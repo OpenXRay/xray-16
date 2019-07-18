@@ -13,6 +13,7 @@
 #include "xrCore/cdecl_cast.hpp"
 #include "xrPhysics/IPHWorld.h"
 #include "PerformanceAlert.hpp"
+#include "TaskScheduler.hpp"
 
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
@@ -135,6 +136,8 @@ void CStats::Show()
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
         Engine.Scheduler.DumpStatistics(font, alertPtr);
+        if (TaskScheduler)
+            TaskScheduler->DumpStatistics(font, alertPtr);
         g_pGamePersistent->DumpStatistics(font, alertPtr);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
@@ -147,6 +150,7 @@ void CStats::Show()
         font.OutSkip();
         pInput->DumpStatistics(font, alertPtr);
         font.OutSkip();
+        font.OutNext("CPU: %u", CPU::GetCurrentCPU());
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
     }
@@ -169,6 +173,13 @@ void CStats::Show()
     }
 #endif
     font.OnRender();
+
+    if (psDeviceFlags.test(rsShowFPS))
+    {
+        const auto fps = u32(Device.GetStats().fFPS);
+        fpsFont->Out(Device.dwWidth - 40, 5, "%3d", fps);
+        fpsFont->OnRender();
+    }
 }
 
 void CStats::OnDeviceCreate()
@@ -176,7 +187,12 @@ void CStats::OnDeviceCreate()
     g_bDisableRedText = !!strstr(Core.Params, "-xclsx");
 
     if (!GEnv.isDedicatedServer)
+    {
         statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
+        fpsFont = new CGameFont("hud_font_di", CGameFont::fsDeviceIndependent);
+        fpsFont->SetHeightI(0.025f);
+        fpsFont->SetColor(color_rgba(250, 250, 15, 180));
+    }
 
 #ifdef DEBUG
     if (!g_bDisableRedText)
@@ -194,6 +210,7 @@ void CStats::OnDeviceDestroy()
 {
     SetLogCB(nullptr);
     xr_delete(statsFont);
+    xr_delete(fpsFont);
 }
 
 void CStats::FilteredLog(const char* s)
@@ -212,7 +229,7 @@ void CStats::OnRender()
         GEnv.Sound->statistic(0, &snd_stat_ext);
         auto _I = snd_stat_ext.items.begin();
         auto _E = snd_stat_ext.items.end();
-        for (; _I != _E; _I++)
+        for (; _I != _E; ++_I)
         {
             const CSound_stats_ext::SItem& item = *_I;
             if (item._3D)

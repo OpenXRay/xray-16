@@ -82,7 +82,7 @@ const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_asse
 {
     T_INIT::InitXmlIdToIndex();
     T_VECTOR::iterator it;
-    for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; it++)
+    for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; ++it)
     {
         if ((*it).id == str_id)
             break;
@@ -91,7 +91,7 @@ const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_asse
     if (it == m_pItemDataVector->end())
     {
         int i = 0;
-        for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; it++, i++)
+        for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; ++it, i++)
             Msg("[%d]=[%s]", i, *(*it).id);
 
         R_ASSERT3(no_assert, "item not found, id", *str_id);
@@ -158,7 +158,7 @@ void CSXML_IdToIndex::InitInternal()
 
             //проверетить ID на уникальность
             T_VECTOR::iterator t_it = m_pItemDataVector->begin();
-            for (; m_pItemDataVector->end() != t_it; t_it++)
+            for (; m_pItemDataVector->end() != t_it; ++t_it)
             {
                 if (shared_str((*t_it).id) == shared_str(item_name))
                     break;

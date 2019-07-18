@@ -19,8 +19,8 @@ public:
     virtual bool IsChangedOptValue() const; // backup!=current
 
     // CUIMultiTextureOwner
-    virtual void InitTexture(LPCSTR texture);
-    virtual void InitTextureEx(LPCSTR texture, LPCSTR shader);
+    virtual bool InitTexture(pcstr texture, bool fatal = true);
+    virtual bool InitTextureEx(pcstr texture, pcstr shader, bool fatal = true);
 
 protected:
     CUIFrameLineWnd* m_frameLine;

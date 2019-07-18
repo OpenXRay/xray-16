@@ -19,13 +19,13 @@ void CEnvelope::ClearAndFree()
 
 void CEnvelope::Clear()
 {
-    for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
+    for (KeyIt k_it = keys.begin(); k_it != keys.end(); ++k_it)
         xr_delete(*k_it);
 }
 
 void CEnvelope::FindNearestKey(float t, KeyIt& min_k, KeyIt& max_k, float eps)
 {
-    for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
+    for (KeyIt k_it = keys.begin(); k_it != keys.end(); ++k_it)
     {
         if (fsimilar((*k_it)->time, t, eps))
         {
@@ -46,7 +46,7 @@ void CEnvelope::FindNearestKey(float t, KeyIt& min_k, KeyIt& max_k, float eps)
 
 KeyIt CEnvelope::FindKey(float t, float eps)
 {
-    for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
+    for (KeyIt k_it = keys.begin(); k_it != keys.end(); ++k_it)
     {
         if (fsimilar((*k_it)->time, t, eps))
             return k_it;
@@ -59,7 +59,7 @@ KeyIt CEnvelope::FindKey(float t, float eps)
 void CEnvelope::InsertKey(float t, float val)
 {
     KeyIt k_it;
-    for (k_it = keys.begin(); k_it != keys.end(); k_it++)
+    for (k_it = keys.begin(); k_it != keys.end(); ++k_it)
     {
         if (fsimilar((*k_it)->time, t, EPS_L))
         {
@@ -82,7 +82,7 @@ void CEnvelope::InsertKey(float t, float val)
 
 void CEnvelope::DeleteKey(float t)
 {
-    for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
+    for (KeyIt k_it = keys.begin(); k_it != keys.end(); ++k_it)
     {
         if (fsimilar((*k_it)->time, t, EPS_L))
         {
@@ -110,18 +110,18 @@ BOOL CEnvelope::ScaleKeys(float from_time, float to_time, float scale_factor, fl
     if (min_k != keys.end() && min_k != max_k)
     {
         if (max_k != keys.end())
-            max_k++;
+            ++max_k;
         float t0 = (*min_k)->time;
         float offset = 0;
         KeyIt it;
-        for (it = min_k + 1; it != max_k; it++)
+        for (it = min_k + 1; it != max_k; ++it)
         {
             float new_time = offset + t0 + ((*it)->time - t0) * scale_factor;
             offset += ((new_time - (*(it - 1))->time) - ((*it)->time - t0));
             t0 = (*it)->time;
             (*it)->time = new_time;
         }
-        for (; it != keys.end(); it++)
+        for (; it != keys.end(); ++it)
         {
             float new_time = offset + (*it)->time;
             offset += ((new_time - (*(it - 1))->time) - ((*it)->time - t0));
@@ -162,7 +162,7 @@ void CEnvelope::Save(IWriter& F)
     F.w_u8((u8)behavior[0]);
     F.w_u8((u8)behavior[1]);
     F.w_u16((u16)keys.size());
-    for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
+    for (KeyIt k_it = keys.begin(); k_it != keys.end(); ++k_it)
         (*k_it)->Save(F);
 }
 
@@ -248,9 +248,9 @@ void CEnvelope::Optimize()
 
     KeyIt it = keys.begin();
     st_Key K = **it;
-    it++;
+    ++it;
     bool equal = true;
-    for (; it != keys.end(); it++)
+    for (; it != keys.end(); ++it)
     {
         if (!(*it)->equal(K))
         {
@@ -263,9 +263,9 @@ void CEnvelope::Optimize()
         KeyVec new_keys;
         new_keys.push_back(new st_Key(*keys.front()));
         new_keys.push_back(new st_Key(*keys.back()));
-        for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
+        for (KeyIt k_it = keys.begin(); k_it != keys.end(); ++k_it)
             xr_delete(*k_it);
         keys.clear();
-        keys = new_keys;
+        keys = std::move(new_keys);
     }
 }

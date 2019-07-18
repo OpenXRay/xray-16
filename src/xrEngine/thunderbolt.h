@@ -47,9 +47,9 @@ struct SThunderboltDesc
 public:
     SThunderboltDesc();
     virtual ~SThunderboltDesc();
-    void load(CInifile& pIni, shared_str const& sect);
-    virtual void create_top_gradient(CInifile& pIni, shared_str const& sect);
-    virtual void create_center_gradient(CInifile& pIni, shared_str const& sect);
+    void load(const CInifile& pIni, shared_str const& sect);
+    virtual void create_top_gradient(const CInifile& pIni, shared_str const& sect);
+    virtual void create_center_gradient(const CInifile& pIni, shared_str const& sect);
 };
 
 struct SThunderboltCollection
@@ -60,7 +60,7 @@ struct SThunderboltCollection
 
     SThunderboltCollection();
     ~SThunderboltCollection();
-    void load(CInifile* pIni, CInifile* thunderbolts, LPCSTR sect);
+    void load(CInifile const* pIni, CInifile const* thunderbolts, pcstr sect);
     SThunderboltDesc* GetRandomDesc()
     {
         VERIFY(palette.size() > 0);
@@ -124,7 +124,7 @@ public:
     void OnFrame(shared_str id, float period, float duration);
     void Render();
 
-    shared_str AppendDef(CEnvironment& environment, CInifile* pIni, CInifile* thunderbolts, LPCSTR sect);
+    shared_str AppendDef(CEnvironment& environment, CInifile const* pIni, CInifile const* thunderbolts, pcstr sect);
 };
 
 #endif // ThunderboltH

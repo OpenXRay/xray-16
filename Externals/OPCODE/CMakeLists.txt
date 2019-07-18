@@ -7,7 +7,6 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
     ${SDL_INCLUDE_DIRS}
     )
 
@@ -17,4 +16,7 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore)
-xr_install(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    GROUP_READ 
+    WORLD_READ )

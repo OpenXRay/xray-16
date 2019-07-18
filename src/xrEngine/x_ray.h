@@ -55,6 +55,7 @@ public:
     void LoadStage();
     void LoadSwitch();
     void LoadDraw();
+    void LoadForceDrop();
     void LoadForceFinish();
 
     void SetLoadStageTitle(pcstr ls_title);
@@ -66,10 +67,11 @@ public:
     virtual ~CApplication();
 
     virtual void OnFrame();
-    void load_draw_internal();
+    void load_draw_internal(bool precaching = false);
 
     void SetLoadingScreen(ILoadingScreen* newScreen);
     void DestroyLoadingScreen();
+    void ShowLoadingScreen(bool show);
 };
 
 extern ENGINE_API CApplication* pApp;

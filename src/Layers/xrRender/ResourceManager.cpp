@@ -55,26 +55,14 @@ IBlender* CResourceManager::_GetBlender(LPCSTR Name)
 
     LPSTR N = LPSTR(Name);
     map_Blender::iterator I = m_blenders.find(N);
-#ifdef _EDITOR
-    if (I == m_blenders.end())
-        return 0;
-#else
-//	TODO: DX10: When all shaders are ready switch to common path
-#if defined(USE_DX10) || defined(USE_DX11)
+
     if (I == m_blenders.end())
     {
-        Msg("DX10: Shader '%s' not found in library.", Name);
-        return 0;
-    }
-#endif
-    if (I == m_blenders.end())
-    {
-        xrDebug::Fatal(DEBUG_INFO, "Shader '%s' not found in library.", Name);
+        Msg("! Shader '%s' not found in library.", Name);
         return nullptr;
     }
-#endif
-    else
-        return I->second;
+    
+    return I->second;
 }
 
 IBlender* CResourceManager::_FindBlender(LPCSTR Name)
@@ -274,16 +262,10 @@ Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR
 {
     if (!GEnv.isDedicatedServer)
     {
-//	TODO: DX10: When all shaders are ready switch to common path
-#if defined(USE_DX10) || defined(USE_DX11)
         IBlender* pBlender = _GetBlender(s_shader ? s_shader : "null");
         if (!pBlender)
             return nullptr;
         return _cpp_Create(pBlender, s_shader, s_textures, s_constants, s_matrices);
-#else //	USE_DX10
-        return _cpp_Create(_GetBlender(s_shader ? s_shader : "null"), s_shader, s_textures, s_constants, s_matrices);
-#endif //	USE_DX10
-        //#else
     }
     return nullptr;
 }
@@ -391,7 +373,7 @@ void CResourceManager::_GetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u
 
     map_Texture::iterator I = m_textures.begin();
     map_Texture::iterator E = m_textures.end();
-    for (; I != E; I++)
+    for (; I != E; ++I)
     {
         u32 m = I->second->flags.MemoryUsage;
         if (strstr(I->first, "lmap"))
@@ -414,7 +396,7 @@ void CResourceManager::_DumpMemoryUsage()
     {
         map_Texture::iterator I = m_textures.begin();
         map_Texture::iterator E = m_textures.end();
-        for (; I != E; I++)
+        for (; I != E; ++I)
         {
             u32 m = I->second->flags.MemoryUsage;
             shared_str n = I->second->cName;
@@ -426,7 +408,7 @@ void CResourceManager::_DumpMemoryUsage()
     {
         xr_multimap<u32, std::pair<u32, shared_str>>::iterator I = mtex.begin();
         xr_multimap<u32, std::pair<u32, shared_str>>::iterator E = mtex.end();
-        for (; I != E; I++)
+        for (; I != E; ++I)
             Msg("* %4.1f : [%4d] %s", float(I->first) / 1024.f, I->second.first, I->second.second.c_str());
     }
 }

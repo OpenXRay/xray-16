@@ -191,7 +191,7 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
         xr_strcpy(pRData->FilterStr, FilterStr);
         pRData->pGSBrowser = this;
         m_bTryingToConnectToMasterServer = true;
-        thread_spawn(RefreshInternetList, "GS Internet Refresh", 0, pRData);
+        Threading::SpawnThread(RefreshInternetList, "GS Internet Refresh", 0, pRData);
         return GSUpdateStatus::ConnectingToMaster;
     }
     SBError error = ServerBrowserLANUpdate(m_pGSBrowser, onUpdate ? SBTrue : SBFalse, START_PORT_LAN, END_PORT_LAN);

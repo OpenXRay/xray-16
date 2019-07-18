@@ -270,6 +270,7 @@ void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
         if (!game_graph().vertex(dest))
         {
             Msg("! There is no game vertices on the level %s, cannot jump to the specified level", start_level_name);
+            xr_delete(graph_engine);
             return;
         }
     }

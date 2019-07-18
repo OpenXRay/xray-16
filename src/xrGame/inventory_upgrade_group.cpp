@@ -28,7 +28,7 @@ void Group::construct(const shared_str& group_id, UpgradeBase& parent_upgrade, M
     VERIFY2(upgrades_str, make_string("in upgrade group <%s> elements are empty!", m_id.c_str()));
 
     u32 const buffer_size = (xr_strlen(upgrades_str) + 1) * sizeof(char);
-    PSTR temp = (PSTR)_alloca(buffer_size);
+    PSTR temp = (PSTR)xr_alloca(buffer_size);
     for (int n = _GetItemCount(upgrades_str), i = 0; i < n; ++i)
     {
         UpgradeBase* upgrade_p =
@@ -50,7 +50,7 @@ void Group::add_parent_upgrade(UpgradeBase& parent_upgrade)
 void Group::log_hierarchy(LPCSTR nest)
 {
     u32 sz = (xr_strlen(nest) + 4) * sizeof(char);
-    PSTR nest2 = (PSTR)_alloca(sz);
+    PSTR nest2 = (PSTR)xr_alloca(sz);
     xr_strcpy(nest2, sz, nest);
     xr_strcat(nest2, sz, "   ");
     Msg("%s(g) %s", nest2, m_id.c_str());

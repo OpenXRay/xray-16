@@ -43,14 +43,24 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
     else
         m_fov_direction.normalize();
 
-    m_danger_fov_direction = parse_fvector(description, "danger_fov_direction");
-    if (m_danger_fov_direction.square_magnitude() < EPS_L)
+    // XXX: check for m_wVersion from CSE_SmartCover
+    Fvector dangerFovDirection;
+    if (parse_fvector(description, "danger_fov_direction", dangerFovDirection))
     {
-        Msg("! danger fov direction for loophole %s is setup incorrectly", m_id.c_str());
-        m_danger_fov_direction.set(0.f, 0.f, 1.f);
+        m_danger_fov_direction = dangerFovDirection;
+        if (m_danger_fov_direction.square_magnitude() < EPS_L)
+        {
+            Msg("! danger fov direction for loophole %s is setup incorrectly", m_id.c_str());
+            m_danger_fov_direction.set(0.f, 0.f, 1.f);
+        }
+        else
+            m_danger_fov_direction.normalize();
     }
     else
-        m_danger_fov_direction.normalize();
+    {
+        Msg("~ missing danger fov direction for loophole %s", m_id.c_str());
+        m_danger_fov_direction.set(0.f, 0.f, 1.f);
+    }
 
     m_enter_direction = parse_fvector(description, "enter_direction");
 
@@ -88,7 +98,12 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
     fill_transitions(transitions);
 
     m_fov = deg2rad(parse_float(description, "fov", 0.f, 360.f));
-    m_danger_fov = deg2rad(parse_float(description, "danger_fov", 0.f, 360.f));
+
+    // XXX: check for m_wVersion from CSE_SmartCover
+    float dangerFov = 0.f;
+    if (parse_float(dangerFov, description, "danger_fov", 0.f, 360.f))
+        m_danger_fov = deg2rad(dangerFov);
+
     m_range = parse_float(description, "range", 0.f);
 }
 

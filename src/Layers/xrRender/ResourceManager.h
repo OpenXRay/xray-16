@@ -101,6 +101,7 @@ public:
     //.	CInifile*											m_textures_description;
     xr_vector<std::pair<shared_str, R_constant_setup*>> v_constant_setup;
     BOOL bDeferredLoad;
+    bool m_shader_fallback_allowed;
     CScriptEngine ScriptEngine;
 
 private:
@@ -178,7 +179,7 @@ public:
     SPS* _CreatePS(LPCSTR Name);
     void _DeletePS(const SPS* PS);
 
-    SVS* _CreateVS(LPCSTR Name);
+    SVS* _CreateVS(cpcstr shader, cpcstr fallbackShader = nullptr);
     void _DeleteVS(const SVS* VS);
 
     SPass* _CreatePass(const SPass& proto);
@@ -213,7 +214,11 @@ public:
     Shader* _lua_Create(LPCSTR s_shader, LPCSTR s_textures);
     BOOL _lua_HasShader(LPCSTR s_shader);
 
-    CResourceManager() : bDeferredLoad(TRUE) {}
+    CResourceManager() : bDeferredLoad(TRUE)
+    {
+        m_shader_fallback_allowed = !!strstr(Core.Params, "-lack_of_shaders");
+    }
+
     ~CResourceManager();
 
     void OnDeviceCreate(IReader* F);
@@ -255,7 +260,7 @@ private:
     T& GetShaderMap();
 
     template <typename T>
-    T* CreateShader(const char* name, const char* filename = nullptr, const bool searchForEntryAndTarget = false);
+    T* CreateShader(cpcstr name, pcstr filename = nullptr, pcstr fallbackShader = nullptr, bool searchForEntryAndTarget = false);
 
     template <typename T>
     bool DestroyShader(const T* sh);

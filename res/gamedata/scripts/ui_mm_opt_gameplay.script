@@ -9,6 +9,7 @@ end
 
 function opt_gameplay:InitControls(x, y, xml, handler)
     local _st
+    local ctl
 
     self.scroll_v = xml:InitScrollView("tab_gameplay:scroll_v", self)
 
@@ -76,6 +77,20 @@ function opt_gameplay:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("tab_gameplay:templ_item", nil)
 	xml:InitStatic("tab_gameplay:cap_check_hud_draw", _st)
 	xml:InitCheck("tab_gameplay:check_hud_draw", _st)
+	self.scroll_v:AddWindow(_st, true)
+
+	_st = xml:InitStatic("tab_gameplay:templ_item", nil)
+	xml:InitStatic("tab_gameplay:cap_check_simplified_item_pickup", _st)
+	ctl = xml:InitCheck("tab_gameplay:check_simplified_item_pickup", _st)
+	handler.check_simple_pickup = ctl
+	handler:Register(ctl, "check_simple_pickup")
+	self.scroll_v:AddWindow(_st, true)
+
+	_st = xml:InitStatic("tab_gameplay:templ_item", nil)
+	xml:InitStatic("tab_gameplay:cap_check_multi_item_pickup", _st)
+	ctl = xml:InitCheck("tab_gameplay:check_multi_item_pickup", _st)
+	handler.check_multi_pickup = ctl
+	handler:Register(ctl, "check_multi_pickup")
 	self.scroll_v:AddWindow(_st, true)
 
 	_st = xml:InitStatic("tab_gameplay:templ_item", nil)

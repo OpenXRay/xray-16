@@ -27,8 +27,11 @@ public:
     virtual void OnStaticFocusLost(CUIWindow* pWnd);
 
     // Добавление кнопки-закладки в список закладок контрола
-    bool AddItem(LPCSTR pItemName, LPCSTR pTexName, Fvector2 pos, Fvector2 size);
+    bool AddItem(cpcstr pItemName, cpcstr pTexName, Fvector2 pos, Fvector2 size);
     bool AddItem(CUITabButton* pButton);
+    void RemoveItemById(const shared_str& id);
+    void RemoveItemById_script(cpcstr id) { RemoveItemById(id); }
+    void RemoveItemByIndex(u32 index);
 
     void RemoveAll();
 
@@ -36,17 +39,27 @@ public:
     virtual void Enable(bool status);
 
     const shared_str& GetActiveId() const { return m_sPushedId; }
-    LPCSTR GetActiveId_script();
+    pcstr GetActiveId_script() const { return GetActiveId().c_str(); }
+    int GetActiveIndex() const;
+
     const shared_str& GetPrevActiveId() { return m_sPrevPushedId; }
+
     void SetActiveTab(const shared_str& sNewTab);
     void SetActiveTab_script(LPCSTR sNewTab) { SetActiveTab(sNewTab); };
+    void SetActiveTabByIndex(u32 index);
+
     const u32 GetTabsCount() const { return m_TabsArr.size(); }
+
     // Режим клавилатурных акселераторов (вкл/выкл)
     IC bool GetAcceleratorsMode() const { return m_bAcceleratorsEnable; }
     void SetAcceleratorsMode(bool bEnable) { m_bAcceleratorsEnable = bEnable; }
+
     TABS_VECTOR* GetButtonsVector() { return &m_TabsArr; }
+
     CUITabButton* GetButtonById(const shared_str& id);
-    CUITabButton* GetButtonById_script(LPCSTR s) { return GetButtonById(s); }
+    CUITabButton* GetButtonById_script(cpcstr s) { return GetButtonById(s); }
+    CUITabButton* GetButtonByIndex(u32 index) const;
+
     void ResetTab();
 
 protected:

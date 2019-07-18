@@ -86,7 +86,7 @@ float evaluate(CEF_Storage* ef_storage, LPCSTR function, CSE_ALifeObject* _0, CS
     if (_0 && !ef_storage->alife().member())
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "object %s is not herited from CSE_ALifeSchedulable!", _1->name_replace());
+            LuaMessageType::Error, "object %s is not herited from CSE_ALifeSchedulable!", _0->name_replace());
         return (0.f);
     }
 

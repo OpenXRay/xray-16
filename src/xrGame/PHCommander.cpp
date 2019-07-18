@@ -48,6 +48,29 @@ void CPHCommander::clear()
         delete_call(it);
 
     m_calls.clear();
+    m_callsUpdateDeferred.clear();
+}
+
+void CPHCommander::UpdateDeferred()
+{
+    for (auto it : m_callsUpdateDeferred)
+    {
+        if (it.second)
+        {
+            m_calls.push_back(it.first);
+        }
+        else
+        {
+            auto callToDeleteIt = std::find(m_calls.begin(), m_calls.end(), it.first);
+            if (callToDeleteIt != m_calls.end())
+            {
+                delete_call(*callToDeleteIt);
+                m_calls.erase(callToDeleteIt);
+            }
+        }
+    }
+
+    m_callsUpdateDeferred.clear();
 }
 
 void CPHCommander::update()
@@ -91,6 +114,11 @@ void CPHCommander::add_call_threadsafety(CPHCondition* condition, CPHAction* act
 void CPHCommander::add_call(CPHCondition* condition, CPHAction* action)
 {
     m_calls.push_back(new CPHCall(condition, action));
+}
+
+void CPHCommander::AddCallDeferred(CPHCondition* condition, CPHAction* action)
+{
+    m_callsUpdateDeferred.insert({new CPHCall(condition, action), true});
 }
 
 struct SFEqualPred
@@ -175,6 +203,17 @@ void CPHCommander::remove_calls_threadsafety(CPHReqComparerV* cmp_object)
 void CPHCommander::remove_calls(CPHReqComparerV* cmp_object)
 {
     m_calls.erase(std::remove_if(m_calls.begin(), m_calls.end(), SRemovePred1(cmp_object)), m_calls.end());
+}
+
+void CPHCommander::RemoveCallsDeferred(CPHReqComparerV* comparer)
+{
+    for (const auto& call : m_calls)
+    {
+        if (call->is_any(comparer))
+        {
+            m_callsUpdateDeferred.insert({call, false});
+        }
+    }
 }
 
 void CPHCommander::phys_shell_relcase(CPhysicsShell* sh)

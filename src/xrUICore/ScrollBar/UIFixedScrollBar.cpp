@@ -15,22 +15,23 @@ CUIFixedScrollBar::CUIFixedScrollBar()
 }
 
 CUIFixedScrollBar::~CUIFixedScrollBar(void) {}
-void CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, LPCSTR profile)
+bool CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, cpcstr profile)
 {
     string256 _path;
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scroll_bar.xml");
 
-    float width = xml_doc.ReadAttribFlt(profile, 0, "width", 17.0f);
-    float height = xml_doc.ReadAttribFlt(profile, 0, "height", 17.0f);
-    float width_v = xml_doc.ReadAttribFlt(profile, 0, "width_v", 17.0f);
-    float height_v = xml_doc.ReadAttribFlt(profile, 0, "height_v", 17.0f);
+    const float width = xml_doc.ReadAttribFlt(profile, 0, "width", 17.0f);
+    const float height = xml_doc.ReadAttribFlt(profile, 0, "height", 17.0f);
+    const float width_v = xml_doc.ReadAttribFlt(profile, 0, "width_v", 17.0f);
+    const float height_v = xml_doc.ReadAttribFlt(profile, 0, "height_v", 17.0f);
     m_hold_delay = xml_doc.ReadAttribFlt(profile, 0, "hold_delay", 50.0f);
     m_ScrollBoxOffset.x = xml_doc.ReadAttribInt(profile, 0, "scroll_box_offset_x", 0);
     m_ScrollBoxOffset.y = xml_doc.ReadAttribInt(profile, 0, "scroll_box_offset_y", 0);
 
     inherited::SetWndPos(pos);
     m_bIsHorizontal = horizontal;
+
     if (m_bIsHorizontal)
     {
         inherited::SetWndSize(Fvector2().set(width, height));
@@ -45,7 +46,8 @@ void CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, LPCSTR prof
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_ScrollBox);
 
         strconcat(sizeof(_path), _path, profile, ":back");
-        CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_FrameBackground);
+        if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_FrameBackground, false))
+            return false;
 
         m_ScrollWorkArea = _max(0, iFloor(GetWidth() - 2 * height));
     }
@@ -63,11 +65,14 @@ void CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, LPCSTR prof
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_ScrollBox);
 
         strconcat(sizeof(_path), _path, profile, ":back_v");
-        CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_FrameBackground);
+        if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_FrameBackground, false))
+            return false;
 
         m_ScrollWorkArea = _max(0, iFloor(GetHeight() - 2 * width_v));
     }
+
     UpdateScrollBar();
+    return true;
 }
 void CUIFixedScrollBar::UpdateScrollBar()
 {

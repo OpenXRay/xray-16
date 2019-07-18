@@ -140,7 +140,9 @@ void CVisualMemoryManager::reinit()
 
 void CVisualMemoryManager::reload(LPCSTR section)
 {
-    //	m_max_object_count			= READ_IF_EXISTS(pSettings,r_s32,section,"DynamicObjectsCount",1);
+    const s32 maxObjectCount = pSettings->read_if_exists<s32>(section, "DynamicObjectsCount", -1);
+    if (maxObjectCount > -1)
+        m_max_object_count = std::max<u32>(maxObjectCount, m_max_object_count);
 
     if (m_stalker)
     {
@@ -149,8 +151,8 @@ void CVisualMemoryManager::reload(LPCSTR section)
     }
     else if (m_object)
     {
-        m_free.Load(pSettings->r_string(section, "vision_free_section"), !!m_client);
-        m_danger.Load(pSettings->r_string(section, "vision_danger_section"), !!m_client);
+        m_free.Load(READ_IF_EXISTS(pSettings, r_string, section, "vision_free_section", section), !!m_client);
+        m_danger.Load(READ_IF_EXISTS(pSettings, r_string, section, "vision_free_section", section), !!m_client);
     }
     else
     {

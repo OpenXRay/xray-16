@@ -15,6 +15,7 @@
 
 #include "Include/xrRender/UIRender.h"
 #include "Include/xrRender/Kinematics.h"
+#include "xrEngine/TaskScheduler.hpp"
 
 #ifdef DEBUG
 #include "debug_renderer.h"
@@ -89,11 +90,11 @@ CBulletManager::CBulletManager()
 #if 0 // def CONFIG_PROFILE_LOCKS
     : m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
-        ,m_thread_id(GetCurrentThreadId())
+        ,m_thread_id(Threading::GetCurrThreadId())
 #endif // #ifdef DEBUG
 #else // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-    : m_thread_id(GetCurrentThreadId())
+    : m_thread_id(Threading::GetCurrThreadId())
 #endif // #ifdef DEBUG
 #endif // #ifdef CONFIG_PROFILE_LOCKS
 {
@@ -186,7 +187,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     // Always called in Primary thread
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
-    VERIFY(m_thread_id == GetCurrentThreadId());
+    VERIFY(m_thread_id == Threading::GetCurrThreadId());
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
@@ -209,7 +210,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 
 void CBulletManager::UpdateWorkload()
 {
-    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == GetCurrentThreadId());
+    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == Threading::GetCurrThreadId());
 
     rq_storage.r_clear();
 
@@ -846,7 +847,7 @@ void CBulletManager::Render()
 
     GEnv.UIRender->StartPrimitive((u32)bullet_num * 12, IUIRender::ptTriList, IUIRender::pttLIT);
 
-    for (auto it = m_BulletsRendered.begin(); it != m_BulletsRendered.end(); it++)
+    for (auto it = m_BulletsRendered.begin(); it != m_BulletsRendered.end(); ++it)
     {
         SBullet* bullet = &(*it);
         if (!bullet->flags.allow_tracer)
@@ -906,7 +907,18 @@ void CBulletManager::CommitRenderSet() // @ the end of frame
     m_BulletsRendered = m_Bullets;
     if (g_mt_config.test(mtBullets))
     {
-        Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CBulletManager::UpdateWorkload));
+        if (true)
+        {
+            Device.seqParallel.push_back(
+                fastdelegate::FastDelegate0<>(this, &CBulletManager::UpdateWorkload));
+
+        }
+        else
+        {
+            TaskScheduler->AddTask("CBulletManager::UpdateWorkload", Task::Type::Game,
+                { this, &CBulletManager::UpdateWorkload },
+                { &Device, &CRenderDevice::IsMTProcessingAllowed });
+        }
     }
     else
     {

@@ -232,7 +232,7 @@ void CBackend::set_Textures(STextureList* _T)
     STextureList::iterator _it = _T->begin();
     STextureList::iterator _end = _T->end();
 
-    for (; _it != _end; _it++)
+    for (; _it != _end; ++_it)
     {
         std::pair<u32, ref_texture>& loader = *_it;
         u32 load_id = loader.first;
@@ -395,6 +395,7 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + _last_ps));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #elif defined(USE_DX10) || defined(USE_DX11)
         // TODO: DX10: Optimise: set all resources at once
@@ -415,6 +416,7 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + CTexture::rstVertex + _last_vs));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #elif defined(USE_DX10) || defined(USE_DX11)
         // TODO: DX10: Optimise: set all resources at once

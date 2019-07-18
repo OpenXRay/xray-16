@@ -42,6 +42,13 @@ void CActor::AddGameNews(GAME_NEWS_DATA& news_data)
     }
 }
 
+void CActor::ClearGameNews()
+{
+    GAME_NEWS_VECTOR& news_vector = game_news_registry->registry().objects();
+    news_vector.clear();
+    m_defferedMessages.clear();
+}
+
 bool CActor::OnReceiveInfo(shared_str info_id) const
 {
     if (!CInventoryOwner::OnReceiveInfo(info_id))

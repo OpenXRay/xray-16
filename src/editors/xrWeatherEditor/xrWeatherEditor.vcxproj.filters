@@ -762,4 +762,7 @@
     <EmbeddedResource Include="window_weather.resx" />
     <EmbeddedResource Include="window_weather_editor.resx" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

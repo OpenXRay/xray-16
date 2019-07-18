@@ -12,7 +12,11 @@ Texture2DMS	s_vollight;
 _out _main( _input I )
 {
 	// final tone-mapping
-	float          	tm_scale        = I.tc0.w;	// interpolated from VS
+#ifdef USE_VTF
+	float	tm_scale	= I.tc0.w;	// interpolated from VS
+#else // USE_VTF
+	float	tm_scale	= tex2D(s_tonemap, I.tc0).x;
+#endif // USE_VTF
 
 	_out	o;
 	float4	color;
@@ -28,7 +32,7 @@ _out _main( _input I )
 	color /= MSAA_SAMPLES;
 #endif // USE_MSAA
 
-	tonemap(o.low, o.high, color.rgb, tm_scale );
+	tonemap(o.low, o.high, color.rgb, tm_scale);
 
 	return o;
 }

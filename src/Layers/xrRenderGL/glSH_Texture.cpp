@@ -211,7 +211,7 @@ void CTexture::Load()
             GLenum err = glGetError();
             if (err != GL_NO_ERROR)
             {
-                FATAL_F("Invalid video stream: 0x%x", err);
+                Msg("Invalid video stream: 0x%x", err);
                 xr_delete(pTheora);
                 pSurface = 0;
             }

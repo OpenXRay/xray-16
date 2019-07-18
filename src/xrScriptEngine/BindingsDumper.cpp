@@ -264,7 +264,7 @@ void BindingsDumper::PrintClass()
     // print static members (static functions + nested classes)
     crep->get_default_table(ls);
     object staticMembers(from_stack(ls, -1));
-    for (luabind::iterator it(staticMembers), end; it != end; it++)
+    for (luabind::iterator it(staticMembers), end; it != end; ++it)
     {
         auto proxy = *it;
         int prev = lua_gettop(ls);
@@ -284,7 +284,7 @@ void BindingsDumper::PrintClass()
     // print functions and properties
     crep->get_table(ls);
     object members(from_stack(ls, -1));
-    for (luabind::iterator it(members), end; it != end; it++)
+    for (luabind::iterator it(members), end; it != end; ++it)
     {
         auto proxy = *it;
         int prev = lua_gettop(ls);
@@ -305,7 +305,7 @@ void BindingsDumper::PrintNamespace(luabind::object& namesp)
     using namespace luabind;
     using namespace luabind::detail;
     int scopeFunctions = 0, scopeClasses = 0, scopeNamespaces = 0;
-    for (luabind::iterator it(namesp), end; it != end; it++)
+    for (luabind::iterator it(namesp), end; it != end; ++it)
     {
         auto proxy = *it;
         int ltype = luabind::type(proxy);

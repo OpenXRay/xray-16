@@ -127,7 +127,7 @@ void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
     {
         g_player_hud->attach_item(this);
         m_sounds.PlaySound("sndShow", Fvector().set(0, 0, 0), this, true, false);
-        PlayHUDMotion(m_bFastAnimMode ? "anm_show_fast" : "anm_show", FALSE /*TRUE*/, this, GetState());
+        PlayHUDMotion(m_bFastAnimMode ? "anm_show_fast" : "anm_show", "anim_show", FALSE /*TRUE*/, this, GetState());
         SetPending(TRUE);
     }
     break;
@@ -136,7 +136,7 @@ void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
         if (oldState != eHiding)
         {
             m_sounds.PlaySound("sndHide", Fvector().set(0, 0, 0), this, true, false);
-            PlayHUDMotion(m_bFastAnimMode ? "anm_hide_fast" : "anm_hide", FALSE/*TRUE*/, this, GetState());
+            PlayHUDMotion(m_bFastAnimMode ? "anm_hide_fast" : "anm_hide", "anim_show", FALSE/*TRUE*/, this, GetState());
             SetPending(TRUE);
         }
     }
@@ -197,10 +197,11 @@ BOOL CCustomDetector::net_Spawn(CSE_Abstract* DC)
 
 void CCustomDetector::Load(LPCSTR section)
 {
+    m_animation_slot = 7;
     inherited::Load(section);
 
-    m_fAfDetectRadius = pSettings->r_float(section, "af_radius");
-    m_fAfVisRadius = pSettings->r_float(section, "af_vis_radius");
+    m_fAfDetectRadius = pSettings->read_if_exists<float>(section, "af_radius", 30.0f);
+    m_fAfVisRadius = pSettings->read_if_exists<float>(section, "af_vis_radius", 2.0f);
     m_fDecayRate = READ_IF_EXISTS(pSettings, r_float, section, "decay_rate", 0.f); //Alundaio
     m_artefacts.load(section, "af");
 

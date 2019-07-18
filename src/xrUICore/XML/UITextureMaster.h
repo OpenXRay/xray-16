@@ -9,6 +9,7 @@
 
 #pragma once
 
+class CUIXml;
 class CUIStaticItem;
 #include "xrUICore/ui_defs.h"
 
@@ -38,18 +39,25 @@ class XRUICORE_API CUITextureMaster
 public:
     static void ParseShTexInfo(pcstr xml_file);
     static void ParseShTexInfo(pcstr path, pcstr xml_file);
+    static void ParseShTexInfo(CUIXml& xml, bool override); 
     static void FreeTexInfo();
     static void FreeCachedShaders();
 
-    static void InitTexture(
+    static bool InitTexture(
         const shared_str& texture_name, CUIStaticItem* tc, const shared_str& shader_name = "hud" DELIMITER "default");
-    static void InitTexture(
+    static bool InitTexture(
         const shared_str& texture_name, const shared_str& shader_name, ui_shader& out_shader, Frect& out_rect);
     static float GetTextureHeight(const shared_str& texture_name);
     static float GetTextureWidth(const shared_str& texture_name);
+    static bool GetTextureHeight(const shared_str& texture_name, float& outValue);
+    static bool GetTextureWidth(const shared_str& texture_name, float& outValue);
     static Frect GetTextureRect(const shared_str& texture_name);
+    static pcstr GetTextureFileName(pcstr texture_name);
     static void GetTextureShader(const shared_str& texture_name, ui_shader& sh);
-    static TEX_INFO FindItem(const shared_str& texture_name);
+    static TEX_INFO FindItem(const shared_str& texture_name, pcstr default_texture = nullptr);
+    static bool FindItem(const shared_str& texture_name, TEX_INFO& outValue);
+    static bool FindItem(const shared_str& texture_name, pcstr default_texture, TEX_INFO& outValue);
+    static bool ItemExist(const shared_str& texture_name);
 
 protected:
     IC static bool IsSh(const shared_str& texture_name);

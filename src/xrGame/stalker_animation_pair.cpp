@@ -282,7 +282,7 @@ void CStalkerAnimationPair::on_animation_end()
 
     u32 callback_count = m_callbacks.size();
     typedef buffer_vector<CALLBACK_ID> Callbacks;
-    Callbacks callbacks(_alloca(callback_count * sizeof(Callbacks::value_type)), callback_count, m_callbacks.begin(),
+    Callbacks callbacks(xr_alloca(callback_count * sizeof(Callbacks::value_type)), callback_count, m_callbacks.begin(),
         m_callbacks.end());
     Callbacks::const_iterator i = callbacks.begin();
     Callbacks::const_iterator e = callbacks.end();

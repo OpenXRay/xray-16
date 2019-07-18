@@ -7,11 +7,13 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
+#include "xrEngine/TaskScheduler.hpp"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
+#include "Layers/xrRenderGL/glBufferPool.h"
 
 CRender RImplementation;
 
@@ -242,7 +244,9 @@ void CRender::create()
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
     o.sunstatic = r2_sun_static;
     o.advancedpp = r2_advanced_pp;
-    o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
+    // XXX: temporary disabled, need to fix it
+    //o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
+    o.volumetricfog = FALSE;
     o.sjitter = strstr(Core.Params, "-sjitter") ? TRUE : FALSE;
     o.depth16 = strstr(Core.Params, "-depth16") ? TRUE : FALSE;
     o.noshadows = strstr(Core.Params, "-noshadows") ? TRUE : FALSE;
@@ -256,8 +260,11 @@ void CRender::create()
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && ps_r_ssao != 0;
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && ps_r_ssao != 0;
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && ps_r_ssao != 0;
-    o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && ps_r_ssao != 0;
-    o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && ps_r_ssao != 0;
+    // XXX: temporary disabled, need to fix it
+    //o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && ps_r_ssao != 0;
+    //o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && ps_r_ssao != 0;
+    o.ssao_hdao = FALSE;
+    o.ssao_hbao = FALSE;
 
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
     o.hbao_vectorized = false;
@@ -273,8 +280,11 @@ void CRender::create()
     o.dx10_sm4_1 = true;
 
     //	MSAA option dependencies
-    o.dx10_msaa = !!ps_r3_msaa;
-    o.dx10_msaa_samples = 1 << ps_r3_msaa;
+    // XXX: temporary disabled, need to fix it
+    //o.dx10_msaa = !!ps_r3_msaa;
+    //o.dx10_msaa_samples = 1 << ps_r3_msaa;
+    o.dx10_msaa = FALSE;
+    o.dx10_msaa_samples = 0;
 
     o.dx10_msaa_opt = o.dx10_msaa;
 
@@ -304,7 +314,9 @@ void CRender::create()
         }
     }
 
-    o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
+    // XXX: temporary disabled, need to fix it
+    //o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
+    o.dx10_gbuffer_opt = FALSE;
 
     o.dx10_minmax_sm = ps_r3_minmax_sm;
     o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
@@ -446,23 +458,41 @@ void CRender::OnFrame()
             fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
     }
 }*/
+
+void CRender::BeforeFrame()
+{
+    // MT-HOM (@front)
+    TaskScheduler->AddTask("CHOM::MT_RENDER", Task::Type::Renderer,
+        { &HOM, &CHOM::MT_RENDER },
+        { &Device, &CRenderDevice::IsMTProcessingAllowed });
+}
+
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         // MT-details (@front)
-        Device.seqParallel.insert(Device.seqParallel.begin(),
-                                  fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
-
-        // MT-HOM (@front)
-        Device.seqParallel.insert(Device.seqParallel.begin(),
-                                  fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
+        TaskScheduler->AddTask("CDetailManager::MT_CALC", Task::Type::Renderer,
+            { Details, &CDetailManager::MT_CALC },
+            { &Device, &CRenderDevice::IsMTProcessingAllowed });
     }
 }
 
 void CRender::BeforeWorldRender() {}
 void CRender::AfterWorldRender() {}
+
+void CRender::MakeContextCurrent(bool acquire)
+{
+    int result;
+    if (acquire)
+        result = SDL_GL_MakeCurrent(HW.m_hWnd, HW.m_hRC);
+    else
+        result = SDL_GL_MakeCurrent(nullptr, nullptr);
+#ifdef WINDOWS // FIXME: find out why Linux always fails.. But works.
+    R_ASSERT2(result == 0, "Failed to switch OpenGL context");
+#endif
+}
 
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
@@ -552,7 +582,7 @@ D3DVERTEXELEMENT9* CRender::getVB_Format(int id, BOOL _alt)
     return nDC[id].begin();
 }
 
-GLuint CRender::getVB(int id, BOOL _alt)
+IGLVertexBuffer* CRender::getVB(int id, BOOL _alt)
 {
     if (_alt)
     {
@@ -563,7 +593,7 @@ GLuint CRender::getVB(int id, BOOL _alt)
     return nVB[id];
 }
 
-GLuint CRender::getIB(int id, BOOL _alt)
+IGLIndexBuffer* CRender::getIB(int id, BOOL _alt)
 {
     if (_alt)
     {

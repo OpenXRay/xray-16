@@ -67,7 +67,7 @@ void IGame_Level::net_Stop()
 
 //-------------------------------------------------------------------------------------------
 // extern CStatTimer tscreate;
-void __stdcall _sound_event(ref_sound_data_ptr S, float range)
+void __stdcall _sound_event(const ref_sound_data_ptr& S, float range)
 {
     if (g_pGameLevel && S && S->feedback)
         g_pGameLevel->SoundEvent_Register(S, range);

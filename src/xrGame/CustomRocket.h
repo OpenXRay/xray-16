@@ -48,7 +48,6 @@ public:
 
     virtual BOOL UsedAI_Locations() { return (FALSE); }
     virtual bool Useful() const { return (m_eState == eInactive); }
-    virtual void renderable_Render() { inherited::renderable_Render(); }
     //создание физической оболочки
     virtual void activate_physic_shell();
     virtual void create_physic_shell();

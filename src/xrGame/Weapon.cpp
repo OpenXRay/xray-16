@@ -346,38 +346,39 @@ void CWeapon::Load(LPCSTR section)
         zoom_cam_recoil.DispersionFrac = _abs(pSettings->r_float(section, "zoom_cam_dispersion_frac"));
     }
 
-    m_pdm.m_fPDM_disp_base = pSettings->r_float(section, "PDM_disp_base");
-    m_pdm.m_fPDM_disp_vel_factor = pSettings->r_float(section, "PDM_disp_vel_factor");
-    m_pdm.m_fPDM_disp_accel_factor = pSettings->r_float(section, "PDM_disp_accel_factor");
-    m_pdm.m_fPDM_disp_crouch = pSettings->r_float(section, "PDM_disp_crouch");
-    m_pdm.m_fPDM_disp_crouch_no_acc = pSettings->r_float(section, "PDM_disp_crouch_no_acc");
+    m_pdm.m_fPDM_disp_base = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_base", 1.0f);
+    m_pdm.m_fPDM_disp_vel_factor = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_vel_factor", 1.0f);
+    m_pdm.m_fPDM_disp_accel_factor = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_accel_factor", 1.0f);
+    m_pdm.m_fPDM_disp_crouch = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_crouch", 1.0f);
+    m_pdm.m_fPDM_disp_crouch_no_acc = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_crouch_no_acc", 1.0f);
+
     m_crosshair_inertion = READ_IF_EXISTS(pSettings, r_float, section, "crosshair_inertion", 5.91f);
     m_first_bullet_controller.load(section);
     fireDispersionConditionFactor = pSettings->r_float(section, "fire_dispersion_condition_factor");
 
     // modified by Peacemaker [17.10.08]
-    //	misfireProbability			  = pSettings->r_float(section,"misfire_probability");
-    //	misfireConditionK			  = READ_IF_EXISTS(pSettings, r_float, section, "misfire_condition_k",	1.0f);
-    misfireStartCondition = pSettings->r_float(section, "misfire_start_condition");
-    misfireEndCondition = READ_IF_EXISTS(pSettings, r_float, section, "misfire_end_condition", 0.f);
-    misfireStartProbability = READ_IF_EXISTS(pSettings, r_float, section, "misfire_start_prob", 0.f);
-    misfireEndProbability = pSettings->r_float(section, "misfire_end_prob");
+    const float misfireProbability = pSettings->read_if_exists<float>(section, "misfire_probability", 0.001f);
+    const float misfireConditionK = pSettings->read_if_exists<float>(section, "misfire_condition_k", 1.0f);
+
+    misfireStartCondition = pSettings->read_if_exists<float>(section, "misfire_start_condition", 0.95f);
+    misfireEndCondition = pSettings->read_if_exists<float>(section, "misfire_end_condition", 0.f);
+
+    misfireStartProbability = pSettings->read_if_exists<float>(section, "misfire_start_prob",
+        misfireProbability + powf(1.f - misfireStartCondition, 3.f) * misfireConditionK);
+    misfireEndProbability = pSettings->read_if_exists<float>(section, "misfire_end_prob",
+        misfireProbability + powf(1.f - misfireEndCondition, 3.f) * misfireConditionK);
+
     conditionDecreasePerShot = pSettings->r_float(section, "condition_shot_dec");
-    conditionDecreasePerQueueShot =
-        READ_IF_EXISTS(pSettings, r_float, section, "condition_queue_shot_dec", conditionDecreasePerShot);
+    conditionDecreasePerQueueShot = pSettings->read_if_exists<float>(section, "condition_queue_shot_dec", conditionDecreasePerShot);
 
     vLoadedFirePoint = pSettings->r_fvector3(section, "fire_point");
-
-    if (pSettings->line_exist(section, "fire_point2"))
-        vLoadedFirePoint2 = pSettings->r_fvector3(section, "fire_point2");
-    else
-        vLoadedFirePoint2 = vLoadedFirePoint;
+    vLoadedFirePoint2 = pSettings->read_if_exists<Fvector3>(section, "fire_point2", vLoadedFirePoint);
 
     // hands
     eHandDependence = EHandDependence(pSettings->r_s32(section, "hand_dependence"));
-    m_bIsSingleHanded = true;
-    if (pSettings->line_exist(section, "single_handed"))
-        m_bIsSingleHanded = !!pSettings->r_bool(section, "single_handed");
+
+    m_bIsSingleHanded = pSettings->read_if_exists<bool>(section, "single_handed", true);
+
     //
     m_fMinRadius = pSettings->r_float(section, "min_radius");
     m_fMaxRadius = pSettings->r_float(section, "max_radius");
@@ -388,7 +389,7 @@ void CWeapon::Load(LPCSTR section)
     m_eGrenadeLauncherStatus = (ALife::EWeaponAddonStatus)pSettings->r_s32(section, "grenade_launcher_status");
 
     m_zoom_params.m_bZoomEnabled = !!pSettings->r_bool(section, "zoom_enabled");
-    m_zoom_params.m_fZoomRotateTime = pSettings->r_float(section, "zoom_rotate_time");
+    m_zoom_params.m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, section, "zoom_rotate_time", ROTATION_TIME);
 
     if (m_eScopeStatus == ALife::eAddonAttachable)
     {
@@ -409,9 +410,9 @@ void CWeapon::Load(LPCSTR section)
     }
     else if (m_eScopeStatus == ALife::eAddonPermanent)
     {
-        shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
-        if (!GEnv.isDedicatedServer)
+        // Xottab_DUTY: Let others can launch SOC without debugger
+        if (!GEnv.isDedicatedServer && !ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
         {
             m_UIScope = new CUIWindow();
             if (!pWpnScopeXml)
@@ -419,6 +420,7 @@ void CWeapon::Load(LPCSTR section)
                 pWpnScopeXml = new CUIXml();
                 pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
             }
+            shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
             CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
         }
     }

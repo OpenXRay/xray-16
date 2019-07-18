@@ -199,6 +199,7 @@ SCRIPT_EXPORT(fs_registrator, (), {
             .def("GetAt", &FS_file_list::GetAt)
             .def("Free", &FS_file_list::Free),
 
+        // XXX: uncomment
         /*		class_<FS_Path>("FS_Path")
                     .def_readonly("m_Path",						&FS_Path::m_Path)
                     .def_readonly("m_Root",						&FS_Path::m_Root)
@@ -231,7 +232,8 @@ SCRIPT_EXPORT(fs_registrator, (), {
                 value("FSType_External", int(FSType::External)), value("FSType_Any", int(FSType::Any))]
             .def("path_exist", &CLocatorAPI::path_exist)
             .def("update_path", &update_path_script)
-            .def("get_path", &CLocatorAPI::get_path)
+            .def("get_path", static_cast<FS_Path*(CLocatorAPI::*)(pcstr)>(&CLocatorAPI::get_path))
+            .def("get_path", static_cast<bool(CLocatorAPI::*)(pcstr, FS_Path**)>(&CLocatorAPI::get_path))
             .def("append_path", &CLocatorAPI::append_path)
             .def("rescan_path", &rescan_path_script) //Alundaio
 

@@ -245,7 +245,7 @@ void CDetailManager::cache_Decompress(Slot* S)
 
 // Angles and scale
 #ifndef DBG_SWITCHOFF_RANDOMIZE
-            Item.scale = r_scale.randF(Dobj->m_fMinScale * 0.5f, Dobj->m_fMaxScale * 0.9f);
+            Item.scale = r_scale.randF(Dobj->m_fMinScale * 0.5f, Dobj->m_fMaxScale * 0.9f) * ps_current_detail_height;
 #else
             Item.scale = (Dobj->m_fMinScale * 0.5f + Dobj->m_fMaxScale * 0.9f) / 2;
 // Item.scale	= 0.1f;

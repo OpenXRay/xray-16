@@ -34,8 +34,8 @@ public:
     void save(CInifile& config);
     void fill(::editor::environment::manager& environment, XRay::Editor::property_holder_collection* collection);
     inline pcstr id() const { return m_id.c_str(); }
-    virtual void create_top_gradient(CInifile& pIni, shared_str const& sect);
-    virtual void create_center_gradient(CInifile& pIni, shared_str const& sect);
+    virtual void create_top_gradient(const CInifile& pIni, shared_str const& sect);
+    virtual void create_center_gradient(const CInifile& pIni, shared_str const& sect);
 
 private:
     pcstr xr_stdcall id_getter() const;

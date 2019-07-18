@@ -418,7 +418,7 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 #endif // DEBUG
 
 #if 0 //def DEBUG
-    BYTE* src_back = (BYTE*)_alloca(count);
+    BYTE* src_back = (BYTE*)xr_alloca(count);
     Decompress(src_back, count, dest, compressed_size);
     BYTE* I = src_back;
     BYTE* E = src_back + count;

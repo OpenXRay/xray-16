@@ -344,7 +344,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (is_binded(kUSE, dik) || is_binded(kQUIT, dik))
+        if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik))
         {
             if (!b_disable_break)
             {
@@ -352,7 +352,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 return true;
             }
         }
-        else if (is_binded(kSPRINT_TOGGLE, dik))
+        else if (IsBinded(kSPRINT_TOGGLE, dik))
         {
             if (UITalkDialogWnd->mechanic_mode)
                 SwitchToUpgrade();
@@ -415,6 +415,11 @@ void CUITalkWnd::StopSnd()
 void CUITalkWnd::AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
 {
     UITalkDialogWnd->AddIconedAnswer(caption, text, texture_name, templ_name);
+}
+
+void CUITalkWnd::AddIconedMessage(cpcstr text, cpcstr texture_name, Frect texture_rect, cpcstr templ_name)
+{
+    UITalkDialogWnd->AddIconedAnswer(text, texture_name, texture_rect, templ_name);
 }
 
 void CUITalkWnd::StopTalk() { HideDialog(); }

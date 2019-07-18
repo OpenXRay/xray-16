@@ -78,7 +78,6 @@ bool CExplosiveItem::shedule_Needed()
     return (inherited::shedule_Needed() || CDelayedActionFuse::isActive());
 }
 
-void CExplosiveItem::renderable_Render() { inherited::renderable_Render(); }
 void CExplosiveItem::net_Relcase(IGameObject* O)
 {
     CExplosive::net_Relcase(O);

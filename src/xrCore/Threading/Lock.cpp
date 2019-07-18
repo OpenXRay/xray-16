@@ -70,7 +70,7 @@ Lock::~Lock() { delete impl; }
 void Lock::Enter()
 {
     impl->Lock();
-    lockCounter++;
+    ++lockCounter;
 }
 #endif // CONFIG_PROFILE_LOCKS
 

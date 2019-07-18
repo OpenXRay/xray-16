@@ -4,15 +4,15 @@
 #include <fcntl.h>
 #endif
 
-void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
+void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
 {
 #if defined(WINDOWS)
-    m_file_handle = CreateFile(file_name, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+    m_file_handle = CreateFile(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 
     VERIFY(m_file_handle != INVALID_HANDLE_VALUE);
-    u32 file_size = (u32)GetFileSize(m_file_handle, NULL);
-
-    HANDLE file_mapping_handle = CreateFileMapping(m_file_handle, 0, PAGE_READONLY, 0, 0, 0);
+    const auto file_size = static_cast<size_t>(GetFileSize(m_file_handle, nullptr));
+    
+    const auto file_mapping_handle = CreateFileMapping(m_file_handle, nullptr, PAGE_READONLY, 0, 0, nullptr);
     VERIFY(file_mapping_handle != INVALID_HANDLE_VALUE);
 
     inherited::construct(file_mapping_handle, 0, file_size, file_size, window_size);
@@ -24,7 +24,7 @@ void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
     VERIFY(m_file_handle != -1);
     struct stat file_info;
     ::fstat(m_file_handle, &file_info);
-    u32 file_size = (u32)file_info.st_size;
+    size_t file_size = (size_t)file_info.st_size;
     inherited::construct(m_file_handle, 0, file_size, file_size, window_size);
 #endif
 }
@@ -32,7 +32,7 @@ void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
 void CFileStreamReader::destroy()
 {
 #if defined(WINDOWS)
-    HANDLE file_mapping_handle = this->file_mapping_handle();
+    const auto file_mapping_handle = this->file_mapping_handle();
     inherited::destroy();
     CloseHandle(file_mapping_handle);
     CloseHandle(m_file_handle);

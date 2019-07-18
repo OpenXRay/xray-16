@@ -73,6 +73,7 @@ class CPHCommander : public IPHWorldUpdateCallbck
 {
     Lock lock;
     PHCALL_STORAGE m_calls;
+    xr_unordered_map<CPHCall*, bool> m_callsUpdateDeferred;
 
 public:
     ~CPHCommander();
@@ -82,13 +83,16 @@ public:
         CPHCondition* condition, CPHReqComparerV* cmp_condition, CPHAction* action, CPHReqComparerV* cmp_action);
     void add_call(CPHCondition* condition, CPHAction* action);
     void add_call_threadsafety(CPHCondition* condition, CPHAction* action);
+    void AddCallDeferred(CPHCondition* condition, CPHAction* action);
 
     bool has_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
     PHCALL_I find_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
     void remove_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
     void remove_calls(CPHReqComparerV* cmp_object);
     void remove_calls_threadsafety(CPHReqComparerV* cmp_object);
+    void RemoveCallsDeferred(CPHReqComparerV* comparer);
 
+    void UpdateDeferred();
     void update();
     void update_threadsafety();
     

@@ -127,7 +127,7 @@ void CActor::PickupModeUpdate()
     //подбирание объекта
     if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
         m_pObjectWeLookingAt->cast_inventory_item()->Useful() && m_pUsableObject &&
-        !m_pUsableObject->nonscript_usable() && !Level().m_feel_deny.is_object_denied(m_pObjectWeLookingAt))
+        m_pUsableObject->nonscript_usable() && !Level().m_feel_deny.is_object_denied(m_pObjectWeLookingAt))
     {
         m_pUsableObject->use(this);
         Game().SendPickUpEvent(ID(), m_pObjectWeLookingAt->ID());
@@ -138,7 +138,7 @@ void CActor::PickupModeUpdate()
     CFrustum frustum;
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    for (xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
+    for (xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); ++it)
     {
         if (CanPickItem(frustum, Device.vCameraPosition, *it))
             PickupInfoDraw(*it);
@@ -146,15 +146,15 @@ void CActor::PickupModeUpdate()
 }
 
 #include "xrEngine/CameraBase.h"
-BOOL g_b_COD_PickUpMode = TRUE; // XXX: allow to change this via console
+BOOL g_b_COD_PickUpMode = TRUE;
 void CActor::PickupModeUpdate_COD()
 {
-    if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode)
+    if (Level().CurrentViewEntity() != this)
         return;
 
-    if (!g_Alive() || eacFirstEye != cam_active)
+    if (!g_Alive() || eacFirstEye != cam_active || !g_b_COD_PickUpMode)
     {
-        CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(NULL);
+        CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(nullptr);
         return;
     };
 
@@ -235,6 +235,9 @@ void CActor::PickupModeUpdate_COD()
 
         //подбирание объекта
         Game().SendPickUpEvent(ID(), pNearestItem->object().ID());
+
+        if (!psActorFlags.test(AF_MULTI_ITEM_PICKUP))
+            m_bPickupMode = false;
     }
 };
 
@@ -322,8 +325,8 @@ void CActor::PickupInfoDraw(IGameObject* object)
     UI().Font().pFontLetterica16Russian->Out(x, y, draw_str);
 }
 
-void CActor::feel_sound_new(
-    IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power)
+void CActor::feel_sound_new(IGameObject* who, int /*type*/, const CSound_UserDataPtr& /*user_data*/,
+    const Fvector& /*position*/, float power)
 {
     if (who == this)
         m_snd_noise = _max(m_snd_noise, power);

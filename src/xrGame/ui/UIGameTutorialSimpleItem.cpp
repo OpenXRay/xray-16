@@ -79,8 +79,8 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     }
     if (str)
     {
-        EGameActions cmd = action_name_to_id(str);
-        m_continue_dik_guard = get_action_dik(cmd);
+        EGameActions cmd = ActionNameToId(str);
+        m_continue_dik_guard = GetActionDik(cmd);
     }
 
     m_flags.set(etiCanBeStopped, (m_continue_dik_guard == -1));
@@ -94,7 +94,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     {
         SActionItem& itm = m_actions[idx];
         LPCSTR str = xml->ReadAttrib("action", idx, "id");
-        itm.m_action = action_name_to_id(str);
+        itm.m_action = ActionNameToId(str);
         itm.m_bfinalize = !!xml->ReadAttribInt("action", idx, "finalize", FALSE);
         itm.m_functor = xml->Read(xml->GetLocalRoot(), "action", idx, "");
     }
@@ -103,8 +103,8 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_UIWindow = new CUIWindow();
     m_UIWindow->SetAutoDelete(false);
     XML_NODE _lsr = xml->GetLocalRoot();
-    CUIXmlInit xml_init;
-    xml_init.InitWindow(*xml, "main_wnd", 0, m_UIWindow);
+
+    CUIXmlInit::InitWindow(*xml, "main_wnd", 0, m_UIWindow);
     xml->SetLocalRoot(_lsr);
 
     // initialize auto_static
@@ -256,9 +256,19 @@ void CUISequenceSimpleItem::Start()
             return;
         }
 
-        if (!xr_stricmp(m_pda_section, "pda_tasks"))
+        if (!xr_stricmp(m_pda_section, "pda_map"))
+        {
+            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptMap");
+            bShowPda = true;
+        }
+        else if (!xr_stricmp(m_pda_section, "pda_tasks"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
+            bShowPda = true;
+        }
+        else if (!xr_stricmp(m_pda_section, "pda_statistics"))
+        {
+            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptStatistics");
             bShowPda = true;
         }
         else if (!xr_stricmp(m_pda_section, "pda_ranking"))
@@ -328,7 +338,7 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
     for (u32 idx = 0; idx < m_actions.size(); ++idx)
     {
         SActionItem& itm = m_actions[idx];
-        bool b = is_binded(itm.m_action, dik);
+        bool b = IsBinded(itm.m_action, dik);
         if (b)
         {
             luabind::functor<void> functor_to_call;

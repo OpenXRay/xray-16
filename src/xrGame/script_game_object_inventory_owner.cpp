@@ -76,11 +76,17 @@ bool CScriptGameObject::DisableInfoPortion(LPCSTR info_id)
     return true;
 }
 
-void _AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
-
-void CScriptGameObject::AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
+void _AddIconedTalkMessage(cpcstr text, cpcstr texture_name, const Frect& tex_rect, cpcstr templ_name)
 {
-    _AddIconedTalkMessage(caption, text, texture_name, templ_name);
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
+    if (!pGameSP)
+        return;
+
+    if (pGameSP->TalkMenu->IsShown())
+    {
+        pGameSP->TalkMenu->AddIconedMessage(
+            text, texture_name, tex_rect, templ_name ? templ_name : "iconed_answer_item");
+    }
 }
 
 void _AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
@@ -94,6 +100,16 @@ void _AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPC
         pGameSP->TalkMenu->AddIconedMessage(
             caption, text, texture_name, templ_name ? templ_name : "iconed_answer_item");
     }
+}
+
+void CScriptGameObject::AddIconedTalkMessage(cpcstr text, cpcstr texture_name, Frect tex_rect, cpcstr templ_name)
+{
+    _AddIconedTalkMessage(text, texture_name, tex_rect, templ_name);
+}
+
+void CScriptGameObject::AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
+{
+    _AddIconedTalkMessage(caption, text, texture_name, templ_name);
 }
 
 void _give_news(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type);
@@ -126,6 +142,11 @@ void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int
         Actor()->AddGameNews(news_data);
     else
         Actor()->AddGameNews_deffered(news_data, delay);
+}
+
+void CScriptGameObject::ClearGameNews() const
+{
+    Actor()->ClearGameNews();
 }
 
 bool CScriptGameObject::HasInfo(LPCSTR info_id)
@@ -1242,7 +1263,12 @@ void CScriptGameObject::SetActiveTask(CGameTask* t)
 bool CScriptGameObject::IsActiveTask(CGameTask* t)
 {
     VERIFY(t);
-    return Level().GameTaskManager().ActiveTask() == t;
+
+    const auto t1 = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
+    const auto t2 = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
+    const auto t3 = Level().GameTaskManager().ActiveTask(eTaskTypeInsignificant);
+
+    return t == t1 || t == t2 || t == t3;
 }
 
 u32 CScriptGameObject::active_slot()

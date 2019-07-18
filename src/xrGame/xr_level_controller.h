@@ -4,17 +4,17 @@
 #include "xrCommon/xr_map.h"
 #include "xrEngine/xr_input_xinput.h"
 
-bool is_group_not_conflicted(_key_group g1, _key_group g2);
+bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2);
 
-pcstr dik_to_keyname(int _dik);
-_keyboard* dik_to_ptr(int _dik, bool bSafe);
+pcstr DikToKeyname(int dik);
+keyboard_key* DikToPtr(int dik, bool safe);
 
-pcstr id_to_action_name(EGameActions _id);
-EGameActions get_binded_action(int dik);
+pcstr IdToActionName(EGameActions id);
+EGameActions GetBindedAction(int dik);
 
 extern void CCC_RegisterInput();
 
-struct _conCmd
+struct con_cmd
 {
     shared_str cmd;
 };
@@ -22,7 +22,7 @@ struct _conCmd
 class ConsoleBindCmds
 {
 public:
-    xr_map<int, _conCmd> m_bindConsoleCmds;
+    xr_map<int, con_cmd> m_bindConsoleCmds;
 
     void bind(int dik, LPCSTR N);
     void unbind(int dik);
@@ -31,4 +31,4 @@ public:
     void save(IWriter* F);
 };
 
-extern ConsoleBindCmds bindConsoleCmds;
+extern ConsoleBindCmds g_consoleBindCmds;

@@ -17,14 +17,18 @@ XR_EXPORT void SetupEnv()
     xrRender_initconsole();
 }
 
-XR_EXPORT pcstr GetModeName()
-{
-    return "renderer_gl";
-}
-
 XR_EXPORT bool CheckRendererSupport()
 {
     // XXX: do a real check
     return true;
 }
 }
+
+SCRIPT_EXPORT(CheckRendererSupport_R2, (),
+{
+    using namespace luabind;
+    module(luaState)
+    [
+        def("xrRender_test_gl_hw", &CheckRendererSupport)
+    ];
+});

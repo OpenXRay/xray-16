@@ -13,6 +13,7 @@ public:
     string64 m_pChallengeString;
     int m_iCDKeyReauthHint;
     bool m_bCDKeyAuth;
+    u32 suspiciousActionCount;
 
     xrGameSpyClientData();
     virtual void Clear();

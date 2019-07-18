@@ -153,14 +153,32 @@ void CRenderTarget::phase_combine()
         m_v2w.invert(Device.mView);
         CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
-        Fvector4 ambclr = {_max(envdesc.ambient.x * 2, minamb), _max(envdesc.ambient.y * 2, minamb),
-            _max(envdesc.ambient.z * 2, minamb), 0};
+        Fvector4 ambclr =
+        {
+            std::max(envdesc.ambient.x * 2.f, minamb),
+            std::max(envdesc.ambient.y * 2.f, minamb),
+            std::max(envdesc.ambient.z * 2.f, minamb),
+            0
+        };
         ambclr.mul(ps_r2_sun_lumscale_amb);
 
-        //.		Fvector4	envclr			= { envdesc.sky_color.x*2+EPS,	envdesc.sky_color.y*2+EPS,
-        // envdesc.sky_color.z*2+EPS,	envdesc.weight					};
-        Fvector4 envclr = {envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
-            envdesc.hemi_color.z * 2 + EPS, envdesc.weight};
+        Fvector4 envclr;
+        if (envdesc.old_style)
+        {
+            envclr =
+            {
+                envdesc.sky_color.x * 2 + EPS, envdesc.sky_color.y * 2 + EPS,
+                envdesc.sky_color.z * 2 + EPS, envdesc.weight
+            };
+        }
+        else
+        {
+            envclr =
+            {
+                envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
+                envdesc.hemi_color.z * 2 + EPS, envdesc.weight
+            };
+        }
 
         Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
         envclr.x *= 2 * ps_r2_sun_lumscale_hemi;
@@ -500,7 +518,7 @@ void CRenderTarget::phase_combine()
     RCache.set_Stencil(FALSE);
 
     //	if FP16-BLEND !not! supported - draw flares here, overwise they are already in the bloom target
-	/* if (!RImplementation.o.fp16_blend)*/
+    /* if (!RImplementation.o.fp16_blend)*/
     PIX_EVENT(LENS_FLARES);
     g_pGamePersistent->Environment().RenderFlares(); // lens-flares
 

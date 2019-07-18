@@ -7,9 +7,9 @@
 #include "xr_level_controller.h"
 #include "string_table.h"
 
-CUIKeyBinding::CUIKeyBinding()
+CUIKeyBinding::CUIKeyBinding() : m_isGamepadBinds(false)
 {
-    for (int i = 0; i < 3; i++)
+    for (u8 i = 0; i < 3; ++i)
         AttachChild(&m_header[i]);
 
     AttachChild(&m_frame);
@@ -24,10 +24,12 @@ void CUIKeyBinding::InitFromXml(CUIXml& xml_doc, LPCSTR path)
     AttachChild(m_scroll_wnd);
     CUIXmlInit::InitScrollView(xml_doc, strconcat(sizeof(buf), buf, path, ":scroll_view"), 0, m_scroll_wnd);
 
+    m_isGamepadBinds = !!(xml_doc.ReadAttribInt(path, 0, "gamepad_bind", 0));
     CUIXmlInit::InitFrameWindow(xml_doc, strconcat(sizeof(buf), buf, path, ":frame"), 0, &m_frame);
     CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_1"), 0, &m_header[0]);
     CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_2"), 0, &m_header[1]);
-    CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_3"), 0, &m_header[2]);
+    if (!m_isGamepadBinds)
+        CUIXmlInit::InitFrameLine(xml_doc, strconcat(sizeof(buf), buf, path, ":header_3"), 0, &m_header[2]);
 
     FillUpList(xml_doc, path);
 }
@@ -46,10 +48,10 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
         shared_str grp_name = xml_doc.ReadAttrib("group", i, "name");
         R_ASSERT(xr_strlen(grp_name));
 
-        CUIStatic* pItem = new CUIStatic();
-        CUIXmlInit::InitStatic(xml_doc_ui, strconcat(sizeof(buf), buf, path_ui, ":scroll_view:item_group"), 0, pItem);
-        pItem->TextItemControl()->SetTextST(grp_name.c_str());
-        m_scroll_wnd->AddWindow(pItem, true);
+        CUIStatic* item = new CUIStatic();
+        CUIXmlInit::InitStatic(xml_doc_ui, strconcat(sizeof(buf), buf, path_ui, ":scroll_view:item_group"), 0, item);
+        item->TextItemControl()->SetTextST(grp_name.c_str());
+        m_scroll_wnd->AddWindow(item, true);
 
         // add group items
         int commandsCount = xml_doc.GetNodesNum("group", i, "command");
@@ -61,15 +63,15 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
             // first field of list item
             shared_str command_id = xml_doc.ReadAttrib("command", j, "id");
 
-            pItem = new CUIStatic();
-            CUIXmlInit::InitStatic(xml_doc_ui, strconcat(sizeof(buf), buf, path_ui, ":scroll_view:item_key"), 0, pItem);
-            pItem->TextItemControl()->SetTextST(command_id.c_str());
-            m_scroll_wnd->AddWindow(pItem, true);
+            item = new CUIStatic();
+            CUIXmlInit::InitStatic(xml_doc_ui, strconcat(sizeof(buf), buf, path_ui, ":scroll_view:item_key"), 0, item);
+            item->TextItemControl()->SetTextST(command_id.c_str());
+            m_scroll_wnd->AddWindow(item, true);
 
             shared_str exe = xml_doc.ReadAttrib("command", j, "exe");
 
 #ifdef DEBUG
-            if (kNOTBINDED == action_name_to_id(*exe))
+            if (kNOTBINDED == ActionNameToId(*exe))
             {
                 Msg("action [%s] not exist. update data", exe.c_str());
                 continue;
@@ -78,19 +80,29 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
 
             float item_width = m_header[1].GetWidth() - 3.0f;
             float item_pos = m_header[1].GetWndPos().x;
-            CUIEditKeyBind* pEditKB = new CUIEditKeyBind(true);
-            pEditKB->SetAutoDelete(true);
-            pEditKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, pItem->GetWndSize().y));
-            pEditKB->AssignProps(exe, "key_binding");
-            pItem->AttachChild(pEditKB);
+            CUIEditKeyBind* editKB;
+            if (!m_isGamepadBinds)
+                editKB = new CUIEditKeyBind(true);
+            else
+                editKB = new CUIEditKeyBind(false, true);
+            editKB->SetAutoDelete(true);
+            editKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, item->GetWndSize().y));
+            if (!m_isGamepadBinds)
+                editKB->AssignProps(exe, "key_binding");
+            else
+                editKB->AssignProps(exe, "key_binding_gpad");
+            item->AttachChild(editKB);
 
-            item_width = m_header[2].GetWidth() - 3.0f;
-            item_pos = m_header[2].GetWndPos().x;
-            pEditKB = new CUIEditKeyBind(false);
-            pEditKB->SetAutoDelete(true);
-            pEditKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, pItem->GetWndSize().y));
-            pEditKB->AssignProps(exe, "key_binding");
-            pItem->AttachChild(pEditKB);
+            if (!m_isGamepadBinds)
+            {
+                item_width = m_header[2].GetWidth() - 3.0f;
+                item_pos = m_header[2].GetWndPos().x;
+                editKB = new CUIEditKeyBind(false);
+                editKB->SetAutoDelete(true);
+                editKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, item->GetWndSize().y));
+                editKB->AssignProps(exe, "key_binding");
+                item->AttachChild(editKB);
+            }
         }
         xml_doc.SetLocalRoot(xml_doc.GetRoot());
     }
@@ -103,34 +115,32 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
 void CUIKeyBinding::CheckStructure(CUIXml& xml_doc)
 {
     bool first = true;
-    CUITextWnd* pItem = nullptr;
+    CUITextWnd* item = nullptr;
 
-    for (int i = 0; true; i++)
+    for (int i = 0; true; ++i)
     {
         LPCSTR action_name = actions[i].action_name;
         if (action_name)
         {
-            if (IsActionExist(action_name, xml_doc))
-                continue;
-            else
+            if (!IsActionExist(action_name, xml_doc))
             {
                 if (first)
                 {
-                    pItem = new CUITextWnd();
-                    pItem->SetWndPos(Fvector2().set(0, 0));
-                    pItem->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
-                    pItem->SetText("NEXT ITEMS NOT DESCRIBED IN COMMAND DESC LIST");
+                    item = new CUITextWnd();
+                    item->SetWndPos(Fvector2().set(0, 0));
+                    item->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
+                    item->SetText("NEXT ITEMS NOT DESCRIBED IN COMMAND DESC LIST");
                     first = false;
-                    pItem->SetAutoDelete(true);
-                    m_scroll_wnd->AddWindow(pItem, true);
+                    item->SetAutoDelete(true);
+                    m_scroll_wnd->AddWindow(item, true);
                 }
 
-                pItem = new CUITextWnd();
-                pItem->SetWndPos(Fvector2().set(0, 0));
-                pItem->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
-                pItem->SetText(action_name);
-                pItem->SetAutoDelete(true);
-                m_scroll_wnd->AddWindow(pItem, true);
+                item = new CUITextWnd();
+                item->SetWndPos(Fvector2().set(0, 0));
+                item->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
+                item->SetText(action_name);
+                item->SetAutoDelete(true);
+                m_scroll_wnd->AddWindow(item, true);
             }
         }
         else
@@ -143,7 +153,7 @@ bool CUIKeyBinding::IsActionExist(LPCSTR action, CUIXml& xml_doc)
     bool ret = false;
     int groupsCount = xml_doc.GetNodesNum("", 0, "group");
 
-    for (int i = 0; i < groupsCount; i++)
+    for (int i = 0; i < groupsCount; ++i)
     {
         // add group items
         int commandsCount = xml_doc.GetNodesNum("group", i, "command");

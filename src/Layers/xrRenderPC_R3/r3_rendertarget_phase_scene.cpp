@@ -31,13 +31,13 @@ void CRenderTarget::phase_scene_prepare()
         // HW.pDevice->ClearRenderTargetView(rt_Normal->pRT, ColorRGBA);
         // HW.pDevice->ClearRenderTargetView(rt_Color->pRT, ColorRGBA);
         if (!RImplementation.o.dx10_msaa)
-            HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
+            HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
         else
         {
             HW.pDevice->ClearRenderTargetView(rt_Color->pRT, ColorRGBA);
             HW.pDevice->ClearRenderTargetView(rt_Accumulator->pRT, ColorRGBA);
-            HW.pDevice->ClearDepthStencilView(rt_MSAADepth->pZRT, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
-            HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
+            HW.pDevice->ClearDepthStencilView(rt_MSAADepth->pZRT, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
+            HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
         }
     }
     else
@@ -47,13 +47,13 @@ void CRenderTarget::phase_scene_prepare()
         {
             u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
             // CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
-            HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
+            HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
         }
         else
         {
             u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, rt_MSAADepth->pZRT);
             // CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
-            HW.pDevice->ClearDepthStencilView(rt_MSAADepth->pZRT, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
+            HW.pDevice->ClearDepthStencilView(rt_MSAADepth->pZRT, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
         }
     }
 

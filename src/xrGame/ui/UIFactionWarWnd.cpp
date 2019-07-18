@@ -24,9 +24,10 @@
 
 constexpr pcstr PDA_FACTION_WAR_XML = "pda_fraction_war.xml";
 
-CUIFactionWarWnd::CUIFactionWarWnd()
+CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint)
 {
     Reset();
+    hint_wnd = hint;
 }
 
 CUIFactionWarWnd::~CUIFactionWarWnd()
@@ -44,36 +45,44 @@ void CUIFactionWarWnd::Reset()
     hint_wnd           = NULL;
     m_tc_pos.set       ( 0.0f, 0.0f );
     m_td_pos.set       ( 0.0f, 0.0f );
+
+    m_background = nullptr;
+    m_center_background = nullptr;
+
+    m_background2 = nullptr;
+    m_center_background2 = nullptr;
 }
 
-void CUIFactionWarWnd::Init()
+bool CUIFactionWarWnd::Init()
 {
 	CUIXml xml;
     if (!xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_FACTION_WAR_XML, false))
-    {
-        m_initialized = false;
-        return;
-    }
+        return false;
 
 	CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
 
-	m_background			= UIHelper::CreateFrameWindow( xml, "background", this );
+    m_background = UIHelper::CreateFrameWindow(xml, "background", this, false);
+    m_center_background = UIHelper::CreateFrameWindow(xml, "center_background", this, false);
 
-	m_center_background		= UIHelper::CreateFrameWindow( xml, "center_background", this );
+    if (!m_background)
+        m_background2 = UIHelper::CreateFrameLine(xml, "background", this, false);
 
-	m_target_static			= UIHelper::CreateTextWnd( xml, "target_static", this );
-	m_target_caption		= UIHelper::CreateTextWnd( xml, "target_caption", this );
+    if (!m_center_background)
+        m_center_background2 = UIHelper::CreateStatic(xml, "center_background", this, false);
+
+	m_target_static			= UIHelper::CreateStatic( xml, "target_static", this );
+	m_target_caption		= UIHelper::CreateStatic( xml, "target_caption", this );
 	//m_target_caption->SetElipsis( 1, 0 );
 	m_tc_pos				= m_target_caption->GetWndPos();
 
-	m_target_desc			= UIHelper::CreateTextWnd( xml, "target_decs", this );
+	m_target_desc			= UIHelper::CreateStatic( xml, "target_decs", this );
 	m_td_pos				= m_target_desc->GetWndPos();
 
 	m_state_static			= UIHelper::CreateStatic( xml, "state_static", this );
 	
 	m_our_icon				= UIHelper::CreateStatic( xml, "static_our_icon", this );
 	m_our_icon_over			= UIHelper::CreateStatic( xml, "static_our_icon_over", this );
-	m_our_name				= UIHelper::CreateTextWnd( xml, "static_our_name", this );
+	m_our_name				= UIHelper::CreateStatic( xml, "static_our_name", this );
 	m_st_our_frac_info		= UIHelper::CreateStatic( xml, "static_our_frac_info", this );
 	m_st_our_mem_count		= UIHelper::CreateStatic( xml, "static_our_mem_count", this );
 	m_st_our_resource		= UIHelper::CreateStatic( xml, "static_our_resource", this );
@@ -84,7 +93,7 @@ void CUIFactionWarWnd::Init()
 
 	m_enemy_icon			= UIHelper::CreateStatic( xml, "static_enemy_icon", this );
 	m_enemy_icon_over		= UIHelper::CreateStatic( xml, "static_enemy_icon_over", this );
-	m_enemy_name			= UIHelper::CreateTextWnd( xml, "static_enemy_name", this );
+	m_enemy_name			= UIHelper::CreateStatic( xml, "static_enemy_name", this );
 	m_st_enemy_frac_info	= UIHelper::CreateStatic( xml, "static_enemy_frac_info", this );
 	m_st_enemy_mem_count	= UIHelper::CreateStatic( xml, "static_enemy_mem_count", this );
 	m_st_enemy_resource		= UIHelper::CreateStatic( xml, "static_enemy_resource", this );
@@ -154,14 +163,11 @@ void CUIFactionWarWnd::Init()
 	int delay = xml.ReadAttribInt( "main_wnd", 0, "update_delay", 3000 );
 	m_update_delay = (0 < delay)? (u32)delay : 0;
 
-    m_initialized = true;
+    return true;
 }
 
 void CUIFactionWarWnd::ShowInfo( bool status )
 {
-    if (!m_initialized)
-        return;
-
 //	m_target_static->Show( status );
 //	m_target_caption->Show( status );
 //	m_target_desc->Show( status );
@@ -212,9 +218,6 @@ void CUIFactionWarWnd::SendMessage( CUIWindow* pWnd, s16 msg, void* pData )
 
 void CUIFactionWarWnd::Show( bool status )
 {
-    if (!m_initialized)
-        return;
-
     if ( status )
         InitFactions();
 
@@ -226,9 +229,6 @@ void CUIFactionWarWnd::Show( bool status )
 
 void CUIFactionWarWnd::Update()
 {
-    if (!m_initialized)
-        return;
-
     inherited::Update();
     if ( !IsShown() )
     {
@@ -258,8 +258,8 @@ bool CUIFactionWarWnd::InitFactions()
         return false;
     }
     u32   size_temp   = (xr_strlen(vs_teams) + 1) * sizeof(char);
-    PSTR  our_fract   = (PSTR)_alloca( size_temp );
-    PSTR  enemy_fract = (PSTR)_alloca( size_temp );
+    PSTR  our_fract   = (PSTR)xr_alloca( size_temp );
+    PSTR  enemy_fract = (PSTR)xr_alloca( size_temp );
     _GetItem( vs_teams, 0, our_fract );
     _GetItem( vs_teams, 1, enemy_fract );
 
@@ -276,9 +276,6 @@ bool CUIFactionWarWnd::InitFactions()
 
 void CUIFactionWarWnd::UpdateInfo()
 {
-    if (!m_initialized)
-        return;
-
     if ( m_our_faction.get_faction_id2().size() == 0 )
     {
         if ( !InitFactions() )
@@ -343,9 +340,6 @@ void CUIFactionWarWnd::UpdateInfo()
 
 void CUIFactionWarWnd::UpdateWarStates( FactionState const& faction )
 {
-    if (!m_initialized)
-        return;
-
     Fvector2 pos;
     pos = m_war_states_parent->GetWndPos();
 
@@ -373,9 +367,6 @@ void CUIFactionWarWnd::UpdateWarStates( FactionState const& faction )
 
 void CUIFactionWarWnd::set_amount_our_bonus( int value )
 {
-    if (!m_initialized)
-        return;
-
     for ( u32 i = 0; i < max_bonuce; ++i )
     {
         m_our_bonuces[i]->SetTextureColor( color_rgba( 255, 255, 255, 70) );
@@ -389,9 +380,6 @@ void CUIFactionWarWnd::set_amount_our_bonus( int value )
 
 void CUIFactionWarWnd::set_amount_enemy_bonus( int value )
 {
-    if (!m_initialized)
-        return;
-
     for ( u32 i = 0; i < max_bonuce; ++i )
     {
         m_enemy_bonuces[i]->SetTextureColor( color_rgba( 255, 255, 255, 70) );

@@ -99,7 +99,7 @@ public:
     {
         smem_value* v = rhs.p_;
         if (0 != v)
-            v->dwReference++;
+            ++v->dwReference;
         _dec();
         p_ = v;
     }
@@ -117,7 +117,7 @@ public:
     {
         smem_value* v = g_pSharedMemoryContainer->dock(dwCRC, dwLength * sizeof(T), ptr);
         if (0 != v)
-            v->dwReference++;
+            ++v->dwReference;
         _dec();
         p_ = v;
     }

@@ -26,28 +26,30 @@ inline void CSAStar::initialize(TPathManager& path_manager)
 {
     THROW2(!this->m_search_started, "Recursive graph engine usage is not allowed!");
     this->m_search_started = true;
+    auto& data_storage = this->data_storage();
     // initialize data structures before we started path search
-    this->data_storage().init();
+    data_storage.init();
     // initialize path manager before we started path search
     path_manager.init();
     // create a node
-    Vertex& start = this->data_storage().create_vertex(path_manager.start_node());
+    Vertex& start = data_storage.create_vertex(path_manager.start_node());
     // assign corresponding values to the created node
     start.g() = Distance(0);
     start.h() = path_manager.estimate(start.index());
     start.f() = start.g() + start.h();
     // assign null parent to the start node
-    this->data_storage().assign_parent(start, 0);
+    data_storage.assign_parent(start, 0);
     // add start node to the opened list
-    this->data_storage().add_opened(start);
+    data_storage.add_opened(start);
 }
 
 TEMPLATE_SPECIALIZATION
 template <typename TPathManager>
 inline bool CSAStar::step(TPathManager& path_manager)
 {
+    auto& data_storage = this->data_storage();
     // get the best node, i.e. a node with the minimum 'f'
-    Vertex& best = this->data_storage().get_best();
+    Vertex& best = data_storage.get_best();
     // check if this node is the one we are searching for
     if (path_manager.is_goal_reached(best.index()))
     {
@@ -58,13 +60,13 @@ inline bool CSAStar::step(TPathManager& path_manager)
         return true;
     }
     // put best node to the closed list
-    this->data_storage().add_best_closed();
+    data_storage.add_best_closed();
     // and remove this node from the opened one
-    this->data_storage().remove_best_opened();
+    data_storage.remove_best_opened();
     // iterating on the best node neighbours
     typename TPathManager::const_iterator i, e;
     path_manager.begin(best.index(), i, e);
-    for (; i != e; i++)
+    for (; i != e; ++i)
     {
         const Index& neighbour_index = path_manager.get_value(i);
         // check if neighbour is accessible
@@ -72,13 +74,13 @@ inline bool CSAStar::step(TPathManager& path_manager)
             continue;
         // check if neighbour is visited, i.e. is in the opened or
         // closed lists
-        if (this->data_storage().is_visited(neighbour_index))
+        if (data_storage.is_visited(neighbour_index))
         {
             // so, this neighbour node has been already visited
             // therefore get the pointer to this node
-            Vertex& neighbour = this->data_storage().get_node(neighbour_index);
+            Vertex& neighbour = data_storage.get_node(neighbour_index);
             // check if this node is in the opened list
-            if (this->data_storage().is_opened(neighbour))
+            if (data_storage.is_opened(neighbour))
             {
                 // compute 'g' for the node
                 Distance g = best.g() + path_manager.evaluate(best.index(), neighbour_index, i);
@@ -92,9 +94,9 @@ inline bool CSAStar::step(TPathManager& path_manager)
                     neighbour.f() = neighbour.g() + neighbour.h();
                     // assign correct parent to the node to be able
                     // to retrieve a path
-                    this->data_storage().assign_parent(neighbour, &best, path_manager.edge(i));
+                    data_storage.assign_parent(neighbour, &best, path_manager.edge(i));
                     // notify data storage about node decreasing value
-                    this->data_storage().decrease_opened(neighbour, d);
+                    data_storage.decrease_opened(neighbour, d);
                     // continue iterating on neighbours
                     continue;
                 }
@@ -129,10 +131,10 @@ inline bool CSAStar::step(TPathManager& path_manager)
                     neighbour.f() = neighbour.g() + neighbour.h();
                     // assign correct parent to the node to be able
                     // to retrieve a path
-                    this->data_storage().assign_parent(neighbour, &best, path_manager.edge(i));
+                    data_storage.assign_parent(neighbour, &best, path_manager.edge(i));
                     // notify data storage about node decreasing value
                     // to make it modify all the node successors
-                    this->data_storage().update_successors(neighbour);
+                    data_storage.update_successors(neighbour);
                     // continue iterating on neighbours
                     continue;
                 }
@@ -147,15 +149,15 @@ inline bool CSAStar::step(TPathManager& path_manager)
         {
             // so, this neighbour node is not in the opened or closed lists
             // put neighbour node to the opened list
-            Vertex& neighbour = this->data_storage().create_vertex(neighbour_index);
+            Vertex& neighbour = data_storage.create_vertex(neighbour_index);
             // fill the corresponding node parameters
             neighbour.g() = best.g() + path_manager.evaluate(best.index(), neighbour_index, i);
             neighbour.h() = path_manager.estimate(neighbour.index());
             neighbour.f() = neighbour.g() + neighbour.h();
             // assign best node as its parent
-            this->data_storage().assign_parent(neighbour, &best, path_manager.edge(i));
+            data_storage.assign_parent(neighbour, &best, path_manager.edge(i));
             // add start node to the opened list
-            this->data_storage().add_opened(neighbour);
+            data_storage.add_opened(neighbour);
             // continue iterating on neighbours
             continue;
         }

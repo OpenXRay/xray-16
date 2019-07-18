@@ -20,14 +20,13 @@ enum
     TORCH_SLOT, // torch
     ARTEFACT_SLOT, // artefact
     HELMET_SLOT,
-    //Alundaio: More slots for custom uses
     CUSTOM_SLOT_1,
     CUSTOM_SLOT_2,
     CUSTOM_SLOT_3,
     CUSTOM_SLOT_4,
     CUSTOM_SLOT_5,
-    //-Alundaio
-    LAST_SLOT = CUSTOM_SLOT_5
+    CUSTOM_SLOT_6,
+    LAST_SLOT = CUSTOM_SLOT_6
 };
 
 #define RUCK_HEIGHT 280
@@ -75,6 +74,7 @@ struct II_BriefInfo
     shared_str fmj_ammo;
     shared_str ap_ammo;
     shared_str third_ammo; //Alundaio
+    shared_str total_ammo;
     shared_str fire_mode;
 
     shared_str grenade;
@@ -88,6 +88,7 @@ struct II_BriefInfo
         fmj_ammo = "";
         ap_ammo = "";
         third_ammo = ""; //Alundaio
+        total_ammo = "";
         fire_mode = "";
         grenade = "";
     }

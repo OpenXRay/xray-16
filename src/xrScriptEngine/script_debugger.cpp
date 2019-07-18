@@ -225,7 +225,7 @@ void CScriptDebugger::DrawCurrentState()
     m_lua->DrawStackTrace();
     m_callStack->SetStackTraceLevel(0);
     m_lua->DrawGlobalVariables();
-    _SendMessage(DMSG_GOTO_STACKTRACE_LEVEL, GetStackTraceLevel(), 0);
+    //_SendMessage(DMSG_GOTO_STACKTRACE_LEVEL, GetStackTraceLevel(), 0); // xRayScriptDebugger crashes here
 }
 
 void CScriptDebugger::DebugBreak(const char* szFile, int nLine)
@@ -379,10 +379,11 @@ bool CScriptDebugger::HasBreakPoint(const char* fileName, s32 lineNum)
     char dir[_MAX_DIR];
     char ext[_MAX_EXT];
     _splitpath(fileName, drive, dir, sFileName, ext);
-    for (u32 i = 0; i < m_breakPoints.size(); i++)
+    const size_t filenameLength = xr_strlen(sFileName);
+    for (size_t i = 0; i < m_breakPoints.size(); i++)
     {
         SBreakPoint bp(m_breakPoints[i]);
-        if (bp.nLine == lineNum && xr_strlen(bp.fileName) == xr_strlen(sFileName) && !xr_stricmp(*bp.fileName, sFileName))
+        if (bp.nLine == lineNum && xr_strlen(bp.fileName) == filenameLength && !xr_stricmp(*bp.fileName, sFileName))
             return true;
     }
     return false;

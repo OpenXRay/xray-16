@@ -109,8 +109,8 @@ public:
     virtual void reload(LPCSTR section);
 
     virtual void init() {}
-    virtual void feel_sound_new(
-        IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power);
+    void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
+        const Fvector& position, float power) override;
     virtual bool feel_vision_isRelevant(IGameObject* O);
     virtual bool feel_touch_on_contact(IGameObject* O);
     virtual bool feel_touch_contact(IGameObject*);
@@ -126,7 +126,6 @@ public:
     virtual void PHFreeze() { return inherited::PHFreeze(); }
     virtual BOOL UsedAI_Locations() { return inherited::UsedAI_Locations(); }
     virtual const SRotation Orientation() const { return inherited::Orientation(); }
-    virtual void renderable_Render() { return inherited::renderable_Render(); }
     virtual void on_restrictions_change();
 
     virtual void SetAttackEffector();

@@ -292,7 +292,7 @@ shared_str UICore::get_xml_name(LPCSTR fn)
         else
             xr_sprintf(str, "%s_16", fn);
 
-        if (NULL == FS.exist(str_, "$game_config$", UI_PATH_WITH_DELIMITER, str))
+        if (!FS.exist(str_, "$game_config$", UI_PATH_WITH_DELIMITER, str))
         {
             xr_sprintf(str, "%s", fn);
             if (nullptr == strext(fn))

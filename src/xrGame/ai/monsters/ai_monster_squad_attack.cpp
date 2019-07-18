@@ -11,7 +11,7 @@ void CMonsterSquad::ProcessAttack()
     m_temp_entities.clear();
 
     // Выделить элементы с общими врагами и состянием атаки
-    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
+    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); ++it_goal)
     {
         //		CEntity *member = it_goal->first;
         SMemberGoal goal = it_goal->second;
@@ -76,7 +76,7 @@ void CMonsterSquad::set_rat_squad_index(const CEntity* m_enemy)
 
     // Выделить элементы с общей целью
 
-    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
+    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); ++it_goal)
     {
         if (it_goal->first->g_Alive())
         {
@@ -93,7 +93,7 @@ void CMonsterSquad::set_rat_squad_index(const CEntity* m_enemy)
         }
     }
 
-    for (auto it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); it_enemy++)
+    for (auto it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); ++it_enemy)
     {
         get_index_in_rat_squad(it_enemy->second, it_enemy->first);
     }
@@ -122,7 +122,7 @@ void CMonsterSquad::set_squad_index(const CEntity* m_enemy)
 
     // Выделить элементы с общей целью
 
-    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
+    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); ++it_goal)
     {
         if (it_goal->first->g_Alive())
         {
@@ -139,7 +139,7 @@ void CMonsterSquad::set_squad_index(const CEntity* m_enemy)
         }
     }
 
-    for (auto it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); it_enemy++)
+    for (auto it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); ++it_enemy)
     {
         get_index_in_squad(it_enemy->second, it_enemy->first);
     }

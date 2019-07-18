@@ -90,7 +90,14 @@ static Fbox bbCrouchBox;
 static Fvector vFootCenter;
 static Fvector vFootExt;
 
-Flags32 psActorFlags = {AF_GODMODE_RT | AF_AUTOPICKUP | AF_RUN_BACKWARD | AF_IMPORTANT_SAVE};
+Flags32 psActorFlags =
+{
+    AF_GODMODE_RT |
+    AF_AUTOPICKUP | 
+    AF_RUN_BACKWARD | 
+    AF_IMPORTANT_SAVE |
+    AF_MULTI_ITEM_PICKUP
+};
 int psActorSleepTime = 1;
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
@@ -364,8 +371,8 @@ void CActor::Load(LPCSTR section)
 
     m_fPickupInfoRadius = pSettings->r_float(section, "pickup_info_radius");
 
-    m_fFeelGrenadeRadius = pSettings->r_float(section, "feel_grenade_radius");
-    m_fFeelGrenadeTime = pSettings->r_float(section, "feel_grenade_time");
+    m_fFeelGrenadeRadius = pSettings->read_if_exists<float>(section, "feel_grenade_radius", 10.0f);
+    m_fFeelGrenadeTime = pSettings->read_if_exists<float>(section, "feel_grenade_time", 1.0f);
     m_fFeelGrenadeTime *= 1000.0f;
 
     character_physics_support()->in_Load(section);
@@ -399,8 +406,16 @@ void CActor::Load(LPCSTR section)
             m_HeavyBreathSnd.create(
                 pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
             m_BloodSnd.create(pSettings->r_string(section, "heavy_blood_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
-            m_DangerSnd.create(
-                pSettings->r_string(section, "heavy_danger_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
+            if (pSettings->line_exist(section, "heavy_danger_snd"))
+            {
+                m_DangerSnd.create(pSettings->r_string(section, "heavy_danger_snd"),
+                    st_Effect, SOUND_TYPE_MONSTER_INJURING);
+            }
+            else
+            {
+                m_DangerSnd.create(pSettings->r_string(section, "heavy_blood_snd"),
+                    st_Effect, SOUND_TYPE_MONSTER_INJURING);
+            }
         }
     }
     if (psActorFlags.test(AF_PSP))
@@ -945,15 +960,20 @@ void CActor::UpdateCL()
 {
     if (g_Alive() && Level().CurrentViewEntity() == this)
     {
-        if (CurrentGameUI() && NULL == CurrentGameUI()->TopInputReceiver())
+        if (CurrentGameUI() && !CurrentGameUI()->TopInputReceiver() && !m_holder)
         {
-            int dik = get_action_dik(kUSE, 0);
-            if (dik && pInput->iGetAsyncKeyState(dik))
-                m_bPickupMode = true;
+            const bool allowed = psActorFlags.test(AF_MULTI_ITEM_PICKUP);
 
-            dik = get_action_dik(kUSE, 1);
-            if (dik && pInput->iGetAsyncKeyState(dik))
-                m_bPickupMode = true;
+            for (u8 i = 0; i < bindtypes_count && allowed; ++i)
+            {
+                const int dik = GetActionDik(kUSE, i);
+                if (dik && pInput->iGetAsyncKeyState(dik))
+                    m_bPickupMode = true;
+            }
+        }
+        else
+        {
+            m_bPickupMode = false;
         }
     }
 
@@ -1089,7 +1109,8 @@ void CActor::UpdateCL()
     if (IsFocused())
         g_player_hud->update(trans);
 
-    m_bPickupMode = false;
+    if (psActorFlags.test(AF_MULTI_ITEM_PICKUP))
+        m_bPickupMode = false;
 }
 
 float NET_Jump = 0;
@@ -1211,7 +1232,8 @@ void CActor::shedule_Update(u32 DT)
             mstate_wishful &= ~mcRLookout;
             mstate_wishful &= ~mcFwd;
             mstate_wishful &= ~mcBack;
-            if (!psActorFlags.test(AF_CROUCH_TOGGLE))
+            extern bool g_bAutoClearCrouch;
+            if (!psActorFlags.test(AF_CROUCH_TOGGLE) || g_bAutoClearCrouch)
                 mstate_wishful &= ~mcCrouch;
         }
     }
@@ -1235,12 +1257,10 @@ void CActor::shedule_Update(u32 DT)
         }
         mstate_old = mstate_real;
     }
-    /*
-        if (this == Level().CurrentViewEntity())
-        {
-            UpdateMotionIcon		(mstate_real);
-        };
-    */
+    if (this == Level().CurrentViewEntity())
+    {
+        UpdateMotionIcon(mstate_real);
+    };
     NET_Jump = 0;
 
     inherited::shedule_Update(DT);
@@ -1600,6 +1620,9 @@ void CActor::ForceTransform(const Fmatrix& m)
     // character_physics_support()->set_movement_position( m.c );
     // character_physics_support()->movement()->SetVelocity( 0, 0, 0 );
 
+    Fvector xyz;
+    m.getHPB(xyz);
+    cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
     character_physics_support()->ForceTransform(m);
     const float block_damage_time_seconds = 2.f;
     if (!IsGameTypeSingle())
@@ -1834,34 +1857,30 @@ void CActor::AnimTorsoPlayCallBack(CBlend* B)
     actor->m_bAnimTorsoPlayed = FALSE;
 }
 
-/*
 void CActor::UpdateMotionIcon(u32 mstate_rl)
 {
-    CUIMotionIcon*	motion_icon=CurrentGameUI()->UIMainIngameWnd->MotionIcon();
-    if(mstate_rl&mcClimb)
+    CUIMotionIcon* motion_icon = CurrentGameUI()->UIMainIngameWnd->MotionIcon();
+    if (mstate_rl & mcClimb)
     {
         motion_icon->ShowState(CUIMotionIcon::stClimb);
     }
     else
     {
-        if(mstate_rl&mcCrouch)
+        if (mstate_rl & mcCrouch)
         {
             if (!isActorAccelerated(mstate_rl, IsZoomAimingMode()))
                 motion_icon->ShowState(CUIMotionIcon::stCreep);
             else
                 motion_icon->ShowState(CUIMotionIcon::stCrouch);
         }
-        else
-        if(mstate_rl&mcSprint)
-                motion_icon->ShowState(CUIMotionIcon::stSprint);
-        else
-        if(mstate_rl&mcAnyMove && isActorAccelerated(mstate_rl, IsZoomAimingMode()))
+        else if (mstate_rl & mcSprint)
+            motion_icon->ShowState(CUIMotionIcon::stSprint);
+        else if (mstate_rl & mcAnyMove && isActorAccelerated(mstate_rl, IsZoomAimingMode()))
             motion_icon->ShowState(CUIMotionIcon::stRun);
         else
             motion_icon->ShowState(CUIMotionIcon::stNormal);
     }
 }
-*/
 
 CPHDestroyable* CActor::ph_destroyable() { return smart_cast<CPHDestroyable*>(character_physics_support()); }
 CEntityConditionSimple* CActor::create_entity_condition(CEntityConditionSimple* ec)

@@ -59,7 +59,8 @@ void player_hud_motion_container::load(IKinematicsAnimated* model, const shared_
 
     for (; _b != _e; ++_b)
     {
-        if (strstr(_b->first.c_str(), "anm_") == _b->first.c_str())
+        if (strstr(_b->first.c_str(), "anm_") == _b->first.c_str() ||
+            strstr(_b->first.c_str(), "anim_") == _b->first.c_str())
         {
             const shared_str& anm = _b->second;
             m_anims.resize(m_anims.size() + 1);
@@ -390,16 +391,16 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
     {
         CActor* current_actor = static_cast_checked<CActor*>(Level().CurrentControlEntity());
         VERIFY(current_actor);
-        CEffectorCam* ec = current_actor->Cameras().GetCamEffector(eCEWeaponAction);
-
-        if (ec)
-            current_actor->Cameras().RemoveCamEffector(eCEWeaponAction);
 
         string_path ce_path;
         string_path anm_name;
         strconcat(sizeof(anm_name), anm_name, "camera_effects" DELIMITER "weapon" DELIMITER, M.name.c_str(), ".anm");
         if (FS.exist(ce_path, "$game_anims$", anm_name))
         {
+            CEffectorCam* ec = current_actor->Cameras().GetCamEffector(eCEWeaponAction);
+            if (ec)
+                current_actor->Cameras().RemoveCamEffector(eCEWeaponAction);
+            
             CAnimatorCamEffector* e = new CAnimatorCamEffector();
             e->SetType(eCEWeaponAction);
             e->SetHudAffect(false);
@@ -444,6 +445,11 @@ void player_hud::load(const shared_str& player_hud_sect)
     {
         IRenderVisual* v = m_model->dcast_RenderVisual();
         GEnv.Render->model_Delete(v);
+    }
+
+    if (ShadowOfChernobylMode && !pSettings->line_exist(player_hud_sect, "visual"))
+    {
+        return;
     }
 
     m_sect_name = player_hud_sect;
@@ -533,16 +539,19 @@ u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud
         return 100; // ms TEMPORARY
     R_ASSERT2(pm,
         make_string("hudItem model [%s] has no motion with alias [%s]", hud_name.c_str(), anim_name.c_str()).c_str());
-    return motion_length(pm->m_animations[0].mid, md, speed);
+    return motion_length(pm->m_animations[0].mid, md, speed, reinterpret_cast<IKinematicsAnimated*>(pi->m_model));
 }
 
-u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float speed)
+u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel)
 {
-    md = m_model->LL_GetMotionDef(M);
+    IKinematicsAnimated* model = m_model;
+    if (!model && itemModel)
+        model = itemModel;
+    md = model->LL_GetMotionDef(M);
     VERIFY(md);
     if (md->flags & esmStopAtEnd)
     {
-        CMotion* motion = m_model->LL_GetRootMotion(M);
+        CMotion* motion = model->LL_GetRootMotion(M);
         return iFloor(0.5f + 1000.f * motion->GetLength() / (md->Dequantize(md->speed) * speed));
     }
     return 0;
@@ -577,9 +586,12 @@ void player_hud::update(const Fmatrix& cam_trans)
     m_transform.mul(trans, m_attach_offset);
     // insert inertion here
 
-    m_model->UpdateTracks();
-    m_model->dcast_PKinematics()->CalculateBones_Invalidate();
-    m_model->dcast_PKinematics()->CalculateBones(TRUE);
+    if (m_model)
+    {
+        m_model->UpdateTracks();
+        m_model->dcast_PKinematics()->CalculateBones_Invalidate();
+        m_model->dcast_PKinematics()->CalculateBones(TRUE);
+    }
 
     if (m_attached_items[0])
         m_attached_items[0]->update(true);
@@ -606,7 +618,7 @@ u32 player_hud::anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotio
     }
     m_model->dcast_PKinematics()->CalculateBones_Invalidate();
 
-    return motion_length(M, md, speed);
+    return motion_length(M, md, speed, nullptr);
 }
 
 void player_hud::update_additional(Fmatrix& trans)
@@ -727,7 +739,8 @@ attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
     }
     attachable_hud_item* res = new attachable_hud_item(this);
     res->load(sect);
-    res->m_hand_motions.load(m_model, sect);
+    IKinematicsAnimated* animatedHudItem = smart_cast<IKinematicsAnimated*>(res->m_model);
+    res->m_hand_motions.load(m_model ? m_model : animatedHudItem, sect);
     m_pool.push_back(res);
 
     return res;

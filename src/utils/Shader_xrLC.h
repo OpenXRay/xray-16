@@ -70,10 +70,10 @@ public:
             return;
         };
 
-        int count = fs->length() / sizeof(Shader_xrLC);
-        R_ASSERT(int(fs->length()) == int(count * sizeof(Shader_xrLC)));
+        const size_t count = fs->length() / sizeof(Shader_xrLC);
+        R_ASSERT(fs->length() == count * sizeof(Shader_xrLC));
         library.resize(count);
-        fs->r(&*library.begin(), fs->length());
+        fs->r(&library.front(), fs->length());
         FS.r_close(fs);
     }
     bool Save(LPCSTR name)
@@ -81,7 +81,7 @@ public:
         auto F = FS.w_open(name);
         if (F)
         {
-            F->w(&*library.begin(), (u32)library.size() * sizeof(Shader_xrLC));
+            F->w(&library.front(), library.size() * sizeof(Shader_xrLC));
             FS.w_close(F);
             return true;
         }
@@ -89,12 +89,12 @@ public:
     }
     void Unload() { library.clear(); }
 
-    u32 GetID(LPCSTR name) const
+    size_t GetID(LPCSTR name) const
     {
-        for (auto it = library.begin(); it != library.end(); it++)
+        for (auto it = library.begin(); it != library.end(); ++it)
             if (0 == xr_stricmp(name, it->Name))
-                return u32(it - library.begin());
-        return u32(-1);
+                return size_t(it - library.begin());
+        return size_t(-1);
     }
 
     Shader_xrLC* Get(LPCSTR name)
@@ -105,9 +105,9 @@ public:
         return nullptr;
     }
 
-    Shader_xrLC* Get(int id) { return &library[id]; }
+    Shader_xrLC* Get(size_t id) { return &library[id]; }
 
-    const Shader_xrLC* Get(int id) const { return &library[id]; }
+    const Shader_xrLC* Get(size_t id) const { return &library[id]; }
 
     Shader_xrLC* Append(Shader_xrLC* parent = 0)
     {
@@ -117,7 +117,7 @@ public:
 
     void Remove(LPCSTR name)
     {
-        for (auto it = library.begin(); it != library.end(); it++)
+        for (auto it = library.begin(); it != library.end(); ++it)
             if (0 == xr_stricmp(name, it->Name))
             {
                 library.erase(it);
@@ -137,7 +137,7 @@ public:
 IC void post_process_materials(
     const Shader_xrLC_LIB& shaders, const xr_vector<b_shader>& shader_compile, xr_vector<b_material>& materials)
 {
-    for (u32 m = 0; m < materials.size(); m++)
+    for (size_t m = 0; m < materials.size(); m++)
     {
         b_material& M = materials[m];
 

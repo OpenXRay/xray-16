@@ -32,36 +32,37 @@
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)Common.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -69,7 +70,6 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -87,7 +87,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi.lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\x86;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -97,7 +97,7 @@
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi64.lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\amd64;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -108,7 +108,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi.lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\x86;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -119,7 +119,7 @@
       <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi64.lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\amd64;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi.lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\x86;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -139,13 +139,14 @@
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi64.lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\amd64;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
     <ClCompile Include="..\xrRenderGL\GL Rain\glRainBlender.cpp" />
+    <ClCompile Include="..\xrRenderGL\glBufferPool.cpp" />
     <ClCompile Include="..\xrRenderGL\glHW.cpp" />
     <ClCompile Include="..\xrRenderGL\glBufferUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glDetailManager_VS.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="..\xrRenderGL\MSAA\glMSAABlender.cpp" />
     <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
+    <ClCompile Include="..\xrRender\D3DXRenderBase.cpp" />
     <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRender\du_box.cpp" />
@@ -341,6 +343,7 @@
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h" />
+    <ClInclude Include="..\xrRenderGL\glBufferPool.h" />
     <ClInclude Include="..\xrRenderGL\glBufferUtils.h" />
     <ClInclude Include="..\xrRenderGL\glMinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderGL\glR_Backend_Runtime.h" />
@@ -499,6 +502,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -93,7 +93,7 @@ public:
     ISpatial_DB* space; // allow different spaces
 };
 
-class ISpatial
+class XRCDB_API ISpatial
 {
 public:
     virtual ~ISpatial() = 0;

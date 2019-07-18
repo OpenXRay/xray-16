@@ -17,11 +17,6 @@ XR_EXPORT void SetupEnv()
     xrRender_initconsole();
 }
 
-XR_EXPORT pcstr GetModeName()
-{
-    return "renderer_r2.5";
-}
-
 XR_EXPORT bool CheckRendererSupport()
 {
     D3DCAPS9 caps;
@@ -37,3 +32,12 @@ XR_EXPORT bool CheckRendererSupport()
     return true;
 }
 }
+
+SCRIPT_EXPORT(CheckRendererSupport_R2, (),
+{
+    using namespace luabind;
+    module(luaState)
+    [
+        def("xrRender_test_r2_hw", &CheckRendererSupport)
+    ];
+});

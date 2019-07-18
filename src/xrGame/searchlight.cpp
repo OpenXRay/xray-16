@@ -166,7 +166,6 @@ void CProjector::UpdateCL()
     angle_lerp(_current.pitch, _target.pitch, bone_y.velocity, Device.fTimeDelta);
 }
 
-void CProjector::renderable_Render() { inherited::renderable_Render(); }
 BOOL CProjector::UsedAI_Locations() { return (FALSE); }
 bool CProjector::bfAssignWatch(CScriptEntityAction* tpEntityAction)
 {

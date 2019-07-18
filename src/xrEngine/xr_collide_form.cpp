@@ -132,7 +132,7 @@ void CCF_Skeleton::BuildState()
         }
     }
 
-    for (auto I = elements.begin(); I != elements.end(); I++)
+    for (auto I = elements.begin(); I != elements.end(); ++I)
     {
         if (!I->valid())
             continue;
@@ -183,12 +183,13 @@ void CCF_Skeleton::BuildState()
         case SBoneShape::stCylinder:
         {
             const Fcylinder& C = shape.cylinder;
-            Mbone.transform_tiny(I->c_cylinder.m_center, C.m_center);
-            L2W.transform_tiny(I->c_cylinder.m_center);
-            Mbone.transform_dir(I->c_cylinder.m_direction, C.m_direction);
-            L2W.transform_dir(I->c_cylinder.m_direction);
-            I->c_cylinder.m_height = C.m_height;
-            I->c_cylinder.m_radius = C.m_radius;
+            auto& c_cylinder = I->c_cylinder;
+            Mbone.transform_tiny(c_cylinder.m_center, C.m_center);
+            L2W.transform_tiny(c_cylinder.m_center);
+            Mbone.transform_dir(c_cylinder.m_direction, C.m_direction);
+            L2W.transform_dir(c_cylinder.m_direction);
+            c_cylinder.m_height = C.m_height;
+            c_cylinder.m_radius = C.m_radius;
         }
         break;
         }
@@ -241,7 +242,7 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
     }
 
     BOOL bHIT = FALSE;
-    for (auto I = elements.begin(); I != elements.end(); I++)
+    for (auto I = elements.begin(); I != elements.end(); ++I)
     {
         if (!I->valid())
             continue;

@@ -75,7 +75,7 @@ CSE_SmartCover::CSE_SmartCover(LPCSTR section) : CSE_ALifeDynamicObject(section)
     m_enter_min_enemy_distance = pSettings->r_float(section, "enter_min_enemy_distance");
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
     m_is_combat_cover = pSettings->r_bool(section, "is_combat_cover");
-    m_can_fire = m_is_combat_cover ? true : pSettings->r_bool(section, "can_fire");
+    m_can_fire = m_is_combat_cover ? true : pSettings->read_if_exists<bool>(section, "can_fire", false);
     m_need_to_reparse_loopholes = true;
 }
 
@@ -295,15 +295,14 @@ void CSE_SmartCover::fill_visuals()
         if (!I->is_enterable)
             return;
 
-        CSE_Visual* visual = new CSE_SmartVisual();
-        visual->set_visual("actors" DELIMITER "stalker_neutral" DELIMITER "stalker_neutral_1");
-
         if (I->animation_id.size() == 0)
         {
             Msg("cover [%s] doesn't have idle_2_fire animation", I->string_identifier.c_str());
             return;
         }
 
+        CSE_Visual* visual = new CSE_SmartVisual();
+        visual->set_visual("actors" DELIMITER "stalker_neutral" DELIMITER "stalker_neutral_1");
         visual->startup_animation = I->animation_id;
 
         visual_data tmp;

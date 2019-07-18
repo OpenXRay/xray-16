@@ -218,7 +218,7 @@ public:
         return *this;
     }
 
-    T& operator[](int i) const
+    T& operator[](size_t i) const
     {
         // assert: 0 <= i < 2; x and y are packed into 2*sizeof(float) bytes
         return (T&)*(&x + i);

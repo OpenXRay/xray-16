@@ -70,10 +70,7 @@ struct XRCORE_API xr_rtoken
     int id;
 
     xr_rtoken(pcstr _nm, int _id)
-    {
-        name = _nm;
-        id = _id;
-    }
+        : name(_nm), id(_id) {}
 
     void rename(pcstr _nm) { name = _nm; }
     bool equal(pcstr _nm) const { return (0 == xr_strcmp(*name, _nm)); }
@@ -102,6 +99,7 @@ using RTokenVec = xr_vector<xr_rtoken>;
 #endif
 
 #include "net_utils.h"
+#include "Threading/ThreadUtil.h"
 
 // destructor
 template <class T>
@@ -122,6 +120,8 @@ class XRCORE_API xrCore
     u32 buildId = 0;
 
 public:
+    xrCore();
+
     string64 ApplicationName;
     string_path ApplicationPath;
     string_path WorkingPath;

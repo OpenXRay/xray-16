@@ -77,7 +77,7 @@ ambient::~ambient()
 }
 
 void ambient::load(
-    CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config, const shared_str& section)
+    const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config, const shared_str& section)
 {
     VERIFY(m_load_section == section);
     inherited::load(ambients_config, sound_channels_config, effects_config, m_load_section);
@@ -115,7 +115,7 @@ void ambient::save(CInifile& config)
         for (const auto &i : m_sound_channels_ids)
             count += i->id().size() + 2;
 
-        temp = (pstr)_alloca(count * sizeof(char));
+        temp = (pstr)xr_alloca(count * sizeof(char));
         *temp = '\0';
         for (const auto &i : m_sound_channels_ids)
         {
@@ -135,7 +135,7 @@ void ambient::save(CInifile& config)
         for (const auto &i : m_effects_ids)
             count += i->id().size() + 2;
 
-        temp = (pstr)_alloca(count * sizeof(char));
+        temp = (pstr)xr_alloca(count * sizeof(char));
         *temp = '\0';
         for (const auto &i : m_effects_ids)
         {
@@ -197,7 +197,7 @@ ambient::property_holder_type* ambient::object() { return (m_property_holder); }
     return (m_manager.sounds_manager());
 }
 
-ambient::SEffect* ambient::create_effect(CInifile& config, pcstr id)
+ambient::SEffect* ambient::create_effect(const CInifile& config, pcstr id)
 {
     effect* result = new effect(m_manager.effects_manager(), id);
     result->load(config);
@@ -205,10 +205,10 @@ ambient::SEffect* ambient::create_effect(CInifile& config, pcstr id)
     return (result);
 }
 
-ambient::SSndChannel* ambient::create_sound_channel(CInifile& config, pcstr id)
+ambient::SSndChannel* ambient::create_sound_channel(const CInifile& config, pcstr id, pcstr sectionToReadFrom)
 {
     channel* result = new channel(m_manager.sounds_manager(), id);
-    result->load(config);
+    result->load(config, sectionToReadFrom);
     result->fill(m_sounds_collection);
     return (result);
 }

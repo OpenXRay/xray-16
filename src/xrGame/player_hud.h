@@ -143,7 +143,7 @@ public:
 
     void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result);
     void tune(Ivector values);
-    u32 motion_length(const MotionID& M, const CMotionDef*& md, float speed);
+    u32 motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel);
     u32 motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md);
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 

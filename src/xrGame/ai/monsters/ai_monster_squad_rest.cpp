@@ -9,7 +9,7 @@ void CMonsterSquad::ProcessIdle()
     VERIFY(leader && !leader->getDestroy());
 
     // Выделить элементы с общими врагами и состянием атаки
-    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
+    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); ++it_goal)
     {
         SMemberGoal goal = it_goal->second;
         if ((goal.type == MG_Rest) || (goal.type == MG_WalkGraph))
@@ -48,7 +48,7 @@ void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
         left.clear();
         right.clear();
 
-        for (auto IT = members.begin(); IT != members.end(); IT++)
+        for (auto IT = members.begin(); IT != members.end(); ++IT)
         {
             if ((*IT) == leader)
                 continue;
@@ -214,7 +214,7 @@ void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
     else if (goal.type == MG_Rest)
     {
         // пересчитать положение в команде в соответствие с целью лидера
-        for (auto it = members.begin(); it != members.end(); it++)
+        for (auto it = members.begin(); it != members.end(); ++it)
         {
             if ((*it) == leader)
                 continue;

@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrCore/FMesh.hpp"
 #include "FSkinned.h"
 #include "SkeletonX.h"
 #include "Layers/xrRenderDX10/dx10BufferUtils.h"
 #include "Layers/xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRenderGL/glBufferPool.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
 
@@ -386,7 +386,11 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     {
     case RM_SKINNING_SOFT:
         //Msg("skinning: software");
+#ifdef USE_OGL
+        V.rm_geom.create(vertRenderFVF, RCache.Vertex.Buffer(), (V.p_rm_Indices) ? V.p_rm_Indices->m_Buffer : 0);
+#else
         V.rm_geom.create(vertRenderFVF, RCache.Vertex.Buffer(), V.p_rm_Indices);
+#endif // USE_OGL
         break;
     case RM_SINGLE:
     case RM_SKINNING_1B:
@@ -399,27 +403,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_01W);
-#else
+#else // USE_OGL
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_01W, 0);
 #endif // USE_OGL
         VERIFY(vStride == sizeof(vertHW_1W));
-        //BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
+        VERIFY(nullptr == V.p_rm_Vertices);
 
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_1W* dst = (vertHW_1W*)bytes;
-        //vertBoned1W* src = (vertBoned1W*)_verts_;
-        //for (u32 it = 0; it<V.vCount; it++)
-        //{
-        //    Fvector2 uv;
-        //    uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv, src->matrix*3);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
         // TODO: DX10: Check for memory fragmentation
         vertHW_1W* dstOriginal = xr_alloc<vertHW_1W>(V.vCount);
         vertHW_1W* dst = dstOriginal;
@@ -433,13 +422,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
 #ifdef USE_OGL
-        glBufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
-#else
+        GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
+#else // USE_OGL
         R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
-#endif
+#endif // USE_OGL
         xr_free(dstOriginal);
-
         V.rm_geom.create(dwDecl_01W, V.p_rm_Vertices, V.p_rm_Indices);
     }
     break;
@@ -453,27 +441,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_2W);
-#else
+#else // USE_OGL
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_2W, 0);
-#endif
+#endif // USE_OGL
         VERIFY(vStride == sizeof(vertHW_2W));
-        // BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
+        VERIFY(nullptr == V.p_rm_Vertices);
 
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_2W* dst = (vertHW_2W*)bytes;
-        //vertBoned2W* src = (vertBoned2W*)_verts_;
-        //for (u32 it = 0; it<V.vCount; ++it)
-        //{
-        //    Fvector2uv;
-        //    uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv, int(src->matrix0)*3, int(src->matrix1)*3, src->w);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
         // TODO: DX10: Check for memory fragmentation
         vertHW_2W* dstOriginal = xr_alloc<vertHW_2W>(V.vCount);
         vertHW_2W* dst = dstOriginal;
@@ -487,13 +460,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
 #ifdef USE_OGL
-        glBufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
-#else
+        GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
+#else // USE_OGL
         R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
-#endif
+#endif // USE_OGL
         xr_free(dstOriginal);
-
         V.rm_geom.create(dwDecl_2W, V.p_rm_Vertices, V.p_rm_Indices);
     }
     break;
@@ -506,29 +478,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
         }
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_3W);
-#else
+#else // USE_OGL
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_3W, 0);
 #endif // USE_OGL
         VERIFY(vStride == sizeof(vertHW_3W));
-        //BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
+        VERIFY(nullptr == V.p_rm_Vertices);
 
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_3W* dst = (vertHW_3W*)bytes;
-        //vertBoned3W* src = (vertBoned3W*)_verts_;
-
-        //for (u32 it = 0; it<V.vCount; ++it)
-        //{
-        //    Fvector2 uv;
-        //    uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv,
-        //        int(src->m[0])*3, int(src->m[1])*3, int(src->m[2])*3, src->w[0], src->w[1]);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
         // TODO: DX10: Check for memory fragmentation
         vertHW_3W* dstOriginal = xr_alloc<vertHW_3W>(V.vCount);
         vertHW_3W* dst = dstOriginal;
@@ -543,13 +498,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
 #ifdef USE_OGL
-        glBufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
-#else
+        GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
+#else // USE_OGL
         R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
-#endif
+#endif // USE_OGL
         xr_free(dstOriginal);
-
         V.rm_geom.create(dwDecl_3W, V.p_rm_Vertices, V.p_rm_Indices);
     }
     break;
@@ -563,27 +517,11 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 
 #ifdef USE_OGL
         u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_4W);
-#else
+#else // USE_OGL
         u32 vStride = D3DXGetDeclVertexSize(dwDecl_4W, 0);
-#endif
+#endif // USE_OGL
         VERIFY(vStride == sizeof(vertHW_4W));
-        //BYTE* bytes = 0;
-        VERIFY(NULL == V.p_rm_Vertices);
-
-        //R_CHK
-        //(HW.pDevice->CreateVertexBuffer(V.vCount*vStride, dwUsage, 0, D3DPOOL_MANAGED, &V.p_rm_Vertices, 0));
-        //R_CHK(V.p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
-        //vertHW_4W* dst = (vertHW_4W*)bytes;
-        //vertBoned4W* src = (vertBoned4W*)_verts_;
-        //for (u32 it = 0; it<V.vCount; ++it)
-        //{
-        //    Fvector2 uv; uv.set(src->u, src->v);
-        //    dst->set(src->P, src->N, src->T, src->B, uv, int(src->m[0])*3,
-        //        int(src->m[1])*3, int(src->m[2])*3, int(src->m[3])*3, src->w[0], src->w[1], src->w[2]);
-        //    dst++;
-        //    src++;
-        //}
-        //V.p_rm_Vertices->Unlock();
+        VERIFY(nullptr == V.p_rm_Vertices);
 
         // TODO: DX10: Check for memory fragmentation
         vertHW_4W* dstOriginal = xr_alloc<vertHW_4W>(V.vCount);
@@ -599,13 +537,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
 #ifdef USE_OGL
-        glBufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
-#else
+        GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
+#else // USE_OGL
         R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
-#endif
+#endif // USE_OGL
         xr_free(dstOriginal);
-
         V.rm_geom.create(dwDecl_4W, V.p_rm_Vertices, V.p_rm_Indices);
     }
     break;
@@ -1523,7 +1460,7 @@ template <typename vertex_buffer_type>
 void TEnumBoneVertices(
     vertex_buffer_type vertices, u16* indices, CBoneData::FacesVec& faces, SEnumVerticesCallback& C)
 {
-    for (auto it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); ++it)
     {
         u32 idx = (*it) * 3;
         for (u32 k = 0; k < 3; k++)

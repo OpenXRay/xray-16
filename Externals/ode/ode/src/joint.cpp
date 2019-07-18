@@ -2542,11 +2542,11 @@ extern "C" ODE_API void dJointSetAMotorAxis (dxJointAMotor *joint, int anum, int
 extern "C" ODE_API void dJointSetAMotorAngle (dxJointAMotor *joint, int anum,
 				      dReal angle)
 {
-  dAASSERT(joint && anum >= 0 && anum < 3);
+  dAASSERT(joint && anum >= 0 && anum < 2);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
   if (joint->mode == dAMotorUser) {
     if (anum < 0) anum = 0;
-    if (anum > 3) anum = 3;
+    if (anum > 2) anum = 2;
     joint->angle[anum] = angle;
   }
 }
@@ -2620,10 +2620,10 @@ extern "C" ODE_API int dJointGetAMotorAxisRel (dxJointAMotor *joint, int anum)
 
 extern "C" ODE_API dReal dJointGetAMotorAngle (dxJointAMotor *joint, int anum)
 {
-  dAASSERT(joint && anum >= 0 && anum < 3);
+  dAASSERT(joint && anum >= 0 && anum < 2);
   dUASSERT(joint->vtable == &__damotor_vtable,"joint is not an amotor");
   if (anum < 0) anum = 0;
-  if (anum > 3) anum = 3;
+  if (anum > 2) anum = 2;
   return joint->angle[anum];
 }
 

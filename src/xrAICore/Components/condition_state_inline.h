@@ -154,7 +154,7 @@ IC CConditionState<_world_property>& CConditionStateAbstract::operator-=(const C
             ++I;
             ++i;
         }
-    m_conditions = temp;
+    m_conditions = std::move(temp);
     return (*this);
 }
 

@@ -335,10 +335,10 @@ void CAI_Rat::move(bool bCanAdjustSpeed, bool bStraightForward)
     m_bCanAdjustSpeed = bCanAdjustSpeed;
     m_bStraightForward = bStraightForward;
 
-    Fvector tSafeHPB = m_tHPB;
-    Fvector tSavedPosition = Position();
-    SRotation tSavedTorsoTarget = movement().m_body.target;
-    float fSavedDHeading = m_fDHeading;
+    const Fvector tSafeHPB = m_tHPB; //-V821
+    const Fvector tSavedPosition = Position(); //-V821
+    const SRotation tSavedTorsoTarget = movement().m_body.target; //-V821
+    const float fSavedDHeading = m_fDHeading; //-V821
 
     if (bCanAdjustSpeed)
         select_speed();

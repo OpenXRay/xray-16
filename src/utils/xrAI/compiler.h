@@ -3,8 +3,8 @@
 #include "xrCDB/xrCDB.h"
 #include "utils/Shader_xrLC.h"
 #include "xrAICore/Navigation/level_graph.h"
-#include "editors/LevelEditor/Engine/communicate.h"
-#include "editors/LevelEditor/Edit/ESceneAIMapTools_Export.h"
+#include "utils/communicate.h"
+#include "ESceneAIMapTools_Export.h"
 #include "Layers/xrRender/ETextureParams.h"
 
 // base patch used all the time up to merging
@@ -84,6 +84,10 @@ extern SAIParams g_params;
 struct b_BuildTexture : public b_texture
 {
     STextureParams THM;
+
+    b_BuildTexture() : b_texture() {}
+    b_BuildTexture(IReader*& file) : b_texture(file) {}
+    b_BuildTexture(const b_texture& p) : b_texture(p) {}
 
     u32& Texel(u32 x, u32 y) { return pSurface[y * dwWidth + x]; }
     void Vflip()

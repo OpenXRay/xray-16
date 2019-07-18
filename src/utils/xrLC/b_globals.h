@@ -15,9 +15,10 @@ bool exact_normalize(float* a);
 
 struct SBuildOptions
 {
+    BOOL b_skipinvalid;
     BOOL b_radiosity;
     BOOL b_noise;
     BOOL b_net_light;
-    SBuildOptions() : b_radiosity(FALSE), b_noise(FALSE), b_net_light(FALSE) {}
+    SBuildOptions() : b_skipinvalid(FALSE), b_radiosity(FALSE), b_noise(FALSE), b_net_light(FALSE) {}
 };
 extern SBuildOptions g_build_options;

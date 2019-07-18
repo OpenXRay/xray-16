@@ -1,10 +1,17 @@
 #include "pch_script.h"
 #include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
 CConsole* console() { return Console; }
+
+bool get_renderer_command_state(void)
+{
+    return renderer_allow_override;
+}
+
 int get_console_integer(CConsole* c, LPCSTR cmd)
 {
     int min = 0, max = 0;
@@ -39,5 +46,7 @@ SCRIPT_EXPORT(CConsole, (), {
             .def("get_bool", &get_console_bool)
             .def("get_float", &get_console_float)
             .def("get_token", &CConsole::GetToken)
-            .def("execute_deferred", &execute_console_command_deferred)];
+            .def("execute_deferred", &execute_console_command_deferred),
+            
+        def("renderer_allow_override", &get_renderer_command_state)];
 });

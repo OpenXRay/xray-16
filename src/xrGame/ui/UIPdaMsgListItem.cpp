@@ -16,17 +16,15 @@ void CUIPdaMsgListItem::InitPdaMsgListItem(const Fvector2& size)
 
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "maingame_pda_msg.xml");
-
-    CUIXmlInit xml_init;
     AttachChild(&UIIcon);
-    xml_init.InitStatic(uiXml, "icon_static", 0, &UIIcon);
+    CUIXmlInit::InitStatic(uiXml, "icon_static", 0, &UIIcon);
 
     AttachChild(&UITimeText);
-    xml_init.InitTextWnd(uiXml, "time_static", 0, &UITimeText);
+    CUIXmlInit::InitTextWnd(uiXml, "time_static", 0, &UITimeText);
 
     AttachChild(&UICaptionText);
-    xml_init.InitTextWnd(uiXml, "caption_static", 0, &UICaptionText);
+    CUIXmlInit::InitTextWnd(uiXml, "caption_static", 0, &UICaptionText);
 
     AttachChild(&UIMsgText);
-    xml_init.InitTextWnd(uiXml, "msg_static", 0, &UIMsgText);
+    CUIXmlInit::InitTextWnd(uiXml, "msg_static", 0, &UIMsgText);
 }

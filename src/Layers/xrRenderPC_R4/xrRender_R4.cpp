@@ -17,13 +17,17 @@ XR_EXPORT void SetupEnv()
     xrRender_initconsole();
 }
 
-XR_EXPORT pcstr GetModeName()
-{
-    return "renderer_r4";
-}
-
 XR_EXPORT bool CheckRendererSupport()
 {
     return xrRender_test_hw() ? true : false;
 }
 }
+
+SCRIPT_EXPORT(CheckRendererSupport_R4, (),
+{
+    using namespace luabind;
+    module(luaState)
+    [
+        def("xrRender_test_r4_hw", &CheckRendererSupport)
+    ];
+});

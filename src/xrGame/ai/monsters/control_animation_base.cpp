@@ -301,11 +301,13 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 void CControlAnimationBase::CheckReplacedAnim()
 {
     for (auto it = m_tReplacedAnims.begin(); m_tReplacedAnims.end() != it; ++it)
+    {
         if ((cur_anim_info().get_motion() == it->cur_anim) && (*(it->flag) == true))
         {
             cur_anim_info().set_motion(it->new_anim);
             return;
         }
+    }
 }
 
 SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
@@ -313,7 +315,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
     // искать текущую анимацию в AA_VECTOR
     MotionID motion = smart_cast<IKinematicsAnimated*>(m_object->Visual())->LL_MotionID(anim_name);
 
-    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
+    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); ++it)
     {
         if (it->motion == motion)
             return (*it);
@@ -326,7 +328,7 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
 SAAParam& CControlAnimationBase::AA_GetParams(MotionID motion, float time_perc)
 {
     // искать текущую анимацию в AA_VECTOR
-    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
+    for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); ++it)
     {
         if ((it->motion == motion) && (it->time == time_perc))
             return (*it);
@@ -367,7 +369,12 @@ void CControlAnimationBase::FX_Play(EHitSide side, float amount)
     }
 
     if (p_str && p_str->size())
-        smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX(*(*p_str), amount);
+    {
+        if (anim_it->fxs.may_not_exist[side])
+            smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX_Safe(*(*p_str), amount);
+        else
+            smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX(*(*p_str), amount);
+    }
 
     fx_time_last_play = m_object->m_dwCurrentTime;
 }
@@ -502,8 +509,9 @@ void CControlAnimationBase::ValidateAnimation()
 void CControlAnimationBase::UpdateAnimCount()
 {
     IKinematicsAnimated* skel = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    xr_vector<u32> subjectsToDelete;
 
-    for (auto it = m_anim_storage.begin(); it != m_anim_storage.end(); it++)
+    for (auto it = m_anim_storage.begin(); it != m_anim_storage.end(); ++it)
     {
         if (!(*it))
             continue;
@@ -530,13 +538,55 @@ void CControlAnimationBase::UpdateAnimCount()
                 break;
         }
 
+        if (count == 0 && (*it)->target_name2.size())
+        {
+            for (int i = 0;; ++i)
+            {
+                strconcat(sizeof(s_temp), s_temp, *((*it)->target_name2), xr_itoa(i, s, 10));
+                LPCSTR name = s_temp;
+                MotionID id = skel->ID_Cycle_Safe(name);
+
+                if (id.valid())
+                {
+                    count++;
+                    AddAnimTranslation(id, name);
+                }
+                else
+                    break;
+            }
+        }
+
         if (count != 0)
             (*it)->count = count;
+        else if ((*it)->target_may_not_exist)
+            subjectsToDelete.push_back(std::distance(m_anim_storage.begin(), it));
         else
         {
             xr_sprintf(s, "Error! No animation: %s for monster %s", *((*it)->target_name), *m_object->cName());
             R_ASSERT2(count != 0, s);
+            subjectsToDelete.push_back(std::distance(m_anim_storage.begin(), it));
         }
+    }
+
+    for (u32 idx : subjectsToDelete)
+    {
+        xr_delete(m_anim_storage[idx]);
+        while (true)
+        {
+            auto it = std::find_if(m_tReplacedAnims.begin(), m_tReplacedAnims.end(), [idx](const SReplacedAnim& ranim)
+            {
+                return ranim.cur_anim == idx || ranim.new_anim == idx;
+            });
+            if (it == m_tReplacedAnims.end())
+                break;
+            m_tReplacedAnims.erase(it);
+        }
+        const auto it = std::find_if(m_tMotions.begin(), m_tMotions.end(), [idx](const std::pair<EAction, SMotionItem>& item)
+        {
+            return item.second.anim == idx;
+        });
+        if (it != m_tMotions.end())
+            m_tMotions.erase(it);
     }
 }
 

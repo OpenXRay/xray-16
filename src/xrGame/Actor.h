@@ -100,8 +100,8 @@ public:
     // Render
     virtual void renderable_Render();
     virtual BOOL renderable_ShadowGenerate();
-    virtual void feel_sound_new(
-        IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power);
+    void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
+        const Fvector& position, float power) override;
     virtual Feel::Sound* dcast_FeelSound() { return this; }
     float m_snd_noise;
 #ifdef DEBUG
@@ -132,6 +132,7 @@ public:
 public:
     void AddGameNews_deffered(GAME_NEWS_DATA& news_data, u32 delay);
     virtual void AddGameNews(GAME_NEWS_DATA& news_data);
+    void ClearGameNews();
 
 protected:
     CActorStatisticMgr* m_statistic_manager;
@@ -385,7 +386,7 @@ public:
     void g_sv_Orientate(u32 mstate_rl, float dt);
     void g_Orientate(u32 mstate_rl, float dt);
     bool g_LadderOrient();
-    //	void					UpdateMotionIcon		(u32 mstate_rl);
+    void UpdateMotionIcon(u32 mstate_rl);
 
     bool CanAccelerate();
     bool CanJump();

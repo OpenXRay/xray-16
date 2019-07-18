@@ -15,7 +15,7 @@ public:
     CUIOutfitImmunity();
     virtual ~CUIOutfitImmunity();
 
-    void InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type);
+    bool InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type);
     void SetProgressValue(float cur, float comp);
 
 protected:
@@ -32,7 +32,6 @@ class CUIOutfitInfo : public CUIWindow
 {
 public:
     CUIOutfitInfo();
-    virtual ~CUIOutfitInfo();
 
     void InitFromXml(CUIXml& xml_doc);
     void UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit = NULL);
@@ -41,10 +40,10 @@ public:
 protected:
     enum
     {
-        max_count = ALife::eHitTypeMax - 4
+        max_count = ALife::eHitTypeMax - 2
     };
 
-    //	CUIStatic*			m_caption;
+    CUIStatic* m_caption;
     CUIStatic* m_Prop_line;
     CUIOutfitImmunity* m_items[max_count];
 

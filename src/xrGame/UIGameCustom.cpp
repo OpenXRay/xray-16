@@ -103,7 +103,7 @@ void CUIGameCustom::Render()
     DoRenderDialogs();
 }
 
-StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singleInstance)
+StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singleInstance, float ttlDefault /*= -1.0f*/)
 {
     if (singleInstance)
     {
@@ -111,13 +111,13 @@ StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singl
         if (it != CustomStatics.end())
             return *it;
     }
-    CUIXmlInit xmlInit;
+
     CustomStatics.push_back(new StaticDrawableWrapper());
     StaticDrawableWrapper* sss = CustomStatics.back();
     sss->m_static = new CUIStatic();
     sss->m_name = id;
-    xmlInit.InitStatic(*MsgConfig, id, 0, sss->m_static);
-    float ttl = MsgConfig->ReadAttribFlt(id, 0, "ttl", -1.0f);
+    CUIXmlInit::InitStatic(*MsgConfig, id, 0, sss->m_static);
+    float ttl = MsgConfig->ReadAttribFlt(id, 0, "ttl", ttlDefault);
     if (ttl > 0.0f)
         sss->m_endTime = Device.fTimeGlobal + ttl;
     return sss;
@@ -326,10 +326,10 @@ CMapListHelper gMapListHelper;
 void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName, const char* levelVer /*= "1.0"*/)
 {
     CInifile levelCfg(cfgName);
-    shared_str shLevelName = levelName.substr(0, levelName.find(_DELIMITER)).c_str();
-    shared_str shLevelVer = levelVer;
     if (levelCfg.section_exist("map_usage"))
     {
+        shared_str shLevelName = levelName.substr(0, levelName.find(_DELIMITER)).c_str();
+        shared_str shLevelVer = levelVer;
         if (levelCfg.line_exist("map_usage", "ver") && !levelVer)
             shLevelVer = levelCfg.r_string("map_usage", "ver");
         for (CInifile::Item& kv : levelCfg.r_section("map_usage").Data)

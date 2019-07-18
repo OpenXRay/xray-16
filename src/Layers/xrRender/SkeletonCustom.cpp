@@ -343,7 +343,7 @@ IC void iBuildGroups(CBoneData* B, U16Vec& tgt, u16 id, u16& last_id)
     if (B->IK_data.ik_flags.is(SJointIKData::flBreakable))
         id = ++last_id;
     tgt[B->GetSelfID()] = id;
-    for (xr_vector<CBoneData*>::iterator bone_it = B->children.begin(); bone_it != B->children.end(); bone_it++)
+    for (xr_vector<CBoneData*>::iterator bone_it = B->children.begin(); bone_it != B->children.end(); ++bone_it)
         iBuildGroups(*bone_it, tgt, id, last_id);
 }
 
@@ -503,7 +503,7 @@ void CKinematics::LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive)
     if (bRecursive)
     {
         for (xr_vector<CBoneData*>::iterator C = (*bones)[bone_id]->children.begin();
-             C != (*bones)[bone_id]->children.end(); C++)
+             C != (*bones)[bone_id]->children.end(); ++C)
             LL_SetBoneVisible((*C)->GetSelfID(), val, bRecursive);
     }
     Visibility_Invalidate();
@@ -569,7 +569,7 @@ IC static void RecursiveBindTransform(CKinematics* K, xr_vector<Fmatrix>& matric
     Fmatrix& BM = matrices[bone_id];
     // Build matrix
     BM.mul_43(parent, BD.bind_transform);
-    for (xr_vector<CBoneData*>::iterator C = BD.children.begin(); C != BD.children.end(); C++)
+    for (xr_vector<CBoneData*>::iterator C = BD.children.begin(); C != BD.children.end(); ++C)
         RecursiveBindTransform(K, matrices, (*C)->GetSelfID(), BM);
 }
 
@@ -719,7 +719,7 @@ void CKinematics::AddWallmark(
     for (u32 i = 0; i < children.size(); i++)
     {
         CSkeletonX* S = LL_GetChild(i);
-        for (auto b_it = test_bones.begin(); b_it != test_bones.end(); b_it++)
+        for (auto b_it = test_bones.begin(); b_it != test_bones.end(); ++b_it)
             S->FillVertices(mView, *wm, normal, size, *b_it);
     }
 
@@ -737,7 +737,7 @@ void CKinematics::CalculateWallmarks()
     {
         wm_frame = RDEVICE.dwFrame;
         bool need_remove = false;
-        for (auto it = wallmarks.begin(); it != wallmarks.end(); it++)
+        for (auto it = wallmarks.begin(); it != wallmarks.end(); ++it)
         {
             intrusive_ptr<CSkeletonWallmark>& wm = *it;
             float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;

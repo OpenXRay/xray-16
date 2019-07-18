@@ -112,7 +112,7 @@ void CUIMpPlayersAdm::FillPlayersList(u32 const)
 {
     m_pPlayersList->Clear();
     game_cl_GameState::PLAYERS_MAP_IT b = Game().players.begin();
-    for (; b != Game().players.end(); b++)
+    for (; b != Game().players.end(); ++b)
     {
         //		if(b->first!=Game().local_svdpnid)
         {

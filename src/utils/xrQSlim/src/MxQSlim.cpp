@@ -536,7 +536,7 @@ void MxEdgeQSlim::apply_contraction(const MxPairContraction& conx)
     edges.erase(new_end, edges.end());
     //	u32 rr=edges.size();
     //	Msg	("%d: %d/%d - %d",(unsigned int)edge_links(conx.v1).length(),r,rr,r-rr);
-    for (auto it = edges.begin(); it != edges.end(); it++)
+    for (auto it = edges.begin(); it != edges.end(); ++it)
         compute_edge_info(*it);
 }
 

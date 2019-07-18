@@ -17,7 +17,7 @@
 
 void CBuild::validate_splits()
 {
-    for (splitIt it = g_XSplit.begin(); it != g_XSplit.end(); it++)
+    for (splitIt it = g_XSplit.begin(); it != g_XSplit.end(); ++it)
     {
         u32 MODEL_ID = u32(it - g_XSplit.begin());
         if ((*it)->size() > c_SS_HighVertLimit * 2)
@@ -63,7 +63,7 @@ void OGF_AddFace(OGF& ogf, const Face& FF, bool _tc_)
 
 void BuildOGFGeom(OGF& ogf, const vecFace& faces, bool _tc_)
 {
-    for (vecFaceCit Fit = faces.begin(); Fit != faces.end(); Fit++)
+    for (vecFaceCit Fit = faces.begin(); Fit != faces.end(); ++Fit)
     {
         Face* FF = *Fit;
         R_ASSERT(FF);
@@ -80,7 +80,7 @@ void CBuild::Flex2OGF()
 
     g_tree.clear();
     g_tree.reserve(4096);
-    for (splitIt it = g_XSplit.begin(); it != g_XSplit.end(); it++)
+    for (splitIt it = g_XSplit.begin(); it != g_XSplit.end(); ++it)
     {
         R_ASSERT(!(*it)->empty());
 

@@ -38,15 +38,15 @@
 // MINIMUM_DRIVER_VERSION as well. While a public driver hasn't been finalized use our internal 
 // release tags to identify it (like 378.GA2).
 #define ANSEL_SDK_PRODUCT_VERSION_MAJOR 1
-#define ANSEL_SDK_PRODUCT_VERSION_MINOR 5
-#define ANSEL_SDK_MINIMUM_DRIVER_VERSION "388.13"
+#define ANSEL_SDK_PRODUCT_VERSION_MINOR 6
+#define ANSEL_SDK_MINIMUM_DRIVER_VERSION "396.GA6"
 
 // The lines below are automatically updated by build agents. Please don't touch.
 // The BUILD_NUMBER and COMMIT_HASH are useful in uniquely identifying a build of the Ansel SDK.
 // Changes to the customer facing API can be tracked with these since they are automatically 
 // updated every time a change is made.
-#define ANSEL_SDK_BUILD_NUMBER 427
-#define ANSEL_SDK_COMMIT_HASH 0x6e7c9960
+#define ANSEL_SDK_BUILD_NUMBER 490
+#define ANSEL_SDK_COMMIT_HASH 0xa7eda3e4
 
 #define ANSEL_SDK_VERSION ( uint64_t(ANSEL_SDK_PRODUCT_VERSION_MAJOR) << 48 | uint64_t(ANSEL_SDK_PRODUCT_VERSION_MINOR) << 32 \
                            | ANSEL_SDK_COMMIT_HASH )

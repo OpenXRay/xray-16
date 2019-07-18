@@ -51,7 +51,7 @@ void CPseudoGigant::Load(LPCSTR section)
     SVelocityParam& velocity_none = move().get_velocity(MonsterMovement::eVelocityParameterIdle);
     SVelocityParam& velocity_turn = move().get_velocity(MonsterMovement::eVelocityParameterStand);
     SVelocityParam& velocity_walk = move().get_velocity(MonsterMovement::eVelocityParameterWalkNormal);
-    //	SVelocityParam &velocity_run		= move().get_velocity(MonsterMovement::eVelocityParameterRunNormal);
+    SVelocityParam& velocity_run = move().get_velocity(MonsterMovement::eVelocityParameterRunNormal);
     SVelocityParam& velocity_walk_dmg = move().get_velocity(MonsterMovement::eVelocityParameterWalkDamaged);
     //	SVelocityParam &velocity_run_dmg	= move().get_velocity(MonsterMovement::eVelocityParameterRunDamaged);
     SVelocityParam& velocity_steal = move().get_velocity(MonsterMovement::eVelocityParameterSteal);
@@ -145,8 +145,8 @@ void CPseudoGigant::Load(LPCSTR section)
     // "fx_stand_b",
     // "fx_stand_l", "fx_stand_r");
 
-    // 	anim().AddAnim(eAnimRunTurnLeft,	"stand_run_left_",		-1, &velocity_run,		PS_STAND);
-    // 	anim().AddAnim(eAnimRunTurnRight,	"stand_run_right_",		-1, &velocity_run,		PS_STAND);
+    anim().AddAnim(eAnimRunTurnLeft, { "stand_run_left_", true }, -1, &velocity_run, PS_STAND);
+    anim().AddAnim(eAnimRunTurnRight, { "stand_run_right_", true }, -1, &velocity_run, PS_STAND);
 
     anim().LinkAction(ACT_STAND_IDLE, eAnimStandIdle);
     anim().LinkAction(ACT_SIT_IDLE, eAnimSitIdle);

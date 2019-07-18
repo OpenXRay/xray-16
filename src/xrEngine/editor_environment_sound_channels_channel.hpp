@@ -28,7 +28,7 @@ class channel : public CEnvAmbient::SSndChannel, public XRay::Editor::property_h
 public:
     channel(manager const& manager, shared_str const& id);
     virtual ~channel();
-    void load(CInifile& config);
+    void load(const CInifile& config, pcstr sectionToReadFrom = nullptr);
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
     inline pcstr id() const { return m_load_section.c_str(); }

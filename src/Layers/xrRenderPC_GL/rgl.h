@@ -15,6 +15,7 @@
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
+#include "Layers/xrRenderGL/glBufferPool.h"
 
 class dxRender_Visual;
 
@@ -153,8 +154,8 @@ public:
     xr_vector<ref_shader> Shaders;
     typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
-    xr_vector<GLuint> nVB, xVB;
-    xr_vector<GLuint> nIB, xIB;
+    xr_vector<IGLVertexBuffer*> nVB, xVB;
+    xr_vector<IGLIndexBuffer*> nIB, xIB;
     xr_vector<dxRender_Visual*> Visuals;
     CPSLibrary PSLibrary;
 
@@ -178,8 +179,8 @@ public:
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
-    GLuint q_sync_point[CHWCaps::MAX_GPUS];
-    //GLsync q_sync_point[CHWCaps::MAX_GPUS];
+//    GLuint q_sync_point[CHWCaps::MAX_GPUS];
+    GLsync q_sync_point[CHWCaps::MAX_GPUS];
     u32 q_sync_count;
 
     bool m_bMakeAsyncSS;
@@ -224,8 +225,8 @@ public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
     D3DVERTEXELEMENT9* getVB_Format(int id, BOOL _alt = FALSE);
-    GLuint getVB(int id, BOOL _alt = FALSE);
-    GLuint getIB(int id, BOOL _alt = FALSE);
+    IGLVertexBuffer* getVB(int id, BOOL _alt = FALSE);
+    IGLIndexBuffer* getIB(int id, BOOL _alt = FALSE);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();
@@ -357,6 +358,8 @@ public:
     BOOL occ_visible(sPoly& P) override;
 
     // Main
+    void BeforeFrame() override;
+
     void Calculate() override;
     void Render() override;
     void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
@@ -367,6 +370,8 @@ public:
 
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
+
+    void MakeContextCurrent(bool acquire) override;
 
     // Render mode
     void rmNear() override;

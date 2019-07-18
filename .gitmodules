@@ -1,6 +1,6 @@
 [submodule "Externals/LuaJIT"]
 	path = Externals/LuaJIT
-	url = https://github.com/LuaJIT/LuaJIT.git
+	url = https://github.com/OpenXRay/LuaJIT.git
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/OpenXRay/luabind-deboostified.git
@@ -31,9 +31,6 @@
 [submodule "Externals/BugTrap"]
 	path = Externals/BugTrap
 	url = https://github.com/Xottab-DUTY/BugTrap.git
-[submodule "Externals/FreeImage"]
-	path = Externals/FreeImage
-	url = https://github.com/OpenXRay/ext-win-freeimage.git
 [submodule "Externals/cryptopp"]
 	path = Externals/cryptopp
 	url = https://github.com/weidai11/cryptopp.git
@@ -43,18 +40,6 @@
 [submodule "Externals/FreeMagic"]
 	path = Externals/FreeMagic
 	url = https://github.com/OpenXRay/FreeMagic.git
-[submodule "Externals/lightwave"]
-	path = Externals/lightwave
-	url = https://github.com/OpenXRay/LightWave.git
-[submodule "Externals/3dsmax"]
-	path = Externals/3dsmax
-	url = https://github.com/OpenXRay/3dsmax.git
-[submodule "Externals/maya"]
-	path = Externals/maya
-	url = https://github.com/OpenXRay/maya.git
-[submodule "Externals/nvapi"]
-	path = Externals/nvapi
-	url = https://github.com/OpenXRay/nvapi.git
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git

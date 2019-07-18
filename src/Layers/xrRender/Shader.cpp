@@ -28,20 +28,35 @@ void resptrcode_shader::create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, 
 //////////////////////////////////////////////////////////////////////////
 #ifdef USE_OGL
 void resptrcode_geom::create(u32 FVF, GLuint vb, GLuint ib)
-#else
-void resptrcode_geom::create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
-#endif // USE_OGL
 {
     _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
 }
-#ifdef USE_OGL
+
 void resptrcode_geom::create(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib)
-#else
-void resptrcode_geom::create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
-#endif // USE_OGL
 {
     _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
 }
+
+void resptrcode_geom::create(u32 FVF, IGLVertexBuffer* vb, IGLIndexBuffer* ib)
+{
+    _set(RImplementation.Resources->CreateGeom(FVF, (vb) ? vb->m_Buffer : 0, (ib) ? ib->m_Buffer : 0));
+}
+
+void resptrcode_geom::create(D3DVERTEXELEMENT9* decl, IGLVertexBuffer* vb, IGLIndexBuffer* ib)
+{
+    _set(RImplementation.Resources->CreateGeom(decl, (vb) ? vb->m_Buffer : 0, (ib) ? ib->m_Buffer : 0));
+}
+#else // USE_OGL
+void resptrcode_geom::create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+{
+    _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
+}
+
+void resptrcode_geom::create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+{
+    _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
+}
+#endif // USE_OGL
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -146,7 +161,7 @@ u32 STextureList::find_texture_stage(const shared_str& TexName) const
 
     STextureList::const_iterator _it = this->begin();
     STextureList::const_iterator _end = this->end();
-    for (; _it != _end; _it++)
+    for (; _it != _end; ++_it)
     {
         const std::pair<u32, ref_texture>& loader = *_it;
 

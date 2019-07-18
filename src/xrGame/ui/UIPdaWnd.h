@@ -12,8 +12,10 @@ class CUIXml;
 class CUIFrameWindow;
 class UIHint;
 
+class CUIMapWnd;
 class CUITaskWnd;
 class CUIFactionWarWnd;
+class CUIActorInfoWnd;
 class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
@@ -30,9 +32,9 @@ protected:
     CUIStatic* UIMainPdaFrame;
     CUIStatic* UINoice;
 
-    CUITextWnd* m_caption;
+    CUIStatic* m_caption;
     shared_str m_caption_const;
-    //	CUIAnimatedStatic*		m_anim_static;
+    CUIAnimatedStatic* m_anim_static;
     CUITextWnd* m_clock;
 
     // Текущий активный диалог
@@ -42,8 +44,11 @@ protected:
     UIHint* m_hint_wnd;
 
 public:
+    // Поддиалоги PDA
+    CUIMapWnd* pUIMapWnd;
     CUITaskWnd* pUITaskWnd;
-    CUIFactionWarWnd*		pUIFactionWarWnd;
+    CUIFactionWarWnd* pUIFactionWarWnd;
+    CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
     CUILogsWnd* pUILogsWnd;
 

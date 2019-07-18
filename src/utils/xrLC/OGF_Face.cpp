@@ -30,7 +30,7 @@ BOOL OGF_Vertex::similar(OGF* ogf, OGF_Vertex& V)
         return FALSE;
 
     R_ASSERT(UV.size() == V.UV.size());
-    for (u32 i = 0; i < V.UV.size(); i++)
+    for (size_t i = 0; i < V.UV.size(); i++)
     {
         OGF_Texture* T = &*ogf->textures.begin() + i;
         b_texture* B = T->pBuildSurface;
@@ -48,7 +48,7 @@ void OGF_Vertex::dump(u32 id)
 BOOL x_vertex::similar(OGF* ogf, x_vertex& V) { return P.similar(V.P); }
 u16 OGF::x_BuildVertex(x_vertex& V1)
 {
-    for (itXV it = fast_path_data.vertices.begin(); it != fast_path_data.vertices.end(); it++)
+    for (itXV it = fast_path_data.vertices.begin(); it != fast_path_data.vertices.end(); ++it)
         if (it->similar(this, V1))
             return u16(it - fast_path_data.vertices.begin());
     fast_path_data.vertices.push_back(V1);
@@ -58,7 +58,7 @@ u16 OGF::_BuildVertex(OGF_Vertex& V1)
 {
     try
     {
-        for (itOGF_V it = data.vertices.begin(); it != data.vertices.end(); it++)
+        for (itOGF_V it = data.vertices.begin(); it != data.vertices.end(); ++it)
         {
             if (it->similar(this, V1))
                 return u16(it - data.vertices.begin());
@@ -77,7 +77,7 @@ void OGF::x_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_)
     if (_tc_)
         return; // make empty-list for stuff that has relevant TCs
     x_face F;
-    u32 VertCount = (u32)fast_path_data.vertices.size();
+    const size_t VertCount = fast_path_data.vertices.size();
     F.v[0] = x_BuildVertex(x_vertex(V1));
     F.v[1] = x_BuildVertex(x_vertex(V2));
     F.v[2] = x_BuildVertex(x_vertex(V3));
@@ -94,13 +94,13 @@ void OGF::x_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_)
 void OGF::_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_)
 {
     OGF_Face F;
-    u32 VertCount = (u32)data.vertices.size();
+    const size_t VertCount = data.vertices.size();
     F.v[0] = _BuildVertex(V1);
     F.v[1] = _BuildVertex(V2);
     F.v[2] = _BuildVertex(V3);
     if (!F.Degenerate())
     {
-        for (itOGF_F I = data.faces.begin(); I != data.faces.end(); I++)
+        for (itOGF_F I = data.faces.begin(); I != data.faces.end(); ++I)
             if (I->Equal(F))
                 return;
         data.faces.push_back(F);
@@ -116,7 +116,7 @@ BOOL OGF::dbg_SphereContainsVertex(Fvector& c, float R)
 {
     Fsphere S;
     S.set(c, R);
-    for (u32 it = 0; it < data.vertices.size(); it++)
+    for (size_t it = 0; it < data.vertices.size(); it++)
         if (S.contains(data.vertices[it].P))
             return TRUE;
     return FALSE;
@@ -125,7 +125,7 @@ BOOL OGF::dbg_SphereContainsVertex(Fvector& c, float R)
 void OGF::adjacent_select(xr_vector<u32>& dest, xr_vector<bool>& vmark, xr_vector<bool>& fmark)
 {
     // 0. Search for the group
-    for (u32 fit = 0; fit < data.faces.size(); fit++)
+    for (size_t fit = 0; fit < data.faces.size(); fit++)
     {
         OGF_Face& F = data.faces[fit];
         if (fmark[fit])
@@ -146,10 +146,10 @@ void OGF::adjacent_select(xr_vector<u32>& dest, xr_vector<bool>& vmark, xr_vecto
         {
             // check connectivity
             BOOL bConnected = FALSE;
-            for (u32 vid = 0; vid < 3; vid++)
+            for (size_t vid = 0; vid < 3; vid++)
             {
-                u32 id = F.v[vid]; // search in already registered verts
-                for (u32 sid = 0; sid < dest.size(); sid++)
+                const size_t id = F.v[vid]; // search in already registered verts
+                for (size_t sid = 0; sid < dest.size(); sid++)
                 {
                     if (id == dest[sid])
                     {
@@ -211,7 +211,7 @@ void OGF::Optimize()
                 Fvector2 Tmin,Tmax;
                 Tmin.set(flt_max,flt_max);
                 Tmax.set(flt_min,flt_min);
-                for (u32 j=0; j<x_vertices.size(); j++)			{
+                for (size_t j=0; j<x_vertices.size(); j++)			{
                     x_vertex& V = x_vertices[j];
                     //Tmin.min	(V.UV);
                     //Tmax.max	(V.UV);
@@ -224,7 +224,7 @@ void OGF::Optimize()
 
             // 2. Recalc UV mapping
             try {
-                for (u32 i=0; i<x_vertices.size(); i++)
+                for (size_t i=0; i<x_vertices.size(); i++)
                     x_vertices[i].UV.sub	(Tdelta);
             } catch(...) {
                 Msg	("* ERROR: optimize: x-geom : recalc : failed");
@@ -276,9 +276,9 @@ void OGF::Optimize()
         xr_vector<u32> selection;
         for (;;)
         {
-            u32 _old = selection.size();
+            const size_t _old = selection.size();
             adjacent_select(selection, vmarker, fmarker);
-            u32 _new = selection.size();
+            const size_t _new = selection.size();
             if (_old == _new)
                 break; // group selected !
         }
@@ -292,7 +292,7 @@ void OGF::Optimize()
             Fvector2 Tmin, Tmax;
             Tmin.set(flt_max, flt_max);
             Tmax.set(flt_min, flt_min);
-            for (u32 j = 0; j < selection.size(); j++)
+            for (size_t j = 0; j < selection.size(); j++)
             {
                 OGF_Vertex& V = data.vertices[selection[j]];
                 Tmin.min(V.UV[0]);
@@ -309,7 +309,7 @@ void OGF::Optimize()
         // 2. Recalc UV mapping
         try
         {
-            for (u32 i = 0; i < selection.size(); i++)
+            for (size_t i = 0; i < selection.size(); i++)
                 data.vertices[selection[i]].UV[0].sub(Tdelta);
         }
         catch (...)
@@ -350,10 +350,10 @@ void OGF::MakeProgressive(float metric_limit)
         // prepare progressive geom
         VIPM_Init();
         // clMsg("--- append v start .");
-        for (u32 v_idx = 0; v_idx < data.vertices.size(); v_idx++)
+        for (size_t v_idx = 0; v_idx < data.vertices.size(); v_idx++)
             VIPM_AppendVertex(data.vertices[v_idx].P, data.vertices[v_idx].UV[0]);
         // clMsg("--- append f start .");
-        for (u32 f_idx = 0; f_idx < data.faces.size(); f_idx++)
+        for (size_t f_idx = 0; f_idx < data.faces.size(); f_idx++)
             VIPM_AppendFace(data.faces[f_idx].v[0], data.faces[f_idx].v[1], data.faces[f_idx].v[2]);
         // clMsg("--- append end.");
 
@@ -395,12 +395,12 @@ void OGF::MakeProgressive(float metric_limit)
 
             // OK
             // Permute vertices
-            for (u32 i = 0; i < data.vertices.size(); i++)
+            for (size_t i = 0; i < data.vertices.size(); i++)
                 data.vertices[VR->permute_verts[i]] = _saved_vertices[i];
 
             // Fill indices
             data.faces.resize(VR->indices.size() / 3);
-            for (u32 f_idx = 0; f_idx < data.faces.size(); f_idx++)
+            for (size_t f_idx = 0; f_idx < data.faces.size(); f_idx++)
             {
                 data.faces[f_idx].v[0] = VR->indices[f_idx * 3 + 0];
                 data.faces[f_idx].v[1] = VR->indices[f_idx * 3 + 1];
@@ -409,7 +409,7 @@ void OGF::MakeProgressive(float metric_limit)
             // Fill SWR
             data.m_SWI.count = VR->swr_records.size();
             data.m_SWI.sw = xr_alloc<FSlideWindow>(data.m_SWI.count);
-            for (u32 swr_idx = 0; swr_idx != data.m_SWI.count; swr_idx++)
+            for (size_t swr_idx = 0; swr_idx != data.m_SWI.count; swr_idx++)
             {
                 FSlideWindow& dst = data.m_SWI.sw[swr_idx];
                 VIPM_SWR& src = VR->swr_records[swr_idx];
@@ -432,9 +432,9 @@ void OGF::MakeProgressive(float metric_limit)
         VIPM_Init();
         Fvector2 zero;
         zero.set(0, 0);
-        for (u32 v_idx = 0; v_idx < fast_path_data.vertices.size(); v_idx++)
+        for (size_t v_idx = 0; v_idx < fast_path_data.vertices.size(); v_idx++)
             VIPM_AppendVertex(fast_path_data.vertices[v_idx].P, zero);
-        for (u32 f_idx = 0; f_idx < fast_path_data.faces.size(); f_idx++)
+        for (size_t f_idx = 0; f_idx < fast_path_data.faces.size(); f_idx++)
             VIPM_AppendFace(
                 fast_path_data.faces[f_idx].v[0], fast_path_data.faces[f_idx].v[1], fast_path_data.faces[f_idx].v[2]);
 
@@ -445,15 +445,15 @@ void OGF::MakeProgressive(float metric_limit)
         }
         catch (...)
         {
-            data.faces = _saved_faces;
-            data.vertices = _saved_vertices;
+            data.faces = std::move(_saved_faces);
+            data.vertices = std::move(_saved_vertices);
             progressive_clear();
             Logger.clMsg("* X-mesh simplification failed: access violation");
         }
         if (0 == VR)
         {
-            data.faces = _saved_faces;
-            data.vertices = _saved_vertices;
+            data.faces = std::move(_saved_faces);
+            data.vertices = std::move(_saved_vertices);
             progressive_clear();
             Logger.clMsg("* X-mesh simplification failed");
         }
@@ -478,12 +478,12 @@ void OGF::MakeProgressive(float metric_limit)
 
             // Permute vertices
             vertices_saved = fast_path_data.vertices;
-            for (u32 i = 0; i < fast_path_data.vertices.size(); i++)
+            for (size_t i = 0; i < fast_path_data.vertices.size(); i++)
                 fast_path_data.vertices[VR->permute_verts[i]] = vertices_saved[i];
 
             // Fill indices
             fast_path_data.faces.resize(VR->indices.size() / 3);
-            for (u32 f_idx = 0; f_idx < fast_path_data.faces.size(); f_idx++)
+            for (size_t f_idx = 0; f_idx < fast_path_data.faces.size(); f_idx++)
             {
                 fast_path_data.faces[f_idx].v[0] = VR->indices[f_idx * 3 + 0];
                 fast_path_data.faces[f_idx].v[1] = VR->indices[f_idx * 3 + 1];
@@ -493,7 +493,7 @@ void OGF::MakeProgressive(float metric_limit)
             // Fill SWR
             fast_path_data.m_SWI.count = VR->swr_records.size();
             fast_path_data.m_SWI.sw = xr_alloc<FSlideWindow>(fast_path_data.m_SWI.count);
-            for (u32 swr_idx = 0; swr_idx != fast_path_data.m_SWI.count; swr_idx++)
+            for (size_t swr_idx = 0; swr_idx != fast_path_data.m_SWI.count; swr_idx++)
             {
                 FSlideWindow& dst = fast_path_data.m_SWI.sw[swr_idx];
                 VIPM_SWR& src = VR->swr_records[swr_idx];

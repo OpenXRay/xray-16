@@ -18,8 +18,14 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
-CUIZoneMap::CUIZoneMap() : m_current_map_idx(u8(-1)), visible(true) {}
+CUIZoneMap::CUIZoneMap() : m_current_map_idx(u8(-1)), visible(true)
+{
+    m_clock_wnd = nullptr;
+    m_pointerDistanceText = nullptr;
+}
+
 CUIZoneMap::~CUIZoneMap() {}
+
 void CUIZoneMap::Init()
 {
     CUIXml uiXml;
@@ -29,7 +35,12 @@ void CUIZoneMap::Init()
     CUIXmlInit::InitWindow(uiXml, "minimap:level_frame", 0, &m_clipFrame);
     CUIXmlInit::InitStatic(uiXml, "minimap:center", 0, &m_center);
 
-    m_clock_wnd = UIHelper::CreateStatic(uiXml, "minimap:clock_wnd", &m_background);
+    m_clock_wnd = UIHelper::CreateStatic(uiXml, "minimap:clock_wnd", &m_background, false);
+
+    if (IsGameTypeSingle())
+    {
+        m_pointerDistanceText = UIHelper::CreateStatic(uiXml, "minimap:background:dist_text", &m_background, false);
+    }
 
     m_activeMap = new CUIMiniMap();
     m_clipFrame.AttachChild(m_activeMap);
@@ -44,40 +55,45 @@ void CUIZoneMap::Init()
     m_Counter_text.SetText("");
     visible = true;
 
-    Fvector2 sz_k = m_clipFrame.GetWndSize();
-    Fvector2 sz = sz_k;
+    Fvector2 temp;
+    const float k = UI().get_current_kx();
+
+    if (m_clipFrame.WndRectIsProbablyRelative())
     {
-        float k = UI().get_current_kx();
+        temp = m_clipFrame.GetWndSize();
+        temp.y *= UI_BASE_HEIGHT * k;
+        temp.x = temp.y / k;
+        m_clipFrame.SetWndSize(temp);
 
-        sz.y *= UI_BASE_HEIGHT * k;
-        sz.x = sz.y / k;
-
-        m_clipFrame.SetWndSize(sz);
-
-        Fvector2 p = m_clipFrame.GetWndPos();
-        p.mul(UI_BASE_HEIGHT);
-        m_clipFrame.SetWndPos(p);
-
-        m_background.SetHeight(m_background.GetHeight() * UI_BASE_HEIGHT);
-        m_background.SetWidth(m_background.GetHeight() * k);
+        temp = m_clipFrame.GetWndPos();
+        m_clipFrame.SetWndPos(temp.mul(UI_BASE_HEIGHT));
     }
 
-    Fvector2 map_center;
-    m_clipFrame.GetWndRect().getcenter(map_center);
-    m_background.SetWndPos(map_center);
+    if (m_background.WndSizeIsProbablyRelative())
+    {
+        m_background.SetHeight(m_background.GetHeight() * UI_BASE_HEIGHT);
+        m_background.SetWidth(m_background.GetHeight() * k);
 
-    Fvector2 cp;
-    cp.x = m_clipFrame.GetWidth() / 2.0f;
-    cp.y = m_clipFrame.GetHeight() / 2.0f;
-    m_center.SetWndPos(cp);
+        m_clipFrame.GetWndRect().getcenter(temp);
+        m_background.SetWndPos(temp);
+    }
 
-    Fvector2 rel_pos = m_compass.GetWndPos();
-    rel_pos.mul(m_background.GetWndSize());
-    m_compass.SetWndPos(rel_pos);
+    temp = m_clipFrame.GetWndSize();
+    m_center.SetWndPos(temp.div(2.0f));
 
-    rel_pos = m_clock_wnd->GetWndPos();
-    rel_pos.mul(m_background.GetWndSize());
-    m_clock_wnd->SetWndPos(rel_pos);
+    if (m_compass.WndPosIsProbablyRelative())
+    {
+        temp = m_compass.GetWndPos();
+        temp.mul(m_background.GetWndSize());
+        m_compass.SetWndPos(temp);
+    }
+
+    if (m_clock_wnd && m_clock_wnd->WndPosIsProbablyRelative())
+    {
+        temp = m_clock_wnd->GetWndPos();
+        temp.mul(m_background.GetWndSize());
+        m_clock_wnd->SetWndPos(temp);
+    }
 
     if (IsGameTypeSingle())
     {
@@ -86,9 +102,12 @@ void CUIZoneMap::Init()
         CUIXmlInit::InitTextWnd(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
         m_Counter.AttachChild(&m_Counter_text);
 
-        rel_pos = m_Counter.GetWndPos();
-        rel_pos.mul(m_background.GetWndSize());
-        m_Counter.SetWndPos(rel_pos);
+        if (m_Counter.WndPosIsProbablyRelative())
+        {
+            temp = m_Counter.GetWndPos();
+            temp.mul(m_background.GetWndSize());
+            m_Counter.SetWndPos(temp);
+        }
     }
 }
 
@@ -129,8 +148,11 @@ void CUIZoneMap::Update()
     Device.vCameraDirection.getHP(h, p);
     SetHeading(-h);
 
-    m_clock_wnd->TextItemControl()->SetText(
-        InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+    if (m_clock_wnd)
+    {
+        m_clock_wnd->TextItemControl()->SetText(
+            InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+    }
 }
 
 void CUIZoneMap::SetHeading(float angle)
@@ -144,6 +166,20 @@ void CUIZoneMap::UpdateRadar(Fvector pos)
     m_clipFrame.Update();
     m_background.Update();
     m_activeMap->SetActivePoint(pos);
+
+    if (m_pointerDistanceText)
+    {
+        if (m_activeMap->GetPointerDistance() > 0.5f)
+        {
+            string64 str;
+            xr_sprintf(str, "%.0f m", m_activeMap->GetPointerDistance());
+            m_pointerDistanceText->SetText(str);
+        }
+        else
+        {
+            m_pointerDistanceText->SetText("");
+        }
+    }
 }
 
 bool CUIZoneMap::ZoomIn() { return true; }

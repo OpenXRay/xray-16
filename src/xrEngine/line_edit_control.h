@@ -8,6 +8,8 @@
 #ifndef LINE_EDIT_CONTROL_H_INCLUDED
 #define LINE_EDIT_CONTROL_H_INCLUDED
 
+#include "xr_input.h"
+
 namespace text_editor
 {
 void remove_spaces(pstr str); // in & out
@@ -50,17 +52,24 @@ class ENGINE_API line_edit_control
     using Callback = fastdelegate::FastDelegate0<void>;
 
 public:
-    line_edit_control(u32 str_buffer_size);
-    void init(u32 str_buffer_size, init_mode mode = im_standart);
+    line_edit_control(size_t str_buffer_size);
+    void init(size_t str_buffer_size, init_mode mode = im_standart);
     ~line_edit_control();
 
     void clear_states();
+
+    void on_ir_capture();
+    void on_ir_release();
+
     void on_key_press(int dik);
     void on_key_hold(int dik);
     void on_key_release(int dik);
+    void on_text_input(const char *text);
+    
     void on_frame();
 
     void assign_callback(int const dik, key_state state, Callback const& callback);
+    void remove_callback(int dik);
 
     void insert_character(char c);
 
@@ -76,6 +85,8 @@ public:
     void set_edit(pcstr str);
     void set_selected_mode(bool status) { m_unselected_mode = !status; }
     bool get_selected_mode() const { return !m_unselected_mode; }
+
+    bool char_is_allowed(char c);
 
 private:
     line_edit_control(line_edit_control const&);
@@ -105,12 +116,10 @@ private:
     void xr_stdcall delete_word_forward();
     void xr_stdcall SwitchKL();
 
-    void assign_char_pairs(init_mode mode);
     void create_key_state(int const dik, key_state state);
-    void create_char_pair(int const dik, char c, char c_shift, bool translate = false);
 
     void clear_inserted();
-    bool empty_inserted();
+    bool empty_inserted() const;
 
     void add_inserted_text();
 
@@ -119,7 +128,7 @@ private:
     void clamp_cur_pos();
 
 private:
-    Base* m_actions[SDL_NUM_SCANCODES];
+    Base* m_actions[CInput::COUNT_KB_BUTTONS];
 
     char* m_edit_str;
     char* m_undo_buf;
@@ -134,12 +143,13 @@ private:
         MIN_BUF_SIZE = 8,
         MAX_BUF_SIZE = 4096
     };
-    int m_buffer_size;
+    size_t m_buffer_size;
 
-    int m_cur_pos;
-    int m_select_start;
-    int m_p1;
-    int m_p2;
+    size_t m_cur_pos;
+    size_t m_inserted_pos;
+    size_t m_select_start;
+    size_t m_p1;
+    size_t m_p2;
 
     float m_accel;
     float m_cur_time;
@@ -149,6 +159,7 @@ private:
     u32 m_last_changed_frame;
 
     Flags32 m_key_state;
+    init_mode m_current_mode;
 
     bool m_hold_mode;
     bool m_insert_mode;

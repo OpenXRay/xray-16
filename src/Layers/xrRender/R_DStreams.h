@@ -5,8 +5,8 @@
 #ifdef USE_OGL
 enum
 {
-    LOCKFLAGS_FLUSH = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
-    LOCKFLAGS_APPEND = GL_MAP_WRITE_BIT // TODO: Implement buffer object appending using glBufferSubData
+    LOCKFLAGS_FLUSH = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
+    LOCKFLAGS_APPEND = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT // TODO: Implement buffer object appending using glBufferSubData
 };
 #else
 enum

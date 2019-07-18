@@ -15,7 +15,7 @@ static void generate_orthonormal_basis(const Fvector& dir, Fmatrix& result)
 }
 CParticlesPlayer::SParticlesInfo* CParticlesPlayer::SBoneInfo::FindParticles(const shared_str& ps_name)
 {
-    for (auto it = particles.begin(); it != particles.end(); it++)
+    for (auto it = particles.begin(); it != particles.end(); ++it)
         if (it->ps && it->ps->Name() == ps_name)
             return &(*it);
     return 0;
@@ -45,7 +45,7 @@ void CParticlesPlayer::SBoneInfo::StopParticles(const shared_str& ps_name, bool 
 
 void CParticlesPlayer::SBoneInfo::StopParticles(u16 sender_id, bool bDestroy)
 {
-    for (auto it = particles.begin(); it != particles.end(); it++)
+    for (auto it = particles.begin(); it != particles.end(); ++it)
         if (it->sender_id == sender_id)
         {
             if (!bDestroy)
@@ -82,7 +82,7 @@ void CParticlesPlayer::LoadParticles(IKinematics* K)
     {
         bone_mask = 0;
         CInifile::Sect& data = ini->r_section("particle_bones");
-        for (auto I = data.Data.cbegin(); I != data.Data.cend(); I++)
+        for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
         {
             const CInifile::Item& item = *I;
             u16 index = K->LL_BoneID(*item.first);
@@ -104,11 +104,11 @@ void CParticlesPlayer::net_DestroyParticles()
 {
     VERIFY(m_self_object);
 
-    for (auto b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
+    for (auto b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
     {
         SBoneInfo& b_info = *b_it;
 
-        for (auto p_it = b_info.particles.begin(); p_it != b_info.particles.end(); p_it++)
+        for (auto p_it = b_info.particles.begin(); p_it != b_info.particles.end(); ++p_it)
         {
             SParticlesInfo& p_info = *p_it;
             CParticlesObject::Destroy(p_info.ps);
@@ -171,7 +171,7 @@ void CParticlesPlayer::StartParticles(
 {
     IGameObject* object = m_self_object;
     VERIFY(object);
-    for (auto it = m_Bones.begin(); it != m_Bones.end(); it++)
+    for (auto it = m_Bones.begin(); it != m_Bones.end(); ++it)
     {
         SParticlesInfo& particles_info = *it->AppendParticles(object, ps_name);
         particles_info.sender_id = sender_id;
@@ -203,7 +203,7 @@ void CParticlesPlayer::StopParticles(u16 sender_id, u16 bone_id, bool bDestroy)
 {
     if (BI_NONE == bone_id)
     {
-        for (auto it = m_Bones.begin(); it != m_Bones.end(); it++)
+        for (auto it = m_Bones.begin(); it != m_Bones.end(); ++it)
             it->StopParticles(sender_id, bDestroy);
     }
     else
@@ -219,7 +219,7 @@ void CParticlesPlayer::StopParticles(const shared_str& ps_name, u16 bone_id, boo
 {
     if (BI_NONE == bone_id)
     {
-        for (auto it = m_Bones.begin(); it != m_Bones.end(); it++)
+        for (auto it = m_Bones.begin(); it != m_Bones.end(); ++it)
             it->StopParticles(ps_name, bDestroy);
     }
     else
@@ -236,7 +236,7 @@ void CParticlesPlayer::AutoStopParticles(const shared_str& ps_name, u16 bone_id,
 {
     if (BI_NONE == bone_id)
     {
-        for (auto it = m_Bones.begin(); it != m_Bones.end(); it++)
+        for (auto it = m_Bones.begin(); it != m_Bones.end(); ++it)
         {
             SParticlesInfo* pInfo = it->FindParticles(ps_name);
             if (pInfo)
@@ -262,11 +262,11 @@ void CParticlesPlayer::UpdateParticles()
     IGameObject* object = m_self_object;
     VERIFY(object);
 
-    for (auto b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
+    for (auto b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
     {
         SBoneInfo& b_info = *b_it;
 
-        for (auto p_it = b_info.particles.begin(); p_it != b_info.particles.end(); p_it++)
+        for (auto p_it = b_info.particles.begin(); p_it != b_info.particles.end(); ++p_it)
         {
             SParticlesInfo& p_info = *p_it;
             if (!p_info.ps)

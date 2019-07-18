@@ -116,6 +116,7 @@ struct ECORE_API SState : public xr_resource_flagged
     ID3DState* state;
 #endif
     SimulatorStates state_code;
+    SState() = default;
     ~SState();
 };
 typedef resptr_core<SState, resptr_base<SState>> ref_state;
@@ -137,6 +138,7 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
 
     //	Use this for DirectX10 to cache DX9 declaration for comparison purpose only
     xr_vector<D3DVERTEXELEMENT9> dcl_code;
+    SDeclaration() = default;
     ~SDeclaration();
 };
 typedef resptr_core<SDeclaration, resptr_base<SDeclaration>> ref_declaration;

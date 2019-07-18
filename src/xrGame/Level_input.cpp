@@ -48,12 +48,12 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eMouseWheel)(x);
-    /* avo: end */
-#endif
+    }
+
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
         return;
     if (Device.Paused()
@@ -79,12 +79,11 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eMouseMove)(dx, dy);
-    /* avo: end */
-#endif
+    }
 
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
         return;
@@ -122,14 +121,13 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     bool b_ui_exist = !!CurrentGameUI();
 
-    EGameActions _curr = get_binded_action(key);
+    EGameActions _curr = GetBindedAction(key);
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (!g_bDisableAllInput && g_actor)
+    {
         g_actor->callback(GameObject::eKeyPress)(key);
-    /* avo: end */
-#endif
+    }
 
     if (_curr == kPAUSE)
     {
@@ -193,7 +191,7 @@ void CLevel::IR_OnKeyboardPress(int key)
             )
         return;
 
-    if (game && game->OnKeyboardPress(get_binded_action(key)))
+    if (game && game->OnKeyboardPress(GetBindedAction(key)))
         return;
 
     if (_curr == kQUICK_SAVE && IsGameTypeSingle())
@@ -475,14 +473,14 @@ void CLevel::IR_OnKeyboardPress(int key)
     }
 #endif // MASTER_GOLD
 
-    if (bindConsoleCmds.execute(key))
+    if (g_consoleBindCmds.execute(key))
         return;
 
     if (CURRENT_ENTITY())
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardPress(get_binded_action(key));
+            IR->IR_OnKeyboardPress(GetBindedAction(key));
     }
 
 #ifdef _DEBUG
@@ -501,16 +499,15 @@ void CLevel::IR_OnKeyboardRelease(int key)
     if (!bReady || g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eKeyRelease)(key);
-    /* avo: end */
-#endif
+    }
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
         return;
-    if (game && game->OnKeyboardRelease(get_binded_action(key)))
+    if (game && game->OnKeyboardRelease(GetBindedAction(key)))
         return;
     if (Device.Paused()
 #ifdef DEBUG
@@ -523,7 +520,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardRelease(get_binded_action(key));
+            IR->IR_OnKeyboardRelease(GetBindedAction(key));
     }
 }
 
@@ -532,12 +529,11 @@ void CLevel::IR_OnKeyboardHold(int key)
     if (g_bDisableAllInput)
         return;
 
-#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor)
+    {
         g_actor->callback(GameObject::eKeyHold)(key);
-    /* avo: end */
-#endif
+    }
 
 #ifdef DEBUG
     // Lain: added
@@ -580,11 +576,38 @@ void CLevel::IR_OnKeyboardHold(int key)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnKeyboardHold(get_binded_action(key));
+            IR->IR_OnKeyboardHold(GetBindedAction(key));
+    }
+}
+
+void CLevel::IR_OnTextInput(pcstr text)
+{
+    if (!bReady || g_bDisableAllInput)
+        return;
+
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnTextInput(text))
+        return;
+
+    if (CURRENT_ENTITY())
+    {
+        IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
+        if (IR)
+            IR->IR_OnTextInput(text);
     }
 }
 
 void CLevel::IR_OnMouseStop(int /**axis/**/, int /**value/**/) {}
+
+void CLevel::IR_OnControllerPress(int btn) 
+{ 
+    IR_OnKeyboardPress(ControllerButtonToKey[btn]); 
+}
+
+void CLevel::IR_OnControllerRelease(int btn)
+{
+    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
+}
+
 void CLevel::IR_OnActivate()
 {
     if (!pInput)
@@ -594,7 +617,7 @@ void CLevel::IR_OnActivate()
     {
         if (IR_GetKeyState(i))
         {
-            EGameActions action = get_binded_action(i);
+            EGameActions action = GetBindedAction(i);
             switch (action)
             {
             case kFWD:

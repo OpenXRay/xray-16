@@ -37,7 +37,7 @@ struct SAttackGoodwillStorage
         enemy_attack_goodwill = pSettings->r_s32(ACTIONS_POINTS_SECT, s);
 
         strconcat(sizeof(s), s, prefix, "community_member_attack_goodwill");
-        community_member_attack_goodwill = pSettings->r_s32(ACTIONS_POINTS_SECT, s);
+        community_member_attack_goodwill = pSettings->read_if_exists<s32>(ACTIONS_POINTS_SECT, s, 0);
 
         strconcat(sizeof(s), s, prefix, "friend_attack_reputation");
         friend_attack_reputation = pSettings->r_s32(ACTIONS_POINTS_SECT, s);
@@ -82,7 +82,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
     static CHARACTER_GOODWILL enemy_fight_help_goodwill =
         pSettings->r_s32(ACTIONS_POINTS_SECT, "enemy_fight_help_goodwill");
     static CHARACTER_GOODWILL community_member_fight_help_goodwill =
-        pSettings->r_s32(ACTIONS_POINTS_SECT, "community_member_fight_help_goodwill");
+        READ_IF_EXISTS(pSettings, r_s32, ACTIONS_POINTS_SECT, "community_member_fight_help_goodwill", 0);
 
     static CHARACTER_REPUTATION_VALUE friend_fight_help_reputation =
         pSettings->r_s32(ACTIONS_POINTS_SECT, "friend_fight_help_reputation");

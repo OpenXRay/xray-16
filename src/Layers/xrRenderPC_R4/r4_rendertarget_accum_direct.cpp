@@ -579,6 +579,8 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
 
+        // Pass view vector projected in shadow space to far pixel shader
+        // Needed for shadow fading.
         if (sub_phase == SE_SUN_FAR)
         {
             Fvector3 view_viewspace;
@@ -1228,7 +1230,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
         STextureList::iterator _it = _T->begin();
         STextureList::iterator _end = _T->end();
-        for (; _it != _end; _it++)
+        for (; _it != _end; ++_it)
         {
             std::pair<u32, ref_texture>& loader = *_it;
             u32 load_id = loader.first;

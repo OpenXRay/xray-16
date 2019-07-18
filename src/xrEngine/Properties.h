@@ -96,7 +96,7 @@ public:
 };
 
 // Writers
-IC void xrPWRITE(IWriter& fs, u32 ID, LPCSTR name, LPCVOID data, u32 size)
+IC void xrPWRITE(IWriter& fs, u32 ID, LPCSTR name, LPCVOID data, size_t size)
 {
     fs.w_u32(ID);
     fs.w_stringZ(name);

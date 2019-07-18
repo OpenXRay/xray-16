@@ -154,6 +154,7 @@ void CCar::OnKeyboardPress(int cmd)
             OwnerActor()->steer_Vehicle(-1);
         break;
     case kJUMP: PressBreaks(); break;
+    case kENGINE: [[fallthrough]];
     case kDETECTOR: SwitchEngine(); break;
     case kTORCH: m_lights.SwitchHeadLights(); break;
     case kUSE: break;

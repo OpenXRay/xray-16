@@ -15,11 +15,7 @@ void CLocatorAPI::auth_generate(xr_vector<shared_str>& ignore, xr_vector<shared_
     _o->ignore = ignore;
     _o->important = important;
 
-#if 1
     FS.auth_runtime(_o);
-#else
-    thread_spawn(auth_entry, "checksum", 0, _o);
-#endif
 }
 
 u64 CLocatorAPI::auth_get()
@@ -62,7 +58,7 @@ void CLocatorAPI::auth_runtime(void* params)
 
             // test for skip
             BOOL bSkip = FALSE;
-            for (u32 s = 0; s < _o->ignore.size(); s++)
+            for (size_t s = 0; s < _o->ignore.size(); s++)
             {
                 if (strstr(f.name, _o->ignore[s].c_str()))
                     bSkip = TRUE;
@@ -72,7 +68,7 @@ void CLocatorAPI::auth_runtime(void* params)
                 continue;
 
             // test for important
-            for (u32 s = 0; s < _o->important.size(); s++)
+            for (size_t s = 0; s < _o->important.size(); s++)
             {
                 if ((f.size_real != 0) && strstr(f.name, _o->important[s].c_str()))
                 {

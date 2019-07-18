@@ -100,11 +100,15 @@ public:
         MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
     virtual CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr,
         LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
+
     // fx'es
     virtual MotionID ID_FX(LPCSTR N) = 0;
     virtual MotionID ID_FX_Safe(LPCSTR N) = 0;
+
     virtual CBlend* PlayFX(LPCSTR N, float power_scale) = 0;
     virtual CBlend* PlayFX(MotionID M, float power_scale) = 0;
+
+    virtual CBlend* PlayFX_Safe(cpcstr N, float power_scale) = 0;
 
     virtual const CPartition& partitions() const = 0;
 

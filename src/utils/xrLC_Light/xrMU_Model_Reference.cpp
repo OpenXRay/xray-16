@@ -40,7 +40,7 @@ void xrMU_Reference::export_cform_game(CDB::CollectorPacked& CL)
 
         // faces and mark vertices
         cfFaces->reserve(model->m_faces.size());
-        for (xrMU_Model::v_faces_it I = model->m_faces.begin(); I != model->m_faces.end(); I++)
+        for (xrMU_Model::v_faces_it I = model->m_faces.begin(); I != model->m_faces.end(); ++I)
         {
             _face* F = *I;
             if (F->Shader().flags.bCollision)
@@ -66,7 +66,7 @@ void xrMU_Reference::export_cform_game(CDB::CollectorPacked& CL)
 
     // Collect faces
     u32 Offset = (u32)CL.getTS();
-    for (xrMU_Model::v_faces_it F = cfFaces->begin(); F != cfFaces->end(); F++)
+    for (xrMU_Model::v_faces_it F = cfFaces->begin(); F != cfFaces->end(); ++F)
     {
         _face* T = *F;
 

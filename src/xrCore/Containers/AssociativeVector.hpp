@@ -84,7 +84,7 @@ public:
     IC const_equal_range_result equal_range(const key_type& key) const;
     IC size_type count(const key_type& key) const;
     IC size_type max_size() const;
-    IC u32 size() const;
+    IC size_type size() const;
     IC bool empty() const;
     IC key_compare key_comp() const;
     IC TComparer value_comp() const;
@@ -184,7 +184,7 @@ IC void _associative_vector::clear() { inherited::clear(); }
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::size_type _associative_vector::max_size() const { return inherited::max_size(); }
 TEMPLATE_SPECIALIZATION
-IC u32 _associative_vector::size() const { return inherited::size(); }
+IC typename _associative_vector::size_type _associative_vector::size() const { return inherited::size(); }
 TEMPLATE_SPECIALIZATION
 IC bool _associative_vector::empty() const { return inherited::empty(); }
 TEMPLATE_SPECIALIZATION

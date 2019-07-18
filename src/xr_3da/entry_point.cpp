@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #if defined(WINDOWS)
-#include "StickyKeyFilter.hpp"
+#include "AccessibilityShortcuts.hpp"
 #elif defined(LINUX)
 #include <unistd.h>
 #include <stdlib.h>
@@ -14,7 +14,7 @@
 
 int entry_point(pcstr commandLine)
 {
-    xrDebug::Initialize();
+    xrDebug::Initialize(commandLine);
     R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
 
     if (!strstr(commandLine, "-nosplash"))
@@ -27,16 +27,16 @@ int entry_point(pcstr commandLine)
         GEnv.isDedicatedServer = true;
 
 #ifdef WINDOWS
-    StickyKeyFilter filter;
+    AccessibilityShortcuts shortcuts;
     if (!GEnv.isDedicatedServer)
-        filter.initialize();
+        shortcuts.Disable();
 #endif
 
     pcstr fsltx = "-fsltx ";
     string_path fsgame = "";
     if (strstr(commandLine, fsltx))
     {
-        const u32 sz = xr_strlen(fsltx);
+        const size_t sz = xr_strlen(fsltx);
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
     Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);

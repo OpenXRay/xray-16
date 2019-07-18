@@ -11,6 +11,7 @@ file(GLOB HINT Hint/*.h Hint/*.cpp)
 file(GLOB INTERACTIVE_BACKGROUND InteractiveBackground/*.h InteractiveBackground/*.cpp)
 file(GLOB LINES Lines/*.h Lines/*.cpp)
 file(GLOB LIST_BOX ListBox/*.h ListBox/*.cpp)
+file(GLOB LIST_WND ListWnd/*.h ListWnd/*.cpp)
 file(GLOB MESSAGE_BOX MessageBox/*.h MessageBox/*.cpp)
 file(GLOB OPTIONS Options/*.h Options/*.cpp)
 set(PCH pch.cpp pch.hpp)
@@ -39,6 +40,7 @@ source_group("Hint" FILES ${HINT})
 source_group("InteractiveBackground" FILES ${INTERACTIVE_BACKGROUND})
 source_group("Lines" FILES ${LINES})
 source_group("ListBox" FILES ${LIST_BOX})
+source_group("ListWnd" FILES ${LIST_WND})
 source_group("MessageBox" FILES ${MESSAGE_BOX})
 source_group("Options" FILES ${OPTIONS})
 source_group("PCH" FILES ${PCH})
@@ -68,7 +70,7 @@ endif()
 add_library(xrUICore SHARED ${ARROW} ${BUTTONS} ${CALLBACKS}
                     ${COMBO_BOX} ${CURSOR}
                     ${EDIT_BOX} ${FONT_MANAGER} ${HINT}
-                    ${INTERACTIVE_BACKGROUND} ${LINES} ${LIST_BOX}
+                    ${INTERACTIVE_BACKGROUND} ${LINES} ${LIST_BOX} ${LIST_WND}
                     ${MESSAGE_BOX} ${OPTIONS} ${PCH}
                     ${PROGRESS_BAR} ${PROPERTIES_BOX} ${SCROLL_BAR} ${SCROLL_VIEW} ${SPIN_BOX}
                     ${STATIC_WINDS} ${TAB_CONTROL} ${TRACK_BAR} ${WINDOWS} ${XML}
@@ -81,5 +83,8 @@ target_include_directories(xrUICore PRIVATE
     ../../Externals/lzo/include
     ../../Externals/luabind
     ${SDL_INCLUDE_DIRS})
-target_link_libraries(xrUICore xrAPI pugixml xrScriptEngine ${LUAJIT_LIBRARIES} xrEngine xrMiscMath xrCore luabind ${SDL_LIBRARIES})
-xr_install(${PROJECT_NAME})
+target_link_libraries(xrUICore xrAPI xrScriptEngine ${LUAJIT_LIBRARIES} xrEngine xrMiscMath xrCore xrLuabind ${SDL_LIBRARIES})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    GROUP_READ 
+    WORLD_READ )

@@ -36,10 +36,10 @@ void lblit(lm_layer& dst, lm_layer& src, u32 px, u32 py, u32 aREF)
         {
             u32 dx = px + x;
             u32 dy = py + y;
-            base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
             if (sm >= aREF)
             {
+                base_color sc = src.surface[y * ss_x + x];
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -55,10 +55,10 @@ void blit(lm_layer& dst, u32 ds_x, u32 ds_y, lm_layer& src, u32 ss_x, u32 ss_y, 
         {
             u32 dx = px + x;
             u32 dy = py + y;
-            base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
             if (sm >= aREF)
             {
+                base_color sc = src.surface[y * ss_x + x];
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -89,10 +89,10 @@ void blit_r(lm_layer& dst, u32 ds_x, u32 ds_y, lm_layer& src, u32 ss_x, u32 ss_y
         {
             u32 dx = px + y;
             u32 dy = py + x;
-            base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
             if (sm >= aREF)
             {
+                base_color sc = src.surface[y * ss_x + x];
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -131,7 +131,7 @@ void CDeflector::OA_Export()
     tN.set(0, 0, 0);
     float density = 0;
     float fcount = 0;
-    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
     {
         Face* F = it->owner;
         Fvector SN;
@@ -147,7 +147,7 @@ void CDeflector::OA_Export()
     else
     {
         Logger.clMsg("* ERROR: Internal precision error in CDeflector::OA_Export");
-        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
         {
             Face& fc = *((*it).owner);
             inlc_global_data()->err_tjunction().w_fvector3(fc.v[0]->P);
@@ -178,7 +178,7 @@ void CDeflector::OA_Export()
 
     Fbox bb;
     bb.invalidate();
-    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+    for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
     {
         UVtri* T = &*it;
         Face* F = T->owner;
@@ -241,7 +241,7 @@ void CDeflector::GetRect(Fvector2& min, Fvector2& max)
     // Calculate bounds
     xr_vector<UVtri>::iterator it = UVpolys.begin();
     min = max = it->uv[0];
-    for (; it != UVpolys.end(); it++)
+    for (; it != UVpolys.end(); ++it)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -287,11 +287,11 @@ void CDeflector::RemapUV(
     UVtri tnew;
     if (bRotate)
     {
-        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
         {
             UVtri& T = *it;
             tnew.owner = T.owner;
-            for (int i = 0; i < 3; i++)
+            for (size_t i = 0; i < 3; i++)
             {
                 tc.x = ((T.uv[i].y - a_min.y) / a_size.y) * d_size.x + d_min.x;
                 tc.y = ((T.uv[i].x - a_min.x) / a_size.x) * d_size.y + d_min.y;
@@ -302,11 +302,11 @@ void CDeflector::RemapUV(
     }
     else
     {
-        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
+        for (UVIt it = UVpolys.begin(); it != UVpolys.end(); ++it)
         {
             UVtri& T = *it;
             tnew.owner = T.owner;
-            for (int i = 0; i < 3; i++)
+            for (size_t i = 0; i < 3; i++)
             {
                 tc.x = ((T.uv[i].x - a_min.x) / a_size.x) * d_size.x + d_min.x;
                 tc.y = ((T.uv[i].y - a_min.y) / a_size.y) * d_size.y + d_min.y;
@@ -321,7 +321,7 @@ void CDeflector::RemapUV(u32 base_u, u32 base_v, u32 size_u, u32 size_v, u32 lm_
 {
     xr_vector<UVtri> tris_new;
     RemapUV(tris_new, base_u, base_v, size_u, size_v, lm_u, lm_v, bRotate);
-    UVpolys = tris_new;
+    UVpolys = std::move(tris_new);
 }
 
 void CDeflector::L_Calculate(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H)
@@ -335,7 +335,7 @@ void CDeflector::L_Calculate(CDB::COLLIDER* DB, base_lighting* LightsSelected, H
         Fbox2 bounds;
         Bounds_Summary(bounds);
         H.initialize(bounds, (u32)UVpolys.size());
-        for (u32 fid = 0; fid < UVpolys.size(); fid++)
+        for (size_t fid = 0; fid < UVpolys.size(); fid++)
         {
             UVtri* T = &(UVpolys[fid]);
             Bounds(fid, bounds);

@@ -1,6 +1,0 @@
-{TODO -oAlexMX -cTODO : Вращение костей + Системы координат для вращения и перемещения}
-{TODO 1 -oAlexMX -cTODO : GetOpenName, GetSaveName}
-{DONE -oAlexMX -cERROR : Не правильно разворачивается LeftBar -+}
-{TODO -oAlexMX -cERROR : Mgc::MinSphere - 2 time run error}
-
- 

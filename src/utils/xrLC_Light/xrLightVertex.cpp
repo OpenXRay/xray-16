@@ -33,14 +33,14 @@ void g_trans_register_internal(Vertex* V)
 
     // Decrement to the start and inc to end
     while (it != g_trans->begin() && ((it->first + eps2) > key))
-        it--;
+        --it;
     while (it2 != g_trans->end() && ((it2->first - eps2) < key))
-        it2++;
+        ++it2;
     if (it2 != g_trans->end())
-        it2++;
+        ++it2;
 
     // Search
-    for (; it != it2; it++)
+    for (; it != it2; ++it)
     {
         vecVertex& VL = it->second;
         Vertex* Front = VL.front();
@@ -179,7 +179,7 @@ void LightVertex(bool net)
     }
     // Process all groups
     Logger.Status("Transluenting...");
-    for (mapVertIt it = g_trans->begin(); it != g_trans->end(); it++)
+    for (mapVertIt it = g_trans->begin(); it != g_trans->end(); ++it)
     {
         // Unique
         vecVertex& VL = it->second;

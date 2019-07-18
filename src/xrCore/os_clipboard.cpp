@@ -12,11 +12,22 @@
 #pragma hdrstop
 #include "SDL.h"
 #include "os_clipboard.h"
-#include "xrCore/_std_extensions.h"
+#include "Text/StringConversion.hpp"
 
-void os_clipboard::copy_to_clipboard(pcstr buf)
+void os_clipboard::copy_to_clipboard(pcstr buf, bool alreadyUTF8 /*= false*/)
 {
-    if (SDL_SetClipboardText(buf) < 0)
+    int result;
+    if (alreadyUTF8)
+    {
+        result = SDL_SetClipboardText(buf);
+    }
+    else
+    {
+        static std::locale locale("");
+        xr_string string = StringToUTF8(buf, locale);
+        result = SDL_SetClipboardText(string.c_str());
+    }
+    if (result < 0)
     {
         Msg("! Failed to copy text to the clipboard: %s", SDL_GetError());
         Log(buf);
@@ -39,18 +50,21 @@ void os_clipboard::paste_from_clipboard(pstr buffer, size_t buffer_size)
         return;
     }
 
-    strncpy_s(buffer, buffer_size, clipData, buffer_size - 1);
+    static std::locale locale("");
+    const xr_string string = StringFromUTF8(clipData, locale);
+    SDL_free(clipData);
 
-    for (size_t i = 0; i < xr_strlen(buffer); ++i)
+    strncpy_s(buffer, buffer_size, string.c_str(), buffer_size - 1);
+
+    const size_t length = xr_strlen(buffer);
+    for (size_t i = 0; i < length; ++i)
     {
         const char c = buffer[i];
-        if (isprint(c) == 0 && c != char(-1) || c == '\t' || c == '\n') // "я" = -1
+        if (std::isprint(c, locale) == 0 && c != char(-1) || c == '\t' || c == '\n') // "я" = -1
         {
             buffer[i] = ' ';
         }
     }
-
-    SDL_free(clipData);
 }
 
 void os_clipboard::update_clipboard(pcstr string)
@@ -71,24 +85,25 @@ void os_clipboard::update_clipboard(pcstr string)
 
     if (!clipData)
     {
-        DEBUG_BREAK;
-        Msg("! Failed to get text from the clipboard: %s", SDL_GetError());
-        Log("! Falling back to copy_to_clipboard()");
+        VERIFY3(clipData, "Failed to get text from the clipboard", SDL_GetError());
         copy_to_clipboard(string);
         return;
     }
 
+    static std::locale locale("");
+    const xr_string stringInUTF8 = StringToUTF8(string, locale);
+
     const size_t clipLength = xr_strlen(clipData);
-    const size_t stringLength = xr_strlen(string);
+    const size_t stringLength = stringInUTF8.size();
 
     const size_t bufferSize = (clipLength + stringLength + 1) * sizeof(char);
 
-    pstr buffer = (pstr)_alloca(bufferSize);
+    pstr buffer = (pstr)xr_alloca(bufferSize);
 
     xr_strcpy(buffer, bufferSize, clipData); // copy the clipboard
-    xr_strcat(buffer, bufferSize, string);   // copy the new string
+    xr_strcat(buffer, bufferSize, stringInUTF8.c_str()); // copy the new string
 
     SDL_free(clipData);
 
-    copy_to_clipboard(buffer);
+    copy_to_clipboard(buffer, true);
 }

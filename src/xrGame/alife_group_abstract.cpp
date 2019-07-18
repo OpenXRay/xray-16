@@ -39,7 +39,8 @@ void CSE_ALifeGroupAbstract::switch_online()
             if (l_tpALifeMonsterAbstract)
                 l_tpALifeMonsterAbstract->o_torso.yaw = angle_normalize_signed((I - B) / N * PI_MUL_2);
         }
-        object->alife().add_online(J, false);
+        if (!J->m_bOnline)
+            object->alife().add_online(J, false);
     }
     m_bCreateSpawnPositions = false;
     object->alife().scheduled().remove(object);

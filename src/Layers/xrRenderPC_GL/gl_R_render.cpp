@@ -295,33 +295,13 @@ void CRender::Render()
     //*******
     // Sync point
     BasicStats.WaitS.Begin();
-    /* TODO: OGL: Implement sync point */
-/*    if (false)
-    {
-        CTimer T;
-        T.Start();
-        BOOL result = FALSE;
-        HRESULT hr = S_FALSE;
-        //while	((hr=q_sync_point[q_sync_count]->GetData	(&result,sizeof(result),D3DGETDATA_FLUSH))==S_FALSE) {
-        while ((hr = GetData(q_sync_point[q_sync_count], &result, sizeof(result))) == S_FALSE)
-        {
-            if (!SwitchToThread()) Sleep(ps_r2_wait_sleep);
-            if (T.GetElapsed_ms() > 500)
-            {
-                result = FALSE;
-                break;
-            }
-        }
-    }
-*/
-/*
-    if (false)
+
+    if (true)
     {
         CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
-        CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500));
+        CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500 * 1000 * 1000));
         CHK_GL(glDeleteSync(q_sync_point[q_sync_count]));
     }
-*/
 
     BasicStats.WaitS.End();
     // TODO: OGL: Implement SLI/Crossfire support.

@@ -681,6 +681,12 @@
     <ClCompile Include="blender_fxaa.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\D3DXRenderBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glBufferPool.cpp">
+      <Filter>dx9 to gl Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1121,11 +1127,14 @@
     <ClInclude Include="blender_fxaa.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="..\..\TypeHelper.natvis" />
+    <ClInclude Include="..\xrRenderGL\glBufferPool.h">
+      <Filter>dx9 to gl Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

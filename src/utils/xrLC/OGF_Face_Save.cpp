@@ -246,7 +246,7 @@ void OGF::PreSave(u32 tree_id)
         VDeclarator x_D;
         x_D.set(x_decl_vert);
         x_VB.Begin(x_D);
-        for (itXV V = fast_path_data.vertices.begin(); V != fast_path_data.vertices.end(); V++)
+        for (itXV V = fast_path_data.vertices.begin(); V != fast_path_data.vertices.end(); ++V)
         {
             x_vert v(V->P);
             x_VB.Add(&v, sizeof(v));
@@ -263,7 +263,7 @@ void OGF::PreSave(u32 tree_id)
         // vertex-colored
         D.set(r1_decl_vert);
         g_VB.Begin(D);
-        for (itOGF_V V = data.vertices.begin(); V != data.vertices.end(); V++)
+        for (itOGF_V V = data.vertices.begin(); V != data.vertices.end(); ++V)
         {
             r1v_vert v(V->P, V->N, V->T, V->B, V->Color, V->UV[0]);
             g_VB.Add(&v, sizeof(v));
@@ -275,7 +275,7 @@ void OGF::PreSave(u32 tree_id)
         // lmap-colored
         D.set(r1_decl_lmap);
         g_VB.Begin(D);
-        for (itOGF_V V = data.vertices.begin(); V != data.vertices.end(); V++)
+        for (itOGF_V V = data.vertices.begin(); V != data.vertices.end(); ++V)
         {
             r1v_lmap v(V->P, V->N, V->T, V->B, V->Color, V->UV[0], V->UV[1]);
             g_VB.Add(&v, sizeof(v));

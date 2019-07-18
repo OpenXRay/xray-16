@@ -17,7 +17,7 @@ void CUIEditBox::InitCustomEdit(Fvector2 pos, Fvector2 size)
     CUICustomEdit::InitCustomEdit(pos, size);
 }
 
-void CUIEditBox::InitTextureEx(LPCSTR texture, LPCSTR shader)
+bool CUIEditBox::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*/)
 {
     if (!m_frameLine)
     {
@@ -25,12 +25,17 @@ void CUIEditBox::InitTextureEx(LPCSTR texture, LPCSTR shader)
         AttachChild(m_frameLine);
         m_frameLine->SetAutoDelete(true);
     }
-    m_frameLine->InitTexture(texture, shader);
+    const bool result = m_frameLine->InitTexture(texture, shader, fatal);
     m_frameLine->SetWndPos(Fvector2().set(0, 0));
     m_frameLine->SetWndSize(GetWndSize());
+    return result;
 }
 
-void CUIEditBox::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud" DELIMITER "default"); }
+bool CUIEditBox::InitTexture(pcstr texture, bool fatal /*= true*/)
+{
+    return InitTextureEx(texture, "hud" DELIMITER "default", fatal);
+}
+
 void CUIEditBox::SetCurrentOptValue()
 {
     SetText(GetOptStringValue());

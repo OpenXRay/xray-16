@@ -162,7 +162,7 @@ void Startup(LPSTR lpCmdLine)
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    xrDebug::Initialize();
+    xrDebug::Initialize(lpCmdLine);
     Core.Initialize("xrAI");
 
     Startup(lpCmdLine);

@@ -81,17 +81,16 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_detector_artefact.xml");
 
-    CUIXmlInit xml_init;
     string512 buff;
     xr_strcpy(buff, p->ui_xml_tag());
 
-    xml_init.InitWindow(uiXml, buff, 0, this);
+    CUIXmlInit::InitWindow(uiXml, buff, 0, this);
 
     m_wrk_area = new CUIWindow();
 
     xr_sprintf(buff, "%s:wrk_area", p->ui_xml_tag());
 
-    xml_init.InitWindow(uiXml, buff, 0, m_wrk_area);
+    CUIXmlInit::InitWindow(uiXml, buff, 0, m_wrk_area);
     m_wrk_area->SetAutoDelete(true);
     AttachChild(m_wrk_area);
 
@@ -104,7 +103,7 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
         CUIStatic* S = new CUIStatic();
         shared_str name = uiXml.ReadAttrib("palette", idx, "id");
         m_palette[name] = S;
-        xml_init.InitStatic(uiXml, "palette", idx, S);
+        CUIXmlInit::InitStatic(uiXml, "palette", idx, S);
         S->SetAutoDelete(true);
         m_wrk_area->AttachChild(S);
         S->SetCustomDraw(true);

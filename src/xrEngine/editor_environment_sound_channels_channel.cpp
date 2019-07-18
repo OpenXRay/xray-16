@@ -53,9 +53,9 @@ channel::~channel()
     ::ide().destroy(m_property_holder);
 }
 
-void channel::load(CInifile& config)
+void channel::load(const CInifile& config, pcstr sectionToReadFrom)
 {
-    inherited::load(config, m_load_section.c_str());
+    inherited::load(config, m_load_section.c_str(), sectionToReadFrom);
 
     VERIFY(m_sounds.empty());
     pcstr sounds = config.r_string(m_load_section, "sounds");
@@ -81,7 +81,7 @@ void channel::save(CInifile& config)
     for (const auto &i : m_sounds)
         count += xr_strlen(i->id()) + 2;
 
-    pstr temp = (pstr)_alloca(count * sizeof(char));
+    pstr temp = (pstr)xr_alloca(count * sizeof(char));
     *temp = '\0';
     for (const auto &i : m_sounds)
     {

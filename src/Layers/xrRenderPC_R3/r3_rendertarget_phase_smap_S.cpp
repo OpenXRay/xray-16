@@ -8,7 +8,7 @@ void CRenderTarget::phase_smap_spot_clear()
     CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_ZBUFFER,	0xffffffff,	1.0f, 0L));
     */
 
-    HW.pDevice->ClearDepthStencilView(rt_smap_depth->pZRT, D3D10_CLEAR_DEPTH, 1.0f, 0L);
+    HW.pDevice->ClearDepthStencilView(rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 }
 
 void CRenderTarget::phase_smap_spot(light* L)

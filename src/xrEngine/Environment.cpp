@@ -87,41 +87,72 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     // tsky0 = Device.Resources->_CreateTexture("$user$sky0");
     // tsky1 = Device.Resources->_CreateTexture("$user$sky1");
 
-    string_path file_name;
-    m_ambients_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), TRUE, TRUE, FALSE);
-    m_sound_channels_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), TRUE, TRUE, FALSE);
-    m_effects_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "effects.ltx"), TRUE, TRUE, FALSE);
-    m_suns_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), TRUE, TRUE, FALSE);
-    m_thunderbolt_collections_config = new CInifile(
-        FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
-    m_thunderbolts_config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), TRUE, TRUE, FALSE);
-
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "environment.ltx"), TRUE, TRUE, FALSE);
-
-    // params
-    p_var_alt = deg2rad(config->r_float("environment", "altitude"));
-    p_var_long = deg2rad(config->r_float("environment", "delta_longitude"));
-    p_min_dist = std::min(.95f, config->r_float("environment", "min_dist_factor"));
-    p_tilt = deg2rad(config->r_float("environment", "tilt"));
-    p_second_prop = config->r_float("environment", "second_propability");
-    clamp(p_second_prop, 0.f, 1.f);
-    p_sky_color = config->r_float("environment", "sky_color");
-    p_sun_color = config->r_float("environment", "sun_color");
-    p_fog_color = config->r_float("environment", "fog_color");
-
-    xr_delete(config);
-
     // OpenXRay environment configuration
     useDynamicSunDir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
     sunDirAzimuth = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
     clamp(sunDirAzimuth, 0.0f, 360.0f);
     sunDirAzimuth *= (PI / 180.0f);
+
+    m_ambients_config = nullptr;
+    m_sound_channels_config = nullptr;
+    m_effects_config = nullptr;
+    m_suns_config = nullptr;
+    m_thunderbolt_collections_config = nullptr;
+    m_thunderbolts_config = nullptr;
+
+    string_path filePath;
+    const bool environmentFolderExist = FS.exist("$game_config$", "environment" DELIMITER);
+
+    CInifile const* config = pSettings;
+    pcstr section = "thunderbolt_common";
+
+    if (environmentFolderExist)
+    {
+        config = new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "environment.ltx"),
+            TRUE, TRUE, FALSE);
+        section = "environment";
+    }
+    else
+    {
+        R_ASSERT4(config->section_exist(section),
+            "Path (which is [Argument 1]) doesn't exist and section (which is [Argument 2]) is missing. "
+            "Please, use either COP or SOC weather config", filePath, section);
+    }
+
+    // params
+    if (!config->try_read(p_var_alt, section, "altitude"))
+    {
+        p_var_alt.x = config->r_float(section, "altitude");
+        p_var_alt.y = p_var_alt.x;
+    }
+    p_var_alt.x = deg2rad(p_var_alt.x);
+    p_var_alt.y = deg2rad(p_var_alt.y);
+    p_var_long = deg2rad(config->r_float(section, "delta_longitude"));
+    p_min_dist = std::min(MAX_DIST_FACTOR, config->r_float(section, "min_dist_factor"));
+    p_tilt = deg2rad(config->r_float(section, "tilt"));
+    p_second_prop = config->r_float(section, "second_propability");
+    clamp(p_second_prop, 0.f, 1.f);
+    p_sky_color = config->r_float(section, "sky_color");
+    p_sun_color = config->r_float(section, "sun_color");
+    p_fog_color = config->r_float(section, "fog_color");
+
+    if (environmentFolderExist)
+        xr_delete(config);
+    else
+        return;
+
+    m_ambients_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "ambients.ltx"), TRUE, TRUE, FALSE);
+    m_sound_channels_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), TRUE, TRUE, FALSE);
+    m_effects_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "effects.ltx"), TRUE, TRUE, FALSE);
+    m_suns_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "suns.ltx"), TRUE, TRUE, FALSE);
+    m_thunderbolt_collections_config = new CInifile(
+        FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
+    m_thunderbolts_config =
+        new CInifile(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), TRUE, TRUE, FALSE);
 }
 
 CEnvironment::~CEnvironment()
@@ -129,29 +160,23 @@ CEnvironment::~CEnvironment()
     xr_delete(PerlinNoise1D);
     OnDeviceDestroy();
 
-    VERIFY(m_ambients_config);
     CInifile::Destroy(m_ambients_config);
-    m_ambients_config = 0;
+    m_ambients_config = nullptr;
 
-    VERIFY(m_sound_channels_config);
     CInifile::Destroy(m_sound_channels_config);
-    m_sound_channels_config = 0;
+    m_sound_channels_config = nullptr;
 
-    VERIFY(m_effects_config);
     CInifile::Destroy(m_effects_config);
-    m_effects_config = 0;
+    m_effects_config = nullptr;
 
-    VERIFY(m_suns_config);
     CInifile::Destroy(m_suns_config);
-    m_suns_config = 0;
+    m_suns_config = nullptr;
 
-    VERIFY(m_thunderbolt_collections_config);
     CInifile::Destroy(m_thunderbolt_collections_config);
-    m_thunderbolt_collections_config = 0;
+    m_thunderbolt_collections_config = nullptr;
 
-    VERIFY(m_thunderbolts_config);
     CInifile::Destroy(m_thunderbolts_config);
-    m_thunderbolts_config = 0;
+    m_thunderbolts_config = nullptr;
 
     destroy_mixer();
 }
@@ -300,7 +325,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
             NormalizeTime(fGameTime - ((rewind_tm / (Current[1]->exec_time - fGameTime)) * current_length - rewind_tm));
         C1->copy(*Current[1]);
         C1->exec_time = NormalizeTime(start_tm);
-        for (auto t_it = CurrentWeather->begin() + 2; t_it != CurrentWeather->end() - 1; t_it++)
+        for (auto t_it = CurrentWeather->begin() + 2; t_it != CurrentWeather->end() - 1; ++t_it)
             (*t_it)->exec_time = NormalizeTime(start_tm + (*t_it)->exec_time_loaded);
         SelectEnv(PrevWeather, WFX_end_desc[0], CE->exec_time);
         SelectEnv(PrevWeather, WFX_end_desc[1], WFX_end_desc[0]->exec_time + 0.5f);
@@ -334,7 +359,7 @@ bool CEnvironment::StartWeatherFXFromTime(shared_str name, float time)
     if (!SetWeatherFX(name))
         return false;
 
-    for (auto it = CurrentWeather->begin(); it != CurrentWeather->end(); it++)
+    for (auto it = CurrentWeather->begin(); it != CurrentWeather->end(); ++it)
         (*it)->exec_time = NormalizeTime((*it)->exec_time - wfx_time + time);
 
     wfx_time = time;
@@ -481,7 +506,7 @@ void CEnvironment::OnFrame()
     lerp(current_weight);
 
     // Igor. Dynamic sun position.
-    if (!GEnv.Render->is_sun_static() && useDynamicSunDir)
+    if (!GEnv.Render->is_sun_static() && useDynamicSunDir && !CurrentEnv->old_style)
         calculate_dynamic_sun_dir();
 
 #ifndef MASTER_GOLD
@@ -586,14 +611,14 @@ void CEnvironment::create_mixer()
 }
 
 void CEnvironment::destroy_mixer() { xr_delete(CurrentEnv); }
-SThunderboltDesc* CEnvironment::thunderbolt_description(CInifile& config, shared_str const& section)
+SThunderboltDesc* CEnvironment::thunderbolt_description(const CInifile& config, shared_str const& section)
 {
     SThunderboltDesc* result = new SThunderboltDesc();
     result->load(config, section);
     return (result);
 }
 
-SThunderboltCollection* CEnvironment::thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, LPCSTR section)
+SThunderboltCollection* CEnvironment::thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section)
 {
     SThunderboltCollection* result = new SThunderboltCollection();
     result->load(pIni, thunderbolts, section);
@@ -611,14 +636,15 @@ SThunderboltCollection* CEnvironment::thunderbolt_collection(
     return nullptr;
 }
 
-CLensFlareDescriptor* CEnvironment::add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id)
+CLensFlareDescriptor* CEnvironment::add_flare(
+    xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni)
 {
     for (const auto& it: collection)
         if (it->section == id)
             return it;
 
     CLensFlareDescriptor* result = new CLensFlareDescriptor();
-    result->load(m_suns_config, id.c_str());
+    result->load(pIni, id.c_str());
     collection.push_back(result);
     return result;
 }

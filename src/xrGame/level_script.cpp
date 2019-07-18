@@ -41,9 +41,8 @@
 #include "HUDManager.h"
 #include "raypick.h"
 #include "xrCDB/xr_collide_defs.h"
-#ifdef NAMESPACE_LEVEL_EXPORTS
 #include "xrNetServer/NET_Messages.h"
-#endif
+
 using namespace luabind;
 using namespace luabind::policy;
 
@@ -240,18 +239,23 @@ bool patrol_path_exists(LPCSTR patrol_path) { return (!!ai().patrol_paths().path
 LPCSTR get_name() { return (*Level().name()); }
 void prefetch_sound(LPCSTR name) { Level().PrefetchSound(name); }
 CClientSpawnManager& get_client_spawn_manager() { return (Level().client_spawn_manager()); }
-/*
+
 void start_stop_menu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 {
-    if(pDialog->IsShown())
+    if (pDialog->IsShown())
         pDialog->HideDialog();
     else
         pDialog->ShowDialog(bDoHideIndicators);
 }
-*/
 
 void add_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->AddDialogToRender(pDialog); }
 void remove_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->RemoveDialogToRender(pDialog); }
+
+CUIDialogWnd* main_input_receiver()
+{
+    return HUD().GetGameUI()->TopInputReceiver();
+}
+
 void hide_indicators()
 {
     if (CurrentGameUI())
@@ -569,9 +573,8 @@ void stop_tutorial()
 LPCSTR translate_string(LPCSTR str) { return *StringTable().translate(str); }
 bool has_active_tutotial() { return (g_tutorial != NULL); }
 
-//Alundaio: namespace level exports extension
-#ifdef NAMESPACE_LEVEL_EXPORTS
-//ability to update level netpacket
+// Alundaio: namespace level exports extension
+// ability to update level netpacket
 void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool bHighPriority = false, bool bSendImmediately = false)
 {
     Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, bSendImmediately));
@@ -589,7 +592,7 @@ CScriptGameObject* g_get_target_obj()
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
     if (RQ.O)
     {
-        CGameObject* game_object = static_cast<CGameObject*>(RQ.O);
+        CGameObject* game_object = smart_cast<CGameObject*>(RQ.O);
         if (game_object)
             return game_object->lua_game_object();
     }
@@ -599,9 +602,7 @@ CScriptGameObject* g_get_target_obj()
 float g_get_target_dist()
 {
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-    if (RQ.range)
-        return RQ.range;
-    return 0.f;
+    return RQ.range;
 }
 
 u32 g_get_target_element()
@@ -628,8 +629,17 @@ void set_active_cam(u8 mode)
     if (actor && mode <= eacMaxCam)
         actor->cam_Set((EActorCameras)mode);
 }
-#endif
 //-Alundaio
+
+void iterate_online_objects(luabind::functor<bool> functor)
+{
+    for (u16 i = 0; i < 0xffff; ++i)
+    {
+        CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(i));
+        if (pGameObject && functor(pGameObject->lua_game_object()))
+            return;
+    }
+}
 
 // KD: raypick	
 bool ray_pick(const Fvector& start, const Fvector& dir, float range,
@@ -658,11 +668,12 @@ IC static void CLevel_Export(lua_State* luaState)
         .def_readonly("fog_density", &CEnvDescriptor::fog_density)
         .def_readonly("far_plane", &CEnvDescriptor::far_plane),
 
-        class_<CEnvironment>("CEnvironment").def("current", current_environment);
+    class_<CEnvironment>("CEnvironment")
+        .def("current", current_environment);
 
-    module(luaState, "level")[
+    module(luaState, "level")
+    [
         //Alundaio: Extend level namespace exports
-#ifdef NAMESPACE_LEVEL_EXPORTS
         def("send", &g_send) , //allow the ability to send netpacket to level
         //def("ray_pick",g_ray_pick),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
@@ -671,8 +682,9 @@ IC static void CLevel_Export(lua_State* luaState)
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
-#endif
         //Alundaio: END
+
+        def("iterate_online_objects", &iterate_online_objects),
         // obsolete\deprecated
         def("object_by_id", get_object_by_id),
 #ifdef DEBUG
@@ -700,12 +712,16 @@ IC static void CLevel_Export(lua_State* luaState)
         def("client_spawn_manager", get_client_spawn_manager),
 
         def("map_add_object_spot_ser", map_add_object_spot_ser), def("map_add_object_spot", map_add_object_spot),
-        //-		def("map_add_object_spot_complex",		map_add_object_spot_complex),
+        // def("map_add_object_spot_complex", map_add_object_spot_complex),
         def("map_remove_object_spot", map_remove_object_spot), def("map_has_object_spot", map_has_object_spot),
         def("map_change_spot_hint", map_change_spot_hint),
 
-        def("add_dialog_to_render", add_dialog_to_render), def("remove_dialog_to_render", remove_dialog_to_render),
-        def("hide_indicators", hide_indicators), def("hide_indicators_safe", hide_indicators_safe),
+        def("start_stop_menu", start_stop_menu),
+        def("add_dialog_to_render", add_dialog_to_render),
+        def("remove_dialog_to_render", remove_dialog_to_render),
+        def("main_input_receiver", main_input_receiver),
+        def("hide_indicators", hide_indicators),
+        def("hide_indicators_safe", hide_indicators_safe),
 
         def("show_indicators", show_indicators), def("show_weapon", show_weapon),
         def("add_call", ((void (*)(const luabind::functor<bool>&, const luabind::functor<void>&)) & add_call)),
@@ -718,27 +734,47 @@ IC static void CLevel_Export(lua_State* luaState)
             ((void (*)(const luabind::object&, const luabind::functor<bool>&, const luabind::functor<void>&)) &
                 remove_call)),
         def("remove_call", ((void (*)(const luabind::object&, LPCSTR, LPCSTR)) & remove_call)),
-        def("remove_calls_for_object", remove_calls_for_object), def("present", is_level_present),
-        def("disable_input", disable_input), def("enable_input", enable_input), def("spawn_phantom", spawn_phantom),
+        def("remove_calls_for_object", remove_calls_for_object),
+        def("present", is_level_present),
+        def("disable_input", disable_input),
+        def("enable_input", enable_input), def("spawn_phantom", spawn_phantom),
 
         def("get_bounding_volume", get_bounding_volume),
 
-        def("iterate_sounds", &iterate_sounds1), def("iterate_sounds", &iterate_sounds2),
-        def("physics_world", &physics_world_scripted), def("get_snd_volume", &get_snd_volume),
-        def("set_snd_volume", &set_snd_volume), def("add_cam_effector", &add_cam_effector),
-        def("add_cam_effector2", &add_cam_effector2), def("remove_cam_effector", &remove_cam_effector),
-        def("add_pp_effector", &add_pp_effector), def("set_pp_effector_factor", &set_pp_effector_factor),
-        def("set_pp_effector_factor", &set_pp_effector_factor2), def("remove_pp_effector", &remove_pp_effector),
+        def("iterate_sounds", &iterate_sounds1),
+        def("iterate_sounds", &iterate_sounds2),
+        def("physics_world", &physics_world_scripted),
+        def("get_snd_volume", &get_snd_volume),
+        def("set_snd_volume", &set_snd_volume),
 
-        def("add_complex_effector", &add_complex_effector), def("remove_complex_effector", &remove_complex_effector),
+        def("add_cam_effector", &add_cam_effector),
+        def("add_cam_effector2", &add_cam_effector2),
+        def("add_cam_effector2", +[](pcstr fn, int id, bool cyclic, pcstr cb_func)
+        {
+            add_cam_effector2(fn, id, cyclic, cb_func, 0.0f);
+        }),
+
+        def("remove_cam_effector", &remove_cam_effector),
+        def("add_pp_effector", &add_pp_effector),
+        def("set_pp_effector_factor", &set_pp_effector_factor),
+        def("set_pp_effector_factor", &set_pp_effector_factor2),
+        def("remove_pp_effector", &remove_pp_effector),
+
+        def("add_complex_effector", &add_complex_effector),
+        def("remove_complex_effector", &remove_complex_effector),
 
         def("vertex_id", &vertex_id),
 
         def("game_id", &GameID),
-        def("ray_pick", &ray_pick)],
+        def("ray_pick", &ray_pick)
+    ],
 
-        module(luaState, "actor_stats")[def("add_points", &add_actor_points),
-            def("add_points_str", &add_actor_points_str), def("get_points", &get_actor_points)];
+    module(luaState, "actor_stats")
+    [
+        def("add_points", &add_actor_points),
+        def("add_points_str", &add_actor_points_str),
+        def("get_points", &get_actor_points)
+    ];
 
     module(luaState)
     [
@@ -773,55 +809,72 @@ IC static void CLevel_Export(lua_State* luaState)
         ]
     ];
 
-    module(luaState)[def("command_line", &command_line),
+    module(luaState)
+    [
+        def("command_line", &command_line),
         def("IsGameTypeSingle", (bool (*)())&IsGameTypeSingle),
         def("IsDynamicMusic", &IsDynamicMusic), def("render_get_dx_level", &render_get_dx_level),
-        def("IsImportantSave", &IsImportantSave)];
+        def("IsImportantSave", &IsImportantSave)
+    ];
 
-    module(luaState, "relation_registry")[def("community_goodwill", &g_community_goodwill),
+    module(luaState, "relation_registry")
+    [
+        def("community_goodwill", &g_community_goodwill),
         def("set_community_goodwill", &g_set_community_goodwill),
         def("change_community_goodwill", &g_change_community_goodwill),
 
         def("community_relation", &g_get_community_relation), def("set_community_relation", &g_set_community_relation),
-        def("get_general_goodwill_between", &g_get_general_goodwill_between)];
-    module(
-        luaState, "game")[class_<xrTime>("CTime")
-                              .enum_("date_format")[value("DateToDay", int(InventoryUtilities::edpDateToDay)),
-                                  value("DateToMonth", int(InventoryUtilities::edpDateToMonth)),
-                                  value("DateToYear", int(InventoryUtilities::edpDateToYear))]
-                              .enum_("time_format")[value("TimeToHours", int(InventoryUtilities::etpTimeToHours)),
-                                  value("TimeToMinutes", int(InventoryUtilities::etpTimeToMinutes)),
-                                  value("TimeToSeconds", int(InventoryUtilities::etpTimeToSeconds)),
-                                  value("TimeToMilisecs", int(InventoryUtilities::etpTimeToMilisecs))]
-                              .def(constructor<>())
-                              .def(constructor<const xrTime&>())
-                              .def(const_self < xrTime())
-                              .def(const_self <= xrTime())
-                              .def(const_self > xrTime())
-                              .def(const_self >= xrTime())
-                              .def(const_self == xrTime())
-                              .def(self + xrTime())
-                              .def(self - xrTime())
+        def("get_general_goodwill_between", &g_get_general_goodwill_between)
+    ];
 
-                              .def("diffSec", &xrTime::diffSec_script)
-                              .def("add", &xrTime::add_script)
-                              .def("sub", &xrTime::sub_script)
+    module(luaState, "game")
+    [
+        class_<xrTime>("CTime")
+            .enum_("date_format")
+            [
+                value("DateToDay", int(InventoryUtilities::edpDateToDay)),
+                value("DateToMonth", int(InventoryUtilities::edpDateToMonth)),
+                value("DateToYear", int(InventoryUtilities::edpDateToYear))
+            ]
+            .enum_("time_format")
+            [
+                value("TimeToHours", int(InventoryUtilities::etpTimeToHours)),
+                value("TimeToMinutes", int(InventoryUtilities::etpTimeToMinutes)),
+                value("TimeToSeconds", int(InventoryUtilities::etpTimeToSeconds)),
+                value("TimeToMilisecs", int(InventoryUtilities::etpTimeToMilisecs))
+            ]
+            .def(constructor<>())
+            .def(constructor<const xrTime&>())
+            .def(const_self < xrTime())
+            .def(const_self <= xrTime())
+            .def(const_self > xrTime())
+            .def(const_self >= xrTime())
+            .def(const_self == xrTime())
+            .def(self + xrTime())
+            .def(self - xrTime())
 
-                              .def("setHMS", &xrTime::setHMS)
-                              .def("setHMSms", &xrTime::setHMSms)
-                              .def("set", &xrTime::set)
-                              .def("get", &xrTime::get, policy_list<out_value<2>, out_value<3>, out_value<4>,
-                                                            out_value<5>, out_value<6>, out_value<7>, out_value<8>>())
-                              .def("dateToString", &xrTime::dateToString)
-                              .def("timeToString", &xrTime::timeToString),
+            .def("diffSec", &xrTime::diffSec_script)
+            .def("add", &xrTime::add_script)
+            .def("sub", &xrTime::sub_script)
+
+            .def("setHMS", &xrTime::setHMS)
+            .def("setHMSms", &xrTime::setHMSms)
+            .def("set", &xrTime::set)
+            .def("get", &xrTime::get, policy_list<out_value<2>, out_value<3>, out_value<4>,
+                                          out_value<5>, out_value<6>, out_value<7>, out_value<8>>())
+            .def("dateToString", &xrTime::dateToString)
+            .def("timeToString", &xrTime::timeToString),
+
         // declarations
-        def("time", get_time), def("get_game_time", get_time_struct),
-        //		def("get_surge_time",	Game::get_surge_time),
-        //		def("get_object_by_name",Game::get_object_by_name),
+        def("time", get_time),
+        def("get_game_time", get_time_struct),
+        // def("get_surge_time",	Game::get_surge_time),
+        // def("get_object_by_name",Game::get_object_by_name),
 
-        def("start_tutorial", &start_tutorial), def("stop_tutorial", &stop_tutorial),
-        def("has_active_tutorial", &has_active_tutotial), def("translate_string", &translate_string)
-
+        def("start_tutorial", &start_tutorial),
+        def("stop_tutorial", &stop_tutorial),
+        def("has_active_tutorial", &has_active_tutotial),
+        def("translate_string", &translate_string)
     ];
 
 };

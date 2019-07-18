@@ -160,7 +160,7 @@ public:
     // rewind
     void Rewind();
     // find_chunk
-    UInt32 FindChunk(UInt32 id, int* isCompressed);
+    UInt32 FindChunk(UInt32 id, bool* isCompressed);
     // r_chunk
     bool ReadChunk(UInt32 id, void* buffer);
     // r_chunk_safe

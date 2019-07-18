@@ -944,7 +944,7 @@ void CGameObject::dbg_DrawSkeleton()
     Skeleton->_dbg_refresh();
 
     const CCF_Skeleton::ElementVec& Elements = Skeleton->_GetElements();
-    for (CCF_Skeleton::ElementVec::const_iterator I = Elements.begin(); I != Elements.end(); I++)
+    for (CCF_Skeleton::ElementVec::const_iterator I = Elements.begin(); I != Elements.end(); ++I)
     {
         if (!I->valid())
             continue;
@@ -1415,7 +1415,7 @@ void render_box(
         return;
 
     Fmatrix matrix;
-    Fvector* points = (Fvector*)_alloca(visible_bone_count * 8 * sizeof(Fvector));
+    Fvector* points = (Fvector*)xr_alloca(visible_bone_count * 8 * sizeof(Fvector));
     Fvector* I = points;
     for (u16 i = 0; i < bone_count; ++i)
     {

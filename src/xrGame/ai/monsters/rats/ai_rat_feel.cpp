@@ -22,8 +22,8 @@ bool CAI_Rat::feel_vision_isRelevant(IGameObject* O)
     return true;
 }
 
-void CAI_Rat::feel_sound_new(
-    IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power)
+void CAI_Rat::feel_sound_new(IGameObject* who, int eType, const CSound_UserDataPtr& user_data,
+    const Fvector& position, float power)
 {
     if (!g_Alive())
         return;
@@ -38,7 +38,7 @@ void CAI_Rat::feel_sound_new(
             m_tLastSound.eSoundType = ESoundTypes(eType);
             m_tLastSound.dwTime = Device.dwTimeGlobal;
             m_tLastSound.fPower = power;
-            m_tLastSound.tSavedPosition = Position;
+            m_tLastSound.tSavedPosition = position;
             m_tLastSound.tpEntity = smart_cast<CEntityAlive*>(who);
             if ((eType & SOUND_TYPE_MONSTER_DYING) == SOUND_TYPE_MONSTER_DYING)
                 m_fMorale += m_fMoraleDeathQuant;
@@ -50,7 +50,7 @@ void CAI_Rat::feel_sound_new(
         }
     }
 
-    inherited::feel_sound_new(who, eType, user_data, Position, power);
+    inherited::feel_sound_new(who, eType, user_data, position, power);
 }
 
 bool CAI_Rat::feel_touch_on_contact(IGameObject* O) { return (inherited::feel_touch_on_contact(O)); }

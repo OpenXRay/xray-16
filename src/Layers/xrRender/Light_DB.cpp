@@ -6,25 +6,24 @@
 #include "utils/xrLC_Light/R_light.h"
 #include "Light_DB.h"
 
-CLight_DB::CLight_DB() {}
+CLight_DB::CLight_DB() : sun(nullptr) {}
 CLight_DB::~CLight_DB() {}
 void CLight_DB::Load(IReader* fs)
 {
     IReader* F = fs->open_chunk(fsL_LIGHT_DYNAMIC);
     {
         // Light itself
-        sun = NULL;
+        sun = nullptr;
 
-		u32 size = F->length();
-        u32 element = sizeof(Flight) + 4;
-        u32 count = (size / element);
+		const size_t size = F->length();
+        const size_t element = sizeof(Flight) + 4;
+        const size_t count = (size / element);
         VERIFY((count * element) == size);
         v_static.reserve(count);
-        for (u32 i = 0; i < count; ++i)
+        for (size_t i = 0; i < count; ++i)
         {
             Flight Ldata;
-            u32 controller = 0;
-            F->r(&controller, 4);
+            u32 controller = F->r_u32();
             F->r(&Ldata, sizeof(Flight));
 
             light* L = Create();
@@ -82,12 +81,12 @@ void CLight_DB::LoadHemi()
 
             if (chunk)
             {
-                u32 size = chunk->length();
-                u32 element = sizeof(R_Light);
-                u32 count = size / element;
+                const size_t size = chunk->length();
+                const size_t element = sizeof(R_Light);
+                const size_t count = size / element;
                 VERIFY(count * element == size);
                 v_hemi.reserve(count);
-                for (u32 i = 0; i < count; i++)
+                for (size_t i = 0; i < count; i++)
                 {
                     R_Light Ldata;
                     chunk->r(&Ldata, sizeof(R_Light));
@@ -185,13 +184,29 @@ void CLight_DB::Update()
 
         VERIFY2(E.sun_dir.y < 0, "Invalid sun direction settings in evironment-config");
         Fvector dir, pos;
-        dir.set(E.sun_dir).normalize();
+
+        if (!GEnv.Render->is_sun_static() && !ShadowOfChernobylMode)
+        {
+            // true sunlight direction
+            dir.set(E.sun_dir).normalize();
+        }
+        else
+        {
+            // for some reason E.sun_dir can point-up
+            dir.set(0.0f, -0.75f, 0.0f).add(E.sun_dir);
+            u32 counter = 0;
+            while (dir.magnitude() < 0.001f && counter < 10)
+            {
+                dir.add(E.sun_dir);
+                ++counter;
+            }
+            dir.normalize();
+        }
         pos.mad(Device.vCameraPosition, dir, -500.f);
 
         sun->set_rotation(dir, _sun->right);
         sun->set_position(pos);
-        sun->set_color(
-            E.sun_color.x * ps_r2_sun_lumscale, E.sun_color.y * ps_r2_sun_lumscale, E.sun_color.z * ps_r2_sun_lumscale);
+        sun->set_color(E.sun_color.x * ps_r2_sun_lumscale, E.sun_color.y * ps_r2_sun_lumscale, E.sun_color.z * ps_r2_sun_lumscale);
         sun->set_range(600.f);
     }
     // Clear selection

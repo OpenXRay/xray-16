@@ -9,7 +9,7 @@ template <typename T> class buffer_vector;
 
 namespace file_transfer
 {
-class filereceiver_node
+class filereceiver_node : public Noncopyable
 {
 private:
     shared_str m_file_name;
@@ -23,7 +23,6 @@ private:
 public:
     filereceiver_node(shared_str const& file_name, receiving_state_callback_t const& callback);
     filereceiver_node(CMemoryWriter* mem_writer, receiving_state_callback_t const& callback);
-    filereceiver_node& operator=(filereceiver_node const& copy) { NODEFAULT; };
     ~filereceiver_node();
 
     bool receive_packet(NET_Packet& packet); // returns true if receiving is complete

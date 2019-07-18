@@ -57,13 +57,13 @@ protected:
     {
         if (0 == p_)
             return;
-        p_->dwReference++;
+        ++p_->dwReference;
     }
     void _dec()
     {
         if (0 == p_)
             return;
-        p_->dwReference--;
+        --p_->dwReference;
         if (0 == p_->dwReference)
             xr_delete(p_);
     }
@@ -72,7 +72,7 @@ public:
     ICF void _set(T* rhs)
     {
         if (0 != rhs)
-            rhs->dwReference++;
+            ++rhs->dwReference;
         _dec();
         p_ = rhs;
     }

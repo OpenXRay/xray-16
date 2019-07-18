@@ -194,7 +194,9 @@ void cdkey_ban_list::print_ban_list(char const* filter_string)
 }
 
 cdkey_ban_list::banned_client::banned_client()
+    : client_ip_addr(), admin_ip_addr()
 {
+
     ban_start_time = 0;
     ban_end_time = 0;
 }

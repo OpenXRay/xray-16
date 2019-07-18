@@ -26,70 +26,28 @@ CAI_Dog::CAI_Dog()
     m_smelling_count = Random.randI(3);
     CControlled::init_external(this);
 
-    com_man().add_ability(ControlCom::eControlJump);
+    if (!ShadowOfChernobylMode)
+        com_man().add_ability(ControlCom::eControlJump);
+    else
+        com_man().add_ability(ControlCom::eControlMeleeJump);
+
     com_man().add_ability(ControlCom::eControlRotationJump);
-    //	com_man().add_ability(ControlCom::eControlMeleeJump);
 }
 
 CAI_Dog::~CAI_Dog() { xr_delete(StateMan); }
 void CAI_Dog::Load(LPCSTR section)
 {
     inherited::Load(section);
-    if (pSettings->line_exist(section, "anim_factor"))
-    {
-        m_anim_factor = pSettings->r_u32(section, "anim_factor");
-    }
-    else
-    {
-        m_anim_factor = 50;
-    }
+    m_anim_factor = pSettings->read_if_exists<u32>(section, "anim_factor", 50);
 
-    if (pSettings->line_exist(section, "corpse_use_timeout"))
-    {
-        m_corpse_use_timeout = 1000 * pSettings->r_u32(section, "corpse_use_timeout");
-    }
-    else
-    {
-        m_corpse_use_timeout = 5000;
-    }
+    m_corpse_use_timeout = 1000 * pSettings->read_if_exists<u32>(section, "corpse_use_timeout", 5); // default is 5000 (5 * 1000)
+    m_min_sleep_time = 1000 * pSettings->read_if_exists<u32>(section, "min_sleep_time", 5); // default is 5000 (5 * 1000)
+    m_min_life_time = 1000 * pSettings->read_if_exists<u32>(section, "min_life_time", 10); // default is 10000 (10 * 1000)
+    m_drive_out_time = 1000 * pSettings->read_if_exists<u32>(section, "drive_out_time", 10); // default is 10000 (10 * 1000)
 
-    if (pSettings->line_exist(section, "min_sleep_time"))
-    {
-        m_min_sleep_time = 1000 * pSettings->r_u32(section, "min_sleep_time");
-    }
-    else
-    {
-        m_min_sleep_time = 5000;
-    }
+    min_move_dist = pSettings->read_if_exists<u32>(section, "min_move_dist", 5);
+    max_move_dist = pSettings->read_if_exists<u32>(section, "max_move_dist", 7);
 
-    if (pSettings->line_exist(section, "min_life_time"))
-    {
-        m_min_life_time = 1000 * pSettings->r_u32(section, "min_life_time");
-    }
-    else
-    {
-        m_min_life_time = 10000;
-    }
-
-    if (pSettings->line_exist(section, "drive_out_time"))
-    {
-        m_drive_out_time = 1000 * pSettings->r_u32(section, "drive_out_time");
-    }
-    else
-    {
-        m_drive_out_time = 10000;
-    }
-
-    if (pSettings->line_exist(section, "min_move_dist"))
-    {
-        min_move_dist = pSettings->r_u32(section, "min_move_dist");
-        ;
-    }
-    if (pSettings->line_exist(section, "max_move_dist"))
-    {
-        max_move_dist = pSettings->r_u32(section, "max_move_dist");
-        ;
-    }
     if (max_move_dist < min_move_dist)
     {
         min_move_dist = u32(5);
@@ -136,15 +94,14 @@ void CAI_Dog::Load(LPCSTR section)
     anim().AddAnim(eAnimRunTurnRight, "stand_run_turn_right_", -1, &velocity_run, PS_STAND);
 
     anim().AddAnim(eAnimCheckCorpse, "stand_check_corpse_", -1, &velocity_none, PS_STAND);
-    anim().AddAnim(eAnimDragCorpse, "stand_drage_", -1, &velocity_drag, PS_STAND);
+    anim().AddAnim2(eAnimDragCorpse, { "stand_drage_", "stand_drag_" }, -1, &velocity_drag, PS_STAND);
     // anim().AddAnim(eAnimSniff,		"stand_sniff_",			-1, &velocity_none,		PS_STAND);
     // anim().AddAnim(eAnimHowling,		"stand_howling_",		-1,	&velocity_none,		PS_STAND);
 
     // anim().AddAnim(eAnimJumpGlide,   	"jump_glide_",			-1, &velocity_none,		PS_STAND);
-    // anim().AddAnim(eAnimJumpGlide,   	"stand_jump_left_",		 0, &velocity_none,		PS_STAND);
     anim().AddAnim(eAnimJumpGlide, "stand_jump_left_", 0, &velocity_none, PS_STAND);
 
-    anim().AddAnim(eAnimSteal, "stand_walk_fwd_", -1, &velocity_steal, PS_STAND);
+    anim().AddAnim2(eAnimSteal, { "stand_walk_fwd_", "stand_steal_" }, -1, &velocity_steal, PS_STAND);
     anim().AddAnim(eAnimThreaten, "stand_threaten_", -1, &velocity_none, PS_STAND);
 
     anim().AddAnim(eAnimSitLieDown, "sit_lie_down_", -1, &velocity_none, PS_SIT);
@@ -158,8 +115,8 @@ void CAI_Dog::Load(LPCSTR section)
 
     /////////////mob home
 
-    anim().AddAnim(eAnimHomeWalkSmelling, "stand_walk_smelling_", -1, &velocity_walk_smell, PS_STAND);
-    anim().AddAnim(eAnimHomeWalkGrowl, "stand_growl_walk_", -1, &velocity_walk_growl, PS_STAND);
+    anim().AddAnim(eAnimHomeWalkSmelling, { "stand_walk_smelling_", true }, -1, &velocity_walk_smell, PS_STAND);
+    anim().AddAnim(eAnimHomeWalkGrowl, { "stand_growl_walk_", true }, -1, &velocity_walk_growl, PS_STAND);
 
     /////////////end mob home
 
@@ -209,7 +166,8 @@ void CAI_Dog::reinit()
 
     com_man().add_rotation_jump_data("1", "2", "3", "4", PI_DIV_2);
     com_man().add_rotation_jump_data("5", "6", "7", "8", deg(179));
-    // com_man().add_melee_jump_data("5","jump_right_0");
+    if (ShadowOfChernobylMode)
+        com_man().add_melee_jump_data("5","jump_right_0");
     // com_man().add_rotation_jump_data("stand_jump_left_0","stand_jump_left_0",
     //	                             "stand_jump_right_0","stand_jump_right_0", deg(179));
     // com_man().add_melee_jump_data("stand_jump_left_0", "stand_jump_right_0");
@@ -387,8 +345,11 @@ LPCSTR CAI_Dog::get_current_animation()
 void CAI_Dog::reload(LPCSTR section)
 {
     inherited::reload(section);
-    com_man().load_jump_data(0, "jump_ataka_01", "jump_ataka_02", "jump_ataka_03",
-        MonsterMovement::eVelocityParameterRunNormal, MonsterMovement::eVelocityParameterRunNormal, 0);
+    if (!ShadowOfChernobylMode)
+    {
+        com_man().load_jump_data(0, "jump_ataka_01", "jump_ataka_02", "jump_ataka_03",
+            MonsterMovement::eVelocityParameterRunNormal, MonsterMovement::eVelocityParameterRunNormal, 0);
+    }
 }
 
 void CAI_Dog::HitEntityInJump(const CEntity* pEntity)

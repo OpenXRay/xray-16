@@ -464,6 +464,15 @@ CBlend* CKinematicsAnimated::PlayFX(LPCSTR N, float power_scale)
     MotionID motion_ID = ID_FX(N);
     return PlayFX(motion_ID, power_scale);
 }
+
+CBlend* CKinematicsAnimated::PlayFX_Safe(cpcstr N, float power_scale)
+{
+    MotionID motion_ID = ID_FX_Safe(N);
+    if (motion_ID.valid())
+        return PlayFX(motion_ID, power_scale);
+    return nullptr;
+}
+
 // u16 part,u8 channel, MotionID motion_ID, BOOL  bMixing, float blendAccrue, float blendFalloff, float Speed, BOOL
 // noloop, PlayCallback callback(), LPVOID CallbackParam)
 

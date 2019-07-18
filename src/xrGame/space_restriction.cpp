@@ -123,7 +123,7 @@ void CSpaceRestriction::merge_in_out_restrictions()
 
     if (m_in_space_restriction)
     {
-        buffer_vector<u32> temp_border(_alloca(m_in_space_restriction->border().size() * sizeof(u32)),
+        buffer_vector<u32> temp_border(xr_alloca(m_in_space_restriction->border().size() * sizeof(u32)),
             m_in_space_restriction->border().size(), m_in_space_restriction->border().begin(),
             m_in_space_restriction->border().end());
         temp_border.erase(std::remove_if(temp_border.begin(), temp_border.end(),

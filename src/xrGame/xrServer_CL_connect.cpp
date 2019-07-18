@@ -191,6 +191,7 @@ void xrServer::Check_GameSpy_CDKey_Success(IClient* CL)
 };
 
 BOOL g_SV_Disable_Auth_Check = FALSE;
+BOOL g_sv_ignore_version_mismatch = FALSE;
 
 bool xrServer::NeedToCheckClient_BuildVersion(IClient* CL)
 {
@@ -225,7 +226,7 @@ void xrServer::OnBuildVersionRespond(IClient* CL, NET_Packet& P)
     _our = MP_DEBUG_AUTH;
 #endif // USE_DEBUG_AUTH
 
-    if (_our != _him)
+    if (_our != _him && !g_sv_ignore_version_mismatch)
     {
         SendConnectResult(CL, 0, ecr_data_verification_failed, "Data verification failed. Cheater?");
     }

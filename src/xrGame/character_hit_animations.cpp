@@ -77,8 +77,11 @@ IC void play_cycle(IKinematicsAnimated* CA, const MotionID& m, u8 channel, CBlen
             power *= g_params.reduce_power_factor;
     }
     CBlend* B = (CA->PlayCycle(m, mixin, 0, 0, channel));
-    B->blendAmount = power;
-    B->blendPower = power;
+    if (B)
+    {
+        B->blendAmount = power;
+        B->blendPower = power;
+    }
     blend_block = B;
 }
 

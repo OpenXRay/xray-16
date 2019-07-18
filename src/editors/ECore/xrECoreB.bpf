@@ -1,8 +1,0 @@
-USEFORM("Editor\ImageEditor.cpp", frmImageLib);
-USEFORM("Editor\LogForm.cpp", frmLog);
-USEFORM("Editor\SoundEditor.cpp", frmSoundLib);
-USEFORM("Editor\MinimapEditor.cpp", TMinimapEditor);
-//---------------------------------------------------------------------------
-This file is used by the project manager only and should be treated like the project file
-
-DllEntryPoint

@@ -121,6 +121,9 @@
     <Filter Include="Events">
       <UniqueIdentifier>{f17d865f-a3fd-41ac-b217-d7d34ed591f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threading\Util">
+      <UniqueIdentifier>{14c94737-f2c7-482d-9033-775a3da068cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -151,9 +154,6 @@
       <Filter>Math\Extensions</Filter>
     </ClCompile>
     <ClCompile Include="clsid.cpp">
-      <Filter>Math\Extensions</Filter>
-    </ClCompile>
-    <ClCompile Include="string_concatenations.cpp">
       <Filter>Math\Extensions</Filter>
     </ClCompile>
     <ClCompile Include="xr_trims.cpp">
@@ -330,6 +330,24 @@
     <ClCompile Include="Memory\xrMemory_align.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Crypto\trivial_encryptor.cpp">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\Task.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\TaskManager.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\BoneEditor.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="string_concatenations.cpp">
+      <Filter>shared memory/string library</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ThreadUtil.cpp">
+      <Filter>Threading\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -435,12 +453,6 @@
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="fastdelegate.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="string_concatenations.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="string_concatenations_inline.h">
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="xr_trims.h">
@@ -719,6 +731,27 @@
     <ClInclude Include="Memory\xrMemory_align.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\FixedMap.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Crypto\trivial_encryptor.h">
+      <Filter>Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Task.hpp">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\TaskManager.hpp">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="string_concatenations.h">
+      <Filter>shared memory/string library</Filter>
+    </ClInclude>
+    <ClInclude Include="string_concatenations_inline.h">
+      <Filter>shared memory/string library</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ThreadUtil.h">
+      <Filter>Threading\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">
@@ -737,6 +770,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

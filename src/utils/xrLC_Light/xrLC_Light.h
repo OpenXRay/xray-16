@@ -17,7 +17,7 @@
 #pragma warning(pop)
 
 #include "Common/_d3d_extensions.h"
-#include "editors/LevelEditor/Engine/communicate.h"
+#include "utils/communicate.h"
 
 static const int edge2idx3[3][3] = {{0, 1, 2}, {1, 2, 0}, {2, 0, 1}};
 static const int edge2idx[3][2] = {{0, 1}, {1, 2}, {2, 0}};

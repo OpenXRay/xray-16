@@ -1158,7 +1158,7 @@ bool IPureClient::Connect(pcstr options)
 
                 void sync_thread(void* P)
                 {
-                    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+                    SetThreadPriority(Threading::GetCurrentThreadHandle(), THREAD_PRIORITY_TIME_CRITICAL);
                     IPureClient* C = (IPureClient*)P;
                     C->Sync_Thread();
                 }
@@ -1167,7 +1167,7 @@ bool IPureClient::Connect(pcstr options)
                 {
                     net_Syncronised = false;
                     net_DeltaArray.clear();
-                    thread_spawn(sync_thread, "network-time-sync", 0, this);
+                    Threading::SpawnThread(sync_thread, "network-time-sync", 0, this);
                 }
 
                 bool IPureClient::net_isDisconnected() const { return net_Disconnected; }

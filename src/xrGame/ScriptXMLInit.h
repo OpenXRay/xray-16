@@ -26,6 +26,7 @@ class CUITrackBar;
 class CUIMapInfo;
 class CUIMMShniaga;
 class CUIScrollView;
+class CUIListWnd;
 class CUIListBox;
 class CUIProgressBar;
 
@@ -59,6 +60,7 @@ public:
     CUIMMShniaga* InitMMShniaga(LPCSTR path, CUIWindow* parent);
     CUIWindow* InitKeyBinding(LPCSTR path, CUIWindow* parent);
     CUIScrollView* InitScrollView(LPCSTR path, CUIWindow* parent);
+    CUIListWnd* InitListWnd(pcstr path, CUIWindow* parent);
     CUIListBox* InitListBox(LPCSTR path, CUIWindow* parent);
     CUIProgressBar* InitProgressBar(LPCSTR path, CUIWindow* parent);
 

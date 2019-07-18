@@ -1389,7 +1389,7 @@ void CDrawUtilities::DrawGrid()
     u32 vBase;
     // fill VB
     FVF::L* pv = (FVF::L*)Stream->Lock(m_GridPoints.size(), vs_L->vb_stride, vBase);
-    for (auto v_it = m_GridPoints.begin(); v_it != m_GridPoints.end(); v_it++, pv++)
+    for (auto v_it = m_GridPoints.begin(); v_it != m_GridPoints.end(); ++v_it, pv++)
         pv->set(*v_it);
     Stream->Unlock(m_GridPoints.size(), vs_L->vb_stride);
     // Render it as triangle list

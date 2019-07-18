@@ -165,8 +165,8 @@ shared_str CRestrictions::GetItemGroup(const shared_str& item) const
     Groups::const_iterator it;
     group_items::const_iterator IT;
 
-    for (it = m_goups.begin(); it != m_goups.end(); it++)
-        for (IT = (*it).second.begin(); IT != (*it).second.end(); IT++)
+    for (it = m_goups.begin(); it != m_goups.end(); ++it)
+        for (IT = (*it).second.begin(); IT != (*it).second.end(); ++IT)
             if ((*IT) == item)
                 return (*it).first;
 

@@ -21,7 +21,7 @@ void game_sv_Deathmatch::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sen
     {
         xrClientData* l_pC = m_server->ID_to_client(sender);
 #ifdef DEBUG
-        Msg("--- On player [%d] buy finishing...", l_pC->ID);
+        Msg("--- On player [%d] buy finishing...", l_pC->ID.value());
 #endif // #ifdef DEBUG
         OnPlayerBuyFinished(l_pC->ID, P);
     }

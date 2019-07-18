@@ -13,6 +13,7 @@
 #include "Weapon.h"
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
+#include "UIHelper.h"
 
 CUICellItem* CUICellItem::m_mouse_selected_item = NULL;
 
@@ -68,11 +69,14 @@ void CUICellItem::init()
     m_upgrade_pos = m_upgrade->GetWndPos();
     m_upgrade->Show(false);
 
-    m_pConditionState = new CUIProgressBar();
-    m_pConditionState->SetAutoDelete(true);
-    AttachChild(m_pConditionState);
-    CUIXmlInit::InitProgressBar(uiXml, "condition_progess_bar", 0, m_pConditionState);
-    m_pConditionState->Show(true);
+    // Try progress first and then progess
+    m_pConditionState = UIHelper::CreateProgressBar(uiXml, "condition_progress_bar", this, false);
+
+    if (!m_pConditionState)
+        m_pConditionState = UIHelper::CreateProgressBar(uiXml, "condition_progess_bar", this, false);
+
+    if (m_pConditionState)
+        m_pConditionState->Show(true);
 }
 
 void CUICellItem::Draw()
@@ -202,6 +206,9 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 
 void CUICellItem::UpdateConditionProgressBar()
 {
+    if (!m_pConditionState)
+        return;
+
     if (m_pParentList && m_pParentList->GetConditionProgBarVisibility())
     {
         PIItem itm = static_cast<PIItem>(m_pData);

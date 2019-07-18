@@ -66,7 +66,7 @@ bool CMonsterSquad::SquadActive()
 
     // проверить количество живых объектов в группе
     u32 alive_num = 0;
-    for (auto it = m_goals.begin(); it != m_goals.end(); it++)
+    for (auto it = m_goals.begin(); it != m_goals.end(); ++it)
         if (it->first->g_Alive())
             alive_num++;
 
@@ -83,7 +83,7 @@ u8 CMonsterSquad::squad_alife_count()
 
     // проверить количество живых объектов в группе
     u8 alive_num = 0;
-    for (auto it = m_goals.begin(); it != m_goals.end(); it++)
+    for (auto it = m_goals.begin(); it != m_goals.end(); ++it)
         if (it->first->g_Alive())
             alive_num++;
 
@@ -143,7 +143,7 @@ void CMonsterSquad::GetCommand(CEntity* pE, SSquadCommand& com) { com = GetComma
 void CMonsterSquad::UpdateSquadCommands()
 {
     // Отменить все команды в группе
-    for (MEMBER_COMMAND_MAP_IT it = m_commands.begin(); it != m_commands.end(); it++)
+    for (MEMBER_COMMAND_MAP_IT it = m_commands.begin(); it != m_commands.end(); ++it)
     {
         it->second.type = SC_NONE;
     }
@@ -176,7 +176,7 @@ void CMonsterSquad::remove_links(IGameObject* O)
     }
 
     // Удалить все цели, объекты которых невалидны или ушли в оффлайн
-    for (MEMBER_COMMAND_MAP_IT it = m_commands.begin(); it != m_commands.end(); it++)
+    for (MEMBER_COMMAND_MAP_IT it = m_commands.begin(); it != m_commands.end(); ++it)
     {
         SSquadCommand com = it->second;
         if (com.entity == O)

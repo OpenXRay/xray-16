@@ -100,7 +100,8 @@ struct TL_2c3uv
     u32 color0;
     u32 color1;
     Fvector2 uv[3];
-    IC void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
+
+    void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
     {
         p.set(x, y, EPS_S, 1.f);
         color0 = c0;

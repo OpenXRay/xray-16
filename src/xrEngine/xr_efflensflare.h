@@ -62,7 +62,7 @@ public:
         section = 0;
         m_StateBlendUpSpeed = m_StateBlendDnSpeed = 0.1f;
     }
-    void load(CInifile* pIni, LPCSTR section);
+    void load(CInifile const* pIni, pcstr section);
     void OnDeviceCreate();
     void OnDeviceDestroy();
 };
@@ -124,7 +124,7 @@ public:
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
-    shared_str AppendDef(CEnvironment& environment, CInifile* pIni, LPCSTR sect);
+    shared_str AppendDef(CEnvironment& environment, CInifile const* pIni, pcstr sect);
 
     void Invalidate() { m_State = lfsNone; }
 };

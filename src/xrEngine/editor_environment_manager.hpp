@@ -74,12 +74,11 @@ public:
     virtual void load();
     virtual void unload();
     virtual void create_mixer();
-    virtual CEnvAmbient* AppendEnvAmb(const shared_str& sect);
-    virtual SThunderboltDesc* thunderbolt_description(CInifile& config, shared_str const& section);
-    virtual SThunderboltCollection* thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, pcstr section);
+    CEnvAmbient* AppendEnvAmb(const shared_str& sect, CInifile const* pIni = nullptr) override;
+    virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);
+    virtual SThunderboltCollection* thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section);
     virtual SThunderboltCollection* thunderbolt_collection(
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
-    virtual CLensFlareDescriptor* add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id);
     void save();
     shader_ids_type const& shader_ids() const;
     particle_ids_type const& particle_ids() const;

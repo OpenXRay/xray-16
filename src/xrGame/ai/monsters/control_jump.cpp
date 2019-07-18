@@ -599,16 +599,16 @@ bool CControlJump::jump_intersect_geometry(Fvector const& target, IGameObject* c
             ignored_object, temp_rq_results, pass_jump_picks, pass_collide_tris, sizes))
     {
 #ifdef DEBUG
-        m_object->m_jump_picks = jump_picks;
-        m_object->m_jump_collide_tris = collide_tris;
+        m_object->m_jump_picks = std::move(jump_picks);
+        m_object->m_jump_collide_tris = std::move(collide_tris);
 #endif // #ifdef DEBUG
 
         return true;
     }
 
 #ifdef DEBUG
-    m_object->m_jump_picks = jump_picks;
-    m_object->m_jump_collide_tris = collide_tris;
+    m_object->m_jump_picks = std::move(jump_picks);
+    m_object->m_jump_collide_tris = std::move(collide_tris);
 #endif // #ifdef DEBUG
 
     return false;

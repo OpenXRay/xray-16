@@ -72,7 +72,7 @@ void compute_bbox(Vec& min, Vec& max, const List& items)
     else
         min = max = items[0];
 
-    for (iterator i = items.begin(); i != items.end(); i++)
+    for (iterator i = items.begin(); i != items.end(); ++i)
     {
         const Vec& v = *i;
         for (int j = 0; j < Vec::dim(); j++)

@@ -52,7 +52,7 @@ void time::load_from(shared_str const& id, CInifile& config, shared_str const& n
     m_identifier = new_id;
 }
 
-void time::load(CInifile& config)
+void time::load(const CInifile& config)
 {
     // Ivector3 tm ={0,0,0};
     // sscanf (m_identifier.c_str(),"%d:%d:%d",&tm.x,&tm.y,&tm.z);

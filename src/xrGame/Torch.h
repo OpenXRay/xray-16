@@ -80,7 +80,6 @@ public:
     virtual void setup_physic_shell();
 
     virtual void afterDetach();
-    virtual void renderable_Render();
 };
 
 class CNightVisionEffector

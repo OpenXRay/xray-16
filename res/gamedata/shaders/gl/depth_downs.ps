@@ -1,0 +1,62 @@
+#include "common.h"
+
+out vec4 SV_Target;
+in vec4 gl_FragCoord;
+
+#ifdef ISAMPLE
+#	undef ISAMPLE
+#endif // #ifdef ISAMPLE
+
+#define ISAMPLE 0
+
+uniform float3x4	m_v2w;
+
+struct	_input
+{
+	float4	tc0		; // TEXCOORD0;	// tc.xy, tc.w = tonemap scale
+	float2	tcJ		; // TEXCOORD1;	// jitter coords
+	float4	pos2d		; // SV_Position;
+};
+
+layout(location = TEXCOORD0)	in float4 	p_depth_tc0	; // TEXCOORD0;
+layout(location = TEXCOORD1)	in float2	p_depth_tcJ	; // TEXCOORD1;
+
+void main ()
+{
+	_input		I;
+	I.tc0			= p_depth_tc0;
+	I.tcJ			= p_depth_tcJ;
+	I.pos2d		= gl_FragCoord;
+
+	//	TODO: move it to C++ code to save maths in PS
+	//	??? Why we move x and y in the same direction???
+	gbuffer_data gbd0 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
+	gbuffer_data gbd1 = gbuffer_load_data( GLD_P(I.tc0.xy - 0.5f * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
+	gbuffer_data gbd2 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(+pos_decompression_params2.z, -pos_decompression_params2.w), I.pos2d * 2, ISAMPLE) );
+	gbuffer_data gbd3 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(-pos_decompression_params2.z, +pos_decompression_params2.w), I.pos2d * 2, ISAMPLE) );
+
+	gbuffer_data gbd = gbd0;
+	if (gbd1.P.z < gbd.P.z) gbd = gbd1;	
+	if (gbd2.P.z < gbd.P.z) gbd = gbd2;	
+	if (gbd3.P.z < gbd.P.z) gbd = gbd3;
+
+	float4	P = float4( gbd.P, gbd.mtl );	// position.(mtl or sun)
+
+//	SSAO_OPT_DATA == 2	for half-res data
+//	SSAO_OPT_DATA == 1	for full-res data
+
+#ifndef HDAO // AMDs hdao turned off
+#if SSAO_OPT_DATA == 2	
+	return  float4(P.zzzz);
+#else	//	SSAO_OPT_DATA == 2
+	gbd = gbuffer_load_data( GLD_P(I.tc0.xy, I.pos2d, ISAMPLE) );
+	SV_Target = float4(gbd.P.zzzz);
+#endif	//	SSAO_OPT_DATA == 2
+#else // HDAO
+#if SSAO_OPT_DATA == 2	
+	SV_Target = float4(P.zzzz + g_fHDAOZDispScale * gbd.N.zzzz );
+#else	//	SSAO_OPT_DATA == 2
+	SV_Target = float4(0.0, 0.0, 0.0, 1.0);
+#endif	//	SSAO_OPT_DATA == 2
+#endif // HDAO
+}

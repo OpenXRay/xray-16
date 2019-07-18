@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include "ComputeShader.h"
 
-void ComputeShader::Construct(ID3D11ComputeShader* cs, ref_ctable ctable, xr_vector<ID3D11SamplerState*>& Samplers,
+void ComputeShader::Construct(ID3D11ComputeShader* cs, const ref_ctable& ctable, xr_vector<ID3D11SamplerState*>& Samplers,
     xr_vector<ID3D11ShaderResourceView*>& Textures, xr_vector<ID3D11UnorderedAccessView*>& Outputs)
 {
     m_cs = cs;
@@ -29,7 +29,7 @@ ComputeShader::~ComputeShader()
         m_Samplers[i]->Release();
 }
 
-u32 GetCB(ref_constant C) { return (C->destination & RC_dest_pixel_cb_index_mask) >> RC_dest_pixel_cb_index_shift; }
+u32 GetCB(const ref_constant& C) { return (C->destination & RC_dest_pixel_cb_index_mask) >> RC_dest_pixel_cb_index_shift; }
 ComputeShader& ComputeShader::set_c(shared_str name, const Fvector4& value)
 {
     ref_constant c = m_ctable->get(name);
@@ -63,7 +63,7 @@ void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
     // process constant-loaders
     R_constant_table::c_table::iterator it = m_ctable->table.begin();
     R_constant_table::c_table::iterator end = m_ctable->table.end();
-    for (; it != end; it++)
+    for (; it != end; ++it)
     {
         R_constant* Cs = &**it;
         if (Cs->handler)

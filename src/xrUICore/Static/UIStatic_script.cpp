@@ -43,8 +43,22 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
             .def("SetTextColor", &CUIStatic::SetTextColor_script)
 
+            .def("Init", +[](CUIStatic* self, float x, float y, float width, float height)
+            {
+                const Frect rect { x, y, width, height };
+                self->SetWndRect(rect);
+            })
+            .def("Init", +[](CUIStatic* self, cpcstr texture, float x, float y, float width, float height)
+            {
+                const Frect rect { x, y, width, height };
+                self->SetWndRect(rect);
+                self->InitTexture(texture);
+            })
+
             .def("InitTexture", &CUIStatic::InitTexture)
+            .def("InitTexture", +[](CUIStatic* self, pcstr texture) { self->InitTexture(texture); })
             .def("InitTextureEx", &CUIStatic::InitTextureEx)
+            .def("InitTextureEx", +[](CUIStatic* self, pcstr texture, pcstr shader) { self->InitTextureEx(texture, shader); })
 
             .def("SetTextureOffset", &CUIStatic::SetTextureOffset)
 

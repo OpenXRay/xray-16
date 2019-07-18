@@ -1,5 +1,16 @@
 #pragma once
 
+//UI-controls
+class CUIStatic;
+class CUIEditBox;
+class CUIDialogWnd;
+class CUIFrameWindow;
+class CUIFrameLineWnd;
+class CUIProgressBar;
+class CUITabControl;
+class CUIListWnd;
+class CUIListBox;
+
 template <typename T>
 struct CWrapperBase : public T, public luabind::wrap_base
 {
@@ -26,3 +37,14 @@ struct CWrapperBase : public T, public luabind::wrap_base
 
 typedef CWrapperBase<CUIDialogWndEx> WrapType;
 typedef CUIDialogWndEx BaseType;
+
+template <typename T>
+T* CUIDialogWndEx::GetControl(pcstr name)
+{
+    shared_str n = name;
+    CUIWindow* pWnd = FindChild(n);
+    if (pWnd == nullptr)
+        return nullptr;
+
+    return smart_cast<T*>(pWnd);
+}

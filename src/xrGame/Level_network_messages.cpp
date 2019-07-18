@@ -404,7 +404,7 @@ void CLevel::ClientReceive()
 
                 u32 temp_str_size = str_end - str_start;
                 R_ASSERT2(temp_str_size < 256, "level name too big");
-                LevelName = static_cast<char*>(_alloca(temp_str_size + 1));
+                LevelName = static_cast<char*>(xr_alloca(temp_str_size + 1));
                 P->r_seek(str_start);
                 P->r_stringZ(LevelName);
 
@@ -414,7 +414,7 @@ void CLevel::ClientReceive()
                 str_end = P->r_tell();
                 temp_str_size = str_end - str_start;
                 R_ASSERT2(temp_str_size < 256, "incorect game type");
-                GameType = static_cast<char*>(_alloca(temp_str_size + 1));
+                GameType = static_cast<char*>(xr_alloca(temp_str_size + 1));
                 P->r_seek(str_start);
                 P->r_stringZ(GameType);*/
 

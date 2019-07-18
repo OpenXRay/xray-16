@@ -5,11 +5,11 @@
 // Vertex
 v2p_TL _main ( v_TL I )
 {
-	v2p_TL O;
+	v2p_TL	O;
 
-	O.HPos = mul( m_VP, I.P );
-	O.Tex0 = I.Tex0;
-	O.Color = I.Color.bgra;	//	swizzle vertex colour
+	O.HPos		= mul( m_VP, I.P );
+	O.Tex0		= I.Tex0;
+	O.Color		= unpack_D3DCOLOR(I.Color);
 
- 	return O;
+ 	return	O;
 }

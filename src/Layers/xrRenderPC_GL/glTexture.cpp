@@ -6,6 +6,8 @@
 
 #include <gli/gli.hpp>
 
+constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
+
 void fix_texture_name(LPSTR fn)
 {
     LPSTR _ext = strext(fn);
@@ -45,7 +47,7 @@ int get_texture_load_lod(LPCSTR fn)
     return 2;
 }
 
-u32 calc_texture_size(int lod, u32 mip_cnt, u32 orig_size)
+u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 {
     if (1 == mip_cnt)
         return orig_size;
@@ -66,13 +68,15 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
     GLuint pTexture = 0;
     string_path fn;
     u32 dwWidth, dwHeight, dwDepth;
-    u32 img_size = 0;
+    size_t img_size = 0;
     int img_loaded_lod = 0;
     gli::gl::format fmt;
     u32 mip_cnt = u32(-1);
     // validation
     R_ASSERT(fRName);
     R_ASSERT(fRName[0]);
+
+    bool dummyTextureExist;
 
     // make file name
     string_path fname;
@@ -91,9 +95,11 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 #else
 
     Msg("! Can't find texture '%s'", fname);
-    R_ASSERT(FS.exist(fn, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
-
-    //	xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
+    dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
+    if (!ShadowOfChernobylMode)
+        R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
+    if (!dummyTextureExist)
+        return 0;
 
 #endif
 
@@ -107,7 +113,7 @@ _DDS:
         img_size = S->length();
         R_ASSERT(S);
         gli::texture Texture = gli::load((char*)S->pointer(), img_size);
-        R_ASSERT(!Texture.empty());
+        R_ASSERT2(!Texture.empty(), fn);
         if (is_target_cube(Texture.target())) goto _DDS_CUBE;
         if (Texture.target() == gli::TARGET_3D) goto _DDS_3D;
         goto _DDS_2D;

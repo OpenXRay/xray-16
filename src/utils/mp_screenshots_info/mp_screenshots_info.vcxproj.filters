@@ -24,4 +24,7 @@
   <ItemGroup>
     <CustomBuild Include="screenshots_writer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

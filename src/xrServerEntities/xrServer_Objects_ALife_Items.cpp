@@ -209,34 +209,71 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
     anim_use=false;
     }*/
 
+    const u16 m_wVersion = base()->m_wVersion;
     {
-        tNetPacket.r_vec3(State.force);
-        tNetPacket.r_vec3(State.torque);
+        if (m_wVersion >= 122) // Xottab_DUTY: not sure, 121 or even 119 may be correct
+        {
+            tNetPacket.r_vec3(State.force);
+            tNetPacket.r_vec3(State.torque);
+        }
+        else
+        {
+            State.force.set(0.f, 0.f, 0.f);
+            State.torque.set(0.f, 0.f, 0.f);
+        }
 
         tNetPacket.r_vec3(State.position);
         base()->o_Position.set(State.position); // this is very important because many functions use this o_Position..
 
-        tNetPacket.r_float(State.quaternion.x);
-        tNetPacket.r_float(State.quaternion.y);
-        tNetPacket.r_float(State.quaternion.z);
-        tNetPacket.r_float(State.quaternion.w);
+        if (m_wVersion >= 122) // Xottab_DUTY: not sure, 121 or even 119 may be correct too
+        {
+            tNetPacket.r_float(State.quaternion.x);
+            tNetPacket.r_float(State.quaternion.y);
+            tNetPacket.r_float(State.quaternion.z);
+            tNetPacket.r_float(State.quaternion.w);
+        }
+        else
+        {
+            tNetPacket.r_float_q8(State.quaternion.x, 0.f, 1.f);
+            tNetPacket.r_float_q8(State.quaternion.y, 0.f, 1.f);
+            tNetPacket.r_float_q8(State.quaternion.z, 0.f, 1.f);
+            tNetPacket.r_float_q8(State.quaternion.w, 0.f, 1.f);
+        }
 
         State.enabled = check(num_items.mask, inventory_item_state_enabled);
 
         if (!check(num_items.mask, inventory_item_angular_null))
         {
-            tNetPacket.r_float(State.angular_vel.x);
-            tNetPacket.r_float(State.angular_vel.y);
-            tNetPacket.r_float(State.angular_vel.z);
+            if (m_wVersion >= 122) // Xottab_DUTY: not sure, 121 or even 119 may be correct too
+            {
+                tNetPacket.r_float(State.angular_vel.x);
+                tNetPacket.r_float(State.angular_vel.y);
+                tNetPacket.r_float(State.angular_vel.z);
+            }
+            else
+            {
+                tNetPacket.r_float_q8(State.angular_vel.x, 0.f, 10 * PI_MUL_2);
+                tNetPacket.r_float_q8(State.angular_vel.y, 0.f, 10 * PI_MUL_2);
+                tNetPacket.r_float_q8(State.angular_vel.z, 0.f, 10 * PI_MUL_2);
+            }
         }
         else
             State.angular_vel.set(0.f, 0.f, 0.f);
 
         if (!check(num_items.mask, inventory_item_linear_null))
         {
-            tNetPacket.r_float(State.linear_vel.x);
-            tNetPacket.r_float(State.linear_vel.y);
-            tNetPacket.r_float(State.linear_vel.z);
+            if (m_wVersion >= 122) // Xottab_DUTY: not sure, 121 or even 119 may be correct too
+            {
+                tNetPacket.r_float(State.linear_vel.x);
+                tNetPacket.r_float(State.linear_vel.y);
+                tNetPacket.r_float(State.linear_vel.z);
+            }
+            else
+            {
+                tNetPacket.r_float_q8(State.linear_vel.x, -32.f, 32.f);
+                tNetPacket.r_float_q8(State.linear_vel.y, -32.f, 32.f);
+                tNetPacket.r_float_q8(State.linear_vel.z, -32.f, 32.f);
+            }
         }
         else
             State.linear_vel.set(0.f, 0.f, 0.f);
@@ -247,7 +284,7 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
         }*/
     }
     prev_freezed = freezed;
-    if (tNetPacket.r_eof()) // in case spawn + update
+    if (tNetPacket.r_eof() || m_wVersion < 122) // in case spawn + update
     {
         freezed = false;
         return;

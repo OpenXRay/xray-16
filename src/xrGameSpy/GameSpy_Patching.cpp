@@ -75,7 +75,7 @@ void __cdecl GS_ptPatchCallback(
     };
     Msg("Found NewPatch: %s - %s", versionName, downloadURL);
     u32 new_url_size = APPEND_DWURL_INFO_LEN + (downloadURL ? xr_strlen(downloadURL) : 0);
-    char* new_download_url = static_cast<char*>(_alloca(new_url_size));
+    char* new_download_url = static_cast<char*>(xr_alloca(new_url_size));
     char const* new_url = ModifyDownloadUrl(new_download_url, new_url_size, downloadURL);
     Msg("NewPatch url after updating: %s", new_url);
     cb(true, versionName, new_url);

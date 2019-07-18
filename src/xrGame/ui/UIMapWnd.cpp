@@ -18,10 +18,11 @@
 #include "map_hint.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "xrEngine/xr_input.h" //remove me !!!
+#include "UIHelper.h"
 
 CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(
 CUIMapWnd* GetMapWnd() { return g_map_wnd; }
-CUIMapWnd::CUIMapWnd()
+CUIMapWnd::CUIMapWnd(UIHint* hint)
 {
     m_tgtMap = NULL;
     m_GlobalMap = NULL;
@@ -36,10 +37,10 @@ CUIMapWnd::CUIMapWnd()
     //	m_dbg_info				= NULL;
     #endif // DEBUG /**/
 
-    //	UIMainMapHeader			= NULL;
+    m_UIMainMapHeader = nullptr;
     m_scroll_mode = false;
     m_nav_timing = Device.dwTimeGlobal;
-    hint_wnd = NULL;
+    hint_wnd = hint;
     g_map_wnd = this;
 }
 
@@ -56,33 +57,44 @@ CUIMapWnd::~CUIMapWnd()
     g_map_wnd = NULL;
 }
 
-void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
+bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*/)
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name);
+    if (!uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name, critical))
+        return false;
 
     string512 pth;
-    CUIXmlInit xml_init;
     strconcat(sizeof(pth), pth, start_from, ":main_wnd");
-    xml_init.InitWindow(uiXml, pth, 0, this);
+    CUIXmlInit::InitWindow(uiXml, pth, 0, this);
 
     m_map_move_step = uiXml.ReadAttribFlt(start_from, 0, "map_move_step", 10.0f);
 
-    m_UILevelFrame = new CUIWindow();
-    m_UILevelFrame->SetAutoDelete(true);
-    strconcat(sizeof(pth), pth, start_from, ":level_frame");
-    xml_init.InitWindow(uiXml, pth, 0, m_UILevelFrame);
-    //	m_UIMainFrame->AttachChild		(m_UILevelFrame);
-    AttachChild(m_UILevelFrame);
-
-    m_UIMainFrame = new CUIFrameWindow();
-    m_UIMainFrame->SetAutoDelete(true);
-    AttachChild(m_UIMainFrame);
     strconcat(sizeof(pth), pth, start_from, ":main_map_frame");
-    xml_init.InitFrameWindow(uiXml, pth, 0, m_UIMainFrame);
+    m_UIMainFrame = UIHelper::CreateFrameWindow(uiXml, pth, this, false);
+    if (!m_UIMainFrame)
+    {
+        strconcat(sizeof(pth), pth, start_from, ":main_wnd:main_map_frame");
+        m_UIMainFrame = UIHelper::CreateFrameWindow(uiXml, pth, this, false);
+    }
 
-    m_scroll_mode = (uiXml.ReadAttribInt(start_from, 0, "scroll_enable", 0) == 1) ? true : false;
-    if (m_scroll_mode)
+    strconcat(sizeof(pth), pth, start_from, ":level_frame");
+    m_UILevelFrame = UIHelper::CreateNormalWindow(uiXml, pth, this, false);
+    if (!m_UILevelFrame)
+    {
+        strconcat(sizeof(pth), pth, start_from, ":main_wnd:main_map_frame:level_frame");
+        m_UILevelFrame = UIHelper::CreateNormalWindow(uiXml, pth, m_UIMainFrame);
+    }
+
+    strconcat(sizeof(pth), pth, start_from, "main_map_header");
+    m_UIMainMapHeader = UIHelper::CreateFrameLine(uiXml, pth, this, false);
+    if (!m_UIMainMapHeader)
+    {
+        strconcat(sizeof(pth), pth, start_from, ":main_wnd:map_header_frame_line");
+        m_UIMainMapHeader = UIHelper::CreateFrameLine(uiXml, pth, m_UIMainFrame, false);
+    }
+
+    m_scroll_mode = uiXml.ReadAttribInt(start_from, 0, "scroll_enable", 0) == 1;
+    if (m_scroll_mode || ShadowOfChernobylMode)
     {
         float dx, dy, sx, sy;
         strconcat(sizeof(pth), pth, start_from, ":main_map_frame");
@@ -94,20 +106,38 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
         CUIWindow* rect_parent = m_UIMainFrame; // m_UILevelFrame;
         Frect r = rect_parent->GetWndRect();
 
-        m_UIMainScrollH = new CUIFixedScrollBar();
-        m_UIMainScrollH->SetAutoDelete(true);
-        m_UIMainScrollH->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), true);
+        auto tempScroll = new CUIFixedScrollBar();
+        if (tempScroll->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), true))
+            m_UIMainScrollH = tempScroll;
+        else
+        {
+            Msg("! Failed to init m_UIMainScrollH as FixedScrollBar, trying to initialize it as ScrollBar");
+            xr_delete(tempScroll);
+            m_UIMainScrollH = new CUIScrollBar();
+            m_UIMainScrollH->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), r.right - r.left - dx * 2 - sx, true, "pda");
+        }
+
         m_UIMainScrollH->SetStepSize(_max(1, (int)(m_UILevelFrame->GetWidth() * 0.1f)));
         m_UIMainScrollH->SetPageSize((int)m_UILevelFrame->GetWidth()); // iFloor
+        m_UIMainScrollH->SetAutoDelete(true);
         AttachChild(m_UIMainScrollH);
         Register(m_UIMainScrollH);
         AddCallback(m_UIMainScrollH, SCROLLBAR_HSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollH));
 
-        m_UIMainScrollV = new CUIFixedScrollBar();
-        m_UIMainScrollV->SetAutoDelete(true);
-        m_UIMainScrollV->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), false);
+        tempScroll = new CUIFixedScrollBar();
+        if (tempScroll->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), false))
+            m_UIMainScrollV = tempScroll;
+        else
+        {
+            Msg("! Failed to init m_UIMainScrollV as FixedScrollBar, trying to initialize it as ScrollBar");
+            xr_delete(tempScroll);
+            m_UIMainScrollV = new CUIScrollBar();
+            m_UIMainScrollV->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), r.bottom - r.top - dy * 2, false, "pda");
+        }
+
         m_UIMainScrollV->SetStepSize(_max(1, (int)(m_UILevelFrame->GetHeight() * 0.1f)));
         m_UIMainScrollV->SetPageSize((int)m_UILevelFrame->GetHeight());
+        m_UIMainScrollV->SetAutoDelete(true);
         AttachChild(m_UIMainScrollV);
         Register(m_UIMainScrollV);
         AddCallback(m_UIMainScrollV, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollV));
@@ -142,7 +172,7 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     {
         CInifile::Sect& S = pGameIni->r_section(sect_name.c_str());
         auto it = S.Data.cbegin(), end = S.Data.cend();
-        for (; it != end; it++)
+        for (; it != end; ++it)
         {
             shared_str map_name = it->first;
             xr_strlwr(map_name);
@@ -188,6 +218,8 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     m_ActionPlanner = new CMapActionPlanner();
     m_ActionPlanner->setup(this);
     m_view_actor = true;
+
+    return true;
 }
 
 void CUIMapWnd::Show(bool status)

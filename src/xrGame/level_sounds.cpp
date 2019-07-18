@@ -33,10 +33,14 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
     {
         if (0 == m_Source._feedback())
         {
+            Fvector occ[3];
+            const float occluder_volume = GEnv.Sound->get_occlusion(m_Position, .2f, occ);
+            const float vol = m_Volume * occluder_volume;
+            
             if ((0 == m_PauseTime.x) && (0 == m_PauseTime.y))
             {
                 m_Source.play_at_pos(0, m_Position, sm_Looped);
-                m_Source.set_volume(m_Volume);
+                m_Source.set_volume(vol);
                 m_Source.set_frequency(m_Freq);
                 m_StopTime = 0xFFFFFFFF;
             }
@@ -46,7 +50,7 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
                 {
                     bool bFullPlay = (0 == m_PlayTime.x) && (0 == m_PlayTime.y);
                     m_Source.play_at_pos(0, m_Position, bFullPlay ? 0 : sm_Looped);
-                    m_Source.set_volume(m_Volume);
+                    m_Source.set_volume(vol);
                     m_Source.set_frequency(m_Freq);
                     if (bFullPlay)
                     {
@@ -82,7 +86,14 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
 #ifdef DEBUG
     m_DbgName = fn;
 #endif
-    m_SourceStereo.create(fn, st_Music, sg_Undefined);
+    // create source
+    string_path _l, _r;
+    strconcat(sizeof(_l), _l, fn, "_l");
+    strconcat(sizeof(_r), _r, fn, "_r");
+    const bool left = m_SourceLeft.create(_l, st_Music, sg_Undefined, false);
+    const bool right = m_SourceRight.create(_r, st_Music, sg_Undefined, false);
+
+    m_SourceStereo.create(fn, st_Music, sg_Undefined, !left && !right);
 
     // parse params
     int cnt = _GetItemCount(params);
@@ -122,17 +133,31 @@ BOOL SMusicTrack::in(u32 game_time)
 void SMusicTrack::Play()
 {
     m_SourceStereo.play_at_pos(0, Fvector().set(0.0f, 0.0f, 0.0f), sm_2D);
+    m_SourceLeft.play_at_pos(0, Fvector().set(-0.5f, 0.f, 0.3f), sm_2D);
+    m_SourceRight.play_at_pos(0, Fvector().set(+0.5f, 0.f, 0.3f), sm_2D);
+
     SetVolume(1.0f);
 }
 
-BOOL SMusicTrack::IsPlaying()
+bool SMusicTrack::IsPlaying() const
 {
-    BOOL ret = (NULL != m_SourceStereo._feedback());
-    return ret;
+    const bool stereo = !!m_SourceStereo._feedback();
+    const bool mono = !!m_SourceLeft._feedback() && !!m_SourceRight._feedback();
+    return stereo || mono;
 }
 
-void SMusicTrack::SetVolume(float volume) { m_SourceStereo.set_volume(volume * m_Volume); }
-void SMusicTrack::Stop() { m_SourceStereo.stop_deferred(); }
+void SMusicTrack::SetVolume(float volume)
+{
+    m_SourceStereo.set_volume(volume * m_Volume);
+    m_SourceLeft.set_volume(volume * m_Volume);
+    m_SourceRight.set_volume(volume * m_Volume);
+}
+void SMusicTrack::Stop()
+{
+    m_SourceStereo.stop_deferred();
+    m_SourceLeft.stop_deferred();
+    m_SourceRight.stop_deferred();
+}
 
 //-----------------------------------------------------------------------------
 // level sound manager
@@ -174,7 +199,7 @@ void CLevelSoundManager::Load()
                 CInifile::Sect& S = gameLtx.r_section(music_sect);
                 auto it = S.Data.cbegin(), end = S.Data.cend();
                 m_MusicTracks.reserve(S.Data.size());
-                for (; it != end; it++)
+                for (; it != end; ++it)
                 {
                     m_MusicTracks.push_back(SMusicTrack());
                     m_MusicTracks.back().Load(*it->first, *it->second);

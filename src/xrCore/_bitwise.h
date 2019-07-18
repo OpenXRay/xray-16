@@ -1,6 +1,7 @@
 #pragma once
 #ifndef _BITWISE_
 #define _BITWISE_
+#include <cmath>
 #include "math_constants.h"
 #include "_types.h"
 

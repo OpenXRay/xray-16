@@ -75,8 +75,8 @@ VertexFormatPairs VertexFormatList[] = {{D3DDECLTYPE_FLOAT1, DXGI_FORMAT_R32_FLO
 
 DXGI_FORMAT ConvertVertexFormat(D3DDECLTYPE dx9FMT)
 {
-    int arrayLength = sizeof(VertexFormatList) / sizeof(VertexFormatList[0]);
-    for (int i = 0; i < arrayLength; ++i)
+    size_t arrayLength = sizeof(VertexFormatList) / sizeof(VertexFormatList[0]);
+    for (size_t i = 0; i < arrayLength; ++i)
     {
         if (VertexFormatList[i].m_dx9FMT == dx9FMT)
             return VertexFormatList[i].m_dx10FMT;
@@ -111,8 +111,8 @@ VertexSemanticPairs VertexSemanticList[] = {
 
 LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
 {
-    int arrayLength = sizeof(VertexSemanticList) / sizeof(VertexSemanticList[0]);
-    for (int i = 0; i < arrayLength; ++i)
+    size_t arrayLength = sizeof(VertexSemanticList) / sizeof(VertexSemanticList[0]);
+    for (size_t i = 0; i < arrayLength; ++i)
     {
         if (VertexSemanticList[i].m_dx9Semantic == Semantic)
             return VertexSemanticList[i].m_dx10Semantic;
@@ -124,10 +124,10 @@ LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
 
 void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vector<D3D_INPUT_ELEMENT_DESC>& declOut)
 {
-    int iDeclSize = declIn.size() - 1;
+    s32 iDeclSize = declIn.size() - 1;
     declOut.resize(iDeclSize + 1);
 
-    for (int i = 0; i < iDeclSize; ++i)
+    for (s32 i = 0; i < iDeclSize; ++i)
     {
         const D3DVERTEXELEMENT9& descIn = declIn[i];
         D3D_INPUT_ELEMENT_DESC& descOut = declOut[i];
@@ -141,6 +141,7 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
         descOut.InstanceDataStepRate = 0;
     }
 
-    ZeroMemory(&declOut[iDeclSize], sizeof(declOut[iDeclSize]));
+    if (iDeclSize >= 0)
+        ZeroMemory(&declOut[iDeclSize], sizeof(declOut[iDeclSize]));
 }
 };

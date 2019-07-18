@@ -9,6 +9,7 @@
 #pragma comment(lib, "winmm.lib")
 #elif defined(LINUX)
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <pwd.h>
 #include <unistd.h>
 #endif
@@ -181,11 +182,18 @@ void SDLLogOutput(void* /*userdata*/,
 
     constexpr pcstr format = "%c [sdl][%s][%s]: %s";
     const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
-    pstr buf = (pstr)_alloca(size);
+    pstr buf = (pstr)xr_alloca(size);
 
     xr_sprintf(buf, size, format, mark, from, type, message);
     Log(buf);
 }
+
+xrCore::xrCore()
+    : ApplicationName{}, ApplicationPath{},
+      WorkingPath{},
+      UserName{}, CompName{},
+      Params(nullptr), dwFrame(0),
+      PluginMode(false) {}
 
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
@@ -214,9 +222,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #else
-        char *base_path = SDL_GetBasePath();
-        SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
-        SDL_free(base_path);
+        char *pref_path = SDL_GetPrefPath("GSC", "SCOP");
+        SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
+        SDL_free(pref_path);
 #endif
 
 #ifdef _EDITOR
@@ -233,6 +241,30 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #else
         getcwd(WorkingPath, sizeof(WorkingPath));
+        chdir(ApplicationPath);
+        string_path tmp;
+        xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
+        struct stat statbuf;
+        memset(&statbuf, 0, sizeof(struct stat));
+
+        int res = lstat(tmp, &statbuf);
+
+        if(!S_ISLNK(statbuf.st_mode)) // If not symlink (original fsgame.ltx at first run), remove it
+            unlink(tmp);
+
+        if(-1 == res || !S_ISLNK(statbuf.st_mode))
+            symlink("/usr/share/openxray/fsgame.ltx", tmp);
+
+        xr_sprintf(tmp, "%sgamedata", ApplicationPath);
+
+        memset(&statbuf, 0, sizeof(struct stat));
+        res = lstat(tmp, &statbuf);
+
+        if(S_ISDIR(statbuf.st_mode)) // If folder (custom gamedata), remove it
+            rmdir(tmp);
+
+        if(-1 == res || !S_ISLNK(statbuf.st_mode))
+            symlink("/usr/share/openxray/gamedata", tmp);
 #endif
 
 #if defined(WINDOWS)

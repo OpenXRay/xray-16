@@ -159,6 +159,9 @@ void Manager::load_all_inventory()
 {
     LPCSTR items_section = "upgraded_inventory";
 
+    if (!pSettings->section_exist(items_section) && ShadowOfChernobylMode)
+        return;
+
     VERIFY2(pSettings->section_exist(items_section), make_string("Section [%s] does not exist !", items_section));
     VERIFY2(pSettings->line_count(items_section), make_string("Section [%s] is empty !", items_section));
 
@@ -194,6 +197,10 @@ void Manager::load_all_inventory()
 void Manager::load_all_properties()
 {
     LPCSTR properties_section = "upgrades_properties";
+
+    if (!pSettings->section_exist(properties_section) && ShadowOfChernobylMode)
+        return;
+
 
     VERIFY2(
         pSettings->section_exist(properties_section), make_string("Section [%s] does not exist !", properties_section));
@@ -390,7 +397,7 @@ void Manager::init_install(CInventoryItem& item)
         if (installed_upgrades_str)
         {
             u32 const buffer_size = (xr_strlen(installed_upgrades_str) + 1) * sizeof(char);
-            PSTR temp = (PSTR)_alloca(buffer_size);
+            PSTR temp = (PSTR)xr_alloca(buffer_size);
 
             for (int n = _GetItemCount(installed_upgrades_str), i = 0; i < n; ++i)
             {

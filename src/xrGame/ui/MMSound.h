@@ -22,7 +22,8 @@ public:
 protected:
     IC bool check_file(LPCSTR fname);
 
-    ref_sound m_music_stereo;
+    static constexpr size_t channels_count = 2;
+    xr_array<ref_sound, channels_count> m_music;
 
     ref_sound m_whell;
     ref_sound m_whell_click;

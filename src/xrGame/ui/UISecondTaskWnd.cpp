@@ -28,7 +28,10 @@
 #include "GametaskManager.h"
 #include "Actor.h"
 
-UITaskListWnd::UITaskListWnd() { hint_wnd = NULL; }
+UITaskListWnd::UITaskListWnd()
+    : hint_wnd(nullptr), m_background(nullptr), m_list(nullptr),
+      m_caption(nullptr), m_bt_close(nullptr), m_orig_h(0) {}
+
 UITaskListWnd::~UITaskListWnd() {}
 void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
 {
@@ -166,15 +169,16 @@ void UITaskListWnd::UpdateCounter()
 // - -----------------------------------------------------------------------------------------------
 
 UITaskListWndItem::UITaskListWndItem()
+    : show_hint_can(false), show_hint(false),
+      m_task(nullptr), m_name(nullptr),
+      m_bt_view(nullptr), m_st_story(nullptr),
+      m_bt_focus(nullptr)
 {
-    m_task = NULL;
-
-    m_color_states[0] = (u32)(-1);
-    m_color_states[1] = (u32)(-1);
-    m_color_states[2] = (u32)(-1);
+     m_color_states[0] = u32(-1);
+     m_color_states[1] = u32(-1);
+     m_color_states[2] = u32(-1);
 }
 
-UITaskListWndItem::~UITaskListWndItem() {}
 IC u32 UITaskListWndItem::get_priority_task() const
 {
     VERIFY(m_task);
@@ -197,8 +201,8 @@ bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
     CUIXmlInit::InitWindow(xml, "second_task_wnd:task_item", 0, this);
 
     m_name = UIHelper::Create3tButton(xml, "second_task_wnd:task_item:name", this);
-    //	m_bt_view  = UIHelper::CreateCheck(      xml, "second_task_wnd:task_item:btn_view", this );
-    m_st_story = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:st_story", this);
+    m_bt_view = UIHelper::CreateCheck(xml, "second_task_wnd:task_item:btn_view", this, false);
+    m_st_story = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:st_story", this, false);
     m_bt_focus = UIHelper::Create3tButton(xml, "second_task_wnd:task_item:btn_focus", this);
 
     m_color_states[stt_activ] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:activ", 0, (u32)(-1));
@@ -235,15 +239,29 @@ void UITaskListWndItem::update_view()
 {
     VERIFY(m_task);
     CMapLocation* ml = m_task->LinkedMapLocation();
-    if (ml && ml->SpotEnabled())
-        m_bt_focus->Show(true);
-    else
-        m_bt_focus->Show(false);
 
-    if (m_task->GetTaskType() == eTaskTypeStoryline)
-        m_st_story->InitTexture("ui_inGame2_PDA_icon_Primary_mission");
+    if (ml && ml->SpotEnabled())
+    {
+        if (m_bt_view)
+            m_bt_view->SetCheck(false);
+        else
+            m_bt_focus->Show(true);
+    }
     else
-        m_st_story->InitTexture("ui_inGame2_PDA_icon_Secondary_mission");
+    {
+        if (m_bt_view)
+            m_bt_view->SetCheck(true);
+        else
+            m_bt_focus->Show(false);
+    }
+
+    if (m_st_story)
+    {
+        if (m_task->GetTaskType() == eTaskTypeStoryline)
+            m_st_story->InitTexture("ui_inGame2_PDA_icon_Primary_mission");
+        else
+            m_st_story->InitTexture("ui_inGame2_PDA_icon_Secondary_mission");
+    }
 
     m_name->TextItemControl()->SetTextST(m_task->m_Title.c_str());
     m_name->AdjustHeightToText();
@@ -251,9 +269,10 @@ void UITaskListWndItem::update_view()
     h1 = _max(h1, GetHeight());
     SetHeight(h1);
 
-    CGameTask* activ_task = Level().GameTaskManager().ActiveTask();
-
-    if (m_task == activ_task)
+    const CGameTask* storyTask = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
+    const CGameTask* additionalTask = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
+    
+    if (m_task == storyTask || m_task == additionalTask)
     {
         m_name->SetStateTextColor(m_color_states[stt_activ], S_Enabled);
     }
@@ -276,23 +295,20 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             GetMessageTarget()->SendMessage(this, PDA_TASK_SET_TARGET_MAP, (void*)m_task);
         }
     }
-    /*
-        if ( pWnd == m_bt_view )
+    if (pWnd == m_bt_view)
+    {
+        if (m_bt_view->GetCheck() && msg == BUTTON_CLICKED)
         {
-            if ( m_bt_view->GetCheck() && msg == BUTTON_CLICKED )
-            {
-                GetMessageTarget()->SendMessage( this, PDA_TASK_HIDE_MAP_SPOT, (void*)m_task );
-    //			Msg( " HIDE task  id = %d", m_task->m_ID );
-                return;
-            }
-            if ( !m_bt_view->GetCheck() && msg == BUTTON_CLICKED )
-            {
-                GetMessageTarget()->SendMessage( this, PDA_TASK_SHOW_MAP_SPOT, (void*)m_task );
-    //			Msg( " show task  id = %d", m_task->m_ID );
-                return;
-            }
+            GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_MAP_SPOT, (void*)m_task);
+            return;
         }
-    */
+        if (!m_bt_view->GetCheck() && msg == BUTTON_CLICKED)
+        {
+            GetMessageTarget()->SendMessage(this, PDA_TASK_SHOW_MAP_SPOT, (void*)m_task);
+            return;
+        }
+    }
+    
     if (pWnd == m_name)
     {
         if (msg == BUTTON_DOWN)

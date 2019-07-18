@@ -137,7 +137,7 @@ bool CALifeSwitchManager::synchronize_location(CSE_ALifeDynamicObject* I)
     if (!I->children.empty())
     {
         u32 size = I->children.size();
-        ALife::_OBJECT_ID* test = (ALife::_OBJECT_ID*)_alloca(size * sizeof(ALife::_OBJECT_ID));
+        ALife::_OBJECT_ID* test = (ALife::_OBJECT_ID*)xr_alloca(size * sizeof(ALife::_OBJECT_ID));
         memcpy(test, &*I->children.begin(), size * sizeof(ALife::_OBJECT_ID));
         std::sort(test, test + size);
         for (u32 i = 1; i < size; ++i)

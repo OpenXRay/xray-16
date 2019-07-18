@@ -982,7 +982,7 @@ u16 CIKLimb::foot_matrix_predict(Fmatrix& foot, Fmatrix& toe, float time, IKinem
 {
     // CBlend *control = 0;
     u32 blends_count = K->LL_PartBlendsCount(0);
-    buffer_vector<CBlend> saved_blends(_alloca(blends_count * sizeof(CBlend)), blends_count);
+    buffer_vector<CBlend> saved_blends(xr_alloca(blends_count * sizeof(CBlend)), blends_count);
 
     for (u32 i = 0; i < blends_count; ++i)
     {

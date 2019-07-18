@@ -1145,45 +1145,16 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         Element = s_accum_direct_volumetric_minmax->E[0];
 
     //	Assume everything was recalculated before this call by accum_direct
-
-    //	Set correct depth surface
-    //	It's slow. Make this when shader is created
-    {
-        char* pszSMapName;
-        BOOL b_HW_smap = RImplementation.o.HW_smap;
-        BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
-        if (b_HW_smap)
-        {
-            if (b_HW_PCF) pszSMapName = r2_RT_smap_depth;
-            else pszSMapName = r2_RT_smap_depth;
-        }
-        else pszSMapName = r2_RT_smap_surf;
-        //s_smap
-        STextureList* _T = &*Element->passes[0]->T;
-
-        STextureList::iterator _it = _T->begin();
-        STextureList::iterator _end = _T->end();
-        for (; _it != _end; _it++)
-        {
-            std::pair<u32, ref_texture>& loader = *_it;
-            u32 load_id = loader.first;
-            //	Shadowmap texture always uses 0 texture unit
-            if (load_id == 0)
-            {
-                //	Assign correct texture
-                loader.second.create(pszSMapName);
-            }
-        }
-    }
-
     // Perform lighting
     {
         // *** assume accumulator setted up ***
         light* fuckingsun = (light*)RImplementation.Lights.sun._get();
 
         // Common constants (light-related)
-        Fvector L_clr;
+        Fvector L_dir, L_clr;
         L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
+        Device.mView.transform_dir(L_dir, fuckingsun->direction);
+        L_dir.normalize();
 
         //	Use g_combine_2UV that was set up by accum_direct
         //	RCache.set_Geometry			(g_combine_2UV);
@@ -1192,7 +1163,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         //RCache.set_Element			(s_accum_direct_volumetric->E[sub_phase]);
         RCache.set_Element(Element);
         RCache.set_CullMode(CULL_CCW);
-        //		RCache.set_c				("Ldynamic_dir",		L_dir.x,L_dir.y,L_dir.z,0 );
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0);
         RCache.set_c("m_shadow", mShadow);
         Fmatrix m_Texgen;
@@ -1200,8 +1171,21 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         RCache.xforms.set_W(m_Texgen);
         RCache.xforms.set_V(Device.mView);
         RCache.xforms.set_P(Device.mProject);
-        u_compute_texgen_screen(m_Texgen);
-
+        //u_compute_texgen_screen(m_Texgen);
+        float _w = float(Device.dwWidth);
+        float _h = float(Device.dwHeight);
+        float o_w = (.5f / _w);
+        float o_h = (.5f / _h);
+        Fmatrix m_TexelAdjust =
+        {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            //	Removing half pixel offset
+            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
+            //0.5f, 0.5f , 0.0f, 1.0f
+        };
+        m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
         RCache.set_c("m_texgen", m_Texgen);
         //		RCache.set_c				("m_sunmask",			m_clouds_shadow);
 

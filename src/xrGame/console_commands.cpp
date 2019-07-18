@@ -49,6 +49,8 @@
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
+#include "GametaskManager.h"
+
 #ifdef DEBUG
 #include "PHDebug.h"
 #include "ui/UIDebugFonts.h"
@@ -604,7 +606,9 @@ public:
 #ifdef DEBUG
         Msg("Game save overhead  : %f milliseconds", timer.GetElapsed_sec() * 1000.f);
 #endif
-        StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true);
+        const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+        StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true, compat ? 3.0f : -1.0f);
+
         LPSTR save_name;
         STRCONCAT(save_name, StringTable().translate("st_game_saved").c_str(), ": ", S);
         _s->wnd()->TextItemControl()->SetText(save_name);
@@ -622,7 +626,13 @@ public:
 #endif
     } // virtual void Execute
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        if (ShadowOfChernobylMode || ClearSkyMode)
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
+        else
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION);
+    }
 }; // CCC_ALifeSave
 
 class CCC_ALifeLoadFrom : public IConsole_Command
@@ -694,7 +704,13 @@ public:
         Level().Send(net_packet, net_flags(TRUE));
     }
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        if (ShadowOfChernobylMode || ClearSkyMode)
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
+        else
+            get_files_list(tips, "$game_saves$", SAVE_EXTENSION);
+    }
 }; // CCC_ALifeLoadFrom
 
 class CCC_LoadLastSave : public IConsole_Command
@@ -1548,7 +1564,7 @@ public:
     {
         VERIFY3(false, "This is a test crash", "Do not post it as a bug");
         int* pointer = 0;
-        *pointer = 0;
+        *pointer = 0; //-V522
     }
 };
 
@@ -1795,6 +1811,25 @@ public:
         if (!Device.editor())
             g_pGamePersistent->Environment().SetWeather(args, true);
     }
+    void fill_tips(vecTips& tips, u32 mode) override
+    {
+        if (!g_pGamePersistent || Device.editor())
+            return;
+        for (auto& [name, cycle] : g_pGamePersistent->Environment().WeatherCycles)
+        {
+            tips.push_back(name);
+        }
+    }
+};
+
+class CCC_CleanupTasks : public IConsole_Command
+{
+public:
+    CCC_CleanupTasks(pcstr name) : IConsole_Command(name) {}
+    void Execute(pcstr /*args*/) override
+    {
+        Level().GameTaskManager().CleanupTasks();
+    }
 };
 
 void CCC_RegisterCommands()
@@ -1803,6 +1838,7 @@ void CCC_RegisterCommands()
     g_OptConCom.Init();
 
     CMD1(CCC_MemStats, "stat_memory");
+
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
@@ -1810,7 +1846,9 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
-// alife
+    CMD3(CCC_Mask, "g_multi_item_pickup", &psActorFlags, AF_MULTI_ITEM_PICKUP);
+
+    // alife
 #ifdef DEBUG
     CMD1(CCC_ALifePath, "al_path"); // build path
 
@@ -1987,6 +2025,8 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
+
+    CMD1(CCC_CleanupTasks, "dbg_cleanup_tasks");
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");

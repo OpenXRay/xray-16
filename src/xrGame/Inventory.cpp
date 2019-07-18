@@ -31,6 +31,22 @@ u16 INV_STATE_BLOCK_ALL = 0xffff;
 u16 INV_STATE_INV_WND = INV_STATE_BLOCK_ALL;
 u16 INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
 
+bool defaultSlotActiveness[] =
+{
+    true, // knife
+    true, // pistol
+    true, // automatic
+    true, // grenades
+    true, // binocular
+    true, // bolt
+    false, // outfit
+    false, // pda
+    false, // detector
+    false, // torch
+    true, // artefact
+    false // helmet
+};
+
 CInventorySlot::CInventorySlot()
 {
     m_pIItem = NULL;
@@ -44,8 +60,17 @@ CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
-    u32 sz = LAST_SLOT + 1; //pSettings->r_s32("inventory", "slots_count"); //Alundaio: Get slot count directly to automate this process
+    u16 sz;
+    const u16 tempSlotsCount = pSettings->read_if_exists<s16>("inventory", "slots_count", 10);
+    if (tempSlotsCount > 0 && tempSlotsCount <= LAST_SLOT)
+        sz = tempSlotsCount + 1;
+    else
+    {
+        Log("! [inventory] slots_count is less than 1 or more than LAST_SLOT");
+        sz = 1;
+    }
     m_slots.resize(sz + 1); // first is [1]
+    m_iLastSlot = sz - 1;
 
     m_iActiveSlot = NO_ACTIVE_SLOT;
     m_iNextActiveSlot = NO_ACTIVE_SLOT;
@@ -55,10 +80,10 @@ CInventory::CInventory()
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
     {
         xr_sprintf(temp, "slot_persistent_%d", i);
-        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
+        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
 
         xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
+        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
     };
 
     m_bSlotsUseful = true;
@@ -71,7 +96,7 @@ CInventory::CInventory()
     InitPriorityGroupsForQSwitch();
     m_next_item_iteration_time = 0;
 
-    for (u16 i = 0; i < LAST_SLOT + 1; ++i)
+    for (u16 i = 0; i < sz; ++i)
     {
         m_blocked_slots[i] = 0;
     }
@@ -614,7 +639,9 @@ void CInventory::Activate(u16 slot, bool bForce)
 PIItem CInventory::ItemFromSlot(u16 slot) const
 {
     VERIFY(NO_ACTIVE_SLOT != slot);
-    return m_slots[slot].m_pIItem;
+    if (slot < m_slots.size())
+        return m_slots[slot].m_pIItem;
+    return nullptr;
 }
 
 void CInventory::SendActionEvent(u16 cmd, u32 flags)
@@ -1237,7 +1264,7 @@ bool CInventory::CanTakeItem(CInventoryItem* inventory_item) const
     if (!inventory_item->CanTake())
         return false;
     TIItemContainer::const_iterator it;
-    for (it = m_all.begin(); it != m_all.end(); it++)
+    for (it = m_all.begin(); it != m_all.end(); ++it)
         if ((*it)->object().ID() == inventory_item->object().ID())
             break;
     VERIFY3(it == m_all.end(), "item already exists in inventory", *inventory_item->object().cName());
@@ -1410,7 +1437,7 @@ void CInventory::TryDeactivateActiveSlot()
 
 void CInventory::BlockSlot(u16 slot_id)
 {
-    VERIFY(slot_id <= LAST_SLOT);
+    VERIFY(slot_id <= LastSlot());
 
     ++m_blocked_slots[slot_id];
 
@@ -1419,7 +1446,7 @@ void CInventory::BlockSlot(u16 slot_id)
 
 void CInventory::UnblockSlot(u16 slot_id)
 {
-    VERIFY(slot_id <= LAST_SLOT);
+    VERIFY(slot_id <= LastSlot());
     VERIFY2(m_blocked_slots[slot_id] > 0, make_string("blocked slot [%d] underflow").c_str());
 
     --m_blocked_slots[slot_id];
@@ -1427,7 +1454,7 @@ void CInventory::UnblockSlot(u16 slot_id)
 
 bool CInventory::IsSlotBlocked(u16 slot_id) const
 {
-    VERIFY(slot_id <= LAST_SLOT);
+    VERIFY(slot_id <= LastSlot());
     return m_blocked_slots[slot_id] > 0;
 }
 

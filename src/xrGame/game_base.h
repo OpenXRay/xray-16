@@ -53,7 +53,6 @@ struct Bonus_Money_Struct
 
 struct game_PlayerState
 {
-    // string64	name;
     u8 team;
 
     // for statistics
@@ -100,6 +99,7 @@ struct game_PlayerState
     // if account_info == NULL then constructor call load_account method.
     // so it MUST be use ONLY for local_player !
     explicit game_PlayerState(NET_Packet* account_info);
+    game_PlayerState() : game_PlayerState(nullptr) {}
     ~game_PlayerState();
 
     virtual void clear();
@@ -107,7 +107,7 @@ struct game_PlayerState
     void setFlag(u16 f);
     void resetFlag(u16 f);
     LPCSTR getName() const { return m_account.name().c_str(); }
-    // void	setName					(LPCSTR s){xr_strcpy(name,s);}
+    void setName(pcstr s) { m_account.set_player_name(s); }
     void SetGameID(u16 NewID);
     bool HasOldID(u16 ID);
     bool IsSkip() const { return testFlag(GAME_PLAYER_FLAG_SKIP); }
@@ -176,6 +176,8 @@ public:
 IC IGameState::~IGameState() {}
 class game_GameState : public FactoryObjectBase, public virtual IGameState
 {
+    friend void game_GameState_script_register(lua_State* luaState);
+
 protected:
     EGameIDs m_type;
     u16 m_phase;

@@ -36,16 +36,16 @@ void CRender::render_lights(light_Package& LP)
         xr_vector<light*>& source = LP.v_shadowed;
         xr_vector<light*> refactored;
         refactored.reserve(source.size());
-        u32 total = source.size();
+        const size_t total = source.size();
 
-        for (u16 smap_ID = 0; refactored.size() != total; smap_ID++)
+        for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            sort(source.begin(), source.end(), pred_area);
-            for (u32 test = 0; test < source.size(); test++)
+            std::sort(source.begin(), source.end(), pred_area);
+            for (size_t test = 0; test < source.size(); ++test)
             {
                 light* L = source[test];
-                SMAP_Rect R;
+                SMAP_Rect R{};
                 if (LP_smap_pool.push(R, L->X.S.size))
                 {
                     // OK
@@ -54,15 +54,17 @@ void CRender::render_lights(light_Package& LP)
                     L->vis.smap_ID = smap_ID;
                     refactored.push_back(L);
                     source.erase(source.begin() + test);
-                    test --;
+                    --test;
                 }
             }
         }
 
         // save (lights are popped from back)
-        reverse(refactored.begin(), refactored.end());
-        LP.v_shadowed = refactored;
+        std::reverse(refactored.begin(), refactored.end());
+        LP.v_shadowed = std::move(refactored);
     }
+
+    PIX_EVENT(SHADOWED_LIGHTS);
 
     //////////////////////////////////////////////////////////////////////////
     // sort lights by importance???

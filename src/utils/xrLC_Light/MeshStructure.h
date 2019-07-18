@@ -119,7 +119,7 @@ public:
         return -1;
     };
 
-    IC void SetVertex(int idx, type_vertex* V)
+    IC void SetVertex(size_t idx, type_vertex* V)
     {
         v[idx] = V;
         V->prep_add(this);
@@ -131,13 +131,13 @@ public:
         SetVertex(2, V3);
     };
     IC BOOL isDegenerated() { return (v[0] == v[1] || v[0] == v[2] || v[1] == v[2]); };
-    IC float EdgeLen(int edge)
+    IC float EdgeLen(size_t edge)
     {
         type_vertex* V1 = v[edge2idx[edge][0]];
         type_vertex* V2 = v[edge2idx[edge][1]];
         return V1->P.distance_to(V2->P);
     };
-    IC void EdgeVerts(int e, type_vertex** A, type_vertex** B) const
+    IC void EdgeVerts(size_t e, type_vertex** A, type_vertex** B) const
     {
         *A = v[edge2idx[e][0]];
         *B = v[edge2idx[e][1]];
@@ -340,9 +340,9 @@ IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*>& vertices)
     if (bProgress)
         Logger.Status("Isolating vertices...");
     // g_bUnregister		= false;
-    const u32 verts_old = vertices.size();
+    const size_t verts_old = vertices.size();
 
-    for (int it = 0; it < int(verts_old); ++it)
+    for (size_t it = 0; it < verts_old; ++it)
     {
         if (bProgress)
             Logger.Progress(float(it) / float(verts_old));
@@ -366,8 +366,8 @@ IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*>& vertices)
     if (bProgress)
         Logger.Progress(1.f);
 
-    u32 verts_new = vertices.size();
-    u32 _count = verts_old - verts_new;
+    size_t verts_new = vertices.size();
+    size_t _count = verts_old - verts_new;
 
     if (_count)
         Logger.clMsg("::compact:: %d verts removed", _count);

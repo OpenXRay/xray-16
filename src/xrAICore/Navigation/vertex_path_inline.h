@@ -35,15 +35,15 @@ TEMPLATE_SPECIALIZATION
 inline void CVertexPathBuilder::get_node_path(xr_vector<Index>& path, Vertex* best)
 {
     Vertex *t1 = best, *t2 = best->back();
-    u32 i;
-    for (i = 1; t2; t1 = t2, t2 = t2->back(), i++)
+    size_t i;
+    for (i = 1; t2; t1 = t2, t2 = t2->back(), ++i)
         ;
     path.resize(i);
     t1 = best;
     path[--i] = best->index();
     t2 = t1->back();
     auto it = path.rbegin();
-    for (it++; t2; t2 = t2->back(), it++)
+    for (++it; t2; t2 = t2->back(), ++it)
         *it = t2->index();
 }
 

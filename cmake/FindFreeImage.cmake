@@ -36,9 +36,19 @@ ELSE (WIN32)
 		/sw/lib
 		/opt/local/lib
 		DOC "The FreeImage library")
+	FIND_LIBRARY( FREEIMAGEPLUS_LIBRARY
+		NAMES FreeImagePlus freeimageplus
+		PATHS
+		/usr/lib64
+		/usr/lib
+		/usr/local/lib64
+		/usr/local/lib
+		/sw/lib
+		/opt/local/lib
+		DOC "The FreeImagePlus library")
 ENDIF (WIN32)
 
-SET(FREEIMAGE_LIBRARIES ${FREEIMAGE_LIBRARY})
+SET(FREEIMAGE_LIBRARIES ${FREEIMAGE_LIBRARY} ${FREEIMAGEPLUS_LIBRARY})
 
 IF (FREEIMAGE_INCLUDE_PATH AND FREEIMAGE_LIBRARY)
 	SET( FREEIMAGE_FOUND TRUE CACHE BOOL "Set to TRUE if FreeImage is found, FALSE otherwise")

@@ -178,12 +178,12 @@ Fvector vunpack(s32 x, s32 y, s32 z)
     return pck;
 }
 
-Fvector vunpack(Ivector src)
+Fvector vunpack(const Ivector& src)
 {
     return vunpack(src.x, src.y, src.z);
 }
 
-Ivector vpack(Fvector src)
+Ivector vpack(const Fvector& src)
 {
     Fvector _v;
     int bx = fpack(src.x);
@@ -920,28 +920,19 @@ CRenderTarget::~CRenderTarget()
     glDeleteTextures(1, &t_ss_async);
 
     // Textures
-    t_material->surface_set(GL_TEXTURE_2D, 0);
+    t_material->surface_set(GL_TEXTURE_3D, 0);
     glDeleteTextures(1, &t_material_surf);
+    t_material.destroy();
 
     t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
     t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
+    t_LUM_src.destroy();
+    t_LUM_dest.destroy();
 
-#ifdef DEBUG
-    GLuint	pSurf = 0;
-
-    pSurf = t_envmap_0->surface_get();
-    glDeleteTextures(1, &pSurf);
-
-    pSurf = t_envmap_1->surface_get();
-    glDeleteTextures(1, &pSurf);
-#endif // DEBUG
     t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
     t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
     t_envmap_0.destroy();
     t_envmap_1.destroy();
-
-    //	TODO: DX10: Check if we need old style SMAPs
-    //	_RELEASE					(rt_smap_ZB);
 
     // Jitter
     for (int it = 0; it < TEX_jitter_count; it++)

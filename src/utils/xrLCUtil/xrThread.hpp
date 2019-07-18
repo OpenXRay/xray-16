@@ -31,7 +31,7 @@ public:
         thDestroyOnComplete = TRUE;
     }
     virtual ~CThread() {}
-    void Start() { thread_spawn(startup, "worker-thread", 1024 * 1024, this); }
+    void Start() { Threading::SpawnThread(startup, "worker-thread", 1024 * 1024, this); }
     virtual void Execute() = 0;
 };
 

@@ -10,7 +10,6 @@ add_dir("${DIRS}")
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/OpenAutomate/inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind
     ${SDL_INCLUDE_DIRS}
     ${FREEIMAGE_INCLUDE_PATH}
@@ -35,6 +34,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "
 cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath luabind xrAPI xrSound xrScriptEngine xrNetServer ${LUA_LIBRARIES} ${THEORA_LIBRARY} ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARY} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES})
-xr_install(${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrLuabind xrAPI xrSound xrScriptEngine xrNetServer ${LUA_LIBRARIES} ${THEORA_LIBRARY} ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARIES} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    GROUP_READ 
+    WORLD_READ )
 

@@ -53,7 +53,7 @@ void CSheduler::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     stats.FrameEnd();
     const float percentage = 100.f * stats.Update.result / Device.GetStats().EngineTotal.result;
-    font.OutNext("Scheduler:");
+    font.OutNext("Object Scheduler:");
     font.OutNext("- update:     %2.2fms, %2.1f%%", stats.Update.result, percentage);
     font.OutNext("- load:       %2.2fms", stats.Load);
     if (alert && stats.Update.result > 3.0f)
@@ -335,6 +335,8 @@ void CSheduler::ProcessStep()
             continue;
         }
 
+        auto& schedulerData = item.Object->GetSchedulerData();
+
 #ifdef DEBUG_SCHEDULER
         Msg("SCHEDULER: process step [%s][%x][false]", item.scheduled_name.c_str(), item.Object);
 #endif
@@ -347,13 +349,13 @@ void CSheduler::ProcessStep()
         // Real update call
         // Msg("------- %d:", Device.dwFrame);
 #ifdef DEBUG
-        item.Object->GetSchedulerData().dbg_startframe = Device.dwFrame;
+        schedulerData.dbg_startframe = Device.dwFrame;
         eTimer.Start();
 #endif
 
         // Calc next update interval
-        const u32 dwMin = _max(u32(30), item.Object->GetSchedulerData().t_min);
-        u32 dwMax = (1000 + item.Object->GetSchedulerData().t_max) / 2;
+        const u32 dwMin = _max(u32(30), schedulerData.t_min);
+        u32 dwMax = (1000 + schedulerData.t_max) / 2;
         const float scale = item.Object->shedule_Scale();
         u32 dwUpdate = dwMin + iFloor(float(dwMax - dwMin) * scale);
         clamp(dwUpdate, u32(_max(dwMin, u32(20))), dwMax);
@@ -361,7 +363,7 @@ void CSheduler::ProcessStep()
         m_current_step_obj = item.Object;
 
         item.Object->shedule_Update(
-            clampr(Elapsed, u32(1), u32(_max(u32(item.Object->GetSchedulerData().t_max), u32(1000)))));
+            clampr(Elapsed, u32(1), u32(_max(u32(schedulerData.t_max), u32(1000)))));
         if (!m_current_step_obj)
         {
 #ifdef DEBUG_SCHEDULER
@@ -511,7 +513,7 @@ void Scheduler::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     stats.FrameEnd();
     const float percentage = 100.f * stats.Update.result / Device.GetStats().EngineTotal.result;
-    font.OutNext("SchedulerMT:");
+    font.OutNext("Object Scheduler MT:");
     font.OutNext("- update:     %2.2fms, %2.1f%%", stats.Update.result, percentage);
     font.OutNext("- load:       %2.2fms", stats.Load);
     if (alert && stats.Update.result > 3.0f)
@@ -806,6 +808,8 @@ void Scheduler::ProcessUpdateQueue()
                 continue;
             }
 
+            auto& schedulerData = item.Object->GetSchedulerData();
+
 #ifdef DEBUG_SCHEDULERMT
             Msg("SCHEDULERMT: process step [%s][%x][non-realtime]", item.ScheduledName.c_str(), item.Object);
 #endif
@@ -813,20 +817,20 @@ void Scheduler::ProcessUpdateQueue()
             // Real update call
             // Msg("------- %d:", Device.dwFrame);
 #ifdef DEBUG
-            item.Object->GetSchedulerData().dbg_startframe = Device.dwFrame;
+            schedulerData.dbg_startframe = Device.dwFrame;
             eTimer.Start();
 #endif
 
             // Calc next update interval
             auto Elapsed = dwTime - item.TimeOfLastExecute;
-            const u32 dwMin = _max(u32(30), item.Object->GetSchedulerData().t_min);
-            u32 dwMax = (1000 + item.Object->GetSchedulerData().t_max) / 2;
+            const u32 dwMin = _max(u32(30), schedulerData.t_min);
+            u32 dwMax = (1000 + schedulerData.t_max) / 2;
             const float scale = item.Object->shedule_Scale();
             u32 dwUpdate = dwMin + iFloor(float(dwMax - dwMin) * scale);
             clamp(dwUpdate, u32(_max(dwMin, u32(20))), dwMax);
 
             item.Object->shedule_Update(
-                clampr(Elapsed, u32(1), u32(_max(item.Object->GetSchedulerData().t_max, u32(1000)))));
+                clampr(Elapsed, u32(1), u32(_max(schedulerData.t_max, u32(1000)))));
 
             if (!item.Object)
             {
@@ -845,7 +849,7 @@ void Scheduler::ProcessUpdateQueue()
             const auto delta_ms = dwTime - item.TimeForExecute;
             const auto execTime = eTimer.GetElapsed_ms();
 
-            VERIFY3(item.Object->GetSchedulerData().dbg_update_shedule == item.Object->GetSchedulerData().dbg_startframe,
+            VERIFY3(schedulerData.dbg_update_shedule == schedulerData.dbg_startframe,
                 "Broken sequence of calls to 'shedule_Update'", item.Object->shedule_Name().c_str());
 
             if (delta_ms > 3 * dwUpdate)

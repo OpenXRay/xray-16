@@ -134,7 +134,7 @@ void light::set_active(bool a)
 
 void light::set_position(const Fvector& P)
 {
-    float eps = EPS_L; //_max(range*0.001f,EPS_L);
+    const float eps = EPS_L; //_max(range*0.001f,EPS_L);
     if (position.similar(P, eps))
         return;
     position.set(P);
@@ -143,7 +143,7 @@ void light::set_position(const Fvector& P)
 
 void light::set_range(float R)
 {
-    float eps = _max(range * 0.1f, EPS_L);
+    const float eps = std::max(range * 0.1f, EPS_L);
     if (fsimilar(range, R, eps))
         return;
     range = R;

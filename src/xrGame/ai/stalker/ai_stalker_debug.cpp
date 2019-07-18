@@ -358,7 +358,7 @@ void CAI_Stalker::debug_text()
 
         float fuzzy = 0.f;
         xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
-        for (; I != E; I++)
+        for (; I != E; ++I)
             if (I->O->ID() == memory().enemy().selected()->ID())
             {
                 fuzzy = I->fuzzy;
@@ -1300,7 +1300,7 @@ static void fill_bones(CAI_Stalker& self, Fmatrix const& transform, IKinematicsA
         start_transform = controller->start_transform();
 
     u32 buffer_size = u32(bone_count) * sizeof(Fmatrix);
-    Fmatrix* buffer = (Fmatrix*)_alloca(buffer_size);
+    Fmatrix* buffer = (Fmatrix*)xr_alloca(buffer_size);
     buffer_vector<Fmatrix> bones(buffer, bone_count);
     for (u16 i = 0; i < bone_count; ++i)
     {

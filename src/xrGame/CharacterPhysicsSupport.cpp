@@ -108,10 +108,13 @@ void CCharacterPhysicsSupport::SetRemoved()
     m_eState = esRemoved;
     if (m_flags.test(fl_skeleton_in_shell))
     {
+        if (!m_pPhysicsShell)
+            return;
+
         if (m_pPhysicsShell->isEnabled())
             m_EntityAlife.processing_deactivate();
-        if (m_pPhysicsShell)
-            m_pPhysicsShell->Deactivate();
+
+        m_pPhysicsShell->Deactivate();
         xr_delete(m_pPhysicsShell);
     }
     else
@@ -772,7 +775,7 @@ void reset_root_bone_start_pose( CPhysicsShell& shell )
 
     //u16 anim_bones_number = K->LL_BoneCount();
 
-    //buffer_vector<u32>	anim_bones_bind_positions( _alloca(anim_bones_number*sizeof(u32)),
+    //buffer_vector<u32>	anim_bones_bind_positions( xr_alloca(anim_bones_number*sizeof(u32)),
     //												anim_bones_number
     //											);
 #pragma todo("LL_GetBindTransform shoud use buffer_vector")

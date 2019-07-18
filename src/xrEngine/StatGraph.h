@@ -111,7 +111,7 @@ public:
         mn = _mn;
         mx = _mx;
         max_item_count = item_count;
-        for (auto it = subgraphs.begin(); it != subgraphs.end(); it++)
+        for (auto it = subgraphs.begin(); it != subgraphs.end(); ++it)
         {
             while (it->elements.size() > max_item_count)
                 it->elements.pop_front();

@@ -37,7 +37,7 @@ void Touch::feel_touch_update(Fvector& C, float R)
     if (n_end != n_begin)
     {
         // Process results (NEW)
-        for (xr_vector<IGameObject*>::iterator it = n_begin; it != n_end; it++)
+        for (xr_vector<IGameObject*>::iterator it = n_begin; it != n_end; ++it)
         {
             IGameObject* O = *it;
             if (O->getDestroy())

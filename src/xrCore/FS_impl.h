@@ -72,13 +72,14 @@ struct IReaderBase_Test
 };
 
 template <typename T>
-IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
+IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
-    u32 dwSize, dwType;
+    u32 dwType;
+    size_t dwSize = 0;
 
     rewind();
     while (!eof())
@@ -87,7 +88,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
         dwSize = r_u32();
         if ((dwType & (~CFS_CompressMark)) == ID)
         {
-            VERIFY((u32)impl().tell() + dwSize <= (u32)impl().length());
+            VERIFY(impl().tell() + dwSize <= impl().length());
             if (bCompressed)
                 *bCompressed = dwType & CFS_CompressMark;
             return dwSize;
@@ -110,13 +111,14 @@ struct IReaderBase_Test
 #pragma warning(push)
 #pragma warning(disable : 4701)
 template <typename T>
-IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
+IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
-    u32 dwSize, dwType;
+    u32 dwType;
+    size_t dwSize = 0;
 
     bool success = false;
 
@@ -157,12 +159,12 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
         }
     }
 
-    VERIFY((u32)impl().tell() + dwSize <= (u32)impl().length());
+    VERIFY(impl().tell() + dwSize <= impl().length());
     if (bCompressed)
         *bCompressed = dwType & CFS_CompressMark;
 
-    const int dwPos = impl().tell();
-    if (dwPos + dwSize < (u32)impl().length())
+    const size_t dwPos = impl().tell();
+    if (dwPos + dwSize < impl().length())
     {
         m_last_pos = dwPos + dwSize;
     }
@@ -184,18 +186,19 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 
 struct IReaderBase_Test
 {
-    typedef associative_vector<u32, u32> id2pos_container;
+    typedef associative_vector<u32, size_t> id2pos_container;
     id2pos_container id2pos;
 };
 
 template <typename T>
-IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
+IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
-    u32 dwSize, dwType;
+    u32 dwType;
+    size_t dwSize = 0;
 
     if (!m_test)
     {
@@ -210,7 +213,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
             ++num_chunks;
         }
 
-        ((std::vector<std::pair<u32, u32>>*)&m_test->id2pos)->reserve(num_chunks);
+        ((std::vector<std::pair<u32, size_t>>*)&m_test->id2pos)->reserve(num_chunks);
 
         rewind();
         while (!eof())
@@ -221,7 +224,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
             dwSize = r_u32();
 
             u32 dwId = dwType & (~CFS_CompressMark);
-            VERIFY((u32)impl().tell() + dwSize <= (u32)impl().length());
+            VERIFY(impl().tell() + dwSize <= impl().length());
 
             m_test->id2pos.insert(IReaderBase_Test::id2pos_container::value_type(dwId, dwPos));
 
@@ -254,20 +257,21 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 
 struct IReaderBase_Test
 {
-    typedef xr_hash_map<u32, u32> id2pos_container;
+    typedef xr_unordered_map<u32, size_t> id2pos_container;
 
     id2pos_container id2pos;
-    u32 last_pos;
+    size_t last_pos;
 };
 
 template <typename T>
-IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
+IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
-    u32 dwSize, dwType;
+    u32 dwType;
+    size_t dwSize = 0;
 
     if (!m_test)
     {
@@ -292,12 +296,12 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
     impl().seek(m_test->last_pos);
     while (!eof())
     {
-        u32 dwPos = impl().tell();
+        size_t dwPos = impl().tell();
 
         dwType = r_u32();
         dwSize = r_u32();
 
-        VERIFY((u32)impl().tell() + dwSize <= (u32)impl().length());
+        VERIFY(impl().tell() + dwSize <= impl().length());
 
         u32 dwId = dwType & (~CFS_CompressMark);
 

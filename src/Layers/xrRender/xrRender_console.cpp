@@ -22,10 +22,12 @@ const xr_token qsmapsize_token[] =
     { "3072", 3072 },
     { "3584", 3584 },
     { "4096", 4096 },
+#ifndef USE_DX9
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
     { "8192", 8192 },
+#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if this really supported on OpenGL
     { "9216", 9216 },
     { "10240", 10240 },
     { "11264", 11264 },
@@ -34,6 +36,8 @@ const xr_token qsmapsize_token[] =
     { "14336", 14336 },
     { "15360", 15360 },
     { "16384", 16384 },
+#endif // defined(USE_DX11) || defined(USE_OGL)
+#endif // !USE_DX9
     { nullptr, 0 }
 };
 
@@ -52,14 +56,13 @@ const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_m
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
-#ifndef USE_DX9
+#if !defined(USE_DX9) && !defined(USE_OGL) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
-#endif // USE_DX10
+#endif // !USE_DX9
     {nullptr, 0}};
 
 u32 ps_r3_msaa = 0; // = 0;
-const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2},
-    //{"8x", 3},
+const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2}, {"8x", 3},
     {nullptr, 0}};
 
 u32 ps_r3_msaa_atest = 0; // = 0;
@@ -85,6 +88,7 @@ int ps_r__LightSleepFrames = 10;
 float ps_r__Detail_l_ambient = 0.9f;
 float ps_r__Detail_l_aniso = 0.25f;
 float ps_r__Detail_density = 0.3f;
+float ps_r__Detail_height = 1.f;
 float ps_r__Detail_rainbow_hemi = 0.75f;
 
 float ps_r__Tree_w_rot = 10.0f;
@@ -218,6 +222,7 @@ u32 dm_current_cache_size = 2401; //dm_current_cache_line*dm_current_cache_line
 float dm_current_fade = 47.5; //float(2*dm_current_size)-.5f;
 
 float ps_current_detail_density = 0.6;
+float ps_current_detail_height = 1.f;
 
 xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
     {"qt_high", 3}, {"qt_extreme", 4}, {nullptr, 0}};
@@ -725,6 +730,8 @@ void xrRender_initconsole()
 
     //CMD4(CCC_Float, "r__detail_density", &ps_r__Detail_density, .05f, 0.99f);
     CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.04f, 0.6f); //AVO: extended from 0.2f to 0.04f and replaced variable
+    CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
+    CMD4(CCC_Float, "r__detail_height", &ps_r__Detail_height, 1, 2);
     CMD3(CCC_Mask, "r2_detail_shadow", &ps_r2_ls_flags, R2FLAG_DETAIL_SHADOW);
 
 #ifdef DEBUG
@@ -916,7 +923,6 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_msaa_alphatest", &ps_r3_msaa_atest, qmsaa__atest_token);
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
 
-    CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
     CMD4(CCC_Integer, "r2_fxaa", &ps_r2_fxaa, 0, 1);
 
 //  Allow real-time fog config reload

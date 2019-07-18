@@ -59,7 +59,7 @@ bool CLevel::net_Start(const char* op_server, const char* op_client)
             xr_strcpy(tmpstr, op_client);
             *(strstr(tmpstr, "name=") + 5) = 0;
             xr_strcat(tmpstr, player_name);
-            const char* ptmp = strstr(strstr(op_client, "name="), "/");
+            pcstr ptmp = strchr(strstr(op_client, "name="), '/');
             if (ptmp)
                 xr_strcat(tmpstr, ptmp);
             m_caClientOptions = tmpstr;

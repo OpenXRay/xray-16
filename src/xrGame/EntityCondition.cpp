@@ -340,7 +340,7 @@ CWound* CEntityCondition::AddWound(float hit_power, ALife::EHitType hit_type, u1
 
     //запомнить кость по которой ударили и силу удара
     auto it = m_WoundVector.begin();
-    for (; it != m_WoundVector.end(); it++)
+    for (; it != m_WoundVector.end(); ++it)
     {
         if ((*it)->GetBoneNum() == element)
             break;
@@ -476,7 +476,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     }
 }
 
-float CEntityCondition::BleedingSpeed()
+float CEntityCondition::BleedingSpeed() const
 {
     float bleeding_speed = 0;
 
@@ -537,7 +537,7 @@ void CEntityCondition::save(NET_Packet& output_packet)
         save_data(m_fPsyHealth, output_packet);
 
         output_packet.w_u8((u8)m_WoundVector.size());
-        for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; it++)
+        for (auto it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
             (*it)->save(output_packet);
     }
 }

@@ -10,7 +10,7 @@ int xrSimulate(xr_vector<u16>& indices, int iCacheSize)
     VertexCache C(iCacheSize);
 
     int count = 0;
-    for (u32 i = 0; i < indices.size(); i++)
+    for (size_t i = 0; i < indices.size(); i++)
     {
         int id = indices[i];
         if (C.InCache(id))
@@ -29,6 +29,7 @@ void xrStripify(xr_vector<u16>& indices, xr_vector<u16>& perturb, int iCacheSize
 
     // Generate strips
     xr_vector<PrimitiveGroup> PGROUP;
+    // XXX: replace u32 with size_t
     GenerateStrips(&*indices.begin(), (u32)indices.size(), PGROUP);
     R_ASSERT(PGROUP.size() == 1);
     R_ASSERT(PGROUP[0].type == PT_LIST);
@@ -42,7 +43,7 @@ void xrStripify(xr_vector<u16>& indices, xr_vector<u16>& perturb, int iCacheSize
     R_ASSERT(xPGROUP[0].type == PT_LIST);
 
     // Build perturberation table
-    for (u32 index = 0; index < PGROUP[0].numIndices; index++)
+    for (size_t index = 0; index < PGROUP[0].numIndices; index++)
     {
         u16 oldIndex = PGROUP[0].indices[index];
         int newIndex = xPGROUP[0].indices[index];
@@ -52,7 +53,7 @@ void xrStripify(xr_vector<u16>& indices, xr_vector<u16>& perturb, int iCacheSize
     }
 
     // Copy indices
-    memcpy(&*indices.begin(), xPGROUP[0].indices, (u32)indices.size() * sizeof(u16));
+    CopyMemory(&indices.front(), xPGROUP[0].indices, indices.size() * sizeof(u16));
 
     // Release memory
     xPGROUP.clear();
@@ -71,13 +72,13 @@ try {
     xr_vector<u16>	indices,permute;
 
     // Stripify
-    u16* F			= (u16*)&*x_faces.begin();
+    u16* F			= (u16*)&x_faces.front();
     indices.assign	(F,F+(x_faces.size()*3)	);
     permute.resize	(x_vertices.size()		);
     xrStripify		(indices,permute,c_vCacheSize,0);
 
     // Copy faces
-    CopyMemory		(&*x_faces.begin(),&*indices.begin(),(u32)indices.size()*sizeof(u16));
+    CopyMemory		(&x_faces.front(), &indices.front(), indices.size()*sizeof(u16));
 
     // Permute vertices
     vec_XV temp_list = x_vertices;
@@ -107,10 +108,10 @@ try {
                 fast_path_data.vertices.size(), FALSE, remap);
             R_CHK(rhr);
             vec_XV _source = fast_path_data.vertices;
-            for (u32 it = 0; it < _source.size(); it++)
+            for (size_t it = 0; it < _source.size(); it++)
                 fast_path_data.vertices[remap[it]] = _source[it];
-            for (u32 it = 0; it < fast_path_data.faces.size(); it++)
-                for (u32 j = 0; j < 3; j++)
+            for (size_t it = 0; it < fast_path_data.faces.size(); it++)
+                for (size_t j = 0; j < 3; j++)
                     fast_path_data.faces[it].v[j] = (u16)remap[fast_path_data.faces[it].v[j]];
             xr_free(remap);
         }
@@ -122,17 +123,17 @@ try {
         xr_vector<u16> indices, permute;
 
         // Stripify
-        u16* F = (u16*)&*data.faces.begin();
+        u16* F = (u16*)&data.faces.front();
         indices.assign(F, F + (data.faces.size() * 3));
         permute.resize(data.vertices.size());
         xrStripify(indices, permute, c_vCacheSize, 0);
 
         // Copy faces
-        CopyMemory(&*data.faces.begin(), &*indices.begin(), (u32)indices.size() * sizeof(u16));
+        CopyMemory(&data.faces.front(), &indices.front(), indices.size() * sizeof(u16));
 
         // Permute vertices
         vecOGF_V temp_list = data.vertices;
-        for (u32 i = 0; i < temp_list.size(); i++)
+        for (size_t i = 0; i < temp_list.size(); i++)
             data.vertices[i] = temp_list[permute[i]];
     }
     catch (...)
@@ -145,11 +146,11 @@ try {
 void OGF::DumpFaces()
 {
     Logger.clMsg("normal:");
-    for (u32 i = 0; i < data.faces.size(); i++)
+    for (size_t i = 0; i < data.faces.size(); i++)
         Logger.clMsg(
             "face #%4d: %4d %4d %4d", i, int(data.faces[i].v[0]), int(data.faces[i].v[1]), int(data.faces[i].v[2]));
     Logger.clMsg("fast:");
-    for (u32 i = 0; i < fast_path_data.faces.size(); i++)
+    for (size_t i = 0; i < fast_path_data.faces.size(); i++)
         Logger.clMsg("face #%4d: %4d %4d %4d", i, int(fast_path_data.faces[i].v[0]), int(fast_path_data.faces[i].v[1]),
             int(fast_path_data.faces[i].v[2]));
 }

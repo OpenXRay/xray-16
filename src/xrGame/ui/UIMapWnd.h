@@ -6,7 +6,7 @@
 class CUICustomMap;
 class CUIGlobalMap;
 class CUIFrameWindow;
-class CUIFixedScrollBar;
+class CUIScrollBar;
 class CUIFrameLineWnd;
 class CMapActionPlanner;
 class CUITabControl;
@@ -39,11 +39,11 @@ private:
 
     CUIFrameWindow* m_UIMainFrame;
     bool m_scroll_mode;
-    CUIFixedScrollBar* m_UIMainScrollV;
-    CUIFixedScrollBar* m_UIMainScrollH;
+    CUIScrollBar* m_UIMainScrollV;
+    CUIScrollBar* m_UIMainScrollH;
     CUIWindow* m_UILevelFrame;
     CMapActionPlanner* m_ActionPlanner;
-    //	CUIFrameLineWnd*			UIMainMapHeader;
+    CUIFrameLineWnd* m_UIMainMapHeader;
     CUIMapLocationHint* m_map_location_hint;
 
 #ifdef DEBUG
@@ -111,10 +111,10 @@ protected:
     void Activated();
 
 public:
-    CUIMapWnd();
+    CUIMapWnd(UIHint* hint);
     virtual ~CUIMapWnd();
 
-    virtual void Init(LPCSTR xml_name, LPCSTR start_from);
+    virtual bool Init(cpcstr xml_name, cpcstr start_from, bool critical = true);
     virtual void Show(bool status);
     virtual void Draw();
     virtual void Reset();

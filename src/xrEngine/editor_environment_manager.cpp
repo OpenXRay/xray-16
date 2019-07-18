@@ -196,13 +196,13 @@ void manager::unload()
     Ambients.clear();
 }
 
-CEnvAmbient* manager::AppendEnvAmb(const shared_str& sect) { return (m_ambients->get_ambient(sect)); }
-SThunderboltDesc* manager::thunderbolt_description(CInifile& config, shared_str const& section)
+CEnvAmbient* manager::AppendEnvAmb(const shared_str& sect, CInifile const* /*pIni = nullptr*/) { return (m_ambients->get_ambient(sect)); }
+SThunderboltDesc* manager::thunderbolt_description(const CInifile& config, shared_str const& section)
 {
     return (m_thunderbolts->description(config, section));
 }
 
-SThunderboltCollection* manager::thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, pcstr section)
+SThunderboltCollection* manager::thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section)
 {
     return (m_thunderbolts->get_collection(section));
 }
@@ -212,20 +212,3 @@ SThunderboltCollection* manager::thunderbolt_collection(
 {
     return (m_thunderbolts->get_collection(id));
 }
-
-CLensFlareDescriptor* manager::add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id)
-{
-#if 0
-    // return (m_suns->get_flare(id));
-    for (const auto &i : collection)
-        if (i->section == id)
-            return i;
-
-    NODEFAULT;
-#ifdef DEBUG
-    return (0);
-#endif // #ifdef DEBUG
-#endif // #if 0
-    return (inherited::add_flare(collection, id));
-}
-

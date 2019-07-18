@@ -85,7 +85,7 @@ void FS_Path::_set_root(LPCSTR root)
 {
     string_path temp;
     xr_strcpy(temp, root);
-    if (m_Root[0] && m_Root[xr_strlen(m_Root) - 1] != _DELIMITER)
+    if (*temp && temp[xr_strlen(temp) - 1] != _DELIMITER)
         xr_strcat(temp, DELIMITER);
     xr_free(m_Root);
     m_Root = xr_strdup(temp);

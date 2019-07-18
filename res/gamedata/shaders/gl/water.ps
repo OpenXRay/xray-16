@@ -28,7 +28,13 @@ float4 _main( v2p I )
 		Nw	= normalize (Nw);
 	float3	v2point	= normalize (I.v2point);
 	float3	vreflect = reflect(v2point, Nw);
-		vreflect.y = vreflect.y*2.0 - 1.0;     // fake remapping
+
+	// true remapping (slow)
+	float3	vreflectabs	=  abs(vreflect);
+	float	vreflectmax	=  max(vreflectabs.x, max(vreflectabs.y, vreflectabs.z));
+		vreflect	/= vreflectmax;
+	if (vreflect.y < 0.999)
+		vreflect.y	= vreflect.y*2.0 - 1.0;     // fake remapping (fast)
 
 	float3	env0	= texCUBE (s_env0, vreflect).rgb;
 	float3	env1	= texCUBE (s_env1, vreflect).rgb;

@@ -1141,7 +1141,7 @@ void CPHShell::PassEndJoints(u16 from, u16 to, CPHShell* dest)
 {
     auto i_from = joints.begin() + from, e = joints.begin() + to;
     auto i = i_from;
-    for (; i != e; i++)
+    for (; i != e; ++i)
     {
         (*i)->SetShell(dest);
     }

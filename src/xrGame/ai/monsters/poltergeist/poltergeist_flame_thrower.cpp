@@ -138,7 +138,7 @@ void CPolterFlame::update_schedule()
     inherited::update_schedule();
 
     // check all flames
-    for (auto it = m_flames.begin(); it != m_flames.end(); it++)
+    for (auto it = m_flames.begin(); it != m_flames.end(); ++it)
     {
         SFlameElement* elem = *it;
 

@@ -54,7 +54,7 @@ void CBuild::xrPhase_Subdivide()
         Fvector size;
 
         bb.invalidate();
-        for (vecFaceIt F = g_XSplit[X]->begin(); F != g_XSplit[X]->end(); F++)
+        for (vecFaceIt F = g_XSplit[X]->begin(); F != g_XSplit[X]->end(); ++F)
         {
             Face* XF = *F;
             bb.modify(XF->v[0]->P);
@@ -114,7 +114,7 @@ void CBuild::xrPhase_Subdivide()
         s2.clear();
         s1.clear();
         iteration_per_edge++;
-        for (vecFaceIt F = g_XSplit[X]->begin(); F != g_XSplit[X]->end(); F++)
+        for (vecFaceIt F = g_XSplit[X]->begin(); F != g_XSplit[X]->end(); ++F)
         {
             Face* XF = *F;
             Fvector C;

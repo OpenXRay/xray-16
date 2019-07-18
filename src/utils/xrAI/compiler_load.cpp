@@ -37,12 +37,12 @@ template <class T>
 void transfer(const char* name, xr_vector<T>& dest, IReader& F, u32 chunk)
 {
     IReader* O = F.open_chunk(chunk);
-    u32 count = O ? (O->length() / sizeof(T)) : 0;
+    const size_t count = O ? (O->length() / sizeof(T)) : 0;
     Logger.clMsg("* %16s: %d", name, count);
     if (count)
     {
         dest.reserve(count);
-        dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count);
+        dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count); //-V595
     }
     if (O)
         O->close();
@@ -111,19 +111,12 @@ void xrLoad(LPCSTR name, bool draft_mode)
             {
                 Surface_Init();
                 IReader* F = fs->open_chunk(EB_Textures);
-                u32 tex_count = F->length() / sizeof(b_texture);
-                for (u32 t = 0; t < tex_count; t++)
+                const size_t tex_count = F->length() / sizeof(b_texture);
+                for (size_t t = 0; t < tex_count; t++)
                 {
                     Logger.Progress(float(t) / float(tex_count));
 
-                    // В данном месте в случае 64-битной сборки происходит чтение лишних 4 байт из файла потому,
-                    // что читается структура с указателем, размер которого разный для 32 и 64-битных систем.
-                    // Как следствие, продолжение работы компилятора невозможно.
-                    b_texture TEX;
-                    F->r(&TEX, sizeof(TEX));
-
-                    b_BuildTexture BT;
-                    CopyMemory(&BT, &TEX, sizeof(TEX));
+                    b_BuildTexture BT(F);
 
                     // load thumbnail
                     string128& N = BT.name;
@@ -209,8 +202,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
         {
             F = fs.open_chunk(EB_Light_static);
             b_light_static temp;
-            u32 cnt = F->length() / sizeof(temp);
-            for (u32 i = 0; i < cnt; i++)
+            size_t cnt = F->length() / sizeof(temp);
+            for (size_t i = 0; i < cnt; i++)
             {
                 R_Light RL;
                 F->r(&temp, sizeof(temp));
@@ -266,8 +259,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
         F->r(&g_params, sizeof(g_params));
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_NODES));
-        u32 N = F->r_u32();
-        R_ASSERT2(N < ((u32(1) << u32(MAX_NODE_BIT_COUNT)) - 2), "Too many nodes!");
+        size_t N = F->r_u32();
+        R_ASSERT2(N < ((size_t(1) << size_t(MAX_NODE_BIT_COUNT)) - 2), "Too many nodes!");
         g_nodes.resize(N);
 
         hdrNODES H;
@@ -278,14 +271,14 @@ void xrLoad(LPCSTR name, bool draft_mode)
         H.aabb = LevelBB;
 
         typedef BYTE NodeLink[3];
-        for (u32 i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
         {
             NodeLink id;
             u16 pl;
             SNodePositionOld _np;
             NodePosition np;
 
-            for (int j = 0; j < 4; ++j)
+            for (size_t j = 0; j < 4; ++j)
             {
                 F->r(&id, 3);
                 g_nodes[i].n[j] = (*LPDWORD(&id)) & 0x00ffffff;

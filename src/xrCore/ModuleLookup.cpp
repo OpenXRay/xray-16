@@ -29,7 +29,7 @@ void* ModuleHandle::Open(pcstr moduleName)
 
 #ifdef WINDOWS
     buf += ".dll";
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
     buf += ".so";
 #else
 #error add your platform-specific extension here

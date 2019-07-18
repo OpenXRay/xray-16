@@ -126,7 +126,7 @@ void CBuild::BuildCForm()
 
     Fbox BB;
     BB.invalidate();
-    for (vecVertexIt it = cfVertices->begin(); it != cfVertices->end(); it++)
+    for (vecVertexIt it = cfVertices->begin(); it != cfVertices->end(); ++it)
         BB.modify((*it)->P);
 
     // CForm
@@ -137,7 +137,7 @@ void CBuild::BuildCForm()
 
     // Collect faces
     CDB::CollectorPacked CL(BB, cfVertices->size(), cfFaces->size());
-    for (vecFaceIt F = cfFaces->begin(); F != cfFaces->end(); F++)
+    for (vecFaceIt F = cfFaces->begin(); F != cfFaces->end(); ++F)
     {
         Face* T = *F;
 
@@ -189,7 +189,7 @@ void CBuild::BuildCForm()
     MFS->w(CL.getT(), (u32)CL.getTS() * sizeof(CDB::TRI));
 
     // Clear pDeflector (it is stored in the same memory space with dwMaterialGame)
-    for (vecFaceIt I = lc_global_data()->g_faces().begin(); I != lc_global_data()->g_faces().end(); I++)
+    for (vecFaceIt I = lc_global_data()->g_faces().begin(); I != lc_global_data()->g_faces().end(); ++I)
     {
         Face* F = *I;
         F->pDeflector = NULL;

@@ -12,8 +12,8 @@ public:
     virtual void InitCustomEdit(Fvector2 pos, Fvector2 size);
 
     // CUIMultiTextureOwner
-    virtual void InitTexture(LPCSTR texture);
-    virtual void InitTextureEx(LPCSTR texture, LPCSTR shader);
+    virtual bool InitTexture(pcstr texture, bool fatal = true);
+    virtual bool InitTextureEx(pcstr texture, pcstr shader, bool fatal = true);
 
 protected:
     CUIFrameWindow* m_pFrameWindow;

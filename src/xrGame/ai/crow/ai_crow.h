@@ -41,7 +41,7 @@ class CAI_Crow : public CEntity
         typedef svector<MotionID, MAX_ANIM_COUNT> MotionSVec;
         MotionSVec m_Animations;
         const MotionID& GetRandom() { return m_Animations[Random.randI(0, m_Animations.size())]; }
-        void Load(IKinematicsAnimated* visual, LPCSTR prefix);
+        void Load(IKinematicsAnimated* visual, cpcstr prefix, cpcstr prefix2);
     };
 
     struct SSound

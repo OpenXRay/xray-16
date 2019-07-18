@@ -9,20 +9,32 @@
 #include "Actor.h"
 #include "ActorCondition.h"
 #include "player_hud.h"
+#include "UIHelper.h"
 
-LPCSTR immunity_names[] = {
-    "burn_immunity", "shock_immunity", "chemical_burn_immunity", "radiation_immunity", "telepatic_immunity",
-    "wound_immunity", "fire_wound_immunity",
-    //	"strike_immunity",
-    "explosion_immunity", //Alundaio: uncommented
+LPCSTR immunity_names[] =
+{
+    "burn_immunity",
+    "shock_immunity",
+    "chemical_burn_immunity",
+    "radiation_immunity",
+    "telepatic_immunity",
+    "wound_immunity",
+    "fire_wound_immunity",
+    "strike_immunity",
+    "explosion_immunity",
 };
 
-LPCSTR immunity_st_names[] = {
-    "ui_inv_outfit_burn_protection", "ui_inv_outfit_shock_protection", "ui_inv_outfit_chemical_burn_protection",
-    "ui_inv_outfit_radiation_protection", "ui_inv_outfit_telepatic_protection", "ui_inv_outfit_wound_protection",
+LPCSTR immunity_st_names[] =
+{
+    "ui_inv_outfit_burn_protection",
+    "ui_inv_outfit_shock_protection",
+    "ui_inv_outfit_chemical_burn_protection",
+    "ui_inv_outfit_radiation_protection",
+    "ui_inv_outfit_telepatic_protection",
+    "ui_inv_outfit_wound_protection",
     "ui_inv_outfit_fire_wound_protection",
-    //	"ui_inv_outfit_strike_protection",
-    "ui_inv_outfit_explosion_protection", //Alundaio: uncommented
+    "ui_inv_outfit_strike_protection",
+    "ui_inv_outfit_explosion_protection",
 };
 
 CUIOutfitImmunity::CUIOutfitImmunity()
@@ -34,14 +46,16 @@ CUIOutfitImmunity::CUIOutfitImmunity()
 }
 
 CUIOutfitImmunity::~CUIOutfitImmunity() {}
-void CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type)
+bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type)
 {
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 
     string256 buf;
 
     strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type]);
-    CUIXmlInit::InitWindow(xml_doc, buf, 0, this);
+    if (!CUIXmlInit::InitWindow(xml_doc, buf, 0, this, false))
+        return false;
+    
     CUIXmlInit::InitStatic(xml_doc, buf, 0, &m_name);
     m_name.TextItemControl()->SetTextST(immunity_st_names[hit_type]);
 
@@ -49,9 +63,18 @@ void CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_ty
     m_progress.InitFromXml(xml_doc, buf);
 
     strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type], ":static_value");
-    m_value.SetVisible(false);
+    if (xml_doc.NavigateToNode(buf, 0) && !CallOfPripyatMode)
+    {
+        CUIXmlInit::InitTextWnd(xml_doc, buf, 0, &m_value);
+        m_value.Show(true);
+    }
+    else
+    {
+        m_value.Show(false);
+    }
 
     m_magnitude = xml_doc.ReadAttribFlt(buf, 0, "magnitude", 1.0f);
+    return true;
 }
 
 void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
@@ -69,18 +92,9 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
 
 CUIOutfitInfo::CUIOutfitInfo()
 {
-    for (u32 i = 0; i < max_count; ++i)
-    {
-        m_items[i] = NULL;
-    }
-}
-
-CUIOutfitInfo::~CUIOutfitInfo()
-{
-    for (u32 i = 0; i < max_count; ++i)
-    {
-        xr_delete(m_items[i]);
-    }
+    m_Prop_line = nullptr;
+    for (auto& item : m_items)
+        item = nullptr;
 }
 
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
@@ -90,29 +104,35 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 
     string128 buf;
-    // m_caption = new CUIStatic();
-    // AttachChild( m_caption );
-    // m_caption->SetAutoDelete( true );
-    // string128 buf;
-    // strconcat( sizeof(buf), buf, base_str, ":caption" );
-    // CUIXmlInit::InitStatic( xml_doc, buf, 0, m_caption );
 
-    m_Prop_line = new CUIStatic();
-    AttachChild(m_Prop_line);
-    m_Prop_line->SetAutoDelete(true);
+    strconcat(sizeof(buf), buf, base_str, ":caption");
+    m_caption = UIHelper::CreateStatic(xml_doc, buf, this, false);
+
     strconcat(sizeof(buf), buf, base_str, ":", "prop_line");
-    CUIXmlInit::InitStatic(xml_doc, buf, 0, m_Prop_line);
+    m_Prop_line = UIHelper::CreateStatic(xml_doc, buf, this, false);
 
     Fvector2 pos;
-    pos.set(0.0f, m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y);
+    pos.set(0.0f, 0.0f);
+
+    if (m_Prop_line)
+        pos.set(0.0f, m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y);
+    else if (m_caption)
+        pos.set(0.0f, m_caption->GetWndSize().y);
 
     for (u32 i = 0; i < max_count; ++i)
     {
-        m_items[i] = new CUIOutfitImmunity();
-        m_items[i]->InitFromXml(xml_doc, base_str, i);
-        AttachChild(m_items[i]);
-        m_items[i]->SetWndPos(pos);
-        pos.y += m_items[i]->GetWndSize().y;
+        auto immunity = new CUIOutfitImmunity();
+        if (!immunity->InitFromXml(xml_doc, base_str, i))
+        {
+            xr_delete(immunity);
+            continue;
+        }
+        immunity->SetAutoDelete(true);
+        AttachChild(immunity);
+        immunity->SetWndPos(pos);
+        pos.y += immunity->GetWndSize().y;
+
+        m_items[i] = immunity;
     }
     pos.x = GetWndSize().x;
     SetWndSize(pos);
@@ -128,10 +148,11 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
 
     for (u32 i = 0; i < max_count; ++i)
     {
-        if (i == ALife::eHitTypeFireWound)
-        {
+        if (!m_items[i])
             continue;
-        }
+
+        if (i == ALife::eHitTypeFireWound)
+            continue;
 
         ALife::EHitType hit_type = (ALife::EHitType)i;
         float max_power = actor->conditions().GetZoneMaxPower(hit_type);
@@ -188,10 +209,11 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
 
     for (u32 i = 0; i < max_count; ++i)
     {
-        if (i == ALife::eHitTypeFireWound)
-        {
+        if (!m_items[i])
             continue;
-        }
+
+        if (i == ALife::eHitTypeFireWound)
+            continue;
 
         ALife::EHitType hit_type = (ALife::EHitType)i;
         float max_power = actor->conditions().GetZoneMaxPower(hit_type);

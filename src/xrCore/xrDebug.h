@@ -15,6 +15,16 @@
 #endif
 
 struct SDL_Window;
+
+enum class AssertionResult : int
+{
+    undefined = -1,
+    ignore,
+    tryAgain,
+    abort,
+    ok
+};
+
 class ErrorLocation
 {
 public:
@@ -38,6 +48,14 @@ public:
     }
 };
 
+class IWindowHandler
+{
+public:
+    virtual SDL_Window* GetApplicationWindow() = 0;
+    virtual void DisableFullscreen() = 0;
+    virtual void ResetFullscreen() = 0;
+};
+
 class XRCORE_API xrDebug
 {
 public:
@@ -47,22 +65,24 @@ public:
     using UnhandledExceptionFilter = LONG(WINAPI*)(EXCEPTION_POINTERS* exPtrs);
 
 private:
-    static SDL_Window* applicationWindow;
+    static IWindowHandler* windowHandler;
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
     static CrashHandler OnCrash;
     static DialogHandler OnDialog;
     static string_path BugReportFile;
     static bool ErrorAfterDialog;
+    static bool ShowErrorMessage;
 
 public:
     xrDebug() = delete;
-    static void Initialize();
+    static void Initialize(pcstr commandLine);
     static void Destroy();
     static void OnThreadSpawn();
+    static void OnFilesystemInitialized();
 
-    static SDL_Window* GetApplicationWindow() { return applicationWindow; }
-    static void SetApplicationWindow(SDL_Window* window) { applicationWindow = window; }
+    static IWindowHandler* GetWindowHandler() { return windowHandler; }
+    static void SetWindowHandler(IWindowHandler* handler) { windowHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
     static CrashHandler GetCrashHandler() { return OnCrash; }
@@ -74,15 +94,15 @@ public:
     static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
                            const char* desc, const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void Fatal(const ErrorLocation& loc, const char* format, ...);
-    static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult,
+    static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
-    static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr,
+    static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr,
                      const char* desc = "assertion failed", const char* arg1 = nullptr, const char* arg2 = nullptr);
-    static void Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
+    static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void DoExit(const std::string& message);
 
-    static int ShowMessage(pcstr title, pcstr message, bool simple = true);
+    static AssertionResult ShowMessage(pcstr title, pcstr message, bool simpleMode = true);
 
     static void LogStackTrace(const char* header);
     static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = 512);

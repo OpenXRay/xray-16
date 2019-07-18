@@ -2,6 +2,11 @@
 #include "xr_effgamma.h"
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
+#if defined(WINDOWS)
+#include <FreeImage/FreeImagePlus.h>
+#else
+#include <FreeImagePlus.h>
+#endif
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "d3dx10tex.h"
 #endif // USE_DX10
@@ -42,70 +47,103 @@ IC void MouseRayFromPoint(Fvector& direction, int x, int y, Fmatrix& m_CamMat)
 #define SM_FOR_SEND_HEIGHT 480
 
 #if defined(USE_OGL)
-// XXX: remove
-// Temporary solution based on:
-// http://masandilov.ru/opengl/ScreenShots
-void WriteTGA(IWriter* file)
+bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWORD& bufferSize, bool gamesave = false)
 {
     const u32 width = psCurrentVidMode[0];
     const u32 height = psCurrentVidMode[1];
 
     constexpr u32 colorMode = 3;
-    const u32 size = width * height * colorMode;
-
-    auto output = new u8[size];
-
-    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, output);
+    constexpr u8 bits = 24;
+    const size_t bitsSize = width * height * colorMode;
 
     const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    const u8 header[6] =
+    {
+        width % 256, width / 256,
+        height % 256, height / 256,
+        bits, 0
+    };
 
-    constexpr u8 bits = 24;
+    const size_t headerSize = sizeof(tgaHeader) + sizeof(header);
 
-    u8 header[6];
-    header[0] = width % 256;
-    header[1] = width / 256;
-    header[2] = height % 256;
-    header[3] = height / 256;
-    header[4] = bits;
-    header[5] = 0;
+    xr_vector<u8> pixels;
+    pixels.resize(bitsSize + headerSize);
+    
+    for (size_t i = 0; i < sizeof(tgaHeader); i++)
+        pixels[i] = tgaHeader[i];
 
-    file->w(tgaHeader, sizeof(tgaHeader));
-    file->w(header, sizeof(header));
+    for (size_t i = 0; i < sizeof(header); i++)
+        pixels[sizeof(tgaHeader) + i] = header[i];
+
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data() + headerSize);
 
     // TGA format used BGR instead of RGB
-    for (u32 i = 0; i < size; i += colorMode)
-        std::swap(output[i], output[i + 2]);
+    for (size_t i = headerSize; i < bitsSize + headerSize; i += colorMode)
+        std::swap(pixels[i], pixels[i + 2]);
 
-    file->w(output, size);
-    xr_delete(output);
+    fipMemoryIO tmpMemFile(pixels.data(), pixels.size());
+
+    fipImage image;
+    image.loadFromMemory(tmpMemFile);
+
+    if (image.isValid())
+    {
+        bool result = true;
+        if (gamesave)
+            result = image.rescale(GAMESAVE_SIZE, GAMESAVE_SIZE, FILTER_LANCZOS3);
+
+        return result && image.saveToMemory(format, output) && output.acquire(&buffer, &bufferSize);
+    }
+
+    return false;
 }
 
 // XXX: Provide full implementation
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
+    u8* buffer;
+    DWORD bufferSize;
+    fipMemoryIO output;
+    IWriter* fs = nullptr;
+    
     switch (mode)
     {
     case SM_NORMAL:
     {
+        pcstr extension = "jpg";
+        FREE_IMAGE_FORMAT format = FIF_JPEG;
+        if (strstr(Core.Params, "-ss_png"))
+        {
+            extension = "png";
+            format = FIF_PNG;
+        }
+
         string64 time;
         string_path buf;
-        xr_sprintf(buf, sizeof(buf), "ss_%s_%s_(%s).tga", Core.UserName, timestamp(time),
-            g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+        xr_sprintf(buf, sizeof(buf), "ss_%s_%s_(%s).%s", Core.UserName, timestamp(time),
+            g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu", extension);
 
-        IWriter* fs = FS.w_open("$screenshots$", buf);
+        if (CreateImage(output, format, buffer, bufferSize))
+            fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
-        WriteTGA(fs);
-        FS.w_close(fs);
-
-        return;
+        break;
     }
-
-    case SM_FOR_CUBEMAP:
     case SM_FOR_GAMESAVE:
-    case SM_FOR_LEVELMAP:
-    case SM_FOR_MPSENDING:
-        VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
+    {
+        if (CreateImage(output, FIF_DDS, buffer, bufferSize, true))
+            fs = FS.w_open(name);
+        break;
     }
+    default: VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
+    }
+
+    if (fs)
+    {
+        fs->w(buffer, bufferSize);
+        FS.w_close(fs);
+    }
+    else
+        Log("! Failed to make a screenshot");
 }
 #elif defined(USE_DX10) || defined(USE_DX11)
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
@@ -155,7 +193,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
             IWriter* fs = FS.w_open(name);
             if (fs)
             {
-                fs->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+                fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
                 FS.w_close(fs);
             }
         }
@@ -203,13 +241,13 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
                 IWriter* fs = FS.w_open(name);
                 if (fs)
                 {
-                    fs->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+                    fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
                     FS.w_close(fs);
                 }
             }
             else
             {
-                memory_writer->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+                memory_writer->w(saved->GetBufferPointer(), saved->GetBufferSize());
             }
         }
         _RELEASE(saved);
@@ -232,7 +270,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 #endif
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
-        fs->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
+        fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
         FS.w_close(fs);
         _RELEASE(saved);
 
@@ -249,7 +287,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 #endif
             IWriter* fs2 = FS.w_open("$screenshots$", buf);
             R_ASSERT(fs2);
-            fs2->w(saved2->GetBufferPointer(), (u32)saved2->GetBufferSize());
+            fs2->w(saved2->GetBufferPointer(), saved2->GetBufferSize());
             FS.w_close(fs2);
             _RELEASE(saved2);
         }

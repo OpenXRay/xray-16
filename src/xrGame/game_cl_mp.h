@@ -192,6 +192,7 @@ public:
 
     void xr_stdcall OnBuySpawn(CUIWindow* pWnd, void* p);
     virtual void TranslateGameMessage(u32 msg, NET_Packet& P);
+    virtual void CommonMessageOut(pcstr msg);
 
     virtual bool OnKeyboardPress(int key);
 
@@ -248,11 +249,11 @@ public:
     virtual s16 ModifyTeam(s16 Team) { return Team; };
     virtual bool Is_Spectator_TeamCamera_Allowed() { return m_bSpectator_TeamCamera && !Level().IsDemoPlay(); };
     virtual bool Is_Spectator_Camera_Allowed(CSpectator::EActorCameras Camera);
-    virtual bool Is_Rewarding_Allowed() const = 0;
+    virtual bool Is_Rewarding_Allowed() const { return false; }
 
     void SendPlayerStarted();
     virtual void OnConnected();
-    virtual LPCSTR GetGameScore(string32& score_dest) = 0;
+    virtual LPCSTR GetGameScore(string32& score_dest) { return score_dest; }
 
     screenshot_manager ss_manager;
     mp_anticheat::configs_dumper cd_manager;

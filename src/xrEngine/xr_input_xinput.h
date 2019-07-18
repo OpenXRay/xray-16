@@ -12,6 +12,7 @@ enum EGameActions
     kDOWN,
     kJUMP,
     kCROUCH,
+    kCROUCH_TOGGLE,
     kACCEL,
     kSPRINT_TOGGLE,
 
@@ -23,11 +24,15 @@ enum EGameActions
     kL_LOOKOUT,
     kR_LOOKOUT,
 
+    kENGINE,
+
     kCAM_1,
     kCAM_2,
     kCAM_3,
+    kCAM_4,
     kCAM_ZOOM_IN,
     kCAM_ZOOM_OUT,
+    kCAM_AUTOAIM,
 
     kTORCH,
     kNIGHT_VISION,
@@ -63,6 +68,9 @@ enum EGameActions
     kSKIN,
     kTEAM,
     kACTIVE_JOBS,
+    kMAP,
+    kCONTACTS,
+    kEXT_1,
 
     kVOTE_BEGIN,
     kSHOW_ADMIN_MENU,
@@ -75,6 +83,17 @@ enum EGameActions
 
     kSPEECH_MENU_0,
     kSPEECH_MENU_1,
+    kSPEECH_MENU_2,
+    kSPEECH_MENU_3,
+    kSPEECH_MENU_4,
+    kSPEECH_MENU_5,
+    kSPEECH_MENU_6,
+    kSPEECH_MENU_7,
+    kSPEECH_MENU_8,
+    kSPEECH_MENU_9,
+
+    kUSE_BANDAGE,
+    kUSE_MEDKIT,
 
     kQUICK_USE_1,
     kQUICK_USE_2,
@@ -101,8 +120,6 @@ enum EGameActions
     kCUSTOM14,
     kCUSTOM15,
 
-    kCAM_AUTOAIM,
-
     kPDA_TAB1,
     kPDA_TAB2,
     kPDA_TAB3,
@@ -117,47 +134,50 @@ enum EGameActions
     kFORCEDWORD = u32(-1)
 };
 
-struct ENGINE_API _keyboard
+struct ENGINE_API keyboard_key
 {
     pcstr key_name;
     int dik;
     xr_string key_local_name;
 };
-enum _key_group
+enum EKeyGroup
 {
     _both = (1 << 0),
     _sp = _both | (1 << 1),
     _mp = _both | (1 << 2),
 };
 
-extern ENGINE_API _key_group g_current_keygroup;
+extern ENGINE_API EKeyGroup g_current_keygroup;
 
-struct ENGINE_API _action
+struct ENGINE_API game_action
 {
     pcstr action_name;
     EGameActions id;
-    _key_group key_group;
+    EKeyGroup key_group;
 };
 
-extern ENGINE_API _action actions[];
-extern ENGINE_API _keyboard keyboards[];
+extern ENGINE_API game_action actions[];
+extern ENGINE_API keyboard_key keyboards[];
 
 #define bindings_count kLASTACTION
-struct ENGINE_API _binding
+#define bindtypes_count 3
+struct ENGINE_API key_binding
 {
-    _action* m_action;
-    _keyboard* m_keyboard[2];
+    game_action* m_action;
+    keyboard_key* m_keyboard[bindtypes_count];
 };
 
-extern ENGINE_API _binding g_key_bindings[];
+extern ENGINE_API key_binding g_key_bindings[];
 
-ENGINE_API EGameActions action_name_to_id(pcstr _name);
-ENGINE_API _action* action_name_to_ptr(pcstr _name);
+ENGINE_API EGameActions ActionNameToId(pcstr name);
+ENGINE_API game_action* ActionNameToPtr(pcstr name);
 
-ENGINE_API bool is_binded(EGameActions action_id, int dik);
-ENGINE_API int get_action_dik(EGameActions action_id, int idx = -1);
+ENGINE_API bool IsBinded(EGameActions action_id, int dik);
+ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
 
-ENGINE_API int keyname_to_dik(pcstr _name);
-ENGINE_API _keyboard* keyname_to_ptr(pcstr _name);
+ENGINE_API int KeynameToDik(pcstr name);
+ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
 
 ENGINE_API void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz);
+
+ENGINE_API std::pair<int, int> GetKeysBindedTo(EGameActions action_id);

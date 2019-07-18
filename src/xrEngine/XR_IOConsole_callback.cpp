@@ -38,7 +38,6 @@ void CConsole::Register_callbacks()
     ec().assign_callback(SDL_SCANCODE_KP_ENTER, text_editor::ks_free, Callback(this, &CConsole::Execute_cmd));
 
     ec().assign_callback(SDL_SCANCODE_ESCAPE, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd_esc));
-    ec().assign_callback(SDL_SCANCODE_GRAVE, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
 }
 
 void CConsole::Prev_log() // SDL_SCANCODE_PRIOR=PAGE_UP
@@ -94,7 +93,7 @@ void CConsole::Find_cmd_back() // SDL_SCANCODE_TAB+shift
         IConsole_Command& cc = *(it->second);
         LPCSTR name_cmd = cc.Name();
         u32 name_cmd_size = xr_strlen(name_cmd);
-        PSTR new_str = (PSTR)_alloca((offset + name_cmd_size + 2) * sizeof(char));
+        PSTR new_str = (PSTR)xr_alloca((offset + name_cmd_size + 2) * sizeof(char));
 
         xr_strcpy(new_str, offset + name_cmd_size + 2, (b_ra) ? radmin_cmd_name : "");
         xr_strcat(new_str, offset + name_cmd_size + 2, name_cmd);

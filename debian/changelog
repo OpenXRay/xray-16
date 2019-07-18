@@ -1,0 +1,8 @@
+openxray (1.6.02-12-ubuntu1) disco; urgency=medium
+
+  * move shlib to /usr/lib
+  * try auto dep
+
+  * fix build
+
+ -- Ilya Orlov <eagleivg@mail.ru>  Sun, 23 Jun 2019 14:46:00 +0300

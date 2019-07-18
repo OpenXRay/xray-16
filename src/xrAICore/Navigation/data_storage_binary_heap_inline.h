@@ -58,7 +58,7 @@ inline void CBinaryHeap::decrease_opened(Vertex& vertex, const Distance value)
     VERIFY(!is_opened_empty());
     Vertex** i = m_heap_head;
     while (*i != &vertex)
-        i++;
+        ++i;
     std::push_heap(m_heap_head, i + 1, VertexPredicate());
 }
 

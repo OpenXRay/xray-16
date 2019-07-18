@@ -48,11 +48,11 @@ inline void CHashFixedVertexManager::init()
 {
     CDataStorageBase::init();
     CDataStorageAllocator::init();
-    m_current_path_id++;
+    ++m_current_path_id;
     m_vertex_count = 0;
     if (!m_current_path_id)
     {
-        m_current_path_id++;
+        ++m_current_path_id;
         ZeroMemory(m_hash, HashSize * sizeof(IndexVertex*));
         ZeroMemory(m_vertices, FixSize * sizeof(IndexVertex));
     }
@@ -104,7 +104,7 @@ inline CHashFixedVertexManagerT::Vertex& CHashFixedVertexManager::get_node(const
             return *vertex->m_vertex;
     }
     NODEFAULT;
-    return *vertex->m_vertex;
+    return *vertex->m_vertex; //-V522
 }
 
 TEMPLATE_SPECIALIZATION

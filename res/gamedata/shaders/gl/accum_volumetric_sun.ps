@@ -30,9 +30,9 @@
 
 #include "shadow.h"
 
-float4	volume_range;	//	x - near plane, y - far plane
-float4	sun_shafts_intensity;
-uniform	float4	screen_res;
+uniform float4 volume_range;	//	x - near plane, y - far plane
+uniform float4 sun_shafts_intensity;
+uniform float4 screen_res;
 
 #ifdef MSAA_OPTIMIZATION
 //#ifdef GBUFFER_OPTIMIZATION
@@ -78,19 +78,18 @@ float4 	_main (v2p_volume  I)
 	float	depth = P.z;
 	float	deltaDepth = direction.z;
 	
-	float4	current	= mul (m_shadow,float4(P,1));
-	float4	delta 	= mul (m_shadow, float4(direction,0));
+	float4	current = mul (m_shadow, float4(P, 1.0));
+	float4	delta = mul (m_shadow, float4(direction, 0.0));
 
-	float	res = 0;
-	float	max_density = sun_shafts_intensity.x;
-	float	density = max_density/RAY_SAMPLES;
+	float res = 0.0;
+	float max_density = sun_shafts_intensity.x;
+	float density = max_density/float(RAY_SAMPLES);
 
-	if (depth<0.0001)
-		res = max_density;
+ 	if (depth < 0.01) res = max_density; // filter for the sky
 
-	for ( int i=0; i<RAY_SAMPLES; ++i )
+	for ( int i=0; i < RAY_SAMPLES; ++i )
 	{
-		if (depth>0.3)
+		if (depth > 0.3)
 		{
 #ifndef	FILTER_LOW
 #ifndef SM_MINMAX
@@ -107,14 +106,13 @@ float4 	_main (v2p_volume  I)
 		current -= delta;
 	}
 
-	float fSturation = -Ldynamic_dir.z;
+	float fSaturation = -Ldynamic_dir.z;
 
 	//	Normalize dot product to
-	fSturation	= 0.5*fSturation+0.5;
+	fSaturation	= 0.5*fSaturation+0.5;
 	//	Map saturation to 0.2..1
-	fSturation	= 0.80*fSturation+0.20;
-
-	res		*= fSturation;
+	fSaturation	= 0.80*fSaturation+0.20;
+	res		*= fSaturation;
 
 	return res*Ldynamic_color;
 #endif	//	SUN_SHAFTS_QUALITY

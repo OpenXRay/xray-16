@@ -31,7 +31,7 @@ public:
     CSoundRender_Source();
     ~CSoundRender_Source();
 
-    void load(pcstr name);
+    bool load(pcstr name, bool warnOnNotFound = true);
     void unload();
     void decompress(u32 line, OggVorbis_File* ovf);
 

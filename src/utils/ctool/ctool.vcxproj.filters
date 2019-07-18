@@ -16,4 +16,7 @@
       <Filter>PPMTrain</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
 </Project>

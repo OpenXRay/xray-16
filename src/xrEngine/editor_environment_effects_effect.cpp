@@ -32,7 +32,7 @@ effect::~effect()
     ::ide().destroy(m_property_holder);
 }
 
-void effect::load(CInifile& config)
+void effect::load(const CInifile& config)
 {
     life_time = config.r_u32(m_id, "life_time");
     offset = config.r_fvector3(m_id, "offset");

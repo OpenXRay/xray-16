@@ -60,10 +60,7 @@ public:
     void OnSectorChanged(int sector);
 
     xr_vector<CUIStatic*> m_quick_slots_icons;
-    CUITextWnd* m_QuickSlotText1;
-    CUITextWnd* m_QuickSlotText2;
-    CUITextWnd* m_QuickSlotText3;
-    CUITextWnd* m_QuickSlotText4;
+    xr_vector<CUITextWnd*> m_quick_slots_texts;
 
 protected:
     // 5 статиков для отображения иконок:
@@ -125,7 +122,7 @@ public:
 
     void ReceiveNews(GAME_NEWS_DATA* news);
     void UpdateMainIndicators();
-    void UpdateBoosterIndicators(const xr_map<EBoostParams, SBooster> influences);
+    void UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences);
 
 protected:
     void UpdateQuickSlots();

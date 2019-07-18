@@ -92,7 +92,7 @@ bool CConsole::is_mark(Console_mark type)
 
 CConsole::CConsole() : m_hShader_back(NULL)
 {
-    m_editor = new text_editor::line_editor((u32)CONSOLE_BUF_SIZE);
+    m_editor = new text_editor::line_editor(CONSOLE_BUF_SIZE);
     m_cmd_history_max = cmd_history_max;
     m_disable_tips = false;
     Register_callbacks();
@@ -171,7 +171,7 @@ void CConsole::OutFont(LPCSTR text, float& pos_y)
         float f = 0.0f;
         int sz = 0;
         int ln = 0;
-        PSTR one_line = (PSTR)_alloca((CONSOLE_BUF_SIZE + 1) * sizeof(char));
+        PSTR one_line = (PSTR)xr_alloca((CONSOLE_BUF_SIZE + 1) * sizeof(char));
 
         while (text[sz] && (ln + sz < CONSOLE_BUF_SIZE - 5)) // перенос строк
         {
@@ -227,7 +227,10 @@ void CConsole::OnRender()
     }
     if (!pFont2)
     {
-        pFont2 = new CGameFont("hud_font_di2", CGameFont::fsDeviceIndependent);
+        pcstr fontSection = "hud_font_di2";
+        if (!pSettings->section_exist(fontSection))
+            fontSection = "hud_font_di";
+        pFont2 = new CGameFont(fontSection, CGameFont::fsDeviceIndependent);
         pFont2->SetHeightI(0.025f);
     }
 
@@ -511,9 +514,9 @@ void CConsole::DrawRect(Frect const& r, u32 color)
 void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
 {
     u32 str_size = xr_strlen(cmd_str);
-    PSTR edt = (PSTR)_alloca((str_size + 1) * sizeof(char));
-    PSTR first = (PSTR)_alloca((str_size + 1) * sizeof(char));
-    PSTR last = (PSTR)_alloca((str_size + 1) * sizeof(char));
+    PSTR edt = (PSTR)xr_alloca((str_size + 1) * sizeof(char));
+    PSTR first = (PSTR)xr_alloca((str_size + 1) * sizeof(char));
+    PSTR last = (PSTR)xr_alloca((str_size + 1) * sizeof(char));
 
     xr_strcpy(edt, str_size + 1, cmd_str);
     edt[str_size] = 0;
@@ -607,6 +610,16 @@ void CConsole::Show()
     reset_selected_tip();
     update_tips();
 
+    auto [key1, key2] = GetKeysBindedTo(kCONSOLE);
+
+    if (key1 > -1 && key1 < CInput::COUNT_KB_BUTTONS)
+        ec().assign_callback(key1, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
+    if (key2 > -1 && key2 < CInput::COUNT_KB_BUTTONS)
+        ec().assign_callback(key2, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
+
+    lastBindedKeys[0] = key1;
+    lastBindedKeys[1] = key2;
+
     m_editor->IR_Capture();
     Device.seqRender.Add(this, 1);
     Device.seqFrame.Add(this);
@@ -631,6 +644,9 @@ void CConsole::Hide()
     reset_selected_tip();
     update_tips();
 
+    ec().remove_callback(lastBindedKeys[0]);
+    ec().remove_callback(lastBindedKeys[1]);
+
     Device.seqFrame.Remove(this);
     Device.seqRender.Remove(this);
     m_editor->IR_Release();
@@ -653,7 +669,7 @@ void CConsole::Execute(LPCSTR cmd) { ExecuteCommand(cmd, false); }
 void CConsole::ExecuteScript(LPCSTR str)
 {
     u32 str_size = xr_strlen(str);
-    PSTR buf = (PSTR)_alloca((str_size + 10) * sizeof(char));
+    PSTR buf = (PSTR)xr_alloca((str_size + 10) * sizeof(char));
     xr_strcpy(buf, str_size + 10, "cfg_load ");
     xr_strcat(buf, str_size + 10, str);
     Execute(buf);
@@ -676,7 +692,7 @@ IConsole_Command* CConsole::find_next_cmd(LPCSTR in_str, shared_str& out_str)
         IConsole_Command* cc = it->second;
         LPCSTR name_cmd = cc->Name();
         u32 name_cmd_size = xr_strlen(name_cmd);
-        PSTR new_str = (PSTR)_alloca((offset + name_cmd_size + 2) * sizeof(char));
+        PSTR new_str = (PSTR)xr_alloca((offset + name_cmd_size + 2) * sizeof(char));
 
         xr_strcpy(new_str, offset + name_cmd_size + 2, (b_ra) ? radmin_cmd_name : "");
         xr_strcat(new_str, offset + name_cmd_size + 2, name_cmd);
@@ -826,8 +842,8 @@ void CConsole::update_tips()
     }
     m_prev_length_str = cur_length;
 
-    PSTR first = (PSTR)_alloca((cur_length + 1) * sizeof(char));
-    PSTR last = (PSTR)_alloca((cur_length + 1) * sizeof(char));
+    PSTR first = (PSTR)xr_alloca((cur_length + 1) * sizeof(char));
+    PSTR last = (PSTR)xr_alloca((cur_length + 1) * sizeof(char));
     text_editor::split_cmd(first, last, cur);
 
     u32 first_lenght = xr_strlen(first);
@@ -899,7 +915,7 @@ void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& ou
     }
 
     bool all = (xr_strlen(filter_str) == 0);
-
+    const size_t filter_str_len = xr_strlen(filter_str);
     //vecTips::iterator itb = in_v.begin();
     //vecTips::iterator ite = in_v.end();
     //for (; itb != ite; ++itb)
@@ -913,8 +929,8 @@ void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& ou
             pcstr fd_str = strstr(str.c_str(), filter_str);
             if (fd_str)
             {
-                int fd_sz = str.size() - xr_strlen(fd_str);
-                TipString ts(str, fd_sz, fd_sz + xr_strlen(filter_str));
+                size_t fd_sz = str.size() - xr_strlen(fd_str);
+                TipString ts(str, fd_sz, fd_sz + filter_str_len);
                 out_v.push_back(ts);
             }
         }

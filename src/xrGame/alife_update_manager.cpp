@@ -137,13 +137,6 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
     if (m_changing_level)
         return (false);
 
-#ifdef ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS
-    luabind::functor<void> funct;
-    GEnv.ScriptEngine->functor("_G.CALifeUpdateManager__on_before_change_level", funct);
-    if (funct)
-        funct(&net_packet);
-#endif
-
     //	prepare_objects_for_save		();
     // we couldn't use prepare_objects_for_save since we need
     // get updates from client
@@ -194,7 +187,7 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
 
     string256 autoave_name;
     strconcat(sizeof(autoave_name), autoave_name, Core.UserName, " - ", "autosave");
-    LPCSTR temp0 = strstr(**m_server_command_line, "/");
+    LPCSTR temp0 = strchr(**m_server_command_line, '/');
     VERIFY(temp0);
     string256 temp;
     *m_server_command_line = strconcat(sizeof(temp), temp, autoave_name, temp0);
@@ -294,10 +287,16 @@ bool CALifeUpdateManager::load_game(LPCSTR game_name, bool no_assert)
         FS.update_path(file_name, "$game_saves$", temp);
         if (!FS.exist(file_name))
         {
-            R_ASSERT3(no_assert, "There is no saved game ", file_name);
-            return (false);
+            strconcat(sizeof(temp), temp, game_name, SAVE_EXTENSION_LEGACY);
+            FS.update_path(file_name, "$game_saves$", temp);
+            if (!FS.exist(file_name))
+            {
+                R_ASSERT3(no_assert, "There is no saved game ", game_name);
+                return (false);
+            }
         }
     }
+
     string512 S, S1;
     xr_strcpy(S, **m_server_command_line);
     LPSTR temp = strchr(S, '/');

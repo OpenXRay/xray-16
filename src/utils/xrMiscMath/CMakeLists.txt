@@ -8,7 +8,6 @@ add_dir("${DIRS}")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../sdk/include
     ${SDL_INCLUDE_DIRS}
     )
 
@@ -20,3 +19,4 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp")
 cotire(${PROJECT_NAME})
+

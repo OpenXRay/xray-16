@@ -142,6 +142,12 @@ void IGame_Persistent::Prefetch()
     timer.Start();
     const auto memoryBefore = Memory.mem_usage();
 
+    if (psSoundPrecacheAll != 0)
+    {
+        Log("Loading sounds...");
+        GEnv.Sound->prefetch();
+    }
+
     Log("Loading objects...");
     ObjectPool.prefetch();
 
@@ -222,7 +228,7 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
     else
     {
         u32 active_size = ps_active.size();
-        CPS_Instance** I = (CPS_Instance**)_alloca(active_size * sizeof(CPS_Instance*));
+        CPS_Instance** I = (CPS_Instance**)xr_alloca(active_size * sizeof(CPS_Instance*));
         std::copy(ps_active.begin(), ps_active.end(), I);
 
         struct destroy_on_game_load

@@ -302,7 +302,7 @@ void CSE_ALifeOnlineOfflineGroup::on_after_game_load()
     if (m_members.empty())
         return;
 
-    ALife::_OBJECT_ID* temp = (ALife::_OBJECT_ID*)_alloca(m_members.size() * sizeof(ALife::_OBJECT_ID));
+    ALife::_OBJECT_ID* temp = (ALife::_OBJECT_ID*)xr_alloca(m_members.size() * sizeof(ALife::_OBJECT_ID));
     ALife::_OBJECT_ID *i = temp, *e = temp + m_members.size();
 
     {

@@ -23,7 +23,7 @@ size_t ov_read_func(void* ptr, size_t size, size_t nmemb, void* datasource)
     IReader* F = (IReader*)datasource;
     size_t exist_block = _max(0ul, iFloor(F->elapsed() / (float)size));
     size_t read_block = std::min(exist_block, nmemb);
-    F->r(ptr, (int)(read_block * size));
+    F->r(ptr, read_block * size);
     return read_block;
 }
 int ov_close_func(void* datasource) { return 0; }
@@ -122,7 +122,7 @@ void CSoundRender_Source::LoadWave(pcstr pName)
     FS.r_close(wave);
 }
 
-void CSoundRender_Source::load(pcstr name)
+bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -139,12 +139,20 @@ void CSoundRender_Source::load(pcstr name)
     if (!FS.exist("$level$", fn))
         FS.update_path(fn, "$game_sounds$", fn);
 
-#ifdef _EDITOR
-    if (!FS.exist(fn))
+    const bool soundExist = FS.exist(fn);
+    if (!soundExist && replaceWithNoSound)
+    {
+        Msg("! Can't find sound '%s'", name);
         FS.update_path(fn, "$game_sounds$", "$no_sound.ogg");
-#endif
-    LoadWave(fn);
-    SoundRender->cache.cat_create(CAT, dwBytesTotal);
+    }
+    
+    if (soundExist || replaceWithNoSound)
+    {
+        LoadWave(fn);
+        SoundRender->cache.cat_create(CAT, dwBytesTotal);
+    }
+
+    return soundExist;
 }
 
 void CSoundRender_Source::unload()

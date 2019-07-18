@@ -44,7 +44,7 @@ void SStatSectionData::load(IReader& stream)
     load_data(data, stream);
     if (ai().get_alife()->header().version() == 0x0002)
     {
-        int tmp;
+        int tmp = -1;
         load_data(tmp, stream);
         switch (tmp)
         {
@@ -56,7 +56,7 @@ void SStatSectionData::load(IReader& stream)
         case 5: key = "reputation"; break;
         case 0: key = "foo"; break;
         }
-        s32 tmp2;
+        s32 tmp2 = -1;
         load_data(tmp2, stream); // old total_points
     }
     else

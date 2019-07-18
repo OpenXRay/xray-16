@@ -253,7 +253,7 @@ void CPHSkeleton::RestoreNetState(CSE_PHSkeleton* po)
     }
 
     if (saved_bones.size() == obj->PHGetSyncItemsNumber())
-        for (u16 bone = 0; e != i; i++, bone++)
+        for (u16 bone = 0; e != i; ++i, bone++)
         {
             R_ASSERT(bone < obj->PHGetSyncItemsNumber());
             obj->PHGetSyncItem(bone)->set_State(*i);

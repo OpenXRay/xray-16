@@ -11,11 +11,11 @@ v2p _main (v_vert v)
 	o.fog 		= saturate(o.fog);
 	o.c.rgb 	= lerp(fog_color.rgb, o.c.rgb, o.fog);
 
-//	float scale = tex2Dlod	(s_tonemap,float4(0.5,0.5,0.5,0.5)).x ;
-//	float scale = s_tonemap.Load(int3(0,0,0)).x;
-//	float scale = s_tonemap.Load(int3(1,1,0)).x;
-	float scale = texelFetch(s_tonemap,int2(0,0),0).x;
+#ifdef USE_VTF
+	float scale	= texelFetch(s_tonemap,int2(0,0),0).x;
 	o.c.rgb		= o.c.rgb*scale;      		// copy color, pre-scale by tonemap //float4 ( v.c.rgb*scale*2, v.c.a );
+#endif // USE_VTF
+
 	o.c.a		= o.fog;
 
 	return o;

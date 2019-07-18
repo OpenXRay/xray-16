@@ -6,7 +6,7 @@
 
 # NOTE: This build is currently only supporting x86 targets, for other targets use the original makefile. Please do not submit bugs to the LuaJIT author in case this build fails, instead use http://github.com/LuaDist/luajit
 
-project ( luajit C ASM)
+project ( xrLuajit C ASM)
 cmake_minimum_required ( VERSION 2.8 )
 
 ## CONFIGURATION
@@ -257,6 +257,7 @@ set ( LJCORE_C
   ${LUAJIT_DIR}/lj_err.c
   ${LUAJIT_DIR}/lj_char.c
   ${LUAJIT_DIR}/lj_bc.c
+  ${LUAJIT_DIR}/lj_buf.c
   ${LUAJIT_DIR}/lj_obj.c
   ${LUAJIT_DIR}/lj_str.c
   ${LUAJIT_DIR}/lj_tab.c
@@ -283,8 +284,11 @@ set ( LJCORE_C
   ${LUAJIT_DIR}/lj_opt_loop.c
   ${LUAJIT_DIR}/lj_opt_split.c
   ${LUAJIT_DIR}/lj_opt_sink.c
+  ${LUAJIT_DIR}/lj_profile.c
   ${LUAJIT_DIR}/lj_mcode.c
   ${LUAJIT_DIR}/lj_snap.c
+  ${LUAJIT_DIR}/lj_strfmt.c
+  ${LUAJIT_DIR}/lj_strfmt_num.c
   ${LUAJIT_DIR}/lj_record.c
   ${LUAJIT_DIR}/lj_crecord.c
   ${LUAJIT_DIR}/lj_ffrecord.c
@@ -307,9 +311,9 @@ set ( LJCORE_C
 )
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-	 set(LIB_NAME luajit-debug)
+	 set(LIB_NAME ${PROJECT_NAME}-debug)
 else()
-	 set(LIB_NAME luajit)
+	 set(LIB_NAME ${PROJECT_NAME})
 endif()
 
 #if(${BUILD_STATIC_LIB})
@@ -319,12 +323,14 @@ endif()
 	add_library( ${LIB_NAME} SHARED ${LJCORE_C} ${DEPS} )
 	set_target_properties ( ${LIB_NAME} PROPERTIES PREFIX "" )
 	target_link_libraries ( ${LIB_NAME} ${LIBS} )
-	xr_install(${LIB_NAME})
+    install(TARGETS ${LIB_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+        GROUP_READ 
+        WORLD_READ )
 #endif()
 
 if(NOT ${BUILD_LIB_ONLY})
 	## LuaJIT Executable
-	add_executable ( luajit ${LUAJIT_DIR}/luajit.c ${LUAJIT_DIR}/luajit.rc )
+	add_executable ( ${PROJECT_NAME} ${LUAJIT_DIR}/luajit.c ${LUAJIT_DIR}/luajit.rc )
 	target_link_libraries ( luajit ${LIB_NAME} )
 
 	# On Windows build a no-console variant also

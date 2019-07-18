@@ -399,6 +399,8 @@ void PATargetColor::Load(IReader& F)
     F.r_fvector3(color);
     alpha = F.r_float();
     scale = F.r_float();
+    if (ShadowOfChernobylMode)
+        return; // XXX: make dynamic check
     timeFrom = F.r_float();
     timeTo = F.r_float();
 }

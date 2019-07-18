@@ -305,7 +305,6 @@ public:
         return (inherited::net_SaveRelevant() && BOOL(PPhysicsShell() != NULL)) || m_exploded;
     };
 
-    virtual void renderable_Render() { inherited::renderable_Render(); };
     virtual BOOL renderable_ShadowGenerate() { return FALSE; }
     virtual BOOL renderable_ShadowReceive() { return TRUE; }
     virtual void OnEvent(NET_Packet& P, u16 type);

@@ -100,7 +100,7 @@ void MakeFilter(string1024& dest, LPCSTR info, LPCSTR ext)
     }
     xr_strcpy(dest, res.c_str());
 
-    for (u32 i = 0; i < res.size(); ++i)
+    for (size_t i = 0; i < res.size(); ++i)
     {
         if (res[i] == '|')
             dest[i] = '\0';
@@ -122,7 +122,7 @@ UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
 #endif
 
 bool EFS_Utils::GetOpenNameInternal(
-    LPCSTR initial, LPSTR buffer, int sz_buf, bool bMulti, LPCSTR offset, int start_flt_ext)
+    LPCSTR initial, LPSTR buffer, size_t sz_buf, bool bMulti /*= false*/, LPCSTR offset /*= 0*/, int start_flt_ext /*= -1*/)
 {
     VERIFY(buffer && (sz_buf > 0));
 #if defined(WINDOWS)
@@ -282,7 +282,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
 #endif
 }
 //----------------------------------------------------
-LPCSTR EFS_Utils::AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, int depth, BOOL full_name)
+LPCSTR EFS_Utils::AppendFolderToName(LPSTR tex_name, size_t const tex_name_size, int depth, BOOL full_name)
 {
     string256 _fn;
     xr_strcpy(tex_name, tex_name_size, AppendFolderToName(tex_name, _fn, sizeof(_fn), depth, full_name));
@@ -290,7 +290,7 @@ LPCSTR EFS_Utils::AppendFolderToName(LPSTR tex_name, u32 const tex_name_size, in
 }
 
 LPCSTR EFS_Utils::AppendFolderToName(
-    LPCSTR src_name, LPSTR dest_name, u32 const dest_name_size, int depth, BOOL full_name)
+    LPCSTR src_name, LPSTR dest_name, size_t const dest_name_size, int depth, BOOL full_name)
 {
     shared_str tmp = src_name;
     LPCSTR s = src_name;
@@ -324,7 +324,7 @@ LPCSTR EFS_Utils::AppendFolderToName(
 }
 
 LPCSTR EFS_Utils::GenerateName(
-    LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, LPSTR out_name, u32 const out_name_size)
+    LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, LPSTR out_name, size_t const out_name_size)
 {
     int cnt = 0;
     string_path fn;
@@ -334,10 +334,12 @@ LPCSTR EFS_Utils::GenerateName(
         xr_sprintf(fn, sizeof(fn), "%s%02d%s", base_path, cnt++, def_ext);
 
     while (FS.exist(fn))
+    {
         if (base_name)
             xr_sprintf(fn, sizeof(fn), "%s%s%02d%s", base_path, base_name, cnt++, def_ext);
         else
             xr_sprintf(fn, sizeof(fn), "%s%02d%s", base_path, cnt++, def_ext);
+    }
     xr_strcpy(out_name, out_name_size, fn);
     return out_name;
 }

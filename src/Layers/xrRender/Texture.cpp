@@ -10,6 +10,8 @@
 #include <d3dx9.h>
 #pragma warning(pop)
 
+constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
+
 void fix_texture_name(LPSTR fn)
 {
     LPSTR _ext = strext(fn);
@@ -68,7 +70,7 @@ int get_texture_load_lod(LPCSTR fn)
         return 2;
 }
 
-u32 calc_texture_size(int lod, u32 mip_cnt, u32 orig_size)
+u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 {
     if (1 == mip_cnt)
         return orig_size;
@@ -278,7 +280,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     IDirect3DCubeTexture9* pTextureCUBE = nullptr;
     string_path fn;
     u32 dwWidth, dwHeight;
-    u32 img_size = 0;
+    size_t img_size = 0;
     int img_loaded_lod = 0;
     D3DFORMAT fmt;
     u32 mip_cnt = u32(-1);
@@ -307,7 +309,11 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 #else
 
     Msg("! Can't find texture '%s'", fname);
-    R_ASSERT(FS.exist(fn, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
+    const bool dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
+    if (!ShadowOfChernobylMode)
+        R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
+    if (!dummyTextureExist)
+        return nullptr;
     goto _DDS;
 
 //xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
@@ -330,7 +336,7 @@ _DDS:
         Msg("! Can't get image info for texture '%s'", fn);
         FS.r_close(S);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"));
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
         goto _DDS;
@@ -351,7 +357,7 @@ _DDS_CUBE:
     {
         Msg("! Can't load texture '%s'", fn);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"));
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);
         goto _DDS;
@@ -379,7 +385,7 @@ _DDS_2D:
     {
         Msg("! Can't load texture '%s'", fn);
         string_path temp;
-        R_ASSERT(FS.exist(temp, "$game_textures$", "ed" DELIMITER "ed_not_existing_texture", ".dds"));
+        R_ASSERT(FS.exist(temp, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"));
         xr_strlwr(temp);
         R_ASSERT(xr_strcmp(temp, fn));
         xr_strcpy(fn, temp);

@@ -40,4 +40,8 @@ function opt_video:InitControls(x, y, xml, handler)
 
 	btn		= xml:Init3tButton		("tab_video:btn_advanced",	self)
 	handler:Register				(btn, "btn_advanced_graphic")
+
+	-- Disable `combo_renderer` combobox control if `renderer` command locked
+	local _enable = renderer_allow_override()
+	handler.combo_renderer:Enable(_enable)
 end

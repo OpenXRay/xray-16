@@ -392,13 +392,13 @@ public:
     void ResetData();
     void CopyData(CBone* bone);
 
-    void ShapeScale(const Fvector& amount);
-    void ShapeRotate(const Fvector& amount);
-    void ShapeMove(const Fvector& amount);
+    void ShapeScale(const Fvector& amount, bool parentCS = false);
+    void ShapeRotate(const Fvector& amount, bool parentCS = false);
+    void ShapeMove(const Fvector& amount, bool parentCS = false);
     void BindRotate(const Fvector& amount);
     void BindMove(const Fvector& amount);
     void BoneMove(const Fvector& amount);
-    void BoneRotate(const Fvector& axis, float angle);
+    void BoneRotate(const Fvector& axis, float angle, bool parentCS = false);
 
     bool Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix& parent);
 
@@ -495,10 +495,10 @@ private:
     float hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
 
 public:
-    virtual u32 mem_usage()
+    virtual size_t mem_usage()
     {
-        u32 sz = sizeof(*this) + sizeof(vecBones::value_type) * children.size();
-        for (auto c_it = child_faces.begin(); c_it != child_faces.end(); c_it++)
+        size_t sz = sizeof(*this) + sizeof(vecBones::value_type) * children.size();
+        for (auto c_it = child_faces.begin(); c_it != child_faces.end(); ++c_it)
             sz += c_it->size() * sizeof(FacesVec::value_type) + sizeof(*c_it);
         return sz;
     }

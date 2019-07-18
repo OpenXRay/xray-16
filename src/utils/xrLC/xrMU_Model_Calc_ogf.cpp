@@ -43,7 +43,7 @@ void OGF_AddFace(OGF& ogf, const _face& FF, const xrMU_Model& model)
 void calc_ogf(xrMU_Model& mu_model)
 {
     // Build OGFs
-    for (xrMU_Model::v_subdivs_it it = mu_model.m_subdivs.begin(); it != mu_model.m_subdivs.end(); it++)
+    for (xrMU_Model::v_subdivs_it it = mu_model.m_subdivs.begin(); it != mu_model.m_subdivs.end(); ++it)
     {
         OGF* pOGF = new OGF();
         b_material* M = &(pBuild->materials()[it->material]); // and it's material
@@ -66,7 +66,7 @@ void calc_ogf(xrMU_Model& mu_model)
             {
                 xrMU_Model::v_faces_it _beg = mu_model.m_faces.begin() + it->start;
                 xrMU_Model::v_faces_it _end = _beg + it->count;
-                for (xrMU_Model::v_faces_it Fit = _beg; Fit != _end; Fit++)
+                for (xrMU_Model::v_faces_it Fit = _beg; Fit != _end; ++Fit)
                 {
                     _face* FF = *Fit;
                     R_ASSERT(FF);

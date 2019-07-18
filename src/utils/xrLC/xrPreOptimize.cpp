@@ -89,7 +89,7 @@ void CBuild::PreOptimize()
         vecVertex& H = *(HASH[ix][iy][iz]);
 
         // Search similar vertices in hash table
-        for (vecVertexIt T = H.begin(); T != H.end(); T++)
+        for (vecVertexIt T = H.begin(); T != H.end(); ++T)
         {
             Vertex* pBase = *T;
             if (pBase->similar(*pTest, g_params().m_weld_distance))
@@ -153,7 +153,10 @@ void CBuild::PreOptimize()
     if (InvalideFaces())
     {
         err_save();
-        xrDebug::Fatal(DEBUG_INFO, "* FATAL: %d invalid faces. Compilation aborted", InvalideFaces());
+        if (!g_build_options.b_skipinvalid)
+            xrDebug::Fatal(DEBUG_INFO, "* FATAL: %d invalid faces. Compilation aborted", InvalideFaces());
+        else
+            Logger.clMsg("* WARNING! Total %d invalid faces found.", InvalideFaces());
     }
 
     Logger.Status("Adjacency check...");

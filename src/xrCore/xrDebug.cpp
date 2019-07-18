@@ -94,23 +94,15 @@ ICN void* GetInstructionPtr()
 }
 }*/
 
-// XXX: Probably rename this to AssertionResult?
-enum MessageBoxResult
-{
-    resultUndefined = -1,
-    resultContinue = 0,
-    resultTryAgain = 1,
-    resultCancel = 2
-};
-
 constexpr SDL_MessageBoxButtonData buttons[] =
 {
     /* .flags, .buttonid, .text */
-    { 0, resultContinue, "Continue"  },
-    { 0, resultTryAgain, "Try again" },
+    { 0, (int)AssertionResult::ignore, "Continue"  },
+    { 0, (int)AssertionResult::tryAgain, "Try again" },
+
     { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT |
       SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,
-         resultCancel, "Cancel"      }
+         (int)AssertionResult::abort, "Cancel" }
 };
 
 SDL_MessageBoxData messageboxdata =
@@ -124,16 +116,16 @@ SDL_MessageBoxData messageboxdata =
     nullptr
 };
 
-int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
+AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode)
 {
 #ifdef WINDOWS // because Windows default Message box is fancy
     HWND hwnd = nullptr;
 
-    if (applicationWindow)
+    if (windowHandler)
     {
         SDL_SysWMinfo info;
         SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(applicationWindow, &info))
+        if (SDL_GetWindowWMInfo(windowHandler->GetApplicationWindow(), &info))
         {
             switch (info.subsystem)
             {
@@ -145,29 +137,37 @@ int xrDebug::ShowMessage(pcstr title, pcstr message, bool simple)
         }
     }
 
-    if (simple)
-        return MessageBox(hwnd, message, title, MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+    if (simpleMode)
+    {
+        MessageBox(hwnd, message, title, MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        return AssertionResult::ok;
+    }
 
     const int result = MessageBox(hwnd, message, title,
         MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
 
     switch (result)
     {
-    case IDCANCEL: return resultCancel;
-    case IDTRYAGAIN: return resultTryAgain;
-    case IDCONTINUE: return resultContinue;
-    default: return resultUndefined;
+    case IDCANCEL: return AssertionResult::abort;
+    case IDTRYAGAIN: return AssertionResult::tryAgain;
+    case IDCONTINUE: return AssertionResult::ignore;
+    default: return AssertionResult::undefined;
     }
 #else
-    if (simple)
-        return SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, applicationWindow);
+    if (simpleMode)
+    {
+        SDL_Window* parent = windowHandler ? windowHandler->GetApplicationWindow() : nullptr;
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, parent);
+        return AssertionResult::ok;
+    }
 
-    messageboxdata.window = applicationWindow;
+    if (windowHandler)
+        messageboxdata.window =  windowHandler->GetApplicationWindow();
     messageboxdata.title = title;
     messageboxdata.message = message;
-    int button = resultUndefined;
+    int button = -1;
     SDL_ShowMessageBox(&messageboxdata, &button);
-    return button;
+    return (AssertionResult)button;
 #endif
 }
 
@@ -177,24 +177,39 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
     if (data->always_ignore)
         return SDL_ASSERTION_ALWAYS_IGNORE;
 
-    constexpr pcstr desc = "SDL2 assert triggered";
+    constexpr pcstr desc = "SDL2 assertion triggered";
     bool alwaysIgnore = false;
-    xrDebug::Fail(alwaysIgnore, {data->filename, data->linenum, data->function}, data->condition, desc);
 
-    if (alwaysIgnore)
+    const auto result = xrDebug::Fail(alwaysIgnore,
+        { data->filename, data->linenum, data->function },
+        data->condition, desc);
+
+    switch (result)
+    {
+    case AssertionResult::ignore:
         return SDL_ASSERTION_ALWAYS_IGNORE;
 
-    // XXX: change Fail return type from void to 'enum MessageBoxResult'
-    return SDL_ASSERTION_IGNORE;
+    case AssertionResult::tryAgain:
+        return SDL_ASSERTION_RETRY;
+
+    case AssertionResult::abort:
+        return SDL_ASSERTION_ABORT;
+
+    case AssertionResult::undefined:
+    case AssertionResult::ok:
+    default:
+        return SDL_ASSERTION_IGNORE;
+    }
 }
 
-SDL_Window* xrDebug::applicationWindow = nullptr;
+IWindowHandler* xrDebug::windowHandler = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
 xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
 xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
+bool xrDebug::ShowErrorMessage = false;
 
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
@@ -476,13 +491,13 @@ void xrDebug::Fatal(const ErrorLocation& loc, const char* format, ...)
     Fail(ignoreAlways, loc, nullptr, "fatal error", desc);
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult, const char* arg1,
+AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult, const char* arg1,
                    const char* arg2)
 {
-    Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
+    return Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
+AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
                    const char* arg2)
 {
 #ifdef PROFILE_CRITICAL_SECTIONS
@@ -495,73 +510,102 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     string4096 assertionInfo;
     auto size = sizeof(assertionInfo);
     GatherInfo(assertionInfo, sizeof(assertionInfo), loc, expr, desc, arg1, arg2);
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    xr_strcat(assertionInfo,
-           "\r\n"
-           "Press CANCEL to abort execution\r\n"
-           "Press TRY AGAIN to continue execution\r\n"
-           "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
-           "\r\n");
-#endif
+
+    if (ShowErrorMessage)
+    {
+        xr_strcat(assertionInfo,
+            "\r\n"
+            "Press CANCEL to abort execution\r\n"
+            "Press TRY AGAIN to continue execution\r\n"
+            "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
+            "\r\n");
+    }
+
     if (OnCrash)
         OnCrash();
+
     if (OnDialog)
         OnDialog(true);
+
     FlushLog();
+
+    if (windowHandler)
+        windowHandler->DisableFullscreen();
+
+    bool resetFullscreen = false;
+    AssertionResult result = AssertionResult::abort;
     if (Core.PluginMode)
-        ShowMessage("X-Ray error", assertionInfo);
+        /*result =*/ ShowMessage("X-Ray error", assertionInfo); // Do not assign 'result'
     else
     {
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        switch (ShowMessage("Fatal error", assertionInfo, false))
+        if (ShowErrorMessage)
+            result = ShowMessage("Fatal error", assertionInfo, false);
+
+        switch (result)
         {
-        case resultUndefined:
+        case AssertionResult::tryAgain:
+            ErrorAfterDialog = false;
+            resetFullscreen = windowHandler != nullptr;
+            break;
+
+        case AssertionResult::ignore:
+            ErrorAfterDialog = false;
+            ignoreAlways = true;
+            resetFullscreen = windowHandler != nullptr;
+            break;
+
+        case AssertionResult::undefined:
             xr_strcat(assertionInfo, SDL_GetError());
             [[fallthrough]];
-
-        case resultCancel:
+        case AssertionResult::abort:
+            [[fallthrough]];
+        default:
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
             DEBUG_BREAK;
-            break;
-
-        case resultTryAgain:
-            ErrorAfterDialog = false;
-            break;
-
-        case resultContinue:
-            ErrorAfterDialog = false;
-            ignoreAlways = true;
-            break;
-        default: DEBUG_BREAK;
-        }
-#else // !USE_OWN_ERROR_MESSAGE_WINDOW
-#ifdef USE_BUG_TRAP
-        BT_SetUserMessage(assertionInfo);
-#endif
-        DEBUG_BREAK;
-#endif
+        } // switch (result)
     }
+
     if (OnDialog)
         OnDialog(false);
 
+    if (resetFullscreen)
+        windowHandler->ResetFullscreen();
+
     lock.Leave();
+    return result;
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
+AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
                    const char* arg1, const char* arg2)
 {
-    Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
+    return Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
 }
 
 void xrDebug::DoExit(const std::string& message)
 {
+    if (windowHandler)
+        windowHandler->DisableFullscreen();
+
     FlushLog();
-    ShowMessage("Error", message.c_str());
+
+    if (ShowErrorMessage)
+    {
+        const auto result = ShowMessage("Error", message.c_str(), false);
+        if (result != AssertionResult::abort)
+            DEBUG_BREAK;
+    }
+    else
+        ShowMessage("Error", message.c_str());
+
 #if defined(WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
 #endif
+
+    volatile bool neverTrue = false; // if you're under debugger,
+    if (neverTrue && windowHandler) // you can jump here manually
+        windowHandler->ResetFullscreen(); // to reset fullscreen
 }
 
 LPCSTR xrDebug::ErrorToString(long code)
@@ -627,12 +671,6 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
 
-    string_path dumpPath;
-    if (FS.path_exist("$app_data_root$"))
-        FS.update_path(dumpPath, "$app_data_root$", "");
-    xr_strcat(dumpPath, "reports");
-
-    BT_SetReportFilePath(dumpPath);
     BT_SaveSnapshot(nullptr);
 #endif
 }
@@ -652,23 +690,27 @@ void xrDebug::SetupExceptionHandler()
     else
         BT_SetActivityType(BTA_SAVEREPORT);
     BT_SetDialogMessage(BTDM_INTRO2,
-                        "This is X-Ray Engine v1.6 crash reporting client. "
+                        "This is OpenXRay crash reporting client. "
                         "To help the development process, "
                         "please Submit Bug or save report and email it manually (button More...)."
                         "\r\n"
                         "Many thanks in advance and sorry for the inconvenience.");
     BT_SetPreErrHandler(PreErrorHandler, 0);
-    BT_SetAppName("X-Ray Engine");
+    BT_SetAppName("OpenXRay");
     BT_SetReportFormat(BTRF_TEXT);
     BT_SetFlags(BTF_DETAILEDMODE | BTF_ATTACHREPORT);
 
-#ifdef MASTER_GOLD
-    auto minidumpFlags = MiniDumpFilterMemory | MiniDumpScanMemory;
+    auto minidumpFlags = MiniDumpWithDataSegs|
+        MiniDumpWithIndirectlyReferencedMemory |
+        MiniDumpScanMemory |
+        MiniDumpWithProcessThreadData |
+        MiniDumpWithThreadInfo;
 
-    if (strstr(commandLine, "-detailed_minidump"))
-        minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
-#else
-    const auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
+    if (strstr(commandLine, "-full_memory_dump"))
+        minidumpFlags |= MiniDumpWithFullMemory | MiniDumpIgnoreInaccessibleMemory;
+#ifdef MASTER_GOLD
+    else if (!strstr(commandLine, "-detailed_minidump"))
+        minidumpFlags |= MiniDumpFilterMemory;
 #endif
     
     BT_SetDumpType(minidumpFlags);
@@ -677,10 +719,21 @@ void xrDebug::SetupExceptionHandler()
 #endif
 }
 
+void xrDebug::OnFilesystemInitialized()
+{
+#ifdef USE_BUG_TRAP
+    string_path dumpPath;
+    if (FS.update_path(dumpPath, "$app_data_root$", "reports", false))
+    {
+        BT_SetReportFilePath(dumpPath);
+    }
+#endif
+}
+
 void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 {
 #if defined(WINDOWS)
-    int lastErr = GetLastError();
+    const int lastErr = GetLastError();
     if (lastErr == ERROR_SUCCESS)
     {
         *buffer = 0;
@@ -733,27 +786,48 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     }
     if (shared_str_initialized)
         FlushLog();
-#ifndef USE_OWN_ERROR_MESSAGE_WINDOW
-#ifdef USE_OWN_MINI_DUMP
-    SaveMiniDump(exPtrs);
-#endif
-#else
-    if (!ErrorAfterDialog)
+
+    if (windowHandler)
+        windowHandler->DisableFullscreen();
+
+    constexpr pcstr fatalError = "Fatal error";
+
+    AssertionResult msgRes = AssertionResult::abort;
+
+    if (!ErrorAfterDialog && ShowErrorMessage)
     {
         if (OnDialog)
             OnDialog(true);
+
         constexpr pcstr msg = "Fatal error occurred\n\n"
             "Press OK to abort program execution";
-        ShowMessage("Fatal error", msg);
+        msgRes = ShowMessage(fatalError, msg);
     }
-#endif
-    ReportFault(exPtrs, 0);
+
+    BT_SetUserMessage(fatalError);
+    BT_SaveSnapshotEx(exPtrs, nullptr);
+
+    const auto reportRes = ReportFault(exPtrs, 0);
+    if (msgRes != AssertionResult::abort ||
+        reportRes == frrvLaunchDebugger)
+    {
+        while (true)
+        {
+            if (IsDebuggerPresent())
+                DEBUG_BREAK;
+        }
+    }
+
     if (PrevFilter)
         PrevFilter(exPtrs);
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    if (OnDialog)
+
+    if (OnDialog && ShowErrorMessage)
         OnDialog(false);
-#endif
+
+    volatile bool neverTrue = false; // if you're under debugger,
+    if (neverTrue && windowHandler) // you can manually
+        windowHandler->ResetFullscreen(); // reset fullscreen
+
     return EXCEPTION_CONTINUE_SEARCH;
 #else
     return 0;
@@ -852,7 +926,7 @@ void xrDebug::OnThreadSpawn()
 #endif
 }
 
-void xrDebug::Initialize()
+void xrDebug::Initialize(pcstr commandLine)
 {
     *BugReportFile = 0;
     OnThreadSpawn();
@@ -861,5 +935,10 @@ void xrDebug::Initialize()
     // exception handler to all "unhandled" exceptions
 #if defined(WINDOWS)
     PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);
+#endif
+#ifdef DEBUG
+    ShowErrorMessage = true;
+#else
+    ShowErrorMessage = commandLine ? !!strstr(commandLine, "-show_error_window") : false;
 #endif
 }

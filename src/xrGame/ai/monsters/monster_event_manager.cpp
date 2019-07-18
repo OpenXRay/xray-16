@@ -34,7 +34,7 @@ void CMonsterEventManager::raise(EEventType event, IEventData* data)
     if (it == m_event_storage.end())
         return;
 
-    for (auto I = it->second.begin(); I != it->second.end(); I++)
+    for (auto I = it->second.begin(); I != it->second.end(); ++I)
     {
         if (!I->need_remove)
             (I->delegate)(data);
@@ -46,7 +46,7 @@ void CMonsterEventManager::raise(EEventType event, IEventData* data)
 
 void CMonsterEventManager::clear()
 {
-    for (auto I_map = m_event_storage.begin(); I_map != m_event_storage.end(); I_map++)
+    for (auto I_map = m_event_storage.begin(); I_map != m_event_storage.end(); ++I_map)
     {
         I_map->second.clear();
     }

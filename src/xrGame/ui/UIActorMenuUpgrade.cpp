@@ -20,7 +20,8 @@ void CUIActorMenu::InitUpgradeMode()
     m_PartnerCharacterInfo->Show(true);
     m_PartnerMoney->Show(false);
     m_pUpgradeWnd->Show(true);
-    m_pQuickSlot->Show(true);
+    if (m_pQuickSlot)
+        m_pQuickSlot->Show(true);
 
     InitInventoryContents(m_pInventoryBagList);
     VERIFY(m_pPartnerInvOwner);
@@ -74,7 +75,7 @@ void CUIActorMenu::SetupUpgradeItem()
         can_upgrade = CanUpgradeItem(item);
     }
 
-    m_pUpgradeWnd->InitInventory(item, can_upgrade);
+    m_pUpgradeWnd->InitInventory(CurrentItem(), can_upgrade);
     if (m_upgrade_info)
     {
         m_upgrade_info->Show(false);

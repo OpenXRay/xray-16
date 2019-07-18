@@ -58,6 +58,8 @@ public:
 class ENGINE_API CRenderDeviceData
 {
 public:
+    static constexpr u32 MaximalWaitTime = 33; // ms
+
     // Rendering resolution
     u32 dwWidth;
     u32 dwHeight;
@@ -72,6 +74,7 @@ public:
     BOOL b_is_Ready;
     BOOL b_is_Active;
     bool IsAnselActive;
+    bool AllowWindowDrag; // For windowed mode
 
     // Engine flow-control
     u32 dwFrame;
@@ -131,7 +134,7 @@ protected:
 
 #pragma pack(pop)
 // refs
-class ENGINE_API CRenderDevice : public CRenderDeviceBase
+class ENGINE_API CRenderDevice : public CRenderDeviceBase, public IWindowHandler
 {
 public:
     class ENGINE_API CSecondVPParams //--#SM+#-- +SecondVP+
@@ -210,7 +213,8 @@ public:
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
-        : fWidth_2(0), fHeight_2(0), m_editor_module(nullptr), m_editor_initialize(nullptr),
+        : fWidth_2(0), fHeight_2(0), mtProcessingAllowed(false),
+          m_editor_module(nullptr), m_editor_initialize(nullptr),
           m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
     {
         m_sdlWnd = NULL;
@@ -228,16 +232,24 @@ public:
     BOOL Paused();
 
 private:
+    static void PrimaryThreadProc(void* context);
     static void SecondaryThreadProc(void* context);
     static void RenderThreadProc(void* context);
 
 public:
     // Scene control
+    void xr_stdcall ProcessFrame();
+
     void PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input);
-    BOOL Begin();
-    void Clear();
-    void End();
+
+    bool BeforeFrame();
     void FrameMove();
+
+    void BeforeRender();
+    void DoRender();
+    bool RenderBegin();
+    void Clear();
+    void RenderEnd();
 
     void overdrawBegin();
     void overdrawEnd();
@@ -247,8 +259,16 @@ public:
     IC CTimer_paused* GetTimerGlobal() { return &TimerGlobal; }
     u32 TimerAsync() { return TimerGlobal.GetElapsed_ms(); }
     u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
+
+private:
     // Creation & Destroying
-    void Create(void);
+    void CreateInternal();
+    void ResetInternal(bool precache = true);
+
+public:
+    void Create();
+    void WaitUntilCreated();
+
     void Run(void);
     void Destroy(void);
     void Reset(bool precache = true);
@@ -261,6 +281,10 @@ public:
     void ShutDown(void);
     virtual const RenderDeviceStatictics& GetStats() const override { return stats; }
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
+    SDL_Window* GetApplicationWindow() override;
+    void DisableFullscreen() override;
+    void ResetFullscreen() override;
 
     void time_factor(const float& time_factor)
     {
@@ -275,11 +299,21 @@ public:
     }
 
 private:
+    std::atomic<bool> shouldReset;
+    std::atomic<bool> precacheWhileReset;
+    std::atomic<bool> mtProcessingAllowed;
+    Event deviceCreated, deviceReadyToRun;
+    Event primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 
 public:
     volatile BOOL mt_bMustExit;
+
+    bool IsMTProcessingAllowed()
+    {
+        return mtProcessingAllowed;
+    }
 
     ICF void remove_from_seq_parallel(const fastdelegate::FastDelegate0<>& delegate)
     {
@@ -293,7 +327,6 @@ private:
     void CalcFrameStats();
 
 public:
-    void xr_stdcall on_idle();
 #if !defined(LINUX)
     bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif

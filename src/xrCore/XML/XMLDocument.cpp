@@ -360,7 +360,7 @@ size_t XMLDocument::GetNodesNum(pcstr path, const size_t index, pcstr tag_name) 
     return GetNodesNum(node, tag_name);
 }
 
-size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name) const
+size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name, bool includingComments /*= true*/) const
 {
     if (!node)
         return 0;
@@ -376,7 +376,8 @@ size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name) const
 
     while (el)
     {
-        ++result;
+        if (includingComments || el->Type() != TiXmlNode::NodeType::COMMENT)
+            ++result;
         if (!tag_name)
             el = el->NextSibling();
         else
@@ -434,12 +435,14 @@ pcstr XMLDocument::CheckUniqueAttrib(XML_NODE start_node, pcstr tag_name, pcstr 
     {
         pcstr attrib = ReadAttrib(start_node, tag_name, i, attrib_name, nullptr);
 
-        xr_vector<shared_str>::iterator it = std::find(m_AttribValues.begin(), m_AttribValues.end(), attrib);
+        auto it = std::find(m_AttribValues.begin(), m_AttribValues.end(), attrib);
 
         if (m_AttribValues.end() != it)
             return attrib;
 
         m_AttribValues.push_back(attrib);
     }
+
+    m_AttribValues.clear();
     return nullptr;
 }

@@ -23,23 +23,23 @@ protected:
     CUIDoubleProgressBar m_progressDamage;
     CUIDoubleProgressBar m_progressRPM;
 
-    CUIStatic m_icon_acc;
-    CUIStatic m_icon_dam;
-    CUIStatic m_icon_han;
-    CUIStatic m_icon_rpm;
+    CUIStatic* m_icon_acc;
+    CUIStatic* m_icon_dam;
+    CUIStatic* m_icon_han;
+    CUIStatic* m_icon_rpm;
 
-    CUIStatic m_stAmmo;
+    CUIStatic* m_stAmmo;
     CUITextWnd m_textAccuracy;
     CUITextWnd m_textHandling;
     CUITextWnd m_textDamage;
     CUITextWnd m_textRPM;
-    CUITextWnd m_textAmmoTypes;
-    CUITextWnd m_textAmmoUsedType;
-    CUITextWnd m_textAmmoCount;
-    CUITextWnd m_textAmmoCount2;
-    CUIStatic m_stAmmoType1;
-    CUIStatic m_stAmmoType2;
-    CUIStatic m_Prop_line;
+    CUITextWnd* m_textAmmoTypes;
+    CUITextWnd* m_textAmmoUsedType;
+    CUITextWnd* m_textAmmoCount;
+    CUITextWnd* m_textAmmoCount2;
+    CUIStatic* m_stAmmoType1;
+    CUIStatic* m_stAmmoType2;
+    CUIStatic* m_Prop_line;
 };
 
 // -------------------------------------------------------------------------------------------------

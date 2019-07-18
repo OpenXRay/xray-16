@@ -54,6 +54,12 @@ public:
         return Now() - startTime - pauseAccum;
     }
 
+    u64 GetElapsed_ns() const
+    {
+        using namespace std::chrono;
+        return duration_cast<nanoseconds>(getElapsedTime()).count();
+    }
+
     u64 GetElapsed_ms() const
     {
         using namespace std::chrono;
@@ -181,6 +187,13 @@ public:
     }
 
     Duration getElapsedTime() const { return accum; }
+
+    u64 GetElapsed_ns() const
+    {
+        using namespace std::chrono;
+        return duration_cast<nanoseconds>(getElapsedTime()).count();
+    }
+
     u64 GetElapsed_ms() const
     {
         using namespace std::chrono;

@@ -88,6 +88,8 @@ protected:
     bool m_disable_tips;
 
 private:
+    int lastBindedKeys[2];
+
     vecHistory m_cmd_history;
     u32 m_cmd_history_max;
     int m_cmd_history_idx;
@@ -107,6 +109,8 @@ public:
     virtual ~CConsole();
     virtual void Initialize();
     virtual void Destroy();
+
+    virtual void OnDeviceInitialize() {}
 
     virtual void OnRender();
     virtual void OnFrame();

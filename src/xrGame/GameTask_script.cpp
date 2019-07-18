@@ -4,16 +4,26 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CGameTask, (), {
-    class EnumTaskState
-    {
-    };
-    module(luaState)[class_<EnumTaskState>("task")
-                         .enum_("task_state")[value("fail", int(eTaskStateFail)),
-                             value("in_progress", int(eTaskStateInProgress)),
-                             value("completed", int(eTaskStateCompleted)), value("task_dummy", int(eTaskStateDummy))]
-                         .enum_("task_type")[value("storyline", int(eTaskTypeStoryline)),
-                             value("additional", int(eTaskTypeAdditional))],
+SCRIPT_EXPORT(CGameTask, (),
+{
+    class EnumTaskState {};
+
+    module(luaState)
+    [
+        class_<EnumTaskState>("task")
+            .enum_("task_state")
+            [
+                value("fail", int(eTaskStateFail)),
+                value("in_progress", int(eTaskStateInProgress)),
+                value("completed", int(eTaskStateCompleted)),
+                value("task_dummy", int(eTaskStateDummy))
+            ]
+            .enum_("task_type")
+            [
+                value("storyline", int(eTaskTypeStoryline)),
+                value("additional", int(eTaskTypeAdditional)),
+                value("insignificant", int(eTaskTypeInsignificant))
+            ],
 
         class_<CGameTask>("CGameTask")
             .def(constructor<>())
@@ -24,7 +34,7 @@ SCRIPT_EXPORT(CGameTask, (), {
             .def("get_id", &CGameTask::GetID_script)
             .def("set_id", &CGameTask::SetID_script)
             .def("set_type", &CGameTask::SetType_script)
-            //				.def("get_type",							&CGameTask::GetType_script )
+            .def("get_type", &CGameTask::GetType_script)
             .def("set_icon_name", &CGameTask::SetIconName_script)
             .def("get_icon_name", &CGameTask::GetIconName_script)
             .def("set_description", &CGameTask::SetDescription_script)

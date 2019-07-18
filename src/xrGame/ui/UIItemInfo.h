@@ -35,9 +35,9 @@ public:
     virtual ~CUIItemInfo();
     CInventoryItem* CurrentItem() const { return m_pInvItem; }
     void InitItemInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name);
-    void InitItemInfo(LPCSTR xml_name);
-    void InitItem(
-        CUICellItem* pCellItem, CInventoryItem* pCompareItem = NULL, u32 item_price = u32(-1), LPCSTR trade_tip = NULL);
+    bool InitItemInfo(cpcstr xml_name);
+    void InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem = nullptr,
+        u32 item_price = u32(-1), pcstr trade_tip = nullptr);
 
     void TryAddConditionInfo(CInventoryItem& pInvItem, CInventoryItem* pCompareItem);
     void TryAddWpnInfo(CInventoryItem& pInvItem, CInventoryItem* pCompareItem);
@@ -59,7 +59,7 @@ public:
     CUIScrollView* UIDesc;
     bool m_complex_desc;
 
-    //	CUIConditionParams*		UIConditionWnd;
+    CUIConditionParams* UIConditionWnd;
     CUIWpnParams* UIWpnParams;
     CUIArtefactParams* UIArtefactParams;
     UIInvUpgPropertiesWnd* UIProperties;

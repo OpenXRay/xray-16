@@ -163,9 +163,13 @@ protected:
 
 class CUISequenceVideoItem : public CUISequenceItem
 {
-    typedef CUISequenceItem inherited;
-    ref_sound m_sound;
+    using inherited = CUISequenceItem;
+
+    static constexpr size_t channels_count = 2;
+    xr_array<ref_sound, channels_count> m_sound;
+
     FactoryPtr<IUISequenceVideoItem> m_texture;
+
     enum
     {
         etiPlaying = (1 << (eti_last + 0)),
@@ -173,6 +177,7 @@ class CUISequenceVideoItem : public CUISequenceItem
         etiDelayed = (1 << (eti_last + 2)),
         etiBackVisible = (1 << (eti_last + 3)),
     };
+
     float m_delay;
     CUIStatic* m_wnd;
     CUIStatic* m_wnd_bg;

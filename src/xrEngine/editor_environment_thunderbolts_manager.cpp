@@ -161,7 +161,8 @@ void manager::save()
 
     CEnvironment& environment = g_pGamePersistent->Environment();
 
-    config->w_float("environment", "altitude", rad2deg(environment.p_var_alt));
+    // XXX: update weather editor to also use p_var_alt.y
+    config->w_float("environment", "altitude", rad2deg(environment.p_var_alt.x));
     config->w_float("environment", "delta_longitude", rad2deg(environment.p_var_long));
     config->w_float("environment", "min_dist_factor", environment.p_min_dist);
     config->w_float("environment", "tilt", rad2deg(environment.p_tilt));
@@ -173,8 +174,9 @@ void manager::save()
     xr_delete(config);
 }
 
-float manager::altitude_getter() const { return (rad2deg(m_environment.p_var_alt)); }
-void manager::altitude_setter(float value) { m_environment.p_var_alt = deg2rad(value); }
+// XXX: update weather editor to also use p_var_alt.y
+float manager::altitude_getter() const { return (rad2deg(m_environment.p_var_alt.x)); }
+void manager::altitude_setter(float value) { m_environment.p_var_alt.x = deg2rad(value); }
 float manager::longitude_getter() const { return (rad2deg(m_environment.p_var_long)); }
 void manager::longitude_setter(float value) { m_environment.p_var_long = deg2rad(value); }
 float manager::tilt_getter() const { return (rad2deg(m_environment.p_tilt)); }
@@ -192,8 +194,9 @@ void manager::fill(XRay::Editor::property_holder_base* holder)
     float_getter.bind(this, &manager::altitude_getter);
     float_setter.bind(this, &manager::altitude_setter);
 
+    // XXX: update weather editor to also use p_var_alt.y
     holder->add_property("altitude", "thunderbolts", "this option is responsible for thunderbolts altitude (in degrees)",
-        rad2deg(m_environment.p_var_alt), float_getter, float_setter, -360.0f, 360.f);
+        rad2deg(m_environment.p_var_alt.x), float_getter, float_setter, -360.0f, 360.f);
 
     float_getter.bind(this, &manager::longitude_getter);
     float_setter.bind(this, &manager::longitude_setter);
@@ -286,7 +289,7 @@ shared_str manager::unique_collection_id(shared_str const& id) const
     return (m_collections_collection->generate_unique_id(id.c_str()));
 }
 
-SThunderboltDesc* manager::description(CInifile& config, shared_str const& section) const
+SThunderboltDesc* manager::description(const CInifile& config, shared_str const& section) const
 {
     for (const auto &i : m_thunderbolts)
         if (i->id() == section)

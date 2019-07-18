@@ -20,7 +20,7 @@ struct IRender_Mesh
 
     // verts
 #ifdef USE_OGL
-    GLuint p_rm_Vertices;
+    IGLVertexBuffer* p_rm_Vertices;
 #else
     ID3DVertexBuffer* p_rm_Vertices;
 #endif // USE_OGL
@@ -29,7 +29,7 @@ struct IRender_Mesh
 
     // indices
 #ifdef USE_OGL
-    GLuint p_rm_Indices;
+    IGLIndexBuffer* p_rm_Indices;
 #else // USE_OGL
     ID3DIndexBuffer* p_rm_Indices;
 #endif // USE_OGL
@@ -39,10 +39,10 @@ struct IRender_Mesh
 
     IRender_Mesh()
     {
-        p_rm_Vertices   = 0;
+        p_rm_Vertices   = nullptr;
         vBase           = 0;
         vCount          = 0;
-        p_rm_Indices    = 0;
+        p_rm_Indices    = nullptr;
         iBase           = 0;
         iCount          = 0;
         dwPrimitives    = 0;

@@ -18,7 +18,7 @@ protected:
 private:
     // ambient particles
     CParticlesObject* ambient_particles;
-    u32 ambient_sound_next_time[20]; // max snd channels
+    xr_vector<u32> ambient_sound_next_time; // max snd channels
     u32 ambient_effect_next_time;
     u32 ambient_effect_stop_time;
 

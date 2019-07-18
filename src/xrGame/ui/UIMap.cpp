@@ -68,11 +68,15 @@ void CUICustomMap::Draw()
 void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     m_name = name;
-    Fvector4 tmp;
 
-    m_texture = pLtx.r_string(sect_name, "texture");
+    m_texture = pLtx.read_if_exists<pcstr>(sect_name, "texture", "ui\\ui_nomap2");
+    if (pLtx.line_exist(m_name, "texture"))
+        m_texture = pLtx.r_string(m_name, "texture"); // Override if needed
+
+    Fvector4 tmp = pLtx.read_if_exists<Fvector4>(sect_name, "bound_rect", {-10000.0f, -10000.0f, 10000.0f, 10000.0f});
+    pLtx.read_if_exists(tmp, m_name, "bound_rect"); // Override if needed
+
     m_shader_name = sh_name;
-    tmp = pLtx.r_fvector4(sect_name, "bound_rect");
 
     if (!Heading())
     {
@@ -559,6 +563,12 @@ void CUIMiniMap::UpdateSpots()
 
 void CUIMiniMap::Draw()
 {
+    if (ClearSkyMode || ShadowOfChernobylMode)
+    {
+        inherited::Draw();
+        return;
+    }
+
     u32 segments_count = 20;
 
     GEnv.UIRender->SetShader(*m_UIStaticItem.GetShader());

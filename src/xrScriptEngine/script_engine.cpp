@@ -371,7 +371,7 @@ int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
     return result;
 }
 
-bool CScriptEngine::parse_namespace(LPCSTR caNamespaceName, LPSTR b, u32 b_size, LPSTR c, u32 c_size)
+bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size, pstr c, size_t c_size)
 {
     *b = 0;
     *c = 0;
@@ -413,15 +413,15 @@ lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameS
         if (!parse_namespace(caNameSpaceName, a, sizeof(a), b, sizeof(b)))
             return false;
         xr_sprintf(insert, header, caNameSpaceName, a, b);
-        u32 str_len = xr_strlen(insert);
-        u32 const total_size = str_len + tSize;
+        const size_t str_len = xr_strlen(insert);
+        const size_t total_size = str_len + tSize;
         if (total_size >= scriptBufferSize)
         {
             scriptBufferSize = total_size;
             scriptBuffer = (char*)xr_realloc(scriptBuffer, scriptBufferSize);
         }
         xr_strcpy(scriptBuffer, total_size, insert);
-        CopyMemory(scriptBuffer + str_len, caBuffer, u32(tSize));
+        CopyMemory(scriptBuffer + str_len, caBuffer, tSize);
         l_iErrorCode = luaL_loadbuffer(L, scriptBuffer, tSize + str_len, caScriptName);
     }
     else
@@ -445,7 +445,7 @@ bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
         return false;
     }
     strconcat(sizeof(l_caLuaFileName), l_caLuaFileName, "@", caScriptName);
-    if (!load_buffer(lua(), static_cast<LPCSTR>(l_tpFileReader->pointer()), (size_t)l_tpFileReader->length(),
+    if (!load_buffer(lua(), static_cast<LPCSTR>(l_tpFileReader->pointer()), l_tpFileReader->length(),
         l_caLuaFileName, caNameSpaceName))
     {
         // VERIFY(lua_gettop(lua())>=4);
@@ -866,12 +866,15 @@ void CScriptEngine::unload()
     *m_last_no_file = 0;
 }
 
-void CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err)
+bool CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err)
 {
     print_output(L, scriptName, errorCode, err);
     on_error(L);
 
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
+    bool ignoreAlways;
+    const auto result = xrDebug::Fail(ignoreAlways, DEBUG_INFO, "LUA error", err);
+
+    return result == AssertionResult::ignore;
 }
 
 int CScriptEngine::lua_panic(lua_State* L)
@@ -891,10 +894,14 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
     const bool isString = lua_isstring(L, -1);
     const pcstr err = isString ? lua_tostring(L, -1) : "";
 
-    onErrorCallback(L, "", LUA_ERRRUN, err);
+    const bool result = onErrorCallback(L, "", LUA_ERRRUN, err);
 
     if (isString)
         lua_pop(L, 1);
+
+    if (result)
+        return LUA_OK;
+
     return LUA_ERRRUN;
 }
 #if 1 //!XRAY_EXCEPTIONS
@@ -974,6 +981,22 @@ void CScriptEngine::setup_auto_load()
     // lua_settop(lua(), 0);
 }
 
+// initialize lua standard library functions
+struct luajit
+{
+    static void open_lib(lua_State* L, pcstr module_name, lua_CFunction function)
+    {
+        lua_pushcfunction(L, function);
+        lua_pushstring(L, module_name);
+        lua_call(L, 1, 0);
+    }
+
+    static void allow_escape_sequences(bool allowed)
+    {
+        lj_allow_escape_sequences(allowed ? 1 : 0);
+    }
+};
+
 void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 {
 #ifdef USE_LUA_STUDIO
@@ -983,8 +1006,20 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #endif
     reinit();
     luabind::open(lua());
-    // XXX: temporary workaround to preserve backwards compatibility with game scripts
-    luabind::disable_super_deprecation();
+
+    // Workarounds to preserve backwards compatibility with game scripts
+    {
+        const bool nilConversion =
+            pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", true);
+     
+        luabind::allow_nil_conversion(nilConversion);
+        luabind::disable_super_deprecation();
+
+        const bool escapeSequences =
+            pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_escape_sequences", false);
+        luajit::allow_escape_sequences(escapeSequences);
+    }
+
     luabind::bind_class_info(lua());
     setup_callbacks();
     if (exporterFunc)
@@ -1005,16 +1040,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         dumper.Dump(lua(), writer, options);
         FS.w_close(writer);
     }
-    // initialize lua standard library functions
-    struct luajit
-    {
-        static void open_lib(lua_State* L, pcstr module_name, lua_CFunction function)
-        {
-            lua_pushcfunction(L, function);
-            lua_pushstring(L, module_name);
-            lua_call(L, 1, 0);
-        }
-    };
+
     luajit::open_lib(lua(), "", luaopen_base);
     luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
     luajit::open_lib(lua(), LUA_TABLIBNAME, luaopen_table);
@@ -1027,6 +1053,19 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
+
+    // Game scripts doesn't call randomize but use random
+    // So, we should randomize in the engine.
+    {
+        pcstr randomSeed = "math.randomseed(os.time())";
+        pcstr mathRandom = "math.random()";
+
+        luaL_dostring(lua(), randomSeed);
+        // It's a good practice to call random few times before using it
+        for (int i = 0; i < 3; ++i)
+            luaL_dostring(lua(), mathRandom);
+    }
+
     // XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
     // is that lua hooks somehow make 'super' global unavailable (is's used all over the vanilla scripts).
     // You can disable script profiler by commenting out the following lines in the beginning of _g.script:
@@ -1099,7 +1138,7 @@ bool CScriptEngine::load_file(const char* scriptName, const char* namespaceName)
 
 bool CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_exist)
 {
-    u32 string_length = xr_strlen(file_name);
+    const size_t string_length = xr_strlen(file_name);
     if (!warn_if_not_exist && no_file_exists(file_name, string_length))
         return false;
     string_path S, S1;
@@ -1176,7 +1215,7 @@ CScriptProcess* CScriptEngine::script_process(const ScriptProcessor& process_id)
     return nullptr;
 }
 
-void CScriptEngine::parse_script_namespace(const char* name, char* ns, u32 nsSize, char* func, u32 funcSize)
+void CScriptEngine::parse_script_namespace(pcstr name, pstr ns, size_t nsSize, pstr func, size_t funcSize)
 {
     const char* p = strrchr(name, '.');
     if (!p)
@@ -1186,7 +1225,7 @@ void CScriptEngine::parse_script_namespace(const char* name, char* ns, u32 nsSiz
     }
     else
     {
-        VERIFY(u32(p - name + 1) <= nsSize);
+        VERIFY(size_t(p - name + 1) <= nsSize);
         strncpy(ns, name, p - name);
         ns[p - name] = 0;
     }
@@ -1256,14 +1295,14 @@ bool CScriptEngine::UnregisterState(lua_State* state)
     return result;
 }
 
-bool CScriptEngine::no_file_exists(LPCSTR file_name, u32 string_length)
+bool CScriptEngine::no_file_exists(pcstr file_name, size_t string_length)
 {
     if (m_last_no_file_length != string_length)
         return false;
     return !memcmp(m_last_no_file, file_name, string_length);
 }
 
-void CScriptEngine::add_no_file(LPCSTR file_name, u32 string_length)
+void CScriptEngine::add_no_file(pcstr file_name, size_t string_length)
 {
     m_last_no_file_length = string_length;
     CopyMemory(m_last_no_file, file_name, string_length + 1);

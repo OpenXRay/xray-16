@@ -1013,7 +1013,7 @@ bool game_sv_CaptureTheArtefact::LoadAnomaliesItems(LPCSTR ini_set_id, TAnomalie
 
     u32 const str_size = xr_strlen(anomaly_string);
     u32 const buffer_size = (str_size + 1) * sizeof(char);
-    PSTR temp_str = static_cast<PSTR>(_alloca(buffer_size));
+    PSTR temp_str = static_cast<PSTR>(xr_alloca(buffer_size));
     for (u32 i = 0; i < items_count; ++i)
     {
         _GetItem(anomaly_string, i, temp_str, buffer_size);
@@ -1207,7 +1207,7 @@ void game_sv_CaptureTheArtefact::LoadArtefactRPoints()
         FS.r_close(F);
     }
     // verifying initialization of all rpoints
-    for (TeamsMap::const_iterator i = teams.begin(); i != teams.end(); i++)
+    for (TeamsMap::const_iterator i = teams.begin(); i != teams.end(); ++i)
     {
         if (!i->second.rPointInitialized)
         {
@@ -1622,7 +1622,7 @@ void game_sv_CaptureTheArtefact::ProcessPlayerDeath(game_PlayerState* playerStat
 void game_sv_CaptureTheArtefact::ReSpawnArtefacts()
 {
     TeamsMap::iterator te = teams.end();
-    for (TeamsMap::iterator ti = teams.begin(); ti != te; ti++)
+    for (TeamsMap::iterator ti = teams.begin(); ti != te; ++ti)
     {
         VERIFY2(!!ti->second.artefactName, make_string("not found artefact class name for team %d", ti->first).c_str());
         CSE_ALifeItemArtefact* tempSvEntity =

@@ -96,12 +96,102 @@ public:
     Root& sections() { return DATA; }
     Root const& sections() const { return DATA; }
 
+    // Generic reading templated functions
     template<typename T>
-    T read_if_exists(pcstr section, pcstr line, T defaultValue) const;
+    T read(pcstr section, pcstr line) const;
 
     template<typename T>
-    T read_if_exists(const shared_str& section, pcstr line, T defaultValue) const;
+    T read(const shared_str& section, pcstr line) const
+    {
+        return read<T>(section.c_str(), line);
+    }
 
+    template<typename T>
+    bool try_read(T& outValue, pcstr section, pcstr line) const;
+
+    template<typename T>
+    bool try_read(T& outValue, const shared_str& section, pcstr line) const
+    {
+        return try_read<T>(outValue, section.c_str(), line);
+    }
+
+    // Returns value if it exist, or returns default value
+    template<typename T>
+    T read_if_exists(pcstr section, pcstr line, T defaultValue) const
+    {
+        if (line_exist(section, line))
+        {
+            return read<T>(section, line);
+        }
+        return defaultValue;
+    }
+
+    template<typename T>
+    T read_if_exists(const shared_str& section, pcstr line, T defaultValue) const
+    {
+        return read_if_exists<T>(section.c_str(), line, defaultValue);
+    }
+
+    // Returns true if value is exist and assigns it or returns false
+    template<typename T>
+    bool read_if_exists(T& outValue, pcstr section, pcstr line) const
+    {
+        if (line_exist(section, line))
+        {
+            outValue = read<T>(section, line);
+            return true;
+        }
+        return false;
+    }
+
+    template<typename T>
+    bool read_if_exists(T& outValue, const shared_str& section, pcstr line) const
+    {
+        return read_if_exists(outValue, section.c_str(), line);
+    }
+
+    // Returns true if value or fallback value exist, crashes otherwise
+    template<typename T>
+    bool read_if_exists(T& outValue, pcstr section, pcstr line, pcstr line2, bool at_least_one = false) const
+    {
+        if (line_exist(section, line))
+        {
+            outValue = read<T>(section, line);
+            return true;
+        }
+        if (line_exist(section, line2))
+        {
+            outValue = read<T>(section, line2);
+            return true;
+        }
+        if (at_least_one)
+            outValue = read<T>(section, line); // provoke crash
+        return false;
+    }
+
+    template<typename T>
+    bool read_if_exists(T& outValue, const shared_str& section, pcstr line, pcstr line2, bool at_least_one = false) const
+    {
+        return read_if_exists(outValue, section.c_str(), line, line2, at_least_one);
+    }
+
+    template<typename T>
+    bool try_read_if_exists(T& outValue, pcstr section, pcstr line) const
+    {
+        if (line_exist(section, line))
+        {
+            return try_read<T>(outValue, section, line);
+        }
+        return false;
+    }
+
+    template<typename T>
+    bool try_read_if_exists(T& outValue, const shared_str& section, pcstr line) const
+    {
+        return try_read_if_exists(outValue, section.c_str(), line);
+    }
+
+    // Generic reading functions
     CLASS_ID r_clsid(pcstr S, pcstr L) const;
     CLASS_ID r_clsid(const shared_str& S, pcstr L) const { return r_clsid(*S, L); }
     pcstr r_string(pcstr S, pcstr L) const; // Left quotes in place

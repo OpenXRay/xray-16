@@ -151,7 +151,7 @@ public:
     ICF xr_vector<RESULT>* r_get() { return &rd; };
     RESULT& r_add();
     void r_free();
-    ICF int r_count() { return rd.size(); };
+    ICF size_t r_count() { return rd.size(); };
     ICF void r_clear() { rd.clear(); };
     ICF void r_clear_compact() { rd.clear(); };
 };
@@ -214,11 +214,11 @@ public:
     void add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 dummy, u32 flags);
 
     xr_vector<Fvector>& getV_Vec() { return verts; }
-    Fvector* getV() { return &*verts.begin(); }
+    Fvector* getV() { return &verts.front(); }
     size_t getVS() { return verts.size(); }
-    TRI* getT() { return &*faces.begin(); }
-    u32 getfFlags(u32 index) { return flags[index]; }
-    IC TRI& getT(u32 index) { return faces[index]; }
+    TRI* getT() { return &faces.front(); }
+    u32 getfFlags(size_t index) { return flags[index]; }
+    IC TRI& getT(size_t index) { return faces[index]; }
     size_t getTS() { return faces.size(); }
     void clear();
 };

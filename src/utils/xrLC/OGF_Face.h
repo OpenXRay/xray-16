@@ -203,7 +203,7 @@ struct OGF : public OGF_Base
 
     virtual void GetGeometry(xr_vector<Fvector>& R)
     {
-        for (xr_vector<OGF_Vertex>::iterator I = data.vertices.begin(); I != data.vertices.end(); I++)
+        for (xr_vector<OGF_Vertex>::iterator I = data.vertices.begin(); I != data.vertices.end(); ++I)
             R.push_back(I->P);
     }
 };
@@ -230,7 +230,7 @@ struct OGF_Reference : public OGF_Base
     virtual void GetGeometry(xr_vector<Fvector>& R)
     {
         Fvector P;
-        for (xr_vector<OGF_Vertex>::iterator I = model->data.vertices.begin(); I != model->data.vertices.end(); I++)
+        for (xr_vector<OGF_Vertex>::iterator I = model->data.vertices.begin(); I != model->data.vertices.end(); ++I)
         {
             xform.transform_tiny(P, I->P);
             R.push_back(P);
@@ -254,7 +254,7 @@ struct OGF_Node : public OGF_Base
     virtual void Save(IWriter& fs);
     virtual void GetGeometry(xr_vector<Fvector>& R)
     {
-        for (xr_vector<u32>::iterator I = chields.begin(); I != chields.end(); I++)
+        for (xr_vector<u32>::iterator I = chields.begin(); I != chields.end(); ++I)
             g_tree[*I]->GetGeometry(R);
     }
 };

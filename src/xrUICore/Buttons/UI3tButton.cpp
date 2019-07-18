@@ -101,7 +101,7 @@ void CUI3tButton::SetHeight(float height)
     }
 }
 
-void CUI3tButton::InitTexture(LPCSTR tex_name)
+bool CUI3tButton::InitTexture(pcstr tex_name, bool fatal /*= true*/)
 {
     string_path tex_enabled;
     string_path tex_disabled;
@@ -124,27 +124,29 @@ void CUI3tButton::InitTexture(LPCSTR tex_name)
     xr_strcpy(tex_highlighted, tex_name);
     xr_strcat(tex_highlighted, "_h");
 
-    this->InitTexture(tex_enabled, tex_disabled, tex_touched, tex_highlighted);
+    return InitTexture(tex_enabled, tex_disabled, tex_touched, tex_highlighted, fatal);
 }
 
-void CUI3tButton::InitTexture(LPCSTR tex_enabled, LPCSTR tex_disabled, LPCSTR tex_touched, LPCSTR tex_highlighted)
+bool CUI3tButton::InitTexture(pcstr tex_enabled, pcstr tex_disabled, pcstr tex_touched, pcstr tex_highlighted, bool fatal /*= true*/)
 {
+    bool failed = false;
     if (m_background)
     {
-        m_background->InitState(S_Enabled, tex_enabled);
-        m_background->InitState(S_Disabled, tex_disabled);
-        m_background->InitState(S_Touched, tex_touched);
-        m_background->InitState(S_Highlighted, tex_highlighted);
+        failed |= !m_background->InitState(S_Enabled, tex_enabled, fatal);
+        failed |= !m_background->InitState(S_Disabled, tex_disabled, fatal);
+        failed |= !m_background->InitState(S_Touched, tex_touched, fatal);
+        failed |= !m_background->InitState(S_Highlighted, tex_highlighted, fatal);
     }
     else if (m_back_frameline)
     {
-        m_back_frameline->InitState(S_Enabled, tex_enabled);
-        m_back_frameline->InitState(S_Disabled, tex_disabled);
-        m_back_frameline->InitState(S_Touched, tex_touched);
-        m_back_frameline->InitState(S_Highlighted, tex_highlighted);
+        failed |= !m_back_frameline->InitState(S_Enabled, tex_enabled, fatal);
+        failed |= !m_back_frameline->InitState(S_Disabled, tex_disabled, fatal);
+        failed |= !m_back_frameline->InitState(S_Touched, tex_touched, fatal);
+        failed |= !m_back_frameline->InitState(S_Highlighted, tex_highlighted, fatal);
     }
 
-    this->m_bTextureEnable = true;
+    m_bTextureEnable = true;
+    return !failed;
 }
 
 void CUI3tButton::SetTextureOffset(float x, float y)

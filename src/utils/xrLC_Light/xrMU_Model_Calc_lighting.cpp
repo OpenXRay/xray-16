@@ -134,15 +134,15 @@ void xrMU_Model::calc_lighting(
 
         // Decrement to the start and inc to end
         while (it != g_trans.begin() && ((it->first + eps2) > key))
-            it--;
+            --it;
         while (it2 != g_trans.end() && ((it2->first - eps2) < key))
-            it2++;
+            ++it2;
         if (it2 != g_trans.end())
-            it2++;
+            ++it2;
 
         // Search
         BOOL found = FALSE;
-        for (; it != it2; it++)
+        for (; it != it2; ++it)
         {
             v_vertices& VL = it->second;
             _vertex* Front = VL.front();
@@ -170,7 +170,7 @@ void xrMU_Model::calc_lighting(
     */
 
     // Process all groups
-    for (mapVertIt it = g_trans.begin(); it != g_trans.end(); it++)
+    for (mapVertIt it = g_trans.begin(); it != g_trans.end(); ++it)
     {
         // Unique
         v_vertices& VL = it->second;
@@ -219,7 +219,7 @@ void xrMU_Model::calc_lighting()
     // BB
     Fbox BB;
     BB.invalidate();
-    for (v_vertices_it vit = m_vertices.begin(); vit != m_vertices.end(); vit++)
+    for (v_vertices_it vit = m_vertices.begin(); vit != m_vertices.end(); ++vit)
         BB.modify((*vit)->P);
 
     // Export CForm

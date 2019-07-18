@@ -180,6 +180,8 @@ public:
     virtual BOOL occ_visible(sPoly& P) override;
 
     // Main
+    void BeforeFrame() override;
+
     virtual void Calculate() override;
     virtual void Render() override;
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;

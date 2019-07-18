@@ -122,7 +122,7 @@ CGamePersistent::CGamePersistent(void)
     ambient_effect_wind_out_time = 0.f;
     ambient_effect_wind_on = false;
 
-    ZeroMemory(ambient_sound_next_time, sizeof(ambient_sound_next_time));
+    ambient_sound_next_time.reserve(32);
 
     m_pMainMenu = nullptr;
     m_intro = nullptr;
@@ -166,8 +166,6 @@ CGamePersistent::~CGamePersistent(void)
 
 void CGamePersistent::PreStart(LPCSTR op)
 {
-    if (!GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new UILoadingScreen());
     inherited::PreStart(op);
 }
 
@@ -217,6 +215,8 @@ void CGamePersistent::OnAppStart()
     GEnv.UI = new UICore();
     m_pMainMenu = new CMainMenu();
 
+    pApp->SetLoadingScreen(new UILoadingScreen());
+
 #ifdef WINDOWS
     ansel = new AnselManager();
     ansel->Load();
@@ -229,6 +229,7 @@ void CGamePersistent::OnAppEnd()
     if (m_pMainMenu->IsActive())
         m_pMainMenu->Activate(false);
 
+    pApp->DestroyLoadingScreen();
     xr_delete(m_pMainMenu);
     xr_delete(GEnv.UI);
 
@@ -305,10 +306,7 @@ void CGamePersistent::WeathersUpdate()
         if (actor)
             bIndoor = actor->renderable_ROS()->get_luminocity_hemi() < 0.05f;
 
-        int data_set = (Random.randF() < (1.f - Environment().CurrentEnv->weight)) ? 0 : 1;
-
-        CEnvDescriptor* const current_env = Environment().Current[0];
-        VERIFY(current_env);
+        const size_t data_set = (Random.randF() < (1.f - Environment().CurrentEnv->weight)) ? 0 : 1;
 
         CEnvDescriptor* const _env = Environment().Current[data_set];
         VERIFY(_env);
@@ -316,14 +314,15 @@ void CGamePersistent::WeathersUpdate()
         CEnvAmbient* env_amb = _env->env_ambient;
         if (env_amb)
         {
-            CEnvAmbient::SSndChannelVec& vec = current_env->env_ambient->get_snd_channels();
-            auto I = vec.begin();
-            auto E = vec.end();
+            CEnvAmbient::SSndChannelVec& vec = env_amb->get_snd_channels();
 
-            for (u32 idx = 0; I != E; ++I, ++idx)
+            auto I = vec.cbegin();
+            const auto E = vec.cend();
+
+            for (size_t idx = 0; I != E; ++I, ++idx)
             {
                 CEnvAmbient::SSndChannel& ch = **I;
-                R_ASSERT(idx < 20);
+
                 if (ambient_sound_next_time[idx] == 0) // first
                 {
                     ambient_sound_next_time[idx] = Device.dwTimeGlobal + ch.get_rnd_sound_first_time();
@@ -347,30 +346,12 @@ void CGamePersistent::WeathersUpdate()
 #endif // DEBUG
 
                     VERIFY(snd._handle());
-                    u32 _length_ms = iFloor(snd.get_length_sec() * 1000.0f);
+                    const u32 _length_ms = iFloor(snd.get_length_sec() * 1000.0f);
                     ambient_sound_next_time[idx] = Device.dwTimeGlobal + _length_ms + ch.get_rnd_sound_time();
-                    //					Msg("- Playing ambient sound channel [%s]
-                    // file[%s]",ch.m_load_section.c_str(),snd._handle()->file_name());
+                    //Msg("- Playing ambient sound channel [%s] file[%s]", ch.m_load_section.c_str(), snd._handle()->file_name());
                 }
             }
-            /*
-                        if (Device.dwTimeGlobal > ambient_sound_next_time)
-                        {
-                            ref_sound* snd			= env_amb->get_rnd_sound();
-                            ambient_sound_next_time	= Device.dwTimeGlobal + env_amb->get_rnd_sound_time();
-                            if (snd)
-                            {
-                                Fvector	pos;
-                                float	angle		= ::Random.randF(PI_MUL_2);
-                                pos.x				= _cos(angle);
-                                pos.y				= 0;
-                                pos.z				= _sin(angle);
-                                pos.normalize		().mul(env_amb->get_rnd_sound_dist()).add(Device.vCameraPosition);
-                                pos.y				+= 10.f;
-                                snd->play_at_pos	(0,pos);
-                            }
-                        }
-            */
+
             // start effect
             if ((FALSE == bIndoor) && (0 == ambient_particles) && Device.dwTimeGlobal > ambient_effect_next_time)
             {
@@ -482,11 +463,7 @@ void CGamePersistent::WeathersUpdate()
 bool allow_intro()
 {
 #if defined(WINDOWS)
-#ifdef MASTER_GOLD
-    if (g_SASH.IsRunning())
-#else // #ifdef MASTER_GOLD
     if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
-#endif // #ifdef MASTER_GOLD
 #else
     if (0 != strstr(Core.Params, "-nointro"))
 #endif
@@ -544,10 +521,10 @@ void CGamePersistent::game_loaded()
             load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
         {
             VERIFY(NULL == m_intro);
-            m_intro = new CUISequencer();
-            m_intro->Start("game_loaded");
             Msg("intro_start game_loaded");
+            m_intro = new CUISequencer();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
+            m_intro->Start("game_loaded");
         }
         m_intro_event = 0;
     }
@@ -562,6 +539,8 @@ void CGamePersistent::update_game_loaded()
 
 void CGamePersistent::start_game_intro()
 {
+    load_screen_renderer.stop();
+
     if (!allow_intro())
     {
         m_intro_event = 0;
@@ -574,9 +553,9 @@ void CGamePersistent::start_game_intro()
         if (0 == xr_stricmp(m_game_params.m_new_or_load, "new"))
         {
             VERIFY(NULL == m_intro);
+            Log("intro_start intro_game");
             m_intro = new CUISequencer();
             m_intro->Start("intro_game");
-            Msg("intro_start intro_game");
         }
     }
 }
@@ -624,6 +603,9 @@ void CGamePersistent::OnFrame()
 #endif
     if (!GEnv.isDedicatedServer && !m_intro_event.empty())
         m_intro_event();
+
+    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 1 && !m_intro && m_intro_event.empty())
+        pApp->LoadForceFinish(); // hack
 
     if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 0 && !m_intro && m_intro_event.empty())
         load_screen_renderer.stop();
@@ -684,7 +666,7 @@ void CGamePersistent::OnFrame()
                         CSE_ALifeCreatureActor* s_actor = smart_cast<CSE_ALifeCreatureActor*>(e);
                         VERIFY(s_actor);
                         xr_vector<u16>::iterator it = s_actor->children.begin();
-                        for (; it != s_actor->children.end(); it++)
+                        for (; it != s_actor->children.end(); ++it)
                         {
                             IGameObject* obj = Level().Objects.net_Find(*it);
                             if (obj && Engine.Sheduler.Registered(obj))
@@ -880,21 +862,28 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
     pApp->LoadStage();
     if (change_tip)
     {
+        bool noTips = false;
         string512 buff;
         u8 tip_num;
         luabind::functor<u8> m_functor;
-        bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
+        const bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
         if (is_single)
         {
-            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_tip_number", m_functor));
-            tip_num = m_functor(map_name.c_str());
+            if (GEnv.ScriptEngine->functor("loadscreen.get_tip_number", m_functor))
+                tip_num = m_functor(map_name.c_str());
+            else
+                noTips = true;
         }
         else
         {
-            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_mp_tip_number", m_functor));
-            tip_num = m_functor(map_name.c_str());
+            if (GEnv.ScriptEngine->functor("loadscreen.get_mp_tip_number", m_functor))
+                tip_num = m_functor(map_name.c_str());
+            else
+                noTips = true;
         }
-        //		tip_num = 83;
+        if (noTips)
+            return;
+
         xr_sprintf(buff, "%s%d:", StringTable().translate("ls_tip_number").c_str(), tip_num);
         shared_str tmp = buff;
 
@@ -944,11 +933,11 @@ void CGamePersistent::RestoreEffectorDOF() { SetEffectorDOF(m_dof[3]); }
 //	m_dof		[4];	// 0-dest 1-current 2-from 3-original
 void CGamePersistent::UpdateDof()
 {
-    static float diff_far = pSettings->r_float("zone_pick_dof", "far"); // 70.0f;
-    static float diff_near = pSettings->r_float("zone_pick_dof", "near"); //-70.0f;
-
     if (m_bPickableDOF)
     {
+        static float diff_far = pSettings->read_if_exists<float>("zone_pick_dof", "far", 70.0f);
+        static float diff_near = pSettings->read_if_exists<float>("zone_pick_dof", "near", -70.0f);
+
         Fvector pick_dof;
         pick_dof.y = HUD().GetCurrentRayQuery().range;
         pick_dof.x = pick_dof.y + diff_near;

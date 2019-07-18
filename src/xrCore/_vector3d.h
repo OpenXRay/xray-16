@@ -2,6 +2,7 @@
 #ifndef __V3D__
 #define __V3D__
 #include <algorithm>
+#include <cmath>
 #include "xrCommon/inlining_macros.h"
 #include "_types.h"
 #include "_random.h"
@@ -18,8 +19,8 @@ struct _vector3
     T x, y, z;
 
     // access operators
-    ICF T& operator[](int i) { return *((T*)this + i); }
-    ICF T& operator[](int i) const { return *((T*)this + i); }
+    ICF T& operator[](size_t i) { return *((T*)this + i); }
+    ICF T& operator[](size_t i) const { return *((T*)this + i); }
 
     ICF SelfRef set(T _x, T _y, T _z) noexcept
     {

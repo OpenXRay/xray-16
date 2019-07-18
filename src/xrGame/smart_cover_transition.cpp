@@ -45,7 +45,7 @@ bool action::applicable() const
 
 void action::load_animations(luabind::object const& table)
 {
-    for (luabind::iterator it(table), end; it != end; it++)
+    for (luabind::iterator it(table), end; it != end; ++it)
     {
         auto tmp = *it;
         Fvector const& pos = parse_fvector(tmp, "position");

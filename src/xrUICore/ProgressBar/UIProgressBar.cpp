@@ -65,10 +65,6 @@ void CUIProgressBar::UpdateProgressBar()
         }
         else
             m_UIProgressItem.SetTextureColor(m_maxColor.get());
-
-        // XXX: Implement color smoothing
-        if (colorSmoothing)
-            R_ASSERT2(false, "color smoothing is not implemented.");
     }
 }
 

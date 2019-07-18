@@ -25,7 +25,7 @@ void CUIOptionsManager::RegisterItem(CUIOptionsItem* item, const shared_str& gro
 void CUIOptionsManager::UnRegisterItem(CUIOptionsItem* item)
 {
     groups_it it;
-    for (it = m_groups.begin(); it != m_groups.end(); it++)
+    for (it = m_groups.begin(); it != m_groups.end(); ++it)
     {
         for (u32 i = 0; i < (*it).second.size(); i++)
             if ((*it).second[i] == item)

@@ -7,11 +7,17 @@ template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)
 {
-    result->sh = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size);
+    HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
+    if (!SUCCEEDED(_hr))
+    {
+        Log("! Shader: ", file_name);
+        Msg("! CreateHWShader hr == 0x%08x", _hr);
+        return E_FAIL;
+    }
 
     LPCVOID data = nullptr;
 
-    HRESULT const _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+    _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
 
     if (SUCCEEDED(_hr) && data)
     {
@@ -68,7 +74,7 @@ public:
         }
 
         // duplicate and zero-terminate
-        u32 size = R->length();
+        const size_t size = R->length();
         u8* data = xr_alloc<u8>(size + 1);
         CopyMemory(data, R->pointer(), size);
         data[size] = 0;
@@ -93,11 +99,13 @@ HRESULT CRender::shader_compile(
 {
     D3DXMACRO defines[128];
     int def_it = 0;
-    char c_smapsize[32];
-    char c_gloss[32];
-    char c_sun_shafts[32];
-    char c_ssao[32];
-    char c_sun_quality[32];
+    
+    // Don't move these variables to lower scope!
+    string32 c_smapsize;
+    string32 c_gloss;
+    string32 c_sun_shafts;
+    string32 c_ssao;
+    string32 c_sun_quality;
 
     char sh_name[MAX_PATH] = "";
     u32 len = 0;
@@ -107,9 +115,8 @@ HRESULT CRender::shader_compile(
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
-        VERIFY(xr_strlen(c_smapsize) == 4 || atoi(c_smapsize) < 16384);
         xr_strcat(sh_name, c_smapsize);
-        len += 4;
+        len += xr_strlen(c_smapsize);
     }
 
     if (o.fp16_filter)

@@ -5,9 +5,7 @@
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "Level.h"
 #include "ai_space.h"
-#include "script_engine.h"
-
-using namespace luabind;
+#include "xrScriptEngine/script_engine.hpp"
 
 void game_sv_mp_script::SetHitParams(NET_Packet* P, float impulse, float power)
 {
@@ -142,6 +140,8 @@ void game_sv_mp_script::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 Game
 
 #pragma warning(push)
 #pragma warning(disable : 4709)
+using namespace luabind;
+using namespace luabind::policy;
 
 template <typename T>
 struct CWrapperBase : public T, public luabind::wrap_base
@@ -159,10 +159,13 @@ struct CWrapperBase : public T, public luabind::wrap_base
     //	DEFINE_LUA_WRAPPER_METHOD_V1(OnDelayedRoundEnd, ERoundEnd_Result)
     DEFINE_LUA_WRAPPER_METHOD_V0(OnRoundEnd)
 
-    virtual game_PlayerState* createPlayerState()
+    game_PlayerState* createPlayerState() override
     {
-        return call_member<game_PlayerState*>(this, "createPlayerState")[adopt(result)];
+        return call_member<game_PlayerState*>(this, "createPlayerState");
+        // XXX: investigate
+        //return call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
     }
+
     static game_PlayerState* createPlayerState_static(inherited* ptr)
     {
         return ptr->self_type::inherited::createPlayerState();
@@ -174,43 +177,50 @@ struct CWrapperBase : public T, public luabind::wrap_base
 #pragma warning(pop)
 
 #pragma optimize("s", on)
-void game_sv_mp::script_register(lua_State* L)
+void game_sv_mp_script_register(lua_State* luaState)
 {
-    module(L)[class_<game_sv_mp, game_sv_GameState>("game_sv_mp")
-                  .def(constructor<>())
-                  //.def("SpawnWeaponForActor",		&game_sv_mp::SpawnWeaponForActor)
-                  .def("KillPlayer", &game_sv_mp::KillPlayer)
-                  .def("SendPlayerKilledMessage", &game_sv_mp::SendPlayerKilledMessage)
-                  .def("signal_Syncronize", &game_sv_GameState::signal_Syncronize)];
+    module(luaState)
+    [
+        class_<game_sv_mp, game_sv_GameState>("game_sv_mp")
+            .def(constructor<>())
+            //.def("SpawnWeaponForActor", &game_sv_mp::SpawnWeaponForActor)
+            .def("KillPlayer", &game_sv_mp::KillPlayer)
+            .def("SendPlayerKilledMessage", &game_sv_mp::SendPlayerKilledMessage)
+            .def("signal_Syncronize", &game_sv_GameState::signal_Syncronize)
+    ];
 }
 
-void game_sv_mp_script::script_register(lua_State* L)
+void game_sv_mp_script_script_register(lua_State* luaState)
 {
-    typedef CWrapperBase<game_sv_mp_script> WrapType;
-    typedef game_sv_mp_script BaseType;
+    using WrapType = CWrapperBase<game_sv_mp_script>;
+    using BaseType = game_sv_mp_script;
 
-    module(L)[class_<game_sv_mp_script, WrapType, game_sv_mp>("game_sv_mp_script")
-                  .def(constructor<>())
-                  .def("GetTeamData", &GetTeamData)
-                  .def("SpawnPlayer", &SpawnPlayer)
-                  .def("switch_Phase", &switch_Phase)
-                  .def("SetHitParams", &BaseType::SetHitParams)
-                  .def("GetHitParamsPower", &BaseType::GetHitParamsPower)
-                  .def("GetHitParamsImpulse", &BaseType::GetHitParamsImpulse)
+    module(luaState)
+    [
+        class_<game_sv_mp_script, game_sv_mp, default_holder, WrapType>("game_sv_mp_script")
+            .def(constructor<>())
+            .def("GetTeamData", &game_sv_mp_script::GetTeamData)
+            .def("SpawnPlayer", &game_sv_mp_script::SpawnPlayer)
+            .def("switch_Phase", &game_sv_mp_script::switch_Phase)
+            .def("SetHitParams", &BaseType::SetHitParams)
+            .def("GetHitParamsPower", &BaseType::GetHitParamsPower)
+            .def("GetHitParamsImpulse", &BaseType::GetHitParamsImpulse)
 
-                  .def("type_name", &BaseType::type_name, &WrapType::type_name_static)
-                  .def("Update", &BaseType::Update, &WrapType::Update_static)
-                  .def("OnEvent", &BaseType::OnEvent, &WrapType::OnEvent_static)
-                  .def("Create", (void (BaseType::*)(LPCSTR))(&BaseType::Create), &WrapType::Create_static)
+            .def("type_name", &BaseType::type_name, &WrapType::type_name_static)
+            .def("Update", &BaseType::Update, &WrapType::Update_static)
+            .def("OnEvent", &BaseType::OnEvent, &WrapType::OnEvent_static)
+            .def("Create", (void (BaseType::*)(LPCSTR))(&BaseType::Create), &WrapType::Create_static)
 
-                  .def("OnPlayerHitPlayer", &BaseType::OnPlayerHitPlayer, &WrapType::OnPlayerHitPlayer_static)
+            .def("OnPlayerHitPlayer", &BaseType::OnPlayerHitPlayer, &WrapType::OnPlayerHitPlayer_static)
 
-                  .def("OnRoundStart", &BaseType::OnRoundStart, &WrapType::OnRoundStart_static)
-                  //			.def("OnDelayedRoundEnd",	&BaseType::OnDelayedRoundEnd,
-                  //&WrapType::OnDelayedRoundEnd_static)
-                  .def("OnRoundEnd", &BaseType::OnRoundEnd, &WrapType::OnRoundEnd_static)
+            .def("OnRoundStart", &BaseType::OnRoundStart, &WrapType::OnRoundStart_static)
+            //.def("OnDelayedRoundEnd", &BaseType::OnDelayedRoundEnd, &WrapType::OnDelayedRoundEnd_static)
+            .def("OnRoundEnd", &BaseType::OnRoundEnd, &WrapType::OnRoundEnd_static)
 
-                  .def("net_Export_State", &BaseType::net_Export_State, &WrapType::net_Export_State_static)
-                  .def("createPlayerState", &BaseType::createPlayerState, &WrapType::createPlayerState_static,
-                      adopt(result))];
+            .def("net_Export_State", &BaseType::net_Export_State, &WrapType::net_Export_State_static)
+            .def("createPlayerState", &BaseType::createPlayerState, &WrapType::createPlayerState_static, adopt<0>())
+    ];
 }
+
+SCRIPT_EXPORT_FUNC(game_sv_mp, (game_sv_GameState), game_sv_mp_script_register);
+SCRIPT_EXPORT_FUNC(game_sv_mp_script, (game_sv_mp), game_sv_mp_script_script_register);

@@ -26,7 +26,7 @@ class effect : public CEnvAmbient::SEffect, public XRay::Editor::property_holder
 public:
     effect(manager const& manager, shared_str const& id);
     virtual ~effect();
-    void load(CInifile& config);
+    void load(const CInifile& config);
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
     inline pcstr id() const { return m_id.c_str(); }

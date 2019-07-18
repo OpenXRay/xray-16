@@ -113,7 +113,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
         R_ASSERT2(source_joints.size() >= spl_inf.m_start_jt_num && source_joints.size() >= spl_inf.m_end_jt_num,
             "wrong spl_inf");
         auto e_joint = source_joints.begin() + spl_inf.m_start_jt_num;
-        for (; i_joint != e_joint; i_joint++)
+        for (; i_joint != e_joint; ++i_joint)
         {
             CPHJointDestroyInfo* jointDestroyInfo = (*i_joint)->JointDestroyInfo();
             if (!jointDestroyInfo)
@@ -161,7 +161,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
         if (!fracturesHolder)
             continue;
         FRACTURE_I f_i = fracturesHolder->m_fractures.begin(), f_e = fracturesHolder->m_fractures.end();
-        for (; f_i != f_e; f_i++)
+        for (; f_i != f_e; ++f_i)
         {
             u16& end_el_num = f_i->m_end_el_num;
             u16& start_el_num = f_i->m_start_el_num;

@@ -136,6 +136,14 @@ namespace ansel
         // Holds the sdk version, doesn't require modifications
         uint64_t sdkVersion;
 
+        // Called when Ansel wants to give the application an opportunity to change image quality.
+        // For example, keeping normal quality in-game for setting up a shot, but boosting quality
+        // when actually taking the shot, then dropping quality back down to normal afterwards
+        // we provide a binary normal/high quality switch using the bool argument (normal=false,high=true)
+        // if the application wants to provide finer controls for quality, it can do so through 
+        // general Ansel SDK user controls
+        ChangeQualityCallback changeQualityCallback;
+
         Configuration()
         {
             right.x = 0.0f;
@@ -166,6 +174,7 @@ namespace ansel
             stopCaptureCallback = nullptr;
             unused2 = true;
             unused1 = false;
+            changeQualityCallback = nullptr;
             sdkVersion = ANSEL_SDK_VERSION;
         }
     };

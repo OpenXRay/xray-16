@@ -275,12 +275,12 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
 
             xr_vector<SlotItemVec*>::iterator _vI = vis.begin();
             xr_vector<SlotItemVec*>::iterator _vE = vis.end();
-            for (; _vI != _vE; _vI++)
+            for (; _vI != _vE; ++_vI)
             {
                 SlotItemVec* items = *_vI;
                 auto _iI = items->begin();
                 auto _iE = items->end();
-                for (; _iI != _iE; _iI++)
+                for (; _iI != _iE; ++_iI)
                 {
                     SlotItem& Instance = **_iI;
                     u32 base = dwBatch * 4;

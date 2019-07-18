@@ -744,15 +744,15 @@ void dInternalStepIsland_x2 (dxWorld *world, dxBody * const *body, int nb,
 	  // get joint numbers and ensure ofs[j1] >= ofs[j2]
 	  int j1 = n1->joint->tag;
 	  int j2 = n2->joint->tag;
+      // if either joint was tagged as -1 then it is an inactive (m=0)
+	  // joint that should not be considered
+	  if (j1==-1 || j2==-1) continue;
+
 	  if (ofs[j1] < ofs[j2]) {
 	    int tmp = j1;
 	    j1 = j2;
 	    j2 = tmp;
 	  }
-
-	  // if either joint was tagged as -1 then it is an inactive (m=0)
-	  // joint that should not be considered
-	  if (j1==-1 || j2==-1) continue;
 
 	  // determine if body i is the 1st or 2nd body of joints j1 and j2
 	  int jb1 = (joint[j1]->node[1].body == body[i]);

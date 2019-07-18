@@ -11,7 +11,7 @@ static class cl_sampler : public R_constant_setup
     }
 } binder_sampler;
 
-IC bool p_sort(ref_constant C1, ref_constant C2)
+IC bool p_sort(const ref_constant& C1, const ref_constant& C2)
 {
     return xr_strcmp(C1->name, C2->name) < 0;
 }

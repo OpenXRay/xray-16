@@ -80,15 +80,21 @@ IC bool _valid(const float x) noexcept
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
 #if defined(WINDOWS) && defined(_MSC_VER)
-    int cls = _fpclass(double(x));
+#if defined(XR_X64)
+    const int cls = _fpclassf(x);
+#else
+    const int cls = _fpclass(static_cast<double>(x));
+#endif // XR_X64
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
-    int cls = std::fpclassify((double )x);
+    const int cls = std::fpclassify(x);
     switch (cls)
     {
     case FP_NAN:
+        [[fallthrough]];
     case FP_INFINITE:
+        [[fallthrough]];
     case FP_SUBNORMAL:
         return false;
     default:
@@ -111,15 +117,17 @@ IC bool _valid(const double x)
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
 #if defined(WINDOWS) && defined(_MSC_VER)
-    int cls = _fpclass(x);
+    const int cls = _fpclass(x);
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
-    int cls = std::fpclassify((double )x);
+    const int cls = std::fpclassify(x);
     switch (cls)
     {
     case FP_NAN:
+        [[fallthrough]];
     case FP_INFINITE:
+        [[fallthrough]];
     case FP_SUBNORMAL:
         return false;
     default:
@@ -185,7 +193,7 @@ inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCST
     return result;
 }
 
-template <int count>
+template <size_t count>
 inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, ...)
 {
     va_list args;
@@ -236,13 +244,13 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 }
 #endif // #ifndef MASTER_GOLD
 
-template <int count>
+template <size_t count>
 inline int xr_strcpy(char(&destination)[count], LPCSTR source)
 {
     return xr_strcpy(destination, count, source);
 }
 
-template <int count>
+template <size_t count>
 inline int xr_strcat(char(&destination)[count], LPCSTR source)
 {
     return xr_strcat(destination, count, source);

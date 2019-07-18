@@ -58,6 +58,7 @@ CAI_Bloodsucker::CAI_Bloodsucker()
     m_runaway_invisible_time = 0;
 
     using namespace detail::bloodsucker;
+    m_critical_hit_chance = default_critical_hit_chance;
 }
 
 CAI_Bloodsucker::~CAI_Bloodsucker() { xr_delete(StateMan); }
@@ -107,7 +108,7 @@ void CAI_Bloodsucker::Load(LPCSTR section)
         anim().AddAnim(eAnimStandTurnLeft, "stand_turn_ls_", -1, &velocity_turn, PS_STAND);
         anim().AddAnim(eAnimStandTurnRight, "stand_turn_rs_", -1, &velocity_turn, PS_STAND);
         anim().AddAnim(eAnimSleep, "lie_sleep_", -1, &velocity_none, PS_LIE);
-        anim().AddAnim(eAnimSleepStanding, "stand_sleep_", -1, &velocity_none, PS_STAND);
+        anim().AddAnim(eAnimSleepStanding, { "stand_sleep_", true }, -1, &velocity_none, PS_STAND);
         anim().AddAnim(eAnimWalkFwd, "stand_walk_fwd_", -1, &velocity_walk, PS_STAND);
         anim().AddAnim(eAnimWalkDamaged, "stand_walk_fwd_dmg_", -1, &velocity_walk_dmg, PS_STAND);
         anim().AddAnim(eAnimRun, "stand_run_", -1, &velocity_run, PS_STAND);
@@ -148,7 +149,7 @@ void CAI_Bloodsucker::Load(LPCSTR section)
             "fx_stand_l", "fx_stand_r");
         anim().AddAnim(
             eAnimSleep, "lie_sleep_", -1, &velocity_none, PS_LIE, "fx_run_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
-        anim().AddAnim(eAnimSleepStanding, "stand_sleep_", -1, &velocity_none, PS_STAND, "fx_run_f", "fx_stand_b",
+        anim().AddAnim(eAnimSleepStanding, { "stand_sleep_", true }, -1, &velocity_none, PS_STAND, "fx_run_f", "fx_stand_b",
             "fx_stand_l", "fx_stand_r");
         anim().AddAnim(eAnimWalkFwd, "stand_walk_fwd_", -1, &velocity_walk, PS_STAND, "fx_run_f", "fx_stand_b",
             "fx_stand_l", "fx_stand_r");
@@ -243,9 +244,9 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 
     m_vampire_want_speed = pSettings->r_float(section, "Vampire_Want_Speed");
     m_vampire_wound = pSettings->r_float(section, "Vampire_Wound");
-    m_vampire_gain_health = pSettings->r_float(section, "Vampire_GainHealth");
-    m_vampire_distance = pSettings->r_float(section, "Vampire_Distance");
-    m_sufficient_hits_before_vampire = pSettings->r_u32(section, "Vampire_Sufficient_Hits");
+    m_vampire_gain_health = pSettings->read_if_exists<float>(section, "Vampire_GainHealth", 0.5f);
+    m_vampire_distance = pSettings->read_if_exists<float>(section, "Vampire_Distance", 1.0f);
+    m_sufficient_hits_before_vampire = pSettings->read_if_exists<u32>(section, "Vampire_Sufficient_Hits", 5);
     m_sufficient_hits_before_vampire_random = -1 + (rand() % 3);
 
     invisible_particle_name = pSettings->r_string(section, "Particle_Invisible");
@@ -253,6 +254,9 @@ void CAI_Bloodsucker::Load(LPCSTR section)
     using namespace detail::bloodsucker;
 
     READ_IF_EXISTS(pSettings, r_float, section, "separate_factor", 0.f);
+
+    m_critical_hit_chance = pSettings->read_if_exists<float>(section, "critical_hit_chance",
+        default_critical_hit_chance);
 
     m_visibility_state_change_min_delay = READ_IF_EXISTS(
         pSettings, r_u32, section, "visibility_state_change_min_delay", default_visibility_state_change_min_delay);

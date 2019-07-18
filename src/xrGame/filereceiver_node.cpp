@@ -63,7 +63,7 @@ void split_received_to_buffers(u8* data_ptr, u32 data_size, buffer_vector<const_
     while (!tmp_reader.eof())
     {
         u32 const tmp_buffer_size = tmp_reader.r_u32();
-        int current_pos = tmp_reader.tell();
+        const size_t current_pos = tmp_reader.tell();
         u8 const* tmp_buffer_ptr = static_cast<u8 const*>(tmp_reader.pointer());
         dst_buffers.push_back(std::make_pair(tmp_buffer_ptr, tmp_buffer_size));
         tmp_reader.seek(current_pos + tmp_buffer_size);

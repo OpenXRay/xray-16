@@ -76,7 +76,7 @@ void flares::load(CInifile& config, shared_str const& section)
             min_flare_count);
 
     u32 const buffer_size = max_string_count * sizeof(char);
-    pstr result = (pstr)_alloca(buffer_size);
+    pstr result = (pstr)xr_alloca(buffer_size);
     for (u32 i = 0; i < min_flare_count; ++i)
     {
         flare* object = new flare();

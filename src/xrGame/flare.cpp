@@ -45,7 +45,7 @@ void CFlare::OnStateSwitch(u32 S, u32 oldState)
     case eFlareShowing:
     {
         g_player_hud->attach_item(this);
-        PlayHUDMotion("anm_show", TRUE, this, GetState());
+        PlayHUDMotion("anm_show", "anim_show", TRUE, this, GetState());
         SetPending(TRUE);
     }
     break;
@@ -53,7 +53,7 @@ void CFlare::OnStateSwitch(u32 S, u32 oldState)
     {
         if (oldState != eFlareHiding)
         {
-            PlayHUDMotion("anm_hide", TRUE, this, GetState());
+            PlayHUDMotion("anm_hide", "anim_hide", TRUE, this, GetState());
             SetPending(TRUE);
         }
     }
@@ -69,7 +69,7 @@ void CFlare::OnStateSwitch(u32 S, u32 oldState)
     break;
     case eFlareDropping:
     {
-        PlayHUDMotion("anm_drop", TRUE, this, GetState());
+        PlayHUDMotion("anm_drop", "anim_drop", TRUE, this, GetState());
         SetPending(TRUE);
     }
     break;

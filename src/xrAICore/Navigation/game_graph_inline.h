@@ -13,14 +13,22 @@ inline void CGameGraph::Initialize(IReader& stream, bool own)
     ownReader = own;
     m_reader = &stream;
     m_header.load(m_reader);
-    R_ASSERT2(header().version() == XRAI_CURRENT_VERSION, "Graph version mismatch!");
+    ASSERT_XRAI_VERSION_MATCH(header().version(), "Game graph version mismatch!");
     m_nodes = (CVertex*)m_reader->pointer();
     m_current_level_some_vertex_id = _GRAPH_ID(-1);
     m_enabled.assign(header().vertex_count(), true);
+
+    if (header().version() <= XRAI_VERSION_SOC)
+    {
+        m_cross_tables = nullptr;
+        m_current_level_cross_table = nullptr;
+        return;
+    }
+
     u8* temp = (u8*)(m_nodes + header().vertex_count());
     temp += header().edge_count() * sizeof(CGameGraph::CEdge);
     m_cross_tables = (u32*)(((CLevelPoint*)temp) + header().death_point_count());
-    m_current_level_cross_table = 0;
+    m_current_level_cross_table = nullptr;
 }
 
 IC CGameGraph::CGameGraph(LPCSTR file_name, u32 current_version)
@@ -250,21 +258,29 @@ IC void GameGraph::CHeader::save(IWriter* writer)
 IC void CGameGraph::set_current_level(u32 const level_id)
 {
     xr_delete(m_current_level_cross_table);
-    u32* current_cross_table = m_cross_tables;
-    GameGraph::LEVEL_MAP::const_iterator I = header().levels().begin();
-    GameGraph::LEVEL_MAP::const_iterator E = header().levels().end();
-    for (; I != E; ++I)
+    if (m_cross_tables)
     {
-        if (level_id != (*I).first)
+        u32* current_cross_table = m_cross_tables;
+        GameGraph::LEVEL_MAP::const_iterator I = header().levels().begin();
+        GameGraph::LEVEL_MAP::const_iterator E = header().levels().end();
+        for (; I != E; ++I)
         {
-            current_cross_table = (u32*)((u8*)current_cross_table + *current_cross_table);
-            continue;
+            if (level_id != (*I).first)
+            {
+                current_cross_table = (u32*)((u8*)current_cross_table + *current_cross_table);
+                continue;
+            }
+
+            m_current_level_cross_table = new CGameLevelCrossTable(current_cross_table + 1, *current_cross_table);
+            break;
         }
-
-        m_current_level_cross_table = new CGameLevelCrossTable(current_cross_table + 1, *current_cross_table);
-        break;
     }
-
+    else
+    {
+        string_path fName;
+        FS.update_path(fName, "$level$", CROSS_TABLE_NAME);
+        m_current_level_cross_table = new CGameLevelCrossTable(fName);
+    }
     VERIFY(m_current_level_cross_table);
 
     m_current_level_some_vertex_id = _GRAPH_ID(-1);

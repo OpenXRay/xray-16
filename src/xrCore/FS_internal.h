@@ -12,9 +12,13 @@
 #include <share.h>
 #endif
 
-void* FileDownload(LPCSTR fn, u32* pdwSize = NULL);
-void FileCompress(const char* fn, const char* sign, void* data, u32 size);
-void* FileDecompress(const char* fn, const char* sign, u32* size = NULL);
+#if defined(FREEBSD)
+#define _sys_errlist sys_errlist
+#endif
+
+void* FileDownload(pcstr fn, size_t* pdwSize = nullptr);
+void FileCompress(pcstr fn, pcstr sign, void* data, size_t size);
+void* FileDecompress(pcstr fn, pcstr sign, size_t* size = nullptr);
 
 class CFileWriter : public IWriter
 {
@@ -31,7 +35,7 @@ public:
         convert_path_separators(conv_fn);
         if (exclusive)
         {
-            int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
+            const int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
 #ifdef _EDITOR
             if (handle == -1)
                 Msg("!Can't create file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
@@ -64,13 +68,13 @@ public:
         }
     }
     // kernel
-    virtual void w(const void* _ptr, u32 count)
+    void w(const void* _ptr, size_t count) override
     {
         if ((0 != hf) && (0 != count))
         {
-            const u32 mb_sz = 0x1000000;
+            const size_t mb_sz = 0x1000000; // 2 MB
             u8* ptr = (u8*)_ptr;
-            int req_size;
+            size_t req_size;
             for (req_size = count; req_size > mb_sz; req_size -= mb_sz, ptr += mb_sz)
             {
                 size_t W = fwrite(ptr, mb_sz, 1, hf);
@@ -83,14 +87,16 @@ public:
             }
         }
     };
-    virtual void seek(u32 pos)
+
+    void seek(size_t pos) override
     {
         if (0 != hf)
             fseek(hf, pos, SEEK_SET);
     };
-    virtual u32 tell() { return (0 != hf) ? ftell(hf) : 0; };
-    virtual bool valid() { return (0 != hf); }
-    virtual void flush()
+    size_t tell() override { return (0 != hf) ? ftell(hf) : 0; };
+    bool valid() override { return (0 != hf); }
+
+    void flush() override
     {
         if (hf)
             fflush(hf);
@@ -101,7 +107,7 @@ public:
 class CTempReader : public IReader
 {
 public:
-    CTempReader(void* _data, int _size, int _iterpos) : IReader(_data, _size, _iterpos) {}
+    CTempReader(void* _data, size_t _size, size_t _iterpos) : IReader(_data, _size, _iterpos) {}
     virtual ~CTempReader();
 };
 class CPackReader : public IReader
@@ -109,7 +115,7 @@ class CPackReader : public IReader
     void* base_address;
 
 public:
-    CPackReader(void* _base, void* _data, int _size) : IReader(_data, _size) { base_address = _base; }
+    CPackReader(void* _base, void* _data, size_t _size) : IReader(_data, _size), base_address(_base) {}
     virtual ~CPackReader();
 };
 class XRCORE_API CFileReader : public IReader

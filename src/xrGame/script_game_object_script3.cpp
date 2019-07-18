@@ -163,15 +163,22 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 
         .def("give_info_portion", &CScriptGameObject::GiveInfoPortion)
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
+
         .def("give_game_news",
             (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int))(&CScriptGameObject::GiveGameNews))
         .def("give_game_news",
             (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int, int))(&CScriptGameObject::GiveGameNews))
 
-        .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))(
-                                      &CScriptGameObject::AddIconedTalkMessage_old)) // old version, must remove!
-        .def("give_talk_message2",
-            (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))(&CScriptGameObject::AddIconedTalkMessage))
+        .def("clear_game_news", &CScriptGameObject::ClearGameNews)
+
+        .def("give_talk_message", (void (CScriptGameObject::*)(cpcstr, cpcstr, Frect, cpcstr))
+            (&CScriptGameObject::AddIconedTalkMessage))
+
+        .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))
+            (&CScriptGameObject::AddIconedTalkMessage_old)) // old version, must remove!
+
+        .def("give_talk_message2", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))
+            (&CScriptGameObject::AddIconedTalkMessage))
 
         .def("has_info", &CScriptGameObject::HasInfo)
         .def("dont_has_info", &CScriptGameObject::DontHasInfo)

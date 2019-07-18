@@ -5,6 +5,8 @@
 
 CUIProgressShape::CUIProgressShape()
 {
+    m_pBackground = nullptr;
+    m_pTexture = nullptr;
     m_bText = false;
     m_blend = true;
     m_angle_begin = 0.0f;
@@ -22,7 +24,10 @@ void CUIProgressShape::SetPos(int pos, int max)
     if (m_bText)
     {
         string256 _buff;
-        TextItemControl()->SetText(xr_itoa(pos, _buff, 10));
+        if (m_pTexture)
+            m_pTexture->SetText(xr_itoa(pos, _buff, 10));
+        else
+            TextItemControl()->SetText(xr_itoa(pos, _buff, 10));
     }
 }
 
@@ -56,24 +61,43 @@ float calc_color(u32 idx, u32 total, float stage, float max_stage, bool blend)
 
 void CUIProgressShape::Draw()
 {
-    if (m_bText)
-        DrawText();
+    if (m_pBackground)
+        m_pBackground->Draw();
 
-    GEnv.UIRender->SetShader(*GetShader());
+    if (m_bText)
+    {
+        if (m_pTexture)
+            m_pTexture->DrawText();
+        else
+            DrawText();
+    }
+
+    if (m_pTexture)
+        GEnv.UIRender->SetShader(*m_pTexture->GetShader());
+    else
+        GEnv.UIRender->SetShader(*GetShader());
+
     Fvector2 tsize;
     GEnv.UIRender->GetActiveTextureResolution(tsize);
 
     GEnv.UIRender->StartPrimitive(m_sectorCount * 3, IUIRender::ptTriList, UI().m_currentPointType);
 
     Frect pos_rect;
-    GetAbsoluteRect(pos_rect);
+    if (m_pTexture)
+        m_pTexture->GetAbsoluteRect(pos_rect);
+    else
+        GetAbsoluteRect(pos_rect);
     UI().ClientToScreenScaled(pos_rect.lt, pos_rect.x1, pos_rect.y1);
     UI().ClientToScreenScaled(pos_rect.rb, pos_rect.x2, pos_rect.y2);
 
     Fvector2 center_pos;
     pos_rect.getcenter(center_pos);
 
-    Frect tex_rect = GetUIStaticItem().GetTextureRect();
+    Frect tex_rect;
+    if (m_pTexture)
+        tex_rect = m_pTexture->GetUIStaticItem().GetTextureRect();
+    else
+        tex_rect = GetUIStaticItem().GetTextureRect();
 
     tex_rect.lt.x /= tsize.x;
     tex_rect.lt.y /= tsize.y;

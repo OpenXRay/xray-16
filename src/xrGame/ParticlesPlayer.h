@@ -55,7 +55,7 @@ public:
     {
         if (BI_NONE == bone_index)
             return 0;
-        for (auto it = m_Bones.begin(); it != m_Bones.end(); it++)
+        for (auto it = m_Bones.begin(); it != m_Bones.end(); ++it)
             if (it->index == bone_index)
                 return &(*it);
         return 0;

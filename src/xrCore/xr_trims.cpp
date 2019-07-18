@@ -3,10 +3,10 @@
 #include "xrCore/xr_token.h"
 #include "xrCore/_std_extensions.h"
 
-LPSTR _TrimLeft(LPSTR str)
+LPSTR _TrimLeft(LPSTR str, char whatToTrim /*= ' '*/)
 {
     LPSTR p = str;
-    while (*p && (u8(*p) <= u8(' ')))
+    while (*p && (u8(*p) <= u8(whatToTrim)))
         p++;
     if (p != str)
     {
@@ -18,19 +18,19 @@ LPSTR _TrimLeft(LPSTR str)
     return str;
 }
 
-LPSTR _TrimRight(LPSTR str)
+LPSTR _TrimRight(LPSTR str, char whatToTrim /*= ' '*/)
 {
     LPSTR p = str + xr_strlen(str);
-    while ((p != str) && (u8(*p) <= u8(' ')))
+    while ((p != str) && (u8(*p) <= u8(whatToTrim)))
         p--;
     *(++p) = 0;
     return str;
 }
 
-LPSTR _Trim(LPSTR str)
+LPSTR _Trim(LPSTR str, char whatToTrim /*= ' '*/)
 {
-    _TrimLeft(str);
-    _TrimRight(str);
+    _TrimLeft(str, whatToTrim);
+    _TrimRight(str, whatToTrim);
     return str;
 }
 
@@ -169,7 +169,7 @@ LPSTR _ReplaceItems(LPCSTR src, int idx_start, int idx_end, LPCSTR new_items, LP
 
 xr_string& _ReplaceItems(pcstr src, int idx_start, int idx_end, pcstr new_items, xr_string& dst, char separator)
 {
-    dst = "";
+    dst.clear();
     int level = 0;
     bool bCopy = true;
     for (pcstr p = src; *p != 0; p++)
@@ -226,7 +226,7 @@ LPSTR _ReplaceItem(LPCSTR src, int index, LPCSTR new_item, LPSTR dst, char separ
 
 xr_string& _ReplaceItem(pcstr src, int index, pcstr new_item, xr_string& dst, char separator)
 {
-    dst = "";
+    dst.clear();
     int level = 0;
     bool bCopy = true;
     for (pcstr p = src; *p != 0; p++)
@@ -266,7 +266,7 @@ LPSTR _ChangeSymbol(LPSTR name, char src, char dest)
 
 xr_string& _ChangeSymbol(xr_string& name, char src, char dest)
 {
-    for (xr_string::iterator it = name.begin(); it != name.end(); it++)
+    for (xr_string::iterator it = name.begin(); it != name.end(); ++it)
         if (*it == src)
             *it = xr_string::value_type(dest);
     return name;
@@ -406,7 +406,7 @@ void _SequenceToList(LPSTRVec& lst, LPCSTR in, char separator)
     {
         _GetItem(in, i, T, separator, 0);
         _Trim(T);
-        if (xr_strlen(T))
+        if (xr_strlen(T) != 0)
             lst.push_back(xr_strdup(T));
     }
 }
@@ -428,25 +428,25 @@ void _SequenceToList(xr_vector<shared_str>& lst, LPCSTR in, char separator)
 void _SequenceToList(SStringVec& lst, LPCSTR in, char separator)
 {
     lst.clear();
-    int t_cnt = _GetItemCount(in, separator);
+    const int t_cnt = _GetItemCount(in, separator);
     xr_string T;
     for (int i = 0; i < t_cnt; i++)
     {
         _GetItem(in, i, T, separator, 0);
         _Trim(T);
         if (T.size())
-            lst.push_back(T.c_str());
+            lst.push_back(T);
     }
 }
 
 xr_string _ListToSequence(const SStringVec& lst)
 {
     static xr_string out;
-    out = "";
-    if (lst.size())
+    out.clear();
+    if (!lst.empty())
     {
         out = lst.front();
-        for (SStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); s_it++)
+        for (SStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); ++s_it)
             out += xr_string(",") + (*s_it);
     }
     return out;
@@ -515,7 +515,7 @@ shared_str _ListToSequence(const RStringVec& lst)
     if (lst.size())
     {
         out = *lst.front();
-        for (RStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); s_it++)
+        for (RStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); ++s_it)
         {
             out += ",";
             out += **s_it;

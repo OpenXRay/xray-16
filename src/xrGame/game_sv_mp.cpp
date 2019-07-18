@@ -308,7 +308,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
 #ifdef DEBUG
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (l_pC && l_pC->ps)
-            Msg("--- GAME_EVENT_PLAYER_KILLED: sender [%d][0x%08x]", l_pC->ps->GameID, sender);
+            Msg("--- GAME_EVENT_PLAYER_KILLED: sender [%d][0x%08x]", l_pC->ps->GameID, sender.value());
 #endif // #ifdef DEBUG
         OnPlayerKilled(P);
     }
@@ -317,7 +317,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
 #ifdef DEBUG
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (l_pC && l_pC->ps)
-            Msg("--- GAME_EVENT_PLAYER_HITTED: sender [%d][0x%08x]", l_pC->ps->GameID, sender);
+            Msg("--- GAME_EVENT_PLAYER_HITTED: sender [%d][0x%08x]", l_pC->ps->GameID, sender.value());
 #endif // #ifdef DEBUG
         OnPlayerHitted(P);
     }
@@ -384,7 +384,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
     break;
     case GAME_EVENT_PLAYER_STARTED: {
 #ifdef DEBUG
-        Msg("--- Player 0x%08x started.", sender);
+        Msg("--- Player 0x%08x started.", sender.value());
 #endif // #ifdef DEBUG
         if (CheckPlayerMapName(sender, P))
         {
@@ -441,7 +441,7 @@ bool game_sv_mp::CheckPlayerMapName(ClientID const& clientID, NET_Packet& P)
 
     if (xr_strcmp(Level().name().c_str(), temp_map_name))
     {
-        Msg("! Player 0x%08x has incorrect map name", clientID, temp_map_name);
+        Msg("! Player 0x%08x has incorrect map name", clientID.value(), temp_map_name);
         // ReconnectPlayer(clientID);
         return false;
     }
@@ -453,7 +453,7 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 void game_sv_mp::ReconnectPlayer(ClientID const& clientID)
 {
 #ifdef DEBUG
-    Msg("--- Reconnecting player 0x%08x", clientID);
+    Msg("--- Reconnecting player 0x%08x", clientID.value());
 #endif // #ifdef DEBUG
     NET_Packet P;
     P.w_begin(M_CHANGE_LEVEL_GAME);
@@ -1692,9 +1692,9 @@ void game_sv_mp::UpdatePlayersMoney()
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
-            game_PlayerState* ps = l_pC->ps;
-            if (!l_pC || !l_pC->net_Ready || !ps)
+            if (!l_pC || !l_pC->net_Ready || !l_pC->ps)
                 return;
+            game_PlayerState* ps = l_pC->ps;
             if (!ps->money_added && ps->m_aBonusMoney.empty())
                 return;
             //-----------------------------------------------------------
@@ -1818,7 +1818,7 @@ void game_sv_mp::RenewAllActorsHealth()
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
-            VERIFY2(l_pC->ps, make_string("player state of client, ClientID = 0x%08x", l_pC->ID.value()).c_str());
+            VERIFY2(l_pC && l_pC->ps, make_string("player state of client, ClientID = 0x%08x", l_pC->ID.value()).c_str());
             if (!l_pC || !l_pC->ps)
             {
                 return;
@@ -2308,11 +2308,11 @@ void game_sv_mp::OnPlayerChangeName(NET_Packet& P, ClientID sender)
     {
         Msg("Player \"%s\" try to change name on \"%s\" at public server.", ps->getName(), NewName);
 
-        NET_Packet P;
-        GenerateGameMessage(P);
-        P.w_u32(GAME_EVENT_SERVER_STRING_MESSAGE);
-        P.w_stringZ("Server is public. Can\'t change player name!");
-        m_server->SendTo(sender, P);
+        NET_Packet P2;
+        GenerateGameMessage(P2);
+        P2.w_u32(GAME_EVENT_SERVER_STRING_MESSAGE);
+        P2.w_stringZ("Server is public. Can\'t change player name!");
+        m_server->SendTo(sender, P2);
         return;
     }
 
@@ -2323,15 +2323,15 @@ void game_sv_mp::OnPlayerChangeName(NET_Packet& P, ClientID sender)
 
     if (pClient->owner)
     {
-        NET_Packet P;
-        GenerateGameMessage(P);
-        P.w_u32(GAME_EVENT_PLAYER_NAME);
-        P.w_u16(pClient->owner->ID);
-        P.w_s16(ps->team);
-        P.w_stringZ(old_name.c_str());
-        P.w_stringZ(ps->getName());
+        NET_Packet P3;
+        GenerateGameMessage(P3);
+        P3.w_u32(GAME_EVENT_PLAYER_NAME);
+        P3.w_u16(pClient->owner->ID);
+        P3.w_s16(ps->team);
+        P3.w_stringZ(old_name.c_str());
+        P3.w_stringZ(ps->getName());
         //---------------------------------------------------
-        real_sender tmp_functor(m_server, &P);
+        real_sender tmp_functor(m_server, &P3);
         m_server->ForEachClientDoSender(tmp_functor);
         //---------------------------------------------------
         pClient->owner->set_name_replace(ps->getName());

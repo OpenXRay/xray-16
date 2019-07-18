@@ -11,6 +11,7 @@
 
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
+#include "Layers/xrRenderGL/glBufferPool.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -18,14 +19,16 @@
 
 IRender_Mesh::~IRender_Mesh()
 {
+    rm_geom.destroy();
 #ifdef USE_OGL
-    glDeleteBuffers(1, &p_rm_Vertices);
-    glDeleteBuffers(1, &p_rm_Indices);
+    if (p_rm_Vertices)
+        GLBuffers.DeleteVertexBuffer(p_rm_Vertices);
+    if (p_rm_Indices)
+        GLBuffers.DeleteIndexBuffer(p_rm_Indices);
 #else // USE_OGL
     _RELEASE(p_rm_Vertices);
     _RELEASE(p_rm_Indices);
 #endif // USE_OGL
-    rm_geom = nullptr;
 }
 
 dxRender_Visual::dxRender_Visual()

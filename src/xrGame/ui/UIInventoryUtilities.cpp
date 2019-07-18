@@ -17,6 +17,7 @@
 #include "Include/xrRender/UIShader.h"
 
 #define BUY_MENU_TEXTURE "ui" DELIMITER "ui_mp_buy_menu"
+#define EQUIPMENT_ICONS  "ui" DELIMITER "ui_icon_equipment"
 #define CHAR_ICONS "ui" DELIMITER "ui_icons_npc"
 #define MAP_ICONS "ui" DELIMITER "ui_icons_map"
 #define MP_CHAR_ICONS "ui" DELIMITER "ui_models_multiplayer"
@@ -35,7 +36,6 @@ ui_shader* g_EquipmentIconsShader = NULL;
 ui_shader* g_MPCharIconsShader = NULL;
 ui_shader* g_OutfitUpgradeIconsShader = NULL;
 ui_shader* g_WeaponUpgradeIconsShader = NULL;
-ui_shader* g_tmpWMShader = NULL;
 static CUIStatic* GetUIStatic();
 
 typedef std::pair<CHARACTER_RANK_VALUE, shared_str> CharInfoStringID;
@@ -47,9 +47,7 @@ CharInfoStrings* charInfoGoodwillStrings = NULL;
 
 void InventoryUtilities::CreateShaders()
 {
-    g_tmpWMShader = new ui_shader();
-    (*g_tmpWMShader)->create("effects" DELIMITER "wallmark", "wm" DELIMITER "wm_grenade");
-    // g_tmpWMShader.create("effects" DELIMITER "wallmark",  "wm" DELIMITER "wm_grenade");
+    // Nothing here. All needed shaders will be created on demand
 }
 
 void InventoryUtilities::DestroyShaders()
@@ -68,9 +66,6 @@ void InventoryUtilities::DestroyShaders()
 
     xr_delete(g_WeaponUpgradeIconsShader);
     g_WeaponUpgradeIconsShader = 0;
-
-    xr_delete(g_tmpWMShader);
-    g_tmpWMShader = 0;
 }
 
 bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
@@ -189,7 +184,7 @@ const ui_shader& InventoryUtilities::GetEquipmentIconsShader()
     if (!g_EquipmentIconsShader)
     {
         g_EquipmentIconsShader = new ui_shader();
-        (*g_EquipmentIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_icon_equipment");
+        (*g_EquipmentIconsShader)->create("hud" DELIMITER "default", EQUIPMENT_ICONS);
     }
 
     return *g_EquipmentIconsShader;
@@ -516,15 +511,15 @@ void InventoryUtilities::SendInfoToLuaScripts(shared_str info)
     {
         int mode = 10; // now Menu is Talk Dialog (show)
         luabind::functor<void> funct;
-        R_ASSERT(GEnv.ScriptEngine->functor("pda.actor_menu_mode", funct));
-        funct(mode);
+        if (GEnv.ScriptEngine->functor("pda.actor_menu_mode", funct))
+            funct(mode);
     }
     if (info == shared_str("ui_talk_hide"))
     {
         int mode = 11; // Talk Dialog hide
         luabind::functor<void> funct;
-        R_ASSERT(GEnv.ScriptEngine->functor("pda.actor_menu_mode", funct));
-        funct(mode);
+        if (GEnv.ScriptEngine->functor("pda.actor_menu_mode", funct))
+            funct(mode);
     }
 }
 // XXX: interpolate color (enemy..neutral..friend)<->(red..gray..lime)
@@ -533,7 +528,7 @@ u32 InventoryUtilities::GetGoodwillColor(CHARACTER_GOODWILL gw)
     u32 res = 0xffc0c0c0;
     if (gw == NEUTRAL_GOODWILL)
     {
-        res = 0xfffce80b; //0xffc0c0c0;
+        res = 0xffc0c0c0;
     }
     else if (gw > 1000)
     {
@@ -569,7 +564,7 @@ u32 InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
     switch (relation)
     {
     case ALife::eRelationTypeFriend: return 0xff00ff00; break;
-    case ALife::eRelationTypeNeutral: return 0xfffce80b/*0xffc0c0c0*/; break;
+    case ALife::eRelationTypeNeutral: return 0xffc0c0c0; break;
     case ALife::eRelationTypeEnemy: return 0xffff0000; break;
     default: NODEFAULT;
     }

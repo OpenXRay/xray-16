@@ -7,7 +7,7 @@ XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;
 XRCORE_API CInifile const* pSettingsOpenXRay = nullptr;
 
-#if defined(LINUX)
+#if defined(LINUX) || defined(FREEBSD)
 #include <stdint.h>
 #define MSVCRT_EINVAL	22
 #define MSVCRT_ERANGE	34
@@ -351,10 +351,10 @@ CInifile::CInifile(pcstr fileName, bool readOnly, bool loadAtStart, bool saveAtE
 
     if (loadAtStart)
     {
-        const xr_string path = EFS_Utils::ExtractFilePath(m_file_name);
         IReader* R = FS.r_open(fileName);
         if (R)
         {
+            const xr_string path = EFS_Utils::ExtractFilePath(m_file_name);
             if (sect_count)
                 DATA.reserve(sect_count);
             Load(R, path.c_str(), allow_include_func);
@@ -455,11 +455,11 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
 
                 string_path fn;
                 strconcat(sizeof fn, fn, path, inc_name);
-                const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
                 if (!allow_include_func || allow_include_func(fn))
                 {
                     IReader* I = FS.r_open(fn);
                     R_ASSERT3(I, "Can't find include file:", inc_name);
+                    const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
                     Load(I, inc_path.c_str(), allow_include_func);
                     FS.r_close(I);
                 }
@@ -503,7 +503,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                     string512 tmp;
                     _GetItem(inherited_names, k, tmp);
                     Sect& inherited_section = r_section(tmp);
-                    for (auto it = inherited_section.Data.begin(); it != inherited_section.Data.end(); it++)
+                    for (auto it = inherited_section.Data.begin(); it != inherited_section.Data.end(); ++it)
                         insert_item(Current, *it);
                 }
             }
@@ -522,20 +522,44 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                     *t = 0;
                     _Trim(name);
                     ++t;
-                    xr_strcpy(value_raw, sizeof value_raw, t);
+                    xr_strcpy(value_raw, t);
                     bInsideSTR = _parse(str2, value_raw);
                     if (bInsideSTR) // multiline str value
                     {
+                        string4096 prevStr;
+                        xr_strcpy(prevStr, str2);
+
+                        bool incorrectFormat = false;
+                        const size_t prevPos = F->tell();
                         while (bInsideSTR)
                         {
                             xr_strcat(value_raw, sizeof value_raw, "\r\n");
                             string4096 str_add_raw;
                             F->r_string(str_add_raw, sizeof str_add_raw);
-                            R_ASSERT2(xr_strlen(value_raw) + xr_strlen(str_add_raw) < sizeof value_raw,
-                                make_string("Incorrect inifile format: section[%s], variable[%s]. Odd number of quotes "
-                                            "(\") found, but "
-                                            "should be even.",
-                                    Current->Name.c_str(), name));
+
+                            cpstr sectionNameTester = strchr(str_add_raw, '[');
+                            if (sectionNameTester)
+                            {
+                                if (strchr(sectionNameTester, ']'))
+                                {
+                                    // That's a new section name! This is 100% error!
+                                    incorrectFormat = true;
+                                }
+                            }
+
+                            if (!(xr_strlen(value_raw) + xr_strlen(str_add_raw) < sizeof value_raw)
+                                || incorrectFormat)
+                            {
+                                Msg("! Incorrect inifile format: section[%s], variable[%s]. Odd number of quotes "
+                                    "(\") found, but "
+                                    "should be even. Trimming it to the first new line.",
+                                    Current->Name.c_str(), name);
+                                _Trim(prevStr, '\"');
+                                xr_strcpy(str2, prevStr);
+                                F->seek(prevPos);
+                                break;
+                            }
+
                             xr_strcat(value_raw, sizeof value_raw, str_add_raw);
                             bInsideSTR = _parse(str2, value_raw);
                             if (bInsideSTR)
@@ -666,7 +690,7 @@ u32 CInifile::line_count(pcstr Sname) const
     Sect& S = r_section(Sname);
     auto I = S.Data.cbegin();
     u32 C = 0;
-    for (; I != S.Data.cend(); I++)
+    for (; I != S.Data.cend(); ++I)
         if (*I->first)
             C++;
     return C;
@@ -863,7 +887,7 @@ Fvector4 CInifile::r_fvector4(pcstr S, pcstr L) const
 bool CInifile::r_bool(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
-    VERIFY2(xr_strlen(C) <= 5, make_string("\"%s\" is not a valid bool value, section[%s], line[%s]", C, S, L));
+    VERIFY2(C && xr_strlen(C) <= 5, make_string("\"%s\" is not a valid bool value, section[%s], line[%s]", C, S, L));
     char B[8];
     xr_strcpy(B, 7, C);
     B[7] = 0;
@@ -891,7 +915,7 @@ bool CInifile::r_line(pcstr S, int L, pcstr* N, pcstr* V) const
     Sect& SS = r_section(S);
     if (L >= (int)SS.Data.size() || L < 0)
         return false;
-    for (auto I = SS.Data.cbegin(); I != SS.Data.cend(); I++)
+    for (auto I = SS.Data.cbegin(); I != SS.Data.cend(); ++I)
         if (!L--)
         {
             *N = *I->first;
@@ -1090,257 +1114,117 @@ void CInifile::remove_line(pcstr S, pcstr L)
 }
 
 template<>
-XRCORE_API u8 CInifile::read_if_exists(pcstr section, pcstr line, u8 defaultValue) const
+XRCORE_API pcstr CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_u8(section, line);
-    return defaultValue;
+    return r_string(section, line);
 }
 
 template<>
-XRCORE_API u8 CInifile::read_if_exists(const shared_str& section, pcstr line, u8 defaultValue) const
+XRCORE_API u8 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_u8(section.c_str(), line);
-    return defaultValue;
+    return r_u8(section, line);
 }
 
 template<>
-XRCORE_API u16 CInifile::read_if_exists(pcstr section, pcstr line, u16 defaultValue) const
+XRCORE_API u16 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_u16(section, line);
-    return defaultValue;
+    return r_u16(section, line);
 }
 
 template<>
-XRCORE_API u16 CInifile::read_if_exists(const shared_str& section, pcstr line, u16 defaultValue) const
+XRCORE_API u32 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_u16(section.c_str(), line);
-    return defaultValue;
+    return r_u32(section, line);
 }
 
 template<>
-XRCORE_API u32 CInifile::read_if_exists(pcstr section, pcstr line, u32 defaultValue) const
+XRCORE_API s8 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_u32(section, line);
-    return defaultValue;
+    return r_s8(section, line);
 }
 
 template<>
-XRCORE_API u32 CInifile::read_if_exists(const shared_str& section, pcstr line, u32 defaultValue) const
+XRCORE_API s16 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_u32(section.c_str(), line);
-    return defaultValue;
+    return r_s16(section, line);
 }
 
 template<>
-XRCORE_API s8 CInifile::read_if_exists(pcstr section, pcstr line, s8 defaultValue) const
+XRCORE_API s32 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s8(section, line);
-    return defaultValue;
+    return r_s32(section, line);
 }
 
 template<>
-XRCORE_API s8 CInifile::read_if_exists(const shared_str& section, pcstr line, s8 defaultValue) const
+XRCORE_API s64 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s8(section.c_str(), line);
-    return defaultValue;
+    return r_s64(section, line);
 }
 
 template<>
-XRCORE_API s16 CInifile::read_if_exists(pcstr section, pcstr line, s16 defaultValue) const
+XRCORE_API float CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s16(section, line);
-    return defaultValue;
+    return r_float(section, line);
 }
 
 template<>
-XRCORE_API s16 CInifile::read_if_exists(const shared_str& section, pcstr line, s16 defaultValue) const
+XRCORE_API Fcolor CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s16(section.c_str(), line);
-    return defaultValue;
+    return r_fcolor(section, line);
 }
 
 template<>
-XRCORE_API s32 CInifile::read_if_exists(pcstr section, pcstr line, s32 defaultValue) const
+XRCORE_API Ivector2 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s32(section, line);
-    return defaultValue;
+    return r_ivector2(section, line);
 }
 
 template<>
-XRCORE_API s32 CInifile::read_if_exists(const shared_str& section, pcstr line, s32 defaultValue) const
+XRCORE_API Ivector3 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s32(section.c_str(), line);
-    return defaultValue;
+    return r_ivector3(section, line);
 }
 
 template<>
-XRCORE_API s64 CInifile::read_if_exists(pcstr section, pcstr line, s64 defaultValue) const
+XRCORE_API Ivector4 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s64(section, line);
-    return defaultValue;
+    return r_ivector4(section, line);
 }
 
 template<>
-XRCORE_API s64 CInifile::read_if_exists(const shared_str& section, pcstr line, s64 defaultValue) const
+XRCORE_API bool CInifile::try_read(Ivector4& outValue, pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_s64(section.c_str(), line);
-    return defaultValue;
+    pcstr C = r_string(section, line);
+    return 4 == sscanf(C, "%d,%d,%d,%d", &outValue.x, &outValue.y, &outValue.z, &outValue.w);
 }
 
 template<>
-XRCORE_API float CInifile::read_if_exists(pcstr section, pcstr line, float defaultValue) const
+XRCORE_API Fvector2 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_float(section, line);
-    return defaultValue;
+    return r_fvector2(section, line);
 }
 
 template<>
-XRCORE_API float CInifile::read_if_exists(const shared_str& section, pcstr line, float defaultValue) const
+XRCORE_API bool CInifile::try_read(Fvector2& outValue, pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_float(section.c_str(), line);
-    return defaultValue;
+    pcstr C = r_string(section, line);
+    return 2 == sscanf(C, "%f,%f", &outValue.x, &outValue.y);
 }
 
 template<>
-XRCORE_API Fcolor CInifile::read_if_exists(pcstr section, pcstr line, Fcolor defaultValue) const
+XRCORE_API Fvector3 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_fcolor(section, line);
-    return defaultValue;
+    return r_fvector3(section, line);
 }
 
 template<>
-XRCORE_API Fcolor CInifile::read_if_exists(const shared_str& section, pcstr line, Fcolor defaultValue) const
+XRCORE_API Fvector4 CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_fcolor(section.c_str(), line);
-    return defaultValue;
+    return r_fvector4(section, line);
 }
 
 template<>
-XRCORE_API Ivector2 CInifile::read_if_exists(pcstr section, pcstr line, Ivector2 defaultValue) const
+XRCORE_API bool CInifile::read(pcstr section, pcstr line) const
 {
-    if (line_exist(section, line))
-        return r_ivector2(section, line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Ivector2 CInifile::read_if_exists(const shared_str& section, pcstr line, Ivector2 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_ivector2(section.c_str(), line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Ivector3 CInifile::read_if_exists(pcstr section, pcstr line, Ivector3 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_ivector3(section, line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Ivector3 CInifile::read_if_exists(const shared_str& section, pcstr line, Ivector3 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_ivector3(section.c_str(), line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Ivector4 CInifile::read_if_exists(pcstr section, pcstr line, Ivector4 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_ivector4(section, line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Ivector4 CInifile::read_if_exists(const shared_str& section, pcstr line, Ivector4 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_ivector4(section.c_str(), line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Fvector2 CInifile::read_if_exists(pcstr section, pcstr line, Fvector2 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_fvector2(section, line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Fvector2 CInifile::read_if_exists(const shared_str& section, pcstr line, Fvector2 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_fvector2(section.c_str(), line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Fvector3 CInifile::read_if_exists(pcstr section, pcstr line, Fvector3 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_fvector3(section, line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Fvector3 CInifile::read_if_exists(const shared_str& section, pcstr line, Fvector3 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_fvector3(section.c_str(), line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Fvector4 CInifile::read_if_exists(pcstr section, pcstr line, Fvector4 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_fvector4(section, line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API Fvector4 CInifile::read_if_exists(const shared_str& section, pcstr line, Fvector4 defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_fvector4(section.c_str(), line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API bool CInifile::read_if_exists(pcstr section, pcstr line, bool defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_bool(section, line);
-    return defaultValue;
-}
-
-template<>
-XRCORE_API bool CInifile::read_if_exists(const shared_str& section, pcstr line, bool defaultValue) const
-{
-    if (line_exist(section, line))
-        return r_bool(section.c_str(), line);
-    return defaultValue;
+    return r_bool(section, line);
 }

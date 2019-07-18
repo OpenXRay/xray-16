@@ -23,7 +23,7 @@ std::string dbg_valide_pos_string(const Fvector& pos, const Fbox& bounds, const 
 {
     return std::string(msg) + make_string("\n pos: %s , seems to be invalid ", get_string(pos).c_str()) +
         make_string("\n Level box: %s ", get_string(bounds).c_str()) + std::string("\n object dump: \n") +
-        (obj ? obj->dump(full) : std::string(""));
+        (obj ? obj->dump(full) : std::string());
 }
 std::string dbg_valide_pos_string(const Fvector& pos, const IPhysicsShellHolder* obj, LPCSTR msg)
 {

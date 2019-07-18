@@ -13,7 +13,6 @@ include_directories(
 #	${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/libogg/include
     ${OGG_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/openal/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
     ${SDL_INCLUDE_DIRS}
     )
 
@@ -32,5 +31,8 @@ cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrAPI xrCDB ${OGG_LIBRARIES} openal vorbis vorbisfile)
-xr_install(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    GROUP_READ 
+    WORLD_READ )
 

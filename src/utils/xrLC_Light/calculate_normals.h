@@ -33,7 +33,7 @@ public:
         Logger.Status("Processing...");
         float sm_cos = _cos(deg2rad(g_params().m_sm_angle));
 
-        for (vecFaceIt it = faces.begin(); it != faces.end(); it++)
+        for (vecFaceIt it = faces.begin(); it != faces.end(); ++it)
         {
             (*it)->flags.bSplitted = true;
             (*it)->CalcNormal();
@@ -78,13 +78,13 @@ public:
         isolate_vertices<type_vertex>(FALSE, vertices);
 
         // Recalculate normals
-        for (vecVertexIt it = vertices.begin(); it != vertices.end(); it++)
+        for (vecVertexIt it = vertices.begin(); it != vertices.end(); ++it)
             (*it)->normalFromAdj();
 
         Logger.clMsg("%d vertices was duplicated 'cause of SM groups", vertices.size() - Vcount);
 
         // Clear temporary flag
-        for (vecFaceIt it = faces.begin(); it != faces.end(); it++)
+        for (vecFaceIt it = faces.begin(); it != faces.end(); ++it)
             (*it)->flags.bSplitted = false;
     }
 };

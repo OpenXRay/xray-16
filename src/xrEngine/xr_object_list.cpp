@@ -38,7 +38,7 @@ void CObjectList::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
         alert->Print(font, "UpdateCL  > 3ms:  %3.1f", stats.Update.result);
 }
 
-CObjectList::CObjectList() : m_owner_thread_id(GetCurrentThreadId())
+CObjectList::CObjectList() : m_owner_thread_id(Threading::GetCurrThreadId())
 {
     statsFrame = u32(-1);
     ZeroMemory(map_NETID, 0xffff * sizeof(IGameObject*));
@@ -258,7 +258,7 @@ void CObjectList::Update(bool bForce)
             stats.Total = objects_active.size() + objects_sleeping.size();
 
             u32 const objects_count = workload->size();
-            IGameObject** objects = (IGameObject**)_alloca(objects_count * sizeof(IGameObject*));
+            IGameObject** objects = (IGameObject**)xr_alloca(objects_count * sizeof(IGameObject*));
             std::copy(workload->begin(), workload->end(), objects);
 
             m_primary_crows.clear();
@@ -289,12 +289,12 @@ void CObjectList::Update(bool bForce)
     if (!destroy_queue.empty())
     {
         // Info
-        for (Objects::iterator oit = objects_active.begin(); oit != objects_active.end(); oit++)
+        for (Objects::iterator oit = objects_active.begin(); oit != objects_active.end(); ++oit)
             for (int it = destroy_queue.size() - 1; it >= 0; it--)
             {
                 (*oit)->net_Relcase(destroy_queue[it]);
             }
-        for (Objects::iterator oit = objects_sleeping.begin(); oit != objects_sleeping.end(); oit++)
+        for (Objects::iterator oit = objects_sleeping.begin(); oit != objects_sleeping.end(); ++oit)
             for (int it = destroy_queue.size() - 1; it >= 0; it--)
                 (*oit)->net_Relcase(destroy_queue[it]);
 

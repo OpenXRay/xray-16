@@ -21,7 +21,7 @@ void CPHCollisionDamageReceiver::Init()
     if (ini->section_exist("collision_damage"))
     {
         CInifile::Sect& data = ini->r_section("collision_damage");
-        for (auto I = data.Data.cbegin(); I != data.Data.cend(); I++)
+        for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
         {
             const CInifile::Item& item = *I;
             u16 index = K->LL_BoneID(*item.first);

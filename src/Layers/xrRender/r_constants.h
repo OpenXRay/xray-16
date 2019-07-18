@@ -146,8 +146,9 @@ typedef resptr_core<R_constant, resptr_base<R_constant>> ref_constant;
 class ECORE_API R_constant_setup
 {
 public:
+    R_constant_setup() = default;
     virtual void setup(R_constant* C) = 0;
-    virtual ~R_constant_setup() {}
+    virtual ~R_constant_setup() = default;
 };
 
 class ECORE_API R_constant_table : public xr_resource_flagged
@@ -170,6 +171,7 @@ private:
 #endif // USE_DX10
 
 public:
+    R_constant_table() = default;
     ~R_constant_table();
 
     void clear();

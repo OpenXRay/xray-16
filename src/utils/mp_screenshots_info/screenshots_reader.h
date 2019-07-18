@@ -26,12 +26,12 @@ public:
     bool const verify();
     bool const is_valid() const { return m_info_section != NULL; };
 private:
-    reader(){};
+    reader() = default;
     u8* m_jpeg_data;
-    u32 m_jpeg_data_size;
+    size_t m_jpeg_data_size;
 
-    u32 m_info_pos;
-    u32 m_info_size;
+    size_t m_info_pos;
+    size_t m_info_size;
 
     CInifile* m_info_section;
     sign_verifyer m_verifyer;

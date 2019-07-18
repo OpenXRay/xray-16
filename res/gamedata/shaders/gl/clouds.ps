@@ -1,8 +1,6 @@
 #include "common.h"
 #include "iostructs\p_clouds.h"
 
-//uniform sampler2D 	s_clouds0;
-//uniform sampler2D 	s_clouds1;
 Texture2D	s_clouds0;
 Texture2D	s_clouds1;
 
@@ -10,12 +8,20 @@ Texture2D	s_clouds1;
 // Pixel
 float4 	_main	( v2p I )
 {
-	float4 	s0		= tex2D		(s_clouds0,I.tc0);
-	float4 	s1		= tex2D		(s_clouds1,I.tc1);
-	float4 	mix 	= I.color * (s0 + s1)	;
+	float4 	s0	=	tex2D(s_clouds0, I.tc0);
+	float4 	s1	=	tex2D(s_clouds1, I.tc1);
+	float4 	mix	=	I.color * (s0 + s1);
 
-	float4 	rgb		= mix		;
+#ifdef USE_VTF
+	return  mix;
+#else // USE_VTF
+	float4 result, high;
 
-//	return  float4	(rgb.rgb, I.color.a);
-	return  rgb;
+	float scale	=	tex2D(s_tonemap, float2(0.5,0.5)).x;
+	tonemap			(result, high, mix.rgb, scale);
+
+	result.a	= mix.a;
+
+	return	result;
+#endif // USE_VTF
 }

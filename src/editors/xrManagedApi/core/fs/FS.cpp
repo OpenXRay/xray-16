@@ -154,7 +154,7 @@ void ReaderBase::ReadScaledDirection([Out] Vector3F % A)
     A = reinterpret_cast<Vector3F&>(tmp);
 }
 void ReaderBase::Rewind() { impl->rewind(); }
-UInt32 ReaderBase::FindChunk(UInt32 id, int* isCompressed) { return impl->find_chunk(id, isCompressed); }
+UInt32 ReaderBase::FindChunk(UInt32 id, bool* isCompressed) { return impl->find_chunk(id, isCompressed); }
 bool ReaderBase::ReadChunk(UInt32 id, void* buffer) { return !!impl->r_chunk(id, buffer); }
 bool ReaderBase::ReadChunkSafe(UInt32 id, void* buffer, UInt32 bufferSize)
 {

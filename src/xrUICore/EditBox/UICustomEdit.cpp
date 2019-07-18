@@ -4,10 +4,12 @@
 #include "xrEngine/line_edit_control.h"
 #include "xrEngine/xr_input.h"
 
+// XXX: replace u32 and int with size_t
+
 CUICustomEdit::CUICustomEdit()
 {
-    m_editor_control = new text_editor::line_edit_control((u32)EDIT_BUF_SIZE);
-    Init((u32)EDIT_BUF_SIZE);
+    m_editor_control = new text_editor::line_edit_control(EDIT_BUF_SIZE);
+    Init(EDIT_BUF_SIZE);
 
     TextItemControl()->SetVTextAlignment(valCenter);
     TextItemControl()->SetTextComplexMode(false);
@@ -15,7 +17,7 @@ CUICustomEdit::CUICustomEdit()
     TextItemControl()->SetCutWordsMode(true);
     TextItemControl()->SetUseNewLineMode(false);
 
-    m_out_str[0] = NULL;
+    m_out_str[0] = '\0';
     m_dx_cur = 0.0f;
     m_read_mode = false;
     m_force_update = true;
@@ -84,7 +86,7 @@ void CUICustomEdit::InitCustomEdit(Fvector2 pos, Fvector2 size)
 }
 
 void CUICustomEdit::SetPasswordMode(bool mode) { TextItemControl()->SetPasswordMode(mode); }
-void CUICustomEdit::OnFocusLost() { inherited::OnFocusLost(); }
+
 void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     //кто-то другой захватил клавиатуру
@@ -93,6 +95,10 @@ void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         m_bInputFocus = false;
         GetMessageTarget()->SendMessage(this, EDIT_TEXT_COMMIT, NULL);
     }
+    else if (msg == WINDOW_FOCUS_RECEIVED)
+        ec().on_ir_capture();
+    else if (msg == WINDOW_FOCUS_LOST)
+        ec().on_ir_release();
 }
 
 bool CUICustomEdit::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -143,6 +149,12 @@ bool CUICustomEdit::OnKeyboardHold(int dik)
     }
 
     ec().on_key_hold(dik);
+    return true;
+}
+
+bool CUICustomEdit::OnTextInput(pcstr text)
+{
+    ec().on_text_input(text);
     return true;
 }
 
@@ -296,7 +308,14 @@ void CUICustomEdit::press_tab()
 void CUICustomEdit::CaptureFocus(bool bCapture)
 {
     if (bCapture)
+    {
         GetParent()->SetKeyboardCapture(this, true);
+        ec().on_ir_capture();
+    }
+    else
+    {
+        ec().on_ir_release();
+    }
 
     m_bInputFocus = bCapture;
 }

@@ -117,7 +117,7 @@ extern u16 RegisterShader(LPCSTR T);
 
 void CBuild::Light_prepare()
 {
-    for (vecFaceIt I = lc_global_data()->g_faces().begin(); I != lc_global_data()->g_faces().end(); I++)
+    for (vecFaceIt I = lc_global_data()->g_faces().begin(); I != lc_global_data()->g_faces().end(); ++I)
         (*I)->CacheOpacity();
     for (u32 m = 0; m < mu_models().size(); m++)
         mu_models()[m]->calc_faceopacity();

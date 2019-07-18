@@ -80,7 +80,7 @@ private:
     CScriptThread* m_current_thread;
     bool m_reload_modules;
     string128 m_last_no_file;
-    u32 m_last_no_file_length;
+    size_t m_last_no_file_length;
     static string4096 g_ca_stdout;
     bool logReenterability = false;
     bool bindingsDumped = false;
@@ -110,12 +110,12 @@ private:
     static CScriptEngine* GetInstance(lua_State* state);
     static bool RegisterState(lua_State* state, CScriptEngine* scriptEngine);
     static bool UnregisterState(lua_State* state);
-    bool no_file_exists(LPCSTR file_name, u32 string_length);
-    void add_no_file(LPCSTR file_name, u32 string_length);
+    bool no_file_exists(pcstr file_name, size_t string_length);
+    void add_no_file(pcstr file_name, size_t string_length);
 
 protected:
     int vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, va_list marker);
-    bool parse_namespace(LPCSTR caNamespaceName, LPSTR b, u32 b_size, LPSTR c, u32 c_size);
+    bool parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size, pstr c, size_t c_size);
     bool do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName);
     void reinit();
 
@@ -141,7 +141,7 @@ public:
 
 private:
     static void print_error(lua_State* L, int iErrorCode);
-    static void onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err = nullptr);
+    static bool onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err = nullptr);
 
 public:
     static void on_error(lua_State* state);
@@ -177,7 +177,7 @@ public:
     bool process_file(LPCSTR file_name);
     bool process_file(LPCSTR file_name, bool reload_modules);
     bool function_object(LPCSTR function_to_call, luabind::object& object, int type = LUA_TFUNCTION);
-    void parse_script_namespace(const char* name, char* ns, u32 nsSize, char* func, u32 funcSize);
+    void parse_script_namespace(pcstr name, pstr ns, size_t nsSize, pstr func, size_t funcSize);
     template <typename TResult>
     IC bool functor(LPCSTR function_to_call, luabind::functor<TResult>& lua_function);
 #ifdef USE_DEBUGGER

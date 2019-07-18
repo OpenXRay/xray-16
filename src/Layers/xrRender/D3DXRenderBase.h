@@ -176,7 +176,7 @@ public:
     void r_dsgraph_render_subspace(
         IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
     void r_dsgraph_render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
-    virtual void Copy(IRender& _in) override;
+
     //	Gamma correction functions
     virtual void setGamma(float fGamma) override;
     virtual void setBrightness(float fGamma) override;
@@ -209,12 +209,15 @@ public:
     virtual bool GetForceGPU_REF() override;
     virtual u32 GetCacheStatPolys() override;
     virtual void Begin() override;
+    void BeforeFrame() override {}
     virtual void Clear() override;
     virtual void End() override;
     virtual void ClearTarget() override;
     virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) override;
     virtual void OnAssetsChanged() override;
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
+    void MakeContextCurrent(bool /*acquire*/) override {}
 
 public:
     CResourceManager* Resources;

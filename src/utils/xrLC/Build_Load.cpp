@@ -14,12 +14,12 @@ template <class T>
 void transfer(const char* name, xr_vector<T>& dest, IReader& F, u32 chunk)
 {
     IReader* O = F.open_chunk(chunk);
-    u32 count = O ? (O->length() / sizeof(T)) : 0;
+    size_t count = O ? (O->length() / sizeof(T)) : 0;
     Logger.clMsg("* %16s: %d", name, count);
     if (count)
     {
         dest.reserve(count);
-        dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count);
+        dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count); //-V595
     }
     if (O)
         O->close();
@@ -45,7 +45,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     // HANDLE		hLargeHeap	= HeapCreate(0,64*1024*1024,0);
     // clMsg		("* <LargeHeap> handle: %X",hLargeHeap);
 
-    u32 i = 0;
+    size_t i = 0;
 
     float p_total = 0;
     float p_cost = 1.f / 3.f;
@@ -61,7 +61,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     Logger.Status("Vertices...");
     {
         F = fs.open_chunk(EB_Vertices);
-        u32 v_count = F->length() / sizeof(b_vertex);
+        size_t v_count = F->length() / sizeof(b_vertex);
         lc_global_data()->g_vertices().reserve(3 * v_count / 2);
         scene_bb.invalidate();
         for (i = 0; i < v_count; i++)
@@ -81,7 +81,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     {
         F = fs.open_chunk(EB_Faces);
         R_ASSERT(F);
-        u32 f_count = F->length() / sizeof(b_face);
+        size_t f_count = F->length() / sizeof(b_face);
         lc_global_data()->g_faces().reserve(f_count);
         for (i = 0; i < f_count; i++)
         {
@@ -96,7 +96,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                 _F->dwMaterialGame = B.dwMaterialGame;
 
                 // Vertices and adjacement info
-                for (u32 it = 0; it < 3; ++it)
+                for (size_t it = 0; it < 3; ++it)
                 {
                     int id = B.v[it];
                     R_ASSERT(id < (int)lc_global_data()->g_vertices().size());
@@ -127,14 +127,14 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             R_ASSERT2(F, "EB_SmoothGroups chunk not found.");
 
             u32* sm_groups = NULL;
-            u32 sm_count = F->length() / sizeof(u32);
+            size_t sm_count = F->length() / sizeof(u32);
 
             R_ASSERT(sm_count == lc_global_data()->g_faces().size());
             sm_groups = xr_alloc<u32>(sm_count);
             F->r(sm_groups, F->length());
             F->close();
 
-            for (u32 idx = 0; idx < sm_count; ++idx)
+            for (size_t idx = 0; idx < sm_count; ++idx)
                 lc_global_data()->g_faces()[idx]->sm_group = sm_groups[idx];
 
             xr_free(sm_groups);
@@ -143,7 +143,10 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         if (InvalideFaces())
         {
             err_save();
-            xrDebug::Fatal(DEBUG_INFO, "* FATAL: %d invalid faces. Compilation aborted", InvalideFaces());
+            if (!g_build_options.b_skipinvalid)
+                xrDebug::Fatal(DEBUG_INFO, "* FATAL: %d invalid faces. Compilation aborted", InvalideFaces());
+            else
+                Logger.clMsg("* ERROR! Total %d invalid faces found.", InvalideFaces());
         }
     }
 
@@ -195,7 +198,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             while (!F->eof())
             {
                 F->r(temp.control.name, sizeof(temp.control.name));
-                u32 cnt = F->r_u32();
+                size_t cnt = F->r_u32();
                 temp.control.data.resize(cnt);
                 F->r(&*temp.control.data.begin(), cnt * sizeof(u32));
 
@@ -208,7 +211,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         {
             F = fs.open_chunk(EB_Light_static);
             b_light_static temp;
-            u32 cnt = F->length() / sizeof(temp);
+            size_t cnt = F->length() / sizeof(temp);
             for (i = 0; i < cnt; i++)
             {
                 R_Light RL;
@@ -254,7 +257,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         }
 
         // ***Search LAYERS***
-        for (u32 LH = 0; LH < L_layers.size(); LH++)
+        for (size_t LH = 0; LH < L_layers.size(); LH++)
         {
             R_Layer& TEST = L_layers[LH];
             if (0 == xr_stricmp(TEST.control.name, LCONTROL_HEMI))
@@ -289,16 +292,12 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     {
         Surface_Init();
         F = fs.open_chunk(EB_Textures);
-        u32 tex_count = F->length() / sizeof(b_texture);
-        for (u32 t = 0; t < tex_count; t++)
+        size_t tex_count = F->length() / sizeof(b_texture);
+        for (size_t t = 0; t < tex_count; t++)
         {
             Logger.Progress(float(t) / float(tex_count));
 
-            b_texture TEX;
-            F->r(&TEX, sizeof(TEX));
-
-            b_BuildTexture BT;
-            CopyMemory(&BT, &TEX, sizeof(TEX));
+            b_BuildTexture BT(F);
 
             // load thumbnail
             LPSTR N = BT.name;

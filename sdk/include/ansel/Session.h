@@ -93,6 +93,7 @@ namespace ansel
     typedef void(__cdecl *StopSessionCallback)(void* userPointer);
     typedef void(__cdecl *StartCaptureCallback)(const CaptureConfiguration&, void* userPointer);
     typedef void(__cdecl *StopCaptureCallback)(void* userPointer);
+    typedef void(__cdecl *ChangeQualityCallback)(bool isHighQuality, void* userPointer);
 
     // Starts a session if there is not one already active. This function can be used to trigger
     // Ansel via any method that the game chooses (key combination, controller input, etc)

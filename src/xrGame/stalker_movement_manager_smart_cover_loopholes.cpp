@@ -356,7 +356,7 @@ void stalker_movement_manager_smart_cover::build_exit_path_to_cover()
         smart_cover::transitions::action const& current_action = nearest_action(current_cover, exitable_loophole_id,
             smart_cover::transform_vertex("", false), target_position, exit_position, exit_vertex_id, &exit_body_state);
 
-        buffer_vector<shared_str> temp(_alloca(sizeof(u32) * m_temp_loophole_path.size()), m_temp_loophole_path.size(),
+        buffer_vector<shared_str> temp(xr_alloca(sizeof(u32) * m_temp_loophole_path.size()), m_temp_loophole_path.size(),
             m_temp_loophole_path.begin(), m_temp_loophole_path.end());
         new_value += enter_path(0, exit_position, exit_vertex_id, target_cover,
             (target_loophole.enterable() ? target_loophole : nearest_enterable_loophole()).id());

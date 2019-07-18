@@ -66,7 +66,7 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
             if (owner.m_Current->m_Flags.is(CLensFlareDescriptor::flFlare))
             {
                 for (auto it = owner.m_Current->m_Flares.begin();
-                     it != owner.m_Current->m_Flares.end(); it++)
+                     it != owner.m_Current->m_Flares.end(); ++it)
                 {
                     CLensFlareDescriptor::SFlare& F = *it;
                     vec.mul(owner.vecAxis, F.fPosition);

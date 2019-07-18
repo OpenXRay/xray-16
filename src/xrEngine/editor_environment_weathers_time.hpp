@@ -32,7 +32,7 @@ public:
 public:
     time(editor::environment::manager* manager, weather const* weather, shared_str const& id);
     virtual ~time();
-    void load(CInifile& config);
+    void load(const CInifile& config);
     void load_from(shared_str const& id, CInifile& config, shared_str const& new_id);
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* holder);

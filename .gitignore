@@ -5,13 +5,21 @@
 !.travis.yml
 
 # exclude binaries and temporary files
-bin*/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+bin/
 intermediate/
 intermediate_plugs/
 lib/
+CMakeFiles/
 *.aps
 *.user
 *.PVS-Studio.*
+*.gch
+*.so
+*.a
+*.o
 
 # exclude doxygen output
 doc/doxygen/html/*

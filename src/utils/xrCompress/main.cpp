@@ -7,11 +7,12 @@ extern int ProcessDifference();
 
 int __cdecl main(int argc, char* argv[])
 {
-    xrDebug::Initialize();
+    LPCSTR params = GetCommandLine();
+
+    xrDebug::Initialize(params);
     Core.Initialize("xrCompress", 0, FALSE);
     printf("\n\n");
 
-    LPCSTR params = GetCommandLine();
 
 #ifndef MOD_COMPRESS
     if (strstr(params, "-diff"))

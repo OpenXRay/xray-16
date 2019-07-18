@@ -54,7 +54,7 @@ public:
         int* m_ID;
         RELCASE_CALLBACK m_Callback;
         SRelcasePair(int* id, RELCASE_CALLBACK cb) : m_ID(id), m_Callback(cb) {}
-        bool operator==(RELCASE_CALLBACK cb) { return m_Callback == cb; }
+        bool operator==(const RELCASE_CALLBACK& cb) const { return m_Callback == cb; }
     };
     typedef xr_vector<SRelcasePair> RELCASE_CALLBACK_VEC;
     RELCASE_CALLBACK_VEC m_relcase_callbacks;
@@ -126,7 +126,7 @@ public:
 private:
     IC Objects& get_crows()
     {
-        if (GetCurrentThreadId() == m_owner_thread_id)
+        if (Threading::GetCurrThreadId() == m_owner_thread_id)
             return (m_primary_crows);
 
         return (m_secondary_crows);

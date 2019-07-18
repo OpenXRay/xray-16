@@ -60,93 +60,88 @@ float shadow_hw( float4 tc )
 #define FS  FILTER_SIZE
 #define FS2 ( FILTER_SIZE / 2 )
 
-const float W2[11][11] = 
-                 { { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 }, 
-			       { 0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0 },
-			       { 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 },
-			       { 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 },
-			       { 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 },
-			       { 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 },
-			       { 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 },
-			       { 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 },
-			       { 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 },
-			       { 0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       };
-
-const float W1[11][11] = 
-                 { { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 }, 
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0,0.0 },
-			       { 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 },
-			       { 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 },
-			       { 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 },
-			       { 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 },
-			       { 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 },
-			       { 0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       };
-
-const float W0[11][11] = 
-                 { { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 }, 
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.1,0.1,0.1,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.1,1.0,0.1,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.1,0.1,0.1,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       { 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 },
-			       };
-
-float Fw( int r, int c, float fL )
-{
-	return        (1.0-fL) * (1.0-fL) * (1.0-fL) * W0[r][c] +
-	       3.0 * (1.0-fL) * (1.0-fL) *   fL     * W1[r][c] +
-	       3.0 *    fL    *    fL    * (1.0-fL) * W2[r][c] +
-                     fL    *    fL    *   fL     * 1.0;
-} 
-
 #define BLOCKER_FILTER_SIZE	11
 #define BFS  BLOCKER_FILTER_SIZE
 #define BFS2 ( BLOCKER_FILTER_SIZE / 2 )
+
+#define Fw3(r, c, fL)		float( (1.0-fL) * (1.0-fL) * (1.0-fL) * W0[r][c] + 3.0 * (1.0-fL) * (1.0-fL) * fL * W1[r][c] + 3.0 * fL * fL * (1.0-fL) * W2[r][c] + fL * fL * fL * 1.0)
+#define Fw2(r, c)		float4( W0[r][c], W1[r][c], W2[r][c], 1.0)
 
 #define SUN_WIDTH 300.0
 
 // uses gather for DX11/10.1 and visibilty encoding for DX10.0
 float shadow_extreme_quality( float3 tc )
 {
+	float W2[11][11] = 
+	                 float[11][11]( float[11]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ), 
+				       float[11]( 0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0 ),
+				       float[11]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[11]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[11]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[11]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[11]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[11]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[11]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[11]( 0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0 ),
+				       float[11]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 )
+				       );
+ 
+	float W1[11][11] = 
+	                 float[][]( float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ), 
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 )
+				       );
+ 
+	const float W0[11][11] = 
+	                 float[][]( float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ), 
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.1,0.1,0.1,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.1,1.0,0.1,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.1,0.1,0.1,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 )
+				       );
+
    float  s   = 0.0;
    float2 stc = ( float( SMAP_size ) * tc.xy ) + float2( 0.5, 0.5 );
    float2 tcs = floor( stc );
-   float2 fc;
-   int    row;
-   int    col;
+   float2 fc = float2(0.0);
+   int    row = 0;
+   int    col = 0;
    float  w = 0.0;
-   float  avgBlockerDepth = 0;
-   float  blockerCount = 0;
-   float  fRatio;
+   float  avgBlockerDepth = 0.0;
+   float  blockerCount = 0.0;
+   float  fRatio = 0.0;
    float4 v1[ FS2 + 1 ];
    float2 v0[ FS2 + 1 ];
-   float2 off;
+   float2 off = float2(0.0);
 
    fc     = stc - tcs;
    tc.xy  = tc.xy - ( 1.0 / float( SMAP_size ) * fc );
    tc.z  -= 0.0001;
 
-#if defined(SM_4_1) || defined( SM_5) 
+#if 0// defined(SM_4_1) || defined( SM_5) 
     // find number of blockers and sum up blocker depth
     for( row = -BFS2; row <= BFS2; row += 2 )
     {
         for( col = -BFS2; col <= BFS2; col += 2 )
         {
-            float4 d4 = textureGatherOffset( s_smap, tc.xy, int2( col, row ) );
-            float4 b4 = ( tc.zzzz <= d4 ) ? (0.0).xxxx : (1.0).xxxx;   
+            float4 d4 = textureGatherOffset( s_smap, tc.xy, 0.0, int2( col, row ) );
+            float4 b4 = all( lessThanEqual( tc.zzzz, d4 )) ? float4(0.0) : float4(1.0);   
 			
-            blockerCount += dot( b4, (1.0).xxxx );
+            blockerCount += dot( b4, float4(1.0) );
             avgBlockerDepth += dot( d4, b4 );
         }
     }
@@ -205,7 +200,7 @@ float shadow_extreme_quality( float3 tc )
    for( row = 0; row < FS; ++row )
    {
       for( col = 0; col < FS; ++col )
-         w += Fw(row,col,fRatio);
+         w += Fw3(row,col,fRatio);
    }
 
     // filter shadow map samples using the dynamic weights
@@ -224,36 +219,36 @@ float shadow_extreme_quality( float3 tc )
 #endif
 		  if( col == -FS2 )
 		  {
-			 s += ( 1 - fc.y ) * ( v1[0].w * ( Fw(row+FS2,0,fRatio) - Fw(row+FS2,0,fRatio) * fc.x ) + v1[0].z * ( fc.x * ( Fw(row+FS2,0,fRatio) - Fw(row+FS2,1,fRatio) ) +  Fw(row+FS2,1,fRatio) ) );
-			 s += (     fc.y ) * ( v1[0].x * ( Fw(row+FS2,0,fRatio) - Fw(row+FS2,0,fRatio) * fc.x ) + v1[0].y * ( fc.x * ( Fw(row+FS2,0,fRatio) - Fw(row+FS2,1,fRatio) ) +  Fw(row+FS2,1,fRatio) ) );
+			 s += ( 1 - fc.y ) * ( v1[0].w * ( Fw3(row+FS2,0,fRatio) - Fw3(row+FS2,0,fRatio) * fc.x ) + v1[0].z * ( fc.x * ( Fw3(row+FS2,0,fRatio) - Fw3(row+FS2,1,fRatio) ) +  Fw3(row+FS2,1,fRatio) ) );
+			 s += (     fc.y ) * ( v1[0].x * ( Fw3(row+FS2,0,fRatio) - Fw3(row+FS2,0,fRatio) * fc.x ) + v1[0].y * ( fc.x * ( Fw3(row+FS2,0,fRatio) - Fw3(row+FS2,1,fRatio) ) +  Fw3(row+FS2,1,fRatio) ) );
 			 if( row > -FS2 )
 			 {
-				s += ( 1 - fc.y ) * ( v0[0].x * ( Fw(row+FS2-1,0,fRatio) - Fw(row+FS2-1,0,fRatio) * fc.x ) + v0[0].y * ( fc.x * ( Fw(row+FS2-1,0,fRatio) - Fw(row+FS2-1,1,fRatio) ) +  Fw(row+FS2-1,1,fRatio) ) );
-				s += (     fc.y ) * ( v1[0].w * ( Fw(row+FS2-1,0,fRatio) - Fw(row+FS2-1,0,fRatio) * fc.x ) + v1[0].z * ( fc.x * ( Fw(row+FS2-1,0,fRatio) - Fw(row+FS2-1,1,fRatio) ) +  Fw(row+FS2-1,1,fRatio) ) );
+				s += ( 1 - fc.y ) * ( v0[0].x * ( Fw3(row+FS2-1,0,fRatio) - Fw3(row+FS2-1,0,fRatio) * fc.x ) + v0[0].y * ( fc.x * ( Fw3(row+FS2-1,0,fRatio) - Fw3(row+FS2-1,1,fRatio) ) +  Fw3(row+FS2-1,1,fRatio) ) );
+				s += (     fc.y ) * ( v1[0].w * ( Fw3(row+FS2-1,0,fRatio) - Fw3(row+FS2-1,0,fRatio) * fc.x ) + v1[0].z * ( fc.x * ( Fw3(row+FS2-1,0,fRatio) - Fw3(row+FS2-1,1,fRatio) ) +  Fw3(row+FS2-1,1,fRatio) ) );
 			 }
 		  }
 		  else if( col == FS2 )
 		  {
-			 s += ( 1 - fc.y ) * ( v1[FS2].w * ( fc.x * ( Fw(row+FS2,FS-2,fRatio) - Fw(row+FS2,FS-1,fRatio) ) + Fw(row+FS2,FS-1,fRatio) ) + v1[FS2].z * fc.x * Fw(row+FS2,FS-1,fRatio) );
-			 s += (     fc.y ) * ( v1[FS2].x * ( fc.x * ( Fw(row+FS2,FS-2,fRatio) - Fw(row+FS2,FS-1,fRatio) ) + Fw(row+FS2,FS-1,fRatio) ) + v1[FS2].y * fc.x * Fw(row+FS2,FS-1,fRatio) );
+			 s += ( 1 - fc.y ) * ( v1[FS2].w * ( fc.x * ( Fw3(row+FS2,FS-2,fRatio) - Fw3(row+FS2,FS-1,fRatio) ) + Fw3(row+FS2,FS-1,fRatio) ) + v1[FS2].z * fc.x * Fw3(row+FS2,FS-1,fRatio) );
+			 s += (     fc.y ) * ( v1[FS2].x * ( fc.x * ( Fw3(row+FS2,FS-2,fRatio) - Fw3(row+FS2,FS-1,fRatio) ) + Fw3(row+FS2,FS-1,fRatio) ) + v1[FS2].y * fc.x * Fw3(row+FS2,FS-1,fRatio) );
 			 if( row > -FS2 )
 			 {
-				s += ( 1 - fc.y ) * ( v0[FS2].x * ( fc.x * ( Fw(row+FS2-1,FS-2,fRatio) - Fw(row+FS2-1,FS-1,fRatio) ) + Fw(row+FS2-1,FS-1,fRatio) ) + v0[FS2].y * fc.x * Fw(row+FS2-1,FS-1,fRatio) );
-				s += (     fc.y ) * ( v1[FS2].w * ( fc.x * ( Fw(row+FS2-1,FS-2,fRatio) - Fw(row+FS2-1,FS-1,fRatio) ) + Fw(row+FS2-1,FS-1,fRatio) ) + v1[FS2].z * fc.x * Fw(row+FS2-1,FS-1,fRatio) );
+				s += ( 1 - fc.y ) * ( v0[FS2].x * ( fc.x * ( Fw3(row+FS2-1,FS-2,fRatio) - Fw3(row+FS2-1,FS-1,fRatio) ) + Fw3(row+FS2-1,FS-1,fRatio) ) + v0[FS2].y * fc.x * Fw3(row+FS2-1,FS-1,fRatio) );
+				s += (     fc.y ) * ( v1[FS2].w * ( fc.x * ( Fw3(row+FS2-1,FS-2,fRatio) - Fw3(row+FS2-1,FS-1,fRatio) ) + Fw3(row+FS2-1,FS-1,fRatio) ) + v1[FS2].z * fc.x * Fw3(row+FS2-1,FS-1,fRatio) );
 			 }
 		  }
 		  else
 		  {
-			 s += ( 1 - fc.y ) * ( v1[(col+FS2)/2].w * ( fc.x * ( Fw(row+FS2,col+FS2-1,fRatio) - Fw(row+FS2,col+FS2+0,fRatio) ) + Fw(row+FS2,col+FS2+0,fRatio) ) +
-						           v1[(col+FS2)/2].z * ( fc.x * ( Fw(row+FS2,col+FS2-0,fRatio) - Fw(row+FS2,col+FS2+1,fRatio) ) + Fw(row+FS2,col+FS2+1,fRatio) ) );
-			 s += (     fc.y ) * ( v1[(col+FS2)/2].x * ( fc.x * ( Fw(row+FS2,col+FS2-1,fRatio) - Fw(row+FS2,col+FS2+0,fRatio) ) + Fw(row+FS2,col+FS2+0,fRatio) ) +
-						           v1[(col+FS2)/2].y * ( fc.x * ( Fw(row+FS2,col+FS2-0,fRatio) - Fw(row+FS2,col+FS2+1,fRatio) ) + Fw(row+FS2,col+FS2+1,fRatio) ) );
+			 s += ( 1 - fc.y ) * ( v1[(col+FS2)/2].w * ( fc.x * ( Fw3(row+FS2,col+FS2-1,fRatio) - Fw3(row+FS2,col+FS2+0,fRatio) ) + Fw3(row+FS2,col+FS2+0,fRatio) ) +
+						           v1[(col+FS2)/2].z * ( fc.x * ( Fw3(row+FS2,col+FS2-0,fRatio) - Fw3(row+FS2,col+FS2+1,fRatio) ) + Fw3(row+FS2,col+FS2+1,fRatio) ) );
+			 s += (     fc.y ) * ( v1[(col+FS2)/2].x * ( fc.x * ( Fw3(row+FS2,col+FS2-1,fRatio) - Fw3(row+FS2,col+FS2+0,fRatio) ) + Fw3(row+FS2,col+FS2+0,fRatio) ) +
+						           v1[(col+FS2)/2].y * ( fc.x * ( Fw3(row+FS2,col+FS2-0,fRatio) - Fw3(row+FS2,col+FS2+1,fRatio) ) + Fw3(row+FS2,col+FS2+1,fRatio) ) );
 			 if( row > -FS2 )
 			 {
-				s += ( 1 - fc.y ) * ( v0[(col+FS2)/2].x * ( fc.x * ( Fw(row+FS2-1,col+FS2-1,fRatio) - Fw(row+FS2-1,col+FS2+0,fRatio) ) + Fw(row+FS2-1,col+FS2+0,fRatio) ) +
-							          v0[(col+FS2)/2].y * ( fc.x * ( Fw(row+FS2-1,col+FS2-0,fRatio) - Fw(row+FS2-1,col+FS2+1,fRatio) ) + Fw(row+FS2-1,col+FS2+1,fRatio) ) );
-				s += (     fc.y ) * ( v1[(col+FS2)/2].w * ( fc.x * ( Fw(row+FS2-1,col+FS2-1,fRatio) - Fw(row+FS2-1,col+FS2+0,fRatio) ) + Fw(row+FS2-1,col+FS2+0,fRatio) ) +
-							          v1[(col+FS2)/2].z * ( fc.x * ( Fw(row+FS2-1,col+FS2-0,fRatio) - Fw(row+FS2-1,col+FS2+1,fRatio) ) + Fw(row+FS2-1,col+FS2+1,fRatio) ) );
+				s += ( 1 - fc.y ) * ( v0[(col+FS2)/2].x * ( fc.x * ( Fw3(row+FS2-1,col+FS2-1,fRatio) - Fw3(row+FS2-1,col+FS2+0,fRatio) ) + Fw3(row+FS2-1,col+FS2+0,fRatio) ) +
+							          v0[(col+FS2)/2].y * ( fc.x * ( Fw3(row+FS2-1,col+FS2-0,fRatio) - Fw3(row+FS2-1,col+FS2+1,fRatio) ) + Fw3(row+FS2-1,col+FS2+1,fRatio) ) );
+				s += (     fc.y ) * ( v1[(col+FS2)/2].w * ( fc.x * ( Fw3(row+FS2-1,col+FS2-1,fRatio) - Fw3(row+FS2-1,col+FS2+0,fRatio) ) + Fw3(row+FS2-1,col+FS2+0,fRatio) ) +
+							          v1[(col+FS2)/2].z * ( fc.x * ( Fw3(row+FS2-1,col+FS2-0,fRatio) - Fw3(row+FS2-1,col+FS2+1,fRatio) ) + Fw3(row+FS2-1,col+FS2+1,fRatio) ) );
 			 }
 	      }
 		  if( row != FS2 )
@@ -264,29 +259,66 @@ float shadow_extreme_quality( float3 tc )
    return s/w;
 }
 
-float4 Fw( int r, int c )
-{
-	return float4( W0[r][c], W1[r][c], W2[r][c], 1.0 );
-}
-
 //======================================================================================
 // This shader computes the contact hardening shadow filter
 //======================================================================================
 float shadow_extreme_quality_fused( float3 tc )
 {
-    float4 s   = (0.0).xxxx;
+	const float W2[11][11] = 
+	                 float[][]( float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ), 
+				       float[]( 0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0 ),
+				       float[]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[]( 0.0,0.2,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.2,0.0 ),
+				       float[]( 0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 )
+				       );
+ 
+	const float W1[11][11] = 
+	                 float[][]( float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ), 
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,1.0,1.0,1.0,1.0,1.0,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 )
+				       );
+ 
+	const float W0[11][11] = 
+	                 float[][]( float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ), 
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.1,0.1,0.1,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.1,1.0,0.1,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.1,0.1,0.1,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 ),
+				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 )
+				       );
+
+    float4 s   = float4(0.0);
     float2 stc = ( float(SMAP_size) * tc.xy ) + float2( 0.5, 0.5 );
     float2 tcs = floor( stc );
-    float2 fc;
-    int    row;
-    int    col;
+    float2 fc = float2(0.0);
+    int    row = 0;
+    int    col = 0;
     float  w = 0.0;
-    float  avgBlockerDepth = 0;
-    float  blockerCount = 0;
-    float  fRatio;
+    float  avgBlockerDepth = 0.0;
+    float  blockerCount = 0.0;
+    float  fRatio = 0.0;
     float4 v1[ FS2 + 1 ];
     float2 v0[ FS2 + 1 ];
-    float2 off;
+    float2 off = float2(0.0);
 
     fc     = stc - tcs;
     tc.xy  = tc.xy - ( fc * (1.0/float(SMAP_size)) );
@@ -306,98 +338,98 @@ float shadow_extreme_quality_fused( float3 tc )
 			d4.y = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col+1, row+1 ), 0 ).x;
 			d4.x = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col, row+1 ), 0 ).x;
 #endif
-            float4 b4  = ( tc.zzzz <= d4 ) ? (0.0).xxxx : (1.0).xxxx;   
+            float4 b4  = all( lessThanEqual( tc.zzzz, d4 )) ? float4(0.0) : float4(1.0);   
 
-            v1[(col+FS2)/2] = ( tc.zzzz <= d4 ) ? (1.0).xxxx : (0.0).xxxx;
-            blockerCount += dot( b4, (1.0).xxxx );
+            v1[(col+FS2)/2] = all( lessThanEqual( tc.zzzz, d4 )) ? float4(1.0) : float4(0.0);
+            blockerCount += dot( b4, float4(1.0) );
             avgBlockerDepth += dot( d4, b4 );
           
             if( col == -FS2 )
             {
-                s += ( 1 - fc.y ) * ( v1[0].w * ( Fw(row+FS2,0) - 
-                                      Fw(row+FS2,0) * fc.x ) + v1[0].z * 
-                                    ( fc.x * ( Fw(row+FS2,0) - 
-                                      Fw(row+FS2,1) ) +  
-                                      Fw(row+FS2,1) ) );
-                s += (     fc.y ) * ( v1[0].x * ( Fw(row+FS2,0) - 
-                                      Fw(row+FS2,0) * fc.x ) + 
-                                      v1[0].y * ( fc.x * ( Fw(row+FS2,0) - 
-                                      Fw(row+FS2,1) ) +  
-                                      Fw(row+FS2,1) ) );
+                s += ( 1 - fc.y ) * ( v1[0].w * ( Fw2(row+FS2,0) - 
+                                      Fw2(row+FS2,0) * fc.x ) + v1[0].z * 
+                                    ( fc.x * ( Fw2(row+FS2,0) - 
+                                      Fw2(row+FS2,1) ) +  
+                                      Fw2(row+FS2,1) ) );
+                s += (     fc.y ) * ( v1[0].x * ( Fw2(row+FS2,0) - 
+                                      Fw2(row+FS2,0) * fc.x ) + 
+                                      v1[0].y * ( fc.x * ( Fw2(row+FS2,0) - 
+                                      Fw2(row+FS2,1) ) +  
+                                      Fw2(row+FS2,1) ) );
                 if( row > -FS2 )
                 {
-                    s += ( 1 - fc.y ) * ( v0[0].x * ( Fw(row+FS2-1,0) - 
-                                          Fw(row+FS2-1,0) * fc.x ) + v0[0].y * 
-                                        ( fc.x * ( Fw(row+FS2-1,0) - 
-                                          Fw(row+FS2-1,1) ) +  
-                                          Fw(row+FS2-1,1) ) );
-                    s += (     fc.y ) * ( v1[0].w * ( Fw(row+FS2-1,0) - 
-                                          Fw(row+FS2-1,0) * fc.x ) + v1[0].z * 
-                                        ( fc.x * ( Fw(row+FS2-1,0) - 
-                                          Fw(row+FS2-1,1) ) +  
-                                          Fw(row+FS2-1,1) ) );
+                    s += ( 1 - fc.y ) * ( v0[0].x * ( Fw2(row+FS2-1,0) - 
+                                          Fw2(row+FS2-1,0) * fc.x ) + v0[0].y * 
+                                        ( fc.x * ( Fw2(row+FS2-1,0) - 
+                                          Fw2(row+FS2-1,1) ) +  
+                                          Fw2(row+FS2-1,1) ) );
+                    s += (     fc.y ) * ( v1[0].w * ( Fw2(row+FS2-1,0) - 
+                                          Fw2(row+FS2-1,0) * fc.x ) + v1[0].z * 
+                                        ( fc.x * ( Fw2(row+FS2-1,0) - 
+                                          Fw2(row+FS2-1,1) ) +  
+                                          Fw2(row+FS2-1,1) ) );
                 }
             }
             else if( col == FS2 )
             {
-                s += ( 1 - fc.y ) * ( v1[FS2].w * ( fc.x * ( Fw(row+FS2,FS-2) - 
-                                      Fw(row+FS2,FS-1) ) + 
-                                      Fw(row+FS2,FS-1) ) + v1[FS2].z * fc.x * 
-                                      Fw(row+FS2,FS-1) );
-                s += (     fc.y ) * ( v1[FS2].x * ( fc.x * ( Fw(row+FS2,FS-2) - 
-                                      Fw(row+FS2,FS-1) ) + 
-                                      Fw(row+FS2,FS-1) ) + v1[FS2].y * fc.x * 
-                                      Fw(row+FS2,FS-1) );
+                s += ( 1 - fc.y ) * ( v1[FS2].w * ( fc.x * ( Fw2(row+FS2,FS-2) - 
+                                      Fw2(row+FS2,FS-1) ) + 
+                                      Fw2(row+FS2,FS-1) ) + v1[FS2].z * fc.x * 
+                                      Fw2(row+FS2,FS-1) );
+                s += (     fc.y ) * ( v1[FS2].x * ( fc.x * ( Fw2(row+FS2,FS-2) - 
+                                      Fw2(row+FS2,FS-1) ) + 
+                                      Fw2(row+FS2,FS-1) ) + v1[FS2].y * fc.x * 
+                                      Fw2(row+FS2,FS-1) );
                 if( row > -FS2 )
                 {
                     s += ( 1 - fc.y ) * ( v0[FS2].x * ( fc.x * 
-                                        ( Fw(row+FS2-1,FS-2) - 
-                                          Fw(row+FS2-1,FS-1) ) + 
-                                          Fw(row+FS2-1,FS-1) ) + 
-                                          v0[FS2].y * fc.x * Fw(row+FS2-1,FS-1) );
+                                        ( Fw2(row+FS2-1,FS-2) - 
+                                          Fw2(row+FS2-1,FS-1) ) + 
+                                          Fw2(row+FS2-1,FS-1) ) + 
+                                          v0[FS2].y * fc.x * Fw2(row+FS2-1,FS-1) );
                     s += (     fc.y ) * ( v1[FS2].w * ( fc.x * 
-                                        ( Fw(row+FS2-1,FS-2) - 
-                                          Fw(row+FS2-1,FS-1) ) + 
-                                          Fw(row+FS2-1,FS-1) ) + 
-                                          v1[FS2].z * fc.x * Fw(row+FS2-1,FS-1) );
+                                        ( Fw2(row+FS2-1,FS-2) - 
+                                          Fw2(row+FS2-1,FS-1) ) + 
+                                          Fw2(row+FS2-1,FS-1) ) + 
+                                          v1[FS2].z * fc.x * Fw2(row+FS2-1,FS-1) );
                 }
             }
             else
             {
                 s += ( 1 - fc.y ) * ( v1[(col+FS2)/2].w * ( fc.x * 
-                                    ( Fw(row+FS2,col+FS2-1) - 
-                                      Fw(row+FS2,col+FS2+0) ) + 
-                                      Fw(row+FS2,col+FS2+0) ) +
+                                    ( Fw2(row+FS2,col+FS2-1) - 
+                                      Fw2(row+FS2,col+FS2+0) ) + 
+                                      Fw2(row+FS2,col+FS2+0) ) +
                                       v1[(col+FS2)/2].z * ( fc.x * 
-                                    ( Fw(row+FS2,col+FS2-0) - 
-                                      Fw(row+FS2,col+FS2+1) ) + 
-                                      Fw(row+FS2,col+FS2+1) ) );
+                                    ( Fw2(row+FS2,col+FS2-0) - 
+                                      Fw2(row+FS2,col+FS2+1) ) + 
+                                      Fw2(row+FS2,col+FS2+1) ) );
                 s += (     fc.y ) * ( v1[(col+FS2)/2].x * ( fc.x * 
-                                    ( Fw(row+FS2,col+FS2-1) - 
-                                      Fw(row+FS2,col+FS2+0) ) + 
-                                      Fw(row+FS2,col+FS2+0) ) +
+                                    ( Fw2(row+FS2,col+FS2-1) - 
+                                      Fw2(row+FS2,col+FS2+0) ) + 
+                                      Fw2(row+FS2,col+FS2+0) ) +
                                       v1[(col+FS2)/2].y * ( fc.x * 
-                                    ( Fw(row+FS2,col+FS2-0) - 
-                                      Fw(row+FS2,col+FS2+1) ) + 
-                                      Fw(row+FS2,col+FS2+1) ) );
+                                    ( Fw2(row+FS2,col+FS2-0) - 
+                                      Fw2(row+FS2,col+FS2+1) ) + 
+                                      Fw2(row+FS2,col+FS2+1) ) );
                 if( row > -FS2 )
                 {
                     s += ( 1 - fc.y ) * ( v0[(col+FS2)/2].x * ( fc.x * 
-                                        ( Fw(row+FS2-1,col+FS2-1) - 
-                                          Fw(row+FS2-1,col+FS2+0) ) + 
-                                          Fw(row+FS2-1,col+FS2+0) ) +
+                                        ( Fw2(row+FS2-1,col+FS2-1) - 
+                                          Fw2(row+FS2-1,col+FS2+0) ) + 
+                                          Fw2(row+FS2-1,col+FS2+0) ) +
                                           v0[(col+FS2)/2].y * ( fc.x * 
-                                        ( Fw(row+FS2-1,col+FS2-0) - 
-                                          Fw(row+FS2-1,col+FS2+1) ) + 
-                                          Fw(row+FS2-1,col+FS2+1) ) );
+                                        ( Fw2(row+FS2-1,col+FS2-0) - 
+                                          Fw2(row+FS2-1,col+FS2+1) ) + 
+                                          Fw2(row+FS2-1,col+FS2+1) ) );
                     s += (     fc.y ) * ( v1[(col+FS2)/2].w * ( fc.x * 
-                                        ( Fw(row+FS2-1,col+FS2-1) - 
-                                          Fw(row+FS2-1,col+FS2+0) ) + 
-                                          Fw(row+FS2-1,col+FS2+0) ) +
+                                        ( Fw2(row+FS2-1,col+FS2-1) - 
+                                          Fw2(row+FS2-1,col+FS2+0) ) + 
+                                          Fw2(row+FS2-1,col+FS2+0) ) +
                                           v1[(col+FS2)/2].z * ( fc.x * 
-                                        ( Fw(row+FS2-1,col+FS2-0) - 
-                                          Fw(row+FS2-1,col+FS2+1) ) + 
-                                          Fw(row+FS2-1,col+FS2+1) ) );
+                                        ( Fw2(row+FS2-1,col+FS2-0) - 
+                                          Fw2(row+FS2-1,col+FS2+1) ) + 
+                                          Fw2(row+FS2-1,col+FS2+1) ) );
                 }
             }
             
@@ -425,7 +457,7 @@ float shadow_extreme_quality_fused( float3 tc )
     {
        for( col = 0; col < FS; ++col )
        {
-          w += Fw(row,col,fRatio);
+          w += Fw3(row,col,fRatio);
        }
     }
 
@@ -499,7 +531,7 @@ float dx10_0_hw_hq_7x7( float4 tc )
    float  s   = 0.0;
    float2 stc = ( float(SMAP_size) * tc.xy ) + float2( 0.5, 0.5 );
    float2 tcs = floor( stc );
-   float2 fc;
+   float2 fc = float2(0.0);
 
    fc    = stc - tcs;
    tc.xy = tc.xy - ( fc * ( 1.0/float(SMAP_size) ) );

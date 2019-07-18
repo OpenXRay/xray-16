@@ -10,17 +10,25 @@
 
 namespace text_editor
 {
-line_editor::line_editor(u32 str_buffer_size) : m_control(str_buffer_size)
+line_editor::line_editor(size_t str_buffer_size) : m_control(str_buffer_size)
 {
-    SDL_StartTextInput();
-}
-line_editor::~line_editor()
-{
-    SDL_StopTextInput();
 }
 
 void line_editor::on_frame() { m_control.on_frame(); }
 void line_editor::IR_OnKeyboardPress(int dik) { m_control.on_key_press(dik); }
 void line_editor::IR_OnKeyboardHold(int dik) { m_control.on_key_hold(dik); }
 void line_editor::IR_OnKeyboardRelease(int dik) { m_control.on_key_release(dik); }
+void line_editor::IR_OnTextInput(const char *text) { m_control.on_text_input(text); }
+
+void line_editor::IR_Capture()
+{
+    IInputReceiver::IR_Capture();
+    m_control.on_ir_capture();
+}
+
+void line_editor::IR_Release()
+{
+    m_control.on_ir_release();
+    IInputReceiver::IR_Release();
+}
 } // namespace text_editor

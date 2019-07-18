@@ -1,3 +1,4 @@
+
 // EngineAPI.cpp: implementation of the CEngineAPI class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -9,7 +10,6 @@
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/xr_token.h"
 
-extern void FillMonitorsToken();
 extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr check_function = "CheckRendererSupport";
@@ -118,24 +118,7 @@ void CEngineAPI::InitializeRenderers()
     R_ASSERT2(setupSelectedRenderer, "Can't setup renderer");
     setupSelectedRenderer();
 
-    // Now unload unused renderers
-    // XXX: Unloading disabled due to typeids invalidation
-    /*if (GEnv.CurrentRenderer != 5)
-        renderers[gl_library]->close();
-
-    if (GEnv.CurrentRenderer != 4)
-        renderers[r4_library]->close();
-
-    if (GEnv.CurrentRenderer != 3)
-        renderers[r3_library]->close();
-
-    if (GEnv.CurrentRenderer != 2)
-        renderers[r2_library]->close();
-
-    if (GEnv.CurrentRenderer != 1)
-        renderers[r1_library]->close();*/
-
-    FillMonitorsToken();
+    Log("Selected renderer:", Console->GetString("renderer"));
 }
 
 void CEngineAPI::Initialize(void)
@@ -170,6 +153,8 @@ void CEngineAPI::Initialize(void)
 
         tune_enabled = true;
     }
+
+    CloseUnusedLibraries();
 }
 
 void CEngineAPI::Destroy(void)
@@ -181,6 +166,27 @@ void CEngineAPI::Destroy(void)
     renderers.clear();
     Engine.Event._destroy();
     XRC.r_clear_compact();
+}
+
+void CEngineAPI::CloseUnusedLibraries()
+{
+    // Only windows because on linux only one library is loaded - xrRender_GL
+#ifdef WINDOWS
+    if (GEnv.CurrentRenderer != 5 && renderers[gl_library]->IsLoaded())
+        renderers[gl_library]->Close();
+
+    if (GEnv.CurrentRenderer != 4 && renderers[r4_library]->IsLoaded())
+        renderers[r4_library]->Close();
+
+    if (GEnv.CurrentRenderer != 3 && renderers[r3_library]->IsLoaded())
+        renderers[r3_library]->Close();
+
+    if (GEnv.CurrentRenderer != 2 && renderers[r2_library]->IsLoaded())
+        renderers[r2_library]->Close();
+
+    if (GEnv.CurrentRenderer != 1 && renderers[r1_library]->IsLoaded())
+        renderers[r1_library]->Close();
+#endif
 }
 
 void CEngineAPI::CreateRendererList()
@@ -209,15 +215,9 @@ void CEngineAPI::CreateRendererList()
     auto& modes = VidQualityToken;
 
 #if defined(WINDOWS)
-    // Hide "d3d10.dll not found" message box for XP
-    SetErrorMode(SEM_FAILCRITICALERRORS);
-
     renderers[r2_library] = XRay::LoadModule(r2_library);
     renderers[r3_library] = XRay::LoadModule(r3_library);
     renderers[r4_library] = XRay::LoadModule(r4_library);
-
-    // Restore error handling
-    SetErrorMode(0);
 #endif
 
     const auto checkRenderer = [&](pcstr library, pcstr mode, int index)
@@ -226,11 +226,10 @@ void CEngineAPI::CreateRendererList()
         {
             // Load SupportCheck, SetupEnv and GetModeName functions from DLL
             const auto checkSupport = (SupportCheck)renderers[library]->GetProcAddress(check_function);
-            const auto getModeName  = (GetModeName)renderers[library]->GetProcAddress(mode_function);
 
             // Test availability
             if (checkSupport && checkSupport())
-                modes.emplace_back(getModeName ? getModeName() : mode, index);
+                modes.emplace_back(mode, index);
             else // Close the handle if test is failed
                 renderers[library]->Close();
         }

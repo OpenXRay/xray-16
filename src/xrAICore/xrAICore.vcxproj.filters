@@ -366,6 +366,9 @@
     <ClInclude Include="pch.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
+    <ClInclude Include="Navigation\level_graph_manager.h">
+      <Filter>AI\Navigation\LevelGraph</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Navigation\game_graph_script.cpp">
@@ -406,6 +409,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

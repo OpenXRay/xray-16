@@ -14,6 +14,9 @@
 #include "SH_Matrix.h"
 #include "SH_Constant.h"
 #include "SH_RT.h"
+#ifdef USE_OGL
+#include "Layers/xrRenderGL/glBufferPool.h"
+#endif // USE_OGL
 
 using sh_list = xr_vector<shared_str>;
 class CBlender_Compile;
@@ -26,6 +29,7 @@ class IBlender;
 struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std::pair<u32, ref_texture>>
 {
     using inherited_vec = xr_vector<std::pair<u32, ref_texture>>;
+    STextureList() = default;
     ~STextureList();
 
     BOOL equal(const STextureList& base) const
@@ -73,6 +77,7 @@ struct ECORE_API SGeometry : public xr_resource_flagged
     ID3DIndexBuffer* ib;
 #endif
     u32 vb_stride;
+    SGeometry() = default;
     ~SGeometry();
 };
 
@@ -81,6 +86,8 @@ struct ECORE_API resptrcode_geom : public resptr_base<SGeometry>
 #ifdef USE_OGL
     void create(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
     void create(u32 FVF, GLuint vb, GLuint ib);
+    void create(D3DVERTEXELEMENT9* decl, IGLVertexBuffer* vb, IGLIndexBuffer* ib);
+    void create(u32 FVF, IGLVertexBuffer* vb, IGLIndexBuffer* ib);
 #else
     void create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
     void create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
@@ -113,6 +120,7 @@ struct ECORE_API SPass : public xr_resource_flagged
     ref_matrix_list M;
 #endif
 
+    SPass() = default;
     ~SPass();
 
     BOOL equal(const SPass& other);
@@ -145,6 +153,7 @@ struct ECORE_API Shader : public xr_resource_flagged
 {
     ref_selement E[6]; // R1 - 0=norm_lod0(det), 1=norm_lod1(normal), 2=L_point, 3=L_spot, 4=L_for_models,
     // R2 - 0=deffer, 1=norm_lod1(normal), 2=psm, 3=ssm, 4=dsm
+    Shader() = default;
     ~Shader();
     BOOL equal(Shader* S);
     BOOL equal(Shader* S, int index);

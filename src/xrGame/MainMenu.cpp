@@ -47,23 +47,31 @@ extern ENGINE_API BOOL bShowPauseString;
 
 //#define DEMO_BUILD
 
-string128 ErrMsgBoxTemplate[] = {"message_box_invalid_pass", "message_box_invalid_host", "message_box_session_full",
-    "message_box_server_reject", "message_box_cdkey_in_use", "message_box_cdkey_disabled", "message_box_cdkey_invalid",
-    "message_box_different_version", "message_box_gs_service_not_available",
-    "message_box_sb_master_server_connect_failed", "msg_box_no_new_patch", "msg_box_new_patch",
-    "msg_box_patch_download_error", "msg_box_patch_download_success", "msg_box_connect_to_master_server",
-    "msg_box_kicked_by_server", "msg_box_error_loading", "message_box_download_level"};
+constexpr cpcstr ErrMsgBoxTemplate[] =
+{
+    "message_box_invalid_pass",
+    "message_box_invalid_host",
+    "message_box_session_full",
+    "message_box_server_reject",
+    "message_box_cdkey_in_use",
+    "message_box_cdkey_disabled",
+    "message_box_cdkey_invalid",
+    "message_box_different_version",
+    "message_box_gs_service_not_available",
+    "message_box_sb_master_server_connect_failed",
+    "msg_box_no_new_patch",
+    "msg_box_new_patch",
+    "msg_box_patch_download_error",
+    "msg_box_patch_download_success",
+    "msg_box_connect_to_master_server",
+    "msg_box_kicked_by_server",
+    "msg_box_error_loading",
+    "message_box_download_level"
+};
 
 extern bool b_shniaganeed_pp;
 
 CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
-//----------------------------------------------------------------------------------
-#define INIT_MSGBOX(_box, _template)     \
-    {                                    \
-        _box = new CUIMessageBoxEx();    \
-        _box->InitMessageBox(_template); \
-    }
-//----------------------------------------------------------------------------------
 
 CMainMenu::CMainMenu() : languageChanged(false)
 {
@@ -117,13 +125,12 @@ CMainMenu::CMainMenu() : languageChanged(false)
         g_btnHint = new CUIButtonHint();
         g_statHint = new CUIButtonHint();
         m_pGameSpyFull = new CGameSpy_Full();
-#ifdef WINDOWS
 
-        for (u32 i = 0; i < u32(ErrMax); i++)
+#ifdef WINDOWS
+        for (cpcstr name : ErrMsgBoxTemplate)
         {
-            CUIMessageBoxEx* pNewErrDlg;
-            INIT_MSGBOX(pNewErrDlg, ErrMsgBoxTemplate[i]);
-            m_pMB_ErrDlgs.push_back(pNewErrDlg);
+            m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
+            m_pMB_ErrDlgs.back()->InitMessageBox(name);
         }
 
         m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_YES_CLICKED,
@@ -180,15 +187,11 @@ void CMainMenu::ReadTextureInfo()
     string_path buf;
     FS_FileSet files;
 
-    const auto UpdateFileSet = [&](pcstr path)
+    const auto ParseFileSet = [&](pcstr path)
     {
         FS.file_list(files, "$game_config$", FS_ListFiles,
-            strconcat(sizeof(buf), buf, path, DELIMITER, "textures_descr" DELIMITER "*.xml")
+            strconcat(sizeof(buf), buf, path, DELIMITER "textures_descr" DELIMITER "*.xml")
         );
-    };
-
-    const auto ParseFileSet = [&]()
-    {
         for (const auto& file : files)
         {
             string_path path, name;
@@ -200,14 +203,25 @@ void CMainMenu::ReadTextureInfo()
         }
     };
 
-    UpdateFileSet(UI_PATH_DEFAULT);
-    ParseFileSet();
+    ParseFileSet(UI_PATH_DEFAULT);
 
-    if (0 == xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
-        return;
+    if (0 != xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
+        ParseFileSet(UI_PATH);
 
-    UpdateFileSet(UI_PATH);
-    ParseFileSet();
+    if (pSettings->section_exist("texture_desc"))
+    {
+        string256 single_item;
+
+        cpcstr itemsList = pSettings->r_string("texture_desc", "files");
+        const u32 itemsCount = _GetItemCount(itemsList);
+
+        for (u32 i = 0; i < itemsCount; i++)
+        {
+            _GetItem(itemsList, i, single_item);
+            xr_strcat(single_item, ".xml");
+            CUITextureMaster::ParseShTexInfo(single_item);
+        }
+    }
 }
 
 void CMainMenu::Activate(bool bActivate)
@@ -411,7 +425,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     if (!IsActive())
         return;
 
-    if (is_binded(kCONSOLE, dik))
+    if (IsBinded(kCONSOLE, dik))
     {
         Console->Show();
         return;
@@ -422,6 +436,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
+        Device.AllowWindowDrag = true;
 #if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 0.9f);
 #endif
@@ -445,6 +460,7 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
+        Device.AllowWindowDrag = false;
 #if SDL_VERSION_ATLEAST(2,0,5)
         SDL_SetWindowOpacity(Device.m_sdlWnd, 1.f);
 #endif
@@ -462,12 +478,36 @@ void CMainMenu::IR_OnKeyboardHold(int dik)
     CDialogHolder::IR_UIOnKeyboardHold(dik);
 };
 
+void CMainMenu::IR_OnTextInput(pcstr text)
+{
+    if (!IsActive())
+        return;
+
+    CDialogHolder::IR_UIOnTextInput(text);
+}
+
 void CMainMenu::IR_OnMouseWheel(int x, int y)
 {
     if (!IsActive())
         return;
 
     CDialogHolder::IR_UIOnMouseWheel(x, y);
+}
+
+void CMainMenu::IR_OnControllerPress(int btn)
+{
+    if (!IsActive())
+        return;
+
+    IR_OnKeyboardPress(ControllerButtonToKey[btn]);
+}
+
+void CMainMenu::IR_OnControllerRelease(int btn)
+{
+    if (!IsActive())
+        return;
+
+    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }
@@ -656,7 +696,8 @@ void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
     }
     if (!m_pMB_ErrDlgs[NewPatchFound])
     {
-        INIT_MSGBOX(m_pMB_ErrDlgs[NewPatchFound], "msg_box_new_patch");
+        m_pMB_ErrDlgs[NewPatchFound] = new CUIMessageBoxEx();
+        m_pMB_ErrDlgs[NewPatchFound]->InitMessageBox("msg_box_new_patch");
 
         shared_str tmpText;
         tmpText.printf(m_pMB_ErrDlgs[NewPatchFound]->GetText(), VersionName, URL);

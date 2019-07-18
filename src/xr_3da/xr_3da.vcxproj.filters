@@ -9,7 +9,7 @@
     <ClInclude Include="resource.h">
       <Filter>resources</Filter>
     </ClInclude>
-    <ClInclude Include="StickyKeyFilter.hpp" />
+    <ClInclude Include="AccessibilityShortcuts.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -28,11 +28,17 @@
     <Image Include="stalker_cs.ico">
       <Filter>resources</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
+    <Image Include="splash_xrcs_ru.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="splash_xrcs_pl.bmp">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

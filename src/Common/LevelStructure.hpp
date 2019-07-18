@@ -169,6 +169,15 @@ public:
     friend class CNodeRenumberer;
     friend class CRenumbererConverter;
 };
+
+struct NodeCompressedOld
+{
+    u8 data[12];
+    NodeCompressed::SCover cover;
+    u16 plane;
+    NodePosition p;
+};
+
 #endif
 
 #ifdef AI_COMPILER
@@ -263,10 +272,24 @@ struct SNodePositionOld
 typedef SNodePositionOld NodePosition;
 #endif
 
-const char LEVEL_GRAPH_NAME[] = "level.ai";
+constexpr cpcstr LEVEL_GRAPH_NAME = "level.ai";
 
 const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
 const u32 MAX_NODE_BIT_COUNT = 23;
-const u32 XRAI_CURRENT_VERSION = 10;
+
+enum xrAI_Versions
+{
+    XRAI_VERSION_SOC = 8,
+    XRAI_VERSION_CS = 9,
+    XRAI_VERSION_COP = 10,
+
+    XRAI_VERSION_ALLOWED = XRAI_VERSION_SOC,
+    XRAI_VERSION_OPENXRAY = XRAI_VERSION_COP,
+
+    XRAI_CURRENT_VERSION = XRAI_VERSION_OPENXRAY
+};
+
+#define ASSERT_XRAI_VERSION_MATCH(version, description)\
+    R_ASSERT2((version) >= XRAI_VERSION_ALLOWED && (version) <= XRAI_CURRENT_VERSION, description);

@@ -40,10 +40,9 @@ void CStatePoltergeistAttackHiddenAbstract::select_target_for_move()
     Fvector const enemy_dir = normalize(enemy->Direction());
     Fvector const front_point = enemy_pos + (enemy_dir * fly_radius);
 
-    Fvector const self2front = front_point - self_pos;
-
     if (current_time() > m_fly_side_select_tick)
     {
+        Fvector const self2front = front_point - self_pos;
         bool left_side = self2enemy.x * self2front.z - self2enemy.z * self2front.x > 0.f;
         if (!(rand() % 2))
         {

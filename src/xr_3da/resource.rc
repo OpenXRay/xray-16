@@ -7,7 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "winres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -35,7 +35,7 @@ IDI_ICON1               ICON                    "stalker_cs.ico"
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
+IDB_BITMAP1             BITMAP                  "splash_xrcs_ru.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -101,7 +101,7 @@ END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
+    "#include ""winres.h""\r\n"
     "\0"
 END
 
@@ -116,6 +116,19 @@ END
 #endif    // Ukrainian resources
 /////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////
+// Polish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_POL)
+#ifdef _WIN32
+LANGUAGE LANG_POLISH, SUBLANG_POLISH_POLAND
+#pragma code_page(1250)
+#endif //_WIN32
+
+IDB_BITMAP1             BITMAP                  "splash_xrcs_pl.bmp"
+
+#endif // Polish resources
+/////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
@@ -125,6 +138,8 @@ END
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
+
+IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -19,7 +19,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Include/xrRender
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/luabind
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/gli
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../sdk/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/gli/external/glm
     ${SDL_INCLUDE_DIRS}
     )
 
@@ -47,6 +47,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "
 cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrCDB xrEngine xrParticles xrScriptEngine xrAPI GL GLEW luabind ${LUA_LIBRARIES})
-xr_install(${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} xrCore xrCDB xrEngine xrParticles xrScriptEngine xrAPI GL GLEW xrLuabind ${LUA_LIBRARIES})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    GROUP_READ 
+    WORLD_READ )
 

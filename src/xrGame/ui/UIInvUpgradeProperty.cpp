@@ -19,6 +19,7 @@
 #include "inventory_upgrade_manager.h"
 #include "inventory_upgrade.h"
 #include "inventory_upgrade_property.h"
+#include "UIHelper.h"
 
 UIProperty::UIProperty()
 {
@@ -138,6 +139,7 @@ UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
 {
     m_properties_ui.reserve(15);
     m_temp_upgrade_vector.reserve(1);
+    m_Upgr_line = nullptr;
 }
 
 UIInvUpgPropertiesWnd::~UIInvUpgPropertiesWnd() { delete_data(m_properties_ui); }
@@ -152,10 +154,7 @@ void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
 
     CUIXmlInit::InitWindow(ui_xml, "properties", 0, this);
 
-    m_Upgr_line = new CUIStatic();
-    AttachChild(m_Upgr_line);
-    m_Upgr_line->SetAutoDelete(true);
-    CUIXmlInit::InitStatic(ui_xml, "properties:upgr_line", 0, m_Upgr_line);
+    m_Upgr_line = UIHelper::CreateStatic(ui_xml, "properties:upgr_line", this, false);
 
     LPCSTR properties_section = "upgrades_properties";
 
@@ -176,6 +175,7 @@ void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
         if (!ui_property->init_property(property_id))
         {
             Msg("! Invalid property <%s> in inventory upgrade manager!", property_id.c_str());
+            xr_delete(ui_property);
             continue;
         }
 
@@ -189,7 +189,9 @@ void UIInvUpgPropertiesWnd::set_info(ItemUpgrades_type const& item_upgrades)
 {
     Fvector2 new_size;
     new_size.x = GetWndSize().x;
-    new_size.y = m_Upgr_line->GetWndSize().y + 3.0f;
+    new_size.y = 0.0f;
+    if (m_Upgr_line)
+        new_size.y = m_Upgr_line->GetWndSize().y + 3.0f;
 
     Properties_type::iterator ib = m_properties_ui.begin();
     Properties_type::iterator ie = m_properties_ui.end();

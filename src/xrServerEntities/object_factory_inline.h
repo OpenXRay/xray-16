@@ -68,7 +68,11 @@ IC const CObjectItemAbstract& CObjectFactory::item(const CLASS_ID& clsid) const
 {
     actualize();
     const_iterator I = std::lower_bound(clsids().begin(), clsids().end(), clsid, CObjectItemPredicate());
-    VERIFY((I != clsids().end()) && ((*I)->clsid() == clsid));
+#ifdef DEBUG
+    string16 temp;
+    CLSID2TEXT(clsid, temp);
+    VERIFY3((I != clsids().end()) && ((*I)->clsid() == clsid), "CLSID is missing", temp);
+#endif
     return (**I);
 }
 #else
@@ -110,7 +114,11 @@ IC int CObjectFactory::script_clsid(const CLASS_ID& clsid) const
 {
     actualize();
     const_iterator I = std::lower_bound(clsids().begin(), clsids().end(), clsid, CObjectItemPredicate());
-    VERIFY((I != clsids().end()) && ((*I)->clsid() == clsid));
+#ifdef DEBUG
+    string16 temp;
+    CLSID2TEXT(clsid, temp);
+    VERIFY3((I != clsids().end()) && ((*I)->clsid() == clsid), "CLSID is missing", temp);
+#endif
     return (int(I - clsids().begin()));
 }
 

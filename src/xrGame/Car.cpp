@@ -945,7 +945,7 @@ void CCar::Init()
     if (ini->section_exist("damage_items"))
     {
         CInifile::Sect& data = ini->r_section("damage_items");
-        for (auto I = data.Data.cbegin(); I != data.Data.cend(); I++)
+        for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
         {
             const CInifile::Item& item = *I;
             u16 index = pKinematics->LL_BoneID(*item.first);
@@ -1673,10 +1673,10 @@ void CCar::OnEvent(NET_Packet& P, u16 type)
         {
             if (!O || !O->H_Parent() || (this != O->H_Parent()))
                 return;
-            NET_Packet P;
-            u_EventGen(P, GE_OWNERSHIP_REJECT, ID());
-            P.w_u16(u16(O->ID()));
-            u_EventSend(P);
+            NET_Packet P2;
+            u_EventGen(P2, GE_OWNERSHIP_REJECT, ID());
+            P2.w_u16(u16(O->ID()));
+            u_EventSend(P2);
         }
     }
     break;

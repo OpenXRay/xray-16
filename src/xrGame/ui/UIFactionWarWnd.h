@@ -21,15 +21,16 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
 
-    bool m_initialized;
+    CUIFrameWindow* m_background;
+    CUIFrameWindow* m_center_background;
 
-	CUIFrameWindow*	m_background;
-	CUIFrameWindow*	m_center_background;
+	CUIFrameLineWnd* m_background2;
+	CUIStatic* m_center_background2;
 
-	CUITextWnd*			m_target_static;
-	CUITextWnd*			m_target_caption;       // our
+    CUIStatic* m_target_static;
+    CUIStatic* m_target_caption; // our
 	Fvector2			m_tc_pos;
-	CUITextWnd*			m_target_desc;
+    CUIStatic*			m_target_desc;
 	Fvector2			m_td_pos;
 	CUIStatic*			m_state_static;
 
@@ -42,7 +43,7 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 
 	CUIStatic*			m_our_icon;
 	CUIStatic*			m_our_icon_over;
-	CUITextWnd*			m_our_name;
+    CUIStatic*			m_our_name;
 	CUIStatic*			m_st_our_frac_info;
 	CUIStatic*			m_st_our_mem_count;
 	CUIStatic*			m_st_our_resource;
@@ -53,7 +54,7 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 
 	CUIStatic*			m_enemy_icon;
 	CUIStatic*			m_enemy_icon_over;
-	CUITextWnd*			m_enemy_name;
+    CUIStatic*			m_enemy_name;
 	CUIStatic*			m_st_enemy_frac_info;
 	CUIStatic*			m_st_enemy_mem_count;
 	CUIStatic*			m_st_enemy_resource;
@@ -86,7 +87,7 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 	float				m_max_power;
 
 public:
-						CUIFactionWarWnd		();
+						CUIFactionWarWnd		(UIHint* hint);
 	virtual				~CUIFactionWarWnd		();
 
 	virtual void		SendMessage				( CUIWindow* pWnd, s16 msg, void* pData );
@@ -96,7 +97,7 @@ public:
 			void		ShowInfo				( bool status );
 
 			void		Reset					();
-			void		Init					();
+			bool		Init					();
 			
 			bool		InitFactions			();
 			void		UpdateInfo				();

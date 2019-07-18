@@ -22,8 +22,8 @@ bool TestDX11Present()
     }
 
     // Create window
-    HWND hWnd = CreateWindow("TestDX11WindowClass", "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-        CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, NULL, NULL);
+    HWND hWnd = CreateWindow("TestDX11WindowClass", "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, NULL, NULL);
 
     if (!hWnd)
     {
@@ -45,14 +45,20 @@ bool TestDX11Present()
     sd.SampleDesc.Quality = 0;
     sd.Windowed = TRUE;
 
-    D3D_FEATURE_LEVEL pFeatureLevels[] = {D3D_FEATURE_LEVEL_11_0};
+    D3D_FEATURE_LEVEL featureLevels[] =
+    {
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0
+    };
     D3D_FEATURE_LEVEL FeatureLevel;
 
     ID3D11Device* pd3dDevice = NULL;
     ID3D11DeviceContext* pContext = NULL;
     IDXGISwapChain* pSwapChain = NULL;
 
-    HRESULT hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, pFeatureLevels, 1, D3D11_SDK_VERSION,
+    HRESULT hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0,
+        featureLevels, sizeof(featureLevels) / sizeof(featureLevels[0]), D3D11_SDK_VERSION,
         &sd, &pSwapChain, &pd3dDevice, &FeatureLevel, &pContext);
 
     if (FAILED(hr))
@@ -70,11 +76,5 @@ bool TestDX11Present()
 
 BOOL xrRender_test_hw()
 {
-    // CHW							_HW;
-    // HRESULT						hr;
-    //_HW.CreateD3D				()		;
-    // hr = _HW.m_pAdapter->CheckInterfaceSupport(__uuidof(ID3DDevice), 0);
-    //_HW.DestroyD3D				()		;
-
-    return TestDX11Present(); // SUCCEEDED(hr);
+    return TestDX11Present();
 }

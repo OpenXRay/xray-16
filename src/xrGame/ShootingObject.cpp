@@ -105,7 +105,7 @@ void CShootingObject::LoadFireParams(LPCSTR section)
 
     //сила выстрела и его мощьность
     s_sHitPower = pSettings->r_string_wb(section, "hit_power"); //читаем строку силы хита пули оружия
-    s_sHitPowerCritical = pSettings->r_string_wb(section, "hit_power_critical");
+    s_sHitPowerCritical = READ_IF_EXISTS(pSettings, r_string_wb, section, "hit_power_critical", s_sHitPower);
     fvHitPower[egdMaster] =
         (float)atof(_GetItem(*s_sHitPower, 0, buffer)); //первый параметр - это хит для уровня игры мастер
     fvHitPowerCritical[egdMaster] =

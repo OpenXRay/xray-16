@@ -235,6 +235,9 @@
     <Filter Include="Game API\StringTable">
       <UniqueIdentifier>{948b4643-0f42-4027-ac44-dbe3702887f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces\MonitorManager">
+      <UniqueIdentifier>{fa21495d-605e-438d-8058-79e6ff670abe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -576,6 +579,12 @@
     <ClInclude Include="StringTable\IStringTableDefs.h">
       <Filter>Game API\StringTable</Filter>
     </ClInclude>
+    <ClInclude Include="MonitorManager.hpp">
+      <Filter>Interfaces\MonitorManager</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskScheduler.hpp">
+      <Filter>Interfaces\Sheduler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -899,6 +908,12 @@
     <ClCompile Include="StringTable\IStringTable.cpp">
       <Filter>Game API\StringTable</Filter>
     </ClCompile>
+    <ClCompile Include="MonitorManager.cpp">
+      <Filter>Interfaces\MonitorManager</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskScheduler.cpp">
+      <Filter>Interfaces\Sheduler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />
@@ -907,9 +922,9 @@
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\TypeHelper.natvis" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

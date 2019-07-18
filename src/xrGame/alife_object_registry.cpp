@@ -134,7 +134,7 @@ void CALifeObjectRegistry::load(IReader& file_stream)
     m_objects.clear();
 
     u32 count = file_stream.r_u32();
-    CSE_ALifeDynamicObject** objects = (CSE_ALifeDynamicObject**)_alloca(count * sizeof(CSE_ALifeDynamicObject*));
+    CSE_ALifeDynamicObject** objects = (CSE_ALifeDynamicObject**)xr_alloca(count * sizeof(CSE_ALifeDynamicObject*));
 
     CSE_ALifeDynamicObject** I = objects;
     CSE_ALifeDynamicObject** E = objects + count;

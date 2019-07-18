@@ -72,7 +72,7 @@ void CBuild::xrPhase_UVmap()
             // Select maximal sized poly
             Face* msF = NULL;
             float msA = 0;
-            for (vecFaceIt it = g_XSplit[SP]->begin(); it != g_XSplit[SP]->end(); it++)
+            for (vecFaceIt it = g_XSplit[SP]->begin(); it != g_XSplit[SP]->end(); ++it)
             {
                 if ((*it)->pDeflector == NULL)
                 {

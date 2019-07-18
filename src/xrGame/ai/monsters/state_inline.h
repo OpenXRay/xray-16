@@ -23,7 +23,7 @@ void CStateAbstract::reinit()
     if (current_substate != u32(-1))
         get_state_current()->critical_finalize();
 
-    for (STATE_MAP_IT it = substates.begin(); it != substates.end(); it++)
+    for (STATE_MAP_IT it = substates.begin(); it != substates.end(); ++it)
         it->second->reinit();
 
     reset();
@@ -136,7 +136,7 @@ void CStateAbstract::add_state(u32 state_id, CSState* s) { substates.insert(std:
 TEMPLATE_SPECIALIZATION
 void CStateAbstract::free_mem()
 {
-    for (STATE_MAP_IT it = substates.begin(); it != substates.end(); it++)
+    for (STATE_MAP_IT it = substates.begin(); it != substates.end(); ++it)
         xr_delete(it->second);
 }
 

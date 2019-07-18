@@ -100,7 +100,7 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
 
                     // World space
                     Fvector wP, wN, B;
-                    for (auto it = space.begin(); it != space.end(); it++)
+                    for (auto it = space.begin(); it != space.end(); ++it)
                     {
                         Face* F = *it;
                         _TCF& tc = F->tc[0];
@@ -154,7 +154,7 @@ void ImplicitLighting(BOOL b_net)
         ImplicitLightingExec(FALSE);
         return;
     }
-    thread_spawn(ImplicitLightingTreadNetExec, "worker-thread", 1024 * 1024, 0);
+    Threading::SpawnThread(ImplicitLightingTreadNetExec, "worker-thread", 1024 * 1024, 0);
 }
 Lock implicit_net_lock;
 void XRLC_LIGHT_API ImplicitNetWait()
@@ -178,7 +178,7 @@ void ImplicitLightingExec(BOOL b_net)
     not_clear.clear();
     // Sorting
     Logger.Status("Sorting faces...");
-    for (auto I = inlc_global_data()->g_faces().begin(); I != inlc_global_data()->g_faces().end(); I++)
+    for (auto I = inlc_global_data()->g_faces().begin(); I != inlc_global_data()->g_faces().end(); ++I)
     {
         Face* F = *I;
         if (F->pDeflector)
@@ -208,7 +208,7 @@ void ImplicitLightingExec(BOOL b_net)
     }
 
     // Lighting
-    for (auto imp = calculator.begin(); imp != calculator.end(); imp++)
+    for (auto imp = calculator.begin(); imp != calculator.end(); ++imp)
     {
         ImplicitDeflector& defl = imp->second;
         Logger.Status("Lighting implicit map '%s'...", defl.texture->name);

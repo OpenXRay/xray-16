@@ -41,7 +41,15 @@ half4   main( vf I )          : COLOR
 			Nw	= normalize (Nw);
 	half3	v2point	= normalize (I.v2point);
 	half3	vreflect= reflect(v2point, Nw);
-			vreflect.y= vreflect.y*2-1;     // fake remapping
+
+//	true remapping (slow)
+	half3	vreflectabs	=  abs(vreflect);
+	half	vreflectmax	=  max(vreflectabs.x, max(vreflectabs.y, vreflectabs.z));
+		vreflect	/= vreflectmax;
+	if (vreflect.y < 0.999)
+
+//	fake remapping (fast)
+		vreflect.y	=  vreflect.y * 2 - 1;
 
 	half3	env0	= texCUBE (s_env0, vreflect);
 	half3	env1	= texCUBE (s_env1, vreflect);
