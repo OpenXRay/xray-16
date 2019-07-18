@@ -146,20 +146,20 @@ bool item_respawn_manager::parse_string(char const* str, u32 str_size, section_i
     if (params_count >= 2)
     {
         _GetItem(str, 1, temp_string);
-        std::from_chars(temp_string, temp_string + xr_strlen(temp_string), result.respawn_time);
+        xr_from_chars(temp_string, temp_string + xr_strlen(temp_string), result.respawn_time);
         result.respawn_time *= 1000;
     }
 
     if (params_count >= 3)
     {
         _GetItem(str, 2, temp_string);
-        std::from_chars(temp_string, temp_string + xr_strlen(temp_string), result.addons);
+        xr_from_chars(temp_string, temp_string + xr_strlen(temp_string), result.addons);
     }
 
     if (params_count >= 4)
     {
         _GetItem(str, 3, temp_string);
-        std::from_chars(temp_string, temp_string + xr_strlen(temp_string), result.count_of_ammo);
+        xr_from_chars(temp_string, temp_string + xr_strlen(temp_string), result.count_of_ammo);
     }
     return true;
 }

@@ -236,7 +236,7 @@ void CRender::create()
     if (g)
     {
         const char* tmp = g + xr_strlen("-gloss ");
-        std::from_chars(tmp, tmp + xr_strlen(tmp), o.forcegloss_v);
+        xr_from_chars(tmp, tmp + xr_strlen(tmp), o.forcegloss_v);
         o.forcegloss_v /= 255.f;
     }
 

@@ -315,7 +315,7 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
         int reinf;
         {
             const char* tmp = GetString(pServer, G_REINFORCEMENT_KEY, "0");
-            std::from_chars(tmp, tmp + xr_strlen(tmp), reinf);
+            xr_from_chars(tmp, tmp + xr_strlen(tmp), reinf);
         }
         switch (reinf)
         {

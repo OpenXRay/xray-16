@@ -15,7 +15,7 @@ REPUTATION_DATA::REPUTATION_DATA(int idx, shared_str idn, LPCSTR threshold_str)
 {
     index = idx;
     id = idn;
-    std::from_chars(threshold_str, threshold_str + xr_strlen(threshold_str), threshold);
+    xr_from_chars(threshold_str, threshold_str + xr_strlen(threshold_str), threshold);
 }
 //////////////////////////////////////////////////////////////////////////
 CHARACTER_REPUTATION::GOODWILL_TABLE CHARACTER_REPUTATION::m_relation_table;

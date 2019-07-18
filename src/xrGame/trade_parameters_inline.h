@@ -87,10 +87,10 @@ IC void CTradeParameters::process(_action_type type, CInifile& ini_file, const s
         {
             _GetItem(*(*I).second, 0, buffer);
             float tmp_0;
-            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_0);
+            xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp_0);
             _GetItem(*(*I).second, 1, buffer);
             float tmp_1;
-            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_1);
+            xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp_1);
             _action.enable((*I).first, CTradeFactors(tmp_0, tmp_1));
         }
     }

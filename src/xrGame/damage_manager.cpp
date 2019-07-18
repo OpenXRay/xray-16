@@ -36,9 +36,9 @@ void CDamageManager::reload(LPCSTR section, CInifile const* ini)
         {
             LPCSTR value = ini->r_string(section, "default");
             _GetItem(value, 0, buffer);
-            std::from_chars(buffer, buffer + xr_strlen(buffer), m_default_hit_factor);
+            xr_from_chars(buffer, buffer + xr_strlen(buffer), m_default_hit_factor);
             _GetItem(value, 2, buffer);
-            std::from_chars(buffer, buffer + xr_strlen(buffer), m_default_wound_factor);
+            xr_from_chars(buffer, buffer + xr_strlen(buffer), m_default_wound_factor);
         }
     }
 
@@ -88,32 +88,32 @@ void CDamageManager::load_section(LPCSTR section, CInifile const* ini)
             {
                 float tmp;
                 _GetItem(*(*i).second, 0, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 bone_instance.set_param(0, tmp);
 
                 _GetItem(*(*i).second, 2, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 bone_instance.set_param(2, tmp);
                 
             }
             {
                 int tmp;
                 _GetItem(*(*i).second, 1, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 bone_instance.set_param(1, tmp);
             }
             if (_GetItemCount(*(*i).second) < 4)
             {
                 float tmp;
                 _GetItem(*(*i).second, 0, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 bone_instance.set_param(3, tmp);
             }
             else
             {
                 float tmp;
                 _GetItem(*(*i).second, 3, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 bone_instance.set_param(3, tmp);
             }
             if (0 == bone && (fis_zero(bone_instance.get_param(0)) || fis_zero(bone_instance.get_param(2))))

@@ -177,7 +177,7 @@ void CAI_Stalker::reinit()
         {
             float weight;
             _GetItem(weights, i, temp);
-            std::from_chars(temp, temp + xr_strlen(temp), weight);
+            xr_from_chars(temp, temp + xr_strlen(temp), weight);
             m_critical_wound_weights.push_back(weight);
         }
     }

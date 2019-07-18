@@ -22,11 +22,11 @@ u32 CTeamInfo::GetTeam1_color()
     {
         u32 tmp_0, tmp_1, tmp_2;
         _GetItem(tm_col, 0, _buff);
-        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_0);
+        xr_from_chars(_buff, _buff + xr_strlen(_buff), tmp_0);
         _GetItem(tm_col, 1, _buff);
-        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_1);
+        xr_from_chars(_buff, _buff + xr_strlen(_buff), tmp_1);
         _GetItem(tm_col, 2, _buff);
-        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_2);
+        xr_from_chars(_buff, _buff + xr_strlen(_buff), tmp_2);
         team1_color = color_argb(
             155, tmp_0, tmp_1, tmp_2);
 
@@ -47,11 +47,11 @@ u32 CTeamInfo::GetTeam2_color()
     {
         u32 tmp_0, tmp_1, tmp_2;
         _GetItem(tm_col, 0, _buff);
-        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_0);
+        xr_from_chars(_buff, _buff + xr_strlen(_buff), tmp_0);
         _GetItem(tm_col, 1, _buff);
-        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_1);
+        xr_from_chars(_buff, _buff + xr_strlen(_buff), tmp_1);
         _GetItem(tm_col, 2, _buff);
-        std::from_chars(_buff, _buff + xr_strlen(_buff), tmp_2);
+        xr_from_chars(_buff, _buff + xr_strlen(_buff), tmp_2);
         team2_color = color_argb(
             155, tmp_0, tmp_1, tmp_2);
 

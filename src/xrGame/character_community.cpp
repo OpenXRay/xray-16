@@ -11,7 +11,7 @@ COMMUNITY_DATA::COMMUNITY_DATA(CHARACTER_COMMUNITY_INDEX idx, CHARACTER_COMMUNIT
 {
     index = idx;
     id = idn;
-    std::from_chars(team_str, team_str + xr_strlen(team_str), team);
+    xr_from_chars(team_str, team_str + xr_strlen(team_str), team);
 }
 
 //////////////////////////////////////////////////////////////////////////

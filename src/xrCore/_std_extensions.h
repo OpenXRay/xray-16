@@ -5,6 +5,9 @@
 #include <math.h>
 #include <float.h>
 #include <stdio.h>
+#include <charconv>
+#include <system_error>
+#include "log.h"
 #include "xrCommon/math_funcs_inline.h"
 //#include "xr_token.h"
 
@@ -170,6 +173,79 @@ IC s64 _max(s64 x, s64 y) { return x - ((x - y) & ((x - y) >> (sizeof(s64) * 8 -
 // return pointer to ".ext"
 IC char* strext(const char* S) { return (char*)strrchr(S, '.'); }
 IC size_t xr_strlen(const char* S) { return strlen(S); }
+
+#ifdef _MSC_VER
+#define xr__cplusplus _MSVC_LANG
+#else
+#define xr__cplusplus __cplusplus
+#endif
+
+#if xr__cplusplus >= 201703L
+template<class T>
+inline std::from_chars_result xr_from_chars(const char* first, const char* last, T& value)
+{
+    //(*first=='+'?first+1:first)
+    const auto retval = std::from_chars(first, last, value);
+    const T tmp = (T)atoi(first);
+    if (tmp != value)
+    {
+        Msg("[charconv] %s converted to %d, proper value is %d", first, retval, tmp);
+    }
+    return retval;
+}
+
+template<>
+inline std::from_chars_result xr_from_chars(const char* first, const char* last, u64& value)
+{
+    //(first=='+'?first+1:first)
+    const auto retval = std::from_chars(first, last, value);
+    const auto tmp = _strtoui64(first, nullptr, 10);
+    if (tmp != value)
+    {
+        Msg("[charconv] %s converted to %llu, proper value is %llu", first, retval, tmp);
+    }
+    return retval;
+}
+
+template<>
+inline std::from_chars_result xr_from_chars(const char* first, const char* last, s64& value)
+{
+    //(first=='+'?first+1:first)
+    const auto retval = std::from_chars(first, last, value);
+    const auto tmp = _atoi64(first);
+    if (tmp != value)
+    {
+        Msg("[charconv] %s converted to %lld, proper value is %lld", first, retval, tmp);
+    }
+    return retval;
+}
+
+template<>
+inline std::from_chars_result xr_from_chars(const char* first, const char* last, float& value)
+{
+    //(first=='+'?first+1:first)
+    const auto retval = std::from_chars(first, last, value);
+    const auto tmp = (float)atof(first);
+    if (tmp != value)
+    {
+        Msg("[charconv] %s converted to %f, proper value is %f", first, retval, tmp);
+    }
+    return retval;
+}
+
+template<>
+inline std::from_chars_result xr_from_chars(const char* first, const char* last, double& value)
+{
+    //(first=='+'?first+1:first)
+    const auto retval = std::from_chars(first, last, value);
+    const auto tmp = atof(first);
+    if (tmp != value)
+    {
+        Msg("[charconv] %s converted to %f, proper value is %f", first, retval, tmp);
+    }
+    return retval;
+}
+#endif
 
 //#ifndef _EDITOR
 #ifndef MASTER_GOLD

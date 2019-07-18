@@ -15,7 +15,7 @@ MONSTER_COMMUNITY_DATA::MONSTER_COMMUNITY_DATA(MONSTER_COMMUNITY_INDEX idx, MONS
 {
     index = idx;
     id = idn;
-    std::from_chars(team_str, team_str + xr_strlen(team_str), team);
+    xr_from_chars(team_str, team_str + xr_strlen(team_str), team);
 }
 
 //////////////////////////////////////////////////////////////////////////

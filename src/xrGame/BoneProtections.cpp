@@ -50,13 +50,13 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
         BoneProtection BP;
 
         _GetItem(i->second.c_str(), 0, buffer);
-        std::from_chars(buffer, buffer + xr_strlen(buffer), BP.koeff);
+        xr_from_chars(buffer, buffer + xr_strlen(buffer), BP.koeff);
         _GetItem(i->second.c_str(), 1, buffer);
-        std::from_chars(buffer, buffer + xr_strlen(buffer), BP.armor);
+        xr_from_chars(buffer, buffer + xr_strlen(buffer), BP.armor);
         _GetItem(i->second.c_str(), 2, buffer);
         {
             float tmp;
-            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+            xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
             BP.BonePassBullet = (tmp > 0.5f);
         }
 
@@ -97,10 +97,10 @@ void SBoneProtections::add(const shared_str& bone_sect, IKinematics* kinematics)
             {
                 float tmp;
                 _GetItem(i->second.c_str(), 0, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 BP.koeff += tmp;
                 _GetItem(i->second.c_str(), 1, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 BP.armor += tmp;
             }
         }
@@ -112,10 +112,10 @@ void SBoneProtections::add(const shared_str& bone_sect, IKinematics* kinematics)
             {
                 float tmp;
                 _GetItem(i->second.c_str(), 0, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 BP.koeff += tmp;
                 _GetItem(i->second.c_str(), 1, buffer);
-                std::from_chars(buffer, buffer + xr_strlen(buffer), tmp);
+                xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp);
                 BP.armor += tmp;
             }
         }

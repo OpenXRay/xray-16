@@ -487,7 +487,7 @@ public:
             LPSTR comma = strchr(const_cast<LPSTR>(args), ',');
             if (comma)
             {
-                std::from_chars(comma + 1, comma + 1 + xr_strlen(comma + 1), loops);
+                xr_from_chars(comma + 1, comma + 1 + xr_strlen(comma + 1), loops);
                 *comma = 0; //. :)
             }
             strconcat(sizeof(fn), fn, args, ".xrdemo");
@@ -1138,7 +1138,7 @@ public:
 #endif
         {
             float tmp;
-            std::from_chars(args, args + xr_strlen(args), tmp);
+            xr_from_chars(args, args + xr_strlen(args), tmp);
             physics_world()->SetGravity(tmp);
         }
     }
@@ -1161,7 +1161,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         float step_count;
-        std::from_chars(args, args + xr_strlen(args), step_count);
+        xr_from_chars(args, args + xr_strlen(args), step_count);
 #ifndef DEBUG
         clamp(step_count, 50.f, 200.f);
 #endif
@@ -1335,7 +1335,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         float time_factor;
-        std::from_chars(args, args + xr_strlen(args), time_factor);
+        xr_from_chars(args, args + xr_strlen(args), time_factor);
         clamp(time_factor, EPS, 1000.f);
         Device.time_factor(time_factor);
     }

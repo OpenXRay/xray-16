@@ -95,14 +95,14 @@ IC void read_delay(LPCSTR section, LPCSTR name, u32& delay_min, u32& delay_max)
     if (_GetItemCount(delay) == 2)
     {
         _GetItem(delay, 0, tempst);
-        std::from_chars(tempst, tempst + xr_strlen(tempst), delay_min);
+        xr_from_chars(tempst, tempst + xr_strlen(tempst), delay_min);
         _GetItem(delay, 1, tempst);
-        std::from_chars(tempst, tempst + xr_strlen(tempst), delay_max);
+        xr_from_chars(tempst, tempst + xr_strlen(tempst), delay_max);
     }
     else
     {
         delay_min = 0;
-        std::from_chars(delay, delay + xr_strlen(delay), delay_max);
+        xr_from_chars(delay, delay + xr_strlen(delay), delay_max);
     }
 }
 
@@ -114,7 +114,7 @@ IC void read_distance(LPCSTR section, LPCSTR name, float& dist_min, float& dist_
     VERIFY(_GetItemCount(dist) == 2);
 
     _GetItem(dist, 0, tempst);
-    std::from_chars(tempst, tempst + xr_strlen(tempst), dist_min);
+    xr_from_chars(tempst, tempst + xr_strlen(tempst), dist_min);
     _GetItem(dist, 1, tempst);
-    std::from_chars(tempst, tempst + xr_strlen(tempst), dist_max);
+    xr_from_chars(tempst, tempst + xr_strlen(tempst), dist_max);
 }

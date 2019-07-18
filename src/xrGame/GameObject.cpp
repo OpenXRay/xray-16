@@ -731,12 +731,12 @@ void CGameObject::spawn_supplies()
                 {
                     string16 temp;
                     _GetItem(V, 0, temp);
-                    std::from_chars(temp, temp + xr_strlen(temp), j); // count
+                    xr_from_chars(temp, temp + xr_strlen(temp), j); // count
                 }
                 {
                     const char* prob_c = strstr(V, "prob=");
                     if (nullptr != prob_c)
-                        std::from_chars(prob_c + 5, prob_c + 5 + xr_strlen(prob_c + 5), p);
+                        xr_from_chars(prob_c + 5, prob_c + 5 + xr_strlen(prob_c + 5), p);
                 }
                 if (fis_zero(p))
                     p = 1.f;
@@ -745,7 +745,7 @@ void CGameObject::spawn_supplies()
                 {
                     const char* cond_c = strstr(V, "cond=");
                     if (nullptr != cond_c)
-                        std::from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
+                        xr_from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
                 }
                 bScope = (nullptr != strstr(V, "scope"));
                 bSilencer = (nullptr != strstr(V, "silencer"));

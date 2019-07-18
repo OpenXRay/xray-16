@@ -542,7 +542,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         float v;
-        std::from_chars(args, args + xr_strlen(args), v);
+        xr_from_chars(args, args + xr_strlen(args), v);
         if (v < ps_r2_dof.y + 0.1f)
         {
             char pBuf[256];
@@ -570,7 +570,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         float v;
-        std::from_chars(args, args + xr_strlen(args), v);
+        xr_from_chars(args, args + xr_strlen(args), v);
 
         if (v > ps_r2_dof.y - 0.1f)
         {
@@ -599,7 +599,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         float v;
-        std::from_chars(args, args + xr_strlen(args), v);
+        xr_from_chars(args, args + xr_strlen(args), v);
 
         if (v > ps_r2_dof.z - 0.1f)
         {

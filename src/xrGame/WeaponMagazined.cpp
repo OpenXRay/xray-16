@@ -133,7 +133,7 @@ void CWeaponMagazined::Load(LPCSTR section)
             _GetItem(FireModesList.c_str(), i, sItem);
             {
                 s8 tmp;
-                std::from_chars(sItem, sItem + xr_strlen(sItem), tmp);
+                xr_from_chars(sItem, sItem + xr_strlen(sItem), tmp);
                 m_aFireModes.push_back(tmp);
             }
         }
@@ -1430,7 +1430,7 @@ bool CWeaponMagazined::install_upgrade_impl(LPCSTR section, bool test)
             _GetItem(str, i, sItem);
             {
                 s8 tmp;
-                std::from_chars(sItem, sItem + xr_strlen(sItem), tmp);
+                xr_from_chars(sItem, sItem + xr_strlen(sItem), tmp);
                 m_aFireModes.push_back(tmp);
             }
         }

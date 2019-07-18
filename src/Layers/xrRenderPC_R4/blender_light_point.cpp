@@ -133,7 +133,7 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        std::from_chars(Definition, Definition + xr_strlen(Definition), GEnv.Render->m_MSAASample);
+        xr_from_chars(Definition, Definition + xr_strlen(Definition), GEnv.Render->m_MSAASample);
     else
         GEnv.Render->m_MSAASample = -1;
 

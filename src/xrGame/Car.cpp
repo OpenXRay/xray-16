@@ -955,7 +955,7 @@ void CCar::Init()
             if (i != m_wheels_map.end())
             {
                 float tmp;
-                std::from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
+                xr_from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
                 i->second.CDamagableHealthItem::Init(tmp, 2);
             }
             else
@@ -964,7 +964,7 @@ void CCar::Init()
                 R_ASSERT3(i != m_doors.end(), "only wheel and doors bones allowed for damage defs", *item.first);
                 {
                     float tmp;
-                    std::from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
+                    xr_from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
                     i->second.CDamagableHealthItem::Init(tmp, 1);
                 }
             }

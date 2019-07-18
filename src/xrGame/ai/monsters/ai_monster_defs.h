@@ -109,15 +109,15 @@ struct SVelocityParam
     {
         string32 buffer;
         _GetItem(pSettings->r_string(section, line), 0, buffer);
-        std::from_chars(buffer, buffer + xr_strlen(buffer), velocity.linear);
+        xr_from_chars(buffer, buffer + xr_strlen(buffer), velocity.linear);
         _GetItem(pSettings->r_string(section, line), 1, buffer);
-        std::from_chars(buffer, buffer + xr_strlen(buffer), velocity.angular_real);
+        xr_from_chars(buffer, buffer + xr_strlen(buffer), velocity.angular_real);
         _GetItem(pSettings->r_string(section, line), 2, buffer);
-        std::from_chars(buffer, buffer + xr_strlen(buffer), velocity.angular_path);
+        xr_from_chars(buffer, buffer + xr_strlen(buffer), velocity.angular_path);
         _GetItem(pSettings->r_string(section, line), 3, buffer);
-        std::from_chars(buffer, buffer + xr_strlen(buffer), min_factor);
+        xr_from_chars(buffer, buffer + xr_strlen(buffer), min_factor);
         _GetItem(pSettings->r_string(section, line), 4, buffer);
-        std::from_chars(buffer, buffer + xr_strlen(buffer), max_factor);
+        xr_from_chars(buffer, buffer + xr_strlen(buffer), max_factor);
     }
 };
 

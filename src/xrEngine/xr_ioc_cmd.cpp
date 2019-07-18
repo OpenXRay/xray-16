@@ -191,7 +191,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         int _mode;
-        std::from_chars(args, args + xr_strlen(args), _mode);
+        xr_from_chars(args, args + xr_strlen(args), _mode);
         _dump_open_files(_mode);
     }
 };
@@ -489,7 +489,7 @@ public:
         }
 
         u32 value;
-        std::from_chars(args, args + xr_strlen(args), value);
+        xr_from_chars(args, args + xr_strlen(args), value);
 
         const auto it = std::find(rates->begin(), rates->end(), value);
 

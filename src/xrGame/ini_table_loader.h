@@ -48,7 +48,7 @@ private:
         if constexpr(std::is_same<T_ITEM, int>::value)
         {
             int tmp;
-            std::from_chars(str, str + xr_strlen(str), tmp);
+            xr_from_chars(str, str + xr_strlen(str), tmp);
             return tmp;
         }
         else
@@ -57,7 +57,7 @@ private:
                 "Specialization for convert in CIni_Table not found.");
             {
                 float tmp;
-                std::from_chars(str, str + xr_strlen(str), tmp);
+                xr_from_chars(str, str + xr_strlen(str), tmp);
                 return tmp;
             }
         }

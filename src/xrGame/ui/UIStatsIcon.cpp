@@ -85,7 +85,7 @@ void CUIStatsIcon::SetValue(LPCSTR str)
         int rank;
         {
             const char* tmp = strchr(str, '0');
-            std::from_chars(tmp, tmp + xr_strlen(tmp), rank);
+            xr_from_chars(tmp, tmp + xr_strlen(tmp), rank);
             rank -= 1;
         }
 

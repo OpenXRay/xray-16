@@ -190,7 +190,7 @@ s32 game_sv_GameState::get_option_i(LPCSTR lst, LPCSTR name, s32 def)
     {
         const char* tmp = str_c + xr_strlen(op);
         s32 retval;
-        std::from_chars(tmp, tmp + xr_strlen(tmp), retval);
+        xr_from_chars(tmp, tmp + xr_strlen(tmp), retval);
         return retval;
     }
     else
@@ -1220,7 +1220,7 @@ void game_sv_GameState::GenerateNewName(char const* old_name, char* dest, u32 co
         currc = old_name + old_name_size - 1;
 
     int curret_number;
-    std::from_chars(currc + 1, currc + 1 + xr_strlen(currc + 1), curret_number);
+    xr_from_chars(currc + 1, currc + 1 + xr_strlen(currc + 1), curret_number);
     ++curret_number;
 
     u32 name_length = static_cast<u32>(currc - old_name);

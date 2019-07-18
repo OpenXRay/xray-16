@@ -118,13 +118,13 @@ void CLensFlareDescriptor::load(CInifile const* pIni, pcstr sect)
         {
             _GetItem(R, i, name);
             float r;
-            std::from_chars(name, name + xr_strlen(name), r);
+            xr_from_chars(name, name + xr_strlen(name), r);
             _GetItem(O, i, name);
             float o;
-            std::from_chars(name, name + xr_strlen(name), o);
+            xr_from_chars(name, name + xr_strlen(name), o);
             _GetItem(P, i, name);
             float p;
-            std::from_chars(name, name + xr_strlen(name), p);
+            xr_from_chars(name, name + xr_strlen(name), p);
             _GetItem(T, i, name);
             AddFlare(r, o, p, name, S);
         }

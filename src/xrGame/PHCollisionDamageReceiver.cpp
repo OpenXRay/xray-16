@@ -28,7 +28,7 @@ void CPHCollisionDamageReceiver::Init()
             R_ASSERT3(index != BI_NONE, "Wrong bone name", *item.first);
             {
                 float tmp;
-                std::from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
+                xr_from_chars(*item.second, *item.second + xr_strlen(*item.second), tmp);
                 BoneInsert(index, tmp);
             }
             CODEGeom* og = sh->PPhysicsShell()->get_GeomByID(index);

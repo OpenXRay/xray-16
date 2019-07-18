@@ -252,7 +252,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         float v;
-        std::from_chars(args, args + xr_strlen(args), v);
+        xr_from_chars(args, args + xr_strlen(args), v);
         if (v < (min - EPS) || v > (max + EPS))
             InvalidSyntax();
         else
@@ -345,7 +345,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         int v;
-        std::from_chars(args, args + xr_strlen(args), v);
+        xr_from_chars(args, args + xr_strlen(args), v);
         if (v < min || v > max)
             InvalidSyntax();
         else

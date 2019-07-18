@@ -767,7 +767,7 @@ u8 CInifile::r_u8(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         u8 tmp;
-        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        const auto [_, err] = xr_from_chars(C, C + xr_strlen(C), tmp);
         if (err == std::errc::invalid_argument)
         {
             return -1;
@@ -781,7 +781,7 @@ u16 CInifile::r_u16(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         u16 tmp;
-        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        const auto [_, err] = xr_from_chars(C, C + xr_strlen(C), tmp);
         if (err == std::errc::invalid_argument)
         {
             return -1;
@@ -795,7 +795,7 @@ u32 CInifile::r_u32(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         u32 tmp;
-        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        const auto [_, err] = xr_from_chars(C, C + xr_strlen(C), tmp);
         if (err == std::errc::invalid_argument)
         {
             return -1;
@@ -810,7 +810,7 @@ u64 CInifile::r_u64(pcstr S, pcstr L) const
 #ifndef _EDITOR
     {
         u64 tmp;
-        const auto [_, err] = std::from_chars(C, C + xr_strlen(C), tmp);
+        const auto [_, err] = xr_from_chars(C, C + xr_strlen(C), tmp);
         if (err == std::errc::invalid_argument)
         {
             return -1;
@@ -827,7 +827,7 @@ s64 CInifile::r_s64(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         s64 tmp;
-        std::from_chars(C, C + xr_strlen(C), tmp);
+        xr_from_chars(C, C + xr_strlen(C), tmp);
         return tmp;
     }
 }
@@ -837,7 +837,7 @@ s8 CInifile::r_s8(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         s8 tmp;
-        std::from_chars(C, C + xr_strlen(C), tmp);
+        xr_from_chars(C, C + xr_strlen(C), tmp);
         return tmp;
     }
 }
@@ -847,7 +847,7 @@ s16 CInifile::r_s16(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         s16 tmp;
-        std::from_chars(C, C + xr_strlen(C), tmp);
+        xr_from_chars(C, C + xr_strlen(C), tmp);
         return tmp;
     }
 }
@@ -857,7 +857,7 @@ s32 CInifile::r_s32(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         s32 tmp;
-        std::from_chars(C, C + xr_strlen(C), tmp);
+        xr_from_chars(C, C + xr_strlen(C), tmp);
         return tmp;
     }
 }
@@ -867,7 +867,7 @@ float CInifile::r_float(pcstr S, pcstr L) const
     pcstr C = r_string(S, L);
     {
         float tmp;
-        std::from_chars(C, C + xr_strlen(C), tmp);
+        xr_from_chars(C, C + xr_strlen(C), tmp);
         return tmp;
     }
 }

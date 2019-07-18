@@ -170,7 +170,7 @@ void SArtefactActivation::SpawnAnomaly()
     VERIFY3(3 == _GetItemCount(str), "Bad record format in artefact_spawn_zones", str);
     float zone_radius;
     _GetItem(str, 1, tmp);
-    std::from_chars(tmp, tmp + xr_strlen(tmp), zone_radius);
+    xr_from_chars(tmp, tmp + xr_strlen(tmp), zone_radius);
     LPCSTR zone_sect = _GetItem(str, 0, tmp); // must be last call of _GetItem... (LPCSTR !!!)
 
     Fvector pos;
@@ -224,19 +224,19 @@ void SArtefactActivation::SStateDef::Load(LPCSTR section, LPCSTR name)
     string128 tmp;
 
     _GetItem(str, 0, tmp);
-    std::from_chars(tmp, tmp + xr_strlen(tmp), m_time);
+    xr_from_chars(tmp, tmp + xr_strlen(tmp), m_time);
 
     m_snd = clear_brackets(_GetItem(str, 1, tmp));
 
     _GetItem(str, 2, tmp);
-    std::from_chars(tmp, tmp + xr_strlen(tmp), m_light_color.r);
+    xr_from_chars(tmp, tmp + xr_strlen(tmp), m_light_color.r);
     _GetItem(str, 3, tmp);
-    std::from_chars(tmp, tmp + xr_strlen(tmp), m_light_color.g);
+    xr_from_chars(tmp, tmp + xr_strlen(tmp), m_light_color.g);
     _GetItem(str, 4, tmp);
-    std::from_chars(tmp, tmp + xr_strlen(tmp), m_light_color.b);
+    xr_from_chars(tmp, tmp + xr_strlen(tmp), m_light_color.b);
 
     _GetItem(str, 5, tmp);
-    std::from_chars(tmp, tmp + xr_strlen(tmp), m_light_range);
+    xr_from_chars(tmp, tmp + xr_strlen(tmp), m_light_range);
 
     m_particle = clear_brackets(_GetItem(str, 6, tmp));
     m_animation = clear_brackets(_GetItem(str, 7, tmp));

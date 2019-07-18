@@ -98,7 +98,7 @@ void generate_story_ids(STORY_PAIRS& result, _id_type INVALID_ID, LPCSTR section
 
         {
             int tmp;
-            std::from_chars(N, N + xr_strlen(N), tmp);
+            xr_from_chars(N, N + xr_strlen(N), tmp);
             result.push_back(std::make_pair(*temp, tmp));
         }
     }

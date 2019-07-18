@@ -71,7 +71,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         {
                             string64 tmp;
                             _GetItem(V, 0, tmp);
-                            std::from_chars(tmp, tmp + xr_strlen(tmp), spawn_count); // count
+                            xr_from_chars(tmp, tmp + xr_strlen(tmp), spawn_count); // count
                         }
 
                         if (!spawn_count)
@@ -79,7 +79,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         {
                             const char* cond_c = strstr(V, "cond=");
                             if (nullptr != cond_c)
-                                std::from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
+                                xr_from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
                         }
                         bScope = nullptr != strstr(V, "scope");
                         bSilencer = nullptr != strstr(V, "silencer");
@@ -87,7 +87,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         {
                             const char* ammo_type_c = strstr(V, "cond=");
                             if (nullptr != ammo_type_c)
-                                std::from_chars(
+                                xr_from_chars(
                                     ammo_type_c + 10, ammo_type_c + 10 + xr_strlen(ammo_type_c + 10), i_ammo_type);
                         }
                     }
@@ -152,7 +152,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                     {
                         string64 buf;
                         _GetItem(V, 0, buf);
-                        std::from_chars(buf, buf + xr_strlen(buf), j);
+                        xr_from_chars(buf, buf + xr_strlen(buf), j);
                     }
                     if (!j)
                         j = 1;
@@ -164,14 +164,14 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                     {
                         const char* prob_c = strstr(V, "prob=");
                         if (prob_c != nullptr)
-                            std::from_chars(prob_c + 5, prob_c + 5 + xr_strlen(prob_c + 5), p);
+                            xr_from_chars(prob_c + 5, prob_c + 5 + xr_strlen(prob_c + 5), p);
                     }
                     if (fis_zero(p))
                         p = 1.0f;
                     {
                         const char* cond_c = strstr(V, "cond=");
                         if (nullptr != cond_c)
-                            std::from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
+                            xr_from_chars(cond_c + 5, cond_c + 5 + xr_strlen(cond_c + 5), f_cond);
                     }
                 }
                 for (u32 i = 0; i < j; ++i)

@@ -205,7 +205,7 @@ int XMLDocument::ReadInt(XML_NODE node, const int default_int_val) const
         return default_int_val;
     {
         int tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -218,7 +218,7 @@ int XMLDocument::ReadInt(pcstr path, const size_t index, const int default_int_v
 
     {
         int tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -231,7 +231,7 @@ int XMLDocument::ReadInt(XML_NODE start_node, pcstr path, const size_t index, co
 
     {
         int tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -244,7 +244,7 @@ float XMLDocument::ReadFlt(pcstr path, const size_t index, float default_flt_val
 
     {
         float tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -257,7 +257,7 @@ float XMLDocument::ReadFlt(XML_NODE start_node, pcstr path, const size_t index, 
 
     {
         float tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -271,7 +271,7 @@ float XMLDocument::ReadFlt(XML_NODE node, float default_flt_val) const
 
     {
         float tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -312,7 +312,7 @@ int XMLDocument::ReadAttribInt(XML_NODE node, pcstr attrib, const int default_in
 
     {
         int tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -326,7 +326,7 @@ int XMLDocument::ReadAttribInt(pcstr path, const size_t index, pcstr attrib, int
 
     {
         int tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -339,7 +339,7 @@ int XMLDocument::ReadAttribInt(XML_NODE start_node, pcstr path, const size_t ind
         return default_int_val;
     {
         int tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -353,7 +353,7 @@ float XMLDocument::ReadAttribFlt(pcstr path, const size_t index, pcstr attrib, c
 
     {
         float tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -367,7 +367,7 @@ float XMLDocument::ReadAttribFlt(XML_NODE start_node, pcstr path, const size_t i
 
     {
         float tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }
@@ -381,7 +381,7 @@ float XMLDocument::ReadAttribFlt(XML_NODE node, pcstr attrib, const float defaul
 
     {
         float tmp;
-        std::from_chars(result_str, result_str + xr_strlen(result_str), tmp);
+        xr_from_chars(result_str, result_str + xr_strlen(result_str), tmp);
         return tmp;
     }
 }

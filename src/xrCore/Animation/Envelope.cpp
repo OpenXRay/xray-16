@@ -203,7 +203,7 @@ void CEnvelope::LoadA(IReader& F)
     {
         F.r_string(buf, sizeof(buf));
         int nkeys;
-        std::from_chars(buf, buf + xr_strlen(buf), nkeys);
+        xr_from_chars(buf, buf + xr_strlen(buf), nkeys);
         keys.resize(nkeys);
         for (u32 i = 0; i < keys.size(); i++)
         {

@@ -34,10 +34,10 @@ void CPurchaseList::process(CInifile& ini_file, LPCSTR section, CInventoryOwner&
         {
             _GetItem(*(*I).second, 0, buffer);
             int tmp_i;
-            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_i);
+            xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp_i);
             _GetItem(*(*I).second, 1, buffer);
             float tmp_f;
-            std::from_chars(buffer, buffer + xr_strlen(buffer), tmp_f);
+            xr_from_chars(buffer, buffer + xr_strlen(buffer), tmp_f);
             process(game_object, (*I).first, tmp_i, tmp_f);
         }
     }
