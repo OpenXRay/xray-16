@@ -134,48 +134,49 @@ enum EGameActions
     kFORCEDWORD = u32(-1)
 };
 
-struct ENGINE_API _keyboard
+struct ENGINE_API keyboard_key
 {
     pcstr key_name;
     int dik;
     xr_string key_local_name;
 };
-enum _key_group
+enum EKeyGroup
 {
     _both = (1 << 0),
     _sp = _both | (1 << 1),
     _mp = _both | (1 << 2),
 };
 
-extern ENGINE_API _key_group g_current_keygroup;
+extern ENGINE_API EKeyGroup g_current_keygroup;
 
-struct ENGINE_API _action
+struct ENGINE_API game_action
 {
     pcstr action_name;
     EGameActions id;
-    _key_group key_group;
+    EKeyGroup key_group;
 };
 
-extern ENGINE_API _action actions[];
-extern ENGINE_API _keyboard keyboards[];
+extern ENGINE_API game_action actions[];
+extern ENGINE_API keyboard_key keyboards[];
 
 #define bindings_count kLASTACTION
-struct ENGINE_API _binding
+#define bindtypes_count 3
+struct ENGINE_API key_binding
 {
-    _action* m_action;
-    _keyboard* m_keyboard[2];
+    game_action* m_action;
+    keyboard_key* m_keyboard[bindtypes_count];
 };
 
-extern ENGINE_API _binding g_key_bindings[];
+extern ENGINE_API key_binding g_key_bindings[];
 
-ENGINE_API EGameActions action_name_to_id(pcstr _name);
-ENGINE_API _action* action_name_to_ptr(pcstr _name);
+ENGINE_API EGameActions ActionNameToId(pcstr name);
+ENGINE_API game_action* ActionNameToPtr(pcstr name);
 
-ENGINE_API bool is_binded(EGameActions action_id, int dik);
-ENGINE_API int get_action_dik(EGameActions action_id, int idx = -1);
+ENGINE_API bool IsBinded(EGameActions action_id, int dik);
+ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
 
-ENGINE_API int keyname_to_dik(pcstr _name);
-ENGINE_API _keyboard* keyname_to_ptr(pcstr _name);
+ENGINE_API int KeynameToDik(pcstr name);
+ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
 
 ENGINE_API void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz);
 

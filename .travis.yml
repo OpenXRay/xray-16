@@ -89,10 +89,11 @@ script:
 
 deploy:
   provider: releases
-  user: $GITHUB_USERNAME
-  password: $GITHUB_PASSWORD
-  file: *.deb
+  api_key:
+    secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
+  file: ./*.deb
   skip_cleanup: true
+  draft: true
 
 notifications:
   email: false

@@ -90,11 +90,11 @@ CBulletManager::CBulletManager()
 #if 0 // def CONFIG_PROFILE_LOCKS
     : m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
-        ,m_thread_id(GetCurrentThreadId())
+        ,m_thread_id(Threading::GetCurrThreadId())
 #endif // #ifdef DEBUG
 #else // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-    : m_thread_id(GetCurrentThreadId())
+    : m_thread_id(Threading::GetCurrThreadId())
 #endif // #ifdef DEBUG
 #endif // #ifdef CONFIG_PROFILE_LOCKS
 {
@@ -187,7 +187,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     // Always called in Primary thread
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
-    VERIFY(m_thread_id == GetCurrentThreadId());
+    VERIFY(m_thread_id == Threading::GetCurrThreadId());
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
@@ -210,7 +210,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 
 void CBulletManager::UpdateWorkload()
 {
-    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == GetCurrentThreadId());
+    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == Threading::GetCurrThreadId());
 
     rq_storage.r_clear();
 

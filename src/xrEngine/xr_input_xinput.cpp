@@ -3,11 +3,11 @@
 #include "xr_input.h"
 #include "StringTable/IStringTable.h"
 
-ENGINE_API _binding g_key_bindings[bindings_count];
-ENGINE_API _key_group g_current_keygroup = _sp;
+ENGINE_API key_binding g_key_bindings[bindings_count];
+ENGINE_API EKeyGroup g_current_keygroup = _sp;
 
 // clang-format off
-_action actions[] = {
+game_action actions[] = {
     { "left",              kLEFT,              _both },
     { "right",             kRIGHT,             _both },
     { "up",                kUP,                _both },
@@ -136,7 +136,7 @@ _action actions[] = {
     { nullptr,             kLASTACTION,        _both }
 };
 
-_keyboard keyboards[] =
+keyboard_key keyboards[] =
 {
     { "mouse1",                 MOUSE_1,                         "LMB" },
     { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake cause init algorithm was changed.
@@ -450,111 +450,116 @@ _keyboard keyboards[] =
 };
 // clang-format on
 
-EGameActions action_name_to_id(pcstr _name)
+EGameActions ActionNameToId(pcstr name)
 {
-    _action* action = action_name_to_ptr(_name);
+    game_action* action = ActionNameToPtr(name);
     if (action)
         return action->id;
     else
         return kNOTBINDED;
 }
 
-_action* action_name_to_ptr(pcstr _name)
+game_action* ActionNameToPtr(pcstr name)
 {
     size_t idx = 0;
     while (actions[idx].action_name)
     {
-        if (!xr_stricmp(_name, actions[idx].action_name))
+        if (!xr_stricmp(name, actions[idx].action_name))
             return &actions[idx];
         ++idx;
     }
-    Msg("! [action_name_to_ptr] cant find corresponding 'id' for '%s'", _name);
+    Msg("! [ActionNameToPtr] cant find corresponding 'id' for '%s'", name);
     return nullptr;
 }
 
-bool is_binded(EGameActions _action_id, int _dik)
+bool IsBinded(EGameActions action_id, int dik)
 {
-    _binding* pbinding = &g_key_bindings[_action_id];
-    if (pbinding->m_keyboard[0] && pbinding->m_keyboard[0]->dik == _dik)
-        return true;
-
-    if (pbinding->m_keyboard[1] && pbinding->m_keyboard[1]->dik == _dik)
-        return true;
+    key_binding* binding = &g_key_bindings[action_id];
+    for (u8 i = 0; i < bindtypes_count; ++i)
+        if (binding->m_keyboard[i] && binding->m_keyboard[i]->dik == dik)
+            return true;
 
     return false;
 }
 
-int get_action_dik(EGameActions _action_id, int idx)
+int GetActionDik(EGameActions action_id, int idx)
 {
-    _binding* pbinding = &g_key_bindings[_action_id];
+    key_binding* binding = &g_key_bindings[action_id];
 
     if (idx == -1)
     {
-        if (pbinding->m_keyboard[0])
-            return pbinding->m_keyboard[0]->dik;
-
-        if (pbinding->m_keyboard[1])
-            return pbinding->m_keyboard[1]->dik;
+        for (u8 i = 0; i < bindtypes_count; ++i)
+            if (binding->m_keyboard[i])
+                return binding->m_keyboard[i]->dik;
     }
     else
     {
-        if (pbinding->m_keyboard[idx])
-            return pbinding->m_keyboard[idx]->dik;
+        if (binding->m_keyboard[idx])
+            return binding->m_keyboard[idx]->dik;
     }
     return SDL_SCANCODE_UNKNOWN;
 }
 
-int keyname_to_dik(pcstr _name)
+int KeynameToDik(pcstr name)
 {
-    _keyboard* _kb = keyname_to_ptr(_name);
-    return _kb->dik;
+    keyboard_key* kb = KeynameToPtr(name);
+    return kb->dik;
 }
 
-_keyboard* keyname_to_ptr(pcstr _name)
+keyboard_key* KeynameToPtr(pcstr name)
 {
     size_t idx = 0;
     while (keyboards[idx].key_name)
     {
-        _keyboard& kb = keyboards[idx];
-        if (!xr_stricmp(_name, kb.key_name))
+        keyboard_key& kb = keyboards[idx];
+        if (!xr_stricmp(name, kb.key_name))
             return &keyboards[idx];
         ++idx;
     }
 
-    Msg("! [keyname_to_ptr] cant find corresponding '_keyboard' for keyname %s", _name);
+    Msg("! [KeynameToPtr] cant find corresponding 'keyboard_key' for keyname %s", name);
     return NULL;
 }
 
-void GetActionAllBinding(LPCSTR _action, char* dst_buff, int dst_buff_sz)
+void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz)
 {
-    int action_id = action_name_to_id(_action);
-    _binding* pbinding = &g_key_bindings[action_id];
+    int action_id = ActionNameToId(action);
+    key_binding* binding = &g_key_bindings[action_id];
 
     string128 prim;
     string128 sec;
+    string128 gpad;
     prim[0] = 0;
     sec[0] = 0;
+    gpad[0] = 0;
 
-    if (pbinding->m_keyboard[0])
+    if (binding->m_keyboard[0])
     {
-        xr_strcpy(prim, pbinding->m_keyboard[0]->key_local_name.c_str());
+        xr_strcpy(prim, binding->m_keyboard[0]->key_local_name.c_str());
     }
-    if (pbinding->m_keyboard[1])
+    if (binding->m_keyboard[1])
     {
-        xr_strcpy(sec, pbinding->m_keyboard[1]->key_local_name.c_str());
+        xr_strcpy(sec, binding->m_keyboard[1]->key_local_name.c_str());
     }
-    if (NULL == pbinding->m_keyboard[0] && NULL == pbinding->m_keyboard[1])
+    if (binding->m_keyboard[2])
+    {
+        xr_strcpy(gpad, binding->m_keyboard[2]->key_local_name.c_str());
+    }
+    if (NULL == binding->m_keyboard[0] && NULL == binding->m_keyboard[1] && NULL == binding->m_keyboard[2])
     {
         xr_sprintf(dst_buff, dst_buff_sz, "%s", gStringTable->translate("st_key_notbinded").c_str());
     }
     else
-        xr_sprintf(
-            dst_buff, dst_buff_sz, "%s%s%s", prim[0] ? prim : "", (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "");
+        xr_sprintf(dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "", 
+            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "", 
+            ((gpad[0] && prim[0]) || (gpad[0] && sec[0])) ? " , " : "", gpad[0] ? gpad : "");
 }
+
+#pragma todo("Artur to All: Gamepads has own bindings. Add m_keyboard[2]")
 
 std::pair<int, int> GetKeysBindedTo(EGameActions action_id)
 {
-    const _binding& binding = g_key_bindings[action_id];
+    const key_binding& binding = g_key_bindings[action_id];
     return
     {
         binding.m_keyboard[0] ? binding.m_keyboard[0]->dik : -1,

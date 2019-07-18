@@ -154,7 +154,7 @@ void ImplicitLighting(BOOL b_net)
         ImplicitLightingExec(FALSE);
         return;
     }
-    thread_spawn(ImplicitLightingTreadNetExec, "worker-thread", 1024 * 1024, 0);
+    Threading::SpawnThread(ImplicitLightingTreadNetExec, "worker-thread", 1024 * 1024, 0);
 }
 Lock implicit_net_lock;
 void XRLC_LIGHT_API ImplicitNetWait()

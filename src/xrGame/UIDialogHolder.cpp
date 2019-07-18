@@ -277,7 +277,7 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
             if (IR)
             //				IR->IR_OnKeyboardPress(get_binded_action(dik));
             {
-                EGameActions action = get_binded_action(dik);
+                EGameActions action = GetBindedAction(dik);
                 if (action != kQUICK_USE_1 && action != kQUICK_USE_2 && action != kQUICK_USE_3 &&
                     action != kQUICK_USE_4)
                     IR->IR_OnKeyboardPress(action);
@@ -316,7 +316,7 @@ bool CDialogHolder::IR_UIOnKeyboardRelease(int dik)
         {
             IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
             if (IR)
-                IR->IR_OnKeyboardRelease(get_binded_action(dik));
+                IR->IR_OnKeyboardRelease(GetBindedAction(dik));
             return (false);
         }
     }
@@ -352,7 +352,7 @@ bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
         {
             IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
             if (IR)
-                IR->IR_OnKeyboardHold(get_binded_action(dik));
+                IR->IR_OnKeyboardHold(GetBindedAction(dik));
             return false;
         }
     }

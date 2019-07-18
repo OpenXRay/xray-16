@@ -71,6 +71,7 @@ public:
 
     void InitializeRenderers();
     void SelectRenderer();
+    void CloseUnusedLibraries();
 
     void Destroy();
 

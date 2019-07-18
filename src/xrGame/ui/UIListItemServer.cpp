@@ -99,22 +99,22 @@ void CUIListItemServer::InitItemServer(LIST_SRV_ITEM& params)
 }
 
 #include "string_table.h"
-u32 cut_string_by_length(CGameFont* pFont, LPCSTR src, LPSTR dst, u32 dst_size, float length);
+u32 CutStringByLength(CGameFont* font, LPCSTR src, LPSTR dst, u32 dstSize, float length);
 
 void CUIListItemServer::SetParams(LIST_SRV_ITEM& params)
 {
     string1024 buff;
 
     LPCSTR _srv_name = StringTable().translate(params.info.server).c_str();
-    cut_string_by_length(m_map->GetFont(), _srv_name, buff, sizeof(buff), m_server->GetWidth());
+    CutStringByLength(m_map->GetFont(), _srv_name, buff, sizeof(buff), m_server->GetWidth());
     m_server->SetText(buff);
 
     LPCSTR _map_name = StringTable().translate(params.info.map).c_str();
-    cut_string_by_length(m_map->GetFont(), _map_name, buff, sizeof(buff), m_map->GetWidth());
+    CutStringByLength(m_map->GetFont(), _map_name, buff, sizeof(buff), m_map->GetWidth());
     m_map->SetText(buff);
 
     LPCSTR _game_name = StringTable().translate(params.info.game).c_str();
-    cut_string_by_length(m_game->GetFont(), _game_name, buff, sizeof(buff), m_game->GetWidth());
+    CutStringByLength(m_game->GetFont(), _game_name, buff, sizeof(buff), m_game->GetWidth());
     m_game->SetText(buff);
 
     m_players->SetText(params.info.players.c_str());

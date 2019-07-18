@@ -121,6 +121,9 @@
     <Filter Include="Events">
       <UniqueIdentifier>{f17d865f-a3fd-41ac-b217-d7d34ed591f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threading\Util">
+      <UniqueIdentifier>{14c94737-f2c7-482d-9033-775a3da068cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -341,6 +344,9 @@
     </ClCompile>
     <ClCompile Include="string_concatenations.cpp">
       <Filter>shared memory/string library</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ThreadUtil.cpp">
+      <Filter>Threading\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -742,6 +748,9 @@
     </ClInclude>
     <ClInclude Include="string_concatenations_inline.h">
       <Filter>shared memory/string library</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ThreadUtil.h">
+      <Filter>Threading\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
