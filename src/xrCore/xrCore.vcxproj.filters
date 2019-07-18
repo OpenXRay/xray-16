@@ -156,9 +156,6 @@
     <ClCompile Include="clsid.cpp">
       <Filter>Math\Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="string_concatenations.cpp">
-      <Filter>Math\Extensions</Filter>
-    </ClCompile>
     <ClCompile Include="xr_trims.cpp">
       <Filter>Math\Extensions</Filter>
     </ClCompile>
@@ -345,6 +342,9 @@
     <ClCompile Include="Animation\BoneEditor.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
+    <ClCompile Include="string_concatenations.cpp">
+      <Filter>shared memory/string library</Filter>
+    </ClCompile>
     <ClCompile Include="Threading\ThreadUtil.cpp">
       <Filter>Threading\Util</Filter>
     </ClCompile>
@@ -453,12 +453,6 @@
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="fastdelegate.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="string_concatenations.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="string_concatenations_inline.h">
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="xr_trims.h">
@@ -748,6 +742,12 @@
     </ClInclude>
     <ClInclude Include="Threading\TaskManager.hpp">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="string_concatenations.h">
+      <Filter>shared memory/string library</Filter>
+    </ClInclude>
+    <ClInclude Include="string_concatenations_inline.h">
+      <Filter>shared memory/string library</Filter>
     </ClInclude>
     <ClInclude Include="Threading\ThreadUtil.h">
       <Filter>Threading\Util</Filter>
