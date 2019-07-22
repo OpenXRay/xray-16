@@ -43,3 +43,6 @@
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
+[submodule "Externals/kNet"]
+	path = Externals/kNet
+	url = https://github.com/juj/kNet.git
