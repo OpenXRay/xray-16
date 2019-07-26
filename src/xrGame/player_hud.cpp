@@ -539,7 +539,7 @@ u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud
         return 100; // ms TEMPORARY
     R_ASSERT2(pm,
         make_string("hudItem model [%s] has no motion with alias [%s]", hud_name.c_str(), anim_name.c_str()).c_str());
-    return motion_length(pm->m_animations[0].mid, md, speed, reinterpret_cast<IKinematicsAnimated*>(pi->m_model));
+    return motion_length(pm->m_animations[0].mid, md, speed, smart_cast<IKinematicsAnimated*>(pi->m_model));
 }
 
 u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel)
