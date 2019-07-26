@@ -340,16 +340,17 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
     case eFire:
     case eFire2:
     {
+        u32 time = 0;
         if (attackStarted)
         {
             attackStarted = false;
             if (state == eFire)
-                PlayHUDMotion("anm_attack_end", "anim_shoot1_end", FALSE, this, state);
+                time = PlayHUDMotion("anm_attack_end", "anim_shoot1_end", FALSE, this, state);
             else // eFire2
-                PlayHUDMotion("anm_attack2_end", "anim_shoot2_end", FALSE, this, state);
-            hitEndAnimation = true;
+                time = PlayHUDMotion("anm_attack2_end", "anim_shoot2_end", FALSE, this, state);
+            hitEndAnimation = time != 0;
         }
-        else
+        if (time == 0)
         {
             hitEndAnimation = false;
             SwitchState(eIdle);
