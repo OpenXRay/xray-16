@@ -122,20 +122,23 @@ void CInput::DisplayDevicesList()
     {
         Msg("Available joysticks[%d]:", joysticks.size() - controllers.size());
 
-        size_t it = 0;
-        for (auto& token : JoysticksToken)
+        if(controllers.size() > 0)
         {
-            if (it <= ControllersToken.size())
+            size_t it = 0;
+            for (auto& token : JoysticksToken)
             {
-                if (token.id == ControllersToken[it].id)
+                if (it <= ControllersToken.size())
                 {
-                    ++it;
-                    continue;
+                    if (token.id == ControllersToken[it].id)
+                    {
+                        ++it;
+                        continue;
+                    }
                 }
-            }
 
-            if (token.name)
-                Log(token.name);
+                if (token.name)
+                    Log(token.name);
+            }
         }
     }
 
