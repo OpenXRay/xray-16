@@ -5,17 +5,16 @@
 
 using namespace XRay;
 
-ScriptExporter::Node* ScriptExporter::Node::firstNode = nullptr;
-ScriptExporter::Node* ScriptExporter::Node::lastNode = nullptr;
-size_t ScriptExporter::Node::nodeCount = 0;
+ScriptExporter::Node* ScriptExporter::Node::FirstNode = nullptr;
+ScriptExporter::Node* ScriptExporter::Node::LastNode = nullptr;
+size_t ScriptExporter::Node::NodeCount = 0;
 
-ScriptExporter::Node::Node(const char* id, size_t depCount, const char* const* deps, ExporterFunc exporterFunc)
+ScriptExporter::Node::Node(const char* id, std::initializer_list<shared_str> deps, ExporterFunc exporterFunc)
+: m_deps(deps)
 {
-    this->id = id;
-    this->depCount = depCount;
-    this->deps = deps;
-    this->exporterFunc = exporterFunc;
-    done = false;
+    m_id = id;
+    m_exporterFunc = exporterFunc;
+    m_done = false;
     InsertAfter(nullptr, this);
 }
 
@@ -24,28 +23,28 @@ ScriptExporter::Node::~Node()
     // Remap locals
     // ... <-> N <-> this <-> N <-> ...
     {
-        if (prevNode)
-            prevNode->nextNode = this->nextNode;
+        if (m_prevNode)
+            m_prevNode->m_nextNode = m_nextNode;
 
-        if (nextNode)
-            nextNode->prevNode = this->prevNode;
+        if (m_nextNode)
+            m_nextNode->m_prevNode = m_prevNode;
     }
 
     // Remap globals
     {
         // this <-> N <-> ...
-        if (firstNode == this)
-            firstNode = this->nextNode;
+        if (FirstNode == this)
+            FirstNode = m_nextNode;
 
         // ... <-> N <-> this
-        if (lastNode == this)
-            lastNode = this->prevNode;
+        if (LastNode == this)
+            LastNode = m_prevNode;
     }
 }
 
 void ScriptExporter::Node::Export(lua_State* luaState)
 {
-    if (done)
+    if (m_done)
     {
 #ifdef CONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
         Msg("* ScriptExporter: skipping exported node %s", id);
@@ -53,12 +52,12 @@ void ScriptExporter::Node::Export(lua_State* luaState)
         return;
     }
     // export dependencies recursively
-    for (size_t i = 0; i < depCount; i++)
+    for (const shared_str& it : m_deps)
     {
         // check if 'deps[i]' depends on 'node'
         for (Node* n = GetFirst(); n; n = n->GetNext())
         {
-            if (!n->done && !strcmp(deps[i], n->id))
+            if (!n->m_done && !xr_strcmp(it, n->m_id))
             {
                 n->Export(luaState);
                 break;
@@ -68,23 +67,23 @@ void ScriptExporter::Node::Export(lua_State* luaState)
 #ifdef CONFIG_SCRIPT_ENGINE_LOG_EXPORTS
     Msg("* ScriptExporter: exporting node %s", id);
 #endif
-    exporterFunc(luaState);
-    done = true;
+    m_exporterFunc(luaState);
+    m_done = true;
 }
 
 bool ScriptExporter::Node::HasDependency(const Node* node) const
 {
-    for (size_t i = 0; i < depCount; i++)
+    for (const shared_str& it : m_deps)
     {
-        if (!strcmp(deps[i], node->id))
+        if (!xr_strcmp(it, node->m_id))
             return true;
     }
-    for (size_t i = 0; i < depCount; i++)
+    for (const shared_str& it : m_deps)
     {
         // check if 'deps[i]' depends on 'node'
         for (Node* n = GetFirst(); n; n = n->GetNext())
         {
-            if (!strcmp(deps[i], n->id))
+            if (!xr_strcmp(it, n->m_id))
             {
                 if (n->HasDependency(node))
                     return true;
@@ -99,23 +98,23 @@ void ScriptExporter::Node::InsertAfter(Node* target, Node* node)
 {
     if (!target)
     {
-        node->prevNode = lastNode;
-        node->nextNode = nullptr;
-        if (lastNode)
-            lastNode->nextNode = node;
+        node->m_prevNode = LastNode;
+        node->m_nextNode = nullptr;
+        if (LastNode)
+            LastNode->m_nextNode = node;
         else
-            firstNode = node;
-        lastNode = node;
+            FirstNode = node;
+        LastNode = node;
     }
     else
     {
-        node->prevNode = target;
-        node->nextNode = target->nextNode;
-        if (target == lastNode)
-            lastNode = node;
-        target->nextNode = node;
+        node->m_prevNode = target;
+        node->m_nextNode = target->m_nextNode;
+        if (target == LastNode)
+            LastNode = node;
+        target->m_nextNode = node;
     }
-    nodeCount++;
+    NodeCount++;
 }
 
 void ScriptExporter::Export(lua_State* luaState)
@@ -125,10 +124,9 @@ void ScriptExporter::Export(lua_State* luaState)
     for (auto node = Node::GetFirst(); node; node = node->GetNext())
     {
         Msg("* %s", node->GetId());
-        size_t depCount = node->GetDependencyCount();
-        const char* const* depIds = node->GetDependencyIds();
-        for (int i = 0; i < depCount; i++)
-            Msg("* <- %s", depIds[i]);
+        const xr_list<shared_str>& depIds = node->GetDependencyIds();
+        for (const shared_str& it : depIds)
+            Msg("* <- %s", it.c_str());
     }
 #endif
     for (auto node = Node::GetFirst(); node; node = node->GetNext())
