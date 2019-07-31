@@ -126,7 +126,7 @@ void CInventoryItem::Load(LPCSTR section)
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 }
 
-void CInventoryItem::reloadNames()
+void CInventoryItem::ReloadNames()
 {
     m_name = StringTable().translate(pSettings->r_string(m_object->cNameSect(), "inv_name"));
     m_nameShort = StringTable().translate(pSettings->r_string(m_object->cNameSect(), "inv_name_short"));

@@ -258,8 +258,8 @@ bool CMainMenu::ReloadUI()
 bool CMainMenu::IsActive() { return !!m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
 
-bool CMainMenu::isLanguageChanged() { return mLanguageChanged; }
-void CMainMenu::setLanguageChanged(bool status) { mLanguageChanged = status; }
+bool CMainMenu::IsLanguageChanged() { return mLanguageChanged; }
+void CMainMenu::SetLanguageChanged(bool status) { mLanguageChanged = status; }
 
 // IInputReceiver
 static int mouse_button_2_key[] = {MOUSE_1, MOUSE_2, MOUSE_3};

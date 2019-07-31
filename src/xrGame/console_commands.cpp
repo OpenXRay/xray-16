@@ -105,9 +105,6 @@ extern BOOL g_invert_zoom;
 int g_inv_highlight_equipped = 0;
 //-Alundaio
 
-extern u32 gLanguage;
-extern xr_vector<xr_token> gLanguagesToken;
-
 //-----------------------------------------------------------
 
 BOOL g_bCheckTime = FALSE;
@@ -206,35 +203,33 @@ public:
 class CCC_GameLanguage : public CCC_Token
 {
 public:
-    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&gLanguage, NULL) {};
+    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, &CStringTable::LanguageID, NULL){};
 
     virtual void Execute(LPCSTR args)
     {
-        tokens = gLanguagesToken.data();
-
         CCC_Token::Execute(args);
         StringTable().ReloadLanguage();
 
         if (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive())
-            MainMenu()->setLanguageChanged(true);
+            MainMenu()->SetLanguageChanged(true);
 
         if (!g_pGameLevel)
             return;
 
         for (u16 id = 0; id < 0xffff; id++)
         {
-            CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(id));
-            if (!pGameObject)
-                continue;
-
-            if (CInventoryItem* p = smart_cast<CInventoryItem*>(pGameObject))
-                p->reloadNames();
+            IGameObject* gameObj = Level().Objects.net_Find(id);
+            if (gameObj)
+            {
+                if (CInventoryItem* invItem = gameObj->cast_inventory_item())
+                    invItem->ReloadNames();
+            }
         }
     }
 
     const xr_token* GetToken() noexcept override
     {
-        tokens = gLanguagesToken.data();
+        tokens = StringTable().GetLanguagesToken();
         return CCC_Token::GetToken();
     }
 };

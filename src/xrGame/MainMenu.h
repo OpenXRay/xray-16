@@ -83,8 +83,8 @@ public:
     virtual bool IsActive();
     virtual bool CanSkipSceneRendering();
 
-    virtual bool isLanguageChanged();
-    virtual void setLanguageChanged(bool status);
+    bool IsLanguageChanged();
+    void SetLanguageChanged(bool status);
 
     virtual bool IgnorePause() { return true; }
     virtual void IR_OnMousePress(int btn);

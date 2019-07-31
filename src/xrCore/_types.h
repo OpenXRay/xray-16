@@ -22,6 +22,7 @@ using f64 = double;
 
 using pstr = char*;
 using pcstr = const char*;
+using cpcstr = const char* const;
 
 // Type limits
 template <typename T>

@@ -32,15 +32,16 @@ public:
 
     void ReloadLanguage();
 
+    xr_token* GetLanguagesToken() const;
+    static u32 LanguageID;
+
 private:
     void Load(LPCSTR xml_file);
+    void FillLanguageToken();
+    void SetLanguage();
     static STRING_VALUE ParseLine(LPCSTR str, LPCSTR key, bool bFirst);
     static STRING_TABLE_DATA* pData;
+    static xr_vector<xr_token> m_languagesToken;
 };
-
-#ifdef COC_EDITION
-extern u32 gLanguage;
-extern xr_vector<xr_token> gLanguagesToken;
-#endif
 
 CStringTable& StringTable();

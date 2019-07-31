@@ -6,22 +6,31 @@
 
 CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
 
-STRING_TABLE_DATA* CStringTable::pData = NULL;
+STRING_TABLE_DATA* CStringTable::pData = nullptr;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
-
-u32 gLanguage = -1;
-xr_vector<xr_token> gLanguagesToken;
+u32 CStringTable::LanguageID = std::numeric_limits<u32>::max();
+xr_vector<xr_token> CStringTable::m_languagesToken;
 
 CStringTable::CStringTable()
 {
     pData = nullptr;
+    FillLanguageToken();
 }
 
-CStringTable::~CStringTable() { Destroy(); }
-void CStringTable::Destroy() { xr_delete(pData); }
+CStringTable::~CStringTable()
+{
+    Destroy();
+    m_languagesToken.clear();
+}
+
+void CStringTable::Destroy()
+{
+    xr_delete(pData);
+}
+
 void CStringTable::rescan()
 {
-    if (NULL != pData)
+    if (pData != nullptr)
         return;
     Destroy();
     Init();
@@ -29,46 +38,13 @@ void CStringTable::rescan()
 
 void CStringTable::Init()
 {
-    if (NULL != pData)
+    if (pData != nullptr)
         return;
 
     pData = new STRING_TABLE_DATA();
-
-    if (gLanguagesToken.size() == 0)
-    {
-        u32 lineCount = pSettings->line_count("Languages");
-        R_ASSERT2(lineCount != 0, "Section \"Languages\" is empty!");
-
-        LPCSTR lineName, lineVal;
-        for (u16 i = 0; i < lineCount; i++)
-        {
-            pSettings->r_line("Languages", i, &lineName, &lineVal);
-            gLanguagesToken.emplace_back(lineName, i);
-        }
-        gLanguagesToken.emplace_back(nullptr, -1);
-    }
     
-    //имя языка, если не задано (NULL), то первый <text> в <string> в XML
-    if (gLanguage != (u32)-1)
-        pData->m_sLanguage = gLanguagesToken.at(gLanguage).name;
-    else
-    {
-        pData->m_sLanguage = pSettings->r_string("string_table", "language");
-        bool found = false;
-        for (const auto& it : gLanguagesToken)
-        {
-            if (it.name && it.name == pData->m_sLanguage)
-            {
-                gLanguage = it.id;
-                found = true;
-                break;
-            }
-        }
-
-        R_ASSERT2(found, "Check localization.ltx");
-    }
+    SetLanguage();
     
-    //---
     FS_FileSet fset;
     string_path files_mask;
     xr_sprintf(files_mask, "text\\%s\\*.xml", pData->m_sLanguage.c_str());
@@ -87,9 +63,51 @@ void CStringTable::Init()
 #ifdef DEBUG
     Msg("StringTable: loaded %d files", fset.size());
 #endif // #ifdef DEBUG
-    //---
+
     ReparseKeyBindings();
 }
+
+void CStringTable::FillLanguageToken()
+{
+    if (m_languagesToken.size() == 0)
+    {
+        u32 lineCount = pSettings->line_count("Languages");
+        R_ASSERT2(lineCount > 0, "Section \"Languages\" is empty!");
+
+        LPCSTR lineName, lineVal;
+        for (u16 i = 0; i < lineCount; i++)
+        {
+            pSettings->r_line("Languages", i, &lineName, &lineVal);
+            m_languagesToken.emplace_back(lineName, i);
+        }
+        m_languagesToken.emplace_back(nullptr, -1);
+    }
+}
+
+void CStringTable::SetLanguage()
+{
+    if (LanguageID != std::numeric_limits<u32>::max())
+        pData->m_sLanguage = m_languagesToken.at(LanguageID).name;
+    else
+    {
+        pData->m_sLanguage = pSettings->r_string("string_table", "language");
+        bool found = false;
+        for (const auto& it : m_languagesToken)
+        {
+            if (it.name && it.name == pData->m_sLanguage)
+            {
+                LanguageID = it.id;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            R_ASSERT2(false, "Check localization.ltx");
+    }
+}
+
+xr_token* CStringTable::GetLanguagesToken() const { return m_languagesToken.data(); }
 
 void CStringTable::Load(LPCSTR xml_file_full)
 {
@@ -137,11 +155,10 @@ void CStringTable::ReparseKeyBindings()
 
 void CStringTable::ReloadLanguage()
 {
-    if (0 == xr_strcmp(gLanguagesToken.at(gLanguage).name, pData->m_sLanguage.c_str()))
+    if (0 == xr_strcmp(m_languagesToken.at(LanguageID).name, pData->m_sLanguage.c_str()))
         return;
 
-    xr_delete(pData);
-
+    Destroy();
     Init();
 }
 
