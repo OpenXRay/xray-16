@@ -52,7 +52,7 @@ void CSE_ALifeOnlineOfflineGroup::update()
     if (!bfActive())
         return;
 
-    brain().update();
+    m_brain->update();
 
     MEMBERS::iterator I = m_members.begin();
     MEMBERS::iterator E = m_members.end();
@@ -67,7 +67,7 @@ void CSE_ALifeOnlineOfflineGroup::update()
     return;
 }
 
-void CSE_ALifeOnlineOfflineGroup::on_location_change() const { brain().on_location_change(); }
+void CSE_ALifeOnlineOfflineGroup::on_location_change() const { m_brain->on_location_change(); }
 void CSE_ALifeOnlineOfflineGroup::register_member(ALife::_OBJECT_ID member_id)
 {
     VERIFY(m_members.find(member_id) == m_members.end());

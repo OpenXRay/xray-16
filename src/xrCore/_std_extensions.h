@@ -28,41 +28,11 @@
 #undef max
 #endif
 
-#if 0//def _EDITOR
-IC char* strncpy_s(char* strDestination, size_t sizeInBytes, const char* strSource, size_t count)
-{
-    return strncpy(strDestination, strSource, count);
-}
-
-IC char* xr_strcpy(char* strDestination, size_t sizeInBytes, const char* strSource)
-{
-    return strcpy(strDestination, strSource);
-}
-
-IC char* xr_strcpy(char* strDestination, const char* strSource) { return strcpy(strDestination, strSource); }
-IC char* _strlwr_s(char* strDestination, size_t sizeInBytes) { return xr_strlwr(strDestination); }
-IC char* xr_strcat(char* strDestination, size_t sizeInBytes, const char* strSource)
-{
-    return strncat(strDestination, strSource, sizeInBytes);
-}
-
-IC char* xr_strcat(char* strDestination, const char* strSource) { return strcat(strDestination, strSource); }
-IC int xr_sprintf(char* dest, size_t sizeOfBuffer, const char* format, ...)
-{
-    va_list mark;
-    va_start(mark, format);
-    int sz = _vsnprintf(dest, sizeOfBuffer, format, mark);
-    dest[sizeOfBuffer - 1] = 0;
-    va_end(mark);
-    return sz;
-}
-#endif // _EDITOR
-
 #if defined(LINUX)
-IC int vsnprintf_s( char *buffer, size_t size, size_t count, const char *format, va_list list)
+IC int vsnprintf_s(char* buffer, size_t size, size_t count, const char* format, va_list list)
 {
-	//TODO add bound check
-	return vsnprintf(buffer, size, format, list);
+    // TODO add bound check
+    return vsnprintf(buffer, size, format, list);
 }
 #endif
 

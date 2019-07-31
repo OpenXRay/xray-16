@@ -23,8 +23,7 @@ int entry_point(pcstr commandLine)
     xrDebug::Initialize(GEnv.isDedicatedServer);
 
     StickyKeyFilter filter;
-    if (!GEnv.isDedicatedServer)
-        filter.initialize();
+    filter.initialize();
 
     pcstr fsltx = "-fsltx ";
     string_path fsgame = "";

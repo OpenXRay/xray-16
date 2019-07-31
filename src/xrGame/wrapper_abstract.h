@@ -11,31 +11,6 @@
 class CScriptGameObject;
 class CPropertyStorage;
 
-/* Xottab_DUTY: commented since I can't compile it and it's unused
-template <typename _object_type, template <typename _base_object_type> class ancestor,
-    typename _base_object_type = CScriptGameObject>
-class CWrapperAbstract : public ancestor<_base_object_type>
-{
-protected:
-    using inherited = ancestor<__base_object_type>;
-
-    _object_type* m_object;
-
-public:
-    CWrapperAbstract() noexcept : m_object(nullptr) {}
-
-    template <typename T1>
-    CWrapperAbstract(T1 t1) : inherited(t1), m_object(nullptr) {}
-
-    template <typename T1, typename T2, typename T3>
-    CWrapperAbstract(T1 t1, T2 t2, T3 t3) : inherited(t1, t2, t3), m_object(nullptr) {}
-
-    virtual ~CWrapperAbstract() {}
-    virtual void setup(_object_type* object);
-    virtual void setup(CScriptGameObject* object);
-    _object_type& object() const;
-};*/
-
 template <typename _object_type, template <typename _base_object_type> class ancestor,
     typename _base_object_type = CScriptGameObject>
 class CWrapperAbstract2 : public ancestor<_base_object_type>

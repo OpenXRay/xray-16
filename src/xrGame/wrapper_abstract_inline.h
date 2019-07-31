@@ -16,38 +16,6 @@
 		typename _base_object_type\
 	>
 
-/*
-#define CWrapper CWrapperAbstract<_object_type,ancestor,_base_object_type>
-
-TEMPLATE_SPECIALIZATION
-void CWrapper::setup(_object_type *object)
-{
-    VERIFY(object);
-    inherited::setup(object->lua_game_object());
-    m_object = object;
-}
-
-TEMPLATE_SPECIALIZATION
-void CWrapper::setup(CScriptGameObject *object)
-{
-    VERIFY(object);
-    inherited::setup(object);
-    m_object = smart_cast<_object_type*>(&object->object());
-    VERIFY(m_object);
-}
-
-TEMPLATE_SPECIALIZATION
-IC	_object_type &CWrapper::object() const
-{
-    VERIFY(m_object);
-    return				(*m_object);
-}
-
-#undef CWrapper*/
-
-//////////////////////////////////////////////////////////////////////////
-// CWrapperAbstract2
-//////////////////////////////////////////////////////////////////////////
 #define CWrapper2 CWrapperAbstract2<_object_type, ancestor, _base_object_type>
 
 TEMPLATE_SPECIALIZATION
