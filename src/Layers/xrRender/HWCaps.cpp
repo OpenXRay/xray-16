@@ -70,7 +70,7 @@ u32 GetATIGpuNum()
 {
     AGSContext* ags = nullptr;
     AGSGPUInfo gpuInfo = {};
-    AGSReturnCode status = agsInit(&ags, &gpuInfo);
+    AGSReturnCode status = agsInit(&ags, nullptr, &gpuInfo);
     if (status != AGS_SUCCESS)
     {
         Msg("* AGS: Initialization failed (%d)", status);
@@ -108,7 +108,7 @@ u32 GetGpuNum()
 #else
 u32 GetGpuNum() { return 1; }
 #endif
-}
+} // namespace
 
 #if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
 void CHWCaps::Update()
