@@ -429,6 +429,7 @@
     <ClInclude Include="compression_ppmd_stream_inline.h" />
     <ClInclude Include="Containers\AssociativeVector.hpp" />
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
+    <ClInclude Include="Containers\FixedMap.h" />
     <ClInclude Include="cpuid.h" />
     <ClInclude Include="Debug\dxerr.h" />
     <ClInclude Include="Debug\DXGetErrorDescription.inl">

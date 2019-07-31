@@ -36,21 +36,22 @@ public:
         return *this;
     }
 
-    pointer allocate(const size_type n, const void* p = nullptr) const { return xr_alloc<T>(n); }
-    void deallocate(pointer p, const size_type /*n*/) const { xr_free(p); }
-    void deallocate(void* p, const size_type /*n*/) const { xr_free(p); }
+    static pointer allocate(const size_type n, const void* p = nullptr) { return xr_alloc<T>(n); }
+    static void deallocate(pointer p, const size_type /*n*/) { xr_free(p); }
+    static void deallocate(void* p, const size_type /*n*/) { xr_free(p); }
 
     template <class U, class... Args>
-    void construct(U* ptr, Args&&... args)
+    static void construct(U* ptr, Args&&... args)
     {
         new (ptr) U(std::forward<Args>(args)...);
     }
     template <class U>
-    void destroy(U* p)
+    static void destroy(U* p)
     {
         p->~U();
     }
-    size_type max_size() const
+
+    static constexpr size_type max_size()
     {
         constexpr auto count = std::numeric_limits<size_type>::max() / sizeof(T);
         return 0 < count ? count : 1;
@@ -65,10 +66,10 @@ struct xr_allocator
         using result = xalloc<T>;
     };
 
-    static void* alloc(const size_t n) { return xr_malloc(n); }
+    static void* allocate(const size_t n) { return xr_malloc(n); }
 
     template <typename T>
-    static void dealloc(T*& p)
+    static void deallocate(T*& p)
     {
         xr_free(p);
     }

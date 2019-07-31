@@ -141,9 +141,6 @@
     <ClCompile Include="clsid.cpp">
       <Filter>Math\Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="string_concatenations.cpp">
-      <Filter>Math\Extensions</Filter>
-    </ClCompile>
     <ClCompile Include="xr_trims.cpp">
       <Filter>Math\Extensions</Filter>
     </ClCompile>
@@ -291,6 +288,9 @@
     <ClCompile Include="Threading\ThreadUtil_Win.cpp">
       <Filter>Threading\Util</Filter>
     </ClCompile>
+    <ClCompile Include="string_concatenations.cpp">
+      <Filter>shared memory/string library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -396,12 +396,6 @@
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="fastdelegate.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="string_concatenations.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="string_concatenations_inline.h">
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="xr_trims.h">
@@ -652,6 +646,15 @@
     </ClInclude>
     <ClInclude Include="Threading\ThreadUtil.h">
       <Filter>Threading\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\FixedMap.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="string_concatenations.h">
+      <Filter>shared memory/string library</Filter>
+    </ClInclude>
+    <ClInclude Include="string_concatenations_inline.h">
+      <Filter>shared memory/string library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
