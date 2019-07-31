@@ -273,12 +273,6 @@
     <ClInclude Include="..\..\xrServerEntities\inventory_space.h">
       <Filter>ServerStuff\Common\GameStuff</Filter>
     </ClInclude>
-    <ClInclude Include="client_id.h">
-      <Filter>ServerStuff\Common\NetworkStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrNetServer\NET_Compressor.h">
-      <Filter>ServerStuff\Common\NetworkStuff</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrCore\net_utils.h">
       <Filter>ServerStuff\Common\NetworkStuff</Filter>
     </ClInclude>

@@ -7,4 +7,7 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="entry_point.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\TypeHelper.natvis" />
+  </ItemGroup>
 </Project>

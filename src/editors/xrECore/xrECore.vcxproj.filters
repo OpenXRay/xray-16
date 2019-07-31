@@ -193,4 +193,7 @@
       <Filter>Windows &amp; Controls\Windows\WindowLog</Filter>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\TypeHelper.natvis" />
+  </ItemGroup>
 </Project>

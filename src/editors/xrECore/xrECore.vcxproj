@@ -74,7 +74,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>

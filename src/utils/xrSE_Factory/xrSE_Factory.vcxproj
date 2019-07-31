@@ -202,8 +202,6 @@
     <ClInclude Include="ai_space.h" />
     <ClInclude Include="ai_space_inline.h" />
     <ClInclude Include="..\..\xrCore\ChooseTypes.H" />
-    <ClInclude Include="client_id.h" />
-    <ClInclude Include="..\..\xrNetServer\NET_Compressor.h" />
     <ClInclude Include="..\..\xrCore\net_utils.h" />
     <ClInclude Include="script_properties_list_helper.h" />
     <ClInclude Include="script_value.h" />

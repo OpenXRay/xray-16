@@ -6,10 +6,7 @@ image:
 - Visual Studio 2017
 configuration:
 - Release_COC
-- Release
 - Mixed_COC
-- Mixed
-- Debug
 platform:
 - x64
 - x86
@@ -23,18 +20,6 @@ after_build:
 - cmd: xrbuild.cmd
 test: off
 artifacts:
-- path: res/OpenXRay.Dx86.7z
-  name: OpenXRay.Dx86.7z
-- path: res/OpenXRay.Dx64.7z
-  name: OpenXRay.Dx64.7z
-- path: res/OpenXRay.Mx86.7z
-  name: OpenXRay.Mx86.7z
-- path: res/OpenXRay.Mx64.7z
-  name: OpenXRay.Mx64.7z
-- path: res/OpenXRay.Rx86.7z
-  name: OpenXRay.Rx86.7z
-- path: res/OpenXRay.Rx64.7z
-  name: OpenXRay.Rx64.7z
 - path: res/OpenXRay_CoC.Mx86.7z
   name: OpenXRay_CoC.Mx86.7z
 - path: res/OpenXRay_CoC.Mx64.7z
@@ -50,6 +35,6 @@ deploy:
   description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: 9iDOYVjThQ3nK0u2621weCBYrqi7YZgoE9p1AJ3JHn+hJtlQN/kxE9ccC/EDqHxa
-  artifact: OpenXRay.Mx86.7z, OpenXRay.Mx64.7z, OpenXRay.Rx86.7z, OpenXRay.Rx64.7z, OpenXRay_CoC.Mx86.7z, OpenXRay_CoC.Mx64.7z, OpenXRay_CoC.Rx86.7z, OpenXRay_CoC.Rx64.7z
+  artifact: OpenXRay_CoC.Mx86.7z, OpenXRay_CoC.Mx64.7z, OpenXRay_CoC.Rx86.7z, OpenXRay_CoC.Rx64.7z
   draft: true
   force_update: true

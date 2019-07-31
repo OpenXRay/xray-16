@@ -12,11 +12,12 @@
 #define ECORE_API
 
 #include "Common/Common.hpp"
+#include "Common/object_type_traits.h"
 #include "xrCore/xrCore.h"
 #include "xrCore/_fbox.h"
 #include "xrCore/_quaternion.h"
 #include "xrScriptEngine/DebugMacros.hpp" // XXX: move debug macros to xrCore
 #include "xrServerEntities/smart_cast.h"
 
-#define READ_IF_EXISTS(ltx, method, section, name, default_value)\
+#define READ_IF_EXISTS(ltx, method, section, name, default_value) \
     (ltx->line_exist(section, name)) ? ltx->method(section, name) : default_value
