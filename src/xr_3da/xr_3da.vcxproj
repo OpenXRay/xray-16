@@ -132,7 +132,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_COC|Win32'">None</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">None</DebugInformationFormat>
