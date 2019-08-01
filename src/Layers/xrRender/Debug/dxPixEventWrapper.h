@@ -13,9 +13,13 @@ public:
     ~dxPixEventWrapper() { D3DPERF_EndEvent(); }
 };
 
+#if defined(USE_DX10) || defined(USE_DX11)
 void dxPixSetDebugName(ID3DDeviceChild* resource, const shared_str& name);
 
 #define SET_DEBUG_NAME(resource, name) dxPixSetDebugName(resource, name)
+#else
+#define SET_DEBUG_NAME(resource, name) { }
+#endif
 
 #else //    DEBUG
 

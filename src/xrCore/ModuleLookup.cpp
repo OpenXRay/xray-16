@@ -34,7 +34,7 @@ void* ModuleHandle::Open(pcstr moduleName)
     if (handle == nullptr)
     {
 #ifdef WINDOWS
-        Msg("! Failed to load DLL: 0x%d", GetLastError());
+        Msg("! Failed to load DLL: %s", xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
         Msg("! Failed to load DLL: 0x%d", dlerror());
 #endif
@@ -59,7 +59,7 @@ void ModuleHandle::Close()
     if (closed == false)
     {
 #ifdef WINDOWS
-        Msg("! Failed to close DLL: 0x%d", GetLastError());
+        Msg("! Failed to close DLL: %s", xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
         Msg("! Failed to close DLL: 0x%d", dlerror());
 #endif

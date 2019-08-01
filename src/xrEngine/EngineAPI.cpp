@@ -107,7 +107,7 @@ void CEngineAPI::Initialize(void)
     InitializeRenderers();
 
     hGame = XRay::LoadModule("xrGame");
-    R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
+    R_ASSERT2(hGame->IsLoaded(), "Game DLL raised exception during loading or there is no game DLL at all");
 
     pCreate = (Factory_Create*)hGame->GetProcAddress("xrFactory_Create");
     R_ASSERT(pCreate);
@@ -136,7 +136,7 @@ void CEngineAPI::Initialize(void)
     }
 
     // Close only AFTER other libraries are loaded!!
-    // CloseUnusedLibraries();
+    CloseUnusedLibraries();
 }
 
 void CEngineAPI::Destroy(void)
