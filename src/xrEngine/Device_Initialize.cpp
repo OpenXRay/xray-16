@@ -64,7 +64,10 @@ void CRenderDevice::Initialize()
             }
         }
 
-        m_sdlWnd = SDL_CreateWindow("S.T.A.L.K.E.R.: Call of Pripyat", 0, 0, 640, 480, flags);
+        pcstr title = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "window", 
+                                    "title", "S.T.A.L.K.E.R.: Call of Pripyat");
+        
+        m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
