@@ -1,35 +1,22 @@
 #pragma once
-#ifndef XR_SHA_INCLUDED
-#define XR_SHA_INCLUDED
-
-#include <cryptopp/sha.h>
-
 #include "xrCore/xrCore.h"
+#include <cryptopp/sha.h>
+#include <array>
 
 namespace crypto
 {
-class XRCORE_API xr_sha256
+class XRCORE_API xr_sha1
 {
 public:
-    static u32 const digest_length = 20; // SHA_DIGEST_LENGTH
+    static const size_t DIGEST_SIZE = CryptoPP::SHA1::DIGESTSIZE;
+    static const size_t BLOCK_SIZE = CryptoPP::SHA1::BLOCKSIZE;
+    using sha_checksum_t = std::array<u8, DIGEST_SIZE>;
 
-    xr_sha256();
-    ~xr_sha256();
-
-    void start_calculate(u8 const* data, u32 data_size);
-    bool continue_calculate();
-
-    u8 const* pointer() const { return m_result; };
+    const xr_sha1::sha_checksum_t& calculate(const u8* data, u32 data_size);
 private:
-    static u32 const calc_chunk_size = 512;
+    // m_buf is added as a field, because in this case it will be 
+    // allocated on the stack where xr_sha1 instance was created
+    sha_checksum_t m_buf;
+};
+}
 
-    u8 const* m_data_src;
-    u32 m_data_size;
-
-    u8 m_result[digest_length];
-    CryptoPP::SHA1 m_sha_ctx;
-}; // xr_sha256
-
-} // namespace crypto
-
-#endif //#ifndef XR_SHA_INCLUDED

@@ -40,7 +40,7 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
     return nullptr;
 }
 
-bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_t& sha_checksum)
+bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::sha_checksum_t& sha_checksum)
 {
     char* tmp_info_sect = search_info_section(data, data_size);
     if (!tmp_info_sect)
@@ -77,7 +77,7 @@ bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_
     if (!ret)
         return false;
 
-    CopyMemory(sha_checksum, m_verifyer.get_sha_checksum(), sizeof(sha_checksum));
+    CopyMemory(sha_checksum.data(), m_verifyer.get_sha_checksum(), crypto::xr_sha1::DIGEST_SIZE);
 
     return true;
 }
@@ -195,20 +195,17 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
 
     m_orig_config_body.w_stringZ(add_str);
 
-    crypto::xr_sha256 tmp_sha_checksum;
-    tmp_sha_checksum.start_calculate(m_orig_config_body.pointer(), m_orig_config_body.tell());
-    while (!tmp_sha_checksum.continue_calculate())
-    {
-    };
+    crypto::xr_sha1 tmp_sha_checksum{};
+    auto hash = tmp_sha_checksum.calculate(m_orig_config_body.pointer(), m_orig_config_body.tell());
 
-    u8 tmp_checksum[crypto::xr_sha256::digest_length];
+    crypto::xr_sha1::sha_checksum_t tmp_checksum{};
     if (!verify_dsign(data, data_size, tmp_checksum))
     {
         xr_strcpy(diff, "invalid digital sign");
         return false;
     }
 
-    if (memcmp(tmp_checksum, tmp_sha_checksum.pointer(), sizeof(tmp_checksum)))
+    if (memcmp(tmp_checksum.data(), hash.data(), crypto::xr_sha1::DIGEST_SIZE))
     {
         get_diff(tmp_ini, tmp_active_params, diff);
         return false;

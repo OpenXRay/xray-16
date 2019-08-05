@@ -6,37 +6,28 @@ xr_dsa_signer::xr_dsa_signer(u8 const p_number[crypto::xr_dsa::public_key_length
     u8 const q_number[crypto::xr_dsa::private_key_length], u8 const g_number[crypto::xr_dsa::public_key_length])
     : m_private_key(), m_dsa(p_number, q_number, g_number)
 {
-    static_assert(crypto::xr_dsa::private_key_length == crypto::xr_sha256::digest_length,
+    static_assert(crypto::xr_dsa::private_key_length == crypto::xr_sha1::DIGEST_SIZE,
         "Private key size must be equal to digest value size.");
 }
 
 xr_dsa_signer::~xr_dsa_signer() {}
 shared_str const xr_dsa_signer::sign(u8 const* data, u32 data_size)
 {
-    m_sha.start_calculate(data, data_size);
-    while (!m_sha.continue_calculate())
-    {
-    };
+    auto hash = m_sha.calculate(data, data_size);
 #ifdef DEBUG
     IWriter* sign_data = FS.w_open("$logs$", "sign");
     sign_data->w(data, data_size);
     sign_data->w_string("sha_checksum");
-    sign_data->w(m_sha.pointer(), m_sha.digest_length);
+    sign_data->w(hash.data(), crypto::xr_sha1::DIGEST_SIZE);
     FS.w_close(sign_data);
 #endif
-    return m_dsa.sign(m_private_key, m_sha.pointer(), m_sha.digest_length);
+    return m_dsa.sign(m_private_key, hash.data(), crypto::xr_sha1::DIGEST_SIZE);
 }
 
 shared_str const xr_dsa_signer::sign_mt(u8 const* data, u32 data_size, sha_process_yielder yielder)
 {
-    m_sha.start_calculate(data, data_size);
-    long sha_process_counter = 0;
-    while (!m_sha.continue_calculate())
-    {
-        yielder(sha_process_counter);
-        ++sha_process_counter;
-    }
-    return m_dsa.sign(m_private_key, m_sha.pointer(), m_sha.digest_length);
+    auto hash = m_sha.calculate(data, data_size);
+    return m_dsa.sign(m_private_key, hash.data(), crypto::xr_sha1::DIGEST_SIZE);
 }
 
 char* current_time(string64& dest_time)
