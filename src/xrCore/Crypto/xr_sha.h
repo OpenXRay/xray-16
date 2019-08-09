@@ -17,12 +17,8 @@ public:
     static const size_t BLOCK_SIZE = CryptoPP::SHA1::BLOCKSIZE;
     using hash_t = std::array<u8, DIGEST_SIZE>;
 
-    const xr_sha1::hash_t& calculate(const u8* data, u32 data_size, std::optional<yielder_t> yielder);
-    const xr_sha1::hash_t& calculate(const u8* data, u32 data_size);
-private:
-    // m_buf is added as a field, because in this case it will be 
-    // allocated on the stack where xr_sha1 instance was created
-    hash_t m_buf;
+    void calculate(hash_t& result, const u8* data, u32 data_size, std::optional<yielder_t> yielder);
+    void calculate(hash_t& result, const u8* data, u32 data_size);
 };
 
 }

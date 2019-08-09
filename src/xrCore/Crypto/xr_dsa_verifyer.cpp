@@ -13,8 +13,8 @@ xr_dsa_verifyer::xr_dsa_verifyer(u8 const p_number[crypto::xr_dsa::public_key_le
 xr_dsa_verifyer::~xr_dsa_verifyer() {}
 std::pair<bool, const crypto::xr_sha1::hash_t&> xr_dsa_verifyer::verify(u8 const* data, u32 data_size, shared_str const& dsign)
 {
-    auto hash = m_sha.calculate(data, data_size);
-
+    crypto::xr_sha1::hash_t hash{};
+    m_sha.calculate(hash, data, data_size);
 #ifdef DEBUG
     IWriter* verify_data = FS.w_open("$logs$", "verify");
     verify_data->w(data, data_size);
