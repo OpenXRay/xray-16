@@ -14,7 +14,7 @@ xr_dsa_signer::~xr_dsa_signer() {}
 shared_str const xr_dsa_signer::sign(u8 const* data, u32 data_size)
 {
     crypto::xr_sha1::hash_t hash{};
-    m_sha.calculate(hash, data, data_size);
+    crypto::xr_sha1::calculate(hash, data, data_size);
 #ifdef DEBUG
     IWriter* sign_data = FS.w_open("$logs$", "sign");
     sign_data->w(data, data_size);
@@ -28,7 +28,7 @@ shared_str const xr_dsa_signer::sign(u8 const* data, u32 data_size)
 shared_str const xr_dsa_signer::sign_mt(u8 const* data, u32 data_size, crypto::yielder_t yielder)
 {
     crypto::xr_sha1::hash_t hash{};
-    m_sha.calculate(hash, data, data_size, yielder);
+    crypto::xr_sha1::calculate(hash, data, data_size, yielder);
     return m_dsa.sign(m_private_key, hash.data(), crypto::xr_sha1::DIGEST_SIZE);
 }
 
