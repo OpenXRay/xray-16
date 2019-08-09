@@ -24,9 +24,9 @@ shared_str const xr_dsa_signer::sign(u8 const* data, u32 data_size)
     return m_dsa.sign(m_private_key, hash.data(), crypto::xr_sha1::DIGEST_SIZE);
 }
 
-shared_str const xr_dsa_signer::sign_mt(u8 const* data, u32 data_size, sha_process_yielder yielder)
+shared_str const xr_dsa_signer::sign_mt(u8 const* data, u32 data_size, crypto::sha_process_yielder yielder)
 {
-    auto hash = m_sha.calculate(data, data_size);
+    auto hash = m_sha.calculate(data, data_size, yielder);
     return m_dsa.sign(m_private_key, hash.data(), crypto::xr_sha1::DIGEST_SIZE);
 }
 
