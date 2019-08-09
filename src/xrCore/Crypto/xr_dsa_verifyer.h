@@ -16,7 +16,7 @@ public:
 
     ~xr_dsa_verifyer();
 
-    std::pair<bool, const crypto::xr_sha1::sha_checksum_t&> verify(u8 const* data, u32 data_size, shared_str const& dsign);
+    std::pair<bool, const crypto::xr_sha1::hash_t&> verify(u8 const* data, u32 data_size, shared_str const& dsign);
 protected:
     crypto::xr_dsa::public_key_t m_public_key;
 

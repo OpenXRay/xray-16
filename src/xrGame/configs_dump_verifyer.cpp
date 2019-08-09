@@ -36,7 +36,7 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
     return nullptr;
 }
 
-bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::sha_checksum_t& sha_checksum)
+bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::hash_t& sha_checksum)
 {
     char* tmp_info_sect = search_info_section(data, data_size);
     if (!tmp_info_sect)
@@ -200,7 +200,7 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
     crypto::xr_sha1 tmp_sha_checksum;
     auto hash = tmp_sha_checksum.calculate(m_orig_config_body.pointer(), m_orig_config_body.tell());
 
-    crypto::xr_sha1::sha_checksum_t tmp_checksum{};
+    crypto::xr_sha1::hash_t tmp_checksum{};
     if (!verify_dsign(data, data_size, tmp_checksum))
     {
         xr_strcpy(diff, "invalid digital sign");

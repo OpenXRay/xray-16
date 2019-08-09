@@ -15,7 +15,7 @@ public:
     ~xr_dsa_signer();
 
     shared_str const sign(u8 const* data, u32 data_size);
-    shared_str const sign_mt(u8 const* data, u32 data_size, crypto::sha_process_yielder yielder);
+    shared_str const sign_mt(u8 const* data, u32 data_size, crypto::yielder_t yielder);
 
 protected:
     crypto::xr_dsa::private_key_t m_private_key;

@@ -11,7 +11,7 @@ xr_dsa_verifyer::xr_dsa_verifyer(u8 const p_number[crypto::xr_dsa::public_key_le
 }
 
 xr_dsa_verifyer::~xr_dsa_verifyer() {}
-std::pair<bool, const crypto::xr_sha1::sha_checksum_t&> xr_dsa_verifyer::verify(u8 const* data, u32 data_size, shared_str const& dsign)
+std::pair<bool, const crypto::xr_sha1::hash_t&> xr_dsa_verifyer::verify(u8 const* data, u32 data_size, shared_str const& dsign)
 {
     auto hash = m_sha.calculate(data, data_size);
 

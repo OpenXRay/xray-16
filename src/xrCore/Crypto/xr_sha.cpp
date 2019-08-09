@@ -3,7 +3,7 @@
 
 using namespace crypto;
 
-const xr_sha1::sha_checksum_t& xr_sha1::calculate(const u8* data, u32 data_size, std::optional<sha_process_yielder> yielder)
+const xr_sha1::hash_t& xr_sha1::calculate(const u8* data, u32 data_size, std::optional<yielder_t> yielder)
 {
     VERIFY(data_size);
     const u8* data_pos = data;
@@ -26,7 +26,7 @@ const xr_sha1::sha_checksum_t& xr_sha1::calculate(const u8* data, u32 data_size,
     return { m_buf };
 }
 
-const inline xr_sha1::sha_checksum_t& xr_sha1::calculate(const u8* data, u32 data_size)
+const inline xr_sha1::hash_t& xr_sha1::calculate(const u8* data, u32 data_size)
 {
     return calculate(data, data_size, std::nullopt);
 }
