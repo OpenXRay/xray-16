@@ -3,6 +3,8 @@
 !.git*
 
 # exclude binaries and temporary files
+__vs_gr_dbg_sessions/
+_build/
 bin/
 bin_plugs/
 intermediate/

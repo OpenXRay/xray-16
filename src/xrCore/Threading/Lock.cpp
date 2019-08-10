@@ -2,15 +2,23 @@
 #include "Lock.hpp"
 #include <mutex>
 
-struct LockImpl
-{
-    std::recursive_mutex mutex;
-};
+FastLock::FastLock() { InitializeSRWLock(&srw); }
 
-Lock::~Lock()
-{
-    delete impl;
-}
+void FastLock::Enter() { AcquireSRWLockExclusive(&srw); }
+
+bool FastLock::TryEnter() { return 0 != TryAcquireSRWLockExclusive(&srw); }
+
+void FastLock::Leave() { ReleaseSRWLockExclusive(&srw); }
+
+void FastLock::EnterShared() { AcquireSRWLockShared(&srw); }
+
+bool FastLock::TryEnterShared() { return 0 != TryAcquireSRWLockShared(&srw); }
+
+void FastLock::LeaveShared() { ReleaseSRWLockShared(&srw); }
+
+void* FastLock::GetHandle() { return reinterpret_cast<void*>(&srw); }
+
+////////////////////////////////////////////////////////////////
 
 #ifdef CONFIG_PROFILE_LOCKS
 static add_profile_portion_callback add_profile_portion = 0;
@@ -39,43 +47,38 @@ struct profiler
     }
 };
 
-Lock::Lock(const char* id) : impl(new LockImpl), lockCounter(0), id(id) {}
+Lock::Lock(const char* id) : lockCounter(0), id(id) { InitializeCriticalSection(&cs); }
 
 void Lock::Enter()
 {
-#if 0 // def DEBUG
-    static bool show_call_stack = false;
-    if (show_call_stack)
-        OutputDebugStackTrace("----------------------------------------------------");
-#endif // DEBUG
     profiler temp(id);
     mutex.lock();
     isLocked = true;
 }
 #else
-Lock::Lock() : impl(new LockImpl), lockCounter(0) {}
+Lock::Lock() : lockCounter(0) { InitializeCriticalSection(&cs); }
+
+Lock::~Lock() { DeleteCriticalSection(&cs); }
 
 void Lock::Enter()
 {
-    impl->mutex.lock();
-    lockCounter++;
+    EnterCriticalSection(&cs);
+    ++lockCounter;
 }
 #endif // CONFIG_PROFILE_LOCKS
 
 bool Lock::TryEnter()
 {
-    bool locked = impl->mutex.try_lock();
+    const bool locked = !!TryEnterCriticalSection(&cs);
     if (locked)
-        lockCounter++;
+        ++lockCounter;
     return locked;
 }
 
 void Lock::Leave()
 {
-    impl->mutex.unlock();
-    lockCounter--;
+    LeaveCriticalSection(&cs);
+    --lockCounter;
 }
 
-#ifdef DEBUG
-extern void OutputDebugStackTrace(const char* header);
-#endif
+void* Lock::GetHandle() { return reinterpret_cast<void*>(&cs); }

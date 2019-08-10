@@ -533,8 +533,8 @@ public:
     bool unlimited_ammo();
     IC bool can_be_strapped() const { return m_can_be_strapped; };
 
-    const decltype(m_magazine)& GetMagazine() { return m_magazine; };
-    float GetMagazineWeight(const decltype(m_magazine)& mag) const;
+    const xr_vector<CCartridge>& GetMagazine() { return m_magazine; };
+    float GetMagazineWeight(const xr_vector<CCartridge>& mag) const;
 
 protected:
     u32 m_ef_main_weapon_type;
@@ -544,7 +544,7 @@ public:
     virtual u32 ef_main_weapon_type() const;
     virtual u32 ef_weapon_type() const;
 
-    //Alundaio
+    // Alundaio
     int GetAmmoCount_forType(shared_str const& ammo_type) const;
     virtual void set_ef_main_weapon_type(u32 type) { m_ef_main_weapon_type = type; };
     virtual void set_ef_weapon_type(u32 type) { m_ef_weapon_type = type; };
@@ -589,6 +589,4 @@ private:
 
 public:
     virtual void SetActivationSpeedOverride(Fvector const& speed);
-    virtual void DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const;
-    virtual shared_str const GetAnticheatSectionName() const { return cNameSect(); };
 };

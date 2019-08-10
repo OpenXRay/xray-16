@@ -375,13 +375,15 @@ void CLevel::OnFrame()
     g_pGamePersistent->Environment().m_paused = m_bEnvPaused;
 #endif
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
-    if (!GEnv.isDedicatedServer)
-        GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
+
+    GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
     m_ph_commander->update();
     m_ph_commander_scripts->update();
+
     stats.BulletManagerCommit.Begin();
     BulletManager().CommitRenderSet();
     stats.BulletManagerCommit.End();
+
     // update static sounds
     if (!GEnv.isDedicatedServer)
     {
@@ -429,10 +431,9 @@ void CLevel::OnRender()
     inherited::OnRender();
     if (!game)
         return;
+
     Game().OnRender();
-    // Device.Statistic->TEST1.Begin();
     BulletManager().Render();
-    // Device.Statistic->TEST1.End();
 
     GEnv.Render->AfterWorldRender(); //--#SM+#-- +SecondVP+
 

@@ -1573,12 +1573,6 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\Explosives">
       <UniqueIdentifier>{b7688ab2-2055-4da9-bb6c-d249ae0911bd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\MPPlayersBag">
-      <UniqueIdentifier>{f67b84c1-a3e6-44b2-b1b1-b8659b40006d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\MPAnticheat">
-      <UniqueIdentifier>{1fdfed8b-07ff-4a81-971c-69867c8087b9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Objects\searchlight">
       <UniqueIdentifier>{232c37a1-c0f1-4197-8170-2f8571d519ac}</UniqueIdentifier>
     </Filter>
@@ -1797,12 +1791,6 @@
     </Filter>
     <Filter Include="UI\Common\PDA\logs\News">
       <UniqueIdentifier>{f21f213a-d49e-4bc4-88eb-c2c3da37b244}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UI\Common\ui-item-infos">
-      <UniqueIdentifier>{39ccfc67-3565-45a8-a2f8-8580cd504d0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UI\Common\ui-item-infos\CharacterInfo">
-      <UniqueIdentifier>{632c7527-8c9c-4cec-82a8-fcbe6ae428c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="UI\Common\TALK">
       <UniqueIdentifier>{6219607c-2f9a-4cdb-a116-8dc19268d4fb}</UniqueIdentifier>
@@ -2061,6 +2049,12 @@
     </Filter>
     <Filter Include="Core\Client\Objects\actor\memory">
       <UniqueIdentifier>{57409636-2e3d-496b-9644-152df522c1c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\Inventory\CharacterInfo">
+      <UniqueIdentifier>{632c7527-8c9c-4cec-82a8-fcbe6ae428c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\ItemInfo">
+      <UniqueIdentifier>{39ccfc67-3565-45a8-a2f8-8580cd504d0e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -5052,12 +5046,6 @@
     <ClInclude Include="wallmark_manager.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
     </ClInclude>
-    <ClInclude Include="MPPlayersBag.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\MPPlayersBag</Filter>
-    </ClInclude>
-    <ClInclude Include="anticheat_dumpable_object.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\MPAnticheat</Filter>
-    </ClInclude>
     <ClInclude Include="searchlight.h">
       <Filter>Core\Client\Objects\searchlight</Filter>
     </ClInclude>
@@ -5356,22 +5344,22 @@
       <Filter>UI\Common\PDA\logs\News</Filter>
     </ClInclude>
     <ClInclude Include="ui\ui_af_params.h">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIBoosterInfo.h">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIItemInfo.h">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIOutfitInfo.h">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIWpnParams.h">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UICharacterInfo.h">
-      <Filter>UI\Common\ui-item-infos\CharacterInfo</Filter>
+      <Filter>UI\Common\Inventory\CharacterInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UITalkDialogWnd.h">
       <Filter>UI\Common\TALK</Filter>
@@ -7674,15 +7662,6 @@
     <ClCompile Include="wallmark_manager.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
     </ClCompile>
-    <ClCompile Include="shootingObject_dump_impl.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\MPAnticheat</Filter>
-    </ClCompile>
-    <ClCompile Include="weapon_ammo_dump_impl.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\MPAnticheat</Filter>
-    </ClCompile>
-    <ClCompile Include="weapon_dump_impl.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\MPAnticheat</Filter>
-    </ClCompile>
     <ClCompile Include="searchlight.cpp">
       <Filter>Core\Client\Objects\searchlight</Filter>
     </ClCompile>
@@ -8056,22 +8035,22 @@
       <Filter>UI\Common\PDA\logs\News</Filter>
     </ClCompile>
     <ClCompile Include="ui\ui_af_params.cpp">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIBoosterInfo.cpp">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIItemInfo.cpp">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIOutfitInfo.cpp">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIWpnParams.cpp">
-      <Filter>UI\Common\ui-item-infos</Filter>
+      <Filter>UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UICharacterInfo.cpp">
-      <Filter>UI\Common\ui-item-infos\CharacterInfo</Filter>
+      <Filter>UI\Common\Inventory\CharacterInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UITalkDialogWnd.cpp">
       <Filter>UI\Common\TALK</Filter>

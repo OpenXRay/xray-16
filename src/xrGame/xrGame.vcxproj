@@ -631,7 +631,6 @@
     <ClInclude Include="animation_movement_controller.h" />
     <ClInclude Include="animation_script_callback.h" />
     <ClInclude Include="animation_utils.h" />
-    <ClInclude Include="anticheat_dumpable_object.h" />
     <ClInclude Include="antirad.h" />
     <ClInclude Include="Artefact.h" />
     <ClInclude Include="artefact_activation.h" />
@@ -902,7 +901,6 @@
     <ClInclude Include="moving_objects_impl.h" />
     <ClInclude Include="moving_objects_inline.h" />
     <ClInclude Include="moving_object_inline.h" />
-    <ClInclude Include="MPPlayersBag.h" />
     <ClInclude Include="mt_config.h" />
     <ClInclude Include="Needles.h" />
     <ClInclude Include="NET_Queue.h" />
@@ -2654,7 +2652,6 @@
     <ClCompile Include="seniority_hierarchy_holder.cpp" />
     <ClCompile Include="server_entity_wrapper.cpp" />
     <ClCompile Include="ShootingObject.cpp" />
-    <ClCompile Include="shootingObject_dump_impl.cpp" />
     <ClCompile Include="sight_action.cpp" />
     <ClCompile Include="sight_manager.cpp" />
     <ClCompile Include="sight_manager_target.cpp" />
@@ -3099,8 +3096,6 @@
     <ClCompile Include="WeaponUpgrade.cpp" />
     <ClCompile Include="WeaponVal.cpp" />
     <ClCompile Include="WeaponVintorez.cpp" />
-    <ClCompile Include="weapon_ammo_dump_impl.cpp" />
-    <ClCompile Include="weapon_dump_impl.cpp" />
     <ClCompile Include="Wound.cpp" />
     <ClCompile Include="xrGame.cpp" />
     <ClCompile Include="xrgame_dll_detach.cpp">

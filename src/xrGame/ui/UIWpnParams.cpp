@@ -7,7 +7,8 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "inventory_item_object.h"
 #include "UIInventoryUtilities.h"
-#include "Weapon.h"
+#include "WeaponKnife.h"
+#include "WeaponBinoculars.h"
 
 struct SLuaWpnParams
 {
@@ -270,22 +271,22 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
     }
 }
 
-bool CUIWpnParams::Check(const shared_str& wpn_section)
+bool CUIWpnParams::Check(const CInventoryItem& item)
 {
-    if (pSettings->line_exist(wpn_section, "fire_dispersion_base"))
+    CGameObject* invObj = &item.object();
+    if (smart_cast<CWeaponKnife*>(invObj) || smart_cast<CWeaponBinoculars*>(invObj))
+    {
+        return false;
+    }
+
+    shared_str wpnSect = invObj->cNameSect();
+    if (pSettings->line_exist(wpnSect, "fire_dispersion_base"))
     {
         //Alundaio: Most likely a fake weapon or melee weapon
-		if (pSettings->line_exist(wpn_section, "ammo_mag_size") &&
-			pSettings->r_u32(wpn_section, "ammo_mag_size") == 0)
+        if (pSettings->line_exist(wpnSect, "ammo_mag_size") && pSettings->r_u32(wpnSect, "ammo_mag_size") == 0)
 				return false;
 
-        if (0 == xr_strcmp(pSettings->r_string(wpn_section,"class"), "WP_KNIFE"))
-            return false;
-        if (0 == xr_strcmp(wpn_section, "wpn_addon_silencer"))
-            return false;
-        if (0 == xr_strcmp(wpn_section, "wpn_binoc"))
-            return false;
-        if (0 == xr_strcmp(wpn_section, "mp_wpn_binoc"))
+        if (0 == xr_strcmp(wpnSect, "wpn_addon_silencer"))
             return false;
 
         return true;

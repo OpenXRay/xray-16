@@ -1831,7 +1831,7 @@ bool CWeapon::unlimited_ammo()
     return ((GameID() == eGameIDDeathmatch) && m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited));
 };
 
-float CWeapon::GetMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
+float CWeapon::GetMagazineWeight(const xr_vector<CCartridge>& mag) const
 {
     float res = 0;
     const char* last_type = nullptr;
