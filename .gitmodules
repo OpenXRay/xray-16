@@ -44,3 +44,7 @@
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
+[submodule "res/gamedata"]
+	path = res/gamedata
+	url = https://qweasdd136963@bitbucket.org/qweasdd136963/call-of-chernobyl.git
+	branch = rebalance_wip
