@@ -9,8 +9,6 @@
 
 class ENGINE_API CGameFont;
 
-DECLARE_MESSAGE(Stats);
-
 class ENGINE_API CStats : public pureRender
 {
 private:

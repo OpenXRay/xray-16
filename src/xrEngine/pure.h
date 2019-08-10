@@ -8,39 +8,70 @@
 #define REG_PRIORITY_CAPTURE 0x7ffffffful
 #define REG_PRIORITY_INVALID 0xfffffffful
 
-struct IPure
+// XXX: rename to FrameStart
+struct pureFrame
 {
-    virtual ~IPure() = default;
-    virtual void OnPure() = 0;
+    virtual void OnFrame() = 0;
+    ICF void __fastcall OnPure() { OnFrame(); }
 };
 
-#define DECLARE_MESSAGE(name)\
-struct pure##name : IPure\
-{\
-    virtual void On##name() = 0;\
-private:\
-    void OnPure() override { On##name(); }\
+struct pureFrameEnd
+{
+    virtual void OnFrameEnd() = 0;
+    ICF void __fastcall OnPure() { OnFrameEnd(); }
 };
 
-DECLARE_MESSAGE(Frame); // XXX: rename to FrameStart
-DECLARE_MESSAGE(FrameEnd);
-DECLARE_MESSAGE(Render);
-DECLARE_MESSAGE(AppActivate);
-DECLARE_MESSAGE(AppDeactivate);
-DECLARE_MESSAGE(AppStart);
-DECLARE_MESSAGE(AppEnd);
-DECLARE_MESSAGE(DeviceReset);
-DECLARE_MESSAGE(ScreenResolutionChanged);
-
-struct MessageObject
+struct pureRender
 {
-    IPure* Object;
-    int Prio;
+    virtual void OnRender() = 0;
+    ICF void __fastcall OnPure() { OnRender(); }
+};
+
+struct pureAppActivate
+{
+    virtual void OnAppActivate() = 0;
+    ICF void __fastcall OnPure() { OnAppActivate(); }
+};
+
+struct pureAppDeactivate
+{
+    virtual void OnAppDeactivate() = 0;
+    ICF void __fastcall OnPure() { OnAppDeactivate(); }
+};
+
+struct pureAppStart
+{
+    virtual void OnAppStart() = 0;
+    ICF void __fastcall OnPure() { OnAppStart(); }
+};
+
+struct pureAppEnd
+{
+    virtual void OnAppEnd() = 0;
+    ICF void __fastcall OnPure() { OnAppEnd(); }
+};
+
+struct pureDeviceReset
+{
+    virtual void OnDeviceReset() = 0;
+    ICF void __fastcall OnPure() { OnDeviceReset(); }
+};
+
+struct pureScreenResolutionChanged
+{
+    virtual void OnScreenResolutionChanged() = 0;
+    ICF void __fastcall OnPure() { OnScreenResolutionChanged(); }
 };
 
 template<class T>
 class MessageRegistry
 {
+    struct MessageObject
+    {
+        T* Object;
+        int Prio;
+    };
+
     bool changed, inProcess;
     xr_vector<MessageObject> messages;
 
@@ -68,8 +99,11 @@ public:
         VERIFY(newMessage.Prio != REG_PRIORITY_INVALID);
 
         // Verify that we don't already have the same object with valid priority
-        for (auto& message : messages)
+        for (size_t i = 0; i < messages.size(); ++i)
+        {
+            auto& message = messages[i];
             VERIFY(!(message.Prio != REG_PRIORITY_INVALID && message.Object == newMessage.Object));
+        }
 #endif
         messages.emplace_back(newMessage);
 
@@ -81,10 +115,11 @@ public:
 
     void Remove(T* object)
     {
-        for (auto& it : messages)
+        for (size_t i = 0; i < messages.size(); ++i)
         {
-            if (it.Object == object)
-                it.Prio = REG_PRIORITY_INVALID;
+            auto& message = messages[i];
+            if (message.Object == object)
+                message.Prio = REG_PRIORITY_INVALID;
         }
 
         if (inProcess)
@@ -104,9 +139,12 @@ public:
             messages[0].Object->OnPure();
         else
         {
-            for (const auto& message : messages)
+            for (size_t i = 0; i < messages.size(); ++i)
+            {
+                auto& message = messages[i];
                 if (message.Prio != REG_PRIORITY_INVALID)
                     message.Object->OnPure();
+            }
         }
 
         if (changed)

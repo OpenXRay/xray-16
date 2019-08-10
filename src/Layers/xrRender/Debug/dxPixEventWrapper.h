@@ -1,31 +1,34 @@
-#ifndef dxPixEventWrapper_included
-#define dxPixEventWrapper_included
 #pragma once
 
 #if defined(COC_DEBUG) && !defined(USE_OGL)
 
-#define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(L#Name)
-
-class dxPixEventWrapper
+class CScopedPixEvent
 {
 public:
-    dxPixEventWrapper(LPCWSTR wszName) { D3DPERF_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName); }
-    ~dxPixEventWrapper() { D3DPERF_EndEvent(); }
+    CScopedPixEvent(LPCWSTR eventName);
+    ~CScopedPixEvent();
 };
+
+#define PIX_EVENT(Name) CScopedPixEvent pixEvent##Name(L#Name)
+
+// You shouldn't use this macro more than one time in one scope.
+#define PIX_EVENT_TEXT(evtName) CScopedPixEvent pixLocalEvt(evtName)
 
 #if defined(USE_DX10) || defined(USE_DX11)
 void dxPixSetDebugName(ID3DDeviceChild* resource, const shared_str& name);
 
 #define SET_DEBUG_NAME(resource, name) dxPixSetDebugName(resource, name)
 #else
-#define SET_DEBUG_NAME(resource, name) { }
+#define SET_DEBUG_NAME(resource, name) {}
 #endif
 
 #else //    DEBUG
 
-#define PIX_EVENT(Name) { }
-#define SET_DEBUG_NAME(resource, name) { }
+#define PIX_EVENT(Name) {}
+
+// You shouldn't use this macro more than one time in one scope.
+#define PIX_EVENT_TEXT(evtName) {}
+
+#define SET_DEBUG_NAME(resource, name) {}
 
 #endif //   DEBUG
-
-#endif //   dxPixEventWrapper_included

@@ -370,10 +370,12 @@ CRenderTarget::CRenderTarget()
             static_cast<CBlender_SSAO_MSAA*>(b_ssao_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
         }
     }
+
     //	NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+        SET_DEBUG_NAME(rt_Position._get()->pRT, "rt_Position");
 
         if (RImplementation.o.dx10_msaa)
             rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
@@ -421,9 +423,13 @@ CRenderTarget::CRenderTarget()
         rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
         rt_secondVP.create (r2_RT_secondVP, w, h, D3DFMT_A8R8G8B8, 1); //--#SM+#-- +SecondVP+
 
-        // RT - KD
-        rt_sunshafts_0.create(r2_RT_sunshafts0, w, h, D3DFMT_A8R8G8B8);
-        rt_sunshafts_1.create(r2_RT_sunshafts1, w, h, D3DFMT_A8R8G8B8);
+        if (ps_sunshafts_mode == R2SS_SCREEN_SPACE)
+        {
+            // RT - KD
+            s_sunshafts.create(b_sunshafts, "r2\\sunshafts");
+            rt_sunshafts_0.create(r2_RT_sunshafts0, w, h, D3DFMT_A8R8G8B8);
+            rt_sunshafts_1.create(r2_RT_sunshafts1, w, h, D3DFMT_A8R8G8B8);
+        }
 
         if (RImplementation.o.dx10_msaa)
         {
@@ -436,8 +442,6 @@ CRenderTarget::CRenderTarget()
         if (RImplementation.o.advancedpp)
             rt_Generic_2.create(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
     }
-
-    s_sunshafts.create(b_sunshafts, "r2\\sunshafts");
 
     // OCCLUSION
     s_occq.create(b_occq, "r2\\occq");

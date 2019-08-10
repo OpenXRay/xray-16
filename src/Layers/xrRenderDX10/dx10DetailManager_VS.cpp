@@ -146,11 +146,6 @@ void CDetailManager::hw_Render_dump(
                 RCache.set_c(strDir2D, wind);
                 RCache.set_c(strXForm, Device.mFullTransform);
 
-                // ref_constant constArray = RCache.get_c(strArray);
-                // VERIFY(constArray);
-
-                // u32			c_base				= x_array->vs.index;
-                // Fvector4*	c_storage			= RCache.get_ConstantCache_Vertex().get_array_f().access(c_base);
                 Fvector4* c_storage = 0;
                 //	Map constants to memory directly
                 {
@@ -172,6 +167,28 @@ void CDetailManager::hw_Render_dump(
                     auto _iE = items->end();
                     for (; _iI != _iE; _iI++)
                     {
+                        float dist = Device.vCameraPosition.distance_to((*_iI)->mRotY.c);
+                        if (m_shadowsStage && dist > ps_r2_details_opt.x)
+                        {
+                            continue;
+                        }
+
+                        if (dist > ps_r2_details_opt.z)
+                        {
+                            if (!(*_iI)->NeedToRenderAnyway[2])
+                                continue;
+                        }
+                        else if (dist > ps_r2_details_opt.y)
+                        {
+                            if (!(*_iI)->NeedToRenderAnyway[1])
+                                continue;
+                        }
+                        else if (dist > ps_r2_details_opt.x)
+                        {
+                            if (!(*_iI)->NeedToRenderAnyway[0])
+                                continue;
+                        }
+
                         SlotItem& Instance = **_iI;
                         u32 base = dwBatch * 4;
 
@@ -181,17 +198,13 @@ void CDetailManager::hw_Render_dump(
                         c_storage[base + 0].set(M._11 * scale, M._21 * scale, M._31 * scale, M._41);
                         c_storage[base + 1].set(M._12 * scale, M._22 * scale, M._32 * scale, M._42);
                         c_storage[base + 2].set(M._13 * scale, M._23 * scale, M._33 * scale, M._43);
-                        // RCache.set_ca(&*constArray, base+0, M._11*scale,	M._21*scale,	M._31*scale,	M._41	);
-                        // RCache.set_ca(&*constArray, base+1, M._12*scale,	M._22*scale,	M._32*scale,	M._42	);
-                        // RCache.set_ca(&*constArray, base+2, M._13*scale,	M._23*scale,	M._33*scale,	M._43	);
-
+                        
                         // Build color
                         // R2 only needs hemisphere
                         float h = Instance.c_hemi;
                         float s = Instance.c_sun;
                         c_storage[base + 3].set(s, s, s, h);
-                        // RCache.set_ca(&*constArray, base+3, s,				s,				s,				h
-                        // );
+
                         dwBatch++;
                         if (dwBatch == hw_BatchSize)
                         {

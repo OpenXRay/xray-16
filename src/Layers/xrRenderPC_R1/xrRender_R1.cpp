@@ -5,7 +5,7 @@
 
 extern "C"
 {
-XR_EXPORT void SetupEnvR1()
+XR_EXPORT void SetupEnv()
 {
     GEnv.Render = &RImplementation;
     GEnv.RenderFactory = &RenderFactoryImpl;

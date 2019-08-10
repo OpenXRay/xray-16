@@ -110,7 +110,7 @@ int ps_r2_fxaa = 0;
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
 
-//int ps_r__Supersample = 1;
+// int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
 
 float ps_r__Detail_l_ambient = 0.9f;
@@ -131,7 +131,7 @@ float ps_r__WallmarkSHIFT_V = 0.0001f;
 float ps_r__GLOD_ssa_start = 256.f;
 float ps_r__GLOD_ssa_end = 64.f;
 float ps_r__LOD = 0.75f;
-//float ps_r__LOD_Power = 1.5f;
+// float ps_r__LOD_Power = 1.5f;
 float ps_r__ssaDISCARD = 3.5f; // RO
 float ps_r__ssaDONTSORT = 32.f; // RO
 float ps_r__ssaHZBvsTEX = 96.f; // RO
@@ -171,10 +171,10 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
 Flags32 ps_r2_ls_flags_ext = {
     /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION};
 
-BOOL ps_clear_models_on_unload	= 0; //Alundaio
-BOOL ps_no_scale_on_fade        = 0; //Alundaio
-BOOL ps_use_precompiled_shaders = 0; //Alundaio
-BOOL ps_grass_shadow = 0; //Alundaio
+BOOL ps_clear_models_on_unload = 0; // Alundaio
+BOOL ps_no_scale_on_fade = 0; // Alundaio
+BOOL ps_use_precompiled_shaders = 0; // Alundaio
+BOOL ps_grass_shadow = 0; // Alundaio
 
 float ps_r2_df_parallax_h = 0.02f;
 float ps_r2_df_parallax_range = 75.f;
@@ -233,32 +233,34 @@ float ps_r3_dyn_wet_surf_near = 10.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 30.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
-//AVO: detail draw radius
+// AVO: detail draw radius
 Flags32 ps_common_flags = {0}; // r1-only
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
+Ivector ps_r2_details_opt = {60, 90, 120};
+
 #ifdef DETAIL_RADIUS // управление радиусом отрисовки травы
 u32 dm_size = 24;
-u32 dm_cache1_line = 12; //dm_size*2/dm_cache1_count
-u32 dm_cache_line = 49; //dm_size+1+dm_size
-u32 dm_cache_size = 2401; //dm_cache_line*dm_cache_line
-float dm_fade = 47.5; //float(2*dm_size)-.5f;
+u32 dm_cache1_line = 12; // dm_size*2/dm_cache1_count
+u32 dm_cache_line = 49; // dm_size+1+dm_size
+u32 dm_cache_size = 2401; // dm_cache_line*dm_cache_line
+float dm_fade = 47.5; // float(2*dm_size)-.5f;
 u32 dm_current_size = 24;
-u32 dm_current_cache1_line = 12; //dm_current_size*2/dm_cache1_count
-u32 dm_current_cache_line = 49; //dm_current_size+1+dm_current_size
-u32 dm_current_cache_size = 2401; //dm_current_cache_line*dm_current_cache_line
-float dm_current_fade = 47.5; //float(2*dm_current_size)-.5f;
+u32 dm_current_cache1_line = 12; // dm_current_size*2/dm_cache1_count
+u32 dm_current_cache_line = 49; // dm_current_size+1+dm_current_size
+u32 dm_current_cache_size = 2401; // dm_current_cache_line*dm_current_cache_line
+float dm_current_fade = 47.5; // float(2*dm_current_size)-.5f;
 #endif
 float ps_current_detail_density = 0.6f;
 float ps_current_detail_scale = 1.f;
-xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
-    {"qt_high", 3}, {"qt_extreme", 4}, {nullptr, 0}};
+xr_token ext_quality_token[] = {
+    {"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2}, {"qt_high", 3}, {"qt_extreme", 4}, {nullptr, 0}};
 //-AVO
 
 float ps_r2_ss_sunshafts_length = 1.f;
 float ps_r2_ss_sunshafts_radius = 1.f;
 
-Flags32 ps_actor_shadow_flags = { 0 };
+Flags32 ps_actor_shadow_flags = {0};
 
 //- Mad Max
 float ps_r2_gloss_factor = 4.0f;
@@ -273,7 +275,7 @@ float ps_r2_gloss_factor = 4.0f;
 
 //-----------------------------------------------------------------------
 
-//AVO: detail draw radius
+// AVO: detail draw radius
 #ifdef DETAIL_RADIUS
 class CCC_detail_radius : public CCC_Integer
 {
@@ -287,7 +289,7 @@ public:
         dm_current_fade = float(2 * dm_current_size) - .5f;
     }
 
-    CCC_detail_radius(LPCSTR N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max) {};
+    CCC_detail_radius(LPCSTR N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max){};
 
     void Execute(LPCSTR args) override
     {
@@ -295,14 +297,33 @@ public:
         apply();
     }
 
-    void Status(TStatus& S) override
-    {
-        CCC_Integer::Status(S);
-    }
+    void Status(TStatus& S) override { CCC_Integer::Status(S); }
 };
 
 //-AVO
 #endif
+
+class CCC_DetailsOpt : public CCC_IVector3
+{
+public:
+    CCC_DetailsOpt(LPCSTR N, Ivector* V, const Ivector _min, const Ivector _max) : CCC_IVector3(N, V, _min, _max) {}
+    virtual void Execute(LPCSTR args)
+    {
+        Ivector v;
+        if ((3 != sscanf(args, "%d,%d,%d", &v.x, &v.y, &v.z)) && (3 != sscanf(args, "(%d, %d, %d)", &v.x, &v.y, &v.z)))
+        {
+            InvalidSyntax();
+        }
+        else if (v.x > v.y || v.y > v.z)
+        {
+            InvalidSyntax();
+        }
+        else
+        {
+            CCC_IVector3::Execute(args);
+        }
+    }
+};
 
 class CCC_tf_Aniso : public CCC_Integer
 {
@@ -344,7 +365,7 @@ public:
 
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 // TODO: DX10: Implement mip bias control
-//VERIFY(!"apply not implmemented.");
+// VERIFY(!"apply not implmemented.");
 #else // USE_DX10
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)value)));
@@ -522,7 +543,7 @@ public:
 
         Msg("memory usage  mb \t \t video    \t managed      \t system \n");
 
-        const float MiB = 1024*1024; // XXX: use it as common enum value (like in X-Ray 2.0)
+        const float MiB = 1024 * 1024; // XXX: use it as common enum value (like in X-Ray 2.0)
         const u32* mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex];
 
         float vb_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
@@ -535,7 +556,7 @@ public:
         float ib_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
         Msg("index buffer      \t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
 
-        float textures_managed = (m_base+m_lmaps)/MiB;
+        float textures_managed = (m_base + m_lmaps) / MiB;
         Msg("textures          \t \t %f \t %f \t %f ", 0.f, textures_managed, 0.f);
 
         mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget];
@@ -825,7 +846,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_zfill_depth", &ps_r2_zfill, .001f, .5f);
     CMD3(CCC_Mask, "r2_allow_r1_lights", &ps_r2_ls_flags, R2FLAG_R1LIGHTS);
 
-    CMD3(CCC_Mask, "r__actor_shadow", &ps_actor_shadow_flags, RFLAG_ACTOR_SHADOW); //Swartz
+    CMD3(CCC_Mask, "r__actor_shadow", &ps_actor_shadow_flags, RFLAG_ACTOR_SHADOW); // Swartz
 
     //- Mad Max
     CMD4(CCC_Float, "r2_gloss_factor", &ps_r2_gloss_factor, .0f, 10.f);
@@ -839,14 +860,14 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r2_sun", &ps_r2_ls_flags, R2FLAG_SUN);
     CMD3(CCC_Mask, "r2_sun_details", &ps_r2_ls_flags, R2FLAG_SUN_DETAILS);
     CMD3(CCC_Mask, "r2_sun_focus", &ps_r2_ls_flags, R2FLAG_SUN_FOCUS);
-    //CMD3(CCC_Mask, "r2_exp_splitscene", &ps_r2_ls_flags, R2FLAG_EXP_SPLIT_SCENE);
-    //CMD3(CCC_Mask, "r2_exp_donttest_uns", &ps_r2_ls_flags, R2FLAG_EXP_DONT_TEST_UNSHADOWED);
+    // CMD3(CCC_Mask, "r2_exp_splitscene", &ps_r2_ls_flags, R2FLAG_EXP_SPLIT_SCENE);
+    // CMD3(CCC_Mask, "r2_exp_donttest_uns", &ps_r2_ls_flags, R2FLAG_EXP_DONT_TEST_UNSHADOWED);
     CMD3(CCC_Mask, "r2_exp_donttest_shad", &ps_r2_ls_flags, R2FLAG_EXP_DONT_TEST_SHADOWED);
 
     CMD3(CCC_Mask, "r2_sun_tsm", &ps_r2_ls_flags, R2FLAG_SUN_TSM);
     CMD4(CCC_Float, "r2_sun_tsm_proj", &ps_r2_sun_tsm_projection, .001f, 0.8f);
     CMD4(CCC_Float, "r2_sun_tsm_bias", &ps_r2_sun_tsm_bias, -0.5, +0.5);
-    CMD4(CCC_Float, "r2_sun_near", &ps_r2_sun_near, 1.f, 150.f); //AVO: extended from 50.f to 150.f
+    CMD4(CCC_Float, "r2_sun_near", &ps_r2_sun_near, 1.f, 150.f); // AVO: extended from 50.f to 150.f
 #if RENDER != R_R1
     CMD4(CCC_Float, "r2_sun_far", &OLES_SUN_LIMIT_27_01_07, 51.f, 180.f);
 #endif
@@ -900,8 +921,8 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_dof_sky", &ps_r2_dof_sky, -10000.f, 10000.f);
     CMD3(CCC_Mask, "r2_dof_enable", &ps_r2_ls_flags, R2FLAG_DOF);
 
-    //float ps_r2_dof_near = 0.f; // 0.f
-    //float ps_r2_dof_focus = 1.4f; // 1.4f
+    // float ps_r2_dof_near = 0.f; // 0.f
+    // float ps_r2_dof_focus = 1.4f; // 1.4f
 
     if (Core.ParamFlags.test(xrCore::dev))
         CMD4(CCC_SunshaftsIntensity, "r__sunshafts_intensity", &ccSunshaftsIntensity, 0.f, 1.f);
@@ -910,7 +931,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_ss_sunshafts_length", &ps_r2_ss_sunshafts_length, .2f, 1.5f);
     CMD4(CCC_Float, "r2_ss_sunshafts_radius", &ps_r2_ss_sunshafts_radius, .5f, 2.f);
     CMD3(CCC_Mask, "r2_volumetric_lights", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS);
-    //CMD3(CCC_Mask, "r2_sun_shafts", &ps_r2_ls_flags, R2FLAG_SUN_SHAFTS);
+    // CMD3(CCC_Mask, "r2_sun_shafts", &ps_r2_ls_flags, R2FLAG_SUN_SHAFTS);
     CMD3(CCC_Token, "r2_sun_shafts", &ps_r_sun_shafts, qsun_shafts_token);
     CMD3(CCC_SSAO_Mode, "r2_ssao_mode", &ps_r_ssao_mode, qssao_mode_token);
     CMD3(CCC_Token, "r2_ssao", &ps_r_ssao, qssao_token);
@@ -926,31 +947,35 @@ void xrRender_initconsole()
 
     CMD3(CCC_Token, "r2_sun_quality", &ps_r_sun_quality, qsun_quality_token);
 
-    //Igor: need restart
+    // Igor: need restart
     CMD3(CCC_Mask, "r2_soft_water", &ps_r2_ls_flags, R2FLAG_SOFT_WATER);
     CMD3(CCC_Mask, "r2_soft_particles", &ps_r2_ls_flags, R2FLAG_SOFT_PARTICLES);
 
     CMD3(CCC_Token, "r2_smap_size", &ps_r2_smap_size, qsmap_size_token);
 
-    //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
+    // CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);
-    //CMD3(CCC_Mask, "r3_msaa_hybrid", &ps_r2_ls_flags, R3FLAG_MSAA_HYBRID);
-    //CMD3(CCC_Mask, "r3_msaa_opt", &ps_r2_ls_flags, R3FLAG_MSAA_OPT);
+    // CMD3(CCC_Mask, "r3_msaa_hybrid", &ps_r2_ls_flags, R3FLAG_MSAA_HYBRID);
+    // CMD3(CCC_Mask, "r3_msaa_opt", &ps_r2_ls_flags, R3FLAG_MSAA_OPT);
     CMD3(CCC_Mask, "r3_gbuffer_opt", &ps_r2_ls_flags, R3FLAG_GBUFFER_OPT);
     CMD3(CCC_Mask, "r3_use_dx10_1", &ps_r2_ls_flags, (u32)R3FLAG_USE_DX10_1);
-    //CMD3(CCC_Mask, "r3_msaa_alphatest", &ps_r2_ls_flags, (u32)R3FLAG_MSAA_ALPHATEST);
+    // CMD3(CCC_Mask, "r3_msaa_alphatest", &ps_r2_ls_flags, (u32)R3FLAG_MSAA_ALPHATEST);
     CMD3(CCC_Token, "r3_msaa_alphatest", &ps_r3_msaa_atest, qmsaa__atest_token);
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
 
 #ifdef DETAIL_RADIUS
     CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 200);
 #endif
+    Ivector dopt_min, dopt_max;
+    dopt_min.set(1, 1, 1);
+    dopt_max.set(390, 390, 390);
+    CMD4(CCC_DetailsOpt, "r2_details_opt", &ps_r2_details_opt, dopt_min, dopt_max);
     CMD4(CCC_Integer, "r2_fxaa", &ps_r2_fxaa, 0, 1);
 
-    CMD4(CCC_Integer, "r__clear_models_on_unload", &ps_clear_models_on_unload, 0, 1); //Alundaio
-    CMD4(CCC_Integer, "r__use_precompiled_shaders", &ps_use_precompiled_shaders, 0, 1); //Alundaio
-    CMD4(CCC_Integer, "r__enable_grass_shadow", &ps_grass_shadow, 0, 1); //Alundaio
-    CMD4(CCC_Integer, "r__no_scale_on_fade", &ps_no_scale_on_fade, 0, 1); //Alundaio
+    CMD4(CCC_Integer, "r__clear_models_on_unload", &ps_clear_models_on_unload, 0, 1); // Alundaio
+    CMD4(CCC_Integer, "r__use_precompiled_shaders", &ps_use_precompiled_shaders, 0, 1); // Alundaio
+    CMD4(CCC_Integer, "r__enable_grass_shadow", &ps_grass_shadow, 0, 1); // Alundaio
+    CMD4(CCC_Integer, "r__no_scale_on_fade", &ps_no_scale_on_fade, 0, 1); // Alundaio
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
@@ -967,7 +992,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r3_volumetric_smoke", &ps_r2_ls_flags, R3FLAG_VOLUMETRIC_SMOKE);
     CMD1(CCC_memory_stats, "render_memory_stats");
 
-    //CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
+    // CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
 }
 
 void xrRender_apply_tf()

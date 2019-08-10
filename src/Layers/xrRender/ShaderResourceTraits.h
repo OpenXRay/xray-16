@@ -24,10 +24,7 @@ struct ShaderTypeTraits<SVS>
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
     {
-        if (HW.Caps.geometry_major >= 2)
-            target = "vs_2_0";
-        else
-            target = "vs_1_1";
+        target = "vs_2_0";
 
 #if RENDER==R_R1 || defined(R2_SHADERS_BACKWARDS_COMPATIBILITY)
         if (strstr(data, "main_vs_1_1"))

@@ -16,7 +16,6 @@ IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 {
     PIX_EVENT(render_main);
-    //	Msg						("---begin");
     marker++;
 
     // Calculate sector(s) and their objects
@@ -164,12 +163,14 @@ void CRender::render_menu()
 
     // Main Render
     {
+        PIX_EVENT_TEXT(L"Menu Main Render");
         Target->u_setrt(Target->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
 
     // Distort
     {
+        PIX_EVENT_TEXT(L"Menu Distort");
         FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
         Target->u_setrt(Target->rt_Generic_1, 0, 0, HW.pBaseZB); // Now RT is a distortion mask
         HW.pContext->ClearRenderTargetView(Target->rt_Generic_1->pRT, ColorRGBA);
@@ -236,16 +237,12 @@ void CRender::Render()
         return;
     }
 
-    //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
-
     // Configure
     RImplementation.o.distortion = FALSE; // disable distorion
-    Fcolor sun_color = ((light*)Lights.sun_adapted._get())->color;
-    BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
-    if (o.sunstatic)
-        bSUN = FALSE;
-    // Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
-
+    Fcolor sunColor = ((light*)Lights.sun_adapted._get())->color;
+    BOOL bSUN = !o.sunstatic && ps_r2_ls_flags.test(R2FLAG_SUN) &&
+        (u_diffuse2s(sunColor.r, sunColor.g, sunColor.b) > EPS);
+    
     // HOM
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
     View = 0;
@@ -262,7 +259,7 @@ void CRender::Render()
         RImplementation.BasicStats.Culling.Begin();
         float z_distance = ps_r2_zfill;
         Fmatrix m_zfill, m_project;
-        m_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
+        m_project.build_projection(deg2rad(Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
             z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
         m_zfill.mul(m_project, Device.mView);
         r_pmask(true, false); // enable priority "0"
@@ -292,7 +289,6 @@ void CRender::Render()
         T.Start();
         BOOL result = FALSE;
         HRESULT hr = S_FALSE;
-        // while	((hr=q_sync_point[q_sync_count]->GetData	(&result,sizeof(result),D3DGETDATA_FLUSH))==S_FALSE) {
         while ((hr = GetData(q_sync_point[q_sync_count], &result, sizeof(result))) == S_FALSE)
         {
             if (!SwitchToThread())
@@ -305,8 +301,7 @@ void CRender::Render()
         }
     }
     RImplementation.BasicStats.WaitS.End();
-    q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;
-    // CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
+    q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;\
     CHK_DX(EndQuery(q_sync_point[q_sync_count]));
 
     //******* Main calc - DEFERRER RENDERER
@@ -330,8 +325,8 @@ void CRender::Render()
     //******* Main render :: PART-0	-- first
     if (!split_the_scene_to_minimize_wait)
     {
-        PIX_EVENT(DEFER_PART0_NO_SPLIT);
         // level, DO NOT SPLIT
+        PIX_EVENT_TEXT(L"Deferred Part0: No Split");
         Target->phase_scene_begin();
         r_dsgraph_render_hud();
         r_dsgraph_render_graph(0);
@@ -342,8 +337,8 @@ void CRender::Render()
     }
     else
     {
-        PIX_EVENT(DEFER_PART0_SPLIT);
         // level, SPLIT
+        PIX_EVENT_TEXT(L"Deferred Part0: Split");
         Target->phase_scene_begin();
         r_dsgraph_render_graph(0);
         Target->disable_aniso();
@@ -408,25 +403,6 @@ void CRender::Render()
     if (split_the_scene_to_minimize_wait)
     {
         PIX_EVENT(DEFER_PART1_SPLIT);
-        // skybox can be drawn here
-        if (0)
-        {
-            if (!RImplementation.o.dx10_msaa)
-                Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, HW.pBaseZB);
-            else
-                Target->u_setrt(
-                    Target->rt_Generic_0_r, Target->rt_Generic_1, 0, RImplementation.Target->rt_MSAADepth->pZRT);
-            RCache.set_CullMode(CULL_NONE);
-            RCache.set_Stencil(FALSE);
-
-            // draw skybox
-            RCache.set_ColorWriteEnable();
-            // CHK_DX(HW.pDevice->SetRenderState			( D3DRS_ZENABLE,	FALSE				));
-            RCache.set_Z(FALSE);
-            g_pGamePersistent->Environment().RenderSky();
-            // CHK_DX(HW.pDevice->SetRenderState			( D3DRS_ZENABLE,	TRUE				));
-            RCache.set_Z(TRUE);
-        }
 
         // level
         Target->phase_scene_begin();

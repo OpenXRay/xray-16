@@ -265,6 +265,55 @@ public:
     }
 };
 
+class ENGINE_API CCC_IVector3 : public IConsole_Command
+{
+protected:
+    Ivector* value;
+    Ivector min, max;
+
+public:
+    CCC_IVector3(LPCSTR N, Ivector* V, const Ivector _min, const Ivector _max) : IConsole_Command(N), value(V)
+    {
+        min.set(_min);
+        max.set(_max);
+    };
+    const Ivector GetValue() const { return *value; };
+    Ivector* GetValuePtr() const { return value; };
+    virtual void Execute(LPCSTR args)
+    {
+        Ivector v;
+        if ((3 != sscanf(args, "%d,%d,%d", &v.x, &v.y, &v.z)) && (3 != sscanf(args, "(%d, %d, %d)", &v.x, &v.y, &v.z)))
+        {
+            InvalidSyntax();
+            return;
+        }
+        if (v.x < min.x || v.y < min.y || v.z < min.z)
+        {
+            InvalidSyntax();
+            return;
+        }
+        if (v.x > max.x || v.y > max.y || v.z > max.z)
+        {
+            InvalidSyntax();
+            return;
+        }
+        value->set(v);
+    }
+    virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "(%d, %d, %d)", value->x, value->y, value->z); }
+    virtual void Info(TInfo& I)
+    {
+        xr_sprintf(I, sizeof(I), "vector3 in range [%d,%d,%d]-[%d,%d,%d]", min.x, min.y, min.z, max.x, max.y, max.z);
+    }
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        TStatus str;
+        xr_sprintf(str, sizeof(str), "(%d, %d, %d) (current) [(%d,%d,%d)-(%d,%d,%d)]", value->x, value->y, value->z,
+            min.x, min.y, min.z, max.x, max.y, max.z);
+        tips.push_back(str);
+        IConsole_Command::fill_tips(tips, mode);
+    }
+};
+
 class ENGINE_API CCC_Vector3 : public IConsole_Command
 {
 protected:

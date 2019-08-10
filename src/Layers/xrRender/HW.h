@@ -78,6 +78,9 @@ public:
     IDXGISwapChain*    m_pSwapChain = nullptr;
     ID3D11RenderTargetView* pBaseRT = nullptr; //	combine with DX9 pBaseRT via typedef
     ID3D11DepthStencilView* pBaseZB = nullptr;
+#ifdef COC_DEBUG
+    ID3DUserDefinedAnnotation* UserDefinedAnnotation = nullptr;
+#endif
 
     CHWCaps Caps;
 

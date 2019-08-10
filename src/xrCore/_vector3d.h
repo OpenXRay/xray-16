@@ -29,6 +29,14 @@ struct _vector3
         return *this;
     }
 
+    ICF SelfRef set(const _vector3<s32>& v) noexcept
+    {
+        x = T(v.x);
+        y = T(v.y);
+        z = T(v.z);
+        return *this;
+    }
+
     ICF SelfRef set(const _vector3<float>& v) noexcept
     {
         x = T(v.x);

@@ -15,9 +15,11 @@ const int quant = 16384;
 const int c_hdr = 10;
 const int c_size = 4;
 
-static D3DVERTEXELEMENT9 dwDecl[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
+static D3DVERTEXELEMENT9 dwDecl[] = {
+    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
     {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
-    D3DDECL_END()};
+    D3DDECL_END()
+};
 
 #pragma pack(push, 1)
 struct vertHW
@@ -282,6 +284,28 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
                 auto _iE = items->end();
                 for (; _iI != _iE; _iI++)
                 {
+                    float dist = Device.vCameraPosition.distance_to((*_iI)->mRotY.c);
+                    if (m_shadowsStage && dist > ps_r2_details_opt.x)
+                    {
+                        continue;
+                    }
+
+                    if (dist > ps_r2_details_opt.z)
+                    {
+                        if (!(*_iI)->NeedToRenderAnyway[2])
+                            continue;
+                    }
+                    else if (dist > ps_r2_details_opt.y)
+                    {
+                        if (!(*_iI)->NeedToRenderAnyway[1])
+                            continue;
+                    }
+                    else if (dist > ps_r2_details_opt.x)
+                    {
+                        if (!(*_iI)->NeedToRenderAnyway[0])
+                            continue;
+                    }
+
                     SlotItem& Instance = **_iI;
                     u32 base = dwBatch * 4;
 

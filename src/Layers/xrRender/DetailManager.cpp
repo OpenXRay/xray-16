@@ -3,8 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "DetailManager.h"
 #include "xrCDB/Intersect.hpp"
 
@@ -19,6 +17,9 @@
 #include "xrEngine/Environment.h"
 #include <xmmintrin.h>
 #endif
+#include "xrCore/Threading/ScopeLock.hpp"
+
+extern float ps_current_detail_scale;
 
 const float dbgOffset = 0.f;
 const int dbgItems = 128;
@@ -78,7 +79,6 @@ CDetailManager::CDetailManager() : xrc("detail manager")
 {
     dtFS = nullptr;
     dtSlots = nullptr;
-    soft_Geom = nullptr;
     hw_Geom = nullptr;
     hw_BatchSize = 0;
     hw_VB = 0;
@@ -147,15 +147,6 @@ CDetailManager::~CDetailManager()
 
 #ifndef _EDITOR
 
-/*
-void dump(CDetailManager::vis_list& lst)
-{
-    for (int i = 0; i<lst.size(); i++)
-    {
-        Msg("%8x / %8x / %8x",  lst[i]._M_start, lst[i]._M_finish, lst[i]._M_end_of_storage._M_data);
-    }
-}
-*/
 void CDetailManager::Load()
 {
     // Open file stream
@@ -199,11 +190,7 @@ void CDetailManager::Load()
     // Make dither matrix
     bwdithermap(2, dither);
 
-    // Hardware specific optimizations
-    if (UseVS())
-        hw_Load();
-    else
-        soft_Load();
+    hw_Load();
 
     // swing desc
     // normal
@@ -222,10 +209,7 @@ void CDetailManager::Load()
 #endif
 void CDetailManager::Unload()
 {
-    if (UseVS())
-        hw_Unload();
-    else
-        soft_Unload();
+    hw_Unload();
 
     for (DetailIt it = objects.begin(); it != objects.end(); it++)
     {
@@ -343,6 +327,8 @@ void CDetailManager::UpdateVisibleM()
                         {
                             SlotItem& Item = *siIT;
                             float scale = ps_no_scale_on_fade ? (Item.scale_calculated = Item.scale) : (Item.scale_calculated = Item.scale*alpha_i);
+                            Item.scale_calculated *= ps_current_detail_scale;
+                            
                             float ssa = ps_no_scale_on_fade ? scale : scale * scale*Rq_drcp;
                             if (ssa < r_ssaDISCARD)
                             {
@@ -382,6 +368,11 @@ void CDetailManager::UpdateVisibleM()
     RImplementation.BasicStats.DetailVisibility.End();
 }
 
+void CDetailManager::SetShadowsStage(bool value)
+{
+    m_shadowsStage = value;
+}
+
 void CDetailManager::Render()
 {
 #ifndef _EDITOR
@@ -390,6 +381,8 @@ void CDetailManager::Render()
     if (!psDeviceFlags.is(rsDetails))
         return;
 #endif
+
+    PIX_EVENT_TEXT(L"Render Details");
 
     // MT
     MT_SYNC();
@@ -406,15 +399,15 @@ void CDetailManager::Render()
 
     RCache.set_CullMode(CULL_NONE);
     RCache.set_xform_world(Fidentity);
-    if (UseVS())
-        hw_Render();
-    else
-        soft_Render();
+    hw_Render();
     RCache.set_CullMode(CULL_CCW);
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
     RImplementation.BasicStats.DetailRender.End();
     m_frame_rendered = RDEVICE.dwFrame;
+
+    if (m_shadowsStage)
+        m_shadowsStage = false;
 }
 
 void __stdcall CDetailManager::MT_CALC()
@@ -428,8 +421,9 @@ void __stdcall CDetailManager::MT_CALC()
         return;
 #endif
 
-    MT.Enter();
+    ScopeLock lock(&MT);
     if (m_frame_calc != RDEVICE.dwFrame)
+    {
         if ((m_frame_rendered + 1) == RDEVICE.dwFrame) // already rendered
         {
             Fvector EYE = RDEVICE.vCameraPositionSaved;
@@ -444,5 +438,5 @@ void __stdcall CDetailManager::MT_CALC()
             UpdateVisibleM();
             m_frame_calc = RDEVICE.dwFrame;
         }
-    MT.Leave();
+    }
 }

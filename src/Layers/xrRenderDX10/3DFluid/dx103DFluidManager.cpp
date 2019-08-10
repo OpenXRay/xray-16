@@ -407,20 +407,12 @@ void dx103DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
         RCache.set_Element(m_SimulationTechnique[SS_AdvectTemp]);
     else
         RCache.set_Element(m_SimulationTechnique[SS_Advect]);
+
     // Advect forward to get \phi^(n+1)
-    // pShaderResourceVariables[RENDER_TARGET_TEMPVECTOR]->SetResource( NULL );
-    // TimeStepShaderVariable->SetFloat(timestep);
     RCache.set_c(strTimeStep, timestep);
-    // ModulateShaderVariable->SetFloat(1.0f);
     RCache.set_c(strModulate, 1.0f);
-    // ForwardShaderVariable->SetFloat(1.0f);
     RCache.set_c(strForward, 1.0f);
-    // SetRenderTarget( RENDER_TARGET_TEMPVECTOR );
-    // TechniqueAdvect->GetPassByIndex(0)->Apply(0);
     m_pGrid->DrawSlices();
-    // m_pD3DDevice->OMSetRenderTargets(0, NULL, NULL);
-    // pShaderResourceVariables[RENDER_TARGET_TEMPVECTOR]->SetResource(
-    // pRenderTargetShaderViews[RENDER_TARGET_TEMPVECTOR] );
 
     // Advect back to get \bar{\phi}
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_TEMPSCALAR]);
@@ -431,9 +423,7 @@ void dx103DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
         AdvectElement = m_SimulationTechnique[SS_Advect];
 
     RCache.set_Element(AdvectElement);
-    // pShaderResourceVariables[RENDER_TARGET_TEMPSCALAR]->SetResource( NULL );
-    // pShaderResourceVariables[RENDER_TARGET_COLOR0]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_TEMPVECTOR]
-    // );
+
     //  Overwrite RENDER_TARGET_COLOR0 with RENDER_TARGET_TEMPVECTOR
     //  Find texture index and patch texture manually using DirecX call!
     static shared_str strColorName(m_pEngineTextureNames[RENDER_TARGET_COLOR_IN]);
@@ -563,32 +553,18 @@ void dx103DFluidManager::ApplyVorticityConfinement(float timestep)
     // Compute vorticity
     float color[4] = {0, 0, 0, 0};
     HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR], color);
-
-    // pShaderResourceVariables[RENDER_TARGET_TEMPVECTOR]->SetResource( NULL );
-    // SetRenderTarget( RENDER_TARGET_TEMPVECTOR );
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR]);
-    // TechniqueVorticity->GetPassByIndex(0)->Apply(0);
     RCache.set_Element(m_SimulationTechnique[SS_Vorticity]);
     m_pGrid->DrawSlices();
-    // m_pD3DDevice->OMSetRenderTargets(0, NULL, NULL);
-    // pShaderResourceVariables[RENDER_TARGET_TEMPVECTOR]->SetResource(
-    // pRenderTargetShaderViews[RENDER_TARGET_TEMPVECTOR] );
 
     // Compute and apply vorticity confinement force
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_VELOCITY1]);
     RCache.set_Element(m_SimulationTechnique[SS_Confinement]);
-    // pShaderResourceVariables[RENDER_TARGET_VELOCITY1]->SetResource( NULL );
-    // EpsilonShaderVariable->SetFloat(confinementScale);
     RCache.set_c(strEpsilon, m_fConfinementScale);
-    // TimeStepShaderVariable->SetFloat(timestep);
     RCache.set_c(strTimeStep, timestep);
-    // TechniqueConfinement->GetPassByIndex(0)->Apply(0);
-    // SetRenderTarget( RENDER_TARGET_VELOCITY1 );
+
     // Add the confinement force to the rest of the forces
     m_pGrid->DrawSlices();
-    // m_pD3DDevice->OMSetRenderTargets(0, NULL, NULL);
-    // pShaderResourceVariables[RENDER_TARGET_VELOCITY1]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_VELOCITY1]
-    // );
 }
 
 void dx103DFluidManager::ApplyExternalForces(const dx103DFluidData& FluidData, float /*timestep*/)

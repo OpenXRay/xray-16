@@ -100,8 +100,6 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     selectResolution(sd.BufferDesc.Width, sd.BufferDesc.Height, bWindowed);
 
     // Back buffer
-    //. P.BackBufferWidth       = dwWidth;
-    //. P.BackBufferHeight      = dwHeight;
     //  TODO: DX10: implement dynamic format selection
     // sd.BufferDesc.Format     = fTarget;
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -115,11 +113,6 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     sd.OutputWindow = m_hWnd;
     sd.Windowed = bWindowed;
-
-    // Depth/stencil (DX10 don't need this?)
-    //P.EnableAutoDepthStencil = TRUE;
-    //P.AutoDepthStencilFormat = fDepth;
-    //P.Flags = 0; //. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
 
     // Refresh rate
     if (bWindowed)
@@ -136,8 +129,12 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
     UINT createDeviceFlags = 0;
-#ifdef DEBUG
-// createDeviceFlags |= D3Dxx_CREATE_DEVICE_DEBUG;
+#if defined(COC_DEBUG) || defined(DEBUG)
+#ifdef USE_DX11
+    createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#else
+    createDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+#endif
 #endif
     HRESULT R;
 #ifdef USE_DX11
@@ -151,6 +148,10 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
         D3D_DRIVER_TYPE_UNKNOWN, // Если мы выбираем конкретный адаптер, то мы обязаны использовать D3D_DRIVER_TYPE_UNKNOWN.
         NULL, createDeviceFlags, pFeatureLevels, sizeof(pFeatureLevels) / sizeof(pFeatureLevels[0]),
         D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
+    
+#ifdef COC_DEBUG
+    R_CHK(pContext->QueryInterface(__uuidof(UserDefinedAnnotation), reinterpret_cast<void**>(&UserDefinedAnnotation)));
+#endif
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
 
@@ -189,6 +190,10 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     updateWindowProps(m_hWnd);
     fill_vid_mode_list(this);
 #endif
+
+#ifdef USE_DX11
+    SET_DEBUG_NAME(pContext, "pContext");
+#endif
 }
 
 void CHW::DestroyDevice()
@@ -213,6 +218,9 @@ void CHW::DestroyDevice()
     _RELEASE(m_pSwapChain);
 
 #ifdef USE_DX11
+#ifdef COC_DEBUG
+    _RELEASE(UserDefinedAnnotation);
+#endif
     _RELEASE(pContext);
 #endif
 
@@ -482,7 +490,6 @@ void CHW::UpdateViews()
     HRESULT R;
 
     // Create a render target view
-    // R_CHK    (pDevice->GetRenderTarget           (0,&pBaseRT));
     ID3DTexture2D* pBuffer;
     R = m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (LPVOID*)&pBuffer);
     R_CHK(R);

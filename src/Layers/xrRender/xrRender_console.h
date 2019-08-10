@@ -149,6 +149,8 @@ extern ECORE_API float ps_r2_ss_sunshafts_length;
 extern ECORE_API float ps_r2_ss_sunshafts_radius;
 extern u32 ps_sunshafts_mode;
 
+extern Ivector ps_r2_details_opt;
+
 enum
 {
     R2FLAG_SUN = (1 << 0),

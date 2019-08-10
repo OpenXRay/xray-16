@@ -68,7 +68,6 @@ bool det_render_debug = false;
 
 #include "xrEngine/GameMtlLib.h"
 
-extern float ps_current_detail_scale;
 //#define		DBG_SWITCHOFF_RANDOMIZE
 void CDetailManager::cache_Decompress(Slot* S)
 {
@@ -251,7 +250,7 @@ void CDetailManager::cache_Decompress(Slot* S)
             Item.scale = (Dobj->m_fMinScale * 0.5f + Dobj->m_fMaxScale * 0.9f) / 2;
 // Item.scale	= 0.1f;
 #endif
-            Item.scale *= ps_current_detail_scale;
+
             // X-Form BBox
             Fmatrix mScale, mXform;
             Fbox ItemBB;
@@ -275,19 +274,6 @@ void CDetailManager::cache_Decompress(Slot* S)
 #endif
 #endif
 
-// Color
-/*
-DetailPalette*	c_pal			= (DetailPalette*)&DS.color;
-float gray255	[4];
-gray255[0]						=	255.f*float(c_pal->a0)/15.f;
-gray255[1]						=	255.f*float(c_pal->a1)/15.f;
-gray255[2]						=	255.f*float(c_pal->a2)/15.f;
-gray255[3]						=	255.f*float(c_pal->a3)/15.f;
-*/
-// float c_f						=	1.f;	//Interpolate		(gray255,x,z,d_size)+.5f;
-// int c_dw						=	255;	//iFloor			(c_f);
-// clamp							(c_dw,0,255);
-// Item.C_dw						=	color_rgba		(c_dw,c_dw,c_dw,255);
 #if RENDER == R_R1
             Item.c_rgb.x = DS.r_qclr(DS.c_r, 15);
             Item.c_rgb.y = DS.r_qclr(DS.c_g, 15);
@@ -296,27 +282,24 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
             Item.c_hemi = DS.r_qclr(DS.c_hemi, 15);
             Item.c_sun = DS.r_qclr(DS.c_dir, 15);
 
-//? hack: RGB = hemi
-//? Item.c_rgb.add					(ps_r__Detail_rainbow_hemi*Item.c_hemi);
+            // KD
+            Item.NeedToRenderAnyway[0] = (::Random.randI(100) > 15) ? true : false;
+            Item.NeedToRenderAnyway[1] = (::Random.randI(100) > 30) ? true : false;
+            Item.NeedToRenderAnyway[2] = (::Random.randI(100) > 45) ? true : false;
 
-// Vis-sorting
+            //? hack: RGB = hemi
+            //? Item.c_rgb.add(ps_r__Detail_rainbow_hemi*Item.c_hemi);
+
+            // Vis-sorting
 #ifndef DBG_SWITCHOFF_RANDOMIZE
-            if (!UseVS())
-            {
-                // Always still on CPU pipe
+            if (Dobj->m_Flags.is(DO_NO_WAVING))
                 Item.vis_ID = 0;
-            }
             else
             {
-                if (Dobj->m_Flags.is(DO_NO_WAVING))
-                    Item.vis_ID = 0;
+                if (::Random.randI(0, 3) == 0)
+                    Item.vis_ID = 2; // Second wave
                 else
-                {
-                    if (::Random.randI(0, 3) == 0)
-                        Item.vis_ID = 2; // Second wave
-                    else
-                        Item.vis_ID = 1; // First wave
-                }
+                    Item.vis_ID = 1; // First wave
             }
 #else
             Item.vis_ID = 0;

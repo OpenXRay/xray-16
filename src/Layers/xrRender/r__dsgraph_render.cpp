@@ -429,8 +429,7 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
 {
     VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
-    PIX_EVENT(r_dsgraph_render_hud_ui);
-
+    PIX_EVENT_TEXT(L"Render Hud Item");
     hud_transform_helper helper;
 
 #if RENDER != R_R1
@@ -589,7 +588,10 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
 #if RENDER != R_R1
     if (g_pGameLevel && (phase == RImplementation.PHASE_SMAP) && ps_actor_shadow_flags.test(RFLAG_ACTOR_SHADOW))
+    {
+        PIX_EVENT_TEXT(L"Render Actor Shadow");
         g_hud->Render_Actor_Shadow(); // Actor Shadow
+    }
 #endif
 
     // Restore

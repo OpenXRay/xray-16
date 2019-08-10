@@ -838,6 +838,7 @@ void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+    SSManager.SetMaxAnisotropy(4);
 //  TODO: DX10: Implement Resetting of render states into default mode
 // VERIFY(!"D3DXRenderBase::SetupStates not implemented.");
 #else //    USE_DX10
@@ -892,12 +893,10 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 #endif
     Resources->OnDeviceCreate(shName);
     create();
-    if (!GEnv.isDedicatedServer)
-    {
-        m_WireShader.create("editor\\wire");
-        m_SelectionShader.create("editor\\selection");
-        DUImpl.OnDeviceCreate();
-    }
+
+    m_WireShader.create("editor\\wire");
+    m_SelectionShader.create("editor\\selection");
+    DUImpl.OnDeviceCreate();
 }
 
 void D3DXRenderBase::Create(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2, bool move_window)

@@ -71,6 +71,7 @@ public:
 #if RENDER == R_R1
         Fvector c_rgb;
 #endif
+        bool NeedToRenderAnyway[3];
     };
 
     using SlotItemVec = xr_vector<SlotItem*>;
@@ -147,6 +148,7 @@ public:
     float m_time_rot_2;
     float m_time_pos;
     float m_global_time_old;
+    bool m_shadowsStage = false;
 
     IReader* dtFS;
     DetailHeader dtH;
@@ -178,18 +180,10 @@ public:
     PSS poolSI; // pool из которого выделяются SlotItem
 
     void UpdateVisibleM();
-    void UpdateVisibleS();
 
 #ifdef _EDITOR
     virtual ObjectList* GetSnapList() = 0;
 #endif
-
-    bool UseVS() { return HW.Caps.geometry_major >= 1; }
-    // Software processor
-    ref_geom soft_Geom;
-    void soft_Load();
-    void soft_Unload();
-    void soft_Render();
 
     // Hardware processor
     ref_geom hw_Geom;
@@ -218,6 +212,8 @@ public:
 #else //	USE_DX10
     void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
 #endif //	USE_DX10
+
+    void SetShadowsStage(bool value);
 
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);

@@ -84,7 +84,6 @@ void CRenderTarget::phase_scene_begin()
             u_setrt(rt_Position, rt_Accumulator, pZB);
         else
             u_setrt(rt_Position, rt_Color, pZB);
-        // else								u_setrt		(rt_Position,	rt_Color, rt_Normal,		pZB);
     }
 
     // Stencil - write 0x1 at pixel pos
@@ -101,9 +100,7 @@ void CRenderTarget::phase_scene_begin()
 void CRenderTarget::disable_aniso()
 {
     // Disable ANISO
-    //	TODO: DX10: disable aniso here
-    // for (u32 i=0; i<HW.Caps.raster.dwStages; i++)
-    //	CHK_DX(HW.pDevice->SetSamplerState( i, D3DSAMP_MAXANISOTROPY, 1	));
+    SSManager.SetMaxAnisotropy(1);
 }
 
 // end

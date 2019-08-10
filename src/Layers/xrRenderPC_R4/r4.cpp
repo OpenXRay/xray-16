@@ -221,8 +221,6 @@ void CRender::create()
 
     // SMAP / DST
     o.HW_smap_FETCH4 = FALSE;
-    //	DX10 disabled
-    // o.HW_smap			= HW.support	(D3DFMT_D24X8,			D3DRTYPE_TEXTURE,D3DUSAGE_DEPTHSTENCIL);
     o.HW_smap = true;
     o.HW_smap_PCF = o.HW_smap;
     if (o.HW_smap)
@@ -235,10 +233,6 @@ void CRender::create()
         Msg("* HWDST/PCF supported and used");
     }
 
-    //	DX10 disabled
-    // o.fp16_filter		= HW.support	(D3DFMT_A16B16G16R16F,	D3DRTYPE_TEXTURE,D3DUSAGE_QUERY_FILTER);
-    // o.fp16_blend		= HW.support	(D3DFMT_A16B16G16R16F,
-    // D3DRTYPE_TEXTURE,D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING);
     o.fp16_filter = true;
     o.fp16_blend = true;
 
@@ -428,17 +422,12 @@ void CRender::create()
 
     rmNormal();
     marker = 0;
+
     D3D_QUERY_DESC qdesc;
     qdesc.MiscFlags = 0;
     qdesc.Query = D3D_QUERY_EVENT;
     ZeroMemory(q_sync_point, sizeof(q_sync_point));
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
-    //	Prevent error on first get data
-    // q_sync_point[0]->End();
-    // q_sync_point[1]->End();
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[1]));
+
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         R_CHK(HW.pDevice->CreateQuery(&qdesc, &q_sync_point[i]));
     HW.pContext->End(q_sync_point[0]);
@@ -455,8 +444,6 @@ void CRender::destroy()
     m_bMakeAsyncSS = false;
     FluidManager.Destroy();
     ::PortalTraverser.destroy();
-    //_RELEASE					(q_sync_point[1]);
-    //_RELEASE					(q_sync_point[0]);
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         _RELEASE(q_sync_point[i]);
     HWOCC.occq_destroy();
@@ -499,8 +486,6 @@ void CRender::reset_begin()
 
     xr_delete(Target);
     HWOCC.occq_destroy();
-    //_RELEASE					(q_sync_point[1]);
-    //_RELEASE					(q_sync_point[0]);
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         _RELEASE(q_sync_point[i]);
 }
@@ -510,15 +495,12 @@ void CRender::reset_end()
     D3D_QUERY_DESC qdesc;
     qdesc.MiscFlags = 0;
     qdesc.Query = D3D_QUERY_EVENT;
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         R_CHK(HW.pDevice->CreateQuery(&qdesc, &q_sync_point[i]));
+
     //	Prevent error on first get data
     HW.pContext->End(q_sync_point[0]);
-    // q_sync_point[1]->End();
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[1]));
+
     HWOCC.occq_create(occq_size);
 
     Target = new CRenderTarget();
