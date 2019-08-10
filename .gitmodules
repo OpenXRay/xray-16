@@ -47,4 +47,4 @@
 [submodule "res/gamedata"]
 	path = res/gamedata
 	url = https://qweasdd136963@bitbucket.org/qweasdd136963/call-of-chernobyl.git
-	branch = rebalance_wip
+	branch = qw_br
