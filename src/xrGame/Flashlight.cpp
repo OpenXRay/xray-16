@@ -312,7 +312,7 @@ bool CFlashlight::IsWorking()
 void CFlashlight::UpdateVisibility()
 {
 	//check visibility
-	attachable_hud_item* i0 = g_player_hud->attached_item(1);
+	attachable_hud_item* i0 = g_player_hud->attached_item(0);
 	if (i0 && HudItemData())
 	{
 		if (light_trace_bone.size())
@@ -326,7 +326,7 @@ void CFlashlight::UpdateVisibility()
 			}
 		}
 
-		bool bClimb = ((Actor()->MovingState()&mcClimb) != 0);
+		bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
 		if (bClimb)
 		{
 			HideDevice(true);
@@ -355,20 +355,19 @@ void CFlashlight::UpdateVisibility()
 			}
 		}
 	}
-	else
-		if (m_bNeedActivation)
-		{
-			attachable_hud_item* i0 = g_player_hud->attached_item(1);
-			bool bClimb = ((Actor()->MovingState()&mcClimb) != 0);
-			if (!bClimb)
-			{
-				CHudItem* huditem = (i0) ? i0->m_parent_hud_item : NULL;
-				bool bChecked = !huditem || CheckCompatibilityInt(huditem, 0);
+    else if (m_bNeedActivation)
+    {
+        attachable_hud_item* i0 = g_player_hud->attached_item(0);
+        bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
+	    if (!bClimb)
+        {
+            CHudItem* huditem = (i0) ? i0->m_parent_hud_item : NULL;
+            bool bChecked = !huditem || CheckCompatibilityInt(huditem, 0);
 
-				if (bChecked)
-					ShowDevice(true);
-			}
-		}
+            if (bChecked)
+                ShowDevice(true);
+        }
+    }
 }
 
 void CFlashlight::UpdateCL()

@@ -13,7 +13,6 @@ constexpr pcstr R1_LIBRARY = "xrRender_R1";
 constexpr pcstr R2_LIBRARY = "xrRender_R2";
 constexpr pcstr R3_LIBRARY = "xrRender_R3";
 constexpr pcstr R4_LIBRARY = "xrRender_R4";
-constexpr pcstr GL_LIBRARY = "xrRender_GL";
 
 constexpr pcstr RENDERER_R1 = "renderer_r1";
 constexpr pcstr RENDERER_R2A = "renderer_r2a";
@@ -21,7 +20,6 @@ constexpr pcstr RENDERER_R2 = "renderer_r2";
 constexpr pcstr RENDERER_R2_5 = "renderer_r2.5";
 constexpr pcstr RENDERER_R3 = "renderer_r3";
 constexpr pcstr RENDERER_R4 = "renderer_r4";
-constexpr pcstr RENDERER_GL = "renderer_gl";
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -71,7 +69,6 @@ void CEngineAPI::SelectRenderer()
         }
     };
 
-    select(GL_LIBRARY, rsRGL, 5, rsR4);
     select(R4_LIBRARY, rsR4, 4, rsR3);
     select(R3_LIBRARY, rsR3, 3, rsR2);
     select(R2_LIBRARY, rsR2, 2, rsR1);
@@ -153,9 +150,6 @@ void CEngineAPI::Destroy(void)
 void CEngineAPI::CloseUnusedLibraries()
 {
     // Now unload unused renderers
-    if (GEnv.CurrentRenderer != 5)
-        m_renderers[GL_LIBRARY]->Close();
-
     if (GEnv.CurrentRenderer != 4)
         m_renderers[R4_LIBRARY]->Close();
 
@@ -175,17 +169,9 @@ void CEngineAPI::CreateRendererList()
         return;
 
     m_renderers[R1_LIBRARY] = XRay::LoadModule(R1_LIBRARY);
-
-    // Hide "d3d10.dll not found" message box for XP
-    SetErrorMode(SEM_FAILCRITICALERRORS);
-
     m_renderers[R2_LIBRARY] = XRay::LoadModule(R2_LIBRARY);
     m_renderers[R3_LIBRARY] = XRay::LoadModule(R3_LIBRARY);
     m_renderers[R4_LIBRARY] = XRay::LoadModule(R4_LIBRARY);
-    m_renderers[GL_LIBRARY] = XRay::LoadModule(GL_LIBRARY);
-
-    // Restore error handling
-    SetErrorMode(0);
 
     auto& modes = vid_quality_token;
 
@@ -213,7 +199,6 @@ void CEngineAPI::CreateRendererList()
     checkRenderer(R2_LIBRARY, RENDERER_R2_5, 3);
     checkRenderer(R3_LIBRARY, RENDERER_R3, 4);
     checkRenderer(R4_LIBRARY, RENDERER_R4, 5);
-    checkRenderer(GL_LIBRARY, RENDERER_GL, 6);
 
     modes.emplace_back(xr_token(nullptr, -1));
 

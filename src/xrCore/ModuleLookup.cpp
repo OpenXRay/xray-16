@@ -91,9 +91,9 @@ void* ModuleHandle::GetProcAddress(pcstr procName) const
     if (proc == nullptr)
     {
 #ifdef WINDOWS
-        Msg("! Failed to load procedure [%s] from DLL: 0x%d", procName, GetLastError());
+        Msg("! Failed to load procedure [%s]: %s", xrDebug::ErrorToString(GetLastError()));
 #elif defined(LINUX)
-        Msg("! Failed to load procedure [%s] from DLL: 0x%d", procName, dlerror());
+        Msg("! Failed to load procedure [%s]: 0x%d", procName, dlerror());
 #endif
     }
 
