@@ -489,9 +489,7 @@ void CRender::MakeContextCurrent(bool acquire)
         result = SDL_GL_MakeCurrent(HW.m_hWnd, HW.m_hRC);
     else
         result = SDL_GL_MakeCurrent(nullptr, nullptr);
-#ifdef WINDOWS // FIXME: find out why Linux always fails.. But works.
     R_ASSERT2(result == 0, "Failed to switch OpenGL context");
-#endif
 }
 
 // Implementation
