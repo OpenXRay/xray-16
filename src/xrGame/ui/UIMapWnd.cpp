@@ -23,6 +23,7 @@
 CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(
 CUIMapWnd* GetMapWnd() { return g_map_wnd; }
 CUIMapWnd::CUIMapWnd(UIHint* hint)
+    : m_ActionPlanner(nullptr)
 {
     m_tgtMap = NULL;
     m_GlobalMap = NULL;

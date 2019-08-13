@@ -175,13 +175,13 @@ void CRenderDevice::PrimaryThreadProc(void* context)
     GEnv.Render->MakeContextCurrent(false);
     device.deviceCreated.Set();
 
-    device.deviceReadyToRun.Wait(); // ping
+    device.deviceReadyToRun.Wait();
     GEnv.Render->MakeContextCurrent(true);
     
     device.seqAppStart.Process();
     GEnv.Render->ClearTarget();
 
-    device.deviceReadyToRun.Set(); // pong
+    device.primaryReadyToRun.Set();
 
     while (true)
     {
@@ -520,10 +520,10 @@ void CRenderDevice::Run()
 
     // Pre start
     GEnv.Render->MakeContextCurrent(false);
-    deviceReadyToRun.Set();  // ping
+    deviceReadyToRun.Set();
 
-    while (!deviceReadyToRun.Wait(MaximalWaitTime))
-        SDL_PumpEvents(); // pong
+    while (!primaryReadyToRun.Wait(MaximalWaitTime))
+        SDL_PumpEvents();
 
     splash::hide();
     SDL_HideWindow(m_sdlWnd);
