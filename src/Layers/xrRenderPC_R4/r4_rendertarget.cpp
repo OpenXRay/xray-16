@@ -275,7 +275,7 @@ CRenderTarget::CRenderTarget()
     if (ps_r_ssao_mode != 2 /*hdao*/)
         ps_r_ssao = _min(ps_r_ssao, 3);
 
-    RImplementation.o.ssao_ultra = ps_r_ssao > 3;
+    RImplementation.o.ssao_ultra = ps_r_ssao > 3 && HW.ComputeShadersSupported;
     if (RImplementation.o.dx10_msaa)
         SampleCount = RImplementation.o.dx10_msaa_samples;
 

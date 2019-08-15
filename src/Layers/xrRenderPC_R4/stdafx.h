@@ -18,6 +18,11 @@
 #define HAS_DX11_2
 #endif
 
+#if __has_include(<d3d11_3.h>)
+#include <d3d11_3.h>
+#define HAS_DX11_3
+#endif
+
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 

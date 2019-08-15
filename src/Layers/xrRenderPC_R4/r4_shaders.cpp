@@ -404,6 +404,11 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     // Shader Model 5.0
     appendShaderOption(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5", "1");
 
+#ifdef HAS_DX11_3
+    // Shader Model 5.1
+    appendShaderOption(HW.pDevice3 != nullptr, "SM_5_1", "1");
+#endif
+
     // Minmax SM
     appendShaderOption(o.dx10_minmax_sm, "USE_MINMAX_SM", "1");
 
@@ -476,13 +481,16 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
                 pTarget = "vs_4_1";
             else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_0)
                 pTarget = "vs_5_0";
-            else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_1)
+            else if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_1)
             {
-                // XXX: Introduce DirectX 11.3 support
-                if (false /*HW.pDevice3*/)
+#ifdef HAS_DX11_3
+                if (HW.pDevice3)
                     pTarget = "vs_5_1";
                 else
+#endif
+                {
                     pTarget = "vs_5_0";
+                }
             }
         }
         else if ('p' == pTarget[0])
@@ -493,13 +501,16 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
                 pTarget = "ps_4_1";
             else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_0)
                 pTarget = "ps_5_0";
-            else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_1)
+            else if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_1)
             {
-                // XXX: Introduce DirectX 11.3 support
-                if (false /*HW.pDevice3*/)
+#ifdef HAS_DX11_3
+                if (HW.pDevice3)
                     pTarget = "ps_5_1";
                 else
+#endif
+                {
                     pTarget = "ps_5_0";
+                }
             }
         }
         else if ('g' == pTarget[0])
@@ -510,26 +521,32 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
                 pTarget = "gs_4_1";
             else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_0)
                 pTarget = "gs_5_0";
-            else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_1)
+            else if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_1)
             {
-                // XXX: Introduce DirectX 11.3 support
-                if (false /*HW.pDevice3*/)
+#ifdef HAS_DX11_3
+                if (HW.pDevice3)
                     pTarget = "gs_5_1";
                 else
+#endif
+                {
                     pTarget = "gs_5_0";
+                }
             }
         }
         else if ('c' == pTarget[0])
         {
             if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_0)
                 pTarget = "cs_5_0";
-            else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_1)
+            else if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_1)
             {
-                // XXX: Introduce DirectX 11.3 support
-                if (false /*HW.pDevice3*/)
+#ifdef HAS_DX11_3
+                if (HW.pDevice3)
                     pTarget = "cs_5_1";
                 else
+#endif
+                {
                     pTarget = "cs_5_0";
+                }
             }
         }
     }

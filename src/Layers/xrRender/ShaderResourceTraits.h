@@ -274,7 +274,30 @@ struct ShaderTypeTraits<SCS>
 #endif
 
     static inline const char* GetShaderExt() { return ".cs"; }
-    static inline const char* GetCompilationTarget() { return "cs_5_0"; }
+
+    static inline const char* GetCompilationTarget()
+    {
+#ifdef USE_DX11
+        switch (HW.FeatureLevel)
+        {
+        case D3D_FEATURE_LEVEL_10_0:
+            return "cs_4_0";
+        case D3D_FEATURE_LEVEL_10_1:
+            return "cs_4_1";
+        case D3D_FEATURE_LEVEL_11_0:
+            return "cs_5_0";
+        case D3D_FEATURE_LEVEL_11_1:
+#ifdef HAS_DX11_3
+            if (HW.pDevice3)
+                return "cs_5_1";
+#endif
+            return "cs_5_0";
+        }
+#endif // USE_DX11
+
+        NODEFAULT;
+        return "cs_5_0";
+    }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
     {

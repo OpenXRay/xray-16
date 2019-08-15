@@ -81,9 +81,13 @@ public:
     IDXGISwapChain* m_pSwapChain = nullptr;
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
     D3D_FEATURE_LEVEL FeatureLevel;
+    bool ComputeShadersSupported;
 #ifdef HAS_DX11_2
     IDXGIFactory2* m_pFactory2 = nullptr;
     IDXGISwapChain2* m_pSwapChain2 = nullptr;
+#endif
+#ifdef HAS_DX11_3
+    ID3D11Device3* pDevice3 = nullptr;
 #endif
 #if defined(USE_DX10)
     ID3D10Device1* pDevice1 = nullptr;

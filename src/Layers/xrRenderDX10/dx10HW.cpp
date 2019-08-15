@@ -110,6 +110,16 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     R = createDevice(featureLevels, count);
     if (FAILED(R))
         R = createDevice(&featureLevels[1], count - 1);
+
+    if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+        ComputeShadersSupported = true;
+    else
+    {
+        D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS,
+            &data, sizeof(data));
+        ComputeShadersSupported = data.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
+    }
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
 
@@ -135,7 +145,11 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         TerminateProcess(GetCurrentProcess(), 0);
     };
 
-    _SHOW_REF("* CREATE: DeviceREF:", HW.pDevice);
+    _SHOW_REF("* CREATE: DeviceREF:", pDevice);
+
+#ifdef HAS_DX11_3
+    pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
+#endif
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
@@ -309,6 +323,11 @@ void CHW::DestroyDevice()
 #endif
     _SHOW_REF("refCount:HW.pDevice:", HW.pDevice);
     _RELEASE(HW.pDevice);
+
+#ifdef HAS_DX11_3
+    _SHOW_REF("refCount:HW.pDevice3:", HW.pDevice3);
+    _RELEASE(HW.pDevice3);
+#endif
 
     DestroyD3D();
 }
