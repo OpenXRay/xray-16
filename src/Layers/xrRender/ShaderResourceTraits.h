@@ -158,7 +158,9 @@ struct ShaderTypeTraits<SGS>
         else if (HW.FeatureLevel == D3D_FEATURE_LEVEL_11_0)
             return "gs_5_0";
 #endif
-        NODEFAULT;
+        // Xottab_DUTY: commented this NODEFAULT, not necessary
+        // XXX: Refactor this later
+        //NODEFAULT;
         return "gs_4_0";
     }
 
