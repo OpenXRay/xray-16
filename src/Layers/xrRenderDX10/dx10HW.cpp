@@ -381,7 +381,10 @@ DXGI_FORMAT CHW::SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT form
 bool CHW::UsingFlipPresentationModel() const
 {
     return m_ChainDesc.SwapEffect == DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
-        || m_ChainDesc.SwapEffect == DXGI_SWAP_EFFECT_FLIP_DISCARD;
+#ifdef HAS_DXGI1_4
+        || m_ChainDesc.SwapEffect == DXGI_SWAP_EFFECT_FLIP_DISCARD
+#endif
+    ;
 }
 
 D3DFORMAT CHW::selectDepthStencil(D3DFORMAT /*fTarget*/)
