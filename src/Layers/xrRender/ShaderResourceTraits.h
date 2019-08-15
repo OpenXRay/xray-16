@@ -2,6 +2,26 @@
 
 #include "ResourceManager.h"
 
+#ifdef USE_OGL
+template<GLenum type>
+inline std::pair<GLuint, GLuint> GLCreateShader(pcstr* buffer, size_t size, pcstr name)
+{
+    GLenum res;
+
+    GLuint shader = glCreateShader(type);
+    R_ASSERT(shader);
+    glShaderSource(shader, size, buffer, nullptr);
+    glCompileShader(shader);
+
+    GLuint program = glCreateProgram();
+    R_ASSERT(program);
+    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
+
+    return { shader, program };
+}
+#endif
+
 template <typename T>
 struct ShaderTypeTraits;
 
@@ -12,8 +32,12 @@ struct ShaderTypeTraits<SVS>
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<GLuint, GLuint>;
 #else
     using HWShaderType = ID3DVertexShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
 #endif
 
     static inline const char* GetShaderExt() { return ".vs"; }
@@ -74,12 +98,13 @@ struct ShaderTypeTraits<SVS>
         }
     }
 
-    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
+    static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
+        pcstr name = nullptr)
     {
-        HRESULT res = 0;
+        ResultType res{};
 
 #ifdef USE_OGL
-        sh = glCreateShader(GL_VERTEX_SHADER);
+        res = GLCreateShader<GL_VERTEX_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
         res = HW.pDevice->CreateVertexShader(buffer, size, 0, &sh);
 #elif defined(USE_DX10)
@@ -101,8 +126,12 @@ struct ShaderTypeTraits<SPS>
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<GLuint, GLuint>;
 #else
     using HWShaderType = ID3DPixelShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
 #endif
 
     static inline const char* GetShaderExt() { return ".ps"; }
@@ -175,12 +204,13 @@ struct ShaderTypeTraits<SPS>
         }
     }
 
-    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
+    static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
+        pcstr name = nullptr)
     {
-        HRESULT res = 0;
+        ResultType res{};
 
 #ifdef USE_OGL
-        sh = glCreateShader(GL_FRAGMENT_SHADER);
+        res = GLCreateShader<GL_FRAGMENT_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
         res = HW.pDevice->CreatePixelShader(buffer, size, 0, &sh);
 #elif defined(USE_DX10)
@@ -203,10 +233,13 @@ struct ShaderTypeTraits<SGS>
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<GLuint, GLuint>;
 #else
     using HWShaderType = ID3DGeometryShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
 #endif
-
 
     static inline const char* GetShaderExt() { return ".gs"; }
 
@@ -245,12 +278,13 @@ struct ShaderTypeTraits<SGS>
         entry = "main";
     }
 
-    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
+    static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
+        pcstr name = nullptr)
     {
-        HRESULT res = 0;
+        ResultType res{};
 
 #ifdef USE_OGL
-        sh = glCreateShader(GL_GEOMETRY_SHADER);
+        res = GLCreateShader<GL_GEOMETRY_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
         res = HW.pDevice->CreateGeometryShader(buffer, size, 0, &sh);
 #else
@@ -272,8 +306,12 @@ struct ShaderTypeTraits<SHS>
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<GLuint, GLuint>;
 #else
     using HWShaderType = ID3D11HullShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
 #endif
 
     static inline const char* GetShaderExt() { return ".hs"; }
@@ -303,12 +341,13 @@ struct ShaderTypeTraits<SHS>
         entry = "main";
     }
 
-    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
+    static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
+        pcstr name = nullptr)
     {
-        HRESULT res = 0;
+        ResultType res{};
 
 #ifdef USE_OGL
-        sh = glCreateShader(GL_TESS_CONTROL_SHADER);
+        res = GLCreateShader<GL_TESS_CONTROL_SHADER>(buffer, size, name);
 #else
         res = HW.pDevice->CreateHullShader(buffer, size, NULL, &sh);
 #endif
@@ -326,8 +365,12 @@ struct ShaderTypeTraits<SDS>
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<GLuint, GLuint>;
 #else
     using HWShaderType = ID3D11DomainShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
 #endif
 
     static inline const char* GetShaderExt() { return ".ds"; }
@@ -357,12 +400,13 @@ struct ShaderTypeTraits<SDS>
         entry = "main";
     }
 
-    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
+    static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
+        pcstr name = nullptr)
     {
-        HRESULT res = 0;
+        ResultType res{};
 
 #ifdef USE_OGL
-        sh = glCreateShader(GL_TESS_EVALUATION_SHADER);
+        res = GLCreateShader<GL_TESS_EVALUATION_SHADER>(buffer, size, name);
 #else
         res = HW.pDevice->CreateDomainShader(buffer, size, NULL, &sh);
 #endif
@@ -380,8 +424,12 @@ struct ShaderTypeTraits<SCS>
 
 #ifdef USE_OGL
     using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<GLuint, GLuint>;
 #else
     using HWShaderType = ID3D11ComputeShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
 #endif
 
     static inline const char* GetShaderExt() { return ".cs"; }
@@ -415,12 +463,13 @@ struct ShaderTypeTraits<SCS>
         entry = "main";
     }
 
-    static inline HRESULT CreateHWShader(DWORD const* buffer, size_t size, HWShaderType& sh)
+    static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
+        pcstr name = nullptr)
     {
-        HRESULT res = 0;
+        ResultType res{};
         
 #ifdef USE_OGL
-        sh = glCreateShader(GL_COMPUTE_SHADER);
+        res = GLCreateShader<GL_COMPUTE_SHADER>(buffer, size, name);
 #else
         res = HW.pDevice->CreateComputeShader(buffer, size, NULL, &sh);
 #endif

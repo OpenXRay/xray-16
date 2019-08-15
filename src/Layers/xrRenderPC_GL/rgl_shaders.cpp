@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "rgl.h"
 
+#include "Layers/xrRender/ShaderResourceTraits.h"
+
 void CRender::addShaderOption(const char* name, const char* value)
 {
     m_ShaderOptions += "#define ";
@@ -10,10 +12,107 @@ void CRender::addShaderOption(const char* name, const char* value)
     m_ShaderOptions += "\n";
 }
 
+template <typename T>
+static bool create_shader(cpcstr name, pcstr* buffer, size_t const buffer_size, cpcstr file_name,
+    T*& result, bool const disasm)
+{
+    auto [shader, program] = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh, name);
+
+    // Get the compilation result
+    GLint status;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+
+    // Link program if compilation succeeded
+    GLchar* errors = nullptr;
+    if ((GLboolean)status == GL_TRUE)
+    {
+        CHK_GL(glAttachShader(program, shader));
+        CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+        CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+        CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+        CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+        CHK_GL(glLinkProgram(program));
+        CHK_GL(glDetachShader(program, shader));
+        CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
+
+        // Parse constant, texture, sampler binding
+        if ((GLboolean)status == GL_TRUE)
+        {
+            result->sh = program;
+            // Let constant table parse it's data
+            result->constants.parse(&program, ShaderTypeTraits<T>::GetShaderDest());
+        }
+        else
+        {
+            GLint length;
+            CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
+            errors = xr_alloc<GLchar>(length);
+            CHK_GL(glGetProgramInfoLog(program, length, nullptr, errors));
+        }
+    }
+    else
+    {
+        GLint length;
+        CHK_GL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
+        errors = xr_alloc<GLchar>(length);
+        CHK_GL(glGetShaderInfoLog(shader, length, nullptr, errors));
+    }
+
+    if ((GLboolean)status == GL_FALSE)
+    {
+#ifdef DEBUG
+        GLint srcLen;
+        CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &srcLen));
+        GLchar* shaderSrc = xr_alloc<GLchar>(srcLen);
+        CHK_GL(glGetShaderSource(shader, srcLen, nullptr, shaderSrc));
+#endif
+
+        Msg("! shader compilation failed");
+        Log("! ", name);
+        if (errors)
+            Log("! error: ", errors);
+
+#ifdef DEBUG
+        if (shaderSrc)
+        {
+            Log("Shader source:");
+            Log(shaderSrc);
+            Log("Shader source end.");
+        }
+        xr_free(shaderSrc);
+#endif
+    }
+
+    CHK_GL(glDeleteShader(shader));
+    xr_free(errors);
+    return GLboolean(status) == GL_TRUE;
+}
+
+static bool create_shader(cpcstr name, cpcstr pTarget, pcstr* buffer, size_t const buffer_size,
+    cpcstr file_name, void*& result, bool const disasm)
+{
+    switch (pTarget[0])
+    {
+    case 'p':
+        return create_shader(name, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+    case 'v':
+        return create_shader(name, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+    case 'g':
+        return create_shader(name, buffer, buffer_size, file_name, (SGS*&)result, disasm);
+    case 'c':
+        return create_shader(name, buffer, buffer_size, file_name, (SCS*&)result, disasm);
+    case 'h':
+        return create_shader(name, buffer, buffer_size, file_name, (SHS*&)result, disasm);
+    case 'd':
+        return create_shader(name, buffer, buffer_size, file_name, (SDS*&)result, disasm);
+    default:
+        NODEFAULT;
+        return false;
+    }
+}
+
 static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
-
-/////////
 
 // TODO: OGL: make ignore commented includes
 static inline void load_includes(pcstr pSrcData, UINT SrcDataLen, xr_vector<pstr>& source, xr_vector<pstr>& includes)
@@ -138,9 +237,8 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     string32 c_sun_quality;
 
     // TODO: OGL: Implement these parameters.
-    VERIFY(!pFunctionName);
-    VERIFY(!pTarget);
-    VERIFY(!Flags);
+    UNUSED(pFunctionName);
+    UNUSED(Flags);
 
     // open included files
     load_includes((pcstr)fs->pointer(), fs->length(), source, includes);
@@ -416,86 +514,15 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     CopyMemory(sources + head_lines + options.size(), source.data(), source.size() * sizeof(pstr));
 
     // Compile the shader
-    GLuint shader = *(GLuint*)result;
-    R_ASSERT(shader);
-    CHK_GL(glShaderSource(shader, sources_lines, sources, nullptr));
-    CHK_GL(glCompileShader(shader));
-
-    // Create the shader program
-    GLuint program = glCreateProgram();
-    R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
-    CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
-    *(GLuint*)result = program;
+    const bool success = create_shader(name, pTarget, sources, sources_lines, nullptr, result, o.disasm);
 
     // Free string resources
     xr_free(sources);
     for (auto it = includes.begin(); it != includes.end(); ++it)
         xr_free(*it);
 
-    // Get the compilation result
-    GLint status;
-    CHK_GL(glGetShaderiv(shader, GL_COMPILE_STATUS, &status));
+    if (success)
+        return S_OK;
 
-    // Link program if compilation succeeded
-    GLchar* _pErrorMsgs = nullptr;
-    if ((GLboolean)status == GL_TRUE)
-    {
-        CHK_GL(glAttachShader(program, shader));
-        CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
-        CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
-        CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
-        CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
-        CHK_GL(glLinkProgram(program));
-        CHK_GL(glDetachShader(program, shader));
-        CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
-
-        if ((GLboolean)status == GL_FALSE)
-        {
-            GLint length;
-            CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
-            _pErrorMsgs = xr_alloc<GLchar>(length);
-            CHK_GL(glGetProgramInfoLog(program, length, nullptr, _pErrorMsgs));
-        }
-    }
-    else
-    {
-        GLint length;
-        CHK_GL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
-        _pErrorMsgs = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderInfoLog(shader, length, nullptr, _pErrorMsgs));
-    }
-
-    if ((GLboolean)status == GL_FALSE)
-    {
-#ifdef DEBUG
-        GLint srcLen;
-        CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &srcLen));
-        GLchar* shaderSrc = xr_alloc<GLchar>(srcLen);
-        CHK_GL(glGetShaderSource(shader, srcLen, nullptr, shaderSrc));
-#endif
-
-        Msg("! shader compilation failed");
-        Log("! ", name);
-        if (_pErrorMsgs)
-            Log("! error: ", _pErrorMsgs);
-
-#ifdef DEBUG
-        if (shaderSrc)
-        {
-            Log("Shader source:");
-            Log(shaderSrc);
-            Log("Shader source end.");
-        }
-        xr_free(shaderSrc);
-#endif
-
-        xr_free(_pErrorMsgs);
-        CHK_GL(glDeleteShader(shader));
-        return E_FAIL;
-    }
-
-    xr_free(_pErrorMsgs);
-    CHK_GL(glDeleteShader(shader));
-    return S_OK;
+    return E_FAIL;
 }

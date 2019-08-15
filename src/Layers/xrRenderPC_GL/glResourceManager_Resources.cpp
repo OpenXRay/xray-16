@@ -163,80 +163,22 @@ void CResourceManager::_DeleteDecl(const SDeclaration* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr /*fallbackShader = nullptr*/)
+SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullptr*/)
 {
     string_path name;
     xr_strcpy(name, shader);
-    if (0 == GEnv.Render->m_skinning) xr_strcat(name, "_0");
-    if (1 == GEnv.Render->m_skinning) xr_strcat(name, "_1");
-    if (2 == GEnv.Render->m_skinning) xr_strcat(name, "_2");
-    if (3 == GEnv.Render->m_skinning) xr_strcat(name, "_3");
-    if (4 == GEnv.Render->m_skinning) xr_strcat(name, "_4");
-    LPSTR N = LPSTR(name);
-    map_VS::iterator I = m_vs.find(N);
-    if (I != m_vs.end()) return I->second;
-    SVS* _vs = new SVS();
-    _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
-    //_vs->vs = NULL;
-    //_vs->signature = NULL;
-    VERIFY(xr_strcmpi(name, "null") != 0);
+    if (0 == GEnv.Render->m_skinning)
+        xr_strcat(name, "_0");
+    if (1 == GEnv.Render->m_skinning)
+        xr_strcat(name, "_1");
+    if (2 == GEnv.Render->m_skinning)
+        xr_strcat(name, "_2");
+    if (3 == GEnv.Render->m_skinning)
+        xr_strcat(name, "_3");
+    if (4 == GEnv.Render->m_skinning)
+        xr_strcat(name, "_4");
 
-    string_path shName;
-    {
-        const char* pchr = strchr(shader, '(');
-        ptrdiff_t size = pchr ? pchr - shader : xr_strlen(shader);
-        strncpy(shName, shader, size);
-        shName[size] = 0;
-    }
-
-    string_path cname;
-    strconcat(sizeof cname, cname, GEnv.Render->getShaderPath(),/*_name*/shName, ".vs");
-    FS.update_path(cname, "$game_shaders$", cname);
-    // LPCSTR target = NULL;
-
-    // duplicate and zero-terminate
-    IReader* file = FS.r_open(cname);
-    // TODO: OGL: HACK: Implement all shaders. Remove this for PS
-    if (!file)
-    {
-    fallback:
-        string1024 tmp;
-        xr_sprintf(tmp, "OGL: %s is missing. Replace with stub_default.vs", cname);
-        Msg(tmp);
-        strconcat(sizeof cname, cname, GEnv.Render->getShaderPath(), "stub_default", ".vs");
-        FS.update_path(cname, "$game_shaders$", cname);
-        file = FS.r_open(cname);
-    }
-
-    // Select target
-    _vs->sh = glCreateShader(GL_VERTEX_SHADER);
-    void* _result = &_vs->sh;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, 0, _result);
-
-    FS.r_close(file);
-
-    VERIFY(SUCCEEDED(_hr));
-
-    if (!SUCCEEDED(_hr))
-    {
-        Log("Can't create shader, replacing it with stub..");
-        goto fallback;
-    }
-
-    // Parse constant, texture, sampler binding
-    if (SUCCEEDED(_hr))
-    {
-        // Let constant table parse it's data
-        _vs->constants.parse(_result, RC_dest_vertex);
-    }
-
-    CHECK_OR_EXIT (
-        !FAILED(_hr),
-        "Your video card doesn't meet game requirements.\n\nTry to lower game settings."
-    );
-
-    return _vs;
+    return CreateShader<SVS>(name, shader, fallbackShader);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
@@ -244,151 +186,31 @@ void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
-    strcpy_s(name, _name);
-    if (0 == GEnv.Render->m_MSAASample) xr_strcat(name, "_0");
-    if (1 == GEnv.Render->m_MSAASample) xr_strcat(name, "_1");
-    if (2 == GEnv.Render->m_MSAASample) xr_strcat(name, "_2");
-    if (3 == GEnv.Render->m_MSAASample) xr_strcat(name, "_3");
-    if (4 == GEnv.Render->m_MSAASample) xr_strcat(name, "_4");
-    if (5 == GEnv.Render->m_MSAASample) xr_strcat(name, "_5");
-    if (6 == GEnv.Render->m_MSAASample) xr_strcat(name, "_6");
-    if (7 == GEnv.Render->m_MSAASample) xr_strcat(name, "_7");
-    LPSTR N = LPSTR(name);
-    map_PS::iterator I = m_ps.find(N);
-    if (I != m_ps.end()) return I->second;
-    SPS* _ps = new SPS();
-    _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
-    VERIFY(xr_strcmpi(name, "null") != 0);
+    xr_strcpy(name, _name);
+    if (0 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_0");
+    if (1 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_1");
+    if (2 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_2");
+    if (3 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_3");
+    if (4 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_4");
+    if (5 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_5");
+    if (6 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_6");
+    if (7 == GEnv.Render->m_MSAASample)
+        xr_strcat(name, "_7");
 
-    string_path shName;
-    const char* pchr = strchr(_name, '(');
-    ptrdiff_t strSize = pchr ? pchr - _name : xr_strlen(_name);
-    strncpy(shName, _name, strSize);
-    shName[strSize] = 0;
-
-    // Open file
-    string_path cname;
-    strconcat(sizeof cname, cname, GEnv.Render->getShaderPath(),/*_name*/shName, ".ps");
-    FS.update_path(cname, "$game_shaders$", cname);
-
-    // duplicate and zero-terminate
-    IReader* file = FS.r_open(cname);
-    // TODO: DX10: HACK: Implement all shaders. Remove this for PS
-    if (!file)
-    {
-    fallback:
-        string1024 tmp;
-        // TODO: HACK: Test failure
-        //Memory.mem_compact();
-        xr_sprintf(tmp, "OGL: %s is missing. Replace with stub_default.ps", cname);
-        Msg(tmp);
-        strconcat(sizeof cname, cname, GEnv.Render->getShaderPath(), "stub_default", ".ps");
-        FS.update_path(cname, "$game_shaders$", cname);
-        file = FS.r_open(cname);
-    }
-    R_ASSERT2 ( file, cname );
-
-    // Select target
-    _ps->sh = glCreateShader(GL_FRAGMENT_SHADER);
-    void* _result = &_ps->sh;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr, nullptr, 0, _result);
-
-    FS.r_close(file);
-
-    VERIFY(SUCCEEDED(_hr));
-
-    if (!SUCCEEDED(_hr))
-    {
-        Log("Can't create shader, replacing it with stub..");
-        goto fallback;
-    }
-
-    // Parse constant, texture, sampler binding
-    if (SUCCEEDED(_hr))
-    {
-        // Let constant table parse it's data
-        _ps->constants.parse(_result, RC_dest_pixel);
-    }
-
-    CHECK_OR_EXIT(
-        !FAILED(_hr),
-        "Your video card doesn't meet game requirements.\n\nTry to lower game settings."
-    );
-
-    return _ps;
+    return CreateShader<SPS>(name, _name, nullptr);
 }
 
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 //--------------------------------------------------------------------------------------------------------------
-SGS* CResourceManager::_CreateGS(LPCSTR name)
-{
-    LPSTR N = LPSTR(name);
-    map_GS::iterator I = m_gs.find(N);
-    if (I != m_gs.end()) return I->second;
-    SGS* _gs = new SGS();
-    _gs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
-    if (0 == xr_stricmp(name, "null"))
-    {
-        _gs->sh = 0;
-        return _gs;
-    }
-
-    // Open file
-    string_path cname;
-    strconcat(sizeof cname, cname, GEnv.Render->getShaderPath(), name, ".gs");
-    FS.update_path(cname, "$game_shaders$", cname);
-
-    // duplicate and zero-terminate
-    IReader* file = FS.r_open(cname);
-    // TODO: DX10: HACK: Implement all shaders. Remove this for PS
-    if (!file)
-    {
-    fallback:
-        string1024 tmp;
-        // TODO: HACK: Test failure
-        //Memory.mem_compact();
-        xr_sprintf(tmp, "OGL: %s is missing. Replace with stub_default.gs", cname);
-        Msg(tmp);
-        strconcat(sizeof cname, cname, GEnv.Render->getShaderPath(), "stub_default", ".gs");
-        FS.update_path(cname, "$game_shaders$", cname);
-        file = FS.r_open(cname);
-    }
-    R_ASSERT2 ( file, cname );
-
-    // Select target
-    _gs->sh = glCreateShader(GL_GEOMETRY_SHADER);
-    void* _result = &_gs->sh;
-    HRESULT const _hr = GEnv.Render->shader_compile(name, file, nullptr,
-                                                    nullptr, 0, _result);
-
-    VERIFY(SUCCEEDED(_hr));
-
-    if (!SUCCEEDED(_hr))
-    {
-        Log("Can't create shader, replacing it with stub..");
-        goto fallback;
-    }
-
-    // Parse constant, texture, sampler binding
-    if (SUCCEEDED(_hr))
-    {
-        // Let constant table parse it's data
-        _gs->constants.parse(_result, RC_dest_geometry);
-    }
-
-    FS.r_close(file);
-
-    CHECK_OR_EXIT (
-        !FAILED(_hr),
-        "Your video card doesn't meet game requirements.\n\nTry to lower game settings."
-    );
-
-    return _gs;
-}
-
+SGS* CResourceManager::_CreateGS(LPCSTR Name) { return CreateShader<SGS>(Name); }
 void CResourceManager::_DeleteGS(const SGS* gs) { DestroyShader(gs); }
 
 SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
