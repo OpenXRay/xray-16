@@ -350,6 +350,17 @@ void D3DXRenderBase::End()
 #ifndef USE_DX9
     bool bUseVSync = psDeviceFlags.is(rsFullscreen) && psDeviceFlags.test(rsVSync); //xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
     HW.m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+#ifdef HAS_DX11_2
+    HRESULT r;
+    if (HW.m_pSwapChain2 && HW.UsingFlipPresentationModel())
+    {
+        const float fps = Device.GetStats().fFPS;
+        if (fps < 30)
+            r = HW.m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.85f, Device.dwHeight * 0.85f);
+        else if (fps < 15)
+            r = HW.m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.7f, Device.dwHeight * 0.7f);
+    }
+#endif
 #else
     CHK_DX(HW.pDevice->EndScene());
     HW.pDevice->Present(nullptr, nullptr, nullptr, nullptr);
