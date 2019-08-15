@@ -624,31 +624,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
     defines[def_it].Definition = nullptr;
     def_it++;
 
-    if (0 == xr_strcmp(pFunctionName, "main"))
-    {
-        if ('v' == pTarget[0])
-        {
-            if (HW.pDevice1 == 0)
-                pTarget = D3D10GetVertexShaderProfile(HW.pDevice); // vertex	"vs_4_0";
-            else
-                pTarget = "vs_4_1"; // pixel	"ps_4_0";
-        }
-        else if ('p' == pTarget[0])
-        {
-            if (HW.pDevice1 == 0)
-                pTarget = D3D10GetPixelShaderProfile(HW.pDevice); // pixel	"ps_4_0";
-            else
-                pTarget = "ps_4_1"; // pixel	"ps_4_0";
-        }
-        else if ('g' == pTarget[0])
-        {
-            if (HW.pDevice1 == 0)
-                pTarget = D3D10GetGeometryShaderProfile(HW.pDevice); // geometry	"gs_4_0";
-            else
-                pTarget = "gs_4_1"; // pixel	"ps_4_0";
-        }
-    }
-
     HRESULT _result = E_FAIL;
 
     char extension[3];

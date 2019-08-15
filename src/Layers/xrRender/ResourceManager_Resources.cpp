@@ -174,12 +174,12 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullpt
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
     
-    return CreateShader<SVS>(name, shader, fallbackShader, true);
+    return CreateShader<SVS>(name, shader, fallbackShader);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 
-SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr, nullptr, true); }
+SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr, nullptr); }
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)

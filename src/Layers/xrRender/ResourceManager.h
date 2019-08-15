@@ -260,7 +260,7 @@ private:
     T& GetShaderMap();
 
     template <typename T>
-    T* CreateShader(cpcstr name, pcstr filename = nullptr, pcstr fallbackShader = nullptr, bool searchForEntryAndTarget = false);
+    T* CreateShader(cpcstr name, pcstr filename = nullptr, pcstr fallbackShader = nullptr);
 
     template <typename T>
     bool DestroyShader(const T* sh);
