@@ -3,6 +3,8 @@
 #if defined(WINDOWS)
 
 Event::Event() noexcept { handle = (void*)CreateEvent(NULL, FALSE, FALSE, NULL); }
+Event::Event(std::nullptr_t) noexcept { handle = nullptr; }
+Event::Event(void* event) noexcept { handle = event; }
 Event::~Event() noexcept { CloseHandle(handle); }
 void Event::Reset() noexcept { ResetEvent(handle); }
 void Event::Set() noexcept { SetEvent(handle); }

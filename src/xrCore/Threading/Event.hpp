@@ -20,6 +20,8 @@ private:
 
 public:
     Event() noexcept;
+    Event(std::nullptr_t) noexcept;
+    Event(void* event) noexcept;
     ~Event() noexcept;
 
     // Reset the event to the unsignalled state.
@@ -34,5 +36,6 @@ public:
     */
     bool Wait(u32 millisecondsTimeout) noexcept;
 
-    void* GetHandle() noexcept { return handle; }
+    void* GetHandle() const noexcept { return handle; }
+    bool Valid() const noexcept { return handle != nullptr; }
 };

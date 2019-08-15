@@ -264,6 +264,9 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 
     m_pSwapChain->QueryInterface(__uuidof(IDXGISwapChain2), reinterpret_cast<void**>(&m_pSwapChain2));
 
+    if (m_pSwapChain2)
+        Device.SetPresentationFinishedEvent(m_pSwapChain2->GetFrameLatencyWaitableObject());
+
     return true;
 #else // #ifdef HAS_DX11_2
     UNUSED(hwnd);
