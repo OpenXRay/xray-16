@@ -381,7 +381,7 @@ void CRenderDevice::ProcessFrame()
     const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
     const u64 frameTime = frameEndTime - frameStartTime;
 
-    u32 updateDelta = 2; // 2 ms
+    u32 updateDelta = 1; // 1 ms
 
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
