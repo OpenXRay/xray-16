@@ -6,12 +6,10 @@
 template<GLenum type>
 inline std::pair<GLuint, GLuint> GLCreateShader(pcstr* buffer, size_t size, pcstr name)
 {
-    GLenum res;
-
     GLuint shader = glCreateShader(type);
     R_ASSERT(shader);
-    glShaderSource(shader, size, buffer, nullptr);
-    glCompileShader(shader);
+    CHK_GL(glShaderSource(shader, size, buffer, nullptr));
+    CHK_GL(glCompileShader(shader));
 
     GLuint program = glCreateProgram();
     R_ASSERT(program);
