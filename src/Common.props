@@ -39,6 +39,19 @@
   </PropertyGroup>
 
   <PropertyGroup Label="UserMacros">
+    <!-- Default is 10.0 (latest) -->
+    <xrTargetPlatform>10.0</xrTargetPlatform>
+
+    <!-- 8.1 is allowed -->
+    <xrTargetPlatform Condition="'$(WindowsTargetPlatformVersion)'=='8.1'">8.1</xrTargetPlatform>
+    <xrTargetPlatform Condition="'$(SDKVersion)'=='8.1'">8.1</xrTargetPlatform>
+
+    <!-- Any 10.0.* is allowed -->
+    <xrTargetPlatform Condition="$(WindowsTargetPlatformVersion.StartsWith('10.0'))">$(WindowsTargetPlatformVersion)</xrTargetPlatform>
+    <xrTargetPlatform Condition="$(SDKVersion.StartsWith('10.0'))">$(SDKVersion)</xrTargetPlatform>
+  </PropertyGroup>
+
+  <PropertyGroup Label="UserMacros">
     <!-- Default is v142 -->
     <xrPlatformToolset>v142</xrPlatformToolset>
     
