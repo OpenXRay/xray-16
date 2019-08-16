@@ -34,6 +34,8 @@ using namespace GraphEngineSpace;
 
 class CGraphEngine
 {
+    Lock m_lock;
+
 public:
     // common algorithm
     using CPriorityQueue = CDataStorageBucketList<u32, u32, 8 * 1024, false>;
