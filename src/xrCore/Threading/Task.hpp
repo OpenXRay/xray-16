@@ -31,6 +31,7 @@ public:
     using TaskFunc = xrDelegate<void()>;
 
 private:
+    friend class TaskManagerBase;
     IsAllowedCallback isExecutionAllowed;
     DoneCallback onTaskDone;
     TaskFunc task;

@@ -8,8 +8,10 @@ class IPerformanceAlert;
 class TaskManager : public TaskManagerBase
 {
     Lock statisticsLock;
+    u32 spawnedTasks;
     xr_vector<float> statistics;
 
+    void SpawnTask(Task* task) override;
     void TaskDone(Task* task, u64 executionTime) override;
 
 public:

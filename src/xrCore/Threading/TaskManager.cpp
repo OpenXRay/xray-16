@@ -152,18 +152,31 @@ void TaskManagerBase::AddTask(pcstr name, Task::Type type, Task::TaskFunc taskFu
     lock.Leave();
 }
 
+void TaskManagerBase::RemoveTask(Task::TaskFunc&& func)
+{
+    ScopeLock scope(&lock);
+
+    xr_vector<Task*>::iterator it;
+    const auto search = [&]()
+    {
+        it = std::find_if(tasks.begin(), tasks.end(), [&](Task* task)
+        {
+            return func == task->task;
+        });
+        return it;
+    };
+    if (search() != tasks.end())
+    {
+        Task::destroy(**it);
+        tasks.erase(it);
+    }
+}
+
 void TaskManagerBase::RemoveTasksWithName(pcstr name)
 {
     ScopeLock scope(&lock);
 
-    for (Task* task : tasks)
-    {
-        if (0 == xr_strcmp(name, task->GetName()))
-            Task::destroy(*task);
-    }
-
     xr_vector<Task*>::iterator it;
-
     const auto search = [&]()
     {
         it = std::find_if(tasks.begin(), tasks.end(), [&](Task* task)
@@ -175,6 +188,7 @@ void TaskManagerBase::RemoveTasksWithName(pcstr name)
 
     while (search() != tasks.end())
     {
+        Task::destroy(**it);
         tasks.erase(it);
     }
 }
@@ -183,14 +197,7 @@ void TaskManagerBase::RemoveTasksWithType(Task::Type type)
 {
     ScopeLock scope(&lock);
 
-    for (Task* task : tasks)
-    {
-        if (task->GetType() == type)
-            Task::destroy(*task);
-    }
-
     xr_vector<Task*>::iterator it;
-
     const auto search = [&]()
     {
         it = std::find_if(tasks.begin(), tasks.end(), [&](Task* task)
@@ -202,6 +209,7 @@ void TaskManagerBase::RemoveTasksWithType(Task::Type type)
 
     while (search() != tasks.end())
     {
+        Task::destroy(**it);
         tasks.erase(it);
     }
 }
