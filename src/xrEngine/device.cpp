@@ -373,9 +373,6 @@ void CRenderDevice::ProcessFrame()
     syncProcessFrame.Set(); // allow secondary thread to do its job
     mtProcessingAllowed = true;
 
-    //if (presentationFinished.Valid())
-    //    presentationFinished.Wait();
-
     DoRender();
 
     const u64 frameEndTime = TimerGlobal.GetElapsed_ms();

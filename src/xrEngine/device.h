@@ -302,19 +302,14 @@ private:
     std::atomic<bool> shouldReset;
     std::atomic<bool> precacheWhileReset;
     std::atomic<bool> mtProcessingAllowed;
-    Event presentationFinished = nullptr;
     Event deviceCreated, deviceReadyToRun;
     Event primaryReadyToRun, primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 
 public:
+    Event PresentationFinished = nullptr;
     volatile BOOL mt_bMustExit;
-
-    void SetPresentationFinishedEvent(Event event) noexcept
-    {
-        presentationFinished = event;
-    }
 
     bool IsMTProcessingAllowed()
     {

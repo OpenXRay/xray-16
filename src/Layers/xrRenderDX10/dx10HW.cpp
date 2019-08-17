@@ -193,7 +193,9 @@ void CHW::CreateSwapChain(HWND hwnd)
     sd.BufferDesc.Format = SelectFormat(D3D_FORMAT_SUPPORT_DISPLAY, formats, std::size(formats));
     Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(sd.BufferDesc.Format);
 
+    // Buffering
     sd.BufferCount = 1;
+    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
     // Multisample
     sd.SampleDesc.Count = 1;
@@ -213,7 +215,7 @@ void CHW::CreateSwapChain(HWND hwnd)
     sd.Windowed = !psDeviceFlags.is(rsFullscreen);
 
     //  Additional set up
-    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     R_CHK(m_pFactory->CreateSwapChain(pDevice, &sd, &m_pSwapChain));
 }
@@ -235,9 +237,6 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.Width = Device.dwWidth;
     desc.Height = Device.dwHeight;
 
-    DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc{};
-    fulldesc.Windowed = !psDeviceFlags.is(rsFullscreen);
-
     constexpr DXGI_FORMAT formats[] =
     {
         //DXGI_FORMAT_R16G16B16A16_FLOAT,
@@ -249,18 +248,24 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.Format = SelectFormat(D3D11_FORMAT_SUPPORT_DISPLAY, formats, std::size(formats));
     Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(desc.Format);
 
-    // Multisample
-    desc.SampleDesc.Count = 1;
-    desc.SampleDesc.Quality = 0;
-
     // Buffering
     desc.BufferCount = 1; // For DXGI_SWAP_EFFECT_FLIP_DISCARD we need at least two
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+
+    // Multisample
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
 
     // Windoze
     //desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // XXX: tearing glitches with flip presentation model
     desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     desc.Scaling = DXGI_SCALING_STRETCH;
+
+    DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc{};
+    fulldesc.Windowed = !psDeviceFlags.is(rsFullscreen);
+
+    // Additional setup
+    desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     IDXGISwapChain1* swapchain = nullptr;
     HRESULT result = m_pFactory2->CreateSwapChainForHwnd(pDevice, hwnd, &desc,
@@ -270,12 +275,12 @@ bool CHW::CreateSwapChain2(HWND hwnd)
         return false;
 
     m_pSwapChain = swapchain;
-    m_pSwapChain->GetDesc(&m_ChainDesc);
+    R_CHK(m_pSwapChain->GetDesc(&m_ChainDesc));
 
     m_pSwapChain->QueryInterface(__uuidof(IDXGISwapChain2), reinterpret_cast<void**>(&m_pSwapChain2));
 
     if (m_pSwapChain2)
-        Device.SetPresentationFinishedEvent(m_pSwapChain2->GetFrameLatencyWaitableObject());
+        Device.PresentationFinished = m_pSwapChain2->GetFrameLatencyWaitableObject();
 
     return true;
 #else // #ifdef HAS_DX11_2
@@ -348,7 +353,7 @@ void CHW::Reset()
     _RELEASE(pBaseZB);
     _RELEASE(pBaseRT);
     CHK_DX(m_pSwapChain->ResizeBuffers(
-        cd.BufferCount, desc.Width, desc.Height, desc.Format, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
+        cd.BufferCount, desc.Width, desc.Height, desc.Format, cd.Flags));
     UpdateViews();
 }
 
