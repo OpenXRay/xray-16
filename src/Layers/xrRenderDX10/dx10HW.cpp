@@ -186,8 +186,6 @@ void CHW::CreateSwapChain(HWND hwnd)
     {
         //DXGI_FORMAT_R16G16B16A16_FLOAT, // Do we even need this?
         //DXGI_FORMAT_R10G10B10A2_UNORM, // D3DX11SaveTextureToMemory fails on this format
-        DXGI_FORMAT_B8G8R8X8_UNORM, // This is not supported for DXGI flip presentation model
-        DXGI_FORMAT_B8G8R8A8_UNORM,
         DXGI_FORMAT_R8G8B8A8_UNORM,
     };
 
@@ -244,8 +242,6 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     {
         //DXGI_FORMAT_R16G16B16A16_FLOAT,
         //DXGI_FORMAT_R10G10B10A2_UNORM,
-        DXGI_FORMAT_B8G8R8X8_UNORM, // This is not supported for DXGI flip presentation model
-        DXGI_FORMAT_B8G8R8A8_UNORM,
         DXGI_FORMAT_R8G8B8A8_UNORM,
     };
 
