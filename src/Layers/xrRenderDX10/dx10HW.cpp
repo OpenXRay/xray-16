@@ -190,7 +190,7 @@ void CHW::CreateSwapChain(HWND hwnd)
     };
 
     // Select back-buffer format
-    sd.BufferDesc.Format = SelectFormat(D3D_FORMAT_SUPPORT_DISPLAY, formats, std::size(formats));
+    sd.BufferDesc.Format = SelectFormat(D3D_FORMAT_SUPPORT_DISPLAY, formats);
     Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(sd.BufferDesc.Format);
 
     // Buffering
@@ -245,7 +245,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     };
 
     // Select back-buffer format
-    desc.Format = SelectFormat(D3D11_FORMAT_SUPPORT_DISPLAY, formats, std::size(formats));
+    desc.Format = SelectFormat(D3D11_FORMAT_SUPPORT_DISPLAY, formats);
     Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(desc.Format);
 
     // Buffering
@@ -372,7 +372,7 @@ bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const UINT feature) const
 
 DXGI_FORMAT CHW::SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT formats[], size_t count) const
 {
-    for (u32 i = 0; i < count; ++i)
+    for (size_t i = 0; i < count; ++i)
         if (CheckFormatSupport(formats[i], feature))
             return formats[i];
 
@@ -433,7 +433,7 @@ void CHW::UpdateViews()
         DXGI_FORMAT_D32_FLOAT,
         DXGI_FORMAT_D16_UNORM
     };
-    descDepth.Format = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats, std::size(formats));
+    descDepth.Format = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
     Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(descDepth.Format);
 
     descDepth.SampleDesc.Count = sd.SampleDesc.Count;
