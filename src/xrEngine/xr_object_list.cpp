@@ -272,7 +272,10 @@ void CObjectList::Update(bool bForce)
             }
 
             for (IGameObject** i = b; i != e; ++i)
+            {
+                (*i)->PreUpdateCL();
                 SingleUpdate(*i);
+            }
 
             //--#SM+#-- PostUpdateCL для всех клиентских объектов [for crowed and non-crowed]
             for (auto& object : objects_active)

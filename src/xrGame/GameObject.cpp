@@ -1397,7 +1397,8 @@ void CGameObject::UpdateCL()
     m_previous_matrix = XFORM();
 }
 
-void CGameObject::PostUpdateCL(bool bUpdateCL_disabled) {}
+void CGameObject::PreUpdateCL() { m_client_updated = false; }
+void CGameObject::PostUpdateCL(bool /*bUpdateCL_disabled*/) { m_client_updated = true;}
 
 void CGameObject::on_matrix_change(const Fmatrix& previous) { obstacle().on_move(); }
 #ifdef DEBUG

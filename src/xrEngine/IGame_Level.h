@@ -58,6 +58,8 @@ class ENGINE_API IGame_Level : public FactoryObjectBase,
                                public pureFrame,
                                public IEventReceiver
 {
+    bool m_world_rendered;
+
 protected:
     // Network interface
     IGameObject* pCurrentEntity;
@@ -111,6 +113,9 @@ public:
     virtual void OnFrame(void);
     virtual void OnRender(void);
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
+
+    [[nodiscard]] bool WorldRendered() const { return m_world_rendered; }
+    void WorldRendered(bool rendered) { m_world_rendered = rendered; }
 
     virtual shared_str OpenDemoFile(const char* demo_file_name) = 0;
     virtual void net_StartPlayDemo() = 0;

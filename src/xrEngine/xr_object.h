@@ -215,6 +215,7 @@ public:
     virtual void Load(LPCSTR section) = 0;
     virtual void PostLoad(LPCSTR section) = 0; //--#SM+#--
     // Update
+    virtual void PreUpdateCL() = 0;
     virtual void UpdateCL() = 0; // Called each frame, so no need for dt
     virtual void PostUpdateCL(bool bUpdateCL_disabled) = 0; //--#SM+#-- Вызывается всегда, в отличии от UpdateCL [called always for object regardless of it being active\sleep]
     // Position stack
@@ -301,6 +302,8 @@ public:
     virtual BOOL TestServerFlag(u32 flag) const = 0;
     virtual bool can_validate_position_on_spawn() = 0;
 #ifdef DEBUG
+    virtual bool ShouldProcessOnRender() const = 0;
+    virtual void ShouldProcessOnRender(bool should_process) = 0;
     virtual void OnRender() = 0;
 #endif
     virtual void reinit() = 0;

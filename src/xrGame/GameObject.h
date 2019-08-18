@@ -99,6 +99,8 @@ protected:
     CScriptBinder scriptBinder;
     bool m_bObjectRemoved;
     CInifile* m_ini_file;
+    bool m_should_process_onrender{};
+    bool m_client_updated{};
 
 public:
     CGameObject();
@@ -219,6 +221,7 @@ public:
     // Methods
     virtual void Load(LPCSTR section) override;
     void PostLoad(LPCSTR section) override; //--#SM+#--
+    void PreUpdateCL() override;
     virtual void UpdateCL() override; // Called each frame, so no need for dt
     void PostUpdateCL(bool bUpdateCL_disabled) override; //--#SM+#--
     virtual void OnChangeVisual() override;
@@ -277,6 +280,8 @@ public:
     virtual BOOL TestServerFlag(u32 Flag) const override;
     virtual bool can_validate_position_on_spawn() override { return true; }
 #ifdef DEBUG
+    bool ShouldProcessOnRender() const override { return m_should_process_onrender; }
+    void ShouldProcessOnRender(bool should_process) override { m_should_process_onrender = should_process; }
     virtual void OnRender() override;
 #endif
     virtual void reinit() override;

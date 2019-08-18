@@ -383,6 +383,7 @@ public:
     IC bool group_behaviour() const;
     virtual void update_range_fov(float& new_range, float& new_fov, float start_range, float start_fov);
     void __stdcall update_object_handler();
+    bool mt_object_handler_update_allowed() const;
     bool zoom_state() const;
     void react_on_grenades();
     void react_on_member_death();

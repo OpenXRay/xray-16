@@ -61,6 +61,7 @@
 #include "smart_cover_animation_selector.h"
 #include "smart_cover_animation_planner.h"
 #include "smart_cover_planner_target_selector.h"
+#include "xrEngine/TaskScheduler.hpp"
 
 #ifdef DEBUG
 #include "alife_simulator.h"
@@ -638,14 +639,7 @@ void CAI_Stalker::net_Destroy()
     CInventoryOwner::net_Destroy();
     m_pPhysics_support->in_NetDestroy();
 
-    Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler));
-
-#ifdef DEBUG
-    fastdelegate::FastDelegate0<> f = fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler);
-    xr_vector<fastdelegate::FastDelegate0<>>::const_iterator I;
-    I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), f);
-    VERIFY(I == Device.seqParallel.end());
-#endif // DEBUG
+    TaskScheduler->RemoveTask({ this, &CAI_Stalker::update_object_handler });
 
     xr_delete(m_ce_close);
     xr_delete(m_ce_far);
@@ -789,6 +783,11 @@ void CAI_Stalker::update_object_handler()
     }
 }
 
+bool CAI_Stalker::mt_object_handler_update_allowed() const
+{
+    return !ShouldProcessOnRender() && g_pGameLevel->WorldRendered() && m_client_updated;
+}
+
 void CAI_Stalker::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool local_animation)
 {
     inherited::create_anim_mov_ctrl(b, start_pose, local_animation);
@@ -823,13 +822,9 @@ void CAI_Stalker::UpdateCL()
     {
         if (g_mt_config.test(mtObjectHandler) && CObjectHandler::planner().initialized())
         {
-            fastdelegate::FastDelegate0<> f = fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler);
-#ifdef DEBUG
-            xr_vector<fastdelegate::FastDelegate0<>>::const_iterator I;
-            I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), f);
-            VERIFY(I == Device.seqParallel.end());
-#endif
-            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler));
+            TaskScheduler->AddTask("CAI_Stalker::update_object_handler", Task::Type::Game,
+                { this, &CAI_Stalker::update_object_handler },
+                { this, &CAI_Stalker::mt_object_handler_update_allowed });
         }
         else
         {

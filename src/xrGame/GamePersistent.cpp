@@ -618,6 +618,8 @@ void CGamePersistent::OnFrame()
     if (!g_pGameLevel->bReady)
         return;
 
+    g_pGameLevel->WorldRendered(false);
+
     if (Device.Paused())
     {
         if (Level().IsDemoPlay())
