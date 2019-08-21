@@ -624,9 +624,11 @@ void CLevel::OnRender()
 {
     GEnv.Render->BeforeWorldRender();	//--#SM+#-- +SecondVP+
 
+#ifdef DEBUG
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(Level().CurrentEntity());
     if (stalker)
         stalker->ShouldProcessOnRender(true);
+#endif
 
     inherited::OnRender();
     if (!game)
