@@ -7,11 +7,11 @@
 class dxFontRender : public IFontRender
 {
 public:
-    dxFontRender();
-    virtual ~dxFontRender();
+    dxFontRender() = default;
+    ~dxFontRender() override;
 
-    virtual void Initialize(LPCSTR cShader, LPCSTR cTexture);
-    virtual void OnRender(CGameFont& owner);
+    void Initialize(cpcstr cShader, cpcstr cTexture) override;
+    void OnRender(CGameFont& owner) override;
 
 private:
     ref_shader pShader;
