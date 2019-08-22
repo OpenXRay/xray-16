@@ -7,6 +7,8 @@
 
 #include <thread>
 
+#include <tbb/task_scheduler_init.h>
+
 xr_unique_ptr<TaskManagerBase> TaskScheduler;
 
 TaskManagerBase::TaskManagerBase() : taskerSleepTime(2), shouldStop(true) {}
@@ -38,6 +40,11 @@ bool TaskManagerBase::TaskQueueIsEmpty() const
 
 void TaskManagerBase::taskManagerThread(void* thisPtr)
 {
+    int threads = tbb::task_scheduler_init::default_num_threads();
+    if (threads < 4)
+        threads = 4;
+    tbb::task_scheduler_init init(threads);
+
     TaskManagerBase& self = *static_cast<TaskManagerBase*>(thisPtr);
 
     while (!self.shouldStop)
