@@ -315,7 +315,7 @@ public:
     void set_Object(IRenderable* O) override;
     void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderVisual* V) override; // add visual leaf	(no culling performed at all)
-    void add_Geometry(IRenderVisual* V) override; // add visual(s)	(all culling performed)
+    void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 
     // wallmarks
     virtual void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);

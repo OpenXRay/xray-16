@@ -266,7 +266,7 @@ public:
 
     // data
     CFrustum ViewBase;
-    CFrustum* View;
+    const CFrustum* View;
 
 public:
     // feature level
@@ -303,10 +303,9 @@ public:
     virtual IRender_Target* getTarget() = 0;
 
     // Main
-    IC void set_Frustum(CFrustum* O)
+    IC void set_Frustum(const CFrustum& O)
     {
-        VERIFY(O);
-        View = O;
+        View = &O;
     }
     virtual void set_Transform(Fmatrix* M) = 0;
     virtual void set_HUD(BOOL V) = 0;
@@ -316,7 +315,7 @@ public:
     virtual void set_Object(IRenderable* O) = 0;
     virtual void add_Occluder(Fbox2& bb_screenspace) = 0; // mask screen region as oclluded (-1..1, -1..1)
     virtual void add_Visual(IRenderVisual* V) = 0; // add visual leaf (no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V) = 0; // add visual(s) (all culling performed)
+    virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;
     virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) = 0;
     // Prefer this function when possible

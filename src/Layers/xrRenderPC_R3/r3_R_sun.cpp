@@ -440,8 +440,7 @@ void CRender::render_sun()
             CSector* S = (CSector*)Sectors[s];
             dxRender_Visual* root = S->root();
 
-            set_Frustum(&cull_frustum);
-            add_Geometry(root);
+            add_Geometry(root, cull_frustum);
         }
     }
     set_Recorder(NULL);

@@ -555,8 +555,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
             dxRender_Visual* root = sector->root();
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
-                set_Frustum(&(sector->r_frustums[v_it]));
-                add_Geometry(root);
+                add_Geometry(root, sector->r_frustums[v_it]);
             }
         }
     }
@@ -579,8 +578,8 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
                 continue; // inactive (untouched) sector
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
-                set_Frustum(&(sector->r_frustums[v_it]));
-                if (!View->testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
+                const CFrustum& view = sector->r_frustums[v_it];
+                if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
                     continue;
 
                 // renderable
