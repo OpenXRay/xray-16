@@ -25,6 +25,11 @@ bool IGame_Persistent::IsMainMenuActive()
     return g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
 }
 
+bool IGame_Persistent::MainMenuActiveOrLevelNotExist()
+{
+    return !g_pGameLevel || g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
+}
+
 IGame_Persistent::IGame_Persistent()
 {
     RDEVICE.seqAppStart.Add(this);

@@ -536,6 +536,8 @@ void CRender::reset_end()
 
 void CRender::BeforeFrame()
 {
+    if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
+        return;
     // MT-HOM (@front)
     TaskScheduler->AddTask("CHOM::MT_RENDER", Task::Type::Renderer,
         { &HOM, &CHOM::MT_RENDER },
@@ -545,12 +547,14 @@ void CRender::BeforeFrame()
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
+    if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
+        return;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         // MT-details (@front)
         TaskScheduler->AddTask("CDetailManager::MT_CALC", Task::Type::Renderer,
             { Details, &CDetailManager::MT_CALC },
-            { &Device, &CRenderDevice::IsMTProcessingAllowed });
+            { &HOM, &CHOM::MT_Synced });
     }
 }
 

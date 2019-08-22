@@ -55,10 +55,15 @@ public:
     void Disable();
     void Enable();
 
+    bool MT_Synced() const
+    {
+        return MT_frame_rendered == Device.dwFrame || IGame_Persistent::MainMenuActiveOrLevelNotExist();
+    }
+
     void __stdcall MT_RENDER();
     ICF void MT_SYNC()
     {
-        if (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive())
+        if (MT_Synced())
             return;
 
         MT_RENDER();

@@ -95,6 +95,7 @@ public:
 #endif
     IMainMenu* m_pMainMenu;
     static bool IsMainMenuActive();
+    static bool MainMenuActiveOrLevelNotExist();
 
     ParticleStatistics stats;
 
