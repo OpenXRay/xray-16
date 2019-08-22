@@ -50,7 +50,7 @@ public:
     bool TaskQueueIsEmpty() const;
 
     void AddTask(pcstr name, Task::Type type, Task::TaskFunc taskFunc,
-        Task::IsAllowedCallback callback, Task::DoneCallback done = nullptr);
+        Task::IsAllowedCallback callback = nullptr, Task::DoneCallback done = nullptr);
 
     void RemoveTask(Task::TaskFunc&& func);
     void RemoveTasksWithName(pcstr name);

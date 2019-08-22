@@ -150,7 +150,7 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
 }
 
 void TaskManagerBase::AddTask(pcstr name, Task::Type type, Task::TaskFunc taskFunc,
-    Task::IsAllowedCallback callback, Task::DoneCallback done /*= nullptr*/)
+    Task::IsAllowedCallback callback /*= nullptr*/, Task::DoneCallback done /*= nullptr*/)
 {
     Task* task = new (tbb::task::allocate_root()) Task(name, type, taskFunc, callback, done);
 
