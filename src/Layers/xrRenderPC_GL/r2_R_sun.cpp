@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/IRenderable.h"
+#include "xrEngine/CustomHUD.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "r3_R_sun_support.h"
 
@@ -1006,6 +1007,10 @@ void CRender::render_sun_near()
         //		fuckingsun->svis.begin					();
     }
 
+    // Actor Shadow
+    if (psDeviceFlags.test(rsDrawDynamic))
+        g_hud->Render_First();
+
     // Fill the database
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
@@ -1349,6 +1354,10 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         else r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
+
+    // Actor Shadow
+    if (cascade_ind == 0 && psDeviceFlags.test(rsDrawDynamic))
+        g_hud->Render_First();
 
     // Fill the database
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
