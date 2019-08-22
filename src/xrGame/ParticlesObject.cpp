@@ -286,8 +286,7 @@ void CParticlesObject::renderable_Render()
         dwLastTime = Device.dwTimeGlobal;
     }
 
-    GEnv.Render->set_Transform(&renderable.xform);
-    GEnv.Render->add_Visual(renderable.visual);
+    GEnv.Render->add_Visual(renderable.visual, renderable.xform);
 }
 
 bool CParticlesObject::IsAutoRemove()

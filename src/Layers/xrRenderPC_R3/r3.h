@@ -299,7 +299,7 @@ public:
     virtual void flush();
     virtual void set_Object(IRenderable* O);
     virtual void add_Occluder(Fbox2& bb_screenspace); // mask screen region as oclluded
-    virtual void add_Visual(IRenderVisual* V); // add visual leaf	(no culling performed at all)
+    void add_Visual(IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 
     // wallmarks

@@ -553,7 +553,11 @@ void CRender::flush() { r_dsgraph_render_graph(0); }
 BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
-void CRender::add_Visual(IRenderVisual* V) { add_leafs_Dynamic((dxRender_Visual*)V); }
+void CRender::add_Visual(IRenderVisual* V, Fmatrix& m)
+{
+    set_Transform(m);
+    add_leafs_Dynamic((dxRender_Visual*)V);
+}
 void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 {
     set_Frustum(view);

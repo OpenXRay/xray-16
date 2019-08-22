@@ -1078,8 +1078,7 @@ void CGameObject::renderable_Render()
     //
     MakeMeCrow();
     // ~
-    GEnv.Render->set_Transform(&XFORM());
-    GEnv.Render->add_Visual(Visual());
+    GEnv.Render->add_Visual(Visual(), XFORM());
     Visual()->getVisData().hom_frame = Device.dwFrame;
 }
 

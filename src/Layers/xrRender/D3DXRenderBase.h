@@ -83,10 +83,9 @@ public:
     RenderStatistics BasicStats;
 
 public:
-    virtual void set_Transform(Fmatrix* M) override
+    void set_Transform(Fmatrix& M) override
     {
-        VERIFY(M);
-        val_pTransform = M;
+        val_pTransform = &M;
     }
     virtual void set_HUD(BOOL V) override { val_bHUD = V; }
     virtual BOOL get_HUD() override { return val_bHUD; }
