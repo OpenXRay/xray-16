@@ -785,7 +785,12 @@ void CAI_Stalker::update_object_handler()
 
 bool CAI_Stalker::mt_object_handler_update_allowed() const
 {
-    return !ShouldProcessOnRender() && g_pGameLevel->WorldRendered() && m_client_updated;
+    return m_client_updated &&
+        (g_pGameLevel->WorldRendered() || IGame_Persistent::IsMainMenuActive())
+#ifdef DEBUG
+        && !ShouldProcessOnRender()
+#endif
+    ;
 }
 
 void CAI_Stalker::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool local_animation)

@@ -99,8 +99,10 @@ protected:
     CScriptBinder scriptBinder;
     bool m_bObjectRemoved;
     CInifile* m_ini_file;
-    bool m_should_process_onrender{};
     bool m_client_updated{};
+#ifdef DEBUG
+    bool m_should_process_onrender{};
+#endif
 
 public:
     CGameObject();
