@@ -8,8 +8,6 @@ D3DXRenderBase::D3DXRenderBase()
 {
     val_pObject = nullptr;
     val_pTransform = nullptr;
-    val_bHUD = FALSE;
-    val_bInvisible = FALSE;
     val_bRecordMP = FALSE;
     val_feedback = nullptr;
     val_feedback_breakp = 0;

@@ -13,6 +13,8 @@ public:
     IRenderVisual* visual;
     IRender_ObjectSpecific* pROS;
     BOOL pROS_Allowed;
+    bool invisible; // object should be invisible on the scene graph
+    bool hud; // At the current moment, object is being rendered on HUD
 };
 
 class IRenderable
@@ -24,6 +26,10 @@ public:
     virtual IRender_ObjectSpecific* renderable_ROS() = 0;
     virtual BOOL renderable_ShadowGenerate() = 0;
     virtual BOOL renderable_ShadowReceive() = 0;
+    virtual bool renderable_Invisible() = 0;
+    virtual void renderable_Invisible(bool value) = 0;
+    virtual bool renderable_HUD() = 0;
+    virtual void renderable_HUD(bool value) = 0;
 };
 
 inline IRenderable::~IRenderable() {}
@@ -40,6 +46,10 @@ public:
     BENCH_SEC_SCRAMBLEVTBL2
     virtual BOOL renderable_ShadowGenerate() override { return FALSE; }
     virtual BOOL renderable_ShadowReceive() override { return FALSE; }
+    bool renderable_Invisible() override { return renderable.invisible; }
+    void renderable_Invisible(bool value) override { renderable.invisible = value; }
+    bool renderable_HUD() override { return renderable.hud; }
+    void renderable_HUD(bool value) override { renderable.hud = value; }
 };
 
 #endif // IRENDERABLE_H_INCLUDED

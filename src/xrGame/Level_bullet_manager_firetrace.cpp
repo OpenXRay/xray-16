@@ -183,6 +183,9 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
         if (Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID())
             return;
 
+        if (R.O->renderable_HUD())
+            return;
+
         if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
         {
             //добавить отметку на материале

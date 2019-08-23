@@ -19,8 +19,6 @@ class D3DXRenderBase : public IRender, public pureFrame
 public:
     IRenderable* val_pObject;
     Fmatrix* val_pTransform;
-    BOOL val_bHUD;
-    BOOL val_bInvisible;
     BOOL val_bRecordMP; // record nearest for multi-pass
     R_feedback* val_feedback; // feedback for geometry being rendered
     u32 val_feedback_breakp; // breakpoint
@@ -87,9 +85,6 @@ public:
     {
         val_pTransform = &M;
     }
-    virtual void set_HUD(BOOL V) override { val_bHUD = V; }
-    virtual BOOL get_HUD() override { return val_bHUD; }
-    virtual void set_Invisible(BOOL V) override { val_bInvisible = V; }
     void set_Feedback(R_feedback* V, u32 id)
     {
         val_feedback_breakp = id;

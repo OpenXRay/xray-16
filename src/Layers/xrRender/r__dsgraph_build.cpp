@@ -69,7 +69,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         return;
 
     // HUD rendering
-    if (RI.val_bHUD)
+    if (RI.val_pObject && RI.val_pObject->renderable_HUD())
     {
         if (sh->flags.bStrictB2F)
             mapHUDSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
@@ -87,7 +87,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
 #if RENDER == R_R1
     RI.L_Shadows->add_element(_MatrixItem{ SSA, RI.val_pObject, pVisual, *RI.val_pTransform });
 #endif
-    if (RI.val_bInvisible)
+    if (RI.val_pObject && RI.val_pObject->renderable_Invisible())
         return;
 
     // strict-sorting selection
@@ -402,7 +402,7 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         else
         {
             pV->CalculateBones(TRUE);
-            pV->CalculateWallmarks(); //. bug?
+            pV->CalculateWallmarks(val_pObject ? val_pObject->renderable_HUD() : false); //. bug?
             for (auto& i : pV->children)
             {
                 i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
@@ -601,7 +601,7 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
         else
         {
             pV->CalculateBones(TRUE);
-            pV->CalculateWallmarks(); //. bug?
+            pV->CalculateWallmarks(val_pObject ? val_pObject->renderable_HUD() : false); //. bug?
             for (auto& i : pV->children)
                 add_leafs_Dynamic(i);
         }

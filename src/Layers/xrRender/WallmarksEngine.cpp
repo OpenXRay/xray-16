@@ -326,20 +326,17 @@ void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
     if (::RImplementation.phase != CRender::PHASE_NORMAL)
         return;
 
-    if (!::RImplementation.val_bHUD)
-    {
-        lock.Enter();
-        // search if similar wallmark exists
-        wm_slot* slot = FindSlot(wm->Shader());
-        if (nullptr == slot)
-            slot = AppendSlot(wm->Shader());
-        // no similar - register _new_
-        slot->skeleton_items.push_back(wm);
+    lock.Enter();
+    // search if similar wallmark exists
+    wm_slot* slot = FindSlot(wm->Shader());
+    if (nullptr == slot)
+        slot = AppendSlot(wm->Shader());
+    // no similar - register _new_
+    slot->skeleton_items.push_back(wm);
 #ifdef DEBUG
-        wm->used_in_render = Device.dwFrame;
+    wm->used_in_render = Device.dwFrame;
 #endif
-        lock.Leave();
-    }
+    lock.Leave();
 }
 
 extern float r_ssaDISCARD;

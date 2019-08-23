@@ -54,7 +54,7 @@ void CLightProjector::set_object(IRenderable* O)
         current = nullptr;
     else
     {
-        if (!O->renderable_ShadowReceive() || RImplementation.val_bInvisible ||
+        if (!O->renderable_ShadowReceive() || O->renderable_Invisible() ||
             ((CROS_impl*)O->renderable_ROS())->shadow_recv_frame == Device.dwFrame)
         {
             current = nullptr;

@@ -171,7 +171,7 @@ public:
 public:
     // wallmarks
     void AddWallmark(const Fmatrix* parent, const Fvector3& start, const Fvector3& dir, ref_shader shader, float size);
-    void CalculateWallmarks();
+    void CalculateWallmarks(bool hud);
     void RenderWallmark(intrusive_ptr<CSkeletonWallmark> wm, FVF::LIT*& verts);
     void ClearWallmarks();
 
