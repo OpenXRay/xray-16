@@ -726,8 +726,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 3.f); //AVO: extended from 1.2f to 3.f
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);
 
-    //CMD4(CCC_Float, "r__detail_density", &ps_r__Detail_density, .05f, 0.99f);
-    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.04f, 0.6f); //AVO: extended from 0.2f to 0.04f and replaced variable
+    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.1f, 0.99f);
     CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
     CMD4(CCC_Float, "r__detail_height", &ps_r__Detail_height, 1, 2);
 
@@ -746,6 +745,7 @@ void xrRender_initconsole()
 
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
     CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
+    CMD2(CCC_tf_MipBias, "r2_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
 
     // R1
     CMD4(CCC_Float, "r1_ssa_lod_a", &ps_r1_ssaLOD_A, 16, 96);
