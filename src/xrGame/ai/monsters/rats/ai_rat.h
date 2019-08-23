@@ -391,7 +391,7 @@ public:
 
     /////////////////////////////////////
     // rat as eatable item
-    virtual void OnHUDDraw(CCustomHUD* hud) { inherited::OnHUDDraw(hud); }
+    void OnHUDDraw(CCustomHUD* hud, IRenderable* root) override { inherited::OnHUDDraw(hud, root); }
     virtual void OnH_B_Chield();
     virtual void OnH_B_Independent();
     virtual void OnH_A_Independent();

@@ -784,7 +784,7 @@ BOOL CCustomMonster::net_Spawn(CSE_Abstract* DC)
 }
 
 #ifdef DEBUG
-void CCustomMonster::OnHUDDraw(CCustomHUD* hud) {}
+void CCustomMonster::OnHUDDraw(CCustomHUD* /*hud*/, IRenderable* /*root*/) {}
 #endif
 
 void CCustomMonster::Exec_Action(float /**dt/**/) {}

@@ -246,7 +246,7 @@ public:
     virtual u32 ps_Size() const override { return PositionStack.size(); }
     virtual GameObjectSavedPosition ps_Element(u32 ID) const override;
     virtual void ForceTransform(const Fmatrix& m) override {}
-    virtual void OnHUDDraw(CCustomHUD* hud) override {}
+    void OnHUDDraw(CCustomHUD* /*hud*/, IRenderable* /*root*/) override {}
     void OnRenderHUD(IGameObject* pCurViewEntity) override {} //--#SM+#--
     void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) override  {} //--#SM+#--
     virtual BOOL Ready() override { return getReady(); } // update only if active and fully initialized by/for network

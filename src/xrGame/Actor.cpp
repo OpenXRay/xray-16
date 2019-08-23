@@ -1483,11 +1483,11 @@ bool CActor::use_default_throw_force()
 float CActor::missile_throw_force() { return 0.f; }
 
 // HUD
-void CActor::OnHUDDraw(CCustomHUD*)
+void CActor::OnHUDDraw(CCustomHUD* hud, IRenderable* root)
 {
     R_ASSERT(IsFocused());
     if (!((mstate_real & mcLookout) && !IsGameTypeSingle()))
-        g_player_hud->render_hud();
+        g_player_hud->render_hud(root);
 }
 
 void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& IndShader)

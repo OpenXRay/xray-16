@@ -223,7 +223,7 @@ public:
     virtual GameObjectSavedPosition ps_Element(u32 id) const = 0;
     virtual void ForceTransform(const Fmatrix& m) = 0;
     // HUD
-    virtual void OnHUDDraw(CCustomHUD* hud) = 0;
+    virtual void OnHUDDraw(CCustomHUD* hud, IRenderable* root) = 0;
     virtual void OnRenderHUD(IGameObject* pCurViewEntity) = 0; //--#SM+#--
     virtual void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) = 0; //--#SM+#--
     // Active/non active

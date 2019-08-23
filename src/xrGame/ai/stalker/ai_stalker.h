@@ -200,7 +200,7 @@ public:
     virtual bool feel_vision_isRelevant(IGameObject* who);
     virtual float Radius() const;
 #ifdef DEBUG
-    virtual void OnHUDDraw(CCustomHUD* hud);
+    void OnHUDDraw(CCustomHUD* hud, IRenderable* root) override;
     virtual void OnRender();
     void debug_text();
     bool m_dbg_hud_draw;

@@ -107,7 +107,7 @@ void CHUDManager::Render_Last()
     // hud itself
     GEnv.Render->set_HUD(TRUE);
     GEnv.Render->set_Object(O->H_Root());
-    O->OnHUDDraw(this);
+    O->OnHUDDraw(this, O->H_Root());
     GEnv.Render->set_HUD(FALSE);
 }
 

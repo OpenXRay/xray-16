@@ -217,7 +217,7 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 }
 
 bool attachable_hud_item::need_renderable() { return m_parent_hud_item->need_renderable(); }
-void attachable_hud_item::render()
+void attachable_hud_item::render(IRenderable* root)
 {
     GEnv.Render->add_Visual(m_model->dcast_RenderVisual(), m_item_transform);
     debug_draw_firedeps();
@@ -506,7 +506,7 @@ void player_hud::render_item_ui()
         m_attached_items[1]->render_item_ui();
 }
 
-void player_hud::render_hud()
+void player_hud::render_hud(IRenderable* root)
 {
     if (!m_attached_items[0] && !m_attached_items[1])
         return;
@@ -520,10 +520,10 @@ void player_hud::render_hud()
     GEnv.Render->add_Visual(m_model->dcast_RenderVisual(), m_transform);
 
     if (m_attached_items[0])
-        m_attached_items[0]->render();
+        m_attached_items[0]->render(root);
 
     if (m_attached_items[1])
-        m_attached_items[1]->render();
+        m_attached_items[1]->render(root);
 }
 
 #include "xrCore/Animation/Motion.hpp"
