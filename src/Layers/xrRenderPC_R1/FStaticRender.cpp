@@ -311,8 +311,9 @@ void CRender::flush() { r_dsgraph_render_graph(0); }
 BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
-void CRender::add_Visual(IRenderVisual* V, Fmatrix& m)
+void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
+    set_Object(root);
     set_Transform(m);
     add_leafs_Dynamic((dxRender_Visual*)V);
 }
@@ -363,6 +364,8 @@ void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace);
 #include "xrEngine/PS_instance.h"
 void CRender::set_Object(IRenderable* O)
 {
+    if (val_pObject == O)
+        return;
     val_pObject = O; // NULL is OK, trust me :)
     if (val_pObject)
     {
@@ -629,7 +632,6 @@ void CRender::Calculate()
                                 CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
                                 T->update(renderable);
                             }
-                            set_Object(renderable);
                             renderable->renderable_Render(renderable);
                             set_Object(nullptr); //? is it needed at all
                         }

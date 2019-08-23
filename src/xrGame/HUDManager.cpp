@@ -67,8 +67,8 @@ void CHUDManager::Render_First()
     if (GEnv.CurrentRenderer == 1)
         GEnv.Render->set_Invisible(TRUE);
 
-    GEnv.Render->set_Object(O->H_Root());
     O->renderable_Render(O->H_Root());
+    GEnv.Render->set_Object(nullptr);
 
     if (GEnv.CurrentRenderer == 1)
         GEnv.Render->set_Invisible(FALSE);
@@ -106,8 +106,8 @@ void CHUDManager::Render_Last()
     IGameObject* O = g_pGameLevel->CurrentViewEntity();
     // hud itself
     GEnv.Render->set_HUD(TRUE);
-    GEnv.Render->set_Object(O->H_Root());
     O->OnHUDDraw(this, O->H_Root());
+    GEnv.Render->set_Object(nullptr);
     GEnv.Render->set_HUD(FALSE);
 }
 

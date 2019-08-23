@@ -219,7 +219,7 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
 bool attachable_hud_item::need_renderable() { return m_parent_hud_item->need_renderable(); }
 void attachable_hud_item::render(IRenderable* root)
 {
-    GEnv.Render->add_Visual(m_model->dcast_RenderVisual(), m_item_transform);
+    GEnv.Render->add_Visual(root, m_model->dcast_RenderVisual(), m_item_transform);
     debug_draw_firedeps();
     m_parent_hud_item->render_hud_mode();
 }
@@ -517,7 +517,7 @@ void player_hud::render_hud(IRenderable* root)
     if (!b_r0 && !b_r1)
         return;
 
-    GEnv.Render->add_Visual(m_model->dcast_RenderVisual(), m_transform);
+    GEnv.Render->add_Visual(root, m_model->dcast_RenderVisual(), m_transform);
 
     if (m_attached_items[0])
         m_attached_items[0]->render(root);
