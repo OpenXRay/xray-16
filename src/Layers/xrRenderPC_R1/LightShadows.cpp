@@ -7,7 +7,7 @@
 #include "xrCore/Math/MathUtil.hpp"
 using namespace XRay::Math;
 
-const float S_distance = 48;
+const float S_distance = 144;
 const float S_distance2 = S_distance * S_distance;
 const float S_ideal_size = 4.f; // ideal size for the object
 const float S_fade = 4.5;

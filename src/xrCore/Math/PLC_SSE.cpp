@@ -9,7 +9,7 @@ namespace XRay
 {
 namespace Math
 {
-static constexpr float S_distance = 48;
+static constexpr float S_distance = 144;
 static constexpr float S_distance2 = S_distance * S_distance;
 static constexpr float S_fade = 4.5;
 static constexpr float S_fade2 = S_fade * S_fade;
