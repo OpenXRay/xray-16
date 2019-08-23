@@ -10,8 +10,8 @@ const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"
 u32 ps_r2_smapsize = 2048;
 const xr_token qsmapsize_token[] =
 {
-#ifndef MASTER_GOLD
-    { "256", 256 }, // Too bad
+#if !defined(MASTER_GOLD) || RENDER == R_R1
+    { "256", 256 }, // Too bad for R2+
     { "512", 512 }, // But works
 #endif
     { "1024", 1024 },

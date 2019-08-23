@@ -73,7 +73,11 @@ private:
     ref_shader sh_Screen;
     ref_geom geom_Screen;
 
+    u32 rt_size;
+
 private:
+    void recreate_rt();
+
 public:
     void set_object(IRenderable* O);
     void add_element(NODE& N);
