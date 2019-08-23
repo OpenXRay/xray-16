@@ -165,7 +165,7 @@ public:
 
     float get_vampire_distance() const { return m_vampire_distance; }
     pcstr get_monster_class_name() override { return "bloodsucker"; }
-    virtual void renderable_Render();
+    void renderable_Render() override;
 
 #ifdef DEBUG
     virtual CBaseMonster::SDebugInfo show_debug_info();

@@ -576,7 +576,7 @@ public:
     virtual void UpdateEx(float fov); // called by owner
 
     virtual void shedule_Update(u32 dt);
-    virtual void renderable_Render();
+    void renderable_Render() override;
     virtual bool bfAssignMovement(CScriptEntityAction* tpEntityAction);
     virtual bool bfAssignObject(CScriptEntityAction* tpEntityAction);
 

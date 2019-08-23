@@ -121,7 +121,7 @@ public:
     virtual void net_Destroy();
     virtual BOOL renderable_ShadowGenerate() { return FALSE; }
     virtual BOOL renderable_ShadowReceive() { return FALSE; }
-    virtual void renderable_Render();
+    void renderable_Render() override;
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();
 

@@ -193,7 +193,7 @@ public:
     virtual void feel_touch_new(IGameObject* O);
     virtual void feel_touch_delete(IGameObject* O);
     void on_ownership_reject(IGameObject* O, bool just_before_destroy);
-    virtual void renderable_Render();
+    void renderable_Render() override;
     virtual void Exec_Look(float dt);
     virtual void Hit(SHit* pHDS);
     virtual void PHHit(SHit& H);

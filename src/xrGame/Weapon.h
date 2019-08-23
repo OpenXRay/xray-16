@@ -49,9 +49,9 @@ public:
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
 
-    virtual void renderable_Render();
-    virtual void render_hud_mode();
-    virtual bool need_renderable();
+    void renderable_Render() override;
+    void render_hud_mode() override;
+    bool need_renderable() override;
 
     virtual void render_item_ui();
     virtual bool render_item_ui_query();

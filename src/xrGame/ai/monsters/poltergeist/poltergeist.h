@@ -75,7 +75,7 @@ public:
     bool detected_enemy();
     float get_fly_around_distance() const { return m_fly_around_distance; }
     float get_fly_around_change_direction_time() const { return m_fly_around_change_direction_time; }
-    virtual void renderable_Render();
+    void renderable_Render() override;
 
     IC CPolterSpecialAbility* ability() { return (m_flame ? m_flame : m_tele); }
     IC bool is_hidden() { return state_invisible; }
