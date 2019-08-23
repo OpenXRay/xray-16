@@ -135,7 +135,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 
                     // Rendering
                     set_Object(renderable);
-                    renderable->renderable_Render();
+                    renderable->renderable_Render(renderable);
                     set_Object(0);
                 }
                 break; // exit loop on frustums

@@ -868,7 +868,7 @@ void CWeapon::EnableActorNVisnAfterZoom()
 }
 
 bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
-void CWeapon::renderable_Render()
+void CWeapon::renderable_Render(IRenderable* root)
 {
     UpdateXForm();
 
@@ -882,7 +882,7 @@ void CWeapon::renderable_Render()
     else
         RenderHud(TRUE);
 
-    inherited::renderable_Render();
+    inherited::renderable_Render(root);
 }
 
 void CWeapon::signal_HideComplete()

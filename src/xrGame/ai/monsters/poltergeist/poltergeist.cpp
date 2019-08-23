@@ -306,10 +306,10 @@ void CPoltergeist::Show()
     ability()->on_show();
 }
 
-void CPoltergeist::renderable_Render()
+void CPoltergeist::renderable_Render(IRenderable* root)
 {
     Visual()->getVisData().hom_frame = Device.dwFrame;
-    inherited::renderable_Render();
+    inherited::renderable_Render(root);
 }
 
 void CPoltergeist::UpdateCL()

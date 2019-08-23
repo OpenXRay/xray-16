@@ -68,7 +68,7 @@ void CHUDManager::Render_First()
         GEnv.Render->set_Invisible(TRUE);
 
     GEnv.Render->set_Object(O->H_Root());
-    O->renderable_Render();
+    O->renderable_Render(O->H_Root());
 
     if (GEnv.CurrentRenderer == 1)
         GEnv.Render->set_Invisible(FALSE);

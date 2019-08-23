@@ -1073,7 +1073,7 @@ Fvector CGameObject::get_last_local_point_on_mesh(Fvector const& local_point, u1
     return result;
 }
 
-void CGameObject::renderable_Render()
+void CGameObject::renderable_Render(IRenderable* root)
 {
     //
     MakeMeCrow();

@@ -127,7 +127,7 @@ public:
 // ~ISheduled
 // IRenderable
 // virtual RenderData &GetRenderData() override = 0;
-// virtual void renderable_Render() override = 0;
+// virtual void renderable_Render(IRenderable* root) override = 0;
 // virtual IRender_ObjectSpecific *renderable_ROS() override = 0;
 // virtual BOOL renderable_ShadowGenerate() override = 0;
 // virtual BOOL renderable_ShadowReceive() override = 0;

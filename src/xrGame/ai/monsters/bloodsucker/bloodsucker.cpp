@@ -807,11 +807,11 @@ void CAI_Bloodsucker::manual_deactivate()
     setVisible(TRUE);
 }
 
-void CAI_Bloodsucker::renderable_Render()
+void CAI_Bloodsucker::renderable_Render(IRenderable* root)
 {
     if (m_visibility_state != no_visibility)
     {
-        inherited::renderable_Render();
+        inherited::renderable_Render(root);
     }
 }
 

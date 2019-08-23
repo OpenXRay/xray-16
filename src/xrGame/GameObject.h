@@ -250,7 +250,7 @@ public:
     void OnRenderHUD(IGameObject* pCurViewEntity) override {} //--#SM+#--
     void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) override  {} //--#SM+#--
     virtual BOOL Ready() override { return getReady(); } // update only if active and fully initialized by/for network
-    void renderable_Render() override;
+    void renderable_Render(IRenderable* root) override;
     virtual void OnEvent(NET_Packet& P, u16 type) override;
     virtual void Hit(SHit* pHDS) override {}
     virtual void SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir) override {}

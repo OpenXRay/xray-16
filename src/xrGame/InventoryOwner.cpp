@@ -298,12 +298,12 @@ void CInventoryOwner::StopTrading()
 
 bool CInventoryOwner::IsTrading() { return m_bTrading; }
 //==============
-void CInventoryOwner::renderable_Render()
+void CInventoryOwner::renderable_Render(IRenderable* root)
 {
     if (inventory().ActiveItem())
-        inventory().ActiveItem()->renderable_Render();
+        inventory().ActiveItem()->renderable_Render(root);
 
-    CAttachmentOwner::renderable_Render();
+    CAttachmentOwner::renderable_Render(root);
 }
 
 void CInventoryOwner::OnItemTake(CInventoryItem* inventory_item)

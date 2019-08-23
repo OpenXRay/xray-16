@@ -630,7 +630,7 @@ void CRender::Calculate()
                                 T->update(renderable);
                             }
                             set_Object(renderable);
-                            renderable->renderable_Render();
+                            renderable->renderable_Render(renderable);
                             set_Object(nullptr); //? is it needed at all
                         }
                         break; // exit loop on frustums

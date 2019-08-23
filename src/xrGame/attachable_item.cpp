@@ -59,7 +59,7 @@ void CAttachableItem::OnH_A_Chield()
         object().setVisible(true);
 }
 
-void CAttachableItem::renderable_Render()
+void CAttachableItem::renderable_Render(IRenderable* root)
 {
     GEnv.Render->add_Visual(object().Visual(), object().XFORM());
 }

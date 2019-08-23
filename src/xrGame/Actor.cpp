@@ -1424,10 +1424,10 @@ void CActor::shedule_Update(u32 DT)
     Check_for_AutoPickUp();
 };
 #include "debug_renderer.h"
-void CActor::renderable_Render()
+void CActor::renderable_Render(IRenderable* root)
 {
     VERIFY(_valid(XFORM()));
-    inherited::renderable_Render();
+    inherited::renderable_Render(root);
 
     if ((cam_active == eacFirstEye && // first eye cam
             GEnv.Render->get_generation() == GEnv.Render->GENERATION_R2 && // R2
@@ -1436,12 +1436,12 @@ void CActor::renderable_Render()
         !(IsFocused() && cam_active == eacFirstEye &&
             (!m_holder || (m_holder && m_holder->allowWeapon() && m_holder->HUDView())))
     )
-        CInventoryOwner::renderable_Render();
+        CInventoryOwner::renderable_Render(root);
 
 
     //if (1 /*!HUDview()*/)
     //{
-    //    CInventoryOwner::renderable_Render();
+    //    CInventoryOwner::renderable_Render(root);
     //}
     //VERIFY(_valid(XFORM()));
 }

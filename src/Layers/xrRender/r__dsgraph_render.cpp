@@ -587,7 +587,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
                 if (nullptr == renderable)
                     continue; // unknown, but renderable object (r1_glow???)
 
-                renderable->renderable_Render();
+                renderable->renderable_Render(renderable);
             }
         }
     }

@@ -324,10 +324,10 @@ void CAI_Crow::UpdateCL()
         XFORM().set(m_pPhysicsShell->mXFORM);
     }
 }
-void CAI_Crow::renderable_Render()
+void CAI_Crow::renderable_Render(IRenderable* root)
 {
     UpdateWorkload(Device.fTimeDelta * (Device.dwFrame - o_workload_frame));
-    inherited::renderable_Render();
+    inherited::renderable_Render(root);
     o_workload_rframe = Device.dwFrame;
 }
 void CAI_Crow::shedule_Update(u32 DT)
