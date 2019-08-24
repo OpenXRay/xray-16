@@ -32,7 +32,7 @@ ICF float CalcSSA(float& distSQ, Fvector& C, float R)
     return R / distSQ;
 }
 
-void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector& Center)
+void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
 {
     CRender& RI = RImplementation;
 
@@ -58,7 +58,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
     if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
-        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
+        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
     }
 
     // Select shader
@@ -69,31 +69,31 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         return;
 
     // HUD rendering
-    if (RI.val_pObject && RI.val_pObject->renderable_HUD())
+    if (root && root->renderable_HUD())
     {
         if (sh->flags.bStrictB2F)
-            mapHUDSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
+            mapHUDSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
         else
-            mapHUD      .insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
+            mapHUD      .insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
 
 #if RENDER != R_R1
         if (sh->flags.bEmissive)
-            mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
+            mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
 #endif
         return;
     }
 
 // Shadows registering
 #if RENDER == R_R1
-    RI.L_Shadows->add_element(_MatrixItem{ SSA, RI.val_pObject, pVisual, *RI.val_pTransform });
+    RI.L_Shadows->add_element(_MatrixItem{ SSA, root, pVisual, xform });
 #endif
-    if (RI.val_pObject && RI.val_pObject->renderable_Invisible())
+    if (root && root->renderable_Invisible())
         return;
 
     // strict-sorting selection
     if (sh->flags.bStrictB2F)
     {
-        mapSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
+        mapSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
         return;
     }
 
@@ -105,18 +105,18 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d })); // sh_d -> L_special
+        mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
     }
     if (sh->flags.bWmark && pmask_wmark)
     {
-        mapWmark.insert_anyway(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh }));
+        mapWmark.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
         return;
     }
 #endif
 
     // Create common node
     // NOTE: Invisible elements exist only in R1
-    _MatrixItem item = { SSA, RI.val_pObject, pVisual, *RI.val_pTransform };
+    _MatrixItem item = { SSA, root, pVisual, xform };
 
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
@@ -189,8 +189,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     if (val_recorder)
     {
         Fbox3 temp;
-        Fmatrix& xf = *RI.val_pTransform;
-        temp.xform(pVisual->vis.box, xf);
+        temp.xform(pVisual->vis.box, xform);
         val_recorder->push_back(temp);
     }
 #endif
@@ -343,7 +342,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
+void D3DXRenderBase::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
 {
     if (nullptr == pVisual)
         return;
@@ -359,11 +358,11 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         {
             PS::CParticleGroup::SItem& I = it;
             if (I._effect)
-                add_leafs_Dynamic(I._effect);
+                add_leafs_Dynamic(root, I._effect, xform);
             for (auto& pit : I._children_related)
-                add_leafs_Dynamic(pit);
+                add_leafs_Dynamic(root, pit, xform);
             for (auto& pit : I._children_free)
-                add_leafs_Dynamic(pit);
+                add_leafs_Dynamic(root, pit, xform);
         }
     }
         return;
@@ -376,7 +375,7 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
 
-            add_leafs_Dynamic(i);
+            add_leafs_Dynamic(root, i, xform);
         }
     }
         return;
@@ -390,24 +389,24 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         {
             Fvector Tpos;
             float D;
-            val_pTransform->transform_tiny(Tpos, pV->vis.sphere.P);
+            xform.transform_tiny(Tpos, pV->vis.sphere.P);
             float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f); // assume dynamics never consume full sphere
             if (ssa < r_ssaLOD_A)
                 _use_lod = TRUE;
         }
         if (_use_lod)
         {
-            add_leafs_Dynamic(pV->m_lod);
+            add_leafs_Dynamic(root, pV->m_lod, xform);
         }
         else
         {
             pV->CalculateBones(TRUE);
-            pV->CalculateWallmarks(val_pObject ? val_pObject->renderable_HUD() : false); //. bug?
+            pV->CalculateWallmarks(root ? root->renderable_HUD() : false); //. bug?
             for (auto& i : pV->children)
             {
                 i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                              // [use shader data from parent model, rather than it childrens]
-                add_leafs_Dynamic(i);
+                add_leafs_Dynamic(root, i, xform);
             }
         }
     }
@@ -417,16 +416,16 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         // General type of visual
         // Calculate distance to it's center
         Fvector Tpos;
-        val_pTransform->transform_tiny(Tpos, pVisual->vis.sphere.P);
-        r_dsgraph_insert_dynamic(pVisual, Tpos);
+        xform.transform_tiny(Tpos, pVisual->vis.sphere.P);
+        r_dsgraph_insert_dynamic(root, pVisual, xform, Tpos);
     }
         return;
     }
 }
 
-void CRender::add_leafs_Static(dxRender_Visual* pVisual)
+void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
 {
-    if (!HOM.visible(pVisual->vis))
+    if (!RImplementation.HOM.visible(pVisual->vis))
         return;
 
     // Visual is 100% visible - simply add it
@@ -434,8 +433,13 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
     {
     case MT_PARTICLE_GROUP:
     {
+        // Xottab_DUTY: for dynamic objects we need matrixб
+        // which is nullptr, when we use add_leafs_Static
+        Log("Dynamic particles added via static procedure. Please, contact Xottab_DUTY and tell him about the issue.");
+        NODEFAULT;
+
         // Add all children, doesn't perform any tests
-        PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
+        /*PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
         for (auto& it : pG->items)
         {
             PS::CParticleGroup::SItem& I = it;
@@ -445,7 +449,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
                 add_leafs_Dynamic(pit);
             for (auto& pit : I._children_free)
                 add_leafs_Dynamic(pit);
-        }
+        }*/
     }
         return;
     case MT_HIERRARHY:
@@ -487,7 +491,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
             mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
-        if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)
+        if (ssa > r_ssaLOD_B || phase == CRender::PHASE_SMAP)
 #else
         if (ssa > r_ssaLOD_B)
 #endif
@@ -521,7 +525,10 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
+
+/* Xottab_DUTY: this function is only called from add_Static,
+ * but we need a matrix, which is nullptr at this point
+BOOL D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
 {
     // Check frustum visibility and calculate distance to visual's center
     Fvector Tpos; // transformed position
@@ -615,18 +622,18 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
     break;
     }
     return TRUE;
-}
+}*/
 
-void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
+void D3DXRenderBase::add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
 {
-    // Check frustum visibility and calculate distance to visual's center
-    EFC_Visible VIS;
     vis_data& vis = pVisual->vis;
-    VIS = View->testSAABB(vis.sphere.P, vis.sphere.R, vis.box.data(), planes);
+
+    // Check frustum visibility and calculate distance to visual's center
+    EFC_Visible VIS = view.testSAABB(vis.sphere.P, vis.sphere.R, vis.box.data(), planes);
     if (fcvNone == VIS)
         return;
 
-    if (!HOM.visible(vis))
+    if (!RImplementation.HOM.visible(vis))
         return;
 
     // If we get here visual is visible or partially visible
@@ -634,8 +641,13 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
     {
     case MT_PARTICLE_GROUP:
     {
+        // Xottab_DUTY: for dynamic objects we need matrixб
+        // which is nullptr, when we use add_Static
+        Log("Dynamic particles added via static procedure. Please, contact Xottab_DUTY and tell him about the issue.");
+        NODEFAULT;
+
         // Add all children, doesn't perform any tests
-        PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
+        /*PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
         for (auto& it : pG->items)
         {
             PS::CParticleGroup::SItem& I = it;
@@ -657,7 +669,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
                 for (auto& pit : I._children_free)
                     add_leafs_Dynamic(pit);
             }
-        }
+        }*/
     }
     break;
     case MT_HIERRARHY:
@@ -667,7 +679,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         if (fcvPartial == VIS)
         {
             for (auto& i : pV->children)
-                add_Static(i, planes);
+                add_Static(i, view, planes);
         }
         else
         {
@@ -685,7 +697,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         if (fcvPartial == VIS)
         {
             for (auto& i : pV->children)
-                add_Static(i, planes);
+                add_Static(i, view, planes);
         }
         else
         {
@@ -707,7 +719,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
             mapLOD.insert_anyway(D, _LodItem({ ssa, pVisual }));
         }
 #if RENDER != R_R1
-        if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)
+        if (ssa > r_ssaLOD_B || phase == CRender::PHASE_SMAP)
 #else
         if (ssa > r_ssaLOD_B)
 #endif

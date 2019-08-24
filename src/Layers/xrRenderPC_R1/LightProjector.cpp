@@ -50,6 +50,9 @@ CLightProjector::~CLightProjector()
 
 void CLightProjector::set_object(IRenderable* O)
 {
+    if (current == O)
+        return;
+
     if ((nullptr == O) || (receivers.size() >= P_o_count))
         current = nullptr;
     else

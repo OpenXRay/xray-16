@@ -198,11 +198,6 @@ private:
     void LoadSWIs(CStreamReader* fs);
     void Load3DFluid();
 
-    BOOL add_Dynamic(dxRender_Visual* pVisual, u32 planes); // normal processing
-    void add_Static(dxRender_Visual* pVisual, u32 planes);
-    void add_leafs_Dynamic(dxRender_Visual* pVisual); // if detected node's full visibility
-    void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
-
 public:
     IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
     void render_main(Fmatrix& mCombined, bool _fportals);
@@ -312,7 +307,6 @@ public:
 
     // Main
     void flush() override;
-    void set_Object(IRenderable* O) override;
     void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)

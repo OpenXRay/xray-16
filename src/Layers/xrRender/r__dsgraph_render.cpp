@@ -525,7 +525,6 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     // Save and build new frustum, disable HOM
     CFrustum ViewSave = ViewBase;
     ViewBase = *_frustum;
-    View = &ViewBase;
 
     if (_precise_portals && RImplementation.rmPortals)
     {
@@ -594,7 +593,6 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
     // Restore
     ViewBase = ViewSave;
-    View = nullptr;
 }
 
 #include "SkeletonCustom.h"

@@ -91,6 +91,9 @@ CLightShadows::~CLightShadows()
 
 void CLightShadows::set_object(IRenderable* O)
 {
+    if (current == O)
+        return;
+
     if (nullptr == O)
         current = nullptr;
     else

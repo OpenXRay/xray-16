@@ -314,13 +314,11 @@ BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     set_Object(root);
-    set_Transform(m);
-    add_leafs_Dynamic((dxRender_Visual*)V);
+    add_leafs_Dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 {
-    set_Frustum(view);
-    add_Static((dxRender_Visual*)V, View->getMask());
+    add_Static((dxRender_Visual*)V, view, view.getMask());
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
@@ -364,10 +362,7 @@ void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace);
 #include "xrEngine/PS_instance.h"
 void CRender::set_Object(IRenderable* O)
 {
-    if (val_pObject == O)
-        return;
-    val_pObject = O; // NULL is OK, trust me :)
-    if (val_pObject)
+    if (O)
     {
         VERIFY(dynamic_cast<IGameObject*>(O) || dynamic_cast<CPS_Instance*>(O));
         if (O->GetRenderData().pROS)
@@ -485,7 +480,7 @@ void CRender::Calculate()
 
     // Frustum & HOM rendering
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-    View = nullptr;
+
     if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         HOM.Enable();

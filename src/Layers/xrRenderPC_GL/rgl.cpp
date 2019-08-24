@@ -615,14 +615,11 @@ BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
-    set_Object(root);
-    set_Transform(m);
-    add_leafs_Dynamic((dxRender_Visual*)V);
+    add_leafs_Dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 {
-    set_Frustum(view);
-    add_Static((dxRender_Visual*)V, View->getMask());
+    add_Static((dxRender_Visual*)V, view, view.getMask());
 }
 
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
@@ -673,11 +670,6 @@ void CRender::add_SkeletonWallmark(const Fmatrix* xf, IKinematics* obj, IWallMar
 void CRender::add_Occluder(Fbox2& bb_screenspace)
 {
     HOM.occlude(bb_screenspace);
-}
-
-void CRender::set_Object(IRenderable* O)
-{
-    val_pObject = O;
 }
 
 void CRender::rmNear()
