@@ -450,7 +450,7 @@ void CLevel::OnFrame()
             }
             else
             {
-                TaskScheduler->AddTask("CMapManager::Update", Task::Type::Game,
+                TaskScheduler->AddTask("CMapManager::Update",
                     { m_map_manager, &CMapManager::Update },
                     { &Device, &CRenderDevice::IsMTProcessingAllowed });
             }
@@ -572,7 +572,7 @@ void CLevel::OnFrame()
             }
             else
             {
-                TaskScheduler->AddTask("CLevelSoundManager::Update", Task::Type::Game,
+                TaskScheduler->AddTask("CLevelSoundManager::Update",
                     { m_level_sound_manager, &CLevelSoundManager::Update },
                     { &Device, &CRenderDevice::IsMTProcessingAllowed });
             }
@@ -591,7 +591,7 @@ void CLevel::OnFrame()
             }
             else
             {
-                TaskScheduler->AddTask("CLevel::script_gc", Task::Type::Scripting,
+                TaskScheduler->AddTask("CLevel::script_gc",
                     { this, &CLevel::script_gc },
                     { &Device, &CRenderDevice::IsMTProcessingAllowed });
             }

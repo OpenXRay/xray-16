@@ -149,11 +149,11 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
     self.watcherThreadExit.Set();
 }
 
-void TaskManagerBase::AddTask(pcstr name, Task::Type type, Task::TaskFunc taskFunc,
+void TaskManagerBase::AddTask(pcstr name, Task::TaskFunc taskFunc,
     Task::IsAllowedCallback callback /*= nullptr*/, Task::DoneCallback done /*= nullptr*/,
     Event* doneEvent /*= nullptr*/)
 {
-    Task* task = new (tbb::task::allocate_root()) Task(name, type, std::move(taskFunc),
+    Task* task = new (tbb::task::allocate_root()) Task(name, std::move(taskFunc),
         std::move(callback), std::move(done), doneEvent);
 
     if (!task->isExecutionAllowed)
@@ -197,27 +197,6 @@ void TaskManagerBase::RemoveTasksWithName(pcstr name)
         it = std::find_if(tasks.begin(), tasks.end(), [&](Task* task)
         {
             return 0 == xr_strcmp(name, task->GetName());
-        });
-        return it;
-    };
-
-    while (search() != tasks.end())
-    {
-        Task::destroy(**it);
-        tasks.erase(it);
-    }
-}
-
-void TaskManagerBase::RemoveTasksWithType(Task::Type type)
-{
-    ScopeLock scope(&lock);
-
-    xr_vector<Task*>::iterator it;
-    const auto search = [&]()
-    {
-        it = std::find_if(tasks.begin(), tasks.end(), [&](Task* task)
-        {
-            return type == task->GetType();
         });
         return it;
     };

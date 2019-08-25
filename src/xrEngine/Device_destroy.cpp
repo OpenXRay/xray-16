@@ -48,8 +48,6 @@ extern BOOL bNeed_re_create_env;
 
 void CRenderDevice::ResetInternal(bool precache)
 {
-    TaskScheduler->RemoveTasksWithType(Task::Type::Renderer);
-
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
     pInput->GrabInput(false);

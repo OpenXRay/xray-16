@@ -827,7 +827,7 @@ void CAI_Stalker::UpdateCL()
     {
         if (g_mt_config.test(mtObjectHandler) && CObjectHandler::planner().initialized())
         {
-            TaskScheduler->AddTask("CAI_Stalker::update_object_handler", Task::Type::Game,
+            TaskScheduler->AddTask("CAI_Stalker::update_object_handler",
                 { this, &CAI_Stalker::update_object_handler },
                 { this, &CAI_Stalker::mt_object_handler_update_allowed });
         }

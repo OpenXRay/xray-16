@@ -3,10 +3,10 @@
 #include "Task.hpp"
 #include "TaskManager.hpp"
 
-Task::Task(pcstr name, Type type, TaskFunc&& task, IsAllowedCallback&& allowed /*= nullptr*/,
+Task::Task(pcstr name, TaskFunc&& task, IsAllowedCallback&& allowed /*= nullptr*/,
     DoneCallback&& done /*= nullptr*/, Event* doneEvent /*= nullptr*/)
     : isExecutionAllowed(allowed), onTaskDone(done), onTaskDoneEvent(doneEvent),
-      task(task), name(name), type(type), isStarted(false)
+      task(task), name(name), isStarted(false)
 {
     R_ASSERT2(name && xr_strlen(name) > 1, "Please, specify task name!");
 }

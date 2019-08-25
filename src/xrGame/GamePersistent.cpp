@@ -209,14 +209,16 @@ void CGamePersistent::OnAppStart()
 {
     Event globalsInitialized, menuCreated;
 
-    TaskScheduler->AddTask("init_game_globals", Task::Type::Game,
-        init_game_globals, nullptr, nullptr, &globalsInitialized);
+    TaskScheduler->AddTask("init_game_globals", init_game_globals,
+        nullptr, nullptr, &globalsInitialized);
 
     SetupUIStyle();
     GEnv.UI = new UICore();
 
-    TaskScheduler->AddTask("CMainMenu::CMainMenu()", Task::Type::Game,
-        [&](){ m_pMainMenu = new CMainMenu(); }, nullptr, nullptr, &menuCreated);
+    TaskScheduler->AddTask("CMainMenu::CMainMenu()", [&]()
+    {
+        m_pMainMenu = new CMainMenu();
+    }, nullptr, nullptr, &menuCreated);
 
     // load game materials
     GMLib.Load();

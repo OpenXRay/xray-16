@@ -49,13 +49,12 @@ public:
 
     bool TaskQueueIsEmpty() const;
 
-    void AddTask(pcstr name, Task::Type type, Task::TaskFunc taskFunc,
+    void AddTask(pcstr name, Task::TaskFunc taskFunc,
         Task::IsAllowedCallback callback = nullptr, Task::DoneCallback done = nullptr,
         Event* doneEvent = nullptr);
 
     void RemoveTask(Task::TaskFunc&& func);
     void RemoveTasksWithName(pcstr name);
-    void RemoveTasksWithType(Task::Type type);
 
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
 };

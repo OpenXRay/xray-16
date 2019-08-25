@@ -915,7 +915,7 @@ void CBulletManager::CommitRenderSet() // @ the end of frame
         }
         else
         {
-            TaskScheduler->AddTask("CBulletManager::UpdateWorkload", Task::Type::Game,
+            TaskScheduler->AddTask("CBulletManager::UpdateWorkload",
                 { this, &CBulletManager::UpdateWorkload },
                 { &Device, &CRenderDevice::IsMTProcessingAllowed });
         }

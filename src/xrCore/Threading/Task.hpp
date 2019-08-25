@@ -9,24 +9,6 @@
 class XRCORE_API Task : public tbb::task
 {
 public:
-    enum class Type
-    {
-        AI,
-        Core,
-        Collision,
-        Engine,
-        Game,
-        GameSpy,
-        Network,
-        Particles,
-        Physics,
-        Renderer,
-        Scripting,
-        Sound,
-        UI,
-        Other
-    };
-
     using IsAllowedCallback = xrDelegate<bool()>;
     using DoneCallback = xrDelegate<void()>;
     using TaskFunc = xrDelegate<void()>;
@@ -40,21 +22,15 @@ private:
     CTimer timer;
 
     pcstr name;
-    Type type;
     bool isStarted;
 
 public:
-    Task(pcstr name, Type type, TaskFunc&& task, IsAllowedCallback&& allowed = nullptr,
+    Task(pcstr name, TaskFunc&& task, IsAllowedCallback&& allowed = nullptr,
         DoneCallback&& done = nullptr, Event* doneEvent = nullptr);
 
     pcstr GetName() const
     {
         return name;
-    }
-
-    Type GetType() const
-    {
-        return type;
     }
 
     bool IsStarted() const
