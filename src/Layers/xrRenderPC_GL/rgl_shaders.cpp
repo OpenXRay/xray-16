@@ -104,46 +104,6 @@ static GLuint create_shader(cpcstr pTarget, pcstr* buffer, size_t const buffer_s
     }
 }
 
-// TODO: OGL: make ignore commented includes
-static inline void load_includes(pcstr pSrcData, UINT SrcDataLen, xr_vector<pstr>& source, xr_vector<pstr>& includes)
-{
-    // Copy source file data into a null-terminated buffer
-    pstr srcData = xr_alloc<char>(SrcDataLen + 2);
-    CopyMemory(srcData, pSrcData, SrcDataLen);
-    srcData[SrcDataLen] = '\n';
-    srcData[SrcDataLen + 1] = '\0';
-    includes.push_back(srcData);
-    source.push_back(srcData);
-
-    string_path path;
-    pstr str = srcData;
-    while (strstr(str, "#include") != nullptr)
-    {
-        // Get filename of include directive
-        str = strstr(str, "#include"); // Find the include directive
-        char* fn = strchr(str, '"') + 1; // Get filename, skip quotation
-        *str = '\0'; // Terminate previous source
-        str = strchr(fn, '"'); // Get end of filename path
-        *str = '\0'; // Terminate filename path
-
-        // Create path to included shader
-        strconcat(sizeof(path), path, GEnv.Render->getShaderPath(), fn);
-        FS.update_path(path, _game_shaders_, path);
-        while (pstr sep = strchr(path, '/'))
-            *sep = '\\';
-
-        // Open and read file, recursively load includes
-        IReader* R = FS.r_open(path);
-        R_ASSERT2(R, path);
-        load_includes((pstr)R->pointer(), R->length(), source, includes);
-        FS.r_close(R);
-
-        // Add next source, skip quotation
-        ++str;
-        source.push_back(str);
-    }
-}
-
 struct SHADER_MACRO
 {
     pcstr Name = nullptr;
@@ -211,13 +171,119 @@ public:
     SHADER_MACRO* data() { return m_options; }
 };
 
+class shader_sources_manager
+{
+    pcstr* m_sources{};
+    size_t m_sources_lines{};
+    xr_vector<pstr> m_source, m_includes;
+    string512 m_name_comment;
+
+public:
+    explicit shader_sources_manager(cpcstr name)
+    {
+        xr_sprintf(m_name_comment, "// %s\n", name);
+    }
+
+    ~shader_sources_manager()
+    {
+        // Free string resources
+        xr_free(m_sources);
+        for (pstr include : m_includes)
+            xr_free(include);
+        m_source.clear();
+        m_includes.clear();
+    }
+
+    [[nodiscard]] auto get() const { return m_sources; }
+    [[nodiscard]] auto length() const { return m_sources_lines; }
+
+    [[nodiscard]] static constexpr bool optimized()
+    {
+#ifdef DEBUG
+        return false;
+#else
+        return true;
+#endif
+    }
+
+    void compile(IReader* file, shader_options_holder& options)
+    {
+        load_includes(file);
+        apply_options(options);
+    }
+
+private:
+    // TODO: OGL: make ignore commented includes
+    void load_includes(IReader* file)
+    {
+        cpcstr sourceData = static_cast<cpcstr>(file->pointer());
+        const size_t dataLength = file->length();
+
+        // Copy source file data into a null-terminated buffer
+        cpstr data = xr_alloc<char>(dataLength + 2);
+        CopyMemory(data, sourceData, dataLength);
+        data[dataLength] = '\n';
+        data[dataLength + 1] = '\0';
+        m_includes.push_back(data);
+        m_source.push_back(data);
+
+        string_path path;
+        pstr str = data;
+        while (strstr(str, "#include") != nullptr)
+        {
+            // Get filename of include directive
+            str = strstr(str, "#include"); // Find the include directive
+            char* fn = strchr(str, '"') + 1; // Get filename, skip quotation
+            *str = '\0'; // Terminate previous source
+            str = strchr(fn, '"'); // Get end of filename path
+            *str = '\0'; // Terminate filename path
+
+            // Create path to included shader
+            strconcat(sizeof(path), path, GEnv.Render->getShaderPath(), fn);
+            FS.update_path(path, _game_shaders_, path);
+            while (cpstr sep = strchr(path, '/'))
+                *sep = '\\';
+
+            // Open and read file, recursively load includes
+            IReader* R = FS.r_open(path);
+            R_ASSERT2(R, path);
+            load_includes(R);
+            FS.r_close(R);
+
+            // Add next source, skip quotation
+            ++str;
+            m_source.push_back(str);
+        }
+    }
+
+    void apply_options(shader_options_holder& options)
+    {
+        // Compile sources list
+        const size_t head_lines = 2; // "#version" line + name_comment line
+        m_sources_lines = m_source.size() + options.size() + head_lines;
+        m_sources = xr_alloc<pcstr>(m_sources_lines);
+#ifdef DEBUG
+        m_sources[0] = "#version 410\n#pragma optimize (off)\n";
+#else
+        m_sources[0] = "#version 410\n";
+#endif
+        m_sources[1] = m_name_comment;
+
+        // Make define lines
+        for (size_t i = 0; i < options.size(); ++i)
+        {
+            m_sources[head_lines + i] = options[i].FullDefine;
+        }
+        CopyMemory(m_sources + head_lines + options.size(), m_source.data(), m_source.size() * sizeof(pstr));
+    }
+};
+
 HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
 {
+    shader_sources_manager sources(name);
     shader_options_holder options;
     shader_name_holder sh_name;
-    
-    xr_vector<pstr> source, includes;
 
     // Don't move these variables to lower scope!
     string32 c_smapsize;
@@ -229,9 +295,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     // TODO: OGL: Implement these parameters.
     UNUSED(pFunctionName);
     UNUSED(Flags);
-
-    // open included files
-    load_includes((pcstr)fs->pointer(), fs->length(), source, includes);
 
     // options:
     const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value)
@@ -479,29 +542,15 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
     }
 
+    // Don't mix optimized and unoptimized shaders
+    sh_name.append(static_cast<u32>(sources.optimized()));
+
     // finish
     options.finish();
     sh_name.finish();
 
     // Compile sources list
-    const size_t head_lines = 2; // "#version" line + name_comment line
-    size_t sources_lines = source.size() + options.size() + head_lines;
-    string256 name_comment;
-    xr_sprintf(name_comment, "// %s\n", name);
-    pcstr* sources = xr_alloc<pcstr>(sources_lines);
-#ifdef DEBUG
-    sources[0] = "#version 410\n#pragma optimize (off)\n";
-#else
-    sources[0] = "#version 410\n";
-#endif
-    sources[1] = name_comment;
-
-    // Make define lines
-    for (size_t i = 0; i < options.size(); ++i)
-    {
-        sources[head_lines + i] = options[i].FullDefine;
-    }
-    CopyMemory(sources + head_lines + options.size(), source.data(), source.size() * sizeof(pstr));
+    sources.compile(fs, options);
 
     char extension[3];
     strncpy_s(extension, pTarget, 2);
@@ -555,7 +604,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     // Compile the shader
     if (!program)
     {
-        program = create_shader(pTarget, sources, sources_lines, filename, result, nullptr);
+        program = create_shader(pTarget, sources.get(), sources.length(), filename, result, nullptr);
 
         if (HW.ShaderBinarySupported && program)
         {
@@ -587,11 +636,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
             }
         }
     }
-
-    // Free string resources
-    xr_free(sources);
-    for (pstr include : includes)
-        xr_free(include);
 
     if (program)
         return S_OK;
