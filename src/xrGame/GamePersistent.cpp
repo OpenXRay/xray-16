@@ -35,6 +35,7 @@
 #include "xrEngine/x_ray.h"
 #include "ui/UILoadingScreen.h"
 #include "AnselManager.h"
+#include "xrEngine/TaskScheduler.hpp"
 
 #ifndef MASTER_GOLD
 #include "CustomMonster.h"
@@ -206,14 +207,21 @@ extern void init_game_globals();
 
 void CGamePersistent::OnAppStart()
 {
+    Event globalsInitialized, menuCreated;
+
+    TaskScheduler->AddTask("init_game_globals", Task::Type::Game,
+        init_game_globals, nullptr, nullptr, &globalsInitialized);
+
     SetupUIStyle();
+    GEnv.UI = new UICore();
+
+    TaskScheduler->AddTask("CMainMenu::CMainMenu()", Task::Type::Game,
+        [&](){ m_pMainMenu = new CMainMenu(); }, nullptr, nullptr, &menuCreated);
 
     // load game materials
     GMLib.Load();
-    init_game_globals();
+
     inherited::OnAppStart();
-    GEnv.UI = new UICore();
-    m_pMainMenu = new CMainMenu();
 
     pApp->SetLoadingScreen(new UILoadingScreen());
 
@@ -222,6 +230,11 @@ void CGamePersistent::OnAppStart()
     ansel->Load();
     ansel->Init();
 #endif
+
+    while (!globalsInitialized.Wait(Device.MaximalWaitTime))
+        SDL_PumpEvents();
+    while (!menuCreated.Wait(Device.MaximalWaitTime))
+        SDL_PumpEvents();
 }
 
 void CGamePersistent::OnAppEnd()
