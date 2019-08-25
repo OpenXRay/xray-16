@@ -150,12 +150,20 @@ void TaskManagerBase::taskWatcherThread(void* thisPtr)
 }
 
 void TaskManagerBase::AddTask(pcstr name, Task::Type type, Task::TaskFunc taskFunc,
-    Task::IsAllowedCallback callback /*= nullptr*/, Task::DoneCallback done /*= nullptr*/)
+    Task::IsAllowedCallback callback /*= nullptr*/, Task::DoneCallback done /*= nullptr*/,
+    Event* doneEvent /*= nullptr*/)
 {
-    Task* task = new (tbb::task::allocate_root()) Task(name, type, taskFunc, callback, done);
+    Task* task = new (tbb::task::allocate_root()) Task(name, type, std::move(taskFunc),
+        std::move(callback), std::move(done), doneEvent);
+
+    if (!task->isExecutionAllowed)
+    {
+        SpawnTask(task, true);
+        return;
+    }
 
     lock.Enter();
-    tasks.push_back(task);
+    tasks.emplace_back(task);
     lock.Leave();
 }
 
@@ -221,17 +229,19 @@ void TaskManagerBase::RemoveTasksWithType(Task::Type type)
     }
 }
 
-void TaskManagerBase::SpawnTask(Task* task)
+void TaskManagerBase::SpawnTask(Task* task, bool shortcut /*= false*/)
 {
-    const auto it = std::find(tasks.begin(), tasks.end(), task);
-    R_ASSERT3(it != tasks.end(), "Task is deleted from the task manager", task->GetName());
+    if (!shortcut)
+    {
+        const auto it = std::find(tasks.begin(), tasks.end(), task);
+        R_ASSERT3(it != tasks.end(), "Task is deleted from the task manager", task->GetName());
 
-    // Remove it from the queue
-    tasks.erase(it);
-    
-    // Watch it
+        // Remove it from the queue
+        tasks.erase(it);
+    }
+
     executionLock.Enter();
-    tasksInExecution.push_back(task);
+    tasksInExecution.emplace_back(task);
     executionLock.Leave();
 
     // Run it

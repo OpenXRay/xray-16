@@ -38,7 +38,7 @@ class XRCORE_API TaskManagerBase
 
 protected:
     friend class Task;
-    virtual void SpawnTask(Task* task);
+    virtual void SpawnTask(Task* task, bool shortcut = false);
     virtual void TaskDone(Task* task, u64 executionTime);
 
 public:
@@ -50,7 +50,8 @@ public:
     bool TaskQueueIsEmpty() const;
 
     void AddTask(pcstr name, Task::Type type, Task::TaskFunc taskFunc,
-        Task::IsAllowedCallback callback = nullptr, Task::DoneCallback done = nullptr);
+        Task::IsAllowedCallback callback = nullptr, Task::DoneCallback done = nullptr,
+        Event* doneEvent = nullptr);
 
     void RemoveTask(Task::TaskFunc&& func);
     void RemoveTasksWithName(pcstr name);

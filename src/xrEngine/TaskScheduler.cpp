@@ -8,14 +8,13 @@
 
 #include <cinttypes>
 
-void TaskManager::SpawnTask(Task* task)
+void TaskManager::SpawnTask(Task* task, bool shortcut /*= false*/)
 {
-    TaskManagerBase::SpawnTask(task);
+    TaskManagerBase::SpawnTask(task, shortcut);
 
     if (psDeviceFlags.test(rsStatistic))
     {
-        ScopeLock scope(&statisticsLock);
-        spawnedTasks++;
+        ++spawnedTasks;
     }
 }
 
@@ -26,7 +25,7 @@ void TaskManager::TaskDone(Task* task, u64 executionTime)
     if (psDeviceFlags.test(rsStatistic))
     {
         ScopeLock scope(&statisticsLock);
-        statistics.push_back(static_cast<float>(executionTime));
+        statistics.emplace_back(static_cast<float>(executionTime));
     }
 }
 
@@ -51,7 +50,7 @@ void TaskManager::DumpStatistics(class IGameFont& font, class IPerformanceAlert*
         averageExecutionTime = totalExecutionTime / static_cast<float>(tasksDone);
 
     font.OutNext("Task scheduler:");
-    font.OutNext("- tasks given:   %u", spawnedTasks);
+    font.OutNext("- tasks given:   %u", spawnedTasks.load());
     font.OutNext("  - processed:   %zu", tasksDone);
     font.OutNext("- execution time");
     font.OutNext("  - average:     %2.2f ms", averageExecutionTime);

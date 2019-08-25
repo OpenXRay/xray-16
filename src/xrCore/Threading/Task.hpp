@@ -4,6 +4,7 @@
 #include "xrCore/FTimer.h"
 
 #include <tbb/task.h>
+#include "Event.hpp"
 
 class XRCORE_API Task : public tbb::task
 {
@@ -34,6 +35,7 @@ private:
     friend class TaskManagerBase;
     IsAllowedCallback isExecutionAllowed;
     DoneCallback onTaskDone;
+    Event* onTaskDoneEvent;
     TaskFunc task;
     CTimer timer;
 
@@ -42,7 +44,8 @@ private:
     bool isStarted;
 
 public:
-    Task(pcstr name, Type type, TaskFunc task, IsAllowedCallback allowed = nullptr, DoneCallback done = nullptr);
+    Task(pcstr name, Type type, TaskFunc&& task, IsAllowedCallback&& allowed = nullptr,
+        DoneCallback&& done = nullptr, Event* doneEvent = nullptr);
 
     pcstr GetName() const
     {
