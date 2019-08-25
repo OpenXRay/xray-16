@@ -2,6 +2,7 @@
 #include "rgl.h"
 
 #include "Layers/xrRender/ShaderResourceTraits.h"
+#include "xrCore/FileCRC32.h"
 
 void CRender::addShaderOption(const char* name, const char* value)
 {
@@ -12,107 +13,96 @@ void CRender::addShaderOption(const char* name, const char* value)
     m_ShaderOptions += "\n";
 }
 
-template <typename T>
-static bool create_shader(cpcstr name, pcstr* buffer, size_t const buffer_size, cpcstr file_name,
-    T*& result, bool const disasm)
+void show_errors(cpcstr filename, GLuint* program, GLuint* shader)
 {
-    auto [shader, program] = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh, name);
+    GLint length;
+    GLchar *errors = nullptr, *sources = nullptr;
 
-    // Get the compilation result
-    GLint status;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-
-    // Link program if compilation succeeded
-    GLchar* errors = nullptr;
-    if ((GLboolean)status == GL_TRUE)
+    if (program)
     {
-        CHK_GL(glAttachShader(program, shader));
-        CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
-        CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
-        CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
-        CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
-        CHK_GL(glLinkProgram(program));
-        CHK_GL(glDetachShader(program, shader));
-        CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
+        CHK_GL(glGetProgramiv(*program, GL_INFO_LOG_LENGTH, &length));
+        errors = xr_alloc<GLchar>(length);
+        CHK_GL(glGetProgramInfoLog(*program, length, nullptr, errors));
+    }
+    else if (shader)
+    {
+        CHK_GL(glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &length));
+        errors = xr_alloc<GLchar>(length);
+        CHK_GL(glGetShaderInfoLog(*shader, length, nullptr, errors));
 
-        // Parse constant, texture, sampler binding
-        if ((GLboolean)status == GL_TRUE)
-        {
-            result->sh = program;
-            // Let constant table parse it's data
-            result->constants.parse(&program, ShaderTypeTraits<T>::GetShaderDest());
-        }
-        else
-        {
-            GLint length;
-            CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
-            errors = xr_alloc<GLchar>(length);
-            CHK_GL(glGetProgramInfoLog(program, length, nullptr, errors));
-        }
+        CHK_GL(glGetShaderiv(*shader, GL_SHADER_SOURCE_LENGTH, &length));
+        sources = xr_alloc<GLchar>(length);
+        CHK_GL(glGetShaderSource(*shader, length, nullptr, sources));
+    }
+
+    Log("! shader compilation failed:", filename);
+    if (errors)
+        Log("! error: ", errors);
+
+    if (sources)
+    {
+        Log("Shader source:");
+        Log(sources);
+        Log("Shader source end.");
+    }
+    xr_free(errors);
+    xr_free(sources);
+}
+
+template <typename T>
+static GLuint create_shader(pcstr* buffer, size_t const buffer_size, cpcstr filename,
+    T*& result, const GLenum* format)
+{
+    auto [shader, program] = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh, format, filename);
+
+    const bool success = shader == 0 && program != 0 && program != GLuint(-1);
+
+    // Parse constant, texture, sampler binding
+    if (success)
+    {
+        result->sh = program;
+        // Let constant table parse it's data
+        result->constants.parse(&program, ShaderTypeTraits<T>::GetShaderDest());
     }
     else
     {
-        GLint length;
-        CHK_GL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
-        errors = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderInfoLog(shader, length, nullptr, errors));
-    }
-
-    if ((GLboolean)status == GL_FALSE)
-    {
-#ifdef DEBUG
-        GLint srcLen;
-        CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &srcLen));
-        GLchar* shaderSrc = xr_alloc<GLchar>(srcLen);
-        CHK_GL(glGetShaderSource(shader, srcLen, nullptr, shaderSrc));
-#endif
-
-        Msg("! shader compilation failed");
-        Log("! ", name);
-        if (errors)
-            Log("! error: ", errors);
-
-#ifdef DEBUG
-        if (shaderSrc)
+        if (shader != 0 && shader != GLuint(-1))
         {
-            Log("Shader source:");
-            Log(shaderSrc);
-            Log("Shader source end.");
+            show_errors(filename, nullptr, &shader);
+            glDeleteShader(shader);
         }
-        xr_free(shaderSrc);
-#endif
+        else
+        {
+            show_errors(filename, &program, nullptr);
+            glDeleteProgram(program);
+        }
     }
 
-    CHK_GL(glDeleteShader(shader));
-    xr_free(errors);
-    return GLboolean(status) == GL_TRUE;
+    return success ? program : 0;
 }
 
-static bool create_shader(cpcstr name, cpcstr pTarget, pcstr* buffer, size_t const buffer_size,
-    cpcstr file_name, void*& result, bool const disasm)
+static GLuint create_shader(cpcstr pTarget, pcstr* buffer, size_t const buffer_size,
+    cpcstr filename, void*& result, const GLenum* format)
 {
     switch (pTarget[0])
     {
     case 'p':
-        return create_shader(name, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+        return create_shader(buffer, buffer_size, filename, (SPS*&)result, format);
     case 'v':
-        return create_shader(name, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+        return create_shader(buffer, buffer_size, filename, (SVS*&)result, format);
     case 'g':
-        return create_shader(name, buffer, buffer_size, file_name, (SGS*&)result, disasm);
+        return create_shader(buffer, buffer_size, filename, (SGS*&)result, format);
     case 'c':
-        return create_shader(name, buffer, buffer_size, file_name, (SCS*&)result, disasm);
+        return create_shader(buffer, buffer_size, filename, (SCS*&)result, format);
     case 'h':
-        return create_shader(name, buffer, buffer_size, file_name, (SHS*&)result, disasm);
+        return create_shader(buffer, buffer_size, filename, (SHS*&)result, format);
     case 'd':
-        return create_shader(name, buffer, buffer_size, file_name, (SDS*&)result, disasm);
+        return create_shader(buffer, buffer_size, filename, (SDS*&)result, format);
     default:
         NODEFAULT;
-        return false;
+        return 0;
     }
 }
-
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 // TODO: OGL: make ignore commented includes
 static inline void load_includes(pcstr pSrcData, UINT SrcDataLen, xr_vector<pstr>& source, xr_vector<pstr>& includes)
@@ -513,15 +503,97 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     }
     CopyMemory(sources + head_lines + options.size(), source.data(), source.size() * sizeof(pstr));
 
+    char extension[3];
+    strncpy_s(extension, pTarget, 2);
+
+    u32 fileCrc = 0;
+    string_path filename, full_path;
+    strconcat(sizeof(filename), filename, "gl" DELIMITER, name, ".", extension, DELIMITER, sh_name.c_str());
+    if (HW.ShaderBinarySupported)
+    {
+        string_path file;
+        strconcat(sizeof(file), file, "shaders_cache" DELIMITER, filename);
+        FS.update_path(full_path, "$app_data_root$", file);
+
+        string_path shadersFolder;
+        FS.update_path(shadersFolder, "$game_shaders$", GEnv.Render->getShaderPath());
+
+        getFileCrc32(fs, shadersFolder, fileCrc);
+        fs->seek(0);
+    }
+
+    GLuint program = 0;
+    if (HW.ShaderBinarySupported && FS.exist(full_path))
+    {
+        IReader* file = FS.r_open(full_path);
+        if (file->length() > 8)
+        {
+            xr_string renderer, glVer, shadingVer;
+            file->r_string(renderer);
+            file->r_string(glVer);
+            file->r_string(shadingVer);
+
+            if (0 == xr_strcmp(renderer.c_str(), HW.AdapterName) &&
+                0 == xr_strcmp(glVer.c_str(), HW.OpenGLVersion) &&
+                0 == xr_strcmp(shadingVer.c_str(), HW.ShadingVersion))
+            {
+                const GLenum binaryFormat = file->r_u32();
+
+                const u32 savedFileCrc = file->r_u32();
+                if (savedFileCrc == fileCrc)
+                {
+                    const u32 savedBytecodeCrc = file->r_u32();
+                    const u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
+                    if (bytecodeCrc == savedBytecodeCrc)
+                        program = create_shader(pTarget, (pcstr*)file->pointer(), file->elapsed(), filename, result, &binaryFormat);
+                }
+            }
+        }
+        file->close();
+    }
+
     // Compile the shader
-    const bool success = create_shader(name, pTarget, sources, sources_lines, nullptr, result, o.disasm);
+    if (!program)
+    {
+        program = create_shader(pTarget, sources, sources_lines, filename, result, nullptr);
+
+        if (HW.ShaderBinarySupported && program)
+        {
+            GLvoid* binary{};
+            GLint binaryLength{};
+            GLenum binaryFormat{};
+            glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
+            if (binaryLength)
+                binary = static_cast<GLvoid*>(xr_malloc(binaryLength));
+
+            if (binary)
+            {
+                glGetProgramBinary(program, binaryLength, nullptr, &binaryFormat, binary);
+                IWriter* file = FS.w_open(full_path);
+
+                file->w_string(HW.AdapterName);
+                file->w_string(HW.OpenGLVersion);
+                file->w_string(HW.ShadingVersion);
+
+                file->w_u32(binaryFormat);
+                file->w_u32(fileCrc);
+
+                const u32 bytecodeCrc = crc32(binary, binaryLength);
+                file->w_u32(bytecodeCrc);
+
+                file->w(binary, binaryLength);
+                FS.w_close(file);
+                xr_free(binary);
+            }
+        }
+    }
 
     // Free string resources
     xr_free(sources);
-    for (auto it = includes.begin(); it != includes.end(); ++it)
-        xr_free(*it);
+    for (pstr include : includes)
+        xr_free(include);
 
-    if (success)
+    if (program)
         return S_OK;
 
     return E_FAIL;

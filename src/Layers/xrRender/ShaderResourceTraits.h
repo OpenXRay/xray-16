@@ -4,19 +4,61 @@
 
 #ifdef USE_OGL
 template<GLenum type>
-inline std::pair<GLuint, GLuint> GLCreateShader(pcstr* buffer, size_t size, pcstr name)
+inline std::pair<GLuint, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr name)
 {
+    GLint status{};
+
     GLuint shader = glCreateShader(type);
     R_ASSERT(shader);
-    CHK_GL(glShaderSource(shader, size, buffer, nullptr));
-    CHK_GL(glCompileShader(shader));
+    glShaderSource(shader, size, buffer, nullptr);
+    glCompileShader(shader);
+
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+    if (GLboolean(status) == GL_FALSE)
+        return { shader, -1 };
+
+    GLuint program = glCreateProgram();
+    R_ASSERT(program);
+    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
+    CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
+
+    glAttachShader(program, shader);
+    glBindFragDataLocation(program, 0, "SV_Target");
+    glBindFragDataLocation(program, 0, "SV_Target0");
+    glBindFragDataLocation(program, 1, "SV_Target1");
+    glBindFragDataLocation(program, 2, "SV_Target2");
+    glLinkProgram(program);
+    glDetachShader(program, shader);
+    glDeleteShader(shader);
+
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    if (GLboolean(status) == GL_FALSE)
+        return { -1, program };
+
+    return { 0, program };
+}
+
+inline std::pair<GLuint, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLenum* format, pcstr name)
+{
+    GLint status{};
 
     GLuint program = glCreateProgram();
     R_ASSERT(program);
     CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
-    return { shader, program };
+    glBindFragDataLocation(program, 0, "SV_Target");
+    glBindFragDataLocation(program, 0, "SV_Target0");
+    glBindFragDataLocation(program, 1, "SV_Target1");
+    glBindFragDataLocation(program, 2, "SV_Target2");
+
+    glProgramBinary(program, *format, buffer, size);
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    if ((GLboolean)status == GL_FALSE)
+        return { -1, program };
+
+    return { 0, program };
 }
 #endif
 
@@ -29,10 +71,16 @@ struct ShaderTypeTraits<SVS>
     using MapType = CResourceManager::map_VS;
 
 #ifdef USE_OGL
+    using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
+#ifdef USE_DX11
+    using LinkageType = ID3D11ClassLinkage*;
+#else
+    using LinkageType = void*;
+#endif
     using HWShaderType = ID3DVertexShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
@@ -97,14 +145,17 @@ struct ShaderTypeTraits<SVS>
     }
 
     static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
-        pcstr name = nullptr)
+        LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
 
 #ifdef USE_OGL
-        res = GLCreateShader<GL_VERTEX_SHADER>(buffer, size, name);
+        if (linkage)
+            res = GLUseBinary(buffer, size, linkage, name);
+        else
+            res = GLCompileShader<GL_VERTEX_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
-        res = HW.pDevice->CreateVertexShader(buffer, size, 0, &sh);
+        res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
 #elif defined(USE_DX10)
         res = HW.pDevice->CreateVertexShader(buffer, size, &sh);
 #else
@@ -123,10 +174,16 @@ struct ShaderTypeTraits<SPS>
     using MapType = CResourceManager::map_PS;
 
 #ifdef USE_OGL
+    using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
+#ifdef USE_DX11
+    using LinkageType = ID3D11ClassLinkage*;
+#else
+    using LinkageType = void*;
+#endif
     using HWShaderType = ID3DPixelShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
@@ -203,14 +260,17 @@ struct ShaderTypeTraits<SPS>
     }
 
     static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
-        pcstr name = nullptr)
+        LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
 
 #ifdef USE_OGL
-        res = GLCreateShader<GL_FRAGMENT_SHADER>(buffer, size, name);
+        if (linkage)
+            res = GLUseBinary(buffer, size, linkage, name);
+        else
+            res = GLCompileShader<GL_FRAGMENT_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
-        res = HW.pDevice->CreatePixelShader(buffer, size, 0, &sh);
+        res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
 #elif defined(USE_DX10)
         res = HW.pDevice->CreatePixelShader(buffer, size, &sh);
 #else
@@ -230,10 +290,16 @@ struct ShaderTypeTraits<SGS>
     using MapType = CResourceManager::map_GS;
 
 #ifdef USE_OGL
+    using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
+#ifdef USE_DX11
+    using LinkageType = ID3D11ClassLinkage*;
+#else
+    using LinkageType = void*;
+#endif
     using HWShaderType = ID3DGeometryShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
@@ -277,14 +343,17 @@ struct ShaderTypeTraits<SGS>
     }
 
     static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
-        pcstr name = nullptr)
+        LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
 
 #ifdef USE_OGL
-        res = GLCreateShader<GL_GEOMETRY_SHADER>(buffer, size, name);
+        if (linkage)
+            res = GLUseBinary(buffer, size, linkage, name);
+        else
+            res = GLCompileShader<GL_GEOMETRY_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
-        res = HW.pDevice->CreateGeometryShader(buffer, size, 0, &sh);
+        res = HW.pDevice->CreateGeometryShader(buffer, size, linkage, &sh);
 #else
         res = HW.pDevice->CreateGeometryShader(buffer, size, &sh);
 #endif
@@ -303,10 +372,16 @@ struct ShaderTypeTraits<SHS>
     using MapType = CResourceManager::map_HS;
 
 #ifdef USE_OGL
+    using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
+#ifdef USE_DX11
+    using LinkageType = ID3D11ClassLinkage*;
+#else
+    using LinkageType = void*;
+#endif
     using HWShaderType = ID3D11HullShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
@@ -340,14 +415,17 @@ struct ShaderTypeTraits<SHS>
     }
 
     static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
-        pcstr name = nullptr)
+        LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
 
 #ifdef USE_OGL
-        res = GLCreateShader<GL_TESS_CONTROL_SHADER>(buffer, size, name);
+        if (linkage)
+            res = GLUseBinary(buffer, size, linkage, name);
+        else
+            res = GLCompileShader<GL_TESS_CONTROL_SHADER>(buffer, size, name);
 #else
-        res = HW.pDevice->CreateHullShader(buffer, size, NULL, &sh);
+        res = HW.pDevice->CreateHullShader(buffer, size, linkage, &sh);
 #endif
 
         return res;
@@ -362,10 +440,16 @@ struct ShaderTypeTraits<SDS>
     using MapType = CResourceManager::map_DS;
 
 #ifdef USE_OGL
+    using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
+#ifdef USE_DX11
+    using LinkageType = ID3D11ClassLinkage*;
+#else
+    using LinkageType = void*;
+#endif
     using HWShaderType = ID3D11DomainShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
@@ -399,14 +483,17 @@ struct ShaderTypeTraits<SDS>
     }
 
     static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
-        pcstr name = nullptr)
+        LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
 
 #ifdef USE_OGL
-        res = GLCreateShader<GL_TESS_EVALUATION_SHADER>(buffer, size, name);
+        if (linkage)
+            res = GLUseBinary(buffer, size, linkage, name);
+        else
+            res = GLCompileShader<GL_TESS_EVALUATION_SHADER>(buffer, size, name);
 #else
-        res = HW.pDevice->CreateDomainShader(buffer, size, NULL, &sh);
+        res = HW.pDevice->CreateDomainShader(buffer, size, linkage, &sh);
 #endif
 
         return res;
@@ -421,10 +508,16 @@ struct ShaderTypeTraits<SCS>
     using MapType = CResourceManager::map_CS;
 
 #ifdef USE_OGL
+    using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
+#ifdef USE_DX11
+    using LinkageType = ID3D11ClassLinkage*;
+#else
+    using LinkageType = void*;
+#endif
     using HWShaderType = ID3D11ComputeShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
@@ -462,14 +555,17 @@ struct ShaderTypeTraits<SCS>
     }
 
     static inline ResultType CreateHWShader(BufferType buffer, size_t size, HWShaderType& sh,
-        pcstr name = nullptr)
+        LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
         
 #ifdef USE_OGL
-        res = GLCreateShader<GL_COMPUTE_SHADER>(buffer, size, name);
+        if (linkage)
+            res = GLUseBinary(buffer, size, linkage, name);
+        else
+            res = GLCompileShader<GL_COMPUTE_SHADER>(buffer, size, name);
 #else
-        res = HW.pDevice->CreateComputeShader(buffer, size, NULL, &sh);
+        res = HW.pDevice->CreateComputeShader(buffer, size, linkage, &sh);
 #endif
 
         return res;

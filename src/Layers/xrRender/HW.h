@@ -68,6 +68,10 @@ public:
     SDL_Window* m_hWnd;
     HDC m_hDC;
     SDL_GLContext m_hRC;
+    pcstr AdapterName;
+    pcstr OpenGLVersion;
+    pcstr ShadingVersion;
+    bool ShaderBinarySupported;
 #else // General DirectX
     ID3DDevice* pDevice = nullptr; // render device
     ID3DRenderTargetView* pBaseRT = nullptr; // base render target
