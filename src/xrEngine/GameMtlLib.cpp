@@ -97,8 +97,8 @@ void CGameMtlLibrary::Load()
     material_index = fs.r_u32();
     material_pair_index = fs.r_u32();
 
-    materials.clear();
-    material_pairs.clear();
+    materials.reserve(material_index);
+    material_pairs.reserve(material_pair_index);
 
     IReader* OBJ = fs.open_chunk(GAMEMTLS_CHUNK_MTLS);
     if (OBJ)
