@@ -66,25 +66,21 @@ CUIMapList::CUIMapList()
 CUIMapList::~CUIMapList() {}
 void CUIMapList::StartDedicatedServer()
 {
-    string_path ModuleFileName;
-#ifndef LINUX // FIXME!!!
-    GetModuleFileName(NULL, ModuleFileName, sizeof(ModuleFileName));
+#ifdef WINDOWS
+    strconcat(g_sLaunchOnExit_app, Core.ApplicationPath, "xrEngine.exe");
+#else
+    strconcat(g_sLaunchOnExit_app, Core.ApplicationPath, "xrEngine");
+#endif
+    xr_strcpy(g_sLaunchWorkingFolder, Core.WorkingPath);
 
-    char* ModuleName = NULL;
-    GetFullPathName(ModuleFileName, sizeof(g_sLaunchWorkingFolder), g_sLaunchWorkingFolder, &ModuleName);
-    // removing module name from WorkingDirectory that contain full path...
-    ModuleName[0] = 0;
+    cpcstr params = " -dedicated -i -nosound -";
+    strconcat(g_sLaunchOnExit_params, g_sLaunchOnExit_app, params, GetCommandLine(""));
 
-    xr_strcpy(g_sLaunchOnExit_app, g_sLaunchWorkingFolder);
-    xr_strcat(g_sLaunchOnExit_app, "dedicated" DELIMITER "xrEngine.exe");
 
-    xr_strcpy(g_sLaunchOnExit_params, g_sLaunchOnExit_app);
-    xr_strcat(g_sLaunchOnExit_params, " -i -fsltx .." DELIMITER "fsgame.ltx -nosound -");
-    xr_strcat(g_sLaunchOnExit_params, GetCommandLine(""));
     Msg("Going to quit before starting dedicated server");
     Msg("Working folder is:%s", g_sLaunchWorkingFolder);
     Msg("%s %s", g_sLaunchOnExit_app, g_sLaunchOnExit_params);
-#endif
+
     Console->Execute("quit");
 }
 
