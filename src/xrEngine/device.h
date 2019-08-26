@@ -317,10 +317,17 @@ public:
     }
 
     // Usable only when called from thread, that initialized SDL
+    // Calls SDL_PumpEvents() at least twice.
     static void WaitEvent(Event& event)
     {
+        // Once at the beginning:
+        SDL_PumpEvents();
+
         while (!event.Wait(MaximalWaitTime))
             SDL_PumpEvents();
+
+        // And once in the end:
+        SDL_PumpEvents();
     }
 
     ICF void remove_from_seq_parallel(const fastdelegate::FastDelegate0<>& delegate)
