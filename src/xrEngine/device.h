@@ -316,6 +316,13 @@ public:
         return mtProcessingAllowed;
     }
 
+    // Usable only when called from thread, that initialized SDL
+    static void WaitEvent(Event& event)
+    {
+        while (!event.Wait(MaximalWaitTime))
+            SDL_PumpEvents();
+    }
+
     ICF void remove_from_seq_parallel(const fastdelegate::FastDelegate0<>& delegate)
     {
         xr_vector<fastdelegate::FastDelegate0<>>::iterator I =

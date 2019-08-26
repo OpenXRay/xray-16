@@ -522,8 +522,7 @@ void CRenderDevice::Run()
     GEnv.Render->MakeContextCurrent(false);
     deviceReadyToRun.Set();
 
-    while (!primaryReadyToRun.Wait(MaximalWaitTime))
-        SDL_PumpEvents();
+    WaitEvent(primaryReadyToRun);
 
     splash::hide();
     SDL_HideWindow(m_sdlWnd);

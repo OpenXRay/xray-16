@@ -233,10 +233,8 @@ void CGamePersistent::OnAppStart()
     ansel->Init();
 #endif
 
-    while (!globalsInitialized.Wait(Device.MaximalWaitTime))
-        SDL_PumpEvents();
-    while (!menuCreated.Wait(Device.MaximalWaitTime))
-        SDL_PumpEvents();
+    Device.WaitEvent(globalsInitialized);
+    Device.WaitEvent(menuCreated);
 }
 
 void CGamePersistent::OnAppEnd()

@@ -48,8 +48,7 @@ void CRenderDevice::Create()
 
 void CRenderDevice::WaitUntilCreated()
 {
-    while (!deviceCreated.Wait(MaximalWaitTime))
-        SDL_PumpEvents();
+    WaitEvent(deviceCreated);
     GEnv.Render->MakeContextCurrent(true);
 }
 
