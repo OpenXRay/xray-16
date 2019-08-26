@@ -21,7 +21,8 @@ inline std::pair<GLuint, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcs
     R_ASSERT(program);
     CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
-    CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
+    if (HW.ShaderBinarySupported)
+        CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
 
     glAttachShader(program, shader);
     glBindFragDataLocation(program, 0, "SV_Target");
