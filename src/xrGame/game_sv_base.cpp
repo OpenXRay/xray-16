@@ -1045,7 +1045,7 @@ shared_str game_sv_GameState::parse_level_version(const shared_str& server_optio
     string128 result_version;
     if (map_ver)
     {
-        map_ver += sizeof(map_ver_string);
+        map_ver += xr_strlen(map_ver_string);
         if (strchr(map_ver, '/'))
             strncpy_s(result_version, map_ver, strchr(map_ver, '/') - map_ver);
         else
