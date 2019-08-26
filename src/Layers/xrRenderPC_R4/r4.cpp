@@ -550,7 +550,8 @@ void CRender::BeforeFrame()
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;
     // MT-HOM (@front)
-    TaskScheduler->AddTask("CHOM::MT_RENDER", { &HOM, &CHOM::MT_RENDER });
+    TaskScheduler->AddTask("CHOM::MT_RENDER", { &HOM, &CHOM::MT_RENDER },
+        { &Device, &CRenderDevice::IsMTProcessingAllowed });
 }
 
 void CRender::OnFrame()
