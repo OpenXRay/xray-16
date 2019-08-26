@@ -55,6 +55,7 @@ protected:
     CDB::MODEL* geom_ENV;
 
     // Containers
+    Lock s_sources_lock;
     xr_unordered_map<xr_string, CSoundRender_Source*> s_sources;
     xr_vector<CSoundRender_Emitter*> s_emitters;
     u32 s_emitters_u; // emitter update marker

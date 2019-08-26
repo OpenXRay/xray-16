@@ -21,11 +21,15 @@ bool CSoundRender_Core::i_create_source(CSoundRender_Source*& result, pcstr name
     xr_strlwr(id);
     if (strext(id))
         * strext(id) = 0;
-    const auto it = s_sources.find(id);
-    if (it != s_sources.end())
+
     {
-        result = it->second;
-        return true;
+        ScopeLock scope(&s_sources_lock);
+        const auto it = s_sources.find(id);
+        if (it != s_sources.end())
+        {
+            result = it->second;
+            return true;
+        }
     }
 
     // Load a _new one
@@ -38,7 +42,9 @@ bool CSoundRender_Core::i_create_source(CSoundRender_Source*& result, pcstr name
     }
     else
     {
+        s_sources_lock.Enter();
         s_sources.insert({ id, S });
+        s_sources_lock.Leave();
     }
 
     result = S;
