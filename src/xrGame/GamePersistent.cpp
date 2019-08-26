@@ -207,10 +207,25 @@ extern void init_game_globals();
 
 void CGamePersistent::OnAppStart()
 {
-    Event globalsInitialized, menuCreated;
+    Event materialsLoaded, globalsInitialized, menuCreated;
 
-    TaskScheduler->AddTask("init_game_globals", init_game_globals,
+    // init game globals
+    TaskScheduler->AddTask("init_game_globals()", init_game_globals,
         nullptr, nullptr, &globalsInitialized);
+
+    // load game materials
+    if (psDeviceFlags.test(rsRGL))
+    {
+        // OpenGL renderer requires context switch,
+        // let's just load it synchronously
+        GMLib.Load();
+        materialsLoaded.Set();
+    }
+    else // yay, async
+    {
+        TaskScheduler->AddTask("GMLib.Load()", { &GMLib, &CGameMtlLibrary::Load },
+            nullptr, nullptr, &materialsLoaded);
+    }
 
     SetupUIStyle();
     GEnv.UI = new UICore();
@@ -219,9 +234,6 @@ void CGamePersistent::OnAppStart()
     {
         m_pMainMenu = new CMainMenu();
     }, nullptr, nullptr, &menuCreated);
-
-    // load game materials
-    GMLib.Load();
 
     inherited::OnAppStart();
 
@@ -235,6 +247,7 @@ void CGamePersistent::OnAppStart()
 
     Device.WaitEvent(globalsInitialized);
     Device.WaitEvent(menuCreated);
+    Device.WaitEvent(materialsLoaded);
 }
 
 void CGamePersistent::OnAppEnd()
