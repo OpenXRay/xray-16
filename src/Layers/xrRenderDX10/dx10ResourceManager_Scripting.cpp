@@ -8,6 +8,7 @@
 //	adopt_compiler don't have = operator And it can't have = operator
 #include "xrScriptEngine/script_engine.hpp"
 #include "luabind/return_reference_to_policy.hpp"
+#include "xrCore/Threading/ScopeLock.hpp"
 
 using namespace luabind;
 using namespace luabind::policy;
@@ -454,6 +455,7 @@ BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
     for (int i = 0, l = xr_strlen(s_shader) + 1; i < l; i++)
         undercorated[i] = ('\\' == s_shader[i]) ? '_' : s_shader[i];
 
+    ScopeLock scope(&ScriptEngineLock);
 #ifdef _EDITOR
     return ScriptEngine.object(undercorated, "editor", LUA_TFUNCTION);
 #else
@@ -483,6 +485,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     C.detail_texture = NULL;
     C.detail_scaler = NULL;
 
+    ScriptEngineLock.Enter();
     // Compile element	(LOD0 - HQ)
     if (ScriptEngine.object(s_shader, "normal_hq", LUA_TFUNCTION))
     {
@@ -538,6 +541,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
         C.bDetail = FALSE;
         S.E[4] = C._lua_Compile(s_shader, "l_special");
     }
+    ScriptEngineLock.Leave();
 
     // Search equal in shaders array
     for (u32 it = 0; it < v_shaders.size(); it++)
@@ -561,11 +565,13 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     LPCSTR t_0 = *L_textures[0] ? *L_textures[0] : "null";
     LPCSTR t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
     LPCSTR t_d = detail_texture ? detail_texture : "null";
+    RImplementation.Resources->ScriptEngineLock.Enter();
     const object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
     const functor<void> element = (object)shader[name];
     bool bFirstPass = false;
     adopt_compiler ac = adopt_compiler(this, bFirstPass);
     element(ac, t_0, t_1, t_d);
+    RImplementation.Resources->ScriptEngineLock.Leave();
     r_End();
     ShaderElement* _r = RImplementation.Resources->_CreateElement(E);
     return _r;

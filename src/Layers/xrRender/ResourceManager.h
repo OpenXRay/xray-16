@@ -103,6 +103,7 @@ public:
     BOOL bDeferredLoad;
     bool m_shader_fallback_allowed;
     CScriptEngine ScriptEngine;
+    Lock ScriptEngineLock;
 
 private:
     void LS_Load();
