@@ -311,7 +311,7 @@ public:
     Event PresentationFinished = nullptr;
     volatile BOOL mt_bMustExit;
 
-    bool IsMTProcessingAllowed()
+    bool IsMTProcessingAllowed() const
     {
         return mtProcessingAllowed;
     }
