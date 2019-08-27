@@ -172,20 +172,20 @@ void CEngineAPI::CloseUnusedLibraries()
 {
     // Only windows because on linux only one library is loaded - xrRender_GL
 #ifdef WINDOWS
-    if (GEnv.CurrentRenderer != 5 && renderers[gl_library]->IsLoaded())
-        renderers[gl_library]->Close();
+    if (GEnv.CurrentRenderer != 5)
+        renderers[gl_library] = nullptr;
 
-    if (GEnv.CurrentRenderer != 4 && renderers[r4_library]->IsLoaded())
-        renderers[r4_library]->Close();
+    if (GEnv.CurrentRenderer != 4)
+        renderers[r4_library] = nullptr;
 
-    if (GEnv.CurrentRenderer != 3 && renderers[r3_library]->IsLoaded())
-        renderers[r3_library]->Close();
+    if (GEnv.CurrentRenderer != 3)
+        renderers[r3_library] = nullptr;
 
-    if (GEnv.CurrentRenderer != 2 && renderers[r2_library]->IsLoaded())
-        renderers[r2_library]->Close();
+    if (GEnv.CurrentRenderer != 2)
+        renderers[r2_library] = nullptr;
 
-    if (GEnv.CurrentRenderer != 1 && renderers[r1_library]->IsLoaded())
-        renderers[r1_library]->Close();
+    if (GEnv.CurrentRenderer != 1)
+        renderers[r1_library] = nullptr;
 #endif
 }
 
@@ -224,14 +224,14 @@ void CEngineAPI::CreateRendererList()
     {
         if (renderers[library]->IsLoaded())
         {
-            // Load SupportCheck, SetupEnv and GetModeName functions from DLL
+            // Load SupportCheck function from DLL
             const auto checkSupport = (SupportCheck)renderers[library]->GetProcAddress(check_function);
 
             // Test availability
             if (checkSupport && checkSupport())
                 modes.emplace_back(mode, index);
             else // Close the handle if test is failed
-                renderers[library]->Close();
+                renderers[library] = nullptr;
         }
     };
 
