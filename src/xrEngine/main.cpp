@@ -266,8 +266,10 @@ ENGINE_API void Startup()
     LALib.OnCreate();
 
     pApp = new CApplication();
+#ifdef WINDOWS // XXX: Remove this macro check
     if (GEnv.isDedicatedServer)
         pApp->SetLoadingScreen(new TextLoadingScreen());
+#endif
 
     g_SpatialSpace = new ISpatial_DB("Spatial obj");
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
