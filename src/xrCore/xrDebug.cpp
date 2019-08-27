@@ -811,11 +811,11 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (msgRes != AssertionResult::abort ||
         reportRes == frrvLaunchDebugger)
     {
-        while (true)
-        {
-            if (IsDebuggerPresent())
-                DEBUG_BREAK;
-        }
+        constexpr cpcstr debugger = "Please, attach the debugger to the process"
+            " if you want to debug this fatal error.";
+        ShowMessage("xrDebug", debugger);
+        if (IsDebuggerPresent())
+            DEBUG_BREAK;
     }
 
     if (PrevFilter)
