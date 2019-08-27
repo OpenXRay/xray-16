@@ -73,6 +73,7 @@ ENGINE_API BOOL g_bDisableRedText = FALSE;
 CStats::CStats()
 {
     statsFont = nullptr;
+    fpsFont = nullptr;
     fMem_calls = 0;
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 }
