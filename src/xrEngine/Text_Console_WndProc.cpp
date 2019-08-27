@@ -8,7 +8,9 @@ LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
     {
     case WM_PAINT:
     {
-        // return 0;
+        CTextConsole* pTextConsole = (CTextConsole*)Console;
+        pTextConsole->OnPaint();
+        return 0;
     }
     break;
     case WM_ERASEBKGND:
