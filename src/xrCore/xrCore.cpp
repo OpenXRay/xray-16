@@ -189,23 +189,28 @@ void SDLLogOutput(void* /*userdata*/,
 }
 
 xrCore::xrCore()
-    : ApplicationName{}, ApplicationPath{},
+    : buildId(0), buildDate(__DATE__),
+      buildCommit(TO_STRING(GIT_INFO_CURRENT_COMMIT)),
+      buildBranch(TO_STRING(GIT_INFO_CURRENT_BRANCH)),
+      ApplicationName{}, ApplicationPath{},
       WorkingPath{},
       UserName{}, CompName{},
       Params(nullptr), dwFrame(0),
-      PluginMode(false) {}
+      PluginMode(false)
+{
+    CalculateBuildId();
+}
 
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
     {
-        CalculateBuildId();
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
         if (commandLine)
-            Params = xr_strdup (commandLine);
+            Params = xr_strdup(commandLine);
         else
             Params = xr_strdup("");
 
@@ -402,7 +407,6 @@ void xrCore::CalculateBuildId()
     const int startYear = 1999;
     const char* monthId[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     const int daysInMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    buildDate = __DATE__;
     int days;
     int months = 0;
     int years;

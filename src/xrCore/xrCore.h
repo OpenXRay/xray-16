@@ -116,8 +116,10 @@ public:
 // ***** The Core definition *****
 class XRCORE_API xrCore
 {
-    const char* buildDate = "";
-    u32 buildId = 0;
+    u32 buildId;
+    cpcstr buildDate;
+    cpcstr buildCommit;
+    cpcstr buildBranch;
 
 public:
     xrCore();
