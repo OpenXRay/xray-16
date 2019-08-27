@@ -237,7 +237,8 @@ void CGamePersistent::OnAppStart()
 
     inherited::OnAppStart();
 
-    pApp->SetLoadingScreen(new UILoadingScreen());
+    if (!GEnv.isDedicatedServer)
+        pApp->SetLoadingScreen(new UILoadingScreen());
 
 #ifdef WINDOWS
     ansel = new AnselManager();

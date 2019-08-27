@@ -264,7 +264,11 @@ ENGINE_API void Startup()
     // Initialize APP
     Device.Create();
     LALib.OnCreate();
+
     pApp = new CApplication();
+    if (GEnv.isDedicatedServer)
+        pApp->SetLoadingScreen(new TextLoadingScreen());
+
     g_SpatialSpace = new ISpatial_DB("Spatial obj");
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
     Device.WaitUntilCreated();

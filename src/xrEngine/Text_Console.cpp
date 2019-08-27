@@ -2,6 +2,7 @@
 #include "Text_Console.h"
 #include "line_editor.h"
 #include "SDL_syswm.h"
+#include "x_ray.h"
 
 extern char const* const ioc_prompt;
 extern char const* const ch_cursor;
@@ -342,4 +343,49 @@ void CTextConsole::OnFrame()
      */ InvalidateRect(m_hConsoleWnd, NULL, FALSE);
     SetCursor(LoadCursor(NULL, IDC_ARROW));
     // m_bNeedUpdate = true;
+}
+
+void TextLoadingScreen::Initialize()
+{
+
+}
+
+void TextLoadingScreen::Show(bool status)
+{
+
+}
+
+bool TextLoadingScreen::IsShown()
+{
+    return false;
+}
+
+void TextLoadingScreen::Update(int stagesCompleted, int stagesTotal)
+{
+
+}
+
+void TextLoadingScreen::ForceDrop()
+{
+
+}
+
+void TextLoadingScreen::ForceFinish()
+{
+
+}
+
+void TextLoadingScreen::SetLevelLogo(cpcstr name)
+{
+
+}
+
+void TextLoadingScreen::SetStageTitle(cpcstr title)
+{
+
+}
+
+void TextLoadingScreen::SetStageTip(cpcstr header, cpcstr tipNumber, cpcstr tip)
+{
+
 }

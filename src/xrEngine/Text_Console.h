@@ -1,6 +1,26 @@
 #pragma once
 #include "XR_IOConsole.h"
 #include "IGame_Level.h"
+#include "xrEngine/ILoadingScreen.h"
+
+class TextLoadingScreen : public ILoadingScreen
+{
+public:
+    ~TextLoadingScreen() = default;
+
+    void Initialize() override;
+
+    void Show(bool status) override;
+    bool IsShown() override;
+
+    void Update(int stagesCompleted, int stagesTotal) override;
+    void ForceDrop() override;
+    void ForceFinish() override;
+
+    void SetLevelLogo(cpcstr name) override;
+    void SetStageTitle(cpcstr title) override;
+    void SetStageTip(cpcstr header, cpcstr tipNumber, cpcstr tip) override;
+};
 
 class ENGINE_API CTextConsole : public CConsole
 {

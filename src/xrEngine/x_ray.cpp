@@ -286,6 +286,7 @@ void CApplication::LoadEnd()
 
 void CApplication::SetLoadingScreen(ILoadingScreen* newScreen)
 {
+    R_ASSERT(!loadingScreen);
     loadingScreen = newScreen;
 }
 
