@@ -167,6 +167,8 @@ void CRenderDevice::PrimaryThreadProc(void* context)
 {
     auto& device = *static_cast<CRenderDevice*>(context);
 
+    Core.CoInitializeMultithreaded();
+
     device.deviceCreated.Reset();
     GEnv.Render->MakeContextCurrent(true);
 

@@ -177,10 +177,8 @@ void ALDeviceList::Enumerate()
             GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no",
             GetDeviceDesc(j).props.xram ? "yes" : "no");
     }
-#if defined(WINDOWS)
-    if (!strstr(GetCommandLine(), "-weather"))
-        CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-#endif
+
+    Core.CoInitializeMultithreaded();
 }
 
 pcstr ALDeviceList::GetDeviceName(u32 index) const { return snd_devices_token[index].name; }

@@ -138,6 +138,8 @@ public:
     u32 GetBuildId() const { return buildId; }
     static constexpr pcstr GetBuildConfiguration();
 
+    void CoInitializeMultithreaded() const;
+
 private:
     void CalculateBuildId();
 };

@@ -209,10 +209,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         else
             Params = xr_strdup("");
 
-#if defined(WINDOWS)
-        if (!strstr(Params, "-weather"))
-            CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-#endif
+        CoInitializeMultithreaded();
 
 #if defined(WINDOWS)
         string_path fn, dr, di;
@@ -387,6 +384,14 @@ constexpr pcstr xrCore::GetBuildConfiguration()
 #else
     return "Dx86";
 #endif
+#endif
+}
+
+void xrCore::CoInitializeMultithreaded() const
+{
+#if defined(WINDOWS)
+    if (!strstr(Params, "-weather"))
+        CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
 }
 
