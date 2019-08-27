@@ -104,13 +104,6 @@ static GLuint create_shader(cpcstr pTarget, pcstr* buffer, size_t const buffer_s
     }
 }
 
-struct SHADER_MACRO
-{
-    pcstr Name = nullptr;
-    pcstr Definition = nullptr;
-    pstr  FullDefine = nullptr;
-};
-
 class shader_name_holder
 {
     size_t pos{};
@@ -144,31 +137,22 @@ public:
 class shader_options_holder
 {
     size_t pos{};
-    SHADER_MACRO m_options[128];
+    string512 m_options[128];
 
 public:
-    ~shader_options_holder()
-    {
-        for (; pos != 0; --pos)
-            xr_free(m_options[pos].FullDefine);
-    }
-
     void add(cpcstr name, cpcstr value)
     {
-        string512 option_line;
-        xr_sprintf(option_line, "#define %s\t%s\n", name, value);
-        m_options[pos] = { name, value, xr_strdup(option_line) };
-        ++pos;
+        // It's important to have postfix increment!
+        xr_sprintf(m_options[pos++], "#define %s\t%s\n", name, value);
     }
 
     void finish()
     {
-        m_options[pos] = { nullptr, nullptr, nullptr };
+        m_options[pos][0] = '\0';
     }
 
-    size_t size() const { return pos; }
-    SHADER_MACRO& operator[](size_t idx) { return m_options[idx]; }
-    SHADER_MACRO* data() { return m_options; }
+    [[nodiscard]] size_t size() const { return pos; }
+    string512& operator[](size_t idx) { return m_options[idx]; }
 };
 
 class shader_sources_manager
@@ -272,7 +256,7 @@ private:
         // Make define lines
         for (size_t i = 0; i < options.size(); ++i)
         {
-            m_sources[head_lines + i] = options[i].FullDefine;
+            m_sources[head_lines + i] = options[i];
         }
         CopyMemory(m_sources + head_lines + options.size(), m_source.data(), m_source.size() * sizeof(pstr));
     }
