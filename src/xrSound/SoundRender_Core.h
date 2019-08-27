@@ -95,7 +95,12 @@ public:
     void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) override;
     void destroy(ref_sound& S) override;
 
-    void prefetch() override { i_create_all_sources(); }
+    void prefetch() override
+    {
+        if (!bPresent)
+            return;
+        i_create_all_sources();
+    }
 
     void stop_emitters() override;
     int pause_emitters(bool val) override;
