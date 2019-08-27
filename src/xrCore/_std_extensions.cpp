@@ -13,29 +13,11 @@ int xr_strcmp(const char* S1, const char* S2)
 
 char* timestamp(string64& dest)
 {
-    string64 temp;
+    time_t     now = time(nullptr);
+    struct tm  tstruct;
+    tstruct = *localtime(&now);
 
-    /* Set time zone from TZ environment variable. If TZ is not set,
-    * the operating system is queried to obtain the default value
-    * for the variable.
-    */
-#if defined(WINDOWS)
-    _tzset();
-    u32 it;
+    strftime(dest, sizeof(dest), "%m-%d-%y_%H-%M-%S", &tstruct);
 
-    // date
-    _strdate(temp);
-    for (it = 0; it < xr_strlen(temp); it++)
-        if ('/' == temp[it])
-            temp[it] = '-';
-    strconcat(sizeof(dest), dest, temp, "_");
-
-    // time
-    _strtime(temp);
-    for (it = 0; it < xr_strlen(temp); it++)
-        if (':' == temp[it])
-            temp[it] = '-';
-    xr_strcat(dest, sizeof(dest), temp);
-#endif
     return dest;
 }
