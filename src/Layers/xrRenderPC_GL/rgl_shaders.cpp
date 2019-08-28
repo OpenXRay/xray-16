@@ -265,7 +265,6 @@ private:
 HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
 {
-    shader_sources_manager sources(name);
     shader_options_holder options;
     shader_name_holder sh_name;
 
@@ -527,14 +526,11 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     }
 
     // Don't mix optimized and unoptimized shaders
-    sh_name.append(static_cast<u32>(sources.optimized()));
+    sh_name.append(static_cast<u32>(shader_sources_manager::optimized()));
 
     // finish
     options.finish();
     sh_name.finish();
-
-    // Compile sources list
-    sources.compile(fs, options);
 
     char extension[3];
     strncpy_s(extension, pTarget, 2);
@@ -585,9 +581,14 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         file->close();
     }
 
-    // Compile the shader
+    // Failed to use cached shader, then:
     if (!program)
     {
+        // Compile sources list
+        shader_sources_manager sources(name);
+        sources.compile(fs, options);
+
+        // Compile the shader from sources
         program = create_shader(pTarget, sources.get(), sources.length(), filename, result, nullptr);
 
         if (HW.ShaderBinarySupported && program)
