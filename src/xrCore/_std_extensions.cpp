@@ -15,7 +15,7 @@ char* timestamp(string64& dest)
 {
     time_t     now = time(nullptr);
     struct tm  tstruct;
-    tstruct = *localtime(&now);
+    tstruct = *localtime(&now); // localtime is NOT thread-safe
 
     strftime(dest, sizeof(dest), "%m-%d-%y_%H-%M-%S", &tstruct);
 
