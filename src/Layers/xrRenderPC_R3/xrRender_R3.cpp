@@ -22,12 +22,3 @@ XR_EXPORT bool CheckRendererSupport()
     return xrRender_test_hw() ? true : false;
 }
 }
-
-SCRIPT_EXPORT(CheckRendererSupport_R3, (),
-{
-    using namespace luabind;
-    module(luaState)
-    [
-        def("xrRender_test_r3_hw", &CheckRendererSupport)
-    ];
-});

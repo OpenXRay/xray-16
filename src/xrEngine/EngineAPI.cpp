@@ -10,6 +10,8 @@
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/xr_token.h"
 
+#include "xrScriptEngine/ScriptExporter.hpp"
+
 extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr check_function = "CheckRendererSupport";
@@ -29,6 +31,8 @@ constexpr pcstr renderer_r2_5  = "renderer_r2.5";
 constexpr pcstr renderer_r3    = "renderer_r3";
 constexpr pcstr renderer_r4    = "renderer_r4";
 constexpr pcstr renderer_gl    = "renderer_gl";
+
+static bool r2_available = false;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -239,6 +243,7 @@ void CEngineAPI::CreateRendererList()
     checkRenderer(r1_library, renderer_r1, 0);
     if (renderers[r2_library]->IsLoaded())
     {
+        r2_available = true;
         modes.emplace_back(renderer_r2a, 1);
         modes.emplace_back(renderer_r2,  2);
     }
@@ -256,3 +261,12 @@ void CEngineAPI::CreateRendererList()
         if (mode.name)
             Log(mode.name);
 }
+
+SCRIPT_EXPORT(CheckRendererSupport, (),
+{
+    using namespace luabind;
+    module(luaState)
+    [
+        def("xrRender_test_r2_hw", +[]() { return r2_available; })
+    ];
+});
