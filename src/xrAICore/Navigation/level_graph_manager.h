@@ -10,7 +10,7 @@ class CLevelGraphManager
     xr_vector<CVertex*> m_nodes; // nodes array
 
 public:
-    CLevelGraphManager(IReader* stream, u32 vertex_count, u32 version)
+    CLevelGraphManager(IReader* stream, size_t vertex_count, u32 version)
     {
         m_nodes.resize(vertex_count);
         if (version <= 8)
@@ -18,7 +18,7 @@ public:
             compatibilityMode = true;
             NodeCompressedOld* nodes = static_cast<NodeCompressedOld*>(stream->pointer());
             CVertex* newNodes = new CVertex[vertex_count];
-            for (u32 i = 0; i < vertex_count; ++i)
+            for (size_t i = 0; i < vertex_count; ++i)
             {
                 CVertex& vertex = newNodes[i];
                 NodeCompressed& newNode = vertex;
