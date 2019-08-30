@@ -33,38 +33,17 @@ void UILoadingScreen::Initialize()
     CUIXml uiXml;
     const bool loaded = uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_mm_loading_screen.xml", false);
 
-    if (!loaded) // Robustness? Yes!
+    // It was hardcoded even harder anyway. (search in history for deleted dxApplicationRender class)
+    // Hardcoded XML is more flexible, so:
+    if (!loaded) // then just use preset we have
     {
-        if (ShadowOfChernobylMode)
-        {
-            uiXml.Set(LoadingScreenXMLClearSkyTexturesDescription);
-            CUITextureMaster::ParseShTexInfo(uiXml, false);
-            uiXml.ClearInternal();
-            if (UICore::is_widescreen())
-                uiXml.Set(LoadingScreenXML16x9ShadowOfChernobyl);
-            else
-                uiXml.Set(LoadingScreenXMLClearSky);
-        }
-        else if (ClearSkyMode)
-        {
-            uiXml.Set(LoadingScreenXMLClearSkyTexturesDescription);
-            CUITextureMaster::ParseShTexInfo(uiXml, false);
-            uiXml.ClearInternal();
-            if (UICore::is_widescreen())
-                uiXml.Set(LoadingScreenXML16x9ClearSky);
-            else
-                uiXml.Set(LoadingScreenXMLClearSky);
-        }
-        else
-        {
-            uiXml.Set(LoadingScreenXMLTexturesDescription);
-            CUITextureMaster::ParseShTexInfo(uiXml, false);
-            uiXml.ClearInternal();
-            if (UICore::is_widescreen())
-                uiXml.Set(LoadingScreenXML16x9);
-            else
-                uiXml.Set(LoadingScreenXML);
-        }
+        // First, process textures description for loading screen (just in case)
+        uiXml.Set(GetLoadingScreenTexturesDescr());
+        CUITextureMaster::ParseShTexInfo(uiXml, false);
+        uiXml.ClearInternal(); // cleanup
+
+        // And then, set loading screen itself
+        uiXml.Set(GetLoadingScreenXML());
     }
 
     const auto loadProgressBar = [&]()

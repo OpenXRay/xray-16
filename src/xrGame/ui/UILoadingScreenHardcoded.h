@@ -1,5 +1,8 @@
 #pragma once
 
+pcstr GetLoadingScreenXML();
+pcstr GetLoadingScreenTexturesDescr();
+
 constexpr pcstr LoadingScreenXML =
 "<w>\
 	<background width=\"1024\" height=\"768\">\
@@ -157,3 +160,37 @@ constexpr cpcstr LoadingScreenXMLClearSkyTexturesDescription =
    </file>\
 </w>";
 
+inline pcstr GetLoadingScreenXML()
+{
+    const bool is_wide = UICore::is_widescreen();
+    if (ShadowOfChernobylMode)
+    {
+        if (is_wide)
+            return LoadingScreenXML16x9ShadowOfChernobyl;
+        return LoadingScreenXMLClearSky;
+    }
+    if (ClearSkyMode)
+    {
+        if (is_wide)
+            return LoadingScreenXML16x9ClearSky;
+        return LoadingScreenXMLClearSky;
+    }
+    // Call of Pripyat
+    if (is_wide)
+        return LoadingScreenXML16x9;
+    return LoadingScreenXML;
+}
+
+inline pcstr GetLoadingScreenTexturesDescr()
+{
+    if (ShadowOfChernobylMode)
+    {
+        return LoadingScreenXMLClearSkyTexturesDescription;
+    }
+    if (ClearSkyMode)
+    {
+        return LoadingScreenXMLClearSkyTexturesDescription;
+    }
+    // Call of Pripyat
+    return LoadingScreenXMLTexturesDescription;
+}
