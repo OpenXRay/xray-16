@@ -175,7 +175,13 @@ add_subdirectory(res)
 
 # Unix system configuration
 if (UNIX)
-    # uninstall target
+    # --------------------------------------------------
+    # Uninstall target
+    # --------------------------------------------------
+    # To clean system folder from libraries and binaries
+    # that was installed with `sudo make install`
+    # just run `sudo make uninstall`
+    #
     if(NOT TARGET uninstall)
         configure_file(
                 "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
