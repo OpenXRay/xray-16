@@ -107,12 +107,11 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
     case kCROUCH_TOGGLE:
-        if (!psActorFlags.test(AF_CROUCH_TOGGLE))
-            g_bAutoClearCrouch = !g_bAutoClearCrouch;
-        [[fallthrough]];
     case kCROUCH:
     {
-        if (psActorFlags.test(AF_CROUCH_TOGGLE) || !g_bAutoClearCrouch)
+        if (psActorFlags.test(AF_CROUCH_TOGGLE) || cmd == kCROUCH_TOGGLE)
+            g_bAutoClearCrouch = !g_bAutoClearCrouch;
+        if (!g_bAutoClearCrouch)
             mstate_wishful ^= mcCrouch;
     }
     break;
@@ -267,7 +266,8 @@ void CActor::IR_OnKeyboardRelease(int cmd)
                 g_PerformDrop();
             break;
         case kCROUCH:
-            g_bAutoClearCrouch = true;
+            if (!psActorFlags.test(AF_CROUCH_TOGGLE))
+                g_bAutoClearCrouch = true;
             break;
         }
     }
