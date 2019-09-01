@@ -600,10 +600,12 @@ void xrDebug::DoExit(const std::string& message)
 #else
     exit(1);
 #endif
+    // if you're under debugger, you can jump here manually
+    if (OnDialog)
+        OnDialog(false);
 
-    volatile bool neverTrue = false; // if you're under debugger,
-    if (neverTrue && windowHandler) // you can jump here manually
-        windowHandler->ResetFullscreen(); // to reset fullscreen
+    if (windowHandler)
+        windowHandler->ResetFullscreen();
 }
 
 LPCSTR xrDebug::ErrorToString(long code)
@@ -815,15 +817,15 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
             DEBUG_BREAK;
     }
 
+    // Typically, PrevFilter is BugTrap filter
     if (PrevFilter)
         PrevFilter(exPtrs);
 
     if (OnDialog)
         OnDialog(false);
 
-    volatile bool neverTrue = false; // if you're under debugger,
-    if (neverTrue && windowHandler) // you can manually
-        windowHandler->ResetFullscreen(); // reset fullscreen
+    if (windowHandler)
+        windowHandler->ResetFullscreen();
 
     return EXCEPTION_CONTINUE_SEARCH;
 #else
