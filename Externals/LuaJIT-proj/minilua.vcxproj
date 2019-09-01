@@ -64,12 +64,20 @@
     </PostBuildEvent>
     <ClCompile>
       <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp17</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
     <PostBuildEvent>
       <Command>$(OutDir)$(TargetName) ..\LuaJIT\dynasm\dynasm.lua -LN -D WIN -D JIT -D FFI -D P64 -o .\buildvm_arch_$(PlatformShortName).h ..\LuaJIT\src\vm_x86.dasc</Command>
     </PostBuildEvent>
+    <ClCompile>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp17</LanguageStandard>
+    </ClCompile>
+    <ClCompile>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\LuaJIT\src\host\minilua.c" />
