@@ -716,6 +716,7 @@ void xrDebug::SetupExceptionHandler()
     BT_SetDumpType(minidumpFlags);
     //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
     BT_SetSupportEMail("openxray@yahoo.com");
+    BT_SetSupportURL("https://github.com/OpenXRay/xray-16/issues");
 #endif
 }
 
