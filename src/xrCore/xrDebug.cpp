@@ -581,6 +581,9 @@ void xrDebug::DoExit(const std::string& message)
     if (windowHandler)
         windowHandler->DisableFullscreen();
 
+    if (OnDialog)
+        OnDialog(true);
+
     FlushLog();
 
     if (ShowErrorMessage)
@@ -780,15 +783,15 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (windowHandler)
         windowHandler->DisableFullscreen();
 
+    if (OnDialog)
+        OnDialog(true);
+
     constexpr pcstr fatalError = "Fatal error";
 
     AssertionResult msgRes = AssertionResult::abort;
 
     if (!ErrorAfterDialog && ShowErrorMessage)
     {
-        if (OnDialog)
-            OnDialog(true);
-
         constexpr pcstr msg = "Fatal error occurred\n\n"
             "Press OK to abort program execution";
         msgRes = ShowMessage(fatalError, msg);
@@ -811,7 +814,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (PrevFilter)
         PrevFilter(exPtrs);
 
-    if (OnDialog && ShowErrorMessage)
+    if (OnDialog)
         OnDialog(false);
 
     volatile bool neverTrue = false; // if you're under debugger,
