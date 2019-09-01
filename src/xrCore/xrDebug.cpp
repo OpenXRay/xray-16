@@ -756,8 +756,10 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         xr_vector<xr_string> stackTrace = BuildStackTrace(exPtrs->ContextRecord, 1024);
         *exPtrs->ContextRecord = save;
         Msg("stack trace:\n");
+#ifdef DEBUG
         if (!IsDebuggerPresent())
             os_clipboard::copy_to_clipboard("stack trace:\r\n\r\n");
+#endif
         string4096 buffer;
         for (size_t i = 0; i < stackTrace.size(); i++)
         {
