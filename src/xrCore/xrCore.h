@@ -25,6 +25,12 @@
 #define DEBUG
 #endif
 
+#define MACRO_TO_STRING_HELPER(a) #a
+#define MACRO_TO_STRING(a) MACRO_TO_STRING_HELPER(a)
+
+#define CONCATENIZE_HELPER(a, b) a##b
+#define CONCATENIZE(a, b) CONCATENIZE_HELPER(a, b)
+
 // Warnings
 #pragma warning(disable : 4100) // unreferenced formal parameter
 #pragma warning(disable : 4127) // conditional expression is constant
@@ -101,6 +107,18 @@ using RTokenVec = xr_vector<xr_rtoken>;
 #include "net_utils.h"
 #include "Threading/ThreadUtil.h"
 
+#if __has_include(".GitInfo.hpp")
+#include ".GitInfo.hpp"
+#endif
+
+#ifndef GIT_INFO_CURRENT_COMMIT
+#define GIT_INFO_CURRENT_COMMIT unknown
+#endif
+
+#ifndef GIT_INFO_CURRENT_BRANCH
+#define GIT_INFO_CURRENT_BRANCH unknown
+#endif
+
 // destructor
 template <class T>
 class destructor
@@ -116,10 +134,10 @@ public:
 // ***** The Core definition *****
 class XRCORE_API xrCore
 {
-    u32 buildId;
-    cpcstr buildDate;
-    cpcstr buildCommit;
-    cpcstr buildBranch;
+    u32 buildId; // XXX: Make constexpr
+    static constexpr pcstr buildDate = __DATE__;
+    static constexpr pcstr buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
+    static constexpr pcstr buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
 
 public:
     xrCore();
@@ -136,8 +154,12 @@ public:
     void Initialize(
         pcstr ApplicationName, pcstr commandLine = nullptr, LogCallback cb = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false);
     void _destroy();
-    const char* GetBuildDate() const { return buildDate; }
+
     u32 GetBuildId() const { return buildId; }
+    static constexpr pcstr GetBuildDate() { return buildDate; }
+    static constexpr pcstr GetBuildCommit() { return buildCommit; }
+    static constexpr pcstr GetBuildBranch() { return buildBranch; }
+
     static constexpr pcstr GetBuildConfiguration();
 
     void CoInitializeMultithreaded() const;

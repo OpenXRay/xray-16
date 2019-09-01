@@ -18,18 +18,6 @@
 #include "xrCore/_std_extensions.h"
 #include "SDL.h"
 
-#if __has_include(".GitInfo.hpp")
-#include ".GitInfo.hpp"
-#endif
-
-#ifndef GIT_INFO_CURRENT_BRANCH
-#define GIT_INFO_CURRENT_BRANCH unknown
-#endif
-
-#ifndef GIT_INFO_CURRENT_COMMIT
-#define GIT_INFO_CURRENT_COMMIT unknown
-#endif
-
 #include "Compression/compression_ppmd_stream.h"
 extern compression::ppmd::stream* trained_model;
 
@@ -46,16 +34,13 @@ static u32 init_counter = 0;
 #endif
 #endif
 
-#define HELPER(s) #s
-#define TO_STRING(s) HELPER(s)
-
 void PrintBuildInfo()
 {
     pcstr name = "Custom";
     pcstr buildId = nullptr;
     pcstr builder = nullptr;
-    pcstr commit = TO_STRING(GIT_INFO_CURRENT_COMMIT);
-    pcstr branch = TO_STRING(GIT_INFO_CURRENT_BRANCH);
+    pcstr commit = Core.GetBuildCommit();
+    pcstr branch = Core.GetBuildBranch();
 
 #if defined(CI)
 #if defined(APPVEYOR)
@@ -73,16 +58,16 @@ void PrintBuildInfo()
 #endif
 
     string512 buf;
-    strconcat(sizeof(buf), buf, name, " build "); // "%s build "
+    strconcat(buf, name, " build "); // "%s build "
 
     if (buildId)
-        strconcat(sizeof(buf), buf, buf, buildId, " "); // "id "
+        strconcat(buf, buf, buildId, " "); // "id "
 
-    strconcat(sizeof(buf), buf, buf, "from commit[", commit, "]"); // "from commit[hash]"
-    strconcat(sizeof(buf), buf, buf, " branch[", branch, "]"); // " branch[name]"
+    strconcat(buf, buf, "from commit[", commit, "]"); // "from commit[hash]"
+    strconcat(buf, buf, " branch[", branch, "]"); // " branch[name]"
 
     if (builder)
-        strconcat(sizeof(buf), buf, buf, " (built by ", builder, ")"); // " (built by builder)"
+        strconcat(buf, buf, " (built by ", builder, ")"); // " (built by builder)"
 
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
@@ -189,10 +174,7 @@ void SDLLogOutput(void* /*userdata*/,
 }
 
 xrCore::xrCore()
-    : buildId(0), buildDate(__DATE__),
-      buildCommit(TO_STRING(GIT_INFO_CURRENT_COMMIT)),
-      buildBranch(TO_STRING(GIT_INFO_CURRENT_BRANCH)),
-      ApplicationName{}, ApplicationPath{},
+    : ApplicationName{}, ApplicationPath{},
       WorkingPath{},
       UserName{}, CompName{},
       Params(nullptr), dwFrame(0),
