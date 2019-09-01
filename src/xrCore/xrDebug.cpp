@@ -589,7 +589,7 @@ void xrDebug::DoExit(const std::string& message)
     if (ShowErrorMessage)
     {
         const auto result = ShowMessage("Error", message.c_str(), false);
-        if (result != AssertionResult::abort)
+        if (result != AssertionResult::abort && IsDebuggerPresent())
             DEBUG_BREAK;
     }
     else
@@ -597,6 +597,8 @@ void xrDebug::DoExit(const std::string& message)
 
 #if defined(WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
+#else
+    exit(1);
 #endif
 
     volatile bool neverTrue = false; // if you're under debugger,
