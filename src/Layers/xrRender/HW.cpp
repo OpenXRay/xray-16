@@ -298,11 +298,11 @@ u32 CHW::selectPresentInterval()
     return D3DPRESENT_INTERVAL_DEFAULT;
 }
 
-void CheckForIntelGMA(CHWCaps& Caps)
+void CheckForIntelGMA(u32 id_vendor, u32 id_device)
 {
     bool isIntelGMA = false;
 
-    if (Caps.id_vendor == 0x8086) // Intel
+    if (id_vendor == 0x8086) // Intel
     {
         constexpr auto GMA_SL_SIZE = 43;
         constexpr DWORD IntelGMA_SoftList[GMA_SL_SIZE] =
@@ -316,7 +316,7 @@ void CheckForIntelGMA(CHWCaps& Caps)
 
         for (int idx = 0; idx < GMA_SL_SIZE; ++idx)
         {
-            if (IntelGMA_SoftList[idx] == Caps.id_device)
+            if (IntelGMA_SoftList[idx] == id_device)
             {
                 isIntelGMA = true;
                 break;
@@ -349,7 +349,7 @@ void CheckForIntelGMA(CHWCaps& Caps)
 u32 CHW::selectGPU()
 {
 #if RENDER == R_R1
-    CheckForIntelGMA(Caps);
+    CheckForIntelGMA(Caps.id_vendor, Caps.id_device);
 #endif
 
     if (Caps.bForceGPU_SW)
