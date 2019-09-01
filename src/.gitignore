@@ -10,6 +10,7 @@ _ReSharper.Caches/
 *.sdf
 *.opensdf
 *.user
+*.user.props
 *.VC.opendb
 *.VC.db
 *.nvuser

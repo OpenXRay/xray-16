@@ -54,7 +54,7 @@
   <PropertyGroup Label="UserMacros">
     <!-- Default is v142 -->
     <xrPlatformToolset>v142</xrPlatformToolset>
-    
+
     <!-- v141 is allowed -->
     <xrPlatformToolset Condition="'$(DefaultPlatformToolset)'=='v141'">v141</xrPlatformToolset>
   </PropertyGroup>
@@ -155,4 +155,5 @@
       <OutputFile>$(xrLibDir)$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
+  <Import Project="Common.user.props" Condition="exists('Common.user.props')"/>
 </Project>
