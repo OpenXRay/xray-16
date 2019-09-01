@@ -107,10 +107,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
         Log("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
             "Can not find matching format for back buffer.");
-        FlushLog();
-        MessageBox(nullptr, "Failed to initialize graphics hardware.\nPlease try to restart the game.", "Error!",
-            MB_OK | MB_ICONERROR);
-        TerminateProcess(GetCurrentProcess(), 0);
+        xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     }
 
     // Set up the presentation parameters
@@ -177,10 +174,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
         Msg("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
             "CreateDevice returned 0x%08x(D3DERR_DEVICELOST)", result);
-        FlushLog();
-        MessageBox(nullptr, "Failed to initialize graphics hardware.\nPlease try to restart the game.", "Error!",
-            MB_OK | MB_ICONERROR);
-        TerminateProcess(GetCurrentProcess(), 0);
+        xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     };
 
     _SHOW_REF("* CREATE: DeviceREF:", HW.pDevice);
