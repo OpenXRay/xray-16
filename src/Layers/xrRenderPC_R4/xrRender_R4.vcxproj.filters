@@ -390,9 +390,6 @@
     <ClInclude Include="..\xrRender\ColorMapManager.h">
       <Filter>Core_Target\ColorMap</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\HW.h">
-      <Filter>Refactored\HW</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\HWCaps.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
@@ -719,6 +716,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX10\dx10HW.h">
+      <Filter>Refactored\HW</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1052,9 +1052,6 @@
     <ClCompile Include="..\xrRenderDX10\dx10HW.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\HWCaps.cpp">
-      <Filter>Refactored\HW</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\R_Backend.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
@@ -1315,6 +1312,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX10\dx10HWCaps.cpp">
+      <Filter>Refactored\HW</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

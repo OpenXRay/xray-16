@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Layers/xrRender/HW.h"
+#include "dx10HW.h"
 #include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"

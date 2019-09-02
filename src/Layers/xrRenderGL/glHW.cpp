@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRender/HW.h"
+#include "Layers/xrRenderGL/glHW.h"
 #include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "Include/xrAPI/xrAPI.h"

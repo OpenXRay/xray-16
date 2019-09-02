@@ -153,6 +153,7 @@
     <ClCompile Include="..\xrRenderGL\glHW.cpp" />
     <ClCompile Include="..\xrRenderGL\glBufferUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glDetailManager_VS.cpp" />
+    <ClCompile Include="..\xrRenderGL\glHWCaps.cpp" />
     <ClCompile Include="..\xrRenderGL\glMinMaxSMBlender.cpp" />
     <ClCompile Include="..\xrRenderGL\glSH_RT.cpp" />
     <ClCompile Include="..\xrRenderGL\glSH_Texture.cpp" />
@@ -261,7 +262,6 @@
     <ClCompile Include="..\xrRender\FBasicVisual.cpp" />
     <ClCompile Include="..\xrRender\FHierrarhyVisual.cpp" />
     <ClCompile Include="..\xrRender\HOM.cpp" />
-    <ClCompile Include="..\xrRender\HWCaps.cpp" />
     <ClCompile Include="..\xrRender\light.cpp" />
     <ClCompile Include="..\xrRender\LightTrack.cpp" />
     <ClCompile Include="..\xrRender\Light_DB.cpp" />
@@ -348,6 +348,7 @@
     <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h" />
     <ClInclude Include="..\xrRenderGL\glBufferPool.h" />
     <ClInclude Include="..\xrRenderGL\glBufferUtils.h" />
+    <ClInclude Include="..\xrRenderGL\glHW.h" />
     <ClInclude Include="..\xrRenderGL\glMinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderGL\glR_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderGL\glr_constants_cache.h" />
@@ -384,7 +385,6 @@
     <ClInclude Include="..\xrRender\FSkinned.h" />
     <ClInclude Include="..\xrRender\FTreeVisual.h" />
     <ClInclude Include="..\xrRender\FVisual.h" />
-    <ClInclude Include="..\xrRender\HW.h" />
     <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
     <ClInclude Include="..\xrRender\ModelPool.h" />
     <ClInclude Include="..\xrRender\r_sun_cascades.h" />
