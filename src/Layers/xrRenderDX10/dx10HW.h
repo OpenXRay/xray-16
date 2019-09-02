@@ -21,18 +21,29 @@ public:
     void DestroyD3D();
 
     void CreateDevice(SDL_Window* sdlWnd);
-
-    void CreateSwapChain(HWND hwnd);
-    bool CreateSwapChain2(HWND hwnd);
-
     void DestroyDevice();
 
     void Reset();
 
-    u32 selectPresentInterval();
-    BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
-
     void Validate() {}
+
+    bool CheckFormatSupport(DXGI_FORMAT format, UINT feature) const;
+    DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT formats[], size_t count) const;
+    template <size_t count>
+    inline DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT (&formats)[count]) const
+    {
+        return SelectFormat(feature, formats, count);
+    }
+    bool UsingFlipPresentationModel() const;
+
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
+
+private:
+    void CreateSwapChain(HWND hwnd);
+    bool CreateSwapChain2(HWND hwnd);
+
+    void UpdateViews();
 
 public:
     CHWCaps Caps;
@@ -65,19 +76,6 @@ public:
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
-
-    void UpdateViews();
-
-    bool CheckFormatSupport(DXGI_FORMAT format, UINT feature) const;
-    DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT formats[], size_t count) const;
-    template <size_t count>
-    inline DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT (&formats)[count]) const
-    {
-        return SelectFormat(feature, formats, count);
-    }
-    bool UsingFlipPresentationModel() const;
-    virtual void OnAppActivate();
-    virtual void OnAppDeactivate();
 };
 
 extern ECORE_API CHW HW;

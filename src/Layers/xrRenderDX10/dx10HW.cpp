@@ -385,13 +385,6 @@ bool CHW::UsingFlipPresentationModel() const
     ;
 }
 
-BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
-{
-    // TODO: DX10: implement stub for this code.
-    VERIFY(!"Implement CHW::support");
-    return TRUE;
-}
-
 void CHW::UpdateViews()
 {
     const DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;

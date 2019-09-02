@@ -24,9 +24,6 @@ public:
 
     void Reset();
 
-    D3DFORMAT selectDepthStencil(D3DFORMAT);
-    u32 selectPresentInterval();
-    u32 selectGPU();
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 
 #if defined(DEBUG)
@@ -39,7 +36,11 @@ public:
     void Validate() {}
 #endif
 
-    // Variables section
+private:
+    u32 selectPresentInterval();
+    u32 selectGPU();
+    D3DFORMAT selectDepthStencil(D3DFORMAT);
+
 public:
     CHWCaps Caps;
 
@@ -52,10 +53,7 @@ public:
 #ifdef DEBUG
     IDirect3DStateBlock9* dwDebugSB = nullptr;
 #endif
-private:
-    XRay::Module hD3D = nullptr;
 
-public:
     IDirect3D9* pD3D = nullptr; // D3D
 
     UINT DevAdapter;
@@ -64,6 +62,9 @@ public:
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
+
+private:
+    XRay::Module hD3D = nullptr;
 };
 
 extern ECORE_API CHW HW;
