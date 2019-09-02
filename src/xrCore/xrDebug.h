@@ -81,6 +81,8 @@ public:
     static void OnThreadSpawn();
     static void OnFilesystemInitialized();
 
+    static bool DebuggerIsPresent();
+
     static IWindowHandler* GetWindowHandler() { return windowHandler; }
     static void SetWindowHandler(IWindowHandler* handler) { windowHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }

@@ -412,7 +412,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
 
     buffer = assertionInfo;
 #if defined(WINDOWS)
-    if (IsDebuggerPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert"))
+    if (DebuggerIsPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert"))
         return;
 #endif
     Log("stack trace:\n");
@@ -562,7 +562,7 @@ void xrDebug::DoExit(const std::string& message)
     if (ShowErrorMessage)
     {
         const auto result = ShowMessage("Error", message.c_str(), false);
-        if (result != AssertionResult::abort && IsDebuggerPresent())
+        if (result != AssertionResult::abort && DebuggerIsPresent())
             DEBUG_BREAK;
     }
     else
@@ -704,6 +704,18 @@ void xrDebug::OnFilesystemInitialized()
 #endif
 }
 
+bool xrDebug::DebuggerIsPresent()
+{
+#ifdef WINDOWS
+    return IsDebuggerPresent();
+#else
+    if (ptrace(PTRACE_TRACEME, 0, 0, 0) == -1)
+        return true;
+    ptrace(PTRACE_DETACH, 0, 0, 0);
+    return false;
+#endif
+}
+
 void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 {
 #if defined(WINDOWS)
@@ -734,7 +746,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         *exPtrs->ContextRecord = save;
         Msg("stack trace:\n");
 #ifdef DEBUG
-        if (!IsDebuggerPresent())
+        if (!DebuggerIsPresent())
             os_clipboard::copy_to_clipboard("stack trace:\r\n\r\n");
 #endif
         string4096 buffer;
@@ -743,7 +755,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
             Log(stackTrace[i].c_str());
             xr_sprintf(buffer, sizeof(buffer), "%s\r\n", stackTrace[i].c_str());
 #ifdef DEBUG
-            if (!IsDebuggerPresent())
+            if (!DebuggerIsPresent())
                 os_clipboard::update_clipboard(buffer);
 #endif
         }
@@ -752,7 +764,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
             Msg("\n%s", errMsg);
             xr_strcat(errMsg, "\r\n");
 #ifdef DEBUG
-            if (!IsDebuggerPresent())
+            if (!DebuggerIsPresent())
                 os_clipboard::update_clipboard(buffer);
 #endif
         }
@@ -786,7 +798,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         constexpr cpcstr debugger = "Please, attach the debugger to the process"
             " if you want to debug this fatal error.";
         ShowMessage("xrDebug", debugger);
-        if (IsDebuggerPresent())
+        if (DebuggerIsPresent())
             DEBUG_BREAK;
     }
 

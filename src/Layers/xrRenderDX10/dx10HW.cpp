@@ -83,7 +83,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     UINT createDeviceFlags = 0;
 
 #ifdef DEBUG
-    if (IsDebuggerPresent())
+    if (xrDebug::DebuggerIsPresent())
         createDeviceFlags |= D3D_CREATE_DEVICE_DEBUG;
 #endif
 
