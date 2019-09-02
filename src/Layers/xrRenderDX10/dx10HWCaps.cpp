@@ -110,7 +110,6 @@ u32 GetGpuNum() { return 1; }
 #endif
 }
 
-
 void CHWCaps::Update()
 {
     // ***************** GEOMETRY

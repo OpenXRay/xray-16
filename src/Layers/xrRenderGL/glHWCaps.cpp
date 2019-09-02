@@ -4,12 +4,10 @@
 #include "Layers/xrRender/HWCaps.h"
 #include "glHW.h"
 
-
 namespace
 {
 u32 GetGpuNum() { return 1; }
 }
-
 
 void CHWCaps::Update()
 {

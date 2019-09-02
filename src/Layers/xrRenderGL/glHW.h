@@ -5,7 +5,6 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
-
 class CHW
 {
 public:

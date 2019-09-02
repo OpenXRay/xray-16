@@ -17,7 +17,6 @@ public:
     CHW();
     ~CHW();
 
-
     void CreateD3D();
     void DestroyD3D();
 
