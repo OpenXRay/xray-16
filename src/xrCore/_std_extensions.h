@@ -265,7 +265,6 @@ inline void MemFill32(void* dst, u32 value, size_t dstSize)
         *ptr++ = value;
 }
 
-// This function is NOT thread-safe
 XRCORE_API char* timestamp(string64& dest);
 
 extern XRCORE_API u32 crc32(const void* P, u32 len);
