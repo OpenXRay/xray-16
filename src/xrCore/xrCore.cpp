@@ -45,11 +45,11 @@ void PrintBuildInfo()
 #if defined(CI)
 #if defined(APPVEYOR)
     name = "AppVeyor";
-    buildId = TO_STRING(APPVEYOR_BUILD_VERSION);
-    builder = TO_STRING(APPVEYOR_ACCOUNT_NAME);
+    buildId = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
+    builder = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
 #elif defined(TRAVIS)
     name = "Travis";
-    buildId = TO_STRING(TRAVIS_BUILD_NUMBER);
+    buildId = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
 #else
 #pragma TODO("PrintCI for other CIs")
     name = "CI";
