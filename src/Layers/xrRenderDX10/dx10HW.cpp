@@ -385,13 +385,6 @@ bool CHW::UsingFlipPresentationModel() const
     ;
 }
 
-D3DFORMAT CHW::selectDepthStencil(D3DFORMAT /*fTarget*/)
-{
-// R3 hack
-#pragma todo("R3 need to specify depth format")
-    return D3DFMT_D24S8;
-}
-
 BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 {
     // TODO: DX10: implement stub for this code.

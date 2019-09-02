@@ -29,9 +29,7 @@ public:
 
     void Reset();
 
-    D3DFORMAT selectDepthStencil(D3DFORMAT);
     u32 selectPresentInterval();
-    u32 selectGPU();
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 
     void Validate() {}
