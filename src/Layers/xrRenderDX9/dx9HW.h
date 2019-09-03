@@ -1,12 +1,12 @@
 #pragma once
 
-#include "HWCaps.h"
+#include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
 #include "SDL.h"
 #include "SDL_syswm.h"
 
 #if !defined(_MAYA_EXPORT)
-#include "stats_manager.h"
+#include "Layers/xrRender/stats_manager.h"
 #endif
 
 class CHW

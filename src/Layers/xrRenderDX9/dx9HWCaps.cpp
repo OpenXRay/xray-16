@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "HWCaps.h"
-#include "HW.h"
+#include "Layers/xrRender/HWCaps.h"
+#include "dx9HW.h"
 
 #if !defined(_EDITOR)
 #include <nvapi.h>

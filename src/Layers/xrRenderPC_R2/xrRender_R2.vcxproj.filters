@@ -342,9 +342,6 @@
     <ClInclude Include="..\xrRender\ColorMapManager.h">
       <Filter>Core_Target\ColorMap</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\HW.h">
-      <Filter>Refactored\HW</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\HWCaps.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
@@ -614,6 +611,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\ShaderResourceTraits.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX9\dx9HW.h">
+      <Filter>Refactored\HW</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -911,12 +911,6 @@
     <ClCompile Include="..\xrRender\ColorMapManager.cpp">
       <Filter>Core_Target\ColorMap</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\HW.cpp">
-      <Filter>Refactored\HW</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\HWCaps.cpp">
-      <Filter>Refactored\HW</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\R_Backend.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
@@ -1105,6 +1099,12 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9HW.cpp">
+      <Filter>Refactored\HW</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9HWCaps.cpp">
+      <Filter>Refactored\HW</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
