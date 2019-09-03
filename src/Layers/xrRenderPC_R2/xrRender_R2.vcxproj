@@ -187,6 +187,7 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
+    <ClInclude Include="..\xrRenderDX9\dx9HW.h" />
     <ClInclude Include="..\xrRenderDX9\dx9R_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderDX9\dx9r_constants_cache.h" />
     <ClInclude Include="..\xrRender\Animation.h" />
@@ -240,7 +241,6 @@
     <ClInclude Include="..\xrRender\FVF.h" />
     <ClInclude Include="..\xrRender\FVisual.h" />
     <ClInclude Include="..\xrRender\HOM.h" />
-    <ClInclude Include="..\xrRender\HW.h" />
     <ClInclude Include="..\xrRender\HWCaps.h" />
     <ClInclude Include="..\xrRender\IRenderDetailModel.h" />
     <ClInclude Include="..\xrRender\KinematicAnimatedDefs.h" />
@@ -318,6 +318,8 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\xrRenderDX9\dx9HW.cpp" />
+    <ClCompile Include="..\xrRenderDX9\dx9HWCaps.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9r_constants_cache.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender.cpp" />
@@ -372,8 +374,6 @@
     <ClCompile Include="..\xrRender\FTreeVisual.cpp" />
     <ClCompile Include="..\xrRender\FVisual.cpp" />
     <ClCompile Include="..\xrRender\HOM.cpp" />
-    <ClCompile Include="..\xrRender\HW.cpp" />
-    <ClCompile Include="..\xrRender\HWCaps.cpp" />
     <ClCompile Include="..\xrRender\light.cpp" />
     <ClCompile Include="..\xrRender\LightTrack.cpp" />
     <ClCompile Include="..\xrRender\Light_DB.cpp" />

@@ -197,6 +197,7 @@
     <ClInclude Include="..\xrRenderDX10\dx10BufferUtils.h" />
     <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer.h" />
     <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer_impl.h" />
+    <ClInclude Include="..\xrRenderDX10\dx10HW.h" />
     <ClInclude Include="..\xrRenderDX10\dx10MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderDX10\dx10R_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderDX10\dx10r_constants_cache.h" />
@@ -260,7 +261,6 @@
     <ClInclude Include="..\xrRender\FVF.h" />
     <ClInclude Include="..\xrRender\FVisual.h" />
     <ClInclude Include="..\xrRender\HOM.h" />
-    <ClInclude Include="..\xrRender\HW.h" />
     <ClInclude Include="..\xrRender\HWCaps.h" />
     <ClInclude Include="..\xrRender\IRenderDetailModel.h" />
     <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp" />
@@ -352,6 +352,7 @@
     <ClCompile Include="..\xrRenderDX10\dx10ConstantBuffer.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10HW.cpp" />
+    <ClCompile Include="..\xrRenderDX10\dx10HWCaps.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10MinMaxSMBlender.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10ResourceManager_Resources.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10ResourceManager_Scripting.cpp" />
@@ -422,7 +423,6 @@
     <ClCompile Include="..\xrRender\FTreeVisual.cpp" />
     <ClCompile Include="..\xrRender\FVisual.cpp" />
     <ClCompile Include="..\xrRender\HOM.cpp" />
-    <ClCompile Include="..\xrRender\HWCaps.cpp" />
     <ClCompile Include="..\xrRender\light.cpp" />
     <ClCompile Include="..\xrRender\LightTrack.cpp" />
     <ClCompile Include="..\xrRender\Light_DB.cpp" />

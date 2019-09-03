@@ -1,17 +1,17 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "HWCaps.h"
-#include "HW.h"
+#include "Layers/xrRender/HWCaps.h"
+#include "dx9HW.h"
 
-#if !defined(_EDITOR) && !defined(USE_OGL)
+#if !defined(_EDITOR)
 #include <nvapi.h>
 #include <ags_lib/inc/amd_ags.h>
 #endif
 
 namespace
 {
-#if !defined(_EDITOR) && !defined(USE_OGL)
+#if !defined(_EDITOR)
 u32 GetNVGpuNum()
 {
     NvLogicalGpuHandle logicalGPUs[NVAPI_MAX_LOGICAL_GPUS];
@@ -110,7 +110,6 @@ u32 GetGpuNum() { return 1; }
 #endif
 }
 
-#ifdef USE_DX9
 void CHWCaps::Update()
 {
     D3DCAPS9 caps;
@@ -219,71 +218,3 @@ void CHWCaps::Update()
 
     iGPUNum = GetGpuNum();
 }
-#else // USE_DX9
-void CHWCaps::Update()
-{
-    // ***************** GEOMETRY
-    geometry_major = 4;
-    geometry_minor = 0;
-    geometry.bSoftware = FALSE;
-    geometry.bPointSprites = FALSE;
-    geometry.bNPatches = FALSE;
-    DWORD cnt = 256;
-    clamp<DWORD>(cnt, 0, 256);
-    geometry.dwRegisters = cnt;
-    geometry.dwInstructions = 256;
-    geometry.dwClipPlanes = _min(6, 15);
-#ifdef USE_OGL
-    // XXX: Disabled by default. Need to:
-    // FIX: Sky texture filtering (point filter now) when VTF is on
-    // TODO: Implement support VTF and: HW.support(D3DFMT_R32F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_VERTEXTEXTURE)
-    geometry.bVTF = (strstr(Core.Params, "-vtf")) ? TRUE : FALSE;
-#else // USE_OGL
-    geometry.bVTF = TRUE;
-#endif // USE_OGL
-
-    // ***************** PIXEL processing
-    raster_major = 4;
-    raster_minor = 0;
-    // XXX: review this
-    raster.dwStages = 15; // Previuos value is 16, but it's out of bounds
-    raster.bNonPow2 = TRUE;
-    raster.bCubemap = TRUE;
-    raster.dwMRT_count = 4;
-    // raster.b_MRT_mixdepth		= FALSE;
-    raster.b_MRT_mixdepth = TRUE;
-    raster.dwInstructions = 256;
-    //	TODO: DX10: Find a way to detect cache size
-    geometry.dwVertexCache = 24;
-
-#ifndef USE_OGL
-    // ***************** Info
-    Msg("* GPU shading: vs(%x/%d.%d/%d), ps(%x/%d.%d/%d)", 0, geometry_major, geometry_minor,
-        CAP_VERSION(geometry_major, geometry_minor), 0, raster_major, raster_minor,
-        CAP_VERSION(raster_major, raster_minor));
-    // *******1********** Vertex cache
-    Msg("* GPU vertex cache: %s, %d", "unrecognized", u32(geometry.dwVertexCache));
-#endif // USE_OGL
-    // *******1********** Compatibility : vertex shader
-    if (0 == raster_major)
-        geometry_major = 0; // Disable VS if no PS
-
-    //
-    bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
-
-    // Detect if stencil available
-    bStencil = TRUE;
-
-    // Scissoring
-    bScissor = TRUE;
-
-    // Stencil relative caps
-    soInc = D3DSTENCILOP_INCRSAT;
-    soDec = D3DSTENCILOP_DECRSAT;
-    dwMaxStencilValue = (1 << 8) - 1;
-
-    // DEV INFO
-
-    iGPUNum = GetGpuNum();
-}
-#endif // USE_DX9

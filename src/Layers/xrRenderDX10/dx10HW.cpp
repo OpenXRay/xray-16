@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Layers/xrRender/HW.h"
+#include "dx10HW.h"
 #include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
@@ -383,20 +383,6 @@ bool CHW::UsingFlipPresentationModel() const
         || m_ChainDesc.SwapEffect == DXGI_SWAP_EFFECT_FLIP_DISCARD
 #endif
     ;
-}
-
-D3DFORMAT CHW::selectDepthStencil(D3DFORMAT /*fTarget*/)
-{
-// R3 hack
-#pragma todo("R3 need to specify depth format")
-    return D3DFMT_D24S8;
-}
-
-BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
-{
-    // TODO: DX10: implement stub for this code.
-    VERIFY(!"Implement CHW::support");
-    return TRUE;
 }
 
 void CHW::UpdateViews()

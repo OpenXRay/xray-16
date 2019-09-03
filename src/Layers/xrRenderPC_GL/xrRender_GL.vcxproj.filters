@@ -435,9 +435,6 @@
     <ClCompile Include="..\xrRender\SkeletonX.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\HWCaps.cpp">
-      <Filter>Refactored\HW</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\r__sector_traversal.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
@@ -686,6 +683,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderGL\glBufferPool.cpp">
       <Filter>dx9 to gl Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glHWCaps.cpp">
+      <Filter>Refactored\HW</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -995,9 +995,6 @@
     <ClInclude Include="..\xrRender\Light_Render_Direct.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\HW.h">
-      <Filter>Refactored\HW</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\RenderFactory.h">
       <Filter>Interface implementations\RenderFactory</Filter>
     </ClInclude>
@@ -1129,6 +1126,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRenderGL\glBufferPool.h">
       <Filter>dx9 to gl Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderGL\glHW.h">
+      <Filter>Refactored\HW</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -229,19 +229,6 @@ void CRender::create()
     o.fp16_filter = true;
     o.fp16_blend = true;
 
-    // search for ATI formats
-    if (!o.HW_smap && (0 == strstr(Core.Params, "-nodf24")))
-    {
-        o.HW_smap = HW.support((D3DFORMAT)(MAKEFOURCC('D', 'F', '2', '4')), D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
-        if (o.HW_smap)
-        {
-            o.HW_smap_FORMAT = MAKEFOURCC('D', 'F', '2', '4');
-            o.HW_smap_PCF = FALSE;
-            o.HW_smap_FETCH4 = TRUE;
-        }
-        Msg("* DF24/F4 supported and used [%X]", o.HW_smap_FORMAT);
-    }
-
     // emulate ATI-R4xx series
     if (strstr(Core.Params, "-r4xx"))
     {
