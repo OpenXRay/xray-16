@@ -24,11 +24,7 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-#ifdef USE_DX11
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
-#else
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
-#endif
 {
     if (pSurface)
         return;
@@ -133,6 +129,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 #ifdef USE_DX11
     if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1 && useUAV)
         desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+#else
+    UNUSED(useUAV);
 #endif
 
     CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));

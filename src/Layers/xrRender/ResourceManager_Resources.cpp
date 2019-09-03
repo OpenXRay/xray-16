@@ -203,7 +203,7 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
+CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, bool useUAV /*= false*/)
 {
     R_ASSERT(Name && Name[0] && w && h);
 
@@ -218,7 +218,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*S
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets.insert(std::make_pair(RT->set_name(Name), RT));
         if (RDEVICE.b_is_Ready)
-            RT->create(Name, w, h, f);
+            RT->create(Name, w, h, f, sampleCount, useUAV);
         return RT;
     }
 }
