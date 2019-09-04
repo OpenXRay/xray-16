@@ -74,6 +74,7 @@ game_action actions[] = {
     { "map",                kMAP,               _both },
     { "contacts",           kCONTACTS,          _sp },
     { "ext_1",              kEXT_1,             _both },
+    { "invweapon_unload",  kWPN_UNLOAD,         _sp }, // Unload all guns in the backpack
 
     { "vote_begin",        kVOTE_BEGIN,        _both },
     { "show_admin_menu",   kSHOW_ADMIN_MENU,   _both },
