@@ -673,23 +673,6 @@ bool CInventory::Action(u16 cmd, u32 flags)
         case kWPN_ZOOM: { pActor->SetZoomRndSeed();
         }
         break;
-        case kWPN_UNLOAD: // Unload all guns in the backpack
-        {
-            for (TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it)
-            {
-                CWeapon* wpn = smart_cast<CWeapon*>(*it);
-                if (wpn)
-                {
-                    CWeaponMagazined* weap_mag = smart_cast<CWeaponMagazined*>(wpn);
-                    if (weap_mag)
-                    {
-                        weap_mag->UnloadMagazine(); // @TODO What about addons? Grenade launcher unload?
-                        //weap_mag->PlayReloadSound(); // @TODO Sound?
-                    }
-                }
-            }
-        }
-        break;
         };
     };
 

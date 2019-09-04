@@ -71,7 +71,6 @@ enum EGameActions
     kMAP,
     kCONTACTS,
     kEXT_1,
-    kWPN_UNLOAD, // Unload all guns in the backpack
 
     kVOTE_BEGIN,
     kSHOW_ADMIN_MENU,
