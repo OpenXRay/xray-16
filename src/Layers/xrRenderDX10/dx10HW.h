@@ -61,6 +61,9 @@ public:
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
     D3D_FEATURE_LEVEL FeatureLevel;
     bool ComputeShadersSupported;
+    bool DoublePrecisionFloatShaderOps;
+    bool SAD4ShaderInstructions;
+    bool ExtendedDoublesShaderInstructions;
 #ifdef HAS_DX11_2
     IDXGIFactory2* m_pFactory2 = nullptr;
     IDXGISwapChain2* m_pSwapChain2 = nullptr;

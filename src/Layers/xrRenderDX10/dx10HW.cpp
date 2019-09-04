@@ -120,6 +120,15 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             &data, sizeof(data));
         ComputeShadersSupported = data.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
     }
+    D3D11_FEATURE_DATA_D3D11_OPTIONS options;
+    pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &options, sizeof(options));
+
+    D3D11_FEATURE_DATA_DOUBLES doubles;
+    pDevice->CheckFeatureSupport(D3D11_FEATURE_DOUBLES, &doubles, sizeof(doubles));
+
+    DoublePrecisionFloatShaderOps = doubles.DoublePrecisionFloatShaderOps;
+    SAD4ShaderInstructions = options.SAD4ShaderInstructions;
+    ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
 
