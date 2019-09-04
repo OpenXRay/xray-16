@@ -108,12 +108,9 @@ struct ShaderTypeTraits<SVS>
         case D3D_FEATURE_LEVEL_10_1:
             return "vs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
-            return "vs_5_0";
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-            if (HW.pDevice3)
-                return "vs_5_1";
-#endif
+        case D3D_FEATURE_LEVEL_12_0:
+        case D3D_FEATURE_LEVEL_12_1:
             return "vs_5_0";
         }
 #endif
@@ -211,12 +208,9 @@ struct ShaderTypeTraits<SPS>
         case D3D_FEATURE_LEVEL_10_1:
             return "ps_4_1";
         case D3D_FEATURE_LEVEL_11_0:
-            return "ps_5_0";
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-            if (HW.pDevice3)
-                return "ps_5_1";
-#endif
+        case D3D_FEATURE_LEVEL_12_0:
+        case D3D_FEATURE_LEVEL_12_1:
             return "ps_5_0";
         }
 #endif // USE_DX11
@@ -324,12 +318,9 @@ struct ShaderTypeTraits<SGS>
         case D3D_FEATURE_LEVEL_10_1:
             return "gs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
-            return "gs_5_0";
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-            if (HW.pDevice3)
-                return "gs_5_1";
-#endif
+        case D3D_FEATURE_LEVEL_12_0:
+        case D3D_FEATURE_LEVEL_12_1:
             return "gs_5_0";
         }
 #endif // USE_DX11
@@ -392,20 +383,6 @@ struct ShaderTypeTraits<SHS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX11
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_11_0:
-            return "hs_5_0";
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-            if (HW.pDevice3)
-                return "hs_5_1";
-#endif
-            return "hs_5_0";
-        }
-#endif // USE_DX11
-
         return "hs_5_0";
     }
 
@@ -460,20 +437,6 @@ struct ShaderTypeTraits<SDS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX11
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_11_0:
-            return "ds_5_0";
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-            if (HW.pDevice3)
-                return "ds_5_1";
-#endif
-            return "ds_5_0";
-        }
-#endif // USE_DX11
-
         return "ds_5_0";
     }
 
@@ -536,12 +499,9 @@ struct ShaderTypeTraits<SCS>
         case D3D_FEATURE_LEVEL_10_1:
             return "cs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
-            return "cs_5_0";
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-            if (HW.pDevice3)
-                return "cs_5_1";
-#endif
+        case D3D_FEATURE_LEVEL_12_0:
+        case D3D_FEATURE_LEVEL_12_1:
             return "cs_5_0";
         }
 #endif // USE_DX11
