@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
+	<string id="st_unload_magazine_all">
+		<text>unload all weapons</text>
+	</string>
 	<string id="st_unequip">
 		<text>unequip</text>
 	</string>
