@@ -25,9 +25,9 @@ extern XRCORE_API xrMemory Memory;
 #undef ZeroMemory
 #undef CopyMemory
 #undef FillMemory
-#define ZeroMemory(a, b) memset(a, 0, b)
-#define CopyMemory(a, b, c) memcpy(a, b, c)
-#define FillMemory(a, b, c) memset(a, c, b)
+#define ZeroMemory(dst, size) memset(dst, 0, size)
+#define CopyMemory(dst, src, size) memcpy(dst, src, size)
+#define FillMemory(dst, size, val) memset(dst, val, size)
 
 /*
 Начиная со стандарта C++11 нет необходимости объявлять все формы операторов new и delete.
