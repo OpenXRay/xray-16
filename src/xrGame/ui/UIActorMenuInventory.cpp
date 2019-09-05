@@ -1029,6 +1029,7 @@ void CUIActorMenu::PropertiesBoxForWeapon(CUICellItem* cell_item, PIItem item, b
         if (b)
         {
             m_UIPropertiesBox->AddItem("st_unload_magazine", NULL, INVENTORY_UNLOAD_MAGAZINE);
+            m_UIPropertiesBox->AddItem("st_unload_magazine_all", NULL, INVENTORY_UNLOAD_MAGAZINE_ALL);
             b_show = true;
         }
     }
@@ -1409,6 +1410,30 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
             if (child_weap_mag)
             {
                 child_weap_mag->UnloadMagazine();
+            }
+        }
+        break;
+    }
+    case INVENTORY_UNLOAD_MAGAZINE_ALL:
+    {
+        u32 const ci_count = m_pInventoryBagList->ItemsCount();
+        for (u32 i = 0; i < ci_count; ++i)
+        {
+            CUICellItem* ci = m_pInventoryBagList->GetItemIdx(i);
+            VERIFY(ci);
+            CWeaponMagazined* weap_mag = smart_cast<CWeaponMagazined*>((CWeapon*)ci->m_pData);
+            if (weap_mag)
+            {
+                weap_mag->UnloadMagazine();
+                for (u32 i = 0; i < ci->ChildsCount(); ++i)
+                {
+                    CUICellItem* child_itm = ci->Child(i);
+                    CWeaponMagazined* child_weap_mag = smart_cast<CWeaponMagazined*>((CWeapon*)child_itm->m_pData);
+                    if (child_weap_mag)
+                    {
+                        child_weap_mag->UnloadMagazine();
+                    }
+                }
             }
         }
         break;
