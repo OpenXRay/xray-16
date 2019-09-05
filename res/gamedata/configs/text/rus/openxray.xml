@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
 	<string id="st_unload_magazine_all">
-		<text>разрядить всё</text>
+		<text>разрядить всё оружие</text>
 	</string>
 	<string id="st_unequip">
 		<text>убрать в рюкзак</text>
