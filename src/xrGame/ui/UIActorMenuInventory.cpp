@@ -1416,23 +1416,17 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
     }
     case INVENTORY_UNLOAD_MAGAZINE_ALL:
     {
-        u32 const ci_count = m_pInventoryBagList->ItemsCount();
-        for (u32 i = 0; i < ci_count; ++i)
+        TIItemContainer ruck_list;
+        ruck_list = m_pActorInvOwner->inventory().m_ruck;
+        for (TIItemContainer::const_iterator it = ruck_list.begin(); ruck_list.end() != it; ++it)
         {
-            CUICellItem* ci = m_pInventoryBagList->GetItemIdx(i);
-            VERIFY(ci);
-            CWeaponMagazined* weap_mag = smart_cast<CWeaponMagazined*>((CWeapon*)ci->m_pData);
-            if (weap_mag)
+            CWeapon* wpn = smart_cast<CWeapon*>(*it);
+            if (wpn)
             {
-                weap_mag->UnloadMagazine();
-                for (u32 i = 0; i < ci->ChildsCount(); ++i)
+                CWeaponMagazined* weap_mag = smart_cast<CWeaponMagazined*>(wpn);
+                if (weap_mag)
                 {
-                    CUICellItem* child_itm = ci->Child(i);
-                    CWeaponMagazined* child_weap_mag = smart_cast<CWeaponMagazined*>((CWeapon*)child_itm->m_pData);
-                    if (child_weap_mag)
-                    {
-                        child_weap_mag->UnloadMagazine();
-                    }
+                    weap_mag->UnloadMagazine();
                 }
             }
         }
