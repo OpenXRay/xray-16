@@ -45,8 +45,11 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
             selected = *I;
         }
     }
-    VERIFY2(level_graph.valid_vertex_id(selected),
+    bool selected_vertex_id_is_valid = level_graph.valid_vertex_id(selected);
+    VERIFY2(selected_vertex_id_is_valid,
         make_string("vertex_id[%d], object[%s], position[%f][%f][%f]", selected, *name(), VPUSH(position)));
+    if (!selected_vertex_id_is_valid)
+        return -1;
 
     {
         min_dist_sqr = flt_max;
@@ -74,7 +77,10 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
         }
         selected = new_selected;
     }
-    VERIFY(level_graph.valid_vertex_id(selected));
+    selected_vertex_id_is_valid = level_graph.valid_vertex_id(selected);
+    VERIFY(selected_vertex_id_is_valid);
+    if (!selected_vertex_id_is_valid)
+        return -1;
 
     {
         Fvector center = level_graph.vertex_position(selected);
@@ -113,7 +119,10 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
         }
         VERIFY(found);
     }
-    VERIFY(level_graph.valid_vertex_id(selected));
+    selected_vertex_id_is_valid = level_graph.valid_vertex_id(selected);
+    VERIFY(selected_vertex_id_is_valid);
+    if (!selected_vertex_id_is_valid)
+        return -1;
 
     return (selected);
 }
