@@ -984,6 +984,10 @@ void CRender::render_sun_near()
         //		fuckingsun->svis.begin					();
     }
 
+    // Actor Shadow
+    if (psDeviceFlags.test(rsDrawDynamic))
+        g_hud->Render_First();
+
     // Fill the database
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
 
