@@ -7,8 +7,6 @@
 const float tweak_rain_COP_initial_offs = 1200.f;
 const float tweak_rain_ortho_xform_initial_offs = 1000.f; //. ?
 
-
-
 //	Defined in r2_R_sun.cpp
 Fvector3 wform(Fmatrix& m, Fvector3 const& v);
 void XRMatrixOrthoOffCenterLH(Fmatrix *pout, float l, float r, float b, float t, float zn, float zf);

@@ -152,7 +152,6 @@ static inline BOOL PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0
     return TRUE;
 }
 
-
 Frustum::Frustum()
 {
     for (int i = 0; i < 6; i++)
