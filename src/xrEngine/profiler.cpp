@@ -7,8 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-// XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-#if 0
+
 #include "profiler.h"
 #include "xrEngine/GameFont.h"
 
@@ -268,4 +267,3 @@ void CProfiler::add_profile_portion	(const CProfileResultPortion &profile_portio
 	InterlockedExchange			(&critical_section_counter,0);
 #endif // CONFIG_PROFILE_LOCKS
 }
-#endif

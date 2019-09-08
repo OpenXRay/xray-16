@@ -30,6 +30,7 @@ typedef xr_vector<std::pair<shared_str, int>> STORY_PAIRS;
 extern STORY_PAIRS story_ids;
 extern STORY_PAIRS spawn_story_ids;
 
+extern void release_smart_cast_stats();
 extern void clean_wnd_rects();
 extern void CreateUIGeom();
 extern void DestroyUIGeom();
@@ -57,7 +58,6 @@ void init_game_globals()
 
 extern CUIXml* g_uiSpotXml;
 extern CUIXml* pWpnScopeXml;
-
 
 void clean_game_globals()
 {
@@ -100,9 +100,8 @@ void clean_game_globals()
     xr_delete(g_sound_collection_storage);
 
 #ifdef DEBUG
-    // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-    // xr_delete										(g_profiler);
-    // release_smart_cast_stats();
+    xr_delete(g_profiler);
+    release_smart_cast_stats();
 #endif
 
     RELATION_REGISTRY::clear_relation_registry();

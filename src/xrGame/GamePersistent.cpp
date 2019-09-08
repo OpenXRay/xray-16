@@ -763,9 +763,8 @@ void CGamePersistent::OnFrame()
     }
 
 #ifdef DEBUG
-// XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-// if ((m_last_stats_frame + 1) < m_frame_counter)
-//	profiler().clear		();
+    if ((m_last_stats_frame + 1) < m_frame_counter)
+        profiler().clear();
 #endif
     UpdateDof();
 }
@@ -821,9 +820,10 @@ void CGamePersistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     IGame_Persistent::DumpStatistics(font, alert);
 #ifdef DEBUG
 #ifndef _EDITOR
+    font.OutSet(400, 120);
     m_last_stats_frame = m_frame_counter;
-// XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-// profiler().show_stats(font,!!psAI_Flags.test(aiStats));
+    profiler().show_stats(font, psAI_Flags.test(aiStats));
+    font.OutSet(0, 0);
 #endif
 #endif
 }
