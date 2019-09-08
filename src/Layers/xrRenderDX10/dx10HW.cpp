@@ -92,13 +92,20 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 #ifdef USE_DX11
     D3D_FEATURE_LEVEL featureLevels[] =
     {
+        D3D_FEATURE_LEVEL_12_1,
+        D3D_FEATURE_LEVEL_12_0,
         D3D_FEATURE_LEVEL_11_1,
         D3D_FEATURE_LEVEL_11_0,
         D3D_FEATURE_LEVEL_10_1,
         D3D_FEATURE_LEVEL_10_0
     };
 
-    constexpr auto count = std::size(featureLevels);
+    D3D_FEATURE_LEVEL featureLevels2[] =
+    {
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0
+    };
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
@@ -107,9 +114,9 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
     };
 
-    R = createDevice(featureLevels, count);
+    R = createDevice(featureLevels, std::size(featureLevels));
     if (FAILED(R))
-        R = createDevice(&featureLevels[1], count - 1);
+        R = createDevice(featureLevels2, std::size(featureLevels2));
 
     if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
         ComputeShadersSupported = true;
