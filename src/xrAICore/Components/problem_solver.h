@@ -150,5 +150,3 @@ public:
     IC const xr_vector<_operator_id_type>& solution() const;
     virtual void clear();
 };
-
-#include "xrAICore/Components/problem_solver_inline.h"
