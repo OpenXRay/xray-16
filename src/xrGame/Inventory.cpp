@@ -405,8 +405,7 @@ bool CInventory::Slot(u16 slot_id, PIItem pIItem, bool bNotActivate, bool strict
         m_slots[pIItem->CurrSlot()].m_pIItem = NULL;
     }
 
-    if (((m_iActiveSlot == slot_id) || (m_iActiveSlot == NO_ACTIVE_SLOT) && m_iNextActiveSlot == NO_ACTIVE_SLOT) &&
-        (!bNotActivate))
+    if ((m_iActiveSlot == slot_id) || ((m_iActiveSlot == NO_ACTIVE_SLOT) && (m_iNextActiveSlot == NO_ACTIVE_SLOT) && (!bNotActivate)))
     {
 #ifdef DEBUG
         Msg("---To Slot: activating slot [%d], Frame[%d]", slot_id, Device.dwFrame);
