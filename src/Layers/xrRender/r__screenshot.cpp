@@ -59,8 +59,12 @@ bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWO
     const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     const u8 header[6] =
     {
-        width % 256, width / 256,
-        height % 256, height / 256,
+        // Dirty hack with types convertion
+        // TODO: Find better solution for this.
+        (u8)(width % 256),
+        (u8)(width / 256),
+        (u8)(height % 256),
+        (u8)(height / 256),
         bits, 0
     };
 
