@@ -92,8 +92,6 @@ CMainMenu::CMainMenu() : languageChanged(false)
     g_pGamePersistent->m_pMainMenu = this;
     if (Device.b_is_Ready)
         OnDeviceCreate();
-    ReadTextureInfo();
-    CUIXmlInit::InitColorDefs();
     g_btnHint = NULL;
     g_statHint = NULL;
     m_deactivated_frame = 0;
@@ -180,48 +178,6 @@ CMainMenu::~CMainMenu()
     delete_data(m_pMB_ErrDlgs);
 
     ai().Unsubscribe(m_script_reset_event_cid, CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
-}
-
-void CMainMenu::ReadTextureInfo()
-{
-    string_path buf;
-    FS_FileSet files;
-
-    const auto ParseFileSet = [&](pcstr path)
-    {
-        FS.file_list(files, "$game_config$", FS_ListFiles,
-            strconcat(sizeof(buf), buf, path, DELIMITER "textures_descr" DELIMITER "*.xml")
-        );
-        for (const auto& file : files)
-        {
-            string_path path, name;
-            _splitpath(file.name.c_str(), nullptr, path, name, nullptr);
-            xr_strcat(name, ".xml");
-            path[xr_strlen(path) - 1] = '\0'; // cut the latest '\\'
-
-            CUITextureMaster::ParseShTexInfo(path, name);
-        }
-    };
-
-    ParseFileSet(UI_PATH_DEFAULT);
-
-    if (0 != xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
-        ParseFileSet(UI_PATH);
-
-    if (pSettings->section_exist("texture_desc"))
-    {
-        string256 single_item;
-
-        cpcstr itemsList = pSettings->r_string("texture_desc", "files");
-        const u32 itemsCount = _GetItemCount(itemsList);
-
-        for (u32 i = 0; i < itemsCount; i++)
-        {
-            _GetItem(itemsList, i, single_item);
-            xr_strcat(single_item, ".xml");
-            CUITextureMaster::ParseShTexInfo(single_item);
-        }
-    }
 }
 
 void CMainMenu::Activate(bool bActivate)
@@ -823,8 +779,9 @@ void CMainMenu::OnDeviceReset()
 
 void CMainMenu::OnUIReset()
 {
+    // XXX: move to UICore
     CUIXmlInitBase::InitColorDefs();
-    ReadTextureInfo();
+    GEnv.UI->ReadTextureInfo();
     ReloadUI();
 }
 

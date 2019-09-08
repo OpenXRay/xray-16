@@ -29,6 +29,7 @@ public:
 
     UICore();
     ~UICore();
+    void ReadTextureInfo();
     CFontManager& Font() { return *m_pFontManager; }
     CUICursor& GetUICursor() { return *m_pUICursor; }
     IC float ClientToScreenScaledX(float left) const { return left * m_current_scale->x; };
