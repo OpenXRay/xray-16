@@ -53,8 +53,8 @@ public:
     virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     virtual void Die(IGameObject* who);
     virtual void Think();
-    virtual void HitSignal(float /**P/**/, Fvector& /**local_dir/**/, IGameObject* /**who/**/, s16 /**element/**/){};
-    virtual void HitImpulse(float /**P/**/, Fvector& /**vWorldDir/**/, Fvector& /**vLocalDir/**/){};
+    virtual void HitSignal(float /**P**/, Fvector& /**local_dir**/, IGameObject* /**who**/, s16 /**element**/){};
+    virtual void HitImpulse(float /**P**/, Fvector& /**vWorldDir**/, Fvector& /**vLocalDir**/){};
     virtual void Hit(SHit* pHDS) { inherited::Hit(pHDS); }
     virtual void UpdateCL();
 

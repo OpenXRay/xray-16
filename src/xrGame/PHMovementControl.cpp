@@ -150,7 +150,7 @@ void CPHMovementControl::in_shedule_Update(u32 DT)
 }
 
 void CPHMovementControl::Calculate(
-    Fvector& vAccel, const Fvector& camDir, float /**ang_speed/**/, float jump, float /**dt/**/, bool /**bLight/**/)
+    Fvector& vAccel, const Fvector& camDir, float /**ang_speed**/, float jump, float /**dt**/, bool /**bLight**/)
 {
     Fvector previous_position;
     previous_position.set(vPosition);
@@ -933,7 +933,7 @@ void CPHMovementControl::Load(LPCSTR section)
     //	ActivateBox	(0);
 }
 
-void CPHMovementControl::CheckEnvironment(const Fvector& /**V/**/)
+void CPHMovementControl::CheckEnvironment(const Fvector& /**V**/)
 {
     eOldEnvironment = eEnvironment;
     switch (m_character->CheckInvironment())

@@ -178,7 +178,7 @@ public:
     virtual void SetTurnAnimation(bool turn_left);
 
     // установка специфических анимаций
-    virtual void CheckSpecParams(u32 /**spec_params/**/) {}
+    virtual void CheckSpecParams(u32 /**spec_params**/) {}
     virtual void ForceFinalAnimation() {}
     virtual void LookPosition(Fvector to_point,
         float angular_speed =

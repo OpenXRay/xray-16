@@ -312,7 +312,7 @@ struct conversion_sequence
         struct helper
         {
             typedef
-                typename conversion_sequence<Target, T, length, use_heritage /**,new_visited/**/>::result search_result;
+                typename conversion_sequence<Target, T, length, use_heritage /**,new_visited**/>::result search_result;
 
             template <bool>
             struct selector

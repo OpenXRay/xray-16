@@ -201,9 +201,9 @@ MotionID CStalkerAnimationManager::weapon_animation(u32 slot, const EBodyState& 
         if (eMovementTypeWalk == movement.movement_type())
         {
             if ((body_state == eBodyStateStand) && (slot == 2) && need_look_back())
-                return (animation[13 + m_looking_back - 1].A[1 /**1/**/]);
+                return (animation[13 + m_looking_back - 1].A[1 /**1**/]);
             else
-                return (animation[1].A[0 /**2/**/]);
+                return (animation[1].A[0 /**2**/]);
         }
 
         if ((body_state == eBodyStateStand) && (slot == 2) && need_look_back())

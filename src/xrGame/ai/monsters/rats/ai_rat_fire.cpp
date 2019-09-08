@@ -17,7 +17,7 @@
 
 using namespace RatSpace;
 
-void CAI_Rat::Exec_Action(float /**dt/**/)
+void CAI_Rat::Exec_Action(float /**dt**/)
 {
     switch (m_tAction)
     {
@@ -73,7 +73,7 @@ void CAI_Rat::Exec_Action(float /**dt/**/)
     }
 }
 
-void CAI_Rat::HitSignal(float amount, Fvector& vLocalDir, IGameObject* who, s16 /**element/**/)
+void CAI_Rat::HitSignal(float amount, Fvector& vLocalDir, IGameObject* who, s16 /**element**/)
 {
     // Save event
     Fvector D;

@@ -809,7 +809,7 @@ void CStalkerActionDetourEnemy::initialize()
     aim_ready();
 
 #ifdef DISABLE_COVER_BEFORE_DETOUR
-    if (/**(Random.randF(1.f) < .8f) && /**/ object().agent_manager().member().member(m_object).cover())
+    if (/**(Random.randF(1.f) < .8f) && **/ object().agent_manager().member().member(m_object).cover())
         object().agent_manager().location().add(
             new CDangerCoverLocation(object().agent_manager().member().member(m_object).cover(), Device.dwTimeGlobal,
                 TEMP_DANGER_INTERVAL, TEMP_DANGER_DISTANCE, object().agent_manager().member().mask(&object())));

@@ -57,7 +57,7 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* obj
             CActor* actor = smart_cast<CActor*>(entity);
             CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(entity);
             // в кого попали?
-            if (actor && IsGameTypeSingle() /**/ || stalker /**/)
+            if (actor && IsGameTypeSingle() || stalker)
             {
                 // попали в актера или сталкера
                 Fsphere S = cform->getSphere();

@@ -41,7 +41,7 @@ Msg("*   %s",*visible_objects()[i]->cName());\
 %7.3f",*cName(),s,m_fTimeUpdateDelta,float(Device.dwTimeGlobal)/1000.f);\
     m_bStopThinking = true;\
 }
-/**/
+**/
 
 #ifndef DEBUG
 #undef WRITE_TO_LOG

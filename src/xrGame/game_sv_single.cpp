@@ -37,7 +37,7 @@ CSE_Abstract*		game_sv_Single::get_entity_from_eid		(u16 id)
 
     return				(object);
 }
-/**/
+**/
 
 void game_sv_Single::OnCreate(u16 id_who)
 {

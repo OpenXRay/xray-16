@@ -41,7 +41,7 @@ void CAI_Rat::load_animations()
     tpVisualObject->PlayCycle(m_tRatAnimations.tNormal.tGlobal.tpaIdle[0]);
 }
 
-void CAI_Rat::SelectAnimation(const Fvector& /**_view/**/, const Fvector& /**_move/**/, float /**speed/**/)
+void CAI_Rat::SelectAnimation(const Fvector& /**_view**/, const Fvector& /**_move**/, float /**speed**/)
 {
     IKinematicsAnimated* tpVisualObject = smart_cast<IKinematicsAnimated*>(Visual());
     MotionID tpGlobalAnimation;

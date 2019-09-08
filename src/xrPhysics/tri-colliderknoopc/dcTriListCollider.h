@@ -43,15 +43,15 @@ private:
     IC bool FragmentonSphereTest(
         const dReal* center, const dReal radius, const dReal* pt1, const dReal* pt2, dReal* norm, dReal& depth);
     IC bool PointSphereTest(const dReal* center, const dReal radius, const dReal* pt, dReal* norm, dReal& depth);
-    int dSortedTriSphere(const dReal* /**v1/**/, const dReal* /**v2/**/, const dReal* triAx, CDB::TRI* T, dReal dist,
+    int dSortedTriSphere(const dReal* /**v1**/, const dReal* /**v2**/, const dReal* triAx, CDB::TRI* T, dReal dist,
         dxGeom* Sphere, dxGeom* Geometry, int Flags, dContactGeom* Contacts, int skip);
-    IC float dSphereProj(dxGeom* sphere, const dReal* /**normal/**/)
+    IC float dSphereProj(dxGeom* sphere, const dReal* /**normal**/)
     {
         VERIFY(dGeomGetClass(sphere) == dSphereClass);
         return dGeomSphereGetRadius(sphere);
     }
     int dTriSphere(const dReal* v0, const dReal* v1, const dReal* v2, Triangle* T, dxGeom* Sphere, dxGeom* Geometry,
-        int Flags, dContactGeom* Contacts, int /**skip/**/);
+        int Flags, dContactGeom* Contacts, int /**skip**/);
     IC float dBoxProj(dxGeom* box, const dReal* normal);
     IC void CrossProjLine(const dReal* pt1, const dReal* vc1, const dReal* pt2, const dReal* vc2, dReal* proj);
     IC void CrossProjLine1(const dReal* pt1, const dReal* vc1, const dReal* pt2, const dReal* vc2, dReal* proj);

@@ -121,7 +121,7 @@ public:
 #endif
             return TRUE;
         }
-        /**/
+        **/
         return TRUE;
     }
     IC void get(u16& ID, u16& dest, u16& type, NET_Packet& P)
