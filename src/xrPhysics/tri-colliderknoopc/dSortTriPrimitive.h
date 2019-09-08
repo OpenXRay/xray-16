@@ -17,19 +17,22 @@
 IC bool negative_tri_set_ignored_by_positive_tri(
     const Triangle& neg_tri, const Triangle& pos_tri, const Fvector* V_array)
 {
-    bool common0 = neg_tri.T->verts[0] == pos_tri.T->verts[0] || neg_tri.T->verts[0] == pos_tri.T->verts[1] ||
-        neg_tri.T->verts[0] == pos_tri.T->verts[2];
+    bool common0 =  (neg_tri.T->verts[0] == pos_tri.T->verts[0]) ||
+                    (neg_tri.T->verts[0] == pos_tri.T->verts[1]) ||
+                    (neg_tri.T->verts[0] == pos_tri.T->verts[2]);
 
-    bool common1 = neg_tri.T->verts[1] == pos_tri.T->verts[0] || neg_tri.T->verts[1] == pos_tri.T->verts[1] ||
-        neg_tri.T->verts[1] == pos_tri.T->verts[2];
+    bool common1 =  (neg_tri.T->verts[1] == pos_tri.T->verts[0]) ||
+                    (neg_tri.T->verts[1] == pos_tri.T->verts[1]) ||
+                    (neg_tri.T->verts[1] == pos_tri.T->verts[2]);
 
-    bool common2 = neg_tri.T->verts[2] == pos_tri.T->verts[0] || neg_tri.T->verts[2] == pos_tri.T->verts[1] ||
-        neg_tri.T->verts[2] == pos_tri.T->verts[2];
+    bool common2 =  (neg_tri.T->verts[2] == pos_tri.T->verts[0]) ||
+                    (neg_tri.T->verts[2] == pos_tri.T->verts[1]) ||
+                    (neg_tri.T->verts[2] == pos_tri.T->verts[2]);
 
     return (common0 && common1 && common2) ||
-        !common0 && !(dDOT(neg_tri.norm, (dReal*)&V_array[pos_tri.T->verts[0]]) > neg_tri.pos) ||
-        !common1 && !(dDOT(neg_tri.norm, (dReal*)&V_array[pos_tri.T->verts[1]]) > neg_tri.pos) ||
-        !common2 && !(dDOT(neg_tri.norm, (dReal*)&V_array[pos_tri.T->verts[2]]) > neg_tri.pos);
+        (!common0 && !(dDOT(neg_tri.norm, (dReal*)&V_array[pos_tri.T->verts[0]]) > neg_tri.pos)) ||
+        (!common1 && !(dDOT(neg_tri.norm, (dReal*)&V_array[pos_tri.T->verts[1]]) > neg_tri.pos)) ||
+        (!common2 && !(dDOT(neg_tri.norm, (dReal*)&V_array[pos_tri.T->verts[2]]) > neg_tri.pos));
 }
 
 int SetBackTrajectoryCnt(
@@ -263,7 +266,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
                         intersect = true;
                     }
 
-                    if (!b_passable && (b_pased || contain_pos && no_last_pos))
+                    if (!b_passable && (b_pased || (contain_pos && no_last_pos)))
                     {
                         dReal sidePr = primitive.Proj(o1, tri.norm);
                         tri.depth = sidePr - tri.dist;

@@ -196,7 +196,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
 
     GLint currentFilter = (GLint)GL_NEAREST;
 
-    if (m_samplerArray[stage] == NULL)
+    if (m_samplerArray[stage] == 0)
         glGenSamplers(1, &m_samplerArray[stage]);
     else if (name == D3DSAMP_MINFILTER || name == D3DSAMP_MIPFILTER)
         glGetSamplerParameteriv(m_samplerArray[stage], GL_TEXTURE_MIN_FILTER, &currentFilter);

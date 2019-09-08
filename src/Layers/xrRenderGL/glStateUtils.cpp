@@ -171,7 +171,7 @@ GLint ConvertTextureFilter(u32 dxFilter, GLint glFilter, bool MipMap)
     case D3DTEXF_POINT:
     {
         if (MipMap)
-            return glFilter & ~MipFilterLinear | MipFilterEnable;
+            return ((glFilter & ~MipFilterLinear) | MipFilterEnable);
         return glFilter & ~FilterLinear;
     }
     case D3DTEXF_LINEAR:
