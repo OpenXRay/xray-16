@@ -160,7 +160,7 @@ void CSE_SpawnGroup::FillProps				(LPCSTR pref, PropItemVec& values)
 flSpawnSingleItemOnly);
 }
 #endif // #ifndef XRGAME_EXPORTS
-/**/
+**/
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_PHSkeleton

@@ -23,7 +23,7 @@ class CALifeInteractionManager : public CALifeCombatManager, public CALifeCommun
         BOOL_VECTOR						m_temp_marks;
         ALife::WEAPON_P_VECTOR			m_temp_weapons;
 
-    /**/
+    **/
 public:
     CALifeInteractionManager(IPureServer* server, LPCSTR section);
     /**
@@ -31,5 +31,5 @@ public:
                 void					check_for_interaction		(CSE_ALifeSchedulable		*tpALifeSchedulable);
                 void					check_for_interaction		(CSE_ALifeSchedulable		*tpALifeSchedulable,
     GameGraph::_GRAPH_ID		tGraphID);
-    /**/
+    **/
 };

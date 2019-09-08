@@ -934,7 +934,7 @@ void CRender::render_sun_near()
         frustum_bb.min.y -= diff_y; frustum_bb.max.y += diff_y;
         Fbox&	bb					= frustum_bb;
         D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.min.x,bb.max.x,  bb.min.y,bb.max.y,  bb.min.z-tweak_ortho_xform_initial_offs,bb.max.z);
-        /**/
+        */
 
         //	Simple
         Fbox frustum_bb;
@@ -949,7 +949,6 @@ void CRender::render_sun_near()
         bb.grow(EPS);
         D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
                                    bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
-        /**/
 
 
         // build viewport xform
@@ -1223,9 +1222,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                                    map_size * 0.5f, 0.1, dist + /*sqrt(2)*/1.41421f * map_size);
 
         //////////////////////////////////////////////////////////////////////////
-
-
-        /**/
 
         // build viewport xform
         float view_dim = float(RImplementation.o.smapsize);

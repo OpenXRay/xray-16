@@ -55,7 +55,7 @@ void CUIListWnd::script_register(lua_State* L)
 
         class_<CUIListItem, CUIButton, CUIListItemWrapper>("CUIListItem").def(constructor<>()),
 
-        class_<CUIListItemEx, CUIListItem /**/, CUIListItemExWrapper /**/>("CUIListItemEx")
+        class_<CUIListItemEx, CUIListItem, CUIListItemExWrapper>("CUIListItemEx")
             .def(constructor<>())
             .def("SetSelectionColor", &CUIListItemEx::SetSelectionColor),
 

@@ -691,7 +691,7 @@ void CCustomMonster::UpdateCamera()
     g_pGameLevel->Cameras().Update(eye_matrix.c, eye_matrix.k, eye_matrix.j, new_fov, .75f, new_range, 0);
 }
 
-void CCustomMonster::HitSignal(float /**perc/**/, Fvector& /**vLocalDir/**/, IGameObject* /**who/**/) {}
+void CCustomMonster::HitSignal(float /**perc**/, Fvector& /**vLocalDir**/, IGameObject* /**who**/) {}
 void CCustomMonster::Die(IGameObject* who)
 {
     inherited::Die(who);
@@ -787,7 +787,7 @@ BOOL CCustomMonster::net_Spawn(CSE_Abstract* DC)
 void CCustomMonster::OnHUDDraw(CCustomHUD* /*hud*/, IRenderable* /*root*/) {}
 #endif
 
-void CCustomMonster::Exec_Action(float /**dt/**/) {}
+void CCustomMonster::Exec_Action(float /**dt**/) {}
 // void CCustomMonster::Hit(float P, Fvector &dir,IGameObject* who, s16 element,Fvector position_in_object_space, float
 // impulse, ALife::EHitType hit_type)
 void CCustomMonster::Hit(SHit* pHDS)

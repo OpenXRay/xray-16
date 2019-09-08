@@ -17,7 +17,7 @@ IC CALifeLevelRegistry& CALifeGraphRegistry::level() const
 IC void CALifeGraphRegistry::change(
     CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_ID tGraphPointID, GameGraph::_GRAPH_ID tNextGraphPointID)
 {
-    VERIFY3(object->used_ai_locations() /** && (object->interactive() || object->m_bOnline)/**/, *object->s_name,
+    VERIFY3(object->used_ai_locations() /** && (object->interactive() || object->m_bOnline)**/, *object->s_name,
         object->name_replace());
     remove(object, tGraphPointID);
     add(object, tNextGraphPointID);

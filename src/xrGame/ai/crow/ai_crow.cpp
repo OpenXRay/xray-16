@@ -88,7 +88,7 @@ void CAI_Crow::SSound::Unload()
 }
 
 void cb_OnHitEndPlaying(CBlend* B) { ((CAI_Crow*)B->CallbackParam)->OnHitEndPlaying(B); }
-void CAI_Crow::OnHitEndPlaying(CBlend* /**B/**/) { bPlayDeathIdle = true; }
+void CAI_Crow::OnHitEndPlaying(CBlend* /**B**/) { bPlayDeathIdle = true; }
 CAI_Crow::CAI_Crow() { init(); }
 CAI_Crow::~CAI_Crow()
 {
@@ -448,7 +448,7 @@ void CAI_Crow::net_Import(NET_Packet& P)
     VERIFY2(valid_pos(Position()), dbg_valide_pos_string(Position(), this, " CAI_Crow::net_Import	(NET_Packet& P)"));
 }
 //---------------------------------------------------------------------
-void CAI_Crow::HitSignal(float /**HitAmount/**/, Fvector& /**local_dir/**/, IGameObject* who, s16 /**element/**/)
+void CAI_Crow::HitSignal(float /**HitAmount**/, Fvector& /**local_dir**/, IGameObject* who, s16 /**element**/)
 {
     // bool				first_time = !!g_Alive();
     //	bool				first_time = !PPhysicsShell();
@@ -463,7 +463,7 @@ void CAI_Crow::HitSignal(float /**HitAmount/**/, Fvector& /**local_dir/**/, IGam
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(m_Anims.m_death_dead.GetRandom());
 }
 //---------------------------------------------------------------------
-void CAI_Crow::HitImpulse(float /**amount/**/, Fvector& /**vWorldDir/**/, Fvector& /**vLocalDir/**/) {}
+void CAI_Crow::HitImpulse(float /**amount**/, Fvector& /**vWorldDir**/, Fvector& /**vLocalDir**/) {}
 //---------------------------------------------------------------------
 void CAI_Crow::CreateSkeleton()
 {

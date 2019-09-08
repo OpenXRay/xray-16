@@ -10,7 +10,7 @@ IC bool compare_safe(const luabind::object &o1 , const luabind::object &o2)
 {
     return (o1.type()==LUA_TNIL && o2.type()==LUA_TNIL) || o1==o2;
 }
-/**/
+**/
 
 CPHScriptCondition::CPHScriptCondition(const luabind::functor<bool>& func)
 {
