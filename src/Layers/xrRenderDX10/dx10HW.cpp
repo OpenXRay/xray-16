@@ -118,24 +118,30 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     if (FAILED(R))
         R = createDevice(featureLevels2, std::size(featureLevels2));
 
-    if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-        ComputeShadersSupported = true;
-    else
+    if (SUCCEEDED(R))
     {
-        D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
-        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS,
-            &data, sizeof(data));
-        ComputeShadersSupported = data.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
+#ifdef HAS_DX11_3
+        pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
+#endif
+        if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+            ComputeShadersSupported = true;
+        else
+        {
+            D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
+            pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS,
+                &data, sizeof(data));
+            ComputeShadersSupported = data.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
+        }
+        D3D11_FEATURE_DATA_D3D11_OPTIONS options;
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &options, sizeof(options));
+
+        D3D11_FEATURE_DATA_DOUBLES doubles;
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_DOUBLES, &doubles, sizeof(doubles));
+
+        DoublePrecisionFloatShaderOps = doubles.DoublePrecisionFloatShaderOps;
+        SAD4ShaderInstructions = options.SAD4ShaderInstructions;
+        ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
     }
-    D3D11_FEATURE_DATA_D3D11_OPTIONS options;
-    pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &options, sizeof(options));
-
-    D3D11_FEATURE_DATA_DOUBLES doubles;
-    pDevice->CheckFeatureSupport(D3D11_FEATURE_DOUBLES, &doubles, sizeof(doubles));
-
-    DoublePrecisionFloatShaderOps = doubles.DoublePrecisionFloatShaderOps;
-    SAD4ShaderInstructions = options.SAD4ShaderInstructions;
-    ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
 
@@ -159,10 +165,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     }
 
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
-
-#ifdef HAS_DX11_3
-    pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
-#endif
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);

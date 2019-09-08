@@ -403,11 +403,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
 
     // Shader Model 5.0
     appendShaderOption(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5", "1");
-
-#ifdef HAS_DX11_3
-    // Shader Model 5.1
-    appendShaderOption(HW.pDevice3 != nullptr, "SM_5_1", "1");
-#endif
      
     // Double precision
     appendShaderOption(HW.DoublePrecisionFloatShaderOps, "DOUBLE_PRECISION", "1");
