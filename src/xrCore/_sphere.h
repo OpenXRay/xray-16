@@ -108,7 +108,7 @@ public:
         float afT[2];
         typename Fsphere::ERP_Result result = intersect(start, dir, dist, quantity, afT);
 
-        if (result == Fsphere::rpOriginInside || ((result == Fsphere::rpOriginOutside) && (afT[0] < dist)))
+        if ((result == Fsphere::rpOriginInside) || ((result == Fsphere::rpOriginOutside) && (afT[0] < dist)))
         {
             switch (result)
             {

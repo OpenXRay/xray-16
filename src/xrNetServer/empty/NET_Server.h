@@ -40,7 +40,7 @@ struct XRNETSERVER_API ip_address {
 
     bool operator==(const ip_address& other) const
     {
-        return m_data.data == other.m_data.data || m_data.a1 == other.m_data.a1 && m_data.a2 == other.m_data.a2 && m_data.a3 == other.m_data.a3 && m_data.a4 == 0;
+        return (m_data.data == other.m_data.data) || ((m_data.a1 == other.m_data.a1) && (m_data.a2 == other.m_data.a2) && (m_data.a3 == other.m_data.a3) && (m_data.a4 == 0));
     }
 };
 
