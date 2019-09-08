@@ -155,8 +155,7 @@ void CRender::BeforeFrame()
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;
     // MT-HOM (@front)
-    TaskScheduler->AddTask("CHOM::MT_RENDER", { &HOM, &CHOM::MT_RENDER },
-        { &Device, &CRenderDevice::IsMTProcessingAllowed });
+    TaskScheduler->AddTask("CHOM::MT_RENDER", { &HOM, &CHOM::MT_RENDER });
 }
 
 void CRender::OnFrame()
@@ -169,7 +168,7 @@ void CRender::OnFrame()
         // MT-details (@front)
         TaskScheduler->AddTask("CDetailManager::MT_CALC",
             { Details, &CDetailManager::MT_CALC },
-            { &HOM, &CHOM::MT_Synced });
+            { &HOM, &CHOM::MT_Sync });
     }
 }
 
