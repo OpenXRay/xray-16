@@ -378,3 +378,16 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
         return FALSE;
     return TRUE;
 }
+
+SIZE CHW::GetSurfaceSize() const
+{
+    return {
+        LONG(DevPP.BackBufferWidth),
+        LONG(DevPP.BackBufferHeight)
+    };
+}
+
+D3DFORMAT CHW::GetSurfaceFormat() const
+{
+    return DevPP.BackBufferFormat;
+}

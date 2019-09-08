@@ -187,3 +187,11 @@ HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
     SDL_GL_SwapWindow(m_hWnd);
     return S_OK;
 }
+
+SIZE CHW::GetSurfaceSize() const
+{
+    return {
+        LONG(psCurrentVidMode[0]),
+        LONG(psCurrentVidMode[1])
+    };
+}

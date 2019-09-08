@@ -12,12 +12,13 @@ public:
     ~CHW();
 
     void CreateDevice(SDL_Window* sdlWnd);
-
     void DestroyDevice();
 
     void Reset();
 
     void Validate() {}
+
+    SIZE GetSurfaceSize() const;
 
     void UpdateViews();
 
