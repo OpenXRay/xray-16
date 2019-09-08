@@ -382,7 +382,7 @@ public:
 };
 
 template<class T>
-IC void __fastcall render_item(const T& item)
+void __fastcall render_item(const T& item)
 {
     dxRender_Visual* V = item.second.pVisual;
     VERIFY(V && V->shader._get());
@@ -399,14 +399,14 @@ template <class T> IC bool cmp_first_l(const T &lhs, const T &rhs) { return (lhs
 template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs.first > rhs.first); }
 
 template<class T>
-IC void sort_front_to_back_render_and_clean(T &vec)
+ICF void sort_front_to_back_render_and_clean(T& vec)
 {
     vec.traverse_left_right(render_item);
     vec.clear();
 }
 
 template<class T>
-IC void sort_back_to_front_render_and_clean(T &vec)
+ICF void sort_back_to_front_render_and_clean(T& vec)
 {
     vec.traverse_right_left(render_item);
     vec.clear();
