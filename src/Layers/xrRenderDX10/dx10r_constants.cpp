@@ -47,9 +47,9 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         u16 type = u16(-1);
         switch (TypeDesc.Type)
         {
-        case D3D10_SVT_FLOAT: type = RC_float; break;
-        case D3D10_SVT_BOOL: type = RC_bool; break;
-        case D3D10_SVT_INT: type = RC_int; break;
+        case D3D_SVT_FLOAT: type = RC_float; break;
+        case D3D_SVT_BOOL: type = RC_bool; break;
+        case D3D_SVT_INT: type = RC_int; break;
         default: fatal("R_constant_table::parse: unexpected shader variable type.");
         }
 
@@ -66,8 +66,8 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         // switch (T->Class)
         switch (TypeDesc.Class)
         {
-        case D3D10_SVC_SCALAR: r_type = RC_1x1; break;
-        case D3D10_SVC_VECTOR:
+        case D3D_SVC_SCALAR: r_type = RC_1x1; break;
+        case D3D_SVC_VECTOR:
         {
             switch (TypeDesc.Columns)
             {
@@ -78,7 +78,7 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
             }
         }
         break;
-        case D3D10_SVC_MATRIX_ROWS:
+        case D3D_SVC_MATRIX_ROWS:
         {
             switch (TypeDesc.Columns)
             {
@@ -111,9 +111,9 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
             }
         }
         break;
-        case D3D10_SVC_MATRIX_COLUMNS: fatal("Pclass MATRIX_COLUMNS unsupported"); break;
-        case D3D10_SVC_STRUCT: fatal("Pclass D3DXPC_STRUCT unsupported"); break;
-        case D3D10_SVC_OBJECT:
+        case D3D_SVC_MATRIX_COLUMNS: fatal("Pclass MATRIX_COLUMNS unsupported"); break;
+        case D3D_SVC_STRUCT: fatal("Pclass D3DXPC_STRUCT unsupported"); break;
+        case D3D_SVC_OBJECT:
         {
             //  TODO: DX10:
             VERIFY(!"Implement shader object parsing.");
@@ -202,9 +202,9 @@ BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int Res
 
         switch (ResDesc.Type)
         {
-        case D3D10_SIT_TEXTURE: type = RC_dx10texture; break;
-        case D3D10_SIT_SAMPLER: type = RC_sampler; break;
-        case D3D11_SIT_UAV_RWTYPED: type = RC_dx11UAV; break;
+        case D3D_SIT_TEXTURE: type = RC_dx10texture; break;
+        case D3D_SIT_SAMPLER: type = RC_sampler; break;
+        case D3D_SIT_UAV_RWTYPED: type = RC_dx11UAV; break;
         default: continue;
         }
 
