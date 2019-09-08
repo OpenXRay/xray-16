@@ -119,7 +119,7 @@ void CMovementManager::process_game_path()
         }
 
         Fvector temp =
-            ai().level_graph().vertex_position(dest_level_vertex_id /**level_path().intermediate_vertex_id()/**/);
+            ai().level_graph().vertex_position(dest_level_vertex_id /**level_path().intermediate_vertex_id()**/);
         level_path_builder().setup(object().ai_location().level_vertex_id(), dest_level_vertex_id, true, &temp);
 
         if (can_use_distributed_computations(mtLevelPath))

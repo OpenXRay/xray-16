@@ -42,7 +42,7 @@ IC bool CLevelFlooderPathManager::is_goal_reached(const _index_type& node_index)
 
 TEMPLATE_SPECIALIZATION
 IC _dist_type CLevelFlooderPathManager::evaluate(
-    const _index_type& node_index1, const _index_type& node_index2, const _Graph::const_iterator& /**i/**/)
+    const _index_type& node_index1, const _index_type& node_index2, const _Graph::const_iterator& /**i**/)
 {
     VERIFY(this->graph);
     return (m_cell_dist);

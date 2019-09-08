@@ -144,7 +144,7 @@ void CSE_ALifeMonsterAbstract::update()
             }
         }
         m_tTimeID					= ai().alife().time_manager().game_time();
-    /**/
+    **/
 }
 
 void CSE_ALifeMonsterAbstract::on_location_change() const { brain().on_location_change(); }
@@ -178,13 +178,13 @@ ALife::EMeetActionType CSE_ALifeMonsterAbstract::tfGetActionType(
         }
         else
             return					(ALife::eMeetActionTypeAttack);
-    /**/
+    **/
 }
 
 bool CSE_ALifeMonsterAbstract::bfActive()
 {
     CSE_ALifeGroupAbstract* l_tpALifeGroupAbstract = smart_cast<CSE_ALifeGroupAbstract*>(this);
-    return (/**/ interactive() && /**/ ((l_tpALifeGroupAbstract && (l_tpALifeGroupAbstract->m_wCount > 0)) ||
+    return (interactive() && ((l_tpALifeGroupAbstract && (l_tpALifeGroupAbstract->m_wCount > 0)) ||
                                       (!l_tpALifeGroupAbstract && (get_health() > EPS_L))));
 }
 

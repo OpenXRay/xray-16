@@ -36,7 +36,8 @@ CUIMapWnd::CUIMapWnd(UIHint* hint)
     #ifdef DEBUG
     //	m_dbg_text_hint			= NULL;
     //	m_dbg_info				= NULL;
-    #endif // DEBUG /**/
+    #endif // DEBUG
+    */
 
     m_UIMainMapHeader = nullptr;
     m_scroll_mode = false;
@@ -54,7 +55,8 @@ CUIMapWnd::~CUIMapWnd()
     #ifdef DEBUG
         delete_data( m_dbg_text_hint );
         delete_data( m_dbg_info );
-    #endif // DEBUG/**/
+    #endif // DEBUG
+    */
     g_map_wnd = NULL;
 }
 
@@ -357,7 +359,7 @@ void CUIMapWnd::Draw()
     #ifdef DEBUG
         m_dbg_text_hint->Draw	();
         m_dbg_info->Draw		();
-    #endif // DEBUG/**/
+    #endif // DEBUG */
 
     m_btn_nav_parent->Draw();
 }
@@ -725,7 +727,7 @@ void CUIMapWnd::Hint(const shared_str& text)
     /*
 #ifdef DEBUG
     m_dbg_text_hint->SetTextST( *text );
-#endif // DEBUG/**/
+#endif // DEBUG */
 }
 
 void CUIMapWnd::Reset()

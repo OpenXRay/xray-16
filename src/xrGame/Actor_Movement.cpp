@@ -533,7 +533,7 @@ void CActor::g_cl_Orientate(u32 mstate_rl, float dt)
     }
 }
 
-void CActor::g_sv_Orientate(u32 /**mstate_rl/**/, float /**dt/**/)
+void CActor::g_sv_Orientate(u32 /**mstate_rl**/, float /**dt**/)
 {
     r_model_yaw = NET_Last.o_model;
 

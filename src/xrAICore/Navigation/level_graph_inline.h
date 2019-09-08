@@ -429,7 +429,7 @@ IC bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2& s
                 path_node.set_vertex_id(next_vertex_id);
                 tpaOutputPoints.push_back(path_node);
 
-                if (dest_xz == v->position().xz() /**box.contains(dest)/**/)
+                if (dest_xz == v->position().xz() /**box.contains(dest)**/)
                 {
                     tIntersectPoint = v3d(dest);
                     if (bAssignY)

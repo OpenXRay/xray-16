@@ -501,7 +501,7 @@ void CPHSimpleCharacter::ApplyForce(const Fvector& dir, float force)
     ApplyForce(dir.x * force, dir.y * force, dir.z * force);
 }
 
-void CPHSimpleCharacter::PhDataUpdate(dReal /**step/**/)
+void CPHSimpleCharacter::PhDataUpdate(dReal /**step**/)
 {
     ///////////////////
 

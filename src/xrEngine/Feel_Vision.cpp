@@ -185,7 +185,7 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
             D.div(f);
             // setup ray defs & feel params
             collide::ray_defs RD(P, D, f, CDB::OPT_CULL,
-                collide::rq_target(collide::rqtStatic | /**/ collide::rqtObject | /**/ collide::rqtObstacle));
+                collide::rq_target(collide::rqtStatic | collide::rqtObject | collide::rqtObstacle));
             SFeelParam feel_params(this, &*I, vis_threshold);
             // check cache
             if (I->Cache.result && I->Cache.similar(P, D, f))

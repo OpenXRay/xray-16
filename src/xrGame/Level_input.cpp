@@ -432,7 +432,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         }
         break;
     }
-/**/
+
 #endif
 #ifdef DEBUG
     case SDL_SCANCODE_F9:
@@ -596,7 +596,7 @@ void CLevel::IR_OnTextInput(pcstr text)
     }
 }
 
-void CLevel::IR_OnMouseStop(int /**axis/**/, int /**value/**/) {}
+void CLevel::IR_OnMouseStop(int /**axis**/, int /**value**/) {}
 
 void CLevel::IR_OnControllerPress(int btn) 
 { 

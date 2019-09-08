@@ -143,7 +143,7 @@ public:
     virtual void Die(IGameObject* who);
 
     virtual void HitSignal(float P, Fvector& vLocalDir, IGameObject* who);
-    virtual void g_WeaponBones(int& /**L/**/, int& /**R1/**/, int& /**R2/**/){};
+    virtual void g_WeaponBones(int& /**L**/, int& /**R1**/, int& /**R2**/){};
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();
 
