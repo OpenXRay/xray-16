@@ -25,7 +25,7 @@ public:
 
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 
-    SIZE GetSurfaceSize() const;
+    std::pair<u32, u32> GetSurfaceSize() const;
     D3DFORMAT GetSurfaceFormat() const;
 
 #if defined(DEBUG)

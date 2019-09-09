@@ -447,10 +447,10 @@ void CHW::UpdateViews()
     _RELEASE(pDepthStencil);
 }
 
-SIZE CHW::GetSurfaceSize() const
+std::pair<u32, u32> CHW::GetSurfaceSize() const
 {
     return {
-        LONG(m_ChainDesc.BufferDesc.Width),
-        LONG(m_ChainDesc.BufferDesc.Height)
+        m_ChainDesc.BufferDesc.Width,
+        m_ChainDesc.BufferDesc.Height
     };
 }

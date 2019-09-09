@@ -18,7 +18,7 @@ public:
 
     void Validate() {}
 
-    SIZE GetSurfaceSize() const;
+    std::pair<u32, u32> GetSurfaceSize() const;
 
     void UpdateViews();
 

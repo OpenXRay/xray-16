@@ -78,9 +78,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Memory.mem_compact();
     HW.Reset();
 
-    const auto& surfaceSize = HW.GetSurfaceSize();
-    dwWidth = surfaceSize.cx;
-    dwHeight = surfaceSize.cy;
+    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
@@ -162,9 +160,7 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
 {
     HW.CreateDevice(hWnd);
 
-    const auto& surfaceSize = HW.GetSurfaceSize();
-    dwWidth = surfaceSize.cx;
-    dwHeight = surfaceSize.cy;
+    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);

@@ -27,7 +27,7 @@ public:
 
     void Validate() {}
 
-    SIZE GetSurfaceSize() const;
+    std::pair<u32, u32> GetSurfaceSize() const;
 
     bool CheckFormatSupport(DXGI_FORMAT format, UINT feature) const;
     DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT formats[], size_t count) const;

@@ -1169,8 +1169,8 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     case CRender::MMSM_AUTO: return need_to_render_sunshafts();
     case CRender::MMSM_AUTODETECT:
     {
-        const auto& surfaceSize = HW.GetSurfaceSize();
-        u32 dwScreenArea = surfaceSize.cx * surfaceSize.cy;
+        const auto& [width, height] = HW.GetSurfaceSize();
+        u32 dwScreenArea = width * height;
 
         if ((dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold))
             return need_to_render_sunshafts();

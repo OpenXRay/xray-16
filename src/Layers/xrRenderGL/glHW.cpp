@@ -188,10 +188,10 @@ HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
     return S_OK;
 }
 
-SIZE CHW::GetSurfaceSize() const
+std::pair<u32, u32> CHW::GetSurfaceSize() const
 {
     return {
-        LONG(psCurrentVidMode[0]),
-        LONG(psCurrentVidMode[1])
+        psCurrentVidMode[0],
+        psCurrentVidMode[1]
     };
 }
