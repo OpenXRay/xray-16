@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include "xrCore/xrCore.h"
-#include "xrEngine/Engine.h"
-#include "xrEngine/defines.h"
-
-class IGameFont;
-
 #if defined(DEBUG) && !defined(USE_PROFILER)
 #define USE_PROFILER
 #endif
 
 #ifdef USE_PROFILER
+
+#include "xrCore/xrCore.h"
+#include "xrEngine/Engine.h"
+#include "xrEngine/defines.h"
+
+class IGameFont;
 
 #ifdef CONFIG_PROFILE_LOCKS
 extern void add_profile_portion(LPCSTR id, const u64 &time);

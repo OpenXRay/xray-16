@@ -13,8 +13,8 @@
 
 #include "factory_api.h"
 
-Factory_Create* create_entity = 0;
-Factory_Destroy* destroy_entity = 0;
+CreateEntity* create_entity = nullptr;
+DestroyEntity* destroy_entity = nullptr;
 
 extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
 extern void verify_level_graph(LPCSTR name, bool verbose);
@@ -113,8 +113,8 @@ void execute(LPSTR cmd)
             pcstr create_entity_name = "_create_entity@4";
             pcstr destroy_entity_name = "_destroy_entity@4";
 #endif
-            create_entity = (Factory_Create*)hFactory->GetProcAddress(create_entity_name);
-            destroy_entity = (Factory_Destroy*)hFactory->GetProcAddress(destroy_entity_name);
+            create_entity = (CreateEntity*)hFactory->GetProcAddress(create_entity_name);
+            destroy_entity = (DestroyEntity*)hFactory->GetProcAddress(destroy_entity_name);
 
             R_ASSERT(create_entity);
             R_ASSERT(destroy_entity);
