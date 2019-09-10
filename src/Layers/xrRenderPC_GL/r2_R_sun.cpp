@@ -159,7 +159,7 @@ Frustum::Frustum()
 }
 
 //  build a frustum from a camera (projection, or viewProjection) matrix
-Frustum::Frustum(const glm::mat4 *matrix)
+Frustum::Frustum(const glm::mat4* matrix)
 {
     //  build a view frustum based on the current view & projection matrices...
     glm::vec4 column1 = glm::column(*matrix, 0);
@@ -357,7 +357,7 @@ void CRender::render_sun()
     glm::mat4 m_LightViewProj;
 
     // calculate view-frustum bounds in world space
-    glm::mat4 ex_full_inverse, ex_full, ex_project;
+    glm::mat4 ex_full, ex_project, ex_full_inverse;
     {
         float _far_ = std::min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv->far_plane);
         ex_project = glm::perspective(deg2rad(Device.fFOV), Device.fASPECT, VIEWPORT_NEAR, _far_);
@@ -1334,7 +1334,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // Actor Shadow
     if (cascade_ind == 0 && psDeviceFlags.test(rsDrawDynamic))
         g_hud->Render_First();
-
 
     // Fill the database
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
