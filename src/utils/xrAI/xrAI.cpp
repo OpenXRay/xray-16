@@ -113,8 +113,8 @@ void execute(LPSTR cmd)
             pcstr create_entity_name = "_create_entity@4";
             pcstr destroy_entity_name = "_destroy_entity@4";
 #endif
-            create_entity = (CreateEntity*)hFactory->GetProcAddress(create_entity_name);
-            destroy_entity = (DestroyEntity*)hFactory->GetProcAddress(destroy_entity_name);
+            create_entity = static_cast<CreateEntity*>(hFactory->GetProcAddress(create_entity_name));
+            destroy_entity = static_cast<DestroyEntity*>(hFactory->GetProcAddress(destroy_entity_name));
 
             R_ASSERT(create_entity);
             R_ASSERT(destroy_entity);
