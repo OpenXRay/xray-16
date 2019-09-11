@@ -1,6 +1,5 @@
 #pragma once
 
-#define ENGINE_API
 #define ECORE_API
 #define XR_EPROPS_API
 
