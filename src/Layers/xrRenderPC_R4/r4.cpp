@@ -98,7 +98,7 @@ static class cl_water_intensity : public R_constant_setup
     {
         CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
         float fValue = E.m_fWaterIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0);
+        RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_water_intensity;
 
@@ -108,7 +108,7 @@ static class cl_tree_amplitude_intensity : public R_constant_setup
     {
         CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
         float fValue = env.m_fTreeAmplitudeIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0);
+        RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_tree_amplitude_intensity;
 // XXX: do we need to register this binder?
@@ -119,7 +119,7 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     {
         CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
         float fValue = E.m_fSunShaftsIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0);
+        RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_sun_shafts_intensity;
 
