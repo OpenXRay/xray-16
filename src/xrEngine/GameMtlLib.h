@@ -209,7 +209,7 @@ public:
     }
     bool IsPair(int m0, int m1) const
     {
-        return ((mtl0 == m0) && (mtl1 == m1)) || ((mtl0 == m1) && (mtl1 == m0));
+        return (mtl0 == m0 && mtl1 == m1) || (mtl0 == m1 && mtl1 == m0);
     }
     int GetParent() const { return ID_parent; }
     void Save(IWriter& fs);
