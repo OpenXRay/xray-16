@@ -172,7 +172,7 @@ public:
 
     // Hardware processor
     ref_geom hw_Geom;
-    u32 hw_BatchSize;
+    size_t hw_BatchSize;
 #ifdef USE_OGL
     GLuint hw_VB;
     GLuint hw_IB;
