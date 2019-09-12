@@ -106,7 +106,7 @@ public:
         flush_cache();
     }
 
-    ICF void access_direct(R_constant* C, u32 DataSize, void** ppVData, void** ppGData, void** ppPData)
+    ICF void access_direct(R_constant* C, size_t DataSize, void** ppVData, void** ppGData, void** ppPData)
     {
         if (ppPData)
         {
@@ -155,7 +155,7 @@ private:
     }
 
     template<BufferType BType>
-    void access_direct(R_constant* C, R_constant_load& L, void** ppData, u32 DataSize)
+    void access_direct(R_constant* C, R_constant_load& L, void** ppData, size_t DataSize) const
     {
         dx10ConstantBuffer& Buffer = GetCBuffer<BType>(C);
         *ppData = Buffer.AccessDirect(L, DataSize);

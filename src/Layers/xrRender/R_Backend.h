@@ -252,7 +252,7 @@ public:
     }
 
 #if defined(USE_DX10) || defined(USE_DX11)
-    IC void get_ConstantDirect(shared_str& n, u32 DataSize, void** pVData, void** pGData, void** pPData);
+    IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
 #else // USE_DX10
 #ifndef USE_OGL
     R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
@@ -389,7 +389,7 @@ public:
         return nullptr;
     }
 
-    ICF ref_constant get_c(shared_str& n)
+    ICF ref_constant get_c(const shared_str& n)
     {
         if (ctable)
             return ctable->get(n);
