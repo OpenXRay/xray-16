@@ -199,8 +199,8 @@ void ALDeviceList::SelectBestDevice()
                 continue;
 
             GetDeviceVersion(i, &majorVersion, &minorVersion);
-            if ((majorVersion > best_majorVersion) ||
-                ((majorVersion == best_majorVersion) && minorVersion) > best_minorVersion)
+            if (majorVersion > best_majorVersion ||
+                (majorVersion == best_majorVersion && minorVersion > best_minorVersion))
             {
                 best_majorVersion = majorVersion;
                 best_minorVersion = minorVersion;
