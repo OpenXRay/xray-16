@@ -3,7 +3,7 @@
 OpenXRay
 ==========================
 
-OpenXRay is an improved version the X-Ray engine, used in world famous S.T.A.L.K.E.R. game series by GSC Game World.
+OpenXRay is an improved version of the X-Ray engine, used in world famous S.T.A.L.K.E.R. game series by GSC Game World.
 
 ### Supported games
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
