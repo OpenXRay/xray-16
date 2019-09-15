@@ -449,7 +449,8 @@ void CHW::UpdateViews()
 
 std::pair<u32, u32> CHW::GetSurfaceSize() const
 {
-    return {
+    return
+    {
         m_ChainDesc.BufferDesc.Width,
         m_ChainDesc.BufferDesc.Height
     };
