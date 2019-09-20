@@ -255,32 +255,7 @@ void D3DXRenderBase::ResourcesDumpMemoryUsage()
 DeviceState D3DXRenderBase::GetDeviceState()
 {
     HW.Validate();
-#ifdef USE_OGL
-    //  TODO: OGL: Implement GetDeviceState
-#elif !defined(USE_DX9)
-    const auto result = HW.m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
-
-    switch (result)
-    {
-        // Check if the device is ready to be reset
-    case DXGI_ERROR_DEVICE_RESET:
-        return DeviceState::NeedReset;
-    }
-#else
-    const auto result = HW.pDevice->TestCooperativeLevel();
-
-    switch (result)
-    {
-        // If the device was lost, do not render until we get it back
-    case D3DERR_DEVICELOST:
-        return DeviceState::Lost;
-
-        // Check if the device is ready to be reset
-    case D3DERR_DEVICENOTRESET:
-        return DeviceState::NeedReset;
-    }
-#endif
-    return DeviceState::Normal;
+    return HW.GetDeviceState();
 }
 
 bool D3DXRenderBase::GetForceGPU_REF()
@@ -293,9 +268,6 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 }
 void D3DXRenderBase::Begin()
 {
-#ifdef USE_DX9
-    CHK_DX(HW.pDevice->BeginScene());
-#endif
     RCache.OnFrameBegin();
     RCache.set_CullMode(CULL_CW);
     RCache.set_CullMode(CULL_CCW);
@@ -327,23 +299,7 @@ void D3DXRenderBase::End()
         overdrawEnd();
     RCache.OnFrameEnd();
     DoAsyncScreenshot();
-#ifndef USE_DX9
-    const bool bUseVSync = psDeviceFlags.is(rsFullscreen) && psDeviceFlags.test(rsVSync); //xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
-    HW.m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
-#ifdef HAS_DX11_2
-    if (HW.m_pSwapChain2 && HW.UsingFlipPresentationModel())
-    {
-        const float fps = Device.GetStats().fFPS;
-        if (fps < 30)
-            HW.m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.85f, Device.dwHeight * 0.85f);
-        else if (fps < 15)
-            HW.m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.7f, Device.dwHeight * 0.7f);
-    }
-#endif
-#else
-    CHK_DX(HW.pDevice->EndScene());
-    HW.pDevice->Present(nullptr, nullptr, nullptr, nullptr);
-#endif
+    HW.Present();
 }
 
 void D3DXRenderBase::ResourcesDestroyNecessaryTextures()
