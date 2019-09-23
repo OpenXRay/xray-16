@@ -78,16 +78,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Memory.mem_compact();
     HW.Reset();
 
-#if defined(USE_OGL)
-    dwWidth = psCurrentVidMode[0];
-    dwHeight = psCurrentVidMode[1];
-#elif defined(USE_DX10) || defined(USE_DX11)
-    dwWidth = HW.m_ChainDesc.BufferDesc.Width;
-    dwHeight = HW.m_ChainDesc.BufferDesc.Height;
-#else //    USE_DX10
-    dwWidth = HW.DevPP.BackBufferWidth;
-    dwHeight = HW.DevPP.BackBufferHeight;
-#endif //   USE_DX10
+    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
@@ -168,16 +159,9 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
     HW.CreateDevice(hWnd);
-#if defined(USE_OGL)
-    dwWidth = psCurrentVidMode[0];
-    dwHeight = psCurrentVidMode[1];
-#elif defined(USE_DX10) || defined(USE_DX11)
-    dwWidth = HW.m_ChainDesc.BufferDesc.Width;
-    dwHeight = HW.m_ChainDesc.BufferDesc.Height;
-#else
-    dwWidth = HW.DevPP.BackBufferWidth;
-    dwHeight = HW.DevPP.BackBufferHeight;
-#endif
+
+    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
+
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
     Resources = new CResourceManager();
