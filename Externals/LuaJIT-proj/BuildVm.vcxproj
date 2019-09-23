@@ -58,12 +58,11 @@
     </ClCompile>
     <PostBuildEvent>
       <Command>$(OutDir)$(TargetName) -m peobj -o lj_vm_$(PlatformShortName).obj
-$(OutDir)$(TargetName) -m bcdef -o ..\LuaJIT\src\lj_bcdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m ffdef -o ..\LuaJIT\src\lj_ffdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m libdef -o ..\LuaJIT\src\lj_libdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m recdef -o ..\LuaJIT\src\lj_recdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m vmdef -o ..\LuaJIT\src\jit\vmdef.lua ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m folddef -o ..\LuaJIT\src\lj_folddef.h ..\LuaJIT\src\lj_opt_fold.c
+$(OutDir)$(TargetName) -m bcdef -o lj_bcdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
+$(OutDir)$(TargetName) -m ffdef -o lj_ffdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
+$(OutDir)$(TargetName) -m libdef -o lj_libdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
+$(OutDir)$(TargetName) -m recdef -o lj_recdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
+$(OutDir)$(TargetName) -m folddef -o lj_folddef.h ..\LuaJIT\src\lj_opt_fold.c
 </Command>
     </PostBuildEvent>
     <Link>
