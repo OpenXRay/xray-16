@@ -27,16 +27,9 @@ public:
 
     std::pair<u32, u32> GetSurfaceSize() const;
     D3DFORMAT GetSurfaceFormat() const;
-
-#if defined(DEBUG)
-    void Validate()
-    {
-        VERIFY(pDevice);
-        VERIFY(pD3D);
-    };
-#else
-    void Validate() {}
-#endif
+    void Present();
+    DeviceState GetDeviceState();
+    void Validate();
 
 private:
     u32 selectPresentInterval();

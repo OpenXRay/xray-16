@@ -392,3 +392,34 @@ D3DFORMAT CHW::GetSurfaceFormat() const
 {
     return DevPP.BackBufferFormat;
 }
+
+void CHW::Validate()
+{
+#if defined(DEBUG)
+    VERIFY(pDevice);
+    VERIFY(pD3D);
+#endif
+};
+
+void CHW::Present()
+{
+    pDevice->Present(nullptr, nullptr, nullptr, nullptr);
+}
+
+DeviceState CHW::GetDeviceState()
+{
+    const auto result = pDevice->TestCooperativeLevel();
+
+    switch (result)
+    {
+        // If the device was lost, do not render until we get it back
+    case D3DERR_DEVICELOST:
+        return DeviceState::Lost;
+
+        // Check if the device is ready to be reset
+    case D3DERR_DEVICENOTRESET:
+        return DeviceState::NeedReset;
+    }
+
+    return DeviceState::Normal;
+}

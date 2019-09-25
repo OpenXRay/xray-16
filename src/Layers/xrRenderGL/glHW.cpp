@@ -181,11 +181,16 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
     CHK_GL(glClear(mask));
 }
 
-HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
+void CHW::Present()
 {
     RImplementation.Target->phase_flip();
     SDL_GL_SwapWindow(m_hWnd);
-    return S_OK;
+}
+
+DeviceState CHW::GetDeviceState()
+{
+    //  TODO: OGL: Implement GetDeviceState
+    return DeviceState::Normal;
 }
 
 std::pair<u32, u32> CHW::GetSurfaceSize() const

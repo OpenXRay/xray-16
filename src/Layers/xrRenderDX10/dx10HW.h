@@ -36,7 +36,9 @@ public:
     {
         return SelectFormat(feature, formats, count);
     }
+    void Present();
     bool UsingFlipPresentationModel() const;
+    DeviceState GetDeviceState();
 
     void OnAppActivate() override;
     void OnAppDeactivate() override;

@@ -27,7 +27,8 @@ public:
 
     void ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil);
 
-    HRESULT Present(UINT SyncInterval, UINT Flags);
+    void Present();
+    DeviceState GetDeviceState();
 
 public:
     CHWCaps Caps;

@@ -473,3 +473,34 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
         m_ChainDesc.BufferDesc.Height
     };
 }
+
+void CHW::Present()
+{
+    const bool bUseVSync = psDeviceFlags.is(rsFullscreen) &&
+        psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
+    m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+#ifdef HAS_DX11_2
+    if (m_pSwapChain2 && UsingFlipPresentationModel())
+    {
+        const float fps = Device.GetStats().fFPS;
+        if (fps < 30)
+            m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.85f, Device.dwHeight * 0.85f);
+        else if (fps < 15)
+            m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.7f, Device.dwHeight * 0.7f);
+    }
+#endif
+}
+
+DeviceState CHW::GetDeviceState()
+{
+    const auto result = m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
+
+    switch (result)
+    {
+        // Check if the device is ready to be reset
+    case DXGI_ERROR_DEVICE_RESET:
+        return DeviceState::NeedReset;
+    }
+
+    return DeviceState::Normal;
+}
