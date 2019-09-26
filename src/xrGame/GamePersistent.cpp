@@ -820,10 +820,11 @@ void CGamePersistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     IGame_Persistent::DumpStatistics(font, alert);
 #ifdef DEBUG
 #ifndef _EDITOR
+    const Fvector2 prev = font.GetPosition();
     font.OutSet(400, 120);
     m_last_stats_frame = m_frame_counter;
     profiler().show_stats(font, psAI_Flags.test(aiStats));
-    font.OutSet(0, 0);
+    font.OutSet(prev.x, prev.y);
 #endif
 #endif
 }
