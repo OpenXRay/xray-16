@@ -103,9 +103,6 @@ void CUIInventoryUpgradeWnd::InitInventory(CUICellItem* cellItem, bool can_upgra
     if (m_item_info)
         m_item_info->InitItem(cellItem);
 
-    if (!cellItem)
-        return;
-
     m_inv_item = static_cast<PIItem>(cellItem ? cellItem->m_pData : nullptr);
     // Загружаем картинку
     if (m_item && m_inv_item)
@@ -146,6 +143,8 @@ void CUIInventoryUpgradeWnd::InitInventory(CUICellItem* cellItem, bool can_upgra
         else
             m_item->Show(false);
     }
+    else if (m_item)
+        m_item->Show(false);
 
     m_scheme_wnd->DetachAll();
     m_scheme_wnd->Show(false);
