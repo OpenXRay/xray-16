@@ -273,15 +273,11 @@ void CActor::cam_Lookout(const Fmatrix& xform, float camera_height)
         r_torso.roll = 0.f;
     }
 }
-#ifdef DEBUG
+
 BOOL ik_cam_shift = true;
 float ik_cam_shift_tolerance = 0.2f;
 float ik_cam_shift_speed = 0.01f;
-#else
-static const BOOL ik_cam_shift = true;
-static const float ik_cam_shift_tolerance = 0.2f;
-static const float ik_cam_shift_speed = 0.01f;
-#endif
+float ik_cam_shift_interpolation = 4.f;
 
 void CActor::cam_Update(float dt, float fFOV)
 {
@@ -312,13 +308,14 @@ void CActor::cam_Update(float dt, float fFOV)
         current_ik_cam_shift = 0;
 
     // Alex ADD: smooth crouch fix
-    float HeightInterpolationSpeed = 4.f;
-
+    const float targetHeight = CameraHeight();
     if (CurrentHeight < 0.0f)
-        CurrentHeight = CameraHeight();
-
-    if (CurrentHeight != CameraHeight())
-        CurrentHeight = (CurrentHeight * (1.0f - HeightInterpolationSpeed*dt)) + (CameraHeight() * HeightInterpolationSpeed*dt);
+        CurrentHeight = targetHeight;
+    else if (!fsimilar(CurrentHeight, targetHeight))
+    {
+        const float dti = ik_cam_shift_interpolation * dt;
+        CurrentHeight = (CurrentHeight * (1.0f - dti)) + (targetHeight * dti);
+    }
 
     Fvector point = { 0, CurrentHeight + current_ik_cam_shift, 0 };
 
