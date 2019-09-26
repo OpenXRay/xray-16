@@ -524,13 +524,13 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
 
     ScopeLock scope(&v_shaders_lock);
     // Search equal in shaders array
-    for (u32 it = 0; it < v_shaders.size(); it++)
-        if (S.equal(v_shaders[it])) return v_shaders[it];
+    for (Shader* v_shader : v_shaders)
+        if (S.equal(v_shader))
+            return v_shader;
 
     // Create _new_ entry
-    Shader* N = new Shader(S);
+    Shader* N = v_shaders.emplace_back(new Shader(S));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    v_shaders.push_back(N);
     return N;
 }
 
