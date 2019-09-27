@@ -24,6 +24,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         //!!!
         //!!! BECAUSE OF PARALLEL HOM RENDERING TRY TO DELAY ACCESS TO HOM AS MUCH AS POSSIBLE
         //!!!
+        if (psDeviceFlags.test(rsDrawDynamic))
         {
             // Traverse object database
             g_SpatialSpace->q_frustum
