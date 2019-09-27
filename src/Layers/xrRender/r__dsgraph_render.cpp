@@ -418,9 +418,11 @@ void D3DXRenderBase::r_dsgraph_render_hud()
 {
     PIX_EVENT(r_dsgraph_render_hud);
 
-    hud_transform_helper helper;
-
-    sort_front_to_back_render_and_clean(mapHUD);
+    if (!mapHUD.empty())
+    {
+        hud_transform_helper helper;
+        sort_front_to_back_render_and_clean(mapHUD);
+    }
 
 #if RENDER == R_R1
     if (g_hud && g_hud->RenderActiveItemUIQuery())
@@ -464,9 +466,11 @@ void D3DXRenderBase::r_dsgraph_render_sorted()
 
     sort_back_to_front_render_and_clean(mapSorted);
 
-    hud_transform_helper helper;
-
-    sort_back_to_front_render_and_clean(mapHUDSorted);
+    if (!mapHUDSorted.empty())
+    {
+        hud_transform_helper helper;
+        sort_back_to_front_render_and_clean(mapHUDSorted);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -478,9 +482,11 @@ void D3DXRenderBase::r_dsgraph_render_emissive()
 
     sort_front_to_back_render_and_clean(mapEmissive);
 
-    hud_transform_helper helper;
-
-    sort_front_to_back_render_and_clean(mapHUDEmissive);
+    if (!mapHUDEmissive.empty())
+    {
+        hud_transform_helper helper;
+        sort_front_to_back_render_and_clean(mapHUDEmissive);
+    }
 #endif
 }
 
