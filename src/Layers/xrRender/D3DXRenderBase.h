@@ -68,6 +68,7 @@ public:
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
     xr_vector<dxRender_Visual*> lstVisuals;
+    xr_vector<R_dsgraph::_LodItem> lstLODs;
 
     u32 counter_S;
     u32 counter_D;
