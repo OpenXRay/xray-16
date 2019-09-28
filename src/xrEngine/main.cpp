@@ -92,6 +92,36 @@ void InitConfig(T& config, pcstr name, bool fatal = true,
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 }
 
+// XXX: make it more fancy
+// некрасиво слишком
+void set_shoc_mode()
+{
+    CallOfPripyatMode = false;
+    ShadowOfChernobylMode = true;
+    ClearSkyMode = false;
+}
+
+void set_cs_mode()
+{
+    CallOfPripyatMode = false;
+    ShadowOfChernobylMode = false;
+    ClearSkyMode = true;
+}
+
+void set_cop_mode()
+{
+    CallOfPripyatMode = true;
+    ShadowOfChernobylMode = false;
+    ClearSkyMode = false;
+}
+
+void set_free_mode()
+{
+    CallOfPripyatMode = false;
+    ShadowOfChernobylMode = false;
+    ClearSkyMode = false;
+}
+
 ENGINE_API void InitSettings()
 {
     xr_auth_strings_t ignoredPaths, checkedPaths;
@@ -105,31 +135,25 @@ ENGINE_API void InitSettings()
     InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
     InitConfig(pGameIni, "game.ltx");
 
-    pcstr gameMode = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
-
-    if (xr_strcmpi("cop", gameMode) == 0)
+    if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+        set_shoc_mode();
+    else if (strstr(Core.Params, "-cs"))
+        set_cs_mode();
+    else if (strstr(Core.Params, "-cop"))
+        set_cop_mode();
+    else if (strstr(Core.Params, "-unlock_game_mode"))
+        set_free_mode();
+    else
     {
-        CallOfPripyatMode = true;
-        ShadowOfChernobylMode = false;
-        ClearSkyMode = false;
-    }
-    else if (xr_strcmpi("cs", gameMode) == 0)
-    {
-        CallOfPripyatMode = false;
-        ShadowOfChernobylMode = false;
-        ClearSkyMode = true;
-    }
-    else if (xr_strcmpi("shoc", gameMode) == 0 || xr_strcmpi("soc", gameMode) == 0)
-    {
-        CallOfPripyatMode = false;
-        ShadowOfChernobylMode = true;
-        ClearSkyMode = false;
-    }
-    else if (xr_strcmpi("unlock", gameMode) == 0)
-    {
-        CallOfPripyatMode = false;
-        ShadowOfChernobylMode = false;
-        ClearSkyMode = false;
+        pcstr gameMode = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
+        if (xr_strcmpi("cop", gameMode) == 0)
+            set_cop_mode();
+        else if (xr_strcmpi("cs", gameMode) == 0)
+            set_cs_mode();
+        else if (xr_strcmpi("shoc", gameMode) == 0 || xr_strcmpi("soc", gameMode) == 0)
+            set_shoc_mode();
+        else if (xr_strcmpi("unlock", gameMode) == 0)
+            set_free_mode();
     }
 }
 
