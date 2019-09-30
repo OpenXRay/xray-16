@@ -195,7 +195,7 @@ Frustum::Frustum(const glm::mat4* matrix)
 }
 
 //////////////////////////////////////////////////////////////////////////
-Fvector3 wform(Fmatrix& m, Fvector3 const& v)
+Fvector3 wform(Fmatrix const& m, Fvector3 const& v)
 {
     Fvector4 r;
     r.x = v.x * m._11 + v.y * m._21 + v.z * m._31 + m._41;
@@ -207,7 +207,7 @@ Fvector3 wform(Fmatrix& m, Fvector3 const& v)
     return {r.x * invW, r.y * invW, r.z * invW};
 }
 
-Fvector3 wform(Fmatrix& m, glm::vec3 const& v)
+Fvector3 wform(Fmatrix const& m, glm::vec3 const& v)
 {
     Fvector4 r;
     r.x = v.x * m._11 + v.y * m._21 + v.z * m._31 + m._41;
@@ -219,7 +219,7 @@ Fvector3 wform(Fmatrix& m, glm::vec3 const& v)
     return {r.x * invW, r.y * invW, r.z * invW};
 }
 
-Fvector3 wform(glm::mat4& m, Fvector3 const& v)
+Fvector3 wform(glm::mat4 const& m, Fvector3 const& v)
 {
     Fvector4 r;
     r.x = v.x * m[0][0] + v.y * m[1][0] + v.z * m[2][0] + m[3][0];
@@ -231,7 +231,7 @@ Fvector3 wform(glm::mat4& m, Fvector3 const& v)
     return {r.x * invW, r.y * invW, r.z * invW};
 }
 
-Fvector3 wform(glm::mat4& m, glm::vec3 const& v)
+Fvector3 wform(glm::mat4 const& m, glm::vec3 const& v)
 {
     Fvector4 r;
     r.x = v.x * m[0][0] + v.y * m[1][0] + v.z * m[2][0] + m[3][0];
