@@ -203,7 +203,7 @@ Fvector3 wform(Fmatrix const& m, Fvector3 const& v)
     r.z = v.x * m._13 + v.y * m._23 + v.z * m._33 + m._43;
     r.w = v.x * m._14 + v.y * m._24 + v.z * m._34 + m._44;
     // VERIFY		(r.w>0.f);
-    float invW = 1.0f / r.w;
+    const float invW = 1.0f / r.w;
     return {r.x * invW, r.y * invW, r.z * invW};
 }
 
@@ -215,7 +215,7 @@ Fvector3 wform(Fmatrix const& m, glm::vec3 const& v)
     r.z = v.x * m._13 + v.y * m._23 + v.z * m._33 + m._43;
     r.w = v.x * m._14 + v.y * m._24 + v.z * m._34 + m._44;
     // VERIFY		(r.w>0.f);
-    float invW = 1.0f / r.w;
+    const float invW = 1.0f / r.w;
     return {r.x * invW, r.y * invW, r.z * invW};
 }
 
@@ -227,7 +227,7 @@ Fvector3 wform(glm::mat4 const& m, Fvector3 const& v)
     r.z = v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2] + m[3][2];
     r.w = v.x * m[0][3] + v.y * m[1][3] + v.z * m[2][3] + m[3][3];
     // VERIFY		(r.w>0.f);
-    float invW = 1.0f / r.w;
+    const float invW = 1.0f / r.w;
     return {r.x * invW, r.y * invW, r.z * invW};
 }
 
@@ -239,7 +239,7 @@ Fvector3 wform(glm::mat4 const& m, glm::vec3 const& v)
     r.z = v.x * m[0][2] + v.y * m[1][2] + v.z * m[2][2] + m[3][2];
     r.w = v.x * m[0][3] + v.y * m[1][3] + v.z * m[2][3] + m[3][3];
     // VERIFY		(r.w>0.f);
-    float invW = 1.0f / r.w;
+    const float invW = 1.0f / r.w;
     return {r.x * invW, r.y * invW, r.z * invW};
 }
 
