@@ -493,7 +493,7 @@ void CRender::render_sun()
     if (_abs(m_fCosGamma) < 0.99f && ps_r2_ls_flags.test(R2FLAG_SUN_TSM))
     {
         //  get the near and the far plane (points) in eye space.
-        #define POINTS_NUM 8
+        constexpr size_t POINTS_NUM = 8;
         glm::vec3 frustumPnts[POINTS_NUM];
 
         Frustum eyeFrustum(&m_Projection); // autocomputes all the extrema points
