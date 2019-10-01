@@ -109,8 +109,10 @@ struct ShaderTypeTraits<SVS>
             return "vs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
+#ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
+#endif
             return "vs_5_0";
         }
 #endif
@@ -209,8 +211,10 @@ struct ShaderTypeTraits<SPS>
             return "ps_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
+#ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
+#endif
             return "ps_5_0";
         }
 #endif // USE_DX11
@@ -319,8 +323,10 @@ struct ShaderTypeTraits<SGS>
             return "gs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
+#ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
+#endif
             return "gs_5_0";
         }
 #endif // USE_DX11
@@ -500,8 +506,10 @@ struct ShaderTypeTraits<SCS>
             return "cs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
+#ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
+#endif
             return "cs_5_0";
         }
 #endif // USE_DX11
