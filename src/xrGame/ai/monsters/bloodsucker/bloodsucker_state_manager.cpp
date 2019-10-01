@@ -89,58 +89,76 @@ void CStateManagerBloodsucker::execute()
     u32 state_id = u32(-1);
 
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
-
-    if (enemy)
+    if (!object->is_drag_anim_jump() && !object->is_animated())
     {
-        if (check_vampire())
+        if (enemy)
         {
-            state_id = eStateVampire_Execute;
+            if (check_vampire())
+            {
+                state_id = eStateVampire_Execute;
+            }
+            else
+            {
+                switch (object->EnemyMan.get_danger_type())
+                {
+                case eStrong: state_id = eStatePanic; break;
+                case eWeak: state_id = eStateAttack; break;
+                }
+            }
+        }
+        else if (object->HitMemory.is_hit())
+        {
+            state_id = eStateHitted;
+        }
+        else if (object->hear_interesting_sound)
+        {
+            state_id = eStateHearInterestingSound;
+        }
+        else if (object->hear_dangerous_sound)
+        {
+            state_id = eStateHearDangerousSound;
         }
         else
         {
-            switch (object->EnemyMan.get_danger_type())
-            {
-            case eStrong: state_id = eStatePanic; break;
-            case eWeak: state_id = eStateAttack; break;
-            }
+            if (can_eat())
+                state_id = eStateEat;
+            else
+                state_id = eStateRest;
         }
-    }
-    else if (object->HitMemory.is_hit())
-    {
-        state_id = eStateHitted;
-    }
-    else if (object->hear_interesting_sound)
-    {
-        state_id = eStateHearInterestingSound;
-    }
-    else if (object->hear_dangerous_sound)
-    {
-        state_id = eStateHearDangerousSound;
+
+        // check if start interesting sound state
+        // 	if ( (prev_substate != eStateHearInterestingSound) && (state_id == eStateHearInterestingSound) )
+        // 	{
+        // 		object->start_invisible_predator();
+        // 	}
+        // 	else
+        // 	// check if stop interesting sound state
+        // 	if ( (prev_substate == eStateHearInterestingSound) && (state_id != eStateHearInterestingSound) )
+        // 	{
+        // 		object->stop_invisible_predator();
+        // 	}
+
+        select_state(state_id);
+
+        // выполнить текущее состояние
+        get_state_current()->execute();
+
+        prev_substate = current_substate;
     }
     else
     {
-        if (can_eat())
-            state_id = eStateEat;
-        else
-            state_id = eStateRest;
+        state_id = eStateCustom;
+
+        if (object->is_drag_anim_jump())
+        {
+            select_state(state_id);
+
+            // выполнить текущее состояние
+            get_state_current()->execute();
+
+            prev_substate = current_substate;
+
+            drag_object();
+        }
     }
-
-    // check if start interesting sound state
-    // 	if ( (prev_substate != eStateHearInterestingSound) && (state_id == eStateHearInterestingSound) )
-    // 	{
-    // 		object->start_invisible_predator();
-    // 	}
-    // 	else
-    // 	// check if stop interesting sound state
-    // 	if ( (prev_substate == eStateHearInterestingSound) && (state_id != eStateHearInterestingSound) )
-    // 	{
-    // 		object->stop_invisible_predator();
-    // 	}
-
-    select_state(state_id);
-
-    // выполнить текущее состояние
-    get_state_current()->execute();
-
-    prev_substate = current_substate;
 }
