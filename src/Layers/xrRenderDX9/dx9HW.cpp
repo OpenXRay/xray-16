@@ -36,7 +36,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = true; //!psDeviceFlags.is(rsFullscreen);
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -227,7 +227,7 @@ void CHW::Reset()
     _RELEASE(pBaseZB);
     _RELEASE(pBaseRT);
 
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = true; // !psDeviceFlags.is(rsFullscreen);
 
     DevPP.BackBufferWidth = Device.dwWidth;
     DevPP.BackBufferHeight = Device.dwHeight;
