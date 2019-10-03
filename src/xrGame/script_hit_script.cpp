@@ -23,6 +23,7 @@ SCRIPT_EXPORT(CScriptHit, (), {
                           value("chemical_burn", int(ALife::eHitTypeChemicalBurn)),
                           value("explosion", int(ALife::eHitTypeExplosion)),
                           value("fire_wound", int(ALife::eHitTypeFireWound)),
+                          value("physic_strike", int(ALife::eHitTypePhysicStrike)),
                           value("light_burn", int(ALife::eHitTypeLightBurn)), value("dummy", int(ALife::eHitTypeMax))]
                       .def_readwrite("power", &CScriptHit::m_fPower)
                       .def_readwrite("direction", &CScriptHit::m_tDirection)

@@ -102,7 +102,7 @@ enum EHitType : u32
     eHitTypeStrike,
     eHitTypeExplosion,
     eHitTypeWound_2, // knife's alternative fire
-    //      eHitTypePhysicStrike,
+    eHitTypePhysicStrike,
     eHitTypeLightBurn,
     eHitTypeMax,
 };

@@ -1194,14 +1194,14 @@ void game_sv_Deathmatch::SetSkin(CSE_Abstract* E, u16 Team, u16 ID)
 
 void game_sv_Deathmatch::OnPlayerHitPlayer_Case(game_PlayerState* ps_hitter, game_PlayerState* ps_hitted, SHit* pHitS)
 {
-    // if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
-    //{
-    if (ps_hitted->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+    if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
     {
-        pHitS->power = 0;
-        pHitS->impulse = 0;
+        if (ps_hitted->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+        {
+            pHitS->power = 0;
+            pHitS->impulse = 0;
+        }
     }
-    //	}
 };
 
 void game_sv_Deathmatch::OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P)
