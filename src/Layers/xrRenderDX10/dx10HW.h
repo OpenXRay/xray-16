@@ -25,8 +25,6 @@ public:
 
     void Reset();
 
-    void Validate() {}
-
     std::pair<u32, u32> GetSurfaceSize() const;
 
     bool CheckFormatSupport(DXGI_FORMAT format, UINT feature) const;

@@ -181,7 +181,6 @@ public:
     virtual void updateGamma() override;
     //	Destroy
     virtual void OnDeviceDestroy(bool bKeepTextures) override;
-    virtual void ValidateHW() override;
     virtual void DestroyHW() override;
     virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
     //	Init

@@ -393,14 +393,6 @@ D3DFORMAT CHW::GetSurfaceFormat() const
     return DevPP.BackBufferFormat;
 }
 
-void CHW::Validate()
-{
-#if defined(DEBUG)
-    VERIFY(pDevice);
-    VERIFY(pD3D);
-#endif
-};
-
 void CHW::Present()
 {
     pDevice->Present(nullptr, nullptr, nullptr, nullptr);

@@ -29,7 +29,6 @@ public:
     D3DFORMAT GetSurfaceFormat() const;
     void Present();
     DeviceState GetDeviceState();
-    void Validate();
 
 private:
     u32 selectPresentInterval();

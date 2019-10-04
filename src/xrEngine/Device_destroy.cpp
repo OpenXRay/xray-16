@@ -13,7 +13,6 @@ void CRenderDevice::Destroy()
     if (!b_is_Ready)
         return;
     Log("Destroying Render...");
-    GEnv.Render->ValidateHW();
     GEnv.DU->OnDeviceDestroy();
     b_is_Ready = false;
     Statistic->OnDeviceDestroy();

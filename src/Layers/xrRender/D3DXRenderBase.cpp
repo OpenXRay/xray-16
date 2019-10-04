@@ -58,10 +58,6 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
     RCache.OnDeviceDestroy();
 }
 
-void D3DXRenderBase::ValidateHW()
-{
-    HW.Validate();
-}
 void D3DXRenderBase::DestroyHW()
 {
     xr_delete(Resources);
@@ -254,7 +250,6 @@ void D3DXRenderBase::ResourcesDumpMemoryUsage()
 }
 DeviceState D3DXRenderBase::GetDeviceState()
 {
-    HW.Validate();
     return HW.GetDeviceState();
 }
 
