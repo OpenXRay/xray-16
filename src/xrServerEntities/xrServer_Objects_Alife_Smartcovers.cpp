@@ -114,6 +114,13 @@ void CSE_SmartCover::STATE_Read(NET_Packet& tNetPacket, u16 size)
 
     if (m_wVersion >= 128)
         m_can_fire = tNetPacket.r_u8();
+    else
+    {
+        // I don't know how, but it seems that
+        // m_is_combat_cover can be changed
+        // in scripts. Let's just sync here.
+        m_can_fire = m_is_combat_cover;
+    }
 }
 
 void CSE_SmartCover::STATE_Write(NET_Packet& tNetPacket)
