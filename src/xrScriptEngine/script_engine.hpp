@@ -114,10 +114,43 @@ private:
     void add_no_file(pcstr file_name, size_t string_length);
 
 protected:
-    int vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, va_list marker);
     bool parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size, pstr c, size_t c_size);
     bool do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName);
     void reinit();
+    
+    static constexpr std::pair<cpcstr, cpcstr> get_message_headers(LuaMessageType message)
+    {
+        switch (message)
+        {
+        case LuaMessageType::Info:
+            return { "* [LUA] ", "[INFO]        " };
+
+        case LuaMessageType::Error:
+            return { "! [LUA] ", "[ERROR]       " };
+
+        case LuaMessageType::Message:
+            return { "[LUA] ", "[MESSAGE]     " };
+
+        case LuaMessageType::HookCall:
+            return { "[LUA][HOOK_CALL] ", "[CALL]        " };
+
+        case LuaMessageType::HookReturn:
+            return { "[LUA][HOOK_RETURN] ", "[RETURN]      " };
+
+        case LuaMessageType::HookLine:
+            return { "[LUA][HOOK_LINE] ", "[LINE]        " };
+
+        case LuaMessageType::HookCount:
+            return { "[LUA][HOOK_COUNT] ", "[COUNT]       " };
+
+        case LuaMessageType::HookTailReturn:
+            return { "[LUA][HOOK_TAIL_RETURN] ", "[TAIL_RETURN] " };
+
+        default:
+            NODEFAULT;
+            return {};
+        }
+    }
 
 public:
     lua_State* lua() { return m_virtual_machine; }
@@ -135,8 +168,40 @@ public:
     bool object(LPCSTR caIdentifier, int type);
     bool object(LPCSTR caNamespaceName, LPCSTR caIdentifier, int type);
     luabind::object name_space(LPCSTR namespace_name);
-    int error_log(LPCSTR caFormat, ...);
-    int script_log(LuaMessageType message, LPCSTR caFormat, ...);
+
+    template<typename... Args>
+    int error_log(cpcstr format, Args... args)
+    {
+        string4096 log;
+        const int result = xr_sprintf(log, format, std::forward<Args>(args)...);
+        constexpr cpcstr header = "! [LUA][ERROR] ";
+        Log(header, log);
+        return result;
+    }
+
+    template<typename... Args>
+    int script_log(LuaMessageType message, cpcstr format, Args... args)
+    {
+        int result = 0;
+
+        //if (g_LuaDebug.test(1) || message == LuaMessageType::Error)
+        {
+            string4096 log;
+            result = xr_sprintf(log, format, std::forward<Args>(args)...);
+
+            auto [logHeader, luaLogHeader] = get_message_headers(message);
+            Log(logHeader, log);
+            m_output.w(luaLogHeader, xr_strlen(luaLogHeader));
+            m_output.w(log, xr_strlen(log));
+            m_output.w("\r\n", sizeof("\r\n"));
+        }
+
+        if (message == LuaMessageType::Error)
+            print_stack();
+
+        return result;
+    }
+
     static bool print_output(lua_State* L, pcstr caScriptName, int iErrorCode = 0, pcstr caErrorText = nullptr);
 
 private:

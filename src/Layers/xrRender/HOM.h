@@ -61,12 +61,12 @@ public:
     }
 
     void __stdcall MT_RENDER();
-    ICF void MT_SYNC()
+    ICF bool MT_Sync()
     {
-        if (MT_Synced())
-            return;
+        if (!MT_Synced())
+            MT_RENDER();
 
-        MT_RENDER();
+        return true;
     }
 
     BOOL visible(vis_data& vis);

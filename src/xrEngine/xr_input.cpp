@@ -430,15 +430,15 @@ bool CInput::iGetAsyncGpadBtnState(const int btn)
 void CInput::GrabInput(const bool grab)
 {
     // Self descriptive
-    SDL_ShowCursor(grab ? SDL_FALSE : SDL_TRUE);
+    SDL_ShowCursor(SDL_TRUE);
 
     // Clip cursor to the current window
     // If SDL_HINT_GRAB_KEYBOARD is set then the keyboard will be grabbed too
-    SDL_SetWindowGrab(Device.m_sdlWnd, grab ? SDL_TRUE : SDL_FALSE);
+    SDL_SetWindowGrab(Device.m_sdlWnd, SDL_FALSE);
 
     // Grab the mouse
     if (exclusiveInput)
-        SDL_SetRelativeMouseMode(grab ? SDL_TRUE : SDL_FALSE);
+        SDL_SetRelativeMouseMode(SDL_FALSE);
 
     // We're done here.
     inputGrabbed = grab;

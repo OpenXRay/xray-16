@@ -178,7 +178,7 @@ public:
     BOOL parse(void* desc, u32 destination);
     void merge(R_constant_table* C);
     ref_constant get(LPCSTR name); // slow search
-    ref_constant get(shared_str& name); // fast search
+    ref_constant get(const shared_str& name); // fast search
 
     BOOL equal(R_constant_table& C);
     BOOL equal(R_constant_table* C) { return equal(*C); }

@@ -16,7 +16,7 @@ const xr_token hit_types_token[] =
     {"chemical_burn", eHitTypeChemicalBurn},
     {"explosion", eHitTypeExplosion},
     {"wound_2", eHitTypeWound_2},
-    //{"physic_strike", eHitTypePhysicStrike},
+    {"physic_strike", eHitTypePhysicStrike},
     {"light_burn", eHitTypeLightBurn},
     {nullptr, 0}
 };
@@ -45,6 +45,8 @@ EHitType g_tfString2HitType(LPCSTR caHitType)
         return eHitTypeExplosion;
     if (!xr_stricmp(caHitType, "wound_2"))
         return eHitTypeWound_2;
+    if (!xr_stricmp(caHitType, "physic_strike"))
+        return eHitTypePhysicStrike;
 
     FATAL("Unsupported hit type!");
     NODEFAULT;

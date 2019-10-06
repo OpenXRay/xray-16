@@ -100,12 +100,15 @@ CPHMovementControl::~CPHMovementControl(void)
 
 static ALife::EHitType DefineCollisionHitType(u16 material_idx)
 {
-    if (GMLib.GetMaterialByIdx(material_idx)->Flags.test(SGameMtl::flInjurious) && IsGameTypeSingle())
-        return ALife::eHitTypeRadiation;
-    else
-        return ALife::eHitTypeStrike;
-    //	return (GameID() == eGameIDSingle) ? ALife::eHitTypeStrike : ALife::eHitTypePhysicStrike;
-} //
+    if (IsGameTypeSingle())
+    {
+        if (GMLib.GetMaterialByIdx(material_idx)->Flags.test(SGameMtl::flInjurious))
+            return ALife::eHitTypeRadiation;
+    }
+    else if (ShadowOfChernobylMode || ClearSkyMode)
+        return ALife::eHitTypePhysicStrike;
+    return ALife::eHitTypeStrike;
+}
 
 // static Fvector old_pos={0,0,0};
 // static bool bFirst=true;
@@ -1280,6 +1283,7 @@ void CPHMovementControl::ApplyHit(const Fvector& dir, const float P, ALife::EHit
         case ALife::eHitTypeBurn:; // stop
         case ALife::eHitTypeShock:; // stop
         case ALife::eHitTypeStrike:; // stop
+        case ALife::eHitTypePhysicStrike: // stop
         case ALife::eHitTypeWound:
             SetVelocity(Fvector().set(0, 0, 0));
             break; // stop							;
@@ -1292,7 +1296,6 @@ void CPHMovementControl::ApplyHit(const Fvector& dir, const float P, ALife::EHit
         case ALife::eHitTypeFireWound:; // stop
         case ALife::eHitTypeWound_2:;
             break; // stop		//knife's alternative fire
-        //			case ALife::eHitTypePhysicStrike:	SetVelocity(Fvector().set(0,0,0))	;break;//stop
         default: NODEFAULT;
         }
     }

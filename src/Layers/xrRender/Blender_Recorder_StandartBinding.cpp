@@ -236,7 +236,7 @@ class cl_eye_P : public R_constant_setup
     virtual void setup(R_constant* C)
     {
         Fvector& V = RDEVICE.vCameraPosition;
-        RCache.set_c(C, V.x, V.y, V.z, 1);
+        RCache.set_c(C, V.x, V.y, V.z, 1.f);
     }
 };
 static cl_eye_P binder_eye_P;
@@ -247,7 +247,7 @@ class cl_eye_D : public R_constant_setup
     virtual void setup(R_constant* C)
     {
         Fvector& V = RDEVICE.vCameraDirection;
-        RCache.set_c(C, V.x, V.y, V.z, 0);
+        RCache.set_c(C, V.x, V.y, V.z, 0.f);
     }
 };
 static cl_eye_D binder_eye_D;
@@ -258,7 +258,7 @@ class cl_eye_N : public R_constant_setup
     virtual void setup(R_constant* C)
     {
         Fvector& V = RDEVICE.vCameraTop;
-        RCache.set_c(C, V.x, V.y, V.z, 0);
+        RCache.set_c(C, V.x, V.y, V.z, 0.f);
     }
 };
 static cl_eye_N binder_eye_N;

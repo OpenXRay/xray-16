@@ -28,6 +28,7 @@ void CBackend::OnFrameEnd()
         CHK_DX(HW.pDevice->SetIndices(nullptr));
         CHK_DX(HW.pDevice->SetVertexShader(nullptr));
         CHK_DX(HW.pDevice->SetPixelShader(nullptr));
+        CHK_DX(HW.pDevice->EndScene());
 #endif
         Invalidate();
     }
@@ -39,6 +40,9 @@ void CBackend::OnFrameBegin()
     {
         PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));
 
+#if defined(USE_DX9)
+        CHK_DX(HW.pDevice->BeginScene());
+#endif
         // DX9 sets base rt and base zb by default
 #ifndef USE_DX9
         Invalidate();
@@ -234,6 +238,9 @@ void CBackend::set_Textures(STextureList* _T)
 
     for (; _it != _end; ++_it)
     {
+        if (_it->second == NULL) {
+            continue;
+        }
         std::pair<u32, ref_texture>& loader = *_it;
         u32 load_id = loader.first;
         CTexture* load_surf = &*loader.second;
@@ -248,12 +255,12 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_ps[load_id] != load_surf)
             {
                 textures_ps[load_id] = load_surf;
-#ifdef DEBUG
-                stat.textures++;
-#endif
+//#ifdef DEBUG
+//                stat.textures++;
+//#endif
                 if (load_surf)
                 {
-                    PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
+                    //Msg("PGO:tex%d:  %s", load_id, load_surf->cName.c_str());
                     load_surf->bind(load_id);
                     //load_surf->Apply(load_id);
                 }
@@ -274,12 +281,12 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_vs[load_id_remapped] != load_surf)
             {
                 textures_vs[load_id_remapped] = load_surf;
-#ifdef DEBUG
-                stat.textures++;
-#endif
+//#ifdef DEBUG
+//                stat.textures++;
+//#endif
                 if (load_surf)
                 {
-                    PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
+                    //Msg("PGO:tex%d:  %s", load_id, load_surf->cName.c_str());
                     load_surf->bind(load_id);
                     //load_surf->Apply(load_id);
                 }
@@ -303,7 +310,7 @@ void CBackend::set_Textures(STextureList* _T)
 #endif
                 if (load_surf)
                 {
-                    PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
+                    //PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(load_id);
                     //load_surf->Apply(load_id);
                 }
@@ -327,7 +334,7 @@ void CBackend::set_Textures(STextureList* _T)
 #endif
                 if (load_surf)
                 {
-                    PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
+                    //PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(load_id);
                     //load_surf->Apply(load_id);
                 }
@@ -350,7 +357,7 @@ void CBackend::set_Textures(STextureList* _T)
 #endif
                 if (load_surf)
                 {
-                    PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
+                    //PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(load_id);
                     //load_surf->Apply(load_id);
                 }
@@ -373,7 +380,7 @@ void CBackend::set_Textures(STextureList* _T)
 #endif
                 if (load_surf)
                 {
-                    PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
+                    //PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(load_id);
                     //load_surf->Applyload_id);
                 }

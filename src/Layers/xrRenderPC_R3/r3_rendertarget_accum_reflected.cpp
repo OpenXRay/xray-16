@@ -54,7 +54,7 @@ void CRenderTarget::accum_reflected(light* L)
         // Constants
         RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, 1 / (L->range * L->range));
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
-        RCache.set_c("direction", L_dir.x, L_dir.y, L_dir.z, 0);
+        RCache.set_c("direction", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("m_texgen", m_Texgen);
 
         if (!RImplementation.o.dx10_msaa)

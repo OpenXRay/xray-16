@@ -2,6 +2,8 @@
 #include "ui_base.h"
 #include "Cursor/UICursor.h"
 #include "xrCore/XML/XMLDocument.hpp"
+#include "XML/UIXmlInitBase.h"
+#include "XML/UITextureMaster.h"
 
 CUICursor& GetUICursor() { return GEnv.UI->GetUICursor(); }
 UICore& UI() { return *GEnv.UI; }
@@ -226,12 +228,56 @@ UICore::UICore()
     m_current_scale = &m_scale_;
     g_current_font_scale.set(1.0f, 1.0f);
     m_currentPointType = IUIRender::pttTL;
+    ReadTextureInfo();
+    CUIXmlInitBase::InitColorDefs();
 }
 
 UICore::~UICore()
 {
     xr_delete(m_pFontManager);
     xr_delete(m_pUICursor);
+}
+
+void UICore::ReadTextureInfo()
+{
+    string_path buf;
+    FS_FileSet files;
+
+    const auto ParseFileSet = [&](pcstr path)
+    {
+        FS.file_list(files, "$game_config$", FS_ListFiles,
+            strconcat(sizeof(buf), buf, path, DELIMITER "textures_descr" DELIMITER "*.xml")
+        );
+        for (const auto& file : files)
+        {
+            string_path path, name;
+            _splitpath(file.name.c_str(), nullptr, path, name, nullptr);
+            xr_strcat(name, ".xml");
+            path[xr_strlen(path) - 1] = '\0'; // cut the latest '\\'
+
+            CUITextureMaster::ParseShTexInfo(path, name);
+        }
+    };
+
+    ParseFileSet(UI_PATH_DEFAULT);
+
+    if (0 != xr_strcmp(UI_PATH, UI_PATH_DEFAULT))
+        ParseFileSet(UI_PATH);
+
+    if (pSettings->section_exist("texture_desc"))
+    {
+        string256 single_item;
+
+        cpcstr itemsList = pSettings->r_string("texture_desc", "files");
+        const u32 itemsCount = _GetItemCount(itemsList);
+
+        for (u32 i = 0; i < itemsCount; i++)
+        {
+            _GetItem(itemsList, i, single_item);
+            xr_strcat(single_item, ".xml");
+            CUITextureMaster::ParseShTexInfo(single_item);
+        }
+    }
 }
 
 void UICore::pp_start()

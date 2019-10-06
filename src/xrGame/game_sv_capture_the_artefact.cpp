@@ -1521,22 +1521,22 @@ void game_sv_CaptureTheArtefact::OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted,
 void game_sv_CaptureTheArtefact::OnPlayerHitPlayer_Case(
     game_PlayerState* ps_hitter, game_PlayerState* ps_hitted, SHit* pHitS)
 {
-    // if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
-    //{
-    if (ps_hitter && ps_hitted)
+    if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
     {
-        if (ps_hitter->team == ps_hitted->team && ps_hitter != ps_hitted)
+        if (ps_hitter && ps_hitted)
         {
-            pHitS->power *= GetFriendlyFire();
-            pHitS->impulse *= (GetFriendlyFire() > 1.0f) ? GetFriendlyFire() : 1.0f;
+            if (ps_hitter->team == ps_hitted->team && ps_hitter != ps_hitted)
+            {
+                pHitS->power *= GetFriendlyFire();
+                pHitS->impulse *= (GetFriendlyFire() > 1.0f) ? GetFriendlyFire() : 1.0f;
+            }
+        }
+        if (ps_hitted->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+        {
+            pHitS->power = 0;
+            pHitS->impulse = 0;
         }
     }
-    if (ps_hitted->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
-    {
-        pHitS->power = 0;
-        pHitS->impulse = 0;
-    }
-    //	}
 };
 
 void game_sv_CaptureTheArtefact::OnPlayerKillPlayer(game_PlayerState* ps_killer, game_PlayerState* ps_killed,

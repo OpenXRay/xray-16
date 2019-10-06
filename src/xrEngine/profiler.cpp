@@ -7,9 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-// XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-#if 0
+
 #include "profiler.h"
+
+#ifdef USE_PROFILER
 #include "xrEngine/GameFont.h"
 
 #ifdef CONFIG_PROFILE_LOCKS
@@ -30,7 +31,7 @@ void add_profile_portion				(LPCSTR id, const u64 &time)
 }
 #endif // CONFIG_PROFILE_LOCKS
 
-CProfiler	*g_profiler			= 0;
+CProfiler	*g_profiler			= nullptr;
 LPCSTR		indent				= "  ";
 char		white_character		= '.';
 
@@ -268,4 +269,5 @@ void CProfiler::add_profile_portion	(const CProfileResultPortion &profile_portio
 	InterlockedExchange			(&critical_section_counter,0);
 #endif // CONFIG_PROFILE_LOCKS
 }
-#endif
+
+#endif // USE_PROFILER

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 
 CRT::CRT()
 {
@@ -19,7 +19,7 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/, bool /*useUAV = false*/)
 {
     if (pSurface)
         return;

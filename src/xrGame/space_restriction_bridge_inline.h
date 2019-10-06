@@ -29,32 +29,37 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
     VERIFY(!restriction->border().empty());
     VERIFY(!restriction->accessible_neighbour_border(restriction, out_restriction).empty());
 
+    auto& level_graph = ai().level_graph();
+
     float min_dist_sqr = flt_max;
     u32 selected = u32(-1);
     xr_vector<u32>::const_iterator I = restriction->accessible_neighbour_border(restriction, out_restriction).begin();
     xr_vector<u32>::const_iterator E = restriction->accessible_neighbour_border(restriction, out_restriction).end();
     for (; I != E; ++I)
     {
-        VERIFY2(ai().level_graph().valid_vertex_id(*I), make_string("%d", *I));
-        float distance_sqr = ai().level_graph().vertex_position(*I).distance_to_sqr(position);
+        VERIFY2(level_graph.valid_vertex_id(*I), make_string("%d", *I));
+        float distance_sqr = level_graph.vertex_position(*I).distance_to_sqr(position);
         if (distance_sqr < min_dist_sqr)
         {
             min_dist_sqr = distance_sqr;
             selected = *I;
         }
     }
-    VERIFY2(ai().level_graph().valid_vertex_id(selected),
+    bool selected_vertex_id_is_valid = level_graph.valid_vertex_id(selected);
+    VERIFY2(selected_vertex_id_is_valid,
         make_string("vertex_id[%d], object[%s], position[%f][%f][%f]", selected, *name(), VPUSH(position)));
+    if (!selected_vertex_id_is_valid)
+        return -1;
 
     {
         min_dist_sqr = flt_max;
         u32 new_selected = u32(-1);
         CLevelGraph::const_iterator I, E;
-        ai().level_graph().begin(selected, I, E);
+        level_graph.begin(selected, I, E);
         for (; I != E; ++I)
         {
-            u32 current = ai().level_graph().value(selected, I);
-            if (!ai().level_graph().valid_vertex_id(current))
+            u32 current = level_graph.value(selected, I);
+            if (!level_graph.valid_vertex_id(current))
                 continue;
             // if (out_restriction)
             //		check if node is completely inside
@@ -63,7 +68,7 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
             if (restriction->inside(current, !out_restriction) != out_restriction)
                 continue;
 
-            float distance_sqr = ai().level_graph().vertex_position(current).distance_to_sqr(position);
+            float distance_sqr = level_graph.vertex_position(current).distance_to_sqr(position);
             if (distance_sqr < min_dist_sqr)
             {
                 min_dist_sqr = distance_sqr;
@@ -72,11 +77,14 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
         }
         selected = new_selected;
     }
-    VERIFY(ai().level_graph().valid_vertex_id(selected));
+    selected_vertex_id_is_valid = level_graph.valid_vertex_id(selected);
+    VERIFY(selected_vertex_id_is_valid);
+    if (!selected_vertex_id_is_valid)
+        return -1;
 
     {
-        Fvector center = ai().level_graph().vertex_position(selected);
-        float offset = ai().level_graph().header().cell_size() * .5f - EPS_L;
+        Fvector center = level_graph.vertex_position(selected);
+        float offset = level_graph.header().cell_size() * .5f - EPS_L;
         bool found = false;
         min_dist_sqr = flt_max;
         for (u32 i = 0; i < 5; ++i)
@@ -96,9 +104,9 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
             default: NODEFAULT;
             }
             if (i < 4)
-                current.P.y = ai().level_graph().vertex_plane_y(selected, current.P.x, current.P.z);
+                current.P.y = level_graph.vertex_plane_y(selected, current.P.x, current.P.z);
 
-            VERIFY(ai().level_graph().inside(selected, current.P));
+            VERIFY(level_graph.inside(selected, current.P));
             VERIFY(restriction->inside(selected, !out_restriction) == out_restriction);
             VERIFY(restriction->inside(current) == out_restriction);
             float distance_sqr = current.P.distance_to(position);
@@ -111,7 +119,10 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
         }
         VERIFY(found);
     }
-    VERIFY(ai().level_graph().valid_vertex_id(selected));
+    selected_vertex_id_is_valid = level_graph.valid_vertex_id(selected);
+    VERIFY(selected_vertex_id_is_valid);
+    if (!selected_vertex_id_is_valid)
+        return -1;
 
     return (selected);
 }

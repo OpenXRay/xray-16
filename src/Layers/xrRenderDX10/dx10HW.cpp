@@ -92,13 +92,22 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 #ifdef USE_DX11
     D3D_FEATURE_LEVEL featureLevels[] =
     {
+#ifdef HAS_DX11_3
+        D3D_FEATURE_LEVEL_12_1,
+        D3D_FEATURE_LEVEL_12_0,
+#endif
         D3D_FEATURE_LEVEL_11_1,
         D3D_FEATURE_LEVEL_11_0,
         D3D_FEATURE_LEVEL_10_1,
         D3D_FEATURE_LEVEL_10_0
     };
 
-    constexpr auto count = std::size(featureLevels);
+    D3D_FEATURE_LEVEL featureLevels2[] =
+    {
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0
+    };
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
@@ -107,18 +116,33 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
     };
 
-    R = createDevice(featureLevels, count);
+    R = createDevice(featureLevels, std::size(featureLevels));
     if (FAILED(R))
-        R = createDevice(&featureLevels[1], count - 1);
+        R = createDevice(featureLevels2, std::size(featureLevels2));
 
-    if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-        ComputeShadersSupported = true;
-    else
+    if (SUCCEEDED(R))
     {
-        D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
-        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS,
-            &data, sizeof(data));
-        ComputeShadersSupported = data.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
+#ifdef HAS_DX11_3
+        pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
+#endif
+        if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+            ComputeShadersSupported = true;
+        else
+        {
+            D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
+            pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS,
+                &data, sizeof(data));
+            ComputeShadersSupported = data.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
+        }
+        D3D11_FEATURE_DATA_D3D11_OPTIONS options;
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &options, sizeof(options));
+
+        D3D11_FEATURE_DATA_DOUBLES doubles;
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_DOUBLES, &doubles, sizeof(doubles));
+
+        DoublePrecisionFloatShaderOps = doubles.DoublePrecisionFloatShaderOps;
+        SAD4ShaderInstructions = options.SAD4ShaderInstructions;
+        ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
     }
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
@@ -143,10 +167,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     }
 
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
-
-#ifdef HAS_DX11_3
-    pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
-#endif
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
@@ -445,4 +465,44 @@ void CHW::UpdateViews()
     R_CHK(R);
 
     _RELEASE(pDepthStencil);
+}
+
+std::pair<u32, u32> CHW::GetSurfaceSize() const
+{
+    return
+    {
+        m_ChainDesc.BufferDesc.Width,
+        m_ChainDesc.BufferDesc.Height
+    };
+}
+
+void CHW::Present()
+{
+    const bool bUseVSync = psDeviceFlags.is(rsFullscreen) &&
+        psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
+    m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+#ifdef HAS_DX11_2
+    if (m_pSwapChain2 && UsingFlipPresentationModel())
+    {
+        const float fps = Device.GetStats().fFPS;
+        if (fps < 30)
+            m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.85f, Device.dwHeight * 0.85f);
+        else if (fps < 15)
+            m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.7f, Device.dwHeight * 0.7f);
+    }
+#endif
+}
+
+DeviceState CHW::GetDeviceState()
+{
+    const auto result = m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
+
+    switch (result)
+    {
+        // Check if the device is ready to be reset
+    case DXGI_ERROR_DEVICE_RESET:
+        return DeviceState::NeedReset;
+    }
+
+    return DeviceState::Normal;
 }

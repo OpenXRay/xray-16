@@ -751,7 +751,7 @@ ICF void CBackend::ApplyRTandZB()
     }
 }
 
-IC void CBackend::get_ConstantDirect(shared_str& n, u32 DataSize, void** pVData, void** pGData, void** pPData)
+IC void CBackend::get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData)
 {
     ref_constant C = get_c(n);
 

@@ -129,61 +129,6 @@ void CScriptEngine::reinit()
     scriptBuffer = xr_alloc<char>(scriptBufferSize);
 }
 
-int CScriptEngine::vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, va_list marker)
-{
-    //if (!g_LuaDebug.test(1) && luaMessageType != LuaMessageType::Error)
-    //    return 0;
-    LPCSTR S = "", SS = "";
-    LPSTR S1;
-    string4096 S2;
-    switch (luaMessageType)
-    {
-    case LuaMessageType::Info:
-        S = "* [LUA] ";
-        SS = "[INFO]        ";
-        break;
-    case LuaMessageType::Error:
-        S = "! [LUA] ";
-        SS = "[ERROR]       ";
-        break;
-    case LuaMessageType::Message:
-        S = "[LUA] ";
-        SS = "[MESSAGE]     ";
-        break;
-    case LuaMessageType::HookCall:
-        S = "[LUA][HOOK_CALL] ";
-        SS = "[CALL]        ";
-        break;
-    case LuaMessageType::HookReturn:
-        S = "[LUA][HOOK_RETURN] ";
-        SS = "[RETURN]      ";
-        break;
-    case LuaMessageType::HookLine:
-        S = "[LUA][HOOK_LINE] ";
-        SS = "[LINE]        ";
-        break;
-    case LuaMessageType::HookCount:
-        S = "[LUA][HOOK_COUNT] ";
-        SS = "[COUNT]       ";
-        break;
-    case LuaMessageType::HookTailReturn:
-        S = "[LUA][HOOK_TAIL_RETURN] ";
-        SS = "[TAIL_RETURN] ";
-        break;
-    default: NODEFAULT;
-    }
-    xr_strcpy(S2, S);
-    S1 = S2 + xr_strlen(S);
-    int l_iResult = vsprintf(S1, caFormat, marker);
-    Msg("%s", S2);
-    xr_strcpy(S2, SS);
-    S1 = S2 + xr_strlen(SS);
-    vsprintf(S1, caFormat, marker);
-    xr_strcat(S2, "\r\n");
-    m_output.w(S2, xr_strlen(S2));
-    return l_iResult;
-}
-
 void CScriptEngine::print_stack(lua_State* L)
 {
     if (!m_stack_is_ready || logReenterability)
@@ -356,20 +301,6 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level)
     Msg("%s %s %s : %s", tabBuffer, type, name, value);
 }
 
-int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
-{
-    va_list marker;
-    va_start(marker, caFormat);
-    int result = vscript_log(message, caFormat, marker);
-    va_end(marker);
-
-#ifdef DEBUG
-    if (message == LuaMessageType::Error)
-        print_stack();
-#endif
-
-    return result;
-}
 
 bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size, pstr c, size_t c_size)
 {
@@ -717,21 +648,6 @@ void CScriptEngine::flush_log()
     strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, "_lua.log");
     FS.update_path(log_file_name, "$logs$", log_file_name);
     m_output.save_to(log_file_name);
-}
-
-int CScriptEngine::error_log(LPCSTR format, ...)
-{
-    va_list marker;
-    va_start(marker, format);
-    LPCSTR S = "! [LUA][ERROR] ";
-    LPSTR S1;
-    string4096 S2;
-    xr_strcpy(S2, S);
-    S1 = S2 + xr_strlen(S);
-    int result = vsprintf(S1, format, marker);
-    va_end(marker);
-    Msg("%s", S2);
-    return result;
 }
 
 #ifdef USE_DEBUGGER

@@ -93,6 +93,7 @@ private:
     xr_vector<SPass*> v_passes;
     xr_vector<ShaderElement*> v_elements;
     xr_vector<Shader*> v_shaders;
+    Lock v_shaders_lock;
 
     xr_vector<ref_texture> m_necessary;
     // misc
@@ -152,11 +153,7 @@ public:
     void _DeleteInputSignature(const SInputSignature* pSignature);
 #endif //	USE_DX10
 
-#ifdef USE_DX11
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
-#else
-    CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1);
-#endif
     void _DeleteRT(const CRT* RT);
 
 //	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);

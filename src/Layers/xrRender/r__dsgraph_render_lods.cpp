@@ -22,12 +22,13 @@ void D3DXRenderBase::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
     if (mapLOD.empty())
         return;
 
-    xr_vector<R_dsgraph::_LodItem> lstLODs;
-
     if (_setup_zb)
         mapLOD.get_left_right(lstLODs); // front-to-back
     else
         mapLOD.get_right_left(lstLODs);	// back-to-front
+
+    if (lstLODs.empty())
+        return;
 
     // *** Fill VB and generate groups
     u32 shid = _setup_zb ? SE_R1_LMODELS : SE_R1_NORMAL_LQ;
@@ -143,6 +144,8 @@ void D3DXRenderBase::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
 
         lstLODgroups.clear();
     }
+
+    lstLODs.clear();
 
     if (_clear)
         mapLOD.clear();

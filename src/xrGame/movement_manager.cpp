@@ -137,10 +137,10 @@ u32 CMovementManager::level_dest_vertex_id() const { return (level_path().dest_v
 const xr_vector<DetailPathManager::STravelPathPoint>& CMovementManager::path() const { return (detail().path()); }
 void CMovementManager::update_path()
 {
-    START_PROFILE("Build Path::update")
-
     if (!enabled() || wait_for_distributed_computation())
         return;
+
+    START_PROFILE("Build Path::update")
 
     if (!game_path().evaluator())
         game_path().set_evaluator(base_game_params());

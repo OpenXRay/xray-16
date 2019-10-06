@@ -543,15 +543,15 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
     ScriptEngineLock.Leave();
 
+    ScopeLock scope(&v_shaders_lock);
     // Search equal in shaders array
-    for (u32 it = 0; it < v_shaders.size(); it++)
-        if (S.equal(v_shaders[it]))
-            return v_shaders[it];
+    for (Shader* v_shader : v_shaders)
+        if (S.equal(v_shader))
+            return v_shader;
 
     // Create _new_ entry
-    Shader* N = new Shader(S);
+    Shader* N = v_shaders.emplace_back(new Shader(S));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    v_shaders.push_back(N);
     return N;
 }
 
@@ -565,13 +565,11 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     LPCSTR t_0 = *L_textures[0] ? *L_textures[0] : "null";
     LPCSTR t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
     LPCSTR t_d = detail_texture ? detail_texture : "null";
-    RImplementation.Resources->ScriptEngineLock.Enter();
     const object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
     const functor<void> element = (object)shader[name];
     bool bFirstPass = false;
     adopt_compiler ac = adopt_compiler(this, bFirstPass);
     element(ac, t_0, t_1, t_d);
-    RImplementation.Resources->ScriptEngineLock.Leave();
     r_End();
     ShaderElement* _r = RImplementation.Resources->_CreateElement(E);
     return _r;

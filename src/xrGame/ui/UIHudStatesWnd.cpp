@@ -74,7 +74,7 @@ ALife::EInfluenceType CUIHudStatesWnd::get_indik_type(ALife::EHitType hit_type)
     case ALife::eHitTypeExplosion:
     case ALife::eHitTypeFireWound:
     case ALife::eHitTypeWound_2:
-        //	case ALife::eHitTypePhysicStrike:
+    case ALife::eHitTypePhysicStrike:
         return ALife::infl_max_count;
     default: NODEFAULT;
     }

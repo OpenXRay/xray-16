@@ -8,35 +8,31 @@
 
 #pragma once
 
-// XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-#define START_PROFILE(a) {
-#define STOP_PROFILE }
-#if 0
-#include "xrCore/xrCore.h"
-#include "xrEngine/Engine.h"
-#include "xrEngine/defines.h"
-
-class IGameFont;
-
 #if defined(DEBUG) && !defined(USE_PROFILER)
 #define USE_PROFILER
 #endif
 
 #ifdef USE_PROFILER
 
+#include "xrCore/xrCore.h"
+#include "xrEngine/Engine.h"
+#include "xrEngine/defines.h"
+
+class IGameFont;
+
 #ifdef CONFIG_PROFILE_LOCKS
 extern void add_profile_portion(LPCSTR id, const u64 &time);
 #endif
 
 #pragma pack(push, 4)
-struct ENGINE_API CProfileResultPortion
+struct CProfileResultPortion
 {
     u64 m_time;
     LPCSTR m_timer_id;
 };
 #pragma pack(pop)
 
-struct ENGINE_API CProfilePortion : public CProfileResultPortion
+struct CProfilePortion : public CProfileResultPortion
 {
 private:
     bool enabled = false;
@@ -45,7 +41,7 @@ public:
     inline ~CProfilePortion();
 };
 
-struct ENGINE_API CProfileStats
+struct CProfileStats
 {
     u32 m_update_time;
     shared_str m_name;
@@ -91,52 +87,18 @@ public:
     void add_profile_portion(const CProfileResultPortion &profile_portion);
 };
 
-extern ENGINE_API CProfiler *g_profiler;
+extern ENGINE_API CProfiler* g_profiler;
 
-inline CProfiler &profiler();
+inline CProfiler& profiler();
+
+#include "profiler_inline.h"
 
 #define START_PROFILE(...) \
     {                      \
         CProfilePortion __profile_portion__(__VA_ARGS__);
 #define STOP_PROFILE }
 
-inline CProfilePortion::CProfilePortion(const char *id, bool enableIf)
-{
-    // XXX: wrap into global xrGame function and pass as enableIf
-    //if (!psAI_Flags.test(aiStats))
-    //    return;
-    if (!enableIf || !psDeviceFlags.test(rsStatistic))
-        return;
-    enabled = true;
-    m_timer_id = id;
-    m_time = CPU::QPC();
-}
-
-inline CProfilePortion::~CProfilePortion()
-{
-    if (!enabled)
-        return;
-    u64 temp = CPU::QPC();
-    m_time = temp - m_time;
-    profiler().add_profile_portion(*this);
-}
-
-inline CProfiler &profiler() { return *g_profiler; }
-
-inline CProfileStats::CProfileStats()
-{
-    m_update_time = 0;
-    m_name = shared_str("");
-    m_time = 0.f;
-    m_min_time = 0.f;
-    m_max_time = 0.f;
-    m_total_time = 0.f;
-    m_count = 0;
-    m_call_count = 0;
-}
-
 #else // !USE_PROFILER
 #define START_PROFILE(a) {
 #define STOP_PROFILE }
-#endif
 #endif
