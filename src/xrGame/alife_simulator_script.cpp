@@ -333,10 +333,9 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("level_name", &get_level_name)
             .def("object",
                 (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
-            .def("object", (CSE_ALifeDynamicObject*(*)(const CALifeSimulator*, pcstr))(alife_object))
             .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
                                alife_object))
-	        .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
+	        .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, pcstr))(alife_object))
             .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(
                                      alife_story_object))
             .def("set_switch_online",

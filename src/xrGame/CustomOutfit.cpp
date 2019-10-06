@@ -69,7 +69,8 @@ void CCustomOutfit::Load(LPCSTR section)
     m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = pSettings->r_float(section, "chemical_burn_protection");
     m_HitTypeProtection[ALife::eHitTypeExplosion] = pSettings->r_float(section, "explosion_protection");
     m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.f; // pSettings->r_float(section,"fire_wound_protection");
-    //	m_HitTypeProtection[ALife::eHitTypePhysicStrike]= pSettings->r_float(section,"physic_strike_protection");
+    m_HitTypeProtection[ALife::eHitTypePhysicStrike] = pSettings->read_if_exists<float>(
+        section, "physic_strike_protection", m_HitTypeProtection[ALife::eHitTypeStrike]);
     m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
     m_boneProtection->m_fHitFracActor = pSettings->read_if_exists<float>(section, "hit_fraction_actor", 0.1f);
 
@@ -295,8 +296,8 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
         section, "explosion_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeExplosion], test);
     result |= process_if_exists(
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
-    //	result |= process_if_exists( section, "physic_strike_protection", &CInifile::r_float,
-    // m_HitTypeProtection[ALife::eHitTypePhysicStrike], test );
+    result |= process_if_exists(
+        section, "physic_strike_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypePhysicStrike], test);
     LPCSTR str;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test)

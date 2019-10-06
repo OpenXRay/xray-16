@@ -1,0 +1,32 @@
+pkgname=openxray                                    
+pkgver=1.6.02_df255fe83                                          
+pkgrel=1          
+pkgdesc="Unofficial X-Ray Engine Linux port by OpenXRay team (Originally developed by GSC Game World)"                                          
+arch=('x86_64') 
+url="https://github.com/OpenXRay/xray-16"
+license=('custom:Custom 3-сlause BSD')
+install="info.install"
+makedepends=(gcc git cmake libglvnd libjpeg6-turbo ncurses pcre2 pcre)
+depends=(glew sdl2 openal intel-tbb crypto++ liblockfile freeimage libogg libtheora libvorbis lzo lzop libjpeg-turbo) 
+
+pkgver() {
+  cd ../..
+  printf 1.6.02_"$(git rev-parse --short HEAD)"
+}
+
+build() {
+   cd ../..
+#  rm -f -R bin
+   mkdir bin
+   cd bin
+   cmake ..
+   make
+}
+
+package() {
+    cd ../../bin
+    make DESTDIR="${pkgdir}/" install
+    mv "${pkgdir}/usr/games/" "${pkgdir}/usr/bin"
+    mkdir -p "${pkgdir}/usr/share/licenses/$pkgname/"
+    cp ../License.txt "${pkgdir}/usr/share/licenses/$pkgname/"
+}

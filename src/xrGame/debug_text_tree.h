@@ -14,8 +14,8 @@ IC xr_string __cdecl make_xrstr(pcstr format, ...)
     va_list args;
     va_start(args, format);
 
-    char temp[4096];
-    vsprintf(temp, format, args);
+    string4096 temp;
+    vsprintf_s(temp, format, args);
 
     va_end(args);
     return xr_string(temp);

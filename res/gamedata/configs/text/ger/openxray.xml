@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_unequip">
+		<text>wegstecken</text>
+	</string>
+	<string id="st_donate">
+		<text>Spenden</text>
+	</string>
+	<string id="st_loading_lights">
+		<text>Lade Lichter</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>CLIENT: Verbinde zu</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>CLIENT: Spawne</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>CLIENT: Synchronisiere</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>Erstelle neues Spiel</text>
+	</string>
+	<string id="ui_mm_always_active">
+		<text>Immer aktiv</text>
+	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Grasdetail Radius</text>
+	</string>
+	<string id="ui_mm_ui_style">
+		<text>Interfacedesign</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Call of Pripyat</text>
+	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Vereinf. Aufheben (SoC)</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Wiederh. Aufheben (CoP)</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Ladefortschritt anzeigen</text>
+	</string>
+	<string id="renderer_gl">
+		<text>Erw. Volldyn. Beleuchtung (OpenGL)</text>
+	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Qualitat der Schattenkarte</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Nassflachenoptimierung</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Nassflachen Nahbereich</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Nassflachen Fernbereich</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Nassflachen Qualitat</text>
+	</string>
+	<string id="ui_mm_fov">
+		<text>Blickwinkel (FOV)</text>
+	</string>
+	<string id="ui_mm_localization">
+		<text>Sprache</text>
+	</string>
+	<string id="eng">
+		<text>Englisch (English)</text>
+	</string>
+	<string id="fra">
+		<text>Franzosisch (French)</text>
+	</string>
+	<string id="ger">
+		<text>Deutsch (German)</text>
+	</string>
+	<string id="ita">
+		<text>Italienisch (Italian)</text>
+	</string>
+	<string id="pol">
+		<text>Polnisch (Polish)</text>
+	</string>
+	<string id="rus">
+		<text>Russissch (Russian)</text>
+	</string>
+	<string id="spa">
+		<text>Spanisch (Spanish)</text>
+	</string>
+	<string id="cze">
+		<text>Tschechisch (Tzech)</text>
+	</string>
+	<string id="ukr">
+		<text>Ukrainisch (Ukrainian)</text>
+	</string>
+	<string id="jpn">
+		<text>Japanisch (Japanese)</text>
+	</string>
+</string_table>

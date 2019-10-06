@@ -93,6 +93,7 @@ private:
     xr_vector<SPass*> v_passes;
     xr_vector<ShaderElement*> v_elements;
     xr_vector<Shader*> v_shaders;
+    Lock v_shaders_lock;
 
     xr_vector<ref_texture> m_necessary;
     // misc

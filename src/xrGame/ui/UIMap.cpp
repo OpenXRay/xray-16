@@ -398,15 +398,32 @@ void CUILevelMap::Draw()
                 if (sp->m_bScale)
                 {
                     Fvector2 sz = sp->m_originSize;
-                    float k = gmz;
+                    // XXX: try to remove if-else branches and use common code path
+                    if (!ShadowOfChernobylMode && !ClearSkyMode)
+                    {
+                        float k = gmz;
 
-                    if (gmz > sp->m_scale_bounds.y)
-                        k = sp->m_scale_bounds.y;
-                    else if (gmz < sp->m_scale_bounds.x)
-                        k = sp->m_scale_bounds.x;
+                        if (gmz > sp->m_scale_bounds.y)
+                            k = sp->m_scale_bounds.y;
+                        else if (gmz < sp->m_scale_bounds.x)
+                            k = sp->m_scale_bounds.x;
 
-                    sz.mul(k);
-                    sp->SetWndSize(sz);
+                        sz.mul(k);
+                        sp->SetWndSize(sz);
+                    }
+                    else
+                    {
+                        if (gmz > sp->m_scale_bounds.x && gmz < sp->m_scale_bounds.y)
+                        {
+                            float k = (gmz - sp->m_scale_bounds.x) / (sp->m_scale_bounds.y - sp->m_scale_bounds.x);
+                            sz.mul(k);
+                            sp->SetWndSize(sz);
+                        }
+                        else if (gmz > sp->m_scale_bounds.y)
+                        {
+                            sp->SetWndSize(sz);
+                        }
+                    }
                 }
                 else if (sp->m_scale_bounds.x > 0.0f)
                     sp->SetVisible(sp->m_scale_bounds.x < gmz);

@@ -15,10 +15,6 @@
 #include "Layers/xrRenderDX10/MSAA/dx10MSAABlender.h"
 #include "Layers/xrRenderDX10/DX10 Rain/dx10RainBlender.h"
 
-#if defined(LINUX)
-float OLES_SUN_LIMIT_27_01_07 = 100.f;
-#endif
-
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb)
 {
     if (_1)
@@ -578,7 +574,6 @@ CRenderTarget::CRenderTarget()
         if (RImplementation.o.dx10_msaa)
         {
             s_bloom_msaa.create(b_bloom_msaa, "r2" DELIMITER "bloom");
-            s_postprocess_msaa.create(b_postprocess_msaa, "r2" DELIMITER "post");
         }
         f_bloom_factor = 0.5f;
     }
@@ -899,6 +894,10 @@ CRenderTarget::CRenderTarget()
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(),
                          RCache.QuadIB);
+    if (RImplementation.o.dx10_msaa)
+    {
+        s_postprocess_msaa.create(b_postprocess_msaa, "r2" DELIMITER "post");
+    }
 
     // Menu
     s_menu.create("distort");

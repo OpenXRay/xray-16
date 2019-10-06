@@ -435,7 +435,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
         m_fDeltaPower -= hit_power * m_fPowerHitPart;
         break;
     case ALife::eHitTypeStrike:
-        //	case ALife::eHitTypePhysicStrike:
+    case ALife::eHitTypePhysicStrike:
         hit_power *= GetHitImmunity(pHDS->hit_type) - m_fBoostStrikeImmunity;
         m_fHealthLost = hit_power * m_fHealthHitPart;
         m_fDeltaHealth -= CanBeHarmed() ? m_fHealthLost : 0;

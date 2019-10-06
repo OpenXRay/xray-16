@@ -24,6 +24,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         //!!!
         //!!! BECAUSE OF PARALLEL HOM RENDERING TRY TO DELAY ACCESS TO HOM AS MUCH AS POSSIBLE
         //!!!
+        if (psDeviceFlags.test(rsDrawDynamic))
         {
             // Traverse object database
             g_SpatialSpace->q_frustum
@@ -461,7 +462,6 @@ void CRender::Render()
         Target->mark_msaa_edges();
     }
 
-#ifdef WINDOWS//	TODO: DX10: Implement DX10 rain.
     if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
     {
         PIX_EVENT(DEFER_RAIN);
@@ -483,7 +483,6 @@ void CRender::Render()
         }
         Target->accum_direct_blend();
     }
-#endif
 
     {
         PIX_EVENT(DEFER_SELF_ILLUM);

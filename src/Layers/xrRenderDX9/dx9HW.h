@@ -19,22 +19,16 @@ public:
     void DestroyD3D();
 
     void CreateDevice(SDL_Window* sdlWnd);
-
     void DestroyDevice();
 
     void Reset();
 
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 
-#if defined(DEBUG)
-    void Validate()
-    {
-        VERIFY(pDevice);
-        VERIFY(pD3D);
-    };
-#else
-    void Validate() {}
-#endif
+    std::pair<u32, u32> GetSurfaceSize() const;
+    D3DFORMAT GetSurfaceFormat() const;
+    void Present();
+    DeviceState GetDeviceState();
 
 private:
     u32 selectPresentInterval();
@@ -57,13 +51,13 @@ public:
     IDirect3D9* pD3D = nullptr; // D3D
 
     UINT DevAdapter;
-    D3DPRESENT_PARAMETERS DevPP;
 
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
 
 private:
+    D3DPRESENT_PARAMETERS DevPP;
     XRay::Module hD3D = nullptr;
 };
 

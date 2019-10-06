@@ -36,7 +36,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = true; //!psDeviceFlags.is(rsFullscreen);
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -227,7 +227,7 @@ void CHW::Reset()
     _RELEASE(pBaseZB);
     _RELEASE(pBaseRT);
 
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = true; // !psDeviceFlags.is(rsFullscreen);
 
     DevPP.BackBufferWidth = Device.dwWidth;
     DevPP.BackBufferHeight = Device.dwHeight;
@@ -377,4 +377,41 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
     if (FAILED(result))
         return FALSE;
     return TRUE;
+}
+
+std::pair<u32, u32> CHW::GetSurfaceSize() const
+{
+    return
+    {
+        DevPP.BackBufferWidth,
+        DevPP.BackBufferHeight
+    };
+}
+
+D3DFORMAT CHW::GetSurfaceFormat() const
+{
+    return DevPP.BackBufferFormat;
+}
+
+void CHW::Present()
+{
+    pDevice->Present(nullptr, nullptr, nullptr, nullptr);
+}
+
+DeviceState CHW::GetDeviceState()
+{
+    const auto result = pDevice->TestCooperativeLevel();
+
+    switch (result)
+    {
+        // If the device was lost, do not render until we get it back
+    case D3DERR_DEVICELOST:
+        return DeviceState::Lost;
+
+        // Check if the device is ready to be reset
+    case D3DERR_DEVICENOTRESET:
+        return DeviceState::NeedReset;
+    }
+
+    return DeviceState::Normal;
 }

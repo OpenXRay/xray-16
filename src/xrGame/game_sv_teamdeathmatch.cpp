@@ -492,17 +492,17 @@ u32 game_sv_TeamDeathmatch::RP_2_Use(CSE_Abstract* E)
 void game_sv_TeamDeathmatch::OnPlayerHitPlayer_Case(
     game_PlayerState* ps_hitter, game_PlayerState* ps_hitted, SHit* pHitS)
 {
-    // if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
-    //{
-    if (ps_hitter && ps_hitted)
+    if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
     {
-        if (ps_hitter->team == ps_hitted->team && ps_hitter != ps_hitted)
+        if (ps_hitter && ps_hitted)
         {
-            pHitS->power *= GetFriendlyFire();
-            pHitS->impulse *= (GetFriendlyFire() > 1.0f) ? GetFriendlyFire() : 1.0f;
+            if (ps_hitter->team == ps_hitted->team && ps_hitter != ps_hitted)
+            {
+                pHitS->power *= GetFriendlyFire();
+                pHitS->impulse *= (GetFriendlyFire() > 1.0f) ? GetFriendlyFire() : 1.0f;
+            }
         }
     }
-    //	}
     inherited::OnPlayerHitPlayer_Case(ps_hitter, ps_hitted, pHitS);
 };
 

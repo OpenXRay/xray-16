@@ -25,7 +25,7 @@ public:
 
     void Reset();
 
-    void Validate() {}
+    std::pair<u32, u32> GetSurfaceSize() const;
 
     bool CheckFormatSupport(DXGI_FORMAT format, UINT feature) const;
     DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT formats[], size_t count) const;
@@ -34,7 +34,9 @@ public:
     {
         return SelectFormat(feature, formats, count);
     }
+    void Present();
     bool UsingFlipPresentationModel() const;
+    DeviceState GetDeviceState();
 
     void OnAppActivate() override;
     void OnAppDeactivate() override;
@@ -58,7 +60,6 @@ public:
     IDXGIAdapter1* m_pAdapter = nullptr; // pD3D equivalent
     ID3DDeviceContext* pContext = nullptr;
     IDXGISwapChain* m_pSwapChain = nullptr;
-    DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
     D3D_FEATURE_LEVEL FeatureLevel;
     bool ComputeShadersSupported;
     bool DoublePrecisionFloatShaderOps;
@@ -79,6 +80,8 @@ public:
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
+private:
+    DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
 };
 
 extern ECORE_API CHW HW;

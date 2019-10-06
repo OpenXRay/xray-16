@@ -125,13 +125,12 @@ private:
 };
 
 // for debug purposes only
-inline std::string make_string(const char* format, ...)
+template<typename... Args>
+std::string make_string(cpcstr format, Args... args)
 {
-    va_list args;
-    va_start(args, format);
-    string4096 temp;
-    vsprintf(temp, format, args);
-    return temp;
+    string4096 log;
+    xr_sprintf(log, format, std::forward<Args>(args)...);
+    return log;
 }
 
 #include "xrDebug_macros.h"

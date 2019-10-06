@@ -175,6 +175,9 @@ void CUIEditKeyBind::SetValue()
 
 void CUIEditKeyBind::SetCurrentOptValue()
 {
+    VERIFY(m_action);
+    if (!m_action)
+        return;
     key_binding* binding = &g_key_bindings[m_action->id];
 
     int idx = (!m_isGamepadBinds) ? ((m_primary) ? 0 : 1) : 2;

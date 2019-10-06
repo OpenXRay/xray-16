@@ -58,10 +58,6 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
     RCache.OnDeviceDestroy();
 }
 
-void D3DXRenderBase::ValidateHW()
-{
-    HW.Validate();
-}
 void D3DXRenderBase::DestroyHW()
 {
     xr_delete(Resources);
@@ -78,16 +74,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Memory.mem_compact();
     HW.Reset();
 
-#if defined(USE_OGL)
-    dwWidth = psCurrentVidMode[0];
-    dwHeight = psCurrentVidMode[1];
-#elif defined(USE_DX10) || defined(USE_DX11)
-    dwWidth = HW.m_ChainDesc.BufferDesc.Width;
-    dwHeight = HW.m_ChainDesc.BufferDesc.Height;
-#else //    USE_DX10
-    dwWidth = HW.DevPP.BackBufferWidth;
-    dwHeight = HW.DevPP.BackBufferHeight;
-#endif //   USE_DX10
+    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
@@ -168,16 +155,9 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
     HW.CreateDevice(hWnd);
-#if defined(USE_OGL)
-    dwWidth = psCurrentVidMode[0];
-    dwHeight = psCurrentVidMode[1];
-#elif defined(USE_DX10) || defined(USE_DX11)
-    dwWidth = HW.m_ChainDesc.BufferDesc.Width;
-    dwHeight = HW.m_ChainDesc.BufferDesc.Height;
-#else
-    dwWidth = HW.DevPP.BackBufferWidth;
-    dwHeight = HW.DevPP.BackBufferHeight;
-#endif
+
+    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
+
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
     Resources = new CResourceManager();
@@ -270,33 +250,7 @@ void D3DXRenderBase::ResourcesDumpMemoryUsage()
 }
 DeviceState D3DXRenderBase::GetDeviceState()
 {
-    HW.Validate();
-#ifdef USE_OGL
-    //  TODO: OGL: Implement GetDeviceState
-#elif !defined(USE_DX9)
-    const auto result = HW.m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
-
-    switch (result)
-    {
-        // Check if the device is ready to be reset
-    case DXGI_ERROR_DEVICE_RESET:
-        return DeviceState::NeedReset;
-    }
-#else
-    const auto result = HW.pDevice->TestCooperativeLevel();
-
-    switch (result)
-    {
-        // If the device was lost, do not render until we get it back
-    case D3DERR_DEVICELOST:
-        return DeviceState::Lost;
-
-        // Check if the device is ready to be reset
-    case D3DERR_DEVICENOTRESET:
-        return DeviceState::NeedReset;
-    }
-#endif
-    return DeviceState::Normal;
+    return HW.GetDeviceState();
 }
 
 bool D3DXRenderBase::GetForceGPU_REF()
@@ -309,9 +263,6 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 }
 void D3DXRenderBase::Begin()
 {
-#ifdef USE_DX9
-    CHK_DX(HW.pDevice->BeginScene());
-#endif
     RCache.OnFrameBegin();
     RCache.set_CullMode(CULL_CW);
     RCache.set_CullMode(CULL_CCW);
@@ -343,23 +294,7 @@ void D3DXRenderBase::End()
         overdrawEnd();
     RCache.OnFrameEnd();
     DoAsyncScreenshot();
-#ifndef USE_DX9
-    const bool bUseVSync = psDeviceFlags.is(rsFullscreen) && psDeviceFlags.test(rsVSync); //xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
-    HW.m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
-#ifdef HAS_DX11_2
-    if (HW.m_pSwapChain2 && HW.UsingFlipPresentationModel())
-    {
-        const float fps = Device.GetStats().fFPS;
-        if (fps < 30)
-            HW.m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.85f, Device.dwHeight * 0.85f);
-        else if (fps < 15)
-            HW.m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.7f, Device.dwHeight * 0.7f);
-    }
-#endif
-#else
-    CHK_DX(HW.pDevice->EndScene());
-    HW.pDevice->Present(nullptr, nullptr, nullptr, nullptr);
-#endif
+    HW.Present();
 }
 
 void D3DXRenderBase::ResourcesDestroyNecessaryTextures()

@@ -102,13 +102,19 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 {
     SelectResolution(windowed);
 
-    if (windowed)
+    const bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
+    if (windowed || isDX9Renderer)
     {
         const bool drawBorders = strstr(Core.Params, "-draw_borders");
 
         bool useDesktopFullscreen = false;
-        if (b_is_Ready && !drawBorders && g_monitors.SelectedResolutionIsMaximal())
-            useDesktopFullscreen = true;
+        if (b_is_Ready)
+        {
+            if (!drawBorders && g_monitors.SelectedResolutionIsMaximal())
+                useDesktopFullscreen = true;
+            else if (!windowed && isDX9Renderer)
+                useDesktopFullscreen = true;
+        }
 
         SDL_Rect rect;
         SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);

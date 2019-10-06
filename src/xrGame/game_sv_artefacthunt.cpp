@@ -1501,14 +1501,14 @@ bool game_sv_ArtefactHunt::Player_Check_Rank(game_PlayerState* ps)
 
 void game_sv_ArtefactHunt::OnPlayerHitPlayer_Case(game_PlayerState* ps_hitter, game_PlayerState* ps_hitted, SHit* pHitS)
 {
-    // if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
-    //{
-    if (ps_hitted->testFlag(GAME_PLAYER_FLAG_ONBASE) && Get_ShieldedBases())
+    if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
     {
-        pHitS->power = 0;
-        pHitS->impulse = 0;
+        if (ps_hitted->testFlag(GAME_PLAYER_FLAG_ONBASE) && Get_ShieldedBases())
+        {
+            pHitS->power = 0;
+            pHitS->impulse = 0;
+        }
     }
-    //	}
     inherited::OnPlayerHitPlayer_Case(ps_hitter, ps_hitted, pHitS);
 };
 

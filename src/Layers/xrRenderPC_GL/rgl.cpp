@@ -93,7 +93,7 @@ static class cl_water_intensity : public R_constant_setup
     {
         CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
         float fValue = E.m_fWaterIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0);
+        RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_water_intensity;
 
@@ -103,7 +103,7 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     {
         CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
         float fValue = E.m_fSunShaftsIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0);
+        RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_sun_shafts_intensity;
 
@@ -701,9 +701,7 @@ void CRender::rmNormal()
 CRender::CRender()
     : m_bFirstFrameAfterReset(false)
 {
-#if defined(WINDOWS) // remove this after port r2_R_sun.cpp
     init_cacades();
-#endif
 }
 
 CRender::~CRender() {}

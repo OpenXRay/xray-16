@@ -68,6 +68,7 @@ public:
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
     xr_vector<dxRender_Visual*> lstVisuals;
+    xr_vector<R_dsgraph::_LodItem> lstLODs;
 
     u32 counter_S;
     u32 counter_D;
@@ -180,7 +181,6 @@ public:
     virtual void updateGamma() override;
     //	Destroy
     virtual void OnDeviceDestroy(bool bKeepTextures) override;
-    virtual void ValidateHW() override;
     virtual void DestroyHW() override;
     virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
     //	Init

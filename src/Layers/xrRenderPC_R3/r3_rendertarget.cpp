@@ -598,7 +598,6 @@ CRenderTarget::CRenderTarget()
         if (RImplementation.o.dx10_msaa)
         {
             s_bloom_msaa.create(b_bloom_msaa, "r2" DELIMITER "bloom");
-            s_postprocess_msaa.create(b_postprocess_msaa, "r2" DELIMITER "post");
         }
         f_bloom_factor = 0.5f;
     }
@@ -970,6 +969,10 @@ CRenderTarget::CRenderTarget()
     s_postprocess.create("postprocess");
     g_postprocess.create(
         D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
+    if (RImplementation.o.dx10_msaa)
+    {
+        s_postprocess_msaa.create(b_postprocess_msaa, "r2" DELIMITER "post");
+    }
 
     // Menu
     s_menu.create("distort");
@@ -1139,7 +1142,8 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     case CRender::MMSM_AUTO: return need_to_render_sunshafts();
     case CRender::MMSM_AUTODETECT:
     {
-        u32 dwScreenArea = HW.m_ChainDesc.BufferDesc.Width * HW.m_ChainDesc.BufferDesc.Height;
+        const auto& [width, height] = HW.GetSurfaceSize();
+        u32 dwScreenArea = width * height;
 
         if ((dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold))
             return need_to_render_sunshafts();

@@ -54,7 +54,7 @@ static Fvector boxvert[boxvertcount];
 #define DU_DRAW_SH(sh)\
     {\
         RCache.set_Shader(sh);\
-        RCache.set_c("tfactor", 1, 1, 1, 1);\
+        RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);\
     }
 #endif
 
