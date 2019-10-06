@@ -1,0 +1,20 @@
+post_install() {
+	
+	cat << EOF 
+
+The OpenXRay project continues the non-official support and development of the X-Ray 1.6.02 game engine. The original engine is used in the S.T.A.L.K.E.R.: Call of Pripyat game released by GSC Game World.
+
+Attention!!! Be advised that this project is not sanctioned by GSC Game World in any way – and they remain the copyright holders of all the original source code.
+
+This package does not provide game resources, to start the game you will need the original game resources of a licensed copy of S.T.A.L.K.E.R.: Call of Pripyat.
+From the original licensed version of S.T.A.L.K.E.R.: Call of Pripyat copy the following directories levels, localization, mp, patches, resources to ~/.local/share/GSC/SCOP You can use the resources from a physical DVD media, GOG or Steam.
+
+Attention!!! All directory and file names inside directories must be lowercase.
+
+It is also possible to launch fan modifications for the vanilla version of S.T.A.L.K.E.R.: Call of Pripyat however, it may be necessary to adapt them.
+
+EOF
+	
+}
+
+
