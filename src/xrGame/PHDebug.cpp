@@ -1004,7 +1004,7 @@ class CPHDebugOutput : public IDebugOutput
         string1024 t;
         va_list marker;
         va_start(marker, s);
-        vsprintf_s(t, s, marker);
+        vsprintf_s(t, sizeof(t), s, marker);
         va_end(marker);
         DBG_DrawPHAbstruct(new SPHDBGOutText(t));
     }
