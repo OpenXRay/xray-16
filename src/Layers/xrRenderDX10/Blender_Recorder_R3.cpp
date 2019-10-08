@@ -76,21 +76,21 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     }
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
-    if (0 == xr_strcmp(ResourceName, "smp_rtlinear"))
+    else if (0 == xr_strcmp(ResourceName, "smp_rtlinear"))
     {
         i_Address(stage, D3DTADDRESS_CLAMP);
         i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
     }
 
     //	Use	D3DTADDRESS_WRAP,	D3DTEXF_LINEAR,			D3DTEXF_LINEAR,	D3DTEXF_LINEAR
-    if (0 == xr_strcmp(ResourceName, "smp_linear"))
+    else if (0 == xr_strcmp(ResourceName, "smp_linear"))
     {
         i_Address(stage, D3DTADDRESS_WRAP);
         i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
     //	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
-    if (0 == xr_strcmp(ResourceName, "smp_base"))
+    else if (0 == xr_strcmp(ResourceName, "smp_base"))
     {
         i_Address(stage, D3DTADDRESS_WRAP);
         i_dx10FilterAnizo(stage, TRUE);
@@ -98,14 +98,14 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     }
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
-    if (0 == xr_strcmp(ResourceName, "smp_material"))
+    else if (0 == xr_strcmp(ResourceName, "smp_material"))
     {
         i_Address(stage, D3DTADDRESS_CLAMP);
         i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
     }
 
-    if (0 == xr_strcmp(ResourceName, "smp_smap"))
+    else if (0 == xr_strcmp(ResourceName, "smp_smap"))
     {
         i_Address(stage, D3DTADDRESS_CLAMP);
         i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
@@ -113,7 +113,7 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
         RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 
-    if (0 == xr_strcmp(ResourceName, "smp_jitter"))
+    else if (0 == xr_strcmp(ResourceName, "smp_jitter"))
     {
         i_Address(stage, D3DTADDRESS_WRAP);
         i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
