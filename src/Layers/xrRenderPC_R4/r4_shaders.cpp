@@ -10,8 +10,8 @@ void CRender::addShaderOption(const char* name, const char* value)
 }
 
 template <typename T>
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    T*& result, bool const disasm)
+static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
+    T*& result)
 {
     HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
     if (!SUCCEEDED(_hr))
@@ -47,13 +47,13 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
     if (pTarget[0] == 'p')
     {
         extension = ".ps";
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result);
     }
     else if (pTarget[0] == 'v')
     {
         extension = ".vs";
         SVS* svs_result = (SVS*)result;
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, svs_result, disasm);
+        _result = create_shader(buffer, buffer_size, file_name, svs_result);
         if (SUCCEEDED(_result))
         {
             //	Store input signature (need only for VS)
@@ -69,22 +69,22 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
     else if (pTarget[0] == 'g')
     {
         extension = ".gs";
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SGS*&)result, disasm);
+        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result);
     }
     else if (pTarget[0] == 'c')
     {
         extension = ".cs";
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SCS*&)result, disasm);
+        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result);
     }
     else if (pTarget[0] == 'h')
     {
         extension = ".hs";
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SHS*&)result, disasm);
+        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result);
     }
     else if (pTarget[0] == 'd')
     {
         extension = ".ds";
-        _result = create_shader(pTarget, buffer, buffer_size, file_name, (SDS*&)result, disasm);
+        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result);
     }
     else
     {
