@@ -12,19 +12,38 @@ template <typename... Args>
 pstr strconcat(size_t size, pstr outStr, const Args... args)
 {
     pstr currSymbol = &outStr[0];
-    pstr endSymbol = &outStr[0] + size - 1;
+    const pstr endSymbol = &outStr[0] + size - 1;
 
-    std::initializer_list<pcstr> strArgs = {args...};
+#ifdef MASTER_GOLD
+    bool shouldStop = false;
+#endif
+    std::initializer_list<pcstr> strArgs = { args... };
     for (pcstr strCursor : strArgs)
     {
         while (*strCursor)
         {
-            R_ASSERT3(currSymbol < endSymbol, "buffer overflow: cannot concatenate string ", &outStr[0]);
+#ifdef MASTER_GOLD
+            // silently skip and prevent crash
+            if (currSymbol == endSymbol)
+            {
+                shouldStop = true;
+            }
+#else
+            R_ASSERT3(currSymbol != endSymbol, "buffer overflow: cannot concatenate string ", &outStr[0]);
+#endif
 
             *currSymbol = *strCursor;
             currSymbol++;
             strCursor++;
+#ifdef MASTER_GOLD
+            if (shouldStop)
+                break;
+#endif
         }
+#ifdef MASTER_GOLD
+        if (shouldStop)
+            break;
+#endif
     }
 
     *currSymbol = '\0';
