@@ -242,7 +242,7 @@ BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int Res
             VERIFY(0);
         }
 
-        ref_constant C = get(ResDesc.Name);
+        ref_constant C = get(ResDesc.Name, dx9compatibility ? type : u16(-1));
         if (!C)
         {
             C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();

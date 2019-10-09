@@ -11,7 +11,7 @@ void CRender::addShaderOption(const char* name, const char* value)
 
 template <typename T>
 static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    T*& result)
+    T*& result, bool const dx9compatibility)
 {
     HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
     if (!SUCCEEDED(_hr))
@@ -26,6 +26,7 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
 
     if (SUCCEEDED(_hr) && pReflection)
     {
+        result->constants.dx9compatibility = dx9compatibility;
         // Parse constant table data
         result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
 
@@ -40,20 +41,20 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
 }
 
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm)
+    void*& result, bool const disasm, bool dx9compatibility)
 {
     HRESULT _result = E_FAIL;
     pcstr extension = ".hlsl";
     if (pTarget[0] == 'p')
     {
         extension = ".ps";
-        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result);
+        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result, dx9compatibility);
     }
     else if (pTarget[0] == 'v')
     {
         extension = ".vs";
         SVS* svs_result = (SVS*)result;
-        _result = create_shader(buffer, buffer_size, file_name, svs_result);
+        _result = create_shader(buffer, buffer_size, file_name, svs_result, dx9compatibility);
         if (SUCCEEDED(_result))
         {
             //	Store input signature (need only for VS)
@@ -69,22 +70,22 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
     else if (pTarget[0] == 'g')
     {
         extension = ".gs";
-        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result);
+        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result, dx9compatibility);
     }
     else if (pTarget[0] == 'c')
     {
         extension = ".cs";
-        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result);
+        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result, dx9compatibility);
     }
     else if (pTarget[0] == 'h')
     {
         extension = ".hs";
-        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result);
+        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result, dx9compatibility);
     }
     else if (pTarget[0] == 'd')
     {
         extension = ".ds";
-        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result);
+        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result, dx9compatibility);
     }
     else
     {
@@ -527,8 +528,13 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
                 u32 savedBytecodeCrc = file->r_u32();
                 u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                 if (bytecodeCrc == savedBytecodeCrc)
+                {
+                    const bool dx9compatibility = file->r_u32();
+
                     _result =
-                        create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), filename, result, o.disasm);
+                        create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(),
+                            filename, result, o.disasm, dx9compatibility);
+                }
             }
         }
         file->close();
@@ -539,19 +545,24 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         includer Includer;
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
-        _result = D3DCompile(fs->pointer(), fs->length(), "", options.data(), &Includer, pFunctionName, pTarget, Flags, 0,
-            &pShaderBuf, &pErrorBuf);
+        _result = D3DCompile(fs->pointer(), fs->length(), "", options.data(),
+            &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
 
-#if 0
-        if (pErrorBuf)
+        if (FAILED(_result) && pErrorBuf)
         {
-            std::string shaderErrStr = std::string((const char*)pErrorBuf->GetBufferPointer(), pErrorBuf->GetBufferSize());
-            Msg("shader: %s \n %s", name, shaderErrStr.c_str());
+            cpcstr str = static_cast<cpcstr>(pErrorBuf->GetBufferPointer());
+            if (strstr(str, "error X3523")) // is there a better way?
+            {
+                pErrorBuf = nullptr;
+                Flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+                _result = D3DCompile(fs->pointer(), fs->length(), "", options.data(),
+                    &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
+            }
         }
-#endif
 
         if (SUCCEEDED(_result))
         {
+            const bool dx9compatibility = Flags & D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
             IWriter* file = FS.w_open(file_name);
 
             file->w_u32(fileCrc);
@@ -559,11 +570,13 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
             u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
             file->w_u32(bytecodeCrc);
 
+            file->w_u32(dx9compatibility);
+
             file->w(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
             FS.w_close(file);
 
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
-                filename, result, o.disasm);
+                filename, result, o.disasm, dx9compatibility);
         }
         else
         {

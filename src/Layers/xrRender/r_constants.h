@@ -154,6 +154,8 @@ public:
 class ECORE_API R_constant_table : public xr_resource_flagged
 {
 public:
+    bool dx9compatibility{};
+
     typedef xr_vector<ref_constant> c_table;
     c_table table;
 
@@ -177,8 +179,8 @@ public:
     void clear();
     BOOL parse(void* desc, u32 destination);
     void merge(R_constant_table* C);
-    ref_constant get(LPCSTR name); // slow search
-    ref_constant get(const shared_str& name); // fast search
+    ref_constant get(pcstr name, u16 type = u16(-1)); // slow search
+    ref_constant get(const shared_str& name, u16 type = u16(-1)); // fast search
 
     BOOL equal(R_constant_table& C);
     BOOL equal(R_constant_table* C) { return equal(*C); }

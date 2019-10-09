@@ -11,31 +11,57 @@
 // R_constant_table::~R_constant_table	()	{	dxRenderDeviceRender::Instance().Resources->_DeleteConstantTable(this);
 // }
 
+struct search_entry
+{
+    cpcstr name;
+    const u16 type;
+};
+
 R_constant_table::~R_constant_table() { RImplementation.Resources->_DeleteConstantTable(this); }
 void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
 // predicates
 IC bool p_search(const ref_constant& C, cpcstr S) { return xr_strcmp(*C->name, S) < 0; }
 IC bool p_sort(const ref_constant& C1, const ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
-ref_constant R_constant_table::get(LPCSTR S)
+ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/)
 {
     // assumption - sorted by name
-    c_table::iterator I = std::lower_bound(table.begin(), table.end(), S, p_search);
-    if (I == table.end() || (0 != xr_strcmp(*(*I)->name, S)))
-        return nullptr;
+    c_table::iterator it;
+    if (type == u16(-1))
+    {
+        it = std::lower_bound(table.begin(), table.end(), S, p_search);
+    }
     else
-        return *I;
+    {
+        it = std::find_if(table.begin(), table.end(), [&](const ref_constant& constant)
+        {
+            return 0 == xr_strcmp(constant->name.c_str(), S) && constant->type == type;
+        });
+    }
+
+    if (it == table.end() || (0 != xr_strcmp((*it)->name.c_str(), S)))
+        return nullptr;
+    return *it;
 }
-ref_constant R_constant_table::get(const shared_str& S)
+ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/)
 {
     // linear search, but only ptr-compare
-    c_table::iterator I = table.begin();
-    c_table::iterator E = table.end();
-    for (; I != E; ++I)
+    if (type == u16(-1))
     {
-        ref_constant C = *I;
-        if (C->name.equal(S))
-            return C;
+        for (const ref_constant& C : table)
+        {
+            if (C->name.equal(S))
+                return C;
+        }
     }
+    else
+    {
+        for (const ref_constant& C : table)
+        {
+            if (C->name.equal(S) && C->type == type)
+                return C;
+        }
+    }
+
     return nullptr;
 }
 
@@ -174,12 +200,15 @@ void R_constant_table::merge(R_constant_table* T)
     if (nullptr == T)
         return;
 
+    if (T->dx9compatibility)
+        dx9compatibility = true;
+
     // Real merge
     for (u32 it = 0; it < T->table.size(); it++)
     {
         ref_constant src = T->table[it];
-        ref_constant C = get(*src->name);
-        if (!C)
+        ref_constant C = get(*src->name, dx9compatibility ? src->type : u16(-1));
+        if (!C || (dx9compatibility && C->type != src->type))
         {
             C = new R_constant(); //.g_constant_allocator.create();
             C->name = src->name;

@@ -158,10 +158,10 @@ public:
 #endif
 
 #if defined(USE_DX10) || defined(USE_DX11)
-    void r_dx10Texture(LPCSTR ResourceName, LPCSTR texture);
-    void r_dx10Texture(LPCSTR ResourceName, shared_str texture)
+    void r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
+    void r_dx10Texture(LPCSTR ResourceName, shared_str texture, bool recursive = false)
     {
-        return r_dx10Texture(ResourceName, texture.c_str());
+        return r_dx10Texture(ResourceName, texture.c_str(), recursive);
     };
     u32 r_dx10Sampler(LPCSTR ResourceName);
 #endif //	USE_DX10
