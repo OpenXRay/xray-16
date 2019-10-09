@@ -40,7 +40,7 @@ public:
 protected:
     enum
     {
-        max_count = ALife::eHitTypeMax - 2
+        max_count = ALife::eHitTypeMax - 3
     };
 
     CUIStatic* m_caption;

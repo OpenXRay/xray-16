@@ -11,7 +11,7 @@
 #include "player_hud.h"
 #include "UIHelper.h"
 
-LPCSTR immunity_names[] =
+constexpr cpcstr immunity_names[] =
 {
     "burn_immunity",
     "shock_immunity",
@@ -22,9 +22,10 @@ LPCSTR immunity_names[] =
     "fire_wound_immunity",
     "strike_immunity",
     "explosion_immunity",
+    nullptr
 };
 
-LPCSTR immunity_st_names[] =
+constexpr cpcstr immunity_st_names[] =
 {
     "ui_inv_outfit_burn_protection",
     "ui_inv_outfit_shock_protection",
@@ -35,6 +36,7 @@ LPCSTR immunity_st_names[] =
     "ui_inv_outfit_fire_wound_protection",
     "ui_inv_outfit_strike_protection",
     "ui_inv_outfit_explosion_protection",
+    nullptr
 };
 
 CUIOutfitImmunity::CUIOutfitImmunity()
