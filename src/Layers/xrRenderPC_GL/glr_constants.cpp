@@ -111,7 +111,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             ref_constant C = get(name);
             if (!C)
             {
-                C = new R_constant();//.g_constant_allocator.create();
+                C = table.emplace_back(new R_constant());//.g_constant_allocator.create();
                 C->name = name;
                 C->destination = RC_dest_sampler;
                 C->type = RC_sampler;
@@ -121,7 +121,6 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 L.cls = RC_sampler;
                 L.location = r_location;
                 L.program = program;
-                table.push_back(C);
             }
             else
             {
@@ -148,7 +147,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         ref_constant C = get(name);
         if (!C)
         {
-            C = new R_constant();//.g_constant_allocator.create();
+            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
@@ -157,7 +156,6 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             L.cls = r_type;
             L.location = r_location;
             L.program = program;
-            table.push_back(C);
         }
         else
         {

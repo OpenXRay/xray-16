@@ -114,14 +114,13 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 ref_constant C = get(name);
                 if (!C)
                 {
-                    C = new R_constant(); //.g_constant_allocator.create();
+                    C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
                     C->name = name;
                     C->destination = RC_dest_sampler;
                     C->type = RC_sampler;
                     R_constant_load& L = C->samp;
                     L.index = u16(r_index + ((destination & 1) ? 0 : D3DVERTEXTEXTURESAMPLER0));
                     L.cls = RC_sampler;
-                    table.push_back(C);
                 }
                 else
                 {
@@ -147,14 +146,13 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         ref_constant C = get(name);
         if (!C)
         {
-            C = new R_constant(); //.g_constant_allocator.create();
+            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
             R_constant_load& L = (destination & 1) ? C->ps : C->vs;
             L.index = r_index;
             L.cls = r_type;
-            table.push_back(C);
         }
         else
         {
