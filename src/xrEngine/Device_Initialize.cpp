@@ -66,7 +66,8 @@ void CRenderDevice::Initialize()
 
         pcstr title = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "window", 
                                     "title", "S.T.A.L.K.E.R.: Call of Pripyat");
-        
+
+        xr_strcpy(Core.ApplicationTitle, title);
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
