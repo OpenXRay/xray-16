@@ -95,6 +95,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
     {
         ID3DBlob* disasm = 0;
         D3DDisassemble(buffer, buffer_size, FALSE, 0, &disasm);
+        if (!disasm)
+            return _result;
+
         string_path dname;
         strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, extension);
         IWriter* W = FS.w_open("$app_data_root$", dname);

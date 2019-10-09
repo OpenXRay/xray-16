@@ -32,6 +32,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     {
         ID3DXBuffer* disasm = nullptr;
         D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
+        if (!disasm)
+            return _hr;
+
         string_path dname;
         strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
         IWriter* W = FS.w_open("$app_data_root$", dname);
