@@ -143,6 +143,7 @@ public:
     xrCore();
 
     string64 ApplicationName;
+    string64 ApplicationTitle;
     string_path ApplicationPath;
     string_path WorkingPath;
     string64 UserName;
