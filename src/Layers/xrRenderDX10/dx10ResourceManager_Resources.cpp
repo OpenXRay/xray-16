@@ -40,11 +40,13 @@ BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
     auto it = vec.begin();
     auto end = vec.end();
     for (; it != end; ++it)
+    {
         if (*it == ptr)
         {
             vec.erase(it);
             return TRUE;
         }
+    }
     return FALSE;
 }
 
@@ -52,10 +54,8 @@ BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
 SState* CResourceManager::_CreateState(SimulatorStates& state_code)
 {
     // Search equal state-code
-    for (u32 it = 0; it < v_states.size(); it++)
+    for (SState* C : v_states)
     {
-        SState* C = v_states[it];
-        ;
         SimulatorStates& base = C->state_code;
         if (base.equal(state_code))
             return C;
@@ -80,9 +80,9 @@ void CResourceManager::_DeleteState(const SState* state)
 //--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {
-    for (u32 it = 0; it < v_passes.size(); it++)
-        if (v_passes[it]->equal(proto))
-            return v_passes[it];
+    for (SPass* pass : v_passes)
+        if (pass->equal(proto))
+            return pass;
 
     SPass* P = v_passes.emplace_back(new SPass());
     P->dwFlags |= xr_resource_flagged::RF_REGISTERED;
@@ -190,11 +190,9 @@ static BOOL dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
 SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 {
     // Search equal code
-    for (u32 it = 0; it < v_declarations.size(); it++)
+    for (SDeclaration* D : v_declarations)
     {
-        SDeclaration* D = v_declarations[it];
-        ;
-        if (dcl_equal(dcl, &*D->dcl_code.begin()))
+        if (dcl_equal(dcl, &D->dcl_code.front()))
             return D;
     }
 
@@ -223,11 +221,11 @@ void CResourceManager::_DeleteDecl(const SDeclaration* dcl)
 R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)
 {
     if (C.empty())
-        return NULL;
+        return nullptr;
 
-    for (u32 it = 0; it < v_constant_tables.size(); it++)
-        if (v_constant_tables[it]->equal(C))
-            return v_constant_tables[it];
+    for (R_constant_table* table : v_constant_tables)
+        if (table->equal(C))
+            return table;
 
     R_constant_table* table = v_constant_tables.emplace_back(new R_constant_table(C));
     table->dwFlags |= xr_resource_flagged::RF_REGISTERED;
@@ -333,11 +331,11 @@ SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffe
     u32 vb_stride = D3DXGetDeclVertexSize(decl, 0);
 
     // ***** first pass - search already loaded shader
-    for (u32 it = 0; it < v_geoms.size(); it++)
+    for (SGeometry* v_geom : v_geoms)
     {
-        SGeometry& G = *(v_geoms[it]);
+        SGeometry& G = *v_geom;
         if ((G.dcl == dcl) && (G.vb == vb) && (G.ib == ib) && (G.vb_stride == vb_stride))
-            return v_geoms[it];
+            return v_geom;
     }
 
     SGeometry* Geom = v_geoms.emplace_back(new SGeometry());
@@ -371,7 +369,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 {
     // DBG_VerifyTextures	();
     if (0 == xr_strcmp(_Name, "null"))
-        return 0;
+        return nullptr;
     R_ASSERT(_Name && _Name[0]);
     string_path Name;
     xr_strcpy(Name, _Name); //. andy if (strext(Name)) *strext(Name)=0;
@@ -426,7 +424,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
     if (0 == xr_stricmp(Name, "$null"))
-        return NULL;
+        return nullptr;
 
     LPSTR N = LPSTR(Name);
     map_Matrix::iterator I = m_matrices.find(N);
@@ -464,7 +462,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
     if (0 == xr_stricmp(Name, "$null"))
-        return NULL;
+        return nullptr;
 
     LPSTR N = LPSTR(Name);
     map_Constant::iterator I = m_constants.find(N);
@@ -507,9 +505,8 @@ bool cmp_tl(const std::pair<u32, ref_texture>& _1, const std::pair<u32, ref_text
 STextureList* CResourceManager::_CreateTextureList(STextureList& L)
 {
     std::sort(L.begin(), L.end(), cmp_tl);
-    for (u32 it = 0; it < lst_textures.size(); it++)
+    for (STextureList* base : lst_textures)
     {
-        STextureList* base = lst_textures[it];
         if (L.equal(*base))
             return base;
     }
@@ -537,12 +534,12 @@ SMatrixList* CResourceManager::_CreateMatrixList(SMatrixList& L)
             bEmpty = FALSE;
             break;
         }
-    if (bEmpty)
-        return NULL;
 
-    for (u32 it = 0; it < lst_matrices.size(); it++)
+    if (bEmpty)
+        return nullptr;
+
+    for (SMatrixList* base : lst_matrices)
     {
-        SMatrixList* base = lst_matrices[it];
         if (L.equal(*base))
             return base;
     }
@@ -564,18 +561,20 @@ void CResourceManager::_DeleteMatrixList(const SMatrixList* L)
 SConstantList* CResourceManager::_CreateConstantList(SConstantList& L)
 {
     BOOL bEmpty = TRUE;
-    for (u32 i = 0; i < L.size(); i++)
-        if (L[i])
+    for (const ref_constant_obsolette& constant : L)
+    {
+        if (constant)
         {
             bEmpty = FALSE;
             break;
         }
-    if (bEmpty)
-        return NULL;
+    }
 
-    for (u32 it = 0; it < lst_constants.size(); it++)
+    if (bEmpty)
+        return nullptr;
+
+    for (SConstantList* base : lst_constants)
     {
-        SConstantList* base = lst_constants[it];
         if (L.equal(*base))
             return base;
     }
@@ -599,9 +598,8 @@ dx10ConstantBuffer* CResourceManager::_CreateConstantBuffer(ID3DShaderReflection
     VERIFY(pTable);
     dx10ConstantBuffer* pTempBuffer = new dx10ConstantBuffer(pTable);
 
-    for (u32 it = 0; it < v_constant_buffer.size(); it++)
+    for (dx10ConstantBuffer* buf : v_constant_buffer)
     {
-        dx10ConstantBuffer* buf = v_constant_buffer[it];
         if (pTempBuffer->Similar(*buf))
         {
             xr_delete(pTempBuffer);
@@ -628,9 +626,8 @@ SInputSignature* CResourceManager::_CreateInputSignature(ID3DBlob* pBlob)
 {
     VERIFY(pBlob);
 
-    for (u32 it = 0; it < v_input_signature.size(); it++)
+    for (SInputSignature* sign : v_input_signature)
     {
-        SInputSignature* sign = v_input_signature[it];
         if ((pBlob->GetBufferSize() == sign->signature->GetBufferSize()) &&
             (!(memcmp(pBlob->GetBufferPointer(), sign->signature->GetBufferPointer(), pBlob->GetBufferSize()))))
         {
