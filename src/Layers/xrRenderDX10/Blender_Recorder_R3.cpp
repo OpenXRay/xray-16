@@ -30,8 +30,15 @@ void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask,
 
 void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetRS(D3DRS_STENCILREF, Ref); }
 void CBlender_Compile::r_CullMode(D3DCULL Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
-void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
+void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
 {
+    if (ctable.dx9compatibility && !recursive)
+    {
+        const u32 stage = r_Sampler(ResourceName, texture);
+        if (stage != u16(-1))
+            return;
+    }
+
     VERIFY(ResourceName);
     if (!texture)
         return;
@@ -41,7 +48,7 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
     fix_texture_name(TexName);
 
     // Find index
-    ref_constant C = ctable.get(ResourceName);
+    ref_constant C = ctable.get(ResourceName, ctable.dx9compatibility ? RC_dx10texture : u16(-1));
     // VERIFY(C);
     if (!C)
         return;
@@ -139,7 +146,10 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
 
     // Create shaders
     SPS* ps = RImplementation.Resources->_CreatePS(_ps);
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs);
+    u32 flags = 0;
+    if (ps->constants.dx9compatibility)
+        flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+    SVS* vs = RImplementation.Resources->_CreateVS(_vs, nullptr, flags);
     SGS* gs = RImplementation.Resources->_CreateGS(_gs);
     dest.ps = ps;
     dest.vs = vs;

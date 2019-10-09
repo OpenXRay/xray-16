@@ -115,7 +115,7 @@ void CResourceManager::_DeletePass(const SPass* P)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullptr*/)
+SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullptr*/, u32 flags /*= 0*/)
 {
     string_path name;
     xr_strcpy(name, shader);
@@ -130,7 +130,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullpt
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
     
-    return CreateShader<SVS>(name, shader, fallbackShader);
+    return CreateShader<SVS>(name, shader, fallbackShader, flags);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs)

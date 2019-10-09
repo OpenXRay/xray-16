@@ -586,7 +586,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 
 template <typename T>
 T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
-    pcstr fallbackShader /*= nullptr*/)
+    pcstr fallbackShader /*= nullptr*/, u32 flags /*= 0*/)
 {
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
     LPSTR N = LPSTR(name);
@@ -656,12 +656,10 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         pcstr c_target, c_entry;
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
-#ifdef USE_OGL
-        DWORD flags = 0;
-#elif defined(USE_DX10) || defined(USE_DX11)
-        DWORD flags = D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
-#else
-        DWORD flags = D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR;
+#if defined(USE_DX10) || defined(USE_DX11)
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+#elif  defined(USE_DX9)
+        flags |= D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR;
 #endif
 
         // Compile
