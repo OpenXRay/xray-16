@@ -4,13 +4,6 @@
 
 #include "glStateUtils.h"
 
-IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
-{
-    stat.xforms++;
-    //	TODO: OGL: Implement CBackend::set_xform
-    //VERIFY(!"Implement CBackend::set_xform");
-}
-
 IC GLuint CBackend::get_FB()
 {
     return pFB;

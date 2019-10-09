@@ -261,7 +261,6 @@ public:
 #endif // USE_DX10
 
     // API
-    IC void set_xform(u32 ID, const Fmatrix& M);
     IC void set_xform_world(const Fmatrix& M);
     IC void set_xform_view(const Fmatrix& M);
     IC void set_xform_project(const Fmatrix& M);

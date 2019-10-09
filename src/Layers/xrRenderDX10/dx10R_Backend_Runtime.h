@@ -5,13 +5,6 @@
 #include "StateManager/dx10StateManager.h"
 #include "StateManager/dx10ShaderResourceStateCache.h"
 
-IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
-{
-    stat.xforms++;
-    //  TODO: DX10: Implement CBackend::set_xform
-    // VERIFY(!"Implement CBackend::set_xform");
-}
-
 IC void CBackend::set_RT(ID3DRenderTargetView* RT, u32 ID)
 {
     if (RT != pRT[ID])

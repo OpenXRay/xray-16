@@ -17,7 +17,7 @@ void R_xforms::set_W(const Fmatrix& m)
     m_bInvWValid = false;
     if (c_invw)
         apply_invw();
-    RCache.set_xform(D3DTS_WORLD, m);
+    RCache.stat.xforms++;
 }
 void R_xforms::set_V(const Fmatrix& m)
 {
@@ -33,7 +33,7 @@ void R_xforms::set_V(const Fmatrix& m)
         RCache.set_c(c_wv, m_wv);
     if (c_wvp)
         RCache.set_c(c_wvp, m_wvp);
-    RCache.set_xform(D3DTS_VIEW, m);
+    RCache.stat.xforms++;
 }
 void R_xforms::set_P(const Fmatrix& m)
 {
@@ -46,8 +46,7 @@ void R_xforms::set_P(const Fmatrix& m)
         RCache.set_c(c_vp, m_vp);
     if (c_wvp)
         RCache.set_c(c_wvp, m_wvp);
-    // always setup projection - D3D relies on it to work correctly :(
-    RCache.set_xform(D3DTS_PROJECTION, m);
+    RCache.stat.xforms++;
 }
 
 void R_xforms::apply_invw()
