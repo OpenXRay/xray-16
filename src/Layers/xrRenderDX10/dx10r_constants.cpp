@@ -164,7 +164,7 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         ref_constant C = get(name);
         if (!C)
         {
-            C = new R_constant(); //.g_constant_allocator.create();
+            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
@@ -174,7 +174,6 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
                                   ? C->vs : C->gs);*/
             L.index = r_index;
             L.cls = r_type;
-            table.push_back(C);
         }
         else
         {
@@ -246,14 +245,13 @@ BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int Res
         ref_constant C = get(ResDesc.Name);
         if (!C)
         {
-            C = new R_constant(); //.g_constant_allocator.create();
+            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
             C->name = ResDesc.Name;
             C->destination = RC_dest_sampler;
             C->type = type;
             R_constant_load& L = C->samp;
             L.index = r_index;
             L.cls = type;
-            table.push_back(C);
         }
         else
         {

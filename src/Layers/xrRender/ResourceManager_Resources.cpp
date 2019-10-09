@@ -70,11 +70,11 @@ SState* CResourceManager::_CreateState(SimulatorStates& state_code)
     }
 
     // Create New
-    v_states.push_back(new SState());
-    v_states.back()->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    v_states.back()->state = state_code.record();
-    v_states.back()->state_code = state_code;
-    return v_states.back();
+    SState* state = v_states.emplace_back(new SState());
+    state->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    state->state = state_code.record();
+    state->state_code = state_code;
+    return state;
 }
 void CResourceManager::_DeleteState(const SState* state)
 {
@@ -92,7 +92,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
         if (v_passes[it]->equal(proto))
             return v_passes[it];
 
-    SPass* P = new SPass();
+    SPass* P = v_passes.emplace_back(new SPass());
     P->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     P->state = proto.state;
     P->ps = proto.ps;
@@ -104,7 +104,6 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 #endif
     P->C = proto.C;
 
-    v_passes.push_back(P);
     return v_passes.back();
 }
 
@@ -140,12 +139,12 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
     }
 
     // Create _new
-    SDeclaration* D = new SDeclaration();
+    SDeclaration* D = v_declarations.emplace_back(new SDeclaration());
     u32 dcl_size = D3DXGetDeclLength(dcl) + 1;
     CHK_DX(HW.pDevice->CreateVertexDeclaration(dcl, &D->dcl));
     D->dcl_code.assign(dcl, dcl + dcl_size);
     D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    v_declarations.push_back(D);
+
     return D;
 }
 
@@ -186,12 +185,15 @@ R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)
 {
     if (C.empty())
         return nullptr;
+
     for (u32 it = 0; it < v_constant_tables.size(); it++)
         if (v_constant_tables[it]->equal(C))
             return v_constant_tables[it];
-    v_constant_tables.push_back(new R_constant_table(C));
-    v_constant_tables.back()->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    return v_constant_tables.back();
+
+    R_constant_table* table = v_constant_tables.emplace_back(new R_constant_table(C));
+    table->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+
+    return table;
 }
 void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
 {
@@ -216,7 +218,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
     {
         CRT* RT = new CRT();
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_rtargets.insert(std::make_pair(RT->set_name(Name), RT));
+        m_rtargets.emplace(RT->set_name(Name), RT);
         if (RDEVICE.b_is_Ready)
             RT->create(Name, w, h, f, sampleCount, useUAV);
         return RT;
@@ -251,7 +253,7 @@ CRTC*	CResourceManager::_CreateRTC		(LPCSTR Name, u32 size,	D3DFORMAT f)
     {
         CRTC *RT				=	new CRTC();
         RT->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
-        m_rtargets_c.insert		(std::make_pair(RT->set_name(Name),RT));
+        m_rtargets_c.emplace	(RT->set_name(Name), RT);
         if (RDEVICE.b_is_Ready)	RT->create	(Name,size,f);
         return					RT;
     }
@@ -301,13 +303,13 @@ SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffe
             return v_geoms[it];
     }
 
-    SGeometry* Geom = new SGeometry();
+    SGeometry* Geom = v_geoms.emplace_back(new SGeometry());
     Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     Geom->dcl = dcl;
     Geom->vb = vb;
     Geom->vb_stride = vb_stride;
     Geom->ib = ib;
-    v_geoms.push_back(Geom);
+
     return Geom;
 }
 SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
@@ -351,7 +353,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     {
         CTexture* T = new CTexture();
         T->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_textures.insert(std::make_pair(T->set_name(Name), T));
+        m_textures.emplace(T->set_name(Name), T);
         T->Preload();
         if (RDEVICE.b_is_Ready && !bDeferredLoad)
             T->Load();
@@ -405,7 +407,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
         CMatrix* M = new CMatrix();
         M->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         M->dwReference = 1;
-        m_matrices.insert(std::make_pair(M->set_name(Name), M));
+        m_matrices.emplace(M->set_name(Name), M);
         return M;
     }
 }
@@ -443,7 +445,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
         CConstant* C = new CConstant();
         C->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         C->dwReference = 1;
-        m_constants.insert(std::make_pair(C->set_name(Name), C));
+        m_constants.emplace(C->set_name(Name), C);
         return C;
     }
 }
@@ -481,9 +483,10 @@ STextureList* CResourceManager::_CreateTextureList(STextureList& L)
         if (L.equal(*base))
             return base;
     }
-    STextureList* lst = new STextureList(L);
+
+    STextureList* lst = lst_textures.emplace_back(new STextureList(L));
     lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    lst_textures.push_back(lst);
+
     return lst;
 }
 void CResourceManager::_DeleteTextureList(const STextureList* L)
@@ -513,9 +516,10 @@ SMatrixList* CResourceManager::_CreateMatrixList(SMatrixList& L)
         if (L.equal(*base))
             return base;
     }
-    SMatrixList* lst = new SMatrixList(L);
+
+    SMatrixList* lst = lst_matrices.emplace_back(new SMatrixList(L));
     lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    lst_matrices.push_back(lst);
+
     return lst;
 }
 void CResourceManager::_DeleteMatrixList(const SMatrixList* L)
@@ -545,9 +549,10 @@ SConstantList* CResourceManager::_CreateConstantList(SConstantList& L)
         if (L.equal(*base))
             return base;
     }
-    SConstantList* lst = new SConstantList(L);
+
+    SConstantList* lst = lst_constants.emplace_back(new SConstantList(L));
     lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    lst_constants.push_back(lst);
+
     return lst;
 }
 void CResourceManager::_DeleteConstantList(const SConstantList* L)
