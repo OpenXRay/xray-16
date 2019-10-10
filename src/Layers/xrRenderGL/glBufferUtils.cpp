@@ -279,3 +279,35 @@ u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
     return element - decl;
 }
 } // namespace glBufferUtils
+
+void IndexStagingBuffer::Create(size_t size)
+{
+    m_HostData = xr_alloc<u8>(size);
+    m_Size = size;
+}
+
+void* IndexStagingBuffer::GetHostPointer() const
+{
+    return m_HostData;
+}
+
+void IndexStagingBuffer::Flush()
+{
+    // Upload data to device
+    glBufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
+    // Free host memory
+    xr_delete(m_HostData);
+    m_HostData = nullptr;
+}
+
+GLuint IndexStagingBuffer::GetBufferHandle() const
+{
+    return m_DeviceBuffer;
+}
+
+void IndexStagingBuffer::Destroy()
+{
+    if (m_HostData)
+        xr_delete(m_HostData);
+    glDeleteBuffers(1, &m_DeviceBuffer);
+}
