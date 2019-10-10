@@ -8,7 +8,7 @@ OpenXRay is an improved version of the X-Ray engine, used in world famous S.T.A.
 ### Supported games
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
 |---|---|---|
-|Yes|Beta (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| Not yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
+|Yes|Release Candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| Not yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
 
 ### Build status
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/40d84a83b38147c49b4e66705c47a16a)](https://www.codacy.com/app/OpenXRay/xray-16?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenXRay/xray-16&amp;utm_campaign=Badge_Grade)
