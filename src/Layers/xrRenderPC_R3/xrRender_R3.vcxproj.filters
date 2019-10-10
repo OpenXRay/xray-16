@@ -180,9 +180,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\xrD3DDefs.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\xrRender_console.h">
       <Filter>Kernel</Filter>
     </ClInclude>
@@ -698,6 +695,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRenderDX10\dx10HW.h">
       <Filter>Refactored\HW</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX10\CommonTypes.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

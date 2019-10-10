@@ -14,7 +14,7 @@
 #include <GL/glu.h>
 #include "SDL_opengl_glext.h"
 
-#include "Layers/xrRender/xrD3DDefs.h"
+#include "Layers/xrRenderGL/CommonTypes.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #define R_GL 0

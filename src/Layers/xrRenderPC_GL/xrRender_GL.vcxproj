@@ -345,6 +345,7 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
+    <ClInclude Include="..\xrRenderGL\CommonTypes.h" />
     <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h" />
     <ClInclude Include="..\xrRenderGL\glBufferPool.h" />
     <ClInclude Include="..\xrRenderGL\glBufferUtils.h" />

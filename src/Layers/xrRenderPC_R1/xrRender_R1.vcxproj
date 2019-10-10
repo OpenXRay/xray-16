@@ -186,6 +186,7 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
+    <ClInclude Include="..\xrRenderDX9\CommonTypes.h" />
     <ClInclude Include="..\xrRenderDX9\dx9HW.h" />
     <ClInclude Include="..\xrRenderDX9\dx9R_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderDX9\dx9r_constants_cache.h" />
@@ -284,7 +285,6 @@
     <ClInclude Include="..\xrRender\tss_def.h" />
     <ClInclude Include="..\xrRender\VertexCache.h" />
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
-    <ClInclude Include="..\xrRender\xrD3DDefs.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
     <ClInclude Include="..\xrRender\xrStripify.h" />
     <ClInclude Include="..\xrRender\xr_effgamma.h" />
