@@ -212,6 +212,7 @@
     <ClInclude Include="edit_actions.h" />
     <ClInclude Include="Effector.h" />
     <ClInclude Include="EffectorPP.h" />
+    <ClInclude Include="embedded_resources_management.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EngineAPI.h" />
     <ClInclude Include="engine_impl.hpp" />
