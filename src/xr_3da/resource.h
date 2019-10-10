@@ -3,7 +3,6 @@
 // Used by resource.rc
 //
 #define IDDEBUG 3
-#define IDD_STARTUP 106
 #define IDI_ICON1 111
 #define IDB_BITMAP2 116
 #define IDB_BITMAP3 120
@@ -14,7 +13,6 @@
 #define IDC_DESC 1003
 #define IDSTOP 1004
 #define IDC_STACK 1006
-#define IDC_STATIC_LOGO 1007
 #define RC_VIRT_MEM_ERROR 2071
 #define RC_VIRT_MEM_TEXT 2072
 
