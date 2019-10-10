@@ -65,7 +65,16 @@ void CRenderDevice::Initialize()
         }
 
         pcstr title = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "window", 
-                                    "title", "S.T.A.L.K.E.R.: Call of Pripyat");
+                                    "title", nullptr);
+        if (!title)
+        {
+            if (ShadowOfChernobylMode)
+                title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
+            else if (ClearSkyMode)
+                title = "S.T.A.L.K.E.R.: Clear Sky";
+            else
+                title = "S.T.A.L.K.E.R.: Call of Pripyat";
+        }
 
         xr_strcpy(Core.ApplicationTitle, title);
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
