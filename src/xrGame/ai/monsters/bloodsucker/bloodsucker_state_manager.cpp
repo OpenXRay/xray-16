@@ -22,6 +22,7 @@
 
 CStateManagerBloodsucker::CStateManagerBloodsucker(CAI_Bloodsucker* monster) : inherited(monster)
 {
+    add_state(eStateCustom, new CStateCaptureJumpBloodsucker<CAI_Bloodsucker>(monster));
     add_state(eStateRest, new CStateMonsterRest<CAI_Bloodsucker>(monster));
     add_state(eStatePanic, new CStateMonsterPanic<CAI_Bloodsucker>(monster));
 
