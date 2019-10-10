@@ -615,6 +615,9 @@
     <ClInclude Include="..\xrRenderDX9\dx9HW.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRenderDX9\CommonTypes.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

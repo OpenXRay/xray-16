@@ -1130,6 +1130,9 @@
     <ClInclude Include="..\xrRenderGL\glHW.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRenderGL\CommonTypes.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
