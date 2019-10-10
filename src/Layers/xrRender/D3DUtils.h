@@ -17,6 +17,8 @@
 
 struct SPrimitiveBuffer
 {
+    IndexStagingBuffer pIB;
+    VertexStagingBuffer pVB;
     ref_geom pGeom;
     u32 v_cnt;
     u32 i_cnt;
