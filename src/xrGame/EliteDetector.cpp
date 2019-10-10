@@ -7,6 +7,8 @@
 #include "xrUICore/Static/UIStatic.h"
 #include "ui/ArtefactDetectorUI.h"
 
+constexpr cpcstr AF_SIGN = "af_sign";
+
 CEliteDetector::CEliteDetector() { m_artefacts.m_af_rank = 3; }
 CEliteDetector::~CEliteDetector() {}
 void CEliteDetector::CreateUI()
@@ -95,15 +97,28 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
     AttachChild(m_wrk_area);
 
     xr_sprintf(buff, "%s", p->ui_xml_tag());
-    int num = uiXml.GetNodesNum(buff, 0, "palette");
     XML_NODE pStoredRoot = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(uiXml.NavigateToNode(buff, 0));
-    for (int idx = 0; idx < num; ++idx)
+
+    const int num = uiXml.GetNodesNum(buff, 0, "palette");
+    if (num > 0)
+    {
+        for (int idx = 0; idx < num; ++idx)
+        {
+            CUIStatic* S = new CUIStatic();
+            shared_str name = uiXml.ReadAttrib("palette", idx, "id");
+            m_palette[name] = S;
+            CUIXmlInit::InitStatic(uiXml, "palette", idx, S);
+            S->SetAutoDelete(true);
+            m_wrk_area->AttachChild(S);
+            S->SetCustomDraw(true);
+        }
+    }
+    else
     {
         CUIStatic* S = new CUIStatic();
-        shared_str name = uiXml.ReadAttrib("palette", idx, "id");
-        m_palette[name] = S;
-        CUIXmlInit::InitStatic(uiXml, "palette", idx, S);
+        m_palette[AF_SIGN] = S;
+        CUIXmlInit::InitStatic(uiXml, AF_SIGN, 0, S);
         S->SetAutoDelete(true);
         m_wrk_area->AttachChild(S);
         S->SetCustomDraw(true);
