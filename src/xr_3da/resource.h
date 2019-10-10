@@ -4,9 +4,12 @@
 //
 #define IDDEBUG 3
 #define IDI_ICON1 111
-#define IDB_BITMAP2 116
-#define IDB_BITMAP3 120
-#define IDB_BITMAP1 123
+#define IDI_ICON2 112
+#define IDI_ICON3 113
+#define IDI_COP IDI_ICON1
+#define IDI_CS IDI_ICON2
+#define IDI_SOC IDI_ICON3
+#define IDB_BITMAP1 116
 #define IDC_LIST 1000
 #define IDC_FILE 1001
 #define IDC_LINE 1002
