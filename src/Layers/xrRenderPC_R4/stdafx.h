@@ -28,7 +28,7 @@
 #define HAS_DX11_3
 #endif
 
-#include "Layers/xrRender/xrD3DDefs.h"
+#include "Layers/xrRenderDX11/CommonTypes.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #define R_GL 0
