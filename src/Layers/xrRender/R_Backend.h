@@ -67,15 +67,10 @@ public:
     // Dynamic geometry streams
     _VertexStream Vertex;
     _IndexStream Index;
-#ifdef USE_OGL
-    GLuint QuadIB;
-    GLuint old_QuadIB;
-    GLuint CuboidIB;
-#else
-    ID3DIndexBuffer* QuadIB;
-    ID3DIndexBuffer* old_QuadIB;
-    ID3DIndexBuffer* CuboidIB;
-#endif // USE_OGL
+
+    IndexStagingBuffer QuadIB;
+    IndexStagingBuffer old_QuadIB;
+
     R_xforms xforms;
     R_hemi hemi;
     R_tree tree;

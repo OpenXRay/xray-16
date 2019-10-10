@@ -27,6 +27,7 @@
 #include "xrParticles/psystem.h"
 
 #include "Layers/xrRenderGL/glHW.h"
+#include "Layers/xrRenderGL/glBufferUtils.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"

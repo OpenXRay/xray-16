@@ -40,6 +40,7 @@
 
 #include "xrParticles/psystem.h"
 #include "Layers/xrRenderDX10/dx10HW.h"
+#include "Layers/xrRenderDX10/dx10BufferUtils.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"
