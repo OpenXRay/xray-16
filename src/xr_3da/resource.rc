@@ -1,5 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
+#pragma code_page(65001)
+
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
@@ -16,19 +18,7 @@
 // Russian resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
-#ifdef _WIN32
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
-#pragma code_page(1251)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON1               ICON                    "stalker_cs.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -36,6 +26,7 @@ IDI_ICON1               ICON                    "stalker_cs.ico"
 //
 
 IDB_BITMAP1             BITMAP                  "splash_xrcs_ru.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -63,7 +54,7 @@ BEGIN
             VALUE "FileDescription", "X-Ray 1.6 Engine"
             VALUE "FileVersion", "1.6.02"
             VALUE "InternalName", "xrEngine"
-            VALUE "LegalCopyright", "Copyright © 2009 GSC Game World"
+            VALUE "LegalCopyright", "Copyright Â© 2009 GSC Game World"
             VALUE "OriginalFilename", "xrEngine.exe"
             VALUE "ProductName", "S.T.A.L.K.E.R.: Call Of Pripyat"
             VALUE "ProductVersion", "1.6.02"
@@ -75,6 +66,16 @@ BEGIN
     END
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "stalker_cs.ico"
+
 #endif    // Russian resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -83,10 +84,7 @@ END
 // Ukrainian resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_UKR)
-#ifdef _WIN32
 LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
-#pragma code_page(1251)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -116,28 +114,34 @@ END
 #endif    // Ukrainian resources
 /////////////////////////////////////////////////////////////////////////////
 
+
 /////////////////////////////////////////////////////////////////////////////
 // Polish resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_POL)
-#ifdef _WIN32
-LANGUAGE LANG_POLISH, SUBLANG_POLISH_POLAND
-#pragma code_page(1250)
-#endif //_WIN32
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_PLK)
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
 
 IDB_BITMAP1             BITMAP                  "splash_xrcs_pl.bmp"
 
-#endif // Polish resources
+#endif    // Polish resources
 /////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
 
 IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
 
