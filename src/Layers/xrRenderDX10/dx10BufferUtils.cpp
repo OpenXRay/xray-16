@@ -146,6 +146,42 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
 }
 };
 
+//-----------------------------------------------------------------------------
+void VertexStagingBuffer::Create(size_t size)
+{
+    m_HostData = xr_alloc<u8>(size);
+    m_Size = size;
+}
+
+void* VertexStagingBuffer::GetHostPointer() const
+{
+    return m_HostData;
+}
+
+void VertexStagingBuffer::Flush()
+{
+    // Upload data to device
+    dx10BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
+    HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
+    // Free host memory
+    xr_delete(m_HostData);
+    m_HostData = nullptr;
+}
+
+ID3DVertexBuffer* VertexStagingBuffer::GetBufferHandle() const
+{
+    return m_DeviceBuffer;
+}
+
+void VertexStagingBuffer::Destroy()
+{
+    if (m_HostData)
+        xr_delete(m_HostData);
+    HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
+    _RELEASE(m_DeviceBuffer);
+}
+
+//-----------------------------------------------------------------------------
 void IndexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);

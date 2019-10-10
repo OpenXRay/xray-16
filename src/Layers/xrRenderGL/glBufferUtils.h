@@ -15,6 +15,36 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl);
 void ConvertVertexDeclaration(const D3DVERTEXELEMENT9* dxdecl, SDeclaration* decl);
 };
 
+class VertexStagingBuffer
+{
+public:
+    void Create(size_t size);
+    void Destroy();
+
+    void* GetHostPointer() const;
+    GLuint GetBufferHandle() const;
+    void Flush();
+
+    operator GLuint() const
+    {
+        return m_DeviceBuffer;
+    }
+
+    bool VertexStagingBuffer::operator==(GLuint other) const
+    {
+        return other == m_DeviceBuffer;
+    }
+    bool VertexStagingBuffer::operator==(const VertexStagingBuffer& other) const
+    {
+        return other.m_DeviceBuffer == m_DeviceBuffer;
+    }
+
+private:
+    GLuint m_DeviceBuffer{ 0 };
+    void* m_HostData{ nullptr };
+    size_t m_Size{ 0 };
+};
+
 class IndexStagingBuffer
 {
 public:
