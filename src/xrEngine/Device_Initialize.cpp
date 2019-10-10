@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xr_3da/resource.h"
+#include "embedded_resources_management.h"
 #include "SDL.h"
 
 #include "Include/editor/ide.hpp"
@@ -64,17 +64,22 @@ void CRenderDevice::Initialize()
             }
         }
 
-        pcstr title = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "window", 
-                                    "title", nullptr);
-        if (!title)
+        int icon = IDI_COP;
+        pcstr title = "S.T.A.L.K.E.R.: Call of Pripyat";
+
+        if (ShadowOfChernobylMode)
         {
-            if (ShadowOfChernobylMode)
-                title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
-            else if (ClearSkyMode)
-                title = "S.T.A.L.K.E.R.: Clear Sky";
-            else
-                title = "S.T.A.L.K.E.R.: Call of Pripyat";
+            title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
+            icon = IDI_SOC;
         }
+        else if (ClearSkyMode)
+        {
+            title = "S.T.A.L.K.E.R.: Clear Sky";
+            icon = IDI_CS;
+        }
+
+        title = READ_IF_EXISTS(pSettingsOpenXRay, r_string,
+            "window", "title", title);
 
         xr_strcpy(Core.ApplicationTitle, title);
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
@@ -82,6 +87,7 @@ void CRenderDevice::Initialize()
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
         xrDebug::SetWindowHandler(this);
+        ExtractAndSetWindowIcon(m_sdlWnd, icon);
     }
 }
 

@@ -1,65 +1,10 @@
 #include "stdafx.h"
-
 #include "splash.h"
+#include "embedded_resources_management.h"
 
-#include "xr_3da/resource.h"
 #include <thread>
 
 constexpr u32 SPLASH_FRAMERATE = 30;
-
-SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
-{
-    const size_t pitch = source->pitch;
-    const size_t size = pitch * source->h;
-
-    // XXX: get rid of alloca usage, possible stack overflow
-    //auto original = new u8(size);
-
-    auto original = static_cast<u8*>(alloca(size));
-    CopyMemory(original, source->pixels, size);
-
-    auto flipped = static_cast<u8*>(source->pixels) + size;
-
-    for (auto line = 0; line < source->h; ++line)
-    {
-        CopyMemory(flipped, original, pitch);
-        original += pitch;
-        flipped -= pitch;
-    }
-
-    //xr_delete(original);
-    return source;
-}
-
-#ifdef WINDOWS
-SDL_Surface* ExtractSurfaceFromApplication(int idx)
-{
-    BITMAP splash;
-    const HBITMAP bitmapHandle = (HBITMAP)LoadImage(GetModuleHandle(nullptr), // NOLINT
-        MAKEINTRESOURCE(idx), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-
-    const int bitmapSize = GetObject(bitmapHandle, sizeof(BITMAP), &splash);
-
-    if (0 == bitmapSize)
-    {
-        DeleteObject(bitmapHandle);
-        return nullptr;
-    }
-
-    constexpr Uint32 alpha = 0xFF000000;
-    constexpr Uint32 red   = 0x00FF0000;
-    constexpr Uint32 green = 0x0000FF00;
-    constexpr Uint32 blue  = 0x000000FF;
-
-    SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(
-        splash.bmBits, splash.bmWidth, splash.bmHeight,
-        splash.bmBitsPixel, splash.bmWidthBytes,
-        red, green, blue, alpha);
-
-    XRSDL_SurfaceVerticalFlip(surface);
-    return surface;
-}
-#endif // WINDOWS
 
 class splash_screen
 {
@@ -106,31 +51,24 @@ public:
         if (m_window)
             return;
 
-        SDL_Surface* surface = nullptr;
+        m_surfaces = std::move(ExtractSplashScreen());
 
-        // XXX: that's the place, where splash frames can be added
-        // Animated splash screen!
-#ifdef WINDOWS
-        surface = ExtractSurfaceFromApplication(IDB_BITMAP1);
-#else
-        surface = SDL_LoadBMP("logo.bmp"); // You need to place logo.bmp beside fsgame.ltx
-#endif
-        if (!surface)
+        if (m_surfaces.empty())
         {
             Log("! Couldn't create surface from image:", SDL_GetError());
             return;
         }
 
-    Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
+        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
     
 #if SDL_VERSION_ATLEAST(2,0,5)
-    if (topmost)
-        flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+        if (topmost)
+            flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 #endif
 
+        SDL_Surface* surface = m_surfaces.front();
         m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, surface->w, surface->h, flags);
 
-        m_surfaces.push_back(surface);
         const auto current = SDL_GetWindowSurface(m_window);
         SDL_BlitSurface(surface, nullptr, current, nullptr);
         SDL_ShowWindow(m_window);

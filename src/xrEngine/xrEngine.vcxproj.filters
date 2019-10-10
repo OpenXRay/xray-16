@@ -585,6 +585,9 @@
     <ClInclude Include="TaskScheduler.hpp">
       <Filter>Interfaces\Sheduler</Filter>
     </ClInclude>
+    <ClInclude Include="embedded_resources_management.h">
+      <Filter>General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
