@@ -58,30 +58,12 @@ void CDetailManager::hw_Load_Geom()
     }
     u32 vSize = sizeof(vertHW);
     Msg("* [DETAILS] %d v(%d), %d p", dwVerts, vSize, dwIndices / 3);
-
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
-    // Determine POOL & USAGE
-    u32 dwUsage = D3DUSAGE_WRITEONLY;
-
-    // Create VB/IB
-    R_CHK(HW.pDevice->CreateVertexBuffer(dwVerts * vSize, dwUsage, 0, D3DPOOL_MANAGED, &hw_VB, nullptr));
-    HW.stats_manager.increment_stats_vb(hw_VB);
-    R_CHK(HW.pDevice->CreateIndexBuffer(dwIndices * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &hw_IB, nullptr));
-    HW.stats_manager.increment_stats_ib(hw_IB);
-
-#endif //	USE_DX10
     Msg("* [DETAILS] Batch(%d), VB(%dK), IB(%dK)", hw_BatchSize, (dwVerts * vSize) / 1024, (dwIndices * 2) / 1024);
 
     // Fill VB
+    hw_VB.Create(dwVerts * vSize);
     {
-        vertHW* pV;
-#ifndef USE_DX9
-        vertHW* pVOriginal;
-        pVOriginal = xr_alloc<vertHW>(dwVerts);
-        pV = pVOriginal;
-#else //	USE_DX10
-        R_CHK(hw_VB->Lock(0, 0, (void**)&pV, 0));
-#endif //	USE_DX10
+        vertHW* pV = static_cast<vertHW*>(hw_VB.GetHostPointer());
         for (u32 o = 0; o < objects.size(); o++)
         {
             const CDetail& D = *objects[o];
@@ -102,28 +84,13 @@ void CDetailManager::hw_Load_Geom()
                 }
             }
         }
-#if defined(USE_OGL)
-        glBufferUtils::CreateVertexBuffer(&hw_VB, pVOriginal, dwVerts * vSize);
-        xr_free(pVOriginal);
-#elif defined(USE_DX10) || defined(USE_DX11)
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&hw_VB, pVOriginal, dwVerts * vSize));
-        HW.stats_manager.increment_stats_vb(hw_VB);
-        xr_free(pVOriginal);
-#else //	USE_DX10
-        R_CHK(hw_VB->Unlock());
-#endif //	USE_DX10
+        hw_VB.Flush();
     }
 
     // Fill IB
+    hw_IB.Create(dwIndices * sizeof(u16));
     {
-        u16* pI;
-#ifndef USE_DX9
-        u16* pIOriginal;
-        pIOriginal = xr_alloc<u16>(dwIndices);
-        pI = pIOriginal;
-#else //	USE_DX10
-        R_CHK(hw_IB->Lock(0, 0, (void**)(&pI), 0));
-#endif //	USE_DX10
+        u16* pI = static_cast<u16*>(hw_IB.GetHostPointer());
         for (u32 o = 0; o < objects.size(); o++)
         {
             const CDetail& D = *objects[o];
@@ -135,16 +102,7 @@ void CDetailManager::hw_Load_Geom()
                 offset = u16(offset + u16(D.number_vertices));
             }
         }
-#if defined(USE_OGL)
-        glBufferUtils::CreateIndexBuffer(&hw_IB, pIOriginal, dwIndices * 2);
-        xr_free(pIOriginal);
-#elif defined(USE_DX10) || defined(USE_DX11)
-        R_CHK(dx10BufferUtils::CreateIndexBuffer(&hw_IB, pIOriginal, dwIndices * 2));
-        HW.stats_manager.increment_stats_ib(hw_IB);
-        xr_free(pIOriginal);
-#else //	USE_DX10
-        R_CHK(hw_IB->Unlock());
-#endif //	USE_DX10
+        hw_IB.Flush();
     }
 
     // Declare geometry
@@ -155,15 +113,8 @@ void CDetailManager::hw_Unload()
 {
     // Destroy VS/VB/IB
     hw_Geom.destroy();
-#ifdef USE_OGL
-    GLuint buffers[] = { hw_IB, hw_VB };
-    glDeleteBuffers(2, buffers);
-#else
-    HW.stats_manager.decrement_stats_vb(hw_VB);
-    HW.stats_manager.decrement_stats_ib(hw_IB);
-    _RELEASE(hw_IB);
-    _RELEASE(hw_VB);
-#endif // USE_OGL
+    hw_IB.Destroy();
+    hw_VB.Destroy();
 }
 
 #if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)

@@ -173,13 +173,10 @@ public:
     // Hardware processor
     ref_geom hw_Geom;
     size_t hw_BatchSize;
-#ifdef USE_OGL
-    GLuint hw_VB;
-    GLuint hw_IB;
-#else
-    ID3DVertexBuffer* hw_VB;
-    ID3DIndexBuffer* hw_IB;
-#endif // USE_OGL
+
+    VertexStagingBuffer hw_VB;
+    IndexStagingBuffer hw_IB;
+
     ref_constant hwc_consts;
     ref_constant hwc_wave;
     ref_constant hwc_wind;
