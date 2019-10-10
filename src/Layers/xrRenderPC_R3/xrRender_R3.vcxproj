@@ -193,6 +193,7 @@
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidObstacles.h" />
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidRenderer.h" />
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.h" />
+    <ClInclude Include="..\xrRenderDX10\CommonTypes.h" />
     <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h" />
     <ClInclude Include="..\xrRenderDX10\dx10BufferUtils.h" />
     <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer.h" />
@@ -308,7 +309,6 @@
     <ClInclude Include="..\xrRender\Utils\dxHashHelper.h" />
     <ClInclude Include="..\xrRender\VertexCache.h" />
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
-    <ClInclude Include="..\xrRender\xrD3DDefs.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
     <ClInclude Include="..\xrRender\xrStripify.h" />
     <ClInclude Include="..\xrRender\xr_effgamma.h" />

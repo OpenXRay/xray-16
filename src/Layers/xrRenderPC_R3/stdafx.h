@@ -13,7 +13,7 @@
 #include <D3Dx10core.h>
 #include <D3DCompiler.h>
 
-#include "Layers/xrRender/xrD3DDefs.h"
+#include "Layers/xrRenderDX10/CommonTypes.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #define R_GL 0
