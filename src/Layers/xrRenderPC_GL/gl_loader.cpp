@@ -204,13 +204,13 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             fs->r(dcl, buffer_size);
             fs->advance(-(int)buffer_size);
 
-            u32 dcl_len = glBufferUtils::GetDeclLength(dcl) + 1;
+            u32 dcl_len = GetDeclLength(dcl) + 1;
             _DC[i].resize(dcl_len);
             fs->r(_DC[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
 
             // count, size
             u32 vCount = fs->r_u32();
-            u32 vSize = glBufferUtils::GetDeclVertexSize(dcl);
+            u32 vSize = GetDeclVertexSize(dcl, 0);
             Msg("* [Loading VB] %d verts, %d Kb", vCount, vCount * vSize / 1024);
 
             //	Check if buffer is less then 2048 kb

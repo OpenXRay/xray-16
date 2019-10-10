@@ -64,7 +64,7 @@ void dx103DFluidGrid::CreateVertexBuffers()
         {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
         {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, D3DDECL_END()};
 
-    u32 vSize = D3DXGetDeclVertexSize(layoutDesc, 0);
+    u32 vSize = GetDeclVertexSize(layoutDesc, 0);
 
     // UINT numElements = sizeof(layoutDesc)/sizeof(layoutDesc[0]);
     // CreateLayout( layoutDesc, numElements, technique, &layout);

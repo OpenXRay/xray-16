@@ -1,6 +1,21 @@
 #include "stdafx.h"
 #include "dx10BufferUtils.h"
 
+u32 GetFVFVertexSize(u32 FVF)
+{
+    return D3DXGetFVFVertexSize(FVF);
+}
+
+u32 GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream)
+{
+    return D3DXGetDeclVertexSize(decl, Stream);
+}
+
+u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
+{
+    return D3DXGetDeclLength(decl);
+}
+
 namespace dx10BufferUtils
 {
 HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT DataSize, bool /*bImmutable*/, bool bIndexBuffer)
@@ -44,6 +59,7 @@ HRESULT CreateConstantBuffer(ID3DBuffer** ppBuffer, UINT DataSize)
     // R_CHK(res);
     return res;
 }
+};
 
 struct VertexFormatPairs
 {
@@ -144,7 +160,6 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
     if (iDeclSize >= 0)
         ZeroMemory(&declOut[iDeclSize], sizeof(declOut[iDeclSize]));
 }
-};
 
 //-----------------------------------------------------------------------------
 void VertexStagingBuffer::Create(size_t size)

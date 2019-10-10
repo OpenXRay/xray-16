@@ -1,5 +1,9 @@
 #pragma once
 
+u32 GetFVFVertexSize(u32 FVF);
+u32 GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream);
+u32 GetDeclLength(const D3DVERTEXELEMENT9* decl);
+
 class VertexStagingBuffer
 {
 public:

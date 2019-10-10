@@ -234,7 +234,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             fs->r(dcl, bufferSize);
             fs->advance(-(int)bufferSize);
 
-            u32 dcl_len = D3DXGetDeclLength(dcl) + 1;
+            u32 dcl_len = GetDeclLength(dcl) + 1;
             _DC[i].resize(dcl_len);
             fs->r(_DC[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
 

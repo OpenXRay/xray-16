@@ -22,6 +22,7 @@ void CreateIndexBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool b
 {
     return CreateBuffer(pBuffer, pData, DataSize, bImmutable, true);
 }
+} // namespace glBufferUtils
 
 const GLsizei VertexSizeList[] =
 {
@@ -125,7 +126,7 @@ const GLuint VertexUsageList[] =
     ~0u, // D3DDECLUSAGE_SAMPLE
 };
 
-GLsizei GetDeclVertexSize(const D3DVERTEXELEMENT9* decl)
+GLsizei GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream)
 {
     GLsizei size = 0;
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
@@ -145,7 +146,7 @@ void ConvertVertexDeclaration(const D3DVERTEXELEMENT9* dxdecl, SDeclaration* dec
     RCache.set_Format(decl);
 
     // XXX: tamlin: use 'stride', or drop it.
-    GLsizei stride = GetDeclVertexSize(dxdecl);
+    GLsizei stride = GetDeclVertexSize(dxdecl, 0);
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
     {
         const D3DVERTEXELEMENT9& desc = dxdecl[i];
@@ -278,7 +279,6 @@ u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
 
     return element - decl;
 }
-} // namespace glBufferUtils
 
 //-----------------------------------------------------------------------------
 void VertexStagingBuffer::Create(size_t size)

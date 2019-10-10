@@ -1,5 +1,20 @@
 #include "stdafx.h"
 
+u32 GetFVFVertexSize(u32 FVF)
+{
+    return D3DXGetFVFVertexSize(FVF);
+}
+
+u32 GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream)
+{
+    return D3DXGetDeclVertexSize(decl, Stream);
+}
+
+u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
+{
+    return D3DXGetDeclLength(decl);
+}
+
 //-----------------------------------------------------------------------------
 void VertexStagingBuffer::Create(size_t size)
 {
