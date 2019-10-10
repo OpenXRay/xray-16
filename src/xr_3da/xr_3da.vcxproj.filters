@@ -22,10 +22,16 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="splash_xrcs_en.bmp">
+    <Image Include="stalker_cop.ico">
       <Filter>resources</Filter>
     </Image>
     <Image Include="stalker_cs.ico">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="stalker_soc.ico">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="splash_xrcs_en.bmp">
       <Filter>resources</Filter>
     </Image>
     <Image Include="splash_xrcs_ru.bmp">
