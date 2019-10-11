@@ -168,6 +168,11 @@ void VertexStagingBuffer::Create(size_t size)
     m_Size = size;
 }
 
+bool VertexStagingBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
+}
+
 void* VertexStagingBuffer::GetHostPointer() const
 {
     return m_HostData;
@@ -194,6 +199,7 @@ void VertexStagingBuffer::Destroy()
         xr_delete(m_HostData);
     HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
     _RELEASE(m_DeviceBuffer);
+    m_DeviceBuffer = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -201,6 +207,11 @@ void IndexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);
     m_Size = size;
+}
+
+bool IndexStagingBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
 }
 
 void* IndexStagingBuffer::GetHostPointer() const
@@ -229,4 +240,5 @@ void IndexStagingBuffer::Destroy()
         xr_delete(m_HostData);
     HW.stats_manager.decrement_stats_ib(m_DeviceBuffer);
     _RELEASE(m_DeviceBuffer);
+    m_DeviceBuffer = nullptr;
 }

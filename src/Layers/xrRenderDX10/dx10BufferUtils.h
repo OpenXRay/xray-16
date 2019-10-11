@@ -21,6 +21,7 @@ public:
     void Create(size_t size);
     void Destroy();
 
+    bool IsValid() const;
     void* GetHostPointer() const;
     ID3DVertexBuffer* GetBufferHandle() const;
     void Flush();
@@ -51,6 +52,7 @@ public:
     void Create(size_t size);
     void Destroy();
 
+    bool IsValid() const;
     void* GetHostPointer() const;
     ID3DIndexBuffer* GetBufferHandle() const;
     void Flush();

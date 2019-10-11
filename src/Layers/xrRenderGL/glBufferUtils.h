@@ -22,6 +22,7 @@ public:
     void Create(size_t size);
     void Destroy();
 
+    bool IsValid() const;
     void* GetHostPointer() const;
     GLuint GetBufferHandle() const;
     void Flush();
@@ -52,6 +53,7 @@ public:
     void Create(size_t size);
     void Destroy();
 
+    bool IsValid() const;
     void* GetHostPointer() const;
     GLuint GetBufferHandle() const;
     void Flush();
