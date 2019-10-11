@@ -69,13 +69,13 @@ void CRenderDevice::Initialize()
 
         if (ShadowOfChernobylMode)
         {
-            title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
             icon = IDI_SOC;
+            title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
         }
         else if (ClearSkyMode)
         {
-            title = "S.T.A.L.K.E.R.: Clear Sky";
             icon = IDI_CS;
+            title = "S.T.A.L.K.E.R.: Clear Sky";
         }
 
         title = READ_IF_EXISTS(pSettingsOpenXRay, r_string,
