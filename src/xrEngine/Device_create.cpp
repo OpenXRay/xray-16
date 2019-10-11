@@ -129,7 +129,7 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
     {
         // Changing monitor, unset fullscreen for the previous monitor
         if (SDL_GetWindowDisplayIndex(m_sdlWnd) != Vid_SelectedMonitor)
-            SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
+            SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
 
         SDL_Rect rect;
         SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
