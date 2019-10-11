@@ -138,8 +138,7 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 
         if (b_is_Ready)
         {
-            const bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-            SDL_SetWindowFullscreen(m_sdlWnd, isDX9Renderer ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_FULLSCREEN);
+            SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
 
             SDL_DisplayMode mode;
             SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
