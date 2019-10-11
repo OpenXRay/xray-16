@@ -22,7 +22,7 @@ public:
     void Destroy();
 
     bool IsValid() const;
-    void* GetHostPointer() const;
+    void* GetHostPointer();
     ID3DVertexBuffer* GetBufferHandle() const;
     void Flush();
 
@@ -53,7 +53,7 @@ public:
     void Destroy();
 
     bool IsValid() const;
-    void* GetHostPointer() const;
+    void* GetHostPointer();
     ID3DIndexBuffer* GetBufferHandle() const;
     void Flush();
 

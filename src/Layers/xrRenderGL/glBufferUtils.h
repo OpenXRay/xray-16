@@ -23,7 +23,7 @@ public:
     void Destroy();
 
     bool IsValid() const;
-    void* GetHostPointer() const;
+    void* GetHostPointer();
     GLuint GetBufferHandle() const;
     void Flush();
 
@@ -54,7 +54,7 @@ public:
     void Destroy();
 
     bool IsValid() const;
-    void* GetHostPointer() const;
+    void* GetHostPointer();
     GLuint GetBufferHandle() const;
     void Flush();
 

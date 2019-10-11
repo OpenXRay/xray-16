@@ -173,13 +173,20 @@ bool VertexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* VertexStagingBuffer::GetHostPointer() const
+void* VertexStagingBuffer::GetHostPointer()
 {
+    if (m_HostData == nullptr)
+    {
+        // The buffer was flushed and is being updating again
+        VERIFY(m_Size);
+        Create(m_Size);
+    }
     return m_HostData;
 }
 
 void VertexStagingBuffer::Flush()
 {
+    VERIFY(m_HostData && m_Size);
     // Upload data to device
     dx10BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
     HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
@@ -214,13 +221,20 @@ bool IndexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* IndexStagingBuffer::GetHostPointer() const
+void* IndexStagingBuffer::GetHostPointer()
 {
+    if (m_HostData == nullptr)
+    {
+        // The buffer was flushed and is being updating again
+        VERIFY(m_Size);
+        Create(m_Size);
+    }
     return m_HostData;
 }
 
 void IndexStagingBuffer::Flush()
 {
+    VERIFY(m_HostData && m_Size);
     // Upload data to device
     dx10BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
     HW.stats_manager.increment_stats_ib(m_DeviceBuffer);

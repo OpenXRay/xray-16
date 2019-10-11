@@ -33,13 +33,14 @@ bool VertexStagingBuffer::IsValid() const
 
 void* VertexStagingBuffer::GetHostPointer() const
 {
-    VERIFY(m_DeviceBuffer);
+    VERIFY(IsValid());
     R_CHK(m_DeviceBuffer->Lock(0, 0, const_cast<void**>(&m_HostData), 0));
     return m_HostData;
 }
 
 void VertexStagingBuffer::Flush()
 {
+    VERIFY(IsValid());
     // Upload data to device
     R_CHK(m_DeviceBuffer->Unlock());
     HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
@@ -77,13 +78,14 @@ bool IndexStagingBuffer::IsValid() const
 
 void* IndexStagingBuffer::GetHostPointer() const
 {
-    VERIFY(m_DeviceBuffer);
+    VERIFY(IsValid());
     R_CHK(m_DeviceBuffer->Lock(0, 0, const_cast<void**>(&m_HostData), 0));
     return m_HostData;
 }
 
 void IndexStagingBuffer::Flush()
 {
+    VERIFY(IsValid());
     // Upload data to device
     R_CHK(m_DeviceBuffer->Unlock());
     HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
