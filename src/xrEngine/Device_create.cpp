@@ -104,7 +104,7 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 
     if (windowed)
     {
-        const bool drawBorders = strstr(Core.Params, "-draw_borders");
+        static bool drawBorders = strstr(Core.Params, "-draw_borders");
 
         bool useDesktopFullscreen = false;
         if (b_is_Ready)
