@@ -102,8 +102,7 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 {
     SelectResolution(windowed);
 
-    const bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-    if (windowed || isDX9Renderer)
+    if (windowed)
     {
         const bool drawBorders = strstr(Core.Params, "-draw_borders");
 
@@ -111,8 +110,6 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
         if (b_is_Ready)
         {
             if (!drawBorders && g_monitors.SelectedResolutionIsMaximal())
-                useDesktopFullscreen = true;
-            else if (!windowed && isDX9Renderer)
                 useDesktopFullscreen = true;
         }
 
@@ -141,8 +138,9 @@ void CRenderDevice::UpdateWindowProps(const bool windowed)
 
         if (b_is_Ready)
         {
-            SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
-            
+            const bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
+            SDL_SetWindowFullscreen(m_sdlWnd, isDX9Renderer ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_FULLSCREEN);
+
             SDL_DisplayMode mode;
             SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
             mode.w = psCurrentVidMode[0];
