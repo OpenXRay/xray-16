@@ -26,6 +26,7 @@ int entry_point(pcstr commandLine)
 {
     xrDebug::Initialize(commandLine);
     R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
+    SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "0");
 
     if (!strstr(commandLine, "-nosplash"))
     {
