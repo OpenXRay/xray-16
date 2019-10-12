@@ -71,7 +71,7 @@ ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
     }
 }
 
-ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
+ICF void CBackend::set_Vertices(VertexBufferHandle _vb, u32 _vb_stride)
 {
     if ((vb != _vb) || (vb_stride != _vb_stride))
     {
@@ -85,7 +85,7 @@ ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
     }
 }
 
-ICF void CBackend::set_Indices(ID3DIndexBuffer* _ib)
+ICF void CBackend::set_Indices(IndexBufferHandle _ib)
 {
     if (ib != _ib)
     {

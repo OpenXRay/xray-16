@@ -3,8 +3,7 @@
 #include "xrCore/FMesh.hpp"
 #include "FSkinned.h"
 #include "SkeletonX.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
-#include "Layers/xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderGL/glBufferPool.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
@@ -420,7 +419,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);
@@ -454,7 +453,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);
@@ -489,7 +488,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);
@@ -524,7 +523,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);

@@ -7,7 +7,7 @@
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
 #include "Layers/xrRender/FHierrarhyVisual.h"
 
@@ -254,7 +254,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             //	Check if buffer is less then 2048 kb
             BYTE* pData = xr_alloc<BYTE>(vCount * vSize);
             fs->r(pData, vCount * vSize);
-            dx10BufferUtils::CreateVertexBuffer(&_VB[i], pData, vCount * vSize);
+            BufferUtils::CreateVertexBuffer(&_VB[i], pData, vCount * vSize);
             HW.stats_manager.increment_stats_vb(_VB[i]);
             xr_free(pData);
 
@@ -286,7 +286,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             //	Check if buffer is less then 2048 kb
             BYTE* pData = xr_alloc<BYTE>(iCount * 2);
             fs->r(pData, iCount * 2);
-            dx10BufferUtils::CreateIndexBuffer(&_IB[i], pData, iCount * 2);
+            BufferUtils::CreateIndexBuffer(&_IB[i], pData, iCount * 2);
             HW.stats_manager.increment_stats_ib(_IB[i]);
             xr_free(pData);
 

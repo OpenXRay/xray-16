@@ -5,17 +5,27 @@ u32 GetFVFVertexSize(u32 FVF)
     return D3DXGetFVFVertexSize(FVF);
 }
 
-u32 GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
 {
     return D3DXGetDeclVertexSize(decl, Stream);
 }
 
-u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
+u32 GetDeclLength(const VertexElement* decl)
 {
     return D3DXGetDeclLength(decl);
 }
 
 //-----------------------------------------------------------------------------
+VertexStagingBuffer::VertexStagingBuffer()
+    : m_DeviceBuffer{ nullptr }
+{
+}
+
+VertexStagingBuffer::~VertexStagingBuffer()
+{
+    Destroy();
+}
+
 void VertexStagingBuffer::Create(size_t size)
 {
     m_Size = size;
@@ -31,7 +41,7 @@ bool VertexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* VertexStagingBuffer::GetHostPointer() const
+void* VertexStagingBuffer::GetHostPointer()
 {
     VERIFY(IsValid());
     R_CHK(m_DeviceBuffer->Lock(0, 0, const_cast<void**>(&m_HostData), 0));
@@ -48,7 +58,7 @@ void VertexStagingBuffer::Flush()
     m_HostData = nullptr;
 }
 
-ID3DVertexBuffer* VertexStagingBuffer::GetBufferHandle() const
+VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
 {
     return m_DeviceBuffer;
 }
@@ -61,6 +71,16 @@ void VertexStagingBuffer::Destroy()
 }
 
 //-----------------------------------------------------------------------------
+IndexStagingBuffer::IndexStagingBuffer()
+    : m_DeviceBuffer{ nullptr }
+{
+}
+
+IndexStagingBuffer::~IndexStagingBuffer()
+{
+    Destroy();
+}
+
 void IndexStagingBuffer::Create(size_t size)
 {
     m_Size = size;
@@ -76,7 +96,7 @@ bool IndexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* IndexStagingBuffer::GetHostPointer() const
+void* IndexStagingBuffer::GetHostPointer()
 {
     VERIFY(IsValid());
     R_CHK(m_DeviceBuffer->Lock(0, 0, const_cast<void**>(&m_HostData), 0));
@@ -93,7 +113,7 @@ void IndexStagingBuffer::Flush()
     m_HostData = nullptr;
 }
 
-ID3DIndexBuffer* IndexStagingBuffer::GetBufferHandle() const
+IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
 {
     return m_DeviceBuffer;
 }

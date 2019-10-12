@@ -267,3 +267,10 @@ typedef ID3D11ShaderReflectionType ID3DShaderReflectionType;
 
 typedef dx10State ID3DState;
 #define DX10_ONLY(expr) expr
+
+using VertexBufferHandle = ID3D11Buffer*;
+using IndexBufferHandle = ID3D11Buffer*;
+using ConstantBufferHandle = ID3D11Buffer*;
+
+using VertexElement = D3DVERTEXELEMENT9;
+using InputElementDesc = D3D11_INPUT_ELEMENT_DESC;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx103DFluidRenderer.h"
 #include "dx103DFluidBlenders.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "dx103DFluidData.h"
 
 struct VsInput
@@ -127,14 +127,14 @@ void dx103DFluidRenderer::CreateGridBox()
     };
     m_iGridBoxVertNum = sizeof(vertices) / sizeof(vertices[0]);
 
-    CHK_DX(dx10BufferUtils::CreateVertexBuffer(&m_pGridBoxVertexBuffer, vertices, sizeof(vertices)));
+    CHK_DX(BufferUtils::CreateVertexBuffer(&m_pGridBoxVertexBuffer, vertices, sizeof(vertices)));
 
     // Create index buffer
     u16 indices[] = {
         0, 4, 1, 1, 4, 5, 0, 1, 2, 2, 1, 3, 4, 6, 5, 6, 7, 5, 2, 3, 6, 3, 7, 6, 1, 5, 3, 3, 5, 7, 0, 2, 4, 2, 6, 4};
     m_iGridBoxFaceNum = (sizeof(indices) / sizeof(indices[0])) / 3;
 
-    CHK_DX(dx10BufferUtils::CreateIndexBuffer(&m_pGridBoxIndexBuffer, indices, sizeof(indices)));
+    CHK_DX(BufferUtils::CreateIndexBuffer(&m_pGridBoxIndexBuffer, indices, sizeof(indices)));
     HW.stats_manager.increment_stats(sizeof(indices), enum_stats_buffer_type_index, D3DPOOL_MANAGED);
 
     // Define the input layout
@@ -158,7 +158,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
     svQuad[2].pos = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
     svQuad[3].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
 
-    CHK_DX(dx10BufferUtils::CreateVertexBuffer(&m_pQuadVertexBuffer, svQuad, sizeof(svQuad)));
+    CHK_DX(BufferUtils::CreateVertexBuffer(&m_pQuadVertexBuffer, svQuad, sizeof(svQuad)));
     m_GeomQuadVertex.create(quadlayout, m_pQuadVertexBuffer, 0);
 }
 

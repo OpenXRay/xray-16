@@ -20,3 +20,12 @@ typedef IDirect3DVolumeTexture9 ID3DTexture3D;
 typedef IDirect3DStateBlock9 ID3DState;
 
 #define DX10_ONLY(expr) do {} while (0)
+
+using Unused = int[0];
+
+using VertexBufferHandle = ID3DVertexBuffer*;
+using IndexBufferHandle = ID3DIndexBuffer*;
+using ConstantBufferHandle = Unused;
+
+using VertexElement = D3DVERTEXELEMENT9;
+using InputElementDesc = Unused;

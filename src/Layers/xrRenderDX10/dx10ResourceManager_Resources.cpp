@@ -16,7 +16,7 @@
 #include "Layers/xrRender/tss.h"
 #include "Layers/xrRender/blenders/blender.h"
 #include "Layers/xrRender/blenders/blender_recorder.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/du_sphere.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 /*
 Fvector du_sphere_vertices[DU_SPHERE_NUMVERTEX]=
@@ -303,7 +303,7 @@ void CRenderTarget::accum_point_geom_create()
         //		CopyMemory				(pData,du_sphere_vertices,vCount*vSize);
         //		g_accum_point_vb->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&g_accum_point_vb, du_sphere_vertices, vCount * vSize));
+        R_CHK(BufferUtils::CreateVertexBuffer(&g_accum_point_vb, du_sphere_vertices, vCount * vSize));
         HW.stats_manager.increment_stats_vb(g_accum_point_vb);
     }
 
@@ -318,7 +318,7 @@ void CRenderTarget::accum_point_geom_create()
         // CopyMemory		(pData,du_sphere_faces,iCount*2);
         // g_accum_point_ib->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateIndexBuffer(&g_accum_point_ib, du_sphere_faces, iCount * 2));
+        R_CHK(BufferUtils::CreateIndexBuffer(&g_accum_point_ib, du_sphere_faces, iCount * 2));
         HW.stats_manager.increment_stats_ib(g_accum_point_ib);
     }
 }

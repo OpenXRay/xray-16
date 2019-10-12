@@ -1,22 +1,22 @@
 #include "stdafx.h"
-#include "dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 u32 GetFVFVertexSize(u32 FVF)
 {
     return D3DXGetFVFVertexSize(FVF);
 }
 
-u32 GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
 {
     return D3DXGetDeclVertexSize(decl, Stream);
 }
 
-u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
+u32 GetDeclLength(const VertexElement* decl)
 {
     return D3DXGetDeclLength(decl);
 }
 
-namespace dx10BufferUtils
+namespace BufferUtils
 {
 HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT DataSize, bool /*bImmutable*/, bool bIndexBuffer)
 {
@@ -36,17 +36,17 @@ HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT DataSize,
     return res;
 }
 
-HRESULT CreateVertexBuffer(ID3DVertexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, false);
 }
 
-HRESULT CreateIndexBuffer(ID3DIndexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, true);
 }
 
-HRESULT CreateConstantBuffer(ID3DBuffer** ppBuffer, UINT DataSize)
+HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize)
 {
     D3D_BUFFER_DESC desc;
     desc.ByteWidth = DataSize;
@@ -162,6 +162,16 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
 }
 
 //-----------------------------------------------------------------------------
+VertexStagingBuffer::VertexStagingBuffer()
+    : m_DeviceBuffer{ nullptr }
+{
+}
+
+VertexStagingBuffer::~VertexStagingBuffer()
+{
+    Destroy();
+}
+
 void VertexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);
@@ -188,14 +198,14 @@ void VertexStagingBuffer::Flush()
 {
     VERIFY(m_HostData && m_Size);
     // Upload data to device
-    dx10BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
     HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
     // Free host memory
     xr_delete(m_HostData);
     m_HostData = nullptr;
 }
 
-ID3DVertexBuffer* VertexStagingBuffer::GetBufferHandle() const
+VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
 {
     return m_DeviceBuffer;
 }
@@ -210,6 +220,16 @@ void VertexStagingBuffer::Destroy()
 }
 
 //-----------------------------------------------------------------------------
+IndexStagingBuffer::IndexStagingBuffer()
+    : m_DeviceBuffer{ nullptr }
+{
+}
+
+IndexStagingBuffer::~IndexStagingBuffer()
+{
+    Destroy();
+}
+
 void IndexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);
@@ -236,14 +256,14 @@ void IndexStagingBuffer::Flush()
 {
     VERIFY(m_HostData && m_Size);
     // Upload data to device
-    dx10BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
+    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
     HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
     // Free host memory
     xr_delete(m_HostData);
     m_HostData = nullptr;
 }
 
-ID3DIndexBuffer* IndexStagingBuffer::GetBufferHandle() const
+IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
 {
     return m_DeviceBuffer;
 }

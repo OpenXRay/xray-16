@@ -13,7 +13,6 @@
 #include "Layers/xrRenderDX9/CommonTypes.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 #include "Layers/xrRenderDX9/dx9HW.h"
-#include "Layers/xrRenderDX9/BufferUtils.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"

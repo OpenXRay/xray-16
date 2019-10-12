@@ -971,9 +971,6 @@
     <ClInclude Include="..\xrRender\FSkinned.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderGL\glBufferUtils.h">
-      <Filter>dx9 to gl Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\FTreeVisual.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
@@ -1132,6 +1129,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRenderGL\CommonTypes.h">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\BufferUtils.h">
+      <Filter>dx9 to gl Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

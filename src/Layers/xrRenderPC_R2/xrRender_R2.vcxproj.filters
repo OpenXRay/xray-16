@@ -615,11 +615,11 @@
     <ClInclude Include="..\xrRenderDX9\dx9HW.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX9\BufferUtils.h">
-      <Filter>Refactored\HW</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderDX9\CommonTypes.h">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\BufferUtils.h">
+      <Filter>Refactored\HW</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

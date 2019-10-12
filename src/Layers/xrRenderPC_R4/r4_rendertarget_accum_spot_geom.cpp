@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/du_cone.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 /*
 Fvector du_cone_vertices[DU_CONE_NUMVERTEX]=
@@ -81,7 +81,7 @@ void CRenderTarget::accum_spot_geom_create()
         // CopyMemory				(pData,du_cone_vertices,vCount*vSize);
         // g_accum_spot_vb->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&g_accum_spot_vb, du_cone_vertices, vCount * vSize));
+        R_CHK(BufferUtils::CreateVertexBuffer(&g_accum_spot_vb, du_cone_vertices, vCount * vSize));
         HW.stats_manager.increment_stats_vb(g_accum_spot_vb);
     }
 
@@ -96,7 +96,7 @@ void CRenderTarget::accum_spot_geom_create()
         // CopyMemory		(pData,du_cone_faces,iCount*2);
         // g_accum_spot_ib->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateIndexBuffer(&g_accum_spot_ib, du_cone_faces, iCount * 2));
+        R_CHK(BufferUtils::CreateIndexBuffer(&g_accum_spot_ib, du_cone_faces, iCount * 2));
         HW.stats_manager.increment_stats_ib(g_accum_spot_ib);
     }
 }
@@ -164,7 +164,7 @@ void CRenderTarget::accum_volumetric_geom_create()
             t += dt;
         }
 
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&g_accum_volumetric_vb, &pSlice, vCount * vSize));
+        R_CHK(BufferUtils::CreateVertexBuffer(&g_accum_volumetric_vb, &pSlice, vCount * vSize));
         HW.stats_manager.increment_stats_vb(g_accum_volumetric_vb);
     }
 
@@ -203,7 +203,7 @@ void CRenderTarget::accum_volumetric_geom_create()
             pInd[5] = basevert + 3;
         }
 
-        R_CHK(dx10BufferUtils::CreateIndexBuffer(&g_accum_volumetric_ib, &Datap, iCount * 2));
+        R_CHK(BufferUtils::CreateIndexBuffer(&g_accum_volumetric_ib, &Datap, iCount * 2));
         HW.stats_manager.increment_stats_ib(g_accum_volumetric_ib);
 
         //		R_CHK

@@ -8,8 +8,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #endif
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
-#include "Layers/xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 const int quant = 16384;
 const int c_hdr = 10;

@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
-namespace glBufferUtils
+namespace BufferUtils
 {
-void CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer)
+HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer)
 {
     GLenum usage = bImmutable ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
     GLenum target = bIndexBuffer ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
@@ -11,16 +11,17 @@ void CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmut
     glGenBuffers(1, pBuffer);
     glBindBuffer(target, *pBuffer);
     CHK_GL(glBufferData(target, DataSize, pData, usage));
+    return S_OK;
 }
 
-void CreateVertexBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(pBuffer, pData, DataSize, bImmutable, false);
 }
 
-void CreateIndexBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
-    return CreateBuffer(pBuffer, pData, DataSize, bImmutable, true);
+    return CreateBuffer(static_cast<GLuint*>(pBuffer), pData, DataSize, bImmutable, true);
 }
 } // namespace glBufferUtils
 
@@ -126,7 +127,7 @@ const GLuint VertexUsageList[] =
     ~0u, // D3DDECLUSAGE_SAMPLE
 };
 
-GLsizei GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
 {
     GLsizei size = 0;
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
@@ -141,7 +142,7 @@ GLsizei GetDeclVertexSize(const D3DVERTEXELEMENT9* decl, DWORD Stream)
     return size;
 }
 
-void ConvertVertexDeclaration(const D3DVERTEXELEMENT9* dxdecl, SDeclaration* decl)
+void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
 {
     RCache.set_Format(decl);
 
@@ -169,7 +170,7 @@ void ConvertVertexDeclaration(const D3DVERTEXELEMENT9* dxdecl, SDeclaration* dec
     }
 }
 
-GLsizei GetFVFVertexSize(u32 FVF)
+u32 GetFVFVertexSize(u32 FVF)
 {
     GLsizei offset = 0;
 
@@ -281,6 +282,16 @@ u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
 }
 
 //-----------------------------------------------------------------------------
+VertexStagingBuffer::VertexStagingBuffer()
+    : m_DeviceBuffer{ 0 }
+{
+}
+
+VertexStagingBuffer::~VertexStagingBuffer()
+{
+    Destroy();
+}
+
 void VertexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);
@@ -307,7 +318,7 @@ void VertexStagingBuffer::Flush()
 {
     VERIFY(m_HostData && m_Size);
     // Upload data to device
-    glBufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
     // Free host memory
     xr_delete(m_HostData);
     m_HostData = nullptr;
@@ -322,11 +333,24 @@ void VertexStagingBuffer::Destroy()
 {
     if (m_HostData)
         xr_delete(m_HostData);
-    glDeleteBuffers(1, &m_DeviceBuffer);
-    m_DeviceBuffer = 0;
+    if (m_DeviceBuffer)
+    {
+        glDeleteBuffers(1, &m_DeviceBuffer);
+        m_DeviceBuffer = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
+IndexStagingBuffer::IndexStagingBuffer()
+    : m_DeviceBuffer{ 0 }
+{
+}
+
+IndexStagingBuffer::~IndexStagingBuffer()
+{
+    Destroy();
+}
+
 void IndexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);
@@ -353,7 +377,7 @@ void IndexStagingBuffer::Flush()
 {
     VERIFY(m_HostData && m_Size);
     // Upload data to device
-    glBufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
+    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
     // Free host memory
     xr_delete(m_HostData);
     m_HostData = nullptr;
@@ -368,6 +392,9 @@ void IndexStagingBuffer::Destroy()
 {
     if (m_HostData)
         xr_delete(m_HostData);
-    glDeleteBuffers(1, &m_DeviceBuffer);
-    m_DeviceBuffer = 0;
+    if (m_DeviceBuffer)
+    {
+        glDeleteBuffers(1, &m_DeviceBuffer);
+        m_DeviceBuffer = 0;
+    }
 }

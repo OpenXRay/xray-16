@@ -7,7 +7,7 @@
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
-#include "Layers/xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderGL/glBufferPool.h"
 #include "Layers/xrRender/FHierrarhyVisual.h"
 

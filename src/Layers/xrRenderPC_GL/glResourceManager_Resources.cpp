@@ -9,7 +9,7 @@
 #include "../xrRender/tss.h"
 #include "../xrRender/blenders/Blender.h"
 #include "../xrRender/blenders/Blender_Recorder.h"
-#include "../xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 void fix_texture_name(LPSTR fn);

@@ -348,7 +348,6 @@
     <ClInclude Include="..\xrRenderGL\CommonTypes.h" />
     <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h" />
     <ClInclude Include="..\xrRenderGL\glBufferPool.h" />
-    <ClInclude Include="..\xrRenderGL\glBufferUtils.h" />
     <ClInclude Include="..\xrRenderGL\glHW.h" />
     <ClInclude Include="..\xrRenderGL\glMinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderGL\glR_Backend_Runtime.h" />
@@ -357,6 +356,7 @@
     <ClInclude Include="..\xrRenderGL\glStateUtils.h" />
     <ClInclude Include="..\xrRenderGL\glTextureUtils.h" />
     <ClInclude Include="..\xrRenderGL\MSAA\glMSAABlender.h" />
+    <ClInclude Include="..\xrRender\BufferUtils.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />

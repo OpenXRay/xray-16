@@ -7,15 +7,13 @@
 #endif
 
 #include "xrEngine/stdafx.h"
-#if defined(WINDOWS)
+
 #include <d3d9.h>
 #include <d3dx9.h>
 
 #include "Layers/xrRenderDX9/CommonTypes.h"
-#endif
-#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderDX9/dx9HW.h"
-#include "Layers/xrRenderDX9/BufferUtils.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"
@@ -27,6 +25,7 @@
 #define R_R4 4
 #define RENDER R_R1
 
+#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "xrEngine/vis_common.h"
 #include "xrEngine/Render.h"
