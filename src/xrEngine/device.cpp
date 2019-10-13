@@ -102,9 +102,7 @@ void CRenderDevice::RenderEnd(void)
             Memory.mem_compact();
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
-#ifdef FIND_CHUNK_BENCHMARK_ENABLE
-            g_find_chunk_counter.flush();
-#endif
+            FIND_CHUNK_COUNTER_FLUSH();
             CheckPrivilegySlowdown();
             if (g_pGamePersistent->GameType() == 1 && !ps_always_active) // haCk
             {
