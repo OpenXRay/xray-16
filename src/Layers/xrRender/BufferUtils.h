@@ -31,6 +31,19 @@ public:
     VertexBufferHandle GetBufferHandle() const;
     void Flush();
 
+    void AddRef()
+    {
+        ++m_RefCounter;
+    }
+
+    u32 Release()
+    {
+        VERIFY(m_RefCounter); // attempting to release unused object
+        if (--m_RefCounter == 0)
+            Destroy();
+        return m_RefCounter;
+    }
+
     operator VertexBufferHandle() const
     {
         return m_DeviceBuffer;
@@ -49,6 +62,7 @@ private:
     VertexBufferHandle m_DeviceBuffer;
     void* m_HostData{ nullptr };
     size_t m_Size{ 0 };
+    u32 m_RefCounter{ 0 };
 };
 
 class IndexStagingBuffer
@@ -64,6 +78,19 @@ public:
     void* GetHostPointer();
     IndexBufferHandle GetBufferHandle() const;
     void Flush();
+
+    void AddRef()
+    {
+        ++m_RefCounter;
+    }
+
+    u32 Release()
+    {
+        VERIFY(m_RefCounter); // attempting to release unused object
+        if (--m_RefCounter == 0)
+            Destroy();
+        return m_RefCounter;
+    }
 
     operator IndexBufferHandle() const
     {
@@ -83,4 +110,5 @@ private:
     IndexBufferHandle m_DeviceBuffer;
     void* m_HostData{ nullptr };
     size_t m_Size{ 0 };
+    u32 m_RefCounter{ 0 };
 };

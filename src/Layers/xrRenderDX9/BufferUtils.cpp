@@ -34,6 +34,7 @@ void VertexStagingBuffer::Create(size_t size)
     if (HW.Caps.geometry.bSoftware)
         dwUsage |= D3DUSAGE_SOFTWAREPROCESSING;
     R_CHK(HW.pDevice->CreateVertexBuffer(size, dwUsage, 0, D3DPOOL_MANAGED, &m_DeviceBuffer, nullptr));
+    AddRef();
 }
 
 bool VertexStagingBuffer::IsValid() const
@@ -89,6 +90,7 @@ void IndexStagingBuffer::Create(size_t size)
     if (HW.Caps.geometry.bSoftware)
         dwUsage |= D3DUSAGE_SOFTWAREPROCESSING;
     R_CHK(HW.pDevice->CreateIndexBuffer(size, dwUsage, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &m_DeviceBuffer, NULL));
+    AddRef();
 }
 
 bool IndexStagingBuffer::IsValid() const

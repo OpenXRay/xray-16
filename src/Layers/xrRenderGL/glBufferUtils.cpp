@@ -296,6 +296,7 @@ void VertexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);
     m_Size = size;
+    AddRef();
 }
 
 bool VertexStagingBuffer::IsValid() const
@@ -355,6 +356,7 @@ void IndexStagingBuffer::Create(size_t size)
 {
     m_HostData = xr_alloc<u8>(size);
     m_Size = size;
+    AddRef();
 }
 
 bool IndexStagingBuffer::IsValid() const
