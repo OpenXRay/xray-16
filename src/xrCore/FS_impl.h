@@ -36,11 +36,7 @@ struct find_chunk_counter
     }
 };
 
-#ifdef INCLUDE_FROM_ENGINE
-extern XR_IMPORT find_chunk_counter g_find_chunk_counter;
-#else // INCLUDE_FROM_ENGINE
-extern XR_EXPORT find_chunk_counter g_find_chunk_counter;
-#endif // INCLUDE_FROM_ENGINE
+extern XRCORE_API find_chunk_counter g_find_chunk_counter;
 
 extern bool g_initialize_cpu_called;
 

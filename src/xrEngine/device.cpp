@@ -20,8 +20,6 @@
 #include "x_ray.h"
 #include "Render.h"
 
-// must be defined before include of FS_impl.h
-#define INCLUDE_FROM_ENGINE
 #include "xrCore/FS_impl.h"
 
 #include "Include/editor/ide.hpp"
