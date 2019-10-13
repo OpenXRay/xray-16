@@ -88,51 +88,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
-#if defined(USE_OGL)
-    // TODO: OGL: Implement SetupStates().
-#elif defined(USE_DX10) || defined(USE_DX11)
-    SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);
-    SSManager.SetMipLODBias(ps_r__tf_Mipbias);
-#else //    USE_DX10
-    for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-    {
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, ps_r__tf_Anisotropic));
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *(LPDWORD)&ps_r__tf_Mipbias));
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR));
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR));
-        CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR));
-    }
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_LOCALVIEWER, TRUE));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_MATERIAL));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_SPECULARMATERIALSOURCE, D3DMCS_MATERIAL));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, D3DMCS_MATERIAL));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE));
-    if (psDeviceFlags.test(rsWireframe))
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME));
-    else
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID));
-    // ******************** Fog parameters
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGCOLOR, 0));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_RANGEFOGENABLE, FALSE));
-    if (HW.Caps.bTableFog)
-    {
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGTABLEMODE, D3DFOG_LINEAR));
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGVERTEXMODE, D3DFOG_NONE));
-    }
-    else
-    {
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGTABLEMODE, D3DFOG_NONE));
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGVERTEXMODE, D3DFOG_LINEAR));
-    }
-#endif // USE_DX10
+    RCache.SetupStates();
 }
 
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
@@ -172,58 +128,12 @@ void D3DXRenderBase::SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bF
 
 void D3DXRenderBase::overdrawBegin()
 {
-#ifndef USE_DX9
-    //  TODO: DX10: Implement overdrawBegin
-    VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
-#else
-    // Turn stenciling
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILREF, 0));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILMASK, 0x00000000));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILWRITEMASK, 0xffffffff));
-    // Increment the stencil buffer for each pixel drawn
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INCRSAT));
-    if (1 == HW.Caps.SceneMode)
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP)); // Overdraw
-    else
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCRSAT)); // ZB access
-#endif
+    RCache.dbg_OverdrawBegin();
 }
 
 void D3DXRenderBase::overdrawEnd()
 {
-#ifndef USE_DX9
-    // TODO: DX10: Implement overdrawEnd
-    VERIFY(!"D3DXRenderBase::overdrawEnd not implemented.");
-#else
-    // Set up the stencil states
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff));
-    // Set the background to black
-    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
-    // Draw a rectangle wherever the count equal I
-    RCache.OnFrameEnd();
-    CHK_DX(HW.pDevice->SetFVF(FVF::F_TL));
-    // Render gradients
-    for (int I = 0; I < 12; I++)
-    {
-        u32 _c = I * 256 / 13;
-        u32 c = color_xrgb(_c, _c, _c);
-        FVF::TL pv[4];
-        pv[0].set(float(0), float(Device.dwHeight), c, 0, 0);
-        pv[1].set(float(0), float(0), c, 0, 0);
-        pv[2].set(float(Device.dwWidth), float(Device.dwHeight), c, 0, 0);
-        pv[3].set(float(Device.dwWidth), float(0), c, 0, 0);
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILREF, I));
-        CHK_DX(HW.pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pv, sizeof(FVF::TL)));
-    }
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE));
-#endif // USE_DX10
+    RCache.dbg_OverdrawEnd();
 }
 
 void D3DXRenderBase::DeferredLoad(bool E)
