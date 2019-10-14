@@ -21,11 +21,11 @@ typedef IDirect3DStateBlock9 ID3DState;
 
 #define DX10_ONLY(expr) do {} while (0)
 
-using Unused = int[0];
+using unused_t = int[0];
 
 using VertexBufferHandle = ID3DVertexBuffer*;
 using IndexBufferHandle = ID3DIndexBuffer*;
-using ConstantBufferHandle = Unused;
+using ConstantBufferHandle = unused_t;
 
 using VertexElement = D3DVERTEXELEMENT9;
-using InputElementDesc = Unused;
+using InputElementDesc = unused_t;

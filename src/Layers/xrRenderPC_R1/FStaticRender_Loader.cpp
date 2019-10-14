@@ -206,7 +206,6 @@ void CRender::level_Unload()
 void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 {
     Resources->Evict();
-    u32 dwUsage = D3DUSAGE_WRITEONLY | (HW.Caps.geometry.bSoftware ? D3DUSAGE_SOFTWAREPROCESSING : 0);
 
     xr_vector<VertexDeclarator>& _DC  = alternative ? xDC : nDC;
     xr_vector<VertexStagingBuffer>& _VB = alternative ? xVB : nVB;
@@ -241,7 +240,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             // count, size
             u32 vCount = fs->r_u32();
-            u32 vSize = D3DXGetDeclVertexSize(dcl, 0);
+            u32 vSize = GetDeclVertexSize(dcl, 0);
             Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount * vSize) / 1024);
 
             // Create and fill

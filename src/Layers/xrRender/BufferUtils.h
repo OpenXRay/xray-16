@@ -38,8 +38,9 @@ public:
 
     u32 Release()
     {
-        VERIFY(m_RefCounter); // attempting to release unused object
-        if (--m_RefCounter == 0)
+        VERIFY2(m_RefCounter, "Attempt to release unused object");
+        --m_RefCounter;
+        if (m_RefCounter == 0)
             Destroy();
         return m_RefCounter;
     }
@@ -86,8 +87,9 @@ public:
 
     u32 Release()
     {
-        VERIFY(m_RefCounter); // attempting to release unused object
-        if (--m_RefCounter == 0)
+        VERIFY2(m_RefCounter, "Attempt to release unused object");
+        --m_RefCounter;
+        if (m_RefCounter == 0)
             Destroy();
         return m_RefCounter;
     }

@@ -203,7 +203,6 @@ void VertexStagingBuffer::Flush()
     HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
     // Free host memory
     xr_delete(m_HostData);
-    m_HostData = nullptr;
 }
 
 VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
@@ -217,7 +216,6 @@ void VertexStagingBuffer::Destroy()
         xr_delete(m_HostData);
     HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
     _RELEASE(m_DeviceBuffer);
-    m_DeviceBuffer = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -262,7 +260,6 @@ void IndexStagingBuffer::Flush()
     HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
     // Free host memory
     xr_delete(m_HostData);
-    m_HostData = nullptr;
 }
 
 IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
@@ -276,5 +273,4 @@ void IndexStagingBuffer::Destroy()
         xr_delete(m_HostData);
     HW.stats_manager.decrement_stats_ib(m_DeviceBuffer);
     _RELEASE(m_DeviceBuffer);
-    m_DeviceBuffer = nullptr;
 }

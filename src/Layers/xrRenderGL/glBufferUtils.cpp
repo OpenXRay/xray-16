@@ -322,7 +322,6 @@ void VertexStagingBuffer::Flush()
     BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
     // Free host memory
     xr_delete(m_HostData);
-    m_HostData = nullptr;
 }
 
 GLuint VertexStagingBuffer::GetBufferHandle() const
@@ -382,7 +381,6 @@ void IndexStagingBuffer::Flush()
     BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
     // Free host memory
     xr_delete(m_HostData);
-    m_HostData = nullptr;
 }
 
 GLuint IndexStagingBuffer::GetBufferHandle() const

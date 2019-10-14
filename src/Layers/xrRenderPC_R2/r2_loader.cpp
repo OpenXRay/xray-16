@@ -228,7 +228,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             u32 dcl_len = GetDeclLength(dcl) + 1;
             _DC[i].resize(dcl_len);
-            fs->r(_DC[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
+            fs->r(_DC[i].begin(), dcl_len * sizeof(VertexElement));
 
             // count, size
             u32 vCount = fs->r_u32();
