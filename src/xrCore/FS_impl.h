@@ -26,7 +26,7 @@ struct find_chunk_counter
 
     void flush() const
     {
-        Msg("find_chunk: [calls: %u] [seconds: %f]", calls, seconds.load());
+        Msg("find_chunk: [calls: %u] [seconds: %f]", calls.load(), seconds.load());
     }
 };
 
