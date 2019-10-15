@@ -172,6 +172,7 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
     HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 #endif //	USE_DX10
 }
+#endif
 
 void CBackend::dbg_OverdrawBegin()
 {
@@ -229,4 +230,3 @@ void CBackend::dbg_OverdrawEnd()
 #endif // USE_DX10
 }
 
-#endif
