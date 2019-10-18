@@ -192,7 +192,7 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
                 result = Ruck(pIItem, strict_placement);
                 VERIFY(result);
                 CWeaponMagazined* pWeapon = smart_cast<CWeaponMagazined*>(pIItem);
-                if (pWeapon && result && auto_ammo_unload)
+                if (pWeapon && result && g_auto_ammo_unload)
                 {
                     pWeapon->UnloadMagazine();
                 }
