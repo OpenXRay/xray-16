@@ -30,6 +30,7 @@ u16 INV_STATE_CAR = INV_STATE_LADDER;
 u16 INV_STATE_BLOCK_ALL = 0xffff;
 u16 INV_STATE_INV_WND = INV_STATE_BLOCK_ALL;
 u16 INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
+extern int auto_ammo_unload;
 
 bool defaultSlotActiveness[] =
 {
@@ -122,6 +123,7 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
 {
     CInventoryItem* pIItem = smart_cast<CInventoryItem*>(pObj);
     VERIFY(pIItem);
+    CWeaponMagazined* pWeapon = smart_cast<CWeaponMagazined*>(pIItem);
     VERIFY(pIItem->m_pInventory == NULL);
     VERIFY(CanTakeItem(pIItem));
 
@@ -188,6 +190,10 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
             }
             else
             {
+                if (pWeapon && result && auto_ammo_unload)
+                {
+                    pWeapon->UnloadMagazine();
+                }
                 result = Ruck(pIItem, strict_placement);
                 VERIFY(result);
             }

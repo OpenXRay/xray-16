@@ -705,6 +705,15 @@
             <options_item entry="rs_loadingstages" group="mm_opt_gameplay" is_integer="1"/>
         </check_loadingstages>
 
+        <cap_unload_after_pickup x="20" y="3" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">st_unload_magazine_after_pickup</text>
+        </cap_unload_after_pickup>
+
+        <unload_after_pickup x="167" y="0" width="44" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="g_unload_ammo_after_pick_up" group="mm_opt_gameplay" is_integer="1"/>
+        </unload_after_pickup>
+
         <btn_check_updates x="338" y="322" width="108" height="24">
             <text align="c" font="letterica16">ui_mm_check_updates</text>
             <texture>ui_inGame2_button</texture>
