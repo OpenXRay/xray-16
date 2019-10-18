@@ -123,7 +123,6 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
 {
     CInventoryItem* pIItem = smart_cast<CInventoryItem*>(pObj);
     VERIFY(pIItem);
-    CWeaponMagazined* pWeapon = smart_cast<CWeaponMagazined*>(pIItem);
     VERIFY(pIItem->m_pInventory == NULL);
     VERIFY(CanTakeItem(pIItem));
 
@@ -190,12 +189,13 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
             }
             else
             {
+                result = Ruck(pIItem, strict_placement);
+                VERIFY(result);
+                CWeaponMagazined* pWeapon = smart_cast<CWeaponMagazined*>(pIItem);
                 if (pWeapon && result && auto_ammo_unload)
                 {
                     pWeapon->UnloadMagazine();
                 }
-                result = Ruck(pIItem, strict_placement);
-                VERIFY(result);
             }
         }
         else
