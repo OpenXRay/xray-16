@@ -76,7 +76,7 @@ ENGINE_API
 extern float psHUD_FOV;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
-int auto_ammo_unload = 0;
+extern int g_auto_ammo_unload;
 
 extern int x_m_x;
 extern int x_m_z;

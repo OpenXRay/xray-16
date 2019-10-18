@@ -30,7 +30,7 @@ u16 INV_STATE_CAR = INV_STATE_LADDER;
 u16 INV_STATE_BLOCK_ALL = 0xffff;
 u16 INV_STATE_INV_WND = INV_STATE_BLOCK_ALL;
 u16 INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
-extern int auto_ammo_unload;
+int g_auto_ammo_unload = 0;
 
 bool defaultSlotActiveness[] =
 {
