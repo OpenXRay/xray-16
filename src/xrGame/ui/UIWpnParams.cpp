@@ -56,10 +56,10 @@ CUIWpnParams::CUIWpnParams()
 }
 
 CUIWpnParams::~CUIWpnParams() {}
-void CUIWpnParams::InitFromXml(CUIXml& xml_doc)
+bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
 {
     if (!xml_doc.NavigateToNode("wpn_params", 0))
-        return;
+        return false;
 
     CUIXmlInit::InitWindow(xml_doc, "wpn_params", 0, this);
 
@@ -90,6 +90,7 @@ void CUIWpnParams::InitFromXml(CUIXml& xml_doc)
         m_stAmmoType1 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type1", this, false);
         m_stAmmoType2 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type2", this, false);
     }
+    return true;
 }
 
 void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
@@ -253,13 +254,14 @@ CUIConditionParams::CUIConditionParams()
 }
 
 CUIConditionParams::~CUIConditionParams() {}
-void CUIConditionParams::InitFromXml(CUIXml& xml_doc)
+bool CUIConditionParams::InitFromXml(CUIXml& xml_doc)
 {
     if (!xml_doc.NavigateToNode("condition_params", 0))
-        return;
+        return false;
     CUIXmlInit::InitWindow(xml_doc, "condition_params", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "condition_params:caption", 0, &m_text);
     m_progress.InitFromXml(xml_doc, "condition_params:progress_state");
+    return true;
 }
 
 void CUIConditionParams::SetInfo(CInventoryItem const* slot_item, CInventoryItem const& cur_item)
