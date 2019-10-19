@@ -46,10 +46,8 @@ void CUIBoosterInfo::InitFromXml(CUIXml& xml)
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
 
-    m_Prop_line = new CUIStatic();
-    AttachChild(m_Prop_line);
+    m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false);
     m_Prop_line->SetAutoDelete(false);
-    CUIXmlInit::InitStatic(xml, "prop_line", 0, m_Prop_line);
 
     for (u32 i = 0; i < eBoostExplImmunity; ++i)
     {
