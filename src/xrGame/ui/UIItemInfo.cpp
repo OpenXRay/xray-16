@@ -105,7 +105,8 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
         UIArtefactParams->InitFromXml(uiXml);
 
         UIBoosterInfo = new CUIBoosterInfo();
-        UIBoosterInfo->InitFromXml(uiXml);
+        if (!UIBoosterInfo->InitFromXml(uiXml))
+            xr_delete(UIBoosterInfo);
 
         // UIDesc_line						= new CUIStatic();
         // AttachChild						(UIDesc_line);
