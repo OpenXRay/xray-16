@@ -7,6 +7,7 @@
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "xrCDB/xrCDB.h"
 #include "utils/xrLC_Light/xrface.h"
+#include "utils/xrLC_Light/base_face_ptr_storage.h"
 
 //.#include "communicate.h"
 
@@ -147,7 +148,7 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
         for (u32 k = 0; k < CL.getTS(); k++)
         {
             CDB::TRI& T = CL.getT(k);
-            base_Face* F = (base_Face*)(*((void**)&T.dummy));
+            base_Face* F = get_base_face_pointer(T);
             b_rc_face& cf = rc_faces[k];
             cf.dwMaterial = F->dwMaterial;
             cf.dwMaterialGame = F->dwMaterialGame;
