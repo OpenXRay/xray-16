@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\openxray.luajit.2.1.0\build\openxray.luajit.props" Condition="Exists('..\packages\openxray.luajit.2.1.0\build\openxray.luajit.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -477,5 +478,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
     <Error Condition="!Exists('..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
+    <Error Condition="!Exists('..\packages\openxray.luajit.2.1.0\build\openxray.luajit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openxray.luajit.2.1.0\build\openxray.luajit.props'))" />
   </Target>
 </Project>

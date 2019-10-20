@@ -98,7 +98,6 @@
         $(ProjectDir);
         $(xrSdkDir)include;
         $(xrSdkDir)DXSDK/Include;
-        $(xrExternals)luajit\src;
         $(xrExternals)luabind;
         $(xrExternals)GameSpy\src;
         %(AdditionalIncludeDirectories)
