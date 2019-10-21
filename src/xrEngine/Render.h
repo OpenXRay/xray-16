@@ -419,5 +419,6 @@ public:
     virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) = 0;
     virtual void OnAssetsChanged() = 0;
 
+    virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
     virtual void MakeContextCurrent(bool acquire) = 0;
 };

@@ -16,6 +16,8 @@ public:
 
     void Reset();
 
+    void SetPrimaryAttributes();
+
     std::pair<u32, u32> GetSurfaceSize() const;
 
     void UpdateViews();

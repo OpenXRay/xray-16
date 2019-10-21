@@ -475,6 +475,12 @@ void CRender::OnFrame()
 void CRender::BeforeWorldRender() {}
 void CRender::AfterWorldRender() {}
 
+void CRender::ObtainRequiredWindowFlags(u32& windowFlags)
+{
+    windowFlags |= SDL_WINDOW_OPENGL;
+    HW.SetPrimaryAttributes();
+}
+
 void CRender::MakeContextCurrent(bool acquire)
 {
     int result;
