@@ -481,14 +481,10 @@ void CRender::ObtainRequiredWindowFlags(u32& windowFlags)
     HW.SetPrimaryAttributes();
 }
 
-void CRender::MakeContextCurrent(bool acquire)
+void CRender::MakeContextCurrent(RenderContext context)
 {
-    int result;
-    if (acquire)
-        result = SDL_GL_MakeCurrent(HW.m_window, HW.m_context);
-    else
-        result = SDL_GL_MakeCurrent(nullptr, nullptr);
-    R_ASSERT2(result == 0, "Failed to switch OpenGL context");
+    R_ASSERT3(HW.MakeContextCurrent(context) == 0,
+        "Failed to switch OpenGL context", SDL_GetError());
 }
 
 // Implementation

@@ -49,12 +49,32 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
-    // Make the new context the current context for this thread
-    // NOTE: This assumes the thread calling Create() is the only
-    // thread that will use the context.
-    if (SDL_GL_MakeCurrent(m_window, m_context) != 0)
+    if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
         Msg("Could not make context current. %s", SDL_GetError());
+        return;
+    }
+
+    {
+        const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL;
+
+        m_helper_window = SDL_CreateWindow("OpenXRay OpenGL helper window", 0, 0, 1, 1, flags);
+        R_ASSERT3(m_helper_window, "Cannot create helper window for OpenGL", SDL_GetError());
+
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
+        // Create helper context
+        m_helper_context = SDL_GL_CreateContext(m_helper_window);
+        R_ASSERT3(m_helper_context, "Cannot create OpenGL context", SDL_GetError());
+
+        // just in case
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
+    }
+
+    if (MakeContextCurrent(IRender::PrimaryContext) != 0)
+    {
+        Msg("Could not make context current after creating helper context."
+            " %s", SDL_GetError());
         return;
     }
 
@@ -93,14 +113,13 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
 void CHW::DestroyDevice()
 {
-    if (m_context)
-    {
-        if (SDL_GL_MakeCurrent(nullptr, nullptr) != 0)
-            Msg("Could not release drawing context: %s", SDL_GetError());
+    SDL_GL_MakeCurrent(nullptr, nullptr);
 
-        SDL_GL_DeleteContext(m_context);
-        m_context = nullptr;
-    }
+    SDL_GL_DeleteContext(m_context);
+    m_context = nullptr;
+
+    SDL_GL_DeleteContext(m_helper_context);
+    m_helper_context = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -129,6 +148,25 @@ void CHW::SetPrimaryAttributes()
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     }
+}
+
+int CHW::MakeContextCurrent(IRender::RenderContext context) const
+{
+    switch (context)
+    {
+    case IRender::NoContext:
+        return SDL_GL_MakeCurrent(nullptr, nullptr);
+
+    case IRender::PrimaryContext:
+        return SDL_GL_MakeCurrent(m_window, m_context);
+
+    case IRender::HelperContext:
+        return SDL_GL_MakeCurrent(m_helper_window, m_helper_context);
+
+    default:
+        NODEFAULT;
+    }
+    return -1;
 }
 
 void CHW::UpdateViews()

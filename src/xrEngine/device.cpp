@@ -165,28 +165,22 @@ void CRenderDevice::PrimaryThreadProc(void* context)
 
     Core.CoInitializeMultithreaded();
 
-    device.deviceCreated.Reset();
-    GEnv.Render->MakeContextCurrent(true);
-
     device.CreateInternal();
 
-    GEnv.Render->MakeContextCurrent(false);
+    GEnv.Render->MakeContextCurrent(IRender::NoContext);
     device.deviceCreated.Set();
 
     device.deviceReadyToRun.Wait();
-    GEnv.Render->MakeContextCurrent(true);
-    
-    device.seqAppStart.Process();
-    GEnv.Render->ClearTarget();
+    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
 
-    device.primaryReadyToRun.Set();
+    GEnv.Render->ClearTarget();
 
     while (true)
     {
         device.primaryProcessFrame.Wait();
         if (device.mt_bMustExit)
         {
-            GEnv.Render->MakeContextCurrent(false);
+            GEnv.Render->MakeContextCurrent(IRender::NoContext);
             device.primaryThreadExit.Set();
             return;
         }
@@ -517,10 +511,7 @@ void CRenderDevice::Run()
     }
 
     // Pre start
-    GEnv.Render->MakeContextCurrent(false);
-    deviceReadyToRun.Set();
-
-    WaitEvent(primaryReadyToRun);
+    seqAppStart.Process();
 
     splash::hide();
     SDL_HideWindow(m_sdlWnd);
@@ -531,6 +522,9 @@ void CRenderDevice::Run()
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     OnWM_Activate(1, 0);
 
+    GEnv.Render->MakeContextCurrent(IRender::NoContext);
+    deviceReadyToRun.Set();
+
     // Message cycle
     message_loop();
 
@@ -539,7 +533,7 @@ void CRenderDevice::Run()
 
     primaryProcessFrame.Set();
     primaryThreadExit.Wait();
-    GEnv.Render->MakeContextCurrent(true);
+    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
 
     seqAppEnd.Process();
     

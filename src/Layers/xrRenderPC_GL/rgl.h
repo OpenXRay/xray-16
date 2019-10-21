@@ -364,7 +364,7 @@ public:
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
     void ObtainRequiredWindowFlags(u32& windowFlags) override;
-    void MakeContextCurrent(bool acquire) override;
+    void MakeContextCurrent(RenderContext context) override;
 
     // Render mode
     void rmNear() override;

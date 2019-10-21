@@ -32,8 +32,6 @@ void CRenderDevice::Create()
     if (b_is_Ready)
         return; // prevent double call
 
-    GEnv.Render->MakeContextCurrent(false);
-
     // Start all threads
     mt_bMustExit = FALSE;
 
@@ -49,7 +47,7 @@ void CRenderDevice::Create()
 void CRenderDevice::WaitUntilCreated()
 {
     WaitEvent(deviceCreated);
-    GEnv.Render->MakeContextCurrent(true);
+    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
 }
 
 void CRenderDevice::CreateInternal()

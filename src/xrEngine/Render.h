@@ -182,6 +182,13 @@ public:
         SM_forcedword = u32(-1)
     };
 
+    enum RenderContext
+    {
+        NoContext = -1,
+        PrimaryContext,
+        HelperContext
+    };
+
     struct RenderStatistics
     {
         CStatTimer Culling; // portal traversal, frustum culling, entities "renderable_Render"
@@ -420,5 +427,5 @@ public:
     virtual void OnAssetsChanged() = 0;
 
     virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
-    virtual void MakeContextCurrent(bool acquire) = 0;
+    virtual void MakeContextCurrent(RenderContext context) = 0;
 };
