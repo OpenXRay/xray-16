@@ -20,8 +20,7 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
 }
 
 CHW::CHW()
-    : pDevice(this), pContext(this), m_pSwapChain(this), pBaseRT(0), pBaseZB(0), pPP(0), pFB(0), m_hWnd(nullptr),
-      m_hDC(nullptr), m_hRC(nullptr)
+    : pDevice(this), pContext(this), m_pSwapChain(this), pBaseRT(0), pBaseZB(0), pPP(0), pFB(0)
 {
 }
 
@@ -31,20 +30,20 @@ CHW::~CHW() {}
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateDevice(SDL_Window* hWnd)
 {
-    m_hWnd = hWnd;
+    m_window = hWnd;
 
-    R_ASSERT(m_hWnd);
+    R_ASSERT(m_window);
 
     // Choose the closest pixel format
     SDL_DisplayMode mode;
-    SDL_GetWindowDisplayMode(m_hWnd, &mode);
+    SDL_GetWindowDisplayMode(m_window, &mode);
     mode.format = SDL_PIXELFORMAT_RGBA8888;
     // Apply the pixel format to the device context
-    SDL_SetWindowDisplayMode(m_hWnd, &mode);
+    SDL_SetWindowDisplayMode(m_window, &mode);
 
     // Create the context
-    m_hRC = SDL_GL_CreateContext(m_hWnd);
-    if (m_hRC == nullptr)
+    m_context = SDL_GL_CreateContext(m_window);
+    if (m_context == nullptr)
     {
         Msg("Could not create drawing context: %s", SDL_GetError());
         return;
@@ -53,7 +52,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     // Make the new context the current context for this thread
     // NOTE: This assumes the thread calling Create() is the only
     // thread that will use the context.
-    if (SDL_GL_MakeCurrent(m_hWnd, m_hRC) != 0)
+    if (SDL_GL_MakeCurrent(m_window, m_context) != 0)
     {
         Msg("Could not make context current. %s", SDL_GetError());
         return;
@@ -94,14 +93,13 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
 void CHW::DestroyDevice()
 {
-    if (m_hRC)
+    if (m_context)
     {
         if (SDL_GL_MakeCurrent(nullptr, nullptr) != 0)
             Msg("Could not release drawing context: %s", SDL_GetError());
 
-        SDL_GL_DeleteContext(m_hRC);
-
-        m_hRC = nullptr;
+        SDL_GL_DeleteContext(m_context);
+        m_context = nullptr;
     }
 }
 
@@ -198,7 +196,7 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 void CHW::Present()
 {
     RImplementation.Target->phase_flip();
-    SDL_GL_SwapWindow(m_hWnd);
+    SDL_GL_SwapWindow(m_window);
 }
 
 DeviceState CHW::GetDeviceState()

@@ -485,7 +485,7 @@ void CRender::MakeContextCurrent(bool acquire)
 {
     int result;
     if (acquire)
-        result = SDL_GL_MakeCurrent(HW.m_hWnd, HW.m_hRC);
+        result = SDL_GL_MakeCurrent(HW.m_window, HW.m_context);
     else
         result = SDL_GL_MakeCurrent(nullptr, nullptr);
     R_ASSERT2(result == 0, "Failed to switch OpenGL context");

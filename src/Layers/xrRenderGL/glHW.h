@@ -41,9 +41,9 @@ public:
     GLuint pPP;
     GLuint pFB;
 
-    SDL_Window* m_hWnd;
-    HDC m_hDC;
-    SDL_GLContext m_hRC;
+    SDL_Window* m_window{};
+    SDL_GLContext m_context{};
+
     pcstr AdapterName;
     pcstr OpenGLVersion;
     pcstr ShadingVersion;
