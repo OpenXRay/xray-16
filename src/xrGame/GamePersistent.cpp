@@ -214,18 +214,12 @@ void CGamePersistent::OnAppStart()
         nullptr, nullptr, &globalsInitialized);
 
     // load game materials
-    if (psDeviceFlags.test(rsRGL))
+    TaskScheduler->AddTask("GMLib.Load()", [&]()
     {
-        // OpenGL renderer requires context switch,
-        // let's just load it synchronously
+        GEnv.Render->MakeContextCurrent(IRender::HelperContext); // free to use, so let's use it
         GMLib.Load();
-        materialsLoaded.Set();
-    }
-    else // yay, async
-    {
-        TaskScheduler->AddTask("GMLib.Load()", { &GMLib, &CGameMtlLibrary::Load },
-            nullptr, nullptr, &materialsLoaded);
-    }
+        GEnv.Render->MakeContextCurrent(IRender::NoContext); // release it for other users
+    }, nullptr, nullptr, &materialsLoaded);
 
     SetupUIStyle();
     GEnv.UI = new UICore();
