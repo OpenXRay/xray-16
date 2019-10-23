@@ -411,6 +411,8 @@ void CRenderDevice::message_loop()
     const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
 
     bool timedOut = false;
+    bool canCallActivate = false;
+    bool shouldActivate = false;
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
@@ -460,13 +462,15 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_FOCUS_GAINED:
                 case SDL_WINDOWEVENT_RESTORED:
                 case SDL_WINDOWEVENT_MAXIMIZED:
-                    OnWM_Activate(1, event.window.data2);
+                    canCallActivate = true;
+                    shouldActivate = true;
                     break;
 
                 case SDL_WINDOWEVENT_HIDDEN:
                 case SDL_WINDOWEVENT_FOCUS_LOST:
                 case SDL_WINDOWEVENT_MINIMIZED:
-                    OnWM_Activate(0, event.window.data2);
+                    canCallActivate = true;
+                    shouldActivate = false;
                     break;
 
                 case SDL_WINDOWEVENT_ENTER:
@@ -483,6 +487,13 @@ void CRenderDevice::message_loop()
                 }
             }
             }
+        }
+
+        // Workaround for screen blinking when there's too much timeouts
+        if (canCallActivate)
+        {
+            OnWM_Activate(shouldActivate ? 1 : 0, 0);
+            canCallActivate = false;
         }
 
         if (isDX9Renderer)
