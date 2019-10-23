@@ -45,6 +45,8 @@
 #include "ai_debug.h"
 #endif // _EDITOR
 
+extern ENGINE_API int ps_always_active;
+
 u32 UIStyleID = 0;
 xr_vector<xr_token> UIStyleToken;
 
@@ -832,6 +834,9 @@ static BOOL bEntryFlag = TRUE;
 
 void CGamePersistent::OnAppActivate()
 {
+    if (ps_always_active)
+        return;
+
     bool bIsMP = (g_pGameLevel && Level().game && GameID() != eGameIDSingle);
     bIsMP &= !Device.Paused();
 
@@ -845,6 +850,9 @@ void CGamePersistent::OnAppActivate()
 
 void CGamePersistent::OnAppDeactivate()
 {
+    if (ps_always_active)
+        return;
+
     if (!bEntryFlag)
         return;
 

@@ -677,11 +677,9 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     else
         pInput->GrabInput(false);
 
-    const BOOL isGameActive = ps_always_active || isWndActive;
-
-    if (isGameActive != Device.b_is_Active)
+    if (isWndActive != Device.b_is_Active)
     {
-        Device.b_is_Active = isGameActive;
+        Device.b_is_Active = isWndActive;
         if (Device.b_is_Active)
         {
             Device.seqAppActivate.Process();
