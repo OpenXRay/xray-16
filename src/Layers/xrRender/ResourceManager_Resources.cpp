@@ -106,7 +106,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 #endif
     P->C = proto.C;
 
-    return v_passes.back();
+    return P;
 }
 
 void CResourceManager::_DeletePass(const SPass* P)
