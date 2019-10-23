@@ -53,7 +53,11 @@ bool CRenderDevice::RenderBegin()
     if (GEnv.isDedicatedServer)
         return true;
 
-    switch (GEnv.Render->GetDeviceState())
+    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
+    if (!isDX9Renderer)
+        LastDeviceState = GEnv.Render->GetDeviceState();
+
+    switch (LastDeviceState)
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
@@ -63,7 +67,7 @@ bool CRenderDevice::RenderBegin()
 
     case DeviceState::NeedReset:
         // Check if the device is ready to be reset
-        ResetInternal();
+        Reset();
         return false;
 
     default: R_ASSERT(0);
@@ -185,11 +189,9 @@ void CRenderDevice::PrimaryThreadProc(void* context)
             return;
         }
 
-        if (device.shouldReset)
+        if (device.shouldReset) // never happen on DX9, will be done in message_loop()
         {
             device.ResetInternal(device.precacheWhileReset);
-            device.shouldReset = false;
-            device.precacheWhileReset = false;
         }
 
         device.ProcessFrame();
@@ -406,6 +408,8 @@ void CRenderDevice::message_loop()
         return;
     }
 
+    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
+
     bool timedOut = false;
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
@@ -481,8 +485,17 @@ void CRenderDevice::message_loop()
             }
         }
 
+        if (isDX9Renderer)
+        {
+            LastDeviceState = GEnv.Render->GetDeviceState();
+        }
+
         if (!timedOut)
         {
+            if (isDX9Renderer && shouldReset)
+            {
+                ResetInternal(precacheWhileReset);
+            }
             primaryProcessFrame.Set();
         }
 

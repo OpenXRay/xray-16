@@ -80,4 +80,7 @@ void CRenderDevice::ResetInternal(bool precache)
 
     if (!GEnv.isDedicatedServer)
         pInput->GrabInput(true);
+
+    shouldReset = false;
+    precacheWhileReset = false;
 }
