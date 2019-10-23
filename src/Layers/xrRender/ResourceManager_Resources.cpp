@@ -162,17 +162,25 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullpt
 {
     string_path name;
     xr_strcpy(name, shader);
-    if (0 == GEnv.Render->m_skinning)
+    switch (GEnv.Render->m_skinning)
+    {
+    case 0:
         xr_strcat(name, "_0");
-    if (1 == GEnv.Render->m_skinning)
+        break;
+    case 1:
         xr_strcat(name, "_1");
-    if (2 == GEnv.Render->m_skinning)
+        break;
+    case 2:
         xr_strcat(name, "_2");
-    if (3 == GEnv.Render->m_skinning)
+        break;
+    case 3:
         xr_strcat(name, "_3");
-    if (4 == GEnv.Render->m_skinning)
+        break;
+    case 4:
         xr_strcat(name, "_4");
-    
+        break;
+    }
+
     return CreateShader<SVS>(name, shader, fallbackShader, flags);
 }
 
