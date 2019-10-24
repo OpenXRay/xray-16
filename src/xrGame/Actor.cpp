@@ -102,7 +102,9 @@ int psActorSleepTime = 1;
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 {
+    encyclopedia_registry = new CEncyclopediaRegistryWrapper();
     game_news_registry = new CGameNewsRegistryWrapper();
+
     // Cameras
     cameras[eacFirstEye] = new CCameraFirstEye(this);
     cameras[eacFirstEye]->Load("actor_firsteye_cam");
@@ -217,6 +219,8 @@ CActor::~CActor()
 {
     xr_delete(m_location_manager);
     xr_delete(m_memory);
+
+    xr_delete(encyclopedia_registry);
     xr_delete(game_news_registry);
 #ifdef DEBUG
     Device.seqRender.Remove(this);
