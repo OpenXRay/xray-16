@@ -78,7 +78,7 @@ public:
     void save_task(IWriter& stream);
     void load_task(IReader& stream);
 
-    shared_str m_ID;
+    TASK_ID m_ID;
     shared_str m_Title;
     shared_str m_Description;
     ALife::_TIME_ID m_ReceiveTime;
