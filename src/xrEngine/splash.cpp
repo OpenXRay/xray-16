@@ -10,6 +10,7 @@ class splash_screen
 {
     SDL_Window* m_window;
     Event m_should_exit;
+    bool m_thread_operational;
 
     size_t m_current_surface_idx;
     xr_vector<SDL_Surface*> m_surfaces;
@@ -20,6 +21,7 @@ public:
     static void splash_proc(void* self_ptr)
     {
         auto& self = *static_cast<splash_screen*>(self_ptr);
+        self.m_thread_operational = true;
 
         while (true)
         {
@@ -44,6 +46,8 @@ public:
 
         SDL_DestroyWindow(self.m_window);
         self.m_window = nullptr;
+
+        self.m_thread_operational = false;
     }
 
     void show(bool topmost)
@@ -74,14 +78,17 @@ public:
         SDL_ShowWindow(m_window);
         SDL_UpdateWindowSurface(m_window);
 
-        m_should_exit.Reset();
         Threading::SpawnThread(splash_proc, "X-Ray Splash Thread", 0, this);
+
+        while (!m_thread_operational)
+            SDL_PumpEvents();
+        SDL_PumpEvents();
     }
 
     void hide()
     {
         m_should_exit.Set();
-        while (m_window != nullptr)
+        while (m_thread_operational)
         {
             SDL_PumpEvents();
             std::this_thread::yield();
