@@ -33,7 +33,7 @@ public:
     void init_functors(xr_vector<shared_str>& v_src, task_state_functors& v_dest);
 };
 
-class CGameTask
+class CGameTask : public Noncopyable
 {
 private:
     ETaskState m_task_state;
@@ -69,8 +69,6 @@ private:
     bool CheckFunctions(const task_state_functors& v) const;
 
     void CreateMapLocation(bool on_load);
-
-    CGameTask(const CGameTask&);
 
 public:
     CGameTask();
