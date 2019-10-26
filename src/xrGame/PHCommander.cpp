@@ -17,7 +17,17 @@ CPHCall::~CPHCall()
     xr_delete(m_action);
     xr_delete(m_condition);
 }
-bool CPHCall::obsolete() { return !m_action || m_action->obsolete() || !m_condition || m_condition->obsolete(); }
+
+// Crashes in this file appeared after we removed memory pools
+// XXX: Recheck if there's memory problems with CPHCommander and CPHCall that were hidden in the original engine
+// XXX: Check if checking m_action and m_condition for nullptr is correct and only way to fix crashes
+
+bool CPHCall::obsolete()
+{
+    return !m_action || m_action->obsolete()
+        || !m_condition || m_condition->obsolete();
+}
+
 void CPHCall::check()
 {
     if (m_condition && m_condition->is_true() && m_action)
@@ -26,9 +36,16 @@ void CPHCall::check()
 
 bool CPHCall::equal(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action)
 {
-    return m_action->compare(cmp_action) && m_condition->compare(cmp_condition);
+    return m_action && m_action->compare(cmp_action)
+        && m_condition && m_condition->compare(cmp_condition);
 }
-bool CPHCall::is_any(CPHReqComparerV* v) { return m_action->compare(v) || m_condition->compare(v); }
+
+bool CPHCall::is_any(CPHReqComparerV* v)
+{
+    return (m_action && m_action->compare(v))
+        || (m_condition && m_condition->compare(v));
+}
+
 void delete_call(CPHCall*& call)
 {
     try

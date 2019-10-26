@@ -15,54 +15,44 @@
 //#define FIND_CHUNK_BENCHMARK_ENABLE
 
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
-
 struct find_chunk_counter
 {
-    CTimer timer;
+    CTimer timer{};
 
-    u64 ticks;
-    u32 calls;
+    std::atomic<u32> calls{};
+    std::atomic<float> seconds{};
 
-    find_chunk_counter()
+    find_chunk_counter() = default;
+
+    void flush() const
     {
-        ticks = 0;
-        calls = 0;
-    }
-
-    void flush()
-    {
-        float secs = (float)ticks / CPU::qpc_freq;
-        Msg("find_chunk sec: %f", secs);
+        Msg("find_chunk: [calls: %u] [seconds: %f]", calls.load(), seconds.load());
     }
 };
 
-#ifdef INCLUDE_FROM_ENGINE
-extern XR_IMPORT find_chunk_counter g_find_chunk_counter;
-#else // INCLUDE_FROM_ENGINE
-extern XR_EXPORT find_chunk_counter g_find_chunk_counter;
-#endif // INCLUDE_FROM_ENGINE
+extern XRCORE_API find_chunk_counter g_find_chunk_counter;
 
-extern bool g_initialize_cpu_called;
-
-struct find_chunk_auto_timer
+struct find_chunk_auto_timer_t
 {
-    find_chunk_auto_timer()
+    find_chunk_auto_timer_t()
     {
-        if (g_initialize_cpu_called)
-        {
-            g_find_chunk_counter.timer.Start();
-        }
+        ++g_find_chunk_counter.calls;
+        g_find_chunk_counter.timer.Start();
     }
 
-    ~find_chunk_auto_timer()
+    ~find_chunk_auto_timer_t()
     {
-        if (g_initialize_cpu_called)
-        {
-            g_find_chunk_counter.ticks += g_find_chunk_counter.timer.GetElapsed_ticks();
-        }
+        // XXX: replace with operator+= after C++20
+        const float old = g_find_chunk_counter.seconds.load();
+        g_find_chunk_counter.seconds = old + g_find_chunk_counter.timer.GetElapsed_sec();
     }
 };
 
+#define FIND_CHUNK_AUTO_TIMER find_chunk_auto_timer_t __find_chunk_auto_timer
+#define FIND_CHUNK_COUNTER_FLUSH() g_find_chunk_counter.flush()
+#else
+#define FIND_CHUNK_AUTO_TIMER
+#define FIND_CHUNK_COUNTER_FLUSH()
 #endif // FIND_CHUNK_BENCHMARK_ENABLE
 
 #ifdef FIND_CHUNK_STD
@@ -74,9 +64,7 @@ struct IReaderBase_Test
 template <typename T>
 IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
-#ifdef FIND_CHUNK_BENCHMARK_ENABLE
-    find_chunk_auto_timer timer;
-#endif // FIND_CHUNK_BENCHMARK_ENABLE
+    FIND_CHUNK_AUTO_TIMER;
 
     u32 dwType;
     size_t dwSize = 0;
@@ -113,9 +101,7 @@ struct IReaderBase_Test
 template <typename T>
 IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
-#ifdef FIND_CHUNK_BENCHMARK_ENABLE
-    find_chunk_auto_timer timer;
-#endif // FIND_CHUNK_BENCHMARK_ENABLE
+    FIND_CHUNK_AUTO_TIMER;
 
     u32 dwType;
     size_t dwSize = 0;
@@ -193,9 +179,7 @@ struct IReaderBase_Test
 template <typename T>
 IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
-#ifdef FIND_CHUNK_BENCHMARK_ENABLE
-    find_chunk_auto_timer timer;
-#endif // FIND_CHUNK_BENCHMARK_ENABLE
+    FIND_CHUNK_AUTO_TIMER;
 
     u32 dwType;
     size_t dwSize = 0;
@@ -266,9 +250,7 @@ struct IReaderBase_Test
 template <typename T>
 IC size_t IReaderBase<T>::find_chunk(u32 ID, bool* bCompressed)
 {
-#ifdef FIND_CHUNK_BENCHMARK_ENABLE
-    find_chunk_auto_timer timer;
-#endif // FIND_CHUNK_BENCHMARK_ENABLE
+    FIND_CHUNK_AUTO_TIMER;
 
     u32 dwType;
     size_t dwSize = 0;

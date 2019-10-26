@@ -48,21 +48,7 @@ void CRenderDevice::Initialize()
         Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE;
 
-        if (psDeviceFlags.test(rsRGL))
-        {
-            flags |= SDL_WINDOW_OPENGL;
-
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-            if (!strstr(Core.Params, "-no_gl_context"))
-            {
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-            }
-        }
+        GEnv.Render->ObtainRequiredWindowFlags(flags);
 
         int icon = IDI_COP;
         pcstr title = "S.T.A.L.K.E.R.: Call of Pripyat";

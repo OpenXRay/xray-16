@@ -89,7 +89,7 @@ LPCSTR af_actor_param_names[]=
 };
 */
 
-void CUIArtefactParams::InitFromXml(CUIXml& xml)
+bool CUIArtefactParams::InitFromXml(CUIXml& xml)
 {
     LPCSTR base = "af_params";
 
@@ -97,7 +97,7 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
     XML_NODE base_node = xml.NavigateToNode(base, 0);
     if (!base_node)
     {
-        return;
+        return false;
     }
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
@@ -150,6 +150,7 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
     }
 
     xml.SetLocalRoot(stored_root);
+    return true;
 }
 
 bool CUIArtefactParams::Check(const shared_str& af_section)

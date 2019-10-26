@@ -7,6 +7,7 @@
 
 #include "xrCore/Threading/Lock.hpp"
 #include "xrCDB/xrCDB.h"
+#include "utils/xrLC_Light/base_face_ptr_storage.h"
 
 const u32 gi_num_photons = 32;
 const float gi_optimal_range = 15.f;
@@ -29,7 +30,7 @@ static Fvector GetPixel_7x7(CDB::RESULT& rpinf)
 
     // Access to texture
     CDB::TRI& clT = lc_global_data()->RCAST_Model()->get_tris()[rpinf.id];
-    base_Face* F = (base_Face*)(*((void**)&clT.dummy));
+    base_Face* F = get_base_face_pointer(clT);
     if (0 == F)
         return R;
     const Shader_xrLC& SH = F->Shader();

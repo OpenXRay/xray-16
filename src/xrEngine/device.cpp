@@ -20,8 +20,6 @@
 #include "x_ray.h"
 #include "Render.h"
 
-// must be defined before include of FS_impl.h
-#define INCLUDE_FROM_ENGINE
 #include "xrCore/FS_impl.h"
 
 #include "Include/editor/ide.hpp"
@@ -55,7 +53,11 @@ bool CRenderDevice::RenderBegin()
     if (GEnv.isDedicatedServer)
         return true;
 
-    switch (GEnv.Render->GetDeviceState())
+    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
+    if (!isDX9Renderer)
+        LastDeviceState = GEnv.Render->GetDeviceState();
+
+    switch (LastDeviceState)
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
@@ -65,7 +67,7 @@ bool CRenderDevice::RenderBegin()
 
     case DeviceState::NeedReset:
         // Check if the device is ready to be reset
-        ResetInternal();
+        Reset();
         return false;
 
     default: R_ASSERT(0);
@@ -104,9 +106,7 @@ void CRenderDevice::RenderEnd(void)
             Memory.mem_compact();
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
-#ifdef FIND_CHUNK_BENCHMARK_ENABLE
-            g_find_chunk_counter.flush();
-#endif
+            FIND_CHUNK_COUNTER_FLUSH();
             CheckPrivilegySlowdown();
             if (g_pGamePersistent->GameType() == 1 && !ps_always_active) // haCk
             {
@@ -169,37 +169,29 @@ void CRenderDevice::PrimaryThreadProc(void* context)
 
     Core.CoInitializeMultithreaded();
 
-    device.deviceCreated.Reset();
-    GEnv.Render->MakeContextCurrent(true);
-
     device.CreateInternal();
 
-    GEnv.Render->MakeContextCurrent(false);
+    GEnv.Render->MakeContextCurrent(IRender::NoContext);
     device.deviceCreated.Set();
 
     device.deviceReadyToRun.Wait();
-    GEnv.Render->MakeContextCurrent(true);
-    
-    device.seqAppStart.Process();
-    GEnv.Render->ClearTarget();
+    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
 
-    device.primaryReadyToRun.Set();
+    GEnv.Render->ClearTarget();
 
     while (true)
     {
         device.primaryProcessFrame.Wait();
         if (device.mt_bMustExit)
         {
-            GEnv.Render->MakeContextCurrent(false);
+            GEnv.Render->MakeContextCurrent(IRender::NoContext);
             device.primaryThreadExit.Set();
             return;
         }
 
-        if (device.shouldReset)
+        if (device.shouldReset) // never happen on DX9, will be done in message_loop()
         {
             device.ResetInternal(device.precacheWhileReset);
-            device.shouldReset = false;
-            device.precacheWhileReset = false;
         }
 
         device.ProcessFrame();
@@ -416,7 +408,11 @@ void CRenderDevice::message_loop()
         return;
     }
 
+    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
+
     bool timedOut = false;
+    bool canCallActivate = false;
+    bool shouldActivate = false;
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
@@ -466,13 +462,15 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_FOCUS_GAINED:
                 case SDL_WINDOWEVENT_RESTORED:
                 case SDL_WINDOWEVENT_MAXIMIZED:
-                    OnWM_Activate(1, event.window.data2);
+                    canCallActivate = true;
+                    shouldActivate = true;
                     break;
 
                 case SDL_WINDOWEVENT_HIDDEN:
                 case SDL_WINDOWEVENT_FOCUS_LOST:
                 case SDL_WINDOWEVENT_MINIMIZED:
-                    OnWM_Activate(0, event.window.data2);
+                    canCallActivate = true;
+                    shouldActivate = false;
                     break;
 
                 case SDL_WINDOWEVENT_ENTER:
@@ -491,8 +489,24 @@ void CRenderDevice::message_loop()
             }
         }
 
+        // Workaround for screen blinking when there's too much timeouts
+        if (canCallActivate)
+        {
+            OnWM_Activate(shouldActivate ? 1 : 0, 0);
+            canCallActivate = false;
+        }
+
+        if (isDX9Renderer)
+        {
+            LastDeviceState = GEnv.Render->GetDeviceState();
+        }
+
         if (!timedOut)
         {
+            if (isDX9Renderer && shouldReset)
+            {
+                ResetInternal(precacheWhileReset);
+            }
             primaryProcessFrame.Set();
         }
 
@@ -521,10 +535,7 @@ void CRenderDevice::Run()
     }
 
     // Pre start
-    GEnv.Render->MakeContextCurrent(false);
-    deviceReadyToRun.Set();
-
-    WaitEvent(primaryReadyToRun);
+    seqAppStart.Process();
 
     splash::hide();
     SDL_HideWindow(m_sdlWnd);
@@ -535,6 +546,9 @@ void CRenderDevice::Run()
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     OnWM_Activate(1, 0);
 
+    GEnv.Render->MakeContextCurrent(IRender::NoContext);
+    deviceReadyToRun.Set();
+
     // Message cycle
     message_loop();
 
@@ -543,7 +557,7 @@ void CRenderDevice::Run()
 
     primaryProcessFrame.Set();
     primaryThreadExit.Wait();
-    GEnv.Render->MakeContextCurrent(true);
+    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
 
     seqAppEnd.Process();
     
@@ -747,8 +761,3 @@ void CLoadScreenRenderer::stop()
 }
 
 void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(true); }
-
-bool CRenderDevice::CSecondVPParams::IsSVPFrame() //--#SM+#-- +SecondVP+
-{
-    return IsSVPActive() && Device.dwFrame % frameDelay == 0;
-}

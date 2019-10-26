@@ -19,16 +19,17 @@ XR_EXPORT void SetupEnv()
 
 XR_EXPORT bool CheckRendererSupport()
 {
-    // XXX: do a real check
+    // XXX: this check should be removed after implementing support for HLSL
+    // https://github.com/OpenXRay/xray-16/issues/258
+    // Check if shaders are available
+    if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+    {
+        Log("~ No shaders found for OpenGL");
+        return false;
+    }
+
+    // Check if minimal required OpenGL features are available
+    // XXX: implement minimal feature availability check
     return true;
 }
-}
-
-SCRIPT_EXPORT(CheckRendererSupport_R2, (),
-{
-    using namespace luabind;
-    module(luaState)
-    [
-        def("xrRender_test_gl_hw", &CheckRendererSupport)
-    ];
-});
+} // extern "C"

@@ -181,7 +181,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                                         RCache.LOD.set_LOD(LOD);
 #endif
                                         //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                                        RCache.hemi.c_update(it_it.pVisual);
+                                        //RCache.hemi.c_update(it_it.pVisual);
 
                                         it_it.pVisual->Render(LOD);
                                     }
@@ -294,7 +294,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                                     RCache.LOD.set_LOD(LOD);
 #endif
                                     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                                    RCache.hemi.c_update(ni_it.pVisual);
+                                    //RCache.hemi.c_update(ni_it.pVisual);
 
                                     ni_it.pVisual->Render(LOD);
                                 }
@@ -391,7 +391,7 @@ void __fastcall render_item(const T& item)
     RImplementation.apply_object(item.second.pObject);
     RImplementation.apply_lmaterial();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-    RCache.hemi.c_update(V);
+    //RCache.hemi.c_update(V);
     V->Render(calcLOD(item.first, V->vis.sphere.R));
 }
 

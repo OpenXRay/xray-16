@@ -35,21 +35,19 @@ LPCSTR boost_influence_caption[] = {"ui_inv_health", "ui_inv_power", "ui_inv_rad
     "ui_inv_outfit_chemical_burn_protection", "ui_inv_outfit_burn_immunity", "ui_inv_outfit_shock_immunity",
     "ui_inv_outfit_radiation_immunity", "ui_inv_outfit_telepatic_immunity", "ui_inv_outfit_chemical_burn_immunity"};
 
-void CUIBoosterInfo::InitFromXml(CUIXml& xml)
+bool CUIBoosterInfo::InitFromXml(CUIXml& xml)
 {
     LPCSTR base = "booster_params";
     XML_NODE stored_root = xml.GetLocalRoot();
     XML_NODE base_node = xml.NavigateToNode(base, 0);
     if (!base_node)
-        return;
+        return false;
 
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
 
-    m_Prop_line = new CUIStatic();
-    AttachChild(m_Prop_line);
+    m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false);
     m_Prop_line->SetAutoDelete(false);
-    CUIXmlInit::InitStatic(xml, "prop_line", 0, m_Prop_line);
 
     for (u32 i = 0; i < eBoostExplImmunity; ++i)
     {
@@ -84,6 +82,7 @@ void CUIBoosterInfo::InitFromXml(CUIXml& xml)
     m_booster_time->SetCaption(name);
 
     xml.SetLocalRoot(stored_root);
+    return true;
 }
 
 void CUIBoosterInfo::SetInfo(shared_str const& section)
