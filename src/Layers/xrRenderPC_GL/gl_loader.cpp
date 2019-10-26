@@ -184,12 +184,11 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     Resources->Evict();
     //	u32	dwUsage					= D3DUSAGE_WRITEONLY;
 
-    xr_vector<VertexDeclarator>& _DC = alternative ? xDC : nDC;
-    xr_vector<IGLVertexBuffer*>& _VB = alternative ? xVB : nVB;
-    xr_vector<IGLIndexBuffer*>& _IB = alternative ? xIB : nIB;
-
     // Vertex buffers
     {
+        xr_vector<VertexDeclarator>& _DC = alternative ? xDC : nDC;
+        xr_vector<IGLVertexBuffer*>& _VB = alternative ? xVB : nVB;
+
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
         R_ASSERT2 (fs,"Could not load geometry. File 'level.geom?' corrupted.");
@@ -224,6 +223,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     // Index buffers
     {
+        xr_vector<IGLIndexBuffer*>& _IB = alternative ? xIB : nIB;
+
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
         _IB.resize(count);
