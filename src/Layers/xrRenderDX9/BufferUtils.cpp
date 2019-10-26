@@ -53,7 +53,7 @@ void* VertexStagingBuffer::Map(
     bool read /*= false*/)
 {
     VERIFY(IsValid());
-    VERIFY2(!read || (read && m_AllowReadBack), "Can't read from write only buffer");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
     VERIFY(size <= m_Size);
 
     DWORD mapMode = read ? D3DLOCK_READONLY : 0;
@@ -154,7 +154,7 @@ void* IndexStagingBuffer::Map(
     bool read /*= false*/)
 {
     VERIFY(IsValid());
-    VERIFY2(!read || (read && m_AllowReadBack), "Can't read from write only buffer");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
     VERIFY(size <= m_Size);
 
     DWORD mapMode = read ? D3DLOCK_READONLY : 0;

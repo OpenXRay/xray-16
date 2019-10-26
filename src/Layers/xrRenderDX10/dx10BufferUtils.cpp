@@ -192,7 +192,7 @@ void* VertexStagingBuffer::Map(
     size_t size /*= 0*/,
     bool read /*= false*/)
 {
-    VERIFY2(!read || (read && m_HostBuffer), "Can't read from write only buffer");
+    VERIFY2(!read || m_HostBuffer, "Can't read from write only buffer");
     VERIFY(size <= m_Size);
 
     if (m_HostBuffer == nullptr)
@@ -293,7 +293,7 @@ void* IndexStagingBuffer::Map(
     size_t size /*= 0*/,
     bool read /*= LOCKFLAG_NOT_SET*/)
 {
-    VERIFY2(!read || (read && m_HostBuffer), "Can't read from write only buffer");
+    VERIFY2(!read || m_HostBuffer, "Can't read from write only buffer");
     VERIFY(size <= m_Size);
 
     if (m_HostBuffer == nullptr)
