@@ -18,7 +18,7 @@ void CBackend::CreateQuadIB()
 
     QuadIB.Create(idxSize);
 
-    u16* Indices = static_cast<u16*>(QuadIB.GetHostPointer());
+    u16* Indices = static_cast<u16*>(QuadIB.Map());
     {
         int Cnt = 0;
         int ICnt = 0;
@@ -58,5 +58,5 @@ void CBackend::OnDeviceDestroy()
     Vertex.Destroy();
 
     // Quad
-    QuadIB.Destroy();
+    QuadIB.Release();
 }

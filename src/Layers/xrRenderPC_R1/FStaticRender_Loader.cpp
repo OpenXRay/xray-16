@@ -161,24 +161,24 @@ void CRender::level_Unload()
     //*** VB/IB
     for (I = 0; I < nVB.size(); I++)
     {
-        nVB[I].Destroy();
+        nVB[I].Release();
     }
 
     for (I = 0; I < xVB.size(); I++)
     {
-        xVB[I].Destroy();
+        xVB[I].Release();
     }
     nVB.clear();
     xVB.clear();
 
     for (I = 0; I < nIB.size(); I++)
     {
-        nIB[I].Destroy();
+        nIB[I].Release();
     }
 
     for (I = 0; I < xIB.size(); I++)
     {
-        xIB[I].Destroy();
+        xIB[I].Release();
     }
 
     nIB.clear();
@@ -245,7 +245,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             // Create and fill
             _VB[i].Create(vCount * vSize);
-            BYTE* pData = static_cast<BYTE*>(_VB[i].GetHostPointer());
+            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
             //			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
             _VB[i].Flush();
@@ -272,7 +272,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             // Create and fill
             _IB[i].Create(iCount * 2);
-            BYTE* pData = static_cast<BYTE*>(_IB[i].GetHostPointer());
+            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
             //			CopyMemory			(pData,fs->pointer(),iCount*2);
             fs->r(pData, iCount * 2);
             _IB[i].Flush();

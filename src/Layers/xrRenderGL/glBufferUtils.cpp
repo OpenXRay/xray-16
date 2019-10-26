@@ -284,6 +284,7 @@ u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
 //-----------------------------------------------------------------------------
 VertexStagingBuffer::VertexStagingBuffer()
     : m_DeviceBuffer{ 0 }
+    , m_HostBuffer{ nullptr }
 {
 }
 
@@ -292,10 +293,12 @@ VertexStagingBuffer::~VertexStagingBuffer()
     Destroy();
 }
 
-void VertexStagingBuffer::Create(size_t size)
+void VertexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
 {
-    m_HostData = xr_alloc<u8>(size);
     m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
     AddRef();
 }
 
@@ -304,24 +307,41 @@ bool VertexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* VertexStagingBuffer::GetHostPointer()
+void* VertexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= false*/)
 {
-    if (m_HostData == nullptr)
+    VERIFY2(!read || (read && m_HostBuffer), "Can't read from write only buffer");
+    VERIFY(size <= m_Size);
+
+    if (m_HostBuffer == nullptr)
     {
         // The buffer was flushed and is being updating again
         VERIFY(m_Size);
         Create(m_Size);
+        --m_RefCounter; // set correct ref counter
     }
-    return m_HostData;
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void VertexStagingBuffer::Unmap()
+{
+    /* Do nothing */
 }
 
 void VertexStagingBuffer::Flush()
 {
-    VERIFY(m_HostData && m_Size);
+    VERIFY(m_HostBuffer && m_Size);
+
     // Upload data to device
-    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
-    // Free host memory
-    xr_delete(m_HostData);
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
 }
 
 GLuint VertexStagingBuffer::GetBufferHandle() const
@@ -331,8 +351,9 @@ GLuint VertexStagingBuffer::GetBufferHandle() const
 
 void VertexStagingBuffer::Destroy()
 {
-    if (m_HostData)
-        xr_delete(m_HostData);
+    DiscardHostBuffer();
+    m_Size = 0;
+
     if (m_DeviceBuffer)
     {
         glDeleteBuffers(1, &m_DeviceBuffer);
@@ -340,9 +361,32 @@ void VertexStagingBuffer::Destroy()
     }
 }
 
+void VertexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t VertexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t VertexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (!m_DeviceBuffer)
+        return 0;
+
+    GLint VB_size;
+    glBindBuffer(GL_ARRAY_BUFFER, m_DeviceBuffer);
+    CHK_GL(glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &VB_size));
+    return VB_size;
+}
+
 //-----------------------------------------------------------------------------
 IndexStagingBuffer::IndexStagingBuffer()
     : m_DeviceBuffer{ 0 }
+    , m_HostBuffer{ nullptr }
 {
 }
 
@@ -351,10 +395,12 @@ IndexStagingBuffer::~IndexStagingBuffer()
     Destroy();
 }
 
-void IndexStagingBuffer::Create(size_t size)
+void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
 {
-    m_HostData = xr_alloc<u8>(size);
     m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
     AddRef();
 }
 
@@ -363,24 +409,41 @@ bool IndexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* IndexStagingBuffer::GetHostPointer()
+void* IndexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= false*/)
 {
-    if (m_HostData == nullptr)
+    VERIFY2(!read || (read && m_HostBuffer), "Can't read from write only buffer");
+    VERIFY(size <= m_Size);
+
+    if (m_HostBuffer == nullptr)
     {
         // The buffer was flushed and is being updating again
         VERIFY(m_Size);
         Create(m_Size);
+        --m_RefCounter; // set correct ref counter
     }
-    return m_HostData;
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void IndexStagingBuffer::Unmap()
+{
+    /* Do nothing */
 }
 
 void IndexStagingBuffer::Flush()
 {
-    VERIFY(m_HostData && m_Size);
+    VERIFY(m_HostBuffer && m_Size);
+
     // Upload data to device
-    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, true);
-    // Free host memory
-    xr_delete(m_HostData);
+    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
 }
 
 GLuint IndexStagingBuffer::GetBufferHandle() const
@@ -390,11 +453,34 @@ GLuint IndexStagingBuffer::GetBufferHandle() const
 
 void IndexStagingBuffer::Destroy()
 {
-    if (m_HostData)
-        xr_delete(m_HostData);
+    DiscardHostBuffer();
+    m_Size = 0;
+
     if (m_DeviceBuffer)
     {
         glDeleteBuffers(1, &m_DeviceBuffer);
         m_DeviceBuffer = 0;
     }
+}
+
+void IndexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t IndexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t IndexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (!m_DeviceBuffer)
+        return 0;
+
+    GLint IB_size;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
+    CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &IB_size));
+    return IB_size;
 }

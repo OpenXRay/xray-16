@@ -62,7 +62,7 @@ void CDetailManager::hw_Load_Geom()
     // Fill VB
     hw_VB.Create(dwVerts * vSize);
     {
-        vertHW* pV = static_cast<vertHW*>(hw_VB.GetHostPointer());
+        vertHW* pV = static_cast<vertHW*>(hw_VB.Map());
         for (u32 o = 0; o < objects.size(); o++)
         {
             const CDetail& D = *objects[o];
@@ -89,7 +89,7 @@ void CDetailManager::hw_Load_Geom()
     // Fill IB
     hw_IB.Create(dwIndices * sizeof(u16));
     {
-        u16* pI = static_cast<u16*>(hw_IB.GetHostPointer());
+        u16* pI = static_cast<u16*>(hw_IB.Map());
         for (u32 o = 0; o < objects.size(); o++)
         {
             const CDetail& D = *objects[o];
@@ -112,8 +112,8 @@ void CDetailManager::hw_Unload()
 {
     // Destroy VS/VB/IB
     hw_Geom.destroy();
-    hw_IB.Destroy();
-    hw_VB.Destroy();
+    hw_IB.Release();
+    hw_VB.Release();
 }
 
 #if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)

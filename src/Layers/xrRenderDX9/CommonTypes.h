@@ -26,6 +26,7 @@ using unused_t = int[0];
 using VertexBufferHandle = ID3DVertexBuffer*;
 using IndexBufferHandle = ID3DIndexBuffer*;
 using ConstantBufferHandle = unused_t;
+using HostBufferHandle = void*;
 
 using VertexElement = D3DVERTEXELEMENT9;
 using InputElementDesc = unused_t;

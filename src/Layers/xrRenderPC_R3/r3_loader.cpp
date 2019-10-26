@@ -164,22 +164,22 @@ void CRender::level_Unload()
     //*** VB/IB
     for (I = 0; I < nVB.size(); I++)
     {
-        nVB[I].Destroy();
+        nVB[I].Release();
     }
     for (I = 0; I < xVB.size(); I++)
     {
-        xVB[I].Destroy();
+        xVB[I].Release();
     }
     nVB.clear();
     xVB.clear();
 
     for (I = 0; I < nIB.size(); I++)
     {
-        nIB[I].Destroy();
+        nIB[I].Release();
     }
     for (I = 0; I < xIB.size(); I++)
     {
-        xIB[I].Destroy();
+        xIB[I].Release();
     }
     nIB.clear();
     xIB.clear();
@@ -242,7 +242,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             //	TODO: DX10: Check fragmentation.
             //	Check if buffer is less then 2048 kb
             _VB[i].Create(vCount * vSize);
-            BYTE* pData = static_cast<BYTE*>(_VB[i].GetHostPointer());
+            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
             _VB[i].Flush();
 
@@ -264,7 +264,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             //	TODO: DX10: Check fragmentation.
             //	Check if buffer is less then 2048 kb
             _IB[i].Create(iCount * 2);
-            BYTE* pData = static_cast<BYTE*>(_IB[i].GetHostPointer());
+            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
             fs->r(pData, iCount * 2);
             _IB[i].Flush();
 

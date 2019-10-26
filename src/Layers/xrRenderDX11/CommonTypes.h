@@ -271,6 +271,7 @@ typedef dx10State ID3DState;
 using VertexBufferHandle = ID3D11Buffer*;
 using IndexBufferHandle = ID3D11Buffer*;
 using ConstantBufferHandle = ID3D11Buffer*;
+using HostBufferHandle = void*;
 
 using VertexElement = D3DVERTEXELEMENT9;
 using InputElementDesc = D3D11_INPUT_ELEMENT_DESC;

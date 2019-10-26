@@ -164,6 +164,7 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
 //-----------------------------------------------------------------------------
 VertexStagingBuffer::VertexStagingBuffer()
     : m_DeviceBuffer{ nullptr }
+    , m_HostBuffer{ nullptr }
 {
 }
 
@@ -172,10 +173,12 @@ VertexStagingBuffer::~VertexStagingBuffer()
     Destroy();
 }
 
-void VertexStagingBuffer::Create(size_t size)
+void VertexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
 {
-    m_HostData = xr_alloc<u8>(size);
     m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
     AddRef();
 }
 
@@ -184,25 +187,42 @@ bool VertexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* VertexStagingBuffer::GetHostPointer()
+void* VertexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= false*/)
 {
-    if (m_HostData == nullptr)
+    VERIFY2(!read || (read && m_HostBuffer), "Can't read from write only buffer");
+    VERIFY(size <= m_Size);
+
+    if (m_HostBuffer == nullptr)
     {
         // The buffer was flushed and is being updating again
         VERIFY(m_Size);
         Create(m_Size);
+        --m_RefCounter; // correct ref counter value
     }
-    return m_HostData;
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void VertexStagingBuffer::Unmap()
+{
+    /* Do nothing */
 }
 
 void VertexStagingBuffer::Flush()
 {
-    VERIFY(m_HostData && m_Size);
+    VERIFY(m_HostBuffer && m_Size);
+
     // Upload data to device
-    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
     HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
-    // Free host memory
-    xr_delete(m_HostData);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
 }
 
 VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
@@ -212,15 +232,40 @@ VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
 
 void VertexStagingBuffer::Destroy()
 {
-    if (m_HostData)
-        xr_delete(m_HostData);
+    DiscardHostBuffer();
+    m_Size = 0;
+
     HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
     _RELEASE(m_DeviceBuffer);
+}
+
+void VertexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t VertexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t VertexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (m_DeviceBuffer)
+    {
+        D3D_BUFFER_DESC desc;
+        m_DeviceBuffer->GetDesc(&desc);
+        return desc.ByteWidth;
+    }
+
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
 IndexStagingBuffer::IndexStagingBuffer()
     : m_DeviceBuffer{ nullptr }
+    , m_HostBuffer{ nullptr }
 {
 }
 
@@ -229,10 +274,12 @@ IndexStagingBuffer::~IndexStagingBuffer()
     Destroy();
 }
 
-void IndexStagingBuffer::Create(size_t size)
+void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
 {
-    m_HostData = xr_alloc<u8>(size);
     m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
     AddRef();
 }
 
@@ -241,25 +288,42 @@ bool IndexStagingBuffer::IsValid() const
     return !!m_DeviceBuffer;
 }
 
-void* IndexStagingBuffer::GetHostPointer()
+void* IndexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= LOCKFLAG_NOT_SET*/)
 {
-    if (m_HostData == nullptr)
+    VERIFY2(!read || (read && m_HostBuffer), "Can't read from write only buffer");
+    VERIFY(size <= m_Size);
+
+    if (m_HostBuffer == nullptr)
     {
         // The buffer was flushed and is being updating again
         VERIFY(m_Size);
         Create(m_Size);
+        --m_RefCounter; // correct ref counter value
     }
-    return m_HostData;
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void IndexStagingBuffer::Unmap()
+{
+    /* Do nothing */
 }
 
 void IndexStagingBuffer::Flush()
 {
-    VERIFY(m_HostData && m_Size);
+    VERIFY(m_HostBuffer && m_Size);
+
     // Upload data to device
-    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostData, m_Size, false);
+    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
     HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
-    // Free host memory
-    xr_delete(m_HostData);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
 }
 
 IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
@@ -269,8 +333,32 @@ IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
 
 void IndexStagingBuffer::Destroy()
 {
-    if (m_HostData)
-        xr_delete(m_HostData);
+    DiscardHostBuffer();
+    m_Size = 0;
+
     HW.stats_manager.decrement_stats_ib(m_DeviceBuffer);
     _RELEASE(m_DeviceBuffer);
+}
+
+void IndexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t IndexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t IndexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (m_DeviceBuffer)
+    {
+        D3D_BUFFER_DESC desc;
+        m_DeviceBuffer->GetDesc(&desc);
+        return desc.ByteWidth;
+    }
+
+    return 0;
 }

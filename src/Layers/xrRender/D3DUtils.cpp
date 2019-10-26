@@ -119,7 +119,7 @@ void SPrimitiveBuffer::CreateFromData(
     i_cnt = _i_cnt;
     u32 stride = GetFVFVertexSize(FVF);
     pVB.Create(v_cnt * stride);
-    u8* bytes = static_cast<u8*>(pVB.GetHostPointer());
+    u8* bytes = static_cast<u8*>(pVB.Map());
     FLvertexVec verts(v_cnt);
     for (u32 k = 0; k < v_cnt; ++k)
         verts[k].set(((Fvector*)vertices)[k], 0xFFFFFFFF);
@@ -128,7 +128,7 @@ void SPrimitiveBuffer::CreateFromData(
     if (i_cnt)
     {
         pIB.Create(i_cnt * sizeof(u16));
-        bytes = static_cast<u8*>(pIB.GetHostPointer());
+        bytes = static_cast<u8*>(pIB.Map());
         memcpy(bytes, indices, i_cnt * sizeof(u16));
         pIB.Flush();
         OnRender.bind(this, &SPrimitiveBuffer::RenderDIP);
@@ -143,8 +143,8 @@ void SPrimitiveBuffer::Destroy()
 {
     if (pGeom)
     {
-        pIB.Destroy();
-        pVB.Destroy();
+        pIB.Release();
+        pVB.Release();
         pGeom.destroy();
     }
 }

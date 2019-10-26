@@ -23,13 +23,13 @@ public:
     VertexStagingBuffer();
     ~VertexStagingBuffer();
 
-    void Create(size_t size);
-    void Destroy();
-
+    void Create(size_t size, bool allowReadBack = false);
     bool IsValid() const;
-    void* GetHostPointer();
+    void* Map(size_t offset = 0, size_t size = 0, bool read = false);
+    void Unmap();
     VertexBufferHandle GetBufferHandle() const;
-    void Flush();
+    void Flush(); // Does unmap implicitly
+    void DiscardHostBuffer();
 
     void AddRef()
     {
@@ -59,11 +59,17 @@ public:
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
 
+    size_t GetSystemMemoryUsage() const;
+    size_t GetVideoMemoryUsage() const;
+
 private:
+    void Destroy();
+
     VertexBufferHandle m_DeviceBuffer;
-    void* m_HostData{ nullptr };
+    HostBufferHandle m_HostBuffer;
     size_t m_Size{ 0 };
     u32 m_RefCounter{ 0 };
+    bool m_AllowReadBack{ false }; // specifies whether host will want to have the data back (e.g. skinning code)
 };
 
 class IndexStagingBuffer
@@ -72,13 +78,13 @@ public:
     IndexStagingBuffer();
     ~IndexStagingBuffer();
 
-    void Create(size_t size);
-    void Destroy();
-
+    void Create(size_t size, bool allowReadBack = false);
     bool IsValid() const;
-    void* GetHostPointer();
+    void* Map(size_t offset = 0, size_t size = 0, bool read = false);
+    void Unmap();
     IndexBufferHandle GetBufferHandle() const;
-    void Flush();
+    void Flush(); // Does unmap implicitly
+    void DiscardHostBuffer();
 
     void AddRef()
     {
@@ -108,9 +114,15 @@ public:
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
 
+    size_t GetSystemMemoryUsage() const;
+    size_t GetVideoMemoryUsage() const;
+
 private:
+    void Destroy();
+
     IndexBufferHandle m_DeviceBuffer;
-    void* m_HostData{ nullptr };
+    HostBufferHandle m_HostBuffer;
     size_t m_Size{ 0 };
     u32 m_RefCounter{ 0 };
+    bool m_AllowReadBack{ false }; // specifies whether host will want to have the data back (e.g. skinning code)
 };
