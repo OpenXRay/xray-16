@@ -323,13 +323,16 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
             if(0 == UserName[0])
                 strcpy(UserName, pw->pw_name);
         }
+        
         gethostname(CompName, sizeof(CompName));
 #endif
+        
         Memory._initialize();
+        
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
         Msg("%s %s build %d, %s", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
         PrintBuildInfo();
-        Msg("\ncommand line %s\n", Params);;
+        Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
 #if defined(XR_X86) || defined(XR_X64)
         R_ASSERT(SDL_HasSSE());
@@ -384,7 +387,7 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
-        FS._destroy();;
+        FS._destroy();
         EFS._destroy();
         xr_FS.reset();
         xr_EFS.reset();
