@@ -236,6 +236,7 @@ public:
 
     const xr_token* GetToken() noexcept override
     {
+        StringTable().Init(); // Prevent failure without usage Nifty counters 
         tokens = StringTable().GetLanguagesToken();
         return CCC_Token::GetToken();
     }

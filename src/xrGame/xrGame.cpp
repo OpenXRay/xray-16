@@ -48,7 +48,6 @@ static void load(int argc, char** argv, char** envp)
     g_profiler = new CProfiler();
 #endif
     gStringTable = new CStringTable();
-    StringTable().Init();
 }
 
 #ifdef LINUX
