@@ -212,7 +212,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     // Vertex buffers
     {
         xr_vector<VertexDeclarator>& _DC  = alternative ? xDC : nDC;
-        xr_vector<ID3DVertexBuffer*>& _VB = alternative ? xVB : nVB;
+        xr_vector<VertexStagingBuffer>& _VB = alternative ? xVB : nVB;
 
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
@@ -252,7 +252,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     // Index buffers
     {
-        xr_vector<ID3DIndexBuffer*>& _IB = alternative ? xIB : nIB;
+        xr_vector<IndexStagingBuffer>& _IB = alternative ? xIB : nIB;
 
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
