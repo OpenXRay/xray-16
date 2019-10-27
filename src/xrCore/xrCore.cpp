@@ -208,18 +208,20 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #else
 
     char *pref_path = SDL_GetBasePath();
-    if (strstr(Core.Params, "-fsltx")){ 
-        //Если введён ключь fsltx то ничего не делаем переменной pref_path уже присвоенно необходимое значение (это необходимо для возможности указать относительный путь, а не полный начинающийся от корня)
-    } 
-    else {
-        if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc")){ // Оставил такиеже ключи для запуска ТЧ как и у Султана
+    if (!strstr(Core.Params, "-fsltx"))   // Если введён ключь fsltx то ничего не делаем переменной pref_path уже присвоенно необходимое значение (это необходимо для возможности указать относительный путь, а не полный начинающийся от корня)
+    {
+
+        if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc")) // Оставил такие же ключи для запуска ТЧ как и у Султана
+        {
             pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadows of Chernobyl");
         }
         else {
-            if (strstr(Core.Params, "-cs")){
+            if (strstr(Core.Params, "-cs"))
+            {
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
             }
-            else{
+            else
+            {
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");                
             }
         }
@@ -246,61 +248,42 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 /*==============================================================================================================================================*/
 /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
 * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
-* the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed
-* Очень не красиво много повторяющегося кода но зато работает должным образом */
+* the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
 
-        if (strstr(Core.Params, "-fsltx")) { }                                      // Если пользователь указывает расположение ресурсов то ничего не делаем       
-        else {                                                                      // впротивном случае проверяем
-            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc")){       // если запускаем ТЧ то
-                chdir(ApplicationPath);                                             // перейти в каталог ApplicationPath
-                string_path tmp;
-                xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);                   // записываем в tmp путь ApplicationPath/fsgame.ltx
-                struct stat statbuf;
-                memset(&statbuf, 0, sizeof(struct stat));
-                int res = lstat(tmp, &statbuf);
-            if(-1 == res || !S_ISLNK(statbuf.st_mode)){                             // проверяю существует ли линк на fsgame.ltx 
-                symlink("/usr/share/openxray/fsgame.ltx", tmp);}                    // создаю линк на fsgame.ltx 
-                xr_sprintf(tmp, "%sgamedata", ApplicationPath);
-                memset(&statbuf, 0, sizeof(struct stat));
-                res = lstat(tmp, &statbuf);
-            if(-1 == res || !S_ISLNK(statbuf.st_mode)){                             // проверяю существует ли линк на shaders        
-                mkdir(tmp, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);                  // создать папку gamedata в рабочей директории
-                xr_sprintf(tmp, "%sshaders","gamedata/", ApplicationPath);  
-                symlink("/usr/share/openxray/gamedata/shaders", tmp);}}             // создаю линк на папку с шейдерами в gamedata
-        else {  
-            if (strstr(Core.Params, "-cs")){                                        // если запускаем ЧН
-                chdir(ApplicationPath);                                             // перейти в каталог ApplicationPath
-                string_path tmp;
-                xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);                   // записываем в tmp путь ApplicationPath/fsgame.ltx
-                struct stat statbuf;
-                memset(&statbuf, 0, sizeof(struct stat));
-                int res = lstat(tmp, &statbuf);
-            if(-1 == res || !S_ISLNK(statbuf.st_mode)){                             // проверяю существует ли линк на fsgame.ltx 
-                symlink("/usr/share/openxray/fsgame.ltx", tmp);}                    // создаю линк на fsgame.ltx 
-                xr_sprintf(tmp, "%sgamedata", ApplicationPath);
-                memset(&statbuf, 0, sizeof(struct stat));
-                res = lstat(tmp, &statbuf);
-            if(-1 == res || !S_ISLNK(statbuf.st_mode)){                             // проверяю существует ли линк на shaders
-                mkdir(tmp, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);                  // создать папку gamedata в рабочей директории
-                xr_sprintf(tmp, "%sshaders","gamedata/", ApplicationPath); 
-                symlink("/usr/share/openxray/gamedata/shaders", tmp);}}             // создаю линк на шейдеры в gamedata
-        else {                                                                      // если запускаем ЗП
-                chdir(ApplicationPath);                                             // перейти в каталог ApplicationPath
-                string_path tmp;
-                xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);                   // записываем в tmp путь ApplicationPath/fsgame.ltx
-                struct stat statbuf;
-                memset(&statbuf, 0, sizeof(struct stat));
-                int res = lstat(tmp, &statbuf);
-            if(-1 == res || !S_ISLNK(statbuf.st_mode))                              // проверяю существует ли линк на fsgame.ltx 
-                symlink("/usr/share/openxray/fsgame.ltx", tmp);                     // создаю линк на fsgame.ltx  
-                xr_sprintf(tmp, "%sgamedata", ApplicationPath);                 
-                memset(&statbuf, 0, sizeof(struct stat));
-                res = lstat(tmp, &statbuf); 
-            if(-1 == res || !S_ISLNK(statbuf.st_mode))                              // проверяю на существование линка gamedata
-                symlink("/usr/share/openxray/gamedata", tmp);                       // создаю линк на gamedata
+    if (!strstr(Core.Params, "-fsltx"))                                             // Если пользователь указывает расположение ресурсов то ничего не делаем       
+    {                                                                               // впротивном случае проверяем
+        chdir(ApplicationPath);                                                     // перейти в каталог рабочий каталог ApplicationPath
+        string_path tmp;
+        xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);                           // записать в tmp путь ApplicationPath/fsgame.ltx
+        struct stat statbuf;
+        ZeroMemory(&statbuf, sizeof(stat));                                         // очистить память
+        int res = lstat(tmp, &statbuf);                                             // проверить существует ли линк fsgame.ltx
+        
+        if(-1 == res || !S_ISLNK(statbuf.st_mode))                                  // если не существует 
+            symlink("/usr/share/openxray/fsgame.ltx", tmp);                         // создать линк на fsgame.ltx  
+
+        if (strstr(Core.Params, "-cs") || strstr(Core.Params, "-shoc") 
+                                       || strstr(Core.Params, "-soc"))              // если запускаем ЧН или ТЧ то    
+            {                                                                        
+                xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);          // записать в tmp путь ApplicationPath/gamedata/shaders/gl
+                ZeroMemory(&statbuf, sizeof(stat));                                 // очистить память
+                res = lstat(tmp, &statbuf);                                         // проверить существует ли линк gamedata/shaders/gl
+            if(-1 == res || !S_ISLNK(statbuf.st_mode))                              // если существует
+                {                                  
+                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);           // создать древо каталогов в ApplicationPath
+                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);   // делаю в два захода поскольку функция mkdir() может работать только с одним каталогом
+                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);            // создать линк на шейдеры в gamedata/shaders
+                }
+            }             
+        else                                                                        // если запускаем ЗП
+            {                                                                   
+                xr_sprintf(tmp, "%sgamedata", ApplicationPath);                     // записать в tmp путь ApplicationPath/gamedata               
+                ZeroMemory(&statbuf, sizeof(stat));                                 // очистить память
+                res = lstat(tmp, &statbuf);                                         // проверить существует ли линк ApplicationPath/gamedata
+            if(-1 == res || !S_ISLNK(statbuf.st_mode))                              // если существует                             
+                symlink("/usr/share/openxray/gamedata", tmp);                       // создать линк на gamedata
             }
-        }
-    }                   
+    }                
 /*==============================================================================================================================================*/
 #endif
 
@@ -339,8 +322,11 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #endif
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
+
         rtc_initialize();
+
         xr_FS = xr_make_unique<CLocatorAPI>();
+
         xr_EFS = xr_make_unique<EFS_Utils>();
         //. R_ASSERT (co_res==S_OK);
     }
@@ -391,6 +377,7 @@ void xrCore::_destroy()
         EFS._destroy();
         xr_FS.reset();
         xr_EFS.reset();
+
         if (trained_model)
         {
             void* buffer = trained_model->buffer();

@@ -813,16 +813,23 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
         free(tmp_path);
     }
     else
-    if (strstr(Core.Params, "-fsltx")){
+    if (strstr(Core.Params, "-fsltx"))
+        {
         SDL_strlcpy(full_current_directory, SDL_GetBasePath(), sizeof full_current_directory);
         } 
-    else{
+    else
+        {
         if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc")){
-            SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadows of Chernobyl"), sizeof full_current_directory);}
-        else{
-            if (strstr(Core.Params, "-cs")){
-                SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky"), sizeof full_current_directory);}
-            else{
+            SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadows of Chernobyl"), sizeof full_current_directory);
+        }
+        else
+            {
+            if (strstr(Core.Params, "-cs"))
+                {
+                SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky"), sizeof full_current_directory);
+                }
+            else
+                {
                 SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat"), sizeof full_current_directory);
                 }
             }
