@@ -87,7 +87,7 @@ bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWO
 
     fipMemoryIO tmpMemFile(pixels.data(), pixels.size());
 
-    fipImage image;
+    fipImage image{ FIT_BITMAP, width, height, u32(bits) };
     image.loadFromMemory(tmpMemFile);
 
     if (image.isValid())

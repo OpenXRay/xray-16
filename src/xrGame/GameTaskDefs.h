@@ -21,15 +21,16 @@ enum ETaskType
 };
 
 constexpr pcstr g_active_task_no_task___internal = "__xr_no_task_-_nullptr__";
+using TASK_ID = shared_str;
 
-extern shared_str g_active_task_id[eTaskTypeCount];
+extern TASK_ID g_active_task_id[eTaskTypeCount];
 class CGameTask;
 
 struct SGameTaskKey : public ISerializable, public IPureDestroyableObject
 {
-    shared_str task_id;
+    TASK_ID task_id;
     CGameTask* game_task;
-    SGameTaskKey(const shared_str& t_id) : task_id(t_id), game_task(NULL){};
+    SGameTaskKey(const TASK_ID& t_id) : task_id(t_id), game_task(NULL){};
     SGameTaskKey() : task_id(NULL), game_task(NULL){};
 
     virtual void save(IWriter& stream);

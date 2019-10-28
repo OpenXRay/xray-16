@@ -98,6 +98,11 @@ function opt_gameplay:InitControls(x, y, xml, handler)
 	xml:InitCheck("tab_gameplay:check_loadingstages", _st)
 	self.scroll_v:AddWindow(_st, true)
 
+	_st = xml:InitStatic("tab_gameplay:templ_item", nil)
+	xml:InitStatic("tab_gameplay:cap_unload_after_pickup", _st)
+	xml:InitCheck("tab_gameplay:unload_after_pickup", _st)
+	self.scroll_v:AddWindow(_st, true)
+
 	local btn
 	btn = xml:Init3tButton	("tab_gameplay:btn_check_updates", self)
 	handler:Register		(btn, "btn_check_updates")

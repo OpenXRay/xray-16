@@ -86,6 +86,7 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp14</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp14</LanguageStandard>
+      <FloatingPointModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>ode/config/msvcdefs.def</ModuleDefinitionFile>
@@ -97,6 +98,7 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp14</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp14</LanguageStandard>
+      <FloatingPointModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Precise</FloatingPointModel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Mixed'">
@@ -104,6 +106,7 @@
       <PreprocessorDefinitions>dNODEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">stdcpp14</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">stdcpp14</LanguageStandard>
+      <FloatingPointModel Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">Precise</FloatingPointModel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

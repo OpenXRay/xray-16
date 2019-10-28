@@ -12,7 +12,7 @@ class CUIArtefactParams : public CUIWindow
 public:
     CUIArtefactParams();
     virtual ~CUIArtefactParams();
-    void InitFromXml(CUIXml& xml);
+    bool InitFromXml(CUIXml& xml);
     bool Check(const shared_str& af_section);
     void SetInfo(const shared_str& af_section);
 

@@ -212,13 +212,12 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     Resources->Evict();
     u32 dwUsage = D3DUSAGE_WRITEONLY | (HW.Caps.geometry.bSoftware ? D3DUSAGE_SOFTWAREPROCESSING : 0);
 
-    xr_vector<VertexDeclarator>& _DC  = alternative ? xDC : nDC;
-    xr_vector<ID3DVertexBuffer*>& _VB = alternative ? xVB : nVB;
-    xr_vector<ID3DIndexBuffer*>& _IB  = alternative ? xIB : nIB;
-
     // Vertex buffers
     if (base_fs->find_chunk(fsL_VB))
     {
+        xr_vector<VertexDeclarator>& _DC = alternative ? xDC : nDC;
+        xr_vector<ID3DVertexBuffer*>& _VB = alternative ? xVB : nVB;
+
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
         u32 count = fs->r_u32();
@@ -269,6 +268,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     // Index buffers
     if (base_fs->find_chunk(fsL_IB))
     {
+        xr_vector<ID3DIndexBuffer*>& _IB = alternative ? xIB : nIB;
+
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
         _IB.resize(count);

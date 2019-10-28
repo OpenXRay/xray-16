@@ -308,6 +308,9 @@
       <Filter>do_light</Filter>
     </ClInclude>
     <ClInclude Include="..\Shader_xrLC.h" />
+    <ClInclude Include="base_face_ptr_storage.h">
+      <Filter>Light\Mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -76,6 +76,7 @@ ENGINE_API
 extern float psHUD_FOV;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
+extern int g_auto_ammo_unload;
 
 extern int x_m_x;
 extern int x_m_z;
@@ -236,6 +237,14 @@ public:
     const xr_token* GetToken() noexcept override
     {
         tokens = StringTable().GetLanguagesToken();
+        if(!tokens) // Prevent failure without usage Nifty counters
+        {
+            Msg("GetToken: token missing");
+            StringTable().Destroy();
+            StringTable().Init();
+
+            tokens = StringTable().GetLanguagesToken();
+        }
         return CCC_Token::GetToken();
     }
 };
@@ -2025,6 +2034,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
+    CMD4(CCC_Integer, "g_unload_ammo_after_pick_up", &g_auto_ammo_unload, 0, 1);
 
     CMD1(CCC_CleanupTasks, "dbg_cleanup_tasks");
 
