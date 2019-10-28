@@ -61,6 +61,7 @@ install:
 
 before_script:
   - export core_count=$(nproc || echo 4) && echo core_count = $core_count
+  - git submodule deinit Externals/cryptopp
   - mkdir bin
   - cd bin
   - if [ $TARGET_CPU == x64 ]; then
