@@ -312,26 +312,21 @@ void* VertexStagingBuffer::Map(
     size_t size /*= 0*/,
     bool read /*= false*/)
 {
-    VERIFY2(!read || m_HostBuffer, "Can't read from write only buffer");
-    VERIFY(size <= m_Size);
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
 
-    if (m_HostBuffer == nullptr)
-    {
-        // The buffer was flushed and is being updating again
-        VERIFY(m_Size);
-        Create(m_Size);
-        --m_RefCounter; // set correct ref counter
-    }
     return static_cast<u8*>(m_HostBuffer) + offset;
 }
 
-void VertexStagingBuffer::Unmap()
+void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
 {
-    /* Do nothing */
-}
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
 
-void VertexStagingBuffer::Flush()
-{
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
@@ -344,7 +339,7 @@ void VertexStagingBuffer::Flush()
     }
 }
 
-GLuint VertexStagingBuffer::GetBufferHandle() const
+VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
 {
     return m_DeviceBuffer;
 }
@@ -414,30 +409,25 @@ void* IndexStagingBuffer::Map(
     size_t size /*= 0*/,
     bool read /*= false*/)
 {
-    VERIFY2(!read || m_HostBuffer, "Can't read from write only buffer");
-    VERIFY(size <= m_Size);
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
 
-    if (m_HostBuffer == nullptr)
-    {
-        // The buffer was flushed and is being updating again
-        VERIFY(m_Size);
-        Create(m_Size);
-        --m_RefCounter; // set correct ref counter
-    }
     return static_cast<u8*>(m_HostBuffer) + offset;
 }
 
-void IndexStagingBuffer::Unmap()
+void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
 {
-    /* Do nothing */
-}
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
 
-void IndexStagingBuffer::Flush()
-{
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
-    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
 
     if (!m_AllowReadBack)
     {
@@ -446,7 +436,7 @@ void IndexStagingBuffer::Flush()
     }
 }
 
-GLuint IndexStagingBuffer::GetBufferHandle() const
+IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
 {
     return m_DeviceBuffer;
 }

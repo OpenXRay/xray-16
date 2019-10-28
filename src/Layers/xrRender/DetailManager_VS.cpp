@@ -83,7 +83,7 @@ void CDetailManager::hw_Load_Geom()
                 }
             }
         }
-        hw_VB.Flush();
+        hw_VB.Unmap(true); // upload vertex data
     }
 
     // Fill IB
@@ -101,7 +101,7 @@ void CDetailManager::hw_Load_Geom()
                 offset = u16(offset + u16(D.number_vertices));
             }
         }
-        hw_IB.Flush();
+        hw_IB.Unmap(true); // upload index data
     }
 
     // Declare geometry

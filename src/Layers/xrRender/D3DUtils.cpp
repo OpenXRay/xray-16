@@ -124,13 +124,13 @@ void SPrimitiveBuffer::CreateFromData(
     for (u32 k = 0; k < v_cnt; ++k)
         verts[k].set(((Fvector*)vertices)[k], 0xFFFFFFFF);
     memcpy(bytes, &*verts.begin(), v_cnt * stride);
-    pVB.Flush();
+    pVB.Unmap(true); // upload vertex data
     if (i_cnt)
     {
         pIB.Create(i_cnt * sizeof(u16));
         bytes = static_cast<u8*>(pIB.Map());
         memcpy(bytes, indices, i_cnt * sizeof(u16));
-        pIB.Flush();
+        pIB.Unmap(true); // upload index data
         OnRender.bind(this, &SPrimitiveBuffer::RenderDIP);
     }
     else

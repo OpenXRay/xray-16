@@ -70,7 +70,7 @@ void CRenderTarget::accum_spot_geom_create()
         g_accum_spot_vb.Create(vCount * vSize);
         BYTE* pData = static_cast<BYTE*>(g_accum_spot_vb.Map());
         CopyMemory(pData, du_cone_vertices, vCount * vSize);
-        g_accum_spot_vb.Flush();
+        g_accum_spot_vb.Unmap(true); // upload vertex data
     }
 
     // Indices
@@ -80,7 +80,7 @@ void CRenderTarget::accum_spot_geom_create()
         g_accum_spot_ib.Create(iCount * 2);
         BYTE* pData = static_cast<BYTE*>(g_accum_spot_ib.Map());
         CopyMemory(pData, du_cone_faces, iCount * 2);
-        g_accum_spot_ib.Flush();
+        g_accum_spot_ib.Unmap(true); // upload index data
     }
 }
 
@@ -122,7 +122,7 @@ void CRenderTarget::accum_volumetric_geom_create()
             pSlice[i].m_Vert[3] = Fvector().set(1, 1, t);
             t += dt;
         }
-        g_accum_volumetric_vb.Flush();
+        g_accum_volumetric_vb.Unmap(true); // upload vertex data
     }
 
     // Indices
@@ -141,7 +141,7 @@ void CRenderTarget::accum_volumetric_geom_create()
             pInd[4] = basevert + 1;
             pInd[5] = basevert + 3;
         }
-        g_accum_volumetric_ib.Flush();
+        g_accum_volumetric_ib.Unmap(true); // upload index data
     }
 }
 

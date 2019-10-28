@@ -35,7 +35,7 @@ void CBackend::CreateQuadIB()
             Cnt += 4;
         }
     }
-    QuadIB.Flush();
+    QuadIB.Unmap(true); // upload index data
 }
 
 // Device dependance

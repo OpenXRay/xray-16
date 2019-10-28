@@ -17,6 +17,22 @@ HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT Da
 HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize);
 };
 
+/**
+ * Staging buffer abstraction provides a convenient way to upload vertex or index data into GPU memory.
+ * It uses intermediate heap storage to handle host data which can be discarded or preserved for future
+ * use in accordance to allocation policy.
+ *
+ * Two types of allocation available:
+ * 1. Push once
+ *    Such buffers can be mapped only for write and no data read back is available. Use this mode for cases
+ *    when you have static geometry which you are going to upload only once and forget about it. To
+ *    improve memory use the intermediate buffer will be discarded as soon as `Unmap()` called.
+ * 2. Persistent
+ *    In this case unmap operation doesn't discard heap storage content which can be accessed in order
+ *    to read the data back. Mapping with read flag can be done multiple times but you won't be able to
+ *    modify anything. The intermediate storage can be discarded explicitly to reclaim host memory.
+ */
+
 class VertexStagingBuffer
 {
 public:
@@ -26,9 +42,8 @@ public:
     void Create(size_t size, bool allowReadBack = false);
     bool IsValid() const;
     void* Map(size_t offset = 0, size_t size = 0, bool read = false);
-    void Unmap();
+    void Unmap(bool doFlush = false);
     VertexBufferHandle GetBufferHandle() const;
-    void Flush(); // Does unmap implicitly
     void DiscardHostBuffer();
 
     void AddRef()
@@ -81,9 +96,8 @@ public:
     void Create(size_t size, bool allowReadBack = false);
     bool IsValid() const;
     void* Map(size_t offset = 0, size_t size = 0, bool read = false);
-    void Unmap();
+    void Unmap(bool doFlush = false);
     IndexBufferHandle GetBufferHandle() const;
-    void Flush(); // Does unmap implicitly
     void DiscardHostBuffer();
 
     void AddRef()

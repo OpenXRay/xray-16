@@ -192,26 +192,21 @@ void* VertexStagingBuffer::Map(
     size_t size /*= 0*/,
     bool read /*= false*/)
 {
-    VERIFY2(!read || m_HostBuffer, "Can't read from write only buffer");
-    VERIFY(size <= m_Size);
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
 
-    if (m_HostBuffer == nullptr)
-    {
-        // The buffer was flushed and is being updating again
-        VERIFY(m_Size);
-        Create(m_Size);
-        --m_RefCounter; // correct ref counter value
-    }
     return static_cast<u8*>(m_HostBuffer) + offset;
 }
 
-void VertexStagingBuffer::Unmap()
+void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
 {
-    /* Do nothing */
-}
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
 
-void VertexStagingBuffer::Flush()
-{
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
@@ -293,26 +288,21 @@ void* IndexStagingBuffer::Map(
     size_t size /*= 0*/,
     bool read /*= LOCKFLAG_NOT_SET*/)
 {
-    VERIFY2(!read || m_HostBuffer, "Can't read from write only buffer");
-    VERIFY(size <= m_Size);
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
 
-    if (m_HostBuffer == nullptr)
-    {
-        // The buffer was flushed and is being updating again
-        VERIFY(m_Size);
-        Create(m_Size);
-        --m_RefCounter; // correct ref counter value
-    }
     return static_cast<u8*>(m_HostBuffer) + offset;
 }
 
-void IndexStagingBuffer::Unmap()
+void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
 {
-    /* Do nothing */
-}
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
 
-void IndexStagingBuffer::Flush()
-{
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device

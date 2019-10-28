@@ -293,7 +293,7 @@ void CRenderTarget::accum_point_geom_create()
 
         BYTE* pData = static_cast<BYTE*>(g_accum_point_vb.Map());
         CopyMemory(pData, du_sphere_vertices, vCount * vSize);
-        g_accum_point_vb.Flush();
+        g_accum_point_vb.Unmap(true); // upload vertex data
     }
 
     // Indices
@@ -303,7 +303,7 @@ void CRenderTarget::accum_point_geom_create()
         g_accum_point_ib.Create(iCount * 2);
         BYTE* pData = static_cast<BYTE*>(g_accum_point_ib.Map());
         CopyMemory(pData, du_sphere_faces, iCount * 2);
-        g_accum_point_ib.Flush();
+        g_accum_point_ib.Unmap(true); // upload index data
     }
 }
 

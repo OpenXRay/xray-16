@@ -239,7 +239,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
             //			CopyMemory			(pData,fs().pointer(),vCount*vSize);
             fs->r(pData, vCount * vSize);
-            _VB[i].Flush();
+            _VB[i].Unmap(true); // upload vertex data
 
             //			fs->advance			(vCount*vSize);
         }
@@ -263,7 +263,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
             //			CopyMemory			(pData,fs().pointer(),iCount*2);
             fs->r(pData, iCount * 2);
-            _IB[i].Flush();
+            _IB[i].Unmap(true); // upload index data
 
             //			fs().advance		(iCount*2);
         }
