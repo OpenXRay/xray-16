@@ -800,7 +800,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     setup_fs_path(fs_name, fs_path);
 
     string_path full_current_directory;
-    
+
 #if defined(WINDOWS)
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
 #elif defined(LINUX) || defined(FREEBSD)
@@ -808,33 +808,26 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     {
         char *tmp_path = realpath(fs_path, NULL);
         CHECK_OR_EXIT(tmp_path && tmp_path[0],
-            make_string("Cannot get realpath for \"%s\": %s", fs_path, strerror(errno)));
+        make_string("Cannot get realpath for \"%s\": %s", fs_path, strerror(errno)));
         SDL_strlcpy(full_current_directory, tmp_path, sizeof full_current_directory);
         free(tmp_path);
     }
     else
-    if (strstr(Core.Params, "-fsltx"))
+    {
+        char* pref_path = SDL_GetBasePath();
+        if (!strstr(Core.Params, "-fsltx"))
         {
-        SDL_strlcpy(full_current_directory, SDL_GetBasePath(), sizeof full_current_directory);
-        } 
-    else
-        {
-        if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc")){
-            SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadows of Chernobyl"), sizeof full_current_directory);
-        }
-        else
-            {
-            if (strstr(Core.Params, "-cs"))
-                {
-                SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky"), sizeof full_current_directory);
-                }
+            SDL_free(pref_path);
+            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
+            else if (strstr(Core.Params, "-cs"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
             else
-                {
-                SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat"), sizeof full_current_directory);
-                }
-            }
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
         }
-
+        SDL_strlcpy(full_current_directory, pref_path, sizeof full_current_directory);
+        SDL_free(pref_path);
+    }
 #endif
 
     FS_Path* path = new FS_Path(full_current_directory, "", "", "", 0);
