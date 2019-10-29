@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC const CPatrolPath::CVertex* CPatrolPath::point(shared_str name) const
+IC const CPatrolPath::CVrtx* CPatrolPath::point(shared_str name) const
 {
     const_vertex_iterator I = vertices().begin();
     const_vertex_iterator E = vertices().end();
@@ -19,9 +19,9 @@ IC const CPatrolPath::CVertex* CPatrolPath::point(shared_str name) const
 }
 
 template <typename T>
-IC const CPatrolPath::CVertex* CPatrolPath::point(const Fvector& position, const T& evaluator) const
+IC const CPatrolPath::CVrtx* CPatrolPath::point(const Fvector& position, const T& evaluator) const
 {
-    const CPatrolPath::CVertex* nearest = 0;
+    const CPatrolPath::CVrtx* nearest = 0;
     float best_distance = flt_max;
     const_vertex_iterator I = vertices().begin();
     const_vertex_iterator E = vertices().end();
@@ -39,7 +39,7 @@ IC const CPatrolPath::CVertex* CPatrolPath::point(const Fvector& position, const
     return (nearest);
 }
 
-IC const CPatrolPath::CVertex* CPatrolPath::point(const Fvector& position) const
+IC const CPatrolPath::CVrtx* CPatrolPath::point(const Fvector& position) const
 {
     return (point(position, CAlwaysTrueEvaluator()));
 }

@@ -82,7 +82,7 @@ IC bool CPatrolPathManager::accessible(u32 vertex_id) const
     return (m_object ? object().accessible(vertex_id) : true);
 }
 
-IC bool CPatrolPathManager::accessible(const CPatrolPath::CVertex* vertex) const
+IC bool CPatrolPathManager::accessible(const CPatrolPath::CVrtx* vertex) const
 {
     return (vertex ? object().accessible(vertex->data().position()) : true);
 }
@@ -98,7 +98,7 @@ struct CAccessabilityEvaluator
 void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_id)
 {
     VERIFY(m_path && !m_path->vertices().empty());
-    const CPatrolPath::CVertex* vertex = 0;
+    const CPatrolPath::CVrtx* vertex = 0;
     if (!actual() || !m_path->vertex(m_curr_point_index))
     {
         switch (m_start_type)
@@ -294,7 +294,7 @@ u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
 {
     u32 count = 0; // количество разветвлений
     float sum = 0.f; // сумма весов разветвления
-    const CPatrolPath::CVertex* vertex = m_path->vertex(prev_point_index);
+    const CPatrolPath::CVrtx* vertex = m_path->vertex(prev_point_index);
 
     CPatrolPath::const_iterator I = vertex->edges().begin(), E = vertex->edges().end();
     u32 target = u32(-1);

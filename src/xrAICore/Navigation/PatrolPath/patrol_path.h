@@ -48,10 +48,10 @@ public:
     virtual ~CPatrolPath();
     CPatrolPath& load_raw(const CLevelGraph* level_graph, const CGameLevelCrossTable* cross,
         const CGameGraph* game_graph, IReader& stream);
-    IC const CVertex* point(shared_str name) const;
+    IC const CVrtx* point(shared_str name) const;
     template <typename T>
-    IC const CVertex* point(const Fvector& position, const T& evaluator) const;
-    IC const CVertex* point(const Fvector& position) const;
+    IC const CVrtx* point(const Fvector& position, const T& evaluator) const;
+    IC const CVrtx* point(const Fvector& position) const;
 
 #ifdef DEBUG
 public:

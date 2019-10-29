@@ -182,7 +182,7 @@ void CALifeSpawnRegistry::load_updates(IReader& stream)
          chunk = stream.open_chunk_iterator(vertex_id, chunk))
     {
         VERIFY(u32(ALife::_SPAWN_ID(-1)) > vertex_id);
-        const SPAWN_GRAPH::CVertex* vertex = m_spawns.vertex(ALife::_SPAWN_ID(vertex_id));
+        const SPAWN_GRAPH::CVrtx* vertex = m_spawns.vertex(ALife::_SPAWN_ID(vertex_id));
         VERIFY(vertex);
         vertex->data()->load_update(*chunk);
     }

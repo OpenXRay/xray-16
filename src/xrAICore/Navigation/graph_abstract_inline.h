@@ -25,7 +25,7 @@ TEMPLATE_SPECIALIZATION
 IC void CAbstractGraph::add_vertex(const _data_type& data, const _vertex_id_type& vertex_id)
 {
     VERIFY(!vertex(vertex_id));
-    m_vertices.insert(std::make_pair(vertex_id, new CVertex(data, vertex_id, &m_edge_count)));
+    m_vertices.insert(std::make_pair(vertex_id, new CVrtx(data, vertex_id, &m_edge_count)));
 }
 
 TEMPLATE_SPECIALIZATION
@@ -42,9 +42,9 @@ TEMPLATE_SPECIALIZATION
 IC void CAbstractGraph::add_edge(
     const _vertex_id_type& vertex_id0, const _vertex_id_type& vertex_id1, const _edge_weight_type& edge_weight)
 {
-    CVertex* _vertex0 = vertex(vertex_id0);
+    CVrtx* _vertex0 = vertex(vertex_id0);
     VERIFY(_vertex0);
-    CVertex* _vertex1 = vertex(vertex_id1);
+    CVrtx* _vertex1 = vertex(vertex_id1);
     VERIFY(_vertex1);
     _vertex0->add_edge(_vertex1, edge_weight);
 }
@@ -60,7 +60,7 @@ IC void CAbstractGraph::add_edge(const _vertex_id_type& vertex_id0, const _verte
 TEMPLATE_SPECIALIZATION
 IC void CAbstractGraph::remove_edge(const _vertex_id_type& vertex_id0, const _vertex_id_type& vertex_id1)
 {
-    CVertex* _vertex = vertex(vertex_id0);
+    CVrtx* _vertex = vertex(vertex_id0);
     VERIFY(_vertex);
     VERIFY(vertex(vertex_id1));
     _vertex->remove_edge(vertex_id1);
@@ -81,7 +81,7 @@ IC void CAbstractGraph::clear()
 }
 
 TEMPLATE_SPECIALIZATION
-IC const typename CAbstractGraph::CVertex* CAbstractGraph::vertex(const _vertex_id_type& vertex_id) const
+IC const typename CAbstractGraph::CVrtx* CAbstractGraph::vertex(const _vertex_id_type& vertex_id) const
 {
     const_vertex_iterator I = vertices().find(vertex_id);
     if (vertices().end() == I)
@@ -90,7 +90,7 @@ IC const typename CAbstractGraph::CVertex* CAbstractGraph::vertex(const _vertex_
 }
 
 TEMPLATE_SPECIALIZATION
-IC typename CAbstractGraph::CVertex* CAbstractGraph::vertex(const _vertex_id_type& vertex_id)
+IC typename CAbstractGraph::CVrtx* CAbstractGraph::vertex(const _vertex_id_type& vertex_id)
 {
     vertex_iterator I = m_vertices.find(vertex_id);
     if (m_vertices.end() == I)
@@ -102,7 +102,7 @@ TEMPLATE_SPECIALIZATION
 IC const typename CAbstractGraph::CEdge* CAbstractGraph::edge(
     const _vertex_id_type& vertex_id0, const _vertex_id_type& vertex_id1) const
 {
-    const CVertex* _vertex = vertex(vertex_id0);
+    const CVrtx* _vertex = vertex(vertex_id0);
     if (!_vertex)
         return (0);
     return (_vertex->edge(vertex_id1));
@@ -112,7 +112,7 @@ TEMPLATE_SPECIALIZATION
 IC typename CAbstractGraph::CEdge* CAbstractGraph::edge(
     const _vertex_id_type& vertex_id0, const _vertex_id_type& vertex_id1)
 {
-    CVertex* _vertex = vertex(vertex_id0);
+    CVrtx* _vertex = vertex(vertex_id0);
     if (!_vertex)
         return (0);
     return (_vertex->edge(vertex_id1));
@@ -154,7 +154,7 @@ IC _vertex_id_type const& CAbstractGraph::value(
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CAbstractGraph::begin(const CVertex* vertex, const_iterator& b, const_iterator& e) const
+IC void CAbstractGraph::begin(const CVrtx* vertex, const_iterator& b, const_iterator& e) const
 {
     VERIFY(vertex);
     b = vertex->edges().begin();

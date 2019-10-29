@@ -49,7 +49,7 @@ protected:
     IC bool random() const;
     IC bool accessible(const Fvector& position) const;
     IC bool accessible(u32 vertex_id) const;
-    IC bool accessible(const CPatrolPath::CVertex* vertex) const;
+    IC bool accessible(const CPatrolPath::CVrtx* vertex) const;
 
 public:
     IC CPatrolPathManager(CRestrictedObject* object, CGameObject* game_object);

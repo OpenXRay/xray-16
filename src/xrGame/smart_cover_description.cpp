@@ -195,7 +195,7 @@ IC void delete_data(const CGraphAbstract<_data_type, _edge_weight_type, _vertex_
 
     for (auto vi = verts.begin(); vi != verts.end(); ++vi)
     {
-        typename Graph::CVertex* vert = (*vi).second;
+        typename Graph::CVrtx* vert = (*vi).second;
         delete_data(vert->data());
 
         Edges& edges = const_cast<Edges&>(vert->edges());

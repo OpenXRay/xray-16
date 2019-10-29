@@ -21,13 +21,13 @@ template <typename _data_type = Loki::EmptyType, typename _edge_weight_type = fl
 class CGraphAbstract
 {
 public:
-    typedef CVertex<_data_type, _vertex_id_type, CGraphAbstract> CVertex;
+    typedef CVertex<_data_type, _vertex_id_type, CGraphAbstract> CVrtx;
 
-    typedef CEdge<_edge_weight_type, CVertex, _edge_data_type> CEdge;
+    typedef CEdge<_edge_weight_type, CVrtx, _edge_data_type> CEdge;
 
 public:
-    typedef xr_map<_vertex_id_type, CVertex*> VERTICES;
-    typedef typename CVertex::EDGES EDGES;
+    typedef xr_map<_vertex_id_type, CVrtx*> VERTICES;
+    typedef typename CVrtx::EDGES EDGES;
 
 public:
     typedef typename VERTICES::const_iterator const_vertex_iterator;
@@ -57,8 +57,8 @@ public:
     IC bool empty() const;
     IC const VERTICES& vertices() const;
     IC VERTICES& vertices();
-    IC const CVertex* vertex(const _vertex_id_type& vertex_id) const;
-    IC CVertex* vertex(const _vertex_id_type& vertex_id);
+    IC const CVrtx* vertex(const _vertex_id_type& vertex_id) const;
+    IC CVrtx* vertex(const _vertex_id_type& vertex_id);
     IC const CEdge* edge(const _vertex_id_type& vertex_id0, const _vertex_id_type& vertex_id1) const;
     IC CEdge* edge(const _vertex_id_type& vertex_id0, const _vertex_id_type& vertex_id1);
     IC const CGraphAbstract& header() const;
@@ -66,7 +66,7 @@ public:
         const _vertex_id_type vertex_index0, const _vertex_id_type vertex_index1, const_iterator i) const;
     IC bool is_accessible(const _vertex_id_type vertex_index) const;
     IC _vertex_id_type const& value(_vertex_id_type const& vertex_index, const_iterator i) const;
-    IC void begin(const CVertex* vertex, const_iterator& b, const_iterator& e) const;
+    IC void begin(const CVrtx* vertex, const_iterator& b, const_iterator& e) const;
     IC void begin(_vertex_id_type const& vertex_index, const_iterator& b, const_iterator& e) const;
 };
 

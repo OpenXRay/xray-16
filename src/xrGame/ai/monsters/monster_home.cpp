@@ -136,7 +136,7 @@ u32 CMonsterHome::get_place_in_min_home()
     }
     else
     {
-        const CPatrolPath::CVertex* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
+        const CPatrolPath::CVrtx* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
         input_node = vertex->data().level_vertex_id();
     }
     m_object->control().path_builder().get_node_in_radius(input_node, 1, m_radius_min, 5, result);
@@ -157,7 +157,7 @@ u32 CMonsterHome::get_place_in_mid_home()
 {
     u32 result = u32(-1);
     u32 input_node;
-    const CPatrolPath::CVertex* vertex;
+    const CPatrolPath::CVrtx* vertex;
 
     int m_move_dist = min_move_dist + Random.randI(max_move_dist - min_move_dist);
     float m_res_dist = 0.f + m_move_dist;
@@ -357,7 +357,7 @@ u32 CMonsterHome::get_place_in_max_home()
     }
     else
     {
-        const CPatrolPath::CVertex* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
+        const CPatrolPath::CVrtx* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
         input_node = vertex->data().level_vertex_id();
     }
     m_object->control().path_builder().get_node_in_radius(input_node, m_radius_min, m_radius_max, 5, result);
@@ -401,7 +401,7 @@ u32 CMonsterHome::get_place()
         VERIFY(m_path);
 
         // get_random_point
-        const CPatrolPath::CVertex* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
+        const CPatrolPath::CVrtx* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
 
         // get_random node
         m_object->control().path_builder().get_node_in_radius(vertex->data().level_vertex_id(), m_radius_min,
@@ -440,7 +440,7 @@ u32 CMonsterHome::get_place_in_cover()
         VERIFY(m_path);
 
         // get_random_point
-        const CPatrolPath::CVertex* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
+        const CPatrolPath::CVrtx* vertex = m_path->vertex(Random.randI(m_path->vertex_count()));
 
         // find cover
         const CCoverPoint* point = m_object->CoverMan->find_cover(vertex->data().position(), vertex->data().position(),
@@ -472,7 +472,7 @@ bool CMonsterHome::at_home(const Fvector& pos, float const radius)
         // check every point and distance to it
         for (u32 i = 0; i < m_path->vertex_count(); i++)
         {
-            const CPatrolPath::CVertex* vertex = m_path->vertex(i);
+            const CPatrolPath::CVrtx* vertex = m_path->vertex(i);
 
             u32 const level_vertex = vertex->data().level_vertex_id();
             if (!ai().level_graph().valid_vertex_id(level_vertex))
@@ -512,7 +512,7 @@ Fvector CMonsterHome::get_home_point()
             return (m_object->Position());
     }
 
-    typedef CPatrolPath::CVertex CVertex;
+    typedef CPatrolPath::CVrtx CVertex;
     if (!m_path->vertices().empty())
         return (ai().level_graph().vertex_position(m_path->vertex(0)->data().level_vertex_id()));
 

@@ -89,7 +89,7 @@ struct SHeliMovementState
     EHeilMovementState type;
     // specified path
     const CPatrolPath* currPatrolPath;
-    const CPatrolPath::CVertex* currPatrolVertex;
+    const CPatrolPath::CVrtx* currPatrolVertex;
 
     int patrol_begin_idx;
     shared_str patrol_path_name;

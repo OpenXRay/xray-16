@@ -135,7 +135,7 @@ void remove_out_restriction(CALifeSimulator* alife, CSE_ALifeMonsterAbstract* mo
 u32 get_level_id(CALifeSimulator* self) { return (self->graph().level().level_id()); }
 CSE_ALifeDynamicObject* CALifeSimulator__create(CALifeSimulator* self, ALife::_SPAWN_ID spawn_id)
 {
-    const CALifeSpawnRegistry::SPAWN_GRAPH::CVertex* vertex = ai().alife().spawns().spawns().vertex(spawn_id);
+    const CALifeSpawnRegistry::SPAWN_GRAPH::CVrtx* vertex = ai().alife().spawns().spawns().vertex(spawn_id);
     THROW2(vertex, "Invalid spawn id!");
 
     CSE_ALifeDynamicObject* spawn = smart_cast<CSE_ALifeDynamicObject*>(&vertex->data()->object());
