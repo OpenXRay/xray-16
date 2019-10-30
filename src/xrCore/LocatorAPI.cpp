@@ -808,7 +808,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     {
         char *tmp_path = realpath(fs_path, NULL);
         CHECK_OR_EXIT(tmp_path && tmp_path[0],
-        make_string("Cannot get realpath for \"%s\": %s", fs_path, strerror(errno)));
+            make_string("Cannot get realpath for \"%s\": %s", fs_path, strerror(errno)));
         SDL_strlcpy(full_current_directory, tmp_path, sizeof full_current_directory);
         free(tmp_path);
     }
