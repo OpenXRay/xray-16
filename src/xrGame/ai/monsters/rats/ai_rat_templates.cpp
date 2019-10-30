@@ -559,7 +559,7 @@ void CAI_Rat::draw_way()
 {
     if (!m_path)
         return;
-    const CPatrolPath::CVertex* vertex;
+    const CPatrolPath::CVrtx* vertex;
     Fvector P1, P2;
     Fmatrix m_sphere;
 
