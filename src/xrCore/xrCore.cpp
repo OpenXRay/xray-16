@@ -260,16 +260,20 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
             ZeroMemory(&statbuf, sizeof(stat));                                     // очистить память
             res = lstat(tmp, &statbuf);                                             // проверить существует ли линк gamedata/shaders/gl
             if (-1 == res || !S_ISLNK(statbuf.st_mode))                             // если не существует
+            {
                 mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);           // создать древо каталогов в ApplicationPath
                 mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);   // делаю в два захода поскольку функция mkdir() может работать только с одним каталогом
                 symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);            // создать линк на шейдеры в gamedata/shaders
+            }
         }
         else                                                                        // если запускаем ЗП
+        {
             xr_sprintf(tmp, "%sgamedata", ApplicationPath);                         // записать в tmp путь ApplicationPath/gamedata
             ZeroMemory(&statbuf, sizeof(stat));                                     // очистить память
             res = lstat(tmp, &statbuf);                                             // проверить существует ли линк ApplicationPath/gamedata
             if (-1 == res || !S_ISLNK(statbuf.st_mode))                             // если не существует
                 symlink("/usr/share/openxray/gamedata", tmp);                       // создать линк на gamedata
+        }
     }
 #endif
 
