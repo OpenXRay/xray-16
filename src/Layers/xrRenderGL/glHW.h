@@ -16,6 +16,10 @@ public:
 
     void Reset();
 
+    void SetPrimaryAttributes();
+
+    int  MakeContextCurrent(IRender::RenderContext context) const;
+
     std::pair<u32, u32> GetSurfaceSize() const;
 
     void UpdateViews();
@@ -39,9 +43,12 @@ public:
     GLuint pPP;
     GLuint pFB;
 
-    SDL_Window* m_hWnd;
-    HDC m_hDC;
-    SDL_GLContext m_hRC;
+    SDL_Window* m_window{};
+    SDL_Window* m_helper_window{};
+
+    SDL_GLContext m_context{};
+    SDL_GLContext m_helper_context{};
+
     pcstr AdapterName;
     pcstr OpenGLVersion;
     pcstr ShadingVersion;

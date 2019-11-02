@@ -32,10 +32,14 @@ void CRenderDevice::Create()
     if (b_is_Ready)
         return; // prevent double call
 
-    GEnv.Render->MakeContextCurrent(false);
-
     // Start all threads
     mt_bMustExit = FALSE;
+
+    // To work correctly, DX9 in fullscreen mode requires that
+    // the device must be created at the same thread where the main window was created
+    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
+    if (isDX9Renderer)
+        CreateInternal();
 
     Threading::SetThreadName(NULL, "X-Ray Window thread");
     Threading::SpawnThread(PrimaryThreadProc, "X-RAY Primary thread", 0, this);
@@ -49,7 +53,7 @@ void CRenderDevice::Create()
 void CRenderDevice::WaitUntilCreated()
 {
     WaitEvent(deviceCreated);
-    GEnv.Render->MakeContextCurrent(true);
+    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
 }
 
 void CRenderDevice::CreateInternal()

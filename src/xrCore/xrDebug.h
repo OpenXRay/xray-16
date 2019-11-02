@@ -7,6 +7,7 @@
 #include <string>
 #if defined(LINUX)
 #include <cstdio>
+#include "xrCore/_std_extensions.h" // Supress many of warnings
 #elif defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared

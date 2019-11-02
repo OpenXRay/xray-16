@@ -213,7 +213,8 @@ public:
     virtual void OnAssetsChanged() override;
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
-    void MakeContextCurrent(bool /*acquire*/) override {}
+    void ObtainRequiredWindowFlags(u32& /*windowFlags*/) override {}
+    void MakeContextCurrent(RenderContext /*context*/) override {}
 
 public:
     CResourceManager* Resources;

@@ -237,6 +237,14 @@ public:
     const xr_token* GetToken() noexcept override
     {
         tokens = StringTable().GetLanguagesToken();
+        if(!tokens) // Prevent failure without usage Nifty counters
+        {
+            Msg("GetToken: token missing");
+            StringTable().Destroy();
+            StringTable().Init();
+
+            tokens = StringTable().GetLanguagesToken();
+        }
         return CCC_Token::GetToken();
     }
 };

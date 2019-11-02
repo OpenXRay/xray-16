@@ -9,6 +9,7 @@
 #include "xrmu_model.h"
 #include "xrmu_model_reference.h"
 #include "xrCDB/xrCDB.h"
+#include "base_face_ptr_storage.h"
 
 bool g_using_smooth_groups = true;
 bool g_smooth_groups_by_faces = false;
@@ -159,8 +160,6 @@ void xrLC_GlobalData::initialize()
 
 //*((u32*)&F)
 
-base_Face* convert_nax(u32 dummy) { return (base_Face*)(*((void**)&dummy)); }
-u32 convert_nax(base_Face* F) { return *((u32*)&F); }
 void write(IWriter& w, const CDB::TRI& tri)
 {
     w.w_u32(tri.verts[0]);
@@ -170,7 +169,7 @@ void write(IWriter& w, const CDB::TRI& tri)
 void write(IWriter& w, const CDB::TRI& tri, const xrLC_GlobalData& lc_global_data)
 {
     ::write(w, tri);
-    const base_Face* F = convert_nax(tri.dummy);
+    const base_Face* F = get_base_face_pointer(tri);
     VERIFY(&lc_global_data);
     lc_global_data.write(w, F);
 }
@@ -188,7 +187,7 @@ void read(INetReader& r, CDB::TRI& tri, xrLC_GlobalData& lc_global_data)
     VERIFY(&lc_global_data);
     base_Face* F = 0;
     lc_global_data.read(r, F);
-    tri.dummy = convert_nax(F);
+    store_base_face_pointer(tri, F);
 }
 
 static xr_vector<Fvector> verts;

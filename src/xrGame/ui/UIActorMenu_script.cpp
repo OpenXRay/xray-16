@@ -97,6 +97,6 @@ void CUIActorMenu::CurModeToScript()
 {
     int mode = (int)m_currMenuMode;
     luabind::functor<void> funct;
-    R_ASSERT(GEnv.ScriptEngine->functor("actor_menu.actor_menu_mode", funct));
-    funct(mode);
+    if (GEnv.ScriptEngine->functor("actor_menu.actor_menu_mode", funct))
+        funct(mode);
 }

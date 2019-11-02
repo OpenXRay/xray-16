@@ -25,7 +25,7 @@ void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bF
     // Create shaders
     SPS* ps = RImplementation.Resources->_CreatePS(_ps);
     u32 flags = 0;
-#if defined(USEDX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11)
     if (ps->constants.dx9compatibility)
         flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 #endif

@@ -33,7 +33,7 @@ public:
     void init_functors(xr_vector<shared_str>& v_src, task_state_functors& v_dest);
 };
 
-class CGameTask
+class CGameTask : public Noncopyable
 {
 private:
     ETaskState m_task_state;
@@ -70,15 +70,13 @@ private:
 
     void CreateMapLocation(bool on_load);
 
-    CGameTask(const CGameTask&);
-
 public:
     CGameTask();
 
     void save_task(IWriter& stream);
     void load_task(IReader& stream);
 
-    shared_str m_ID;
+    TASK_ID m_ID;
     shared_str m_Title;
     shared_str m_Description;
     ALife::_TIME_ID m_ReceiveTime;

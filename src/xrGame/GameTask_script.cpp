@@ -54,5 +54,6 @@ SCRIPT_EXPORT(CGameTask, (),
             .def("add_on_fail_func", &CGameTask::AddOnFailFunc_script)
 
             .def("remove_map_locations", &CGameTask::RemoveMapLocations)
-            .def("change_map_location", &CGameTask::ChangeMapLocation)];
+            .def("change_map_location", &CGameTask::ChangeMapLocation)
+    ];
 });

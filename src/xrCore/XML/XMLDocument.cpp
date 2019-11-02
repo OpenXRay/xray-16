@@ -87,7 +87,7 @@ bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
     W.w_stringZ("");
     FS.r_close(F);
 
-    return Set(reinterpret_cast<pcstr>(W.pointer()));
+    return Set(reinterpret_cast<pcstr>(W.pointer()), fatal);
 }
 
 // XXX: support #include directive

@@ -270,6 +270,7 @@ public:
     }
 
 private:
+    std::atomic<DeviceState> LastDeviceState;
     std::atomic<bool> shouldReset;
     std::atomic<bool> precacheWhileReset;
     std::atomic<bool> mtProcessingAllowed;

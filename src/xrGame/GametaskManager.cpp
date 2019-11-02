@@ -18,7 +18,7 @@
 #include <malloc.h>
 #pragma warning(pop)
 
-shared_str g_active_task_id[eTaskTypeCount] =
+TASK_ID g_active_task_id[eTaskTypeCount] =
 {
     g_active_task_no_task___internal,
     g_active_task_no_task___internal,
@@ -27,9 +27,9 @@ shared_str g_active_task_id[eTaskTypeCount] =
 
 struct FindTaskByID
 {
-    shared_str id;
+    TASK_ID id;
     bool b_only_inprocess;
-    FindTaskByID(const shared_str& s, bool search_only_inprocess) : id(s), b_only_inprocess(search_only_inprocess) {}
+    FindTaskByID(const TASK_ID& s, bool search_only_inprocess) : id(s), b_only_inprocess(search_only_inprocess) {}
     bool operator()(const SGameTaskKey& key)
     {
         if (b_only_inprocess)
@@ -86,7 +86,7 @@ vGameTasks& CGameTaskManager::GetGameTasks()
     return *m_gametasks;
 }
 
-CGameTask* CGameTaskManager::HasGameTask(const shared_str& id, bool only_inprocess)
+CGameTask* CGameTaskManager::HasGameTask(const TASK_ID& id, bool only_inprocess)
 {
     FindTaskByID key(id, only_inprocess);
     auto it = std::find_if(GetGameTasks().begin(), GetGameTasks().end(), key);
@@ -162,7 +162,7 @@ void CGameTaskManager::SetTaskState(CGameTask* task, ETaskState state)
         CurrentGameUI()->UpdatePda();
 }
 
-void CGameTaskManager::SetTaskState(const shared_str& id, ETaskState state)
+void CGameTaskManager::SetTaskState(const TASK_ID& id, ETaskState state)
 {
     CGameTask* t = HasGameTask(id, true);
     if (NULL == t)
@@ -243,7 +243,7 @@ CGameTask* CGameTaskManager::ActiveTask(ETaskType type)
     if (type != eTaskTypeStoryline && !m_flags.test(eMultipleTasks))
         return nullptr;
 
-    shared_str& t_id = g_active_task_id[type];
+    TASK_ID& t_id = g_active_task_id[type];
 
     if (!t_id.size())
         t_id = g_active_task_no_task___internal;
@@ -255,7 +255,7 @@ CGameTask* CGameTaskManager::ActiveTask(ETaskType type)
 }
 
 /*
-void CGameTaskManager::SetActiveTask(const shared_str& id, ETaskType type)
+void CGameTaskManager::SetActiveTask(const TASK_ID& id, ETaskType type)
 {
     ETaskType t = eTaskTypeStoryline;
     if (m_flags.test(eMultipleTasks))

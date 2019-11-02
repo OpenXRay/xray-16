@@ -10,6 +10,7 @@
 #include "xrface.h"
 #include "net_task.h"
 #include "xrCore/buffer_vector.h"
+#include "base_face_ptr_storage.h"
 
 // const	u32	rms_discard			= 8;
 // extern	BOOL		gl_linear	;
@@ -359,7 +360,7 @@ float getLastRP_Scale(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Face* skip
 
             // Access to texture
             CDB::TRI& clT = MDL->get_tris()[rpinf.id];
-            base_Face* F = (base_Face*)(*((void**)&clT.dummy));
+            base_Face* F = get_base_face_pointer(clT);
             if (0 == F)
                 continue;
             if (skip == F)
