@@ -247,7 +247,7 @@ public:
     virtual GameObjectSavedPosition ps_Element(u32 ID) const override;
 
     virtual void ForceTransform(const Fmatrix& m) override {}
-    void ForceTransformAndDirection(const Fmatrix& /*m*/) override { ForceTransform(m); }
+    void ForceTransformAndDirection(const Fmatrix& m) override { ForceTransform(m); }
 
     void OnHUDDraw(CCustomHUD* /*hud*/, IRenderable* /*root*/) override {}
     void OnRenderHUD(IGameObject* pCurViewEntity) override {} //--#SM+#--
