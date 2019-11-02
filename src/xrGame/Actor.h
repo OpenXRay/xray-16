@@ -580,6 +580,7 @@ protected:
 public:
     void g_Physics(Fvector& accel, float jump, float dt);
     virtual void ForceTransform(const Fmatrix& m);
+    void ForceTransformAndDirection(const Fmatrix& m) override;
     void SetPhPosition(const Fmatrix& pos);
     virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
     virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps

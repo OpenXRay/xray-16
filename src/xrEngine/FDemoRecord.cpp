@@ -429,11 +429,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
         IGameObject* entity = g_pGameLevel->CurrentEntity();
         if (entity)
         {
-            Fvector xyz;
-            m_Camera.getHPB(xyz);
-
-            entity->ForceTransform(m_Camera);
-            entity->cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
+            entity->ForceTransformAndDirection(m_Camera);
             fLifeTime = -1;
         }
     }

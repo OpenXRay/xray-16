@@ -1605,6 +1605,15 @@ void CActor::ForceTransform(const Fmatrix& m)
         character_physics_support()->movement()->BlockDamageSet(u64(block_damage_time_seconds / fixed_step));
 }
 
+void CActor::ForceTransformAndDirection(const Fmatrix& m)
+{
+    Fvector xyz;
+    m.getHPB(xyz);
+
+    ForceTransform(m);
+    cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
+}
+
 //ENGINE_API extern float psHUD_FOV;
 float CActor::Radius() const
 {
