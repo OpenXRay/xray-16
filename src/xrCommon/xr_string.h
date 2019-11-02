@@ -11,6 +11,24 @@ inline void xr_strlwr(xr_string& src)
         it = xr_string::value_type(tolower(it));
 }
 
+inline xr_string xr_substrreplace(const xr_string& src, const xr_string& src_substr, const xr_string& dst_substr)
+{
+    xr_string res(src);
+    while (true)
+    {
+        size_t pos = res.find(src_substr);
+        if (pos != xr_string::npos)
+        {
+            res.replace(pos, src_substr.size(), dst_substr);
+        }
+        else
+        {
+            break;
+        }
+    }
+    return res;
+}
+
 namespace std
 {
 template<>

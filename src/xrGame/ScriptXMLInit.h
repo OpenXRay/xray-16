@@ -22,6 +22,7 @@ class CUIAnimatedStatic;
 class CUISleepStatic;
 class CServerList;
 class CUIMapList;
+class CUIVersionList;
 class CUITrackBar;
 class CUIMapInfo;
 class CUIMMShniaga;
@@ -53,6 +54,7 @@ public:
     CUITabControl* InitTab(LPCSTR path, CUIWindow* parent);
     CServerList* InitServerList(LPCSTR path, CUIWindow* parent);
     CUIMapList* InitMapList(LPCSTR path, CUIWindow* parent);
+    CUIVersionList* InitVerList(LPCSTR path, CUIWindow* parent);
     CUIMapInfo* InitMapInfo(LPCSTR path, CUIWindow* parent);
     CUITrackBar* InitTrackBar(LPCSTR path, CUIWindow* parent);
     CUIEditBox* InitCDkey(LPCSTR path, CUIWindow* parent);
