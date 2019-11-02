@@ -426,9 +426,14 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
 #ifndef MASTER_GOLD
     if (dik == SDL_SCANCODE_RETURN)
     {
-        if (g_pGameLevel->CurrentEntity())
+        IGameObject* entity = g_pGameLevel->CurrentEntity();
+        if (entity)
         {
-            g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
+            Fvector xyz;
+            m_Camera.getHPB(xyz);
+
+            entity->ForceTransform(m_Camera);
+            entity->cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
             fLifeTime = -1;
         }
     }
