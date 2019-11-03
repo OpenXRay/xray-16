@@ -372,10 +372,10 @@ size_t VertexStagingBuffer::GetVideoMemoryUsage() const
     if (!m_DeviceBuffer)
         return 0;
 
-    GLint VB_size;
+    GLint bufferSize;
     glBindBuffer(GL_ARRAY_BUFFER, m_DeviceBuffer);
-    CHK_GL(glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &VB_size));
-    return VB_size;
+    CHK_GL(glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize));
+    return bufferSize;
 }
 
 //-----------------------------------------------------------------------------
@@ -469,8 +469,8 @@ size_t IndexStagingBuffer::GetVideoMemoryUsage() const
     if (!m_DeviceBuffer)
         return 0;
 
-    GLint IB_size;
+    GLint bufferSize;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
-    CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &IB_size));
-    return IB_size;
+    CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize));
+    return bufferSize;
 }
