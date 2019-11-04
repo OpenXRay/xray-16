@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "glBufferPool.h"
-#include "glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 CBufferPool GLBuffers;
 
@@ -40,7 +40,7 @@ void CBufferPool::CreateVertexBuffer(IGLVertexBuffer* &pBuffer, const void* pDat
     R_ASSERT(nullptr == pBuffer);
 
     pBuffer = new IGLVertexBuffer();
-    glBufferUtils::CreateVertexBuffer(&pBuffer->m_Buffer, pData, DataSize, bImmutable);
+    BufferUtils::CreateVertexBuffer(&pBuffer->m_Buffer, pData, DataSize, bImmutable);
     m_VertexBuffers.emplace_back(pBuffer);
 }
 
@@ -49,7 +49,7 @@ void CBufferPool::CreateIndexBuffer(IGLIndexBuffer* &pBuffer, const void* pData,
     R_ASSERT(nullptr == pBuffer);
 
     pBuffer = new IGLIndexBuffer();
-    glBufferUtils::CreateIndexBuffer(&pBuffer->m_Buffer, pData, DataSize, bImmutable);
+    BufferUtils::CreateIndexBuffer(&pBuffer->m_Buffer, pData, DataSize, bImmutable);
     m_IndexBuffers.emplace_back(pBuffer);
 }
 

@@ -3,8 +3,7 @@
 #include "xrCore/FMesh.hpp"
 #include "FSkinned.h"
 #include "SkeletonX.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
-#include "Layers/xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderGL/glBufferPool.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
@@ -401,11 +400,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             Vertices1W.create(crc, V.vCount, (vertBoned1W*)_verts_);
         }
 
-#ifdef USE_OGL
-        u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_01W);
-#else // USE_OGL
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_01W, 0);
-#endif // USE_OGL
+        u32 vStride = GetDeclVertexSize(dwDecl_01W, 0);
         VERIFY(vStride == sizeof(vertHW_1W));
         VERIFY(nullptr == V.p_rm_Vertices);
 
@@ -424,7 +419,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);
@@ -439,11 +434,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             Vertices2W.create(crc, V.vCount, (vertBoned2W*)_verts_);
         }
 
-#ifdef USE_OGL
-        u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_2W);
-#else // USE_OGL
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_2W, 0);
-#endif // USE_OGL
+        u32 vStride = GetDeclVertexSize(dwDecl_2W, 0);
         VERIFY(vStride == sizeof(vertHW_2W));
         VERIFY(nullptr == V.p_rm_Vertices);
 
@@ -462,7 +453,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);
@@ -476,11 +467,8 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             u32 crc = crc32(_verts_, size);
             Vertices3W.create(crc, V.vCount, (vertBoned3W*)_verts_);
         }
-#ifdef USE_OGL
-        u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_3W);
-#else // USE_OGL
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_3W, 0);
-#endif // USE_OGL
+
+        u32 vStride = GetDeclVertexSize(dwDecl_3W, 0);
         VERIFY(vStride == sizeof(vertHW_3W));
         VERIFY(nullptr == V.p_rm_Vertices);
 
@@ -500,7 +488,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);
@@ -515,11 +503,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             Vertices4W.create(crc, V.vCount, (vertBoned4W*)_verts_);
         }
 
-#ifdef USE_OGL
-        u32 vStride = glBufferUtils::GetDeclVertexSize(dwDecl_4W);
-#else // USE_OGL
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_4W, 0);
-#endif // USE_OGL
+        u32 vStride = GetDeclVertexSize(dwDecl_4W, 0);
         VERIFY(vStride == sizeof(vertHW_4W));
         VERIFY(nullptr == V.p_rm_Vertices);
 
@@ -539,7 +523,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 #ifdef USE_OGL
         GLBuffers.CreateVertexBuffer(V.p_rm_Vertices, dstOriginal, V.vCount * vStride);
 #else // USE_OGL
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
+        R_CHK(BufferUtils::CreateVertexBuffer(&V.p_rm_Vertices, dstOriginal, V.vCount * vStride));
         HW.stats_manager.increment_stats_vb(V.p_rm_Vertices);
 #endif // USE_OGL
         xr_free(dstOriginal);
@@ -566,7 +550,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     case RM_SINGLE:
     case RM_SKINNING_1B:
     {
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_01W, 0);
+        u32 vStride = GetDeclVertexSize(dwDecl_01W, 0);
         VERIFY(vStride == sizeof(vertHW_1W));
         BYTE* bytes = nullptr;
         VERIFY(NULL == V.p_rm_Vertices);
@@ -589,7 +573,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     break;
     case RM_SKINNING_2B:
     {
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_2W, 0);
+        u32 vStride = GetDeclVertexSize(dwDecl_2W, 0);
         VERIFY(vStride == sizeof(vertHW_2W));
         BYTE* bytes = nullptr;
         VERIFY(NULL == V.p_rm_Vertices);
@@ -613,7 +597,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     break;
     case RM_SKINNING_3B:
     {
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_3W, 0);
+        u32 vStride = GetDeclVertexSize(dwDecl_3W, 0);
         VERIFY(vStride == sizeof(vertHW_3W));
         BYTE* bytes = nullptr;
         VERIFY(NULL == V.p_rm_Vertices);
@@ -638,7 +622,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     break;
     case RM_SKINNING_4B:
     {
-        u32 vStride = D3DXGetDeclVertexSize(dwDecl_4W, 0);
+        u32 vStride = GetDeclVertexSize(dwDecl_4W, 0);
         VERIFY(vStride == sizeof(vertHW_4W));
         BYTE* bytes = nullptr;
         VERIFY(NULL == V.p_rm_Vertices);

@@ -80,8 +80,6 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     dtSlots = nullptr;
     hw_Geom = nullptr;
     hw_BatchSize = 0;
-    hw_VB = 0;
-    hw_IB = 0;
     m_time_rot_1 = 0;
     m_time_rot_2 = 0;
     m_time_pos = 0;

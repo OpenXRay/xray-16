@@ -3,8 +3,7 @@
 
 #include "xrCore/FMesh.hpp"
 #include "FVisual.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
-#include "Layers/xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderGL/glBufferPool.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -123,14 +122,14 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 
             VERIFY(nullptr == p_rm_Vertices);
 #ifdef USE_OGL
-            u32 vStride = glBufferUtils::GetFVFVertexSize(fvf);
+            u32 vStride = GetFVFVertexSize(fvf);
             GLBuffers.CreateVertexBuffer(p_rm_Vertices, data->pointer(), vCount * vStride);
 #elif defined(USE_DX10) || defined(USE_DX11)
-            u32 vStride = D3DXGetFVFVertexSize(fvf);
-            R_CHK(dx10BufferUtils::CreateVertexBuffer(&p_rm_Vertices, data->pointer(), vCount * vStride));
+            u32 vStride = GetFVFVertexSize(fvf);
+            R_CHK(BufferUtils::CreateVertexBuffer(&p_rm_Vertices, data->pointer(), vCount * vStride));
             HW.stats_manager.increment_stats_vb(p_rm_Vertices);
 #else //    USE_DX10
-            u32 vStride = D3DXGetFVFVertexSize(fvf);
+            u32 vStride = GetFVFVertexSize(fvf);
             BOOL bSoft = HW.Caps.geometry.bSoftware;
             u32 dwUsage = D3DUSAGE_WRITEONLY | (bSoft ? D3DUSAGE_SOFTWAREPROCESSING : 0);
             BYTE* bytes = nullptr;
@@ -171,7 +170,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 #ifdef USE_OGL
             GLBuffers.CreateIndexBuffer(p_rm_Indices, data->pointer(), iCount * 2);
 #elif defined(USE_DX10) || defined(USE_DX11)
-            R_CHK(dx10BufferUtils::CreateIndexBuffer(&p_rm_Indices, data->pointer(), iCount * 2));
+            R_CHK(BufferUtils::CreateIndexBuffer(&p_rm_Indices, data->pointer(), iCount * 2));
             HW.stats_manager.increment_stats_ib(p_rm_Indices);
 #else // USE_DX10
             BOOL bSoft = HW.Caps.geometry.bSoftware;

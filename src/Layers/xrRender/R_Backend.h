@@ -10,6 +10,7 @@
 #define PGO(a)
 #endif
 
+#include "Layers/xrRender/BufferUtils.h"
 #include "R_DStreams.h"
 #include "r_constants_cache.h"
 #include "R_Backend_xform.h"
@@ -67,15 +68,10 @@ public:
     // Dynamic geometry streams
     _VertexStream Vertex;
     _IndexStream Index;
-#ifdef USE_OGL
-    GLuint QuadIB;
-    GLuint old_QuadIB;
-    GLuint CuboidIB;
-#else
-    ID3DIndexBuffer* QuadIB;
-    ID3DIndexBuffer* old_QuadIB;
-    ID3DIndexBuffer* CuboidIB;
-#endif // USE_OGL
+
+    IndexStagingBuffer QuadIB;
+    IndexStagingBuffer old_QuadIB;
+
     R_xforms xforms;
     R_hemi hemi;
     R_tree tree;
@@ -115,13 +111,8 @@ private:
 #else	//	USE_DX10
     IDirect3DVertexDeclaration9* decl;
 #endif	//	USE_DX10
-#ifdef USE_OGL
-    GLuint vb;
-    GLuint ib;
-#else
-    ID3DVertexBuffer* vb;
-    ID3DIndexBuffer* ib;
-#endif // USE_OGL
+    VertexBufferHandle vb;
+    IndexBufferHandle ib;
     u32 vb_stride;
 
     // Pixel/Vertex constants
@@ -361,8 +352,8 @@ public:
     ICF	void set_Vertices(GLuint _vb, u32 _vb_stride);
     ICF	void set_Indices(GLuint _ib);
 #else
-    ICF void set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride);
-    ICF void set_Indices(ID3DIndexBuffer* _ib);
+    ICF void set_Vertices(VertexBufferHandle _vb, u32 _vb_stride);
+    ICF void set_Indices(IndexBufferHandle _ib);
 #endif // USE_OGL
     ICF void set_Geometry(SGeometry* _geom);
     ICF void set_Geometry(ref_geom& _geom) { set_Geometry(&*_geom); }

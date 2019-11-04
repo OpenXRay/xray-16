@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/du_sphere_part.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 void CRenderTarget::accum_omnip_geom_create()
 {
@@ -22,7 +22,7 @@ void CRenderTarget::accum_omnip_geom_create()
         //		CopyMemory				(pData,du_sphere_part_vertices,vCount*vSize);
         //		g_accum_omnip_vb->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&g_accum_omnip_vb, du_sphere_part_vertices, vCount * vSize));
+        R_CHK(BufferUtils::CreateVertexBuffer(&g_accum_omnip_vb, du_sphere_part_vertices, vCount * vSize));
         HW.stats_manager.increment_stats_vb(g_accum_omnip_vb);
     }
 
@@ -37,7 +37,7 @@ void CRenderTarget::accum_omnip_geom_create()
         //		CopyMemory		(pData,du_sphere_part_faces,iCount*2);
         //		g_accum_omnip_ib->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateIndexBuffer(&g_accum_omnip_ib, du_sphere_part_faces, iCount * 2));
+        R_CHK(BufferUtils::CreateIndexBuffer(&g_accum_omnip_ib, du_sphere_part_faces, iCount * 2));
         HW.stats_manager.increment_stats_ib(g_accum_omnip_ib);
     }
 }

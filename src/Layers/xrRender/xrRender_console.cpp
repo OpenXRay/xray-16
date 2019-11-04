@@ -375,13 +375,6 @@ public:
     }
 };
 
-class CCC_RestoreQuadIBData : public IConsole_Command
-{
-public:
-    CCC_RestoreQuadIBData(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR /*args*/) { RCache.RestoreQuadIBData(); }
-};
-
 class CCC_ModelPoolStat : public IConsole_Command
 {
 public:
@@ -704,8 +697,6 @@ void xrRender_initconsole()
     // Common
     CMD1(CCC_Screenshot, "screenshot");
 
-    //  Igor: just to test bug with rain/particles corruption
-    CMD1(CCC_RestoreQuadIBData, "r_restore_quad_ib_data");
 #ifdef DEBUG
 #if RENDER != R_R1 && RENDER != R_GL
     CMD1(CCC_BuildSSA, "build_ssa");
