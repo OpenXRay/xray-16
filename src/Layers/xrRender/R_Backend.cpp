@@ -3,13 +3,6 @@
 
 CBackend RCache;
 
-// Igor: is used to test bug with rain, particles corruption
-void CBackend::RestoreQuadIBData()
-{
-    // Igor: never seen this corruption for DX10
-    ;
-}
-
 void CBackend::CreateQuadIB()
 {
     constexpr auto triCount = 4 * 1024;
