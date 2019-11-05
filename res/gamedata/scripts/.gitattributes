@@ -1,2 +1,2 @@
 # X-Ray uses custom extension instead of .lua
-*.script linguist-language=Lua diff=Lua
+*.script text linguist-language=Lua diff=Lua
