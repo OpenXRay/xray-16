@@ -393,7 +393,7 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
 
         sp->SetWndPos(m_position_on_map);
 
-        Frect wnd_rect = sp->GetWndRect();
+        const Frect& wnd_rect = sp->GetWndRect();
 
         if (map->IsRectVisible(wnd_rect))
         {
