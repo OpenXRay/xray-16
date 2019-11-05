@@ -575,26 +575,26 @@ VertexElement* CRender::getVB_Format(int id, BOOL _alt)
     return nDC[id].begin();
 }
 
-IGLVertexBuffer* CRender::getVB(int id, BOOL _alt)
+VertexStagingBuffer* CRender::getVB(int id, BOOL _alt)
 {
     if (_alt)
     {
         VERIFY(id<int(xVB.size()));
-        return xVB[id];
+        return &xVB[id];
     }
     VERIFY(id<int(nVB.size()));
-    return nVB[id];
+    return &nVB[id];
 }
 
-IGLIndexBuffer* CRender::getIB(int id, BOOL _alt)
+IndexStagingBuffer* CRender::getIB(int id, BOOL _alt)
 {
     if (_alt)
     {
         VERIFY(id<int(xIB.size()));
-        return xIB[id];
+        return &xIB[id];
     }
     VERIFY(id<int(nIB.size()));
-    return nIB[id];
+    return &nIB[id];
 }
 
 FSlideWindowItem* CRender::getSWI(int id)

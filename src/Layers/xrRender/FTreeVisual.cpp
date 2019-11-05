@@ -5,7 +5,6 @@
 #include "xrEngine/Environment.h"
 #include "xrCore/FMesh.hpp"
 #include "FTreeVisual.h"
-#include "Layers/xrRenderGL/glBufferPool.h"
 
 shared_str m_xform;
 shared_str m_xform_v;
@@ -66,7 +65,7 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
     }
 
     // Geom
-    rm_geom.create(vFormat, p_rm_Vertices, p_rm_Indices);
+    rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);
 
     // Get constants
     m_xform = "m_xform";
@@ -158,6 +157,7 @@ void FTreeVisual::Copy(dxRender_Visual* pSrc)
         p_rm_Vertices->AddRef();
     PCOPY(vBase);
     PCOPY(vCount);
+    PCOPY(vStride);
     PCOPY(p_rm_Indices);
     if (p_rm_Indices)
         p_rm_Indices->AddRef();

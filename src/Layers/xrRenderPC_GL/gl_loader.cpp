@@ -154,17 +154,17 @@ void CRender::level_Unload()
     SWIs.clear();
 
     //*** VB/IB
-    for (IGLVertexBuffer* &buff : nVB)
-        GLBuffers.DeleteVertexBuffer(buff);
+    for (auto& buff : nVB)
+        buff.Release();
     nVB.clear();
-    for (IGLVertexBuffer* &buff : xVB)
-        GLBuffers.DeleteVertexBuffer(buff);
+    for (auto& buff : xVB)
+        buff.Release();
     xVB.clear();
-    for (IGLIndexBuffer* &buff : nIB)
-        GLBuffers.DeleteIndexBuffer(buff);
+    for (auto& buff : nIB)
+        buff.Release();
     nIB.clear();
-    for (IGLIndexBuffer* &buff : xIB)
-        GLBuffers.DeleteIndexBuffer(buff);
+    for (auto& buff : xIB)
+        buff.Release();
     xIB.clear();
     nDC.clear();
     xDC.clear();
@@ -187,7 +187,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     // Vertex buffers
     {
         xr_vector<VertexDeclarator>& _DC = alternative ? xDC : nDC;
-        xr_vector<IGLVertexBuffer*>& _VB = alternative ? xVB : nVB;
+        xr_vector<VertexStagingBuffer>& _VB = alternative ? xVB : nVB;
 
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
@@ -213,17 +213,17 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             Msg("* [Loading VB] %d verts, %d Kb", vCount, vCount * vSize / 1024);
 
             //	Check if buffer is less then 2048 kb
-            BYTE* pData = xr_alloc<BYTE>(vCount * vSize);
+            _VB[i].Create(vCount * vSize);
+            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
-            GLBuffers.CreateVertexBuffer(_VB[i], pData, vCount * vSize);
-            xr_free(pData);
+            _VB[i].Unmap(true); // upload vertex data
         }
         fs->close();
     }
 
     // Index buffers
     {
-        xr_vector<IGLIndexBuffer*>& _IB = alternative ? xIB : nIB;
+        xr_vector<IndexStagingBuffer>& _IB = alternative ? xIB : nIB;
 
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
@@ -234,10 +234,10 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             Msg("* [Loading IB] %d indices, %d Kb", iCount, iCount * 2 / 1024);
 
             //	Check if buffer is less then 2048 kb
-            BYTE* pData = xr_alloc<BYTE>(iCount * 2);
+            _IB[i].Create(iCount * 2);
+            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
             fs->r(pData, iCount * 2);
-            GLBuffers.CreateIndexBuffer(_IB[i], pData, iCount * 2);
-            xr_free(pData);
+            _IB[i].Unmap(true); // upload index data
         }
         fs->close();
     }

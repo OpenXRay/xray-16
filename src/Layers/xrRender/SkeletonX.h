@@ -116,6 +116,7 @@ public:
         Parent = nullptr;
         ChildIDX = u16(-1);
     }
+    virtual ~CSkeletonX() = default;
 
     virtual void SetParent(CKinematics* K) { Parent = K; }
     virtual void AfterLoad(CKinematics* parent, u16 child_idx) = 0;
@@ -124,14 +125,6 @@ public:
         IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id) = 0;
     virtual void FillVertices(
         const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size, u16 bone_id) = 0;
-
-#ifndef USE_DX9
-protected:
-    void _DuplicateIndices(const char* N, IReader* data);
-
-    //	Index buffer replica since we can't read from index buffer in DX10
-    ref_smem<u16> m_Indices;
-#endif //	USE_DX10
 };
 
 template <typename T_vertex, typename T_buffer>
@@ -157,25 +150,15 @@ BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result&
     return FALSE;
 }
 
-#ifndef USE_DX9
 template <typename T>
 BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
 {
-    VERIFY(!"Not implemented");
-    return FALSE;
-}
-#else //	USE_DX10
-template <typename T>
-BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
-    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    T* vertices;
-    CHK_DX(V->p_rm_Vertices->Lock(V->vBase, V->vCount, (void**)&vertices, D3DLOCK_READONLY));
+    void* data = static_cast<BYTE*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true)); // read-back
+    T* vertices = static_cast<T*>(data);
     bool intersect = !!pick_bone<T, T*>(vertices, Parent, r, dist, S, D, indices, faces);
-    CHK_DX(V->p_rm_Vertices->Unlock());
+    V->p_rm_Vertices->Unmap();
     return intersect;
 }
-#endif //	USE_DX10
 
 #endif // SkeletonXH
