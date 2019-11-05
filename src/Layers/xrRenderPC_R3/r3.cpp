@@ -612,7 +612,7 @@ IRenderVisual* CRender::getVisual(int id)
     VERIFY(id < int(Visuals.size()));
     return Visuals[id];
 }
-D3DVERTEXELEMENT9* CRender::getVB_Format(int id, bool alternative)
+VertexElement* CRender::getVB_Format(int id, bool alternative)
 {
     if (alternative)
     {

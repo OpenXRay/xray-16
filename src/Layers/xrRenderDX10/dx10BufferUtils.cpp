@@ -207,6 +207,7 @@ void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
         return;
     }
 
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
@@ -286,7 +287,7 @@ bool IndexStagingBuffer::IsValid() const
 void* IndexStagingBuffer::Map(
     size_t offset /*= 0*/,
     size_t size /*= 0*/,
-    bool read /*= LOCKFLAG_NOT_SET*/)
+    bool read /*= false*/)
 {
     VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
     VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
@@ -303,6 +304,7 @@ void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
         return;
     }
 
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device

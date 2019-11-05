@@ -46,7 +46,7 @@ float errN(Fvector3 v, u8* qv)
 float errN(Fvector3 /*v*/, u8* /*qv*/) { return 0; }
 #endif
 
-static D3DVERTEXELEMENT9 dwDecl_01W[] = // 36bytes
+static VertexElement dwDecl_01W[] = // 36bytes
 {
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // P : 2 : -12..+12
     {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0}, // N, w=index(RC, 0..1) : 1 : -1..+1
@@ -92,7 +92,7 @@ struct vertHW_1W
     }
 };
 
-static D3DVERTEXELEMENT9 dwDecl_2W[] = // 44bytes
+static VertexElement dwDecl_2W[] = // 44bytes
 {
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
     // n.xyz, w=weight : 1 : -1..+1, w=0..1
@@ -147,7 +147,7 @@ struct vertHW_2W
         p.lerp(P0, P1, get_weight());
     }
 };
-static D3DVERTEXELEMENT9 dwDecl_3W[] = // 44bytes
+static VertexElement dwDecl_3W[] = // 44bytes
 {
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
     // n.xyz, w=weight0 : 1 : -1..+1, w=0..1
@@ -227,7 +227,7 @@ struct vertHW_3W
     }
 };
 
-static D3DVERTEXELEMENT9 dwDecl_4W[] = // 40bytes
+static VertexElement dwDecl_4W[] = // 40bytes
 {
     // p : 2 : -12..+12
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},

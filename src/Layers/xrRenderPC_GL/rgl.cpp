@@ -564,7 +564,7 @@ IRenderVisual* CRender::getVisual(int id)
     return Visuals[id];
 }
 
-D3DVERTEXELEMENT9* CRender::getVB_Format(int id, BOOL _alt)
+VertexElement* CRender::getVB_Format(int id, BOOL _alt)
 {
     if (_alt)
     {

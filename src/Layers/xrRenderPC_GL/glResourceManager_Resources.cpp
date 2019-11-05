@@ -293,7 +293,7 @@ void CResourceManager::_DeleteRT(const CRT* RT)
 //--------------------------------------------------------------------------------------------------------------
 void CResourceManager::DBG_VerifyGeoms() {}
 
-SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib)
+SGeometry* CResourceManager::CreateGeom(VertexElement* decl, GLuint vb, GLuint ib)
 {
     R_ASSERT(decl && vb);
 

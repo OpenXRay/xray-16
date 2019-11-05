@@ -26,7 +26,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
     dxRender_Visual::Load(N, data, dwFlags);
 
     u32 fvf = 0;
-    D3DVERTEXELEMENT9* vFormat = nullptr;
+    VertexElement* vFormat = nullptr;
     dwPrimitives = 0;
     BOOL loaded_v = false;
 
@@ -69,7 +69,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast = new IRender_Mesh();
 
             // verts
-            D3DVERTEXELEMENT9* fmt = nullptr;
+            VertexElement* fmt = nullptr;
             ID = def().r_u32();
             m_fast->vBase = def().r_u32();
             m_fast->vCount = def().r_u32();

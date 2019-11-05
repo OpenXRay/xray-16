@@ -119,17 +119,17 @@ void CResourceManager::_DeletePass(const SPass* P)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-static BOOL dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
+static BOOL dcl_equal(VertexElement* a, VertexElement* b)
 {
     // check sizes
     u32 a_size = GetDeclLength(a);
     u32 b_size = GetDeclLength(b);
     if (a_size != b_size)
         return FALSE;
-    return 0 == memcmp(a, b, a_size * sizeof(D3DVERTEXELEMENT9));
+    return 0 == memcmp(a, b, a_size * sizeof(VertexElement));
 }
 
-SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
+SDeclaration* CResourceManager::_CreateDecl(VertexElement* dcl)
 {
     // Search equal code
     for (SDeclaration* D : v_declarations)
@@ -296,7 +296,7 @@ void CResourceManager::DBG_VerifyGeoms()
     */
 }
 
-SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+SGeometry* CResourceManager::CreateGeom(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     R_ASSERT(decl && vb);
 
@@ -320,9 +320,9 @@ SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffe
 
     return Geom;
 }
-SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+SGeometry* CResourceManager::CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
 {
-    D3DVERTEXELEMENT9 dcl[MAX_FVF_DECL_SIZE];
+    VertexElement dcl[MAX_FVF_DECL_SIZE];
     CHK_DX(D3DXDeclaratorFromFVF(FVF, dcl));
     SGeometry* g = CreateGeom(dcl, vb, ib);
     return g;
