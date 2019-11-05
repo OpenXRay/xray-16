@@ -4,7 +4,6 @@
 #include "FSkinned.h"
 #include "SkeletonX.h"
 #include "Layers/xrRender/BufferUtils.h"
-#include "Layers/xrRenderGL/glBufferPool.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
 

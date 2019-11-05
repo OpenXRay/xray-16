@@ -13,7 +13,6 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
-#include "Layers/xrRenderGL/glBufferPool.h"
 
 CRender RImplementation;
 

@@ -15,7 +15,6 @@
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
-#include "Layers/xrRenderGL/glBufferPool.h"
 
 class dxRender_Visual;
 

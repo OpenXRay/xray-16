@@ -14,7 +14,6 @@
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
-#include "Layers/xrRenderGL/glBufferPool.h"
 #else
 #include "FMesh.h"
 #include "FVisual.h"
