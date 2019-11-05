@@ -20,7 +20,7 @@ float4 _main ( _input I )
 float4 _main ( _input I, uint iSample )
 #endif
 {
-	gbuffer_data gbd0 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5 * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
+	gbuffer_data gbd0 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5 * pos_decompression_params2.zw, I.pos2d * 2, uint(ISAMPLE)) );
 
 	float3	P = gbd0.P.xyz;
 	float3	N = gbd0.N.xyz;

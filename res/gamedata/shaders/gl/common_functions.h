@@ -191,10 +191,10 @@ float gbuf_pack_hemi_mtl( float hemi, float mtl )
 	//	Clamp hemi max value
 	uint packed_hemi = ( MUST_BE_SET + ( uint( saturate(hemi) * 255.9 ) << 13 ) + ( ( packed_mtl & uint( 31 ) ) << 21 ) );
 
-   if( ( packed_hemi & USABLE_BIT_13 ) == 0 )
+   if( ( packed_hemi & USABLE_BIT_13 ) == 0u )
       packed_hemi |= USABLE_BIT_14;
 
-   if( ( packed_mtl & uint( 16 ) ) != 0 )
+   if( ( packed_mtl & uint( 16 ) ) != 0u )
       packed_hemi |= USABLE_BIT_15;
 
    return asfloat( packed_hemi );
@@ -209,7 +209,7 @@ float gbuf_unpack_hemi( float mtl_hemi )
 float gbuf_unpack_mtl( float mtl_hemi )
 {
    uint packed_mtl       = asuint( mtl_hemi );
-   uint packed_hemi  = ( ( packed_mtl >> 21 ) & uint(15) ) + ( ( packed_mtl & USABLE_BIT_15 ) == 0 ? 0 : 16 );
+   uint packed_hemi  = ( ( packed_mtl >> 21 ) & uint(15) ) + ( ( packed_mtl & USABLE_BIT_15 ) == 0u ? 0u : 16u );
    return float( packed_hemi ) * (1.0/31.0) * 1.333333333;
 }
 
@@ -287,14 +287,14 @@ gbuffer_data gbuffer_load_data( float2 tc, float4 pos2d, uint iSample )
 
 gbuffer_data gbuffer_load_data( float2 tc, float4 pos2d )
 {
-   return gbuffer_load_data( tc, pos2d, 0 );
+   return gbuffer_load_data( tc, pos2d, 0u );
 }
 
 gbuffer_data gbuffer_load_data_offset( float2 tc, float2 OffsetTC, float4 pos2d )
 {
 	float4  delta	  = float4( ( OffsetTC - tc ) * pos_decompression_params2.xy, 0, 0 );
 
-	return gbuffer_load_data( OffsetTC, pos2d + delta, 0 );
+	return gbuffer_load_data( OffsetTC, pos2d + delta, 0u );
 }
 
 gbuffer_data gbuffer_load_data_offset( float2 tc, float2 OffsetTC, float4 pos2d, uint iSample )
@@ -342,12 +342,12 @@ gbuffer_data gbuffer_load_data( float2 tc, uint iSample )
 
 gbuffer_data gbuffer_load_data( float2 tc  )
 {
-   return gbuffer_load_data( tc, 0 );
+   return gbuffer_load_data( tc, 0u );
 }
 
 gbuffer_data gbuffer_load_data_offset( float2 tc, float2 OffsetTC, uint iSample )
 {
-   return gbuffer_load_data( OffsetTC, iSample );
+   return gbuffer_load_data( OffsetTC, uint(iSample) );
 }
 
 #endif // GBUFFER_OPTIMIZATION

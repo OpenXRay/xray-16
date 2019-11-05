@@ -32,13 +32,13 @@ c2_out _main( v2p_aa_AA I )
 
 /*	
 #ifdef USE_MSAA
-	[unroll] for( int iSample = 0; iSample < MSAA_SAMPLES; ++iSample )
+	[unroll] for( uint iSample = 0u; iSample < uint(MSAA_SAMPLES); ++iSample )
 	{
 #else // USE_MSAA	
-	int iSample = 0;
+	uint iSample = 0u;
 #endif
 */
-	int iSample = 0;
+	uint iSample = 0u;
 
 #ifdef GBUFFER_OPTIMIZATION
 	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, I.HPos, iSample );

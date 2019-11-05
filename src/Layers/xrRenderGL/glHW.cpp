@@ -85,6 +85,12 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
+    if (!GLEW_ARB_separate_shader_objects)
+    {
+        Msg("Mandatory extension GL_ARB_separate_shader_objects missing.");
+        return;
+    }
+
     Console->Execute("rs_v_sync apply");
 
 #ifdef DEBUG
@@ -145,8 +151,8 @@ void CHW::SetPrimaryAttributes()
 
     if (!strstr(Core.Params, "-no_gl_context"))
     {
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     }
 }
 

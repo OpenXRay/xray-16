@@ -24,7 +24,7 @@ float4 _main ( float4 tc )
 //	float4 _N		= tex2Dproj 	(s_normal,   tc); 
 	float2	tcProj	= tc.xy / tc.w;
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d, uint(ISAMPLE)) );
 
 	float4 _P		= float4( gbd.P,gbd.mtl );
 	float4 _N		= float4( gbd.N,gbd.hemi );

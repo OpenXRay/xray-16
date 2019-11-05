@@ -17,7 +17,7 @@ float4 	_main	( p_aa_AA_sun I )
 #endif
 #endif
 {
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, pos2d, uint(ISAMPLE)) );
 
 //  float4 _P		= tex2D 	(s_position, 	I.tc); 
 //  float4  _N		= tex2D 	(s_normal,   	I.tc); 

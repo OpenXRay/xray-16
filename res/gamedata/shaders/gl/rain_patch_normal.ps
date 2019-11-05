@@ -73,13 +73,13 @@ float4 _main ( float2 tc, float2 tcJ )
 #ifdef MSAA_OPTIMIZATION
 	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, iSample );
 #else
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, ISAMPLE );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, uint(ISAMPLE) );
 #endif
 #else
 #ifdef MSAA_OPTIMIZATION
 	gbuffer_data gbd = gbuffer_load_data( tc, iSample );
 #else
-	gbuffer_data gbd = gbuffer_load_data( tc, ISAMPLE );
+	gbuffer_data gbd = gbuffer_load_data( tc, uint(ISAMPLE) );
 #endif
 #endif
 	float4 _P = float4( gbd.P, 1.0 );

@@ -25,7 +25,7 @@ float4 _main ( v2p_volume I  )
 {
 	//float4 _P = tex2D( s_position, tc );
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, I.hpos, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, I.hpos, uint(ISAMPLE)) );
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
@@ -50,7 +50,7 @@ float4 _main ( v2p_volume I )
 	//float4 	_P	= tex2D( s_position, tc );
 	//float4	_N	= tex2D( s_normal, tc );
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc.xy/I.tc.w, I.hpos, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc.xy/I.tc.w, I.hpos, uint(ISAMPLE)) );
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset

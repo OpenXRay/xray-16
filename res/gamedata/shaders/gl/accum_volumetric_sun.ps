@@ -51,7 +51,7 @@ float4 	_main (v2p_volume  I)
 	float2	tc  = I.tc.xy/I.tc.w;
 	float4	pos2d = I.hpos;
 	
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(tc, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(tc, pos2d, uint(ISAMPLE)) );
 
 #ifndef	SUN_SHAFTS_QUALITY
 	return float4(0,0,0,0);

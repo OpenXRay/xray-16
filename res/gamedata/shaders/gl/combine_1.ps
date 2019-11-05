@@ -74,7 +74,7 @@ _out _main ( _input I )
 _out _main ( _input I, uint iSample )
 #endif
 {
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc0.xy, I.pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc0.xy, I.pos2d, uint(ISAMPLE)) );
 	
 	// Sample the buffers:
 	float4	P = float4( gbd.P, gbd.mtl );	// position.(mtl or sun)

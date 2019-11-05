@@ -33,7 +33,7 @@ float4 _main( p_volume I )
 
 	float2	tcProj			= I.tc.xy / I.tc.w;
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d, uint(ISAMPLE)) );
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
