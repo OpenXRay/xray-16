@@ -210,8 +210,6 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 void CInput::MouseUpdate()
 {
-    SDL_PumpEvents();
-
     const auto mousePrev = mouseState;
 
     bool mouseMoved = false;
@@ -274,8 +272,6 @@ void CInput::MouseUpdate()
 
 void CInput::KeyUpdate()
 {
-    SDL_PumpEvents();
-
     SDL_Event events[MAX_KEYBOARD_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
         SDL_GETEVENT, SDL_KEYDOWN, SDL_TEXTINPUT);
@@ -315,8 +311,6 @@ void CInput::KeyUpdate()
 
 void CInput::GameControllerUpdate()
 {
-    SDL_PumpEvents();
-
     const auto controllerPrev = controllerState;
 
     SDL_Event events[MAX_CONTROLLER_EVENTS];
