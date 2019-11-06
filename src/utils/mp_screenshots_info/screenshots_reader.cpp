@@ -106,7 +106,7 @@ bool const reader::verify()
     const size_t jpeg_info_size = xr_strlen(jpeg_info_start) + 1; // ending zero
     const size_t jpeg_full_size = m_info_pos + jpeg_info_size;
 
-    return m_verifyer.verify(m_jpeg_data, jpeg_full_size, tmp_sign);
+    return m_verifyer.verify(m_jpeg_data, jpeg_full_size, tmp_sign).has_value();
 }
 
 } // namespace screenshots

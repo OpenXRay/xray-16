@@ -11,7 +11,7 @@ xr_dsa_verifyer::xr_dsa_verifyer(u8 const p_number[crypto::xr_dsa::public_key_le
 }
 
 xr_dsa_verifyer::~xr_dsa_verifyer() {}
-std::pair<bool, const crypto::xr_sha1::hash_t&> xr_dsa_verifyer::verify(u8 const* data, u32 data_size, shared_str const& dsign)
+std::optional<crypto::xr_sha1::hash_t> xr_dsa_verifyer::verify(u8 const* data, u32 data_size, shared_str const& dsign)
 {
     crypto::xr_sha1::hash_t hash{};
     crypto::xr_sha1::calculate(hash, data, data_size);
@@ -23,5 +23,5 @@ std::pair<bool, const crypto::xr_sha1::hash_t&> xr_dsa_verifyer::verify(u8 const
     FS.w_close(verify_data);
 #endif
     bool success = m_dsa.verify(m_public_key, hash.data(), crypto::xr_sha1::DIGEST_SIZE, dsign);
-    return { success, hash };
+    return success ? std::optional<crypto::xr_sha1::hash_t>{hash} : std::nullopt;
 }

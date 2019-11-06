@@ -2,6 +2,8 @@
 #ifndef XR_DSA_VERIFYER_INCLUDED
 #define XR_DSA_VERIFYER_INCLUDED
 
+#include <optional>
+
 #include <cryptopp/dsa.h>
 
 #include "xr_dsa.h"
@@ -16,7 +18,7 @@ public:
 
     ~xr_dsa_verifyer();
 
-    std::pair<bool, const crypto::xr_sha1::hash_t&> verify(u8 const* data, u32 data_size, shared_str const& dsign);
+    std::optional<crypto::xr_sha1::hash_t> verify(u8 const* data, u32 data_size, shared_str const& dsign);
 protected:
     crypto::xr_dsa::public_key_t m_public_key;
 

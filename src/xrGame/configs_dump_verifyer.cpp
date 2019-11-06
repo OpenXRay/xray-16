@@ -69,11 +69,11 @@ bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, crypto::xr_sh
     xr_strcat(dst_buffer, dst_size, add_str);
     src_data_size += xr_strlen(dst_buffer) + 1; // zero ending
 
-    auto [success, hash] = m_verifyer.verify(data, src_data_size, tmp_dsign);
-    if (!success)
+    auto hash = m_verifyer.verify(data, src_data_size, tmp_dsign);
+    if (!hash)
         return false;
 
-    CopyMemory(sha_checksum.data(), hash.data(), crypto::xr_sha1::DIGEST_SIZE);
+    CopyMemory(sha_checksum.data(), hash.value().data(), crypto::xr_sha1::DIGEST_SIZE);
 
     return true;
 }
