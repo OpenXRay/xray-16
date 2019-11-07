@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "D3DXRenderBase.h"
+#include "D3DUtils.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 

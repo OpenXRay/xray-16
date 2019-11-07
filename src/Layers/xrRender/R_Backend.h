@@ -511,8 +511,4 @@ private:
 
 extern ECORE_API CBackend RCache;
 
-#ifndef _EDITOR
-#include "D3DUtils.h"
-#endif
-
 #endif

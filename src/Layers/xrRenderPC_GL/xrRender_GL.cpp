@@ -2,6 +2,7 @@
 #include "Layers/xrRender/dxRenderFactory.h"
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
+#include "Layers/xrRender/D3DUtils.h"
 
 extern "C"
 {
