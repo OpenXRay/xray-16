@@ -5,6 +5,8 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
+ENGINE_API extern u32 Vid_SelectedRefreshRate;
+
 CHW HW;
 
 CHW::CHW() {}
@@ -155,9 +157,16 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Refresh rate
     if (bWindowed)
+    {
         P.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+        P.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    }
     else
+    {
         P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
+        P.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+    }
+
 
     // Create the device
     const auto GPU = selectGPU();
@@ -239,9 +248,15 @@ void CHW::Reset()
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
+    {
         DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
+        DevPP.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+    }
     else
+    {
         DevPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+        DevPP.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    }
 
     while (true)
     {
