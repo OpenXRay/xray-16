@@ -106,11 +106,7 @@ private:
 #endif // USE_OGL
 
     // Vertices/Indices/etc
-#ifndef USE_DX9
     SDeclaration* decl;
-#else	//	USE_DX10
-    IDirect3DVertexDeclaration9* decl;
-#endif	//	USE_DX10
     VertexBufferHandle vb;
     IndexBufferHandle ib;
     u32 vb_stride;
@@ -294,11 +290,7 @@ public:
     ICF void set_States(SState* _state);
     ICF void set_States(ref_state& _state) { set_States(&*_state); }
 
-#ifndef USE_DX9
     ICF void set_Format(SDeclaration* _decl);
-#else // USE_DX10
-    ICF void set_Format(IDirect3DVertexDeclaration9* _decl);
-#endif // USE_DX10
 
 #ifdef USE_OGL
     ICF void set_PS(GLuint _ps, LPCSTR _n = 0);
