@@ -327,6 +327,7 @@ void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
         return;
     }
 
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
@@ -424,6 +425,7 @@ void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
         return;
     }
 
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device

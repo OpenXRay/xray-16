@@ -95,13 +95,13 @@ private:
     ref_texture m_HHGGTexture;
 
     ref_geom m_GeomGridBox;
-    ID3DVertexBuffer* m_pGridBoxVertexBuffer;
-    ID3DIndexBuffer* m_pGridBoxIndexBuffer;
+    VertexStagingBuffer m_pGridBoxVertexBuffer;
+    IndexStagingBuffer m_pGridBoxIndexBuffer;
     int m_iGridBoxVertNum;
     int m_iGridBoxFaceNum;
 
     ref_geom m_GeomQuadVertex;
-    ID3DVertexBuffer* m_pQuadVertexBuffer;
+    VertexStagingBuffer m_pQuadVertexBuffer;
 
     //	Cache vectors to avoid memory reallocations
     //	TODO: DX10: Reserve memory on object creation

@@ -4,7 +4,6 @@
 #include "xrCore/FMesh.hpp"
 #include "FVisual.h"
 #include "Layers/xrRender/BufferUtils.h"
-#include "Layers/xrRenderGL/glBufferPool.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -13,10 +12,6 @@
 Fvisual::Fvisual() : dxRender_Visual() { m_fast = nullptr; }
 Fvisual::~Fvisual()
 {
-#ifndef USE_OGL
-    HW.stats_manager.decrement_stats_vb(p_rm_Vertices);
-    HW.stats_manager.decrement_stats_ib(p_rm_Indices);
-#endif
     xr_delete(m_fast);
 }
 
@@ -26,7 +21,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
     dxRender_Visual::Load(N, data, dwFlags);
 
     u32 fvf = 0;
-    D3DVERTEXELEMENT9* vFormat = nullptr;
+    VertexElement* vFormat = nullptr;
     dwPrimitives = 0;
     BOOL loaded_v = false;
 
@@ -69,7 +64,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast = new IRender_Mesh();
 
             // verts
-            D3DVERTEXELEMENT9* fmt = nullptr;
+            VertexElement* fmt = nullptr;
             ID = def().r_u32();
             m_fast->vBase = def().r_u32();
             m_fast->vCount = def().r_u32();
@@ -91,7 +86,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast->p_rm_Indices->AddRef();
 
             // geom
-            m_fast->rm_geom.create(fmt, m_fast->p_rm_Vertices, m_fast->p_rm_Indices);
+            m_fast->rm_geom.create(fmt, *m_fast->p_rm_Vertices, *m_fast->p_rm_Indices);
         }
     }
 
@@ -121,24 +116,12 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             vCount = data->r_u32();
 
             VERIFY(nullptr == p_rm_Vertices);
-#ifdef USE_OGL
-            u32 vStride = GetFVFVertexSize(fvf);
-            GLBuffers.CreateVertexBuffer(p_rm_Vertices, data->pointer(), vCount * vStride);
-#elif defined(USE_DX10) || defined(USE_DX11)
-            u32 vStride = GetFVFVertexSize(fvf);
-            R_CHK(BufferUtils::CreateVertexBuffer(&p_rm_Vertices, data->pointer(), vCount * vStride));
-            HW.stats_manager.increment_stats_vb(p_rm_Vertices);
-#else //    USE_DX10
-            u32 vStride = GetFVFVertexSize(fvf);
-            BOOL bSoft = HW.Caps.geometry.bSoftware;
-            u32 dwUsage = D3DUSAGE_WRITEONLY | (bSoft ? D3DUSAGE_SOFTWAREPROCESSING : 0);
-            BYTE* bytes = nullptr;
-            R_CHK(HW.pDevice->CreateVertexBuffer(vCount * vStride, dwUsage, 0, D3DPOOL_MANAGED, &p_rm_Vertices, nullptr));
-            HW.stats_manager.increment_stats_vb(p_rm_Vertices);
-            R_CHK(p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
+            vStride = GetFVFVertexSize(fvf);
+            p_rm_Vertices = new VertexStagingBuffer{};
+            p_rm_Vertices->Create(vCount * vStride);
+            BYTE* bytes = static_cast<BYTE*>(p_rm_Vertices->Map());
             CopyMemory(bytes, data->pointer(), vCount * vStride);
-            p_rm_Vertices->Unlock();
-#endif //   USE_DX10
+            p_rm_Vertices->Unmap(true); // upload vertex data
         }
     }
 
@@ -167,31 +150,20 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             dwPrimitives = iCount / 3;
 
             VERIFY(nullptr == p_rm_Indices);
-#ifdef USE_OGL
-            GLBuffers.CreateIndexBuffer(p_rm_Indices, data->pointer(), iCount * 2);
-#elif defined(USE_DX10) || defined(USE_DX11)
-            R_CHK(BufferUtils::CreateIndexBuffer(&p_rm_Indices, data->pointer(), iCount * 2));
-            HW.stats_manager.increment_stats_ib(p_rm_Indices);
-#else // USE_DX10
-            BOOL bSoft = HW.Caps.geometry.bSoftware;
-            u32 dwUsage = /*D3DUSAGE_WRITEONLY |*/ (
-                bSoft ? D3DUSAGE_SOFTWAREPROCESSING : 0); // indices are read in model-wallmarks code
-            BYTE* bytes = nullptr;
-            R_CHK(HW.pDevice->CreateIndexBuffer(iCount * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &p_rm_Indices, nullptr));
-            HW.stats_manager.increment_stats_ib(p_rm_Indices);
-            R_CHK(p_rm_Indices->Lock(0, 0, (void**)&bytes, 0));
+            p_rm_Indices = new IndexStagingBuffer{};
+            p_rm_Indices->Create(iCount * 2, true); // indices are read in model-wallmarks code
+            BYTE* bytes = static_cast<BYTE*>(p_rm_Indices->Map());
             CopyMemory(bytes, data->pointer(), iCount * 2);
-            p_rm_Indices->Unlock();
-#endif // USE_DX10
+            p_rm_Indices->Unmap(true); // upload index data
         }
     }
 
     if (dwFlags & VLOAD_NOVERTICES)
         return;
     else if (fvf)
-        rm_geom.create(fvf, p_rm_Vertices, p_rm_Indices);
+        rm_geom.create(fvf, *p_rm_Vertices, *p_rm_Indices);
     else
-        rm_geom.create(vFormat, p_rm_Vertices, p_rm_Indices);
+        rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);
 }
 
 void Fvisual::Render(float)
@@ -227,6 +199,7 @@ void Fvisual::Copy(dxRender_Visual* pSrc)
         p_rm_Vertices->AddRef();
     PCOPY(vBase);
     PCOPY(vCount);
+    PCOPY(vStride);
     PCOPY(p_rm_Indices);
     if (p_rm_Indices)
         p_rm_Indices->AddRef();

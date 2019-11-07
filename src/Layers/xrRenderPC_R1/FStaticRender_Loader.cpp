@@ -234,7 +234,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             u32 dcl_len = GetDeclLength(dcl) + 1;
 
             _DC[i].resize(dcl_len);
-            fs->r(_DC[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
+            fs->r(_DC[i].begin(), dcl_len * sizeof(VertexElement));
             //.????????? remove T&B from _DC[]
 
             // count, size
@@ -247,7 +247,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
             //			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
-            _VB[i].Unmap(); // upload vertex data
+            _VB[i].Unmap(true); // upload vertex data
 
             //			fs->advance			(vCount*vSize);
         }

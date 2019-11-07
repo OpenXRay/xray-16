@@ -441,7 +441,6 @@ public:
 #endif
 
     // Device create / destroy / frame signaling
-    void RestoreQuadIBData(); // Igor: is used to test bug with rain, particles corruption
     void CreateQuadIB();
     void OnFrameBegin();
     void OnFrameEnd();

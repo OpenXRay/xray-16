@@ -191,7 +191,7 @@ public:
     SDeclaration* _CreateDecl (u32 FVF);
 #endif
 
-    SDeclaration* _CreateDecl(D3DVERTEXELEMENT9* dcl);
+    SDeclaration* _CreateDecl(VertexElement* dcl);
     void _DeleteDecl(const SDeclaration* dcl);
 
     STextureList* _CreateTextureList(STextureList& L);
@@ -240,13 +240,8 @@ public:
         v_constant_setup.push_back(std::make_pair(shared_str(name), s));
     }
 
-#ifdef USE_OGL
-    SGeometry* CreateGeom(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
-    SGeometry* CreateGeom(u32 FVF, GLuint vb, GLuint ib);
-#else
-    SGeometry* CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-    SGeometry* CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-#endif
+    SGeometry* CreateGeom(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
+    SGeometry* CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib);
 
     void DeleteGeom(const SGeometry* VS);
     void DeferredLoad(BOOL E) { bDeferredLoad = E; }

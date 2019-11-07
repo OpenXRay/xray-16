@@ -12,8 +12,6 @@ void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<
 
 namespace BufferUtils
 {
-HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable = true);
-HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable = true);
 HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize);
 };
 

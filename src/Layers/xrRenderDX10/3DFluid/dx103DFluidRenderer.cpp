@@ -82,11 +82,11 @@ void dx103DFluidRenderer::Destroy()
     m_HHGGTexture = nullptr;
 
     m_GeomQuadVertex = nullptr;
-    _RELEASE(m_pQuadVertexBuffer);
+    m_pQuadVertexBuffer.Release();
 
     m_GeomGridBox = nullptr;
-    _RELEASE(m_pGridBoxVertexBuffer);
-    _RELEASE(m_pGridBoxIndexBuffer);
+    m_pGridBoxVertexBuffer.Release();
+    m_pGridBoxIndexBuffer.Release();
 
     DestroyShaders();
 }
@@ -127,15 +127,20 @@ void dx103DFluidRenderer::CreateGridBox()
     };
     m_iGridBoxVertNum = sizeof(vertices) / sizeof(vertices[0]);
 
-    CHK_DX(BufferUtils::CreateVertexBuffer(&m_pGridBoxVertexBuffer, vertices, sizeof(vertices)));
+    m_pGridBoxVertexBuffer.Create(sizeof(vertices));
+    BYTE* pData = static_cast<BYTE*>(m_pGridBoxVertexBuffer.Map());
+    CopyMemory(pData, vertices, sizeof(vertices));
+    m_pGridBoxVertexBuffer.Unmap(true);
 
     // Create index buffer
     u16 indices[] = {
         0, 4, 1, 1, 4, 5, 0, 1, 2, 2, 1, 3, 4, 6, 5, 6, 7, 5, 2, 3, 6, 3, 7, 6, 1, 5, 3, 3, 5, 7, 0, 2, 4, 2, 6, 4};
     m_iGridBoxFaceNum = (sizeof(indices) / sizeof(indices[0])) / 3;
 
-    CHK_DX(BufferUtils::CreateIndexBuffer(&m_pGridBoxIndexBuffer, indices, sizeof(indices)));
-    HW.stats_manager.increment_stats(sizeof(indices), enum_stats_buffer_type_index, D3DPOOL_MANAGED);
+    m_pGridBoxIndexBuffer.Create(sizeof(indices));
+    pData = static_cast<BYTE*>(m_pGridBoxIndexBuffer.Map());
+    CopyMemory(pData, indices, sizeof(indices));
+    m_pGridBoxIndexBuffer.Unmap(true);
 
     // Define the input layout
     static D3DVERTEXELEMENT9 layout[] = {
@@ -158,7 +163,10 @@ void dx103DFluidRenderer::CreateScreenQuad()
     svQuad[2].pos = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
     svQuad[3].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
 
-    CHK_DX(BufferUtils::CreateVertexBuffer(&m_pQuadVertexBuffer, svQuad, sizeof(svQuad)));
+    m_pQuadVertexBuffer.Create(sizeof(svQuad));
+    BYTE* pData = static_cast<BYTE*>(m_pQuadVertexBuffer.Map());
+    CopyMemory(pData, svQuad, sizeof(svQuad));
+    m_pQuadVertexBuffer.Unmap(true);
     m_GeomQuadVertex.create(quadlayout, m_pQuadVertexBuffer, 0);
 }
 

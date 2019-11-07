@@ -178,9 +178,9 @@ public:
 public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
-    D3DVERTEXELEMENT9* getVB_Format(int id, bool alternative = false);
-    ID3DVertexBuffer* getVB(int id, bool alternative = false);
-    ID3DIndexBuffer* getIB(int id, bool alternative = false);
+    VertexElement* getVB_Format(int id, bool alternative = false);
+    VertexStagingBuffer* getVB(int id, bool alternative = false);
+    IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();

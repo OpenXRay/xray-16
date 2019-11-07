@@ -51,10 +51,6 @@ void CSkeletonX::_Copy(CSkeletonX* B)
     RenderMode = B->RenderMode;
     RMS_boneid = B->RMS_boneid;
     RMS_bonecount = B->RMS_bonecount;
-
-#ifndef USE_DX9
-    m_Indices = B->m_Indices;
-#endif //	USE_DX10
 }
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
@@ -679,19 +675,3 @@ void CSkeletonX::_FillVerticesSoft4W(const Fmatrix& view, CSkeletonWallmark& wm,
         }
     }
 }
-
-#ifndef USE_DX9
-void CSkeletonX::_DuplicateIndices(const char* /*N*/, IReader* data)
-{
-    //	We will have trouble with container since don't know were to take readable indices
-    VERIFY(!data->find_chunk(OGF_ICONTAINER));
-    //	Index buffer replica since we can't read from index buffer in DX10
-    // ref_smem<u16>			Indices;
-    R_ASSERT(data->find_chunk(OGF_INDICES));
-    u32 iCount = data->r_u32();
-
-    u32 size = iCount * 2;
-    u32 crc = crc32(data->pointer(), size);
-    m_Indices.create(crc, iCount, (u16*)data->pointer());
-}
-#endif // !USE_DX9

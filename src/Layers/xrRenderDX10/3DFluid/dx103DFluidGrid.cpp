@@ -76,18 +76,22 @@ void dx103DFluidGrid::CreateVertexBuffers()
     VS_INPUT_FLUIDSIM_STRUCT* boundaryLines = NULL;
 
     m_iNumVerticesRenderQuad = VERTICES_PER_SLICE * m_vDim[2];
-    renderQuad = xr_alloc<VS_INPUT_FLUIDSIM_STRUCT>(m_iNumVerticesRenderQuad);
+    m_pRenderQuadBuffer.Create(vSize * m_iNumVerticesRenderQuad);
+    renderQuad = static_cast<VS_INPUT_FLUIDSIM_STRUCT*>(m_pRenderQuadBuffer.Map());
 
     m_iNumVerticesSlices = VERTICES_PER_SLICE * (m_vDim[2] - 2);
-    slices = xr_alloc<VS_INPUT_FLUIDSIM_STRUCT>(m_iNumVerticesSlices);
+    m_pSlicesBuffer.Create(vSize * m_iNumVerticesSlices);
+    slices = static_cast<VS_INPUT_FLUIDSIM_STRUCT*>(m_pSlicesBuffer.Map());
 
     m_iNumVerticesBoundarySlices = VERTICES_PER_SLICE * 2;
-    boundarySlices = xr_alloc<VS_INPUT_FLUIDSIM_STRUCT>(m_iNumVerticesBoundarySlices);
+    m_pBoundarySlicesBuffer.Create(vSize * m_iNumVerticesBoundarySlices);
+    boundarySlices = static_cast<VS_INPUT_FLUIDSIM_STRUCT*>(m_pBoundarySlicesBuffer.Map());
 
     m_iNumVerticesBoundaryLines = VERTICES_PER_LINE * LINES_PER_SLICE * (m_vDim[2]);
-    boundaryLines = xr_alloc<VS_INPUT_FLUIDSIM_STRUCT>(m_iNumVerticesBoundaryLines);
+    m_pBoundaryLinesBuffer.Create(vSize * m_iNumVerticesBoundaryLines);
+    boundaryLines = static_cast<VS_INPUT_FLUIDSIM_STRUCT*>(m_pBoundaryLinesBuffer.Map());
 
-    VERIFY(renderQuad && m_iNumVerticesSlices && m_iNumVerticesBoundarySlices && m_iNumVerticesBoundaryLines);
+    VERIFY(renderQuad && slices && boundarySlices && boundaryLines);
 
     // Vertex buffer for "m_vDim[2]" quads to draw all the slices of the 3D-texture as a flat 3D-texture
     // (used to draw all the individual slices at once to the screen buffer)
@@ -97,7 +101,7 @@ void dx103DFluidGrid::CreateVertexBuffers()
 
     // CreateVertexBuffer(sizeof(VS_INPUT_FLUIDSIM_STRUCT)*numVerticesRenderQuad,
     //	D3Dxx_BIND_VERTEX_BUFFER, &renderQuadBuffer, renderQuad, numVerticesRenderQuad));
-    CHK_DX(BufferUtils::CreateVertexBuffer(&m_pRenderQuadBuffer, renderQuad, vSize * m_iNumVerticesRenderQuad));
+    m_pRenderQuadBuffer.Unmap(true);
     m_GeomRenderQuad.create(layoutDesc, m_pRenderQuadBuffer, 0);
 
     // Vertex buffer for "m_vDim[2]" quads to draw all the slices to a 3D texture
@@ -108,7 +112,7 @@ void dx103DFluidGrid::CreateVertexBuffers()
     VERIFY(index == m_iNumVerticesSlices);
     // V_RETURN(CreateVertexBuffer(sizeof(VS_INPUT_FLUIDSIM_STRUCT)*numVerticesSlices,
     //	D3Dxx_BIND_VERTEX_BUFFER, &slicesBuffer, slices , numVerticesSlices));
-    CHK_DX(BufferUtils::CreateVertexBuffer(&m_pSlicesBuffer, slices, vSize * m_iNumVerticesSlices));
+    m_pSlicesBuffer.Unmap(true);
     m_GeomSlices.create(layoutDesc, m_pSlicesBuffer, 0);
 
     // Vertex buffers for boundary geometry
@@ -118,8 +122,7 @@ void dx103DFluidGrid::CreateVertexBuffers()
     VERIFY(index == m_iNumVerticesBoundarySlices);
     // V_RETURN(CreateVertexBuffer(sizeof(VS_INPUT_FLUIDSIM_STRUCT)*numVerticesBoundarySlices,
     //	D3Dxx_BIND_VERTEX_BUFFER, &boundarySlicesBuffer, boundarySlices, numVerticesBoundarySlices));
-    CHK_DX(BufferUtils::CreateVertexBuffer(
-        &m_pBoundarySlicesBuffer, boundarySlices, vSize * m_iNumVerticesBoundarySlices));
+    m_pBoundarySlicesBuffer.Unmap(true);
     m_GeomBoundarySlices.create(layoutDesc, m_pBoundarySlicesBuffer, 0);
 
     //   ( 4 * "m_vDim[2]" ) boundary lines
@@ -128,29 +131,16 @@ void dx103DFluidGrid::CreateVertexBuffers()
     VERIFY(index == m_iNumVerticesBoundaryLines);
     // V_RETURN(CreateVertexBuffer(sizeof(VS_INPUT_FLUIDSIM_STRUCT)*numVerticesBoundaryLines,
     //	D3Dxx_BIND_VERTEX_BUFFER, &boundaryLinesBuffer, boundaryLines, numVerticesBoundaryLines));
-    CHK_DX(BufferUtils::CreateVertexBuffer(
-        &m_pBoundaryLinesBuffer, boundaryLines, vSize * m_iNumVerticesBoundaryLines));
+    m_pBoundaryLinesBuffer.Unmap(true);
     m_GeomBoundaryLines.create(layoutDesc, m_pBoundaryLinesBuffer, 0);
-
-    // cleanup:
-    xr_free(renderQuad);
-
-    xr_free(slices);
-    slices = NULL;
-
-    xr_free(boundarySlices);
-    boundarySlices = NULL;
-
-    xr_free(boundaryLines);
-    boundaryLines = NULL;
 }
 
 void dx103DFluidGrid::DestroyVertexBuffers()
 {
-    _RELEASE(m_pRenderQuadBuffer);
-    _RELEASE(m_pSlicesBuffer);
-    _RELEASE(m_pBoundarySlicesBuffer);
-    _RELEASE(m_pBoundaryLinesBuffer);
+    m_pRenderQuadBuffer.Release();
+    m_pSlicesBuffer.Release();
+    m_pBoundarySlicesBuffer.Release();
+    m_pBoundaryLinesBuffer.Release();
 }
 
 void dx103DFluidGrid::InitScreenSlice(VS_INPUT_FLUIDSIM_STRUCT** vertices, int z, int& index)

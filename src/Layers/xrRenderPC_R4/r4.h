@@ -157,7 +157,7 @@ public:
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
     xr_vector<ref_shader> Shaders;
-    typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
+    typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<VertexStagingBuffer> nVB, xVB;
     xr_vector<IndexStagingBuffer> nIB, xIB;
@@ -221,9 +221,9 @@ public:
 public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
-    D3DVERTEXELEMENT9* getVB_Format(int id, bool alternative = false);
-    ID3DVertexBuffer* getVB(int id, bool alternative = false);
-    ID3DIndexBuffer* getIB(int id, bool alternative = false);
+    VertexElement* getVB_Format(int id, bool alternative = false);
+    VertexStagingBuffer* getVB(int id, bool alternative = false);
+    IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();
