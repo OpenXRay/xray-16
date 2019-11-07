@@ -52,13 +52,19 @@ void D3DXRenderBase::updateGamma()
 
 void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 {
-    m_WireShader.destroy();
-    m_SelectionShader.destroy();
+    if (!GEnv.isDedicatedServer)
+    {
+        DUImpl.OnDeviceDestroy();
+        m_SelectionShader.destroy();
+        m_WireShader.destroy();
+    }
+    destroy();
+
     Resources->OnDeviceDestroy(bKeepTextures);
     RCache.OnDeviceDestroy();
 }
 
-void D3DXRenderBase::DestroyHW()
+void D3DXRenderBase::Destroy()
 {
     xr_delete(Resources);
     HW.DestroyDevice();
