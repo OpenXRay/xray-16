@@ -379,8 +379,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     {
         V.vStride = GetDeclVertexSize(dwDecl_01W, 0);
         VERIFY(NULL == V.p_rm_Vertices);
-        m_pVertices = xr_make_unique<VertexStagingBuffer>();
-        V.p_rm_Vertices = m_pVertices.get();
+        V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
         BYTE* bytes = static_cast<BYTE*>(V.p_rm_Vertices->Map());
         vertHW_1W* dst = (vertHW_1W*)bytes;
@@ -401,8 +400,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     {
         V.vStride = GetDeclVertexSize(dwDecl_2W, 0);
         VERIFY(NULL == V.p_rm_Vertices);
-        m_pVertices = xr_make_unique<VertexStagingBuffer>();
-        V.p_rm_Vertices = m_pVertices.get();
+        V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
         BYTE* bytes = static_cast<BYTE*>(V.p_rm_Vertices->Map());
         vertHW_2W* dst = (vertHW_2W*)bytes;
@@ -424,8 +422,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     {
         V.vStride = GetDeclVertexSize(dwDecl_3W, 0);
         VERIFY(NULL == V.p_rm_Vertices);
-        m_pVertices = xr_make_unique<VertexStagingBuffer>();
-        V.p_rm_Vertices = m_pVertices.get();
+        V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
         BYTE* bytes = static_cast<BYTE*>(V.p_rm_Vertices->Map());
         vertHW_3W* dst = (vertHW_3W*)bytes;
@@ -448,8 +445,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     {
         V.vStride = GetDeclVertexSize(dwDecl_4W, 0);
         VERIFY(NULL == V.p_rm_Vertices);
-        m_pVertices = xr_make_unique<VertexStagingBuffer>();
-        V.p_rm_Vertices = m_pVertices.get();
+        V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true);  // VB may be read by wallmarks code
         BYTE* bytes = static_cast<BYTE*>(V.p_rm_Vertices->Map());
         vertHW_4W* dst = (vertHW_4W*)bytes;

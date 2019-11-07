@@ -11,8 +11,6 @@
 struct SEnumVerticesCallback;
 class CSkeletonX_ext : public CSkeletonX // shared code for SkeletonX derivates
 {
-public:
-    ~CSkeletonX_ext() override = default;
 protected:
     virtual void _Load_hw(Fvisual& V, void* data);
 
@@ -49,8 +47,6 @@ protected:
 
     virtual BOOL _PickBone(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
         u16 bone_id, u32 iBase, u32 iCount);
-private:
-    xr_unique_ptr<VertexStagingBuffer> m_pVertices{};
 };
 
 class CSkeletonX_ST : public Fvisual, public CSkeletonX_ext
