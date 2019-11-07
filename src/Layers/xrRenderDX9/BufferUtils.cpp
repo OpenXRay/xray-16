@@ -124,7 +124,7 @@ IndexStagingBuffer::~IndexStagingBuffer()
     Destroy();
 }
 
-void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
+void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/, bool managed /*= true*/)
 {
     m_Size = size;
     m_AllowReadBack = allowReadBack;
@@ -132,7 +132,7 @@ void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
     u32 dwUsage = m_AllowReadBack ? 0 : D3DUSAGE_WRITEONLY;
     if (HW.Caps.geometry.bSoftware)
         dwUsage |= D3DUSAGE_SOFTWAREPROCESSING;
-    R_CHK(HW.pDevice->CreateIndexBuffer(size, dwUsage, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &m_DeviceBuffer, NULL));
+    R_CHK(HW.pDevice->CreateIndexBuffer(size, dwUsage, D3DFMT_INDEX16, managed ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT, &m_DeviceBuffer, NULL));
 
     HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
     AddRef();

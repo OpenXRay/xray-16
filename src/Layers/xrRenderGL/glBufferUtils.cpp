@@ -391,7 +391,7 @@ IndexStagingBuffer::~IndexStagingBuffer()
     Destroy();
 }
 
-void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
+void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/, bool /*managed = true*/)
 {
     m_Size = size;
     m_AllowReadBack = allowReadBack;

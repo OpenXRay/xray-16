@@ -91,7 +91,7 @@ public:
     IndexStagingBuffer();
     ~IndexStagingBuffer();
 
-    void Create(size_t size, bool allowReadBack = false);
+    void Create(size_t size, bool allowReadBack = false, bool managed = true);
     bool IsValid() const;
     void* Map(size_t offset = 0, size_t size = 0, bool read = false);
     void Unmap(bool doFlush = false);

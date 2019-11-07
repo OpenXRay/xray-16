@@ -9,7 +9,7 @@ void CBackend::CreateQuadIB()
     constexpr auto idxCount = triCount * 2 * 3;
     constexpr auto idxSize = idxCount * sizeof(u16);
 
-    QuadIB.Create(idxSize);
+    QuadIB.Create(idxSize, false, false);
 
     u16* Indices = static_cast<u16*>(QuadIB.Map());
     {
