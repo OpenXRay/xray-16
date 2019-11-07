@@ -444,21 +444,8 @@ public:
     // Debug render
     void dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
     void dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-#ifndef USE_DX9
-    //	TODO: DX10: Implement this.
-    IC void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { VERIFY(!"Not implemented"); }
-    IC void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value) { VERIFY(!"Not implemented"); }
-#else // USE_DX10
-    void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)
-    {
-        CHK_DX(HW.pDevice->SetRenderState(p1, p2));
-    }
-
-    void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
-    {
-        CHK_DX(HW.pDevice->SetSamplerState(sampler, type, value));
-    }
-#endif // USE_DX10
+    void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2);
+    void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value);
 #ifdef DEBUG
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt);
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
