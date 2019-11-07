@@ -61,7 +61,7 @@ void* VertexStagingBuffer::Map(
     return m_HostBuffer;
 }
 
-void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
+void VertexStagingBuffer::Unmap(bool /*doFlush = false*/)
 {
     VERIFY(IsValid());
     R_CHK(m_DeviceBuffer->Unlock());
@@ -157,7 +157,7 @@ void* IndexStagingBuffer::Map(
     return m_HostBuffer;
 }
 
-void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
+void IndexStagingBuffer::Unmap(bool /*doFlush = false*/)
 {
     VERIFY(IsValid());
     R_CHK(m_DeviceBuffer->Unlock());
