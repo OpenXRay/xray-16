@@ -340,13 +340,8 @@ protected: //	In DX10 we need input shader signature which is stored in ref_vs
 #if defined(USE_DX10) || defined(USE_DX11)
 public:
 #endif // USE_DX10
-#ifdef USE_OGL
-    ICF	void set_Vertices(GLuint _vb, u32 _vb_stride);
-    ICF	void set_Indices(GLuint _ib);
-#else
     ICF void set_Vertices(VertexBufferHandle _vb, u32 _vb_stride);
     ICF void set_Indices(IndexBufferHandle _ib);
-#endif // USE_OGL
     ICF void set_Geometry(SGeometry* _geom);
     ICF void set_Geometry(ref_geom& _geom) { set_Geometry(&*_geom); }
     IC void set_Stencil(u32 _enable, u32 _func = D3DCMP_ALWAYS, u32 _ref = 0x00, u32 _mask = 0x00,
