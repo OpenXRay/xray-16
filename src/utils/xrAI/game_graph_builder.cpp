@@ -434,8 +434,8 @@ float CGameGraphBuilder::path_distance(const u32& game_vertex_id0, const u32& ga
 
     VERIFY(m_graph_engine);
 
-    graph_type::CVertex& vertex0 = *graph().vertex(game_vertex_id0);
-    graph_type::CVertex& vertex1 = *graph().vertex(game_vertex_id1);
+    graph_type::CVrtx& vertex0 = *graph().vertex(game_vertex_id0);
+    graph_type::CVrtx& vertex1 = *graph().vertex(game_vertex_id1);
 
     typedef GraphEngineSpace::CStraightLineParams CStraightLineParams;
     CStraightLineParams parameters(vertex0.data().level_point(), vertex1.data().level_point());
@@ -521,8 +521,8 @@ void CGameGraphBuilder::create_tripples(const float& /*start*/, const float& /*a
 
 void CGameGraphBuilder::process_tripple(const TRIPPLE& tripple)
 {
-    const graph_type::CVertex& vertex0 = *graph().vertex(tripple.second.first);
-    const graph_type::CVertex& vertex1 = *graph().vertex(tripple.second.second);
+    const graph_type::CVrtx& vertex0 = *graph().vertex(tripple.second.first);
+    const graph_type::CVrtx& vertex1 = *graph().vertex(tripple.second.second);
 
     for (const auto &i : vertex0.edges())
     {
