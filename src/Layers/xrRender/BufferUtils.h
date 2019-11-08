@@ -63,11 +63,11 @@ public:
         return m_DeviceBuffer;
     }
 
-    bool VertexStagingBuffer::operator==(VertexBufferHandle other) const
+    bool operator==(VertexBufferHandle other) const
     {
         return other == m_DeviceBuffer;
     }
-    bool VertexStagingBuffer::operator==(const VertexStagingBuffer& other) const
+    bool operator==(const VertexStagingBuffer& other) const
     {
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
@@ -117,11 +117,11 @@ public:
         return m_DeviceBuffer;
     }
 
-    bool IndexStagingBuffer::operator==(IndexBufferHandle other) const
+    bool operator==(IndexBufferHandle other) const
     {
         return other == m_DeviceBuffer;
     }
-    bool IndexStagingBuffer::operator==(const IndexStagingBuffer& other) const
+    bool operator==(const IndexStagingBuffer& other) const
     {
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
