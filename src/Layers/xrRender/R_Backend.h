@@ -70,7 +70,7 @@ public:
     _IndexStream Index;
 
     IndexStagingBuffer QuadIB;
-    IndexStagingBuffer old_QuadIB;
+    IndexBufferHandle old_QuadIB;
 
     R_xforms xforms;
     R_hemi hemi;
