@@ -106,11 +106,7 @@ private:
 #endif // USE_OGL
 
     // Vertices/Indices/etc
-#ifndef USE_DX9
     SDeclaration* decl;
-#else	//	USE_DX10
-    IDirect3DVertexDeclaration9* decl;
-#endif	//	USE_DX10
     VertexBufferHandle vb;
     IndexBufferHandle ib;
     u32 vb_stride;
@@ -294,11 +290,7 @@ public:
     ICF void set_States(SState* _state);
     ICF void set_States(ref_state& _state) { set_States(&*_state); }
 
-#ifndef USE_DX9
     ICF void set_Format(SDeclaration* _decl);
-#else // USE_DX10
-    ICF void set_Format(IDirect3DVertexDeclaration9* _decl);
-#endif // USE_DX10
 
 #ifdef USE_OGL
     ICF void set_PS(GLuint _ps, LPCSTR _n = 0);
@@ -348,13 +340,8 @@ protected: //	In DX10 we need input shader signature which is stored in ref_vs
 #if defined(USE_DX10) || defined(USE_DX11)
 public:
 #endif // USE_DX10
-#ifdef USE_OGL
-    ICF	void set_Vertices(GLuint _vb, u32 _vb_stride);
-    ICF	void set_Indices(GLuint _ib);
-#else
     ICF void set_Vertices(VertexBufferHandle _vb, u32 _vb_stride);
     ICF void set_Indices(IndexBufferHandle _ib);
-#endif // USE_OGL
     ICF void set_Geometry(SGeometry* _geom);
     ICF void set_Geometry(ref_geom& _geom) { set_Geometry(&*_geom); }
     IC void set_Stencil(u32 _enable, u32 _func = D3DCMP_ALWAYS, u32 _ref = 0x00, u32 _mask = 0x00,
@@ -451,21 +438,8 @@ public:
     // Debug render
     void dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
     void dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-#ifndef USE_DX9
-    //	TODO: DX10: Implement this.
-    IC void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { VERIFY(!"Not implemented"); }
-    IC void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value) { VERIFY(!"Not implemented"); }
-#else // USE_DX10
-    void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)
-    {
-        CHK_DX(HW.pDevice->SetRenderState(p1, p2));
-    }
-
-    void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
-    {
-        CHK_DX(HW.pDevice->SetSamplerState(sampler, type, value));
-    }
-#endif // USE_DX10
+    void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2);
+    void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value);
 #ifdef DEBUG
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt);
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
@@ -509,9 +483,5 @@ private:
 #pragma warning(pop)
 
 extern ECORE_API CBackend RCache;
-
-#ifndef _EDITOR
-#include "D3DUtils.h"
-#endif
 
 #endif
