@@ -149,7 +149,7 @@ _DDS:
                            Extent.x, Extent.y, Extent.z));
             break;
         default:
-            assert(0);
+            NODEFAULT;
             break;
         }
 
