@@ -200,7 +200,7 @@ _DDS:
                     }
                         break;
                     default: 
-                        assert(0); 
+                        NODEFAULT; 
                         break;
                     }
                 }
