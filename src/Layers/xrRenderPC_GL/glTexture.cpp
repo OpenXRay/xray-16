@@ -114,127 +114,106 @@ _DDS:
         R_ASSERT(S);
         gli::texture Texture = gli::load((char*)S->pointer(), img_size);
         R_ASSERT2(!Texture.empty(), fn);
-        if (is_target_cube(Texture.target())) goto _DDS_CUBE;
-        if (Texture.target() == gli::TARGET_3D) goto _DDS_3D;
-        goto _DDS_2D;
+        
+        
+        gli::gl GL(gli::gl::PROFILE_GL33);
 
-    _DDS_CUBE:
+        gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+        GLenum Target = GL.translate(Texture.target());
+
+        glGenTextures(1, &pTexture);
+        glBindTexture(Target, pTexture);
+
+        glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+
+        if(gli::gl::EXTERNAL_RED != Format.External) // skip for properly greyscale-alpfa fonts textures
         {
-            gli::gl GL;
-            mip_cnt = Texture.levels();
-            dwWidth = Texture.dimensions().x;
-            dwHeight = Texture.dimensions().y;
-            dwDepth = Texture.dimensions().z;
-            fmt = GL.translate(Texture.format());
+            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
+        }
 
-            glGenTextures(1, &pTexture);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, pTexture);
-            CHK_GL(glTexStorage2D(GL_TEXTURE_CUBE_MAP, mip_cnt, (GLenum)fmt.Internal, dwWidth, dwHeight));
+        glm::tvec3<GLsizei> const Extent(Texture.extent());
 
-            for (size_t face = 0; face < Texture.faces(); face++)
+        switch(Texture.target())
+        {
+        case gli::TARGET_2D:
+        case gli::TARGET_CUBE:
+            CHK_GL(glTexStorage2D(Target, static_cast<GLint>(Texture.levels()), Format.Internal,
+                           Extent.x, Extent.y));
+            break;
+        case gli::TARGET_3D:
+            CHK_GL(glTexStorage3D(Target, static_cast<GLint>(Texture.levels()), Format.Internal,
+                           Extent.x, Extent.y, Extent.z));
+            break;
+        default:
+            assert(0);
+            break;
+        }
+
+        for(std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
+        {
+            for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
             {
-                for (size_t i = 0; i < mip_cnt; i++)
+                for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
                 {
-                    if (is_compressed(Texture.format()))
+                    glm::tvec3<GLsizei> Extent(Texture.extent(Level));
+                    Target = gli::is_target_cube(Texture.target())
+                             ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face)
+                             : Target;
+                    
+                    switch(Texture.target())
                     {
-                        CHK_GL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, i, 0, 0, Texture.
-                            dimensions(i).x, Texture.dimensions(i).y,
-                            (GLenum)fmt.Internal, Texture.size(i), Texture.data(0, face, i)));
-                    }
-                    else
+                    case gli::TARGET_2D:
+                    case gli::TARGET_CUBE:
                     {
-                        CHK_GL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, i, 0, 0, Texture.dimensions(i).x,
-                            Texture.dimensions(i).y,
-                            (GLenum)fmt.External, (GLenum)fmt.Type, Texture.data(0, face, i)));
+                        if(gli::is_compressed(Texture.format()))
+                            CHK_GL(glCompressedTexSubImage2D(Target, static_cast<GLint>(Level),
+                                        0, 0,
+                                        Extent.x, Extent.y,
+                                        Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
+                                        Texture.data(Layer, Face, Level)));
+                        else
+                            CHK_GL(glTexSubImage2D(Target, static_cast<GLint>(Level),
+                                        0, 0,
+                                        Extent.x, Extent.y,
+                                        Format.External, Format.Type,
+                                        Texture.data(Layer, Face, Level)));
+                    }
+                        break;
+                    case gli::TARGET_3D:
+                    {
+                        if(gli::is_compressed(Texture.format()))
+                            CHK_GL(glCompressedTexSubImage3D(Target, static_cast<GLint>(Level),
+                                        0, 0, 0,
+                                        Extent.x, Extent.y, Extent.z,
+                                        Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
+                                        Texture.data(Layer, Face, Level)));
+                        else
+                            CHK_GL(glTexSubImage3D(Target, static_cast<GLint>(Level),
+                                        0, 0, 0,
+                                        Extent.x, Extent.y, Extent.z,
+                                        Format.External, Format.Type,
+                                        Texture.data(Layer, Face, Level)));
+                    }
+                        break;
+                    default: 
+                        assert(0); 
+                        break;
                     }
                 }
             }
-            FS.r_close(S);
-
-            // OK
-            ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
-            ret_desc = GL_TEXTURE_CUBE_MAP;
-            return pTexture;
         }
-    _DDS_3D:
-        {
-            // Check for LMAP and compress if needed
-            xr_strlwr(fn);
+        
+        FS.r_close(S);
 
-
-            // Load   SYS-MEM-surface, bound to device restrictions
-            gli::gl GL;
-            mip_cnt = Texture.levels();
-            dwWidth = Texture.dimensions().x;
-            dwHeight = Texture.dimensions().y;
-            dwDepth = Texture.dimensions().z;
-            fmt = GL.translate(Texture.format());
-
-            glGenTextures(1, &pTexture);
-            glBindTexture(GL_TEXTURE_3D, pTexture);
-            CHK_GL(glTexStorage3D(GL_TEXTURE_3D, mip_cnt, (GLenum)fmt.Internal, dwWidth, dwHeight, dwDepth));
-            for (size_t i = 0; i < mip_cnt; i++)
-            {
-                if (is_compressed(Texture.format()))
-                {
-                    CHK_GL(glCompressedTexSubImage3D(GL_TEXTURE_3D, i, 0, 0, 0, Texture.dimensions(i).x, Texture.
-                        dimensions(i).y, Texture.dimensions(i).z,
-                        (GLenum)fmt.Internal, Texture.size(i), Texture.data(0, 0, i)));
-                }
-                else
-                {
-                    CHK_GL(glTexSubImage3D(GL_TEXTURE_3D, i, 0, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y,
-                        Texture.dimensions(i).z,
-                        (GLenum)fmt.External, (GLenum)fmt.Type, Texture.data(0, 0, i)));
-                }
-            }
-            FS.r_close(S);
-
-            // OK
-            img_loaded_lod = get_texture_load_lod(fn);
-            ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
-            ret_desc = GL_TEXTURE_3D;
-            return pTexture;
-        }
-    _DDS_2D:
-        {
-            // Check for LMAP and compress if needed
-            xr_strlwr(fn);
-
-
-            // Load   SYS-MEM-surface, bound to device restrictions
-            gli::gl GL;
-            mip_cnt = Texture.levels();
-            dwWidth = Texture.dimensions().x;
-            dwHeight = Texture.dimensions().y;
-            dwDepth = Texture.dimensions().z;
-            fmt = GL.translate(Texture.format());
-
-            glGenTextures(1, &pTexture);
-            glBindTexture(GL_TEXTURE_2D, pTexture);
-            CHK_GL(glTexStorage2D(GL_TEXTURE_2D, mip_cnt, (GLenum)fmt.Internal, dwWidth, dwHeight));
-            for (size_t i = 0; i < mip_cnt; i++)
-            {
-                if (is_compressed(Texture.format()))
-                {
-                    CHK_GL(glCompressedTexSubImage2D(GL_TEXTURE_2D, i, 0, 0, Texture.dimensions(i).x, Texture.dimensions
-                        (i).y,
-                        (GLenum)fmt.Internal, Texture.size(i), Texture.data(0, 0, i)));
-                }
-                else
-                {
-                    CHK_GL(glTexSubImage2D(GL_TEXTURE_2D, i, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y,
-                        (GLenum)fmt.External, (GLenum)fmt.Type, Texture.data(0, 0, i)));
-                }
-            }
-            FS.r_close(S);
-
-            // OK
-            img_loaded_lod = get_texture_load_lod(fn);
-            ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
-            ret_desc = GL_TEXTURE_2D;
-            return pTexture;
-        }
+        xr_strlwr(fn);
+        ret_desc = Target;
+        img_loaded_lod = is_target_cube(Texture.target()) ? img_loaded_lod : get_texture_load_lod(fn);
+        ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
+        return pTexture;
     }
 
 _BUMP_from_base:
