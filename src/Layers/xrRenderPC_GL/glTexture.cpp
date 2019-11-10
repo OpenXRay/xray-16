@@ -127,7 +127,7 @@ _DDS:
         glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 
-        if(gli::gl::EXTERNAL_RED != Format.External) // skip for properly greyscale-alpfa fonts textures
+        if (gli::gl::EXTERNAL_RED != Format.External) // skip for properly greyscale-alpfa fonts textures
         {
             glTexParameteri(Target, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
             glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
@@ -137,7 +137,7 @@ _DDS:
 
         glm::tvec3<GLsizei> const Extent(Texture.extent());
 
-        switch(Texture.target())
+        switch (Texture.target())
         {
         case gli::TARGET_2D:
         case gli::TARGET_CUBE:
@@ -153,23 +153,22 @@ _DDS:
             break;
         }
 
-        for(std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
+        for (std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
         {
-            for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
+            for (std::size_t Face = 0; Face < Texture.faces(); ++Face)
             {
-                for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+                for (std::size_t Level = 0; Level < Texture.levels(); ++Level)
                 {
                     glm::tvec3<GLsizei> Extent(Texture.extent(Level));
                     Target = gli::is_target_cube(Texture.target())
                              ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face)
                              : Target;
                     
-                    switch(Texture.target())
+                    switch (Texture.target())
                     {
                     case gli::TARGET_2D:
                     case gli::TARGET_CUBE:
-                    {
-                        if(gli::is_compressed(Texture.format()))
+                        if (gli::is_compressed(Texture.format()))
                             CHK_GL(glCompressedTexSubImage2D(Target, static_cast<GLint>(Level),
                                         0, 0,
                                         Extent.x, Extent.y,
@@ -181,11 +180,9 @@ _DDS:
                                         Extent.x, Extent.y,
                                         Format.External, Format.Type,
                                         Texture.data(Layer, Face, Level)));
-                    }
                         break;
                     case gli::TARGET_3D:
-                    {
-                        if(gli::is_compressed(Texture.format()))
+                        if (gli::is_compressed(Texture.format()))
                             CHK_GL(glCompressedTexSubImage3D(Target, static_cast<GLint>(Level),
                                         0, 0, 0,
                                         Extent.x, Extent.y, Extent.z,
@@ -197,7 +194,6 @@ _DDS:
                                         Extent.x, Extent.y, Extent.z,
                                         Format.External, Format.Type,
                                         Texture.data(Layer, Face, Level)));
-                    }
                         break;
                     default: 
                         NODEFAULT; 
