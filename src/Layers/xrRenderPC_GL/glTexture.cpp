@@ -163,37 +163,37 @@ _DDS:
                     Target = gli::is_target_cube(Texture.target())
                              ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face)
                              : Target;
-                    
+
                     switch (Texture.target())
                     {
                     case gli::TARGET_2D:
                     case gli::TARGET_CUBE:
+                    {
                         if (gli::is_compressed(Texture.format()))
                             CHK_GL(glCompressedTexSubImage2D(Target, static_cast<GLint>(level),
-                                        0, 0,
-                                        Extent.x, Extent.y,
+                                        0, 0, Extent.x, Extent.y,
                                         Format.Internal, static_cast<GLsizei>(Texture.size(level)),
                                         Texture.data(layer, face, level)));
                         else
                             CHK_GL(glTexSubImage2D(Target, static_cast<GLint>(level),
-                                        0, 0,
-                                        Extent.x, Extent.y,
+                                        0, 0, Extent.x, Extent.y,
                                         Format.External, Format.Type,
                                         Texture.data(layer, face, level)));
+                    }
                         break;
                     case gli::TARGET_3D:
+                    {
                         if (gli::is_compressed(Texture.format()))
                             CHK_GL(glCompressedTexSubImage3D(Target, static_cast<GLint>(level),
-                                        0, 0, 0,
-                                        Extent.x, Extent.y, Extent.z,
+                                        0, 0, 0, Extent.x, Extent.y, Extent.z,
                                         Format.Internal, static_cast<GLsizei>(Texture.size(level)),
                                         Texture.data(layer, face, level)));
                         else
                             CHK_GL(glTexSubImage3D(Target, static_cast<GLint>(level),
-                                        0, 0, 0,
-                                        Extent.x, Extent.y, Extent.z,
+                                        0, 0, 0, Extent.x, Extent.y, Extent.z,
                                         Format.External, Format.Type,
                                         Texture.data(layer, face, level)));
+                    }
                         break;
                     default: 
                         NODEFAULT; 
