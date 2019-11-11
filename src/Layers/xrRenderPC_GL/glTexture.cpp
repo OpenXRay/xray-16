@@ -153,15 +153,15 @@ _DDS:
             break;
         }
 
-        for (std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
+        for (std::size_t layer = 0; layer < Texture.layers(); ++layer)
         {
-            for (std::size_t Face = 0; Face < Texture.faces(); ++Face)
+            for (std::size_t face = 0; face < Texture.faces(); ++face)
             {
-                for (std::size_t Level = 0; Level < Texture.levels(); ++Level)
+                for (std::size_t level = 0; level < Texture.levels(); ++level)
                 {
-                    glm::tvec3<GLsizei> Extent(Texture.extent(Level));
+                    glm::tvec3<GLsizei> Extent(Texture.extent(level));
                     Target = gli::is_target_cube(Texture.target())
-                             ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face)
+                             ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face)
                              : Target;
                     
                     switch (Texture.target())
@@ -169,31 +169,31 @@ _DDS:
                     case gli::TARGET_2D:
                     case gli::TARGET_CUBE:
                         if (gli::is_compressed(Texture.format()))
-                            CHK_GL(glCompressedTexSubImage2D(Target, static_cast<GLint>(Level),
+                            CHK_GL(glCompressedTexSubImage2D(Target, static_cast<GLint>(level),
                                         0, 0,
                                         Extent.x, Extent.y,
-                                        Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
-                                        Texture.data(Layer, Face, Level)));
+                                        Format.Internal, static_cast<GLsizei>(Texture.size(level)),
+                                        Texture.data(layer, face, level)));
                         else
-                            CHK_GL(glTexSubImage2D(Target, static_cast<GLint>(Level),
+                            CHK_GL(glTexSubImage2D(Target, static_cast<GLint>(level),
                                         0, 0,
                                         Extent.x, Extent.y,
                                         Format.External, Format.Type,
-                                        Texture.data(Layer, Face, Level)));
+                                        Texture.data(layer, face, level)));
                         break;
                     case gli::TARGET_3D:
                         if (gli::is_compressed(Texture.format()))
-                            CHK_GL(glCompressedTexSubImage3D(Target, static_cast<GLint>(Level),
+                            CHK_GL(glCompressedTexSubImage3D(Target, static_cast<GLint>(level),
                                         0, 0, 0,
                                         Extent.x, Extent.y, Extent.z,
-                                        Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
-                                        Texture.data(Layer, Face, Level)));
+                                        Format.Internal, static_cast<GLsizei>(Texture.size(level)),
+                                        Texture.data(layer, face, level)));
                         else
-                            CHK_GL(glTexSubImage3D(Target, static_cast<GLint>(Level),
+                            CHK_GL(glTexSubImage3D(Target, static_cast<GLint>(level),
                                         0, 0, 0,
                                         Extent.x, Extent.y, Extent.z,
                                         Format.External, Format.Type,
-                                        Texture.data(Layer, Face, Level)));
+                                        Texture.data(layer, face, level)));
                         break;
                     default: 
                         NODEFAULT; 
