@@ -127,12 +127,7 @@ _DDS:
         glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
         if (gli::gl::EXTERNAL_RED != format.External) // skip for properly greyscale-alpfa fonts textures
-        {
-            glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, format.Swizzles[0]);
-            glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, format.Swizzles[1]);
-            glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, format.Swizzles[2]);
-            glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, format.Swizzles[3]);
-        }
+            glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA, &format.Swizzles[gli::SWIZZLE_RED]);
 
         glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
