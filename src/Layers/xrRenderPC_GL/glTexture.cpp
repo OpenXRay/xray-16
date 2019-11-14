@@ -67,7 +67,6 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 {
     GLuint pTexture = 0;
     string_path fn;
-    u32 dwWidth, dwHeight, dwDepth;
     size_t img_size = 0;
     int img_loaded_lod = 0;
     gli::gl::format fmt;
@@ -112,94 +111,94 @@ _DDS:
 #endif // DEBUG
         img_size = S->length();
         R_ASSERT(S);
-        gli::texture Texture = gli::load((char*)S->pointer(), img_size);
-        R_ASSERT2(!Texture.empty(), fn);
+        gli::texture texture = gli::load((char*)S->pointer(), img_size);
+        R_ASSERT2(!texture.empty(), fn);
         
         
         gli::gl GL(gli::gl::PROFILE_GL33);
 
-        gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
-        GLenum Target = GL.translate(Texture.target());
+        gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
+        GLenum target = GL.translate(texture.target());
 
         glGenTextures(1, &pTexture);
-        glBindTexture(Target, pTexture);
+        glBindTexture(target, pTexture);
 
-        glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+        glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
-        if (gli::gl::EXTERNAL_RED != Format.External) // skip for properly greyscale-alpfa fonts textures
+        if (gli::gl::EXTERNAL_RED != format.External) // skip for properly greyscale-alpfa fonts textures
         {
-            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
-            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
-            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
-            glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
+            glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, format.Swizzles[0]);
+            glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, format.Swizzles[1]);
+            glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, format.Swizzles[2]);
+            glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, format.Swizzles[3]);
         }
 
-        glm::tvec3<GLsizei> const Extent(Texture.extent());
+        glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
-        switch (Texture.target())
+        switch (texture.target())
         {
         case gli::TARGET_2D:
         case gli::TARGET_CUBE:
-            CHK_GL(glTexStorage2D(Target, static_cast<GLint>(Texture.levels()), Format.Internal,
-                           Extent.x, Extent.y));
+            CHK_GL(glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
+                           tex_extent.x, tex_extent.y));
             break;
         case gli::TARGET_3D:
-            CHK_GL(glTexStorage3D(Target, static_cast<GLint>(Texture.levels()), Format.Internal,
-                           Extent.x, Extent.y, Extent.z));
+            CHK_GL(glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
+                           tex_extent.x, tex_extent.y, tex_extent.z));
             break;
         default:
             NODEFAULT;
             break;
         }
 
-        for (std::size_t layer = 0; layer < Texture.layers(); ++layer)
+        for (std::size_t layer = 0; layer < texture.layers(); ++layer)
         {
-            for (std::size_t face = 0; face < Texture.faces(); ++face)
+            for (std::size_t face = 0; face < texture.faces(); ++face)
             {
-                for (std::size_t level = 0; level < Texture.levels(); ++level)
+                for (std::size_t level = 0; level < texture.levels(); ++level)
                 {
-                    glm::tvec3<GLsizei> Extent(Texture.extent(level));
-                    Target = gli::is_target_cube(Texture.target())
+                    glm::tvec3<GLsizei> const tex_level_extent(texture.extent(level));
+                    target = gli::is_target_cube(texture.target())
                              ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face)
-                             : Target;
+                             : target;
 
-                    switch (Texture.target())
+                    switch (texture.target())
                     {
                     case gli::TARGET_2D:
                     case gli::TARGET_CUBE:
                     {
-                        if (gli::is_compressed(Texture.format()))
+                        if (gli::is_compressed(texture.format()))
                         {
-                            CHK_GL(glCompressedTexSubImage2D(Target, static_cast<GLint>(level),
-                                        0, 0, Extent.x, Extent.y,
-                                        Format.Internal, static_cast<GLsizei>(Texture.size(level)),
-                                        Texture.data(layer, face, level)));
+                            CHK_GL(glCompressedTexSubImage2D(target, static_cast<GLint>(level),
+                                        0, 0, tex_level_extent.x, tex_level_extent.y,
+                                        format.Internal, static_cast<GLsizei>(texture.size(level)),
+                                        texture.data(layer, face, level)));
                         }
                         else
                         {
-                            CHK_GL(glTexSubImage2D(Target, static_cast<GLint>(level),
-                                        0, 0, Extent.x, Extent.y,
-                                        Format.External, Format.Type,
-                                        Texture.data(layer, face, level)));
+                            CHK_GL(glTexSubImage2D(target, static_cast<GLint>(level),
+                                        0, 0, tex_level_extent.x, tex_level_extent.y,
+                                        format.External, format.Type,
+                                        texture.data(layer, face, level)));
                         }
                         break;
                     }
                     case gli::TARGET_3D:
                     {
-                        if (gli::is_compressed(Texture.format()))
+                        if (gli::is_compressed(texture.format()))
                         {
-                            CHK_GL(glCompressedTexSubImage3D(Target, static_cast<GLint>(level),
-                                        0, 0, 0, Extent.x, Extent.y, Extent.z,
-                                        Format.Internal, static_cast<GLsizei>(Texture.size(level)),
-                                        Texture.data(layer, face, level)));
+                            CHK_GL(glCompressedTexSubImage3D(target, static_cast<GLint>(level),
+                                        0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
+                                        format.Internal, static_cast<GLsizei>(texture.size(level)),
+                                        texture.data(layer, face, level)));
                         }
                         else
                         {
-                            CHK_GL(glTexSubImage3D(Target, static_cast<GLint>(level),
-                                        0, 0, 0, Extent.x, Extent.y, Extent.z,
-                                        Format.External, Format.Type,
-                                        Texture.data(layer, face, level)));
+                            CHK_GL(glTexSubImage3D(target, static_cast<GLint>(level),
+                                        0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
+                                        format.External, format.Type,
+                                        texture.data(layer, face, level)));
                         }
                         break;
                     }
@@ -214,8 +213,8 @@ _DDS:
         FS.r_close(S);
 
         xr_strlwr(fn);
-        ret_desc = Target;
-        img_loaded_lod = is_target_cube(Texture.target()) ? img_loaded_lod : get_texture_load_lod(fn);
+        ret_desc = target;
+        img_loaded_lod = is_target_cube(texture.target()) ? img_loaded_lod : get_texture_load_lod(fn);
         ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
         return pTexture;
     }
