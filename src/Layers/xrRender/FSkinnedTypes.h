@@ -53,6 +53,47 @@ static VertexElement dwDecl_01W[] = // 36bytes
     D3DDECL_END()
 };
 
+static VertexElement dwDecl_2W[] = // 44bytes
+{
+    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
+    // n.xyz, w=weight : 1 : -1..+1, w=0..1
+    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+    {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0}, // T : 1 : -1..+1
+    {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0}, // B : 1 : -1..+1
+    // xy(tc), zw(indices): 2 : -16..+16, zw[0..32767]
+    {0, 28, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+    D3DDECL_END()
+};
+
+static VertexElement dwDecl_3W[] = // 44bytes
+{
+    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
+    // n.xyz, w=weight0 : 1 : -1..+1, w=0..1
+    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+    // T.xyz, w=weight1 : 1 : -1..+1, w=0..1
+    {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
+    // B.xyz, w=index2 : 1 : -1..+1, w=0..255
+    {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
+    // xy(tc), zw(indices): 2 : -16..+16, zw[0..32767]
+    {0, 28, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+    D3DDECL_END()
+};
+
+static VertexElement dwDecl_4W[] = // 40bytes
+{
+    // p : 2 : -12..+12
+    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+    // n.xyz, w = weight0 : 1 : -1..+1, w=0..1
+    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+    // T.xyz, w = weight1 : 1 : -1..+1, w=0..1
+    {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
+    // B.xyz, w = weight2 : 1 : -1..+1, w=0..1
+    {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
+    {0, 28, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // : xy(tc) : 2 : -16..+16
+    {0, 36, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1}, // : indices : 1 :  0..255
+    D3DDECL_END()
+};
+
 struct vertHW_1W
 {
     float _P[4];
@@ -95,18 +136,6 @@ struct vertHW_1W
         p.y = _P[1];
         p.z = _P[2];
     }
-};
-
-static VertexElement dwDecl_2W[] = // 44bytes
-{
-    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
-    // n.xyz, w=weight : 1 : -1..+1, w=0..1
-    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-    {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0}, // T : 1 : -1..+1
-    {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0}, // B : 1 : -1..+1
-    // xy(tc), zw(indices): 2 : -16..+16, zw[0..32767]
-    {0, 28, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-    D3DDECL_END()
 };
 
 struct vertHW_2W
@@ -163,20 +192,6 @@ struct vertHW_2W
         xform1.transform_tiny(P1);
         p.lerp(P0, P1, get_weight());
     }
-};
-
-static VertexElement dwDecl_3W[] = // 44bytes
-{
-    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
-    // n.xyz, w=weight0 : 1 : -1..+1, w=0..1
-    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-    // T.xyz, w=weight1 : 1 : -1..+1, w=0..1
-    {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
-    // B.xyz, w=index2 : 1 : -1..+1, w=0..255
-    {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
-    // xy(tc), zw(indices): 2 : -16..+16, zw[0..32767]
-    {0, 28, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-    D3DDECL_END()
 };
 
 struct vertHW_3W
@@ -256,21 +271,6 @@ struct vertHW_3W
         p.add(P1);
         p.add(P2);
     }
-};
-
-static VertexElement dwDecl_4W[] = // 40bytes
-{
-    // p : 2 : -12..+12
-    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-    // n.xyz, w = weight0 : 1 : -1..+1, w=0..1
-    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-    // T.xyz, w = weight1 : 1 : -1..+1, w=0..1
-    {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
-    // B.xyz, w = weight2 : 1 : -1..+1, w=0..1
-    {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
-    {0, 28, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // : xy(tc) : 2 : -16..+16
-    {0, 36, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1}, // : indices : 1 :  0..255
-    D3DDECL_END()
 };
 
 struct vertHW_4W
