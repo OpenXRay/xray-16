@@ -43,7 +43,18 @@ inline float errN(Fvector3 /*v*/, u8* /*qv*/)
 }
 #endif
 
-static VertexElement dwDecl_01W[] = // 36bytes
+#pragma region 1W
+static VertexElement dwDecl_01W[] = // 24bytes
+{
+    {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // P : 2 : -12..+12
+    {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0}, // N, w=index(RC, 0..1) : 1 : -1..+1
+    {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0}, // T : 1 : -1..+1
+    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0}, // B : 1 : -1..+1
+    {0, 20, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // tc : 1 : -16..+16
+    D3DDECL_END()
+};
+
+static VertexElement dwDecl_01W_HQ[] = // 36bytes
 {
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // P : 2 : -12..+12
     {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0}, // N, w=index(RC, 0..1) : 1 : -1..+1
@@ -52,8 +63,22 @@ static VertexElement dwDecl_01W[] = // 36bytes
     {0, 28, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // tc : 1 : -16..+16
     D3DDECL_END()
 };
+#pragma endregion 1W
 
-static VertexElement dwDecl_2W[] = // 44bytes
+#pragma region 2W
+static VertexElement dwDecl_2W[] = // 28bytes
+{
+    {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
+    // n.xyz, w=weight : 1 : -1..+1, w=0..1
+    {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+    {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0}, // T : 1 : -1..+1
+    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0}, // B : 1 : -1..+1
+    // xy(tc), zw(indices): 2 : -16..+16, zw[0..32767]
+    {0, 20, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+    D3DDECL_END()
+};
+
+static VertexElement dwDecl_2W_HQ[] = // 44bytes
 {
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
     // n.xyz, w=weight : 1 : -1..+1, w=0..1
@@ -64,8 +89,24 @@ static VertexElement dwDecl_2W[] = // 44bytes
     {0, 28, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
     D3DDECL_END()
 };
+#pragma endregion 2W
 
-static VertexElement dwDecl_3W[] = // 44bytes
+#pragma region 3W
+static VertexElement dwDecl_3W[] = // 28bytes
+{
+    {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
+    // n.xyz, w=weight0 : 1 : -1..+1, w=0..1
+    {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+    // T.xyz, w=weight1 : 1 : -1..+1, w=0..1
+    {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
+    // B.xyz, w=index2 : 1 : -1..+1, w=0..255
+    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
+    // xy(tc), zw(indices): 2 : -16..+16, zw[0..32767]
+    {0, 20, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+    D3DDECL_END()
+};
+
+static VertexElement dwDecl_3W_HQ[] = // 44bytes
 {
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
     // n.xyz, w=weight0 : 1 : -1..+1, w=0..1
@@ -78,8 +119,25 @@ static VertexElement dwDecl_3W[] = // 44bytes
     {0, 28, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
     D3DDECL_END()
 };
+#pragma endregion 3W
 
-static VertexElement dwDecl_4W[] = // 40bytes
+#pragma region 4W
+static VertexElement dwDecl_4W[] = // 28bytes
+{
+    // p : 2 : -12..+12
+    {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+    // n.xyz, w = weight0 : 1 : -1..+1, w=0..1
+    {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
+    // T.xyz, w = weight1 : 1 : -1..+1, w=0..1
+    {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
+    // B.xyz, w = weight2 : 1 : -1..+1, w=0..1
+    {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
+    {0, 20, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // : xy(tc) : 2 : -16..+16
+    {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1}, // : indices : 1 :  0..255
+    D3DDECL_END()
+};
+
+static VertexElement dwDecl_4W_HQ[] = // 40bytes
 {
     // p : 2 : -12..+12
     {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
@@ -93,6 +151,7 @@ static VertexElement dwDecl_4W[] = // 40bytes
     {0, 36, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1}, // : indices : 1 :  0..255
     D3DDECL_END()
 };
+#pragma endregion 4W
 
 struct vertHW_1W
 {

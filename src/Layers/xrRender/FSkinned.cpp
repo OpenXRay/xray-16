@@ -78,7 +78,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     case RM_SINGLE:
     case RM_SKINNING_1B:
     {
-        V.vStride = GetDeclVertexSize(dwDecl_01W, 0);
+        V.vStride = GetDeclVertexSize(dwDecl_01W_HQ, 0);
         VERIFY(NULL == V.p_rm_Vertices);
         V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
@@ -94,12 +94,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
         V.p_rm_Vertices->Unmap(true); // upload vertex data
-        V.rm_geom.create(dwDecl_01W, *V.p_rm_Vertices, *V.p_rm_Indices);
+        V.rm_geom.create(dwDecl_01W_HQ, *V.p_rm_Vertices, *V.p_rm_Indices);
     }
     break;
     case RM_SKINNING_2B:
     {
-        V.vStride = GetDeclVertexSize(dwDecl_2W, 0);
+        V.vStride = GetDeclVertexSize(dwDecl_2W_HQ, 0);
         VERIFY(NULL == V.p_rm_Vertices);
         V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
@@ -116,12 +116,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
         V.p_rm_Vertices->Unmap(true); // upload vertex data
-        V.rm_geom.create(dwDecl_2W, *V.p_rm_Vertices, *V.p_rm_Indices);
+        V.rm_geom.create(dwDecl_2W_HQ, *V.p_rm_Vertices, *V.p_rm_Indices);
     }
     break;
     case RM_SKINNING_3B:
     {
-        V.vStride = GetDeclVertexSize(dwDecl_3W, 0);
+        V.vStride = GetDeclVertexSize(dwDecl_3W_HQ, 0);
         VERIFY(NULL == V.p_rm_Vertices);
         V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
@@ -139,12 +139,12 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
         V.p_rm_Vertices->Unmap(true);  // upload vertex data
-        V.rm_geom.create(dwDecl_3W, *V.p_rm_Vertices, *V.p_rm_Indices);
+        V.rm_geom.create(dwDecl_3W_HQ, *V.p_rm_Vertices, *V.p_rm_Indices);
     }
     break;
     case RM_SKINNING_4B:
     {
-        V.vStride = GetDeclVertexSize(dwDecl_4W, 0);
+        V.vStride = GetDeclVertexSize(dwDecl_4W_HQ, 0);
         VERIFY(NULL == V.p_rm_Vertices);
         V.p_rm_Vertices = new VertexStagingBuffer;
         V.p_rm_Vertices->Create(V.vCount * V.vStride, true);  // VB may be read by wallmarks code
@@ -162,7 +162,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
             src++;
         }
         V.p_rm_Vertices->Unmap(true); // upload vertex data
-        V.rm_geom.create(dwDecl_4W, *V.p_rm_Vertices, *V.p_rm_Indices);
+        V.rm_geom.create(dwDecl_4W_HQ, *V.p_rm_Vertices, *V.p_rm_Indices);
     }
     break;
     }
