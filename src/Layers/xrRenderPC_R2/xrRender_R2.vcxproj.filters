@@ -621,6 +621,9 @@
     <ClInclude Include="..\xrRender\BufferUtils.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FSkinnedTypes.h">
+      <Filter>Models\Visuals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

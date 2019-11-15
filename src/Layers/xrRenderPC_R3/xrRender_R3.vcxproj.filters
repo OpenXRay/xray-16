@@ -699,6 +699,9 @@
     <ClInclude Include="..\xrRender\BufferUtils.h">
       <Filter>dx9 to dx10 Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FSkinnedTypes.h">
+      <Filter>Models\Visuals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

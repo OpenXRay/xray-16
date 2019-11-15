@@ -1127,6 +1127,9 @@
     <ClInclude Include="..\xrRender\BufferUtils.h">
       <Filter>dx9 to gl Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FSkinnedTypes.h">
+      <Filter>Models\Visuals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

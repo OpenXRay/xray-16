@@ -257,6 +257,7 @@
     <ClInclude Include="..\xrRender\FLOD.h" />
     <ClInclude Include="..\xrRender\FProgressive.h" />
     <ClInclude Include="..\xrRender\FSkinned.h" />
+    <ClInclude Include="..\xrRender\FSkinnedTypes.h" />
     <ClInclude Include="..\xrRender\FTreeVisual.h" />
     <ClInclude Include="..\xrRender\FVF.h" />
     <ClInclude Include="..\xrRender\FVisual.h" />
