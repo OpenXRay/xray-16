@@ -166,16 +166,16 @@ static VertexElement dwDecl_4W_HQ[] = // 40bytes
 };
 #pragma endregion 4W
 
-template <typename T>
+template <typename TVal>
 struct vertHW_1W
 {
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+    static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    T   _P[4];
+    TVal _P[4];
     u32 _N_I;
     u32 _T;
     u32 _B;
-    T   _tc[2];
+    TVal _tc[2];
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index)
     {
@@ -213,16 +213,16 @@ struct vertHW_1W
     }
 };
 
-template <typename T>
+template <typename TVal>
 struct vertHW_2W
 {
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+    static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    T   _P[4];
+    TVal _P[4];
     u32 _N_w;
     u32 _T;
     u32 _B;
-    T   _tc_i[4];
+    TVal _tc_i[4];
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, float w)
     {
@@ -272,16 +272,16 @@ struct vertHW_2W
     }
 };
 
-template <typename T>
+template <typename TVal>
 struct vertHW_3W
 {
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+    static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    T   _P[4];
+    TVal _P[4];
     u32 _N_w;
     u32 _T_w;
     u32 _B_i;
-    T   _tc_i[4];
+    TVal _tc_i[4];
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
         float w0, float w1)
@@ -354,16 +354,16 @@ struct vertHW_3W
     }
 };
 
-template <typename T>
+template <typename TVal>
 struct vertHW_4W
 {
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+    static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    T   _P[4];
+    TVal _P[4];
     u32 _N_w;
     u32 _T_w;
     u32 _B_w;
-    T   _tc[2];
+    TVal _tc[2];
     u32 _i;
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
