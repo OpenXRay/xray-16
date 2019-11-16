@@ -15,7 +15,6 @@ D3DXRenderBase::D3DXRenderBase()
     r_pmask(true, true);
     b_loaded = FALSE;
     Resources = nullptr;
-    m_hq_skinning = true;
 }
 
 void D3DXRenderBase::setGamma(float fGamma)
@@ -107,6 +106,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     m_Gamma.Update();
 #endif
     Resources->OnDeviceCreate(shName);
+    Resources->CompatibilityCheck();
     create();
     if (!GEnv.isDedicatedServer)
     {

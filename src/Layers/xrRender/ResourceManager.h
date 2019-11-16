@@ -230,6 +230,8 @@ public:
     void reset_begin();
     void reset_end();
 
+    void CompatibilityCheck();
+
     // Creation/Destroying
     Shader* Create(LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     Shader* Create(
