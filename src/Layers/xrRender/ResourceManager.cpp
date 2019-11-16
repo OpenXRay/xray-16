@@ -288,7 +288,7 @@ void CResourceManager::CompatibilityCheck()
     else if (strstr(str.data(), "int4"))
         RImplementation.m_hq_skinning = false;
     else
-        R_ASSERT(0, "Custom skinning is unsupported. Please, correct this compatibility check manually");
+        R_ASSERT2(0, "Custom skinning is unsupported. Please, correct this compatibility check manually");
 
     FS.r_close(file);
 }
