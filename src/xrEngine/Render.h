@@ -266,6 +266,7 @@ public:
 
 public:
     // options
+    bool m_hq_skinning;
     s32 m_skinning;
     s32 m_MSAASample;
 

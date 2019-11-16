@@ -5,15 +5,24 @@
 //////////////////////////////////////////////////////////////////////
 
 #pragma pack(push, 1)
+inline float u_P(float v)
+{
+    return v;
+}
+
 inline float u_P(s16 v)
 {
     return float(v) / (32767.f / 12.f);
 }
 
-inline s16 q_P(float v)
+inline void q_P(float& dst, float val)
 {
-    int _v = clampr(iFloor(v * (32767.f / 12.f)), -32768, 32767);
-    return s16(_v);
+    dst = val;
+}
+
+inline void q_P(s16& dst, float val)
+{
+    dst = u16(clampr<int>(iFloor(val * (32767.f / 12.f)), -32768, 32767));
 }
 
 inline u8 q_N(float v)
@@ -22,10 +31,14 @@ inline u8 q_N(float v)
     return u8(_v);
 }
 
-inline s16 q_tc(float v)
+inline void q_tc(float& dst, float val)
 {
-    int _v = clampr(iFloor(v * (32767.f / 16.f)), -32768, 32767);
-    return s16(_v);
+    dst = val;
+}
+
+inline void q_tc(s16& dst, float val)
+{
+    dst = s16(clampr<int>(iFloor(val * (32767.f / 16.f)), -32768, 32767));
 }
 
 #ifdef _DEBUG
@@ -44,6 +57,18 @@ inline float errN(Fvector3 /*v*/, u8* /*qv*/)
 #endif
 
 #pragma region 1W
+template <typename T>
+struct vertHW_1W_data
+{
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T _P[4];
+    u32 _N_I;
+    u32 _T;
+    u32 _B;
+    T _tc[2];
+};
+
 static VertexElement dwDecl_01W[] = // 24bytes
 {
     {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // P : 2 : -12..+12
@@ -66,6 +91,18 @@ static VertexElement dwDecl_01W_HQ[] = // 36bytes
 #pragma endregion 1W
 
 #pragma region 2W
+template <typename T>
+struct vertHW_2W_data
+{
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T _P[4];
+    u32 _N_w;
+    u32 _T;
+    u32 _B;
+    T _tc_i[4];
+};
+
 static VertexElement dwDecl_2W[] = // 28bytes
 {
     {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
@@ -92,6 +129,18 @@ static VertexElement dwDecl_2W_HQ[] = // 44bytes
 #pragma endregion 2W
 
 #pragma region 3W
+template <typename T>
+struct vertHW_3W_data
+{
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T _P[4];
+    u32 _N_w;
+    u32 _T_w;
+    u32 _B_i;
+    T _tc_i[4];
+};
+
 static VertexElement dwDecl_3W[] = // 28bytes
 {
     {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
@@ -122,6 +171,19 @@ static VertexElement dwDecl_3W_HQ[] = // 44bytes
 #pragma endregion 3W
 
 #pragma region 4W
+template <typename T>
+struct vertHW_4W_data
+{
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T _P[4];
+    u32 _N_w;
+    u32 _T_w;
+    u32 _B_w;
+    T _tc[2];
+    u32 _i;
+};
+
 static VertexElement dwDecl_4W[] = // 28bytes
 {
     // p : 2 : -12..+12
@@ -153,28 +215,26 @@ static VertexElement dwDecl_4W_HQ[] = // 40bytes
 };
 #pragma endregion 4W
 
-struct vertHW_1W
+template <typename T>
+struct vertHW_1W : vertHW_1W_data<T>
 {
-    float _P[4];
-    u32 _N_I;
-    u32 _T;
-    u32 _B;
-    float _tc[2];
+    using self_type = vertHW_1W;
+    using value_type = T;
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index)
     {
         N.normalize_safe();
         T.normalize_safe();
         B.normalize_safe();
-        _P[0] = P.x;
-        _P[1] = P.y;
-        _P[2] = P.z;
+        q_P(_P[0], P.x);
+        q_P(_P[1], P.y);
+        q_P(_P[2], P.z);
         _P[3] = 1.f;
         _N_I = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(index));
         _T = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), 0);
         _B = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), 0);
-        _tc[0] = tc.x;
-        _tc[1] = tc.y;
+        q_tc(_tc[0], tc.x);
+        q_tc(_tc[1], tc.y);
     }
 
     u16 get_bone() const
@@ -191,34 +251,32 @@ struct vertHW_1W
 
     void get_pos(Fvector& p) const
     {
-        p.x = _P[0];
-        p.y = _P[1];
-        p.z = _P[2];
+        p.x = u_P(_P[0]);
+        p.y = u_P(_P[1]);
+        p.z = u_P(_P[2]);
     }
 };
 
-struct vertHW_2W
+template <typename T>
+struct vertHW_2W : vertHW_2W_data<T>
 {
-    float _P[4];
-    u32 _N_w;
-    u32 _T;
-    u32 _B;
-    float _tc_i[4];
+    using self_type = vertHW_2W;
+    using value_type = T;
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, float w)
     {
         N.normalize_safe();
         T.normalize_safe();
         B.normalize_safe();
-        _P[0] = P.x;
-        _P[1] = P.y;
-        _P[2] = P.z;
+        q_P(_P[0], P.x);
+        q_P(_P[1], P.y);
+        q_P(_P[2], P.z);
         _P[3] = 1.f;
         _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w * 255.f + .5f), 0, 255)));
         _T = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), 0);
         _B = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), 0);
-        _tc_i[0] = tc.x;
-        _tc_i[1] = tc.y;
+        q_tc(_tc_i[0], tc.x);
+        q_tc(_tc_i[1], tc.y);
         _tc_i[2] = s16(index0);
         _tc_i[3] = s16(index1);
     }
@@ -235,9 +293,9 @@ struct vertHW_2W
 
     void get_pos(Fvector& p) const
     {
-        p.x = _P[0];
-        p.y = _P[1];
-        p.z = _P[2];
+        p.x = u_P(_P[0]);
+        p.y = u_P(_P[1]);
+        p.z = u_P(_P[2]);
     }
 
     void get_pos_bones(Fvector& p, CKinematics* Parent) const
@@ -253,13 +311,11 @@ struct vertHW_2W
     }
 };
 
-struct vertHW_3W
+template <typename T>
+struct vertHW_3W : vertHW_3W_data<T>
 {
-    float _P[4];
-    u32 _N_w;
-    u32 _T_w;
-    u32 _B_i;
-    float _tc_i[4];
+    using self_type = vertHW_3W;
+    using value_type = T;
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
         float w0, float w1)
@@ -267,15 +323,15 @@ struct vertHW_3W
         N.normalize_safe();
         T.normalize_safe();
         B.normalize_safe();
-        _P[0] = P.x;
-        _P[1] = P.y;
-        _P[2] = P.z;
+        q_P(_P[0], P.x);
+        q_P(_P[1], P.y);
+        q_P(_P[2], P.z);
         _P[3] = 1.f;
         _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
         _T_w = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
         _B_i = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), u8(index2));
-        _tc_i[0] = tc.x;
-        _tc_i[1] = tc.y;
+        q_tc(_tc_i[0], tc.x);;
+        q_tc(_tc_i[1], tc.y);;
         _tc_i[2] = s16(index0);
         _tc_i[3] = s16(index1);
     }
@@ -304,9 +360,9 @@ struct vertHW_3W
 
     void get_pos(Fvector& p) const
     {
-        p.x = _P[0];
-        p.y = _P[1];
-        p.z = _P[2];
+        p.x = u_P(_P[0]);
+        p.y = u_P(_P[1]);
+        p.z = u_P(_P[2]);
     }
 
     void get_pos_bones(Fvector& p, CKinematics* Parent) const
@@ -332,14 +388,11 @@ struct vertHW_3W
     }
 };
 
-struct vertHW_4W
+template <typename T>
+struct vertHW_4W : vertHW_4W_data<T>
 {
-    float _P[4];
-    u32 _N_w;
-    u32 _T_w;
-    u32 _B_w;
-    float _tc[2];
-    u32 _i;
+    using self_type = vertHW_4W;
+    using value_type = T;
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
         int index3, float w0, float w1, float w2)
@@ -347,15 +400,15 @@ struct vertHW_4W
         N.normalize_safe();
         T.normalize_safe();
         B.normalize_safe();
-        _P[0] = P.x;
-        _P[1] = P.y;
-        _P[2] = P.z;
+        q_P(_P[0], P.x);
+        q_P(_P[1], P.y);
+        q_P(_P[2], P.z);
         _P[3] = 1.f;
         _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
         _T_w = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
         _B_w = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), u8(clampr(iFloor(w2 * 255.f + .5f), 0, 255)));
-        _tc[0] = tc.x;
-        _tc[1] = tc.y;
+        q_tc(_tc[0], tc.x);
+        q_tc(_tc[1], tc.y);
         _i = color_rgba(u8(index0), u8(index1), u8(index2), u8(index3));
     }
 
@@ -389,9 +442,9 @@ struct vertHW_4W
 
     void get_pos(Fvector& p) const
     {
-        p.x = _P[0];
-        p.y = _P[1];
-        p.z = _P[2];
+        p.x = u_P(_P[0]);
+        p.y = u_P(_P[1]);
+        p.z = u_P(_P[2]);
     }
 
     void get_pos_bones(Fvector& p, CKinematics* Parent) const
@@ -423,25 +476,49 @@ template <typename T>
 constexpr VertexElement* get_decl() = delete;
 
 template <>
-constexpr VertexElement* get_decl<vertHW_1W>()
+constexpr VertexElement* get_decl<vertHW_1W<s16>>()
+{
+    return dwDecl_01W;
+}
+
+template <>
+constexpr VertexElement* get_decl<vertHW_2W<s16>>()
+{
+    return dwDecl_2W;
+}
+
+template <>
+constexpr VertexElement* get_decl<vertHW_3W<s16>>()
+{
+    return dwDecl_3W;
+}
+
+template <>
+constexpr VertexElement* get_decl<vertHW_4W<s16>>()
+{
+    return dwDecl_4W;
+}
+
+template <>
+constexpr VertexElement* get_decl<vertHW_1W<float>>()
 {
     return dwDecl_01W_HQ;
 }
 
 template <>
-constexpr VertexElement* get_decl<vertHW_2W>()
+constexpr VertexElement* get_decl<vertHW_2W<float>>()
 {
     return dwDecl_2W_HQ;
 }
 
 template <>
-constexpr VertexElement* get_decl<vertHW_3W>()
+constexpr VertexElement* get_decl<vertHW_3W<float>>()
 {
     return dwDecl_3W_HQ;
 }
 
 template <>
-constexpr VertexElement* get_decl<vertHW_4W>()
+constexpr VertexElement* get_decl<vertHW_4W<float>>()
 {
     return dwDecl_4W_HQ;
 }

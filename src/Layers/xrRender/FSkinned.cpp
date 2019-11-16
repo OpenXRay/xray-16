@@ -67,27 +67,24 @@ void CSkeletonX_ST::Load(const char* N, IReader* data, u32 dwFlags)
     _Load_hw(*this, _verts_);
 }
 
-template <typename TDst, typename TSrc>
-void set_vertice_hw(TDst* dst, TSrc* src) = delete;
-
-template <>
-void set_vertice_hw(vertHW_1W* dst, vertBoned1W* src)
+template <typename T>
+ICF void set_vertice_hw(vertHW_1W<T>* dst, vertBoned1W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
     dst->set(src->P, src->N, src->T, src->B, uv, src->matrix * 3);
 }
 
-template <>
-void set_vertice_hw(vertHW_2W* dst, vertBoned2W* src)
+template <typename T>
+ICF void set_vertice_hw(vertHW_2W<T>* dst, vertBoned2W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
     dst->set(src->P, src->N, src->T, src->B, uv, int(src->matrix0) * 3, int(src->matrix1) * 3, src->w);
 }
 
-template <>
-void set_vertice_hw(vertHW_3W* dst, vertBoned3W* src)
+template <typename T>
+ICF void set_vertice_hw(vertHW_3W<T>* dst, vertBoned3W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
@@ -96,8 +93,8 @@ void set_vertice_hw(vertHW_3W* dst, vertBoned3W* src)
         src->w[0], src->w[1]);
 }
 
-template <>
-void set_vertice_hw(vertHW_4W* dst, vertBoned4W* src)
+template <typename T>
+ICF void set_vertice_hw(vertHW_4W<T>* dst, vertBoned4W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
@@ -138,19 +135,36 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 
     case RM_SINGLE:
     case RM_SKINNING_1B:
-        load_hw<vertHW_1W>(V, (vertBoned1W*)_verts_);
+        load_hw<vertHW_1W<s16>>(V, (vertBoned1W*)_verts_);
         break;
 
     case RM_SKINNING_2B:
-        load_hw<vertHW_2W>(V, (vertBoned2W*)_verts_);
+        load_hw<vertHW_2W<s16>>(V, (vertBoned2W*)_verts_);
         break;
 
     case RM_SKINNING_3B:
-        load_hw<vertHW_3W>(V, (vertBoned3W*)_verts_);
+        load_hw<vertHW_3W<s16>>(V, (vertBoned3W*)_verts_);
         break;
 
     case RM_SKINNING_4B:
-        load_hw<vertHW_4W>(V, (vertBoned4W*)_verts_);
+        load_hw<vertHW_4W<s16>>(V, (vertBoned4W*)_verts_);
+        break;
+
+    case RM_SINGLE_HQ:
+    case RM_SKINNING_1B_HQ:
+        load_hw<vertHW_1W<float>>(V, (vertBoned1W*)_verts_);
+        break;
+
+    case RM_SKINNING_2B_HQ:
+        load_hw<vertHW_2W<float>>(V, (vertBoned2W*)_verts_);
+        break;
+
+    case RM_SKINNING_3B_HQ:
+        load_hw<vertHW_3W<float>>(V, (vertBoned3W*)_verts_);
+        break;
+
+    case RM_SKINNING_4B_HQ:
+        load_hw<vertHW_4W<float>>(V, (vertBoned4W*)_verts_);
         break;
     }
 }
@@ -187,17 +201,14 @@ static void verify_vertex(const vertex_type& v, const Fvisual* V, const CKinemat
 #endif
 
 template <typename T>
-void append_bone_faces(CKinematics* Parent, T& v, u16 ChildIDX, u32 idx) = delete;
-
-template <>
-void append_bone_faces<vertHW_1W>(CKinematics* Parent, vertHW_1W& v, u16 ChildIDX, u32 idx)
+ICF void append_bone_faces(CKinematics* Parent, vertHW_1W<T>& v, u16 ChildIDX, u32 idx)
 {
     CBoneData& BD = Parent->LL_GetData(v.get_bone());
     BD.AppendFace(ChildIDX, (u16)(idx / 3));
 }
 
-template <>
-void append_bone_faces<vertHW_2W>(CKinematics* Parent, vertHW_2W& v, u16 ChildIDX, u32 idx)
+template <typename T>
+ICF void append_bone_faces(CKinematics* Parent, vertHW_2W<T>& v, u16 ChildIDX, u32 idx)
 {
     CBoneData& BD0 = Parent->LL_GetData(v.get_bone(0));
     BD0.AppendFace(ChildIDX, (u16)(idx / 3));
@@ -205,8 +216,8 @@ void append_bone_faces<vertHW_2W>(CKinematics* Parent, vertHW_2W& v, u16 ChildID
     BD1.AppendFace(ChildIDX, (u16)(idx / 3));
 }
 
-template <>
-void append_bone_faces<vertHW_3W>(CKinematics* Parent, vertHW_3W& v, u16 ChildIDX, u32 idx)
+template <typename T>
+ICF void append_bone_faces(CKinematics* Parent, vertHW_3W<T>& v, u16 ChildIDX, u32 idx)
 {
     CBoneData& BD0 = Parent->LL_GetData(v.get_bone(0));
     BD0.AppendFace(ChildIDX, (u16)(idx / 3));
@@ -216,8 +227,8 @@ void append_bone_faces<vertHW_3W>(CKinematics* Parent, vertHW_3W& v, u16 ChildID
     BD2.AppendFace(ChildIDX, (u16)(idx / 3));
 }
 
-template <>
-void append_bone_faces<vertHW_4W>(CKinematics* Parent, vertHW_4W& v, u16 ChildIDX, u32 idx)
+template <typename T>
+ICF void append_bone_faces(CKinematics* Parent, vertHW_4W<T>& v, u16 ChildIDX, u32 idx)
 {
     CBoneData& BD0 = Parent->LL_GetData(v.get_bone(0));
     BD0.AppendFace(ChildIDX, (u16)(idx / 3));
@@ -233,13 +244,12 @@ template <typename T>
 void CSkeletonX_ext::_CollectBoneFacesHW(u16* indices, Fvisual* V, u32 iCount)
 {
     VERIFY(V->vStride == sizeof(T));
-    void* data = static_cast<BYTE*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
-    T* vertices = static_cast<T*>(data);
+    T* vertices = static_cast<T*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
 
     for (u32 idx = 0; idx < iCount; idx++)
     {
         T& v = vertices[indices[idx]];
-        append_bone_faces<T>(Parent, v, ChildIDX, idx);
+        append_bone_faces(Parent, v, ChildIDX, idx);
     }
 
     V->p_rm_Vertices->Unmap(); // ? keep ?
@@ -320,24 +330,41 @@ void CSkeletonX_ext::_CollectBoneFaces(Fvisual* V, u32 iBase, u32 iCount)
         }
         else
             R_ASSERT2(0, "not implemented yet");
+        break;
     }
-    break;
 
     case RM_SINGLE:
     case RM_SKINNING_1B:
-        _CollectBoneFacesHW<vertHW_1W>(indices, V, iCount);
+        _CollectBoneFacesHW<vertHW_1W<s16>>(indices, V, iCount);
         break;
 
     case RM_SKINNING_2B:
-        _CollectBoneFacesHW<vertHW_2W>(indices, V, iCount);
+        _CollectBoneFacesHW<vertHW_2W<s16>>(indices, V, iCount);
         break;
 
     case RM_SKINNING_3B:
-        _CollectBoneFacesHW<vertHW_3W>(indices, V, iCount);
+        _CollectBoneFacesHW<vertHW_3W<s16>>(indices, V, iCount);
         break;
 
     case RM_SKINNING_4B:
-        _CollectBoneFacesHW<vertHW_4W>(indices, V, iCount);
+        _CollectBoneFacesHW<vertHW_4W<s16>>(indices, V, iCount);
+        break;
+
+    case RM_SINGLE_HQ:
+    case RM_SKINNING_1B_HQ:
+        _CollectBoneFacesHW<vertHW_1W<float>>(indices, V, iCount);
+        break;
+
+    case RM_SKINNING_2B_HQ:
+        _CollectBoneFacesHW<vertHW_2W<float>>(indices, V, iCount);
+        break;
+
+    case RM_SKINNING_3B_HQ:
+        _CollectBoneFacesHW<vertHW_3W<float>>(indices, V, iCount);
+        break;
+
+    case RM_SKINNING_4B_HQ:
+        _CollectBoneFacesHW<vertHW_4W<float>>(indices, V, iCount);
         break;
     }
     V->p_rm_Indices->Unmap();
@@ -362,34 +389,12 @@ void get_pos_bones(const T& v, Fvector& p, CKinematics* Parent)
     v.get_pos_bones(p, Parent);
 }
 
-BOOL CSkeletonX_ext::_PickBoneHW1W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
-    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    return pick_bone<vertHW_1W>(Parent, r, dist, S, D, V, indices, faces);
-}
-BOOL CSkeletonX_ext::_PickBoneHW2W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
-    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    return pick_bone<vertHW_2W>(Parent, r, dist, S, D, V, indices, faces);
-}
-
-BOOL CSkeletonX_ext::_PickBoneHW3W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
-    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    return pick_bone<vertHW_3W>(Parent, r, dist, S, D, V, indices, faces);
-}
-BOOL CSkeletonX_ext::_PickBoneHW4W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
-    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    return pick_bone<vertHW_4W>(Parent, r, dist, S, D, V, indices, faces);
-}
-
 BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir,
     Fvisual* V, u16 bone_id, u32 iBase, u32 /*iCount*/)
 {
     VERIFY(Parent && ChildIDX != u16(-1));
     CBoneData& BD = Parent->LL_GetData(bone_id);
-    CBoneData::FacesVec* faces = &BD.child_faces[ChildIDX];
+    CBoneData::FacesVec& faces = BD.child_faces[ChildIDX];
     BOOL result = FALSE;
     u16* indices = static_cast<u16*>(V->p_rm_Indices->Map(0, V->dwPrimitives * 3, true));
     switch (RenderMode)
@@ -397,31 +402,51 @@ BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fv
     case RM_SKINNING_SOFT:
     {
         if (*Vertices1W)
-            result = _PickBoneSoft1W(r, dist, start, dir, indices + iBase, *faces);
+            result = _PickBoneSoft1W(r, dist, start, dir, indices + iBase, faces);
         else if (*Vertices2W)
-            result = _PickBoneSoft2W(r, dist, start, dir, indices + iBase, *faces);
+            result = _PickBoneSoft2W(r, dist, start, dir, indices + iBase, faces);
         else if (*Vertices3W)
-            result = _PickBoneSoft3W(r, dist, start, dir, indices + iBase, *faces);
+            result = _PickBoneSoft3W(r, dist, start, dir, indices + iBase, faces);
         else
         {
             VERIFY(!!*Vertices4W);
-            result = _PickBoneSoft4W(r, dist, start, dir, indices + iBase, *faces);
+            result = _PickBoneSoft4W(r, dist, start, dir, indices + iBase, faces);
         }
-    }
         break;
+    }
+
     case RM_SINGLE:
     case RM_SKINNING_1B:
-        result = _PickBoneHW1W(r, dist, start, dir, V, indices + iBase, *faces);
+        result = pick_bone<vertHW_1W<s16>>(Parent, r, dist, start, dir, V, indices, faces);
         break;
+
     case RM_SKINNING_2B:
-        result = _PickBoneHW2W(r, dist, start, dir, V, indices + iBase, *faces);
+        result = pick_bone<vertHW_2W<s16>>(Parent, r, dist, start, dir, V, indices, faces);
         break;
     case RM_SKINNING_3B:
-        result = _PickBoneHW3W(r, dist, start, dir, V, indices + iBase, *faces);
+        result = pick_bone<vertHW_3W<s16>>(Parent, r, dist, start, dir, V, indices, faces);
         break;
+
     case RM_SKINNING_4B:
-        result = _PickBoneHW4W(r, dist, start, dir, V, indices + iBase, *faces);
+        result = pick_bone<vertHW_4W<s16>>(Parent, r, dist, start, dir, V, indices, faces);
         break;
+
+    case RM_SINGLE_HQ:
+    case RM_SKINNING_1B_HQ:
+        result = pick_bone<vertHW_1W<float>>(Parent, r, dist, start, dir, V, indices, faces);
+        break;
+
+    case RM_SKINNING_2B_HQ:
+        result = pick_bone<vertHW_2W<float>>(Parent, r, dist, start, dir, V, indices, faces);
+        break;
+    case RM_SKINNING_3B_HQ:
+        result = pick_bone<vertHW_3W<float>>(Parent, r, dist, start, dir, V, indices, faces);
+        break;
+
+    case RM_SKINNING_4B_HQ:
+        result = pick_bone<vertHW_4W<float>>(Parent, r, dist, start, dir, V, indices, faces);
+        break;
+
     default: NODEFAULT;
     }
     V->p_rm_Indices->Unmap();
@@ -452,8 +477,8 @@ void CSkeletonX_PM::EnumBoneVertices(SEnumVerticesCallback& C, u16 bone_id)
     inherited2::_EnumBoneVertices(C, this, bone_id, iBase + SW.offset, SW.num_tris * 3);
 }
 
-template <>
-void CSkeletonX_ext::_FillFace<vertHW_1W>(Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_1W& vert)
+template <typename T>
+ICF void fill_face(CKinematics* parent, Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_1W<T>& vert)
 {
     F.bone_id[k][0] = vert.get_bone();
     F.bone_id[k][1] = F.bone_id[k][0];
@@ -463,13 +488,13 @@ void CSkeletonX_ext::_FillFace<vertHW_1W>(Fvector p[3], CSkeletonWallmark::WMFac
     F.weight[k][1] = 0.f;
     F.weight[k][2] = 0.f;
 
-    const Fmatrix& xform = Parent->LL_GetBoneInstance(F.bone_id[k][0]).mRenderTransform;
+    const Fmatrix& xform = parent->LL_GetBoneInstance(F.bone_id[k][0]).mRenderTransform;
     vert.get_pos(F.vert[k]);
     xform.transform_tiny(p[k], F.vert[k]);
 }
 
-template <>
-void CSkeletonX_ext::_FillFace<vertHW_2W>(Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_2W& vert)
+template <typename T>
+ICF void fill_face(CKinematics* parent, Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_2W<T>& vert)
 {
     F.bone_id[k][0] = vert.get_bone(0);
     F.bone_id[k][1] = vert.get_bone(1);
@@ -479,8 +504,8 @@ void CSkeletonX_ext::_FillFace<vertHW_2W>(Fvector p[3], CSkeletonWallmark::WMFac
     F.weight[k][1] = 0.f;
     F.weight[k][2] = 0.f;
 
-    Fmatrix& xform0 = Parent->LL_GetBoneInstance(F.bone_id[k][0]).mRenderTransform;
-    Fmatrix& xform1 = Parent->LL_GetBoneInstance(F.bone_id[k][1]).mRenderTransform;
+    Fmatrix& xform0 = parent->LL_GetBoneInstance(F.bone_id[k][0]).mRenderTransform;
+    Fmatrix& xform1 = parent->LL_GetBoneInstance(F.bone_id[k][1]).mRenderTransform;
     vert.get_pos(F.vert[k]);
 
     Fvector P0, P1;
@@ -489,8 +514,8 @@ void CSkeletonX_ext::_FillFace<vertHW_2W>(Fvector p[3], CSkeletonWallmark::WMFac
     p[k].lerp(P0, P1, F.weight[k][0]);
 }
 
-template <>
-void CSkeletonX_ext::_FillFace<vertHW_3W>(Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_3W& vert)
+template <typename T>
+ICF void fill_face(CKinematics* parent, Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_3W<T>& vert)
 {
     F.bone_id[k][0] = vert.get_bone(0);
     F.bone_id[k][1] = vert.get_bone(1);
@@ -500,11 +525,11 @@ void CSkeletonX_ext::_FillFace<vertHW_3W>(Fvector p[3], CSkeletonWallmark::WMFac
     F.weight[k][1] = vert.get_weight1();
     F.weight[k][2] = 0.f;
     vert.get_pos(F.vert[k]);
-    vert.get_pos_bones(p[k], Parent);
+    vert.get_pos_bones(p[k], parent);
 }
 
-template <>
-void CSkeletonX_ext::_FillFace<vertHW_4W>(Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_4W& vert)
+template <typename T>
+ICF void fill_face(CKinematics* parent, Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, vertHW_4W<T>& vert)
 {
     F.bone_id[k][0] = vert.get_bone(0);
     F.bone_id[k][1] = vert.get_bone(1);
@@ -514,16 +539,15 @@ void CSkeletonX_ext::_FillFace<vertHW_4W>(Fvector p[3], CSkeletonWallmark::WMFac
     F.weight[k][1] = vert.get_weight1();
     F.weight[k][2] = vert.get_weight2();
     vert.get_pos(F.vert[k]);
-    vert.get_pos_bones(p[k], Parent);
+    vert.get_pos_bones(p[k], parent);
 }
 
 template <typename T>
-void CSkeletonX_ext::_FillVerticesHW(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
+void fill_vertices_hw(CKinematics* parent, const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
     float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
 {
     VERIFY(V->vStride == sizeof(T));
-    void* data = static_cast<BYTE*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
-    T* vertices = static_cast<T*>(data);
+    T* vertices = static_cast<T*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
 
     for (auto it = faces.begin(); it != faces.end(); ++it)
     {
@@ -534,12 +558,12 @@ void CSkeletonX_ext::_FillVerticesHW(const Fmatrix& view, CSkeletonWallmark& wm,
         for (u32 k = 0; k < 3; k++)
         {
             T& vert = vertices[indices[idx + k]];
-            _FillFace<T>(p, F, k, vert);
+            fill_face(parent, p, F, k, vert);
         }
 
         Fvector test_normal;
         test_normal.mknormal(p[0], p[1], p[2]);
-        float cosa = test_normal.dotproduct(normal);
+        const float cosa = test_normal.dotproduct(normal);
         if (cosa < EPS)
             continue;
 
@@ -557,30 +581,6 @@ void CSkeletonX_ext::_FillVerticesHW(const Fmatrix& view, CSkeletonWallmark& wm,
         }
     }
     V->p_rm_Vertices->Unmap();
-}
-
-void CSkeletonX_ext::_FillVerticesHW1W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
-                                       float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    _FillVerticesHW<vertHW_1W>(view, wm, normal, size, V, indices, faces);
-}
-
-void CSkeletonX_ext::_FillVerticesHW2W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
-                                       float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    _FillVerticesHW<vertHW_2W>(view, wm, normal, size, V, indices, faces);
-}
-
-void CSkeletonX_ext::_FillVerticesHW3W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
-                                       float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    _FillVerticesHW<vertHW_3W>(view, wm, normal, size, V, indices, faces);
-}
-
-void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
-                                       float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    _FillVerticesHW<vertHW_4W>(view, wm, normal, size, V, indices, faces);
 }
 
 void CSkeletonX_ext::_FillVertices(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
@@ -603,14 +603,39 @@ void CSkeletonX_ext::_FillVertices(const Fmatrix& view, CSkeletonWallmark& wm, c
             _FillVerticesSoft4W(view, wm, normal, size, indices + iBase, *faces);
         }
         break;
+
     case RM_SINGLE:
-    case RM_SKINNING_1B: _FillVerticesHW1W(view, wm, normal, size, V, indices + iBase, *faces);
+    case RM_SKINNING_1B:
+        fill_vertices_hw<vertHW_1W<s16>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
         break;
-    case RM_SKINNING_2B: _FillVerticesHW2W(view, wm, normal, size, V, indices + iBase, *faces);
+
+    case RM_SKINNING_2B:
+        fill_vertices_hw<vertHW_2W<s16>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
         break;
-    case RM_SKINNING_3B: _FillVerticesHW3W(view, wm, normal, size, V, indices + iBase, *faces);
+
+    case RM_SKINNING_3B:
+        fill_vertices_hw<vertHW_3W<s16>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
         break;
-    case RM_SKINNING_4B: _FillVerticesHW4W(view, wm, normal, size, V, indices + iBase, *faces);
+
+    case RM_SKINNING_4B:
+        fill_vertices_hw<vertHW_4W<s16>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
+        break;
+
+    case RM_SINGLE_HQ:
+    case RM_SKINNING_1B_HQ:
+        fill_vertices_hw<vertHW_1W<float>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
+        break;
+
+    case RM_SKINNING_2B_HQ:
+        fill_vertices_hw<vertHW_2W<float>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
+        break;
+
+    case RM_SKINNING_3B_HQ:
+        fill_vertices_hw<vertHW_3W<float>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
+        break;
+
+    case RM_SKINNING_4B_HQ:
+        fill_vertices_hw<vertHW_4W<float>>(Parent, view, wm, normal, size, V, indices + iBase, *faces);
         break;
     }
     V->p_rm_Indices->Unmap();
@@ -672,32 +697,61 @@ void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16
     case RM_SINGLE:
     case RM_SKINNING_1B:
     {
-        VERIFY(V->vStride == sizeof(vertHW_1W));
-        vertHW_1W *vertices = static_cast<vertHW_1W*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        VERIFY(V->vStride == sizeof(vertHW_1W<s16>));
+        vertHW_1W<s16>* vertices = static_cast<vertHW_1W<s16>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
         TEnumBoneVertices(vertices, indices + iBase, *faces, C);
-    }
         break;
+    }
     case RM_SKINNING_2B:
     {
-        VERIFY(V->vStride == sizeof(vertHW_2W));
-        vertHW_2W *vertices = static_cast<vertHW_2W*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        VERIFY(V->vStride == sizeof(vertHW_2W<s16>));
+        vertHW_2W<s16>* vertices = static_cast<vertHW_2W<s16>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
         TEnumBoneVertices(vertices, indices + iBase, *faces, C);
-    }
         break;
+    }
     case RM_SKINNING_3B:
     {
-        VERIFY(V->vStride == sizeof(vertHW_3W));
-        vertHW_3W* vertices = static_cast<vertHW_3W*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        VERIFY(V->vStride == sizeof(vertHW_3W<s16>));
+        vertHW_3W<s16>* vertices = static_cast<vertHW_3W<s16>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
         TEnumBoneVertices(vertices, indices + iBase, *faces, C);
-    }
         break;
+    }
     case RM_SKINNING_4B:
     {
-        VERIFY(V->vStride == sizeof(vertHW_4W));
-        vertHW_4W* vertices = static_cast<vertHW_4W*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        VERIFY(V->vStride == sizeof(vertHW_4W<s16>));
+        vertHW_4W<s16>* vertices = static_cast<vertHW_4W<s16>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
         TEnumBoneVertices(vertices, indices + iBase, *faces, C);
-    }
         break;
+    }
+    case RM_SINGLE_HQ:
+    case RM_SKINNING_1B_HQ:
+    {
+        VERIFY(V->vStride == sizeof(vertHW_1W<float>));
+        vertHW_1W<float>* vertices = static_cast<vertHW_1W<float>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        TEnumBoneVertices(vertices, indices + iBase, *faces, C);
+        break;
+    }
+    case RM_SKINNING_2B_HQ:
+    {
+        VERIFY(V->vStride == sizeof(vertHW_2W<float>));
+        vertHW_2W<float>* vertices = static_cast<vertHW_2W<float>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        TEnumBoneVertices(vertices, indices + iBase, *faces, C);
+        break;
+    }
+    case RM_SKINNING_3B_HQ:
+    {
+        VERIFY(V->vStride == sizeof(vertHW_3W<float>));
+        vertHW_3W<float>* vertices = static_cast<vertHW_3W<float>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        TEnumBoneVertices(vertices, indices + iBase, *faces, C);
+        break;
+    }
+    case RM_SKINNING_4B_HQ:
+    {
+        VERIFY(V->vStride == sizeof(vertHW_4W<float>));
+        vertHW_4W<float>* vertices = static_cast<vertHW_4W<float>*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
+        TEnumBoneVertices(vertices, indices + iBase, *faces, C);
+        break;
+    }
     default: NODEFAULT;
     }
     if (RenderMode != RM_SKINNING_SOFT)

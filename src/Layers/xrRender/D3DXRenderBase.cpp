@@ -15,6 +15,7 @@ D3DXRenderBase::D3DXRenderBase()
     r_pmask(true, true);
     b_loaded = FALSE;
     Resources = nullptr;
+    m_hq_skinning = true;
 }
 
 void D3DXRenderBase::setGamma(float fGamma)
