@@ -57,18 +57,6 @@ inline float errN(Fvector3 /*v*/, u8* /*qv*/)
 #endif
 
 #pragma region 1W
-template <typename T>
-struct vertHW_1W_data
-{
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
-
-    T _P[4];
-    u32 _N_I;
-    u32 _T;
-    u32 _B;
-    T _tc[2];
-};
-
 static VertexElement dwDecl_01W[] = // 24bytes
 {
     {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // P : 2 : -12..+12
@@ -91,18 +79,6 @@ static VertexElement dwDecl_01W_HQ[] = // 36bytes
 #pragma endregion 1W
 
 #pragma region 2W
-template <typename T>
-struct vertHW_2W_data
-{
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
-
-    T _P[4];
-    u32 _N_w;
-    u32 _T;
-    u32 _B;
-    T _tc_i[4];
-};
-
 static VertexElement dwDecl_2W[] = // 28bytes
 {
     {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
@@ -129,18 +105,6 @@ static VertexElement dwDecl_2W_HQ[] = // 44bytes
 #pragma endregion 2W
 
 #pragma region 3W
-template <typename T>
-struct vertHW_3W_data
-{
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
-
-    T _P[4];
-    u32 _N_w;
-    u32 _T_w;
-    u32 _B_i;
-    T _tc_i[4];
-};
-
 static VertexElement dwDecl_3W[] = // 28bytes
 {
     {0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // p : 2 : -12..+12
@@ -171,19 +135,6 @@ static VertexElement dwDecl_3W_HQ[] = // 44bytes
 #pragma endregion 3W
 
 #pragma region 4W
-template <typename T>
-struct vertHW_4W_data
-{
-    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
-
-    T _P[4];
-    u32 _N_w;
-    u32 _T_w;
-    u32 _B_w;
-    T _tc[2];
-    u32 _i;
-};
-
 static VertexElement dwDecl_4W[] = // 28bytes
 {
     // p : 2 : -12..+12
@@ -216,10 +167,15 @@ static VertexElement dwDecl_4W_HQ[] = // 40bytes
 #pragma endregion 4W
 
 template <typename T>
-struct vertHW_1W : vertHW_1W_data<T>
+struct vertHW_1W
 {
-    using self_type = vertHW_1W;
-    using value_type = T;
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T   _P[4];
+    u32 _N_I;
+    u32 _T;
+    u32 _B;
+    T   _tc[2];
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index)
     {
@@ -258,10 +214,15 @@ struct vertHW_1W : vertHW_1W_data<T>
 };
 
 template <typename T>
-struct vertHW_2W : vertHW_2W_data<T>
+struct vertHW_2W
 {
-    using self_type = vertHW_2W;
-    using value_type = T;
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T   _P[4];
+    u32 _N_w;
+    u32 _T;
+    u32 _B;
+    T   _tc_i[4];
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, float w)
     {
@@ -312,10 +273,15 @@ struct vertHW_2W : vertHW_2W_data<T>
 };
 
 template <typename T>
-struct vertHW_3W : vertHW_3W_data<T>
+struct vertHW_3W
 {
-    using self_type = vertHW_3W;
-    using value_type = T;
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T   _P[4];
+    u32 _N_w;
+    u32 _T_w;
+    u32 _B_i;
+    T   _tc_i[4];
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
         float w0, float w1)
@@ -389,10 +355,16 @@ struct vertHW_3W : vertHW_3W_data<T>
 };
 
 template <typename T>
-struct vertHW_4W : vertHW_4W_data<T>
+struct vertHW_4W
 {
-    using self_type = vertHW_4W;
-    using value_type = T;
+    static_assert(std::is_same_v<T, float> || std::is_same_v<T, s16>, "Only float and s16 are supported");
+
+    T   _P[4];
+    u32 _N_w;
+    u32 _T_w;
+    u32 _B_w;
+    T   _tc[2];
+    u32 _i;
 
     void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
         int index3, float w0, float w1, float w2)
