@@ -418,4 +418,31 @@ struct vertHW_4W
             p.add(P[k]);
     }
 };
+
+template <typename T>
+constexpr VertexElement* get_decl() = delete;
+
+template <>
+constexpr VertexElement* get_decl<vertHW_1W>()
+{
+    return dwDecl_01W_HQ;
+}
+
+template <>
+constexpr VertexElement* get_decl<vertHW_2W>()
+{
+    return dwDecl_2W_HQ;
+}
+
+template <>
+constexpr VertexElement* get_decl<vertHW_3W>()
+{
+    return dwDecl_3W_HQ;
+}
+
+template <>
+constexpr VertexElement* get_decl<vertHW_4W>()
+{
+    return dwDecl_4W_HQ;
+}
 #pragma pack(pop)

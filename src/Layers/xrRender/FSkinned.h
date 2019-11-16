@@ -18,6 +18,18 @@ protected:
 
     void _EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16 bone_id, u32 iBase, u32 iCount) const;
 
+private:
+    template <typename T>
+    void _CollectBoneFacesHW(u16* indices, Fvisual* V, u32 iCount);
+
+    template <typename T>
+    void _FillFace(Fvector p[3], CSkeletonWallmark::WMFace& F, u32 k, T& vert);
+
+    template <typename T>
+    void _FillVerticesHW(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
+        Fvisual* V, u16* indices, CBoneData::FacesVec& faces);
+
+protected:
     virtual void _FillVerticesHW1W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
         Fvisual* V, u16* indices, CBoneData::FacesVec& faces);
 
