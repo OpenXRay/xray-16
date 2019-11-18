@@ -11,7 +11,7 @@
 #include "alife_story_registry.h"
 #include "xrServer_Objects_ALife.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "ui/uixmlinit.h"
+#include "ui/UIXmlInit.h"
 
 void INFO_DATA::load(IReader& stream)
 {
