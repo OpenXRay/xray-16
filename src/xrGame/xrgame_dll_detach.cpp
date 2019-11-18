@@ -43,9 +43,8 @@ void init_game_globals()
     InitHudSoundSettings();
     if (!GEnv.isDedicatedServer)
     {
-        const bool required = ShadowOfChernobylMode || ClearSkyMode;
-        CInfoPortion::InitInternal(required);
-        CEncyclopediaArticle::InitInternal(required);
+        CInfoPortion::InitInternal(ShadowOfChernobylMode || ClearSkyMode);
+        CEncyclopediaArticle::InitInternal(ShadowOfChernobylMode);
         CPhraseDialog::InitInternal();
         InventoryUtilities::CreateShaders();
     };
