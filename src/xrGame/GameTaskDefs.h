@@ -42,7 +42,7 @@ using vGameTasks = xr_vector<SGameTaskKey>;
 
 struct CGameTaskRegistry : public CALifeAbstractRegistry<u16, vGameTasks>
 {
-    virtual void save(IWriter& stream)
+    void save(IWriter& stream) override
     {
         CALifeAbstractRegistry<u16, vGameTasks>::save(stream);
         for (auto& taskId : g_active_task_id)
@@ -54,8 +54,9 @@ struct CGameTaskRegistry : public CALifeAbstractRegistry<u16, vGameTasks>
 
             save_data(taskId, stream);
         }
-    };
-    virtual void load(IReader& stream)
+    }
+
+    void load(IReader& stream) override
     {
         CALifeAbstractRegistry<u16, vGameTasks>::load(stream);
 
