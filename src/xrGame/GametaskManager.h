@@ -31,7 +31,7 @@ public:
     void CleanupTasks() const
     {
         for (auto& taskId : g_active_task_id)
-            taskId = g_active_task_no_task___internal;
+            taskId = nullptr;
     }
 
     vGameTasks& GetGameTasks();
