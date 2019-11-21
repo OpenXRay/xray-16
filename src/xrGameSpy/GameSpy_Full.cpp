@@ -26,7 +26,12 @@ CGameSpy_Full::CGameSpy_Full()
     gsCoreInitialize();
     m_pGS_Patching = new CGameSpy_Patching();
     m_pGS_HTTP = new CGameSpy_HTTP();
-    m_pGS_SB = new CGameSpy_Browser();
+
+    char secretKey[16];
+    FillSecretKey(secretKey);
+    CGameSpy_Browser::SMasterListConfig cfg = {GAMESPY_GAMENAME, secretKey};
+    m_pGS_SB = new CGameSpy_Browser(cfg);
+
     m_pGS_GP = new CGameSpy_GP();
     m_pGS_SAKE = new CGameSpy_SAKE();
     m_pGS_ATLAS = new CGameSpy_ATLAS();

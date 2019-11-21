@@ -85,7 +85,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
 }
 }
 
-CGameSpy_Browser::CGameSpy_Browser()
+CGameSpy_Browser::CGameSpy_Browser(const SMasterListConfig& masterListCfg)
 #ifdef CONFIG_PROFILE_LOCKS
     : m_refresh_lock(MUTEX_PROFILE_ID(CGameSpy_Browser::m_refresh_lock))
 #endif // CONFIG_PROFILE_LOCKS
@@ -97,10 +97,8 @@ CGameSpy_Browser::CGameSpy_Browser()
     m_bAbleToConnectToMasterServer = true;
     m_bTryingToConnectToMasterServer = false;
     m_bShowCMSErr = false;
-    char secretKey[16];
-    FillSecretKey(secretKey);
-    m_pGSBrowser = ServerBrowserNewA(GAMESPY_GAMENAME, GAMESPY_GAMENAME, secretKey, 0, GAMESPY_BROWSER_MAX_UPDATES,
-        QVERSION_QR2, SBFalse, SBCallback, this);
+    m_pGSBrowser = ServerBrowserNewA(masterListCfg.gamename, masterListCfg.gamename, masterListCfg.secretkey, 0,
+        GAMESPY_BROWSER_MAX_UPDATES, QVERSION_QR2, SBFalse, SBCallback, this);
     if (!m_pGSBrowser)
     {
         Msg("! Unable to init Server Browser!");

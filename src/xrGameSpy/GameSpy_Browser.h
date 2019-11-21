@@ -111,6 +111,12 @@ public:
     using UpdateCallback = fastdelegate::FastDelegate<void()>;
     using DestroyCallback = fastdelegate::FastDelegate<void(CGameSpy_Browser*)>;
 
+    struct SMasterListConfig
+    {
+        pcstr gamename;
+        pcstr secretkey;
+    };
+
 private:
     //	string16	m_SecretKey;
     _ServerBrowser* m_pGSBrowser;
@@ -127,7 +133,7 @@ private:
     Lock m_refresh_lock;
 
 public:
-    CGameSpy_Browser();
+    CGameSpy_Browser(const SMasterListConfig& masterListCfg);
     ~CGameSpy_Browser();
 
     bool Init(UpdateCallback updateCb, DestroyCallback destroyCb);
