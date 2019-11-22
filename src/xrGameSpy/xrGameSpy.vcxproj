@@ -146,6 +146,7 @@
     <ClCompile Include="GameSpy_ATLAS.cpp" />
     <ClCompile Include="GameSpy_Available.cpp" />
     <ClCompile Include="GameSpy_Browser.cpp" />
+    <ClCompile Include="GameSpy_BrowsersWrapper.cpp" />
     <ClCompile Include="GameSpy_Full.cpp" />
     <ClCompile Include="GameSpy_GCD_Client.cpp" />
     <ClCompile Include="GameSpy_GCD_Server.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="GameSpy_ATLAS.h" />
     <ClInclude Include="GameSpy_Available.h" />
     <ClInclude Include="GameSpy_Browser.h" />
+    <ClInclude Include="GameSpy_BrowsersWrapper.h" />
     <ClInclude Include="GameSpy_Full.h" />
     <ClInclude Include="GameSpy_GCD_Client.h" />
     <ClInclude Include="GameSpy_GCD_Server.h" />

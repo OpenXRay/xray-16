@@ -3,7 +3,7 @@
 #include "GameSpy_Available.h"
 #include "GameSpy_Patching.h"
 #include "GameSpy_HTTP.h"
-#include "GameSpy_Browser.h"
+#include "GameSpy_BrowsersWrapper.h"
 #include "GameSpy_GP.h"
 #include "GameSpy_SAKE.h"
 #include "GameSpy_ATLAS.h"
@@ -26,11 +26,7 @@ CGameSpy_Full::CGameSpy_Full()
     gsCoreInitialize();
     m_pGS_Patching = new CGameSpy_Patching();
     m_pGS_HTTP = new CGameSpy_HTTP();
-
-    char secretKey[16];
-    FillSecretKey(secretKey);
-    CGameSpy_Browser::SMasterListConfig cfg = {GAMESPY_GAMENAME, secretKey};
-    m_pGS_SB = new CGameSpy_Browser(cfg);
+    m_pGS_SB = new CGameSpy_BrowsersWrapper();
 
     m_pGS_GP = new CGameSpy_GP();
     m_pGS_SAKE = new CGameSpy_SAKE();

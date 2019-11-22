@@ -97,6 +97,7 @@ CGameSpy_Browser::CGameSpy_Browser(const SMasterListConfig& masterListCfg)
     m_bAbleToConnectToMasterServer = true;
     m_bTryingToConnectToMasterServer = false;
     m_bShowCMSErr = false;
+    m_inited = false;
     m_pGSBrowser = ServerBrowserNewA(masterListCfg.gamename, masterListCfg.gamename, masterListCfg.secretkey, 0,
         GAMESPY_BROWSER_MAX_UPDATES, QVERSION_QR2, SBFalse, SBCallback, this);
     if (!m_pGSBrowser)
@@ -109,9 +110,6 @@ CGameSpy_Browser::CGameSpy_Browser(const SMasterListConfig& masterListCfg)
 
 CGameSpy_Browser::~CGameSpy_Browser()
 {
-    if (onDestroy)
-        onDestroy(this);
-
     Clear();
 
     delete_data(m_pQR2);
@@ -124,19 +122,19 @@ CGameSpy_Browser::~CGameSpy_Browser()
 
 static bool services_checked = false;
 
-bool CGameSpy_Browser::Init(UpdateCallback updateCb, DestroyCallback destroyCb)
+bool CGameSpy_Browser::Init(UpdateCallback updateCb)
 {
-    if (onDestroy)
-        onDestroy(this);
+    if (m_inited)
+        Clear();
     onUpdate = updateCb;
-    onDestroy = destroyCb;
+    m_inited = true;
     return true;
 };
 
 void CGameSpy_Browser::Clear()
 {
     onUpdate.clear();
-    onDestroy.clear();
+    m_inited = false;
 };
 
 struct RefreshData

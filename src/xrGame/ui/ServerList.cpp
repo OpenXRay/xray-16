@@ -16,17 +16,13 @@
 #include "VersionSwitcher.h"
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
-CGameSpy_Browser* g_gs_browser = NULL;
 
 CServerList::CServerList()
 {
 #ifdef WINDOWS
-    m_GSBrowser = MainMenu()->GetGS()->GetGameSpyBrowser();
-    CGameSpy_Browser::UpdateCallback updateCb;
+    CGameSpy_BrowsersWrapper::UpdateCallback updateCb;
     updateCb.bind(this, &CServerList::OnUpdate);
-    CGameSpy_Browser::DestroyCallback destroyCb;
-    destroyCb.bind(this, &CServerList::OnBrowserDestroy);
-    browser().Init(updateCb, destroyCb);
+    browser().Init(updateCb);
 
     for (int i = 0; i < LST_COLUMN_COUNT; i++)
         AttachChild(&m_header_frames[i]);
@@ -77,23 +73,32 @@ CServerList::~CServerList()
 {
     xr_delete(m_version_switch_msgbox);
     xr_delete(m_message_box);
-    if (m_GSBrowser)
-        m_GSBrowser->Clear();
+
+    auto bro = browser_LL();
+    if (bro)
+        bro->Clear();
 
     DestroySrvItems();
 };
 
-inline CGameSpy_Browser& CServerList::browser() const
+CGameSpy_BrowsersWrapper* CServerList::browser_LL()
 {
-    VERIFY(m_GSBrowser);
-    return (*m_GSBrowser);
+    auto mm = MainMenu();
+    if (mm)
+    {
+        auto gs = mm->GetGS();
+        if (gs)
+            return gs->GetGameSpyBrowser();
+    }
+    return nullptr;
 }
 
-void CServerList::OnBrowserDestroy(CGameSpy_Browser* browser)
+CGameSpy_BrowsersWrapper& CServerList::browser()
 {
-    VERIFY(m_GSBrowser);
-    VERIFY(m_GSBrowser == browser);
-    m_GSBrowser = 0;
+    // browser_LL must return not-null almost always; null is possible when the game exits (and main menu is already destroyed)
+    auto bro = browser_LL();
+    R_ASSERT(bro);
+    return *bro;
 }
 
 void CServerList::Update()
@@ -243,15 +248,14 @@ void CServerList::AddServerDetail(const GameInfo& info)
 
 void CServerList::AddBoolED(const char* keyName, bool value)
 {
-    AddServerDetail(
-        GameInfo(*StringTable().translate(keyName), value ? *StringTable().translate("mp_si_enabled") :
-            *StringTable().translate("mp_si_disabled")));
+    AddServerDetail(GameInfo(*StringTable().translate(keyName),
+        value ? *StringTable().translate("mp_si_enabled") : *StringTable().translate("mp_si_disabled")));
 }
 
 void CServerList::AddBoolYN(const char* keyName, bool value)
 {
-    AddServerDetail(GameInfo(*StringTable().translate(keyName), value ? *StringTable().translate("mp_si_yes") :
-        *StringTable().translate("mp_si_no")));
+    AddServerDetail(GameInfo(*StringTable().translate(keyName),
+        value ? *StringTable().translate("mp_si_yes") : *StringTable().translate("mp_si_no")));
 }
 
 void CServerList::AddBoolKeyED(void* s, const char* keyName, int k) { AddBoolED(keyName, browser().GetBool(s, k)); }
@@ -765,7 +769,6 @@ void CServerList::RefreshList_internal()
     ClearSrvItems();
 
     u32 NumServersFound = browser().GetServersCount();
-    g_gs_browser = m_GSBrowser;
     m_tmp_srv_lst.resize(NumServersFound);
 
     for (u32 i = 0; i < NumServersFound; i++)
@@ -855,7 +858,7 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
 
 bool CServerList::sort_by_ServerName(int p1, int p2)
 {
-    CGameSpy_Browser& gs_browser = *g_gs_browser;
+    auto& gs_browser = browser();
     ServerInfo info1, info2;
 
     gs_browser.GetServerInfoByIndex(&info1, p1);
@@ -867,7 +870,7 @@ bool CServerList::sort_by_ServerName(int p1, int p2)
 
 bool CServerList::sort_by_Map(int p1, int p2)
 {
-    CGameSpy_Browser& gs_browser = *g_gs_browser;
+    auto& gs_browser = browser();
     ServerInfo info1, info2;
 
     gs_browser.GetServerInfoByIndex(&info1, p1);
@@ -879,7 +882,7 @@ bool CServerList::sort_by_Map(int p1, int p2)
 
 bool CServerList::sort_by_GameType(int p1, int p2)
 {
-    CGameSpy_Browser& gs_browser = *g_gs_browser;
+    auto& gs_browser = browser();
     ServerInfo info1, info2;
 
     gs_browser.GetServerInfoByIndex(&info1, p1);
@@ -891,7 +894,7 @@ bool CServerList::sort_by_GameType(int p1, int p2)
 
 bool CServerList::sort_by_Players(int p1, int p2)
 {
-    CGameSpy_Browser& gs_browser = *g_gs_browser;
+    auto& gs_browser = browser();
     ServerInfo info1, info2;
 
     gs_browser.GetServerInfoByIndex(&info1, p1);
@@ -903,7 +906,7 @@ bool CServerList::sort_by_Players(int p1, int p2)
 
 bool CServerList::sort_by_Ping(int p1, int p2)
 {
-    CGameSpy_Browser& gs_browser = *g_gs_browser;
+    auto& gs_browser = browser();
     ServerInfo info1, info2;
 
     gs_browser.GetServerInfoByIndex(&info1, p1);
@@ -914,7 +917,7 @@ bool CServerList::sort_by_Ping(int p1, int p2)
 
 bool CServerList::sort_by_Version(int p1, int p2)
 {
-    CGameSpy_Browser& gs_browser = *g_gs_browser;
+    auto& gs_browser = browser();
     ServerInfo info1, info2;
 
     gs_browser.GetServerInfoByIndex(&info1, p1);

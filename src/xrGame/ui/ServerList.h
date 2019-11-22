@@ -11,9 +11,8 @@
 #include "mixed_delegate.h"
 
 class CUIXml;
-class CGameSpy_Browser;
+class CGameSpy_BrowsersWrapper;
 class CUIMessageBoxEx;
-class CGameSpy_Browser;
 struct ServerInfo;
 struct GameInfo;
 
@@ -69,7 +68,6 @@ public:
 
 private:
     void xr_stdcall OnUpdate() { RefreshList(); }
-    void xr_stdcall OnBrowserDestroy(CGameSpy_Browser* browser);
 
 protected:
     bool IsValidItem(ServerInfo& item);
@@ -125,7 +123,7 @@ protected:
 
     CUIMessageBoxEx* m_message_box;
     CUIMessageBoxEx* m_version_switch_msgbox;
-    CGameSpy_Browser* m_GSBrowser;
+
     shared_str m_sort_func;
     xr_vector<int> m_tmp_srv_lst;
     struct SrvItem
@@ -151,5 +149,6 @@ protected:
 
 private:
     connect_error_cb m_connect_cb;
-    inline CGameSpy_Browser& browser() const;
+    static inline CGameSpy_BrowsersWrapper* browser_LL();
+    static inline CGameSpy_BrowsersWrapper& browser();
 };

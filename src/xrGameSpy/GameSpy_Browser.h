@@ -109,7 +109,6 @@ class XRGAMESPY_API CGameSpy_Browser
 {
 public:
     using UpdateCallback = fastdelegate::FastDelegate<void()>;
-    using DestroyCallback = fastdelegate::FastDelegate<void(CGameSpy_Browser*)>;
 
     struct SMasterListConfig
     {
@@ -122,13 +121,13 @@ private:
     _ServerBrowser* m_pGSBrowser;
     CGameSpy_QR2* m_pQR2;
     UpdateCallback onUpdate;
-    DestroyCallback onDestroy;
 
     void ReadServerInfo(ServerInfo* pServerInfo, void* pServer);
 
     bool m_bAbleToConnectToMasterServer;
     bool m_bTryingToConnectToMasterServer;
     bool m_bShowCMSErr;
+    bool m_inited;
 
     Lock m_refresh_lock;
 
@@ -136,7 +135,7 @@ public:
     CGameSpy_Browser(const SMasterListConfig& masterListCfg);
     ~CGameSpy_Browser();
 
-    bool Init(UpdateCallback updateCb, DestroyCallback destroyCb);
+    bool Init(UpdateCallback updateCb);
     void Clear();
 
     GSUpdateStatus RefreshList_Full(bool Local, const char* FilterStr = "");
