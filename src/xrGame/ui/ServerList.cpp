@@ -45,7 +45,7 @@ CServerList::CServerList()
     m_bShowServerInfo = false;
     m_bAnimation = false;
 
-    m_sort_func = "none";
+    m_sort_mode = SORT_PING;
     m_message_box = new CUIMessageBoxEx();
     m_message_box->InitMessageBox("message_box_password");
     m_message_box->SetMessageTarget(this);
@@ -150,27 +150,27 @@ void CServerList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     {
         if (pWnd == &m_header[1])
         {
-            SetSortFunc("server_name", true);
+            SetSortFunc_internal(SORT_SERVERNAME, SORT_TYPE_AUTO, true);
         }
         else if (pWnd == &m_header[2])
         {
-            SetSortFunc("map", true);
+            SetSortFunc_internal(SORT_MAP, SORT_TYPE_AUTO, true);
         }
         else if (pWnd == &m_header[3])
         {
-            SetSortFunc("game_type", true);
+            SetSortFunc_internal(SORT_GAMETYPE, SORT_TYPE_AUTO, true);
         }
         else if (pWnd == &m_header[4])
         {
-            SetSortFunc("player", true);
+            SetSortFunc_internal(SORT_PLAYERSCOUNT, SORT_TYPE_AUTO, true);
         }
         else if (pWnd == &m_header[5])
         {
-            SetSortFunc("ping", true);
+            SetSortFunc_internal(SORT_PING, SORT_TYPE_AUTO, true);
         }
         else if (pWnd == &m_header[6])
         {
-            SetSortFunc("version", true);
+            SetSortFunc_internal(SORT_GAMEVERSION, SORT_TYPE_AUTO, true);
         }
     }
     else if (EDIT_TEXT_COMMIT == msg && pWnd == &m_edit_gs_filter)
@@ -706,8 +706,7 @@ void CServerList::NetRadioChanged(bool Local)
 
 void CServerList::RefreshGameSpyList(bool Local)
 {
-    SetSortFunc("", false);
-    SetSortFunc("ping", false);
+    SetSortFunc_internal(SORT_PING, SORT_TYPE_ASCENDING, false);
     auto result = browser().RefreshList_Full(Local, m_edit_gs_filter.GetText());
     switch (result)
     {
@@ -761,6 +760,50 @@ void CServerList::UpdateServerInList(ServerInfo* pServerInfo, CUIListItemServer*
 };
 
 void CServerList::RefreshList() { m_need_refresh_fr = Device.dwFrame; }
+
+class CServerComparer
+{
+private:
+    CGameSpy_BrowsersWrapper& browser;
+    CServerList::ESortingMode mode;
+    bool ascending;
+
+public:
+    CServerComparer(CGameSpy_BrowsersWrapper& bro, CServerList::ESortingMode sortmode, bool asc)
+        : browser(bro), mode(sortmode), ascending(asc)
+    {
+    }
+
+    bool compare_ints(int val1, int val2) { return (ascending) ? (val1 < val2) : (val1 > val2); }
+
+    bool compare_strs(const char* val1, const char* val2)
+    {
+        int res = xr_strcmp(val1, val2);
+        return (ascending) ? (-1 == res) : (1 == res);
+    }
+
+    bool operator()(int p1, int p2)
+    {
+        ServerInfo info1, info2;
+
+        browser.GetServerInfoByIndex(&info1, p1);
+        browser.GetServerInfoByIndex(&info2, p2);
+
+        switch (mode)
+        {
+        case CServerList::SORT_SERVERNAME: return compare_strs(info1.m_ServerName, info2.m_ServerName);
+        case CServerList::SORT_MAP: return compare_strs(info1.m_SessionName, info2.m_SessionName);
+        case CServerList::SORT_GAMETYPE: return compare_strs(info1.m_ServerGameType, info2.m_ServerGameType);
+        case CServerList::SORT_PLAYERSCOUNT: return compare_ints(info1.m_ServerNumPlayers, info2.m_ServerNumPlayers);
+        case CServerList::SORT_PING: return compare_ints(info1.m_Ping, info2.m_Ping);
+        case CServerList::SORT_GAMEVERSION: return compare_strs(info1.m_ServerVersion, info2.m_ServerVersion);
+        }
+
+        return false;
+    }
+};
+
+
 void CServerList::RefreshList_internal()
 {
     m_need_refresh_fr = u32(-1);
@@ -768,34 +811,20 @@ void CServerList::RefreshList_internal()
     m_list[LST_SERVER].Clear();
     ClearSrvItems();
 
-    u32 NumServersFound = browser().GetServersCount();
+    auto& bro = browser();
+    u32 NumServersFound = bro.GetServersCount();
     m_tmp_srv_lst.resize(NumServersFound);
 
     for (u32 i = 0; i < NumServersFound; i++)
         m_tmp_srv_lst[i] = i;
 
-    if (0 == xr_strcmp(m_sort_func, "server_name"))
-        std::sort(m_tmp_srv_lst.begin(), m_tmp_srv_lst.end(), sort_by_ServerName);
-
-    else if (0 == xr_strcmp(m_sort_func, "map"))
-        std::sort(m_tmp_srv_lst.begin(), m_tmp_srv_lst.end(), sort_by_Map);
-
-    else if (0 == xr_strcmp(m_sort_func, "game_type"))
-        std::sort(m_tmp_srv_lst.begin(), m_tmp_srv_lst.end(), sort_by_GameType);
-
-    else if (0 == xr_strcmp(m_sort_func, "player"))
-        std::sort(m_tmp_srv_lst.begin(), m_tmp_srv_lst.end(), sort_by_Players);
-
-    else if (0 == xr_strcmp(m_sort_func, "ping"))
-        std::sort(m_tmp_srv_lst.begin(), m_tmp_srv_lst.end(), sort_by_Ping);
-
-    else if (0 == xr_strcmp(m_sort_func, "version"))
-        std::sort(m_tmp_srv_lst.begin(), m_tmp_srv_lst.end(), sort_by_Version);
+    CServerComparer cmpr(bro, m_sort_mode, m_sort_ascending);
+    std::sort(m_tmp_srv_lst.begin(), m_tmp_srv_lst.end(), cmpr);
 
     for (u32 i = 0; i < NumServersFound; i++)
     {
         ServerInfo NewServerInfo;
-        browser().GetServerInfoByIndex(&NewServerInfo, m_tmp_srv_lst[i]);
+        bro.GetServerInfoByIndex(&NewServerInfo, m_tmp_srv_lst[i]);
 
         AddServerToList(&NewServerInfo);
     }
@@ -819,18 +848,53 @@ void CServerList::RefreshQuick()
     }
 }
 
-bool g_bSort_Ascending = true;
 void CServerList::SetSortFunc(const char* func_name, bool make_sort)
 {
-    if (!xr_strcmp(m_sort_func, func_name))
-    {
-        g_bSort_Ascending = !g_bSort_Ascending;
-    }
+    ESortingMode mode;
+
+    if (!xr_strcmp(func_name, "server_name"))
+        mode = SORT_SERVERNAME;
+    else if (!xr_strcmp(func_name, "map"))
+        mode = SORT_MAP;
+    else if (!xr_strcmp(func_name, "game_type"))
+        mode = SORT_GAMETYPE;
+    else if (!xr_strcmp(func_name, "player"))
+        mode = SORT_PLAYERSCOUNT;
+    else if (!xr_strcmp(func_name, "ping"))
+        mode = SORT_PING;
+    else if (!xr_strcmp(func_name, "version"))
+        mode = SORT_GAMEVERSION;
     else
-        g_bSort_Ascending = true;
+        R_ASSERT(false, "Unsupported sorting function name");
 
-    m_sort_func = func_name;
+    SetSortFunc_internal(mode, SORT_TYPE_AUTO, make_sort);
+}
 
+void CServerList::SetSortFunc_internal(ESortingMode sort_mode, ESortingType sorting_type, bool make_sort)
+{
+    switch (sorting_type)
+    {
+    case SORT_TYPE_ASCENDING:
+    {
+        m_sort_ascending = true;
+        break;
+    }
+    case SORT_TYPE_DESCENDING:
+    {
+        m_sort_ascending = false;
+        break;
+    }
+    default:
+    {
+        if (m_sort_mode == sort_mode)
+            m_sort_ascending = !m_sort_ascending;
+        else
+            m_sort_ascending = true;
+        break;
+    }
+    }
+
+    m_sort_mode = sort_mode;
     if (make_sort)
         RefreshList();
 }
@@ -854,77 +918,6 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
     m_itemInfo.info.icons.user_pass = pServerInfo->m_bUserPass;
 
     m_itemInfo.info.Index = pServerInfo->Index;
-}
-
-bool CServerList::sort_by_ServerName(int p1, int p2)
-{
-    auto& gs_browser = browser();
-    ServerInfo info1, info2;
-
-    gs_browser.GetServerInfoByIndex(&info1, p1);
-    gs_browser.GetServerInfoByIndex(&info2, p2);
-
-    int res = xr_strcmp(info1.m_ServerName, info2.m_ServerName);
-    return (g_bSort_Ascending) ? (-1 == res) : (1 == res);
-}
-
-bool CServerList::sort_by_Map(int p1, int p2)
-{
-    auto& gs_browser = browser();
-    ServerInfo info1, info2;
-
-    gs_browser.GetServerInfoByIndex(&info1, p1);
-    gs_browser.GetServerInfoByIndex(&info2, p2);
-
-    int res = xr_strcmp(info1.m_SessionName, info2.m_SessionName);
-    return (g_bSort_Ascending) ? (-1 == res) : (1 == res);
-}
-
-bool CServerList::sort_by_GameType(int p1, int p2)
-{
-    auto& gs_browser = browser();
-    ServerInfo info1, info2;
-
-    gs_browser.GetServerInfoByIndex(&info1, p1);
-    gs_browser.GetServerInfoByIndex(&info2, p2);
-
-    int res = xr_strcmp(info1.m_ServerGameType, info2.m_ServerGameType);
-    return (g_bSort_Ascending) ? (-1 == res) : (1 == res);
-}
-
-bool CServerList::sort_by_Players(int p1, int p2)
-{
-    auto& gs_browser = browser();
-    ServerInfo info1, info2;
-
-    gs_browser.GetServerInfoByIndex(&info1, p1);
-    gs_browser.GetServerInfoByIndex(&info2, p2);
-
-    return (g_bSort_Ascending) ? (info1.m_ServerNumPlayers < info2.m_ServerNumPlayers) :
-                                 (info1.m_ServerNumPlayers > info2.m_ServerNumPlayers);
-}
-
-bool CServerList::sort_by_Ping(int p1, int p2)
-{
-    auto& gs_browser = browser();
-    ServerInfo info1, info2;
-
-    gs_browser.GetServerInfoByIndex(&info1, p1);
-    gs_browser.GetServerInfoByIndex(&info2, p2);
-
-    return (g_bSort_Ascending) ? (info1.m_Ping < info2.m_Ping) : (info1.m_Ping > info2.m_Ping);
-}
-
-bool CServerList::sort_by_Version(int p1, int p2)
-{
-    auto& gs_browser = browser();
-    ServerInfo info1, info2;
-
-    gs_browser.GetServerInfoByIndex(&info1, p1);
-    gs_browser.GetServerInfoByIndex(&info2, p2);
-
-    int res = xr_strcmp(info1.m_ServerVersion, info2.m_ServerVersion);
-    return (g_bSort_Ascending) ? (-1 == res) : (1 == res);
 }
 
 void CServerList::SaveCurItem()
