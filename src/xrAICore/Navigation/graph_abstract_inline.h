@@ -229,20 +229,19 @@ IC void CAbstractGraph::load(IReader& stream)
 {
     this->clear();
 
-    u32 id;
-    _data_type data;
-    _vertex_id_type vertex_id;
-    IReader *chunk0, *chunk1, *chunk2;
-
-    chunk0 = stream.open_chunk(0);
+    IReader* chunk0 = stream.open_chunk(0);
     chunk0->r_u32();
     chunk0->close();
 
+    u32 id;
     chunk0 = stream.open_chunk(1);
 
-    for (chunk1 = chunk0->open_chunk_iterator(id); chunk1; chunk1 = chunk0->open_chunk_iterator(id, chunk1))
+    for (IReader* chunk1 = chunk0->open_chunk_iterator(id); chunk1; chunk1 = chunk0->open_chunk_iterator(id, chunk1))
     {
-        chunk2 = chunk1->open_chunk(0);
+        _data_type data{};
+        _vertex_id_type vertex_id;
+
+        IReader* chunk2 = chunk1->open_chunk(0);
         load_data(vertex_id, *chunk2);
         chunk2->close();
 
