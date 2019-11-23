@@ -298,7 +298,6 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClCompile Include="Crypto\xr_dsa.cpp" />
     <ClCompile Include="Crypto\xr_dsa_signer.cpp" />
     <ClCompile Include="Crypto\xr_dsa_verifyer.cpp" />
-    <ClCompile Include="Crypto\xr_sha.cpp" />
     <ClCompile Include="Debug\dxerr.cpp" />
     <ClCompile Include="Debug\MiniDump.cpp" />
     <ClCompile Include="dump_string.cpp" />
