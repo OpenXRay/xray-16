@@ -3,6 +3,51 @@
 #include "xrCommon/xr_array.h"
 #include "xrCore/Threading/ScopeLock.hpp"
 
+CGSUpdateStatusAccumulator::CGSUpdateStatusAccumulator(GSUpdateStatus s) { Register(s); }
+
+void CGSUpdateStatusAccumulator::Register(GSUpdateStatus s) { accumulator.push_back(s); }
+
+void CGSUpdateStatusAccumulator::Reset(GSUpdateStatus s)
+{
+    ScopeLock sl(&lock);
+    accumulator.clear();
+    Register(s);
+}
+
+GSUpdateStatus CGSUpdateStatusAccumulator::GetOptimistic() const
+{
+    ScopeLock sl(&lock);
+    GSUpdateStatus res = GSUpdateStatus::Unknown;
+    for (auto s : accumulator)
+    {
+        if (s < res)
+        {
+            res = s;
+            if (res == GSUpdateStatus::Success)
+                break;
+        }
+    }
+    return res;
+}
+
+GSUpdateStatus CGSUpdateStatusAccumulator::GetPessimistic() const
+{
+    ScopeLock sl(&lock);
+    GSUpdateStatus res = GSUpdateStatus::Success;
+    for (auto s : accumulator)
+    {
+        if (s > res)
+        {
+            res = s;
+            if (res == GSUpdateStatus::Unknown)
+                break;
+        }
+    }
+    return res;
+}
+
+bool CGSUpdateStatusAccumulator::IsStatusGood(GSUpdateStatus s) { return (s <= GSUpdateStatus::ConnectingToMaster); }
+
 struct SBrowserConfig
 {
     CGameSpy_Browser::SMasterListConfig cfg;
@@ -15,13 +60,14 @@ static constexpr SBrowserConfig soc_master_bro = { {GAMESPY_GAMENAME_SOC, GAMESP
 
 static constexpr xr_array<SBrowserConfig, 3> master_lists = {cop_master_bro, cs_master_bro, soc_master_bro};
 
-CGameSpy_BrowsersWrapper::CGameSpy_BrowsersWrapper() : last_update_status(GSUpdateStatus::Success)
+CGameSpy_BrowsersWrapper::CGameSpy_BrowsersWrapper()
 {
     browsers.resize(master_lists.size());
     for (size_t i = 0; i < master_lists.size(); ++i)
     {
         browsers[i].browser = xr_make_unique<CGameSpy_Browser>(master_lists[i].cfg);
         browsers[i].active = master_lists[i].active;
+        browsers[i].reportedFailure = false;
         browsers[i].servers_count = 0;
 
         CGameSpy_Browser::UpdateCallback cb;
@@ -69,8 +115,6 @@ void CGameSpy_BrowsersWrapper::UpdateCb(CGameSpy_Browser* gs_browser)
 {
     {
         ScopeLock sl1(&servers_lock);
-        if (last_update_status != GSUpdateStatus::Success && last_update_status != GSUpdateStatus::ConnectingToMaster)
-            return;
 
         SBrowserInfo* bro_info = nullptr;
         for (auto& bro : browsers)
@@ -111,16 +155,15 @@ void CGameSpy_BrowsersWrapper::ForgetAllServers()
     for (auto& bro : browsers)
     {
         bro.servers_count = 0;
+        bro.reportedFailure = false;
     }
 }
 
 GSUpdateStatus CGameSpy_BrowsersWrapper::RefreshList_Full(bool Local, const char* FilterStr)
 {
+    CGSUpdateStatusAccumulator acc(GSUpdateStatus::OutOfService);
+
     ScopeLock sl(&servers_lock);
-    if (last_update_status != GSUpdateStatus::Success && last_update_status != GSUpdateStatus::ConnectingToMaster)
-    {
-        return last_update_status;
-    }
     ForgetAllServers();
 
     for (auto& bro : browsers)
@@ -128,14 +171,13 @@ GSUpdateStatus CGameSpy_BrowsersWrapper::RefreshList_Full(bool Local, const char
         if (!bro.active)
             continue;
 
-        last_update_status = bro.browser->RefreshList_Full(Local, FilterStr);
-        if (last_update_status != GSUpdateStatus::Success && last_update_status != GSUpdateStatus::ConnectingToMaster)
-        {
-            break;
-        }
+        auto status = bro.browser->RefreshList_Full(Local, FilterStr);
+        acc.Register(status);
+        if (!CGSUpdateStatusAccumulator::IsStatusGood(status))
+            bro.reportedFailure = true;
     };
 
-    return last_update_status;
+    return acc.GetOptimistic();
 }
 
 void CGameSpy_BrowsersWrapper::RefreshQuick(int server_id)
@@ -187,6 +229,7 @@ void* CGameSpy_BrowsersWrapper::GetServerByIndex(int server_id)
 
 bool CGameSpy_BrowsersWrapper::GetBool(void* srv, int keyId, bool defaultValue)
 {
+    ScopeLock sl(&servers_lock);
     for (auto& server : servers)
     {
         if (server.gs_data == srv)
@@ -197,6 +240,7 @@ bool CGameSpy_BrowsersWrapper::GetBool(void* srv, int keyId, bool defaultValue)
 }
 int CGameSpy_BrowsersWrapper::GetInt(void* srv, int keyId, int defaultValue)
 {
+    ScopeLock sl(&servers_lock);
     for (auto& server : servers)
     {
         if (server.gs_data == srv)
@@ -207,6 +251,7 @@ int CGameSpy_BrowsersWrapper::GetInt(void* srv, int keyId, int defaultValue)
 }
 float CGameSpy_BrowsersWrapper::GetFloat(void* srv, int keyId, float defaultValue)
 {
+    ScopeLock sl(&servers_lock);
     for (auto& server : servers)
     {
         if (server.gs_data == srv)
@@ -218,21 +263,27 @@ float CGameSpy_BrowsersWrapper::GetFloat(void* srv, int keyId, float defaultValu
 
 GSUpdateStatus CGameSpy_BrowsersWrapper::Update()
 {
+    CGSUpdateStatusAccumulator acc(GSUpdateStatus::MasterUnreachable);
     ScopeLock sl(&servers_lock);
-    if (last_update_status != GSUpdateStatus::Success && last_update_status != GSUpdateStatus::ConnectingToMaster)
-    {
-        // After first reporting 'bad' status we need to report 'success' one;
-        // otherwise the error dialogs will be shown to user in cycle
-        return GSUpdateStatus::Success;
-    }
 
+    size_t nonWorkBroCnt = 0;
     for (auto& bro : browsers)
     {
-        last_update_status = bro.browser->Update();
-        if (last_update_status != GSUpdateStatus::Success && last_update_status != GSUpdateStatus::ConnectingToMaster)
-        {
-            break;
-        }
+        auto status = bro.browser->Update();
+        acc.Register(status);
+        if (!CGSUpdateStatusAccumulator::IsStatusGood(status))
+            bro.reportedFailure = true;
+        if (bro.reportedFailure || !bro.active)
+            ++nonWorkBroCnt;
     }
-    return last_update_status;
+
+    if (nonWorkBroCnt < browsers.size())
+    {
+        return acc.GetOptimistic();
+    }
+    else
+    {
+        ForgetAllServers();
+        return acc.GetPessimistic();
+    }
 }

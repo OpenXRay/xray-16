@@ -124,7 +124,6 @@ private:
 
     void ReadServerInfo(ServerInfo* pServerInfo, void* pServer);
 
-    bool m_bAbleToConnectToMasterServer;
     bool m_bTryingToConnectToMasterServer;
     bool m_bShowCMSErr;
     bool m_inited;

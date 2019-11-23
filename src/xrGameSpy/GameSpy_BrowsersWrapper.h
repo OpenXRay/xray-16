@@ -6,6 +6,41 @@ class CGameSpy_Browser;
 struct ServerInfo;
 
 /*!
+\brief "Accumulator" for responds sequences
+\details Use when you need to decide was the sequence of statuses ( for example, from multiple servers) successful or
+not
+*/
+class CGSUpdateStatusAccumulator
+{
+protected:
+    mutable Lock lock;
+    xr_vector<GSUpdateStatus> accumulator;
+
+public:
+    /*! Creates the accumulator and puts argument as the first status of the series */
+    CGSUpdateStatusAccumulator(GSUpdateStatus s);
+
+    /*! Adds the new status to the internal accumulator */
+    void Register(GSUpdateStatus s);
+
+    /*! Clears history which is currently stored in the accumulator and stores the first status (from the argument) */
+    void Reset(GSUpdateStatus s);
+
+    /*! Returns the generalized status of the stored sequence.
+        The sequence succeed when at least one status is "good"
+     */
+    GSUpdateStatus GetOptimistic() const;
+
+    /*! Returns the generalized status of the stored sequence.
+        The sequence fails when at least one status is "bad"
+     */
+    GSUpdateStatus GetPessimistic() const;
+
+    /*! Indicates whether the system can continue to work or not. */
+    static bool IsStatusGood(GSUpdateStatus s);
+};
+
+/*!
 \brief "Proxy" class which allows support of multiple master-lists in network game.
 
 \details Owns multiple server browsers (one browser for one master-list), accumulates data and presents it as one big
@@ -23,6 +58,7 @@ protected:
         xr_unique_ptr<CGameSpy_Browser> browser;
         size_t servers_count;
         bool active;
+        bool reportedFailure;
     };
     xr_vector<SBrowserInfo> browsers;
 
@@ -32,14 +68,15 @@ protected:
         size_t idx;
         void* gs_data;
     };
-
     xr_vector<SServerDescription> servers;
+
+    // Lock it before accessing 'browsers' or 'servers' members
     Lock servers_lock;
 
     xr_vector<UpdateCallback> updates_subscriptions;
+    // Lock it before accessing 'updates_subscriptions' member
     Lock updates_subscriptions_lock;
 
-    GSUpdateStatus last_update_status;
     void xr_stdcall UpdateCb(CGameSpy_Browser* gs_browser);
     void ForgetAllServers();
 

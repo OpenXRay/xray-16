@@ -94,7 +94,6 @@ CGameSpy_Browser::CGameSpy_Browser(const SMasterListConfig& masterListCfg)
     m_pGSBrowser = NULL;
     m_pQR2 = new CGameSpy_QR2();
     m_pQR2->RegisterAdditionalKeys();
-    m_bAbleToConnectToMasterServer = true;
     m_bTryingToConnectToMasterServer = false;
     m_bShowCMSErr = false;
     m_inited = false;
@@ -157,7 +156,6 @@ void CGameSpy_Browser::RefreshListInternet(const char* FilterStr)
     const int fieldCount = sizeof(targetFields) / sizeof(targetFields[0]);
     SBError error =
         ServerBrowserUpdateA(m_pGSBrowser, onUpdate ? SBTrue : SBFalse, SBFalse, targetFields, fieldCount, FilterStr);
-    m_bAbleToConnectToMasterServer = (error == sbe_noerror);
     m_bShowCMSErr = (error != sbe_noerror);
     m_bTryingToConnectToMasterServer = false;
 
@@ -181,8 +179,6 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
     {
         m_refresh_lock.Enter();
         m_refresh_lock.Leave();
-        if (!m_bAbleToConnectToMasterServer)
-            return GSUpdateStatus::MasterUnreachable;
         RefreshData* pRData = new RefreshData();
         xr_strcpy(pRData->FilterStr, FilterStr);
         pRData->pGSBrowser = this;
