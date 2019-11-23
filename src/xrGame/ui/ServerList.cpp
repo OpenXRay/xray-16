@@ -535,6 +535,9 @@ bool CServerList::IsValidItem(ServerInfo& item)
 {
     bool result = true;
 
+    // Filter 'junk' servers (which are not replying for queries)
+    result &= (item.m_Port > 0);
+
     result &= !m_sf.empty ? (m_sf.empty == (item.m_ServerNumPlayers == 0)) : true;
     result &= !m_sf.full ? (m_sf.full == (item.m_ServerNumPlayers == item.m_ServerMaxPlayers)) : true;
     result &= !m_sf.with_pass ? (m_sf.with_pass == item.m_bPassword) : true;
