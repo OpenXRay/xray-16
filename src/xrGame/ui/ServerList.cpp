@@ -14,7 +14,7 @@
 #include "Spectator.h"
 #include "VersionSwitcher.h"
 
-LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
+LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
 CServerList::CServerList()
 {
@@ -909,7 +909,7 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
     address += xr_itoa(pServerInfo->m_Port, port, 10);
     m_itemInfo.info.address = address.c_str();
     m_itemInfo.info.map = pServerInfo->m_SessionName;
-    m_itemInfo.info.game = GameTypeToString((EGameIDs)pServerInfo->m_GameType, true);
+    m_itemInfo.info.game = GameTypeToStringEx(pServerInfo->m_GameType, true);
     m_itemInfo.info.players.printf("%d/%d", pServerInfo->m_ServerNumPlayers, pServerInfo->m_ServerMaxPlayers);
     m_itemInfo.info.ping.printf("%d", pServerInfo->m_Ping);
     m_itemInfo.info.version = pServerInfo->m_ServerVersion;
