@@ -388,7 +388,7 @@ GSUpdateStatus CGameSpy_Browser::Update()
 void CGameSpy_Browser::UpdateServerList()
 {
     if (onUpdate)
-        onUpdate();
+        onUpdate(this);
 }
 
 void CGameSpy_Browser::SortBrowserByPing() { ServerBrowserSortA(m_pGSBrowser, SBTrue, "ping", sbcm_int); }

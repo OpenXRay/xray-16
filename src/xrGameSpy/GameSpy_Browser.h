@@ -108,7 +108,7 @@ struct _ServerBrowser;
 class XRGAMESPY_API CGameSpy_Browser
 {
 public:
-    using UpdateCallback = fastdelegate::FastDelegate<void()>;
+    using UpdateCallback = fastdelegate::FastDelegate<void(CGameSpy_Browser*)>;
 
     struct SMasterListConfig
     {

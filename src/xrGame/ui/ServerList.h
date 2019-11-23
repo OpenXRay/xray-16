@@ -9,9 +9,9 @@
 #include "xrUICore/EditBox/UIEditBox.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 #include "mixed_delegate.h"
+#include "xrGameSpy/GameSpy_BrowsersWrapper.h"
 
 class CUIXml;
-class CGameSpy_BrowsersWrapper;
 class CUIMessageBoxEx;
 struct ServerInfo;
 struct GameInfo;
@@ -158,6 +158,8 @@ protected:
     u32 m_last_retreived_index;
     u32 m_need_refresh_fr;
     void RefreshList_internal();
+
+    CGameSpy_BrowsersWrapper::SubscriberIdx m_subscriber_id;
 
 private:
     connect_error_cb m_connect_cb;

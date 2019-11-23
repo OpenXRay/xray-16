@@ -11,7 +11,6 @@
 #include "login_manager.h"
 #include "xrGameSpy/GameSpy_Keys.h"
 #include "xrGameSpy/GameSpy_Full.h"
-#include "xrGameSpy/GameSpy_Browser.h"
 #include "Spectator.h"
 #include "VersionSwitcher.h"
 
@@ -22,7 +21,7 @@ CServerList::CServerList()
 #ifdef WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;
     updateCb.bind(this, &CServerList::OnUpdate);
-    browser().Init(updateCb);
+    m_subscriber_id = browser().SubscribeUpdates(updateCb);
 
     for (int i = 0; i < LST_COLUMN_COUNT; i++)
         AttachChild(&m_header_frames[i]);
@@ -76,13 +75,14 @@ CServerList::~CServerList()
 
     auto bro = browser_LL();
     if (bro)
-        bro->Clear();
+        bro->UnsubscribeUpdates(m_subscriber_id);
 
     DestroySrvItems();
 };
 
 CGameSpy_BrowsersWrapper* CServerList::browser_LL()
 {
+#ifdef WINDOWS
     auto mm = MainMenu();
     if (mm)
     {
@@ -90,6 +90,7 @@ CGameSpy_BrowsersWrapper* CServerList::browser_LL()
         if (gs)
             return gs->GetGameSpyBrowser();
     }
+#endif
     return nullptr;
 }
 
@@ -865,7 +866,7 @@ void CServerList::SetSortFunc(const char* func_name, bool make_sort)
     else if (!xr_strcmp(func_name, "version"))
         mode = SORT_GAMEVERSION;
     else
-        R_ASSERT(false, "Unsupported sorting function name");
+        R_ASSERT2(false, "Unsupported sorting function name");
 
     SetSortFunc_internal(mode, SORT_TYPE_AUTO, make_sort);
 }

@@ -1,16 +1,7 @@
 #include "stdafx.h"
 #include "xrGameSpy.h"
 
-void FillSecretKey(char* secretKey)
-{
-    secretKey[0] = 'L';
-    secretKey[1] = 'T';
-    secretKey[2] = 'U';
-    secretKey[3] = '2';
-    secretKey[4] = 'z';
-    secretKey[5] = '2';
-    secretKey[6] = '\0';
-}
+void FillSecretKey(char* secretKey) { strcpy(secretKey, GAMESPY_GAMEKEY); }
 
 const char* GetGameVersion() { return GAME_VERSION; }
 // WORD: Bit masks for languages
