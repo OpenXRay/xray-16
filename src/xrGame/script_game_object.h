@@ -15,6 +15,7 @@
 #include "character_info_defs.h"
 #include "xrAICore/Navigation/game_graph_space.h"
 #include "game_location_selector.h"
+#include "GameTaskDefs.h"
 
 // fwd. decl.
 namespace ALife
@@ -336,8 +337,8 @@ public:
     xrTime GetInfoTime(LPCSTR info_id);
 
     //работа с заданиями
-    ETaskState GetGameTaskState(LPCSTR task_id);
-    void SetGameTaskState(ETaskState state, LPCSTR task_id);
+    ETaskState GetGameTaskState(pcstr task_id, TASK_OBJECTIVE_ID objective_id);
+    void SetGameTaskState(ETaskState state, pcstr task_id, TASK_OBJECTIVE_ID objective_id);
     void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting, u32 t_timer);
     void SetActiveTask(CGameTask* t);
     bool IsActiveTask(CGameTask* t);

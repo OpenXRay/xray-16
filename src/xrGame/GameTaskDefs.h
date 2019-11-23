@@ -21,10 +21,16 @@ enum ETaskType
 };
 
 using TASK_ID = shared_str;
+using TASK_OBJECTIVE_ID = u16;
+
+using TASK_ID_VECTOR = xr_vector<TASK_ID>;
+
+constexpr auto NO_TASK_OBJECTIVE = static_cast<TASK_OBJECTIVE_ID>(-1);
+constexpr auto ROOT_TASK_OBJECTIVE = static_cast<TASK_OBJECTIVE_ID>(0); // task itself
 
 extern TASK_ID g_active_task_id[eTaskTypeCount];
-class CGameTask;
 
+class CGameTask;
 struct SGameTaskKey : public ISerializable, public IPureDestroyableObject
 {
     TASK_ID task_id;

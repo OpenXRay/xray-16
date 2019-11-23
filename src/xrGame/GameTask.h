@@ -36,6 +36,7 @@ public:
 class SGameTaskObjective : public ISerializable
 {
     friend struct SGameTaskKey;
+    friend class CGameTask;
     friend class CGameTaskManager;
 
 protected:
@@ -45,17 +46,23 @@ protected:
     SScriptTaskHelper m_pScriptHelper;
 
 public:
-    int m_idx{};
+    TASK_OBJECTIVE_ID m_idx;
     shared_str m_Title;
     shared_str m_Description;
 
+    // encyclopedia
+    shared_str m_article_id;
+    shared_str m_article_key;
+
     // icon
+    Frect m_icon_rect;
     shared_str m_icon_texture_name;
 
     // map
     shared_str m_map_hint;
     shared_str m_map_location;
     u16 m_map_object_id{};
+    bool m_def_location_enabled{};
     CMapLocation* m_linked_map_location{};
 
     // timing
@@ -79,8 +86,7 @@ private:
     task_state_functors m_lua_functions_on_fail;
 
 public:
-    SGameTaskObjective();
-    SGameTaskObjective(CGameTask* parent, int idx);
+    SGameTaskObjective(CGameTask* parent, TASK_OBJECTIVE_ID idx);
 
     CGameTask* GetParent() const { return m_parent; }
 
@@ -88,7 +94,7 @@ public:
     auto GetTaskState() const { return m_task_state; }
 
     auto GetTaskType() const { return m_task_type; }
-    auto LinkedMapLocation() const { return m_linked_map_location; }
+    virtual CMapLocation* LinkedMapLocation() { return m_linked_map_location; }
 
     ETaskState UpdateState();
 
@@ -113,7 +119,7 @@ public:
     auto GetType_script() const { return m_task_type; }
     void SetType_script(int t)  { m_task_type = (ETaskType)t; }
 
-    auto GetIDX_script() const { return m_idx; }
+    auto GetID() const { return m_idx; }
 
     auto GetTitle_script() const { return m_Title.c_str(); }
     void SetTitle_script(pcstr title) { m_Title = title; }
@@ -121,8 +127,13 @@ public:
     auto GetDescription_script() const { return m_Description.c_str(); }
     void SetDescription_script(pcstr desc) { m_Description = desc; }
 
+    // encyclopedia
+    void SetArticleID_script(cpcstr id) { m_article_id = id; }
+    void SetArticleKey_script(cpcstr key) { m_article_key = key; }
+
+    // icon
     auto GetIconName_script() const { return m_icon_texture_name.c_str(); }
-    void SetIconName_script(pcstr tex) { m_icon_texture_name = tex; }
+    void SetIconName_script(pcstr tex);
 
     // map
     void SetMapHint_script(pcstr hint) { m_map_hint = hint; }
@@ -145,28 +156,56 @@ public:
     void CommitScriptHelperContents();
 };
 
-class CGameTask : public SGameTaskObjective, public Noncopyable
+using OBJECTIVES_VECTOR = xr_vector<SGameTaskObjective>;
+
+class CGameTask final : public SGameTaskObjective, public Noncopyable
 {
 public:
     TASK_ID m_ID;
     u32 m_priority{};
     bool m_read{};
 
+private:
+    OBJECTIVES_VECTOR m_Objectives;
+    TASK_OBJECTIVE_ID m_active_objective{ NO_TASK_OBJECTIVE };
+
 public:
     CGameTask();
+
+    void Load(const TASK_ID& id);
 
     void save(IWriter& stream) override;
     void load(IReader& stream) override;
 
     void ChangeStateCallback() override;
 
+    TASK_OBJECTIVE_ID ActiveObjectiveIdx() const;
+    SGameTaskObjective* ActiveObjective();
+    SGameTaskObjective& Objective(TASK_OBJECTIVE_ID idx);
+    const SGameTaskObjective& Objective(TASK_OBJECTIVE_ID idx) const;
+    ETaskState ObjectiveState(TASK_OBJECTIVE_ID idx) const;
+    void SetActiveObjective(TASK_OBJECTIVE_ID idx);
+    TASK_OBJECTIVE_ID GetObjectivesCount() const;
+
+    using SGameTaskObjective::SetTaskState;
+    void SetTaskState(ETaskState state, TASK_OBJECTIVE_ID objective_id);
+    bool HasObjectiveInProgress() const;
+
     // map
     void OnArrived();
+    CMapLocation* LinkedMapLocation() override;
+
+    void FillEncyclopedia() const;
 
     // for scripting access
+    void Load_script(pcstr id) { Load(id); }
+
     auto GetID_script() const { return m_ID.c_str(); }
     void SetID_script(pcstr id) { m_ID = id; }
 
     auto GetPriority_script() const { return m_priority; }
     void SetPriority_script(int prio) { m_priority = prio; }
+
+    void AddObjective_script(SGameTaskObjective* O);
+    SGameTaskObjective* GetObjective_script(TASK_OBJECTIVE_ID objective_id);
 };
