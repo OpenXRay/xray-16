@@ -221,7 +221,9 @@ GSUpdateStatus CGameSpy_BrowsersWrapper::Update()
     ScopeLock sl(&servers_lock);
     if (last_update_status != GSUpdateStatus::Success && last_update_status != GSUpdateStatus::ConnectingToMaster)
     {
-        return last_update_status;
+        // After first reporting 'bad' status we need to report 'success' one;
+        // otherwise the error dialogs will be shown to user in cycle
+        return GSUpdateStatus::Success;
     }
 
     for (auto& bro : browsers)
