@@ -211,7 +211,10 @@ void CGameSpy_BrowsersWrapper::GetServerInfoByIndex(ServerInfo* pServerInfo, int
 {
     ScopeLock sl(&servers_lock);
     R_ASSERT(server_id < servers.size());
-    return servers[server_id].browser->GetServerInfoByIndex(pServerInfo, servers[server_id].idx);
+    servers[server_id].browser->GetServerInfoByIndex(pServerInfo, servers[server_id].idx);
+
+    // Correct server ID from 'local' (from the actual browser) to 'global' (from the unified proxy)
+    pServerInfo->Index = server_id;
 }
 
 void* CGameSpy_BrowsersWrapper::GetServerByIndex(int server_id)
