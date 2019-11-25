@@ -53,24 +53,24 @@ bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWO
     const u32 height = psCurrentVidMode[1];
 
     constexpr u32 colorMode = 3;
-    constexpr u8 bits = 24;
+    constexpr u32 bits = 24;
     const size_t bitsSize = width * height * colorMode;
 
-    const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    const u8 header[6] =
+    const u32 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    const u32 header[6] =
     {
         // Dirty hack with types convertion
         // TODO: Find better solution for this.
-        (u8)(width % 256),
-        (u8)(width / 256),
-        (u8)(height % 256),
-        (u8)(height / 256),
+        (u32)(width % 256),
+        (u32)(width / 256),
+        (u32)(height % 256),
+        (u32)(height / 256),
         bits, 0
     };
 
     const size_t headerSize = sizeof(tgaHeader) + sizeof(header);
 
-    xr_vector<u8> pixels;
+    xr_vector<u32> pixels;
     pixels.resize(bitsSize + headerSize);
     
     for (size_t i = 0; i < sizeof(tgaHeader); i++)
@@ -85,7 +85,7 @@ bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWO
     for (size_t i = headerSize; i < bitsSize + headerSize; i += colorMode)
         std::swap(pixels[i], pixels[i + 2]);
 
-    fipMemoryIO tmpMemFile(pixels.data(), pixels.size());
+    fipMemoryIO tmpMemFile((BYTE*)pixels.data(), pixels.size());
 
     fipImage image{ FIT_BITMAP, width, height, u32(bits) };
     image.loadFromMemory(tmpMemFile);
