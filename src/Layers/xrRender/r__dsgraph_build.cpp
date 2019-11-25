@@ -55,10 +55,15 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
     // a) Allow to optimize RT order
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
-    ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
-    if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
-    {
-        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
+    ref_selement shaderPtr = pVisual->shader->E[4];
+    ShaderElement* sh_d;
+
+    if(shaderPtr != nullptr) {
+        sh_d = &*shaderPtr; // 4=L_special
+        if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
+        {
+            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
+        }
     }
 
     // Select shader
@@ -218,10 +223,15 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     // a) Allow to optimize RT order
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
-    ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
-    if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
-    {
-        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
+    ref_selement shaderPtr = pVisual->shader->E[4];
+    ShaderElement* sh_d;
+
+    if(shaderPtr != nullptr) {
+        sh_d = &*shaderPtr; // 4=L_special
+        if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
+        {
+            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
+        }
     }
 
     // Select shader

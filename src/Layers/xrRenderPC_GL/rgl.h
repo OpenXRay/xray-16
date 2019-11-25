@@ -248,9 +248,12 @@ public:
 
     void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (nullptr == C)
+        ref_constant CRef = RCache.get_c(c_sbase);
+        if (CRef == nullptr)
             return;
+
+        R_constant* C = &*CRef; // get sampler
+
         VERIFY (RC_dest_sampler == C->destination);
         VERIFY (RC_sampler == C->type);
         CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));

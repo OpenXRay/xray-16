@@ -415,30 +415,38 @@ public:
     template<typename... Args>
     ICF void set_c(cpcstr name, Args&&... args)
     {
-        if (ctable)
-            set_c(&*ctable->get(name), std::forward<Args>(args)...);
+        ref_constant CRef = ctable->get(name);
+        if (CRef != nullptr) {
+            set_c(&*CRef, std::forward<Args>(args)...);
+        }
     }
 
     template<typename... Args>
     ICF void set_ca(cpcstr name, Args&&... args)
     {
-        if (ctable)
-            set_ca(&*ctable->get(name), std::forward<Args>(args)...);
+        ref_constant CRef = ctable->get(name);
+        if (CRef != nullptr) {
+            set_ca(&*CRef, std::forward<Args>(args)...);
+        }
     }
 
     // constants - shared_str (average)
     template<typename... Args>
     ICF void set_c(const shared_str& name, Args&& ... args)
     {
-        if (ctable)
-            set_c(&*ctable->get(name), std::forward<Args>(args)...);
+        ref_constant CRef = ctable->get(name);
+        if (CRef != nullptr) {
+            set_c(&*CRef, std::forward<Args>(args)...);
+        }
     }
 
     template<typename... Args>
     ICF void set_ca(const shared_str& name, Args&& ... args)
     {
-        if (ctable)
-            set_ca(&*ctable->get(name), std::forward<Args>(args)...);
+        ref_constant CRef = ctable->get(name);
+        if (CRef != nullptr) {
+            set_ca(&*CRef, std::forward<Args>(args)...);
+        }
     }
 
     // Rendering
