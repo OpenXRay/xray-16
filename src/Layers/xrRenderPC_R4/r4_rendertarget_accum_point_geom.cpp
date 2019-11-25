@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/du_sphere.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 /*
 Fvector du_sphere_vertices[DU_SPHERE_NUMVERTEX]=
@@ -303,8 +303,10 @@ void CRenderTarget::accum_point_geom_create()
         //		CopyMemory				(pData,du_sphere_vertices,vCount*vSize);
         //		g_accum_point_vb->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateVertexBuffer(&g_accum_point_vb, du_sphere_vertices, vCount * vSize));
-        HW.stats_manager.increment_stats_vb(g_accum_point_vb);
+        g_accum_point_vb.Create(vCount * vSize);
+        BYTE* pData = static_cast<BYTE*>(g_accum_point_vb.Map());
+        CopyMemory(pData, du_sphere_vertices, vCount * vSize);
+        g_accum_point_vb.Unmap(true); // upload vertex data
     }
 
     // Indices
@@ -318,22 +320,22 @@ void CRenderTarget::accum_point_geom_create()
         // CopyMemory		(pData,du_sphere_faces,iCount*2);
         // g_accum_point_ib->Unlock	();
 
-        R_CHK(dx10BufferUtils::CreateIndexBuffer(&g_accum_point_ib, du_sphere_faces, iCount * 2));
-        HW.stats_manager.increment_stats_ib(g_accum_point_ib);
+        g_accum_point_ib.Create(iCount * 2);
+        BYTE* pData = static_cast<BYTE*>(g_accum_point_ib.Map());
+        CopyMemory(pData, du_sphere_faces, iCount * 2);
+        g_accum_point_ib.Unmap(true); // upload index data
     }
 }
 
 void CRenderTarget::accum_point_geom_destroy()
 {
 #ifdef DEBUG
-    _SHOW_REF("g_accum_point_ib", g_accum_point_ib);
+    _SHOW_REF("g_accum_point_ib", &g_accum_point_ib);
 #endif
-    HW.stats_manager.decrement_stats_ib(g_accum_point_ib);
-    _RELEASE(g_accum_point_ib);
+    g_accum_point_ib.Release();
 
 #ifdef DEBUG
-    _SHOW_REF("g_accum_point_vb", g_accum_point_vb);
+    _SHOW_REF("g_accum_point_vb", &g_accum_point_vb);
 #endif
-    HW.stats_manager.decrement_stats_vb(g_accum_point_vb);
-    _RELEASE(g_accum_point_vb);
+    g_accum_point_vb.Release();
 }

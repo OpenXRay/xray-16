@@ -41,6 +41,7 @@ ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 ENGINE_API BOOL g_bRendering = FALSE;
 
+const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
 extern int ps_always_active;

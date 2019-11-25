@@ -44,7 +44,9 @@ struct CLoader
         template <bool pointer>
         static void load_data(std::enable_if_t<pointer, T&> data, M& stream, const P& p)
         {
-            CLoader<M, P>::load_data(*(data = new typename object_type_traits::remove_pointer<T>::type()), stream, p);
+            if (!data)
+                data = new typename object_type_traits::remove_pointer<T>::type();
+            CLoader<M, P>::load_data(*data, stream, p);
         }
     };
 
@@ -292,6 +294,9 @@ struct CEmptyPredicate
 };
 };
 
+// Be careful with pointer:
+// it will allocate memory if pointers is nullptr,
+// otherwise it will use already allocated object.
 template <typename T, typename M, typename P>
 void load_data(const T& data, M& stream, const P& p)
 {
@@ -299,6 +304,9 @@ void load_data(const T& data, M& stream, const P& p)
     CLoader<M, P>::load_data(*temp, stream, p);
 }
 
+// Be careful with pointer:
+// it will allocate memory if pointers is nullptr,
+// otherwise it will use already allocated object.
 template <typename T, typename M>
 void load_data(const T& data, M& stream)
 {

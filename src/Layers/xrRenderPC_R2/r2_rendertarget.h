@@ -105,17 +105,17 @@ private:
     ref_geom g_accum_omnipart;
     ref_geom g_accum_volumetric;
 
-    ID3DVertexBuffer* g_accum_point_vb;
-    ID3DIndexBuffer* g_accum_point_ib;
+    VertexStagingBuffer g_accum_point_vb;
+    IndexStagingBuffer g_accum_point_ib;
 
-    ID3DVertexBuffer* g_accum_omnip_vb;
-    ID3DIndexBuffer* g_accum_omnip_ib;
+    VertexStagingBuffer g_accum_omnip_vb;
+    IndexStagingBuffer g_accum_omnip_ib;
 
-    ID3DVertexBuffer* g_accum_spot_vb;
-    ID3DIndexBuffer* g_accum_spot_ib;
+    VertexStagingBuffer g_accum_spot_vb;
+    IndexStagingBuffer g_accum_spot_ib;
 
-    ID3DVertexBuffer* g_accum_volumetric_vb;
-    ID3DIndexBuffer* g_accum_volumetric_ib;
+    VertexStagingBuffer g_accum_volumetric_vb;
+    IndexStagingBuffer g_accum_volumetric_ib;
 
     // SSAO
     ref_shader s_ssao;

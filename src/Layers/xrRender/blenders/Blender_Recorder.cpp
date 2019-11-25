@@ -163,6 +163,7 @@ void CBlender_Compile::PassBegin()
     xr_strcpy(pass_ps, "null");
     xr_strcpy(pass_vs, "null");
     dwStage = 0;
+    ctable.clear();
 }
 
 void CBlender_Compile::PassEnd()
@@ -171,34 +172,33 @@ void CBlender_Compile::PassEnd()
     RS.SetTSS(Stage(), D3DTSS_COLOROP, D3DTOP_DISABLE);
     RS.SetTSS(Stage(), D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
-    SPass proto;
     // Create pass
-    proto.state = RImplementation.Resources->_CreateState(RS.GetContainer());
-    proto.ps = RImplementation.Resources->_CreatePS(pass_ps);
-    proto.vs = RImplementation.Resources->_CreateVS(pass_vs);
-    ctable.merge(&proto.ps->constants);
-    ctable.merge(&proto.vs->constants);
+    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
+    dest.ps = RImplementation.Resources->_CreatePS(pass_ps);
+    dest.vs = RImplementation.Resources->_CreateVS(pass_vs);
+    ctable.merge(&dest.ps->constants);
+    ctable.merge(&dest.vs->constants);
 #ifndef USE_DX9
-    proto.gs = RImplementation.Resources->_CreateGS(pass_gs);
-    ctable.merge(&proto.gs->constants);
+    dest.gs = RImplementation.Resources->_CreateGS(pass_gs);
+    ctable.merge(&dest.gs->constants);
 #ifdef USE_DX11
-    proto.hs = RImplementation.Resources->_CreateHS(pass_hs);
-    ctable.merge(&proto.hs->constants);
-    proto.ds = RImplementation.Resources->_CreateDS(pass_ds);
-    ctable.merge(&proto.ds->constants);
-    proto.cs = RImplementation.Resources->_CreateCS(pass_cs);
-    ctable.merge(&proto.cs->constants);
+    dest.hs = RImplementation.Resources->_CreateHS(pass_hs);
+    ctable.merge(&dest.hs->constants);
+    dest.ds = RImplementation.Resources->_CreateDS(pass_ds);
+    ctable.merge(&dest.ds->constants);
+    dest.cs = RImplementation.Resources->_CreateCS(pass_cs);
+    ctable.merge(&dest.cs->constants);
 #endif
 #endif //	USE_DX10
     SetMapping();
-    proto.constants = RImplementation.Resources->_CreateConstantTable(ctable);
-    proto.T = RImplementation.Resources->_CreateTextureList(passTextures);
+    dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
+    dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
 #ifdef _EDITOR
-    proto.M = RImplementation.Resources->_CreateMatrixList(passMatrices);
+    dest.M = RImplementation.Resources->_CreateMatrixList(passMatrices);
 #endif
-    proto.C = RImplementation.Resources->_CreateConstantList(passConstants);
+    dest.C = RImplementation.Resources->_CreateConstantList(passConstants);
 
-    ref_pass _pass_ = RImplementation.Resources->_CreatePass(proto);
+    ref_pass _pass_ = RImplementation.Resources->_CreatePass(dest);
     SH->passes.push_back(_pass_);
 }
 

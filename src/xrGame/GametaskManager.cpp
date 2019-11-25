@@ -18,12 +18,7 @@
 #include <malloc.h>
 #pragma warning(pop)
 
-TASK_ID g_active_task_id[eTaskTypeCount] =
-{
-    g_active_task_no_task___internal,
-    g_active_task_no_task___internal,
-    g_active_task_no_task___internal
-};
+TASK_ID g_active_task_id[eTaskTypeCount];
 
 struct FindTaskByID
 {
@@ -54,14 +49,13 @@ CGameTaskManager::CGameTaskManager()
 
     for (auto& taskId : g_active_task_id)
     {
-        if (!taskId.size())
-            taskId = g_active_task_no_task___internal;
-
-        if (taskId != g_active_task_no_task___internal)
+        if (taskId.size())
         {
             CGameTask* t = HasGameTask(taskId, true);
             if (t)
+            {
                 SetActiveTask(t);
+            }
         }
     }
 }
@@ -246,9 +240,6 @@ CGameTask* CGameTaskManager::ActiveTask(ETaskType type)
     TASK_ID& t_id = g_active_task_id[type];
 
     if (!t_id.size())
-        t_id = g_active_task_no_task___internal;
-
-    if (t_id == g_active_task_no_task___internal)
         return nullptr;
 
     return HasGameTask(t_id, true);

@@ -62,7 +62,7 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
 #ifdef LINUX // FIXME!!!
     return true;
 #else
-    HKEY hKey;
+    HKEY hKey = nullptr;
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_WRITE, &hKey);
 
@@ -90,6 +90,7 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
     default:
     {
         Msg("! Unknown registry data type.");
+        RegCloseKey(hKey);
         return false;
     }
     break;
@@ -97,8 +98,7 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
 
     res = RegSetValueEx(hKey, rKeyName, NULL, rKeyType, (LPBYTE)value, KeyValueSize);
 
-    if (hKey)
-        RegCloseKey(hKey);
+    RegCloseKey(hKey);
     return true;
 #endif
 };

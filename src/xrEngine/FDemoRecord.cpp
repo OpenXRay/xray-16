@@ -426,9 +426,10 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
 #ifndef MASTER_GOLD
     if (dik == SDL_SCANCODE_RETURN)
     {
-        if (g_pGameLevel->CurrentEntity())
+        IGameObject* entity = g_pGameLevel->CurrentEntity();
+        if (entity)
         {
-            g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
+            entity->ForceTransformAndDirection(m_Camera);
             fLifeTime = -1;
         }
     }

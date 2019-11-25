@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
-namespace glBufferUtils
+namespace BufferUtils
 {
-void CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer)
+HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer)
 {
     GLenum usage = bImmutable ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
     GLenum target = bIndexBuffer ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
@@ -11,17 +11,19 @@ void CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmut
     glGenBuffers(1, pBuffer);
     glBindBuffer(target, *pBuffer);
     CHK_GL(glBufferData(target, DataSize, pData, usage));
+    return S_OK;
 }
 
-void CreateVertexBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(pBuffer, pData, DataSize, bImmutable, false);
 }
 
-void CreateIndexBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
-    return CreateBuffer(pBuffer, pData, DataSize, bImmutable, true);
+    return CreateBuffer(static_cast<GLuint*>(pBuffer), pData, DataSize, bImmutable, true);
 }
+} // namespace glBufferUtils
 
 const GLsizei VertexSizeList[] =
 {
@@ -125,7 +127,7 @@ const GLuint VertexUsageList[] =
     ~0u, // D3DDECLUSAGE_SAMPLE
 };
 
-GLsizei GetDeclVertexSize(const D3DVERTEXELEMENT9* decl)
+u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
 {
     GLsizei size = 0;
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
@@ -140,12 +142,12 @@ GLsizei GetDeclVertexSize(const D3DVERTEXELEMENT9* decl)
     return size;
 }
 
-void ConvertVertexDeclaration(const D3DVERTEXELEMENT9* dxdecl, SDeclaration* decl)
+void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
 {
     RCache.set_Format(decl);
 
     // XXX: tamlin: use 'stride', or drop it.
-    GLsizei stride = GetDeclVertexSize(dxdecl);
+    GLsizei stride = GetDeclVertexSize(dxdecl, 0);
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
     {
         const D3DVERTEXELEMENT9& desc = dxdecl[i];
@@ -168,7 +170,7 @@ void ConvertVertexDeclaration(const D3DVERTEXELEMENT9* dxdecl, SDeclaration* dec
     }
 }
 
-GLsizei GetFVFVertexSize(u32 FVF)
+u32 GetFVFVertexSize(u32 FVF)
 {
     GLsizei offset = 0;
 
@@ -278,4 +280,199 @@ u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
 
     return element - decl;
 }
-} // namespace glBufferUtils
+
+//-----------------------------------------------------------------------------
+VertexStagingBuffer::VertexStagingBuffer()
+    : m_DeviceBuffer{ 0 }
+    , m_HostBuffer{ nullptr }
+{
+}
+
+VertexStagingBuffer::~VertexStagingBuffer()
+{
+    Destroy();
+}
+
+void VertexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
+{
+    m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
+    AddRef();
+}
+
+bool VertexStagingBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
+}
+
+void* VertexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= false*/)
+{
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
+
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
+{
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
+
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
+    VERIFY(m_HostBuffer && m_Size);
+
+    // Upload data to device
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
+}
+
+VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
+{
+    return m_DeviceBuffer;
+}
+
+void VertexStagingBuffer::Destroy()
+{
+    DiscardHostBuffer();
+    m_Size = 0;
+
+    if (m_DeviceBuffer)
+    {
+        glDeleteBuffers(1, &m_DeviceBuffer);
+        m_DeviceBuffer = 0;
+    }
+}
+
+void VertexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t VertexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t VertexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (!m_DeviceBuffer)
+        return 0;
+
+    GLint bufferSize;
+    glBindBuffer(GL_ARRAY_BUFFER, m_DeviceBuffer);
+    CHK_GL(glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize));
+    return bufferSize;
+}
+
+//-----------------------------------------------------------------------------
+IndexStagingBuffer::IndexStagingBuffer()
+    : m_DeviceBuffer{ 0 }
+    , m_HostBuffer{ nullptr }
+{
+}
+
+IndexStagingBuffer::~IndexStagingBuffer()
+{
+    Destroy();
+}
+
+void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/, bool /*managed = true*/)
+{
+    m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
+    AddRef();
+}
+
+bool IndexStagingBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
+}
+
+void* IndexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= false*/)
+{
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
+
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
+{
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
+
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
+    VERIFY(m_HostBuffer && m_Size);
+
+    // Upload data to device
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
+}
+
+IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
+{
+    return m_DeviceBuffer;
+}
+
+void IndexStagingBuffer::Destroy()
+{
+    DiscardHostBuffer();
+    m_Size = 0;
+
+    if (m_DeviceBuffer)
+    {
+        glDeleteBuffers(1, &m_DeviceBuffer);
+        m_DeviceBuffer = 0;
+    }
+}
+
+void IndexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t IndexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t IndexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (!m_DeviceBuffer)
+        return 0;
+
+    GLint bufferSize;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
+    CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize));
+    return bufferSize;
+}

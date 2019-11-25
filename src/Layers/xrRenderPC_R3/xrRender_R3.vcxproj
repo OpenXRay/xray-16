@@ -195,7 +195,6 @@
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.h" />
     <ClInclude Include="..\xrRenderDX10\CommonTypes.h" />
     <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10BufferUtils.h" />
     <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer.h" />
     <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer_impl.h" />
     <ClInclude Include="..\xrRenderDX10\dx10HW.h" />
@@ -224,6 +223,7 @@
     <ClInclude Include="..\xrRender\Blender_Particle.h" />
     <ClInclude Include="..\xrRender\Blender_Screen_SET.h" />
     <ClInclude Include="..\xrRender\Blender_tree.h" />
+    <ClInclude Include="..\xrRender\BufferUtils.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
@@ -258,6 +258,7 @@
     <ClInclude Include="..\xrRender\FLOD.h" />
     <ClInclude Include="..\xrRender\FProgressive.h" />
     <ClInclude Include="..\xrRender\FSkinned.h" />
+    <ClInclude Include="..\xrRender\FSkinnedTypes.h" />
     <ClInclude Include="..\xrRender\FTreeVisual.h" />
     <ClInclude Include="..\xrRender\FVF.h" />
     <ClInclude Include="..\xrRender\FVisual.h" />

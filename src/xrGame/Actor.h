@@ -23,6 +23,8 @@ class CInfoPortion;
 struct GAME_NEWS_DATA;
 class CActorCondition;
 class CCustomOutfit;
+class CKnownContactsRegistryWrapper;
+class CEncyclopediaRegistryWrapper;
 class CGameTaskRegistryWrapper;
 class CGameNewsRegistryWrapper;
 class CCharacterPhysicsSupport;
@@ -120,6 +122,9 @@ public:
     void DumpTasks();
 #endif
 
+protected:
+    virtual void AddEncyclopediaArticle(const CInfoPortion* info_portion) const;
+
     struct SDefNewsMsg
     {
         GAME_NEWS_DATA* news_data;
@@ -141,6 +146,7 @@ public:
     virtual void StartTalk(CInventoryOwner* talk_partner);
     void RunTalkDialog(CInventoryOwner* talk_partner, bool disable_break);
     CActorStatisticMgr& StatisticMgr() { return *m_statistic_manager; }
+    CEncyclopediaRegistryWrapper* encyclopedia_registry;
     CGameNewsRegistryWrapper* game_news_registry;
     CCharacterPhysicsSupport* m_pPhysics_support;
 
@@ -580,6 +586,7 @@ protected:
 public:
     void g_Physics(Fvector& accel, float jump, float dt);
     virtual void ForceTransform(const Fmatrix& m);
+    void ForceTransformAndDirection(const Fmatrix& m) override;
     void SetPhPosition(const Fmatrix& pos);
     virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
     virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps

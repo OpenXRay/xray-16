@@ -62,46 +62,38 @@ u16 du_cone_faces[DU_CONE_NUMFACES*3]=
 
 void CRenderTarget::accum_spot_geom_create()
 {
-    u32 dwUsage = D3DUSAGE_WRITEONLY;
-
     // vertices
     {
         u32 vCount = DU_CONE_NUMVERTEX;
         u32 vSize = 3 * 4;
-        R_CHK(HW.pDevice->CreateVertexBuffer(vCount * vSize, dwUsage, 0, D3DPOOL_MANAGED, &g_accum_spot_vb, 0));
-        HW.stats_manager.increment_stats_vb(g_accum_spot_vb);
 
-        BYTE* pData = 0;
-        R_CHK(g_accum_spot_vb->Lock(0, 0, (void**)&pData, 0));
+        g_accum_spot_vb.Create(vCount * vSize);
+        BYTE* pData = static_cast<BYTE*>(g_accum_spot_vb.Map());
         CopyMemory(pData, du_cone_vertices, vCount * vSize);
-        g_accum_spot_vb->Unlock();
+        g_accum_spot_vb.Unmap(true); // upload vertex data
     }
 
     // Indices
     {
         u32 iCount = DU_CONE_NUMFACES * 3;
 
-        BYTE* pData = 0;
-        R_CHK(HW.pDevice->CreateIndexBuffer(iCount * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &g_accum_spot_ib, 0));
-        HW.stats_manager.increment_stats_ib(g_accum_spot_ib);
-        R_CHK(g_accum_spot_ib->Lock(0, 0, (void**)&pData, 0));
+        g_accum_spot_ib.Create(iCount * 2);
+        BYTE* pData = static_cast<BYTE*>(g_accum_spot_ib.Map());
         CopyMemory(pData, du_cone_faces, iCount * 2);
-        g_accum_spot_ib->Unlock();
+        g_accum_spot_ib.Unmap(true); // upload index data
     }
 }
 
 void CRenderTarget::accum_spot_geom_destroy()
 {
 #ifdef DEBUG
-    _SHOW_REF("g_accum_spot_ib", g_accum_spot_ib);
+    _SHOW_REF("g_accum_spot_ib", &g_accum_spot_ib);
 #endif // DEBUG
-    HW.stats_manager.decrement_stats_ib(g_accum_spot_ib);
-    _RELEASE(g_accum_spot_ib);
+    g_accum_spot_ib.Release();
 #ifdef DEBUG
-    _SHOW_REF("g_accum_spot_vb", g_accum_spot_vb);
+    _SHOW_REF("g_accum_spot_vb", &g_accum_spot_vb);
 #endif // DEBUG
-    HW.stats_manager.decrement_stats_vb(g_accum_spot_vb);
-    _RELEASE(g_accum_spot_vb);
+    g_accum_spot_vb.Release();
 }
 
 struct Slice
@@ -111,18 +103,14 @@ struct Slice
 
 void CRenderTarget::accum_volumetric_geom_create()
 {
-    u32 dwUsage = D3DUSAGE_WRITEONLY;
-
     // vertices
     {
         //	VOLUMETRIC_SLICES quads
         const u32 vCount = VOLUMETRIC_SLICES * 4;
         u32 vSize = 3 * 4;
-        R_CHK(HW.pDevice->CreateVertexBuffer(vCount * vSize, dwUsage, 0, D3DPOOL_MANAGED, &g_accum_volumetric_vb, 0));
-        HW.stats_manager.increment_stats_vb(g_accum_volumetric_vb);
+        g_accum_volumetric_vb.Create(vCount * vSize);
 
-        BYTE* pData = 0;
-        R_CHK(g_accum_volumetric_vb->Lock(0, 0, (void**)&pData, 0));
+        BYTE* pData = static_cast<BYTE*>(g_accum_volumetric_vb.Map());
         Slice* pSlice = (Slice*)pData;
         float t = 0;
         float dt = 1.0f / (VOLUMETRIC_SLICES - 1);
@@ -134,20 +122,15 @@ void CRenderTarget::accum_volumetric_geom_create()
             pSlice[i].m_Vert[3] = Fvector().set(1, 1, t);
             t += dt;
         }
-
-        g_accum_volumetric_vb->Unlock();
+        g_accum_volumetric_vb.Unmap(true); // upload vertex data
     }
 
     // Indices
     {
         const u32 iCount = VOLUMETRIC_SLICES * 6;
 
-        BYTE* pData = 0;
-        R_CHK(HW.pDevice->CreateIndexBuffer(
-            iCount * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &g_accum_volumetric_ib, 0));
-        HW.stats_manager.increment_stats_ib(g_accum_volumetric_ib);
-        R_CHK(g_accum_volumetric_ib->Lock(0, 0, (void**)&pData, 0));
-        u16* pInd = (u16*)pData;
+        g_accum_volumetric_ib.Create(iCount * 2);
+        u16* pInd = static_cast<u16*>(g_accum_volumetric_ib.Map());
         for (u16 i = 0; i < VOLUMETRIC_SLICES; ++i, pInd += 6)
         {
             u16 basevert = i * 4;
@@ -158,21 +141,19 @@ void CRenderTarget::accum_volumetric_geom_create()
             pInd[4] = basevert + 1;
             pInd[5] = basevert + 3;
         }
-        g_accum_volumetric_ib->Unlock();
+        g_accum_volumetric_ib.Unmap(true); // upload index data
     }
 }
 
 void CRenderTarget::accum_volumetric_geom_destroy()
 {
 #ifdef DEBUG
-    _SHOW_REF("g_accum_volumetric_ib", g_accum_volumetric_ib);
+    _SHOW_REF("g_accum_volumetric_ib", &g_accum_volumetric_ib);
 #endif // DEBUG
-    HW.stats_manager.decrement_stats_ib(g_accum_volumetric_ib);
-    _RELEASE(g_accum_volumetric_ib);
+    g_accum_volumetric_ib.Release();
 
 #ifdef DEBUG
-    _SHOW_REF("g_accum_volumetric_vb", g_accum_volumetric_vb);
+    _SHOW_REF("g_accum_volumetric_vb", &g_accum_volumetric_vb);
 #endif // DEBUG
-    HW.stats_manager.decrement_stats_vb(g_accum_volumetric_vb);
-    _RELEASE(g_accum_volumetric_vb);
+    g_accum_volumetric_vb.Release();
 }

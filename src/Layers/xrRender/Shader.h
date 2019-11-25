@@ -14,9 +14,6 @@
 #include "SH_Matrix.h"
 #include "SH_Constant.h"
 #include "SH_RT.h"
-#ifdef USE_OGL
-#include "Layers/xrRenderGL/glBufferPool.h"
-#endif // USE_OGL
 
 using sh_list = xr_vector<shared_str>;
 class CBlender_Compile;
@@ -69,13 +66,8 @@ typedef resptr_core<SConstantList, resptr_base<SConstantList>> ref_constant_list
 struct ECORE_API SGeometry : public xr_resource_flagged
 {
     ref_declaration dcl;
-#ifdef USE_OGL
-	GLuint vb;
-	GLuint ib;
-#else
-    ID3DVertexBuffer* vb;
-    ID3DIndexBuffer* ib;
-#endif
+    VertexBufferHandle vb;
+    IndexBufferHandle ib;
     u32 vb_stride;
     SGeometry() = default;
     ~SGeometry();
@@ -83,15 +75,8 @@ struct ECORE_API SGeometry : public xr_resource_flagged
 
 struct ECORE_API resptrcode_geom : public resptr_base<SGeometry>
 {
-#ifdef USE_OGL
-    void create(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
-    void create(u32 FVF, GLuint vb, GLuint ib);
-    void create(D3DVERTEXELEMENT9* decl, IGLVertexBuffer* vb, IGLIndexBuffer* ib);
-    void create(u32 FVF, IGLVertexBuffer* vb, IGLIndexBuffer* ib);
-#else
-    void create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-    void create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-#endif // USE_OGL
+    void create(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
+    void create(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib);
     void destroy() { _set(nullptr); }
     u32 stride() const { return _get()->vb_stride; }
 };

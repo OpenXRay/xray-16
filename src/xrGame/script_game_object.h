@@ -333,6 +333,8 @@ public:
     //предикаты наличия/отсутствия порции информации у персонажа
     bool HasInfo(LPCSTR info_id);
     bool DontHasInfo(LPCSTR info_id);
+    xrTime GetInfoTime(LPCSTR info_id);
+
     //работа с заданиями
     ETaskState GetGameTaskState(LPCSTR task_id);
     void SetGameTaskState(ETaskState state, LPCSTR task_id);

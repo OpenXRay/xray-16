@@ -62,7 +62,7 @@ void IBannedClient::Load(CInifile& ini, const shared_str& sect)
     tm _tm_banned;
     const shared_str& time_to = ini.r_string(sect, "time_to");
     int res_t = sscanf(time_to.c_str(), "%02d.%02d.%d_%02d:%02d:%02d", &_tm_banned.tm_mday, &_tm_banned.tm_mon,
-                       &_tm_banned.tm_year, &_tm_banned.tm_hour, &_tm_banned.tm_min, &_tm_banned.tm_sec);
+        &_tm_banned.tm_year, &_tm_banned.tm_hour, &_tm_banned.tm_min, &_tm_banned.tm_sec);
     VERIFY(res_t == 6);
 
     _tm_banned.tm_mon -= 1;
@@ -83,7 +83,7 @@ xr_string IBannedClient::BannedTimeTo() const
     string256 res;
     tm* _tm_banned = _localtime64(&BanTime);
     xr_sprintf(res, sizeof(res), "%02d.%02d.%d_%02d:%02d:%02d", _tm_banned->tm_mday, _tm_banned->tm_mon + 1,
-               _tm_banned->tm_year + 1900, _tm_banned->tm_hour, _tm_banned->tm_min, _tm_banned->tm_sec);
+        _tm_banned->tm_year + 1900, _tm_banned->tm_hour, _tm_banned->tm_min, _tm_banned->tm_sec);
 
     return res;
 }
@@ -127,7 +127,7 @@ IClientStatistic::IClientStatistic(const IClientStatistic& rhs) :
 
 IClientStatistic::~IClientStatistic()
 {
-    delete m_pimpl;
+    xr_delete(m_pimpl);
 }
 
 void IClientStatistic::Update(DPN_CONNECTION_INFO& CI)
@@ -416,12 +416,14 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
 
         // Create our IDirectPlay8Address Device Address, --- Set the SP for our Device Address
         net_Address_device = nullptr;
-        CHK_DX(CoCreateInstance(CLSID_DirectPlay8Address, NULL, CLSCTX_INPROC_SERVER, IID_IDirectPlay8Address, (LPVOID*)&net_Address_device));
+        CHK_DX(CoCreateInstance(CLSID_DirectPlay8Address, nullptr, CLSCTX_INPROC_SERVER,
+            IID_IDirectPlay8Address, (LPVOID*)&net_Address_device));
 
         CHK_DX(net_Address_device->SetSP(bSimulator ? &CLSID_NETWORKSIMULATOR_DP8SP_TCPIP : &CLSID_DP8SP_TCPIP));
 
         DWORD dwTraversalMode = DPNA_TRAVERSALMODE_NONE;
-        CHK_DX(net_Address_device->AddComponent(DPNA_KEY_TRAVERSALMODE, &dwTraversalMode, sizeof(dwTraversalMode), DPNA_DATATYPE_DWORD));
+        CHK_DX(net_Address_device->AddComponent(DPNA_KEY_TRAVERSALMODE,
+            &dwTraversalMode, sizeof(dwTraversalMode), DPNA_DATATYPE_DWORD));
 
         HRESULT HostSuccess = S_FALSE;
         // We are now ready to host the app and will try different ports
@@ -431,10 +433,11 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
             CHK_DX(net_Address_device->AddComponent(DPNA_KEY_PORT, &psNET_Port, sizeof(psNET_Port), DPNA_DATATYPE_DWORD));
 
             HostSuccess = NET->Host(&dpAppDesc, // AppDesc
-                                    &net_Address_device, 1, // Device Address
-                                    nullptr, nullptr, // Reserved
-                                    nullptr, // Player Context
-                                    0); // dwFlags
+                &net_Address_device, 1, // Device Address
+                nullptr, nullptr, // Reserved
+                nullptr, // Player Context
+                0); // dwFlags
+
             if (HostSuccess != S_OK)
             {
                 //			xr_string res = xrDebug::ErrorToString(HostSuccess);
@@ -447,10 +450,14 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
 
                 psNET_Port++;
                 if (psNET_Port > END_PORT_LAN)
+                {
                     return ErrConnect;
+                }
             }
             else
+            {
                 Msg("- IPureServer : created on port %d!", psNET_Port);
+            }
         }
 
         CHK_DX(HostSuccess);
@@ -534,13 +541,14 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
 
         if (Pinfo->pvData && Pinfo->dwDataSize == sizeof(cl_data))
         {
-            cl_data = *(SClientConnectData*)Pinfo->pvData;
+            cl_data = *((SClientConnectData*)Pinfo->pvData);
         }
         cl_data.clientID.set(msg->dpnidPlayer);
 
         new_client(&cl_data);
     }
-        break;
+    break;
+
     case DPN_MSGID_DESTROY_PLAYER:
     {
         PDPNMSG_DESTROY_PLAYER msg = PDPNMSG_DESTROY_PLAYER(pMessage);
@@ -555,7 +563,8 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
             client_Destroy(tmp_client);
         }
     }
-        break;
+    break;
+
     case DPN_MSGID_RECEIVE:
     {
         PDPNMSG_RECEIVE pMsg = PDPNMSG_RECEIVE(pMessage);
@@ -579,9 +588,11 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
             }
         }
         else
-            RecievePacket(pMsg->pReceiveData, pMsg->dwReceiveDataSize, m_sender);
+        {
+            MultipacketReciever::RecievePacket(pMsg->pReceiveData, pMsg->dwReceiveDataSize, m_sender);
+        }
     }
-        break;
+    break;
 
     case DPN_MSGID_INDICATE_CONNECT:
     {
@@ -604,8 +615,9 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
             return S_FALSE;
         }
     }
-        break;
+    break;
     }
+
     return S_OK;
 }
 
@@ -703,7 +715,7 @@ void IPureServer::SendBroadcast_LL(ClientID exclude, void* data, u32 size, u32 d
         u32 m_dwFlags;
 
         ClientSenderFunctor(IPureServer* owner, void* data, u32 size, u32 dwFlags)
-            : m_owner(owner), m_data(data), m_size(size), m_dwFlags(dwFlags) { }
+            : m_owner(owner), m_data(data), m_size(size), m_dwFlags(dwFlags) {}
 
         void operator()(IClient* client) { m_owner->SendTo_LL(client->ID, m_data, m_size, m_dwFlags); }
     };
@@ -727,11 +739,11 @@ u32 IPureServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means bro
     {
     case M_CHAT:
     {
-        char buffer[256];
+        string256 buffer;
         P.r_string(buffer);
-        printf("RECEIVE: %s\n", buffer);
+        printf("RECEIVE: %s\n",buffer);
     }
-        break;
+    break;
     }
     */
 
@@ -810,7 +822,8 @@ void IPureServer::ClearStatistic()
 /*
 bool IPureServer::DisconnectClient(IClient* C)
 {
-    if (!C) return false;
+    if (!C)
+        return false;
 
     string64 Reason = "st_kicked_by_server";
     HRESULT res = NET->DestroyClient(C->ID.value(), Reason, xr_strlen(Reason) + 1, 0);
@@ -842,14 +855,16 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
 
         ToDisconnectFillerFunctor(
             IPureServer* owner, buffer_vector<IClient*>* dest_disconnect, ip_address const* address)
-            : m_owner(owner), dest(dest_disconnect), address_to_disconnect(address) { }
+            : m_owner(owner), dest(dest_disconnect), address_to_disconnect(address) {}
 
         void operator()(IClient* client)
         {
             ip_address tmp_address;
             m_owner->GetClientAddress(client->ID, tmp_address);
             if (*address_to_disconnect == tmp_address)
+            {
                 dest->push_back(client);
+            }
         }
     };
 
@@ -941,7 +956,7 @@ void IPureServer::UnBanAddress(const ip_address& Address)
     {
         Msg("! Can't find address %s in ban list.", Address.to_string().c_str());
         return;
-    }
+    };
 
     for (u32 it = 0; it < BannedAddresses.size(); it++)
     {
@@ -1013,14 +1028,21 @@ void IPureServer::IpList_Unload()
     m_ip_filter.unload();
 }
 
-bool IPureServer::IsPlayerIPDenied(u32 ip_address) { return !m_ip_filter.is_ip_present(ip_address); }
-bool banned_client_comparer(IBannedClient* C1, IBannedClient* C2) { return C1->BanTime > C2->BanTime; }
+bool IPureServer::IsPlayerIPDenied(u32 ip_address)
+{
+    return !m_ip_filter.is_ip_present(ip_address);
+}
+
+bool banned_client_comparer(IBannedClient* C1, IBannedClient* C2)
+{
+    return C1->BanTime > C2->BanTime;
+}
 
 void IPureServer::UpdateBannedList()
 {
     if (!BannedAddresses.size())
         return;
-    sort(BannedAddresses.begin(), BannedAddresses.end(), banned_client_comparer);
+    std::sort(BannedAddresses.begin(), BannedAddresses.end(), banned_client_comparer);
     time_t T;
     time(&T);
 

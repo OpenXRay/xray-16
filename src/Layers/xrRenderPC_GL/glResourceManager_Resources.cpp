@@ -9,7 +9,7 @@
 #include "../xrRender/tss.h"
 #include "../xrRender/blenders/Blender.h"
 #include "../xrRender/blenders/Blender_Recorder.h"
-#include "../xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 void fix_texture_name(LPSTR fn);
@@ -107,8 +107,8 @@ void CResourceManager::_DeletePass(const SPass* P)
 static BOOL dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
 {
     // check sizes
-    u32 a_size = glBufferUtils::GetDeclLength(a);
-    u32 b_size = glBufferUtils::GetDeclLength(b);
+    u32 a_size = GetDeclLength(a);
+    u32 b_size = GetDeclLength(b);
     if (a_size != b_size) return FALSE;
     return 0 == memcmp(a, b, a_size * sizeof(D3DVERTEXELEMENT9));
 }
@@ -126,7 +126,7 @@ SDeclaration* CResourceManager::_CreateDecl(u32 FVF)
     glGenVertexArrays(1, &D->dcl);
 
     D->FVF = FVF;
-    glBufferUtils::ConvertVertexDeclaration(FVF, D);
+    ConvertVertexDeclaration(FVF, D);
     D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return D;
@@ -145,9 +145,9 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
     glGenVertexArrays(1, &D->dcl);
 
     D->FVF = 0;
-    u32 dcl_size = glBufferUtils::GetDeclLength(dcl) + 1;
+    u32 dcl_size = GetDeclLength(dcl) + 1;
     D->dcl_code.assign(dcl, dcl + dcl_size);
-    glBufferUtils::ConvertVertexDeclaration(dcl, D);
+    ConvertVertexDeclaration(dcl, D);
     D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return D;
@@ -293,12 +293,12 @@ void CResourceManager::_DeleteRT(const CRT* RT)
 //--------------------------------------------------------------------------------------------------------------
 void CResourceManager::DBG_VerifyGeoms() {}
 
-SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib)
+SGeometry* CResourceManager::CreateGeom(VertexElement* decl, GLuint vb, GLuint ib)
 {
     R_ASSERT(decl && vb);
 
     SDeclaration* dcl = _CreateDecl(decl);
-    u32 vb_stride = glBufferUtils::GetDeclVertexSize(decl);
+    u32 vb_stride = GetDeclVertexSize(decl, 0);
 
     // ***** first pass - search already loaded shader
     for (SGeometry* geom : v_geoms)
@@ -322,7 +322,7 @@ SGeometry* CResourceManager::CreateGeom(u32 FVF, GLuint vb, GLuint ib)
     R_ASSERT(FVF && vb);
 
     SDeclaration* dcl = _CreateDecl(FVF);
-    u32 vb_stride = glBufferUtils::GetFVFVertexSize(FVF);
+    u32 vb_stride = GetFVFVertexSize(FVF);
 
     // ***** first pass - search already loaded shader
     for (SGeometry* geom : v_geoms)

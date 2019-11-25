@@ -28,10 +28,15 @@ protected:
     {
         RM_SKINNING_SOFT,
         RM_SINGLE,
+        RM_SINGLE_HQ,
         RM_SKINNING_1B,
+        RM_SKINNING_1B_HQ,
         RM_SKINNING_2B,
+        RM_SKINNING_2B_HQ,
         RM_SKINNING_3B,
-        RM_SKINNING_4B
+        RM_SKINNING_3B_HQ,
+        RM_SKINNING_4B,
+        RM_SKINNING_4B_HQ
     };
 
     CKinematics* Parent; // setted up by parent
@@ -77,14 +82,6 @@ protected:
     void _FillVerticesSoft4W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
                              u16* indices, CBoneData::FacesVec& faces);
 
-    virtual void _FillVerticesHW1W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-        Fvisual* V, u16* indices, CBoneData::FacesVec& faces) = 0;
-    virtual void _FillVerticesHW2W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-        Fvisual* V, u16* indices, CBoneData::FacesVec& faces) = 0;
-    virtual void _FillVerticesHW3W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-        Fvisual* V, u16* indices, CBoneData::FacesVec& faces) = 0;
-    virtual void _FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-        Fvisual* V, u16* indices, CBoneData::FacesVec& faces) = 0;
     virtual void _FillVertices(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
         Fvisual* V, u16 bone_id, u32 iBase, u32 iCount) = 0;
 
@@ -96,15 +93,6 @@ protected:
         CBoneData::FacesVec& faces);
     BOOL _PickBoneSoft4W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
         CBoneData::FacesVec& faces);
-
-    virtual BOOL _PickBoneHW1W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
-        u16* indices, CBoneData::FacesVec& faces) = 0;
-    virtual BOOL _PickBoneHW2W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
-        u16* indices, CBoneData::FacesVec& faces) = 0;
-    virtual BOOL _PickBoneHW3W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
-        u16* indices, CBoneData::FacesVec& faces) = 0;
-    virtual BOOL _PickBoneHW4W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
-        u16* indices, CBoneData::FacesVec& faces) = 0;
 
     virtual BOOL _PickBone(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
         u16 bone_id, u32 iBase, u32 iCount) = 0;
@@ -124,14 +112,6 @@ public:
         IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id) = 0;
     virtual void FillVertices(
         const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size, u16 bone_id) = 0;
-
-#ifndef USE_DX9
-protected:
-    void _DuplicateIndices(const char* N, IReader* data);
-
-    //	Index buffer replica since we can't read from index buffer in DX10
-    ref_smem<u16> m_Indices;
-#endif //	USE_DX10
 };
 
 template <typename T_vertex, typename T_buffer>
@@ -157,25 +137,15 @@ BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result&
     return FALSE;
 }
 
-#ifndef USE_DX9
 template <typename T>
 BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
 {
-    VERIFY(!"Not implemented");
-    return FALSE;
-}
-#else //	USE_DX10
-template <typename T>
-BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
-    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    T* vertices;
-    CHK_DX(V->p_rm_Vertices->Lock(V->vBase, V->vCount, (void**)&vertices, D3DLOCK_READONLY));
+    void* data = static_cast<BYTE*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true)); // read-back
+    T* vertices = static_cast<T*>(data);
     bool intersect = !!pick_bone<T, T*>(vertices, Parent, r, dist, S, D, indices, faces);
-    CHK_DX(V->p_rm_Vertices->Unlock());
+    V->p_rm_Vertices->Unmap();
     return intersect;
 }
-#endif //	USE_DX10
 
 #endif // SkeletonXH

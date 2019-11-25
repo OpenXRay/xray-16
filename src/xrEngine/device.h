@@ -58,7 +58,7 @@ public:
 class ENGINE_API CRenderDeviceData
 {
 public:
-    static constexpr u32 MaximalWaitTime = 33; // ms
+    static const u32 MaximalWaitTime; // ms
 
     // Rendering resolution
     u32 dwWidth;

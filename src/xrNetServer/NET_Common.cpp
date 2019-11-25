@@ -98,8 +98,8 @@ void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 f
     u32 old_flags = buf->last_flags & ~DPNSEND_IMMEDIATELLY;
     u32 new_flags = flags & (~DPNSEND_IMMEDIATELLY);
 
-    if (buf->buffer.B.count + packet_sz + sizeof(u16) >= NET_PacketSizeLimit || old_flags != new_flags ||
-        flags & DPNSEND_IMMEDIATELLY)
+    if ((buf->buffer.B.count + packet_sz + sizeof(u16) >= NET_PacketSizeLimit) || (old_flags != new_flags) ||
+        (flags & DPNSEND_IMMEDIATELLY))
     {
         _FlushSendBuffer(timeout, buf);
     }
@@ -145,7 +145,7 @@ void MultipacketSender::_FlushSendBuffer(u32 timeout, Buffer* buf)
         R_ASSERT(comp_sz < 65535);
 
         comp_sz = Compressor.Compress(packet_data + sizeof(MultipacketHeader),
-                                      sizeof(packet_data) - sizeof(MultipacketHeader), buf->buffer.B.data, buf->buffer.B.count);
+            sizeof(packet_data) - sizeof(MultipacketHeader), buf->buffer.B.data, buf->buffer.B.count);
 
         header->tag = NET_TAG_MERGED;
         header->unpacked_size = (u16)buf->buffer.B.count;

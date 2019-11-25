@@ -991,7 +991,8 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     if (!strstr(Core.Params, "-nojit"))
     {
         luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
-        RunJITCommand(lua(), "opt.start(2)");
+        // Xottab_DUTY: commented this. Let's use default opt level, which is 3
+        //RunJITCommand(lua(), "opt.start(2)");
     }
 #ifdef USE_LUA_STUDIO
     if (m_lua_studio_world || strstr(Core.Params, "-lua_studio"))

@@ -42,24 +42,20 @@ void CPatrolPathStorage::load_raw(
 
 void CPatrolPathStorage::load(IReader& stream)
 {
-    IReader* chunk;
-
-    chunk = stream.open_chunk(0);
-    u32 size = chunk->r_u32();
+    IReader* chunk = stream.open_chunk(0);
+    const u32 size = chunk->r_u32();
     chunk->close();
 
     m_registry.clear();
 
-    PATROL_REGISTRY::value_type pair;
-
     chunk = stream.open_chunk(1);
     for (u32 i = 0; i < size; ++i)
     {
-        IReader* chunk1;
-        chunk1 = chunk->open_chunk(i);
+        PATROL_REGISTRY::value_type pair{};
 
-        IReader* chunk2;
-        chunk2 = chunk1->open_chunk(0);
+        IReader* chunk1 = chunk->open_chunk(i);
+        IReader* chunk2 = chunk1->open_chunk(0);
+
         load_data(pair.first, *chunk2);
         chunk2->close();
 

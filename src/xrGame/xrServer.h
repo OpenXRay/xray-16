@@ -181,8 +181,8 @@ public:
     void Perform_reject(CSE_Abstract* what, CSE_Abstract* from, int delta);
     virtual void Perform_destroy(CSE_Abstract* tpSE_Abstract, u32 mode) override;
 
-    CSE_Abstract* Process_spawn(NET_Packet& P, ClientID sender,
-                                bool bSpawnWithClientsMainEntityAsParent = false, CSE_Abstract* tpExistedEntity = nullptr) override;
+    CSE_Abstract* Process_spawn(NET_Packet& P, ClientID sender, bool bSpawnWithClientsMainEntityAsParent = false,
+        CSE_Abstract* tpExistedEntity = nullptr) override;
     void Process_update(NET_Packet& P, ClientID sender);
     void Process_save(NET_Packet& P, ClientID sender);
     void Process_event(NET_Packet& P, ClientID sender);

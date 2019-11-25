@@ -24,3 +24,13 @@ typedef enum D3D_COMPARISON_FUNC {
 } D3D_COMPARISON_FUNC;
 
 #define DX10_ONLY(expr)			do {} while (0)
+
+using unused_t = int[0];
+
+using IndexBufferHandle = GLuint;
+using VertexBufferHandle = GLuint;
+using ConstantBufferHandle = GLuint;
+using HostBufferHandle = void*;
+
+using VertexElement = D3DVERTEXELEMENT9;
+using InputElementDesc = unused_t;

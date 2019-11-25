@@ -43,8 +43,8 @@ void init_game_globals()
     InitHudSoundSettings();
     if (!GEnv.isDedicatedServer)
     {
-        //		CInfoPortion::InitInternal					();
-        //.		CEncyclopediaArticle::InitInternal			();
+        CInfoPortion::InitInternal(ShadowOfChernobylMode || ClearSkyMode);
+        CEncyclopediaArticle::InitInternal(ShadowOfChernobylMode);
         CPhraseDialog::InitInternal();
         InventoryUtilities::CreateShaders();
     };
@@ -73,6 +73,12 @@ void clean_game_globals()
 
     if (!GEnv.isDedicatedServer)
     {
+        CInfoPortion::DeleteSharedData();
+        CInfoPortion::DeleteIdToIndexData();
+
+        CEncyclopediaArticle::DeleteSharedData();
+        CEncyclopediaArticle::DeleteIdToIndexData();
+
         CPhraseDialog::DeleteSharedData();
         CPhraseDialog::DeleteIdToIndexData();
 

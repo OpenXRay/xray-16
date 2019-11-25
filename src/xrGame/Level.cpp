@@ -608,7 +608,7 @@ void CLevel::OnFrame()
     }
 }
 
-int psLUA_GCSTEP = 10;
+int psLUA_GCSTEP = 100; // 10
 void CLevel::script_gc() { lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTEP, psLUA_GCSTEP); }
 #ifdef DEBUG_PRECISE_PATH
 void test_precise_path();

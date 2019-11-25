@@ -30,7 +30,7 @@ IC void CBackend::set_ZB(ID3DDepthStencilView* ZB)
     }
 }
 
-ICF void CBackend::set_Format(IDirect3DVertexDeclaration9* _decl)
+ICF void CBackend::set_Format(SDeclaration* _decl)
 {
     if (decl != _decl)
     {
@@ -39,7 +39,7 @@ ICF void CBackend::set_Format(IDirect3DVertexDeclaration9* _decl)
         stat.decl++;
 #endif
         decl = _decl;
-        CHK_DX(HW.pDevice->SetVertexDeclaration(decl));
+        CHK_DX(HW.pDevice->SetVertexDeclaration(decl->dcl));
     }
 }
 
@@ -71,7 +71,7 @@ ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
     }
 }
 
-ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
+ICF void CBackend::set_Vertices(VertexBufferHandle _vb, u32 _vb_stride)
 {
     if ((vb != _vb) || (vb_stride != _vb_stride))
     {
@@ -85,7 +85,7 @@ ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
     }
 }
 
-ICF void CBackend::set_Indices(ID3DIndexBuffer* _ib)
+ICF void CBackend::set_Indices(IndexBufferHandle _ib)
 {
     if (ib != _ib)
     {
@@ -128,7 +128,7 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
 
 IC void CBackend::set_Geometry(SGeometry* _geom)
 {
-    set_Format(_geom->dcl._get()->dcl);
+    set_Format(_geom->dcl._get());
     set_Vertices(_geom->vb, _geom->vb_stride);
     set_Indices(_geom->ib);
 }
