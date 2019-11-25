@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "xrGameSpy.h"
 
-void FillSecretKey(char* secretKey) { strcpy(secretKey, GAMESPY_GAMEKEY); }
-
 const char* GetGameVersion() { return GAME_VERSION; }
 // WORD: Bit masks for languages
 #define SKU_HAS_E 0x0001 // English

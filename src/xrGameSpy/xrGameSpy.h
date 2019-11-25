@@ -24,8 +24,6 @@ XRGAMESPY_API const char* GetGameVersion();
 XRGAMESPY_API int GetGameDistribution();
 XRGAMESPY_API void GetGameID(int* GameID, int verID);
 
-void FillSecretKey(char* secretKey);
-
 // hack
 #undef min
 #undef max
