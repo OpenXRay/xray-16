@@ -24,10 +24,18 @@ public:
 
     void UpdateViews();
 
-    // TODO: OGL: Implement this into a compatibility layer?
-    void ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4]);
+    void ClearRenderTarget(GLuint view, Fcolor color) const;
+    [[nodiscard]] int ClearRenderTargetRect(GLuint view, Fcolor color, u32 numRects, Irect* rects) const;
 
-    void ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil);
+    void ClearDepth(GLuint view, float depth) const;
+    [[nodiscard]] int ClearDepthRect(GLuint view, float depth, u32 numRects, Irect* rects) const;
+
+    void ClearStencil(GLuint view, u8 stencil) const;
+
+    void ClearDepthStencil(GLuint view, float depth, u8 stencil) const;
+
+    void ClearRTAndZB(GLuint rt, Fcolor color,
+        GLuint zb, float depth, u8 stencil) const;
 
     void Present();
     DeviceState GetDeviceState();

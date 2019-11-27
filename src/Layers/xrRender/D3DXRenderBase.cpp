@@ -190,17 +190,8 @@ void D3DXRenderBase::Begin()
 
 void D3DXRenderBase::Clear()
 {
-#ifndef USE_DX9
-    HW.pContext->ClearDepthStencilView(RCache.get_ZB(), D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
-    if (psDeviceFlags.test(rsClearBB))
-    {
-        FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
-    }
-#else
-    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | (psDeviceFlags.test(rsClearBB) ? D3DCLEAR_TARGET : 0) |
-        (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), color_xrgb(0, 0, 0), 1, 0));
-#endif
+    HW.ClearRTAndZB(psDeviceFlags.test(rsClearBB) ? RCache.get_RT() : 0, // don't set nullptr instead of 0 (OpenGL requires 0)
+        { 0.0f, 0.0f, 0.0f, 0.0f }, RCache.get_ZB(), 1.0f, 0);
 }
 
 void DoAsyncScreenshot();
@@ -219,14 +210,10 @@ void D3DXRenderBase::ResourcesDestroyNecessaryTextures()
 {
     Resources->DestroyNecessaryTextures();
 }
+
 void D3DXRenderBase::ClearTarget()
 {
-#ifndef USE_DX9
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
-#else
-    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(0, 0, 0), 1, 0));
-#endif
+    HW.ClearRenderTarget(RCache.get_RT(), { 0.0f, 0.0f, 0.0f, 0.0f });
 }
 
 void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)

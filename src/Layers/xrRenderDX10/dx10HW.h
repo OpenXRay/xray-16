@@ -38,6 +38,19 @@ public:
     bool UsingFlipPresentationModel() const;
     DeviceState GetDeviceState();
 
+    void ClearRenderTarget(ID3DRenderTargetView* view, Fcolor color) const;
+    [[nodiscard]] int ClearRenderTargetRect(ID3DRenderTargetView* view, Fcolor color, u32 numRects, Irect* rects) const;
+
+    void ClearDepth(ID3DDepthStencilView* view, float depth) const;
+    [[nodiscard]] int ClearDepthRect(ID3DDepthStencilView* view, float depth, u32 numRects, Irect* rects) const;
+
+    void ClearStencil(ID3DDepthStencilView* view, u8 stencil) const;
+
+    void ClearDepthStencil(ID3DDepthStencilView* view, float depth, u8 stencil) const;
+
+    void ClearRTAndZB(ID3DRenderTargetView* rt, Fcolor color,
+        ID3DDepthStencilView* zb, float depth, u8 stencil) const;
+
     void OnAppActivate() override;
     void OnAppDeactivate() override;
 
@@ -75,6 +88,8 @@ public:
 #if defined(USE_DX10)
     ID3D10Device1* pDevice1 = nullptr;
     ID3D10Device1* pContext1 = nullptr;
+#elif defined (USE_DX11)
+    ID3D11DeviceContext1* pContext1 = nullptr;
 #endif
 
 #if !defined(_MAYA_EXPORT)

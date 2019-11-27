@@ -595,9 +595,9 @@ CRenderTarget::CRenderTarget()
             xr_sprintf(name, "%s_%d", r2_RT_luminance_pool, it);
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
             //u_setrt						(rt_LUM_pool[it],	0,	0,	0			);
-            //CHK_DX						(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0x7f7f7f7f,	1.0f, 0L));
-            FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
-            HW.pDevice->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
+
+            const Fcolor color = { 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f };
+            HW.ClearRenderTarget(rt_LUM_pool[it]->pRT, color);
         }
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
     }

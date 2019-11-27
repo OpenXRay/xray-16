@@ -208,8 +208,10 @@ void CBackend::dbg_OverdrawEnd()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff));
+
     // Set the background to black
-    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
+    HW.ClearRenderTarget(HW.pBaseRT, { 1.f, 0.f, 0.f, 1.f });
+
     // Draw a rectangle wherever the count equal I
     RCache.OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_TL));

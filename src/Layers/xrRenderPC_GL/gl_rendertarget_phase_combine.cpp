@@ -68,18 +68,17 @@ void CRenderTarget::phase_combine()
             phase_ssao();
     }
 
-	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     // low/hi RTs
     if (!RImplementation.o.dx10_msaa)
     {
-        HW.pDevice->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
-        HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
+        HW.ClearRenderTarget(rt_Generic_0->pRT, { 0.0f, 0.0f, 0.0f, 0.0f });
+        HW.ClearRenderTarget(rt_Generic_1->pRT, { 0.0f, 0.0f, 0.0f, 0.0f });
         u_setrt(rt_Generic_0, rt_Generic_1, nullptr, HW.pBaseZB);
     }
     else
     {
-        HW.pDevice->ClearRenderTargetView(rt_Generic_0_r->pRT, ColorRGBA);
-        HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
+        HW.ClearRenderTarget(rt_Generic_0_r->pRT, { 0.0f, 0.0f, 0.0f, 0.0f });
+        HW.ClearRenderTarget(rt_Generic_1_r->pRT, { 0.0f, 0.0f, 0.0f, 0.0f });
         u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
     }
     RCache.set_CullMode(CULL_NONE);
@@ -329,17 +328,17 @@ void CRenderTarget::phase_combine()
         if (bDistort)
         {
             PIX_EVENT(render_distort_objects);
-            FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
+            const Fcolor color = { 127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f };
             if (!RImplementation.o.dx10_msaa)
             {
                 u_setrt(rt_Generic_1, 0, 0, HW.pBaseZB); // Now RT is a distortion mask
-                HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
+                HW.ClearRenderTarget(rt_Generic_1->pRT, color);
             }
             else
             {
                 u_setrt(rt_Generic_1_r, 0, 0, RImplementation.Target->rt_MSAADepth->pZRT);
                 // Now RT is a distortion mask
-                HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
+                HW.ClearRenderTarget(rt_Generic_1_r->pRT, color);
             }
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);

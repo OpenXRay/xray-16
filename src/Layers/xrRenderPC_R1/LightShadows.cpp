@@ -199,7 +199,7 @@ void CLightShadows::calculate()
                 bRTS = TRUE;
                 RCache.set_RT(RT_temp->pRT);
                 RCache.set_ZB(RImplementation.Target->pTempZB);
-                HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 255, 255), 1, 0);
+                HW.ClearRenderTarget(RT_temp->pRT, { 1.f, 1.f, 1.f, 1.f });
             }
 
             // calculate light center

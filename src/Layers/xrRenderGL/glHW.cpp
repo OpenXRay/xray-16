@@ -190,47 +190,6 @@ void CHW::UpdateViews()
     CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
 }
 
-void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
-{
-    if (pRenderTargetView == 0)
-        return;
-
-    // Attach the render target
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pRenderTargetView, 0));
-
-    // Clear the color buffer without affecting the global state
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glClearColor(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]);
-    CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
-}
-
-void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
-{
-    if (pDepthStencilView == 0)
-        return;
-
-    // Attach the depth buffer
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, pDepthStencilView, 0));
-
-    u32 mask = 0;
-    if (ClearFlags & D3D_CLEAR_DEPTH)
-        mask |= (u32)GL_DEPTH_BUFFER_BIT;
-    if (ClearFlags & D3D_CLEAR_STENCIL)
-        mask |= (u32)GL_STENCIL_BUFFER_BIT;
-
-    if (ClearFlags & D3D_CLEAR_DEPTH)
-    {
-        glDepthMask(GL_TRUE);
-        glClearDepthf(Depth);
-    }
-    if (ClearFlags & D3D_CLEAR_STENCIL)
-    {
-        glStencilMask(~0);
-        glClearStencil(Stencil);
-    }
-    CHK_GL(glClear(mask));
-}
-
 void CHW::Present()
 {
     RImplementation.Target->phase_flip();
@@ -250,4 +209,131 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
         psCurrentVidMode[0],
         psCurrentVidMode[1]
     };
+}
+
+void CHW::ClearRenderTarget(GLuint view, Fcolor color) const
+{
+    if (view == 0)
+        return;
+
+    // Attach the render target
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, view, 0));
+
+    // Clear the color buffer without affecting the global state
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glClearColor(color.r, color.g, color.b, color.a);
+
+    CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
+}
+
+int CHW::ClearRenderTargetRect(GLuint view, Fcolor color, u32 numRects, Irect* rects) const
+{
+    if (view == 0)
+        return 0;
+
+    // Attach the render target
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, view, 0));
+
+    CHK_GL(glEnable(GL_SCISSOR_TEST));
+
+    for (u32 i = 0; i < numRects; ++i, ++rects)
+    {
+        // The window space is inverted compared to DX
+        // so we have to invert our vertical coordinates
+        const u32 bottom = Device.dwHeight - rects->bottom;
+
+        // The origin of the scissor box is lower-left
+        CHK_GL(glScissor(rects->left, bottom, rects->width(), rects->height()));
+
+        // Clear the color buffer without affecting the global state
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glClearColor(color.r, color.g, color.b, color.a);
+
+        CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
+    }
+
+    CHK_GL(glDisable(GL_SCISSOR_TEST));
+
+    return numRects;
+}
+
+void CHW::ClearDepth(GLuint view, float depth) const
+{
+    if (view == 0)
+        return;
+
+    // Attach the depth buffer
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, view, 0));
+
+    glDepthMask(GL_TRUE);
+    glClearDepthf(depth);
+
+    CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
+}
+
+int CHW::ClearDepthRect(GLuint view, float depth, u32 numRects, Irect* rects) const
+{
+    if (view == 0)
+        return 0;
+
+    // Attach the depth buffer
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, view, 0));
+
+    CHK_GL(glEnable(GL_SCISSOR_TEST));
+
+    for (u32 i = 0; i < numRects; ++i, ++rects)
+    {
+        // The window space is inverted compared to DX
+        // so we have to invert our vertical coordinates
+        const u32 bottom = Device.dwHeight - rects->bottom;
+
+        // The origin of the scissor box is lower-left
+        CHK_GL(glScissor(rects->left, bottom, rects->width(), rects->height()));
+
+        glDepthMask(GL_TRUE);
+        glClearDepthf(depth);
+
+        CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
+    }
+
+    CHK_GL(glDisable(GL_SCISSOR_TEST));
+
+    return numRects;
+}
+
+void CHW::ClearStencil(GLuint view, u8 stencil) const
+{
+    if (view == 0)
+        return;
+
+    // Attach the depth buffer
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, view, 0));
+
+    glStencilMask(~0);
+    glClearStencil(stencil);
+
+    CHK_GL(glClear(GL_STENCIL_BUFFER_BIT));
+}
+
+void CHW::ClearDepthStencil(GLuint view, float depth, u8 stencil) const
+{
+    if (view == 0)
+        return;
+
+    // Attach the depth buffer
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, view, 0));
+
+    glDepthMask(GL_TRUE);
+    glClearDepthf(depth);
+
+    glStencilMask(~0);
+    glClearStencil(stencil);
+
+    CHK_GL(glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+}
+
+void CHW::ClearRTAndZB(GLuint rt, Fcolor color, GLuint zb, float depth, u8 stencil) const
+{
+    ClearRenderTarget(rt, color);
+    ClearDepthStencil(zb, depth, stencil);
 }

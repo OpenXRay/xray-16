@@ -434,3 +434,44 @@ DeviceState CHW::GetDeviceState()
 
     return DeviceState::Normal;
 }
+
+void CHW::ClearRenderTarget(ID3DRenderTargetView* /*view*/, Fcolor color) const
+{
+    CHK_DX(pDevice->Clear(0L, nullptr, D3DCLEAR_TARGET, color.get(), 1.0f, 0L));
+}
+
+int CHW::ClearRenderTargetRect(ID3DRenderTargetView* /*view*/, Fcolor color, u32 numRects, Irect* rects) const
+{
+    static_assert(sizeof(D3D_RECT) == sizeof(Irect), "Types should match");
+    CHK_DX(HW.pDevice->Clear(numRects, (D3D_RECT*)rects, D3DCLEAR_TARGET, color.get(), color.r, 0L));
+    return numRects;
+}
+
+void CHW::ClearDepth(ID3DDepthStencilView* /*view*/, float depth) const
+{
+    CHK_DX(pDevice->Clear(0L, nullptr, D3DCLEAR_ZBUFFER, 0, depth, 0L));
+}
+
+int CHW::ClearDepthRect(ID3DDepthStencilView* /*view*/, float depth, u32 numRects, Irect* rects) const
+{
+    static_assert(sizeof(D3D_RECT) == sizeof(Irect), "Types should match");
+    CHK_DX(HW.pDevice->Clear(numRects, (D3D_RECT*)rects, D3DCLEAR_ZBUFFER, 0, depth, 0L));
+    return numRects;
+}
+
+void CHW::ClearStencil(ID3DDepthStencilView* /*view*/, u8 stencil) const
+{
+    CHK_DX(pDevice->Clear(0L, nullptr, D3DCLEAR_STENCIL, 0, 0.0f, stencil));
+}
+
+void CHW::ClearDepthStencil(ID3DDepthStencilView* /*view*/, float depth, u8 stencil) const
+{
+    CHK_DX(pDevice->Clear(0L, nullptr, D3DCLEAR_ZBUFFER | (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), 0, depth, stencil));
+}
+
+void CHW::ClearRTAndZB(ID3DRenderTargetView* rt, Fcolor color,
+    ID3DDepthStencilView* zb, float depth, u8 stencil) const
+{
+    const u32 flags = (rt ? D3DCLEAR_TARGET : 0) | (zb ? D3DCLEAR_ZBUFFER : 0) | (Caps.bStencil ? D3DCLEAR_STENCIL : 0);
+    CHK_DX(pDevice->Clear(0L, nullptr, flags, color.get(), depth, stencil));
+}

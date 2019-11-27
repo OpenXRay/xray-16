@@ -172,9 +172,9 @@ void CRender::render_menu()
 
     // Distort
     {
-        FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
+        const Fcolor color = { 127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f };
         Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, HW.pBaseZB); // Now RT is a distortion mask
-        HW.pDevice->ClearRenderTargetView(Target->rt_Generic_1->pRT, ColorRGBA);
+        HW.ClearRenderTarget(Target->rt_Generic_1->pRT, color);
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
 

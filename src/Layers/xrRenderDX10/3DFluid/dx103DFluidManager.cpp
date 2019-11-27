@@ -247,11 +247,9 @@ void dx103DFluidManager::DestroyRTTextureAndViews(size_t rtIndex)
 
 void dx103DFluidManager::Reset()
 {
-    float color[4] = {0, 0, 0, 0};
-
     for (size_t rtIndex = 0; rtIndex < NUM_OWN_RENDER_TARGETS; rtIndex++)
     {
-        HW.pContext->ClearRenderTargetView(pRenderTargetViews[rtIndex], color);
+        HW.ClearRenderTarget(pRenderTargetViews[rtIndex], { 0, 0, 0, 0 });
     }
 }
 
@@ -397,10 +395,10 @@ void dx103DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
 {
     PIX_EVENT(AdvectColorBFECC);
 
-    float color[4] = {0, 0, 0, 0};
+    const Fcolor color = { 0, 0, 0, 0 };
 
-    HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR], color);
-    HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_TEMPSCALAR], color);
+    HW.ClearRenderTarget(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR], color);
+    HW.ClearRenderTarget(pRenderTargetViews[RENDER_TARGET_TEMPSCALAR], color);
 
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR]);
     if (bTeperature)
@@ -561,8 +559,7 @@ void dx103DFluidManager::ApplyVorticityConfinement(float timestep)
     PIX_EVENT(ApplyVorticityConfinement);
 
     // Compute vorticity
-    float color[4] = {0, 0, 0, 0};
-    HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR], color);
+    HW.ClearRenderTarget(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR], { 0, 0, 0, 0 });
 
     // pShaderResourceVariables[RENDER_TARGET_TEMPVECTOR]->SetResource( NULL );
     // SetRenderTarget( RENDER_TARGET_TEMPVECTOR );
@@ -606,8 +603,7 @@ void dx103DFluidManager::ComputeVelocityDivergence(float /*timestep*/)
 {
     PIX_EVENT(ComputeVelocityDivergence);
 
-    float color[4] = {0, 0, 0, 0};
-    HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR], color);
+    HW.ClearRenderTarget(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR], { 0, 0, 0, 0 });
 
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_TEMPVECTOR]);
     RCache.set_Element(m_SimulationTechnique[SS_Divergence]);
@@ -625,8 +621,7 @@ void dx103DFluidManager::ComputePressure(float /*timestep*/)
 {
     PIX_EVENT(ComputePressure);
 
-    float color[4] = {0, 0, 0, 0};
-    HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_TEMPSCALAR], color);
+    HW.ClearRenderTarget(pRenderTargetViews[RENDER_TARGET_TEMPSCALAR], { 0, 0, 0, 0 });
 
     // ID3DxxTexture3D  *pTemp = (ID3DxxTexture3D*) pRTTextures[RENDER_TARGET_TEMPSCALAR]->surface_get();
     // ID3DxxTexture3D  *pPressure = (ID3DxxTexture3D*) pRTTextures[RENDER_TARGET_PRESSURE]->surface_get();
@@ -740,9 +735,9 @@ void dx103DFluidManager::UpdateObstacles(const dx103DFluidData& FluidData, float
 {
     PIX_EVENT(Fluid_update_obstacles);
     //  Reset data
-    float color[4] = {0, 0, 0, 0};
-    HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_OBSTACLES], color);
-    HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_OBSTVELOCITY], color);
+    const Fcolor color = { 0, 0, 0, 0 };
+    HW.ClearRenderTarget(pRenderTargetViews[RENDER_TARGET_OBSTACLES], color);
+    HW.ClearRenderTarget(pRenderTargetViews[RENDER_TARGET_OBSTVELOCITY], color);
 
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_OBSTACLES], 0);
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_OBSTVELOCITY], 1);

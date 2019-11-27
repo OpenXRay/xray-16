@@ -10,6 +10,7 @@
 #include <d3dx9.h>
 
 #include <D3D11.h>
+#include <d3d11_1.h>
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>
 

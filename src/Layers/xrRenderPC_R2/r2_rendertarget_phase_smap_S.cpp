@@ -21,11 +21,13 @@ void CRenderTarget::phase_smap_spot(light* L)
     // Misc		- draw only front-faces //back-faces
     RCache.set_CullMode(CULL_CCW);
     RCache.set_Stencil(FALSE);
-// no transparency
+
+    // no transparency
 #pragma todo("can optimize for multi-lights covering more than say 50%...")
     if (RImplementation.o.HW_smap)
         RCache.set_ColorWriteEnable(FALSE);
-    CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L));
+
+    HW.ClearDepth(RCache.get_ZB(), 1.0f);
 }
 
 void CRenderTarget::phase_smap_spot_tsh(light* L)
@@ -35,7 +37,7 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
     if (IRender_Light::OMNIPART == L->flags.type)
     {
         // omni-part
-        CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, 0xffffffff, 1.0f, 0L));
+        HW.ClearRenderTarget(RCache.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f });
     }
     else
     {

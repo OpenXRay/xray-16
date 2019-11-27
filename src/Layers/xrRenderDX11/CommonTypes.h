@@ -36,6 +36,7 @@ typedef D3D11_INPUT_ELEMENT_DESC D3D_INPUT_ELEMENT_DESC;
 typedef D3D11_PRIMITIVE_TOPOLOGY D3D_PRIMITIVE_TOPOLOGY;
 typedef D3D11_VIEWPORT D3D_VIEWPORT;
 typedef D3D11_USAGE D3D_USAGE;
+typedef D3D11_RECT D3D_RECT;
 
 typedef ID3D11RasterizerState ID3DRasterizerState;
 typedef ID3D11DepthStencilState ID3DDepthStencilState;
@@ -53,6 +54,7 @@ typedef ID3D11Texture2D ID3DTexture2D;
 typedef ID3D11Texture3D ID3DTexture3D;
 typedef ID3D11Resource ID3DBaseTexture;
 typedef ID3D11Resource ID3DResource;
+typedef ID3D11View ID3DView;
 typedef ID3D11RenderTargetView ID3DRenderTargetView;
 typedef ID3D11DepthStencilView ID3DDepthStencilView;
 typedef ID3D11ShaderResourceView ID3DShaderResourceView;

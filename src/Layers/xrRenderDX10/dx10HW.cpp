@@ -122,6 +122,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     if (SUCCEEDED(R))
     {
+        pContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&pContext1));
 #ifdef HAS_DX11_3
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
 #endif
@@ -333,6 +334,7 @@ void CHW::DestroyDevice()
 #endif
 
 #ifdef USE_DX11
+    _RELEASE(pContext1);
     _RELEASE(pContext);
 #endif
 
@@ -505,4 +507,68 @@ DeviceState CHW::GetDeviceState()
     }
 
     return DeviceState::Normal;
+}
+
+void CHW::ClearRenderTarget(ID3DRenderTargetView* view, Fcolor color) const
+{
+    pContext->ClearRenderTargetView(view, (FLOAT*)&color);
+}
+
+int CHW::ClearRenderTargetRect(ID3DRenderTargetView* view, Fcolor color, u32 numRects, Irect* rects) const
+{
+#ifdef USE_DX11
+    static_assert(sizeof(D3D_RECT) == sizeof(Irect), "Types should match");
+    if (pContext1)
+    {
+        pContext1->ClearView(view, (FLOAT*)&color, (D3D_RECT*)rects, numRects);
+        return numRects;
+    }
+#else
+    UNUSED(numRects);
+    UNUSED(rects);
+#endif
+
+    return 0;
+}
+
+void CHW::ClearDepth(ID3DDepthStencilView* view, float depth) const
+{
+    pContext->ClearDepthStencilView(view, D3D_CLEAR_DEPTH, depth, 0);
+}
+
+int CHW::ClearDepthRect(ID3DDepthStencilView* view, float depth, u32 numRects, Irect* rects) const
+{
+#ifdef USE_DX11
+    static_assert(sizeof(D3D_RECT) == sizeof(Irect), "Types should match");
+    if (pContext1)
+    {
+        Fcolor color = { depth, depth, depth, depth };
+        pContext1->ClearView(view, (FLOAT*)&color, (D3D_RECT*)rects, numRects);
+        return numRects;
+    }
+#else
+    UNUSED(numRects);
+    UNUSED(rects);
+#endif
+
+    return 0;
+}
+
+void CHW::ClearStencil(ID3DDepthStencilView* view, u8 stencil) const
+{
+    pContext->ClearDepthStencilView(view, D3D_CLEAR_STENCIL, 1.f, stencil);
+}
+
+void CHW::ClearDepthStencil(ID3DDepthStencilView* view, float depth, u8 stencil) const
+{
+    pContext->ClearDepthStencilView(view, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, depth, stencil);
+}
+
+void CHW::ClearRTAndZB(ID3DRenderTargetView* rt, Fcolor color,
+    ID3DDepthStencilView* zb, float depth, u8 stencil) const
+{
+    if (rt)
+        ClearRenderTarget(rt, color);
+    if (zb)
+        ClearDepthStencil(zb, depth, stencil);
 }
