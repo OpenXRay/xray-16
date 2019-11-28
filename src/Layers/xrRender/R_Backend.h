@@ -358,6 +358,7 @@ public:
     void set_ClipPlanes(u32 _enable, Fplane* _planes = nullptr, u32 count = 0);
     void set_ClipPlanes(u32 _enable, Fmatrix* _xform = nullptr, u32 fmask = 0xff);
     IC void set_Scissor(Irect* rect = nullptr);
+    IC void SetViewport(D3D_VIEWPORT viewport) const;
 
     // constants
     ICF ref_constant get_c(LPCSTR n)

@@ -293,8 +293,8 @@ void CLightShadows::calculate()
             // Select slot and set viewport
             int s_x = slot_id % slot_line;
             int s_y = slot_id / slot_line;
-            D3DVIEWPORT9 VP = {s_x * s_size, s_y * s_size, s_size, s_size, 0, 1};
-            CHK_DX(HW.pDevice->SetViewport(&VP));
+            const D3D_VIEWPORT viewport = { s_x * s_size, s_y * s_size, s_size, s_size, 0.f, 1.f };
+            RCache.SetViewport(viewport);
 
             // Render object-parts
             for (u32 n_it = 0; n_it < C.nodes.size(); n_it++)

@@ -675,25 +675,22 @@ void CRender::add_Occluder(Fbox2& bb_screenspace)
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.f, 0.02f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0, 0.02f };
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.99999f, 1.f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.f, 1.f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 //////////////////////////////////////////////////////////////////////

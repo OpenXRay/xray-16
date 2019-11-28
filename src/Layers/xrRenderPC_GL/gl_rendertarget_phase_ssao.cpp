@@ -2,7 +2,8 @@
 
 static void set_viewport(u32 w, u32 h)
 {
-    CHK_GL(glViewport(0, 0, w, h));
+    const D3D_VIEWPORT viewport = { 0, 0, w, h, 0.f, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 void CRenderTarget::phase_ssao()

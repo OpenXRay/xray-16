@@ -277,7 +277,7 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     rtViewport.Width = m_iTextureWidth;
     rtViewport.Height = m_iTextureHeight;
 #endif // #ifdef USE_DX11
-    HW.pContext->RSSetViewports(1, &rtViewport);
+    RCache.SetViewport(rtViewport);
 
     RCache.set_ZB(0);
 

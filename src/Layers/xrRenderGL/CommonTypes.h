@@ -23,6 +23,13 @@ typedef enum D3D_COMPARISON_FUNC {
     D3D_COMPARISON_ALWAYS = GL_ALWAYS
 } D3D_COMPARISON_FUNC;
 
+using D3D_VIEWPORT = struct XR_GL_VIEWPORT
+{
+    GLint TopLeftX, TopLeftY;
+    GLsizei Width, Height;
+    GLclampf MinDepth, MaxDepth;
+};
+
 #define DX10_ONLY(expr)			do {} while (0)
 
 using unused_t = int[0];
