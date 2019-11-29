@@ -18,7 +18,6 @@
 #include "Include/xrAPI/xrAPI.h"
 #endif
 #include "SkeletonX.h"
-#include "SkeletonCustom.h"
 #include "xrCore/FMesh.hpp"
 #include "xrCore/Math/MathUtil.hpp"
 
