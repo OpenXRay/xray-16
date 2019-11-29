@@ -251,12 +251,6 @@ IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
     glDepthRangef(viewport.MinDepth, viewport.MaxDepth);
 }
 
-IC void CBackend::SetViewport(D3D_VIEWPORT&& viewport) const
-{
-    glViewport(viewport.TopLeftX, viewport.TopLeftY, viewport.Width, viewport.Height);
-    glDepthRangef(viewport.MinDepth, viewport.MaxDepth);
-}
-
 IC void CBackend::set_Stencil(u32 _enable, u32 _func, u32 _ref, u32 _mask, u32 _writemask, u32 _fail, u32 _pass,
                               u32 _zfail)
 {
