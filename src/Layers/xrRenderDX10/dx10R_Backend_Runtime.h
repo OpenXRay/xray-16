@@ -372,7 +372,12 @@ IC void CBackend::set_Scissor(Irect* R)
     }
 }
 
-IC void CBackend::SetViewport(D3D_VIEWPORT viewport) const
+IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
+{
+    HW.pContext->RSSetViewports(1, &viewport);
+}
+
+IC void CBackend::SetViewport(D3D_VIEWPORT&& viewport) const
 {
     HW.pContext->RSSetViewports(1, &viewport);
 }

@@ -245,7 +245,13 @@ IC void CBackend::set_Scissor(Irect* R)
     }
 }
 
-IC void CBackend::SetViewport(D3D_VIEWPORT viewport) const
+IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
+{
+    glViewport(viewport.TopLeftX, viewport.TopLeftY, viewport.Width, viewport.Height);
+    glDepthRangef(viewport.MinDepth, viewport.MaxDepth);
+}
+
+IC void CBackend::SetViewport(D3D_VIEWPORT&& viewport) const
 {
     glViewport(viewport.TopLeftX, viewport.TopLeftY, viewport.Width, viewport.Height);
     glDepthRangef(viewport.MinDepth, viewport.MaxDepth);

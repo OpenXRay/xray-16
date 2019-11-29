@@ -147,7 +147,12 @@ IC void CBackend::set_Scissor(Irect* R)
     }
 }
 
-IC void CBackend::SetViewport(D3D_VIEWPORT viewport) const
+IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
+{
+    CHK_DX(HW.pDevice->SetViewport(&viewport));
+}
+
+IC void CBackend::SetViewport(D3D_VIEWPORT&& viewport) const
 {
     CHK_DX(HW.pDevice->SetViewport(&viewport));
 }
