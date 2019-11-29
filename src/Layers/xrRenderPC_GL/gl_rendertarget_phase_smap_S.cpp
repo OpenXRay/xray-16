@@ -18,7 +18,7 @@ void CRenderTarget::phase_smap_spot(light* L)
         //else								u_setrt	(rt_smap_surf, NULL, NULL, rt_smap_ZB);
     else
         VERIFY(!"Use HW SMap only for DX10!");
-    const D3D_VIEWPORT viewport = { L->X.S.posX, L->X.S.posY, L->X.S.size, L->X.S.size, 0.f, 1.f };
+    D3D_VIEWPORT viewport = { L->X.S.posX, L->X.S.posY, L->X.S.size, L->X.S.size, 0.f, 1.f };
     RCache.SetViewport(std::move(viewport));
 
     // Misc		- draw only front-faces //back-faces
