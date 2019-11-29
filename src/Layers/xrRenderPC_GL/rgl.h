@@ -247,11 +247,11 @@ public:
 
     void apply_lmaterial()
     {
-        ref_constant CRef = RCache.get_c(c_sbase);
-        if (CRef == nullptr)
+        ref_constant constant = RCache.get_c(c_sbase);
+        if (constant == nullptr)
             return;
 
-        R_constant* C = &*CRef; // get sampler
+        R_constant* C = &*constant; // get sampler
 
         VERIFY (RC_dest_sampler == C->destination);
         VERIFY (RC_sampler == C->type);
