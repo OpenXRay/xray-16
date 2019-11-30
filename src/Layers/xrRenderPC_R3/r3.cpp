@@ -709,29 +709,23 @@ void CRender::add_SkeletonWallmark(
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
 void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace); }
+
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    D3D_VIEWPORT VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
-
-    HW.pDevice->RSSetViewports(1, &VP);
-    // CHK_DX				(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.f, 0.02f });
 }
+
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    D3D_VIEWPORT VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
-
-    HW.pDevice->RSSetViewports(1, &VP);
-    // CHK_DX				(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f });
 }
+
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    D3D_VIEWPORT VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
-
-    HW.pDevice->RSSetViewports(1, &VP);
-    // CHK_DX				(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.f, 1.f });
 }
 
 //////////////////////////////////////////////////////////////////////

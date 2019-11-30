@@ -1,11 +1,5 @@
 #include "stdafx.h"
 
-void set_viewport(ID3DDeviceContext* dev, float w, float h)
-{
-    static D3D_VIEWPORT viewport[1] = {0, 0, w, h, 0.f, 1.f};
-    dev->RSSetViewports(1, viewport);
-}
-
 void CRenderTarget::phase_ssao()
 {
     u32 Offset = 0;
@@ -50,7 +44,7 @@ void CRenderTarget::phase_ssao()
     float _w = float(Device.dwWidth) * 0.5f;
     float _h = float(Device.dwHeight) * 0.5f;
 
-    set_viewport(HW.pContext, _w, _h);
+    RCache.SetViewport({ 0.f, 0.f, _w, _h, 0.f, 1.f });
 
     // Fill vertex buffer
     FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
@@ -100,7 +94,7 @@ void CRenderTarget::phase_ssao()
         // RCache.set_Stencil( FALSE, D3DCMP_EQUAL, 0x01, 0xff, 0 );
     }
 
-    set_viewport(HW.pContext, float(Device.dwWidth), float(Device.dwHeight));
+    RCache.SetViewport({ 0.f, 0.f, float(Device.dwWidth), float(Device.dwHeight), 0.f, 1.f });
 
     RCache.set_Stencil(FALSE);
 }
@@ -124,7 +118,7 @@ void CRenderTarget::phase_downsamp()
 
     if (RImplementation.o.ssao_half_data)
     {
-        set_viewport(HW.pContext, float(Device.dwWidth) * 0.5f, float(Device.dwHeight) * 0.5f);
+        RCache.SetViewport({ 0.f, 0.f, float(Device.dwWidth) * 0.5f, float(Device.dwHeight) * 0.5f, 0.f, 1.f });
         w /= 2;
         h /= 2;
     }
@@ -160,5 +154,5 @@ void CRenderTarget::phase_downsamp()
     }
 
     if (RImplementation.o.ssao_half_data)
-        set_viewport(HW.pContext, float(Device.dwWidth), float(Device.dwHeight));
+        RCache.SetViewport({ 0.f, 0.f, float(Device.dwWidth), float(Device.dwHeight), 0.f, 1.f });
 }

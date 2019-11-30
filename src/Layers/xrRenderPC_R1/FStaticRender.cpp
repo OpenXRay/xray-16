@@ -411,20 +411,19 @@ IC void gm_SetNearer(BOOL bNearer)
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 0.02f });
 }
+
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f });
 }
+
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 1.f });
 }
 
 //////////////////////////////////////////////////////////////////////
