@@ -24,6 +24,19 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
+bool CRT::used_as_depth() const
+{
+    switch (fmt)
+    {
+    case D3DFMT_D15S1:
+    case D3DFMT_D24X8:
+    case MAKEFOURCC('D', 'F', '2', '4'):
+        return true;
+    default:
+        return false;
+    }
+}
+
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
 {
     if (pSurface)
@@ -50,15 +63,9 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool u
         return;
 
     // Select usage
-    u32 usage = 0;
-    if (D3DFMT_D24X8 == fmt)
+    u32 usage = D3DUSAGE_RENDERTARGET;
+    if (used_as_depth())
         usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D15S1 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if ((D3DFORMAT)MAKEFOURCC('D', 'F', '2', '4') == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else
-        usage = D3DUSAGE_RENDERTARGET;
 
     DXGI_FORMAT dx10FMT;
 

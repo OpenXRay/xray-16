@@ -13,6 +13,8 @@ public:
     void reset_begin();
     void reset_end();
     BOOL valid() { return !!pTexture; }
+    bool used_as_depth() const;
+
 public:
 #ifdef USE_OGL
     GLuint pRT;
@@ -38,6 +40,7 @@ public:
 
     u64 _order;
 };
+
 struct resptrcode_crt : public resptr_base<CRT>
 {
 #ifdef USE_DX11
