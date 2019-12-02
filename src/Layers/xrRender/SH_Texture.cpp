@@ -160,7 +160,7 @@ void CTexture::Load()
     flags.MemoryUsage = 0;
     if (0 == xr_stricmp(*cName, "$null"))
         return;
-    if (nullptr != strstr(*cName, "$user$"))
+    if (0 == strncmp(*cName, "$user$", 6))
     {
         flags.bUser = true;
         return;
