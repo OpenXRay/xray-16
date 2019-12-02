@@ -19,58 +19,12 @@ void fix_texture_name(LPSTR fn)
         *_ext = 0;
 }
 
-int get_texture_load_lod(LPCSTR fn)
-{
-    CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
-    auto it_ = sect.Data.cbegin();
-    auto it_e_ = sect.Data.cend();
-
-    auto it = it_;
-    auto it_e = it_e_;
-
-    for (; it != it_e; ++it)
-    {
-        if (strstr(fn, it->first.c_str()))
-        {
-            if (psTextureLOD < 1)
-                return 0;
-            if (psTextureLOD < 3)
-                return 1;
-            return 2;
-        }
-    }
-
-    if (psTextureLOD < 2)
-        return 0;
-    if (psTextureLOD < 4)
-        return 1;
-    return 2;
-}
-
-u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
-{
-    if (1 == mip_cnt)
-        return orig_size;
-
-    int _lod = lod;
-    float res = float(orig_size);
-
-    while (_lod > 0)
-    {
-        --_lod;
-        res -= res / 1.333f;
-    }
-    return iFloor(res);
-}
-
 GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 {
     GLuint pTexture = 0;
     string_path fn;
     size_t img_size = 0;
-    int img_loaded_lod = 0;
     gli::gl::format fmt;
-    u32 mip_cnt = u32(-1);
     // validation
     R_ASSERT(fRName);
     R_ASSERT(fRName[0]);
@@ -209,8 +163,7 @@ _DDS:
 
         xr_strlwr(fn);
         ret_desc = target;
-        img_loaded_lod = is_target_cube(texture.target()) ? img_loaded_lod : get_texture_load_lod(fn);
-        ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
+        ret_msize = static_cast<u32>(texture.size());
         return pTexture;
     }
 
