@@ -244,7 +244,7 @@ void CBackend::set_Textures(STextureList* _T)
         u32 load_id = loader.first;
         loaderTexRef = loader.second;
 
-        if (loaderTexRef == nullptr) // TODO [ Clang ]: Find out why some textures come as nullptr in loader.second ref
+        if (!loaderTexRef) // XXX george: Clang. Find out why some textures come as nullptr in loader.second ref
             continue;
 
         CTexture* load_surf = &*loader.second;

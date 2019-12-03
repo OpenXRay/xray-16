@@ -394,7 +394,9 @@ public:
     ICF void set_c(cpcstr name, Args&&... args)
     {
         ref_constant constant = ctable->get(name);
-        if (constant != nullptr)
+        // XXX george: Clang. This condition is needed when constant comes as nullptr.
+        // Same thing about below overloaded functions.
+        if (constant)
             set_c(&*constant, std::forward<Args>(args)...);
     }
 
@@ -402,7 +404,7 @@ public:
     ICF void set_ca(cpcstr name, Args&&... args)
     {
         ref_constant constant = ctable->get(name);
-        if (constant != nullptr)
+        if (constant)
             set_ca(&*constant, std::forward<Args>(args)...);
     }
 
@@ -411,7 +413,7 @@ public:
     ICF void set_c(const shared_str& name, Args&& ... args)
     {
         ref_constant constant = ctable->get(name);
-        if (constant != nullptr)
+        if (constant)
             set_c(&*constant, std::forward<Args>(args)...);
     }
 
@@ -419,7 +421,7 @@ public:
     ICF void set_ca(const shared_str& name, Args&& ... args)
     {
         ref_constant constant = ctable->get(name);
-        if (constant != nullptr)
+        if (constant)
             set_ca(&*constant, std::forward<Args>(args)...);
     }
 

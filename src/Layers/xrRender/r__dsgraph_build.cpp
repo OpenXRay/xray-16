@@ -58,7 +58,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
     ref_selement element = pVisual->shader->E[4];
     ShaderElement* sh_d;
 
-    if (element != nullptr)
+    if (element) // XXX george: Clang. This condition is needed when element comes as nullptr.
     {
         sh_d = &*element; // 4=L_special
         if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
@@ -227,7 +227,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     ref_selement element = pVisual->shader->E[4];
     ShaderElement* sh_d;
 
-    if (element != nullptr)
+    if (element) // XXX george: Clang. This condition is needed when element comes as nullptr.
     {
         sh_d = &*element; // 4=L_special
         if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
