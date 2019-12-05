@@ -6,6 +6,7 @@ static LPCSTR RTname = "$user$rendertarget";
 static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
 static LPCSTR RTname_distort = "$user$distort";
 static LPCSTR RTname_temp_zb = "$user$temp_zb";
+static LPCSTR RTname_async_ss = "$user$async_ss";
 
 CRenderTarget::CRenderTarget()
 {
@@ -81,10 +82,7 @@ BOOL CRenderTarget::Create()
 
     // Igor: TMP
     // Create an RT for online screenshot makining
-    //u32 w = Device.dwWidth, h = Device.dwHeight;
-    //HW.pDevice->CreateOffscreenPlainSurface(
-    // Device.dwWidth, Device.dwHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pFB, NULL);
-    HW.pDevice->CreateOffscreenPlainSurface(rtWidth, rtHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, nullptr);
+    pFB.create(RTname_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 1, { CRT::CreateSurface });
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
@@ -111,7 +109,6 @@ BOOL CRenderTarget::Create()
 
 CRenderTarget::~CRenderTarget()
 {
-    _RELEASE(pFB);
     _RELEASE(ZB);
     s_postprocess_D[1].destroy();
     s_postprocess[1].destroy();
@@ -305,7 +302,7 @@ void CRenderTarget::DoAsyncScreenshot()
         // hr = pTex->GetSurfaceLevel(0, &pFBSrc);
 
         //  SHould be async function
-        hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB);
+        hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB->pRT);
 
         // pFBSrc->Release();
 

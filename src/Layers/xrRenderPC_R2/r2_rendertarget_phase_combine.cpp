@@ -19,7 +19,7 @@ void CRenderTarget::DoAsyncScreenshot()
         //  hr = pTex->GetSurfaceLevel(0, &pFBSrc);
 
         //  SHould be async function
-        hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB);
+        hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB->pRT);
 
         //  pFBSrc->Release();
 

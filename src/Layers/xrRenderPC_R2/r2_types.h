@@ -36,6 +36,8 @@
 #define r2_RT_smap_surf "$user$smap_surf" // --- directional
 #define r2_RT_smap_depth "$user$smap_depth" // ---directional
 
+#define r2_async_ss "$user$async_ss"
+
 #define r2_material "$user$material" // ---
 #define r2_ds2_fade "$user$ds2_fade" // ---
 

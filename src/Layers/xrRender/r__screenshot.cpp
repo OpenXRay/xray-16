@@ -624,11 +624,9 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 
     VERIFY(!m_bMakeAsyncSS);
 
+    IDirect3DSurface9* pFB = Target->pFB->pRT;
+
     D3DLOCKED_RECT D;
-    IDirect3DSurface9* pFB;
-
-    pFB = Target->pFB;
-
     const HRESULT hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
     if (hr != D3D_OK)
         return;
