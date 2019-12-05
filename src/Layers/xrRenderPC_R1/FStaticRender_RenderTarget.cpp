@@ -5,6 +5,7 @@
 static LPCSTR RTname = "$user$rendertarget";
 static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
 static LPCSTR RTname_distort = "$user$distort";
+static LPCSTR RTname_temp_zb = "$user$temp_zb";
 
 CRenderTarget::CRenderTarget()
 {
@@ -76,8 +77,7 @@ BOOL CRenderTarget::Create()
     }
 
     // Temp ZB, used by some of the shadowing code
-    R_CHK(
-        HW.pDevice->CreateDepthStencilSurface(512, 512, HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &pTempZB, NULL));
+    pTempZB.create(RTname_temp_zb, 512, 512, HW.Caps.fDepth, 1, { CRT::CreateSurface });
 
     // Igor: TMP
     // Create an RT for online screenshot makining
@@ -112,7 +112,6 @@ BOOL CRenderTarget::Create()
 CRenderTarget::~CRenderTarget()
 {
     _RELEASE(pFB);
-    _RELEASE(pTempZB);
     _RELEASE(ZB);
     s_postprocess_D[1].destroy();
     s_postprocess[1].destroy();
