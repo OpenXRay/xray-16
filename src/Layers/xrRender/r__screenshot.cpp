@@ -625,12 +625,11 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
     VERIFY(!m_bMakeAsyncSS);
 
     D3DLOCKED_RECT D;
-    HRESULT hr;
     IDirect3DSurface9* pFB;
 
     pFB = Target->pFB;
 
-    hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
+    const HRESULT hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
     if (hr != D3D_OK)
         return;
 
@@ -687,7 +686,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         memory_writer.w(pOrigin, (rtWidth * rtHeight) * 4);
     }
 
-    hr = pFB->UnlockRect();
+    CHK_DX(pFB->UnlockRect());
 }
 
 #endif // USE_DX10
