@@ -76,8 +76,8 @@ BOOL CRenderTarget::Create()
     }
 
     // Temp ZB, used by some of the shadowing code
-    R_CHK(HW.pDevice->CreateDepthStencilSurface(512, 512,
-        HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &pTempZB->pRT, nullptr));
+    R_CHK(
+        HW.pDevice->CreateDepthStencilSurface(512, 512, HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &pTempZB, NULL));
 
     // Igor: TMP
     // Create an RT for online screenshot makining
@@ -104,7 +104,7 @@ BOOL CRenderTarget::Create()
 CRenderTarget::~CRenderTarget()
 {
     _RELEASE(pFB);
-    pTempZB.destroy();
+    _RELEASE(pTempZB);
     _RELEASE(ZB);
     s_postprocess_D[1].destroy();
     s_postprocess[1].destroy();

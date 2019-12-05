@@ -47,7 +47,7 @@ private:
     u32 frame_distort;
 
 public:
-    ref_rt pTempZB;
+    IDirect3DSurface9* pTempZB;
 
     //	Igor: for async screenshots
     IDirect3DSurface9* pFB; // 32bit		(r,g,b,a) is situated in the system memory
