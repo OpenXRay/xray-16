@@ -3,15 +3,17 @@
 #define rt_dimensions 1024
 #include "Layers/xrRender/FBasicVisual.h"
 
-#if !defined(USE_DX10) && !defined(USE_DX11)
 void r_pixel_calculator::begin()
 {
-    rt.create("$user$test", rt_dimensions, rt_dimensions, HW.Caps.fTarget);
-    R_CHK(HW.pDevice->CreateDepthStencilSurface(
-        rt_dimensions, rt_dimensions, HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &zb, NULL));
+    rt.create("$user$pixel_calculator_rt", rt_dimensions, rt_dimensions, HW.Caps.fTarget);
+    zb.create("$user$pixel_calculator_zb", rt_dimensions, rt_dimensions, HW.Caps.fDepth, 1, { CRT::CreateSurface });
 
     RCache.set_RT(rt->pRT);
-    RCache.set_ZB(zb);
+#if defined(USE_DX10) || defined(USE_DX11)
+    RCache.set_ZB(zb->pZRT);
+#else
+    RCache.set_ZB(zb->pRT);
+#endif
 
     R_ASSERT(Device.RenderBegin());
 }
@@ -23,8 +25,8 @@ void r_pixel_calculator::end()
     RCache.set_RT(HW.pBaseRT);
     RCache.set_ZB(HW.pBaseZB);
 
-    _RELEASE(zb);
-    rt = 0;
+    zb = nullptr;
+    rt = nullptr;
 }
 
 // +X, -X, +Y, -Y, +Z, -Z
@@ -35,6 +37,11 @@ static Fvector cmDir[6] = {
 
 r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 {
+    // XXX: use glm instead of D3DXMath
+#ifdef USE_OGL
+    VERIFY(!"Not implemented!");
+    return {};
+#else
     r_aabb_ssa result = {0};
     float area = float(_sqr(rt_dimensions));
 
@@ -77,6 +84,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
     }
 
     return result;
+#endif
 }
 
 void r_pixel_calculator::run()
@@ -91,4 +99,3 @@ void r_pixel_calculator::run()
     }
     end();
 }
-#endif //   USE_DX10
