@@ -230,3 +230,20 @@ void CBackend::dbg_OverdrawEnd()
 #endif // USE_DX10
 }
 
+void CBackend::dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)
+{
+#ifdef USE_DX9
+    CHK_DX(HW.pDevice->SetRenderState(p1, p2));
+#else
+    VERIFY(!"Not implemented");
+#endif
+}
+
+void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
+{
+#ifdef USE_DX9
+    CHK_DX(HW.pDevice->SetSamplerState(sampler, type, value));
+#else
+    VERIFY(!"Not implemented");
+#endif
+}

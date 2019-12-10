@@ -11,7 +11,7 @@ struct ip_address;
 
 class XRNETSERVER_API INetQueue : Noncopyable
 {
-    Lock* pcs;
+    Lock cs;
     xr_deque<NET_Packet*> ready;
     xr_vector<NET_Packet*> unused;
 
@@ -23,8 +23,8 @@ public:
     NET_Packet* Create(const NET_Packet& _other);
     NET_Packet* Retreive();
     void Release();
-    void LockQ();
-    void UnlockQ();
+    void Lock() { cs.Enter(); }
+    void Unlock() { cs.Leave(); }
 };
 
 //==============================================================================
@@ -64,11 +64,12 @@ protected:
     GameDescriptionData m_game_description;
     CTimer* device_timer;
 
+protected:
     IDirectPlay8Client* NET;
     IDirectPlay8Address* net_Address_device;
     IDirectPlay8Address* net_Address_server;
 
-    Lock* net_csEnumeration;
+    Lock net_csEnumeration;
     xr_vector<HOST_NODE> net_Hosts;
 
     NET_Compressor net_Compressor;
@@ -103,14 +104,16 @@ public:
     bool net_isCompleted_Connect() const { return net_Connected == EnmConnectionCompleted; }
     bool net_isFails_Connect() const { return net_Connected == EnmConnectionFails; }
     bool net_isCompleted_Sync() const { return net_Syncronised; }
-    bool net_isDisconnected() const;
+    bool net_isDisconnected() const { return net_Disconnected; }
     GameDescriptionData const& get_net_DescriptionData() const { return m_game_description; }
-    pcstr net_SessionName() { return *net_Hosts.front().dpSessionName; }
+    pcstr net_SessionName() { return net_Hosts.front().dpSessionName.c_str(); }
+
     // receive
-    void StartProcessQueue() { net_Queue.LockQ(); } // WARNING ! after Start must be End !!! <-
+    void StartProcessQueue() { net_Queue.Lock(); } // WARNING ! after Start must be End !!! <-
     virtual NET_Packet* net_msg_Retreive() { return net_Queue.Retreive(); } //							|
     void net_msg_Release() { net_Queue.Release(); } //							|
-    void EndProcessQueue() { net_Queue.UnlockQ(); } //							<-
+    void EndProcessQueue() { net_Queue.Unlock(); } //							<-
+
     // send
     virtual void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
     virtual void Flush_Send_Buffer();
@@ -119,6 +122,7 @@ public:
     virtual void OnInvalidPassword() {}
     virtual void OnSessionFull() {}
     virtual void OnConnectRejected() {}
+
     bool net_HasBandwidth();
     void ClearStatistic();
     IClientStatistic& GetStatistic() { return net_Statistic; }
@@ -133,7 +137,7 @@ public:
     void timeServer_UserDelta(s32 d) { net_TimeDelta_User = d; }
     IC void timeServer_Correct(u32 sv_time, u32 cl_time);
 
-    virtual bool net_IsSyncronised();
+    virtual bool net_IsSyncronised() const { return net_Syncronised; }
 
     virtual pcstr GetMsgId2Name(u16 ID) { return ""; }
     virtual void OnSessionTerminate(pcstr reason) {}

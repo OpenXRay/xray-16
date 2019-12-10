@@ -5,11 +5,11 @@
 CUIDebugFonts::CUIDebugFonts()
 {
     AttachChild(&m_background);
-    InitDebugFonts(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
+    InitDebugFonts({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
 }
 
 CUIDebugFonts::~CUIDebugFonts() {}
-void CUIDebugFonts::InitDebugFonts(Frect r)
+void CUIDebugFonts::InitDebugFonts(Frect&& r)
 {
     CUIDialogWnd::SetWndRect(r);
 

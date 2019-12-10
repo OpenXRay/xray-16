@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "D3DXRenderBase.h"
+#include "D3DUtils.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
@@ -52,13 +53,19 @@ void D3DXRenderBase::updateGamma()
 
 void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 {
-    m_WireShader.destroy();
-    m_SelectionShader.destroy();
+    if (!GEnv.isDedicatedServer)
+    {
+        DUImpl.OnDeviceDestroy();
+        m_SelectionShader.destroy();
+        m_WireShader.destroy();
+    }
+    destroy();
+
     Resources->OnDeviceDestroy(bKeepTextures);
     RCache.OnDeviceDestroy();
 }
 
-void D3DXRenderBase::DestroyHW()
+void D3DXRenderBase::Destroy()
 {
     xr_delete(Resources);
     HW.DestroyDevice();
@@ -99,6 +106,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     m_Gamma.Update();
 #endif
     Resources->OnDeviceCreate(shName);
+    Resources->CompatibilityCheck();
     create();
     if (!GEnv.isDedicatedServer)
     {

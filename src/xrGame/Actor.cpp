@@ -102,7 +102,9 @@ int psActorSleepTime = 1;
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 {
+    encyclopedia_registry = new CEncyclopediaRegistryWrapper();
     game_news_registry = new CGameNewsRegistryWrapper();
+
     // Cameras
     cameras[eacFirstEye] = new CCameraFirstEye(this);
     cameras[eacFirstEye]->Load("actor_firsteye_cam");
@@ -217,6 +219,8 @@ CActor::~CActor()
 {
     xr_delete(m_location_manager);
     xr_delete(m_memory);
+
+    xr_delete(encyclopedia_registry);
     xr_delete(game_news_registry);
 #ifdef DEBUG
     Device.seqRender.Remove(this);
@@ -1599,13 +1603,19 @@ void CActor::ForceTransform(const Fmatrix& m)
     // character_physics_support()->set_movement_position( m.c );
     // character_physics_support()->movement()->SetVelocity( 0, 0, 0 );
 
-    Fvector xyz;
-    m.getHPB(xyz);
-    cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
     character_physics_support()->ForceTransform(m);
     const float block_damage_time_seconds = 2.f;
     if (!IsGameTypeSingle())
         character_physics_support()->movement()->BlockDamageSet(u64(block_damage_time_seconds / fixed_step));
+}
+
+void CActor::ForceTransformAndDirection(const Fmatrix& m)
+{
+    Fvector xyz;
+    m.getHPB(xyz);
+
+    ForceTransform(m);
+    cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
 }
 
 //ENGINE_API extern float psHUD_FOV;

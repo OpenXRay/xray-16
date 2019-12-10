@@ -29,12 +29,7 @@ void CResourceManager::reset_begin()
 
     // destroy DStreams
     RCache.old_QuadIB = RCache.QuadIB;
-#ifdef USE_OGL
-    glDeleteBuffers(1, &RCache.QuadIB);
-#else
-    HW.stats_manager.decrement_stats_ib(RCache.QuadIB);
-    _RELEASE(RCache.QuadIB);
-#endif // USE_OGL
+    RCache.QuadIB.Release();
 
     RCache.Index.reset_begin();
     RCache.Vertex.reset_begin();

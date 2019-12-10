@@ -1,10 +1,5 @@
 #include "stdafx.h"
 
-static void set_viewport(u32 w, u32 h)
-{
-    CHK_GL(glViewport(0, 0, w, h));
-}
-
 void CRenderTarget::phase_ssao()
 {
     u32 Offset = 0;
@@ -49,7 +44,7 @@ void CRenderTarget::phase_ssao()
     u32 _w = Device.dwWidth / 2;
     u32 _h = Device.dwHeight / 2;
 
-    set_viewport(_w, _h);
+    RCache.SetViewport({ 0, 0, (GLsizei)_w, (GLsizei)_h, 0.f, 1.f });
 
     // Fill vertex buffer
     FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
@@ -93,7 +88,7 @@ void CRenderTarget::phase_ssao()
         //RCache.set_Stencil( FALSE, D3DCMP_EQUAL, 0x01, 0xff, 0 );
     }
 
-    set_viewport(Device.dwWidth, Device.dwHeight);
+    RCache.SetViewport({ 0, 0, (GLsizei)Device.dwWidth, (GLsizei)Device.dwHeight, 0.f, 1.f });
 
     RCache.set_Stencil(FALSE);
 }
@@ -118,7 +113,7 @@ void CRenderTarget::phase_downsamp()
 
     if (RImplementation.o.ssao_half_data)
     {
-        set_viewport(Device.dwWidth / 2, Device.dwHeight / 2);
+        RCache.SetViewport({ 0, 0, (GLsizei)Device.dwWidth / 2, (GLsizei)Device.dwHeight / 2, 0.f, 1.f });
         w /= 2;
         h /= 2;
     }
@@ -154,5 +149,5 @@ void CRenderTarget::phase_downsamp()
     }
 
     if (RImplementation.o.ssao_half_data)
-        set_viewport(Device.dwWidth, Device.dwHeight);
+        RCache.SetViewport({ 0, 0, (GLsizei)Device.dwWidth, (GLsizei)Device.dwHeight, 0.f, 1.f });
 }

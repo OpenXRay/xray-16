@@ -13,13 +13,11 @@ void CRenderDevice::Destroy()
     if (!b_is_Ready)
         return;
     Log("Destroying Render...");
-    GEnv.DU->OnDeviceDestroy();
     b_is_Ready = false;
     Statistic->OnDeviceDestroy();
-    GEnv.Render->destroy();
     GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
-    GEnv.Render->DestroyHW();
+    GEnv.Render->Destroy();
     TaskScheduler->Destroy();
     seqRender.Clear();
     seqAppActivate.Clear();

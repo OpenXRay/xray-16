@@ -19,6 +19,24 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
+bool CRT::used_as_depth() const
+{
+    switch (fmt)
+    {
+    case D3DFMT_D16:
+    case D3DFMT_D16_LOCKABLE:
+    case D3DFMT_D24X8:
+    case D3DFMT_D32:
+    case D3DFMT_D15S1:
+    case D3DFMT_D24X4S4:
+    case D3DFMT_D24S8:
+    case MAKEFOURCC('D', 'F', '2', '4'):
+        return true;
+    default:
+        return false;
+    }
+}
+
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/, bool /*useUAV = false*/)
 {
     if (pSurface)
@@ -51,21 +69,9 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/, bo
         return;
 
     // Select usage
-    u32 usage = 0;
-    if (D3DFMT_D24X8 == fmt)
+    u32 usage = D3DUSAGE_RENDERTARGET;
+    if (used_as_depth())
         usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D24S8 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D15S1 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D16 == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if (D3DFMT_D16_LOCKABLE == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else if ((D3DFORMAT)MAKEFOURCC('D', 'F', '2', '4') == fmt)
-        usage = D3DUSAGE_DEPTHSTENCIL;
-    else
-        usage = D3DUSAGE_RENDERTARGET;
 
     // Validate render-target usage
     _hr = HW.pD3D->CheckDeviceFormat(HW.DevAdapter, HW.m_DriverType, HW.Caps.fTarget, usage, D3DRTYPE_TEXTURE, f);

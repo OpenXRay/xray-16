@@ -43,11 +43,11 @@ struct XRNETSERVER_API ip_address
 
     bool operator==(const ip_address& other) const
     {
-        return m_data.data == other.m_data.data ||
-            m_data.a1 == other.m_data.a1 &&
-            m_data.a2 == other.m_data.a2 &&
-            m_data.a3 == other.m_data.a3 &&
-            m_data.a4 == 0;
+        return m_data.data == other.m_data.data
+            || m_data.a1 == other.m_data.a1
+            && m_data.a2 == other.m_data.a2
+            && m_data.a3 == other.m_data.a3
+            && m_data.a4 == 0;
     }
 };
 
@@ -81,6 +81,7 @@ public:
 
     IPureServer* server;
 
+public:
     using MultipacketSender::SendPacket;
     using MultipacketSender::FlushSendBuffer;
 
@@ -299,8 +300,8 @@ public:
 #endif
     bool IsPlayerIPDenied(u32 ip_address);
 
-    // WARNING! very bad method :(
     /*
+    // WARNING! very bad method :(
     IClient* client_Get(u32 index)
     {
         return net_players.GetClientByIndex(index);
@@ -329,7 +330,7 @@ public:
 
     virtual void Perform_destroy(CSE_Abstract* entity, u32 mode) = 0;
     virtual CSE_Abstract* Process_spawn(NET_Packet& packet, ClientID sender, bool mainEntityAsParent = false,
-                                        CSE_Abstract* currentEntity = nullptr) = 0;
+        CSE_Abstract* currentEntity = nullptr) = 0;
 
 private:
 #ifdef DEBUG

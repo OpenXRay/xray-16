@@ -13,7 +13,6 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
-#include "Layers/xrRenderGL/glBufferPool.h"
 
 CRender RImplementation;
 
@@ -564,7 +563,7 @@ IRenderVisual* CRender::getVisual(int id)
     return Visuals[id];
 }
 
-D3DVERTEXELEMENT9* CRender::getVB_Format(int id, BOOL _alt)
+VertexElement* CRender::getVB_Format(int id, BOOL _alt)
 {
     if (_alt)
     {
@@ -575,26 +574,26 @@ D3DVERTEXELEMENT9* CRender::getVB_Format(int id, BOOL _alt)
     return nDC[id].begin();
 }
 
-IGLVertexBuffer* CRender::getVB(int id, BOOL _alt)
+VertexStagingBuffer* CRender::getVB(int id, BOOL _alt)
 {
     if (_alt)
     {
         VERIFY(id<int(xVB.size()));
-        return xVB[id];
+        return &xVB[id];
     }
     VERIFY(id<int(nVB.size()));
-    return nVB[id];
+    return &nVB[id];
 }
 
-IGLIndexBuffer* CRender::getIB(int id, BOOL _alt)
+IndexStagingBuffer* CRender::getIB(int id, BOOL _alt)
 {
     if (_alt)
     {
         VERIFY(id<int(xIB.size()));
-        return xIB[id];
+        return &xIB[id];
     }
     VERIFY(id<int(nIB.size()));
-    return nIB[id];
+    return &nIB[id];
 }
 
 FSlideWindowItem* CRender::getSWI(int id)
@@ -676,25 +675,22 @@ void CRender::add_Occluder(Fbox2& bb_screenspace)
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.f, 0.02f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0, 0.02f };
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.99999f, 1.f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.f, 1.f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 //////////////////////////////////////////////////////////////////////

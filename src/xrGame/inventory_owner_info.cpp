@@ -48,7 +48,7 @@ bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
     KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
     auto it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(info_id));
     if (known_info.end() == it)
-        known_info.push_back(/*INFO_DATA(*/ info_id /*, Level().GetGameTime())*/);
+        known_info.emplace_back(info_id, Level().GetGameTime());
     else
         return false;
 
@@ -56,6 +56,23 @@ bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
     if (psAI_Flags.test(aiInfoPortion))
         Msg("[%s] Received Info [%s]", Name(), *info_id);
 #endif
+
+    //Запустить скриптовый callback
+    const CGameObject* pThisGameObject = smart_cast<const CGameObject*>(this);
+    VERIFY(pThisGameObject);
+
+    //	SCRIPT_CALLBACK_EXECUTE_2(*m_pInfoCallback, pThisGameObject->lua_game_object(), info_index);
+    //	pThisGameObject->callback(GameObject::eInventoryInfo)(pThisGameObject->lua_game_object(), *info_id);
+
+    CInfoPortion info_portion;
+    info_portion.Load(info_id);
+
+    //запустить скриптовые функции
+    info_portion.RunScriptActions(pThisGameObject);
+
+    //выкинуть те info portions которые стали неактуальными
+    for (const shared_str& name : info_portion.DisableInfos())
+        TransferInfo(name, false);
 
     return true;
 }
@@ -69,7 +86,7 @@ void CInventoryOwner::DumpInfo() const
     auto it = known_info.begin();
     for (int i = 0; it != known_info.end(); ++it, ++i)
     {
-        Msg("known info[%d]:%s", i, (*it).c_str());
+        Msg("known info[%d]:%s", i, (*it).info_id.c_str());
     }
     Msg("------------------------------------------");
 }
@@ -129,18 +146,19 @@ bool CInventoryOwner::HasInfo(shared_str info_id) const
 
     return true;
 }
-/*
-bool CInventoryOwner::GetInfo	(shared_str info_id, INFO_DATA& info_data) const
-{
-    VERIFY( info_id.size() );
-    const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr ();
-    if(!known_info) return false;
 
-    KNOWN_INFO_VECTOR::const_iterator it = std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id));
-    if(known_info->end() == it)
+bool CInventoryOwner::GetInfo(shared_str info_id, INFO_DATA& info_data) const
+{
+    VERIFY(info_id.size());
+    const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr();
+    if (!known_info)
+        return false;
+
+    auto it = std::find_if(known_info->cbegin(), known_info->cend(), CFindByIDPred(info_id));
+    if (known_info->cend() == it)
         return false;
 
     info_data = *it;
     return true;
 }
-*/
+

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx10ConstantBuffer.h"
 
-#include "dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
 dx10ConstantBuffer::~dx10ConstantBuffer()
 {
@@ -43,7 +43,7 @@ dx10ConstantBuffer::dx10ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
 
     m_uiMembersCRC = crc32(&m_MembersList[0], Desc.Variables * sizeof(m_MembersList[0]));
 
-    R_CHK(dx10BufferUtils::CreateConstantBuffer(&m_pBuffer, Desc.Size));
+    R_CHK(BufferUtils::CreateConstantBuffer(&m_pBuffer, Desc.Size));
     VERIFY(m_pBuffer);
     m_pBufferData = xr_malloc(Desc.Size);
     VERIFY(m_pBufferData);

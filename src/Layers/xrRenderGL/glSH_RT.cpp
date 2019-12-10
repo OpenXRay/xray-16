@@ -20,6 +20,22 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
+bool CRT::used_as_depth() const
+{
+    switch (fmt)
+    {
+    case D3DFMT_D16:
+    case D3DFMT_D16_LOCKABLE:
+    case D3DFMT_D15S1:
+    case D3DFMT_D24X8:
+    case D3DFMT_D24S8:
+    case MAKEFOURCC('D', 'F', '2', '4'):
+        return true;
+    default:
+        return false;
+    }
+}
+
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool /*useUAV = false*/)
 {
     if (pRT) return;

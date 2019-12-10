@@ -137,7 +137,7 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
 #endif //	USE_DX10
 
     //	Use this for DirectX10 to cache DX9 declaration for comparison purpose only
-    xr_vector<D3DVERTEXELEMENT9> dcl_code;
+    xr_vector<VertexElement> dcl_code;
     SDeclaration() = default;
     ~SDeclaration();
 };

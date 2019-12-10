@@ -414,6 +414,7 @@ void CObjectFactory::register_classes()
     ADD(CElectricBall, CSE_ALifeItemArtefact, TEXT2CLSID("SCRPTART"), "artefact_s");
     //	ADD(CtaGameArtefact			,CSE_ALifeItemArtefact			,TEXT2CLSID("AF_CTA")			,"ctaartefact_s");
     ADD(CTorch, CSE_ALifeItemTorch, TEXT2CLSID("TORCH_S"), "device_torch_s");
+    ADD(CHangingLamp, CSE_ALifeObjectHangingLamp, TEXT2CLSID("SO_HLAMP"), "hlamp_s");
     ADD(CStalkerOutfit, CSE_ALifeItemCustomOutfit, TEXT2CLSID("E_STLK"), "equ_stalker_s");
     ADD(CScope, CSE_ALifeItem, TEXT2CLSID("WP_SCOPE"), "wpn_scope_s");
     ADD(CWeaponAK74, CSE_ALifeItemWeaponMagazinedWGL, TEXT2CLSID("WP_AK74"), "wpn_ak74_s");
@@ -438,6 +439,7 @@ void CObjectFactory::register_classes()
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_GALAN"), "zone_galant_s");
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_MINCE"), "zone_mincer_s");
     ADD(CAmebaZone, CSE_ALifeZoneVisual	, TEXT2CLSID("ZS_AMEBA"), "zone_ameba_s");
+    ADD(CRadioactiveZone, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_RADIO"), "zone_radio_s");
     ADD(CNoGravityZone, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_NGRAV"), "zone_nograv_s");
     ADD(CSpaceRestrictor, CSE_ALifeSpaceRestrictor, TEXT2CLSID("SPC_RS_S"), "script_restr");
 #endif // NO_XR_GAME

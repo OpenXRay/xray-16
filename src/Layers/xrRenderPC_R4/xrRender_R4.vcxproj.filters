@@ -645,9 +645,6 @@
     <ClInclude Include="..\xrRenderDX10\MSAA\dx10MSAABlender.h">
       <Filter>Interfase implementations\MSAARender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\dx10BufferUtils.h">
-      <Filter>dx9 to dx10 Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderDX10\dx10StateUtils.h">
       <Filter>dx9 to dx10 Utils</Filter>
     </ClInclude>
@@ -716,6 +713,12 @@
     </ClInclude>
     <ClInclude Include="..\xrRenderDX11\CommonTypes.h">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\BufferUtils.h">
+      <Filter>dx9 to dx10 Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FSkinnedTypes.h">
+      <Filter>Models\Visuals</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

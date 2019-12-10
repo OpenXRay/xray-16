@@ -18,6 +18,7 @@
 #include "map_manager.h"
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UIPdaWnd.h"
+#include "ui/UIDiaryWnd.h"
 #include "ui/UITalkWnd.h"
 #include "game_object_space.h"
 #include "xrScriptEngine/script_callback_ex.h"
@@ -29,6 +30,70 @@
 #include "CustomDetector.h"
 #include "ai/monsters/basemonster/base_monster.h"
 #include "ai/trader/ai_trader.h"
+
+void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion) const
+{
+    VERIFY(info_portion);
+    ARTICLE_VECTOR& article_vector = encyclopedia_registry->registry().objects();
+
+    auto last_end = article_vector.end();
+    auto B = article_vector.begin();
+    auto E = last_end;
+
+    for (ARTICLE_ID_VECTOR::const_iterator it = info_portion->ArticlesDisable().begin();
+        it != info_portion->ArticlesDisable().end(); it++)
+    {
+        FindArticleByIDPred pred(*it);
+        last_end = std::remove_if(B, last_end, pred);
+    }
+    article_vector.erase(last_end, E);
+
+
+    for (ARTICLE_ID_VECTOR::const_iterator it = info_portion->Articles().begin();
+        it != info_portion->Articles().end(); it++)
+    {
+        FindArticleByIDPred pred(*it);
+        if (std::find_if(article_vector.begin(), article_vector.end(), pred) != article_vector.end()) continue;
+
+        CEncyclopediaArticle article;
+
+        article.Load(*it);
+
+        article_vector.emplace_back(*it, Level().GetGameTime(), article.data()->articleType);
+        LPCSTR g, n;
+        int _atype = article.data()->articleType;
+        g = *(article.data()->group);
+        n = *(article.data()->name);
+        callback(GameObject::eArticleInfo)(lua_game_object(), g, n, _atype);
+
+        /* XXX: Shadow of Chernobyl encyclopedia, return this code
+        if (CurrentGameUI())
+        {
+            CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
+            pda_section::part p = pda_section::encyclopedia;
+            switch (article.data()->articleType)
+            {
+            case ARTICLE_DATA::eEncyclopediaArticle: p = pda_section::encyclopedia;
+                break;
+            case ARTICLE_DATA::eJournalArticle: p = pda_section::journal;
+                break;
+            case ARTICLE_DATA::eInfoArticle: p = pda_section::info;
+                break;
+            case ARTICLE_DATA::eTaskArticle: p = pda_section::quests;
+                break;
+            default: NODEFAULT;
+            };
+            pGameSP->PdaMenu->PdaContentsChanged(p);
+        }
+        */
+        
+        if (CurrentGameUI())
+        {
+            CurrentGameUI()->UpdatePda();
+        }
+    }
+
+}
 
 void CActor::AddGameNews(GAME_NEWS_DATA& news_data)
 {
@@ -56,6 +121,8 @@ bool CActor::OnReceiveInfo(shared_str info_id) const
 
     CInfoPortion info_portion;
     info_portion.Load(info_id);
+
+    AddEncyclopediaArticle(&info_portion);
 
     callback(GameObject::eInventoryInfo)(lua_game_object(), *info_id);
 
@@ -107,6 +174,21 @@ void CActor::UpdateAvailableDialogs(CPhraseDialogManager* partner)
 {
     m_AvailableDialogs.clear();
     m_CheckedDialogs.clear();
+
+    if (m_known_info_registry->registry().objects_ptr())
+    {
+        auto& infoPortionRegistry = *m_known_info_registry->registry().objects_ptr();
+        for (const INFO_DATA& info_data : infoPortionRegistry)
+        {
+            //подгрузить кусочек информации с которым мы работаем
+            CInfoPortion info_portion;
+            info_portion.Load(info_data.info_id);
+
+            const DIALOG_ID_VECTOR& names = info_portion.DialogNames();
+            for (const shared_str& name : names)
+                AddAvailableDialog(name.c_str(), partner);
+        }
+    }
 
     //добавить актерский диалог собеседника
     CInventoryOwner* pInvOwnerPartner = smart_cast<CInventoryOwner*>(partner);

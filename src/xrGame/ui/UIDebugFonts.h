@@ -17,9 +17,11 @@ public:
     CUIDebugFonts();
     virtual ~CUIDebugFonts();
 
-    void InitDebugFonts(Frect r);
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     void FillUpList();
+
+private:
+    void InitDebugFonts(Frect&& r);
 
 protected:
     CUIStatic m_background;

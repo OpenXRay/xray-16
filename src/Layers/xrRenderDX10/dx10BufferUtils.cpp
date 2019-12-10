@@ -1,7 +1,22 @@
 #include "stdafx.h"
-#include "dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 
-namespace dx10BufferUtils
+u32 GetFVFVertexSize(u32 FVF)
+{
+    return D3DXGetFVFVertexSize(FVF);
+}
+
+u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
+{
+    return D3DXGetDeclVertexSize(decl, Stream);
+}
+
+u32 GetDeclLength(const VertexElement* decl)
+{
+    return D3DXGetDeclLength(decl);
+}
+
+namespace BufferUtils
 {
 HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT DataSize, bool /*bImmutable*/, bool bIndexBuffer)
 {
@@ -21,17 +36,17 @@ HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT DataSize,
     return res;
 }
 
-HRESULT CreateVertexBuffer(ID3DVertexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, false);
 }
 
-HRESULT CreateIndexBuffer(ID3DIndexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, true);
 }
 
-HRESULT CreateConstantBuffer(ID3DBuffer** ppBuffer, UINT DataSize)
+HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize)
 {
     D3D_BUFFER_DESC desc;
     desc.ByteWidth = DataSize;
@@ -44,6 +59,7 @@ HRESULT CreateConstantBuffer(ID3DBuffer** ppBuffer, UINT DataSize)
     // R_CHK(res);
     return res;
 }
+};
 
 struct VertexFormatPairs
 {
@@ -144,4 +160,197 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
     if (iDeclSize >= 0)
         ZeroMemory(&declOut[iDeclSize], sizeof(declOut[iDeclSize]));
 }
-};
+
+//-----------------------------------------------------------------------------
+VertexStagingBuffer::VertexStagingBuffer()
+    : m_DeviceBuffer{ nullptr }
+    , m_HostBuffer{ nullptr }
+{
+}
+
+VertexStagingBuffer::~VertexStagingBuffer()
+{
+    Destroy();
+}
+
+void VertexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
+{
+    m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
+    AddRef();
+}
+
+bool VertexStagingBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
+}
+
+void* VertexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= false*/)
+{
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
+
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
+{
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
+
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
+    VERIFY(m_HostBuffer && m_Size);
+
+    // Upload data to device
+    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
+    HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
+}
+
+VertexBufferHandle VertexStagingBuffer::GetBufferHandle() const
+{
+    return m_DeviceBuffer;
+}
+
+void VertexStagingBuffer::Destroy()
+{
+    DiscardHostBuffer();
+    m_Size = 0;
+
+    HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
+    _RELEASE(m_DeviceBuffer);
+}
+
+void VertexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t VertexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t VertexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (m_DeviceBuffer)
+    {
+        D3D_BUFFER_DESC desc;
+        m_DeviceBuffer->GetDesc(&desc);
+        return desc.ByteWidth;
+    }
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+IndexStagingBuffer::IndexStagingBuffer()
+    : m_DeviceBuffer{ nullptr }
+    , m_HostBuffer{ nullptr }
+{
+}
+
+IndexStagingBuffer::~IndexStagingBuffer()
+{
+    Destroy();
+}
+
+void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/, bool /*managed = true*/)
+{
+    m_Size = size;
+    m_AllowReadBack = allowReadBack;
+
+    m_HostBuffer = xr_alloc<u8>(size);
+    AddRef();
+}
+
+bool IndexStagingBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
+}
+
+void* IndexStagingBuffer::Map(
+    size_t offset /*= 0*/,
+    size_t size /*= 0*/,
+    bool read /*= false*/)
+{
+    VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
+    VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
+    VERIFY2((size + offset) <= m_Size, "Map region is too large");
+
+    return static_cast<u8*>(m_HostBuffer) + offset;
+}
+
+void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
+{
+    if (!doFlush)
+    {
+        /* Do nothing*/
+        return;
+    }
+
+    VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
+    VERIFY(m_HostBuffer && m_Size);
+
+    // Upload data to device
+    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
+    HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
+
+    if (!m_AllowReadBack)
+    {
+        // Cache buffer isn't required anymore. Free host memory
+        DiscardHostBuffer();
+    }
+}
+
+IndexBufferHandle IndexStagingBuffer::GetBufferHandle() const
+{
+    return m_DeviceBuffer;
+}
+
+void IndexStagingBuffer::Destroy()
+{
+    DiscardHostBuffer();
+    m_Size = 0;
+
+    HW.stats_manager.decrement_stats_ib(m_DeviceBuffer);
+    _RELEASE(m_DeviceBuffer);
+}
+
+void IndexStagingBuffer::DiscardHostBuffer()
+{
+    if (m_HostBuffer)
+        xr_delete(m_HostBuffer);
+}
+
+size_t IndexStagingBuffer::GetSystemMemoryUsage() const
+{
+    return m_HostBuffer ? m_Size : 0;
+}
+
+size_t IndexStagingBuffer::GetVideoMemoryUsage() const
+{
+    if (m_DeviceBuffer)
+    {
+        D3D_BUFFER_DESC desc;
+        m_DeviceBuffer->GetDesc(&desc);
+        return desc.ByteWidth;
+    }
+
+    return 0;
+}

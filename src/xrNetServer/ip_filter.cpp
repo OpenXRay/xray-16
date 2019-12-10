@@ -78,7 +78,7 @@ u32 ip_filter::load()
         tmp_item->subnet_mask = (u32(-1) >> zero_count) << zero_count;
         m_all_subnets.push_back(tmp_item);
     }
-    sort(m_all_subnets.begin(), m_all_subnets.end(), subnet_comparator());
+    std::sort(m_all_subnets.begin(), m_all_subnets.end(), subnet_comparator());
     return m_all_subnets.size();
 }
 
@@ -89,13 +89,13 @@ bool ip_filter::is_ip_present(u32 ip_address)
     subnet_item tmp_fake_item;
     hton_bo(ip_address, tmp_fake_item);
     tmp_fake_item.subnet_mask = 0;
-    return binary_search(m_all_subnets.begin(), m_all_subnets.end(), &tmp_fake_item, ip_searcher());
+    return std::binary_search(m_all_subnets.begin(), m_all_subnets.end(), &tmp_fake_item, ip_searcher());
 }
 
 void ip_filter::unload()
 {
     for (subnets_coll_t::iterator i = m_all_subnets.begin(), // delete_data(m_all_subnets);
-             ie = m_all_subnets.end();
+         ie = m_all_subnets.end();
          i != ie; ++i)
     {
         xr_delete(*i);

@@ -44,7 +44,7 @@ public:
     CXML_IdToIndex();
     virtual ~CXML_IdToIndex();
 
-    static void InitInternal();
+    static void InitInternal(bool crashOnFail = true);
 
     static const ITEM_DATA* GetById(const shared_str& str_id, bool no_assert = false);
     static const ITEM_DATA* GetByIndex(int index, bool no_assert = false);
@@ -122,7 +122,7 @@ void CSXML_IdToIndex::DeleteIdToIndexData()
 }
 
 TEMPLATE_SPECIALIZATION
-void CSXML_IdToIndex::InitInternal()
+void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/)
 {
     VERIFY(!m_pItemDataVector);
     T_INIT::InitXmlIdToIndex();
@@ -143,7 +143,13 @@ void CSXML_IdToIndex::InitInternal()
         xr_string xml_file_full;
         xml_file_full = xml_file;
         xml_file_full += ".xml";
-        uiXml->Load(CONFIG_PATH, "gameplay", xml_file_full.c_str());
+
+        const bool success = uiXml->Load(CONFIG_PATH, "gameplay", xml_file_full.c_str(), crashOnFail);
+        if (!success)
+        {
+            delete_data(uiXml);
+            continue;
+        }
 
         //общий список
         int items_num = uiXml->GetNodesNum(uiXml->GetRoot(), tag_name);

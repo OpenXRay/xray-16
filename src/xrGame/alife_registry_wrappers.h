@@ -40,10 +40,10 @@ public:
     }
 };
 
-// class CKnownContactsRegistryWrapper :	public
-// CALifeRegistryWrapperObject<CALifeRegistryWrapper<CKnownContactsRegistry> > {};
-// class CEncyclopediaRegistryWrapper :	public CALifeRegistryWrapperObject<CALifeRegistryWrapper<CEncyclopediaRegistry>
-// > {};
+class CKnownContactsRegistryWrapper : public CALifeRegistryWrapperObject<CALifeRegistryWrapper<CKnownContactsRegistry>> {};
+
+class CEncyclopediaRegistryWrapper : public CALifeRegistryWrapperObject<CALifeRegistryWrapper<CEncyclopediaRegistry>> {};
+
 class CGameNewsRegistryWrapper : public CALifeRegistryWrapperObject<CALifeRegistryWrapper<CGameNewsRegistry>>
 {
 };

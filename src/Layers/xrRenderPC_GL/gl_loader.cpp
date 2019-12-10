@@ -7,8 +7,7 @@
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
-#include "Layers/xrRenderGL/glBufferUtils.h"
-#include "Layers/xrRenderGL/glBufferPool.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRender/FHierrarhyVisual.h"
 
 #pragma warning(push)
@@ -154,17 +153,17 @@ void CRender::level_Unload()
     SWIs.clear();
 
     //*** VB/IB
-    for (IGLVertexBuffer* &buff : nVB)
-        GLBuffers.DeleteVertexBuffer(buff);
+    for (auto& buff : nVB)
+        buff.Release();
     nVB.clear();
-    for (IGLVertexBuffer* &buff : xVB)
-        GLBuffers.DeleteVertexBuffer(buff);
+    for (auto& buff : xVB)
+        buff.Release();
     xVB.clear();
-    for (IGLIndexBuffer* &buff : nIB)
-        GLBuffers.DeleteIndexBuffer(buff);
+    for (auto& buff : nIB)
+        buff.Release();
     nIB.clear();
-    for (IGLIndexBuffer* &buff : xIB)
-        GLBuffers.DeleteIndexBuffer(buff);
+    for (auto& buff : xIB)
+        buff.Release();
     xIB.clear();
     nDC.clear();
     xDC.clear();
@@ -187,7 +186,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     // Vertex buffers
     {
         xr_vector<VertexDeclarator>& _DC = alternative ? xDC : nDC;
-        xr_vector<IGLVertexBuffer*>& _VB = alternative ? xVB : nVB;
+        xr_vector<VertexStagingBuffer>& _VB = alternative ? xVB : nVB;
 
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
@@ -198,32 +197,32 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
         for (u32 i = 0; i < count; i++)
         {
             // decl
-            u32 buffer_size = (MAXD3DDECLLENGTH + 1) * sizeof(D3DVERTEXELEMENT9);
-            D3DVERTEXELEMENT9* dcl = (D3DVERTEXELEMENT9*)xr_alloca(buffer_size);
+            u32 buffer_size = (MAXD3DDECLLENGTH + 1) * sizeof(VertexElement);
+            VertexElement* dcl = (VertexElement*)xr_alloca(buffer_size);
             fs->r(dcl, buffer_size);
             fs->advance(-(int)buffer_size);
 
-            u32 dcl_len = glBufferUtils::GetDeclLength(dcl) + 1;
+            u32 dcl_len = GetDeclLength(dcl) + 1;
             _DC[i].resize(dcl_len);
-            fs->r(_DC[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
+            fs->r(_DC[i].begin(), dcl_len * sizeof(VertexElement));
 
             // count, size
             u32 vCount = fs->r_u32();
-            u32 vSize = glBufferUtils::GetDeclVertexSize(dcl);
+            u32 vSize = GetDeclVertexSize(dcl, 0);
             Msg("* [Loading VB] %d verts, %d Kb", vCount, vCount * vSize / 1024);
 
             //	Check if buffer is less then 2048 kb
-            BYTE* pData = xr_alloc<BYTE>(vCount * vSize);
+            _VB[i].Create(vCount * vSize);
+            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
-            GLBuffers.CreateVertexBuffer(_VB[i], pData, vCount * vSize);
-            xr_free(pData);
+            _VB[i].Unmap(true); // upload vertex data
         }
         fs->close();
     }
 
     // Index buffers
     {
-        xr_vector<IGLIndexBuffer*>& _IB = alternative ? xIB : nIB;
+        xr_vector<IndexStagingBuffer>& _IB = alternative ? xIB : nIB;
 
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
@@ -234,10 +233,10 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             Msg("* [Loading IB] %d indices, %d Kb", iCount, iCount * 2 / 1024);
 
             //	Check if buffer is less then 2048 kb
-            BYTE* pData = xr_alloc<BYTE>(iCount * 2);
+            _IB[i].Create(iCount * 2);
+            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
             fs->r(pData, iCount * 2);
-            GLBuffers.CreateIndexBuffer(_IB[i], pData, iCount * 2);
-            xr_free(pData);
+            _IB[i].Unmap(true); // upload index data
         }
         fs->close();
     }

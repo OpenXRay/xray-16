@@ -65,22 +65,22 @@ INetLog::~INetLog()
     if (m_pLogFile)
         fclose(m_pLogFile);
     m_pLogFile = nullptr;
-    delete m_pcs;
+    xr_delete(m_pcs);
 }
 
 void INetLog::FlushLog()
 {
     if (m_pLogFile)
     {
-        for (xr_vector<SLogPacket>::iterator it = m_aLogPackets.begin(); it != m_aLogPackets.end(); ++it)
+        for (xr_vector<SLogPacket>::iterator it = m_aLogPackets.begin(); it != m_aLogPackets.end(); it++)
         {
             SLogPacket* pLPacket = &(*it);
             if (pLPacket->m_u16Type >= sizeof(PacketName) / sizeof(PacketName[0]))
                 fprintf(m_pLogFile, "%s %10u %10u %10u\n", pLPacket->m_bIsIn ? "In:" : "Out:", pLPacket->m_u32Time,
-                        pLPacket->m_u16Type, pLPacket->m_u32Size);
+                    pLPacket->m_u16Type, pLPacket->m_u32Size);
             else
                 fprintf(m_pLogFile, "%s %10u %10s %10u\n", pLPacket->m_bIsIn ? "In:" : "Out:", pLPacket->m_u32Time,
-                        PacketName[pLPacket->m_u16Type], pLPacket->m_u32Size);
+                    PacketName[pLPacket->m_u16Type], pLPacket->m_u32Size);
         }
     }
 
@@ -96,7 +96,7 @@ void INetLog::LogPacket(u32 Time, NET_Packet* pPacket, bool IsIn)
 
     SLogPacket NewPacket;
 
-    NewPacket.m_u16Type = *(u16*)&pPacket->B.data;
+    NewPacket.m_u16Type = *((u16*)&pPacket->B.data);
     NewPacket.m_u32Size = pPacket->B.count;
     NewPacket.m_u32Time = Time - m_dwStartTime;
     NewPacket.m_bIsIn = IsIn;
@@ -117,7 +117,7 @@ void INetLog::LogData(u32 Time, void* data, u32 size, bool IsIn)
 
     SLogPacket NewPacket;
 
-    NewPacket.m_u16Type = *(u16*)data;
+    NewPacket.m_u16Type = *((u16*)data);
     NewPacket.m_u32Size = size;
     NewPacket.m_u32Time = Time - m_dwStartTime;
     NewPacket.m_bIsIn = IsIn;

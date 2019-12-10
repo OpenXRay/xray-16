@@ -222,6 +222,7 @@ public:
     virtual u32 ps_Size() const = 0;
     virtual GameObjectSavedPosition ps_Element(u32 id) const = 0;
     virtual void ForceTransform(const Fmatrix& m) = 0;
+    virtual void ForceTransformAndDirection(const Fmatrix& m) = 0;
     // HUD
     virtual void OnHUDDraw(CCustomHUD* hud, IRenderable* root) = 0;
     virtual void OnRenderHUD(IGameObject* pCurViewEntity) = 0; //--#SM+#--

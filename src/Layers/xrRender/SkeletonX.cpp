@@ -51,10 +51,6 @@ void CSkeletonX::_Copy(CSkeletonX* B)
     RenderMode = B->RenderMode;
     RMS_boneid = B->RMS_boneid;
     RMS_bonecount = B->RMS_bonecount;
-
-#ifndef USE_DX9
-    m_Indices = B->m_Indices;
-#endif //	USE_DX10
 }
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
@@ -67,6 +63,7 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
         RCache.stat.r.s_dynamic_sw.add(vCount);
         break;
     case RM_SINGLE:
+    case RM_SINGLE_HQ:
     {
         Fmatrix W;
         W.mul_43(RCache.xforms.m_w, Parent->LL_GetTransform_R(u16(RMS_boneid)));
@@ -77,9 +74,13 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
     }
     break;
     case RM_SKINNING_1B:
+    case RM_SKINNING_1B_HQ:
     case RM_SKINNING_2B:
+    case RM_SKINNING_2B_HQ:
     case RM_SKINNING_3B:
+    case RM_SKINNING_3B_HQ:
     case RM_SKINNING_4B:
+    case RM_SKINNING_4B_HQ:
     {
         // transfer matrices
         ref_constant array = RCache.get_c(s_bones_array_const);
@@ -96,13 +97,13 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
         // render
         RCache.set_Geometry(hGeom);
         RCache.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);
-        if (RM_SKINNING_1B == RenderMode)
+        if (RM_SKINNING_1B == RenderMode || RM_SKINNING_1B_HQ == RenderMode)
             RCache.stat.r.s_dynamic_1B.add(vCount);
-        else if (RM_SKINNING_2B == RenderMode)
+        else if (RM_SKINNING_2B == RenderMode || RM_SKINNING_2B_HQ == RenderMode)
             RCache.stat.r.s_dynamic_2B.add(vCount);
-        else if (RM_SKINNING_3B == RenderMode)
+        else if (RM_SKINNING_3B == RenderMode || RM_SKINNING_3B_HQ == RenderMode)
             RCache.stat.r.s_dynamic_3B.add(vCount);
-        else if (RM_SKINNING_4B == RenderMode)
+        else if (RM_SKINNING_4B == RenderMode || RM_SKINNING_4B_HQ == RenderMode)
             RCache.stat.r.s_dynamic_4B.add(vCount);
     }
     break;
@@ -219,14 +220,14 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         if (1 == bids.size())
         {
             // HW- single bone
-            RenderMode = RM_SINGLE;
+            RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
             RMS_boneid = *bids.begin();
             GEnv.Render->shader_option_skinning(0);
         }
         else if (sw_bones_cnt <= hw_bones_cnt)
         {
             // HW- one weight
-            RenderMode = RM_SKINNING_1B;
+            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(1);
         }
@@ -262,7 +263,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         if (sw_bones_cnt <= hw_bones_cnt)
         {
             // HW- two weights
-            RenderMode = RM_SKINNING_2B;
+            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_2B_HQ : RM_SKINNING_2B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(2);
         }
@@ -295,7 +296,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
         if ((sw_bones_cnt <= hw_bones_cnt))
         {
-            RenderMode = RM_SKINNING_3B;
+            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_3B_HQ : RM_SKINNING_3B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(3);
         }
@@ -328,7 +329,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
         if (sw_bones_cnt <= hw_bones_cnt)
         {
-            RenderMode = RM_SKINNING_4B;
+            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_4B_HQ : RM_SKINNING_4B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(4);
         }
@@ -355,7 +356,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
 BOOL CSkeletonX::has_visible_bones()
 {
-    if (RM_SINGLE == RenderMode)
+    if (RM_SINGLE == RenderMode || RM_SINGLE_HQ == RenderMode)
     {
         return Parent->LL_GetBoneVisible((u16)RMS_boneid);
     }
@@ -679,19 +680,3 @@ void CSkeletonX::_FillVerticesSoft4W(const Fmatrix& view, CSkeletonWallmark& wm,
         }
     }
 }
-
-#ifndef USE_DX9
-void CSkeletonX::_DuplicateIndices(const char* /*N*/, IReader* data)
-{
-    //	We will have trouble with container since don't know were to take readable indices
-    VERIFY(!data->find_chunk(OGF_ICONTAINER));
-    //	Index buffer replica since we can't read from index buffer in DX10
-    // ref_smem<u16>			Indices;
-    R_ASSERT(data->find_chunk(OGF_INDICES));
-    u32 iCount = data->r_u32();
-
-    u32 size = iCount * 2;
-    u32 crc = crc32(data->pointer(), size);
-    m_Indices.create(crc, iCount, (u16*)data->pointer());
-}
-#endif // !USE_DX9

@@ -7,7 +7,7 @@
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
-#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
 #include "Layers/xrRender/FHierrarhyVisual.h"
 
@@ -164,26 +164,22 @@ void CRender::level_Unload()
     //*** VB/IB
     for (I = 0; I < nVB.size(); I++)
     {
-        HW.stats_manager.decrement_stats_vb(nVB[I]);
-        _RELEASE(nVB[I]);
+        nVB[I].Release();
     }
     for (I = 0; I < xVB.size(); I++)
     {
-        HW.stats_manager.decrement_stats_vb(xVB[I]);
-        _RELEASE(xVB[I]);
+        xVB[I].Release();
     }
     nVB.clear();
     xVB.clear();
 
     for (I = 0; I < nIB.size(); I++)
     {
-        HW.stats_manager.decrement_stats_ib(nIB[I]);
-        _RELEASE(nIB[I]);
+        nIB[I].Release();
     }
     for (I = 0; I < xIB.size(); I++)
     {
-        HW.stats_manager.decrement_stats_ib(xIB[I]);
-        _RELEASE(xIB[I]);
+        xIB[I].Release();
     }
     nIB.clear();
     xIB.clear();
@@ -208,7 +204,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     // Vertex buffers
     {
         xr_vector<VertexDeclarator>& _DC  = alternative ? xDC : nDC;
-        xr_vector<ID3DVertexBuffer*>& _VB = alternative ? xVB : nVB;
+        xr_vector<VertexStagingBuffer>& _VB = alternative ? xVB : nVB;
 
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
@@ -216,8 +212,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
         u32 count = fs->r_u32();
         _DC.resize(count);
         _VB.resize(count);
-        u32 bufferSize = (MAXD3DDECLLENGTH + 1) * sizeof(D3DVERTEXELEMENT9);
-        D3DVERTEXELEMENT9* dcl = (D3DVERTEXELEMENT9*)xr_alloca(bufferSize);
+        u32 bufferSize = (MAXD3DDECLLENGTH + 1) * sizeof(VertexElement);
+        VertexElement* dcl = (VertexElement*)xr_alloca(bufferSize);
         for (u32 i = 0; i < count; i++)
         {
             // decl
@@ -225,29 +221,22 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             fs->r(dcl, bufferSize);
             fs->advance(-(int)bufferSize);
 
-            u32 dcl_len = D3DXGetDeclLength(dcl) + 1;
+            u32 dcl_len = GetDeclLength(dcl) + 1;
             _DC[i].resize(dcl_len);
-            fs->r(_DC[i].begin(), dcl_len * sizeof(D3DVERTEXELEMENT9));
+            fs->r(_DC[i].begin(), dcl_len * sizeof(VertexElement));
 
             // count, size
             u32 vCount = fs->r_u32();
-            u32 vSize = D3DXGetDeclVertexSize(dcl, 0);
+            u32 vSize = GetDeclVertexSize(dcl, 0);
             Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount * vSize) / 1024);
 
-            // Create and fill
-            // BYTE*	pData		= 0;
-            // R_CHK				(HW.pDevice->CreateVertexBuffer(vCount*vSize,dwUsage,0,D3DPOOL_MANAGED,&_VB[i],0));
-            // R_CHK				(_VB[i]->Lock(0,0,(void**)&pData,0));
-            //			CopyMemory			(pData,fs().pointer(),vCount*vSize);
-            // fs->r				(pData,vCount*vSize);
-            //_VB[i]->Unlock		();
+
             //	TODO: DX10: Check fragmentation.
             //	Check if buffer is less then 2048 kb
-            BYTE* pData = xr_alloc<BYTE>(vCount * vSize);
+            _VB[i].Create(vCount * vSize);
+            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
-            dx10BufferUtils::CreateVertexBuffer(&_VB[i], pData, vCount * vSize);
-            HW.stats_manager.increment_stats_vb(_VB[i]);
-            xr_free(pData);
+            _VB[i].Unmap(true); // upload vertex data
 
             //			fs->advance			(vCount*vSize);
         }
@@ -256,7 +245,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     // Index buffers
     {
-        xr_vector<ID3DIndexBuffer*>& _IB = alternative ? xIB : nIB;
+        xr_vector<IndexStagingBuffer>& _IB = alternative ? xIB : nIB;
 
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
@@ -266,22 +255,12 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             u32 iCount = fs->r_u32();
             Msg("* [Loading IB] %d indices, %d Kb", iCount, (iCount * 2) / 1024);
 
-            // Create and fill
-            // BYTE*	pData		= 0;
-            // R_CHK
-            // (HW.pDevice->CreateIndexBuffer(iCount*2,dwUsage,D3DFMT_INDEX16,D3DPOOL_MANAGED,&_IB[i],0));
-            // R_CHK				(_IB[i]->Lock(0,0,(void**)&pData,0));
-            //			CopyMemory			(pData,fs().pointer(),iCount*2);
-            // fs->r				(pData,iCount*2);
-            //_IB[i]->Unlock		();
-
             //	TODO: DX10: Check fragmentation.
             //	Check if buffer is less then 2048 kb
-            BYTE* pData = xr_alloc<BYTE>(iCount * 2);
+            _IB[i].Create(iCount * 2);
+            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
             fs->r(pData, iCount * 2);
-            dx10BufferUtils::CreateIndexBuffer(&_IB[i], pData, iCount * 2);
-            HW.stats_manager.increment_stats_ib(_IB[i]);
-            xr_free(pData);
+            _IB[i].Unmap(true); // upload index data
 
             //			fs().advance		(iCount*2);
         }

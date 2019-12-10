@@ -40,7 +40,7 @@ void stats_manager::increment_stats(u32 size, enum_stats_buffer_type type, _D3DP
 
 void stats_manager::increment_stats_rtarget(ID3DTexture2D* buff)
 {
-    if (GEnv.isDedicatedServer)
+    if (buff == nullptr || GEnv.isDedicatedServer)
         return;
 
     _D3DPOOL pool = D3DPOOL_MANAGED;
@@ -59,7 +59,7 @@ void stats_manager::increment_stats_rtarget(ID3DTexture2D* buff)
 
 void stats_manager::increment_stats_vb(ID3DVertexBuffer* buff)
 {
-    if (GEnv.isDedicatedServer)
+    if (buff == nullptr || GEnv.isDedicatedServer)
         return;
 
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -75,7 +75,7 @@ void stats_manager::increment_stats_vb(ID3DVertexBuffer* buff)
 
 void stats_manager::increment_stats_ib(ID3DIndexBuffer* buff)
 {
-    if (GEnv.isDedicatedServer)
+    if (buff == nullptr || GEnv.isDedicatedServer)
         return;
 
 #if defined(USE_DX10) || defined(USE_DX11)

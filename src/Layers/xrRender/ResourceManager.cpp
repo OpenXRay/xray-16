@@ -268,6 +268,31 @@ Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR
     return nullptr;
 }
 
+void CResourceManager::CompatibilityCheck()
+{
+    cpcstr shader = "skin.h";
+    string_path shaderPath;
+
+    FS.update_path(shaderPath, "$game_shaders$", GEnv.Render->getShaderPath());
+    xr_strcat(shaderPath, shader);
+
+    IReader* file = FS.r_open(shaderPath);
+    R_ASSERT3(file, "Can't open skin.h shader", shaderPath);
+
+    cpcstr begin = strstr((cpcstr)file->pointer(), "v_model_skinned_1");
+    cpcstr end = strstr(begin, "POSITION");
+
+    xr_string str(begin, end);
+    if (strstr(str.data(), "float4"))
+        RImplementation.m_hq_skinning = true;
+    else if (strstr(str.data(), "int4"))
+        RImplementation.m_hq_skinning = false;
+    else
+        R_ASSERT2(0, "Custom skinning is unsupported. Please, correct this compatibility check manually");
+
+    FS.r_close(file);
+}
+
 Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
     if (GEnv.isDedicatedServer)

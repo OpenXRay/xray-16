@@ -5,6 +5,8 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
+ENGINE_API extern u32 Vid_SelectedRefreshRate;
+
 CHW HW;
 
 CHW::CHW() {}
@@ -56,16 +58,19 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     Caps.id_vendor = adapterID.VendorId;
     Caps.id_device = adapterID.DeviceId;
 
-    // Retreive windowed mode
-    D3DDISPLAYMODE mWindowed;
-    R_CHK(pD3D->GetAdapterDisplayMode(DevAdapter, &mWindowed));
-
     // Select back-buffer & depth-stencil format
     D3DFORMAT& fTarget = Caps.fTarget;
     D3DFORMAT& fDepth = Caps.fDepth;
     if (bWindowed)
     {
-        fTarget = mWindowed.Format;
+        // Retrieve display mode
+        D3DDISPLAYMODE mode;
+        R_CHK(pD3D->GetAdapterDisplayMode(DevAdapter, &mode));
+
+        // Apply its format
+        fTarget = mode.Format;
+
+        // Apply depth
         R_CHK(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, TRUE));
         fDepth = selectDepthStencil(fTarget);
     }
@@ -114,8 +119,8 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     D3DPRESENT_PARAMETERS& P = DevPP;
     ZeroMemory(&P, sizeof(P));
 
-    DevPP.BackBufferWidth = Device.dwWidth;
-    DevPP.BackBufferHeight = Device.dwHeight;
+    P.BackBufferWidth = Device.dwWidth;
+    P.BackBufferHeight = Device.dwHeight;
 
     // Back buffer
     P.BackBufferFormat = fTarget;
@@ -152,9 +157,16 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Refresh rate
     if (bWindowed)
+    {
         P.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+        P.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    }
     else
+    {
         P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
+        P.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+    }
+
 
     // Create the device
     const auto GPU = selectGPU();
@@ -231,17 +243,24 @@ void CHW::Reset()
 
     DevPP.BackBufferWidth = Device.dwWidth;
     DevPP.BackBufferHeight = Device.dwHeight;
+
     // Windoze
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
+    {
         DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
+        DevPP.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+    }
     else
+    {
         DevPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+        DevPP.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    }
 
     while (true)
     {
-        auto result = HW.pDevice->Reset(&DevPP);
+        const HRESULT result = HW.pDevice->Reset(&DevPP);
         
         if (SUCCEEDED(result))
             break;

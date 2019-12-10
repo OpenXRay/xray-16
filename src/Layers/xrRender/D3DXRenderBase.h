@@ -179,10 +179,12 @@ public:
     virtual void setBrightness(float fGamma) override;
     virtual void setContrast(float fGamma) override;
     virtual void updateGamma() override;
+
     //	Destroy
     virtual void OnDeviceDestroy(bool bKeepTextures) override;
-    virtual void DestroyHW() override;
+    virtual void Destroy() override;
     virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
+
     //	Init
     virtual void SetupStates() override;
     virtual void OnDeviceCreate(const char* shName) override;

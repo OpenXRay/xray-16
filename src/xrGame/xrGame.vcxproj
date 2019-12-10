@@ -1560,6 +1560,7 @@
     <ClInclude Include="ui\UITalkWnd.h" />
     <ClInclude Include="ui\UITaskWnd.h" />
     <ClInclude Include="ui\UITextVote.h" />
+    <ClInclude Include="ui\UIVersionList.h" />
     <ClInclude Include="ui\UIVote.h" />
     <ClInclude Include="ui\UIVoteStatusWnd.h" />
     <ClInclude Include="ui\UIVotingCategory.h" />
@@ -1567,6 +1568,7 @@
     <ClInclude Include="ui\UIWpnParams.h" />
     <ClInclude Include="ui\UIXmlInit.h" />
     <ClInclude Include="ui\ui_af_params.h" />
+    <ClInclude Include="VersionSwitcher.h" />
     <ClInclude Include="vision_client.h" />
     <ClInclude Include="vision_client_inline.h" />
     <ClInclude Include="visual_memory_manager.h" />
@@ -3575,6 +3577,7 @@
     <ClCompile Include="ui\UITalkWnd.cpp" />
     <ClCompile Include="ui\UITaskWnd.cpp" />
     <ClCompile Include="ui\UITextVote.cpp" />
+    <ClCompile Include="ui\UIVersionList.cpp" />
     <ClCompile Include="ui\UIVote.cpp" />
     <ClCompile Include="ui\UIVoteStatusWnd.cpp" />
     <ClCompile Include="ui\UIVotingCategory.cpp" />
@@ -3593,6 +3596,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="VersionSwitcher.cpp" />
     <ClCompile Include="vision_client.cpp" />
     <ClCompile Include="visual_memory_manager.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>

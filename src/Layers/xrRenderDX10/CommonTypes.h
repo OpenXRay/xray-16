@@ -39,7 +39,6 @@ typedef D3D10_PRIMITIVE_TOPOLOGY D3D_PRIMITIVE_TOPOLOGY;
 typedef D3D10_VIEWPORT D3D_VIEWPORT;
 typedef D3D10_USAGE D3D_USAGE;
 
-typedef ID3D10ShaderResourceView ID3DShaderResourceView;
 typedef ID3D10RasterizerState ID3DRasterizerState;
 typedef ID3D10DepthStencilState ID3DDepthStencilState;
 typedef ID3D10BlendState ID3DBlendState;
@@ -53,6 +52,7 @@ typedef ID3D10Query ID3DQuery;
 typedef ID3D10Texture2D ID3DTexture2D;
 typedef ID3D10RenderTargetView ID3DRenderTargetView;
 typedef ID3D10DepthStencilView ID3DDepthStencilView;
+typedef ID3D10ShaderResourceView ID3DShaderResourceView;
 typedef ID3D10Resource ID3DBaseTexture;
 typedef ID3D10Buffer ID3DVertexBuffer;
 typedef ID3D10Buffer ID3DIndexBuffer;
@@ -270,3 +270,11 @@ typedef ID3D10ShaderReflectionType ID3DShaderReflectionType;
 
 typedef dx10State ID3DState;
 #define DX10_ONLY(expr) expr
+
+using VertexBufferHandle = ID3D10Buffer*;
+using IndexBufferHandle = ID3D10Buffer*;
+using ConstantBufferHandle = ID3D10Buffer*;
+using HostBufferHandle = void*;
+
+using VertexElement = D3DVERTEXELEMENT9;
+using InputElementDesc = D3D10_INPUT_ELEMENT_DESC;

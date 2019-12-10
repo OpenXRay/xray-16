@@ -123,7 +123,7 @@ public:
     virtual void TransferInfo(shared_str info_id, bool add_info) const;
     //есть ли информация у персонажа
     virtual bool HasInfo(shared_str info_id) const;
-//	virtual bool				GetInfo		(shared_str info_id, INFO_DATA&) const;
+	virtual bool GetInfo(shared_str info_id, INFO_DATA&) const;
 
 #ifdef DEBUG
     void DumpInfo() const;

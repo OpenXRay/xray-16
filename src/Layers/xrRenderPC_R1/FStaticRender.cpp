@@ -247,7 +247,7 @@ IRenderVisual* CRender::getVisual(int id)
     VERIFY(id < int(Visuals.size()));
     return Visuals[id];
 }
-D3DVERTEXELEMENT9* CRender::getVB_Format(int id, bool alternative)
+VertexElement* CRender::getVB_Format(int id, bool alternative)
 {
     if (alternative)
     {
@@ -260,30 +260,30 @@ D3DVERTEXELEMENT9* CRender::getVB_Format(int id, bool alternative)
         return nDC[id].begin();
     }
 }
-ID3DVertexBuffer* CRender::getVB(int id, bool alternative)
+VertexStagingBuffer* CRender::getVB(int id, bool alternative)
 {
     if (alternative)
     {
         VERIFY(id < int(xVB.size()));
-        return xVB[id];
+        return &xVB[id];
     }
     else
     {
         VERIFY(id < int(nVB.size()));
-        return nVB[id];
+        return &nVB[id];
     }
 }
-ID3DIndexBuffer* CRender::getIB(int id, bool alternative)
+IndexStagingBuffer* CRender::getIB(int id, bool alternative)
 {
     if (alternative)
     {
         VERIFY(id < int(xIB.size()));
-        return xIB[id];
+        return &xIB[id];
     }
     else
     {
         VERIFY(id < int(nIB.size()));
-        return nIB[id];
+        return &nIB[id];
     }
 }
 FSlideWindowItem* CRender::getSWI(int id)
@@ -411,20 +411,19 @@ IC void gm_SetNearer(BOOL bNearer)
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 0.02f });
 }
+
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f });
 }
+
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
+    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 1.f });
 }
 
 //////////////////////////////////////////////////////////////////////

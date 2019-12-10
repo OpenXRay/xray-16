@@ -24,7 +24,7 @@ void CRenderTarget::DoAsyncScreenshot()
 
         // HW.pDevice->CopyResource( t_ss_async, pTex );
         ID3DTexture2D* pBuffer;
-        hr = HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (LPVOID*)&pBuffer);
+        hr = HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (LPVOID*)&pBuffer);
         HW.pContext->CopyResource(t_ss_async, pBuffer);
 
         RImplementation.m_bMakeAsyncSS = false;
