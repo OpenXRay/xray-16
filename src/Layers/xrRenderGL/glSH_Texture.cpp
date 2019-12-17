@@ -336,7 +336,7 @@ void CTexture::Unload()
 void CTexture::desc_update()
 {
     desc_cache = pSurface;
-    if (pSurface && GL_TEXTURE_2D == desc)
+    if (pSurface && (GL_TEXTURE_2D == desc || GL_TEXTURE_2D_MULTISAMPLE == desc))
     {
         glBindTexture(desc, pSurface);
         CHK_GL(glGetTexLevelParameteriv(desc, 0, GL_TEXTURE_WIDTH, &m_width));

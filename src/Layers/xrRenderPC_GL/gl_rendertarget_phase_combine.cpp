@@ -242,10 +242,6 @@ void CRenderTarget::phase_combine()
         t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
         t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
 
-        // Draw
-        RCache.set_Element(s_combine->E[0]);
-        RCache.set_Geometry(g_combine);
-
         RCache.set_c("m_v2w", m_v2w);
         RCache.set_c("L_ambient", ambclr);
 
@@ -259,14 +255,19 @@ void CRenderTarget::phase_combine()
         RCache.set_c("ssao_kernel_size", fSSAOKernelSize);
 
         if (!RImplementation.o.dx10_msaa)
+        {
+            // Draw
+            RCache.set_Element(s_combine->E[0]);
+            RCache.set_Geometry(g_combine);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+        }
         else
         {
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
             if (RImplementation.o.dx10_msaa_opt)
             {
+                // Draw
                 RCache.set_Element(s_combine_msaa[0]->E[0]);
+                RCache.set_Geometry(g_combine);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
             }
@@ -288,8 +289,6 @@ void CRenderTarget::phase_combine()
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
-        //	TODO: DX10: CHeck this!
-        //g_pGamePersistent->Environment().RenderClouds	();
         RImplementation.render_forward();
         if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
@@ -350,14 +349,6 @@ void CRenderTarget::phase_combine()
         }
     }
 
-    /*
-       if( RImplementation.o.dx10_msaa )
-       {
-          // we need to resolve rt_Generic_1 into rt_Generic_1_r
-          if( bDistort )
-             HW.pDevice->ResolveSubresource( rt_Generic_1_r->pTexture->surface_get(), 0, rt_Generic_1->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM );
-       }
-       */
     RCache.set_Stencil(FALSE);
 
     // SkyLoader: temporary disabled

@@ -46,7 +46,7 @@ float ssao_blur_ps(int2 centerTC, int iSample)
 		float2 sampleData = tex2D(s_occ, sampleTC).rg;
 #else
 		int2	sampleTC   = centerTC + arrOffsets[i];
-		float2 sampleData = texelFetch(s_occ, sampleTC, 0, iSample).rg;
+		float2 sampleData = texelFetch(s_occ, sampleTC, iSample).rg;
 #endif
 	 
 		float fDepth  = sampleData.g;
