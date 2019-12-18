@@ -190,7 +190,7 @@ public:
     CRenderDevice()
         : fWidth_2(0), fHeight_2(0), mtProcessingAllowed(false),
           m_editor_module(nullptr), m_editor_initialize(nullptr),
-          m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
+          m_editor_finalize(nullptr), m_editor(nullptr)
     {
         m_sdlWnd = NULL;
         b_is_Active = FALSE;
@@ -338,7 +338,6 @@ private:
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
     XRay::Editor::ide_base* m_editor;
-    engine_impl* m_engine;
 };
 
 extern ENGINE_API CRenderDevice Device;

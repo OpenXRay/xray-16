@@ -49,6 +49,11 @@ typedef char* LPSTR;
 #pragma warning(disable : 4127)
 #pragma warning(disable : 4100)
 
+#include "xrCore/xrCore.h"
+#include "xrEngine/Engine.h"
+#include "xrEngine/device.h"
+#include "xrSound/Sound.h"
+
 // do not forget to call
 // 'cs_free'
 // on the block of memory being returned

@@ -15,7 +15,6 @@
 #include "xr_object.h"
 #endif
 
-SThunderboltDesc::SThunderboltDesc() : m_GradientTop(0), m_GradientCenter(0) {}
 SThunderboltDesc::~SThunderboltDesc()
 {
     m_pRender->DestroyModel();
@@ -75,7 +74,6 @@ void SThunderboltDesc::load(const CInifile& pIni, shared_str const& sect)
 //----------------------------------------------------------------------------------------------
 // collection
 //----------------------------------------------------------------------------------------------
-SThunderboltCollection::SThunderboltCollection() {}
 void SThunderboltCollection::load(CInifile const* pIni, CInifile const* thunderbolts, pcstr sect)
 {
     section = sect;

@@ -17,6 +17,8 @@
 
 #include <vcclr.h>
 
+class CEnvironment;
+
 namespace editor
 {
 ref class window_ide;
@@ -46,6 +48,7 @@ public:
 public:
     virtual HWND main_handle();
     virtual HWND view_handle();
+    CEnvironment* environment() override;
     virtual void run();
     virtual void on_load_finished();
     virtual void pause();
