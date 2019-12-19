@@ -46,7 +46,7 @@ XR_EXPORT bool CheckRendererSupport()
 
     if (glewInit() != GLEW_OK)
     {
-        Msg("Could not initialize glew.");
+        Log("~ Could not initialize glew.");
         return false;
     }
 
