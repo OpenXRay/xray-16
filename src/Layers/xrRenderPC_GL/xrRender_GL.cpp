@@ -40,7 +40,7 @@ XR_EXPORT bool CheckRendererSupport()
     SDL_GLContext gl_test_context = SDL_GL_CreateContext(gl_test_window);
     if (!gl_test_context)
     {
-        Msg("Cannot create OpenGL context: %s", SDL_GetError());
+        Log("~ Cannot create OpenGL context:", SDL_GetError());
         return false;
     }
 
