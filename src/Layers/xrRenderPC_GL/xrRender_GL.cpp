@@ -29,7 +29,7 @@ XR_EXPORT bool CheckRendererSupport()
         return false;
     }
 
-    SDL_Window* gl_test_window = SDL_CreateWindow("GL test", 0,0,1,1, SDL_WINDOW_HIDDEN|SDL_WINDOW_OPENGL);
+    SDL_Window* gl_test_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 
     if (!gl_test_window)
     {
