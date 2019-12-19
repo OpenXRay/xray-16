@@ -33,7 +33,7 @@ XR_EXPORT bool CheckRendererSupport()
 
     if (!gl_test_window)
     {
-        Msg("Cannot create helper window for OpenGL: %s", SDL_GetError());
+        Log("~ Cannot create helper window for OpenGL:", SDL_GetError());
         return false;
     }
 
