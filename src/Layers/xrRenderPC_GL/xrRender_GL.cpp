@@ -52,7 +52,7 @@ XR_EXPORT bool CheckRendererSupport()
 
     if (!glewIsSupported("GL_VERSION_4_1 GL_EXT_multi_draw_arrays"))
     {
-        Msg("GL_VERSION_4_1 or GL_EXT_multi_draw_arrays not supported\n");
+        Log("~ GL_VERSION_4_1 or GL_EXT_multi_draw_arrays not supported");
         return false;
     }
 
