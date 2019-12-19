@@ -29,6 +29,7 @@ XR_EXPORT bool CheckRendererSupport()
         return false;
     }
 
+	// Check if minimal required OpenGL features are available
     SDL_Window* gl_test_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 
     if (!gl_test_window)
