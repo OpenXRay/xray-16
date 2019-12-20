@@ -51,9 +51,9 @@ XR_EXPORT bool CheckRendererSupport()
         return false;
     }
 
-    if (!glewIsSupported("GL_VERSION_4_1 GL_EXT_multi_draw_arrays"))
+    if (!glewIsSupported("GL_VERSION_3_0 GL_ARB_separate_shader_objects"))
     {
-        Log("~ GL_VERSION_4_1 or GL_EXT_multi_draw_arrays not supported");
+        Log("~ GL_VERSION_3_0 or GL_ARB_separate_shader_objects not supported");
         return false;
     }
 
