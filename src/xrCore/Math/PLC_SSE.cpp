@@ -5,6 +5,8 @@
 #include "Layers/xrRender/light.h"
 #endif
 
+#include <xmmintrin.h>
+
 namespace XRay
 {
 namespace Math
