@@ -4,6 +4,7 @@
 #include "xrCommon/inlining_macros.h"
 #include "xrCore/math_constants.h"
 
+#include <algorithm>
 
 #ifdef min
 # undef min
