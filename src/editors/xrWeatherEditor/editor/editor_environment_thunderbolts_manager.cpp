@@ -291,25 +291,21 @@ shared_str manager::unique_collection_id(shared_str const& id) const
 
 SThunderboltDesc* manager::description(const CInifile& config, shared_str const& section) const
 {
-    for (const auto &i : m_thunderbolts)
-        if (i->id() == section)
-            return i;
+    for (thunderbolt* bolt : m_thunderbolts)
+        if (bolt->id() == section)
+            return bolt;
 
     NODEFAULT;
-#ifdef DEBUG
-    return (0);
-#endif // #ifdef DEBUG
+    return nullptr;
 }
 
 SThunderboltCollection* manager::get_collection(shared_str const& section)
 {
-    for (const auto &i : m_collections)
-        if (i->id() == section)
-            return i;
+    for (collection* item : m_collections)
+        if (item->id() == section)
+            return item;
 
     NODEFAULT;
-#ifdef DEBUG
-    return (0);
-#endif // #ifdef DEBUG
+    return nullptr;
 }
 
