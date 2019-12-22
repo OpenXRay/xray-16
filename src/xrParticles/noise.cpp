@@ -9,7 +9,11 @@
 #include <xmmintrin.h>
 #endif
 
+#if defined(XR_ARM64)
+ICF int iFloor_SSE(float const x) { return floor(x); }
+#else
 ICF int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
+#endif
 #endif
 
 //==============================================================================
