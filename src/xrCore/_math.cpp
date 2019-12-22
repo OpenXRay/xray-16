@@ -217,7 +217,13 @@ XRCORE_API u64 QPC() noexcept
 
 XRCORE_API u64 GetCLK()
 {
+#if defined(XR_ARM64)
+  int64_t virtual_timer_value;
+  asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
+  return virtual_timer_value;
+#else
     return __rdtsc();
+#endif
 }
 
 XRCORE_API u32 GetCurrentCPU()
