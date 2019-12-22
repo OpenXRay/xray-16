@@ -26,12 +26,14 @@ void nativeCpuId(int regs[4], int i)
 #elif (defined(LINUX) || defined(FREEBSD)) && defined(GCC)
     __cpuid((int)i, (int *)regs);
 #elif defined(LINUX) || defined(FREEBSD)
+#if defined(XR_X86) || defined(XR_X64)
     asm volatile("cpuid" :
     "=eax" (regs[0]),
     "=ebx" (regs[1]),
     "=ecx" (regs[2]),
     "=edx" (regs[3])
     : "eax" (i));
+#endif
 #else
 #error Cpuid is not implemented
 #endif
