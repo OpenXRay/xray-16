@@ -47,6 +47,13 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <thread>
 #include "SDL.h"
 
+#if defined(XR_ARM64)
+#define _FPU_EXTENDED 0
+#define _FPU_DOUBLE 0
+#define _FPU_SINGLE 0
+#define _FPU_RC_NEAREST 0
+#endif
+
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
     ULONG Number;
