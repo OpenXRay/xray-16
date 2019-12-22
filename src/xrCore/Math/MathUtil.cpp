@@ -11,7 +11,9 @@
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/light.h"
 #endif
+#if defined(XR_X86) || defined(XR_X64)
 #include "PLC_SSE.hpp"
+#endif
 #if defined(WINDOWS) && defined(XR_X86)
 #include "SkinXW_SSE.hpp"
 #else
