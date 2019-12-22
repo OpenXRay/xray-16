@@ -3,7 +3,11 @@
 #include "noise.h"
 
 #ifndef _EDITOR
+#if defined(XR_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
+#else
 #include <xmmintrin.h>
+#endif
 
 ICF int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
 #endif
