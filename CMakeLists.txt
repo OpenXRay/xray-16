@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.0)
 project(OpenXRay)
 
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
-message(STATUS "Detected platform: "${ARCHITECTURE})
+message(STATUS "Detected platform: " ${ARCHITECTURE})
 if(${ARCHITECTURE} STREQUAL "aarch64")
 	set(PROJECT_PLATFORM_ARM64)
 elseif(${ACHITECTURE} STREQUAL "x86_64" OR ${ACHITECTURE} STREQUAL "x86" OR ${ACHITECTURE} STREQUAL "i686")
