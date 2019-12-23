@@ -247,9 +247,9 @@ private:
         m_sources_lines = m_source.size() + options.size() + head_lines;
         m_sources = xr_alloc<pcstr>(m_sources_lines);
 #ifdef DEBUG
-        m_sources[0] = "#version 400\n#extension GL_ARB_separate_shader_objects : enable\n#pragma optimize (off)\n";
+        m_sources[0] = "#version 410\n#pragma optimize (off)\n";
 #else
-        m_sources[0] = "#version 400\n#extension GL_ARB_separate_shader_objects : enable\n";
+        m_sources[0] = "#version 410\n";
 #endif
         m_sources[1] = m_name_comment;
 
