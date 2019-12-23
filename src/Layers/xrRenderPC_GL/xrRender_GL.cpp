@@ -12,6 +12,7 @@ class sdl_window_test_helper
 public:
     sdl_window_test_helper()
     {
+        HW.SetPrimaryAttributes();
         m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
         if (!m_window)
         {
@@ -72,12 +73,6 @@ XR_EXPORT bool CheckRendererSupport()
     if (glewInit() != GLEW_OK)
     {
         Log("~ Could not initialize glew.");
-        return false;
-    }
-
-    if (!glewIsSupported("GL_VERSION_4_1"))
-    {
-        Log("~ GL_VERSION_4_1 not supported");
         return false;
     }
 
