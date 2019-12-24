@@ -58,8 +58,6 @@ void Initialize()
     //PLCCalc = PLCCalc_CPP;
 #endif
 
-
-
     // XXX: use PLC_energy and iCeil too
     // SSE implementations of this functions is not used.
     // Found duplicate implementation in src\Layers\xrRenderPC_R1\LightShadows.cpp
