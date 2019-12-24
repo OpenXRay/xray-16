@@ -29,6 +29,7 @@
 #endif
 #include "xr_ioc_cmd.h"
 #include "MonitorManager.hpp"
+#include "TaskScheduler.hpp"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -272,6 +273,21 @@ void CheckPrivilegySlowdown()
 #endif
 }
 
+void CreateApplication()
+{
+    pApp = new CApplication();
+#ifdef WINDOWS // XXX: Remove this macro check
+    if (GEnv.isDedicatedServer)
+        pApp->SetLoadingScreen(new TextLoadingScreen());
+#endif
+}
+
+void CreateSpatialSpace()
+{
+    g_SpatialSpace = new ISpatial_DB("Spatial obj");
+    g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
+}
+
 ENGINE_API void Startup()
 {
     execUserScript();
@@ -285,19 +301,27 @@ ENGINE_API void Startup()
     if (loadArgs)
         Console->Execute(loadArgs + 1);
 
+    // Create task scheduler
+    TaskScheduler = std::make_unique<TaskManager>();
+    TaskScheduler->Initialize();
+
     // Initialize APP
+    Event lightAnimCreated, applicationCreated, spatialCreated;
+    TaskScheduler->AddTask("LALib.OnCreate()", [&]()
+    {
+        LALib.OnCreate();
+    }, nullptr, nullptr, &lightAnimCreated);
+
+    TaskScheduler->AddTask("CreateApplication()", CreateApplication,
+        nullptr, nullptr, &applicationCreated);
+
+    TaskScheduler->AddTask("CreateSpatialSpace()", CreateSpatialSpace,
+        nullptr, nullptr, &spatialCreated);
+
     Device.Create();
-    LALib.OnCreate();
-
-    pApp = new CApplication();
-#ifdef WINDOWS // XXX: Remove this macro check
-    if (GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new TextLoadingScreen());
-#endif
-
-    g_SpatialSpace = new ISpatial_DB("Spatial obj");
-    g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
-    Device.WaitUntilCreated();
+    Device.WaitEvent(lightAnimCreated);
+    Device.WaitEvent(applicationCreated);
+    Device.WaitEvent(spatialCreated);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent);

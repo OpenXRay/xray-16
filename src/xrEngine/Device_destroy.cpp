@@ -35,8 +35,7 @@ void CRenderDevice::Destroy()
 
 void CRenderDevice::Reset(bool precache /*= true*/)
 {
-    shouldReset = true;
-    precacheWhileReset = precache;
+    ResetInternal(precache);
 }
 
 #include "IGame_Level.h"
@@ -78,7 +77,4 @@ void CRenderDevice::ResetInternal(bool precache)
 
     if (!GEnv.isDedicatedServer)
         pInput->GrabInput(true);
-
-    shouldReset = false;
-    precacheWhileReset = false;
 }

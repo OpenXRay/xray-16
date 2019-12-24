@@ -237,7 +237,6 @@ private:
 
 public:
     void Create();
-    void WaitUntilCreated();
 
     void Run(void);
     void Destroy(void);
@@ -269,12 +268,7 @@ public:
     }
 
 private:
-    std::atomic<DeviceState> LastDeviceState;
-    std::atomic<bool> shouldReset;
-    std::atomic<bool> precacheWhileReset;
     std::atomic<bool> mtProcessingAllowed;
-    Event deviceCreated, deviceReadyToRun;
-    Event primaryReadyToRun, primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 

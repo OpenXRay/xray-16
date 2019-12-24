@@ -53,11 +53,7 @@ bool CRenderDevice::RenderBegin()
     if (GEnv.isDedicatedServer)
         return true;
 
-    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-    if (!isDX9Renderer)
-        LastDeviceState = GEnv.Render->GetDeviceState();
-
-    switch (LastDeviceState)
+    switch (GEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
@@ -160,43 +156,6 @@ void CRenderDevice::RenderThreadProc(void* context)
             device.stats.RenderTotal.accum = renderTotalReal.accum;
         }
         device.renderFrameDone.Set();
-    }
-}
-
-void CRenderDevice::PrimaryThreadProc(void* context)
-{
-    auto& device = *static_cast<CRenderDevice*>(context);
-
-    Core.CoInitializeMultithreaded();
-
-    device.CreateInternal();
-
-    GEnv.Render->MakeContextCurrent(IRender::NoContext);
-    device.deviceCreated.Set();
-
-    device.deviceReadyToRun.Wait();
-    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
-
-    GEnv.Render->ClearTarget();
-
-    while (true)
-    {
-        device.primaryProcessFrame.Wait();
-        if (device.mt_bMustExit)
-        {
-            GEnv.Render->MakeContextCurrent(IRender::NoContext);
-            device.primaryThreadExit.Set();
-            return;
-        }
-
-        if (device.shouldReset) // never happen on DX9, will be done in message_loop()
-        {
-            device.ResetInternal(device.precacheWhileReset);
-        }
-
-        device.ProcessFrame();
-
-        device.primaryFrameDone.Set();
     }
 }
 
@@ -407,21 +366,14 @@ void CRenderDevice::message_loop()
         return;
     }
 
-    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-
-    bool timedOut = false;
     bool canCallActivate = false;
     bool shouldActivate = false;
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
         SDL_Event events[MAX_WINDOW_EVENTS];
-        int count = 0;
-        if (!timedOut)
-        {
-            count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-                SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
-        }
+        const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
 
         for (int i = 0; i < count; ++i)
         {
@@ -486,7 +438,6 @@ void CRenderDevice::message_loop()
             }
             }
         }
-
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
@@ -494,25 +445,8 @@ void CRenderDevice::message_loop()
             canCallActivate = false;
         }
 
-        if (isDX9Renderer)
-        {
-            LastDeviceState = GEnv.Render->GetDeviceState();
-        }
-
-        if (!timedOut)
-        {
-            if (isDX9Renderer && shouldReset)
-            {
-                ResetInternal(precacheWhileReset);
-            }
-            primaryProcessFrame.Set();
-        }
-
-        timedOut = !primaryFrameDone.Wait(MaximalWaitTime);
+        ProcessFrame();
     }
-
-    if (timedOut)
-        primaryFrameDone.Wait();
 }
 
 void CRenderDevice::Run()
@@ -544,18 +478,11 @@ void CRenderDevice::Run()
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     OnWM_Activate(1, 0);
 
-    GEnv.Render->MakeContextCurrent(IRender::NoContext);
-    deviceReadyToRun.Set();
-
     // Message cycle
     message_loop();
 
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
-
-    primaryProcessFrame.Set();
-    primaryThreadExit.Wait();
-    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
 
     seqAppEnd.Process();
     
