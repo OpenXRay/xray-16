@@ -219,7 +219,8 @@ bool CDetailPathManager::build_circle_trajectory(
     }
     int k = vertex_id ? 0 : -1;
 
-    if (path)
+    if (path && 
+        (size + n + k) >= 0 ) //prevent crach due reserve() call with arg < 0
         path->reserve(size + n + k);
 
     sina = -direction.x;
