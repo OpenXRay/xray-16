@@ -16,7 +16,7 @@ namespace Editor
 class ide_base;
 class engine_base;
 
-using initialize_function_ptr = void(*)(ide_base*&, engine_base*);
+using initialize_function_ptr = void(*)(ide_base*&);
 using finalize_function_ptr = void(*)(ide_base*&);
 
 // XXX: is __cdecl needed?

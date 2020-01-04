@@ -23,7 +23,6 @@
 #include "xrCore/FS_impl.h"
 
 #include "Include/editor/ide.hpp"
-#include "engine_impl.hpp"
 
 #include "xrEngine/TaskScheduler.hpp"
 
@@ -398,7 +397,6 @@ void CRenderDevice::message_loop_weather_editor()
 {
     m_editor->run();
     m_editor_finalize(m_editor);
-    xr_delete(m_engine);
 }
 
 void CRenderDevice::message_loop()

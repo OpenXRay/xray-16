@@ -399,6 +399,8 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + _last_ps));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        if (RImplementation.o.dx10_msaa)
+            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #elif defined(USE_DX10) || defined(USE_DX11)
@@ -420,6 +422,8 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + CTexture::rstVertex + _last_vs));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        if (RImplementation.o.dx10_msaa)
+            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #elif defined(USE_DX10) || defined(USE_DX11)

@@ -9,6 +9,8 @@
 #ifndef EDITOR_IDE_HPP_INCLUDED
 #define EDITOR_IDE_HPP_INCLUDED
 
+class CEnvironment;
+
 namespace XRay
 {
 namespace Editor
@@ -22,6 +24,7 @@ class ide_base
 public:
     virtual HWND main_handle() = 0;
     virtual HWND view_handle() = 0;
+    virtual CEnvironment* environment() = 0;
     virtual void run() = 0;
     virtual void on_load_finished() = 0;
     virtual void pause() = 0;

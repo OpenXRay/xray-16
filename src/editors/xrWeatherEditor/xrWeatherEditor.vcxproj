@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -155,6 +155,41 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="editor\editor_environment_ambients_ambient.cpp" />
+    <ClCompile Include="editor\editor_environment_ambients_effect_id.cpp" />
+    <ClCompile Include="editor\editor_environment_ambients_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_ambients_sound_id.cpp" />
+    <ClCompile Include="editor\editor_environment_detail.cpp" />
+    <ClCompile Include="editor\editor_environment_effects_effect.cpp" />
+    <ClCompile Include="editor\editor_environment_effects_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_levels_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_manager_properties.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="editor\editor_environment_sound_channels_channel.cpp" />
+    <ClCompile Include="editor\editor_environment_sound_channels_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_sound_channels_source.cpp" />
+    <ClCompile Include="editor\editor_environment_suns_blend.cpp" />
+    <ClCompile Include="editor\editor_environment_suns_flare.cpp" />
+    <ClCompile Include="editor\editor_environment_suns_flares.cpp" />
+    <ClCompile Include="editor\editor_environment_suns_gradient.cpp" />
+    <ClCompile Include="editor\editor_environment_suns_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_suns_sun.cpp" />
+    <ClCompile Include="editor\editor_environment_thunderbolts_collection.cpp" />
+    <ClCompile Include="editor\editor_environment_thunderbolts_gradient.cpp" />
+    <ClCompile Include="editor\editor_environment_thunderbolts_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_thunderbolts_thunderbolt.cpp" />
+    <ClCompile Include="editor\editor_environment_thunderbolts_thunderbolt_id.cpp" />
+    <ClCompile Include="editor\editor_environment_weathers_manager.cpp" />
+    <ClCompile Include="editor\editor_environment_weathers_time.cpp" />
+    <ClCompile Include="editor\editor_environment_weathers_weather.cpp" />
+    <ClCompile Include="engine_impl.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="entry_point.cpp" />
     <ClCompile Include="ide_impl.cpp" />
@@ -243,6 +278,37 @@
     <ClInclude Include="..\..\Include\editor\ide.hpp" />
     <ClInclude Include="..\..\Include\editor\interfaces.hpp" />
     <ClInclude Include="..\..\Include\editor\property_holder_base.hpp" />
+    <ClInclude Include="editor\editor_environment_ambients_ambient.hpp" />
+    <ClInclude Include="editor\editor_environment_ambients_effect_id.hpp" />
+    <ClInclude Include="editor\editor_environment_ambients_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_ambients_sound_id.hpp" />
+    <ClInclude Include="editor\editor_environment_detail.hpp" />
+    <ClInclude Include="editor\editor_environment_effects_effect.hpp" />
+    <ClInclude Include="editor\editor_environment_effects_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_levels_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_sound_channels_channel.hpp" />
+    <ClInclude Include="editor\editor_environment_sound_channels_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_sound_channels_source.hpp" />
+    <ClInclude Include="editor\editor_environment_suns_blend.hpp" />
+    <ClInclude Include="editor\editor_environment_suns_flare.hpp" />
+    <ClInclude Include="editor\editor_environment_suns_flares.hpp" />
+    <ClInclude Include="editor\editor_environment_suns_gradient.hpp" />
+    <ClInclude Include="editor\editor_environment_suns_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_suns_sun.hpp" />
+    <ClInclude Include="editor\editor_environment_thunderbolts_collection.hpp" />
+    <ClInclude Include="editor\editor_environment_thunderbolts_gradient.hpp" />
+    <ClInclude Include="editor\editor_environment_thunderbolts_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_thunderbolts_thunderbolt.hpp" />
+    <ClInclude Include="editor\editor_environment_thunderbolts_thunderbolt_id.hpp" />
+    <ClInclude Include="editor\editor_environment_weathers_manager.hpp" />
+    <ClInclude Include="editor\editor_environment_weathers_time.hpp" />
+    <ClInclude Include="editor\editor_environment_weathers_weather.hpp" />
+    <ClInclude Include="engine_impl.hpp" />
+    <ClInclude Include="editor\ide.hpp" />
+    <ClInclude Include="editor\property_collection.hpp" />
+    <ClInclude Include="editor\property_collection_forward.hpp" />
+    <ClInclude Include="editor\property_collection_inline.hpp" />
     <ClInclude Include="engine_include.hpp" />
     <ClInclude Include="ide_impl.hpp" />
     <ClInclude Include="pch.hpp" />
@@ -329,6 +395,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="images\color_picker.cur" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrWeatherEditor.rc" />
@@ -363,8 +430,17 @@
     <ProjectReference Include="$(SolutionDir)editors\xrSdkControls\xrSdkControls.csproj">
       <Project>{e9dc16a3-d0fa-4924-af6e-f6fdf3ea0661}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Layers\xrAPI\xrAPI.vcxproj">
+      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xrEngine\xrEngine.vcxproj">
+      <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -372,5 +448,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
+  </Target>
 </Project>

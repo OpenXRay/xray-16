@@ -1,8 +1,6 @@
 #pragma once
 #include "xrCore/_types.h"
 
-#include "SDL.h"
-
 class XRCORE_API Event
 {
     void* handle;

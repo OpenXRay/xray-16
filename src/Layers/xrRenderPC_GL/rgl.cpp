@@ -313,9 +313,7 @@ void CRender::create()
         }
     }
 
-    // XXX: temporary disabled, need to fix it
-    //o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
-    o.dx10_gbuffer_opt = FALSE;
+    o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
 
     o.dx10_minmax_sm = ps_r3_minmax_sm;
     o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
@@ -675,21 +673,21 @@ void CRender::add_Occluder(Fbox2& bb_screenspace)
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0, 0.02f };
+    const D3D_VIEWPORT viewport = {0, 0, static_cast<GLsizei>(T->get_width()), static_cast<GLsizei>(T->get_height()), 0, 0.02f};
     RCache.SetViewport(viewport);
 }
 
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, static_cast<GLsizei>(T->get_width()), static_cast<GLsizei>(T->get_height()), 0.99999f, 1.f };
     RCache.SetViewport(viewport);
 }
 
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, static_cast<GLsizei>(T->get_width()), static_cast<GLsizei>(T->get_height()), 0, 1.f };
     RCache.SetViewport(viewport);
 }
 
