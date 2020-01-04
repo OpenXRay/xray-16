@@ -1,5 +1,4 @@
 #pragma once
-#include "_std_extensions.h"
 #include "xrCore/_types.h"
 #include "xrCommon/xr_string.h"
 #include "xrCommon/xr_vector.h"
