@@ -1,0 +1,99 @@
+#####################################################################################
+#                                                                                   #
+#   This file is used by bash-completion and contains all the OpenXRay startup keys #
+#   that should work under Linux. The list of keys was taken from here.             #
+#   https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Engine%27s-command-line-keys  #
+#                                                                                   #
+#   To install, copy this file here /usr/share/bash-completion/completions/         #
+#                                                                                   #     
+#####################################################################################
+
+_xr_3da_arglist=(
+    '-_g'
+    '-auto_load_arch'
+    '-break_on_assert'
+    '-bug'
+    '-build'
+    '-cache'
+    '-dedicated'
+    '-demomode'
+    '-depth16'
+    '-designer'
+    '-disasm'
+    '-draw_borders'
+    '-dump_bindings'
+    '-dump_traffic'
+    '-ebuild'
+    '-force_flushlog'
+    '-fsltx'
+    '-game_designer'
+    '-gl'
+    '-gloss'
+    '-gpu_nopure'
+    '-gpu_ref'
+    '-gpu_sw'
+    '-ignore_save_incompatibility'
+    '-keep_lua'
+    '-lack_of_shaders'
+    '-list_thm'
+    '-load'
+    '-ltx'
+    '-lua_studio'
+    '-luadumpstate'
+    '-mblur'
+    '-mt_cdb'
+    '-nes_texture_storing'
+    '-netsim'
+    '-no_hom'
+    '-no_occq'
+    '-no_staging'
+    '-noaref'
+    '-nocolormap'
+    '-nodf24'
+    '-nodistort'
+    '-nojit'
+    '-nolog'
+    '-nonvs'
+    '-noprefetch'
+    '-noshadows'
+    '-nosplash'
+    '-overlay_path'
+    '-psp'
+    '-savescreenshots'
+    '-show_error_window'
+    '-silent_error_mode'
+    '-sjitter'
+    '-skinw'
+    '-smap1024'
+    '-smap1536'
+    '-smap2048'
+    '-smap2560'
+    '-smap3072'
+    '-smap4096'
+    '-smap8192'
+    '-splashnotop'
+    '-ss_png'
+    '-sunfilter'
+    '-svcfg'
+    '-tsh'
+    '-tune'
+    '-vtf'
+    '-weather'
+    '-xclsx'
+)
+
+_xr_3da() {
+COMPREPLY=()
+    wantfiles='-@(fsltx)'
+    _get_comp_words_by_ref cur prev words cword
+
+    if [[ $prev = $wantfiles ]]; then
+        _filedir
+    else
+        COMPREPLY=($(compgen -W '${_xr_3da_arglist[@]}' -- "$cur"))
+    fi
+
+    true
+}
+
+complete -F _xr_3da xr_3da
