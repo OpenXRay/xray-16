@@ -2,7 +2,7 @@ project(xrResources)
 
 install(FILES fsgame.ltx DESTINATION /usr/share/openxray) 
 
-install(FILES xr_3da DESTINATION /usr/share/bash-completion/completions)
+install(DIRECTORY bash-completion DESTINATION /usr/share)
 
 install(DIRECTORY gamedata DESTINATION /usr/share/openxray)
 
