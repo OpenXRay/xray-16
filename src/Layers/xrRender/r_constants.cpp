@@ -204,7 +204,7 @@ void R_constant_table::merge(R_constant_table* T)
         dx9compatibility = true;
 
     // Real merge
-    xr_vector<ref_constant> table_tmp{};
+    xr_vector<ref_constant> table_tmp;
     table_tmp.reserve(table.size());
     for (u32 it = 0; it < T->table.size(); it++)
     {
