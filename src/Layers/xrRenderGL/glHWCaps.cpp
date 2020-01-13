@@ -6,7 +6,10 @@
 
 namespace
 {
-u32 GetGpuNum() { return 1; }
+u32 GetGpuNum()
+{
+    return 2;
+}
 }
 
 void CHWCaps::Update()

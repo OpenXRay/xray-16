@@ -93,6 +93,7 @@ u32 GetGpuNum()
 {
     u32 res = GetNVGpuNum();
     res = _max(res, GetATIGpuNum());
+    res = _max(res, 2);
     res = _min(res, CHWCaps::MAX_GPUS);
 
     if (res == 0)
