@@ -390,7 +390,8 @@ void CActor::Load(LPCSTR section)
             LPCSTR hit_snds = READ_IF_EXISTS(pSettings, r_string, hit_snd_sect, hit_name, "");
             int cnt = _GetItemCount(hit_snds);
             string128 tmp;
-            VERIFY(cnt != 0);
+            if (hit_type != (int)ALife::eHitTypePhysicStrike)
+                VERIFY(cnt != 0);
             for (int i = 0; i < cnt; ++i)
             {
                 sndHit[hit_type].push_back(ref_sound());
