@@ -3,9 +3,6 @@
 	<string id="st_unload_magazine_after_pickup">
 		<text>Autounload weapon after pickup</text>
 	</string>
-	<string id="st_unload_magazine_all">
-		<text>unload all weapons</text>
-	</string>
 	<string id="st_unequip">
 		<text>unequip</text>
 	</string>

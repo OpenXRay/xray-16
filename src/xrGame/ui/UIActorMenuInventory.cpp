@@ -1029,7 +1029,6 @@ void CUIActorMenu::PropertiesBoxForWeapon(CUICellItem* cell_item, PIItem item, b
         if (b)
         {
             m_UIPropertiesBox->AddItem("st_unload_magazine", NULL, INVENTORY_UNLOAD_MAGAZINE);
-            m_UIPropertiesBox->AddItem("st_unload_magazine_all", NULL, INVENTORY_UNLOAD_MAGAZINE_ALL);
             b_show = true;
         }
     }
@@ -1410,24 +1409,6 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
             if (child_weap_mag)
             {
                 child_weap_mag->UnloadMagazine();
-            }
-        }
-        break;
-    }
-    case INVENTORY_UNLOAD_MAGAZINE_ALL:
-    {
-        TIItemContainer ruck_list;
-        ruck_list = m_pActorInvOwner->inventory().m_ruck;
-        for (TIItemContainer::const_iterator it = ruck_list.begin(); ruck_list.end() != it; ++it)
-        {
-            CWeapon* wpn = smart_cast<CWeapon*>(*it);
-            if (wpn)
-            {
-                CWeaponMagazined* weap_mag = smart_cast<CWeaponMagazined*>(wpn);
-                if (weap_mag)
-                {
-                    weap_mag->UnloadMagazine();
-                }
             }
         }
         break;

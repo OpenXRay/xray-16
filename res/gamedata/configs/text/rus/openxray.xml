@@ -3,9 +3,6 @@
 	<string id="st_unload_magazine_after_pickup">
 		<text>Разряжать ор. при поднятии</text>
 	</string>
-	<string id="st_unload_magazine_all">
-		<text>разрядить всё оружие</text>
-	</string>
 	<string id="st_unequip">
 		<text>убрать в рюкзак</text>
 	</string>
