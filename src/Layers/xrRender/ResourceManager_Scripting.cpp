@@ -356,50 +356,56 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     if (ScriptEngine.object(s_shader, "normal_hq", LUA_TFUNCTION))
     {
         // Analyze possibility to detail this shader
-        C.iElement = SE_R1_NORMAL_HQ;
+        C.iElement = 0;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        S.E[C.iElement] = C._lua_Compile(s_shader, C.bDetail ? "normal_hq" : "normal");
+
+        if (C.bDetail)
+            S.E[0] = C._lua_Compile(s_shader, "normal_hq");
+        else
+            S.E[0] = C._lua_Compile(s_shader, "normal");
     }
     else
     {
         if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
         {
-            C.iElement = SE_R1_NORMAL_HQ;
+            C.iElement = 0;
             C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-            S.E[C.iElement] = C._lua_Compile(s_shader, "normal");
+            S.E[0] = C._lua_Compile(s_shader, "normal");
         }
     }
 
     // Compile element (LOD1)
     if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
     {
-        C.iElement = SE_R1_NORMAL_LQ;
+        C.iElement = 1;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        S.E[C.iElement] = C._lua_Compile(s_shader, "normal");
+        S.E[1] = C._lua_Compile(s_shader, "normal");
     }
 
     // Compile element
     if (ScriptEngine.object(s_shader, "l_point", LUA_TFUNCTION))
     {
-        C.iElement = SE_R1_LPOINT;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        S.E[C.iElement] = C._lua_Compile(s_shader, "l_point");
+        C.iElement = 2;
+        C.bDetail = FALSE;
+        S.E[2] = C._lua_Compile(s_shader, "l_point");
+        ;
     }
 
     // Compile element
     if (ScriptEngine.object(s_shader, "l_spot", LUA_TFUNCTION))
     {
-        C.iElement = SE_R1_LSPOT;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        S.E[C.iElement] = C._lua_Compile(s_shader, "l_spot");
+        C.iElement = 3;
+        C.bDetail = FALSE;
+        S.E[3] = C._lua_Compile(s_shader, "l_spot");
+        ;
     }
 
     // Compile element
     if (ScriptEngine.object(s_shader, "l_special", LUA_TFUNCTION))
     {
-        C.iElement = SE_R1_LMODELS;
+        C.iElement = 4;
         C.bDetail = FALSE;
-        S.E[C.iElement] = C._lua_Compile(s_shader, "l_special");
+        S.E[4] = C._lua_Compile(s_shader, "l_special");
     }
     ScriptEngineLock.Leave();
 

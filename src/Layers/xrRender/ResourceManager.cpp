@@ -197,7 +197,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_HQ] = _CreateElement(E);
     }
 
     // Compile element	(LOD1)
@@ -206,7 +206,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_LQ] = _CreateElement(E);
     }
 
     // Compile element
@@ -215,7 +215,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LPOINT] = _CreateElement(E);
     }
 
     // Compile element
@@ -224,7 +224,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LSPOT] = _CreateElement(E);
     }
 
     // Compile element
@@ -233,7 +233,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = TRUE; //.$$$ HACK :)
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LMODELS] = _CreateElement(E);
     }
 
     // Compile element
@@ -242,7 +242,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = FALSE;
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[5] = _CreateElement(E);
     }
 
     // Search equal in shaders array
