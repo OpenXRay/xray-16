@@ -642,9 +642,6 @@
     <ClCompile Include="gl_rendertarget_phase_ssao.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_FXAA.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\r__screenshot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -674,9 +671,6 @@
     </ClCompile>
     <ClCompile Include="rgl_shaders.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="blender_fxaa.cpp">
-      <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp">
       <Filter>Core</Filter>
@@ -1114,9 +1108,6 @@
     </ClInclude>
     <ClInclude Include="..\xrRenderGL\MSAA\glMSAABlender.h">
       <Filter>Interface implementations\MSAARender</Filter>
-    </ClInclude>
-    <ClInclude Include="blender_fxaa.h">
-      <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderGL\glHW.h">
       <Filter>Refactored\HW</Filter>

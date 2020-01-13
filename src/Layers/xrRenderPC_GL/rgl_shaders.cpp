@@ -407,11 +407,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         appendShaderOption(dof, "USE_DOF", "1");
     }
 
-    // FXAA
-    // SkyLoader: temporary added
-    appendShaderOption(ps_r2_fxaa, "USE_FXAA", "1");
-    // end
-
     // Sun shafts
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
