@@ -365,7 +365,7 @@ void CRenderDevice::ProcessFrame()
 
     // renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
-    mtProcessingAllowed = true;
+    //mtProcessingAllowed = true;
 
     DoRender();
 
@@ -385,9 +385,9 @@ void CRenderDevice::ProcessFrame()
 
     syncFrameDone.Wait(); // wait until secondary thread finish its job
     // renderFrameDone.Wait(); // wait until render thread finish its job
-    while (!TaskScheduler->TaskQueueIsEmpty())
-        std::this_thread::yield();
-    mtProcessingAllowed = false;
+    //while (!TaskScheduler->TaskQueueIsEmpty())
+    //    std::this_thread::yield();
+    //mtProcessingAllowed = false;
 
     if (!b_is_Active)
         Sleep(1);
