@@ -639,7 +639,16 @@ void CAI_Stalker::net_Destroy()
     CInventoryOwner::net_Destroy();
     m_pPhysics_support->in_NetDestroy();
 
-    TaskScheduler->RemoveTask({ this, &CAI_Stalker::update_object_handler });
+    // XXX: task scheduler
+    //TaskScheduler->RemoveTask({ this, &CAI_Stalker::update_object_handler });
+    Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler));
+
+#ifdef DEBUG
+    fastdelegate::FastDelegate0<> f = fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler);
+    xr_vector<fastdelegate::FastDelegate0<>>::const_iterator I;
+    I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), f);
+    VERIFY(I == Device.seqParallel.end());
+#endif
 
     xr_delete(m_ce_close);
     xr_delete(m_ce_far);
@@ -827,9 +836,17 @@ void CAI_Stalker::UpdateCL()
     {
         if (g_mt_config.test(mtObjectHandler) && CObjectHandler::planner().initialized())
         {
-            TaskScheduler->AddTask("CAI_Stalker::update_object_handler",
-                { this, &CAI_Stalker::update_object_handler },
-                { this, &CAI_Stalker::mt_object_handler_update_allowed });
+            // XXX: task scheduler
+            //TaskScheduler->AddTask("CAI_Stalker::update_object_handler",
+            //    { this, &CAI_Stalker::update_object_handler },
+            //    { this, &CAI_Stalker::mt_object_handler_update_allowed });
+            fastdelegate::FastDelegate0<> f = fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler);
+#ifdef DEBUG
+            xr_vector<fastdelegate::FastDelegate0<>>::const_iterator I;
+            I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), f);
+            VERIFY(I == Device.seqParallel.end());
+#endif
+            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler));
         }
         else
         {
