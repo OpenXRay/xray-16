@@ -38,10 +38,7 @@ bool TaskManagerBase::TaskQueueIsEmpty() const
 
 void TaskManagerBase::taskManagerThread(void* thisPtr)
 {
-    int threads = tbb::task_scheduler_init::default_num_threads();
-    if (threads < 4)
-        threads = 4;
-    tbb::task_scheduler_init init(threads);
+    tbb::task_scheduler_init init;
 
     TaskManagerBase& self = *static_cast<TaskManagerBase*>(thisPtr);
 
