@@ -892,7 +892,7 @@ CScriptGameObject* CScriptGameObject::GetActiveItem()
     else
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "CScriptGameObject : cannot access class member activge_item!");
+            LuaMessageType::Error, "CScriptGameObject : cannot access class member active_item!");
         return (0);
     }
 }
