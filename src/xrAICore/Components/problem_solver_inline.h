@@ -170,7 +170,7 @@ IC void CProblemSolverAbstract::remove_evaluator(const condition_type& condition
 }
 
 TEMPLATE_SPECIALIZATION
-IC _condition_evaluator_ptr CProblemSolverAbstract::evaluator(
+IC typename CProblemSolverAbstract::condition_evaluator_ptr_type CProblemSolverAbstract::evaluator(
     const condition_type& condition_id) const
 {
     typename EVALUATORS::const_iterator I = evaluators().find(condition_id);
