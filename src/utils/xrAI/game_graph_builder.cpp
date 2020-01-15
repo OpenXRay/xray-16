@@ -242,7 +242,7 @@ void CGameGraphBuilder::recursive_update(const u32& game_vertex_id, const float&
             *result = game_vertex_id;
 
             distances[i] = curr_dist;
-            CLevelGraph::CVertex* node = level_graph().vertex(i);
+            CLevelGraph::CLevelVertex* node = level_graph().vertex(i);
             for (const auto &j : {0, 1, 2, 3})
             {
                 u32 dwNexNodeID = node->link(j);

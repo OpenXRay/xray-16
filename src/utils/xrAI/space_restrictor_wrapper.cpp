@@ -115,7 +115,7 @@ struct border_merge_predicate
         m_level_graph = level_graph;
     }
 
-    IC void operator()(const CLevelGraph::CVertex& vertex) const
+    IC void operator()(const CLevelGraph::CLevelVertex& vertex) const
     {
         if (m_restriction->inside(m_level_graph->vertex_id(&vertex), true) &&
             !m_restriction->inside(m_level_graph->vertex_id(&vertex), false))
