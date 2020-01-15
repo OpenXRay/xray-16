@@ -23,7 +23,7 @@ class CGraphAbstract
 public:
     typedef CGraphVertex<_data_type, _vertex_id_type, CGraphAbstract> CVertex;
 
-    typedef CEdge<_edge_weight_type, CVertex, _edge_data_type> CEdge;
+    typedef CGraphEdge<_edge_weight_type, CVertex, _edge_data_type> CEdge;
 
 public:
     typedef xr_map<_vertex_id_type, CVertex*> VERTICES;

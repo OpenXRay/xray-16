@@ -39,14 +39,14 @@ IC const typename _vertex_type::vertex_id_type& CSGraphEdge::vertex_id() const {
     template <typename _edge_weight_type, typename _vertex_type, typename _edge_data_type\
 >
 
-#define CSGraphEdge CEdge<_edge_weight_type, _vertex_type, _edge_data_type>
+#define CSGraphEdge CGraphEdge<_edge_weight_type, _vertex_type, _edge_data_type>
 
 TEMPLATE_SPECIALIZATION
-IC CSGraphEdge::CEdge(const _edge_weight_type& weight, _vertex_type* vertex) : inherited(weight, vertex) {}
+IC CSGraphEdge::CGraphEdge(const _edge_weight_type& weight, _vertex_type* vertex) : inherited(weight, vertex) {}
 TEMPLATE_SPECIALIZATION
 IC bool CSGraphEdge::operator==(const typename _vertex_type::vertex_id_type& vertex_id) const { return (this->vertex()->vertex_id() == vertex_id); }
 TEMPLATE_SPECIALIZATION
-IC bool CSGraphEdge::operator==(const CEdge& obj) const
+IC bool CSGraphEdge::operator==(const CGraphEdge& obj) const
 {
     if (this->weight() != obj.weight())
         return (false);
@@ -69,14 +69,14 @@ IC _edge_data_type& CSGraphEdge::data() { return (m_data); }
     template <typename _edge_weight_type, typename _vertex_type\
 >
 
-#define CSGraphEdge CEdge<_edge_weight_type, _vertex_type, Loki::EmptyType>
+#define CSGraphEdge CGraphEdge<_edge_weight_type, _vertex_type, Loki::EmptyType>
 
 TEMPLATE_SPECIALIZATION
-IC CSGraphEdge::CEdge(const _edge_weight_type& weight, _vertex_type* vertex) : inherited(weight, vertex) {}
+IC CSGraphEdge::CGraphEdge(const _edge_weight_type& weight, _vertex_type* vertex) : inherited(weight, vertex) {}
 TEMPLATE_SPECIALIZATION
 IC bool CSGraphEdge::operator==(const typename _vertex_type::vertex_id_type& vertex_id) const { return (this->vertex()->vertex_id() == vertex_id); }
 TEMPLATE_SPECIALIZATION
-IC bool CSGraphEdge::operator==(const CEdge& obj) const
+IC bool CSGraphEdge::operator==(const CGraphEdge& obj) const
 {
     if (this->weight() != obj.weight())
         return (false);
