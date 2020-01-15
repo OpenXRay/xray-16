@@ -14,7 +14,7 @@
 class CGameGraphBuilder
 {
 private:
-    typedef GameGraph::CVertex vertex_type;
+    typedef GameGraph::CGameVertex vertex_type;
     typedef CGraphAbstract<vertex_type, float, u32, Loki::EmptyType> graph_type;
     typedef xr_vector<xr_vector<u32>> DISTANCES;
     typedef std::pair<u32, u32> PAIR;

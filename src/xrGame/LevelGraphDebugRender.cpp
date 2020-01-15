@@ -133,8 +133,8 @@ Fvector LevelGraphDebugRender::ConvertPosition(const Fvector& pos)
 
 void LevelGraphDebugRender::DrawEdge(int vid1, int vid2)
 {
-    const GameGraph::CVertex& v1 = *gameGraph->vertex(vid1);
-    const GameGraph::CVertex& v2 = *gameGraph->vertex(vid2);
+    const GameGraph::CGameVertex& v1 = *gameGraph->vertex(vid1);
+    const GameGraph::CGameVertex& v2 = *gameGraph->vertex(vid2);
     float radius = 0.005f;
     if (psAI_Flags.test(aiDrawGameGraphRealPos))
         radius = 1.f;
@@ -237,8 +237,8 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
         const float& walkedDistance = stalker->brain().movement().detail().walked_distance();
         if (fis_zero(walkedDistance))
             continue;
-        const CGameGraph::CVertex& v1 = *gameGraph->vertex(vid1);
-        const CGameGraph::CVertex& v2 = *gameGraph->vertex(vid2);
+        const CGameGraph::CGameVertex& v1 = *gameGraph->vertex(vid1);
+        const CGameGraph::CGameVertex& v2 = *gameGraph->vertex(vid2);
         Fvector pos1, pos2;
         float distance;
         if (psAI_Flags.test(aiDrawGameGraphRealPos))
@@ -271,7 +271,7 @@ void LevelGraphDebugRender::DrawObjects(int vid)
 {
     if (!ai().get_alife())
         return;
-    const GameGraph::CVertex& vertex = *gameGraph->vertex(vid);
+    const GameGraph::CGameVertex& vertex = *gameGraph->vertex(vid);
     float radius = 0.0105f;
     if (psAI_Flags.test(aiDrawGameGraphRealPos))
         radius = 1.0f;
@@ -335,8 +335,8 @@ void LevelGraphDebugRender::DrawObjects(int vid)
             continue;
         Fvector pos1, pos2;
         float distance;
-        const CGameGraph::CVertex& v1 = *gameGraph->vertex(vid1);
-        const CGameGraph::CVertex& v2 = *gameGraph->vertex(vid2);
+        const CGameGraph::CGameVertex& v1 = *gameGraph->vertex(vid1);
+        const CGameGraph::CGameVertex& v2 = *gameGraph->vertex(vid2);
         if (psAI_Flags.test(aiDrawGameGraphRealPos))
         {
             pos1 = v1.level_point();

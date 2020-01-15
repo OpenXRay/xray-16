@@ -612,18 +612,18 @@ void CGameGraphBuilder::save_graph(const float& start, const float& amount)
     header.save(&writer);
 
     {
-        u32 edge_offset = graph().vertices().size() * sizeof(CGameGraph::CVertex);
+        u32 edge_offset = graph().vertices().size() * sizeof(CGameGraph::CGameVertex);
 
         for (const auto &i: graph().vertices())
         {
-            CGameGraph::CVertex& vertex = i.second->data();
+            CGameGraph::CGameVertex& vertex = i.second->data();
 
             VERIFY(i.second->edges().size() < 256);
             vertex.tNeighbourCount = (u8)i.second->edges().size();
             vertex.dwEdgeOffset = edge_offset;
             edge_offset += vertex.tNeighbourCount * sizeof(CGameGraph::CEdge);
 
-            writer.w(&vertex, sizeof(CGameGraph::CVertex));
+            writer.w(&vertex, sizeof(CGameGraph::CGameVertex));
         }
     }
 

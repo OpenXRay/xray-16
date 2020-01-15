@@ -21,7 +21,7 @@ protected:
         inherited;
 
 protected:
-    const _Graph::CVertex* goal_vertex;
+    const _Graph::CGameVertex* goal_vertex;
 
 public:
     virtual ~CPathManager();

@@ -19,13 +19,13 @@ const CGameGraph* get_game_graph() { return &GEnv.AISpace->game_graph(); }
 const CGameGraph::CHeader* get_header(const CGameGraph* self_) { return (&self_->header()); }
 bool get_accessible1(const CGameGraph* self_, const u32& vertex_id) { return (self_->accessible(vertex_id)); }
 void get_accessible2(const CGameGraph* self_, const u32& vertex_id, bool value) { self_->accessible(vertex_id, value); }
-Fvector CVertex__level_point(const CGameGraph::CVertex* vertex)
+Fvector CVertex__level_point(const CGameGraph::CGameVertex* vertex)
 {
     THROW(vertex);
     return (vertex->level_point());
 }
 
-Fvector CVertex__game_point(const CGameGraph::CVertex* vertex)
+Fvector CVertex__game_point(const CGameGraph::CGameVertex* vertex)
 {
     THROW(vertex);
     return (vertex->game_point());
@@ -38,7 +38,7 @@ GameGraph::LEVEL_MAP const& get_levels(CGameGraph const* graph)
 }
 
 SCRIPT_EXPORT(CGameGraph, (), {
-    typedef CGameGraph::CVertex CVertex;
+    typedef CGameGraph::CGameVertex CGameVertex;
     module(luaState)[class_<GameGraph::LEVEL_MAP::value_type>("GameGraph__LEVEL_MAP__value_type")
                          .def_readonly("id", &GameGraph::LEVEL_MAP::value_type::first)
                          .def_readonly("level", &GameGraph::LEVEL_MAP::value_type::second),
@@ -53,9 +53,9 @@ SCRIPT_EXPORT(CGameGraph, (), {
             .def("vertex_id", &CGameGraph::vertex_id)
             .def("levels", &get_levels, return_stl_iterator()),
 
-        class_<CVertex>("GameGraph__CVertex")
+        class_<CGameVertex>("GameGraph__CVertex")
             .def("level_point", &CVertex__level_point)
             .def("game_point", &CVertex__game_point)
-            .def("level_id", &CVertex::level_id)
-            .def("level_vertex_id", &CVertex::level_vertex_id)];
+            .def("level_id", &CGameVertex::level_id)
+            .def("level_vertex_id", &CGameVertex::level_vertex_id)];
 });
