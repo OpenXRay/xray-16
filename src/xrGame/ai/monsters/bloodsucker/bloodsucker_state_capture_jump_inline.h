@@ -11,7 +11,7 @@
 TEMPLATE_SPECIALIZATION
 CStateCaptureJumpBloodsuckerAbstract::CStateCaptureJumpBloodsucker(_Object* obj) : inherited(obj)
 {
-    add_state(eStateCustom, new CStateMonsterCustomAction<_Object>(obj));
+    this->add_state(eStateCustom, new CStateMonsterCustomAction<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION
