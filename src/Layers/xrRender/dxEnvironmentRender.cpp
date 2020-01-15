@@ -143,15 +143,33 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
         if (HW.Caps.raster_major >= 3 && HW.Caps.geometry.bVTF)
         {
             // tonemapping in VS
-            mixRen.sky_r_textures.push_back(std::make_pair(u32(CTexture::rstVertex), tonemap)); //. hack
-            mixRen.sky_r_textures_env.push_back(std::make_pair(u32(CTexture::rstVertex), tonemap)); //. hack
-            mixRen.clouds_r_textures.push_back(std::make_pair(u32(CTexture::rstVertex), tonemap)); //. hack
+            /*
+             * This hack relies on assumption that `s_tonemap` sampler is
+             * only or the very first sampler in the VS. This is ok in case
+             * of DX, but OGL counts uniforms contiguousy disregarding their
+             * types.
+             * The w/a here is to skip VS uniforms in order to get
+             * correct sampler location.
+             */
+#ifdef USE_OGL
+            const u32 smp_location_sky = CTexture::rstVertex + 1 /* m_WVP */;
+            const u32 smp_location_clouds = CTexture::rstVertex + 1 /* m_WVP */;
+#else
+            const u32 smp_location_sky = CTexture::rstVertex;
+            const u32 smp_location_clouds = CTexture::rstVertex;
+#endif
+            mixRen.sky_r_textures.push_back(std::make_pair(smp_location_sky, tonemap)); //. hack
+            mixRen.clouds_r_textures.push_back(std::make_pair(smp_location_clouds, tonemap)); //. hack
         }
         else
         {
             // tonemapping in PS
+            /*
+             * Note: `2` here is a dangerous assumption that previous samplers
+             * (0 and 1) are defined in the shader and there are no other uniforms
+             * before the `s_tonemap` in the case of OGL.
+             */
             mixRen.sky_r_textures.push_back(std::make_pair(2, tonemap)); //. hack
-            mixRen.sky_r_textures_env.push_back(std::make_pair(2, tonemap)); //. hack
             mixRen.clouds_r_textures.push_back(std::make_pair(2, tonemap)); //. hack
         }
     }
