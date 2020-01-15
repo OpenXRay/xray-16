@@ -362,7 +362,9 @@ IC void CProblemSolverAbstract::solve()
     m_solution_changed = true;
     m_current_state.clear();
 
-    m_failed = !ai().graph_engine().search(*this, reverse_search ? target_state() : current_state(),
+    // Call to ai() was replaced with GEnv.AISpace
+    // XXX: looks bad!
+    m_failed = !GEnv.AISpace->graph_engine().search(*this, reverse_search ? target_state() : current_state(),
         reverse_search ? current_state() : target_state(), &m_solution,
         GraphEngineSpace::CSolverBaseParameters(
             GraphEngineSpace::_solver_dist_type(-1), GraphEngineSpace::_solver_condition_type(-1), 8000));
