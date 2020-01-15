@@ -63,8 +63,8 @@ void CMapLocationRegistry::save(IWriter& stream)
     for (; I != E; ++I)
     {
         u32 size = 0;
-        Locations::iterator i = (*I).second.begin();
-        Locations::iterator e = (*I).second.end();
+        vLocations::iterator i = (*I).second.begin();
+        vLocations::iterator e = (*I).second.end();
         for (; i != e; ++i)
         {
             VERIFY((*i).location);
@@ -249,7 +249,7 @@ void CMapManager::DisableAllPointers()
         (*it).location->DisablePointer();
 }
 
-Locations& CMapManager::Locations()
+vLocations& CMapManager::Locations()
 {
     if (!m_locations)
     {

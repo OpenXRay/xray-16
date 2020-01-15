@@ -9,14 +9,14 @@ class CMapLocation;
 class CMapManager
 {
     CMapLocationWrapper* m_locations_wrapper;
-    Locations* m_locations;
+    vLocations* m_locations;
     xr_vector<CMapLocation*> m_deffered_destroy_queue;
 
 public:
     CMapManager();
     ~CMapManager();
     void __stdcall Update();
-    /*ICF */ Locations& Locations(); //{return *m_locations;}
+    /*ICF */ vLocations& Locations(); //{return *m_locations;}
     CMapLocation* AddMapLocation(const shared_str& spot_type, u16 id);
     CMapLocation* AddRelationLocation(CInventoryOwner* pInvOwner);
     void RemoveMapLocation(const shared_str& spot_type, u16 id);

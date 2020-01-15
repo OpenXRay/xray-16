@@ -467,7 +467,7 @@ void CUILevelMap::UpdateSpots()
     if (FALSE == MapWnd()->ActiveMapRect().intersected(_r))
         return;
 
-    Locations& ls = Level().MapManager().Locations();
+    vLocations& ls = Level().MapManager().Locations();
     auto it = ls.begin();
     auto it_e = ls.end();
 
@@ -573,7 +573,7 @@ void CUIMiniMap::Init_internal(const shared_str& name, CInifile& pLtx, const sha
 void CUIMiniMap::UpdateSpots()
 {
     DetachAll();
-    Locations& ls = Level().MapManager().Locations();
+    vLocations& ls = Level().MapManager().Locations();
     for (auto it = ls.begin(); it != ls.end(); ++it)
         (*it).location->UpdateMiniMap(this);
 }
