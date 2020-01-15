@@ -192,8 +192,8 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     }
 
 #ifdef DEBUG
-    GameMaps::iterator it = m_GameMaps.begin();
-    GameMaps::iterator it2;
+    GAME_MAPS::iterator it = m_GameMaps.begin();
+    GAME_MAPS::iterator it2;
     for (; it != m_GameMaps.end(); ++it)
     {
         CUILevelMap* l = smart_cast<CUILevelMap*>(it->second);
@@ -234,7 +234,7 @@ void CUIMapWnd::Show(bool status)
         m_GlobalMap->DetachAll();
         m_GlobalMap->Show(false);
     }
-    GameMaps::iterator it = m_GameMaps.begin();
+    GAME_MAPS::iterator it = m_GameMaps.begin();
     for (; it != m_GameMaps.end(); ++it)
     {
         it->second->DetachAll();
@@ -244,8 +244,8 @@ void CUIMapWnd::Show(bool status)
     {
         m_GlobalMap->Show(true);
         m_GlobalMap->WorkingArea().set(ActiveMapRect());
-        GameMaps::iterator it = m_GameMaps.begin();
-        GameMaps::iterator it_e = m_GameMaps.end();
+        GAME_MAPS::iterator it = m_GameMaps.begin();
+        GAME_MAPS::iterator it_e = m_GameMaps.end();
         for (; it != it_e; ++it)
         {
             m_GlobalMap->AttachChild(it->second);

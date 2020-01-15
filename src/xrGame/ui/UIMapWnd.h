@@ -20,7 +20,7 @@ class CGameTask;
 class CUIXml;
 class UIHint;
 
-using GameMaps = xr_map<shared_str, CUICustomMap*>;
+using GAME_MAPS = xr_map<shared_str, CUICustomMap*>;
 
 class CUIMapWnd : public CUIWindow, public CUIWndCallback
 {
@@ -35,7 +35,7 @@ private:
 
     float m_currentZoom;
     CUIGlobalMap* m_GlobalMap;
-    GameMaps m_GameMaps;
+    GAME_MAPS m_GameMaps;
 
     CUIFrameWindow* m_UIMainFrame;
     bool m_scroll_mode;
@@ -157,7 +157,7 @@ public:
     void AddMapToRender(CUICustomMap*);
     void RemoveMapToRender(CUICustomMap*);
     CUIGlobalMap* GlobalMap() { return m_GlobalMap; }
-    const GameMaps& GameMaps() { return m_GameMaps; }
+    const GAME_MAPS& GameMaps() { return m_GameMaps; }
     CUICustomMap* GetMapByIdx(u16 idx);
     u16 GetIdxByName(const shared_str& map_name);
     void UpdateScroll();
