@@ -7,7 +7,7 @@ namespace LevelGraph
 class CLevelGraphManager
 {
     bool compatibilityMode;
-    xr_vector<CVertex*> m_nodes; // nodes array
+    xr_vector<CLevelVertex*> m_nodes; // nodes array
 
 public:
     CLevelGraphManager(IReader* stream, size_t vertex_count, u32 version)
@@ -17,10 +17,10 @@ public:
         {
             compatibilityMode = true;
             NodeCompressedOld* nodes = static_cast<NodeCompressedOld*>(stream->pointer());
-            CVertex* newNodes = new CVertex[vertex_count];
+            CLevelVertex* newNodes = new CLevelVertex[vertex_count];
             for (size_t i = 0; i < vertex_count; ++i)
             {
-                CVertex& vertex = newNodes[i];
+                CLevelVertex& vertex = newNodes[i];
                 NodeCompressed& newNode = vertex;
                 NodeCompressedOld& oldNode = nodes[i];
 
@@ -36,8 +36,8 @@ public:
         else
         {
             compatibilityMode = false;
-            CVertex* begin = static_cast<CVertex*>(stream->pointer());
-            CVertex* end = begin + vertex_count;
+            CLevelVertex* begin = static_cast<CLevelVertex*>(stream->pointer());
+            CLevelVertex* end = begin + vertex_count;
             for (size_t i = 0; begin != end; ++begin, ++i)
             {
                 m_nodes[i] = begin;
@@ -55,8 +55,8 @@ public:
         m_nodes.clear();
     }
 
-    [[nodiscard]] CVertex* front() { return m_nodes.front(); }
-    [[nodiscard]] CVertex* back() { return m_nodes.back(); }
+    [[nodiscard]] CLevelVertex* front() { return m_nodes.front(); }
+    [[nodiscard]] CLevelVertex* back() { return m_nodes.back(); }
 
     [[nodiscard]] auto begin() { return m_nodes.begin(); }
     [[nodiscard]] auto end() { return m_nodes.end(); }
@@ -64,10 +64,10 @@ public:
     [[nodiscard]] auto cbegin() const { return m_nodes.cbegin(); }
     [[nodiscard]] auto cend() const { return m_nodes.cend(); }
 
-    [[nodiscard]] CVertex* at(size_t id) { VERIFY(id < size()); return m_nodes[id]; }
-    [[nodiscard]] CVertex* operator[](size_t id) { return m_nodes[id]; }
+    [[nodiscard]] CLevelVertex* at(size_t id) { VERIFY(id < size()); return m_nodes[id]; }
+    [[nodiscard]] CLevelVertex* operator[](size_t id) { return m_nodes[id]; }
     
-    [[nodiscard]] CVertex* operator+(size_t id) { return m_nodes[id]; }
+    [[nodiscard]] CLevelVertex* operator+(size_t id) { return m_nodes[id]; }
 
     [[nodiscard]] bool empty() const { return m_nodes.empty(); }
     [[nodiscard]] size_t size() const { return m_nodes.size(); }

@@ -32,11 +32,11 @@ IC void CLevelPathManager::setup(const _Graph* _graph, _DataStorage* _data_stora
 TEMPLATE_SPECIALIZATION
 IC void CLevelPathManager::init()
 {
-    const _Graph::CVertex& tNode1 = *(this->graph->vertex(this->start_node_index));
+    const _Graph::CLevelVertex& tNode1 = *(this->graph->vertex(this->start_node_index));
     this->graph->unpack_xz(tNode1, x2, z2);
     //		y2						= (float)(tNode1.position().y());
 
-    const _Graph::CVertex& tNode2 = *(this->graph->vertex(this->goal_node_index));
+    const _Graph::CLevelVertex& tNode2 = *(this->graph->vertex(this->goal_node_index));
     this->graph->unpack_xz(tNode2, x3, z3);
     //		y3						= (float)(tNode2.position().y());
     x1 = x2;
@@ -50,7 +50,7 @@ IC _dist_type CLevelPathManager::evaluate(
 {
     VERIFY(this->graph);
 
-    //		const _Graph::CVertex	&tNode1 = *graph->vertex(node_index2);
+    //		const _Graph::CLevelVertex	&tNode1 = *graph->vertex(node_index2);
 
     //		y2						= (float)(tNode1.position().y());
 

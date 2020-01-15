@@ -210,9 +210,9 @@ inline bool is_valid_point_to_move(Fvector const& point, u32* out_vertex)
     }
 
     CLevelGraph::CPosition vertex_pos = ai().level_graph().vertex_position(point);
-    CLevelGraph::CVertex* B = ai().level_graph().vertices();
-    CLevelGraph::CVertex* E = B + ai().level_graph().header().vertex_count();
-    CLevelGraph::CVertex* I = std::lower_bound(B, E, vertex_pos.xz());
+    CLevelGraph::CLevelVertex* B = ai().level_graph().vertices();
+    CLevelGraph::CLevelVertex* E = B + ai().level_graph().header().vertex_count();
+    CLevelGraph::CLevelVertex* I = std::lower_bound(B, E, vertex_pos.xz());
 
     for (; (I != E) && ((*I).position().xz() == vertex_pos.xz()); ++I)
     {

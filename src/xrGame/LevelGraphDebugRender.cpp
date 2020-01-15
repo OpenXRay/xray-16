@@ -743,7 +743,7 @@ void LevelGraphDebugRender::DrawCovers()
         Fvector pos = coverPoint->position();
         pos.y += 1.5f;
         debugRenderer.draw_aabb(pos, halfSize - 0.01f, 1.f, halfSize - 0.01f, color_xrgb(0, 255, 0));
-        CLevelGraph::CVertex* v = levelGraph->vertex(coverPoint->level_vertex_id());
+        CLevelGraph::CLevelVertex* v = levelGraph->vertex(coverPoint->level_vertex_id());
         Fvector dir;
         float bestValue = -1;
         u32 j = 0;

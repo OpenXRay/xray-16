@@ -37,7 +37,7 @@ CCoverManager::~CCoverManager()
 
 IC bool CCoverManager::edge_vertex(u32 index) const
 {
-    CLevelGraph::CVertex* v = ai().level_graph().vertex(index);
+    CLevelGraph::CLevelVertex* v = ai().level_graph().vertex(index);
     return ((!ai().level_graph().valid_vertex_id(v->link(0)) && (v->high_cover(0) < MIN_COVER_VALUE)) ||
         (!ai().level_graph().valid_vertex_id(v->link(1)) && (v->high_cover(1) < MIN_COVER_VALUE)) ||
         (!ai().level_graph().valid_vertex_id(v->link(2)) && (v->high_cover(2) < MIN_COVER_VALUE)) ||
@@ -48,14 +48,14 @@ IC bool CCoverManager::edge_vertex(u32 index) const
         (!ai().level_graph().valid_vertex_id(v->link(3)) && (v->low_cover(3) < MIN_COVER_VALUE)));
 }
 
-IC bool CCoverManager::cover(CLevelGraph::CVertex* v, u32 index0, u32 index1) const
+IC bool CCoverManager::cover(CLevelGraph::CLevelVertex* v, u32 index0, u32 index1) const
 {
     return (ai().level_graph().valid_vertex_id(v->link(index0)) &&
         ai().level_graph().valid_vertex_id(ai().level_graph().vertex(v->link(index0))->link(index1)) &&
         m_temp[ai().level_graph().vertex(v->link(index0))->link(index1)]);
 }
 
-IC bool CCoverManager::critical_point(CLevelGraph::CVertex* v, u32 index, u32 index0, u32 index1) const
+IC bool CCoverManager::critical_point(CLevelGraph::CLevelVertex* v, u32 index, u32 index0, u32 index1) const
 {
     return (!ai().level_graph().valid_vertex_id(v->link(index)) &&
         (!ai().level_graph().valid_vertex_id(v->link(index0)) || !ai().level_graph().valid_vertex_id(v->link(index1)) ||
@@ -64,7 +64,7 @@ IC bool CCoverManager::critical_point(CLevelGraph::CVertex* v, u32 index, u32 in
 
 IC bool CCoverManager::critical_cover(u32 index) const
 {
-    CLevelGraph::CVertex* v = ai().level_graph().vertex(index);
+    CLevelGraph::CLevelVertex* v = ai().level_graph().vertex(index);
     return (critical_point(v, 0, 1, 3) || critical_point(v, 2, 1, 3) || critical_point(v, 1, 0, 2) ||
         critical_point(v, 3, 0, 2));
 }
@@ -82,7 +82,7 @@ void CCoverManager::compute_static_cover()
     
     FOR_START(u32, 0, levelVertexCount, i)
         {
-            const CLevelGraph::CVertex& vertex = *graph.vertex(i);
+            const CLevelGraph::CLevelVertex& vertex = *graph.vertex(i);
             if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3))
             {
                 m_temp[i] = edge_vertex(i);

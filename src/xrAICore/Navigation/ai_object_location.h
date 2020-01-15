@@ -12,7 +12,7 @@
 
 namespace LevelGraph
 {
-class CVertex;
+class CLevelVertex;
 };
 
 class CAI_ObjectLocation
@@ -20,7 +20,7 @@ class CAI_ObjectLocation
 public:
     using _GRAPH_ID = GameGraph::_GRAPH_ID;
     using CVertex = GameGraph::CVertex;
-    using CLevelVertex = LevelGraph::CVertex;
+    using CLevelVertex = LevelGraph::CLevelVertex;
 
 private:
     u32 m_level_vertex_id;

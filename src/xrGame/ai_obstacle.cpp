@@ -44,7 +44,7 @@ public:
         m_level_graph = &ai().level_graph();
     }
 
-    IC void operator()(const CLevelGraph::CVertex& vertex) const
+    IC void operator()(const CLevelGraph::CLevelVertex& vertex) const
     {
         u32 vertex_id = m_level_graph->vertex_id(&vertex);
         if (!m_object->inside(vertex_id))

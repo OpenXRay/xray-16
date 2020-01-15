@@ -83,7 +83,7 @@ u32 CLevelGraph::VertexInternal(u32 current_node_id, const Fvector& position) co
             if (valid_vertex_id(current_node_id))
             {
                 {
-                    CVertex const& vertex = *this->vertex(current_node_id);
+                    CLevelVertex const& vertex = *this->vertex(current_node_id);
                     for (u32 i = 0; i < 4; ++i)
                     {
                         if (vertex.link(i) == _vertex_id)
@@ -93,7 +93,7 @@ u32 CLevelGraph::VertexInternal(u32 current_node_id, const Fvector& position) co
                     }
                 }
                 {
-                    CVertex const& vertex = *this->vertex(_vertex_id);
+                    CLevelVertex const& vertex = *this->vertex(_vertex_id);
                     for (u32 i = 0; i < 4; ++i)
                     {
                         if (vertex.link(i) == current_node_id)
@@ -197,9 +197,9 @@ u32 CLevelGraph::vertex_id(const Fvector& position) const
         make_string("invalid position for CLevelGraph::vertex_id specified: [%f][%f][%f]", VPUSH(position)));
 
     CPosition _vertex_position = vertex_position(position);
-    CVertex* B = m_nodes->front();
-    CVertex* E = m_nodes->back();
-    CVertex* I = std::lower_bound(B, E, _vertex_position.xz());
+    CLevelVertex* B = m_nodes->front();
+    CLevelVertex* E = m_nodes->back();
+    CLevelVertex* I = std::lower_bound(B, E, _vertex_position.xz());
     if ((I == E) || ((*I).position().xz() != _vertex_position.xz()))
         return (u32(-1));
 
@@ -268,8 +268,8 @@ u32 CLevelGraph::guess_vertex_id(u32 const& current_vertex_id, Fvector const& po
     float result_distance = nearest(best_point, position, vertex_contour);
     u32 result_vertex_id = current_vertex_id;
 
-    CVertex const* B = m_nodes->front();
-    CVertex const* E = m_nodes->back();
+    CLevelVertex const* B = m_nodes->front();
+    CLevelVertex const* E = m_nodes->back();
     u32 start_x = (u32)std::max(0, int(x) - max_guess_vertex_count);
     u32 stop_x = std::min(max_x(), x + (u32)max_guess_vertex_count);
     u32 start_z = (u32)std::max(0, int(z) - max_guess_vertex_count);
@@ -279,7 +279,7 @@ u32 CLevelGraph::guess_vertex_id(u32 const& current_vertex_id, Fvector const& po
         for (u32 j = start_z; j <= stop_z; ++j)
         {
             u32 test_xz = i * m_row_length + j;
-            CVertex const* I = std::lower_bound(B, E, test_xz);
+            CLevelVertex const* I = std::lower_bound(B, E, test_xz);
             if (I == E)
                 continue;
 

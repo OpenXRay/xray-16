@@ -1711,7 +1711,7 @@ void CAI_Stalker::OnRender()
 
         if (ai().level_graph().valid_vertex_id(level_vertex_id))
         {
-            LevelGraph::CVertex* v = ai().level_graph().vertex(level_vertex_id);
+            LevelGraph::CLevelVertex* v = ai().level_graph().vertex(level_vertex_id);
 
             // high
             Fvector direction;

@@ -124,7 +124,7 @@ void CSightManager::SetDirectionLook()
     object().movement().m_body.target = object().movement().m_head.target;
 }
 
-void CSightManager::SetLessCoverLook(const CLevelGraph::CVertex* tpNode, bool bDifferenceLook)
+void CSightManager::SetLessCoverLook(const CLevelGraph::CLevelVertex* tpNode, bool bDifferenceLook)
 {
     SetDirectionLook();
 
@@ -134,13 +134,13 @@ void CSightManager::SetLessCoverLook(const CLevelGraph::CVertex* tpNode, bool bD
     SetLessCoverLook(tpNode, MAX_HEAD_TURN_ANGLE, bDifferenceLook);
 }
 
-void CSightManager::SetLessCoverLook(const CLevelGraph::CVertex* tpNode, float fMaxHeadTurnAngle, bool bDifferenceLook)
+void CSightManager::SetLessCoverLook(const CLevelGraph::CLevelVertex* tpNode, float fMaxHeadTurnAngle, bool bDifferenceLook)
 {
     float fAngleOfView, range, fMaxSquare = -1.f, fBestAngle = object().movement().m_head.target.yaw;
     m_object->update_range_fov(range, fAngleOfView, m_object->eye_range, m_object->eye_fov);
     fAngleOfView = (fAngleOfView / 180.f * PI) / 2.f;
 
-    CLevelGraph::CVertex* tpNextNode = 0;
+    CLevelGraph::CLevelVertex* tpNextNode = 0;
     u32 node_id;
     bool bOk = false;
     if (bDifferenceLook && !m_object->movement().detail().path().empty() &&

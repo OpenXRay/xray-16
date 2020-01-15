@@ -11,7 +11,7 @@
 #include "game_level_cross_table.h"
 #include "xrCore/_fbox2.h"
 
-float CLevelGraph::distance(const Fvector& position, const CLevelGraph::CVertex* vertex) const
+float CLevelGraph::distance(const Fvector& position, const CLevelGraph::CLevelVertex* vertex) const
 {
     SContour _contour;
     contour(_contour, vertex);
@@ -280,7 +280,7 @@ u32 CLevelGraph::check_position_in_direction_slow(
             u32 next_vertex_id = value(cur_vertex_id, I);
             if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
                 continue;
-            CVertex* v = vertex(next_vertex_id);
+            CLevelVertex* v = vertex(next_vertex_id);
             unpack_xz(v, temp.x, temp.y);
             box.min = box.max = temp;
             box.grow(identity);
@@ -418,7 +418,7 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2& star
             u32 next_vertex_id = value(cur_vertex_id, I);
             if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
                 continue;
-            CVertex* v = vertex(next_vertex_id);
+            CLevelVertex* v = vertex(next_vertex_id);
             unpack_xz(v, temp.x, temp.y);
             box.min = box.max = temp;
             box.grow(identity);
