@@ -96,7 +96,7 @@ inline bool CGraphEngine::search(const CProblemSolver<T1, T2, T3, T4, T5, T6, T7
 {
     ScopeLock scope(&m_lock);
     START_PROFILE("graph_engine")
-    START_PROFILE("graph_engine/proble_solver")
+    START_PROFILE("graph_engine/problem_solver")
     PathTimer.Begin();
     using CSProblemSolver = CProblemSolver<T1, T2, T3, T4, T5, T6, T7, T8>;
     using CSolverPathManager = CPathManager<CSProblemSolver, CSolverAlgorithm::CDataStorage, _Parameters,
