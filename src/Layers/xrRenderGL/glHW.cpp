@@ -96,12 +96,15 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &iMaxVTFUnits);
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &iMaxCTIUnits);
 
+    glGetIntegerv(GL_MAJOR_VERSION, &(std::get<0>(OpenGLVersion)));
+    glGetIntegerv(GL_MINOR_VERSION, &(std::get<1>(OpenGLVersion)));
+
     AdapterName = reinterpret_cast<pcstr>(glGetString(GL_RENDERER));
-    OpenGLVersion = reinterpret_cast<pcstr>(glGetString(GL_VERSION));
+    OpenGLVersionString = reinterpret_cast<pcstr>(glGetString(GL_VERSION));
     ShadingVersion = reinterpret_cast<pcstr>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     Msg("* GPU vendor: [%s] device: [%s]", glGetString(GL_VENDOR), AdapterName);
-    Msg("* GPU OpenGL version: %s", OpenGLVersion);
+    Msg("* GPU OpenGL version: %s", OpenGLVersionString);
     Msg("* GPU OpenGL shading language version: %s", ShadingVersion);
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
