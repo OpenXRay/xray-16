@@ -271,7 +271,7 @@ void item_respawn_manager::add_new_rpoint(shared_str profile_sect, RPoint const&
         else
         {
 #ifndef MASTER_GOLD
-            Msg("! ERROR: failed to create entity [%s] with addons [%d]", iter_rsect->section_name, iter_rsect->addons);
+            Msg("! ERROR: failed to create entity [%s] with addons [%d]", iter_rsect->section_name.c_str(), iter_rsect->addons);
 #endif // #ifndef MASTER_GOLD
         }
     }
