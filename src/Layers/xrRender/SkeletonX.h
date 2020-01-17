@@ -137,15 +137,4 @@ BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result&
     return FALSE;
 }
 
-template <typename T>
-BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
-    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
-{
-    void* data = static_cast<BYTE*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true)); // read-back
-    T* vertices = static_cast<T*>(data);
-    bool intersect = !!pick_bone<T, T*>(vertices, Parent, r, dist, S, D, indices, faces);
-    V->p_rm_Vertices->Unmap();
-    return intersect;
-}
-
 #endif // SkeletonXH
