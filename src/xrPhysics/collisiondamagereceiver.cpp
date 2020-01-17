@@ -52,7 +52,7 @@ void DamageReceiverCollisionCallback(bool& do_colide, bool bo1, dContact& c, SGa
 }
 
 void BreakableObjectCollisionCallback(
-    bool& /**do_colide/**/, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+    bool& /**do_colide**/, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
 {
     dxGeomUserData* usr_data_1 = retrieveGeomUserData(c.geom.g1);
     dxGeomUserData* usr_data_2 = retrieveGeomUserData(c.geom.g2);

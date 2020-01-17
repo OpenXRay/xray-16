@@ -23,6 +23,8 @@
 #include "Actor.h"
 #include "ai/monsters/basemonster/base_monster.h"
 
+extern ENGINE_API int ps_r__WallmarksOnSkeleton;
+
 //константы ShootFactor, определяющие
 //поведение пули при столкновении с объектом
 // XXX: review
@@ -57,7 +59,7 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* obj
             CActor* actor = smart_cast<CActor*>(entity);
             CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(entity);
             // в кого попали?
-            if (actor && IsGameTypeSingle() /**/ || stalker /**/)
+            if (actor && IsGameTypeSingle() || stalker)
             {
                 // попали в актера или сталкера
                 Fsphere S = cform->getSphere();
@@ -173,7 +175,7 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
     SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(bullet->bullet_material_idx, target_material);
     Fvector particle_dir = vNormal;
 
-    if (R.O)
+    if (R.O && ps_r__WallmarksOnSkeleton)
     {
         particle_dir = vDir;
         particle_dir.invert();

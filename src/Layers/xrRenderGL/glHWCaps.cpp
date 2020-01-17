@@ -6,7 +6,10 @@
 
 namespace
 {
-u32 GetGpuNum() { return 1; }
+u32 GetGpuNum()
+{
+    return 2;
+}
 }
 
 void CHWCaps::Update()
@@ -22,11 +25,9 @@ void CHWCaps::Update()
     geometry.dwRegisters = cnt;
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(6, 15);
-
-    // XXX: Disabled by default. Need to:
-    // FIX: Sky texture filtering (point filter now) when VTF is on
-    // TODO: Implement support VTF and: HW.support(D3DFMT_R32F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_VERTEXTEXTURE)
-    geometry.bVTF = (strstr(Core.Params, "-vtf")) ? TRUE : FALSE;
+    geometry.bVTF =
+        (HW.OpenGLVersion >= std::make_pair(3, 0) || GLEW_ARB_texture_float)
+        && !strstr(Core.Params, "-novtf");
 
     // ***************** PIXEL processing
     raster_major = 4;

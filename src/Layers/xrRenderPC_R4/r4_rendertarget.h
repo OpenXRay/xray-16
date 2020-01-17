@@ -49,7 +49,6 @@ public:
     IBlender* b_accum_reflected_msaa[8];
     IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
-    IBlender* b_fxaa;
 
     // compute shader for hdao
     IBlender* b_hdao_cs;
@@ -127,10 +126,6 @@ private:
     ref_shader s_ssao_msaa[8];
     ref_shader s_hdao_cs;
     ref_shader s_hdao_cs_msaa;
-
-    //FXAA
-    ref_shader s_fxaa;
-    ref_geom g_fxaa;
 
     // Accum
     ref_shader s_accum_mask;
@@ -266,7 +261,6 @@ public:
     void phase_occq();
     void phase_ssao();
     void phase_hdao();
-    void phase_fxaa();
     void phase_downsamp();
     void phase_wallmarks();
     void phase_smap_direct(light* L, u32 sub_phase);

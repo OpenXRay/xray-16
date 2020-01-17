@@ -12,10 +12,10 @@
 #define PUSH(a) *stack_iterator++ = (a)
 #define POP() vertex = *--stack_iterator
 
-void floodfill(const CLevelGraph& level_graph, CLevelGraph::CVertex** stack_storage, xr_vector<bool>& marks, const u32 start_vertex_id)
+void floodfill(const CLevelGraph& level_graph, CLevelGraph::CLevelVertex** stack_storage, xr_vector<bool>& marks, const u32 start_vertex_id)
 {
-    CLevelGraph::CVertex** stack_iterator = stack_storage;
-    CLevelGraph::CVertex* vertex = nullptr;
+    CLevelGraph::CLevelVertex** stack_iterator = stack_storage;
+    CLevelGraph::CLevelVertex* vertex = nullptr;
     PUSH(level_graph.vertex(start_vertex_id));
     while (stack_iterator != stack_storage)
     {
@@ -113,7 +113,7 @@ void verify_level_graph(LPCSTR name, bool verbose)
     }
 
     Logger.Progress(0.15f);
-    CLevelGraph::CVertex** stack_storage = (CLevelGraph::CVertex**)xr_malloc(level_graph.header().vertex_count() * sizeof(CLevelGraph::CVertex*));
+    CLevelGraph::CLevelVertex** stack_storage = (CLevelGraph::CLevelVertex**)xr_malloc(level_graph.header().vertex_count() * sizeof(CLevelGraph::CLevelVertex*));
     xr_vector<bool> marks;
     bool valid = true;
     for (auto &i : single_links)

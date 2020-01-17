@@ -110,7 +110,7 @@ public:
 
     virtual void OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender);
 
-    virtual void OnTeamScore(u32 /**team/**/, bool); // команда выиграла
+    virtual void OnTeamScore(u32 /**team**/, bool); // команда выиграла
     virtual void OnTeamsInDraw(){}; // ничья
 
     // Events

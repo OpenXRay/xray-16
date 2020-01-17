@@ -239,7 +239,7 @@ void SPHBonesData::net_Load(NET_Packet& P)
     P.r_vec3(_mx);
     set_min_max(_mn, _mx);
 
-    u16 bones_number = P.r_u16(); // bones number /**/
+    u16 bones_number = P.r_u16(); // bones number
     for (int i = 0; i < bones_number; i++)
     {
         SPHNetState S;

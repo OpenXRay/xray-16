@@ -106,13 +106,13 @@ public:
     virtual bool TouchRestrictor(ERestrictionType rttype) = 0;
     virtual void SetElevator(IClimableObject* climable){};
     virtual void SetMaterial(u16 material) = 0;
-    virtual void SetMaximumVelocity(dReal /**vel/**/) {} //!!
+    virtual void SetMaximumVelocity(dReal /**vel**/) {} //!!
     virtual dReal GetMaximumVelocity() { return 0; }
-    virtual void SetJupmUpVelocity(dReal /**velocity/**/) {} //!!
-    virtual void IPosition(Fvector& /**pos/**/) {}
+    virtual void SetJupmUpVelocity(dReal /**velocity**/) {} //!!
+    virtual void IPosition(Fvector& /**pos**/) {}
     virtual u16 ContactBone() { return 0; }
-    virtual void DeathPosition(Fvector& /**deathPos/**/) {}
-    virtual void ApplyImpulse(const Fvector& /**dir/**/, const dReal /**P/**/) {}
+    virtual void DeathPosition(Fvector& /**deathPos**/) {}
+    virtual void ApplyImpulse(const Fvector& /**dir**/, const dReal /**P**/) {}
     virtual void ApplyForce(const Fvector& force) = 0;
     virtual void ApplyForce(const Fvector& dir, float force) = 0;
     virtual void ApplyForce(float x, float y, float z) = 0;
@@ -122,7 +122,7 @@ public:
     virtual EEnvironment CheckInvironment() = 0;
     virtual bool ContactWas() = 0;
     virtual void GroundNormal(Fvector& norm) = 0;
-    virtual void Create(dVector3 /**sizes/**/) = 0;
+    virtual void Create(dVector3 /**sizes**/) = 0;
     virtual void Destroy(void) = 0;
     virtual void SetBox(const dVector3& sizes) = 0;
     virtual void SetAcceleration(Fvector accel) = 0;
@@ -155,10 +155,10 @@ public:
     virtual void SetRestrictorRadius(ERestrictionType rtype, float r){};
     virtual IPhysicsShellHolder* PhysicsRefObject() { return m_phys_ref_object; }
     // AICharacter
-    virtual void GetDesiredPosition(Fvector& /**dpos/**/) {}
-    virtual void SetDesiredPosition(const Fvector& /**pos/**/) {}
-    virtual void BringToDesired(float /**time/**/, float /**velocity/**/, float force = 1.f) {}
-    virtual bool TryPosition(Fvector /**pos/**/, bool) { return false; }
+    virtual void GetDesiredPosition(Fvector& /**dpos**/) {}
+    virtual void SetDesiredPosition(const Fvector& /**pos**/) {}
+    virtual void BringToDesired(float /**time**/, float /**velocity**/, float force = 1.f) {}
+    virtual bool TryPosition(Fvector /**pos**/, bool) { return false; }
     virtual bool TouchBorder() { return false; }
     virtual void getForce(Fvector& force);
     virtual void setForce(const Fvector& force);

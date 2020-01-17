@@ -221,7 +221,7 @@ void CLevel::PrefetchSound(LPCSTR name)
 }
 
 // Game interface ////////////////////////////////////////////////////
-int CLevel::get_RPID(LPCSTR /**name/**/)
+int CLevel::get_RPID(LPCSTR /**name**/)
 {
     /*
     // Gain access to string
@@ -755,7 +755,7 @@ void CLevel::OnRender()
 #endif
 }
 
-void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2/**/)
+void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2**/)
 {
     if (E == eEntitySpawn)
     {

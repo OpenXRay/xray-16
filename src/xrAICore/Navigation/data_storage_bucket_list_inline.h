@@ -132,7 +132,7 @@ inline void CBucketList::add_to_bucket(typename TManagerDataStorage::Vertex& ver
     if (m_bucket_id < m_min_bucket_id)
         m_min_bucket_id = m_bucket_id;
     typename TManagerDataStorage::Vertex* i = m_buckets[m_bucket_id];
-    if (!i || !ClearBuckets && (i->m_path_id != this->current_path_id() || i->m_bucket_id != m_bucket_id))
+    if (!i || (!ClearBuckets && (i->m_path_id != this->current_path_id())) || (i->m_bucket_id != m_bucket_id))
     {
         vertex.m_bucket_id = m_bucket_id;
         vertex.m_path_id = this->current_path_id();

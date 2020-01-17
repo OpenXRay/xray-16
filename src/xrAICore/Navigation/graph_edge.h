@@ -30,7 +30,7 @@ public:
 };
 
 template <typename _edge_weight_type, typename _vertex_type, typename _edge_data_type>
-class CEdge : public CEdgeBase<_edge_weight_type, _vertex_type>
+class CGraphEdge : public CEdgeBase<_edge_weight_type, _vertex_type>
 {
     using inherited = CEdgeBase<_edge_weight_type, _vertex_type>;
 
@@ -39,24 +39,24 @@ class CEdge : public CEdgeBase<_edge_weight_type, _vertex_type>
 public:
     using _vertex_id_type = typename inherited::vertex_id_type;
 
-    IC CEdge(const _edge_weight_type& weight, _vertex_type* vertex);
+    IC CGraphEdge(const _edge_weight_type& weight, _vertex_type* vertex);
     IC bool operator==(const typename _vertex_type::vertex_id_type& vertex_id) const;
-    IC bool operator==(const CEdge& obj) const;
+    IC bool operator==(const CGraphEdge& obj) const;
     IC const _edge_data_type& data() const;
     IC _edge_data_type& data();
 };
 
 template <typename _edge_weight_type, typename _vertex_type>
-class CEdge<_edge_weight_type, _vertex_type, Loki::EmptyType> : public CEdgeBase<_edge_weight_type, _vertex_type>
+class CGraphEdge<_edge_weight_type, _vertex_type, Loki::EmptyType> : public CEdgeBase<_edge_weight_type, _vertex_type>
 {
     using inherited = CEdgeBase<_edge_weight_type, _vertex_type>;
 
 public:
     using _vertex_id_type = typename inherited::vertex_id_type;
 
-    IC CEdge(const _edge_weight_type& weight, _vertex_type* vertex);
+    IC CGraphEdge(const _edge_weight_type& weight, _vertex_type* vertex);
     IC bool operator==(const typename _vertex_type::vertex_id_type& vertex_id) const;
-    IC bool operator==(const CEdge& obj) const;
+    IC bool operator==(const CGraphEdge& obj) const;
 };
 
 #include "graph_edge_inline.h"

@@ -68,6 +68,8 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
                 continue;
 
             s16 bone_id = kinematics->LL_BoneID(i->first);
+            // TODO: fix that warning
+            // warning: result of comparison of constant 65535 with expression of type 's16' (aka 'short') is always true
             R_ASSERT2(BI_NONE != bone_id, i->first.c_str());
             m_bones_koeff.insert(std::make_pair(bone_id, BP));
         }
@@ -104,6 +106,8 @@ void SBoneProtections::add(const shared_str& bone_sect, IKinematics* kinematics)
         else
         {
             s16 bone_id = kinematics->LL_BoneID(i->first);
+            // TODO: fix that warning
+            // warning: result of comparison of constant 65535 with expression of type 's16' (aka 'short') is always true
             R_ASSERT2(BI_NONE != bone_id, i->first.c_str());
             BoneProtection& BP = m_bones_koeff[bone_id];
             BP.koeff += (float)atof(_GetItem(i->second.c_str(), 0, buffer));

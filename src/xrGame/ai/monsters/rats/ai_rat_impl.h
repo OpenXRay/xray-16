@@ -71,7 +71,7 @@ IC bool CAI_Rat::bfCheckIfSoundFrightful()
         ((m_tLastSound.eSoundType & SOUND_TYPE_WEAPON_SHOOTING) == SOUND_TYPE_WEAPON_SHOOTING));
 };
 
-IC void CAI_Rat::update_morale_broadcast(float const& fValue, float const& /**fRadius/**/)
+IC void CAI_Rat::update_morale_broadcast(float const& fValue, float const& /**fRadius**/)
 {
     CGroupHierarchyHolder& Group = Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group());
     for (int i = 0; i < (int)Group.members().size(); ++i)

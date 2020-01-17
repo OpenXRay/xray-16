@@ -24,7 +24,7 @@ public:
     typedef GameGraph::_LOCATION_ID _LOCATION_ID;
     typedef GameGraph::SLevel SLevel;
     typedef GameGraph::CEdge CEdge;
-    typedef GameGraph::CVertex CVertex;
+    typedef GameGraph::CGameVertex CGameVertex;
     typedef GameGraph::CHeader CHeader;
     typedef GameGraph::CLevelPoint CLevelPoint;
 
@@ -38,7 +38,7 @@ private:
     CHeader m_header;
     bool ownReader;
     IReader* m_reader;
-    CVertex* m_nodes;
+    CGameVertex* m_nodes;
     mutable ENABLED m_enabled;
     _GRAPH_ID m_current_level_some_vertex_id;
 
@@ -69,9 +69,9 @@ public:
     IC void begin_spawn(u32 vertex_id, const_spawn_iterator& start, const_spawn_iterator& end) const;
     IC const _GRAPH_ID& value(u32 vertex_id, const_iterator& i) const;
     IC const float& edge_weight(const_iterator i) const;
-    IC const CVertex* vertex(u32 vertex_id) const;
+    IC const CGameVertex* vertex(u32 vertex_id) const;
     IC void set_invalid_vertex(_GRAPH_ID& vertex_id) const;
-    IC _GRAPH_ID vertex_id(const CVertex* vertex) const;
+    IC _GRAPH_ID vertex_id(const CGameVertex* vertex) const;
     IC void set_current_level(u32 level_id);
     IC const _GRAPH_ID& current_level_vertex() const;
 };

@@ -58,7 +58,7 @@ void AISpaceBase::Validate(u32 levelId) const
     VERIFY(level_graph().header().vertex_count() == cross_table().header().level_vertex_count());
     for (GameGraph::_GRAPH_ID i = 0, n = game_graph().header().vertex_count(); i < n; i++)
     {
-        const GameGraph::CVertex& vertex = *game_graph().vertex(i);
+        const GameGraph::CGameVertex& vertex = *game_graph().vertex(i);
         if (levelId != vertex.level_id())
             continue;
         u32 vid = vertex.level_vertex_id();

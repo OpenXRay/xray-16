@@ -798,6 +798,7 @@ extern int ps_rs_loading_stages;
 ENGINE_API int ps_always_active = 0;
 
 ENGINE_API int ps_r__Supersample = 1;
+ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
 
 void CCC_Register()
 {
@@ -853,6 +854,7 @@ void CCC_Register()
 
     // Render device states
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
+    CMD4(CCC_Integer, "r__wallmarks_on_skeleton", &ps_r__WallmarksOnSkeleton, 0, 1);
 
     CMD4(CCC_Integer, "rs_loadingstages", &ps_rs_loading_stages, 0, 1);
     CMD1(CCC_VSync, "rs_v_sync"); // If you change the name, you also should change it in glHW.cpp in the OpenGL renderer

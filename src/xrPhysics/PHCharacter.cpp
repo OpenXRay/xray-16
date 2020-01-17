@@ -118,7 +118,7 @@ void CPHCharacter::Enable()
     dBodyEnable(m_body);
 }
 
-void CarHitCallback(bool& /**do_colide/**/, dContact& /**c/**/) {}
+void CarHitCallback(bool& /**do_colide**/, dContact& /**c**/) {}
 void CPHCharacter::GetSavedVelocity(Fvector& vvel)
 {
     if (IsEnabled())

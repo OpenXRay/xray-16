@@ -451,8 +451,7 @@ void CRender::BeforeFrame()
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;
     // MT-HOM (@front)
-    TaskScheduler->AddTask("CHOM::MT_RENDER", { &HOM, &CHOM::MT_RENDER },
-        { &Device, &CRenderDevice::IsMTProcessingAllowed });
+    Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
 }
 
 void CRender::OnFrame()
@@ -463,9 +462,8 @@ void CRender::OnFrame()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         // MT-details (@front)
-        TaskScheduler->AddTask("CDetailManager::MT_CALC",
-            { Details, &CDetailManager::MT_CALC },
-            { &HOM, &CHOM::MT_Synced });
+        Device.seqParallel.insert(
+            Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
     }
 }
 

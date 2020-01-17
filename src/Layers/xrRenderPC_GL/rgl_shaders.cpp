@@ -407,11 +407,6 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
         appendShaderOption(dof, "USE_DOF", "1");
     }
 
-    // FXAA
-    // SkyLoader: temporary added
-    appendShaderOption(ps_r2_fxaa, "USE_FXAA", "1");
-    // end
-
     // Sun shafts
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
@@ -563,7 +558,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
             file->r_string(shadingVer);
 
             if (0 == xr_strcmp(renderer.c_str(), HW.AdapterName) &&
-                0 == xr_strcmp(glVer.c_str(), HW.OpenGLVersion) &&
+                0 == xr_strcmp(glVer.c_str(), HW.OpenGLVersionString) &&
                 0 == xr_strcmp(shadingVer.c_str(), HW.ShadingVersion))
             {
                 const GLenum binaryFormat = file->r_u32();
@@ -606,7 +601,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
                 IWriter* file = FS.w_open(full_path);
 
                 file->w_string(HW.AdapterName);
-                file->w_string(HW.OpenGLVersion);
+                file->w_string(HW.OpenGLVersionString);
                 file->w_string(HW.ShadingVersion);
 
                 file->w_u32(binaryFormat);

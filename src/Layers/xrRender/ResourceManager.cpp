@@ -197,7 +197,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_HQ] = _CreateElement(E);
     }
 
     // Compile element	(LOD1)
@@ -206,7 +206,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_LQ] = _CreateElement(E);
     }
 
     // Compile element
@@ -215,7 +215,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LPOINT] = _CreateElement(E);
     }
 
     // Compile element
@@ -224,7 +224,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LSPOT] = _CreateElement(E);
     }
 
     // Compile element
@@ -233,7 +233,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = TRUE; //.$$$ HACK :)
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LMODELS] = _CreateElement(E);
     }
 
     // Compile element
@@ -242,7 +242,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = FALSE;
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[5] = _CreateElement(E);
     }
 
     // Search equal in shaders array
@@ -279,16 +279,28 @@ void CResourceManager::CompatibilityCheck()
     IReader* file = FS.r_open(shaderPath);
     R_ASSERT3(file, "Can't open skin.h shader", shaderPath);
 
-    cpcstr begin = strstr((cpcstr)file->pointer(), "v_model_skinned_1");
-    cpcstr end = strstr(begin, "POSITION");
+    // search for (12.f / 32768.f)
+    bool hq_skinning = true;
+    while (true)
+    {
+        pcstr begin = strstr((cpcstr)file->pointer(), "u_position");
+        if (!begin)
+            break;
 
-    xr_string str(begin, end);
-    if (strstr(str.data(), "float4"))
-        RImplementation.m_hq_skinning = true;
-    else if (strstr(str.data(), "int4"))
-        RImplementation.m_hq_skinning = false;
-    else
-        R_ASSERT2(0, "Custom skinning is unsupported. Please, correct this compatibility check manually");
+        cpcstr end = strstr(begin, "sbones_array");
+        if (!end)
+            break;
+
+        xr_string str(begin, end);
+        pcstr ptr = str.data();
+
+        if ((ptr = strstr(ptr, "12.f")))    // 12.f
+            if ((ptr = strstr(ptr, "/")))   // /
+                if (strstr(ptr, "32768.f")) // 32768.f
+                    hq_skinning = false;    // found
+        break;
+    }
+    RImplementation.m_hq_skinning = hq_skinning;
 
     FS.r_close(file);
 }

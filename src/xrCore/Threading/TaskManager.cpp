@@ -20,7 +20,6 @@ void TaskManagerBase::Initialize()
 
     shouldStop = false;
     Threading::SpawnThread(taskManagerThread, "X-Ray Task Scheduler thread", 0, this);
-    Threading::SpawnThread(taskWatcherThread, "X-Ray Task Watcher thread", 0, this);
 }
 
 void TaskManagerBase::Destroy()
@@ -30,20 +29,16 @@ void TaskManagerBase::Destroy()
 
     shouldStop = true;
     mainThreadExit.Wait();
-    watcherThreadExit.Wait();
 }
 
 bool TaskManagerBase::TaskQueueIsEmpty() const
 {
-    return tasks.empty() && tasksInExecution.empty();
+    return tasks.empty();
 }
 
 void TaskManagerBase::taskManagerThread(void* thisPtr)
 {
-    int threads = tbb::task_scheduler_init::default_num_threads();
-    if (threads < 4)
-        threads = 4;
-    tbb::task_scheduler_init init(threads);
+    tbb::task_scheduler_init init;
 
     TaskManagerBase& self = *static_cast<TaskManagerBase*>(thisPtr);
 
@@ -68,85 +63,6 @@ void TaskManagerBase::taskManagerThread(void* thisPtr)
         self.lock.Leave();
     }
     self.mainThreadExit.Set();
-}
-
-void TaskManagerBase::taskWatcherThread(void* thisPtr)
-{
-    TaskManagerBase& self = *static_cast<TaskManagerBase*>(thisPtr);
-    bool calmDown = false;
-
-    while (!self.shouldStop)
-    {
-        self.executionLock.Enter();
-        if (self.tasksInExecution.empty())
-        {
-            self.executionLock.Leave();
-            Sleep(WATCHER_CALM_DOWN_PERIOD);
-            continue;
-        }
-
-#ifndef MASTER_GOLD
-        for (Task* task : self.tasksInExecution)
-        {
-            if (!task->IsStarted())
-                continue;
-
-            const u64 time = task->GetElapsedMs();
-
-            if (time > ABNORMAL_EXECUTION_TIME)
-            {
-                calmDown = true;
-                Msg("! Abnormal task execution time [%dms] in [ %s ]", time, task->GetName());
-            }
-
-#ifdef PROFILE_TASKS
-            bool tooLong;
-            bool veryLong;
-
-            else if (task->IsComplex())
-            {
-                tooLong = time > COMPLEX_TASK_ACCEPTABLE_EXECUTION_TIME;
-                veryLong = time > COMPLEX_TASK_ACCEPTABLE_EXECUTION_TIME * 2;
-            }
-            else
-            {
-                tooLong = time > SIMPLE_TASK_ACCEPTABLE_EXECUTION_TIME;
-                veryLong = time > SIMPLE_TASK_ACCEPTABLE_EXECUTION_TIME * 2;
-            }
-
-            if (veryLong)
-            {
-                calmDown = true;
-                Msg("! Task [%s] runs too long %dms", task->GetName(), time);
-            }
-            else if (tooLong)
-            {
-                calmDown = true;
-                Msg("~ Task [%s] runs very long %dms", task->GetName(), time);
-            }
-#endif // PROFILE_TASKS
-        }
-#endif // MASTER_GOLD
-        self.executionLock.Leave();
-        if (calmDown)
-        {
-            Sleep(WATCHER_CALM_DOWN_PERIOD);
-            calmDown = false;
-        }
-    }
-
-    // Wait until last task is done
-    while (true)
-    {
-        ScopeLock scope(&self.executionLock);
-        
-        if (self.tasksInExecution.empty())
-            break;
-
-        Sleep(WATCHER_CALM_DOWN_PERIOD);
-    }
-
-    self.watcherThreadExit.Set();
 }
 
 void TaskManagerBase::AddTask(pcstr name, Task::TaskFunc taskFunc,
@@ -219,25 +135,12 @@ void TaskManagerBase::SpawnTask(Task* task, bool shortcut /*= false*/)
         tasks.erase(it);
     }
 
-    executionLock.Enter();
-    tasksInExecution.emplace_back(task);
-    executionLock.Leave();
-
     // Run it
     tbb::task::spawn(*task);
 }
 
 void TaskManagerBase::TaskDone(Task* task, u64 executionTime)
 {
-    executionLock.Enter();
-
-    const auto it = std::find(tasksInExecution.begin(), tasksInExecution.end(), task);
-    R_ASSERT3(it != tasksInExecution.end(), "Task is deleted from the task watcher", task->GetName());
-
-    tasksInExecution.erase(it);
-
-    executionLock.Leave();
-
     if (executionTime > ABNORMAL_EXECUTION_TIME)
     {
         Msg("! Task done after abnormal execution time [%dms] in [%s]", time, task->GetName());

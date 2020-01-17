@@ -10,7 +10,6 @@
 #include "blender_bloom_build.h"
 #include "blender_luminance.h"
 #include "blender_ssao.h"
-#include "blender_fxaa.h"
 #include "Layers/xrRenderDX10/dx10MinMaxSMBlender.h"
 #include "Layers/xrRenderDX10/msaa/dx10MSAABlender.h"
 #include "Layers/xrRenderDX10/DX10 Rain/dx10RainBlender.h"
@@ -321,9 +320,6 @@ CRenderTarget::CRenderTarget()
     b_combine = new CBlender_combine();
     b_ssao = new CBlender_SSAO_noMSAA();
 
-    //FXAA
-    b_fxaa = new CBlender_FXAA();
-
     if (RImplementation.o.dx10_msaa)
     {
         int bound = RImplementation.o.dx10_msaa_samples;
@@ -624,10 +620,6 @@ CRenderTarget::CRenderTarget()
         }
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
     }
-
-    //FXAA
-    s_fxaa.create(b_fxaa, "r3" DELIMITER "fxaa");
-    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // HBAO
     if (RImplementation.o.ssao_opt_data)
@@ -1051,7 +1043,6 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_accum_point);
     xr_delete(b_accum_direct);
     xr_delete(b_ssao);
-    xr_delete(b_fxaa); //FXAA
 
     if (RImplementation.o.dx10_msaa)
     {

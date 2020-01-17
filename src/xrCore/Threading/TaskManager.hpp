@@ -18,22 +18,16 @@ constexpr u64 COMPLEX_TASK_ACCEPTABLE_EXECUTION_TIME = 16; // ms
 constexpr u64 ABNORMAL_EXECUTION_TIME = 1000; // ms
 constexpr u64 BIG_EXECUTION_TIME = 500; // ms
 
-constexpr u64 WATCHER_CALM_DOWN_PERIOD = 5; // ms
-
 class XRCORE_API TaskManagerBase
 {
     xr_vector<Task*> tasks;
-    xr_vector<Task*> tasksInExecution;
 
     Lock lock;
-    Lock executionLock;
     Event mainThreadExit;
-    Event watcherThreadExit;
     u32 taskerSleepTime;
     bool shouldStop;
 
     static void taskManagerThread(void* thisPtr);
-    static void taskWatcherThread(void* thisPtr);
 
 
 protected:

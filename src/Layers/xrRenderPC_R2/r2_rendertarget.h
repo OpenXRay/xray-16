@@ -29,7 +29,6 @@ public:
     IBlender* b_accum_reflected;
     IBlender* b_bloom;
     IBlender* b_ssao;
-    IBlender* b_fxaa;
     IBlender* b_luminance;
     IBlender* b_combine;
 
@@ -122,10 +121,6 @@ private:
     ref_rt rt_ssao_temp;
     ref_rt rt_half_depth;
 
-    //FXAA
-    ref_shader s_fxaa;
-    ref_geom g_fxaa;
-
     // Bloom
     ref_geom g_bloom_build;
     ref_geom g_bloom_filter;
@@ -209,7 +204,6 @@ public:
     void u_DBT_disable();
 
     void phase_ssao();
-    void phase_fxaa();
     void phase_downsamp();
     void phase_scene_prepare();
     void phase_scene_begin();

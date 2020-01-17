@@ -414,7 +414,7 @@ bool CScriptEntity::bfAssignParticles(CScriptEntityAction* tpEntityAction)
         return (false);
     if (l_tParticleAction.m_tpParticleSystem)
     {
-        if (true /** !l_tParticleAction.m_tpParticleSystem/**/)
+        if (true /** !l_tParticleAction.m_tpParticleSystem**/)
             if (!l_tParticleAction.m_bStartedToPlay)
             {
                 const Fmatrix& l_tMatrix = GetUpdatedMatrix(*l_tParticleAction.m_caBoneName,

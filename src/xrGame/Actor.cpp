@@ -386,17 +386,18 @@ void CActor::Load(LPCSTR section)
         LPCSTR hit_snd_sect = pSettings->r_string(section, "hit_sounds");
         for (int hit_type = 0; hit_type < (int)ALife::eHitTypeMax; ++hit_type)
         {
+            string256 buf;
+
             LPCSTR hit_name = ALife::g_cafHitType2String((ALife::EHitType)hit_type);
             LPCSTR hit_snds = READ_IF_EXISTS(pSettings, r_string, hit_snd_sect, hit_name, "");
             int cnt = _GetItemCount(hit_snds);
-            string128 tmp;
-            VERIFY(cnt != 0);
+            if (hit_type != (int)ALife::eHitTypePhysicStrike)
+                VERIFY(cnt != 0);
             for (int i = 0; i < cnt; ++i)
             {
                 sndHit[hit_type].push_back(ref_sound());
-                sndHit[hit_type].back().create(_GetItem(hit_snds, i, tmp), st_Effect, sg_SourceType);
+                sndHit[hit_type].back().create(_GetItem(hit_snds, i, buf), st_Effect, sg_SourceType);
             }
-            char buf[256];
 
             GEnv.Sound->create(
                 sndDie[0], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);

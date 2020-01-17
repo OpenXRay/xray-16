@@ -29,7 +29,7 @@ void CMovementManager::show_game_path_info()
     Msg("! CURRENT LEVEL : %s", *Level().name());
     Fvector temp = ai().game_graph().vertex(object().ai_location().game_vertex_id())->level_point();
     Msg("! CURRENT game point position : [%f][%f][%f]", VPUSH(temp));
-    const GameGraph::CVertex* vertex = ai().game_graph().vertex(game_dest_vertex_id());
+    const GameGraph::CGameVertex* vertex = ai().game_graph().vertex(game_dest_vertex_id());
     Msg("! TARGET LEVEL : %s", *ai().game_graph().header().level(vertex->level_id()).name());
     temp = vertex->level_point();
     Msg("! TARGET  game point position : [%f][%f][%f]", VPUSH(temp));
@@ -119,7 +119,7 @@ void CMovementManager::process_game_path()
         }
 
         Fvector temp =
-            ai().level_graph().vertex_position(dest_level_vertex_id /**level_path().intermediate_vertex_id()/**/);
+            ai().level_graph().vertex_position(dest_level_vertex_id /**level_path().intermediate_vertex_id()**/);
         level_path_builder().setup(object().ai_location().level_vertex_id(), dest_level_vertex_id, true, &temp);
 
         if (can_use_distributed_computations(mtLevelPath))

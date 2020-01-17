@@ -50,8 +50,9 @@ public:
     SDL_GLContext m_helper_context{};
 
     pcstr AdapterName;
-    pcstr OpenGLVersion;
+    pcstr OpenGLVersionString;
     pcstr ShadingVersion;
+    std::pair<GLint, GLint> OpenGLVersion;
     bool ShaderBinarySupported;
 };
 

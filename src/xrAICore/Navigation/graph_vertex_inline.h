@@ -14,11 +14,11 @@
 >
 
 #define CSGraphVertex \
-    CVertex<_data_type, _vertex_id_type, _graph_type\
+    CGraphVertex<_data_type, _vertex_id_type, _graph_type\
 >
 
 TEMPLATE_SPECIALIZATION
-IC CSGraphVertex::CVertex(const _data_type& data, const _vertex_id_type& vertex_id, size_t* edge_count)
+IC CSGraphVertex::CGraphVertex(const _data_type& data, const _vertex_id_type& vertex_id, size_t* edge_count)
 {
     m_data = data;
     m_vertex_id = vertex_id;
@@ -27,7 +27,7 @@ IC CSGraphVertex::CVertex(const _data_type& data, const _vertex_id_type& vertex_
 }
 
 TEMPLATE_SPECIALIZATION
-IC CSGraphVertex::~CVertex()
+IC CSGraphVertex::~CGraphVertex()
 {
     while (!edges().empty())
         remove_edge(edges().back().vertex_id());
@@ -63,7 +63,7 @@ IC typename _graph_type::CEdge* CSGraphVertex::edge(const _vertex_id_type& verte
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CSGraphVertex::add_edge(CVertex* vertex, const typename _graph_type::CEdge::edge_weight_type& edge_weight)
+IC void CSGraphVertex::add_edge(CGraphVertex* vertex, const typename _graph_type::CEdge::edge_weight_type& edge_weight)
 {
     typename EDGES::iterator I = std::find(m_edges.begin(), m_edges.end(), vertex->vertex_id());
     VERIFY(m_edges.end() == I);
@@ -77,14 +77,14 @@ IC void CSGraphVertex::remove_edge(const _vertex_id_type& vertex_id)
 {
     typename EDGES::iterator I = std::find(m_edges.begin(), m_edges.end(), vertex_id);
     VERIFY(m_edges.end() != I);
-    CVertex* vertex = (*I).vertex();
+    CGraphVertex* vertex = (*I).vertex();
     vertex->on_edge_removal(this);
     m_edges.erase(I);
     --*m_edge_count;
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CSGraphVertex::on_edge_addition(CVertex* vertex)
+IC void CSGraphVertex::on_edge_addition(CGraphVertex* vertex)
 {
     typename VERTICES::const_iterator I = std::find(m_vertices.begin(), m_vertices.end(), vertex);
     VERIFY(I == m_vertices.end());
@@ -92,7 +92,7 @@ IC void CSGraphVertex::on_edge_addition(CVertex* vertex)
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CSGraphVertex::on_edge_removal(const CVertex* vertex)
+IC void CSGraphVertex::on_edge_removal(const CGraphVertex* vertex)
 {
     typename VERTICES::iterator I = std::find(m_vertices.begin(), m_vertices.end(), vertex);
     VERIFY(I != m_vertices.end());
@@ -110,7 +110,7 @@ IC void CSGraphVertex::data(const _data_type& data) { m_data = data; }
 TEMPLATE_SPECIALIZATION
 IC const typename CSGraphVertex::EDGES& CSGraphVertex::edges() const { return (m_edges); }
 TEMPLATE_SPECIALIZATION
-IC bool CSGraphVertex::operator==(const CVertex& obj) const
+IC bool CSGraphVertex::operator==(const CGraphVertex& obj) const
 {
     if (vertex_id() != obj.vertex_id())
         return (false);

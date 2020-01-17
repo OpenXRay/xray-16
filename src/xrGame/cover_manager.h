@@ -15,7 +15,7 @@ class CCoverPoint;
 
 namespace LevelGraph
 {
-class CVertex;
+class CLevelVertex;
 };
 
 namespace smart_cover
@@ -54,8 +54,8 @@ private:
 
 protected:
     IC bool edge_vertex(u32 index) const;
-    IC bool cover(LevelGraph::CVertex* v, u32 index0, u32 index1) const;
-    IC bool critical_point(LevelGraph::CVertex* v, u32 index, u32 index0, u32 index1) const;
+    IC bool cover(LevelGraph::CLevelVertex* v, u32 index0, u32 index1) const;
+    IC bool critical_point(LevelGraph::CLevelVertex* v, u32 index, u32 index0, u32 index1) const;
     IC bool critical_cover(u32 index) const;
 
 private:

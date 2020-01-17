@@ -1200,9 +1200,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         //////////////////////////////////////////////////////////////////////////
 
-
-        /**/
-
         // build viewport xform
         float view_dim = float(RImplementation.o.smapsize);
         Fmatrix m_viewport = {

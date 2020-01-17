@@ -66,7 +66,7 @@ public:
     IC const _GRAPH_ID& vertex_id() const;
     IC const float& distance() const;
 };
-class CVertex
+class CGameVertex
 {
 #ifdef AI_COMPILER
 public:

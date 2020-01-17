@@ -15,7 +15,7 @@
 
 using namespace ALife;
 
-/**/
+**/
 CALifeInteractionManager::CALifeInteractionManager(IPureServer* server, LPCSTR section)
     : CALifeCombatManager(server, section), CALifeCommunicationManager(server, section),
       CALifeSimulatorBase(server, section)
@@ -24,7 +24,7 @@ CALifeInteractionManager::CALifeInteractionManager(IPureServer* server, LPCSTR s
         m_inventory_slot_count		= pSettings->r_u32("inventory","slots");
         m_temp_weapons.resize		(m_inventory_slot_count);
         m_temp_marks.assign			(u16(-1),false);
-    /**/
+    **/
 }
 
 /**
@@ -220,4 +220,4 @@ tGraphID)
         )
     );
 }
-/**/
+**/

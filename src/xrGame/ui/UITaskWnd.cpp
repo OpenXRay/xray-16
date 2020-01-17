@@ -239,7 +239,7 @@ void CUITaskWnd::ReloadTaskInfo()
             m_btn_focus2->Show(true);
     }
 
-    Locations map_locs = Level().MapManager().Locations();
+    vLocations map_locs = Level().MapManager().Locations();
     auto b = map_locs.begin(), e = map_locs.end();
     for (; b != e; ++b)
     {

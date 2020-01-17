@@ -24,9 +24,9 @@ struct SLocationKey : public ISerializable, public IPureDestroyableObject
     virtual void destroy();
 };
 
-using Locations = xr_vector<SLocationKey>;
+using vLocations = xr_vector<SLocationKey>;
 
-struct CMapLocationRegistry : public CALifeAbstractRegistry<u16, Locations>
+struct CMapLocationRegistry : public CALifeAbstractRegistry<u16, vLocations>
 {
     void save(IWriter& stream) override;
 };

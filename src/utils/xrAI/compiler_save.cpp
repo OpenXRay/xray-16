@@ -106,8 +106,8 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
 {
     Logger.Status("Saving nodes...");
 
-    Logger.clMsg("NS: %d, CNS: %d, ratio: %f%%", sizeof(vertex), sizeof(CLevelGraph::CVertex),
-        100 * float(sizeof(CLevelGraph::CVertex)) / float(sizeof(vertex)));
+    Logger.clMsg("NS: %d, CNS: %d, ratio: %f%%", sizeof(vertex), sizeof(CLevelGraph::CLevelVertex),
+        100 * float(sizeof(CLevelGraph::CLevelVertex)) / float(sizeof(vertex)));
 
     string_path fName;
     strconcat(sizeof(fName), fName, name, out_name);
