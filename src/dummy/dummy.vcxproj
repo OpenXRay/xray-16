@@ -87,6 +87,7 @@
       <ShowIncludes>true</ShowIncludes>
       <MinimalRebuild>false</MinimalRebuild>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -107,6 +108,7 @@
       <ShowIncludes>true</ShowIncludes>
       <MinimalRebuild>false</MinimalRebuild>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -127,6 +129,7 @@
       <ShowIncludes>true</ShowIncludes>
       <MinimalRebuild>false</MinimalRebuild>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -147,6 +150,7 @@
       <ShowIncludes>true</ShowIncludes>
       <MinimalRebuild>false</MinimalRebuild>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -168,6 +172,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(xrExternals)luajit\src;$(xrExternals)luabind;$(xrExternals)GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -191,6 +196,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(xrExternals)luajit\src;$(xrExternals)luabind;$(xrExternals)GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
