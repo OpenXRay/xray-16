@@ -101,6 +101,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -110,6 +111,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -120,6 +122,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -129,6 +132,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -138,6 +142,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -147,6 +152,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>

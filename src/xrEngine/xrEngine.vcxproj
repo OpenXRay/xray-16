@@ -87,6 +87,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -102,6 +103,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -117,6 +119,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -132,6 +135,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -148,6 +152,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <ResourceCompile />
     <Link>
@@ -164,6 +169,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
