@@ -7,7 +7,6 @@
 #include <string>
 #if defined(LINUX)
 #include <cstdio>
-#include "xrCore/_std_extensions.h" // Supress many of warnings
 #elif defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared
@@ -124,6 +123,11 @@ private:
     static void DeinitializeSymbolEngine(void);
 #endif //WINDOWS
 };
+
+// forward reference
+// Definition is in xrCore/_std_extensions.h
+template <size_t count>
+inline int __cdecl xr_sprintf(char(&destination)[count], LPCSTR format_string, ...);
 
 // for debug purposes only
 template<typename... Args>
