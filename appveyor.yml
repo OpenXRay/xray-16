@@ -22,15 +22,6 @@ matrix:
   exclude:
     - image: Ubuntu
       configuration: Mixed
-  allow_failures:
-    - platform: x86
-      configuration: Mixed
-    - platform: x86
-      configuration: Release
-    - platform: x64
-      configuration: Mixed
-    - platform: x64
-      configuration: Release
 
 cache:
 - src/packages -> **/packages.config
