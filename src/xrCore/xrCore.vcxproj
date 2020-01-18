@@ -103,6 +103,7 @@
       <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -133,6 +134,7 @@ if not exist "$(OutDir)tbbmalloc_proxy_debug.dll" copy /y "$(xrSdkDir)binaries\$
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -164,6 +166,7 @@ if not exist "$(OutDir)tbbmalloc_proxy_debug.dll" copy /y "$(xrSdkDir)binaries\$
       <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -194,6 +197,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -224,6 +228,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -254,6 +259,7 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
