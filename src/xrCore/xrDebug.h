@@ -124,17 +124,16 @@ private:
 #endif //WINDOWS
 };
 
-// forward reference
+// forward declaration
 // Definition is in xrCore/_std_extensions.h
-template <size_t count>
-inline int __cdecl xr_sprintf(char(&destination)[count], LPCSTR format_string, ...);
+inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...);
 
 // for debug purposes only
 template<typename... Args>
 std::string make_string(cpcstr format, Args... args)
 {
     string4096 log;
-    xr_sprintf(log, format, std::forward<Args>(args)...);
+    xr_sprintf(log, std::size(log), format, std::forward<Args>(args)...);
     return log;
 }
 
