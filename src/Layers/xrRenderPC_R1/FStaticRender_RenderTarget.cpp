@@ -95,6 +95,14 @@ BOOL CRenderTarget::Create()
         s_postprocess[1].create("postprocess_cm");
         if (RImplementation.o.distortion)
             s_postprocess_D[1].create("postprocess_dcm");
+        if (!s_postprocess[1] || !s_postprocess_D[1])
+        {
+            Log("~ Color mapping disabled due to lack of one shader or both shaders");
+            s_postprocess[1].destroy();
+            s_postprocess_D[1].destroy();
+            RT_color_map->destroy();
+            RImplementation.o.color_mapping = FALSE;
+        }
     }
     g_postprocess.create(
         D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
