@@ -513,7 +513,6 @@ void CGamePersistent::start_logo_intro()
             m_intro = new CUISequencer();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_logo_intro);
             m_intro->Start("intro_logo");
-            Msg("intro_start intro_logo");
             Console->Hide();
         }
     }
@@ -522,7 +521,6 @@ void CGamePersistent::start_logo_intro()
 void CGamePersistent::update_logo_intro()
 {
     xr_delete(m_intro);
-    Msg("intro_delete ::update_logo_intro");
     Console->Execute("main_menu on");
 }
 
@@ -536,7 +534,6 @@ void CGamePersistent::game_loaded()
             load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
         {
             VERIFY(NULL == m_intro);
-            Msg("intro_start game_loaded");
             m_intro = new CUISequencer();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
             if (!m_intro->Start("game_loaded"))
@@ -548,7 +545,6 @@ void CGamePersistent::game_loaded()
 void CGamePersistent::update_game_loaded()
 {
     xr_delete(m_intro);
-    Msg("intro_delete ::update_game_loaded");
     start_game_intro();
 }
 
@@ -575,7 +571,6 @@ void CGamePersistent::start_game_intro()
 void CGamePersistent::update_game_intro()
 {
     xr_delete(m_intro);
-    Msg("intro_delete ::update_game_intro");
 }
 
 extern CUISequencer* g_tutorial;
