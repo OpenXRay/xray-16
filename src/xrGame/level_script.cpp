@@ -552,6 +552,10 @@ CUISequencer* g_tutorial2 = NULL;
 
 void start_tutorial(LPCSTR name)
 {
+    // Skip any game tutorial on load screen
+    if (load_screen_renderer.IsActive())
+        return;
+
     if (g_tutorial)
     {
         VERIFY(!g_tutorial2);

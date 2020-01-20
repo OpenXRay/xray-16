@@ -101,11 +101,6 @@ CUISequencer::CUISequencer()
 }
 void CUISequencer::Start(LPCSTR tutor_name)
 {
-    // Skip any tutorial except "game_loaded" and "intro_game", on load screen
-    if (load_screen_renderer.IsActive() && xr_strcmp(tutor_name, "game_loaded") != 0 &&
-        xr_strcmp(tutor_name, "intro_game") != 0)
-        return;
-
     VERIFY(m_sequencer_items.empty());
     
     CUIXml uiXml;
