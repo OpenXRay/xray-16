@@ -26,7 +26,7 @@ protected:
 public:
     IInputReceiver* m_pStoredInputReceiver;
     CUISequencer();
-    void Start(LPCSTR tutor_name);
+    bool Start(LPCSTR tutor_name);
     void Stop();
     void Next();
 

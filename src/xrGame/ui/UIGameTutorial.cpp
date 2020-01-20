@@ -99,7 +99,8 @@ CUISequencer::CUISequencer()
     m_pStoredInputReceiver = nullptr;
     m_flags.zero();
 }
-void CUISequencer::Start(LPCSTR tutor_name)
+
+bool CUISequencer::Start(LPCSTR tutor_name)
 {
     VERIFY(m_sequencer_items.empty());
     
@@ -110,8 +111,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
     if (items_count <= 0)
     {
         Msg("! can't find tutorial [%s]", tutor_name);
-        Destroy();
-        return;
+        return false;
     }
 
     uiXml.SetLocalRoot(uiXml.NavigateToNode(tutor_name, 0));
@@ -193,6 +193,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
 
     if (m_start_lua_function.size())
         CallFunction(m_start_lua_function);
+    return true;
 }
 
 CUISequenceItem* CUISequencer::GetNextItem()
