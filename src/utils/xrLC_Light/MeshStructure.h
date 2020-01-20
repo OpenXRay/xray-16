@@ -285,7 +285,7 @@ struct MESHSTRUCTURE_API Tvertex : public DataVertexType, public vector_item
     ///////////////////////////////////////////////////////////////
     v_faces m_adjacents;
 
-    IC type_vertex* Tvertex::CreateCopy(v_vertices& vertises_storage)
+    IC type_vertex* CreateCopy(v_vertices& vertises_storage)
     {
         type_vertex* V = CreateCopy_NOADJ(vertises_storage);
         V->m_adjacents = m_adjacents;
@@ -352,7 +352,7 @@ IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*>& vertices)
     }
     VERIFY(verts_old == vertices.size());
 
-    xr_vector<typeVertex*>::iterator _end = std::remove(vertices.begin(), vertices.end(), (typeVertex*)0);
+    auto _end = std::remove(vertices.begin(), vertices.end(), (typeVertex*)0);
 
     /*
         remove_pred<typeVertex> rp;

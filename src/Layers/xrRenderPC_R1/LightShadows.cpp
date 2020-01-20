@@ -142,7 +142,7 @@ void CLightShadows::set_object(IRenderable* O)
     }
 }
 
-void CLightShadows::add_element(NODE& N)
+void CLightShadows::add_element(const NODE& N)
 {
     if (nullptr == current)
         return;

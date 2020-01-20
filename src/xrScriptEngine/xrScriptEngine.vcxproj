@@ -102,24 +102,28 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <ClCompile>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <ClCompile>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,12 +131,14 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -7,7 +7,6 @@
 #include <string>
 #if defined(LINUX)
 #include <cstdio>
-#include "xrCore/_std_extensions.h" // Supress many of warnings
 #elif defined(WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared
@@ -125,12 +124,16 @@ private:
 #endif //WINDOWS
 };
 
+// forward declaration
+// Definition is in xrCore/_std_extensions.h
+inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...);
+
 // for debug purposes only
 template<typename... Args>
 std::string make_string(cpcstr format, Args... args)
 {
     string4096 log;
-    xr_sprintf(log, format, std::forward<Args>(args)...);
+    xr_sprintf(log, std::size(log), format, std::forward<Args>(args)...);
     return log;
 }
 

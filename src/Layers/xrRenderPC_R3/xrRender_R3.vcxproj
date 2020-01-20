@@ -103,6 +103,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R3_EXPORTS;USE_DX10;MSAA_DX10_1;MSAA_SAMPLES=4;USE_MSAA;GBUFFER_OPTIMIZATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d9.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -113,6 +114,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R3_EXPORTS;USE_DX10;MSAA_DX10_1;MSAA_SAMPLES=4;USE_MSAA;GBUFFER_OPTIMIZATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d9.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -124,6 +126,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R3_EXPORTS;USE_DX10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d9.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -135,6 +138,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R3_EXPORTS;USE_DX10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d9.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -145,6 +149,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R3_EXPORTS;USE_DX10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d9.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -155,6 +160,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R3_EXPORTS;USE_DX10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d9.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;%(AdditionalDependencies)</AdditionalDependencies>

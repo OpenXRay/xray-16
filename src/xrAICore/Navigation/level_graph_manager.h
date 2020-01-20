@@ -50,7 +50,7 @@ public:
         if (compatibilityMode)
         {
             for (auto& node : m_nodes)
-                xr_delete(node);
+                xr_delete(node); // XXX: should be deleted with delete[]
         }
         m_nodes.clear();
     }

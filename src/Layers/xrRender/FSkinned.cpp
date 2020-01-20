@@ -389,6 +389,17 @@ void get_pos_bones(const T& v, Fvector& p, CKinematics* Parent)
     v.get_pos_bones(p, Parent);
 }
 
+template <typename T>
+BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
+    Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
+{
+    void* data = static_cast<BYTE*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true)); // read-back
+    T* vertices = static_cast<T*>(data);
+    const bool intersect = pick_bone<T, T*>(vertices, Parent, r, dist, S, D, indices, faces);
+    V->p_rm_Vertices->Unmap();
+    return intersect;
+}
+
 BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir,
     Fvisual* V, u16 bone_id, u32 iBase, u32 /*iCount*/)
 {
