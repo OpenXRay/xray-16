@@ -4,7 +4,8 @@ void fix_texture_name(LPSTR fn);
 
 void simplify_texture(string_path& fn)
 {
-    if (strstr(Core.Params, "-game_designer"))
+    static const bool iamGameDesigner = strstr(Core.Params, "-game_designer");
+    if (iamGameDesigner)
     {
         if (strstr(fn, "$user"))
             return;
