@@ -128,6 +128,22 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: ps        : %d", m_ps.size());
     if (!bBrief)
         mdump(m_ps);
+#ifndef USE_DX9
+    Msg("* RM_Dump: gs        : %d", m_gs.size());
+    if (!bBrief)
+        mdump(m_gs);
+#ifdef USE_DX11
+    Msg("* RM_Dump: cs        : %d", m_cs.size());
+    if (!bBrief)
+        mdump(m_cs);
+    Msg("* RM_Dump: hs        : %d", m_hs.size());
+    if (!bBrief)
+        mdump(m_hs);
+    Msg("* RM_Dump: ds        : %d", m_ds.size());
+    if (!bBrief)
+        mdump(m_ds);
+#endif
+#endif
     Msg("* RM_Dump: dcl       : %d", v_declarations.size());
     Msg("* RM_Dump: states    : %d", v_states.size());
     Msg("* RM_Dump: tex_list  : %d", lst_textures.size());
