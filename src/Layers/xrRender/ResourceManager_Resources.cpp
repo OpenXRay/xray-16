@@ -41,6 +41,24 @@ BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
     return FALSE;
 }
 
+SState* CResourceManager::_CreateState(SimulatorStates& state_code)
+{
+    // Search equal state-code 
+    for (SState* C : v_states)
+    {
+        SimulatorStates& base = C->state_code;
+        if (base.equal(state_code))
+            return C;
+    }
+
+    // Create New
+    SState* S = v_states.emplace_back(new SState());
+    state_code.record(S->state); // S->state will be assigned here
+    S->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    S->state_code = state_code;
+    return S;
+}
+
 void CResourceManager::_DeleteState(const SState* state)
 {
     if (0 == (state->dwFlags & xr_resource_flagged::RF_REGISTERED))

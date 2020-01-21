@@ -89,13 +89,8 @@ ICF void CBackend::set_States(SState* _state)
 #ifdef DEBUG
         stat.states++;
 #endif
-#ifdef USE_OGL
-        state = _state;
-        state->state.Apply();
-#else
         state = _state->state;
         state->Apply();
-#endif // USE_OGL
     }
 }
 

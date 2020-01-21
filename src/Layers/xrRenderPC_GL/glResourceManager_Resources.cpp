@@ -13,25 +13,6 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 //--------------------------------------------------------------------------------------------------------------
-SState* CResourceManager::_CreateState(SimulatorStates& state_code)
-{
-    // Search equal state-code 
-    for (SState* C : v_states)
-    {
-        SimulatorStates& base = C->state_code;
-        if (base.equal(state_code))
-            return C;
-    }
-
-    // Create New
-    SState* S = v_states.emplace_back(new SState());
-    state_code.record(S->state);
-    S->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    S->state_code = state_code;
-    return S;
-}
-
-//--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {
     for (SPass* pass : v_passes)

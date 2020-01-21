@@ -134,11 +134,7 @@ SInputSignature::~SInputSignature()
 //	SState
 SState::~SState()
 {
-#ifdef USE_OGL
-    state.Release();
-#else // USE_OGL
     _RELEASE(state);
-#endif // USE_OGL
     RImplementation.Resources->_DeleteState(this);
 }
 

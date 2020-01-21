@@ -116,13 +116,12 @@ private:
     R_constant_table* ctable;
 
     // Shaders/State
+    ID3DState* state;
 #ifdef USE_OGL
-    SState* state;
     GLuint ps;
     GLuint vs;
     GLuint gs;
 #else
-    ID3DState* state;
     ID3DPixelShader* ps;
     ID3DVertexShader* vs;
 #if defined(USE_DX10) || defined(USE_DX11)

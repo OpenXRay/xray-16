@@ -37,25 +37,6 @@ BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SState* CResourceManager::_CreateState(SimulatorStates& state_code)
-{
-    // Search equal state-code
-    for (SState* C : v_states)
-    {
-        SimulatorStates& base = C->state_code;
-        if (base.equal(state_code))
-            return C;
-    }
-
-    // Create New
-    SState* state = v_states.emplace_back(new SState());
-    state->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    state->state = ID3DState::Create(state_code);
-    state->state_code = state_code;
-    return state;
-}
-
-//--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {
     for (SPass* pass : v_passes)

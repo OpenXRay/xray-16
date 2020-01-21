@@ -35,6 +35,11 @@ glState::~glState()
     Release();
 }
 
+glState* glState::Create()
+{
+    return new glState();
+}
+
 //	TODO: OGL: Does the render cache provide enough state management?
 void glState::Apply()
 {
@@ -87,6 +92,9 @@ void glState::Release()
 
     // Clear the sampler array
     memset(m_samplerArray, 0, CTexture::mtMaxCombinedShaderTextures * sizeof(GLuint));
+
+    glState* pState = this;
+    xr_delete(pState);
 }
 
 void glState::UpdateRenderState(u32 name, u32 value)
