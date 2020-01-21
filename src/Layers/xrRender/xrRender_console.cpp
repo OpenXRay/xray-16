@@ -108,7 +108,7 @@ float ps_r__ssaDONTSORT = 32.f; // RO
 float ps_r__ssaHZBvsTEX = 96.f; // RO
 
 int ps_r__tf_Anisotropic = 8;
-float ps_r__tf_Mipbias = -0.5f;
+float ps_r__tf_Mipbias = 0.0f;
 
 // R1
 float ps_r1_ssaLOD_A = 64.f;
