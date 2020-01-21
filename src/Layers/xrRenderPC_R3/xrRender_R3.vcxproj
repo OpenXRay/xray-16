@@ -445,6 +445,7 @@
     <ClCompile Include="..\xrRender\ResourceManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager_Loader.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager_Reset.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp" />
     <ClCompile Include="..\xrRender\R_Backend.cpp" />
     <ClCompile Include="..\xrRender\R_Backend_DBG.cpp" />
     <ClCompile Include="..\xrRender\R_Backend_hemi.cpp" />

@@ -971,6 +971,9 @@
     <ClCompile Include="..\xrRenderDX9\BufferUtils.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9ResourceManager_Resources.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Pipeline.txt" />

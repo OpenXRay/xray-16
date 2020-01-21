@@ -678,6 +678,9 @@
     <ClCompile Include="..\xrRenderGL\glHWCaps.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
