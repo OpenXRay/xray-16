@@ -14,12 +14,12 @@ void CResourceManager::reset_begin()
     GEnv.Render->reset_begin();
 
     // destroy state-blocks
-    for (u32 _it = 0; _it < v_states.size(); _it++)
-        _RELEASE(v_states[_it]->state);
+    for (SState* sstate : v_states)
+        _RELEASE(sstate->state);
 
     // destroy RTs
-    for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); ++rt_it)
-        rt_it->second->reset_begin();
+    for (auto& rt_pair : m_rtargets)
+        rt_pair.second->reset_begin();
     //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
     //  DX10 cut        rtc_it->second->reset_begin();
 
@@ -68,12 +68,14 @@ void CResourceManager::reset_end()
     {
 // RT
 #pragma todo("container is created in stack!")
-        xr_vector<CRT*> rt;
-        for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); ++rt_it)
-            rt.push_back(rt_it->second);
-        std::sort(rt.begin(), rt.end(), cmp_rt);
-        for (u32 _it = 0; _it < rt.size(); _it++)
-            rt[_it]->reset_end();
+        xr_vector<CRT*> sorted_rts;
+        for (auto& rt_pair : m_rtargets)
+            sorted_rts.push_back(rt_pair.second);
+
+        std::sort(sorted_rts.begin(), sorted_rts.end(), cmp_rt);
+
+        for (CRT* rt : sorted_rts)
+            rt->reset_end();
     }
     {
 // RTc
@@ -86,10 +88,9 @@ void CResourceManager::reset_end()
     }
 
     // create state-blocks
-    for (u32 _it = 0; _it < v_states.size(); _it++)
+    for (SState* sstate : v_states)
     {
-        SState& sstate = *v_states[_it];
-        sstate.state_code.record(sstate.state);
+        sstate->state_code.record(sstate->state);
     }
 
     // create everything, renderer may use
