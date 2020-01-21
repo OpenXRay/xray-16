@@ -3,14 +3,14 @@
 
 void CBackend::dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc)
 {
-    RCache.set_Geometry(geom);
-    RCache.Render(pt, vBase, pc);
+    set_Geometry(geom);
+    Render(pt, vBase, pc);
 }
 
 void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)
 {
-    RCache.set_Geometry(geom);
-    RCache.Render(pt, baseV, startV, countV, startI, PC);
+    set_Geometry(geom);
+    Render(pt, baseV, startV, countV, startI, PC);
 }
 
 #ifdef DEBUG
@@ -211,7 +211,7 @@ void CBackend::dbg_OverdrawEnd()
     // Set the background to black
     CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
     // Draw a rectangle wherever the count equal I
-    RCache.OnFrameEnd();
+    OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_TL));
     // Render gradients
     for (int I = 0; I < 12; I++)
