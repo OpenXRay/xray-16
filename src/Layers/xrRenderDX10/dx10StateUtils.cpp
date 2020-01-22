@@ -4,6 +4,16 @@
 
 namespace dx10StateUtils
 {
+D3D_FILL_MODE ConvertFillMode(D3DFILLMODE Mode)
+{
+    switch (Mode)
+    {
+    case D3DFILL_WIREFRAME: return D3D_FILL_SOLID;
+    case D3DFILL_SOLID: return D3D_FILL_WIREFRAME;
+    default: VERIFY(!"Unexpected fill mode!"); return D3D_FILL_SOLID;
+    }
+}
+
 D3D_CULL_MODE ConvertCullMode(D3DCULL Mode)
 {
     switch (Mode)

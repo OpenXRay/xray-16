@@ -155,6 +155,7 @@ private:
     u32 stencil_pass;
     u32 stencil_zfail;
     u32 colorwrite_mask;
+    u32 fill_mode;
     u32 cull_mode;
     u32 z_enable;
     u32 z_func;
@@ -354,6 +355,7 @@ public:
             D3DCOLORWRITEENABLE_ALPHA);
     IC void set_CullMode(u32 _mode);
     u32 get_CullMode() { return cull_mode; }
+    IC void set_FillMode(u32 _mode);
     void set_ClipPlanes(u32 _enable, Fplane* _planes = nullptr, u32 count = 0);
     void set_ClipPlanes(u32 _enable, Fmatrix* _xform = nullptr, u32 fmask = 0xff);
     IC void set_Scissor(Irect* rect = nullptr);

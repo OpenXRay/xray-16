@@ -4,6 +4,7 @@
 
 namespace glStateUtils
 {
+GLenum ConvertFillMode(u32 Mode);
 GLenum ConvertCullMode(u32 Mode);
 GLenum ConvertCmpFunction(u32 Func);
 GLenum ConvertStencilOp(u32 Op);
