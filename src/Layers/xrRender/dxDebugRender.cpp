@@ -18,6 +18,7 @@ void dxDebugRender::Render()
         return;
 
     RCache.set_xform_world(Fidentity);
+    RCache.set_Shader(RImplementation.m_WireShader);
     RCache.dbg_Draw(D3DPT_LINELIST, &*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
         m_line_indices.size() / 2);
     m_line_vertices.resize(0);
@@ -73,8 +74,8 @@ void dxDebugRender::add_lines(
 
 void dxDebugRender::NextSceneMode()
 {
-//	This mode is not supported in DX10
-#ifndef USE_DX10
+    // XXX: Fix overdraw on DX10+, OpenGL
+#ifdef USE_DX9
     HW.Caps.SceneMode = (HW.Caps.SceneMode + 1) % 3;
 #endif //	USE_DX10
 }

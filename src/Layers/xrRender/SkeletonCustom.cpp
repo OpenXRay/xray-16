@@ -58,6 +58,8 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 #ifdef DEBUG
 void CKinematics::DebugRender(Fmatrix& XFORM)
 {
+    RCache.set_Shader(RImplementation.m_WireShader);
+
     CalculateBones();
 
     CBoneData::BoneDebug dbgLines;

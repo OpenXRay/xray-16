@@ -1,6 +1,26 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#ifndef USE_DX9
+extern IC u32 GetIndexCount(D3DPRIMITIVETYPE T, u32 iPrimitiveCount);
+#endif
+
+void CBackend::InitializeDebugDraw()
+{
+#ifndef USE_DX9
+    vs_L.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    vs_TL.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+#endif
+}
+
+void CBackend::DestroyDebugDraw()
+{
+#ifndef USE_DX9
+    vs_L.destroy();
+    vs_TL.destroy();
+#endif
+}
+
 void CBackend::dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc)
 {
     set_Geometry(geom);
@@ -18,13 +38,29 @@ void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
 {
 #ifndef USE_DX9
-//	TODO: DX10: implement
-// VERIFY(!"CBackend::dbg_Draw not implemented.");
-    UNUSED(T);
-    UNUSED(pVerts);
-    UNUSED(vcnt);
-    UNUSED(pIdx);
-    UNUSED(pcnt);
+    u32 vBase;
+    {
+        FVF::L* pv = (FVF::L*)Vertex.Lock(vcnt, vs_L->vb_stride, vBase);
+        for (size_t i = 0; i < vcnt; i++)
+        {
+            pv[i] = pVerts[i];
+        }
+        Vertex.Unlock(vcnt, vs_L->vb_stride);
+    }
+
+    u32 iBase;
+    {
+        const size_t count = GetIndexCount(T, pcnt);
+        u16* indices = Index.Lock(count, iBase);
+        for (size_t i = 0; i < count; i++)
+            indices[i] = pIdx[i];
+        Index.Unlock(count);
+    }
+    set_Geometry(vs_L);
+    set_RT(HW.pBaseRT);
+    RImplementation.rmNormal();
+    set_Stencil(FALSE);
+    Render(T, vBase, 0, vcnt, iBase, pcnt);
 #else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
@@ -34,11 +70,21 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
 #ifndef USE_DX9
-//	TODO: DX10: implement
-// VERIFY(!"CBackend::dbg_Draw not implemented.");
-    UNUSED(T);
-    UNUSED(pVerts);
-    UNUSED(pcnt);
+    u32 vBase;
+    {
+        const size_t count = GetIndexCount(T, pcnt);
+        FVF::L* pv = (FVF::L*)Vertex.Lock(count, vs_L->vb_stride, vBase);
+        for (size_t i = 0; i < count; i++)
+        {
+            pv[i] = pVerts[i];
+        }
+        Vertex.Unlock(count, vs_L->vb_stride);
+    }
+    set_Geometry(vs_L);
+    set_RT(HW.pBaseRT);
+    RImplementation.rmFar();
+    set_Stencil(FALSE);
+    Render(T, vBase, pcnt);
 #else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
@@ -124,7 +170,7 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
         -0.9239f, 0.0000f, -0.3827f, -0.9239f, 0.1464f, -0.3536f, -0.9239f, 0.2706f, -0.2706f, -0.9239f, 0.3536f,
         -0.1464f, -0.9239f, 0.3827f, 0.0000f, -0.9239f, 0.3536f, 0.1464f, -0.9239f, 0.2706f, 0.2706f, -0.9239f, 0.1464f,
         0.3536f, -0.9239f, 0.0000f, 0.0000f, -1.0000f};
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
+
     u16 gFaces[224 * 3] = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 7, 0, 7, 8, 0, 8, 9, 0, 9, 10, 0, 10, 11,
         0, 11, 12, 0, 12, 13, 0, 13, 14, 0, 14, 15, 0, 15, 16, 0, 16, 1, 1, 17, 18, 1, 18, 2, 2, 18, 19, 2, 19, 3, 3,
         19, 20, 3, 20, 4, 4, 20, 21, 4, 21, 5, 5, 21, 22, 5, 22, 6, 6, 22, 23, 6, 23, 7, 7, 23, 24, 7, 24, 8, 8, 24, 25,
@@ -150,7 +196,6 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
         96, 96, 112, 97, 96, 97, 81, 113, 98, 97, 113, 99, 98, 113, 100, 99, 113, 101, 100, 113, 102, 101, 113, 103,
         102, 113, 104, 103, 113, 105, 104, 113, 106, 105, 113, 107, 106, 113, 108, 107, 113, 109, 108, 113, 110, 109,
         113, 111, 110, 113, 112, 111, 113, 97, 112};
-#endif // #if defined(USE_DX10) || defined(USE_DX11)
 
     const int vcnt = sizeof(gVertices) / (sizeof(float) * 3);
     FVF::L verts[vcnt];
@@ -162,62 +207,52 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
 
     set_xform_world(T);
 
-#ifndef USE_DX9
-//	TODO: DX10: implement
-// VERIFY(!"CBackend::dbg_Draw not implemented.");
-// dbg_Draw(D3DPT_TRIANGLELIST,verts,vcnt,gFaces,224);
-#else //	USE_DX10
-    HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+    RCache.set_FillMode(D3DFILL_WIREFRAME);
     dbg_Draw(D3DPT_TRIANGLELIST, verts, vcnt, gFaces, 224);
-    HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-#endif //	USE_DX10
+    RCache.set_FillMode(D3DFILL_SOLID);
 }
 #endif
 
 void CBackend::dbg_OverdrawBegin()
 {
-#ifndef USE_DX9
-    //  TODO: DX10: Implement overdrawBegin
-    VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
-#else
     // Turn stenciling
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILREF, 0));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILMASK, 0x00000000));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILWRITEMASK, 0xffffffff));
-    // Increment the stencil buffer for each pixel drawn
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INCRSAT));
+    u32 zfail = D3DSTENCILOP_INCRSAT; // ZB access
     if (1 == HW.Caps.SceneMode)
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP)); // Overdraw
-    else
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCRSAT)); // ZB access
-#endif
+        zfail = D3DSTENCILOP_KEEP; // Overdraw
+
+    // Increment the stencil buffer for each pixel drawn
+    set_Stencil(TRUE, D3DCMP_ALWAYS, 0, 0x00000000, 0xffffffff,
+        D3DSTENCILOP_KEEP, D3DSTENCILOP_INCRSAT, zfail);
 }
 
 void CBackend::dbg_OverdrawEnd()
 {
-#ifndef USE_DX9
-    // TODO: DX10: Implement overdrawEnd
-    VERIFY(!"D3DXRenderBase::overdrawEnd not implemented.");
-#else
-    // Set up the stencil states
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff));
+    set_Stencil(TRUE, D3DCMP_EQUAL, 0, 0xff, 0xffffffff,
+        D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
+
     // Set the background to black
+#ifndef USE_DX9
+    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    HW.pContext->ClearRenderTargetView(get_RT(), ColorRGBA);
+#else
     CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
-    // Draw a rectangle wherever the count equal I
+#endif
+
     OnFrameEnd();
+
+    // Draw a rectangle wherever the count equal I
+#ifdef USE_DX9
     CHK_DX(HW.pDevice->SetFVF(FVF::F_TL));
+#else
+    set_Geometry(vs_TL);
+#endif
+
     // Render gradients
     for (int I = 0; I < 12; I++)
     {
         u32 _c = I * 256 / 13;
         u32 c = color_xrgb(_c, _c, _c);
+#ifdef USE_DX9
         FVF::TL pv[4];
         pv[0].set(float(0), float(Device.dwHeight), c, 0, 0);
         pv[1].set(float(0), float(0), c, 0, 0);
@@ -225,9 +260,21 @@ void CBackend::dbg_OverdrawEnd()
         pv[3].set(float(Device.dwWidth), float(0), c, 0, 0);
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILREF, I));
         CHK_DX(HW.pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pv, sizeof(FVF::TL)));
+#else
+        u32 vBase;
+        FVF::TL* pv = (FVF::TL*)Vertex.Lock(4, vs_L->vb_stride, vBase);
+        pv[0].set(float(0), float(Device.dwHeight), c, 0, 0);
+        pv[1].set(float(0), float(0), c, 0, 0);
+        pv[2].set(float(Device.dwWidth), float(Device.dwHeight), c, 0, 0);
+        pv[3].set(float(Device.dwWidth), float(0), c, 0, 0);
+        Vertex.Unlock(4, vs_L->vb_stride);
+        // Set up the stencil states
+        set_Stencil(TRUE, D3DCMP_EQUAL, I, 0xff, 0xffffffff,
+            D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
+        Render(D3DPT_TRIANGLESTRIP, vBase, 4);
+#endif
     }
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE));
-#endif // USE_DX10
+    set_Stencil(FALSE);
 }
 
 void CBackend::dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)

@@ -466,6 +466,17 @@ public:
 
     CBackend() { Invalidate(); }
 
+private:
+    // Debug Draw
+    void InitializeDebugDraw();
+    void DestroyDebugDraw();
+
+    // DX9 doesn't need this
+#ifndef USE_DX9
+    ref_geom vs_L;
+    ref_geom vs_TL;
+#endif
+
 #if defined(USE_DX10) || defined(USE_DX11)
 private:
     //	DirectX 10 internal functionality
