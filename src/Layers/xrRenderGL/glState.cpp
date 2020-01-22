@@ -30,11 +30,6 @@ glState::glState()
     m_pBlendState.ColorMask = 0xF;
 }
 
-glState::~glState()
-{
-    Release();
-}
-
 glState* glState::Create()
 {
     return new glState();

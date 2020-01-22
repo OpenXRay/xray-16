@@ -40,7 +40,6 @@ private:
 
 public:
     glState();
-    ~glState();
 
     static glState* Create();
 
