@@ -112,6 +112,10 @@ void CBackend::dbg_DrawOBB(Fmatrix& T, Fvector& half_dim, u32 C)
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
     set_xform_world(mL2W_Transform);
+#ifndef USE_DX9
+    RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
+        float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
+#endif // !USE_DX9
     dbg_Draw(D3DPT_LINELIST, aabb, 8, aabb_id, 12);
 }
 void CBackend::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C)
@@ -125,6 +129,10 @@ void CBackend::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u3
     tri[2].color = C;
 
     set_xform_world(T);
+#ifndef USE_DX9
+    RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
+        float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
+#endif // !USE_DX9
     dbg_Draw(D3DPT_TRIANGLESTRIP, tri, 1);
 }
 void CBackend::dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C)
@@ -136,6 +144,10 @@ void CBackend::dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C)
     line[1].color = C;
 
     set_xform_world(T);
+#ifndef USE_DX9
+    RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
+        float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
+#endif // !USE_DX9
     dbg_Draw(D3DPT_LINELIST, line, 1);
 }
 void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
@@ -206,6 +218,10 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
     }
 
     set_xform_world(T);
+#ifndef USE_DX9
+    RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
+        float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
+#endif // !USE_DX9
 
     RCache.set_FillMode(D3DFILL_WIREFRAME);
     dbg_Draw(D3DPT_TRIANGLELIST, verts, vcnt, gFaces, 224);
