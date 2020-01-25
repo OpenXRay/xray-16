@@ -57,8 +57,9 @@ CServerList::CServerList()
     if (CVersionSwitcher::GetVerCount() > 0)
     {
         m_version_switch_msgbox = new CUIMessageBoxEx();
-        m_version_switch_msgbox->InitMessageBox("message_box_version_switch");
         m_version_switch_msgbox->SetMessageTarget(this);
+        if (!m_version_switch_msgbox->InitMessageBox("message_box_version_switch"))
+            xr_delete(m_version_switch_msgbox);
     }
     else
     {
