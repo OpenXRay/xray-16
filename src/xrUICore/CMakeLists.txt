@@ -83,7 +83,7 @@ target_include_directories(xrUICore PRIVATE
     ../../Externals/lzo/include
     ../../Externals/luabind
     ${SDL_INCLUDE_DIRS})
-target_link_libraries(xrUICore xrAPI xrScriptEngine ${LUAJIT_LIBRARIES} xrEngine xrMiscMath xrCore xrLuabind ${SDL_LIBRARIES})
+target_link_libraries(xrUICore xrAPI xrScriptEngine xrEngine xrMiscMath xrCore xrLuabind ${SDL_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
     GROUP_READ 

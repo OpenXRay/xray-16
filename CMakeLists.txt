@@ -112,8 +112,6 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SANITIZE_FLAGS}")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SANITIZE_FLAGS}")
 set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SANITIZE_FLAGS}")
 
-set(LUA_LIBRARIES xrLuajit)
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
@@ -135,7 +133,6 @@ endif()
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     add_definitions(-DDEBUG -DMIXED)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og")
-    set(LUA_LIBRARIES xrLuajit-debug)
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL Release)
@@ -152,8 +149,6 @@ add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION 
 add_definitions(-DLUABIND_DYNAMIC_LINK) #self-explanatory
 add_definitions(-DdSINGLE) # for ODE
 
-set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
-
 if (NOT WIN32)
 find_package(GLEW REQUIRED)
 find_package(FreeImage REQUIRED)
@@ -169,8 +164,10 @@ find_package(TBB REQUIRED)
 find_package(PCRE REQUIRED)
 endif()
 
-include_directories(${LUA_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/Common )
+
+include(Externals/luajit.cmake)
+include_directories(${LUA_INCLUDE_DIR})
 
 add_subdirectory(Externals)
 add_subdirectory(src)
