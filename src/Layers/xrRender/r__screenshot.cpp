@@ -296,37 +296,45 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     case IRender::SM_FOR_LEVELMAP:
     case IRender::SM_FOR_CUBEMAP:
     {
-        VERIFY(!"CRender::Screenshot. This screenshot type is not supported for DX10.");
-        /*
-        string64			t_stemp;
-        string_path			buf;
-        VERIFY				(name);
-        strconcat			(sizeof(buf),buf,"ss_",Core.UserName,"_",timestamp(t_stemp),"_#",name);
-        xr_strcat				(buf,".tga");
-        IWriter*		fs	= FS.w_open	("$screenshots$",buf); R_ASSERT(fs);
-        TGAdesc				p;
-        p.format			= IMG_24B;
+        string_path buf;
+        VERIFY(name);
+        strconcat(sizeof(buf), buf, name, ".tga");
+        IWriter* fs = FS.w_open("$screenshots$", buf);
+        R_ASSERT(fs);
 
-        //	TODO: DX10: This is totally incorrect but mimics
-        //	original behaviour. Fix later.
-        hr					= pFB->LockRect(&D,0,D3DLOCK_NOSYSLOCK);
-        if(hr!=D3D_OK)		return;
-        hr					= pFB->UnlockRect();
-        if(hr!=D3D_OK)		goto _end_;
+        ID3DTexture2D* pTex = Target->t_ss_async;
+        HW.pContext->CopyResource(pTex, pSrcTexture);
 
+        D3D_MAPPED_TEXTURE2D MappedData;
+#ifdef USE_DX11
+        HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
+#else
+        pTex->Map(0, D3D_MAP_READ, 0, &MappedData);
+#endif
+        // Swap r and b, but don't kill alpha
+        {
+            u32* pPixel = (u32*)MappedData.pData;
+            u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
+
+            for (; pPixel != pEnd; pPixel++)
+            {
+                u32 p = *pPixel;
+                *pPixel = color_argb(color_get_A(p), color_get_B(p), color_get_G(p), color_get_R(p));
+            }
+        }
         // save
-        u32* data			= (u32*)xr_malloc(Device.dwHeight*Device.dwHeight*4);
-        imf_Process
-        (data,Device.dwHeight,Device.dwHeight,(u32*)D.pBits,Device.dwWidth,Device.dwHeight,imf_lanczos3);
-        p.scanlenght		= Device.dwHeight*4;
-        p.width				= Device.dwHeight;
-        p.height			= Device.dwHeight;
-        p.data				= data;
-        p.maketga			(*fs);
-        xr_free				(data);
-
-        FS.w_close			(fs);
-        */
+        u32* data = (u32*)xr_malloc(Device.dwHeight * Device.dwHeight * 4);
+        imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)MappedData.pData, Device.dwWidth, Device.dwHeight, imf_lanczos3);
+#ifdef USE_DX11
+        HW.pContext->Unmap(pTex, 0);
+#else
+        pTex->Unmap(0);
+#endif
+        Image img;
+        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageFormat::RGBA8);
+        img.SaveTGA(*fs, true);
+        xr_free(data);
+        FS.w_close(fs);
     }
         break;
     }
