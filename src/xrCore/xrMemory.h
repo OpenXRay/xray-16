@@ -1,6 +1,7 @@
 #pragma once
 
 #include "_types.h"
+#include "Memory/xr_memory_router.hpp"
 
 class XRCORE_API xrMemory
 {
@@ -28,25 +29,6 @@ extern XRCORE_API xrMemory Memory;
 #define ZeroMemory(dst, size) memset(dst, 0, size)
 #define CopyMemory(dst, src, size) memcpy(dst, src, size)
 #define FillMemory(dst, size, val) memset(dst, val, size)
-
-/*
-Начиная со стандарта C++11 нет необходимости объявлять все формы операторов new и delete.
-*/
-
-inline void* operator new(size_t size)
-{
-    return Memory.mem_alloc(size);
-}
-
-inline void operator delete(void* ptr) noexcept
-{
-    Memory.mem_free(ptr);
-}
-
-inline void operator delete(void* ptr, size_t) noexcept
-{
-    Memory.mem_free(ptr);
-}
 
 template <class T>
 inline void xr_delete(T*& ptr) noexcept

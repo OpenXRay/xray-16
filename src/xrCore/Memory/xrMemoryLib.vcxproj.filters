@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="router">
+      <UniqueIdentifier>{6669bec3-0314-4030-a605-e2a483cf2a08}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="xr_memory_router.cpp">
+      <Filter>router</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="xr_memory_router.hpp">
+      <Filter>router</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

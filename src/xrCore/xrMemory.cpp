@@ -10,17 +10,12 @@
 #include <sys/resource.h>
 #endif
 
-// XXX: fix xrMemory_align on Linux
-// and enable it
-#ifdef WINDOWS
 #define USE_MIMALLOC
-#include "mimalloc.h"
-#endif
-
-// Define this if you want to use TBB allocator
 //#define USE_TBB_MALLOC
+//#define USE_PURE_ALLOC
 
 #if defined(USE_MIMALLOC)
+#include "mimalloc.h"
 constexpr size_t xr_default_alignment = 16;
 
 #define xr_internal_malloc(size) mi_malloc_aligned(size, xr_default_alignment);
@@ -39,7 +34,7 @@ constexpr size_t xr_default_alignment = 16;
 #define xr_internal_malloc(size) scalable_malloc(size)
 #define xr_internal_realloc(ptr, size) scalable_realloc(ptr, size)
 #define xr_internal_free(ptr) scalable_free(ptr)
-#else
+#elif defined(USE_PURE_ALLOC)
 // Additional bytes of memory to hide memory problems on Release
 // But for Debug we don't need this if we want to find these problems
 #ifdef NDEBUG
@@ -51,6 +46,8 @@ constexpr size_t xr_reserved_tail = 0;
 #define xr_internal_malloc(size) malloc(size + xr_reserved_tail)
 #define xr_internal_realloc(ptr, size) realloc(ptr, size + xr_reserved_tail)
 #define xr_internal_free(ptr) free(ptr)
+#else
+#error Please, define explicitly which allocator you want to use
 #endif
 
 xrMemory Memory;
