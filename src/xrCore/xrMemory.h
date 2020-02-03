@@ -18,8 +18,8 @@ public:
 
     void* mem_alloc(size_t size);
     void* mem_alloc(size_t size, size_t alignment);
-    void* mem_alloc(size_t size, const std::nothrow_t&);
-    void* mem_alloc(size_t size, size_t alignment, const std::nothrow_t&);
+    void* mem_alloc(size_t size, const std::nothrow_t&) noexcept;
+    void* mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) noexcept;
     void* mem_realloc(void* ptr, size_t size);
     void* mem_realloc(void* ptr, size_t size, size_t alignment);
     void mem_free(void* ptr);

@@ -165,13 +165,13 @@ void* xrMemory::mem_alloc(size_t size, size_t alignment)
     return xr_internal_malloc(size, alignment);
 }
 
-void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&)
+void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&) noexcept
 {
     stat_calls++;
     return xr_internal_malloc_nothrow(size, DEFAULT_ALIGNMENT);
 }
 
-void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&)
+void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) noexcept
 {
     stat_calls++;
     return xr_internal_malloc_nothrow(size, alignment);
