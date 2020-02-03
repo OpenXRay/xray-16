@@ -16,24 +16,23 @@
 
 #if defined(USE_MIMALLOC)
 #include "mimalloc.h"
-constexpr size_t xr_default_alignment = 16;
-
-#define xr_internal_malloc(size) mi_malloc_aligned(size, xr_default_alignment);
-#define xr_internal_realloc(ptr, size) mi_realloc_aligned(ptr, size, xr_default_alignment);
-#define xr_internal_free(ptr) mi_free(ptr);
+#define xr_internal_malloc(size, alignment) mi_malloc_aligned(size, alignment);
+#define xr_internal_malloc_nothrow(size, alignment) mi_malloc_aligned(size, alignment);
+#define xr_internal_realloc(ptr, size, alignment) mi_realloc_aligned(ptr, size, alignment);
+#define xr_internal_free(ptr, alignment) mi_free_aligned(ptr, alignment);
 #elif defined(USE_XR_ALIGNED_MALLOC)
 #include "Memory/xrMemory_align.h"
-constexpr size_t xr_default_alignment = 16;
-
-#define xr_internal_malloc(size) xr_aligned_malloc(size, xr_default_alignment)
-#define xr_internal_realloc(ptr, size) xr_aligned_realloc(ptr, size, xr_default_alignment)
-#define xr_internal_free(ptr) xr_aligned_free(ptr)
+#define xr_internal_malloc(size, alignment) xr_aligned_malloc(size, alignment)
+#define xr_internal_malloc_nothrow(size, alignment) xr_aligned_malloc(size, alignment)
+#define xr_internal_realloc(ptr, size, alignment) xr_aligned_realloc(ptr, size, alignment)
+#define xr_internal_free(ptr, alignment) xr_aligned_free(ptr)
 #elif defined(USE_TBB_MALLOC)
 #include <tbb/scalable_allocator.h>
 
-#define xr_internal_malloc(size) scalable_malloc(size)
-#define xr_internal_realloc(ptr, size) scalable_realloc(ptr, size)
-#define xr_internal_free(ptr) scalable_free(ptr)
+#define xr_internal_malloc(size, alignment) scalable_malloc(size)
+#define xr_internal_malloc_nothrow(size, alignment) scalable_malloc(size)
+#define xr_internal_realloc(ptr, size, alignment) scalable_realloc(ptr, size)
+#define xr_internal_free(ptr, alignment) scalable_free(ptr)
 #elif defined(USE_PURE_ALLOC)
 // Additional bytes of memory to hide memory problems on Release
 // But for Debug we don't need this if we want to find these problems
@@ -43,12 +42,15 @@ constexpr size_t xr_reserved_tail = 8;
 constexpr size_t xr_reserved_tail = 0;
 #endif
 
-#define xr_internal_malloc(size) malloc(size + xr_reserved_tail)
-#define xr_internal_realloc(ptr, size) realloc(ptr, size + xr_reserved_tail)
-#define xr_internal_free(ptr) free(ptr)
+#define xr_internal_malloc(size, alignment) malloc(size + xr_reserved_tail)
+#define xr_internal_malloc_nothrow(size, alignment) malloc(size + xr_reserved_tail)
+#define xr_internal_realloc(ptr, size, alignment) realloc(ptr, size + xr_reserved_tail)
+#define xr_internal_free(ptr, alignment) free(ptr)
 #else
 #error Please, define explicitly which allocator you want to use
 #endif
+
+constexpr size_t DEFAULT_ALIGNMENT = 16;
 
 xrMemory Memory;
 // Also used in src\xrCore\xrDebug.cpp to prevent use of g_pStringContainer before it initialized
@@ -154,19 +156,49 @@ void xrMemory::mem_compact()
 void* xrMemory::mem_alloc(size_t size)
 {
     stat_calls++;
-    return xr_internal_malloc(size);
+    return xr_internal_malloc(size, DEFAULT_ALIGNMENT);
+}
+
+void* xrMemory::mem_alloc(size_t size, size_t alignment)
+{
+    stat_calls++;
+    return xr_internal_malloc(size, alignment);
+}
+
+void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&)
+{
+    stat_calls++;
+    return xr_internal_malloc_nothrow(size, DEFAULT_ALIGNMENT);
+}
+
+void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&)
+{
+    stat_calls++;
+    return xr_internal_malloc_nothrow(size, alignment);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)
 {
     stat_calls++;
-    return xr_internal_realloc(ptr, size);
+    return xr_internal_realloc(ptr, size, DEFAULT_ALIGNMENT);
+}
+
+void* xrMemory::mem_realloc(void* ptr, size_t size, size_t alignment)
+{
+    stat_calls++;
+    return xr_internal_realloc(ptr, size, alignment);
 }
 
 void xrMemory::mem_free(void* ptr)
 {
     stat_calls++;
-    xr_internal_free(ptr);
+    xr_internal_free(ptr, DEFAULT_ALIGNMENT);
+}
+
+void xrMemory::mem_free(void* ptr, size_t alignment)
+{
+    stat_calls++;
+    xr_internal_free(ptr, alignment);
 }
 
 // xr_strdup
