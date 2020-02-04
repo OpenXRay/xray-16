@@ -127,8 +127,12 @@ CMainMenu::CMainMenu() : languageChanged(false)
 #ifdef WINDOWS
         for (cpcstr name : ErrMsgBoxTemplate)
         {
-            m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
-            m_pMB_ErrDlgs.back()->InitMessageBox(name);
+            CUIMessageBoxEx* msgBox = m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
+            if (!msgBox->InitMessageBox(name))
+            {
+                m_pMB_ErrDlgs.pop_back();
+                xr_delete(msgBox);
+            }
         }
 
         m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_YES_CLICKED,
@@ -136,10 +140,14 @@ CMainMenu::CMainMenu() : languageChanged(false)
         m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_OK_CLICKED,
             CUIWndCallback::void_function(this, &CMainMenu::OnConnectToMasterServerOkClicked));
 
-        m_pMB_ErrDlgs[DownloadMPMap]->AddCallbackStr("button_copy", MESSAGE_BOX_COPY_CLICKED,
-            CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap_CopyURL));
-        m_pMB_ErrDlgs[DownloadMPMap]->AddCallbackStr(
-            "button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap));
+        CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap];
+        if (downloadMsg)
+        {
+            downloadMsg->AddCallbackStr("button_copy", MESSAGE_BOX_COPY_CLICKED,
+                CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap_CopyURL));
+            downloadMsg->AddCallbackStr(
+                "button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap));
+        }
 
 #endif
 
@@ -919,14 +927,20 @@ LPCSTR CMainMenu::GetCDKeyFromRegistry()
 
 void CMainMenu::Show_DownloadMPMap(LPCSTR text, LPCSTR url)
 {
-    VERIFY(m_pMB_ErrDlgs[DownloadMPMap]);
-
     m_downloaded_mp_map_url._set(url);
 
-    m_pMB_ErrDlgs[DownloadMPMap]->SetText(text);
-    m_pMB_ErrDlgs[DownloadMPMap]->SetTextEditURL(url);
+    CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap];
+    if (downloadMsg)
+    {
+        m_pMB_ErrDlgs[DownloadMPMap]->SetText(text);
+        m_pMB_ErrDlgs[DownloadMPMap]->SetTextEditURL(url);
 
-    m_pMB_ErrDlgs[DownloadMPMap]->ShowDialog(false);
+        m_pMB_ErrDlgs[DownloadMPMap]->ShowDialog(false);
+    }
+    else
+    {
+        OnDownloadMPMap(nullptr, nullptr);
+    }
 }
 
 void CMainMenu::OnDownloadMPMap_CopyURL(CUIWindow* w, void* d)
