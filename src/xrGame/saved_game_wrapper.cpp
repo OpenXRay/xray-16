@@ -154,7 +154,7 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
         }
 
         chunk = spawn->open_chunk(4);
-        if (!chunk)
+        if (!chunk) // Shadow of Chernobyl
         {
             string_path graph_path;
             FS.update_path(graph_path, "$game_data$", GRAPH_NAME);
