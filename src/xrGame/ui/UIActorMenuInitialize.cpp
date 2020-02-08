@@ -58,9 +58,15 @@ void CUIActorMenu::Construct()
     m_LeftBackground = UIHelper::CreateStatic(uiXml, "left_background", this);
 
     m_pUpgradeWnd = new CUIInventoryUpgradeWnd();
-    AttachChild(m_pUpgradeWnd);
-    m_pUpgradeWnd->SetAutoDelete(true);
-    m_pUpgradeWnd->Init();
+    if (!m_pUpgradeWnd->Init())
+    {
+        xr_delete(m_pUpgradeWnd);
+    }
+    else
+    {
+        AttachChild(m_pUpgradeWnd);
+        m_pUpgradeWnd->SetAutoDelete(true);
+    }
 
     m_ActorCharacterInfo = new CUICharacterInfo();
     m_ActorCharacterInfo->SetAutoDelete(true);
