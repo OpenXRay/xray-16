@@ -276,23 +276,6 @@ void CUIActorMenu::Construct()
     m_UIPropertiesBox->SetWindowName("property_box");
 
     InitCallbacks();
-
-    BindDragDropListEvents(m_pInventoryBeltList);
-    BindDragDropListEvents(m_pInventoryPistolList);
-    BindDragDropListEvents(m_pInventoryAutomaticList);
-    BindDragDropListEvents(m_pInventoryOutfitList);
-    if (m_pInventoryHelmetList)
-        BindDragDropListEvents(m_pInventoryHelmetList);
-    BindDragDropListEvents(m_pInventoryDetectorList);
-    BindDragDropListEvents(m_pInventoryBagList);
-    BindDragDropListEvents(m_pTradeActorBagList);
-    BindDragDropListEvents(m_pTradeActorList);
-    BindDragDropListEvents(m_pTradePartnerBagList);
-    BindDragDropListEvents(m_pTradePartnerList);
-    BindDragDropListEvents(m_pDeadBodyBagList);
-    if (m_pQuickSlot)
-        BindDragDropListEvents(m_pQuickSlot);
-
     InitAllowedDrops();
 
     SetCurrentItem(NULL);
@@ -407,6 +390,22 @@ void CUIActorMenu::InitCallbacks()
     
     AddCallback(m_pUpgradeWnd->m_btn_repair, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
+
+    BindDragDropListEvents(m_pInventoryBeltList);
+    BindDragDropListEvents(m_pInventoryPistolList);
+    BindDragDropListEvents(m_pInventoryAutomaticList);
+    BindDragDropListEvents(m_pInventoryOutfitList);
+    if (m_pInventoryHelmetList)
+        BindDragDropListEvents(m_pInventoryHelmetList);
+    BindDragDropListEvents(m_pInventoryDetectorList);
+    BindDragDropListEvents(m_pInventoryBagList);
+    BindDragDropListEvents(m_pTradeActorBagList);
+    BindDragDropListEvents(m_pTradeActorList);
+    BindDragDropListEvents(m_pTradePartnerBagList);
+    BindDragDropListEvents(m_pTradePartnerList);
+    BindDragDropListEvents(m_pDeadBodyBagList);
+    if (m_pQuickSlot)
+        BindDragDropListEvents(m_pQuickSlot);
 }
 
 void CUIActorMenu::UpdateButtonsLayout()
