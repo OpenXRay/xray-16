@@ -156,6 +156,13 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
         chunk = spawn->open_chunk(4);
         if (!chunk)
         {
+            string_path graph_path;
+            FS.update_path(graph_path, "$game_data$", GRAPH_NAME);
+            chunk = FS.r_open(graph_path);
+        }
+
+        if (!chunk)
+        {
             F_entity_Destroy(object);
             if (b_destroy_spawn)
                 FS.r_close(spawn);
