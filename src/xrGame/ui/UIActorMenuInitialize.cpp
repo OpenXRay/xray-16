@@ -385,6 +385,40 @@ void CUIActorMenu::Construct()
     if (m_pQuickSlot)
         BindDragDropListEvents(m_pQuickSlot);
 
+    InitAllowedDrops();
+
+    m_upgrade_selected = NULL;
+    SetCurrentItem(NULL);
+    SetActor(NULL);
+    SetPartner(NULL);
+    SetInvBox(NULL);
+
+    m_actor_trade = NULL;
+    m_partner_trade = NULL;
+    m_repair_mode = false;
+    m_item_info_view = false;
+    m_highlight_clear = true;
+
+    DeInitInventoryMode();
+    DeInitTradeMode();
+    DeInitUpgradeMode();
+    DeInitDeadBodySearchMode();
+}
+
+void CUIActorMenu::BindDragDropListEvents(CUIDragDropListEx* lst)
+{
+    lst->m_f_item_drop = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDrop);
+    lst->m_f_item_start_drag = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemStartDrag);
+    lst->m_f_item_db_click = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDbClick);
+    lst->m_f_item_selected = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemSelected);
+    lst->m_f_item_rbutton_click = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemRButtonClick);
+    lst->m_f_item_focus_received = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemFocusReceive);
+    lst->m_f_item_focus_lost = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemFocusLost);
+    lst->m_f_item_focused_update = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemFocusedUpdate);
+}
+
+void CUIActorMenu::InitAllowedDrops()
+{
     m_allowed_drops[iTrashSlot].push_back(iActorBag);
     m_allowed_drops[iTrashSlot].push_back(iActorSlot);
     m_allowed_drops[iTrashSlot].push_back(iActorBelt);
@@ -426,35 +460,6 @@ void CUIActorMenu::Construct()
     m_allowed_drops[iQuickSlot].push_back(iActorBag);
     m_allowed_drops[iQuickSlot].push_back(iActorTrade);
     m_allowed_drops[iQuickSlot].push_back(iQuickSlot);
-
-    m_upgrade_selected = NULL;
-    SetCurrentItem(NULL);
-    SetActor(NULL);
-    SetPartner(NULL);
-    SetInvBox(NULL);
-
-    m_actor_trade = NULL;
-    m_partner_trade = NULL;
-    m_repair_mode = false;
-    m_item_info_view = false;
-    m_highlight_clear = true;
-
-    DeInitInventoryMode();
-    DeInitTradeMode();
-    DeInitUpgradeMode();
-    DeInitDeadBodySearchMode();
-}
-
-void CUIActorMenu::BindDragDropListEvents(CUIDragDropListEx* lst)
-{
-    lst->m_f_item_drop = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDrop);
-    lst->m_f_item_start_drag = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemStartDrag);
-    lst->m_f_item_db_click = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDbClick);
-    lst->m_f_item_selected = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemSelected);
-    lst->m_f_item_rbutton_click = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemRButtonClick);
-    lst->m_f_item_focus_received = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemFocusReceive);
-    lst->m_f_item_focus_lost = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemFocusLost);
-    lst->m_f_item_focused_update = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemFocusedUpdate);
 }
 
 void CUIActorMenu::InitCallbacks()

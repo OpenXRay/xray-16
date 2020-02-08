@@ -220,6 +220,7 @@ private:
 
 protected:
     void Construct();
+    void InitAllowedDrops();
     void InitCallbacks();
 
     void InitCellForSlot(u16 slot_idx);
