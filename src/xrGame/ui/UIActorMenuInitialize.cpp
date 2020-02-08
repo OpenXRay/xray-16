@@ -130,7 +130,7 @@ void CUIActorMenu::Construct()
         const float dx = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dx", 0.0f);
         const float dy = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dy", 0.0f);
 
-        for (u8 i = 1; i < 4; i++)
+        for (u8 i = 1; i < e_qslot_count; i++)
         {
             pos.x += dx;
             pos.y += dy;
@@ -197,11 +197,14 @@ void CUIActorMenu::Construct()
 
     m_ActorMoney = UIHelper::CreateTextWnd(uiXml, "actor_money_static", this);
     m_PartnerMoney = UIHelper::CreateTextWnd(uiXml, "partner_money_static", this);
-    m_QuickSlot1 = UIHelper::CreateTextWnd(uiXml, "quick_slot1_text", this, false);
-    m_QuickSlot2 = UIHelper::CreateTextWnd(uiXml, "quick_slot2_text", this, false);
-    m_QuickSlot3 = UIHelper::CreateTextWnd(uiXml, "quick_slot3_text", this, false);
-    m_QuickSlot4 = UIHelper::CreateTextWnd(uiXml, "quick_slot4_text", this, false);
-
+    {
+        string32 temp;
+        for (int i = 0; i < e_qslot_count; i++)
+        {
+            xr_sprintf(temp, "quick_slot%d_text", i+1);
+            m_QuickSlot[i] = UIHelper::CreateTextWnd(uiXml, temp, this, false);
+        }
+    }
     m_WeaponSlot1_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_weapon1", this, false);
     m_WeaponSlot2_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_weapon2", this, false);
     m_Helmet_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_helmet", this, false);
@@ -425,43 +428,17 @@ void CUIActorMenu::UpdateButtonsLayout()
         m_exit_button->SetWndPos(btn_exit_pos);
     }
 
-    string32 tmp;
-    LPCSTR str;
-
-    if (m_QuickSlot1)
+    for (int i = 0; i < e_qslot_count; i++)
     {
-        str = StringTable().translate("quick_use_str_1").c_str();
+        if (!m_QuickSlot[i])
+            continue;
+        string32 tmp;
+        xr_sprintf(tmp, "quick_use_str_%d", i + 1);
+        pcstr str = StringTable().translate(tmp).c_str();
         strncpy_s(tmp, sizeof(tmp), str, 3);
         if (tmp[2] == ',')
             tmp[1] = '\0';
-        m_QuickSlot1->SetTextST(tmp);
-    }
-
-    if (m_QuickSlot2)
-    {
-        str = StringTable().translate("quick_use_str_2").c_str();
-        strncpy_s(tmp, sizeof(tmp), str, 3);
-        if (tmp[2] == ',')
-            tmp[1] = '\0';
-        m_QuickSlot2->SetTextST(tmp);
-    }
-
-    if (m_QuickSlot3)
-    {
-        str = StringTable().translate("quick_use_str_3").c_str();
-        strncpy_s(tmp, sizeof(tmp), str, 3);
-        if (tmp[2] == ',')
-            tmp[1] = '\0';
-        m_QuickSlot3->SetTextST(tmp);
-    }
-
-    if (m_QuickSlot4)
-    {
-        str = StringTable().translate("quick_use_str_4").c_str();
-        strncpy_s(tmp, sizeof(tmp), str, 3);
-        if (tmp[2] == ',')
-            tmp[1] = '\0';
-        m_QuickSlot4->SetTextST(tmp);
+        m_QuickSlot[i]->SetTextST(tmp);
     }
 
     UpdateConditionProgressBars();

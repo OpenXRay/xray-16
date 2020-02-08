@@ -113,7 +113,8 @@ protected:
 
     enum
     {
-        e_af_count = 5
+        e_af_count = 5,
+        e_qslot_count = 4
     };
 
     CUIStatic* m_belt_list_over[e_af_count]{};
@@ -124,7 +125,7 @@ protected:
     CUIStatic* m_HelmetSlotHighlight{};
     CUIStatic* m_OutfitSlotHighlight{};
     CUIStatic* m_DetectorSlotHighlight{};
-    CUIStatic* m_QuickSlotsHighlight[4]{};
+    CUIStatic* m_QuickSlotsHighlight[e_qslot_count]{};
     CUIStatic* m_ArtefactSlotsHighlight[e_af_count]{};
 
     CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
@@ -141,10 +142,7 @@ protected:
 
     CUITextWnd* m_ActorMoney{};
     CUITextWnd* m_PartnerMoney{};
-    CUITextWnd* m_QuickSlot1{};
-    CUITextWnd* m_QuickSlot2{};
-    CUITextWnd* m_QuickSlot3{};
-    CUITextWnd* m_QuickSlot4{};
+    CUITextWnd* m_QuickSlot[e_qslot_count]{};
 
     CUIProgressBar* m_WeaponSlot1_progress{};
     CUIProgressBar* m_WeaponSlot2_progress{};
