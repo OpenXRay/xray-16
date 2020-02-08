@@ -23,7 +23,7 @@ void CUIActorMenu::InitUpgradeMode()
     if (m_pQuickSlot)
         m_pQuickSlot->Show(true);
 
-    InitInventoryContents(m_pInventoryBagList);
+    InitInventoryContents(m_pLists[eInventoryBagList]);
     VERIFY(m_pPartnerInvOwner);
     m_pPartnerInvOwner->StartTrading();
     //-	UpdateUpgradeItem();

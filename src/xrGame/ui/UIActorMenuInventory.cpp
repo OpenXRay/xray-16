@@ -38,23 +38,23 @@ void move_item_from_to(u16 from_id, u16 to_id, u16 what_id);
 
 void CUIActorMenu::InitInventoryMode()
 {
-    m_pInventoryBagList->Show(true);
-    m_pInventoryBeltList->Show(true);
-    m_pInventoryOutfitList->Show(true);
-    if (m_pInventoryHelmetList)
-        m_pInventoryHelmetList->Show(true);
-    m_pInventoryDetectorList->Show(true);
-    m_pInventoryPistolList->Show(true);
-    m_pInventoryAutomaticList->Show(true);
+    m_pLists[eInventoryBagList]->Show(true);
+    m_pLists[eInventoryBeltList]->Show(true);
+    m_pLists[eInventoryOutfitList]->Show(true);
+    if (m_pLists[eInventoryHelmetList])
+        m_pLists[eInventoryHelmetList]->Show(true);
+    m_pLists[eInventoryDetectorList]->Show(true);
+    m_pLists[eInventoryPistolList]->Show(true);
+    m_pLists[eInventoryAutomaticList]->Show(true);
     if (m_pQuickSlot)
         m_pQuickSlot->Show(true);
-    if (m_pTrashList)
-        m_pTrashList->Show(true);
+    if (m_pLists[eTrashList])
+        m_pLists[eTrashList]->Show(true);
     m_RightDelimiter->Show(false);
     if (m_clock_value)
         m_clock_value->Show(true);
 
-    InitInventoryContents(m_pInventoryBagList);
+    InitInventoryContents(m_pLists[eInventoryBagList]);
 
     VERIFY(CurrentGameUI());
     CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(true);
@@ -62,8 +62,8 @@ void CUIActorMenu::InitInventoryMode()
 
 void CUIActorMenu::DeInitInventoryMode()
 {
-    if (m_pTrashList)
-       m_pTrashList->Show(false);
+    if (m_pLists[eTrashList])
+       m_pLists[eTrashList]->Show(false);
     if (m_clock_value)
         m_clock_value->Show(false);
 }
@@ -159,15 +159,15 @@ void CUIActorMenu::DropAllCurrentItem()
 
 bool CUIActorMenu::DropAllItemsFromRuck(bool quest_force)
 {
-    if (!IsShown() || !m_pInventoryBagList || m_currMenuMode != mmInventory)
+    if (!IsShown() || !m_pLists[eInventoryBagList] || m_currMenuMode != mmInventory)
     {
         return false;
     }
 
-    u32 const ci_count = m_pInventoryBagList->ItemsCount();
+    u32 const ci_count = m_pLists[eInventoryBagList]->ItemsCount();
     for (u32 i = 0; i < ci_count; ++i)
     {
-        CUICellItem* ci = m_pInventoryBagList->GetItemIdx(i);
+        CUICellItem* ci = m_pLists[eInventoryBagList]->GetItemIdx(i);
         VERIFY(ci);
         PIItem item = (PIItem)ci->m_pData;
         VERIFY(item);
@@ -239,9 +239,9 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 {
     CUIDragDropListEx* all_lists[] =
     {
-        m_pInventoryBeltList, m_pInventoryPistolList, m_pInventoryAutomaticList,
-        m_pInventoryOutfitList, m_pInventoryHelmetList, m_pInventoryDetectorList, m_pInventoryBagList,
-        m_pTradeActorBagList, m_pTradeActorList
+        m_pLists[eInventoryBeltList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
+        m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList], m_pLists[eInventoryBagList],
+        m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
     };
 
     switch (action_type)
@@ -276,7 +276,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 
         for (auto& curr : all_lists)
         {
-            if (!curr) // m_pInventoryHelmetList can be nullptr
+            if (!curr) // m_pLists[eInventoryHelmetList] can be nullptr
                 continue;
             CUICellItem* ci = nullptr;
 
@@ -294,7 +294,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
             }
         }
         CUICellItem* ci = nullptr;
-        if (GetMenuMode() == mmDeadBodySearch && FindItemInList(m_pDeadBodyBagList, pItem, ci))
+        if (GetMenuMode() == mmDeadBodySearch && FindItemInList(m_pLists[eDeadBodyBagList], pItem, ci))
             break;
 
         if (!b_already)
@@ -325,7 +325,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 
         for (auto& curr : all_lists)
         {
-            if (!curr) // m_pInventoryHelmetList can be nullptr
+            if (!curr) // m_pLists[eInventoryHelmetList] can be nullptr
                 continue;
 
             if (RemoveItemFromList(curr, pItem))
@@ -438,7 +438,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
         InitCellForSlot(TORCH_SLOT); //Alundaio: TODO find out why this crash when you unequip
     //-Alundaio
 
-    curr_list = m_pInventoryBeltList;
+    curr_list = m_pLists[eInventoryBeltList];
     TIItemContainer::iterator itb = m_pActorInvOwner->inventory().m_belt.begin();
     TIItemContainer::iterator ite = m_pActorInvOwner->inventory().m_belt.end();
     for (; itb != ite; ++itb)
@@ -685,10 +685,10 @@ bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
         if (b_use_cursor_pos)
         {
             new_owner = CUIDragDropListEx::m_drag_item->BackList();
-            VERIFY(new_owner == m_pInventoryBeltList);
+            VERIFY(new_owner == m_pLists[eInventoryBeltList]);
         }
         else
-            new_owner = m_pInventoryBeltList;
+            new_owner = m_pLists[eInventoryBeltList];
 
         bool result = (!b_own_item) || m_pActorInvOwner->inventory().Belt(iitem);
         VERIFY(result);
@@ -740,15 +740,15 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     }
     switch (slot_idx)
     {
-    case INV_SLOT_2: return m_pInventoryPistolList; break;
+    case INV_SLOT_2: return m_pLists[eInventoryPistolList]; break;
 
-    case INV_SLOT_3: return m_pInventoryAutomaticList; break;
+    case INV_SLOT_3: return m_pLists[eInventoryAutomaticList]; break;
 
-    case OUTFIT_SLOT: return m_pInventoryOutfitList; break;
+    case OUTFIT_SLOT: return m_pLists[eInventoryOutfitList]; break;
 
-    case HELMET_SLOT: return m_pInventoryHelmetList; break;
+    case HELMET_SLOT: return m_pLists[eInventoryHelmetList]; break;
 
-    case DETECTOR_SLOT: return m_pInventoryDetectorList; break;
+    case DETECTOR_SLOT: return m_pLists[eInventoryDetectorList]; break;
 
     case PDA_SLOT:
     case TORCH_SLOT:
@@ -759,9 +759,9 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     case GRENADE_SLOT: // fake
         if (m_currMenuMode == mmTrade)
         {
-            return m_pTradeActorBagList;
+            return m_pLists[eTradeActorBagList];
         }
-        return m_pInventoryBagList;
+        return m_pLists[eInventoryBagList];
         break;
     };
     return NULL;
@@ -839,7 +839,7 @@ bool CUIActorMenu::OnItemDropped(PIItem itm, CUIDragDropListEx* new_owner, CUIDr
     if (!_iitem->CanAttach(itm))
         return false;
 
-    if (old_owner != m_pInventoryBagList)
+    if (old_owner != m_pLists[eInventoryBagList])
         return false;
 
     AttachAddon(_iitem);
@@ -1336,7 +1336,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         PIItem item = CurrentIItem(); // temporary storing because of AttachAddon is setting curiitem to NULL
         AttachAddon((PIItem)(m_UIPropertiesBox->GetClickedItem()->GetData()));
         if (m_currMenuMode == mmDeadBodySearch)
-            RemoveItemFromList(m_pDeadBodyBagList, item);
+            RemoveItemFromList(m_pLists[eDeadBodyBagList], item);
 
         break;
     }
@@ -1442,7 +1442,7 @@ void CUIActorMenu::UpdateOutfit()
     u32 af_count = m_pActorInvOwner->inventory().BeltWidth();
     VERIFY(0 <= af_count && af_count <= 5);
 
-    VERIFY(m_pInventoryBeltList);
+    VERIFY(m_pLists[eInventoryBeltList]);
     CCustomOutfit* outfit = m_pActorInvOwner->GetOutfit();
 
     if (m_HelmetOver)
@@ -1478,7 +1478,7 @@ void CUIActorMenu::UpdateOutfit()
         afc.y = 1; // af_count;
     }
 
-    m_pInventoryBeltList->SetCellsCapacity(afc);
+    m_pLists[eInventoryBeltList]->SetCellsCapacity(afc);
 
     for (u8 i = 0; i < af_count; ++i)
     {
@@ -1488,13 +1488,13 @@ void CUIActorMenu::UpdateOutfit()
 
 void CUIActorMenu::MoveArtefactsToBag()
 {
-    while (m_pInventoryBeltList->ItemsCount())
+    while (m_pLists[eInventoryBeltList]->ItemsCount())
     {
-        CUICellItem* ci = m_pInventoryBeltList->GetItemIdx(0);
+        CUICellItem* ci = m_pLists[eInventoryBeltList]->GetItemIdx(0);
         VERIFY(ci && ci->m_pData);
         ToBag(ci, false);
     } // for i
-    m_pInventoryBeltList->ClearAll(true);
+    m_pLists[eInventoryBeltList]->ClearAll(true);
 }
 
 void CUIActorMenu::RefreshCurrentItemCell()

@@ -269,36 +269,36 @@ void CUIActorMenu::CheckDistance()
 
 EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 {
-    if (l == m_pInventoryBagList)
+    if (l == m_pLists[eInventoryBagList])
         return iActorBag;
-    if (l == m_pInventoryBeltList)
+    if (l == m_pLists[eInventoryBeltList])
         return iActorBelt;
 
-    if (l == m_pInventoryAutomaticList)
+    if (l == m_pLists[eInventoryAutomaticList])
         return iActorSlot;
-    if (l == m_pInventoryPistolList)
+    if (l == m_pLists[eInventoryPistolList])
         return iActorSlot;
-    if (l == m_pInventoryOutfitList)
+    if (l == m_pLists[eInventoryOutfitList])
         return iActorSlot;
-    if (l == m_pInventoryHelmetList && m_pInventoryHelmetList != nullptr)
+    if (l == m_pLists[eInventoryHelmetList] && m_pLists[eInventoryHelmetList] != nullptr)
         return iActorSlot;
-    if (l == m_pInventoryDetectorList)
+    if (l == m_pLists[eInventoryDetectorList])
         return iActorSlot;
 
-    if (l == m_pTradeActorBagList)
+    if (l == m_pLists[eTradeActorBagList])
         return iActorBag;
-    if (l == m_pTradeActorList)
+    if (l == m_pLists[eTradeActorList])
         return iActorTrade;
-    if (l == m_pTradePartnerBagList)
+    if (l == m_pLists[eTradePartnerBagList])
         return iPartnerTradeBag;
-    if (l == m_pTradePartnerList)
+    if (l == m_pLists[eTradePartnerList])
         return iPartnerTrade;
-    if (l == m_pDeadBodyBagList)
+    if (l == m_pLists[eDeadBodyBagList])
         return iDeadBodyBag;
 
     if (l == m_pQuickSlot && m_pQuickSlot != nullptr)
         return iQuickSlot;
-    if (l == m_pTrashList && m_pTrashList != nullptr)
+    if (l == m_pLists[eTrashList] && m_pLists[eTrashList] != nullptr)
         return iTrashSlot;
 
     NODEFAULT;
@@ -313,15 +313,15 @@ CUIDragDropListEx* CUIActorMenu::GetListByType(EDDListType t)
     case iActorBag:
     {
         if (m_currMenuMode == mmTrade)
-            return m_pTradeActorBagList;
+            return m_pLists[eTradeActorBagList];
         else
-            return m_pInventoryBagList;
+            return m_pLists[eInventoryBagList];
     }
     break;
-    case iDeadBodyBag: { return m_pDeadBodyBagList;
+    case iDeadBodyBag: { return m_pLists[eDeadBodyBagList];
     }
     break;
-    case iActorBelt: { return m_pInventoryBeltList;
+    case iActorBelt: { return m_pLists[eInventoryBeltList];
     }
     break;
     default: { R_ASSERT("invalid call");
@@ -463,20 +463,20 @@ void CUIActorMenu::clear_highlight_lists()
             m_ArtefactSlotsHighlight[i]->Show(false);
     }
 
-    m_pInventoryBagList->clear_select_armament();
+    m_pLists[eInventoryBagList]->clear_select_armament();
 
     switch (m_currMenuMode)
     {
     case mmUndefined: break;
     case mmInventory: break;
     case mmTrade:
-        m_pTradeActorBagList->clear_select_armament();
-        m_pTradeActorList->clear_select_armament();
-        m_pTradePartnerBagList->clear_select_armament();
-        m_pTradePartnerList->clear_select_armament();
+        m_pLists[eTradeActorBagList]->clear_select_armament();
+        m_pLists[eTradeActorList]->clear_select_armament();
+        m_pLists[eTradePartnerBagList]->clear_select_armament();
+        m_pLists[eTradePartnerList]->clear_select_armament();
         break;
     case mmUpgrade: break;
-    case mmDeadBodySearch: m_pDeadBodyBagList->clear_select_armament(); break;
+    case mmDeadBodySearch: m_pLists[eDeadBodyBagList]->clear_select_armament(); break;
     }
     m_highlight_clear = true;
 }
@@ -542,7 +542,7 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
 
         if (m_ArtefactSlotsHighlight[0])
         {
-            Ivector2 cap = m_pInventoryBeltList->CellsCapacity();
+            Ivector2 cap = m_pLists[eInventoryBeltList]->CellsCapacity();
             for (u8 i = 0; i < cap.x; i++)
                 m_ArtefactSlotsHighlight[i]->Show(true);
         }
@@ -564,21 +564,21 @@ void CUIActorMenu::set_highlight_item(CUICellItem* cell_item)
     case mmInventory:
     case mmUpgrade:
     {
-        highlight_armament(item, m_pInventoryBagList);
+        highlight_armament(item, m_pLists[eInventoryBagList]);
         break;
     }
     case mmTrade:
     {
-        highlight_armament(item, m_pTradeActorBagList);
-        highlight_armament(item, m_pTradeActorList);
-        highlight_armament(item, m_pTradePartnerBagList);
-        highlight_armament(item, m_pTradePartnerList);
+        highlight_armament(item, m_pLists[eTradeActorBagList]);
+        highlight_armament(item, m_pLists[eTradeActorList]);
+        highlight_armament(item, m_pLists[eTradePartnerBagList]);
+        highlight_armament(item, m_pLists[eTradePartnerList]);
         break;
     }
     case mmDeadBodySearch:
     {
-        highlight_armament(item, m_pInventoryBagList);
-        highlight_armament(item, m_pDeadBodyBagList);
+        highlight_armament(item, m_pLists[eInventoryBagList]);
+        highlight_armament(item, m_pLists[eDeadBodyBagList]);
         break;
     }
     }
@@ -794,23 +794,23 @@ void CUIActorMenu::ClearAllLists()
     // XXX: to be removed
     if (ShadowOfChernobylMode)
         return;
-    m_pInventoryBagList->ClearAll(true);
+    m_pLists[eInventoryBagList]->ClearAll(true);
 
-    m_pInventoryBeltList->ClearAll(true);
-    m_pInventoryOutfitList->ClearAll(true);
-    if (m_pInventoryHelmetList)
-        m_pInventoryHelmetList->ClearAll(true);
-    m_pInventoryDetectorList->ClearAll(true);
-    m_pInventoryPistolList->ClearAll(true);
-    m_pInventoryAutomaticList->ClearAll(true);
+    m_pLists[eInventoryBeltList]->ClearAll(true);
+    m_pLists[eInventoryOutfitList]->ClearAll(true);
+    if (m_pLists[eInventoryHelmetList])
+        m_pLists[eInventoryHelmetList]->ClearAll(true);
+    m_pLists[eInventoryDetectorList]->ClearAll(true);
+    m_pLists[eInventoryPistolList]->ClearAll(true);
+    m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)
         m_pQuickSlot->ClearAll(true);
 
-    m_pTradeActorBagList->ClearAll(true);
-    m_pTradeActorList->ClearAll(true);
-    m_pTradePartnerBagList->ClearAll(true);
-    m_pTradePartnerList->ClearAll(true);
-    m_pDeadBodyBagList->ClearAll(true);
+    m_pLists[eTradeActorBagList]->ClearAll(true);
+    m_pLists[eTradeActorList]->ClearAll(true);
+    m_pLists[eTradePartnerBagList]->ClearAll(true);
+    m_pLists[eTradePartnerList]->ClearAll(true);
+    m_pLists[eDeadBodyBagList]->ClearAll(true);
 }
 
 void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)
@@ -862,13 +862,13 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
         return true;
     }
 
-    if (item_slot == INV_SLOT_3 && l == m_pInventoryPistolList)
+    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList])
     {
         ret_slot = INV_SLOT_2;
         return true;
     }
 
-    if (item_slot == INV_SLOT_2 && l == m_pInventoryAutomaticList)
+    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList])
     {
         ret_slot = INV_SLOT_3;
         return true;

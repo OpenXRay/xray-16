@@ -25,16 +25,16 @@
 
 void CUIActorMenu::InitTradeMode()
 {
-    m_pInventoryBagList->Show(false);
+    m_pLists[eInventoryBagList]->Show(false);
     m_PartnerCharacterInfo->Show(true);
     m_PartnerMoney->Show(true);
     if (m_pQuickSlot)
         m_pQuickSlot->Show(true);
 
-    m_pTradeActorBagList->Show(true);
-    m_pTradeActorList->Show(true);
-    m_pTradePartnerBagList->Show(true);
-    m_pTradePartnerList->Show(true);
+    m_pLists[eTradeActorBagList]->Show(true);
+    m_pLists[eTradeActorList]->Show(true);
+    m_pLists[eTradePartnerBagList]->Show(true);
+    m_pLists[eTradePartnerList]->Show(true);
 
     m_RightDelimiter->Show(true);
     m_LeftDelimiter->Show(true);
@@ -52,7 +52,7 @@ void CUIActorMenu::InitTradeMode()
     VERIFY(m_pPartnerInvOwner);
     m_pPartnerInvOwner->StartTrading();
 
-    InitInventoryContents(m_pTradeActorBagList);
+    InitInventoryContents(m_pLists[eTradeActorBagList]);
     InitPartnerInventoryContents();
 
     m_actor_trade = m_pActorInvOwner->GetTrade();
@@ -83,7 +83,7 @@ bool is_item_in_list(CUIDragDropListEx* pList, PIItem item)
 
 void CUIActorMenu::InitPartnerInventoryContents()
 {
-    m_pTradePartnerBagList->ClearAll(true);
+    m_pLists[eTradePartnerBagList]->ClearAll(true);
 
     TIItemContainer items_list;
     m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, true);
@@ -93,10 +93,10 @@ void CUIActorMenu::InitPartnerInventoryContents()
     TIItemContainer::iterator ite = items_list.end();
     for (; itb != ite; ++itb)
     {
-        if (!is_item_in_list(m_pTradePartnerList, *itb))
+        if (!is_item_in_list(m_pLists[eTradePartnerList], *itb))
         {
             CUICellItem* itm = create_cell_item(*itb);
-            m_pTradePartnerBagList->SetItem(itm);
+            m_pLists[eTradePartnerBagList]->SetItem(itm);
         }
     }
     m_trade_partner_inventory_state = m_pPartnerInvOwner->inventory().ModifyFrame();
@@ -129,14 +129,14 @@ void CUIActorMenu::DeInitTradeMode()
         m_pPartnerInvOwner->StopTrading();
     }
 
-    m_pInventoryBagList->Show(true);
+    m_pLists[eInventoryBagList]->Show(true);
     m_PartnerCharacterInfo->Show(false);
     m_PartnerMoney->Show(false);
 
-    m_pTradeActorBagList->Show(false);
-    m_pTradeActorList->Show(false);
-    m_pTradePartnerBagList->Show(false);
-    m_pTradePartnerList->Show(false);
+    m_pLists[eTradeActorBagList]->Show(false);
+    m_pLists[eTradeActorList]->Show(false);
+    m_pLists[eTradePartnerBagList]->Show(false);
+    m_pLists[eTradePartnerList]->Show(false);
 
     m_RightDelimiter->Show(false);
     m_LeftDelimiter->Show(false);
@@ -183,10 +183,10 @@ bool CUIActorMenu::ToActorTrade(CUICellItem* itm, bool b_use_cursor_pos)
         if (b_use_cursor_pos)
         {
             new_owner = CUIDragDropListEx::m_drag_item->BackList();
-            VERIFY(new_owner == m_pTradeActorList);
+            VERIFY(new_owner == m_pLists[eTradeActorList]);
         }
         else
-            new_owner = m_pTradeActorList;
+            new_owner = m_pLists[eTradeActorList];
 
         bool result = (old_owner_type != iActorBag) ? m_pActorInvOwner->inventory().Ruck(iitem) : true;
         VERIFY(result);
@@ -223,10 +223,10 @@ bool CUIActorMenu::ToPartnerTrade(CUICellItem* itm, bool b_use_cursor_pos)
     if (b_use_cursor_pos)
     {
         new_owner = CUIDragDropListEx::m_drag_item->BackList();
-        VERIFY(new_owner == m_pTradePartnerList);
+        VERIFY(new_owner == m_pLists[eTradePartnerList]);
     }
     else
-        new_owner = m_pTradePartnerList;
+        new_owner = m_pLists[eTradePartnerList];
 
     CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
 
@@ -247,10 +247,10 @@ bool CUIActorMenu::ToPartnerTradeBag(CUICellItem* itm, bool b_use_cursor_pos)
     if (b_use_cursor_pos)
     {
         new_owner = CUIDragDropListEx::m_drag_item->BackList();
-        VERIFY(new_owner == m_pTradePartnerBagList);
+        VERIFY(new_owner == m_pLists[eTradePartnerBagList]);
     }
     else
-        new_owner = m_pTradePartnerBagList;
+        new_owner = m_pLists[eTradePartnerBagList];
 
     CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
 
@@ -311,8 +311,8 @@ bool CUIActorMenu::CanMoveToPartner(PIItem pItem)
     if (pItem->GetCondition() < m_pPartnerInvOwner->trade_parameters().buy_item_condition_factor)
         return false;
 
-    float r1 = CalcItemsWeight(m_pTradeActorList); // actor
-    float r2 = CalcItemsWeight(m_pTradePartnerList); // partner
+    float r1 = CalcItemsWeight(m_pLists[eTradeActorList]); // actor
+    float r2 = CalcItemsWeight(m_pLists[eTradePartnerList]); // partner
     float itmWeight = pItem->Weight();
     float partner_inv_weight = m_pPartnerInvOwner->inventory().CalcTotalWeight();
     float partner_max_weight = m_pPartnerInvOwner->MaxCarryWeight();
@@ -380,7 +380,7 @@ void CUIActorMenu::UpdatePartnerBag()
     }
 
     LPCSTR kg_str = StringTable().translate("st_kg").c_str();
-    float total = CalcItemsWeight(m_pTradePartnerBagList);
+    float total = CalcItemsWeight(m_pLists[eTradePartnerBagList]);
     xr_sprintf(buf, "%.1f %s", total, kg_str);
     m_PartnerWeight->SetText(buf);
     m_PartnerWeight->AdjustWidthToText();
@@ -398,8 +398,8 @@ void CUIActorMenu::UpdatePrices()
 
     UpdateActor();
     UpdatePartnerBag();
-    u32 actor_price = CalcItemsPrice(m_pTradeActorList, m_partner_trade, true);
-    u32 partner_price = CalcItemsPrice(m_pTradePartnerList, m_partner_trade, false);
+    u32 actor_price = CalcItemsPrice(m_pLists[eTradeActorList], m_partner_trade, true);
+    u32 partner_price = CalcItemsPrice(m_pLists[eTradePartnerList], m_partner_trade, false);
 
     string64 buf;
     xr_sprintf(buf, "%d RU", actor_price);
@@ -409,8 +409,8 @@ void CUIActorMenu::UpdatePrices()
     m_PartnerTradePrice->SetText(buf);
     m_PartnerTradePrice->AdjustWidthToText();
 
-    float actor_weight = CalcItemsWeight(m_pTradeActorList);
-    float partner_weight = CalcItemsWeight(m_pTradePartnerList);
+    float actor_weight = CalcItemsWeight(m_pLists[eTradeActorList]);
+    float partner_weight = CalcItemsWeight(m_pLists[eTradePartnerList]);
 
     xr_sprintf(buf, "(%.1f %s)", actor_weight, kg_str);
     m_ActorTradeWeightMax->SetText(buf);
@@ -432,15 +432,15 @@ void CUIActorMenu::UpdatePrices()
 
 void CUIActorMenu::OnBtnPerformTrade(CUIWindow* w, void* d)
 {
-    if (m_pTradeActorList->ItemsCount() == 0 && m_pTradePartnerList->ItemsCount() == 0)
+    if (m_pLists[eTradeActorList]->ItemsCount() == 0 && m_pLists[eTradePartnerList]->ItemsCount() == 0)
     {
         return;
     }
 
     int actor_money = (int)m_pActorInvOwner->get_money();
     int partner_money = (int)m_pPartnerInvOwner->get_money();
-    int actor_price = (int)CalcItemsPrice(m_pTradeActorList, m_partner_trade, true);
-    int partner_price = (int)CalcItemsPrice(m_pTradePartnerList, m_partner_trade, false);
+    int actor_price = (int)CalcItemsPrice(m_pLists[eTradeActorList], m_partner_trade, true);
+    int partner_price = (int)CalcItemsPrice(m_pLists[eTradePartnerList], m_partner_trade, false);
 
     int delta_price = actor_price - partner_price;
     actor_money += delta_price;
@@ -450,8 +450,8 @@ void CUIActorMenu::OnBtnPerformTrade(CUIWindow* w, void* d)
     {
         m_partner_trade->OnPerformTrade(partner_price, actor_price);
 
-        TransferItems(m_pTradeActorList, m_pTradePartnerBagList, m_partner_trade, true);
-        TransferItems(m_pTradePartnerList, m_pTradeActorBagList, m_partner_trade, false);
+        TransferItems(m_pLists[eTradeActorList], m_pLists[eTradePartnerBagList], m_partner_trade, true);
+        TransferItems(m_pLists[eTradePartnerList], m_pLists[eTradeActorBagList], m_partner_trade, false);
     }
     else
     {
@@ -475,15 +475,15 @@ void CUIActorMenu::OnBtnPerformTrade(CUIWindow* w, void* d)
 
 void CUIActorMenu::OnBtnPerformTradeBuy(CUIWindow* w, void* d)
 {
-    if (m_pTradePartnerList->ItemsCount() == 0)
+    if (m_pLists[eTradePartnerList]->ItemsCount() == 0)
     {
         return;
     }
 
     int actor_money = (int)m_pActorInvOwner->get_money();
     int partner_money = (int)m_pPartnerInvOwner->get_money();
-    int actor_price = 0; //(int)CalcItemsPrice( m_pTradeActorList,   m_partner_trade, true  );
-    int partner_price = (int)CalcItemsPrice(m_pTradePartnerList, m_partner_trade, false);
+    int actor_price = 0; //(int)CalcItemsPrice( m_pLists[eTradeActorList],   m_partner_trade, true  );
+    int partner_price = (int)CalcItemsPrice(m_pLists[eTradePartnerList], m_partner_trade, false);
 
     int delta_price = actor_price - partner_price;
     actor_money += delta_price;
@@ -493,8 +493,8 @@ void CUIActorMenu::OnBtnPerformTradeBuy(CUIWindow* w, void* d)
     {
         m_partner_trade->OnPerformTrade(partner_price, actor_price);
 
-        //		TransferItems( m_pTradeActorList,   m_pTradePartnerBagList, m_partner_trade, true );
-        TransferItems(m_pTradePartnerList, m_pTradeActorBagList, m_partner_trade, false);
+        //		TransferItems( m_pLists[eTradeActorList],   m_pLists[eTradePartnerBagList], m_partner_trade, true );
+        TransferItems(m_pLists[eTradePartnerList], m_pLists[eTradeActorBagList], m_partner_trade, false);
     }
     else
     {
@@ -517,15 +517,15 @@ void CUIActorMenu::OnBtnPerformTradeBuy(CUIWindow* w, void* d)
 }
 void CUIActorMenu::OnBtnPerformTradeSell(CUIWindow* w, void* d)
 {
-    if (m_pTradeActorList->ItemsCount() == 0)
+    if (m_pLists[eTradeActorList]->ItemsCount() == 0)
     {
         return;
     }
 
     int actor_money = (int)m_pActorInvOwner->get_money();
     int partner_money = (int)m_pPartnerInvOwner->get_money();
-    int actor_price = (int)CalcItemsPrice(m_pTradeActorList, m_partner_trade, true);
-    int partner_price = 0; //(int)CalcItemsPrice( m_pTradePartnerList, m_partner_trade, false );
+    int actor_price = (int)CalcItemsPrice(m_pLists[eTradeActorList], m_partner_trade, true);
+    int partner_price = 0; //(int)CalcItemsPrice( m_pLists[eTradePartnerList], m_partner_trade, false );
 
     int delta_price = actor_price - partner_price;
     actor_money += delta_price;
@@ -535,8 +535,8 @@ void CUIActorMenu::OnBtnPerformTradeSell(CUIWindow* w, void* d)
     {
         m_partner_trade->OnPerformTrade(partner_price, actor_price);
 
-        TransferItems(m_pTradeActorList, m_pTradePartnerBagList, m_partner_trade, true);
-        //		TransferItems( m_pTradePartnerList,	m_pTradeActorBagList,	m_partner_trade, false );
+        TransferItems(m_pLists[eTradeActorList], m_pLists[eTradePartnerBagList], m_partner_trade, true);
+        //		TransferItems( m_pLists[eTradePartnerList],	m_pLists[eTradeActorBagList],	m_partner_trade, false );
     }
     else
     {
@@ -588,7 +588,7 @@ void CUIActorMenu::TransferItems(
 //Alundaio: Donate current item while in trade menu
 void CUIActorMenu::DonateCurrentItem(CUICellItem* cell_item)
 {
-    if (!m_partner_trade || !m_pTradePartnerList)
+    if (!m_partner_trade || !m_pLists[eTradePartnerList])
         return;
 
     CUIDragDropListEx* invlist = GetListByType(iActorBag);
@@ -603,7 +603,7 @@ void CUIActorMenu::DonateCurrentItem(CUICellItem* cell_item)
 
     m_partner_trade->TransferItem(item, true, true);
 
-    m_pTradePartnerList->SetItem(itm);
+    m_pLists[eTradePartnerList]->SetItem(itm);
 
     SetCurrentItem(nullptr);
     UpdateItemsPlace();

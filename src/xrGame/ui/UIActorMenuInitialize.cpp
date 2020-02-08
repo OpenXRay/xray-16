@@ -155,28 +155,42 @@ void CUIActorMenu::Construct()
         }
     }
 
-    m_pInventoryBagList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_bag", this);
-    m_pInventoryBeltList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_belt", this);
-    m_pInventoryOutfitList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_outfit", this);
-    m_pInventoryHelmetList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_helmet", this, false);
-    m_pInventoryDetectorList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_detector", this);
-    m_pInventoryPistolList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_pistol", this);
-    m_pInventoryAutomaticList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_automatic", this);
-    m_pTradeActorBagList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_actor_trade_bag", this);
-    m_pTradeActorList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_actor_trade", this);
-    m_pTradePartnerBagList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_bag", this);
-    m_pTradePartnerList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_partner_trade", this);
-    m_pDeadBodyBagList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_deadbody_bag", this);
+    constexpr std::tuple<eActorMenuListType, cpcstr, bool> inventory_lists[] =
+    {
+        // { id,                   "xml_section_name",         is_it_critical_and_required }
+        { eInventoryPistolList,    "dragdrop_pistol",          true },
+        { eInventoryAutomaticList, "dragdrop_automatic",       true },
+
+        { eInventoryOutfitList,    "dragdrop_outfit",          true },
+        { eInventoryHelmetList,    "dragdrop_helmet",          false },
+
+        { eInventoryBeltList,      "dragdrop_belt",            true },
+        { eInventoryDetectorList,  "dragdrop_detector",        true },
+
+        { eInventoryBagList,       "dragdrop_bag",             true },
+
+        { eTradeActorList,         "dragdrop_actor_trade",     true },
+        { eTradeActorBagList,      "dragdrop_actor_trade_bag", true },
+
+        { eTradePartnerList,       "dragdrop_partner_trade",   true },
+        { eTradePartnerBagList,    "dragdrop_partner_bag",     true },
+
+        { eDeadBodyBagList,        "dragdrop_deadbody_bag",    true },
+
+        { eTrashList,              "dragdrop_trash",           false },
+    };
+    static_assert(std::size(inventory_lists) == eListCount,
+        "All lists should be listed in the tuple above.");
+
+    for (const auto& listDesc : inventory_lists)
+    {
+        auto [id, section, critical] = listDesc;
+        m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, this, critical);
+    }
+
     m_pQuickSlot = UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this, false);
     if (m_pQuickSlot)
         m_pQuickSlot->Initialize();
-
-    m_pTrashList = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_trash", this, false);
-    if (m_pTrashList)
-    {
-        m_pTrashList->m_f_item_drop = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDrop);
-        m_pTrashList->m_f_drag_event = CUIDragDropListEx::DRAG_ITEM_EVENT(this, &CUIActorMenu::OnDragItemOnTrash);
-    }
 
     m_belt_list_over[0] = UIHelper::CreateStatic(uiXml, "belt_list_over", this);
     {
@@ -295,6 +309,8 @@ void CUIActorMenu::InitSounds(CUIXml& uiXml)
 
 void CUIActorMenu::BindDragDropListEvents(CUIDragDropListEx* lst)
 {
+    if (!lst)
+        return;
     lst->m_f_item_drop = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDrop);
     lst->m_f_item_start_drag = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemStartDrag);
     lst->m_f_item_db_click = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDbClick);
@@ -395,21 +411,32 @@ void CUIActorMenu::InitCallbacks()
     AddCallback(m_pUpgradeWnd->m_btn_repair, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
 
-    BindDragDropListEvents(m_pInventoryBeltList);
-    BindDragDropListEvents(m_pInventoryPistolList);
-    BindDragDropListEvents(m_pInventoryAutomaticList);
-    BindDragDropListEvents(m_pInventoryOutfitList);
-    if (m_pInventoryHelmetList)
-        BindDragDropListEvents(m_pInventoryHelmetList);
-    BindDragDropListEvents(m_pInventoryDetectorList);
-    BindDragDropListEvents(m_pInventoryBagList);
-    BindDragDropListEvents(m_pTradeActorBagList);
-    BindDragDropListEvents(m_pTradeActorList);
-    BindDragDropListEvents(m_pTradePartnerBagList);
-    BindDragDropListEvents(m_pTradePartnerList);
-    BindDragDropListEvents(m_pDeadBodyBagList);
-    if (m_pQuickSlot)
-        BindDragDropListEvents(m_pQuickSlot);
+    BindDragDropListEvents(m_pLists[eInventoryPistolList]);
+    BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
+
+    BindDragDropListEvents(m_pLists[eInventoryOutfitList]);
+    BindDragDropListEvents(m_pLists[eInventoryHelmetList]);
+
+    BindDragDropListEvents(m_pLists[eInventoryBeltList]);
+    BindDragDropListEvents(m_pLists[eInventoryDetectorList]);
+
+    BindDragDropListEvents(m_pLists[eInventoryBagList]);
+
+    BindDragDropListEvents(m_pLists[eTradeActorBagList]);
+    BindDragDropListEvents(m_pLists[eTradeActorList]);
+
+    BindDragDropListEvents(m_pLists[eTradePartnerBagList]);
+    BindDragDropListEvents(m_pLists[eTradePartnerList]);
+
+    BindDragDropListEvents(m_pLists[eDeadBodyBagList]);
+
+    if (m_pLists[eTrashList])
+    {
+        m_pLists[eTrashList]->m_f_item_drop = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemDrop);
+        m_pLists[eTrashList]->m_f_drag_event = CUIDragDropListEx::DRAG_ITEM_EVENT(this, &CUIActorMenu::OnDragItemOnTrash);
+    }
+
+    BindDragDropListEvents(m_pQuickSlot);
 }
 
 void CUIActorMenu::UpdateButtonsLayout()

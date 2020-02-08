@@ -79,6 +79,32 @@ protected:
         eSndMax
     };
 
+    enum eActorMenuListType
+    {
+        eInventoryPistolList,
+        eInventoryAutomaticList,
+
+        eInventoryOutfitList,
+        eInventoryHelmetList,
+
+        eInventoryBeltList,
+        eInventoryDetectorList,
+
+        eInventoryBagList,
+
+        eTradeActorList,
+        eTradeActorBagList,
+
+        eTradePartnerList,
+        eTradePartnerBagList,
+
+        eDeadBodyBagList,
+
+        eTrashList,
+
+        eListCount
+    };
+
     EMenuMode m_currMenuMode;
     ref_sound sounds[eSndMax];
     void PlaySnd(eActorMenuSndAction a);
@@ -96,20 +122,7 @@ protected:
     CUICharacterInfo* m_ActorCharacterInfo{};
     CUICharacterInfo* m_PartnerCharacterInfo{};
 
-    CUIDragDropListEx* m_pInventoryBeltList{};
-    CUIDragDropListEx* m_pInventoryPistolList{};
-    CUIDragDropListEx* m_pInventoryAutomaticList{};
-    CUIDragDropListEx* m_pInventoryOutfitList{};
-    CUIDragDropListEx* m_pInventoryHelmetList{};
-    CUIDragDropListEx* m_pInventoryDetectorList{};
-    CUIDragDropListEx* m_pInventoryBagList{};
-
-    CUIDragDropListEx* m_pTradeActorBagList{};
-    CUIDragDropListEx* m_pTradeActorList{};
-    CUIDragDropListEx* m_pTradePartnerBagList{};
-    CUIDragDropListEx* m_pTradePartnerList{};
-    CUIDragDropListEx* m_pDeadBodyBagList{};
-    CUIDragDropListEx* m_pTrashList{};
+    CUIDragDropListEx* m_pLists[eListCount]{};
 
     enum
     {
