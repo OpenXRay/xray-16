@@ -6492,6 +6492,9 @@
     <ClInclude Include="ui\UIVersionList.h">
       <Filter>UI\Multiplayer\MM_MP\VersionList</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIOutfitSlot.h">
+      <Filter>UI\Common\Inventory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9850,6 +9853,9 @@
     <ClCompile Include="VersionSwitcher.cpp" />
     <ClCompile Include="ui\UIVersionList.cpp">
       <Filter>UI\Multiplayer\MM_MP\VersionList</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIOutfitSlot.cpp">
+      <Filter>UI\Common\Inventory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

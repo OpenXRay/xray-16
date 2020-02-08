@@ -1542,6 +1542,7 @@
     <ClInclude Include="ui\UINewsItemWnd.h" />
     <ClInclude Include="ui\UIOptConCom.h" />
     <ClInclude Include="ui\UIOutfitInfo.h" />
+    <ClInclude Include="ui\UIOutfitSlot.h" />
     <ClInclude Include="ui\UIPdaKillMessage.h" />
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
     <ClInclude Include="ui\UIPdaWnd.h" />
@@ -3550,6 +3551,7 @@
     <ClCompile Include="ui\UINewsItemWnd.cpp" />
     <ClCompile Include="ui\UIOptConCom.cpp" />
     <ClCompile Include="ui\UIOutfitInfo.cpp" />
+    <ClCompile Include="ui\UIOutfitSlot.cpp" />
     <ClCompile Include="ui\UIPdaKillMessage.cpp" />
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
     <ClCompile Include="ui\UIPdaWnd.cpp" />
