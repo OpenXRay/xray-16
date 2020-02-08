@@ -232,20 +232,6 @@ void CUIActorMenu::Construct()
     m_ActorStateInfo->SetAutoDelete(true);
     AttachChild(m_ActorStateInfo);
 
-    XML_NODE stored_root = uiXml.GetLocalRoot();
-    uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));
-    GEnv.Sound->create(sounds[eSndOpen], uiXml.Read("snd_open", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eSndClose], uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemToSlot], uiXml.Read("snd_item_to_slot", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemToBelt], uiXml.Read("snd_item_to_belt", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemToRuck], uiXml.Read("snd_item_to_ruck", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eProperties], uiXml.Read("snd_properties", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eDropItem], uiXml.Read("snd_drop_item", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eAttachAddon], uiXml.Read("snd_attach_addon", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eDetachAddon], uiXml.Read("snd_detach_addon", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemUse], uiXml.Read("snd_item_use", 0, NULL), st_Effect, sg_SourceType);
-    uiXml.SetLocalRoot(stored_root);
-
     m_ItemInfo = new CUIItemInfo();
     //-	m_ItemInfo->SetAutoDelete			(true);
     //-	AttachChild							(m_ItemInfo);
@@ -275,6 +261,7 @@ void CUIActorMenu::Construct()
     m_UIPropertiesBox->Hide();
     m_UIPropertiesBox->SetWindowName("property_box");
 
+    InitSounds(uiXml);
     InitCallbacks();
     InitAllowedDrops();
 
@@ -287,6 +274,23 @@ void CUIActorMenu::Construct()
     DeInitTradeMode();
     DeInitUpgradeMode();
     DeInitDeadBodySearchMode();
+}
+
+void CUIActorMenu::InitSounds(CUIXml& uiXml)
+{
+    XML_NODE stored_root = uiXml.GetLocalRoot();
+    uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));
+    GEnv.Sound->create(sounds[eSndOpen], uiXml.Read("snd_open", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eSndClose], uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eItemToSlot], uiXml.Read("snd_item_to_slot", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eItemToBelt], uiXml.Read("snd_item_to_belt", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eItemToRuck], uiXml.Read("snd_item_to_ruck", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eProperties], uiXml.Read("snd_properties", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eDropItem], uiXml.Read("snd_drop_item", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eAttachAddon], uiXml.Read("snd_attach_addon", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eDetachAddon], uiXml.Read("snd_detach_addon", 0, NULL), st_Effect, sg_SourceType);
+    GEnv.Sound->create(sounds[eItemUse], uiXml.Read("snd_item_use", 0, NULL), st_Effect, sg_SourceType);
+    uiXml.SetLocalRoot(stored_root);
 }
 
 void CUIActorMenu::BindDragDropListEvents(CUIDragDropListEx* lst)

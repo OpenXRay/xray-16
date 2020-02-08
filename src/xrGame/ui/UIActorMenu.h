@@ -218,6 +218,7 @@ private:
 
 protected:
     void Construct();
+    void InitSounds(CUIXml& uiXml);
     void InitAllowedDrops();
     void InitCallbacks();
 
