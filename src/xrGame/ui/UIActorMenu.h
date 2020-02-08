@@ -83,103 +83,103 @@ protected:
     ref_sound sounds[eSndMax];
     void PlaySnd(eActorMenuSndAction a);
 
-    UIHint* m_hint_wnd;
-    CUIItemInfo* m_ItemInfo;
-    CUICellItem* m_InfoCellItem;
+    UIHint* m_hint_wnd{};
+    CUIItemInfo* m_ItemInfo{};
+    CUICellItem* m_InfoCellItem{};
     u32 m_InfoCellItem_timer;
-    CUICellItem* m_pCurrentCellItem;
+    CUICellItem* m_pCurrentCellItem{};
 
-    CUICellItem* m_upgrade_selected;
-    CUIPropertiesBox* m_UIPropertiesBox;
+    CUICellItem* m_upgrade_selected{};
+    CUIPropertiesBox* m_UIPropertiesBox{};
 
-    ui_actor_state_wnd* m_ActorStateInfo;
-    CUICharacterInfo* m_ActorCharacterInfo;
-    CUICharacterInfo* m_PartnerCharacterInfo;
+    ui_actor_state_wnd* m_ActorStateInfo{};
+    CUICharacterInfo* m_ActorCharacterInfo{};
+    CUICharacterInfo* m_PartnerCharacterInfo{};
 
-    CUIDragDropListEx* m_pInventoryBeltList;
-    CUIDragDropListEx* m_pInventoryPistolList;
-    CUIDragDropListEx* m_pInventoryAutomaticList;
-    CUIDragDropListEx* m_pInventoryOutfitList;
-    CUIDragDropListEx* m_pInventoryHelmetList;
-    CUIDragDropListEx* m_pInventoryDetectorList;
-    CUIDragDropListEx* m_pInventoryBagList;
+    CUIDragDropListEx* m_pInventoryBeltList{};
+    CUIDragDropListEx* m_pInventoryPistolList{};
+    CUIDragDropListEx* m_pInventoryAutomaticList{};
+    CUIDragDropListEx* m_pInventoryOutfitList{};
+    CUIDragDropListEx* m_pInventoryHelmetList{};
+    CUIDragDropListEx* m_pInventoryDetectorList{};
+    CUIDragDropListEx* m_pInventoryBagList{};
 
-    CUIDragDropListEx* m_pTradeActorBagList;
-    CUIDragDropListEx* m_pTradeActorList;
-    CUIDragDropListEx* m_pTradePartnerBagList;
-    CUIDragDropListEx* m_pTradePartnerList;
-    CUIDragDropListEx* m_pDeadBodyBagList;
-    CUIDragDropListEx* m_pTrashList;
+    CUIDragDropListEx* m_pTradeActorBagList{};
+    CUIDragDropListEx* m_pTradeActorList{};
+    CUIDragDropListEx* m_pTradePartnerBagList{};
+    CUIDragDropListEx* m_pTradePartnerList{};
+    CUIDragDropListEx* m_pDeadBodyBagList{};
+    CUIDragDropListEx* m_pTrashList{};
 
     enum
     {
         e_af_count = 5
     };
 
-    CUIStatic* m_belt_list_over[e_af_count];
-    CUIStatic* m_HelmetOver;
+    CUIStatic* m_belt_list_over[e_af_count]{};
+    CUIStatic* m_HelmetOver{};
 
-    CUIStatic* m_InvSlot2Highlight;
-    CUIStatic* m_InvSlot3Highlight;
-    CUIStatic* m_HelmetSlotHighlight;
-    CUIStatic* m_OutfitSlotHighlight;
-    CUIStatic* m_DetectorSlotHighlight;
-    CUIStatic* m_QuickSlotsHighlight[4];
-    CUIStatic* m_ArtefactSlotsHighlight[e_af_count];
+    CUIStatic* m_InvSlot2Highlight{};
+    CUIStatic* m_InvSlot3Highlight{};
+    CUIStatic* m_HelmetSlotHighlight{};
+    CUIStatic* m_OutfitSlotHighlight{};
+    CUIStatic* m_DetectorSlotHighlight{};
+    CUIStatic* m_QuickSlotsHighlight[4]{};
+    CUIStatic* m_ArtefactSlotsHighlight[e_af_count]{};
 
-    CUIInventoryUpgradeWnd* m_pUpgradeWnd;
+    CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
 
-    CUIStatic* m_LeftBackground;
+    CUIStatic* m_LeftBackground{};
 
-    UIInvUpgradeInfo* m_upgrade_info;
-    CUIMessageBoxEx* m_message_box_yes_no;
-    CUIMessageBoxEx* m_message_box_ok;
+    UIInvUpgradeInfo* m_upgrade_info{};
+    CUIMessageBoxEx* m_message_box_yes_no{};
+    CUIMessageBoxEx* m_message_box_ok{};
 
-    CInventoryOwner* m_pActorInvOwner;
-    CInventoryOwner* m_pPartnerInvOwner;
-    CInventoryBox* m_pInvBox;
+    CInventoryOwner* m_pActorInvOwner{};
+    CInventoryOwner* m_pPartnerInvOwner{};
+    CInventoryBox* m_pInvBox{};
 
-    CUITextWnd* m_ActorMoney;
-    CUITextWnd* m_PartnerMoney;
-    CUITextWnd* m_QuickSlot1;
-    CUITextWnd* m_QuickSlot2;
-    CUITextWnd* m_QuickSlot3;
-    CUITextWnd* m_QuickSlot4;
+    CUITextWnd* m_ActorMoney{};
+    CUITextWnd* m_PartnerMoney{};
+    CUITextWnd* m_QuickSlot1{};
+    CUITextWnd* m_QuickSlot2{};
+    CUITextWnd* m_QuickSlot3{};
+    CUITextWnd* m_QuickSlot4{};
 
-    CUIProgressBar* m_WeaponSlot1_progress;
-    CUIProgressBar* m_WeaponSlot2_progress;
-    CUIProgressBar* m_Helmet_progress;
-    CUIProgressBar* m_Outfit_progress;
+    CUIProgressBar* m_WeaponSlot1_progress{};
+    CUIProgressBar* m_WeaponSlot2_progress{};
+    CUIProgressBar* m_Helmet_progress{};
+    CUIProgressBar* m_Outfit_progress{};
     // bottom ---------------------------------
-    CUIStatic* m_ActorBottomInfo;
-    CUITextWnd* m_ActorWeight;
-    CUITextWnd* m_ActorWeightMax;
+    CUIStatic* m_ActorBottomInfo{};
+    CUITextWnd* m_ActorWeight{};
+    CUITextWnd* m_ActorWeightMax{};
 
-    CUIStatic* m_PartnerBottomInfo;
-    CUITextWnd* m_PartnerWeight;
+    CUIStatic* m_PartnerBottomInfo{};
+    CUITextWnd* m_PartnerWeight{};
     float m_PartnerWeight_end_x;
     //*	CUIStatic*					m_PartnerWeightMax;
 
     // delimiter ------------------------------
-    CUIStatic* m_LeftDelimiter;
-    CUITextWnd* m_PartnerTradeCaption;
-    CUITextWnd* m_PartnerTradePrice;
-    CUITextWnd* m_PartnerTradeWeightMax;
+    CUIStatic* m_LeftDelimiter{};
+    CUITextWnd* m_PartnerTradeCaption{};
+    CUITextWnd* m_PartnerTradePrice{};
+    CUITextWnd* m_PartnerTradeWeightMax{};
 
-    CUIStatic* m_RightDelimiter;
-    CUITextWnd* m_ActorTradeCaption;
-    CUITextWnd* m_ActorTradePrice;
-    CUITextWnd* m_ActorTradeWeightMax;
+    CUIStatic* m_RightDelimiter{};
+    CUITextWnd* m_ActorTradeCaption{};
+    CUITextWnd* m_ActorTradePrice{};
+    CUITextWnd* m_ActorTradeWeightMax{};
 
-    CTrade* m_actor_trade;
-    CTrade* m_partner_trade;
+    CTrade* m_actor_trade{};
+    CTrade* m_partner_trade{};
 
-    CUI3tButton* m_trade_button;
-    CUI3tButton* m_trade_buy_button;
-    CUI3tButton* m_trade_sell_button;
-    CUI3tButton* m_takeall_button;
-    CUI3tButton* m_exit_button;
-    CUIStatic* m_clock_value;
+    CUI3tButton* m_trade_button{};
+    CUI3tButton* m_trade_buy_button{};
+    CUI3tButton* m_trade_sell_button{};
+    CUI3tButton* m_takeall_button{};
+    CUI3tButton* m_exit_button{};
+    CUIStatic* m_clock_value{};
 
     u32 m_last_time;
     bool m_repair_mode;
@@ -188,7 +188,7 @@ protected:
     u32 m_trade_partner_inventory_state;
 
 public:
-    CUIDragDropReferenceList* m_pQuickSlot;
+    CUIDragDropReferenceList* m_pQuickSlot{};
 
 public:
     void SetMenuMode(EMenuMode mode);
