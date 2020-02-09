@@ -32,6 +32,7 @@ public:
 
     static CUIWindow* CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIStatic* CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
+    static CUIStatic* CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical = true);
     static CUIScrollView* CreateScrollView(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUITextWnd* CreateTextWnd(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIProgressBar* CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);

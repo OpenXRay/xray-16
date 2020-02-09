@@ -37,6 +37,11 @@ CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* 
 
 CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
+    return CreateStatic(xml, ui_path, 0, parent, critical);
+}
+
+CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical)
+{
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
@@ -47,7 +52,7 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitStatic(xml, ui_path, 0, ui);
+    CUIXmlInit::InitStatic(xml, ui_path, index, ui);
     return ui;
 }
 
