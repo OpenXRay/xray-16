@@ -459,6 +459,11 @@ ICF void CBackend::set_CullMode(u32 _mode)
     // )); }
 }
 
+ICF void CBackend::set_FillMode(u32 _mode)
+{
+    StateManager.SetFillMode(_mode);
+}
+
 IC void CBackend::ApplyVertexLayout()
 {
     VERIFY(vs);

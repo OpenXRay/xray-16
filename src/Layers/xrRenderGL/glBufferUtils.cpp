@@ -360,7 +360,7 @@ void VertexStagingBuffer::Destroy()
 void VertexStagingBuffer::DiscardHostBuffer()
 {
     if (m_HostBuffer)
-        xr_delete(m_HostBuffer);
+        xr_free(m_HostBuffer);
 }
 
 size_t VertexStagingBuffer::GetSystemMemoryUsage() const
@@ -458,7 +458,7 @@ void IndexStagingBuffer::Destroy()
 void IndexStagingBuffer::DiscardHostBuffer()
 {
     if (m_HostBuffer)
-        xr_delete(m_HostBuffer);
+        xr_free(m_HostBuffer);
 }
 
 size_t IndexStagingBuffer::GetSystemMemoryUsage() const

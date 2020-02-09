@@ -110,11 +110,7 @@ typedef resptr_core<SCS, resptr_base<SCS>> ref_cs;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SState : public xr_resource_flagged
 {
-#ifdef	USE_OGL
-    glState state;
-#else
     ID3DState* state;
-#endif
     SimulatorStates state_code;
     SState() = default;
     ~SState();

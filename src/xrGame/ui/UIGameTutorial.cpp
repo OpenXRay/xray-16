@@ -99,13 +99,9 @@ CUISequencer::CUISequencer()
     m_pStoredInputReceiver = nullptr;
     m_flags.zero();
 }
-void CUISequencer::Start(LPCSTR tutor_name)
-{
-    // Skip any tutorial except "game_loaded" and "intro_game", on load screen
-    if (load_screen_renderer.IsActive() && xr_strcmp(tutor_name, "game_loaded") != 0 &&
-        xr_strcmp(tutor_name, "intro_game") != 0)
-        return;
 
+bool CUISequencer::Start(LPCSTR tutor_name)
+{
     VERIFY(m_sequencer_items.empty());
     
     CUIXml uiXml;
@@ -115,8 +111,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
     if (items_count <= 0)
     {
         Msg("! can't find tutorial [%s]", tutor_name);
-        Destroy();
-        return;
+        return false;
     }
 
     uiXml.SetLocalRoot(uiXml.NavigateToNode(tutor_name, 0));
@@ -198,6 +193,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
 
     if (m_start_lua_function.size())
         CallFunction(m_start_lua_function);
+    return true;
 }
 
 CUISequenceItem* CUISequencer::GetNextItem()

@@ -5,26 +5,25 @@
 
 #ifdef USE_OGL
 #include "../xrRenderGL/glState.h"
-void SimulatorStates::record(glState& state)
-{
-	for (u32 it = 0; it < States.size(); it++)
-	{
-		State& S = States[it];
-		switch (S.type)
-		{
-		case 0:	state.UpdateRenderState(S.v1, S.v2);			break;
-		//case 1: VERIFY(!"Texture environment not supported");	break;
-		case 2: state.UpdateSamplerState(S.v1, S.v2, S.v3);		break;
-		}
-}
-}
-#else
-IDirect3DStateBlock9* SimulatorStates::record()
-{
+#endif
+
 // TODO: DX10: Implement equivalent for SimulatorStates::record for DX10
-#if defined(USE_DX10) || defined(USE_DX11)
+void SimulatorStates::record(ID3DState*& state)
+{
+#ifdef USE_OGL
+    state = ID3DState::Create();
+    for (SimulatorStates::State& S : States)
+    {
+        switch (S.type)
+        {
+        case 0:	state->UpdateRenderState(S.v1, S.v2); break;
+        //case 1: VERIFY(!"Texture environment not supported"); break;
+        case 2: state->UpdateSamplerState(S.v1, S.v2, S.v3); break;
+        }
+    }
+#elif defined(USE_DX10) || defined(USE_DX11)
     // VERIFY(!"SimulatorStates::record not implemented!");
-    return 0;
+    state = ID3DState::Create(*this);
 #else // USE_DX10
     CHK_DX(HW.pDevice->BeginStateBlock());
     for (u32 it = 0; it < States.size(); it++)
@@ -42,12 +41,9 @@ IDirect3DStateBlock9* SimulatorStates::record()
         break;
         }
     }
-    IDirect3DStateBlock9* SB = nullptr;
-    CHK_DX(HW.pDevice->EndStateBlock(&SB));
-    return SB;
-#endif // USE_DX10
+    CHK_DX(HW.pDevice->EndStateBlock(&state));
+#endif
 }
-#endif	//	USE_OGL
 
 void SimulatorStates::set_RS(u32 a, u32 b)
 {

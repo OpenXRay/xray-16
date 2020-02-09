@@ -14,16 +14,12 @@ void CResourceManager::reset_begin()
     GEnv.Render->reset_begin();
 
     // destroy state-blocks
-    for (u32 _it = 0; _it < v_states.size(); _it++)
-#ifdef USE_OGL
-        v_states[_it]->state.Release();
-#else
-        _RELEASE(v_states[_it]->state);
-#endif // USE_OGL
+    for (SState* sstate : v_states)
+        _RELEASE(sstate->state);
 
     // destroy RTs
-    for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); ++rt_it)
-        rt_it->second->reset_begin();
+    for (auto& rt_pair : m_rtargets)
+        rt_pair.second->reset_begin();
     //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
     //  DX10 cut        rtc_it->second->reset_begin();
 
@@ -72,12 +68,14 @@ void CResourceManager::reset_end()
     {
 // RT
 #pragma todo("container is created in stack!")
-        xr_vector<CRT*> rt;
-        for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); ++rt_it)
-            rt.push_back(rt_it->second);
-        std::sort(rt.begin(), rt.end(), cmp_rt);
-        for (u32 _it = 0; _it < rt.size(); _it++)
-            rt[_it]->reset_end();
+        xr_vector<CRT*> sorted_rts;
+        for (auto& rt_pair : m_rtargets)
+            sorted_rts.push_back(rt_pair.second);
+
+        std::sort(sorted_rts.begin(), sorted_rts.end(), cmp_rt);
+
+        for (CRT* rt : sorted_rts)
+            rt->reset_end();
     }
     {
 // RTc
@@ -90,15 +88,9 @@ void CResourceManager::reset_end()
     }
 
     // create state-blocks
+    for (SState* sstate : v_states)
     {
-        for (u32 _it = 0; _it < v_states.size(); _it++)
-#if defined(USE_OGL)
-        v_states[_it]->state_code.record(v_states[_it]->state);
-#elif defined(USE_DX10) || defined(USE_DX11)
-            v_states[_it]->state = ID3DState::Create(v_states[_it]->state_code);
-#else // USE_DX10
-            v_states[_it]->state = v_states[_it]->state_code.record();
-#endif // USE_DX10
+        sstate->state_code.record(sstate->state);
     }
 
     // create everything, renderer may use
@@ -136,6 +128,22 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: ps        : %d", m_ps.size());
     if (!bBrief)
         mdump(m_ps);
+#ifndef USE_DX9
+    Msg("* RM_Dump: gs        : %d", m_gs.size());
+    if (!bBrief)
+        mdump(m_gs);
+#ifdef USE_DX11
+    Msg("* RM_Dump: cs        : %d", m_cs.size());
+    if (!bBrief)
+        mdump(m_cs);
+    Msg("* RM_Dump: hs        : %d", m_hs.size());
+    if (!bBrief)
+        mdump(m_hs);
+    Msg("* RM_Dump: ds        : %d", m_ds.size());
+    if (!bBrief)
+        mdump(m_ds);
+#endif
+#endif
     Msg("* RM_Dump: dcl       : %d", v_declarations.size());
     Msg("* RM_Dump: states    : %d", v_states.size());
     Msg("* RM_Dump: tex_list  : %d", lst_textures.size());

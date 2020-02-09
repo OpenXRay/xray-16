@@ -377,7 +377,7 @@ void CRender::apply_object(IRenderable* O)
 {
     if (nullptr == O)
         return;
-    if (PHASE_NORMAL == phase && O->renderable_ROS())
+    if (O->renderable_ROS())
     {
         CROS_impl& LT = *((CROS_impl*)O->GetRenderData().pROS);
         VERIFY(dynamic_cast<IGameObject*>(O) || dynamic_cast<CPS_Instance*>(O));

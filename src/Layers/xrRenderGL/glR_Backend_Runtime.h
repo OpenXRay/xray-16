@@ -325,6 +325,15 @@ ICF void CBackend::set_CullMode(u32 _mode)
     }
 }
 
+ICF void CBackend::set_FillMode(u32 _mode)
+{
+    if (fill_mode != _mode)
+    {
+        fill_mode = _mode;
+        glPolygonMode(GL_FRONT_AND_BACK, glStateUtils::ConvertFillMode(_mode));
+    }
+}
+
 ICF void CBackend::set_VS(ref_vs& _vs)
 {
     set_VS(_vs->sh, _vs->cName.c_str());

@@ -43,3 +43,6 @@
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
+[submodule "Externals/mimalloc"]
+	path = Externals/mimalloc
+	url = https://github.com/microsoft/mimalloc.git
