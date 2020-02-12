@@ -126,20 +126,8 @@ protected:
 
     enum
     {
-        e_af_count = 5,
         e_qslot_count = 4
     };
-
-    CUIStatic* m_belt_list_over[e_af_count]{};
-    CUIStatic* m_HelmetOver{};
-
-    CUIStatic* m_InvSlot2Highlight{};
-    CUIStatic* m_InvSlot3Highlight{};
-    CUIStatic* m_HelmetSlotHighlight{};
-    CUIStatic* m_OutfitSlotHighlight{};
-    CUIStatic* m_DetectorSlotHighlight{};
-    CUIStatic* m_QuickSlotsHighlight[e_qslot_count]{};
-    CUIStatic* m_ArtefactSlotsHighlight[e_af_count]{};
 
     CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
 

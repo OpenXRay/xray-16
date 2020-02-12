@@ -437,33 +437,15 @@ void CUIActorMenu::UpdateItemsPlace()
 
 void CUIActorMenu::clear_highlight_lists()
 {
-    if (m_InvSlot2Highlight)
-        m_InvSlot2Highlight->Show(false);
-
-    if (m_InvSlot3Highlight)
-        m_InvSlot3Highlight->Show(false);
-
-    if (m_HelmetSlotHighlight)
-        m_HelmetSlotHighlight->Show(false);
-
-    if (m_OutfitSlotHighlight)
-        m_OutfitSlotHighlight->Show(false);
-
-    if (m_DetectorSlotHighlight)
-        m_DetectorSlotHighlight->Show(false);
-
-    if (m_QuickSlotsHighlight[0])
-    {
-        for (u8 i = 0; i < 4; i++)
-            m_QuickSlotsHighlight[i]->Show(false);
-    }
-    if (m_ArtefactSlotsHighlight[0])
-    {
-        for (u8 i = 0; i < e_af_count; i++)
-            m_ArtefactSlotsHighlight[i]->Show(false);
-    }
-
+    m_pLists[eInventoryPistolList]->Highlight(false);
+    m_pLists[eInventoryAutomaticList]->Highlight(false);
+    if (m_pLists[eInventoryHelmetList])
+        m_pLists[eInventoryHelmetList]->Highlight(false);
+    m_pLists[eInventoryOutfitList]->Highlight(false);
+    m_pLists[eInventoryDetectorList]->Highlight(false);
+    m_pLists[eInventoryBeltList]->Highlight(false);
     m_pLists[eInventoryBagList]->clear_select_armament();
+    m_pQuickSlot->Highlight(false);
 
     switch (m_currMenuMode)
     {
@@ -499,28 +481,24 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     u16 slot_id = item->BaseSlot();
     if (weapon && (slot_id == INV_SLOT_2 || slot_id == INV_SLOT_3))
     {
-        if (m_InvSlot2Highlight)
-            m_InvSlot2Highlight->Show(true);
-        if (m_InvSlot3Highlight)
-            m_InvSlot3Highlight->Show(true);
+        m_pLists[eInventoryPistolList]->Highlight(true);
+        m_pLists[eInventoryAutomaticList]->Highlight(true);
         return;
     }
     if (helmet && slot_id == HELMET_SLOT)
     {
-        if (m_HelmetSlotHighlight)
-            m_HelmetSlotHighlight->Show(true);
+        if (m_pLists[eInventoryHelmetList])
+            m_pLists[eInventoryHelmetList]->Highlight(true);
         return;
     }
     if (outfit && slot_id == OUTFIT_SLOT)
     {
-        if (m_OutfitSlotHighlight)
-            m_OutfitSlotHighlight->Show(true);
+        m_pLists[eInventoryOutfitList]->Highlight(true);
         return;
     }
     if (detector && slot_id == DETECTOR_SLOT)
     {
-        if (m_DetectorSlotHighlight)
-            m_DetectorSlotHighlight->Show(true);
+        m_pLists[eInventoryDetectorList]->Highlight(true);
         return;
     }
     if (eatable)
@@ -528,11 +506,7 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
         if (cell_item->OwnerList() && GetListType(cell_item->OwnerList()) == iQuickSlot)
             return;
 
-        if (m_QuickSlotsHighlight[0])
-        {
-            for (u8 i = 0; i < 4; i++)
-                m_QuickSlotsHighlight[i]->Show(true);
-        }
+        m_pQuickSlot->Highlight(true);
         return;
     }
     if (artefact)
@@ -540,12 +514,7 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
         if (cell_item->OwnerList() && GetListType(cell_item->OwnerList()) == iActorBelt)
             return;
 
-        if (m_ArtefactSlotsHighlight[0])
-        {
-            Ivector2 cap = m_pLists[eInventoryBeltList]->CellsCapacity();
-            for (u8 i = 0; i < cap.x; i++)
-                m_ArtefactSlotsHighlight[i]->Show(true);
-        }
+        m_pLists[eInventoryBeltList]->Highlight(true);
         return;
     }
 }

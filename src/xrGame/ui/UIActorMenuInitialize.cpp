@@ -108,112 +108,63 @@ void CUIActorMenu::Construct()
     m_PartnerBottomInfo->AdjustWidthToText();
     m_PartnerWeight_end_x = m_PartnerWeight->GetWndPos().x;
 
-    if ((m_InvSlot2Highlight = UIHelper::CreateStatic(uiXml, "inv_slot2_highlight", this, false)))
-        m_InvSlot2Highlight->Show(false);
-
-    if ((m_InvSlot3Highlight = UIHelper::CreateStatic(uiXml, "inv_slot3_highlight", this, false)))
-        m_InvSlot3Highlight->Show(false);
-
-    if ((m_HelmetSlotHighlight = UIHelper::CreateStatic(uiXml, "helmet_slot_highlight", this, false)))
-        m_HelmetSlotHighlight->Show(false);
-
-    if ((m_OutfitSlotHighlight = UIHelper::CreateStatic(uiXml, "outfit_slot_highlight", this, false)))
-        m_OutfitSlotHighlight->Show(false);
-
-    if ((m_DetectorSlotHighlight = UIHelper::CreateStatic(uiXml, "detector_slot_highlight", this, false)))
-        m_DetectorSlotHighlight->Show(false);
-
-    if ((m_QuickSlotsHighlight[0] = UIHelper::CreateStatic(uiXml, "quick_slot_highlight", this, false)))
-        m_QuickSlotsHighlight[0]->Show(false);
-
-    m_ArtefactSlotsHighlight[0] = UIHelper::CreateStatic(uiXml, "artefact_slot_highlight", this, false);
-    if (m_ArtefactSlotsHighlight[0])
-        m_ArtefactSlotsHighlight[0]->Show(false);
-
-    if (m_QuickSlotsHighlight[0])
+    constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
     {
-        Fvector2 pos = m_QuickSlotsHighlight[0]->GetWndPos();
-        const float dx = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dx", 0.0f);
-        const float dy = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dy", 0.0f);
+        // { id,                   "xml_section_name",         "highlighter",             "blocker", is_it_critical_and_required }
+        { eInventoryPistolList,    "dragdrop_pistol",          "inv_slot2_highlight",     nullptr,            true },
+        { eInventoryAutomaticList, "dragdrop_automatic",       "inv_slot3_highlight",     nullptr,            true },
 
-        for (u8 i = 1; i < e_qslot_count; i++)
-        {
-            pos.x += dx;
-            pos.y += dy;
-            m_QuickSlotsHighlight[i] = UIHelper::CreateStatic(uiXml, "quick_slot_highlight", this);
-            m_QuickSlotsHighlight[i]->SetWndPos(pos);
-            m_QuickSlotsHighlight[i]->Show(false);
-        }
-    }
+        { eInventoryOutfitList,    "dragdrop_outfit",          "outfit_slot_highlight",   nullptr,            true },
+        { eInventoryHelmetList,    "dragdrop_helmet",          "helmet_slot_highlight",   "helmet_over",      false },
 
-    if (m_ArtefactSlotsHighlight[0])
-    {
-        Fvector2 pos = m_ArtefactSlotsHighlight[0]->GetWndPos();
-        const float dx = uiXml.ReadAttribFlt("artefact_slot_highlight", 0, "dx", 0.0f);
-        const float dy = uiXml.ReadAttribFlt("artefact_slot_highlight", 0, "dy", 0.0f);
-        for (u8 i = 1; i < e_af_count; i++)
-        {
-            pos.x += dx;
-            pos.y += dy;
-            m_ArtefactSlotsHighlight[i] = UIHelper::CreateStatic(uiXml, "artefact_slot_highlight", this);
-            m_ArtefactSlotsHighlight[i]->SetWndPos(pos);
-            m_ArtefactSlotsHighlight[i]->Show(false);
-        }
-    }
+        { eInventoryBeltList,      "dragdrop_belt",            "artefact_slot_highlight", "belt_list_over",   true },
+        { eInventoryDetectorList,  "dragdrop_detector",        "detector_slot_highlight", nullptr,            true },
 
-    constexpr std::tuple<eActorMenuListType, cpcstr, bool> inventory_lists[] =
-    {
-        // { id,                   "xml_section_name",         is_it_critical_and_required }
-        { eInventoryPistolList,    "dragdrop_pistol",          true },
-        { eInventoryAutomaticList, "dragdrop_automatic",       true },
+        { eInventoryBagList,       "dragdrop_bag",             nullptr,                   nullptr,            true },
 
-        { eInventoryOutfitList,    "dragdrop_outfit",          true },
-        { eInventoryHelmetList,    "dragdrop_helmet",          false },
+        { eTradeActorList,         "dragdrop_actor_trade",     nullptr,                   nullptr,            true },
+        { eTradeActorBagList,      "dragdrop_actor_trade_bag", nullptr,                   nullptr,            true },
 
-        { eInventoryBeltList,      "dragdrop_belt",            true },
-        { eInventoryDetectorList,  "dragdrop_detector",        true },
+        { eTradePartnerList,       "dragdrop_partner_trade",   nullptr,                   nullptr,            true },
+        { eTradePartnerBagList,    "dragdrop_partner_bag",     nullptr,                   nullptr,            true },
 
-        { eInventoryBagList,       "dragdrop_bag",             true },
+        { eDeadBodyBagList,        "dragdrop_deadbody_bag",    nullptr,                   nullptr,            true },
 
-        { eTradeActorList,         "dragdrop_actor_trade",     true },
-        { eTradeActorBagList,      "dragdrop_actor_trade_bag", true },
-
-        { eTradePartnerList,       "dragdrop_partner_trade",   true },
-        { eTradePartnerBagList,    "dragdrop_partner_bag",     true },
-
-        { eDeadBodyBagList,        "dragdrop_deadbody_bag",    true },
-
-        { eTrashList,              "dragdrop_trash",           false },
+        { eTrashList,              "dragdrop_trash",           nullptr,                   nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
 
     for (const auto& listDesc : inventory_lists)
     {
-        auto [id, section, critical] = listDesc;
-        m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, this, critical);
+        auto [id, section, highlight, block, critical] = listDesc;
+        CUIDragDropListEx*& list = m_pLists[id];
+
+        list = UIHelper::CreateDragDropListEx(uiXml, section, this, critical);
+        if (list && highlight)
+        {
+            const float dx = uiXml.ReadAttribFlt(highlight, 0, "dx", 0.0f);
+            const float dy = uiXml.ReadAttribFlt(highlight, 0, "dy", 0.0f);
+            m_pLists[id]->SetHighlighter(UIHelper::CreateStatic(uiXml, highlight, nullptr, false), { dx, dy });
+        }
+        if (list && block)
+        {
+            const float dx = uiXml.ReadAttribFlt(block, 0, "dx", 0.0f);
+            const float dy = uiXml.ReadAttribFlt(block, 0, "dy", 0.0f);
+            m_pLists[id]->SetBlocker(UIHelper::CreateStatic(uiXml, block, nullptr, false), { dx, dy });
+        }
     }
+    if (m_pLists[eInventoryHelmetList])
+        m_pLists[eInventoryHelmetList]->SetMaxCellsCapacity(m_pLists[eInventoryHelmetList]->CellsCapacity());
 
     m_pQuickSlot = UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this, false);
     if (m_pQuickSlot)
-        m_pQuickSlot->Initialize();
-
-    m_belt_list_over[0] = UIHelper::CreateStatic(uiXml, "belt_list_over", this);
     {
-        Fvector2 pos = m_belt_list_over[0]->GetWndPos();
-        const float dx = uiXml.ReadAttribFlt("belt_list_over", 0, "dx", 0.0f);
-        const float dy = uiXml.ReadAttribFlt("belt_list_over", 0, "dy", 0.0f);
-        for (u8 i = 1; i < e_af_count; ++i)
-        {
-            pos.x += dx;
-            pos.y += dy;
-            m_belt_list_over[i] = UIHelper::CreateStatic(uiXml, "belt_list_over", this);
-            m_belt_list_over[i]->SetWndPos(pos);
-        }
+        m_pQuickSlot->Initialize();
+        const float dx = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dx", 0.0f);
+        const float dy = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dy", 0.0f);
+        m_pQuickSlot->SetHighlighter(UIHelper::CreateStatic(uiXml, "quick_slot_highlight", nullptr, false), { dx, dy });
     }
-
-    if ((m_HelmetOver = UIHelper::CreateStatic(uiXml, "helmet_over", this, false)))
-        m_HelmetOver->Show(false);
 
     m_ActorMoney = UIHelper::CreateTextWnd(uiXml, "actor_money_static", this);
     m_PartnerMoney = UIHelper::CreateTextWnd(uiXml, "partner_money_static", this);
