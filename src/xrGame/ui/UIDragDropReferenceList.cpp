@@ -26,16 +26,22 @@ void CUIDragDropReferenceList::Initialize(pcstr labelSection /*= nullptr*/, pcst
 
     Fvector2 listAbsPos;
     GetAbsolutePos(listAbsPos);
+    const Ivector2& cellSize = m_container->CellSize();
+    const Ivector2& cellSpacing = m_container->CellsSpacing();
     for (int i = 0; i < m_container->CellsCapacity().x; i++)
     {
-        m_references.push_back(new CUIStatic());
-        Fvector2 pos = Fvector2().set((m_container->CellSize().x + m_container->CellsSpacing().x) * i, 0);
-        m_references.back()->SetAutoDelete(true);
-        m_references.back()->SetWndPos(pos);
-        m_references.back()->SetWndSize(Fvector2().set(m_container->CellSize().x, m_container->CellSize().y));
-        AttachChild(m_references.back());
-        m_references.back()->SetWindowName("cell_item_reference");
-        Register(m_references.back());
+        CUIStatic* reference = m_references.emplace_back(new CUIStatic());
+
+        const Fvector2 pos = Fvector2().set((cellSize.x + cellSpacing.x) * i, 0);
+        const Fvector2 size = Fvector2().set(cellSize.x, cellSize.y);
+        reference->SetWndPos(pos);
+        reference->SetWndSize(size);
+
+        reference->SetWindowName("cell_item_reference");
+        reference->SetAutoDelete(true);
+        AttachChild(reference);
+        Register(reference);
+
         if (labelSection)
         {
             string32 temp;
