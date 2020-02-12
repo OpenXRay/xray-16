@@ -160,7 +160,7 @@ void CUIActorMenu::Construct()
     m_pQuickSlot = UIHelper::CreateDragDropReferenceList(uiXml, "dragdrop_quick_slots", this, false);
     if (m_pQuickSlot)
     {
-        m_pQuickSlot->Initialize();
+        m_pQuickSlot->Initialize("quick_slot%d_text", "quick_use_str_%d", &uiXml);
         const float dx = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dx", 0.0f);
         const float dy = uiXml.ReadAttribFlt("quick_slot_highlight", 0, "dy", 0.0f);
         m_pQuickSlot->SetHighlighter(UIHelper::CreateStatic(uiXml, "quick_slot_highlight", nullptr, false), { dx, dy });
@@ -168,14 +168,7 @@ void CUIActorMenu::Construct()
 
     m_ActorMoney = UIHelper::CreateTextWnd(uiXml, "actor_money_static", this);
     m_PartnerMoney = UIHelper::CreateTextWnd(uiXml, "partner_money_static", this);
-    {
-        string32 temp;
-        for (int i = 0; i < e_qslot_count; i++)
-        {
-            xr_sprintf(temp, "quick_slot%d_text", i+1);
-            m_QuickSlot[i] = UIHelper::CreateTextWnd(uiXml, temp, this, false);
-        }
-    }
+
     m_WeaponSlot1_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_weapon1", this, false);
     m_WeaponSlot2_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_weapon2", this, false);
     m_Helmet_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_helmet", this, false);
@@ -415,18 +408,7 @@ void CUIActorMenu::UpdateButtonsLayout()
         m_exit_button->SetWndPos(btn_exit_pos);
     }
 
-    for (int i = 0; i < e_qslot_count; i++)
-    {
-        if (!m_QuickSlot[i])
-            continue;
-        string32 tmp;
-        xr_sprintf(tmp, "quick_use_str_%d", i + 1);
-        pcstr str = StringTable().translate(tmp).c_str();
-        strncpy_s(tmp, sizeof(tmp), str, 3);
-        if (tmp[2] == ',')
-            tmp[1] = '\0';
-        m_QuickSlot[i]->SetTextST(tmp);
-    }
-
+    if (m_pQuickSlot)
+        m_pQuickSlot->UpdateLabels();
     UpdateConditionProgressBars();
 }

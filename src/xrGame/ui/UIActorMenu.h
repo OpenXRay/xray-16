@@ -124,11 +124,6 @@ protected:
 
     CUIDragDropListEx* m_pLists[eListCount]{};
 
-    enum
-    {
-        e_qslot_count = 4
-    };
-
     CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
 
     CUIStatic* m_LeftBackground{};
@@ -143,7 +138,6 @@ protected:
 
     CUITextWnd* m_ActorMoney{};
     CUITextWnd* m_PartnerMoney{};
-    CUITextWnd* m_QuickSlot[e_qslot_count]{};
 
     CUIProgressBar* m_WeaponSlot1_progress{};
     CUIProgressBar* m_WeaponSlot2_progress{};

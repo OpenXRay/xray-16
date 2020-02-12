@@ -445,7 +445,8 @@ void CUIActorMenu::clear_highlight_lists()
     m_pLists[eInventoryDetectorList]->Highlight(false);
     m_pLists[eInventoryBeltList]->Highlight(false);
     m_pLists[eInventoryBagList]->clear_select_armament();
-    m_pQuickSlot->Highlight(false);
+    if (m_pQuickSlot)
+        m_pQuickSlot->Highlight(false);
 
     switch (m_currMenuMode)
     {
@@ -506,7 +507,8 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
         if (cell_item->OwnerList() && GetListType(cell_item->OwnerList()) == iQuickSlot)
             return;
 
-        m_pQuickSlot->Highlight(true);
+        if (m_pQuickSlot)
+            m_pQuickSlot->Highlight(true);
         return;
     }
     if (artefact)

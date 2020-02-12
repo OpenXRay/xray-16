@@ -11,6 +11,7 @@
 #include "xrEngine/xr_input.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "UICellItemFactory.h"
+#include "UIHelper.h"
 
 CUIDragDropReferenceList::CUIDragDropReferenceList()
 {
@@ -18,8 +19,13 @@ CUIDragDropReferenceList::CUIDragDropReferenceList()
         CUIWndCallback::void_function(this, &CUIDragDropReferenceList::OnItemDBClick));
 }
 CUIDragDropReferenceList::~CUIDragDropReferenceList() {}
-void CUIDragDropReferenceList::Initialize()
+void CUIDragDropReferenceList::Initialize(pcstr labelSection /*= nullptr*/, pcstr translationId /*= nullptr*/, CUIXml* uiXml /*= nullptr*/)
 {
+    m_translation_id = translationId;
+    R_ASSERT((labelSection && uiXml && translationId) || (!labelSection && !uiXml && !translationId)); // all or nothing
+
+    Fvector2 listAbsPos;
+    GetAbsolutePos(listAbsPos);
     for (int i = 0; i < m_container->CellsCapacity().x; i++)
     {
         m_references.push_back(new CUIStatic());
@@ -30,6 +36,21 @@ void CUIDragDropReferenceList::Initialize()
         AttachChild(m_references.back());
         m_references.back()->SetWindowName("cell_item_reference");
         Register(m_references.back());
+        if (labelSection)
+        {
+            string32 temp;
+            xr_sprintf(temp, labelSection, i + 1);
+            CUITextWnd* label = UIHelper::CreateTextWnd(*uiXml, temp, this, false);
+            if (label)
+            {
+                if (!label->WndPosIsProbablyRelative()) // Without this, UI Frustum will cull our label
+                {
+                    const Fvector2& lblPos = label->GetWndPos();
+                    label->SetWndPos({ lblPos.x - listAbsPos.x, lblPos.y - listAbsPos.y });
+                }
+                m_labels.emplace_back(label);
+            }
+        }
     }
 }
 void CUIDragDropReferenceList::SetItem(CUICellItem* itm) { inherited::SetItem(itm); }
@@ -127,6 +148,20 @@ void CUIDragDropReferenceList::ReloadReferences(CInventoryOwner* pActor)
         {
             ref->SetTextureColor(color_rgba(255, 255, 255, 0));
         }
+    }
+}
+
+void CUIDragDropReferenceList::UpdateLabels()
+{
+    for (size_t i = 0; i < m_labels.size(); i++)
+    {
+        string32 tmp;
+        xr_sprintf(tmp, m_translation_id, i + 1);
+        pcstr str = StringTable().translate(tmp).c_str();
+        strncpy_s(tmp, sizeof(tmp), str, 3);
+        if (tmp[2] == ',')
+            tmp[1] = '\0';
+        m_labels[i]->SetTextST(tmp);
     }
 }
 
