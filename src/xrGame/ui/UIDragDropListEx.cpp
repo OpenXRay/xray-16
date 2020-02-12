@@ -90,6 +90,107 @@ void CUIDragDropListEx::InitDragDropList(Fvector2 pos, Fvector2 size)
         Fvector2().set(m_vScrollBar->GetWndPos().x - m_vScrollBar->GetWidth(), m_vScrollBar->GetWndPos().y));
 }
 
+void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing)
+{
+    if (m_highlighter)
+    {
+        DetachChild(m_highlighter); // m_highlighter will be deleted
+    }
+    m_highlighter = highlighter;
+    m_highlighter_spacing = spacing;
+
+    if (m_highlighter)
+    {
+        m_highlighter->Show(false);
+        m_highlighter->SetCustomDraw(true);
+        m_highlighter->SetAutoDelete(true);
+        AttachChild(m_highlighter);
+        // Convert absolute position to relative
+        // Without this, UI Frustum will cull our highlighter
+        if (!m_highlighter->WndPosIsProbablyRelative())
+        {
+            Fvector2 ourAbsPos;
+            GetAbsolutePos(ourAbsPos);
+            const Fvector2& pos = m_highlighter->GetWndPos();
+            m_highlighter->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+        }
+    }
+}
+
+void CUIDragDropListEx::Highlight(bool highlight)
+{
+    if (m_highlighter)
+        m_highlighter->Show(highlight);
+}
+
+void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
+{
+    if (m_blocker)
+    {
+        DetachChild(m_blocker); // m_blocker will be deleted
+    }
+    m_blocker = blocker;
+    m_blocker_spacing = spacing;
+
+    if (m_blocker)
+    {
+        m_blocker->SetCustomDraw(true);
+        m_blocker->SetAutoDelete(true);
+        AttachChild(m_blocker);
+        // Convert absolute position to relative
+        // Without this, UI Frustum will cull our blocker
+        if (!m_blocker->WndPosIsProbablyRelative())
+        {
+            Fvector2 ourAbsPos;
+            GetAbsolutePos(ourAbsPos);
+            const Fvector2& pos = m_blocker->GetWndPos();
+            m_blocker->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+        }
+    }
+}
+
+Ivector2 CUIDragDropListEx::CalculateCapacity(int desiredCells)
+{
+    if (desiredCells <= 0)
+        return { 0, 0 };
+
+    const Ivector2& cap = m_orig_cell_capacity;
+    if (cap.x > 1 && cap.y > 1) // oh, ok..
+    {
+        if (cap.x == cap.y) // simple
+        {
+            const int half = desiredCells / 2;
+            const bool beltCellsAreEven = desiredCells % 2 == 0;
+            R_ASSERT2(beltCellsAreEven, "Wrong max_belt value or wrong cells markup.");
+            return { half, half };
+        }
+        else if (cap.x > cap.y) // horizontal
+        {
+            const int count = desiredCells / cap.y;
+            const bool beltCellsAreEven = desiredCells % cap.y == 0;
+            R_ASSERT2(beltCellsAreEven, "Wrong max_belt value or wrong cells markup.");
+            return { count, cap.y };
+        }
+        else // vertical
+        {
+            const int count = desiredCells / cap.x;
+            const bool beltCellsAreEven = desiredCells % cap.x == 0;
+            R_ASSERT2(beltCellsAreEven, "Wrong max_belt value or wrong cells markup.");
+            return { cap.x, count };
+        }
+    }
+    else if (cap.x > 1) // one-line horizontal, simple
+    {
+        return { desiredCells, cap.y };
+    }
+    else if (cap.y > 1) // one-line vertical, simple
+    {
+        return { cap.y, desiredCells };
+    }
+    NODEFAULT;
+    return { 0, 0 };
+}
+
 void CUIDragDropListEx::OnScrollV(CUIWindow* w, void* pData)
 {
     m_container->SetWndPos(Fvector2().set(m_container->GetWndPos().x, float(-m_vScrollBar->GetScrollPos())));
@@ -365,6 +466,19 @@ bool CUIDragDropListEx::OnMouseAction(float x, float y, EUIMessages mouse_action
 
 const Ivector2& CUIDragDropListEx::CellsCapacity() { return m_container->CellsCapacity(); }
 void CUIDragDropListEx::SetCellsCapacity(const Ivector2 c) { m_container->SetCellsCapacity(c); }
+
+void CUIDragDropListEx::SetMaxCellsCapacity(const Ivector2& c)
+{
+    m_max_cell_capacity = c;
+    const Ivector2& curCap = CellsCapacity();
+    if (curCap.x > c.x || curCap.y > c.y)
+    {
+        const int newX = std::clamp(curCap.x, curCap.x, c.x);
+        const int newY = std::clamp(curCap.y, curCap.y, c.y);
+        SetCellsCapacity({ newX, newY });
+    }
+}
+
 const Ivector2& CUIDragDropListEx::CellSize() { return m_container->CellSize(); }
 const Ivector2& CUIDragDropListEx::CellsSpacing() { return m_container->CellsSpacing(); }
 void CUIDragDropListEx::SetCellSize(const Ivector2 new_sz) { m_container->SetCellSize(new_sz); }
@@ -817,7 +931,10 @@ void CUICellContainer::Draw()
 
     Ivector2 cell_cnt = m_pParentDragDropList->CellsCapacity();
     if (cell_cnt.x == 0 || cell_cnt.y == 0)
+    {
+        DrawBlocker();
         return;
+    }
 
     Ivector2 cell_sz = CellSize();
     cell_sz.add(m_cellSpacing);
@@ -852,6 +969,31 @@ void CUICellContainer::Draw()
 
     // fill cell buffer
     u32 max_prim_cnt = ((tgt_cells.width() + 1) * (tgt_cells.height() + 1) * 6);
+
+    CUIStatic* highlighter = m_pParentDragDropList->GetHighlighter();
+    if (highlighter && highlighter->IsShown())
+    {
+        if (m_pParentDragDropList->GetVirtualCells())
+        {
+            highlighter->Draw();
+        }
+        else
+        {
+            const Fvector2 oldPos = highlighter->GetWndPos();
+            const Fvector2& spacing = m_pParentDragDropList->GetHighlighterSpacing();
+            for (int x = tgt_cells.x1; x <= tgt_cells.x2; x++)
+            {
+                for (int y = tgt_cells.y1; y <= tgt_cells.y2; y++)
+                {
+                    const Fvector2 newPos = { oldPos.x + spacing.x * x, oldPos.y + spacing.y * y };
+                    highlighter->SetWndPos(newPos);
+                    highlighter->Draw();
+                }
+            }
+            highlighter->SetWndPos(oldPos);
+        }
+    }
+
     GEnv.UIRender->StartPrimitive(max_prim_cnt, IUIRender::ptTriList, UI().m_currentPointType);
 
     //	u32 cell_i = 0;
@@ -927,6 +1069,66 @@ void CUICellContainer::Draw()
     }
 
     UI().PopScissor();
+    DrawBlocker();
+}
+
+void CUICellContainer::DrawBlocker() const
+{
+    CUIStatic* blocker = m_pParentDragDropList->GetBlocker();
+    if (!blocker)
+        return;
+
+    const Ivector2& maxCapacity = m_pParentDragDropList->MaxCellsCapacity();
+    if (!maxCapacity.x && !maxCapacity.y)
+        return;
+
+    const Ivector2& capacity = m_pParentDragDropList->CellsCapacity();
+    if (maxCapacity.x <= capacity.x && maxCapacity.y <= capacity.y)
+        return;
+
+    if (m_pParentDragDropList->GetVirtualCells())
+    {
+        blocker->Draw();
+    }
+    else
+    {
+        Irect tgt_cells;
+        // Prepare X
+        if (capacity.x < maxCapacity.x)
+        {
+            tgt_cells.x1 = capacity.x;
+            tgt_cells.x2 = maxCapacity.x;
+        }
+        else // capacity.x == maxCapacity.x
+        {
+            tgt_cells.x1 = maxCapacity.x - 1;
+            tgt_cells.x2 = maxCapacity.x;
+        }
+        // Prepare Y
+        if (capacity.y < maxCapacity.y)
+        {
+            tgt_cells.y1 = capacity.y;
+            tgt_cells.y2 = maxCapacity.y;
+        }
+        else // capacity.y == maxCapacity.y
+        {
+            tgt_cells.y1 = maxCapacity.y - 1;
+            tgt_cells.y2 = maxCapacity.y;
+        }
+        const Fvector2 oldPos = blocker->GetWndPos();
+        const Fvector2& spacing = m_pParentDragDropList->GetBlockerSpacing();
+
+        for (int x = tgt_cells.x1; x < tgt_cells.x2; x++)
+        {
+            for (int y = tgt_cells.y1; y < tgt_cells.y2; y++)
+            {
+                const Fvector2 newPos = { oldPos.x + spacing.x * x, oldPos.y + spacing.y * y };
+                blocker->SetWndPos(newPos);
+                blocker->Draw();
+            }
+        }
+        blocker->SetWndPos(oldPos);
+    }
 }
 
 void CUICellContainer::clear_select_armament()
