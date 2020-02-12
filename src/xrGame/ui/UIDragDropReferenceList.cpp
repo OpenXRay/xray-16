@@ -28,33 +28,40 @@ void CUIDragDropReferenceList::Initialize(pcstr labelSection /*= nullptr*/, pcst
     GetAbsolutePos(listAbsPos);
     const Ivector2& cellSize = m_container->CellSize();
     const Ivector2& cellSpacing = m_container->CellsSpacing();
-    for (int i = 0; i < m_container->CellsCapacity().x; i++)
+    const Ivector2& cellsCapacity = m_container->CellsCapacity();
+
+    m_references.resize(cellsCapacity.x + cellsCapacity.y);
+    for (int i = 0; i < cellsCapacity.x; i++)
     {
-        CUIStatic* reference = m_references.emplace_back(new CUIStatic());
-
-        const Fvector2 pos = Fvector2().set((cellSize.x + cellSpacing.x) * i, 0);
-        const Fvector2 size = Fvector2().set(cellSize.x, cellSize.y);
-        reference->SetWndPos(pos);
-        reference->SetWndSize(size);
-
-        reference->SetWindowName("cell_item_reference");
-        reference->SetAutoDelete(true);
-        AttachChild(reference);
-        Register(reference);
-
-        if (labelSection)
+        for (int j = 0; j < cellsCapacity.y; j++)
         {
-            string32 temp;
-            xr_sprintf(temp, labelSection, i + 1);
-            CUITextWnd* label = UIHelper::CreateTextWnd(*uiXml, temp, this, false);
-            if (label)
+            CUIStatic*& reference = m_references[i + j];
+            reference = new CUIStatic();
+
+            const Fvector2 pos = Fvector2().set((cellSize.x + cellSpacing.x) * i, (cellSize.y + cellSpacing.y) * j);
+            const Fvector2 size = Fvector2().set(cellSize.x, cellSize.y);
+            reference->SetWndPos(pos);
+            reference->SetWndSize(size);
+
+            reference->SetWindowName("cell_item_reference");
+            reference->SetAutoDelete(true);
+            AttachChild(reference);
+            Register(reference);
+
+            if (labelSection)
             {
-                if (!label->WndPosIsProbablyRelative()) // Without this, UI Frustum will cull our label
+                string32 temp;
+                xr_sprintf(temp, labelSection, i + j + 1);
+                CUITextWnd* label = UIHelper::CreateTextWnd(*uiXml, temp, this, false);
+                if (label)
                 {
-                    const Fvector2& lblPos = label->GetWndPos();
-                    label->SetWndPos({ lblPos.x - listAbsPos.x, lblPos.y - listAbsPos.y });
+                    if (!label->WndPosIsProbablyRelative()) // Without this, UI Frustum will cull our label
+                    {
+                        const Fvector2& lblPos = label->GetWndPos();
+                        label->SetWndPos({ lblPos.x - listAbsPos.x, lblPos.y - listAbsPos.y });
+                    }
+                    m_labels.emplace_back(label);
                 }
-                m_labels.emplace_back(label);
             }
         }
     }
@@ -133,26 +140,30 @@ void CUIDragDropReferenceList::ReloadReferences(CInventoryOwner* pActor)
     m_container->ClearAll(true);
     m_selected_item = NULL;
 
-    for (u8 i = 0; i < m_container->CellsCapacity().x; i++)
+    const Ivector2& cellsCapacity = m_container->CellsCapacity();
+    for (int i = 0; i < cellsCapacity.x; i++)
     {
-        CUIStatic* ref = m_references[i];
-        LPCSTR item_name = ACTOR_DEFS::g_quick_use_slots[i];
-        if (item_name && xr_strlen(item_name))
+        for (int j = 0; j < cellsCapacity.y; j++)
         {
-            PIItem itm = pActor->inventory().GetAny(item_name);
-            if (itm)
+            CUIStatic* ref = m_references[i + j];
+            LPCSTR item_name = ACTOR_DEFS::g_quick_use_slots[i];
+            if (item_name && xr_strlen(item_name))
             {
-                SetItem(create_cell_item(itm), Ivector2().set(i, 0));
+                PIItem itm = pActor->inventory().GetAny(item_name);
+                if (itm)
+                {
+                    SetItem(create_cell_item(itm), Ivector2().set(i, 0));
+                }
+                else
+                {
+                    LoadItemTexture(item_name, Ivector2().set(i, 0));
+                    ref->SetTextureColor(color_rgba(255, 255, 255, 100));
+                }
             }
             else
             {
-                LoadItemTexture(item_name, Ivector2().set(i, 0));
-                ref->SetTextureColor(color_rgba(255, 255, 255, 100));
+                ref->SetTextureColor(color_rgba(255, 255, 255, 0));
             }
-        }
-        else
-        {
-            ref->SetTextureColor(color_rgba(255, 255, 255, 0));
         }
     }
 }
