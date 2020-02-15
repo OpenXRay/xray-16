@@ -29,10 +29,6 @@ CUIActorMenu::CUIActorMenu()
       m_repair_mode(false), m_item_info_view(false), m_highlight_clear(true),
       m_trade_partner_inventory_state(0)
 {
-    // Xottab_DUTY: Let others can launch SOC without debugger
-    // XXX: to be removed
-    if (ShadowOfChernobylMode)
-        return;
     Construct();
 }
 
