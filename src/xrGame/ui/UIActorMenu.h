@@ -243,7 +243,9 @@ protected:
     void InitCellForSlot(u16 slot_idx);
     void InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyBagList = false);
     void ClearAllLists();
+
     void BindDragDropListEvents(CUIDragDropListEx* lst);
+    void RegisterCallback(CUIWindow* window, s16 event, const CUIWndCallback::void_function& callback);
 
     EDDListType GetListType(CUIDragDropListEx* l);
 

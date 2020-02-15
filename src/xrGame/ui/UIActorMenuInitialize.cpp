@@ -419,6 +419,14 @@ void CUIActorMenu::BindDragDropListEvents(CUIDragDropListEx* lst)
     lst->m_f_item_focused_update = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIActorMenu::OnItemFocusedUpdate);
 }
 
+void CUIActorMenu::RegisterCallback(CUIWindow* window, s16 event, const CUIWndCallback::void_function& callback)
+{
+    if (!window)
+        return;
+    Register(window);
+    AddCallback(window, event, std::forward<const CUIWndCallback::void_function&>(callback));
+}
+
 void CUIActorMenu::InitAllowedDrops()
 {
     m_allowed_drops[iTrashSlot].push_back(iActorBag);
@@ -466,50 +474,26 @@ void CUIActorMenu::InitAllowedDrops()
 
 void CUIActorMenu::InitCallbacks()
 {
-    if (m_trade_button)
-        Register(m_trade_button);
-    if (m_trade_buy_button)
-        Register(m_trade_buy_button);
-    if (m_trade_sell_button)
-        Register(m_trade_sell_button);
-    Register(m_takeall_button);
-    Register(m_exit_button);
-    Register(m_UIPropertiesBox);
-    if (m_pUpgradeWnd)
-        Register(m_pUpgradeWnd->m_btn_repair);
+    RegisterCallback(m_trade_button, BUTTON_CLICKED,
+        CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTrade));
 
-    if (m_trade_button)
-    {
-        AddCallback(m_trade_button, BUTTON_CLICKED,
-            CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTrade));
-    }
+    RegisterCallback(m_trade_buy_button, BUTTON_CLICKED,
+        CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTradeBuy));
 
-    if (m_trade_buy_button)
-    {
-        AddCallback(m_trade_buy_button, BUTTON_CLICKED,
-            CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTradeBuy));
-    }
+    RegisterCallback(m_trade_sell_button, BUTTON_CLICKED,
+        CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTradeSell));
 
-    if (m_trade_sell_button)
-    {
-        AddCallback(m_trade_sell_button, BUTTON_CLICKED,
-            CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTradeSell));
-    }
-
-    AddCallback(m_takeall_button, BUTTON_CLICKED,
+    RegisterCallback(m_takeall_button, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::TakeAllFromPartner));
-    
-    AddCallback(m_exit_button, BUTTON_CLICKED,
+
+    RegisterCallback(m_exit_button, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnExitClicked));
-    
-    AddCallback(m_UIPropertiesBox, PROPERTY_CLICKED,
+
+    RegisterCallback(m_UIPropertiesBox, PROPERTY_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::ProcessPropertiesBoxClicked));
 
-    if (m_pUpgradeWnd)
-    {
-        AddCallback(m_pUpgradeWnd->m_btn_repair, BUTTON_CLICKED,
-            CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
-    }
+    RegisterCallback(m_pUpgradeWnd ? m_pUpgradeWnd->m_btn_repair : nullptr, BUTTON_CLICKED,
+        CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
 
     BindDragDropListEvents(m_pLists[eInventoryPistolList]);
     BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
