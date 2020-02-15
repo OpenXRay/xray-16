@@ -427,51 +427,6 @@ void CUIActorMenu::RegisterCallback(CUIWindow* window, s16 event, const CUIWndCa
     AddCallback(window, event, std::forward<const CUIWndCallback::void_function&>(callback));
 }
 
-void CUIActorMenu::InitAllowedDrops()
-{
-    m_allowed_drops[iTrashSlot].push_back(iActorBag);
-    m_allowed_drops[iTrashSlot].push_back(iActorSlot);
-    m_allowed_drops[iTrashSlot].push_back(iActorBelt);
-    m_allowed_drops[iTrashSlot].push_back(iQuickSlot);
-
-    m_allowed_drops[iActorSlot].push_back(iActorBag);
-    m_allowed_drops[iActorSlot].push_back(iActorSlot);
-    m_allowed_drops[iActorSlot].push_back(iActorTrade);
-    m_allowed_drops[iActorSlot].push_back(iDeadBodyBag);
-
-    m_allowed_drops[iActorBag].push_back(iActorSlot);
-    m_allowed_drops[iActorBag].push_back(iActorBelt);
-    m_allowed_drops[iActorBag].push_back(iActorTrade);
-    m_allowed_drops[iActorBag].push_back(iDeadBodyBag);
-    m_allowed_drops[iActorBag].push_back(iActorBag);
-    m_allowed_drops[iActorBag].push_back(iQuickSlot);
-
-    m_allowed_drops[iActorBelt].push_back(iActorBag);
-    m_allowed_drops[iActorBelt].push_back(iActorTrade);
-    m_allowed_drops[iActorBelt].push_back(iDeadBodyBag);
-    m_allowed_drops[iActorBelt].push_back(iActorBelt);
-
-    m_allowed_drops[iActorTrade].push_back(iActorSlot);
-    m_allowed_drops[iActorTrade].push_back(iActorBag);
-    m_allowed_drops[iActorTrade].push_back(iActorBelt);
-    m_allowed_drops[iActorTrade].push_back(iActorTrade);
-    m_allowed_drops[iActorTrade].push_back(iQuickSlot);
-
-    m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTrade);
-    m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTradeBag);
-    m_allowed_drops[iPartnerTrade].push_back(iPartnerTradeBag);
-    m_allowed_drops[iPartnerTrade].push_back(iPartnerTrade);
-
-    m_allowed_drops[iDeadBodyBag].push_back(iActorSlot);
-    m_allowed_drops[iDeadBodyBag].push_back(iActorBag);
-    m_allowed_drops[iDeadBodyBag].push_back(iActorBelt);
-    m_allowed_drops[iDeadBodyBag].push_back(iDeadBodyBag);
-
-    m_allowed_drops[iQuickSlot].push_back(iActorBag);
-    m_allowed_drops[iQuickSlot].push_back(iActorTrade);
-    m_allowed_drops[iQuickSlot].push_back(iQuickSlot);
-}
-
 void CUIActorMenu::InitCallbacks()
 {
     RegisterCallback(m_trade_button, BUTTON_CLICKED,
@@ -521,6 +476,51 @@ void CUIActorMenu::InitCallbacks()
     }
 
     BindDragDropListEvents(m_pQuickSlot);
+}
+
+void CUIActorMenu::InitAllowedDrops()
+{
+    m_allowed_drops[iTrashSlot].push_back(iActorBag);
+    m_allowed_drops[iTrashSlot].push_back(iActorSlot);
+    m_allowed_drops[iTrashSlot].push_back(iActorBelt);
+    m_allowed_drops[iTrashSlot].push_back(iQuickSlot);
+
+    m_allowed_drops[iActorSlot].push_back(iActorBag);
+    m_allowed_drops[iActorSlot].push_back(iActorSlot);
+    m_allowed_drops[iActorSlot].push_back(iActorTrade);
+    m_allowed_drops[iActorSlot].push_back(iDeadBodyBag);
+
+    m_allowed_drops[iActorBag].push_back(iActorSlot);
+    m_allowed_drops[iActorBag].push_back(iActorBelt);
+    m_allowed_drops[iActorBag].push_back(iActorTrade);
+    m_allowed_drops[iActorBag].push_back(iDeadBodyBag);
+    m_allowed_drops[iActorBag].push_back(iActorBag);
+    m_allowed_drops[iActorBag].push_back(iQuickSlot);
+
+    m_allowed_drops[iActorBelt].push_back(iActorBag);
+    m_allowed_drops[iActorBelt].push_back(iActorTrade);
+    m_allowed_drops[iActorBelt].push_back(iDeadBodyBag);
+    m_allowed_drops[iActorBelt].push_back(iActorBelt);
+
+    m_allowed_drops[iActorTrade].push_back(iActorSlot);
+    m_allowed_drops[iActorTrade].push_back(iActorBag);
+    m_allowed_drops[iActorTrade].push_back(iActorBelt);
+    m_allowed_drops[iActorTrade].push_back(iActorTrade);
+    m_allowed_drops[iActorTrade].push_back(iQuickSlot);
+
+    m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTrade);
+    m_allowed_drops[iPartnerTradeBag].push_back(iPartnerTradeBag);
+    m_allowed_drops[iPartnerTrade].push_back(iPartnerTradeBag);
+    m_allowed_drops[iPartnerTrade].push_back(iPartnerTrade);
+
+    m_allowed_drops[iDeadBodyBag].push_back(iActorSlot);
+    m_allowed_drops[iDeadBodyBag].push_back(iActorBag);
+    m_allowed_drops[iDeadBodyBag].push_back(iActorBelt);
+    m_allowed_drops[iDeadBodyBag].push_back(iDeadBodyBag);
+
+    m_allowed_drops[iQuickSlot].push_back(iActorBag);
+    m_allowed_drops[iQuickSlot].push_back(iActorTrade);
+    m_allowed_drops[iQuickSlot].push_back(iQuickSlot);
 }
 
 void CUIActorMenu::UpdateButtonsLayout()
