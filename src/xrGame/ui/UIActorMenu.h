@@ -111,53 +111,40 @@ protected:
     ref_sound sounds[eSndMax];
     void PlaySnd(eActorMenuSndAction a);
 
-    UIHint* m_hint_wnd{};
-    CUIItemInfo* m_ItemInfo{};
-    CUICellItem* m_InfoCellItem{};
-    u32 m_InfoCellItem_timer;
-    CUICellItem* m_pCurrentCellItem{};
-
-    CUICellItem* m_upgrade_selected{};
-    CUIPropertiesBox* m_UIPropertiesBox{};
-
-    ui_actor_state_wnd* m_ActorStateInfo{};
-    CUICharacterInfo* m_ActorCharacterInfo{};
-    CUICharacterInfo* m_PartnerCharacterInfo{};
-
-    CUIDragDropListEx* m_pLists[eListCount]{};
-
-    CUIWindow* m_pInventoryWnd{};
-    CUIWindow* m_pTradeWnd{};
-    CUIWindow* m_pSearchLootWnd{};
-    CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
-
-    CUIStatic* m_LeftBackground{};
-
-    UIInvUpgradeInfo* m_upgrade_info{};
-    CUIMessageBoxEx* m_message_box_yes_no{};
-    CUIMessageBoxEx* m_message_box_ok{};
-    StaticDrawableWrapper* m_message_static{};
-
     CInventoryOwner* m_pActorInvOwner{};
     CInventoryOwner* m_pPartnerInvOwner{};
     CInventoryBox* m_pInvBox{};
 
+    CTrade* m_actor_trade{};
+    CTrade* m_partner_trade{};
+
+    CUIItemInfo* m_ItemInfo{};
+    CUICellItem* m_pCurrentCellItem{};
+
+    // Messages
+    CUIPropertiesBox* m_UIPropertiesBox{};
+    CUIMessageBoxEx* m_message_box_yes_no{};
+    CUIMessageBoxEx* m_message_box_ok{};
+    StaticDrawableWrapper* m_message_static{};
+
+    // Windows
+    CUIWindow* m_pInventoryWnd{};
+    CUIWindow* m_pTradeWnd{};
+    CUIWindow* m_pSearchLootWnd{};
+    CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
+    UIInvUpgradeInfo* m_upgrade_info{};
+    CUICellItem* m_upgrade_selected{};
+
+    // Left side
+    CUIStatic* m_LeftBackground{};
+
+    // Character infos
+    CUICharacterInfo* m_ActorCharacterInfo{};
+    CUICharacterInfo* m_PartnerCharacterInfo{};
+
+    // Money
     CUITextWnd* m_ActorMoney{};
     CUITextWnd* m_PartnerMoney{};
-
-    CUIProgressBar* m_WeaponSlot1_progress{};
-    CUIProgressBar* m_WeaponSlot2_progress{};
-    CUIProgressBar* m_Helmet_progress{};
-    CUIProgressBar* m_Outfit_progress{};
-    // bottom ---------------------------------
-    CUIStatic* m_ActorBottomInfo{};
-    CUITextWnd* m_ActorWeight{};
-    CUITextWnd* m_ActorWeightMax{};
-
-    CUIStatic* m_PartnerBottomInfo{};
-    CUITextWnd* m_PartnerWeight{};
-    float m_PartnerWeight_end_x;
-    //*	CUIStatic*					m_PartnerWeightMax;
 
     // delimiter ------------------------------
     CUIStatic* m_LeftDelimiter{};
@@ -170,24 +157,45 @@ protected:
     CUITextWnd* m_ActorTradePrice{};
     CUITextWnd* m_ActorTradeWeightMax{};
 
-    CTrade* m_actor_trade{};
-    CTrade* m_partner_trade{};
+    // bottom ---------------------------------
+    CUIStatic* m_ActorBottomInfo{};
+    CUITextWnd* m_ActorWeight{};
+    CUITextWnd* m_ActorWeightMax{};
 
+    CUIStatic* m_PartnerBottomInfo{};
+    CUITextWnd* m_PartnerWeight{};
+    float m_PartnerWeight_end_x;
+    //*	CUIStatic*					m_PartnerWeightMax;
+
+    // Buttons
     CUI3tButton* m_trade_button{};
     CUI3tButton* m_trade_buy_button{};
     CUI3tButton* m_trade_sell_button{};
     CUI3tButton* m_takeall_button{};
     CUI3tButton* m_exit_button{};
-    CUIStatic* m_clock_value{};
 
+    // Helpers
+    CUIStatic* m_clock_value{};
+    UIHint* m_hint_wnd{};
+
+    // Condition bars
+    ui_actor_state_wnd* m_ActorStateInfo{};
+    CUIProgressBar* m_WeaponSlot1_progress{};
+    CUIProgressBar* m_WeaponSlot2_progress{};
+    CUIProgressBar* m_Helmet_progress{};
+    CUIProgressBar* m_Outfit_progress{};
+
+    CUIDragDropListEx* m_pLists[eListCount]{};
+
+public:
+    CUIDragDropReferenceList* m_pQuickSlot{};
+
+protected:
     u32 m_last_time;
     bool m_repair_mode;
     bool m_item_info_view;
     bool m_highlight_clear;
     u32 m_trade_partner_inventory_state;
-
-public:
-    CUIDragDropReferenceList* m_pQuickSlot{};
 
 public:
     void SetMenuMode(EMenuMode mode);
