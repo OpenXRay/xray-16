@@ -356,7 +356,6 @@ void CUIActorMenu::InitCallbacks()
             CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnPerformTradeSell));
     }
 
-
     AddCallback(m_takeall_button, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::TakeAllFromPartner));
     
@@ -365,9 +364,12 @@ void CUIActorMenu::InitCallbacks()
     
     AddCallback(m_UIPropertiesBox, PROPERTY_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::ProcessPropertiesBoxClicked));
-    
-    AddCallback(m_pUpgradeWnd->m_btn_repair, BUTTON_CLICKED,
-        CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
+
+    if (m_pUpgradeWnd)
+    {
+        AddCallback(m_pUpgradeWnd->m_btn_repair, BUTTON_CLICKED,
+            CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
+    }
 
     BindDragDropListEvents(m_pLists[eInventoryPistolList]);
     BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
