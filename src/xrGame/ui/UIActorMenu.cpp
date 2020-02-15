@@ -87,6 +87,7 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
 {
     SetCurrentItem(NULL);
     m_hint_wnd->set_text(NULL);
+    m_message_static = nullptr;
 
     if (mode != m_currMenuMode)
     {
@@ -167,6 +168,7 @@ void CUIActorMenu::Show(bool status)
         SetMenuMode(mmUndefined);
     }
     m_ActorStateInfo->Show(status);
+    m_message_static = nullptr;
 }
 
 void CUIActorMenu::Draw()
@@ -177,6 +179,8 @@ void CUIActorMenu::Draw()
     inherited::Draw();
     m_ItemInfo->Draw();
     m_hint_wnd->Draw();
+    if (m_message_static)
+        m_message_static->Draw();
 }
 
 void CUIActorMenu::Update()
@@ -205,6 +209,16 @@ void CUIActorMenu::Update()
         if (m_pPartnerInvOwner->inventory().ModifyFrame() != m_trade_partner_inventory_state)
             InitPartnerInventoryContents();
         CheckDistance();
+        if (m_message_static)
+        {
+            m_message_static->Update();
+            if (!m_message_static->IsActual())
+            {
+                CurrentGameUI()->RemoveCustomStatic("not_enough_money_mine");
+                CurrentGameUI()->RemoveCustomStatic("not_enough_money_other");
+                m_message_static = nullptr;
+            }
+        }
         break;
     }
     case mmUpgrade:
@@ -782,6 +796,16 @@ void CUIActorMenu::ClearAllLists()
     m_pLists[eTradePartnerBagList]->ClearAll(true);
     m_pLists[eTradePartnerList]->ClearAll(true);
     m_pLists[eDeadBodyBagList]->ClearAll(true);
+}
+
+void CUIActorMenu::ShowMessage(pcstr text, pcstr staticMessage /*= nullptr*/, float staticMsgTtl /*= -1.0f*/)
+{
+    if (m_message_box_ok)
+        CallMessageBoxOK(text);
+    else if (staticMessage && ShadowOfChernobylMode)
+    {
+        m_message_static = CurrentGameUI()->AddCustomStatic(staticMessage, true, staticMsgTtl);
+    }
 }
 
 void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)

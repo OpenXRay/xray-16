@@ -153,6 +153,13 @@ void CUIActorMenu::DeInitTradeMode()
 
     if (!CurrentGameUI())
         return;
+
+    if (CurrentGameUI())
+    {
+        CurrentGameUI()->RemoveCustomStatic("not_enough_money_mine");
+        CurrentGameUI()->RemoveCustomStatic("not_enough_money_other");
+    }
+
     //только если находимся в режиме single
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
     if (!pGameSP)
@@ -457,15 +464,15 @@ void CUIActorMenu::OnBtnPerformTrade(CUIWindow* w, void* d)
     {
         if (actor_money < 0)
         {
-            CallMessageBoxOK("not_enough_money_actor");
+            ShowMessage("not_enough_money_actor", "not_enough_money_mine", 2.0f);
         }
         else if (partner_money < 0)
         {
-            CallMessageBoxOK("not_enough_money_partner");
+            ShowMessage("not_enough_money_partner", "not_enough_money_other", 2.0f);
         }
         else
         {
-            CallMessageBoxOK("trade_dont_make");
+            ShowMessage("trade_dont_make", "trade_dont_make", 2.0f);
         }
     }
     SetCurrentItem(nullptr);
@@ -500,15 +507,15 @@ void CUIActorMenu::OnBtnPerformTradeBuy(CUIWindow* w, void* d)
     {
         if (actor_money < 0)
         {
-            CallMessageBoxOK("not_enough_money_actor");
+            ShowMessage("not_enough_money_actor", "not_enough_money_mine", 2.0f);
         }
         // else if ( partner_money < 0 )
         //{
-        //	CallMessageBoxOK( "not_enough_money_partner" );
+        //	ShowMessage( "not_enough_money_partner", "not_enough_money_other", 2.0f );
         //}
         else
         {
-            CallMessageBoxOK("trade_dont_make");
+            ShowMessage("trade_dont_make", "trade_dont_make", 2.0f);
         }
     }
     SetCurrentItem(NULL);
@@ -542,15 +549,15 @@ void CUIActorMenu::OnBtnPerformTradeSell(CUIWindow* w, void* d)
     {
         /*		if ( actor_money < 0 )
 		{
-			CallMessageBoxOK( "not_enough_money_actor" );
+			ShowMessage( "not_enough_money_actor", "not_enough_money_mine", 2.0f );
 		}
 		else */ if (partner_money < 0)
         {
-            CallMessageBoxOK("not_enough_money_partner");
+            ShowMessage("not_enough_money_partner", "not_enough_money_other", 2.0f);
         }
         else
         {
-            CallMessageBoxOK("trade_dont_make");
+            ShowMessage("trade_dont_make", "trade_dont_make", 2.0f);
         }
     }
     SetCurrentItem(NULL);

@@ -21,6 +21,7 @@ class CInventoryBox;
 class CUIInventoryUpgradeWnd;
 class UIInvUpgradeInfo;
 class CUIMessageBoxEx;
+class StaticDrawableWrapper;
 class CUIPropertiesBox;
 class CTrade;
 class CUIProgressBar;
@@ -131,6 +132,7 @@ protected:
     UIInvUpgradeInfo* m_upgrade_info{};
     CUIMessageBoxEx* m_message_box_yes_no{};
     CUIMessageBoxEx* m_message_box_ok{};
+    StaticDrawableWrapper* m_message_static{};
 
     CInventoryOwner* m_pActorInvOwner{};
     CInventoryOwner* m_pPartnerInvOwner{};
@@ -332,6 +334,8 @@ public:
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
+
+    void ShowMessage(pcstr message, pcstr staticMessage = nullptr, float staticMsgTtl = -1.0f);
 
     void CallMessageBoxYesNo(LPCSTR text);
     void CallMessageBoxOK(LPCSTR text);
