@@ -309,6 +309,8 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
         return iPartnerTrade;
     if (l == m_pLists[eSearchLootBagList])
         return iDeadBodyBag;
+    if (l == m_pLists[eSearchLootActorBagList])
+        return iActorBag;
 
     if (l == m_pQuickSlot && m_pQuickSlot != nullptr)
         return iQuickSlot;
@@ -328,6 +330,8 @@ CUIDragDropListEx* CUIActorMenu::GetListByType(EDDListType t)
     {
         if (m_currMenuMode == mmTrade)
             return m_pLists[eTradeActorBagList];
+        else if (m_currMenuMode == mmDeadBodySearch)
+            return m_pLists[eSearchLootActorBagList];
         else
             return m_pLists[eInventoryBagList];
     }
@@ -473,7 +477,10 @@ void CUIActorMenu::clear_highlight_lists()
         m_pLists[eTradePartnerList]->clear_select_armament();
         break;
     case mmUpgrade: break;
-    case mmDeadBodySearch: m_pLists[eSearchLootBagList]->clear_select_armament(); break;
+    case mmDeadBodySearch:
+        m_pLists[eSearchLootBagList]->clear_select_armament();
+        m_pLists[eSearchLootActorBagList]->clear_select_armament();
+        break;
     }
     m_highlight_clear = true;
 }
@@ -562,8 +569,8 @@ void CUIActorMenu::set_highlight_item(CUICellItem* cell_item)
     }
     case mmDeadBodySearch:
     {
-        highlight_armament(item, m_pLists[eInventoryBagList]);
         highlight_armament(item, m_pLists[eSearchLootBagList]);
+        highlight_armament(item, m_pLists[eSearchLootActorBagList]);
         break;
     }
     }
@@ -792,6 +799,7 @@ void CUIActorMenu::ClearAllLists()
     m_pLists[eTradePartnerBagList]->ClearAll(true);
     m_pLists[eTradePartnerList]->ClearAll(true);
     m_pLists[eSearchLootBagList]->ClearAll(true);
+    m_pLists[eSearchLootActorBagList]->ClearAll(true);
 }
 
 void CUIActorMenu::ShowMessage(pcstr text, pcstr staticMessage /*= nullptr*/, float staticMsgTtl /*= -1.0f*/)

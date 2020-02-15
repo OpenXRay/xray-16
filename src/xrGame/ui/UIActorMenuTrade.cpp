@@ -25,6 +25,8 @@
 
 void CUIActorMenu::InitTradeMode()
 {
+    if (m_pTradeWnd)
+        m_pTradeWnd->Show(true);
     m_pLists[eInventoryBagList]->Show(false);
     m_PartnerCharacterInfo->Show(true);
     m_PartnerMoney->Show(true);
@@ -129,6 +131,8 @@ void CUIActorMenu::DeInitTradeMode()
         m_pPartnerInvOwner->StopTrading();
     }
 
+    if (m_pTradeWnd)
+        m_pTradeWnd->Show(false);
     m_pLists[eInventoryBagList]->Show(true);
     m_PartnerCharacterInfo->Show(false);
     m_PartnerMoney->Show(false);

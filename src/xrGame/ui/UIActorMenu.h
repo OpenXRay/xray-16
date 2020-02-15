@@ -100,6 +100,7 @@ protected:
         eTradePartnerBagList,
 
         eSearchLootBagList,
+        eSearchLootActorBagList,
 
         eTrashList,
 
@@ -125,6 +126,9 @@ protected:
 
     CUIDragDropListEx* m_pLists[eListCount]{};
 
+    CUIWindow* m_pInventoryWnd{};
+    CUIWindow* m_pTradeWnd{};
+    CUIWindow* m_pSearchLootWnd{};
     CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
 
     CUIStatic* m_LeftBackground{};
@@ -217,12 +221,19 @@ protected:
     void Construct();
     void InitializeUniversal(CUIXml& uiXml);
     void InitializeUpgradeMode(CUIXml& uiXml);
+
+    // Old style UI
+    void InitializeInventoryMode(CUIXml& uiXml);
+    void InitializeTradeMode(CUIXml& uiXml);
+    void InitializeSearchLootMode(CUIXml& uiXml);
+    // Old style UI
+
     void InitSounds(CUIXml& uiXml);
     void InitAllowedDrops();
     void InitCallbacks();
 
     void InitCellForSlot(u16 slot_idx);
-    void InitInventoryContents(CUIDragDropListEx* pBagList);
+    void InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyBagList = false);
     void ClearAllLists();
     void BindDragDropListEvents(CUIDragDropListEx* lst);
 

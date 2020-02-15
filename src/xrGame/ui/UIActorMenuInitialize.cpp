@@ -23,6 +23,20 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ui_base.h"
 #include "string_table.h"
+#include "UIOutfitSlot.h"
+
+constexpr cpcstr ACTOR_MENU_XML      = "actor_menu.xml";
+constexpr cpcstr ACTOR_MENU_ITEM_XML = "actor_menu_item.xml";
+
+constexpr cpcstr INVENTORY_XML       = "inventory_new.xml";
+constexpr cpcstr INVENTORY_ITEM_XML  = "inventory_item.xml";
+
+constexpr cpcstr TRADE_XML           = "trade.xml";
+constexpr cpcstr TRADE_CHARACTER_XML = "trade_character.xml";
+constexpr cpcstr TRADE_ITEM_XML      = "trade_item.xml";
+
+constexpr cpcstr CAR_BODY_XML        = "carbody_new.xml";
+constexpr cpcstr CARBODY_ITEM_XML    = "carbody_item.xml";
 
 CUIActorMenu::CUIActorMenu()
     : m_currMenuMode(mmUndefined), m_PartnerWeight_end_x(), m_last_time(u32(-1)),
@@ -79,11 +93,26 @@ void CUIActorMenu::Construct()
     m_ItemInfo = new CUIItemInfo();
     //-	m_ItemInfo->SetAutoDelete			(true);
 
-    CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu.xml");
-    InitializeUniversal(uiXml);
-    InitializeUpgradeMode(uiXml);
-    InitSounds(uiXml);
+    if (ShadowOfChernobylMode)
+    {
+        CUIXml inventoryXml, tradeXml, carbodyXml;
+        inventoryXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, INVENTORY_XML);
+        tradeXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TRADE_XML);
+        carbodyXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, CAR_BODY_XML);
+
+        InitializeInventoryMode(inventoryXml);
+        InitializeTradeMode(tradeXml);
+        InitializeSearchLootMode(carbodyXml);
+        InitSounds(inventoryXml);
+    }
+    else
+    {
+        CUIXml actorMenuXml;
+        actorMenuXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, ACTOR_MENU_XML);
+        InitializeUniversal(actorMenuXml);
+        InitializeUpgradeMode(actorMenuXml);
+        InitSounds(actorMenuXml);
+    }
     InitCallbacks();
     InitAllowedDrops();
 
@@ -172,6 +201,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         { eTradePartnerBagList,    "dragdrop_partner_bag",     nullptr,                   nullptr,            true },
 
         { eSearchLootBagList,      "dragdrop_deadbody_bag",    nullptr,                   nullptr,            true },
+        { eSearchLootActorBagList, nullptr,                    nullptr,                   nullptr,            false },
 
         { eTrashList,              "dragdrop_trash",           nullptr,                   nullptr,            false },
     };
@@ -180,6 +210,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
     for (auto [id, section, highlight, block, critical] : inventory_lists)
     {
+        if (!section)
+            continue;
         CUIDragDropListEx*& list = m_pLists[id];
 
         list = UIHelper::CreateDragDropListEx(uiXml, section, this, critical);
@@ -196,6 +228,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
             m_pLists[id]->SetBlocker(UIHelper::CreateStatic(uiXml, block, nullptr, false), { dx, dy });
         }
     }
+    m_pLists[eSearchLootActorBagList] = m_pLists[eInventoryBagList];
+
     if (m_pLists[eInventoryHelmetList])
         m_pLists[eInventoryHelmetList]->SetMaxCellsCapacity(m_pLists[eInventoryHelmetList]->CellsCapacity());
 
@@ -219,7 +253,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_ActorStateInfo->init_from_xml(uiXml, "actor_state_info");
     AttachChild(m_ActorStateInfo);
 
-    m_ItemInfo->InitItemInfo("actor_menu_item.xml");
+    m_ItemInfo->InitItemInfo(ACTOR_MENU_ITEM_XML);
     //-	AttachChild							(m_ItemInfo);
 }
 
@@ -239,8 +273,119 @@ void CUIActorMenu::InitializeUpgradeMode(CUIXml& /*uiXml*/)
         m_upgrade_info = new UIInvUpgradeInfo();
         m_upgrade_info->SetAutoDelete(true);
         AttachChild(m_upgrade_info);
-        m_upgrade_info->init_from_xml("actor_menu_item.xml");
+        m_upgrade_info->init_from_xml(ACTOR_MENU_ITEM_XML);
     }
+}
+
+void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
+{
+    m_pInventoryWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
+
+    UIHelper::CreateStatic(uiXml, "belt_slots", m_pInventoryWnd);
+    UIHelper::CreateStatic(uiXml, "back", m_pInventoryWnd);
+    UIHelper::CreateStatic(uiXml, "bottom_static", m_pInventoryWnd);
+    CUIStatic* bagWnd = UIHelper::CreateStatic(uiXml, "bag_static", m_pInventoryWnd);
+
+    /*m_ActorMoney =*/ UIHelper::CreateStatic(uiXml, "money_static", m_pInventoryWnd);
+
+    CUIStatic* descWnd = UIHelper::CreateStatic(uiXml, "descr_static", m_pInventoryWnd);
+
+    CUIFrameWindow* personalWnd = UIHelper::CreateFrameWindow(uiXml, "character_frame_window", m_pInventoryWnd);
+    personalWnd->AttachChild(m_ActorStateInfo);
+
+    UIHelper::CreateStatic(uiXml, "static_personal", personalWnd);
+
+    std::tuple<eActorMenuListType, cpcstr, CUIWindow*> inventory_lists[] =
+    {
+        // { id,                   "xml_section_name",   parent }
+        { eInventoryPistolList,    "dragdrop_pistol",    m_pInventoryWnd },
+        { eInventoryAutomaticList, "dragdrop_automatic", m_pInventoryWnd },
+        { eInventoryOutfitList,    "dragdrop_outfit",    m_pInventoryWnd },
+        { eInventoryBeltList,      "dragdrop_belt",      m_pInventoryWnd },
+        { eInventoryBagList,       "dragdrop_bag",       bagWnd },
+    };
+    for (auto [id, section, parent] : inventory_lists)
+    {
+        if (id != eInventoryOutfitList)
+            m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, parent);
+        else // eInventoryOutfitList
+        {
+            CUIOutfitDragDropList* list = new CUIOutfitDragDropList();
+            list->SetAutoDelete(true);
+            parent->AttachChild(list);
+            CUIXmlInit::InitDragDropListEx(uiXml, section, 0, list);
+            m_pLists[id] = list;
+        }
+    }
+
+    CUIStatic* time = UIHelper::CreateStatic(uiXml, "time_static", m_pInventoryWnd);
+    m_clock_value = UIHelper::CreateStatic(uiXml, "time_static_str", time);
+
+    m_exit_button = UIHelper::Create3tButton(uiXml, "exit_button", m_pInventoryWnd);
+}
+
+void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
+{
+    m_pTradeWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
+
+    UIHelper::CreateStatic(uiXml, "top_background", m_pTradeWnd);
+    UIHelper::CreateStatic(uiXml, "bottom_background", m_pTradeWnd);
+
+    CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pTradeWnd);
+    CUIStatic* partnerIcon = UIHelper::CreateStatic(uiXml, "static_icon", 1, m_pTradeWnd);
+
+    CUIStatic* actorBagWnd = UIHelper::CreateStatic(uiXml, "our_bag_static", m_pTradeWnd);
+    CUIStatic* partnerBagWnd = UIHelper::CreateStatic(uiXml, "others_bag_static", m_pTradeWnd);
+
+    /*m_ActorMoney =*/ UIHelper::CreateStatic(uiXml, "our_money_static", actorBagWnd);
+    /*m_PartnerMoney =*/ UIHelper::CreateStatic(uiXml, "other_money_static", partnerBagWnd);
+
+    CUIStatic* actorTradeWnd = UIHelper::CreateStatic(uiXml, "static", 0, m_pTradeWnd);
+    CUIStatic* partnerTradeWnd = UIHelper::CreateStatic(uiXml, "static", 1, m_pTradeWnd);
+
+    std::tuple<eActorMenuListType, int, CUIStatic*> inventory_lists[] =
+    {
+        // { id,                   index, parent }
+        { eTradeActorList,         2,     actorTradeWnd },
+        { eTradeActorBagList,      0,     actorBagWnd },
+                                              
+        { eTradePartnerList,       3,     partnerTradeWnd },
+        { eTradePartnerBagList,    1,     partnerBagWnd },
+    };
+    for (auto [id, index, parent] : inventory_lists)
+    {
+        m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_list", index, parent);
+    }
+
+    CUIStatic* descWnd = UIHelper::CreateStatic(uiXml, "desc_static", m_pTradeWnd);
+
+    m_trade_button = UIHelper::Create3tButton(uiXml, "button", 0, m_pTradeWnd);
+    CUI3tButton* toTalkBtn = UIHelper::Create3tButton(uiXml, "button", 1, m_pTradeWnd);
+    RegisterCallback(toTalkBtn, BUTTON_CLICKED,
+        CUIWndCallback::void_function(this, &CUIActorMenu::OnBtnExitClicked));
+}
+
+void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
+{
+    m_pSearchLootWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
+
+    UIHelper::CreateStatic(uiXml, "top_background", m_pSearchLootWnd);
+    UIHelper::CreateStatic(uiXml, "bottom_background", m_pSearchLootWnd);
+
+    CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pSearchLootWnd);
+    CUIStatic* partnerIcon = UIHelper::CreateStatic(uiXml, "static_icon", 1, m_pSearchLootWnd);
+
+    CUIStatic* actorBagWnd = UIHelper::CreateStatic(uiXml, "our_bag_static", m_pSearchLootWnd);
+    CUIStatic* partnerBagWnd = UIHelper::CreateStatic(uiXml, "others_bag_static", m_pSearchLootWnd);
+
+    m_pLists[eSearchLootActorBagList] = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_list_our", actorBagWnd);
+    m_pLists[eSearchLootBagList] = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_list_other", partnerBagWnd);
+
+    // Item info
+    CUIFrameWindow* descWnd = UIHelper::CreateFrameWindow(uiXml, "frame_window", m_pSearchLootWnd);
+    UIHelper::CreateStatic(uiXml, "descr_static", descWnd);
+
+    m_takeall_button = UIHelper::Create3tButton(uiXml, "take_all_btn", m_pSearchLootWnd);
 }
 
 void CUIActorMenu::InitSounds(CUIXml& uiXml)

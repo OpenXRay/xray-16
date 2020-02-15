@@ -50,7 +50,10 @@ bool move_item_check(PIItem itm, CInventoryOwner* from, CInventoryOwner* to, boo
 
 void CUIActorMenu::InitDeadBodySearchMode()
 {
+    if (m_pSearchLootWnd)
+        m_pSearchLootWnd->Show(true);
     m_pLists[eSearchLootBagList]->Show(true);
+    m_pLists[eSearchLootActorBagList]->Show(true);
     m_LeftBackground->Show(true);
     m_PartnerBottomInfo->Show(true);
     m_PartnerWeight->Show(true);
@@ -65,7 +68,8 @@ void CUIActorMenu::InitDeadBodySearchMode()
         m_PartnerCharacterInfo->Show(false);
     }
 
-    InitInventoryContents(m_pLists[eInventoryBagList]);
+    InitInventoryContents(m_pLists[eSearchLootActorBagList],
+        m_pLists[eSearchLootActorBagList] != m_pLists[eInventoryBagList]);
 
     TIItemContainer items_list;
     if (m_pPartnerInvOwner)
@@ -116,7 +120,10 @@ void CUIActorMenu::InitDeadBodySearchMode()
 
 void CUIActorMenu::DeInitDeadBodySearchMode() const
 {
+    if (m_pSearchLootWnd)
+        m_pSearchLootWnd->Show(false);
     m_pLists[eSearchLootBagList]->Show(false);
+    m_pLists[eSearchLootActorBagList]->Show(false);
     m_PartnerCharacterInfo->Show(false);
     m_LeftBackground->Show(false);
     m_PartnerBottomInfo->Show(false);

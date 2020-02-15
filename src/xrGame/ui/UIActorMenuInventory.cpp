@@ -38,6 +38,8 @@ void move_item_from_to(u16 from_id, u16 to_id, u16 what_id);
 
 void CUIActorMenu::InitInventoryMode()
 {
+    if (m_pInventoryWnd)
+        m_pInventoryWnd->Show(true);
     m_pLists[eInventoryBagList]->Show(true);
     m_pLists[eInventoryBeltList]->Show(true);
     m_pLists[eInventoryOutfitList]->Show(true);
@@ -62,6 +64,8 @@ void CUIActorMenu::InitInventoryMode()
 
 void CUIActorMenu::DeInitInventoryMode()
 {
+    if (m_pInventoryWnd)
+        m_pInventoryWnd->Show(false);
     if (m_pLists[eTrashList])
        m_pLists[eTrashList]->Show(false);
     if (m_clock_value)
@@ -409,14 +413,41 @@ void CUIActorMenu::InitCellForSlot(u16 slot_idx)
     //	helmet->ReloadBonesProtection();
 }
 
-void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
+void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyBagList /*= false*/)
 {
     ClearAllLists();
     m_pMouseCapturer = NULL;
     m_UIPropertiesBox->Hide();
     SetCurrentItem(NULL);
 
-    CUIDragDropListEx* curr_list = NULL;
+    CUIDragDropListEx* curr_list = pBagList;
+
+    TIItemContainer ruck_list = m_pActorInvOwner->inventory().m_ruck;
+    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
+
+    for (PIItem item : ruck_list)
+    {
+        CMPPlayersBag* bag = smart_cast<CMPPlayersBag*>(&item->object());
+        if (bag)
+            continue;
+
+        CUICellItem* itm = create_cell_item(item);
+        curr_list->SetItem(itm);
+        if (m_currMenuMode == mmTrade && m_pPartnerInvOwner)
+            ColorizeItem(itm, !CanMoveToPartner(item));
+
+        // CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(item);
+        // if(outfit)
+        //	outfit->ReloadBonesProtection();
+
+        // CHelmet* helmet = smart_cast<CHelmet*>(item);
+        // if(helmet)
+        //	helmet->ReloadBonesProtection();
+    }
+
+    if (onlyBagList)
+        return;
+
     // Slots
     InitCellForSlot(INV_SLOT_2);
     InitCellForSlot(INV_SLOT_3);
@@ -449,33 +480,6 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
             ColorizeItem(itm, !CanMoveToPartner(*itb));
     }
 
-    TIItemContainer ruck_list;
-    ruck_list = m_pActorInvOwner->inventory().m_ruck;
-    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
-
-    curr_list = pBagList;
-
-    itb = ruck_list.begin();
-    ite = ruck_list.end();
-    for (; itb != ite; ++itb)
-    {
-        CMPPlayersBag* bag = smart_cast<CMPPlayersBag*>(&(*itb)->object());
-        if (bag)
-            continue;
-
-        CUICellItem* itm = create_cell_item(*itb);
-        curr_list->SetItem(itm);
-        if (m_currMenuMode == mmTrade && m_pPartnerInvOwner)
-            ColorizeItem(itm, !CanMoveToPartner(*itb));
-
-        // CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(*itb);
-        // if(outfit)
-        //	outfit->ReloadBonesProtection();
-
-        // CHelmet* helmet = smart_cast<CHelmet*>(*itb);
-        // if(helmet)
-        //	helmet->ReloadBonesProtection();
-    }
     if (m_pQuickSlot)
         m_pQuickSlot->ReloadReferences(m_pActorInvOwner);
 }
