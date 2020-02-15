@@ -210,14 +210,22 @@ void CUIActorMenu::Construct()
     }
 
     m_message_box_yes_no = new CUIMessageBoxEx();
-    m_message_box_yes_no->InitMessageBox("message_box_yes_no");
-    m_message_box_yes_no->SetAutoDelete(true);
-    m_message_box_yes_no->SetText("");
+    if (!m_message_box_yes_no->InitMessageBox("message_box_yes_no"))
+        xr_delete(m_message_box_yes_no);
+    else
+    {
+        m_message_box_yes_no->SetAutoDelete(true);
+        m_message_box_yes_no->SetText("");
+    }
 
     m_message_box_ok = new CUIMessageBoxEx();
-    m_message_box_ok->InitMessageBox("message_box_ok");
-    m_message_box_ok->SetAutoDelete(true);
-    m_message_box_ok->SetText("");
+    if (!m_message_box_ok->InitMessageBox("message_box_ok"))
+        xr_delete(m_message_box_ok);
+    else
+    {
+        m_message_box_ok->SetAutoDelete(true);
+        m_message_box_ok->SetText("");
+    }
 
     m_UIPropertiesBox = new CUIPropertiesBox();
     m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));

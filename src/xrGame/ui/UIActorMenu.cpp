@@ -786,6 +786,11 @@ void CUIActorMenu::ClearAllLists()
 
 void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)
 {
+    if (!m_message_box_yes_no)
+    {
+        OnMesBoxYes(this, nullptr);
+        return;
+    }
     m_message_box_yes_no->SetText(text);
     m_message_box_yes_no->func_on_ok = CUIWndCallback::void_function(this, &CUIActorMenu::OnMesBoxYes);
     m_message_box_yes_no->func_on_no = CUIWndCallback::void_function(this, &CUIActorMenu::OnMesBoxNo);
@@ -794,6 +799,8 @@ void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)
 
 void CUIActorMenu::CallMessageBoxOK(LPCSTR text)
 {
+    if (!m_message_box_ok)
+        return;
     m_message_box_ok->SetText(text);
     m_message_box_ok->ShowDialog(false);
 }
