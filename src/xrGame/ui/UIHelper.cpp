@@ -43,7 +43,7 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent
 CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
-    if (!critical && !xml.NavigateToNode(ui_path, 0))
+    if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
     auto ui = new CUIStatic();
