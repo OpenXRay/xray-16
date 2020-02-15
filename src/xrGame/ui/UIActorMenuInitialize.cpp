@@ -178,9 +178,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
 
-    for (const auto& listDesc : inventory_lists)
+    for (auto [id, section, highlight, block, critical] : inventory_lists)
     {
-        auto [id, section, highlight, block, critical] = listDesc;
         CUIDragDropListEx*& list = m_pLists[id];
 
         list = UIHelper::CreateDragDropListEx(uiXml, section, this, critical);
