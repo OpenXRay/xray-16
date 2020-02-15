@@ -215,6 +215,8 @@ private:
 
 protected:
     void Construct();
+    void InitializeUniversal(CUIXml& uiXml);
+    void InitializeUpgradeMode(CUIXml& uiXml);
     void InitSounds(CUIXml& uiXml);
     void InitAllowedDrops();
     void InitCallbacks();

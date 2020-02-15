@@ -49,34 +49,73 @@ CUIActorMenu::~CUIActorMenu()
 
 void CUIActorMenu::Construct()
 {
+    m_UIPropertiesBox = new CUIPropertiesBox();
+    m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
+    m_UIPropertiesBox->SetWindowName("property_box");
+
+    m_message_box_yes_no = new CUIMessageBoxEx();
+    if (!m_message_box_yes_no->InitMessageBox("message_box_yes_no"))
+        xr_delete(m_message_box_yes_no);
+    else
+    {
+        m_message_box_yes_no->SetAutoDelete(true);
+        m_message_box_yes_no->SetText("");
+    }
+
+    m_message_box_ok = new CUIMessageBoxEx();
+    if (!m_message_box_ok->InitMessageBox("message_box_ok"))
+        xr_delete(m_message_box_ok);
+    else
+    {
+        m_message_box_ok->SetAutoDelete(true);
+        m_message_box_ok->SetText("");
+    }
+
+    m_ActorCharacterInfo = new CUICharacterInfo();
+    m_ActorCharacterInfo->SetAutoDelete(true);
+
+    m_PartnerCharacterInfo = new CUICharacterInfo();
+    m_PartnerCharacterInfo->SetAutoDelete(true);
+
+    m_ActorStateInfo = new ui_actor_state_wnd();
+    m_ActorStateInfo->SetAutoDelete(true);
+
+    m_ItemInfo = new CUIItemInfo();
+    //-	m_ItemInfo->SetAutoDelete			(true);
+
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu.xml");
+    InitializeUniversal(uiXml);
+    InitializeUpgradeMode(uiXml);
+    InitSounds(uiXml);
+    InitCallbacks();
+    InitAllowedDrops();
 
+    AttachChild(m_UIPropertiesBox);
+    m_UIPropertiesBox->Hide();
+
+    SetCurrentItem(nullptr);
+    SetActor(nullptr);
+    SetPartner(nullptr);
+    SetInvBox(nullptr);
+
+    DeInitInventoryMode();
+    DeInitTradeMode();
+    DeInitUpgradeMode();
+    DeInitDeadBodySearchMode();
+}
+
+void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
+{
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
     m_LeftBackground = UIHelper::CreateStatic(uiXml, "left_background", this);
 
-    m_pUpgradeWnd = new CUIInventoryUpgradeWnd();
-    if (!m_pUpgradeWnd->Init())
-    {
-        xr_delete(m_pUpgradeWnd);
-    }
-    else
-    {
-        AttachChild(m_pUpgradeWnd);
-        m_pUpgradeWnd->SetAutoDelete(true);
-    }
-
-    m_ActorCharacterInfo = new CUICharacterInfo();
-    m_ActorCharacterInfo->SetAutoDelete(true);
-    AttachChild(m_ActorCharacterInfo);
     m_ActorCharacterInfo->InitCharacterInfo(&uiXml, "actor_ch_info");
-
-    m_PartnerCharacterInfo = new CUICharacterInfo();
-    m_PartnerCharacterInfo->SetAutoDelete(true);
-    AttachChild(m_PartnerCharacterInfo);
     m_PartnerCharacterInfo->InitCharacterInfo(&uiXml, "partner_ch_info");
+    AttachChild(m_ActorCharacterInfo);
+    AttachChild(m_PartnerCharacterInfo);
 
     m_RightDelimiter = UIHelper::CreateStatic(uiXml, "right_delimiter", this);
     if (!CallOfPripyatMode)
@@ -107,6 +146,14 @@ void CUIActorMenu::Construct()
     m_PartnerWeight = UIHelper::CreateTextWnd(uiXml, "partner_weight", this);
     m_PartnerBottomInfo->AdjustWidthToText();
     m_PartnerWeight_end_x = m_PartnerWeight->GetWndPos().x;
+
+    m_ActorMoney = UIHelper::CreateTextWnd(uiXml, "actor_money_static", this);
+    m_PartnerMoney = UIHelper::CreateTextWnd(uiXml, "partner_money_static", this);
+
+    m_WeaponSlot1_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon1", this, false);
+    m_WeaponSlot2_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon2", this, false);
+    m_Helmet_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_helmet", this, false);
+    m_Outfit_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_outfit", this, false);
 
     constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
     {
@@ -166,23 +213,6 @@ void CUIActorMenu::Construct()
         m_pQuickSlot->SetHighlighter(UIHelper::CreateStatic(uiXml, "quick_slot_highlight", nullptr, false), { dx, dy });
     }
 
-    m_ActorMoney = UIHelper::CreateTextWnd(uiXml, "actor_money_static", this);
-    m_PartnerMoney = UIHelper::CreateTextWnd(uiXml, "partner_money_static", this);
-
-    m_WeaponSlot1_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_weapon1", this, false);
-    m_WeaponSlot2_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_weapon2", this, false);
-    m_Helmet_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_helmet", this, false);
-    m_Outfit_progress = UIHelper::CreateProgressBar(uiXml, "progress_bar_outfit", this, false);
-
-    if (!m_WeaponSlot1_progress)
-        m_WeaponSlot1_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon1", this, false);
-    if (!m_WeaponSlot2_progress)
-        m_WeaponSlot2_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon2", this, false);
-    if (!m_Helmet_progress)
-        m_Helmet_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_helmet", this, false);
-    if (!m_Outfit_progress)
-        m_Outfit_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_outfit", this, false);
-
     m_trade_button = UIHelper::Create3tButton(uiXml, "trade_button", this, false);
     m_trade_buy_button = UIHelper::Create3tButton(uiXml, "trade_buy_button", this, false);
     m_trade_sell_button = UIHelper::Create3tButton(uiXml, "trade_sell_button", this, false);
@@ -191,15 +221,23 @@ void CUIActorMenu::Construct()
 
     m_clock_value = UIHelper::CreateStatic(uiXml, "clock_value", this, false);
 
-    m_ActorStateInfo = new ui_actor_state_wnd();
     m_ActorStateInfo->init_from_xml(uiXml, "actor_state_info");
-    m_ActorStateInfo->SetAutoDelete(true);
     AttachChild(m_ActorStateInfo);
 
-    m_ItemInfo = new CUIItemInfo();
-    //-	m_ItemInfo->SetAutoDelete			(true);
-    //-	AttachChild							(m_ItemInfo);
     m_ItemInfo->InitItemInfo("actor_menu_item.xml");
+    //-	AttachChild							(m_ItemInfo);
+}
+
+void CUIActorMenu::InitializeUpgradeMode(CUIXml& /*uiXml*/)
+{
+    m_pUpgradeWnd = new CUIInventoryUpgradeWnd();
+    if (!m_pUpgradeWnd->Init())
+        xr_delete(m_pUpgradeWnd);
+    else
+    {
+        AttachChild(m_pUpgradeWnd);
+        m_pUpgradeWnd->SetAutoDelete(true);
+    }
 
     if (ai().get_alife())
     {
@@ -208,44 +246,6 @@ void CUIActorMenu::Construct()
         AttachChild(m_upgrade_info);
         m_upgrade_info->init_from_xml("actor_menu_item.xml");
     }
-
-    m_message_box_yes_no = new CUIMessageBoxEx();
-    if (!m_message_box_yes_no->InitMessageBox("message_box_yes_no"))
-        xr_delete(m_message_box_yes_no);
-    else
-    {
-        m_message_box_yes_no->SetAutoDelete(true);
-        m_message_box_yes_no->SetText("");
-    }
-
-    m_message_box_ok = new CUIMessageBoxEx();
-    if (!m_message_box_ok->InitMessageBox("message_box_ok"))
-        xr_delete(m_message_box_ok);
-    else
-    {
-        m_message_box_ok->SetAutoDelete(true);
-        m_message_box_ok->SetText("");
-    }
-
-    m_UIPropertiesBox = new CUIPropertiesBox();
-    m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
-    AttachChild(m_UIPropertiesBox);
-    m_UIPropertiesBox->Hide();
-    m_UIPropertiesBox->SetWindowName("property_box");
-
-    InitSounds(uiXml);
-    InitCallbacks();
-    InitAllowedDrops();
-
-    SetCurrentItem(NULL);
-    SetActor(NULL);
-    SetPartner(NULL);
-    SetInvBox(NULL);
-
-    DeInitInventoryMode();
-    DeInitTradeMode();
-    DeInitUpgradeMode();
-    DeInitDeadBodySearchMode();
 }
 
 void CUIActorMenu::InitSounds(CUIXml& uiXml)
