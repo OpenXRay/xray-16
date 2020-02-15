@@ -128,7 +128,7 @@ void CUIActorMenu::Construct()
         { eTradePartnerList,       "dragdrop_partner_trade",   nullptr,                   nullptr,            true },
         { eTradePartnerBagList,    "dragdrop_partner_bag",     nullptr,                   nullptr,            true },
 
-        { eDeadBodyBagList,        "dragdrop_deadbody_bag",    nullptr,                   nullptr,            true },
+        { eSearchLootBagList,      "dragdrop_deadbody_bag",    nullptr,                   nullptr,            true },
 
         { eTrashList,              "dragdrop_trash",           nullptr,                   nullptr,            false },
     };
@@ -386,7 +386,7 @@ void CUIActorMenu::InitCallbacks()
     BindDragDropListEvents(m_pLists[eTradePartnerBagList]);
     BindDragDropListEvents(m_pLists[eTradePartnerList]);
 
-    BindDragDropListEvents(m_pLists[eDeadBodyBagList]);
+    BindDragDropListEvents(m_pLists[eSearchLootBagList]);
 
     if (m_pLists[eTrashList])
     {

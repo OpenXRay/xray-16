@@ -50,7 +50,7 @@ bool move_item_check(PIItem itm, CInventoryOwner* from, CInventoryOwner* to, boo
 
 void CUIActorMenu::InitDeadBodySearchMode()
 {
-    m_pLists[eDeadBodyBagList]->Show(true);
+    m_pLists[eSearchLootBagList]->Show(true);
     m_LeftBackground->Show(true);
     m_PartnerBottomInfo->Show(true);
     m_PartnerWeight->Show(true);
@@ -87,7 +87,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     for (; it != it_e; ++it)
     {
         CUICellItem* itm = create_cell_item(*it);
-        m_pLists[eDeadBodyBagList]->SetItem(itm);
+        m_pLists[eSearchLootBagList]->SetItem(itm);
     }
 
     CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
@@ -116,7 +116,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
 
 void CUIActorMenu::DeInitDeadBodySearchMode() const
 {
-    m_pLists[eDeadBodyBagList]->Show(false);
+    m_pLists[eSearchLootBagList]->Show(false);
     m_PartnerCharacterInfo->Show(false);
     m_LeftBackground->Show(false);
     m_PartnerBottomInfo->Show(false);
@@ -155,10 +155,10 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
     if (b_use_cursor_pos)
     {
         new_owner = CUIDragDropListEx::m_drag_item->BackList();
-        VERIFY(new_owner == m_pLists[eDeadBodyBagList]);
+        VERIFY(new_owner == m_pLists[eSearchLootBagList]);
     }
     else
-        new_owner = m_pLists[eDeadBodyBagList];
+        new_owner = m_pLists[eSearchLootBagList];
 
     CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
 
@@ -187,7 +187,7 @@ void CUIActorMenu::UpdateDeadBodyBag()
     string64 buf;
 
     LPCSTR kg_str = StringTable().translate("st_kg").c_str();
-    float total = CalcItemsWeight(m_pLists[eDeadBodyBagList]);
+    float total = CalcItemsWeight(m_pLists[eSearchLootBagList]);
     xr_sprintf(buf, "%.1f %s", total, kg_str);
     m_PartnerWeight->SetText(buf);
     m_PartnerWeight->AdjustWidthToText();
@@ -211,10 +211,10 @@ void CUIActorMenu::TakeAllFromPartner(CUIWindow* w, void* d)
         return;
     }
 
-    u32 const cnt = m_pLists[eDeadBodyBagList]->ItemsCount();
+    u32 const cnt = m_pLists[eSearchLootBagList]->ItemsCount();
     for (u32 i = 0; i < cnt; ++i)
     {
-        CUICellItem* ci = m_pLists[eDeadBodyBagList]->GetItemIdx(i);
+        CUICellItem* ci = m_pLists[eSearchLootBagList]->GetItemIdx(i);
         for (u32 j = 0; j < ci->ChildsCount(); ++j)
         {
             PIItem j_item = (PIItem)(ci->Child(j)->m_pData);
@@ -223,17 +223,17 @@ void CUIActorMenu::TakeAllFromPartner(CUIWindow* w, void* d)
         PIItem item = (PIItem)(ci->m_pData);
         move_item_check(item, m_pPartnerInvOwner, m_pActorInvOwner, false);
     } // for i
-    m_pLists[eDeadBodyBagList]->ClearAll(true); // false
+    m_pLists[eSearchLootBagList]->ClearAll(true); // false
 }
 
 void CUIActorMenu::TakeAllFromInventoryBox()
 {
     u16 actor_id = m_pActorInvOwner->object_id();
 
-    u32 const cnt = m_pLists[eDeadBodyBagList]->ItemsCount();
+    u32 const cnt = m_pLists[eSearchLootBagList]->ItemsCount();
     for (u32 i = 0; i < cnt; ++i)
     {
-        CUICellItem* ci = m_pLists[eDeadBodyBagList]->GetItemIdx(i);
+        CUICellItem* ci = m_pLists[eSearchLootBagList]->GetItemIdx(i);
         for (u32 j = 0; j < ci->ChildsCount(); ++j)
         {
             PIItem j_item = (PIItem)(ci->Child(j)->m_pData);
@@ -243,5 +243,5 @@ void CUIActorMenu::TakeAllFromInventoryBox()
         PIItem item = (PIItem)(ci->m_pData);
         move_item_from_to(m_pInvBox->ID(), actor_id, item->object_id());
     } // for i
-    m_pLists[eDeadBodyBagList]->ClearAll(true); // false
+    m_pLists[eSearchLootBagList]->ClearAll(true); // false
 }

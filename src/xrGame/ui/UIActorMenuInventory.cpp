@@ -294,7 +294,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
             }
         }
         CUICellItem* ci = nullptr;
-        if (GetMenuMode() == mmDeadBodySearch && FindItemInList(m_pLists[eDeadBodyBagList], pItem, ci))
+        if (GetMenuMode() == mmDeadBodySearch && FindItemInList(m_pLists[eSearchLootBagList], pItem, ci))
             break;
 
         if (!b_already)
@@ -1336,7 +1336,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         PIItem item = CurrentIItem(); // temporary storing because of AttachAddon is setting curiitem to NULL
         AttachAddon((PIItem)(m_UIPropertiesBox->GetClickedItem()->GetData()));
         if (m_currMenuMode == mmDeadBodySearch)
-            RemoveItemFromList(m_pLists[eDeadBodyBagList], item);
+            RemoveItemFromList(m_pLists[eSearchLootBagList], item);
 
         break;
     }

@@ -99,7 +99,7 @@ protected:
         eTradePartnerList,
         eTradePartnerBagList,
 
-        eDeadBodyBagList,
+        eSearchLootBagList,
 
         eTrashList,
 
