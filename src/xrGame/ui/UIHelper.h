@@ -40,11 +40,13 @@ public:
     static CUIFrameLineWnd* CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIFrameWindow* CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUI3tButton* Create3tButton(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
+    static CUI3tButton* Create3tButton(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical = true);
     static CUICheckButton* CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIEditBox* CreateEditBox(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
 
     static UIHint* CreateHint(CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*/, bool critical = true);
     static CUIDragDropListEx* CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
+    static CUIDragDropListEx* CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical = true);
     static CUIDragDropReferenceList* CreateDragDropReferenceList(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
 
 }; // class UIHelper
