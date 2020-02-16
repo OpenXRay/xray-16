@@ -177,7 +177,8 @@ void CUIActorMenu::Draw()
     CurrentGameUI()->UIMainIngameWnd->DrawMainIndicatorsForInventory();
 
     inherited::Draw();
-    m_ItemInfo->Draw();
+    if (m_ItemInfo)
+        m_ItemInfo->Draw();
     m_hint_wnd->Draw();
     if (m_message_static)
         m_message_static->Draw();
@@ -237,7 +238,8 @@ void CUIActorMenu::Update()
     }
 
     inherited::Update();
-    m_ItemInfo->Update();
+    if (m_ItemInfo)
+        m_ItemInfo->Update();
     m_hint_wnd->Update();
 }
 
@@ -361,6 +363,9 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
     }
     TryHidePropertiesBox();
 
+    if (GetModeSpecificItemInfo())
+        GetModeSpecificItemInfo()->InitItem(itm);
+
     if (m_currMenuMode == mmUpgrade)
     {
         SetupUpgradeItem();
@@ -369,6 +374,8 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
 
 void CUIActorMenu::InfoCurItem(CUICellItem* cell_item)
 {
+    if (!m_ItemInfo)
+        return;
     if (!cell_item)
     {
         m_ItemInfo->InitItem(nullptr);
@@ -430,6 +437,17 @@ void CUIActorMenu::InfoCurItem(CUICellItem* cell_item)
     //	m_ItemInfo->InitItem	( current_item, compare_item );
     float dx_pos = GetWndRect().left;
     fit_in_rect(m_ItemInfo, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH - dx_pos, UI_BASE_HEIGHT), 10.0f, dx_pos);
+}
+
+CUIItemInfo* CUIActorMenu::GetModeSpecificItemInfo()
+{
+    switch (m_currMenuMode)
+    {
+    case mmInventory:      return m_ItemInfoInventoryMode;
+    case mmTrade:          return m_ItemInfoTradeMode;
+    case mmDeadBodySearch: return m_ItemInfoSearchLootMode;
+    }
+    return nullptr;
 }
 
 void CUIActorMenu::UpdateItemsPlace()

@@ -119,6 +119,9 @@ protected:
     CTrade* m_partner_trade{};
 
     CUIItemInfo* m_ItemInfo{};
+    CUIItemInfo* m_ItemInfoInventoryMode{};
+    CUIItemInfo* m_ItemInfoTradeMode{};
+    CUIItemInfo* m_ItemInfoSearchLootMode{};
     CUICellItem* m_pCurrentCellItem{};
 
     // Messages
@@ -292,6 +295,7 @@ protected:
     PIItem CurrentIItem();
 
     void InfoCurItem(CUICellItem* cell_item); // on update item
+    CUIItemInfo* GetModeSpecificItemInfo();
 
     void ActivatePropertiesBox();
     void TryHidePropertiesBox();

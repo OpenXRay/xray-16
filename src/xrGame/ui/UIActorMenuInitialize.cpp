@@ -90,9 +90,6 @@ void CUIActorMenu::Construct()
     m_ActorStateInfo = new ui_actor_state_wnd();
     m_ActorStateInfo->SetAutoDelete(true);
 
-    m_ItemInfo = new CUIItemInfo();
-    //-	m_ItemInfo->SetAutoDelete			(true);
-
     if (ShadowOfChernobylMode)
     {
         CUIXml inventoryXml, tradeXml, carbodyXml;
@@ -253,7 +250,9 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_ActorStateInfo->init_from_xml(uiXml, "actor_state_info");
     AttachChild(m_ActorStateInfo);
 
+    m_ItemInfo = new CUIItemInfo();
     m_ItemInfo->InitItemInfo(ACTOR_MENU_ITEM_XML);
+    //-	m_ItemInfo->SetAutoDelete			(true);
     //-	AttachChild							(m_ItemInfo);
 }
 
@@ -289,6 +288,10 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     /*m_ActorMoney =*/ UIHelper::CreateStatic(uiXml, "money_static", m_pInventoryWnd);
 
     CUIStatic* descWnd = UIHelper::CreateStatic(uiXml, "descr_static", m_pInventoryWnd);
+    m_ItemInfoInventoryMode = new CUIItemInfo();
+    m_ItemInfoInventoryMode->SetAutoDelete(true);
+    descWnd->AttachChild(m_ItemInfoInventoryMode);
+    m_ItemInfoInventoryMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), INVENTORY_ITEM_XML);
 
     CUIFrameWindow* personalWnd = UIHelper::CreateFrameWindow(uiXml, "character_frame_window", m_pInventoryWnd);
     personalWnd->AttachChild(m_ActorStateInfo);
@@ -358,6 +361,10 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
     }
 
     CUIStatic* descWnd = UIHelper::CreateStatic(uiXml, "desc_static", m_pTradeWnd);
+    m_ItemInfoTradeMode = new CUIItemInfo();
+    m_ItemInfoTradeMode->SetAutoDelete(true);
+    descWnd->AttachChild(m_ItemInfoTradeMode);
+    m_ItemInfoTradeMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), TRADE_ITEM_XML);
 
     m_trade_button = UIHelper::Create3tButton(uiXml, "button", 0, m_pTradeWnd);
     CUI3tButton* toTalkBtn = UIHelper::Create3tButton(uiXml, "button", 1, m_pTradeWnd);
@@ -384,6 +391,10 @@ void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
     // Item info
     CUIFrameWindow* descWnd = UIHelper::CreateFrameWindow(uiXml, "frame_window", m_pSearchLootWnd);
     UIHelper::CreateStatic(uiXml, "descr_static", descWnd);
+    m_ItemInfoSearchLootMode = new CUIItemInfo();
+    m_ItemInfoSearchLootMode->SetAutoDelete(true);
+    descWnd->AttachChild(m_ItemInfoSearchLootMode);
+    m_ItemInfoSearchLootMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), CARBODY_ITEM_XML);
 
     m_takeall_button = UIHelper::Create3tButton(uiXml, "take_all_btn", m_pSearchLootWnd);
 }

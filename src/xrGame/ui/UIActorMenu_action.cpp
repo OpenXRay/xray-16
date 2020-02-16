@@ -289,8 +289,7 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
             set_highlight_item(itm);
         }
     }
-    VERIFY(m_ItemInfo);
-    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + m_ItemInfo->delay)
+    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay : 0))
     {
         return true; // false
     }
