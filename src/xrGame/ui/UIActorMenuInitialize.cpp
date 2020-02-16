@@ -215,13 +215,16 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         CUIDragDropListEx*& list = m_pLists[id];
 
         list = UIHelper::CreateDragDropListEx(uiXml, section, this, critical);
-        if (list && highlight)
+        if (!list)
+            continue;
+
+        if (highlight)
         {
             const float dx = uiXml.ReadAttribFlt(highlight, 0, "dx", 0.0f);
             const float dy = uiXml.ReadAttribFlt(highlight, 0, "dy", 0.0f);
             m_pLists[id]->SetHighlighter(UIHelper::CreateStatic(uiXml, highlight, nullptr, false), { dx, dy });
         }
-        if (list && block)
+        if (block)
         {
             const float dx = uiXml.ReadAttribFlt(block, 0, "dx", 0.0f);
             const float dy = uiXml.ReadAttribFlt(block, 0, "dy", 0.0f);
