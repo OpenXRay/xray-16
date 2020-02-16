@@ -41,13 +41,24 @@ void CUIActorMenu::SetActor(CInventoryOwner* io)
     R_ASSERT(!IsShown());
     m_last_time = Device.dwTimeGlobal;
     m_pActorInvOwner = io;
+}
 
+void CUIActorMenu::SetPartner(CInventoryOwner* io)
+{
+    R_ASSERT(!IsShown());
+    m_pPartnerInvOwner = io;
+}
+
+void CUIActorMenu::InitActorInfo()
+{
+    if (!GetModeSpecificActorInfo())
+        return;
     if (IsGameTypeSingle())
     {
-        if (io)
-            m_ActorCharacterInfo->InitCharacter(m_pActorInvOwner->object_id());
+        if (m_pActorInvOwner)
+            GetModeSpecificActorInfo()->InitCharacter(m_pActorInvOwner->object_id());
         else
-            m_ActorCharacterInfo->ClearInfo();
+            GetModeSpecificActorInfo()->ClearInfo();
     }
     else
     {
@@ -55,21 +66,19 @@ void CUIActorMenu::SetActor(CInventoryOwner* io)
     }
 }
 
-void CUIActorMenu::SetPartner(CInventoryOwner* io)
+void CUIActorMenu::InitPartnerInfo()
 {
-    R_ASSERT(!IsShown());
-    m_pPartnerInvOwner = io;
     if (m_pPartnerInvOwner)
     {
         if (m_pPartnerInvOwner->use_simplified_visual())
-            m_PartnerCharacterInfo->ClearInfo();
+            GetModeSpecificPartnerInfo()->ClearInfo();
         else
-            m_PartnerCharacterInfo->InitCharacter(m_pPartnerInvOwner->object_id());
+            GetModeSpecificPartnerInfo()->InitCharacter(m_pPartnerInvOwner->object_id());
 
-        SetInvBox(NULL);
+        SetInvBox(nullptr);
     }
     else
-        m_PartnerCharacterInfo->ClearInfo();
+        GetModeSpecificPartnerInfo()->ClearInfo();
 }
 
 void CUIActorMenu::SetInvBox(CInventoryBox* box)
@@ -79,7 +88,7 @@ void CUIActorMenu::SetInvBox(CInventoryBox* box)
     if (box)
     {
         m_pInvBox->set_in_use(true);
-        SetPartner(NULL);
+        SetPartner(nullptr);
     }
 }
 
@@ -135,6 +144,8 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         default: R_ASSERT(0); break;
         }
         UpdateConditionProgressBars();
+        InitActorInfo();
+        InitPartnerInfo();
         CurModeToScript();
     } // if
 
@@ -448,6 +459,26 @@ CUIItemInfo* CUIActorMenu::GetModeSpecificItemInfo()
     case mmDeadBodySearch: return m_ItemInfoSearchLootMode;
     }
     return nullptr;
+}
+
+CUICharacterInfo* CUIActorMenu::GetModeSpecificActorInfo() const
+{
+    switch (m_currMenuMode)
+    {
+    case mmTrade:          return m_TradeActorCharacterInfo;
+    case mmDeadBodySearch: return m_SearchLootActorCharacterInfo;
+    }
+    return m_ActorCharacterInfo;
+}
+
+CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo() const
+{
+    switch (m_currMenuMode)
+    {
+    case mmTrade:          return m_TradePartnerCharacterInfo;
+    case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
+    }
+    return m_PartnerCharacterInfo;
 }
 
 void CUIActorMenu::UpdateItemsPlace()
@@ -863,7 +894,7 @@ void CUIActorMenu::UpdateActorMP()
 {
     if (!&Level() || !Level().game || !Game().local_player || !m_pActorInvOwner || IsGameTypeSingle())
     {
-        m_ActorCharacterInfo->ClearInfo();
+        GetModeSpecificActorInfo()->ClearInfo();
         m_ActorMoney->SetText("");
         return;
     }
@@ -874,7 +905,7 @@ void CUIActorMenu::UpdateActorMP()
     xr_sprintf(buf, "%d RU", money);
     m_ActorMoney->SetText(buf);
 
-    m_ActorCharacterInfo->InitCharacterMP(Game().local_player->getName(), "ui_npc_u_nebo_1");
+    GetModeSpecificActorInfo()->InitCharacterMP(Game().local_player->getName(), "ui_npc_u_nebo_1");
 }
 
 bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_slot)

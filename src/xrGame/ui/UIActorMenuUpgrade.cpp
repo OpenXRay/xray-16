@@ -17,7 +17,7 @@
 
 void CUIActorMenu::InitUpgradeMode()
 {
-    m_PartnerCharacterInfo->Show(true);
+    GetModeSpecificPartnerInfo()->Show(true);
     m_PartnerMoney->Show(false);
     m_pUpgradeWnd->Show(true);
     if (m_pQuickSlot)
@@ -31,7 +31,7 @@ void CUIActorMenu::InitUpgradeMode()
 
 void CUIActorMenu::DeInitUpgradeMode()
 {
-    m_PartnerCharacterInfo->Show(false);
+    GetModeSpecificPartnerInfo()->Show(false);
     m_pUpgradeWnd->Show(false);
     m_pUpgradeWnd->set_info_cur_upgrade(NULL);
     m_pUpgradeWnd->m_btn_repair->Enable(false);

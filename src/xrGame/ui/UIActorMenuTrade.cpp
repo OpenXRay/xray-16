@@ -28,7 +28,7 @@ void CUIActorMenu::InitTradeMode()
     if (m_pTradeWnd)
         m_pTradeWnd->Show(true);
     m_pLists[eInventoryBagList]->Show(false);
-    m_PartnerCharacterInfo->Show(true);
+    GetModeSpecificPartnerInfo()->Show(true);
     m_PartnerMoney->Show(true);
     if (m_pQuickSlot)
         m_pQuickSlot->Show(true);
@@ -134,7 +134,7 @@ void CUIActorMenu::DeInitTradeMode()
     if (m_pTradeWnd)
         m_pTradeWnd->Show(false);
     m_pLists[eInventoryBagList]->Show(true);
-    m_PartnerCharacterInfo->Show(false);
+    GetModeSpecificPartnerInfo()->Show(false);
     m_PartnerMoney->Show(false);
 
     m_pLists[eTradeActorBagList]->Show(false);

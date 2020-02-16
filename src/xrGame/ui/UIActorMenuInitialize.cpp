@@ -81,12 +81,6 @@ void CUIActorMenu::Construct()
         m_message_box_ok->SetText("");
     }
 
-    m_ActorCharacterInfo = new CUICharacterInfo();
-    m_ActorCharacterInfo->SetAutoDelete(true);
-
-    m_PartnerCharacterInfo = new CUICharacterInfo();
-    m_PartnerCharacterInfo->SetAutoDelete(true);
-
     m_ActorStateInfo = new ui_actor_state_wnd();
     m_ActorStateInfo->SetAutoDelete(true);
 
@@ -134,10 +128,19 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
     m_LeftBackground = UIHelper::CreateStatic(uiXml, "left_background", this);
 
-    m_ActorCharacterInfo->InitCharacterInfo(&uiXml, "actor_ch_info");
-    m_PartnerCharacterInfo->InitCharacterInfo(&uiXml, "partner_ch_info");
+    m_ActorCharacterInfo = new CUICharacterInfo();
+    m_TradeActorCharacterInfo = m_ActorCharacterInfo;
+    m_SearchLootActorCharacterInfo = m_ActorCharacterInfo;
+    m_ActorCharacterInfo->SetAutoDelete(true);
     AttachChild(m_ActorCharacterInfo);
+    m_ActorCharacterInfo->InitCharacterInfo(&uiXml, "actor_ch_info");
+
+    m_PartnerCharacterInfo = new CUICharacterInfo();
+    m_TradePartnerCharacterInfo = m_PartnerCharacterInfo;
+    m_SearchLootPartnerCharacterInfo = m_PartnerCharacterInfo;
+    m_PartnerCharacterInfo->SetAutoDelete(true);
     AttachChild(m_PartnerCharacterInfo);
+    m_PartnerCharacterInfo->InitCharacterInfo(&uiXml, "partner_ch_info");
 
     m_RightDelimiter = UIHelper::CreateStatic(uiXml, "right_delimiter", this);
     if (!CallOfPripyatMode)
@@ -337,6 +340,17 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
     CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pTradeWnd);
     CUIStatic* partnerIcon = UIHelper::CreateStatic(uiXml, "static_icon", 1, m_pTradeWnd);
 
+    m_TradeActorCharacterInfo = new CUICharacterInfo();
+    m_TradePartnerCharacterInfo = new CUICharacterInfo();
+
+    actorIcon->AttachChild(m_TradeActorCharacterInfo);
+    m_TradeActorCharacterInfo->SetAutoDelete(true);
+    m_TradeActorCharacterInfo->InitCharacterInfo({ 0.f, 0.f }, actorIcon->GetWndSize(), TRADE_CHARACTER_XML);
+
+    partnerIcon->AttachChild(m_TradePartnerCharacterInfo);
+    m_TradePartnerCharacterInfo->SetAutoDelete(true);
+    m_TradePartnerCharacterInfo->InitCharacterInfo({ 0.f, 0.f }, partnerIcon->GetWndSize(), TRADE_CHARACTER_XML);
+
     CUIStatic* actorBagWnd = UIHelper::CreateStatic(uiXml, "our_bag_static", m_pTradeWnd);
     CUIStatic* partnerBagWnd = UIHelper::CreateStatic(uiXml, "others_bag_static", m_pTradeWnd);
 
@@ -381,6 +395,17 @@ void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
 
     CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pSearchLootWnd);
     CUIStatic* partnerIcon = UIHelper::CreateStatic(uiXml, "static_icon", 1, m_pSearchLootWnd);
+
+    m_SearchLootActorCharacterInfo = new CUICharacterInfo();
+    m_SearchLootPartnerCharacterInfo = new CUICharacterInfo();
+
+    actorIcon->AttachChild(m_SearchLootActorCharacterInfo);
+    m_SearchLootActorCharacterInfo->SetAutoDelete(true);
+    m_SearchLootActorCharacterInfo->InitCharacterInfo({ 0.f, 0.f }, actorIcon->GetWndSize(), TRADE_CHARACTER_XML);
+
+    partnerIcon->AttachChild(m_SearchLootPartnerCharacterInfo);
+    m_SearchLootPartnerCharacterInfo->SetAutoDelete(true);
+    m_SearchLootPartnerCharacterInfo->InitCharacterInfo({ 0.f, 0.f }, partnerIcon->GetWndSize(), TRADE_CHARACTER_XML);
 
     CUIStatic* actorBagWnd = UIHelper::CreateStatic(uiXml, "our_bag_static", m_pSearchLootWnd);
     CUIStatic* partnerBagWnd = UIHelper::CreateStatic(uiXml, "others_bag_static", m_pSearchLootWnd);

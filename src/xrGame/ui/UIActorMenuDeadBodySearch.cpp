@@ -61,11 +61,11 @@ void CUIActorMenu::InitDeadBodySearchMode()
 
     if (m_pPartnerInvOwner)
     {
-        m_PartnerCharacterInfo->Show(true);
+        GetModeSpecificPartnerInfo()->Show(true);
     }
     else
     {
-        m_PartnerCharacterInfo->Show(false);
+        GetModeSpecificPartnerInfo()->Show(false);
     }
 
     InitInventoryContents(m_pLists[eSearchLootActorBagList],
@@ -124,7 +124,7 @@ void CUIActorMenu::DeInitDeadBodySearchMode() const
         m_pSearchLootWnd->Show(false);
     m_pLists[eSearchLootBagList]->Show(false);
     m_pLists[eSearchLootActorBagList]->Show(false);
-    m_PartnerCharacterInfo->Show(false);
+    GetModeSpecificPartnerInfo()->Show(false);
     m_LeftBackground->Show(false);
     m_PartnerBottomInfo->Show(false);
     m_PartnerWeight->Show(false);

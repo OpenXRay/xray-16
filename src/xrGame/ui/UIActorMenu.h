@@ -144,6 +144,10 @@ protected:
     // Character infos
     CUICharacterInfo* m_ActorCharacterInfo{};
     CUICharacterInfo* m_PartnerCharacterInfo{};
+    CUICharacterInfo* m_TradeActorCharacterInfo{};
+    CUICharacterInfo* m_TradePartnerCharacterInfo{};
+    CUICharacterInfo* m_SearchLootActorCharacterInfo{};
+    CUICharacterInfo* m_SearchLootPartnerCharacterInfo{};
 
     // Money
     CUITextWnd* m_ActorMoney{};
@@ -283,6 +287,9 @@ protected:
     void InitDeadBodySearchMode();
     void DeInitDeadBodySearchMode() const;
 
+    void InitActorInfo();
+    void InitPartnerInfo();
+
     void CurModeToScript();
     void RepairEffect_CurItem();
 
@@ -296,6 +303,8 @@ protected:
 
     void InfoCurItem(CUICellItem* cell_item); // on update item
     CUIItemInfo* GetModeSpecificItemInfo();
+    CUICharacterInfo* GetModeSpecificActorInfo() const;
+    CUICharacterInfo* GetModeSpecificPartnerInfo() const;
 
     void ActivatePropertiesBox();
     void TryHidePropertiesBox();
