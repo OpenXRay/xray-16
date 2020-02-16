@@ -143,7 +143,6 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 
     OnItemDropped(CurrentIItem(), new_owner, old_owner);
 
-    UpdateConditionProgressBars();
     UpdateItemsPlace();
 
     return true;
@@ -234,7 +233,6 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 
     }; // switch
 
-    UpdateConditionProgressBars();
     UpdateItemsPlace();
 
     return true;

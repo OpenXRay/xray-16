@@ -175,40 +175,35 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_ActorMoney = UIHelper::CreateTextWnd(uiXml, "actor_money_static", this);
     m_PartnerMoney = UIHelper::CreateTextWnd(uiXml, "partner_money_static", this);
 
-    m_WeaponSlot1_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon1", this, false);
-    m_WeaponSlot2_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_weapon2", this, false);
-    m_Helmet_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_helmet", this, false);
-    m_Outfit_progress = UIHelper::CreateProgressBar(uiXml, "progess_bar_outfit", this, false);
-
-    constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
+    constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
     {
-        // { id,                   "xml_section_name",         "highlighter",             "blocker", is_it_critical_and_required }
-        { eInventoryPistolList,    "dragdrop_pistol",          "inv_slot2_highlight",     nullptr,            true },
-        { eInventoryAutomaticList, "dragdrop_automatic",       "inv_slot3_highlight",     nullptr,            true },
+        // { id,                   "xml_section_name",         "condition_indicator,  "highlighter",             "blocker", is_it_critical_and_required }
+        { eInventoryPistolList,    "dragdrop_pistol",          "progess_bar_weapon1", "inv_slot2_highlight",     nullptr,            true },
+        { eInventoryAutomaticList, "dragdrop_automatic",       "progess_bar_weapon2", "inv_slot3_highlight",     nullptr,            true },
 
-        { eInventoryOutfitList,    "dragdrop_outfit",          "outfit_slot_highlight",   nullptr,            true },
-        { eInventoryHelmetList,    "dragdrop_helmet",          "helmet_slot_highlight",   "helmet_over",      false },
+        { eInventoryOutfitList,    "dragdrop_outfit",          "progess_bar_outfit",  "outfit_slot_highlight",   nullptr,            true },
+        { eInventoryHelmetList,    "dragdrop_helmet",          "progess_bar_helmet",  "helmet_slot_highlight",   "helmet_over",      false },
 
-        { eInventoryBeltList,      "dragdrop_belt",            "artefact_slot_highlight", "belt_list_over",   true },
-        { eInventoryDetectorList,  "dragdrop_detector",        "detector_slot_highlight", nullptr,            true },
+        { eInventoryBeltList,      "dragdrop_belt",            nullptr,               "artefact_slot_highlight", "belt_list_over",   true },
+        { eInventoryDetectorList,  "dragdrop_detector",        nullptr,               "detector_slot_highlight", nullptr,            true },
 
-        { eInventoryBagList,       "dragdrop_bag",             nullptr,                   nullptr,            true },
+        { eInventoryBagList,       "dragdrop_bag",             nullptr,               nullptr,                   nullptr,            true },
 
-        { eTradeActorList,         "dragdrop_actor_trade",     nullptr,                   nullptr,            true },
-        { eTradeActorBagList,      "dragdrop_actor_trade_bag", nullptr,                   nullptr,            true },
+        { eTradeActorList,         "dragdrop_actor_trade",     nullptr,               nullptr,                   nullptr,            true },
+        { eTradeActorBagList,      "dragdrop_actor_trade_bag", nullptr,               nullptr,                   nullptr,            true },
 
-        { eTradePartnerList,       "dragdrop_partner_trade",   nullptr,                   nullptr,            true },
-        { eTradePartnerBagList,    "dragdrop_partner_bag",     nullptr,                   nullptr,            true },
+        { eTradePartnerList,       "dragdrop_partner_trade",   nullptr,               nullptr,                   nullptr,            true },
+        { eTradePartnerBagList,    "dragdrop_partner_bag",     nullptr,               nullptr,                   nullptr,            true },
 
-        { eSearchLootBagList,      "dragdrop_deadbody_bag",    nullptr,                   nullptr,            true },
-        { eSearchLootActorBagList, nullptr,                    nullptr,                   nullptr,            false },
+        { eSearchLootBagList,      "dragdrop_deadbody_bag",    nullptr,               nullptr,                   nullptr,            true },
+        { eSearchLootActorBagList, nullptr,                    nullptr,               nullptr,                   nullptr,            false },
 
-        { eTrashList,              "dragdrop_trash",           nullptr,                   nullptr,            false },
+        { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
 
-    for (auto [id, section, highlight, block, critical] : inventory_lists)
+    for (auto [id, section, conditionIndicator, highlight, block, critical] : inventory_lists)
     {
         if (!section)
             continue;
@@ -218,6 +213,10 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         if (!list)
             continue;
 
+        if (conditionIndicator)
+        {
+            m_pLists[id]->SetConditionIndicator(UIHelper::CreateProgressBar(uiXml, conditionIndicator, nullptr, false));
+        }
         if (highlight)
         {
             const float dx = uiXml.ReadAttribFlt(highlight, 0, "dx", 0.0f);
@@ -583,5 +582,4 @@ void CUIActorMenu::UpdateButtonsLayout()
 
     if (m_pQuickSlot)
         m_pQuickSlot->UpdateLabels();
-    UpdateConditionProgressBars();
 }

@@ -63,6 +63,7 @@ protected:
     CUIScrollBar* m_vScrollBar;
     CUIStatic* m_highlighter{};
     CUIStatic* m_blocker{};
+    CUIProgressBar* m_condition_indicator{};
 
     virtual void __stdcall OnScrollV(CUIWindow* w, void* pData);
     virtual void __stdcall OnItemStartDragging(CUIWindow* w, void* pData);
@@ -160,6 +161,12 @@ public:
     const Fvector2& GetBlockerSpacing() const
     {
         return m_blocker_spacing;
+    }
+
+    void SetConditionIndicator(CUIProgressBar* indicator);
+    CUIProgressBar* GetConditionIndicator() const
+    {
+        return m_condition_indicator;
     }
 
     Ivector2 CalculateCapacity(int desiredCells);

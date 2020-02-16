@@ -187,10 +187,6 @@ protected:
 
     // Condition bars
     ui_actor_state_wnd* m_ActorStateInfo{};
-    CUIProgressBar* m_WeaponSlot1_progress{};
-    CUIProgressBar* m_WeaponSlot2_progress{};
-    CUIProgressBar* m_Helmet_progress{};
-    CUIProgressBar* m_Outfit_progress{};
 
     CUIDragDropListEx* m_pLists[eListCount]{};
 
@@ -395,7 +391,6 @@ public:
     void xr_stdcall OnBtnExitClicked(CUIWindow* w, void* d);
     void xr_stdcall TakeAllFromPartner(CUIWindow* w, void* d);
     void TakeAllFromInventoryBox();
-    void UpdateConditionProgressBars();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
 

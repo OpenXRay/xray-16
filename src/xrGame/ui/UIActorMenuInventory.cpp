@@ -347,7 +347,6 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
     break;
     }
     UpdateItemsPlace();
-    UpdateConditionProgressBars();
 }
 void CUIActorMenu::AttachAddon(PIItem item_to_upgrade)
 {
@@ -1435,7 +1434,6 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
 
     //SetCurrentItem(nullptr);
     UpdateItemsPlace();
-    UpdateConditionProgressBars();
 } // ProcessPropertiesBoxClicked
 
 void CUIActorMenu::UpdateOutfit()

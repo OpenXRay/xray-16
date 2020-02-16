@@ -149,6 +149,30 @@ void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
     }
 }
 
+void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator)
+{
+    if (m_condition_indicator)
+    {
+        DetachChild(m_condition_indicator); // m_condition_indicator will be deleted
+    }
+    m_condition_indicator = indicator;
+
+    if (m_condition_indicator)
+    {
+        m_condition_indicator->SetAutoDelete(true);
+        AttachChild(m_condition_indicator);
+        // Convert absolute position to relative
+        // Without this, UI Frustum will cull our blocker
+        if (!m_condition_indicator->WndPosIsProbablyRelative())
+        {
+            Fvector2 ourAbsPos;
+            GetAbsolutePos(ourAbsPos);
+            const Fvector2& pos = m_condition_indicator->GetWndPos();
+            m_condition_indicator->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+        }
+    }
+}
+
 Ivector2 CUIDragDropListEx::CalculateCapacity(int desiredCells)
 {
     if (desiredCells <= 0)
@@ -406,6 +430,17 @@ void CUIDragDropListEx::Update()
         }
         else if (this == m_drag_item->BackList())
             m_drag_item->SetBackList(NULL);
+    }
+    if (m_condition_indicator)
+    {
+        float condition = 0.0f;
+        if (ItemsCount())
+        {
+            const PIItem itm = static_cast<PIItem>(GetItemIdx(0)->m_pData);
+            if (itm)
+                condition = iCeil(itm->GetCondition() * 15.0f) / 15.0f;
+        }
+        m_condition_indicator->SetProgressPos(condition);
     }
 }
 
