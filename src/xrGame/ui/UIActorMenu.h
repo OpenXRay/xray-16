@@ -25,6 +25,7 @@ class StaticDrawableWrapper;
 class CUIPropertiesBox;
 class CTrade;
 class CUIProgressBar;
+class CUITradeBar;
 
 namespace inventory
 {
@@ -154,16 +155,9 @@ protected:
     CUIStatic* m_TradeActorMoney{};
     CUIStatic* m_PartnerMoney{};
 
-    // delimiter ------------------------------
-    CUIStatic* m_LeftDelimiter{};
-    CUITextWnd* m_PartnerTradeCaption{};
-    CUITextWnd* m_PartnerTradePrice{};
-    CUITextWnd* m_PartnerTradeWeightMax{};
-
-    CUIStatic* m_RightDelimiter{};
-    CUITextWnd* m_ActorTradeCaption{};
-    CUITextWnd* m_ActorTradePrice{};
-    CUITextWnd* m_ActorTradeWeightMax{};
+    // Trade bar
+    CUITradeBar* m_ActorTradeBar;
+    CUITradeBar* m_PartnerTradeBar;
 
     // bottom ---------------------------------
     CUIStatic* m_ActorBottomInfo{};

@@ -7,6 +7,7 @@
 #include "UIDragDropReferenceList.h"
 #include "UIActorStateInfo.h"
 #include "UIItemInfo.h"
+#include "UITradeBar.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "UIMessageBoxEx.h"
 #include "xrUICore/PropertiesBox/UIPropertiesBox.h"
@@ -81,6 +82,11 @@ void CUIActorMenu::Construct()
         m_message_box_ok->SetText("");
     }
 
+    m_ActorTradeBar = new CUITradeBar();
+    m_PartnerTradeBar = new CUITradeBar();
+    m_ActorTradeBar->SetAutoDelete(true);
+    m_PartnerTradeBar->SetAutoDelete(true);
+
     m_ActorStateInfo = new ui_actor_state_wnd();
     m_ActorStateInfo->SetAutoDelete(true);
 
@@ -142,25 +148,10 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     AttachChild(m_PartnerCharacterInfo);
     m_PartnerCharacterInfo->InitCharacterInfo(&uiXml, "partner_ch_info");
 
-    m_RightDelimiter = UIHelper::CreateStatic(uiXml, "right_delimiter", this);
-    if (!CallOfPripyatMode)
-    {
-        m_ActorTradeCaption = UIHelper::CreateTextWnd(uiXml, "right_delimiter:trade_caption", m_RightDelimiter, false);
-        if (m_ActorTradeCaption)
-            m_ActorTradeCaption->AdjustWidthToText();
-    }
-    m_ActorTradePrice = UIHelper::CreateTextWnd(uiXml, "right_delimiter:trade_price", m_RightDelimiter);
-    m_ActorTradeWeightMax = UIHelper::CreateTextWnd(uiXml, "right_delimiter:trade_weight_max", m_RightDelimiter);
-
-    m_LeftDelimiter = UIHelper::CreateStatic(uiXml, "left_delimiter", this);
-    if (!CallOfPripyatMode)
-    {
-        m_PartnerTradeCaption = UIHelper::CreateTextWnd(uiXml, "left_delimiter:trade_caption", m_LeftDelimiter, false);
-        if (m_PartnerTradeCaption)
-            m_PartnerTradeCaption->AdjustWidthToText();
-    }
-    m_PartnerTradePrice = UIHelper::CreateTextWnd(uiXml, "left_delimiter:trade_price", m_LeftDelimiter);
-    m_PartnerTradeWeightMax = UIHelper::CreateTextWnd(uiXml, "left_delimiter:trade_weight_max", m_LeftDelimiter);
+    m_ActorTradeBar->init_from_xml(uiXml, "right_delimiter");
+    m_PartnerTradeBar->init_from_xml(uiXml, "left_delimiter");
+    AttachChild(m_ActorTradeBar);
+    AttachChild(m_PartnerTradeBar);
 
     m_ActorBottomInfo = UIHelper::CreateStatic(uiXml, "actor_weight_caption", this);
     m_ActorWeight = UIHelper::CreateTextWnd(uiXml, "actor_weight", this);
@@ -341,6 +332,9 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
 
     UIHelper::CreateStatic(uiXml, "top_background", m_pTradeWnd);
     UIHelper::CreateStatic(uiXml, "bottom_background", m_pTradeWnd);
+
+    m_pTradeWnd->AttachChild(m_ActorTradeBar);   // just dummy to prevent 
+    m_pTradeWnd->AttachChild(m_PartnerTradeBar); // memory leaks
 
     CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pTradeWnd);
     CUIStatic* partnerIcon = UIHelper::CreateStatic(uiXml, "static_icon", 1, m_pTradeWnd);

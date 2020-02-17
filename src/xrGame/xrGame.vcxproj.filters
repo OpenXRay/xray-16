@@ -6495,6 +6495,9 @@
     <ClInclude Include="ui\UIOutfitSlot.h">
       <Filter>UI\Common\Inventory</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UITradeBar.h">
+      <Filter>UI\Common\Inventory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9855,6 +9858,9 @@
       <Filter>UI\Multiplayer\MM_MP\VersionList</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIOutfitSlot.cpp">
+      <Filter>UI\Common\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UITradeBar.cpp">
       <Filter>UI\Common\Inventory</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "UIActorMenu.h"
+#include "UITradeBar.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
@@ -36,8 +37,8 @@ void CUIActorMenu::InitTradeMode()
     m_pLists[eTradePartnerBagList]->Show(true);
     m_pLists[eTradePartnerList]->Show(true);
 
-    ShowIfExist(m_RightDelimiter, true);
-    ShowIfExist(m_LeftDelimiter, true);
+    m_ActorTradeBar->Show(true);
+    m_PartnerTradeBar->Show(true);
     ShowIfExist(m_LeftBackground, true);
 
     ShowIfExist(m_PartnerBottomInfo, true);
@@ -136,8 +137,8 @@ void CUIActorMenu::DeInitTradeMode()
     m_pLists[eTradePartnerBagList]->Show(false);
     m_pLists[eTradePartnerList]->Show(false);
 
-    ShowIfExist(m_RightDelimiter, false);
-    ShowIfExist(m_LeftDelimiter, false);
+    m_ActorTradeBar->Show(false);
+    m_PartnerTradeBar->Show(false);
     ShowIfExist(m_LeftBackground, false);
 
     m_PartnerBottomInfo->Show(false);
@@ -398,40 +399,17 @@ void CUIActorMenu::UpdatePartnerBag()
 
 void CUIActorMenu::UpdatePrices()
 {
-    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
-
     UpdateActor();
     UpdatePartnerBag();
-    u32 actor_price = CalcItemsPrice(m_pLists[eTradeActorList], m_partner_trade, true);
-    u32 partner_price = CalcItemsPrice(m_pLists[eTradePartnerList], m_partner_trade, false);
 
-    string64 buf;
-    xr_sprintf(buf, "%d RU", actor_price);
-    m_ActorTradePrice->SetText(buf);
-    m_ActorTradePrice->AdjustWidthToText();
-    xr_sprintf(buf, "%d RU", partner_price);
-    m_PartnerTradePrice->SetText(buf);
-    m_PartnerTradePrice->AdjustWidthToText();
+    const u32 actor_price = CalcItemsPrice(m_pLists[eTradeActorList], m_partner_trade, true);
+    const u32 partner_price = CalcItemsPrice(m_pLists[eTradePartnerList], m_partner_trade, false);
 
-    float actor_weight = CalcItemsWeight(m_pLists[eTradeActorList]);
-    float partner_weight = CalcItemsWeight(m_pLists[eTradePartnerList]);
+    const float actor_weight = CalcItemsWeight(m_pLists[eTradeActorList]);
+    const float partner_weight = CalcItemsWeight(m_pLists[eTradePartnerList]);
 
-    xr_sprintf(buf, "(%.1f %s)", actor_weight, kg_str);
-    m_ActorTradeWeightMax->SetText(buf);
-    xr_sprintf(buf, "(%.1f %s)", partner_weight, kg_str);
-    m_PartnerTradeWeightMax->SetText(buf);
-
-    Fvector2 pos = m_ActorTradePrice->GetWndPos();
-    pos.x = m_ActorTradeWeightMax->GetWndPos().x - m_ActorTradePrice->GetWndSize().x - 5.0f;
-    m_ActorTradePrice->SetWndPos(pos);
-    //	pos.x = pos.x - m_ActorTradeCaption->GetWndSize().x - 5.0f;
-    //	m_ActorTradeCaption->SetWndPos( pos );
-
-    pos = m_PartnerTradePrice->GetWndPos();
-    pos.x = m_PartnerTradeWeightMax->GetWndPos().x - m_PartnerTradePrice->GetWndSize().x - 5.0f;
-    m_PartnerTradePrice->SetWndPos(pos);
-    //	pos.x = pos.x - m_PartnerTradeCaption->GetWndSize().x - 5.0f;
-    //	m_PartnerTradeCaption->SetWndPos( pos );
+    m_ActorTradeBar->UpdateData(actor_price, actor_weight);
+    m_PartnerTradeBar->UpdateData(partner_price, partner_weight);
 }
 
 void CUIActorMenu::OnBtnPerformTrade(CUIWindow* w, void* d)

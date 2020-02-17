@@ -1567,6 +1567,7 @@
     <ClInclude Include="ui\UITalkWnd.h" />
     <ClInclude Include="ui\UITaskWnd.h" />
     <ClInclude Include="ui\UITextVote.h" />
+    <ClInclude Include="ui\UITradeBar.h" />
     <ClInclude Include="ui\UIVersionList.h" />
     <ClInclude Include="ui\UIVote.h" />
     <ClInclude Include="ui\UIVoteStatusWnd.h" />
@@ -3585,6 +3586,7 @@
     <ClCompile Include="ui\UITalkWnd.cpp" />
     <ClCompile Include="ui\UITaskWnd.cpp" />
     <ClCompile Include="ui\UITextVote.cpp" />
+    <ClCompile Include="ui\UITradeBar.cpp" />
     <ClCompile Include="ui\UIVersionList.cpp" />
     <ClCompile Include="ui\UIVote.cpp" />
     <ClCompile Include="ui\UIVoteStatusWnd.cpp" />

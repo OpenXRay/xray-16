@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "UIActorMenu.h"
+#include "UITradeBar.h"
 #include "Inventory.h"
 #include "InventoryOwner.h"
 #include "UIInventoryUtilities.h"
@@ -48,7 +49,7 @@ void CUIActorMenu::InitInventoryMode()
     m_pLists[eInventoryAutomaticList]->Show(true);
     ShowIfExist(m_pQuickSlot, true);
     ShowIfExist(m_pLists[eTrashList], true);
-    m_RightDelimiter->Show(false);
+    m_PartnerTradeBar->Show(false);
     ShowIfExist(m_clock_value, true);
 
     InitInventoryContents(m_pLists[eInventoryBagList]);
