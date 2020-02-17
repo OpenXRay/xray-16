@@ -50,13 +50,12 @@ bool move_item_check(PIItem itm, CInventoryOwner* from, CInventoryOwner* to, boo
 
 void CUIActorMenu::InitDeadBodySearchMode()
 {
-    if (m_pSearchLootWnd)
-        m_pSearchLootWnd->Show(true);
+    ShowIfExist(m_pSearchLootWnd, true);
     m_pLists[eSearchLootBagList]->Show(true);
     m_pLists[eSearchLootActorBagList]->Show(true);
-    m_LeftBackground->Show(true);
-    m_PartnerBottomInfo->Show(true);
-    m_PartnerWeight->Show(true);
+    ShowIfExist(m_LeftBackground, true);
+    ShowIfExist(m_PartnerBottomInfo, true);
+    ShowIfExist(m_PartnerWeight, true);
     m_takeall_button->Show(true);
 
     if (m_pPartnerInvOwner)
@@ -120,14 +119,13 @@ void CUIActorMenu::InitDeadBodySearchMode()
 
 void CUIActorMenu::DeInitDeadBodySearchMode() const
 {
-    if (m_pSearchLootWnd)
-        m_pSearchLootWnd->Show(false);
+    ShowIfExist(m_pSearchLootWnd, false);
     m_pLists[eSearchLootBagList]->Show(false);
     m_pLists[eSearchLootActorBagList]->Show(false);
     GetModeSpecificPartnerInfo()->Show(false);
-    m_LeftBackground->Show(false);
-    m_PartnerBottomInfo->Show(false);
-    m_PartnerWeight->Show(false);
+    ShowIfExist(m_LeftBackground, false);
+    ShowIfExist(m_PartnerBottomInfo, false);
+    ShowIfExist(m_PartnerWeight, false);
     m_takeall_button->Show(false);
 
     if (m_pInvBox)

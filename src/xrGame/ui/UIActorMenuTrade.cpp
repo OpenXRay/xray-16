@@ -25,31 +25,26 @@
 
 void CUIActorMenu::InitTradeMode()
 {
-    if (m_pTradeWnd)
-        m_pTradeWnd->Show(true);
+    ShowIfExist(m_pTradeWnd, true);
     m_pLists[eInventoryBagList]->Show(false);
     GetModeSpecificPartnerInfo()->Show(true);
     m_PartnerMoney->Show(true);
-    if (m_pQuickSlot)
-        m_pQuickSlot->Show(true);
+    ShowIfExist(m_pQuickSlot, true);
 
     m_pLists[eTradeActorBagList]->Show(true);
     m_pLists[eTradeActorList]->Show(true);
     m_pLists[eTradePartnerBagList]->Show(true);
     m_pLists[eTradePartnerList]->Show(true);
 
-    m_RightDelimiter->Show(true);
-    m_LeftDelimiter->Show(true);
-    m_LeftBackground->Show(true);
+    ShowIfExist(m_RightDelimiter, true);
+    ShowIfExist(m_LeftDelimiter, true);
+    ShowIfExist(m_LeftBackground, true);
 
-    m_PartnerBottomInfo->Show(true);
-    m_PartnerWeight->Show(true);
-    if (m_trade_button)
-        m_trade_button->Show(true);
-    if (m_trade_buy_button)
-        m_trade_buy_button->Show(true);
-    if (m_trade_sell_button)
-        m_trade_sell_button->Show(true);
+    ShowIfExist(m_PartnerBottomInfo, true);
+    ShowIfExist(m_PartnerWeight, true);
+    ShowIfExist(m_trade_button, true);
+    ShowIfExist(m_trade_buy_button, true);
+    ShowIfExist(m_trade_sell_button, true);
 
     VERIFY(m_pPartnerInvOwner);
     m_pPartnerInvOwner->StartTrading();
@@ -131,8 +126,7 @@ void CUIActorMenu::DeInitTradeMode()
         m_pPartnerInvOwner->StopTrading();
     }
 
-    if (m_pTradeWnd)
-        m_pTradeWnd->Show(false);
+    ShowIfExist(m_pTradeWnd, false);
     m_pLists[eInventoryBagList]->Show(true);
     GetModeSpecificPartnerInfo()->Show(false);
     m_PartnerMoney->Show(false);
@@ -142,18 +136,15 @@ void CUIActorMenu::DeInitTradeMode()
     m_pLists[eTradePartnerBagList]->Show(false);
     m_pLists[eTradePartnerList]->Show(false);
 
-    m_RightDelimiter->Show(false);
-    m_LeftDelimiter->Show(false);
-    m_LeftBackground->Show(false);
+    ShowIfExist(m_RightDelimiter, false);
+    ShowIfExist(m_LeftDelimiter, false);
+    ShowIfExist(m_LeftBackground, false);
 
     m_PartnerBottomInfo->Show(false);
     m_PartnerWeight->Show(false);
-    if (m_trade_button)
-        m_trade_button->Show(false);
-    if (m_trade_buy_button)
-        m_trade_buy_button->Show(false);
-    if (m_trade_sell_button)
-        m_trade_sell_button->Show(false);
+    ShowIfExist(m_trade_button, false);
+    ShowIfExist(m_trade_buy_button, false);
+    ShowIfExist(m_trade_sell_button, false);
 
     if (!CurrentGameUI())
         return;

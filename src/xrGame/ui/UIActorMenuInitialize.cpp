@@ -586,3 +586,10 @@ void CUIActorMenu::UpdateButtonsLayout()
     if (m_pQuickSlot)
         m_pQuickSlot->UpdateLabels();
 }
+
+bool CUIActorMenu::ShowIfExist(CUIWindow* window, bool status)
+{
+    if (window)
+        window->Show(status);
+    return window != nullptr;
+}

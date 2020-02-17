@@ -38,23 +38,18 @@ void move_item_from_to(u16 from_id, u16 to_id, u16 what_id);
 
 void CUIActorMenu::InitInventoryMode()
 {
-    if (m_pInventoryWnd)
-        m_pInventoryWnd->Show(true);
+    ShowIfExist(m_pInventoryWnd, true);
     m_pLists[eInventoryBagList]->Show(true);
     m_pLists[eInventoryBeltList]->Show(true);
     m_pLists[eInventoryOutfitList]->Show(true);
-    if (m_pLists[eInventoryHelmetList])
-        m_pLists[eInventoryHelmetList]->Show(true);
-    m_pLists[eInventoryDetectorList]->Show(true);
+    ShowIfExist(m_pLists[eInventoryHelmetList], true);
+    ShowIfExist(m_pLists[eInventoryDetectorList], true);
     m_pLists[eInventoryPistolList]->Show(true);
     m_pLists[eInventoryAutomaticList]->Show(true);
-    if (m_pQuickSlot)
-        m_pQuickSlot->Show(true);
-    if (m_pLists[eTrashList])
-        m_pLists[eTrashList]->Show(true);
+    ShowIfExist(m_pQuickSlot, true);
+    ShowIfExist(m_pLists[eTrashList], true);
     m_RightDelimiter->Show(false);
-    if (m_clock_value)
-        m_clock_value->Show(true);
+    ShowIfExist(m_clock_value, true);
 
     InitInventoryContents(m_pLists[eInventoryBagList]);
 
@@ -64,12 +59,9 @@ void CUIActorMenu::InitInventoryMode()
 
 void CUIActorMenu::DeInitInventoryMode()
 {
-    if (m_pInventoryWnd)
-        m_pInventoryWnd->Show(false);
-    if (m_pLists[eTrashList])
-       m_pLists[eTrashList]->Show(false);
-    if (m_clock_value)
-        m_clock_value->Show(false);
+    ShowIfExist(m_pInventoryWnd, false);
+    ShowIfExist(m_pLists[eTrashList], false);
+    ShowIfExist(m_clock_value, false);
 }
 
 void CUIActorMenu::SendEvent_ActivateSlot(u16 slot, u16 recipient)

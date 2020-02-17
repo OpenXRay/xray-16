@@ -251,6 +251,8 @@ protected:
     void BindDragDropListEvents(CUIDragDropListEx* lst);
     void RegisterCallback(CUIWindow* window, s16 event, const CUIWndCallback::void_function& callback);
 
+    static bool ShowIfExist(CUIWindow* window, bool status); // sorry
+
     EDDListType GetListType(CUIDragDropListEx* l);
 
 public:
