@@ -172,8 +172,9 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_PartnerBottomInfo->AdjustWidthToText();
     m_PartnerWeight_end_x = m_PartnerWeight->GetWndPos().x;
 
-    m_ActorMoney = UIHelper::CreateTextWnd(uiXml, "actor_money_static", this);
-    m_PartnerMoney = UIHelper::CreateTextWnd(uiXml, "partner_money_static", this);
+    m_ActorMoney = UIHelper::CreateStatic(uiXml, "actor_money_static", this);
+    m_TradeActorMoney = m_ActorMoney;
+    m_PartnerMoney = UIHelper::CreateStatic(uiXml, "partner_money_static", this);
 
     constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
     {
@@ -290,7 +291,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     UIHelper::CreateStatic(uiXml, "bottom_static", m_pInventoryWnd);
     CUIStatic* bagWnd = UIHelper::CreateStatic(uiXml, "bag_static", m_pInventoryWnd);
 
-    /*m_ActorMoney =*/ UIHelper::CreateStatic(uiXml, "money_static", m_pInventoryWnd);
+    m_ActorMoney = UIHelper::CreateStatic(uiXml, "money_static", m_pInventoryWnd);
 
     CUIStatic* descWnd = UIHelper::CreateStatic(uiXml, "descr_static", m_pInventoryWnd);
     m_ItemInfoInventoryMode = new CUIItemInfo();
@@ -356,8 +357,8 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
     CUIStatic* actorBagWnd = UIHelper::CreateStatic(uiXml, "our_bag_static", m_pTradeWnd);
     CUIStatic* partnerBagWnd = UIHelper::CreateStatic(uiXml, "others_bag_static", m_pTradeWnd);
 
-    /*m_ActorMoney =*/ UIHelper::CreateStatic(uiXml, "our_money_static", actorBagWnd);
-    /*m_PartnerMoney =*/ UIHelper::CreateStatic(uiXml, "other_money_static", partnerBagWnd);
+    m_TradeActorMoney = UIHelper::CreateStatic(uiXml, "our_money_static", actorBagWnd);
+    m_PartnerMoney = UIHelper::CreateStatic(uiXml, "other_money_static", partnerBagWnd);
 
     CUIStatic* actorTradeWnd = UIHelper::CreateStatic(uiXml, "static", 0, m_pTradeWnd);
     CUIStatic* partnerTradeWnd = UIHelper::CreateStatic(uiXml, "static", 1, m_pTradeWnd);

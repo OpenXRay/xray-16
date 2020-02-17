@@ -150,8 +150,9 @@ protected:
     CUICharacterInfo* m_SearchLootPartnerCharacterInfo{};
 
     // Money
-    CUITextWnd* m_ActorMoney{};
-    CUITextWnd* m_PartnerMoney{};
+    CUIStatic* m_ActorMoney{};
+    CUIStatic* m_TradeActorMoney{};
+    CUIStatic* m_PartnerMoney{};
 
     // delimiter ------------------------------
     CUIStatic* m_LeftDelimiter{};
