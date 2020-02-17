@@ -31,7 +31,6 @@
 #include "Artefact.h"
 #include "string_table.h"
 
-ui_actor_state_wnd::ui_actor_state_wnd() {}
 ui_actor_state_wnd::~ui_actor_state_wnd() { delete_data(m_hint_wnd); }
 void ui_actor_state_wnd::init_from_xml(CUIXml& xml, LPCSTR path)
 {
@@ -309,19 +308,8 @@ void ui_actor_state_wnd::Show(bool status)
 }
 
 /// =============================================================================================
-ui_actor_state_item::ui_actor_state_item()
-{
-    m_static = NULL;
-    m_static2 = NULL;
-    m_static3 = NULL;
-    m_progress = NULL;
-    m_sensor = NULL;
-    m_arrow = NULL;
-    m_arrow_shadow = NULL;
-    m_magnitude = 1.0f;
-}
+ui_actor_state_item::ui_actor_state_item() : m_magnitude(1.0f) {}
 
-ui_actor_state_item::~ui_actor_state_item() {}
 void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical /*= true*/)
 {
     if (!CUIXmlInit::InitWindow(xml, path, 0, this, critical))
