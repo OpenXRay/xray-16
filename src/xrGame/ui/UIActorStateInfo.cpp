@@ -32,6 +32,21 @@
 #include "string_table.h"
 
 ui_actor_state_wnd::~ui_actor_state_wnd() { delete_data(m_hint_wnd); }
+
+void ui_actor_state_wnd::init_from_xml(CUIXml& xml)
+{
+    for (int i = 0; i < stt_count; ++i)
+    {
+        m_state[i] = new ui_actor_state_item();
+        m_state[i]->SetAutoDelete(true);
+        AttachChild(m_state[i]);
+        m_state[i]->set_hint_wnd(m_hint_wnd);
+    }
+    m_state[stt_health]->init_from_xml_plain(xml, "progress_bar_health");
+    m_state[stt_psi]->init_from_xml_plain(xml, "progress_bar_psy");
+    m_state[stt_radia]->init_from_xml_plain(xml, "progress_bar_radiation");
+}
+
 void ui_actor_state_wnd::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     XML_NODE stored_root = xml.GetLocalRoot();
@@ -365,6 +380,11 @@ void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical 
     }
     set_arrow(0.0f);
     xml.SetLocalRoot(stored_root);
+}
+
+void ui_actor_state_item::init_from_xml_plain(CUIXml& xml, LPCSTR path)
+{
+    m_progress = UIHelper::CreateProgressBar(xml, path, this);
 }
 
 bool ui_actor_state_item::set_text(float value)
