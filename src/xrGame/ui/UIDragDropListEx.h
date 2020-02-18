@@ -191,6 +191,7 @@ public:
     bool IsOwner(CUICellItem* itm);
     void clear_select_armament();
     Ivector2 PickCell(const Fvector2& abs_pos);
+    CUICell& GetCellIdx(size_t idx);
     CUICell& GetCellAt(const Ivector2& pos);
     CUICellContainer* GetContainer() { return m_container; }; //Alundaio
 
@@ -242,6 +243,7 @@ protected:
     IC const Ivector2& CellsSpacing() { return m_cellSpacing; };
     void SetCellsSpacing(const Ivector2& new_sz);
     Ivector2 TopVisibleCell();
+    CUICell& GetCellIdx(size_t idx);
     CUICell& GetCellAt(const Ivector2& pos);
     Ivector2 PickCell(const Fvector2& abs_pos);
     Ivector2 GetItemPos(CUICellItem* itm);

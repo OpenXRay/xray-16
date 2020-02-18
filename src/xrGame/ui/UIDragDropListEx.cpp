@@ -613,6 +613,12 @@ void CUIDragDropListEx::SetCellsHorizAlignment(xr_string alignment)
 }
 
 Ivector2 CUIDragDropListEx::PickCell(const Fvector2& abs_pos) { return m_container->PickCell(abs_pos); };
+
+CUICell& CUIDragDropListEx::GetCellIdx(size_t idx)
+{
+    return m_container->GetCellIdx(idx);
+}
+
 CUICell& CUIDragDropListEx::GetCellAt(const Ivector2& pos) { return m_container->GetCellAt(pos); };
 // =================================================================================================
 
@@ -861,6 +867,12 @@ void CUICellContainer::SetCellsSpacing(const Ivector2& c)
 Ivector2 CUICellContainer::TopVisibleCell()
 {
     return Ivector2().set(0, iFloor(m_pParentDragDropList->ScrollPos() / float(CellSize().y + m_cellSpacing.y)));
+}
+
+CUICell& CUICellContainer::GetCellIdx(size_t idx)
+{
+    R_ASSERT2(idx < m_cells.size(), "Trying to perform out of bounds");
+    return m_cells[idx];
 }
 
 CUICell& CUICellContainer::GetCellAt(const Ivector2& pos)
