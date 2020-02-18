@@ -237,6 +237,9 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         m_pQuickSlot->SetHighlighter(UIHelper::CreateStatic(uiXml, "quick_slot_highlight", nullptr, false), { dx, dy });
     }
 
+    m_ActorStateInfo->init_from_xml(uiXml, "actor_state_info");
+    AttachChild(m_ActorStateInfo);
+
     m_trade_button = UIHelper::Create3tButton(uiXml, "trade_button", this, false);
     m_trade_buy_button = UIHelper::Create3tButton(uiXml, "trade_buy_button", this, false);
     m_trade_sell_button = UIHelper::Create3tButton(uiXml, "trade_sell_button", this, false);
@@ -244,9 +247,6 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_exit_button = UIHelper::Create3tButton(uiXml, "exit_button", this);
 
     m_clock_value = UIHelper::CreateStatic(uiXml, "clock_value", this, false);
-
-    m_ActorStateInfo->init_from_xml(uiXml, "actor_state_info");
-    AttachChild(m_ActorStateInfo);
 
     m_ItemInfo = new CUIItemInfo();
     m_ItemInfo->InitItemInfo(ACTOR_MENU_ITEM_XML);

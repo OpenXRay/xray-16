@@ -120,10 +120,6 @@ protected:
     CTrade* m_actor_trade{};
     CTrade* m_partner_trade{};
 
-    CUIItemInfo* m_ItemInfo{};
-    CUIItemInfo* m_ItemInfoInventoryMode{};
-    CUIItemInfo* m_ItemInfoTradeMode{};
-    CUIItemInfo* m_ItemInfoSearchLootMode{};
     CUICellItem* m_pCurrentCellItem{};
 
     // Messages
@@ -151,6 +147,12 @@ protected:
     CUICharacterInfo* m_SearchLootActorCharacterInfo{};
     CUICharacterInfo* m_SearchLootPartnerCharacterInfo{};
 
+    // Item infos
+    CUIItemInfo* m_ItemInfo{};
+    CUIItemInfo* m_ItemInfoInventoryMode{};
+    CUIItemInfo* m_ItemInfoTradeMode{};
+    CUIItemInfo* m_ItemInfoSearchLootMode{};
+
     // Money
     CUIStatic* m_ActorMoney{};
     CUIStatic* m_TradeActorMoney{};
@@ -164,6 +166,16 @@ protected:
     CUIWeightBar* m_ActorWeightBar;
     CUIWeightBar* m_PartnerWeightBar;
 
+    // Drag&Drop lists
+    CUIDragDropListEx* m_pLists[eListCount]{};
+
+public:
+    CUIDragDropReferenceList* m_pQuickSlot{};
+
+protected:
+    // Condition bars
+    ui_actor_state_wnd* m_ActorStateInfo{};
+
     // Buttons
     CUI3tButton* m_trade_button{};
     CUI3tButton* m_trade_buy_button{};
@@ -174,14 +186,6 @@ protected:
     // Helpers
     CUIStatic* m_clock_value{};
     UIHint* m_hint_wnd{};
-
-    // Condition bars
-    ui_actor_state_wnd* m_ActorStateInfo{};
-
-    CUIDragDropListEx* m_pLists[eListCount]{};
-
-public:
-    CUIDragDropReferenceList* m_pQuickSlot{};
 
 protected:
     u32 m_last_time;
