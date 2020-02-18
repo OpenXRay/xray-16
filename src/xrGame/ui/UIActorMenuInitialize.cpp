@@ -8,6 +8,7 @@
 #include "UIActorStateInfo.h"
 #include "UIItemInfo.h"
 #include "UITradeBar.h"
+#include "UIWeightBar.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "UIMessageBoxEx.h"
 #include "xrUICore/PropertiesBox/UIPropertiesBox.h"
@@ -40,7 +41,7 @@ constexpr cpcstr CAR_BODY_XML        = "carbody_new.xml";
 constexpr cpcstr CARBODY_ITEM_XML    = "carbody_item.xml";
 
 CUIActorMenu::CUIActorMenu()
-    : m_currMenuMode(mmUndefined), m_PartnerWeight_end_x(), m_last_time(u32(-1)),
+    : m_currMenuMode(mmUndefined), m_last_time(u32(-1)),
       m_repair_mode(false), m_item_info_view(false), m_highlight_clear(true),
       m_trade_partner_inventory_state(0)
 {
@@ -86,6 +87,11 @@ void CUIActorMenu::Construct()
     m_PartnerTradeBar = new CUITradeBar();
     m_ActorTradeBar->SetAutoDelete(true);
     m_PartnerTradeBar->SetAutoDelete(true);
+
+    m_ActorWeightBar = new CUIWeightBar();
+    m_PartnerWeightBar = new CUIWeightBar();
+    m_ActorWeightBar->SetAutoDelete(true);
+    m_PartnerWeightBar->SetAutoDelete(true);
 
     m_ActorStateInfo = new ui_actor_state_wnd();
     m_ActorStateInfo->SetAutoDelete(true);
@@ -153,15 +159,10 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     AttachChild(m_ActorTradeBar);
     AttachChild(m_PartnerTradeBar);
 
-    m_ActorBottomInfo = UIHelper::CreateStatic(uiXml, "actor_weight_caption", this);
-    m_ActorWeight = UIHelper::CreateTextWnd(uiXml, "actor_weight", this);
-    m_ActorWeightMax = UIHelper::CreateTextWnd(uiXml, "actor_weight_max", this);
-    m_ActorBottomInfo->AdjustWidthToText();
-
-    m_PartnerBottomInfo = UIHelper::CreateStatic(uiXml, "partner_weight_caption", this);
-    m_PartnerWeight = UIHelper::CreateTextWnd(uiXml, "partner_weight", this);
-    m_PartnerBottomInfo->AdjustWidthToText();
-    m_PartnerWeight_end_x = m_PartnerWeight->GetWndPos().x;
+    m_ActorWeightBar->init_from_xml(uiXml, "actor");
+    m_PartnerWeightBar->init_from_xml(uiXml, "partner");
+    AttachChild(m_ActorWeightBar);
+    AttachChild(m_PartnerWeightBar);
 
     m_ActorMoney = UIHelper::CreateStatic(uiXml, "actor_money_static", this);
     m_TradeActorMoney = m_ActorMoney;
@@ -275,6 +276,9 @@ void CUIActorMenu::InitializeUpgradeMode(CUIXml& /*uiXml*/)
 
 void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
 {
+    AttachChild(m_ActorWeightBar);   // should be attached to 'this' to work correct
+    AttachChild(m_PartnerWeightBar); // do not attach to m_pInventoryWnd or any other window than 'this'
+
     m_pInventoryWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
 
     UIHelper::CreateStatic(uiXml, "belt_slots", m_pInventoryWnd);

@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "UIActorMenu.h"
+#include "UIWeightBar.h"
 #include "UIDragDropListEx.h"
 #include "UICharacterInfo.h"
 #include "UIInventoryUtilities.h"
@@ -54,8 +55,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     m_pLists[eSearchLootBagList]->Show(true);
     m_pLists[eSearchLootActorBagList]->Show(true);
     ShowIfExist(m_LeftBackground, true);
-    ShowIfExist(m_PartnerBottomInfo, true);
-    ShowIfExist(m_PartnerWeight, true);
+    m_PartnerWeightBar->Show(true);
     m_takeall_button->Show(true);
 
     if (m_pPartnerInvOwner)
@@ -124,8 +124,7 @@ void CUIActorMenu::DeInitDeadBodySearchMode() const
     m_pLists[eSearchLootActorBagList]->Show(false);
     GetModeSpecificPartnerInfo()->Show(false);
     ShowIfExist(m_LeftBackground, false);
-    ShowIfExist(m_PartnerBottomInfo, false);
-    ShowIfExist(m_PartnerWeight, false);
+    m_PartnerWeightBar->Show(false);
     m_takeall_button->Show(false);
 
     if (m_pInvBox)
@@ -189,19 +188,8 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
 
 void CUIActorMenu::UpdateDeadBodyBag()
 {
-    string64 buf;
-
-    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
-    float total = CalcItemsWeight(m_pLists[eSearchLootBagList]);
-    xr_sprintf(buf, "%.1f %s", total, kg_str);
-    m_PartnerWeight->SetText(buf);
-    m_PartnerWeight->AdjustWidthToText();
-
-    Fvector2 pos = m_PartnerWeight->GetWndPos();
-    pos.x = m_PartnerWeight_end_x - m_PartnerWeight->GetWndSize().x - 5.0f;
-    m_PartnerWeight->SetWndPos(pos);
-    pos.x = pos.x - m_PartnerBottomInfo->GetWndSize().x - 5.0f;
-    m_PartnerBottomInfo->SetWndPos(pos);
+    const float total = CalcItemsWeight(m_pLists[eSearchLootBagList]);
+    m_PartnerWeightBar->UpdateData(total);
 }
 
 void CUIActorMenu::TakeAllFromPartner(CUIWindow* w, void* d)

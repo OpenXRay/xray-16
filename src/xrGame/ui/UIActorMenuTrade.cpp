@@ -1,6 +1,7 @@
 #include "pch_script.h"
 #include "UIActorMenu.h"
 #include "UITradeBar.h"
+#include "UIWeightBar.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
@@ -41,8 +42,7 @@ void CUIActorMenu::InitTradeMode()
     m_PartnerTradeBar->Show(true);
     ShowIfExist(m_LeftBackground, true);
 
-    ShowIfExist(m_PartnerBottomInfo, true);
-    ShowIfExist(m_PartnerWeight, true);
+    m_PartnerWeightBar->Show(true);
     ShowIfExist(m_trade_button, true);
     ShowIfExist(m_trade_buy_button, true);
     ShowIfExist(m_trade_sell_button, true);
@@ -141,8 +141,7 @@ void CUIActorMenu::DeInitTradeMode()
     m_PartnerTradeBar->Show(false);
     ShowIfExist(m_LeftBackground, false);
 
-    m_PartnerBottomInfo->Show(false);
-    m_PartnerWeight->Show(false);
+    m_PartnerWeightBar->Show(false);
     ShowIfExist(m_trade_button, false);
     ShowIfExist(m_trade_buy_button, false);
     ShowIfExist(m_trade_sell_button, false);
@@ -352,49 +351,29 @@ void CUIActorMenu::UpdateActor()
         }
     } // actor
 
-    InventoryUtilities::UpdateWeightStr(*m_ActorWeight, *m_ActorWeightMax, m_pActorInvOwner);
-
-    m_ActorWeight->AdjustWidthToText();
-    m_ActorWeightMax->AdjustWidthToText();
-    m_ActorBottomInfo->AdjustWidthToText();
-
-    Fvector2 pos = m_ActorWeight->GetWndPos();
-    pos.x = m_ActorWeightMax->GetWndPos().x - m_ActorWeight->GetWndSize().x - 5.0f;
-    m_ActorWeight->SetWndPos(pos);
-    pos.x = pos.x - m_ActorBottomInfo->GetWndSize().x - 5.0f;
-    m_ActorBottomInfo->SetWndPos(pos);
+    m_ActorWeightBar->UpdateData(m_pActorInvOwner);
 }
 
 void CUIActorMenu::UpdatePartnerBag()
 {
-    string64 buf;
-
-    CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
+    /*CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
     if (monster || m_pPartnerInvOwner->use_simplified_visual())
     {
         m_PartnerWeight->SetText("");
     }
-    else if (m_pPartnerInvOwner->InfinitiveMoney())
+    else*/ if (m_pPartnerInvOwner->InfinitiveMoney())
     {
         m_PartnerMoney->SetText("--- RU");
     }
     else
     {
+        string64 buf;
         xr_sprintf(buf, "%d RU", m_pPartnerInvOwner->get_money());
         m_PartnerMoney->SetText(buf);
     }
 
-    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
-    float total = CalcItemsWeight(m_pLists[eTradePartnerBagList]);
-    xr_sprintf(buf, "%.1f %s", total, kg_str);
-    m_PartnerWeight->SetText(buf);
-    m_PartnerWeight->AdjustWidthToText();
-
-    Fvector2 pos = m_PartnerWeight->GetWndPos();
-    pos.x = m_PartnerWeight_end_x - m_PartnerWeight->GetWndSize().x - 5.0f;
-    m_PartnerWeight->SetWndPos(pos);
-    pos.x = pos.x - m_PartnerBottomInfo->GetWndSize().x - 5.0f;
-    m_PartnerBottomInfo->SetWndPos(pos);
+    const float total = CalcItemsWeight(m_pLists[eTradePartnerBagList]);
+    m_PartnerWeightBar->UpdateData(total);
 }
 
 void CUIActorMenu::UpdatePrices()

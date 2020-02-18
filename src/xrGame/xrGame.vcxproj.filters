@@ -6498,6 +6498,9 @@
     <ClInclude Include="ui\UITradeBar.h">
       <Filter>UI\Common\Inventory</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIWeightBar.h">
+      <Filter>UI\Common\Inventory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9861,6 +9864,9 @@
       <Filter>UI\Common\Inventory</Filter>
     </ClCompile>
     <ClCompile Include="ui\UITradeBar.cpp">
+      <Filter>UI\Common\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIWeightBar.cpp">
       <Filter>UI\Common\Inventory</Filter>
     </ClCompile>
   </ItemGroup>

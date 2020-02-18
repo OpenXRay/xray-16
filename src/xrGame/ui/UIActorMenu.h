@@ -26,6 +26,7 @@ class CUIPropertiesBox;
 class CTrade;
 class CUIProgressBar;
 class CUITradeBar;
+class CUIWeightBar;
 
 namespace inventory
 {
@@ -159,15 +160,9 @@ protected:
     CUITradeBar* m_ActorTradeBar;
     CUITradeBar* m_PartnerTradeBar;
 
-    // bottom ---------------------------------
-    CUIStatic* m_ActorBottomInfo{};
-    CUITextWnd* m_ActorWeight{};
-    CUITextWnd* m_ActorWeightMax{};
-
-    CUIStatic* m_PartnerBottomInfo{};
-    CUITextWnd* m_PartnerWeight{};
-    float m_PartnerWeight_end_x;
-    //*	CUIStatic*					m_PartnerWeightMax;
+    // Weight bar
+    CUIWeightBar* m_ActorWeightBar;
+    CUIWeightBar* m_PartnerWeightBar;
 
     // Buttons
     CUI3tButton* m_trade_button{};
