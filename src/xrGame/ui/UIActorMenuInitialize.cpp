@@ -284,7 +284,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     UIHelper::CreateStatic(uiXml, "belt_slots", m_pInventoryWnd);
     UIHelper::CreateStatic(uiXml, "back", m_pInventoryWnd);
     UIHelper::CreateStatic(uiXml, "bottom_static", m_pInventoryWnd);
-    CUIStatic* bagWnd = UIHelper::CreateStatic(uiXml, "bag_static", m_pInventoryWnd);
+    m_ActorWeightBar->m_BagWnd = UIHelper::CreateStatic(uiXml, "bag_static", m_pInventoryWnd);
 
     m_ActorMoney = UIHelper::CreateStatic(uiXml, "money_static", m_pInventoryWnd);
 
@@ -308,7 +308,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
         { eInventoryAutomaticList, "dragdrop_automatic", m_pInventoryWnd },
         { eInventoryOutfitList,    "dragdrop_outfit",    m_pInventoryWnd },
         { eInventoryBeltList,      "dragdrop_belt",      m_pInventoryWnd },
-        { eInventoryBagList,       "dragdrop_bag",       bagWnd },
+        { eInventoryBagList,       "dragdrop_bag",       m_ActorWeightBar->m_BagWnd },
     };
     for (auto [id, section, parent] : inventory_lists)
     {
@@ -410,10 +410,10 @@ void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
     m_SearchLootPartnerCharacterInfo->SetAutoDelete(true);
     m_SearchLootPartnerCharacterInfo->InitCharacterInfo({ 0.f, 0.f }, partnerIcon->GetWndSize(), TRADE_CHARACTER_XML);
 
-    CUIStatic* actorBagWnd = UIHelper::CreateStatic(uiXml, "our_bag_static", m_pSearchLootWnd);
+    m_ActorWeightBar->m_BagWnd2 = UIHelper::CreateStatic(uiXml, "our_bag_static", m_pSearchLootWnd);
     CUIStatic* partnerBagWnd = UIHelper::CreateStatic(uiXml, "others_bag_static", m_pSearchLootWnd);
 
-    m_pLists[eSearchLootActorBagList] = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_list_our", actorBagWnd);
+    m_pLists[eSearchLootActorBagList] = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_list_our", m_ActorWeightBar->m_BagWnd2);
     m_pLists[eSearchLootBagList] = UIHelper::CreateDragDropListEx(uiXml, "dragdrop_list_other", partnerBagWnd);
 
     // Item info

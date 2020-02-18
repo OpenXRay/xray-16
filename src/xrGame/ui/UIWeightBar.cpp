@@ -44,6 +44,12 @@ void CUIWeightBar::UpdateData(float weight)
 
 void CUIWeightBar::UpdateData(CInventoryOwner* pInvOwner)
 {
+    if (m_BagWnd)
+        InventoryUtilities::UpdateWeight(*m_BagWnd, pInvOwner, true);
+
+    if (m_BagWnd2)
+        InventoryUtilities::UpdateWeight(*m_BagWnd2, pInvOwner, false);
+
     if (!m_Weight || !m_WeightMax || !m_BottomInfo)
         return;
     InventoryUtilities::UpdateWeightStr(*m_Weight, *m_WeightMax, pInvOwner);
