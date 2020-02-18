@@ -57,15 +57,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     ShowIfExist(m_LeftBackground, true);
     m_PartnerWeightBar->Show(true);
     m_takeall_button->Show(true);
-
-    if (m_pPartnerInvOwner)
-    {
-        GetModeSpecificPartnerInfo()->Show(true);
-    }
-    else
-    {
-        GetModeSpecificPartnerInfo()->Show(false);
-    }
+    GetModeSpecificPartnerInfo()->Show(nullptr != m_pPartnerInvOwner);
 
     InitInventoryContents(m_pLists[eSearchLootActorBagList],
         m_pLists[eSearchLootActorBagList] != m_pLists[eInventoryBagList]);

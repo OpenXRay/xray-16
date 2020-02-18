@@ -49,7 +49,6 @@ void CUIActorMenu::InitInventoryMode()
     m_pLists[eInventoryAutomaticList]->Show(true);
     ShowIfExist(m_pQuickSlot, true);
     ShowIfExist(m_pLists[eTrashList], true);
-    m_PartnerTradeBar->Show(false);
     ShowIfExist(m_clock_value, true);
 
     InitInventoryContents(m_pLists[eInventoryBagList]);
