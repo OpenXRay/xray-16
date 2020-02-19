@@ -99,8 +99,6 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
 
         LPCSTR name = StringTable().translate(af_immunity_caption[i]).c_str();
         m_immunity_item[i]->SetCaption(name);
-
-        xml.SetLocalRoot(base_node);
     }
 
     for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
@@ -111,8 +109,6 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
 
         LPCSTR name = StringTable().translate(af_restore_caption[i]).c_str();
         m_restore_item[i]->SetCaption(name);
-
-        xml.SetLocalRoot(base_node);
     }
 
     {
@@ -131,8 +127,6 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
         }
         else
             m_additional_weight->SetCaption(name);
-
-        // xml.SetLocalRoot( base_node );
     }
 
     xml.SetLocalRoot(stored_root);
@@ -225,6 +219,8 @@ UIArtefactParamItem::UIArtefactParamItem()
 void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
 {
     CUIXmlInit::InitWindow(xml, section, 0, this);
+
+    const XML_NODE base_node = xml.GetLocalRoot();
     xml.SetLocalRoot(xml.NavigateToNode(section));
 
     m_caption = UIHelper::CreateStatic(xml, "caption", this);
@@ -244,6 +240,7 @@ void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
         m_texture_plus._set(texture_plus);
         VERIFY(m_texture_plus.size());
     }
+    xml.SetLocalRoot(base_node);
 }
 
 void UIArtefactParamItem::SetCaption(LPCSTR name) { m_caption->TextItemControl()->SetText(name); }
