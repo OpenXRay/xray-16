@@ -11,20 +11,6 @@
 u32 const red_clr = color_argb(255, 210, 50, 50);
 u32 const green_clr = color_argb(255, 170, 170, 170);
 
-CUIArtefactParams::CUIArtefactParams()
-{
-    for (u32 i = 0; i < ALife::infl_max_count; ++i)
-    {
-        m_immunity_item[i] = NULL;
-    }
-    for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
-    {
-        m_restore_item[i] = NULL;
-    }
-    m_additional_weight = NULL;
-    m_Prop_line = nullptr;
-}
-
 CUIArtefactParams::~CUIArtefactParams()
 {
     delete_data(m_immunity_item);
@@ -233,18 +219,9 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
 /// ----------------------------------------------------------------
 
 UIArtefactParamItem::UIArtefactParamItem()
-{
-    m_caption = NULL;
-    m_value = NULL;
-    m_magnitude = 1.0f;
-    m_sign_inverse = false;
+    : m_magnitude(1.0f), m_sign_inverse(false), m_unit_str(""),
+      m_texture_minus(""), m_texture_plus("") {}
 
-    m_unit_str._set("");
-    m_texture_minus._set("");
-    m_texture_plus._set("");
-}
-
-UIArtefactParamItem::~UIArtefactParamItem() {}
 void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
 {
     CUIXmlInit::InitWindow(xml, section, 0, this);
