@@ -94,7 +94,10 @@ void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing)
 {
     if (m_highlighter)
     {
-        DetachChild(m_highlighter); // m_highlighter will be deleted
+        m_highlighter->SetCustomDraw(false);
+        // Delete highlighter only if we own it
+        if (m_highlighter->GetParent() == this)
+            DetachChild(m_highlighter);
     }
     m_highlighter = highlighter;
     m_highlighter_spacing = spacing;
@@ -103,16 +106,20 @@ void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing)
     {
         m_highlighter->Show(false);
         m_highlighter->SetCustomDraw(true);
-        m_highlighter->SetAutoDelete(true);
-        AttachChild(m_highlighter);
-        // Convert absolute position to relative
-        // Without this, UI Frustum will cull our highlighter
-        if (!m_highlighter->WndPosIsProbablyRelative())
+        // Only if doesn't already have a parent
+        if (!m_highlighter->GetParent())
         {
-            Fvector2 ourAbsPos;
-            GetAbsolutePos(ourAbsPos);
-            const Fvector2& pos = m_highlighter->GetWndPos();
-            m_highlighter->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+            m_highlighter->SetAutoDelete(true);
+            AttachChild(m_highlighter);
+            // Convert absolute position to relative
+            // Without this, UI Frustum will cull our highlighter
+            if (!m_highlighter->WndPosIsProbablyRelative())
+            {
+                Fvector2 ourAbsPos;
+                GetAbsolutePos(ourAbsPos);
+                const Fvector2& pos = m_highlighter->GetWndPos();
+                m_highlighter->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+            }
         }
     }
 }
@@ -127,7 +134,10 @@ void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
 {
     if (m_blocker)
     {
-        DetachChild(m_blocker); // m_blocker will be deleted
+        m_blocker->SetCustomDraw(false);
+        // Delete blocker only if we own it
+        if (m_blocker->GetParent() == this)
+            DetachChild(m_blocker); // m_blocker will be deleted
     }
     m_blocker = blocker;
     m_blocker_spacing = spacing;
@@ -135,34 +145,39 @@ void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
     if (m_blocker)
     {
         m_blocker->SetCustomDraw(true);
-        m_blocker->SetAutoDelete(true);
-        AttachChild(m_blocker);
-        // Convert absolute position to relative
-        // Without this, UI Frustum will cull our blocker
-        if (!m_blocker->WndPosIsProbablyRelative())
+        // Only if doesn't already have a parent
+        if (!m_blocker->GetParent())
         {
-            Fvector2 ourAbsPos;
-            GetAbsolutePos(ourAbsPos);
-            const Fvector2& pos = m_blocker->GetWndPos();
-            m_blocker->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+            m_blocker->SetAutoDelete(true);
+            AttachChild(m_blocker);
+            // Convert absolute position to relative
+            // Without this, UI Frustum will cull our blocker
+            if (!m_blocker->WndPosIsProbablyRelative())
+            {
+                Fvector2 ourAbsPos;
+                GetAbsolutePos(ourAbsPos);
+                const Fvector2& pos = m_blocker->GetWndPos();
+                m_blocker->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+            }
         }
     }
 }
 
 void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator)
 {
-    if (m_condition_indicator)
+    if (m_condition_indicator && m_condition_indicator->GetParent() == this)
     {
         DetachChild(m_condition_indicator); // m_condition_indicator will be deleted
     }
     m_condition_indicator = indicator;
 
-    if (m_condition_indicator)
+    // Only if doesn't already have a parent
+    if (m_condition_indicator && !m_condition_indicator->GetParent())
     {
         m_condition_indicator->SetAutoDelete(true);
         AttachChild(m_condition_indicator);
         // Convert absolute position to relative
-        // Without this, UI Frustum will cull our blocker
+        // Without this, UI Frustum will cull our indicator
         if (!m_condition_indicator->WndPosIsProbablyRelative())
         {
             Fvector2 ourAbsPos;

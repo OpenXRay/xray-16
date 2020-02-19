@@ -208,19 +208,19 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
         if (conditionIndicator)
         {
-            m_pLists[id]->SetConditionIndicator(UIHelper::CreateProgressBar(uiXml, conditionIndicator, nullptr, false));
+            m_pLists[id]->SetConditionIndicator(UIHelper::CreateProgressBar(uiXml, conditionIndicator, this, false));
         }
         if (highlight)
         {
             const float dx = uiXml.ReadAttribFlt(highlight, 0, "dx", 0.0f);
             const float dy = uiXml.ReadAttribFlt(highlight, 0, "dy", 0.0f);
-            m_pLists[id]->SetHighlighter(UIHelper::CreateStatic(uiXml, highlight, nullptr, false), { dx, dy });
+            m_pLists[id]->SetHighlighter(UIHelper::CreateStatic(uiXml, highlight, this, false), { dx, dy });
         }
         if (block)
         {
             const float dx = uiXml.ReadAttribFlt(block, 0, "dx", 0.0f);
             const float dy = uiXml.ReadAttribFlt(block, 0, "dy", 0.0f);
-            m_pLists[id]->SetBlocker(UIHelper::CreateStatic(uiXml, block, nullptr, false), { dx, dy });
+            m_pLists[id]->SetBlocker(UIHelper::CreateStatic(uiXml, block, this, false), { dx, dy });
         }
     }
     m_pLists[eSearchLootActorBagList] = m_pLists[eInventoryBagList];
