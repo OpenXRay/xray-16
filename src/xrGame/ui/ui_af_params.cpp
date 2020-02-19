@@ -144,9 +144,20 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
     }
 
     float val = 0.0f, max_val = 1.0f, h = 0.0f;
-    Fvector2 pos;
     if (m_Prop_line)
         h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+
+    const auto setValue = [&](UIArtefactParamItem* item)
+    {
+        item->SetValue(val);
+
+        Fvector2 pos = item->GetWndPos();
+        pos.y = h;
+        item->SetWndPos(pos);
+
+        h += item->GetWndSize().y;
+        AttachChild(item);
+    };
 
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {
@@ -158,28 +169,14 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
         }
         max_val = actor->conditions().GetZoneMaxPower((ALife::EInfluenceType)i);
         val /= max_val;
-        m_immunity_item[i]->SetValue(val);
-
-        pos.set(m_immunity_item[i]->GetWndPos());
-        pos.y = h;
-        m_immunity_item[i]->SetWndPos(pos);
-
-        h += m_immunity_item[i]->GetWndSize().y;
-        AttachChild(m_immunity_item[i]);
+        setValue(m_immunity_item[i]);
     }
 
     {
         val = pSettings->r_float(af_section, "additional_inventory_weight");
         if (!fis_zero(val))
         {
-            m_additional_weight->SetValue(val);
-
-            pos.set(m_additional_weight->GetWndPos());
-            pos.y = h;
-            m_additional_weight->SetWndPos(pos);
-
-            h += m_additional_weight->GetWndSize().y;
-            AttachChild(m_additional_weight);
+            setValue(m_additional_weight);
         }
     }
 
@@ -190,14 +187,7 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
         {
             continue;
         }
-        m_restore_item[i]->SetValue(val);
-
-        pos.set(m_restore_item[i]->GetWndPos());
-        pos.y = h;
-        m_restore_item[i]->SetWndPos(pos);
-
-        h += m_restore_item[i]->GetWndSize().y;
-        AttachChild(m_restore_item[i]);
+        setValue(m_restore_item[i]);
     }
 
     SetHeight(h);
