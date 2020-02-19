@@ -16,6 +16,10 @@ public:
     void SetInfo(const shared_str& af_section);
 
 protected:
+    UIArtefactParamItem* CreateItem(CUIXml& uiXml, pcstr section,
+        shared_str translationId, shared_str translationId2 = nullptr);
+
+protected:
     UIArtefactParamItem* m_immunity_item[ALife::infl_max_count]{};
     UIArtefactParamItem* m_restore_item[ALife::eRestoreTypeMax]{};
     UIArtefactParamItem* m_additional_weight{};

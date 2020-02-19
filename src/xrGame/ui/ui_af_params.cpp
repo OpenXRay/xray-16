@@ -93,44 +93,37 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
 
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {
-        m_immunity_item[i] = new UIArtefactParamItem();
-        m_immunity_item[i]->Init(xml, af_immunity_section_names[i]);
-        m_immunity_item[i]->SetAutoDelete(false);
-
-        LPCSTR name = StringTable().translate(af_immunity_caption[i]).c_str();
-        m_immunity_item[i]->SetCaption(name);
+        m_immunity_item[i] = CreateItem(xml, af_immunity_section_names[i], af_immunity_caption[i]);
     }
-
     for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
     {
-        m_restore_item[i] = new UIArtefactParamItem();
-        m_restore_item[i]->Init(xml, af_restore_section_names[i]);
-        m_restore_item[i]->SetAutoDelete(false);
-
-        LPCSTR name = StringTable().translate(af_restore_caption[i]).c_str();
-        m_restore_item[i]->SetCaption(name);
+        m_restore_item[i] = CreateItem(xml, af_restore_section_names[i], af_restore_caption[i]);
     }
-
-    {
-        m_additional_weight = new UIArtefactParamItem();
-        m_additional_weight->Init(xml, "additional_weight");
-        m_additional_weight->SetAutoDelete(false);
-
-        // use either ui_inv_weight or ui_inv_outfit_additional_weight
-        // but set ui_inv_weight if both unavailable
-        LPCSTR name = StringTable().translate("ui_inv_weight").c_str();
-        LPCSTR add_name = StringTable().translate("ui_inv_outfit_additional_weight").c_str();
-        if (0 == xr_strcmp(name, "ui_inv_weight") &&
-            0 != xr_strcmp(add_name, "ui_inv_outfit_additional_weight"))
-        {
-            m_additional_weight->SetCaption(add_name);
-        }
-        else
-            m_additional_weight->SetCaption(name);
-    }
+    m_additional_weight = CreateItem(xml, "additional_weight", "ui_inv_weight", "ui_inv_outfit_additional_weight");
 
     xml.SetLocalRoot(stored_root);
     return true;
+}
+
+UIArtefactParamItem* CUIArtefactParams::CreateItem(CUIXml& uiXml, pcstr section,
+    shared_str translationId, shared_str translationId2 /*= nullptr*/)
+{
+    UIArtefactParamItem* item = new UIArtefactParamItem();
+
+    item->Init(uiXml, section);
+    item->SetAutoDelete(false);
+
+    // use either translationId or translationId2
+    // but set translationId if both unavailable
+    shared_str name = StringTable().translate(translationId);
+    shared_str name2 = translationId2 != nullptr ? StringTable().translate(translationId2) : nullptr;
+
+    if (name != translationId && name2 != translationId2)
+        item->SetCaption(name2.c_str());
+    else
+        item->SetCaption(name.c_str());
+
+    return item;
 }
 
 bool CUIArtefactParams::Check(const shared_str& af_section)
