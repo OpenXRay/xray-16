@@ -8,7 +8,7 @@
 #include "xrLC_GlobalData.h"
 #include "xrDeflector.h"
 
-void compress(LPCSTR f_in_out);
+void compress(const char* f_in_out);
 
 #ifdef NET_CMP
 static xr_vector<std::pair<CDeflector*, CDeflector*>> diff;
@@ -40,7 +40,7 @@ void __cdecl Finalize(IGenericStream* outStream)
     // VERIFY(outStream->GetLength()==4+9);
     // VERIFY(outStream->GetPos()==0);
 
-    // DWORD n;
+    // unsigned int n;
     // outStream->Read(&n,4);
 
     // outStream->Read(&pival[n-1],9);
@@ -51,7 +51,7 @@ class INetFileBuffWriter;
 static INetFileBuffWriter* gl_data_write = 0;
 static CVirtualFileRW* g_net_data = 0;
 
-void net_task_manager::create_global_data_write(LPCSTR save_path)
+void net_task_manager::create_global_data_write(const char* save_path)
 {
     FPU::m64r();
     Memory.mem_compact();
@@ -188,10 +188,10 @@ void net_task_manager::run()
 }
 
 //#ifdef _DEBUG
-// LPCSTR libraries =
+// const char* libraries =
 // "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrapD.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest,tmp_global_data0,tmp_global_data1,tmp_global_data2,tmp_global_data3,tmp_global_data4,tmp_global_data5";
 //#else
-// LPCSTR libraries =
+// const char* libraries =
 // "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrap.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest,tmp_global_data0,tmp_global_data1,tmp_global_data2,tmp_global_data3,tmp_global_data4,tmp_global_data5";
 //#endif
 
@@ -207,7 +207,7 @@ void net_task_manager::send(IGridUser& user, u32 deflector_id)
         w.w_u32(deflector_id);
     }
 
-    DWORD t_id = deflector_id;
+    unsigned int t_id = deflector_id;
     string_path data;
     strconcat(sizeof(data), data, libraries, ",", gl_data_net_file_name);
     user.RunTask(data, "RunTask", stream, Finalize, &t_id, true);

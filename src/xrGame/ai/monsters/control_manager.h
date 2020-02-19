@@ -45,9 +45,9 @@ public:
 
     // common routines
     void init_external();
-    void load(LPCSTR section);
+    void load(const char* section);
     void reinit();
-    void reload(LPCSTR section);
+    void reload(const char* section);
     void update_schedule();
     void update_frame();
 

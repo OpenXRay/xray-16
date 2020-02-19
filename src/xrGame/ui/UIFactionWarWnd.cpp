@@ -252,7 +252,7 @@ bool CUIFactionWarWnd::InitFactions()
     /*
     shared_str const& actor_team = Actor()->CharacterInfo().Community().id();
 
-    LPCSTR vs_teams  = pSettings->r_string( "actor_communities", actor_team.c_str() );
+    const char* vs_teams  = pSettings->r_string( "actor_communities", actor_team.c_str() );
     if ( _GetItemCount( vs_teams ) != 2 )
     {
         return false;

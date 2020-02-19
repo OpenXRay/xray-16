@@ -306,9 +306,9 @@ bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size
 {
     *b = 0;
     *c = 0;
-    LPSTR S2;
+    char* S2;
     STRCONCAT(S2, caNamespaceName);
-    LPSTR S = S2;
+    char* S = S2;
     for (int i = 0;; i++)
     {
         if (!xr_strlen(S))
@@ -316,7 +316,7 @@ bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size
             script_log(LuaMessageType::Error, "the namespace name %s is incorrect!", caNamespaceName);
             return false;
         }
-        LPSTR S1 = strchr(S, '.');
+        char* S1 = strchr(S, '.');
         if (S1)
             *S1 = 0;
         if (i)
@@ -334,13 +334,13 @@ bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size
 }
 
 bool CScriptEngine::load_buffer(
-lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameSpaceName)
+lua_State* L, const char* caBuffer, size_t tSize, const char* caScriptName, const char* caNameSpaceName)
 {
     int l_iErrorCode;
     if (caNameSpaceName && xr_strcmp(GlobalNamespace, caNameSpaceName))
     {
         string512 insert, a, b;
-        LPCSTR header = file_header;
+        const char* header = file_header;
         if (!parse_namespace(caNameSpaceName, a, sizeof(a), b, sizeof(b)))
             return false;
         xr_sprintf(insert, header, caNameSpaceName, a, b);
@@ -365,7 +365,7 @@ lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameS
     return true;
 }
 
-bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
+bool CScriptEngine::do_file(const char* caScriptName, const char* caNameSpaceName)
 {
     int start = lua_gettop(lua());
     string_path l_caLuaFileName;
@@ -376,7 +376,7 @@ bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
         return false;
     }
     strconcat(sizeof(l_caLuaFileName), l_caLuaFileName, "@", caScriptName);
-    if (!load_buffer(lua(), static_cast<LPCSTR>(l_tpFileReader->pointer()), l_tpFileReader->length(),
+    if (!load_buffer(lua(), static_cast<const char*>(l_tpFileReader->pointer()), l_tpFileReader->length(),
         l_caLuaFileName, caNameSpaceName))
     {
         // VERIFY(lua_gettop(lua())>=4);
@@ -417,7 +417,7 @@ bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
     return true;
 }
 
-bool CScriptEngine::load_file_into_namespace(LPCSTR caScriptName, LPCSTR caNamespaceName)
+bool CScriptEngine::load_file_into_namespace(const char* caScriptName, const char* caNamespaceName)
 {
     int start = lua_gettop(lua());
     if (!do_file(caScriptName, caNamespaceName))
@@ -429,14 +429,14 @@ bool CScriptEngine::load_file_into_namespace(LPCSTR caScriptName, LPCSTR caNames
     return true;
 }
 
-bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
+bool CScriptEngine::namespace_loaded(const char* name, bool remove_from_stack)
 {
     int start = lua_gettop(lua());
     lua_pushstring(lua(), GlobalNamespace);
     lua_rawget(lua(), LUA_GLOBALSINDEX);
     string256 S2 = { 0 };
     xr_strcpy(S2, name);
-    LPSTR S = S2;
+    char* S = S2;
     for (;;)
     {
         if (!xr_strlen(S))
@@ -446,7 +446,7 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
             VERIFY(start == lua_gettop(lua()));
             return false;
         }
-        LPSTR S1 = strchr(S, '.');
+        char* S1 = strchr(S, '.');
         if (S1)
             *S1 = 0;
         lua_pushstring(lua(), S);
@@ -485,7 +485,7 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
     return true;
 }
 
-bool CScriptEngine::object(LPCSTR identifier, int type)
+bool CScriptEngine::object(const char* identifier, int type)
 {
     int start = lua_gettop(lua());
     lua_pushnil(lua());
@@ -506,7 +506,7 @@ bool CScriptEngine::object(LPCSTR identifier, int type)
     return false;
 }
 
-bool CScriptEngine::object(LPCSTR namespace_name, LPCSTR identifier, int type)
+bool CScriptEngine::object(const char* namespace_name, const char* identifier, int type)
 {
     int start = lua_gettop(lua());
     if (xr_strlen(namespace_name) && !namespace_loaded(namespace_name, false))
@@ -519,17 +519,17 @@ bool CScriptEngine::object(LPCSTR namespace_name, LPCSTR identifier, int type)
     return result;
 }
 
-luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
+luabind::object CScriptEngine::name_space(const char* namespace_name)
 {
     string256 S1 = { 0 };
     xr_strcpy(S1, namespace_name);
-    LPSTR S = S1;
+    char* S = S1;
     luabind::object lua_namespace = luabind::globals(lua());
     for (;;)
     {
         if (!xr_strlen(S))
             return lua_namespace;
-        LPSTR I = strchr(S, '.');
+        char* I = strchr(S, '.');
         if (!I)
             return lua_namespace[(const char*)S];
         *I = 0;
@@ -1053,7 +1053,7 @@ bool CScriptEngine::load_file(const char* scriptName, const char* namespaceName)
     return true;
 }
 
-bool CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_exist)
+bool CScriptEngine::process_file_if_exists(const char* file_name, bool warn_if_not_exist)
 {
     const size_t string_length = xr_strlen(file_name);
     if (!warn_if_not_exist && no_file_exists(file_name, string_length))
@@ -1084,8 +1084,8 @@ bool CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_ex
     return true;
 }
 
-bool CScriptEngine::process_file(LPCSTR file_name) { return process_file_if_exists(file_name, true); }
-bool CScriptEngine::process_file(LPCSTR file_name, bool reload_modules)
+bool CScriptEngine::process_file(const char* file_name) { return process_file_if_exists(file_name, true); }
+bool CScriptEngine::process_file(const char* file_name, bool reload_modules)
 {
     m_reload_modules = reload_modules;
     bool result = process_file_if_exists(file_name, true);
@@ -1093,7 +1093,7 @@ bool CScriptEngine::process_file(LPCSTR file_name, bool reload_modules)
     return result;
 }
 
-bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& object, int type)
+bool CScriptEngine::function_object(const char* function_to_call, luabind::object& object, int type)
 {
     if (!xr_strlen(function_to_call))
         return false;
@@ -1101,7 +1101,7 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
     parse_script_namespace(function_to_call, name_space, sizeof(name_space), function, sizeof(function));
     if (xr_strcmp(name_space, GlobalNamespace))
     {
-        LPSTR file_name = strchr(name_space, '.');
+        char* file_name = strchr(name_space, '.');
         if (!file_name)
             process_file(name_space);
         else
@@ -1247,7 +1247,7 @@ CScriptProcess* CScriptEngine::CreateScriptProcess(shared_str name, shared_str s
     return new CScriptProcess(this, name, scripts);
 }
 
-CScriptThread* CScriptEngine::CreateScriptThread(LPCSTR caNamespaceName, bool do_string, bool reload)
+CScriptThread* CScriptEngine::CreateScriptThread(const char* caNamespaceName, bool do_string, bool reload)
 {
     auto thread = new CScriptThread(this, caNamespaceName, do_string, reload);
     lua_State* threadLua = thread->lua();

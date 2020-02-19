@@ -75,7 +75,7 @@ protected:
 
 public:
     IWriteBlock(size_t _size) : size(_size) {}
-    virtual bool save_to(LPCSTR fn) = 0;
+    virtual bool save_to(const char* fn) = 0;
     //	virtual size_t		tell		() 								=0;
     //	virtual	u8*		pointer		()								=0;
     virtual void w(const void* ptr, size_t count) = 0;
@@ -98,7 +98,7 @@ class CMemoryWriteBlock
 
 public:
     CMemoryWriteBlock(u8* _buffer, size_t _size) : buffer(_buffer), buffer_size(_size), position(0) {}
-    //	 bool			save_to				(LPCSTR fn)						{ return mem_writer.save_to(fn); }
+    //	 bool			save_to				(const char* fn)						{ return mem_writer.save_to(fn); }
     void send(IGenericStream* _stream);
     size_t rest() { return buffer_size - tell(); }
     void w(const void* ptr, size_t count);
@@ -117,13 +117,13 @@ class CFileWriteBlock : public IWriteBlock
     FILE* file;
     FILE* file_map;
     //	CVirtualFileRW						*file_map					;
-    LPCSTR file_name;
+    const char* file_name;
     bool reopen;
 
 public:
-    CFileWriteBlock(LPCSTR fn, size_t _size, bool _reopen);
+    CFileWriteBlock(const char* fn, size_t _size, bool _reopen);
     ~CFileWriteBlock();
-    bool save_to(LPCSTR fn) override { return false; };
+    bool save_to(const char* fn) override { return false; };
     void send(IGenericStream* _stream) override;
     size_t rest() override;
     void w_close();
@@ -176,7 +176,7 @@ class XRLC_LIGHT_API INetReaderFile : public INetReader
     FILE* file;
 
 public:
-    INetReaderFile(LPCSTR file);
+    INetReaderFile(const char* file);
 
     virtual ~INetReaderFile();
 
@@ -209,7 +209,7 @@ public:
 
     virtual void send_not_clear(IGenericStream* _stream);
     virtual void clear();
-    virtual void save_buffer(LPCSTR fn) const;
+    virtual void save_buffer(const char* fn) const;
 };
 class XRLC_LIGHT_API INetMemoryBuffWriter : public IWriter, public byte_count
 //	public INetBuffWriter
@@ -288,7 +288,7 @@ public:
     {
     }
 
-    void load_buffer(LPCSTR fn);
+    void load_buffer(const char* fn);
     void r(void* p, size_t cnt) override;
     virtual ~INetBlockReader();
 
@@ -314,8 +314,8 @@ private:
     //======== BEGIN COM INTERFACE =======
     IUNKNOWN_METHODS_IMPLEMENTATION_INSTANCE()
 
-    virtual BYTE* __stdcall GetBasePointer() { return (BYTE*)file->pointer(); }
-    virtual BYTE* __stdcall GetCurPointer()
+    virtual unsigned char* __stdcall GetBasePointer() { return (unsigned char*)file->pointer(); }
+    virtual unsigned char* __stdcall GetCurPointer()
     {
         R_ASSERT(false);
         return 0;

@@ -24,7 +24,7 @@ class ConsoleBindCmds
 public:
     xr_map<int, con_cmd> m_bindConsoleCmds;
 
-    void bind(int dik, LPCSTR N);
+    void bind(int dik, const char* N);
     void unbind(int dik);
     bool execute(int dik);
     void clear();

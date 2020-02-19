@@ -19,7 +19,7 @@ CPolterSpecialAbility::~CPolterSpecialAbility()
     CParticlesObject::Destroy(m_particles_object_electro);
 }
 
-void CPolterSpecialAbility::load(LPCSTR section)
+void CPolterSpecialAbility::load(const char* section)
 {
     m_particles_hidden = pSettings->r_string(section, "Particles_Hidden");
     m_particles_damage = pSettings->r_string(section, "Particles_Damage");

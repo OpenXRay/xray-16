@@ -119,8 +119,8 @@ void CHWCaps::Update()
     geometry.bSoftware = FALSE;
     geometry.bPointSprites = FALSE;
     geometry.bNPatches = FALSE;
-    DWORD cnt = 256;
-    clamp<DWORD>(cnt, 0, 256);
+    unsigned int cnt = 256;
+    clamp<unsigned int>(cnt, 0, 256);
     geometry.dwRegisters = cnt;
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(6, 15);
@@ -152,7 +152,7 @@ void CHWCaps::Update()
         geometry_major = 0; // Disable VS if no PS
 
     //
-    bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
+    bTableFog = FALSE; // bool	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
 
     // Detect if stencil available
     bStencil = TRUE;

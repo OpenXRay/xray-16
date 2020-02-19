@@ -14,7 +14,7 @@
 
 using aimers::base;
 
-base::base(CGameObject* object, LPCSTR animation_id, bool animation_start, Fvector const& target)
+base::base(CGameObject* object, const char* animation_id, bool animation_start, Fvector const& target)
     : m_object(*object), m_kinematics(smart_cast<IKinematics&>(*object->Visual())),
       m_animated(smart_cast<IKinematicsAnimated&>(*object->Visual())), m_target(target),
       m_animation_id(m_animated.LL_MotionID(animation_id)), m_animation_start(animation_start)

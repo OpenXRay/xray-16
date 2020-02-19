@@ -45,8 +45,8 @@ public:
     Flags8 m_RT_Flags;
 
 protected:
-    BOOL SaveActionList(IWriter& F);
-    BOOL LoadActionList(IReader& F);
+    bool SaveActionList(IWriter& F);
+    bool LoadActionList(IReader& F);
 
     void RefreshShader();
 
@@ -63,18 +63,18 @@ public:
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
 
-    virtual void UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM);
+    virtual void UpdateParent(const Fmatrix& m, const Fvector& velocity, bool bXFORM);
 
-    BOOL Compile(CPEDef* def);
+    bool Compile(CPEDef* def);
 
     CPEDef* GetDefinition() { return m_Def; }
     int GetHandleEffect() { return m_HandleEffect; }
     int GetHandleActionList() { return m_HandleActionList; }
     virtual void Play();
-    virtual void Stop(BOOL bDefferedStop = TRUE);
-    virtual BOOL IsPlaying() { return m_RT_Flags.is(flRT_Playing); }
-    virtual void SetHudMode(BOOL b) { m_RT_Flags.set(flRT_HUDmode, b); }
-    virtual BOOL GetHudMode() { return m_RT_Flags.is(flRT_HUDmode); }
+    virtual void Stop(bool bDefferedStop = TRUE);
+    virtual bool IsPlaying() { return m_RT_Flags.is(flRT_Playing); }
+    virtual void SetHudMode(bool b) { m_RT_Flags.set(flRT_HUDmode, b); }
+    virtual bool GetHudMode() { return m_RT_Flags.is(flRT_HUDmode); }
     virtual float GetTimeLimit()
     {
         VERIFY(m_Def);

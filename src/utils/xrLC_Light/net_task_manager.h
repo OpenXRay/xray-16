@@ -15,7 +15,7 @@ class XRLC_LIGHT_API net_task_manager
 public:
     net_task_manager();
     void run();
-    void create_global_data_write(LPCSTR save_path);
+    void create_global_data_write(const char* save_path);
 };
 
 XRLC_LIGHT_API net_task_manager* get_net_task_manager();

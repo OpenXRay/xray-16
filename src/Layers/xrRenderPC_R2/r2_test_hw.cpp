@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-BOOL xrRender_test_hw()
+bool xrRender_test_hw()
 {
     D3DCAPS9 caps;
     CHW _HW;

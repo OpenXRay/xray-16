@@ -21,10 +21,10 @@ public:
     void init();
     void cleanup() { data_cleanup(); }
 protected:
-    void create_data_file(LPCSTR path);
-    bool create_data(LPCSTR path);
+    void create_data_file(const char* path);
+    bool create_data(const char* path);
     void destroy_data();
-    LPCSTR file_name() { return "gl_detail_cl_data"; }
+    const char* file_name() { return "gl_detail_cl_data"; }
     virtual void data_init() = 0 {};
     virtual void data_cleanup() = 0 {};
 };

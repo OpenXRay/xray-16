@@ -49,13 +49,13 @@ protected:
     float fHitImpulse_cur;
 
 protected:
-    virtual void LoadFireParams(LPCSTR section);
+    virtual void LoadFireParams(const char* section);
 
 public:
     CWeaponKnife();
     virtual ~CWeaponKnife();
 
-    void Load(LPCSTR section);
+    void Load(const char* section);
 
     virtual bool IsZoomEnabled() const { return false; }
     void Fire2Start();
@@ -115,7 +115,7 @@ private:
         Fvector const& f_pos, Fmatrix& parent_xform_dest, Fvector& fendpos_dest, Fsphere& query_sphere);
     IGameObject* TryPick(Fvector const& start_pos, Fvector const& dir, float const dist);
 
-    static BOOL RayQueryCallback(collide::rq_result& result, LPVOID this_ptr);
+    static bool RayQueryCallback(collide::rq_result& result, LPVOID this_ptr);
     collide::rq_results m_ray_query_results;
     u16 m_except_id;
     IGameObject* m_last_picked_obj;

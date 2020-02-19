@@ -23,7 +23,7 @@ public:
     virtual void AssignProps(const shared_str& entry, const shared_str& group);
     void SetSystemDepends(ESystemDepends val) { m_dep = val; }
     static CUIOptionsManager* GetOptionsManager() { return &m_optionsManager; }
-    virtual void OnMessage(LPCSTR message);
+    virtual void OnMessage(const char* message);
 
     virtual void SetCurrentOptValue() {} // opt->current
     virtual void SaveBackUpOptValue() {} // current->backup
@@ -33,11 +33,11 @@ public:
     void OnChangedOptValue();
 
 protected:
-    void SendMessage2Group(LPCSTR group, LPCSTR message);
+    void SendMessage2Group(const char* group, const char* message);
 
     // string
-    LPCSTR GetOptStringValue();
-    void SaveOptStringValue(LPCSTR val);
+    const char* GetOptStringValue();
+    void SaveOptStringValue(const char* val);
     // integer
     void GetOptIntegerValue(int& val, int& min, int& max);
     void SaveOptIntegerValue(int val);
@@ -48,7 +48,7 @@ protected:
     bool GetOptBoolValue();
     void SaveOptBoolValue(bool val);
     // token
-    LPCSTR GetOptTokenValue();
+    const char* GetOptTokenValue();
     const xr_token* GetOptToken();
 
     shared_str m_entry;

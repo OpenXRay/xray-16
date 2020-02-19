@@ -53,23 +53,23 @@ public:
     virtual HRESULT Initialize(int width, int height, NVI_PIXEL_FORMAT format);
     virtual HRESULT Initialize(int width, int height, NVI_PIXEL_FORMAT format, u8* data);
     virtual HRESULT Free();
-    UINT GetBytesPerPixel();
-    UINT GetImageNumBytes();
+    unsigned int GetBytesPerPixel();
+    unsigned int GetImageNumBytes();
     NVI_PIXEL_FORMAT GetFormat() { return m_Format; }
-    UINT GetWidth() { return m_nSizeX; }
-    UINT GetHeight() { return m_nSizeY; }
-    UINT GetNumPixels();
-    BYTE* GetImageDataPointer() { return m_pArray; }
+    unsigned int GetWidth() { return m_nSizeX; }
+    unsigned int GetHeight() { return m_nSizeY; }
+    unsigned int GetNumPixels();
+    unsigned char* GetImageDataPointer() { return m_pArray; }
     bool IsDataValid();
     void FlipTopToBottom();
     void AverageRGBToAlpha(); // write each pixels' avg r,g,b to alpha
     void ABGR8_To_ARGB8();
 
 private:
-    void GetPixel_ARGB8(DWORD* outPix, UINT i, UINT j);
-    void SetPixel_ARGB8(UINT i, UINT j, DWORD pix);
-    void GetPixel_ARGB8(DWORD* outPix, UINT index);
-    void SetPixel_ARGB8(UINT index, DWORD pix);
+    void GetPixel_ARGB8(unsigned int* outPix, unsigned int i, unsigned int j);
+    void SetPixel_ARGB8(unsigned int i, unsigned int j, unsigned int pix);
+    void GetPixel_ARGB8(unsigned int* outPix, unsigned int index);
+    void SetPixel_ARGB8(unsigned int index, unsigned int pix);
 
     friend class NVI_PNG_File;
     friend class NVI_GraphicsFile;
@@ -79,7 +79,7 @@ private:
 // Inline functions
 // Should not do any new or delete here
 
-__forceinline void NVI_Image::GetPixel_ARGB8(DWORD* outPix, UINT i, UINT j)
+__forceinline void NVI_Image::GetPixel_ARGB8(unsigned int* outPix, unsigned int i, unsigned int j)
 {
 #ifdef NVIHDEBUG
     // _ASSERT because that evaluates for debug only
@@ -87,18 +87,18 @@ __forceinline void NVI_Image::GetPixel_ARGB8(DWORD* outPix, UINT i, UINT j)
     _ASSERT(GetFormat() == NVI_A8_R8_G8_B8);
     _ASSERT(outPix != NULL);
 #endif
-    *outPix = ((DWORD*)m_pArray)[j * m_nSizeX + i];
+    *outPix = ((unsigned int*)m_pArray)[j * m_nSizeX + i];
 }
 
-__forceinline void NVI_Image::SetPixel_ARGB8(UINT i, UINT j, DWORD pix)
+__forceinline void NVI_Image::SetPixel_ARGB8(unsigned int i, unsigned int j, unsigned int pix)
 {
 #ifdef NVIHDEBUG
     _ASSERT(GetFormat() == NVI_A8_R8_G8_B8);
 #endif
-    ((DWORD*)m_pArray)[j * m_nSizeX + i] = pix;
+    ((unsigned int*)m_pArray)[j * m_nSizeX + i] = pix;
 }
 
-__forceinline void NVI_Image::GetPixel_ARGB8(DWORD* outPix, UINT index)
+__forceinline void NVI_Image::GetPixel_ARGB8(unsigned int* outPix, unsigned int index)
 {
 #ifdef NVIHDEBUG
     // _ASSERT because that evaluates for debug only
@@ -106,15 +106,15 @@ __forceinline void NVI_Image::GetPixel_ARGB8(DWORD* outPix, UINT index)
     _ASSERT(GetFormat() == NVI_A8_R8_G8_B8);
     _ASSERT(outPix != NULL);
 #endif
-    *outPix = ((DWORD*)m_pArray)[index];
+    *outPix = ((unsigned int*)m_pArray)[index];
 }
 
-__forceinline void NVI_Image::SetPixel_ARGB8(UINT index, DWORD pix)
+__forceinline void NVI_Image::SetPixel_ARGB8(unsigned int index, unsigned int pix)
 {
 #ifdef NVIHDEBUG
     _ASSERT(GetFormat() == NVI_A8_R8_G8_B8);
 #endif
-    ((DWORD*)m_pArray)[index] = pix;
+    ((unsigned int*)m_pArray)[index] = pix;
 }
 
 class NVI_ImageBordered : public NVI_Image
@@ -140,7 +140,7 @@ public:
     HRESULT Free();
     // i,j relative to src image, so i,j = 0 fetches from
     //   (i-m_nBorderXLow, j-m_nBorderYLow ) in the m_pArray
-    void GetPixel(DWORD* pDest, int i, int j);
+    void GetPixel(unsigned int* pDest, int i, int j);
 };
 
 // Inline functions
@@ -148,9 +148,9 @@ public:
 
 // i,j relative to src image, so i,j = 0 fetches from
 //   (i-m_nBorderXLow, j-m_nBorderYLow ) in the m_pArray
-__forceinline void NVI_ImageBordered::GetPixel(DWORD* outColor, int i, int j)
+__forceinline void NVI_ImageBordered::GetPixel(unsigned int* outColor, int i, int j)
 {
-    *outColor = ((DWORD*)m_pArray)[(j - m_nBorderYLow) * m_nSizeX + (i - m_nBorderXLow)];
+    *outColor = ((unsigned int*)m_pArray)[(j - m_nBorderYLow) * m_nSizeX + (i - m_nBorderXLow)];
 }
 };
 

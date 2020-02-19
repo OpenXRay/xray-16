@@ -133,11 +133,11 @@ CGamePersistent::CGamePersistent(void)
     m_last_stats_frame = u32(-2);
 #endif
 
-    BOOL bDemoMode = (0 != strstr(Core.Params, "-demomode "));
+    bool bDemoMode = (0 != strstr(Core.Params, "-demomode "));
     if (bDemoMode)
     {
         string256 fname;
-        LPCSTR name = strstr(Core.Params, "-demomode ") + 10;
+        const char* name = strstr(Core.Params, "-demomode ") + 10;
         sscanf(name, "%s", fname);
         R_ASSERT2(fname[0], "Missing filename for 'demomode'");
         Msg("- playing in demo mode '%s'", fname);
@@ -165,7 +165,7 @@ CGamePersistent::~CGamePersistent(void)
     Engine.Event.Handler_Detach(eQuickLoad, this);
 }
 
-void CGamePersistent::PreStart(LPCSTR op)
+void CGamePersistent::PreStart(const char* op)
 {
     inherited::PreStart(op);
 }
@@ -263,7 +263,7 @@ void CGamePersistent::OnAppEnd()
     xr_delete(ansel);
 }
 
-void CGamePersistent::Start(LPCSTR op) { inherited::Start(op); }
+void CGamePersistent::Start(const char* op) { inherited::Start(op); }
 void CGamePersistent::Disconnect()
 {
     // destroy ambient particles
@@ -283,7 +283,7 @@ void CGamePersistent::OnGameStart()
     UpdateGameType();
 }
 
-LPCSTR GameTypeToString(EGameIDs gt, bool bShort)
+const char* GameTypeToString(EGameIDs gt, bool bShort)
 {
     switch (gt)
     {
@@ -323,7 +323,7 @@ void CGamePersistent::WeathersUpdate()
     if (g_pGameLevel && !GEnv.isDedicatedServer)
     {
         CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-        BOOL bIndoor = TRUE;
+        bool bIndoor = TRUE;
         if (actor)
             bIndoor = actor->renderable_ROS()->get_luminocity_hemi() < 0.05f;
 
@@ -767,7 +767,7 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
         if (g_tutorial2)
             g_tutorial2->Stop();
 
-        LPSTR saved_name = (LPSTR)(P1);
+        char* saved_name = (char*)(P1);
 
         Level().remove_objects();
         game_sv_Single* game = smart_cast<game_sv_Single*>(Level().Server->GetGameState());
@@ -779,7 +779,7 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
     else if (E == eDemoStart)
     {
         string256 cmd;
-        LPCSTR demo = LPCSTR(P1);
+        const char* demo = (const char*)(P1);
         xr_sprintf(cmd, "demo_play %s", demo);
         Console->Execute(cmd);
         xr_free(demo);
@@ -805,8 +805,8 @@ float CGamePersistent::MtlTransparent(u32 mtl_idx)
 {
     return GMLib.GetMaterialByIdx((u16)mtl_idx)->fVisTransparencyFactor;
 }
-static BOOL bRestorePause = FALSE;
-static BOOL bEntryFlag = TRUE;
+static bool bRestorePause = FALSE;
+static bool bEntryFlag = TRUE;
 
 void CGamePersistent::OnAppActivate()
 {

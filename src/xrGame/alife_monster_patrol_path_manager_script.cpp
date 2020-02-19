@@ -24,7 +24,7 @@ SCRIPT_EXPORT(CALifeMonsterPatrolPathManager, (),
     module(luaState)
     [
         class_<CALifeMonsterPatrolPathManager>("CALifeMonsterPatrolPathManager")
-            .def("path", (void (CALifeMonsterPatrolPathManager::*)(LPCSTR))(&CALifeMonsterPatrolPathManager::path))
+            .def("path", (void (CALifeMonsterPatrolPathManager::*)(const char*))(&CALifeMonsterPatrolPathManager::path))
             .def("start_type", (void (CALifeMonsterPatrolPathManager::*)(const EPatrolStartType&))(
                                 &CALifeMonsterPatrolPathManager::start_type))
             .def("start_type", (const EPatrolStartType& (CALifeMonsterPatrolPathManager::*)() const)(

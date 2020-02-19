@@ -10,7 +10,7 @@
 // base patch used all the time up to merging
 const u32 InvalidNode = (1 << 24) - 1;
 const u32 UnkonnectedNode = 0xfffffff0;
-const WORD InvalidSector = 0xff;
+const unsigned short InvalidSector = 0xff;
 
 struct vertex // definition of "patch" or "node"
 {
@@ -24,7 +24,7 @@ struct vertex // definition of "patch" or "node"
     };
     Fplane Plane; // plane of patch
     Fvector Pos; // position of patch center
-    WORD Sector; //
+    unsigned short Sector; //
 
     u32 Group;
 
@@ -73,7 +73,7 @@ struct SCover
 
 using Nodes = xr_vector<vertex>;
 using Vectors = xr_vector<Fvector>;
-using Marks = xr_vector<BYTE>;
+using Marks = xr_vector<unsigned char>;
 //using Lights = xr_vector<R_Light>;
 
 // data
@@ -114,9 +114,9 @@ extern xr_vector<b_BuildTexture> g_textures;
 extern xr_vector<b_rc_face> g_rc_faces;
 
 // phases
-void xrLoad(LPCSTR name, bool draft_mode);
+void xrLoad(const char* name, bool draft_mode);
 void xrCover(bool pure_covers);
-void xrSaveNodes(LPCSTR name, LPCSTR out_name);
+void xrSaveNodes(const char* name, const char* out_name);
 
 // constants
 const int RCAST_MaxTris = (2 * 1024);

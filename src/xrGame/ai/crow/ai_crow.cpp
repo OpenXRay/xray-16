@@ -53,7 +53,7 @@ void CAI_Crow::SAnim::Load(IKinematicsAnimated* visual, cpcstr prefix, cpcstr pr
     R_ASSERT(m_Animations.size());
 }
 
-void CAI_Crow::SSound::Load(LPCSTR prefix)
+void CAI_Crow::SSound::Load(const char* prefix)
 {
     string_path fn;
     if (FS.exist(fn, "$game_sounds$", prefix, ".ogg"))
@@ -118,7 +118,7 @@ void CAI_Crow::init()
     o_workload_rframe = 0;
 }
 
-void CAI_Crow::Load(LPCSTR section)
+void CAI_Crow::Load(const char* section)
 {
     inherited::Load(section);
     //////////////////////////////////////////////////////////////////////////
@@ -141,12 +141,12 @@ void CAI_Crow::Load(LPCSTR section)
     vVarGoal = pSettings->r_fvector3(section, "goal_variability");
     fIdleSoundDelta = pSettings->r_float(section, "idle_sound_delta");
     fIdleSoundTime = fIdleSoundDelta + fIdleSoundDelta * Random.randF(-.5f, .5f);
-    VERIFY2(valid_pos(Position()), dbg_valide_pos_string(Position(), this, "CAI_Crow::Load( LPCSTR section )"));
+    VERIFY2(valid_pos(Position()), dbg_valide_pos_string(Position(), this, "CAI_Crow::Load( const char* section )"));
 }
 
-BOOL CAI_Crow::net_Spawn(CSE_Abstract* DC)
+bool CAI_Crow::net_Spawn(CSE_Abstract* DC)
 {
-    BOOL R = inherited::net_Spawn(DC);
+    bool R = inherited::net_Spawn(DC);
     setVisible(TRUE);
     setEnabled(TRUE);
 
@@ -486,7 +486,7 @@ void CAI_Crow::Hit(SHit* pHDS)
     callback(GameObject::eHit)(lua_game_object(), who_object ? who_object->lua_game_object() : 0);
 }
 
-BOOL CAI_Crow::UsedAI_Locations() { return (FALSE); }
+bool CAI_Crow::UsedAI_Locations() { return (FALSE); }
 void CAI_Crow::create_physic_shell()
 {
     // do not delete!!!

@@ -24,13 +24,13 @@ void CDialogScriptHelper::Load(CUIXml* uiXml, XML_NODE phrase_node)
 }
 
 template <class T>
-void CDialogScriptHelper::LoadSequence(CUIXml* uiXml, XML_NODE phrase_node, LPCSTR tag, T& str_vector)
+void CDialogScriptHelper::LoadSequence(CUIXml* uiXml, XML_NODE phrase_node, const char* tag, T& str_vector)
 {
     int tag_num = uiXml->GetNodesNum(phrase_node, tag);
     str_vector.clear();
     for (int i = 0; i < tag_num; ++i)
     {
-        LPCSTR tag_text = uiXml->Read(phrase_node, tag, i, NULL);
+        const char* tag_text = uiXml->Read(phrase_node, tag, i, NULL);
         str_vector.push_back(tag_text);
     }
 }
@@ -76,22 +76,22 @@ void CDialogScriptHelper::TransferInfo(const CInventoryOwner* pOwner) const
         Actor()->TransferInfo(m_DisableInfo[i], false);
 }
 
-LPCSTR CDialogScriptHelper::GetScriptText(LPCSTR str_to_translate, const CGameObject* pSpeakerGO1,
-    const CGameObject* pSpeakerGO2, LPCSTR dialog_id, LPCSTR phrase_id)
+const char* CDialogScriptHelper::GetScriptText(const char* str_to_translate, const CGameObject* pSpeakerGO1,
+    const CGameObject* pSpeakerGO2, const char* dialog_id, const char* phrase_id)
 {
     if (!m_sScriptTextFunc.size())
         return str_to_translate;
 
-    luabind::functor<LPCSTR> lua_function;
+    luabind::functor<const char*> lua_function;
     bool functor_exists = GEnv.ScriptEngine->functor(m_sScriptTextFunc.c_str(), lua_function);
     THROW3(functor_exists, "Cannot find phrase script text ", m_sScriptTextFunc.c_str());
 
-    LPCSTR res = lua_function(pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id);
+    const char* res = lua_function(pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id);
 
     return res;
 }
 
-bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO, LPCSTR dialog_id, LPCSTR phrase_id) const
+bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO, const char* dialog_id, const char* phrase_id) const
 {
     bool predicate_result = true;
 
@@ -123,7 +123,7 @@ bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO, LPCSTR dia
     return predicate_result;
 }
 
-void CDialogScriptHelper::Action(const CGameObject* pSpeakerGO, LPCSTR dialog_id, LPCSTR phrase_id) const
+void CDialogScriptHelper::Action(const CGameObject* pSpeakerGO, const char* dialog_id, const char* phrase_id) const
 {
     for (u32 i = 0; i < Actions().size(); ++i)
     {
@@ -136,8 +136,8 @@ void CDialogScriptHelper::Action(const CGameObject* pSpeakerGO, LPCSTR dialog_id
     TransferInfo(smart_cast<const CInventoryOwner*>(pSpeakerGO));
 }
 
-bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO1, const CGameObject* pSpeakerGO2, LPCSTR dialog_id,
-    LPCSTR phrase_id, LPCSTR next_phrase_id) const
+bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO1, const CGameObject* pSpeakerGO2, const char* dialog_id,
+    const char* phrase_id, const char* next_phrase_id) const
 {
     bool predicate_result = true;
 
@@ -170,7 +170,7 @@ bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO1, const CGa
 }
 
 void CDialogScriptHelper::Action(
-    const CGameObject* pSpeakerGO1, const CGameObject* pSpeakerGO2, LPCSTR dialog_id, LPCSTR phrase_id) const
+    const CGameObject* pSpeakerGO1, const CGameObject* pSpeakerGO2, const char* dialog_id, const char* phrase_id) const
 {
     TransferInfo(smart_cast<const CInventoryOwner*>(pSpeakerGO1));
 

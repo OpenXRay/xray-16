@@ -256,7 +256,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         DWORD sz_user = sizeof(UserName);
         GetUserName(UserName, &sz_user);
 
-        DWORD sz_comp = sizeof(CompName);
+         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
 #elif defined(LINUX)
         uid_t uid = geteuid();
@@ -412,9 +412,9 @@ void xrCore::CalculateBuildId()
 
 #if defined(WINDOWS)
 #ifdef _EDITOR
-BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
+bool WINAPI DllEntryPoint(HINSTANCE hinstDLL, unsigned int ul_reason_for_call, LPVOID lpvReserved)
 #else
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
+bool WINAPI DllMain(HINSTANCE hinstDLL, unsigned int ul_reason_for_call, LPVOID lpvReserved)
 #endif
 {
     switch (ul_reason_for_call)

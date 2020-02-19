@@ -20,7 +20,7 @@ void CUIDetectorWave::Update()
     inherited::Update();
 }
 
-void CUIDetectorWave::InitFromXML(CUIXml& xml, LPCSTR path)
+void CUIDetectorWave::InitFromXML(CUIXml& xml, const char* path)
 {
     CUIXmlInit::InitFrameLine(xml, path, 0, this);
     m_step = xml.ReadAttribFlt(path, 0, "step");

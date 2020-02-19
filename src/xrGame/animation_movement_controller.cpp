@@ -260,12 +260,12 @@ void animation_movement_controller::NewBlend(CBlend* B, const Fmatrix& new_matri
 {
     /*
 #ifdef	DEBUG
-    LPCSTR old_anim_name	= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( ControlBlend(
+    const char* old_anim_name	= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( ControlBlend(
 )->motionID ).first;
-    LPCSTR old_anim_set		= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( ControlBlend(
+    const char* old_anim_set		= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( ControlBlend(
 )->motionID ).second;
-    LPCSTR new_anim_name	= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( B->motionID ).first;
-    LPCSTR new_anim_set		= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( B->motionID ).second;
+    const char* new_anim_name	= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( B->motionID ).first;
+    const char* new_anim_set		= m_pKinematicsC->dcast_PKinematicsAnimated( )->LL_MotionDefName_dbg( B->motionID ).second;
 
     if( ControlBlend( )->playing )
         Msg( " ! obj movement anim not yet ended anim: %s anim set: %s \n and already another started anim: %s anim set:

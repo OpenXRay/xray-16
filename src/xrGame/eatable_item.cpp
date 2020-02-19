@@ -32,7 +32,7 @@ IFactoryObject* CEatableItem::_construct()
     return (inherited::_construct());
 }
 
-void CEatableItem::Load(LPCSTR section)
+void CEatableItem::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -64,7 +64,7 @@ void CEatableItem::save(NET_Packet& packet)
     packet.w_u8(m_iRemainingUses);
 }
 
-BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
+bool CEatableItem::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return FALSE;

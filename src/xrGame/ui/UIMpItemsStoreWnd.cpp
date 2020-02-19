@@ -61,7 +61,7 @@ void CStoreHierarchy::LoadLevel(CUIXml& xml, int index, item* _item, int depth_l
     xml.SetLocalRoot(stored_root);
 }
 
-void CStoreHierarchy::Init(CUIXml& xml, LPCSTR path)
+void CStoreHierarchy::Init(CUIXml& xml, const char* path)
 {
     XML_NODE p_stored_root = xml.GetLocalRoot();
 

@@ -16,7 +16,7 @@ public:
     CBottleItem();
     virtual ~CBottleItem();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
     void OnEvent(NET_Packet& P, u16 type);
 

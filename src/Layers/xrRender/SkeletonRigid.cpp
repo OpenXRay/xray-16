@@ -7,10 +7,10 @@
 extern int psSkeletonUpdate;
 
 #ifdef DEBUG
-void check_kinematics(CKinematics* _k, LPCSTR s);
+void check_kinematics(CKinematics* _k, const char* s);
 #endif
 
-void CKinematics::CalculateBones(BOOL bForceExact)
+void CKinematics::CalculateBones(bool bForceExact)
 {
     // early out.
     // check if the info is still relevant
@@ -121,7 +121,7 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 }
 
 #ifdef DEBUG
-void check_kinematics(CKinematics* _k, LPCSTR s)
+void check_kinematics(CKinematics* _k, const char* s)
 {
     CKinematics* K = _k;
     Fmatrix& MrootBone = K->LL_GetBoneInstance(K->LL_GetBoneRoot()).mTransform;
@@ -250,7 +250,7 @@ void CKinematics::BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8
     // CBlendInstance::BlendSVec &Blend = BLEND_INST.blend_vector();
     // ignore callbacks
     BoneCallback bc = bi.callback();
-    BOOL ow = bi.callback_overwrite();
+    bool ow = bi.callback_overwrite();
     if (ignore_callbacks)
     {
         bi.set_callback(bi.callback_type(), nullptr, bi.callback_param(), 0);

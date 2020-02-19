@@ -7,7 +7,7 @@ class CMMSound
 public:
     CMMSound();
     ~CMMSound();
-    void Init(CUIXml& xml_doc, LPCSTR path);
+    void Init(CUIXml& xml_doc, const char* path);
     void whell_Play();
     void whell_Stop();
     void whell_Click();
@@ -20,7 +20,7 @@ public:
     void all_Stop();
 
 protected:
-    IC bool check_file(LPCSTR fname);
+    IC bool check_file(const char* fname);
 
     static constexpr size_t channels_count = 2;
     xr_array<ref_sound, channels_count> m_music;

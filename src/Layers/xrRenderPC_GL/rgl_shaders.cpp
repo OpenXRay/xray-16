@@ -262,8 +262,7 @@ private:
     }
 };
 
-HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
-    LPCSTR pTarget, DWORD Flags, void*& result)
+HRESULT CRender::shader_compile(const char* name, IReader* fs, const char* pFunctionName, const char* pTarget, DWORD Flags, void*& result)
 {
     shader_options_holder options;
     shader_name_holder sh_name;

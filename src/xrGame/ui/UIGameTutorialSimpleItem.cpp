@@ -15,7 +15,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 
 CUISequenceSimpleItem::~CUISequenceSimpleItem()
 {
@@ -54,7 +54,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     XML_NODE _stored_root = xml->GetLocalRoot();
     xml->SetLocalRoot(xml->NavigateToNode("item", idx));
 
-    LPCSTR m_snd_name = xml->Read("sound", 0, "");
+    const char* m_snd_name = xml->Read("sound", 0, "");
     if (m_snd_name && m_snd_name[0])
     {
         m_sound.create(m_snd_name, st_Effect, sg_Undefined);
@@ -65,7 +65,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_desired_cursor_pos.y = xml->ReadAttribFlt("cursor_pos", 0, "y", 0);
     xr_strcpy(m_pda_section, xml->Read("pda_section", 0, ""));
 
-    LPCSTR str = xml->Read("pause_state", 0, "ignore");
+    const char* str = xml->Read("pause_state", 0, "ignore");
     m_flags.set(etiNeedPauseOn, 0 == xr_stricmp(str, "on"));
     m_flags.set(etiNeedPauseOff, 0 == xr_stricmp(str, "off"));
     m_flags.set(etiNeedPauseSound, 0 == xr_stricmp(str, "on"));
@@ -85,7 +85,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
     m_flags.set(etiCanBeStopped, (m_continue_dik_guard == -1));
 
-    LPCSTR str_grab_input = xml->Read("grab_input", 0, "on");
+    const char* str_grab_input = xml->Read("grab_input", 0, "on");
     m_flags.set(etiGrabInput, (0 == xr_stricmp(str_grab_input, "on") || 0 == xr_stricmp(str_grab_input, "1")));
 
     int actions_count = xml->GetNodesNum(0, 0, "action");
@@ -93,7 +93,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     for (int idx = 0; idx < actions_count; ++idx)
     {
         SActionItem& itm = m_actions[idx];
-        LPCSTR str = xml->ReadAttrib("action", idx, "id");
+        const char* str = xml->ReadAttrib("action", idx, "id");
         itm.m_action = ActionNameToId(str);
         itm.m_bfinalize = !!xml->ReadAttribInt("action", idx, "finalize", FALSE);
         itm.m_functor = xml->Read(xml->GetLocalRoot(), "action", idx, "");

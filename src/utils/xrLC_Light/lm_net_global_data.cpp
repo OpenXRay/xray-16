@@ -14,7 +14,7 @@ bool cmp_weight(CDeflector* d0, CDeflector* d1)
     return d0->weight() > d1->weight();
 }
 
-void net_global_data_impl<gl_lm_data>::create_data_file(LPCSTR path)
+void net_global_data_impl<gl_lm_data>::create_data_file(const char* path)
 {
     FPU::m64r();
     Memory.mem_compact();
@@ -29,7 +29,7 @@ void net_global_data_impl<gl_lm_data>::create_data_file(LPCSTR path)
     // inlc_global_data()->create_read_faces();
     // inlc_global_data()->create_write_faces();
 }
-bool net_global_data_impl<gl_lm_data>::create_data(LPCSTR path)
+bool net_global_data_impl<gl_lm_data>::create_data(const char* path)
 {
     {
         R_ASSERT(inlc_global_data());

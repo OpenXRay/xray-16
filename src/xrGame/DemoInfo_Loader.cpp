@@ -17,7 +17,7 @@ static bool sort_team_players_by_spots(demo_player_info const* left, demo_player
     return left->get_spots() > right->get_spots();
 }
 
-demo_info* demo_info_loader::load_demofile(LPCSTR demo_file_name)
+demo_info* demo_info_loader::load_demofile(const char* demo_file_name)
 {
     CStreamReader* tmp_reader = FS.rs_open("$logs$", demo_file_name);
     if (!tmp_reader)
@@ -37,7 +37,7 @@ demo_info* demo_info_loader::load_demofile(LPCSTR demo_file_name)
     return tmp_demoinfo;
 }
 
-demo_info const* demo_info_loader::get_demofile_info(LPCSTR demo_file_name)
+demo_info const* demo_info_loader::get_demofile_info(const char* demo_file_name)
 {
     R_ASSERT(demo_file_name);
     shared_str tmp_fn = demo_file_name;

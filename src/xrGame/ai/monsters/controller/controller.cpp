@@ -71,7 +71,7 @@ CController::~CController()
     xr_delete(m_psy_hit);
 }
 
-void CController::Load(LPCSTR section)
+void CController::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -95,7 +95,7 @@ void CController::Load(LPCSTR section)
     anim().AddReplacedAnim(&m_bDamaged, eAnimWalkFwd, eAnimWalkDamaged);
 
     // Load control postprocess --------------------------------------------------------
-    LPCSTR ppi_section = pSettings->r_string(section, "control_effector");
+    const char* ppi_section = pSettings->r_string(section, "control_effector");
     m_control_effector.ppi.duality.h = pSettings->r_float(ppi_section, "duality_h");
     m_control_effector.ppi.duality.v = pSettings->r_float(ppi_section, "duality_v");
     m_control_effector.ppi.gray = pSettings->r_float(ppi_section, "gray");
@@ -230,9 +230,9 @@ void CController::Load(LPCSTR section)
     m_tube_damage = pSettings->r_float(section, "tube_damage");
     m_tube_at_once = !!pSettings->r_bool(section, "tube_at_once");
 
-    LPCSTR tube_see_duration_line = "tube_condition_see_duration";
-    LPCSTR tube_condition_min_delay_line = "tube_condition_min_delay";
-    LPCSTR tube_condition_min_distance_line = "tube_condition_min_distance";
+    const char* tube_see_duration_line = "tube_condition_see_duration";
+    const char* tube_condition_min_delay_line = "tube_condition_min_delay";
+    const char* tube_condition_min_distance_line = "tube_condition_min_distance";
 
     using namespace detail::controller;
     m_tube_condition_see_duration = pSettings->line_exist(section, tube_see_duration_line) ?
@@ -252,9 +252,9 @@ void CController::Load(LPCSTR section)
     PostLoad(section);
 }
 
-void CController::load_friend_community_overrides(LPCSTR section)
+void CController::load_friend_community_overrides(const char* section)
 {
-    LPCSTR src = pSettings->r_string(section, "Friend_Community_Overrides");
+    const char* src = pSettings->r_string(section, "Friend_Community_Overrides");
 
     // parse src
     int item_count = _GetItemCount(src);
@@ -279,7 +279,7 @@ bool CController::is_community_friend_overrides(const CEntityAlive* entity_alive
                 IO->CharacterInfo().Community().id()) != m_friend_community_overrides.end());
 }
 
-BOOL CController::net_Spawn(CSE_Abstract* DC)
+bool CController::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -364,7 +364,7 @@ void CController::play_control_sound_hit()
     control_hit_sound.play_at_pos(const_cast<CEntityAlive*>(EnemyMan.get_enemy()), pos);
 }
 
-void CController::reload(LPCSTR section)
+void CController::reload(const char* section)
 {
     inherited::reload(section);
     com_man().ta_fill_data(

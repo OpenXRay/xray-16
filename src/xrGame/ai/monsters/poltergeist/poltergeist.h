@@ -49,11 +49,11 @@ public:
     CPoltergeist();
     virtual ~CPoltergeist();
 
-    virtual void Load(LPCSTR section);
-    virtual void reload(LPCSTR section);
+    virtual void Load(const char* section);
+    virtual void reload(const char* section);
     virtual void reinit();
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Relcase(IGameObject* O);
 
@@ -144,10 +144,10 @@ class CPolterSpecialAbility
     CParticlesObject* m_particles_object;
     CParticlesObject* m_particles_object_electro;
 
-    LPCSTR m_particles_hidden;
-    LPCSTR m_particles_damage;
-    LPCSTR m_particles_death;
-    LPCSTR m_particles_idle;
+    const char* m_particles_hidden;
+    const char* m_particles_damage;
+    const char* m_particles_death;
+    const char* m_particles_idle;
 
     ref_sound m_sound_base;
     u32 m_last_hit_frame;
@@ -159,7 +159,7 @@ public:
     CPolterSpecialAbility(CPoltergeist* polter);
     virtual ~CPolterSpecialAbility();
 
-    virtual void load(LPCSTR section);
+    virtual void load(const char* section);
     virtual void update_schedule();
     virtual void update_frame();
     virtual void on_hide();
@@ -177,9 +177,9 @@ class CPolterFlame : public CPolterSpecialAbility
     typedef CPolterSpecialAbility inherited;
 
     ref_sound m_sound;
-    LPCSTR m_particles_prepare;
-    LPCSTR m_particles_fire;
-    LPCSTR m_particles_stop;
+    const char* m_particles_prepare;
+    const char* m_particles_fire;
+    const char* m_particles_stop;
     u32 m_time_fire_delay;
     u32 m_time_fire_play;
 
@@ -241,7 +241,7 @@ public:
     CPolterFlame(CPoltergeist* polter);
     virtual ~CPolterFlame();
 
-    virtual void load(LPCSTR section);
+    virtual void load(const char* section);
     virtual void update_schedule();
     virtual void on_destroy();
     virtual void on_die();
@@ -296,7 +296,7 @@ public:
     CPolterTele(CPoltergeist* polter);
     virtual ~CPolterTele();
 
-    virtual void load(LPCSTR section);
+    virtual void load(const char* section);
     virtual void update_schedule();
     virtual void update_frame();
 

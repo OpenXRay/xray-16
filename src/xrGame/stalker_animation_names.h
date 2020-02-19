@@ -8,16 +8,16 @@
 
 #pragma once
 
-extern LPCSTR state_names[];
-extern LPCSTR weapon_names[];
-extern LPCSTR weapon_action_names[];
-extern LPCSTR food_names[];
-extern LPCSTR food_action_names[];
-extern LPCSTR movement_names[];
-extern LPCSTR movement_action_names[];
-extern LPCSTR in_place_names[];
-extern LPCSTR global_names[];
-extern LPCSTR head_names[];
+extern const char* state_names[];
+extern const char* weapon_names[];
+extern const char* weapon_action_names[];
+extern const char* food_names[];
+extern const char* food_action_names[];
+extern const char* movement_names[];
+extern const char* movement_action_names[];
+extern const char* in_place_names[];
+extern const char* global_names[];
+extern const char* head_names[];
 
 enum ECriticalWoundType : u32
 {

@@ -80,7 +80,7 @@ public:
 };
 **/
 
-CALifeCommunicationManager::CALifeCommunicationManager(IPureServer* server, LPCSTR section)
+CALifeCommunicationManager::CALifeCommunicationManager(IPureServer* server, const char* section)
     : CALifeSimulatorBase(server, section)
 {
     //	m_tpItems1.reserve			(MAX_STACK_DEPTH);

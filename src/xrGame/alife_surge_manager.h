@@ -30,7 +30,7 @@ protected:
     void spawn_new_objects();
 
 public:
-    IC CALifeSurgeManager(IPureServer* server, LPCSTR section);
+    IC CALifeSurgeManager(IPureServer* server, const char* section);
     virtual ~CALifeSurgeManager();
 };
 

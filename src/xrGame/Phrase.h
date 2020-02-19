@@ -14,10 +14,10 @@ public:
     CPhrase();
     virtual ~CPhrase();
 
-    void SetText(LPCSTR text) { m_text = text; }
-    LPCSTR GetText() const;
+    void SetText(const char* text) { m_text = text; }
+    const char* GetText() const;
 
-    LPCSTR GetScriptText() const;
+    const char* GetScriptText() const;
 
     void SetID(const shared_str& id) { m_ID = id; }
     const shared_str& GetID() const { return m_ID; }

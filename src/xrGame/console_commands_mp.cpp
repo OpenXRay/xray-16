@@ -23,10 +23,10 @@
 #include "xrGameSpy/GameSpy_GP.h"
 #include "xrNetServer/NET_Messages.h"
 
-EGameIDs ParseStringToGameType(LPCSTR str);
-LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
-LPCSTR AddHyphens(LPCSTR c);
-LPCSTR DelHyphens(LPCSTR c);
+EGameIDs ParseStringToGameType(const char* str);
+const char* GameTypeToString(EGameIDs gt, bool bShort);
+const char* AddHyphens(const char* c);
+const char* DelHyphens(const char* c);
 
 extern float g_cl_lvInterp;
 extern int g_cl_InterpolationType; // 0 - Linear, 1 - BSpline, 2 - HSpline
@@ -39,7 +39,7 @@ extern BOOL g_b_COD_PickUpMode;
 extern int g_iWeaponRemove;
 extern int g_iCorpseRemove;
 extern BOOL g_bCollectStatisticData;
-// extern	BOOL	g_bStatisticSaveAuto	;
+// extern	bool	g_bStatisticSaveAuto	;
 extern BOOL g_SV_Disable_Auth_Check;
 extern BOOL g_sv_ignore_version_mismatch;
 
@@ -79,8 +79,8 @@ extern int g_sv_ah_dwArtefactsNum;
 extern u32 g_sv_ah_dwArtefactStayTime;
 extern int g_sv_ah_iReinforcementTime;
 extern BOOL g_sv_ah_bBearerCantSprint;
-extern BOOL g_sv_ah_bShildedBases;
-extern BOOL g_sv_ah_bAfReturnPlayersToBases;
+extern bool g_sv_ah_bShildedBases;
+extern bool g_sv_ah_bAfReturnPlayersToBases;
 extern u32 g_sv_dwMaxClientPing;
 extern int g_be_message_out;
 
@@ -119,14 +119,14 @@ extern BOOL g_sv_write_updates_bin;
 extern u32 g_sv_traffic_optimization_level;
 
 void XRNETSERVER_API DumpNetCompressorStats(bool brief);
-BOOL XRNETSERVER_API g_net_compressor_enabled;
-BOOL XRNETSERVER_API g_net_compressor_gather_stats;
+bool XRNETSERVER_API g_net_compressor_enabled;
+bool XRNETSERVER_API g_net_compressor_gather_stats;
 
 class CCC_Restart : public IConsole_Command
 {
 public:
-    CCC_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_Restart(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -142,8 +142,8 @@ public:
 class CCC_RestartFast : public IConsole_Command
 {
 public:
-    CCC_RestartFast(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_RestartFast(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -159,8 +159,8 @@ public:
 class CCC_Kill : public IConsole_Command
 {
 public:
-    CCC_Kill(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_Kill(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (IsGameTypeSingle())
             return;
@@ -186,24 +186,24 @@ public:
 class CCC_Net_CL_Resync : public IConsole_Command
 {
 public:
-    CCC_Net_CL_Resync(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { Level().net_Syncronize(); }
+    CCC_Net_CL_Resync(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args) { Level().net_Syncronize(); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "resyncronize client"); }
 };
 
 class CCC_Net_CL_ClearStats : public IConsole_Command
 {
 public:
-    CCC_Net_CL_ClearStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { Level().ClearStatistic(); }
+    CCC_Net_CL_ClearStats(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args) { Level().ClearStatistic(); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "clear client net statistic"); }
 };
 
 class CCC_Net_SV_ClearStats : public IConsole_Command
 {
 public:
-    CCC_Net_SV_ClearStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { Level().Server->ClearStatistic(); }
+    CCC_Net_SV_ClearStats(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args) { Level().Server->ClearStatistic(); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "clear server net statistic"); }
 };
 
@@ -211,8 +211,8 @@ public:
 class CCC_Dbg_NumObjects : public IConsole_Command
 {
 public:
-    CCC_Dbg_NumObjects(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_Dbg_NumObjects(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         u32 SVObjNum = (OnServer()) ? Level().Server->GetEntitiesNum() : 0;
         xr_vector<u16> SObjID;
@@ -268,13 +268,13 @@ public:
 };
 #endif // DEBUG
 
-extern void WriteCDKey_ToRegistry(LPSTR cdkey);
+extern void WriteCDKey_ToRegistry(char* cdkey);
 
 class CCC_GSCDKey : public CCC_String
 {
 public:
-    CCC_GSCDKey(LPCSTR N, LPSTR V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR arguments)
+    CCC_GSCDKey(const char* N, char* V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* arguments)
     {
         string64 cdkey;
         if (0 == xr_stricmp(arguments, "clear"))
@@ -291,7 +291,7 @@ public:
         {
             if ((cdkey_len > 5) && cdkey[4] != '-')
             {
-                LPCSTR res = AddHyphens(cdkey);
+                const char* res = AddHyphens(cdkey);
                 xr_strcpy(cdkey, res);
             }
 
@@ -319,7 +319,7 @@ public:
 struct SearcherClientByName
 {
     string512 player_name;
-    SearcherClientByName(LPCSTR name)
+    SearcherClientByName(const char* name)
     {
         strncpy_s(player_name, sizeof(player_name), name, sizeof(player_name) - 1);
         xr_strlwr(player_name);
@@ -327,7 +327,7 @@ struct SearcherClientByName
     bool operator()(IClient* client)
     {
         xrClientData* temp_client = smart_cast<xrClientData*>(client);
-        LPSTR tmp_player = NULL;
+        char* tmp_player = NULL;
         if (!temp_client->ps)
             return false;
 
@@ -347,8 +347,8 @@ struct SearcherClientByName
 class CCC_KickPlayerByName : public IConsole_Command
 {
 public:
-    CCC_KickPlayerByName(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_KickPlayerByName(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -402,8 +402,8 @@ static u32 last_printed_player_banned;
 class CCC_KickPlayerByID : public IConsole_Command
 {
 public:
-    CCC_KickPlayerByID(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_KickPlayerByID(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -457,12 +457,12 @@ public:
 };
 
 #define RAPREFIX "raid:"
-static xrClientData* exclude_command_initiator(LPCSTR args)
+static xrClientData* exclude_command_initiator(const char* args)
 {
-    LPCSTR tmp_str = strrchr(args, ' ');
+    const char* tmp_str = strrchr(args, ' ');
     if (!tmp_str)
         tmp_str = args;
-    LPCSTR clientidstr = strstr(tmp_str, RAPREFIX);
+    const char* clientidstr = strstr(tmp_str, RAPREFIX);
     if (clientidstr)
     {
         clientidstr += sizeof(RAPREFIX) - 1;
@@ -474,7 +474,7 @@ static xrClientData* exclude_command_initiator(LPCSTR args)
     }
     return NULL;
 };
-static char const* exclude_raid_from_args(LPCSTR args, LPSTR dest, size_t dest_size)
+static char const* exclude_raid_from_args(const char* args, char* dest, size_t dest_size)
 {
     strncpy_s(dest, dest_size, args, dest_size - 1);
     char* tmp_str = strrchr(dest, ' ');
@@ -495,8 +495,8 @@ static char const* exclude_raid_from_args(LPCSTR args, LPSTR dest, size_t dest_s
 class CCC_MakeScreenshot : public IConsole_Command
 {
 public:
-    CCC_MakeScreenshot(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args_)
+    CCC_MakeScreenshot(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -543,8 +543,8 @@ public:
 class CCC_MakeConfigDump : public IConsole_Command
 {
 public:
-    CCC_MakeConfigDump(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args_)
+    CCC_MakeConfigDump(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -591,8 +591,8 @@ public:
 class CCC_SetDemoPlaySpeed : public IConsole_Command
 {
 public:
-    CCC_SetDemoPlaySpeed(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_SetDemoPlaySpeed(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlayStarted())
         {
@@ -612,7 +612,7 @@ class DemoPlayControlArgParser
 protected:
     demoplay_control::EAction m_action;
     shared_str m_action_param;
-    bool ParseControlString(LPCSTR args_string)
+    bool ParseControlString(const char* args_string)
     {
         string16 action_name;
         action_name[0] = 0;
@@ -652,7 +652,7 @@ protected:
         }
         return true;
     };
-    inline LPCSTR GetInfoString()
+    inline const char* GetInfoString()
     {
         return "<roundstart,kill,die,artefacttake,artefactdrop,artefactdeliver> [player name]";
     }
@@ -661,8 +661,8 @@ protected:
 class CCC_DemoPlayPauseOn : public IConsole_Command, public DemoPlayControlArgParser
 {
 public:
-    CCC_DemoPlayPauseOn(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_DemoPlayPauseOn(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlayStarted())
         {
@@ -683,7 +683,7 @@ public:
 
     virtual void Info(TInfo& I)
     {
-        LPCSTR info_str = NULL;
+        const char* info_str = NULL;
         STRCONCAT(info_str, "Play demo until specified event (then pause playing). Format: mpdemoplay_pause_on ",
             DemoPlayControlArgParser::GetInfoString());
         xr_strcpy(I, info_str);
@@ -693,8 +693,8 @@ public:
 class CCC_DemoPlayCancelPauseOn : public IConsole_Command
 {
 public:
-    CCC_DemoPlayCancelPauseOn(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_DemoPlayCancelPauseOn(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlayStarted())
         {
@@ -712,8 +712,8 @@ public:
 class CCC_DemoPlayRewindUntil : public IConsole_Command, public DemoPlayControlArgParser
 {
 public:
-    CCC_DemoPlayRewindUntil(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_DemoPlayRewindUntil(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlayStarted())
         {
@@ -734,7 +734,7 @@ public:
 
     virtual void Info(TInfo& I)
     {
-        LPCSTR info_str = NULL;
+        const char* info_str = NULL;
         STRCONCAT(info_str, "Rewind demo until specified event (then pause playing). Format: mpdemoplay_rewind_until ",
             DemoPlayControlArgParser::GetInfoString());
         xr_strcpy(I, info_str);
@@ -744,8 +744,8 @@ public:
 class CCC_DemoPlayStopRewind : public IConsole_Command
 {
 public:
-    CCC_DemoPlayStopRewind(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_DemoPlayStopRewind(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlayStarted())
         {
@@ -763,8 +763,8 @@ public:
 class CCC_DemoPlayRestart : public IConsole_Command
 {
 public:
-    CCC_DemoPlayRestart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_DemoPlayRestart(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlay())
         {
@@ -780,8 +780,8 @@ public:
 class CCC_MulDemoPlaySpeed : public IConsole_Command
 {
 public:
-    CCC_MulDemoPlaySpeed(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_MulDemoPlaySpeed(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlayStarted())
         {
@@ -797,8 +797,8 @@ public:
 class CCC_DivDemoPlaySpeed : public IConsole_Command
 {
 public:
-    CCC_DivDemoPlaySpeed(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_DivDemoPlaySpeed(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!Level().IsDemoPlayStarted())
         {
@@ -820,8 +820,8 @@ public:
 class CCC_ScreenshotAllPlayers : public IConsole_Command
 {
 public:
-    CCC_ScreenshotAllPlayers(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args_)
+    CCC_ScreenshotAllPlayers(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server)
             return;
@@ -849,8 +849,8 @@ public:
 class CCC_ConfigsDumpAll : public IConsole_Command
 {
 public:
-    CCC_ConfigsDumpAll(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args_)
+    CCC_ConfigsDumpAll(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server)
             return;
@@ -879,8 +879,8 @@ public:
 class CCC_DbgMakeScreenshot : public IConsole_Command
 {
 public:
-    CCC_DbgMakeScreenshot(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_DbgMakeScreenshot(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!g_pGameLevel || !Level().Server)
             return;
@@ -894,8 +894,8 @@ public:
 class CCC_BanPlayerByCDKEY : public IConsole_Command
 {
 public:
-    CCC_BanPlayerByCDKEY(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args_)
+    CCC_BanPlayerByCDKEY(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -959,8 +959,8 @@ public:
 class CCC_BanPlayerByCDKEYDirectly : public IConsole_Command
 {
 public:
-    CCC_BanPlayerByCDKEYDirectly(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args_)
+    CCC_BanPlayerByCDKEYDirectly(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -996,8 +996,8 @@ public:
 class CCC_UnBanPlayerByIndex : public IConsole_Command
 {
 public:
-    CCC_UnBanPlayerByIndex(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args_)
+    CCC_UnBanPlayerByIndex(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -1039,8 +1039,8 @@ public:
 class CCC_BanPlayerByName : public IConsole_Command
 {
 public:
-    CCC_BanPlayerByName(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args_)
+    CCC_BanPlayerByName(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -1052,7 +1052,7 @@ public:
             return;
 
         string1024 digits;
-        LPSTR p = buff + len - 1;
+        char* p = buff + len - 1;
         while (isdigit(*p))
         {
             if (p == buff)
@@ -1105,8 +1105,8 @@ public:
 class CCC_BanPlayerByIP : public IConsole_Command
 {
 public:
-    CCC_BanPlayerByIP(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args_)
+    CCC_BanPlayerByIP(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args_)
     {
         if (!g_pGameLevel || !Level().Server)
             return;
@@ -1119,7 +1119,7 @@ public:
             return;
 
         string1024 digits;
-        LPSTR p = buff + len - 1;
+        char* p = buff + len - 1;
         while (isdigit(*p))
         {
             if (p == buff)
@@ -1158,8 +1158,8 @@ public:
 class CCC_UnBanPlayerByIP : public IConsole_Command
 {
 public:
-    CCC_UnBanPlayerByIP(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_UnBanPlayerByIP(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!g_pGameLevel || !Level().Server)
             return;
@@ -1183,8 +1183,8 @@ public:
 class CCC_ListPlayers : public IConsole_Command
 {
 public:
-    CCC_ListPlayers(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_ListPlayers(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -1194,7 +1194,7 @@ public:
         Msg("- ----player list begin-----");
         struct PlayersEnumerator
         {
-            LPCSTR filter_string;
+            const char* filter_string;
             PlayersEnumerator() { filter_string = NULL; }
             void operator()(IClient* client)
             {
@@ -1202,7 +1202,7 @@ public:
                 if (!l_pC)
                     return;
                 ip_address Address;
-                DWORD dwPort = 0;
+                unsigned int dwPort = 0;
                 Level().Server->GetClientAddress(client->ID, Address, &dwPort);
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "- (player session id : %u), (name : %s), (ip: %s), (ping: %u);",
@@ -1244,7 +1244,7 @@ public:
 class CCC_Name : public IConsole_Command
 {
 public:
-    CCC_Name(LPCSTR N) : IConsole_Command(N)
+    CCC_Name(const char* N) : IConsole_Command(N)
     {
         bLowerCaseArgs = false;
         bEmptyArgsHandled = false;
@@ -1265,7 +1265,7 @@ public:
     }
 
     virtual void Save(IWriter* F) {}
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(const char* args)
     {
         if (IsGameTypeSingle())
             return;
@@ -1314,8 +1314,8 @@ public:
 class CCC_ListPlayers_Banned : public IConsole_Command
 {
 public:
-    CCC_ListPlayers_Banned(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_ListPlayers_Banned(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -1342,8 +1342,8 @@ public:
 class CCC_ChangeLevelGameType : public IConsole_Command
 {
 public:
-    CCC_ChangeLevelGameType(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_ChangeLevelGameType(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1405,8 +1405,8 @@ public:
 class CCC_ChangeGameType : public CCC_ChangeLevelGameType
 {
 public:
-    CCC_ChangeGameType(LPCSTR N) : CCC_ChangeLevelGameType(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_ChangeGameType(const char* N) : CCC_ChangeLevelGameType(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1418,7 +1418,7 @@ public:
         string1024 argsNew;
         xr_sprintf(argsNew, "%s %s %s", Level().name().c_str(), Level().version().c_str(), args);
 
-        CCC_ChangeLevelGameType::Execute((LPCSTR)argsNew);
+        CCC_ChangeLevelGameType::Execute((const char*)argsNew);
     };
 
     virtual void Info(TInfo& I) { xr_strcpy(I, "Changing Game Type : <dm>,<tdm>,<ah>,<cta>"); }
@@ -1438,8 +1438,8 @@ public:
 class CCC_ChangeLevel : public CCC_ChangeLevelGameType
 {
 public:
-    CCC_ChangeLevel(LPCSTR N) : CCC_ChangeLevelGameType(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_ChangeLevel(const char* N) : CCC_ChangeLevelGameType(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1458,7 +1458,7 @@ public:
         string1024 argsNew;
         xr_sprintf(argsNew, "%s %s %s", LevelName, LevelVersion, Level().Server->GetGameState()->type_name());
 
-        CCC_ChangeLevelGameType::Execute((LPCSTR)argsNew);
+        CCC_ChangeLevelGameType::Execute((const char*)argsNew);
     };
 
     virtual void Info(TInfo& I) { xr_strcpy(I, "Changing Game Type. Arguments: <level name> <level version>"); }
@@ -1467,14 +1467,14 @@ public:
 class CCC_AddMap : public IConsole_Command
 {
 public:
-    CCC_AddMap(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_AddMap(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
 
         string512 MapName, MapVer;
-        LPCSTR c = strstr(args, "/ver=");
+        const char* c = strstr(args, "/ver=");
         if (!c)
             strncpy_s(MapName, sizeof(MapName), args, sizeof(MapName) - 1);
         else
@@ -1492,8 +1492,8 @@ public:
 class CCC_ListMaps : public IConsole_Command
 {
 public:
-    CCC_ListMaps(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_ListMaps(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
             return;
@@ -1506,8 +1506,8 @@ public:
 class CCC_NextMap : public IConsole_Command
 {
 public:
-    CCC_NextMap(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_NextMap(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1521,8 +1521,8 @@ public:
 class CCC_PrevMap : public IConsole_Command
 {
 public:
-    CCC_PrevMap(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_PrevMap(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1536,8 +1536,8 @@ public:
 class CCC_AnomalySet : public IConsole_Command
 {
 public:
-    CCC_AnomalySet(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_AnomalySet(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1555,8 +1555,8 @@ public:
 class CCC_Vote_Start : public IConsole_Command
 {
 public:
-    CCC_Vote_Start(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_Vote_Start(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (IsGameTypeSingle())
         {
@@ -1591,8 +1591,8 @@ public:
 class CCC_Vote_Stop : public IConsole_Command
 {
 public:
-    CCC_Vote_Stop(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_Vote_Stop(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1630,8 +1630,8 @@ public:
 class CCC_Vote_Yes : public IConsole_Command
 {
 public:
-    CCC_Vote_Yes(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_Vote_Yes(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (IsGameTypeSingle())
         {
@@ -1666,8 +1666,8 @@ public:
 class CCC_Vote_No : public IConsole_Command
 {
 public:
-    CCC_Vote_No(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_Vote_No(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (IsGameTypeSingle())
         {
@@ -1702,8 +1702,8 @@ public:
 class CCC_StartTimeEnvironment : public IConsole_Command
 {
 public:
-    CCC_StartTimeEnvironment(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR args)
+    CCC_StartTimeEnvironment(const char* N) : IConsole_Command(N){};
+    virtual void Execute(const char* args)
     {
         u32 hours = 0, mins = 0;
 
@@ -1727,8 +1727,8 @@ public:
 class CCC_SetWeather : public IConsole_Command
 {
 public:
-    CCC_SetWeather(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR weather_name)
+    CCC_SetWeather(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* weather_name)
     {
         if (!g_pGamePersistent)
             return;
@@ -1747,8 +1747,8 @@ public:
 class CCC_SaveStatistic : public IConsole_Command
 {
 public:
-    CCC_SaveStatistic(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_SaveStatistic(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!Level().Server)
             return;
@@ -1767,15 +1767,15 @@ public:
 class CCC_AuthCheck : public CCC_Integer
 {
 public:
-    CCC_AuthCheck(LPCSTR N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max){};
+    CCC_AuthCheck(const char* N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max){};
     virtual void Save(IWriter* F){};
 };
 
 class CCC_ReturnToBase : public IConsole_Command
 {
 public:
-    CCC_ReturnToBase(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_ReturnToBase(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1790,11 +1790,11 @@ public:
 class CCC_GetServerAddress : public IConsole_Command
 {
 public:
-    CCC_GetServerAddress(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_GetServerAddress(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         ip_address Address;
-        DWORD dwPort = 0;
+        unsigned int dwPort = 0;
 
         Level().GetServerAddress(Address, &dwPort);
 
@@ -1807,8 +1807,8 @@ public:
 class CCC_StartTeamMoney : public IConsole_Command
 {
 public:
-    CCC_StartTeamMoney(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_StartTeamMoney(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1852,9 +1852,9 @@ public:
 class CCC_SV_Integer : public CCC_Integer
 {
 public:
-    CCC_SV_Integer(LPCSTR N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max){};
+    CCC_SV_Integer(const char* N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max){};
 
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(const char* args)
     {
         CCC_Integer::Execute(args);
 
@@ -1868,9 +1868,9 @@ public:
 class CCC_SV_Float : public CCC_Float
 {
 public:
-    CCC_SV_Float(LPCSTR N, float* V, float _min = 0, float _max = 1) : CCC_Float(N, V, _min, _max){};
+    CCC_SV_Float(const char* N, float* V, float _min = 0, float _max = 1) : CCC_Float(N, V, _min, _max){};
 
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(const char* args)
     {
         CCC_Float::Execute(args);
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState())
@@ -1881,8 +1881,8 @@ public:
 class CCC_RadminCmd : public IConsole_Command
 {
 public:
-    CCC_RadminCmd(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR arguments)
+    CCC_RadminCmd(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* arguments)
     {
         if (IsGameTypeSingle() || xr_strlen(arguments) >= 512)
         {
@@ -1928,8 +1928,8 @@ public:
 class CCC_SwapTeams : public IConsole_Command
 {
 public:
-    CCC_SwapTeams(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_SwapTeams(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1940,7 +1940,7 @@ public:
                 smart_cast<game_sv_CaptureTheArtefact*>(Level().Server->GetGameState());
             if (tdmGame)
             {
-                BOOL old_team_swap = g_sv_tdm_bAutoTeamSwap;
+                bool old_team_swap = g_sv_tdm_bAutoTeamSwap;
                 g_sv_tdm_bAutoTeamSwap = TRUE;
                 tdmGame->AutoSwapTeams();
                 g_sv_tdm_bAutoTeamSwap = old_team_swap;
@@ -1964,8 +1964,8 @@ public:
 class CCC_SvStatus : public IConsole_Command
 {
 public:
-    CCC_SvStatus(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_SvStatus(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1980,8 +1980,8 @@ public:
 class CCC_SvChat : public IConsole_Command
 {
 public:
-    CCC_SvChat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_SvChat(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -1990,7 +1990,7 @@ public:
             game_sv_mp* game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
             if (game)
             {
-                LPSTR msg;
+                char* msg;
                 STRCONCAT(msg, args);
                 if (xr_strlen(msg) > 256)
                 {
@@ -2005,8 +2005,8 @@ public:
 class CCC_MpStatistics : public IConsole_Command
 {
 public:
-    CCC_MpStatistics(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_MpStatistics(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(const char* args)
     {
         if (!OnServer())
             return;
@@ -2020,8 +2020,8 @@ public:
 class CCC_CompressorStatus : public IConsole_Command
 {
 public:
-    CCC_CompressorStatus(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_CompressorStatus(const char* N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(const char* args)
     {
         if (strstr(args, "info_full"))
             DumpNetCompressorStats(false);

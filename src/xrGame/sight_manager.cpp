@@ -30,7 +30,7 @@ CSightManager::CSightManager(CAI_Stalker* object)
 {
 }
 
-void CSightManager::Load(LPCSTR section) {}
+void CSightManager::Load(const char* section) {}
 void CSightManager::reinit()
 {
     inherited::reinit();
@@ -43,7 +43,7 @@ void CSightManager::reinit()
     m_current.m_spine.m_factor = s_free_factors.z;
 }
 
-void CSightManager::reload(LPCSTR section)
+void CSightManager::reload(const char* section)
 {
     m_max_left_angle = deg2rad(READ_IF_EXISTS(pSettings, r_float, section, "max_left_torso_angle", 90.f));
     m_max_right_angle = deg2rad(READ_IF_EXISTS(pSettings, r_float, section, "max_right_torso_angle", 60.f));
@@ -644,7 +644,7 @@ void CSightManager::compute_aiming(float const time_delta, float const angular_s
 
         VERIFY(m_animation_id.size());
         VERIFY(m_animation_frame != animation_frame_none);
-        LPCSTR bones[] = {
+        const char* bones[] = {
             pSettings->r_string(object().cNameSect().c_str(), "bone_spin"),
             pSettings->r_string(object().cNameSect().c_str(), "bone_shoulder"),
             pSettings->r_string(object().cNameSect().c_str(), "bone_head"),

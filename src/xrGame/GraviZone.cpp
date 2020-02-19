@@ -12,7 +12,7 @@
 
 CBaseGraviZone::CBaseGraviZone(void) { m_dwTeleTime = 0; }
 CBaseGraviZone::~CBaseGraviZone(void) {}
-void CBaseGraviZone::Load(LPCSTR section)
+void CBaseGraviZone::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -36,7 +36,7 @@ void CBaseGraviZone::Load(LPCSTR section)
         m_sTeleParticlesSmall = NULL;
 }
 
-BOOL CBaseGraviZone::net_Spawn(CSE_Abstract* DC) { return inherited::net_Spawn(DC); }
+bool CBaseGraviZone::net_Spawn(CSE_Abstract* DC) { return inherited::net_Spawn(DC); }
 void CBaseGraviZone::net_Destroy()
 {
     Telekinesis().deactivate();

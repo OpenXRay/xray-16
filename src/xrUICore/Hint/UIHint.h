@@ -28,10 +28,10 @@ public:
     IC bool is_visible() const { return m_visible; }
     IC void set_rect(Frect const& rect) { m_rect.set(rect); }
     IC Frect const& get_rect() const { return m_rect; }
-    void init_from_xml(CUIXml& xml, LPCSTR path);
+    void init_from_xml(CUIXml& xml, const char* path);
 
-    void set_text(LPCSTR text);
-    LPCSTR get_text() const;
+    void set_text(const char* text);
+    const char* get_text() const;
 
     //	virtual void	Update		();
     virtual void Draw();

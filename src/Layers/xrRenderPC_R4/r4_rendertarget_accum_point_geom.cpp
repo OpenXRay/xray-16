@@ -298,13 +298,13 @@ void CRenderTarget::accum_point_geom_create()
         //			D3DPOOL_MANAGED,
         //			&g_accum_point_vb,
         //			0));
-        //		BYTE*	pData				= 0;
+        //		unsigned char*	pData				= 0;
         //		R_CHK						(g_accum_point_vb->Lock(0,0,(void**)&pData,0));
         //		CopyMemory				(pData,du_sphere_vertices,vCount*vSize);
         //		g_accum_point_vb->Unlock	();
 
         g_accum_point_vb.Create(vCount * vSize);
-        BYTE* pData = static_cast<BYTE*>(g_accum_point_vb.Map());
+        unsigned char* pData = static_cast<unsigned char*>(g_accum_point_vb.Map());
         CopyMemory(pData, du_sphere_vertices, vCount * vSize);
         g_accum_point_vb.Unmap(true); // upload vertex data
     }
@@ -313,7 +313,7 @@ void CRenderTarget::accum_point_geom_create()
     {
         u32 iCount = DU_SPHERE_NUMFACES * 3;
 
-        // BYTE*	pData		= 0;
+        // unsigned char*	pData		= 0;
         // R_CHK
         // (HW.pDevice->CreateIndexBuffer(iCount*2,dwUsage,D3DFMT_INDEX16,D3DPOOL_MANAGED,&g_accum_point_ib,0));
         // R_CHK				(g_accum_point_ib->Lock(0,0,(void**)&pData,0));
@@ -321,7 +321,7 @@ void CRenderTarget::accum_point_geom_create()
         // g_accum_point_ib->Unlock	();
 
         g_accum_point_ib.Create(iCount * 2);
-        BYTE* pData = static_cast<BYTE*>(g_accum_point_ib.Map());
+        unsigned char* pData = static_cast<unsigned char*>(g_accum_point_ib.Map());
         CopyMemory(pData, du_sphere_faces, iCount * 2);
         g_accum_point_ib.Unmap(true); // upload index data
     }

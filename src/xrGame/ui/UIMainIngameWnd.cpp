@@ -50,7 +50,7 @@ void test_key(int dik);
 #include "Include/xrRender/Kinematics.h"
 
 using namespace InventoryUtilities;
-// BOOL		g_old_style_ui_hud			= FALSE;
+// bool		g_old_style_ui_hud			= FALSE;
 const u32 g_clWhite = 0xffffffff;
 
 #define DEFAULT_MAP_SCALE 1.f
@@ -403,7 +403,7 @@ void CUIMainIngameWnd::RenderQuickInfos()
         return;
 
     static CGameObject* pObject = NULL;
-    LPCSTR actor_action = pActor->GetDefaultActionForObject();
+    const char* actor_action = pActor->GetDefaultActionForObject();
     UIStaticQuickHelp->Show(NULL != actor_action);
 
     if (NULL != actor_action)
@@ -960,7 +960,7 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
     if (m_ind_boost_rad)
         m_ind_boost_rad->Show(false);
 
-    LPCSTR str_flag = "ui_slow_blinking_alpha";
+    const char* str_flag = "ui_slow_blinking_alpha";
     u8 flags = 0;
     flags |= LA_CYCLIC;
     flags |= LA_ONLYALPHA;

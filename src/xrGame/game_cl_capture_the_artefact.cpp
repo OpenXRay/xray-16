@@ -254,10 +254,10 @@ void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
     CStringTable& st = StringTable();
     string1024 Text;
     // string512 tmp;
-    //	LPSTR	Color_Teams[3]		= {"%c[255,255,255,255]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
+    //	char*	Color_Teams[3]		= {"%c[255,255,255,255]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
     char Color_Main[] = "%c[255,192,192,192]";
     char Color_Artefact[] = "%c[255,255,255,0]";
-    //	LPSTR	TeamsNames[3]		= {"Zero Team", "Team Green", "Team Blue"};
+    //	char*	TeamsNames[3]		= {"Zero Team", "Team Green", "Team Blue"};
 
     switch (msg)
     {
@@ -564,7 +564,7 @@ void game_cl_CaptureTheArtefact::LoadSndMessages()
     LoadSndMessage("dm_snd_messages", "countdown_1", ID_COUNTDOWN_1);
 }
 
-BOOL game_cl_CaptureTheArtefact::CanCallBuyMenu()
+bool game_cl_CaptureTheArtefact::CanCallBuyMenu()
 {
     if (!is_buy_menu_ready())
         return FALSE;
@@ -580,7 +580,7 @@ BOOL game_cl_CaptureTheArtefact::CanCallBuyMenu()
     return TRUE;
 }
 
-BOOL game_cl_CaptureTheArtefact::CanCallInventoryMenu()
+bool game_cl_CaptureTheArtefact::CanCallInventoryMenu()
 {
     if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
     {
@@ -1030,7 +1030,7 @@ bool game_cl_CaptureTheArtefact::OnKeyboardRelease(int key)
     return false;
 }
 
-BOOL game_cl_CaptureTheArtefact::CanCallTeamSelectMenu()
+bool game_cl_CaptureTheArtefact::CanCallTeamSelectMenu()
 {
     VERIFY2(local_player, "local player not initialized");
     if (Phase() != GAME_PHASE_INPROGRESS)
@@ -1635,7 +1635,7 @@ pcstr game_cl_CaptureTheArtefact::getTeamSection(int Team)
 #endif
 }
 
-LPCSTR game_cl_CaptureTheArtefact::GetGameScore(string32& score_dest)
+const char* game_cl_CaptureTheArtefact::GetGameScore(string32& score_dest)
 {
     xr_sprintf(score_dest, "[%d:%d]", greenTeamScore, blueTeamScore);
     return score_dest;

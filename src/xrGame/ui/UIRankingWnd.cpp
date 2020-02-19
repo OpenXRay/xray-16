@@ -295,13 +295,13 @@ void CUIRankingWnd::get_statistic()
     m_stat_info[0]->SetTextColor(color_rgba(170, 170, 170, 255));
     m_stat_info[0]->SetText(buf);
 
-    luabind::functor<LPCSTR> funct;
+    luabind::functor<const char*> funct;
     if (!GEnv.ScriptEngine->functor("pda.get_stat", funct))
         return;
 
     for (u8 i = 1; i < m_stat_count; ++i)
     {
-        LPCSTR str = funct(i);
+        const char* str = funct(i);
         m_stat_info[i]->SetTextColor(color_rgba(170, 170, 170, 255));
         m_stat_info[i]->SetTextST(str);
     }

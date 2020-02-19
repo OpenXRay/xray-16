@@ -3,14 +3,14 @@
 #include "xrServerEntities/xrServer_Object_Base.h"
 
 extern "C" {
-using CreateEntity = XR_IMPORT IServerEntity* __stdcall(LPCSTR section);
+using CreateEntity = XR_IMPORT IServerEntity* __stdcall(const char* section);
 using DestroyEntity = XR_IMPORT void __stdcall(IServerEntity*&);
 };
 
 extern CreateEntity* create_entity;
 extern DestroyEntity* destroy_entity;
 
-IC CSE_Abstract* F_entity_Create(LPCSTR section)
+IC CSE_Abstract* F_entity_Create(const char* section)
 {
     IServerEntity* i = create_entity(section);
     CSE_Abstract* j = smart_cast<CSE_Abstract*>(i);

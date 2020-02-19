@@ -38,7 +38,7 @@ friend class CxImage;
 protected:
 	int Itx, Ity;		// Counters
 	int Stepx, Stepy;
-	BYTE* IterImage;	//  Image pointer
+	unsigned char* IterImage;	//  Image pointer
 	CxImage *ima;
 public:
 	// Constructors
@@ -47,29 +47,29 @@ public:
 	operator CxImage* ();
 
 	// Iterators
-	BOOL ItOK ();
+	bool ItOK ();
 	void Reset ();
 	void Upset ();
-	void SetRow(BYTE *buf, int n);
-	void GetRow(BYTE *buf, int n);
-	BYTE GetByte( ) { return IterImage[Itx]; }
-	void SetByte(BYTE b) { IterImage[Itx] = b; }
-	BYTE* GetRow(void);
-	BYTE* GetRow(int n);
-	BOOL NextRow();
-	BOOL PrevRow();
-	BOOL NextByte();
-	BOOL PrevByte();
+	void SetRow(unsigned char *buf, int n);
+	void GetRow(unsigned char *buf, int n);
+	unsigned char GetByte( ) { return IterImage[Itx]; }
+	void SetByte(unsigned char b) { IterImage[Itx] = b; }
+	unsigned char* GetRow(void);
+	unsigned char* GetRow(int n);
+	bool NextRow();
+	bool PrevRow();
+	bool NextByte();
+	bool PrevByte();
 
 	void SetSteps(int x, int y=0) {  Stepx = x; Stepy = y; }
 	void GetSteps(int *x, int *y) {  *x = Stepx; *y = Stepy; }
-	BOOL NextStep();
-	BOOL PrevStep();
+	bool NextStep();
+	bool PrevStep();
 
 	void SetY(int y);	/* AD - for interlace */
 	int  GetY() {return Ity;}
-	BOOL GetCol(BYTE* pCol, DWORD x);
-	BOOL SetCol(BYTE* pCol, DWORD x);
+	bool GetCol(unsigned char* pCol, unsigned int x);
+	bool SetCol(unsigned char* pCol, unsigned int x);
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ CImageIterator::operator CxImage* ()
 	return ima;
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::ItOK ()
+inline bool CImageIterator::ItOK ()
 {
 	if (ima) return ima->IsInside(Itx, Ity);
 	else	 return FALSE;
@@ -116,14 +116,14 @@ inline void CImageIterator::Upset()
 	IterImage = ima->GetBits() + ima->GetEffWidth()*(ima->GetHeight()-1);
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::NextRow()
+inline bool CImageIterator::NextRow()
 {
 	if (++Ity >= (int)ima->GetHeight()) return 0;
 	IterImage += ima->GetEffWidth();
 	return 1;
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::PrevRow()
+inline bool CImageIterator::PrevRow()
 {
 	if (--Ity < 0) return 0;
 	IterImage -= ima->GetEffWidth();
@@ -137,7 +137,7 @@ inline void CImageIterator::SetY(int y)
 	IterImage = ima->GetBits() + ima->GetEffWidth()*y;
 }
 /////////////////////////////////////////////////////////////////////
-inline void CImageIterator::SetRow(BYTE *buf, int n)
+inline void CImageIterator::SetRow(unsigned char *buf, int n)
 {
 	if (n<0) n = (int)ima->GetEffWidth();
 	else n = MIN(n,(int)ima->GetEffWidth());
@@ -145,24 +145,24 @@ inline void CImageIterator::SetRow(BYTE *buf, int n)
 	if ((IterImage!=NULL)&&(buf!=NULL)&&(n>0)) memcpy(IterImage,buf,n);
 }
 /////////////////////////////////////////////////////////////////////
-inline void CImageIterator::GetRow(BYTE *buf, int n)
+inline void CImageIterator::GetRow(unsigned char *buf, int n)
 {
 	if ((IterImage!=NULL)&&(buf!=NULL)&&(n>0))
 		memcpy(buf,IterImage,MIN(n,(int)ima->GetEffWidth()));
 }
 /////////////////////////////////////////////////////////////////////
-inline BYTE* CImageIterator::GetRow()
+inline unsigned char* CImageIterator::GetRow()
 {
 	return IterImage;
 }
 /////////////////////////////////////////////////////////////////////
-inline BYTE* CImageIterator::GetRow(int n)
+inline unsigned char* CImageIterator::GetRow(int n)
 {
 	SetY(n);
 	return IterImage;
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::NextByte()
+inline bool CImageIterator::NextByte()
 {
 	if (++Itx < (int)ima->GetEffWidth()) return 1;
 	else
@@ -174,7 +174,7 @@ inline BOOL CImageIterator::NextByte()
 			return 0;
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::PrevByte()
+inline bool CImageIterator::PrevByte()
 {
   if (--Itx >= 0) return 1;
   else
@@ -186,7 +186,7 @@ inline BOOL CImageIterator::PrevByte()
 		  return 0;
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::NextStep()
+inline bool CImageIterator::NextStep()
 {
 	Itx += Stepx;
 	if (Itx < (int)ima->GetEffWidth()) return 1;
@@ -201,7 +201,7 @@ inline BOOL CImageIterator::NextStep()
 	}
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::PrevStep()
+inline bool CImageIterator::PrevStep()
 {
 	Itx -= Stepx;
 	if (Itx >= 0) return 1;
@@ -216,34 +216,34 @@ inline BOOL CImageIterator::PrevStep()
 	}
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::GetCol(BYTE* pCol, DWORD x)
+inline bool CImageIterator::GetCol(unsigned char* pCol, unsigned int x)
 {
 	if ((pCol==0)||(ima->GetBpp()<8)||(x>=ima->GetWidth()))
 		return 0;
-	DWORD h = ima->GetHeight();
-	//DWORD line = ima->GetEffWidth();
-	BYTE bytes = (BYTE)(ima->GetBpp()>>3);
-	BYTE* pSrc;
-	for (DWORD y=0;y<h;y++){
+	unsigned int h = ima->GetHeight();
+	//unsigned int line = ima->GetEffWidth();
+	unsigned char bytes = (unsigned char)(ima->GetBpp()>>3);
+	unsigned char* pSrc;
+	for (unsigned int y=0;y<h;y++){
 		pSrc = ima->GetBits(y) + x*bytes;
-		for (BYTE w=0;w<bytes;w++){
+		for (unsigned char w=0;w<bytes;w++){
 			*pCol++=*pSrc++;
 		}
 	}
 	return 1;
 }
 /////////////////////////////////////////////////////////////////////
-inline BOOL CImageIterator::SetCol(BYTE* pCol, DWORD x)
+inline bool CImageIterator::SetCol(unsigned char* pCol, unsigned int x)
 {
 	if ((pCol==0)||(ima->GetBpp()<8)||(x>=ima->GetWidth()))
 		return 0;
-	DWORD h = ima->GetHeight();
-	//DWORD line = ima->GetEffWidth();
-	BYTE bytes = (BYTE)(ima->GetBpp()>>3);
-	BYTE* pSrc;
-	for (DWORD y=0;y<h;y++){
+	unsigned int h = ima->GetHeight();
+	//unsigned int line = ima->GetEffWidth();
+	unsigned char bytes = (unsigned char)(ima->GetBpp()>>3);
+	unsigned char* pSrc;
+	for (unsigned int y=0;y<h;y++){
 		pSrc = ima->GetBits(y) + x*bytes;
-		for (BYTE w=0;w<bytes;w++){
+		for (unsigned char w=0;w<bytes;w++){
 			*pSrc++=*pCol++;
 		}
 	}

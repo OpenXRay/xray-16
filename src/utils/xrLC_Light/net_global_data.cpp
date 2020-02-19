@@ -9,13 +9,13 @@ namespace lc_net
 static net_globals globs;
 
 net_globals& globals() { return globs; }
-static LPCSTR global_data_file_path(LPCSTR name, string_path& path_name)
+static const char* global_data_file_path(const char* name, string_path& path_name)
 {
     FS.update_path(path_name, "$app_root$", name);
     return path_name;
 }
 
-bool global_data_file_path(LPCSTR name, IAgent* agent, DWORD sessionId, string_path& path_name)
+bool global_data_file_path(const char* name, IAgent* agent, unsigned int sessionId, string_path& path_name)
 {
     HRESULT rz = agent->GetSessionCacheDirectory(sessionId, path_name);
     if (rz != S_OK)
@@ -83,7 +83,7 @@ private:
         //
         outStream->Write(&_id, sizeof(_id));
     }
-    virtual bool on_task_receive(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+    virtual bool on_task_receive(IAgent* agent, unsigned int sessionId, IGenericStream* inStream)
     {
         //
         const xr_vector<e_net_globals>& v = gl_gl_reg().get_globals(gl_type);
@@ -110,7 +110,7 @@ private:
         return false;
     }
 
-    virtual LPCSTR files(string_path& buf)
+    virtual const char* files(string_path& buf)
     {
         //
 
@@ -135,7 +135,7 @@ private:
         impl::create_data_file(path_name);
     }
 
-    bool create_data(u32 id, IAgent* agent, DWORD sessionId)
+    bool create_data(u32 id, IAgent* agent, unsigned int sessionId)
     {
         if (_id == id)
             return true;

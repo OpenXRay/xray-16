@@ -18,7 +18,7 @@ class CALifeSimulator : public CALifeUpdateManager, public CALifeInteractionMana
 {
 protected:
     virtual void setup_simulator(CSE_ALifeObject* object);
-    virtual void reload(LPCSTR section);
+    virtual void reload(const char* section);
 
 public:
     CALifeSimulator(IPureServer* server, shared_str* command_line);

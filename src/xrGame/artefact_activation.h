@@ -33,7 +33,7 @@ public:
         shared_str m_animation;
 
         SStateDef() : m_time(0.0f){};
-        void Load(LPCSTR section, LPCSTR name);
+        void Load(const char* section, const char* name);
     };
 
     SArtefactActivation(CArtefact* af, u32 owner_id);

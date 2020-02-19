@@ -20,7 +20,7 @@
 
 using namespace StalkerDecisionSpace;
 
-CStalkerDangerUnknownPlanner::CStalkerDangerUnknownPlanner(CAI_Stalker* object, LPCSTR action_name)
+CStalkerDangerUnknownPlanner::CStalkerDangerUnknownPlanner(CAI_Stalker* object, const char* action_name)
     : inherited(object, action_name)
 {
 }

@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC CScriptValue::CScriptValue(luabind::object object, LPCSTR name)
+IC CScriptValue::CScriptValue(luabind::object object, const char* name)
 {
     m_object = object;
     m_name = name;

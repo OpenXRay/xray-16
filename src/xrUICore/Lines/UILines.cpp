@@ -69,8 +69,8 @@ void CUILines::SetText(const char* text)
         Reset();
     }
 }
-void CUILines::SetTextST(LPCSTR str_id) { SetText(*gStringTable->translate(str_id)); }
-LPCSTR CUILines::GetText() { return m_text.c_str(); }
+void CUILines::SetTextST(const char* str_id) { SetText(*gStringTable->translate(str_id)); }
+const char* CUILines::GetText() { return m_text.c_str(); }
 void CUILines::Reset() { m_lines.clear(); }
 float get_str_width(CGameFont* pFont, char ch)
 {
@@ -101,7 +101,7 @@ void CUILines::ParseText(bool force)
         line->AddSubLine(&subline);
     }
 
-    BOOL bNewLines = FALSE;
+    bool bNewLines = FALSE;
 
     if (uFlags.test(flRecognizeNewLine))
         if (m_pFont->IsMultibyte())
@@ -289,7 +289,7 @@ void CUILines::SetFont(CGameFont* pFont)
     m_pFont = pFont;
 }
 
-LPCSTR GetElipsisText(CGameFont* pFont, float width, LPCSTR source_text, LPSTR buff, int buff_len)
+const char* GetElipsisText(CGameFont* pFont, float width, const char* source_text, char* buff, int buff_len)
 {
     float text_len = pFont->SizeOf_(source_text);
     UI().ClientToScreenScaledWidth(text_len);
@@ -366,7 +366,7 @@ void CUILines::Draw(float x, float y)
                 u32 buff_len = sizeof(char) * xr_strlen(m_text.c_str()) + 1;
 
                 char* p = static_cast<char*>(xr_alloca(buff_len));
-                LPCSTR str = GetElipsisText(m_pFont, m_wndSize.x, m_text.c_str(), p, buff_len);
+                const char* str = GetElipsisText(m_pFont, m_wndSize.x, m_text.c_str(), p, buff_len);
 
                 m_pFont->Out(text_pos.x, text_pos.y, "%s", str);
             }

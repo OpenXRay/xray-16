@@ -40,7 +40,7 @@ class CALifeCombatManager : public virtual CALifeSimulatorBase, CRandom
                 void					vfFinishCombat				(ALife::ECombatResult		tCombatResult);
     **/
 public:
-    CALifeCombatManager(IPureServer* server, LPCSTR section);
+    CALifeCombatManager(IPureServer* server, const char* section);
     /**
         virtual							~CALifeCombatManager		();
         IC		ALife::ECombatType		combat_type					() const;

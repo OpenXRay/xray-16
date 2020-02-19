@@ -19,7 +19,7 @@ UIHint::UIHint()
     m_rect.set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 }
 
-void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)
+void UIHint::init_from_xml(CUIXml& xml, const char* path)
 {
     CUIXmlInitBase::InitWindow(xml, path, 0, this);
 
@@ -43,7 +43,7 @@ void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)
     m_visible = false;
 }
 
-void UIHint::set_text(LPCSTR text)
+void UIHint::set_text(const char* text)
 {
     if (!text || !xr_strlen(text))
     {
@@ -62,7 +62,7 @@ void UIHint::set_text(LPCSTR text)
     SetWndSize(m_background->GetWndSize());
 }
 
-LPCSTR UIHint::get_text() const { return m_text->GetText(); }
+const char* UIHint::get_text() const { return m_text->GetText(); }
 void UIHint::Draw()
 {
     if (m_visible)

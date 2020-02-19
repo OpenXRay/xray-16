@@ -27,7 +27,7 @@ class CCartridge : public IAnticheatDumpable
 {
 public:
     CCartridge();
-    void Load(LPCSTR section, u8 LocalAmmoType);
+    void Load(const char* section, u8 LocalAmmoType);
     float Weight() const;
 
     shared_str m_ammoSect;
@@ -60,8 +60,8 @@ public:
     virtual ~CWeaponAmmo(void);
 
     virtual CWeaponAmmo* cast_weapon_ammo() { return this; }
-    virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);

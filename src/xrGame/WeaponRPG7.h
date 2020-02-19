@@ -11,11 +11,11 @@ public:
     CWeaponRPG7();
     virtual ~CWeaponRPG7();
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void ReloadMagazine();
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
     virtual void switch2_Fire();
     virtual void FireTrace(const Fvector& P, const Fvector& D);
     virtual void on_a_hud_attach();

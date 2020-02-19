@@ -63,9 +63,9 @@ public:
     bool upgrade_install(CInventoryItem& item, shared_str const& upgrade_id, bool loading);
     void init_install(CInventoryItem& item);
 
-    bool compute_range(LPCSTR parameter, float& low, float& high);
-    LPCSTR get_item_scheme(CInventoryItem& item);
-    LPCSTR get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index);
+    bool compute_range(const char* parameter, float& low, float& high);
+    const char* get_item_scheme(CInventoryItem& item);
+    const char* get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index);
 
 #ifdef DEBUG
     void log_hierarchy();
@@ -82,7 +82,7 @@ private:
     Upgrade* upgrade_verify(shared_str const& item_section, shared_str const& upgrade_id);
     static bool item_upgrades_exist(shared_str const& item_id);
 
-    void compute_range_section(LPCSTR section, LPCSTR parameter, float& low, float& high);
+    void compute_range_section(const char* section, const char* parameter, float& low, float& high);
 
 private:
     Roots_type m_roots;

@@ -24,7 +24,7 @@ void CRenderTarget::accum_spot(light* L)
             shader = s_accum_spot;
     }
 
-    BOOL bIntersect = FALSE; // enable_scissor(L);
+    bool bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -196,7 +196,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
-    BOOL bIntersect = FALSE; // enable_scissor(L);
+    bool bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -350,8 +350,8 @@ void CRenderTarget::accum_volumetric(light* L)
         //	It's slow. Make this when shader is created
         {
             pcstr pszSMapName;
-            BOOL b_HW_smap = RImplementation.o.HW_smap;
-            BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
+            bool b_HW_smap = RImplementation.o.HW_smap;
+            bool b_HW_PCF = RImplementation.o.HW_smap_PCF;
             if (b_HW_smap)
             {
                 if (b_HW_PCF)

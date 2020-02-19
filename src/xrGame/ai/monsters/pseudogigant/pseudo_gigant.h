@@ -36,13 +36,13 @@ private:
     SVelocityParam m_fsVelocityJumpPrepare;
     SVelocityParam m_fsVelocityJumpGround;
 
-    LPCSTR m_kick_particles;
+    const char* m_kick_particles;
 
 public:
     CPseudoGigant();
     virtual ~CPseudoGigant();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
     virtual void reinit();
 
     virtual bool ability_earthquake() { return true; }

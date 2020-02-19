@@ -15,14 +15,14 @@ class moving_bones_snd_player
     IKinematics* kinematics;
 
 public:
-    moving_bones_snd_player(IKinematics* K, CInifile* ini, LPCSTR section, const Fmatrix& object);
+    moving_bones_snd_player(IKinematics* K, CInifile* ini, const char* section, const Fmatrix& object);
     ~moving_bones_snd_player();
     void update(float time_delta, CGameObject& object);
     void play(CGameObject& O);
     void stop();
     IC bool is_active() { return true; /*!!sound._feedback();*/ }
 private:
-    void load(IKinematics& K, CInifile& ini, LPCSTR section, const Fmatrix& object);
+    void load(IKinematics& K, CInifile& ini, const char* section, const Fmatrix& object);
     Fmatrix& bone_matrix();
 };
 

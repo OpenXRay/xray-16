@@ -31,7 +31,7 @@ IC bool FaceEqual(Face& F1, Face& F2)
     return false;
 }
 
-void SaveUVM(LPCSTR fname, xr_vector<b_rc_face>& vm)
+void SaveUVM(const char* fname, xr_vector<b_rc_face>& vm)
 {
     IWriter* W = FS.w_open(fname);
     string256 tmp;
@@ -46,7 +46,7 @@ void SaveUVM(LPCSTR fname, xr_vector<b_rc_face>& vm)
     FS.w_close(W);
 }
 
-void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
+void CBuild::BuildRapid(bool bSaveForOtherCompilers)
 {
     float p_total = 0;
     float p_cost = 1.f / (lc_global_data()->g_faces().size());
@@ -84,7 +84,7 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
         adjacent_vec.erase(std::unique(adjacent_vec.begin(), adjacent_vec.end()), adjacent_vec.end());
 
         // Unique
-        BOOL bAlready = FALSE;
+        bool bAlready = FALSE;
         for (u32 ait = 0; ait < adjacent_vec.size(); ++ait)
         {
             Face* Test = adjacent_vec[ait];
@@ -123,7 +123,7 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
     Logger.Status("Building search tree...");
     lc_global_data()->create_rcmodel(CL);
 
-    extern void SaveAsSMF(LPCSTR fname, CDB::CollectorPacked & CL);
+    extern void SaveAsSMF(const char* fname, CDB::CollectorPacked & CL);
 
     // save source SMF
     string_path fn;

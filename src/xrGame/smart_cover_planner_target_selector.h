@@ -36,7 +36,7 @@ private:
 public:
     virtual void setup(animation_planner* object, CPropertyStorage* storage);
     virtual void update();
-    virtual LPCSTR object_name() const;
+    virtual const char* object_name() const;
     void callback(callback_type const& callback);
     IC callback_type const& callback() const;
 };

@@ -112,7 +112,7 @@ public:
     float BonceDamageFactor() { return m_BonceDamageFactor; }
     void set_movement_position(const Fvector& pos);
     void ForceTransform(const Fmatrix& m);
-    void set_use_hit_anims(bool v) { m_flags.set(fl_use_hit_anims, (BOOL)v); }
+    void set_use_hit_anims(bool v) { m_flags.set(fl_use_hit_anims, (bool)v); }
     //////////////////base hierarchi methods///////////////////////////////////////////////////
     void CreateCharacterSafe();
     void CreateCharacter();
@@ -125,7 +125,7 @@ public:
     void destroy_imotion();
     void in_NetRelcase(IGameObject* O);
     void in_Init();
-    void in_Load(LPCSTR section);
+    void in_Load(const char* section);
     void in_Hit(SHit& H, bool is_killing = false);
     void in_NetSave(NET_Packet& P);
     void in_ChangeVisual();

@@ -39,7 +39,7 @@ void reward_manager::load_rewards()
     CInifile rewards_config(tmp_reader);
 
     u32 reward_index = 0;
-    LPCSTR section_name = NULL;
+    const char* section_name = NULL;
     char tmp_dst_buff[16];
 
     STRCONCAT(section_name, section_name_prefix, xr_itoa(reward_index, tmp_dst_buff, 10));
@@ -76,7 +76,7 @@ void reward_manager::load_reward_item(CInifile& reward_config, u32 const index, 
     tmp_descriptor->m_width = reward_config.r_u32(section, "ingame_texture_width");
     tmp_descriptor->m_height = reward_config.r_u32(section, "ingame_texture_height");
 
-    LPCSTR tmp_sound_name = reward_config.r_string(section, "play_sound");
+    const char* tmp_sound_name = reward_config.r_string(section, "play_sound");
     tmp_descriptor->m_play_sound.create(tmp_sound_name, st_Effect, 0);
     tmp_descriptor->m_process_time = reward_config.r_u32(section, "reward_time");
 

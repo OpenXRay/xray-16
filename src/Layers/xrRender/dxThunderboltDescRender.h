@@ -11,7 +11,7 @@ class dxThunderboltDescRender : public IThunderboltDescRender
 public:
     virtual void Copy(IThunderboltDescRender& _in);
 
-    virtual void CreateModel(LPCSTR m_name);
+    virtual void CreateModel(const char* m_name);
     virtual void DestroyModel();
     // private:
 public:

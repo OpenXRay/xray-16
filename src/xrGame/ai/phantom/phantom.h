@@ -56,7 +56,7 @@ private:
 
     Fmatrix XFORM_center();
 
-    CParticlesObject* PlayParticles(const shared_str& name, BOOL bAutoRemove, const Fmatrix& xform);
+    CParticlesObject* PlayParticles(const shared_str& name, bool bAutoRemove, const Fmatrix& xform);
     //	void				PlayMotion					(MotionID);
 
     void UpdatePosition(const Fvector& tgt_pos);
@@ -67,8 +67,8 @@ public:
     CPhantom();
     virtual ~CPhantom();
 
-    virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void net_Export(NET_Packet& P);
@@ -83,9 +83,9 @@ public:
     virtual void HitImpulse(float amount, Fvector& vWorldDir, Fvector& vLocalDir) {}
     virtual void Hit(SHit* pHDS);
 
-    virtual BOOL IsVisibleForHUD() { return false; }
+    virtual bool IsVisibleForHUD() { return false; }
     virtual bool IsVisibleForZones() { return false; }
-    virtual BOOL UsedAI_Locations() { return false; }
+    virtual bool UsedAI_Locations() { return false; }
     virtual CEntity* cast_entity() { return this; }
 
     void SetEnemy(IGameObject* enemy) { m_enemy = enemy; } //Alundaio

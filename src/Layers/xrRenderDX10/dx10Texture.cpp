@@ -10,9 +10,9 @@
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
-void fix_texture_name(LPSTR fn)
+void fix_texture_name(char* fn)
 {
-    LPSTR _ext = strext(fn);
+    char* _ext = strext(fn);
     if (_ext && (!xr_stricmp(_ext, ".tga") || !xr_stricmp(_ext, ".dds") || !xr_stricmp(_ext, ".bmp") ||
         !xr_stricmp(_ext, ".ogm")))
     {
@@ -20,7 +20,7 @@ void fix_texture_name(LPSTR fn)
     }
 }
 
-int get_texture_load_lod(LPCSTR fn)
+int get_texture_load_lod(const char* fn)
 {
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
     auto it_ = sect.Data.cbegin();
@@ -109,7 +109,7 @@ IC void Reduce(int& w, int& h, int& l, int& skip)
         h = 1;
 }
 
-IC void Reduce(UINT& w, UINT& h, int l, int skip)
+IC void Reduce(unsigned int& w, unsigned int& h, int l, int skip)
 {
     while ((l > 1) && skip)
     {
@@ -125,7 +125,7 @@ IC void Reduce(UINT& w, UINT& h, int l, int skip)
         h = 1;
 }
 
-void TW_Save(ID3DTexture2D* T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
+void TW_Save(ID3DTexture2D* T, const char* name, const char* prefix, const char* postfix)
 {
     string256 fn;
     strconcat(sizeof(fn), fn, name, "_", prefix, "-", postfix);
@@ -204,9 +204,9 @@ IC  void    TW_Iterate_1OP
  const _It              pred
  )
 {
-    DWORD mips                          = t_dst->GetLevelCount();
+    unsigned int mips                          = t_dst->GetLevelCount();
     R_ASSERT                            (mips == t_src->GetLevelCount());
-    for (DWORD i = 0; i < mips; i++)    {
+    for (unsigned int i = 0; i < mips; i++)    {
         D3DLOCKED_RECT              Rsrc,Rdst;
         D3DSURFACE_DESC             desc,descS;
 
@@ -218,8 +218,8 @@ IC  void    TW_Iterate_1OP
         t_dst->LockRect             (i,&Rdst,0,0);
         for (u32 y = 0; y < desc.Height; y++)   {
             for (u32 x = 0; x < desc.Width; x++)    {
-                DWORD&  pSrc    = *(((DWORD*)((BYTE*)Rsrc.pBits + (y * Rsrc.Pitch)))+x);
-                DWORD&  pDst    = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch)))+x);
+                unsigned int&  pSrc    = *(((unsigned int*)((unsigned char*)Rsrc.pBits + (y * Rsrc.Pitch)))+x);
+                unsigned int&  pDst    = *(((unsigned int*)((unsigned char*)Rdst.pBits + (y * Rdst.Pitch)))+x);
                 pDst            = pred(pDst,pSrc);
             }
         }
@@ -236,10 +236,10 @@ IC  void    TW_Iterate_2OP
  const _It              pred
  )
 {
-    DWORD mips                          = t_dst->GetLevelCount();
+    unsigned int mips                          = t_dst->GetLevelCount();
     R_ASSERT                            (mips == t_src0->GetLevelCount());
     R_ASSERT                            (mips == t_src1->GetLevelCount());
-    for (DWORD i = 0; i < mips; i++)    {
+    for (unsigned int i = 0; i < mips; i++)    {
         D3DLOCKED_RECT              Rsrc0,Rsrc1,Rdst;
         D3DSURFACE_DESC             desc,descS0,descS1;
 
@@ -254,9 +254,9 @@ IC  void    TW_Iterate_2OP
         t_dst->LockRect             (i,&Rdst,   0,0);
         for (u32 y = 0; y < desc.Height; y++)   {
             for (u32 x = 0; x < desc.Width; x++)    {
-                DWORD&  pSrc0   = *(((DWORD*)((BYTE*)Rsrc0.pBits + (y * Rsrc0.Pitch)))+x);
-                DWORD&  pSrc1   = *(((DWORD*)((BYTE*)Rsrc1.pBits + (y * Rsrc1.Pitch)))+x);
-                DWORD&  pDst    = *(((DWORD*)((BYTE*)Rdst.pBits  + (y * Rdst.Pitch)))+x);
+                unsigned int&  pSrc0   = *(((unsigned int*)((unsigned char*)Rsrc0.pBits + (y * Rsrc0.Pitch)))+x);
+                unsigned int&  pSrc1   = *(((unsigned int*)((unsigned char*)Rsrc1.pBits + (y * Rsrc1.Pitch)))+x);
+                unsigned int&  pDst    = *(((unsigned int*)((unsigned char*)Rdst.pBits  + (y * Rdst.Pitch)))+x);
                 pDst            = pred(pDst,pSrc0,pSrc1);
             }
         }
@@ -302,7 +302,7 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
     (color_get_R(s)+color_get_G(s)+color_get_B(s))/3    );  // height
 }
 */
-ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStaging)
+ID3DBaseTexture* CRender::texture_load(const char* fRName, u32& ret_msize, bool bStaging)
 {
 //  Moved here just to avoid warning
 #ifdef USE_DX11

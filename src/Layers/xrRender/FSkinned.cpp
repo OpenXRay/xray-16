@@ -390,23 +390,23 @@ void get_pos_bones(const T& v, Fvector& p, CKinematics* Parent)
 }
 
 template <typename T>
-BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
+bool pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
 {
-    void* data = static_cast<BYTE*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true)); // read-back
+    void* data = static_cast<unsigned char*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true)); // read-back
     T* vertices = static_cast<T*>(data);
     const bool intersect = pick_bone<T, T*>(vertices, Parent, r, dist, S, D, indices, faces);
     V->p_rm_Vertices->Unmap();
     return intersect;
 }
 
-BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir,
+bool CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir,
     Fvisual* V, u16 bone_id, u32 iBase, u32 /*iCount*/)
 {
     VERIFY(Parent && ChildIDX != u16(-1));
     CBoneData& BD = Parent->LL_GetData(bone_id);
     CBoneData::FacesVec& faces = BD.child_faces[ChildIDX];
-    BOOL result = FALSE;
+    bool result = FALSE;
     u16* indices = static_cast<u16*>(V->p_rm_Indices->Map(0, V->dwPrimitives * 3, true));
     switch (RenderMode)
     {
@@ -465,12 +465,12 @@ BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fv
     return result;
 }
 
-BOOL CSkeletonX_ST::PickBone(
+bool CSkeletonX_ST::PickBone(
     IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id)
 {
     return inherited2::_PickBone(r, dist, start, dir, this, bone_id, iBase, iCount);
 }
-BOOL CSkeletonX_PM::PickBone(
+bool CSkeletonX_PM::PickBone(
     IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id)
 {
     FSlideWindow& SW = nSWI.sw[0];

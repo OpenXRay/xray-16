@@ -84,7 +84,7 @@ struct Fcolor
         return *this;
     }
     u32 get() const noexcept { return color_rgba_f(r, g, b, a); }
-    u32 get_windows() const noexcept // Get color as a Windows DWORD value.
+    u32 get_windows() const noexcept // Get color as a Windows unsigned int value.
     {
         u8 _a, _r, _g, _b;
         _a = u8(a*255.f);
@@ -93,7 +93,7 @@ struct Fcolor
         _b = u8(b*255.f);
         return (u32)(_a << 24) | (_b << 16) | (_g << 8) | _r;
     }
-    Fcolor& set_windows(u32 dw) noexcept // Set color from a Windows DWORD color value.
+    Fcolor& set_windows(u32 dw) noexcept // Set color from a Windows unsigned int color value.
     {
         const float f = 1.0f / 255.0f;
         a = f * (float)(u8)(dw >> 24);

@@ -41,7 +41,7 @@ public:
     void* GetBuffer() { return m_buff; }
     void SetLen(u32 l) { m_len = l; }
     u32 GetLen() const { return m_len; }
-    BOOL r_string(char* dst)
+    bool r_string(char* dst)
     {
         int sz;
         r_int(sz);
@@ -49,7 +49,7 @@ public:
         return TRUE;
     }
 
-    BOOL w_string(const char* dst)
+    bool w_string(const char* dst)
     {
         size_t sz = strlen(dst);
         w_int((int)sz);
@@ -57,44 +57,44 @@ public:
         return TRUE;
     }
 
-    BOOL r_float(float& dst)
+    bool r_float(float& dst)
     {
         Read(&dst, sizeof(float));
         return TRUE;
     }
 
-    BOOL w_float(const float src)
+    bool w_float(const float src)
     {
         Write(&src, sizeof(float));
         return TRUE;
     }
 
-    BOOL r_int(int& dst)
+    bool r_int(int& dst)
     {
         Read(&dst, sizeof(int));
         return TRUE;
     }
 
-    BOOL w_int(const int src)
+    bool w_int(const int src)
     {
         Write(&src, sizeof(int));
         return TRUE;
     }
 
-    BOOL r_buff(void* dst, int sz)
+    bool r_buff(void* dst, int sz)
     {
         Read(dst, sz);
         return TRUE;
     }
 
-    BOOL w_buff(void* src, int sz)
+    bool w_buff(void* src, int sz)
     {
         Write(src, sz);
         return TRUE;
     }
 };
 
-inline HANDLE CreateMailSlotByName(LPCSTR slotName)
+inline HANDLE CreateMailSlotByName(const char* slotName)
 {
 #if defined(WINDOWS)
     HANDLE hSlot = CreateMailslot(slotName,
@@ -107,10 +107,10 @@ inline HANDLE CreateMailSlotByName(LPCSTR slotName)
 #endif
 }
 
-inline BOOL CheckExisting(LPCSTR slotName)
+inline bool CheckExisting(const char* slotName)
 {
     HANDLE hFile;
-    BOOL res;
+    bool res;
 #if defined(WINDOWS)
     hFile = CreateFile(slotName, GENERIC_WRITE,
         FILE_SHARE_READ, // required to write to a mailslot
@@ -122,11 +122,12 @@ inline BOOL CheckExisting(LPCSTR slotName)
     return res;
 }
 
-inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
+inline bool SendMailslotMessage(const char* slotName, CMailSlotMsg& msg)
 {
-    BOOL fResult;
+    bool fResult;
     HANDLE hFile;
     DWORD cbWritten;
+
 #if defined(WINDOWS)
     hFile = CreateFile(slotName, GENERIC_WRITE,
         FILE_SHARE_READ, // required to write to a mailslot
@@ -142,10 +143,10 @@ inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
     return fResult;
 }
 
-inline BOOL CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
+inline bool CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
 {
     DWORD cbMessage, cMessage, cbRead;
-    BOOL fResult;
+    bool fResult;
 #if defined(WINDOWS)
     HANDLE hEvent;
     OVERLAPPED ov;

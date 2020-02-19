@@ -196,7 +196,7 @@ bool CScriptGameObject::in_smart_cover() const
     return (stalker->movement().in_smart_cover());
 }
 
-void CScriptGameObject::set_dest_smart_cover(LPCSTR cover_id)
+void CScriptGameObject::set_dest_smart_cover(const char* cover_id)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -234,7 +234,7 @@ CCoverPoint const* CScriptGameObject::get_dest_smart_cover()
 
     return (stalker->movement().target_params().cover());
 }
-LPCSTR CScriptGameObject::get_dest_smart_cover_name()
+const char* CScriptGameObject::get_dest_smart_cover_name()
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -247,7 +247,7 @@ LPCSTR CScriptGameObject::get_dest_smart_cover_name()
     return (stalker->movement().target_params().cover_id().c_str());
 }
 
-void CScriptGameObject::set_dest_loophole(LPCSTR loophole_id)
+void CScriptGameObject::set_dest_loophole(const char* loophole_id)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -312,7 +312,7 @@ void CScriptGameObject::set_smart_cover_target(CScriptGameObject* enemy_object)
     stalker->movement().target_params().cover_fire_object(&enemy_object->object());
 }
 
-bool CScriptGameObject::in_loophole_fov(LPCSTR cover_id, LPCSTR loophole_id, Fvector object_position) const
+bool CScriptGameObject::in_loophole_fov(const char* cover_id, const char* loophole_id, Fvector object_position) const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -338,7 +338,7 @@ bool CScriptGameObject::in_current_loophole_fov(Fvector object_position) const
     return (stalker->movement().in_current_loophole_fov(object_position));
 }
 
-bool CScriptGameObject::in_loophole_range(LPCSTR cover_id, LPCSTR loophole_id, Fvector object_position) const
+bool CScriptGameObject::in_loophole_range(const char* cover_id, const char* loophole_id, Fvector object_position) const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)

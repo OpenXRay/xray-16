@@ -17,7 +17,7 @@ CSector::CSector(u32 ID)
 }
 
 CSector::~CSector() {}
-IC BOOL ValidateMerge(Fbox& bb_base, Fbox& bb, float& volume, float SLimit)
+IC bool ValidateMerge(Fbox& bb_base, Fbox& bb, float& volume, float SLimit)
 {
     // Size
     Fbox merge;
@@ -43,7 +43,7 @@ void CSector::BuildHierrarhy()
 {
     Fvector scene_size;
     float delimiter;
-    BOOL bAnyNode = FALSE;
+    bool bAnyNode = FALSE;
 
     // calc scene BB
     Fbox& scene_bb = pBuild->scene_bb;

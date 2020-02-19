@@ -110,7 +110,7 @@ void CRenderTarget::accum_volumetric_geom_create()
         //	D3DPOOL_MANAGED,
         //	&g_accum_volumetric_vb,
         //	0));
-        //BYTE*	pData				= 0;
+        //unsigned char*	pData				= 0;
         //R_CHK						(g_accum_volumetric_vb->Lock(0,0,(void**)&pData,0));
         //Slice	*pSlice = (Slice*)pData;
         //float t=0;
@@ -146,7 +146,7 @@ void CRenderTarget::accum_volumetric_geom_create()
     {
         const u32 iCount = VOLUMETRIC_SLICES * 6;
 
-        //BYTE*	pData		= 0;
+        //unsigned char*	pData		= 0;
         //R_CHK				(HW.pDevice->CreateIndexBuffer(iCount*2,dwUsage,D3DFMT_INDEX16,D3DPOOL_MANAGED,&g_accum_volumetric_ib,0));
         //R_CHK				(g_accum_volumetric_ib->Lock(0,0,(void**)&pData,0));
         //u16 *pInd = (u16*) pData;
@@ -162,7 +162,7 @@ void CRenderTarget::accum_volumetric_geom_create()
         //}
         //g_accum_volumetric_ib->Unlock	();
 
-        BYTE Datap[iCount * 2];
+        unsigned char Datap[iCount * 2];
 
         u16* pInd = (u16*)Datap;
         for (u16 i = 0; i < VOLUMETRIC_SLICES; ++i, pInd += 6)

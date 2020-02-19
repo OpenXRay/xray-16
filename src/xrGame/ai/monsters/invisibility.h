@@ -18,7 +18,7 @@ class CInvisibility
     float m_speed; // energy change speed (external)
 
 protected:
-    virtual void reload(LPCSTR section);
+    virtual void reload(const char* section);
     virtual void reinit();
     virtual void frame_update();
 

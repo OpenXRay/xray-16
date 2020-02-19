@@ -1,6 +1,6 @@
 #pragma once
 
-IC void CMeleeChecker::load(LPCSTR section)
+IC void CMeleeChecker::load(const char* section)
 {
     m_as_min_dist = pSettings->r_float(section, "as_min_dist");
     m_as_step = pSettings->r_float(section, "as_step");

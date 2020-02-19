@@ -16,8 +16,8 @@ public:
     CArtefact();
     virtual ~CArtefact();
 
-    virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void OnH_A_Chield();
@@ -31,8 +31,8 @@ public:
 
     virtual bool CanTake() const;
 
-    virtual BOOL renderable_ShadowGenerate() { return FALSE; }
-    virtual BOOL renderable_ShadowReceive() { return TRUE; }
+    virtual bool renderable_ShadowGenerate() { return FALSE; }
+    virtual bool renderable_ShadowReceive() { return TRUE; }
     virtual void create_physic_shell();
 
     virtual CArtefact* cast_artefact() { return this; }
@@ -72,7 +72,7 @@ public:
     IC u8 GetAfRank() const { return m_af_rank; }
     IC bool CanBeActivated() { return m_bCanSpawnZone; };
     void ActivateArtefact();
-    void FollowByPath(LPCSTR path_name, int start_idx, Fvector magic_force);
+    void FollowByPath(const char* path_name, int start_idx, Fvector magic_force);
     bool CanBeInvisible();
     void SwitchVisibility(bool);
 
@@ -114,7 +114,7 @@ public:
     virtual bool IsHidden() const { return GetState() == eHidden; }
     // optimization FAST/SLOW mode
     u32 o_render_frame;
-    BOOL o_fastmode;
+    bool o_fastmode;
     IC void o_switch_2_fast()
     {
         if (o_fastmode)
@@ -145,7 +145,7 @@ struct SArtefactDetectorsSupport
     SArtefactDetectorsSupport(CArtefact* A);
     ~SArtefactDetectorsSupport();
     void SetVisible(bool);
-    void FollowByPath(LPCSTR path_name, int start_idx, Fvector force);
+    void FollowByPath(const char* path_name, int start_idx, Fvector force);
     void UpdateOnFrame();
     void Blink();
 };

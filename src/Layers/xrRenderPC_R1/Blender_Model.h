@@ -13,8 +13,8 @@ public:
     xrP_BOOL oBlend;
 
 public:
-    virtual LPCSTR getComment() { return "MODEL: Default"; }
-    virtual BOOL canBeLMAPped() { return FALSE; }
+    virtual const char* getComment() { return "MODEL: Default"; }
+    virtual bool canBeLMAPped() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

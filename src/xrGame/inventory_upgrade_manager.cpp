@@ -157,7 +157,7 @@ bool Manager::item_upgrades_exist(shared_str const& item_id)
 
 void Manager::load_all_inventory()
 {
-    LPCSTR items_section = "upgraded_inventory";
+    const char* items_section = "upgraded_inventory";
 
     if (!pSettings->section_exist(items_section) && ShadowOfChernobylMode)
         return;
@@ -188,7 +188,7 @@ void Manager::load_all_inventory()
 
     /*
     float low, high; ///? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    LPCSTR param = "cost";
+    const char* param = "cost";
     compute_range( param, low ,high );
     Msg( "Parameter <%s> min = %.3f, max = %.3f", param, low, high );
     */
@@ -196,7 +196,7 @@ void Manager::load_all_inventory()
 
 void Manager::load_all_properties()
 {
-    LPCSTR properties_section = "upgrades_properties";
+    const char* properties_section = "upgrades_properties";
 
     if (!pSettings->section_exist(properties_section) && ShadowOfChernobylMode)
         return;
@@ -393,7 +393,7 @@ void Manager::init_install(CInventoryItem& item)
     if (pSettings->line_exist(item.m_section_id, "installed_upgrades"))
     {
         // installed_upgrades by default
-        LPCSTR installed_upgrades_str = pSettings->r_string(item.m_section_id, "installed_upgrades");
+        const char* installed_upgrades_str = pSettings->r_string(item.m_section_id, "installed_upgrades");
         if (installed_upgrades_str)
         {
             u32 const buffer_size = (xr_strlen(installed_upgrades_str) + 1) * sizeof(char);
@@ -407,7 +407,7 @@ void Manager::init_install(CInventoryItem& item)
     } // if exist
 }
 
-LPCSTR Manager::get_item_scheme(CInventoryItem& item)
+const char* Manager::get_item_scheme(CInventoryItem& item)
 {
     Root* root_p = get_root(item.m_section_id);
     if (!root_p)
@@ -415,7 +415,7 @@ LPCSTR Manager::get_item_scheme(CInventoryItem& item)
     return root_p->scheme();
 }
 
-LPCSTR Manager::get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index)
+const char* Manager::get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index)
 {
     Upgrade* upgrade = NULL;
 
@@ -436,7 +436,7 @@ LPCSTR Manager::get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index
 
 // -------------------------------------------------------------------------------------------------
 
-bool Manager::compute_range(LPCSTR parameter, float& low, float& high)
+bool Manager::compute_range(const char* parameter, float& low, float& high)
 {
     low = flt_max;
     high = flt_min;
@@ -458,7 +458,7 @@ bool Manager::compute_range(LPCSTR parameter, float& low, float& high)
     return (low != flt_max) && (high != flt_min);
 }
 
-void Manager::compute_range_section(LPCSTR section, LPCSTR parameter, float& low, float& high)
+void Manager::compute_range_section(const char* section, const char* parameter, float& low, float& high)
 {
     if (!pSettings->line_exist(section, parameter) || !*pSettings->r_string(section, parameter))
     {

@@ -9,7 +9,7 @@ class dxFlareRender : public IFlareRender
 public:
     virtual void Copy(IFlareRender& _in);
 
-    virtual void CreateShader(LPCSTR sh_name, LPCSTR tex_name);
+    virtual void CreateShader(const char* sh_name, const char* tex_name);
     virtual void DestroyShader();
 
     // private:
@@ -22,7 +22,7 @@ class dxLensFlareRender : public ILensFlareRender
 public:
     virtual void Copy(ILensFlareRender& _in);
 
-    virtual void Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL bGradient);
+    virtual void Render(CLensFlare& owner, bool bSun, bool bFlares, bool bGradient);
 
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();

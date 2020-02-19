@@ -62,10 +62,10 @@ public:
     virtual CEntity* cast_entity() { return this; }
 public:
     // Core events
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
     virtual void reinit();
-    virtual void reload(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void reload(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void shedule_Update(u32 dt);
@@ -76,8 +76,8 @@ public:
     //	virtual float			g_Health			()const	{ return GetfHealth();}
     /*	virtual*/ IC float GetMaxHealth() const { return m_entity_condition->max_health(); }
     /*	virtual*/ IC void SetMaxHealth(float v) { m_entity_condition->max_health() = v; }
-    /*virtual*/ IC BOOL g_Alive() const { return GetfHealth() > 0; }
-    virtual BOOL g_State(SEntityState&) const { return FALSE; }
+    /*virtual*/ IC bool g_Alive() const { return GetfHealth() > 0; }
+    virtual bool g_State(SEntityState&) const { return FALSE; }
     bool AlreadyDie() { return 0 != GetLevelDeathTime() ? true : false; }
     ALife::_TIME_ID GetGameDeathTime() const { return m_game_death_time; }
     u32 GetLevelDeathTime() const { return m_level_death_time; }
@@ -100,7 +100,7 @@ public:
     // Events
     virtual void OnEvent(NET_Packet& P, u16 type);
 
-    virtual BOOL IsVisibleForHUD() { return g_Alive(); }
+    virtual bool IsVisibleForHUD() { return g_Alive(); }
     virtual void g_fireParams(const CHudItem*, Fvector&, Fvector&){};
     virtual bool g_stateFire() { return true; }
     // time of entity death

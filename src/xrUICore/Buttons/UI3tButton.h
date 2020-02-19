@@ -21,8 +21,8 @@ public:
     virtual void SetTextureOffset(float x, float y);
     virtual void SetWidth(float width);
     virtual void SetHeight(float height);
-    void InitSoundH(LPCSTR sound_file);
-    void InitSoundT(LPCSTR sound_file);
+    void InitSoundH(const char* sound_file);
+    void InitSoundT(const char* sound_file);
 
     virtual void OnClick();
     virtual void OnFocusReceive();

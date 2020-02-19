@@ -81,7 +81,7 @@ public:
     virtual ~CActor();
 
 public:
-    virtual BOOL AlwaysTheCrow() { return TRUE; }
+    virtual bool AlwaysTheCrow() { return TRUE; }
     virtual CAttachmentOwner* cast_attachment_owner() { return this; }
     virtual CInventoryOwner* cast_inventory_owner() { return this; }
     virtual CActor* cast_actor() { return this; }
@@ -92,7 +92,7 @@ public:
     virtual CPHDestroyable* ph_destroyable();
     CHolderCustom* Holder() { return m_holder; }
 public:
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
     virtual void shedule_Update(u32 T);
     virtual void UpdateCL();
@@ -101,7 +101,7 @@ public:
 
     // Render
     void renderable_Render(IRenderable* root) override;
-    virtual BOOL renderable_ShadowGenerate();
+    virtual bool renderable_ShadowGenerate();
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
         const Fvector& position, float power) override;
     virtual Feel::Sound* dcast_FeelSound() { return this; }
@@ -150,17 +150,17 @@ public:
     CGameNewsRegistryWrapper* game_news_registry;
     CCharacterPhysicsSupport* m_pPhysics_support;
 
-    virtual LPCSTR Name() const { return CInventoryOwner::Name(); }
+    virtual const char* Name() const { return CInventoryOwner::Name(); }
 public:
     // PhraseDialogManager
     virtual void ReceivePhrase(DIALOG_SHARED_PTR& phrase_dialog);
     virtual void UpdateAvailableDialogs(CPhraseDialogManager* partner);
     virtual void TryToTalk();
-    bool OnDialogSoundHandlerStart(CInventoryOwner* inv_owner, LPCSTR phrase);
+    bool OnDialogSoundHandlerStart(CInventoryOwner* inv_owner, const char* phrase);
     bool OnDialogSoundHandlerStop(CInventoryOwner* inv_owner);
 
     virtual void reinit();
-    virtual void reload(LPCSTR section);
+    virtual void reload(const char* section);
     virtual bool use_bolts() const;
 
     virtual void OnItemTake(CInventoryItem* inventory_item);
@@ -224,7 +224,7 @@ protected:
     float m_fCamHeightFactor;
 
     // Dropping
-    BOOL b_DropActivated;
+    bool b_DropActivated;
     float f_DropPower;
 
     // random seed для Zoom mode
@@ -262,7 +262,7 @@ protected:
     void ActorUse();
 
 protected:
-    BOOL m_bAnimTorsoPlayed;
+    bool m_bAnimTorsoPlayed;
     static void AnimTorsoPlayCallBack(CBlend* B);
 
     // Rotation
@@ -303,7 +303,7 @@ public:
 
 public:
     void OnHUDDraw(CCustomHUD* hud, IRenderable* root) override;
-    BOOL HUDview() const;
+    bool HUDview() const;
 
     // visiblity
     virtual float ffGetFov() const { return 90.f; }
@@ -350,7 +350,7 @@ public:
 
     CGameObject* ObjectWeLookingAt() { return m_pObjectWeLookingAt; }
     CInventoryOwner* PersonWeLookingAt() { return m_pPersonWeLookingAt; }
-    LPCSTR GetDefaultActionForObject() { return *m_sDefaultObjAction; }
+    const char* GetDefaultActionForObject() { return *m_sDefaultObjAction; }
 protected:
     CGameObject* m_pUsableObject;
     // Person we're looking at
@@ -413,7 +413,7 @@ protected:
     u32 mstate_old;
     u32 mstate_real;
 
-    BOOL m_bJumpKeyPressed;
+    bool m_bJumpKeyPressed;
 
 public:
     float m_fWalkAccel;
@@ -445,7 +445,7 @@ public:
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
     virtual void g_fireParams(const CHudItem* pHudItem, Fvector& P, Fvector& D);
     virtual bool g_stateFire() { return !((mstate_wishful & mcLookout) && !IsGameTypeSingle()); }
-    virtual BOOL g_State(SEntityState& state) const;
+    virtual bool g_State(SEntityState& state) const;
     virtual float GetWeaponAccuracy() const;
     float GetFireDispertion() const { return m_fdisp_controller.GetCurrentDispertion(); }
     bool IsZoomAimingMode() const { return m_bZoomAimingMode; }
@@ -502,24 +502,24 @@ protected:
     void ConvState(u32 mstate_rl, string128* buf);
 
 public:
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P); // export to server
     virtual void net_Import(NET_Packet& P); // import from server
     virtual void net_Destroy();
-    virtual BOOL net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
+    virtual bool net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
     virtual void net_Relcase(IGameObject* O); //
     virtual void xr_stdcall on_requested_spawn(IGameObject* object);
     // object serialization
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     virtual void net_Save(NET_Packet& P);
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
 
 protected:
     xr_deque<net_update> NET;
     Fvector NET_SavedAccel;
     net_update NET_Last;
-    BOOL NET_WasInterpolating; // previous update was by interpolation or by extrapolation
+    bool NET_WasInterpolating; // previous update was by interpolation or by extrapolation
     u32 NET_Time; // server time of last update
 
     //---------------------------------------------
@@ -605,7 +605,7 @@ public:
     virtual void OnChangeVisual();
 
     virtual void RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& IndShader);
-    virtual void RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color);
+    virtual void RenderText(const char* Text, Fvector dpos, float* pdup, u32 color);
 
     //////////////////////////////////////////////////////////////////////////
     // Controlled Routines
@@ -625,8 +625,8 @@ protected:
 
     shared_str m_DefaultVisualOutfit;
 
-    LPCSTR invincibility_fire_shield_3rd;
-    LPCSTR invincibility_fire_shield_1st;
+    const char* invincibility_fire_shield_3rd;
+    const char* invincibility_fire_shield_1st;
     shared_str m_sHeadShotParticle;
     u32 last_hit_frame;
 #ifdef DEBUG
@@ -717,12 +717,12 @@ public:
     IC float HitProbability() { return m_hit_probability; }
     virtual CVisualMemoryManager* visual_memory() const;
 
-    virtual BOOL BonePassBullet(int boneID);
+    virtual bool BonePassBullet(int boneID);
     virtual void On_B_NotCurrentEntity();
 
 private:
     collide::rq_results RQR;
-    BOOL CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObject* item);
+    bool CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObject* item);
     xr_vector<ISpatial*> ISpatialResult;
 
 private:

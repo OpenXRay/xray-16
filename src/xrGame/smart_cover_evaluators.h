@@ -32,7 +32,7 @@ private:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    in_cover_evaluator(CAI_Stalker* object, LPCSTR evaluator_name);
+    in_cover_evaluator(CAI_Stalker* object, const char* evaluator_name);
     virtual _value_type evaluate();
 };
 
@@ -46,7 +46,7 @@ private:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    cover_actual_evaluator(CAI_Stalker* object, LPCSTR evaluator_name);
+    cover_actual_evaluator(CAI_Stalker* object, const char* evaluator_name);
     virtual _value_type evaluate();
 };
 
@@ -60,7 +60,7 @@ private:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    cover_entered_evaluator(CAI_Stalker* object, LPCSTR evaluator_name);
+    cover_entered_evaluator(CAI_Stalker* object, const char* evaluator_name);
     virtual _value_type evaluate();
 };
 
@@ -79,7 +79,7 @@ private:
 
 public:
     loophole_actual_evaluator(
-        CAI_Stalker* object, LPCSTR evaluator_name, animation_planner* planner, u32 const& loophole_value);
+        CAI_Stalker* object, const char* evaluator_name, animation_planner* planner, u32 const& loophole_value);
     virtual _value_type evaluate();
 };
 
@@ -96,7 +96,7 @@ private:
     u32 m_time_to_wait;
 
 public:
-    loophole_hit_long_ago_evaluator(animation_planner* object, LPCSTR evaluator_name, u32 const& time_to_wait);
+    loophole_hit_long_ago_evaluator(animation_planner* object, const char* evaluator_name, u32 const& time_to_wait);
     virtual _value_type evaluate();
 };
 
@@ -113,7 +113,7 @@ private:
     bool m_value;
 
 public:
-    loophole_planner_const_evaluator(animation_planner* object, LPCSTR evaluator_name, bool const& value);
+    loophole_planner_const_evaluator(animation_planner* object, const char* evaluator_name, bool const& value);
     virtual _value_type evaluate();
 };
 
@@ -130,7 +130,7 @@ private:
     shared_str m_action_id;
 
 public:
-    is_action_available_evaluator(animation_planner* object, LPCSTR evaluator_name, LPCSTR action_id);
+    is_action_available_evaluator(animation_planner* object, const char* evaluator_name, const char* action_id);
     virtual _value_type evaluate();
 };
 
@@ -144,7 +144,7 @@ private:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    loophole_exitable_evaluator(CAI_Stalker* object, LPCSTR evaluator_name);
+    loophole_exitable_evaluator(CAI_Stalker* object, const char* evaluator_name);
     virtual _value_type evaluate();
 };
 
@@ -158,7 +158,7 @@ private:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    can_exit_loophole_with_animation(CAI_Stalker* object, LPCSTR evaluator_name);
+    can_exit_loophole_with_animation(CAI_Stalker* object, const char* evaluator_name);
     virtual _value_type evaluate();
 };
 
@@ -172,7 +172,7 @@ private:
     typedef CPropertyEvaluator<animation_planner> inherited;
 
 public:
-    default_behaviour_evaluator(animation_planner* object, LPCSTR evaluator_name);
+    default_behaviour_evaluator(animation_planner* object, const char* evaluator_name);
     virtual _value_type evaluate();
 };
 
@@ -186,7 +186,7 @@ private:
     typedef CPropertyEvaluator<animation_planner> inherited;
 
 public:
-    can_fire_at_enemy_evaluator(animation_planner* object, LPCSTR evaluator_name);
+    can_fire_at_enemy_evaluator(animation_planner* object, const char* evaluator_name);
     virtual _value_type evaluate();
 };
 
@@ -203,7 +203,7 @@ private:
     u32 m_time_interval;
 
 public:
-    idle_time_interval_passed_evaluator(animation_planner* object, LPCSTR evaluator_name, u32 const& time_interval);
+    idle_time_interval_passed_evaluator(animation_planner* object, const char* evaluator_name, u32 const& time_interval);
     virtual _value_type evaluate();
 };
 
@@ -220,7 +220,7 @@ private:
     u32 m_time_interval;
 
 public:
-    lookout_time_interval_passed_evaluator(animation_planner* object, LPCSTR evaluator_name, u32 const& time_interval);
+    lookout_time_interval_passed_evaluator(animation_planner* object, const char* evaluator_name, u32 const& time_interval);
     virtual _value_type evaluate();
 };
 

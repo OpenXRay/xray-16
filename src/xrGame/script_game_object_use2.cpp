@@ -196,7 +196,7 @@ void CScriptGameObject::set_manual_invisibility(bool val)
     val ? monster->set_manual_control(true) : monster->set_manual_control(false);
 }
 
-void CScriptGameObject::bloodsucker_drag_jump(CScriptGameObject* e, LPCSTR e_str, const Fvector& position, float factor)
+void CScriptGameObject::bloodsucker_drag_jump(CScriptGameObject* e, const char* e_str, const Fvector& position, float factor)
 {
     CAI_Bloodsucker* monster = smart_cast<CAI_Bloodsucker*>(&object());
     if (!monster)
@@ -327,7 +327,7 @@ void CScriptGameObject::skip_transfer_enemy(bool val)
         monster->skip_transfer_enemy(val);
 }
 
-void CScriptGameObject::set_home(LPCSTR name, float r_min, float r_max, bool aggressive, float r_mid)
+void CScriptGameObject::set_home(const char* name, float r_min, float r_max, bool aggressive, float r_mid)
 {
     CBaseMonster* monster = smart_cast<CBaseMonster*>(&object());
     if (monster)

@@ -138,7 +138,7 @@ game_cl_ArtefactHunt::~game_cl_ArtefactHunt()
     */
 }
 
-BOOL bBearerCantSprint = TRUE;
+bool bBearerCantSprint = TRUE;
 void game_cl_ArtefactHunt::net_import_state(NET_Packet& P)
 {
     inherited::net_import_state(P);
@@ -166,10 +166,10 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
     CStringTable& st = StringTable();
     string512 Text;
     string512 tmp;
-    //	LPSTR	Color_Teams[3]		= {"%c[255,255,255,255]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
+    //	char*	Color_Teams[3]		= {"%c[255,255,255,255]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
     char Color_Main[] = "%c[255,192,192,192]";
     char Color_Artefact[] = "%c[255,255,255,0]";
-    //	LPSTR	TeamsNames[3]		= {"Zero Team", "Team Green", "Team Blue"};
+    //	char*	TeamsNames[3]		= {"Zero Team", "Team Green", "Team Blue"};
 
     switch (msg)
     {
@@ -513,7 +513,7 @@ void game_cl_ArtefactHunt::SetScore()
             m_game_ui->SetFraglimit(ps->frags(), artefactsNum);
     }
 }
-BOOL game_cl_ArtefactHunt::CanCallBuyMenu()
+bool game_cl_ArtefactHunt::CanCallBuyMenu()
 {
     if (!m_bBuyEnabled)
         return FALSE;

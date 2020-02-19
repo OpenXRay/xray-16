@@ -17,7 +17,7 @@ IC CScriptAnimationAction::CScriptAnimationAction() : anim_index(0)
     m_use_animation_movement_controller = false;
 }
 
-IC CScriptAnimationAction::CScriptAnimationAction(LPCSTR caAnimationToPlay, bool use_animation_movement_controller)
+IC CScriptAnimationAction::CScriptAnimationAction(const char* caAnimationToPlay, bool use_animation_movement_controller)
 {
     SetAnimation(caAnimationToPlay);
     m_use_animation_movement_controller = use_animation_movement_controller;
@@ -40,7 +40,7 @@ IC CScriptAnimationAction::CScriptAnimationAction(MonsterSpace::EScriptMonsterAn
     m_use_animation_movement_controller = false;
 }
 
-IC void CScriptAnimationAction::SetAnimation(LPCSTR caAnimationToPlay)
+IC void CScriptAnimationAction::SetAnimation(const char* caAnimationToPlay)
 {
     m_caAnimationToPlay = caAnimationToPlay;
     m_tMentalState = MonsterSpace::eMentalStateDanger;

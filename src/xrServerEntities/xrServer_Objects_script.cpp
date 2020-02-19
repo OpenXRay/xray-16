@@ -15,8 +15,8 @@
 
 using namespace luabind;
 
-LPCSTR get_section_name(const CSE_Abstract* abstract) { return (abstract->name()); }
-LPCSTR get_name(const CSE_Abstract* abstract) { return (abstract->name_replace()); }
+const char* get_section_name(const CSE_Abstract* abstract) { return (abstract->name()); }
+const char* get_name(const CSE_Abstract* abstract) { return (abstract->name_replace()); }
 CScriptIniFile* get_spawn_ini(CSE_Abstract* abstract) { return ((CScriptIniFile*)&abstract->spawn_ini()); }
 template <typename T>
 struct CWrapperBase : public T, public luabind::wrap_base
@@ -24,7 +24,7 @@ struct CWrapperBase : public T, public luabind::wrap_base
     typedef T inherited;
     typedef CWrapperBase<T> self_type;
 
-    IC CWrapperBase(LPCSTR section) : T(section) {}
+    IC CWrapperBase(const char* section) : T(section) {}
     virtual void STATE_Read(NET_Packet& p1) { call<void>("STATE_Read", &p1); }
     static void STATE_Read_static(inherited* ptr, NET_Packet* p1)
     {
@@ -77,7 +77,7 @@ SCRIPT_EXPORT(CSE_Abstract, (CPureServerObject), {
                          .def("STATE_Write", &BaseType::STATE_Write, &WrapType::STATE_Write_static)
                          .def("UPDATE_Read", &BaseType::UPDATE_Read, &WrapType::UPDATE_Read_static)
                          .def("UPDATE_Write", &BaseType::UPDATE_Write, &WrapType::UPDATE_Write_static)
-        //			.def(		constructor<LPCSTR>())
+        //			.def(		constructor<const char*>())
     ];
 });
 
@@ -90,14 +90,14 @@ SCRIPT_EXPORT(CSE_Shape, (), {
 SCRIPT_EXPORT(CSE_Visual, (), {
     module(luaState)[class_<CSE_Visual>("cse_visual")
         //			.def(		constructor<>())
-        //			.def(		constructor<LPCSTR>())
+        //			.def(		constructor<const char*>())
     ];
 });
 
 SCRIPT_EXPORT(CSE_Motion, (), {
     module(luaState)[class_<CSE_Motion>("cse_motion")
         //			.def(		constructor<>())
-        //			.def(		constructor<LPCSTR>())
+        //			.def(		constructor<const char*>())
     ];
 });
 

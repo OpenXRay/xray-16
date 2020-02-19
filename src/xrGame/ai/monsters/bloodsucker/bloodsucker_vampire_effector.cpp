@@ -13,7 +13,7 @@ CVampirePPEffector::CVampirePPEffector(const SPPInfo& ppi, float life_time)
 #define RAD_TO_PERC(rad) ((rad - PI_DIV_2) / (PERIODS * PI_MUL_2))
 #define PERC_TO_RAD(perc) (perc * (PERIODS * PI_MUL_2) + PI_DIV_2)
 
-BOOL CVampirePPEffector::Process(SPPInfo& pp)
+bool CVampirePPEffector::Process(SPPInfo& pp)
 {
     inherited::Process(pp);
 
@@ -74,7 +74,7 @@ CVampireCameraEffector::CVampireCameraEffector(float time, const Fvector& src, c
     dangle_current.set(0.f, 0.f, 0.f);
 }
 
-BOOL CVampireCameraEffector::ProcessCam(SCamEffectorInfo& info)
+bool CVampireCameraEffector::ProcessCam(SCamEffectorInfo& info)
 {
     fLifeTime -= Device.fTimeDelta;
     if (fLifeTime < 0)

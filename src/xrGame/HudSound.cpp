@@ -11,7 +11,7 @@ void InitHudSoundSettings()
     psHUDStepSoundVolume = pSettings->read_if_exists<float>("hud_sound", "hud_step_sound_vol_k", 1.0f);
 }
 
-void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_snd, int type)
+void HUD_SOUND_ITEM::LoadSound(const char* section, const char* line, HUD_SOUND_ITEM& hud_snd, int type)
 {
     hud_snd.m_activeSnd = nullptr;
     hud_snd.sounds.clear();
@@ -29,9 +29,9 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_
     } // while
 }
 
-void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int type, float* volume, float* delay)
+void HUD_SOUND_ITEM::LoadSound(const char* section, const char* line, ref_sound& snd, int type, float* volume, float* delay)
 {
-    LPCSTR str = pSettings->r_string(section, line);
+    const char* str = pSettings->r_string(section, line);
     string256 buf_str;
 
     int count = _GetItemCount(str);
@@ -119,7 +119,7 @@ HUD_SOUND_COLLECTION::~HUD_SOUND_COLLECTION()
     m_sound_items.clear();
 }
 
-HUD_SOUND_ITEM* HUD_SOUND_COLLECTION::FindSoundItem(LPCSTR alias, bool b_assert)
+HUD_SOUND_ITEM* HUD_SOUND_COLLECTION::FindSoundItem(const char* alias, bool b_assert)
 {
     xr_vector<HUD_SOUND_ITEM>::iterator it = std::find(m_sound_items.begin(), m_sound_items.end(), alias);
 
@@ -131,7 +131,7 @@ HUD_SOUND_ITEM* HUD_SOUND_COLLECTION::FindSoundItem(LPCSTR alias, bool b_assert)
 }
 
 void HUD_SOUND_COLLECTION::PlaySound(
-    LPCSTR alias, const Fvector& position, const IGameObject* parent, bool hud_mode, bool looped, u8 index)
+    const char* alias, const Fvector& position, const IGameObject* parent, bool hud_mode, bool looped, u8 index)
 {
     for (auto& sound_item : m_sound_items)
         if (sound_item.m_b_exclusive)
@@ -141,13 +141,13 @@ void HUD_SOUND_COLLECTION::PlaySound(
     HUD_SOUND_ITEM::PlaySound(*snd_item, position, parent, hud_mode, looped, index);
 }
 
-void HUD_SOUND_COLLECTION::StopSound(LPCSTR alias)
+void HUD_SOUND_COLLECTION::StopSound(const char* alias)
 {
     HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, true);
     HUD_SOUND_ITEM::StopSound(*snd_item);
 }
 
-void HUD_SOUND_COLLECTION::SetPosition(LPCSTR alias, const Fvector& pos)
+void HUD_SOUND_COLLECTION::SetPosition(const char* alias, const Fvector& pos)
 {
     HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, true);
     if (snd_item->playing())
@@ -160,7 +160,7 @@ void HUD_SOUND_COLLECTION::StopAllSounds()
         HUD_SOUND_ITEM::StopSound(sound_item);
 }
 
-void HUD_SOUND_COLLECTION::LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive, int type)
+void HUD_SOUND_COLLECTION::LoadSound(const char* section, const char* line, const char* alias, bool exclusive, int type)
 {
     R_ASSERT(NULL == FindSoundItem(alias, false));
     m_sound_items.resize(m_sound_items.size() + 1);

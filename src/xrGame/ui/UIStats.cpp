@@ -10,7 +10,7 @@
 
 CUIStats::CUIStats() {}
 CUIStats::~CUIStats() {}
-CUIWindow* CUIStats::InitStats(CUIXml& xml_doc, LPCSTR path, int team)
+CUIWindow* CUIStats::InitStats(CUIXml& xml_doc, const char* path, int team)
 {
     string256 _path;
     CUIXmlInit::InitScrollView(xml_doc, path, 0, this);

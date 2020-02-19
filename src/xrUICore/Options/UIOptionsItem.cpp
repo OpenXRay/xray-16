@@ -13,18 +13,18 @@ void CUIOptionsItem::AssignProps(const shared_str& entry, const shared_str& grou
     m_entry = entry;
 }
 
-void CUIOptionsItem::SendMessage2Group(LPCSTR group, LPCSTR message)
+void CUIOptionsItem::SendMessage2Group(const char* group, const char* message)
 {
     m_optionsManager.SendMessage2Group(group, message);
 }
 
-void CUIOptionsItem::OnMessage(LPCSTR message)
+void CUIOptionsItem::OnMessage(const char* message)
 {
     // do nothing
 }
 
-LPCSTR CUIOptionsItem::GetOptStringValue() { return Console->GetString(m_entry.c_str()); }
-void CUIOptionsItem::SaveOptStringValue(LPCSTR val)
+const char* CUIOptionsItem::GetOptStringValue() { return Console->GetString(m_entry.c_str()); }
+void CUIOptionsItem::SaveOptStringValue(const char* val)
 {
     xr_string command = m_entry.c_str();
     command += " ";
@@ -64,7 +64,7 @@ void CUIOptionsItem::SaveOptBoolValue(bool val)
     Console->Execute(command);
 }
 
-LPCSTR CUIOptionsItem::GetOptTokenValue() { return Console->GetToken(m_entry.c_str()); }
+const char* CUIOptionsItem::GetOptTokenValue() { return Console->GetToken(m_entry.c_str()); }
 const xr_token* CUIOptionsItem::GetOptToken() { return Console->GetXRToken(m_entry.c_str()); }
 void CUIOptionsItem::SaveOptValue()
 {

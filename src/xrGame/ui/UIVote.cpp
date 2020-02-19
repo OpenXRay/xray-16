@@ -69,7 +69,7 @@ void CUIVote::Init()
     CUIXmlInit::Init3tButton(xml_doc, "vote:btn_cancel", 0, btn_cancel);
 }
 
-void CUIVote::SetVoting(LPCSTR txt) { msg->SetText(txt); }
+void CUIVote::SetVoting(const char* txt) { msg->SetText(txt); }
 void CUIVote::Update()
 {
     CUIDialogWnd::Update();

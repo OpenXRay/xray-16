@@ -24,7 +24,7 @@ property_string::!property_string()
 System::Object ^ property_string::GetValue() { return (to_string((*m_getter)())); }
 void property_string::SetValue(System::Object ^ object)
 {
-    LPSTR result = to_string(safe_cast<System::String ^>(object));
+    char* result = to_string(safe_cast<System::String ^>(object));
     (*m_setter)(result);
     free(result);
 }

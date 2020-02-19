@@ -45,7 +45,7 @@ How to use MeshMender:
     std::vector<unsigned int> mappingNewToOld;
 
     //fill up the vectors with your mesh's data
-    for (DWORD i = 0; i < numVerts; ++i)
+    for (unsigned int i = 0; i < numVerts; ++i)
     {
         MeshMender::Vertex v;
         v.pos = myVerts[i].pos;
@@ -57,7 +57,7 @@ How to use MeshMender:
         theVerts.push_back(v);
     }
 
-    for(DWORD ind = 0; ind<numIndices; ++ind)
+    for(unsigned int ind = 0; ind<numIndices; ++ind)
     {
         theIndices.push_back(myIndices[ind]);
     }

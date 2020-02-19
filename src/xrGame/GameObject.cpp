@@ -178,7 +178,7 @@ void CGameObject::processing_deactivate()
         g_pGameLevel->Objects.o_sleep(this);
 }
 
-void CGameObject::setEnabled(BOOL _enabled)
+void CGameObject::setEnabled(bool _enabled)
 {
     if (_enabled)
     {
@@ -193,7 +193,7 @@ void CGameObject::setEnabled(BOOL _enabled)
     }
 }
 
-void CGameObject::setVisible(BOOL _visible)
+void CGameObject::setVisible(bool _visible)
 {
     if (_visible)
     {
@@ -227,7 +227,7 @@ const Fbox& CGameObject::BoundingBox() const
     return renderable.visual->getVisData().box;
 }
 
-void CGameObject::Load(LPCSTR section)
+void CGameObject::Load(const char* section)
 {
     // Name
     R_ASSERT(section);
@@ -254,7 +254,7 @@ void CGameObject::Load(LPCSTR section)
     }
 }
 
-void CGameObject::PostLoad(LPCSTR section) {}
+void CGameObject::PostLoad(const char* section) {}
 
 void CGameObject::init()
 {
@@ -275,7 +275,7 @@ void CGameObject::reinit()
         it->second.clear();
 }
 
-void CGameObject::reload(LPCSTR section) { m_script_clsid = object_factory().script_clsid(CLS_ID); }
+void CGameObject::reload(const char* section) { m_script_clsid = object_factory().script_clsid(CLS_ID); }
 void CGameObject::net_Destroy()
 {
 #ifdef DEBUG
@@ -429,7 +429,7 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
 
 void VisualCallback(IKinematics* tpKinematics);
 
-BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
+bool CGameObject::net_Spawn(CSE_Abstract* DC)
 {
     VERIFY(!m_spawned);
     m_spawned = true;
@@ -619,7 +619,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
         Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f", PH_DBG_ObjectTrackName(),
             Position().x, Position().y, Position().z);
     }
-    BOOL ret = scriptBinder.net_Spawn(DC);
+    bool ret = scriptBinder.net_Spawn(DC);
 #else
     return (scriptBinder.net_Spawn(DC));
 #endif
@@ -709,7 +709,7 @@ void CGameObject::spawn_supplies()
     if (!spawn_ini()->section_exist("spawn"))
         return;
 
-    LPCSTR N, V;
+    const char* N, *V;
     float p;
     bool bScope = false;
     bool bSilencer = false;
@@ -877,7 +877,7 @@ void CGameObject::spatial_move()
 void CGameObject::spatial_update(float eps_P, float eps_R)
 {
     //
-    BOOL bUpdate = FALSE;
+    bool bUpdate = FALSE;
     if (PositionStack.empty())
     {
         // Empty
@@ -1026,9 +1026,9 @@ void CGameObject::OnH_B_Independent(bool just_before_destroy)
         validate_ai_locations(false);
 }
 
-void CGameObject::setDestroy(BOOL _destroy)
+void CGameObject::setDestroy(bool _destroy)
 {
-    if (_destroy == (BOOL)Props.bDestroy)
+    if (_destroy == (bool)Props.bDestroy)
         return;
     Props.bDestroy = _destroy ? 1 : 0;
     if (_destroy)
@@ -1109,8 +1109,8 @@ void CGameObject::u_EventGen(NET_Packet& P, u32 type, u32 dest)
 void CGameObject::u_EventSend(NET_Packet& P, u32 dwFlags) { Level().Send(P, dwFlags); }
 #include "Bolt.h"
 
-BOOL CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
-BOOL CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }
+bool CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
+bool CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }
 void CGameObject::add_visual_callback(visual_callback callback)
 {
     VERIFY(smart_cast<IKinematics*>(Visual()));
@@ -1209,9 +1209,9 @@ void CGameObject::shedule_Update(u32 dt)
         scriptBinder.shedule_Update(dt);
 }
 
-BOOL CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
+bool CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
 //игровое имя объекта
-LPCSTR CGameObject::Name() const { return (*cName()); }
+const char* CGameObject::Name() const { return (*cName()); }
 u32 CGameObject::ef_creature_type() const
 {
     string16 temp;
@@ -1274,7 +1274,7 @@ CGameObject::CScriptCallbackExVoid& CGameObject::callback(GameObject::ECallbackT
     return ((*m_callbacks)[type]);
 }
 
-LPCSTR CGameObject::visual_name(CSE_Abstract* server_entity)
+const char* CGameObject::visual_name(CSE_Abstract* server_entity)
 {
     const CSE_Visual* visual = smart_cast<const CSE_Visual*>(server_entity);
     VERIFY(visual);
@@ -1526,8 +1526,8 @@ bool CGameObject::use(IGameObject* obj)
     return true;
 }
 
-LPCSTR CGameObject::tip_text() { return *m_sTipText; }
-void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
+const char* CGameObject::tip_text() { return *m_sTipText; }
+void CGameObject::set_tip_text(const char* new_text) { m_sTipText = new_text; }
 void CGameObject::set_tip_text_default() { m_sTipText = NULL; }
 bool CGameObject::nonscript_usable() { return m_bNonscriptUsable; }
 void CGameObject::set_nonscript_usable(bool usable) { m_bNonscriptUsable = usable; }

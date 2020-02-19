@@ -30,7 +30,7 @@ public:
     // own
     virtual void OnBtnUpClick();
     virtual void OnBtnDownClick();
-    LPCSTR GetText();
+    const char* GetText();
 
     void SetTextColor(u32 color);
     void SetTextColorD(u32 color);

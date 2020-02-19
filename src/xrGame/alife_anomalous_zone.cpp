@@ -64,7 +64,7 @@ void CSE_ALifeAnomalousZone::spawn_artefacts				()
     else
         m_maxPower			= randF(m_min_start_power,m_max_start_power);
 
-    LPCSTR					artefacts = pSettings->r_string(name(),"artefacts");
+    const char*					artefacts = pSettings->r_string(name(),"artefacts");
     u32						n = _GetItemCount(artefacts);
     VERIFY2					(!(n % 2),"Invalid parameters count in line artefacts for anomalous zone");
     n						>>= 1;

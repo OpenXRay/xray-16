@@ -129,7 +129,7 @@ inline CObjectFactory::ClientObjectBaseClass* CObjectFactory::client_object(cons
 }
 #endif
 
-inline CObjectFactory::ServerObjectBaseClass* CObjectFactory::server_object(const CLASS_ID& clsid, LPCSTR section) const
+inline CObjectFactory::ServerObjectBaseClass* CObjectFactory::server_object(const CLASS_ID& clsid, const char* section) const
 {
 #ifndef NO_XR_GAME
     return (item(clsid).server_object(section));

@@ -72,7 +72,7 @@ bool is_bone_head(IKinematics& K, u16 bone)
 }
 
 void type_motion_diagnostic(
-    LPCSTR message, type_motion::edirection dr, const CEntityAlive& ea, const SHit& H, const MotionID& m)
+    const char* message, type_motion::edirection dr, const CEntityAlive& ea, const SHit& H, const MotionID& m)
 {
 #ifdef DEBUG
 
@@ -82,13 +82,13 @@ void type_motion_diagnostic(
     IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(ea.Visual());
     VERIFY(KA);
     IKinematics* K = smart_cast<IKinematics*>(ea.Visual());
-    LPCSTR bone_name = "not_definite";
+    const char* bone_name = "not_definite";
     if (H.bone() != BI_NONE)
     {
         CBoneData& bd = K->LL_GetData(H.bone());
         bone_name = bd.name.c_str();
     }
-    LPCSTR motion_name = "not_set";
+    const char* motion_name = "not_set";
     if (m.valid())
         motion_name = KA->LL_MotionDefName_dbg(m).first;
 
@@ -312,7 +312,7 @@ class type_motion6 : public type_motion
     }
 };
 
-void death_anims::setup(IKinematicsAnimated* k, LPCSTR section, CInifile const* ini)
+void death_anims::setup(IKinematicsAnimated* k, const char* section, CInifile const* ini)
 {
     clear();
     //	if( !ini )

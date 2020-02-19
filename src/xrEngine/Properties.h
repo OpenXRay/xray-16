@@ -48,7 +48,7 @@ struct xrP_Float
 
 struct xrP_BOOL
 {
-    BOOL value;
+    bool value;
     xrP_BOOL() : value(FALSE) {}
 };
 
@@ -88,22 +88,22 @@ class CPropertyBase
 {
 protected:
 public:
-    virtual LPCSTR getName() = 0;
-    virtual LPCSTR getComment() = 0;
+    virtual const char* getName() = 0;
+    virtual const char* getComment() = 0;
 
     virtual void Save(IWriter& fs) = 0;
     virtual void Load(IReader& fs, u16 version) = 0;
 };
 
 // Writers
-IC void xrPWRITE(IWriter& fs, u32 ID, LPCSTR name, LPCVOID data, size_t size)
+IC void xrPWRITE(IWriter& fs, u32 ID, const char* name, const void* data, size_t size)
 {
     fs.w_u32(ID);
     fs.w_stringZ(name);
     if (data && size)
         fs.w(data, size);
 }
-IC void xrPWRITE_MARKER(IWriter& fs, LPCSTR name) { xrPWRITE(fs, xrPID_MARKER, name, 0, 0); }
+IC void xrPWRITE_MARKER(IWriter& fs, const char* name) { xrPWRITE(fs, xrPID_MARKER, name, 0, 0); }
 #define xrPWRITE_PROP(FS, name, ID, data)            \
     \
 {                                             \
@@ -133,7 +133,7 @@ IC void xrPREAD_MARKER(IReader& fs) { R_ASSERT(xrPID_MARKER == xrPREAD(fs)); }
 }
 
 // template <class T>
-// IC void xrPWRITE_PROP (IWriter& FS, LPCSTR name, u32 ID, T& data)
+// IC void xrPWRITE_PROP (IWriter& FS, const char* name, u32 ID, T& data)
 //{
 // xrPWRITE (FS,ID,name,&data,sizeof(data));
 //}

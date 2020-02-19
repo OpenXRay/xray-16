@@ -16,11 +16,11 @@ ShaderElement::~ShaderElement() { RImplementation.Resources->_DeleteElement(this
 SGeometry::~SGeometry() { RImplementation.Resources->DeleteGeom(this); }
 Shader::~Shader() { RImplementation.Resources->Delete(this); }
 //////////////////////////////////////////////////////////////////////////
-void resptrcode_shader::create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
+void resptrcode_shader::create(const char* s_shader, const char* s_textures, const char* s_constants, const char* s_matrices)
 {
     _set(RImplementation.Resources->Create(s_shader, s_textures, s_constants, s_matrices));
 }
-void resptrcode_shader::create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
+void resptrcode_shader::create(IBlender* B, const char* s_shader, const char* s_textures, const char* s_constants, const char* s_matrices)
 {
     _set(RImplementation.Resources->Create(B, s_shader, s_textures, s_constants, s_matrices));
 }
@@ -40,7 +40,7 @@ void resptrcode_geom::create(VertexElement* decl, VertexBufferHandle vb, IndexBu
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-BOOL SPass::equal(const SPass& other)
+bool SPass::equal(const SPass& other)
 {
     if (state != other.state)
         return FALSE;
@@ -84,7 +84,7 @@ ShaderElement::ShaderElement()
     flags.bWmark = FALSE;
 }
 
-BOOL ShaderElement::equal(ShaderElement& S)
+bool ShaderElement::equal(ShaderElement& S)
 {
     if (flags.iPriority != S.flags.iPriority)
         return FALSE;
@@ -104,7 +104,7 @@ BOOL ShaderElement::equal(ShaderElement& S)
     return TRUE;
 }
 
-BOOL Shader::equal(Shader* S, int index)
+bool Shader::equal(Shader* S, int index)
 {
     if(nullptr == E[index] && nullptr == S->E[index])
         return TRUE;
@@ -114,7 +114,7 @@ BOOL Shader::equal(Shader* S, int index)
     return E[index]->equal(*S->E[index]);
 }
 
-BOOL Shader::equal(Shader* S)
+bool Shader::equal(Shader* S)
 {
     for (int i = 0; i < 5; i++)
     {

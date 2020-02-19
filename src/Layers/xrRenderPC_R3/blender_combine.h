@@ -3,9 +3,9 @@
 class CBlender_combine : public IBlender
 {
 public:
-    virtual LPCSTR getComment() { return "INTERNAL: combiner"; }
-    virtual BOOL canBeDetailed() { return FALSE; }
-    virtual BOOL canBeLMAPped() { return FALSE; }
+    virtual const char* getComment() { return "INTERNAL: combiner"; }
+    virtual bool canBeDetailed() { return FALSE; }
+    virtual bool canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_combine();
@@ -15,18 +15,18 @@ public:
 class CBlender_combine_msaa : public IBlender
 {
 public:
-    virtual LPCSTR getComment() { return "INTERNAL: combiner"; }
-    virtual BOOL canBeDetailed() { return FALSE; }
-    virtual BOOL canBeLMAPped() { return FALSE; }
+    virtual const char* getComment() { return "INTERNAL: combiner"; }
+    virtual bool canBeDetailed() { return FALSE; }
+    virtual bool canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_combine_msaa();
     virtual ~CBlender_combine_msaa();
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    virtual void SetDefine(const char* Name, const char* Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
     }
-    LPCSTR Name;
-    LPCSTR Definition;
+    const char* Name;
+    const char* Definition;
 };

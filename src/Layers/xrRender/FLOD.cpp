@@ -26,7 +26,7 @@ static VertexElement dwDecl[] = {
     {0, 72, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 3}, // rgbh-1
     D3DDECL_END()};
 
-void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
+void FLOD::Load(const char* name, IReader* data, u32 dwFlags)
 {
     inherited::Load(name, data, dwFlags);
 

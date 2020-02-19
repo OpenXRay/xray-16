@@ -129,7 +129,7 @@ void game_cl_Deathmatch::OnBuyMenu_DefaultItems()
     SetBuyMenuItems(&PlayerDefItems, TRUE);
 };
 
-void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
+void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, bool OnlyPreset)
 {
     game_PlayerState* P = local_player;
     if (!P)
@@ -271,7 +271,7 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
     pCurBuyMenu->CheckBuyAvailabilityInSlots();
 };
 
-void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOOL OnlyPreset)
+void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, bool OnlyPreset)
 {
     R_ASSERT(pItem);
     R_ASSERT(pPresetItems);

@@ -21,7 +21,7 @@ class ECORE_API CResourceManager
 private:
     struct str_pred
     {
-        bool operator()(LPCSTR x, LPCSTR y) const { return xr_strcmp(x, y) < 0; }
+        bool operator()(const char* x, const char* y) const { return xr_strcmp(x, y) < 0; }
     };
     struct texture_detail
     {
@@ -101,7 +101,7 @@ public:
     CTextureDescrMngr m_textures_description;
     //.	CInifile*											m_textures_description;
     xr_vector<std::pair<shared_str, R_constant_setup*>> v_constant_setup;
-    BOOL bDeferredLoad;
+    bool bDeferredLoad;
     bool m_shader_fallback_allowed;
     CScriptEngine ScriptEngine;
     Lock ScriptEngineLock;
@@ -112,12 +112,12 @@ private:
 
 public:
     // Miscelaneous
-    void _ParseList(sh_list& dest, LPCSTR names);
-    IBlender* _GetBlender(LPCSTR Name);
-    IBlender* _FindBlender(LPCSTR Name);
+    void _ParseList(sh_list& dest, const char* names);
+    IBlender* _GetBlender(const char* Name);
+    IBlender* _FindBlender(const char* Name);
     void _GetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps);
     void _DumpMemoryUsage();
-    //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);
+    //.	bool							_GetDetailTexture	(const char* Name, const char*& T, R_constant_setup* &M);
 
     map_Blender& _GetBlenders() { return m_blenders; }
     // Debug
@@ -125,21 +125,21 @@ public:
     void DBG_VerifyTextures();
 
     // Editor cooperation
-    void ED_UpdateBlender(LPCSTR Name, IBlender* data);
-    void ED_UpdateMatrix(LPCSTR Name, CMatrix* data);
-    void ED_UpdateConstant(LPCSTR Name, CConstant* data);
+    void ED_UpdateBlender(const char* Name, IBlender* data);
+    void ED_UpdateMatrix(const char* Name, CMatrix* data);
+    void ED_UpdateConstant(const char* Name, CConstant* data);
 #ifdef _EDITOR
     void ED_UpdateTextures(AStringVec* names);
 #endif
 
     // Low level resource creation
-    CTexture* _CreateTexture(LPCSTR Name);
+    CTexture* _CreateTexture(const char* Name);
     void _DeleteTexture(const CTexture* T);
 
-    CMatrix* _CreateMatrix(LPCSTR Name);
+    CMatrix* _CreateMatrix(const char* Name);
     void _DeleteMatrix(const CMatrix* M);
 
-    CConstant* _CreateConstant(LPCSTR Name);
+    CConstant* _CreateConstant(const char* Name);
     void _DeleteConstant(const CConstant* C);
 
     R_constant_table* _CreateConstantTable(R_constant_table& C);
@@ -153,28 +153,28 @@ public:
     void _DeleteInputSignature(const SInputSignature* pSignature);
 #endif //	USE_DX10
 
-    CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
+    CRT* _CreateRT(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
     void _DeleteRT(const CRT* RT);
 
-//	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
+//	DX10 cut CRTC*							_CreateRTC			(const char* Name, u32 size,	D3DFORMAT f);
 //	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
 #ifndef USE_DX9
-    SGS* _CreateGS(LPCSTR Name);
+    SGS* _CreateGS(const char* Name);
     void _DeleteGS(const SGS* GS);
 #endif //	USE_DX10
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    SHS* _CreateHS(LPCSTR Name);
+    SHS* _CreateHS(const char* Name);
     void _DeleteHS(const SHS* HS);
 
-    SDS* _CreateDS(LPCSTR Name);
+    SDS* _CreateDS(const char* Name);
     void _DeleteDS(const SDS* DS);
 
-    SCS* _CreateCS(LPCSTR Name);
+    SCS* _CreateCS(const char* Name);
     void _DeleteCS(const SCS* CS);
 #endif
 
-    SPS* _CreatePS(LPCSTR Name);
+    SPS* _CreatePS(const char* Name);
     void _DeletePS(const SPS* PS);
 
     SVS* _CreateVS(cpcstr shader, cpcstr fallbackShader = nullptr, u32 flags = 0);
@@ -206,11 +206,11 @@ public:
     ShaderElement* _CreateElement(ShaderElement& L);
     void _DeleteElement(const ShaderElement* L);
 
-    Shader* _cpp_Create(LPCSTR s_shader, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
+    Shader* _cpp_Create(const char* s_shader, const char* s_textures = nullptr, const char* s_constants = nullptr, const char* s_matrices = nullptr);
     Shader* _cpp_Create(
-        IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
-    Shader* _lua_Create(LPCSTR s_shader, LPCSTR s_textures);
-    BOOL _lua_HasShader(LPCSTR s_shader);
+        IBlender* B, const char* s_shader = nullptr, const char* s_textures = nullptr, const char* s_constants = nullptr, const char* s_matrices = nullptr);
+    Shader* _lua_Create(const char* s_shader, const char* s_textures);
+    bool _lua_HasShader(const char* s_shader);
 
     CResourceManager() : bDeferredLoad(TRUE)
     {
@@ -224,8 +224,8 @@ public:
     ~CResourceManager();
 
     void OnDeviceCreate(IReader* F);
-    void OnDeviceCreate(LPCSTR name);
-    void OnDeviceDestroy(BOOL bKeepTextures);
+    void OnDeviceCreate(const char* name);
+    void OnDeviceDestroy(bool bKeepTextures);
 
     void reset_begin();
     void reset_end();
@@ -233,11 +233,11 @@ public:
     void CompatibilityCheck();
 
     // Creation/Destroying
-    Shader* Create(LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
+    Shader* Create(const char* s_shader = nullptr, const char* s_textures = nullptr, const char* s_constants = nullptr, const char* s_matrices = nullptr);
     Shader* Create(
-        IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
+        IBlender* B, const char* s_shader = nullptr, const char* s_textures = nullptr, const char* s_constants = nullptr, const char* s_matrices = nullptr);
     void Delete(const Shader* S);
-    void RegisterConstantSetup(LPCSTR name, R_constant_setup* s)
+    void RegisterConstantSetup(const char* name, R_constant_setup* s)
     {
         v_constant_setup.push_back(std::make_pair(shared_str(name), s));
     }
@@ -246,7 +246,7 @@ public:
     SGeometry* CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib);
 
     void DeleteGeom(const SGeometry* VS);
-    void DeferredLoad(BOOL E) { bDeferredLoad = E; }
+    void DeferredLoad(bool E) { bDeferredLoad = E; }
     void DeferredUpload();
     //.	void			DeferredUnload			();
     void Evict();

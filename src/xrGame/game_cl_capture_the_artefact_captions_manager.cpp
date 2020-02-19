@@ -97,7 +97,7 @@ void CTAGameClCaptionsManager::ShowPendingCaptions() {}
 void CTAGameClCaptionsManager::ShowScoreCaptions()
 {
     VERIFY(m_winner_team != etSpectatorsTeam);
-    LPCSTR team_name = CTeamInfo::GetTeam_name(m_winner_team + 1);
+    const char* team_name = CTeamInfo::GetTeam_name(m_winner_team + 1);
     u32 win_str_size = StringTable().translate("mp_team_wins").size() + xr_strlen(team_name) + 1;
     char* win_str = static_cast<char*>(xr_alloca(win_str_size));
     xr_sprintf(win_str, win_str_size, StringTable().translate("mp_team_wins").c_str(), team_name);

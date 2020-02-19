@@ -89,7 +89,7 @@ int		smfVertex				(Vertex* V)
     return 1 + (std::lower_bound(g_vertices.begin(),g_vertices.end(),V)-g_vertices.begin());
 }
 
-void GSaveAsSMF					(LPCSTR fname)
+void GSaveAsSMF					(const char* fname)
 {
     IWriter* W			= FS.w_open	(fname);
     string256 			tmp;

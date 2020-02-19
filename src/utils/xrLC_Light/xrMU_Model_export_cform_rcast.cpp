@@ -31,7 +31,7 @@ void xrMU_Model::export_cform_rcast(CDB::CollectorPacked& CL, Fmatrix& xform)
         // Unique
         std::sort(adjacent.begin(), adjacent.end());
         adjacent.erase(std::unique(adjacent.begin(), adjacent.end()), adjacent.end());
-        BOOL bAlready = FALSE;
+        bool bAlready = FALSE;
         for (u32 ait = 0; ait < adjacent.size(); ait++)
         {
             _face* Test = adjacent[ait];

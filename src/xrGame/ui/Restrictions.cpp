@@ -56,7 +56,7 @@ void CRestrictions::InitGroups()
 
     // create groups
     u32 c = pSettings->line_count("mp_item_groups");
-    LPCSTR line, name;
+    const char* line, *name;
 
     for (u32 i = 0; i < c; ++i)
     {
@@ -119,7 +119,7 @@ bool CRestrictions::IsAvailable(const shared_str& itm)
     return (_r <= m_rank);
 }
 
-void CRestrictions::AddGroup(LPCSTR group, LPCSTR lst)
+void CRestrictions::AddGroup(const char* group, const char* lst)
 { // private
     VERIFY(m_bInited);
 

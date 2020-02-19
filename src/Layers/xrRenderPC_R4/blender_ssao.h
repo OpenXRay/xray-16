@@ -3,9 +3,9 @@
 class CBlender_SSAO_noMSAA : public IBlender
 {
 public:
-    virtual LPCSTR getComment() { return "INTERNAL: calc SSAO"; }
-    virtual BOOL canBeDetailed() { return FALSE; }
-    virtual BOOL canBeLMAPped() { return FALSE; }
+    virtual const char* getComment() { return "INTERNAL: calc SSAO"; }
+    virtual bool canBeDetailed() { return FALSE; }
+    virtual bool canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_SSAO_noMSAA();
@@ -15,18 +15,18 @@ public:
 class CBlender_SSAO_MSAA : public IBlender
 {
 public:
-    virtual LPCSTR getComment() { return "INTERNAL: calc SSAO"; }
-    virtual BOOL canBeDetailed() { return FALSE; }
-    virtual BOOL canBeLMAPped() { return FALSE; }
+    virtual const char* getComment() { return "INTERNAL: calc SSAO"; }
+    virtual bool canBeDetailed() { return FALSE; }
+    virtual bool canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_SSAO_MSAA();
     virtual ~CBlender_SSAO_MSAA();
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    virtual void SetDefine(const char* Name, const char* Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
     }
-    LPCSTR Name;
-    LPCSTR Definition;
+    const char* Name;
+    const char* Definition;
 };

@@ -4,7 +4,7 @@
 
 #define REGISTRY_BASE HKEY_LOCAL_MACHINE
 
-bool ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value)
+bool ReadRegistryValue(const char* rKeyName, DWORD rKeyType, void* value)
 {
 #ifdef LINUX // FIXME!!!
     return true;
@@ -57,7 +57,7 @@ bool ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value)
 #endif
 };
 
-bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
+bool WriteRegistryValue(const char* rKeyName, DWORD rKeyType, const void* value)
 {
 #ifdef LINUX // FIXME!!!
     return true;
@@ -96,14 +96,14 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
     break;
     };
 
-    res = RegSetValueEx(hKey, rKeyName, NULL, rKeyType, (LPBYTE)value, KeyValueSize);
+    res = RegSetValueEx(hKey, rKeyName, NULL, rKeyType, (unsigned char*)value, KeyValueSize);
 
     RegCloseKey(hKey);
     return true;
 #endif
 };
 
-bool ReadRegistry_StrValue(LPCSTR rKeyName, char* value) 
+bool ReadRegistry_StrValue(const char* rKeyName, char* value) 
 {
 #ifdef LINUX // FIXME!!!
     return true;
@@ -111,25 +111,25 @@ bool ReadRegistry_StrValue(LPCSTR rKeyName, char* value)
     return ReadRegistryValue(rKeyName, REG_SZ, value);
 #endif
 }
-void WriteRegistry_StrValue(LPCSTR rKeyName, const char* value)
+void WriteRegistry_StrValue(const char* rKeyName, const char* value)
 {
 #ifndef LINUX // FIXME!!!
     WriteRegistryValue(rKeyName, REG_SZ, value);
 #endif
 }
-void ReadRegistry_DWValue(LPCSTR rKeyName, DWORD& value)
+void ReadRegistry_DWValue(const char* rKeyName, unsigned int& value)
 {
 #ifndef LINUX // FIXME!!!
     ReadRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
-void WriteRegistry_DWValue(LPCSTR rKeyName, const DWORD& value) 
+void WriteRegistry_DWValue(const char* rKeyName, const unsigned int& value) 
 {
 #ifndef LINUX // FIXME!!
     WriteRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
-u32 const ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const buffer_size)
+u32 const ReadRegistry_BinaryValue(const char* rKeyName, u8* buffer_dest, u32 const buffer_size)
 {
 #ifdef LINUX // FIXME!!!
     return u32(0);
@@ -163,7 +163,7 @@ u32 const ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const b
 #endif
 }
 
-void WriteRegistry_BinaryValue(LPCSTR rKeyName, u8 const* buffer_src, u32 const buffer_size)
+void WriteRegistry_BinaryValue(const char* rKeyName, u8 const* buffer_src, u32 const buffer_size)
 {
 #ifndef LINUX // FIXME!!!
     HKEY hKey;

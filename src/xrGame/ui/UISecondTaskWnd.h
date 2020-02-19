@@ -32,7 +32,7 @@ public:
     UITaskListWnd();
     virtual ~UITaskListWnd();
 
-    void init_from_xml(CUIXml& xml, LPCSTR path);
+    void init_from_xml(CUIXml& xml, const char* path);
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnMouseScroll(float iDirection);

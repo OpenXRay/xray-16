@@ -18,7 +18,7 @@ struct search_entry
 };
 
 R_constant_table::~R_constant_table() { RImplementation.Resources->_DeleteConstantTable(this); }
-void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
+void R_constant_table::fatal(const char* S) { FATAL(S); }
 // predicates
 IC bool p_search(const ref_constant& C, cpcstr S) { return xr_strcmp(*C->name, S) < 0; }
 IC bool p_sort(const ref_constant& C1, const ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
@@ -66,15 +66,15 @@ ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/)
 }
 
 #if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
-BOOL R_constant_table::parse(void* _desc, u32 destination)
+bool R_constant_table::parse(void* _desc, u32 destination)
 {
     D3DXSHADER_CONSTANTTABLE* desc = (D3DXSHADER_CONSTANTTABLE*)_desc;
-    D3DXSHADER_CONSTANTINFO* it = (D3DXSHADER_CONSTANTINFO*)(LPBYTE(desc) + desc->ConstantInfo);
-    LPBYTE ptr = LPBYTE(desc);
+    D3DXSHADER_CONSTANTINFO* it = (D3DXSHADER_CONSTANTINFO*)((unsigned char*)(desc) + desc->ConstantInfo);
+    unsigned char* ptr = (unsigned char*)(desc);
     for (u32 dwCount = desc->Constants; dwCount; dwCount--, it++)
     {
         // Name
-        LPCSTR name = LPCSTR(ptr + it->Name);
+        const char* name = (const char*)(ptr + it->Name);
 
         // Type
         u16 type = RC_float;
@@ -275,9 +275,9 @@ void R_constant_table::clear()
 #endif //
 }
 
-BOOL R_constant_table::equal(R_constant_table& C)
+bool R_constant_table::equal(R_constant_table& C)
 {
-    if (table.size() != C.table.size())
+if (table.size() != C.table.size())
         return FALSE;
     u32 size = table.size();
     for (u32 it = 0; it < size; it++)

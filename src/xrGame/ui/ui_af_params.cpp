@@ -33,7 +33,7 @@ CUIArtefactParams::~CUIArtefactParams()
     xr_delete(m_Prop_line);
 }
 
-LPCSTR af_immunity_section_names[] = // ALife::EInfluenceType
+const char* af_immunity_section_names[] = // ALife::EInfluenceType
 {
     "radiation_immunity", // infl_rad=0
     "burn_immunity", // infl_fire=1
@@ -48,7 +48,7 @@ LPCSTR af_immunity_section_names[] = // ALife::EInfluenceType
     "fire_wound_immunity",
 };
 
-LPCSTR af_restore_section_names[] = // ALife::EConditionRestoreType
+const char* af_restore_section_names[] = // ALife::EConditionRestoreType
     {
         "health_restore_speed", // eHealthRestoreSpeed=0
         "satiety_restore_speed", // eSatietyRestoreSpeed=1
@@ -57,7 +57,7 @@ LPCSTR af_restore_section_names[] = // ALife::EConditionRestoreType
         "radiation_restore_speed", // eRadiationRestoreSpeed=4
 };
 
-LPCSTR af_immunity_caption[] = // ALife::EInfluenceType
+const char* af_immunity_caption[] = // ALife::EInfluenceType
 {
     "ui_inv_outfit_radiation_protection", // "(radiation_imm)",
     "ui_inv_outfit_burn_protection", // "(burn_imm)",
@@ -73,13 +73,13 @@ LPCSTR af_immunity_caption[] = // ALife::EInfluenceType
     "ui_inv_outfit_fire_wound_protection", // "(fire_wound_imm)",
 };
 
-LPCSTR af_restore_caption[] = // ALife::EConditionRestoreType
+const char* af_restore_caption[] = // ALife::EConditionRestoreType
 {
     "ui_inv_health", "ui_inv_satiety", "ui_inv_power", "ui_inv_bleeding", "ui_inv_radiation",
 };
 
 /*
-LPCSTR af_actor_param_names[]=
+const char* af_actor_param_names[]=
 {
     "satiety_health_v",
     "radiation_v",
@@ -91,7 +91,7 @@ LPCSTR af_actor_param_names[]=
 
 bool CUIArtefactParams::InitFromXml(CUIXml& xml)
 {
-    LPCSTR base = "af_params";
+    const char* base = "af_params";
 
     XML_NODE stored_root = xml.GetLocalRoot();
     XML_NODE base_node = xml.NavigateToNode(base, 0);
@@ -111,7 +111,7 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
         m_immunity_item[i]->Init(xml, af_immunity_section_names[i]);
         m_immunity_item[i]->SetAutoDelete(false);
 
-        LPCSTR name = StringTable().translate(af_immunity_caption[i]).c_str();
+        const char* name = StringTable().translate(af_immunity_caption[i]).c_str();
         m_immunity_item[i]->SetCaption(name);
 
         xml.SetLocalRoot(base_node);
@@ -123,7 +123,7 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
         m_restore_item[i]->Init(xml, af_restore_section_names[i]);
         m_restore_item[i]->SetAutoDelete(false);
 
-        LPCSTR name = StringTable().translate(af_restore_caption[i]).c_str();
+        const char* name = StringTable().translate(af_restore_caption[i]).c_str();
         m_restore_item[i]->SetCaption(name);
 
         xml.SetLocalRoot(base_node);
@@ -136,8 +136,8 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
 
         // use either ui_inv_weight or ui_inv_outfit_additional_weight
         // but set ui_inv_weight if both unavailable
-        LPCSTR name = StringTable().translate("ui_inv_weight").c_str();
-        LPCSTR add_name = StringTable().translate("ui_inv_outfit_additional_weight").c_str();
+        const char* name = StringTable().translate("ui_inv_weight").c_str();
+        const char* add_name = StringTable().translate("ui_inv_outfit_additional_weight").c_str();
         if (0 == xr_strcmp(name, "ui_inv_weight") &&
             0 != xr_strcmp(add_name, "ui_inv_outfit_additional_weight"))
         {
@@ -245,7 +245,7 @@ UIArtefactParamItem::UIArtefactParamItem()
 }
 
 UIArtefactParamItem::~UIArtefactParamItem() {}
-void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
+void UIArtefactParamItem::Init(CUIXml& xml, const char* section)
 {
     CUIXmlInit::InitWindow(xml, section, 0, this);
     xml.SetLocalRoot(xml.NavigateToNode(section));
@@ -255,28 +255,28 @@ void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
     m_magnitude = xml.ReadAttribFlt("value", 0, "magnitude", 1.0f);
     m_sign_inverse = (xml.ReadAttribInt("value", 0, "sign_inverse", 0) == 1);
 
-    LPCSTR unit_str = xml.ReadAttrib("value", 0, "unit_str", "");
+    const char* unit_str = xml.ReadAttrib("value", 0, "unit_str", "");
     m_unit_str._set(StringTable().translate(unit_str));
 
-    LPCSTR texture_minus = xml.Read("texture_minus", 0, "");
+    const char* texture_minus = xml.Read("texture_minus", 0, "");
     if (texture_minus && xr_strlen(texture_minus))
     {
         m_texture_minus._set(texture_minus);
 
-        LPCSTR texture_plus = xml.Read("caption:texture", 0, "");
+        const char* texture_plus = xml.Read("caption:texture", 0, "");
         m_texture_plus._set(texture_plus);
         VERIFY(m_texture_plus.size());
     }
 }
 
-void UIArtefactParamItem::SetCaption(LPCSTR name) { m_caption->TextItemControl()->SetText(name); }
+void UIArtefactParamItem::SetCaption(const char* name) { m_caption->TextItemControl()->SetText(name); }
 void UIArtefactParamItem::SetValue(float value)
 {
     value *= m_magnitude;
     string32 buf;
     xr_sprintf(buf, "%+.0f", value);
 
-    LPSTR str;
+    char* str;
     if (m_unit_str.size())
     {
         STRCONCAT(str, buf, " ", m_unit_str.c_str());

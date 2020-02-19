@@ -65,7 +65,7 @@ void CUIChatWnd::Init(CUIXml& uiXml)
     AddCallback(UIEditBox, EDIT_TEXT_CANCEL, CUIWndCallback::void_function(this, &CUIChatWnd::OnChatCancel));
 }
 
-void CUIChatWnd::SetEditBoxPrefix(LPCSTR prefix)
+void CUIChatWnd::SetEditBoxPrefix(const char* prefix)
 {
     UIPrefix->SetText(prefix);
     UIPrefix->AdjustWidthToText();

@@ -38,9 +38,9 @@ void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, 
     {
         u32 item = (iOffset << 16) | iOffset;
         u32 count = number_indices / 2;
-        LPDWORD sit = LPDWORD(indices);
-        LPDWORD send = sit + count;
-        LPDWORD dit = LPDWORD(iDest);
+        unsigned int* sit = (unsigned int*)(indices);
+        unsigned int* send = sit + count;
+        unsigned int* dit = (unsigned int*)(iDest);
         for (; sit != send; dit++, sit++)
             *dit = *sit + item;
         if (number_indices & 1)
@@ -68,9 +68,9 @@ void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, 
     {
         u32 item = (iOffset << 16) | iOffset;
         u32 count = number_indices / 2;
-        LPDWORD sit = LPDWORD(indices);
-        LPDWORD send = sit + count;
-        LPDWORD dit = LPDWORD(iDest);
+        unsigned int* sit = (unsigned int*)(indices);
+        unsigned int* send = sit + count;
+        unsigned int* dit = (unsigned int*)(iDest);
         for (; sit != send; dit++, sit++)
             *dit = *sit + item;
         if (number_indices & 1)

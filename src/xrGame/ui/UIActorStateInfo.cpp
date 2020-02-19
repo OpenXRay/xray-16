@@ -47,7 +47,7 @@ void ui_actor_state_wnd::init_from_xml(CUIXml& xml)
     m_state[stt_radia]->init_from_xml_plain(xml, "progress_bar_radiation");
 }
 
-void ui_actor_state_wnd::init_from_xml(CUIXml& xml, LPCSTR path)
+void ui_actor_state_wnd::init_from_xml(CUIXml& xml, const char* path)
 {
     XML_NODE stored_root = xml.GetLocalRoot();
     CUIXmlInit::InitWindow(xml, path, 0, this);
@@ -325,7 +325,7 @@ void ui_actor_state_wnd::Show(bool status)
 /// =============================================================================================
 ui_actor_state_item::ui_actor_state_item() : m_magnitude(1.0f) {}
 
-void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical /*= true*/)
+void ui_actor_state_item::init_from_xml(CUIXml& xml, const char* path, bool critical /*= true*/)
 {
     if (!CUIXmlInit::InitWindow(xml, path, 0, this, critical))
         return;
@@ -334,7 +334,7 @@ void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical 
     XML_NODE new_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(new_root);
 
-    LPCSTR hint_text = xml.Read("hint_text", 0, "no hint");
+    const char* hint_text = xml.Read("hint_text", 0, "no hint");
     set_hint_text_ST(hint_text);
 
     set_hint_delay((u32)xml.ReadAttribInt("hint_text", 0, "delay"));
@@ -382,7 +382,7 @@ void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical 
     xml.SetLocalRoot(stored_root);
 }
 
-void ui_actor_state_item::init_from_xml_plain(CUIXml& xml, LPCSTR path)
+void ui_actor_state_item::init_from_xml_plain(CUIXml& xml, const char* path)
 {
     m_progress = UIHelper::CreateProgressBar(xml, path, this);
 }

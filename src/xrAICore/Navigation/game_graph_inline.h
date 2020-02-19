@@ -31,7 +31,7 @@ inline void CGameGraph::Initialize(IReader& stream, bool own)
     m_current_level_cross_table = nullptr;
 }
 
-IC CGameGraph::CGameGraph(LPCSTR file_name, u32 current_version)
+IC CGameGraph::CGameGraph(const char* file_name, u32 current_version)
 {
     IReader* stream = FS.r_open(file_name);
     VERIFY(stream);
@@ -93,7 +93,7 @@ IC void CGameGraph::accessible(u32 const vertex_id, bool value) const
 IC bool CGameGraph::valid_vertex_id(u32 const vertex_id) const { return (vertex_id < header().vertex_count()); }
 IC void CGameGraph::begin(u32 const vertex_id, const_iterator& start, const_iterator& end) const
 {
-    end = (start = (const CEdge*)((BYTE*)m_nodes + vertex(_GRAPH_ID(vertex_id))->edge_offset())) +
+    end = (start = (const CEdge*)((unsigned char*)m_nodes + vertex(_GRAPH_ID(vertex_id))->edge_offset())) +
         vertex(_GRAPH_ID(vertex_id))->edge_count();
 }
 
@@ -136,7 +136,7 @@ IC const GameGraph::SLevel& GameGraph::CHeader::level(const _LEVEL_ID& id) const
     return ((*I).second);
 }
 
-IC const GameGraph::SLevel& GameGraph::CHeader::level(LPCSTR level_name) const
+IC const GameGraph::SLevel& GameGraph::CHeader::level(const char* level_name) const
 {
     LEVEL_MAP::const_iterator I = levels().begin();
     LEVEL_MAP::const_iterator E = levels().end();
@@ -153,7 +153,7 @@ IC const GameGraph::SLevel& GameGraph::CHeader::level(LPCSTR level_name) const
 #endif
 }
 
-IC const GameGraph::SLevel* GameGraph::CHeader::level(LPCSTR level_name, bool) const
+IC const GameGraph::SLevel* GameGraph::CHeader::level(const char* level_name, bool) const
 {
     LEVEL_MAP::const_iterator I = levels().begin();
     LEVEL_MAP::const_iterator E = levels().end();

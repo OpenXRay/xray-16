@@ -52,11 +52,11 @@ void CUISleepStatic::Update()
         m_UIStaticItem2.SetSize(Fvector2().set(1, 1));
 }
 
-void CUISleepStatic::InitTextureEx(LPCSTR tex_name, LPCSTR sh_name)
+void CUISleepStatic::InitTextureEx(const char* tex_name, const char* sh_name)
 {
     inherited::InitTextureEx(tex_name, sh_name);
 
-    LPCSTR res_shname = GEnv.UIRender->UpdateShaderName(tex_name, sh_name);
+    const char* res_shname = GEnv.UIRender->UpdateShaderName(tex_name, sh_name);
     CUITextureMaster::InitTexture(tex_name, &m_UIStaticItem2, res_shname);
 
     Fvector2 p = GetWndPos();

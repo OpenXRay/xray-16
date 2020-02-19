@@ -860,7 +860,7 @@ void CUIActorMenu::ShowMessage(pcstr text, pcstr staticMessage /*= nullptr*/, fl
     }
 }
 
-void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)
+void CUIActorMenu::CallMessageBoxYesNo(const char* text)
 {
     if (!m_message_box_yes_no)
     {
@@ -873,7 +873,7 @@ void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)
     m_message_box_yes_no->ShowDialog(false);
 }
 
-void CUIActorMenu::CallMessageBoxOK(LPCSTR text)
+void CUIActorMenu::CallMessageBoxOK(const char* text)
 {
     if (!m_message_box_ok)
         return;

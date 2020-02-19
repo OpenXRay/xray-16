@@ -17,12 +17,12 @@
 #include "MainMenu.h"
 #include "xrNetServer/NET_Messages.h"
 
-extern LPCSTR alife_section;
+extern const char* alife_section;
 
 CAutosaveManager::CAutosaveManager()
 {
     u32 hours, minutes, seconds;
-    LPCSTR section = alife_section;
+    const char* section = alife_section;
 
     sscanf(pSettings->r_string(section, "autosave_interval"), "%d:%d:%d", &hours, &minutes, &seconds);
     m_autosave_interval = (u32)generate_time(1, 1, 1, hours, minutes, seconds);

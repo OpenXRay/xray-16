@@ -28,7 +28,7 @@ private:
     typedef CStalkerActionCombatBase inherited;
 
 public:
-    action_base(CAI_Stalker* object, LPCSTR action_name = "");
+    action_base(CAI_Stalker* object, const char* action_name = "");
     virtual void select_animation(shared_str& result) = 0;
     virtual void on_animation_end() = 0;
     virtual void on_mark();
@@ -47,7 +47,7 @@ private:
     typedef action_base inherited;
 
 public:
-    change_loophole(CAI_Stalker* object, LPCSTR action_name);
+    change_loophole(CAI_Stalker* object, const char* action_name);
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -65,7 +65,7 @@ private:
     typedef action_base inherited;
 
 public:
-    non_animated_change_loophole(CAI_Stalker* object, LPCSTR action_name);
+    non_animated_change_loophole(CAI_Stalker* object, const char* action_name);
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -84,7 +84,7 @@ private:
     typedef action_base inherited;
 
 public:
-    exit(CAI_Stalker* object, LPCSTR action_name);
+    exit(CAI_Stalker* object, const char* action_name);
     virtual void initialize();
     virtual void execute();
     virtual void finalize();

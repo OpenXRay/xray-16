@@ -75,10 +75,10 @@ private:
     CTimer m_debug_timer;
     u32 m_start_time;
     shared_str m_timer_comment;
-    void timer_begin(LPCSTR comment);
+    void timer_begin(const char* comment);
     void timer_end();
 #else
-    inline void timer_begin(LPCSTR comment) {}
+    inline void timer_begin(const char* comment) {}
     inline void timer_end() {}
 #endif
 }; // class configs_dumper

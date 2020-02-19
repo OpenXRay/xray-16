@@ -23,7 +23,7 @@ namespace aimers
 class base : private Noncopyable
 {
 public:
-    base(CGameObject* object, LPCSTR animation_id, bool animation_start, Fvector const& target);
+    base(CGameObject* object, const char* animation_id, bool animation_start, Fvector const& target);
 
 protected:
     template <u32 bone_count0, u32 bone_count1>

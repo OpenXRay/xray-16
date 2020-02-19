@@ -17,13 +17,13 @@ private:
     SCallbackInfo* NewCallback();
 
 public:
-    bool Load(LPCSTR xml_name);
+    bool Load(const char* xml_name);
     void Register(CUIWindow* pChild);
-    void Register(CUIWindow* pChild, LPCSTR name);
+    void Register(CUIWindow* pChild, const char* name);
     CUIDialogWndEx();
     virtual ~CUIDialogWndEx();
     void AddCallback(
-        LPCSTR control_id, s16 event, const luabind::functor<void>& functor, const luabind::object& object);
+        const char* control_id, s16 event, const luabind::functor<void>& functor, const luabind::object& object);
     virtual void Update();
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool Dispatch(int cmd, int param) { return true; }

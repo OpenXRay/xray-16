@@ -9,8 +9,8 @@
 
 struct SExts
 {
-    xr_vector<LPSTR> exts;
-    void format_register(LPCSTR ext)
+    xr_vector<char*> exts;
+    void format_register(const char* ext)
     {
         if (ext && ext[0])
         {
@@ -21,7 +21,7 @@ struct SExts
         }
     }
     u32 size() { return (u32)exts.size(); }
-    LPSTR operator[](int k) { return exts[k]; }
+    char* operator[](int k) { return exts[k]; }
     ~SExts()
     {
         for (u32 i = 0; i < exts.size(); i++)
@@ -33,12 +33,12 @@ SExts formats;
 
 void Surface_FormatExt(FREE_IMAGE_FORMAT f)
 {
-    LPCSTR n = FreeImage_GetFIFExtensionList(f);
+    const char* n = FreeImage_GetFIFExtensionList(f);
     if (n)
     {
-        LPSTR base = xr_strdup(n);
-        LPSTR ext = base;
-        LPSTR cur = ext;
+        char* base = xr_strdup(n);
+        char* ext = base;
+        char* cur = ext;
         for (; ext[0]; ext++)
         {
             if (ext[0] == ',')
@@ -84,7 +84,7 @@ void Surface_Init()
     Msg("* %d supported formats", formats.size());
 }
 
-bool Surface_Detect(string_path& F, LPSTR N)
+bool Surface_Detect(string_path& F, char* N)
 {
     FS.update_path(F, "$game_textures$", strconcat(sizeof(F), F, N, ".dds"));
     FILE* file = fopen(F, "rb");

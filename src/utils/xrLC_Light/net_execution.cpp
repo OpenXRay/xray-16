@@ -4,7 +4,7 @@
 namespace lc_net
 {
 /*
-    bool net_execution::run( IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream )
+    bool net_execution::run( IAgent* agent, unsigned int sessionId, IGenericStream* inStream, IGenericStream* outStream )
     {
         if( receive_task( agent, sessionId,  inStream ) &&
             execute() )

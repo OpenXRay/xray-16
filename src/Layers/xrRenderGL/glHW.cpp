@@ -199,7 +199,7 @@ void CHW::UpdateViews()
     CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
 }
 
-void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
+void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const float ColorRGBA[4])
 {
     if (pRenderTargetView == 0)
         return;
@@ -213,7 +213,7 @@ void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[
     CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
 }
 
-void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
+void CHW::ClearDepthStencilView(GLuint pDepthStencilView, unsigned int ClearFlags, float Depth, unsigned char Stencil)
 {
     if (pDepthStencilView == 0)
         return;

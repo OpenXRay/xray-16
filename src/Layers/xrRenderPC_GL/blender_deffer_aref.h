@@ -7,10 +7,10 @@ public:
     xrP_BOOL oBlend;
     bool lmapped;
 public:
-    LPCSTR getComment() override { return "LEVEL: defer-base-aref"; }
-    BOOL canBeDetailed() override { return TRUE; }
-    BOOL canBeLMAPped() override { return lmapped; }
-    BOOL canUseSteepParallax() override { return TRUE; }
+    const char* getComment() override { return "LEVEL: defer-base-aref"; }
+    bool canBeDetailed() override { return TRUE; }
+    bool canBeLMAPped() override { return lmapped; }
+    bool canUseSteepParallax() override { return TRUE; }
 
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;

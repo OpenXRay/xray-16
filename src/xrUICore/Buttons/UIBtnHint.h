@@ -17,7 +17,7 @@ public:
     void Discard() { m_ownerWnd = NULL; };
     void OnRender();
     void Draw_() { m_enabledOnFrame = true; };
-    void SetHintText(CUIWindow* w, LPCSTR text);
+    void SetHintText(CUIWindow* w, const char* text);
 };
 
 XRUICORE_API extern CUIButtonHint* g_btnHint;

@@ -32,7 +32,7 @@ void ScheduledBase::shedule_Update(u32 dt)
 #ifdef DEBUG
     if (shedule.dbg_startframe == shedule.dbg_update_shedule)
     {
-        LPCSTR name = "unknown";
+        const char* name = "unknown";
         const auto object = dynamic_cast<IGameObject*>(this);
         if (object)
             name = object->cName().c_str();

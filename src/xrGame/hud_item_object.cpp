@@ -10,7 +10,7 @@ IFactoryObject* CHudItemObject::_construct()
     return (this);
 }
 
-void CHudItemObject::Load(LPCSTR section)
+void CHudItemObject::Load(const char* section)
 {
     CInventoryItemObject::Load(section);
     CHudItem::Load(section);
@@ -61,7 +61,7 @@ void CHudItemObject::OnH_A_Independent()
     CInventoryItemObject::OnH_A_Independent();
 }
 
-BOOL CHudItemObject::net_Spawn(CSE_Abstract* DC)
+bool CHudItemObject::net_Spawn(CSE_Abstract* DC)
 {
     return (CInventoryItemObject::net_Spawn(DC) && CHudItem::net_Spawn(DC));
 }

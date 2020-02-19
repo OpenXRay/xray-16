@@ -7,7 +7,7 @@
 
 CVisualZone::CVisualZone() {}
 CVisualZone::~CVisualZone() {}
-BOOL CVisualZone::net_Spawn(CSE_Abstract* DC)
+bool CVisualZone::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -40,7 +40,7 @@ void CVisualZone::SwitchZoneState(EZoneState new_state)
 
     inherited::SwitchZoneState(new_state);
 }
-void CVisualZone::Load(LPCSTR section)
+void CVisualZone::Load(const char* section)
 {
     inherited::Load(section);
     m_dwAttackAnimaionStart = pSettings->r_u32(section, "attack_animation_start");

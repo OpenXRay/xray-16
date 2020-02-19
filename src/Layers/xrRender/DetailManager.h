@@ -203,7 +203,7 @@ public:
     void cache_Task(int gx, int gz, Slot* D);
     Slot* cache_Query(int sx, int sz);
     void cache_Decompress(Slot* D);
-    BOOL cache_Validate();
+    bool cache_Validate();
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
     int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }

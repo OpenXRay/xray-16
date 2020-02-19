@@ -295,7 +295,7 @@ void CUITalkWnd::AddQuestion(const shared_str& text, const shared_str& value, in
     UITalkDialogWnd->AddQuestion(StringTable().translate(text).c_str(), value.c_str(), number, b_finalizer);
 }
 
-void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)
+void CUITalkWnd::AddAnswer(const shared_str& text, const char* SpeakerName)
 {
     //для пустой фразы вообще ничего не выводим
     if (text.size() == 0)
@@ -364,7 +364,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
-void CUITalkWnd::PlaySnd(LPCSTR text)
+void CUITalkWnd::PlaySnd(const char* text)
 {
     u32 text_len = xr_strlen(text);
     if (text_len == 0)
@@ -374,8 +374,8 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
 
     string_path fn;
 
-    LPCSTR path = "characters_voice" DELIMITER "dialogs" DELIMITER;
-    LPCSTR ext = ".ogg";
+    const char* path = "characters_voice" DELIMITER "dialogs" DELIMITER;
+    const char* ext = ".ogg";
     u32 tsize = sizeof(fn) - xr_strlen(path) - xr_strlen(ext) - 1;
     if (text_len > tsize)
     {
@@ -412,7 +412,7 @@ void CUITalkWnd::StopSnd()
         m_sound.stop();
 }
 
-void CUITalkWnd::AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
+void CUITalkWnd::AddIconedMessage(const char* caption, const char* text, const char* texture_name, const char* templ_name)
 {
     UITalkDialogWnd->AddIconedAnswer(caption, text, texture_name, templ_name);
 }

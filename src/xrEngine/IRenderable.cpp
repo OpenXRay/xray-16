@@ -15,7 +15,7 @@ RenderableBase::RenderableBase()
         self->GetSpatialData().type |= STYPE_RENDERABLE;
 }
 
-extern ENGINE_API BOOL g_bRendering;
+extern ENGINE_API bool g_bRendering;
 RenderableBase::~RenderableBase()
 {
     VERIFY(!g_bRendering);

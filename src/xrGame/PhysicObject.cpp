@@ -23,7 +23,7 @@ CPhysicObject::CPhysicObject(void)
       bones_snd_player(nullptr), m_net_updateData(nullptr), m_just_after_spawn(false), m_activated(false) {}
 
 CPhysicObject::~CPhysicObject(void) { xr_delete(m_net_updateData); }
-BOOL CPhysicObject::net_Spawn(CSE_Abstract* DC)
+bool CPhysicObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectPhysic* po = smart_cast<CSE_ALifeObjectPhysic*>(e);
@@ -206,7 +206,7 @@ void CPhysicObject::RunStartupAnim(CSE_Abstract* D)
         smart_cast<IKinematics*>(Visual())->CalculateBones(TRUE);
     }
 }
-IC bool check_blend(CBlend* b, LPCSTR name, LPCSTR sect, LPCSTR visual)
+IC bool check_blend(CBlend* b, const char* name, const char* sect, const char* visual)
 {
 #ifdef DEBUG
     if (!b)
@@ -296,14 +296,14 @@ void CPhysicObject::CreateSkeleton(CSE_ALifeObjectPhysic* po)
         return;
     if (!Visual())
         return;
-    LPCSTR fixed_bones = *po->fixed_bones;
+    const char* fixed_bones = *po->fixed_bones;
     m_pPhysicsShell = P_build_Shell(this, !po->_flags.test(CSE_PHSkeleton::flActive), fixed_bones);
     ApplySpawnIniToPhysicShell(&po->spawn_ini(), m_pPhysicsShell, fixed_bones[0] != '\0');
     ApplySpawnIniToPhysicShell(
         smart_cast<IKinematics*>(Visual())->LL_UserData(), m_pPhysicsShell, fixed_bones[0] != '\0');
 }
 
-void CPhysicObject::Load(LPCSTR section)
+void CPhysicObject::Load(const char* section)
 {
     inherited::Load(section);
     CPHSkeleton::Load(section);
@@ -455,12 +455,12 @@ void CPhysicObject::CreateBody(CSE_ALifeObjectPhysic* po)
     // m_pPhysicsShell->SetAirResistance(0.002f, 0.3f);
 }
 
-BOOL CPhysicObject::net_SaveRelevant()
+bool CPhysicObject::net_SaveRelevant()
 {
     return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
-BOOL CPhysicObject::UsedAI_Locations() { return (FALSE); }
+bool CPhysicObject::UsedAI_Locations() { return (FALSE); }
 void CPhysicObject::InitServerObject(CSE_Abstract* D)
 {
     CPHSkeleton::InitServerObject(D);
@@ -478,7 +478,7 @@ void CPhysicObject::set_collision_hit_callback(ICollisionHitCallback* cc)
 
 //////////////////////////////////////////////////////////////////////////
 /*
-DEFINE_MAP_PRED	(LPCSTR,	CPhysicsJoint*,	JOINT_P_MAP,	JOINT_P_PAIR_IT,	pred_str);
+DEFINE_MAP_PRED	(const char*,	CPhysicsJoint*,	JOINT_P_MAP,	JOINT_P_PAIR_IT,	pred_str);
 
 JOINT_P_MAP			*l_tpJointMap = new JOINT_P_MAP();
 

@@ -179,8 +179,8 @@ void SetupSamplers(CBlender_Compile& C)
 }
 void SetupTextures(CBlender_Compile& C)
 {
-    LPCSTR* TNames = FluidManager.GetEngineTextureNames();
-    LPCSTR* RNames = FluidManager.GetShaderTextureNames();
+    const char** TNames = FluidManager.GetEngineTextureNames();
+    const char** RNames = FluidManager.GetShaderTextureNames();
 
     for (int i = 0; i < dx103DFluidManager::NUM_RENDER_TARGETS; ++i)
         C.r_dx10Texture(RNames[i], TNames[i]);

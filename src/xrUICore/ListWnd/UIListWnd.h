@@ -32,7 +32,7 @@ public:
     virtual void Draw();
     virtual void Update();
     virtual void DetachChild(CUIWindow* pChild);
-    void SetScrollBarProfile(LPCSTR profile) { m_scrollbar_profile = profile; };
+    void SetScrollBarProfile(const char* profile) { m_scrollbar_profile = profile; };
 
     // Добавление элементов в листбокс
     template <class Element>

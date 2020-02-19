@@ -25,13 +25,13 @@ public:
     void init();
     void clear();
     virtual void reinit();
-    virtual void reload(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void reload(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void shedule_Update(u32 time_delta);
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
     virtual void net_Relcase(IGameObject* object);
     void set_object(CScriptBinderObject* object);
     IC CScriptBinderObject* object();

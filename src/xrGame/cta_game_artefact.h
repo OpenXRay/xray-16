@@ -30,7 +30,7 @@ public:
 protected:
     virtual void CreateArtefactActivation();
     virtual void InitializeArtefactRPoint();
-    // virtual		BOOL	net_Relevant				();
+    // virtual		bool	net_Relevant				();
 private:
     bool IsMyTeamArtefact();
     typedef CArtefact inherited;

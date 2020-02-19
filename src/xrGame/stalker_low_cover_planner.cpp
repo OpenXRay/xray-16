@@ -29,7 +29,7 @@ using namespace StalkerDecisionSpace;
 using namespace MonsterSpace;
 using namespace StalkerSpace;
 
-stalker_low_cover_planner::stalker_low_cover_planner(CAI_Stalker* object, LPCSTR action_name)
+stalker_low_cover_planner::stalker_low_cover_planner(CAI_Stalker* object, const char* action_name)
     : inherited(object, action_name)
 {
 }

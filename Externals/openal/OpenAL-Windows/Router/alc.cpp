@@ -56,7 +56,7 @@
 #include "OpenAL32.h"
 
 log_fn_ptr_type*	pLog = NULL;
-void AlLog(LPCSTR format, ...)
+void AlLog(const char* format, ...)
 {
 	if(pLog)
 	{
@@ -270,9 +270,9 @@ ALboolean NewCaptureSpecifierCheck(const ALCchar* specifier)
 //*****************************************************************************
 // GetLoadedModuleDirectory
 //*****************************************************************************
-BOOL GetLoadedModuleDirectory(LPCTSTR moduleName,
+bool GetLoadedModuleDirectory(LPCTSTR moduleName,
                               LPTSTR  directoryContainingModule,
-                              DWORD   directoryContainingModuleLength) {
+                              unsigned int   directoryContainingModuleLength) {
     // Attempts to find the given module in the address space of this
     // process and return the directory containing the module. A NULL
     // moduleName means to look up the directory containing the
@@ -286,7 +286,7 @@ BOOL GetLoadedModuleDirectory(LPCTSTR moduleName,
     TCHAR fileDir[MAX_PATH + 1];
     TCHAR fileName[MAX_PATH + 1];
     TCHAR fileExt[MAX_PATH + 1];
-    DWORD numChars;
+    unsigned int numChars;
 
     if (moduleName != NULL) {
         module = GetModuleHandle(moduleName);
@@ -318,7 +318,7 @@ ALvoid BuildDeviceSpecifierList()
     WIN32_FIND_DATA				findData;
     HANDLE searchHandle			= INVALID_HANDLE_VALUE;
     TCHAR searchName			[MAX_PATH + 1];
-    BOOL found					= FALSE;
+    bool found					= FALSE;
     char* specifier				= 0;
     ALuint specifierSize		= 0;
     char* list					= alcDeviceSpecifierList;
@@ -337,7 +337,7 @@ ALvoid BuildDeviceSpecifierList()
 		//
 		TCHAR dir[4][MAX_PATH + 1];
         int numDirs				= 0;
-		DWORD dirSize			= 0;
+		unsigned int dirSize			= 0;
 		int i;
 		HINSTANCE dll			= 0;
 		ALCAPI_GET_STRING alcGetStringFxn = 0;
@@ -856,7 +856,7 @@ HINSTANCE FindDllWithMatchingSpecifier(TCHAR* dllSearchPattern, char* specifier,
     WIN32_FIND_DATA			findData;
     HANDLE searchHandle		= INVALID_HANDLE_VALUE;
     TCHAR searchName		[MAX_PATH + 1];
-    BOOL found				= FALSE;
+    bool found				= FALSE;
     char* deviceSpecifier	= 0;
 	ALCdevice* device		= NULL;
 	void* context			= NULL;
@@ -869,7 +869,7 @@ HINSTANCE FindDllWithMatchingSpecifier(TCHAR* dllSearchPattern, char* specifier,
     //
     TCHAR dir[4][MAX_PATH + 1];
     int numDirs				= 0;
-    DWORD dirSize			= 0;
+    unsigned int dirSize			= 0;
     int i;
     HINSTANCE dll			= 0;
     ALCAPI_GET_STRING alcGetStringFxn						= 0;
@@ -1104,7 +1104,7 @@ HINSTANCE FindWrapper()
     WIN32_FIND_DATA findData;
     HANDLE searchHandle = INVALID_HANDLE_VALUE;
     TCHAR searchName[MAX_PATH + 1];
-    BOOL found = FALSE;
+    bool found = FALSE;
     const ALCchar* deviceSpecifier = 0;
 
     //
@@ -1115,7 +1115,7 @@ HINSTANCE FindWrapper()
     //
     TCHAR dir[4][MAX_PATH + 1];
     int numDirs = 0;
-    DWORD dirSize = 0;
+    unsigned int dirSize = 0;
     int i;
     HINSTANCE dll = 0;
     ALCAPI_GET_STRING alcGetStringFxn = 0;
@@ -1929,8 +1929,8 @@ void getDefaultPlaybackDeviceNames(char *longName, char *shortName, unsigned int
 
 	if (bFoundOutputName == false) {
 		// figure out name via mmsystem...
-		UINT uDeviceID;
-		DWORD dwFlags=1;
+		unsigned int uDeviceID;
+		unsigned int dwFlags=1;
 		WAVEOUTCAPS outputInfo;
 
 		#if !defined(_WIN64)
@@ -1940,7 +1940,7 @@ void getDefaultPlaybackDeviceNames(char *longName, char *shortName, unsigned int
 		__asm pusha; // workaround for register destruction caused by these wavOutMessage calls (weird but true)
 		#endif
 		#endif // !defined(_WIN64)
-		waveOutMessage((HWAVEOUT)(UINT_PTR)WAVE_MAPPER,0x2000+0x0015,(LPARAM)&uDeviceID,(WPARAM)&dwFlags);
+		waveOutMessage((HWAVEOUT)(uintptr_t)WAVE_MAPPER,0x2000+0x0015,(LPARAM)&uDeviceID,(WPARAM)&dwFlags);
 		waveOutGetDevCaps(uDeviceID,&outputInfo,sizeof(outputInfo));
 		#if !defined(_WIN64)
 		#ifdef __GNUC__
@@ -2001,8 +2001,8 @@ void getDefaultCaptureDeviceNames(char *longName, char *shortName, unsigned int 
 
 	if (bFoundInputName == false) {
 		// figure out name via mmsystem...
-		UINT uDeviceID;
-		DWORD dwFlags=1;
+		unsigned int uDeviceID;
+		unsigned int dwFlags=1;
 		WAVEINCAPS inputInfo;
 
 		#if !defined(_WIN64)
@@ -2012,7 +2012,7 @@ void getDefaultCaptureDeviceNames(char *longName, char *shortName, unsigned int 
 		__asm pusha; // workaround for register destruction caused by these wavOutMessage calls (weird but true)
 		#endif
 		#endif // !defined(_WIN64)
-		waveOutMessage((HWAVEOUT)(UINT_PTR)WAVE_MAPPER,0x2000+0x0015,(LPARAM)&uDeviceID,(WPARAM)&dwFlags);
+		waveOutMessage((HWAVEOUT)(uintptr_t)WAVE_MAPPER,0x2000+0x0015,(LPARAM)&uDeviceID,(WPARAM)&dwFlags);
 		waveInGetDevCaps(uDeviceID, &inputInfo, sizeof(inputInfo));
 		#if !defined(_WIN64)
 		#ifdef __GNUC__

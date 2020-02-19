@@ -31,7 +31,7 @@ ObjectFactory::ClientObjectBaseClass* CObjectItemScript::client_object() const
 
 #endif
 
-ObjectFactory::ServerObjectBaseClass* CObjectItemScript::server_object(LPCSTR section) const
+ObjectFactory::ServerObjectBaseClass* CObjectItemScript::server_object(const char* section) const
 {
     ObjectFactory::ServerObjectBaseClass* object = nullptr;
 
@@ -60,7 +60,7 @@ CObjectItemScript::CObjectItemScript(
 #ifndef NO_XR_GAME
     luabind::object client_creator,
 #endif
-    luabind::object server_creator, const CLASS_ID& clsid, LPCSTR script_clsid)
+    luabind::object server_creator, const CLASS_ID& clsid, const char* script_clsid)
     : inherited(clsid, script_clsid)
 {
 #ifndef NO_XR_GAME
@@ -71,7 +71,7 @@ CObjectItemScript::CObjectItemScript(
 
 #ifndef NO_XR_GAME
 
-CObjectItemScript::CObjectItemScript(luabind::object unknown_creator, const CLASS_ID& clsid, LPCSTR script_clsid)
+CObjectItemScript::CObjectItemScript(luabind::object unknown_creator, const CLASS_ID& clsid, const char* script_clsid)
     : inherited(clsid, script_clsid)
 {
     m_client_creator = m_server_creator = unknown_creator;

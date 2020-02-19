@@ -48,7 +48,7 @@ public:
     }
     void Calculate();
 
-    BOOL Similar(CConstant& C) // comare by modes and params
+    bool Similar(CConstant& C) // comare by modes and params
     {
         if (dwMode != C.dwMode)
             return FALSE;

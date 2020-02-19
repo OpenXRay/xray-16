@@ -134,7 +134,7 @@ bool AABBCollider::Collide(AABBCache& cache, const CollisionAABB& box, OPCODE_Mo
  *	\return		contact status
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL AABBCollider::InitQuery(AABBCache& cache, const CollisionAABB& box)
+bool AABBCollider::InitQuery(AABBCache& cache, const CollisionAABB& box)
 {
     // 1) Call the base method
     VolumeCollider::InitQueryEx();
@@ -386,7 +386,7 @@ bool AABBCollider::Collide(AABBCache& cache, const CollisionAABB& box, const AAB
  *	\return		true if the AABB contains the whole box
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ BOOL AABBCollider::AABBContainsBox(const Point& bc, const Point& be)
+inline_ bool AABBCollider::AABBContainsBox(const Point& bc, const Point& be)
 {
     if (mMin.x > bc.x - be.x)
         return FALSE;

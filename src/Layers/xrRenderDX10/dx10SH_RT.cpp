@@ -37,7 +37,7 @@ bool CRT::used_as_depth() const
     }
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
+void CRT::create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
 {
     if (pSurface)
         return;
@@ -99,7 +99,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool u
     const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
 
     // Validate render-target usage
-    UINT required = D3D_FORMAT_SUPPORT_TEXTURE2D;
+    unsigned int required = D3D_FORMAT_SUPPORT_TEXTURE2D;
 
     if (useAsDepth)
         required |= D3D_FORMAT_SUPPORT_DEPTH_STENCIL;
@@ -129,7 +129,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool u
         desc.BindFlags = (useAsDepth ? D3D_BIND_DEPTH_STENCIL : (D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET));
         if (RImplementation.o.dx10_msaa_opt)
         {
-            desc.SampleDesc.Quality = UINT(D3D_STANDARD_MULTISAMPLE_PATTERN);
+            desc.SampleDesc.Quality = unsigned int(D3D_STANDARD_MULTISAMPLE_PATTERN);
         }
     }
 
@@ -225,12 +225,12 @@ void CRT::destroy()
 void CRT::reset_begin() { destroy(); }
 void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
 #ifdef USE_DX11
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
+void resptrcode_crt::create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, useUAV));
 }
 #else
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
+void resptrcode_crt::create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount));
 }
@@ -255,7 +255,7 @@ CRTC::~CRTC			()
     DEV->_DeleteRTC	(this);
 }
 
-void CRTC::create	(LPCSTR Name, u32 size,	D3DFORMAT f)
+void CRTC::create	(const char* Name, u32 size,	D3DFORMAT f)
 {
     R_ASSERT	(HW.pDevice && Name && Name[0] && size && btwIsPow2(size));
     _order		= CPU::GetCLK();	//Device.GetTimerGlobal()->GetElapsed_clk();
@@ -321,7 +321,7 @@ void CRTC::reset_end	()
     create		(*cName,dwSize,fmt);
 }
 
-void resptrcode_crtc::create(LPCSTR Name, u32 size, D3DFORMAT f)
+void resptrcode_crtc::create(const char* Name, u32 size, D3DFORMAT f)
 {
     _set		(DEV->_CreateRTC(Name,size,f));
 }

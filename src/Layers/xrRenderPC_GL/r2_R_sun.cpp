@@ -36,8 +36,8 @@ static int facetable[6][4] = {
     {0, 3, 5, 7}, {1, 6, 4, 2},
 };
 //////////////////////////////////////////////////////////////////////////
-#define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
-#define FLT_AS_DW(F) (*(DWORD*)&(F))
+#define DW_AS_FLT(DW) (*(float*)&(DW))
+#define FLT_AS_DW(F) (*(unsigned int*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L)==0)
 #define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L)==0x7f800000L)
@@ -86,7 +86,7 @@ struct BoundingBox
     BoundingBox(): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) { }
     BoundingBox(const BoundingBox& other): minPt(other.minPt), maxPt(other.maxPt) { }
 
-    explicit BoundingBox(const glm::vec3* points, UINT n): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
+    explicit BoundingBox(const glm::vec3* points, unsigned int n): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < n; i++)
             Merge(&points[i]);
@@ -126,7 +126,7 @@ struct BoundingBox
 //  PlaneIntersection
 //    computes the point where three planes intersect
 //    returns whether or not the point exists.
-static inline BOOL PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0, const glm::vec4& p1,
+static inline bool PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0, const glm::vec4& p1,
                                      const glm::vec4& p2)
 {
     glm::vec3 n0 = glm::vec3(p0.x, p0.y, p0.z);
@@ -254,7 +254,7 @@ struct DumbClipper
     CFrustum frustum;
     xr_vector<glm::vec4> planes;
 
-    BOOL clip(glm::vec3& p0, glm::vec3& p1) // returns TRUE if result meaningfull
+    bool clip(glm::vec3& p0, glm::vec3& p1) // returns TRUE if result meaningfull
     {
         float denum;
         glm::vec3 D;

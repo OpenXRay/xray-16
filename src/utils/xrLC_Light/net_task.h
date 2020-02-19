@@ -32,6 +32,6 @@ public:
     bool receive(IGenericStream* inStream);
     bool send(IGenericStream* outStream);
 
-    net_task(IAgent* agent, DWORD session);
+    net_task(IAgent* agent, unsigned int session);
     ~net_task();
 };

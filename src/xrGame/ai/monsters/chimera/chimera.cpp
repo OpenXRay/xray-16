@@ -16,7 +16,7 @@ CChimera::CChimera()
 }
 
 CChimera::~CChimera() { xr_delete(StateMan); }
-void CChimera::Load(LPCSTR section)
+void CChimera::Load(const char* section)
 {
     inherited::Load(section);
 

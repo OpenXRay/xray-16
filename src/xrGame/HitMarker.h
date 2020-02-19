@@ -65,8 +65,8 @@ public:
     bool AddGrenade_ForMark(CGrenade* grn);
     void Update_GrenadeView(Fvector& pos_actor);
 
-    void InitShader(LPCSTR tex_name);
-    void InitShader_Grenade(LPCSTR tex_name);
+    void InitShader(const char* tex_name);
+    void InitShader_Grenade(const char* tex_name);
 
     void net_Relcase(IGameObject* obj);
 };

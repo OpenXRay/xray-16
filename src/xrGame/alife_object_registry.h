@@ -31,7 +31,7 @@ public:
     static CSE_ALifeDynamicObject* get_object(IReader& file_stream);
 
 public:
-    CALifeObjectRegistry(LPCSTR section);
+    CALifeObjectRegistry(const char* section);
     virtual ~CALifeObjectRegistry();
     virtual void save(IWriter& memory_stream);
     void load(IReader& file_stream);

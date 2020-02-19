@@ -34,37 +34,37 @@ class CUIProgressBar;
 class CScriptXmlInit
 {
 public:
-    void ParseFile(LPCSTR xml_file);
+    void ParseFile(const char* xml_file);
     void ParseShTexInfo(pcstr xml_file);
-    void InitWindow(LPCSTR path, int index, CUIWindow* pWnd);
-    CUIFrameWindow* InitFrame(LPCSTR path, CUIWindow* parent);
-    CUIFrameLineWnd* InitFrameLine(LPCSTR path, CUIWindow* parent);
-    CUIEditBox* InitEditBox(LPCSTR path, CUIWindow* parent);
-    CUIStatic* InitStatic(LPCSTR path, CUIWindow* parent);
-    CUIStatic* InitAnimStatic(LPCSTR path, CUIWindow* parent);
-    CUIStatic* InitSleepStatic(LPCSTR path, CUIWindow* parent);
-    CUITextWnd* InitTextWnd(LPCSTR path, CUIWindow* parent);
-    CUICheckButton* InitCheck(LPCSTR path, CUIWindow* parent);
-    CUISpinNum* InitSpinNum(LPCSTR path, CUIWindow* parent);
-    CUISpinFlt* InitSpinFlt(LPCSTR path, CUIWindow* parent);
-    CUISpinText* InitSpinText(LPCSTR path, CUIWindow* parent);
-    CUIComboBox* InitComboBox(LPCSTR path, CUIWindow* parent);
-    CUI3tButton* Init3tButton(LPCSTR path, CUIWindow* parent);
+    void InitWindow(const char* path, int index, CUIWindow* pWnd);
+    CUIFrameWindow* InitFrame(const char* path, CUIWindow* parent);
+    CUIFrameLineWnd* InitFrameLine(const char* path, CUIWindow* parent);
+    CUIEditBox* InitEditBox(const char* path, CUIWindow* parent);
+    CUIStatic* InitStatic(const char* path, CUIWindow* parent);
+    CUIStatic* InitAnimStatic(const char* path, CUIWindow* parent);
+    CUIStatic* InitSleepStatic(const char* path, CUIWindow* parent);
+    CUITextWnd* InitTextWnd(const char* path, CUIWindow* parent);
+    CUICheckButton* InitCheck(const char* path, CUIWindow* parent);
+    CUISpinNum* InitSpinNum(const char* path, CUIWindow* parent);
+    CUISpinFlt* InitSpinFlt(const char* path, CUIWindow* parent);
+    CUISpinText* InitSpinText(const char* path, CUIWindow* parent);
+    CUIComboBox* InitComboBox(const char* path, CUIWindow* parent);
+    CUI3tButton* Init3tButton(const char* path, CUIWindow* parent);
 
-    CUITabControl* InitTab(LPCSTR path, CUIWindow* parent);
-    CServerList* InitServerList(LPCSTR path, CUIWindow* parent);
-    CUIMapList* InitMapList(LPCSTR path, CUIWindow* parent);
-    CUIVersionList* InitVerList(LPCSTR path, CUIWindow* parent);
-    CUIMapInfo* InitMapInfo(LPCSTR path, CUIWindow* parent);
-    CUITrackBar* InitTrackBar(LPCSTR path, CUIWindow* parent);
-    CUIEditBox* InitCDkey(LPCSTR path, CUIWindow* parent);
-    CUIEditBox* InitMPPlayerName(LPCSTR path, CUIWindow* parent);
-    CUIMMShniaga* InitMMShniaga(LPCSTR path, CUIWindow* parent);
-    CUIWindow* InitKeyBinding(LPCSTR path, CUIWindow* parent);
-    CUIScrollView* InitScrollView(LPCSTR path, CUIWindow* parent);
+    CUITabControl* InitTab(const char* path, CUIWindow* parent);
+    CServerList* InitServerList(const char* path, CUIWindow* parent);
+    CUIMapList* InitMapList(const char* path, CUIWindow* parent);
+    CUIVersionList* InitVerList(const char* path, CUIWindow* parent);
+    CUIMapInfo* InitMapInfo(const char* path, CUIWindow* parent);
+    CUITrackBar* InitTrackBar(const char* path, CUIWindow* parent);
+    CUIEditBox* InitCDkey(const char* path, CUIWindow* parent);
+    CUIEditBox* InitMPPlayerName(const char* path, CUIWindow* parent);
+    CUIMMShniaga* InitMMShniaga(const char* path, CUIWindow* parent);
+    CUIWindow* InitKeyBinding(const char* path, CUIWindow* parent);
+    CUIScrollView* InitScrollView(const char* path, CUIWindow* parent);
     CUIListWnd* InitListWnd(pcstr path, CUIWindow* parent);
-    CUIListBox* InitListBox(LPCSTR path, CUIWindow* parent);
-    CUIProgressBar* InitProgressBar(LPCSTR path, CUIWindow* parent);
+    CUIListBox* InitListBox(const char* path, CUIWindow* parent);
+    CUIProgressBar* InitProgressBar(const char* path, CUIWindow* parent);
 
 protected:
     CUIXml m_xml;

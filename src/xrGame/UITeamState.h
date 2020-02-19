@@ -67,7 +67,7 @@ private:
 public:
     UITeamState(ETeam teamId, UITeamPanels* teamPanels);
     virtual ~UITeamState();
-    void Init(CUIXml& uiXml, LPCSTR teamNodeName, int index);
+    void Init(CUIXml& uiXml, const char* teamNodeName, int index);
 
     void AddPlayer(ClientID const& clientId);
     void RemovePlayer(ClientID const& clientId);

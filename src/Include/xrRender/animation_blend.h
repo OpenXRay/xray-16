@@ -36,10 +36,10 @@ public:
     float blendPower;
     float speed;
 
-    BOOL playing;
-    BOOL stop_at_end_callback;
-    BOOL stop_at_end;
-    BOOL fall_at_end;
+    bool playing;
+    bool stop_at_end_callback;
+    bool stop_at_end;
+    bool fall_at_end;
     PlayCallback Callback;
     void* CallbackParam;
 

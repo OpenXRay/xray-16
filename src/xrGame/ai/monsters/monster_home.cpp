@@ -33,7 +33,7 @@ void check_path(const CBaseMonster* monster, const CPatrolPath* path)
 #define check_path(a, b)
 #endif // DEBUG
 
-void CMonsterHome::load(LPCSTR line)
+void CMonsterHome::load(const char* line)
 {
     m_path = 0;
     m_level_vertex_id = u32(-1);
@@ -87,7 +87,7 @@ void CMonsterHome::load(LPCSTR line)
     m_aggressive = false;
 }
 
-void CMonsterHome::setup(LPCSTR path_name, float min_radius, float max_radius, bool aggressive, float middle_radius)
+void CMonsterHome::setup(const char* path_name, float min_radius, float max_radius, bool aggressive, float middle_radius)
 {
     m_path = ai().patrol_paths().path(path_name);
     check_path(m_object, m_path);

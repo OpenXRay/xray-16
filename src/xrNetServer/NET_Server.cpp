@@ -220,7 +220,7 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
 
     id.set(param);
     packet.construct(data, data_size);
-    // DWORD currentThreadId = Threading::GetCurrThreadId();
+    // unsigned int currentThreadId = Threading::GetCurrThreadId();
     // Msg("-S- Entering to csMessages from _Receive [%d]", currentThreadId);
     csMessage.Enter();
     // LogStackTrace(
@@ -379,7 +379,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
         // Set server-player info
         DPN_APPLICATION_DESC dpAppDesc;
         DPN_PLAYER_INFO dpPlayerInfo;
-        WCHAR wszName[] = L"XRay Server";
+        wchar_t wszName[] = L"XRay Server";
 
         ZeroMemory(&dpPlayerInfo, sizeof(DPN_PLAYER_INFO));
         dpPlayerInfo.dwSize = sizeof(DPN_PLAYER_INFO);
@@ -392,7 +392,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
         CHK_DX(NET->SetServerInfo(&dpPlayerInfo, NULL, NULL, DPNSETSERVERINFO_SYNC));
 
         // Set server/session description
-        WCHAR SessionNameUNICODE[4096];
+        wchar_t SessionNameUNICODE[4096];
         CHK_DX(MultiByteToWideChar(CP_ACP, 0, session_name, -1, SessionNameUNICODE, 4096));
         // Set server/session description
 
@@ -406,7 +406,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
         dpAppDesc.pvApplicationReservedData = &game_descr;
         dpAppDesc.dwApplicationReservedDataSize = sizeof(game_descr);
 
-        WCHAR SessionPasswordUNICODE[4096];
+        wchar_t SessionPasswordUNICODE[4096];
         if (xr_strlen(password_str))
         {
             CHK_DX(MultiByteToWideChar(CP_ACP, 0, password_str, -1, SessionPasswordUNICODE, 4096));
@@ -421,7 +421,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
 
         CHK_DX(net_Address_device->SetSP(bSimulator ? &CLSID_NETWORKSIMULATOR_DP8SP_TCPIP : &CLSID_DP8SP_TCPIP));
 
-        DWORD dwTraversalMode = DPNA_TRAVERSALMODE_NONE;
+        unsigned int dwTraversalMode = DPNA_TRAVERSALMODE_NONE;
         CHK_DX(net_Address_device->AddComponent(DPNA_KEY_TRAVERSALMODE,
             &dwTraversalMode, sizeof(dwTraversalMode), DPNA_DATATYPE_DWORD));
 
@@ -656,7 +656,7 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
     // send it
     DPN_BUFFER_DESC desc;
     desc.dwBufferSize = size;
-    desc.pBufferData = LPBYTE(data);
+    desc.pBufferData = (unsigned char*)(data);
 
 #ifdef _DEBUG
     u32 time_global = TimeGlobal(device_timer);
@@ -881,9 +881,9 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
     return true;
 }
 
-bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, DWORD* pPort)
+bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, unsigned int* pPort)
 {
-    WCHAR wstrHostname[256] = {0};
+    wchar_t wstrHostname[256] = {0};
     DWORD dwSize = sizeof(wstrHostname);
     DWORD dwDataType = 0;
     CHK_DX(pClientAddress->GetComponentByName(DPNA_KEY_HOSTNAME, wstrHostname, &dwSize, &dwDataType));
@@ -905,7 +905,7 @@ bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_addre
     return true;
 }
 
-bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort)
+bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, unsigned int* pPort)
 {
     IDirectPlay8Address* pClAddr = nullptr;
     CHK_DX(NET->GetClientAddress(ID.value(), &pClAddr, 0));

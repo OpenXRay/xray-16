@@ -103,7 +103,7 @@ void blit_r(lm_layer& dst, u32 ds_x, u32 ds_y, lm_layer& src, u32 ss_x, u32 ss_y
 
 // CDeflector*				Deflector = 0;
 
-IC BOOL UVpointInside(Fvector2& P, UVtri& T)
+IC bool UVpointInside(Fvector2& P, UVtri& T)
 {
     Fvector B;
     return T.isInside(P, B);
@@ -207,7 +207,7 @@ void CDeflector::OA_Export()
     layer.create(dwWidth, dwHeight);
 }
 
-BOOL CDeflector::OA_Place(Face* owner)
+bool CDeflector::OA_Place(Face* owner)
 {
     // It is not correct to rely solely on normal-split-angle for lmaps - imagine smooth sphere
     float cosa = normal.dotproduct(owner->N);
@@ -252,7 +252,7 @@ void CDeflector::GetRect(Fvector2& min, Fvector2& max)
 }
 
 void CDeflector::RemapUV(
-    xr_vector<UVtri>& dest, u32 base_u, u32 base_v, u32 size_u, u32 size_v, u32 lm_u, u32 lm_v, BOOL bRotate)
+    xr_vector<UVtri>& dest, u32 base_u, u32 base_v, u32 size_u, u32 size_v, u32 lm_u, u32 lm_v, bool bRotate)
 {
     dest.clear();
     dest.reserve(UVpolys.size());
@@ -317,7 +317,7 @@ void CDeflector::RemapUV(
     }
 }
 
-void CDeflector::RemapUV(u32 base_u, u32 base_v, u32 size_u, u32 size_v, u32 lm_u, u32 lm_v, BOOL bRotate)
+void CDeflector::RemapUV(u32 base_u, u32 base_v, u32 size_u, u32 size_v, u32 lm_u, u32 lm_v, bool bRotate)
 {
     xr_vector<UVtri> tris_new;
     RemapUV(tris_new, base_u, base_v, size_u, size_v, lm_u, lm_v, bRotate);
@@ -361,7 +361,7 @@ Fvector						normal;
 lm_layer					layer;
 Fsphere						Sphere;
 
-BOOL						bMerged;
+bool						bMerged;
 */
 
 void CDeflector::receive_result(INetReader& r)
@@ -402,7 +402,7 @@ void CDeflector::read(INetReader& r)
 
     r_sphere(r, Sphere);
 
-    bMerged = (BOOL)r.r_u8();
+    bMerged = (bool)r.r_u8();
 }
 
 void CDeflector::write(IWriter& w) const

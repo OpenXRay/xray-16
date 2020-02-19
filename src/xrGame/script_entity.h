@@ -68,7 +68,7 @@ public:
     virtual ~CScriptEntity();
     void init();
     virtual void reinit();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();
@@ -82,7 +82,7 @@ public:
     virtual void vfFinishAction(CScriptEntityAction* tpEntityAction);
     virtual void SetScriptControl(const bool bScriptControl, shared_str caSciptName);
     virtual bool GetScriptControl() const;
-    virtual LPCSTR GetScriptControlName() const;
+    virtual const char* GetScriptControlName() const;
     virtual bool CheckObjectVisibility(const CGameObject* tpObject);
     virtual bool CheckTypeVisibility(const char* section_name);
     virtual bool CheckIfCompleted() const { return false; };
@@ -101,7 +101,7 @@ public:
 
     virtual void sound_callback(const IGameObject* object, int sound_type, const Fvector& position, float sound_power);
 
-    virtual LPCSTR GetPatrolPathName();
+    virtual const char* GetPatrolPathName();
     bool bfScriptAnimation();
     u32 GetActionCount() const;
     const CScriptEntityAction* GetActionByIndex(u32 action_index) const;

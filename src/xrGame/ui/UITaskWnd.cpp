@@ -417,7 +417,7 @@ void CUITaskWnd::OnShowQuestNpcs(CUIWindow* ui, void* d)
 // --------------------------------------------------------------------------------------------------
 CUITaskItem::CUITaskItem() : m_owner(nullptr), show_hint_can(false), show_hint(false), m_hint_wt(500) {}
 
-void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
+void CUITaskItem::Init(CUIXml& uiXml, const char* path)
 {
     CUIXmlInit::InitWindow(uiXml, path, 0, this);
     m_hint_wt = uiXml.ReadAttribInt(path, 0, "hint_wt", 500);

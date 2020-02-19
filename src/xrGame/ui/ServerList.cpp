@@ -15,7 +15,7 @@
 #include "Spectator.h"
 #include "VersionSwitcher.h"
 
-LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
+const char* GameTypeToString(EGameIDs gt, bool bShort);
 CGameSpy_Browser* g_gs_browser = NULL;
 
 CServerList::CServerList()
@@ -316,7 +316,7 @@ void CServerList::FillUpDetailedServerInfo()
 
     if (2 == teams)
     {
-        LPSTR _buff = NULL;
+        char* _buff = NULL;
         CUIListBoxItem* pItemAdv;
         // TEAM 1
         xr_vector<PlayerInfo>::iterator it;
@@ -525,7 +525,7 @@ void CServerList::SetFilters(SServerFilters& sf)
     RefreshList();
 }
 
-void CServerList::SetPlayerName(LPCSTR name) { m_playerName = name; }
+void CServerList::SetPlayerName(const char* name) { m_playerName = name; }
 bool CServerList::IsValidItem(ServerInfo& item)
 {
     bool result = true;
@@ -540,7 +540,7 @@ bool CServerList::IsValidItem(ServerInfo& item)
     return result;
 }
 
-void CServerList::InitFromXml(CUIXml& xml_doc, LPCSTR path)
+void CServerList::InitFromXml(CUIXml& xml_doc, const char* path)
 {
     CUIXmlInit::InitWindow(xml_doc, path, 0, this);
     string256 buf;

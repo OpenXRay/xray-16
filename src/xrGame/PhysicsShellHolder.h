@@ -67,7 +67,7 @@ public:
 public:
     virtual void PHGetLinearVell(Fvector& velocity);
     virtual void PHSetLinearVell(Fvector& velocity);
-    virtual void PHSetMaterial(LPCSTR m);
+    virtual void PHSetMaterial(const char* m);
     virtual void PHSetMaterial(u16 m);
     void PHSaveState(NET_Packet& P);
     void PHLoadState(IReader& P);
@@ -87,7 +87,7 @@ public:
     virtual void deactivate_physics_shell();
 
     virtual void net_Destroy();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     void init();
@@ -110,9 +110,9 @@ public:
 private: // IPhysicsShellHolder
     virtual Fmatrix& ObjectXFORM();
     virtual Fvector& ObjectPosition();
-    virtual LPCSTR ObjectName() const;
-    virtual LPCSTR ObjectNameVisual() const;
-    virtual LPCSTR ObjectNameSect() const;
+    virtual const char* ObjectName() const;
+    virtual const char* ObjectNameVisual() const;
+    virtual const char* ObjectNameSect() const;
     virtual bool ObjectGetDestroy() const;
     virtual ICollisionHitCallback* ObjectGetCollisionHitCallback();
     virtual u16 ObjectID() const;

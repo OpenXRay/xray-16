@@ -14,7 +14,7 @@
 #include "ai_debug.h"
 #include "ef_storage.h"
 
-CPatternFunction::CPatternFunction(LPCSTR caFileName, CEF_Storage* storage) : CBaseFunction(storage)
+CPatternFunction::CPatternFunction(const char* caFileName, CEF_Storage* storage) : CBaseFunction(storage)
 {
     m_dwPatternCount = 0;
     m_dwVariableCount = 0;
@@ -40,7 +40,7 @@ CPatternFunction::~CPatternFunction()
     xr_free(m_dwaVariableValues);
 }
 
-void CPatternFunction::vfLoadEF(LPCSTR caFileName)
+void CPatternFunction::vfLoadEF(const char* caFileName)
 {
     string_path caPath;
     if (!FS.exist(caPath, "$game_ai$", caFileName))

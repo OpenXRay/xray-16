@@ -24,7 +24,7 @@ CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml), m_mark_focused(false)
 }
 
 CMapSpot::~CMapSpot() {}
-void CMapSpot::Load(CUIXml* xml, LPCSTR path)
+void CMapSpot::Load(CUIXml* xml, const char* path)
 {
     CUIXmlInit::InitStatic(*xml, path, 0, this);
     if (!Heading())
@@ -60,7 +60,7 @@ void CMapSpot::Load(CUIXml* xml, LPCSTR path)
     m_mark_focused = false;
 }
 
-LPCSTR CMapSpot::GetHint() { return MapLocation()->GetHint(); };
+const char* CMapSpot::GetHint() { return MapLocation()->GetHint(); };
 void CMapSpot::SetWndPos(const Fvector2& pos) { inherited::SetWndPos(pos); }
 void CMapSpot::Update()
 {
@@ -111,11 +111,11 @@ void CMapSpot::mark_focused() { m_mark_focused = true; }
 
 CMapSpotPointer::CMapSpotPointer(CMapLocation* ml) : inherited(ml) {}
 CMapSpotPointer::~CMapSpotPointer() {}
-LPCSTR CMapSpotPointer::GetHint() { return NULL; }
+const char* CMapSpotPointer::GetHint() { return NULL; }
 //////////////////////////////////////////////////
 CMiniMapSpot::CMiniMapSpot(CMapLocation* ml) : inherited(ml) {}
 CMiniMapSpot::~CMiniMapSpot() {}
-void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
+void CMiniMapSpot::Load(CUIXml* xml, const char* path)
 {
     inherited::Load(xml, path);
 
@@ -133,7 +133,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     XML_NODE n = xml->NavigateToNode(buf, 0);
     if (n)
     {
-        LPCSTR texture = xml->Read(buf, 0, NULL);
+        const char* texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
         if (strchr(texture, _DELIMITER))
         {
@@ -153,7 +153,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     n = xml->NavigateToNode(buf, 0);
     if (n)
     {
-        LPCSTR texture = xml->Read(buf, 0, NULL);
+        const char* texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
         if (strchr(texture, _DELIMITER))
         {
@@ -172,7 +172,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     n = xml->NavigateToNode(buf, 0);
     if (n)
     {
-        LPCSTR texture = xml->Read(buf, 0, NULL);
+        const char* texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
         if (strchr(texture, _DELIMITER))
         {
@@ -244,7 +244,7 @@ CComplexMapSpot::CComplexMapSpot(CMapLocation* ml) : inherited(ml)
 }
 
 CComplexMapSpot::~CComplexMapSpot() {}
-CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, LPCSTR ui_path)
+CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, const char* ui_path)
 {
     CUIStaticOrig* ui = new CUIStaticOrig();
     AttachChild(ui);
@@ -254,7 +254,7 @@ CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, LPCSTR ui_path)
     return ui;
 }
 
-void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path) // complex_spot_template
+void CComplexMapSpot::Load(CUIXml* xml, const char* path) // complex_spot_template
 {
     inherited::Load(xml, path);
 

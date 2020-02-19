@@ -21,7 +21,7 @@ void CBuild::xrPhase_ResolveMaterials()
         for (vecFaceIt F_it = lc_global_data()->g_faces().begin(); F_it != lc_global_data()->g_faces().end(); ++F_it)
         {
             Face* F = *F_it;
-            BOOL bCreate = TRUE;
+            bool bCreate = TRUE;
             for (u32 I = 0; I < counts.size(); I++)
             {
                 if (F->dwMaterial == counts[I].dwMaterial)

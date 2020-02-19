@@ -219,7 +219,7 @@ void CUIArtefactDetectorElite::RegisterItemToDraw(const Fvector& p, const shared
 
 CScientificDetector::CScientificDetector() { m_artefacts.m_af_rank = 3; }
 CScientificDetector::~CScientificDetector() { m_zones.destroy(); }
-void CScientificDetector::Load(LPCSTR section)
+void CScientificDetector::Load(const char* section)
 {
     inherited::Load(section);
     m_zones.load(section, "zone");

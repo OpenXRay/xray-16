@@ -28,7 +28,7 @@ CPHFracturesHolder::~CPHFracturesHolder()
 void CPHFracturesHolder::ApplyImpactsToElement(CPHElement* E)
 {
     auto i = m_impacts.begin(), e = m_impacts.end();
-    BOOL ac_state = E->isActive();
+    bool ac_state = E->isActive();
     // E->bActive=true;
     E->m_flags.set(CPHElement::flActive, TRUE);
     for (; e != i; ++i)

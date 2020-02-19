@@ -31,7 +31,7 @@ imotion_position::imotion_position()
 
                                                                                   };
 
-static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShell* s, float time_left)
+static void interactive_motion_diag(const char* message, const CBlend& b, CPhysicsShell* s, float time_left)
 {
 #ifdef DEBUG
     if (!death_anim_debug)
@@ -43,7 +43,7 @@ static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShe
     VERIFY(KA);
     CPhysicsShellHolder* O = smart_cast<CPhysicsShellHolder*>(s->get_ElementByStoreOrder(0)->PhysicsRefObject());
     VERIFY(O);
-    LPCSTR motion_name = KA->LL_MotionDefName_dbg(m).first;
+    const char* motion_name = KA->LL_MotionDefName_dbg(m).first;
     Msg("death anims - interactive_motion:- %s, motion: %s, blend time %f , total blend time %f , time left: %f , obj: "
         "%s, "
         "model:  %s ",
@@ -51,7 +51,7 @@ static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShe
 #endif
 }
 
-void imotion_position::interactive_motion_diagnostic(LPCSTR message)
+void imotion_position::interactive_motion_diagnostic(const char* message)
 {
 #ifdef DEBUG
     VERIFY(blend);
@@ -101,7 +101,7 @@ void disable_bone_calculation(IKinematics& K, bool v)
         if (bi.callback_param() != 0)
             continue;
 #ifdef DEBUG
-        if (v && bi.callback_overwrite() == BOOL(v))
+        if (v && bi.callback_overwrite() == bool(v))
             Msg("! bone callback_overwrite may have different states");
 #endif
         bi.set_callback_overwrite(v);

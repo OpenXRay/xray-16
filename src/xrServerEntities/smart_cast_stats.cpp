@@ -19,11 +19,11 @@ private:
 private:
     struct CStats
     {
-        LPCSTR m_from;
-        LPCSTR m_to;
+        const char* m_from;
+        const char* m_to;
         u32 m_count;
 
-        IC CStats(LPCSTR from, LPCSTR to, u32 count) : m_from(from), m_to(to), m_count(count) {}
+        IC CStats(const char* from, const char* to, u32 count) : m_from(from), m_to(to), m_count(count) {}
         IC bool operator<(const CStats& stats) const
         {
             return ((m_from < stats.m_from) || ((m_from == stats.m_from) && (m_to < stats.m_to)));
@@ -47,7 +47,7 @@ public:
     IC static void _release();
 
 public:
-    IC void add(LPCSTR from, LPCSTR to);
+    IC void add(const char* from, const char* to);
     IC void clear();
     IC void show();
 };
@@ -74,7 +74,7 @@ IC CSmartCastStats& stats_all()
 }
 #endif
 
-IC void CSmartCastStats::add(LPCSTR from, LPCSTR to)
+IC void CSmartCastStats::add(const char* from, const char* to)
 {
     CStats temp(from, to, 1);
     STATS::iterator I = m_stats.find(temp);
@@ -111,14 +111,14 @@ IC void CSmartCastStats::show()
             (*I).m_from);
 }
 
-void add_smart_cast_stats(LPCSTR from, LPCSTR to)
+void add_smart_cast_stats(const char* from, const char* to)
 {
 #ifdef SMART_CAST_STATS
     stats().add(from, to);
 #endif
 }
 
-void add_smart_cast_stats_all(LPCSTR from, LPCSTR to)
+void add_smart_cast_stats_all(const char* from, const char* to)
 {
 #ifdef SMART_CAST_STATS
 #ifdef SMART_CAST_STATS_ALL

@@ -54,7 +54,7 @@ UIUpgrade::UIUpgrade(CUIInventoryUpgradeWnd* parent_wnd, bool cellBorder) : m_po
 }
 
 UIUpgrade::~UIUpgrade() { xr_delete(m_point); }
-void UIUpgrade::init_upgrade(LPCSTR upgrade_id, CInventoryItem& item)
+void UIUpgrade::init_upgrade(const char* upgrade_id, CInventoryItem& item)
 {
     VERIFY(upgrade_id && xr_strcmp(upgrade_id, ""));
     m_upgrade_id = upgrade_id;
@@ -142,7 +142,7 @@ void UIUpgrade::load_from_xml(CUIXml& ui_xml, int i_column, int i_cell, Frect co
     }
 }
 
-void UIUpgrade::set_texture(Layer layer, LPCSTR texture)
+void UIUpgrade::set_texture(Layer layer, const char* texture)
 {
     switch (layer)
     {

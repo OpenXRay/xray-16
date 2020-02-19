@@ -25,7 +25,7 @@ class CController : public CBaseMonster, public CControlledActor
     u32 time_control_hit_started;
     bool active_control_fx;
 
-    LPCSTR particles_fire;
+    const char* particles_fire;
 
     CControllerAnimation* m_custom_anim_base;
     CControllerDirection* m_custom_dir_base;
@@ -70,15 +70,15 @@ public:
     CController();
     virtual ~CController();
 
-    virtual void Load(LPCSTR section);
-    virtual void reload(LPCSTR section);
+    virtual void Load(const char* section);
+    virtual void reload(const char* section);
     virtual void reinit();
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
     virtual void Die(IGameObject* who);
 
     virtual void net_Destroy();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Relcase(IGameObject* O);
 
     virtual void CheckSpecParams(u32 spec_params);
@@ -95,7 +95,7 @@ public:
 
     virtual bool is_relation_enemy(const CEntityAlive* tpEntityAlive) const;
     xr_vector<shared_str> m_friend_community_overrides;
-    void load_friend_community_overrides(LPCSTR section);
+    void load_friend_community_overrides(const char* section);
     bool is_community_friend_overrides(const CEntityAlive* tpEntityAlive) const;
     //-------------------------------------------------------------------
     // Controller ability

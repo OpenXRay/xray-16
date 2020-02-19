@@ -159,7 +159,7 @@ enum EWeaponAddonStatus
     eAddonAttachable = 2
 };
 
-EHitType g_tfString2HitType(LPCSTR caHitType);
+EHitType g_tfString2HitType(const char* caHitType);
 pcstr g_cafHitType2String(EHitType tHitType);
 
 using INT_VECTOR = xr_vector<int>;

@@ -260,7 +260,7 @@ void CHOM::Render(CFrustum& base)
     stats.Total.End();
 }
 
-ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, Fmatrix& X, float _x, float _y, float _z)
+ICF bool xform_b0(Fvector2& min, Fvector2& max, float& minz, Fmatrix& X, float _x, float _y, float _z)
 {
     float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
     if (z < EPS)
@@ -271,7 +271,7 @@ ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, Fmatrix& X, float _
     minz = 0.f + z * iw;
     return FALSE;
 }
-ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& minz, Fmatrix& X, float _x, float _y, float _z)
+ICF bool xform_b1(Fvector2& min, Fvector2& max, float& minz, Fmatrix& X, float _x, float _y, float _z)
 {
     float t;
     float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
@@ -293,7 +293,7 @@ ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& minz, Fmatrix& X, float _
         minz = t;
     return FALSE;
 }
-IC BOOL _visible(Fbox& B, Fmatrix& m_xform_01)
+IC bool _visible(Fbox& B, Fmatrix& m_xform_01)
 {
     // Find min/max points of xformed-box
     Fvector2 min, max;
@@ -317,7 +317,7 @@ IC BOOL _visible(Fbox& B, Fmatrix& m_xform_01)
     return Raster.test(min.x, min.y, max.x, max.y, z);
 }
 
-BOOL CHOM::visible(Fbox3& B)
+bool CHOM::visible(Fbox3& B)
 {
     if (!bEnabled)
         return TRUE;
@@ -326,14 +326,14 @@ BOOL CHOM::visible(Fbox3& B)
     return _visible(B, m_xform_01);
 }
 
-BOOL CHOM::visible(Fbox2& B, float depth)
+bool CHOM::visible(Fbox2& B, float depth)
 {
     if (!bEnabled)
         return TRUE;
     return Raster.test(B.min.x, B.min.y, B.max.x, B.max.y, depth);
 }
 
-BOOL CHOM::visible(vis_data& vis)
+bool CHOM::visible(vis_data& vis)
 {
     if (Device.dwFrame < vis.hom_frame)
         return TRUE; // not at this time :)
@@ -348,7 +348,7 @@ BOOL CHOM::visible(vis_data& vis)
     u32 frame_current = Device.dwFrame;
     // u32	frame_prev		= frame_current-1;
 
-    BOOL result = _visible(vis.box, m_xform_01);
+    bool result = _visible(vis.box, m_xform_01);
     u32 delay = 1;
     if (result)
     {
@@ -365,7 +365,7 @@ BOOL CHOM::visible(vis_data& vis)
     return result;
 }
 
-BOOL CHOM::visible(sPoly& P)
+bool CHOM::visible(sPoly& P)
 {
     if (!bEnabled)
         return TRUE;

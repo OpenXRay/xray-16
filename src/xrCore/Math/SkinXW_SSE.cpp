@@ -16,7 +16,7 @@ namespace Math
 #define transform_dir(idx, res, SX, SY, SZ, T1) \
     \
 __asm movzx eax,                                \
-        WORD PTR[esi][idx * (TYPE u16)] S.m \
+        unsigned short PTR[esi][idx * (TYPE u16)] S.m \
 __asm movaps res,                               \
         SX \
 __asm sal eax,                                  \
@@ -47,13 +47,13 @@ __asm addps res,                                 \
 #define shuffle_vec(VEC, SX, SY, SZ) \
     \
 __asm movss SX,                      \
-        DWORD PTR[esi] VEC.x \
+        unsigned int PTR[esi] VEC.x \
 __asm movss SY,                      \
-        DWORD PTR[esi] VEC.y \
+        unsigned int PTR[esi] VEC.y \
 __asm shufps SX,                     \
         SX, _MM_SHUFFLE(1, 0, 0, 0) \
 __asm movss SZ,                      \
-        DWORD PTR[esi] VEC.z \
+        unsigned int PTR[esi] VEC.z \
 __asm shufps SY,                     \
         SY, _MM_SHUFFLE(1, 0, 0, 0) \
 __asm shufps SZ,                     \
@@ -62,11 +62,11 @@ __asm shufps SZ,                     \
 #define shuffle_sw4(SW0, SW1, SW2, SW3) \
     \
 __asm movss SW3,                        \
-        DWORD PTR[One] \
+        unsigned int PTR[One] \
 __asm movss SW0,                        \
-        DWORD PTR[esi][0 * (TYPE float)] S.w \
+        unsigned int PTR[esi][0 * (TYPE float)] S.w \
 __asm movss SW1,                        \
-        DWORD PTR[esi][1 * (TYPE float)] S.w \
+        unsigned int PTR[esi][1 * (TYPE float)] S.w \
 __asm subss SW3,                        \
         SW0 \
 __asm shufps SW0,                       \
@@ -74,7 +74,7 @@ __asm shufps SW0,                       \
 __asm subss SW3,                        \
         SW1 \
 __asm movss SW2,                        \
-        DWORD PTR[esi][2 * (TYPE float)] S.w \
+        unsigned int PTR[esi][2 * (TYPE float)] S.w \
 __asm shufps SW1,                       \
         SW1, _MM_SHUFFLE(1, 0, 0, 0) \
 __asm subss SW3,                        \
@@ -87,14 +87,14 @@ __asm shufps SW3,                       \
 void Skin4W_SSE(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 {
     __m128 P0, P1, P2, P3;
-    DWORD One;
+    unsigned int One;
     __asm {
         // ------------------------------------------------------------------
-	mov			edi, DWORD PTR [D]			; edi = D
-	mov			esi, DWORD PTR [S]			; esi = S
-	mov			ecx, DWORD PTR [vCount]		; ecx = vCount
-	mov			edx, DWORD PTR [Bones]		; edx = Bones
-	mov			DWORD PTR [One], 0x3f800000	; One = 1.0f
+	mov			edi, unsigned int PTR [D]			; edi = D
+	mov			esi, unsigned int PTR [S]			; esi = S
+	mov			ecx, unsigned int PTR [vCount]		; ecx = vCount
+	mov			edx, unsigned int PTR [Bones]		; edx = Bones
+	mov			unsigned int PTR [One], 0x3f800000	; One = 1.0f
         // ------------------------------------------------------------------
 	ALIGN		16				;
 	new_vert:					; _new cycle iteration
@@ -141,7 +141,7 @@ void Skin4W_SSE(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 	movaps		xmm5, xmm4					; xmm5 = 00 | Pz | Py | Px
 	add			edi,TYPE vertRender			; // advance dest
 	movss		xmm5, xmm0					; xmm5 = 00 | Pz | Py | Nx
-	prefetchnta BYTE PTR [esi+4*(TYPE vertBoned4W)];		one cache line ahead
+	prefetchnta unsigned char PTR [esi+4*(TYPE vertBoned4W)];		one cache line ahead
 	add			esi,TYPE vertBoned4W		; // advance source
 
 	shufps		xmm4, xmm5, _MM_SHUFFLE(0,2,1,0)	; xmm4 = Nx | Pz | Py | Px
@@ -164,11 +164,11 @@ void Skin4W_SSE(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 #define shuffle_sw3(SW0, SW1, SW2) \
     \
 __asm movss SW2,                   \
-        DWORD PTR[One] \
+        unsigned int PTR[One] \
 __asm movss SW0,                   \
-        DWORD PTR[esi][0 * (TYPE float)] S.w \
+        unsigned int PTR[esi][0 * (TYPE float)] S.w \
 __asm movss SW1,                   \
-        DWORD PTR[esi][1 * (TYPE float)] S.w \
+        unsigned int PTR[esi][1 * (TYPE float)] S.w \
 __asm subss SW2,                   \
         SW0 \
 __asm shufps SW0,                  \
@@ -183,14 +183,14 @@ __asm shufps SW2,                  \
 void Skin3W_SSE(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 {
     __m128 P0, P1;
-    DWORD One;
+    unsigned int One;
     __asm {
         // ------------------------------------------------------------------
-	mov			edi, DWORD PTR [D]			; edi = D
-	mov			esi, DWORD PTR [S]			; esi = S
-	mov			ecx, DWORD PTR [vCount]		; ecx = vCount
-	mov			edx, DWORD PTR [Bones]		; edx = Bones
-	mov			DWORD PTR [One], 0x3f800000	; One = 1.0f
+	mov			edi, unsigned int PTR [D]			; edi = D
+	mov			esi, unsigned int PTR [S]			; esi = S
+	mov			ecx, unsigned int PTR [vCount]		; ecx = vCount
+	mov			edx, unsigned int PTR [Bones]		; edx = Bones
+	mov			unsigned int PTR [One], 0x3f800000	; One = 1.0f
         // ------------------------------------------------------------------
 	ALIGN		16				;
 	new_vert:					; _new cycle iteration
@@ -231,7 +231,7 @@ void Skin3W_SSE(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 	movaps		xmm5, xmm4					; xmm5 = 00 | Pz | Py | Px
 	add			edi,TYPE vertRender			; // advance dest
 	movss		xmm5, xmm0					; xmm5 = 00 | Pz | Py | Nx
-	prefetchnta BYTE PTR [esi+8*(TYPE vertBoned3W)];		one cache line ahead
+	prefetchnta unsigned char PTR [esi+8*(TYPE vertBoned3W)];		one cache line ahead
 	add			esi,TYPE vertBoned3W		; // advance source
 
 	shufps		xmm4, xmm5, _MM_SHUFFLE(0,2,1,0)	; xmm4 = Nx | Pz | Py | Px
@@ -254,7 +254,7 @@ void Skin3W_SSE(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 #define transform_dir2(idx, res, SX, SY, SZ, T1) \
     \
 __asm movzx eax,                                 \
-        WORD PTR[esi] S.matrix##idx \
+        unsigned short PTR[esi] S.matrix##idx \
 __asm movaps res,                                \
         SX \
 __asm sal eax,                                   \
@@ -286,10 +286,10 @@ void Skin2W_SSE(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
 {
     __asm {
         // ------------------------------------------------------------------
-	mov			edi, DWORD PTR [D]			; edi = D
-	mov			esi, DWORD PTR [S]			; esi = S
-	mov			ecx, DWORD PTR [vCount]		; ecx = vCount
-	mov			edx, DWORD PTR [Bones]		; edx = Bones
+	mov			edi, unsigned int PTR [D]			; edi = D
+	mov			esi, unsigned int PTR [S]			; esi = S
+	mov			ecx, unsigned int PTR [vCount]		; ecx = vCount
+	mov			edx, unsigned int PTR [Bones]		; edx = Bones
         // ------------------------------------------------------------------
 	ALIGN		16				;
 	new_vert:					; _new cycle iteration
@@ -304,7 +304,7 @@ void Skin2W_SSE(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
 	transform_dir2(0,xmm2,xmm4,xmm5,xmm6,xmm7);			xmm2 = N0
 	transform_dir2(1,xmm3,xmm4,xmm5,xmm6,xmm7);			xmm3 = N1
 
-	movss		xmm7, DWORD PTR [esi]S.w				; xmm7 = 0 | 0 | 0 | w
+	movss		xmm7, unsigned int PTR [esi]S.w				; xmm7 = 0 | 0 | 0 | w
 
 	subps		xmm1, xmm0								; xmm1 = P1 - P0
 	shufps		xmm7, xmm7, _MM_SHUFFLE(1,0,0,0)		; xmm7 = 0 | w | w | w
@@ -320,7 +320,7 @@ void Skin2W_SSE(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
 	movaps		xmm5, xmm0								; xmm5 = 00 | Pz | Py | Px
 	add			edi,TYPE vertRender						; // advance dest
 	movss		xmm5, xmm2								; xmm5 = 00 | Pz | Py | Nx
-	prefetchnta BYTE PTR [esi+12*(TYPE vertBoned2W)];		one cache line ahead
+	prefetchnta unsigned char PTR [esi+12*(TYPE vertBoned2W)];		one cache line ahead
 	add			esi,TYPE vertBoned2W					; // advance source
 
 	shufps		xmm0, xmm5, _MM_SHUFFLE(0,2,1,0)		; xmm0 = Nx | Pz | Py | Px
@@ -344,29 +344,29 @@ void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
 {
     __asm {
         // ------------------------------------------------------------------
-	mov			edi, DWORD PTR [D]			; edi = D
-	mov			esi, DWORD PTR [S]			; esi = S
-	mov			ecx, DWORD PTR [vCount]		; ecx = vCount
-	mov			edx, DWORD PTR [Bones]		; edx = Bones
+	mov			edi, unsigned int PTR [D]			; edi = D
+	mov			esi, unsigned int PTR [S]			; esi = S
+	mov			ecx, unsigned int PTR [vCount]		; ecx = vCount
+	mov			edx, unsigned int PTR [Bones]		; edx = Bones
         // ------------------------------------------------------------------
 	ALIGN		16				;
 	new_vert:					; _new cycle iteration
         // ------------------------------------------------------------------
-	mov			eax, DWORD PTR [esi]S.matrix		;	eax = S.matrix
+	mov			eax, unsigned int PTR [esi]S.matrix		;	eax = S.matrix
 
-	movss		xmm0, DWORD PTR [esi]S.P.x
-	movss		xmm1, DWORD PTR [esi]S.P.y
+	movss		xmm0, unsigned int PTR [esi]S.P.x
+	movss		xmm1, unsigned int PTR [esi]S.P.y
 	lea			eax, [eax+eax*4]					;	eax *= 5 (160)
 	shufps		xmm0, xmm0, _MM_SHUFFLE(1,0,0,0)
-	movss		xmm2, DWORD PTR [esi]S.P.z
+	movss		xmm2, unsigned int PTR [esi]S.P.z
 	shufps		xmm1, xmm1, _MM_SHUFFLE(1,0,0,0)
 	shufps		xmm2, xmm2, _MM_SHUFFLE(1,0,0,0)
 
-	movss		xmm3, DWORD PTR [esi]S.N.x
-	movss		xmm4, DWORD PTR [esi]S.N.y
+	movss		xmm3, unsigned int PTR [esi]S.N.x
+	movss		xmm4, unsigned int PTR [esi]S.N.y
 	sal			eax, 5								;	eax *= 32
 	shufps		xmm3, xmm3, _MM_SHUFFLE(1,0,0,0)
-	movss		xmm5, DWORD PTR [esi]S.N.z
+	movss		xmm5, unsigned int PTR [esi]S.N.z
 	shufps		xmm4, xmm4, _MM_SHUFFLE(1,0,0,0)
 	shufps		xmm5, xmm5, _MM_SHUFFLE(1,0,0,0)
 
@@ -390,7 +390,7 @@ void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
 	movaps		xmm4, xmm0								; xmm4 = 00 | Pz | Py | Px
 	add			edi,TYPE vertRender						; // advance dest
 	movss		xmm4, xmm3								; xmm4 = 00 | Pz | Py | Nx
-	prefetchnta BYTE PTR [esi+16*(TYPE vertBoned1W)];		one cache line ahead
+	prefetchnta unsigned char PTR [esi+16*(TYPE vertBoned1W)];		one cache line ahead
 	add			esi,TYPE vertBoned1W					; // advance source
 
 	shufps		xmm0, xmm4, _MM_SHUFFLE(0,2,1,0)		; xmm0 = Nx | Pz | Py | Px

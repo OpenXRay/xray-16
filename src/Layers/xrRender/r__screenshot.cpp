@@ -99,7 +99,7 @@ bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWO
 }
 
 // XXX: Provide full implementation
-void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+void CRender::ScreenshotImpl(ScreenshotMode mode, const char* name, CMemoryWriter* memory_writer)
 {
     u8* buffer;
     DWORD bufferSize;
@@ -146,7 +146,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         Log("! Failed to make a screenshot");
 }
 #elif defined(USE_DX10) || defined(USE_DX11)
-void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+void CRender::ScreenshotImpl(ScreenshotMode mode, const char* name, CMemoryWriter* memory_writer)
 {
     ID3DResource* pSrcTexture;
     HW.pBaseRT->GetResource(&pSrcTexture);
@@ -344,7 +344,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 
 #else // USE_DX10
 
-void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+void CRender::ScreenshotImpl(ScreenshotMode mode, const char* name, CMemoryWriter* memory_writer)
 {
     if (!Device.b_is_Ready)
         return;
@@ -550,7 +550,7 @@ _end_:
 
 #endif // USE_DX10
 
-void CRender::Screenshot(ScreenshotMode mode, LPCSTR name) { ScreenshotImpl(mode, name, nullptr); }
+void CRender::Screenshot(ScreenshotMode mode, const char* name) { ScreenshotImpl(mode, name, nullptr); }
 void CRender::Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer)
 {
     if (mode != SM_FOR_MPSENDING)
@@ -654,7 +654,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         static const int iMaxPixelsInARow = 1024;
         D3DXFLOAT16* pPixelElement16 = (D3DXFLOAT16*)pPixel;
 
-        FLOAT tmpArray[4 * iMaxPixelsInARow];
+        float tmpArray[4 * iMaxPixelsInARow];
         while (pPixel != pEnd)
         {
             const int iProcessPixels = _min(iMaxPixelsInARow, (s32)(pEnd - pPixel));

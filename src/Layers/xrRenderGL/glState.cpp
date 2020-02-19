@@ -117,11 +117,11 @@ void glState::UpdateRenderState(u32 name, u32 value)
         break;
 
     case D3DRS_STENCILMASK:
-        m_pDepthStencilState.StencilMask = (UINT)value;
+        m_pDepthStencilState.StencilMask = (unsigned int)value;
         break;
 
     case D3DRS_STENCILWRITEMASK:
-        m_pDepthStencilState.StencilWriteMask = (UINT)value;
+        m_pDepthStencilState.StencilWriteMask = (unsigned int)value;
         break;
 
     case D3DRS_STENCILFAIL:
@@ -176,7 +176,7 @@ void glState::UpdateRenderState(u32 name, u32 value)
     case D3DRS_COLORWRITEENABLE1:
     case D3DRS_COLORWRITEENABLE2:
     case D3DRS_COLORWRITEENABLE3:
-        m_pBlendState.ColorMask = (UINT)value;
+        m_pBlendState.ColorMask = (unsigned int)value;
         break;
 
     case D3DRS_LIGHTING:
@@ -239,10 +239,10 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
     case D3DSAMP_MIPMAPLODBIAS: /* float Mipmap LOD bias */
         CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, *(float*)value));
         break;
-    case D3DSAMP_MAXMIPLEVEL: /* DWORD 0..(n-1) LOD index of largest map to use (0 == largest) */
+    case D3DSAMP_MAXMIPLEVEL: /* unsigned int 0..(n-1) LOD index of largest map to use (0 == largest) */
         CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_LEVEL, value));
         break;
-    case D3DSAMP_MAXANISOTROPY: /* DWORD maximum anisotropy */
+    case D3DSAMP_MAXANISOTROPY: /* unsigned int maximum anisotropy */
         CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_ANISOTROPY_EXT, value));
         break;
     case XRDX10SAMP_COMPARISONFILTER:

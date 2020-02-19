@@ -48,7 +48,7 @@ CUIOutfitImmunity::CUIOutfitImmunity()
 }
 
 CUIOutfitImmunity::~CUIOutfitImmunity() {}
-bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type)
+bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, const char* base_str, u32 hit_type)
 {
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 
@@ -101,7 +101,7 @@ CUIOutfitInfo::CUIOutfitInfo()
 
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
-    LPCSTR base_str = "outfit_info";
+    const char* base_str = "outfit_info";
 
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 

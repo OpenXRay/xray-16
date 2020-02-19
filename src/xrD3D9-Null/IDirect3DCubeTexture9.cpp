@@ -7,8 +7,8 @@
 
 const GUID DECLSPEC_SELECTANY IID_IDirect3DCubeTexture9;
 
-xrIDirect3DCubeTexture9::xrIDirect3DCubeTexture9(IDirect3DDevice9* pIDirect3DDevice9, UINT iWidth, UINT iHeight,
-    UINT iLevels, DWORD iUsage, D3DFORMAT iFormat, D3DPOOL iPool)
+xrIDirect3DCubeTexture9::xrIDirect3DCubeTexture9(IDirect3DDevice9* pIDirect3DDevice9, unsigned int iWidth, unsigned int iHeight,
+    unsigned int iLevels, DWORD iUsage, D3DFORMAT iFormat, D3DPOOL iPool)
     : m_refCount(0), Width(iWidth), Height(iHeight), Levels(iLevels), Format(iFormat)
       //#ifdef D3D_DEBUG_INFO
       ,
@@ -63,7 +63,7 @@ HRESULT xrIDirect3DCubeTexture9::GetDevice(IDirect3DDevice9** ppDevice)
     *ppDevice = m_pIDirect3DDevice9;
     return S_OK;
 }
-HRESULT xrIDirect3DCubeTexture9::SetPrivateData(REFGUID refguid, CONST void* pData, DWORD SizeOfData, DWORD Flags)
+HRESULT xrIDirect3DCubeTexture9::SetPrivateData(REFGUID refguid, const void* pData, DWORD SizeOfData, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::SetPrivateData");
     return S_OK;
@@ -125,7 +125,7 @@ D3DTEXTUREFILTERTYPE xrIDirect3DCubeTexture9::GetAutoGenFilterType()
     return FilterType;
 };
 void xrIDirect3DCubeTexture9::GenerateMipSubLevels() { APIDEBUG("xrIDirect3DCubeTexture9::GenerateMipSubLevels"); };
-HRESULT xrIDirect3DCubeTexture9::GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc)
+HRESULT xrIDirect3DCubeTexture9::GetLevelDesc(unsigned int Level, D3DSURFACE_DESC* pDesc)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::GetLevelDesc");
 
@@ -143,7 +143,7 @@ HRESULT xrIDirect3DCubeTexture9::GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc
 };
 
 HRESULT xrIDirect3DCubeTexture9::GetCubeMapSurface(
-    D3DCUBEMAP_FACES FaceType, UINT Level, IDirect3DSurface9** ppCubeMapSurface)
+    D3DCUBEMAP_FACES FaceType, unsigned int Level, IDirect3DSurface9** ppCubeMapSurface)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::GetCubeMapSurface");
 
@@ -155,17 +155,17 @@ HRESULT xrIDirect3DCubeTexture9::GetCubeMapSurface(
     return S_OK;
 };
 HRESULT xrIDirect3DCubeTexture9::LockRect(
-    D3DCUBEMAP_FACES FaceType, UINT Level, D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags)
+    D3DCUBEMAP_FACES FaceType, unsigned int Level, D3DLOCKED_RECT* pLockedRect, const RECT* pRect, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::LockRect");
     return S_OK;
 };
-HRESULT xrIDirect3DCubeTexture9::UnlockRect(D3DCUBEMAP_FACES FaceType, UINT Level)
+HRESULT xrIDirect3DCubeTexture9::UnlockRect(D3DCUBEMAP_FACES FaceType, unsigned int Level)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::UnlockRect");
     return S_OK;
 };
-HRESULT xrIDirect3DCubeTexture9::AddDirtyRect(D3DCUBEMAP_FACES FaceType, CONST RECT* pDirtyRect)
+HRESULT xrIDirect3DCubeTexture9::AddDirtyRect(D3DCUBEMAP_FACES FaceType, const RECT* pDirtyRect)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::AddDirtyRect");
     return S_OK;

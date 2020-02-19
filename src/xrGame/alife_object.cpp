@@ -14,7 +14,7 @@
 
 void CSE_ALifeObject::spawn_supplies() { spawn_supplies(*m_ini_string); }
 
-void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
+void CSE_ALifeObject::spawn_supplies(const char* ini_string)
 {
     if (!ini_string)
         return;

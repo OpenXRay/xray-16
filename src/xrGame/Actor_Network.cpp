@@ -54,7 +54,7 @@
 int g_cl_InterpolationType = 0;
 u32 g_cl_InterpolationMaxPoints = 0;
 int g_dwInputUpdateDelta = 20;
-BOOL net_cl_inputguaranteed = FALSE;
+bool net_cl_inputguaranteed = FALSE;
 CActor* g_actor = NULL;
 
 CActor* Actor()
@@ -427,7 +427,7 @@ void CActor::net_Import_Base_proceed()
 {
     if (g_Alive())
     {
-        setVisible((BOOL)!HUDview());
+        setVisible((bool)!HUDview());
         setEnabled(TRUE);
     };
     //---------------------------------------------
@@ -532,7 +532,7 @@ void CActor::net_Import_Physic_proceed()
     CrPr_SetActivationStep(0);
 };
 
-BOOL CActor::net_Spawn(CSE_Abstract* DC)
+bool CActor::net_Spawn(CSE_Abstract* DC)
 {
     m_holder_id = ALife::_OBJECT_ID(-1);
     m_feel_touch_characters = 0;
@@ -810,7 +810,7 @@ void CActor::net_Relcase(IGameObject* O)
     HUD().net_Relcase(O);
 }
 
-BOOL CActor::net_Relevant() // relevant for export to server
+bool CActor::net_Relevant() // relevant for export to server
 {
     if (OnServer())
     {
@@ -1866,7 +1866,7 @@ void CActor::net_Save(NET_Packet& P)
 #endif
 }
 
-BOOL CActor::net_SaveRelevant() { return TRUE; }
+bool CActor::net_SaveRelevant() { return TRUE; }
 void CActor::SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir)
 {
     m_iLastHitterID = (who != NULL) ? who->ID() : u16(-1);
@@ -2084,7 +2084,7 @@ bool CActor::InventoryAllowSprint()
     return true;
 };
 
-BOOL CActor::BonePassBullet(int boneID)
+bool CActor::BonePassBullet(int boneID)
 {
     if (GameID() == eGameIDSingle)
         return inherited::BonePassBullet(boneID);

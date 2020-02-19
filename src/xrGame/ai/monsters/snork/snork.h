@@ -12,7 +12,7 @@ public:
     CSnork();
     virtual ~CSnork();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
     virtual void reinit();
     virtual void UpdateCL();
     virtual void CheckSpecParams(u32 spec_params);

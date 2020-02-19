@@ -55,10 +55,10 @@ void CHUDTarget::Load() { HUDCrosshair.Load(); }
 void CHUDTarget::ShowCrosshair(bool b) { m_bShowCrosshair = b; }
 //. fVisTransparencyFactor
 float fCurrentPickPower;
-ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
+ICF static bool pick_trace_callback(collide::rq_result& result, LPVOID params)
 {
     SPickParam* pp = (SPickParam*)params;
-    //	collide::rq_result* RQ	= pp->RQ;
+    //	collbool:rq_result* RQ	= pp->RQ;
     ++pp->pass;
 
     if (result.O)
@@ -110,13 +110,13 @@ void CHUDTarget::CursorOnFrame()
     }
 }
 
-extern ENGINE_API BOOL g_bRendering;
+extern ENGINE_API bool g_bRendering;
 void CHUDTarget::Render()
 {
     BOOL b_do_rendering = (psHUD_Flags.is(HUD_CROSSHAIR | HUD_CROSSHAIR_RT | HUD_CROSSHAIR_RT2));
 
     if (!b_do_rendering)
-        return;
+    return;
 
     VERIFY(g_bRendering);
 

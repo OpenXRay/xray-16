@@ -30,16 +30,16 @@ int g_sv_ah_dwArtefactsNum = 10;
 u32 g_sv_ah_dwArtefactStayTime = 3;
 int g_sv_ah_iReinforcementTime = 15; // 0 - Immediate, -1 - after artefact spawn , other - reinforcement
 BOOL g_sv_ah_bBearerCantSprint = FALSE;
-BOOL g_sv_ah_bShildedBases = TRUE;
-BOOL g_sv_ah_bAfReturnPlayersToBases = TRUE;
+bool g_sv_ah_bShildedBases = TRUE;
+bool g_sv_ah_bAfReturnPlayersToBases = TRUE;
 //-------------------------------------------------------
 int game_sv_ArtefactHunt::Get_ArtefactsCount() { return g_sv_ah_dwArtefactsNum; };
 u32 game_sv_ArtefactHunt::Get_ArtefactsRespawnDelta() { return g_sv_ah_dwArtefactRespawnDelta; };
 u32 game_sv_ArtefactHunt::Get_ArtefactsStayTime() { return g_sv_ah_dwArtefactStayTime; };
 int game_sv_ArtefactHunt::Get_ReinforcementTime() { return g_sv_ah_iReinforcementTime; };
 BOOL game_sv_ArtefactHunt::Get_BearerCantSprint() { return g_sv_ah_bBearerCantSprint; }
-BOOL game_sv_ArtefactHunt::Get_ShieldedBases() { return g_sv_ah_bShildedBases; };
-BOOL game_sv_ArtefactHunt::Get_ReturnPlayers() { return g_sv_ah_bAfReturnPlayersToBases; };
+bool game_sv_ArtefactHunt::Get_ShieldedBases() { return g_sv_ah_bShildedBases; };
+bool game_sv_ArtefactHunt::Get_ReturnPlayers() { return g_sv_ah_bAfReturnPlayersToBases; };
 //-------------------------------------------------------
 void game_sv_ArtefactHunt::Create(shared_str& options)
 {
@@ -1367,7 +1367,7 @@ void game_sv_ArtefactHunt::CheckForTeamElimination()
     RemoveArtefact();
 }
 
-extern INT g_sv_Skip_Winner_Waiting;
+extern signed int g_sv_Skip_Winner_Waiting;
 void game_sv_ArtefactHunt::CheckForTeamWin()
 {
     u8 WinTeam = 0;
@@ -1532,7 +1532,7 @@ void game_sv_ArtefactHunt::OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_P
 
 void game_sv_ArtefactHunt::SwapTeams()
 {
-    BOOL old_team_swap = g_sv_tdm_bAutoTeamSwap;
+    bool old_team_swap = g_sv_tdm_bAutoTeamSwap;
     // swap rpoints
     /*xr_vector<RPoint> tmpRPoints;
     tmpRPoints = rpoints[1];
@@ -1545,7 +1545,7 @@ void game_sv_ArtefactHunt::SwapTeams()
     g_sv_tdm_bAutoTeamSwap = old_team_swap;
 };
 
-void game_sv_ArtefactHunt::WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult)
+void game_sv_ArtefactHunt::WriteGameState(CInifile& ini, const char* sect, bool bRoundResult)
 {
     inherited::WriteGameState(ini, sect, bRoundResult);
 

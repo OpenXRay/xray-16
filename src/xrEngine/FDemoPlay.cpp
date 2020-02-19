@@ -33,7 +33,7 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
     m_MParam = 0;
     string_path nm, fn;
     xr_strcpy(nm, sizeof(nm), name);
-    LPSTR extp = strext(nm);
+    char* extp = strext(nm);
     if (extp)
         xr_strcpy(nm, sizeof(nm) - (extp - nm), ".anm");
 
@@ -223,7 +223,7 @@ void spline1(float t, Fvector* p, Fvector* ret)
     }
 }
 
-BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
+bool CDemoPlay::ProcessCam(SCamEffectorInfo& info)
 {
     // skeep a few frames before counting
     if (Device.dwPrecacheFrame)

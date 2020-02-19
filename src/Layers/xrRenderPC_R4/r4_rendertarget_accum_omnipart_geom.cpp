@@ -17,13 +17,13 @@ void CRenderTarget::accum_omnip_geom_create()
         //			D3DPOOL_MANAGED,
         //			&g_accum_omnip_vb,
         //			0));
-        //		BYTE*	pData				= 0;
+        //		unsigned char*	pData				= 0;
         //		R_CHK						(g_accum_omnip_vb->Lock(0,0,(void**)&pData,0));
         //		CopyMemory				(pData,du_sphere_part_vertices,vCount*vSize);
         //		g_accum_omnip_vb->Unlock	();
 
         g_accum_omnip_vb.Create(vCount * vSize);
-        BYTE* pData = static_cast<BYTE*>(g_accum_omnip_vb.Map());
+        unsigned char* pData = static_cast<unsigned char*>(g_accum_omnip_vb.Map());
         CopyMemory(pData, du_sphere_part_vertices, vCount * vSize);
         g_accum_omnip_vb.Unmap(true); // upload vertex data
     }
@@ -32,7 +32,7 @@ void CRenderTarget::accum_omnip_geom_create()
     {
         u32 iCount = DU_SPHERE_PART_NUMFACES * 3;
 
-        //		BYTE*	pData		= 0;
+        //		unsigned char*	pData		= 0;
         //		R_CHK
         //(HW.pDevice->CreateIndexBuffer(iCount*2,dwUsage,D3DFMT_INDEX16,D3DPOOL_MANAGED,&g_accum_omnip_ib,0));
         //		R_CHK				(g_accum_omnip_ib->Lock(0,0,(void**)&pData,0));
@@ -40,7 +40,7 @@ void CRenderTarget::accum_omnip_geom_create()
         //		g_accum_omnip_ib->Unlock	();
 
         g_accum_omnip_ib.Create(iCount * 2);
-        BYTE* pData = static_cast<BYTE*>(g_accum_omnip_ib.Map());
+        unsigned char* pData = static_cast<unsigned char*>(g_accum_omnip_ib.Map());
         CopyMemory(pData, du_sphere_part_faces, iCount * 2);
         g_accum_omnip_ib.Unmap(true); // upload index data
     }

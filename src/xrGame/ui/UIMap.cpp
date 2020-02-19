@@ -20,7 +20,7 @@ CUICustomMap::CUICustomMap()
     SetPointerDistance(0.0f);
 }
 
-void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
+void CUICustomMap::Initialize(shared_str name, const char* sh_name)
 {
     CInifile* levelIni = nullptr;
     if (name == g_pGameLevel->name())
@@ -65,7 +65,7 @@ void CUICustomMap::Draw()
     UI().PopScissor();
 }
 
-void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, const char* sh_name)
 {
     m_name = name;
 
@@ -156,7 +156,7 @@ bool CUICustomMap::GetPointerTo(const Fvector2& src, float item_radius, Fvector2
     GetAbsoluteRect(map_rect_abs);
 
     Frect rect;
-    BOOL res = rect.intersection(clip_rect_abs, map_rect_abs);
+    bool res = rect.intersection(clip_rect_abs, map_rect_abs);
     if (!res)
         return false;
 
@@ -281,7 +281,7 @@ CUIGlobalMap::CUIGlobalMap(CUIMapWnd* pMapWnd)
 
 CUIGlobalMap::~CUIGlobalMap() {}
 void CUIGlobalMap::Initialize() { Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default"); }
-void CUIGlobalMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIGlobalMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, const char* sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     //	Fvector2 size = CUIStatic::GetWndSize();
@@ -433,7 +433,7 @@ void CUILevelMap::Draw()
     inherited::Draw();
 }
 
-void CUILevelMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUILevelMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, const char* sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     Fvector4 tmp = pGameIni->r_fvector4(MapName(), "global_rect");
@@ -564,7 +564,7 @@ void CUILevelMap::OnFocusLost()
 
 CUIMiniMap::CUIMiniMap() {}
 CUIMiniMap::~CUIMiniMap() {}
-void CUIMiniMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIMiniMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, const char* sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     CUIStatic::SetTextureColor(0x7fffffff);

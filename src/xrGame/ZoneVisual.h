@@ -11,9 +11,9 @@ class CVisualZone : public CCustomZone
 public:
     CVisualZone();
     virtual ~CVisualZone();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void SwitchZoneState(EZoneState new_state);
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
     virtual void UpdateBlowout();
 
 protected:

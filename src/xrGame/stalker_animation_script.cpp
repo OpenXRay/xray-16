@@ -45,7 +45,7 @@ void CStalkerAnimationManager::script_play_callback(CBlend* blend)
 }
 
 void CStalkerAnimationManager::add_script_animation(
-    LPCSTR animation, bool hand_usage, Fvector position, Fvector rotation, bool local_animation)
+    const char* animation, bool hand_usage, Fvector position, Fvector rotation, bool local_animation)
 {
     const MotionID& motion = m_skeleton_animated->ID_Cycle_Safe(animation);
     if (!motion)
@@ -69,7 +69,7 @@ void CStalkerAnimationManager::add_script_animation(
     m_script_animations.push_back(CStalkerAnimationScript(motion, hand_usage, true, &transform, local_animation));
 }
 
-void CStalkerAnimationManager::add_script_animation(LPCSTR animation, bool hand_usage, bool use_movement_controller)
+void CStalkerAnimationManager::add_script_animation(const char* animation, bool hand_usage, bool use_movement_controller)
 {
     const MotionID& motion = m_skeleton_animated->ID_Cycle_Safe(animation);
     if (!motion)

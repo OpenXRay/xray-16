@@ -6,9 +6,9 @@
 #include "Layers/xrRender/blenders/Blender.h"
 #include "Layers/xrRender/tss.h"
 
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(char* fn);
 
-void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
+void CBlender_Compile::r_Stencil(bool Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
 {
     RS.SetRS(D3DRS_STENCILENABLE, BC(Enable));
     if (!Enable) return;
@@ -36,7 +36,7 @@ void CBlender_Compile::i_Comparison(u32 s, u32 func)
     RS.SetSAMP(s, XRDX10SAMP_COMPARISONFUNC, func);
 }
 
-void CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
+void CBlender_Compile::r_Sampler_cmp(const char* name, const char* texture, bool b_ps1x_ProjectiveDivide)
 {
     u32 s = r_Sampler(name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE,
                       D3DTEXF_LINEAR);
@@ -47,8 +47,8 @@ void CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_Pr
     }
 }
 
-void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
-                              D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+void CBlender_Compile::r_Pass(const char* _vs, const char* _gs, const char* _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
+    D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
     R_ASSERT2(_ps, "Probably you are using wrong r_Pass");
     RS.Invalidate();

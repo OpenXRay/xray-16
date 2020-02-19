@@ -15,8 +15,8 @@ public:
     CSilencer(void);
     virtual ~CSilencer(void);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
-    virtual void Load(LPCSTR section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
     virtual void net_Destroy();
 
     virtual void OnH_A_Chield();

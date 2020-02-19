@@ -186,12 +186,12 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     Logger.Status("Loading lights...");
     {
         xr_vector<R_Layer> L_layers;
-        xr_vector<BYTE> L_control_data;
+        xr_vector<unsigned char> L_control_data;
 
         // Controlles/Layers
         {
             F = fs.open_chunk(EB_Light_control);
-            L_control_data.assign(LPBYTE(F->pointer()), LPBYTE(F->pointer()) + F->length());
+            L_control_data.assign((unsigned char*)(F->pointer()), (unsigned char*)(F->pointer()) + F->length());
 
             R_Layer temp;
 
@@ -300,7 +300,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             b_BuildTexture BT(F);
 
             // load thumbnail
-            LPSTR N = BT.name;
+            char* N = BT.name;
             if (strchr(N, '.'))
                 *(strchr(N, '.')) = 0;
             xr_strlwr(N);
@@ -328,7 +328,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
 
                 // analyze thumbnail information
                 BT.THM.Load(*THM);
-                BOOL bLOD = FALSE;
+                bool bLOD = FALSE;
                 if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
                     bLOD = TRUE;
 

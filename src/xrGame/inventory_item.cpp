@@ -88,7 +88,7 @@ CInventoryItem::~CInventoryItem()
 #endif // #ifndef MASTER_GOLD
 }
 
-void CInventoryItem::Load(LPCSTR section)
+void CInventoryItem::Load(const char* section)
 {
     CHitImmunity::LoadImmunities(pSettings->r_string(section, "immunities_sect"), pSettings);
 
@@ -158,10 +158,10 @@ void CInventoryItem::Hit(SHit* pHDS)
     ChangeCondition(-hit_power);
 }
 
-LPCSTR CInventoryItem::NameItem() { return m_name.c_str(); }
-LPCSTR CInventoryItem::NameShort() { return m_nameShort.c_str(); }
+const char* CInventoryItem::NameItem() { return m_name.c_str(); }
+const char* CInventoryItem::NameShort() { return m_nameShort.c_str(); }
 /*
-LPCSTR CInventoryItem::NameComplex()
+const char* CInventoryItem::NameComplex()
 {
     const char *l_name = Name();
     if(l_name) 	m_nameComplex = l_name;
@@ -313,7 +313,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 }
 
 /////////// network ///////////////////////////////
-BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
+bool CInventoryItem::net_Spawn(CSE_Abstract* DC)
 {
     VERIFY(!m_pInventory);
 
@@ -1190,7 +1190,7 @@ float CInventoryItem::interpolate_states(
     return ret_val;
 }
 
-void CInventoryItem::reload(LPCSTR section)
+void CInventoryItem::reload(const char* section)
 {
     inherited::reload(section);
     m_holder_range_modifier = READ_IF_EXISTS(pSettings, r_float, section, "holder_range_modifier", 1.f);
@@ -1452,10 +1452,10 @@ Irect CInventoryItem::GetUpgrIconRect() const
 }
 
 bool CInventoryItem::IsNecessaryItem(CInventoryItem* item) { return IsNecessaryItem(item->object().cNameSect()); };
-BOOL CInventoryItem::IsInvalid() const { return object().getDestroy() || GetDropManual(); }
+bool CInventoryItem::IsInvalid() const { return object().getDestroy() || GetDropManual(); }
 u16 CInventoryItem::object_id() const { return object().ID(); }
 u16 CInventoryItem::parent_id() const { return (object().H_Parent()) ? object().H_Parent()->ID() : u16(-1); }
-void CInventoryItem::SetDropManual(BOOL val)
+void CInventoryItem::SetDropManual(bool val)
 {
     m_flags.set(FdropManual, val);
 

@@ -28,7 +28,7 @@ bool GameTypeChooser::LoadStream(IReader& F)
     return true;
 }
 
-bool GameTypeChooser::LoadLTX(CInifile& ini, LPCSTR sect_name, bool bOldFormat)
+bool GameTypeChooser::LoadLTX(CInifile& ini, const char* sect_name, bool bOldFormat)
 {
     if (bOldFormat /*version==0x0014*/)
     {
@@ -49,11 +49,11 @@ bool GameTypeChooser::LoadLTX(CInifile& ini, LPCSTR sect_name, bool bOldFormat)
 }
 
 void GameTypeChooser::SaveStream(IWriter& F) { F.w_u16(m_GameType.get()); }
-void GameTypeChooser::SaveLTX(CInifile& ini, LPCSTR sect_name) { ini.w_u16(sect_name, "game_type", m_GameType.get()); }
+void GameTypeChooser::SaveLTX(CInifile& ini, const char* sect_name) { ini.w_u16(sect_name, "game_type", m_GameType.get()); }
 #endif
 
 #ifndef XRGAME_EXPORTS
-void GameTypeChooser::FillProp(LPCSTR pref, PropItemVec& items)
+void GameTypeChooser::FillProp(const char* pref, PropItemVec& items)
 {
     PHelper().CreateGameType(items, PrepareKey(pref, "Game Type"), this);
     /*

@@ -68,7 +68,7 @@ public:
     virtual void StartPrimitive(u32 iMaxVerts, ePrimitiveType primType, ePointType pointType) = 0;
     virtual void FlushPrimitive() = 0;
 
-    virtual LPCSTR UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name) = 0;
+    virtual const char* UpdateShaderName(const char* tex_name, const char* sh_name) = 0;
 
     virtual void CacheSetXformWorld(const Fmatrix& M) = 0;
     virtual void CacheSetCullMode(CullMode) = 0;

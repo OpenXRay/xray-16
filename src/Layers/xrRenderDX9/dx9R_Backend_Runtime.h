@@ -43,7 +43,7 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
     }
 }
 
-ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
+ICF void CBackend::set_PS(ID3DPixelShader* _ps, const char* _n)
 {
     if (ps != _ps)
     {
@@ -57,7 +57,7 @@ ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
     }
 }
 
-ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
+ICF void CBackend::set_VS(ID3DVertexShader* _vs, const char* _n)
 {
     if (vs != _vs)
     {

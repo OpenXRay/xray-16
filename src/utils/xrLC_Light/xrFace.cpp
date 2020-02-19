@@ -226,7 +226,7 @@ void Face::OA_Unwarp(CDeflector* D)
         }
 }
 
-BOOL DataFace::RenderEqualTo(Face* F)
+bool DataFace::RenderEqualTo(Face* F)
 {
     if (F->dwMaterial != dwMaterial)
         return FALSE;
@@ -243,7 +243,7 @@ void DataFace::AddChannel(Fvector2& p1, Fvector2& p2, Fvector2& p3)
     tc.push_back(TC);
 }
 
-BOOL DataFace::hasImplicitLighting()
+bool DataFace::hasImplicitLighting()
 {
     if (0 == this)
         return FALSE;
@@ -266,8 +266,8 @@ BOOL DataFace::hasImplicitLighting()
 */
 
 /*
-BOOL	exact_normalize	(Fvector3& a)	{	return exact_normalize(&a.x);	}
-BOOL	exact_normalize (float* a)
+bool	exact_normalize	(Fvector3& a)	{	return exact_normalize(&a.x);	}
+bool	exact_normalize (float* a)
 {
     double	sqr_magnitude	= a[0]*a[0] + a[1]*a[1] + a[2]*a[2];
     double	epsilon			= 1.192092896e-05F;

@@ -245,9 +245,9 @@ protected:
     inline_ void PrimTestTriIndex(udword id1);
     inline_ void PrimTestIndexTri(udword id0);
 
-    inline_ BOOL BoxBoxOverlap(const Point& ea, const Point& ca, const Point& eb, const Point& cb);
-    inline_ BOOL TriBoxOverlap(const Point& center, const Point& extents);
-    inline_ BOOL TriTriOverlap(
+    inline_ bool BoxBoxOverlap(const Point& ea, const Point& ca, const Point& eb, const Point& cb);
+    inline_ bool TriBoxOverlap(const Point& center, const Point& extents);
+    inline_ bool TriTriOverlap(
         const Point& V0, const Point& V1, const Point& V2, const Point& U0, const Point& U1, const Point& U2);
     // Init methods
     void InitQuery(const Matrix4x4* world0 = nullptr, const Matrix4x4* world1 = nullptr);

@@ -67,7 +67,7 @@ public:
     virtual void SetColor(u32 color) { m_UIStaticItem.SetColor(color); }
     virtual u32 GetColor() const { return m_UIStaticItem.GetColor(); }
 
-    virtual void CreateShader(LPCSTR tex, LPCSTR sh = "hud" DELIMITER "default");
+    virtual void CreateShader(const char* tex, const char* sh = "hud" DELIMITER "default");
     ui_shader& GetShader() { return m_UIStaticItem.GetShader(); };
     virtual void SetTextureColor(u32 color) { m_UIStaticItem.SetTextureColor(color); }
     virtual u32 GetTextureColor() const { return m_UIStaticItem.GetTextureColor(); }
@@ -88,7 +88,7 @@ public:
     void TextureOn() { m_bTextureEnable = true; }
     void TextureOff() { m_bTextureEnable = false; }
     // own
-    void SetXformLightAnim(LPCSTR lanim, bool bCyclic);
+    void SetXformLightAnim(const char* lanim, bool bCyclic);
     void ResetXformAnimation();
 
     virtual void DrawTexture();
@@ -143,9 +143,9 @@ public:
     void AdjustHeightToText();
     void AdjustWidthToText();
 
-    void SetText(LPCSTR txt) { TextItemControl().SetText(txt); }
-    void SetTextST(LPCSTR txt) { TextItemControl().SetTextST(txt); }
-    LPCSTR GetText() { return TextItemControl().GetText(); }
+    void SetText(const char* txt) { TextItemControl().SetText(txt); }
+    void SetTextST(const char* txt) { TextItemControl().SetTextST(txt); }
+    const char* GetText() { return TextItemControl().GetText(); }
     void SetFont(CGameFont* F) { TextItemControl().SetFont(F); }
     CGameFont* GetFont() { return TextItemControl().GetFont(); }
     void SetTextColor(u32 color) { TextItemControl().SetTextColor(color); }

@@ -28,7 +28,7 @@ CTeamBaseZone::~CTeamBaseZone() {}
 void CTeamBaseZone::reinit() { inherited::reinit(); }
 void CTeamBaseZone::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCForm()->getSphere().P); }
 float CTeamBaseZone::Radius() const { return (GetCForm()->getRadius()); }
-BOOL CTeamBaseZone::net_Spawn(CSE_Abstract* DC)
+bool CTeamBaseZone::net_Spawn(CSE_Abstract* DC)
 {
     CCF_Shape* l_pShape = new CCF_Shape(this);
     SetCForm(l_pShape);
@@ -59,7 +59,7 @@ BOOL CTeamBaseZone::net_Spawn(CSE_Abstract* DC)
 
     m_Team = l_tpALifeScriptZone->m_team;
 
-    BOOL bOk = inherited::net_Spawn(DC);
+    bool bOk = inherited::net_Spawn(DC);
     if (bOk)
     {
         l_pShape->ComputeBounds();

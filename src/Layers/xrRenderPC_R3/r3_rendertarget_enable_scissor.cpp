@@ -53,8 +53,8 @@ bool CRenderTarget::u_DBT_enable(float /*zMin*/, float /*zMax*/)
     //	TODO: DX10: Check if DX10 supports this feature
     // enable cheat
     // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X,MAKEFOURCC('N','V','D','B'));
-    // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z,*(DWORD*)&zMin);
-    // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W,*(DWORD*)&zMax);
+    // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z,*(unsigned int*)&zMin);
+    // HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W,*(unsigned int*)&zMax);
 
     // return true;
 }
@@ -139,7 +139,7 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 		iVP.transform	(s_points[3],s_points_pp[3]);
 
 		// 4. check intersection of two triangles with (spatial, enclosing) sphere
-		BOOL	bIntersect	= tri_vs_sphere_intersect	(
+		bool	bIntersect	= tri_vs_sphere_intersect	(
 			L->spatial.sphere.P,L->spatial.sphere.R,
 			s_points[0],s_points[1],s_points[2]
 			);
@@ -164,7 +164,7 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 /*
 {
     Fmatrix& M						= RCache.xforms.m_wvp;
-    BOOL	bIntersect				= FALSE;
+    bool	bIntersect				= FALSE;
     for (u32 vit=0; vit<DU_CONE_NUMVERTEX; vit++)	{
         Fvector&	v	= du_cone_vertices[vit];
         float _z = v.x*M._13 + v.y*M._23 + v.z*M._33 + M._43;

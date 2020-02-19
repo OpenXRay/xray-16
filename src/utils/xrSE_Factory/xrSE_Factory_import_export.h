@@ -10,7 +10,7 @@
 #endif
 
 extern "C" {
-FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section);
+FACTORY_API IServerEntity* __stdcall create_entity(const char* section);
 FACTORY_API void __stdcall destroy_entity(IServerEntity*&);
 };
 

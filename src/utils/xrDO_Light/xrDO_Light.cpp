@@ -11,7 +11,7 @@ static const char* h_str =
     "NOTE: The last key is required for any functionality\n";
 
 void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
-void Startup(LPSTR lpCmdLine)
+void Startup(char* lpCmdLine)
 {
     char cmd[512];
     bool bNet = false;
@@ -53,7 +53,7 @@ void Startup(LPSTR lpCmdLine)
     Logger.Destroy();
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow)
 {
     xrDebug::Initialize(lpCmdLine);
     Core.Initialize("xrDO");

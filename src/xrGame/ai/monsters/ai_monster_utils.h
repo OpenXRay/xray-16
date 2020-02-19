@@ -80,16 +80,16 @@ IC u32 time() { return Device.dwTimeGlobal; }
 //////////////////////////////////////////////////////////////////////////
 // bone routines
 //////////////////////////////////////////////////////////////////////////
-extern Fvector get_bone_position(IGameObject* object, LPCSTR bone_name);
+extern Fvector get_bone_position(IGameObject* object, const char* bone_name);
 
 Fvector get_head_position(IGameObject* object);
 
 //////////////////////////////////////////////////////////////////////////
 // LTX routines
 //////////////////////////////////////////////////////////////////////////
-IC void read_delay(LPCSTR section, LPCSTR name, u32& delay_min, u32& delay_max)
+IC void read_delay(const char* section, const char* name, u32& delay_min, u32& delay_max)
 {
-    LPCSTR delay = pSettings->r_string(section, name);
+    const char* delay = pSettings->r_string(section, name);
     string128 tempst;
 
     if (_GetItemCount(delay) == 2)
@@ -104,9 +104,9 @@ IC void read_delay(LPCSTR section, LPCSTR name, u32& delay_min, u32& delay_max)
     }
 }
 
-IC void read_distance(LPCSTR section, LPCSTR name, float& dist_min, float& dist_max)
+IC void read_distance(const char* section, const char* name, float& dist_min, float& dist_max)
 {
-    LPCSTR dist = pSettings->r_string(section, name);
+    const char* dist = pSettings->r_string(section, name);
     string128 tempst;
 
     VERIFY(_GetItemCount(dist) == 2);

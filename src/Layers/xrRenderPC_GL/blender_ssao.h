@@ -3,9 +3,9 @@
 class CBlender_SSAO_noMSAA : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: calc SSAO"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: calc SSAO"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
@@ -16,21 +16,21 @@ public:
 class CBlender_SSAO_MSAA : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: calc SSAO"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: calc SSAO"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
     CBlender_SSAO_MSAA();
     virtual ~CBlender_SSAO_MSAA();
 
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    virtual void SetDefine(const char* Name, const char* Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
     }
 
-    LPCSTR Name;
-    LPCSTR Definition;
+    const char* Name;
+    const char* Definition;
 };

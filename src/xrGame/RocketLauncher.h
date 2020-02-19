@@ -9,7 +9,7 @@ public:
     CRocketLauncher();
     ~CRocketLauncher();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
     void AttachRocket(u16 rocket_id, CGameObject* parent_rocket_launcher);
     void DetachRocket(u16 rocket_id, bool bLaunch);

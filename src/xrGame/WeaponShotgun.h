@@ -10,7 +10,7 @@ public:
     CWeaponShotgun();
     virtual ~CWeaponShotgun();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P);

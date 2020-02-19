@@ -18,7 +18,9 @@ class IRenderVisual;
 class IKinematics;
 class IGameFont;
 class IPerformanceAlert;
-template <class T> class _box2; typedef _box2<float> Fbox2;
+template <class T>
+class _box2;
+typedef _box2<float> Fbox2;
 struct Fcolor;
 class IReader;
 class CMemoryWriter;
@@ -57,7 +59,7 @@ public:
     virtual void set_cone(float angle) = 0;
     virtual void set_range(float R) = 0;
     virtual void set_virtual_size(float R) = 0;
-    virtual void set_texture(LPCSTR name) = 0;
+    virtual void set_texture(const char* name) = 0;
     virtual void set_color(const Fcolor& C) = 0;
     virtual void set_color(float r, float g, float b) = 0;
     virtual void set_hud_mode(bool b) = 0;
@@ -80,7 +82,7 @@ public:
     virtual void set_position(const Fvector& P) = 0;
     virtual void set_direction(const Fvector& P) = 0;
     virtual void set_radius(float R) = 0;
-    virtual void set_texture(LPCSTR name) = 0;
+    virtual void set_texture(const char* name) = 0;
     virtual void set_color(const Fcolor& C) = 0;
     virtual void set_color(float r, float g, float b) = 0;
     virtual ~IRender_Glow();
@@ -294,15 +296,15 @@ public:
     virtual void level_Load(IReader* fs) = 0;
     virtual void level_Unload() = 0;
 
-    // virtual IDirect3DBaseTexture9* texture_load (LPCSTR fname, u32& msize) = 0;
+    // virtual IDirect3DBaseTexture9* texture_load (const char* fname, u32& msize) = 0;
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
-    virtual HRESULT shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags,
-        void*& result) = 0;
+    virtual HRESULT shader_compile(
+        const char* name, IReader* fs, const char* pFunctionName, const char* pTarget, DWORD Flags, void*& result) = 0;
 
     // Information
     virtual void DumpStatistics(IGameFont& font, IPerformanceAlert* alert) = 0;
 
-    virtual LPCSTR getShaderPath() = 0;
+    virtual const char* getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
     virtual IRender_Sector* getSector(int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
@@ -313,7 +315,8 @@ public:
     virtual void flush() = 0;
     virtual void set_Object(IRenderable* O) = 0;
     virtual void add_Occluder(Fbox2& bb_screenspace) = 0; // mask screen region as oclluded (-1..1, -1..1)
-    virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
+    virtual void add_Visual(
+        IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
     virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;
     virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) = 0;
@@ -340,24 +343,24 @@ public:
     virtual void glow_destroy(IRender_Glow* p_){};
 
     // Models
-    virtual IRenderVisual* model_CreateParticles(LPCSTR name) = 0;
+    virtual IRenderVisual* model_CreateParticles(const char* name) = 0;
     // virtual IRender_DetailModel* model_CreateDM (IReader* F) = 0;
     // virtual IRenderDetailModel* model_CreateDM (IReader* F) = 0;
-    // virtual IRenderVisual* model_Create (LPCSTR name, IReader* data=0) = 0;
-    virtual IRenderVisual* model_Create(LPCSTR name, IReader* data = 0) = 0;
-    virtual IRenderVisual* model_CreateChild(LPCSTR name, IReader* data) = 0;
+    // virtual IRenderVisual* model_Create (const char* name, IReader* data=0) = 0;
+    virtual IRenderVisual* model_Create(const char* name, IReader* data = 0) = 0;
+    virtual IRenderVisual* model_CreateChild(const char* name, IReader* data) = 0;
     virtual IRenderVisual* model_Duplicate(IRenderVisual* V) = 0;
-    // virtual void model_Delete (IRenderVisual* & V, BOOL bDiscard=FALSE) = 0;
-    virtual void model_Delete(IRenderVisual*& V, BOOL bDiscard = FALSE) = 0;
+    // virtual void model_Delete (IRenderVisual* & V, bool bDiscard=FALSE) = 0;
+    virtual void model_Delete(IRenderVisual*& V, bool bDiscard = FALSE) = 0;
     // virtual void model_Delete (IRender_DetailModel* & F) = 0;
-    virtual void model_Logging(BOOL bEnable) = 0;
+    virtual void model_Logging(bool bEnable) = 0;
     virtual void models_Prefetch() = 0;
-    virtual void models_Clear(BOOL b_complete) = 0;
+    virtual void models_Clear(bool b_complete) = 0;
 
     // Occlusion culling
-    virtual BOOL occ_visible(vis_data& V) = 0;
-    virtual BOOL occ_visible(Fbox& B) = 0;
-    virtual BOOL occ_visible(sPoly& P) = 0;
+    virtual bool occ_visible(vis_data& V) = 0;
+    virtual bool occ_visible(Fbox& B) = 0;
+    virtual bool occ_visible(sPoly& P) = 0;
 
     // Main
     virtual void Calculate() = 0;
@@ -366,7 +369,7 @@ public:
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
-    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0) = 0;
+    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, const char* name = 0) = 0;
     virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) = 0;
     virtual void ScreenshotAsyncBegin() = 0;
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
@@ -375,13 +378,13 @@ public:
     virtual void rmNear() = 0;
     virtual void rmFar() = 0;
     virtual void rmNormal() = 0;
-    virtual u32 active_phase () = 0;
+    virtual u32 active_phase() = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}
 
 protected:
-    virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) = 0;
+    virtual void ScreenshotImpl(ScreenshotMode mode, const char* name, CMemoryWriter* memory_writer) = 0;
 
 public:
     //	Gamma correction functions
@@ -397,7 +400,7 @@ public:
 
     //	Init
     virtual void SetupStates() = 0;
-    virtual void OnDeviceCreate(LPCSTR shName) = 0;
+    virtual void OnDeviceCreate(const char* shName) = 0;
     virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
     virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) = 0;
 

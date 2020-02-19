@@ -77,7 +77,7 @@ CCarWeapon::~CCarWeapon()
     //.	m_object->processing_deactivate		();
 }
 
-void CCarWeapon::Load(LPCSTR section)
+void CCarWeapon::Load(const char* section)
 {
     inheritedShooting::Load(section);
     HUD_SOUND_ITEM::LoadSound(section, "snd_shoot", m_sndShot, SOUND_TYPE_WEAPON_SHOOTING);

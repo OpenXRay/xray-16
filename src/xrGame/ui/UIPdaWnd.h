@@ -76,7 +76,7 @@ public:
     void DrawHint();
 
     void SetActiveCaption();
-    void SetCaption(LPCSTR text);
+    void SetCaption(const char* text);
     void Show_SecondTaskWnd(bool status);
     void Show_MapLegendWnd(bool status);
 

@@ -59,7 +59,7 @@ private:
 
 private:
     void init();
-    void load(LPCSTR level_name);
+    void load(const char* level_name);
     void unload(bool reload = false);
     void set_alife(CALifeSimulator* alife_simulator);
     void LoadCommonScripts();

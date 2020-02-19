@@ -7,7 +7,7 @@ extern "C" {
 class xrIDirect3DQuery9 : public IDirect3DQuery9
 {
 protected:
-    LONG m_refCount;
+    signed int m_refCount;
     IDirect3DDevice9* m_pIDirect3DDevice9;
 
 public:
@@ -27,7 +27,7 @@ public:
     //#ifdef D3D_DEBUG_INFO
     D3DQUERYTYPE Type;
     DWORD DataSize;
-    LPCWSTR CreationCallStack;
+    const wchar_t * CreationCallStack;
     //#endif
 };
 

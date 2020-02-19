@@ -66,7 +66,7 @@ public:
             C = nullptr;
     }
 
-    adopt_sampler& _texture(LPCSTR texture)
+    adopt_sampler& _texture(const char* texture)
     {
         if (C)
             C->i_Texture(stage, texture);
@@ -226,13 +226,13 @@ public:
         C->SH->flags.bWmark = E;
         return *this;
     }
-    adopt_compiler& _pass(LPCSTR vs, LPCSTR ps)
+    adopt_compiler& _pass(const char* vs, const char* ps)
     {
         TryEndPass();
         C->r_Pass(vs, ps, true);
         return *this;
     }
-    adopt_compiler& _passgs(LPCSTR vs, LPCSTR gs, LPCSTR ps)
+    adopt_compiler& _passgs(const char* vs, const char* gs, const char* ps)
     {
         TryEndPass();
         C->r_Pass(vs, gs, ps, true);
@@ -263,19 +263,19 @@ public:
         C->r_ColorWriteEnable(cR, cG, cB, cA);
         return *this;
     }
-    adopt_sampler _sampler(LPCSTR _name)
+    adopt_sampler _sampler(const char* _name)
     {
         u32 s = C->r_Sampler(_name, nullptr);
         return adopt_sampler(C, s);
     }
 
     //	DX10 specific
-    adopt_dx10sampler _dx10sampler(LPCSTR _name)
+    adopt_dx10sampler _dx10sampler(const char* _name)
     {
         u32 s = C->r_dx10Sampler(_name);
         return adopt_dx10sampler(C, s);
     }
-    adopt_compiler& _dx10texture(LPCSTR _resname, LPCSTR _texname)
+    adopt_compiler& _dx10texture(const char* _resname, const char* _texname)
     {
         C->r_dx10Texture(_resname, _texname);
         return *this;
@@ -449,7 +449,7 @@ void CResourceManager::LS_Load()
 }
 
 void CResourceManager::LS_Unload() { ScriptEngine.unload(); }
-BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
+bool CResourceManager::_lua_HasShader(const char* s_shader)
 {
     string256 undercorated;
     for (int i = 0, l = xr_strlen(s_shader) + 1; i < l; i++)
@@ -464,7 +464,7 @@ BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
 #endif
 }
 
-Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
+Shader* CResourceManager::_lua_Create(const char* d_shader, const char* s_textures)
 {
     CBlender_Compile C;
     Shader S;
@@ -473,7 +473,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     string256 undercorated;
     for (int i = 0, l = xr_strlen(d_shader) + 1; i < l; i++)
         undercorated[i] = ('\\' == d_shader[i]) ? '_' : d_shader[i];
-    LPCSTR s_shader = undercorated;
+    const char* s_shader = undercorated;
 
     // Access to template
     C.BT = NULL;
@@ -555,16 +555,16 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     return N;
 }
 
-ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
+ShaderElement* CBlender_Compile::_lua_Compile(const char* namesp, const char* name)
 {
     ShaderElement E;
     SH = &E;
     RS.Invalidate();
 
     // Compile
-    LPCSTR t_0 = *L_textures[0] ? *L_textures[0] : "null";
-    LPCSTR t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
-    LPCSTR t_d = detail_texture ? detail_texture : "null";
+    const char* t_0 = *L_textures[0] ? *L_textures[0] : "null";
+    const char* t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
+    const char* t_d = detail_texture ? detail_texture : "null";
     const object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
     const functor<void> element = (object)shader[name];
     bool bFirstPass = false;

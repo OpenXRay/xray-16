@@ -91,7 +91,7 @@ void CUIComboBox::InitComboBox(Fvector2 pos, float width)
     m_list_box.SetMessageTarget(this);
 }
 
-CUIListBoxItem* CUIComboBox::AddItem_(LPCSTR str, int _data)
+CUIListBoxItem* CUIComboBox::AddItem_(const char* str, int _data)
 {
     R_ASSERT2(m_bInited, "Can't add item to ComboBox before Initialization");
     CUIListBoxItem* itm = m_list_box.AddTextItem(str);
@@ -113,7 +113,7 @@ void CUIComboBox::OnListItemSelect()
         GetMessageTarget()->SendMessage(this, LIST_ITEM_SELECT, NULL);
 }
 
-void CUIComboBox::SetText(LPCSTR text)
+void CUIComboBox::SetText(const char* text)
 {
     if (!text)
         return;
@@ -151,7 +151,7 @@ void CUIComboBox::SetCurrentOptValue()
         tok++;
     }
     
-    LPCSTR cur_val = *gStringTable->translate(GetOptTokenValue());
+    const char* cur_val = *gStringTable->translate(GetOptTokenValue());
     m_text.SetText(cur_val);
     m_list_box.SetSelectedText(cur_val);
 
@@ -182,15 +182,15 @@ void CUIComboBox::SaveOptValue()
     const xr_token* tok = GetOptToken();
     if (tok)
     {
-        LPCSTR cur_val = get_token_name(tok, m_itoken_id);
+        const char* cur_val = get_token_name(tok, m_itoken_id);
         SaveOptStringValue(cur_val);
     }
 }
 
 bool CUIComboBox::IsChangedOptValue() const { return (m_opt_backup_value != m_itoken_id); }
-LPCSTR CUIComboBox::GetText() { return m_text.GetText(); }
+const char* CUIComboBox::GetText() { return m_text.GetText(); }
 u32 CUIComboBox::GetSize() { return m_list_box.GetSize(); }
-LPCSTR CUIComboBox::GetTextOf(int index)
+const char* CUIComboBox::GetTextOf(int index)
 {
     if (u32(index) >= GetSize())
         return "";

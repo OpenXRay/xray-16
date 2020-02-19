@@ -4,9 +4,9 @@
 
 using namespace luabind;
 
-LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm);
+const char* get_file_age_str(CLocatorAPI* fs, const char* nm);
 CLocatorAPI* getFS() { return &FS; }
-LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
+const char* update_path_script(CLocatorAPI* fs, const char* initial, const char* src)
 {
     string_path temp;
     shared_str temp_2;
@@ -24,12 +24,12 @@ void rescan_path_script(CLocatorAPI* fs, pcstr initial)
 
 class FS_file_list
 {
-    xr_vector<LPSTR>* m_p;
+    xr_vector<char*>* m_p;
 
 public:
-    FS_file_list(xr_vector<LPSTR>* p) : m_p(p) {}
+    FS_file_list(xr_vector<char*>* p) : m_p(p) {}
     u32 Size() { return m_p->size(); }
-    LPCSTR GetAt(u32 idx) { return m_p->at(idx); }
+    const char* GetAt(u32 idx) { return m_p->at(idx); }
     void Free() { FS.file_list_close(m_p); };
 };
 
@@ -40,10 +40,10 @@ struct FS_item
     u32 modif;
     string256 buff;
 
-    LPCSTR NameShort() { return name; }
-    LPCSTR NameFull() { return name; }
+    const char* NameShort() { return name; }
+    const char* NameFull() { return name; }
     u32 Size() { return size; }
-    LPCSTR Modif()
+    const char* Modif()
     {
         struct tm* newtime;
         time_t t = modif;
@@ -52,7 +52,7 @@ struct FS_item
         return buff;
     }
 
-    LPCSTR ModifDigitOnly()
+    const char* ModifDigitOnly()
     {
         struct tm* newtime;
         time_t t = modif;
@@ -99,14 +99,14 @@ public:
         eSortByModifUp,
         eSortByModifDown
     };
-    FS_file_list_ex(LPCSTR path, u32 flags, LPCSTR mask);
+    FS_file_list_ex(const char* path, u32 flags, const char* mask);
 
     u32 Size() { return m_file_items.size(); }
     FS_item GetAt(u32 idx) { return m_file_items[idx]; }
     void Sort(u32 flags);
 };
 
-FS_file_list_ex::FS_file_list_ex(LPCSTR path, u32 flags, LPCSTR mask)
+FS_file_list_ex::FS_file_list_ex(const char* path, u32 flags, const char* mask)
 {
     FS_Path* P = FS.get_path(path);
     P->m_Flags.set(FS_Path::flNeedRescan, TRUE);
@@ -145,28 +145,28 @@ void FS_file_list_ex::Sort(u32 flags)
         std::sort(m_file_items.begin(), m_file_items.end(), modifSorter<false>);
 }
 
-FS_file_list_ex file_list_open_ex(CLocatorAPI* fs, LPCSTR path, u32 flags, LPCSTR mask)
+FS_file_list_ex file_list_open_ex(CLocatorAPI* fs, const char* path, u32 flags, const char* mask)
 {
     return FS_file_list_ex(path, flags, mask);
 }
 
-FS_file_list file_list_open_script(CLocatorAPI* fs, LPCSTR initial, u32 flags)
+FS_file_list file_list_open_script(CLocatorAPI* fs, const char* initial, u32 flags)
 {
     return FS_file_list(fs->file_list_open(initial, flags));
 }
 
-FS_file_list file_list_open_script_2(CLocatorAPI* fs, LPCSTR initial, LPCSTR folder, u32 flags)
+FS_file_list file_list_open_script_2(CLocatorAPI* fs, const char* initial, const char* folder, u32 flags)
 {
     return FS_file_list(fs->file_list_open(initial, folder, flags));
 }
 
-void dir_delete_script_2(CLocatorAPI* fs, LPCSTR path, LPCSTR nm, int remove_files)
+void dir_delete_script_2(CLocatorAPI* fs, const char* path, const char* nm, int remove_files)
 {
     fs->dir_delete(path, nm, remove_files);
 }
 
-void dir_delete_script(CLocatorAPI* fs, LPCSTR full_path, int remove_files) { fs->dir_delete(full_path, remove_files); }
-LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm)
+void dir_delete_script(CLocatorAPI* fs, const char* full_path, int remove_files) { fs->dir_delete(full_path, remove_files); }
+const char* get_file_age_str(CLocatorAPI* fs, const char* nm)
 {
     time_t t = fs->get_file_age(nm);
     struct tm* newtime;
@@ -237,8 +237,8 @@ SCRIPT_EXPORT(fs_registrator, (), {
             .def("append_path", &CLocatorAPI::append_path)
             .def("rescan_path", &rescan_path_script) //Alundaio
 
-            .def("file_delete", (void (CLocatorAPI::*)(LPCSTR, LPCSTR))(&CLocatorAPI::file_delete))
-            .def("file_delete", (void (CLocatorAPI::*)(LPCSTR))(&CLocatorAPI::file_delete))
+            .def("file_delete", (void (CLocatorAPI::*)(const char*, const char*))(&CLocatorAPI::file_delete))
+            .def("file_delete", (void (CLocatorAPI::*)(const char*))(&CLocatorAPI::file_delete))
 
             .def("dir_delete", &dir_delete_script)
             .def("dir_delete", &dir_delete_script_2)
@@ -248,17 +248,17 @@ SCRIPT_EXPORT(fs_registrator, (), {
             .def("file_copy", &CLocatorAPI::file_copy)
 
             .def("exist", &ExistS)
-            .def("exist", (FileStatus(CLocatorAPI::*)(LPCSTR, FSType))(&CLocatorAPI::exist))
-            .def("exist", (FileStatus(CLocatorAPI::*)(LPCSTR, LPCSTR, FSType))(&CLocatorAPI::exist))
+            .def("exist", (FileStatus(CLocatorAPI::*)(const char*, FSType))(&CLocatorAPI::exist))
+            .def("exist", (FileStatus(CLocatorAPI::*)(const char*, const char*, FSType))(&CLocatorAPI::exist))
 
             .def("get_file_age", &CLocatorAPI::get_file_age)
             .def("get_file_age_str", &get_file_age_str)
-            .def("r_open", (IReader * (CLocatorAPI::*)(LPCSTR, LPCSTR))(&CLocatorAPI::r_open))
-            .def("r_open", (IReader * (CLocatorAPI::*)(LPCSTR))(&CLocatorAPI::r_open))
+            .def("r_open", (IReader * (CLocatorAPI::*)(const char*, const char*))(&CLocatorAPI::r_open))
+            .def("r_open", (IReader * (CLocatorAPI::*)(const char*))(&CLocatorAPI::r_open))
             .def("r_close", (void (CLocatorAPI::*)(IReader*&))(&CLocatorAPI::r_close))
 
-            .def("w_open", (IWriter * (CLocatorAPI::*)(LPCSTR, LPCSTR))(&CLocatorAPI::w_open))
-            .def("w_open", (IWriter * (CLocatorAPI::*)(LPCSTR))(&CLocatorAPI::w_close))
+            .def("w_open", (IWriter * (CLocatorAPI::*)(const char*, const char*))(&CLocatorAPI::w_open))
+            .def("w_open", (IWriter * (CLocatorAPI::*)(const char*))(&CLocatorAPI::w_close))
             .def("w_close", &CLocatorAPI::w_close)
 
             .def("file_list_open", &file_list_open_script)

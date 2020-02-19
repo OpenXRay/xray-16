@@ -16,7 +16,7 @@
 ////////////////////////////////////////////////////////////////////////////
 // CSE_Visual
 ////////////////////////////////////////////////////////////////////////////
-CSE_Visual::CSE_Visual(LPCSTR name)
+CSE_Visual::CSE_Visual(const char* name)
 {
     if (name)
     {
@@ -35,7 +35,7 @@ CSE_Visual::CSE_Visual(LPCSTR name)
 }
 
 CSE_Visual::~CSE_Visual() {}
-void CSE_Visual::set_visual(LPCSTR name, bool load)
+void CSE_Visual::set_visual(const char* name, bool load)
 {
     string_path tmp;
     xr_strcpy(tmp, name);
@@ -73,7 +73,7 @@ void CSE_Visual::OnChangeAnim(PropValue* sender)
 }
 
 #ifndef XRGAME_EXPORTS
-void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
+void CSE_Visual::FillProps(const char* pref, PropItemVec& items)
 {
     IServerEntity* abstract = smart_cast<IServerEntity*>(this);
     VERIFY(abstract);
@@ -90,9 +90,9 @@ void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
 ////////////////////////////////////////////////////////////////////////////
 // CSE_Animated
 ////////////////////////////////////////////////////////////////////////////
-CSE_Motion::CSE_Motion(LPCSTR name) { motion_name = name; }
+CSE_Motion::CSE_Motion(const char* name) { motion_name = name; }
 CSE_Motion::~CSE_Motion() {}
-void CSE_Motion::set_motion(LPCSTR name) { motion_name = name; }
+void CSE_Motion::set_motion(const char* name) { motion_name = name; }
 void CSE_Motion::motion_read(NET_Packet& tNetPacket) { tNetPacket.r_stringZ(motion_name); }
 void CSE_Motion::motion_write(NET_Packet& tNetPacket) { tNetPacket.w_stringZ(motion_name); }
 void CSE_Motion::OnChangeMotion(PropValue* sender)
@@ -103,7 +103,7 @@ void CSE_Motion::OnChangeMotion(PropValue* sender)
 }
 
 #ifndef XRGAME_EXPORTS
-void CSE_Motion::FillProps(LPCSTR pref, PropItemVec& items)
+void CSE_Motion::FillProps(const char* pref, PropItemVec& items)
 {
     IServerEntity* abstract = smart_cast<IServerEntity*>(this);
     VERIFY(abstract);

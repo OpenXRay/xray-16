@@ -49,7 +49,7 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
     //*/
 };
 
-void CLevel::g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos)
+void CLevel::g_cl_Spawn(const char* name, u8 rp, u16 flags, Fvector pos)
 {
     // Create
     CSE_Abstract* E = F_entity_Create(name);
@@ -177,7 +177,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 }
 
 CSE_Abstract* CLevel::spawn_item(
-    LPCSTR section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item)
+    const char* section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item)
 {
     CSE_Abstract* abstract = F_entity_Create(section);
     R_ASSERT3(abstract, "Cannot find item with section", section);

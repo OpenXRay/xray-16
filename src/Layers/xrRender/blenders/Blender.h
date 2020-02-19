@@ -28,7 +28,7 @@ public:
         version = 0;
     }
 
-    void Setup(LPCSTR N);
+    void Setup(const char* N);
 };
 
 class ECORE_API IBlender : public CPropertyBase
@@ -43,8 +43,8 @@ protected:
     string64 oT_xform;
 
 protected:
-    u32 BC(BOOL v) { return v ? 0xff : 0; }
-    BOOL c_XForm();
+    u32 BC(bool v) { return v ? 0xff : 0; }
+    bool c_XForm();
 
 public:
     static IBlender* Create(CLASS_ID cls);
@@ -52,12 +52,12 @@ public:
     static void CreatePalette(xr_vector<IBlender*>& palette);
 
     CBlender_DESC& getDescription() { return description; }
-    virtual LPCSTR getName() { return description.cName; }
-    virtual LPCSTR getComment() = 0;
+    virtual const char* getName() { return description.cName; }
+    virtual const char* getComment() = 0;
 
-    virtual BOOL canBeDetailed() { return FALSE; }
-    virtual BOOL canBeLMAPped() = 0;
-    virtual BOOL canUseSteepParallax() { return FALSE; }
+    virtual bool canBeDetailed() { return FALSE; }
+    virtual bool canBeLMAPped() = 0;
+    virtual bool canUseSteepParallax() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

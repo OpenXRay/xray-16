@@ -26,7 +26,7 @@
 
 UIMapLegend::UIMapLegend() {}
 UIMapLegend::~UIMapLegend() { xr_delete(m_list); }
-void UIMapLegend::init_from_xml(CUIXml& xml, LPCSTR path)
+void UIMapLegend::init_from_xml(CUIXml& xml, const char* path)
 {
     CUIXmlInit::InitWindow(xml, path, 0, this);
 

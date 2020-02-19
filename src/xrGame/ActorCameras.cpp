@@ -121,7 +121,7 @@ ICF void calc_gl_point(Fvector& pt, const Fmatrix& xform, float radius, float an
     calc_point(pt, radius, VIEWPORT_NEAR / 2, angle);
     xform.transform_tiny(pt);
 }
-ICF BOOL test_point(const Fvector& pt, xrXRC& xrc, const Fmatrix33& mat, const Fvector& ext)
+ICF bool test_point(const Fvector& pt, xrXRC& xrc, const Fmatrix33& mat, const Fvector& ext)
 {
     for (auto &it : *xrc.r_get())
     {
@@ -241,7 +241,7 @@ void CActor::cam_Lookout(const Fmatrix& xform, float camera_height)
         // if (tri_count)
         {
             float da = 0.f;
-            BOOL bIntersect = FALSE;
+            bool bIntersect = FALSE;
             Fvector ext = {w, h, VIEWPORT_NEAR / 2};
             Fvector pt;
             calc_gl_point(pt, xform, radius, alpha);

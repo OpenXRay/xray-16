@@ -55,23 +55,23 @@ public:
 
     void SetRank(s16 team, u8 rank);
 
-    virtual void ChangeTotalMoneyIndicator(LPCSTR newMoneyString);
-    virtual void DisplayMoneyChange(LPCSTR deltaMoney);
+    virtual void ChangeTotalMoneyIndicator(const char* newMoneyString);
+    virtual void DisplayMoneyChange(const char* deltaMoney);
     virtual void DisplayMoneyBonus(KillMessageStruct* bonus);
     virtual void SetFraglimit(int local_frags, int fraglimit);
 
-    void SetTimeMsgCaption(LPCSTR str);
-    void SetSpectrModeMsgCaption(LPCSTR str);
-    void SetSpectatorMsgCaption(LPCSTR str);
-    void SetPressJumpMsgCaption(LPCSTR str);
-    void SetPressBuyMsgCaption(LPCSTR str);
-    void SetRoundResultCaption(LPCSTR str);
-    void SetForceRespawnTimeCaption(LPCSTR str);
-    void SetDemoPlayCaption(LPCSTR str);
-    void SetWarmUpCaption(LPCSTR str);
+    void SetTimeMsgCaption(const char* str);
+    void SetSpectrModeMsgCaption(const char* str);
+    void SetSpectatorMsgCaption(const char* str);
+    void SetPressJumpMsgCaption(const char* str);
+    void SetPressBuyMsgCaption(const char* str);
+    void SetRoundResultCaption(const char* str);
+    void SetForceRespawnTimeCaption(const char* str);
+    void SetDemoPlayCaption(const char* str);
+    void SetWarmUpCaption(const char* str);
 
-    void SetVoteMessage(LPCSTR str);
-    void SetVoteTimeResultMsg(LPCSTR str);
+    void SetVoteMessage(const char* str);
+    void SetVoteTimeResultMsg(const char* str);
 
     void UpdateTeamPanels();
 

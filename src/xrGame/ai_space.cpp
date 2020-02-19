@@ -153,7 +153,7 @@ void CAI_Space::RestartScriptEngine()
     }
 }
 
-void CAI_Space::load(LPCSTR level_name)
+void CAI_Space::load(const char* level_name)
 {
     VERIFY(m_game_graph);
 

@@ -66,7 +66,7 @@ public:
 protected:
     shared_str m_InfoId;
 
-    void load_shared(LPCSTR) override;
+    void load_shared(const char*) override;
 
     SInfoPortionData* info_data()
     {

@@ -7,7 +7,7 @@
 #include "Common/object_broker.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
+const char* GameTypeToString(EGameIDs gt, bool bShort);
 
 u32 const demo_player_info::demo_info_max_size = DEMOSTRING_MAX_SIZE + 80;
 /*

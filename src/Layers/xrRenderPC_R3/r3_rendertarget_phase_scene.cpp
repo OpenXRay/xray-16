@@ -26,7 +26,7 @@ void CRenderTarget::phase_scene_prepare()
             u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, rt_MSAADepth->pZRT);
 
         // CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        float ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
         HW.pDevice->ClearRenderTargetView(rt_Position->pRT, ColorRGBA);
         // HW.pDevice->ClearRenderTargetView(rt_Normal->pRT, ColorRGBA);
         // HW.pDevice->ClearRenderTargetView(rt_Color->pRT, ColorRGBA);

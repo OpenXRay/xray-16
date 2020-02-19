@@ -17,10 +17,10 @@ public:
 
     virtual void send_task(IGridUser& user, IGenericStream* outStream, u32 id) = 0;
     virtual void receive_result(IGenericStream* outStream) = 0;
-    virtual bool receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream) = 0;
+    virtual bool receive_task(IAgent* agent, unsigned int sessionId, IGenericStream* inStream) = 0;
     virtual void send_result(IGenericStream* outStream) = 0;
-    virtual bool execute(IAgent* agent, DWORD sessionId) = 0;
-    virtual LPCSTR data_files(string_path& buf) = 0;
+    virtual bool execute(IAgent* agent, unsigned int sessionId) = 0;
+    virtual const char* data_files(string_path& buf) = 0;
 
     net_execution(u32 id) : _id(id) {}
     virtual ~net_execution(){};

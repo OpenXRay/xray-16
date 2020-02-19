@@ -10,7 +10,7 @@
 #include "MainMenu.h"
 #include "profile_data_types_script.h"
 
-void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
+void CCC_CreateGameSpyAccount::Execute(const char* args)
 {
 #ifdef WINDOWS
     if (!args || (xr_strlen(args) == 0))
@@ -43,7 +43,7 @@ void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
 #endif
 }
 
-void CCC_GapySpyListProfiles::Execute(LPCSTR args)
+void CCC_GapySpyListProfiles::Execute(const char* args)
 {
 #ifdef WINDOWS
     if (!args || (xr_strlen(args) == 0))
@@ -66,7 +66,7 @@ void CCC_GapySpyListProfiles::Execute(LPCSTR args)
 #endif
 }
 
-void CCC_GameSpyLogin::Execute(LPCSTR args)
+void CCC_GameSpyLogin::Execute(const char* args)
 {
 #ifdef WINDOWS
     if (!args || (xr_strlen(args) == 0))
@@ -91,7 +91,7 @@ void CCC_GameSpyLogin::Execute(LPCSTR args)
 #endif
 }
 
-void CCC_GameSpyLogout::Execute(LPCSTR args)
+void CCC_GameSpyLogout::Execute(const char* args)
 {
 #ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
@@ -109,7 +109,7 @@ static char const* print_time(time_t const& src_time, string64& dest_time)
     return dest_time;
 }
 
-void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
+void CCC_GameSpyPrintProfile::Execute(const char* args)
 {
 #ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
@@ -157,7 +157,7 @@ void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
 #endif
 }
 
-void CCC_GameSpySuggestUNicks::Execute(LPCSTR args)
+void CCC_GameSpySuggestUNicks::Execute(const char* args)
 {
 #ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
@@ -169,7 +169,7 @@ void CCC_GameSpySuggestUNicks::Execute(LPCSTR args)
 #endif
 }
 
-void CCC_GameSpyRegisterUniqueNick::Execute(LPCSTR args)
+void CCC_GameSpyRegisterUniqueNick::Execute(const char* args)
 {
 #ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
@@ -181,7 +181,7 @@ void CCC_GameSpyRegisterUniqueNick::Execute(LPCSTR args)
 #endif
 }
 
-void CCC_GameSpyDeleteProfile::Execute(LPCSTR args)
+void CCC_GameSpyDeleteProfile::Execute(const char* args)
 {
 #ifdef WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
@@ -193,7 +193,7 @@ void CCC_GameSpyDeleteProfile::Execute(LPCSTR args)
 
 static gamespy_profile::all_best_scores_t debug_best_scores;
 
-void CCC_GameSpyProfile::Execute(LPCSTR args)
+void CCC_GameSpyProfile::Execute(const char* args)
 {
 #ifdef WINDOWS
     VERIFY(MainMenu());

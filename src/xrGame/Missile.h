@@ -19,14 +19,14 @@ public:
     CMissile();
     virtual ~CMissile();
 
-    virtual BOOL AlwaysTheCrow() { return TRUE; }
+    virtual bool AlwaysTheCrow() { return TRUE; }
     virtual void render_item_ui();
     virtual bool render_item_ui_query();
 
     virtual void reinit();
     virtual CMissile* cast_missile() { return this; }
-    virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void UpdateCL();

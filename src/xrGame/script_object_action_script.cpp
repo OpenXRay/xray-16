@@ -40,9 +40,9 @@ SCRIPT_EXPORT(CScriptObjectAction, (), {
                          .def(constructor<CScriptGameObject*, MonsterSpace::EObjectAction>())
                          .def(constructor<CScriptGameObject*, MonsterSpace::EObjectAction, u32>())
                          .def(constructor<MonsterSpace::EObjectAction>())
-                         .def(constructor<LPCSTR, MonsterSpace::EObjectAction>())
+                         .def(constructor<const char*, MonsterSpace::EObjectAction>())
                          .def("action", &CScriptObjectAction::SetObjectAction)
-                         .def("object", (void (CScriptObjectAction::*)(LPCSTR))(&CScriptObjectAction::SetObject))
+                         .def("object", (void (CScriptObjectAction::*)(const char*))(&CScriptObjectAction::SetObject))
                          .def("object",
                              (void (CScriptObjectAction::*)(CScriptGameObject*))(&CScriptObjectAction::SetObject))
                          .def("completed", (bool (CScriptObjectAction::*)())(&CScriptObjectAction::completed))];

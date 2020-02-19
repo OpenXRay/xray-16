@@ -81,7 +81,7 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
 //-----------------------------------------------------------------------------
 // music tracks
 //-----------------------------------------------------------------------------
-void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
+void SMusicTrack::Load(const char* fn, const char* params)
 {
 #ifdef DEBUG
     m_DbgName = fn;
@@ -110,14 +110,14 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
     m_PauseTime.mul(1000); // convert sec to ms
 }
 
-BOOL SMusicTrack::in(u32 game_time)
+bool SMusicTrack::in(u32 game_time)
 {
     // game_time -ms
     if (m_ActiveTime.x == 0 && m_ActiveTime.y)
         return TRUE;
 
     bool b_cross_midnight = (m_ActiveTime.y < m_ActiveTime.x);
-    BOOL res = FALSE;
+    bool res = FALSE;
 
     if (!b_cross_midnight)
     {
@@ -190,7 +190,7 @@ void CLevelSoundManager::Load()
     {
         if (gameLtx.line_exist(Level().name(), "music_tracks"))
         {
-            LPCSTR music_sect = gameLtx.r_string(Level().name(), "music_tracks");
+            const char* music_sect = gameLtx.r_string(Level().name(), "music_tracks");
             if (music_sect && music_sect[0])
             {
 #ifdef DEBUG

@@ -12,7 +12,7 @@ BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 u32 CStringTable::LanguageID = std::numeric_limits<u32>::max();
 xr_vector<xr_token> CStringTable::languagesToken;
 
-CStringTable::CStringTable()
+CStringTable::CStringTable() 
 {
     pData = nullptr;
 }
@@ -144,7 +144,7 @@ void CStringTable::SetLanguage()
 
 xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data(); }
 
-void CStringTable::Load(LPCSTR xml_file_full)
+void CStringTable::Load(const char* xml_file_full)
 {
     CUIXml uiXml;
     string_path _s;
@@ -157,12 +157,12 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
     for (int i = 0; i < string_num; ++i)
     {
-        LPCSTR string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", NULL);
+        const char* string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", NULL);
 
         VERIFY3(pData->m_StringTable.find(string_name) == pData->m_StringTable.end(), "duplicate string table id",
             string_name);
 
-        LPCSTR string_text = uiXml.Read(uiXml.GetRoot(), "string:text", i, NULL);
+        const char* string_text = uiXml.Read(uiXml.GetRoot(), "string:text", i, NULL);
 
         if (m_bWriteErrorsToLog && string_text)
             Msg("[string table] '%s' no translation in '%s'", string_name, pData->m_sLanguage.c_str());
@@ -197,7 +197,7 @@ void CStringTable::ReparseKeyBindings()
     }
 }
 
-STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
+STRING_VALUE CStringTable::ParseLine(const char* str, const char* skey, bool bFirst)
 {
     xr_string res;
     int k = 0;

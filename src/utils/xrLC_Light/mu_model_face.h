@@ -26,8 +26,8 @@ public:
     // int					VIndex				( _vertex* pV);
     // void				VSet				( int idx, _vertex* V);
     // void				VSet				( _vertex *V1, _vertex *V2, _vertex *V3);
-    // BOOL				isDegenerated		( );
-    // BOOL				isEqual				( _face& F );
+    // bool				isDegenerated		( );
+    // bool				isEqual				( _face& F );
     // float				EdgeLen				( int edge);
     // void				EdgeVerts			( int e, _vertex** A, _vertex** B);
     // void				CalcNormal			( );
@@ -36,7 +36,7 @@ public:
     // float				CalcMaxEdge			( );
     // void				CalcCenter			( Fvector &C );
 
-    // BOOL				RenderEqualTo		( Face *F );
+    // bool				RenderEqualTo		( Face *F );
 
     data_face() { sm_group = 0; };
     virtual ~data_face(){};

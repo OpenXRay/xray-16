@@ -22,7 +22,7 @@ private:
     void add_actions();
 
 public:
-    CStalkerGetDistancePlanner(CAI_Stalker* object = 0, LPCSTR action_name = "");
+    CStalkerGetDistancePlanner(CAI_Stalker* object = 0, const char* action_name = "");
     virtual ~CStalkerGetDistancePlanner();
     virtual void setup(CAI_Stalker* object, CPropertyStorage* storage);
 };

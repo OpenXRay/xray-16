@@ -30,7 +30,7 @@ public:
     Fplane P;
     Fsphere S;
     u32 marker;
-    BOOL bDualRender;
+    bool bDualRender;
 
     void Setup(Fvector* V, int vcnt, CSector* face, CSector* back);
 

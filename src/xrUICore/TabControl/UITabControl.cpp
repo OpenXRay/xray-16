@@ -44,7 +44,7 @@ void CUITabControl::SaveBackUpOptValue()
 
 bool CUITabControl::IsChangedOptValue() const { return GetActiveId() != m_opt_backup_value; }
 // добавление кнопки-закладки в список закладок контрола
-bool CUITabControl::AddItem(LPCSTR pItemName, LPCSTR pTexName, Fvector2 pos, Fvector2 size)
+bool CUITabControl::AddItem(const char* pItemName, const char* pTexName, Fvector2 pos, Fvector2 size)
 {
     CUITabButton* pNewButton = new CUITabButton();
     pNewButton->SetAutoDelete(true);

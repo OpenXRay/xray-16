@@ -35,12 +35,12 @@ public:
     CProjector();
     virtual ~CProjector();
 
-    virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void shedule_Update(u32 dt); // Called by sheduler
     virtual void UpdateCL(); // Called each frame, so no need for dt
 
-    virtual BOOL UsedAI_Locations();
+    virtual bool UsedAI_Locations();
 
     virtual bool bfAssignWatch(CScriptEntityAction* tpEntityAction);
     virtual bool bfAssignObject(CScriptEntityAction* tpEntityAction);

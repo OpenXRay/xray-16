@@ -29,7 +29,7 @@ public:
     virtual ~CEnergyHolder();
 
     virtual void reinit();
-    virtual void reload(LPCSTR section, LPCSTR prefix = "", LPCSTR suffix = "");
+    virtual void reload(const char* section, const char* prefix = "", const char* suffix = "");
 
     virtual void schedule_update();
 

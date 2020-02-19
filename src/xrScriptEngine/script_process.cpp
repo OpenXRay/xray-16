@@ -30,10 +30,10 @@ CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, sha
 CScriptProcess::~CScriptProcess() { delete_data(m_scripts); }
 void CScriptProcess::run_scripts()
 {
-    LPSTR S;
+    char* S;
     for (; !m_scripts_to_run.empty();)
     {
-        LPSTR I = m_scripts_to_run.back().m_script_name;
+        char* I = m_scripts_to_run.back().m_script_name;
         bool do_string = m_scripts_to_run.back().m_do_string;
         bool reload = m_scripts_to_run.back().m_reload;
         S = xr_strdup(I);
@@ -89,7 +89,7 @@ void CScriptProcess::update()
 #endif
 }
 
-void CScriptProcess::add_script(LPCSTR script_name, bool do_string, bool reload)
+void CScriptProcess::add_script(const char* script_name, bool do_string, bool reload)
 {
     m_scripts_to_run.push_back(CScriptToRun(script_name, do_string, reload));
 }

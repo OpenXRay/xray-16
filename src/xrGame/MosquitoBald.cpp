@@ -12,7 +12,7 @@ CMosquitoBald::CMosquitoBald(void)
 }
 
 CMosquitoBald::~CMosquitoBald(void) {}
-void CMosquitoBald::Load(LPCSTR section) { inherited::Load(section); }
+void CMosquitoBald::Load(const char* section) { inherited::Load(section); }
 bool CMosquitoBald::BlowoutState()
 {
     bool result = inherited::BlowoutState();

@@ -384,7 +384,7 @@ void D3DXRenderBase::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisu
     {
         // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
-        BOOL _use_lod = FALSE;
+        bool _use_lod = FALSE;
         if (pV->m_lod)
         {
             Fvector Tpos;
@@ -528,7 +528,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
 
 /* Xottab_DUTY: this function is only called from add_Static,
  * but we need a matrix, which is nullptr at this point
-BOOL D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
+bool D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
 {
     // Check frustum visibility and calculate distance to visual's center
     Fvector Tpos; // transformed position
@@ -591,7 +591,7 @@ BOOL D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal
     {
         // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
-        BOOL _use_lod = FALSE;
+        bool _use_lod = FALSE;
         if (pV->m_lod)
         {
             Fvector Tpos2;

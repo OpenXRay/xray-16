@@ -9,4 +9,4 @@
 
 CDummyArtefact::CDummyArtefact(void) {}
 CDummyArtefact::~CDummyArtefact(void) {}
-void CDummyArtefact::Load(LPCSTR section) { inherited::Load(section); }
+void CDummyArtefact::Load(const char* section) { inherited::Load(section); }

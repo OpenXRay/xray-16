@@ -15,7 +15,7 @@ public:
     CUIOutfitImmunity();
     virtual ~CUIOutfitImmunity();
 
-    bool InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type);
+    bool InitFromXml(CUIXml& xml_doc, const char* base_str, u32 hit_type);
     void SetProgressValue(float cur, float comp);
 
 protected:

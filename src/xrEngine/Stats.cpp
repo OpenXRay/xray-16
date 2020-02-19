@@ -21,7 +21,7 @@ Flags32 g_stats_flags = {0};
 class optimizer
 {
     float average_;
-    BOOL enabled_;
+    bool enabled_;
 
 public:
     optimizer()
@@ -33,7 +33,7 @@ public:
         enabled_ = FALSE;
     }
 
-    BOOL enabled() { return enabled_; }
+    bool enabled() { return enabled_; }
     void enable()
     {
         if (!enabled_)
@@ -69,7 +69,7 @@ static optimizer vtune;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-ENGINE_API BOOL g_bDisableRedText = FALSE;
+ENGINE_API bool g_bDisableRedText = FALSE;
 CStats::CStats()
 {
     statsFont = nullptr;

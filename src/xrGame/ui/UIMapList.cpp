@@ -21,7 +21,7 @@ extern ENGINE_API string512 g_sLaunchOnExit_app;
 extern ENGINE_API string512 g_sLaunchOnExit_params;
 extern ENGINE_API string_path g_sLaunchWorkingFolder;
 
-LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
+const char* GameTypeToString(EGameIDs gt, bool bShort);
 
 CUIMapList::CUIMapList()
 {
@@ -146,7 +146,7 @@ extern xr_token g_GameModes[];
 void CUIMapList::OnModeChange() { UpdateMapList(GetCurGameType()); }
 EGameIDs CUIMapList::GetCurGameType()
 {
-    LPCSTR text = "";
+    const char* text = "";
     CUIComboBox* combo_ms = smart_cast<CUIComboBox*>(m_pModeSelector);
     CUISpinText* spin_ms = smart_cast<CUISpinText*>(m_pModeSelector);
     if (combo_ms)
@@ -185,7 +185,7 @@ EGameIDs CUIMapList::GetCurGameType()
 #endif
 }
 
-const char* CUIMapList::GetCommandLine(LPCSTR player_name)
+const char* CUIMapList::GetCommandLine(const char* player_name)
 {
     CUIListBoxItem* itm = m_pList2->GetItemByIDX(0);
     if (!itm)
@@ -280,7 +280,7 @@ void CUIMapList::SetWeatherSelector(CUIComboBox* ws) { m_pWeatherSelector = ws; 
 void CUIMapList::SetModeSelector(CUIWindow* ms) { m_pModeSelector = ms; }
 void CUIMapList::SetMapPic(CUIStatic* map_pic) { m_pMapPic = map_pic; }
 void CUIMapList::SetMapInfo(CUIMapInfo* map_info) { m_pMapInfo = map_info; }
-void CUIMapList::SetServerParams(LPCSTR params) { m_srv_params = params; }
+void CUIMapList::SetServerParams(const char* params) { m_srv_params = params; }
 
 void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id)
 {
@@ -334,7 +334,7 @@ void CUIMapList::UpdateMapList(EGameIDs GameType)
 
     for (u32 i = 0; i < list_size; ++i)
     {
-        LPCSTR st = m_pList2->GetText(i);
+        const char* st = m_pList2->GetText(i);
         map_list.push_back(st);
     }
     m_pList2->Clear();

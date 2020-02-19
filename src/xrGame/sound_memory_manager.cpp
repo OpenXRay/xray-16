@@ -49,7 +49,7 @@ CSoundMemoryManager::~CSoundMemoryManager()
 #endif
 }
 
-void CSoundMemoryManager::Load(LPCSTR section) {}
+void CSoundMemoryManager::Load(const char* section) {}
 void CSoundMemoryManager::reinit()
 {
     m_sounds = 0;
@@ -62,7 +62,7 @@ void CSoundMemoryManager::reinit()
 #endif
 }
 
-void CSoundMemoryManager::reload(LPCSTR section)
+void CSoundMemoryManager::reload(const char* section)
 {
     m_max_sound_count = READ_IF_EXISTS(pSettings, r_s32, section, "DynamicSoundsCount", 1);
     m_min_sound_threshold = READ_IF_EXISTS(pSettings, r_float, section, "sound_threshold", 0.05f);
@@ -70,7 +70,7 @@ void CSoundMemoryManager::reload(LPCSTR section)
     m_sound_decrease_quant = READ_IF_EXISTS(pSettings, r_u32, section, "self_decrease_quant", 250);
     m_decrease_factor = READ_IF_EXISTS(pSettings, r_float, section, "self_decrease_factor", .95f);
 
-    LPCSTR sound_perceive_section = READ_IF_EXISTS(pSettings, r_string, section, "sound_perceive_section", section);
+    const char* sound_perceive_section = READ_IF_EXISTS(pSettings, r_string, section, "sound_perceive_section", section);
     m_weapon_factor = READ_IF_EXISTS(pSettings, r_float, sound_perceive_section, "weapon", 10.f);
     m_item_factor = READ_IF_EXISTS(pSettings, r_float, sound_perceive_section, "item", 1.f);
     m_npc_factor = READ_IF_EXISTS(pSettings, r_float, sound_perceive_section, "npc", 1.f);

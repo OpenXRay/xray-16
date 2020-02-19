@@ -9,4 +9,4 @@
 
 CZudaArtefact::CZudaArtefact(void) {}
 CZudaArtefact::~CZudaArtefact(void) {}
-void CZudaArtefact::Load(LPCSTR section) { inherited::Load(section); }
+void CZudaArtefact::Load(const char* section) { inherited::Load(section); }
