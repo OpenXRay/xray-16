@@ -19,50 +19,33 @@ CUIArtefactParams::~CUIArtefactParams()
     xr_delete(m_Prop_line);
 }
 
-LPCSTR af_immunity_section_names[] = // ALife::EInfluenceType
+constexpr std::tuple<ALife::EInfluenceType, cpcstr, cpcstr> af_immunity[] =
 {
-    "radiation_immunity", // infl_rad=0
-    "burn_immunity", // infl_fire=1
-    "chemical_burn_immunity", // infl_acid=2
-    "telepatic_immunity", // infl_psi=3
-    "shock_immunity", // infl_electra=4
-
-    //"strike_immunity",
-    //Alundaio: Uncommented
-    "wound_immunity",
-    "explosion_immunity",
-    "fire_wound_immunity",
+    //{ ALife::infl_,           "section",                  "caption" }
+    { ALife::infl_rad,          "radiation_immunity",       "ui_inv_outfit_radiation_protection" },
+    { ALife::infl_fire,         "burn_immunity",            "ui_inv_outfit_burn_protection" },
+    { ALife::infl_acid,         "chemical_burn_immunity",   "ui_inv_outfit_chemical_burn_protection" },
+    { ALife::infl_psi,          "telepatic_immunity",       "ui_inv_outfit_telepatic_protection" },
+    { ALife::infl_electra,      "shock_immunity",           "ui_inv_outfit_shock_protection" },
+    //{ ALife::infl_strike,     "strike_immunity",          "ui_inv_outfit_strike_protection" }
+    //{ ALife::infl_wound,      "wound_immunity",           "ui_inv_outfit_wound_protection" }
+    //{ ALife::infl_explosion,  "explosion_immunity",       "ui_inv_outfit_explosion_protection" }
+    //{ ALife::infl_fire_wound, "fire_wound_immunity",      "ui_inv_outfit_fire_wound_protection" }
 };
+static_assert(std::size(af_immunity) == ALife::infl_max_count,
+    "All influences should be listed in the tuple above.");
 
-LPCSTR af_restore_section_names[] = // ALife::EConditionRestoreType
-    {
-        "health_restore_speed", // eHealthRestoreSpeed=0
-        "satiety_restore_speed", // eSatietyRestoreSpeed=1
-        "power_restore_speed", // ePowerRestoreSpeed=2
-        "bleeding_restore_speed", // eBleedingRestoreSpeed=3
-        "radiation_restore_speed", // eRadiationRestoreSpeed=4
-};
-
-LPCSTR af_immunity_caption[] = // ALife::EInfluenceType
+constexpr std::tuple<ALife::EConditionRestoreType, cpcstr, cpcstr> af_restore[] =
 {
-    "ui_inv_outfit_radiation_protection", // "(radiation_imm)",
-    "ui_inv_outfit_burn_protection", // "(burn_imm)",
-    "ui_inv_outfit_chemical_burn_protection", // "(chemical_burn_imm)",
-    "ui_inv_outfit_telepatic_protection", // "(telepatic_imm)",
-    "ui_inv_outfit_shock_protection", // "(shock_imm)",
-
-    //"ui_inv_outfit_strike_protection",	 // "(strike_imm)",
-
-    //Alundaio: Uncommented
-    "ui_inv_outfit_wound_protection", // "(wound_imm)",
-    "ui_inv_outfit_explosion_protection", // "(explosion_imm)",
-    "ui_inv_outfit_fire_wound_protection", // "(fire_wound_imm)",
+    //{ ALife::EConditionRestoreType,   "section",                  "caption" }
+    { ALife::eHealthRestoreSpeed,       "health_restore_speed",     "ui_inv_health" },
+    { ALife::eSatietyRestoreSpeed,      "satiety_restore_speed",    "ui_inv_satiety" },
+    { ALife::ePowerRestoreSpeed,        "power_restore_speed",      "ui_inv_power" },
+    { ALife::eBleedingRestoreSpeed,     "bleeding_restore_speed",   "ui_inv_bleeding" },
+    { ALife::eRadiationRestoreSpeed,    "radiation_restore_speed",  "ui_inv_radiation" },
 };
-
-LPCSTR af_restore_caption[] = // ALife::EConditionRestoreType
-{
-    "ui_inv_health", "ui_inv_satiety", "ui_inv_power", "ui_inv_bleeding", "ui_inv_radiation",
-};
+static_assert(std::size(af_restore) == ALife::eRestoreTypeMax,
+    "All restore types should be listed in the tuple above.");
 
 /*
 LPCSTR af_actor_param_names[]=
@@ -91,13 +74,13 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
     if ((m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false)))
         m_Prop_line->SetAutoDelete(false);
 
-    for (u32 i = 0; i < ALife::infl_max_count; ++i)
+    for (auto [id, section, caption] : af_immunity)
     {
-        m_immunity_item[i] = CreateItem(xml, af_immunity_section_names[i], af_immunity_caption[i]);
+        m_immunity_item[id] = CreateItem(xml, section, caption);
     }
-    for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
+    for (auto [id, section, caption] : af_restore)
     {
-        m_restore_item[i] = CreateItem(xml, af_restore_section_names[i], af_restore_caption[i]);
+        m_restore_item[id] = CreateItem(xml, section, caption);
     }
     m_additional_weight = CreateItem(xml, "additional_weight", "ui_inv_weight", "ui_inv_outfit_additional_weight");
 
@@ -159,17 +142,17 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
         AttachChild(item);
     };
 
-    for (u32 i = 0; i < ALife::infl_max_count; ++i)
+    for (auto [id, immunity_section, immunity_caption] : af_immunity)
     {
-        shared_str const& sect = pSettings->r_string(af_section, "hit_absorbation_sect");
-        val = pSettings->r_float(sect, af_immunity_section_names[i]);
+        shared_str const& hit_absorbation_sect = pSettings->r_string(af_section, "hit_absorbation_sect");
+        val = pSettings->r_float(hit_absorbation_sect, immunity_section);
         if (fis_zero(val))
         {
             continue;
         }
-        max_val = actor->conditions().GetZoneMaxPower((ALife::EInfluenceType)i);
+        max_val = actor->conditions().GetZoneMaxPower(id);
         val /= max_val;
-        setValue(m_immunity_item[i]);
+        setValue(m_immunity_item[id]);
     }
 
     {
@@ -180,14 +163,14 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
         }
     }
 
-    for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
+    for (auto [id, restore_section, restore_caption] : af_restore)
     {
-        val = pSettings->r_float(af_section, af_restore_section_names[i]);
+        val = pSettings->r_float(af_section, restore_section);
         if (fis_zero(val))
         {
             continue;
         }
-        setValue(m_restore_item[i]);
+        setValue(m_restore_item[id]);
     }
 
     SetHeight(h);
