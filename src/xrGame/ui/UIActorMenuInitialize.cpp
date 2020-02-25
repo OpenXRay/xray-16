@@ -299,7 +299,6 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
 
     UIHelper::CreateStatic(uiXml, "static_personal", personalWnd);
     m_ActorStateInfo->init_from_xml(uiXml);
-    AttachChild(m_ActorStateInfo);
 
     std::tuple<eActorMenuListType, cpcstr, CUIWindow*> inventory_lists[] =
     {
