@@ -17,7 +17,11 @@ public:
 
 protected:
     UIArtefactParamItem* CreateItem(CUIXml& uiXml, pcstr section,
-        shared_str translationId, shared_str translationId2 = nullptr);
+        const shared_str& translationId, const shared_str& translationId2 = nullptr);
+
+    UIArtefactParamItem* CreateItem(CUIXml& uiXml, pcstr section,
+        float magnitude, bool isSignInverse, const shared_str& unit,
+        const shared_str& translationId, const shared_str& translationId2 = nullptr);
 
 protected:
     UIArtefactParamItem* m_immunity_item[ALife::infl_max_count]{};
@@ -30,15 +34,27 @@ protected:
 
 // -----------------------------------
 
-class UIArtefactParamItem : public CUIWindow
+class UIArtefactParamItem : public CUIStatic
 {
 public:
     UIArtefactParamItem();
     ~UIArtefactParamItem() override = default;
 
-    void Init(CUIXml& xml, LPCSTR section);
+    enum class InitResult
+    {
+        Failed,
+        Normal,
+        Plain
+    };
+
+    InitResult Init(CUIXml& xml, pcstr section);
+
+    void SetDefaultValuesPlain(float magnitude, bool isSignInverse, const shared_str& unit);
     void SetCaption(LPCSTR name);
     void SetValue(float value);
+
+protected:
+    InitResult InitPlain(CUIXml& xml, pcstr section);
 
 private:
     CUIStatic* m_caption{};
