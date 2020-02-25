@@ -29,7 +29,7 @@ void CUIActorMenu::InitTradeMode()
 {
     ShowIfExist(m_pTradeWnd, true);
     m_pLists[eInventoryBagList]->Show(false);
-    GetModeSpecificPartnerInfo()->Show(true);
+    GetModeSpecificPartnerInfo(mmTrade)->Show(true);
     m_PartnerMoney->Show(true);
     ShowIfExist(m_pQuickSlot, true);
 
@@ -129,7 +129,7 @@ void CUIActorMenu::DeInitTradeMode()
 
     ShowIfExist(m_pTradeWnd, false);
     m_pLists[eInventoryBagList]->Show(true);
-    GetModeSpecificPartnerInfo()->Show(false);
+    GetModeSpecificPartnerInfo(mmTrade)->Show(false);
     m_PartnerMoney->Show(false);
 
     m_pLists[eTradeActorBagList]->Show(false);

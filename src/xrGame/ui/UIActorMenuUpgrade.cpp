@@ -17,7 +17,7 @@
 
 void CUIActorMenu::InitUpgradeMode()
 {
-    GetModeSpecificPartnerInfo()->Show(true);
+    ShowIfExist(GetModeSpecificPartnerInfo(mmUpgrade), true);
     m_PartnerMoney->Show(false);
     ShowIfExist(m_pUpgradeWnd, true);
     ShowIfExist(m_pQuickSlot, true);
@@ -31,7 +31,7 @@ void CUIActorMenu::InitUpgradeMode()
 
 void CUIActorMenu::DeInitUpgradeMode()
 {
-    GetModeSpecificPartnerInfo()->Show(false);
+    ShowIfExist(GetModeSpecificPartnerInfo(mmUpgrade), false);
     if (m_pUpgradeWnd)
     {
         m_pUpgradeWnd->Show(false);

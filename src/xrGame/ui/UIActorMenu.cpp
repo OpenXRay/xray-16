@@ -71,14 +71,14 @@ void CUIActorMenu::InitPartnerInfo()
     if (m_pPartnerInvOwner)
     {
         if (m_pPartnerInvOwner->use_simplified_visual())
-            GetModeSpecificPartnerInfo()->ClearInfo();
+            GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
         else
-            GetModeSpecificPartnerInfo()->InitCharacter(m_pPartnerInvOwner->object_id());
+            GetModeSpecificPartnerInfo(m_currMenuMode)->InitCharacter(m_pPartnerInvOwner->object_id());
 
         SetInvBox(nullptr);
     }
     else
-        GetModeSpecificPartnerInfo()->ClearInfo();
+        GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
 }
 
 void CUIActorMenu::SetInvBox(CInventoryBox* box)
@@ -144,7 +144,8 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         default: R_ASSERT(0); break;
         }
         InitActorInfo();
-        InitPartnerInfo();
+        if (m_currMenuMode != mmUndefined && m_currMenuMode != mmInventory)
+            InitPartnerInfo();
         CurModeToScript();
     } // if
 
@@ -470,14 +471,21 @@ CUICharacterInfo* CUIActorMenu::GetModeSpecificActorInfo() const
     return m_ActorCharacterInfo;
 }
 
-CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo() const
+CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo(EMenuMode fallback) const
 {
     switch (m_currMenuMode)
     {
     case mmTrade:          return m_TradePartnerCharacterInfo;
     case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
     }
-    return m_PartnerCharacterInfo;
+    if (m_PartnerCharacterInfo)
+        return m_PartnerCharacterInfo;
+    switch (fallback)
+    {
+    case mmTrade:          return m_TradePartnerCharacterInfo;
+    case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
+    }
+    return nullptr;
 }
 
 void CUIActorMenu::UpdateItemsPlace()

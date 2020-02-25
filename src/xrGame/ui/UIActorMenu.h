@@ -296,7 +296,7 @@ protected:
     void InfoCurItem(CUICellItem* cell_item); // on update item
     CUIItemInfo* GetModeSpecificItemInfo();
     CUICharacterInfo* GetModeSpecificActorInfo() const;
-    CUICharacterInfo* GetModeSpecificPartnerInfo() const;
+    CUICharacterInfo* GetModeSpecificPartnerInfo(EMenuMode fallback) const;
 
     void ActivatePropertiesBox();
     void TryHidePropertiesBox();
