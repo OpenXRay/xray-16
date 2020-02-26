@@ -1542,6 +1542,7 @@
     <ClInclude Include="ui\UINewsItemWnd.h" />
     <ClInclude Include="ui\UIOptConCom.h" />
     <ClInclude Include="ui\UIOutfitInfo.h" />
+    <ClInclude Include="ui\UIOutfitSlot.h" />
     <ClInclude Include="ui\UIPdaKillMessage.h" />
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
     <ClInclude Include="ui\UIPdaWnd.h" />
@@ -1566,11 +1567,13 @@
     <ClInclude Include="ui\UITalkWnd.h" />
     <ClInclude Include="ui\UITaskWnd.h" />
     <ClInclude Include="ui\UITextVote.h" />
+    <ClInclude Include="ui\UITradeBar.h" />
     <ClInclude Include="ui\UIVersionList.h" />
     <ClInclude Include="ui\UIVote.h" />
     <ClInclude Include="ui\UIVoteStatusWnd.h" />
     <ClInclude Include="ui\UIVotingCategory.h" />
     <ClInclude Include="ui\UIWarState.h" />
+    <ClInclude Include="ui\UIWeightBar.h" />
     <ClInclude Include="ui\UIWpnParams.h" />
     <ClInclude Include="ui\UIXmlInit.h" />
     <ClInclude Include="ui\ui_af_params.h" />
@@ -3550,6 +3553,7 @@
     <ClCompile Include="ui\UINewsItemWnd.cpp" />
     <ClCompile Include="ui\UIOptConCom.cpp" />
     <ClCompile Include="ui\UIOutfitInfo.cpp" />
+    <ClCompile Include="ui\UIOutfitSlot.cpp" />
     <ClCompile Include="ui\UIPdaKillMessage.cpp" />
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
     <ClCompile Include="ui\UIPdaWnd.cpp" />
@@ -3583,11 +3587,13 @@
     <ClCompile Include="ui\UITalkWnd.cpp" />
     <ClCompile Include="ui\UITaskWnd.cpp" />
     <ClCompile Include="ui\UITextVote.cpp" />
+    <ClCompile Include="ui\UITradeBar.cpp" />
     <ClCompile Include="ui\UIVersionList.cpp" />
     <ClCompile Include="ui\UIVote.cpp" />
     <ClCompile Include="ui\UIVoteStatusWnd.cpp" />
     <ClCompile Include="ui\UIVotingCategory.cpp" />
     <ClCompile Include="ui\UIWarState.cpp" />
+    <ClCompile Include="ui\UIWeightBar.cpp" />
     <ClCompile Include="ui\UIWindow_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>

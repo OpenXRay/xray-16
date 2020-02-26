@@ -37,8 +37,13 @@ CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* 
 
 CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
+    return CreateStatic(xml, ui_path, 0, parent, critical);
+}
+
+CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical)
+{
     // If it's not critical element, then don't crash if it doesn't exist
-    if (!critical && !xml.NavigateToNode(ui_path, 0))
+    if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
     auto ui = new CUIStatic();
@@ -47,7 +52,7 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitStatic(xml, ui_path, 0, ui);
+    CUIXmlInit::InitStatic(xml, ui_path, index, ui);
     return ui;
 }
 
@@ -181,14 +186,19 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWind
 
 CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
+    return Create3tButton(xml, ui_path, 0, parent, critical);
+}
+
+CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical /*= true*/)
+{
     // If it's not critical element, then don't crash if it doesn't exist
-    if (!critical && !xml.NavigateToNode(ui_path, 0))
+    if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
     auto ui = new CUI3tButton();
     parent->AttachChild(ui);
     ui->SetAutoDelete(true);
-    CUIXmlInit::Init3tButton(xml, ui_path, 0, ui);
+    CUIXmlInit::Init3tButton(xml, ui_path, index, ui);
     return ui;
 }
 
@@ -219,14 +229,19 @@ UIHint* UIHelper::CreateHint(CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*/
 
 CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
+    return CreateDragDropListEx(xml, ui_path, 0, parent, critical);
+}
+
+CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical /*= true*/)
+{
     // If it's not critical element, then don't crash if it doesn't exist
-    if (!critical && !xml.NavigateToNode(ui_path, 0))
+    if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
     auto ui = new CUIDragDropListEx();
     parent->AttachChild(ui);
     ui->SetAutoDelete(true);
-    CUIXmlInit::InitDragDropListEx(xml, ui_path, 0, ui);
+    CUIXmlInit::InitDragDropListEx(xml, ui_path, index, ui);
     return ui;
 }
 

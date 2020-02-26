@@ -60,6 +60,7 @@ bool CInventorySlot::CanBeActivated() const { return (m_bAct); };
 CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
+    m_iMaxBelt = pSettings->read_if_exists<s32>("inventory", "max_belt", 5);
 
     u16 sz;
     const u16 tempSlotsCount = pSettings->read_if_exists<s16>("inventory", "slots_count", 10);
@@ -1254,6 +1255,11 @@ u32 CInventory::BeltWidth() const
         }
     }
     return 0; // m_iMaxBelt;
+}
+
+u32 CInventory::BeltMaxWidth() const
+{
+    return m_iMaxBelt;
 }
 
 void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade) const

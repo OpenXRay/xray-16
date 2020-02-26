@@ -143,7 +143,6 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 
     OnItemDropped(CurrentIItem(), new_owner, old_owner);
 
-    UpdateConditionProgressBars();
     UpdateItemsPlace();
 
     return true;
@@ -234,7 +233,6 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 
     }; // switch
 
-    UpdateConditionProgressBars();
     UpdateItemsPlace();
 
     return true;
@@ -289,8 +287,7 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
             set_highlight_item(itm);
         }
     }
-    VERIFY(m_ItemInfo);
-    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + m_ItemInfo->delay)
+    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay : 0))
     {
         return true; // false
     }
