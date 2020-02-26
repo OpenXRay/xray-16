@@ -106,6 +106,16 @@ void CUIActorMenu::Construct()
         InitializeInventoryMode(inventoryXml);
         InitializeTradeMode(tradeXml);
         InitializeSearchLootMode(carbodyXml);
+        { // hack that is needed if we want events to work correctly
+            Fvector2 size = m_pInventoryWnd->GetWndSize();
+            size.max(m_pTradeWnd->GetWndSize());
+            size.max(m_pSearchLootWnd->GetWndSize());
+            SetWndSize(size);
+            Fvector2 pos = m_pInventoryWnd->GetWndPos();
+            size.min(m_pTradeWnd->GetWndPos());
+            size.min(m_pSearchLootWnd->GetWndPos());
+            SetWndPos(pos);
+        }
         InitSounds(inventoryXml);
     }
     else
