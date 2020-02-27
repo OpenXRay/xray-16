@@ -304,11 +304,16 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     descWnd->AttachChild(m_ItemInfoInventoryMode);
     m_ItemInfoInventoryMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), INVENTORY_ITEM_XML);
 
-    CUIFrameWindow* personalWnd = UIHelper::CreateFrameWindow(uiXml, "character_frame_window", m_pInventoryWnd);
-    personalWnd->AttachChild(m_ActorStateInfo);
-
-    UIHelper::CreateStatic(uiXml, "static_personal", personalWnd);
+    CUIStatic* progressBack = UIHelper::CreateStatic(uiXml, "progress_background", m_pInventoryWnd);
+    progressBack->AttachChild(m_ActorStateInfo);
     m_ActorStateInfo->init_from_xml(uiXml);
+
+    CUIFrameWindow* personalWnd = UIHelper::CreateFrameWindow(uiXml, "character_frame_window", m_pInventoryWnd);
+    UIHelper::CreateStatic(uiXml, "static_personal", personalWnd);
+
+    CUIItemInfo* outfitInfo = new CUIItemInfo();
+    outfitInfo->SetAutoDelete(true);
+    m_pInventoryWnd->AttachChild(outfitInfo);
 
     std::tuple<eActorMenuListType, cpcstr, CUIWindow*> inventory_lists[] =
     {
@@ -516,6 +521,7 @@ void CUIActorMenu::InitCallbacks()
     BindDragDropListEvents(m_pLists[eTradePartnerList]);
 
     BindDragDropListEvents(m_pLists[eSearchLootBagList]);
+    BindDragDropListEvents(m_pLists[eSearchLootActorBagList]);
 
     if (m_pLists[eTrashList])
     {
@@ -573,7 +579,7 @@ void CUIActorMenu::InitAllowedDrops()
 
 void CUIActorMenu::UpdateButtonsLayout()
 {
-    if (m_trade_button)
+    if (m_trade_button && !m_pInventoryWnd)
     {
         Fvector2 btn_exit_pos;
         if (m_trade_button->IsShown() || m_takeall_button->IsShown())
