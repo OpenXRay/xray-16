@@ -35,7 +35,7 @@ void CUIPropertiesBox::InitPropertiesBox(Fvector2 pos, Fvector2 size)
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu.xml");
 
-    if (!xml_doc.NavigateToNode("properties_box"))
+    if (!xml_doc.NavigateToNode("properties_box")) // SOC and CS compatibility
     {
         xml_doc.ClearInternal();
         xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "inventory_new.xml");
