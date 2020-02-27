@@ -15,6 +15,19 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
 {
     string4096 str;
 
+    const auto tryOpenFile = [&](IReader*& file, pcstr includeName, pcstr comparePath, pcstr uiPath, pcstr uiPathDelim)
+    {
+        if (file)
+            return;
+        if (includeName == strstr(includeName, comparePath))
+        {
+            shared_str fn = xml->correct_file_name(uiPath, strchr(includeName, _DELIMITER) + 1);
+            string_path buff;
+            strconcat(buff, uiPathDelim, fn.c_str());
+            file = FS.r_open(path, buff);
+        }
+    };
+
     while (!F->eof())
     {
         F->r_string(str, sizeof str);
@@ -25,13 +38,9 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
             if (_GetItem(str, 1, inc_name, '"'))
             {
                 IReader* I = nullptr;
-                if (inc_name == strstr(inc_name, UI_PATH_DEFAULT_WITH_DELIMITER))
-                {
-                    shared_str fn = xml->correct_file_name(UI_PATH, strchr(inc_name, _DELIMITER) + 1);
-                    string_path buff;
-                    strconcat(sizeof buff, buff, UI_PATH_WITH_DELIMITER, fn.c_str());
-                    I = FS.r_open(path, buff);
-                }
+                tryOpenFile(I, inc_name, UI_PATH, UI_PATH, UI_PATH_WITH_DELIMITER);
+                tryOpenFile(I, inc_name, UI_PATH_DEFAULT_WITH_DELIMITER, UI_PATH, UI_PATH_WITH_DELIMITER);
+                tryOpenFile(I, inc_name, UI_PATH_DEFAULT_WITH_DELIMITER, UI_PATH_DEFAULT, UI_PATH_DEFAULT_WITH_DELIMITER);
 
                 if (!I)
                     I = FS.r_open(path, inc_name);
@@ -91,7 +100,6 @@ bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
     return Set(reinterpret_cast<pcstr>(W.pointer()), fatal);
 }
 
-// XXX: support #include directive
 bool XMLDocument::Set(pcstr text, bool fatal)
 {
     R_ASSERT(text != nullptr);
