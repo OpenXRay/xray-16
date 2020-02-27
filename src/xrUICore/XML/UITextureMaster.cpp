@@ -39,7 +39,7 @@ void CUITextureMaster::ParseShTexInfo(pcstr path, pcstr xml_file)
 void CUITextureMaster::ParseShTexInfo(pcstr xml_file)
 {
     CUIXml xml;
-    xml.Load(CONFIG_PATH, UI_PATH, xml_file);
+    xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_file);
     const shared_str file = xml.Read("file_name", 0, "");
 
     const int num = xml.GetNodesNum("", 0, "texture");
