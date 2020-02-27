@@ -317,7 +317,7 @@ float UICore::get_current_kx()
     return res;
 }
 
-shared_str UICore::get_xml_name(LPCSTR fn)
+shared_str UICore::get_xml_name(pcstr path, pcstr fn)
 {
     string_path str;
     if (!is_widescreen())
@@ -328,7 +328,6 @@ shared_str UICore::get_xml_name(LPCSTR fn)
     }
     else
     {
-        string_path str_;
         if (strext(fn))
         {
             xr_strcpy(str, fn);
@@ -338,7 +337,8 @@ shared_str UICore::get_xml_name(LPCSTR fn)
         else
             xr_sprintf(str, "%s_16", fn);
 
-        if (!FS.exist(str_, "$game_config$", UI_PATH_WITH_DELIMITER, str))
+        string_path str_;
+        if (!FS.exist(str_, "$game_config$", path, str))
         {
             xr_sprintf(str, "%s", fn);
             if (nullptr == strext(fn))

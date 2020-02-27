@@ -66,6 +66,7 @@ bool XMLDocument::Load(pcstr path_alias, pcstr path, pcstr path2, pcstr xml_file
     if (Load(path_alias, str, false))
         return true;
 
+    fn = correct_file_name(path2, xml_filename);
     xr_sprintf(str, "%s" DELIMITER "%s", path2, *fn);
     return Load(path_alias, str, fatal);
 }
