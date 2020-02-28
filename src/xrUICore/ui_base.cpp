@@ -217,12 +217,11 @@ UICore::UICore()
     m_bPostprocess = false;
 
     OnDeviceReset();
+    OnUIReset();
 
     m_current_scale = &m_scale_;
     g_current_font_scale.set(1.0f, 1.0f);
     m_currentPointType = IUIRender::pttTL;
-    ReadTextureInfo();
-    CUIXmlInitBase::InitColorDefs();
 }
 
 void UICore::OnDeviceReset()
@@ -230,6 +229,12 @@ void UICore::OnDeviceReset()
     m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
 
     m_2DFrustum.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth), float(Device.dwHeight)));
+}
+
+void UICore::OnUIReset()
+{
+    ReadTextureInfo();
+    CUIXmlInitBase::InitColorDefs();
 }
 
 UICore::~UICore()

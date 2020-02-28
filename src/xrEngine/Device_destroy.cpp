@@ -74,7 +74,7 @@ void CRenderDevice::ResetInternal(bool precache)
 
     seqDeviceReset.Process();
     if (dwWidth_before != dwWidth || dwHeight_before != dwHeight)
-        seqResolutionChanged.Process();
+        seqUIReset.Process();
 
     if (!GEnv.isDedicatedServer)
         pInput->GrabInput(true);

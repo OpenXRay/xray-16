@@ -9,7 +9,7 @@
 class CUICursor;
 class CUIGameCustom;
 
-class XRUICORE_API UICore : public CDeviceResetNotifier
+class XRUICORE_API UICore : public CDeviceResetNotifier, public CUIResetNotifier
 {
     C2DFrustum m_2DFrustum;
     C2DFrustum m_2DFrustumPP;
@@ -50,6 +50,7 @@ public:
     void RenderFont();
 
     virtual void OnDeviceReset();
+    void OnUIReset() override;
     static bool is_widescreen();
     static float get_current_kx();
     shared_str get_xml_name(pcstr path, pcstr fn);

@@ -120,7 +120,6 @@ public:
     MessageRegistry<pureAppStart> seqAppStart;
     MessageRegistry<pureAppEnd> seqAppEnd;
     MessageRegistry<pureFrame> seqFrame;
-    MessageRegistry<pureScreenResolutionChanged> seqResolutionChanged;
 
     SDL_Window* m_sdlWnd;
 };
@@ -378,28 +377,17 @@ public:
 class CUIResetNotifier : public pureUIReset
 {
 public:
-    CUIResetNotifier(const int prio = REG_PRIORITY_NORMAL) { Device.seqUIReset.Add(this, prio); }
-    virtual ~CUIResetNotifier() { Device.seqUIReset.Remove(this); }
-    void OnUIReset() override {}
-};
-
-class CUIResetAndResolutionNotifier : public pureUIReset, pureScreenResolutionChanged
-{
-public:
-    CUIResetAndResolutionNotifier(const int uiResetPrio = REG_PRIORITY_NORMAL, const int resolutionChangedPrio = REG_PRIORITY_NORMAL)
+    CUIResetNotifier(const int uiResetPrio = REG_PRIORITY_NORMAL)
     {
         Device.seqUIReset.Add(this, uiResetPrio);
-        Device.seqResolutionChanged.Add(this, resolutionChangedPrio);
     }
 
-    virtual ~CUIResetAndResolutionNotifier()
+    virtual ~CUIResetNotifier()
     {
         Device.seqUIReset.Remove(this);
-        Device.seqResolutionChanged.Remove(this);
     }
 
     void OnUIReset() override {}
-    void OnScreenResolutionChanged() override { OnUIReset(); }
 };
 
 #endif

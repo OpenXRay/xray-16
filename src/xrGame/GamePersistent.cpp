@@ -72,23 +72,31 @@ void FillUIStyleToken()
 }
 
 bool defaultUIStyle = true;
-
 void SetupUIStyle()
 {
     if (UIStyleID == 0)
+    {
+        if (!defaultUIStyle)
+        {
+            xr_free(UI_PATH);
+            xr_free(UI_PATH_WITH_DELIMITER);
+        }
+        UI_PATH = UI_PATH_DEFAULT;
+        UI_PATH_WITH_DELIMITER = UI_PATH_DEFAULT_WITH_DELIMITER;
+        defaultUIStyle = true;
         return;
+    }
 
     pcstr selectedStyle = nullptr;
     for (const auto& token : UIStyleToken)
         if (token.id == UIStyleID)
             selectedStyle = token.name;
 
-    string128 selectedStylePath;
-    strconcat(sizeof(selectedStylePath), selectedStylePath, UI_PATH, DELIMITER "styles" DELIMITER, selectedStyle);
-
+    string_path selectedStylePath;
+    strconcat(selectedStylePath, UI_PATH_DEFAULT, DELIMITER "styles" DELIMITER, selectedStyle);
     UI_PATH = xr_strdup(selectedStylePath);
 
-    strconcat(sizeof(selectedStylePath), selectedStylePath, selectedStylePath, DELIMITER);
+    xr_strcat(selectedStylePath, DELIMITER);
     UI_PATH_WITH_DELIMITER = xr_strdup(selectedStylePath);
 
     defaultUIStyle = false;

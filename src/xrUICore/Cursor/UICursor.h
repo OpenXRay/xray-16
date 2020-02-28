@@ -2,7 +2,7 @@
 
 class CUIStatic;
 
-class XRUICORE_API CUICursor : public pureRender, public CUIResetAndResolutionNotifier
+class XRUICORE_API CUICursor : public pureRender, public CUIResetNotifier
 {
     bool bVisible;
     Fvector2 vPos;
