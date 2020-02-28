@@ -112,13 +112,6 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
     return dest;
 }
 
-void UICore::OnDeviceReset()
-{
-    m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
-
-    m_2DFrustum.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth), float(Device.dwHeight)));
-}
-
 void UICore::ClientToScreenScaled(Fvector2& dest, float left, float top) const
 {
     if (m_currentPointType != IUIRender::pttLIT)
@@ -230,6 +223,13 @@ UICore::UICore()
     m_currentPointType = IUIRender::pttTL;
     ReadTextureInfo();
     CUIXmlInitBase::InitColorDefs();
+}
+
+void UICore::OnDeviceReset()
+{
+    m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
+
+    m_2DFrustum.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth), float(Device.dwHeight)));
 }
 
 UICore::~UICore()
