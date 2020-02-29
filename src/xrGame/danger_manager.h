@@ -41,9 +41,9 @@ private:
 public:
     IC CDangerManager(CCustomMonster* object);
     virtual ~CDangerManager();
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
     virtual void reinit();
-    virtual void reload(LPCSTR section);
+    virtual void reload(const char* section);
     virtual void update();
     virtual bool useful(const CDangerObject& object) const;
     virtual bool is_useful(const CDangerObject& object) const;

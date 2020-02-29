@@ -10,8 +10,8 @@ public:
     CUIMapInfo();
     ~CUIMapInfo();
     void InitMapInfo(Fvector2 pos, Fvector2 size);
-    void InitMap(LPCSTR map_name, LPCSTR map_ver);
-    LPCSTR GetLargeDesc();
+    void InitMap(const char* map_name, const char* map_ver);
+    const char* GetLargeDesc();
 
 protected:
     CUIScrollView* m_view;

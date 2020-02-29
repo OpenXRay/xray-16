@@ -122,4 +122,4 @@ void target_selector::add_actions()
     add_operator(eWorldOperatorLoopholeTargetDefaultBehaviour, action);
 }
 
-LPCSTR target_selector::object_name() const { return ("target_selector"); }
+const char* target_selector::object_name() const { return ("target_selector"); }

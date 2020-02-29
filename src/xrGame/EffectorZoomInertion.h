@@ -32,7 +32,7 @@ class CEffectorZoomInertion : public CEffectorCam
     CRandom m_Random;
 
     void CalcNextPoint();
-    void LoadParams(LPCSTR Section, LPCSTR Prefix);
+    void LoadParams(const char* Section, const char* Prefix);
 
 public:
     CEffectorZoomInertion();
@@ -41,7 +41,7 @@ public:
     void Load();
     void SetParams(float disp);
 
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
     virtual void SetRndSeed(s32 Seed) { m_Random.seed(Seed); };
     virtual void Init(CWeaponMagazined* pWeapon);
 

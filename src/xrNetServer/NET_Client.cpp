@@ -465,7 +465,7 @@ bool IPureClient::Connect(pcstr options)
         R_CHK(net_Address_device->SetSP(bSimulator ? &CLSID_NETWORKSIMULATOR_DP8SP_TCPIP : &CLSID_DP8SP_TCPIP));
 
         // Create our IDirectPlay8Address Server Address, --- Set the SP for our Server Address
-        WCHAR ServerNameUNICODE[256];
+        wchar_t ServerNameUNICODE[256];
         R_CHK(MultiByteToWideChar(CP_ACP, 0, server_name, -1, ServerNameUNICODE, 256));
 
         net_Address_server = nullptr;
@@ -494,7 +494,7 @@ bool IPureClient::Connect(pcstr options)
         xr_strcat( tmp, user_name_str );
         xr_strcat( tmp, "/" );*/
 
-        WCHAR ClientNameUNICODE[256];
+        wchar_t ClientNameUNICODE[256];
         R_CHK(MultiByteToWideChar(CP_ACP, 0, user_name_str, -1, ClientNameUNICODE, 256));
 
         {
@@ -517,7 +517,7 @@ bool IPureClient::Connect(pcstr options)
 
         if (xr_stricmp(server_name, "localhost") == 0)
         {
-            WCHAR SessionPasswordUNICODE[4096];
+            wchar_t SessionPasswordUNICODE[4096];
             if (xr_strlen(password_str))
             {
                 CHK_DX(MultiByteToWideChar(CP_ACP, 0, password_str, -1, SessionPasswordUNICODE, 4096));
@@ -601,7 +601,7 @@ bool IPureClient::Connect(pcstr options)
             string64 EnumData;
             EnumData[0] = 0;
             xr_strcat(EnumData, "ToConnect");
-            DWORD EnumSize = xr_strlen(EnumData) + 1;
+            unsigned int EnumSize = xr_strlen(EnumData) + 1;
             // We now have the host address so lets enum
             u32 c_port = psCL_Port;
             HRESULT res = S_FALSE;
@@ -665,7 +665,7 @@ bool IPureClient::Connect(pcstr options)
                 return false;
             }
 
-            WCHAR SessionPasswordUNICODE[4096];
+            wchar_t SessionPasswordUNICODE[4096];
             if (xr_strlen(password_str))
             {
                 CHK_DX(MultiByteToWideChar(CP_ACP, 0, password_str, -1, SessionPasswordUNICODE, 4096));
@@ -777,7 +777,7 @@ HRESULT IPureClient::net_Handler(u32 dwMessageType, PVOID pMessage)
         PDPNMSG_ENUM_HOSTS_RESPONSE pEnumHostsResponseMsg;
         const DPN_APPLICATION_DESC* pDesc;
         // HOST_NODE*                      pHostNode = NULL;
-        // WCHAR*                          pwszSession = NULL;
+        // wchar_t*                          pwszSession = NULL;
 
         pEnumHostsResponseMsg = (PDPNMSG_ENUM_HOSTS_RESPONSE)pMessage;
         pDesc = pEnumHostsResponseMsg->pApplicationDescription;
@@ -977,7 +977,7 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
     DPN_BUFFER_DESC desc;
 
     desc.dwBufferSize = size;
-    desc.pBufferData = (BYTE*)data;
+    desc.pBufferData = (unsigned char*)data;
 
     net_Statistic.dwBytesSended += size;
 
@@ -1098,7 +1098,7 @@ void IPureClient::Sync_Thread()
             DPN_BUFFER_DESC desc;
             DPNHANDLE hAsync = 0;
             desc.dwBufferSize = sizeof(clPing);
-            desc.pBufferData = LPBYTE(&clPing);
+            desc.pBufferData = (unsigned char*)(&clPing);
             if (nullptr == NET || net_Disconnected)
                 break;
 
@@ -1198,13 +1198,13 @@ IPureClient::HOST_NODE::~HOST_NODE() noexcept
     xr_delete(pdpAppDesc);
 }
 
-bool IPureClient::GetServerAddress(ip_address& pAddress, DWORD* pPort)
+bool IPureClient::GetServerAddress(ip_address& pAddress, unsigned int* pPort)
 {
     *pPort = 0;
     if (!net_Address_server)
         return false;
 
-    WCHAR wstrHostname[2048] = {0};
+    wchar_t wstrHostname[2048] = {0};
     DWORD dwHostNameSize = sizeof(wstrHostname);
     DWORD dwHostNameDataType = DPNA_DATATYPE_STRING;
     CHK_DX(

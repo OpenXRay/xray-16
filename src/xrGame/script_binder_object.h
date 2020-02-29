@@ -22,7 +22,7 @@ public:
     CScriptBinderObject(CScriptGameObject* object);
     virtual ~CScriptBinderObject();
     virtual void reinit();
-    virtual void reload(LPCSTR section);
+    virtual void reload(const char* section);
     virtual bool net_Spawn(SpawnType DC);
     virtual void net_Destroy();
     virtual void net_Import(NET_Packet* net_packet);

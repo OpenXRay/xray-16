@@ -38,10 +38,10 @@ public:
     static u32 LanguageID;
 
 private:
-    void Load(LPCSTR xml_file);
+    void Load(const char* xml_file);
     void FillLanguageToken();
     void SetLanguage();
-    static STRING_VALUE ParseLine(LPCSTR str, LPCSTR key, bool bFirst);
+    static STRING_VALUE ParseLine(const char* str, const char* key, bool bFirst);
     static xr_unique_ptr<STRING_TABLE_DATA> pData;
     static xr_vector<xr_token> languagesToken;
 };

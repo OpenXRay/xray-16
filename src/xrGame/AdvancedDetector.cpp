@@ -104,7 +104,7 @@ void CUIArtefactDetectorAdv::update()
     attachable_hud_item* itm = m_parent->HudItemData();
     R_ASSERT(itm);
 
-    BOOL b_visible = !fis_zero(m_target_dir.magnitude());
+    bool b_visible = !fis_zero(m_target_dir.magnitude());
     if (b_visible != itm->m_model->LL_GetBoneVisible(m_bid))
         itm->m_model->LL_SetBoneVisible(m_bid, b_visible, TRUE);
 

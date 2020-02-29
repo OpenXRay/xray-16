@@ -21,7 +21,7 @@ CGrenade::CGrenade(void)
 }
 
 CGrenade::~CGrenade(void) {}
-void CGrenade::Load(LPCSTR section)
+void CGrenade::Load(const char* section)
 {
     inherited::Load(section);
     CExplosive::Load(section);
@@ -49,10 +49,10 @@ void CGrenade::Hit(SHit* pHDS)
     inherited::Hit(pHDS);
 }
 
-BOOL CGrenade::net_Spawn(CSE_Abstract* DC)
+bool CGrenade::net_Spawn(CSE_Abstract* DC)
 {
     m_dwGrenadeIndependencyTime = 0;
-    BOOL ret = inherited::net_Spawn(DC);
+bool ret = inherited::net_Spawn(DC);
     Fvector box;
     BoundingBox().getsize(box);
     float max_size = _max(_max(box.x, box.y), box.z);
@@ -332,10 +332,10 @@ ALife::_TIME_ID CGrenade::TimePassedAfterIndependant() const
         return 0;
 }
 
-BOOL CGrenade::UsedAI_Locations()
+bool CGrenade::UsedAI_Locations()
 {
 #pragma todo( \
-    \
+bool\
 "Dima to Yura : It crashes, because on net_Spawn object doesn't use AI locations, but on net_Destroy it does use them")
     return inherited::UsedAI_Locations(); // m_dwDestroyTime == 0xffffffff;
 }

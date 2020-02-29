@@ -23,7 +23,7 @@ using namespace ALife;
 
 #define NORMALIZE_VARIABLE(a,b,c,d) a = u32(b % c) + d, b /= c;
 
-void print_time(LPCSTR S, _TIME_ID tTimeID)
+void print_time(const char* S, _TIME_ID tTimeID)
 {
     u32 Milliseconds,Seconds,Minutes,Hours,Days,Week,Months,Years;
     NORMALIZE_VARIABLE(Milliseconds,tTimeID,1000,0);
@@ -39,7 +39,7 @@ void print_time(LPCSTR S, _TIME_ID tTimeID)
 }
 
 **/
-CALifeCombatManager::CALifeCombatManager(IPureServer* server, LPCSTR section) : CALifeSimulatorBase(server, section)
+CALifeCombatManager::CALifeCombatManager(IPureServer* server, const char* section) : CALifeSimulatorBase(server, section)
 {
     /**
         seed						(u32(CPU::QPC() & 0xffffffff));

@@ -24,7 +24,7 @@ struct SAttackGoodwillStorage
     CHARACTER_GOODWILL neutral_attack_reputation;
     CHARACTER_GOODWILL enemy_attack_reputation;
 
-    void load(LPCSTR prefix)
+    void load(const char* prefix)
     {
         string128 s;
         strconcat(sizeof(s), s, prefix, "friend_attack_goodwill");

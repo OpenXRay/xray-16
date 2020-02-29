@@ -29,7 +29,7 @@ protected:
     typedef CStalkerActionCombatBase inherited;
 
 public:
-    CStalkerActionGetReadyToKillLowCover(CAI_Stalker* object, LPCSTR action_name = "");
+    CStalkerActionGetReadyToKillLowCover(CAI_Stalker* object, const char* action_name = "");
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -49,7 +49,7 @@ private:
     CRandom32 m_crouch_look_out_random;
 
 public:
-    CStalkerActionKillEnemyLowCover(CAI_Stalker* object, LPCSTR action_name = "");
+    CStalkerActionKillEnemyLowCover(CAI_Stalker* object, const char* action_name = "");
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -69,7 +69,7 @@ private:
     CRandom32 m_crouch_look_out_random;
 
 public:
-    CStalkerActionHoldPositionLowCover(CAI_Stalker* object, LPCSTR action_name = "");
+    CStalkerActionHoldPositionLowCover(CAI_Stalker* object, const char* action_name = "");
     virtual void initialize();
     virtual void execute();
     virtual void finalize();

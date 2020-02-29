@@ -11,9 +11,9 @@ public:
     virtual bool HasTexture() = 0;
     virtual void CaptureTexture() = 0;
     virtual void ResetTexture() = 0;
-    virtual BOOL video_IsPlaying() = 0;
+    virtual bool video_IsPlaying() = 0;
     virtual void video_Sync(u32 _time) = 0;
-    virtual void video_Play(BOOL looped, u32 _time = 0xFFFFFFFF) = 0;
+    virtual void video_Play(bool looped, u32 _time = 0xFFFFFFFF) = 0;
     virtual void video_Stop() = 0;
 };
 

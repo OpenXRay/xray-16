@@ -38,8 +38,8 @@ private:
 public:
     u32 Size() { return data.size(); }
     void ResetData() { data.clear(); }
-    void AddItem(LPCSTR name_, LPCSTR value_, u32 color_ = RGB(255, 255, 255));
-    void AddItem(shared_str& name_, LPCSTR value_, u32 color_ = RGB(255, 255, 255));
+    void AddItem(const char* name_, const char* value_, u32 color_ = RGB(255, 255, 255));
+    void AddItem(shared_str& name_, const char* value_, u32 color_ = RGB(255, 255, 255));
 
     IC SItem_ServerInfo& operator[](u32 id)
     {
@@ -68,7 +68,7 @@ protected:
     // Static sounds
     xr_vector<ref_sound> Sounds_Random;
     u32 Sounds_Random_dwNextTime;
-    BOOL Sounds_Random_Enabled;
+    bool Sounds_Random_Enabled;
     CCameraManager* m_pCameras;
 
     // temporary
@@ -78,7 +78,7 @@ public:
     CObjectList Objects;
     CObjectSpace ObjectSpace;
     CCameraManager& Cameras() { return *m_pCameras; };
-    BOOL bReady;
+    bool bReady;
 
     CInifile* pLevel;
 

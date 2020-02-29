@@ -24,7 +24,7 @@ static void load(int argc, char** argv, char** envp)
 }
 
 #if defined(WINDOWS)
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+bool APIENTRY DllMain(HMODULE hModule, unsigned int ul_reason_for_call, LPVOID lpReserved)
 {
     lpReserved;
     switch (ul_reason_for_call)

@@ -23,7 +23,7 @@ public:
 
     void Initialize(pcstr labelSection = nullptr, pcstr translationId = nullptr, CUIXml* uiXml = nullptr);
     CUICellContainer* GetContainer() { return m_container; };
-    void LoadItemTexture(LPCSTR section, Ivector2 cell_pos);
+    void LoadItemTexture(const char* section, Ivector2 cell_pos);
     void ReloadReferences(CInventoryOwner* pActor);
     void UpdateLabels();
 

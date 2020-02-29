@@ -2,7 +2,7 @@
 #include "dxThunderboltDescRender.h"
 
 void dxThunderboltDescRender::Copy(IThunderboltDescRender& _in) { *this = *((dxThunderboltDescRender*)&_in); }
-void dxThunderboltDescRender::CreateModel(LPCSTR m_name)
+void dxThunderboltDescRender::CreateModel(const char* m_name)
 {
     IReader* F = nullptr;
     F = FS.r_open("$game_meshes$", m_name);

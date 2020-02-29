@@ -25,7 +25,7 @@ class CALifeInteractionManager : public CALifeCombatManager, public CALifeCommun
 
     **/
 public:
-    CALifeInteractionManager(IPureServer* server, LPCSTR section);
+    CALifeInteractionManager(IPureServer* server, const char* section);
     /**
         virtual							~CALifeInteractionManager	();
                 void					check_for_interaction		(CSE_ALifeSchedulable		*tpALifeSchedulable);

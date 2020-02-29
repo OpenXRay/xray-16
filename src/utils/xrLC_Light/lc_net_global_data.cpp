@@ -2,13 +2,13 @@
 #include "lc_net_global_data.h"
 #include "xrlc_globaldata.h"
 #include "file_compress.h"
-// void  DataReadCreate( LPCSTR fn );
+// void  DataReadCreate( const char* fn );
 
-// void decompress( LPCSTR f_in_out );
-void DataReadCreate(LPCSTR fn) {}
+// void decompress( const char* f_in_out );
+void DataReadCreate(const char* fn) {}
 namespace lc_net
 {
-void net_global_data_impl<gl_cl_data>::create_data_file(LPCSTR path)
+void net_global_data_impl<gl_cl_data>::create_data_file(const char* path)
 {
     FPU::m64r();
     Memory.mem_compact();
@@ -22,7 +22,7 @@ void net_global_data_impl<gl_cl_data>::create_data_file(LPCSTR path)
     // inlc_global_data()->create_read_faces();
     // inlc_global_data()->create_write_faces();
 }
-bool net_global_data_impl<gl_cl_data>::create_data(LPCSTR path)
+bool net_global_data_impl<gl_cl_data>::create_data(const char* path)
 {
     decompress(path);
     INetReaderFile r_global(path);

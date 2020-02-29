@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "actor_mp_server.h"
 
-CSE_ActorMP::CSE_ActorMP(LPCSTR section) : inherited(section) { m_ready_to_update = false; }
+CSE_ActorMP::CSE_ActorMP(const char* section) : inherited(section) { m_ready_to_update = false; }
 void CSE_ActorMP::STATE_Read(NET_Packet& packet, u16 size)
 {
     inherited::STATE_Read(packet, size);
@@ -21,7 +21,7 @@ void CSE_ActorMP::STATE_Write(NET_Packet& packet)
 #endif // #ifdef DEBUG
 }
 
-BOOL CSE_ActorMP::Net_Relevant()
+bool CSE_ActorMP::Net_Relevant()
 {
     if (get_health() <= 0)
         return (false);

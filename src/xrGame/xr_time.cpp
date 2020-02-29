@@ -15,11 +15,11 @@
 ALife::_TIME_ID __game_time() { return (ai().get_alife() ? ai().alife().time().game_time() : Level().GetGameTime()); }
 u32 get_time() { return u32(__game_time() & u32(-1)); }
 xrTime get_time_struct() { return xrTime(__game_time()); }
-LPCSTR xrTime::dateToString(int mode)
+const char* xrTime::dateToString(int mode)
 {
     return *InventoryUtilities::GetDateAsString(m_time, (InventoryUtilities::EDatePrecision)mode);
 }
-LPCSTR xrTime::timeToString(int mode)
+const char* xrTime::timeToString(int mode)
 {
     return *InventoryUtilities::GetTimeAsString(m_time, (InventoryUtilities::ETimePrecision)mode);
 }

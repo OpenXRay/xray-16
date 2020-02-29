@@ -18,20 +18,20 @@ const int UP_FREQ = 5, INT_BITS = 7, PERIOD_BITS = 7, TOT_BITS = INT_BITS + PERI
 #pragma pack(1)
 static struct PPM_CONTEXT
 {
-    DWORD EscFreq;
-    WORD NumStats, Dummy;
-    DWORD SummFreq;
+    unsigned int EscFreq;
+    unsigned short NumStats, Dummy;
+    unsigned int SummFreq;
     struct STATE
     {
-        BYTE Symbol, Flag;
-        DWORD Freq;
+        unsigned char Symbol, Flag;
+        unsigned int Freq;
         PPM_CONTEXT* Successor;
     } * Stats;
     PPM_CONTEXT* Suffix;
     inline void encodeBinSymbol(int symbol);
     inline void encodeSymbol(int symbol);
     PPM_CONTEXT* cutOff(int o, int ob, double b);
-    void clean(int o, BOOL FreqsOnly);
+    void clean(int o, bool FreqsOnly);
     void write(int o, FILE* fp);
     void write(int o, FILE* fp1, FILE* fp2, FILE* fp3);
     inline PPM_CONTEXT* createChild(STATE* pStats, STATE& FirstState);
@@ -39,10 +39,10 @@ static struct PPM_CONTEXT
 } * MinContext, *MaxContext;
 #pragma pack()
 
-static BYTE QTable[260]; // constants
+static unsigned char QTable[260]; // constants
 static PPM_CONTEXT::STATE* FoundState; // found next state transition
 static int NumMasked, OrderFall, MaxOrder;
-static BYTE CharMask[256];
+static unsigned char CharMask[256];
 
 inline PPM_CONTEXT* PPM_CONTEXT::createChild(STATE* pStats, STATE& FirstState)
 {
@@ -83,7 +83,7 @@ static void _FASTCALL StartModelRare(int MaxOrder)
         }
     }
 }
-static inline PPM_CONTEXT* CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p1)
+static inline PPM_CONTEXT* CreateSuccessors(bool Skip, PPM_CONTEXT::STATE* p1)
 {
     // static UpState declaration bypasses IntelC bug
     static PPM_CONTEXT::STATE UpState;
@@ -125,9 +125,9 @@ static inline PPM_CONTEXT* CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p1)
 NO_LOOP:
     if (pps == ps)
         return pc;
-    UpState.Symbol = *(BYTE*)UpBranch;
+    UpState.Symbol = *(unsigned char*)UpBranch;
     UpState.Freq = UpState.Flag = 0;
-    UpState.Successor = (PPM_CONTEXT*)(((BYTE*)UpBranch) + 1);
+    UpState.Successor = (PPM_CONTEXT*)(((unsigned char*)UpBranch) + 1);
     do
     {
         pc = pc->createChild(*--pps, UpState);
@@ -142,7 +142,7 @@ static inline void UpdateModel()
     PPM_CONTEXT::STATE* p = NULL;
     fs = *FoundState;
     PPM_CONTEXT *pc, *Successor;
-    UINT ns1;
+    unsigned int ns1;
     if (!OrderFall)
     {
         MinContext = MaxContext = FoundState->Successor = CreateSuccessors(TRUE, p);
@@ -156,7 +156,7 @@ static inline void UpdateModel()
         goto RESTART_MODEL;
     if (fs.Successor)
     {
-        if ((BYTE*)fs.Successor <= pText && (fs.Successor = CreateSuccessors(FALSE, p)) == NULL)
+        if ((unsigned char*)fs.Successor <= pText && (fs.Successor = CreateSuccessors(FALSE, p)) == NULL)
             goto RESTART_MODEL;
         if (!--OrderFall)
         {
@@ -303,7 +303,7 @@ static void EncodeFile1(FILE* DecodedFile)
             } while (MinContext->NumStats == NumMasked);
             MinContext->encodeSymbol(c);
         }
-        if (!OrderFall && (BYTE*)FoundState->Successor > pText)
+        if (!OrderFall && (unsigned char*)FoundState->Successor > pText)
             MinContext = MaxContext = FoundState->Successor;
         else if (UnitsStart - pText > 128 * UNIT_SIZE)
             UpdateModel();
@@ -317,15 +317,15 @@ STOP_ENCODING:
     printf("\n");
     EncodeFile2(DecodedFile);
 }
-void PPM_CONTEXT::clean(int o, BOOL FreqsOnly)
+void PPM_CONTEXT::clean(int o, bool FreqsOnly)
 {
     if (FreqsOnly)
         EscFreq = SummFreq = 0;
     if (!NumStats)
     {
-        if (o != MaxOrder && (BYTE*)oneState().Successor >= UnitsStart)
+        if (o != MaxOrder && (unsigned char*)oneState().Successor >= UnitsStart)
             oneState().Successor->clean(o + 1, FreqsOnly);
-        else if ((BYTE*)oneState().Successor < UnitsStart || !FreqsOnly)
+        else if ((unsigned char*)oneState().Successor < UnitsStart || !FreqsOnly)
             oneState().Successor = NULL;
     }
     else
@@ -333,9 +333,9 @@ void PPM_CONTEXT::clean(int o, BOOL FreqsOnly)
         {
             if (FreqsOnly)
                 p->Freq = 0;
-            if (o != MaxOrder && (BYTE*)p->Successor >= UnitsStart)
+            if (o != MaxOrder && (unsigned char*)p->Successor >= UnitsStart)
                 p->Successor->clean(o + 1, FreqsOnly);
-            else if ((BYTE*)p->Successor < UnitsStart || !FreqsOnly)
+            else if ((unsigned char*)p->Successor < UnitsStart || !FreqsOnly)
                 p->Successor = NULL;
         }
 }
@@ -357,7 +357,7 @@ inline double GetExtraBits(double f, double e, double f1, double sf1, double sf0
         ExtraBits -= COD_ERR * e;
     return ExtraBits;
 }
-static DWORD SizeOfModel, nc;
+static unsigned int SizeOfModel, nc;
 PPM_CONTEXT* PPM_CONTEXT::cutOff(int o, int ob, double b)
 {
     STATE tmp, *p, *p1;

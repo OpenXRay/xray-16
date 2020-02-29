@@ -124,7 +124,7 @@ void CScriptEntity::SetScriptControl(const bool bScriptControl, shared_str caSci
 }
 
 bool CScriptEntity::GetScriptControl() const { return (m_bScriptControl); }
-LPCSTR CScriptEntity::GetScriptControlName() const { return (*m_caScriptName); }
+const char* CScriptEntity::GetScriptControlName() const { return (*m_caScriptName); }
 bool CScriptEntity::CheckObjectVisibility(const CGameObject* tpObject)
 {
     if (!m_monster)
@@ -558,7 +558,7 @@ bool CScriptEntity::bfAssignMovement(CScriptEntityAction* tpEntityAction)
 }
 
 void CScriptEntity::net_Destroy() { m_initialized = false; }
-LPCSTR CScriptEntity::GetPatrolPathName()
+const char* CScriptEntity::GetPatrolPathName()
 {
 #ifdef DEBUG
     if (!GetScriptControl())
@@ -573,7 +573,7 @@ LPCSTR CScriptEntity::GetPatrolPathName()
     return (*m_tpActionQueue.back()->m_tMovementAction.m_path_name);
 }
 
-BOOL CScriptEntity::net_Spawn(CSE_Abstract* DC)
+bool CScriptEntity::net_Spawn(CSE_Abstract* DC)
 {
     m_initialized = true;
     object().setVisible(TRUE);
@@ -623,7 +623,7 @@ bool CScriptEntity::bfScriptAnimation()
 #endif
         m_tpScriptAnimation = m_tpNextAnimation;
         IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(object().Visual());
-        LPCSTR animation_id = *GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay;
+        const char* animation_id = *GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay;
         MotionID animation = skeleton_animated->ID_Cycle(animation_id);
         CBlend* result = 0;
         for (u16 i = 0; i < MAX_PARTS; ++i)

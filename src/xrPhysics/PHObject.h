@@ -61,7 +61,7 @@ protected:
     void SetPrefereExactIntegration() { m_island.SetPrefereExactIntegration(); }
     CPHObject* SelfPointer() { return this; }
 public:
-    IC BOOL IsRayMotion() { return m_flags.test(fl_ray_motions); }
+    IC bool IsRayMotion() { return m_flags.test(fl_ray_motions); }
     void IslandReinit() { m_island.Unmerge(); }
     void IslandStep(dReal step) { m_island.Step(step); }
     void MergeIsland(CPHObject* obj) { m_island.Merge(&obj->m_island); }

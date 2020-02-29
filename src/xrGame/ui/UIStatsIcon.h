@@ -9,7 +9,7 @@ class CUIStatsIcon : public CUIStatic
 
 public:
     CUIStatsIcon();
-    void SetValue(LPCSTR str);
+    void SetValue(const char* str);
 
 protected:
     enum DEF_TEX

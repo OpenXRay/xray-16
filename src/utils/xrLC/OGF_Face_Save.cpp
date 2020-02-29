@@ -7,7 +7,7 @@
 
 using namespace std;
 
-extern u16 RegisterShader(LPCSTR T);
+extern u16 RegisterShader(const char* T);
 extern void geom_batch_average(u32 verts, u32 faces);
 
 u32 u8_vec4(Fvector N, u8 A = 0)
@@ -252,7 +252,7 @@ void OGF::PreSave(u32 tree_id)
             x_VB.Add(&v, sizeof(v));
         }
         x_VB.End(&fast_path_data.vb_id, &fast_path_data.vb_start);
-        x_IB.Register(LPWORD(&*fast_path_data.faces.begin()), LPWORD(&*fast_path_data.faces.end()),
+        x_IB.Register((unsigned short*)(&*fast_path_data.faces.begin()), (unsigned short*)(&*fast_path_data.faces.end()),
             &fast_path_data.ib_id, &fast_path_data.ib_start);
     }
 
@@ -284,7 +284,7 @@ void OGF::PreSave(u32 tree_id)
     }
 
     // Faces
-    g_IB.Register(LPWORD(&*data.faces.begin()), LPWORD(&*data.faces.end()), &data.ib_id, &data.ib_start);
+    g_IB.Register((unsigned short*)(&*data.faces.begin()), (unsigned short*)(&*data.faces.end()), &data.ib_id, &data.ib_start);
 }
 
 template <typename ogf_data_type>
@@ -346,7 +346,7 @@ void read_ogf_swidata(IReader& fs_, FSlideWindowItem& swi)
     // fs.close_chunk		();
 }
 
-void write_ogf_fastpath(IWriter& fs, const OGF& ogf, BOOL progresive)
+void write_ogf_fastpath(IWriter& fs, const OGF& ogf, bool progresive)
 {
     fs.open_chunk(OGF_FASTPATH);
     {
@@ -360,7 +360,7 @@ void write_ogf_fastpath(IWriter& fs, const OGF& ogf, BOOL progresive)
     fs.close_chunk();
 }
 
-void OGF::Save_Normal_PM(IWriter& fs, ogf_header& H, BOOL bVertexColored)
+void OGF::Save_Normal_PM(IWriter& fs, ogf_header& H, bool bVertexColored)
 {
     //	clMsg			("- saving: normal or clod");
 
@@ -376,4 +376,4 @@ void OGF::Save_Normal_PM(IWriter& fs, ogf_header& H, BOOL bVertexColored)
         write_ogf_fastpath(fs, *this, H.type == MT_PROGRESSIVE);
 }
 
-void OGF::Load_Normal_PM(IReader& fs, ogf_header& H, BOOL bVertexColored) {}
+void OGF::Load_Normal_PM(IReader& fs, ogf_header& H, bool bVertexColored) {}

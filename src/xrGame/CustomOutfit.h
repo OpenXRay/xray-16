@@ -13,7 +13,7 @@ public:
     CCustomOutfit();
     virtual ~CCustomOutfit();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
     //уменьшенная версия хита, для вызова, когда костюм надет на персонажа
     virtual void Hit(float P, ALife::EHitType hit_type);
@@ -59,16 +59,16 @@ public:
     bool bIsHelmetAvaliable;
 
     virtual u32 ef_equipment_type() const;
-    virtual BOOL BonePassBullet(int boneID);
+    virtual bool BonePassBullet(int boneID);
     const shared_str& GetFullIconName() const { return m_full_icon_name; }
     u32 get_artefact_count() const { return m_artefact_count; }
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     void ApplySkinModel(CActor* pActor, bool bDress, bool bHUDOnly);
     void ReloadBonesProtection();
-    void AddBonesProtection(LPCSTR bones_section);
+    void AddBonesProtection(const char* bones_section);
 
 protected:
-    virtual bool install_upgrade_impl(LPCSTR section, bool test);
+    virtual bool install_upgrade_impl(const char* section, bool test);
 };

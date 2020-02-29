@@ -26,8 +26,8 @@ private:
         Fvector UVclamp_min;
         Fvector UVclamp_max;
         Fbox BB;
-        DWORD dwFrame;
-        DWORD dwTimeValid;
+        unsigned int dwFrame;
+        unsigned int dwTimeValid;
     };
 
 private:
@@ -43,7 +43,7 @@ private:
 
 public:
     void set_object(IRenderable* O);
-    BOOL shadowing() { return current != nullptr; }
+    bool shadowing() { return current != nullptr; }
     void calculate();
     void setup(int slot);
     void finalize()

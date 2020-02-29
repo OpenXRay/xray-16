@@ -515,7 +515,7 @@ void ValidateState(D3D_DEPTH_STENCIL_DESC& desc)
 #ifdef USE_DX11
 void ValidateState(D3D_BLEND_DESC& desc)
 {
-    BOOL bBlendEnable = FALSE;
+    bool bBlendEnable = FALSE;
 
     for (int i = 0; i < 8; ++i)
     {
@@ -561,7 +561,7 @@ void ValidateState(D3D_BLEND_DESC& desc)
 #else
 void ValidateState(D3D_BLEND_DESC& desc)
 {
-    BOOL bBlendEnable = FALSE;
+    bool bBlendEnable = FALSE;
 
     for (int i = 0; i < 8; ++i)
     {

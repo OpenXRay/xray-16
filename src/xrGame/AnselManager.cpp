@@ -10,9 +10,9 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
-ENGINE_API extern BOOL bShowPauseString;
-ENGINE_API extern BOOL g_bDisableRedText;
-BOOL stored_red_text;
+ENGINE_API extern bool bShowPauseString;
+ENGINE_API extern bool g_bDisableRedText;
+bool stored_red_text;
 
 /* XXX: Support camera move
  * Before just enabling this we should ensure that the user won't use Ansel for cheating
@@ -192,7 +192,7 @@ AnselCamera::AnselCamera(IGameObject* p, u32 flags) : CCameraBase(p, flags) {}
 AnselCameraEffector::AnselCameraEffector()
     : CEffectorCam(cefAnsel, std::numeric_limits<float>::infinity()) {}
 
-BOOL AnselCameraEffector::ProcessCam(SCamEffectorInfo& info)
+bool AnselCameraEffector::ProcessCam(SCamEffectorInfo& info)
 {
     info.dont_apply = false;
 

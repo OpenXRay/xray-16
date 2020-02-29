@@ -27,7 +27,7 @@ void CUIWeightBar::UpdateData(float weight)
     if (!m_Weight || !m_BottomInfo)
         return;
 
-    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
+    const char* kg_str = StringTable().translate("st_kg").c_str();
 
     string64 buf;
     xr_sprintf(buf, "%.1f %s", weight, kg_str);

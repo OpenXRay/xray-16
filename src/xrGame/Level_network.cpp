@@ -32,7 +32,7 @@ void CLevel::remove_objects()
 {
     if (!IsGameTypeSingle())
         Msg("CLevel::remove_objects - Start");
-    BOOL b_stored = psDeviceFlags.test(rsDisableObjectsAsCrows);
+    bool b_stored = psDeviceFlags.test(rsDisableObjectsAsCrows);
 
     int loop = 5;
     while (loop)

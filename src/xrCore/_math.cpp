@@ -47,12 +47,12 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
-    ULONG Number;
-    ULONG MaxMhz;
-    ULONG CurrentMhz;
-    ULONG MhzLimit;
-    ULONG MaxIdleState;
-    ULONG CurrentIdleState;
+    unsigned int Number;
+    unsigned int MaxMhz;
+    unsigned int CurrentMhz;
+    unsigned int MhzLimit;
+    unsigned int MaxIdleState;
+    unsigned int CurrentIdleState;
 } PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
 
 // Initialized on startup
@@ -61,7 +61,7 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #if defined(LINUX) || defined(FREEBSD)
-DWORD timeGetTime()
+unsigned int timeGetTime()
 {
     return SDL_GetTicks();
 }
@@ -333,7 +333,7 @@ void _initialize_cpu()
 #define _MM_FLUSH_ZERO_ON 0x8000
 #define _MM_SET_FLUSH_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_FLUSH_ZERO_MASK) | (mode))
 #define _MM_SET_DENORMALS_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (mode))
-static BOOL _denormals_are_zero_supported = TRUE;
+static bool _denormals_are_zero_supported = TRUE;
 extern void __cdecl _terminate();
 
 void _initialize_cpu_thread()

@@ -90,7 +90,7 @@ public:
 #endif // USE_OGL
 
 
-    BOOL isUser() { return flags.bUser; }
+    bool isUser() { return flags.bUser; }
 
     u32 get_Width()
     {
@@ -105,10 +105,10 @@ public:
     }
 
     void video_Sync(u32 _time) { m_play_time = _time; }
-    void video_Play(BOOL looped, u32 _time = 0xFFFFFFFF);
-    void video_Pause(BOOL state);
+    void video_Play(bool looped, u32 _time = 0xFFFFFFFF);
+    void video_Pause(bool state);
     void video_Stop();
-    BOOL video_IsPlaying();
+    bool video_IsPlaying();
 
     CTexture();
     virtual ~CTexture();
@@ -118,7 +118,7 @@ public:
 #endif // USE_DX10
 
 private:
-    BOOL desc_valid() { return pSurface == desc_cache; }
+    bool desc_valid() { return pSurface == desc_cache; }
 
     void desc_enshure()
     {
@@ -191,7 +191,7 @@ private:
 
 struct resptrcode_texture : public resptr_base<CTexture>
 {
-    void create(LPCSTR _name);
+    void create(const char* _name);
     void destroy() { _set(nullptr); }
     shared_str bump_get() { return _get()->m_bumpmap; }
     bool bump_exist() { return 0 != bump_get().size(); }

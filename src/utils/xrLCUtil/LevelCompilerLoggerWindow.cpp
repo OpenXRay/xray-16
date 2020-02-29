@@ -37,7 +37,7 @@ void LevelCompilerLoggerWindow::LogThreadProc(void* context)
     ptr->LogThreadProc();
 }
 
-static INT_PTR CALLBACK LevelCompilerLoggerWindowDlgProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
+static intptr_t CALLBACK LevelCompilerLoggerWindowDlgProc(HWND hw, unsigned int msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
     {
@@ -75,7 +75,7 @@ void LevelCompilerLoggerWindow::LogThreadProc()
         char tmpbuf[128];
         Msg("Startup time: %s", _strtime(tmpbuf));
     }
-    BOOL bHighPriority = FALSE;
+    bool bHighPriority = FALSE;
     string256 u_name;
     unsigned long u_size = sizeof(u_name) - 1;
     GetUserName(u_name, &u_size);
@@ -98,7 +98,7 @@ void LevelCompilerLoggerWindow::LogThreadProc()
             progress = 1.f;
         else if (progress < 0)
             progress = 0;
-        BOOL bWasChanges = FALSE;
+        bool bWasChanges = FALSE;
         char tbuf[256];
         csLog.Enter();
         if (LogSize != LogFile.size())

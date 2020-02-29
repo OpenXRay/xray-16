@@ -602,7 +602,7 @@ public:
     }
 };
 
-IC BOOL ray_query_callback(collide::rq_result& result, LPVOID params)
+IC bool ray_query_callback(collide::rq_result& result, LPVOID params)
 {
     ray_query_param* param = (ray_query_param*)params;
     float power = param->m_holder->feel_vision_mtl_transp(result.O, result.element);
@@ -1022,7 +1022,7 @@ void CAI_Stalker::update_throw_params()
     CMissile* const pMissile = dynamic_cast<CMissile*>(inventory().ActiveItem());
     if (pMissile)
     {
-        static const LPCSTR third_person_offset_id = "third_person_throw_point_offset";
+        static const const char* third_person_offset_id = "third_person_throw_point_offset";
 
         if (!pSettings->line_exist(pMissile->cNameSect(), third_person_offset_id))
         {

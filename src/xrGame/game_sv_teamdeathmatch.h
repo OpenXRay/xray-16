@@ -22,7 +22,7 @@ public:
 
     virtual void OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender);
 
-    virtual LPCSTR type_name() const { return "teamdeathmatch"; };
+    virtual const char* type_name() const { return "teamdeathmatch"; };
     virtual void Update();
     virtual void net_Export_State(NET_Packet& P, ClientID id_to); // full state
     // Events
@@ -79,5 +79,5 @@ public:
     virtual void RespawnPlayer(ClientID id_who, bool NoSpectator);
 
 protected:
-    virtual void WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult);
+    virtual void WriteGameState(CInifile& ini, const char* sect, bool bRoundResult);
 };

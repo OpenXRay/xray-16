@@ -75,7 +75,7 @@ void CLevelDebug::draw_debug_text()
 }
 
 debug::text_tree& CLevelDebug::get_text_tree() { return *m_p_texttree; }
-CLevelDebug::CObjectInfo& CLevelDebug::object_info(IGameObject* obj, LPCSTR class_name)
+CLevelDebug::CObjectInfo& CLevelDebug::object_info(IGameObject* obj, const char* class_name)
 {
     OBJECT_INFO_MAP_IT obj_it = m_objects_info.find(obj);
     if (obj_it != m_objects_info.end())
@@ -105,7 +105,7 @@ CLevelDebug::CObjectInfo& CLevelDebug::object_info(IGameObject* obj, LPCSTR clas
     }
 }
 
-CLevelDebug::CTextInfo& CLevelDebug::text(void* class_ptr, LPCSTR class_name)
+CLevelDebug::CTextInfo& CLevelDebug::text(void* class_ptr, const char* class_name)
 {
     SKey key(class_ptr, class_name);
 
@@ -122,7 +122,7 @@ CLevelDebug::CTextInfo& CLevelDebug::text(void* class_ptr, LPCSTR class_name)
     }
 }
 
-CLevelDebug::CLevelInfo& CLevelDebug::level_info(void* class_ptr, LPCSTR class_name)
+CLevelDebug::CLevelInfo& CLevelDebug::level_info(void* class_ptr, const char* class_name)
 {
     SKey key(class_ptr, class_name);
 
@@ -233,7 +233,7 @@ void CLevelDebug::draw_level_info()
 // CObjectInfo
 //////////////////////////////////////////////////////////////////////////
 
-void CLevelDebug::CObjectInfo::add_item(LPCSTR text, u32 color, u32 id)
+void CLevelDebug::CObjectInfo::add_item(const char* text, u32 color, u32 id)
 {
     inherited::add_item(SInfoItem(text, color, id));
 }
@@ -271,7 +271,7 @@ void CLevelDebug::CObjectInfo::draw_info(float x, float& y)
 // CTextInfo
 //////////////////////////////////////////////////////////////////////////
 
-void CLevelDebug::CTextInfo::add_item(LPCSTR text, float x, float y, u32 color, u32 id)
+void CLevelDebug::CTextInfo::add_item(const char* text, float x, float y, u32 color, u32 id)
 {
     inherited::add_item(STextItem(text, x, y, color, id));
 }

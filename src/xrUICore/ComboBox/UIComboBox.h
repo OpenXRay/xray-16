@@ -26,13 +26,13 @@ public:
 
     virtual void OnRender(); // only for list-box
 
-    LPCSTR GetText();
-    LPCSTR GetTextOf(int index);
-    void SetText(LPCSTR text);
+    const char* GetText();
+    const char* GetTextOf(int index);
+    void SetText(const char* text);
 
     void SetListLength(int length);
     void SetVertScroll(bool bVScroll = true) { m_list_box.SetFixedScrollBar(bVScroll); };
-    CUIListBoxItem* AddItem_(LPCSTR str, int _data);
+    CUIListBoxItem* AddItem_(const char* str, int _data);
     void InitComboBox(Fvector2 pos, float width);
     void SetItemIDX(int idx);
     void SetItemToken(int tok);

@@ -204,7 +204,7 @@ void CLevel::GetLevelInfo(CServerInfo* si)
     }
 }
 
-void CLevel::PrefetchSound(LPCSTR name)
+void CLevel::PrefetchSound(const char* name)
 {
     // preprocess sound name
     string_path tmp;
@@ -221,11 +221,11 @@ void CLevel::PrefetchSound(LPCSTR name)
 }
 
 // Game interface ////////////////////////////////////////////////////
-int CLevel::get_RPID(LPCSTR /**name**/)
+int CLevel::get_RPID(const char* /**name**/)
 {
     /*
     // Gain access to string
-    LPCSTR	params = pLevel->r_string("respawn_point",name);
+    const char*	params = pLevel->r_string("respawn_point",name);
     if (0==params)	return -1;
 
     // Read data
@@ -761,7 +761,7 @@ void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2**/)
     {
         char Name[128];
         Name[0] = 0;
-        sscanf(LPCSTR(P1), "%s", Name);
+        sscanf((const char*)(P1), "%s", Name);
         Level().g_cl_Spawn(Name, 0xff, M_SPAWN_OBJECT_LOCAL, Fvector().set(0, 0, 0));
     }
     else if (E == eChangeRP && P1)

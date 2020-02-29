@@ -7,7 +7,7 @@ using namespace Feel;
 Touch::Touch() : pure_relcase(&Touch::feel_touch_relcase) {}
 Touch::~Touch() {}
 bool Touch::feel_touch_contact(IGameObject* O) { return true; }
-void Touch::feel_touch_deny(IGameObject* O, DWORD T)
+void Touch::feel_touch_deny(IGameObject* O, unsigned int T)
 {
     DenyTouch D;
     D.O = O;
@@ -18,7 +18,7 @@ void Touch::feel_touch_deny(IGameObject* O, DWORD T)
 void Touch::feel_touch_update(Fvector& C, float R)
 {
     // Check if denied objects expire in time
-    DWORD dwT = Device.dwTimeGlobal;
+    unsigned int dwT = Device.dwTimeGlobal;
     for (u32 dit = 0; dit < feel_touch_disable.size(); dit++)
     {
         if (feel_touch_disable[dit].Expire < dwT)
@@ -48,7 +48,7 @@ void Touch::feel_touch_update(Fvector& C, float R)
             if (std::find(feel_touch.begin(), feel_touch.end(), O) == feel_touch.end())
             {
                 // check for deny
-                BOOL bDeny = FALSE;
+                bool bDeny = FALSE;
                 for (u32 dit = 0; dit < feel_touch_disable.size(); dit++)
                     if (O == feel_touch_disable[dit].O)
                     {

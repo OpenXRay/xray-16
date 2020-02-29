@@ -13,7 +13,7 @@ b_params& g_params()
     return inlc_global_data()->g_params();
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+bool APIENTRY DllMain(HMODULE hModule, unsigned int ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
     {

@@ -18,7 +18,7 @@
 #include <malloc.h>
 #pragma warning(pop)
 
-CALifeSpawnRegistry::CALifeSpawnRegistry(LPCSTR section)
+CALifeSpawnRegistry::CALifeSpawnRegistry(const char* section)
 {
     m_spawn_name = "";
     seed(u32(CPU::QPC() & 0xffffffff));
@@ -51,7 +51,7 @@ void CALifeSpawnRegistry::save(IWriter& memory_stream)
     memory_stream.close_chunk();
 }
 
-void CALifeSpawnRegistry::load(IReader& file_stream, LPCSTR game_name)
+void CALifeSpawnRegistry::load(IReader& file_stream, const char* game_name)
 {
     R_ASSERT(FS.exist(game_name));
 
@@ -78,7 +78,7 @@ void CALifeSpawnRegistry::load(IReader& file_stream, LPCSTR game_name)
     chunk0->close();
 }
 
-void CALifeSpawnRegistry::load(LPCSTR spawn_name)
+void CALifeSpawnRegistry::load(const char* spawn_name)
 {
     Msg("* Loading spawn registry...");
     m_spawn_name = spawn_name;

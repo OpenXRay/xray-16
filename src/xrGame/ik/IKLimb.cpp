@@ -275,7 +275,7 @@ IC void free_limits(float& min, float& max)
     max = 2 * M_PI;
 }
 
-u16 get_ik_bone(IKinematics* K, LPCSTR S, u16 i)
+u16 get_ik_bone(IKinematics* K, const char* S, u16 i)
 {
     string32 sbone;
     _GetItem(S, i, sbone);
@@ -290,7 +290,7 @@ u16 get_ik_bone(IKinematics* K, LPCSTR S, u16 i)
     return bone;
 }
 
-void parse_bones_string(IKinematics* K, LPCSTR S, u16 bones[4])
+void parse_bones_string(IKinematics* K, const char* S, u16 bones[4])
 {
     for (u16 i = 0; 4 > i; ++i)
         bones[i] = get_ik_bone(K, S, i);
@@ -969,7 +969,7 @@ struct ssaved_callback : private Noncopyable
     void restore() { _bi.set_callback(callback_type, callback, callback_param, callback_overwrite); }
     const BoneCallback callback;
     void* callback_param;
-    const BOOL callback_overwrite;
+    const bool callback_overwrite;
     const u32 callback_type;
     CBoneInstance& _bi;
 };

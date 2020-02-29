@@ -4,29 +4,29 @@
 
 typedef struct
 {
-    BOOL DepthEnable;
-    BOOL DepthWriteMask;
+    bool DepthEnable;
+    bool DepthWriteMask;
     D3DCMPFUNC DepthFunc;
-    BOOL StencilEnable;
-    UINT StencilMask;
-    UINT StencilWriteMask;
+    bool StencilEnable;
+    unsigned int StencilMask;
+    unsigned int StencilWriteMask;
     D3DSTENCILOP StencilFailOp;
     D3DSTENCILOP StencilDepthFailOp;
     D3DSTENCILOP StencilPassOp;
     D3DCMPFUNC StencilFunc;
-    UINT StencilRef;
+    unsigned int StencilRef;
 } D3D_DEPTH_STENCIL_STATE;
 
 typedef struct
 {
-    BOOL BlendEnable;
+    bool BlendEnable;
     D3DBLEND SrcBlend;
     D3DBLEND DestBlend;
     D3DBLENDOP BlendOp;
     D3DBLEND SrcBlendAlpha;
     D3DBLEND DestBlendAlpha;
     D3DBLENDOP BlendOpAlpha;
-    UINT ColorMask;
+    unsigned int ColorMask;
 } D3D_BLEND_STATE;
 
 class glState

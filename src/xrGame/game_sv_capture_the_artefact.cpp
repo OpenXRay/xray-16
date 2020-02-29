@@ -81,8 +81,7 @@ u32 game_sv_CaptureTheArtefact::GetWarmUpTime() { return g_sv_dm_dwWarmUp_MaxTim
 s32 game_sv_CaptureTheArtefact::GetTimeLimit() { return g_sv_dm_dwTimeLimit; };
 
 game_sv_CaptureTheArtefact::game_sv_CaptureTheArtefact()
-    : m_dwLastAnomalyStartTime(0), m_iMoney_for_BuySpawn(0),
-      nextReinforcementTime(0), currentTime(0)
+    : m_dwLastAnomalyStartTime(0), m_iMoney_for_BuySpawn(0), nextReinforcementTime(0), currentTime(0)
 {
     m_type = eGameIDCaptureTheArtefact;
     roundStarted = FALSE;
@@ -99,7 +98,7 @@ game_sv_CaptureTheArtefact::game_sv_CaptureTheArtefact()
 }
 
 game_sv_CaptureTheArtefact::~game_sv_CaptureTheArtefact() {}
-LPCSTR game_sv_CaptureTheArtefact::type_name() const { return "capturetheartefact"; }
+const char* game_sv_CaptureTheArtefact::type_name() const { return "capturetheartefact"; }
 void game_sv_CaptureTheArtefact::Update()
 {
     inherited::Update();
@@ -165,8 +164,7 @@ void game_sv_CaptureTheArtefact::Update()
             }
         }
         break;
-    case GAME_PHASE_PLAYER_SCORES:
-    {
+    case GAME_PHASE_PLAYER_SCORES: {
         currentTime = Level().timeServer();
         if (nextReinforcementTime <= currentTime)
         {
@@ -508,7 +506,7 @@ void game_sv_CaptureTheArtefact::OnPlayerReady(ClientID id_who)
         {
             return;
         }
-//------------------------------------------------------------
+        //------------------------------------------------------------
 
 #ifndef MASTER_GOLD
         VERIFY(xrCData->ps);
@@ -986,7 +984,7 @@ void game_sv_CaptureTheArtefact::LoadTeamData(ETeam eteam, const shared_str& caS
 #define CTA_ANOMALY_SET_BASE_NAME "cta_game_anomaly_sets"
 #define MAX_ANOMALIES_COUNT 20
 
-bool game_sv_CaptureTheArtefact::LoadAnomaliesItems(LPCSTR ini_set_id, TAnomaliesVector& destination)
+bool game_sv_CaptureTheArtefact::LoadAnomaliesItems(const char* ini_set_id, TAnomaliesVector& destination)
 {
     VERIFY(ini_set_id);
 
@@ -1002,7 +1000,7 @@ bool game_sv_CaptureTheArtefact::LoadAnomaliesItems(LPCSTR ini_set_id, TAnomalie
         return false;
     }
 
-    LPCSTR anomaly_string = level_ini_file->r_string(CTA_ANOMALY_SET_BASE_NAME, ini_set_id);
+    const char* anomaly_string = level_ini_file->r_string(CTA_ANOMALY_SET_BASE_NAME, ini_set_id);
 
     if (!anomaly_string)
         return false;
@@ -1190,8 +1188,7 @@ void game_sv_CaptureTheArtefact::LoadArtefactRPoints()
                 // O->r_u8	();
                 switch (type)
                 {
-                case rptArtefactSpawn:
-                {
+                case rptArtefactSpawn: {
                     TeamsMap::iterator teamIter = teams.find(team);
                     if (teamIter != teams.end())
                     {
@@ -1317,11 +1314,11 @@ bool game_sv_CaptureTheArtefact::OnKillResult(KILL_RES KillResult, game_PlayerSt
 
     switch (KillResult)
     {
-    case KR_NONE: { res = false;
+    case KR_NONE: {
+        res = false;
     }
     break;
-    case KR_SELF:
-    {
+    case KR_SELF: {
         // pKiller->m_iRivalKills		-= 1;
         pKiller->m_iSelfKills++;
         pKiller->m_iKillsInRowMax = 0;
@@ -1330,8 +1327,7 @@ bool game_sv_CaptureTheArtefact::OnKillResult(KILL_RES KillResult, game_PlayerSt
         res = false;
     }
     break;
-    case KR_RIVAL:
-    {
+    case KR_RIVAL: {
         pKiller->m_iRivalKills++;
         pKiller->m_iKillsInRowCurr++;
         pKiller->m_iKillsInRowMax = _max(pKiller->m_iKillsInRowCurr, pKiller->m_iKillsInRowMax);
@@ -1346,8 +1342,7 @@ bool game_sv_CaptureTheArtefact::OnKillResult(KILL_RES KillResult, game_PlayerSt
     }
     break;
     case KR_TEAMMATE_CRITICAL:
-    case KR_TEAMMATE:
-    {
+    case KR_TEAMMATE: {
         if (pTeam)
         {
             s32 ResMoney = pTeam->m_iM_KillTeam;
@@ -1413,43 +1408,36 @@ void game_sv_CaptureTheArtefact::OnGiveBonus(KILL_RES KillResult, game_PlayerSta
     Set_RankUp_Allowed(true);
     switch (KillResult)
     {
-    case KR_RIVAL:
-    {
+    case KR_RIVAL: {
         switch (KillType)
         {
-        case KT_HIT:
-        {
+        case KT_HIT: {
             switch (SpecialKillType)
             {
-            case SKT_HEADSHOT:
-            {
+            case SKT_HEADSHOT: {
                 Player_AddExperience(pKiller, READ_IF_EXISTS(pSettings, r_float, "mp_bonus_exp", "headshot", 0));
                 Player_AddBonusMoney(
                     pKiller, READ_IF_EXISTS(pSettings, r_s32, "mp_bonus_money", "headshot", 0), SKT_HEADSHOT);
             }
             break;
-            case SKT_EYESHOT:
-            {
+            case SKT_EYESHOT: {
                 Player_AddExperience(pKiller, READ_IF_EXISTS(pSettings, r_float, "mp_bonus_exp", "eyeshot", 0));
                 Player_AddBonusMoney(
                     pKiller, READ_IF_EXISTS(pSettings, r_s32, "mp_bonus_money", "eyeshot", 0), SKT_EYESHOT);
             }
             break;
-            case SKT_BACKSTAB:
-            {
+            case SKT_BACKSTAB: {
                 Player_AddExperience(pKiller, READ_IF_EXISTS(pSettings, r_float, "mp_bonus_exp", "backstab", 0));
                 Player_AddBonusMoney(
                     pKiller, READ_IF_EXISTS(pSettings, r_s32, "mp_bonus_money", "backstab", 0), SKT_BACKSTAB);
             }
             break;
-            default:
-            {
+            default: {
                 if (pWeaponA)
                 {
                     switch (pWeaponA->m_tClassID)
                     {
-                    case CLSID_OBJECT_W_KNIFE:
-                    {
+                    case CLSID_OBJECT_W_KNIFE: {
                         Player_AddExperience(
                             pKiller, READ_IF_EXISTS(pSettings, r_float, "mp_bonus_exp", "knife_kill", 0));
                         Player_AddBonusMoney(pKiller,
@@ -2447,7 +2435,7 @@ void game_sv_CaptureTheArtefact::OnPostCreate(u16 id_who)
     if (!custom_zone)
         return;
 
-    LPCSTR zone_name = custom_zone->name_replace();
+    const char* zone_name = custom_zone->name_replace();
     if (!zone_name)
         return;
 
@@ -2497,7 +2485,7 @@ void game_sv_CaptureTheArtefact::ReadOptions(shared_str& options)
     };
 }
 
-u16 game_sv_CaptureTheArtefact::GetMinUsedAnomalyID(LPCSTR zone_name)
+u16 game_sv_CaptureTheArtefact::GetMinUsedAnomalyID(const char* zone_name)
 {
     typedef TMultiMap::iterator TMultiMIter;
 
@@ -2562,7 +2550,7 @@ void game_sv_CaptureTheArtefact::ClearReadyFlagFromAll()
     m_server->ForEachClientDo(tmp_functor);
 }
 
-void game_sv_CaptureTheArtefact::WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult)
+void game_sv_CaptureTheArtefact::WriteGameState(CInifile& ini, const char* sect, bool bRoundResult)
 {
     inherited::WriteGameState(ini, sect, bRoundResult);
     ini.w_u32(sect, "team_0_score", teams[etGreenTeam].score);

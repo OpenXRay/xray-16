@@ -15,7 +15,7 @@ public:
     CThornArtefact(void);
     virtual ~CThornArtefact(void);
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
 protected:
 };

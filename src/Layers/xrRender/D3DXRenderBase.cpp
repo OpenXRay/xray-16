@@ -194,7 +194,7 @@ void D3DXRenderBase::Clear()
     HW.pContext->ClearDepthStencilView(RCache.get_ZB(), D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
     if (psDeviceFlags.test(rsClearBB))
     {
-        FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        float ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
     }
 #else
@@ -222,7 +222,7 @@ void D3DXRenderBase::ResourcesDestroyNecessaryTextures()
 void D3DXRenderBase::ClearTarget()
 {
 #ifndef USE_DX9
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    float ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
 #else
     CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(0, 0, 0), 1, 0));

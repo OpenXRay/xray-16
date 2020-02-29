@@ -33,8 +33,8 @@ void CUIMoneyIndicator::InitFromXML(CUIXml& xml_doc)
     m_money_change.SetColorAnimation("ui_mp_chat", LA_ONLYALPHA | LA_TEXTCOLOR);
 }
 
-void CUIMoneyIndicator::SetMoneyAmount(LPCSTR money) { m_money_amount.SetText(money); }
-void CUIMoneyIndicator::SetMoneyChange(LPCSTR money)
+void CUIMoneyIndicator::SetMoneyAmount(const char* money) { m_money_amount.SetText(money); }
+void CUIMoneyIndicator::SetMoneyChange(const char* money)
 {
     m_money_change.SetText(money);
     m_money_change.ResetColorAnimation();

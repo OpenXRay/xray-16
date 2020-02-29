@@ -27,8 +27,8 @@ SCRIPT_EXPORT(CScriptAnimationAction, (), {
                              value("turn", int(MonsterSpace::eAA_Turn))]
 
                          .def(constructor<>())
-                         .def(constructor<LPCSTR>())
-                         .def(constructor<LPCSTR, bool>())
+                         .def(constructor<const char*>())
+                         .def(constructor<const char*, bool>())
                          .def(constructor<MonsterSpace::EMentalState>())
 
                          // Monster specific

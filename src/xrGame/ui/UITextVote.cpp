@@ -47,7 +47,7 @@ void CUITextVote::SendMessage(CUIWindow* pWnd, s16 msg, void* pData){
 }
 
 void CUITextVote::OnBtnOk(){
-    LPCSTR name = edit->GetText();
+    const char* name = edit->GetText();
     if (name && name[0])
     {
         string512 command;

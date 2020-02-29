@@ -6,10 +6,10 @@
 #include "log.h"
 #include "xrCore/Threading/Lock.hpp"
 
-BOOL LogExecCB = TRUE;
+bool LogExecCB = TRUE;
 string_path logFName = "engine.log";
 string_path log_file_name = "engine.log";
-BOOL no_log = TRUE;
+bool no_log = TRUE;
 #ifdef CONFIG_PROFILE_LOCKS
 Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
@@ -201,9 +201,9 @@ LogCallback SetLogCB(const LogCallback& cb)
     return (result);
 }
 
-LPCSTR log_name() { return (log_file_name); }
+const char* log_name() { return (log_file_name); }
 
-void CreateLog(BOOL nl)
+void CreateLog(bool nl)
 {
     LogFile.reserve(1000);
 
@@ -236,7 +236,7 @@ void CreateLog(BOOL nl)
 
         for (u32 it = 0; it < LogFile.size(); it++)
         {
-            LPCSTR s = LogFile[it].c_str();
+            const char* s = LogFile[it].c_str();
 #ifdef USE_LOG_TIMING
             LogWriter->w_printf("%s%s\r\n", buf, s ? s : "");
 #else

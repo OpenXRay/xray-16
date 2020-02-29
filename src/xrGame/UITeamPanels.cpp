@@ -14,7 +14,7 @@ UITeamPanels::~UITeamPanels() { CUIStatsIcon::FreeTexInfo(); }
 #define TEAM_NODE_NAME "team"
 #define FRAME_NODE_NAME "frame"
 
-void UITeamPanels::Init(LPCSTR xmlName, LPCSTR panelsRootNode)
+void UITeamPanels::Init(const char* xmlName, const char* panelsRootNode)
 {
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xmlName);
     CUIXmlInit::InitWindow(uiXml, panelsRootNode, 0, this);
@@ -37,7 +37,7 @@ void UITeamPanels::InitAllFrames(shared_str const& frame_node)
         XML_NODE tempFrameNode = uiXml.NavigateToNode(frame_node.c_str(), i);
         if (!tempFrameNode)
             break;
-        LPCSTR frame_class = uiXml.ReadAttrib(tempFrameNode, "class", "class_of_frame_not_defined");
+        const char* frame_class = uiXml.ReadAttrib(tempFrameNode, "class", "class_of_frame_not_defined");
         if (!xr_strcmp(frame_class, "frame_line"))
         {
             CUIFrameLineWnd* temp_frame_line = new CUIFrameLineWnd();
@@ -63,7 +63,7 @@ void UITeamPanels::InitAllTeams(shared_str const& team_node)
         XML_NODE tempTeamNode = uiXml.NavigateToNode(team_node.c_str(), i);
         if (!tempTeamNode)
             break;
-        LPCSTR tempTeamName = uiXml.ReadAttrib(tempTeamNode, "tname", "team_not_set_in_tname_xml_attribute");
+        const char* tempTeamName = uiXml.ReadAttrib(tempTeamNode, "tname", "team_not_set_in_tname_xml_attribute");
         UITeamState* tempTeamPanel = panelsFactory.CreateTeamPanel(tempTeamName, this);
         VERIFY2(tempTeamPanel, make_string("failed to create team panel \"%s\"", tempTeamName).c_str());
         tempTeamPanel->Init(uiXml, team_node.c_str(), i);

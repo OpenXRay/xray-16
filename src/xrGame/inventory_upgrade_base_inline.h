@@ -14,7 +14,7 @@ namespace inventory
 namespace upgrade
 {
 IC const shared_str& UpgradeBase::id() const { return (m_id); }
-IC LPCSTR UpgradeBase::id_str() const { return (m_id.c_str()); }
+IC const char* UpgradeBase::id_str() const { return (m_id.c_str()); }
 IC bool UpgradeBase::is_known() const { return (m_known); }
 } // namespace upgrade
 } // namespace inventory

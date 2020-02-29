@@ -45,9 +45,9 @@ public:
     bool init_property(shared_str const& property_id);
     Property_type* get_property();
 
-    bool read_value_from_section(LPCSTR section, LPCSTR param, float& result);
+    bool read_value_from_section(const char* section, const char* param, float& result);
     bool compute_value(ItemUpgrades_type const& item_upgrades);
-    bool show_result(LPCSTR values);
+    bool show_result(const char* values);
 
 }; // class UIProperty
 
@@ -69,7 +69,7 @@ protected:
 public:
     UIInvUpgPropertiesWnd();
     virtual ~UIInvUpgPropertiesWnd();
-    void init_from_xml(LPCSTR xml_name);
+    void init_from_xml(const char* xml_name);
 
     void set_upgrade_info(Upgrade_type& upgrade);
     void set_item_info(CInventoryItem& item);

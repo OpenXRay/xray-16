@@ -10,7 +10,7 @@
 #include "script_particles.h"
 #include "xrEngine/ObjectAnimator.h"
 
-CScriptParticlesCustom::CScriptParticlesCustom(CScriptParticles* owner, LPCSTR caParticlesName)
+CScriptParticlesCustom::CScriptParticlesCustom(CScriptParticles* owner, const char* caParticlesName)
     : CParticlesObject(caParticlesName, FALSE, true)
 {
     //	CScriptParticlesCustom* self = this;
@@ -61,7 +61,7 @@ void CScriptParticlesCustom::shedule_Update(u32 _dt)
         UpdateParent(m_animator->XFORM(), vel);
     }
 }
-void CScriptParticlesCustom::LoadPath(LPCSTR caPathName)
+void CScriptParticlesCustom::LoadPath(const char* caPathName)
 {
     if (!m_animator)
         m_animator = new CObjectAnimator();
@@ -94,7 +94,7 @@ void CScriptParticlesCustom::remove_owner()
     m_owner = 0;
 }
 
-CScriptParticles::CScriptParticles(LPCSTR caParticlesName)
+CScriptParticles::CScriptParticles(const char* caParticlesName)
 {
     m_particles = new CScriptParticlesCustom(this, caParticlesName);
     m_transform.identity();
@@ -182,7 +182,7 @@ bool CScriptParticles::IsLooped() const
     return m_particles->IsLooped();
 }
 
-void CScriptParticles::LoadPath(LPCSTR caPathName)
+void CScriptParticles::LoadPath(const char* caPathName)
 {
     VERIFY(m_particles);
     m_particles->LoadPath(caPathName);

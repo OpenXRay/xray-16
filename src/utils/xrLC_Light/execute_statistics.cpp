@@ -8,7 +8,7 @@
 #include "execute_statistics.h"
 #include "serialize.h"
 
-LPCSTR make_time(string64& buf, float fsec);
+const char* make_time(string64& buf, float fsec);
 #ifdef COLLECT_EXECUTION_STATS
 
 void execute_time_statistics::read(INetReader& r) { r_pod(r, *this); }

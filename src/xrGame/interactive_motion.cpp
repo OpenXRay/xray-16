@@ -9,7 +9,7 @@
 
 #include "game_object_space.h"
 
-void interactive_motion_diagnostic(LPCSTR message, const MotionID& m, CPhysicsShell* s)
+void interactive_motion_diagnostic(const char* message, const MotionID& m, CPhysicsShell* s)
 {
 #ifdef DEBUG
     if (!death_anim_debug)
@@ -20,7 +20,7 @@ void interactive_motion_diagnostic(LPCSTR message, const MotionID& m, CPhysicsSh
     VERIFY(KA);
     CPhysicsShellHolder* O = smart_cast<CPhysicsShellHolder*>(s->get_ElementByStoreOrder(0)->PhysicsRefObject());
     VERIFY(O);
-    LPCSTR motion_name = KA->LL_MotionDefName_dbg(m).first;
+    const char* motion_name = KA->LL_MotionDefName_dbg(m).first;
     Msg("death anims - interactive_motion:- %s, motion: %s, obj: %s, model:  %s ", message, motion_name,
         O->cName().c_str(), O->cNameVisual().c_str());
 #endif
@@ -42,7 +42,7 @@ void interactive_motion::destroy()
 
     flags.assign(0);
 }
-void interactive_motion::setup(LPCSTR m, CPhysicsShell* s, float angle)
+void interactive_motion::setup(const char* m, CPhysicsShell* s, float angle)
 {
     VERIFY(m);
     VERIFY(s);

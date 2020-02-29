@@ -27,11 +27,11 @@ public:
     void init_from_xml(CUIXml& xml);
     void Update();
 
-    void SetName(LPCSTR name);
-    void SetDescription(LPCSTR desc);
-    void SetHint(LPCSTR hint);
-    void SetIcon(LPCSTR icon);
-    void SetFunctor(LPCSTR func);
+    void SetName(const char* name);
+    void SetDescription(const char* desc);
+    void SetHint(const char* hint);
+    void SetIcon(const char* icon);
+    void SetFunctor(const char* func);
     void SetRepeatable(bool repeat);
 
     virtual void DrawHint();

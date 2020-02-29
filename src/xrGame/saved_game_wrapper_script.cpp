@@ -18,11 +18,11 @@ using namespace luabind;
 xrTime CSavedGameWrapper__game_time(const CSavedGameWrapper* self) { return (xrTime(self->game_time())); }
 SCRIPT_EXPORT(CSavedGameWrapper, (), {
     module(luaState)[class_<CSavedGameWrapper>("CSavedGameWrapper")
-                         .def(constructor<LPCSTR>())
+                         .def(constructor<const char*>())
                          .def("game_time", &CSavedGameWrapper__game_time)
                          .def("level_id", &CSavedGameWrapper::level_id)
                          .def("level_name", &CSavedGameWrapper::level_name)
                          .def("actor_health", &CSavedGameWrapper::actor_health),
 
-        def("valid_saved_game", (bool (*)(LPCSTR))(&CSavedGameWrapper::valid_saved_game))];
+        def("valid_saved_game", (bool (*)(const char*))(&CSavedGameWrapper::valid_saved_game))];
 });

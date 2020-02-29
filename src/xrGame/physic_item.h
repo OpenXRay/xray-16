@@ -23,12 +23,12 @@ public:
     virtual ~CPhysicItem();
     void init();
     virtual void reinit();
-    virtual void Load(LPCSTR section);
-    virtual void reload(LPCSTR section);
+    virtual void Load(const char* section);
+    virtual void reload(const char* section);
     virtual void OnH_B_Independent(bool just_before_destroy);
     virtual void OnH_B_Chield();
     virtual void UpdateCL();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void activate_physic_shell();
     virtual void setup_physic_shell();

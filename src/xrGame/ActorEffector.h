@@ -45,7 +45,7 @@ public:
 
     void SetPP(CEffectorPP* p) { m_pe = p; }
     void SetCam(CEffectorCam* p) { m_ce = p; }
-    virtual BOOL Valid() { return m_ce || m_pe; };
+    virtual bool Valid() { return m_ce || m_pe; };
     virtual float xr_stdcall GetFactor() = 0;
 };
 
@@ -65,10 +65,10 @@ public:
 
     CAnimatorCamEffector();
     virtual ~CAnimatorCamEffector();
-    void Start(LPCSTR fn);
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    void Start(const char* fn);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
     void SetCyclic(bool b) { m_bCyclic = b; }
-    virtual BOOL Valid();
+    virtual bool Valid();
     float GetAnimatorLength() { return fLifeTime; };
     virtual bool AbsolutePositioning() { return m_bAbsolutePositioning; }
 };
@@ -81,9 +81,9 @@ protected:
     using inherited = CAnimatorCamEffector;
 
 public:
-    CAnimatorCamEffectorScriptCB(LPCSTR _cb) { cb_name = _cb; };
-    virtual BOOL Valid();
-    virtual BOOL AllowProcessingIfInvalid() { return m_bAbsolutePositioning; }
+    CAnimatorCamEffectorScriptCB(const char* _cb) { cb_name = _cb; };
+    virtual bool Valid();
+    virtual bool AllowProcessingIfInvalid() { return m_bAbsolutePositioning; }
     virtual void ProcessIfInvalid(SCamEffectorInfo& info);
 };
 
@@ -95,7 +95,7 @@ protected:
 
 public:
     void SetFactorFunc(GET_KOEFF_FUNC f) { m_func = f; }
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
 };
 
 class CAnimatorCamLerpEffectorConst : public CAnimatorCamLerpEffector
@@ -120,7 +120,7 @@ class CCameraEffectorControlled : public CAnimatorCamLerpEffector
 public:
     CCameraEffectorControlled(CEffectorController* c);
     virtual ~CCameraEffectorControlled();
-    virtual BOOL Valid();
+    virtual bool Valid();
 };
 
 class SndShockEffector : public CEffectorController
@@ -142,8 +142,8 @@ public:
     void Start(CActor* A, float snd_length, float power);
     void Update();
 
-    virtual BOOL Valid();
-    BOOL InWork();
+    virtual bool Valid();
+    bool InWork();
     virtual float xr_stdcall GetFactor();
 };
 
@@ -167,6 +167,6 @@ private:
 public:
     CControllerPsyHitCamEffector(ECamEffectorType type, const Fvector& src_pos, const Fvector& target_pos, float time,
         float base_fov, float dest_fov);
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
 };
 //////////////////////////////////////////////////////////////////////////

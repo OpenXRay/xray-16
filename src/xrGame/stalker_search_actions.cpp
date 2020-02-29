@@ -33,7 +33,7 @@ using namespace StalkerDecisionSpace;
 //////////////////////////////////////////////////////////////////////////
 
 CStalkerActionReachEnemyLocation::CStalkerActionReachEnemyLocation(
-    CAI_Stalker* object, CPropertyStorage* combat_storage, LPCSTR action_name)
+    CAI_Stalker* object, CPropertyStorage* combat_storage, const char* action_name)
     : inherited(object, action_name), m_combat_storage(combat_storage)
 {
 }
@@ -147,7 +147,7 @@ void CStalkerActionReachEnemyLocation::execute()
 //////////////////////////////////////////////////////////////////////////
 
 CStalkerActionReachAmbushLocation::CStalkerActionReachAmbushLocation(
-    CAI_Stalker* object, CPropertyStorage* combat_storage, LPCSTR action_name)
+    CAI_Stalker* object, CPropertyStorage* combat_storage, const char* action_name)
     : inherited(object, action_name), m_combat_storage(combat_storage)
 {
 }
@@ -216,7 +216,7 @@ void CStalkerActionReachAmbushLocation::execute()
 //////////////////////////////////////////////////////////////////////////
 
 CStalkerActionHoldAmbushLocation::CStalkerActionHoldAmbushLocation(
-    CAI_Stalker* object, CPropertyStorage* combat_storage, LPCSTR action_name)
+    CAI_Stalker* object, CPropertyStorage* combat_storage, const char* action_name)
     : inherited(object, action_name), m_combat_storage(combat_storage)
 {
 }

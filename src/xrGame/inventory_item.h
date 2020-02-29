@@ -87,18 +87,18 @@ protected:
     };
 
     Flags16 m_flags;
-    BOOL m_can_trade;
+    bool m_can_trade;
 
 public:
     CInventoryItem();
     virtual ~CInventoryItem();
 
 public:
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
     void ReloadNames();
 
-    LPCSTR NameItem(); // remove <virtual> by sea
-    LPCSTR NameShort();
+    const char* NameItem(); // remove <virtual> by sea
+    const char* NameShort();
     shared_str ItemDescription() { return m_Description; }
     virtual bool GetBriefInfo(II_BriefInfo& info)
     {
@@ -115,7 +115,7 @@ public:
     //при детаче спаунится новая вещь при заданно названии секции
     virtual bool Detach(const char* item_section_name, bool b_spawn_item);
     virtual bool CanAttach(PIItem pIItem) { return false; }
-    virtual bool CanDetach(LPCSTR item_section_name) { return false; }
+    virtual bool CanDetach(const char* item_section_name) { return false; }
     virtual EHandDependence HandDependence() const { return hd1Hand; };
     virtual bool IsSingleHanded() const { return true; };
     virtual bool ActivateItem(); // !!! Переопределить. (см. в Inventory.cpp)
@@ -130,19 +130,19 @@ public:
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    virtual BOOL net_SaveRelevant() { return TRUE; }
+    virtual bool net_SaveRelevant() { return TRUE; }
     virtual void render_item_ui(){}; // when in slot & query return TRUE
     virtual bool render_item_ui_query() { return false; }; // when in slot
     virtual void UpdateCL();
 
     virtual void Hit(SHit* pHDS);
 
-    BOOL GetDropManual() const { return m_flags.test(FdropManual); }
-    void SetDropManual(BOOL val);
+    bool GetDropManual() const { return m_flags.test(FdropManual); }
+    void SetDropManual(bool val);
 
-    BOOL IsInvalid() const;
+    bool IsInvalid() const;
 
-    BOOL IsQuestItem() const { return m_flags.test(FIsQuestItem); }
+    bool IsQuestItem() const { return m_flags.test(FIsQuestItem); }
     virtual u32 Cost() const { return m_cost; }
     //			u32					Cost				()	const	{ return m_cost; }
     virtual float Weight() const { return m_weight; }
@@ -226,9 +226,9 @@ protected:
     void CalculateInterpolationParams();
 
 public:
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void reload(LPCSTR section);
+    virtual void reload(const char* section);
     virtual void reinit();
     virtual bool can_kill() const;
     virtual CInventoryItem* can_kill(CInventory* inventory) const;
@@ -293,8 +293,8 @@ public:
 
     bool equal_upgrades(Upgrades_type const& other_upgrades) const;
 
-    bool verify_upgrade(LPCSTR section);
-    bool install_upgrade(LPCSTR section);
+    bool verify_upgrade(const char* section);
+    bool install_upgrade(const char* section);
     void pre_install_upgrade();
 
 #ifdef DEBUG
@@ -307,7 +307,7 @@ public:
 
 protected:
     virtual void net_Spawn_install_upgrades(Upgrades_type saved_upgrades);
-    virtual bool install_upgrade_impl(LPCSTR section, bool test);
+    virtual bool install_upgrade_impl(const char* section, bool test);
 
     template <typename T>
     IC static bool process_if_exists(

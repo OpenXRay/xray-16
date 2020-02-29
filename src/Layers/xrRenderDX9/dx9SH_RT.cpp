@@ -37,7 +37,7 @@ bool CRT::used_as_depth() const
     }
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/, bool /*useUAV = false*/)
+void CRT::create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/, bool /*useUAV = false*/)
 {
     if (pSurface)
         return;
@@ -110,7 +110,7 @@ void CRT::destroy()
 }
 void CRT::reset_begin() { destroy(); }
 void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
+void resptrcode_crt::create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f));
 }
@@ -135,7 +135,7 @@ CRTC::~CRTC			()
     DEV->_DeleteRTC	(this);
 }
 
-void CRTC::create	(LPCSTR Name, u32 size,	D3DFORMAT f)
+void CRTC::create	(const char* Name, u32 size,	D3DFORMAT f)
 {
     R_ASSERT	(HW.pDevice && Name && Name[0] && size && btwIsPow2(size));
     _order		= CPU::GetCLK();	//RDEVICE.GetTimerGlobal()->GetElapsed_clk();
@@ -194,7 +194,7 @@ void CRTC::reset_end	()
     create		(*cName,dwSize,fmt);
 }
 
-void resptrcode_crtc::create(LPCSTR Name, u32 size, D3DFORMAT f)
+void resptrcode_crtc::create(const char* Name, u32 size, D3DFORMAT f)
 {
     _set		(DEV->_CreateRTC(Name,size,f));
 }

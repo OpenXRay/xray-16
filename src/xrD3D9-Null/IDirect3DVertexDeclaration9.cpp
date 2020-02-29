@@ -51,7 +51,7 @@ HRESULT __stdcall xrIDirect3DVertexDeclaration9::GetDevice(IDirect3DDevice9** pp
     return S_OK;
 };
 HRESULT __stdcall xrIDirect3DVertexDeclaration9::GetDeclaration(
-    D3DVERTEXELEMENT9* pD3DVertexElement9, UINT* pNumElements)
+    D3DVERTEXELEMENT9* pD3DVertexElement9, unsigned int* pNumElements)
 {
     APIDEBUG("xrIDirect3DVertexDeclaration9::GetDeclaration");
     return S_OK;

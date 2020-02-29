@@ -57,7 +57,7 @@ light::~light()
 }
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-void light::set_texture(LPCSTR name)
+void light::set_texture(const char* name)
 {
     if ((0 == name) || (0 == name[0]))
     {
@@ -99,7 +99,7 @@ void light::set_texture(LPCSTR name)
 #endif
 
 #if RENDER == R_R1
-void light::set_texture(LPCSTR name) {}
+void light::set_texture(const char* name) {}
 #endif
 
 void light::set_active(bool a)

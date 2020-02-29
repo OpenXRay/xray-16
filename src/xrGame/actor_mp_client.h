@@ -25,7 +25,7 @@ public:
     CActorMP();
     virtual void net_Export(NET_Packet& packet);
     virtual void net_Import(NET_Packet& packet);
-    virtual BOOL net_Relevant();
+    virtual bool net_Relevant();
     virtual void OnEvent(NET_Packet& packet, u16 type);
     virtual void Die(IGameObject* killer);
     virtual void DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const;

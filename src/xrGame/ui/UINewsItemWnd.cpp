@@ -9,7 +9,7 @@
 
 CUINewsItemWnd::CUINewsItemWnd() {}
 CUINewsItemWnd::~CUINewsItemWnd() {}
-void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
+void CUINewsItemWnd::Init(CUIXml& uiXml, const char* start_from)
 {
     CUIXmlInit::InitWindow(uiXml, start_from, 0, this);
 

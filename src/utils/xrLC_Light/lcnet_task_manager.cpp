@@ -137,7 +137,7 @@ void task_manager::wait_all()
     //_user->WaitForCompletion();
     // release();
 }
-exec_pool* task_manager::run(LPCSTR name_pool)
+exec_pool* task_manager::run(const char* name_pool)
 {
     pool_lock.Enter();
 

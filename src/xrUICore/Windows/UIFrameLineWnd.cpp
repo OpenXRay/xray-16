@@ -7,7 +7,7 @@ CUIFrameLineWnd::CUIFrameLineWnd() : bHorizontal(true), m_bTextureVisible(false)
     m_texture_color = color_argb(255, 255, 255, 255);
 }
 
-bool CUIFrameLineWnd::InitFrameLineWnd(LPCSTR base_name, Fvector2 pos, Fvector2 size, bool horizontal, bool fatal /*= true*/)
+bool CUIFrameLineWnd::InitFrameLineWnd(const char* base_name, Fvector2 pos, Fvector2 size, bool horizontal, bool fatal /*= true*/)
 {
     InitFrameLineWnd(pos, size, horizontal);
     return InitTexture(base_name, "hud" DELIMITER "default", fatal);

@@ -18,11 +18,11 @@ class Material
 
 public:
     virtual u32 getID() = 0;
-    virtual LPCSTR getName() = 0;
-    virtual LPCSTR getWallmark(Material* other) = 0;
-    virtual LPCSTR getParticles(Material* other) = 0;
-    virtual LPCSTR getSoundHIT(Material* other) = 0;
-    virtual LPCSTR getSoundSTEP(Material* other) = 0;
+    virtual const char* getName() = 0;
+    virtual const char* getWallmark(Material* other) = 0;
+    virtual const char* getParticles(Material* other) = 0;
+    virtual const char* getSoundHIT(Material* other) = 0;
+    virtual const char* getSoundSTEP(Material* other) = 0;
     virtual float getFriction(Material* other) = 0;
 };
 

@@ -13,7 +13,7 @@ public:
         fr->w_close();
     };
 
-    INetFileBuffWriter(LPCSTR _file_name, size_t block_size, bool _reopen); //:INetWriter(),file_name(file_name)
+    INetFileBuffWriter(const char* _file_name, size_t block_size, bool _reopen); //:INetWriter(),file_name(file_name)
     virtual ~INetFileBuffWriter();
 };
 
@@ -132,7 +132,7 @@ void INetReader::r_stringZ(shared_str& dest)
     r_stringZ(buf);
     dest._set(buf);
 }
-void INetBlockReader::load_buffer(LPCSTR fn)
+void INetBlockReader::load_buffer(const char* fn)
 {
     // xr_delete(mem_reader);
     mem_reader.free_buff();
@@ -222,20 +222,20 @@ INetMemoryBuffWriter::~INetMemoryBuffWriter()
     // R_ASSERT(!mem_writter);
 }
 INetBuffWriter::~INetBuffWriter() { R_ASSERT(!mem_writter); }
-void INetBuffWriter::save_buffer(LPCSTR fn) const
+void INetBuffWriter::save_buffer(const char* fn) const
 {
     if (mem_writter)
         mem_writter->save_to(fn);
 }
 
-INetFileBuffWriter::INetFileBuffWriter(LPCSTR _file_name, size_t block_size, bool _reopen) : INetBuffWriter()
+INetFileBuffWriter::INetFileBuffWriter(const char* _file_name, size_t block_size, bool _reopen) : INetBuffWriter()
 {
     mem_writter = new CFileWriteBlock(_file_name, block_size, _reopen);
 }
 
 INetFileBuffWriter::~INetFileBuffWriter() { xr_delete(mem_writter); }
 /*
-            data = (BYTE*)	xr_realloc	(data,mem_size
+            data = (unsigned char*)	xr_realloc	(data,mem_size
 #ifdef DEBUG_MEMORY_NAME
             ,	"CMemoryWriter - storage"
 #endif // DEBUG_MEMORY_NAME
@@ -279,7 +279,7 @@ void CMemoryWriteBlock::send(IGenericStream* _stream)
     _stream->Write(&block_size, sizeof(block_size));
     _stream->Write(pointer(), block_size);
 }
-CFileWriteBlock::CFileWriteBlock(LPCSTR fn, size_t _size, bool _reopen)
+CFileWriteBlock::CFileWriteBlock(const char* fn, size_t _size, bool _reopen)
     : IWriteBlock(_size), file(0), file_map(0), file_name(fn), reopen(_reopen)
 {
     if (reopen)
@@ -357,7 +357,7 @@ void CFileWriteBlock::w_close()
     file_map = fopen(lfile_name, "rb");
 }
 
-INetReaderFile::INetReaderFile(LPCSTR file_name) : file(0)
+INetReaderFile::INetReaderFile(const char* file_name) : file(0)
 {
     file = fopen(file_name, "rb"); // FS.r_open( file_name );
 }

@@ -9,9 +9,9 @@
 #pragma once
 
 #ifdef DEBUG
-void add_smart_cast_stats(LPCSTR, LPCSTR);
+void add_smart_cast_stats(const char*, const char*);
 #ifdef SMART_CAST_STATS_ALL
-void add_smart_cast_stats_all(LPCSTR, LPCSTR);
+void add_smart_cast_stats_all(const char*, const char*);
 #endif
 #endif
 

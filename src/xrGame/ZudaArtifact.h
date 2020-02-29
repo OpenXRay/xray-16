@@ -15,7 +15,7 @@ public:
     CZudaArtefact(void);
     virtual ~CZudaArtefact(void);
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
 protected:
 };

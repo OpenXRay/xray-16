@@ -54,7 +54,7 @@ void HitData::net_load(NET_Packet* P, victims_table const& vt, bone_table const&
     Completed = true;
 };
 
-Weapon_Statistic::Weapon_Statistic(LPCSTR Name)
+Weapon_Statistic::Weapon_Statistic(const char* Name)
 {
     WName = Name;
     InvName = NULL;
@@ -267,7 +267,7 @@ void bone_table::net_load(NET_Packet* P)
     }
 }
 
-Player_Statistic::Player_Statistic(LPCSTR Name)
+Player_Statistic::Player_Statistic(const char* Name)
     : last_alive_update_time(0), m_dwCurMoneyRoundDelta(0)
 {
     PName = Name;
@@ -399,7 +399,7 @@ void WeaponUsageStatistic::Clear()
 };
 
 WeaponUsageStatistic::~WeaponUsageStatistic() { m_dwLastRequestSenderID = 0; };
-bool WeaponUsageStatistic::GetPlayer(LPCSTR PlayerName, PLAYERS_STATS_it& pPlayerI)
+bool WeaponUsageStatistic::GetPlayer(const char* PlayerName, PLAYERS_STATS_it& pPlayerI)
 {
     statistic_sync_quard syncg(m_mutex);
     pPlayerI = std::find(aPlayersStatistic.begin(), aPlayersStatistic.end(), PlayerName);
@@ -408,7 +408,7 @@ bool WeaponUsageStatistic::GetPlayer(LPCSTR PlayerName, PLAYERS_STATS_it& pPlaye
     return true;
 }
 
-PLAYERS_STATS_it WeaponUsageStatistic::FindPlayer(LPCSTR PlayerName)
+PLAYERS_STATS_it WeaponUsageStatistic::FindPlayer(const char* PlayerName)
 {
     statistic_sync_quard syncg(m_mutex);
     PLAYERS_STATS_it pPlayerI;
@@ -423,7 +423,7 @@ PLAYERS_STATS_it WeaponUsageStatistic::FindPlayer(LPCSTR PlayerName)
     return pPlayerI;
 };
 
-void WeaponUsageStatistic::ChangePlayerName(LPCSTR from, LPCSTR to)
+void WeaponUsageStatistic::ChangePlayerName(const char* from, const char* to)
 {
     statistic_sync_quard syncg(m_mutex);
     if (!CollectData())
@@ -432,7 +432,7 @@ void WeaponUsageStatistic::ChangePlayerName(LPCSTR from, LPCSTR to)
     pPlayerI->PName = to;
 }
 
-WEAPON_STATS_it Player_Statistic::FindPlayersWeapon(LPCSTR WeaponName)
+WEAPON_STATS_it Player_Statistic::FindPlayersWeapon(const char* WeaponName)
 {
     R_ASSERT(WeaponName);
     auto pWeaponI = std::find(aWeaponStats.begin(), aWeaponStats.end(), WeaponName);
@@ -482,7 +482,7 @@ void WeaponUsageStatistic::RemoveBullet(ABULLETS_it& Bullet_it)
     ActiveBullets.pop_back();
 }
 
-void WeaponUsageStatistic::OnWeaponBought(game_PlayerState* ps, LPCSTR WeaponName)
+void WeaponUsageStatistic::OnWeaponBought(game_PlayerState* ps, const char* WeaponName)
 {
     statistic_sync_quard syncg(m_mutex);
     if (!CollectData())

@@ -36,7 +36,7 @@ public:
     CAnomalyDetector(CBaseMonster* monster);
     virtual ~CAnomalyDetector();
 
-    void load(LPCSTR section);
+    void load(const char* section);
     void reinit();
 
     void update_schedule();

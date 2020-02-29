@@ -12,10 +12,10 @@ public:
     CPPEffectorCustom(const SPPInfo& ppi, bool one_instance = false, bool destroy_from_engine = true);
     EEffectorPPType get_type() { return m_type; }
 protected:
-    virtual BOOL Process(SPPInfo& pp);
+    virtual bool Process(SPPInfo& pp);
 
     // update factor; if return FALSE - destroy
-    virtual BOOL update() { return TRUE; }
+    virtual bool update() { return TRUE; }
 private:
     SPPInfo m_state;
     EEffectorPPType m_type;
@@ -31,7 +31,7 @@ class CPPEffectorCustomController
 {
 public:
     CPPEffectorCustomController();
-    IC virtual void load(LPCSTR section);
+    IC virtual void load(const char* section);
     IC virtual bool active() { return (m_effector != 0); }
 protected:
     _Effector* m_effector;
@@ -45,7 +45,7 @@ CPPEffectorCustomController<_Effector>::CPPEffectorCustomController()
 }
 
 template <class _Effector>
-void CPPEffectorCustomController<_Effector>::load(LPCSTR section)
+void CPPEffectorCustomController<_Effector>::load(const char* section)
 {
     m_state.duality.h = pSettings->r_float(section, "duality_h");
     m_state.duality.v = pSettings->r_float(section, "duality_v");
@@ -77,7 +77,7 @@ class CPPEffectorControlled : public CPPEffectorCustom
 public:
     CPPEffectorControlled(CPPEffectorController* controller, const SPPInfo& ppi, bool one_instance = false,
         bool destroy_from_engine = true);
-    virtual BOOL update();
+    virtual bool update();
     IC void set_factor(float value) { m_factor = value; }
 };
 

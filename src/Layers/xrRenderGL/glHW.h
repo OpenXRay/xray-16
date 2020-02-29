@@ -25,9 +25,9 @@ public:
     void UpdateViews();
 
     // TODO: OGL: Implement this into a compatibility layer?
-    void ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4]);
+    void ClearRenderTargetView(GLuint pRenderTargetView, const float ColorRGBA[4]);
 
-    void ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil);
+    void ClearDepthStencilView(GLuint pDepthStencilView, unsigned int ClearFlags, float Depth, unsigned char Stencil);
 
     void Present();
     DeviceState GetDeviceState();

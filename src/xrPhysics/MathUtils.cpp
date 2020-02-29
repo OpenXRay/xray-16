@@ -52,7 +52,7 @@ side,const Fvector &p,Fvector &point)
     float diffs=diffc<0.f ? diffc+h	:	diffc-h;
 }
 */
-IC bool RAYvsCYLINDER(const Fcylinder& c_cylinder, const Fvector& S, const Fvector& D, float& R, BOOL bCull)
+IC bool RAYvsCYLINDER(const Fcylinder& c_cylinder, const Fvector& S, const Fvector& D, float& R, bool bCull)
 {
     const float& r = c_cylinder.m_radius;
     float h = c_cylinder.m_height / 2.f;

@@ -110,9 +110,9 @@ void game_cl_TeamDeathmatch::net_import_state(NET_Packet& P)
 void game_cl_TeamDeathmatch::TranslateGameMessage(u32 msg, NET_Packet& P)
 {
     string512 Text;
-    //	LPSTR	Color_Teams[3]	= {"%c[255,255,255,255]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
+    //	char*	Color_Teams[3]	= {"%c[255,255,255,255]", "%c[255,64,255,64]", "%c[255,64,64,255]"};
     char Color_Main[] = "%c[255,192,192,192]";
-    //	LPSTR	TeamsNames[3]	= {"Zero Team", "Team Green", "Team Blue"};
+    //	char*	TeamsNames[3]	= {"Zero Team", "Team Green", "Team Blue"};
 
     switch (msg)
     {
@@ -558,7 +558,7 @@ void game_cl_TeamDeathmatch::OnRender()
     inherited::OnRender();
 }
 
-BOOL game_cl_TeamDeathmatch::CanCallBuyMenu()
+bool game_cl_TeamDeathmatch::CanCallBuyMenu()
 {
     if (Phase() != GAME_PHASE_INPROGRESS)
         return FALSE;
@@ -590,7 +590,7 @@ BOOL game_cl_TeamDeathmatch::CanCallBuyMenu()
     return m_bBuyEnabled;
 };
 
-BOOL game_cl_TeamDeathmatch::CanCallSkinMenu()
+bool game_cl_TeamDeathmatch::CanCallSkinMenu()
 {
     if (!m_game_ui)
         return FALSE;
@@ -602,7 +602,7 @@ BOOL game_cl_TeamDeathmatch::CanCallSkinMenu()
     return inherited::CanCallSkinMenu();
 };
 
-BOOL game_cl_TeamDeathmatch::CanCallInventoryMenu()
+bool game_cl_TeamDeathmatch::CanCallInventoryMenu()
 {
     if (!m_game_ui)
         return FALSE;
@@ -612,7 +612,7 @@ BOOL game_cl_TeamDeathmatch::CanCallInventoryMenu()
     return inherited::CanCallInventoryMenu();
 };
 
-BOOL game_cl_TeamDeathmatch::CanCallTeamSelectMenu()
+bool game_cl_TeamDeathmatch::CanCallTeamSelectMenu()
 {
     if (Phase() != GAME_PHASE_INPROGRESS)
         return false;
@@ -788,7 +788,7 @@ bool game_cl_TeamDeathmatch::IsPlayerInTeam(game_PlayerState* ps, ETeam team)
     return (ModifyTeam(s16(ps->team)) == s16(team));
 }
 
-LPCSTR game_cl_TeamDeathmatch::GetGameScore(string32& score_dest)
+const char* game_cl_TeamDeathmatch::GetGameScore(string32& score_dest)
 {
     xr_sprintf(score_dest, "[%d:%d]", teams[0].score, teams[1].score);
     return score_dest;

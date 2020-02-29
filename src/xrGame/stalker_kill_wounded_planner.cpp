@@ -22,7 +22,7 @@
 using namespace StalkerSpace;
 using namespace StalkerDecisionSpace;
 
-CStalkerKillWoundedPlanner::CStalkerKillWoundedPlanner(CAI_Stalker* object, LPCSTR action_name)
+CStalkerKillWoundedPlanner::CStalkerKillWoundedPlanner(CAI_Stalker* object, const char* action_name)
     : inherited(object, action_name)
 {
 }

@@ -23,7 +23,7 @@ struct OGF_Vertex
     base_color Color;
     svector<Fvector2, 2> UV;
 
-    BOOL similar(OGF* p, OGF_Vertex& other);
+    bool similar(OGF* p, OGF_Vertex& other);
     void dump(u32 id);
 };
 typedef xr_vector<OGF_Vertex> vecOGF_V;
@@ -33,7 +33,7 @@ struct x_vertex // "fast" geometry, 16b/vertex
 {
     Fvector P;
     x_vertex(const OGF_Vertex& c) { P = c.P; }
-    BOOL similar(OGF* p, x_vertex& other);
+    bool similar(OGF* p, x_vertex& other);
 };
 typedef xr_vector<x_vertex> vec_XV;
 typedef vec_XV::iterator itXV;
@@ -89,7 +89,7 @@ struct OGF_Base
 {
     int iLevel;
     u16 Sector;
-    BOOL bConnected;
+    bool bConnected;
 
     Fbox bbox;
     Fvector C;
@@ -103,7 +103,7 @@ struct OGF_Base
         Sector = 0xffff;
     }
 
-    IC BOOL IsNode() { return iLevel; }
+    IC bool IsNode() { return iLevel; }
     virtual void PreSave(u32 tree_id){};
     virtual void Save(IWriter& fs);
     virtual void GetGeometry(xr_vector<Fvector>& RES) = 0;
@@ -169,7 +169,7 @@ struct OGF : public OGF_Base
         // vb_id=xvb_id=vb_start=xvb_start=ib_id=xib_id=ib_start=xib_start=sw_id=xsw_id=u32(-1);
     };
     ~OGF() { xr_free(data.m_SWI.sw); }
-    BOOL dbg_SphereContainsVertex(Fvector& c, float R);
+    bool dbg_SphereContainsVertex(Fvector& c, float R);
 
     u16 x_BuildVertex(x_vertex& V);
     void x_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_);
@@ -184,7 +184,7 @@ struct OGF : public OGF_Base
     void Stripify();
     void DumpFaces();
 
-    BOOL progressive_test() { return data.m_SWI.count; }
+    bool progressive_test() { return data.m_SWI.count; }
     void progressive_clear()
     {
         data.m_SWI.count = 0;
@@ -194,12 +194,12 @@ struct OGF : public OGF_Base
     virtual void PreSave(u32 tree_id);
     virtual void Save(IWriter& fs);
 
-    //	void				Save_Cached		(IWriter &fs, ogf_header& H, BOOL bColors);
+    //	void				Save_Cached		(IWriter &fs, ogf_header& H, bool bColors);
 
-    void Save_Normal_PM(IWriter& fs, ogf_header& H, BOOL bColors);
-    void Load_Normal_PM(IReader& fs, ogf_header& H, BOOL bColors);
+    void Save_Normal_PM(IWriter& fs, ogf_header& H, bool bColors);
+    void Load_Normal_PM(IReader& fs, ogf_header& H, bool bColors);
 
-    //	void				Save_Progressive(IWriter &fs, ogf_header& H, BOOL bColors);
+    //	void				Save_Progressive(IWriter &fs, ogf_header& H, bool bColors);
 
     virtual void GetGeometry(xr_vector<Fvector>& R)
     {

@@ -645,9 +645,9 @@ void CUIGameCTA::SetReinforcementTimes(u32 curTime, u32 maxTime)
     m_pReinforcementInidcator->SetText(xr_itoa(curTime / 1000, _buff, 10));
 }
 
-void CUIGameCTA::DisplayMoneyChange(LPCSTR deltaMoney) { m_pMoneyIndicator->SetMoneyChange(deltaMoney); }
+void CUIGameCTA::DisplayMoneyChange(const char* deltaMoney) { m_pMoneyIndicator->SetMoneyChange(deltaMoney); }
 void CUIGameCTA::DisplayMoneyBonus(KillMessageStruct* bonus) { m_pMoneyIndicator->AddBonusMoney(*bonus); }
-void CUIGameCTA::ChangeTotalMoneyIndicator(LPCSTR newMoneyString) { m_pMoneyIndicator->SetMoneyAmount(newMoneyString); }
+void CUIGameCTA::ChangeTotalMoneyIndicator(const char* newMoneyString) { m_pMoneyIndicator->SetMoneyAmount(newMoneyString); }
 void CUIGameCTA::SetRank(ETeam team, u8 rank)
 {
     m_pRankIndicator->SetRank(static_cast<u8>(team), rank);
@@ -694,14 +694,14 @@ void CUIGameCTA::Render()
         m_voteStatusWnd->Draw();
 }
 
-void CUIGameCTA::SetRoundResultCaption(LPCSTR str) { m_round_result_caption->SetTextST(str); }
-void CUIGameCTA::SetPressBuyMsgCaption(LPCSTR str) { m_pressbuy_caption->SetTextST(str); }
-void CUIGameCTA::SetPressJumpMsgCaption(LPCSTR str) { m_pressjump_caption->SetTextST(str); }
-void CUIGameCTA::SetSpectatorMsgCaption(LPCSTR str) { m_spectator_caption->SetTextST(str); }
-void CUIGameCTA::SetSpectrModeMsgCaption(LPCSTR str) { m_spectrmode_caption->SetTextST(str); }
-void CUIGameCTA::SetWarmUpCaption(LPCSTR str) { m_warm_up_caption->SetTextST(str); }
-void CUIGameCTA::SetTimeMsgCaption(LPCSTR str) { m_time_caption->SetTextST(str); }
-void CUIGameCTA::SetDemoPlayCaption(LPCSTR str) { m_demo_play_caption->SetTextST(str); }
+void CUIGameCTA::SetRoundResultCaption(const char* str) { m_round_result_caption->SetTextST(str); }
+void CUIGameCTA::SetPressBuyMsgCaption(const char* str) { m_pressbuy_caption->SetTextST(str); }
+void CUIGameCTA::SetPressJumpMsgCaption(const char* str) { m_pressjump_caption->SetTextST(str); }
+void CUIGameCTA::SetSpectatorMsgCaption(const char* str) { m_spectator_caption->SetTextST(str); }
+void CUIGameCTA::SetSpectrModeMsgCaption(const char* str) { m_spectrmode_caption->SetTextST(str); }
+void CUIGameCTA::SetWarmUpCaption(const char* str) { m_warm_up_caption->SetTextST(str); }
+void CUIGameCTA::SetTimeMsgCaption(const char* str) { m_time_caption->SetTextST(str); }
+void CUIGameCTA::SetDemoPlayCaption(const char* str) { m_demo_play_caption->SetTextST(str); }
 void CUIGameCTA::ResetCaptions()
 {
     // bad ...
@@ -732,7 +732,7 @@ void CUIGameCTA::ShowBuySpawn(s32 spawn_cost)
     if (m_pBuySpawnMsgBox->IsShown())
         return;
 
-    LPCSTR format_str = StringTable().translate("mp_press_yes2pay").c_str();
+    const char* format_str = StringTable().translate("mp_press_yes2pay").c_str();
     VERIFY(format_str);
     size_t pay_frm_size = xr_strlen(format_str) * sizeof(char) + 64;
     PSTR pay_frm_str = static_cast<char*>(xr_alloca(pay_frm_size));
@@ -751,7 +751,7 @@ void CUIGameCTA::HideBuySpawn()
     }
 }
 
-void CUIGameCTA::SetVoteMessage(LPCSTR str)
+void CUIGameCTA::SetVoteMessage(const char* str)
 {
     if (m_voteStatusWnd)
     {
@@ -768,7 +768,7 @@ void CUIGameCTA::SetVoteMessage(LPCSTR str)
     }
 };
 
-void CUIGameCTA::SetVoteTimeResultMsg(LPCSTR str)
+void CUIGameCTA::SetVoteTimeResultMsg(const char* str)
 {
     if (m_voteStatusWnd)
         m_voteStatusWnd->SetVoteTimeResultMsg(str);

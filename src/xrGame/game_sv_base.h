@@ -56,8 +56,8 @@ public:
     virtual bool OnNextMap() = 0;
     virtual void OnPrevMap() = 0;
     virtual bool SwitchToNextMap() = 0;
-    virtual BOOL IsVotingEnabled() = 0;
-    virtual BOOL IsVotingEnabled(u16 flag) = 0;
+    virtual bool IsVotingEnabled() = 0;
+    virtual bool IsVotingEnabled(u16 flag) = 0;
     virtual bool IsVotingActive() = 0;
     virtual void SetVotingActive(bool active) = 0;
     virtual void OnVoteStart(const char* voteCommand, ClientID sender) = 0;
@@ -65,7 +65,7 @@ public:
     virtual game_PlayerState* get_eid(u16 id) = 0;
     virtual void* get_client(u16 id) = 0;
     virtual game_PlayerState* get_id(ClientID id) = 0;
-    virtual LPCSTR get_name_id(ClientID id) = 0;
+    virtual const char* get_name_id(ClientID id) = 0;
     virtual u16 get_id_2_eid(ClientID id) = 0;
     virtual u32 get_players_count() = 0;
     virtual CSE_Abstract* get_entity_from_eid(u16 id) = 0;
@@ -151,7 +151,7 @@ public:
     virtual ~game_sv_GameState();
 #define TEAM_COUNT 4
 
-    BOOL sv_force_sync;
+    bool sv_force_sync;
     float rpoints_MinDist[TEAM_COUNT];
     xr_vector<RPoint> rpoints[TEAM_COUNT];
     using RPRef = xr_vector<RPoint*>;
@@ -163,7 +163,7 @@ public:
     void GenerateNewName(char const* old_name, char* dest, u32 const dest_size);
     void CheckPlayerName(xrClientData* CL);
     virtual void OnPlayerConnect(ClientID id_who) override;
-    virtual void OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID) override;
+    virtual void OnPlayerDisconnect(ClientID id_who, char* Name, u16 GameID) override;
     virtual void OnPlayerReady(ClientID id_who) override{};
     virtual void OnPlayerEnteredGame(ClientID id_who) override{};
     virtual void OnPlayerConnectFinished(ClientID id_who) override{};
@@ -175,16 +175,16 @@ public:
     virtual void SetRoundResult(ERoundEnd_Result result) override { round_end_reason = result; }
     virtual void OnRoundEnd() override;
 
-    virtual void MapRotation_AddMap(LPCSTR MapName, LPCSTR MapVer) override;
+    virtual void MapRotation_AddMap(const char* MapName, const char* MapVer) override;
     virtual void MapRotation_ListMaps() override;
     virtual bool OnNextMap() override { return false; }
     virtual void OnPrevMap() override {}
     virtual bool SwitchToNextMap() override { return m_bMapNeedRotation; };
-    virtual BOOL IsVotingEnabled() override;
-    virtual BOOL IsVotingEnabled(u16 flag) override;
+    virtual bool IsVotingEnabled() override;
+    virtual bool IsVotingEnabled(u16 flag) override;
     virtual bool IsVotingActive() override { return false; };
     virtual void SetVotingActive(bool Active) override{};
-    virtual void OnVoteStart(LPCSTR VoteCommand, ClientID sender) override{};
+    virtual void OnVoteStart(const char* VoteCommand, ClientID sender) override{};
     virtual void OnVoteStop() override{};
     // Main accessors
     virtual game_PlayerState* get_eid(u16 id) override;
@@ -192,9 +192,9 @@ public:
     // virtual       game_PlayerState*   get_it                  (u32 it);
     virtual game_PlayerState* get_id(ClientID id) override;
 
-    // virtual       LPCSTR              get_name_it             (u32 it);
-    virtual LPCSTR get_name_id(ClientID id) override;
-    LPCSTR get_player_name_id(ClientID id);
+    // virtual       const char*              get_name_it             (u32 it);
+    virtual const char* get_name_id(ClientID id) override;
+    const char* get_player_name_id(ClientID id);
     virtual u16 get_id_2_eid(ClientID id) override;
     // virtual       ClientID            get_it_2_id             (u32 it);*/
     virtual u32 get_players_count() override;
@@ -208,13 +208,13 @@ public:
     virtual void SetPointFreezed(RPoint* rp) override;
     virtual void OnRender() override;
     virtual void OnSwitchPhase(u32 old_phase, u32 new_phase) override;
-    CSE_Abstract* spawn_begin(LPCSTR N);
+    CSE_Abstract* spawn_begin(const char* N);
     CSE_Abstract* spawn_end(CSE_Abstract* E, ClientID id);
 
     // Utilities
-    float get_option_f(LPCSTR lst, LPCSTR name, float def = 0.0f);
-    s32 get_option_i(LPCSTR lst, LPCSTR name, s32 def = 0);
-    string64& get_option_s(LPCSTR lst, LPCSTR name, LPCSTR def = 0);
+    float get_option_f(const char* lst, const char* name, float def = 0.0f);
+    s32 get_option_i(const char* lst, const char* name, s32 def = 0);
+    string64& get_option_s(const char* lst, const char* name, const char* def = 0);
     virtual u32 get_alive_count(u32 team);
     virtual xr_vector<u16>* get_children(ClientID id_who);
     void u_EventGen(NET_Packet& P, u16 type, u16 dest);

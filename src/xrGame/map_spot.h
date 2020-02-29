@@ -26,10 +26,10 @@ public:
 public:
     CMapSpot(CMapLocation*);
     virtual ~CMapSpot();
-    virtual void Load(CUIXml* xml, LPCSTR path);
+    virtual void Load(CUIXml* xml, const char* path);
     CMapLocation* MapLocation() { return m_map_location; }
     int get_location_level() { return m_location_level; }
-    virtual LPCSTR GetHint();
+    virtual const char* GetHint();
     virtual void SetWndPos(const Fvector2& pos);
     virtual void Update();
     virtual bool OnMouseDown(int mouse_btn);
@@ -47,7 +47,7 @@ class CMapSpotPointer : public CMapSpot
 public:
     CMapSpotPointer(CMapLocation*);
     virtual ~CMapSpotPointer();
-    virtual LPCSTR GetHint();
+    virtual const char* GetHint();
 };
 
 class CMiniMapSpot : public CMapSpot
@@ -59,7 +59,7 @@ class CMiniMapSpot : public CMapSpot
 public:
     CMiniMapSpot(CMapLocation*);
     virtual ~CMiniMapSpot();
-    virtual void Load(CUIXml* xml, LPCSTR path);
+    virtual void Load(CUIXml* xml, const char* path);
     virtual void Draw();
 };
 
@@ -97,21 +97,21 @@ class CComplexMapSpot : public CMapSpot
 public:
     CComplexMapSpot(CMapLocation*);
     virtual ~CComplexMapSpot();
-    virtual void Load(CUIXml* xml, LPCSTR path);
+    virtual void Load(CUIXml* xml, const char* path);
     virtual void Update();
     virtual void SetWndSize(const Fvector2& size);
 
-    void SetLeftTexture(LPCSTR texture_name)
+    void SetLeftTexture(const char* texture_name)
     {
         VERIFY2(m_left_icon, texture_name);
         m_left_icon->InitTexture(texture_name);
     }
-    void SetRightTexture(LPCSTR texture_name)
+    void SetRightTexture(const char* texture_name)
     {
         VERIFY2(m_right_icon, texture_name);
         m_right_icon->InitTexture(texture_name);
     }
-    void SetTopTexture(LPCSTR texture_name)
+    void SetTopTexture(const char* texture_name)
     {
         VERIFY2(m_top_icon, texture_name);
         m_top_icon->InitTexture(texture_name);
@@ -119,6 +119,6 @@ public:
     void SetTimerFinish(ALife::_TIME_ID time); // ms game_time
     ALife::_TIME_ID GetTimerFinish() const { return m_timer_finish; }
 protected:
-    CUIStaticOrig* CreateStaticOrig(CUIXml& xml, LPCSTR ui_path);
+    CUIStaticOrig* CreateStaticOrig(CUIXml& xml, const char* ui_path);
 
 }; // class CComplexMapSpot

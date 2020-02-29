@@ -20,7 +20,7 @@ void CHW::CreateD3D()
     hD3D = XRay::LoadModule(GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9");
     R_ASSERT2(hD3D->IsLoaded(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
 
-    using _Direct3DCreate9 = IDirect3D9* WINAPI(UINT SDKVersion);
+    using _Direct3DCreate9 = IDirect3D9* WINAPI(unsigned int SDKVersion);
     auto createD3D = (_Direct3DCreate9*)hD3D->GetProcAddress("Direct3DCreate9");
     R_ASSERT(createD3D);
     pD3D = createD3D(D3D_SDK_VERSION);
@@ -324,7 +324,7 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
     if (id_vendor == 0x8086) // Intel
     {
         constexpr auto GMA_SL_SIZE = 43;
-        constexpr DWORD IntelGMA_SoftList[GMA_SL_SIZE] =
+        constexpr unsigned int IntelGMA_SoftList[GMA_SL_SIZE] =
         {
             0x2782, 0x2582, 0x2792, 0x2592, 0x2772, 0x2776, 0x27A2, 0x27A6, 0x27AE,
             0x2982, 0x2983, 0x2992, 0x2993, 0x29A2, 0x29A3, 0x2972, 0x2973, 0x2A02,
@@ -390,7 +390,7 @@ u32 CHW::selectGPU()
     return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 }
 
-BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
+bool CHW::support(D3DFORMAT fmt, unsigned int type, unsigned int usage)
 {
     auto result = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
     if (FAILED(result))

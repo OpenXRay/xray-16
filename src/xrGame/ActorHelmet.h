@@ -13,7 +13,7 @@ public:
     CHelmet();
     virtual ~CHelmet();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
     virtual void Hit(float P, ALife::EHitType hit_type);
 
@@ -22,7 +22,7 @@ public:
 
     virtual void OnMoveToSlot(const SInvItemPlace& previous_place);
     virtual void OnMoveToRuck(const SInvItemPlace& previous_place);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     virtual void OnH_A_Chield();
@@ -43,12 +43,12 @@ public:
     float m_fShowNearestEnemiesDistance;
 
     void ReloadBonesProtection();
-    void AddBonesProtection(LPCSTR bones_section);
+    void AddBonesProtection(const char* bones_section);
 
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;
     SBoneProtections* m_boneProtection;
 
 protected:
-    virtual bool install_upgrade_impl(LPCSTR section, bool test);
+    virtual bool install_upgrade_impl(const char* section, bool test);
 };

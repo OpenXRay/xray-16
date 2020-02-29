@@ -11,13 +11,13 @@
 #include "CustomHUD.h"
 #include "CameraManager.h"
 
-extern BOOL g_bDisableRedText;
+extern bool g_bDisableRedText;
 static Flags32 s_hud_flag = {0};
 static Flags32 s_dev_flags = {0};
 
-BOOL stored_weapon;
-BOOL stored_cross;
-BOOL stored_red_text;
+bool stored_weapon;
+bool stored_cross;
+bool stored_red_text;
 
 CDemoRecord* xrDemoRecord = 0;
 CDemoRecord::force_position CDemoRecord::g_position = {false, {0, 0, 0}};
@@ -56,7 +56,7 @@ Fbox get_level_screenshot_bound()
 
     return res;
 }
-void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags);
+void _InitializeFont(CGameFont*& F, const char* section, u32 flags);
 CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDemo, life_time /*,FALSE*/)
 {
     stored_red_text = g_bDisableRedText;
@@ -154,7 +154,7 @@ void CDemoRecord::MakeScreenshotFace()
     m_Stage++;
 }
 
-void GetLM_BBox(Fbox& bb, INT Step)
+void GetLM_BBox(Fbox& bb, signed int Step)
 {
     float half_x = bb.vMin.x + (bb.vMax.x - bb.vMin.x) / 2;
     float half_z = bb.vMin.z + (bb.vMax.z - bb.vMin.z) / 2;
@@ -233,7 +233,7 @@ void CDemoRecord::MakeLevelMapProcess()
         {
             psHUD_Flags.assign(s_hud_flag);
 
-            BOOL bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
+            bool bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
             psDeviceFlags = s_dev_flags;
             if (bDevReset)
                 Device.Reset();
@@ -280,7 +280,7 @@ void CDemoRecord::MakeCubeMapFace(Fvector& D, Fvector& N)
     m_Stage++;
 }
 
-BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
+bool CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 {
     info.dont_apply = false;
     if (0 == file)
@@ -561,7 +561,7 @@ void CDemoRecord::MakeScreenshot()
     m_Stage = 0;
 }
 
-void CDemoRecord::MakeLevelMapScreenshot(BOOL bHQ)
+void CDemoRecord::MakeLevelMapScreenshot(bool bHQ)
 {
     Console->Execute("run_string level.set_weather(\"map\",true)");
 

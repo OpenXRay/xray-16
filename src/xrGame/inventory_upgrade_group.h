@@ -24,10 +24,10 @@ public:
     void add_parent_upgrade(UpgradeBase& parent_upgrade);
 
     IC const shared_str& id() const;
-    IC LPCSTR id_str() const;
+    IC const char* id_str() const;
 
 #ifdef DEBUG
-    void log_hierarchy(LPCSTR nesting);
+    void log_hierarchy(const char* nesting);
 #endif // DEBUG
 
     void fill_root(Root* root);

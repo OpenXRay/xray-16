@@ -17,7 +17,7 @@ void SHeliMovementState::net_Destroy()
     }
 }
 
-void SHeliMovementState::Load(LPCSTR section)
+void SHeliMovementState::Load(const char* section)
 {
     float angularSpeedPitch = pSettings->r_float(section, "path_angular_sp_pitch");
     AngSP = angularSpeedPitch;
@@ -199,7 +199,7 @@ void SHeliMovementState::SetDestPosition(Fvector* pos)
     }
 }
 
-void SHeliMovementState::goPatrolByPatrolPath(LPCSTR path_name, int start_idx)
+void SHeliMovementState::goPatrolByPatrolPath(const char* path_name, int start_idx)
 {
     if (need_to_del_path && currPatrolPath)
     {

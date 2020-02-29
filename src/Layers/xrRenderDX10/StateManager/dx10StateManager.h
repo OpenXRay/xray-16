@@ -20,8 +20,8 @@ public:
     void SetRasterizerState(ID3DRasterizerState* pRState);
     void SetDepthStencilState(ID3DDepthStencilState* pDSState);
     void SetBlendState(ID3DBlendState* pBlendState);
-    void SetStencilRef(UINT uiStencilRef);
-    void SetAlphaRef(UINT uiAlphaRef);
+    void SetStencilRef(unsigned int uiStencilRef);
+    void SetAlphaRef(unsigned int uiAlphaRef);
 
     void BindAlphaRef(R_constant* C);
 
@@ -40,11 +40,11 @@ public:
     void SetMultisample(u32 Enable);
     void SetSampleMask(u32 Mask);
 
-    void EnableScissoring(BOOL bEnable = TRUE);
+    void EnableScissoring(bool bEnable = TRUE);
 
     //	Functions which override value even if new state was set up.
     //	Reset value to current state's value if override is disabled.
-    void OverrideScissoring(bool bOverride = true, BOOL bValue = TRUE);
+    void OverrideScissoring(bool bOverride = true, bool bValue = TRUE);
 
 private:
     void ValidateRDesc();
@@ -57,8 +57,8 @@ private:
     ID3DDepthStencilState* m_pDepthStencilState; //	Weak link
     ID3DBlendState* m_pBlendState; //	Weak link
 
-    UINT m_uiStencilRef;
-    UINT m_uiAlphaRef;
+    unsigned int m_uiStencilRef;
+    unsigned int m_uiAlphaRef;
 
     //	If will need more constants create support class instead
     R_constant* m_cAlphaRef;
@@ -87,8 +87,8 @@ private:
     D3D_BLEND_DESC m_BDesc;
 
     bool m_bOverrideScissoring;
-    BOOL m_bOverrideScissoringValue;
-    UINT m_uiSampleMask;
+    bool m_bOverrideScissoringValue;
+    unsigned int m_uiSampleMask;
 };
 
 extern dx10StateManager StateManager;

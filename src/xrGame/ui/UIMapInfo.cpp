@@ -40,7 +40,7 @@ void CUIMapInfo::InitMapInfo(Fvector2 pos, Fvector2 size)
     st->AdjustHeightToText();                                       \
     m_view->AddWindow(st, true)
 
-void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
+void CUIMapInfo::InitMap(const char* map_name, const char* map_ver)
 {
     m_view->Clear();
     if (NULL == map_name)

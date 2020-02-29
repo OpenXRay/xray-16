@@ -9,8 +9,8 @@
 #include "xrCommon/xr_string.h"
 
 DEFINE_VECTOR(bool, boolVec, boolIt);
-DEFINE_VECTOR(BOOL, BOOLVec, BOOLIt);
-DEFINE_VECTOR(BOOL*, LPBOOLVec, LPBOOLIt);
+DEFINE_VECTOR(bool, BOOLVec, BOOLIt);
+DEFINE_VECTOR(bool*, LPBOOLVec, LPBOOLIt);
 DEFINE_VECTOR(Frect, FrectVec, FrectIt);
 DEFINE_VECTOR(Irect, IrectVec, IrectIt);
 DEFINE_VECTOR(Fplane, PlaneVec, PlaneIt);
@@ -19,8 +19,8 @@ DEFINE_VECTOR(Fvector, FvectorVec, FvectorIt);
 DEFINE_VECTOR(Fvector*, LPFvectorVec, LPFvectorIt);
 DEFINE_VECTOR(Fcolor, FcolorVec, FcolorIt);
 DEFINE_VECTOR(Fcolor*, LPFcolorVec, LPFcolorIt);
-DEFINE_VECTOR(LPSTR, LPSTRVec, LPSTRIt);
-DEFINE_VECTOR(LPCSTR, LPCSTRVec, LPCSTRIt);
+DEFINE_VECTOR(char*, LPSTRVec, LPSTRIt);
+DEFINE_VECTOR(const char*, LPCSTRVec, LPCSTRIt);
 DEFINE_VECTOR(string64, string64Vec, string64It);
 DEFINE_VECTOR(xr_string, SStringVec, SStringVecIt);
 

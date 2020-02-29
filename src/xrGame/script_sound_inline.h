@@ -69,7 +69,7 @@ IC bool CScriptSound::IsPlaying() const
     return (!!m_sound._feedback());
 }
 
-IC void CScriptSound::AttachTail(LPCSTR caSoundName) { m_sound.attach_tail(caSoundName); }
+IC void CScriptSound::AttachTail(const char* caSoundName) { m_sound.attach_tail(caSoundName); }
 IC void CScriptSound::Stop()
 {
     VERIFY(m_sound._handle() || m_bIsNoSound);

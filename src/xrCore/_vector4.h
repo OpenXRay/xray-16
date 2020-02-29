@@ -182,7 +182,7 @@ public:
         return *this;
     }
 
-    IC BOOL similar(const Self& v, T E = EPS_L)
+    IC bool similar(const Self& v, T E = EPS_L)
     {
         return _abs(x - v.x) < E && _abs(y - v.y) < E && _abs(z - v.z) < E && _abs(w - v.w) < E;
     };

@@ -9,7 +9,7 @@ class CParticlesObject : public CPS_Instance
     using inherited = CPS_Instance;
 
     u32 dwLastTime;
-    void Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove);
+    void Init(const char* p_name, IRender_Sector* S, bool bAutoRemove);
     void UpdateSpatial();
 
 protected:
@@ -23,7 +23,7 @@ protected:
     virtual ~CParticlesObject();
 
 public:
-    CParticlesObject(LPCSTR p_name, BOOL bAutoRemove, bool destroy_on_game_load);
+    CParticlesObject(const char* p_name, bool bAutoRemove, bool destroy_on_game_load);
 
     virtual bool shedule_Needed() { return true; };
     virtual float shedule_Scale();
@@ -37,10 +37,10 @@ public:
     IC Fmatrix& XFORM() { return renderable.xform; }
     void UpdateParent(const Fmatrix& m, const Fvector& vel);
 
-    void play_at_pos(const Fvector& pos, BOOL xform = FALSE);
+    void play_at_pos(const Fvector& pos, bool xform = FALSE);
     virtual void Play(bool bHudMode);
-    void Stop(BOOL bDefferedStop = TRUE);
-    virtual BOOL Locked() { return mt_dt; }
+    void Stop(bool bDefferedStop = TRUE);
+    virtual bool Locked() { return mt_dt; }
     bool IsLooped() { return m_bLooped; }
     bool IsAutoRemove();
     bool IsPlaying();
@@ -49,7 +49,7 @@ public:
     const shared_str Name();
 
 public:
-    static CParticlesObject* Create(LPCSTR p_name, BOOL bAutoRemove = TRUE, bool remove_on_game_load = true)
+    static CParticlesObject* Create(const char* p_name, bool bAutoRemove = TRUE, bool remove_on_game_load = true)
     {
         return new CParticlesObject(p_name, bAutoRemove, remove_on_game_load);
     }

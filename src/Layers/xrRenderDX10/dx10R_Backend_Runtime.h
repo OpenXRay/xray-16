@@ -58,7 +58,7 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
     }
 }
 
-ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
+ICF void CBackend::set_PS(ID3DPixelShader* _ps, const char* _n)
 {
     if (ps != _ps)
     {
@@ -77,7 +77,7 @@ ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
     }
 }
 
-ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
+ICF void CBackend::set_GS(ID3DGeometryShader* _gs, const char* _n)
 {
     if (gs != _gs)
     {
@@ -98,7 +98,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
 }
 
 #ifdef USE_DX11
-ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
+ICF void CBackend::set_HS(ID3D11HullShader* _hs, const char* _n)
 {
     if (hs != _hs)
     {
@@ -114,7 +114,7 @@ ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
     }
 }
 
-ICF void CBackend::set_DS(ID3D11DomainShader* _ds, LPCSTR _n)
+ICF void CBackend::set_DS(ID3D11DomainShader* _ds, const char* _n)
 {
     if (ds != _ds)
     {
@@ -130,7 +130,7 @@ ICF void CBackend::set_DS(ID3D11DomainShader* _ds, LPCSTR _n)
     }
 }
 
-ICF void CBackend::set_CS(ID3D11ComputeShader* _cs, LPCSTR _n)
+ICF void CBackend::set_CS(ID3D11ComputeShader* _cs, const char* _n)
 {
     if (cs != _cs)
     {
@@ -149,7 +149,7 @@ ICF void CBackend::set_CS(ID3D11ComputeShader* _cs, LPCSTR _n)
 ICF bool CBackend::is_TessEnabled() { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && (ds != 0 || hs != 0); }
 #endif
 
-ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
+ICF void CBackend::set_VS(ID3DVertexShader* _vs, const char* _n)
 {
     if (vs != _vs)
     {
@@ -179,16 +179,16 @@ ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
         vb = _vb;
         vb_stride = _vb_stride;
         // CHK_DX           (HW.pDevice->SetStreamSource(0,vb,0,vb_stride));
-        // UINT StreamNumber,
+        // unsigned int StreamNumber,
         // ID3DVertexBuffer * pStreamData,
-        // UINT OffsetInBytes,
-        // UINT Stride
+        // unsigned int OffsetInBytes,
+        // unsigned int Stride
 
-        // UINT StartSlot,
-        // UINT NumBuffers,
+        // unsigned int StartSlot,
+        // unsigned int NumBuffers,
         // ID3DxxBuffer *const *ppVertexBuffers,
-        // const UINT *pStrides,
-        // const UINT *pOffsets
+        // const unsigned int *pStrides,
+        // const unsigned int *pOffsets
         u32 iOffset = 0;
         HW.pContext->IASetVertexBuffers(0, 1, &vb, &_vb_stride, &iOffset);
     }
@@ -255,7 +255,7 @@ IC void CBackend::ApplyPrimitieTopology(D3D_PRIMITIVE_TOPOLOGY Topology)
 }
 
 #ifdef USE_DX11
-IC void CBackend::Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ)
+IC void CBackend::Compute(unsigned int ThreadGroupCountX, unsigned int ThreadGroupCountY, unsigned int ThreadGroupCountZ)
 {
     stat.calls++;
 
@@ -293,15 +293,15 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
 
     // CHK_DX(HW.pDevice->DrawIndexedPrimitive(T,baseV, startV, countV,startI,PC));
     // D3DPRIMITIVETYPE Type,
-    // INT BaseVertexIndex,
-    // UINT MinIndex,
-    // UINT NumVertices,
-    // UINT StartIndex,
-    // UINT PriResmitiveCount
+    // signed int BaseVertexIndex,
+    // unsigned int MinIndex,
+    // unsigned int NumVertices,
+    // unsigned int StartIndex,
+    // unsigned int PriResmitiveCount
 
-    // UINT IndexCount,
-    // UINT StartIndexLocation,
-    // INT BaseVertexLocation
+    // unsigned int IndexCount,
+    // unsigned int StartIndexLocation,
+    // signed int BaseVertexLocation
     SRVSManager.Apply();
     ApplyRTandZB();
     ApplyVertexLayout();

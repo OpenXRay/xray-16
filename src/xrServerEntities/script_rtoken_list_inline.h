@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC void CScriptRTokenList::add(LPCSTR value) { m_values.push_back(shared_str(value)); }
+IC void CScriptRTokenList::add(const char* value) { m_values.push_back(shared_str(value)); }
 IC void CScriptRTokenList::remove(u32 index)
 {
     if (index >= size())
@@ -16,7 +16,7 @@ IC void CScriptRTokenList::remove(u32 index)
     m_values.erase(m_values.begin() + index);
 }
 
-IC LPCSTR CScriptRTokenList::get(u32 index)
+IC const char* CScriptRTokenList::get(u32 index)
 {
     if (index >= size())
         return (nullptr);

@@ -129,8 +129,8 @@ struct CLoader
         }
     };
 
-    static void load_data(LPCSTR& data, M& stream, const P& p) { NODEFAULT; }
-    static void load_data(LPSTR& data, M& stream, const P& p)
+    static void load_data(const char*& data, M& stream, const P& p) { NODEFAULT; }
+    static void load_data(char*& data, M& stream, const P& p)
     {
         shared_str S;
         stream.r_stringZ(S);
@@ -150,7 +150,7 @@ struct CLoader
     {
         if (p(data, const_cast<typename object_type_traits::remove_const<T1>::type&>(data.first), true))
         {
-            const bool value = object_type_traits::is_same<T1, LPCSTR>::value;
+            const bool value = object_type_traits::is_same<T1, const char*>::value;
             VERIFY(!value);
             load_data(const_cast<typename object_type_traits::remove_const<T1>::type&>(data.first), stream, p);
         }

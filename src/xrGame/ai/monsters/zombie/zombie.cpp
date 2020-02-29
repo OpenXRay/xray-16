@@ -17,7 +17,7 @@ CZombie::CZombie()
 }
 
 CZombie::~CZombie() { xr_delete(StateMan); }
-void CZombie::Load(LPCSTR section)
+void CZombie::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -86,7 +86,7 @@ void CZombie::reinit()
     active_triple_idx = u8(-1);
 }
 
-void CZombie::reload(LPCSTR section)
+void CZombie::reload(const char* section)
 {
     inherited::reload(section);
 
@@ -127,7 +127,7 @@ void CZombie::vfAssignBones()
     Bones.AddBone(bone_head, AXIS_Y);
 }
 
-BOOL CZombie::net_Spawn(CSE_Abstract* DC)
+bool CZombie::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

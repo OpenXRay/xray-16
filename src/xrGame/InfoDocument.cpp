@@ -12,9 +12,9 @@
 
 CInfoDocument::CInfoDocument(void) { m_Info = NULL; }
 CInfoDocument::~CInfoDocument(void) {}
-BOOL CInfoDocument::net_Spawn(CSE_Abstract* DC)
+bool CInfoDocument::net_Spawn(CSE_Abstract* DC)
 {
-    BOOL res = inherited::net_Spawn(DC);
+    bool res = inherited::net_Spawn(DC);
 
     CSE_Abstract* l_tpAbstract = static_cast<CSE_Abstract*>(DC);
     CSE_ALifeItemDocument* l_tpALifeItemDocument = smart_cast<CSE_ALifeItemDocument*>(l_tpAbstract);
@@ -25,7 +25,7 @@ BOOL CInfoDocument::net_Spawn(CSE_Abstract* DC)
     return (res);
 }
 
-void CInfoDocument::Load(LPCSTR section) { inherited::Load(section); }
+void CInfoDocument::Load(const char* section) { inherited::Load(section); }
 void CInfoDocument::net_Destroy() { inherited::net_Destroy(); }
 void CInfoDocument::shedule_Update(u32 dt) { inherited::shedule_Update(dt); }
 void CInfoDocument::UpdateCL() { inherited::UpdateCL(); }

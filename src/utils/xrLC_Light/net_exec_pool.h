@@ -39,7 +39,7 @@ public:
     u32 end() { return _end; }
     void add_task(net_execution* task);
     void wait();
-    void set_name(LPCSTR name) { xr_strcpy(_name, name); }
+    void set_name(const char* name) { xr_strcpy(_name, name); }
     bool is_running();
     exec_pool& run(IGridUser& user, u8 pool_id);
 
@@ -47,7 +47,7 @@ public:
     void receive_result(IGenericStream* inStream);
     void remove_task(net_execution* e);
     void send_result(IGenericStream* outStream, net_execution& e);
-    net_execution* receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream);
+    net_execution* receive_task(IAgent* agent, unsigned int sessionId, IGenericStream* inStream);
 
 private:
 };

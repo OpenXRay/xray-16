@@ -19,7 +19,7 @@ class CIKFoot
 {
 public:
     CIKFoot();
-    void Create(IKinematics* K, LPCSTR section, u16 bones[4]);
+    void Create(IKinematics* K, const char* section, u16 bones[4]);
     IC void set_ref_bone(u16 ref_bone) { m_ref_bone = ref_bone; }
     void set_ref_bone();
     u16 get_ref_bone(const Fmatrix& foot_transform, const Fmatrix& toe_transform) const;

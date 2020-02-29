@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC CALifeStorageManager::CALifeStorageManager(IPureServer* server, LPCSTR section) : inherited(server, section)
+IC CALifeStorageManager::CALifeStorageManager(IPureServer* server, const char* section) : inherited(server, section)
 {
     m_section = section;
     xr_strcpy(m_save_name, "");

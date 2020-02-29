@@ -18,8 +18,8 @@ namespace aimers
 class weapon : public base
 {
 public:
-    weapon(CGameObject* object, LPCSTR animation_id, bool animation_start, Fvector const& target, LPCSTR bone0,
-        LPCSTR bone1, LPCSTR weapon_bone0, LPCSTR weapon_bone1, CWeapon const& weapon);
+    weapon(CGameObject* object, const char* animation_id, bool animation_start, Fvector const& target, const char* bone0,
+        const char* bone1, const char* weapon_bone0, const char* weapon_bone1, CWeapon const& weapon);
     inline Fmatrix const& get_bone(u32 const& bone_id) const;
 
 private:

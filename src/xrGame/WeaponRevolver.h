@@ -9,7 +9,7 @@ public:
     CWeaponRevolver();
     virtual ~CWeaponRevolver();
 
-    void Load(LPCSTR section) override;
+    void Load(const char* section) override;
 
     void switch2_Reload() override;
 

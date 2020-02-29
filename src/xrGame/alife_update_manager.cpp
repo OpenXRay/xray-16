@@ -50,7 +50,7 @@ public:
     }
 };
 
-CALifeUpdateManager::CALifeUpdateManager(IPureServer* server, LPCSTR section)
+CALifeUpdateManager::CALifeUpdateManager(IPureServer* server, const char* section)
     : CALifeSwitchManager(server, section), CALifeSurgeManager(server, section), CALifeStorageManager(server, section),
       CALifeSimulatorBase(server, section)
 {
@@ -187,7 +187,7 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
 
     string256 autoave_name;
     strconcat(sizeof(autoave_name), autoave_name, Core.UserName, " - ", "autosave");
-    LPCSTR temp0 = strchr(**m_server_command_line, '/');
+    const char* temp0 = strchr(**m_server_command_line, '/');
     VERIFY(temp0);
     string256 temp;
     *m_server_command_line = strconcat(sizeof(temp), temp, autoave_name, temp0);
@@ -213,7 +213,7 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
 }
 
 #include "xrEngine/IGame_Persistent.h"
-void CALifeUpdateManager::new_game(LPCSTR save_name)
+void CALifeUpdateManager::new_game(const char* save_name)
 {
     g_pGamePersistent->SetLoadStageTitle("st_creating_new_game");
     g_pGamePersistent->LoadTitle();
@@ -243,7 +243,7 @@ void CALifeUpdateManager::new_game(LPCSTR save_name)
     Msg("* New game is successfully created!");
 }
 
-void CALifeUpdateManager::load(LPCSTR game_name, bool no_assert, bool new_only)
+void CALifeUpdateManager::load(const char* game_name, bool no_assert, bool new_only)
 {
     g_pGamePersistent->SetLoadStageTitle("st_loading_alife_simulator");
     g_pGamePersistent->LoadTitle();
@@ -272,14 +272,14 @@ void CALifeUpdateManager::load(LPCSTR game_name, bool no_assert, bool new_only)
     g_pGamePersistent->LoadTitle(true, g_pGameLevel->name());
 }
 
-void CALifeUpdateManager::reload(LPCSTR section)
+void CALifeUpdateManager::reload(const char* section)
 {
     CALifeSimulatorBase::reload(section);
     set_process_time((int)m_max_process_time);
     objects_per_update(m_objects_per_update);
 }
 
-bool CALifeUpdateManager::load_game(LPCSTR game_name, bool no_assert)
+bool CALifeUpdateManager::load_game(const char* game_name, bool no_assert)
 {
     {
         string_path temp, file_name;
@@ -299,7 +299,7 @@ bool CALifeUpdateManager::load_game(LPCSTR game_name, bool no_assert)
 
     string512 S, S1;
     xr_strcpy(S, **m_server_command_line);
-    LPSTR temp = strchr(S, '/');
+    char* temp = strchr(S, '/');
     R_ASSERT2(temp, "Invalid server options!");
     strconcat(sizeof(S1), S1, game_name, temp);
     *m_server_command_line = S1;
@@ -327,7 +327,7 @@ void CALifeUpdateManager::set_interactive(ALife::_OBJECT_ID id, bool value)
     object->interactive(value);
 }
 
-void CALifeUpdateManager::jump_to_level(LPCSTR level_name) const
+void CALifeUpdateManager::jump_to_level(const char* level_name) const
 {
     const CGameGraph::SLevel& level = ai().game_graph().header().level(level_name);
     GameGraph::_GRAPH_ID dest = GameGraph::_GRAPH_ID(-1);

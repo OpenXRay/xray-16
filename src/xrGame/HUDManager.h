@@ -46,8 +46,8 @@ public:
 #endif
     void ShowCrosshair(bool show);
 
-    void SetHitmarkType(LPCSTR tex_name);
-    void SetGrenadeMarkType(LPCSTR tex_name);
+    void SetHitmarkType(const char* tex_name);
+    void SetGrenadeMarkType(const char* tex_name);
 
     void OnUIReset() override;
 

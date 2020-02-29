@@ -30,16 +30,16 @@ defined(_UNKNOWN_ENVIRONMENT_) != \
 #include <windows.h>
 #else /* _DOS32_ENVIRONMENT_ || _POSIX_ENVIRONMENT_ || _UNKNOWN_ENVIRONMENT_ */
 #include "stdafx.h"
-//typedef int BOOL;
+//typedef int bool;
 //#define FALSE 0
 //#define TRUE 1
-//typedef unsigned char BYTE;
-//typedef unsigned short WORD;
-//typedef unsigned long DWORD;
-//typedef unsigned int UINT;
+//typedef unsigned char unsigned char;
+//typedef unsigned short unsigned short;
+//typedef unsigned long unsigned int;
+//typedef unsigned int unsigned int;
 #endif /* defined(_WIN32_ENVIRONMENT_)  */
 
-const DWORD PPMdSignature = 0x84ACAF8F, Variant = 'I';
+const unsigned int PPMdSignature = 0x84ACAF8F, Variant = 'I';
 const int MAX_O = 16; /* maximum allowed model order  */
 
 #define _USE_PREFETCHING /* for puzzling mainly          */
@@ -89,10 +89,10 @@ enum { BUF_SIZE=64*1024 };
     int  put(int c) { return (--Count >= 0)?(*p++ = c):(flush(c)); }
     int  getErr() const { return Error; }
     int    tell() const { return StrPos+(p-Buf); }
-    BOOL  atEOS() const { return (Count < 0); }
+    bool  atEOS() const { return (Count < 0); }
 protected:
     int Error, StrPos, Count;
-    BYTE* p, Buf[BUF_SIZE];
+    unsigned char* p, Buf[BUF_SIZE];
     virtual int  fill(     ) = 0;           // it must fill Buf[]
     virtual int flush(int c) = 0;           // it must remove (p-Buf) bytes
 };

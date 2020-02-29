@@ -10,7 +10,7 @@
 // T_ID, T_INDEX -	тип индекса и id
 
 // ITEM_DATA		-	структура с полями id и index типа T_ID и T_INDEX,
-//					обязательно имеет конструктор с параметрами (T_INDEX index, T_ID id, LPCSTR r1, ..., LPCSTR rN)
+//					обязательно имеет конструктор с параметрами (T_INDEX index, T_ID id, const char* r1, ..., const char* rN)
 //					N = ITEM_REC_NUM - число доп. параметров в ITEM_DATA
 
 // T_INIT		-	класс где определена статическая InitIdToIndex
@@ -32,12 +32,12 @@ protected:
     static T_VECTOR* m_pItemDataVector;
 
     template <bool isNum>
-    static void LoadItemData(u32 count, LPCSTR cfgRecord)
+    static void LoadItemData(u32 count, const char* cfgRecord)
     {
         for (u32 k = 0; k < count; k += 1)
         {
             string64 buf;
-            LPCSTR id_str = _GetItem(cfgRecord, k, buf);
+            const char* id_str = _GetItem(cfgRecord, k, buf);
             char* id_str_lwr = xr_strdup(id_str); // not used?
             xr_strlwr(id_str_lwr);
 
@@ -49,7 +49,7 @@ protected:
             else
             {
                 string64 buf1;
-                LPCSTR rec1 = _GetItem(cfgRecord, ++k, buf1);
+                const char* rec1 = _GetItem(cfgRecord, ++k, buf1);
                 ITEM_DATA item_data(T_INDEX(m_pItemDataVector->size()), T_ID(id_str), rec1);
                 m_pItemDataVector->push_back(item_data);
             }
@@ -58,8 +58,8 @@ protected:
     }
 
     //имя секции и линии откуда будут загружаться id
-    static LPCSTR section_name;
-    static LPCSTR line_name;
+    static const char* section_name;
+    static const char* line_name;
 
 public:
     CIni_IdToIndex();
@@ -89,9 +89,9 @@ TEMPLATE_SPECIALIZATION
 typename CSINI_IdToIndex::T_VECTOR* CSINI_IdToIndex::m_pItemDataVector = NULL;
 
 TEMPLATE_SPECIALIZATION
-LPCSTR CSINI_IdToIndex::section_name = NULL;
+const char* CSINI_IdToIndex::section_name = NULL;
 TEMPLATE_SPECIALIZATION
-LPCSTR CSINI_IdToIndex::line_name = NULL;
+const char* CSINI_IdToIndex::line_name = NULL;
 
 TEMPLATE_SPECIALIZATION
 CSINI_IdToIndex::CIni_IdToIndex() {}
@@ -141,7 +141,7 @@ void CSINI_IdToIndex::InitInternal()
         VERIFY(section_name);
         VERIFY(line_name);
 
-        LPCSTR cfgRecord = pSettings->r_string(section_name, line_name);
+        const char* cfgRecord = pSettings->r_string(section_name, line_name);
         VERIFY(cfgRecord);
         u32 count = _GetItemCount(cfgRecord);
         LoadItemData<ITEM_REC_NUM>(count, cfgRecord);

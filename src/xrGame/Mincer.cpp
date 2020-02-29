@@ -31,7 +31,7 @@ void CMincer::OnStateSwitch(EZoneState new_state)
     inherited::OnStateSwitch(new_state);
 }
 
-void CMincer::Load(LPCSTR section)
+void CMincer::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -44,9 +44,9 @@ void CMincer::Load(LPCSTR section)
     // pSettings->r_fvector3(section,whirlwind_center);
 }
 
-BOOL CMincer::net_Spawn(CSE_Abstract* DC)
+bool CMincer::net_Spawn(CSE_Abstract* DC)
 {
-    BOOL result = inherited::net_Spawn(DC);
+    bool result = inherited::net_Spawn(DC);
     Fvector C;
     Center(C);
     C.y += m_fTeleHeight;

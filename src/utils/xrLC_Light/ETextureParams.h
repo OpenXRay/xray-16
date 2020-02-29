@@ -142,13 +142,13 @@ struct /*ECORE_API*/ STextureParams
         bump_virtual_height = 0.05f;
     }
 
-    BOOL HasAlpha()
+    bool HasAlpha()
     {
         // исходная текстура содержит альфа канал
         return flags.is(flHasAlpha);
     }
 
-    BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
+    bool HasAlphaChannel() // игровая текстура содержит альфа канал
     {
         switch (fmt)
         {
@@ -165,15 +165,15 @@ struct /*ECORE_API*/ STextureParams
     void Save(IWriter& F);
     void read(INetReader& r);
     void write(IWriter& w) const;
-    BOOL HasSurface() const { return flags.is(flHasSurface); }
-    void SetHasSurface(BOOL val) { flags.set(flHasSurface, val); }
+    bool HasSurface() const { return flags.is(flHasSurface); }
+    void SetHasSurface(bool val) { flags.set(flHasSurface, val); }
 #ifdef _EDITOR
     PropValue::TOnChange OnTypeChangeEvent;
     void __stdcall OnTypeChange(PropValue* v);
-    void FillProp(LPCSTR base_name, PropItemVec& items, PropValue::TOnChange OnChangeEvent);
-    LPCSTR FormatString();
-    u32 MemoryUsage(LPCSTR base_name);
-    BOOL similar(STextureParams& tp1, xr_vector<AnsiString>& sel_params);
+    void FillProp(const char* base_name, PropItemVec& items, PropValue::TOnChange OnChangeEvent);
+    const char* FormatString();
+    u32 MemoryUsage(const char* base_name);
+    bool similar(STextureParams& tp1, xr_vector<AnsiString>& sel_params);
 
 #endif
 };

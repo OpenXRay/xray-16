@@ -23,7 +23,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
     u32 fvf = 0;
     VertexElement* vFormat = nullptr;
     dwPrimitives = 0;
-    BOOL loaded_v = false;
+    bool loaded_v = false;
 
     if (data->find_chunk(OGF_GCONTAINER))
     {
@@ -119,7 +119,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             vStride = GetFVFVertexSize(fvf);
             p_rm_Vertices = new VertexStagingBuffer{};
             p_rm_Vertices->Create(vCount * vStride);
-            BYTE* bytes = static_cast<BYTE*>(p_rm_Vertices->Map());
+            unsigned char* bytes = static_cast<unsigned char*>(p_rm_Vertices->Map());
             CopyMemory(bytes, data->pointer(), vCount * vStride);
             p_rm_Vertices->Unmap(true); // upload vertex data
         }
@@ -152,7 +152,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             VERIFY(nullptr == p_rm_Indices);
             p_rm_Indices = new IndexStagingBuffer{};
             p_rm_Indices->Create(iCount * 2, true); // indices are read in model-wallmarks code
-            BYTE* bytes = static_cast<BYTE*>(p_rm_Indices->Map());
+            unsigned char* bytes = static_cast<unsigned char*>(p_rm_Indices->Map());
             CopyMemory(bytes, data->pointer(), iCount * 2);
             p_rm_Indices->Unmap(true); // upload index data
         }

@@ -18,7 +18,7 @@ namespace PS
 {
 class CParticleEffect;
 
-typedef BOOL (*CollisionCallback)(
+typedef bool (*CollisionCallback)(
     CParticleEffect* E, PAPI::Particle& P, const Fvector& pt, const Fvector& norm); // TRUE-continue collision exec
 typedef void (*DestroyCallback)(CParticleEffect* E, PAPI::Particle& P);
 
@@ -89,8 +89,8 @@ public:
     float m_fCollideResilience;
     float m_fCollideSqrCutoff;
 
-    BOOL SaveActionList(IWriter& F);
-    BOOL LoadActionList(IReader& F);
+    bool SaveActionList(IWriter& F);
+    bool LoadActionList(IReader& F);
     // execute
     void ExecuteAnimate(PAPI::Particle* particles, u32 p_cnt, float dt);
     void ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CParticleEffect* owner, CollisionCallback cb);
@@ -98,16 +98,16 @@ public:
     CPEDef();
     ~CPEDef();
 
-    void SetName(LPCSTR name);
-    LPCSTR Name() const { return *m_Name; }
+    void SetName(const char* name);
+    const char* Name() const { return *m_Name; }
     void CreateShader();
     void DestroyShader();
 
     void Save(IWriter& F);
-    BOOL Load(IReader& F);
+    bool Load(IReader& F);
 
     void Save2(CInifile& ini);
-    BOOL Load2(CInifile& ini);
+    bool Load2(CInifile& ini);
 
 #ifdef _EDITOR
     // change Copy&Equal if variables changed
@@ -116,7 +116,7 @@ public:
     EPAVec m_EActionList;
 
 public:
-    void __stdcall FindActionByName(LPCSTR new_name, bool& res);
+    void __stdcall FindActionByName(const char* new_name, bool& res);
     bool __stdcall NameOnAfterEdit(PropValue* sender, shared_str& edit_val);
     bool __stdcall CollisionFrictionOnAfterEdit(PropValue* sender, float& edit_val);
     void __stdcall CollisionFrictionOnBeforeEdit(PropValue* sender, float& edit_val);
@@ -131,11 +131,11 @@ public:
     void __stdcall OnControlClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
     void __stdcall OnActionsClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
     bool __stdcall OnAfterActionNameEdit(PropValue* sender, shared_str& edit_val);
-    void FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner);
+    void FillProp(const char* pref, ::PropItemVec& items, ::ListItem* owner);
     void Copy(const CPEDef& src);
-    BOOL Equal(const CPEDef* pe);
+    bool Equal(const CPEDef* pe);
     void Render(const Fmatrix& parent);
-    static PFunction* FindCommandPrototype(LPCSTR src, LPCSTR& dest);
+    static PFunction* FindCommandPrototype(const char* src, const char*& dest);
     void __stdcall FillActionList(ChooseItemVec& items, void* param);
     bool Validate(bool bMsg);
     void Compile(EPAVec& v);

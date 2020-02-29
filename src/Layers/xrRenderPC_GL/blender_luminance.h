@@ -3,9 +3,9 @@
 class CBlender_luminance : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: luminance estimate"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: luminance estimate"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 

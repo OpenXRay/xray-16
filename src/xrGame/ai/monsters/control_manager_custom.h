@@ -34,7 +34,7 @@ class CControlManagerCustom : public CControl_ComBase
 
     SControlMeleeJumpData m_melee_jump_data;
 
-    LPCSTR m_threaten_anim;
+    const char* m_threaten_anim;
     float m_threaten_time;
 
 public:
@@ -61,7 +61,7 @@ public:
     // Triple Animation
     void ta_activate(const SAnimationTripleData& data);
     void ta_pointbreak();
-    void ta_fill_data(SAnimationTripleData& data, LPCSTR s1, LPCSTR s2, LPCSTR s3, bool execute_once, bool skip_prep,
+    void ta_fill_data(SAnimationTripleData& data, const char* s1, const char* s2, const char* s3, bool execute_once, bool skip_prep,
         u32 capture_type = ControlCom::eCaptureDir | ControlCom::eCapturePath | ControlCom::eCaptureMovement);
     bool ta_is_active();
     bool ta_is_active(const SAnimationTripleData& data);
@@ -73,7 +73,7 @@ public:
     bool jump(const SControlJumpData& ta);
     void jump(const Fvector& position);
     void load_jump_data(
-        LPCSTR s1, LPCSTR s2, LPCSTR s3, LPCSTR s4, u32 vel_mask_prepare, u32 vel_mask_ground, u32 flags);
+        const char* s1, const char* s2, const char* s3, const char* s4, u32 vel_mask_prepare, u32 vel_mask_ground, u32 flags);
     bool is_jumping();
 
     bool check_if_jump_possible(Fvector const& target, bool full_check);
@@ -85,18 +85,18 @@ public:
     void script_release(ControlCom::EControlType type);
     //-------------------------------------------------------------------------------
     // Rotation Jump
-    void add_rotation_jump_data(LPCSTR left1, LPCSTR left2, LPCSTR right1, LPCSTR right2, float angle, u32 flags = 0);
-    void add_melee_jump_data(LPCSTR left, LPCSTR right);
+    void add_rotation_jump_data(const char* left1, const char* left2, const char* right1, const char* right2, float angle, u32 flags = 0);
+    void add_melee_jump_data(const char* left, const char* right);
 
     //-------------------------------------------------------------------------------
     // Threaten Animation
-    void set_threaten_data(LPCSTR anim, float time)
+    void set_threaten_data(const char* anim, float time)
     {
         m_threaten_anim = anim;
         m_threaten_time = time;
     }
 
-    void critical_wound(LPCSTR anim);
+    void critical_wound(const char* anim);
 
     void remove_links(IGameObject* object);
 
@@ -109,6 +109,6 @@ private:
     void check_run_attack();
     void check_threaten();
 
-    void fill_rotation_data(SControlRotationJumpData& data, LPCSTR left1, LPCSTR left2, LPCSTR right1, LPCSTR right2,
+    void fill_rotation_data(SControlRotationJumpData& data, const char* left1, const char* left2, const char* right1, const char* right2,
         float angle, u32 flags);
 };

@@ -6,9 +6,9 @@
 #include "Layers/xrRender/blenders/Blender.h"
 #include "Layers/xrRender/tss.h"
 
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(char* fn);
 
-void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
+void CBlender_Compile::r_Stencil(bool Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
 {
     RS.SetRS(D3DRS_STENCILENABLE, BC(Enable));
     if (!Enable)
@@ -30,7 +30,7 @@ void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask,
 
 void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetRS(D3DRS_STENCILREF, Ref); }
 void CBlender_Compile::r_CullMode(D3DCULL Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
-void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
+void CBlender_Compile::r_dx10Texture(const char* ResourceName, const char* texture, bool recursive /*= false*/)
 {
     if (ctable.dx9compatibility && !recursive)
     {
@@ -59,13 +59,13 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool r
     passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
 }
 
-void CBlender_Compile::i_dx10FilterAnizo(u32 s, BOOL value)
+void CBlender_Compile::i_dx10FilterAnizo(u32 s, bool value)
 {
     VERIFY(s != u32(-1));
     RS.SetSAMP(s, XRDX10SAMP_ANISOTROPICFILTER, value);
 }
 
-u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
+u32 CBlender_Compile::r_dx10Sampler(const char* ResourceName)
 {
     // TODO: DX10: Check if we can use dwStage
     u32 stage = i_Sampler(ResourceName);
@@ -129,8 +129,8 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     return stage;
 }
 
-void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
-                              D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+void CBlender_Compile::r_Pass(const char* _vs, const char* _gs, const char* _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
+    D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
     ctable.clear();
@@ -172,8 +172,8 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
 }
 
 #ifdef USE_DX11
-void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest,
-    BOOL bZwrite, BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+void CBlender_Compile::r_TessPass(const char* vs, const char* hs, const char* ds, const char* gs, const char* ps, bool bFog, bool bZtest,
+    bool bZwrite, bool bABlend, D3DBLEND abSRC, D3DBLEND abDST, bool aTest, u32 aRef)
 {
     r_Pass(vs, gs, ps, bFog, bZtest, bZwrite, bABlend, abSRC, abDST, aTest, aRef);
 
@@ -184,7 +184,7 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
     ctable.merge(&dest.ds->constants);
 }
 
-void CBlender_Compile::r_ComputePass(LPCSTR cs)
+void CBlender_Compile::r_ComputePass(const char* cs)
 {
     dest.cs = RImplementation.Resources->_CreateCS(cs);
 

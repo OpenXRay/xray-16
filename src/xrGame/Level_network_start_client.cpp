@@ -73,9 +73,9 @@ bool CLevel::net_start_client3()
 {
     if (connected_to_server)
     {
-        LPCSTR level_name = NULL;
-        LPCSTR level_ver = NULL;
-        LPCSTR download_url = NULL;
+        const char* level_name = NULL;
+        const char* level_ver = NULL;
+        const char* download_url = NULL;
 
         if (psNET_direct_connect) // single
         {

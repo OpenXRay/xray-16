@@ -242,7 +242,7 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void generate_jitter(DWORD* dest, u32 elem_count)
+void generate_jitter(unsigned int* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -250,7 +250,7 @@ void generate_jitter(DWORD* dest, u32 elem_count)
     {
         Ivector2 test;
         test.set(::Random.randI(0, 256), ::Random.randI(0, 256));
-        BOOL valid = TRUE;
+        bool valid = TRUE;
         for (u32 t = 0; t < samples.size(); t++)
         {
             int dist = _abs(test.x - samples[t].x) + _abs(test.y - samples[t].y);
@@ -338,7 +338,7 @@ CRenderTarget::CRenderTarget()
 
         for (int i = 0; i < bound; ++i)
         {
-            static LPCSTR SampleDefs[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
+            static const char* SampleDefs[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
             b_combine_msaa[i] = new CBlender_combine_msaa();
             b_accum_mask_msaa[i] = new CBlender_accum_direct_mask_msaa();
             b_accum_direct_msaa[i] = new CBlender_accum_direct_msaa();
@@ -475,7 +475,7 @@ CRenderTarget::CRenderTarget()
 
             if (RImplementation.o.dx10_msaa)
             {
-                static LPCSTR snames[] = {"accum_volumetric_sun_msaa0", "accum_volumetric_sun_msaa1",
+                static const char* snames[] = {"accum_volumetric_sun_msaa0", "accum_volumetric_sun_msaa1",
                     "accum_volumetric_sun_msaa2", "accum_volumetric_sun_msaa3", "accum_volumetric_sun_msaa4",
                     "accum_volumetric_sun_msaa5", "accum_volumetric_sun_msaa6", "accum_volumetric_sun_msaa7"};
                 int bound = RImplementation.o.dx10_msaa_samples;
@@ -516,7 +516,7 @@ CRenderTarget::CRenderTarget()
 
         if (RImplementation.o.dx10_msaa)
         {
-            static LPCSTR SampleDefs[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
+            static const char* SampleDefs[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
             CBlender_rain_msaa TempBlender[8];
 
             int bound = RImplementation.o.dx10_msaa_samples;
@@ -624,7 +624,7 @@ CRenderTarget::CRenderTarget()
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
             // u_setrt						(rt_LUM_pool[it],	0,	0,	0			);
             // CHK_DX						(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0x7f7f7f7f,	1.0f, 0L));
-            FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
+            float ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
             HW.pContext->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
         }
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
@@ -770,7 +770,7 @@ CRenderTarget::CRenderTarget()
                 {
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
-                        u16* p = (u16*)(LPBYTE(subData.pSysMem) + slice * subData.SysMemSlicePitch +
+                        u16* p = (u16*)((unsigned char*)(subData.pSysMem) + slice * subData.SysMemSlicePitch +
                             y * subData.SysMemPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
                         float ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
@@ -883,11 +883,11 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    DWORD data[TEX_jitter_count - 1];
+                    unsigned int data[TEX_jitter_count - 1];
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it = 0; it < TEX_jitter_count - 1; it++)
                     {
-                        u32* p = (u32*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);
+                        u32* p = (u32*)((unsigned char*)(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);
 
                         *p = data[it];
                     }
@@ -948,7 +948,7 @@ CRenderTarget::CRenderTarget()
                     float dist = ::Random.randF(0.0f, 1.0f);
 
                     float* p =
-                        (float*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4 * sizeof(float));
+                        (float*)((unsigned char*)(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4 * sizeof(float));
                     *p = (float)(_cos(angle));
                     *(p + 1) = (float)(_sin(angle));
                     *(p + 2) = (float)(dist);

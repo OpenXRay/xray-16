@@ -8,7 +8,7 @@
 #include "ai/trader/ai_trader.h"
 #include "ai/trader/trader_animation.h"
 
-void CScriptGameObject::set_trader_global_anim(LPCSTR anim)
+void CScriptGameObject::set_trader_global_anim(const char* anim)
 {
     CAI_Trader* trader = smart_cast<CAI_Trader*>(&object());
     if (!trader)
@@ -18,7 +18,7 @@ void CScriptGameObject::set_trader_global_anim(LPCSTR anim)
     }
     trader->animation().set_animation(anim);
 }
-void CScriptGameObject::set_trader_head_anim(LPCSTR anim)
+void CScriptGameObject::set_trader_head_anim(const char* anim)
 {
     CAI_Trader* trader = smart_cast<CAI_Trader*>(&object());
     if (!trader)
@@ -29,7 +29,7 @@ void CScriptGameObject::set_trader_head_anim(LPCSTR anim)
     trader->animation().set_head_animation(anim);
 }
 
-void CScriptGameObject::set_trader_sound(LPCSTR sound, LPCSTR anim)
+void CScriptGameObject::set_trader_sound(const char* sound, const char* anim)
 {
     CAI_Trader* trader = smart_cast<CAI_Trader*>(&object());
     if (!trader)
@@ -40,7 +40,7 @@ void CScriptGameObject::set_trader_sound(LPCSTR sound, LPCSTR anim)
     trader->animation().set_sound(sound, anim);
 }
 
-void CScriptGameObject::external_sound_start(LPCSTR sound)
+void CScriptGameObject::external_sound_start(const char* sound)
 {
     CAI_Trader* trader = smart_cast<CAI_Trader*>(&object());
     if (!trader)

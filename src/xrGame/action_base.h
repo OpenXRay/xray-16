@@ -49,20 +49,20 @@ protected:
 
 #ifdef LOG_ACTION
 public:
-    LPCSTR m_action_name;
+    const char* m_action_name;
     bool m_use_log;
     bool m_switched;
 
 public:
     virtual void debug_log(const EActionStates state_state) const;
     virtual void set_use_log(bool value);
-    virtual void show(LPCSTR offset = "");
+    virtual void show(const char* offset = "");
 #endif
 
 public:
-    IC CActionBase(_object_type* object, LPCSTR action_name = "");
+    IC CActionBase(_object_type* object, const char* action_name = "");
     virtual ~CActionBase();
-    IC void init(_object_type* object, LPCSTR action_name);
+    IC void init(_object_type* object, const char* action_name);
     virtual void setup(_object_type* object, CPropertyStorage* storage);
     virtual void initialize();
     virtual void execute();

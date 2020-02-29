@@ -18,7 +18,7 @@ class CUINewsItemWnd : public CUIWindow
 public:
     CUINewsItemWnd();
     virtual ~CUINewsItemWnd();
-    void Init(CUIXml& uiXml, LPCSTR start_from);
+    void Init(CUIXml& uiXml, const char* start_from);
     void Setup(GAME_NEWS_DATA& news_data);
     virtual void Update(){};
 };

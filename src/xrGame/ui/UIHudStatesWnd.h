@@ -86,7 +86,7 @@ public:
     CUIHudStatesWnd();
     virtual ~CUIHudStatesWnd();
 
-    void InitFromXml(CUIXml& xml, LPCSTR path);
+    void InitFromXml(CUIXml& xml, const char* path);
     void Load_section();
     virtual void Update();
     //	virtual void	Draw				();
@@ -109,7 +109,7 @@ public:
 protected:
     static ALife::EInfluenceType get_indik_type(ALife::EHitType hit_type);
 
-    void Load_section_type(ALife::EInfluenceType type, LPCSTR section);
+    void Load_section_type(ALife::EInfluenceType type, const char* section);
     void UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type);
     void SwitchLA(bool state, ALife::EInfluenceType type);
 

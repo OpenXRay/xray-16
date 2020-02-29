@@ -10,7 +10,7 @@
 
 CRadioactiveZone::CRadioactiveZone(void) {}
 CRadioactiveZone::~CRadioactiveZone(void) {}
-void CRadioactiveZone::Load(LPCSTR section) { inherited::Load(section); }
+void CRadioactiveZone::Load(const char* section) { inherited::Load(section); }
 bool CRadioactiveZone::BlowoutState()
 {
     bool result = inherited::BlowoutState();

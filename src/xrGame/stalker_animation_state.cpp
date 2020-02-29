@@ -18,7 +18,7 @@ CStalkerAnimationState::CStalkerAnimationState(const CStalkerAnimationState& sta
 }
 
 CStalkerAnimationState::~CStalkerAnimationState() { xr_delete(m_in_place); }
-void CStalkerAnimationState::Load(IKinematicsAnimated* kinematics, LPCSTR base_name)
+void CStalkerAnimationState::Load(IKinematicsAnimated* kinematics, const char* base_name)
 {
     string256 S;
     m_global.Load(kinematics, base_name);

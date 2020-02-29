@@ -9,7 +9,7 @@
 #include "StdAfx.h"
 #include "object_factory.h"
 
-CSE_Abstract* F_entity_Create(LPCSTR section)
+CSE_Abstract* F_entity_Create(const char* section)
 {
     return (object_factory().server_object(pSettings->r_clsid(section, "class"), section));
 }

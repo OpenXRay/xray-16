@@ -12,7 +12,7 @@
 #define RANK_KILL_TABLE_SECT "rank_kill_points"
 
 //////////////////////////////////////////////////////////////////////////
-RANK_DATA::RANK_DATA(int idx, shared_str idn, LPCSTR threshold_str)
+RANK_DATA::RANK_DATA(int idx, shared_str idn, const char* threshold_str)
 {
     index = idx;
     id = idn;

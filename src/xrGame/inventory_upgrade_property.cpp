@@ -30,29 +30,29 @@ void Property::construct(shared_str const& property_id, Manager& manager_r)
     m_icon._set(pSettings->r_string(id(), "icon"));
 
     // functor
-    LPCSTR functor_str = pSettings->r_string(id(), "functor");
+    const char* functor_str = pSettings->r_string(id(), "functor");
     m_desc.parameter = "";
     m_desc.parameter2 = id_str();
     R_ASSERT2(GEnv.ScriptEngine->functor(functor_str, m_desc.functr),
         make_string("Failed to get upgrade property functor in section[%s], functor[%s]", id_str(), functor_str));
     m_desc(); // test
 
-    LPCSTR funct_params_str = pSettings->r_string(id(), "params");
+    const char* funct_params_str = pSettings->r_string(id(), "params");
     u32 const buffer_size = (xr_strlen(funct_params_str) + 1) * sizeof(char);
     PSTR temp = (PSTR)xr_alloca(buffer_size);
     for (int n = _GetItemCount(funct_params_str), i = 0; i < n; ++i)
     {
-        LPCSTR i_param = (_GetItem(funct_params_str, i, temp, buffer_size));
+        const char* i_param = (_GetItem(funct_params_str, i, temp, buffer_size));
         m_functor_params.push_back(i_param);
     }
 }
 
-bool Property::run_functor(LPCSTR parameter, string256& result)
+bool Property::run_functor(const char* parameter, string256& result)
 {
     result[0] = 0;
 
     m_desc.parameter = parameter;
-    LPCSTR functor_res = m_desc(); // execute !!!
+    const char* functor_res = m_desc(); // execute !!!
     if (!functor_res || !xr_strcmp(functor_res, ""))
     {
         return false;

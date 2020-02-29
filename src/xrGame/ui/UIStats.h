@@ -11,5 +11,5 @@ class CUIStats : public CUIScrollView
 public:
     CUIStats();
     virtual ~CUIStats();
-    CUIWindow* InitStats(CUIXml& xml_doc, LPCSTR path, int team);
+    CUIWindow* InitStats(CUIXml& xml_doc, const char* path, int team);
 };

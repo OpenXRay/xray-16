@@ -17,7 +17,7 @@ float CBreakableObject::m_health_threshhold = 0.f;
 float CBreakableObject::m_immunity_factor = 0.1f;
 CBreakableObject::CBreakableObject() { Init(); }
 CBreakableObject::~CBreakableObject() {}
-void CBreakableObject::Load(LPCSTR section)
+void CBreakableObject::Load(const char* section)
 {
     inherited::Load(section);
     m_remove_time = pSettings->r_u32(section, "remove_time") * 1000;
@@ -28,7 +28,7 @@ void CBreakableObject::Load(LPCSTR section)
     this->shedule.t_max = 1000;
 }
 
-BOOL CBreakableObject::net_Spawn(CSE_Abstract* DC)
+bool CBreakableObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectBreakable* obj = smart_cast<CSE_ALifeObjectBreakable*>(e);
@@ -92,7 +92,7 @@ void CBreakableObject::Hit(SHit* pHDS)
 
 void CBreakableObject::net_Export(NET_Packet& P) { VERIFY(Local()); }
 void CBreakableObject::net_Import(NET_Packet& P) { VERIFY(Remote()); }
-BOOL CBreakableObject::UsedAI_Locations() { return (FALSE); }
+bool CBreakableObject::UsedAI_Locations() { return (FALSE); }
 void CBreakableObject::CreateUnbroken()
 {
     m_pUnbrokenObject = P_BuildStaticGeomShell((this), BreakableObjectCollisionCallback);

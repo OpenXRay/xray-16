@@ -102,7 +102,7 @@ void SimulatorStates::set_SAMP(u32 a, u32 b, u32 c)
     States.push_back(st);
 }
 
-BOOL SimulatorStates::equal(SimulatorStates& S)
+bool SimulatorStates::equal(SimulatorStates& S)
 {
     if (States.size() != S.States.size())
         return FALSE;
@@ -227,9 +227,9 @@ void SimulatorStates::UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const
 
             case D3DRS_STENCILENABLE: desc.StencilEnable = S.v2 ? 1 : 0; break;
 
-            case D3DRS_STENCILMASK: desc.StencilReadMask = (UINT8)S.v2; break;
+            case D3DRS_STENCILMASK: desc.StencilReadMask = (unsigned char)S.v2; break;
 
-            case D3DRS_STENCILWRITEMASK: desc.StencilWriteMask = (UINT8)S.v2; break;
+            case D3DRS_STENCILWRITEMASK: desc.StencilWriteMask = (unsigned char)S.v2; break;
 
             case D3DRS_STENCILFAIL:
                 desc.FrontFace.StencilFailOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
@@ -479,12 +479,12 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 desc.AddressW = dx10StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
-            // FLOAT MipLODBias
+            // float MipLODBias
             case D3DSAMP_MIPMAPLODBIAS:
                 desc.MipLODBias = *((float*)(&(S.v3)));
                 break;
 
-            // UINT MaxAnisotropy;
+            // unsigned int MaxAnisotropy;
             case D3DSAMP_MAXANISOTROPY:
                 desc.MaxAnisotropy = S.v3;
                 break;
@@ -494,7 +494,7 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 desc.ComparisonFunc = (D3D_COMPARISON_FUNC)S.v3;
                 break;
 
-            // FLOAT BorderColor[4];
+            // float BorderColor[4];
             case D3DSAMP_BORDERCOLOR:
             {
                 desc.BorderColor[0] = ((S.v3 >> 16) & 0xff) / 255.0f;
@@ -504,13 +504,13 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
             }
             break;
 
-            // FLOAT MinLOD;
+            // float MinLOD;
             case XRDX10SAMP_MINLOD:
-                desc.MinLOD = (FLOAT)S.v3;
+                desc.MinLOD = (float)S.v3;
                 break;
 
-            // FLOAT MaxLOD;
-            case D3DSAMP_MAXMIPLEVEL: desc.MaxLOD = (FLOAT)S.v3; break;
+            // float MaxLOD;
+            case D3DSAMP_MAXMIPLEVEL: desc.MaxLOD = (float)S.v3; break;
             }
         }
     }

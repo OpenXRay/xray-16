@@ -77,7 +77,7 @@ void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
     u32 vl_mPosition = mPosition / Stride + 1;
 
     // Check if there is need to flush and perform lock
-    BYTE* pData = nullptr;
+    unsigned char* pData = nullptr;
 #ifdef USE_OGL
     glBindBuffer(GL_ARRAY_BUFFER, pVB);
 #endif // USE_OGL
@@ -89,10 +89,10 @@ void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
         mDiscardID++;
 
 #if defined (USE_OGL)
-        CHK_GL(pData = (BYTE*)glMapBufferRange(GL_ARRAY_BUFFER, mPosition, bytes_need, LOCKFLAGS_FLUSH));
+        CHK_GL(pData = (unsigned char*)glMapBufferRange(GL_ARRAY_BUFFER, mPosition, bytes_need, LOCKFLAGS_FLUSH));
 #elif defined(USE_DX11)
         HW.pContext->Map(pVB, 0, D3D_MAP_WRITE_DISCARD, 0, &MappedSubRes);
-        pData = (BYTE*)MappedSubRes.pData;
+        pData = (unsigned char*)MappedSubRes.pData;
         pData += vOffset;
 #elif defined(USE_DX10)
         pVB->Map(D3D_MAP_WRITE_DISCARD, 0, (void**)&pData);
@@ -115,10 +115,10 @@ void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
         vOffset = vl_mPosition;
 
 #if defined(USE_OGL)
-        CHK_GL(pData = (BYTE*)glMapBufferRange(GL_ARRAY_BUFFER, mPosition, bytes_need, LOCKFLAGS_APPEND));
+        CHK_GL(pData = (unsigned char*)glMapBufferRange(GL_ARRAY_BUFFER, mPosition, bytes_need, LOCKFLAGS_APPEND));
 #elif defined(USE_DX11)
         HW.pContext->Map(pVB, 0, D3D_MAP_WRITE_NO_OVERWRITE, 0, &MappedSubRes);
-        pData = (BYTE*)MappedSubRes.pData;
+        pData = (unsigned char*)MappedSubRes.pData;
         pData += vOffset * Stride;
 #elif defined(USE_DX10)
         pVB->Map(D3D_MAP_WRITE_NO_OVERWRITE, 0, (void**)&pData);
@@ -241,7 +241,7 @@ u16* _IndexStream::Lock(u32 Count, u32& vOffset)
 #endif
     PGO(Msg("PGO:IB_LOCK:%d", Count));
     vOffset = 0;
-    BYTE* pLockedData = nullptr;
+    unsigned char* pLockedData = nullptr;
 
     // Ensure there is enough space in the VB for this data
     R_ASSERT((2 * Count <= mSize) && Count);
@@ -258,11 +258,11 @@ u16* _IndexStream::Lock(u32 Count, u32& vOffset)
     }
 #if defined(USE_OGL)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pIB);
-    CHK_GL(pLockedData = (BYTE*)glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, mPosition * 2, Count * 2, dwFlags));
+    CHK_GL(pLockedData = (unsigned char*)glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, mPosition * 2, Count * 2, dwFlags));
 #elif defined(USE_DX11)
     D3D_MAP MapMode = (dwFlags == LOCKFLAGS_APPEND) ? D3D_MAP_WRITE_NO_OVERWRITE : D3D_MAP_WRITE_DISCARD;
     HW.pContext->Map(pIB, 0, MapMode, 0, &MappedSubRes);
-    pLockedData = (BYTE*)MappedSubRes.pData;
+    pLockedData = (unsigned char*)MappedSubRes.pData;
     pLockedData += mPosition * 2;
 #elif defined(USE_DX10)
     D3D_MAP MapMode = (dwFlags == LOCKFLAGS_APPEND) ? D3D_MAP_WRITE_NO_OVERWRITE : D3D_MAP_WRITE_DISCARD;
@@ -276,7 +276,7 @@ u16* _IndexStream::Lock(u32 Count, u32& vOffset)
 
     vOffset = mPosition;
 
-    return LPWORD(pLockedData);
+    return (unsigned short*)(pLockedData);
 }
 
 void _IndexStream::Unlock(u32 RealCount)

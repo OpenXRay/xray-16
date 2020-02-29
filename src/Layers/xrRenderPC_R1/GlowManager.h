@@ -26,7 +26,7 @@ public:
     Fcolor color;
 
     // Ray-testing cache
-    BOOL bTestResult;
+    bool bTestResult;
     collide::ray_cache RayCache;
     u32 qid_pass;
     u32 qid_total;
@@ -40,7 +40,7 @@ public:
     virtual void set_position(const Fvector& P);
     virtual void set_direction(const Fvector& P);
     virtual void set_radius(float R);
-    virtual void set_texture(LPCSTR name);
+    virtual void set_texture(const char* name);
     virtual void set_color(const Fcolor& C);
     virtual void set_color(float r, float g, float b);
     virtual void spatial_move();
@@ -57,7 +57,7 @@ class CGlowManager
     xr_vector<ref_glow> SelectedToTest_0; // 0-frames behind
     ref_geom hGeom;
 
-    BOOL b_hardware;
+    bool b_hardware;
     u32 dwTestID;
 
 public:

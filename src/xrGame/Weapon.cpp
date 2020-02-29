@@ -213,7 +213,7 @@ void CWeapon::ForceUpdateFireParticles()
     }
 }
 
-void CWeapon::Load(LPCSTR section)
+void CWeapon::Load(const char* section)
 {
     inherited::Load(section);
     CShootingObject::Load(section);
@@ -223,7 +223,7 @@ void CWeapon::Load(LPCSTR section)
 
     // load ammo classes
     m_ammoTypes.clear();
-    LPCSTR S = pSettings->r_string(section, "ammo_class");
+    const char* S = pSettings->r_string(section, "ammo_class");
     if (S && S[0])
     {
         string128 _ammoItem;
@@ -395,7 +395,7 @@ void CWeapon::Load(LPCSTR section)
     {
         if (pSettings->line_exist(section, "scopes_sect"))
         {
-            LPCSTR str = pSettings->r_string(section, "scopes_sect");
+            const char* str = pSettings->r_string(section, "scopes_sect");
             for (int i = 0, count = _GetItemCount(str); i < count; ++i)
             {
                 string128 scope_section;
@@ -481,7 +481,7 @@ void CWeapon::Load(LPCSTR section)
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", true));
 }
 
-void CWeapon::LoadFireParams(LPCSTR section)
+void CWeapon::LoadFireParams(const char* section)
 {
     cam_recoil.Dispersion = deg2rad(pSettings->r_float(section, "cam_dispersion"));
     cam_recoil.DispersionInc = 0.0f;
@@ -506,10 +506,10 @@ void CWeapon::LoadFireParams(LPCSTR section)
     CShootingObject::LoadFireParams(section);
 };
 
-BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
+bool CWeapon::net_Spawn(CSE_Abstract* DC)
 {
     m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
-    BOOL bResult = inherited::net_Spawn(DC);
+    bool bResult = inherited::net_Spawn(DC);
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeItemWeapon* E = smart_cast<CSE_ALifeItemWeapon*>(e);
 
@@ -553,7 +553,7 @@ void CWeapon::net_Destroy()
         m_magazine.pop_back();
 }
 
-BOOL CWeapon::IsUpdating()
+bool CWeapon::IsUpdating()
 {
     bool bIsActiveItem = m_pInventory && m_pInventory->ActiveItem() == this;
     return bIsActiveItem || bWorking; // || IsPending() || getVisible();
@@ -1016,7 +1016,7 @@ bool CWeapon::SwitchAmmoType(u32 flags)
     return true;
 }
 
-void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, u32 ParentID)
+void CWeapon::SpawnAmmo(u32 boxCurr, const char* ammoSect, u32 ParentID)
 {
     if (!m_ammoTypes.size())
         return;
@@ -1162,7 +1162,7 @@ float CWeapon::GetConditionMisfireProbability() const
     return mis;
 }
 
-BOOL CWeapon::CheckForMisfire()
+bool CWeapon::CheckForMisfire()
 {
     if (OnClient())
         return FALSE;
@@ -1184,7 +1184,7 @@ BOOL CWeapon::CheckForMisfire()
     }
 }
 
-BOOL CWeapon::IsMisfire() const { return bMisfire; }
+bool CWeapon::IsMisfire() const { return bMisfire; }
 void CWeapon::Reload() { OnZoomOut(); }
 bool CWeapon::IsGrenadeLauncherAttached() const
 {
@@ -1437,7 +1437,7 @@ void CWeapon::reinit()
     CHudItemObject::reinit();
 }
 
-void CWeapon::reload(LPCSTR section)
+void CWeapon::reload(const char* section)
 {
     CShootingObject::reload(section);
     CHudItemObject::reload(section);
@@ -1784,14 +1784,14 @@ float CWeapon::GetConditionToShow() const
     return (GetCondition()); // powf(GetCondition(),4.0f));
 }
 
-BOOL CWeapon::ParentMayHaveAimBullet()
+bool CWeapon::ParentMayHaveAimBullet()
 {
     IGameObject* O = H_Parent();
     CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
     return EA->cast_actor() != nullptr;
 }
 
-BOOL CWeapon::ParentIsActor()
+bool CWeapon::ParentIsActor()
 {
     IGameObject* O = H_Parent();
     if (!O)

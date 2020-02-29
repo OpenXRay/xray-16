@@ -49,7 +49,7 @@ static FILE* CompressionDump = nullptr;
 // c is written as first byte in the datastream
 // one could do without c, but then you have an additional if
 // per outputbyte.
-void NET_Compressor::start_encoding(BYTE* dest, u32 header_size)
+void NET_Compressor::start_encoding(unsigned char* dest, u32 header_size)
 {
     dest += header_size - 1;
     RNGC.low = 0; // Full code range
@@ -71,14 +71,14 @@ void NET_Compressor::encode_normalize()
             RNGC.byte_out(RNGC.buffer);
             for (; RNGC.help; RNGC.help--)
                 RNGC.byte_out(0xff);
-            RNGC.buffer = (BYTE)(RNGC.low >> SHIFT_BITS);
+            RNGC.buffer = (unsigned char)(RNGC.low >> SHIFT_BITS);
         }
         else if (RNGC.low & PPM_TOP_VALUE) // carry now, no future carry
         {
             RNGC.byte_out(RNGC.buffer + 1);
             for (; RNGC.help; RNGC.help--)
                 RNGC.byte_out(0);
-            RNGC.buffer = (BYTE)(RNGC.low >> SHIFT_BITS);
+            RNGC.buffer = (unsigned char)(RNGC.low >> SHIFT_BITS);
         }
         else // passes on a potential carry
         {
@@ -151,14 +151,14 @@ u32 NET_Compressor::done_encoding()
             RNGC.byte_out(0xff);
     }
 
-    RNGC.byte_out((BYTE)(tmp & 0xff));
+    RNGC.byte_out((unsigned char)(tmp & 0xff));
     RNGC.byte_out(0);
 
     return RNGC.bytecount;
 }
 
 // Start the decoder
-int NET_Compressor::start_decoding(BYTE* src, u32 header_size)
+int NET_Compressor::start_decoding(unsigned char* src, u32 header_size)
 {
     src += header_size;
     RNGC.ptr = src;
@@ -221,13 +221,13 @@ void NET_Compressor::decode_update(freq sy_f, freq lt_f, freq tot_f)
 
 
 // Decode a byte/short without modelling
-BYTE NET_Compressor::decode_byte()
+unsigned char NET_Compressor::decode_byte()
 {
     u32 tmp = decode_culshift(8);
 
     decode_update(1, tmp, (freq)1 << 8);
 
-    return BYTE(tmp);
+    return unsigned char(tmp);
 }
 
 u16 NET_Compressor::decode_short()
@@ -313,10 +313,10 @@ u16 NET_Compressor::compressed_size(const u32& count) const
 #endif // #if NET_USE_COMPRESSION
 }
 
-XRNETSERVER_API BOOL g_net_compressor_enabled = FALSE;
-XRNETSERVER_API BOOL g_net_compressor_gather_stats = FALSE;
+XRNETSERVER_API bool g_net_compressor_enabled = FALSE;
+XRNETSERVER_API bool g_net_compressor_gather_stats = FALSE;
 
-u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count)
+u16 NET_Compressor::Compress(unsigned char* dest, const u32& dest_size, unsigned char* src, const u32& count)
 {
     SCompressorStats::SStatPacket* _p = nullptr;
     bool b_compress_packet = (count > 36);
@@ -418,11 +418,11 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 #endif // DEBUG
 
 #if 0 //def DEBUG
-    BYTE* src_back = (BYTE*)xr_alloca(count);
+    unsigned char* src_back = (unsigned char*)xr_alloca(count);
     Decompress(src_back, count, dest, compressed_size);
-    BYTE* I = src_back;
-    BYTE* E = src_back + count;
-    BYTE* J = src;
+    unsigned char* I = src_back;
+    unsigned char* E = src_back + count;
+    unsigned char* J = src;
     for (; I != E; ++I , ++J)
     VERIFY (*I == *J);
 
@@ -434,7 +434,7 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 #endif // if !NET_USE_COMPRESSION
 }
 
-u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count)
+u16 NET_Compressor::Decompress(unsigned char* dest, const u32& dest_size, unsigned char* src, const u32& count)
 {
     VERIFY(dest);
     VERIFY(src);

@@ -138,7 +138,7 @@ void CVisualMemoryManager::reinit()
     m_last_update_time = u32(-1);
 }
 
-void CVisualMemoryManager::reload(LPCSTR section)
+void CVisualMemoryManager::reload(const char* section)
 {
     const s32 maxObjectCount = pSettings->read_if_exists<s32>(section, "DynamicObjectsCount", -1);
     if (maxObjectCount > -1)

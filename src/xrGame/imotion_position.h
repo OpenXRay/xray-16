@@ -43,5 +43,5 @@ private:
     void set_root_callback();
     void remove_root_callback();
 
-    void interactive_motion_diagnostic(LPCSTR message);
+    void interactive_motion_diagnostic(const char* message);
 };

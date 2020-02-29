@@ -55,7 +55,7 @@ void CScriptBinder::reinit()
     }
 }
 
-void CScriptBinder::reload(LPCSTR section)
+void CScriptBinder::reload(const char* section)
 {
 #ifndef DBG_DISABLE_SCRIPTS
     VERIFY(!m_object);
@@ -94,7 +94,7 @@ void CScriptBinder::reload(LPCSTR section)
 #endif
 }
 
-BOOL CScriptBinder::net_Spawn(CSE_Abstract* DC)
+bool CScriptBinder::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* abstract = (CSE_Abstract*)DC;
     CSE_ALifeObject* object = smart_cast<CSE_ALifeObject*>(abstract);
@@ -102,7 +102,7 @@ BOOL CScriptBinder::net_Spawn(CSE_Abstract* DC)
     {
         try
         {
-            return ((BOOL)m_object->net_Spawn(object));
+            return ((bool)m_object->net_Spawn(object));
         }
         catch (...)
         {
@@ -193,7 +193,7 @@ void CScriptBinder::load(IReader& input_packet)
     }
 }
 
-BOOL CScriptBinder::net_SaveRelevant()
+bool CScriptBinder::net_SaveRelevant()
 {
     if (m_object)
     {

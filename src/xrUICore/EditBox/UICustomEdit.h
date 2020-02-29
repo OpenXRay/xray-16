@@ -34,8 +34,8 @@ public:
     void CaptureFocus(bool bCapture);
     void SetNextFocusCapturer(CUICustomEdit* next_capturer) { m_next_focus_capturer = next_capturer; };
     void ClearText();
-    virtual void SetText(LPCSTR str);
-    virtual LPCSTR GetText() const;
+    virtual void SetText(const char* str);
+    virtual const char* GetText() const;
 
     virtual void Enable(bool status);
 

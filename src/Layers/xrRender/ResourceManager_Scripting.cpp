@@ -37,7 +37,7 @@ public:
             C = nullptr;
     }
 
-    adopt_sampler& _texture(LPCSTR texture)
+    adopt_sampler& _texture(const char* texture)
     {
         if (C)
             C->i_Texture(stage, texture);
@@ -187,7 +187,7 @@ public:
         C->SH->flags.bWmark = E;
         return *this;
     }
-    adopt_compiler& _pass(LPCSTR vs, LPCSTR ps)
+    adopt_compiler& _pass(const char* vs, const char* ps)
     {
         C->r_Pass(vs, ps, true);
         return *this;
@@ -217,7 +217,7 @@ public:
         C->r_ColorWriteEnable(cR, cG, cB, cA);
         return *this;
     }
-    adopt_sampler _sampler(LPCSTR _name)
+    adopt_sampler _sampler(const char* _name)
     {
         u32 s = C->r_Sampler(_name, nullptr);
         return adopt_sampler(C, s);
@@ -315,7 +315,7 @@ void CResourceManager::LS_Load()
 }
 
 void CResourceManager::LS_Unload() { ScriptEngine.unload(); }
-BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
+bool CResourceManager::_lua_HasShader(const char* s_shader)
 {
     string256 undercorated;
     for (int i = 0, l = xr_strlen(s_shader) + 1; i < l; i++)
@@ -330,7 +330,7 @@ BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
 #endif
 }
 
-Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
+Shader* CResourceManager::_lua_Create(const char* d_shader, const char* s_textures)
 {
     CBlender_Compile C;
     Shader S;
@@ -339,7 +339,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     string256 undercorated;
     for (int i = 0, l = xr_strlen(d_shader) + 1; i < l; i++)
         undercorated[i] = (_DELIMITER == d_shader[i]) ? '_' : d_shader[i];
-    LPCSTR s_shader = undercorated;
+    const char* s_shader = undercorated;
 
     // Access to template
     C.BT = nullptr;
@@ -421,16 +421,16 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     return N;
 }
 
-ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
+ShaderElement* CBlender_Compile::_lua_Compile(const char* namesp, const char* name)
 {
     ShaderElement E;
     SH = &E;
     RS.Invalidate();
 
     // Compile
-    LPCSTR t_0 = *L_textures[0] ? *L_textures[0] : "null";
-    LPCSTR t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
-    LPCSTR t_d = detail_texture ? detail_texture : "null";
+    const char* t_0 = *L_textures[0] ? *L_textures[0] : "null";
+    const char* t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
+    const char* t_d = detail_texture ? detail_texture : "null";
     const object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
     const functor<void> element = (object)shader[name];
     adopt_compiler ac = adopt_compiler(this);

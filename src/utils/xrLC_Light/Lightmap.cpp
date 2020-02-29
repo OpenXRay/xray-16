@@ -13,9 +13,9 @@
 #include "ETextureParams.h"
 
 extern "C" bool __declspec(dllimport) __stdcall DXTCompress(
-    LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
+    const char* out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
-// extern BOOL ApplyBorders	(lm_layer &lm, u32 ref);
+// extern bool ApplyBorders	(lm_layer &lm, u32 ref);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -24,7 +24,7 @@ extern "C" bool __declspec(dllimport) __stdcall DXTCompress(
 CLightmap::CLightmap() {}
 CLightmap::~CLightmap() {}
 CLightmap* CLightmap::read_create() { return new CLightmap(); }
-void CLightmap::Capture(CDeflector* D, int b_u, int b_v, int s_u, int s_v, BOOL bRotated)
+void CLightmap::Capture(CDeflector* D, int b_u, int b_v, int s_u, int s_v, bool bRotated)
 {
     // Allocate 512x512 texture if needed
     if (lm.surface.empty())
@@ -130,7 +130,7 @@ IC void line(int x1, int y1, int x2, int y2, b_texture* T)
     }
 }
 
-void CLightmap::Save(LPCSTR path)
+void CLightmap::Save(const char* path)
 {
     static int lmapNameID = 0;
     ++lmapNameID;
@@ -175,7 +175,7 @@ void CLightmap::Save(LPCSTR path)
         string_path FN;
         xr_sprintf(lm_texture.name, "lmap#%d", lmapNameID);
         xr_sprintf(FN, "%s%s_1.dds", path, lm_texture.name);
-        BYTE* raw_data = LPBYTE(&*lm_packed.begin());
+        unsigned char* raw_data = (unsigned char*)(&*lm_packed.begin());
         u32 w = lm_texture.dwWidth; // lm.width;
         u32 h = lm_texture.dwHeight; // lm.height;
         u32 pitch = w * 4;
@@ -197,7 +197,7 @@ void CLightmap::Save(LPCSTR path)
         string_path FN;
         xr_sprintf(lm_texture.name, "lmap#%d", lmapNameID);
         xr_sprintf(FN, "%s%s_2.dds", path, lm_texture.name);
-        BYTE* raw_data = LPBYTE(&*hemi_packed.begin());
+        unsigned char* raw_data = (unsigned char*)(&*hemi_packed.begin());
 
         STextureParams fmt;
         fmt.fmt = STextureParams::tfDXT5;

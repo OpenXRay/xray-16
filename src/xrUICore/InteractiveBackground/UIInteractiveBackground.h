@@ -61,7 +61,7 @@ void CUIInteractiveBackground<T>::InitIB(Fvector2 pos, Fvector2 size)
 }
 
 template <class T>
-bool CUIInteractiveBackground<T>::InitIB(LPCSTR texture, Fvector2 pos, Fvector2 size, bool fatal /*= true*/)
+bool CUIInteractiveBackground<T>::InitIB(const char* texture, Fvector2 pos, Fvector2 size, bool fatal /*= true*/)
 {
     CUIWindow::SetWndPos(pos);
     CUIWindow::SetWndSize(size);

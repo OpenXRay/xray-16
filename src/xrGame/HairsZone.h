@@ -10,7 +10,7 @@ class CHairsZone : public CVisualZone
 
 public:
     virtual void Affect(SZoneObjectInfo* O);
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
 protected:
     float m_min_speed_to_react;

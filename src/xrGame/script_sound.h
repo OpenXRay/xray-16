@@ -21,7 +21,7 @@ class CScriptSound
     friend class CScriptSoundAction;
 
 public:
-    CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type = SOUND_TYPE_NO_SOUND);
+    CScriptSound(const char* caSoundName, ESoundTypes sound_type = SOUND_TYPE_NO_SOUND);
     virtual ~CScriptSound();
     IC u32 Length();
     IC void Play(CScriptGameObject* object);
@@ -32,7 +32,7 @@ public:
     void PlayAtPos(CScriptGameObject* object, const Fvector& position, float delay, int flags);
     void PlayNoFeedback(
         CScriptGameObject* object, u32 flags /*!< Looping */, float delay /*!< Delay */, Fvector pos, float vol);
-    IC void AttachTail(LPCSTR caSoundName);
+    IC void AttachTail(const char* caSoundName);
     IC void Stop();
     IC void StopDeferred();
     IC void SetPosition(const Fvector& position);

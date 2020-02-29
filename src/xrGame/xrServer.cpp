@@ -102,7 +102,7 @@ IClient* xrServer::client_Create() { return new xrClientData(); }
 void xrServer::client_Replicate() {}
 IClient* xrServer::client_Find_Get(ClientID ID)
 {
-    DWORD dwPort = 0;
+    unsigned int dwPort = 0;
     ip_address tmp_ip_address;
 
     if (!psNET_direct_connect)
@@ -196,7 +196,7 @@ void xrServer::GetPooledState(xrClientData* xrCL)
 int g_Dump_Update_Write = 0;
 
 #ifdef DEBUG
-INT g_sv_SendUpdate = 0;
+signed int g_sv_SendUpdate = 0;
 #endif
 
 void xrServer::Update()
@@ -401,7 +401,7 @@ u32 xrServer::OnDelayedMessage(NET_Packet& P, ClientID sender) // Non-Zero means
             Msg("* Radmin [%s] is running command: %s", CL->ps->getName(), buff);
             SetLogCB(LogCallback(console_log_cb, nullptr));
             _tmp_log.clear();
-            LPSTR result_command;
+            char* result_command;
             string64 tmp_number_str;
             xr_sprintf(tmp_number_str, " raid:%u", CL->ID.value());
             STRCONCAT(result_command, buff, tmp_number_str);
@@ -899,8 +899,8 @@ void xrServer::OnChatMessage(NET_Packet* P, xrClientData* CL)
 
 #ifdef DEBUG
 
-static BOOL _ve_initialized = FALSE;
-static BOOL _ve_use = TRUE;
+static bool _ve_initialized = FALSE;
+static bool _ve_use = TRUE;
 
 bool xrServer::verify_entities() const
 {
@@ -1042,7 +1042,7 @@ void xrServer::PerformCheckClientsForMaxPing()
 
                 if (Client->m_ping_warn.m_maxPingWarnings >= g_sv_maxPingWarningsCount)
                 { // kick
-                    LPSTR reason;
+                    char* reason;
                     STRCONCAT(reason, StringTable().translate("st_kicked_by_server").c_str());
                     Level().Server->DisconnectClient(Client, reason);
                 }
@@ -1071,7 +1071,7 @@ extern int g_sv_mp_iDumpStatsPeriod;
 extern BOOL g_bCollectStatisticData;
 
 // xr_token game_types[];
-LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
+const char* GameTypeToString(EGameIDs gt, bool bShort);
 
 void xrServer::GetServerInfo(CServerInfo* si)
 {
@@ -1079,7 +1079,7 @@ void xrServer::GetServerInfo(CServerInfo* si)
     string256 tmp256;
 
     si->AddItem("Server port", xr_itoa(GetPort(), tmp, 10), RGB(128, 128, 255));
-    LPCSTR time =
+    const char* time =
         InventoryUtilities::GetTimeAsString(Device.dwTimeGlobal, InventoryUtilities::etpTimeToSecondsAndDay).c_str();
     si->AddItem("Uptime", time, RGB(255, 228, 0));
 

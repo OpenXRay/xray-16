@@ -95,7 +95,7 @@ public:
     CVisualMemoryManager(vision_client* client);
     virtual ~CVisualMemoryManager();
     virtual void reinit();
-    virtual void reload(LPCSTR section);
+    virtual void reload(const char* section);
     virtual void update(float time_delta);
     virtual float feel_vision_mtl_transp(IGameObject* O, u32 element);
     void remove_links(IGameObject* object);

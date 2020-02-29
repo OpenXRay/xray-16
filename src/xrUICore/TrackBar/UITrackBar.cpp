@@ -341,7 +341,7 @@ void CUITrackBar::UpdatePos()
     }
 }
 
-void CUITrackBar::OnMessage(LPCSTR message)
+void CUITrackBar::OnMessage(const char* message)
 {
     if (0 == xr_strcmp(message, "set_default_value"))
     {

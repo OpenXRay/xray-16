@@ -60,13 +60,13 @@ public:
 
     void InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xml_doc);
     void InitCharacterInfo(Fvector2 pos, Fvector2 size, cpcstr xml_name, cpcstr xml_name2 = nullptr);
-    void InitCharacterInfo(CUIXml* xml_doc, LPCSTR node_str);
-    void Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type);
-    void Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type);
+    void InitCharacterInfo(CUIXml* xml_doc, const char* node_str);
+    void Init_StrInfoItem(CUIXml& xml_doc, const char* item_str, UIItemType type);
+    void Init_IconInfoItem(CUIXml& xml_doc, const char* item_str, UIItemType type);
 
     void InitCharacter(u16 id);
     void ClearInfo();
-    void InitCharacterMP(LPCSTR player_name, LPCSTR player_icon);
+    void InitCharacterMP(const char* player_name, const char* player_icon);
 
     virtual void Update();
 

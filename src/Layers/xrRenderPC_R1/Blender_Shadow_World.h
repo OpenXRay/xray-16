@@ -5,8 +5,8 @@
 class CBlender_ShWorld : public IBlender
 {
 public:
-    virtual LPCSTR getComment() { return "INTERNAL: shadow projecting"; }
-    virtual BOOL canBeLMAPped() { return FALSE; }
+    virtual const char* getComment() { return "INTERNAL: shadow projecting"; }
+    virtual bool canBeLMAPped() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

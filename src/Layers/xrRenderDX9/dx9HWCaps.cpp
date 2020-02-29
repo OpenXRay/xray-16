@@ -122,8 +122,8 @@ void CHWCaps::Update()
     geometry.bSoftware = (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) == 0;
     geometry.bPointSprites = FALSE;
     geometry.bNPatches = (caps.DevCaps & D3DDEVCAPS_NPATCHES) != 0;
-    DWORD cnt = (caps.MaxVertexShaderConst);
-    clamp<DWORD>(cnt, 0, 256);
+    unsigned int cnt = (caps.MaxVertexShaderConst);
+    clamp<unsigned int>(cnt, 0, 256);
     geometry.dwRegisters = cnt;
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(caps.MaxUserClipPlanes, 15);
@@ -175,7 +175,7 @@ void CHWCaps::Update()
 #endif
 
     //
-    bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
+    bTableFog = FALSE; // bool	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
 
     // Detect if stencil available
     bStencil = FALSE;

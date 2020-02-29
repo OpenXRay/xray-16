@@ -21,7 +21,7 @@ struct SFeelParam
     {
     }
 };
-IC BOOL feel_vision_callback(collide::rq_result& result, LPVOID params)
+IC bool feel_vision_callback(collide::rq_result& result, LPVOID params)
 {
     SFeelParam* fp = (SFeelParam*)params;
     float vis = fp->parent->feel_vision_mtl_transp(result.O, result.element);

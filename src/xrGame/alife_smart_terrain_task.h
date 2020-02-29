@@ -35,8 +35,8 @@ private:
     IC void init(const shared_str& patrol_path_name, const u32& patrol_point_index);
 
 public:
-    CALifeSmartTerrainTask(LPCSTR patrol_path_name);
-    CALifeSmartTerrainTask(LPCSTR patrol_path_name, const u32& patrol_point_index);
+    CALifeSmartTerrainTask(const char* patrol_path_name);
+    CALifeSmartTerrainTask(const char* patrol_path_name, const u32& patrol_point_index);
     CALifeSmartTerrainTask(const shared_str& patrol_path_name);
     CALifeSmartTerrainTask(const shared_str& patrol_path_name, const u32& patrol_point_index = 0);
     CALifeSmartTerrainTask(const GameGraph::_GRAPH_ID& game_vertex_id, const u32& level_vertex_id);

@@ -36,7 +36,7 @@ private:
 
 protected:
     template <typename P, bool value>
-    IC void construct_restriction_string(LPSTR temp_restrictions, u32 const temp_restrictions_size,
+    IC void construct_restriction_string(char* temp_restrictions, u32 const temp_restrictions_size,
         const xr_vector<ALife::_OBJECT_ID>& restrictions, shared_str current_restrictions, const P& p);
     IC void add_object_restriction(ALife::_OBJECT_ID id, const RestrictionSpace::ERestrictorTypes& restrictor_type);
     IC void remove_object_restriction(ALife::_OBJECT_ID id, const RestrictionSpace::ERestrictorTypes& restrictor_type);
@@ -44,7 +44,7 @@ protected:
 public:
     IC CRestrictedObject(CCustomMonster* object);
     virtual ~CRestrictedObject();
-    virtual BOOL net_Spawn(CSE_Abstract* data);
+    virtual bool net_Spawn(CSE_Abstract* data);
     virtual void net_Destroy();
 
 public:

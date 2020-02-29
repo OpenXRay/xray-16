@@ -138,7 +138,7 @@ void CUIMpAdminMenu::SetActiveSubdialog(const shared_str& section)
     m_sActiveSection = section;
 }
 
-void CUIMpAdminMenu::ShowMessageBox(CUIMessageBox::E_MESSAGEBOX_STYLE style, LPCSTR reason)
+void CUIMpAdminMenu::ShowMessageBox(CUIMessageBox::E_MESSAGEBOX_STYLE style, const char* reason)
 {
     switch (style)
     {

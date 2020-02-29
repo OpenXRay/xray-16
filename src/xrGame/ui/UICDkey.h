@@ -9,8 +9,8 @@ private:
 
 public:
     CUICDkey();
-    virtual void SetText(LPCSTR str) {}
-    virtual LPCSTR GetText();
+    virtual void SetText(const char* str) {}
+    virtual const char* GetText();
 
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
@@ -43,7 +43,7 @@ public:
     CUIMPPlayerName(){};
     virtual ~CUIMPPlayerName(){};
 
-    //	virtual	void	SetText			(LPCSTR str) {}
+    //	virtual	void	SetText			(const char* str) {}
 
     //	virtual void	SetCurrentValue();
     //	virtual void	SaveValue();
@@ -54,6 +54,6 @@ public:
 }; // class CUIMPPlayerName
 
 extern void GetCDKey_FromRegistry(char* cdkey);
-extern void WriteCDKey_ToRegistry(LPSTR cdkey);
+extern void WriteCDKey_ToRegistry(char* cdkey);
 extern void GetPlayerName_FromRegistry(char* name, u32 const name_size);
-extern void WritePlayerName_ToRegistry(LPSTR name);
+extern void WritePlayerName_ToRegistry(char* name);

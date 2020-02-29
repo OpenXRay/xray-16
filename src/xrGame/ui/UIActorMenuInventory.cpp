@@ -357,7 +357,7 @@ void CUIActorMenu::AttachAddon(PIItem item_to_upgrade)
     SetCurrentItem(NULL);
 }
 
-void CUIActorMenu::DetachAddon(LPCSTR addon_name, PIItem itm)
+void CUIActorMenu::DetachAddon(const char* addon_name, PIItem itm)
 {
     PlaySnd(eDetachAddon);
     if (OnClient())
@@ -1196,7 +1196,7 @@ void CUIActorMenu::PropertiesBoxForPlaying(PIItem item, bool& b_show)
     if (!pPda || !pPda->CanPlayScriptFunction())
         return;
 
-    LPCSTR act_str = "st_play";
+    const char* act_str = "st_play";
     m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_PLAY_ACTION);
     b_show = true;
 }

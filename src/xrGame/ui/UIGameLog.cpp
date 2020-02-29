@@ -19,7 +19,7 @@ CUIGameLog::CUIGameLog()
     m_pFont = NULL;
 }
 
-CUITextWnd* CUIGameLog::AddLogMessage(LPCSTR msg)
+CUITextWnd* CUIGameLog::AddLogMessage(const char* msg)
 {
     CUITextWnd* pItem = NULL;
     ADD_TEXT_TO_VIEW3(msg, pItem, this);
@@ -50,9 +50,9 @@ CUIPdaKillMessage* CUIGameLog::AddLogMessage(KillMessageStruct& msg)
     return pItem;
 }
 
-void CUIGameLog::AddChatMessage(LPCSTR msg, LPCSTR author)
+void CUIGameLog::AddChatMessage(const char* msg, const char* author)
 {
-    LPSTR fullLine;
+    char* fullLine;
     STRCONCAT(fullLine, author, " ", msg);
 
     _TrimRight(fullLine);

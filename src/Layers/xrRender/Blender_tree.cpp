@@ -77,7 +77,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             if (oNotAnTree.value)
             {
                 // Level view
-                LPCSTR tsv = "tree_s", tsp = "vert";
+                const char* tsv = "tree_s", *tsp = "vert";
                 if (C.bDetail_Diffuse)
                 {
                     tsv = "tree_s_dt";
@@ -168,8 +168,8 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     //*************** codepath is the same, only shaders differ
-    LPCSTR tvs = "tree";
-    LPCSTR tvs_s = "shadow_direct_tree";
+    const char* tvs = "tree";
+    const char* tvs_s = "shadow_direct_tree";
     if (oNotAnTree.value)
     {
         tvs = "tree_s";
@@ -204,8 +204,8 @@ void	CBlender_Tree::Compile	(CBlender_Compile& C)
 	IBlender::Compile	(C);
 
 	//*************** codepath is the same, only shaders differ
-	LPCSTR	tvs;
-	LPCSTR	tvs_s;
+	const char*	tvs;
+	const char*	tvs_s;
 	if (oNotAnTree.value)	
 	{ 
 		tvs="tree_s";
@@ -285,8 +285,8 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     //*************** codepath is the same, only shaders differ
-    LPCSTR tvs;
-    LPCSTR tvs_s;
+    const char* tvs;
+    const char* tvs_s;
     if (oNotAnTree.value)
     {
         tvs = "tree_s";

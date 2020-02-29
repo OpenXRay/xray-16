@@ -64,7 +64,7 @@ void CBuild::xrPhase_Subdivide()
 
         // analyze if we need to split
         size.sub(bb.vMax, bb.vMin);
-        BOOL bSplit = FALSE;
+        bool bSplit = FALSE;
         if (size.x > c_SS_maxsize)
             bSplit = TRUE;
         if (size.y > c_SS_maxsize)

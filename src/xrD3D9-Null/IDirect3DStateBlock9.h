@@ -7,7 +7,7 @@ extern "C" {
 class xrIDirect3DStateBlock9 : public IDirect3DStateBlock9
 {
 protected:
-    LONG m_refCount;
+    signed int m_refCount;
     IDirect3DDevice9* m_pIDirect3DDevice9;
 
 public:

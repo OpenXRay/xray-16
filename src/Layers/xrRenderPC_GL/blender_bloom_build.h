@@ -3,9 +3,9 @@
 class CBlender_bloom_build : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: combine to bloom target"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: combine to bloom target"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
@@ -16,9 +16,9 @@ public:
 class CBlender_bloom_build_msaa : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: combine to bloom target msaa"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: combine to bloom target msaa"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
@@ -29,9 +29,9 @@ public:
 class CBlender_postprocess_msaa : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: combine to bloom target msaa"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: combine to bloom target msaa"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 

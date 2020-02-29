@@ -11,7 +11,7 @@ public:
     CMosquitoBald();
     virtual ~CMosquitoBald();
 
-    virtual void Load(LPCSTR section);
+    virtual void Load(const char* section);
 
     virtual void Affect(SZoneObjectInfo* O);
 

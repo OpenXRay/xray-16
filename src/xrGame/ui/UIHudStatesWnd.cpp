@@ -81,7 +81,7 @@ ALife::EInfluenceType CUIHudStatesWnd::get_indik_type(ALife::EHitType hit_type)
     return iz_type;
 }
 
-void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
+void CUIHudStatesWnd::InitFromXml(CUIXml& xml, const char* path)
 {
     CUIXmlInit::InitWindow(xml, path, 0, this);
     XML_NODE stored_root = xml.GetLocalRoot();
@@ -219,7 +219,7 @@ void CUIHudStatesWnd::Load_section()
     Load_section_type(ALife::infl_electra, "electra_zone_detector"); // no uistatic
 }
 
-void CUIHudStatesWnd::Load_section_type(ALife::EInfluenceType type, LPCSTR section)
+void CUIHudStatesWnd::Load_section_type(ALife::EInfluenceType type, const char* section)
 {
     /*m_zone_max_power[type] = pSettings->r_float( section, "max_power" );
     if ( m_zone_max_power[type] <= 0.0f )
@@ -668,7 +668,7 @@ void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType t
     constexpr u32 c_yellow = color_rgba(255, 255, 0, 255);
     constexpr u32 c_red = color_rgba(255, 0, 0, 255);
     
-    LPCSTR texture = "";
+    const char* texture = "";
     string256 str;
     switch (type)
     {
@@ -839,7 +839,7 @@ void CUIHudStatesWnd::FakeUpdateIndicatorType(u8 t, float power)
     if (!actor)
         return;
 
-    LPCSTR texture = "";
+    const char* texture = "";
     string128 str;
     switch (type)
     {

@@ -17,7 +17,7 @@ CHelmet::CHelmet()
 }
 
 CHelmet::~CHelmet() { xr_delete(m_boneProtection); }
-void CHelmet::Load(LPCSTR section)
+void CHelmet::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -65,12 +65,12 @@ void CHelmet::ReloadBonesProtection()
         m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
 }
 
-BOOL CHelmet::net_Spawn(CSE_Abstract* DC)
+bool CHelmet::net_Spawn(CSE_Abstract* DC)
 {
     if (IsGameTypeSingle())
         ReloadBonesProtection();
 
-    BOOL res = inherited::net_Spawn(DC);
+    bool res = inherited::net_Spawn(DC);
     return (res);
 }
 
@@ -143,7 +143,7 @@ float CHelmet::GetHitTypeProtection(ALife::EHitType hit_type, s16 element)
 }
 
 float CHelmet::GetBoneArmor(s16 element) { return m_boneProtection->getBoneArmor(element); }
-bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
+bool CHelmet::install_upgrade_impl(const char* section, bool test)
 {
     bool result = inherited::install_upgrade_impl(section, test);
 
@@ -166,7 +166,7 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
     result |= process_if_exists(
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
 
-    LPCSTR str;
+    const char* str;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
     {
@@ -199,7 +199,7 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
     return result;
 }
 
-void CHelmet::AddBonesProtection(LPCSTR bones_section)
+void CHelmet::AddBonesProtection(const char* bones_section)
 {
     IGameObject* parent = H_Parent();
     if (IsGameTypeSingle())

@@ -521,7 +521,7 @@ keyboard_key* KeynameToPtr(pcstr name)
     return NULL;
 }
 
-void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz)
+void GetActionAllBinding(const char* action, char* dst_buff, int dst_buff_sz)
 {
     int action_id = ActionNameToId(action);
     key_binding* binding = &g_key_bindings[action_id];

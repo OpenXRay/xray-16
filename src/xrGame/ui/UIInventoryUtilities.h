@@ -72,19 +72,19 @@ const shared_str GetTimeAsString(
 const shared_str GetTimeAndDateAsString(ALife::_TIME_ID time);
 const shared_str Get_GameTimeAndDate_AsString();
 
-LPCSTR GetTimePeriodAsString(LPSTR _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to);
+const char* GetTimePeriodAsString(char* _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to);
 // Отобразить вес, который несет (*pInvOwner)
 void UpdateWeight(CUIStatic& wnd, CInventoryOwner* pInvOwner, bool withPrefix = false);
 void UpdateWeightStr(CUITextWnd& wnd, CUITextWnd& wnd_max, CInventoryOwner* pInvOwner);
 
 // Функции получения строки-идентификатора ранга и отношения по их числовому идентификатору
-LPCSTR GetRankAsText(CHARACTER_RANK_VALUE rankID);
-LPCSTR GetReputationAsText(CHARACTER_REPUTATION_VALUE rankID);
-LPCSTR GetGoodwillAsText(CHARACTER_GOODWILL goodwill);
+const char* GetRankAsText(CHARACTER_RANK_VALUE rankID);
+const char* GetReputationAsText(CHARACTER_REPUTATION_VALUE rankID);
+const char* GetGoodwillAsText(CHARACTER_GOODWILL goodwill);
 
 void ClearCharacterInfoStrings();
 
-void SendInfoToActor(LPCSTR info_id);
+void SendInfoToActor(const char* info_id);
 void SendInfoToLuaScripts(shared_str info);
 u32 GetGoodwillColor(CHARACTER_GOODWILL gw);
 u32 GetRelationColor(ALife::ERelationType r);

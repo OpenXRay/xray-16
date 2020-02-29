@@ -651,7 +651,7 @@ void CUIMapWnd::ViewActor()
     SetTargetMap(lm, m_prev_actor_pos, true);
 }
 
-void CUIMapWnd::ShowHintStr(CUIWindow* parent, LPCSTR text) // map name
+void CUIMapWnd::ShowHintStr(CUIWindow* parent, const char* text) // map name
 {
     if (m_map_location_hint->GetOwner())
         return;

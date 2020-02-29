@@ -25,8 +25,8 @@ protected:
     virtual ~CShootingObject();
 
     void reinit();
-    void reload(LPCSTR section){};
-    void Load(LPCSTR section);
+    void reload(const char* section){};
+    void Load(const char* section);
 
     Fvector m_vCurrentShootDir;
     Fvector m_vCurrentShootPos;
@@ -42,7 +42,7 @@ protected:
     // Fire Params
     //////////////////////////////////////////////////////////////////////////
 protected:
-    virtual void LoadFireParams(LPCSTR section); //сила выстрела
+    virtual void LoadFireParams(const char* section); //сила выстрела
     virtual bool SendHitAllowed(IGameObject* pUser);
     virtual void FireBullet(const Fvector& pos, const Fvector& dir, float fire_disp, const CCartridge& cartridge,
         u16 parent_id, u16 weapon_id, bool send_hit);
@@ -52,9 +52,9 @@ protected:
     virtual void FireEnd();
 
 public:
-    IC BOOL IsWorking() const { return bWorking; }
-    virtual BOOL ParentMayHaveAimBullet() { return FALSE; }
-    virtual BOOL ParentIsActor() { return FALSE; }
+    IC bool IsWorking() const { return bWorking; }
+    virtual bool ParentMayHaveAimBullet() { return FALSE; }
+    virtual bool ParentIsActor() { return FALSE; }
 protected:
     // Weapon fires now
     bool bWorking;
@@ -129,7 +129,7 @@ protected:
     void Light_Start();
     void Light_Render(const Fvector& P);
 
-    virtual void LoadLights(LPCSTR section, LPCSTR prefix);
+    virtual void LoadLights(const char* section, const char* prefix);
     virtual void RenderLight();
     virtual void UpdateLight();
     virtual void StopLight();
@@ -145,13 +145,13 @@ protected:
 
     ////////////////////////////////////////////////
     //общие функции для работы с партиклами оружия
-    void StartParticles(CParticlesObject*& pParticles, LPCSTR particles_name, const Fvector& pos,
+    void StartParticles(CParticlesObject*& pParticles, const char* particles_name, const Fvector& pos,
         const Fvector& vel = zero_vel, bool auto_remove_flag = false);
     void StopParticles(CParticlesObject*& pParticles);
     void UpdateParticles(CParticlesObject*& pParticles, const Fvector& pos, const Fvector& vel = zero_vel);
 
-    void LoadShellParticles(LPCSTR section, LPCSTR prefix);
-    void LoadFlameParticles(LPCSTR section, LPCSTR prefix);
+    void LoadShellParticles(const char* section, const char* prefix);
+    void LoadFlameParticles(const char* section, const char* prefix);
 
     ////////////////////////////////////////////////
     //спецефические функции для партиклов

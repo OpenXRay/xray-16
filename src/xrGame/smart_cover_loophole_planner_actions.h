@@ -42,7 +42,7 @@ protected:
     bool setup_sight(bool const& change_sight);
 
 public:
-    loophole_action_base(CAI_Stalker* object, LPCSTR action_name);
+    loophole_action_base(CAI_Stalker* object, const char* action_name);
 };
 
 class loophole_action : public loophole_action_base
@@ -59,7 +59,7 @@ protected:
     CRandom m_random;
 
 public:
-    loophole_action(CAI_Stalker* object, LPCSTR action_name);
+    loophole_action(CAI_Stalker* object, const char* action_name);
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -73,7 +73,7 @@ private:
     typedef loophole_action inherited;
 
 public:
-    loophole_action_no_sight(CAI_Stalker* object, LPCSTR action_name);
+    loophole_action_no_sight(CAI_Stalker* object, const char* action_name);
     virtual void initialize();
     virtual void finalize();
 }; // class loophole_action_no_sight
@@ -84,7 +84,7 @@ private:
     typedef loophole_action inherited;
 
 public:
-    loophole_lookout(CAI_Stalker* object, LPCSTR action_name);
+    loophole_lookout(CAI_Stalker* object, const char* action_name);
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -100,7 +100,7 @@ private:
     bool m_firing;
 
 public:
-    loophole_fire(CAI_Stalker* object, LPCSTR action_name);
+    loophole_fire(CAI_Stalker* object, const char* action_name);
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -116,7 +116,7 @@ private:
     typedef loophole_action_no_sight inherited;
 
 public:
-    loophole_reload(CAI_Stalker* object, LPCSTR action_name);
+    loophole_reload(CAI_Stalker* object, const char* action_name);
     virtual void select_animation(shared_str& result);
 };
 
@@ -137,7 +137,7 @@ protected:
     shared_str m_animation;
 
 public:
-    transition(CAI_Stalker* object, LPCSTR action_name, LPCSTR action_from, LPCSTR action_to,
+    transition(CAI_Stalker* object, const char* action_name, const char* action_from, const char* action_to,
         StalkerDecisionSpace::EWorldProperties state_from, StalkerDecisionSpace::EWorldProperties state_to,
         animation_planner* planner);
     virtual void initialize();
@@ -152,7 +152,7 @@ private:
     typedef transition inherited;
 
 public:
-    idle_2_fire_transition(CAI_Stalker* object, LPCSTR action_name, LPCSTR action_from, LPCSTR action_to,
+    idle_2_fire_transition(CAI_Stalker* object, const char* action_name, const char* action_from, const char* action_to,
         StalkerDecisionSpace::EWorldProperties state_from, StalkerDecisionSpace::EWorldProperties state_to,
         animation_planner* planner, bool const& use_weapon);
     virtual void initialize();
@@ -165,7 +165,7 @@ private:
     typedef transition inherited;
 
 public:
-    fire_2_idle_transition(CAI_Stalker* object, LPCSTR action_name, LPCSTR action_from, LPCSTR action_to,
+    fire_2_idle_transition(CAI_Stalker* object, const char* action_name, const char* action_from, const char* action_to,
         StalkerDecisionSpace::EWorldProperties state_from, StalkerDecisionSpace::EWorldProperties state_to,
         animation_planner* planner);
     virtual void initialize();
@@ -178,7 +178,7 @@ private:
     typedef transition inherited;
 
 public:
-    idle_2_lookout_transition(CAI_Stalker* object, LPCSTR action_name, LPCSTR action_from, LPCSTR action_to,
+    idle_2_lookout_transition(CAI_Stalker* object, const char* action_name, const char* action_from, const char* action_to,
         StalkerDecisionSpace::EWorldProperties state_from, StalkerDecisionSpace::EWorldProperties state_to,
         animation_planner* planner);
     virtual void initialize();
@@ -191,7 +191,7 @@ private:
     typedef transition inherited;
 
 public:
-    lookout_2_idle_transition(CAI_Stalker* object, LPCSTR action_name, LPCSTR action_from, LPCSTR action_to,
+    lookout_2_idle_transition(CAI_Stalker* object, const char* action_name, const char* action_from, const char* action_to,
         StalkerDecisionSpace::EWorldProperties state_from, StalkerDecisionSpace::EWorldProperties state_to,
         animation_planner* planner);
     virtual void initialize();

@@ -19,7 +19,7 @@ protected:
     shared_str m_name;
 
 public:
-    IC CScriptValue(luabind::object object, LPCSTR name);
+    IC CScriptValue(luabind::object object, const char* name);
     virtual void assign() = 0;
     IC shared_str name();
 };

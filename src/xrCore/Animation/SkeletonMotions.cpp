@@ -22,7 +22,7 @@ u16 CPartition::part_id(const shared_str& name) const
     return u16(-1);
 }
 
-void CPartition::load(IKinematics* V, LPCSTR model_name)
+void CPartition::load(IKinematics* V, const char* model_name)
 {
     string_path fn, fn_full;
     xr_strcpy(fn, sizeof(fn), model_name);
@@ -74,7 +74,7 @@ u16 find_bone_id(vecBones* bones, shared_str nm)
 }
 
 //-----------------------------------------------------------------------
-BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
+BOOL motions_value::load(const char* N, IReader* data, vecBones* bones)
 {
     m_id = N;
 
@@ -280,7 +280,7 @@ motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* 
         VERIFY(data);
         result = new motions_value();
         result->m_dwReference = 0;
-        BOOL bres = result->load(key.c_str(), data, bones);
+        bool bres = result->load(key.c_str(), data, bones);
         if (bres)
             container.insert(std::make_pair(key, result));
         else

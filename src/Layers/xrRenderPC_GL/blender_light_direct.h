@@ -3,9 +3,9 @@
 class CBlender_accum_direct : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: accumulate direct light"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: accumulate direct light"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
@@ -17,20 +17,20 @@ class CBlender_accum_direct_msaa : public IBlender
 {
 public:
 
-    LPCSTR getComment() override { return "INTERNAL: accumulate direct light"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: accumulate direct light"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    virtual void SetDefine(const char* Name, const char* Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
     }
 
-    LPCSTR Name;
-    LPCSTR Definition;
+    const char* Name;
+    const char* Definition;
 
     CBlender_accum_direct_msaa();
     virtual ~CBlender_accum_direct_msaa();
@@ -40,13 +40,13 @@ class CBlender_accum_direct_volumetric_msaa : public IBlender
 {
 public:
 
-    LPCSTR getComment() override { return "INTERNAL: accumulate direct light"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: accumulate direct light"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    virtual void SetDefine(const char* Name, const char* Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
@@ -54,21 +54,21 @@ public:
 
     CBlender_accum_direct_volumetric_msaa();
     virtual ~CBlender_accum_direct_volumetric_msaa();
-    LPCSTR Name;
-    LPCSTR Definition;
+    const char* Name;
+    const char* Definition;
 };
 
 class CBlender_accum_direct_volumetric_sun_msaa : public IBlender
 {
 public:
 
-    LPCSTR getComment() override { return "INTERNAL: accumulate direct light"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: accumulate direct light"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    virtual void SetDefine(const char* Name, const char* Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
@@ -76,6 +76,6 @@ public:
 
     CBlender_accum_direct_volumetric_sun_msaa();
     virtual ~CBlender_accum_direct_volumetric_sun_msaa();
-    LPCSTR Name;
-    LPCSTR Definition;
+    const char* Name;
+    const char* Definition;
 };

@@ -13,7 +13,7 @@ UI_Arrow::UI_Arrow()
 }
 
 UI_Arrow::~UI_Arrow() {}
-void UI_Arrow::init_from_xml(CUIXml& xml, LPCSTR path, CUIWindow* parent)
+void UI_Arrow::init_from_xml(CUIXml& xml, const char* path, CUIWindow* parent)
 {
     parent->AttachChild(this);
     SetAutoDelete(true);

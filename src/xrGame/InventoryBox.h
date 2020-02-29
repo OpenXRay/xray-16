@@ -19,7 +19,7 @@ public:
     virtual ~CInventoryBox();
 
     virtual void OnEvent(NET_Packet& P, u16 type);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Relcase(IGameObject* O);
     void AddAvailableItems(TIItemContainer& items_container) const;
@@ -30,7 +30,7 @@ public:
     IC bool in_use() const { return m_in_use; }
     void set_can_take(bool status);
     IC bool can_take() const { return m_can_take; }
-    void set_closed(bool status, LPCSTR reason);
+    void set_closed(bool status, const char* reason);
     IC bool closed() const { return m_closed; }
 protected:
     void SE_update_status();

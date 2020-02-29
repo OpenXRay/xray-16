@@ -91,8 +91,8 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
     }
     else
     {
-        LPCSTR vsname = nullptr;
-        LPCSTR psname = nullptr;
+        const char* vsname = nullptr;
+        const char* psname = nullptr;
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
@@ -152,8 +152,8 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
     if (oBlend.value)
     {
         // forward
-        LPCSTR vsname = 0;
-        LPCSTR psname = 0;
+        const char* vsname = 0;
+        const char* psname = 0;
         switch (C.iElement)
         {
         case 0:
@@ -197,8 +197,8 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
 	if (oBlend.value)
 	{
 		// forward
-		LPCSTR	vsname = 0;
-		LPCSTR	psname = 0;
+		const char*	vsname = 0;
+		const char*	psname = 0;
 		switch (C.iElement)
 		{
 		case 0:
@@ -248,8 +248,8 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
     if (oBlend.value)
     {
         // forward
-        LPCSTR vsname = 0;
-        LPCSTR psname = 0;
+        const char* vsname = 0;
+        const char* psname = 0;
         switch (C.iElement)
         {
         case 0:

@@ -8,11 +8,11 @@ class CRT : public xr_resource_named
 public:
     CRT();
     ~CRT();
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
+    void create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
     void destroy();
     void reset_begin();
     void reset_end();
-    BOOL valid() { return !!pTexture; }
+    bool valid() { return !!pTexture; }
     bool used_as_depth() const;
 
 public:
@@ -44,9 +44,9 @@ public:
 struct resptrcode_crt : public resptr_base<CRT>
 {
 #ifdef USE_DX11
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
+    void create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
 #else
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1);
+    void create(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1);
 #endif
     void destroy() { _set(nullptr); }
 };
@@ -68,15 +68,15 @@ public:
     CRTC					();
     ~CRTC					();
 
-    void				create			(LPCSTR name, u32 size, D3DFORMAT f);
+    void				create			(const char* name, u32 size, D3DFORMAT f);
     void				destroy			();
     void				reset_begin		();
     void				reset_end		();
-    IC BOOL				valid			()	{ return !pTexture; }
+    IC bool				valid			()	{ return !pTexture; }
 };
 struct 		resptrcode_crtc	: public resptr_base<CRTC>
 {
-    void				create			(LPCSTR Name, u32 size, D3DFORMAT f);
+    void				create			(const char* Name, u32 size, D3DFORMAT f);
     void				destroy			()	{ _set(NULL);		}
 };
 typedef	resptr_core<CRTC,resptrcode_crtc>		ref_rtc;

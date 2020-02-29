@@ -90,9 +90,9 @@ public:
 #endif
     D3D_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
     ID3DInputLayout* m_pInputLayout;
-    DWORD dummy0; // Padding to avoid warning	
-    DWORD dummy1; // Padding to avoid warning	
-    DWORD dummy2; // Padding to avoid warning	
+    unsigned int dummy0; // Padding to avoid warning	
+    unsigned int dummy1; // Padding to avoid warning	
+    unsigned int dummy2; // Padding to avoid warning	
 #endif
 private:
     // Render-targets
@@ -135,14 +135,14 @@ private:
 #endif // USE_OGL
 
 #ifdef DEBUG
-    LPCSTR ps_name;
-    LPCSTR vs_name;
+    const char* ps_name;
+    const char* vs_name;
 #ifndef USE_DX9
-    LPCSTR gs_name;
+    const char* gs_name;
 #ifdef USE_DX11
-    LPCSTR hs_name;
-    LPCSTR ds_name;
-    LPCSTR cs_name;
+    const char* hs_name;
+    const char* ds_name;
+    const char* cs_name;
 #endif
 #endif // USE_DX10
 #endif
@@ -293,28 +293,28 @@ public:
     ICF void set_Format(SDeclaration* _decl);
 
 #ifdef USE_OGL
-    ICF void set_PS(GLuint _ps, LPCSTR _n = 0);
+    ICF void set_PS(GLuint _ps, const char* _n = 0);
 #else
-    ICF void set_PS(ID3DPixelShader* _ps, LPCSTR _n = nullptr);
+    ICF void set_PS(ID3DPixelShader* _ps, const char* _n = nullptr);
 #endif // USE_OGL
     ICF void set_PS(ref_ps& _ps) { set_PS(_ps->sh, _ps->cName.c_str()); }
 
 #ifndef USE_DX9
 #ifdef USE_OGL
-    ICF void set_GS(GLuint _gs, LPCSTR _n = 0);
+    ICF void set_GS(GLuint _gs, const char* _n = 0);
 #else
-    ICF void set_GS(ID3DGeometryShader* _gs, LPCSTR _n = nullptr);
+    ICF void set_GS(ID3DGeometryShader* _gs, const char* _n = nullptr);
 #endif // USE_OGL
     ICF void set_GS(ref_gs& _gs) { set_GS(_gs->sh, _gs->cName.c_str()); }
 
 #	ifdef USE_DX11
-    ICF void set_HS(ID3D11HullShader* _hs, LPCSTR _n = nullptr);
+    ICF void set_HS(ID3D11HullShader* _hs, const char* _n = nullptr);
     ICF void set_HS(ref_hs& _hs) { set_HS(_hs->sh, _hs->cName.c_str()); }
 
-    ICF void set_DS(ID3D11DomainShader* _ds, LPCSTR _n = nullptr);
+    ICF void set_DS(ID3D11DomainShader* _ds, const char* _n = nullptr);
     ICF void set_DS(ref_ds& _ds) { set_DS(_ds->sh, _ds->cName.c_str()); }
 
-    ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
+    ICF void set_CS(ID3D11ComputeShader* _cs, const char* _n = nullptr);
     ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
 #	endif
 
@@ -333,9 +333,9 @@ public:
 protected: //	In DX10 we need input shader signature which is stored in ref_vs
 #endif // USE_DX10
 #ifdef USE_OGL
-    ICF void set_VS(GLuint _vs, LPCSTR _n = 0);
+    ICF void set_VS(GLuint _vs, const char* _n = 0);
 #else
-    ICF void set_VS(ID3DVertexShader* _vs, LPCSTR _n = nullptr);
+    ICF void set_VS(ID3DVertexShader* _vs, const char* _n = nullptr);
 #endif // USE_OGL
 #if defined(USE_DX10) || defined(USE_DX11)
 public:
@@ -362,7 +362,7 @@ public:
     IC void SetViewport(const D3D_VIEWPORT& viewport) const;
 
     // constants
-    ICF ref_constant get_c(LPCSTR n)
+    ICF ref_constant get_c(const char* n)
     {
         if (ctable)
             return ctable->get(n);
@@ -426,7 +426,7 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
 #ifdef USE_DX11
-    ICF void Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ);
+    ICF void Compute(unsigned int ThreadGroupCountX, unsigned int ThreadGroupCountY, unsigned int ThreadGroupCountZ);
 #endif
 
     // Device create / destroy / frame signaling

@@ -23,7 +23,7 @@ bool CHelicopter::isObjectVisible(IGameObject* O)
     dir_to_object.sub(to_point, from_point).normalize_safe();
     float ray_length = from_point.distance_to(to_point);
 
-    BOOL res = Level().ObjectSpace.RayTest(from_point, dir_to_object, ray_length, collide::rqtStatic, NULL, NULL);
+    bool res = Level().ObjectSpace.RayTest(from_point, dir_to_object, ray_length, collide::rqtStatic, NULL, NULL);
 
     return !res;
 }
@@ -257,7 +257,7 @@ void CHelicopter::DieHelicopter()
     if (true /*!PPhysicsShell()*/)
     {
         string256 I;
-        LPCSTR bone;
+        const char* bone;
 
         u16 bone_id;
         for (u32 i = 0, n = _GetItemCount(*m_death_bones_to_hide); i < n; ++i)
@@ -292,7 +292,7 @@ void CHelicopter::DieHelicopter()
     m_dead = true;
 }
 
-void SHeliEnemy::Load(LPCSTR section)
+void SHeliEnemy::Load(const char* section)
 {
     fire_trail_length_des = pSettings->r_float(section, "fire_trail_length");
     bUseFireTrail = !!pSettings->r_bool(section, "use_fire_trail");
@@ -362,7 +362,7 @@ void CHelicopter::UseFireTrail(bool val)
     }
 }
 
-void SHeliBodyState::Load(LPCSTR section)
+void SHeliBodyState::Load(const char* section)
 {
     model_angSpeedBank = pSettings->r_float(section, "model_angular_sp_bank");
     model_angSpeedPitch = pSettings->r_float(section, "model_angular_sp_pitch");

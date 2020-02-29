@@ -24,7 +24,7 @@ public:
     // vecAdj m_adjacents;
     typedef DataFace DataFaceType;
 
-    IC BOOL similar(Tvertex<DataVertex>& V, float eps);
+    IC bool similar(Tvertex<DataVertex>& V, float eps);
 
     virtual void read(INetReader& r);
     virtual void write(IWriter& w) const;
@@ -47,10 +47,10 @@ public:
     CLightmap* lmap_layer;
     u32 sm_group;
     virtual Fvector2* getTC0() { return tc[0].uv; }
-    BOOL RenderEqualTo(Face* F);
+    bool RenderEqualTo(Face* F);
 
     void AddChannel(Fvector2& p1, Fvector2& p2, Fvector2& p3);
-    BOOL hasImplicitLighting();
+    bool hasImplicitLighting();
 
     virtual void read(INetReader& r);
     virtual void write(IWriter& w) const;

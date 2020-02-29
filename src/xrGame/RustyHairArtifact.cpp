@@ -8,4 +8,4 @@
 
 CRustyHairArtefact::CRustyHairArtefact(void) {}
 CRustyHairArtefact::~CRustyHairArtefact(void) {}
-void CRustyHairArtefact::Load(LPCSTR section) { inherited::Load(section); }
+void CRustyHairArtefact::Load(const char* section) { inherited::Load(section); }

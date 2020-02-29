@@ -14,7 +14,7 @@
 #define PRIORITY_NORMAL 8
 #define PRIORITY_LOW 4
 
-void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
+void resptrcode_texture::create(const char* _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -114,10 +114,10 @@ void CTexture::apply_avi(u32 dwStage)
         R_CHK(T2D->LockRect(0, &R, NULL, 0));
         R_ASSERT(R.Pitch == int(pAVI->m_dwWidth * 4));
         //		R_ASSERT(pAVI->DecompressFrame((u32*)(R.pBits)));
-        BYTE* ptr;
+        unsigned char* ptr;
         pAVI->GetFrame(&ptr);
         CopyMemory(R.pBits, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
-        //		R_ASSERT(pAVI->GetFrame((BYTE*)(&R.pBits)));
+        //		R_ASSERT(pAVI->GetFrame((unsigned char*)(&R.pBits)));
 
         R_CHK(T2D->UnlockRect(0));
     }
@@ -185,7 +185,7 @@ void CTexture::Load()
             else
             {
                 flags.MemoryUsage = pTheora->Width(true) * pTheora->Height(true) * 4;
-                BOOL bstop_at_end = (nullptr != strstr(cName.c_str(), "intro" DELIMITER)) || (nullptr != strstr(cName.c_str(), "outro" DELIMITER));
+                bool bstop_at_end = (nullptr != strstr(cName.c_str(), "intro" DELIMITER)) || (nullptr != strstr(cName.c_str(), "outro" DELIMITER));
                 pTheora->Play(!bstop_at_end, RDEVICE.dwTimeContinual);
 
                 // Now create texture
@@ -332,13 +332,13 @@ void CTexture::desc_update()
     }
 }
 
-void CTexture::video_Play(BOOL looped, u32 _time)
+void CTexture::video_Play(bool looped, u32 _time)
 {
     if (pTheora)
         pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : RDEVICE.dwTimeContinual);
 }
 
-void CTexture::video_Pause(BOOL state)
+void CTexture::video_Pause(bool state)
 {
     if (pTheora)
         pTheora->Pause(state);
@@ -350,4 +350,4 @@ void CTexture::video_Stop()
         pTheora->Stop();
 }
 
-BOOL CTexture::video_IsPlaying() { return (pTheora) ? pTheora->IsPlaying() : FALSE; }
+bool CTexture::video_IsPlaying() { return (pTheora) ? pTheora->IsPlaying() : FALSE; }

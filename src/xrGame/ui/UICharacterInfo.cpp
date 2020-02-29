@@ -90,7 +90,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
     pUIBio = UIHelper::CreateScrollView(*xml_doc, "biography_list", this, false);
 }
 
-void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
+void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, const char* item_str, UIItemType type)
 {
     CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
     if (item)
@@ -99,7 +99,7 @@ void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItem
     }
 }
 
-void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
+void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, const char* item_str, UIItemType type)
 {
     CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
     if (item)
@@ -120,7 +120,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, cpcstr xml
     InitCharacterInfo(pos, size, &uiXml);
 }
 
-void CUICharacterInfo::InitCharacterInfo(CUIXml* xml_doc, LPCSTR node_str)
+void CUICharacterInfo::InitCharacterInfo(CUIXml* xml_doc, const char* node_str)
 {
     Fvector2 pos, size;
     XML_NODE stored_root = xml_doc->GetLocalRoot();
@@ -175,7 +175,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
     }
 
     shared_str const& comm_id = chInfo.Community().id();
-    LPCSTR community0 = comm_id.c_str();
+    const char* community0 = comm_id.c_str();
     string64 community1;
     xr_strcpy(community1, sizeof(community1), community0);
     xr_strcat(community1, sizeof(community1), "_icon");
@@ -239,7 +239,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
         m_icons[eCommunityBigIconOver]->Show(false);
 }
 
-void CUICharacterInfo::InitCharacterMP(LPCSTR player_name, LPCSTR player_icon)
+void CUICharacterInfo::InitCharacterMP(const char* player_name, const char* player_icon)
 {
     ClearInfo();
 

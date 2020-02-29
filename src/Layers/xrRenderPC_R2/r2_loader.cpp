@@ -34,12 +34,12 @@ void CRender::level_Load(IReader* fs)
         for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
         {
             string512 n_sh, n_tlist;
-            LPCSTR n = LPCSTR(chunk->pointer());
+            const char* n = (const char*)(chunk->pointer());
             chunk->skip_stringZ();
             if (0 == n[0])
                 continue;
             xr_strcpy(n_sh, n);
-            LPSTR delim = strchr(n_sh, '/');
+            char* delim = strchr(n_sh, '/');
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
             Shaders[i] = Resources->Create(n_sh, n_tlist);
@@ -236,7 +236,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             // Create and fill
             _VB[i].Create(vCount * vSize);
-            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
+            unsigned char* pData = static_cast<unsigned char*>(_VB[i].Map());
             //			CopyMemory			(pData,fs().pointer(),vCount*vSize);
             fs->r(pData, vCount * vSize);
             _VB[i].Unmap(true); // upload vertex data
@@ -260,7 +260,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             // Create and fill
             _IB[i].Create(iCount * 2);
-            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
+            unsigned char* pData = static_cast<unsigned char*>(_IB[i].Map());
             //			CopyMemory			(pData,fs().pointer(),iCount*2);
             fs->r(pData, iCount * 2);
             _IB[i].Unmap(true); // upload index data

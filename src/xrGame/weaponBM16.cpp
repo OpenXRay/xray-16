@@ -2,7 +2,7 @@
 #include "weaponBM16.h"
 
 CWeaponBM16::~CWeaponBM16() {}
-void CWeaponBM16::Load(LPCSTR section)
+void CWeaponBM16::Load(const char* section)
 {
     inherited::Load(section);
     m_sounds.LoadSound(section, "snd_reload_1", "sndReload1", true, m_eSoundShot);

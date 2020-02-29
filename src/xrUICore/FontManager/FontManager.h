@@ -25,8 +25,8 @@ struct XRUICORE_API CFontManager : public pureDeviceReset
     CGameFont* pFontStat;
 
     void InitializeFonts();
-    void InitializeFont(CGameFont*& F, LPCSTR section, u32 flags = 0);
-    LPCSTR GetFontTexName(LPCSTR section);
+    void InitializeFont(CGameFont*& F, const char* section, u32 flags = 0);
+    const char* GetFontTexName(const char* section);
 
     virtual void OnDeviceReset();
 };

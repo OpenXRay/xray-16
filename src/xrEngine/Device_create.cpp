@@ -12,7 +12,7 @@
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;
 
-extern XRCDB_API BOOL* cdb_bDebug;
+extern XRCDB_API bool* cdb_bDebug;
 
 void CRenderDevice::_SetupStates()
 {

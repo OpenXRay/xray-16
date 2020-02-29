@@ -19,7 +19,7 @@ extern u32 dbg_joints_num;
 extern u32 dbg_islands_num;
 extern u32 dbg_contacts_num;
 extern float dbg_vel_collid_damage_to_display;
-extern LPCSTR dbg_trace_object;
+extern const char* dbg_trace_object;
 class IGameObject;
 extern IGameObject* trace_object;
 #ifdef DRAW_CONTACTS
@@ -64,7 +64,7 @@ void DBG_DrawRotationY(
     const Fmatrix& m, float ang0, float ang1, float size, u32 ac, bool solid = false, u32 tessel = 7);
 void DBG_DrawRotationZ(
     const Fmatrix& m, float ang0, float ang1, float size, u32 ac, bool solid = false, u32 tessel = 7);
-void _cdecl DBG_OutText(LPCSTR s, ...);
+void _cdecl DBG_OutText(const char* s, ...);
 void DBG_TextOutSet(float x, float y);
 void DBG_TextSetColor(u32 color);
 void DBG_DrawBind(IGameObject& O);
@@ -73,7 +73,7 @@ void DBG_DrawBones(IGameObject& O);
 void DBG_DrawFrameStart();
 void PH_DBG_Render();
 void PH_DBG_Clear();
-LPCSTR PH_DBG_ObjectTrackName();
+const char* PH_DBG_ObjectTrackName();
 ////////////////////////////////////////////////
 
 /////////////////////////////////////////////////

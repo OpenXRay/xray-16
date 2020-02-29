@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include <zlib.h>
 
-void compress(LPCSTR f_in, LPCSTR f_out);
-void decompress(LPCSTR f_in, LPCSTR f_out);
+void compress(const char* f_in, const char* f_out);
+void decompress(const char* f_in, const char* f_out);
 
-void compress(LPCSTR f_in, LPCSTR f_out)
+void compress(const char* f_in, const char* f_out)
 {
     FILE* file = fopen(f_in, "rb");
     u32 buff_size = 1024 * 1024 / 2;
@@ -28,7 +28,7 @@ void compress(LPCSTR f_in, LPCSTR f_out)
     gzclose(z_file);
 }
 
-void decompress(LPCSTR f_in, LPCSTR f_out)
+void decompress(const char* f_in, const char* f_out)
 {
     FILE* file = fopen(f_out, "wb");
     u32 buff_size = 1024 * 1024 / 2;
@@ -50,7 +50,7 @@ void decompress(LPCSTR f_in, LPCSTR f_out)
     gzclose(z_file);
 }
 
-void compress(LPCSTR f_in_out)
+void compress(const char* f_in_out)
 {
     string_path tmp;
     strconcat(sizeof(tmp), tmp, f_in_out, "___ctmp");
@@ -63,7 +63,7 @@ void compress(LPCSTR f_in_out)
     rename(tmp, f_in_out);
 }
 
-void decompress(LPCSTR f_in_out)
+void decompress(const char* f_in_out)
 {
     string_path tmp;
     strconcat(sizeof(tmp), tmp, f_in_out, "___dtmp");

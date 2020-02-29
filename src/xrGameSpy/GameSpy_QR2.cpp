@@ -143,4 +143,4 @@ void CGameSpy_QR2::KeyBufferAdd(void* keybuffer, int keyid)
 }
 
 const char* CGameSpy_QR2::GetGameVersion() { return GAME_VERSION; }
-const char* CGameSpy_QR2::RegisteredKey(DWORD KeyID) { return qr2_registered_key_list[KeyID]; }
+const char* CGameSpy_QR2::RegisteredKey(unsigned int KeyID) { return qr2_registered_key_list[KeyID]; }

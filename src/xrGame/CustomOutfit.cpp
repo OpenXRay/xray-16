@@ -26,12 +26,12 @@ CCustomOutfit::CCustomOutfit()
 }
 
 CCustomOutfit::~CCustomOutfit() { xr_delete(m_boneProtection); }
-BOOL CCustomOutfit::net_Spawn(CSE_Abstract* DC)
+bool CCustomOutfit::net_Spawn(CSE_Abstract* DC)
 {
     if (IsGameTypeSingle())
         ReloadBonesProtection();
 
-    BOOL res = inherited::net_Spawn(DC);
+    bool res = inherited::net_Spawn(DC);
     return (res);
 }
 
@@ -56,7 +56,7 @@ void CCustomOutfit::OnH_A_Chield()
         ReloadBonesProtection();
 }
 
-void CCustomOutfit::Load(LPCSTR section)
+void CCustomOutfit::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -189,7 +189,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     return NewHitPower;
 }
 
-BOOL CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection->getBonePassBullet(s16(boneID)); }
+bool CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection->getBonePassBullet(s16(boneID)); }
 #include "Torch.h"
 void CCustomOutfit::OnMoveToSlot(const SInvItemPlace& prev)
 {
@@ -274,7 +274,7 @@ void CCustomOutfit::OnMoveToRuck(const SInvItemPlace& prev)
 };
 
 u32 CCustomOutfit::ef_equipment_type() const { return (m_ef_equipment_type); }
-bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
+bool CCustomOutfit::install_upgrade_impl(const char* section, bool test)
 {
     bool result = inherited::install_upgrade_impl(section, test);
 
@@ -298,7 +298,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
     result |= process_if_exists(
         section, "physic_strike_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypePhysicStrike], test);
-    LPCSTR str;
+    const char* str;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
     {
@@ -339,7 +339,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
     return result;
 }
 
-void CCustomOutfit::AddBonesProtection(LPCSTR bones_section)
+void CCustomOutfit::AddBonesProtection(const char* bones_section)
 {
     IGameObject* parent = H_Parent();
     if (IsGameTypeSingle())

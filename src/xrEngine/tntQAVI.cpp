@@ -46,7 +46,7 @@ CAviPlayerCustom::~CAviPlayerCustom()
 }
 
 //---------------------------------
-BOOL CAviPlayerCustom::Load(char* fname)
+bool CAviPlayerCustom::Load(char* fname)
 {
     // Check for alpha
     string_path aname;
@@ -104,7 +104,7 @@ BOOL CAviPlayerCustom::Load(char* fname)
 
     AVIStreamHeaderCustom strh;
     ZeroMemory(&strh, sizeof(strh));
-    if (mmckinfoParent.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)&strh, mmckinfoParent.cksize))
+    if (mmckinfoParent.cksize != (unsigned int)mmioRead(hmmioFile, (HPSTR)&strh, mmckinfoParent.cksize))
     {
         mmioClose(hmmioFile, 0);
         return FALSE;
@@ -133,7 +133,7 @@ BOOL CAviPlayerCustom::Load(char* fname)
 
     R_ASSERT(m_dwWidth && m_dwHeight);
 
-    m_pDecompressedBuf = (BYTE*)xr_malloc(m_dwWidth * m_dwHeight * 4 + 4);
+    m_pDecompressedBuf = (unsigned char*)xr_malloc(m_dwWidth * m_dwHeight * 4 + 4);
 
     //++strf
     ZeroMemory(&mmckinfoParent, sizeof(mmckinfoParent));
@@ -145,7 +145,7 @@ BOOL CAviPlayerCustom::Load(char* fname)
     }
 
     // получаем входной формат декомпрессора в BITMAPINFOHEADER
-    if (mmckinfoParent.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)&m_biInFormat, mmckinfoParent.cksize))
+    if (mmckinfoParent.cksize != (unsigned int)mmioRead(hmmioFile, (HPSTR)&m_biInFormat, mmckinfoParent.cksize))
     {
         mmioClose(hmmioFile, 0);
         return FALSE;
@@ -209,14 +209,14 @@ BOOL CAviPlayerCustom::Load(char* fname)
     mmioSeek(hmmioFile, mmckinfoSubchunk.dwDataOffset, SEEK_SET);
 
     // Выделить память под сжатые данные всего клипа
-    m_pMovieData = (BYTE*)xr_malloc(mmckinfoSubchunk.cksize);
+    m_pMovieData = (unsigned char*)xr_malloc(mmckinfoSubchunk.cksize);
     if (m_pMovieData == NULL)
     {
         mmioClose(hmmioFile, 0);
         return FALSE;
     }
 
-    if (mmckinfoSubchunk.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)m_pMovieData, mmckinfoSubchunk.cksize))
+    if (mmckinfoSubchunk.cksize != (unsigned int)mmioRead(hmmioFile, (HPSTR)m_pMovieData, mmckinfoSubchunk.cksize))
     {
         xr_free(m_pMovieData);
         m_pMovieData = NULL;
@@ -255,7 +255,7 @@ BOOL CAviPlayerCustom::Load(char* fname)
         return FALSE;
     }
 
-    if (mmckinfoSubchunk.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)m_pMovieIndex, mmckinfoSubchunk.cksize))
+    if (mmckinfoSubchunk.cksize != (unsigned int)mmioRead(hmmioFile, (HPSTR)m_pMovieIndex, mmckinfoSubchunk.cksize))
     {
         xr_free(m_pMovieIndex);
         m_pMovieIndex = NULL;
@@ -278,7 +278,7 @@ BOOL CAviPlayerCustom::Load(char* fname)
     return TRUE;
 }
 
-BOOL CAviPlayerCustom::DecompressFrame(DWORD dwFrameNum)
+bool CAviPlayerCustom::DecompressFrame(unsigned int dwFrameNum)
 {
     // получаем элемент индекса
     AVIINDEXENTRY* pCurrFrameIndex = &m_pMovieIndex[dwFrameNum];
@@ -286,7 +286,7 @@ BOOL CAviPlayerCustom::DecompressFrame(DWORD dwFrameNum)
     m_biInFormat.biSizeImage = pCurrFrameIndex->dwChunkLength;
     R_ASSERT(m_biInFormat.biSizeImage != 0);
 
-    DWORD dwFlags;
+    unsigned int dwFlags;
     dwFlags = (pCurrFrameIndex->dwFlags & AVIIF_KEYFRAME) ? 0 : ICDECOMPRESS_NOTKEYFRAME;
     m_biInFormat.biSizeImage = pCurrFrameIndex->dwChunkLength;
     dwFlags |= (m_biInFormat.biSizeImage) ? 0 : ICDECOMPRESS_NULLFRAME;
@@ -300,7 +300,7 @@ BOOL CAviPlayerCustom::DecompressFrame(DWORD dwFrameNum)
     if (alpha)
     {
         // update
-        BYTE* alpha_buf;
+        unsigned char* alpha_buf;
         alpha->GetFrame(&alpha_buf);
         u32* dst = (u32*)m_pDecompressedBuf;
         u32* src = (u32*)alpha_buf;
@@ -322,11 +322,11 @@ GetFrame
 
 возвращает TRUE если кадр изменился, иначе FALSE
 */
-BOOL CAviPlayerCustom::GetFrame(BYTE** pDest)
+bool CAviPlayerCustom::GetFrame(unsigned char** pDest)
 {
     R_ASSERT(pDest);
 
-    DWORD dwCurrFrame;
+    unsigned int dwCurrFrame;
     dwCurrFrame = CalcFrame();
 
     //** debug dwCurrFrame = 112;
@@ -371,12 +371,12 @@ BOOL CAviPlayerCustom::GetFrame(BYTE** pDest)
 }
 
 // минимум проверок на валидность переданного для преролла кадра - нужна скорость
-VOID CAviPlayerCustom::PreRoll(DWORD dwFrameNum)
+void CAviPlayerCustom::PreRoll(unsigned int dwFrameNum)
 {
     int i;
 
     AVIINDEXENTRY* pCurrFrameIndex;
-    DWORD res;
+    unsigned int res;
 
     // находим в массиве индексов первый предшествующий ему ключевой кадр
     // или берем кадр, корректно расжатый до этого
@@ -393,7 +393,7 @@ VOID CAviPlayerCustom::PreRoll(DWORD dwFrameNum)
             {
                 pCurrFrameIndex = &m_pMovieIndex[i];
 
-                DWORD dwFlags;
+                unsigned int dwFlags;
                 dwFlags = ICDECOMPRESS_PREROLL | ICDECOMPRESS_NOTKEYFRAME | ICDECOMPRESS_HURRYUP;
                 m_biInFormat.biSizeImage = pCurrFrameIndex->dwChunkLength;
                 dwFlags |= (m_biInFormat.biSizeImage) ? 0 : ICDECOMPRESS_NULLFRAME;
@@ -432,7 +432,7 @@ VOID CAviPlayerCustom::PreRoll(DWORD dwFrameNum)
     {
         pCurrFrameIndex = &m_pMovieIndex[i];
 
-        DWORD dwFlags;
+        unsigned int dwFlags;
         dwFlags = ICDECOMPRESS_PREROLL | ICDECOMPRESS_NOTKEYFRAME | ICDECOMPRESS_HURRYUP;
         m_biInFormat.biSizeImage = pCurrFrameIndex->dwChunkLength;
         dwFlags |= (m_biInFormat.biSizeImage) ? 0 : ICDECOMPRESS_NULLFRAME;
@@ -449,7 +449,7 @@ VOID CAviPlayerCustom::PreRoll(DWORD dwFrameNum)
     } // for(...
 }
 
-VOID CAviPlayerCustom::GetSize(DWORD* dwWidth, DWORD* dwHeight)
+void CAviPlayerCustom::GetSize(unsigned int* dwWidth, unsigned int* dwHeight)
 {
     if (dwWidth)
         *dwWidth = m_dwWidth;
@@ -457,18 +457,18 @@ VOID CAviPlayerCustom::GetSize(DWORD* dwWidth, DWORD* dwHeight)
         *dwHeight = m_dwHeight;
 }
 
-INT CAviPlayerCustom::SetSpeed(INT nPercent)
+signed int CAviPlayerCustom::SetSpeed(signed int nPercent)
 {
-    INT res = INT(m_fCurrentRate / m_fRate * 100);
+    signed int res = signed int(m_fCurrentRate / m_fRate * 100);
 
-    m_fCurrentRate = m_fRate * FLOAT(nPercent / 100.0f);
+    m_fCurrentRate = m_fRate * float(nPercent / 100.0f);
 
     return res;
 }
-DWORD CAviPlayerCustom::CalcFrame()
+unsigned int CAviPlayerCustom::CalcFrame()
 {
     if (0 == m_dwFirstFrameOffset)
         m_dwFirstFrameOffset = RDEVICE.dwTimeContinual - 1;
 
-    return DWORD(floor((RDEVICE.dwTimeContinual - m_dwFirstFrameOffset) * m_fCurrentRate / 1000.0f)) % m_dwFrameTotal;
+    return unsigned int(floor((RDEVICE.dwTimeContinual - m_dwFirstFrameOffset) * m_fCurrentRate / 1000.0f)) % m_dwFrameTotal;
 }

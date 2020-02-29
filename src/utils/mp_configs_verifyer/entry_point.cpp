@@ -10,9 +10,9 @@ static char const* help_msg =
     "	--help, -h		Prints this message\n";
 
 void print_format() { printf(help_msg); };
-void xrcore_log_cb(void* context, LPCSTR log_string) { printf("%s\n", log_string); };
+void xrcore_log_cb(void* context, const char* log_string) { printf("%s\n", log_string); };
 void safe_verify(
-    LPCSTR file_name, mp_anticheat::configs_verifyer& verifyer, u8* data, u32 const data_size, string256& dst_reason)
+    const char* file_name, mp_anticheat::configs_verifyer& verifyer, u8* data, u32 const data_size, string256& dst_reason)
 {
     __try
     {
@@ -31,7 +31,7 @@ void safe_verify(
     }
 }
 
-void check_file(LPCSTR file_name)
+void check_file(const char* file_name)
 {
     mp_anticheat::configs_verifyer tmp_verifyer;
     IReader* tmp_reader = FS.r_open(file_name);
@@ -69,7 +69,7 @@ void create_unpack_name(string_path& dst_src_path)
 };
 
 static u32 const max_uncompressed_size = 0x100000; // 1 Mb
-void unpack_file(LPCSTR file_name)
+void unpack_file(const char* file_name)
 {
     mp_anticheat::configs_verifyer tmp_verifyer;
     string_path new_file_name;
@@ -169,8 +169,8 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    LPCSTR file_name = argv[argc - 1];
-    LPCSTR cmd_params = "";
+    const char* file_name = argv[argc - 1];
+    const char* cmd_params = "";
     for (int i = 1; i < argc; ++i)
     {
         STRCONCAT(cmd_params, cmd_params, " ", argv[i]);

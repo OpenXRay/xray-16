@@ -21,10 +21,10 @@ class CScriptParticlesCustom : public CParticlesObject
     CScriptParticles* m_owner;
 
 public:
-    CScriptParticlesCustom(CScriptParticles* owner, LPCSTR caParticlesName);
+    CScriptParticlesCustom(CScriptParticles* owner, const char* caParticlesName);
     virtual void shedule_Update(u32 dt);
 
-    void LoadPath(LPCSTR caPathName);
+    void LoadPath(const char* caPathName);
     void StartPath(bool looped);
     void StopPath();
     void PausePath(bool val);
@@ -39,7 +39,7 @@ class CScriptParticles
 
 public:
     CScriptParticlesCustom* m_particles;
-    CScriptParticles(LPCSTR caParticlesName);
+    CScriptParticles(const char* caParticlesName);
     virtual ~CScriptParticles();
 
     void Play();
@@ -56,7 +56,7 @@ public:
     void SetOrientation(float yaw, float pitch, float roll);
     Fvector LastPosition() const { return m_transform.c; }
 
-    void LoadPath(LPCSTR caPathName);
+    void LoadPath(const char* caPathName);
     void StartPath(bool looped);
     void StopPath();
     void PausePath(bool val);

@@ -21,7 +21,7 @@ SCRIPT_EXPORT(CScriptPropertyEvaluator, (), {
                          .def_readonly("storage", &CScriptPropertyEvaluator::m_storage)
                          .def(constructor<>())
                          .def(constructor<CScriptGameObject*>())
-                         .def(constructor<CScriptGameObject*, LPCSTR>())
+                         .def(constructor<CScriptGameObject*, const char*>())
                          .def("setup", &CScriptPropertyEvaluator::setup, &CScriptPropertyEvaluatorWrapper::setup_static)
                          .def("evaluate", &CScriptPropertyEvaluator::evaluate,
                              &CScriptPropertyEvaluatorWrapper::evaluate_static),

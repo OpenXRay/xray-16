@@ -13,64 +13,64 @@
 #include "object_factory.h"
 #include "xrCore/xrDebug.h"
 
-CScriptIniFile::CScriptIniFile(IReader* F, LPCSTR path) : inherited(F, path) {}
-CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
+CScriptIniFile::CScriptIniFile(IReader* F, const char* path) : inherited(F, path) {}
+CScriptIniFile::CScriptIniFile(const char* szFileName, bool ReadOnly, bool bLoadAtStart, bool SaveAtEnd)
     : inherited(update(szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
 {}
 
 CScriptIniFile::~CScriptIniFile() {}
-LPCSTR CScriptIniFile::update(LPCSTR file_name)
+const char* CScriptIniFile::update(const char* file_name)
 {
     string_path S1;
     FS.update_path(S1, "$game_config$", file_name);
     return *shared_str(S1);
 }
 
-bool CScriptIniFile::line_exist(LPCSTR S, LPCSTR L) { return !!inherited::line_exist(S, L); }
-bool CScriptIniFile::section_exist(LPCSTR S) { return !!inherited::section_exist(S); }
-int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L) { return object_factory().script_clsid(inherited::r_clsid(S, L)); }
-bool CScriptIniFile::r_bool(LPCSTR S, LPCSTR L) { return !!inherited::r_bool(S, L); }
-int CScriptIniFile::r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list)
+bool CScriptIniFile::line_exist(const char* S, const char* L) { return !!inherited::line_exist(S, L); }
+bool CScriptIniFile::section_exist(const char* S) { return !!inherited::section_exist(S); }
+int CScriptIniFile::r_clsid(const char* S, const char* L) { return object_factory().script_clsid(inherited::r_clsid(S, L)); }
+bool CScriptIniFile::r_bool(const char* S, const char* L) { return !!inherited::r_bool(S, L); }
+int CScriptIniFile::r_token(const char* S, const char* L, const CScriptTokenList& token_list)
 {
     return inherited::r_token(S, L, &*token_list.tokens().begin());
 }
 
-LPCSTR CScriptIniFile::r_string_wb(LPCSTR S, LPCSTR L) { return *inherited::r_string_wb(S, L); }
-u32 CScriptIniFile::line_count(LPCSTR S)
+const char* CScriptIniFile::r_string_wb(const char* S, const char* L) { return *inherited::r_string_wb(S, L); }
+u32 CScriptIniFile::line_count(const char* S)
 {
     VERIFY3(inherited::section_exist(S), "Cannot find section", S);
     return inherited::line_count(S);
 }
 
-LPCSTR CScriptIniFile::r_string(LPCSTR S, LPCSTR L)
+const char* CScriptIniFile::r_string(const char* S, const char* L)
 {
     VERIFY3(inherited::section_exist(S), "Cannot find section", S);
     VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
     return inherited::r_string(S, L);
 }
 
-u32 CScriptIniFile::r_u32(LPCSTR S, LPCSTR L)
+u32 CScriptIniFile::r_u32(const char* S, const char* L)
 {
     VERIFY3(inherited::section_exist(S), "Cannot find section", S);
     VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
     return inherited::r_u32(S, L);
 }
 
-int CScriptIniFile::r_s32(LPCSTR S, LPCSTR L)
+int CScriptIniFile::r_s32(const char* S, const char* L)
 {
     VERIFY3(inherited::section_exist(S), "Cannot find section", S);
     VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
     return inherited::r_s32(S, L);
 }
 
-float CScriptIniFile::r_float(LPCSTR S, LPCSTR L)
+float CScriptIniFile::r_float(const char* S, const char* L)
 {
     VERIFY3(inherited::section_exist(S), "Cannot find section", S);
     VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
     return inherited::r_float(S, L);
 }
 
-Fvector CScriptIniFile::r_fvector3(LPCSTR S, LPCSTR L)
+Fvector CScriptIniFile::r_fvector3(const char* S, const char* L)
 {
     VERIFY3(inherited::section_exist(S), "Cannot find section", S);
     VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);

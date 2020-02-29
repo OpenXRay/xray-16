@@ -49,14 +49,14 @@ class ENGINE_API ELightAnimLibrary
 {
 public:
     LAItemVec Items;
-    LAItemIt FindItemI(LPCSTR name);
-    CLAItem* FindItem(LPCSTR name);
+    LAItemIt FindItemI(const char* name);
+    CLAItem* FindItem(const char* name);
 
     ELightAnimLibrary();
     ~ELightAnimLibrary();
 #ifdef _EDITOR
-    void RemoveObject(LPCSTR fname, EItemType type, bool& res);
-    void RenameObject(LPCSTR fn0, LPCSTR fn1, EItemType type);
+    void RemoveObject(const char* fname, EItemType type, bool& res);
+    void RenameObject(const char* fn0, const char* fn1, EItemType type);
 #endif
 
     void OnCreate();
@@ -65,7 +65,7 @@ public:
     void Save();
     void Reload();
     void Unload();
-    CLAItem* AppendItem(LPCSTR name, CLAItem* src);
+    CLAItem* AppendItem(const char* name, CLAItem* src);
     LAItemVec& Objects() { return Items; }
 };
 

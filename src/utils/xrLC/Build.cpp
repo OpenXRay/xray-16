@@ -16,9 +16,9 @@ using namespace std;
 struct OGF_Base;
 xr_vector<OGF_Base*> g_tree;
 
-// BOOL					b_noise		= FALSE;
-// BOOL					b_radiosity	= FALSE;
-// BOOL					b_net_light	= FALSE;
+// bool					b_noise		= FALSE;
+// bool					b_radiosity	= FALSE;
+// bool					b_net_light	= FALSE;
 SBuildOptions g_build_options;
 vec2Face g_XSplit;
 
@@ -41,7 +41,7 @@ void CBuild::TempSave(u32 stage) { CheckBeforeSave(stage); }
 // xr_vector<b_portal>				portals;
 // xr_vector<b_lod>					lods;
 // string_path						path;
-// xr_vector<LPCSTR>					g_Shaders;
+// xr_vector<const char*>					g_Shaders;
 void CBuild::read(INetReader& r)
 {
     r_pod(r, g_build_options);
@@ -113,7 +113,7 @@ Shader_xrLC_LIB& CBuild::shaders()
     return lc_global_data()->shaders();
 }
 
-extern u16 RegisterShader(LPCSTR T);
+extern u16 RegisterShader(const char* T);
 
 void CBuild::Light_prepare()
 {
@@ -127,7 +127,7 @@ void CBuild::Light_prepare()
 #ifdef LOAD_GL_DATA
 void net_light();
 #endif
-void CBuild::Run(LPCSTR P)
+void CBuild::Run(const char* P)
 {
     lc_global_data()->initialize();
 #ifdef LOAD_GL_DATA

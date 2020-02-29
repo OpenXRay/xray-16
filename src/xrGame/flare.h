@@ -29,8 +29,8 @@ private:
 
 public:
     virtual void UpdateCL();
-    virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void OnStateSwitch(u32 S, u32 oldState);

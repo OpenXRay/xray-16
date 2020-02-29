@@ -10,13 +10,13 @@
 
 const Fvector zero_vel = {0.f, 0.f, 0.f};
 
-CParticlesObject::CParticlesObject(LPCSTR p_name, BOOL bAutoRemove, bool destroy_on_game_load)
+CParticlesObject::CParticlesObject(const char* p_name, bool bAutoRemove, bool destroy_on_game_load)
     : inherited(destroy_on_game_load)
 {
     Init(p_name, 0, bAutoRemove);
 }
 
-void CParticlesObject::Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
+void CParticlesObject::Init(const char* p_name, IRender_Sector* S, bool bAutoRemove)
 {
     m_bLooped = false;
     m_bStopping = false;
@@ -98,7 +98,7 @@ void CParticlesObject::UpdateSpatial()
         }
         else
         {
-            BOOL bMove = FALSE;
+            bool bMove = FALSE;
             if (!P.similar(spatial.sphere.P, EPS_L * 10.f))
                 bMove = TRUE;
             if (!fsimilar(R, spatial.sphere.R, 0.15f))
@@ -140,7 +140,7 @@ void CParticlesObject::Play(bool bHudMode)
     m_bStopping = false;
 }
 
-void CParticlesObject::play_at_pos(const Fvector& pos, BOOL xform)
+void CParticlesObject::play_at_pos(const Fvector& pos, bool xform)
 {
     if (GEnv.isDedicatedServer)
         return;
@@ -157,7 +157,7 @@ void CParticlesObject::play_at_pos(const Fvector& pos, BOOL xform)
     m_bStopping = false;
 }
 
-void CParticlesObject::Stop(BOOL bDefferedStop)
+void CParticlesObject::Stop(bool bDefferedStop)
 {
     if (GEnv.isDedicatedServer)
         return;

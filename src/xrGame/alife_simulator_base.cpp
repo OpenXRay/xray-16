@@ -34,7 +34,7 @@
 
 using namespace ALife;
 
-CALifeSimulatorBase::CALifeSimulatorBase(IPureServer* server, LPCSTR section)
+CALifeSimulatorBase::CALifeSimulatorBase(IPureServer* server, const char* section)
 {
     m_server = server;
     m_initialized = false;
@@ -75,7 +75,7 @@ void CALifeSimulatorBase::unload()
         Level().OnAlifeSimulatorUnLoaded();
 }
 
-void CALifeSimulatorBase::reload(LPCSTR section)
+void CALifeSimulatorBase::reload(const char* section)
 {
     m_header = new CALifeSimulatorHeader(section);
     m_time_manager = new CALifeTimeManager(section);
@@ -91,7 +91,7 @@ void CALifeSimulatorBase::reload(LPCSTR section)
     m_initialized = true;
 }
 
-CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& position, u32 level_vertex_id,
+CSE_Abstract* CALifeSimulatorBase::spawn_item(const char* section, const Fvector& position, u32 level_vertex_id,
     GameGraph::_GRAPH_ID game_vertex_id, u16 parent_id, bool registration)
 {
     CSE_Abstract* abstract = F_entity_Create(section);
@@ -144,7 +144,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
 CSE_Abstract* CALifeSimulatorBase::create(CSE_ALifeGroupAbstract* tpALifeGroupAbstract, CSE_ALifeDynamicObject* j)
 {
     NET_Packet tNetPacket;
-    LPCSTR S = pSettings->r_string(tpALifeGroupAbstract->base()->s_name, "monster_section");
+    const char* S = pSettings->r_string(tpALifeGroupAbstract->base()->s_name, "monster_section");
     CSE_Abstract* l_tpAbstract = F_entity_Create(S);
     R_ASSERT2(l_tpAbstract, "Can't create entity.");
     CSE_ALifeDynamicObject* k = smart_cast<CSE_ALifeDynamicObject*>(l_tpAbstract);

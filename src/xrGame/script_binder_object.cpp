@@ -20,7 +20,7 @@ CScriptBinderObject::~CScriptBinderObject()
 }
 
 void CScriptBinderObject::reinit() {}
-void CScriptBinderObject::reload(LPCSTR section) {}
+void CScriptBinderObject::reload(const char* section) {}
 bool CScriptBinderObject::net_Spawn(SpawnType DC) { return (true); }
 void CScriptBinderObject::net_Destroy() {}
 void CScriptBinderObject::net_Import(NET_Packet* net_packet) {}

@@ -24,7 +24,7 @@
 #include <malloc.h>
 #pragma warning(pop)
 
-extern void setup_location_types_line(GameGraph::TERRAIN_VECTOR& m_vertex_types, LPCSTR string);
+extern void setup_location_types_line(GameGraph::TERRAIN_VECTOR& m_vertex_types, const char* string);
 
 CSE_ALifeItemWeapon* CSE_ALifeOnlineOfflineGroup::tpfGetBestWeapon(ALife::EHitType& tHitType, float& fHitPower)
 {
@@ -341,7 +341,7 @@ void CSE_ALifeOnlineOfflineGroup::clear_location_types()
     }
 }
 
-void CSE_ALifeOnlineOfflineGroup::add_location_type(LPCSTR mask)
+void CSE_ALifeOnlineOfflineGroup::add_location_type(const char* mask)
 {
     setup_location_types_line(m_tpaTerrain, mask);
     MEMBERS::iterator I = m_members.begin();

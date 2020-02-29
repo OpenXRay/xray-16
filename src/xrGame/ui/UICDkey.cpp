@@ -15,8 +15,8 @@
 #endif
 
 string64 gsCDKey = "";
-LPCSTR AddHyphens(LPCSTR c);
-LPCSTR DelHyphens(LPCSTR c);
+const char* AddHyphens(const char* c);
+const char* DelHyphens(const char* c);
 
 CUICDkey::CUICDkey()
 {
@@ -54,7 +54,7 @@ void CUICDkey::paste_from_clipboard()
 {
     string32 temp;
     os_clipboard::paste_from_clipboard(&temp[0], sizeof(temp));
-    LPSTR const new_end = std::remove_if(&temp[0], &temp[0] + xr_strlen(temp), inappropriate_characters());
+    char* const new_end = std::remove_if(&temp[0], &temp[0] + xr_strlen(temp), inappropriate_characters());
     *new_end = 0;
     temp[16] = 0;
 
@@ -80,7 +80,7 @@ void CUICDkey::OnFocusLost()
 
 void CUICDkey::Draw()
 {
-    LPCSTR edt_str = ec().str_edit();
+    const char* edt_str = ec().str_edit();
     u32 edt_size = xr_strlen(edt_str);
 
     if (edt_size == 0)
@@ -112,7 +112,7 @@ void CUICDkey::Draw()
     xx_str[edt_size] = 0;
 
     string64 xx_str1 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-    LPCSTR edt_str1 = ec().str_before_cursor();
+    const char* edt_str1 = ec().str_before_cursor();
     u32 edt_size1 = xr_strlen(edt_str1);
     if (edt_size1 > 63)
     {
@@ -122,8 +122,8 @@ void CUICDkey::Draw()
 
     if (m_bInputFocus)
     {
-        LPCSTR res = (m_view_access) ? edt_str : xx_str;
-        LPCSTR res1 = (m_view_access) ? edt_str1 : xx_str1;
+        const char* res = (m_view_access) ? edt_str : xx_str;
+        const char* res1 = (m_view_access) ? edt_str1 : xx_str1;
 
         TextItemControl()->GetFont()->Out(pos.x, pos.y, "%s", AddHyphens(res));
 
@@ -158,7 +158,7 @@ void CUICDkey::Draw()
     TextItemControl()->GetFont()->OnRender();
 }
 
-LPCSTR CUICDkey::GetText() { return AddHyphens(inherited::GetText()); }
+const char* CUICDkey::GetText() { return AddHyphens(inherited::GetText()); }
 void CUICDkey::SetCurrentOptValue()
 {
     CUIOptionsItem::SetCurrentOptValue();
@@ -217,7 +217,7 @@ void GetCDKey_FromRegistry(char* cdkey)
     }
 }
 
-void WriteCDKey_ToRegistry(LPSTR cdkey)
+void WriteCDKey_ToRegistry(char* cdkey)
 {
     if (xr_strlen(cdkey) > 64)
     {
@@ -264,7 +264,7 @@ void GetPlayerName_FromRegistry(char* name, u32 const name_size)
     strncpy_s(name, name_size, new_name, max_name_length);
 }
 
-void WritePlayerName_ToRegistry(LPSTR name)
+void WritePlayerName_ToRegistry(char* name)
 {
     u32 const max_name_length = GP_UNIQUENICK_LEN - 1;
     if (xr_strlen(name) > max_name_length)

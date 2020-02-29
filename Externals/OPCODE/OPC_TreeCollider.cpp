@@ -804,8 +804,8 @@ void AABBTreeCollider::_Collide(const AABBNoLeafNode* a, const AABBNoLeafNode* b
         return;
 
     // Catch leaf status
-    BOOL BHasLeaf = b->HasLeaf();
-    BOOL BHasLeaf2 = b->HasLeaf2();
+    bool BHasLeaf = b->HasLeaf();
+    bool BHasLeaf2 = b->HasLeaf2();
 
     if (a->HasLeaf())
     {
@@ -1084,8 +1084,8 @@ void AABBTreeCollider::_Collide(const AABBQuantizedNoLeafNode* a, const AABBQuan
         return;
 
     // Catch leaf status
-    BOOL BHasLeaf = b->HasLeaf();
-    BOOL BHasLeaf2 = b->HasLeaf2();
+    bool BHasLeaf = b->HasLeaf();
+    bool BHasLeaf2 = b->HasLeaf2();
 
     if (a->HasLeaf())
     {

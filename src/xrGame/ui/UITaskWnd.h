@@ -139,7 +139,7 @@ public:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
-    void Init(CUIXml& uiXml, LPCSTR path);
+    void Init(CUIXml& uiXml, const char* path);
     void InitTask(CGameTask* task);
     CGameTask* OwnerTask() { return m_owner; }
 public:

@@ -53,7 +53,7 @@ public:
 
     void InitItemServer(LIST_SRV_ITEM& params /*, Fvector2 size*/);
     void SetParams(LIST_SRV_ITEM& params);
-    void CreateConsoleCommand(xr_string& command, LPCSTR player_name, LPCSTR player_pass, LPCSTR server_psw);
+    void CreateConsoleCommand(xr_string& command, const char* player_name, const char* player_pass, const char* server_psw);
 
     int Get_gs_index() { return m_srv_info.info.Index; }
     LIST_SRV_ITEM* GetInfo() { return &m_srv_info; };

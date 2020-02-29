@@ -38,7 +38,7 @@ shared_str strHalfVolumeDim("halfVolumeDim");
 shared_str strGravityBuoyancy("GravityBuoyancy");
 }
 
-LPCSTR dx103DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
+const char* dx103DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
     "$user$Texture_velocity1", //RENDER_TARGET_VELOCITY1 = 0,
     // Swap with object's
     "$user$Texture_color_out", //RENDER_TARGET_COLOR,
@@ -52,7 +52,7 @@ LPCSTR dx103DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
     "$user$Texture_color", //RENDER_TARGET_COLOR_IN,
 };
 
-LPCSTR dx103DFluidManager::m_pShaderTextureNames[NUM_RENDER_TARGETS] = {
+const char* dx103DFluidManager::m_pShaderTextureNames[NUM_RENDER_TARGETS] = {
     "Texture_velocity1", //RENDER_TARGET_VELOCITY1 = 0,
     // Swap with object's
     "Texture_color_out", //RENDER_TARGET_COLOR,

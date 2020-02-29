@@ -29,7 +29,7 @@ CPseudoGigant::CPseudoGigant()
 }
 
 CPseudoGigant::~CPseudoGigant() { xr_delete(StateMan); }
-void CPseudoGigant::Load(LPCSTR section)
+void CPseudoGigant::Load(const char* section)
 {
     inherited::Load(section);
 
@@ -172,7 +172,7 @@ void CPseudoGigant::Load(LPCSTR section)
 #endif
 
     // Load psi postprocess --------------------------------------------------------
-    LPCSTR ppi_section = pSettings->r_string(section, "threaten_effector");
+    const char* ppi_section = pSettings->r_string(section, "threaten_effector");
     m_threaten_effector.ppi.duality.h = pSettings->r_float(ppi_section, "duality_h");
     m_threaten_effector.ppi.duality.v = pSettings->r_float(ppi_section, "duality_v");
     m_threaten_effector.ppi.gray = pSettings->r_float(ppi_section, "gray");

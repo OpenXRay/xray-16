@@ -55,7 +55,7 @@ typedef CStalkerPropertyEvaluator::_value_type _value_type;
 // in_cover_evaluator
 //////////////////////////////////////////////////////////////////////////
 
-in_cover_evaluator::in_cover_evaluator(CAI_Stalker* object, LPCSTR evaluator_name)
+in_cover_evaluator::in_cover_evaluator(CAI_Stalker* object, const char* evaluator_name)
     : inherited(object ? object->lua_game_object() : 0, evaluator_name)
 {
 }
@@ -65,7 +65,7 @@ _value_type in_cover_evaluator::evaluate() { return (!!object().movement().curre
 // cover_actual_evaluator
 //////////////////////////////////////////////////////////////////////////
 
-cover_actual_evaluator::cover_actual_evaluator(CAI_Stalker* object, LPCSTR evaluator_name)
+cover_actual_evaluator::cover_actual_evaluator(CAI_Stalker* object, const char* evaluator_name)
     : inherited(object ? object->lua_game_object() : 0, evaluator_name)
 {
 }
@@ -80,7 +80,7 @@ _value_type cover_actual_evaluator::evaluate()
 // cover_entered_evaluator
 //////////////////////////////////////////////////////////////////////////
 
-cover_entered_evaluator::cover_entered_evaluator(CAI_Stalker* object, LPCSTR evaluator_name)
+cover_entered_evaluator::cover_entered_evaluator(CAI_Stalker* object, const char* evaluator_name)
     : inherited(object ? object->lua_game_object() : 0, evaluator_name)
 {
 }
@@ -91,7 +91,7 @@ _value_type cover_entered_evaluator::evaluate() { return (!!object().movement().
 //////////////////////////////////////////////////////////////////////////
 
 loophole_actual_evaluator::loophole_actual_evaluator(
-    CAI_Stalker* object, LPCSTR evaluator_name, animation_planner* planner, u32 const& loophole_value)
+    CAI_Stalker* object, const char* evaluator_name, animation_planner* planner, u32 const& loophole_value)
     : inherited(object ? object->lua_game_object() : 0, evaluator_name), m_loophole_value(loophole_value),
       m_planner(planner)
 {
@@ -113,7 +113,7 @@ _value_type loophole_actual_evaluator::evaluate()
 //////////////////////////////////////////////////////////////////////////
 
 loophole_hit_long_ago_evaluator::loophole_hit_long_ago_evaluator(
-    animation_planner* object, LPCSTR evaluator_name, u32 const& time_to_wait)
+    animation_planner* object, const char* evaluator_name, u32 const& time_to_wait)
     : inherited(object, evaluator_name), m_time_to_wait(time_to_wait)
 {
 }
@@ -128,7 +128,7 @@ _value_type loophole_hit_long_ago_evaluator::evaluate()
 //////////////////////////////////////////////////////////////////////////
 
 is_action_available_evaluator::is_action_available_evaluator(
-    animation_planner* object, LPCSTR evaluator_name, LPCSTR action_id)
+    animation_planner* object, const char* evaluator_name, const char* action_id)
     : inherited(object, evaluator_name), m_action_id(action_id)
 {
 }
@@ -149,7 +149,7 @@ _value_type is_action_available_evaluator::evaluate()
 //////////////////////////////////////////////////////////////////////////
 
 loophole_planner_const_evaluator::loophole_planner_const_evaluator(
-    animation_planner* object, LPCSTR evaluator_name, bool const& value)
+    animation_planner* object, const char* evaluator_name, bool const& value)
     : inherited(object, evaluator_name), m_value(value)
 {
 }
@@ -159,7 +159,7 @@ _value_type loophole_planner_const_evaluator::evaluate() { return (m_value); }
 // loophole_exitable_evaluator
 //////////////////////////////////////////////////////////////////////////
 
-loophole_exitable_evaluator::loophole_exitable_evaluator(CAI_Stalker* object, LPCSTR evaluator_name)
+loophole_exitable_evaluator::loophole_exitable_evaluator(CAI_Stalker* object, const char* evaluator_name)
     : inherited(object ? object->lua_game_object() : 0, evaluator_name)
 {
 }
@@ -176,7 +176,7 @@ _value_type loophole_exitable_evaluator::evaluate()
 // can_exit_loophole_with_animation
 //////////////////////////////////////////////////////////////////////////
 
-can_exit_loophole_with_animation::can_exit_loophole_with_animation(CAI_Stalker* object, LPCSTR evaluator_name)
+can_exit_loophole_with_animation::can_exit_loophole_with_animation(CAI_Stalker* object, const char* evaluator_name)
     : inherited(object ? object->lua_game_object() : 0, evaluator_name)
 {
 }
@@ -218,7 +218,7 @@ _value_type can_exit_loophole_with_animation::evaluate()
 // default_behaviour_evaluator
 //////////////////////////////////////////////////////////////////////////
 
-default_behaviour_evaluator::default_behaviour_evaluator(animation_planner* object, LPCSTR evaluator_name)
+default_behaviour_evaluator::default_behaviour_evaluator(animation_planner* object, const char* evaluator_name)
     : inherited(object, evaluator_name)
 {
 }
@@ -232,7 +232,7 @@ _value_type default_behaviour_evaluator::evaluate()
 // can_fire_at_enemy_evaluator
 //////////////////////////////////////////////////////////////////////////
 
-can_fire_at_enemy_evaluator::can_fire_at_enemy_evaluator(animation_planner* object, LPCSTR evaluator_name)
+can_fire_at_enemy_evaluator::can_fire_at_enemy_evaluator(animation_planner* object, const char* evaluator_name)
     : inherited(object, evaluator_name)
 {
 }
@@ -256,7 +256,7 @@ _value_type can_fire_at_enemy_evaluator::evaluate()
 //////////////////////////////////////////////////////////////////////////
 
 idle_time_interval_passed_evaluator::idle_time_interval_passed_evaluator(
-    animation_planner* object, LPCSTR evaluator_name, u32 const& time_interval)
+    animation_planner* object, const char* evaluator_name, u32 const& time_interval)
     : inherited(object, evaluator_name), m_time_interval(time_interval)
 {
 }
@@ -288,7 +288,7 @@ _value_type idle_time_interval_passed_evaluator::evaluate()
 //////////////////////////////////////////////////////////////////////////
 
 lookout_time_interval_passed_evaluator::lookout_time_interval_passed_evaluator(
-    animation_planner* object, LPCSTR evaluator_name, u32 const& time_interval)
+    animation_planner* object, const char* evaluator_name, u32 const& time_interval)
     : inherited(object, evaluator_name), m_time_interval(time_interval)
 {
 }

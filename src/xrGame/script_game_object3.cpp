@@ -329,7 +329,7 @@ CScriptGameObject* CScriptGameObject::GetMedikit() const
     return (medikit ? medikit->lua_game_object() : 0);
 }
 
-LPCSTR CScriptGameObject::GetPatrolPathName()
+const char* CScriptGameObject::GetPatrolPathName()
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -348,7 +348,7 @@ LPCSTR CScriptGameObject::GetPatrolPathName()
         return (*stalker->movement().patrol().path_name());
 }
 
-void CScriptGameObject::add_animation(LPCSTR animation, bool hand_usage, bool use_movement_controller)
+void CScriptGameObject::add_animation(const char* animation, bool hand_usage, bool use_movement_controller)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -376,7 +376,7 @@ void CScriptGameObject::add_animation(LPCSTR animation, bool hand_usage, bool us
 }
 
 void CScriptGameObject::add_animation(
-    LPCSTR animation, bool hand_usage, Fvector position, Fvector rotation, bool local_animation)
+    const char* animation, bool hand_usage, Fvector position, Fvector rotation, bool local_animation)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -443,7 +443,7 @@ void CScriptGameObject::set_actor_relation_flags(Flags32 flags)
 }
 
 void CScriptGameObject::set_patrol_path(
-    LPCSTR path_name, const EPatrolStartType patrol_start_type, const EPatrolRouteType patrol_route_type, bool random)
+    const char* path_name, const EPatrolStartType patrol_start_type, const EPatrolRouteType patrol_route_type, bool random)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -897,7 +897,7 @@ CScriptGameObject* CScriptGameObject::GetActiveItem()
     }
 }
 
-CScriptGameObject* CScriptGameObject::GetObjectByName(LPCSTR caObjectName) const
+CScriptGameObject* CScriptGameObject::GetObjectByName(const char* caObjectName) const
 {
     CInventoryOwner* l_tpInventoryOwner = smart_cast<CInventoryOwner*>(&object());
     if (l_tpInventoryOwner)
@@ -1035,7 +1035,7 @@ Fvector CScriptGameObject::head_orientation() const
     return (Fvector().setHP(-r.yaw, -r.pitch));
 }
 
-void CScriptGameObject::info_add(LPCSTR text)
+void CScriptGameObject::info_add(const char* text)
 {
 #ifdef DEBUG
     DBG().object_info(&object(), this).add_item(text, color_xrgb(255, 0, 0), 0);
@@ -1083,7 +1083,7 @@ void CScriptGameObject::make_object_visible_somewhen(CScriptGameObject* object)
     stalker->memory().make_object_visible_somewhen(entity_alive);
 }
 
-void CScriptGameObject::sell_condition(CScriptIniFile* ini_file, LPCSTR section)
+void CScriptGameObject::sell_condition(CScriptIniFile* ini_file, const char* section)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
@@ -1110,7 +1110,7 @@ void CScriptGameObject::sell_condition(float friend_factor, float enemy_factor)
         CTradeParameters::action_sell(0), CTradeFactors(friend_factor, enemy_factor));
 }
 
-void CScriptGameObject::buy_condition(CScriptIniFile* ini_file, LPCSTR section)
+void CScriptGameObject::buy_condition(CScriptIniFile* ini_file, const char* section)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
@@ -1137,7 +1137,7 @@ void CScriptGameObject::buy_condition(float friend_factor, float enemy_factor)
         CTradeParameters::action_buy(0), CTradeFactors(friend_factor, enemy_factor));
 }
 
-void CScriptGameObject::show_condition(CScriptIniFile* ini_file, LPCSTR section)
+void CScriptGameObject::show_condition(CScriptIniFile* ini_file, const char* section)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
@@ -1150,7 +1150,7 @@ void CScriptGameObject::show_condition(CScriptIniFile* ini_file, LPCSTR section)
     inventory_owner->trade_parameters().process(CTradeParameters::action_show(0), *ini_file, section);
 }
 
-void CScriptGameObject::buy_supplies(CScriptIniFile* ini_file, LPCSTR section)
+void CScriptGameObject::buy_supplies(CScriptIniFile* ini_file, const char* section)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
@@ -1176,7 +1176,7 @@ void CScriptGameObject::buy_item_condition_factor(float factor)
     inventory_owner->trade_parameters().buy_item_condition_factor = factor;
 }
 
-void sell_condition(CScriptIniFile* ini_file, LPCSTR section)
+void sell_condition(CScriptIniFile* ini_file, const char* section)
 {
     default_trade_parameters().process(CTradeParameters::action_sell(0), *ini_file, section);
 }
@@ -1187,7 +1187,7 @@ void sell_condition(float friend_factor, float enemy_factor)
         CTradeParameters::action_sell(0), CTradeFactors(friend_factor, enemy_factor));
 }
 
-void buy_condition(CScriptIniFile* ini_file, LPCSTR section)
+void buy_condition(CScriptIniFile* ini_file, const char* section)
 {
     default_trade_parameters().process(CTradeParameters::action_buy(0), *ini_file, section);
 }
@@ -1198,12 +1198,12 @@ void buy_condition(float friend_factor, float enemy_factor)
         CTradeParameters::action_buy(0), CTradeFactors(friend_factor, enemy_factor));
 }
 
-void show_condition(CScriptIniFile* ini_file, LPCSTR section)
+void show_condition(CScriptIniFile* ini_file, const char* section)
 {
     default_trade_parameters().process(CTradeParameters::action_show(0), *ini_file, section);
 }
 
-LPCSTR CScriptGameObject::sound_prefix() const
+const char* CScriptGameObject::sound_prefix() const
 {
     CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(&object());
     if (!custom_monster)
@@ -1216,7 +1216,7 @@ LPCSTR CScriptGameObject::sound_prefix() const
     return (*custom_monster->sound().sound_prefix());
 }
 
-void CScriptGameObject::sound_prefix(LPCSTR sound_prefix)
+void CScriptGameObject::sound_prefix(const char* sound_prefix)
 {
     CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(&object());
     if (!custom_monster)

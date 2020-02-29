@@ -59,7 +59,7 @@ public:
     //для работы с relation system
     u16 object_id() const;
     CHARACTER_COMMUNITY_INDEX Community() const;
-    LPCSTR CommunityName() const;
+    const char* CommunityName() const;
     CHARACTER_RANK_VALUE Rank();
     CHARACTER_REPUTATION_VALUE Reputation();
     void SetRank(CHARACTER_RANK_VALUE val);
@@ -74,7 +74,7 @@ public:
     xr_vector<shared_str> m_DefaultCharacters;
 
 public:
-    CSE_ALifeTraderAbstract(LPCSTR caSection);
+    CSE_ALifeTraderAbstract(const char* caSection);
     virtual ~CSE_ALifeTraderAbstract();
     // we need this to prevent virtual inheritance :-(
     virtual CSE_Abstract* base() = 0;
@@ -107,7 +107,7 @@ class CSE_ALifeTrader : public CSE_ALifeDynamicObjectVisual, public CSE_ALifeTra
     using inherited2 = CSE_ALifeTraderAbstract;
 
 public:
-    CSE_ALifeTrader(LPCSTR caSection);
+    CSE_ALifeTrader(const char* caSection);
     virtual ~CSE_ALifeTrader();
     virtual bool interactive() const /* noexcept */;
     virtual CSE_Abstract* init();
@@ -146,7 +146,7 @@ public:
     u32 m_disabled_time;
     u32 m_start_time_shift;
 
-    CSE_ALifeCustomZone(LPCSTR caSection);
+    CSE_ALifeCustomZone(const char* caSection);
     virtual ~CSE_ALifeCustomZone();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -165,7 +165,7 @@ public:
     u32 m_artefact_position_offset;
     u16 m_artefact_spawn_count;
 
-    CSE_ALifeAnomalousZone(LPCSTR caSection);
+    CSE_ALifeAnomalousZone(const char* caSection);
     virtual ~CSE_ALifeAnomalousZone();
     virtual CSE_Abstract* init();
     virtual CSE_Abstract* base();
@@ -197,7 +197,7 @@ class CSE_ALifeTorridZone : public CSE_ALifeCustomZone, public CSE_Motion
     using inherited2 = CSE_Motion;
 
 public:
-    CSE_ALifeTorridZone(LPCSTR caSection);
+    CSE_ALifeTorridZone(const char* caSection);
     virtual ~CSE_ALifeTorridZone();
     virtual CSE_Motion* __stdcall motion();
     virtual void UPDATE_Read(NET_Packet& P);
@@ -214,7 +214,7 @@ class CSE_ALifeZoneVisual : public CSE_ALifeAnomalousZone, public CSE_Visual
 
 public:
     shared_str attack_animation;
-    CSE_ALifeZoneVisual(LPCSTR caSection);
+    CSE_ALifeZoneVisual(const char* caSection);
     virtual ~CSE_ALifeZoneVisual();
     virtual CSE_Visual* __stdcall visual();
     virtual void UPDATE_Read(NET_Packet& P);
@@ -256,7 +256,7 @@ public:
 
     ALife::_TIME_ID m_game_death_time;
 
-    CSE_ALifeCreatureAbstract(LPCSTR caSection);
+    CSE_ALifeCreatureAbstract(const char* caSection);
     virtual ~CSE_ALifeCreatureAbstract();
     virtual u8 g_team();
     virtual u8 g_squad();
@@ -323,7 +323,7 @@ public:
     ALife::_OBJECT_ID m_group_id;
 
 public:
-    CSE_ALifeMonsterAbstract(LPCSTR caSection);
+    CSE_ALifeMonsterAbstract(const char* caSection);
     virtual ~CSE_ALifeMonsterAbstract();
     IC float g_MaxHealth() const { return m_fMaxHealthValue; }
     virtual CSE_Abstract* init();
@@ -407,7 +407,7 @@ public:
     u8 m_BoneDataSize;
     char m_DeadBodyData[1024];
     ///////////////////////////////////////////
-    CSE_ALifeCreatureActor(LPCSTR caSection);
+    CSE_ALifeCreatureActor(const char* caSection);
     virtual ~CSE_ALifeCreatureActor();
     virtual CSE_Abstract* base();
     virtual const CSE_Abstract* base() const;
@@ -427,7 +427,7 @@ public:
     virtual CSE_Abstract* cast_abstract() { return this; };
     virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return this; };
 public:
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -440,7 +440,7 @@ class CSE_ALifeCreatureCrow : public CSE_ALifeCreatureAbstract
     using inherited = CSE_ALifeCreatureAbstract;
 
 public:
-    CSE_ALifeCreatureCrow(LPCSTR caSection);
+    CSE_ALifeCreatureCrow(const char* caSection);
     virtual ~CSE_ALifeCreatureCrow();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
@@ -455,7 +455,7 @@ class CSE_ALifeCreaturePhantom : public CSE_ALifeCreatureAbstract
     using inherited = CSE_ALifeCreatureAbstract;
 
 public:
-    CSE_ALifeCreaturePhantom(LPCSTR caSection);
+    CSE_ALifeCreaturePhantom(const char* caSection);
     virtual ~CSE_ALifeCreaturePhantom();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
@@ -495,7 +495,7 @@ public:
     float fAttackAngle;
     float fAttackSuccessProbability;
 
-    CSE_ALifeMonsterRat(LPCSTR caSection); // constructor for variable initialization
+    CSE_ALifeMonsterRat(const char* caSection); // constructor for variable initialization
     virtual ~CSE_ALifeMonsterRat();
     virtual bool bfUseful();
     virtual CSE_Abstract* init();
@@ -529,7 +529,7 @@ public:
     float fAttackDistance;
     float fAttackAngle;
 
-    CSE_ALifeMonsterZombie(LPCSTR caSection); // constructor for variable initialization
+    CSE_ALifeMonsterZombie(const char* caSection); // constructor for variable initialization
     virtual ~CSE_ALifeMonsterZombie();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -546,11 +546,11 @@ class CSE_ALifeMonsterBase : public CSE_ALifeMonsterAbstract, public CSE_PHSkele
 public:
     u16 m_spec_object_id;
 
-    CSE_ALifeMonsterBase(LPCSTR caSection); // constructor for variable initialization
+    CSE_ALifeMonsterBase(const char* caSection); // constructor for variable initialization
     virtual ~CSE_ALifeMonsterBase();
     virtual void load(NET_Packet& tNetPacket);
     virtual CSE_Abstract* cast_abstract() { return this; }
-    virtual void spawn_supplies(LPCSTR) {}
+    virtual void spawn_supplies(const char*) {}
     virtual void spawn_supplies() {}
 #ifdef XRGAME_EXPORTS
     virtual void on_spawn();
@@ -569,7 +569,7 @@ class CSE_ALifePsyDogPhantom : public CSE_ALifeMonsterBase
     using inherited = CSE_ALifeMonsterBase;
 
 public:
-    CSE_ALifePsyDogPhantom(LPCSTR caSection); // constructor for variable initialization
+    CSE_ALifePsyDogPhantom(const char* caSection); // constructor for variable initialization
     virtual ~CSE_ALifePsyDogPhantom();
     virtual CSE_Abstract* cast_abstract() { return this; }
     virtual bool bfActive() { return false; }
@@ -586,7 +586,7 @@ class CSE_ALifeHumanAbstract : public CSE_ALifeTraderAbstract, public CSE_ALifeM
     using inherited2 = CSE_ALifeMonsterAbstract;
 
 public:
-    CSE_ALifeHumanAbstract(LPCSTR caSection);
+    CSE_ALifeHumanAbstract(const char* caSection);
     virtual ~CSE_ALifeHumanAbstract();
     virtual CSE_Abstract* init();
     virtual CSE_Abstract* base();
@@ -640,7 +640,7 @@ class CSE_ALifeHumanStalker : public CSE_ALifeHumanAbstract, public CSE_PHSkelet
 public:
     shared_str m_start_dialog;
 
-    CSE_ALifeHumanStalker(LPCSTR caSection);
+    CSE_ALifeHumanStalker(const char* caSection);
     virtual ~CSE_ALifeHumanStalker();
     virtual void load(NET_Packet& tNetPacket);
     virtual CSE_Abstract* cast_abstract() { return this; }
@@ -660,7 +660,7 @@ class CSE_ALifeOnlineOfflineGroup : public CSE_ALifeDynamicObject,
     using inherited3 = CMovementManagerHolder;
 
 public:
-    CSE_ALifeOnlineOfflineGroup(LPCSTR caSection);
+    CSE_ALifeOnlineOfflineGroup(const char* caSection);
     virtual ~CSE_ALifeOnlineOfflineGroup();
     virtual CSE_Abstract* base();
     virtual const CSE_Abstract* base() const;
@@ -718,7 +718,7 @@ public:
     MEMBERS const& squad_members() const;
     u32 npc_count() const;
     void clear_location_types();
-    void add_location_type(LPCSTR mask);
+    void add_location_type(const char* mask);
     void force_change_position(Fvector position);
     //void force_change_game_vertex_id(GameGraph::_GRAPH_ID game_vertex_id);
     virtual void on_failed_switch_online();

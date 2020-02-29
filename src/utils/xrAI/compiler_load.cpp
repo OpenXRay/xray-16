@@ -51,7 +51,7 @@ void transfer(const char* name, xr_vector<T>& dest, IReader& F, u32 chunk)
 extern u32* Surface_Load(char* name, u32& w, u32& h);
 extern void Surface_Init();
 
-void xrLoad(LPCSTR name, bool draft_mode)
+void xrLoad(const char* name, bool draft_mode)
 {
     FS.get_path("$level$")->_set((LPSTR)name);
     string_path file_name;
@@ -147,7 +147,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
                         // analyze thumbnail information
                         BT.THM.Load(*THM);
-                        BOOL bLOD = FALSE;
+                        bool bLOD = FALSE;
                         if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
                             bLOD = TRUE;
 
@@ -270,7 +270,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
         H.size_y = 1.f;
         H.aabb = LevelBB;
 
-        typedef BYTE NodeLink[3];
+        typedef unsigned char NodeLink[3];
         for (size_t i = 0; i < N; i++)
         {
             NodeLink id;
@@ -281,7 +281,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
             for (size_t j = 0; j < 4; ++j)
             {
                 F->r(&id, 3);
-                g_nodes[i].n[j] = (*LPDWORD(&id)) & 0x00ffffff;
+                g_nodes[i].n[j] = (*(unsigned int*)(&id)) & 0x00ffffff;
             }
 
             pl = F->r_u16();

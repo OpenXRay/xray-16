@@ -26,8 +26,8 @@ using namespace luabind;
 
 typedef xr_vector<std::pair<shared_str, int>> STORY_PAIRS;
 typedef STORY_PAIRS SPAWN_STORY_PAIRS;
-LPCSTR _INVALID_STORY_ID = "INVALID_STORY_ID";
-LPCSTR _INVALID_SPAWN_STORY_ID = "INVALID_SPAWN_STORY_ID";
+const char* _INVALID_STORY_ID = "INVALID_STORY_ID";
+const char* _INVALID_SPAWN_STORY_ID = "INVALID_SPAWN_STORY_ID";
 STORY_PAIRS story_ids;
 SPAWN_STORY_PAIRS spawn_story_ids;
 
@@ -71,17 +71,17 @@ CSE_ALifeDynamicObject* alife_story_object(const CALifeSimulator* self, ALife::_
 }
 
 template <typename _id_type>
-void generate_story_ids(STORY_PAIRS& result, _id_type INVALID_ID, LPCSTR section_name, LPCSTR INVALID_ID_STRING,
-    LPCSTR invalid_id_description, LPCSTR invalid_id_redefinition, LPCSTR duplicated_id_description)
+void generate_story_ids(STORY_PAIRS& result, _id_type INVALID_ID, const char* section_name, const char* INVALID_ID_STRING,
+    const char* invalid_id_description, const char* invalid_id_redefinition, const char* duplicated_id_description)
 {
     result.clear();
 
     CInifile* Ini = pGameIni;
 
-    LPCSTR N, V;
+    const char* N, *V;
     u32 k;
     shared_str temp;
-    LPCSTR section = section_name;
+    const char* section = section_name;
     R_ASSERT(Ini->section_exist(section));
 
     for (k = 0; Ini->r_line(section, k, &N, &V); ++k)
@@ -147,14 +147,14 @@ CSE_ALifeDynamicObject* CALifeSimulator__create(CALifeSimulator* self, ALife::_S
     return (object);
 }
 
-CSE_Abstract* CALifeSimulator__spawn_item(CALifeSimulator* self, LPCSTR section, const Fvector& position,
+CSE_Abstract* CALifeSimulator__spawn_item(CALifeSimulator* self, const char* section, const Fvector& position,
     u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id)
 {
     THROW(self);
     return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, ALife::_OBJECT_ID(-1)));
 }
 
-CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section, const Fvector& position,
+CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, const char* section, const Fvector& position,
     u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent)
 {
     if (id_parent == ALife::_OBJECT_ID(-1))
@@ -188,7 +188,7 @@ CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section
     return (self->server().Process_spawn(packet, clientID));
 }
 
-CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section, const Fvector& position,
+CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, const char* section, const Fvector& position,
     u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent, int ammo_to_spawn)
 {
     //	if (id_parent == ALife::_OBJECT_ID(-1))
@@ -268,9 +268,9 @@ void CALifeSimulator__release(CALifeSimulator* self, CSE_Abstract* object, bool)
     Level().Send(packet, net_flags(TRUE, TRUE));
 }
 
-LPCSTR get_level_name(const CALifeSimulator* self, int level_id)
+const char* get_level_name(const CALifeSimulator* self, int level_id)
 {
-    LPCSTR result = *ai().game_graph().header().level((GameGraph::_LEVEL_ID)level_id).name();
+    const char* result = *ai().game_graph().header().level((GameGraph::_LEVEL_ID)level_id).name();
     return (result);
 }
 
@@ -286,7 +286,7 @@ KNOWN_INFO_VECTOR* registry(const CALifeSimulator* self, const ALife::_OBJECT_ID
     return (self->registry(info_portions).object(id, true));
 }
 
-bool has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPCSTR info_id)
+bool has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, const char* info_id)
 {
     const KNOWN_INFO_VECTOR* known_info = registry(self, id);
     if (!known_info)
@@ -298,7 +298,7 @@ bool has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPCSTR i
     return (true);
 }
 
-bool dont_has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPCSTR info_id)
+bool dont_has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, const char* info_id)
 {
     THROW(self);
     // absurdly, but only because of scriptwriters needs

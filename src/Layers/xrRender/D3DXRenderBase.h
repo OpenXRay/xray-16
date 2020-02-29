@@ -17,7 +17,7 @@ public:
 class D3DXRenderBase : public IRender, public pureFrame
 {
 public:
-    BOOL val_bRecordMP; // record nearest for multi-pass
+    bool val_bRecordMP; // record nearest for multi-pass
     R_feedback* val_feedback; // feedback for geometry being rendered
     u32 val_feedback_breakp; // breakpoint
     xr_vector<Fbox3>* val_recorder; // coarse structure recorder
@@ -72,7 +72,7 @@ public:
 
     u32 counter_S;
     u32 counter_D;
-    BOOL b_loaded;
+    bool b_loaded;
 
 public:
     friend class CSkeletonX; // Stats.Skinning
@@ -169,9 +169,9 @@ public:
     void r_dsgraph_render_wmarks();
     void r_dsgraph_render_distort();
     void r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
-        BOOL _dynamic, BOOL _precise_portals = FALSE);
+        bool _dynamic, bool _precise_portals = FALSE);
     void r_dsgraph_render_subspace(
-        IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
+        IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, bool _dynamic, bool _precise_portals = FALSE);
     void r_dsgraph_render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
 
     //	Gamma correction functions

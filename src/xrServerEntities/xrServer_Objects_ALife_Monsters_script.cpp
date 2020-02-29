@@ -14,20 +14,20 @@
 using namespace luabind;
 
 #ifdef XRGAME_EXPORTS
-LPCSTR profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
+const char* profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
 SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
     module(luaState)[class_<CSE_ALifeTraderAbstract>("cse_alife_trader_abstract")
-                         //			.def(		constructor<LPCSTR>())
+                         //			.def(		constructor<const char*>())
                          .def("community", &CSE_ALifeTraderAbstract::CommunityName)
                          .def("profile_name", &profile_name_script)
                          .def("rank", &CSE_ALifeTraderAbstract::Rank)
                          .def("reputation", &CSE_ALifeTraderAbstract::Reputation)];
 });
 #else
-LPCSTR profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
+const char* profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
 SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
     module(luaState)[class_<CSE_ALifeTraderAbstract>("cse_alife_trader_abstract")
-    //			.def(		constructor<LPCSTR>())
+    //			.def(		constructor<const char*>())
     //.def("community", &CSE_ALifeTraderAbstract::CommunityName)
     .def("profile_name", &profile_name_script)
     //.def("rank", &CSE_ALifeTraderAbstract::Rank)

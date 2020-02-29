@@ -41,11 +41,11 @@ private:
 private:
     int m_iReportToMasterServer;
 
-    BOOL m_bQR2_Initialized;
+    bool m_bQR2_Initialized;
     void QR2_Init(int PortID);
     void QR2_ShutDown();
 
-    BOOL m_bCDKey_Initialized;
+    bool m_bCDKey_Initialized;
     void CDKey_Init();
     void CDKey_ShutDown();
     void SendChallengeString_2_Client(IClient* C);

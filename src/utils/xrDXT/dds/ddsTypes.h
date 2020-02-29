@@ -11,7 +11,7 @@
 
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
-typedef unsigned long DWORD;
+typedef unsigned long unsigned int;
 
 typedef enum nvD3DFORMAT
 {
@@ -244,14 +244,14 @@ enum nvPixelFormat
 // filled in by reading a dds file
 struct DDS_PIXELFORMAT
 {
-    DWORD dwSize;
-    DWORD dwFlags;
-    DWORD dwFourCC;
-    DWORD dwRGBBitCount;
-    DWORD dwRBitMask;
-    DWORD dwGBitMask;
-    DWORD dwBBitMask;
-    DWORD dwRGBAlphaBitMask;
+    unsigned int dwSize;
+    unsigned int dwFlags;
+    unsigned int dwFourCC;
+    unsigned int dwRGBBitCount;
+    unsigned int dwRBitMask;
+    unsigned int dwGBitMask;
+    unsigned int dwBBitMask;
+    unsigned int dwRGBAlphaBitMask;
 };
 
 class nvImageContainer
@@ -267,13 +267,13 @@ public:
     size_t nMIPMapsToLoad;
     bool bFoundAlphaInRead; // is alpha field present and non-zero
     // in the input file
-    DWORD dwCubeMapFlags;
+    unsigned int dwCubeMapFlags;
     size_t bits_per_component;
     size_t nPlanes; // number of planes in the file format
     bool bCompressed; // is file a compressed format
     size_t paletteSize; // 16 or 256 entries
     rgba_t palette[256];
-    DWORD fmt; // D3DFORMAT specified in .dds file
+    unsigned int fmt; // D3DFORMAT specified in .dds file
     nvTextureFormats textureFormat;
     nvTextureTypes textureType;
     fpMipMappedImage fpMIPImage;

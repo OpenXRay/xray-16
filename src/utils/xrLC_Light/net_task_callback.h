@@ -6,11 +6,11 @@ class net_task_callback
 {
     static const u16 _break_connection_times = 1;
     IAgent& _agent;
-    DWORD _session;
+    unsigned int _session;
     u16 _beak_count;
 
 public:
-    net_task_callback(IAgent* agent, DWORD session)
+    net_task_callback(IAgent* agent, unsigned int session)
         : _agent(*agent), _session(session), _beak_count(_break_connection_times)
     {
     }
@@ -20,7 +20,7 @@ public:
     bool test_connection();
     const IAgent& agent() const { return _agent; }
     IAgent& agent() { return _agent; }
-    DWORD session() const { return _session; }
+    unsigned int session() const { return _session; }
 };
 
 #endif

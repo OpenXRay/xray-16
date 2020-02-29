@@ -61,7 +61,7 @@ static void unload()
 }
 
 #ifdef WINDOWS
-BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
+bool APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
     {

@@ -31,14 +31,14 @@ public:
 
 public:
     IC CScriptAnimationAction();
-    IC CScriptAnimationAction(LPCSTR caAnimationToPlay, bool use_animation_movement_controller = false);
+    IC CScriptAnimationAction(const char* caAnimationToPlay, bool use_animation_movement_controller = false);
     IC CScriptAnimationAction(MonsterSpace::EMentalState tMentalState);
     // -------------------------------------------------------------------------------------------------
     // Monster
     // -------------------------------------------------------------------------------------------------
     IC CScriptAnimationAction(MonsterSpace::EScriptMonsterAnimAction tAnimAction, int index);
     virtual ~CScriptAnimationAction();
-    IC void SetAnimation(LPCSTR caAnimationToPlay);
+    IC void SetAnimation(const char* caAnimationToPlay);
     IC void SetMentalState(MonsterSpace::EMentalState tMentalState);
     IC void initialize();
 };

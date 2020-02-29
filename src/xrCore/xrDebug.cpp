@@ -30,7 +30,7 @@
 #define USE_BUG_TRAP
 #else
 #define USE_BUG_TRAP
-static BOOL bException = FALSE;
+static bool bException = FALSE;
 #endif
 #endif
 
@@ -194,7 +194,7 @@ void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 
 #if defined(WINDOWS)
 bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
 {
-    BOOL result = StackWalk(MACHINE_TYPE, GetCurrentProcess(), GetCurrentThread(), stackFrame, threadCtx, nullptr,
+    bool result = StackWalk(MACHINE_TYPE, GetCurrentProcess(), GetCurrentThread(), stackFrame, threadCtx, nullptr,
                             SymFunctionTableAccess, SymGetModuleBase, nullptr);
 
     if (result == FALSE || stackFrame->AddrPC.Offset == 0)
@@ -223,12 +223,12 @@ bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCt
     ///
     /// Function info
     ///
-    BYTE arrSymBuffer[512];
+    unsigned char arrSymBuffer[512];
     ZeroMemory(arrSymBuffer, sizeof(arrSymBuffer));
     PIMAGEHLP_SYMBOL functionInfo = reinterpret_cast<PIMAGEHLP_SYMBOL>(arrSymBuffer);
     functionInfo->SizeOfStruct = sizeof(*functionInfo);
     functionInfo->MaxNameLength = sizeof(arrSymBuffer) - sizeof(*functionInfo) + 1;
-    DWORD_PTR dwFunctionOffset;
+    uintptr_t dwFunctionOffset;
 
     result = SymGetSymFromAddr(GetCurrentProcess(), stackFrame->AddrPC.Offset, &dwFunctionOffset, functionInfo);
 
@@ -275,7 +275,7 @@ bool xrDebug::InitializeSymbolEngine()
 {
     if (!symEngineInitialized)
     {
-        DWORD dwOptions = SymGetOptions();
+        unsigned int dwOptions = SymGetOptions();
         SymSetOptions(dwOptions | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
 
         if (SymInitialize(GetCurrentProcess(), nullptr, TRUE))
@@ -581,7 +581,7 @@ void xrDebug::DoExit(const std::string& message)
         windowHandler->ResetFullscreen();
 }
 
-LPCSTR xrDebug::ErrorToString(long code)
+const char* xrDebug::ErrorToString(long code)
 {
     const char* result = nullptr;
     static string1024 descStorage;
@@ -614,9 +614,9 @@ int out_of_memory_handler(size_t size)
     return 1;
 }
 
-extern LPCSTR log_name();
+extern const char* log_name();
 
-void WINAPI xrDebug::PreErrorHandler(INT_PTR)
+void WINAPI xrDebug::PreErrorHandler(intptr_t)
 {
 #if defined(USE_BUG_TRAP) && defined(WINDOWS)
     if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady))
@@ -727,7 +727,7 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
     }
     void* msg = nullptr;
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, lastErr,
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (char*)&msg, 0, nullptr);
     // XXX nitrocaster: check buffer overflow
     xr_sprintf(buffer, bufferSize, "[error][%8d]: %s", lastErr, (char*)msg);
     LocalFree(msg);

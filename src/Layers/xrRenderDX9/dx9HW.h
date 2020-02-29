@@ -23,7 +23,7 @@ public:
 
     void Reset();
 
-    BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
+    bool support(D3DFORMAT fmt, unsigned int type, unsigned int usage);
 
     std::pair<u32, u32> GetSurfaceSize() const;
     D3DFORMAT GetSurfaceFormat() const;
@@ -50,7 +50,7 @@ public:
 
     IDirect3D9* pD3D = nullptr; // D3D
 
-    UINT DevAdapter;
+    unsigned int DevAdapter;
 
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;

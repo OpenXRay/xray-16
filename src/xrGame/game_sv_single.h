@@ -17,7 +17,7 @@ public:
     game_sv_Single();
     virtual ~game_sv_Single();
 
-    virtual LPCSTR type_name() const { return "single"; };
+    virtual const char* type_name() const { return "single"; };
     virtual void Create(shared_str& options);
     //	virtual		CSE_Abstract*		get_entity_from_eid		(u16 id);
 
@@ -50,7 +50,7 @@ public:
     virtual void sls_default();
     virtual shared_str level_name(const shared_str& server_options) const;
     virtual void on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src);
-    void restart_simulator(LPCSTR saved_game_name);
+    void restart_simulator(const char* saved_game_name);
 
     IC xrServer& server() const
     {

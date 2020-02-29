@@ -27,7 +27,7 @@ CProjector::~CProjector()
     glow_render.destroy();
 }
 
-void CProjector::Load(LPCSTR section) { inherited::Load(section); }
+void CProjector::Load(const char* section) { inherited::Load(section); }
 void CProjector::BoneCallbackX(CBoneInstance* B)
 {
     CProjector* P = static_cast<CProjector*>(B->callback_param());
@@ -50,13 +50,12 @@ void CProjector::BoneCallbackY(CBoneInstance* B)
     B->mTransform.mulB_43(M);
 }
 
-BOOL CProjector::net_Spawn(CSE_Abstract* DC)
+bool CProjector::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectProjector* slight = smart_cast<CSE_ALifeObjectProjector*>(e);
     R_ASSERT(slight);
-
-    if (!inherited::net_Spawn(DC))
+   if (!inherited::net_Spawn(DC))
         return (FALSE);
 
     R_ASSERT(Visual() && smart_cast<IKinematics*>(Visual()));
@@ -166,12 +165,11 @@ void CProjector::UpdateCL()
     angle_lerp(_current.pitch, _target.pitch, bone_y.velocity, Device.fTimeDelta);
 }
 
-BOOL CProjector::UsedAI_Locations() { return (FALSE); }
+bool CProjector::UsedAI_Locations() { return (FALSE); }
 bool CProjector::bfAssignWatch(CScriptEntityAction* tpEntityAction)
 {
     if (!inherited::bfAssignWatch(tpEntityAction))
         return (false);
-
     CScriptWatchAction& l_tWatchAction = tpEntityAction->m_tWatchAction;
 
     (!l_tWatchAction.m_tpObjectToWatch) ? SetTarget(l_tWatchAction.m_tTargetPoint) :

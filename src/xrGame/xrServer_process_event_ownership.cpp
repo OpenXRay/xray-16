@@ -13,7 +13,7 @@ void ReplaceOwnershipHeader(NET_Packet& P)
     CopyMemory(&P.B.data[6], &NewType, 2);
 };
 
-void xrServer::Process_event_ownership(NET_Packet& P, ClientID sender, u32 time, u16 ID, BOOL bForced)
+void xrServer::Process_event_ownership(NET_Packet& P, ClientID sender, u32 time, u16 ID, bool bForced)
 {
     u32 MODE = net_flags(TRUE, TRUE, FALSE, TRUE);
 

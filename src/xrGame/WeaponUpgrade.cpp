@@ -2,13 +2,13 @@
 #include "StdAfx.h"
 #include "Weapon.h"
 
-static bool process_if_exists_deg2rad(LPCSTR section, LPCSTR name, float& value, bool test)
+static bool process_if_exists_deg2rad(const char* section, const char* name, float& value, bool test)
 {
     if (!pSettings->line_exist(section, name))
     {
         return false;
     }
-    LPCSTR str = pSettings->r_string(section, name);
+    const char* str = pSettings->r_string(section, name);
     if (!str || !xr_strlen(str))
     {
         return false;
@@ -21,7 +21,7 @@ static bool process_if_exists_deg2rad(LPCSTR section, LPCSTR name, float& value,
     return true;
 }
 
-bool CWeapon::install_upgrade_impl(LPCSTR section, bool test)
+bool CWeapon::install_upgrade_impl(const char* section, bool test)
 {
     // inherited::install_upgrade( section );
     bool result = CInventoryItemObject::install_upgrade_impl(section, test);
@@ -33,9 +33,9 @@ bool CWeapon::install_upgrade_impl(LPCSTR section, bool test)
     return result;
 }
 
-bool CWeapon::install_upgrade_ammo_class(LPCSTR section, bool test)
+bool CWeapon::install_upgrade_ammo_class(const char* section, bool test)
 {
-    LPCSTR str;
+    const char* str;
 
     bool result = process_if_exists(section, "ammo_mag_size", &CInifile::r_s32, iMagazineSize, test);
 
@@ -58,7 +58,7 @@ bool CWeapon::install_upgrade_ammo_class(LPCSTR section, bool test)
     return result;
 }
 
-bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
+bool CWeapon::install_upgrade_disp(const char* section, bool test)
 {
     bool result = process_if_exists(
         section, "fire_dispersion_condition_factor", &CInifile::r_float, fireDispersionConditionFactor, test);
@@ -138,7 +138,7 @@ bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
     return result;
 }
 
-bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
+bool CWeapon::install_upgrade_hit(const char* section, bool test)
 {
     bool result = false;
 
@@ -207,7 +207,7 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
         result |= process_if_exists(section, "time_to_aim", &CInifile::r_float, m_fTimeToAim, test);
     }
 
-    //	LPCSTR weapon_section = cNameSect().c_str();
+    //	const char* weapon_section = cNameSect().c_str();
     float rpm = 60.0f / fOneShotTime; // pSettings->r_float( weapon_section, "rpm" ); // fOneShotTime * 60.0f;
     result2 = process_if_exists(section, "rpm", &CInifile::r_float, rpm, test);
     if (result2 && !test)
@@ -220,7 +220,7 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
     return result;
 }
 
-bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
+bool CWeapon::install_upgrade_addon(const char* section, bool test)
 {
     bool result = false;
     // pcstr weapon_section = cNameSect().c_str();

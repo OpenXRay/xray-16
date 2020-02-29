@@ -40,7 +40,7 @@ public:
     CActorCondition(CActor* object);
     virtual ~CActorCondition();
 
-    virtual void LoadCondition(LPCSTR section);
+    virtual void LoadCondition(const char* section);
     virtual void reinit();
 
     virtual CWound* ConditionHit(SHit* pHDS);
@@ -181,7 +181,7 @@ class CActorDeathEffector
     void xr_stdcall OnPPEffectorReleased();
 
 public:
-    CActorDeathEffector(CActorCondition* parent, LPCSTR sect); // -((
+    CActorDeathEffector(CActorCondition* parent, const char* sect); // -((
     ~CActorDeathEffector();
     void UpdateCL();
     IC bool IsActual() { return m_b_actual; }

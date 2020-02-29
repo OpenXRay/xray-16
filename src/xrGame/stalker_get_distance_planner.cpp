@@ -19,7 +19,7 @@
 using namespace StalkerSpace;
 using namespace StalkerDecisionSpace;
 
-CStalkerGetDistancePlanner::CStalkerGetDistancePlanner(CAI_Stalker* object, LPCSTR action_name)
+CStalkerGetDistancePlanner::CStalkerGetDistancePlanner(CAI_Stalker* object, const char* action_name)
     : inherited(object, action_name)
 {
 }

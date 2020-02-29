@@ -34,8 +34,8 @@ struct SMusicTrack
     float m_Volume;
 
 public:
-    void Load(LPCSTR fn, LPCSTR params);
-    BOOL in(u32 game_time);
+    void Load(const char* fn, const char* params);
+    bool in(u32 game_time);
     bool IsPlaying() const;
     void Play();
     void Stop();

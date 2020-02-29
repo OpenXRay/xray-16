@@ -19,7 +19,7 @@ public:
 
     CActor* m_pActor;
 
-    void Load(LPCSTR section);
+    void Load(const char* section);
     void Update(float dist, float radius, ALife::EHitType hit_type);
     void Stop();
     float xr_stdcall GetFactor();

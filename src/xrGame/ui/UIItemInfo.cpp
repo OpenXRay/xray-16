@@ -24,7 +24,7 @@
 #include "xrGame/game_type.h"
 #include "UIHelper.h"
 
-extern const LPCSTR g_inventory_upgrade_xml;
+extern const const char* g_inventory_upgrade_xml;
 
 #define INV_GRID_WIDTH2 40.0f
 #define INV_GRID_HEIGHT2 40.0f
@@ -152,14 +152,14 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
     return true;
 }
 
-void CUIItemInfo::InitItemInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name)
+void CUIItemInfo::InitItemInfo(Fvector2 pos, Fvector2 size, const char* xml_name)
 {
     inherited::SetWndPos(pos);
     inherited::SetWndSize(size);
     InitItemInfo(xml_name);
 }
 
-void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem, u32 item_price, LPCSTR trade_tip)
+void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem, u32 item_price, const char* trade_tip)
 {
     if (!pCellItem)
     {
@@ -186,7 +186,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
     }
     if (UIWeight)
     {
-        LPCSTR kg_str = StringTable().translate("st_kg").c_str();
+        const char* kg_str = StringTable().translate("st_kg").c_str();
         float weight = pInvItem->Weight();
 
         if (!weight)

@@ -9,7 +9,7 @@
 
 CPhysicsSkeletonObject::CPhysicsSkeletonObject() {}
 CPhysicsSkeletonObject::~CPhysicsSkeletonObject() {}
-BOOL CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
+bool CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
 
@@ -41,7 +41,7 @@ void CPhysicsSkeletonObject::net_Destroy()
     CPHSkeleton::RespawnInit();
 }
 
-void CPhysicsSkeletonObject::Load(LPCSTR section)
+void CPhysicsSkeletonObject::Load(const char* section)
 {
     inherited::Load(section);
     CPHSkeleton::Load(section);
@@ -70,12 +70,12 @@ void CPhysicsSkeletonObject::net_Save(NET_Packet& P)
     CPHSkeleton::SaveNetState(P);
 }
 
-BOOL CPhysicsSkeletonObject::net_SaveRelevant()
+bool CPhysicsSkeletonObject::net_SaveRelevant()
 {
     return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
-BOOL CPhysicsSkeletonObject::UsedAI_Locations() { return (FALSE); }
+bool CPhysicsSkeletonObject::UsedAI_Locations() { return (FALSE); }
 void CPhysicsSkeletonObject::UpdateCL()
 {
     inherited::UpdateCL();

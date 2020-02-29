@@ -10,7 +10,7 @@
 
 const GUID DECLSPEC_SELECTANY IID_IDirect3DSurface9;
 
-xrIDirect3DSurface9::xrIDirect3DSurface9(IDirect3DDevice9* pIDirect3DDevice9, UINT iWidth, UINT iHeight,
+xrIDirect3DSurface9::xrIDirect3DSurface9(IDirect3DDevice9* pIDirect3DDevice9, unsigned int iWidth, unsigned int iHeight,
     D3DFORMAT iFormat, D3DMULTISAMPLE_TYPE iMultiSample, DWORD iMultisampleQuality)
     : Width(iWidth), Height(iHeight), Format(iFormat), MultiSampleType(iMultiSample),
       MultiSampleQuality(iMultisampleQuality), m_refCount(0)
@@ -72,7 +72,7 @@ HRESULT xrIDirect3DSurface9::GetDevice(IDirect3DDevice9** ppDevice)
     return S_OK;
 };
 
-HRESULT xrIDirect3DSurface9::SetPrivateData(REFGUID refguid, CONST void* pData, DWORD SizeOfData, DWORD Flags)
+HRESULT xrIDirect3DSurface9::SetPrivateData(REFGUID refguid, const void* pData, DWORD SizeOfData, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DSurface9::SetPrivateData");
     return S_OK;
@@ -125,7 +125,7 @@ HRESULT xrIDirect3DSurface9::GetDesc(D3DSURFACE_DESC* pDesc)
     pDesc->Height = Height;
     return S_OK;
 };
-HRESULT xrIDirect3DSurface9::LockRect(D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags)
+HRESULT xrIDirect3DSurface9::LockRect(D3DLOCKED_RECT* pLockedRect, const RECT* pRect, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DSurface9::LockRect");
 #ifdef _DEBUG
@@ -134,9 +134,9 @@ HRESULT xrIDirect3DSurface9::LockRect(D3DLOCKED_RECT* pLockedRect, CONST RECT* p
         _ASSERT(0);
     }
 #endif
-    UINT RWidth = (NULL == pRect) ? Width : (pRect->right - pRect->left);
-    UINT RHeight = (NULL == pRect) ? Height : (pRect->bottom - pRect->top);
-    m_pLockedData = new BYTE[RWidth * RHeight * 4];
+    unsigned int RWidth = (NULL == pRect) ? Width : (pRect->right - pRect->left);
+    unsigned int RHeight = (NULL == pRect) ? Height : (pRect->bottom - pRect->top);
+    m_pLockedData = new unsigned char[RWidth * RHeight * 4];
     pLockedRect->Pitch = 4;
     pLockedRect->pBits = m_pLockedData;
 

@@ -32,7 +32,7 @@ private:
 
 public:
     virtual ~CLevelChanger();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void Center(Fvector& C) const;
     virtual float Radius() const;
@@ -43,9 +43,9 @@ public:
     virtual bool IsVisibleForZones() { return false; }
     void EnableLevelChanger(bool b) { m_b_enabled = b; }
     bool IsLevelChangerEnabled() const { return m_b_enabled; }
-    void SetLEvelChangerInvitationStr(LPCSTR str) { m_invite_str = str; }
+    void SetLEvelChangerInvitationStr(const char* str) { m_invite_str = str; }
     // serialization
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 };

@@ -37,7 +37,7 @@ smart_cover::action::action(luabind::object const& description)
     for (luabind::iterator I(animations), E; I != E; ++I)
     {
         VERIFY(luabind::type(I.key()) == LUA_TSTRING);
-        LPCSTR animation_type = luabind::object_cast<LPCSTR>(I.key());
+        const char* animation_type = luabind::object_cast<const char*>(I.key());
         luabind::object table = *I;
         if (luabind::type(table) != LUA_TTABLE)
         {
@@ -49,7 +49,7 @@ smart_cover::action::action(luabind::object const& description)
 }
 
 smart_cover::action::~action() { delete_data(m_animations); }
-void smart_cover::action::add_animation(LPCSTR type, luabind::object const& table)
+void smart_cover::action::add_animation(const char* type, luabind::object const& table)
 {
     VERIFY(luabind::type(table) == LUA_TTABLE);
     Animations* animations = new Animations();
@@ -62,7 +62,7 @@ void smart_cover::action::add_animation(LPCSTR type, luabind::object const& tabl
             continue;
         }
 
-        shared_str animation = luabind::object_cast<LPCSTR>(string);
+        shared_str animation = luabind::object_cast<const char*>(string);
         VERIFY2(std::find(animations->begin(), animations->end(), animation) == animations->end(),
             make_string("duplicated_animation found: %s", animation.c_str()));
         animations->push_back(animation);

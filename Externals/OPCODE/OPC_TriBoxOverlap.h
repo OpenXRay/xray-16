@@ -12,7 +12,7 @@
         max = x2;
 
 //! TO BE DOCUMENTED
-inline_ BOOL planeBoxOverlap(const Point& normal, const float d, const Point& maxbox)
+inline_ bool planeBoxOverlap(const Point& normal, const float d, const Point& maxbox)
 {
     Point vmin, vmax;
     for (udword q = 0; q <= 2; q++)
@@ -165,7 +165,7 @@ inline_ BOOL planeBoxOverlap(const Point& normal, const float d, const Point& ma
  *	\return		true if triangle & box overlap
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ BOOL AABBTreeCollider::TriBoxOverlap(const Point& center, const Point& extents)
+inline_ bool AABBTreeCollider::TriBoxOverlap(const Point& center, const Point& extents)
 {
     // Stats
     mNbBVPrimTests++;
@@ -257,7 +257,7 @@ inline_ BOOL AABBTreeCollider::TriBoxOverlap(const Point& center, const Point& e
 }
 
 //! A dedicated version where the box is constant
-inline_ BOOL OBBCollider::TriBoxOverlap()
+inline_ bool OBBCollider::TriBoxOverlap()
 {
     // Stats
     mNbVolumePrimTests++;
@@ -330,7 +330,7 @@ inline_ BOOL OBBCollider::TriBoxOverlap()
 }
 
 //! ...and another one, jeez
-inline_ BOOL AABBCollider::TriBoxOverlap()
+inline_ bool AABBCollider::TriBoxOverlap()
 {
     // Stats
     mNbVolumePrimTests++;

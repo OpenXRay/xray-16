@@ -26,7 +26,7 @@ engine_impl::~engine_impl()
     xr_delete(m_input_receiver);
 }
 #if !defined(LINUX)
-bool engine_impl::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+bool engine_impl::on_message(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
     return (Device.on_message(hWnd, uMsg, wParam, lParam, result));
 }
@@ -70,9 +70,9 @@ bool engine_impl::quit_requested() const
     return SDL_QuitRequested();
 }
 
-void engine_impl::value(LPCSTR value, shared_str& result) { result = value; }
-LPCSTR engine_impl::value(shared_str const& value) { return (value.c_str()); }
-void engine_impl::weather(LPCSTR value)
+void engine_impl::value(const char* value, shared_str& result) { result = value; }
+const char* engine_impl::value(shared_str const& value) { return (value.c_str()); }
+void engine_impl::weather(const char* value)
 {
     if (!g_pGamePersistent)
         return;
@@ -94,7 +94,7 @@ void engine_impl::weather(LPCSTR value)
     g_pGamePersistent->Environment().SelectEnvs(game_time);
 }
 
-LPCSTR engine_impl::weather()
+const char* engine_impl::weather()
 {
     if (!g_pGamePersistent)
         return ("");
@@ -102,7 +102,7 @@ LPCSTR engine_impl::weather()
     return (g_pGamePersistent->Environment().GetWeather().c_str());
 }
 
-void engine_impl::current_weather_frame(LPCSTR frame_id)
+void engine_impl::current_weather_frame(const char* frame_id)
 {
     if (!g_pGamePersistent)
         return;
@@ -141,7 +141,7 @@ void engine_impl::current_weather_frame(LPCSTR frame_id)
         }
 }
 
-LPCSTR engine_impl::current_weather_frame()
+const char* engine_impl::current_weather_frame()
 {
     if (!g_pGamePersistent)
         return ("");

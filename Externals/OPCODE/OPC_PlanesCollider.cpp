@@ -132,7 +132,7 @@ bool PlanesCollider::Collide(
  *  \warning    SCALE NOT SUPPORTED. The matrix must contain rotation & translation parts only.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL PlanesCollider::InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm)
+bool PlanesCollider::InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm)
 {
     // 1) Call the base method
     VolumeCollider::InitQueryEx();

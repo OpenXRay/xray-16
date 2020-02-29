@@ -17,11 +17,11 @@
 
 using aimers::weapon;
 
-weapon::weapon(CGameObject* object, LPCSTR animation_id, bool animation_start, Fvector const& target, LPCSTR bone0,
-    LPCSTR bone1, LPCSTR weapon_bone0, LPCSTR weapon_bone1, CWeapon const& weapon)
+weapon::weapon(CGameObject* object, const char* animation_id, bool animation_start, Fvector const& target, const char* bone0,
+    const char* bone1, const char* weapon_bone0, const char* weapon_bone1, CWeapon const& weapon)
     : inherited(object, animation_id, animation_start, target), m_weapon(weapon)
 {
-    LPCSTR bones[4] = {bone0, bone1, weapon_bone0, weapon_bone1};
+    const char* bones[4] = {bone0, bone1, weapon_bone0, weapon_bone1};
     for (u32 i = 0; i < 4; ++i)
         m_bones_ids[i] = m_kinematics.LL_BoneID(bones[i]);
 

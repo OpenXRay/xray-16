@@ -16,7 +16,7 @@
 using namespace ALife;
 
 **/
-CALifeInteractionManager::CALifeInteractionManager(IPureServer* server, LPCSTR section)
+CALifeInteractionManager::CALifeInteractionManager(IPureServer* server, const char* section)
     : CALifeCombatManager(server, section), CALifeCommunicationManager(server, section),
       CALifeSimulatorBase(server, section)
 {

@@ -89,7 +89,7 @@ struct HitData
     bool operator!=(u32 ID) { return ID != BulletID; };
     //-----------------------------------------------------------
     void Write(FILE* pFile);
-    void WriteLtx(CInifile& ini, LPCSTR sect, LPCSTR perfix);
+    void WriteLtx(CInifile& ini, const char* sect, const char* perfix);
 };
 
 using HITS_VEC = xr_vector<HitData>;
@@ -116,21 +116,21 @@ struct Weapon_Statistic
     HITS_VEC m_Hits;
     void add_hit(HitData const& hit);
 
-    Weapon_Statistic(LPCSTR Name);
+    Weapon_Statistic(const char* Name);
     ~Weapon_Statistic();
 
     void net_save(NET_Packet* P, victims_table const& vt, bone_table const& bt);
     void net_load(NET_Packet* P, victims_table const& vt, bone_table const& bt);
 
     bool FindHit(u32 BulletID, HITS_VEC_it& Hit_it);
-    bool operator==(LPCSTR name)
+    bool operator==(const char* name)
     {
         int res = xr_strcmp(WName.c_str(), name);
         return res == 0;
     }
     //-----------------------------------------------------------
     void Write(FILE* pFile);
-    void WriteLtx(CInifile& ini, LPCSTR sect);
+    void WriteLtx(CInifile& ini, const char* sect);
 };
 
 using WEAPON_STATS = xr_vector<Weapon_Statistic>;
@@ -159,22 +159,22 @@ struct Player_Statistic
     //-----------------------------------------------
     u32 m_dwCurMoneyRoundDelta;
 
-    Player_Statistic(LPCSTR Name);
+    Player_Statistic(const char* Name);
     ~Player_Statistic();
 
-    WEAPON_STATS_it FindPlayersWeapon(LPCSTR WeaponName);
+    WEAPON_STATS_it FindPlayersWeapon(const char* WeaponName);
 
     void net_save(NET_Packet* P);
     void net_load(NET_Packet* P);
 
-    bool operator==(LPCSTR name)
+    bool operator==(const char* name)
     {
         int res = xr_strcmp(PName.c_str(), name);
         return res == 0;
     }
     //-----------------------------------------------------------
     void Write(FILE* pFile);
-    void WriteLtx(CInifile& ini, LPCSTR sect);
+    void WriteLtx(CInifile& ini, const char* sect);
 
     u32 create_victims_table(victims_table& victims_table); // retutns size in bytes of table
     u32 create_bone_table(bone_table& bone_table); // retutns size in bytes of table
@@ -238,15 +238,15 @@ struct WeaponUsageStatistic
 
     void Clear();
 
-    PLAYERS_STATS_it FindPlayer(LPCSTR PlayerName);
-    bool GetPlayer(LPCSTR PlayerName, PLAYERS_STATS_it& pPlayerI);
-    void ChangePlayerName(LPCSTR from, LPCSTR to);
+    PLAYERS_STATS_it FindPlayer(const char* PlayerName);
+    bool GetPlayer(const char* PlayerName, PLAYERS_STATS_it& pPlayerI);
+    void ChangePlayerName(const char* from, const char* to);
     u8 ConvertToTeamIndex(s16 team);
 
     bool FindBullet(u32 BulletID, ABULLETS_it& Bullet_it);
     void RemoveBullet(ABULLETS_it& Bullet_it);
     //-----------------------------------------------
-    void OnWeaponBought(game_PlayerState* ps, LPCSTR WeaponName);
+    void OnWeaponBought(game_PlayerState* ps, const char* WeaponName);
     void OnBullet_Fire(SBullet* pBullet, const CCartridge& cartridge);
     virtual void OnBullet_Hit(SBullet* pBullet, u16 TargetID, s16 element, Fvector HitLocation);
     void OnBullet_Remove(SBullet* pBullet);

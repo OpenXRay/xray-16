@@ -152,7 +152,7 @@ void STextureParams::OnTypeChange(PropValue* prop)
         OnTypeChangeEvent(prop);
 }
 
-void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::TOnChange on_type_change)
+void STextureParams::FillProp(const char* base_name, PropItemVec& items, PropValue::TOnChange on_type_change)
 {
     OnTypeChangeEvent = on_type_change;
     PropValue* P = PHelper().CreateToken32(items, "Type", (u32*)&type, ttype_token);
@@ -231,9 +231,9 @@ void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::T
     }
 }
 
-BOOL STextureParams::similar(STextureParams& tp1, xr_vector<AnsiString>& sel_params)
+bool STextureParams::similar(STextureParams& tp1, xr_vector<AnsiString>& sel_params)
 {
-    BOOL res = TRUE;
+    bool res = TRUE;
 
     xr_vector<AnsiString>::iterator it = sel_params.begin();
     xr_vector<AnsiString>::iterator it_e = sel_params.end();
@@ -370,8 +370,8 @@ BOOL STextureParams::similar(STextureParams& tp1, xr_vector<AnsiString>& sel_par
     return res;
 }
 
-LPCSTR STextureParams::FormatString() { return get_token_name(tfmt_token, fmt); }
-u32 STextureParams::MemoryUsage(LPCSTR base_name)
+const char* STextureParams::FormatString() { return get_token_name(tfmt_token, fmt); }
+u32 STextureParams::MemoryUsage(const char* base_name)
 {
     u32 mem_usage = width * height * 4;
     if (flags.test(flGenerateMipMaps))

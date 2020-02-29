@@ -28,8 +28,8 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
             .def("TextControl", &CUIStatic::TextItemControl)
 
-            .def("SetText",   (void (CUIStatic::*)(LPCSTR)) (&CUIStatic::SetText))
-            .def("SetTextST", (void (CUIStatic::*)(LPCSTR)) (&CUIStatic::SetTextST))
+            .def("SetText",   (void (CUIStatic::*)(const char*)) (&CUIStatic::SetText))
+            .def("SetTextST", (void (CUIStatic::*)(const char*)) (&CUIStatic::SetTextST))
 
             .def("GetText", &CUIStatic::GetText)
 

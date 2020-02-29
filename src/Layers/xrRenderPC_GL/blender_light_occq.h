@@ -3,9 +3,9 @@
 class CBlender_light_occq : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: occlusion testing"; }
-    BOOL canBeDetailed() override { return FALSE; }
-    BOOL canBeLMAPped() override { return FALSE; }
+    const char* getComment() override { return "INTERNAL: occlusion testing"; }
+    bool canBeDetailed() override { return FALSE; }
+    bool canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 

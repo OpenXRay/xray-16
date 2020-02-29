@@ -74,7 +74,7 @@ public:
         m_ItemInfos.clear();
         Feel::Touch::feel_touch.clear();
     }
-    virtual void load(LPCSTR sect, LPCSTR prefix)
+    virtual void load(const char* sect, const char* prefix)
     {
         u32 i = 1;
         string256 temp;
@@ -128,8 +128,8 @@ public:
     CCustomDetector();
     virtual ~CCustomDetector();
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
-    virtual void Load(LPCSTR section);
+    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual void Load(const char* section);
 
     virtual void OnH_A_Chield();
     virtual void OnH_B_Independent(bool just_before_destroy);

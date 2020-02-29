@@ -1,7 +1,7 @@
 #pragma once
 
 u32 GetFVFVertexSize(u32 FVF);
-u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream);
+u32 GetDeclVertexSize(const VertexElement* decl, unsigned int Stream);
 u32 GetDeclLength(const VertexElement* decl);
 
 struct SDeclaration;
@@ -12,7 +12,7 @@ void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<
 
 namespace BufferUtils
 {
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize);
+HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, unsigned int DataSize);
 };
 
 /**

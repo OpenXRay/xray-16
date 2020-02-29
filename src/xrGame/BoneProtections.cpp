@@ -22,7 +22,7 @@ float SBoneProtections::getBoneArmor(s16 bone_id)
         return m_default.armor;
 }
 
-BOOL SBoneProtections::getBonePassBullet(s16 bone_id)
+bool SBoneProtections::getBonePassBullet(s16 bone_id)
 {
     storage_it it = m_bones_koeff.find(bone_id);
     if (it != m_bones_koeff.end())

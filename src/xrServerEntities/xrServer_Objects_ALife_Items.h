@@ -54,7 +54,7 @@ public:
     xr_vector<shared_str> m_upgrades;
 
 public:
-    CSE_ALifeInventoryItem(LPCSTR caSection);
+    CSE_ALifeInventoryItem(const char* caSection);
     virtual ~CSE_ALifeInventoryItem();
     // we need this to prevent virtual inheritance :-(
     virtual CSE_Abstract* base() = 0;
@@ -63,7 +63,7 @@ public:
     virtual CSE_Abstract* cast_abstract() { return nullptr; };
     virtual CSE_ALifeInventoryItem* cast_inventory_item() { return this; };
     virtual u32 update_rate() const;
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
 
     bool has_upgrade(const shared_str& upgrade_id);
     void add_upgrade(const shared_str& upgrade_id);
@@ -101,14 +101,14 @@ class CSE_ALifeItem : public CSE_ALifeDynamicObjectVisual, public CSE_ALifeInven
 public:
     bool m_physics_disabled;
 
-    CSE_ALifeItem(LPCSTR caSection);
+    CSE_ALifeItem(const char* caSection);
     virtual ~CSE_ALifeItem();
     virtual CSE_Abstract* base();
     virtual const CSE_Abstract* base() const;
     virtual CSE_Abstract* init();
     virtual CSE_Abstract* cast_abstract() { return this; };
     virtual CSE_ALifeInventoryItem* cast_inventory_item() { return this; };
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
     virtual void OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender);
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -131,9 +131,9 @@ public:
     bool m_active;
     bool m_nightvision_active;
     bool m_attached;
-    CSE_ALifeItemTorch(LPCSTR caSection);
+    CSE_ALifeItemTorch(const char* caSection);
     virtual ~CSE_ALifeItemTorch();
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -149,7 +149,7 @@ public:
     u16 a_elapsed;
     u16 m_boxSize;
 
-    CSE_ALifeItemAmmo(LPCSTR caSection);
+    CSE_ALifeItemAmmo(const char* caSection);
     virtual ~CSE_ALifeItemAmmo();
     virtual CSE_ALifeItemAmmo* cast_item_ammo() { return this; };
     virtual bool can_switch_online() const /* noexcept */;
@@ -203,14 +203,14 @@ public:
 
     float m_fHitPower;
     ALife::EHitType m_tHitType;
-    LPCSTR m_caAmmoSections;
+    const char* m_caAmmoSections;
     u32 m_dwAmmoAvailable;
     Flags8 m_addon_flags;
     u8 m_bZoom;
     u32 m_ef_main_weapon_type;
     u32 m_ef_weapon_type;
 
-    CSE_ALifeItemWeapon(LPCSTR caSection);
+    CSE_ALifeItemWeapon(const char* caSection);
     virtual ~CSE_ALifeItemWeapon();
     virtual void OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender);
     virtual u32 ef_main_weapon_type() const;
@@ -222,7 +222,7 @@ public:
     u16 get_ammo_magsize();
     void clone_addons(CSE_ALifeItemWeapon* parent);
 
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
 
     virtual CSE_ALifeItemWeapon* cast_item_weapon() { return this; }
     virtual void UPDATE_Read(NET_Packet& P);
@@ -238,7 +238,7 @@ class CSE_ALifeItemWeaponMagazined : public CSE_ALifeItemWeapon
 
 public:
     u8 m_u8CurFireMode;
-    CSE_ALifeItemWeaponMagazined(LPCSTR caSection);
+    CSE_ALifeItemWeaponMagazined(const char* caSection);
     virtual ~CSE_ALifeItemWeaponMagazined();
 
     virtual CSE_ALifeItemWeapon* cast_item_weapon() { return this; }
@@ -255,7 +255,7 @@ class CSE_ALifeItemWeaponMagazinedWGL : public CSE_ALifeItemWeaponMagazined
 
 public:
     bool m_bGrenadeMode;
-    CSE_ALifeItemWeaponMagazinedWGL(LPCSTR caSection);
+    CSE_ALifeItemWeaponMagazinedWGL(const char* caSection);
     virtual ~CSE_ALifeItemWeaponMagazinedWGL();
 
     virtual CSE_ALifeItemWeapon* cast_item_weapon() { return this; }
@@ -272,7 +272,7 @@ class CSE_ALifeItemWeaponShotGun : public CSE_ALifeItemWeaponMagazined
 
 public:
     xr_vector<u8> m_AmmoIDs;
-    CSE_ALifeItemWeaponShotGun(LPCSTR caSection);
+    CSE_ALifeItemWeaponShotGun(const char* caSection);
     virtual ~CSE_ALifeItemWeaponShotGun();
 
     virtual CSE_ALifeItemWeapon* cast_item_weapon() { return this; }
@@ -288,7 +288,7 @@ class CSE_ALifeItemWeaponAutoShotGun : public CSE_ALifeItemWeaponShotGun
     using inherited = CSE_ALifeItemWeaponShotGun;
 
 public:
-    CSE_ALifeItemWeaponAutoShotGun(LPCSTR caSection);
+    CSE_ALifeItemWeaponAutoShotGun(const char* caSection);
     virtual ~CSE_ALifeItemWeaponAutoShotGun();
 
     virtual CSE_ALifeItemWeapon* cast_item_weapon() { return this; }
@@ -305,7 +305,7 @@ class CSE_ALifeItemDetector : public CSE_ALifeItem
 
 public:
     u32 m_ef_detector_type;
-    CSE_ALifeItemDetector(LPCSTR caSection);
+    CSE_ALifeItemDetector(const char* caSection);
     virtual ~CSE_ALifeItemDetector();
     virtual u32 ef_detector_type() const;
     virtual CSE_ALifeItemDetector* cast_item_detector() { return this; }
@@ -322,9 +322,9 @@ class CSE_ALifeItemArtefact : public CSE_ALifeItem
 
 public:
     float m_fAnomalyValue;
-    CSE_ALifeItemArtefact(LPCSTR caSection);
+    CSE_ALifeItemArtefact(const char* caSection);
     virtual ~CSE_ALifeItemArtefact();
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -341,7 +341,7 @@ public:
     shared_str m_specific_character;
     shared_str m_info_portion;
 
-    CSE_ALifeItemPDA(LPCSTR caSection);
+    CSE_ALifeItemPDA(const char* caSection);
     virtual ~CSE_ALifeItemPDA();
     virtual CSE_ALifeItemPDA* cast_item_pda() { return this; };
     virtual void UPDATE_Read(NET_Packet& P);
@@ -357,7 +357,7 @@ class CSE_ALifeItemDocument : public CSE_ALifeItem
 
 public:
     shared_str m_wDoc;
-    CSE_ALifeItemDocument(LPCSTR caSection);
+    CSE_ALifeItemDocument(const char* caSection);
     virtual ~CSE_ALifeItemDocument();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -372,7 +372,7 @@ class CSE_ALifeItemGrenade : public CSE_ALifeItem
 
 public:
     u32 m_ef_weapon_type;
-    CSE_ALifeItemGrenade(LPCSTR caSection);
+    CSE_ALifeItemGrenade(const char* caSection);
     virtual ~CSE_ALifeItemGrenade();
     virtual u32 ef_weapon_type() const;
     virtual void UPDATE_Read(NET_Packet& P);
@@ -387,7 +387,7 @@ class CSE_ALifeItemExplosive : public CSE_ALifeItem
     using inherited = CSE_ALifeItem;
 
 public:
-    CSE_ALifeItemExplosive(LPCSTR caSection);
+    CSE_ALifeItemExplosive(const char* caSection);
     virtual ~CSE_ALifeItemExplosive();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -402,7 +402,7 @@ class CSE_ALifeItemBolt : public CSE_ALifeItem
 
 public:
     u32 m_ef_weapon_type;
-    CSE_ALifeItemBolt(LPCSTR caSection);
+    CSE_ALifeItemBolt(const char* caSection);
     virtual ~CSE_ALifeItemBolt();
     virtual bool can_save() const /* noexcept */;
     virtual bool used_ai_locations() const /* noexcept */;
@@ -420,10 +420,10 @@ class CSE_ALifeItemCustomOutfit : public CSE_ALifeItem
 
 public:
     u32 m_ef_equipment_type;
-    CSE_ALifeItemCustomOutfit(LPCSTR caSection);
+    CSE_ALifeItemCustomOutfit(const char* caSection);
     virtual ~CSE_ALifeItemCustomOutfit();
     virtual u32 ef_equipment_type() const;
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -436,9 +436,9 @@ class CSE_ALifeItemHelmet : public CSE_ALifeItem
     using inherited = CSE_ALifeItem;
 
 public:
-    CSE_ALifeItemHelmet(LPCSTR caSection);
+    CSE_ALifeItemHelmet(const char* caSection);
     virtual ~CSE_ALifeItemHelmet();
-    virtual BOOL Net_Relevant();
+    virtual bool Net_Relevant();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);

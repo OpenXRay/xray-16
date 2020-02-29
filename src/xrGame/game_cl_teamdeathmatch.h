@@ -27,10 +27,10 @@ public:
     virtual void SetGameUI(CUIGameCustom*);
     virtual void GetMapEntities(xr_vector<SZoneMapEntityData>& dst);
 
-    virtual BOOL CanCallBuyMenu();
-    virtual BOOL CanCallSkinMenu();
-    virtual BOOL CanCallInventoryMenu();
-    virtual BOOL CanCallTeamSelectMenu();
+    virtual bool CanCallBuyMenu();
+    virtual bool CanCallSkinMenu();
+    virtual bool CanCallInventoryMenu();
+    virtual bool CanCallTeamSelectMenu();
 
     virtual void OnSpectatorSelect();
     virtual void OnSkinMenuBack();
@@ -50,7 +50,7 @@ public:
     virtual s16 ModifyTeam(s16 Team) { return (Team != -1) ? Team - 1 : Team; };
     virtual bool Get_ShowPlayerNamesEnabled() { return m_bFriendlyNames; };
     virtual bool IsPlayerInTeam(game_PlayerState* ps, ETeam team);
-    virtual LPCSTR GetGameScore(string32& score_dest);
+    virtual const char* GetGameScore(string32& score_dest);
     s32 GetGreenTeamScore() const { return teams[0].score; };
     s32 GetBlueTeamScore() const { return teams[1].score; };
     // from UIGameTDM
@@ -62,7 +62,7 @@ protected:
     PRESET_ITEMS PresetItemsTeam1;
     PRESET_ITEMS PresetItemsTeam2;
 
-    BOOL m_bTeamSelected;
+    bool m_bTeamSelected;
     bool m_bShowPlayersNames;
 
     virtual bool CanBeReady();

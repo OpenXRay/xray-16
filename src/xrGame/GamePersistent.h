@@ -63,8 +63,8 @@ public:
     CGamePersistent();
     virtual ~CGamePersistent();
 
-    void PreStart(LPCSTR op) override;
-    virtual void Start(LPCSTR op);
+    void PreStart(const char* op) override;
+    virtual void Start(const char* op);
     virtual void Disconnect();
 
     virtual void OnAppActivate();

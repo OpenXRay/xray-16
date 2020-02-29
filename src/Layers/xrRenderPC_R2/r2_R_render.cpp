@@ -128,7 +128,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                         vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
                         vis_data v_copy = v_orig;
                         v_copy.box.xform(renderable->GetRenderData().xform);
-                        BOOL bVisible = HOM.visible(v_copy);
+                        bool bVisible = HOM.visible(v_copy);
                         v_orig.marker = v_copy.marker;
                         v_orig.accept_frame = v_copy.accept_frame;
                         v_orig.hom_frame = v_copy.hom_frame;
@@ -230,7 +230,7 @@ void CRender::Render()
     // Configure
     RImplementation.o.distortion = FALSE; // disable distorion
     Fcolor sun_color = ((light*)Lights.sun._get())->color;
-    BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+    bool bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
     if (o.sunstatic)
         bSUN = FALSE;
     // Msg						("sstatic: %s, sun: %s",o.sunstatic?"true":"false", bSUN?"true":"false");
@@ -277,7 +277,7 @@ void CRender::Render()
     {
         CTimer T;
         T.Start();
-        BOOL result = FALSE;
+        bool result = FALSE;
         HRESULT hr = S_FALSE;
         while ((hr = q_sync_point[q_sync_count]->GetData(&result, sizeof(result), D3DGETDATA_FLUSH)) == S_FALSE)
         {
@@ -308,7 +308,7 @@ void CRender::Render()
     r_pmask(true, false); // disable priority "1"
     BasicStats.Culling.End();
 
-    BOOL split_the_scene_to_minimize_wait = FALSE;
+    bool split_the_scene_to_minimize_wait = FALSE;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))
         split_the_scene_to_minimize_wait = TRUE;
 
