@@ -12,7 +12,7 @@
 
 CPolterFlame::CPolterFlame(CPoltergeist* polter) : inherited(polter) {}
 CPolterFlame::~CPolterFlame() {}
-void CPolterFlame::load(const char* section)
+void CPolterFlame::load(LPCSTR section)
 {
     inherited::load(section);
 
@@ -45,7 +45,7 @@ void CPolterFlame::load(const char* section)
     read_delay(section, "flame_scan_delay_min_max", m_scan_delay_min, m_scan_delay_max);
 
     // load scan effector
-    const char* ppi_section = pSettings->r_string(section, "flame_scan_effector_section");
+    LPCSTR ppi_section = pSettings->r_string(section, "flame_scan_effector_section");
     m_scan_effector_info.duality.h = pSettings->r_float(ppi_section, "duality_h");
     m_scan_effector_info.duality.v = pSettings->r_float(ppi_section, "duality_v");
     m_scan_effector_info.gray = pSettings->r_float(ppi_section, "gray");

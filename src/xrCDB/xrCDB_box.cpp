@@ -244,7 +244,7 @@ public:
         }
         return true;
     }
-    void _prim(unsigned int prim)
+    void _prim(DWORD prim)
     {
         TRI& T = tris[prim];
         Fvector& v0 = verts[T.verts[0]];

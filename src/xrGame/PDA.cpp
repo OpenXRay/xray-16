@@ -20,7 +20,7 @@ CPda::CPda(void)
 }
 
 CPda::~CPda() {}
-bool CPda::net_Spawn(CSE_Abstract* DC)
+BOOL CPda::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     CSE_Abstract* abstract = (CSE_Abstract*)(DC);
@@ -40,7 +40,7 @@ void CPda::net_Destroy()
     UpdateActiveContacts();
 }
 
-void CPda::Load(const char* section)
+void CPda::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -191,7 +191,7 @@ void CPda::load(IReader& input_packet)
 
 IGameObject* CPda::GetOwnerObject() { return Level().Objects.net_Find(GetOriginalOwnerID()); }
 /* remove must
-const char*		CPda::Name				()
+LPCSTR		CPda::Name				()
 {
     if( !m_SpecificChracterOwner.size() )
         return inherited::Name();

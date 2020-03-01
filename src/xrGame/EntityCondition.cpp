@@ -96,9 +96,9 @@ void CEntityCondition::ClearWounds()
     m_bIsBleeding = false;
 }
 
-void CEntityCondition::LoadCondition(const char* entity_section)
+void CEntityCondition::LoadCondition(LPCSTR entity_section)
 {
-    const char* section = READ_IF_EXISTS(pSettings, r_string, entity_section, "condition_sect", entity_section);
+    LPCSTR section = READ_IF_EXISTS(pSettings, r_string, entity_section, "condition_sect", entity_section);
 
     m_change_v.load(section, "");
 
@@ -114,7 +114,7 @@ void CEntityCondition::LoadCondition(const char* entity_section)
     m_fInvulnerableTimeDelta = READ_IF_EXISTS(pSettings, r_float, section, "invulnerable_time", 0.0f) / 1000.f;
 }
 
-void CEntityCondition::LoadTwoHitsDeathParams(const char* section)
+void CEntityCondition::LoadTwoHitsDeathParams(LPCSTR section)
 {
     m_fKillHitTreshold = READ_IF_EXISTS(pSettings, r_float, section, "killing_hit_treshold", 0.0f);
     m_fLastChanceHealth = READ_IF_EXISTS(pSettings, r_float, section, "last_chance_health", 0.0f);
@@ -566,7 +566,7 @@ void CEntityCondition::load(IReader& input_packet)
     }
 }
 
-void CEntityCondition::SConditionChangeV::load(const char* sect, const char* prefix)
+void CEntityCondition::SConditionChangeV::load(LPCSTR sect, LPCSTR prefix)
 {
     string256 str;
     m_fV_Circumspection = 0.01f;

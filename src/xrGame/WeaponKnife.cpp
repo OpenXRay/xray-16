@@ -57,7 +57,7 @@ enum class FieldTypes
 };
 
 CWeaponKnife::~CWeaponKnife() {}
-void CWeaponKnife::Load(const char* section)
+void CWeaponKnife::Load(LPCSTR section)
 {
     // verify class
     inherited::Load(section);
@@ -428,7 +428,7 @@ bool CWeaponKnife::Action(u16 cmd, u32 flags)
     return false;
 }
 
-void CWeaponKnife::LoadFireParams(const char* section)
+void CWeaponKnife::LoadFireParams(LPCSTR section)
 {
     inherited::LoadFireParams(section);
 
@@ -891,7 +891,7 @@ bool CWeaponKnife::SelectBestHitVictim(
     return !m_spartial_query_res.empty();
 }
 
-bool CWeaponKnife::RayQueryCallback(collide::rq_result& result, LPVOID this_ptr)
+BOOL CWeaponKnife::RayQueryCallback(collide::rq_result& result, LPVOID this_ptr)
 {
     CWeaponKnife* me = static_cast<CWeaponKnife*>(this_ptr);
     if (result.O && (result.O->ID() != me->m_except_id))

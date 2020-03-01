@@ -882,7 +882,7 @@ void game_sv_Deathmatch::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
     E->o_Angle.set(r.A);
 };
 
-bool game_sv_Deathmatch::IsBuyableItem(const char* ItemName)
+bool game_sv_Deathmatch::IsBuyableItem(LPCSTR ItemName)
 {
     if (m_strWeaponsData->GetItemIdx(ItemName) == u32(-1))
         return false;
@@ -2276,7 +2276,7 @@ void game_sv_Deathmatch::on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src)
 
 void game_sv_Deathmatch::OnPlayer_Sell_Item(ClientID id_who, NET_Packet& P){};
 
-void game_sv_Deathmatch::WriteGameState(CInifile& ini, const char* sect, bool bRoundResult)
+void game_sv_Deathmatch::WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult)
 {
     inherited::WriteGameState(ini, sect, bRoundResult);
 

@@ -34,11 +34,11 @@ public:
     }
 };
 
-bool ISpatial_DB::verify()
+BOOL ISpatial_DB::verify()
 {
     walker W;
     W.walk(m_root, m_center, m_bounds);
-    bool bResult = (W.o_count == Stats.ObjectCount) && (W.n_count == Stats.NodeCount);
+    BOOL bResult = (W.o_count == Stats.ObjectCount) && (W.n_count == Stats.NodeCount);
     VERIFY(bResult);
     return bResult;
 }

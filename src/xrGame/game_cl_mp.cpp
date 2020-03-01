@@ -322,7 +322,7 @@ void game_cl_mp::Vote()
     m_pVoteRespondWindow->ShowDialog(true);
 }
 
-void game_cl_mp::OnCantVoteMsg(const char* Text)
+void game_cl_mp::OnCantVoteMsg(LPCSTR Text)
 {
     if (CurrentGameUI())
         CurrentGameUI()->CommonMessageOut(Text);
@@ -491,7 +491,7 @@ void game_cl_mp::CommonMessageOut(pcstr msg)
         CurrentGameUI()->m_pMessagesWnd->AddLogMessage(msg);
 }
 
-void game_cl_mp::ChatSay(const char* phrase, bool bAll)
+void game_cl_mp::ChatSay(LPCSTR phrase, bool bAll)
 {
     s16 team = ModifyTeam(local_player->team) + 1;
 
@@ -560,7 +560,7 @@ void game_cl_mp::OnChatMessage(NET_Packet* P)
         team = 0;
     }
 
-    char* colPlayerName;
+    LPSTR colPlayerName;
     STRCONCAT(colPlayerName, Color_Teams[team], PlayerName, ":%c[default]");
     if (Level().CurrentViewEntity() && CurrentGameUI())
         CurrentGameUI()->m_pMessagesWnd->AddChatMessage(ChatMsg, colPlayerName);
@@ -636,7 +636,7 @@ void game_cl_mp::shedule_Update(u32 dt)
     }
 }
 
-void game_cl_mp::SendStartVoteMessage(const char* args)
+void game_cl_mp::SendStartVoteMessage(LPCSTR args)
 {
     if (!args)
         return;
@@ -710,8 +710,8 @@ void game_cl_mp::LoadTeamData(const shared_str& TeamName)
         Team.IndicatorPos.y = pSettings->r_float(TeamName, "indicator_y");
         Team.IndicatorPos.z = pSettings->r_float(TeamName, "indicator_z");
 
-        const char* ShaderType = pSettings->r_string(TeamName, "indicator_shader");
-        const char* ShaderTexture = pSettings->r_string(TeamName, "indicator_texture");
+        LPCSTR ShaderType = pSettings->r_string(TeamName, "indicator_shader");
+        LPCSTR ShaderTexture = pSettings->r_string(TeamName, "indicator_texture");
         Team.IndicatorShader->create(ShaderType, ShaderTexture);
 
         ShaderType = pSettings->r_string(TeamName, "invincible_shader");
@@ -1073,7 +1073,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         CurrentGameUI()->m_pMessagesWnd->AddLogMessage(KMS);
 };
 
-extern void WritePlayerName_ToRegistry(char* name);
+extern void WritePlayerName_ToRegistry(LPSTR name);
 
 void game_cl_mp::OnPlayerChangeName(NET_Packet& P)
 {
@@ -1344,7 +1344,7 @@ void game_cl_mp::OnGameRoundStarted()
 
 void game_cl_mp::SendPlayerStarted()
 {
-    const char* map_name = Level().name().c_str();
+    LPCSTR map_name = Level().name().c_str();
     R_ASSERT2(map_name && (xr_strlen(map_name) > 0), "map name not present");
 
     NET_Packet P;
@@ -1363,7 +1363,7 @@ void game_cl_mp::LoadBonuses()
     u32 BonusCount = pSettings->line_count("mp_bonus_money");
     for (u32 i = 0; i < BonusCount; i++)
     {
-        const char* line, *name;
+        LPCSTR line, name;
         pSettings->r_line("mp_bonus_money", i, &name, &line);
         //-------------------------------------
         string1024 tmp0, tmp1, IconStr;
@@ -1732,7 +1732,7 @@ void __stdcall game_cl_mp::fr_callback_binder::receiving_serverinfo_callback(
     };
 };
 
-void game_cl_mp::decompress_and_save_screenshot(const char* file_name, u8* data, u32 data_size, u32 file_size)
+void game_cl_mp::decompress_and_save_screenshot(LPCSTR file_name, u8* data, u32 data_size, u32 file_size)
 {
     if (!file_size)
     {
@@ -1762,7 +1762,7 @@ void game_cl_mp::decompress_and_save_screenshot(const char* file_name, u8* data,
     FS.w_close(ftosave);
 }
 
-void game_cl_mp::decompress_and_process_config(const char* file_name, u8* data, u32 data_size, u32 file_size)
+void game_cl_mp::decompress_and_process_config(LPCSTR file_name, u8* data, u32 data_size, u32 file_size)
 {
     if (!file_size)
     {

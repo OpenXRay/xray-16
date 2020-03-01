@@ -15,7 +15,7 @@ using namespace luabind;
 
 SCRIPT_EXPORT(CSE_ALifeInventoryItem, (), {
     module(luaState)[class_<CSE_ALifeInventoryItem>("cse_alife_inventory_item")
-        //          .def(       constructor<const char*>())
+        //          .def(       constructor<LPCSTR>())
     ];
 });
 

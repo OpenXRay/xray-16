@@ -12,9 +12,9 @@ public:
     CWeaponMagazinedWGrenade(ESoundTypes eSoundType = SOUND_TYPE_WEAPON_SUBMACHINEGUN);
     virtual ~CWeaponMagazinedWGrenade();
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
@@ -68,8 +68,8 @@ public:
 
 private:
     virtual void net_Spawn_install_upgrades(Upgrades_type saved_upgrades);
-    virtual bool install_upgrade_impl(const char* section, bool test);
-    virtual bool install_upgrade_ammo_class(const char* section, bool test);
+    virtual bool install_upgrade_impl(LPCSTR section, bool test);
+    virtual bool install_upgrade_ammo_class(LPCSTR section, bool test);
 
     int GetAmmoCount2(u8 ammo2_type) const;
 

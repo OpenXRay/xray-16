@@ -22,7 +22,7 @@ static u32 g_batch_500;
 static u32 g_batch_1000;
 static u32 g_batch_5000;
 
-u16 RegisterShader(const char* T)
+u16 RegisterShader(LPCSTR T)
 {
     for (u32 it = 0; it < pBuild->g_Shaders.size(); it++)
         if (0 == xr_stricmp(T, pBuild->g_Shaders[it]))
@@ -57,7 +57,7 @@ static bool remap_order(u32 id0, u32 id1)
     return xr_strcmp(*o0->textures.front().name, *o1->textures.front().name) < 0;
 }
 
-static void SaveGEOMs(const char* fn, VBContainer& vb, IBContainer& ib, SWIContainer& swi)
+static void SaveGEOMs(LPCSTR fn, VBContainer& vb, IBContainer& ib, SWIContainer& swi)
 {
     Logger.Status("Geometry '%s'...", fn);
     // geometry
@@ -130,7 +130,7 @@ void CBuild::SaveTREE(IWriter& fs)
     Logger.Status("Shader table...");
     fs.open_chunk(fsL_SHADERS);
     fs.w_u32(g_Shaders.size());
-    for (xr_vector<const char*>::iterator T = g_Shaders.begin(); T != g_Shaders.end(); ++T)
+    for (xr_vector<LPCSTR>::iterator T = g_Shaders.begin(); T != g_Shaders.end(); ++T)
         fs.w_stringZ(*T);
     fs.close_chunk();
     // mem_Compact			();

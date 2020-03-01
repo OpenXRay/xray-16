@@ -33,7 +33,7 @@ CUIStatic::CUIStatic()
 }
 
 CUIStatic::~CUIStatic() { xr_delete(m_pTextControl); }
-void CUIStatic::SetXformLightAnim(const char* lanim, bool bCyclic)
+void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
 {
     if (lanim && lanim[0] != 0)
         m_lanim_xform.m_lanim = LALib.FindItem(lanim);
@@ -58,7 +58,7 @@ void CUIStatic::CreateShader(const char* tex, const char* sh)
 
 bool CUIStatic::InitTextureEx(pcstr texture, pcstr shader, bool /*fatal = true*/)
 {
-    const char* res_shname = GEnv.UIRender->UpdateShaderName(texture, shader);
+    LPCSTR res_shname = GEnv.UIRender->UpdateShaderName(texture, shader);
     bool result = CUITextureMaster::InitTexture(texture, &m_UIStaticItem, res_shname);
 
     Fvector2 p = GetWndPos();

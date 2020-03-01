@@ -203,11 +203,11 @@ protected:
     void _UnboundedStab(const AABBQuantizedNoLeafNode* node);
     void _UnboundedStab(const AABBTreeNode* node, Container& box_indices);
     // Overlap tests
-    inline_ bool RayAABBOverlap(const Point& center, const Point& extents);
-    inline_ bool SegmentAABBOverlap(const Point& center, const Point& extents);
-    inline_ bool RayTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
+    inline_ BOOL RayAABBOverlap(const Point& center, const Point& extents);
+    inline_ BOOL SegmentAABBOverlap(const Point& center, const Point& extents);
+    inline_ BOOL RayTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
     // Init methods
-    bool InitQuery(const Ray& world_ray, const Matrix4x4* world = nullptr, udword* faceid = nullptr);
+    BOOL InitQuery(const Ray& world_ray, const Matrix4x4* world = nullptr, udword* faceid = nullptr);
 };
 
 #endif // __OPC_RAYCOLLIDER_H__

@@ -15,7 +15,7 @@
 #define PRIORITY_NORMAL 8
 #define PRIORITY_LOW 4
 
-void resptrcode_texture::create(const char* _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
+void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ void CTexture::ProcessStaging()
     flags.bLoadedAsStaging = FALSE;
 
     //	Check if texture was not copied _before_ it was converted.
-    unsigned int RefCnt = pSurface->Release();
+    ULONG RefCnt = pSurface->Release();
     pSurface = 0;
 
     VERIFY(!RefCnt);
@@ -331,7 +331,7 @@ void CTexture::apply_avi(u32 dwStage)
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
         R_ASSERT(mapData.RowPitch == int(pAVI->m_dwWidth * 4));
-        unsigned char* ptr;
+        BYTE* ptr;
         pAVI->GetFrame(&ptr);
         CopyMemory(mapData.pData, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
 // R_CHK	(T2D->UnlockRect(0));
@@ -664,13 +664,13 @@ D3D_USAGE CTexture::GetUsage()
     return res;
 }
 
-void CTexture::video_Play(bool looped, u32 _time)
+void CTexture::video_Play(BOOL looped, u32 _time)
 {
     if (pTheora)
         pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : Device.dwTimeContinual);
 }
 
-void CTexture::video_Pause(bool state)
+void CTexture::video_Pause(BOOL state)
 {
     if (pTheora)
         pTheora->Pause(state);
@@ -682,4 +682,4 @@ void CTexture::video_Stop()
         pTheora->Stop();
 }
 
-bool CTexture::video_IsPlaying() { return (pTheora) ? pTheora->IsPlaying() : FALSE; }
+BOOL CTexture::video_IsPlaying() { return (pTheora) ? pTheora->IsPlaying() : FALSE; }

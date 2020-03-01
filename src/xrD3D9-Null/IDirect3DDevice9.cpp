@@ -95,7 +95,7 @@ HRESULT xrIDirect3DDevice9::TestCooperativeLevel()
     APIDEBUG("xrIDirect3DDevice9::TestCooperativeLevel");
     return S_OK;
 };
-unsigned int xrIDirect3DDevice9::GetAvailableTextureMem()
+UINT xrIDirect3DDevice9::GetAvailableTextureMem()
 {
     APIDEBUG("xrIDirect3DDevice9::GetAvailableTextureMem");
     return AvailableTextureMem;
@@ -114,7 +114,7 @@ HRESULT xrIDirect3DDevice9::GetDirect3D(IDirect3D9** ppD3D9)
     return S_OK;
 };
 
-HRESULT xrIDirect3DDevice9::GetDisplayMode(unsigned int iSwapChain, D3DDISPLAYMODE* pMode)
+HRESULT xrIDirect3DDevice9::GetDisplayMode(UINT iSwapChain, D3DDISPLAYMODE* pMode)
 {
     APIDEBUG("xrIDirect3DDevice9::GetDisplayMode");
     return S_OK;
@@ -124,7 +124,7 @@ HRESULT xrIDirect3DDevice9::GetCreationParameters(D3DDEVICE_CREATION_PARAMETERS*
     APIDEBUG("xrIDirect3DDevice9::GetCreationParameters");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetCursorProperties(unsigned int XHotSpot, unsigned int YHotSpot, IDirect3DSurface9* pCursorBitmap)
+HRESULT xrIDirect3DDevice9::SetCursorProperties(UINT XHotSpot, UINT YHotSpot, IDirect3DSurface9* pCursorBitmap)
 {
     APIDEBUG("xrIDirect3DDevice9::SetCursorProperties");
     return S_OK;
@@ -144,12 +144,12 @@ HRESULT xrIDirect3DDevice9::CreateAdditionalSwapChain(
     APIDEBUG("xrIDirect3DDevice9::CreateAdditionalSwapChain");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetSwapChain(unsigned int iSwapChain, IDirect3DSwapChain9** pSwapChain)
+HRESULT xrIDirect3DDevice9::GetSwapChain(UINT iSwapChain, IDirect3DSwapChain9** pSwapChain)
 {
     APIDEBUG("xrIDirect3DDevice9::GetSwapChain");
     return S_OK;
 };
-unsigned int xrIDirect3DDevice9::GetNumberOfSwapChains()
+UINT xrIDirect3DDevice9::GetNumberOfSwapChains()
 {
     APIDEBUG("xrIDirect3DDevice9::GetNumberOfSwapChains");
     return 1;
@@ -160,18 +160,18 @@ HRESULT xrIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::Present(
-    const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
+    CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride, CONST RGNDATA* pDirtyRegion)
 {
     APIDEBUG("xrIDirect3DDevice9::Present");
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::GetBackBuffer(
-    unsigned int iSwapChain, unsigned int iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface9** ppBackBuffer)
+    UINT iSwapChain, UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface9** ppBackBuffer)
 {
     APIDEBUG("xrIDirect3DDevice9::GetBackBuffer");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetRasterStatus(unsigned int iSwapChain, D3DRASTER_STATUS* pRasterStatus)
+HRESULT xrIDirect3DDevice9::GetRasterStatus(UINT iSwapChain, D3DRASTER_STATUS* pRasterStatus)
 {
     APIDEBUG("xrIDirect3DDevice9::GetRasterStatus");
     return S_OK;
@@ -181,16 +181,16 @@ HRESULT xrIDirect3DDevice9::SetDialogBoxMode(BOOL bEnableDialogs)
     APIDEBUG("xrIDirect3DDevice9::SetDialogBoxMode");
     return S_OK;
 };
-void xrIDirect3DDevice9::SetGammaRamp(unsigned int iSwapChain, DWORD Flags, const D3DGAMMARAMP* pRamp)
+void xrIDirect3DDevice9::SetGammaRamp(UINT iSwapChain, DWORD Flags, CONST D3DGAMMARAMP* pRamp)
 {
     APIDEBUG("xrIDirect3DDevice9::SetGammaRamp");
 };
-void xrIDirect3DDevice9::GetGammaRamp(unsigned int iSwapChain, D3DGAMMARAMP* pRamp)
+void xrIDirect3DDevice9::GetGammaRamp(UINT iSwapChain, D3DGAMMARAMP* pRamp)
 {
     APIDEBUG("xrIDirect3DDevice9::GetGammaRamp");
 };
 
-HRESULT xrIDirect3DDevice9::CreateTexture(unsigned int Width, unsigned int Height, unsigned int Levels, DWORD Usage, D3DFORMAT Format,
+HRESULT xrIDirect3DDevice9::CreateTexture(UINT Width, UINT Height, UINT Levels, DWORD Usage, D3DFORMAT Format,
     D3DPOOL Pool, IDirect3DTexture9** ppTexture, HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateTexture");
@@ -202,14 +202,14 @@ HRESULT xrIDirect3DDevice9::CreateTexture(unsigned int Width, unsigned int Heigh
     return S_OK;
 };
 
-HRESULT xrIDirect3DDevice9::CreateVolumeTexture(unsigned int Width, unsigned int Height, unsigned int Depth, unsigned int Levels, DWORD Usage,
+HRESULT xrIDirect3DDevice9::CreateVolumeTexture(UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage,
     D3DFORMAT Format, D3DPOOL Pool, IDirect3DVolumeTexture9** ppVolumeTexture, HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateVolumeTexture");
     return S_OK;
 };
 
-HRESULT xrIDirect3DDevice9::CreateCubeTexture(unsigned int EdgeLength, unsigned int Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
+HRESULT xrIDirect3DDevice9::CreateCubeTexture(UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
     IDirect3DCubeTexture9** ppCubeTexture, HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateCubeTexture");
@@ -222,7 +222,7 @@ HRESULT xrIDirect3DDevice9::CreateCubeTexture(unsigned int EdgeLength, unsigned 
 };
 
 HRESULT xrIDirect3DDevice9::CreateVertexBuffer(
-    unsigned int Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, IDirect3DVertexBuffer9** ppVertexBuffer, HANDLE* pSharedHandle)
+    UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, IDirect3DVertexBuffer9** ppVertexBuffer, HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateVertexBuffer");
 
@@ -232,7 +232,7 @@ HRESULT xrIDirect3DDevice9::CreateVertexBuffer(
 
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::CreateIndexBuffer(unsigned int Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
+HRESULT xrIDirect3DDevice9::CreateIndexBuffer(UINT Length, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
     IDirect3DIndexBuffer9** ppIndexBuffer, HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateIndexBuffer");
@@ -243,22 +243,22 @@ HRESULT xrIDirect3DDevice9::CreateIndexBuffer(unsigned int Length, DWORD Usage, 
 
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::CreateRenderTarget(unsigned int Width, unsigned int Height, D3DFORMAT Format,
+HRESULT xrIDirect3DDevice9::CreateRenderTarget(UINT Width, UINT Height, D3DFORMAT Format,
     D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, BOOL Lockable, IDirect3DSurface9** ppSurface,
     HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateRenderTarget");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::CreateDepthStencilSurface(unsigned int Width, unsigned int Height, D3DFORMAT Format,
+HRESULT xrIDirect3DDevice9::CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format,
     D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, BOOL Discard, IDirect3DSurface9** ppSurface,
     HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateDepthStencilSurface");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::UpdateSurface(IDirect3DSurface9* pSourceSurface, const RECT* pSourceRect,
-    IDirect3DSurface9* pDestinationSurface, const POINT* pDestPoint)
+HRESULT xrIDirect3DDevice9::UpdateSurface(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect,
+    IDirect3DSurface9* pDestinationSurface, CONST POINT* pDestPoint)
 {
     APIDEBUG("xrIDirect3DDevice9::UpdateSurface");
     return S_OK;
@@ -274,24 +274,24 @@ HRESULT xrIDirect3DDevice9::GetRenderTargetData(IDirect3DSurface9* pRenderTarget
     APIDEBUG("xrIDirect3DDevice9::GetRenderTargetData");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetFrontBufferData(unsigned int iSwapChain, IDirect3DSurface9* pDestSurface)
+HRESULT xrIDirect3DDevice9::GetFrontBufferData(UINT iSwapChain, IDirect3DSurface9* pDestSurface)
 {
     APIDEBUG("xrIDirect3DDevice9::GetFrontBufferData");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::StretchRect(IDirect3DSurface9* pSourceSurface, const RECT* pSourceRect,
-    IDirect3DSurface9* pDestSurface, const RECT* pDestRect, D3DTEXTUREFILTERTYPE Filter)
+HRESULT xrIDirect3DDevice9::StretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect,
+    IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect, D3DTEXTUREFILTERTYPE Filter)
 {
     APIDEBUG("xrIDirect3DDevice9::StretchRect");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::ColorFill(IDirect3DSurface9* pSurface, const RECT* pRect, D3DCOLOR color)
+HRESULT xrIDirect3DDevice9::ColorFill(IDirect3DSurface9* pSurface, CONST RECT* pRect, D3DCOLOR color)
 {
     APIDEBUG("xrIDirect3DDevice9::ColorFill");
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::CreateOffscreenPlainSurface(
-    unsigned int Width, unsigned int Height, D3DFORMAT Format, D3DPOOL Pool, IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
+    UINT Width, UINT Height, D3DFORMAT Format, D3DPOOL Pool, IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateOffscreenPlainSurface");
     return S_OK;
@@ -332,12 +332,12 @@ HRESULT xrIDirect3DDevice9::EndScene()
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::Clear(
-    DWORD Count, const D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil)
+    DWORD Count, CONST D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil)
 {
     APIDEBUG("xrIDirect3DDevice9::Clear");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, const D3DMATRIX* pMatrix)
+HRESULT xrIDirect3DDevice9::SetTransform(D3DTRANSFORMSTATETYPE State, CONST D3DMATRIX* pMatrix)
 {
     APIDEBUG("xrIDirect3DDevice9::SetTransform");
     return S_OK;
@@ -347,12 +347,12 @@ HRESULT xrIDirect3DDevice9::GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX*
     APIDEBUG("xrIDirect3DDevice9::GetTransform");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::MultiplyTransform(D3DTRANSFORMSTATETYPE, const D3DMATRIX*)
+HRESULT xrIDirect3DDevice9::MultiplyTransform(D3DTRANSFORMSTATETYPE, CONST D3DMATRIX*)
 {
     APIDEBUG("xrIDirect3DDevice9::MultiplyTransform");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetViewport(const D3DVIEWPORT9* pViewport)
+HRESULT xrIDirect3DDevice9::SetViewport(CONST D3DVIEWPORT9* pViewport)
 {
     APIDEBUG("xrIDirect3DDevice9::SetViewport");
     return S_OK;
@@ -362,7 +362,7 @@ HRESULT xrIDirect3DDevice9::GetViewport(D3DVIEWPORT9* pViewport)
     APIDEBUG("xrIDirect3DDevice9::GetViewport");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetMaterial(const D3DMATERIAL9* pMaterial)
+HRESULT xrIDirect3DDevice9::SetMaterial(CONST D3DMATERIAL9* pMaterial)
 {
     APIDEBUG("xrIDirect3DDevice9::SetMaterial");
     return S_OK;
@@ -372,7 +372,7 @@ HRESULT xrIDirect3DDevice9::GetMaterial(D3DMATERIAL9* pMaterial)
     APIDEBUG("xrIDirect3DDevice9::GetMaterial");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetLight(DWORD Index, const D3DLIGHT9*)
+HRESULT xrIDirect3DDevice9::SetLight(DWORD Index, CONST D3DLIGHT9*)
 {
     APIDEBUG("xrIDirect3DDevice9::SetLight");
     return S_OK;
@@ -392,7 +392,7 @@ HRESULT xrIDirect3DDevice9::GetLightEnable(DWORD Index, BOOL* pEnable)
     APIDEBUG("xrIDirect3DDevice9::GetLightEnable");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetClipPlane(DWORD Index, const float* pPlane)
+HRESULT xrIDirect3DDevice9::SetClipPlane(DWORD Index, CONST float* pPlane)
 {
     APIDEBUG("xrIDirect3DDevice9::SetClipPlane");
     return S_OK;
@@ -430,7 +430,7 @@ HRESULT xrIDirect3DDevice9::EndStateBlock(IDirect3DStateBlock9** ppSB)
     APIDEBUG("xrIDirect3DDevice9::EndStateBlock");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetClipStatus(const D3DCLIPSTATUS9* pClipStatus)
+HRESULT xrIDirect3DDevice9::SetClipStatus(CONST D3DCLIPSTATUS9* pClipStatus)
 {
     APIDEBUG("xrIDirect3DDevice9::SetClipStatus");
     return S_OK;
@@ -475,27 +475,27 @@ HRESULT xrIDirect3DDevice9::ValidateDevice(DWORD* pNumPasses)
     APIDEBUG("xrIDirect3DDevice9::ValidateDevice");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetPaletteEntries(unsigned int PaletteNumber, const PALETTEENTRY* pEntries)
+HRESULT xrIDirect3DDevice9::SetPaletteEntries(UINT PaletteNumber, CONST PALETTEENTRY* pEntries)
 {
     APIDEBUG("xrIDirect3DDevice9::SetPaletteEntries");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetPaletteEntries(unsigned int PaletteNumber, PALETTEENTRY* pEntries)
+HRESULT xrIDirect3DDevice9::GetPaletteEntries(UINT PaletteNumber, PALETTEENTRY* pEntries)
 {
     APIDEBUG("xrIDirect3DDevice9::GetPaletteEntries");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetCurrentTexturePalette(unsigned int PaletteNumber)
+HRESULT xrIDirect3DDevice9::SetCurrentTexturePalette(UINT PaletteNumber)
 {
     APIDEBUG("xrIDirect3DDevice9::SetCurrentTexturePalette");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetCurrentTexturePalette(unsigned int* PaletteNumber)
+HRESULT xrIDirect3DDevice9::GetCurrentTexturePalette(UINT* PaletteNumber)
 {
     APIDEBUG("xrIDirect3DDevice9::GetCurrentTexturePalette");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetScissorRect(const RECT* pRect)
+HRESULT xrIDirect3DDevice9::SetScissorRect(CONST RECT* pRect)
 {
     APIDEBUG("xrIDirect3DDevice9::SetScissorRect");
     return S_OK;
@@ -525,38 +525,38 @@ float xrIDirect3DDevice9::GetNPatchMode()
     APIDEBUG("xrIDirect3DDevice9::GetNPatchMode");
     return 0.0f;
 };
-HRESULT xrIDirect3DDevice9::DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, unsigned int StartVertex, unsigned int PrimitiveCount)
+HRESULT xrIDirect3DDevice9::DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount)
 {
     APIDEBUG("xrIDirect3DDevice9::DrawPrimitive");
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::DrawIndexedPrimitive(
-    D3DPRIMITIVETYPE, INT BaseVertexIndex, unsigned int MinVertexIndex, unsigned int NumVertices, unsigned int startIndex, unsigned int primCount)
+    D3DPRIMITIVETYPE, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount)
 {
     APIDEBUG("xrIDirect3DDevice9::DrawIndexedPrimitive");
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::DrawPrimitiveUP(
-    D3DPRIMITIVETYPE PrimitiveType, unsigned int PrimitiveCount, const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride)
+    D3DPRIMITIVETYPE PrimitiveType, UINT PrimitiveCount, CONST void* pVertexStreamZeroData, UINT VertexStreamZeroStride)
 {
     APIDEBUG("xrIDirect3DDevice9::DrawPrimitiveUP");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, unsigned int MinVertexIndex,
-    unsigned int NumVertices, unsigned int PrimitiveCount, const void* pIndexData, D3DFORMAT IndexDataFormat,
-    const void* pVertexStreamZeroData, unsigned int VertexStreamZeroStride)
+HRESULT xrIDirect3DDevice9::DrawIndexedPrimitiveUP(D3DPRIMITIVETYPE PrimitiveType, UINT MinVertexIndex,
+    UINT NumVertices, UINT PrimitiveCount, CONST void* pIndexData, D3DFORMAT IndexDataFormat,
+    CONST void* pVertexStreamZeroData, UINT VertexStreamZeroStride)
 {
     APIDEBUG("xrIDirect3DDevice9::DrawIndexedPrimitiveUP");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::ProcessVertices(unsigned int SrcStartIndex, unsigned int DestIndex, unsigned int VertexCount,
+HRESULT xrIDirect3DDevice9::ProcessVertices(UINT SrcStartIndex, UINT DestIndex, UINT VertexCount,
     IDirect3DVertexBuffer9* pDestBuffer, IDirect3DVertexDeclaration9* pVertexDecl, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DDevice9::ProcessVertices");
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::CreateVertexDeclaration(
-    const D3DVERTEXELEMENT9* pVertexElements, IDirect3DVertexDeclaration9** ppDecl)
+    CONST D3DVERTEXELEMENT9* pVertexElements, IDirect3DVertexDeclaration9** ppDecl)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateVertexDeclaration");
     *ppDecl = NULL;
@@ -584,7 +584,7 @@ HRESULT xrIDirect3DDevice9::GetFVF(DWORD* pFVF)
     APIDEBUG("xrIDirect3DDevice9::GetFVF");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::CreateVertexShader(const DWORD* pFunction, IDirect3DVertexShader9** ppShader)
+HRESULT xrIDirect3DDevice9::CreateVertexShader(CONST DWORD* pFunction, IDirect3DVertexShader9** ppShader)
 {
     APIDEBUG("xrIDirect3DDevice9::CreateVertexShader");
     *ppShader = NULL;
@@ -602,54 +602,54 @@ HRESULT xrIDirect3DDevice9::GetVertexShader(IDirect3DVertexShader9** ppShader)
     APIDEBUG("xrIDirect3DDevice9::GetVertexShader");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetVertexShaderConstantF(unsigned int StartRegister, const float* pConstantData, unsigned int Vector4fCount)
+HRESULT xrIDirect3DDevice9::SetVertexShaderConstantF(UINT StartRegister, CONST float* pConstantData, UINT Vector4fCount)
 {
     APIDEBUG("xrIDirect3DDevice9::SetVertexShaderConstantF");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetVertexShaderConstantF(unsigned int StartRegister, float* pConstantData, unsigned int Vector4fCount)
+HRESULT xrIDirect3DDevice9::GetVertexShaderConstantF(UINT StartRegister, float* pConstantData, UINT Vector4fCount)
 {
     APIDEBUG("xrIDirect3DDevice9::GetVertexShaderConstantF");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetVertexShaderConstantI(unsigned int StartRegister, const int* pConstantData, unsigned int Vector4iCount)
+HRESULT xrIDirect3DDevice9::SetVertexShaderConstantI(UINT StartRegister, CONST int* pConstantData, UINT Vector4iCount)
 {
     APIDEBUG("xrIDirect3DDevice9::SetVertexShaderConstantI");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetVertexShaderConstantI(unsigned int StartRegister, int* pConstantData, unsigned int Vector4iCount)
+HRESULT xrIDirect3DDevice9::GetVertexShaderConstantI(UINT StartRegister, int* pConstantData, UINT Vector4iCount)
 {
     APIDEBUG("xrIDirect3DDevice9::GetVertexShaderConstantI");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetVertexShaderConstantB(unsigned int StartRegister, const BOOL* pConstantData, unsigned int BoolCount)
+HRESULT xrIDirect3DDevice9::SetVertexShaderConstantB(UINT StartRegister, CONST BOOL* pConstantData, UINT BoolCount)
 {
     APIDEBUG("xrIDirect3DDevice9::SetVertexShaderConstantB");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetVertexShaderConstantB(unsigned int StartRegister, BOOL* pConstantData, unsigned int BoolCount)
+HRESULT xrIDirect3DDevice9::GetVertexShaderConstantB(UINT StartRegister, BOOL* pConstantData, UINT BoolCount)
 {
     APIDEBUG("xrIDirect3DDevice9::GetVertexShaderConstantB");
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::SetStreamSource(
-    unsigned int StreamNumber, IDirect3DVertexBuffer9* pStreamData, unsigned int OffsetInBytes, unsigned int Stride)
+    UINT StreamNumber, IDirect3DVertexBuffer9* pStreamData, UINT OffsetInBytes, UINT Stride)
 {
     APIDEBUG("xrIDirect3DDevice9::SetStreamSource");
     return S_OK;
 };
 HRESULT xrIDirect3DDevice9::GetStreamSource(
-    unsigned int StreamNumber, IDirect3DVertexBuffer9** ppStreamData, unsigned int* pOffsetInBytes, unsigned int* pStride)
+    UINT StreamNumber, IDirect3DVertexBuffer9** ppStreamData, UINT* pOffsetInBytes, UINT* pStride)
 {
     APIDEBUG("xrIDirect3DDevice9::GetStreamSource");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetStreamSourceFreq(unsigned int StreamNumber, unsigned int Setting)
+HRESULT xrIDirect3DDevice9::SetStreamSourceFreq(UINT StreamNumber, UINT Setting)
 {
     APIDEBUG("xrIDirect3DDevice9::SetStreamSourceFreq");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetStreamSourceFreq(unsigned int StreamNumber, unsigned int* pSetting)
+HRESULT xrIDirect3DDevice9::GetStreamSourceFreq(UINT StreamNumber, UINT* pSetting)
 {
     APIDEBUG("xrIDirect3DDevice9::GetStreamSourceFreq");
     return S_OK;
@@ -664,7 +664,7 @@ HRESULT xrIDirect3DDevice9::GetIndices(IDirect3DIndexBuffer9** ppIndexData)
     APIDEBUG("xrIDirect3DDevice9::GetIndices");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::CreatePixelShader(const DWORD* pFunction, IDirect3DPixelShader9** ppShader)
+HRESULT xrIDirect3DDevice9::CreatePixelShader(CONST DWORD* pFunction, IDirect3DPixelShader9** ppShader)
 {
     APIDEBUG("xrIDirect3DDevice9::CreatePixelShader");
     *ppShader = NULL;
@@ -682,47 +682,47 @@ HRESULT xrIDirect3DDevice9::GetPixelShader(IDirect3DPixelShader9** ppShader)
     APIDEBUG("xrIDirect3DDevice9::GetPixelShader");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetPixelShaderConstantF(unsigned int StartRegister, const float* pConstantData, unsigned int Vector4fCount)
+HRESULT xrIDirect3DDevice9::SetPixelShaderConstantF(UINT StartRegister, CONST float* pConstantData, UINT Vector4fCount)
 {
     APIDEBUG("xrIDirect3DDevice9::SetPixelShaderConstantF");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetPixelShaderConstantF(unsigned int StartRegister, float* pConstantData, unsigned int Vector4fCount)
+HRESULT xrIDirect3DDevice9::GetPixelShaderConstantF(UINT StartRegister, float* pConstantData, UINT Vector4fCount)
 {
     APIDEBUG("xrIDirect3DDevice9::GetPixelShaderConstantF");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetPixelShaderConstantI(unsigned int StartRegister, const int* pConstantData, unsigned int Vector4iCount)
+HRESULT xrIDirect3DDevice9::SetPixelShaderConstantI(UINT StartRegister, CONST int* pConstantData, UINT Vector4iCount)
 {
     APIDEBUG("xrIDirect3DDevice9::SetPixelShaderConstantI");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetPixelShaderConstantI(unsigned int StartRegister, int* pConstantData, unsigned int Vector4iCount)
+HRESULT xrIDirect3DDevice9::GetPixelShaderConstantI(UINT StartRegister, int* pConstantData, UINT Vector4iCount)
 {
     APIDEBUG("xrIDirect3DDevice9::GetPixelShaderConstantI");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::SetPixelShaderConstantB(unsigned int StartRegister, const BOOL* pConstantData, unsigned int BoolCount)
+HRESULT xrIDirect3DDevice9::SetPixelShaderConstantB(UINT StartRegister, CONST BOOL* pConstantData, UINT BoolCount)
 {
     APIDEBUG("xrIDirect3DDevice9::SetPixelShaderConstantB");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::GetPixelShaderConstantB(unsigned int StartRegister, BOOL* pConstantData, unsigned int BoolCount)
+HRESULT xrIDirect3DDevice9::GetPixelShaderConstantB(UINT StartRegister, BOOL* pConstantData, UINT BoolCount)
 {
     APIDEBUG("xrIDirect3DDevice9::GetPixelShaderConstantB");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::DrawRectPatch(unsigned int Handle, const float* pNumSegs, const D3DRECTPATCH_INFO* pRectPatchInfo)
+HRESULT xrIDirect3DDevice9::DrawRectPatch(UINT Handle, CONST float* pNumSegs, CONST D3DRECTPATCH_INFO* pRectPatchInfo)
 {
     APIDEBUG("xrIDirect3DDevice9::DrawRectPatch");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::DrawTriPatch(unsigned int Handle, const float* pNumSegs, const D3DTRIPATCH_INFO* pTriPatchInfo)
+HRESULT xrIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float* pNumSegs, CONST D3DTRIPATCH_INFO* pTriPatchInfo)
 {
     APIDEBUG("xrIDirect3DDevice9::DrawTriPatch");
     return S_OK;
 };
-HRESULT xrIDirect3DDevice9::DeletePatch(unsigned int Handle)
+HRESULT xrIDirect3DDevice9::DeletePatch(UINT Handle)
 {
     APIDEBUG("xrIDirect3DDevice9::DeletePatch");
     return S_OK;

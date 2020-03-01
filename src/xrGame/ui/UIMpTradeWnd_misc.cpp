@@ -116,7 +116,7 @@ void CUIMpTradeWnd::SetMoneyChangeString(int diff)
     m_static_money_change->ResetColorAnimation();
 }
 
-void CUIMpTradeWnd::SetInfoString(const char* str)
+void CUIMpTradeWnd::SetInfoString(LPCSTR str)
 {
     m_static_information->SetText(str);
     m_static_information->ResetColorAnimation();
@@ -131,7 +131,7 @@ CInventoryItem* CUIMpTradeWnd::CurrentIItem()
 {
     return (m_pCurrentCellItem) ? (CInventoryItem*)m_pCurrentCellItem->m_pData : NULL;
 }
-const char* _team_names[] = {"green", "blue"};
+LPCSTR _team_names[] = {"green", "blue"};
 void CUIMpTradeWnd::SetCurrentItem(CUICellItem* itm)
 {
     if (m_pCurrentCellItem == itm)

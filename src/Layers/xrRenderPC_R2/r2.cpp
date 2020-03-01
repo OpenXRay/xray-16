@@ -29,7 +29,7 @@ public:
     virtual void set_position(const Fvector& P) {}
     virtual void set_direction(const Fvector& D) {}
     virtual void set_radius(float R) {}
-    virtual void set_texture(const char* name) {}
+    virtual void set_texture(LPCSTR name) {}
     virtual void set_color(const Fcolor& C) {}
     virtual void set_color(float r, float g, float b) {}
 };
@@ -107,8 +107,8 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
-extern ENGINE_API bool r2_sun_static;
-extern ENGINE_API bool r2_advanced_pp; //	advanced post process and effects
+extern ENGINE_API BOOL r2_sun_static;
+extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -433,10 +433,10 @@ void CRender::OnFrame()
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
-IRenderVisual* CRender::model_Create(const char* name, IReader* data) { return Models->Create(name, data); }
-IRenderVisual* CRender::model_CreateChild(const char* name, IReader* data) { return Models->CreateChild(name, data); }
+IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
+IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
-void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
+void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
@@ -458,13 +458,13 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         F = nullptr;
     }
 }
-IRenderVisual* CRender::model_CreatePE(const char* name)
+IRenderVisual* CRender::model_CreatePE(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     R_ASSERT3(SE, "Particle effect doesn't exist", name);
     return Models->CreatePE(SE);
 }
-IRenderVisual* CRender::model_CreateParticles(const char* name)
+IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     if (SE)
@@ -477,7 +477,7 @@ IRenderVisual* CRender::model_CreateParticles(const char* name)
     }
 }
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
 ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
@@ -547,9 +547,9 @@ IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return new CGlow(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
-bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     add_leafs_Dynamic(root, (dxRender_Visual*)V, m);

@@ -16,7 +16,7 @@ CZoneEffector::CZoneEffector()
 }
 
 CZoneEffector::~CZoneEffector() { Stop(); }
-void CZoneEffector::Load(const char* section)
+void CZoneEffector::Load(LPCSTR section)
 {
     if (pSettings->line_exist(section, "pp_eff_name"))
         m_pp_fname = pSettings->r_string(section, "pp_eff_name");

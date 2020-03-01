@@ -27,7 +27,7 @@ SCRIPT_EXPORT(CScriptWatchAction, (), {
                          .def(constructor<SightManager::ESightType>())
                          .def(constructor<SightManager::ESightType, Fvector&>())
                          .def(constructor<SightManager::ESightType, CScriptGameObject*>())
-                         .def(constructor<SightManager::ESightType, CScriptGameObject*, const char*>())
+                         .def(constructor<SightManager::ESightType, CScriptGameObject*, LPCSTR>())
 
                          // searchlight
                          .def(constructor<const Fvector&, float, float>())

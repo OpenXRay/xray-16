@@ -3,9 +3,9 @@
 class CBlender_accum_point : public IBlender
 {
 public:
-    const char* getComment() override { return "INTERNAL: accumulate point light"; }
-    bool canBeDetailed() override { return FALSE; }
-    bool canBeLMAPped() override { return FALSE; }
+    LPCSTR getComment() override { return "INTERNAL: accumulate point light"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
@@ -16,21 +16,21 @@ public:
 class CBlender_accum_point_msaa : public IBlender
 {
 public:
-    const char* getComment() override { return "INTERNAL: accumulate point light msaa"; }
-    bool canBeDetailed() override { return FALSE; }
-    bool canBeLMAPped() override { return FALSE; }
+    LPCSTR getComment() override { return "INTERNAL: accumulate point light msaa"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
     CBlender_accum_point_msaa();
     virtual ~CBlender_accum_point_msaa();
 
-    virtual void SetDefine(const char* Name, const char* Definition)
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
     }
 
-    const char* Name;
-    const char* Definition;
+    LPCSTR Name;
+    LPCSTR Definition;
 };

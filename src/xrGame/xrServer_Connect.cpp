@@ -14,10 +14,10 @@
 #include "xrNetServer/NET_AuthCheck.h"
 #include "xrNetServer/NET_Messages.h"
 
-const char* xrServer::get_map_download_url(const char* level_name, const char* level_version)
+LPCSTR xrServer::get_map_download_url(LPCSTR level_name, LPCSTR level_version)
 {
     R_ASSERT(level_name && level_version);
-    const char* ret_url = "";
+    LPCSTR ret_url = "";
     CInifile* level_ini = pApp->GetArchiveHeader(level_name, level_version);
     if (!level_ini)
     {
@@ -166,7 +166,7 @@ void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
         R_ASSERT2(tmp_client != GetServerClient(), "can't disconnect server client");
         Msg("--- Client [%s] tried to connect - rejecting connection (he is banned by %s) ...",
             tmp_client->m_cAddress.to_string().c_str(), admin_name.size() ? admin_name.c_str() : "Server");
-        char* message_to_user;
+        LPSTR message_to_user;
         if (admin_name.size())
         {
             STRCONCAT(message_to_user, "mp_you_have_been_banned_by ", admin_name.c_str());

@@ -7,7 +7,7 @@
 #define FAR_DIST g_pGamePersistent->Environment().CurrentEnv->far_plane
 
 void dxFlareRender::Copy(IFlareRender& _in) { *this = *(dxFlareRender*)&_in; }
-void dxFlareRender::CreateShader(const char* sh_name, const char* tex_name)
+void dxFlareRender::CreateShader(LPCSTR sh_name, LPCSTR tex_name)
 {
     if (tex_name && tex_name[0])
         hShader.create(sh_name, tex_name);
@@ -15,7 +15,7 @@ void dxFlareRender::CreateShader(const char* sh_name, const char* tex_name)
 
 void dxFlareRender::DestroyShader() { hShader.destroy(); }
 void dxLensFlareRender::Copy(ILensFlareRender& _in) { *this = *(dxLensFlareRender*)&_in; }
-void dxLensFlareRender::Render(CLensFlare& owner, bool bSun, bool bFlares, bool bGradient)
+void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL bGradient)
 {
     Fcolor dwLight;
     Fcolor color;

@@ -162,7 +162,7 @@ void CLightShadows::calculate()
     if (casters.empty())
         return;
 
-    bool bRTS = FALSE;
+    BOOL bRTS = FALSE;
     HW.pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
     if (rt_size != ps_r2_smapsize / 2)
@@ -459,7 +459,7 @@ void CLightShadows::render()
 
         // Search the cache
         cache_item* CI = nullptr;
-        bool bValid = FALSE;
+        BOOL bValid = FALSE;
         cache_item CI_what;
         CI_what.O = S.O;
         CI_what.L = S.L;

@@ -20,7 +20,7 @@ using namespace StalkerDecisionSpace;
 using smart_cover::default_behaviour_planner;
 using smart_cover::animation_planner;
 
-default_behaviour_planner::default_behaviour_planner(animation_planner* object, const char* action_name)
+default_behaviour_planner::default_behaviour_planner(animation_planner* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -72,4 +72,4 @@ void default_behaviour_planner::add_actions()
     action->setup(&object(), inherited_action::m_storage);
 }
 
-const char* default_behaviour_planner::object_name() const { return ("default_behaviour_planner"); }
+LPCSTR default_behaviour_planner::object_name() const { return ("default_behaviour_planner"); }

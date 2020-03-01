@@ -9,7 +9,7 @@ BOOL death_anim_debug = FALSE;
 #endif
 
 rnd_motion::rnd_motion() {}
-rnd_motion* rnd_motion::setup(IKinematicsAnimated* k, const char* s)
+rnd_motion* rnd_motion::setup(IKinematicsAnimated* k, LPCSTR s)
 {
     VERIFY(k);
     VERIFY(s);
@@ -39,7 +39,7 @@ void type_motion::clear()
     anims.clear();
 }
 /*
-void type_motion::set_motion( IKinematicsAnimated* k, CInifile* ini, const char* type, const char* dir, edirection id_dir )
+void type_motion::set_motion( IKinematicsAnimated* k, CInifile* ini, LPCSTR type, LPCSTR dir, edirection id_dir )
 {
     if( ini->line_exist( type, dir ) )
             anims[ u16( id_dir ) ] = new rnd_motion()->setup( k, ini->r_string( type, dir ) );
@@ -48,7 +48,7 @@ void type_motion::set_motion( IKinematicsAnimated* k, CInifile* ini, const char*
 extern const xr_token motion_dirs[] = {{"front", type_motion::front}, {"back", type_motion::back}, {"left", type_motion::left},
     {"right", type_motion::right}, {0, 0}};
 
-void type_motion::set_motion(IKinematicsAnimated* k, u16 id_motion, const char* dir_anim)
+void type_motion::set_motion(IKinematicsAnimated* k, u16 id_motion, LPCSTR dir_anim)
 {
     // VERIFY2( _GetItemCount( dir_anim, '-' ) == 2,"wrong params" );
 
@@ -59,12 +59,12 @@ void type_motion::set_motion(IKinematicsAnimated* k, u16 id_motion, const char* 
     anims[id_motion] = (new rnd_motion())->setup(k, dir_anim);
 }
 
-type_motion* type_motion::setup(IKinematicsAnimated* k, CInifile const* ini, const char* section, const char* type)
+type_motion* type_motion::setup(IKinematicsAnimated* k, CInifile const* ini, LPCSTR section, LPCSTR type)
 {
     anims.resize(dirs_number, 0);
     if (ini->line_exist(section, type))
     {
-        const char* line = ini->r_string(section, type);
+        LPCSTR line = ini->r_string(section, type);
         if (!line)
         {
 #ifdef DEBUG
@@ -98,7 +98,7 @@ type_motion* type_motion::setup(IKinematicsAnimated* k, CInifile const* ini, con
 }
 
 /*
-type_motion* type_motion::setup( IKinematicsAnimated* k, CInifile* ini, const char* type, u16 id_type )
+type_motion* type_motion::setup( IKinematicsAnimated* k, CInifile* ini, LPCSTR type, u16 id_type )
 {
     anims.resize( dirs_number, 0 );
     if( ini->section_exist( type ) )

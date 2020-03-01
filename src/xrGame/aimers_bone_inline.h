@@ -14,7 +14,7 @@
 
 TEMPLATE_SPECIALIZATION
 inline BONE::bone(
-    CGameObject* object, const char* animation_id, bool animation_start, Fvector const& target, const char* (&bones)[bone_count])
+    CGameObject* object, LPCSTR animation_id, bool animation_start, Fvector const& target, LPCSTR (&bones)[bone_count])
     : inherited(object, animation_id, animation_start, target)
 {
     for (u32 i = 0; i < bone_count; ++i)

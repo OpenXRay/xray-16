@@ -21,9 +21,9 @@ protected:
 public:
     CObjectManager();
     virtual ~CObjectManager();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void update();
     bool add(T* object);
     virtual bool is_useful(T* object) const;

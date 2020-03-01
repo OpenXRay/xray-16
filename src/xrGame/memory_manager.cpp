@@ -53,7 +53,7 @@ CMemoryManager::~CMemoryManager()
     xr_delete(m_danger);
 }
 
-void CMemoryManager::Load(const char* section)
+void CMemoryManager::Load(LPCSTR section)
 {
     sound().Load(section);
     hit().Load(section);
@@ -72,7 +72,7 @@ void CMemoryManager::reinit()
     danger().reinit();
 }
 
-void CMemoryManager::reload(const char* section)
+void CMemoryManager::reload(LPCSTR section)
 {
     visual().reload(section);
     sound().reload(section);

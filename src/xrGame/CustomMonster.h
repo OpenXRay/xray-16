@@ -56,7 +56,7 @@ protected:
         MotionID ls;
         MotionID rs;
 
-        void Create(IKinematicsAnimated* K, const char* base);
+        void Create(IKinematicsAnimated* K, LPCSTR base);
     };
 
 private:
@@ -75,7 +75,7 @@ public:
     u32 eye_pp_timestamp;
     Fvector m_tEyeShift;
     float m_fEyeShiftYaw;
-    bool NET_WasExtrapolating;
+    BOOL NET_WasExtrapolating;
 
     Fvector tWatchDirection;
 
@@ -110,7 +110,7 @@ public:
     };
     xr_deque<net_update> NET;
     net_update NET_Last;
-    bool NET_WasInterpolating; // previous update was by interpolation or by extrapolation
+    BOOL NET_WasInterpolating; // previous update was by interpolation or by extrapolation
     u32 NET_Time; // server time of last update
     //------------------------------
 
@@ -139,7 +139,7 @@ public:
     virtual CEntity* cast_entity() { return this; }
 public:
     virtual IFactoryObject* _construct();
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void Die(IGameObject* who);
 
     virtual void HitSignal(float P, Fvector& vLocalDir, IGameObject* who);
@@ -171,13 +171,13 @@ public:
     void set_fov(float new_fov);
     void set_range(float new_range);
     //	virtual	void				feel_touch_new			(IGameObject	*O);
-    virtual bool feel_visible_isRelevant(IGameObject* O);
+    virtual BOOL feel_visible_isRelevant(IGameObject* O);
     virtual Feel::Sound* dcast_FeelSound() { return this; }
     virtual void Hit(SHit* pHDS);
 
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void net_Destroy();
-    virtual bool UsedAI_Locations();
+    virtual BOOL UsedAI_Locations();
     ///////////////////////////////////////////////////////////////////////
     virtual u16 PHGetSyncItemsNumber() { return inherited::PHGetSyncItemsNumber(); }
     virtual CPHSynchronize* PHGetSyncItem(u16 item) { return inherited::PHGetSyncItem(item); }
@@ -185,9 +185,9 @@ public:
     virtual void PHFreeze() { return inherited::PHFreeze(); }
     ///////////////////////////////////////////////////////////////////////
 public:
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual const SRotation Orientation() const;
     virtual float get_custom_pitch_speed(float def_speed) { return def_speed; }
     virtual bool human_being() const { return (false); }
@@ -195,7 +195,7 @@ public:
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    virtual bool net_SaveRelevant() { return inherited::net_SaveRelevant(); }
+    virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     virtual const MonsterSpace::SBoneRotation& head_orientation() const;
 
     virtual void UpdatePositionAnimation();
@@ -204,7 +204,7 @@ public:
     virtual CParticlesPlayer* cast_particles_player() { return this; }
     virtual CCustomMonster* cast_custom_monster() { return this; }
     virtual CScriptEntity* cast_script_entity() { return this; }
-    void load_killer_clsids(const char* section);
+    void load_killer_clsids(LPCSTR section);
     bool is_special_killer(IGameObject* obj);
 
     IC CMemoryManager& memory() const;
@@ -250,7 +250,7 @@ public:
     virtual void on_restrictions_change();
 
     virtual bool should_wait_to_use_corspe_visual() { return true; }
-    virtual const char* visual_name(CSE_Abstract* server_entity);
+    virtual LPCSTR visual_name(CSE_Abstract* server_entity);
 
 private:
     bool m_already_dead;

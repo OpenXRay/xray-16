@@ -32,7 +32,7 @@ class CControllerPsyHit : public CControl_ComCustom<>
     u32 m_time_last_tube;
 
 public:
-    virtual void load(const char* section);
+    virtual void load(LPCSTR section);
     virtual void reinit();
     virtual void update_frame();
     virtual bool check_start_conditions();

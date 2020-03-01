@@ -35,7 +35,7 @@ struct ray_cache
     Fvector start;
     Fvector dir;
     float range;
-    bool result;
+    BOOL result;
 
     // cached vertices
     Fvector verts[3];
@@ -51,7 +51,7 @@ struct ray_cache
         verts[2].set(0, 0, 0);
     }
 
-    void set(const Fvector& _start, const Fvector& _dir, const float _range, const bool _result)
+    void set(const Fvector& _start, const Fvector& _dir, const float _range, const BOOL _result)
     {
         start = _start;
         dir = _dir;
@@ -59,7 +59,7 @@ struct ray_cache
         result = _result;
     }
 
-    bool similar(const Fvector& _start, const Fvector& _dir, const float _range)
+    BOOL similar(const Fvector& _start, const Fvector& _dir, const float _range)
     {
         if (!_start.similar(start))
             return FALSE;
@@ -113,7 +113,7 @@ struct rq_result
         return *this;
     }
 
-    IC bool set_if_less(CDB::RESULT* I)
+    IC BOOL set_if_less(CDB::RESULT* I)
     {
         if (I->range < range)
         {
@@ -123,7 +123,7 @@ struct rq_result
         else
             return FALSE;
     }
-    IC bool set_if_less(rq_result* R)
+    IC BOOL set_if_less(rq_result* R)
     {
         if (R->range < range)
         {
@@ -133,7 +133,7 @@ struct rq_result
         else
             return FALSE;
     }
-    IC bool set_if_less(IGameObject* _who, float _range, int _element)
+    IC BOOL set_if_less(IGameObject* _who, float _range, int _element)
     {
         if (_range < range)
         {
@@ -143,7 +143,7 @@ struct rq_result
         else
             return FALSE;
     }
-    IC bool valid() { return (element >= 0); }
+    IC BOOL valid() { return (element >= 0); }
 };
 
 using rqVec = xr_vector<rq_result>;
@@ -155,7 +155,7 @@ protected:
     static bool r_sort_pred(const rq_result& a, const rq_result& b) { return a.range < b.range; }
 
 public:
-    IC bool append_result(IGameObject* _who, float _range, int _element, bool bNearest)
+    IC BOOL append_result(IGameObject* _who, float _range, int _element, BOOL bNearest)
     {
         if (bNearest && !results.empty())
         {
@@ -193,6 +193,6 @@ public:
     IC rqVec& r_results() { return results; }
 };
 
-typedef bool rq_callback(rq_result& result, LPVOID user_data);
-typedef bool test_callback(const ray_defs& rd, IGameObject* object, LPVOID user_data);
+typedef BOOL rq_callback(rq_result& result, LPVOID user_data);
+typedef BOOL test_callback(const ray_defs& rd, IGameObject* object, LPVOID user_data);
 }

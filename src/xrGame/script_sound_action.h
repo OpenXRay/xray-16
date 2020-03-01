@@ -39,13 +39,13 @@ public:
 
 public:
     IC CScriptSoundAction();
-    IC CScriptSoundAction(const char* caSoundToPlay, const char* caBoneName,
+    IC CScriptSoundAction(LPCSTR caSoundToPlay, LPCSTR caBoneName,
         const Fvector& tPositionOffset = Fvector().set(0, 0, 0), const Fvector& tAngleOffset = Fvector().set(0, 0, 0),
         bool bLooped = false, ESoundTypes sound_type = SOUND_TYPE_NO_SOUND);
-    IC CScriptSoundAction(const char* caSoundToPlay, Fvector* tPosition,
+    IC CScriptSoundAction(LPCSTR caSoundToPlay, Fvector* tPosition,
         const Fvector& tAngleOffset = Fvector().set(0, 0, 0), bool bLooped = false,
         ESoundTypes sound_type = SOUND_TYPE_NO_SOUND);
-    IC CScriptSoundAction(CScriptSound* sound, const char* caBoneName,
+    IC CScriptSoundAction(CScriptSound* sound, LPCSTR caBoneName,
         const Fvector& tPositionOffset = Fvector().set(0, 0, 0), const Fvector& tAngleOffset = Fvector().set(0, 0, 0),
         bool bLooped = false, ESoundTypes sound_type = SOUND_TYPE_NO_SOUND);
     IC CScriptSoundAction(CScriptSound* sound, Fvector* tPosition, const Fvector& tAngleOffset = Fvector().set(0, 0, 0),
@@ -58,12 +58,12 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////
     // Trader Specific
     ///////////////////////////////////////////////////////////////////////////////////
-    IC CScriptSoundAction(const char* caSoundToPlay, const char* caBoneName, MonsterSpace::EMonsterHeadAnimType head_anim_type);
+    IC CScriptSoundAction(LPCSTR caSoundToPlay, LPCSTR caBoneName, MonsterSpace::EMonsterHeadAnimType head_anim_type);
     virtual ~CScriptSoundAction();
-    void SetSound(const char* caSoundToPlay);
+    void SetSound(LPCSTR caSoundToPlay);
     IC void SetSound(const CScriptSound& sound);
     IC void SetPosition(const Fvector& tPosition);
-    IC void SetBone(const char* caBoneName);
+    IC void SetBone(LPCSTR caBoneName);
     IC void SetAngles(const Fvector& tAngles);
     IC void SetSoundType(const ESoundTypes sound_type);
     IC void initialize();

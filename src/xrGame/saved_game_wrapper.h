@@ -24,14 +24,14 @@ private:
     float m_actor_health;
 
 public:
-    CSavedGameWrapper(const char* saved_game_name);
+    CSavedGameWrapper(LPCSTR saved_game_name);
     static pcstr saved_game_full_name(pcstr saved_game_name, string_path& result, pcstr extension);
-    static bool saved_game_exist(const char* saved_game_name);
+    static bool saved_game_exist(LPCSTR saved_game_name);
     static bool valid_saved_game(IReader& stream);
-    static bool valid_saved_game(const char* saved_game_name);
+    static bool valid_saved_game(LPCSTR saved_game_name);
     inline const _TIME_ID& game_time() const;
     inline const _LEVEL_ID& level_id() const;
-    inline const char* level_name() const;
+    inline LPCSTR level_name() const;
     inline const float& actor_health() const;
 };
 

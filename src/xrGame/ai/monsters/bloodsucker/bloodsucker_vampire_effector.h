@@ -12,7 +12,7 @@ class CVampirePPEffector : public CEffectorPP
 
 public:
     CVampirePPEffector(const SPPInfo& ppi, float life_time);
-    virtual bool Process(SPPInfo& pp);
+    virtual BOOL Process(SPPInfo& pp);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -31,5 +31,5 @@ class CVampireCameraEffector : public CEffectorCam
 
 public:
     CVampireCameraEffector(float time, const Fvector& src, const Fvector& tgt);
-    virtual bool ProcessCam(SCamEffectorInfo& info);
+    virtual BOOL ProcessCam(SCamEffectorInfo& info);
 };

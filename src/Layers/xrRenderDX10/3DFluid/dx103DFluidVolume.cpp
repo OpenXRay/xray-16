@@ -5,7 +5,7 @@
 
 dx103DFluidVolume::dx103DFluidVolume() {}
 dx103DFluidVolume::~dx103DFluidVolume() {}
-void dx103DFluidVolume::Load(const char* /*N*/, IReader* data, u32 /*dwFlags*/)
+void dx103DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
 {
     //	Uncomment this if choose to read from OGF
     //	dxRender_Visual::Load		(N,data,dwFlags);

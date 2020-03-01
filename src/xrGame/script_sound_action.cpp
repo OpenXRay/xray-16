@@ -12,7 +12,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 
 CScriptSoundAction::~CScriptSoundAction() {}
-void CScriptSoundAction::SetSound(const char* caSoundToPlay)
+void CScriptSoundAction::SetSound(LPCSTR caSoundToPlay)
 {
     m_caSoundToPlay = caSoundToPlay;
     m_tGoalType = eGoalTypeSoundAttached;

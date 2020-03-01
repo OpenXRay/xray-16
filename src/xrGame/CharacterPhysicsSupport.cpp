@@ -126,7 +126,7 @@ void CCharacterPhysicsSupport::SetRemoved()
     }
 }
 
-void CCharacterPhysicsSupport::in_Load(const char* section)
+void CCharacterPhysicsSupport::in_Load(LPCSTR section)
 {
     m_character_shell_control.Load(section);
     m_flags.set(fl_specific_bonce_demager, TRUE);
@@ -378,7 +378,7 @@ void CCharacterPhysicsSupport::in_shedule_Update(u32 DT)
 
 #ifdef DEBUG
 string64 sdbg_stalker_death_anim = "none";
-char* dbg_stalker_death_anim = sdbg_stalker_death_anim;
+LPSTR dbg_stalker_death_anim = sdbg_stalker_death_anim;
 #endif
 BOOL b_death_anim_velocity = TRUE;
 const float cmp_angle = M_PI / 10.f;

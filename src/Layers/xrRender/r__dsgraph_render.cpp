@@ -513,7 +513,7 @@ void D3DXRenderBase::r_dsgraph_render_distort()
 //////////////////////////////////////////////////////////////////////////
 // sub-space rendering - shortcut to render with frustum extracted from matrix
 void D3DXRenderBase::r_dsgraph_render_subspace(
-    IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, bool _dynamic, bool _precise_portals)
+    IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     CFrustum temp;
     temp.CreateFromMatrix(mCombined, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
@@ -522,7 +522,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(
 
 // sub-space rendering - main procedure
 void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined,
-    Fvector& _cop, bool _dynamic, bool _precise_portals)
+    Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     VERIFY(_sector);
     PIX_EVENT(r_dsgraph_render_subspace);

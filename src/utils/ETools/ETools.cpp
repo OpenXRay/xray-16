@@ -5,7 +5,7 @@
 
 #pragma warning(disable : 4267)
 
-bool APIENTRY DllMain(HANDLE hModule, unsigned int fdwReason, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
 {
     switch (fdwReason)
     {

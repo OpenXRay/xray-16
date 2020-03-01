@@ -108,7 +108,7 @@ void CUIGameDM::UnLoad()
 }
 
 CUIGameDM::~CUIGameDM() {}
-void CUIGameDM::SetTimeMsgCaption(const char* str) { m_time_caption->SetTextST(str); }
+void CUIGameDM::SetTimeMsgCaption(LPCSTR str) { m_time_caption->SetTextST(str); }
 void CUIGameDM::ShowFragList(bool bShow)
 {
     if (bShow && m_pTeamPanels)
@@ -125,15 +125,15 @@ void CUIGameDM::ShowPlayersList(bool bShow)
         RemoveDialogToRender(m_pTeamPanels);
 }
 
-void CUIGameDM::SetSpectrModeMsgCaption(const char* str) { m_spectrmode_caption->SetTextST(str); }
-void CUIGameDM::SetSpectatorMsgCaption(const char* str) { m_spectator_caption->SetTextST(str); }
-void CUIGameDM::SetPressJumpMsgCaption(const char* str) { m_pressjump_caption->SetTextST(str); }
-void CUIGameDM::SetPressBuyMsgCaption(const char* str) { m_pressbuy_caption->SetTextST(str); }
-void CUIGameDM::SetRoundResultCaption(const char* str) { m_round_result_caption->SetTextST(str); }
-void CUIGameDM::SetForceRespawnTimeCaption(const char* str) { m_force_respawn_time_caption->SetTextST(str); }
-void CUIGameDM::SetDemoPlayCaption(const char* str) { m_demo_play_caption->SetTextST(str); }
-void CUIGameDM::SetWarmUpCaption(const char* str) { m_warm_up_caption->SetTextST(str); }
-void CUIGameDM::SetVoteMessage(const char* str)
+void CUIGameDM::SetSpectrModeMsgCaption(LPCSTR str) { m_spectrmode_caption->SetTextST(str); }
+void CUIGameDM::SetSpectatorMsgCaption(LPCSTR str) { m_spectator_caption->SetTextST(str); }
+void CUIGameDM::SetPressJumpMsgCaption(LPCSTR str) { m_pressjump_caption->SetTextST(str); }
+void CUIGameDM::SetPressBuyMsgCaption(LPCSTR str) { m_pressbuy_caption->SetTextST(str); }
+void CUIGameDM::SetRoundResultCaption(LPCSTR str) { m_round_result_caption->SetTextST(str); }
+void CUIGameDM::SetForceRespawnTimeCaption(LPCSTR str) { m_force_respawn_time_caption->SetTextST(str); }
+void CUIGameDM::SetDemoPlayCaption(LPCSTR str) { m_demo_play_caption->SetTextST(str); }
+void CUIGameDM::SetWarmUpCaption(LPCSTR str) { m_warm_up_caption->SetTextST(str); }
+void CUIGameDM::SetVoteMessage(LPCSTR str)
 {
     if (!str)
     {
@@ -153,7 +153,7 @@ void CUIGameDM::SetVoteMessage(const char* str)
     }
 };
 
-void CUIGameDM::SetVoteTimeResultMsg(const char* str)
+void CUIGameDM::SetVoteTimeResultMsg(LPCSTR str)
 {
     if (m_voteStatusWnd)
         m_voteStatusWnd->SetVoteTimeResultMsg(str);
@@ -173,9 +173,9 @@ void CUIGameDM::Render()
         m_voteStatusWnd->Draw();
 }
 
-void CUIGameDM::DisplayMoneyChange(const char* deltaMoney) { m_pMoneyIndicator->SetMoneyChange(deltaMoney); }
+void CUIGameDM::DisplayMoneyChange(LPCSTR deltaMoney) { m_pMoneyIndicator->SetMoneyChange(deltaMoney); }
 void CUIGameDM::DisplayMoneyBonus(KillMessageStruct* bonus) { m_pMoneyIndicator->AddBonusMoney(*bonus); }
-void CUIGameDM::ChangeTotalMoneyIndicator(const char* newMoneyString) { m_pMoneyIndicator->SetMoneyAmount(newMoneyString); }
+void CUIGameDM::ChangeTotalMoneyIndicator(LPCSTR newMoneyString) { m_pMoneyIndicator->SetMoneyAmount(newMoneyString); }
 void CUIGameDM::SetRank(s16 team, u8 rank) { m_pRankIndicator->SetRank(u8(m_game->ModifyTeam(team)), rank); };
 void CUIGameDM::SetFraglimit(int local_frags, int fraglimit)
 {

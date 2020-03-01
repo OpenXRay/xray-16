@@ -102,7 +102,7 @@
  *      bool IsOk = TC.Collide(ColCache, World0, World1);
  *
  *      // Get collision status => if true, objects overlap
- *      bool Status = TC.GetContactStatus();
+ *      BOOL Status = TC.GetContactStatus();
  *
  *      // Number of colliding pairs and list of pairs
  *      udword NbPairs = TC.GetNbPairs();

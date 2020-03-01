@@ -21,7 +21,7 @@ const xr_token hit_types_token[] =
     {nullptr, 0}
 };
 
-EHitType g_tfString2HitType(const char* caHitType)
+EHitType g_tfString2HitType(LPCSTR caHitType)
 {
     if (!xr_stricmp(caHitType, "burn"))
         return eHitTypeBurn;

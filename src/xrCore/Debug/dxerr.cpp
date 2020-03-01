@@ -72,7 +72,7 @@
     case HRESULT_FROM_WIN32b(hrchk): return strOut;
 
 //-----------------------------------------------------
-const wchar_t* WINAPI DXGetErrorStringW(_In_ HRESULT hr)
+const WCHAR* WINAPI DXGetErrorStringW(_In_ HRESULT hr)
 {
 #define CHK_ERRA CHK_ERRA_W
 #define CHK_ERR CHK_ERR_W
@@ -87,7 +87,7 @@ const wchar_t* WINAPI DXGetErrorStringW(_In_ HRESULT hr)
 #undef CHK_ERR
 }
 
-const char* WINAPI DXGetErrorStringA(_In_ HRESULT hr)
+const CHAR* WINAPI DXGetErrorStringA(_In_ HRESULT hr)
 {
 #define CHK_ERRA CHK_ERRA_A
 #define CHK_ERR CHK_ERR_A
@@ -124,7 +124,7 @@ const char* WINAPI DXGetErrorStringA(_In_ HRESULT hr)
     case hrchk: strcpy_s(desc, count, strOut);
 
 //--------------------------------------------------------------------------------------
-void WINAPI DXGetErrorDescriptionW(_In_ HRESULT hr, _Out_cap_(count) wchar_t* desc, _In_ size_t count)
+void WINAPI DXGetErrorDescriptionW(_In_ HRESULT hr, _Out_cap_(count) WCHAR* desc, _In_ size_t count)
 {
 #define CHK_ERRA CHK_ERRA_W
 #define CHK_ERR CHK_ERR_W
@@ -135,7 +135,7 @@ void WINAPI DXGetErrorDescriptionW(_In_ HRESULT hr, _Out_cap_(count) wchar_t* de
 #undef CHK_ERR
 }
 
-void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) char* desc, _In_ size_t count)
+void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) CHAR* desc, _In_ size_t count)
 {
 #define CHK_ERRA CHK_ERRA_A
 #define CHK_ERR CHK_ERR_A
@@ -147,11 +147,11 @@ void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) char* desc,
 }
 
 //-----------------------------------------------------------------------------
-HRESULT WINAPI DXTraceW(_In_z_ const wchar_t* strFile, _In_ unsigned int dwLine, _In_ HRESULT hr,
-    _In_opt_ const wchar_t* strMsg, _In_ bool bPopMsgBox)
+HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr,
+    _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox)
 {
 #define DX_STR_WRAP(...) L##__VA_ARGS__
-#define DX_CHAR wchar_t
+#define DX_CHAR WCHAR
 #define DX_SPRINTF_S swprintf_s
 #define DX_STRCPY_S wcscpy_s
 #define DX_STRNLEN_S wcsnlen_s
@@ -171,11 +171,11 @@ HRESULT WINAPI DXTraceW(_In_z_ const wchar_t* strFile, _In_ unsigned int dwLine,
 #undef DX_GETERRORSTRING
 }
 
-HRESULT WINAPI DXTraceA(_In_z_ const char* strFile, _In_ unsigned int dwLine, _In_ HRESULT hr,
-    _In_opt_ const char* strMsg, _In_ bool bPopMsgBox)
+HRESULT WINAPI DXTraceA(_In_z_ const CHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr,
+    _In_opt_ const CHAR* strMsg, _In_ bool bPopMsgBox)
 {
 #define DX_STR_WRAP(s) s
-#define DX_CHAR char
+#define DX_CHAR CHAR
 #define DX_SPRINTF_S sprintf_s
 #define DX_STRCPY_S strcpy_s
 #define DX_STRNLEN_S strnlen_s

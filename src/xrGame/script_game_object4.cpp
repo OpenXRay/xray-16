@@ -55,7 +55,7 @@ bool CScriptGameObject::is_body_turning() const
 ////////////////////////////////////////////////////////////////////////////
 
 u32 CScriptGameObject::add_sound(
-    const char* prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, const char* bone_name)
+    LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
@@ -68,7 +68,7 @@ u32 CScriptGameObject::add_sound(
 }
 
 u32 CScriptGameObject::add_combat_sound(
-    const char* prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, const char* bone_name)
+    LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name)
 {
     CAI_Stalker* const stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -82,7 +82,7 @@ u32 CScriptGameObject::add_combat_sound(
 }
 
 u32 CScriptGameObject::add_sound(
-    const char* prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type)
+    LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type)
 {
     return (add_sound(prefix, max_count, type, priority, mask, internal_type, "bip01_head"));
 }
@@ -252,7 +252,7 @@ bool CScriptGameObject::IsInvBoxEmpty()
         return ib->IsEmpty();
 }
 
-bool CScriptGameObject::inv_box_closed(bool status, const char* reason)
+bool CScriptGameObject::inv_box_closed(bool status, LPCSTR reason)
 {
     CInventoryBox* ib = smart_cast<CInventoryBox*>(&object());
     if (!ib)
@@ -324,14 +324,14 @@ bool CScriptGameObject::is_level_changer_enabled()
     return false;
 }
 
-void CScriptGameObject::set_level_changer_invitation(const char* str)
+void CScriptGameObject::set_level_changer_invitation(LPCSTR str)
 {
     CLevelChanger* lch = smart_cast<CLevelChanger*>(&object());
     if (lch)
         lch->SetLEvelChangerInvitationStr(str);
 }
 
-void CScriptGameObject::start_particles(const char* pname, const char* bone)
+void CScriptGameObject::start_particles(LPCSTR pname, LPCSTR bone)
 {
     CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(&object());
     if (!PP)
@@ -349,7 +349,7 @@ void CScriptGameObject::start_particles(const char* pname, const char* bone)
             LuaMessageType::Error, "Cant start particles, bone [%s] is not visible now", bone);
 }
 
-void CScriptGameObject::stop_particles(const char* pname, const char* bone)
+void CScriptGameObject::stop_particles(LPCSTR pname, LPCSTR bone)
 {
     CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(&object());
     if (!PP)

@@ -50,7 +50,7 @@ void CPEDef::CreateShader()
     }
 }
 void CPEDef::DestroyShader() { m_CachedShader.destroy(); }
-void CPEDef::SetName(const char* name) { m_Name = name; }
+void CPEDef::SetName(LPCSTR name) { m_Name = name; }
 /*
 void CPEDef::pAlignToPath(float rot_x, float rot_y, float rot_z)
 {
@@ -62,7 +62,7 @@ void CPEDef::pVelocityScale(float scale_x, float scale_y, float scale_z)
     m_Flags.set			(dfVelocityScale,TRUE);
     m_VelocityScale.set	(scale_x, scale_y, scale_z);
 }
-void CPEDef::pCollision(float friction, float resilience, float cutoff, bool destroy_on_contact)
+void CPEDef::pCollision(float friction, float resilience, float cutoff, BOOL destroy_on_contact)
 {
     m_fCollideOneMinusFriction 	= 1.f-friction;
     m_fCollideResilience		= resilience;
@@ -77,14 +77,14 @@ void CPEDef::pSprite(string128& sh_name, string128& tex_name)
     xr_free(m_TextureName);	m_TextureName	= xr_strdup(tex_name);
     m_Flags.set	(dfSprite,TRUE);
 }
-void CPEDef::pFrame(bool random_frame, u32 frame_count, u32 tex_width, u32 tex_height, u32 frame_width, u32
+void CPEDef::pFrame(BOOL random_frame, u32 frame_count, u32 tex_width, u32 tex_height, u32 frame_width, u32
 frame_height)
 {
     m_Flags.set			(dfFramed,TRUE);
     m_Flags.set			(dfRandomFrame,random_frame);
     m_Frame.Set			(frame_count, (float)tex_width, (float)tex_height, (float)frame_width, (float)frame_height);
 }
-void CPEDef::pAnimate(float speed, bool random_playback)
+void CPEDef::pAnimate(float speed, BOOL random_playback)
 {
     m_Frame.m_fSpeed	= speed;
     m_Flags.set			(dfAnimated,TRUE);
@@ -192,7 +192,7 @@ void CPEDef::ExecuteCollision(
 //------------------------------------------------------------------------------
 // I/O part
 //------------------------------------------------------------------------------
-bool CPEDef::Load(IReader& F)
+BOOL CPEDef::Load(IReader& F)
 {
     R_ASSERT(F.find_chunk(PED_CHUNK_VERSION));
     u16 version = F.r_u16();
@@ -272,7 +272,7 @@ bool CPEDef::Load(IReader& F)
     return TRUE;
 }
 
-bool CPEDef::Load2(CInifile& ini)
+BOOL CPEDef::Load2(CInifile& ini)
 {
     //.	u16 version		= ini.r_u16("_effect", "version");
     m_MaxParticles = ini.r_u32("_effect", "max_particles");

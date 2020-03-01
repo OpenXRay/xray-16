@@ -116,7 +116,7 @@ void CCar::reinit()
         m_memory->reinit();
 }
 
-void CCar::reload(const char* section)
+void CCar::reload(LPCSTR section)
 {
     CEntity::reload(section);
     if (m_memory)
@@ -142,7 +142,7 @@ void CCar::cb_Steer(CBoneInstance* B)
 }
 
 // Core events
-void CCar::Load(const char* section)
+void CCar::Load(LPCSTR section)
 {
     inherited::Load(section);
     // CPHSkeleton::Load(section);
@@ -151,14 +151,14 @@ void CCar::Load(const char* section)
         self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
 }
 
-bool CCar::net_Spawn(CSE_Abstract* DC)
+BOOL CCar::net_Spawn(CSE_Abstract* DC)
 {
 #ifdef DEBUG
     InitDebug();
 #endif
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeCar* co = smart_cast<CSE_ALifeCar*>(e);
-    bool R = inherited::net_Spawn(DC);
+    BOOL R = inherited::net_Spawn(DC);
 
     PKinematics(Visual())->CalculateBones_Invalidate();
     PKinematics(Visual())->CalculateBones(TRUE);
@@ -263,7 +263,7 @@ void CCar::net_Save(NET_Packet& P)
     SaveNetState(P);
 }
 
-bool CCar::net_SaveRelevant()
+BOOL CCar::net_SaveRelevant()
 {
     return TRUE;
     // return
@@ -415,7 +415,7 @@ void CCar::UpdateEx(float fov)
     }
 }
 
-bool CCar::AlwaysTheCrow() { return (m_car_weapon && m_car_weapon->IsActive()); }
+BOOL CCar::AlwaysTheCrow() { return (m_car_weapon && m_car_weapon->IsActive()); }
 void CCar::UpdateCL()
 {
     inherited::UpdateCL();
@@ -1738,7 +1738,7 @@ void CCar::PhDataUpdate(float step)
     VERIFY(_valid(m_steer_angle));
 }
 
-bool CCar::UsedAI_Locations() { return (FALSE); }
+BOOL CCar::UsedAI_Locations() { return (FALSE); }
 u16 CCar::DriverAnimationType() { return m_driver_anim_type; }
 void CCar::OnAfterExplosion() {}
 void CCar::OnBeforeExplosion() { setEnabled(FALSE); }
@@ -1816,7 +1816,7 @@ void CCar::CarExplode()
 //}
 
 template <class T>
-IC void CCar::fill_wheel_vector(const char* S, xr_vector<T>& type_wheels)
+IC void CCar::fill_wheel_vector(LPCSTR S, xr_vector<T>& type_wheels)
 {
     IKinematics* pKinematics = smart_cast<IKinematics*>(Visual());
     string64 S1;
@@ -1849,7 +1849,7 @@ IC void CCar::fill_wheel_vector(const char* S, xr_vector<T>& type_wheels)
     }
 }
 
-IC void CCar::fill_exhaust_vector(const char* S, xr_vector<SExhaust>& exhausts)
+IC void CCar::fill_exhaust_vector(LPCSTR S, xr_vector<SExhaust>& exhausts)
 {
     IKinematics* pKinematics = smart_cast<IKinematics*>(Visual());
     string64 S1;
@@ -1870,7 +1870,7 @@ IC void CCar::fill_exhaust_vector(const char* S, xr_vector<SExhaust>& exhausts)
     }
 }
 
-IC void CCar::fill_doors_map(const char* S, xr_map<u16, SDoor>& doors)
+IC void CCar::fill_doors_map(LPCSTR S, xr_map<u16, SDoor>& doors)
 {
     IKinematics* pKinematics = smart_cast<IKinematics*>(Visual());
     string64 S1;

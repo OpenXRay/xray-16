@@ -18,7 +18,7 @@ public:
     virtual void Draw();
     virtual void Update();
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
-    virtual void OnMessage(const char* message);
+    virtual void OnMessage(LPCSTR message);
     // CUIWindow
     void InitTrackBar(Fvector2 pos, Fvector2 size);
     virtual void Enable(bool status);

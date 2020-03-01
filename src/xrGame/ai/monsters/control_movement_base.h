@@ -14,12 +14,12 @@ class CControlMovementBase : public CControl_ComBase
     float m_accel;
 
 public:
-    virtual void load(const char* section);
+    virtual void load(LPCSTR section);
 
     virtual void reinit();
     virtual void update_frame();
 
-    void load_velocity(const char* section, const char* line, u32 param);
+    void load_velocity(LPCSTR section, LPCSTR line, u32 param);
     SVelocityParam& get_velocity(u32 velocity_id);
 
     void stop();

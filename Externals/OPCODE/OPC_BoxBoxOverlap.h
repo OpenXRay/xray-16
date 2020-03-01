@@ -16,7 +16,7 @@
  *	\return		true if boxes overlap
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ bool AABBTreeCollider::BoxBoxOverlap(const Point& ea, const Point& ca, const Point& eb, const Point& cb)
+inline_ BOOL AABBTreeCollider::BoxBoxOverlap(const Point& ea, const Point& ca, const Point& eb, const Point& cb)
 {
     // Stats
     mNbBVBVTests++;
@@ -101,7 +101,7 @@ inline_ bool AABBTreeCollider::BoxBoxOverlap(const Point& ea, const Point& ca, c
 }
 
 //! A dedicated version when one box is constant
-inline_ bool OBBCollider::BoxBoxOverlap(const Point& extents, const Point& center)
+inline_ BOOL OBBCollider::BoxBoxOverlap(const Point& extents, const Point& center)
 {
     // Stats
     mNbVolumeBVTests++;
@@ -184,7 +184,7 @@ inline_ bool OBBCollider::BoxBoxOverlap(const Point& extents, const Point& cente
 }
 
 //! A special version for 2 axis-aligned boxes
-inline_ bool AABBCollider::AABBAABBOverlap(const Point& extents, const Point& center)
+inline_ BOOL AABBCollider::AABBAABBOverlap(const Point& extents, const Point& center)
 {
     // Stats
     mNbVolumeBVTests++;

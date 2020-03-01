@@ -24,15 +24,15 @@ public:
     _object_type* m_object;
     CPropertyStorage* m_storage;
 #if 1//def LOG_ACTION //Alundaio: m_evaluator_name
-    const char* m_evaluator_name;
+    LPCSTR m_evaluator_name;
 #endif
 
 public:
-    IC CPropertyEvaluator(_object_type* object = 0, const char* evaluator_name = "");
+    IC CPropertyEvaluator(_object_type* object = 0, LPCSTR evaluator_name = "");
     virtual ~CPropertyEvaluator();
-    IC void init(_object_type* object, const char* evaluator_name);
+    IC void init(_object_type* object, LPCSTR evaluator_name);
     virtual void setup(_object_type* object, CPropertyStorage* storage);
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual _value_type evaluate();
     IC const _value_type& property(const _condition_type& condition_id) const;
 

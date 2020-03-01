@@ -12,7 +12,7 @@ void net_global_data_impl<gl_implicit_cl_data>::init()
     data_init(); // init as new data
 }
 
-void net_global_data_impl<gl_implicit_cl_data>::create_data_file(const char* path)
+void net_global_data_impl<gl_implicit_cl_data>::create_data_file(LPCSTR path)
 {
     // FPU::m64r			();
     // Memory.mem_compact	();
@@ -28,7 +28,7 @@ void net_global_data_impl<gl_implicit_cl_data>::create_data_file(const char* pat
     compress(path);
     Logger.clMsg("create_implicit_data_write:  end");
 }
-bool net_global_data_impl<gl_implicit_cl_data>::create_data(const char* path)
+bool net_global_data_impl<gl_implicit_cl_data>::create_data(LPCSTR path)
 {
     decompress(path);
     INetReaderFile r_global(path);

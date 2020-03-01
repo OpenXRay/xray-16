@@ -6,7 +6,7 @@
 #include "control_direction_base.h"
 #include "control_movement_base.h"
 
-void CControlRunAttack::load(const char* section)
+void CControlRunAttack::load(LPCSTR section)
 {
     read_distance(section, "Run_Attack_Dist", m_min_dist, m_max_dist);
     read_delay(section, "Run_Attack_Delay", m_min_delay, m_max_delay);

@@ -184,7 +184,7 @@ public:
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();
-    IRenderVisual* model_CreatePE(const char* name);
+    IRenderVisual* model_CreatePE(LPCSTR name);
     IRender_Sector* detectSector(const Fvector& P, Fvector& D);
     int translateSector(IRender_Sector* pSector);
 
@@ -239,13 +239,13 @@ public:
     virtual void level_Load(IReader*);
     virtual void level_Unload();
 
-    virtual IDirect3DBaseTexture9* texture_load(const char* fname, u32& msize);
+    virtual IDirect3DBaseTexture9* texture_load(LPCSTR fname, u32& msize);
     virtual HRESULT shader_compile(
-        const char* name, IReader* fs, const char* pFunctionName, const char* pTarget, DWORD Flags, void*& result);
+        LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void*& result);
 
     // Information
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    virtual const char* getShaderPath() { return "r2" DELIMITER ""; }
+    virtual LPCSTR getShaderPath() { return "r2" DELIMITER ""; }
     virtual ref_shader getShader(int id);
     virtual IRender_Sector* getSector(int id);
     virtual IRenderVisual* getVisual(int id);
@@ -255,8 +255,7 @@ public:
     // Main
     virtual void flush();
     virtual void add_Occluder(Fbox2& bb_screenspace); // mask screen region as oclluded
-    void add_Visual(
-        IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
+    void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 
     // wallmarks
@@ -283,35 +282,35 @@ public:
     virtual IRender_Glow* glow_create();
 
     // Models
-    virtual IRenderVisual* model_CreateParticles(const char* name);
+    virtual IRenderVisual* model_CreateParticles(LPCSTR name);
     virtual IRender_DetailModel* model_CreateDM(IReader* F);
-    virtual IRenderVisual* model_Create(const char* name, IReader* data = 0);
-    virtual IRenderVisual* model_CreateChild(const char* name, IReader* data);
+    virtual IRenderVisual* model_Create(LPCSTR name, IReader* data = 0);
+    virtual IRenderVisual* model_CreateChild(LPCSTR name, IReader* data);
     virtual IRenderVisual* model_Duplicate(IRenderVisual* V);
-    virtual void model_Delete(IRenderVisual*& V, bool bDiscard);
+    virtual void model_Delete(IRenderVisual*& V, BOOL bDiscard);
     virtual void model_Delete(IRender_DetailModel*& F);
-    virtual void model_Logging(bool bEnable) { Models->Logging(bEnable); }
+    virtual void model_Logging(BOOL bEnable) { Models->Logging(bEnable); }
     virtual void models_Prefetch();
-    virtual void models_Clear(bool b_complete);
+    virtual void models_Clear(BOOL b_complete);
 
     // Occlusion culling
-    virtual bool occ_visible(vis_data& V);
-    virtual bool occ_visible(Fbox& B);
-    virtual bool occ_visible(sPoly& P);
+    virtual BOOL occ_visible(vis_data& V);
+    virtual BOOL occ_visible(Fbox& B);
+    virtual BOOL occ_visible(sPoly& P);
 
     // Main
     void BeforeFrame() override;
 
     virtual void Calculate();
     virtual void Render();
-    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, const char* name = 0);
+    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);
     virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer);
     virtual void ScreenshotAsyncBegin();
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer);
     virtual void OnFrame();
 
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
-    void AfterWorldRender() override; //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
+    void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
 
     // Render mode
     virtual void rmNear();
@@ -325,7 +324,7 @@ public:
     virtual ~CRender();
 
 protected:
-    virtual void ScreenshotImpl(ScreenshotMode mode, const char* name, CMemoryWriter* memory_writer);
+    virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer);
 
 private:
     FS_FileSet m_file_set;

@@ -21,7 +21,7 @@
 #include "moving_objects.h"
 #endif // DEBUG
 
-const char* alife_section = "alife";
+LPCSTR alife_section = "alife";
 
 
 CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
@@ -52,7 +52,7 @@ CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
     xr_strcat(temp, p.m_alife);
     *command_line = temp;
 
-    const char* start_game_callback = pSettings->r_string(alife_section, "start_game_callback");
+    LPCSTR start_game_callback = pSettings->r_string(alife_section, "start_game_callback");
     luabind::functor<void> functor;
     R_ASSERT2(GEnv.ScriptEngine->functor(start_game_callback, functor), "failed to get start game callback");
     functor();
@@ -84,7 +84,7 @@ void CALifeSimulator::setup_simulator(CSE_ALifeObject* object)
     object->m_alife_simulator = this;
 }
 
-void CALifeSimulator::reload(const char* section) { CALifeUpdateManager::reload(section); }
+void CALifeSimulator::reload(LPCSTR section) { CALifeUpdateManager::reload(section); }
 struct string_prdicate
 {
     shared_str m_value;

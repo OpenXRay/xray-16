@@ -21,7 +21,7 @@ IC static void CScriptActionBase_Export(lua_State* luaState)
                       .def_readonly("storage", &CScriptActionBase::m_storage)
                       .def(constructor<>())
                       .def(constructor<CScriptGameObject*>())
-                      .def(constructor<CScriptGameObject*, const char*>())
+                      .def(constructor<CScriptGameObject*, LPCSTR>())
                       .def("add_precondition",
                           (void (CScriptActionBase::*)(const CScriptActionBase::COperatorCondition&))(
                               &CScriptActionBase::add_condition))

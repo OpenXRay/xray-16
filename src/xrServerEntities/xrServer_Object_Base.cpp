@@ -40,8 +40,8 @@ IPropHelper& PHelper()
 #endif // #ifdef XRGAME_EXPORTS
 #endif
 
-const char* script_section = "script";
-const char* current_version = "current_server_entity_version";
+LPCSTR script_section = "script";
+LPCSTR current_version = "current_server_entity_version";
 
 /*IC*/ u16 script_server_object_version() // XXX: can't compile Release because of "inline"
 {
@@ -67,7 +67,7 @@ void CPureServerObject::save(NET_Packet& tNetPacket) {}
 ////////////////////////////////////////////////////////////////////////////
 // CSE_Abstract
 ////////////////////////////////////////////////////////////////////////////
-CSE_Abstract::CSE_Abstract(const char* caSection)
+CSE_Abstract::CSE_Abstract(LPCSTR caSection)
 {
     m_editor_flags.zero();
     RespawnTime = 0;
@@ -124,7 +124,7 @@ CSE_Abstract::CSE_Abstract(const char* caSection)
         if (config)
         {
             const size_t size = config->length() * sizeof(char);
-            char* temp = (char*)xr_alloca(size + 1);
+            LPSTR temp = (LPSTR)xr_alloca(size + 1);
             CopyMemory(temp, config->pointer(), size);
             temp[size] = 0;
             m_ini_string = temp;
@@ -168,7 +168,7 @@ CInifile& CSE_Abstract::spawn_ini()
     return (*m_ini_file);
 }
 
-void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, bool bLocal)
+void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
 {
     // generic
     tNetPacket.w_begin(M_SPAWN);
@@ -245,7 +245,7 @@ enum EGameTypes {
     GAME_DUMMY = 255 // temporary game type
 };
 
-bool CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
+BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
 {
     u16 dummy16;
     // generic
@@ -373,8 +373,8 @@ void CSE_Abstract::load(NET_Packet& tNetPacket)
 CSE_Abstract* CSE_Abstract::base() { return (this); }
 const CSE_Abstract* CSE_Abstract::base() const { return (this); }
 CSE_Abstract* CSE_Abstract::init() { return (this); }
-const char* CSE_Abstract::name() const { return (*s_name); }
-const char* CSE_Abstract::name_replace() const { return (s_name_replace); }
+LPCSTR CSE_Abstract::name() const { return (*s_name); }
+LPCSTR CSE_Abstract::name_replace() const { return (s_name_replace); }
 Fvector& CSE_Abstract::position() { return (o_Position); }
 Fvector& CSE_Abstract::angle() { return (o_Angle); }
 Flags16& CSE_Abstract::flags() { return (s_flags); }
@@ -386,7 +386,7 @@ const xr_token game_types[] = {{"any_game", eGameIDNoGame}, {"single", eGameIDSi
     {nullptr, 0}};
 
 #ifndef XRGAME_EXPORTS
-void CSE_Abstract::FillProps(const char* pref, PropItemVec& items)
+void CSE_Abstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     m_gameType.FillProp(pref, items);
@@ -400,7 +400,7 @@ void CSE_Abstract::FillProps(const char* pref, PropItemVec& items)
     */
 }
 
-void CSE_Abstract::FillProp(const char* pref, PropItemVec& items)
+void CSE_Abstract::FillProp(LPCSTR pref, PropItemVec& items)
 {
     CScriptValueContainer::assign();
     CScriptValueContainer::clear();

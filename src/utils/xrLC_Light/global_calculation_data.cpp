@@ -123,7 +123,7 @@ void global_claculation_data::xrLoad()
 #endif
 
                 // load thumbnail
-                char* N = BT.name;
+                LPSTR N = BT.name;
                 if (strchr(N, '.'))
                     *(strchr(N, '.')) = 0;
                 xr_strlwr(N);
@@ -158,7 +158,7 @@ void global_claculation_data::xrLoad()
                     BT.THM.mip_filter = THM->r_u32();
                     BT.THM.width = THM->r_u32();
                     BT.THM.height = THM->r_u32();
-                    bool bLOD = FALSE;
+                    BOOL bLOD = FALSE;
                     if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
                         bLOD = TRUE;
 

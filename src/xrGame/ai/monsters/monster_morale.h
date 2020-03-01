@@ -30,7 +30,7 @@ public:
     CMonsterMorale() {}
     ~CMonsterMorale() {}
     void init_external(CBaseMonster* obj);
-    void load(const char* section);
+    void load(LPCSTR section);
     void reinit();
 
     void on_hit();

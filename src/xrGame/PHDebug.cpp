@@ -28,7 +28,7 @@ Flags32 ph_dbg_draw_mask;
 Flags32 ph_dbg_draw_mask1;
 bool draw_frame = 0;
 
-// const char*	dbg_trace_object_name					=NULL;
+// LPCSTR	dbg_trace_object_name					=NULL;
 string64 s_dbg_trace_obj_name = "none";
 IGameObject* trace_object = NULL;
 u32 dbg_bodies_num = 0;
@@ -328,7 +328,7 @@ struct SPHDBGOutText : public SPHDBGDrawAbsract
 {
     string1024 s;
     bool rendered;
-    SPHDBGOutText(const char* t)
+    SPHDBGOutText(LPCSTR t)
     {
         xr_strcpy(s, t);
         rendered = false;
@@ -347,7 +347,7 @@ struct SPHDBGOutText : public SPHDBGDrawAbsract
     }
 };
 
-void _cdecl DBG_OutText(const char* s, ...)
+void _cdecl DBG_OutText(LPCSTR s, ...)
 {
     string1024 t;
     va_list marker;
@@ -689,7 +689,7 @@ bool CFunctionGraph::IsActive()
     return !!m_stat_graph;
 }
 
-const char* PH_DBG_ObjectTrackName() { return s_dbg_trace_obj_name; }
+LPCSTR PH_DBG_ObjectTrackName() { return s_dbg_trace_obj_name; }
 // extern ENGINE_API	IGame_Level*	g_pGameLevel;
 void PH_DBG_SetTrackObject()
 {
@@ -699,13 +699,13 @@ void PH_DBG_SetTrackObject()
         trace_object = Level().Objects.FindObjectByName(PH_DBG_ObjectTrackName());
 }
 
-static const char* name_bool(BOOL v)
+static LPCSTR name_bool(BOOL v)
 {
     static const xr_token token_bool[] = {{"false", 0}, {"true", 1}};
     return get_token_name(token_bool, v);
 }
 
-static const char* name_blend_type(CBlend::ECurvature blend)
+static LPCSTR name_blend_type(CBlend::ECurvature blend)
 {
     static xr_token token_blend[] = {{"eFREE_SLOT", int(CBlend::eFREE_SLOT)}, {"eAccrue", int(CBlend::eAccrue)},
         {"eFalloff", int(CBlend::eFalloff)}, {"eFORCEDWORD", int(CBlend::eFORCEDWORD)}};
@@ -735,7 +735,7 @@ void DBG_AnimBlend(IKinematicsAnimated& ka, const CBlend& B)
     DBG_OutText("-------------------------------------");
     if (dbg_track_obj_flags.test(dbg_track_obj_blends_motion_name))
     {
-        std::pair<const char*, const char*> motion = ka.LL_MotionDefName_dbg(B.motionID);
+        std::pair<LPCSTR, LPCSTR> motion = ka.LL_MotionDefName_dbg(B.motionID);
         DBG_OutText("motion : name %s, set: %s ", motion.first, motion.second);
     }
     if (dbg_track_obj_flags.test(dbg_track_obj_blends_time))
@@ -999,7 +999,7 @@ class CPHDebugOutput : public IDebugOutput
     // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
     // false,
     // u32 tessel = 7 ) = 0;
-    virtual void _cdecl DBG_OutText(const char* s, ...)
+    virtual void _cdecl DBG_OutText(LPCSTR s, ...)
     {
         string1024 t;
         va_list marker;
@@ -1016,7 +1016,7 @@ class CPHDebugOutput : public IDebugOutput
     virtual void DBG_DrawFrameStart() { ::DBG_DrawFrameStart(); }
     virtual void PH_DBG_Render() { ::PH_DBG_Render(); }
     virtual void PH_DBG_Clear() { ::PH_DBG_Clear(); }
-    virtual const char* PH_DBG_ObjectTrackName() { return ::PH_DBG_ObjectTrackName(); }
+    virtual LPCSTR PH_DBG_ObjectTrackName() { return ::PH_DBG_ObjectTrackName(); }
     // virtual	bool			draw_frame								()=0;
     virtual u32& dbg_tries_num()
     {

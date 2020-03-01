@@ -41,7 +41,7 @@ void CRenderDevice::Reset(bool precache /*= true*/)
 
 #include "IGame_Level.h"
 #include "CustomHUD.h"
-extern bool bNeed_re_create_env;
+extern BOOL bNeed_re_create_env;
 
 void CRenderDevice::ResetInternal(bool precache)
 {

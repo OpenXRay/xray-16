@@ -23,7 +23,7 @@ CAI_Boar::CAI_Boar()
 }
 
 CAI_Boar::~CAI_Boar() { xr_delete(StateMan); }
-void CAI_Boar::Load(const char* section)
+void CAI_Boar::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -130,7 +130,7 @@ void CAI_Boar::BoneCallback(CBoneInstance* B)
     B->mTransform.mulB_43(M);
 }
 
-bool CAI_Boar::net_Spawn(CSE_Abstract* DC)
+BOOL CAI_Boar::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

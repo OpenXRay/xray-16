@@ -260,7 +260,7 @@ void CUIPdaWnd::SetActiveCaption()
     {
         if ((*it_b)->m_btn_id == m_sActiveSection)
         {
-            const char* cur = (*it_b)->TextItemControl()->GetText();
+            LPCSTR cur = (*it_b)->TextItemControl()->GetText();
             string256 buf;
             strconcat(sizeof(buf), buf, m_caption_const.c_str(), cur);
             SetCaption(buf);
@@ -356,7 +356,7 @@ void CUIPdaWnd::Reset()
         pUILogsWnd->ResetAll();
 }
 
-void CUIPdaWnd::SetCaption(const char* text) { m_caption->SetText(text); }
+void CUIPdaWnd::SetCaption(LPCSTR text) { m_caption->SetText(text); }
 void RearrangeTabButtons(CUITabControl* pTab)
 {
     const auto& buttons = *pTab->GetButtonsVector();

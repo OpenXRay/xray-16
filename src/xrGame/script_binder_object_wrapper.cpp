@@ -19,8 +19,8 @@ void CScriptBinderObjectWrapper::reinit_static(CScriptBinderObject* script_binde
     script_binder_object->CScriptBinderObject::reinit();
 }
 
-void CScriptBinderObjectWrapper::reload(const char* section) { luabind::call_member<void>(this, "reload", section); }
-void CScriptBinderObjectWrapper::reload_static(CScriptBinderObject* script_binder_object, const char* section)
+void CScriptBinderObjectWrapper::reload(LPCSTR section) { luabind::call_member<void>(this, "reload", section); }
+void CScriptBinderObjectWrapper::reload_static(CScriptBinderObject* script_binder_object, LPCSTR section)
 {
     script_binder_object->CScriptBinderObject::reload(section);
 }

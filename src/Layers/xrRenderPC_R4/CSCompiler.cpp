@@ -15,7 +15,7 @@ CSCompiler& CSCompiler::begin(const char* name)
     return *this;
 }
 
-CSCompiler& CSCompiler::defSampler(const char* ResourceName)
+CSCompiler& CSCompiler::defSampler(LPCSTR ResourceName)
 {
     D3D11_SAMPLER_DESC desc;
     ZeroMemory(&desc, sizeof(desc));
@@ -99,7 +99,7 @@ CSCompiler& CSCompiler::defSampler(const char* ResourceName)
     return *this;
 }
 
-CSCompiler& CSCompiler::defSampler(const char* ResourceName, const D3D_SAMPLER_DESC& def)
+CSCompiler& CSCompiler::defSampler(LPCSTR ResourceName, const D3D_SAMPLER_DESC& def)
 {
     VERIFY(ResourceName);
 
@@ -118,9 +118,9 @@ CSCompiler& CSCompiler::defSampler(const char* ResourceName, const D3D_SAMPLER_D
     return *this;
 }
 
-void fix_texture_name(char*);
+void fix_texture_name(LPSTR);
 
-CSCompiler& CSCompiler::defOutput(const char* ResourceName, const ref_rt& rt)
+CSCompiler& CSCompiler::defOutput(LPCSTR ResourceName, const ref_rt& rt)
 {
     VERIFY(ResourceName);
     if (!rt)
@@ -141,7 +141,7 @@ CSCompiler& CSCompiler::defOutput(const char* ResourceName, const ref_rt& rt)
     return *this;
 }
 
-CSCompiler& CSCompiler::defTexture(const char* ResourceName, ref_texture texture)
+CSCompiler& CSCompiler::defTexture(LPCSTR ResourceName, ref_texture texture)
 {
     VERIFY(ResourceName);
     if (!texture)
@@ -193,8 +193,8 @@ void CSCompiler::compile(const char* name)
     R_ASSERT2(file, cname);
 
     // Select target
-    const char* c_target = "cs_5_0";
-    const char* c_entry = "main";
+    LPCSTR c_target = "cs_5_0";
+    LPCSTR c_entry = "main";
 
     HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry,
         c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)m_cs);

@@ -33,7 +33,7 @@ static class DebugOutputEmptyImpl : public IDebugOutput
     // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
     // false,
     // u32 tessel = 7 ) = 0;
-    virtual void _cdecl DBG_OutText(const char* s, ...) {}
+    virtual void _cdecl DBG_OutText(LPCSTR s, ...) {}
     // virtual	void DBG_TextOutSet( float x, float y )									=0;
     // virtual	void DBG_TextSetColor( u32 color )										=0;
     // virtual	void DBG_DrawBind( IGameObject &O )											=0;
@@ -42,7 +42,7 @@ static class DebugOutputEmptyImpl : public IDebugOutput
     virtual void DBG_DrawFrameStart() {}
     virtual void PH_DBG_Render() {}
     virtual void PH_DBG_Clear() {}
-    virtual const char* PH_DBG_ObjectTrackName() { return "none"; }
+    virtual LPCSTR PH_DBG_ObjectTrackName() { return "none"; }
     // virtual	bool			draw_frame								()=0;
     u32 tries_num;
     virtual u32& dbg_tries_num() { return tries_num; }

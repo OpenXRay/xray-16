@@ -70,7 +70,7 @@ struct CRemoveByTimePredicate
 };
 
 CDangerManager::~CDangerManager() {}
-void CDangerManager::Load(const char* section) {}
+void CDangerManager::Load(LPCSTR section) {}
 void CDangerManager::reinit()
 {
     m_objects.clear();
@@ -79,7 +79,7 @@ void CDangerManager::reinit()
     m_selected = 0;
 }
 
-void CDangerManager::reload(const char* section) {}
+void CDangerManager::reload(LPCSTR section) {}
 void CDangerManager::update()
 {
     START_PROFILE("Memory Manager/dangers::update")

@@ -12,7 +12,7 @@
  *	\return		true on overlap
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ bool RayCollider::SegmentAABBOverlap(const Point& center, const Point& extents)
+inline_ BOOL RayCollider::SegmentAABBOverlap(const Point& center, const Point& extents)
 {
     // Stats
     mNbRayBVTests++;
@@ -49,7 +49,7 @@ inline_ bool RayCollider::SegmentAABBOverlap(const Point& center, const Point& e
  *	\return		true on overlap
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ bool RayCollider::RayAABBOverlap(const Point& center, const Point& extents)
+inline_ BOOL RayCollider::RayAABBOverlap(const Point& center, const Point& extents)
 {
     // Stats
     mNbRayBVTests++;

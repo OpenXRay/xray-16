@@ -18,7 +18,7 @@ CPhantom::CPhantom() : m_fly_particles(nullptr), m_enemy(nullptr)
 
 CPhantom::~CPhantom() {}
 //---------------------------------------------------------------------
-void CPhantom::Load(const char* section)
+void CPhantom::Load(LPCSTR section)
 {
     inherited::Load(section);
     //////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ void CPhantom::Load(const char* section)
     fASpeed = pSettings->r_float(section, "angular_speed");
     fContactHit = pSettings->r_float(section, "contact_hit");
 
-    const char* snd_name = 0;
+    LPCSTR snd_name = 0;
     m_state_data[stBirth].particles = pSettings->r_string(section, "particles_birth");
     snd_name = pSettings->r_string(section, "sound_birth");
     if (snd_name && snd_name[0])
@@ -54,16 +54,16 @@ void CPhantom::Load(const char* section)
     if (snd_name && snd_name[0])
         m_state_data[stShoot].sound.create(snd_name, st_Effect, sg_SourceType);
 }
-bool CPhantom::net_Spawn(CSE_Abstract* DC)
+BOOL CPhantom::net_Spawn(CSE_Abstract* DC)
 {
     CSE_ALifeCreaturePhantom* OBJ = smart_cast<CSE_ALifeCreaturePhantom*>(DC);
     VERIFY(OBJ);
 
     // select visual at first
-    const char* vis_name = OBJ->get_visual();
+    LPCSTR vis_name = OBJ->get_visual();
     if (!(vis_name && vis_name[0]))
     {
-        const char* visuals = pSettings->r_string(cNameSect(), "visuals");
+        LPCSTR visuals = pSettings->r_string(cNameSect(), "visuals");
         u32 cnt = _GetItemCount(visuals);
         string256 tmp;
         OBJ->set_visual(_GetItem(visuals, Random.randI(cnt), tmp));
@@ -307,7 +307,7 @@ Fmatrix CPhantom::XFORM_center()
     return xform.translate_over(center);
 }
 
-CParticlesObject* CPhantom::PlayParticles(const shared_str& name, bool bAutoRemove, const Fmatrix& xform)
+CParticlesObject* CPhantom::PlayParticles(const shared_str& name, BOOL bAutoRemove, const Fmatrix& xform)
 {
     CParticlesObject* ps = CParticlesObject::Create(name.c_str(), bAutoRemove);
     ps->UpdateParent(xform, zero_vel);

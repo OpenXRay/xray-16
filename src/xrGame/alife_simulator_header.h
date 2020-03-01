@@ -17,7 +17,7 @@ protected:
     u32 m_version;
 
 public:
-    IC CALifeSimulatorHeader(const char* section);
+    IC CALifeSimulatorHeader(LPCSTR section);
     virtual ~CALifeSimulatorHeader();
     virtual void save(IWriter& tMemoryStream);
     virtual void load(IReader& tFileStream);

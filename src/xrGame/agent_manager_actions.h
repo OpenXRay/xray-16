@@ -24,7 +24,7 @@ protected:
     typedef CAgentManagerActionBase inherited;
 
 public:
-    CAgentManagerActionNoOrders(CAgentManager* object, const char* action_name = "");
+    CAgentManagerActionNoOrders(CAgentManager* object, LPCSTR action_name = "");
     virtual void finalize();
 };
 
@@ -38,7 +38,7 @@ protected:
     typedef CAgentManagerActionBase inherited;
 
 public:
-    CAgentManagerActionGatherItems(CAgentManager* object, const char* action_name = "");
+    CAgentManagerActionGatherItems(CAgentManager* object, LPCSTR action_name = "");
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ protected:
     typedef CAgentManagerActionBase inherited;
 
 public:
-    CAgentManagerActionKillEnemy(CAgentManager* object, const char* action_name = "");
+    CAgentManagerActionKillEnemy(CAgentManager* object, LPCSTR action_name = "");
     virtual void initialize();
     virtual void finalize();
     virtual void execute();
@@ -67,7 +67,7 @@ protected:
     typedef CAgentManagerActionBase inherited;
 
 public:
-    CAgentManagerActionReactOnDanger(CAgentManager* object, const char* action_name = "");
+    CAgentManagerActionReactOnDanger(CAgentManager* object, LPCSTR action_name = "");
     virtual void initialize();
     virtual void execute();
 };

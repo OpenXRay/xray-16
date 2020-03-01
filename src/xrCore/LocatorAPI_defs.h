@@ -23,19 +23,19 @@ public:
     };
 
 public:
-    char* m_Path;
-    char* m_Root;
-    char* m_Add;
-    char* m_DefExt;
-    char* m_FilterCaption;
+    LPSTR m_Path;
+    LPSTR m_Root;
+    LPSTR m_Add;
+    LPSTR m_DefExt;
+    LPSTR m_FilterCaption;
     Flags32 m_Flags;
 
 public:
-    FS_Path(const char* _Root, const char* _Add, const char* _DefExt = 0, const char* _FilterString = 0, u32 flags = 0);
+    FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt = 0, LPCSTR _FilterString = 0, u32 flags = 0);
     ~FS_Path();
-    const char* _update(string_path& dest, const char* src) const;
-    void _set(const char* add);
-    void _set_root(const char* root);
+    LPCSTR _update(string_path& dest, LPCSTR src) const;
+    void _set(LPCSTR add);
+    void _set_root(LPCSTR root);
 
     void __stdcall rescan_path_cb();
 };
@@ -74,6 +74,6 @@ public:
 };
 using FS_FileSet = xr_set<FS_File>;
 
-extern bool XRCORE_API PatternMatch(const char* s, const char* mask);
+extern bool XRCORE_API PatternMatch(LPCSTR s, LPCSTR mask);
 
 #endif // LocatorAPI_defsH

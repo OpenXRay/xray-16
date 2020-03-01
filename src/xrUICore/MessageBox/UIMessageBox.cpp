@@ -48,7 +48,7 @@ bool CUIMessageBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return inherited::OnMouseAction(x, y, mouse_action);
 }
 
-bool CUIMessageBox::InitMessageBox(const char* box_template)
+bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
 {
     Clear();
     CUIXml uiXml;
@@ -77,7 +77,7 @@ bool CUIMessageBox::InitMessageBox(const char* box_template)
     xr_strcpy(str, box_template);
     CUIXmlInitBase::InitStatic(uiXml, str, 0, this);
 
-    const char* _type = uiXml.ReadAttrib(str, 0, "type", nullptr);
+    LPCSTR _type = uiXml.ReadAttrib(str, 0, "type", nullptr);
     R_ASSERT4(_type, "Please specify type for message box", str, uiXml.m_xml_file_name);
 
     if (!_type)       // Assign this if we're debugging engine
@@ -386,9 +386,9 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     inherited::SendMessage(pWnd, msg, pData);
 }
 
-void CUIMessageBox::SetText(const char* str) { m_UIStaticText->SetTextST(str); }
-const char* CUIMessageBox::GetText() { return m_UIStaticText->GetText(); }
-const char* CUIMessageBox::GetHost()
+void CUIMessageBox::SetText(LPCSTR str) { m_UIStaticText->SetTextST(str); }
+LPCSTR CUIMessageBox::GetText() { return m_UIStaticText->GetText(); }
+LPCSTR CUIMessageBox::GetHost()
 {
     if (m_UIEditHost)
     {
@@ -411,7 +411,7 @@ const char* CUIMessageBox::GetHost()
         return NULL;
 }
 
-const char* CUIMessageBox::GetPassword()
+LPCSTR CUIMessageBox::GetPassword()
 {
     if (m_UIEditPass)
         return m_UIEditPass->GetText();
@@ -419,7 +419,7 @@ const char* CUIMessageBox::GetPassword()
         return NULL;
 }
 
-const char* CUIMessageBox::GetUserPassword()
+LPCSTR CUIMessageBox::GetUserPassword()
 {
     if (m_UIEditUserPass)
         return m_UIEditUserPass->GetText();
@@ -427,7 +427,7 @@ const char* CUIMessageBox::GetUserPassword()
         return NULL;
 }
 
-void CUIMessageBox::SetTextEditURL(const char* text)
+void CUIMessageBox::SetTextEditURL(LPCSTR text)
 {
     if (m_UIEditURL)
     {
@@ -435,7 +435,7 @@ void CUIMessageBox::SetTextEditURL(const char* text)
     }
 }
 
-const char* CUIMessageBox::GetTextEditURL()
+LPCSTR CUIMessageBox::GetTextEditURL()
 {
     if (m_UIEditURL)
     {

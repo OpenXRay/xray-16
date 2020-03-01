@@ -77,7 +77,7 @@ void CDetailManager::cache_Task(int gx, int gz, Slot* D)
     }
 }
 
-bool CDetailManager::cache_Validate()
+BOOL CDetailManager::cache_Validate()
 {
     for (int z = 0; z < dm_cache_line; z++)
     {
@@ -164,7 +164,7 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view, int limit)
     }
 
     // Task performer
-    bool bFullUnpack = FALSE;
+    BOOL bFullUnpack = FALSE;
     if (cache_task.size() == dm_cache_size)
     {
         limit = dm_cache_size;

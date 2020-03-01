@@ -30,7 +30,7 @@ CCameraBase::CCameraBase(IGameObject* p, u32 flags)
 }
 
 CCameraBase::~CCameraBase() {}
-void CCameraBase::Load(const char* section)
+void CCameraBase::Load(LPCSTR section)
 {
     rot_speed = pSettings->r_fvector3(section, "rot_speed");
 

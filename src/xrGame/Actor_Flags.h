@@ -16,6 +16,6 @@ enum
 };
 
 extern Flags32 psActorFlags;
-extern bool GodMode();
+extern BOOL GodMode();
 
 extern int psActorSleepTime;

@@ -10,7 +10,7 @@ struct GameInfo
 {
     shared_str InfoName;
     shared_str InfoData;
-    GameInfo(const char* Name, const char* Data)
+    GameInfo(LPCSTR Name, LPCSTR Data)
     {
         InfoName._set(Name);
         InfoData._set(Data);
@@ -87,7 +87,7 @@ struct ServerInfo
 
     ServerInfo(){};
     ServerInfo(string128 NewAddress) { xr_strcpy(m_Address, NewAddress); };
-    bool operator==(const char* Address)
+    bool operator==(LPCSTR Address)
     {
         int res = xr_strcmp(m_Address, Address);
         return res == 0;

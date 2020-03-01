@@ -5,8 +5,8 @@
 #pragma warning(disable : 4995)
 #include <MgcCont3DMinSphere.h>
 
-bool f_valid(float f) { return _finite(f) && !_isnan(f); }
-bool SphereValid(xr_vector<Fvector>& geom, Fsphere& test)
+BOOL f_valid(float f) { return _finite(f) && !_isnan(f); }
+BOOL SphereValid(xr_vector<Fvector>& geom, Fsphere& test)
 {
     if (!f_valid(test.P.x) || !f_valid(test.R))
     {
@@ -35,7 +35,7 @@ void OGF_Base::CalcBounds()
     // 1: calc first variation
     Fsphere S1;
     Fsphere_compute(S1, &*V.begin(), (u32)V.size());
-    bool B1 = SphereValid(V, S1);
+    BOOL B1 = SphereValid(V, S1);
 
     // 2: calc ordinary algorithm (2nd)
     Fsphere S2;
@@ -52,14 +52,14 @@ void OGF_Base::CalcBounds()
             S2.R = d;
     }
     S2.R = _sqrt(_abs(S2.R));
-    bool B2 = SphereValid(V, S2);
+    BOOL B2 = SphereValid(V, S2);
 
     // 3: calc magic-fm
     Mgc::Sphere _S3 = Mgc::MinSphere((u32)V.size(), (const Mgc::Vector3*)&*V.begin());
     Fsphere S3;
     S3.P.set(_S3.Center().x, _S3.Center().y, _S3.Center().z);
     S3.R = _S3.Radius();
-    bool B3 = SphereValid(V, S3);
+    BOOL B3 = SphereValid(V, S3);
 
     // select best one
     if (B1 && (S1.R < S2.R))

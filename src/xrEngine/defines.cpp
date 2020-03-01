@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #ifdef DEBUG
-ECORE_API bool bDebug = FALSE;
+ECORE_API BOOL bDebug = FALSE;
 
 #endif
 

@@ -7,7 +7,7 @@ extern "C" {
 class xrIDirect3DVertexShader9 : public IDirect3DVertexShader9
 {
 protected:
-    signed int m_refCount;
+    LONG m_refCount;
     IDirect3DDevice9* m_pIDirect3DDevice9;
 
 public:
@@ -19,7 +19,7 @@ public:
 
     /*** IDirect3DVertexDeclaration9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice);
-    HRESULT __stdcall GetFunction(void*, unsigned int* pSizeOfData);
+    HRESULT __stdcall GetFunction(void*, UINT* pSizeOfData);
 };
 
 #ifdef __cplusplus

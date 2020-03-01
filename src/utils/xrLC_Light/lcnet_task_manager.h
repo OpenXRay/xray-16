@@ -43,7 +43,7 @@ private:
 
 public:
     task_manager();
-    exec_pool* run(const char* name_pool);
+    exec_pool* run(LPCSTR name_pool);
     void add_task(net_execution* task);
     void startup();
     void progress(u32 task);
@@ -61,5 +61,5 @@ public:
 };
 
 XRLC_LIGHT_API task_manager& get_task_manager();
-}; // namespace lc_net
+};
 #endif

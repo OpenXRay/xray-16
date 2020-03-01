@@ -28,9 +28,9 @@ void set_add_profile_portion(add_profile_portion_callback callback) { add_profil
 struct profiler
 {
     u64 m_time;
-    const char* m_timer_id;
+    LPCSTR m_timer_id;
 
-    IC profiler::profiler(const char* timer_id)
+    IC profiler::profiler(LPCSTR timer_id)
     {
         if (!add_profile_portion)
             return;

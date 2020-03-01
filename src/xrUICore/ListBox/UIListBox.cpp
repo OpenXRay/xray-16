@@ -19,7 +19,7 @@ CUIListBox::CUIListBox()
     InitScrollView();
 }
 
-void CUIListBox::SetSelectionTexture(const char* texture) { m_selection_texture = texture; }
+void CUIListBox::SetSelectionTexture(LPCSTR texture) { m_selection_texture = texture; }
 bool CUIListBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     if (CUIWindow::OnMouseAction(x, y, mouse_action))
@@ -39,7 +39,7 @@ bool CUIListBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return false;
 }
 
-CUIListBoxItem* CUIListBox::AddTextItem(const char* text)
+CUIListBoxItem* CUIListBox::AddTextItem(LPCSTR text)
 {
     CUIListBoxItem* pItem = AddItem();
 
@@ -112,7 +112,7 @@ CUIListBoxItem* CUIListBox::GetSelectedItem()
         return NULL;
 }
 
-const char* CUIListBox::GetSelectedText()
+LPCSTR CUIListBox::GetSelectedText()
 {
     CUIWindow* w = GetSelected();
 
@@ -144,7 +144,7 @@ u32 CUIListBox::GetSelectedIDX()
     return u32(-1);
 }
 
-const char* CUIListBox::GetText(int idx)
+LPCSTR CUIListBox::GetText(int idx)
 {
     if (idx == -1)
         return NULL;
@@ -206,7 +206,7 @@ void CUIListBox::MoveSelectedDown()
 
 void CUIListBox::SetSelectedIDX(u32 idx) { SetSelected(GetItemByIDX(idx)); }
 void CUIListBox::SetSelectedTAG(u32 tag_val) { SetSelected(GetItemByTAG(tag_val)); }
-void CUIListBox::SetSelectedText(const char* txt) { SetSelected(GetItemByText(txt)); }
+void CUIListBox::SetSelectedText(LPCSTR txt) { SetSelected(GetItemByText(txt)); }
 int CUIListBox::GetIdxByTAG(u32 tag_val)
 {
     int result = -1;
@@ -258,7 +258,7 @@ CUIListBoxItem* CUIListBox::GetItemByIDX(int idx)
     return NULL;
 }
 
-CUIListBoxItem* CUIListBox::GetItemByText(const char* txt)
+CUIListBoxItem* CUIListBox::GetItemByText(LPCSTR txt)
 {
     for (auto it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
     {

@@ -60,7 +60,7 @@ void awards_store::load_awards_from_ltx(CInifile& ini)
     for (int i = 0; i < at_awards_count; ++i)
     {
         enum_awards_t tmp_awid = static_cast<enum_awards_t>(i);
-        const char* tmp_award_name = get_award_name(tmp_awid);
+        LPCSTR tmp_award_name = get_award_name(tmp_awid);
         u16 tmp_count = ini.r_u16(tmp_award_name, award_count_line);
         u32 tmp_rdate = ini.r_u32(tmp_award_name, award_rdate_line);
         m_ltx_awards_result.insert(std::make_pair(tmp_awid, award_data(tmp_count, tmp_rdate)));

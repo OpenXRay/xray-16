@@ -7,7 +7,7 @@
 const GUID DECLSPEC_SELECTANY IID_IDirect3DIndexBuffer9;
 
 xrIDirect3DIndexBuffer9::xrIDirect3DIndexBuffer9(
-    IDirect3DDevice9* pIDirect3DDevice9, unsigned int iLength, DWORD iUsage, D3DFORMAT iFormat, D3DPOOL iPool)
+    IDirect3DDevice9* pIDirect3DDevice9, UINT iLength, DWORD iUsage, D3DFORMAT iFormat, D3DPOOL iPool)
     : m_refCount(0)
 {
     APIDEBUG("xrIDirect3DIndexBuffer9::xrIDirect3DIndexBuffer9");
@@ -28,8 +28,8 @@ xrIDirect3DIndexBuffer9::xrIDirect3DIndexBuffer9(
 
     switch (Format)
     {
-    case D3DFMT_INDEX16: m_pBuffer = new unsigned char[Length * 2]; break;
-    case D3DFMT_INDEX32: m_pBuffer = new unsigned char[Length * 4]; break;
+    case D3DFMT_INDEX16: m_pBuffer = new BYTE[Length * 2]; break;
+    case D3DFMT_INDEX32: m_pBuffer = new BYTE[Length * 4]; break;
     }
 };
 /*** IUnknown methods ***/
@@ -74,7 +74,7 @@ HRESULT __stdcall xrIDirect3DIndexBuffer9::GetDevice(IDirect3DDevice9** ppDevice
     return S_OK;
 };
 HRESULT __stdcall xrIDirect3DIndexBuffer9::SetPrivateData(
-    REFGUID refguid, const void* pData, DWORD SizeOfData, DWORD Flags)
+    REFGUID refguid, CONST void* pData, DWORD SizeOfData, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DIndexBuffer9::SetPrivateData");
     return S_OK;
@@ -107,7 +107,7 @@ D3DRESOURCETYPE __stdcall xrIDirect3DIndexBuffer9::GetType()
     APIDEBUG("xrIDirect3DIndexBuffer9::GetType");
     return D3DRESOURCETYPE(0);
 };
-HRESULT __stdcall xrIDirect3DIndexBuffer9::Lock(unsigned int OffsetToLock, unsigned int SizeToLock, void** ppbData, DWORD Flags)
+HRESULT __stdcall xrIDirect3DIndexBuffer9::Lock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DIndexBuffer9::Lock");
     *ppbData = m_pBuffer + OffsetToLock;

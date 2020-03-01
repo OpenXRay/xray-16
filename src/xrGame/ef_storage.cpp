@@ -81,7 +81,7 @@ CEF_Storage::~CEF_Storage()
         xr_delete(m_fpaBaseFunctions[i]);
 }
 
-CBaseFunction* CEF_Storage::function(const char* function) const
+CBaseFunction* CEF_Storage::function(LPCSTR function) const
 {
     for (int i = 0; i < AI_MAX_EVALUATION_FUNCTION_COUNT; ++i)
     {

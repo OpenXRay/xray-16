@@ -12,7 +12,7 @@
 #include "xrPhysics/IPHWorld.h"
 
 // extern CPHWorld*	ph_world;
-void read_bones(IKinematics* K, const char* S, xr_vector<u16>& bones)
+void read_bones(IKinematics* K, LPCSTR S, xr_vector<u16>& bones)
 {
     string64 S1;
     int count = _GetItemCount(S);

@@ -5,9 +5,9 @@
 #include "blenders/Blender_Recorder.h"
 #include "blenders/Blender.h"
 
-void fix_texture_name(char* fn);
+void fix_texture_name(LPSTR fn);
 
-void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, const char* _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
+void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
     BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
@@ -52,7 +52,7 @@ void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, const char* _ps, bo
     }
 }
 
-void CBlender_Compile::r_Constant(const char* name, R_constant_setup* s)
+void CBlender_Compile::r_Constant(LPCSTR name, R_constant_setup* s)
 {
     R_ASSERT(s);
     ref_constant C = ctable.get(name);
@@ -62,7 +62,7 @@ void CBlender_Compile::r_Constant(const char* name, R_constant_setup* s)
 
 void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
 {
-    unsigned char Mask = 0;
+    BYTE Mask = 0;
     Mask |= cR ? D3DCOLORWRITEENABLE_RED : 0;
     Mask |= cG ? D3DCOLORWRITEENABLE_GREEN : 0;
     Mask |= cB ? D3DCOLORWRITEENABLE_BLUE : 0;
@@ -74,7 +74,7 @@ void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
     RS.SetRS(D3DRS_COLORWRITEENABLE3, Mask);
 }
 
-u32 CBlender_Compile::i_Sampler(const char* _name)
+u32 CBlender_Compile::i_Sampler(LPCSTR _name)
 {
     string256 name;
     xr_strcpy(name, _name);
@@ -93,7 +93,7 @@ u32 CBlender_Compile::i_Sampler(const char* _name)
     return stage;
 }
 
-void CBlender_Compile::i_Texture(u32 s, const char* name)
+void CBlender_Compile::i_Texture(u32 s, LPCSTR name)
 {
     if (name)
         passTextures.push_back(std::make_pair(s, ref_texture(RImplementation.Resources->_CreateTexture(name))));
@@ -125,7 +125,7 @@ void CBlender_Compile::i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag)
 }
 
 u32 CBlender_Compile::r_Sampler(
-    const char* _name, const char* texture, bool b_ps1x_ProjectiveDivide, u32 address, u32 fmin, u32 fmip, u32 fmag)
+    LPCSTR _name, LPCSTR texture, bool b_ps1x_ProjectiveDivide, u32 address, u32 fmin, u32 fmip, u32 fmag)
 {
     dwStage = i_Sampler(_name);
     if (u32(-1) != dwStage)
@@ -167,15 +167,15 @@ u32 CBlender_Compile::r_Sampler(
     return dwStage;
 }
 
-void CBlender_Compile::r_Sampler_rtf(const char* name, const char* texture, bool b_ps1x_ProjectiveDivide)
+void CBlender_Compile::r_Sampler_rtf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
 {
     r_Sampler(name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
 }
-void CBlender_Compile::r_Sampler_clf(const char* name, const char* texture, bool b_ps1x_ProjectiveDivide)
+void CBlender_Compile::r_Sampler_clf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
 {
     r_Sampler(name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
 }
-void CBlender_Compile::r_Sampler_clw(const char* name, const char* texture, bool b_ps1x_ProjectiveDivide)
+void CBlender_Compile::r_Sampler_clw(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
 {
     u32 s = r_Sampler(
         name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);

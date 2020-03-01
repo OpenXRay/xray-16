@@ -4,12 +4,12 @@
 
 using namespace luabind;
 
-void CDialogScriptHelper::AddPrecondition(const char* str) { m_Preconditions.push_back(str); }
-void CDialogScriptHelper::AddAction(const char* str) { m_ScriptActions.push_back(str); }
-void CDialogScriptHelper::AddHasInfo(const char* str) { m_HasInfo.push_back(str); }
-void CDialogScriptHelper::AddDontHasInfo(const char* str) { m_DontHasInfo.push_back(str); }
-void CDialogScriptHelper::AddGiveInfo(const char* str) { m_GiveInfo.push_back(str); }
-void CDialogScriptHelper::AddDisableInfo(const char* str) { m_DisableInfo.push_back(str); }
+void CDialogScriptHelper::AddPrecondition(LPCSTR str) { m_Preconditions.push_back(str); }
+void CDialogScriptHelper::AddAction(LPCSTR str) { m_ScriptActions.push_back(str); }
+void CDialogScriptHelper::AddHasInfo(LPCSTR str) { m_HasInfo.push_back(str); }
+void CDialogScriptHelper::AddDontHasInfo(LPCSTR str) { m_DontHasInfo.push_back(str); }
+void CDialogScriptHelper::AddGiveInfo(LPCSTR str) { m_GiveInfo.push_back(str); }
+void CDialogScriptHelper::AddDisableInfo(LPCSTR str) { m_DisableInfo.push_back(str); }
 SCRIPT_EXPORT(CPhraseDialogExporter, (), {
     module(luaState)[class_<CPhrase>("CPhrase").def("GetPhraseScript", &CPhrase::GetScriptHelper),
 

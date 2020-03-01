@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "uber_deffer.h"
-void fix_texture_name(char* fn);
+void fix_texture_name(LPSTR fn);
 
-void uber_deffer(CBlender_Compile& C, bool hq, const char* _vspec, const char* _pspec, bool _aref, const char* _detail_replace,
+void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref, LPCSTR _detail_replace,
     bool DO_NOT_FINISH)
 {
     // Uber-parse
@@ -37,7 +37,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, const char* _vspec, const char* _
     bool bHasDetailBump = false;
     if (C.bDetail_Bump)
     {
-        const char* detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
+        LPCSTR detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
         // Detect and use detail bump
         if (detail_bump_texture)
         {
@@ -234,7 +234,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, const char* _vspec, const char* _
 }
 
 #ifdef USE_DX11
-void uber_shadow(CBlender_Compile& C, const char* _vspec)
+void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 {
     // Uber-parse
     string256 fname, fnameA, fnameB;
@@ -266,7 +266,7 @@ void uber_shadow(CBlender_Compile& C, const char* _vspec)
     bool bHasDetailBump = false;
     if (C.bDetail_Bump)
     {
-        const char* detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
+        LPCSTR detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
         //  Detect and use detail bump
         if (detail_bump_texture)
         {

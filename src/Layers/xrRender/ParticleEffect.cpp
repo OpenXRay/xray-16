@@ -109,7 +109,7 @@ void CParticleEffect::Play()
     m_RT_Flags.set(flRT_Playing, TRUE);
     ParticleManager()->PlayEffect(m_HandleEffect, m_HandleActionList);
 }
-void CParticleEffect::Stop(bool bDefferedStop)
+void CParticleEffect::Stop(BOOL bDefferedStop)
 {
     ParticleManager()->StopEffect(m_HandleEffect, m_HandleActionList, bDefferedStop);
     if (bDefferedStop)
@@ -127,7 +127,7 @@ void CParticleEffect::RefreshShader()
     OnDeviceCreate();
 }
 
-void CParticleEffect::UpdateParent(const Fmatrix& m, const Fvector& velocity, bool bXFORM)
+void CParticleEffect::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)
 {
     m_RT_Flags.set(flRT_XFORM, bXFORM);
     if (bXFORM)
@@ -216,7 +216,7 @@ void CParticleEffect::OnFrame(u32 frame_dt)
     }
 }
 
-bool CParticleEffect::Compile(CPEDef* def)
+BOOL CParticleEffect::Compile(CPEDef* def)
 {
     m_Def = def;
     if (m_Def)
@@ -456,7 +456,7 @@ __forceinline void magnitude_sse(Fvector& vec, float& res)
 void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, CParticleEffect * pPE)
 {
     float sina = 0.0f, cosa = 0.0f;
-    // Xottab_DUTY: changed angle to be float instead of unsigned int
+    // Xottab_DUTY: changed angle to be float instead of DWORD
     // But it must be 0xFFFFFFFF or otherwise some particles won't play
     float angle = 0xFFFFFFFF;
 

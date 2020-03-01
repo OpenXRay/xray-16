@@ -5,7 +5,7 @@
 class CRenderTarget : public IRender_Target
 {
 private:
-    bool bAvailable;
+    BOOL bAvailable;
     u32 rtWidth;
     u32 rtHeight;
 
@@ -53,11 +53,11 @@ public:
     IDirect3DSurface9* pFB; // 32bit		(r,g,b,a) is situated in the system memory
 
 private:
-    bool Create();
+    BOOL Create();
     bool NeedColorMapping();
-    bool NeedPostProcess();
-    bool Available() { return bAvailable; }
-    bool Perform();
+    BOOL NeedPostProcess();
+    BOOL Available() { return bAvailable; }
+    BOOL Perform();
 
     void calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);

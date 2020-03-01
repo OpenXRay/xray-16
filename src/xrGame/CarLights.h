@@ -21,7 +21,7 @@ struct SCarLight
     bool isOn();
     void Init(CCarLights* holder);
     void Update();
-    void ParseDefinitions(const char* section);
+    void ParseDefinitions(LPCSTR section);
 };
 
 using LIGHTS_STORAGE = xr_vector<SCarLight*>;

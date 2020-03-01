@@ -515,7 +515,7 @@ void CActor::ActorUse()
     }
 }
 
-bool CActor::HUDview() const
+BOOL CActor::HUDview() const
 {
     return IsFocused() && (cam_active == eacFirstEye) &&
         ((!m_holder) || (m_holder && m_holder->allowWeapon() && m_holder->HUDView()));

@@ -149,7 +149,7 @@ public:
     string64 UserName;
     string64 CompName;
     char* Params;
-    unsigned int dwFrame;
+    DWORD dwFrame;
     bool PluginMode;
 
     void Initialize(

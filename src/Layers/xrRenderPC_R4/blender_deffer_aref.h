@@ -8,10 +8,10 @@ public:
     bool lmapped;
 
 public:
-    virtual const char* getComment() { return "LEVEL: defer-base-aref"; }
-    virtual bool canBeDetailed() { return TRUE; }
-    virtual bool canBeLMAPped() { return lmapped; }
-    virtual bool canUseSteepParallax() { return TRUE; }
+    virtual LPCSTR getComment() { return "LEVEL: defer-base-aref"; }
+    virtual BOOL canBeDetailed() { return TRUE; }
+    virtual BOOL canBeLMAPped() { return lmapped; }
+    virtual BOOL canUseSteepParallax() { return TRUE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
     virtual void Compile(CBlender_Compile& C);

@@ -59,7 +59,7 @@ public:
     CSE_ALifeDynamicObject* m_tpBestDetector;
     u64 m_schedule_counter;
 
-    CSE_ALifeSchedulable(const char* caSection);
+    CSE_ALifeSchedulable(LPCSTR caSection);
     virtual ~CSE_ALifeSchedulable();
     // we need this to prevent virtual inheritance :-(
     virtual CSE_Abstract* base() = 0;
@@ -97,7 +97,7 @@ public:
     shared_str m_caConnectionPointName;
     u8 m_tLocations[GameGraph::LOCATION_TYPE_COUNT];
 
-    CSE_ALifeGraphPoint(const char* caSection);
+    CSE_ALifeGraphPoint(LPCSTR caSection);
     virtual ~CSE_ALifeGraphPoint();
     virtual bool match_configuration() const /* noexcept */ { return false; }
 #ifndef XRGAME_EXPORTS
@@ -149,7 +149,7 @@ public:
     CALifeSimulator* m_alife_simulator;
 #endif
 
-    CSE_ALifeObject(const char* caSection);
+    CSE_ALifeObject(LPCSTR caSection);
     virtual ~CSE_ALifeObject();
     virtual bool used_ai_locations() const /* noexcept* */;
     virtual bool can_save() const /* noexcept */;
@@ -170,7 +170,7 @@ public:
     virtual u32 ef_weapon_type() const;
     virtual u32 ef_detector_type() const;
 #ifdef XRGAME_EXPORTS
-    virtual void spawn_supplies(const char*);
+    virtual void spawn_supplies(LPCSTR);
     virtual void spawn_supplies();
     CALifeSimulator& alife() const;
     virtual Fvector draw_level_position() const;
@@ -191,7 +191,7 @@ public:
     u16 m_wCount;
     ALife::_TIME_ID m_tNextBirthTime;
 
-    CSE_ALifeGroupAbstract(const char* caSection);
+    CSE_ALifeGroupAbstract(LPCSTR caSection);
     virtual ~CSE_ALifeGroupAbstract();
     virtual CSE_Abstract* init();
     virtual CSE_Abstract* base() = 0;
@@ -220,7 +220,7 @@ class CSE_ALifeGroupTemplate : public __A, public CSE_ALifeGroupAbstract
     using inherited2 = CSE_ALifeGroupAbstract;
 
 public:
-    CSE_ALifeGroupTemplate(const char* caSection)
+    CSE_ALifeGroupTemplate(LPCSTR caSection)
         : __A(pSettings->line_exist(caSection, "monster_section") ? pSettings->r_string(caSection, "monster_section") :
                                                                     caSection),
           CSE_ALifeGroupAbstract(caSection){};
@@ -261,7 +261,7 @@ public:
     virtual CSE_Abstract* base() { return (inherited1::base()); }
     virtual const CSE_Abstract* base() const { return (inherited1::base()); }
 #ifndef XRGAME_EXPORTS
-    virtual void FillProps(const char* pref, PropItemVec& items)
+    virtual void FillProps(LPCSTR pref, PropItemVec& items)
     {
         inherited1::FillProps(pref, items);
         inherited2::FillProps(pref, items);
@@ -288,7 +288,7 @@ public:
     ALife::_TIME_ID m_tTimeID;
     u64 m_switch_counter;
 
-    CSE_ALifeDynamicObject(const char* caSection);
+    CSE_ALifeDynamicObject(LPCSTR caSection);
     virtual ~CSE_ALifeDynamicObject();
 #ifdef XRGAME_EXPORTS
     virtual void on_spawn();
@@ -323,7 +323,7 @@ class CSE_ALifeDynamicObjectVisual : public CSE_ALifeDynamicObject, public CSE_V
     using inherited2 = CSE_Visual;
 
 public:
-    CSE_ALifeDynamicObjectVisual(const char* caSection);
+    CSE_ALifeDynamicObjectVisual(LPCSTR caSection);
     virtual ~CSE_ALifeDynamicObjectVisual();
     virtual CSE_Visual* __stdcall visual();
     virtual void UPDATE_Read(NET_Packet& P);
@@ -339,7 +339,7 @@ class CSE_ALifePHSkeletonObject : public CSE_ALifeDynamicObjectVisual, public CS
     using inherited2 = CSE_PHSkeleton;
 
 public:
-    CSE_ALifePHSkeletonObject(const char* caSection);
+    CSE_ALifePHSkeletonObject(LPCSTR caSection);
     virtual ~CSE_ALifePHSkeletonObject();
     virtual bool can_save() const /* noexcept */;
     virtual bool used_ai_locations() const /* noexcept */;
@@ -361,7 +361,7 @@ class CSE_ALifeSpaceRestrictor : public CSE_ALifeDynamicObject, public CSE_Shape
 public:
     u8 m_space_restrictor_type;
 
-    CSE_ALifeSpaceRestrictor(const char* caSection);
+    CSE_ALifeSpaceRestrictor(LPCSTR caSection);
     virtual ~CSE_ALifeSpaceRestrictor();
     virtual IServerEntityShape* __stdcall shape();
     virtual bool can_switch_offline() const /* noexcept */;
@@ -384,9 +384,9 @@ public:
     Fvector m_tAngles;
     shared_str m_caLevelToChange;
     shared_str m_caLevelPointToChange;
-    bool m_bSilentMode;
+    BOOL m_bSilentMode;
 
-    CSE_ALifeLevelChanger(const char* caSection);
+    CSE_ALifeLevelChanger(LPCSTR caSection);
     virtual ~CSE_ALifeLevelChanger();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -401,7 +401,7 @@ class CSE_ALifeSmartZone : public CSE_ALifeSpaceRestrictor, public CSE_ALifeSche
     using inherited2 = CSE_ALifeSchedulable;
 
 public:
-    CSE_ALifeSmartZone(const char* caSection);
+    CSE_ALifeSmartZone(LPCSTR caSection);
     virtual ~CSE_ALifeSmartZone();
     virtual CSE_Abstract* base();
     virtual const CSE_Abstract* base() const;
@@ -442,7 +442,7 @@ public:
     u32 type;
     f32 mass;
     shared_str fixed_bones;
-    CSE_ALifeObjectPhysic(const char* caSection);
+    CSE_ALifeObjectPhysic(LPCSTR caSection);
     virtual ~CSE_ALifeObjectPhysic();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual bool can_save() const /* noexcept */;
@@ -483,7 +483,7 @@ public:
     bool freezed;
     SPHNetState State;
 
-    virtual bool Net_Relevant();
+    virtual BOOL Net_Relevant();
 
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -540,7 +540,7 @@ public:
     // game
     float m_health;
 
-    CSE_ALifeObjectHangingLamp(const char* caSection);
+    CSE_ALifeObjectHangingLamp(LPCSTR caSection);
     virtual ~CSE_ALifeObjectHangingLamp();
     virtual void load(NET_Packet& tNetPacket);
     virtual bool used_ai_locations() const /* noexcept */;
@@ -563,7 +563,7 @@ class CSE_ALifeObjectProjector : public CSE_ALifeDynamicObjectVisual
     using inherited = CSE_ALifeDynamicObjectVisual;
 
 public:
-    CSE_ALifeObjectProjector(const char* caSection);
+    CSE_ALifeObjectProjector(LPCSTR caSection);
     virtual ~CSE_ALifeObjectProjector();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
@@ -581,7 +581,7 @@ class CSE_ALifeHelicopter : public CSE_ALifeDynamicObjectVisual, public CSE_Moti
 
 public:
     shared_str engine_sound;
-    CSE_ALifeHelicopter(const char* caSection);
+    CSE_ALifeHelicopter(LPCSTR caSection);
     virtual ~CSE_ALifeHelicopter();
     virtual void load(NET_Packet& tNetPacket);
     virtual bool can_save() const /* noexcept */;
@@ -617,7 +617,7 @@ public:
     xr_vector<SDoorState> door_states;
     xr_vector<SWheelState> wheel_states;
     float health;
-    CSE_ALifeCar(const char* caSection);
+    CSE_ALifeCar(LPCSTR caSection);
     virtual ~CSE_ALifeCar();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual void load(NET_Packet& tNetPacket);
@@ -641,7 +641,7 @@ class CSE_ALifeObjectBreakable : public CSE_ALifeDynamicObjectVisual
 
 public:
     float m_health;
-    CSE_ALifeObjectBreakable(const char* caSection);
+    CSE_ALifeObjectBreakable(LPCSTR caSection);
     virtual ~CSE_ALifeObjectBreakable();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual bool can_switch_offline() const /* noexcept */;
@@ -658,7 +658,7 @@ class CSE_ALifeObjectClimable : public CSE_Shape, public CSE_ALifeDynamicObject
     using inherited2 = CSE_ALifeDynamicObject;
 
 public:
-    CSE_ALifeObjectClimable(const char* caSection);
+    CSE_ALifeObjectClimable(LPCSTR caSection);
     shared_str material;
     virtual ~CSE_ALifeObjectClimable();
     virtual bool used_ai_locations() const /* noexcept */;
@@ -680,7 +680,7 @@ class CSE_ALifeMountedWeapon : public CSE_ALifeDynamicObjectVisual
     using inherited = CSE_ALifeDynamicObjectVisual;
 
 public:
-    CSE_ALifeMountedWeapon(const char* caSection);
+    CSE_ALifeMountedWeapon(LPCSTR caSection);
     virtual ~CSE_ALifeMountedWeapon();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -697,7 +697,7 @@ public:
     bool m_bWorking;
     Fvector m_destEnemyDir;
 
-    CSE_ALifeStationaryMgun(const char* caSection);
+    CSE_ALifeStationaryMgun(LPCSTR caSection);
     virtual ~CSE_ALifeStationaryMgun();
 
     virtual void UPDATE_Read(NET_Packet& P);
@@ -712,7 +712,7 @@ class CSE_ALifeTeamBaseZone : public CSE_ALifeSpaceRestrictor
     using inherited = CSE_ALifeSpaceRestrictor;
 
 public:
-    CSE_ALifeTeamBaseZone(const char* caSection);
+    CSE_ALifeTeamBaseZone(LPCSTR caSection);
     virtual ~CSE_ALifeTeamBaseZone();
 
     u8 m_team;
@@ -732,7 +732,7 @@ public:
     bool m_closed;
     shared_str m_tip_text;
 
-    CSE_ALifeInventoryBox(const char* caSection);
+    CSE_ALifeInventoryBox(LPCSTR caSection);
     virtual ~CSE_ALifeInventoryBox();
 #ifdef XRGAME_EXPORTS
     virtual void add_offline(const xr_vector<ALife::_OBJECT_ID>& saved_children, const bool& update_registries);

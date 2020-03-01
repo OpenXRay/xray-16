@@ -78,7 +78,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
         {
         case SE_R1_NORMAL_HQ:
         {
-            const char* sname = "lmap";
+            LPCSTR sname = "lmap";
             if (C.bDetail_Diffuse)
                 sname = "lmap_dt";
             if (oBlend.value)
@@ -96,7 +96,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
 
         case SE_R1_NORMAL_LQ:
         {
-            const char* sname = "lmap";
+            LPCSTR sname = "lmap";
             if (oBlend.value)
                 C.r_Pass(
                     sname, sname, TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);

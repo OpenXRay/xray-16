@@ -65,7 +65,7 @@ protected:
 private:
     CMapLocation(const CMapLocation&) { R_ASSERT(0); } // disable copy ctor
 protected:
-    void LoadSpot(const char* type, bool bReload);
+    void LoadSpot(LPCSTR type, bool bReload);
     void UpdateSpot(CUICustomMap* map, CMapSpot* sp);
     void UpdateSpotPointer(CUICustomMap* map, CMapSpotPointer* sp);
     void CalcLevelName();
@@ -73,12 +73,12 @@ protected:
     CMapSpot* GetSpotBorder(CMapSpot* sp);
 
 public:
-    CMapLocation(const char* type, u16 object_id);
+    CMapLocation(LPCSTR type, u16 object_id);
     virtual ~CMapLocation();
     virtual void destroy();
 
     IC bool HintEnabled() { return !!m_flags.test(eHintEnabled); }
-    const char* GetHint();
+    LPCSTR GetHint();
     void SetHint(const shared_str& hint);
     CComplexMapSpot* complex_spot() { return m_complex_spot; }
     const CMapSpot* LevelMapSpot() { return m_level_spot; }

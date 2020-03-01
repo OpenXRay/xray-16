@@ -161,7 +161,7 @@ void CUIDemoPlayControl::InitAllPlayers()
     {
         demo_player_info const* tmp_player = tmp_demo_info->get_player(i);
         R_ASSERT(tmp_player);
-        const char* tmp_player_name = tmp_player->get_name();
+        LPCSTR tmp_player_name = tmp_player->get_name();
         R_ASSERT(tmp_player_name);
         m_players->push_back(shared_str(tmp_player_name));
         m_all_players->AddItem(tmp_player_name, NULL, i + 1); // warning ! player_index = tag - 1 !!!
@@ -310,7 +310,7 @@ void CUIDemoPlayControl::OnRepeatRewind(CUIWindow* w, void* d)
 
 void CUIDemoPlayControl::Update()
 {
-    const char* demo_play_string = NULL;
+    LPCSTR demo_play_string = NULL;
     string32 demo_pos;
     string32 demo_speed;
 

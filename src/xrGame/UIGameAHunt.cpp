@@ -71,4 +71,4 @@ void CUIGameAHunt::SetClGame(game_cl_GameState* g)
     m_pBuySpawnMsgBox->func_on_ok = CUIWndCallback::void_function(clmp_game, &game_cl_mp::OnBuySpawn);
 }
 
-void CUIGameAHunt::SetBuyMsgCaption(const char* str) { m_buy_msg_caption->SetTextST(str); }
+void CUIGameAHunt::SetBuyMsgCaption(LPCSTR str) { m_buy_msg_caption->SetTextST(str); }

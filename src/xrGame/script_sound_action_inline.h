@@ -22,7 +22,7 @@ IC CScriptSoundAction::CScriptSoundAction() : m_monster_sound_delay(0)
     m_tHeadAnimType = MonsterSpace::eHeadAnimNone;
 }
 
-IC CScriptSoundAction::CScriptSoundAction(const char* caSoundToPlay, const char* caBoneName, const Fvector& tPositionOffset,
+IC CScriptSoundAction::CScriptSoundAction(LPCSTR caSoundToPlay, LPCSTR caBoneName, const Fvector& tPositionOffset,
     const Fvector& tAngleOffset, bool bLooped, ESoundTypes sound_type)
 {
     m_bLooped = bLooped;
@@ -36,7 +36,7 @@ IC CScriptSoundAction::CScriptSoundAction(const char* caSoundToPlay, const char*
 }
 
 IC CScriptSoundAction::CScriptSoundAction(
-    const char* caSoundToPlay, Fvector* tPosition, const Fvector& tAngleOffset, bool bLooped, ESoundTypes sound_type)
+    LPCSTR caSoundToPlay, Fvector* tPosition, const Fvector& tAngleOffset, bool bLooped, ESoundTypes sound_type)
 {
     m_bLooped = bLooped;
     SetSound(caSoundToPlay);
@@ -47,7 +47,7 @@ IC CScriptSoundAction::CScriptSoundAction(
     m_tHeadAnimType = MonsterSpace::eHeadAnimNone;
 }
 
-IC CScriptSoundAction::CScriptSoundAction(CScriptSound* sound, const char* caBoneName, Fvector const& tPositionOffset,
+IC CScriptSoundAction::CScriptSoundAction(CScriptSound* sound, LPCSTR caBoneName, Fvector const& tPositionOffset,
     const Fvector& tAngleOffset, bool bLooped, ESoundTypes sound_type)
 {
     m_bLooped = bLooped;
@@ -95,7 +95,7 @@ IC CScriptSoundAction::CScriptSoundAction(MonsterSound::EType sound_type, int de
 ///////////////////////////////////////////////////////////////////////////////////
 
 IC CScriptSoundAction::CScriptSoundAction(
-    const char* caSoundToPlay, const char* caBoneName, MonsterSpace::EMonsterHeadAnimType head_anim_type)
+    LPCSTR caSoundToPlay, LPCSTR caBoneName, MonsterSpace::EMonsterHeadAnimType head_anim_type)
 {
     SetBone(caBoneName);
     SetSound(caSoundToPlay);
@@ -124,7 +124,7 @@ IC void CScriptSoundAction::SetPosition(const Fvector& tPosition)
     m_bStartedToPlay = false;
 }
 
-IC void CScriptSoundAction::SetBone(const char* caBoneName)
+IC void CScriptSoundAction::SetBone(LPCSTR caBoneName)
 {
     m_caBoneName = caBoneName;
     m_bStartedToPlay = false;

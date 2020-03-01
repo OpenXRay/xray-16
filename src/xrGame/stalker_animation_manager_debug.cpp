@@ -169,7 +169,7 @@ void add_animation(
 }
 
 void add_blend(const shared_str& animation_id, const shared_str& animation_set_id, const shared_str& visual_id,
-    const std::pair<const char*, const char*>* blend_id)
+    const std::pair<LPCSTR, LPCSTR>* blend_id)
 {
     if (!blend_id)
         return;
@@ -188,7 +188,7 @@ void add_blend(const shared_str& animation_id, const shared_str& animation_set_i
 }
 
 void add_animation_stats(const shared_str& animation_id, const shared_str& animation_set_id,
-    const shared_str& visual_id, const std::pair<const char*, const char*>* blend_id, bool just_started)
+    const shared_str& visual_id, const std::pair<LPCSTR, LPCSTR>* blend_id, bool just_started)
 {
     add_animation(animation_id, animation_set_id, visual_id, just_started);
     add_blend(animation_id, animation_set_id, visual_id, blend_id);
@@ -203,7 +203,7 @@ void CStalkerAnimationManager::add_animation_stats(
 
 void CStalkerAnimationManager::add_animation_stats()
 {
-    std::pair<const char*, const char*> blend;
+    std::pair<LPCSTR, LPCSTR> blend;
 
     if (script().animation())
     {

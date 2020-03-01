@@ -40,8 +40,8 @@ struct Patch_Dawnload_Progress
 
     bool GetInProgress() { return IsInProgress; }
     float GetProgress() { return Progress; }
-    const char* GetStatus() { return Status.c_str(); }
-    const char* GetFlieName() { return FileName.c_str(); }
+    LPCSTR GetStatus() { return Status.c_str(); }
+    LPCSTR GetFlieName() { return FileName.c_str(); }
 };
 
 class CMainMenu : public IMainMenu,
@@ -178,7 +178,7 @@ public:
     bool UseIndicators() override { return false; }
     void OnDeviceCreate();
 
-    void Screenshot(IRender::ScreenshotMode mode = IRender::SM_NORMAL, const char* name = 0);
+    void Screenshot(IRender::ScreenshotMode mode = IRender::SM_NORMAL, LPCSTR name = 0);
     void RegisterPPDraw(CUIWindow* w);
     void UnregisterPPDraw(CUIWindow* w);
 
@@ -188,16 +188,16 @@ public:
 
     void SwitchToMultiplayerMenu();
 
-    void xr_stdcall OnPatchCheck(bool success, const char* VersionName, const char* URL);
+    void xr_stdcall OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL);
     void xr_stdcall OnDownloadPatch(CUIWindow*, void*);
     void xr_stdcall OnConnectToMasterServerOkClicked(CUIWindow*, void*);
 
-    void Show_DownloadMPMap(const char* text, const char* url);
+    void Show_DownloadMPMap(LPCSTR text, LPCSTR url);
     void xr_stdcall OnDownloadMPMap_CopyURL(CUIWindow*, void*);
     void xr_stdcall OnDownloadMPMap(CUIWindow*, void*);
 
-    void OnSessionTerminate(const char* reason);
-    void OnLoadError(const char* module);
+    void OnSessionTerminate(LPCSTR reason);
+    void OnLoadError(LPCSTR module);
 
     void xr_stdcall OnDownloadPatchResult(bool success);
     void xr_stdcall OnDownloadPatchProgress(u64 received, u64 total);
@@ -210,15 +210,15 @@ public:
     void OnDeviceReset() override;
     void OnUIReset() override;
 
-    const char* GetGSVer();
+    LPCSTR GetGSVer();
 
     bool IsCDKeyIsValid();
     bool ValidateCDKey();
 
-    const char* GetPlayerName();
-    const char* GetCDKeyFromRegistry();
+    LPCSTR GetPlayerName();
+    LPCSTR GetCDKeyFromRegistry();
 
-    demo_info const* GetDemoInfo(const char* file_name);
+    demo_info const* GetDemoInfo(LPCSTR file_name);
 
     CEventNotifierCallback::CID m_script_reset_event_cid;
 };

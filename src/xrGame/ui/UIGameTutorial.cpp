@@ -14,7 +14,7 @@
 #include "UIPdaWnd.h"
 #include "xrScriptEngine/Functor.hpp"
 
-extern ENGINE_API bool bShowPauseString;
+extern ENGINE_API BOOL bShowPauseString;
 
 void CallFunction(shared_str const& func)
 {
@@ -39,7 +39,7 @@ void CUISequenceItem::Load(CUIXml* xml, int idx)
 
     for (int i = 0; i < disabled_cnt; ++i)
     {
-        const char* str = xml->Read("disabled_key", i, NULL);
+        LPCSTR str = xml->Read("disabled_key", i, NULL);
         m_disabled_actions.push_back(ActionNameToId(str));
     }
 
@@ -100,7 +100,7 @@ CUISequencer::CUISequencer()
     m_flags.zero();
 }
 
-bool CUISequencer::Start(const char* tutor_name)
+bool CUISequencer::Start(LPCSTR tutor_name)
 {
     VERIFY(m_sequencer_items.empty());
     
@@ -139,12 +139,12 @@ bool CUISequencer::Start(const char* tutor_name)
     XML_NODE bk = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(uiXml.NavigateToNode("global_wnd", 0));
     {
-        const char* str = uiXml.Read("pause_state", 0, "ignore");
+        LPCSTR str = uiXml.Read("pause_state", 0, "ignore");
         m_flags.set(etsNeedPauseOn, 0 == xr_stricmp(str, "on"));
         m_flags.set(etsNeedPauseOff, 0 == xr_stricmp(str, "off"));
     }
 
-    const char* snd_name = uiXml.Read("sound", 0, "");
+    LPCSTR snd_name = uiXml.Read("sound", 0, "");
     if (snd_name && snd_name[0])
     {
         m_global_sound.create(snd_name, st_Effect, sg_Undefined);
@@ -157,7 +157,7 @@ bool CUISequencer::Start(const char* tutor_name)
 
     for (int i = 0; i < items_count; ++i)
     {
-        const char* _tp = uiXml.ReadAttrib("item", i, "type", "");
+        LPCSTR _tp = uiXml.ReadAttrib("item", i, "type", "");
         bool bVideo = 0 == xr_stricmp(_tp, "video");
         CUISequenceItem* pItem = 0;
         if (bVideo)

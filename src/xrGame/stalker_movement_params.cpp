@@ -190,7 +190,7 @@ void stalker_movement_params::actualize_loophole() const
         m_cover->best_loophole(position, value, true, m_manager->current_params().cover() == m_cover);
 }
 
-const char* stalker_movement_params::cover_loophole_id() const
+LPCSTR stalker_movement_params::cover_loophole_id() const
 {
     VERIFY(m_cover);
 

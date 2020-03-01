@@ -15,7 +15,7 @@
  */
 RGBQUAD	CxImage::GetTransColor()
 {
-	if (head.biBitCount<24 && info.nBkgndIndex>=0) return GetPaletteColor((unsigned char)info.nBkgndIndex);
+	if (head.biBitCount<24 && info.nBkgndIndex>=0) return GetPaletteColor((BYTE)info.nBkgndIndex);
 	return info.nBkgndColor;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,9 +64,9 @@ bool CxImage::IsIndexed() const
 /**
  * \return 1 = indexed, 2 = RGB, 4 = RGBA
  */
-unsigned char CxImage::GetColorType()
+BYTE CxImage::GetColorType()
 {
-	unsigned char b = (unsigned char)((head.biBitCount>8) ? 2 /*COLORTYPE_COLOR*/ : 1 /*COLORTYPE_PALETTE*/);
+	BYTE b = (BYTE)((head.biBitCount>8) ? 2 /*COLORTYPE_COLOR*/ : 1 /*COLORTYPE_PALETTE*/);
 #if CXIMAGE_SUPPORT_ALPHA
 	if (AlphaIsValid()) b = 4 /*COLORTYPE_ALPHA*/;
 #endif //CXIMAGE_SUPPORT_ALPHA
@@ -114,7 +114,7 @@ void CxImage::SetYDPI(long dpi)
 /**
  * \sa SetFlags
  */
-unsigned int CxImage::GetFlags() const
+DWORD CxImage::GetFlags() const
 {
 	return info.dwFlags;
 }
@@ -128,7 +128,7 @@ unsigned int CxImage::GetFlags() const
  *
  * \param bLockReservedFlags protects the "reserved" and "blend modes" flags 
  */
-void CxImage::SetFlags(unsigned int flags, bool bLockReservedFlags)
+void CxImage::SetFlags(DWORD flags, bool bLockReservedFlags)
 {
 	if (bLockReservedFlags) info.dwFlags = flags & 0x0000ffff;
 	else info.dwFlags = flags;
@@ -137,7 +137,7 @@ void CxImage::SetFlags(unsigned int flags, bool bLockReservedFlags)
 /**
  * \sa SetCodecOption
  */
-unsigned int CxImage::GetCodecOption(unsigned int imagetype)
+DWORD CxImage::GetCodecOption(DWORD imagetype)
 {
 	imagetype = GetTypeIndexFromId(imagetype);
 	if (imagetype==0){
@@ -155,7 +155,7 @@ unsigned int CxImage::GetCodecOption(unsigned int imagetype)
  *
  * \return true if everything is ok
  */
-bool CxImage::SetCodecOption(unsigned int opt, unsigned int imagetype)
+bool CxImage::SetCodecOption(DWORD opt, DWORD imagetype)
 {
 	imagetype = GetTypeIndexFromId(imagetype);
 	if (imagetype==0){
@@ -173,20 +173,20 @@ void* CxImage::GetDIB() const
 	return pDib;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::GetHeight() const
+DWORD CxImage::GetHeight() const
 {
 	return head.biHeight;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::GetWidth() const
+DWORD CxImage::GetWidth() const
 {
 	return head.biWidth;
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * \return unsigned int aligned width of the image.
+ * \return DWORD aligned width of the image.
  */
-unsigned int CxImage::GetEffWidth() const
+DWORD CxImage::GetEffWidth() const
 {
 	return info.dwEffWidth;
 }
@@ -194,7 +194,7 @@ unsigned int CxImage::GetEffWidth() const
 /**
  * \return 2, 16, 256; 0 for RGB images.
  */
-unsigned int CxImage::GetNumColors() const
+DWORD CxImage::GetNumColors() const
 {
 	return head.biClrUsed;
 }
@@ -202,7 +202,7 @@ unsigned int CxImage::GetNumColors() const
 /**
  * \return: 1, 4, 8, 24.
  */
-unsigned short CxImage::GetBpp() const
+WORD CxImage::GetBpp() const
 {
 	return head.biBitCount;
 }
@@ -211,7 +211,7 @@ unsigned short CxImage::GetBpp() const
  * \return original image format
  * \sa ENUM_CXIMAGE_FORMATS.
  */
-unsigned int CxImage::GetType() const
+DWORD CxImage::GetType() const
 {
 	return info.dwType;
 }
@@ -220,7 +220,7 @@ unsigned int CxImage::GetType() const
  * change image format identifier
  * \sa ENUM_CXIMAGE_FORMATS.
  */
-bool CxImage::SetType(unsigned int type)
+bool CxImage::SetType(DWORD type)
 {
 	switch (type){
 #if CXIMAGE_SUPPORT_BMP
@@ -287,12 +287,12 @@ bool CxImage::SetType(unsigned int type)
 	return false;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::GetNumTypes()
+DWORD CxImage::GetNumTypes()
 {
 	return CMAX_IMAGE_FORMATS-1;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::GetTypeIdFromName(const TCHAR* ext)
+DWORD CxImage::GetTypeIdFromName(const TCHAR* ext)
 {
 #if CXIMAGE_SUPPORT_BMP
 	if (_tcsnicmp(ext,_T("bmp"),3)==0 )		return CXIMAGE_FORMAT_BMP;
@@ -379,9 +379,9 @@ unsigned int CxImage::GetTypeIdFromName(const TCHAR* ext)
 	return CXIMAGE_FORMAT_UNKNOWN;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::GetTypeIdFromIndex(const unsigned int index)
+DWORD CxImage::GetTypeIdFromIndex(const DWORD index)
 {
-	unsigned int n;
+	DWORD n;
 
 	n=0; if (index == n) return CXIMAGE_FORMAT_UNKNOWN;
 #if CXIMAGE_SUPPORT_BMP
@@ -445,9 +445,9 @@ unsigned int CxImage::GetTypeIdFromIndex(const unsigned int index)
 	return CXIMAGE_FORMAT_UNKNOWN;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::GetTypeIndexFromId(const unsigned int id)
+DWORD CxImage::GetTypeIndexFromId(const DWORD id)
 {
-	unsigned int n;
+	DWORD n;
 
 	n=0; if (id == CXIMAGE_FORMAT_UNKNOWN) return n;
 #if CXIMAGE_SUPPORT_BMP
@@ -514,7 +514,7 @@ unsigned int CxImage::GetTypeIndexFromId(const unsigned int id)
 /**
  * \return current frame delay in milliseconds. Only for GIF and MNG formats.
  */
-unsigned int CxImage::GetFrameDelay() const
+DWORD CxImage::GetFrameDelay() const
 {
 	return info.dwFrameDelay;
 }
@@ -523,7 +523,7 @@ unsigned int CxImage::GetFrameDelay() const
  * Sets current frame delay. Only for GIF format.
  * \param d = delay in milliseconds
  */
-void CxImage::SetFrameDelay(unsigned int d)
+void CxImage::SetFrameDelay(DWORD d)
 {
 	info.dwFrameDelay=d;
 }
@@ -544,9 +544,9 @@ void CxImage::SetOffset(long x,long y)
  * \sa SetJpegQuality, GetJpegQualityF
  * \author [DP]; changes [Stefan Schürmans]
  */
-unsigned char CxImage::GetJpegQuality() const
+BYTE CxImage::GetJpegQuality() const
 {
-	return (unsigned char)(info.fQuality + 0.5f);
+	return (BYTE)(info.fQuality + 0.5f);
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -563,7 +563,7 @@ float CxImage::GetJpegQualityF() const
  * \param q: can be from 0 to 100
  * \author [DP]; changes [Stefan Schürmans]
  */
-void CxImage::SetJpegQuality(unsigned char q){
+void CxImage::SetJpegQuality(BYTE q){
 	info.fQuality = (float)q;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -581,7 +581,7 @@ void CxImage::SetJpegQualityF(float q){
 /**
  * \sa SetJpegScale
  */
-unsigned char CxImage::GetJpegScale() const
+BYTE CxImage::GetJpegScale() const
 {
 	return info.nJpegScale;
 }
@@ -590,7 +590,7 @@ unsigned char CxImage::GetJpegScale() const
  * scaling down during JPEG decoding valid numbers are 1, 2, 4, 8
  * \author [ignacio]
  */
-void CxImage::SetJpegScale(unsigned char q){
+void CxImage::SetJpegScale(BYTE q){
 	info.nJpegScale = q;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -687,7 +687,7 @@ void CxImage::SetFrame(long nFrame){
  * Sets the method for drawing the frame related to others
  * \sa GetDisposalMethod
  */
-void CxImage::SetDisposalMethod(unsigned char dm)
+void CxImage::SetDisposalMethod(BYTE dm)
 {	info.dispmeth=dm; }
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -703,7 +703,7 @@ void CxImage::SetDisposalMethod(unsigned char dm)
  *                   what was there prior to rendering the graphic.
  *             4-7 -    To be defined.
  */
-unsigned char CxImage::GetDisposalMethod() const
+BYTE CxImage::GetDisposalMethod() const
 {	return info.dispmeth; }
 ////////////////////////////////////////////////////////////////////////////////
 bool CxImage::GetRetreiveAllFrames() const
@@ -757,9 +757,9 @@ const char* CxImage::GetLastError()
 	return info.szLastError;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::DumpSize()
+DWORD CxImage::DumpSize()
 {
-	unsigned int n;
+	DWORD n;
 	n = sizeof(BITMAPINFOHEADER) + sizeof(CXIMAGEINFO) + GetSize();
 
 	if (pAlpha){
@@ -789,7 +789,7 @@ unsigned int CxImage::DumpSize()
 	return n;
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::Dump(unsigned char * dst)
+DWORD CxImage::Dump(BYTE * dst)
 {
 	if (!dst) return 0;
 
@@ -843,7 +843,7 @@ unsigned int CxImage::Dump(unsigned char * dst)
 	return DumpSize();
 }
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int CxImage::UnDump(const unsigned char * src)
+DWORD CxImage::UnDump(const BYTE * src)
 {
 	if (!src)
 		return 0;
@@ -852,7 +852,7 @@ unsigned int CxImage::UnDump(const unsigned char * src)
 	if (!DestroyFrames())
 		return 0;
 
-	unsigned int n = 0;
+	DWORD n = 0;
 
 	memcpy(&head,src,sizeof(BITMAPINFOHEADER));
 	n += sizeof(BITMAPINFOHEADER);

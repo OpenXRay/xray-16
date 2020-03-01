@@ -7,7 +7,7 @@
 #include "Render.h"
 #endif
 
-extern ENGINE_API bool g_bRendering;
+extern ENGINE_API BOOL g_bRendering;
 ENGINE_API Fvector2 g_current_font_scale = {1.0f, 1.0f};
 
 #include "Include/xrRender/RenderFactory.h"
@@ -51,7 +51,7 @@ void CGameFont::Initialize(pcstr cShader, pcstr cTextureName)
 {
     string_path cTexture;
 
-    const char* _lang = pSettings->r_string("string_table", "font_prefix");
+    LPCSTR _lang = pSettings->r_string("string_table", "font_prefix");
     bool is_di = strstr(cTextureName, "ui_font_hud_01") || strstr(cTextureName, "ui_font_hud_02") ||
         strstr(cTextureName, "ui_font_console_02");
     if (_lang && !is_di)

@@ -34,7 +34,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_icon._set(pSettings->r_string(id(), "icon"));
 
     // section --------------------------------------------------------------------------
-    const char* section_str = pSettings->r_string(id(), "section");
+    LPCSTR section_str = pSettings->r_string(id(), "section");
     VERIFY2(pSettings->section_exist(section_str),
         make_string("Upgrade <%s> : settings section [%s] not exist!", id_str(), section_str));
     VERIFY2(pSettings->line_count(section_str),
@@ -43,7 +43,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_section._set(section_str);
 
     // precondition_functor
-    const char* precondition_functor_str = pSettings->r_string(id(), "precondition_functor");
+    LPCSTR precondition_functor_str = pSettings->r_string(id(), "precondition_functor");
     m_preconditions.parameter = pSettings->r_string(id(), "precondition_parameter");
     m_preconditions.parameter2 = m_section.c_str();
     R_ASSERT2(GEnv.ScriptEngine->functor(precondition_functor_str, m_preconditions.functr),
@@ -52,7 +52,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_preconditions();
 
     // effect_functor
-    const char* effect_functor_str = pSettings->r_string(id(), "effect_functor");
+    LPCSTR effect_functor_str = pSettings->r_string(id(), "effect_functor");
     m_effects.parameter = pSettings->r_string(id(), "effect_parameter");
     m_effects.parameter2 = m_section.c_str();
     m_effects.parameter3 = 1;
@@ -61,8 +61,8 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_effects();
 
     // prereq_functor (1,2) : m_prerequisites, m_tooltip
-    const char* prereq_functor_str = pSettings->r_string(id(), "prereq_functor"); // prerequisites_functor
-    //	const char* tooltip_functor_str	= pSettings->r_string( id(), "prereq_tooltip_functor" );
+    LPCSTR prereq_functor_str = pSettings->r_string(id(), "prereq_functor"); // prerequisites_functor
+    //	LPCSTR tooltip_functor_str	= pSettings->r_string( id(), "prereq_tooltip_functor" );
     m_prerequisites.parameter = pSettings->r_string(id(), "prereq_params"); // prerequisites_params
     m_prerequisites.parameter2 = m_section.c_str();
     //	m_tooltip.parameter			= pSettings->r_string( id(), "prereq_params" );
@@ -79,7 +79,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_tooltip();*/
 
     // effects = groups
-    const char* groups_str = pSettings->r_string(id(), "effects");
+    LPCSTR groups_str = pSettings->r_string(id(), "effects");
     if (groups_str)
     {
         add_dependent_groups(groups_str, manager_r);
@@ -111,7 +111,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
 
 #ifdef DEBUG
 
-void Upgrade::log_hierarchy(const char* nest)
+void Upgrade::log_hierarchy(LPCSTR nest)
 {
     u32 sz = (xr_strlen(nest) + 4) * sizeof(char);
     PSTR nest2 = (PSTR)xr_alloca(sz);
@@ -172,7 +172,7 @@ bool Upgrade::check_scheme_index(Ivector2 const& scheme_index)
     return (m_scheme_index.x == scheme_index.x && m_scheme_index.y == scheme_index.y);
 }
 
-const char* Upgrade::get_prerequisites() { return m_prerequisites(); }
+LPCSTR Upgrade::get_prerequisites() { return m_prerequisites(); }
 UpgradeStateResult Upgrade::get_preconditions()
 {
     int res_prec = m_preconditions();

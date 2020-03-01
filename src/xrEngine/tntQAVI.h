@@ -16,26 +16,26 @@
 // reverse enginered AVI index v.1 format
 /*struct AviIndex {
 
- unsigned int dwChunkType; // chunk type, i.e. '##dc' - DIB compressed
- unsigned int dwFlags; // key-frame etc.
- unsigned int dwOffset; // sub-chunk offset from the begining of the LIST chunk
- unsigned int dwLenght; // chunk lenght
+ DWORD dwChunkType; // chunk type, i.e. '##dc' - DIB compressed
+ DWORD dwFlags; // key-frame etc.
+ DWORD dwOffset; // sub-chunk offset from the begining of the LIST chunk
+ DWORD dwLenght; // chunk lenght
 
  };
 
  typedef struct {
  FOURCC fccType;
  FOURCC fccHandler;
- unsigned int dwFlags;
- unsigned int dwPriority;
- unsigned int dwInitialFrames;
- unsigned int dwScale;
- unsigned int dwRate;
- unsigned int dwStart;
- unsigned int dwLength;
- unsigned int dwSuggestedBufferSize;
- unsigned int dwQuality;
- unsigned int dwSampleSize;
+ DWORD dwFlags;
+ DWORD dwPriority;
+ DWORD dwInitialFrames;
+ DWORD dwScale;
+ DWORD dwRate;
+ DWORD dwStart;
+ DWORD dwLength;
+ DWORD dwSuggestedBufferSize;
+ DWORD dwQuality;
+ DWORD dwSampleSize;
  RECT rcFrame;
  } AVIStreamHeader;
  */
@@ -43,22 +43,22 @@ typedef struct
 {
     FOURCC fccType;
     FOURCC fccHandler;
-    unsigned int dwFlags;
-    unsigned int dwPriority;
-    unsigned int dwInitialFrames;
-    unsigned int dwScale;
-    unsigned int dwRate;
-    unsigned int dwStart;
-    unsigned int dwLength;
-    unsigned int dwSuggestedBufferSize;
-    unsigned int dwQuality;
-    unsigned int dwSampleSize;
+    DWORD dwFlags;
+    DWORD dwPriority;
+    DWORD dwInitialFrames;
+    DWORD dwScale;
+    DWORD dwRate;
+    DWORD dwStart;
+    DWORD dwLength;
+    DWORD dwSuggestedBufferSize;
+    DWORD dwQuality;
+    DWORD dwSampleSize;
     struct
     {
-        unsigned short left;
-        unsigned short top;
-        unsigned short right;
-        unsigned short bottom;
+        WORD left;
+        WORD top;
+        WORD right;
+        WORD bottom;
     };
     // RECT rcFrame; - лажа в MSDN
 } AVIStreamHeaderCustom;
@@ -70,9 +70,9 @@ protected:
 
 protected:
     AVIINDEXENTRY* m_pMovieIndex;
-    unsigned char* m_pMovieData;
+    BYTE* m_pMovieData;
     HIC m_aviIC;
-    unsigned char* m_pDecompressedBuf;
+    BYTE* m_pDecompressedBuf;
 
     BITMAPINFOHEADER m_biOutFormat;
     BITMAPINFOHEADER m_biInFormat;
@@ -80,27 +80,27 @@ protected:
     float m_fRate; // стандартная скорость, fps
     float m_fCurrentRate; // текущая скорость, fps
 
-    unsigned int m_dwFrameTotal;
-    unsigned int m_dwFrameCurrent;
+    DWORD m_dwFrameTotal;
+    DWORD m_dwFrameCurrent;
     u32 m_dwFirstFrameOffset;
 
-    unsigned int CalcFrame();
+    DWORD CalcFrame();
 
-    bool DecompressFrame(unsigned int dwFrameNum);
-    void PreRoll(unsigned int dwFrameNum);
+    BOOL DecompressFrame(DWORD dwFrameNum);
+    VOID PreRoll(DWORD dwFrameNum);
 
 public:
     CAviPlayerCustom();
     ~CAviPlayerCustom();
 
-    unsigned int m_dwWidth, m_dwHeight;
+    DWORD m_dwWidth, m_dwHeight;
 
-    void GetSize(unsigned int* dwWidth, unsigned int* dwHeight);
+    VOID GetSize(DWORD* dwWidth, DWORD* dwHeight);
 
-    bool Load(char* fname);
-    bool GetFrame(unsigned char** pDest);
+    BOOL Load(char* fname);
+    BOOL GetFrame(BYTE** pDest);
 
-    bool NeedUpdate() { return CalcFrame() != m_dwFrameCurrent; }
-    signed int SetSpeed(signed int nPercent);
+    BOOL NeedUpdate() { return CalcFrame() != m_dwFrameCurrent; }
+    INT SetSpeed(INT nPercent);
 };
 #endif

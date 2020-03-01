@@ -10,9 +10,9 @@ public:
     CUILines();
     virtual ~CUILines();
 
-    void SetText(const char* text);
-    void SetTextST(const char* text);
-    const char* GetText();
+    void SetText(LPCSTR text);
+    void SetTextST(LPCSTR text);
+    LPCSTR GetText();
     //--
     void SetTextColor(u32 color);
     u32 GetTextColor() { return m_dwTextColor; }

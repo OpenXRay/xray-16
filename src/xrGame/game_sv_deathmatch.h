@@ -43,7 +43,7 @@ protected:
 
     xr_vector<game_TeamState> teams; // dm,tdm,ah
 
-    const char* pWinnigPlayerName;
+    LPCSTR pWinnigPlayerName;
 
     virtual void ReadOptions(shared_str& options);
     virtual void ConsoleCommands_Create();
@@ -105,7 +105,7 @@ public:
     virtual ~game_sv_Deathmatch();
     virtual void Create(shared_str& options);
 
-    virtual const char* type_name() const { return "deathmatch"; };
+    virtual LPCSTR type_name() const { return "deathmatch"; };
     virtual void net_Export_State(NET_Packet& P, ClientID id_to);
 
     virtual void OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender);
@@ -181,7 +181,7 @@ public:
 
     virtual void StartAnomalies(int AnomalySet = -1);
 
-    virtual bool IsBuyableItem(const char* ItemName);
+    virtual bool IsBuyableItem(LPCSTR ItemName);
     void RemoveItemFromActor(CSE_Abstract* pItem);
     //----- Money routines -----------------------------------------------------------------
     virtual void Money_SetStart(ClientID id_who);
@@ -209,7 +209,7 @@ public:
     void __stdcall RespawnPlayerAsSpectator(IClient* client);
 
 protected:
-    virtual void WriteGameState(CInifile& ini, const char* sect, bool bRoundResult);
+    virtual void WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult);
     shared_str m_not_free_ammo_str;
     virtual bool CanChargeFreeAmmo(char const* ammo_section);
 };

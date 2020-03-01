@@ -7,7 +7,7 @@ struct b_texture
     string128			name;
     u32					dwWidth;
     u32					dwHeight;
-    bool				bHasAlpha;
+    BOOL				bHasAlpha;
     u32*				pSurface;
 };
 STextureParams	THM;

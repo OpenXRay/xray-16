@@ -189,13 +189,13 @@ CCustomDetector::~CCustomDetector()
     xr_delete(m_ui);
 }
 
-bool CCustomDetector::net_Spawn(CSE_Abstract* DC)
+BOOL CCustomDetector::net_Spawn(CSE_Abstract* DC)
 {
     TurnDetectorInternal(false);
     return (inherited::net_Spawn(DC));
 }
 
-void CCustomDetector::Load(const char* section)
+void CCustomDetector::Load(LPCSTR section)
 {
     m_animation_slot = 7;
     inherited::Load(section);

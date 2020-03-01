@@ -189,7 +189,7 @@ public:
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
 
-    void u_stencil_optimize(bool common_stencil = TRUE);
+    void u_stencil_optimize(BOOL common_stencil = TRUE);
     void u_compute_texgen_screen(Fmatrix& dest);
     void u_compute_texgen_screen_asd(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);

@@ -172,7 +172,7 @@ void anti_aim_ability::start_camera_effector()
         cam_eff->SetHudAffect(!!pSettings->r_bool(effector_name, "cam_eff_hud_affect"));
     }
 
-    const char* fn = pSettings->r_string(effector_name, "cam_eff_name");
+    LPCSTR fn = pSettings->r_string(effector_name, "cam_eff_name");
     cam_eff->Start(fn);
 
     m_camera_effector_end_tick = Device.dwTimeGlobal + (TTime)(cam_eff->GetAnimatorLength() * 1000);

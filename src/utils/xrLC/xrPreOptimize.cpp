@@ -211,4 +211,4 @@ void CBuild::PreOptimize()
     // -------------------------------------------------------------
 }
 
-void CBuild::IsolateVertices(bool bProgress) { isolate_vertices<Vertex>(bProgress, lc_global_data()->g_vertices()); }
+void CBuild::IsolateVertices(BOOL bProgress) { isolate_vertices<Vertex>(bProgress, lc_global_data()->g_vertices()); }

@@ -130,7 +130,7 @@ void CEntity::Hit(SHit* pHDS)
     inherited::Hit(pHDS);
 }
 
-void CEntity::Load(const char* section)
+void CEntity::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -149,7 +149,7 @@ void CEntity::Load(const char* section)
     //////////////////////////////////////
 }
 
-bool CEntity::net_Spawn(CSE_Abstract* DC)
+BOOL CEntity::net_Spawn(CSE_Abstract* DC)
 {
     m_level_death_time = 0;
     m_game_death_time = 0;
@@ -316,7 +316,7 @@ void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
 //}
 
 void CEntity::reinit() { inherited::reinit(); }
-void CEntity::reload(const char* section)
+void CEntity::reload(LPCSTR section)
 {
     inherited::reload(section);
     if (!use_simplified_visual())

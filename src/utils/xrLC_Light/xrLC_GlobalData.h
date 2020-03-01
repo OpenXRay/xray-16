@@ -142,18 +142,18 @@ extern "C" XRLC_LIGHT_API xrLC_GlobalData* lc_global_data();
 extern "C" XRLC_LIGHT_API void create_global_data();
 extern "C" XRLC_LIGHT_API void destroy_global_data();
 extern "C" XRLC_LIGHT_API u32 InvalideFaces();
-XRLC_LIGHT_API void ImplicitLighting(bool net);
+XRLC_LIGHT_API void ImplicitLighting(BOOL net);
 
 extern xrLC_GlobalData* data;
 IC xrLC_GlobalData* inlc_global_data() { return data; }
-static const char* gl_data_net_file_name = "tmp_global_data";
+static LPCSTR gl_data_net_file_name = "tmp_global_data";
 
 #ifdef _DEBUG
-static const char* libraries =
+static LPCSTR libraries =
     "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,BugTrapD.dll,FreeImage.dll,"
     "msvcr80.dll,Microsoft.VC80.CRT.manifest";
 #else
-static const char* libraries =
+static LPCSTR libraries =
     "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,FreeImage.dll,msvcr80.dll,"
     "Microsoft.VC80.CRT.manifest";
 #endif

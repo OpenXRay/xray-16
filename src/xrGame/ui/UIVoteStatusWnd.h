@@ -12,6 +12,6 @@ class UIVoteStatusWnd : public CUIFrameWindow
 
 public:
     void InitFromXML(CUIXml& xml_doc);
-    void SetVoteTimeResultMsg(const char* s);
-    void SetVoteMsg(const char* s);
+    void SetVoteTimeResultMsg(LPCSTR s);
+    void SetVoteMsg(LPCSTR s);
 };

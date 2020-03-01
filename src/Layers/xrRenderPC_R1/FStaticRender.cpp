@@ -180,10 +180,10 @@ void CRender::AfterWorldRender() {}
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
-IRenderVisual* CRender::model_Create(const char* name, IReader* data) { return Models->Create(name, data); }
-IRenderVisual* CRender::model_CreateChild(const char* name, IReader* data) { return Models->CreateChild(name, data); }
+IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
+IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
-void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
+void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
@@ -205,13 +205,13 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         F = nullptr;
     }
 }
-IRenderVisual* CRender::model_CreatePE(const char* name)
+IRenderVisual* CRender::model_CreatePE(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     R_ASSERT3(SE, "Particle effect doesn't exist", name);
     return Models->CreatePE(SE);
 }
-IRenderVisual* CRender::model_CreateParticles(const char* name)
+IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     if (SE)
@@ -224,7 +224,7 @@ IRenderVisual* CRender::model_CreateParticles(const char* name)
     }
 }
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
 ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
@@ -294,9 +294,9 @@ IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return new CGlow(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
-bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     set_Object(root);
@@ -393,9 +393,9 @@ void CRender::apply_object(IRenderable* O)
 
 // Misc
 float g_fSCREEN;
-static bool gm_Nearer = 0;
+static BOOL gm_Nearer = 0;
 
-IC void gm_SetNearer(bool bNearer)
+IC void gm_SetNearer(BOOL bNearer)
 {
     if (bNearer != gm_Nearer)
     {
@@ -597,7 +597,7 @@ void CRender::Calculate()
                             vis_data& v_orig = renderable->GetRenderData().visual->getVisData();
                             vis_data v_copy = v_orig;
                             v_copy.box.xform(renderable->GetRenderData().xform);
-                            bool bVisible = HOM.visible(v_copy);
+                            BOOL bVisible = HOM.visible(v_copy);
                             v_orig.accept_frame = v_copy.accept_frame;
                             v_orig.marker = v_copy.marker;
                             v_orig.hom_frame = v_copy.hom_frame;

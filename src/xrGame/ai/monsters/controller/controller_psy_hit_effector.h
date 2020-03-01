@@ -13,7 +13,7 @@
 //	float			m_release_perc;
 //
 // public:
-//	virtual void	load					(const char* section);
+//	virtual void	load					(LPCSTR section);
 //	virtual bool	check_completion		();
 //	virtual bool	check_start_conditions	();
 //	virtual void	update_factor			();
@@ -34,5 +34,5 @@
 //
 // public:
 //					CPsyHitEffectorCam	(EEffectorType type);
-//	virtual	bool	Process				(Fvector &p, Fvector &d, Fvector &n, float& fFov, float& fFar, float& fAspect);
+//	virtual	BOOL	Process				(Fvector &p, Fvector &d, Fvector &n, float& fFov, float& fFar, float& fAspect);
 //};

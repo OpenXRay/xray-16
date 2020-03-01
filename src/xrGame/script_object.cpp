@@ -24,14 +24,14 @@ void CScriptObject::reinit()
     CGameObject::reinit();
 }
 
-bool CScriptObject::net_Spawn(CSE_Abstract* DC) { return (CGameObject::net_Spawn(DC) && CScriptEntity::net_Spawn(DC)); }
+BOOL CScriptObject::net_Spawn(CSE_Abstract* DC) { return (CGameObject::net_Spawn(DC) && CScriptEntity::net_Spawn(DC)); }
 void CScriptObject::net_Destroy()
 {
     CGameObject::net_Destroy();
     CScriptEntity::net_Destroy();
 }
 
-bool CScriptObject::UsedAI_Locations() { return (FALSE); }
+BOOL CScriptObject::UsedAI_Locations() { return (FALSE); }
 void CScriptObject::shedule_Update(u32 DT)
 {
     CGameObject::shedule_Update(DT);

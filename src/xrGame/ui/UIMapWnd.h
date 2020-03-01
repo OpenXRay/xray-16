@@ -126,7 +126,7 @@ public:
     void SetZoom(float value);
     bool UpdateZoom(bool b_zoom_in);
 
-    void ShowHintStr(CUIWindow* parent, const char* text);
+    void ShowHintStr(CUIWindow* parent, LPCSTR text);
     void ShowHintSpot(CMapSpot* spot);
     void ShowHintTask(CGameTask* task, CUIWindow* owner);
 

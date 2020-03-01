@@ -9,7 +9,7 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
-static int ParseName(const char* N)
+static int ParseName(LPCSTR N)
 {
     if (0 == xr_strcmp(N, "$null"))
         return -1;
@@ -50,7 +50,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     // Analyze possibility to detail this shader
     detail_texture = nullptr;
     detail_scaler = nullptr;
-    const char* base = nullptr;
+    LPCSTR base = nullptr;
     if (bDetail && BT->canBeDetailed())
     {
         //
@@ -202,19 +202,19 @@ void CBlender_Compile::PassEnd()
     SH->passes.push_back(_pass_);
 }
 
-void CBlender_Compile::PassSET_PS(const char* name)
+void CBlender_Compile::PassSET_PS(LPCSTR name)
 {
     xr_strcpy(pass_ps, name);
     xr_strlwr(pass_ps);
 }
 
-void CBlender_Compile::PassSET_VS(const char* name)
+void CBlender_Compile::PassSET_VS(LPCSTR name)
 {
     xr_strcpy(pass_vs, name);
     xr_strlwr(pass_vs);
 }
 
-void CBlender_Compile::PassSET_ZB(bool bZTest, bool bZWrite, bool bInvertZTest)
+void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
 {
     if (Pass())
         bZWrite = FALSE;
@@ -226,7 +226,7 @@ void CBlender_Compile::PassSET_ZB(bool bZTest, bool bZWrite, bool bInvertZTest)
     */
 }
 
-void CBlender_Compile::PassSET_ablend_mode(bool bABlend, u32 abSRC, u32 abDST)
+void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
 {
     if (bABlend && D3DBLEND_ONE == abSRC && D3DBLEND_ZERO == abDST)
         bABlend = FALSE;
@@ -243,7 +243,7 @@ void CBlender_Compile::PassSET_ablend_mode(bool bABlend, u32 abSRC, u32 abDST)
     RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
 #endif //	USE_DX10
 }
-void CBlender_Compile::PassSET_ablend_aref(bool bATest, u32 aRef)
+void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {
     clamp(aRef, 0u, 255u);
     RS.SetRS(D3DRS_ALPHATESTENABLE, BC(bATest));
@@ -251,7 +251,7 @@ void CBlender_Compile::PassSET_ablend_aref(bool bATest, u32 aRef)
         RS.SetRS(D3DRS_ALPHAREF, u32(aRef));
 }
 
-void CBlender_Compile::PassSET_Blend(bool bABlend, u32 abSRC, u32 abDST, bool bATest, u32 aRef)
+void CBlender_Compile::PassSET_Blend(BOOL bABlend, u32 abSRC, u32 abDST, BOOL bATest, u32 aRef)
 {
     PassSET_ablend_mode(bABlend, abSRC, abDST);
 #ifdef DEBUG
@@ -264,7 +264,7 @@ void CBlender_Compile::PassSET_Blend(bool bABlend, u32 abSRC, u32 abDST, bool bA
     PassSET_ablend_aref(bATest, aRef);
 }
 
-void CBlender_Compile::PassSET_LightFog(bool bLight, bool bFog)
+void CBlender_Compile::PassSET_LightFog(BOOL bLight, BOOL bFog)
 {
     RS.SetRS(D3DRS_LIGHTING, BC(bLight));
     RS.SetRS(D3DRS_FOGENABLE, BC(bFog));
@@ -295,7 +295,7 @@ void CBlender_Compile::StageSET_XForm(u32 tf, u32 tc)
 void CBlender_Compile::StageSET_Color(u32 a1, u32 op, u32 a2) { RS.SetColor(Stage(), a1, op, a2); }
 void CBlender_Compile::StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3) { RS.SetColor3(Stage(), a1, op, a2, a3); }
 void CBlender_Compile::StageSET_Alpha(u32 a1, u32 op, u32 a2) { RS.SetAlpha(Stage(), a1, op, a2); }
-void CBlender_Compile::StageSET_TMC(const char* T, const char* M, const char* C, int UVW_channel)
+void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel)
 {
     Stage_Texture(T);
     Stage_Matrix(M, UVW_channel);
@@ -310,11 +310,11 @@ void CBlender_Compile::StageTemplate_LMAP0()
     StageSET_TMC("$base1", "$null", "$null", 1);
 }
 
-void CBlender_Compile::Stage_Texture(const char* name, u32, u32 fmin, u32 fmip, u32 fmag)
+void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 fmag)
 {
     sh_list& lst = L_textures;
     int id = ParseName(name);
-    const char* N = name;
+    LPCSTR N = name;
     if (id >= 0)
     {
         if (id >= int(lst.size()))
@@ -325,7 +325,7 @@ void CBlender_Compile::Stage_Texture(const char* name, u32, u32 fmin, u32 fmip, 
     //	i_Address				(Stage(),address);
     i_Filter(Stage(), fmin, fmip, fmag);
 }
-void CBlender_Compile::Stage_Matrix(const char* name, int iChannel)
+void CBlender_Compile::Stage_Matrix(LPCSTR name, int iChannel)
 {
     sh_list& lst = L_matrices;
     int id = ParseName(name);
@@ -351,7 +351,7 @@ void CBlender_Compile::Stage_Matrix(const char* name, int iChannel)
         StageSET_XForm(D3DTTFF_DISABLE, D3DTSS_TCI_PASSTHRU | iChannel);
     }
 }
-void CBlender_Compile::Stage_Constant(const char* name)
+void CBlender_Compile::Stage_Constant(LPCSTR name)
 {
     sh_list& lst = L_constants;
     int id = ParseName(name);

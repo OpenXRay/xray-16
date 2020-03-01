@@ -13,7 +13,7 @@ CEngine Engine;
 
 CEngine::CEngine() {}
 CEngine::~CEngine() {}
-extern void msCreate(const char* name);
+extern void msCreate(LPCSTR name);
 
 void CEngine::Initialize(void)
 {

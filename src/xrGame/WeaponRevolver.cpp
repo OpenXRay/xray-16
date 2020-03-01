@@ -17,7 +17,7 @@ void CWeaponRevolver::net_Destroy()
 }
 
 
-void CWeaponRevolver::Load(const char* section)
+void CWeaponRevolver::Load(LPCSTR section)
 {
     inherited::Load(section);
 

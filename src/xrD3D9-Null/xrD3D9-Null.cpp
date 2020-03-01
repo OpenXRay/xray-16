@@ -5,7 +5,7 @@
 #include "xrD3D9-Null.h"
 #include "xrD3D9-Null_OutProc.h"
 
-bool APIENTRY DllMain(HANDLE hModule, unsigned int ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
     {
@@ -34,9 +34,9 @@ CxrD3D9Null::CxrD3D9Null()
 }
 */
 
-IDirect3D9* WINAPI Direct3DCreate9(unsigned int SDKVersion)
+IDirect3D9* WINAPI Direct3DCreate9(UINT SDKVersion)
 {
-    unsigned int cSDKVersion = D3D_SDK_VERSION;
+    UINT cSDKVersion = D3D_SDK_VERSION;
 //	LogOut_File("In %x out %x", cSDKVersion, SDKVersion);
 //	LogOut("In %d out %d", cSDKVersion, SDKVersion);
 #ifdef NDEBUG

@@ -19,13 +19,13 @@ public:
     CDamageManager();
     virtual ~CDamageManager();
     virtual IFactoryObject* _construct();
-    virtual void reload(const char* section, CInifile const* ini);
-    virtual void reload(const char* section, const char* sub_section, CInifile const* ini);
+    virtual void reload(LPCSTR section, CInifile const* ini);
+    virtual void reload(LPCSTR section, LPCSTR sub_section, CInifile const* ini);
 
     virtual void HitScale(const int bone_num, float& hit_scale, float& wound_scale, bool aim_bullet = false);
 
 private:
-    void load_section(const char* section, CInifile const* ini);
+    void load_section(LPCSTR section, CInifile const* ini);
     // init default params
-    void init_bones(const char* section, CInifile const* ini);
+    void init_bones(LPCSTR section, CInifile const* ini);
 };

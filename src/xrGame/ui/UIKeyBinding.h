@@ -12,15 +12,15 @@ class CUIKeyBinding : public CUIWindow
 {
 public:
     CUIKeyBinding();
-    void InitFromXml(CUIXml& xml_doc, const char* path);
+    void InitFromXml(CUIXml& xml_doc, LPCSTR path);
 
 #ifdef DEBUG
     void CheckStructure(CUIXml& xml_doc);
-    bool IsActionExist(const char* action, CUIXml& xml_doc);
+    bool IsActionExist(LPCSTR action, CUIXml& xml_doc);
 #endif
 
 protected:
-    void FillUpList(CUIXml& xml_doc, const char* path);
+    void FillUpList(CUIXml& xml_doc, LPCSTR path);
 
     bool m_isGamepadBinds;
 

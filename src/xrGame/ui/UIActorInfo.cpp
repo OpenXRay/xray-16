@@ -255,7 +255,7 @@ void CUIActorInfoWnd::Reset()
     inherited::Reset();
 }
 
-void CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, const char* path)
+void CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
 {
     const XML_NODE _list_node = xml->NavigateToNode("relation_communities_list", 0);
     const int cnt = xml->GetNodesNum("relation_communities_list", 0, "r");
@@ -295,7 +295,7 @@ CUIActorStaticticHeader::CUIActorStaticticHeader(CUIActorInfoWnd* w)
     : m_actorInfoWnd(w), m_stored_alpha(0),
       m_text1(nullptr), m_text2(nullptr) {}
 
-void CUIActorStaticticHeader::Init(CUIXml* xml, const char* path, int idx_in_xml)
+void CUIActorStaticticHeader::Init(CUIXml* xml, LPCSTR path, int idx_in_xml)
 {
     const XML_NODE _stored_root = xml->GetLocalRoot();
 
@@ -347,7 +347,7 @@ void CUIActorStaticticHeader::SetSelected(bool b)
 }
 
 
-void CUIActorStaticticDetail::Init(CUIXml* xml, const char* path, int idx)
+void CUIActorStaticticDetail::Init(CUIXml* xml, LPCSTR path, int idx)
 {
     const XML_NODE _stored_root = xml->GetLocalRoot();
 

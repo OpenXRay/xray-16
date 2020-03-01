@@ -52,7 +52,7 @@ public:
 
 protected:
     shared_str m_ArticleId;
-    virtual void load_shared(const char*);
+    virtual void load_shared(LPCSTR);
     static void InitXmlIdToIndex();
 
 public:

@@ -16,7 +16,7 @@
 #define		PRIORITY_NORMAL	8
 #define		PRIORITY_LOW	4
 
-void resptrcode_texture::create(const char* _name)
+void resptrcode_texture::create(LPCSTR _name)
 {
     _set(RImplementation.Resources->_CreateTexture(_name));
 }
@@ -112,7 +112,7 @@ void CTexture::apply_avi(u32 dwStage)
     if (pAVI->NeedUpdate())
     {
         // AVI
-        unsigned char* ptr;
+        BYTE* ptr;
         pAVI->GetFrame(&ptr);
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, m_width, m_height,
             GL_RGBA, GL_UNSIGNED_BYTE, ptr));
@@ -344,12 +344,12 @@ void CTexture::desc_update()
     }
 }
 
-void CTexture::video_Play(bool looped, u32 _time)
+void CTexture::video_Play(BOOL looped, u32 _time)
 {
     if (pTheora) pTheora->Play(looped, _time != 0xFFFFFFFF ? (m_play_time = _time) : Device.dwTimeContinual);
 }
 
-void CTexture::video_Pause(bool state)
+void CTexture::video_Pause(BOOL state)
 {
     if (pTheora) pTheora->Pause(state);
 }
@@ -359,7 +359,7 @@ void CTexture::video_Stop()
     if (pTheora) pTheora->Stop();
 }
 
-bool CTexture::video_IsPlaying()
+BOOL CTexture::video_IsPlaying()
 {
     return pTheora ? pTheora->IsPlaying() : FALSE;
 }

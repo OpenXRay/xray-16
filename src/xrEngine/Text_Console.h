@@ -69,7 +69,7 @@ public:
 
     // virtual void IR_OnKeyboardPress (int dik);
 
-    void AddString(const char* string);
+    void AddString(LPCSTR string);
     void OnPaint();
 
 }; // class TextConsole

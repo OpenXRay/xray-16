@@ -160,7 +160,7 @@ LARGE_INTEGER _cdecl _atoi64(const char *str)
 
 uint64_t _cdecl _strtoui64_l(const char *nptr, char **endptr, int base, locale_t locale)
 {
-    bool negative = FALSE;
+    BOOL negative = FALSE;
     uint64_t ret = 0;
 
     if (!(nptr != NULL))

@@ -29,9 +29,9 @@
 // DllMain
 //*****************************************************************************
 //
-bool APIENTRY DllMain(HANDLE module, unsigned int reason, LPVOID reserved)
+BOOL APIENTRY DllMain(HANDLE module, DWORD reason, LPVOID reserved)
 {
-    bool result = TRUE;
+    BOOL result = TRUE;
 
     // Perform actions based on the reason for calling.
     switch(reason)

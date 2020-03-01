@@ -80,7 +80,7 @@ void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
 
     if (!m_Outputs.empty())
     {
-        unsigned int num = 0;
+        UINT num = 0;
         HW.pContext->CSSetUnorderedAccessViews(0, m_Outputs.size(), &m_Outputs[0], &num);
     }
 

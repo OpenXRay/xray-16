@@ -9,4 +9,4 @@
 
 CThornArtefact::CThornArtefact(void) {}
 CThornArtefact::~CThornArtefact(void) {}
-void CThornArtefact::Load(const char* section) { inherited::Load(section); }
+void CThornArtefact::Load(LPCSTR section) { inherited::Load(section); }

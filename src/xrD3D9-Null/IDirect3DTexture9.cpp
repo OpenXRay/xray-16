@@ -7,7 +7,7 @@
 
 const GUID DECLSPEC_SELECTANY IID_IDirect3DTexture9;
 
-xrIDirect3DTexture9::xrIDirect3DTexture9(IDirect3DDevice9* pIDirect3DDevice9, unsigned int iWidth, unsigned int iHeight, unsigned int iLevels,
+xrIDirect3DTexture9::xrIDirect3DTexture9(IDirect3DDevice9* pIDirect3DDevice9, UINT iWidth, UINT iHeight, UINT iLevels,
     DWORD iUsage, D3DFORMAT iFormat, D3DPOOL iPool)
     : m_refCount(0), Width(iWidth), Height(iHeight), Levels(iLevels), Format(iFormat)
       //#ifdef D3D_DEBUG_INFO
@@ -63,7 +63,7 @@ HRESULT xrIDirect3DTexture9::GetDevice(IDirect3DDevice9** ppDevice)
     *ppDevice = m_pIDirect3DDevice9;
     return S_OK;
 }
-HRESULT xrIDirect3DTexture9::SetPrivateData(REFGUID refguid, const void* pData, DWORD SizeOfData, DWORD Flags)
+HRESULT xrIDirect3DTexture9::SetPrivateData(REFGUID refguid, CONST void* pData, DWORD SizeOfData, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DTexture9::SetPrivateData");
     return S_OK;
@@ -125,7 +125,7 @@ D3DTEXTUREFILTERTYPE xrIDirect3DTexture9::GetAutoGenFilterType()
     return D3DTEXTUREFILTERTYPE(FilterType);
 };
 void xrIDirect3DTexture9::GenerateMipSubLevels() { APIDEBUG("xrIDirect3DTexture9::GenerateMipSubLevels"); };
-HRESULT xrIDirect3DTexture9::GetLevelDesc(unsigned int Level, D3DSURFACE_DESC* pDesc)
+HRESULT xrIDirect3DTexture9::GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc)
 {
     APIDEBUG("xrIDirect3DTexture9::GetLevelDesc");
 
@@ -142,7 +142,7 @@ HRESULT xrIDirect3DTexture9::GetLevelDesc(unsigned int Level, D3DSURFACE_DESC* p
     return S_OK;
 };
 
-HRESULT xrIDirect3DTexture9::GetSurfaceLevel(unsigned int Level, IDirect3DSurface9** ppSurfaceLevel)
+HRESULT xrIDirect3DTexture9::GetSurfaceLevel(UINT Level, IDirect3DSurface9** ppSurfaceLevel)
 {
     APIDEBUG("xrIDirect3DTexture9::GetSurfaceLevel");
 
@@ -153,17 +153,17 @@ HRESULT xrIDirect3DTexture9::GetSurfaceLevel(unsigned int Level, IDirect3DSurfac
 
     return S_OK;
 };
-HRESULT xrIDirect3DTexture9::LockRect(unsigned int Level, D3DLOCKED_RECT* pLockedRect, const RECT* pRect, DWORD Flags)
+HRESULT xrIDirect3DTexture9::LockRect(UINT Level, D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags)
 {
     APIDEBUG("xrIDirect3DTexture9::LockRect");
     return S_OK;
 };
-HRESULT xrIDirect3DTexture9::UnlockRect(unsigned int Level)
+HRESULT xrIDirect3DTexture9::UnlockRect(UINT Level)
 {
     APIDEBUG("xrIDirect3DTexture9::UnlockRect");
     return S_OK;
 };
-HRESULT xrIDirect3DTexture9::AddDirtyRect(const RECT* pDirtyRect)
+HRESULT xrIDirect3DTexture9::AddDirtyRect(CONST RECT* pDirtyRect)
 {
     APIDEBUG("xrIDirect3DTexture9::AddDirtyRect");
     return S_OK;

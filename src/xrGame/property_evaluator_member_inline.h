@@ -13,7 +13,7 @@
 
 TEMPLATE_SPECIALIZATION
 CEvaluator::CPropertyEvaluatorMember(
-    CPropertyStorage* storage, _condition_type condition_id, _value_type value, bool equality, const char* evaluator_name)
+    CPropertyStorage* storage, _condition_type condition_id, _value_type value, bool equality, LPCSTR evaluator_name)
     : m_condition_id(condition_id), m_value(value), m_equality(equality)
 {
 #if 1//def LOG_ACTION //Alundaio: m_evaluator_name

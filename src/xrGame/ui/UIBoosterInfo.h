@@ -33,8 +33,8 @@ public:
     UIBoosterInfoItem();
     virtual ~UIBoosterInfoItem();
 
-    void Init(CUIXml& xml, const char* section);
-    void SetCaption(const char* name);
+    void Init(CUIXml& xml, LPCSTR section);
+    void SetCaption(LPCSTR name);
     void SetValue(float value);
 
 private:

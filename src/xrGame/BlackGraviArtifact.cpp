@@ -26,7 +26,7 @@ CBlackGraviArtefact::CBlackGraviArtefact(void)
 }
 
 CBlackGraviArtefact::~CBlackGraviArtefact(void) { m_GameObjectList.clear(); }
-void CBlackGraviArtefact::Load(const char* section)
+void CBlackGraviArtefact::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -36,7 +36,7 @@ void CBlackGraviArtefact::Load(const char* section)
     m_sParticleName = pSettings->r_string(section, "particle");
 }
 
-bool CBlackGraviArtefact::net_Spawn(CSE_Abstract* DC)
+BOOL CBlackGraviArtefact::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return FALSE;
@@ -182,7 +182,7 @@ void CBlackGraviArtefact::GraviStrike()
 
         if (impulse > .001f)
         {
-            //?			bool		enabled = getEnabled();
+            //?			BOOL		enabled = getEnabled();
             //?			setEnabled	(FALSE);
             impulse *= CExplosive::ExplosionEffect(rq_storage, NULL, pGameObject, Position(), m_fRadius);
             //?			setEnabled	(enabled);

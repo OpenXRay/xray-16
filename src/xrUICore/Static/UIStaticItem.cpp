@@ -196,7 +196,7 @@ void CUIStaticItem::Render(float angle)
     GEnv.UIRender->FlushPrimitive();
 }
 
-void CUIStaticItem::CreateShader(const char* tex, const char* sh)
+void CUIStaticItem::CreateShader(LPCSTR tex, LPCSTR sh)
 {
     hShader->create(sh, tex);
 
@@ -207,7 +207,7 @@ void CUIStaticItem::CreateShader(const char* tex, const char* sh)
     uFlags.set(flValidTextureRect, FALSE);
 }
 
-void CUIStaticItem::Init(const char* tex, const char* sh, float left, float top)
+void CUIStaticItem::Init(LPCSTR tex, LPCSTR sh, float left, float top)
 {
     uFlags.set(flValidSize, FALSE);
     CreateShader(tex, sh);

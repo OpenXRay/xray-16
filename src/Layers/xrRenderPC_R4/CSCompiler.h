@@ -15,10 +15,10 @@ public:
     CSCompiler(ComputeShader& target);
 
     CSCompiler& begin(const char* name);
-    CSCompiler& defSampler(const char* ResourceName);
-    CSCompiler& defSampler(const char* ResourceName, const D3D_SAMPLER_DESC& def);
-    CSCompiler& defOutput(const char* ResourceName, const ref_rt& rt);
-    CSCompiler& defTexture(const char* ResourceName, ref_texture texture);
+    CSCompiler& defSampler(LPCSTR ResourceName);
+    CSCompiler& defSampler(LPCSTR ResourceName, const D3D_SAMPLER_DESC& def);
+    CSCompiler& defOutput(LPCSTR ResourceName, const ref_rt& rt);
+    CSCompiler& defTexture(LPCSTR ResourceName, ref_texture texture);
     void end();
 
 private:

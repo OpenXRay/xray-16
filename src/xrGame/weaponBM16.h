@@ -8,7 +8,7 @@ class CWeaponBM16 : public CWeaponShotgun
 
 public:
     virtual ~CWeaponBM16();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
 
 protected:
     virtual void PlayAnimShoot();

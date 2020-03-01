@@ -22,7 +22,7 @@ CMonsterEffector::CMonsterEffector(
     VERIFY(!fis_zero(m_attack));
 }
 
-bool CMonsterEffector::Process(SPPInfo& pp)
+BOOL CMonsterEffector::Process(SPPInfo& pp)
 {
     inherited::Process(pp);
 
@@ -59,7 +59,7 @@ CMonsterEffectorHit::CMonsterEffectorHit(float time, float amp, float periods, f
     offset.set(Random.randF(1, 2), Random.randF(1, 6), Random.randF(1, 6));
 }
 
-bool CMonsterEffectorHit::ProcessCam(SCamEffectorInfo& info)
+BOOL CMonsterEffectorHit::ProcessCam(SCamEffectorInfo& info)
 {
     fLifeTime -= Device.fTimeDelta;
     if (fLifeTime < 0)

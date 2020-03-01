@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "controller_psy_hit_effector.h"
 
-// void CPsyHitEffectorPP::load(const char* section)
+// void CPsyHitEffectorPP::load(LPCSTR section)
 //{
 //	inherited::load(section);
 //

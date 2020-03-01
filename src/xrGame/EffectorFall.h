@@ -10,7 +10,7 @@ class CEffectorFall : public CEffectorCam
 
 public:
     CEffectorFall(float power, float life_time = 1);
-    virtual bool ProcessCam(SCamEffectorInfo& info);
+    virtual BOOL ProcessCam(SCamEffectorInfo& info);
 };
 
 class CEffectorDOF : public CEffectorCam
@@ -19,5 +19,5 @@ class CEffectorDOF : public CEffectorCam
 
 public:
     CEffectorDOF(const Fvector4& dof);
-    virtual bool ProcessCam(SCamEffectorInfo& info);
+    virtual BOOL ProcessCam(SCamEffectorInfo& info);
 };

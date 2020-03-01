@@ -23,7 +23,7 @@ private:
     void add_actions();
 
 public:
-    stalker_low_cover_planner(CAI_Stalker* object = 0, const char* action_name = "");
+    stalker_low_cover_planner(CAI_Stalker* object = 0, LPCSTR action_name = "");
     virtual void setup(CAI_Stalker* object, CPropertyStorage* storage);
     virtual void update();
     virtual void initialize();

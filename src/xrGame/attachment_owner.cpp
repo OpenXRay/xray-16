@@ -14,7 +14,7 @@
 #include "PhysicsShellHolder.h"
 
 CAttachmentOwner::~CAttachmentOwner() {}
-void CAttachmentOwner::reload(const char* section)
+void CAttachmentOwner::reload(LPCSTR section)
 {
     if (!pSettings->line_exist(section, "attachable_items"))
     {
@@ -22,7 +22,7 @@ void CAttachmentOwner::reload(const char* section)
         return;
     }
 
-    const char* attached_sections = pSettings->r_string(section, "attachable_items");
+    LPCSTR attached_sections = pSettings->r_string(section, "attachable_items");
     u32 item_count = _GetItemCount(attached_sections);
     string256 current_item_section;
     m_attach_item_sections.resize(item_count);

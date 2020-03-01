@@ -10,9 +10,9 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    //bool	b_HW_smap		= RImplementation.o.HW_smap;
-    //bool	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
-    bool blend = RImplementation.o.fp16_blend;
+    //BOOL	b_HW_smap		= RImplementation.o.HW_smap;
+    //BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
+    BOOL blend = RImplementation.o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
     switch (C.iElement)
     {
@@ -81,9 +81,9 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
     else
         GEnv.Render->m_MSAASample = -1;
 
-    //bool	b_HW_smap		= RImplementation.o.HW_smap;
-    //bool	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
-    bool blend = RImplementation.o.fp16_blend;
+    //BOOL	b_HW_smap		= RImplementation.o.HW_smap;
+    //BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
+    BOOL blend = RImplementation.o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
     switch (C.iElement)
     {

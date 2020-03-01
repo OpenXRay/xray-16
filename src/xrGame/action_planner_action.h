@@ -30,11 +30,11 @@ public:
 #ifdef LOG_ACTION
 public:
     virtual void set_use_log(bool value);
-    virtual void show(const char* offset = "");
+    virtual void show(LPCSTR offset = "");
 #endif
 
 public:
-    IC CActionPlannerAction(_object_type* object = 0, const char* action_name = "");
+    IC CActionPlannerAction(_object_type* object = 0, LPCSTR action_name = "");
     virtual ~CActionPlannerAction();
     virtual void setup(_object_type* object, CPropertyStorage* storage);
     virtual void initialize();

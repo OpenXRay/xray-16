@@ -16,8 +16,8 @@ CUIOptConCom::CUIOptConCom() { xr_strcpy(m_playerName, ""); }
 class CCC_UserName : public CCC_String
 {
 public:
-    CCC_UserName(const char* N, char* V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = false; };
-    virtual void Execute(const char* arguments)
+    CCC_UserName(LPCSTR N, LPSTR V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = false; };
+    virtual void Execute(LPCSTR arguments)
     {
         string512 str;
         xr_strcpy(str, arguments);

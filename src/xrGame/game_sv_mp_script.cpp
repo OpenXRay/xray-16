@@ -48,11 +48,11 @@ float game_sv_mp_script::GetHitParamsImpulse(NET_Packet* P)
 void game_sv_mp_script::Create(shared_str& options)
 {
     inherited::Create(options);
-    const char* lpcstr_options = options.c_str();
+    LPCSTR lpcstr_options = options.c_str();
     Create(lpcstr_options);
 }
 
-void game_sv_mp_script::SpawnPlayer(ClientID id, const char* N, const char* SkinName, RPoint rp)
+void game_sv_mp_script::SpawnPlayer(ClientID id, LPCSTR N, LPCSTR SkinName, RPoint rp)
 {
     xrClientData* CL = m_server->ID_to_client(id);
     game_PlayerState* ps_who = CL->ps;
@@ -148,11 +148,11 @@ struct CWrapperBase : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperBase<T> self_type;
-    DEFINE_LUA_WRAPPER_CONST_METHOD_0(type_name, const char*)
+    DEFINE_LUA_WRAPPER_CONST_METHOD_0(type_name, LPCSTR)
 
     DEFINE_LUA_WRAPPER_METHOD_V0(Update)
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V4(OnEvent, NET_Packet, u16, u32, ClientID)
-    DEFINE_LUA_WRAPPER_METHOD_V1(Create, const char*)
+    DEFINE_LUA_WRAPPER_METHOD_V1(Create, LPCSTR)
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V2(net_Export_State, NET_Packet, ClientID)
 
     DEFINE_LUA_WRAPPER_METHOD_V0(OnRoundStart)
@@ -163,7 +163,7 @@ struct CWrapperBase : public T, public luabind::wrap_base
     {
         return call_member<game_PlayerState*>(this, "createPlayerState");
         // XXX: investigate
-        // return call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
+        //return call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
     }
 
     static game_PlayerState* createPlayerState_static(inherited* ptr)
@@ -179,12 +179,15 @@ struct CWrapperBase : public T, public luabind::wrap_base
 #pragma optimize("s", on)
 void game_sv_mp_script_register(lua_State* luaState)
 {
-    module(luaState)[class_<game_sv_mp, game_sv_GameState>("game_sv_mp")
-                         .def(constructor<>())
-                         //.def("SpawnWeaponForActor", &game_sv_mp::SpawnWeaponForActor)
-                         .def("KillPlayer", &game_sv_mp::KillPlayer)
-                         .def("SendPlayerKilledMessage", &game_sv_mp::SendPlayerKilledMessage)
-                         .def("signal_Syncronize", &game_sv_GameState::signal_Syncronize)];
+    module(luaState)
+    [
+        class_<game_sv_mp, game_sv_GameState>("game_sv_mp")
+            .def(constructor<>())
+            //.def("SpawnWeaponForActor", &game_sv_mp::SpawnWeaponForActor)
+            .def("KillPlayer", &game_sv_mp::KillPlayer)
+            .def("SendPlayerKilledMessage", &game_sv_mp::SendPlayerKilledMessage)
+            .def("signal_Syncronize", &game_sv_GameState::signal_Syncronize)
+    ];
 }
 
 void game_sv_mp_script_script_register(lua_State* luaState)
@@ -192,29 +195,31 @@ void game_sv_mp_script_script_register(lua_State* luaState)
     using WrapType = CWrapperBase<game_sv_mp_script>;
     using BaseType = game_sv_mp_script;
 
-    module(luaState)[class_<game_sv_mp_script, game_sv_mp, default_holder, WrapType>("game_sv_mp_script")
-                         .def(constructor<>())
-                         .def("GetTeamData", &game_sv_mp_script::GetTeamData)
-                         .def("SpawnPlayer", &game_sv_mp_script::SpawnPlayer)
-                         .def("switch_Phase", &game_sv_mp_script::switch_Phase)
-                         .def("SetHitParams", &BaseType::SetHitParams)
-                         .def("GetHitParamsPower", &BaseType::GetHitParamsPower)
-                         .def("GetHitParamsImpulse", &BaseType::GetHitParamsImpulse)
+    module(luaState)
+    [
+        class_<game_sv_mp_script, game_sv_mp, default_holder, WrapType>("game_sv_mp_script")
+            .def(constructor<>())
+            .def("GetTeamData", &game_sv_mp_script::GetTeamData)
+            .def("SpawnPlayer", &game_sv_mp_script::SpawnPlayer)
+            .def("switch_Phase", &game_sv_mp_script::switch_Phase)
+            .def("SetHitParams", &BaseType::SetHitParams)
+            .def("GetHitParamsPower", &BaseType::GetHitParamsPower)
+            .def("GetHitParamsImpulse", &BaseType::GetHitParamsImpulse)
 
-                         .def("type_name", &BaseType::type_name, &WrapType::type_name_static)
-                         .def("Update", &BaseType::Update, &WrapType::Update_static)
-                         .def("OnEvent", &BaseType::OnEvent, &WrapType::OnEvent_static)
-                         .def("Create", (void (BaseType::*)(const char*))(&BaseType::Create), &WrapType::Create_static)
+            .def("type_name", &BaseType::type_name, &WrapType::type_name_static)
+            .def("Update", &BaseType::Update, &WrapType::Update_static)
+            .def("OnEvent", &BaseType::OnEvent, &WrapType::OnEvent_static)
+            .def("Create", (void (BaseType::*)(LPCSTR))(&BaseType::Create), &WrapType::Create_static)
 
-                         .def("OnPlayerHitPlayer", &BaseType::OnPlayerHitPlayer, &WrapType::OnPlayerHitPlayer_static)
+            .def("OnPlayerHitPlayer", &BaseType::OnPlayerHitPlayer, &WrapType::OnPlayerHitPlayer_static)
 
-                         .def("OnRoundStart", &BaseType::OnRoundStart, &WrapType::OnRoundStart_static)
-                         //.def("OnDelayedRoundEnd", &BaseType::OnDelayedRoundEnd, &WrapType::OnDelayedRoundEnd_static)
-                         .def("OnRoundEnd", &BaseType::OnRoundEnd, &WrapType::OnRoundEnd_static)
+            .def("OnRoundStart", &BaseType::OnRoundStart, &WrapType::OnRoundStart_static)
+            //.def("OnDelayedRoundEnd", &BaseType::OnDelayedRoundEnd, &WrapType::OnDelayedRoundEnd_static)
+            .def("OnRoundEnd", &BaseType::OnRoundEnd, &WrapType::OnRoundEnd_static)
 
-                         .def("net_Export_State", &BaseType::net_Export_State, &WrapType::net_Export_State_static)
-                         .def("createPlayerState", &BaseType::createPlayerState, &WrapType::createPlayerState_static,
-                             adopt<0>())];
+            .def("net_Export_State", &BaseType::net_Export_State, &WrapType::net_Export_State_static)
+            .def("createPlayerState", &BaseType::createPlayerState, &WrapType::createPlayerState_static, adopt<0>())
+    ];
 }
 
 SCRIPT_EXPORT_FUNC(game_sv_mp, (game_sv_GameState), game_sv_mp_script_register);

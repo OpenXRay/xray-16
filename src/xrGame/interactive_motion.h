@@ -23,7 +23,7 @@ public:
     virtual ~interactive_motion();
     void init();
     void destroy();
-    void setup(const char* m, CPhysicsShell* s, float angle);
+    void setup(LPCSTR m, CPhysicsShell* s, float angle);
     void setup(const MotionID& m, CPhysicsShell* s, float angle);
 
     void update();
@@ -59,7 +59,7 @@ IC void destroy(interactive_motion*& im)
     xr_delete(im);
 }
 
-void interactive_motion_diagnostic(const char* message, const MotionID& m, CPhysicsShell* s);
+void interactive_motion_diagnostic(LPCSTR message, const MotionID& m, CPhysicsShell* s);
 #ifdef DEBUG
 extern BOOL death_anim_debug;
 #endif

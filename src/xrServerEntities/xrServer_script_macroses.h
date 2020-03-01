@@ -44,7 +44,7 @@ class CALifeSmartTerrainTask;
     INHERIT_PURE                                                      \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(STATE_Write, NET_Packet)        \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V2(STATE_Read, NET_Packet, u16)    \
-    DEFINE_LUA_WRAPPER_METHOD_R2P2_V2(FillProps, const char*, PropItemVec) \
+    DEFINE_LUA_WRAPPER_METHOD_R2P2_V2(FillProps, LPCSTR, PropItemVec) \
     DEFINE_LUA_WRAPPER_METHOD_0(init, CSE_Abstract*)
 #else // #ifndef XRGAME_EXPORTS
 #define INHERIT_ABSTRACT                                           \
@@ -132,7 +132,7 @@ struct CWrapperPure : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperPure<T> self_type;
-    CWrapperPure(const char* section) : inherited(section) {}
+    CWrapperPure(LPCSTR section) : inherited(section) {}
     INHERIT_PURE;
 };
 
@@ -142,7 +142,7 @@ struct CWrapperAbstract : public T, public luabind::wrap_base
     typedef T inherited;
     typedef CWrapperAbstract<T> self_type;
 
-    CWrapperAbstract(const char* section) : inherited(section) {}
+    CWrapperAbstract(LPCSTR section) : inherited(section) {}
     INHERIT_ABSTRACT;
 };
 
@@ -151,7 +151,7 @@ struct CWrapperAbstractALife : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperAbstractALife<T> self_type;
-    CWrapperAbstractALife(const char* section) : inherited(section) {}
+    CWrapperAbstractALife(LPCSTR section) : inherited(section) {}
     INHERIT_ALIFE;
 };
 
@@ -160,7 +160,7 @@ struct CWrapperAbstractDynamicALife : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperAbstractDynamicALife<T> self_type;
-    CWrapperAbstractDynamicALife(const char* section) : inherited(section) {}
+    CWrapperAbstractDynamicALife(LPCSTR section) : inherited(section) {}
     INHERIT_DYNAMIC_ALIFE;
 };
 
@@ -169,7 +169,7 @@ struct CWrapperAbstractOnlineOfflineGroup : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperAbstractOnlineOfflineGroup<T> self_type;
-    CWrapperAbstractOnlineOfflineGroup(const char* section) : inherited(section) {}
+    CWrapperAbstractOnlineOfflineGroup(LPCSTR section) : inherited(section) {}
     INHERIT_ONLINE_OFFLINE_GROUP;
 };
 
@@ -178,7 +178,7 @@ struct CWrapperAbstractZone : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperAbstractZone<T> self_type;
-    CWrapperAbstractZone(const char* section) : inherited(section) {}
+    CWrapperAbstractZone(LPCSTR section) : inherited(section) {}
     INHERIT_ZONE;
 };
 
@@ -187,7 +187,7 @@ struct CWrapperAbstractCreature : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperAbstractCreature<T> self_type;
-    CWrapperAbstractCreature(const char* section) : inherited(section) {}
+    CWrapperAbstractCreature(LPCSTR section) : inherited(section) {}
     INHERIT_CREATURE;
 };
 
@@ -196,7 +196,7 @@ struct CWrapperAbstractMonster : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperAbstractMonster<T> self_type;
-    CWrapperAbstractMonster(const char* section) : inherited(section) {}
+    CWrapperAbstractMonster(LPCSTR section) : inherited(section) {}
     INHERIT_MONSTER;
 };
 
@@ -205,20 +205,20 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CWrapperAbstractItem<T> self_type;
-    CWrapperAbstractItem(const char* section) : inherited(section) {}
+    CWrapperAbstractItem(LPCSTR section) : inherited(section) {}
     INHERIT_ITEM;
 };
 
-#define luabind_virtual_pure(a, b) .def(constructor<const char*>())
+#define luabind_virtual_pure(a, b) .def(constructor<LPCSTR>())
 
 //#ifndef USE_WRITER_READER
 //#	define luabind_virtual_pure(a,b) \
-//		.def(	constructor<const char*>()) \
+//		.def(	constructor<LPCSTR>()) \
 //		DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_1(a,b,save,void,NET_Packet&,NET_Packet*) \
 //		DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_1(a,b,load,void,NET_Packet&,NET_Packet*)
 //#else
 //#	define luabind_virtual_pure(a,b) \
-//		.def(	constructor<const char*>()) \
+//		.def(	constructor<LPCSTR>()) \
 //		DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_1(a,b,save,void,NET_Packet&,NET_Packet*) \
 //		DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_1(a,b,load,void,NET_Packet&,NET_Packet*) \
 //		DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_1(a,b,save,void,IWriter&,IWriter*) \

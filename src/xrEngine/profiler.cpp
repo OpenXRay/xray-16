@@ -14,9 +14,9 @@
 #include "xrEngine/GameFont.h"
 
 #ifdef CONFIG_PROFILE_LOCKS
-static volatile signed int					critical_section_counter = 0;
+static volatile LONG					critical_section_counter = 0;
 
-void add_profile_portion				(const char* id, const u64 &time)
+void add_profile_portion				(LPCSTR id, const u64 &time)
 {
 	if (!*id)
 		return;	
@@ -32,7 +32,7 @@ void add_profile_portion				(const char* id, const u64 &time)
 #endif // CONFIG_PROFILE_LOCKS
 
 CProfiler	*g_profiler			= nullptr;
-const char*		indent				= "  ";
+LPCSTR		indent				= "  ";
 char		white_character		= '.';
 
 struct CProfilePortionPredicate {
@@ -57,9 +57,9 @@ CProfiler::~CProfiler				()
 #endif // CONFIG_PROFILE_LOCKS
 }
 
-IC	u32 compute_string_length		(const char* str)
+IC	u32 compute_string_length		(LPCSTR str)
 {
-	const char*						i, *j = str;
+	LPCSTR						i, j = str;
 	u32							count = 0;
 	while ((i = strchr(j,'/')) != 0) {
 		j = i					= i + 1;
@@ -68,10 +68,10 @@ IC	u32 compute_string_length		(const char* str)
 	return						(count*xr_strlen(indent) + xr_strlen(j));
 }
 
-IC	void CProfiler::convert_string	(const char* str, shared_str &out, u32 max_string_size)
+IC	void CProfiler::convert_string	(LPCSTR str, shared_str &out, u32 max_string_size)
 {
 	string256					m_temp;
-	const char*						i, *j = str;
+	LPCSTR						i, j = str;
 	u32							count = 0;
 	while ((i = strchr(j,'/')) != 0) {
 		j = i					= i + 1;
@@ -88,7 +88,7 @@ IC	void CProfiler::convert_string	(const char* str, shared_str &out, u32 max_str
 	out							= m_temp;
 }
 
-void CProfiler::setup_timer			(const char* timer_id, const u64 &timer_time, const u32 &call_count)
+void CProfiler::setup_timer			(LPCSTR timer_id, const u64 &timer_time, const u32 &call_count)
 {
 	string256					m_temp;
 	float						_time = float(timer_time)*1000.f/CPU::qpc_freq;

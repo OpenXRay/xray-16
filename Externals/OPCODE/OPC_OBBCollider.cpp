@@ -149,7 +149,7 @@ bool OBBCollider::Collide(
  *  \warning    SCALE NOT SUPPORTED. The matrices must contain rotation & translation parts only.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool OBBCollider::InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb, const Matrix4x4* worldm)
+BOOL OBBCollider::InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb, const Matrix4x4* worldm)
 {
     // 1) Call the base method
     VolumeCollider::InitQueryEx();
@@ -424,7 +424,7 @@ bool OBBCollider::Collide(OBBCache& cache, const OBB& box, const AABBQuantizedNo
  *  \return     true if the OBB contains the whole box
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ bool OBBCollider::OBBContainsBox(const Point& bc, const Point& be)
+inline_ BOOL OBBCollider::OBBContainsBox(const Point& bc, const Point& be)
 {
     // I assume if all 8 box vertices are inside the OBB, so does the whole box.
     // Sounds ok but maybe there's a better way?

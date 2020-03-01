@@ -66,9 +66,9 @@ bool CActor::feel_touch_on_contact(IGameObject* O)
     return (false);
 }
 
-ICF static bool info_trace_callback(collide::rq_result& result, LPVOID params)
+ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
 {
-    bool& bOverlaped = *(bool*)params;
+    BOOL& bOverlaped = *(BOOL*)params;
     if (result.O)
     {
         if (Level().CurrentEntity() == result.O)
@@ -94,12 +94,12 @@ ICF static bool info_trace_callback(collide::rq_result& result, LPVOID params)
     return FALSE;
 }
 
-bool CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObject* item)
+BOOL CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObject* item)
 {
     if (!item->getVisible())
         return FALSE;
 
-    bool bOverlaped = FALSE;
+    BOOL bOverlaped = FALSE;
     Fvector dir, to;
     item->Center(to);
     float range = dir.sub(to, from).magnitude();
@@ -296,7 +296,7 @@ void CActor::Check_for_AutoPickUp()
 
 void CActor::PickupInfoDraw(IGameObject* object)
 {
-    const char* draw_str = NULL;
+    LPCSTR draw_str = NULL;
 
     CInventoryItem* item = smart_cast<CInventoryItem*>(object);
     if (!item)

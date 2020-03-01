@@ -29,7 +29,7 @@ struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std
     STextureList() = default;
     ~STextureList();
 
-    bool equal(const STextureList& base) const
+    BOOL equal(const STextureList& base) const
     {
         if (size() != base.size())
             return FALSE;
@@ -108,7 +108,7 @@ struct ECORE_API SPass : public xr_resource_flagged
     SPass() = default;
     ~SPass();
 
-    bool equal(const SPass& other);
+    BOOL equal(const SPass& other);
 };
 typedef resptr_core<SPass, resptr_base<SPass>> ref_pass;
 
@@ -129,7 +129,7 @@ struct ECORE_API ShaderElement : public xr_resource_flagged
 
     ShaderElement();
     ~ShaderElement();
-    bool equal(ShaderElement& S);
+    BOOL equal(ShaderElement& S);
 };
 using ref_selement = resptr_core<ShaderElement, resptr_base<ShaderElement>>;
 
@@ -140,14 +140,14 @@ struct ECORE_API Shader : public xr_resource_flagged
     // R2 - 0=deffer, 1=norm_lod1(normal), 2=psm, 3=ssm, 4=dsm
     Shader() = default;
     ~Shader();
-    bool equal(Shader* S);
-    bool equal(Shader* S, int index);
+    BOOL equal(Shader* S);
+    BOOL equal(Shader* S, int index);
 };
 
 struct ECORE_API resptrcode_shader : public resptr_base<Shader>
 {
-    void create(const char* s_shader = nullptr, const char* s_textures = nullptr, const char* s_constants = nullptr, const char* s_matrices = nullptr);
-    void create(IBlender* B, const char* s_shader = nullptr, const char* s_textures = nullptr, const char* s_constants = nullptr, const char* s_matrices = nullptr);
+    void create(LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
+    void create(IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     void destroy() { _set(nullptr); }
 };
 

@@ -17,10 +17,10 @@
 #include "Message_Filter.h"
 #include "xrPhysics/IPHWorld.h"
 
-extern const char* map_ver_string;
-char* remove_version_option(const char* opt_str, char* new_opt_str, u32 new_opt_str_size)
+extern LPCSTR map_ver_string;
+LPSTR remove_version_option(LPCSTR opt_str, LPSTR new_opt_str, u32 new_opt_str_size)
 {
-    const char* temp_substr = strstr(opt_str, map_ver_string);
+    LPCSTR temp_substr = strstr(opt_str, map_ver_string);
     if (!temp_substr)
     {
         xr_strcpy(new_opt_str, new_opt_str_size, opt_str);

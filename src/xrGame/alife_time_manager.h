@@ -23,11 +23,11 @@ private:
     ALife::_TIME_ID m_start_game_time;
 
 public:
-    CALifeTimeManager(const char* section);
+    CALifeTimeManager(LPCSTR section);
     virtual ~CALifeTimeManager();
     virtual void save(IWriter& memory_stream);
     virtual void load(IReader& file_stream);
-    void init(const char* section);
+    void init(LPCSTR section);
     IC void set_time_factor(float time_factor);
     IC ALife::_TIME_ID start_game_time() const;
     IC ALife::_TIME_ID game_time() const;

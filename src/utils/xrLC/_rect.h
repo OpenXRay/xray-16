@@ -130,10 +130,10 @@ public:
         return *this;
     };
 
-    IC bool in(T x, T y) const { return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2); };
-    IC bool in(Tvector& p) const { return (p.x >= x1) && (p.x <= x2) && (p.y >= y1) && (p.y <= y2); };
-    IC bool cmp(_rect<int>& r) { return x1 == r.x1 && y1 == r.y1 && x2 == r.x2 && y2 == r.y2; };
-    IC bool cmp(_rect<float>& r)
+    IC BOOL in(T x, T y) const { return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2); };
+    IC BOOL in(Tvector& p) const { return (p.x >= x1) && (p.x <= x2) && (p.y >= y1) && (p.y <= y2); };
+    IC BOOL cmp(_rect<int>& r) { return x1 == r.x1 && y1 == r.y1 && x2 == r.x2 && y2 == r.y2; };
+    IC BOOL cmp(_rect<float>& r)
     {
         return fsimilar(x1, r.x1) && fsimilar(y1, r.y1) && fsimilar(x2, r.x2) && fsimilar(y2, r.y2);
     };
@@ -163,12 +163,12 @@ public:
         return *this;
     };
 
-    IC bool intersected(SelfCRef b1, SelfCRef b2) const
+    IC BOOL intersected(SelfCRef b1, SelfCRef b2) const
     {
         return !(b1.x1 > b2.x2 || b1.x2 < b2.x1 || b1.y1 > b2.y2 || b1.y2 < b2.y1);
     }
-    IC bool intersected(SelfCRef b) const { return intersected(*this, b); }
-    IC bool intersection(SelfCRef b1, SelfCRef b2)
+    IC BOOL intersected(SelfCRef b) const { return intersected(*this, b); }
+    IC BOOL intersection(SelfCRef b1, SelfCRef b2)
     {
         if (!intersected(b1, b2))
             return (FALSE);
@@ -186,7 +186,7 @@ typedef _rect<double> Drect;
 typedef _rect<int> Irect;
 
 template <class T>
-bool _valid(const _rect<T>& m)
+BOOL _valid(const _rect<T>& m)
 {
     return lt._valid() && rb._valid();
 }

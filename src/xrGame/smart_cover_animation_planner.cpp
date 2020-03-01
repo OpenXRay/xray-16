@@ -30,7 +30,7 @@
 using smart_cover::animation_planner;
 using namespace StalkerDecisionSpace;
 
-animation_planner::animation_planner(CAI_Stalker* object, const char* action_name)
+animation_planner::animation_planner(CAI_Stalker* object, LPCSTR action_name)
     : inherited(), m_time_object_hit(0), m_last_transition_time(0), m_default_idle_interval(0),
       m_default_lookout_interval(0), m_loophole_value(1000), m_head_speed(flt_max), m_idle_min_time(0.f),
       m_idle_max_time(0.f), m_lookout_min_time(0.f), m_lookout_max_time(0.f), m_stay_idle(true), m_last_idle_time(0),
@@ -296,4 +296,4 @@ bool animation_planner::hit_callback(SHit const* hit)
     return (false);
 }
 
-const char* animation_planner::object_name() const { return ("animation_planner"); }
+LPCSTR animation_planner::object_name() const { return ("animation_planner"); }

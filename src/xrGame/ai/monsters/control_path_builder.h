@@ -38,7 +38,7 @@ public:
     CControlPathBuilder(CCustomMonster* monster);
     virtual ~CControlPathBuilder();
 
-    virtual void load(const char* section);
+    virtual void load(LPCSTR section);
     virtual void reinit();
     virtual void update_schedule();
 

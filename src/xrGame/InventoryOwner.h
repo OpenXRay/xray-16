@@ -38,12 +38,12 @@ public:
     virtual CInventoryOwner* cast_inventory_owner() { return this; }
 public:
     virtual IFactoryObject* _construct();
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     void Init();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void OnEvent(NET_Packet& P, u16 type);
 
     // serialization
@@ -91,8 +91,8 @@ public:
     virtual void LostPdaContact(CInventoryOwner*);
 
     //игровое имя
-    virtual const char* Name() const;
-    const char* IconName() const;
+    virtual LPCSTR Name() const;
+    LPCSTR IconName() const;
     u32 get_money() const { return m_money; }
     void set_money(u32 amount, bool bSendEvent);
     bool is_alive();
@@ -219,15 +219,15 @@ public:
 private:
     CTradeParameters* m_trade_parameters;
     CPurchaseList* m_purchase_list;
-    bool m_need_osoznanie_mode;
+    BOOL m_need_osoznanie_mode;
     bool m_deadbody_can_take;
     bool m_deadbody_closed;
 
 public:
     IC CTradeParameters& trade_parameters() const;
-    virtual const char* trade_section() const;
+    virtual LPCSTR trade_section() const;
     float deficit_factor(const shared_str& section) const;
-    void buy_supplies(CInifile& ini_file, const char* section);
+    void buy_supplies(CInifile& ini_file, LPCSTR section);
     void sell_useless_items();
     virtual void on_before_sell(CInventoryItem* item) {}
     virtual void on_before_buy(CInventoryItem* item) {}

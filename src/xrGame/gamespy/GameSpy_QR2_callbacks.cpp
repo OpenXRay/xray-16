@@ -44,7 +44,7 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
     game_sv_TeamDeathmatch* gmTDM = smart_cast<game_sv_TeamDeathmatch*>(gameState);
     game_sv_ArtefactHunt* gmAhunt = smart_cast<game_sv_ArtefactHunt*>(gameState);
 
-    const char* time_str =
+    LPCSTR time_str =
         InventoryUtilities::GetTimeAsString(Device.dwTimeGlobal, InventoryUtilities::etpTimeToSecondsAndDay).c_str();
     switch (keyid)
     {

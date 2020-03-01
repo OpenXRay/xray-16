@@ -19,7 +19,7 @@
     Finding a good name is difficult!
     Here's the draft for this lib.... Spooky, uh?
 
-    void?			Very Optimized Interference Detection
+    VOID?			Very Optimized Interference Detection
     ZOID?			Zappy's Optimized Interference Detection
     CID?			Custom/Clever Interference Detection
     AID / ACID!		Accurate Interference Detection

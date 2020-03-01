@@ -25,9 +25,9 @@ void CUIInventoryUpgradeWnd::LoadCellsBacks(CUIXml& uiXml)
     {
         uiXml.SetLocalRoot(uiXml.NavigateToNode("state", i_st));
 
-        const char* type = uiXml.Read("type", 0, "");
-        const char* txr = uiXml.Read("back_texture", 0, NULL);
-        const char* txr2 = uiXml.Read("point_texture", 0, NULL);
+        LPCSTR type = uiXml.Read("type", 0, "");
+        LPCSTR txr = uiXml.Read("back_texture", 0, NULL);
+        LPCSTR txr2 = uiXml.Read("point_texture", 0, NULL);
         u32 color = CUIXmlInit::GetColor(uiXml, "item_color", 0, 0);
         LoadCellStates(type, txr, txr2, color);
 
@@ -36,7 +36,7 @@ void CUIInventoryUpgradeWnd::LoadCellsBacks(CUIXml& uiXml)
     uiXml.SetLocalRoot(stored_root);
 }
 
-void CUIInventoryUpgradeWnd::LoadCellStates(const char* state_str, const char* texture_name, const char* texture_name2, u32 color)
+void CUIInventoryUpgradeWnd::LoadCellStates(LPCSTR state_str, LPCSTR texture_name, LPCSTR texture_name2, u32 color)
 {
     VERIFY(state_str && xr_strcmp(state_str, ""));
     if (texture_name && !xr_strcmp(texture_name, ""))
@@ -51,7 +51,7 @@ void CUIInventoryUpgradeWnd::LoadCellStates(const char* state_str, const char* t
     SetCellState(SelectCellState(state_str), texture_name, texture_name2, color);
 }
 
-UIUpgrade::ViewState CUIInventoryUpgradeWnd::SelectCellState(const char* state_str)
+UIUpgrade::ViewState CUIInventoryUpgradeWnd::SelectCellState(LPCSTR state_str)
 {
     if (!xr_strcmp(state_str, "enabled"))
     {
@@ -101,7 +101,7 @@ UIUpgrade::ViewState CUIInventoryUpgradeWnd::SelectCellState(const char* state_s
 }
 
 void CUIInventoryUpgradeWnd::SetCellState(
-    UIUpgrade::ViewState state, const char* texture_name, const char* texture_name2, u32 color)
+    UIUpgrade::ViewState state, LPCSTR texture_name, LPCSTR texture_name2, u32 color)
 {
     m_cell_textures[state] = texture_name;
     m_point_textures[state] = texture_name2;
@@ -152,7 +152,7 @@ void CUIInventoryUpgradeWnd::LoadSchemes(CUIXml& uiXml)
         Scheme* scheme = new Scheme();
         scheme->cells.reserve(MAX_UI_UPGRADE_CELLS);
 
-        const char* name = uiXml.ReadAttrib(tmpl_node, "name", "");
+        LPCSTR name = uiXml.ReadAttrib(tmpl_node, "name", "");
         VERIFY(name && xr_strcmp(name, ""));
         scheme->name._set(name);
 

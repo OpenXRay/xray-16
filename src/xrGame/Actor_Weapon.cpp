@@ -82,7 +82,7 @@ void CActor::g_WeaponBones(int& L, int& R1, int& R2)
     L = m_l_finger1;
 }
 
-bool CActor::g_State(SEntityState& state) const
+BOOL CActor::g_State(SEntityState& state) const
 {
     state.bJump = !!(mstate_real & mcJump);
     state.bCrouch = !!(mstate_real & mcCrouch);
@@ -181,7 +181,7 @@ void CActor::SelectBestWeapon(IGameObject* O)
 }
 
 #define ENEMY_HIT_SPOT "mp_hit_sector_location"
-bool g_bShowHitSectors = TRUE;
+BOOL g_bShowHitSectors = TRUE;
 
 void CActor::HitSector(IGameObject* who, IGameObject* weapon)
 {

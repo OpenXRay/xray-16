@@ -10,13 +10,13 @@
 #include <emmintrin.h>
 #endif
 
-static unsigned char surface[c_LMAP_size * c_LMAP_size];
+static BYTE surface[c_LMAP_size * c_LMAP_size];
 const u32 alpha_ref = 254 - BORDER;
 
 // Initialization
 void _InitSurface() { FillMemory(surface, c_LMAP_size * c_LMAP_size, 0); }
 // Rendering of rect
-void _rect_register(L_rect& R, lm_layer* D, bool bRotate)
+void _rect_register(L_rect& R, lm_layer* D, BOOL bRotate)
 {
     u8* lm = &*(D->marker.begin());
     u32 s_x = D->width + 2 * BORDER;
@@ -27,7 +27,7 @@ void _rect_register(L_rect& R, lm_layer* D, bool bRotate)
         // Normal (and fastest way)
         for (u32 y = 0; y < s_y; y++)
         {
-            unsigned char* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             u8* S = lm + y * s_x;
             for (u32 x = 0; x < s_x; x++, P++, S++)
                 if (*S >= alpha_ref)
@@ -39,7 +39,7 @@ void _rect_register(L_rect& R, lm_layer* D, bool bRotate)
         // Rotated :(
         for (u32 y = 0; y < s_x; y++)
         {
-            unsigned char* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             for (u32 x = 0; x < s_y; x++, P++)
                 if (lm[x * s_x + y] >= alpha_ref)
                     *P = 255;
@@ -48,7 +48,7 @@ void _rect_register(L_rect& R, lm_layer* D, bool bRotate)
 }
 
 // Test of per-pixel intersection (surface test)
-bool Place_Perpixel(L_rect& R, lm_layer* D, bool bRotate)
+bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
 {
     u8* lm = &*(D->marker.begin());
     int s_x = D->width + 2 * BORDER;
@@ -68,7 +68,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, bool bRotate)
         // Normal (and fastest way)
         for (int y = 0; y < s_y; y++)
         {
-            unsigned char* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             u8* S = lm + y * s_x;
             // accelerated part
             for (x = 0; x < s_x - 8; x += 8, P += 8, S += 8)
@@ -112,7 +112,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, bool bRotate)
         // Rotated :(
         for (int y = 0; y < s_x; y++)
         {
-            unsigned char* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             for (x = 0; x < s_y; x++, P++)
                 if ((*P) && (lm[x * s_x + y] >= alpha_ref))
                 {
@@ -132,11 +132,11 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, bool bRotate)
 }
 
 // Check for intersection
-bool _rect_place(L_rect& r, lm_layer* D)
+BOOL _rect_place(L_rect& r, lm_layer* D)
 {
     L_rect R;
     int _X;
-    unsigned char* temp_surf;
+    BYTE* temp_surf;
 
     // Normal
     {

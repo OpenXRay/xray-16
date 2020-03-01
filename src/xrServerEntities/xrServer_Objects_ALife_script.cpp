@@ -18,7 +18,7 @@ SCRIPT_EXPORT(CSE_ALifeSchedulable, (), {
         //			.def(		constructor<>()),
 
         class_<CSE_ALifeSchedulable, IPureSchedulableObject>("cse_alife_schedulable")
-        //			.def(		constructor<const char*>())
+        //			.def(		constructor<LPCSTR>())
     ];
 });
 
@@ -44,7 +44,7 @@ SCRIPT_EXPORT(CSE_ALifeObject, (CSE_Abstract), {
 
 SCRIPT_EXPORT(CSE_ALifeGroupAbstract, (), {
     module(luaState)[class_<CSE_ALifeGroupAbstract>("cse_alife_group_abstract")
-        //			.def(		constructor<const char*>())
+        //			.def(		constructor<LPCSTR>())
     ];
 });
 

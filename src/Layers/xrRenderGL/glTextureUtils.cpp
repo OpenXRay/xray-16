@@ -83,7 +83,7 @@ TextureFormatPairs TextureFormatList[] =
     //D3DDECLTYPE_FLOAT3 GL_RGB32F 
     //D3DDECLTYPE_FLOAT4 GL_RGBA32F 
     //D3DDECLTYPED3DCOLOR Not available 
-    //D3DDECLTYPE_UBYTE4 GL_RGBA8 Note: Shader gets unsigned int values, but if Direct3D 9 style integral floats are needed (0.0f, 1.0f... 255.f), unsigned int can just be converted to float32 in shader. 
+    //D3DDECLTYPE_UBYTE4 GL_RGBA8 Note: Shader gets UINT values, but if Direct3D 9 style integral floats are needed (0.0f, 1.0f... 255.f), UINT can just be converted to float32 in shader. 
     //D3DDECLTYPE_SHORT2 GL_RG16 Note: Shader gets SINT values, but if Direct3D 9 style integral floats are needed, SINT can just be converted to float32 in shader. 
     //D3DDECLTYPE_SHORT4 GL_RGBA16 Note: Shader gets SINT values, but if Direct3D 9 style integral floats are needed, SINT can just be converted to float32 in shader. 
     //D3DDECLTYPE_UBYTE4N GL_RGBA8 

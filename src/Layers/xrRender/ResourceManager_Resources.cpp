@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void fix_texture_name(char* fn);
+void fix_texture_name(LPSTR fn);
 
 void simplify_texture(string_path& fn)
 {
@@ -26,7 +26,7 @@ void simplify_texture(string_path& fn)
 }
 
 template <class T>
-bool reclaim(xr_vector<T*>& vec, const T* ptr)
+BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
 {
     auto it = vec.begin();
     auto end = vec.end();
@@ -110,12 +110,12 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
     Msg("! ERROR: Failed to find compiled constant-table");
 }
 
-CRT* CResourceManager::_CreateRT(const char* Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, bool useUAV /*= false*/)
+CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, bool useUAV /*= false*/)
 {
     R_ASSERT(Name && Name[0] && w && h);
 
     // ***** first pass - search already created RT
-    char* N = (char*)(Name);
+    LPSTR N = LPSTR(Name);
     map_RT::iterator I = m_rtargets.find(N);
     if (I != m_rtargets.end())
         return I->second;
@@ -134,7 +134,7 @@ void CResourceManager::_DeleteRT(const CRT* RT)
 {
     if (0 == (RT->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    char* N = (char*)(*RT->cName);
+    LPSTR N = LPSTR(*RT->cName);
     map_RT::iterator I = m_rtargets.find(N);
     if (I != m_rtargets.end())
     {
@@ -146,12 +146,12 @@ void CResourceManager::_DeleteRT(const CRT* RT)
 
 //	DX10 cut
 /*
-CRTC* CResourceManager::_CreateRTC(const char* Name, u32 size, D3DFORMAT f)
+CRTC* CResourceManager::_CreateRTC(LPCSTR Name, u32 size, D3DFORMAT f)
 {
     R_ASSERT(Name && Name[0] && size);
 
     // ***** first pass - search already created RTC
-    char* N = char*(Name);
+    LPSTR N = LPSTR(Name);
     map_RTC::iterator I = m_rtargets_c.find(N);
     if (I != m_rtargets_c.end())
         return I->second;
@@ -169,7 +169,7 @@ void	CResourceManager::_DeleteRTC(const CRTC* RT)
 {
     if (0 == (RT->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    char* N = char*(*RT->cName);
+    LPSTR N = LPSTR(*RT->cName);
     map_RTC::iterator I = m_rtargets_c.find(N);
     if (I != m_rtargets_c.end())
     {
@@ -206,7 +206,7 @@ void CResourceManager::DBG_VerifyGeoms()
     */
 }
 
-CTexture* CResourceManager::_CreateTexture(const char* _Name)
+CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 {
     // DBG_VerifyTextures	();
     if (0 == xr_strcmp(_Name, "null"))
@@ -221,7 +221,7 @@ CTexture* CResourceManager::_CreateTexture(const char* _Name)
 #endif //	DEBUG
 
     // ***** first pass - search already loaded texture
-    char* N = (char*)(Name);
+    LPSTR N = LPSTR(Name);
     auto I = m_textures.find(N);
     if (I != m_textures.end())
         return I->second;
@@ -241,7 +241,7 @@ void CResourceManager::_DeleteTexture(const CTexture* T)
 
     if (0 == (T->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    char* N = (char*)(*T->cName);
+    LPSTR N = LPSTR(*T->cName);
     map_Texture::iterator I = m_textures.find(N);
     if (I != m_textures.end())
     {
@@ -266,13 +266,13 @@ void CResourceManager::DBG_VerifyTextures()
 }
 #endif
 
-CMatrix* CResourceManager::_CreateMatrix(const char* Name)
+CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
     if (0 == xr_stricmp(Name, "$null"))
         return nullptr;
 
-    char* N = (char*)(Name);
+    LPSTR N = LPSTR(Name);
     map_Matrix::iterator I = m_matrices.find(N);
     if (I != m_matrices.end())
         return I->second;
@@ -290,7 +290,7 @@ void CResourceManager::_DeleteMatrix(const CMatrix* M)
 {
     if (0 == (M->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    char* N = (char*)(*M->cName);
+    LPSTR N = LPSTR(*M->cName);
     map_Matrix::iterator I = m_matrices.find(N);
     if (I != m_matrices.end())
     {
@@ -300,19 +300,19 @@ void CResourceManager::_DeleteMatrix(const CMatrix* M)
     Msg("! ERROR: Failed to find xform-def '%s'", *M->cName);
 }
 
-void CResourceManager::ED_UpdateMatrix(const char* Name, CMatrix* data)
+void CResourceManager::ED_UpdateMatrix(LPCSTR Name, CMatrix* data)
 {
     CMatrix* M = _CreateMatrix(Name);
     *M = *data;
 }
 
-CConstant* CResourceManager::_CreateConstant(const char* Name)
+CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
     if (0 == xr_stricmp(Name, "$null"))
         return nullptr;
 
-    char* N = (char*)(Name);
+    LPSTR N = LPSTR(Name);
     map_Constant::iterator I = m_constants.find(N);
     if (I != m_constants.end())
         return I->second;
@@ -329,7 +329,7 @@ void CResourceManager::_DeleteConstant(const CConstant* C)
 {
     if (0 == (C->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    char* N = (char*)(*C->cName);
+    LPSTR N = LPSTR(*C->cName);
     map_Constant::iterator I = m_constants.find(N);
     if (I != m_constants.end())
     {
@@ -339,7 +339,7 @@ void CResourceManager::_DeleteConstant(const CConstant* C)
     Msg("! ERROR: Failed to find R1-constant-def '%s'", *C->cName);
 }
 
-void CResourceManager::ED_UpdateConstant(const char* Name, CConstant* data)
+void CResourceManager::ED_UpdateConstant(LPCSTR Name, CConstant* data)
 {
     CConstant* C = _CreateConstant(Name);
     *C = *data;
@@ -376,7 +376,7 @@ void CResourceManager::_DeleteTextureList(const STextureList* L)
 
 SMatrixList* CResourceManager::_CreateMatrixList(SMatrixList& L)
 {
-    bool bEmpty = TRUE;
+    BOOL bEmpty = TRUE;
     for (const ref_matrix& matrix : L)
     {
         if (matrix)
@@ -411,7 +411,7 @@ void CResourceManager::_DeleteMatrixList(const SMatrixList* L)
 
 SConstantList* CResourceManager::_CreateConstantList(SConstantList& L)
 {
-    bool bEmpty = TRUE;
+    BOOL bEmpty = TRUE;
     for (const ref_constant_obsolette& constant : L)
     {
         if (constant)

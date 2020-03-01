@@ -843,7 +843,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     {
         // For sun-filter - clear to zero
         // CHK_DX	(HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0L));
-        float ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
         HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
 
         // Fill vertex buffer
@@ -1214,8 +1214,8 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     //	It's slow. Make this when shader is created
     {
         pcstr pszSMapName;
-        bool b_HW_smap = RImplementation.o.HW_smap;
-        bool b_HW_PCF = RImplementation.o.HW_smap_PCF;
+        BOOL b_HW_smap = RImplementation.o.HW_smap;
+        BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
         if (b_HW_smap)
         {
             if (b_HW_PCF)

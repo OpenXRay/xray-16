@@ -3,10 +3,10 @@
 class CBlender_deffer_flat : public IBlender
 {
 public:
-    const char* getComment() override { return "LEVEL: defer-base-normal"; }
-    bool canBeDetailed() override { return TRUE; }
-    bool canBeLMAPped() override { return FALSE; }
-    bool canUseSteepParallax() override { return TRUE; }
+    LPCSTR getComment() override { return "LEVEL: defer-base-normal"; }
+    BOOL canBeDetailed() override { return TRUE; }
+    BOOL canBeLMAPped() override { return FALSE; }
+    BOOL canUseSteepParallax() override { return TRUE; }
 
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;

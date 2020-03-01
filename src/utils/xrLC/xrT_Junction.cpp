@@ -43,7 +43,7 @@ static void check(Vertex* vE1, Vertex* vE2, Vertex* vTEST)
 {
     if (_sqrt(SqrDistance2Segment(vTEST->P, vE1->P, vE2->P)) < 0.002f)
     {
-        bool bWeld = FALSE;
+        BOOL bWeld = FALSE;
 
         // check for duplicated errors
         if (vE1 > vE2)

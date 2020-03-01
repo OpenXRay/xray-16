@@ -22,7 +22,7 @@ void WeaponUsageStatistic::SaveDataLtx(CInifile& ini)
 
 void WeaponUsageStatistic::WriteLtx(CInifile& ini)
 {
-    const char* sect = "wpn_usage";
+    LPCSTR sect = "wpn_usage";
 
     ini.w_u32(sect, "dwTotalPlayersAliveTime_0_sec", m_dwTotalPlayersAliveTime[0] / 1000);
     ini.w_u32(sect, "dwTotalPlayersAliveTime_1_sec", m_dwTotalPlayersAliveTime[1] / 1000);
@@ -123,7 +123,7 @@ void WeaponUsageStatistic::Write(FILE* pFile)
     }
 }
 
-void Player_Statistic::WriteLtx(CInifile& ini, const char* sect)
+void Player_Statistic::WriteLtx(CInifile& ini, LPCSTR sect)
 {
     ini.w_string(sect, "name", PName.c_str());
     ini.w_string(sect, "player_unique_digest", PDigest.c_str());
@@ -183,7 +183,7 @@ void Player_Statistic::Write(FILE* pFile)
     }
 };
 
-void Weapon_Statistic::WriteLtx(CInifile& ini, const char* sect)
+void Weapon_Statistic::WriteLtx(CInifile& ini, LPCSTR sect)
 {
     ini.w_string(sect, "wpn_name", WName.c_str());
 
@@ -297,7 +297,7 @@ void Weapon_Statistic::add_hit(HitData const& hit)
     m_Hits.push_back(hit);
 }
 
-void HitData::WriteLtx(CInifile& ini, const char* sect, const char* prefix)
+void HitData::WriteLtx(CInifile& ini, LPCSTR sect, LPCSTR prefix)
 {
     string512 buff;
 

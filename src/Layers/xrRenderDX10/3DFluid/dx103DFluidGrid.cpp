@@ -66,7 +66,7 @@ void dx103DFluidGrid::CreateVertexBuffers()
 
     u32 vSize = GetDeclVertexSize(layoutDesc, 0);
 
-    // unsigned int numElements = sizeof(layoutDesc)/sizeof(layoutDesc[0]);
+    // UINT numElements = sizeof(layoutDesc)/sizeof(layoutDesc[0]);
     // CreateLayout( layoutDesc, numElements, technique, &layout);
 
     int index = 0;
@@ -254,8 +254,8 @@ void dx103DFluidGrid::InitBoundaryLines(VS_INPUT_FLUIDSIM_STRUCT** vertices, int
 
 void dx103DFluidGrid::DrawSlices(void)
 {
-    // unsigned int stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
-    // unsigned int offset[1] = { 0 };
+    // UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
+    // UINT offset[1] = { 0 };
     // DrawPrimitive( D3Dxx_PRIMITIVE_TOPOLOGY_TRIANGLELIST, layout, &slicesBuffer,
     //	stride, offset, 0, numVerticesSlices );
 
@@ -265,8 +265,8 @@ void dx103DFluidGrid::DrawSlices(void)
 
 void dx103DFluidGrid::DrawSlicesToScreen(void)
 {
-    // unsigned int stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
-    // unsigned int offset[1] = { 0 };
+    // UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
+    // UINT offset[1] = { 0 };
     // DrawPrimitive( D3Dxx_PRIMITIVE_TOPOLOGY_TRIANGLELIST, layout, &renderQuadBuffer,
     //	stride, offset, 0, numVerticesRenderQuad );
 
@@ -276,8 +276,8 @@ void dx103DFluidGrid::DrawSlicesToScreen(void)
 
 void dx103DFluidGrid::DrawBoundaryQuads(void)
 {
-    // unsigned int stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
-    // unsigned int offset[1] = { 0 };
+    // UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
+    // UINT offset[1] = { 0 };
     // DrawPrimitive( D3Dxx_PRIMITIVE_TOPOLOGY_TRIANGLELIST, layout, &boundarySlicesBuffer,
     //	stride, offset, 0, numVerticesBoundarySlices );
 
@@ -287,8 +287,8 @@ void dx103DFluidGrid::DrawBoundaryQuads(void)
 
 void dx103DFluidGrid::DrawBoundaryLines(void)
 {
-    //	unsigned int stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
-    //	unsigned int offset[1] = { 0 };
+    //	UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
+    //	UINT offset[1] = { 0 };
     //	DrawPrimitive( D3Dxx_PRIMITIVE_TOPOLOGY_LINELIST, layout, &boundaryLinesBuffer,
     //		stride, offset, 0, numVerticesBoundaryLines  );
 

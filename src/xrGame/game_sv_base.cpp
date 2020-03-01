@@ -17,7 +17,7 @@
 
 #define MAPROT_LIST_NAME "maprot_list.ltx"
 string_path MAPROT_LIST = "";
-bool net_sv_control_hit = FALSE;
+BOOL net_sv_control_hit = FALSE;
 BOOL g_bCollectStatisticData = TRUE;
 //-----------------------------------------------------------------
 u32 g_sv_base_dwRPointFreezeTime = 0;
@@ -56,20 +56,20 @@ game_PlayerState* game_sv_GameState::get_id(ClientID id)
     else				return C->ID;
 }
 
-const char*				game_sv_GameState::get_name_it				(u32 it)
+LPCSTR				game_sv_GameState::get_name_it				(u32 it)
 {
     xrClientData*	C	= (xrClientData*)m_server->client_Get		(it);
     if (0==C)			return 0;
     else				return *C->name;
 }*/
 
-const char* game_sv_GameState::get_name_id(ClientID id)
+LPCSTR game_sv_GameState::get_name_id(ClientID id)
 {
     xrClientData* C = (xrClientData*)m_server->ID_to_client(id);
     return C == NULL ? NULL : C->ps->getName();
 }
 
-const char* game_sv_GameState::get_player_name_id(ClientID id)
+LPCSTR game_sv_GameState::get_player_name_id(ClientID id)
 {
     xrClientData* xrCData = m_server->ID_to_client(id);
     return xrCData == NULL ? "unknown" : xrCData->ps->getName();
@@ -181,7 +181,7 @@ xr_vector<u16>* game_sv_GameState::get_children(ClientID id)
     return &(E->children);
 }
 
-s32 game_sv_GameState::get_option_i(const char* lst, const char* name, s32 def)
+s32 game_sv_GameState::get_option_i(LPCSTR lst, LPCSTR name, s32 def)
 {
     string64 op;
     strconcat(sizeof(op), op, "/", name, "=");
@@ -191,11 +191,11 @@ s32 game_sv_GameState::get_option_i(const char* lst, const char* name, s32 def)
         return def;
 }
 
-float game_sv_GameState::get_option_f(const char* lst, const char* name, float def)
+float game_sv_GameState::get_option_f(LPCSTR lst, LPCSTR name, float def)
 {
     string64 op;
     strconcat(sizeof(op), op, "/", name, "=");
-    const char* found = strstr(lst, op);
+    LPCSTR found = strstr(lst, op);
 
     if (found)
     {
@@ -209,16 +209,16 @@ float game_sv_GameState::get_option_f(const char* lst, const char* name, float d
         return def;
 }
 
-string64& game_sv_GameState::get_option_s(const char* lst, const char* name, const char* def)
+string64& game_sv_GameState::get_option_s(LPCSTR lst, LPCSTR name, LPCSTR def)
 {
     static string64 ret;
 
     string64 op;
     strconcat(sizeof(op), op, "/", name, "=");
-    const char* start = strstr(lst, op);
+    LPCSTR start = strstr(lst, op);
     if (start)
     {
-        const char* begin = start + xr_strlen(op);
+        LPCSTR begin = start + xr_strlen(op);
         sscanf(begin, "%[^/]", ret);
     }
     else
@@ -339,7 +339,7 @@ void game_sv_GameState::net_Export_GameTime(NET_Packet& P)
 };
 
 void game_sv_GameState::OnPlayerConnect(ClientID /**id_who**/) { signal_Syncronize(); }
-void game_sv_GameState::OnPlayerDisconnect(ClientID id_who, char*, u16) { signal_Syncronize(); }
+void game_sv_GameState::OnPlayerDisconnect(ClientID id_who, LPSTR, u16) { signal_Syncronize(); }
 static float rpoints_Dist[TEAM_COUNT] = {1000.f, 1000.f, 1000.f, 1000.f};
 void game_sv_GameState::Create(shared_str& options)
 {
@@ -442,7 +442,7 @@ void game_sv_GameState::Create(shared_str& options)
     //	pTmp->Execute				(Console->ConfigFile);
     //	xr_delete					(pTmp);
     //---------------------------------------------------------------------
-    const char* svcfg_ltx_name = "-svcfg ";
+    LPCSTR svcfg_ltx_name = "-svcfg ";
     if (strstr(Core.Params, svcfg_ltx_name))
     {
         string_path svcfg_name = "";
@@ -559,7 +559,7 @@ void game_sv_GameState::SetPointFreezed(RPoint* rp)
     rp->TimeToUnfreeze = Level().timeServer() + g_sv_base_dwRPointFreezeTime;
 }
 
-CSE_Abstract* game_sv_GameState::spawn_begin(const char* N)
+CSE_Abstract* game_sv_GameState::spawn_begin(LPCSTR N)
 {
     CSE_Abstract* A = F_entity_Create(N);
     R_ASSERT(A); // create SE
@@ -948,7 +948,7 @@ void game_sv_GameState::teleport_object(NET_Packet& packet, u16 id) {}
 void game_sv_GameState::add_restriction(NET_Packet& packet, u16 id) {}
 void game_sv_GameState::remove_restriction(NET_Packet& packet, u16 id) {}
 void game_sv_GameState::remove_all_restrictions(NET_Packet& packet, u16 id) {}
-void game_sv_GameState::MapRotation_AddMap(const char* MapName, const char* MapVer)
+void game_sv_GameState::MapRotation_AddMap(LPCSTR MapName, LPCSTR MapVer)
 {
     SMapRot R;
     R.map_name = MapName;
@@ -1036,8 +1036,8 @@ shared_str game_sv_GameState::level_name(const shared_str& server_options) const
     return parse_level_name(server_options);
 }
 
-const char* default_map_version = "1.0";
-const char* map_ver_string = "ver=";
+LPCSTR default_map_version = "1.0";
+LPCSTR map_ver_string = "ver=";
 
 shared_str game_sv_GameState::parse_level_version(const shared_str& server_options)
 {
@@ -1164,8 +1164,8 @@ if (dbg_net_Draw_Flags.test(dbg_draw_actor_alive))
 
 //  [7/5/2005]
 
-bool game_sv_GameState::IsVotingEnabled() { return g_sv_base_iVotingEnabled != 0; };
-bool game_sv_GameState::IsVotingEnabled(u16 flag) { return (g_sv_base_iVotingEnabled & flag) != 0; };
+BOOL game_sv_GameState::IsVotingEnabled() { return g_sv_base_iVotingEnabled != 0; };
+BOOL game_sv_GameState::IsVotingEnabled(u16 flag) { return (g_sv_base_iVotingEnabled & flag) != 0; };
 class NameSearcherPredicate
 {
 public:

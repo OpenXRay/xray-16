@@ -9,7 +9,7 @@ CUIDoubleProgressBar::CUIDoubleProgressBar()
 }
 
 CUIDoubleProgressBar::~CUIDoubleProgressBar() {}
-void CUIDoubleProgressBar::InitFromXml(CUIXml& xml_doc, const char* path)
+void CUIDoubleProgressBar::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 {
     CUIXmlInitBase::InitProgressBar(xml_doc, path, 0, &m_progress_one);
     CUIXmlInitBase::InitProgressBar(xml_doc, path, 0, &m_progress_two);

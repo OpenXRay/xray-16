@@ -37,7 +37,7 @@ void CUIStatsPlayerList::AddField(const char* name, float width)
     m_field_info.push_back(fi);
 }
 
-void CUIStatsPlayerList::Init(CUIXml& xml_doc, const char* path)
+void CUIStatsPlayerList::Init(CUIXml& xml_doc, LPCSTR path)
 {
     // init window
     CUIXmlInit::InitScrollView(xml_doc, path, 0, this);
@@ -54,7 +54,7 @@ void CUIStatsPlayerList::Init(CUIXml& xml_doc, const char* path)
 
     for (int i = 0; i < tabsCount; ++i)
     {
-        const char* name = xml_doc.ReadAttrib("field", i, "name");
+        LPCSTR name = xml_doc.ReadAttrib("field", i, "name");
         float width = xml_doc.ReadAttribFlt("field", i, "width");
 
         if (0 == xr_strcmp(name, "artefacts") && GameID() != eGameIDArtefactHunt)
@@ -81,14 +81,14 @@ void CUIStatsPlayerList::Init(CUIXml& xml_doc, const char* path)
     }
 }
 
-const char* CUIStatsPlayerList::GetST_entry(const char* itm)
+LPCSTR CUIStatsPlayerList::GetST_entry(LPCSTR itm)
 {
-    static const char* mp_name = "mp_name";
-    static const char* mp_frags = "mp_frags";
-    static const char* mp_deaths = "mp_deaths";
-    static const char* mp_ping = "mp_ping";
-    static const char* mp_artefacts = "mp_artefacts";
-    static const char* mp_status = "mp_status";
+    static LPCSTR mp_name = "mp_name";
+    static LPCSTR mp_frags = "mp_frags";
+    static LPCSTR mp_deaths = "mp_deaths";
+    static LPCSTR mp_ping = "mp_ping";
+    static LPCSTR mp_artefacts = "mp_artefacts";
+    static LPCSTR mp_status = "mp_status";
 
     if (0 == xr_strcmp(itm, "name"))
         return mp_name;
@@ -110,7 +110,7 @@ const char* CUIStatsPlayerList::GetST_entry(const char* itm)
 #endif // DEBUG
 }
 
-void CUIStatsPlayerList::InitHeader(CUIXml& xml_doc, const char* path)
+void CUIStatsPlayerList::InitHeader(CUIXml& xml_doc, LPCSTR path)
 {
     string256 _path;
     CUIXmlInit::InitStatic(xml_doc, strconcat(sizeof(_path), _path, path, ":list_header"), 0, m_header);
@@ -164,7 +164,7 @@ void CUIStatsPlayerList::InitHeader(CUIXml& xml_doc, const char* path)
     }
 }
 
-void CUIStatsPlayerList::InitTeamHeader(CUIXml& xml_doc, const char* path)
+void CUIStatsPlayerList::InitTeamHeader(CUIXml& xml_doc, LPCSTR path)
 {
     string256 _path;
     m_header_team = new CUIWindow();

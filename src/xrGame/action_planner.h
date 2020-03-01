@@ -59,10 +59,10 @@ public:
 
 #ifdef LOG_ACTION
 public:
-    virtual const char* action2string(const _action_id_type& action_id);
-    virtual const char* property2string(const _condition_type& action_id);
-    virtual const char* object_name() const;
-    virtual void show(const char* offset = "");
+    virtual LPCSTR action2string(const _action_id_type& action_id);
+    virtual LPCSTR property2string(const _condition_type& action_id);
+    virtual LPCSTR object_name() const;
+    virtual void show(LPCSTR offset = "");
     IC void show_current_world_state();
     IC void show_target_world_state();
 #endif

@@ -83,7 +83,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         }
 
         strconcat(sizeof(_path), _path, profile, ":back:texture");
-        const char* texture = xml_doc.Read(_path, 0, nullptr);
+        LPCSTR texture = xml_doc.Read(_path, 0, nullptr);
         R_ASSERT(texture);
         
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
@@ -120,7 +120,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         }
 
         strconcat(sizeof(_path), _path, profile, ":back_v:texture");
-        const char* texture = xml_doc.Read(_path, 0, nullptr);
+        LPCSTR texture = xml_doc.Read(_path, 0, nullptr);
         R_ASSERT(texture);
 
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))

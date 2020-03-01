@@ -11,7 +11,7 @@
 /**
  * Initialize the internal structures
  */
-void CxImage::Startup(unsigned int imagetype)
+void CxImage::Startup(DWORD imagetype)
 {
 	//init pointers
 	pDib = pSelection = pAlpha = NULL;
@@ -36,7 +36,7 @@ void CxImage::Startup(unsigned int imagetype)
  * Empty image constructor
  * \param imagetype: (optional) set the image format, see ENUM_CXIMAGE_FORMATS
  */
-CxImage::CxImage(unsigned int imagetype)
+CxImage::CxImage(DWORD imagetype)
 {
 	Startup(imagetype);
 }
@@ -82,7 +82,7 @@ bool CxImage::DestroyFrames()
  * \param wBpp: bit per pixel, can be 1, 4, 8, 24
  * \param imagetype: (optional) set the image format, see ENUM_CXIMAGE_FORMATS
  */
-CxImage::CxImage(unsigned int dwWidth, unsigned int dwHeight, unsigned int wBpp, unsigned int imagetype)
+CxImage::CxImage(DWORD dwWidth, DWORD dwHeight, DWORD wBpp, DWORD imagetype)
 {
 	Startup(imagetype);
 	Create(dwWidth,dwHeight,wBpp,imagetype);
@@ -128,13 +128,13 @@ void CxImage::Copy(const CxImage &src, bool copypixels, bool copyselection, bool
 	//copy the selection
 	if (copyselection && src.pSelection){
 		if (pSelection) cxfree(pSelection);//free(pSelection);
-		pSelection = (unsigned char*)cxalloc(nSize);//malloc(nSize);
+		pSelection = (BYTE*)cxalloc(nSize);//malloc(nSize);
 		memcpy(pSelection,src.pSelection,nSize);
 	}
 	//copy the alpha channel
 	if (copyalpha && src.pAlpha){
 		if (pAlpha) cxfree(pAlpha);//free(pAlpha);
-		pAlpha = (unsigned char*)cxalloc(nSize);//malloc(nSize);
+		pAlpha = (BYTE*)cxalloc(nSize);//malloc(nSize);
 		memcpy(pAlpha,src.pAlpha,nSize);
 	}
 }
@@ -166,7 +166,7 @@ CxImage& CxImage::operator = (const CxImage& isrc)
  * \param imagetype: (optional) set the image format, see ENUM_CXIMAGE_FORMATS
  * \return pointer to the internal pDib object; NULL if an error occurs.
  */
-void* CxImage::Create(unsigned int dwWidth, unsigned int dwHeight, unsigned int wBpp, unsigned int imagetype)
+void* CxImage::Create(DWORD dwWidth, DWORD dwHeight, DWORD wBpp, DWORD imagetype)
 {
 	// destroy the existing image (if any)
 	if (!Destroy())
@@ -213,7 +213,7 @@ void* CxImage::Create(unsigned int dwWidth, unsigned int dwHeight, unsigned int 
     head.biWidth = dwWidth;		// fill in width from parameter
     head.biHeight = dwHeight;	// fill in height from parameter
     head.biPlanes = 1;			// must be 1
-    head.biBitCount = (unsigned short)wBpp;		// from parameter
+    head.biBitCount = (WORD)wBpp;		// from parameter
     head.biCompression = BI_RGB;    
     head.biSizeImage = info.dwEffWidth * dwHeight;
 //    head.biXPelsPerMeter = 0; See SetXDPI
@@ -252,17 +252,17 @@ void* CxImage::Create(unsigned int dwWidth, unsigned int dwHeight, unsigned int 
 /**
  * \return pointer to the image pixels. <b> USE CAREFULLY </b>
  */
-unsigned char* CxImage::GetBits(unsigned int row)
+BYTE* CxImage::GetBits(DWORD row)
 { 
 	if (pDib){
 		if (row) {
-			if (row<(unsigned int)head.biHeight){
-				return ((unsigned char*)pDib + *(unsigned int*)pDib + GetPaletteSize() + (info.dwEffWidth * row));
+			if (row<(DWORD)head.biHeight){
+				return ((BYTE*)pDib + *(DWORD*)pDib + GetPaletteSize() + (info.dwEffWidth * row));
 			} else {
 				return NULL;
 			}
 		} else {
-			return ((unsigned char*)pDib + *(unsigned int*)pDib + GetPaletteSize());
+			return ((BYTE*)pDib + *(DWORD*)pDib + GetPaletteSize());
 		}
 	}
 	return NULL;
@@ -290,7 +290,7 @@ bool CxImage::IsInside(long x, long y)
  * - for indexed images, the output color is set by the palette entries.
  * - for RGB images, the output color is a shade of gray.
  */
-void CxImage::Clear(unsigned char bval)
+void CxImage::Clear(BYTE bval)
 {
 	if (pDib == 0) return;
 
@@ -298,7 +298,7 @@ void CxImage::Clear(unsigned char bval)
 		if (bval > 0) bval = 255;
 	}
 	if (GetBpp() == 4){
-		bval = (unsigned char)(17*(0x0F & bval));
+		bval = (BYTE)(17*(0x0F & bval));
 	}
 
 	memset(info.pImage,bval,head.biSizeImage);
@@ -356,12 +356,12 @@ void CxImage::Ghost(const CxImage *from)
 /**
  * turns a 16 or 32 bit bitfield image into a RGB image
  */
-void CxImage::Bitfield2RGB(unsigned char *src, unsigned int redmask, unsigned int greenmask, unsigned int bluemask, unsigned char bpp)
+void CxImage::Bitfield2RGB(BYTE *src, DWORD redmask, DWORD greenmask, DWORD bluemask, BYTE bpp)
 {
 	switch (bpp){
 	case 16:
 	{
-		unsigned int ns[3]={0,0,0};
+		DWORD ns[3]={0,0,0};
 		// compute the number of shift for each mask
 		for (int i=0;i<16;i++){
 			if ((redmask>>i)&0x01) ns[0]++;
@@ -371,9 +371,9 @@ void CxImage::Bitfield2RGB(unsigned char *src, unsigned int redmask, unsigned in
 		ns[1]+=ns[0]; ns[2]+=ns[1];	ns[0]=8-ns[0]; ns[1]-=8; ns[2]-=8;
 		// dword aligned width for 16 bit image
 		long effwidth2=(((head.biWidth + 1) / 2) * 4);
-		unsigned short w;
+		WORD w;
 		long y2,y3,x2,x3;
-		unsigned char *p=info.pImage;
+		BYTE *p=info.pImage;
 		// scan the buffer in reverse direction to avoid reallocations
 		for (long y=head.biHeight-1; y>=0; y--){
 			y2=effwidth2*y;
@@ -381,17 +381,17 @@ void CxImage::Bitfield2RGB(unsigned char *src, unsigned int redmask, unsigned in
 			for (long x=head.biWidth-1; x>=0; x--){
 				x2 = 2*x+y2;
 				x3 = 3*x+y3;
-				w = (unsigned short)(src[x2]+256*src[1+x2]);
-				p[  x3]=(unsigned char)((w & bluemask)<<ns[0]);
-				p[1+x3]=(unsigned char)((w & greenmask)>>ns[1]);
-				p[2+x3]=(unsigned char)((w & redmask)>>ns[2]);
+				w = (WORD)(src[x2]+256*src[1+x2]);
+				p[  x3]=(BYTE)((w & bluemask)<<ns[0]);
+				p[1+x3]=(BYTE)((w & greenmask)>>ns[1]);
+				p[2+x3]=(BYTE)((w & redmask)>>ns[2]);
 			}
 		}
 		break;
 	}
 	case 32:
 	{
-		unsigned int ns[3]={0,0,0};
+		DWORD ns[3]={0,0,0};
 		// compute the number of shift for each mask
 		for (int i=8;i<32;i+=8){
 			if (redmask>>i) ns[0]++;
@@ -401,7 +401,7 @@ void CxImage::Bitfield2RGB(unsigned char *src, unsigned int redmask, unsigned in
 		// dword aligned width for 32 bit image
 		long effwidth4 = head.biWidth * 4;
 		long y4,y3,x4,x3;
-		unsigned char *p=info.pImage;
+		BYTE *p=info.pImage;
 		// scan the buffer in reverse direction to avoid reallocations
 		for (long y=head.biHeight-1; y>=0; y--){
 			y4=effwidth4*y;
@@ -430,7 +430,7 @@ void CxImage::Bitfield2RGB(unsigned char *src, unsigned int redmask, unsigned in
  * \param bFlipImage: tune this parameter if the image is upsidedown
  * \return true if everything is ok
  */
-bool CxImage::CreateFromArray(unsigned char* pArray,unsigned int dwWidth,unsigned int dwHeight,unsigned int dwBitsperpixel, unsigned int dwBytesperline, bool bFlipImage)
+bool CxImage::CreateFromArray(BYTE* pArray,DWORD dwWidth,DWORD dwHeight,DWORD dwBitsperpixel, DWORD dwBytesperline, bool bFlipImage)
 {
 	if (pArray==NULL) return false;
 	if (!((dwBitsperpixel==1)||(dwBitsperpixel==4)||(dwBitsperpixel==8)||
@@ -444,13 +444,13 @@ bool CxImage::CreateFromArray(unsigned char* pArray,unsigned int dwWidth,unsigne
 	if (dwBitsperpixel==32) AlphaCreate();
 #endif //CXIMAGE_SUPPORT_ALPHA
 
-	unsigned char *dst,*src;
+	BYTE *dst,*src;
 
-	for (unsigned int y = 0; y<dwHeight; y++) {
+	for (DWORD y = 0; y<dwHeight; y++) {
 		dst = info.pImage + (bFlipImage?(dwHeight-1-y):y) * info.dwEffWidth;
 		src = pArray + y * dwBytesperline;
 		if (dwBitsperpixel==32){
-			for(unsigned int x=0;x<dwWidth;x++){
+			for(DWORD x=0;x<dwWidth;x++){
 				*dst++=src[0];
 				*dst++=src[1];
 				*dst++=src[2];
@@ -469,7 +469,7 @@ bool CxImage::CreateFromArray(unsigned char* pArray,unsigned int dwWidth,unsigne
 /**
  * \sa CreateFromArray
  */
-bool CxImage::CreateFromMatrix(unsigned char** ppMatrix,unsigned int dwWidth,unsigned int dwHeight,unsigned int dwBitsperpixel, unsigned int dwBytesperline, bool bFlipImage)
+bool CxImage::CreateFromMatrix(BYTE** ppMatrix,DWORD dwWidth,DWORD dwHeight,DWORD dwBitsperpixel, DWORD dwBytesperline, bool bFlipImage)
 {
 	if (ppMatrix==NULL) return false;
 	if (!((dwBitsperpixel==1)||(dwBitsperpixel==4)||(dwBitsperpixel==8)||
@@ -483,14 +483,14 @@ bool CxImage::CreateFromMatrix(unsigned char** ppMatrix,unsigned int dwWidth,uns
 	if (dwBitsperpixel==32) AlphaCreate();
 #endif //CXIMAGE_SUPPORT_ALPHA
 
-	unsigned char *dst,*src;
+	BYTE *dst,*src;
 
-	for (unsigned int y = 0; y<dwHeight; y++) {
+	for (DWORD y = 0; y<dwHeight; y++) {
 		dst = info.pImage + (bFlipImage?(dwHeight-1-y):y) * info.dwEffWidth;
 		src = ppMatrix[y];
 		if (src){
 			if (dwBitsperpixel==32){
-				for(unsigned int x=0;x<dwWidth;x++){
+				for(DWORD x=0;x<dwWidth;x++){
 					*dst++=src[0];
 					*dst++=src[1];
 					*dst++=src[2];

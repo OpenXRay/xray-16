@@ -5,7 +5,7 @@
 #define EXCEPTION_EXECUTE_HANDLER 1
 #define EXCEPTION_CONTINUE_SEARCH 0
 
-int _cdecl XRCORE_API _resetstkoflwunsigned int);
+int _cdecl XRCORE_API _resetstkoflw(void);
 #endif
 
 template <typename... Args>

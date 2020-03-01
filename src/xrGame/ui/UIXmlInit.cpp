@@ -27,7 +27,7 @@
 CUIXmlInit::CUIXmlInit() : CUIXmlInitBase() {}
 CUIXmlInit::~CUIXmlInit() {}
 
-bool CUIXmlInit::InitTabButtonMP(CUIXml& xml_doc, const char* path, int index, CUITabButtonMP* pWnd)
+bool CUIXmlInit::InitTabButtonMP(CUIXml& xml_doc, LPCSTR path, int index, CUITabButtonMP* pWnd)
 {
     Init3tButton(xml_doc, path, index, pWnd);
 
@@ -54,7 +54,7 @@ bool CUIXmlInit::InitTabButtonMP(CUIXml& xml_doc, const char* path, int index, C
     return true;
 }
 
-bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index, CUIDragDropListEx* pWnd)
+bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, LPCSTR path, int index, CUIDragDropListEx* pWnd)
 {
     R_ASSERT4(xml_doc.NavigateToNode(path, index), "XML node not found", path, xml_doc.m_xml_file_name);
 
@@ -114,7 +114,7 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
     return true;
 }
 
-bool CUIXmlInit::InitSleepStatic(CUIXml& xml_doc, const char* path, int index, CUISleepStatic* pWnd)
+bool CUIXmlInit::InitSleepStatic(CUIXml& xml_doc, LPCSTR path, int index, CUISleepStatic* pWnd)
 {
     R_ASSERT4(xml_doc.NavigateToNode(path, index), "XML node not found", path, xml_doc.m_xml_file_name);
 
@@ -123,11 +123,11 @@ bool CUIXmlInit::InitSleepStatic(CUIXml& xml_doc, const char* path, int index, C
     return true;
 }
 
-bool CUIXmlInit::InitHintWindow(CUIXml& xml_doc, const char* path, int index, UIHintWindow* pWnd)
+bool CUIXmlInit::InitHintWindow(CUIXml& xml_doc, LPCSTR path, int index, UIHintWindow* pWnd)
 {
     VERIFY(pWnd);
     InitWindow(xml_doc, path, index, pWnd);
-    const char* hint_text = xml_doc.Read(path, index, "no hint");
+    LPCSTR hint_text = xml_doc.Read(path, index, "no hint");
     pWnd->set_hint_text_ST(hint_text);
 
     pWnd->set_hint_delay((u32)xml_doc.ReadAttribInt(path, index, "delay"));

@@ -150,7 +150,7 @@ bool SphereCollider::Collide(
  *	\warning	SCALE NOT SUPPORTED. The matrices must contain rotation & translation parts only.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool SphereCollider::InitQuery(
+BOOL SphereCollider::InitQuery(
     SphereCache& cache, const Sphere& sphere, const Matrix4x4* worlds, const Matrix4x4* worldm)
 {
     // 1) Call the base method
@@ -430,7 +430,7 @@ bool SphereCollider::Collide(SphereCache& cache, const Sphere& sphere, const AAB
  *	\return		true if the sphere contains the whole box
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ bool SphereCollider::SphereContainsBox(const Point& bc, const Point& be)
+inline_ BOOL SphereCollider::SphereContainsBox(const Point& bc, const Point& be)
 {
     // I assume if all 8 box vertices are inside the sphere, so does the whole box.
     // Sounds ok but maybe there's a better way?

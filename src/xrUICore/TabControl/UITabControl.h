@@ -45,7 +45,7 @@ public:
     const shared_str& GetPrevActiveId() { return m_sPrevPushedId; }
 
     void SetActiveTab(const shared_str& sNewTab);
-    void SetActiveTab_script(const char* sNewTab) { SetActiveTab(sNewTab); };
+    void SetActiveTab_script(LPCSTR sNewTab) { SetActiveTab(sNewTab); };
     void SetActiveTabByIndex(u32 index);
 
     const u32 GetTabsCount() const { return m_TabsArr.size(); }

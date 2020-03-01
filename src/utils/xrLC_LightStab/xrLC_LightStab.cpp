@@ -4,7 +4,7 @@
 #include "utils/xrLC_Light/lightstab_interface.h"
 
 extern "C" XRLC_LIGHT_STUB_API bool __cdecl RunTask(
-    IAgent* agent, unsigned int sessionId, IGenericStream* inStream, IGenericStream* outStream)
+    IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream)
 {
     if (lc_net::g_net_task_interface)
         return lc_net::g_net_task_interface->run_task(agent, sessionId, inStream, outStream);

@@ -95,7 +95,7 @@ void CActorMP::fill_state(actor_mp_state& state)
     state.physics_state_enabled = State.enabled ? 1 : 0;
 }
 
-bool CActorMP::net_Relevant()
+BOOL CActorMP::net_Relevant()
 {
     if (OnClient())
     {

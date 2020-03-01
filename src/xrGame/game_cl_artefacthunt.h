@@ -16,7 +16,7 @@ protected:
     virtual void TranslateGameMessage(u32 msg, NET_Packet& P);
     virtual void shedule_Update(u32 dt);
 
-    virtual bool CanCallBuyMenu();
+    virtual BOOL CanCallBuyMenu();
     virtual bool CanBeReady();
     virtual void UpdateMapLocations();
 

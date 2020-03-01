@@ -26,8 +26,8 @@ using smart_cover::detail::parse_int;
 
 namespace smart_cover
 {
-static const char* s_enter_loophole_id = "<__ENTER__>";
-static const char* s_exit_loophole_id = "<__EXIT__>";
+static LPCSTR s_enter_loophole_id = "<__ENTER__>";
+static LPCSTR s_exit_loophole_id = "<__EXIT__>";
 
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in)
 {
@@ -40,7 +40,7 @@ shared_str transform_vertex(shared_str const& vertex_id, bool const& in)
     return (s_exit_loophole_id);
 }
 
-shared_str parse_vertex(luabind::object const& table, const char* identifier, bool const& in)
+shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in)
 {
     return (transform_vertex(parse_string(table, identifier), in));
 }

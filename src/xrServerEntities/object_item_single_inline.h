@@ -15,7 +15,7 @@
 #define CSObjectItemSingle CObjectItemSingle<_unknown_type, _client_object>
 
 TEMPLATE_SPECIALIZATION
-IC CSObjectItemSingle::CObjectItemSingle(const CLASS_ID& clsid, const char* script_clsid) : inherited(clsid, script_clsid) {}
+IC CSObjectItemSingle::CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid) : inherited(clsid, script_clsid) {}
 #ifndef NO_XR_GAME
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ClientObjectBaseClass* CSObjectItemSingle::client_object() const
@@ -26,14 +26,14 @@ ObjectFactory::ClientObjectBaseClass* CSObjectItemSingle::client_object() const
 #endif
 
 TEMPLATE_SPECIALIZATION
-ObjectFactory::ServerObjectBaseClass* CSObjectItemSingle::server_object(const char* section) const
+ObjectFactory::ServerObjectBaseClass* CSObjectItemSingle::server_object(LPCSTR section) const
 {
     return (new SERVER_TYPE(section))->init();
 }
 
 #ifndef NO_XR_GAME
 template <typename _unknown_type>
-IC CObjectItemSingle<_unknown_type, true>::CObjectItemSingle(const CLASS_ID& clsid, const char* script_clsid)
+IC CObjectItemSingle<_unknown_type, true>::CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid)
     : inherited(clsid, script_clsid)
 {
 }
@@ -45,7 +45,7 @@ ObjectFactory::ClientObjectBaseClass* CObjectItemSingle<_unknown_type, true>::cl
 }
 
 template <typename _unknown_type>
-ObjectFactory::ServerObjectBaseClass* CObjectItemSingle<_unknown_type, true>::server_object(const char* section) const
+ObjectFactory::ServerObjectBaseClass* CObjectItemSingle<_unknown_type, true>::server_object(LPCSTR section) const
 {
     FATAL("Cannot instantiate server object, because server class is not declared!");
     return (0);

@@ -35,7 +35,7 @@ struct SBuyItemInfo
 
     const EItmState& GetState() const { return m_item_state; }
     void SetState(const EItmState& s);
-    const char* GetStateAsText() const;
+    LPCSTR GetStateAsText() const;
 
 private:
     EItmState m_item_state;
@@ -264,12 +264,12 @@ private:
     void SellAll();
     void ResetToOrigin();
     void DumpPreset(ETradePreset idx);
-    void DumpAllItems(const char* reason);
+    void DumpAllItems(LPCSTR reason);
     dd_list_type GetListType(CUIDragDropListEx* l);
     CUIDragDropListEx* GetMatchedListForItem(const shared_str& sect_name);
     void UpdateCorrespondingItemsForList(CUIDragDropListEx* _list);
     const u32 GetRank() const;
-    void SetInfoString(const char* str);
+    void SetInfoString(LPCSTR str);
     void SetMoneyChangeString(int diff);
     void CleanUserItems();
 

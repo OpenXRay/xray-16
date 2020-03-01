@@ -35,7 +35,7 @@ public:
     void write_to_file(IWriter* file_to_write) const;
     void load_from_player(game_PlayerState* player_state);
 
-    const char* get_name() const { return m_name.c_str(); };
+    LPCSTR get_name() const { return m_name.c_str(); };
     s16 const get_frags() const { return m_frags; };
     s16 const get_deaths() const { return m_deaths; };
     u16 const get_artefacts() const { return m_artefacts; };
@@ -68,11 +68,11 @@ public:
     void sort_players(sorting_less_comparator sorting_comparator);
     void load_from_game();
 
-    const char* get_map_name() const { return m_map_name.c_str(); };
-    const char* get_map_version() const { return m_map_version.c_str(); };
-    const char* get_game_type() const { return m_game_type.c_str(); };
-    const char* get_game_score() const { return m_game_score.c_str(); };
-    const char* get_author_name() const { return m_author_name.c_str(); };
+    LPCSTR get_map_name() const { return m_map_name.c_str(); };
+    LPCSTR get_map_version() const { return m_map_version.c_str(); };
+    LPCSTR get_game_type() const { return m_game_type.c_str(); };
+    LPCSTR get_game_score() const { return m_game_score.c_str(); };
+    LPCSTR get_author_name() const { return m_author_name.c_str(); };
     u32 const get_players_count() const { return m_players.size(); };
     demo_player_info const* get_player(u32 player_index) const;
 

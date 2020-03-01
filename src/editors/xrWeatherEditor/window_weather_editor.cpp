@@ -123,11 +123,11 @@ void window_weather_editor::fill_weathers()
 
     WeathersComboBox->Items->Clear();
 
-    const char* const* weathers_ids = (*m_weathers_getter)();
+    LPCSTR const* weathers_ids = (*m_weathers_getter)();
     for (u32 i = 0, n = (*m_weathers_size_getter)(); i < n; ++i)
         WeathersComboBox->Items->Add(to_string(weathers_ids[i]));
 
-    const char* current_weather_id = m_engine.weather();
+    LPCSTR current_weather_id = m_engine.weather();
     int index = WeathersComboBox->Items->IndexOf(to_string(current_weather_id));
     if ((index == -1) && WeathersComboBox->Items->Count)
         index = 0;
@@ -142,11 +142,11 @@ void window_weather_editor::fill_weathers()
     fill_frames(current_weather_id);
 }
 
-void window_weather_editor::fill_frames(const char* current_weather_id)
+void window_weather_editor::fill_frames(LPCSTR current_weather_id)
 {
     FramesComboBox->Items->Clear();
 
-    const char* const* frames_ids = (*m_frames_getter)(current_weather_id);
+    LPCSTR const* frames_ids = (*m_frames_getter)(current_weather_id);
     for (u32 i = 0, n = (*m_frames_size_getter)(current_weather_id); i < n; ++i)
         FramesComboBox->Items->Add(to_string(frames_ids[i]));
 
@@ -190,7 +190,7 @@ System::Void window_weather_editor::WeathersComboBox_SelectedIndexChanged(Object
         return;
 
     String ^ new_weather = safe_cast<String ^>(WeathersComboBox->SelectedItem);
-    char* new_weather_id = to_string(new_weather);
+    LPSTR new_weather_id = to_string(new_weather);
     m_engine.weather(new_weather_id);
     free(new_weather_id);
 
@@ -209,7 +209,7 @@ System::Void window_weather_editor::FramesComboBox_SelectedIndexChanged(Object ^
     engine_pauser_guard guard(m_engine, false);
 
     String ^ new_weather_frame = safe_cast<String ^>(FramesComboBox->SelectedItem);
-    char* new_weather_frame_id = to_string(new_weather_frame);
+    LPSTR new_weather_frame_id = to_string(new_weather_frame);
     m_engine.current_weather_frame(new_weather_frame_id);
     free(new_weather_frame_id);
 

@@ -3,9 +3,9 @@
 class CBlender_accum_spot : public IBlender
 {
 public:
-    virtual const char* getComment() { return "INTERNAL: accumulate spot light"; }
-    virtual bool canBeDetailed() { return FALSE; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "INTERNAL: accumulate spot light"; }
+    virtual BOOL canBeDetailed() { return FALSE; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_accum_spot();
@@ -15,12 +15,12 @@ public:
 class CBlender_accum_spot_msaa : public IBlender
 {
 public:
-    virtual const char* getComment() { return "INTERNAL: accumulate spot light msaa"; }
-    virtual bool canBeDetailed() { return FALSE; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "INTERNAL: accumulate spot light msaa"; }
+    virtual BOOL canBeDetailed() { return FALSE; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 
-    virtual void SetDefine(const char* Name, const char* Definition)
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
@@ -28,19 +28,19 @@ public:
 
     CBlender_accum_spot_msaa();
     virtual ~CBlender_accum_spot_msaa();
-    const char* Name;
-    const char* Definition;
+    LPCSTR Name;
+    LPCSTR Definition;
 };
 
 class CBlender_accum_volumetric_msaa : public IBlender
 {
 public:
-    virtual const char* getComment() { return "INTERNAL: accumulate spot light msaa"; }
-    virtual bool canBeDetailed() { return FALSE; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "INTERNAL: accumulate spot light msaa"; }
+    virtual BOOL canBeDetailed() { return FALSE; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 
-    virtual void SetDefine(const char* Name, const char* Definition)
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
@@ -48,6 +48,6 @@ public:
 
     CBlender_accum_volumetric_msaa();
     virtual ~CBlender_accum_volumetric_msaa();
-    const char* Name;
-    const char* Definition;
+    LPCSTR Name;
+    LPCSTR Definition;
 };

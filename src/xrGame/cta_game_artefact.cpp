@@ -142,7 +142,7 @@ void CtaGameArtefact::CreateArtefactActivation()
     // deactivate_physics_shell();
 }
 
-/*bool CtaGameArtefact::net_Relevant()
+/*BOOL CtaGameArtefact::net_Relevant()
 {
     return inherited::net_Relevant();
 }*/

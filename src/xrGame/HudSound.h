@@ -4,10 +4,10 @@
 struct HUD_SOUND_ITEM
 {
     HUD_SOUND_ITEM() : m_activeSnd(NULL), m_b_exclusive(false) {}
-    static void LoadSound(const char* section, const char* line, ref_sound& hud_snd, int type = sg_SourceType,
+    static void LoadSound(LPCSTR section, LPCSTR line, ref_sound& hud_snd, int type = sg_SourceType,
         float* volume = NULL, float* delay = NULL);
 
-    static void LoadSound(const char* section, const char* line, HUD_SOUND_ITEM& hud_snd, int type = sg_SourceType);
+    static void LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_snd, int type = sg_SourceType);
 
     static void DestroySound(HUD_SOUND_ITEM& hud_snd);
 
@@ -16,7 +16,7 @@ struct HUD_SOUND_ITEM
 
     static void StopSound(HUD_SOUND_ITEM& snd);
 
-    ICF bool playing()
+    ICF BOOL playing()
     {
         if (m_activeSnd)
             return m_activeSnd->snd._feedback() ? TRUE : FALSE;
@@ -46,7 +46,7 @@ struct HUD_SOUND_ITEM
     bool m_b_exclusive;
     xr_vector<SSnd> sounds;
 
-    bool operator==(const char* alias) const { return 0 == xr_stricmp(m_alias.c_str(), alias); }
+    bool operator==(LPCSTR alias) const { return 0 == xr_stricmp(m_alias.c_str(), alias); }
 };
 
 class HUD_SOUND_COLLECTION
@@ -61,16 +61,16 @@ public:
 
     xr_vector<HUD_SOUND_ITEM> m_sound_items; //Alundaio: made public
 
-    HUD_SOUND_ITEM* FindSoundItem(const char* alias, bool b_assert); //AVO: made public to check if sound is loaded
+    HUD_SOUND_ITEM* FindSoundItem(LPCSTR alias, bool b_assert); //AVO: made public to check if sound is loaded
 
-    void PlaySound(const char* alias, const Fvector& position, const IGameObject* parent, bool hud_mode, bool looped = false,
+    void PlaySound(LPCSTR alias, const Fvector& position, const IGameObject* parent, bool hud_mode, bool looped = false,
         u8 index = u8(-1));
 
-    void StopSound(const char* alias);
+    void StopSound(LPCSTR alias);
 
-    void LoadSound(const char* section, const char* line, const char* alias, bool exclusive = false, int type = sg_SourceType);
+    void LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
 
-    void SetPosition(const char* alias, const Fvector& pos);
+    void SetPosition(LPCSTR alias, const Fvector& pos);
     void StopAllSounds();
 };
 

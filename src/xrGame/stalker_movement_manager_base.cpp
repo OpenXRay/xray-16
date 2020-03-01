@@ -67,8 +67,8 @@ stalker_movement_manager_base::stalker_movement_manager_base(CAI_Stalker* object
 }
 
 stalker_movement_manager_base::~stalker_movement_manager_base() {}
-void stalker_movement_manager_base::Load(const char* section) { inherited::Load(section); }
-void stalker_movement_manager_base::reload(const char* section)
+void stalker_movement_manager_base::Load(LPCSTR section) { inherited::Load(section); }
+void stalker_movement_manager_base::reload(LPCSTR section)
 {
     inherited::reload(section);
     m_velocities = &stalker_velocity_holder().collection(pSettings->r_string(section, "movement_speeds"));

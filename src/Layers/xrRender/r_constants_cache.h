@@ -37,12 +37,12 @@ class	R_constant_array
 public:
     typedef		R_constant_cache<Fvector4,256>	t_f;
     typedef		R_constant_cache<Ivector4,16>	t_i;
-    typedef		R_constant_cache<bool,16>		t_b;
+    typedef		R_constant_cache<BOOL,16>		t_b;
 public:
     ALIGN(16)	t_f					c_f;
 //	ALIGN(16)	t_i					c_i;
 //	ALIGN(16)	t_b					c_b;
-    bool							b_dirty;
+    BOOL							b_dirty;
 public:
     t_f&					get_array_f		()	{ return c_f;	}
 //	t_i&					get_array_i		()	{ return c_i;	}

@@ -1487,7 +1487,7 @@ void CPHElement::Fix()
     FixBody(m_body);
 }
 
-void CPHElement::SetAnimated(bool v) { m_flags.set(flAnimated, bool(v)); }
+void CPHElement::SetAnimated(bool v) { m_flags.set(flAnimated, BOOL(v)); }
 void CPHElement::ReleaseFixed()
 {
     if (!isFixed())

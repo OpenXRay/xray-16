@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-const char* modify_player_name(const char* src_name, string256& dest)
+LPCSTR modify_player_name(LPCSTR src_name, string256& dest)
 {
     xr_strcpy(dest, src_name);
     static const char* denied_symbols = DELIMITER "?%%\"";

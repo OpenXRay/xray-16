@@ -679,7 +679,7 @@ void CGameGraphBuilder::build_graph(const float& start, const float& amount)
     Logger.Progress(start + amount);
 }
 
-void CGameGraphBuilder::build_graph(const char* graph_name, const char* cross_table_name, const char* level_name)
+void CGameGraphBuilder::build_graph(LPCSTR graph_name, LPCSTR cross_table_name, LPCSTR level_name)
 {
     Logger.Phase("Building level game graph");
     Msg("level \"%s\"", level_name);

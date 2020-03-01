@@ -25,7 +25,7 @@ struct functor_base
     typedef luabind::functor<return_type> functor_type;
 
     functor_type functr;
-    const char* parameter;
+    LPCSTR parameter;
 };
 
 template <typename return_type>
@@ -37,7 +37,7 @@ struct functor : public functor_base<return_type>
 template <typename return_type>
 struct functor2 : public functor<return_type>
 {
-    const char* parameter2;
+    LPCSTR parameter2;
 
     IC return_type operator()() const { return this->functr(this->parameter, parameter2); }
 };
@@ -59,7 +59,7 @@ struct functor<void> : public functor_base<void>
 template <>
 struct functor2<void> : public functor<void>
 {
-    const char* parameter2;
+    LPCSTR parameter2;
     IC void operator()() const { functr(parameter, parameter2); }
 };
 
@@ -87,21 +87,21 @@ public:
     virtual ~Upgrade();
     void construct(const shared_str& upgrade_id, Group& parental_group, Manager& manager_r);
 
-    IC const char* section() const;
+    IC LPCSTR section() const;
     IC shared_str const& parent_group_id() const;
     IC Group const* parent_group() const;
-    IC const char* icon_name() const;
-    IC const char* name() const;
-    IC const char* description_text() const;
+    IC LPCSTR icon_name() const;
+    IC LPCSTR name() const;
+    IC LPCSTR description_text() const;
 
-    const char* get_prerequisites();
+    LPCSTR get_prerequisites();
     UpgradeStateResult get_preconditions();
     IC bool get_highlight() const;
     IC shared_str const& get_property_name(u8 index = 0) const;
     IC Ivector2 const& get_scheme_index() const;
 
 #ifdef DEBUG
-    virtual void log_hierarchy(const char* nest);
+    virtual void log_hierarchy(LPCSTR nest);
 #endif // DEBUG
 
     virtual void fill_root_container(Root* root);
@@ -121,7 +121,7 @@ protected:
     typedef detail::functor2<void> VoidFunctor2;
     typedef detail::functor3<void> VoidFunctor3;
 
-    typedef detail::functor2<const char*> StrFunctor;
+    typedef detail::functor2<LPCSTR> StrFunctor;
     typedef detail::functor2<int> IntFunctor;
 
 protected:

@@ -117,11 +117,11 @@ protected:
     void _Collide(const AABBQuantizedNode* node);
     void _Collide(const AABBQuantizedNoLeafNode* node);
     // Overlap tests
-    inline_ bool OBBContainsBox(const Point& bc, const Point& be);
-    inline_ bool BoxBoxOverlap(const Point& extents, const Point& center);
-    inline_ bool TriBoxOverlap();
+    inline_ BOOL OBBContainsBox(const Point& bc, const Point& be);
+    inline_ BOOL BoxBoxOverlap(const Point& extents, const Point& center);
+    inline_ BOOL TriBoxOverlap();
     // Init methods
-    bool InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb = nullptr, const Matrix4x4* worldm = nullptr);
+    BOOL InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb = nullptr, const Matrix4x4* worldm = nullptr);
 };
 
 #endif // __OPC_OBBCOLLIDER_H__

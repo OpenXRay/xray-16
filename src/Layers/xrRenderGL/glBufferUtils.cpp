@@ -3,7 +3,7 @@
 
 namespace BufferUtils
 {
-HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, unsigned int DataSize, bool bImmutable, bool bIndexBuffer)
+HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer)
 {
     GLenum usage = bImmutable ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
     GLenum target = bIndexBuffer ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
@@ -14,12 +14,12 @@ HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, unsigned int DataSize, 
     return S_OK;
 }
 
-HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, unsigned int DataSize, bool bImmutable)
+HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(pBuffer, pData, DataSize, bImmutable, false);
 }
 
-HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, unsigned int DataSize, bool bImmutable)
+HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(static_cast<GLuint*>(pBuffer), pData, DataSize, bImmutable, true);
 }
@@ -127,7 +127,7 @@ const GLuint VertexUsageList[] =
     ~0u, // D3DDECLUSAGE_SAMPLE
 };
 
-u32 GetDeclVertexSize(const VertexElement* decl, unsigned int Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
 {
     GLsizei size = 0;
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)

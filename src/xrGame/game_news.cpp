@@ -44,7 +44,7 @@ void GAME_NEWS_DATA::load(IReader& stream)
     //	load_data(tex_rect,		stream);
 }
 /*
-const char* GAME_NEWS_DATA::SingleLineText()
+LPCSTR GAME_NEWS_DATA::SingleLineText()
 {
     if( xr_strlen(full_news_text.c_str()) )
         return full_news_text.c_str();

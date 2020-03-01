@@ -29,7 +29,7 @@
 #include "ActorHelmet.h"
 #include "Inventory.h"
 
-CMapLocation::CMapLocation(const char* type, u16 object_id)
+CMapLocation::CMapLocation(LPCSTR type, u16 object_id)
 {
     m_flags.zero();
 
@@ -84,7 +84,7 @@ void CMapLocation::destroy()
 }
 
 CUIXml* g_uiSpotXml = NULL;
-void CMapLocation::LoadSpot(const char* type, bool bReload)
+void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 {
     if (!g_uiSpotXml)
     {
@@ -95,7 +95,7 @@ void CMapLocation::LoadSpot(const char* type, bool bReload)
     string512 path_base, path;
     xr_strcpy(path_base, type);
     R_ASSERT3(g_uiSpotXml->NavigateToNode(path_base, 0), "XML node not found in file map_spots.xml", path_base);
-    const char* s = g_uiSpotXml->ReadAttrib(path_base, 0, "hint", "no hint");
+    LPCSTR s = g_uiSpotXml->ReadAttrib(path_base, 0, "hint", "no hint");
     SetHint(s);
 
     s = g_uiSpotXml->ReadAttrib(path_base, 0, "store", NULL);
@@ -127,7 +127,7 @@ void CMapLocation::LoadSpot(const char* type, bool bReload)
     XML_NODE node = g_uiSpotXml->NavigateToNode(path, 0);
     if (node)
     {
-        const char* str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!bReload)
@@ -163,7 +163,7 @@ void CMapLocation::LoadSpot(const char* type, bool bReload)
     node = g_uiSpotXml->NavigateToNode(path, 0);
     if (node)
     {
-        const char* str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!bReload)
@@ -198,7 +198,7 @@ void CMapLocation::LoadSpot(const char* type, bool bReload)
     node = g_uiSpotXml->NavigateToNode(path, 0);
     if (node)
     {
-        const char* str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!bReload)
@@ -616,7 +616,7 @@ void CMapLocation::SetHint(const shared_str& hint)
     m_hint = hint;
 };
 
-const char* CMapLocation::GetHint()
+LPCSTR CMapLocation::GetHint()
 {
     if (!HintEnabled())
     {

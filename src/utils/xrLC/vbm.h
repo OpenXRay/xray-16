@@ -8,11 +8,11 @@ static const u32 c_VB_maxSize = 4096 * 1024; // bytes
 class VBContainer
 {
     xr_vector<VDeclarator> vDcl;
-    xr_vector<xr_vector<unsigned char>> vContainers;
+    xr_vector<xr_vector<BYTE>> vContainers;
 
     // Recording
     VDeclarator R_DCL;
-    xr_vector<unsigned char> R_DATA;
+    xr_vector<BYTE> R_DATA;
 
 public:
     // Constructor & destructor
@@ -34,7 +34,7 @@ public:
     void Add(void* PTR, u32 cnt)
     {
         R_ASSERT(R_DCL.size());
-        unsigned char* P = (unsigned char*)PTR;
+        BYTE* P = (BYTE*)PTR;
         R_DATA.insert(R_DATA.end(), P, P + cnt);
     }
     void End(u32* dwContainerID, u32* dwIndexStart)

@@ -26,11 +26,11 @@ static pcstr h_str =
 void Help() { MessageBox(nullptr, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 typedef int __cdecl xrOptions(b_params* params, u32 version, bool bRunBuild);
 
-void Startup(char* lpCmdLine)
+void Startup(LPSTR lpCmdLine)
 {
     create_global_data();
     string512 cmd;
-    bool bModifyOptions = FALSE;
+    BOOL bModifyOptions = FALSE;
 
     xr_strcpy(cmd, lpCmdLine);
     xr_strlwr(cmd);
@@ -130,7 +130,7 @@ void Startup(char* lpCmdLine)
     Logger.Destroy();
 }
 
-int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     // Initialize debugging
     xrDebug::Initialize(lpCmdLine);

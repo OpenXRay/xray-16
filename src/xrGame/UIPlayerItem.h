@@ -50,7 +50,7 @@ private:
 public:
     UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* tstate, UITeamPanels* tpanels);
     virtual ~UIPlayerItem();
-    void Init(CUIXml& uiXml, const char* playerNode, int index);
+    void Init(CUIXml& uiXml, LPCSTR playerNode, int index);
     s32 GetPlayerCheckPoints() const;
     virtual void Update();
 };

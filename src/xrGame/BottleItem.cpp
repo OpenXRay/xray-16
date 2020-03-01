@@ -13,7 +13,7 @@
 
 CBottleItem::CBottleItem(void) {}
 CBottleItem::~CBottleItem(void) { sndBreaking.destroy(); }
-void CBottleItem::Load(const char* section)
+void CBottleItem::Load(LPCSTR section)
 {
     inherited::Load(section);
 

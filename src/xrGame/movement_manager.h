@@ -159,10 +159,10 @@ protected:
 public:
     CMovementManager(CCustomMonster* object);
     virtual ~CMovementManager();
-    virtual void Load(const char* caSection);
+    virtual void Load(LPCSTR caSection);
     virtual void reinit();
-    virtual void reload(const char* caSection);
-    virtual bool net_Spawn(CSE_Abstract* data);
+    virtual void reload(LPCSTR caSection);
+    virtual BOOL net_Spawn(CSE_Abstract* data);
     virtual void net_Destroy();
     virtual void on_frame(CPHMovementControl* movement_control, Fvector& dest_position);
     IC bool actual() const;

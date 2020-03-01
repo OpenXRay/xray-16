@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "xrCore/ModuleLookup.hpp"
 
-LRESULT CALLBACK WndProc(HWND hWnd, unsigned int message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
@@ -74,7 +74,7 @@ bool TestDX11Present()
     return SUCCEEDED(hr);
 }
 
-bool xrRender_test_hw()
+BOOL xrRender_test_hw()
 {
     return TestDX11Present();
 }

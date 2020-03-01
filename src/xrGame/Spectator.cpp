@@ -495,9 +495,9 @@ void CSpectator::cam_Update(CActor* A)
     };
 }
 
-bool CSpectator::net_Spawn(CSE_Abstract* DC)
+BOOL CSpectator::net_Spawn(CSE_Abstract* DC)
 {
-    bool res = inherited::net_Spawn(DC);
+    BOOL res = inherited::net_Spawn(DC);
     if (!res)
         return FALSE;
 

@@ -47,7 +47,7 @@ configs_dumper::~configs_dumper()
 void configs_dumper::shedule_Update(u32 dt)
 {
 #ifndef LINUX // FIXME!!!
-    unsigned int thread_result = WaitForSingleObject(m_make_done_event, 0);
+    DWORD thread_result = WaitForSingleObject(m_make_done_event, 0);
     R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
     R_ASSERT(m_state == ds_active);
     if (thread_result == WAIT_OBJECT_0)
@@ -161,17 +161,17 @@ char const* cd_creation_date = "creation_date";
 void configs_dumper::sign_configs()
 {
     string64 creation_date;
-    char* tmp_player_name = NULL;
+    LPSTR tmp_player_name = NULL;
     CInifile tmp_ini(NULL, FALSE, FALSE, FALSE);
     game_cl_mp* tmp_cl_game = smart_cast<game_cl_mp*>(&Game());
     R_ASSERT(tmp_cl_game);
     STRCONCAT(tmp_player_name, "\"",
         tmp_cl_game->local_player ? tmp_cl_game->local_player->getName() : "unknown_just_connected", "\"");
-    const char* tmp_cdkey_digest = Level().get_cdkey_digest().c_str();
+    LPCSTR tmp_cdkey_digest = Level().get_cdkey_digest().c_str();
     if (!tmp_cdkey_digest)
         tmp_cdkey_digest = "null";
 
-    const char* add_str = NULL;
+    LPCSTR add_str = NULL;
     STRCONCAT(add_str, tmp_player_name, tmp_cdkey_digest, current_time(creation_date));
 
     u32 tmp_w_pos = m_dump_result.tell();
@@ -251,7 +251,7 @@ void configs_dumper::dumper_thread(void* my_ptr)
 {
     configs_dumper* this_ptr = static_cast<configs_dumper*>(my_ptr);
 #ifndef LINUX // FIXME!!!
-    unsigned int wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
+    DWORD wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
         if (!this_ptr->is_active())
@@ -299,7 +299,7 @@ void configs_dumper::realloc_compress_buffer(u32 need_size)
 }
 
 #ifdef DEBUG
-void configs_dumper::timer_begin(const char* comment)
+void configs_dumper::timer_begin(LPCSTR comment)
 {
     m_timer_comment = comment;
     m_debug_timer.Start();

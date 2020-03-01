@@ -42,7 +42,7 @@ void CFontManager::InitializeFonts()
     pFontStat->SetInterval(0.75f, 1.0f);
 }
 
-const char* CFontManager::GetFontTexName(const char* section)
+LPCSTR CFontManager::GetFontTexName(LPCSTR section)
 {
     constexpr pcstr tex_names[] = { "texture800", "texture", "texture1600" };
     int def_idx = 1; // default 1024x768
@@ -66,12 +66,12 @@ const char* CFontManager::GetFontTexName(const char* section)
     return pSettings->r_string(section, tex_names[def_idx]);
 }
 
-void CFontManager::InitializeFont(CGameFont*& F, const char* section, u32 flags)
+void CFontManager::InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
 {
-    const char* font_tex_name = GetFontTexName(section);
+    LPCSTR font_tex_name = GetFontTexName(section);
     R_ASSERT(font_tex_name);
 
-    const char* sh_name = pSettings->r_string(section, "shader");
+    LPCSTR sh_name = pSettings->r_string(section, "shader");
     if (!F)
         F = new CGameFont(sh_name, font_tex_name, flags);
     else

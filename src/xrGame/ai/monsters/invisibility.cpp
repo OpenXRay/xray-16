@@ -14,7 +14,7 @@ void CInvisibility::reinit()
     m_energy = 0.f;
 }
 
-void CInvisibility::reload(const char* section)
+void CInvisibility::reload(LPCSTR section)
 {
     timeBlink = pSettings->r_u32(section, "Invisibility_BlinkTime");
     timeBlinkInterval = pSettings->r_u32(section, "Invisibility_BlinkMicroInterval");

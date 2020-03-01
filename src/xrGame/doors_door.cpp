@@ -273,7 +273,7 @@ void door::on_change_state(door_state const state)
 }
 
 #ifdef DEBUG
-const char* door::get_name() const { return m_object.cName().c_str(); }
+LPCSTR door::get_name() const { return m_object.cName().c_str(); }
 shared_str door::get_initiators_ids() const
 {
     u32 buffer_size = 1;
@@ -282,9 +282,9 @@ shared_str door::get_initiators_ids() const
     for (; i != e; ++i)
         buffer_size += xr_strlen((*i)->get_name()) + 2;
 
-    char* const result = (char*)xr_alloca(buffer_size);
+    LPSTR const result = (LPSTR)xr_alloca(buffer_size);
     *result = 0;
-    char* j = result;
+    LPSTR j = result;
     u32 left_size = buffer_size;
     for (i = m_initiators.begin(); i != e; ++i)
     {

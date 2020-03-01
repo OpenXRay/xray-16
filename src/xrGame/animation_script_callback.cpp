@@ -7,7 +7,7 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 
 CBlend* PlayMotionByParts(
-    IKinematicsAnimated* sa, MotionID motion_ID, bool bMixIn, PlayCallback Callback, LPVOID CallbackParam)
+    IKinematicsAnimated* sa, MotionID motion_ID, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam)
 {
     CBlend* ret = 0;
     CMotionDef* md = sa->LL_GetMotionDef(motion_ID);

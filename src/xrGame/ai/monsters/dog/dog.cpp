@@ -35,7 +35,7 @@ CAI_Dog::CAI_Dog()
 }
 
 CAI_Dog::~CAI_Dog() { xr_delete(StateMan); }
-void CAI_Dog::Load(const char* section)
+void CAI_Dog::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_anim_factor = pSettings->read_if_exists<u32>(section, "anim_factor", 50);
@@ -301,7 +301,7 @@ void CAI_Dog::anim_end_reinit()
 
 bool CAI_Dog::get_custom_anim_state() { return b_state_anim; }
 void CAI_Dog::set_custom_anim_state(bool b_state_animation) { b_state_anim = b_state_animation; }
-const char* CAI_Dog::get_current_animation()
+LPCSTR CAI_Dog::get_current_animation()
 {
     switch (current_anim)
     {
@@ -342,7 +342,7 @@ const char* CAI_Dog::get_current_animation()
     }
 }
 
-void CAI_Dog::reload(const char* section)
+void CAI_Dog::reload(LPCSTR section)
 {
     inherited::reload(section);
     if (!ShadowOfChernobylMode)

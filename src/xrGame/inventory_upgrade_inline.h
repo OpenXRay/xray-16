@@ -15,12 +15,12 @@ namespace inventory
 {
 namespace upgrade
 {
-IC const char* Upgrade::section() const { return m_section.c_str(); }
+IC LPCSTR Upgrade::section() const { return m_section.c_str(); }
 IC shared_str const& Upgrade::parent_group_id() const { return m_parent_group->id(); }
 IC Group const* Upgrade::parent_group() const { return m_parent_group; }
-IC const char* Upgrade::icon_name() const { return m_icon.c_str(); }
-IC const char* Upgrade::name() const { return m_name.c_str(); }
-IC const char* Upgrade::description_text() const { return m_description.c_str(); }
+IC LPCSTR Upgrade::icon_name() const { return m_icon.c_str(); }
+IC LPCSTR Upgrade::name() const { return m_name.c_str(); }
+IC LPCSTR Upgrade::description_text() const { return m_description.c_str(); }
 IC bool Upgrade::get_highlight() const { return m_highlight; }
 IC shared_str const& Upgrade::get_property_name(u8 index) const
 {

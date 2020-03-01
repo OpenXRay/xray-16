@@ -80,7 +80,7 @@ void xrMU_Model::calc_lighting(
 
     // Disable faces if needed
     /*
-    bool bDisableFaces			= flags&LP_UseFaceDisable;
+    BOOL bDisableFaces			= flags&LP_UseFaceDisable;
     if	(bDisableFaces)
         for (I=0; I<m_faces.size(); I++)	m_faces[I]->flags.bDisableShadowCast	= true;
     */
@@ -141,7 +141,7 @@ void xrMU_Model::calc_lighting(
             ++it2;
 
         // Search
-        bool found = FALSE;
+        BOOL found = FALSE;
         for (; it != it2; ++it)
         {
             v_vertices& VL = it->second;

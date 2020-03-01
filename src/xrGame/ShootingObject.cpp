@@ -50,7 +50,7 @@ CShootingObject::CShootingObject(void)
 }
 CShootingObject::~CShootingObject(void) {}
 void CShootingObject::reinit() { m_pFlameParticles = NULL; }
-void CShootingObject::Load(const char* section)
+void CShootingObject::Load(LPCSTR section)
 {
     if (pSettings->line_exist(section, "light_disabled"))
     {
@@ -94,7 +94,7 @@ void CShootingObject::Light_Create()
 }
 
 void CShootingObject::Light_Destroy() { light_render.destroy(); }
-void CShootingObject::LoadFireParams(const char* section)
+void CShootingObject::LoadFireParams(LPCSTR section)
 {
     string32 buffer;
     shared_str s_sHitPower;
@@ -159,7 +159,7 @@ void CShootingObject::LoadFireParams(const char* section)
     }
 }
 
-void CShootingObject::LoadLights(const char* section, const char* prefix)
+void CShootingObject::LoadLights(LPCSTR section, LPCSTR prefix)
 {
     string256 full_name;
     // light
@@ -214,7 +214,7 @@ void CShootingObject::Light_Render(const Fvector& P)
 //////////////////////////////////////////////////////////////////////////
 
 void CShootingObject::StartParticles(
-    CParticlesObject*& pParticles, const char* particles_name, const Fvector& pos, const Fvector& vel, bool auto_remove_flag)
+    CParticlesObject*& pParticles, LPCSTR particles_name, const Fvector& pos, const Fvector& vel, bool auto_remove_flag)
 {
     if (!particles_name)
         return;
@@ -225,7 +225,7 @@ void CShootingObject::StartParticles(
         return;
     }
 
-    pParticles = CParticlesObject::Create(particles_name, (bool)auto_remove_flag);
+    pParticles = CParticlesObject::Create(particles_name, (BOOL)auto_remove_flag);
 
     UpdateParticles(pParticles, pos, vel);
     CSpectator* tmp_spectr = smart_cast<CSpectator*>(Level().CurrentControlEntity());
@@ -263,7 +263,7 @@ void CShootingObject::UpdateParticles(CParticlesObject*& pParticles, const Fvect
     }
 }
 
-void CShootingObject::LoadShellParticles(const char* section, const char* prefix)
+void CShootingObject::LoadShellParticles(LPCSTR section, LPCSTR prefix)
 {
     string256 full_name;
     strconcat(sizeof(full_name), full_name, prefix, "shell_particles");
@@ -276,7 +276,7 @@ void CShootingObject::LoadShellParticles(const char* section, const char* prefix
     }
 }
 
-void CShootingObject::LoadFlameParticles(const char* section, const char* prefix)
+void CShootingObject::LoadFlameParticles(LPCSTR section, LPCSTR prefix)
 {
     string256 full_name;
 

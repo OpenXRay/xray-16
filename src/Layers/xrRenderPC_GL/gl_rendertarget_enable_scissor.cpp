@@ -4,7 +4,7 @@
 
 //extern Fvector du_cone_vertices			[DU_CONE_NUMVERTEX];
 
-bool tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fvector& v2)
+BOOL tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fvector& v2)
 {
     Fvector e0, e1;
     return CDB::TestSphereTri(SC, R, v0, e0.sub(v1, v0), e1.sub(v2, v0));
@@ -38,7 +38,7 @@ void CRenderTarget::enable_dbt_bounds(light* L)
 }
 
 // nv-DBT
-bool CRenderTarget::u_DBT_enable(float zMin, float zMax)
+BOOL CRenderTarget::u_DBT_enable(float zMin, float zMax)
 {
     if (!RImplementation.o.nvdbt) return FALSE;
     if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT)) return FALSE;
@@ -48,8 +48,8 @@ bool CRenderTarget::u_DBT_enable(float zMin, float zMax)
     //	TODO: DX10: Check if DX10 supports this feature
     // enable cheat
     //HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X,MAKEFOURCC('N','V','D','B'));
-    //HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z,*(unsigned int*)&zMin);
-    //HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W,*(unsigned int*)&zMax); 
+    //HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z,*(DWORD*)&zMin);
+    //HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W,*(DWORD*)&zMax); 
 
     //return TRUE;
 }
@@ -61,12 +61,12 @@ void CRenderTarget::u_DBT_disable()
     //	HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X,0);
 }
 
-bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
+BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 {
     // Msg	("%d: %x type(%d), pos(%f,%f,%f)",Device.dwFrame,u32(L),u32(L->flags.type),VPUSH(L->position));
 
     // Near plane intersection
-    bool near_intersect = FALSE;
+    BOOL near_intersect = FALSE;
     {
         Fmatrix& M = Device.mFullTransform;
         Fvector4 plane;
@@ -133,7 +133,7 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 		iVP.transform	(s_points[3],s_points_pp[3]);
 
 		// 4. check intersection of two triangles with (spatial, enclosing) sphere
-		bool	bIntersect	= tri_vs_sphere_intersect	(
+		BOOL	bIntersect	= tri_vs_sphere_intersect	(
 			L->spatial.sphere.P,L->spatial.sphere.R,
 			s_points[0],s_points[1],s_points[2]
 			);
@@ -159,7 +159,7 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 /*
 {
 	Fmatrix& M						= RCache.xforms.m_wvp;
-	bool	bIntersect				= FALSE;
+	BOOL	bIntersect				= FALSE;
 	for (u32 vit=0; vit<DU_CONE_NUMVERTEX; vit++)	{
 		Fvector&	v	= du_cone_vertices[vit];
 		float _z = v.x*M._13 + v.y*M._23 + v.z*M._33 + M._43;

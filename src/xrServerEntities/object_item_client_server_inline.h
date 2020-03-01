@@ -15,7 +15,7 @@
 #define CSObjectItemClientServer CObjectItemClientServer<_client_type, _server_type>
 
 TEMPLATE_SPECIALIZATION
-IC CSObjectItemClientServer::CObjectItemClientServer(const CLASS_ID& clsid, const char* script_clsid)
+IC CSObjectItemClientServer::CObjectItemClientServer(const CLASS_ID& clsid, LPCSTR script_clsid)
     : inherited(clsid, script_clsid)
 {
 }
@@ -29,7 +29,7 @@ ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServer::client_object() 
 #endif
 
 TEMPLATE_SPECIALIZATION
-ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServer::server_object(const char* section) const
+ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServer::server_object(LPCSTR section) const
 {
     ObjectFactory::ServerObjectBaseClass* o = (new SERVER_TYPE(section))->init();
     R_ASSERT(o);
@@ -47,7 +47,7 @@ ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServer::server_object(co
     CObjectItemClientServerSingleMp<_client_type_single, _client_type_mp, _server_type_single, _server_type_mp>
 
 TEMPLATE_SPECIALIZATION
-IC CSObjectItemClientServerSingleMp::CObjectItemClientServerSingleMp(const CLASS_ID& clsid, const char* script_clsid)
+IC CSObjectItemClientServerSingleMp::CObjectItemClientServerSingleMp(const CLASS_ID& clsid, LPCSTR script_clsid)
     : inherited(clsid, script_clsid)
 {
 }
@@ -62,7 +62,7 @@ ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServerSingleMp::client_o
 }
 
 TEMPLATE_SPECIALIZATION
-ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServerSingleMp::server_object(const char* section) const
+ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServerSingleMp::server_object(LPCSTR section) const
 {
     ObjectFactory::ServerObjectBaseClass* result =
         IsGameTypeSingle() ? new _server_type_single(section) : new _server_type_mp(section);

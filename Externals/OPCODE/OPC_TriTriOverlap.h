@@ -81,7 +81,7 @@
 }
 
 //! TO BE DOCUMENTED
-bool CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Point& v2, const Point& u0, const Point& u1,
+BOOL CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Point& v2, const Point& u0, const Point& u1,
     const Point& u2)
 {
     float A[3];
@@ -208,7 +208,7 @@ bool CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Poin
  *	\return		true if triangles overlap
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ bool AABBTreeCollider::TriTriOverlap(
+inline_ BOOL AABBTreeCollider::TriTriOverlap(
     const Point& V0, const Point& V1, const Point& V2, const Point& U0, const Point& U1, const Point& U2)
 {
     // Stats

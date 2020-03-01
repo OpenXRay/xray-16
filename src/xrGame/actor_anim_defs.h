@@ -8,7 +8,7 @@ struct SAnimState
     MotionID legs_back;
     MotionID legs_ls;
     MotionID legs_rs;
-    void Create(IKinematicsAnimated* K, const char* base0, const char* base1);
+    void Create(IKinematicsAnimated* K, LPCSTR base0, LPCSTR base1);
 };
 
 struct STorsoWpn
@@ -39,7 +39,7 @@ struct STorsoWpn
     MotionID all_attack_0;
     MotionID all_attack_1;
     MotionID all_attack_2;
-    void Create(IKinematicsAnimated* K, const char* base0, const char* base1);
+    void Create(IKinematicsAnimated* K, LPCSTR base0, LPCSTR base1);
 };
 
 #define _total_anim_slots_ 13
@@ -59,7 +59,7 @@ struct SActorState
     MotionID m_head_idle;
 
     MotionID m_damage[DAMAGE_FX_COUNT];
-    void Create(IKinematicsAnimated* K, const char* base);
+    void Create(IKinematicsAnimated* K, LPCSTR base);
     void CreateClimb(IKinematicsAnimated* K);
 };
 

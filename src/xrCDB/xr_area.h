@@ -36,15 +36,15 @@ public:
 #endif
 
 private:
-    bool _RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
+    BOOL _RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
         collide::ray_cache* cache, IGameObject* ignore_object);
-    bool _RayPick(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt, collide::rq_result& R,
+    BOOL _RayPick(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt, collide::rq_result& R,
         IGameObject* ignore_object);
-    bool _RayQuery(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
+    BOOL _RayQuery(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
         collide::test_callback* tb, IGameObject* ignore_object);
-    bool _RayQuery2(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
+    BOOL _RayQuery2(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
         collide::test_callback* tb, IGameObject* ignore_object);
-    bool _RayQuery3(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
+    BOOL _RayQuery3(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
         collide::test_callback* tb, IGameObject* ignore_object);
 
 public:
@@ -52,21 +52,21 @@ public:
     ~CObjectSpace();
 
     void Load(CDB::build_callback build_callback);
-    void Load(const char* path, const char* fname, CDB::build_callback build_callback);
+    void Load(LPCSTR path, LPCSTR fname, CDB::build_callback build_callback);
     void Load(IReader* R, CDB::build_callback build_callback);
     void Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback);
     // Occluded/No
-    bool RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
+    BOOL RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
         collide::ray_cache* cache, IGameObject* ignore_object);
 
     // Game raypick (nearest) - returns object and addititional params
-    bool RayPick(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt, collide::rq_result& R,
+    BOOL RayPick(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt, collide::rq_result& R,
         IGameObject* ignore_object);
 
     // General collision query
-    bool RayQuery(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
+    BOOL RayQuery(collide::rq_results& dest, const collide::ray_defs& rq, collide::rq_callback* cb, LPVOID user_data,
         collide::test_callback* tb, IGameObject* ignore_object);
-    bool RayQuery(collide::rq_results& dest, ICollisionForm* target, const collide::ray_defs& rq);
+    BOOL RayQuery(collide::rq_results& dest, ICollisionForm* target, const collide::ray_defs& rq);
 
     bool BoxQuery(Fvector const& box_center, Fvector const& box_z_axis, Fvector const& box_y_axis,
         Fvector const& box_sizes, xr_vector<Fvector>* out_tris);

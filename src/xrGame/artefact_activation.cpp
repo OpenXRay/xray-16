@@ -39,7 +39,7 @@ void SArtefactActivation::Load()
     for (int i = 0; i < (int)eMax; ++i)
         m_activation_states.push_back(SStateDef());
 
-    const char* activation_seq = pSettings->r_string(*m_af->cNameSect(), "artefact_activation_seq");
+    LPCSTR activation_seq = pSettings->r_string(*m_af->cNameSect(), "artefact_activation_seq");
 
     m_activation_states[(int)eStarting].Load(activation_seq, "starting");
     m_activation_states[(int)eFlying].Load(activation_seq, "flying");
@@ -166,10 +166,10 @@ void SArtefactActivation::SpawnAnomaly()
 {
     VERIFY(!physics_world()->Processing());
     string128 tmp;
-    const char* str = pSettings->r_string("artefact_spawn_zones", *m_af->cNameSect());
+    LPCSTR str = pSettings->r_string("artefact_spawn_zones", *m_af->cNameSect());
     VERIFY3(3 == _GetItemCount(str), "Bad record format in artefact_spawn_zones", str);
     float zone_radius = (float)atof(_GetItem(str, 1, tmp));
-    const char* zone_sect = _GetItem(str, 0, tmp); // must be last call of _GetItem... (const char* !!!)
+    LPCSTR zone_sect = _GetItem(str, 0, tmp); // must be last call of _GetItem... (LPCSTR !!!)
 
     Fvector pos;
     m_af->Center(pos);
@@ -194,7 +194,7 @@ void SArtefactActivation::SpawnAnomaly()
     Msg("artefact [%s] spawned a zone [%s] at [%f]", *m_af->cName(), zone_sect, Device.fTimeGlobal);
     //. #endif
 }
-shared_str clear_brackets(const char* src)
+shared_str clear_brackets(LPCSTR src)
 {
     if (0 == src)
         return shared_str(0);
@@ -214,9 +214,9 @@ shared_str clear_brackets(const char* src)
     return shared_str(_original);
 }
 
-void SArtefactActivation::SStateDef::Load(const char* section, const char* name)
+void SArtefactActivation::SStateDef::Load(LPCSTR section, LPCSTR name)
 {
-    const char* str = pSettings->r_string(section, name);
+    LPCSTR str = pSettings->r_string(section, name);
     VERIFY(_GetItemCount(str) == 8);
 
     string128 tmp;

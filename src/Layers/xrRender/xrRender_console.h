@@ -200,6 +200,6 @@ enum
 };
 
 extern void xrRender_initconsole();
-extern bool xrRender_test_hw();
+extern BOOL xrRender_test_hw();
 
 #endif

@@ -10,8 +10,8 @@
 
 bool ped_sort_pred(const PS::CPEDef* a, const PS::CPEDef* b) { return xr_strcmp(a->Name(), b->Name()) < 0; }
 bool pgd_sort_pred(const PS::CPGDef* a, const PS::CPGDef* b) { return xr_strcmp(a->m_Name, b->m_Name) < 0; }
-bool ped_find_pred(const PS::CPEDef* a, const char* b) { return xr_strcmp(a->Name(), b) < 0; }
-bool pgd_find_pred(const PS::CPGDef* a, const char* b) { return xr_strcmp(a->m_Name, b) < 0; }
+bool ped_find_pred(const PS::CPEDef* a, LPCSTR b) { return xr_strcmp(a->Name(), b) < 0; }
+bool pgd_find_pred(const PS::CPGDef* a, LPCSTR b) { return xr_strcmp(a->m_Name, b) < 0; }
 //----------------------------------------------------
 void CPSLibrary::OnCreate()
 {
@@ -43,7 +43,7 @@ void CPSLibrary::OnDestroy()
     m_PGDs.clear();
 }
 //----------------------------------------------------
-PS::PEDIt CPSLibrary::FindPEDIt(const char* Name)
+PS::PEDIt CPSLibrary::FindPEDIt(LPCSTR Name)
 {
     if (!Name)
         return m_PEDs.end();
@@ -60,13 +60,13 @@ PS::PEDIt CPSLibrary::FindPEDIt(const char* Name)
 #endif
 }
 
-PS::CPEDef* CPSLibrary::FindPED(const char* Name)
+PS::CPEDef* CPSLibrary::FindPED(LPCSTR Name)
 {
     PS::PEDIt it = FindPEDIt(Name);
     return (it == m_PEDs.end()) ? 0 : *it;
 }
 
-PS::PGDIt CPSLibrary::FindPGDIt(const char* Name)
+PS::PGDIt CPSLibrary::FindPGDIt(LPCSTR Name)
 {
     if (!Name)
         return m_PGDs.end();
@@ -83,19 +83,19 @@ PS::PGDIt CPSLibrary::FindPGDIt(const char* Name)
 #endif
 }
 
-PS::CPGDef* CPSLibrary::FindPGD(const char* Name)
+PS::CPGDef* CPSLibrary::FindPGD(LPCSTR Name)
 {
     PS::PGDIt it = FindPGDIt(Name);
     return (it == m_PGDs.end()) ? 0 : *it;
 }
 
-void CPSLibrary::RenamePED(PS::CPEDef* src, const char* new_name)
+void CPSLibrary::RenamePED(PS::CPEDef* src, LPCSTR new_name)
 {
     R_ASSERT(src && new_name && new_name[0]);
     src->SetName(new_name);
 }
 
-void CPSLibrary::RenamePGD(PS::CPGDef* src, const char* new_name)
+void CPSLibrary::RenamePGD(PS::CPGDef* src, LPCSTR new_name)
 {
     R_ASSERT(src && new_name && new_name[0]);
     src->SetName(new_name);

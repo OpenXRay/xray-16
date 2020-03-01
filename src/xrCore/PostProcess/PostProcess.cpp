@@ -32,7 +32,7 @@ void BasicPostProcessAnimator::Clear()
         xr_delete(m_Params[a]);
 }
 
-void BasicPostProcessAnimator::Load(const char* name, bool internalFs /*= true*/)
+void BasicPostProcessAnimator::Load(LPCSTR name, bool internalFs /*= true*/)
 {
     m_Name = name;
     string_path full_path;
@@ -47,7 +47,7 @@ void BasicPostProcessAnimator::Load(const char* name, bool internalFs /*= true*/
     else
         xr_strcpy(full_path, name);
 
-    const char* ext = strext(full_path);
+    LPCSTR ext = strext(full_path);
     if (ext)
     {
         if (!xr_strcmp(ext, POSTPROCESS_FILE_EXTENSION))
@@ -200,7 +200,7 @@ CPostProcessParam* BasicPostProcessAnimator::GetParam(pp_params param)
     return m_Params[param];
 }
 
-void BasicPostProcessAnimator::Save(const char* name)
+void BasicPostProcessAnimator::Save(LPCSTR name)
 {
     IWriter* W = FS.w_open(name);
     VERIFY(W);

@@ -122,7 +122,7 @@ public:
     virtual bool get_ApplyByGravity() = 0;
 
     virtual void SetMaterial(u16 m) = 0;
-    virtual void SetMaterial(const char* m) = 0;
+    virtual void SetMaterial(LPCSTR m) = 0;
     virtual void set_DisableParams(const SAllDDOParams& params) = 0;
     virtual void SetTransform(const Fmatrix& m0, motion_history_state history_state) = 0;
 #ifdef DEBUG
@@ -331,7 +331,7 @@ public:
     virtual void SetIgnoreRagDoll() = 0;
     virtual const CLBits& collide_bits() const = 0;
     virtual const _flags<CLClassBits>& collide_class_bits() const = 0;
-    virtual void CreateShellAnimator(CInifile const* ini, const char* section) = 0;
+    virtual void CreateShellAnimator(CInifile const* ini, LPCSTR section) = 0;
     virtual void SetIgnoreAnimated() = 0;
     //	virtual			bool						Animated									()
     //=
@@ -366,7 +366,7 @@ public:
     virtual ELEMENT_STORAGE& Elements() = 0;
     virtual CPhysicsElement* get_Element(u16 bone_id) = 0;
     virtual CPhysicsElement* get_Element(const shared_str& bone_name) = 0;
-    virtual CPhysicsElement* get_Element(const char* bone_name) = 0;
+    virtual CPhysicsElement* get_Element(LPCSTR bone_name) = 0;
     virtual CPhysicsElement* get_ElementByStoreOrder(u16 num) = 0;
     virtual const CPhysicsElement* get_ElementByStoreOrder(u16 num) const = 0;
     virtual CPhysicsElement* get_PhysicsParrentElement(u16 bone_id) = 0;
@@ -374,7 +374,7 @@ public:
     virtual CPHSynchronize* get_ElementSync(u16 element) = 0;
     virtual CPhysicsJoint* get_Joint(u16 bone_id) = 0;
     virtual CPhysicsJoint* get_Joint(const shared_str& bone_name) = 0;
-    virtual CPhysicsJoint* get_Joint(const char* bone_name) = 0;
+    virtual CPhysicsJoint* get_Joint(LPCSTR bone_name) = 0;
     virtual CPhysicsJoint* get_JointByStoreOrder(u16 num) = 0;
     virtual u16 get_JointsNumber() = 0;
     virtual CODEGeom* get_GeomByID(u16 bone_id) = 0;
@@ -409,7 +409,7 @@ public:
     virtual void ZeroCallbacks() = 0;
     virtual void ResetCallbacks(u16 id, Flags64& mask) = 0;
     virtual void SetCallbacks() = 0;
-    virtual void EnabledCallbacks(bool val) = 0;
+    virtual void EnabledCallbacks(BOOL val) = 0;
     virtual void ToAnimBonesPositions(motion_history_state history_state) = 0;
     virtual bool AnimToVelocityState(float dt, float l_limit, float a_limit) = 0;
     virtual void SetBonesCallbacksOverwrite(bool v) = 0;
@@ -431,17 +431,17 @@ XRPHYSICS_API CPhysicsJoint* P_create_Joint(
 XRPHYSICS_API CPhysicsElement* P_create_Element();
 XRPHYSICS_API CPhysicsShell* P_create_Shell();
 XRPHYSICS_API CPhysicsShell* P_create_splited_Shell();
-XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, const char* fixed_bones);
+XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, LPCSTR fixed_bones);
 XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, U16Vec& fixed_bones);
 XRPHYSICS_API CPhysicsShell* P_build_Shell(
-    IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map, const char* fixed_bones);
+    IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map, LPCSTR fixed_bones);
 
 extern "C" XRPHYSICS_API CPhysicsShell* __stdcall P_build_Shell(
     IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map = 0, bool not_set_bone_callbacks = false);
 
 XRPHYSICS_API CPhysicsShell* P_build_SimpleShell(IPhysicsShellHolder* obj, float mass, bool not_active_state);
 XRPHYSICS_API void ApplySpawnIniToPhysicShell(CInifile const* ini, CPhysicsShell* physics_shell, bool fixed);
-void fix_bones(const char* fixed_bones, CPhysicsShell* shell);
+void fix_bones(LPCSTR fixed_bones, CPhysicsShell* shell);
 
 extern "C" XRPHYSICS_API void __stdcall destroy_physics_shell(CPhysicsShell*& p);
 

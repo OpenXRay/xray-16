@@ -20,7 +20,7 @@ void CPPEffectorPsyDogAura::switch_off()
     m_time_state_started = Device.dwTimeGlobal;
 }
 
-bool CPPEffectorPsyDogAura::update()
+BOOL CPPEffectorPsyDogAura::update()
 {
     // update factor
     if (m_effector_state == eStatePermanent)

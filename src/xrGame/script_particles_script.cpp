@@ -14,7 +14,7 @@ using namespace luabind;
 
 SCRIPT_EXPORT(CScriptParticles, (), {
     module(luaState)[class_<CScriptParticles>("particles_object")
-                         .def(constructor<const char*>())
+                         .def(constructor<LPCSTR>())
                          .def("play", &CScriptParticles::Play)
                          .def("play_at_pos", &CScriptParticles::PlayAtPos)
                          .def("stop", &CScriptParticles::Stop)

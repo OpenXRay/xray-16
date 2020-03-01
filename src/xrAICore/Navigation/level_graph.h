@@ -254,7 +254,7 @@ IC bool operator>(const u32& vertex_xz, const CLevelGraph::CLevelVertex& vertex)
 IC bool operator==(const u32& vertex_xz, const CLevelGraph::CLevelVertex& vertex);
 
 #if defined(DEBUG) && !defined(AI_COMPILER)
-extern bool g_bDebugNode;
+extern BOOL g_bDebugNode;
 extern u32 g_dwDebugNodeSource;
 extern u32 g_dwDebugNodeDest;
 #endif

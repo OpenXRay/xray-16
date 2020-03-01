@@ -37,7 +37,7 @@ public:
             m_Time1 = 0;
         }
 #ifdef _EDITOR
-        bool Equal(const SEffect&);
+        BOOL Equal(const SEffect&);
 #endif
     };
 
@@ -50,20 +50,20 @@ public:
     void __stdcall OnEffectEditClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
     void __stdcall OnControlClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
     void __stdcall OnParamsChange(PropValue* sender);
-    void FillProp(const char* pref, ::PropItemVec& items, ::ListItem* owner);
-    bool Equal(const CPGDef* pe);
+    void FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner);
+    BOOL Equal(const CPGDef* pe);
     bool Validate(bool bMsg);
 #endif
 public:
     CPGDef();
     ~CPGDef();
-    void SetName(const char* name);
+    void SetName(LPCSTR name);
 
     void Save(IWriter& F);
-    bool Load(IReader& F);
+    BOOL Load(IReader& F);
 
     void Save2(CInifile& ini);
-    bool Load2(CInifile& ini);
+    BOOL Load2(CInifile& ini);
 
 #ifdef _EDITOR
     void Clone(CPGDef* source);
@@ -100,17 +100,17 @@ public:
         void OnDeviceCreate();
         void OnDeviceDestroy();
 
-        void StartRelatedChild(CParticleEffect* emitter, const char* eff_name, PAPI::Particle& m);
+        void StartRelatedChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m);
         void StopRelatedChild(u32 idx);
-        void StartFreeChild(CParticleEffect* emitter, const char* eff_name, PAPI::Particle& m);
+        void StartFreeChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m);
 
-        void UpdateParent(const Fmatrix& m, const Fvector& velocity, bool bXFORM);
+        void UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM);
         void OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& box, bool& bPlaying);
 
         u32 ParticlesCount();
         bool IsPlaying() const;
         void Play();
-        void Stop(bool def_stop);
+        void Stop(BOOL def_stop);
     };
     using SItemVec = xr_vector<SItem>;
     SItemVec items;
@@ -132,16 +132,16 @@ public:
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
 
-    virtual void UpdateParent(const Fmatrix& m, const Fvector& velocity, bool bXFORM);
+    virtual void UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM);
 
-    bool Compile(CPGDef* def);
+    BOOL Compile(CPGDef* def);
 
     const CPGDef* GetDefinition() { return m_Def; }
     virtual void Play();
-    virtual void Stop(bool bDefferedStop = TRUE);
-    virtual bool IsPlaying() { return m_RT_Flags.is(flRT_Playing); }
-    virtual void SetHudMode(bool b);
-    virtual bool GetHudMode();
+    virtual void Stop(BOOL bDefferedStop = TRUE);
+    virtual BOOL IsPlaying() { return m_RT_Flags.is(flRT_Playing); }
+    virtual void SetHudMode(BOOL b);
+    virtual BOOL GetHudMode();
 
     virtual float GetTimeLimit()
     {

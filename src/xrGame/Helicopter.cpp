@@ -73,7 +73,7 @@ void CHelicopter::reinit()
     m_enemy.reinit();
 };
 
-void CHelicopter::Load(const char* section)
+void CHelicopter::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_movement.Load(section);
@@ -117,18 +117,18 @@ void CHelicopter::Load(const char* section)
     m_light_color = pSettings->r_fcolor(section, "light_color");
     m_light_color.a = 1.f;
     m_light_color.mul_rgb(m_light_brightness);
-    const char* lanim = pSettings->r_string(section, "light_color_animmator");
+    LPCSTR lanim = pSettings->r_string(section, "light_color_animmator");
     m_lanim = LALib.FindItem(lanim);
 }
 
-void CHelicopter::reload(const char* section) { inherited::reload(section); }
+void CHelicopter::reload(LPCSTR section) { inherited::reload(section); }
 void CollisionCallbackAlife(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
     do_colide = false;
 }
 
 void ContactCallbackAlife(CDB::TRI* T, dContactGeom* c) {}
-bool CHelicopter::net_Spawn(CSE_Abstract* DC)
+BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
 {
     SetfHealth(100.0f);
     setState(CHelicopter::eAlive);
@@ -167,13 +167,13 @@ bool CHelicopter::net_Spawn(CSE_Abstract* DC)
     CExplosive::Load(pUserData, "explosion");
     CExplosive::SetInitiator(ID());
 
-    const char* s = pUserData->r_string("helicopter_definition", "hit_section");
+    LPCSTR s = pUserData->r_string("helicopter_definition", "hit_section");
 
     if (pUserData->section_exist(s))
     {
         int lc = pUserData->line_count(s);
-        const char* name;
-        const char* value;
+        LPCSTR name;
+        LPCSTR value;
         s16 boneID;
         for (int i = 0; i < lc; ++i)
         {
@@ -445,7 +445,7 @@ void CHelicopter::shedule_Update(u32 time_delta)
         ExplodeHelicopter();
 }
 
-void CHelicopter::goPatrolByPatrolPath(const char* path_name, int start_idx)
+void CHelicopter::goPatrolByPatrolPath(LPCSTR path_name, int start_idx)
 {
     m_movement.goPatrolByPatrolPath(path_name, start_idx);
 }

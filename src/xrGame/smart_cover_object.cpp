@@ -20,7 +20,7 @@
 #include "xrEngine/xr_collide_form.h"
 using smart_cover::object;
 
-void object::Load(const char* section)
+void object::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -28,7 +28,7 @@ void object::Load(const char* section)
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
 }
 
-bool object::net_Spawn(CSE_Abstract* server_entity)
+BOOL object::net_Spawn(CSE_Abstract* server_entity)
 {
     CSE_SmartCover* smart_cover = smart_cast<CSE_SmartCover*>(server_entity);
     VERIFY(smart_cover);

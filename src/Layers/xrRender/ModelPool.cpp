@@ -74,7 +74,7 @@ dxRender_Visual* CModelPool::Instance_Duplicate(dxRender_Visual* V)
     return N;
 }
 
-dxRender_Visual* CModelPool::Instance_Load(const char* N, bool allow_register)
+dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
 {
     dxRender_Visual* V;
     string_path fn;
@@ -126,7 +126,7 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, bool allow_register)
     return V;
 }
 
-dxRender_Visual* CModelPool::Instance_Load(const char* name, IReader* data, bool allow_register)
+dxRender_Visual* CModelPool::Instance_Load(LPCSTR name, IReader* data, BOOL allow_register)
 {
     dxRender_Visual* V;
 
@@ -141,7 +141,7 @@ dxRender_Visual* CModelPool::Instance_Load(const char* name, IReader* data, bool
     return V;
 }
 
-void CModelPool::Instance_Register(const char* N, dxRender_Visual* V)
+void CModelPool::Instance_Register(LPCSTR N, dxRender_Visual* V)
 {
     // Registration
     ModelDef M;
@@ -195,7 +195,7 @@ CModelPool::~CModelPool()
     xr_delete(g_pMotionsContainer);
 }
 
-dxRender_Visual* CModelPool::Instance_Find(const char* N)
+dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
 {
     dxRender_Visual* Model = nullptr;
     xr_vector<ModelDef>::iterator I;
@@ -260,7 +260,7 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
     }
 }
 
-dxRender_Visual* CModelPool::CreateChild(const char* name, IReader* data)
+dxRender_Visual* CModelPool::CreateChild(LPCSTR name, IReader* data)
 {
     string256 low_name;
     VERIFY(xr_strlen(name) < 256);
@@ -284,8 +284,8 @@ dxRender_Visual* CModelPool::CreateChild(const char* name, IReader* data)
     return Model;
 }
 
-extern bool ENGINE_API g_bRendering;
-void CModelPool::DeleteInternal(dxRender_Visual*& V, bool bDiscard)
+extern BOOL ENGINE_API g_bRendering;
+void CModelPool::DeleteInternal(dxRender_Visual*& V, BOOL bDiscard)
 {
     VERIFY(!g_bRendering);
     if (!V)
@@ -313,7 +313,7 @@ void CModelPool::DeleteInternal(dxRender_Visual*& V, bool bDiscard)
     V = nullptr;
 }
 
-void CModelPool::Delete(dxRender_Visual*& V, bool bDiscard)
+void CModelPool::Delete(dxRender_Visual*& V, BOOL bDiscard)
 {
     if (nullptr == V)
         return;
@@ -404,7 +404,7 @@ void CModelPool::Prefetch()
     Logging(TRUE);
 }
 
-void CModelPool::ClearPool(bool b_complete)
+void CModelPool::ClearPool(BOOL b_complete)
 {
     POOL_IT _I = Pool.begin();
     POOL_IT _E = Pool.end();

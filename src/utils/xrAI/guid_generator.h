@@ -12,4 +12,4 @@
 
 // XXX: move to xrCore
 ENGINE_API extern xrGUID generate_guid();
-ENGINE_API extern const char* generate_guid(const xrGUID& guid, char* buffer, const size_t& buffer_size);
+ENGINE_API extern LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const size_t& buffer_size);

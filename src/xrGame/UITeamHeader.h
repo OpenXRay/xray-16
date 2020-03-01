@@ -36,7 +36,7 @@ private:
 public:
     UITeamHeader(UITeamState const* const parent);
     virtual ~UITeamHeader();
-    void Init(CUIXml& uiXml, const char* path);
+    void Init(CUIXml& uiXml, LPCSTR path);
     virtual void Update();
 
 protected:

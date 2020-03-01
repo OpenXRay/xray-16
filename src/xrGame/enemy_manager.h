@@ -51,7 +51,7 @@ protected:
 
 public:
     CEnemyManager(CCustomMonster* object);
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual bool useful(const CEntityAlive* object) const;
     virtual bool is_useful(const CEntityAlive* object) const;
     virtual float evaluate(const CEntityAlive* object) const;

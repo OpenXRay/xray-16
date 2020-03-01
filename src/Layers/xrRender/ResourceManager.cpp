@@ -20,11 +20,11 @@
 #include "blenders/Blender_Recorder.h"
 
 //	Already defined in Texture.cpp
-void fix_texture_name(char* fn);
+void fix_texture_name(LPSTR fn);
 /*
-void fix_texture_name(char* fn)
+void fix_texture_name(LPSTR fn)
 {
-    char* _ext = strext(fn);
+    LPSTR _ext = strext(fn);
     if (_ext &&
         (0==xr_stricmp(_ext, ".tga") ||
         0==xr_stricmp(_ext, ".dds") ||
@@ -49,11 +49,11 @@ bool reclaim(xr_vector<T*>& vec, const T* ptr)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-IBlender* CResourceManager::_GetBlender(const char* Name)
+IBlender* CResourceManager::_GetBlender(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
 
-    char* N = (char*)(Name);
+    LPSTR N = LPSTR(Name);
     map_Blender::iterator I = m_blenders.find(N);
 
     if (I == m_blenders.end())
@@ -65,12 +65,12 @@ IBlender* CResourceManager::_GetBlender(const char* Name)
     return I->second;
 }
 
-IBlender* CResourceManager::_FindBlender(const char* Name)
+IBlender* CResourceManager::_FindBlender(LPCSTR Name)
 {
     if (!(Name && Name[0]))
         return nullptr;
 
-    char* N = (char*)(Name);
+    LPSTR N = LPSTR(Name);
     map_Blender::iterator I = m_blenders.find(N);
     if (I == m_blenders.end())
         return nullptr;
@@ -78,9 +78,9 @@ IBlender* CResourceManager::_FindBlender(const char* Name)
         return I->second;
 }
 
-void CResourceManager::ED_UpdateBlender(const char* Name, IBlender* data)
+void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
 {
-    char* N = (char*)(Name);
+    LPSTR N = LPSTR(Name);
     map_Blender::iterator I = m_blenders.find(N);
     if (I != m_blenders.end())
     {
@@ -97,7 +97,7 @@ void CResourceManager::ED_UpdateBlender(const char* Name, IBlender* data)
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-void CResourceManager::_ParseList(sh_list& dest, const char* names)
+void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 {
     if (nullptr == names || 0 == names[0])
         names = "$null";
@@ -163,7 +163,7 @@ void CResourceManager::_DeleteElement(const ShaderElement* S)
 }
 
 Shader* CResourceManager::_cpp_Create(
-    IBlender* B, const char* s_shader, const char* s_textures, const char* s_constants, const char* s_matrices)
+    IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
     CBlender_Compile C;
     Shader S;
@@ -256,7 +256,7 @@ Shader* CResourceManager::_cpp_Create(
     return N;
 }
 
-Shader* CResourceManager::_cpp_Create(const char* s_shader, const char* s_textures, const char* s_constants, const char* s_matrices)
+Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
     if (!GEnv.isDedicatedServer)
     {
@@ -305,7 +305,7 @@ void CResourceManager::CompatibilityCheck()
     FS.r_close(file);
 }
 
-Shader* CResourceManager::Create(IBlender* B, const char* s_shader, const char* s_textures, const char* s_constants, const char* s_matrices)
+Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
     if (GEnv.isDedicatedServer)
         return nullptr;
@@ -313,7 +313,7 @@ Shader* CResourceManager::Create(IBlender* B, const char* s_shader, const char* 
     return _cpp_Create(B, s_shader, s_textures, s_constants, s_matrices);
 }
 
-Shader* CResourceManager::Create(const char* s_shader, const char* s_textures, const char* s_constants, const char* s_matrices)
+Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
     if (!GEnv.isDedicatedServer)
     {
@@ -456,9 +456,9 @@ void CResourceManager::Evict()
 #endif
 }
 /*
-bool	CResourceManager::_GetDetailTexture(const char* Name,const char*& T, R_constant_setup* &CS)
+BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup* &CS)
 {
-    char* N = char*(Name);
+    LPSTR N = LPSTR(Name);
     map_TD::iterator I = m_td.find	(N);
     if (I!=m_td.end())
     {

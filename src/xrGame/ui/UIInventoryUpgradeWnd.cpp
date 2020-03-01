@@ -34,7 +34,7 @@
 #include "ActorHelmet.h"
 #include "script_game_object.h" //Alundaio
 
-const const char* g_inventory_upgrade_xml = "inventory_upgrade.xml";
+const LPCSTR g_inventory_upgrade_xml = "inventory_upgrade.xml";
 
 CUIInventoryUpgradeWnd::Scheme::Scheme() {}
 CUIInventoryUpgradeWnd::Scheme::~Scheme() { delete_data(cells); }
@@ -231,7 +231,7 @@ bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upg
         return false;
     }
 
-    const char* scheme_name = get_manager().get_item_scheme(inv_item);
+    LPCSTR scheme_name = get_manager().get_item_scheme(inv_item);
     if (!scheme_name)
     {
 #ifdef DEBUG
@@ -249,7 +249,7 @@ bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upg
         if (m_back && ui_item->m_point)
             m_back->AttachChild(ui_item->m_point);
 
-        const char* upgrade_name = get_manager().get_upgrade_by_index(inv_item, ui_item->get_scheme_index());
+        LPCSTR upgrade_name = get_manager().get_upgrade_by_index(inv_item, ui_item->get_scheme_index());
         ui_item->init_upgrade(upgrade_name, inv_item);
 
         Upgrade_type* upgrade_p = get_manager().get_upgrade(upgrade_name);
@@ -309,7 +309,7 @@ bool CUIInventoryUpgradeWnd::DBClickOnUIUpgrade(Upgrade_type const* upgr)
     return false;
 }
 
-void CUIInventoryUpgradeWnd::AskUsing(const char* text, const char* upgrade_name)
+void CUIInventoryUpgradeWnd::AskUsing(LPCSTR text, LPCSTR upgrade_name)
 {
     VERIFY(m_inv_item);
     VERIFY(upgrade_name);

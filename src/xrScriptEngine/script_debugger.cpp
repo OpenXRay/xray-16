@@ -25,7 +25,7 @@ LRESULT CScriptDebugger::_SendMessage(u32 message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-LRESULT CScriptDebugger::DebugMessage(unsigned int nMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CScriptDebugger::DebugMessage(UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
     CMailSlotMsg msg;
     switch (nMsg)
@@ -131,7 +131,7 @@ CScriptDebugger::CScriptDebugger(CScriptEngine* scriptEngine)
     Connect(IDE_MAIL_SLOT);
 }
 
-void CScriptDebugger::Connect(const char* mslot_name)
+void CScriptDebugger::Connect(LPCSTR mslot_name)
 {
     m_bIdePresent = CheckExisting(IDE_MAIL_SLOT);
     ZeroMemory(m_curr_connected_mslot, sizeof(m_curr_connected_mslot));
@@ -294,7 +294,7 @@ void CScriptDebugger::CheckNewMessages()
     }
 }
 
-void CScriptDebugger::WaitForReply(bool bWaitForModalResult) // unsigned int nMsg)
+void CScriptDebugger::WaitForReply(bool bWaitForModalResult) // UINT nMsg)
 {
     bool mr = false;
     do

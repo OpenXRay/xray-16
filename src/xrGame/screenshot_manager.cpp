@@ -168,7 +168,7 @@ void screenshot_manager::shedule_Update(u32 dt)
         else
         {
 #ifndef LINUX // FIXME!!!
-            unsigned int thread_result = WaitForSingleObject(m_make_done_event, 0);
+            DWORD thread_result = WaitForSingleObject(m_make_done_event, 0);
             R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
             if (thread_result == WAIT_OBJECT_0)
             {
@@ -283,7 +283,7 @@ void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
 {
     screenshot_manager* this_ptr = static_cast<screenshot_manager*>(arg_ptr);
 #ifndef LINUX // FIXME!!
-    unsigned int wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
+    DWORD wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
         if (!this_ptr->is_active())
@@ -329,7 +329,7 @@ void screenshot_manager::compress_image()
 
 #ifdef DEBUG
 
-void screenshot_manager::timer_begin(const char* comment)
+void screenshot_manager::timer_begin(LPCSTR comment)
 {
     m_timer_comment = comment;
     m_debug_timer.Start();

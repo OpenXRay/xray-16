@@ -108,11 +108,11 @@ protected:
     void _Collide(const AABBQuantizedNode* node, udword clipmask);
     void _Collide(const AABBQuantizedNoLeafNode* node, udword clipmask);
     // Overlap tests
-    inline_ bool PlanesAABBOverlap(
+    inline_ BOOL PlanesAABBOverlap(
         const Point& center, const Point& extents, udword& out_clip_mask, udword in_clip_mask);
-    inline_ bool PlanesTriOverlap(udword in_clip_mask);
+    inline_ BOOL PlanesTriOverlap(udword in_clip_mask);
     // Init methods
-    bool InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm = nullptr);
+    BOOL InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm = nullptr);
 };
 
 #endif // __OPC_PLANESCOLLIDER_H__

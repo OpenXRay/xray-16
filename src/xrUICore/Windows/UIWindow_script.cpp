@@ -30,7 +30,7 @@ void SetCursorPosition_script(Fvector2& pos) { GetUICursor().SetUICursorPosition
 
 using namespace luabind;
 using namespace luabind::policy;
-Frect	get_texture_rect(const char* icon_name)
+Frect	get_texture_rect(LPCSTR icon_name)
 {
     return CUITextureMaster::GetTextureRect(icon_name);
 }

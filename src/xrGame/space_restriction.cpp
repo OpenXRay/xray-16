@@ -148,7 +148,7 @@ CSpaceRestriction::CBaseRestrictionPtr CSpaceRestriction::merge(
             acc_length += xr_strlen(*(*I)->name()) + 1;
     }
 
-    char* S = xr_alloc<char>(acc_length);
+    LPSTR S = xr_alloc<char>(acc_length);
     S[0] = 0;
     shared_str temp = bridge->name();
     RESTRICTIONS::const_iterator I = temp_restrictions.begin();

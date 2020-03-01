@@ -62,7 +62,7 @@ public:
             for (int i = 0; i < 4; ++i)
                 xr_strcpy(m_params[i], "");
         }
-        void parse_cmd_line(const char* cmd_line)
+        void parse_cmd_line(LPCSTR cmd_line)
         {
             reset();
             int n = _min(4, _GetItemCount(cmd_line, '/'));
@@ -84,8 +84,8 @@ public:
     void destroy_particles(const bool& all_particles);
 
 public:
-    virtual void PreStart(const char* op);
-    virtual void Start(const char* op);
+    virtual void PreStart(LPCSTR op);
+    virtual void Start(LPCSTR op);
     virtual void Disconnect();
 #ifndef _EDITOR
     IGame_ObjectPool ObjectPool;

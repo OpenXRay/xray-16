@@ -52,9 +52,9 @@ protected:
 public:
     CMemoryManager(CEntityAlive* entity_alive, CSound_UserDataVisitor* visitor);
     virtual ~CMemoryManager();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void update(float time_delta);
     void remove_links(IGameObject* object);
     virtual void on_restrictions_change();

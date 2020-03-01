@@ -30,7 +30,7 @@ private:
 public:
     car_memory(CCar* object);
 
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
 
     virtual bool feel_vision_isRelevant(IGameObject* object);
     virtual void camera(Fvector& position, Fvector& direction, Fvector& normal, float& field_of_view,

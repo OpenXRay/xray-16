@@ -62,8 +62,8 @@ protected:
 public:
     game_cl_GameState();
     virtual ~game_cl_GameState();
-    const char* type_name() const { return *m_game_type_name; };
-    void set_type_name(const char* s);
+    LPCSTR type_name() const { return *m_game_type_name; };
+    void set_type_name(LPCSTR s);
     virtual void Init(){};
     virtual void net_import_state(NET_Packet& P);
     virtual void net_import_update(NET_Packet& P);
@@ -90,7 +90,7 @@ public:
     void u_EventGen(NET_Packet& P, u16 type, u16 dest);
     void u_EventSend(NET_Packet& P);
 
-    virtual void ChatSay(const char* phrase, bool bAll){};
+    virtual void ChatSay(LPCSTR phrase, bool bAll){};
     virtual void OnChatMessage(NET_Packet* P){};
     virtual void OnWarnMessage(NET_Packet* P){};
     virtual void OnRadminMessage(u16 type, NET_Packet* P){};
@@ -99,7 +99,7 @@ public:
     virtual bool IsVotingEnabled(u16 flag) { return (m_u16VotingEnabled & flag) != 0; };
     virtual bool IsVotingActive() { return false; };
     virtual void SetVotingActive(bool Active){};
-    virtual void SendStartVoteMessage(const char* args){};
+    virtual void SendStartVoteMessage(LPCSTR args){};
     virtual void SendVoteYesMessage(){};
     virtual void SendVoteNoMessage(){};
     virtual void OnVoteStart(NET_Packet& P){};

@@ -58,7 +58,7 @@ public:
 
 public:
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     void remove_links(IGameObject* object);
 
 public:

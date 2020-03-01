@@ -19,27 +19,27 @@ public:
 	IC int		get_actor_goodwill	()const;
 	IC void		set_actor_goodwill	( int gw );
 
-	IC const char*	get_fraction_id		() const;
-	IC void		set_fraction_id		( const char* id );
+	IC LPCSTR	get_fraction_id		() const;
+	IC void		set_fraction_id		( LPCSTR id );
 	IC void		set_fraction_id2	( shared_str const& id );
 
-	IC const char*	get_name			() const;
-	IC void		set_name			( const char* name );
+	IC LPCSTR	get_name			() const;
+	IC void		set_name			( LPCSTR name );
 
-	IC const char*	get_icon			() const;
-	IC void		set_icon			( const char* icon );
+	IC LPCSTR	get_icon			() const;
+	IC void		set_icon			( LPCSTR icon );
 
-	IC const char*	get_icon_big		() const;
-	IC void		set_icon_big		( const char* icon_big );
+	IC LPCSTR	get_icon_big		() const;
+	IC void		set_icon_big		( LPCSTR icon_big );
 
-	IC const char*	get_target			() const;
-	IC void		set_target			( const char* target );
+	IC LPCSTR	get_target			() const;
+	IC void		set_target			( LPCSTR target );
 
-	IC const char*	get_target_desc		() const;
-	IC void		set_target_desc		( const char* target_desc );
+	IC LPCSTR	get_target_desc		() const;
+	IC void		set_target_desc		( LPCSTR target_desc );
 
-	IC const char*	get_location		() const;
-	IC void		set_location		( const char* location );
+	IC LPCSTR	get_location		() const;
+	IC void		set_location		( LPCSTR location );
 
 		void	update_info			();
 

@@ -64,7 +64,7 @@ IGameObject* CObjectList::FindObjectByName(shared_str name)
 
     return nullptr;
 }
-IGameObject* CObjectList::FindObjectByName(const char* name) { return FindObjectByName(shared_str(name)); }
+IGameObject* CObjectList::FindObjectByName(LPCSTR name) { return FindObjectByName(shared_str(name)); }
 IGameObject* CObjectList::FindObjectByCLS_ID(CLASS_ID cls)
 {
     {
@@ -482,7 +482,7 @@ void CObjectList::Unload()
     }
 }
 
-IGameObject* CObjectList::Create(const char* name)
+IGameObject* CObjectList::Create(LPCSTR name)
 {
     IGameObject* O = g_pGamePersistent->ObjectPool.create(name);
     // Msg("CObjectList::Create [%x]%s", O, name);
@@ -566,7 +566,7 @@ void CObjectList::relcase_unregister(int* ID)
     m_relcase_callbacks.pop_back();
 }
 
-void CObjectList::dump_list(Objects& v, const char* reason)
+void CObjectList::dump_list(Objects& v, LPCSTR reason)
 {
 #ifdef DEBUG
     for (auto& it : v)

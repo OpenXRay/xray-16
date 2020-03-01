@@ -11,8 +11,8 @@ public:
     CUIXmlInit();
     virtual ~CUIXmlInit();
 
-    static bool InitDragDropListEx(CUIXml& xml_doc, const char* path, int index, CUIDragDropListEx* pWnd);
-    static bool InitTabButtonMP(CUIXml& xml_doc, const char* path, int index, CUITabButtonMP* pWnd);
-    static bool InitSleepStatic(CUIXml& xml_doc, const char* path, int index, CUISleepStatic* pWnd);
-    static bool InitHintWindow(CUIXml& xml_doc, const char* path, int index, UIHintWindow* pWnd);
+    static bool InitDragDropListEx(CUIXml& xml_doc, LPCSTR path, int index, CUIDragDropListEx* pWnd);
+    static bool InitTabButtonMP(CUIXml& xml_doc, LPCSTR path, int index, CUITabButtonMP* pWnd);
+    static bool InitSleepStatic(CUIXml& xml_doc, LPCSTR path, int index, CUISleepStatic* pWnd);
+    static bool InitHintWindow(CUIXml& xml_doc, LPCSTR path, int index, UIHintWindow* pWnd);
 };

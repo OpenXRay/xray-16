@@ -233,14 +233,14 @@ bool CxImageJPG::Decode(CxFile * hFile)
 		// info.nProgress = (long)(100*cinfo.output_scanline/cinfo.output_height);
 		//<DP> Step 6a: CMYK->RGB */ 
 		if ((cinfo.num_components==4)&&(cinfo.quantize_colors==FALSE)){
-			unsigned char k,*dst,*src;
+			BYTE k,*dst,*src;
 			dst=iter.GetRow();
 			src=buffer[0];
 			for(long x3=0,x4=0; x3<(long)info.dwEffWidth && x4<row_stride; x3+=3, x4+=4){
 				k=src[x4+3];
-				dst[x3]  =(unsigned char)((k * src[x4+2])/255);
-				dst[x3+1]=(unsigned char)((k * src[x4+1])/255);
-				dst[x3+2]=(unsigned char)((k * src[x4+0])/255);
+				dst[x3]  =(BYTE)((k * src[x4+2])/255);
+				dst[x3+1]=(BYTE)((k * src[x4+1])/255);
+				dst[x3+2]=(BYTE)((k * src[x4+0])/255);
 			}
 		} else {
 			/* Assume put_scanline_someplace wants a pointer and sample count. */
@@ -258,7 +258,7 @@ bool CxImageJPG::Decode(CxFile * hFile)
 	//<DP> Step 7A: Swap red and blue components
 	// not necessary if swapped red and blue definition in jmorecfg.h;ln322 <W. Morrison>
 	if ((cinfo.num_components==3)&&(cinfo.quantize_colors==FALSE)){
-		unsigned char* r0=GetBits();
+		BYTE* r0=GetBits();
 		for(long y=0;y<head.biHeight;y++){
 			if (info.nEscape) longjmp(jerr.setjmp_buffer, 1); // <vho> - cancel decoding
 			RGBtoBGR(r0,3*head.biWidth);

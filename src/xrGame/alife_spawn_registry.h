@@ -64,12 +64,12 @@ protected:
     IC bool can_spawn(CSE_Abstract& abstract, ALife::_TIME_ID game_time, xr_vector<ALife::_SPAWN_ID>& objects) const;
 
 public:
-    CALifeSpawnRegistry(const char* section);
+    CALifeSpawnRegistry(LPCSTR section);
     virtual ~CALifeSpawnRegistry();
     virtual void load(IReader& file_stream, xrGUID* save_guid = 0);
     virtual void save(IWriter& memory_stream);
-    void load(IReader& file_stream, const char* game_name);
-    void load(const char* spawn_name);
+    void load(IReader& file_stream, LPCSTR game_name);
+    void load(LPCSTR spawn_name);
     void fill_new_spawns(
         xr_vector<ALife::_SPAWN_ID>& spawns, ALife::_TIME_ID game_time, xr_vector<ALife::_SPAWN_ID>& objects);
     IC const CALifeSpawnHeader& header() const;

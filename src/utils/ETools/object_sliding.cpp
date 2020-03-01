@@ -13,23 +13,23 @@
 #include "object.h"
 #include "object_sliding.h"
 
-// bool g_bUseFastButBadOptimise = FALSE;
+// BOOL g_bUseFastButBadOptimise = FALSE;
 
 // Call this to reorder the tris in this trilist to get good vertex-cache coherency.
 // *pwList is modified (but obviously not changed in size or memory location).
-// void OptimiseVertexCoherencyTriList ( unsigned short *pwList, int iHowManyTris, u32 mode);
-void OptimiseVertexCoherencyTriList(unsigned short* pwList, int iHowManyTris, u32 optimize_mode)
+// void OptimiseVertexCoherencyTriList ( WORD *pwList, int iHowManyTris, u32 mode);
+void OptimiseVertexCoherencyTriList(WORD* pwList, int iHowManyTris, u32 optimize_mode)
 {
     if (iHowManyTris)
     {
         DWORD* remap = xr_alloc<DWORD>(iHowManyTris);
-        unsigned short max_idx = 0;
+        WORD max_idx = 0;
         for (int k = 0; k < iHowManyTris * 3; k++)
             max_idx = std::max(max_idx, pwList[k]);
         HRESULT rhr = D3DXOptimizeFaces(pwList, iHowManyTris, max_idx + 1, FALSE, remap);
         R_CHK(rhr);
-        unsigned short* tmp = xr_alloc<unsigned short>(iHowManyTris * 3);
-        memcpy(tmp, pwList, sizeof(unsigned short) * 3 * iHowManyTris);
+        WORD* tmp = xr_alloc<WORD>(iHowManyTris * 3);
+        memcpy(tmp, pwList, sizeof(WORD) * 3 * iHowManyTris);
         for (int it = 0; it < iHowManyTris; it++)
         {
             pwList[it * 3 + 0] = tmp[remap[it] * 3 + 0];
@@ -41,7 +41,7 @@ void OptimiseVertexCoherencyTriList(unsigned short* pwList, int iHowManyTris, u3
     }
 }
 
-bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
+BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
 {
     result->swr_records.resize(0);
 
@@ -106,7 +106,7 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
     int iNumCollapses = iCurCollapse;
 
     // Add the remaining existing pts in any old order.
-    unsigned short wCurIndex = 0;
+    WORD wCurIndex = 0;
     for (pt = object->CurPtRoot.ListNext(); pt != NULL; pt = pt->ListNext())
     {
         if (pt->mypt.dwNewIndex == INVALID_INDEX)
@@ -143,7 +143,7 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
     int iCurTriBinned = 0;
 
     // Useful thing.
-    ArbitraryList<unsigned short> wTempIndices;
+    ArbitraryList<WORD> wTempIndices;
 
     int iMaxSlidingWindowLevel = iCurSlidingWindowLevel;
 
@@ -172,7 +172,7 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
         }
         R_ASSERT(iJustCheckingNumTris == iCurNumTris);
 
-        bool bJustStartedANewLevel = TRUE;
+        BOOL bJustStartedANewLevel = TRUE;
 
         // Now undo all the collapses for this level in turn, adding vertices,
         // binned tris, and SlidingWindowRecords as we go.
@@ -201,9 +201,9 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
                         R_ASSERT(pTriInfo->ppt[0]->mypt.dwNewIndex < wCurIndex);
                         R_ASSERT(pTriInfo->ppt[1]->mypt.dwNewIndex < wCurIndex);
                         R_ASSERT(pTriInfo->ppt[2]->mypt.dwNewIndex < wCurIndex);
-                        *wTempIndices.item(i * 3 + 0) = (unsigned short)pTriInfo->ppt[0]->mypt.dwNewIndex;
-                        *wTempIndices.item(i * 3 + 1) = (unsigned short)pTriInfo->ppt[1]->mypt.dwNewIndex;
-                        *wTempIndices.item(i * 3 + 2) = (unsigned short)pTriInfo->ppt[2]->mypt.dwNewIndex;
+                        *wTempIndices.item(i * 3 + 0) = (WORD)pTriInfo->ppt[0]->mypt.dwNewIndex;
+                        *wTempIndices.item(i * 3 + 1) = (WORD)pTriInfo->ppt[1]->mypt.dwNewIndex;
+                        *wTempIndices.item(i * 3 + 2) = (WORD)pTriInfo->ppt[2]->mypt.dwNewIndex;
                         iCurNumTris--;
                     }
 
@@ -214,7 +214,7 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
 
                     // And write them to the index list.
                     result->indices.insert(iCurTriBinned * 3, wTempIndices, 0, 3 * pCollapse->TriCollapsed.size());
-                    // memcpy ( result->indices.item ( iCurTriBinned * 3 ), wTempIndices.ptr(), sizeof(unsigned short) * 3 *
+                    // memcpy ( result->indices.item ( iCurTriBinned * 3 ), wTempIndices.ptr(), sizeof(WORD) * 3 *
                     // pCollapse->TriCollapsed.size() );
                     iCurTriBinned += pCollapse->TriCollapsed.size();
                 }
@@ -257,9 +257,9 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
                     R_ASSERT(pTriInfo->ppt[0]->mypt.dwNewIndex < wCurIndex);
                     R_ASSERT(pTriInfo->ppt[1]->mypt.dwNewIndex < wCurIndex);
                     R_ASSERT(pTriInfo->ppt[2]->mypt.dwNewIndex < wCurIndex);
-                    *wTempIndices.item(i * 3 + 0) = (unsigned short)pTriInfo->ppt[0]->mypt.dwNewIndex;
-                    *wTempIndices.item(i * 3 + 1) = (unsigned short)pTriInfo->ppt[1]->mypt.dwNewIndex;
-                    *wTempIndices.item(i * 3 + 2) = (unsigned short)pTriInfo->ppt[2]->mypt.dwNewIndex;
+                    *wTempIndices.item(i * 3 + 0) = (WORD)pTriInfo->ppt[0]->mypt.dwNewIndex;
+                    *wTempIndices.item(i * 3 + 1) = (WORD)pTriInfo->ppt[1]->mypt.dwNewIndex;
+                    *wTempIndices.item(i * 3 + 2) = (WORD)pTriInfo->ppt[2]->mypt.dwNewIndex;
                     iCurNumTris++;
                 }
 
@@ -271,7 +271,7 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
                 // And write them to the index list.
                 result->indices.resize((iCurTriAdded + pCollapse->TriOriginal.size()) * 3);
                 result->indices.insert(iCurTriAdded * 3, wTempIndices, 0, 3 * pCollapse->TriOriginal.size());
-                // memcpy ( result->indices.item ( iCurTriAdded * 3 ), wTempIndices.ptr(), sizeof(unsigned short) * 3 *
+                // memcpy ( result->indices.item ( iCurTriAdded * 3 ), wTempIndices.ptr(), sizeof(WORD) * 3 *
                 // pCollapse->TriOriginal.size() );
                 iCurTriAdded += pCollapse->TriOriginal.size();
             }
@@ -358,7 +358,7 @@ bool CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
         }
     */
 
-    bool bRes = TRUE;
+    BOOL bRes = TRUE;
     // And now check everything is OK.
     R_ASSERT(result->swr_records.size() == u32(iNumCollapses + 1));
     for (int i = 0; i <= iNumCollapses; i++)

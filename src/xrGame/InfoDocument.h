@@ -17,8 +17,8 @@ public:
     CInfoDocument(void);
     virtual ~CInfoDocument(void);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
-    virtual void Load(const char* section);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(LPCSTR section);
     virtual void net_Destroy();
     virtual void shedule_Update(u32 dt);
     virtual void UpdateCL();

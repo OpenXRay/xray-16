@@ -13,7 +13,7 @@
 #include "object_item_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-void CObjectFactory::register_script_class(const char* client_class, const char* server_class, const char* clsid, const char* script_clsid)
+void CObjectFactory::register_script_class(LPCSTR client_class, LPCSTR server_class, LPCSTR clsid, LPCSTR script_clsid)
 {
 #ifdef CONFIG_OBJECT_FACTORY_LOG_REGISTER
     Msg("* CObjectFactory: registering script class '%s'", clsid);
@@ -40,7 +40,7 @@ void CObjectFactory::register_script_class(const char* client_class, const char*
         server, TEXT2CLSID(clsid), script_clsid));
 }
 
-void CObjectFactory::register_script_class(const char* unknown_class, const char* clsid, const char* script_clsid)
+void CObjectFactory::register_script_class(LPCSTR unknown_class, LPCSTR clsid, LPCSTR script_clsid)
 {
 #ifdef CONFIG_OBJECT_FACTORY_LOG_REGISTER
     Msg("* CObjectFactory: registering script class '%s'", clsid);
@@ -88,8 +88,8 @@ void CObjectFactory::register_script() const
 
 SCRIPT_EXPORT(CObjectFactory, (), {
     module(luaState)[class_<CObjectFactory>("object_factory")
-                         .def("register", (void (CObjectFactory::*)(const char*, const char*, const char*, const char*))(
+                         .def("register", (void (CObjectFactory::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))(
                                               &CObjectFactory::register_script_class))
-                         .def("register", (void (CObjectFactory::*)(const char*, const char*, const char*))(
+                         .def("register", (void (CObjectFactory::*)(LPCSTR, LPCSTR, LPCSTR))(
                                               &CObjectFactory::register_script_class))];
 });

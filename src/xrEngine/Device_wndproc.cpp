@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #if defined(WINDOWS)
-bool CRenderDevice::on_message(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+bool CRenderDevice::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
     switch (uMsg)
     {
@@ -59,7 +59,7 @@ bool CRenderDevice::on_message(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPAR
 // Name: WndProc()
 // Desc: Static msg handler which passes messages to the application class.
 //-----------------------------------------------------------------------------
-LRESULT CALLBACK WndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LRESULT result;
     if (Device.on_message(hWnd, uMsg, wParam, lParam, result))

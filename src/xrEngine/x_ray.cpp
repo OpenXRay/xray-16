@@ -42,7 +42,7 @@ struct _SoundProcessor : public pureFrame
     }
 } SoundProcessor;
 
-const char* _GetFontTexName(const char* section)
+LPCSTR _GetFontTexName(LPCSTR section)
 {
     static const char* tex_names[] = {"texture800", "texture", "texture1600"};
     int def_idx = 1; // default 1024x768
@@ -74,12 +74,12 @@ const char* _GetFontTexName(const char* section)
     return pSettings->r_string(section, tex_names[def_idx]);
 }
 
-void _InitializeFont(CGameFont*& F, const char* section, u32 flags)
+void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
 {
-    const char* font_tex_name = _GetFontTexName(section);
+    LPCSTR font_tex_name = _GetFontTexName(section);
     R_ASSERT(font_tex_name);
 
-    const char* sh_name = pSettings->r_string(section, "shader");
+    LPCSTR sh_name = pSettings->r_string(section, "shader");
     if (!F)
     {
         F = new CGameFont(sh_name, font_tex_name, flags);
@@ -178,8 +178,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     }
     else if (E == eStart)
     {
-        char* op_server = (char*)(P1);
-        char* op_client = (char*)(P2);
+        LPSTR op_server = LPSTR(P1);
+        LPSTR op_client = LPSTR(P2);
         Level_Current = u32(-1);
         R_ASSERT(nullptr == g_pGameLevel);
         R_ASSERT(nullptr != g_pGamePersistent);
@@ -223,13 +223,13 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     }
     else if (E == eConsole)
     {
-        char* command = (char*)P1;
+        LPSTR command = (LPSTR)P1;
         Console->ExecuteCommand(command, false);
         xr_free(command);
     }
     else if (E == eStartMPDemo)
     {
-        char* demo_file = (char*)(P1);
+        LPSTR demo_file = LPSTR(P1);
 
         R_ASSERT(nullptr == g_pGameLevel);
         R_ASSERT(nullptr != g_pGamePersistent);
@@ -333,7 +333,7 @@ void CApplication::SetLoadStageTitle(pcstr _ls_title)
     loadingScreen->SetStageTitle(_ls_title);
 }
 
-void CApplication::LoadTitleInt(const char* str1, const char* str2, const char* str3)
+void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
 {
     loadingScreen->SetStageTip(str1, str2, str3);
 }
@@ -366,7 +366,7 @@ void CApplication::OnFrame()
         g_pGameLevel->SoundEvent_Dispatch();
 }
 
-void CApplication::Level_Append(const char* folder)
+void CApplication::Level_Append(LPCSTR folder)
 {
     string_path N1, N2, N3, N4;
     strconcat(sizeof(N1), N1, folder, "level");
@@ -401,7 +401,7 @@ void CApplication::Level_Scan()
     FS.file_list_close(folder);
 }
 
-void gen_logo_name(string_path& dest, const char* level_name, int num = -1)
+void gen_logo_name(string_path& dest, LPCSTR level_name, int num = -1)
 {
     strconcat(sizeof(dest), dest, "intro" DELIMITER "intro_", level_name);
 
@@ -460,7 +460,7 @@ void CApplication::Level_Set(u32 L)
         loadingScreen->SetLevelLogo(path);
 }
 
-int CApplication::Level_ID(const char* name, const char* ver, bool bSet)
+int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 {
     int result = -1;
     auto it = FS.m_archives.begin();
@@ -476,8 +476,8 @@ int CApplication::Level_ID(const char* name, const char* ver, bool bSet)
         if (A.hSrcFile == 0)
 #endif
         {
-            const char* ln = A.header->r_string("header", "level_name");
-            const char* lv = A.header->r_string("header", "level_ver");
+            LPCSTR ln = A.header->r_string("header", "level_name");
+            LPCSTR lv = A.header->r_string("header", "level_ver");
             if (0 == xr_stricmp(ln, name) && 0 == xr_stricmp(lv, ver))
             {
                 FS.LoadArchive(A);
@@ -508,7 +508,7 @@ int CApplication::Level_ID(const char* name, const char* ver, bool bSet)
     return result;
 }
 
-CInifile* CApplication::GetArchiveHeader(const char* name, const char* ver)
+CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 {
     auto it = FS.m_archives.begin();
     auto it_e = FS.m_archives.end();
@@ -519,8 +519,8 @@ CInifile* CApplication::GetArchiveHeader(const char* name, const char* ver)
         if (!A.header)
             continue;
 
-        const char* ln = A.header->r_string("header", "level_name");
-        const char* lv = A.header->r_string("header", "level_ver");
+        LPCSTR ln = A.header->r_string("header", "level_name");
+        LPCSTR lv = A.header->r_string("header", "level_ver");
         if (0 == xr_stricmp(ln, name) && 0 == xr_stricmp(lv, ver))
         {
             return A.header;

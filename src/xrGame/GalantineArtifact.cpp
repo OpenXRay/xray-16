@@ -8,4 +8,4 @@
 
 CGalantineArtefact::CGalantineArtefact(void) {}
 CGalantineArtefact::~CGalantineArtefact(void) {}
-void CGalantineArtefact::Load(const char* section) { inherited::Load(section); }
+void CGalantineArtefact::Load(LPCSTR section) { inherited::Load(section); }

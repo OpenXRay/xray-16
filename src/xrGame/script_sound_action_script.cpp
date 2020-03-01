@@ -25,16 +25,16 @@ SCRIPT_EXPORT(CScriptSoundAction, (), {
                              value("panic", int(MonsterSound::eMonsterSoundPanic))]
 
                          .def(constructor<>())
-                         .def(constructor<const char*, const char*>())
-                         .def(constructor<const char*, const char*, const Fvector&>())
-                         .def(constructor<const char*, const char*, const Fvector&, const Fvector&>())
-                         .def(constructor<const char*, const char*, const Fvector&, const Fvector&, bool>())
-                         .def(constructor<const char*, Fvector*>())
-                         .def(constructor<const char*, Fvector*, const Fvector&>())
-                         .def(constructor<const char*, Fvector*, const Fvector&, bool>())
-                         .def(constructor<CScriptSound*, const char*, const Fvector&>())
-                         .def(constructor<CScriptSound*, const char*, const Fvector&, const Fvector&>())
-                         .def(constructor<CScriptSound*, const char*, const Fvector&, const Fvector&, bool>())
+                         .def(constructor<LPCSTR, LPCSTR>())
+                         .def(constructor<LPCSTR, LPCSTR, const Fvector&>())
+                         .def(constructor<LPCSTR, LPCSTR, const Fvector&, const Fvector&>())
+                         .def(constructor<LPCSTR, LPCSTR, const Fvector&, const Fvector&, bool>())
+                         .def(constructor<LPCSTR, Fvector*>())
+                         .def(constructor<LPCSTR, Fvector*, const Fvector&>())
+                         .def(constructor<LPCSTR, Fvector*, const Fvector&, bool>())
+                         .def(constructor<CScriptSound*, LPCSTR, const Fvector&>())
+                         .def(constructor<CScriptSound*, LPCSTR, const Fvector&, const Fvector&>())
+                         .def(constructor<CScriptSound*, LPCSTR, const Fvector&, const Fvector&, bool>())
                          .def(constructor<CScriptSound*, Fvector*>())
                          .def(constructor<CScriptSound*, Fvector*, const Fvector&>())
                          .def(constructor<CScriptSound*, Fvector*, const Fvector&, bool>())
@@ -42,9 +42,9 @@ SCRIPT_EXPORT(CScriptSoundAction, (), {
                          .def(constructor<MonsterSound::EType>())
                          .def(constructor<MonsterSound::EType, int>())
                          // trader specific
-                         .def(constructor<const char*, const char*, MonsterSpace::EMonsterHeadAnimType>())
+                         .def(constructor<LPCSTR, LPCSTR, MonsterSpace::EMonsterHeadAnimType>())
 
-                         .def("set_sound", (void (CScriptSoundAction::*)(const char*))(&CScriptSoundAction::SetSound))
+                         .def("set_sound", (void (CScriptSoundAction::*)(LPCSTR))(&CScriptSoundAction::SetSound))
                          .def("set_sound",
                              (void (CScriptSoundAction::*)(const CScriptSound&))(&CScriptSoundAction::SetSound))
                          .def("set_sound_type", &CScriptSoundAction::SetSoundType)

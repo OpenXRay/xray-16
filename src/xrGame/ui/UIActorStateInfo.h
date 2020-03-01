@@ -52,7 +52,7 @@ public:
     ui_actor_state_wnd() = default;
     ~ui_actor_state_wnd() override;
     void init_from_xml(CUIXml& xml);
-    void init_from_xml(CUIXml& xml, const char* path);
+    void init_from_xml(CUIXml& xml, LPCSTR path);
     void UpdateActorInfo(CInventoryOwner* owner);
     void UpdateHitZone();
 
@@ -80,8 +80,8 @@ protected:
 public:
     ui_actor_state_item();
     ~ui_actor_state_item() override = default;
-    void init_from_xml(CUIXml& xml, const char* path, bool critical = true);
-    void init_from_xml_plain(CUIXml& xml, const char* path);
+    void init_from_xml(CUIXml& xml, LPCSTR path, bool critical = true);
+    void init_from_xml_plain(CUIXml& xml, LPCSTR path);
 
     bool set_text(float value); // 0..1
     bool set_progress(float value); // 0..1

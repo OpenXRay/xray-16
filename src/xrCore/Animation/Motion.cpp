@@ -175,7 +175,7 @@ float COMotion::GetLength(float* mn, float* mx)
 }
 BOOL COMotion::ScaleKeys(float from_time, float to_time, float scale_factor)
 {
-    bool bRes = TRUE;
+    BOOL bRes = TRUE;
     for (size_t ch = 0; ch < ctMaxChannel; ch++)
         if (FALSE == (bRes = envs[ch]->ScaleKeys(from_time, to_time, scale_factor, 1.f / fFPS)))
             break;

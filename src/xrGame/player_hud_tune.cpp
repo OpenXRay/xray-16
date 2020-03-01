@@ -313,7 +313,7 @@ void hud_draw_adjust_mode()
     if (!hud_adj_mode)
         return;
 
-    const char* _text = NULL;
+    LPCSTR _text = NULL;
     if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT) && hud_adj_mode)
         _text =
             "press SHIFT+NUM 0-return 1-hud_pos 2-hud_rot 3-itm_pos 4-itm_rot 5-fire_point 6-fire_2_point "

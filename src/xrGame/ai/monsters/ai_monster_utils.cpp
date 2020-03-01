@@ -26,7 +26,7 @@ bool object_position_valid(const CEntity* entity)
         ai().level_graph().inside(entity->ai_location().level_vertex_id(), entity->Position()));
 }
 
-Fvector get_bone_position(IGameObject* object, const char* bone_name)
+Fvector get_bone_position(IGameObject* object, LPCSTR bone_name)
 {
     u16 bone_id = smart_cast<IKinematics*>(object->Visual())->LL_BoneID(bone_name);
     CBoneInstance& bone = smart_cast<IKinematics*>(object->Visual())->LL_GetBoneInstance(bone_id);

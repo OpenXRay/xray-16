@@ -41,8 +41,8 @@ void CTheoraSurface::Reset()
     tm_play = 0;
 }
 
-bool CTheoraSurface::Valid() { return ready; }
-void CTheoraSurface::Play(bool _looped, u32 _time)
+BOOL CTheoraSurface::Valid() { return ready; }
+void CTheoraSurface::Play(BOOL _looped, u32 _time)
 {
     playing = TRUE;
     looped = _looped;
@@ -50,10 +50,10 @@ void CTheoraSurface::Play(bool _looped, u32 _time)
     prefetch = -2;
 }
 
-bool CTheoraSurface::Update(u32 _time)
+BOOL CTheoraSurface::Update(u32 _time)
 {
     VERIFY(Valid());
-    bool redraw = FALSE;
+    BOOL redraw = FALSE;
 
     if (prefetch < 0) // fake. first updated frame is data loading
     {
@@ -92,11 +92,11 @@ bool CTheoraSurface::Update(u32 _time)
     return redraw;
 }
 
-bool CTheoraSurface::Load(const char* fname)
+BOOL CTheoraSurface::Load(const char* fname)
 {
     VERIFY(FALSE == ready);
     m_rgb = new CTheoraStream();
-    bool res = m_rgb->Load(fname);
+    BOOL res = m_rgb->Load(fname);
     if (res)
     {
         string_path alpha, ext;

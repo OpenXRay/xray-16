@@ -64,7 +64,7 @@ CCustomZone::~CCustomZone(void)
     xr_delete(m_actor_effector);
 }
 
-void CCustomZone::Load(const char* section)
+void CCustomZone::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -92,7 +92,7 @@ void CCustomZone::Load(const char* section)
         self->GetSpatialData().type |= (STYPE_COLLIDEABLE | STYPE_SHAPE);
     //////////////////////////////////////////////////////////////////////////
 
-    const char* sound_str = NULL;
+    LPCSTR sound_str = NULL;
 
     if (pSettings->line_exist(section, "idle_sound"))
     {
@@ -269,7 +269,7 @@ void CCustomZone::Load(const char* section)
     if (m_zone_flags.test(eIdleLight))
     {
         m_fIdleLightRange = pSettings->r_float(section, "idle_light_range");
-        const char* light_anim = pSettings->r_string(section, "idle_light_anim");
+        LPCSTR light_anim = pSettings->r_string(section, "idle_light_anim");
         m_pIdleLAnim = LALib.FindItem(light_anim);
         m_fIdleLightHeight = pSettings->r_float(section, "idle_light_height");
         m_zone_flags.set(eIdleLightVolumetric, pSettings->r_bool(section, "idle_light_volumetric"));
@@ -288,7 +288,7 @@ void CCustomZone::Load(const char* section)
     m_zone_flags.set(eAffectPickDOF, pSettings->read_if_exists<bool>(section, "pick_dof_effector", false));
 }
 
-bool CCustomZone::net_Spawn(CSE_Abstract* DC)
+BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -763,7 +763,7 @@ void CCustomZone::PlayEntranceParticles(CGameObject* pObject)
 {
     m_entrance_sound.play_at_pos(0, pObject->Position());
 
-    const char* particle_str = NULL;
+    LPCSTR particle_str = NULL;
 
     if (pObject->Radius() < SMALL_OBJECT_RADIUS)
     {
@@ -1368,7 +1368,7 @@ bool CCustomZone::feel_touch_on_contact(IGameObject* O)
     return (inherited::feel_touch_on_contact(O));
 }
 
-bool CCustomZone::AlwaysTheCrow()
+BOOL CCustomZone::AlwaysTheCrow()
 {
     bool b_idle = ZoneState() == eZoneStateIdle || ZoneState() == eZoneStateDisabled;
     if (!b_idle || (m_zone_flags.test(eAlwaysFastmode) && IsEnabled()))

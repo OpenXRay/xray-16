@@ -6,7 +6,7 @@
 
 namespace lc_net
 {
-void net_global_data_impl<gl_ref_model_data>::create_data_file(const char* path)
+void net_global_data_impl<gl_ref_model_data>::create_data_file(LPCSTR path)
 {
     FPU::m64r();
     Memory.mem_compact();
@@ -18,7 +18,7 @@ void net_global_data_impl<gl_ref_model_data>::create_data_file(const char* path)
     compress(path);
     Logger.clMsg("create_ref_model_data_write:  end");
 }
-bool net_global_data_impl<gl_ref_model_data>::create_data(const char* path)
+bool net_global_data_impl<gl_ref_model_data>::create_data(LPCSTR path)
 {
     {
         R_ASSERT(inlc_global_data());

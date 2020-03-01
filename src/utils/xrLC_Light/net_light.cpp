@@ -13,7 +13,7 @@
 //==============================================================================
 
 static Lock block;
-const char* dataDesc = "global_data";
+LPCSTR dataDesc = "global_data";
 
 xr_vector<u32> net_pool;
 /*
@@ -32,13 +32,13 @@ static struct unload
 */
 #pragma warning(push)
 #pragma warning(disable : 4995)
-unsigned int g_sessionId = unsigned int(-1);
+DWORD g_sessionId = DWORD(-1);
 
 // bool  GetGlobalData( IAgent* agent,
-//				    unsigned int sessionId );
-bool TaskReceive(net_task& task, IAgent* agent, unsigned int sessionId, IGenericStream* inStream);
+//				    DWORD sessionId );
+bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream* inStream);
 
-bool GetGlobalData(IAgent* agent, unsigned int sessionId)
+bool GetGlobalData(IAgent* agent, DWORD sessionId)
 {
     if (!inlc_global_data())
     {
@@ -67,7 +67,7 @@ bool GetGlobalData(IAgent* agent, unsigned int sessionId)
                 FS.w_close(file);
 
                 agent->FreeCachedData(sessionId, dataDesc);
-                unsigned int r =globalDataStream->AddRef();
+                ULONG r =globalDataStream->AddRef();
                 r = globalDataStream->Release();
                 if(r>0)
                        globalDataStream->Release();
@@ -82,7 +82,7 @@ bool GetGlobalData(IAgent* agent, unsigned int sessionId)
     return true;
 }
 
-bool TaskReceive(net_task& task, IAgent* agent, unsigned int sessionId, IGenericStream* inStream)
+bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream* inStream)
 {
     bool ret = false;
     __try
@@ -100,12 +100,12 @@ bool TaskReceive(net_task& task, IAgent* agent, unsigned int sessionId, IGeneric
 
 class net_task_interface_impl : public net_task_interface
 {
-    bool TaskReceive(net_task& task, IAgent* agent, unsigned int sessionId, IGenericStream* inStream)
+    bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream* inStream)
     {
         return ::TaskReceive(task, agent, sessionId, inStream);
     }
     /*bool  GetGlobalData( IAgent* agent,
-                       unsigned int sessionId )
+                       DWORD sessionId )
     {
            GetGlobalData()
     }*/
@@ -124,7 +124,7 @@ class net_task_interface_impl : public net_task_interface
         return ret;
     }
 
-    bool RunTask(IAgent* agent, unsigned int sessionId, IGenericStream* inStream, IGenericStream* outStream)
+    bool RunTask(IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream)
     {
         block.Enter();
 
@@ -155,7 +155,7 @@ class net_task_interface_impl : public net_task_interface
 
 XRLC_LIGHT_API net_task_interface* g_net_task_interface = &g_net_task_interface_impl;
 /*
-XRLC_LIGHT_API  void __cdecl  EndSession(IAgent* agent, unsigned int sessionId)
+XRLC_LIGHT_API  void __cdecl  EndSession(IAgent* agent, DWORD sessionId)
 {
     LPCRITICAL_SECTION gcs;
       agent->GetGlobalCriticalSection( &gcs );

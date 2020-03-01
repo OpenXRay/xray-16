@@ -246,7 +246,7 @@ float CEnvironment::NormalizeTime(float tm)
 
 void CEnvironment::SetWeather(shared_str name, bool forced)
 {
-    //. static bool bAlready = FALSE;
+    //. static BOOL bAlready = FALSE;
     //. if(bAlready) return;
     if (name.size())
     {

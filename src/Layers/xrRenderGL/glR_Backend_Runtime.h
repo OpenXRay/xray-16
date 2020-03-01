@@ -66,7 +66,7 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
     }
 }
 
-ICF void CBackend::set_PS(GLuint _ps, const char* _n)
+ICF void CBackend::set_PS(GLuint _ps, LPCSTR _n)
 {
     if (ps != _ps)
     {
@@ -84,7 +84,7 @@ ICF void CBackend::set_PS(GLuint _ps, const char* _n)
     }
 }
 
-ICF void CBackend::set_GS(GLuint _gs, const char* _n)
+ICF void CBackend::set_GS(GLuint _gs, LPCSTR _n)
 {
     if (gs != _gs)
     {
@@ -103,7 +103,7 @@ ICF void CBackend::set_GS(GLuint _gs, const char* _n)
     }
 }
 
-ICF void CBackend::set_VS(GLuint _vs, const char* _n)
+ICF void CBackend::set_VS(GLuint _vs, LPCSTR _n)
 {
     if (vs != _vs)
     {

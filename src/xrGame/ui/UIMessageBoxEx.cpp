@@ -12,7 +12,7 @@ CUIMessageBoxEx::CUIMessageBoxEx()
 }
 
 CUIMessageBoxEx::~CUIMessageBoxEx() { xr_delete(m_pMessageBox); }
-bool CUIMessageBoxEx::InitMessageBox(const char* xml_template)
+bool CUIMessageBoxEx::InitMessageBox(LPCSTR xml_template)
 {
     // CUIDialogWnd::SetWndRect(Frect().set(0.0f,0.0f,1024.0f,768.0f));
     if (!m_pMessageBox->InitMessageBox(xml_template))
@@ -49,8 +49,8 @@ void CUIMessageBoxEx::OnNOClicked(CUIWindow* w, void* d)
     }
 }
 
-void CUIMessageBoxEx::SetText(const char* text) { m_pMessageBox->SetText(text); }
-const char* CUIMessageBoxEx::GetText() { return m_pMessageBox->GetText(); }
+void CUIMessageBoxEx::SetText(LPCSTR text) { m_pMessageBox->SetText(text); }
+LPCSTR CUIMessageBoxEx::GetText() { return m_pMessageBox->GetText(); }
 void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NULL */)
 {
     CUIWndCallback::OnEvent(pWnd, msg, pData);
@@ -72,8 +72,8 @@ void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NUL
     }
 }
 
-const char* CUIMessageBoxEx::GetHost() { return m_pMessageBox->GetHost(); }
-const char* CUIMessageBoxEx::GetPassword() { return m_pMessageBox->GetPassword(); }
+LPCSTR CUIMessageBoxEx::GetHost() { return m_pMessageBox->GetHost(); }
+LPCSTR CUIMessageBoxEx::GetPassword() { return m_pMessageBox->GetPassword(); }
 bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
@@ -98,5 +98,5 @@ bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 }
 
-void CUIMessageBoxEx::SetTextEditURL(const char* text) { m_pMessageBox->SetTextEditURL(text); }
-const char* CUIMessageBoxEx::GetTextEditURL() { return m_pMessageBox->GetTextEditURL(); }
+void CUIMessageBoxEx::SetTextEditURL(LPCSTR text) { m_pMessageBox->SetTextEditURL(text); }
+LPCSTR CUIMessageBoxEx::GetTextEditURL() { return m_pMessageBox->GetTextEditURL(); }

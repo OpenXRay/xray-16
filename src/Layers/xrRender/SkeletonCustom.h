@@ -84,8 +84,8 @@ using SkeletonWMVec = xr_vector<intrusive_ptr<CSkeletonWallmark>>;
 #ifdef DEBUG
 struct dbg_marker
 {
-    bool* lock;
-    dbg_marker(bool* b)
+    BOOL* lock;
+    dbg_marker(BOOL* b)
     {
         lock = b;
         VERIFY(*lock == FALSE);
@@ -112,7 +112,7 @@ protected: //--#SM+#--
 
 public:
 #ifdef DEBUG
-    bool dbg_single_use_marker;
+    BOOL dbg_single_use_marker;
 #endif
     void Bone_Calculate(CBoneData* bd, Fmatrix* parent) override;
     void CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0));
@@ -147,7 +147,7 @@ protected:
     accel* bone_map_N; // bones associations (shared) - sorted by name
     accel* bone_map_P; // bones associations (shared) - sorted by name-pointer
 
-    bool Update_Visibility;
+    BOOL Update_Visibility;
     u32 UCalc_Time;
     s32 UCalc_Visibox;
 
@@ -185,9 +185,9 @@ public:
     virtual ~CKinematics();
 
     // Low level interface
-    u16 LL_BoneID(const char* B) override;
+    u16 LL_BoneID(LPCSTR B) override;
     u16 LL_BoneID(const shared_str& B) override;
-    const char* LL_BoneName_dbg(u16 ID) override;
+    LPCSTR LL_BoneName_dbg(u16 ID) override;
 
     CInifile* LL_UserData() override { return pUserData; }
     accel* LL_Bones() override { return bone_map_N; }
@@ -257,17 +257,17 @@ public:
         iRoot = bone_id;
     }
 
-    bool LL_GetBoneVisible(u16 bone_id) override
+    BOOL LL_GetBoneVisible(u16 bone_id) override
     {
         VERIFY(bone_id < LL_BoneCount());
         return visimask.is(u64(1) << bone_id);
     }
-    void LL_SetBoneVisible(u16 bone_id, bool val, bool bRecursive) override;
+    void LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive) override;
     u64 LL_GetBonesVisible() override { return visimask.get(); }
     void LL_SetBonesVisible(u64 mask) override;
 
     // Main functionality
-    void CalculateBones(bool bForceExact = FALSE) override; // Recalculate skeleton
+    void CalculateBones(BOOL bForceExact = FALSE) override; // Recalculate skeleton
     void CalculateBones_Invalidate() override;
     void Callback(UpdateCallback C, void* Param) override
     {

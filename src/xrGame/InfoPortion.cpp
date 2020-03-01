@@ -37,7 +37,7 @@ void CInfoPortion::Load(shared_str info_id)
     inherited_shared::load_shared(m_InfoId, nullptr);
 }
 
-void CInfoPortion::load_shared(const char*)
+void CInfoPortion::load_shared(LPCSTR)
 {
     const ITEM_DATA* item_data = GetById(m_InfoId, true);
 

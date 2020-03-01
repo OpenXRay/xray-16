@@ -8,9 +8,9 @@
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
-void fix_texture_name(char* fn)
+void fix_texture_name(LPSTR fn)
 {
-    char* _ext = strext(fn);
+    LPSTR _ext = strext(fn);
     if (_ext &&
         (0 == xr_stricmp(_ext, ".tga") ||
             0 == xr_stricmp(_ext, ".dds") ||
@@ -19,7 +19,7 @@ void fix_texture_name(char* fn)
         *_ext = 0;
 }
 
-int get_texture_load_lod(const char* fn)
+int get_texture_load_lod(LPCSTR fn)
 {
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
     auto it_ = sect.Data.cbegin();
@@ -63,7 +63,7 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
     return iFloor(res);
 }
 
-GLuint CRender::texture_load(const char* fRName, u32& ret_msize, GLenum& ret_desc)
+GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 {
     GLuint pTexture = 0;
     string_path fn;

@@ -23,8 +23,8 @@ public:
 
         struct remove_text_pred
         {
-            const char* text;
-            remove_text_pred(const char* t) : text(t) {}
+            LPCSTR text;
+            remove_text_pred(LPCSTR t) : text(t) {}
             bool operator()(const T& item) { return (item.text == text); }
         };
 
@@ -47,7 +47,7 @@ public:
             std::sort(m_data.begin(), m_data.end(), sort_id_pred());
         }
 
-        IC void remove_item(const char* text)
+        IC void remove_item(LPCSTR text)
         {
             ITEM_STORAGE_VEC_IT it = std::remove_if(m_data.begin(), m_data.end(), remove_text_pred(text));
             m_data.erase(it, m_data.end());
@@ -80,7 +80,7 @@ public:
         u32 color;
         u32 id;
 
-        SInfoItem(const char* str, u32 col, u32 i) : text(str), color(col), id(i) {}
+        SInfoItem(LPCSTR str, u32 col, u32 i) : text(str), color(col), id(i) {}
     };
 
     class CObjectInfo : public CItemBase<SInfoItem>
@@ -95,7 +95,7 @@ public:
 
     public:
         CObjectInfo() { setup(); }
-        void add_item(const char* text, u32 color, u32 id = u32(-1));
+        void add_item(LPCSTR text, u32 color, u32 id = u32(-1));
 
         void draw_info(float x, float& y);
         IC void setup(const Fvector& shift = SHIFT_POS_DEFAULT, float delta = DELTA_HEIGHT_DEFAULT)
@@ -119,7 +119,7 @@ public:
         u32 color;
         u32 id;
 
-        STextItem(const char* str, float coord_x, float coord_y, u32 col, u32 i)
+        STextItem(LPCSTR str, float coord_x, float coord_y, u32 col, u32 i)
             : text(str), x(coord_x), y(coord_y), color(col), id(i)
         {
         }
@@ -130,7 +130,7 @@ public:
         typedef CItemBase<STextItem> inherited;
 
     public:
-        void add_item(const char* text, float x, float y, u32 color, u32 id = u32(-1));
+        void add_item(LPCSTR text, float x, float y, u32 color, u32 id = u32(-1));
         void draw_text();
     };
 
@@ -236,17 +236,17 @@ public:
 private:
     void free_mem();
 
-    CObjectInfo& object_info(IGameObject* obj, const char* class_name);
-    CTextInfo& text(void* class_ptr, const char* class_name);
-    CLevelInfo& level_info(void* class_ptr, const char* class_name);
+    CObjectInfo& object_info(IGameObject* obj, LPCSTR class_name);
+    CTextInfo& text(void* class_ptr, LPCSTR class_name);
+    CLevelInfo& level_info(void* class_ptr, LPCSTR class_name);
 
 private:
     struct SKey
     {
         void* class_ptr;
-        const char* class_name;
+        LPCSTR class_name;
 
-        SKey(void* ptr, const char* name)
+        SKey(void* ptr, LPCSTR name)
         {
             class_ptr = ptr;
             class_name = name;
@@ -255,7 +255,7 @@ private:
         bool operator<(const SKey& val) const { return (class_ptr < val.class_ptr); }
     };
 
-    DEFINE_MAP(const char*, CObjectInfo*, CLASS_INFO_MAP, CLASS_INFO_MAP_IT);
+    DEFINE_MAP(LPCSTR, CObjectInfo*, CLASS_INFO_MAP, CLASS_INFO_MAP_IT);
     DEFINE_MAP(IGameObject*, CLASS_INFO_MAP, OBJECT_INFO_MAP, OBJECT_INFO_MAP_IT);
     DEFINE_MAP(SKey, CTextInfo*, TEXT_INFO_MAP, TEXT_INFO_MAP_IT);
     DEFINE_MAP(SKey, CLevelInfo*, LEVEL_INFO_MAP, LEVEL_INFO_MAP_IT);

@@ -37,7 +37,7 @@ protected:
     CUIScrollView* UIMasterList;
     CUIScrollView* UIDetailList;
     void FillPointsInfo();
-    void FillReputationDetails(CUIXml* xml, const char* path);
+    void FillReputationDetails(CUIXml* xml, LPCSTR path);
     void FillMasterPart(CUIXml* xml, const shared_str& key_name);
 };
 
@@ -51,7 +51,7 @@ public:
     CUIStatic* m_text2;
 public:
     CUIActorStaticticHeader(CUIActorInfoWnd* w);
-    void Init(CUIXml* xml, const char* path, int idx_in_xml);
+    void Init(CUIXml* xml, LPCSTR path, int idx_in_xml);
     virtual bool OnMouseDown(int mouse_btn);
     virtual void SetSelected(bool b);
 
@@ -67,5 +67,5 @@ public:
     CUIStatic* m_text2;
     CUIStatic* m_text3;
 public:
-    void Init(CUIXml* xml, const char* path, int xml_idx);
+    void Init(CUIXml* xml, LPCSTR path, int xml_idx);
 };

@@ -88,11 +88,11 @@ protected:
     void _Collide(const AABBQuantizedNoLeafNode* node);
     void _Collide(const AABBTreeNode* node);
     // Overlap tests
-    inline_ bool AABBContainsBox(const Point& bc, const Point& be);
-    inline_ bool AABBAABBOverlap(const Point& b, const Point& Pb);
-    inline_ bool TriBoxOverlap();
+    inline_ BOOL AABBContainsBox(const Point& bc, const Point& be);
+    inline_ BOOL AABBAABBOverlap(const Point& b, const Point& Pb);
+    inline_ BOOL TriBoxOverlap();
     // Init methods
-    bool InitQuery(AABBCache& cache, const CollisionAABB& box);
+    BOOL InitQuery(AABBCache& cache, const CollisionAABB& box);
 };
 
 #endif // __OPC_AABBCOLLIDER_H__

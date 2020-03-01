@@ -104,7 +104,7 @@ public:
     virtual void set_PhysicsRefObject(IPhysicsShellHolder* ref_object); // aux
     virtual IPhysicsShellHolder* PhysicsRefObject() { return m_phys_ref_object; } // aux
     virtual void SetMaterial(u16 m); // aux
-    virtual void SetMaterial(const char* m) { CPHGeometryOwner::SetMaterial(m); } // aux
+    virtual void SetMaterial(LPCSTR m) { CPHGeometryOwner::SetMaterial(m); } // aux
     virtual u16 numberOfGeoms() const; // aux
     virtual const Fvector& local_mass_Center() { return CPHGeometryOwner::local_mass_Center(); } // aux
     virtual float getVolume() { return CPHGeometryOwner::get_volume(); } // aux

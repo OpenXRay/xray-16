@@ -33,12 +33,12 @@ public:
     CCustomRocket(void);
     virtual ~CCustomRocket(void);
 
-    virtual void Load(const char* section);
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual void Load(LPCSTR section);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual bool AlwaysTheCrow() { return TRUE; }
+    virtual BOOL AlwaysTheCrow() { return TRUE; }
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
 
     virtual void OnH_A_Independent();
     virtual void OnH_B_Independent(bool just_before_destroy);
@@ -46,7 +46,7 @@ public:
     virtual void OnH_A_Chield();
     virtual void UpdateCL();
 
-    virtual bool UsedAI_Locations() { return (FALSE); }
+    virtual BOOL UsedAI_Locations() { return (FALSE); }
     virtual bool Useful() const { return (m_eState == eInactive); }
     //создание физической оболочки
     virtual void activate_physic_shell();

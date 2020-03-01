@@ -36,7 +36,7 @@ static const float r_shoulder_factor = 0.2f;
 static const float r_head_factor = 0.2f;
 
 CBlend* PlayMotionByParts(
-    IKinematicsAnimated* sa, MotionID motion_ID, bool bMixIn, PlayCallback Callback, LPVOID CallbackParam);
+    IKinematicsAnimated* sa, MotionID motion_ID, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam);
 
 void CActor::Spin0Callback(CBoneInstance* B)
 {
@@ -107,7 +107,7 @@ void CActor::VehicleHeadCallback(CBoneInstance* B)
     B->mTransform.c = c;
 }
 
-void STorsoWpn::Create(IKinematicsAnimated* K, const char* base0, const char* base1)
+void STorsoWpn::Create(IKinematicsAnimated* K, LPCSTR base0, LPCSTR base1)
 {
     char buf[128];
     moving[eIdle] = K->ID_Cycle_Safe(strconcat(sizeof(buf), buf, base0, "_torso", base1, "_aim_1"));
@@ -129,7 +129,7 @@ void STorsoWpn::Create(IKinematicsAnimated* K, const char* base0, const char* ba
     all_attack_1 = K->ID_Cycle_Safe(strconcat(sizeof(buf), buf, base0, "_all", base1, "_attack_1"));
     all_attack_2 = K->ID_Cycle_Safe(strconcat(sizeof(buf), buf, base0, "_all", base1, "_attack_2"));
 }
-void SAnimState::Create(IKinematicsAnimated* K, const char* base0, const char* base1)
+void SAnimState::Create(IKinematicsAnimated* K, LPCSTR base0, LPCSTR base1)
 {
     char buf[128];
     legs_fwd = K->ID_Cycle(strconcat(sizeof(buf), buf, base0, base1, "_fwd_0"));
@@ -178,7 +178,7 @@ void SActorState::CreateClimb(IKinematicsAnimated* K)
         m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", xr_itoa(k, buf1, 10)));
 }
 
-void SActorState::Create(IKinematicsAnimated* K, const char* base)
+void SActorState::Create(IKinematicsAnimated* K, LPCSTR base)
 {
     string128 buf, buf1;
     legs_turn = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_turn"));

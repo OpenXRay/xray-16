@@ -248,7 +248,7 @@ void CBackend::dbg_OverdrawEnd()
 
     // Set the background to black
 #ifndef USE_DX9
-    float ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     HW.pContext->ClearRenderTargetView(get_RT(), ColorRGBA);
 #else
     CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));

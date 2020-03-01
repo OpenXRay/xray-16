@@ -68,9 +68,9 @@ void SBuyItemInfo::SetState(const EItmState& s)
     };
 }
 
-const char* _state_names[] = {"e_undefined", "e_bought", "e_sold", "e_own", "e_shop"};
+LPCSTR _state_names[] = {"e_undefined", "e_bought", "e_sold", "e_own", "e_shop"};
 
-const char* SBuyItemInfo::GetStateAsText() const
+LPCSTR SBuyItemInfo::GetStateAsText() const
 {
     EItmState st = GetState();
     return _state_names[st];
@@ -811,7 +811,7 @@ struct items_sorter
     };
 };
 
-void CUIMpTradeWnd::DumpAllItems(const char* s)
+void CUIMpTradeWnd::DumpAllItems(LPCSTR s)
 {
     std::sort(m_all_items.begin(), m_all_items.end(), items_sorter());
 

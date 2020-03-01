@@ -22,7 +22,7 @@ protected:
     void add_actions();
 
 public:
-    CStalkerDangerBySoundPlanner(CAI_Stalker* object = 0, const char* action_name = "");
+    CStalkerDangerBySoundPlanner(CAI_Stalker* object = 0, LPCSTR action_name = "");
     virtual void setup(CAI_Stalker* object, CPropertyStorage* storage);
     virtual void initialize();
     virtual void update();

@@ -321,7 +321,7 @@ void game_sv_Single::on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src)
     alife().on_death(e_dest, e_src);
 }
 
-void game_sv_Single::restart_simulator(const char* saved_game_name)
+void game_sv_Single::restart_simulator(LPCSTR saved_game_name)
 {
     shared_str& options = *alife().server_command_line();
 

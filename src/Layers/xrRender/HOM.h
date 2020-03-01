@@ -34,7 +34,7 @@ private:
     xrXRC xrc;
     CDB::MODEL* m_pModel;
     occTri* m_pTris;
-    bool bEnabled;
+    BOOL bEnabled;
     Fmatrix m_xform;
     Fmatrix m_xform_01;
 
@@ -68,10 +68,10 @@ public:
         MT_RENDER();
     }
 
-    bool visible(vis_data& vis);
-    bool visible(Fbox3& B);
-    bool visible(sPoly& P);
-    bool visible(Fbox2& B, float depth); // viewport-space (0..1)
+    BOOL visible(vis_data& vis);
+    BOOL visible(Fbox3& B);
+    BOOL visible(sPoly& P);
+    BOOL visible(Fbox2& B, float depth); // viewport-space (0..1)
 
     CHOM();
     ~CHOM();

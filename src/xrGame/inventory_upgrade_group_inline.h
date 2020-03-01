@@ -14,7 +14,7 @@ namespace inventory
 namespace upgrade
 {
 IC const shared_str& Group::id() const { return (m_id); }
-IC const char* Group::id_str() const { return (m_id.c_str()); }
+IC LPCSTR Group::id_str() const { return (m_id.c_str()); }
 } // namespace upgrade
 } // namespace inventory
 

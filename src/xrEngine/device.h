@@ -71,8 +71,8 @@ public:
     SDL_Rect m_rcWindowClient;
 
     u32 dwPrecacheFrame;
-    bool b_is_Ready;
-    bool b_is_Active;
+    BOOL b_is_Ready;
+    BOOL b_is_Active;
     bool IsAnselActive;
     bool AllowWindowDrag; // For windowed mode
 
@@ -144,7 +144,7 @@ class ENGINE_API CRenderDevice : public CRenderDeviceBase, public IWindowHandler
 
 public:
 #if defined(WINDOWS)
-    LRESULT MsgProc(HWND, unsigned int, WPARAM, LPARAM);
+    LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 #endif
     // u32 dwFrame;
     // u32 dwPrecacheFrame;
@@ -152,15 +152,15 @@ public:
 
     // u32 dwWidth, dwHeight;
     float fWidth_2, fHeight_2;
-    // bool b_is_Ready;
-    // bool b_is_Active;
+    // BOOL b_is_Ready;
+    // BOOL b_is_Active;
     void OnWM_Activate(WPARAM wParam, LPARAM lParam);
 
     // ref_shader m_WireShader;
     // ref_shader m_SelectionShader;
 
-    bool m_bNearer;
-    void SetNearer(bool enabled)
+    BOOL m_bNearer;
+    void SetNearer(BOOL enabled)
     {
         if (enabled && !m_bNearer)
         {
@@ -199,8 +199,8 @@ public:
         m_bNearer = FALSE;
     };
 
-    void Pause(bool bOn, bool bTimer, bool bSound, const char* reason);
-    bool Paused();
+    void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);
+    BOOL Paused();
 
 private:
     static void PrimaryThreadProc(void* context);
@@ -281,7 +281,7 @@ private:
 
 public:
     Event PresentationFinished = nullptr;
-    volatile bool mt_bMustExit;
+    volatile BOOL mt_bMustExit;
 
     bool IsMTProcessingAllowed() const
     {
@@ -315,7 +315,7 @@ private:
 
 public:
 #if !defined(LINUX)
-    bool xr_stdcall on_message(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
+    bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif
 
 private:

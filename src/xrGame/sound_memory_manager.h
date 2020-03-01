@@ -84,9 +84,9 @@ protected:
 public:
     IC CSoundMemoryManager(CCustomMonster* object, CAI_Stalker* stalker, CSound_UserDataVisitor* visitor);
     virtual ~CSoundMemoryManager();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void feel_sound_new(
         IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power);
     virtual void update();

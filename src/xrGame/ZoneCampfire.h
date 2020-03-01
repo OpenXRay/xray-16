@@ -14,13 +14,13 @@ protected:
 
     virtual void PlayIdleParticles(bool bIdleLight = true);
     virtual void StopIdleParticles(bool bIdleLight = true);
-    virtual bool AlwaysTheCrow();
+    virtual BOOL AlwaysTheCrow();
     virtual void UpdateWorkload(u32 dt);
 
 public:
     CZoneCampfire();
     virtual ~CZoneCampfire();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void GoEnabledState();
     virtual void GoDisabledState();
 

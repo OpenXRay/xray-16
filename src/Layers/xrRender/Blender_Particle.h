@@ -13,8 +13,8 @@ class CBlender_Particle : public IBlender
     xrP_BOOL oClamp;
 
 public:
-    virtual const char* getComment() { return "particles"; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "particles"; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

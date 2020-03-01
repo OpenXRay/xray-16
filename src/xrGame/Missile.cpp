@@ -52,7 +52,7 @@ void CMissile::reinit()
     SetState(eHidden);
 }
 
-void CMissile::Load(const char* section)
+void CMissile::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -69,9 +69,9 @@ void CMissile::Load(const char* section)
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
 }
 
-bool CMissile::net_Spawn(CSE_Abstract* DC)
+BOOL CMissile::net_Spawn(CSE_Abstract* DC)
 {
-    bool l_res = inherited::net_Spawn(DC);
+    BOOL l_res = inherited::net_Spawn(DC);
 
     dwXF_Frame = 0xffffffff;
 

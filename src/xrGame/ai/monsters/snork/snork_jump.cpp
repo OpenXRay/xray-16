@@ -18,7 +18,7 @@
 //	xr_delete(m_jumper);
 //}
 //
-// void CSnorkJump::load(const char* section)
+// void CSnorkJump::load(LPCSTR section)
 //{
 //	//m_jumper->load(section);
 //}
@@ -158,7 +158,7 @@
 //{
 //	float ret_val = flt_max;
 //
-//	bool				enabled = m_object->getEnabled();
+//	BOOL				enabled = m_object->getEnabled();
 //	m_object->setEnabled(FALSE);
 //	collide::rq_result	l_rq;
 //

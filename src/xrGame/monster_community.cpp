@@ -11,7 +11,7 @@
 #define MONSTER_RELATIONS_TABLE "monster_relations"
 
 //////////////////////////////////////////////////////////////////////////
-MONSTER_COMMUNITY_DATA::MONSTER_COMMUNITY_DATA(MONSTER_COMMUNITY_INDEX idx, MONSTER_COMMUNITY_ID idn, const char* team_str)
+MONSTER_COMMUNITY_DATA::MONSTER_COMMUNITY_DATA(MONSTER_COMMUNITY_INDEX idx, MONSTER_COMMUNITY_ID idn, LPCSTR team_str)
 {
     index = idx;
     id = idn;

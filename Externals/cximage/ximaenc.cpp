@@ -83,7 +83,7 @@ bool CxImage::EncodeSafeCheck(CxFile *hFile)
 }
 ////////////////////////////////////////////////////////////////////////////////
 //#ifdef WIN32
-//bool CxImage::Save(const wchar_t * filename, unsigned int imagetype)
+//bool CxImage::Save(LPCWSTR filename, DWORD imagetype)
 //{
 //	FILE* hFile;	//file handle to write the image
 //	if ((hFile=_wfopen(filename,L"wb"))==NULL)  return false;
@@ -100,7 +100,7 @@ bool CxImage::EncodeSafeCheck(CxFile *hFile)
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  * \return true if everything is ok
  */
-bool CxImage::Save(const TCHAR * filename, unsigned int imagetype)
+bool CxImage::Save(const TCHAR * filename, DWORD imagetype)
 {
 	FILE* hFile;	//file handle to write the image
 
@@ -121,7 +121,7 @@ bool CxImage::Save(const TCHAR * filename, unsigned int imagetype)
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  * \return true if everything is ok
  */
-bool CxImage::Encode(FILE *hFile, unsigned int imagetype)
+bool CxImage::Encode(FILE *hFile, DWORD imagetype)
 {
 	CxIOFile file(hFile);
 	return Encode(&file,imagetype);
@@ -136,7 +136,7 @@ bool CxImage::Encode(FILE *hFile, unsigned int imagetype)
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  * \return true if everything is ok
  */
-bool CxImage::Encode(unsigned char * &buffer, long &size, unsigned int imagetype)
+bool CxImage::Encode(BYTE * &buffer, long &size, DWORD imagetype)
 {
 	if (buffer!=NULL){
 		strcpy(info.szLastError,"the buffer must be empty");
@@ -159,7 +159,7 @@ bool CxImage::Encode(unsigned char * &buffer, long &size, unsigned int imagetype
  * \return true if everything is ok
  * \sa ENUM_CXIMAGE_FORMATS
  */
-bool CxImage::Encode(CxFile *hFile, unsigned int imagetype)
+bool CxImage::Encode(CxFile *hFile, DWORD imagetype)
 {
 
 #if CXIMAGE_SUPPORT_BMP
@@ -374,7 +374,7 @@ bool CxImage::Encode(CxFile *hFile, unsigned int imagetype)
  * \param imagetype: can be CXIMAGE_FORMAT_TIF or CXIMAGE_FORMAT_GIF.
  * \return true if everything is ok
  */
-bool CxImage::Encode(FILE * hFile, CxImage ** pImages, int pagecount, unsigned int imagetype)
+bool CxImage::Encode(FILE * hFile, CxImage ** pImages, int pagecount, DWORD imagetype)
 {
 	CxIOFile file(hFile);
 	return Encode(&file, pImages, pagecount,imagetype);
@@ -388,7 +388,7 @@ bool CxImage::Encode(FILE * hFile, CxImage ** pImages, int pagecount, unsigned i
  * \param imagetype: can be CXIMAGE_FORMAT_TIF, CXIMAGE_FORMAT_GIF or CXIMAGE_FORMAT_ICO.
  * \return true if everything is ok
  */
-bool CxImage::Encode(CxFile * hFile, CxImage ** pImages, int pagecount, unsigned int imagetype)
+bool CxImage::Encode(CxFile * hFile, CxImage ** pImages, int pagecount, DWORD imagetype)
 {
 #if CXIMAGE_SUPPORT_TIF
 	if (imagetype==CXIMAGE_FORMAT_TIF){
@@ -440,7 +440,7 @@ bool CxImage::Encode(CxFile * hFile, CxImage ** pImages, int pagecount, unsigned
  * \param bFlipY: direction of Y axis. default = false.
  * \return true if everything is ok
  */
-bool CxImage::Encode2RGBA(unsigned char * &buffer, long &size, bool bFlipY)
+bool CxImage::Encode2RGBA(BYTE * &buffer, long &size, bool bFlipY)
 {
 	if (buffer!=NULL){
 		strcpy(info.szLastError,"the buffer must be empty");
@@ -496,8 +496,8 @@ bool CxImage::Encode2RGBA(CxFile *hFile, bool bFlipY)
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  * \return true if everything is ok
  */
-bool CxImage::Load(const TCHAR * filename, unsigned int imagetype)
-//bool CxImage::Load(const char * filename, unsigned int imagetype)
+bool CxImage::Load(const TCHAR * filename, DWORD imagetype)
+//bool CxImage::Load(const char * filename, DWORD imagetype)
 {
 	/*FILE* hFile;	//file handle to read the image
 	if ((hFile=fopen(filename,"rb"))==NULL)  return false;
@@ -541,7 +541,7 @@ bool CxImage::Load(const TCHAR * filename, unsigned int imagetype)
 }
 ////////////////////////////////////////////////////////////////////////////////
 #ifdef WIN32
-//bool CxImage::Load(const wchar_t * filename, unsigned int imagetype)
+//bool CxImage::Load(LPCWSTR filename, DWORD imagetype)
 //{
 //	/*FILE* hFile;	//file handle to read the image
 //	if ((hFile=_wfopen(filename, L"rb"))==NULL)  return false;
@@ -579,9 +579,9 @@ bool CxImage::Load(const TCHAR * filename, unsigned int imagetype)
  * \param hModule: NULL for internal resource, or external application/DLL hinstance returned by LoadLibray.
  * \return true if everything is ok
  */
-bool CxImage::LoadResource(HRSRC hRes, unsigned int imagetype, HMODULE hModule)
+bool CxImage::LoadResource(HRSRC hRes, DWORD imagetype, HMODULE hModule)
 {
-	unsigned int rsize=SizeofResource(hModule,hRes);
+	DWORD rsize=SizeofResource(hModule,hRes);
 	HGLOBAL hMem=::LoadResource(hModule,hRes);
 	if (hMem){
 		char* lpVoid=(char*)LockResource(hMem);
@@ -601,7 +601,7 @@ bool CxImage::LoadResource(HRSRC hRes, unsigned int imagetype, HMODULE hModule)
 				return bOK;
 			}*/
 
-			CxMemFile fTmp((unsigned char*)lpVoid,rsize);
+			CxMemFile fTmp((BYTE*)lpVoid,rsize);
 			return Decode(&fTmp,imagetype);
 		}
 	} else strcpy(info.szLastError,"Unable to load resource!");
@@ -618,8 +618,8 @@ bool CxImage::LoadResource(HRSRC hRes, unsigned int imagetype, HMODULE hModule)
 // > filename: file name
 // > imagetype: specify the image format (CXIMAGE_FORMAT_BMP,...)
 // For UNICODE support: char -> TCHAR
-CxImage::CxImage(const TCHAR * filename, unsigned int imagetype)
-//CxImage::CxImage(const char * filename, unsigned int imagetype)
+CxImage::CxImage(const TCHAR * filename, DWORD imagetype)
+//CxImage::CxImage(const char * filename, DWORD imagetype)
 {
 	Startup(imagetype);
 	Load(filename,imagetype);
@@ -630,7 +630,7 @@ CxImage::CxImage(const TCHAR * filename, unsigned int imagetype)
  * \param stream: file handle, with read access.
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  */
-CxImage::CxImage(FILE * stream, unsigned int imagetype)
+CxImage::CxImage(FILE * stream, DWORD imagetype)
 {
 	Startup(imagetype);
 	Decode(stream,imagetype);
@@ -641,7 +641,7 @@ CxImage::CxImage(FILE * stream, unsigned int imagetype)
  * \param stream: file handle (CxMemFile or CxIOFile), with read access.
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  */
-CxImage::CxImage(CxFile * stream, unsigned int imagetype)
+CxImage::CxImage(CxFile * stream, DWORD imagetype)
 {
 	Startup(imagetype);
 	Decode(stream,imagetype);
@@ -653,7 +653,7 @@ CxImage::CxImage(CxFile * stream, unsigned int imagetype)
  * \param size: size of buffer
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  */
-CxImage::CxImage(unsigned char * buffer, unsigned int size, unsigned int imagetype)
+CxImage::CxImage(BYTE * buffer, DWORD size, DWORD imagetype)
 {
 	Startup(imagetype);
 	CxMemFile stream(buffer,size);
@@ -667,7 +667,7 @@ CxImage::CxImage(unsigned char * buffer, unsigned int size, unsigned int imagety
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  * \return true if everything is ok
  */
-bool CxImage::Decode(unsigned char * buffer, unsigned int size, unsigned int imagetype)
+bool CxImage::Decode(BYTE * buffer, DWORD size, DWORD imagetype)
 {
 	CxMemFile file(buffer,size);
 	return Decode(&file,imagetype);
@@ -679,7 +679,7 @@ bool CxImage::Decode(unsigned char * buffer, unsigned int size, unsigned int ima
  * \param imagetype: file format, see ENUM_CXIMAGE_FORMATS
  * \return true if everything is ok
  */
-bool CxImage::Decode(FILE *hFile, unsigned int imagetype)
+bool CxImage::Decode(FILE *hFile, DWORD imagetype)
 {
 	CxIOFile file(hFile);
 	return Decode(&file,imagetype);
@@ -692,7 +692,7 @@ bool CxImage::Decode(FILE *hFile, unsigned int imagetype)
  * \return true if everything is ok
  * \sa ENUM_CXIMAGE_FORMATS
  */
-bool CxImage::Decode(CxFile *hFile, unsigned int imagetype)
+bool CxImage::Decode(CxFile *hFile, DWORD imagetype)
 {
 	if (hFile == NULL){
 		strcpy(info.szLastError,CXIMAGE_ERR_NOFILE);
@@ -700,7 +700,7 @@ bool CxImage::Decode(CxFile *hFile, unsigned int imagetype)
 	}
 
 	if (imagetype==CXIMAGE_FORMAT_UNKNOWN){
-		unsigned int pos = hFile->Tell();
+		DWORD pos = hFile->Tell();
 #if CXIMAGE_SUPPORT_BMP
 		{ CxImageBMP newima; newima.CopyInfo(*this); if (newima.Decode(hFile)) { Transfer(newima); return true; } else hFile->Seek(pos,SEEK_SET); }
 #endif
@@ -980,7 +980,7 @@ bool CxImage::Decode(CxFile *hFile, unsigned int imagetype)
  *  to retrieve the basic image information.
  * \sa ENUM_CXIMAGE_FORMATS
  */
-bool CxImage::CheckFormat(CxFile * hFile, unsigned int imagetype)
+bool CxImage::CheckFormat(CxFile * hFile, DWORD imagetype)
 {
 	SetType(CXIMAGE_FORMAT_UNKNOWN);
 	SetEscape(-1);
@@ -994,7 +994,7 @@ bool CxImage::CheckFormat(CxFile * hFile, unsigned int imagetype)
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////////
-bool CxImage::CheckFormat(unsigned char * buffer, unsigned int size, unsigned int imagetype)
+bool CxImage::CheckFormat(BYTE * buffer, DWORD size, DWORD imagetype)
 {
 	if (buffer==NULL || size==0){
 		strcpy(info.szLastError,"invalid or empty buffer");

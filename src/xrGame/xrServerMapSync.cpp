@@ -18,8 +18,8 @@ void xrServer::OnProcessClientMapData(NET_Packet& P, ClientID const& clientID)
     P.r_stringZ_s(client_map_version);
     P.r_u32(client_geom_crc32);
 
-    const char* server_map_name = Level().get_net_DescriptionData().map_name;
-    const char* server_map_version = Level().get_net_DescriptionData().map_version;
+    LPCSTR server_map_name = Level().get_net_DescriptionData().map_name;
+    LPCSTR server_map_version = Level().get_net_DescriptionData().map_version;
 
     responseP.w_begin(M_SV_MAP_NAME);
 

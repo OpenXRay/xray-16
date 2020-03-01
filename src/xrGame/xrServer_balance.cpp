@@ -4,7 +4,7 @@
 class xrClientData;
 class CSE_Abstract;
 
-xrClientData* xrServer::SelectBestClientToMigrateTo(CSE_Abstract* E, bool bForceAnother)
+xrClientData* xrServer::SelectBestClientToMigrateTo(CSE_Abstract* E, BOOL bForceAnother)
 {
     return (xrClientData*)SV_Client;
     //

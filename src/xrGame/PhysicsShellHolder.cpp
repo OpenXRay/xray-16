@@ -77,12 +77,12 @@ void CPhysicsShellHolder::net_Destroy()
 
 enum EEnableState { stEnable = 0, stDisable, stNotDefitnite }; // stNotDefitnite? Possibly mistaken name
 static u8 st_enable_state = (u8)stNotDefitnite;
-bool CPhysicsShellHolder::net_Spawn(CSE_Abstract* DC)
+BOOL CPhysicsShellHolder::net_Spawn(CSE_Abstract* DC)
 {
     CParticlesPlayer::net_SpawnParticles();
     st_enable_state = (u8)stNotDefitnite;
     b_sheduled = true;
-    bool ret = inherited::net_Spawn(DC); // load
+    BOOL ret = inherited::net_Spawn(DC); // load
     // create_physic_shell			();
     if (PPhysicsShell() && PPhysicsShell()->isFullActive())
     {
@@ -259,7 +259,7 @@ void CPhysicsShellHolder::PHSetMaterial(u16 m)
         m_pPhysicsShell->SetMaterial(m);
 }
 
-void CPhysicsShellHolder::PHSetMaterial(const char* m)
+void CPhysicsShellHolder::PHSetMaterial(LPCSTR m)
 {
     if (m_pPhysicsShell)
         m_pPhysicsShell->SetMaterial(m);
@@ -455,9 +455,9 @@ void CPhysicsShellHolder::on_physics_disable()
 
 Fmatrix& CPhysicsShellHolder::ObjectXFORM() { return XFORM(); }
 Fvector& CPhysicsShellHolder::ObjectPosition() { return Position(); }
-const char* CPhysicsShellHolder::ObjectName() const { return cName().c_str(); }
-const char* CPhysicsShellHolder::ObjectNameVisual() const { return cNameVisual().c_str(); }
-const char* CPhysicsShellHolder::ObjectNameSect() const { return cNameSect().c_str(); }
+LPCSTR CPhysicsShellHolder::ObjectName() const { return cName().c_str(); }
+LPCSTR CPhysicsShellHolder::ObjectNameVisual() const { return cNameVisual().c_str(); }
+LPCSTR CPhysicsShellHolder::ObjectNameSect() const { return cNameSect().c_str(); }
 bool CPhysicsShellHolder::ObjectGetDestroy() const { return !!CGameObject::getDestroy(); }
 ICollisionHitCallback* CPhysicsShellHolder::ObjectGetCollisionHitCallback() { return get_collision_hit_callback(); }
 u16 CPhysicsShellHolder::ObjectID() const { return ID(); }

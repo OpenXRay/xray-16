@@ -42,7 +42,7 @@ CPoltergeist::~CPoltergeist()
     xr_delete(m_tele);
 }
 
-void CPoltergeist::Load(const char* section)
+void CPoltergeist::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -128,7 +128,7 @@ void CPoltergeist::Load(const char* section)
     m_fly_around_change_direction_time =
         READ_IF_EXISTS(pSettings, r_float, section, "detection_fly_around_change_direction_time", 7);
 
-    const char* polter_type = pSettings->r_string(section, "type");
+    LPCSTR polter_type = pSettings->r_string(section, "type");
 
     if (xr_strcmp(polter_type, "flamer") == 0)
     {
@@ -240,7 +240,7 @@ void CPoltergeist::update_detection()
 }
 
 bool CPoltergeist::detected_enemy() { return get_current_detection_level() > m_fly_around_level; }
-void CPoltergeist::reload(const char* section)
+void CPoltergeist::reload(LPCSTR section)
 {
     inherited::reload(section);
     Energy::reload(section, "Invisible_");
@@ -351,7 +351,7 @@ void CPoltergeist::shedule_Update(u32 dt)
     ability()->update_schedule();
 }
 
-bool CPoltergeist::net_Spawn(CSE_Abstract* DC)
+BOOL CPoltergeist::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

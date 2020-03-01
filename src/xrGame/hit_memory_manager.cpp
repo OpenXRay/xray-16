@@ -66,7 +66,7 @@ const CHitObject* CHitMemoryManager::hit(const CEntityAlive* object) const
 }
 
 void CHitMemoryManager::add(const CEntityAlive* entity_alive) { add(0, Fvector().set(0, 0, 1), entity_alive, 0); }
-void CHitMemoryManager::Load(const char* section) {}
+void CHitMemoryManager::Load(LPCSTR section) {}
 void CHitMemoryManager::reinit()
 {
     m_hits = 0;
@@ -74,7 +74,7 @@ void CHitMemoryManager::reinit()
     m_last_hit_time = 0;
 }
 
-void CHitMemoryManager::reload(const char* section)
+void CHitMemoryManager::reload(LPCSTR section)
 {
 #ifdef USE_SELECTED_HIT
     xr_delete(m_selected_hit);

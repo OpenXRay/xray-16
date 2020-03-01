@@ -14,7 +14,7 @@ public:
     CUIStatsPlayerList();
     virtual ~CUIStatsPlayerList();
 
-    void Init(CUIXml& xml_doc, const char* path);
+    void Init(CUIXml& xml_doc, LPCSTR path);
     void SetSpectator(bool f);
     void SetTeam(int team);
     void AddField(const char* name, float width);
@@ -26,11 +26,11 @@ public:
     virtual void Update();
 
 protected:
-    void InitHeader(CUIXml& xml_doc, const char* path);
-    void InitTeamHeader(CUIXml& xml_doc, const char* path);
+    void InitHeader(CUIXml& xml_doc, LPCSTR path);
+    void InitTeamHeader(CUIXml& xml_doc, LPCSTR path);
     virtual void RecalcSize();
     void ShowHeader(bool bShow);
-    const char* GetST_entry(const char* itm);
+    LPCSTR GetST_entry(LPCSTR itm);
 
     int m_CurTeam;
     bool m_bSpectator;

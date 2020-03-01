@@ -31,7 +31,7 @@ void CUIStatsIcon::InitTexInfo()
     }
 
     // artefact
-    const char* artefact_name = pSettings->r_string("artefacthunt_gamedata", "artefact");
+    LPCSTR artefact_name = pSettings->r_string("artefacthunt_gamedata", "artefact");
     float fGridWidth = pSettings->r_float(artefact_name, "inv_grid_width");
     float fGridHeight = pSettings->r_float(artefact_name, "inv_grid_height");
     float fXPos = pSettings->r_float(artefact_name, "inv_grid_x");
@@ -66,7 +66,7 @@ void CUIStatsIcon::FreeTexInfo()
     m_tex_info[DEATH][1].sh->destroy();
 }
 
-void CUIStatsIcon::SetValue(const char* str)
+void CUIStatsIcon::SetValue(LPCSTR str)
 {
     if (0 == str[0])
     {

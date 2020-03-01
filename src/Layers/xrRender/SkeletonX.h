@@ -85,20 +85,20 @@ protected:
     virtual void _FillVertices(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
         Fvisual* V, u16 bone_id, u32 iBase, u32 iCount) = 0;
 
-    bool _PickBoneSoft1W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
+    BOOL _PickBoneSoft1W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
         CBoneData::FacesVec& faces);
-    bool _PickBoneSoft2W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
+    BOOL _PickBoneSoft2W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
         CBoneData::FacesVec& faces);
-    bool _PickBoneSoft3W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
+    BOOL _PickBoneSoft3W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
         CBoneData::FacesVec& faces);
-    bool _PickBoneSoft4W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
+    BOOL _PickBoneSoft4W(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, u16* indices,
         CBoneData::FacesVec& faces);
 
-    virtual bool _PickBone(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
+    virtual BOOL _PickBone(IKinematics::pick_result& r, float range, const Fvector& S, const Fvector& D, Fvisual* V,
         u16 bone_id, u32 iBase, u32 iCount) = 0;
 
 public:
-    bool has_visible_bones();
+    BOOL has_visible_bones();
     CSkeletonX()
     {
         Parent = nullptr;
@@ -108,14 +108,14 @@ public:
     virtual void SetParent(CKinematics* K) { Parent = K; }
     virtual void AfterLoad(CKinematics* parent, u16 child_idx) = 0;
     virtual void EnumBoneVertices(SEnumVerticesCallback& C, u16 bone_id) = 0;
-    virtual bool PickBone(
+    virtual BOOL PickBone(
         IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id) = 0;
     virtual void FillVertices(
         const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size, u16 bone_id) = 0;
 };
 
 template <typename T_vertex, typename T_buffer>
-bool pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S,
+BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S,
     const Fvector& D, u16* indices, CBoneData::FacesVec& faces)
 {
     for (auto it = faces.begin(); it != faces.end(); ++it)

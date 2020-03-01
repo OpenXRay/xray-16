@@ -186,7 +186,7 @@ class CSE_Spectator : public CSE_Abstract
     using inherited = CSE_Abstract;
 
 public:
-    CSE_Spectator(const char* caSection);
+    CSE_Spectator(LPCSTR caSection);
     virtual ~CSE_Spectator();
     virtual u8 g_team();
     virtual void UPDATE_Read(NET_Packet& P);
@@ -202,7 +202,7 @@ class CSE_Temporary : public CSE_Abstract
 
 public:
     u32 m_tNodeID;
-    CSE_Temporary(const char* caSection);
+    CSE_Temporary(LPCSTR caSection);
     virtual ~CSE_Temporary();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -214,7 +214,7 @@ public:
 class CSE_PHSkeleton
 {
 public:
-    CSE_PHSkeleton(const char* caSection);
+    CSE_PHSkeleton(LPCSTR caSection);
     virtual ~CSE_PHSkeleton();
 
     enum
@@ -250,10 +250,10 @@ public:
     using inherited1 = CSE_Abstract;
     using inherited2 = CSE_Visual;
 
-    CSE_AbstractVisual(const char* caSection);
+    CSE_AbstractVisual(LPCSTR caSection);
     virtual ~CSE_AbstractVisual();
     virtual CSE_Visual* __stdcall visual();
-    const char* getStartupAnimation();
+    LPCSTR getStartupAnimation();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -262,7 +262,7 @@ public:
 };
 
 #ifndef AI_COMPILER
-extern CSE_Abstract* F_entity_Create(const char* caSection);
+extern CSE_Abstract* F_entity_Create(LPCSTR caSection);
 #endif
 
 #pragma warning(pop)

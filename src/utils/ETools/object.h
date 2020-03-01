@@ -26,8 +26,8 @@ struct MyPt
     Fvector3 vNorm;
     float fU, fV;
 
-    unsigned int dwIndex;
-    unsigned int dwNewIndex;
+    DWORD dwIndex;
+    DWORD dwNewIndex;
 
     // Temporary data.
     MeshPt* pTempPt; // Temporary data.
@@ -43,7 +43,7 @@ struct MyTri
     // Temporary data.
     int iSlidingWindowLevel; // Which sliding window level this tri belongs to.
 
-    unsigned int dwNewIndex;
+    DWORD dwNewIndex;
     MeshTri* pOriginalTri;
 };
 

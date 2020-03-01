@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC CGameLevelCrossTable::CGameLevelCrossTable(const char* fName)
+IC CGameLevelCrossTable::CGameLevelCrossTable(LPCSTR fName)
 {
     m_tpCrossTableVFS = FS.r_open(fName);
     R_ASSERT2(m_tpCrossTableVFS, "Can't open cross table!");

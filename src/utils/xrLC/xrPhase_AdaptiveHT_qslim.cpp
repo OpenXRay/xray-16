@@ -81,7 +81,7 @@ int		smfVertex				(Vertex* V)
     return 1 + (std::lower_bound(g_vertices.begin(),g_vertices.end(),V)-g_vertices.begin());
 }
 
-void GSaveAsSMF					(const char* fname)
+void GSaveAsSMF					(LPCSTR fname)
 {
     string_path			fn;
     strconcat			(fn,pBuild->path,fname);
@@ -118,7 +118,7 @@ void GSaveAsSMF					(const char* fname)
     FS.w_close	(W);
 }
 
-void GSaveAsSMF			(MxStdModel* mdl, const char* fname)
+void GSaveAsSMF			(MxStdModel* mdl, LPCSTR fname)
 {
     string_path			fn;
     strconcat			(fn,pBuild->path,fname);

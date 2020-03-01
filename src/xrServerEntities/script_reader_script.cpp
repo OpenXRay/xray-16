@@ -11,7 +11,7 @@
 
 using namespace luabind;
 
-const char* r_stringZ(IReader* self)
+LPCSTR r_stringZ(IReader* self)
 {
     shared_str temp;
     self->r_stringZ(temp);

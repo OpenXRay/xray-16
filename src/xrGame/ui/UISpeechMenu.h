@@ -6,9 +6,9 @@ class CUIScrollView;
 class CUISpeechMenu : public CUIDialogWnd
 {
 public:
-    CUISpeechMenu(const char* section_name);
+    CUISpeechMenu(LPCSTR section_name);
     virtual ~CUISpeechMenu();
-    void InitList(const char* section_name);
+    void InitList(LPCSTR section_name);
     virtual bool NeedCursor() const { return false; }
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool StopAnyMove() { return false; }

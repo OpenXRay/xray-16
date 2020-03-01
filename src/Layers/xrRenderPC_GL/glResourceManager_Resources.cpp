@@ -36,7 +36,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-static bool dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
+static BOOL dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
 {
     // check sizes
     u32 a_size = GetDeclLength(a);
@@ -115,7 +115,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullpt
 void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 
 //--------------------------------------------------------------------------------------------------------------
-SPS* CResourceManager::_CreatePS(const char* _name)
+SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
@@ -153,16 +153,16 @@ SPS* CResourceManager::_CreatePS(const char* _name)
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 //--------------------------------------------------------------------------------------------------------------
-SGS* CResourceManager::_CreateGS(const char* Name) { return CreateShader<SGS>(Name); }
+SGS* CResourceManager::_CreateGS(LPCSTR Name) { return CreateShader<SGS>(Name); }
 void CResourceManager::_DeleteGS(const SGS* gs) { DestroyShader(gs); }
 
-SHS* CResourceManager::_CreateHS(const char* Name) { return CreateShader<SHS>(Name); }
+SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
 void CResourceManager::_DeleteHS(const SHS* HS) { DestroyShader(HS); }
 
-SDS* CResourceManager::_CreateDS(const char* Name) { return CreateShader<SDS>(Name); }
+SDS* CResourceManager::_CreateDS(LPCSTR Name) { return CreateShader<SDS>(Name); }
 void CResourceManager::_DeleteDS(const SDS* DS) { DestroyShader(DS); }
 
-SCS* CResourceManager::_CreateCS(const char* Name) { return CreateShader<SCS>(Name); }
+SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); }
 void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 //--------------------------------------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ extern bool show_restrictions(CRestrictedObject* object);
 
 CControlPathBuilder::CControlPathBuilder(CCustomMonster* monster) : CMovementManager(monster) {}
 CControlPathBuilder::~CControlPathBuilder() {}
-void CControlPathBuilder::load(const char* section) {}
+void CControlPathBuilder::load(LPCSTR section) {}
 void CControlPathBuilder::reinit()
 {
     // todo: remove call twice [CustomMonster reinit && control_manager reinit]

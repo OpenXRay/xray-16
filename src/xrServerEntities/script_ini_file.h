@@ -16,22 +16,22 @@ protected:
     typedef CInifile inherited;
 
 public:
-    CScriptIniFile(IReader* F, const char* path = nullptr);
-    CScriptIniFile(const char* szFileName, bool ReadOnly = TRUE, bool bLoadAtStart = TRUE, bool SaveAtEnd = TRUE);
+    CScriptIniFile(IReader* F, LPCSTR path = nullptr);
+    CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE);
     virtual ~CScriptIniFile();
-    bool line_exist(const char* S, const char* L);
-    bool section_exist(const char* S);
-    int r_clsid(const char* S, const char* L);
-    bool r_bool(const char* S, const char* L);
-    int r_token(const char* S, const char* L, const CScriptTokenList& token_list);
-    const char* r_string_wb(const char* S, const char* L);
-    const char* update(const char* file_name);
-    u32 line_count(const char* S);
-    const char* r_string(const char* S, const char* L);
-    u32 r_u32(const char* S, const char* L);
-    int r_s32(const char* S, const char* L);
-    float r_float(const char* S, const char* L);
-    Fvector r_fvector3(const char* S, const char* L);
+    bool line_exist(LPCSTR S, LPCSTR L);
+    bool section_exist(LPCSTR S);
+    int r_clsid(LPCSTR S, LPCSTR L);
+    bool r_bool(LPCSTR S, LPCSTR L);
+    int r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list);
+    LPCSTR r_string_wb(LPCSTR S, LPCSTR L);
+    LPCSTR update(LPCSTR file_name);
+    u32 line_count(LPCSTR S);
+    LPCSTR r_string(LPCSTR S, LPCSTR L);
+    u32 r_u32(LPCSTR S, LPCSTR L);
+    int r_s32(LPCSTR S, LPCSTR L);
+    float r_float(LPCSTR S, LPCSTR L);
+    Fvector r_fvector3(LPCSTR S, LPCSTR L);
 
     //AVO: additional methods to allow writing to ini files
     void w_bool(pcstr S, pcstr L, bool V, pcstr comment /* = nullptr */);

@@ -81,7 +81,7 @@ struct ECORE_API R_constant_load
     R_constant_load() : index(u16(-1)), cls(u16(-1)) {};
 #endif // USE_OGL
 
-    bool equal(R_constant_load& C)
+    BOOL equal(R_constant_load& C)
     {
 #ifdef USE_OGL
         return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
@@ -132,13 +132,13 @@ struct ECORE_API R_constant : public xr_resource
         return fake;
     }
 
-    bool equal(R_constant& C)
+    BOOL equal(R_constant& C)
     {
         return (!xr_strcmp(name, C.name)) && (type == C.type) && (destination == C.destination) && ps.equal(C.ps) &&
             vs.equal(C.vs) && samp.equal(C.samp) && handler == C.handler;
     }
 
-    bool equal(R_constant* C) { return equal(*C); }
+    BOOL equal(R_constant* C) { return equal(*C); }
 };
 typedef resptr_core<R_constant, resptr_base<R_constant>> ref_constant;
 
@@ -165,11 +165,11 @@ public:
     cb_table m_CBTable;
 #endif // USE_DX10
 private:
-    void fatal(const char* s);
+    void fatal(LPCSTR s);
 
 #if defined(USE_DX10) || defined(USE_DX11)
-    bool parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination);
-    bool parseResources(ID3DShaderReflection* pReflection, int ResNum, u32 destination);
+    BOOL parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination);
+    BOOL parseResources(ID3DShaderReflection* pReflection, int ResNum, u32 destination);
 #endif // USE_DX10
 
 public:
@@ -177,14 +177,14 @@ public:
     ~R_constant_table();
 
     void clear();
-    bool parse(void* desc, u32 destination);
+    BOOL parse(void* desc, u32 destination);
     void merge(R_constant_table* C);
     ref_constant get(pcstr name, u16 type = u16(-1)); // slow search
     ref_constant get(const shared_str& name, u16 type = u16(-1)); // fast search
 
-    bool equal(R_constant_table& C);
-    bool equal(R_constant_table* C) { return equal(*C); }
-    bool empty() { return 0 == table.size(); }
+    BOOL equal(R_constant_table& C);
+    BOOL equal(R_constant_table* C) { return equal(*C); }
+    BOOL empty() { return 0 == table.size(); }
 private:
 };
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;

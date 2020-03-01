@@ -23,10 +23,10 @@ public:
     CBastArtefact(void);
     virtual ~CBastArtefact(void);
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void shedule_Update(u32 dt);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void Hit(SHit* pHDS);

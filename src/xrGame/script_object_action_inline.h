@@ -23,7 +23,7 @@ IC CScriptObjectAction::CScriptObjectAction(
     SetQueueSize(dwQueueSize);
 }
 
-IC CScriptObjectAction::CScriptObjectAction(const char* caBoneName, MonsterSpace::EObjectAction tObjectActionType)
+IC CScriptObjectAction::CScriptObjectAction(LPCSTR caBoneName, MonsterSpace::EObjectAction tObjectActionType)
 {
     SetObject(caBoneName);
     SetObjectAction(tObjectActionType);
@@ -34,7 +34,7 @@ IC CScriptObjectAction::CScriptObjectAction(MonsterSpace::EObjectAction tObjectA
     SetObjectAction(tObjectActionType);
 }
 
-IC void CScriptObjectAction::SetObject(const char* caBoneName)
+IC void CScriptObjectAction::SetObject(LPCSTR caBoneName)
 {
     m_caBoneName = caBoneName;
     m_bCompleted = false;

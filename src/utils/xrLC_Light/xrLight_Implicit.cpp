@@ -13,7 +13,7 @@
 #include "xrCore/Threading/Lock.hpp"
 
 extern "C" bool XR_IMPORT __stdcall DXTCompress(
-    const char* out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
+    LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
 using Implicit = xr_map<u32, ImplicitDeflector>;
 
@@ -143,9 +143,9 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
 
 //#pragma optimize( "g", off )
 
-void ImplicitLightingExec(bool b_net);
+void ImplicitLightingExec(BOOL b_net);
 void ImplicitLightingTreadNetExec(void* p);
-void ImplicitLighting(bool b_net)
+void ImplicitLighting(BOOL b_net)
 {
     if (g_params().m_quality == ebqDraft)
         return;
@@ -170,7 +170,7 @@ void ImplicitLightingTreadNetExec(void* p)
 }
 
 static xr_vector<u32> not_clear;
-void ImplicitLightingExec(bool b_net)
+void ImplicitLightingExec(BOOL b_net)
 {
     Implicit calculator;
 
@@ -263,7 +263,7 @@ void ImplicitLightingExec(bool b_net)
             FS.update_path(out_name, "$game_levels$", out_name);
             Logger.clMsg("Saving texture '%s'...", out_name);
             VerifyPath(out_name);
-            unsigned char* raw_data = (unsigned char*)(TEX.pSurface);
+            BYTE* raw_data = LPBYTE(TEX.pSurface);
             u32 w = TEX.dwWidth;
             u32 h = TEX.dwHeight;
             u32 pitch = w * 4;
@@ -288,7 +288,7 @@ void ImplicitLightingExec(bool b_net)
             FS.update_path(out_name, "$game_levels$", out_name);
             Logger.clMsg("Saving texture '%s'...", out_name);
             VerifyPath(out_name);
-            unsigned char* raw_data = (unsigned char*)(&*packed.begin());
+            BYTE* raw_data = LPBYTE(&*packed.begin());
             u32 w = TEX.dwWidth;
             u32 h = TEX.dwHeight;
             u32 pitch = w * 4;

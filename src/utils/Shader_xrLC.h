@@ -56,7 +56,7 @@ class Shader_xrLC_LIB
     Shader_xrLCVec library;
 
 public:
-    void Load(const char* name)
+    void Load(LPCSTR name)
     {
         auto fs = FS.r_open(name);
         if (NULL == fs)
@@ -76,7 +76,7 @@ public:
         fs->r(&library.front(), fs->length());
         FS.r_close(fs);
     }
-    bool Save(const char* name)
+    bool Save(LPCSTR name)
     {
         auto F = FS.w_open(name);
         if (F)
@@ -89,7 +89,7 @@ public:
     }
     void Unload() { library.clear(); }
 
-    size_t GetID(const char* name) const
+    size_t GetID(LPCSTR name) const
     {
         for (auto it = library.begin(); it != library.end(); ++it)
             if (0 == xr_stricmp(name, it->Name))
@@ -97,7 +97,7 @@ public:
         return size_t(-1);
     }
 
-    Shader_xrLC* Get(const char* name)
+    Shader_xrLC* Get(LPCSTR name)
     {
         for (auto& shader : library)
             if (0 == xr_stricmp(name, shader.Name))
@@ -115,7 +115,7 @@ public:
         return &library.back();
     }
 
-    void Remove(const char* name)
+    void Remove(LPCSTR name)
     {
         for (auto it = library.begin(); it != library.end(); ++it)
             if (0 == xr_stricmp(name, it->Name))

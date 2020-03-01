@@ -12,8 +12,8 @@ static pcstr important_sections[] = {"mp_actor", "mp_actor_damage", "mp_actor_im
 mp_config_sections::mp_config_sections() : m_tmp_dumper(NULL, FALSE, FALSE, FALSE)
 {
     u32 gcount = pSettings->line_count("mp_item_groups");
-    const char* line;
-    const char* name;
+    LPCSTR line;
+    LPCSTR name;
     for (u32 i = 0; i < gcount; ++i)
     {
         pSettings->r_line("mp_item_groups", i, &name, &line);
@@ -54,9 +54,9 @@ mp_active_params::mp_active_params() {}
 mp_active_params::~mp_active_params() {}
 char const* active_params_section = "active_params_section";
 
-/*void mp_active_params::dump	(IAnticheatDumpable const * dumpable_obj, const char* sect_name_key, CInifile & dest_dumper)
+/*void mp_active_params::dump	(IAnticheatDumpable const * dumpable_obj, LPCSTR sect_name_key, CInifile & dest_dumper)
 {
-    const char*		obj_sect_name = "";
+    LPCSTR		obj_sect_name = "";
     if (dumpable_obj)
     {
         shared_str const tmp_obj_section = dumpable_obj->GetAnticheatSectionName();
@@ -77,7 +77,7 @@ char const* active_params_section = "active_params_section";
     }
 }*/
 
-void mp_active_params::load_to(const char* sect_name, CInifile& dest_dumper)
+void mp_active_params::load_to(LPCSTR sect_name, CInifile& dest_dumper)
 {
     if (!pSettings->section_exist(sect_name))
         return;
@@ -85,8 +85,8 @@ void mp_active_params::load_to(const char* sect_name, CInifile& dest_dumper)
     u32 lines_count = pSettings->line_count(sect_name);
     for (u32 i = 0; i < lines_count; ++i)
     {
-        const char* line_name = NULL;
-        const char* line_value = NULL;
+        LPCSTR line_name = NULL;
+        LPCSTR line_value = NULL;
         pSettings->r_line(sect_name, i, &line_name, &line_value);
         dest_dumper.w_string(sect_name, line_name, line_value);
     }

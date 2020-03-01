@@ -33,7 +33,7 @@ void CRenderTarget::accum_spot(light* L)
         }
     }
 
-    bool bIntersect = FALSE; //enable_scissor(L);
+    BOOL bIntersect = FALSE; //enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -276,7 +276,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
-    bool bIntersect = FALSE; //enable_scissor(L);
+    BOOL bIntersect = FALSE; //enable_scissor(L);
     {
         // setup xform
         L->xform_calc();

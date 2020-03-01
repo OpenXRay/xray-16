@@ -444,7 +444,7 @@ int main(int argc, char* argv[])
 
         if (handle != reinterpret_cast<HANDLE>(INVALID_HANDLE_VALUE))
         {
-            bool rv = TRUE;
+            BOOL rv = TRUE;
             bool all_ok = true;
 
             while (rv)

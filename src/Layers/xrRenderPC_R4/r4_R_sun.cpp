@@ -28,8 +28,8 @@ static int facetable[6][4] = {
     {0, 3, 5, 7}, {1, 6, 4, 2},
 };
 //////////////////////////////////////////////////////////////////////////
-#define DW_AS_FLT(DW) (*(float*)&(DW))
-#define FLT_AS_DW(F) (*(unsigned int*)&(F))
+#define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
+#define FLT_AS_DW(F) (*(DWORD*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0)
 #define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0x7f800000L)
@@ -51,7 +51,7 @@ struct BoundingBox
 
     BoundingBox() : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) {}
     BoundingBox(const BoundingBox& other) : minPt(other.minPt), maxPt(other.maxPt) {}
-    explicit BoundingBox(const D3DXVECTOR3* points, unsigned int n) : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
+    explicit BoundingBox(const D3DXVECTOR3* points, UINT n) : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < n; i++)
             Merge(&points[i]);
@@ -89,7 +89,7 @@ struct BoundingBox
 };
 
 ///////////////////////////////////////////////////////////////////////////
-bool LineIntersection2D(D3DXVECTOR2* result, const D3DXVECTOR2* lineA, const D3DXVECTOR2* lineB)
+BOOL LineIntersection2D(D3DXVECTOR2* result, const D3DXVECTOR2* lineA, const D3DXVECTOR2* lineB)
 {
     //  if the lines are parallel, the lines will not intersect in a point
     //  NOTE: assumes the rays are already normalized!!!!
@@ -113,7 +113,7 @@ bool LineIntersection2D(D3DXVECTOR2* result, const D3DXVECTOR2* lineA, const D3D
 //  PlaneIntersection
 //    computes the point where three planes intersect
 //    returns whether or not the point exists.
-static inline bool PlaneIntersection(
+static inline BOOL PlaneIntersection(
     D3DXVECTOR3* intersectPt, const D3DXPLANE* p0, const D3DXPLANE* p1, const D3DXPLANE* p2)
 {
     D3DXVECTOR3 n0(p0->a, p0->b, p0->c);
@@ -213,7 +213,7 @@ struct DumbClipper
 {
     CFrustum frustum;
     xr_vector<D3DXPLANE> planes;
-    bool clip(D3DXVECTOR3& p0, D3DXVECTOR3& p1) // returns TRUE if result meaningfull
+    BOOL clip(D3DXVECTOR3& p0, D3DXVECTOR3& p1) // returns TRUE if result meaningfull
     {
         float denum;
         D3DXVECTOR3 D;

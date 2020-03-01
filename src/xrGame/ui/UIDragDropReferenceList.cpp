@@ -112,7 +112,7 @@ CUICellItem* CUIDragDropReferenceList::RemoveItem(CUICellItem* itm, bool force_r
     return NULL;
 }
 
-void CUIDragDropReferenceList::LoadItemTexture(const char* section, Ivector2 cell_pos)
+void CUIDragDropReferenceList::LoadItemTexture(LPCSTR section, Ivector2 cell_pos)
 {
     CUIStatic* ref = m_references[m_container->CellsCapacity().x * cell_pos.y + cell_pos.x];
     ref->SetShader(InventoryUtilities::GetEquipmentIconsShader());
@@ -145,7 +145,7 @@ void CUIDragDropReferenceList::ReloadReferences(CInventoryOwner* pActor)
         for (int j = 0; j < cellsCapacity.y; j++)
         {
             CUIStatic* ref = m_references[cellsCapacity.x * j + i];
-            const char* item_name = ACTOR_DEFS::g_quick_use_slots[cellsCapacity.x * j + i];
+            LPCSTR item_name = ACTOR_DEFS::g_quick_use_slots[cellsCapacity.x * j + i];
             if (item_name && xr_strlen(item_name))
             {
                 PIItem itm = pActor->inventory().GetAny(item_name);

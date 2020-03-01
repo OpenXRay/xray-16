@@ -7,11 +7,11 @@ extern "C" {
 class xrIDirect3DTexture9 : public IDirect3DTexture9
 {
 protected:
-    signed int m_refCount;
+    LONG m_refCount;
     IDirect3DDevice9* m_pIDirect3DDevice9;
 
 public:
-    xrIDirect3DTexture9(IDirect3DDevice9* pIDirect3DDevice9, unsigned int iWidth, unsigned int iHeight, unsigned int iLevels, DWORD iUsage,
+    xrIDirect3DTexture9(IDirect3DDevice9* pIDirect3DDevice9, UINT iWidth, UINT iHeight, UINT iLevels, DWORD iUsage,
         D3DFORMAT iFormat, D3DPOOL iPool);
     /*** IUnknown methods ***/
     HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
@@ -20,7 +20,7 @@ public:
 
     /*** IDirect3DBaseTexture9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice);
-    HRESULT __stdcall SetPrivateData(REFGUID refguid, const void* pData, DWORD SizeOfData, DWORD Flags);
+    HRESULT __stdcall SetPrivateData(REFGUID refguid, CONST void* pData, DWORD SizeOfData, DWORD Flags);
     HRESULT __stdcall GetPrivateData(REFGUID refguid, void* pData, DWORD* pSizeOfData);
     HRESULT __stdcall FreePrivateData(REFGUID refguid);
     DWORD __stdcall SetPriority(DWORD PriorityNew);
@@ -33,27 +33,28 @@ public:
     HRESULT __stdcall SetAutoGenFilterType(D3DTEXTUREFILTERTYPE FilterType);
     D3DTEXTUREFILTERTYPE __stdcall GetAutoGenFilterType();
     void __stdcall GenerateMipSubLevels();
-    HRESULT __stdcall GetLevelDesc(unsigned int Level, D3DSURFACE_DESC* pDesc);
-    HRESULT __stdcall GetSurfaceLevel(unsigned int Level, IDirect3DSurface9** ppSurfaceLevel);
-    HRESULT __stdcall LockRect(unsigned int Level, D3DLOCKED_RECT* pLockedRect, const RECT* pRect, DWORD Flags);
-    HRESULT __stdcall UnlockRect(unsigned int Level);
-    HRESULT __stdcall AddDirtyRect(const RECT* pDirtyRect);
+    HRESULT __stdcall GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc);
+    HRESULT __stdcall GetSurfaceLevel(UINT Level, IDirect3DSurface9** ppSurfaceLevel);
+    HRESULT __stdcall LockRect(UINT Level, D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags);
+    HRESULT __stdcall UnlockRect(UINT Level);
+    HRESULT __stdcall AddDirtyRect(CONST RECT* pDirtyRect);
 
     //#ifdef D3D_DEBUG_INFO
-    const wchar_t * Name;
-    unsigned int Width;
-    unsigned int Height;
-    unsigned int Levels;
+    LPCWSTR Name;
+    UINT Width;
+    UINT Height;
+    UINT Levels;
     DWORD Usage;
     D3DFORMAT Format;
     D3DPOOL Pool;
     DWORD Priority;
     DWORD LOD;
     D3DTEXTUREFILTERTYPE FilterType;
-    unsigned int LockCount;
-    const wchar_t * CreationCallStack;
+    UINT LockCount;
+    LPCWSTR CreationCallStack;
     //#endif
 };
+
 #ifdef __cplusplus
 };
 #endif

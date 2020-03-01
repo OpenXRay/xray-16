@@ -27,12 +27,12 @@ class ECORE_API CPSLibrary : public particles_systems::library_interface
     AnsiString m_CurrentParticles;
 
 public:
-    void __stdcall FindByName(const char* new_name, bool& res);
+    void __stdcall FindByName(LPCSTR new_name, bool& res);
 #endif
 
 public:
-    bool Load(const char* nm);
-    bool Save(const char* nm);
+    bool Load(LPCSTR nm);
+    bool Save(LPCSTR nm);
 
     bool Load2();
     bool Save2();
@@ -43,10 +43,10 @@ public:
     void OnCreate();
     void OnDestroy();
 
-    PS::CPEDef* FindPED(const char* name);
-    PS::PEDIt FindPEDIt(const char* name);
-    PS::CPGDef* FindPGD(const char* name);
-    PS::PGDIt FindPGDIt(const char* name);
+    PS::CPEDef* FindPED(LPCSTR name);
+    PS::PEDIt FindPEDIt(LPCSTR name);
+    PS::CPGDef* FindPGD(LPCSTR name);
+    PS::PGDIt FindPGDIt(LPCSTR name);
 
     // get object properties methods
     PS::PEDIt FirstPED() { return m_PEDs.begin(); }
@@ -55,9 +55,9 @@ public:
     PS::PGDIt LastPGD() { return m_PGDs.end(); }
     PS::CPEDef* AppendPED(PS::CPEDef* src = nullptr);
     PS::CPGDef* AppendPGD(PS::CPGDef* src = nullptr);
-    void Remove(const char* name);
-    void RenamePED(PS::CPEDef* src, const char* new_name);
-    void RenamePGD(PS::CPGDef* src, const char* new_name);
+    void Remove(LPCSTR name);
+    void RenamePED(PS::CPEDef* src, LPCSTR new_name);
+    void RenamePGD(PS::CPGDef* src, LPCSTR new_name);
 
     void Reload();
     bool Save();

@@ -111,7 +111,7 @@ public:
     // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
     // false,
     // u32 tessel = 7 ) = 0;
-    virtual void _cdecl DBG_OutText(const char* s, ...) = 0;
+    virtual void _cdecl DBG_OutText(LPCSTR s, ...) = 0;
     // virtual	void DBG_TextOutSet( float x, float y )									=0;
     // virtual	void DBG_TextSetColor( u32 color )										=0;
     // virtual	void DBG_DrawBind( IGameObject &O )											=0;
@@ -120,7 +120,7 @@ public:
     virtual void DBG_DrawFrameStart() = 0;
     virtual void PH_DBG_Render() = 0;
     virtual void PH_DBG_Clear() = 0;
-    virtual const char* PH_DBG_ObjectTrackName() = 0;
+    virtual LPCSTR PH_DBG_ObjectTrackName() = 0;
 
     // virtual	bool			draw_frame								()=0;
     virtual u32& dbg_tries_num() = 0;

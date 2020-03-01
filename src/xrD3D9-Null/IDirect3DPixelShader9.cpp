@@ -50,7 +50,7 @@ HRESULT __stdcall xrIDirect3DPixelShader9::GetDevice(IDirect3DDevice9** ppDevice
     *ppDevice = m_pIDirect3DDevice9;
     return S_OK;
 };
-HRESULT __stdcall xrIDirect3DPixelShader9::GetFunction(void* pData, unsigned int* pSizeOfData)
+HRESULT __stdcall xrIDirect3DPixelShader9::GetFunction(void* pData, UINT* pSizeOfData)
 {
     APIDEBUG("xrIDirect3DPixelShader9::GetFunction");
     *pSizeOfData = 0;

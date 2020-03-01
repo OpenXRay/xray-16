@@ -45,9 +45,9 @@ public:
     virtual void EnumBoneVertices(SEnumVerticesCallback& C, u16 bone_id) = 0;
 
     // Low level interface
-    virtual u16 LL_BoneID(const char* B) = 0;
+    virtual u16 LL_BoneID(LPCSTR B) = 0;
     virtual u16 LL_BoneID(const shared_str& B) = 0;
-    virtual const char* LL_BoneName_dbg(u16 ID) = 0;
+    virtual LPCSTR LL_BoneName_dbg(u16 ID) = 0;
 
     virtual CInifile* LL_UserData() = 0;
     virtual accel* LL_Bones() = 0;
@@ -73,8 +73,8 @@ public:
     virtual u16 LL_GetBoneRoot() = 0;
     virtual void LL_SetBoneRoot(u16 bone_id) = 0;
 
-    virtual bool LL_GetBoneVisible(u16 bone_id) = 0;
-    virtual void LL_SetBoneVisible(u16 bone_id, bool val, bool bRecursive) = 0;
+    virtual BOOL LL_GetBoneVisible(u16 bone_id) = 0;
+    virtual void LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive) = 0;
     virtual u64 LL_GetBonesVisible() = 0;
     virtual void LL_SetBonesVisible(u64 mask) = 0;
 
@@ -82,7 +82,7 @@ public:
     virtual void LL_ClearAdditionalTransform(u16 bone_id) = 0; //--#SM+#--
 
     // Main functionality
-    virtual void CalculateBones(bool bForceExact = FALSE) = 0; // Recalculate skeleton
+    virtual void CalculateBones(BOOL bForceExact = FALSE) = 0; // Recalculate skeleton
     virtual void CalculateBones_Invalidate() = 0;
     virtual void Callback(UpdateCallback C, void* Param) = 0;
 

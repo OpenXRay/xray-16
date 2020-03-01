@@ -7,7 +7,7 @@
 #include "Actor.h"
 
 CCameraLook::CCameraLook(IGameObject* p, u32 flags) : CCameraBase(p, flags) {}
-void CCameraLook::Load(const char* section)
+void CCameraLook::Load(LPCSTR section)
 {
     inherited::Load(section);
     style = csLookAt;
@@ -172,7 +172,7 @@ void CCameraLook2::UpdateAutoAim()
         angle_inertion_var(pitch, xyz.x, m_autoaim_inertion_pitch.x, m_autoaim_inertion_pitch.y, PI, Device.fTimeDelta);
 }
 
-void CCameraLook2::Load(const char* section)
+void CCameraLook2::Load(LPCSTR section)
 {
     CCameraLook::Load(section);
     m_cam_offset = pSettings->r_fvector3(section, "offset");
@@ -180,7 +180,7 @@ void CCameraLook2::Load(const char* section)
     m_autoaim_inertion_pitch = pSettings->r_fvector2(section, "autoaim_speed_x");
 }
 
-void CCameraFixedLook::Load(const char* section)
+void CCameraFixedLook::Load(LPCSTR section)
 {
     CCameraLook::Load(section);
     style = csFixed;

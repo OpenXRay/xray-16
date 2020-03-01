@@ -86,7 +86,7 @@ protected:
     static void InitXmlIdToIndex();
 
     //загрузка из XML файла
-    virtual void load_shared(const char*);
+    virtual void load_shared(LPCSTR);
 
     //индекс загруженного профиля
     shared_str m_ProfileId;
@@ -105,7 +105,7 @@ protected:
 public:
 #ifdef XRGAME_EXPORTS
     shared_str Profile() const;
-    const char* Name() const;
+    LPCSTR Name() const;
     shared_str Bio() const;
 
     const CHARACTER_COMMUNITY& Community() const { return m_CurrentCommunity; }

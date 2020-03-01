@@ -106,7 +106,7 @@ void CSheduler::internal_Registration()
     Registration.clear();
 }
 
-void CSheduler::internal_Register(ISheduled* object, bool realTime)
+void CSheduler::internal_Register(ISheduled* object, BOOL realTime)
 {
     VERIFY(!object->GetSchedulerData().b_locked);
 
@@ -131,7 +131,7 @@ void CSheduler::internal_Register(ISheduled* object, bool realTime)
     }
 }
 
-bool CSheduler::internal_Unregister(ISheduled* object, bool realTime, bool warn_on_not_found)
+bool CSheduler::internal_Unregister(ISheduled* object, BOOL realTime, bool warn_on_not_found)
 {
     // the object may be already dead
     // VERIFY (!O->shedule.b_locked);
@@ -247,7 +247,7 @@ bool CSheduler::Registered(ISheduled* object) const
 }
 #endif // DEBUG
 
-void CSheduler::Register(ISheduled* A, bool RT)
+void CSheduler::Register(ISheduled* A, BOOL RT)
 {
     VERIFY(!Registered(A));
 

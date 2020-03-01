@@ -24,8 +24,8 @@ public:
     static void IR_GetMousePosReal(Ivector2& p);
     static void IR_GetMousePosIndependent(Fvector2& f);
     static void IR_GetMousePosIndependentCrop(Fvector2& f);
-    bool IR_GetKeyState(int dik);
-    bool IR_GetBtnState(int btn);
+    BOOL IR_GetKeyState(int dik);
+    BOOL IR_GetBtnState(int btn);
     virtual void IR_Capture(void);
     virtual void IR_Release(void);
 

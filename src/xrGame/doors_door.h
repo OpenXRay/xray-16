@@ -24,7 +24,7 @@ public:
     void change_state(actor* initiator, door_state state);
     void on_change_state(door_state const state);
 #ifdef DEBUG
-    const char* get_name() const;
+    LPCSTR get_name() const;
     shared_str get_initiators_ids() const;
     bool check_initiator(actor const* initiator) const;
 #endif // #ifdef DEBUG

@@ -201,7 +201,7 @@ cdkey_ban_list::banned_client::banned_client()
     ban_end_time = 0;
 }
 
-time_t get_time_from_string(const char* str_time)
+time_t get_time_from_string(LPCSTR str_time)
 {
     tm tmp_time;
     int res_t = sscanf(str_time, "%02d.%02d.%d_%02d:%02d:%02d", &tmp_time.tm_mday, &tmp_time.tm_mon, &tmp_time.tm_year,
@@ -230,7 +230,7 @@ bool cdkey_ban_list::banned_client::load(CInifile* ini, shared_str const& name_s
         return false;
     }
     client_hexstr_digest = ini->r_string(name_sect, CLIENT_HEX_DIGEST_KEY);
-    const char* tmp_string = ini->r_string(name_sect, CLIENT_BAN_END_TIME_KEY);
+    LPCSTR tmp_string = ini->r_string(name_sect, CLIENT_BAN_END_TIME_KEY);
 
     ban_end_time = get_time_from_string(tmp_string);
     if (ban_end_time == 0)

@@ -2,9 +2,9 @@
 #include "fstaticrender_rendertarget.h"
 #include "xrEngine/IGame_Persistent.h"
 
-static const char* RTname = "$user$rendertarget";
-static const char* RTname_color_map = "$user$rendertarget_color_map";
-static const char* RTname_distort = "$user$distort";
+static LPCSTR RTname = "$user$rendertarget";
+static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
+static LPCSTR RTname_distort = "$user$distort";
 
 CRenderTarget::CRenderTarget()
 {
@@ -38,7 +38,7 @@ CRenderTarget::CRenderTarget()
     Msg("* SSample: %s", bAvailable ? "enabled" : "disabled");
 }
 
-bool CRenderTarget::Create()
+BOOL CRenderTarget::Create()
 {
     curWidth = Device.dwWidth;
     curHeight = Device.dwHeight;
@@ -189,7 +189,7 @@ bool CRenderTarget::NeedColorMapping()
     return RImplementation.o.color_mapping && (param_color_map_influence > 0.001f);
 }
 
-bool CRenderTarget::NeedPostProcess()
+BOOL CRenderTarget::NeedPostProcess()
 {
     bool _blur = (param_blur > 0.001f);
     bool _gray = (param_gray > 0.001f);
@@ -226,9 +226,9 @@ bool CRenderTarget::NeedPostProcess()
     return _blur || _gray || _noise || _dual || _cbase || _cadd || _cmap || _menu_pp;
 }
 
-bool CRenderTarget::Perform()
+BOOL CRenderTarget::Perform()
 {
-    return Available() && (((bool)RImplementation.m_bMakeAsyncSS) || NeedPostProcess() || (ps_r__Supersample > 1) ||
+    return Available() && (((BOOL)RImplementation.m_bMakeAsyncSS) || NeedPostProcess() || (ps_r__Supersample > 1) ||
                               (frame_distort == (Device.dwFrame - 1)));
 }
 
@@ -320,9 +320,9 @@ void CRenderTarget::End()
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
 
     // find if distortion is needed at all
-    bool bPerform = Perform();
-    bool bDistort = RImplementation.o.distortion;
-    bool bCMap = NeedColorMapping();
+    BOOL bPerform = Perform();
+    BOOL bDistort = RImplementation.o.distortion;
+    BOOL bCMap = NeedColorMapping();
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
     if ((0 == RImplementation.mapDistort.size()) && !_menu_pp)
         bDistort = FALSE;

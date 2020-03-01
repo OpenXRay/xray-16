@@ -77,7 +77,7 @@ private:
 
 public:
     IC CGameLevelCrossTable(const void* buffer, const u32& buffer_size);
-    IC CGameLevelCrossTable(const char* fName);
+    IC CGameLevelCrossTable(LPCSTR fName);
 
 public:
     IC virtual ~CGameLevelCrossTable();

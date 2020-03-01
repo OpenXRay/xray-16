@@ -20,7 +20,7 @@ character_shell_control::character_shell_control()
 {
 }
 
-void character_shell_control::Load(const char* section)
+void character_shell_control::Load(LPCSTR section)
 {
     skel_airr_ang_factor = pSettings->r_float(section, "ph_skeleton_airr_ang_factor");
     skel_airr_lin_factor = pSettings->r_float(section, "ph_skeleton_airr_lin_factor");

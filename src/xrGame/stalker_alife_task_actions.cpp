@@ -51,7 +51,7 @@ using namespace StalkerDecisionSpace;
 // CStalkerActionSolveZonePuzzle
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionSolveZonePuzzle::CStalkerActionSolveZonePuzzle(CAI_Stalker* object, const char* action_name)
+CStalkerActionSolveZonePuzzle::CStalkerActionSolveZonePuzzle(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -191,7 +191,7 @@ void CStalkerActionSolveZonePuzzle::execute()
 // CStalkerActionSmartTerrain
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionSmartTerrain::CStalkerActionSmartTerrain(CAI_Stalker* object, const char* action_name)
+CStalkerActionSmartTerrain::CStalkerActionSmartTerrain(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
     set_inertia_time(30000);

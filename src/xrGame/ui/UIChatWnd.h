@@ -16,7 +16,7 @@ public:
     virtual void Show(bool status);
     virtual bool NeedCursor() { return false; }
     void Init(CUIXml& uiXml);
-    void SetEditBoxPrefix(const char* prefix);
+    void SetEditBoxPrefix(LPCSTR prefix);
     void ChatToAll(bool b) { sendNextMessageToAll = b; }
     void PendingMode(bool const is_pending_mode);
     virtual bool NeedCursor() const { return false; }

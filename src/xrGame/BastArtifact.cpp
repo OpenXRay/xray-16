@@ -79,9 +79,9 @@ void CBastArtefact::BastCollision(CEntityAlive* pEntityAlive)
     }
 }
 
-bool CBastArtefact::net_Spawn(CSE_Abstract* DC)
+BOOL CBastArtefact::net_Spawn(CSE_Abstract* DC)
 {
-    bool result = inherited::net_Spawn(DC);
+    BOOL result = inherited::net_Spawn(DC);
     if (!result)
         return FALSE;
 
@@ -103,7 +103,7 @@ void CBastArtefact::net_Destroy()
     m_AliveList.clear();
 }
 
-void CBastArtefact::Load(const char* section)
+void CBastArtefact::Load(LPCSTR section)
 {
     inherited::Load(section);
 

@@ -37,7 +37,7 @@ static int vsscanf(const char * buffer, const char * format, va_list argPtr)
 	newStack[1] = (void*)format;
 	memcpy(newStack+2, argPtr, count*sizeof(void*));
 
-	// @@ Use: CALL unsigned int PTR [sscanf]
+	// @@ Use: CALL DWORD PTR [sscanf]
 	
 	// Warp into system sscanf with new stack
 	int result;
@@ -47,9 +47,9 @@ static int vsscanf(const char * buffer, const char * format, va_list argPtr)
 		mov     savedESP, esp
 		mov     esp, newStack
 #if _MSC_VER >= 1400
-		call	unsigned int PTR [sscanf_s]
+		call	DWORD PTR [sscanf_s]
 #else
-		call	unsigned int PTR [sscanf]
+		call	DWORD PTR [sscanf]
 #endif
 		mov     esp, savedESP
 		mov     result, eax

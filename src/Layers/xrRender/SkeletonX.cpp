@@ -353,7 +353,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     }
 }
 
-bool CSkeletonX::has_visible_bones()
+BOOL CSkeletonX::has_visible_bones()
 {
     if (RM_SINGLE == RenderMode || RM_SINGLE_HQ == RenderMode)
     {
@@ -430,31 +430,31 @@ void get_pos_bones(const vertBoned4W& vert, Fvector& p, CKinematics* Parent)
 // Wallmarks
 //-----------------------------------------------------------------------------------------------------
 #include "xrCDB/Intersect.hpp"
-bool CSkeletonX::_PickBoneSoft1W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
+BOOL CSkeletonX::_PickBoneSoft1W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     u16* indices, CBoneData::FacesVec& faces)
 {
     return pick_bone<vertBoned1W>(Vertices1W, Parent, r, dist, S, D, indices, faces);
 }
 
-bool CSkeletonX::_PickBoneSoft2W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
+BOOL CSkeletonX::_PickBoneSoft2W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     u16* indices, CBoneData::FacesVec& faces)
 {
     return pick_bone<vertBoned2W>(Vertices2W, Parent, r, dist, S, D, indices, faces);
 }
 
-bool CSkeletonX::_PickBoneSoft3W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
+BOOL CSkeletonX::_PickBoneSoft3W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     u16* indices, CBoneData::FacesVec& faces)
 {
     return pick_bone<vertBoned3W>(Vertices3W, Parent, r, dist, S, D, indices, faces);
 }
 
-bool CSkeletonX::_PickBoneSoft4W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
+BOOL CSkeletonX::_PickBoneSoft4W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     u16* indices, CBoneData::FacesVec& faces)
 {
     return pick_bone<vertBoned4W>(Vertices4W, Parent, r, dist, S, D, indices, faces);
 }
 /*
-bool	CSkeletonX::_PickBoneSoft1W	(Fvector& normal, float& dist, const Fvector& S, const Fvector& D, u16* indices,
+BOOL	CSkeletonX::_PickBoneSoft1W	(Fvector& normal, float& dist, const Fvector& S, const Fvector& D, u16* indices,
 CBoneData::FacesVec& faces)
 {
     VERIFY				(*Vertices1W);
@@ -476,7 +476,7 @@ CBoneData::FacesVec& faces)
     return intersect;
 }
 
-bool CSkeletonX::_PickBoneSoft2W	(Fvector& normal, float& dist, const Fvector& S, const Fvector& D, u16* indices,
+BOOL CSkeletonX::_PickBoneSoft2W	(Fvector& normal, float& dist, const Fvector& S, const Fvector& D, u16* indices,
 CBoneData::FacesVec& faces)
 {
     VERIFY				(*Vertices2W);

@@ -43,7 +43,7 @@
 #include "xrEngine/xr_input.h"
 
 // fwd. decl.
-extern ENGINE_API bool bShowPauseString;
+extern ENGINE_API BOOL bShowPauseString;
 
 //#define DEMO_BUILD
 
@@ -595,7 +595,7 @@ void CMainMenu::OnFrame()
 }
 
 void CMainMenu::OnDeviceCreate() {}
-void CMainMenu::Screenshot(IRender::ScreenshotMode mode, const char* name)
+void CMainMenu::Screenshot(IRender::ScreenshotMode mode, LPCSTR name)
 {
     if (mode != IRender::SM_FOR_GAMESAVE)
     {
@@ -643,7 +643,7 @@ void CMainMenu::DestroyInternal(bool bForce)
         xr_delete(m_startDialog);
 }
 
-void CMainMenu::OnPatchCheck(bool success, const char* VersionName, const char* URL)
+void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
 {
     if (!success)
     {
@@ -686,7 +686,7 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
         return;
     };
 
-    const char* fileName = *m_sPatchURL;
+    LPCSTR fileName = *m_sPatchURL;
     if (!fileName)
         return;
 
@@ -722,14 +722,14 @@ void CMainMenu::OnDownloadPatchResult(bool success)
     m_pMB_ErrDlgs[dialogId]->ShowDialog(false);
 };
 
-void CMainMenu::OnSessionTerminate(const char* reason)
+void CMainMenu::OnSessionTerminate(LPCSTR reason)
 {
     if (m_NeedErrDialog == SessionTerminate && (Device.dwTimeGlobal - m_start_time) < 8000)
         return;
 
     m_start_time = Device.dwTimeGlobal;
-    const char* str = StringTable().translate("ui_st_kicked_by_server").c_str();
-    char* text;
+    LPCSTR str = StringTable().translate("ui_st_kicked_by_server").c_str();
+    LPSTR text;
 
     if (reason && xr_strlen(reason) && reason[0] == '@')
     {
@@ -744,9 +744,9 @@ void CMainMenu::OnSessionTerminate(const char* reason)
     SetErrorDialog(CMainMenu::SessionTerminate);
 }
 
-void CMainMenu::OnLoadError(const char* module)
+void CMainMenu::OnLoadError(LPCSTR module)
 {
-    const char* str = StringTable().translate("ui_st_error_loading").c_str();
+    LPCSTR str = StringTable().translate("ui_st_error_loading").c_str();
     string1024 Text;
     strconcat(sizeof(Text), Text, str, " ");
     xr_strcat(Text, sizeof(Text), module);
@@ -795,7 +795,7 @@ void CMainMenu::OnUIReset()
 
 // -------------------------------------------------------------------------------------------------
 
-const char* AddHyphens(const char* c)
+LPCSTR AddHyphens(LPCSTR c)
 {
     static string64 buf;
 
@@ -817,7 +817,7 @@ const char* AddHyphens(const char* c)
     return buf;
 }
 
-const char* DelHyphens(const char* c)
+LPCSTR DelHyphens(LPCSTR c)
 {
     static string64 buf;
 
@@ -890,14 +890,14 @@ void CMainMenu::Hide_CTMS_Dialog()
 }
 
 void CMainMenu::OnConnectToMasterServerOkClicked(CUIWindow*, void*) { Hide_CTMS_Dialog(); }
-const char* CMainMenu::GetGSVer()
+LPCSTR CMainMenu::GetGSVer()
 {
     static string256 buff;
     xr_strcpy(buff, GetGameVersion());
     return buff;
 }
 
-const char* CMainMenu::GetPlayerName()
+LPCSTR CMainMenu::GetPlayerName()
 {
 #ifdef WINDOWS
     gamespy_gp::login_manager* l_mngr = GetLoginMngr();
@@ -917,7 +917,7 @@ const char* CMainMenu::GetPlayerName()
     return m_player_name.c_str();
 }
 
-const char* CMainMenu::GetCDKeyFromRegistry()
+LPCSTR CMainMenu::GetCDKeyFromRegistry()
 {
     string512 key = { 0 };
     GetCDKey_FromRegistry(key);
@@ -925,7 +925,7 @@ const char* CMainMenu::GetCDKeyFromRegistry()
     return m_cdkey.c_str();
 }
 
-void CMainMenu::Show_DownloadMPMap(const char* text, const char* url)
+void CMainMenu::Show_DownloadMPMap(LPCSTR text, LPCSTR url)
 {
     m_downloaded_mp_map_url._set(url);
 
@@ -945,15 +945,15 @@ void CMainMenu::Show_DownloadMPMap(const char* text, const char* url)
 
 void CMainMenu::OnDownloadMPMap_CopyURL(CUIWindow* w, void* d)
 {
-    const char* url = m_downloaded_mp_map_url.c_str();
+    LPCSTR url = m_downloaded_mp_map_url.c_str();
     os_clipboard::copy_to_clipboard(url);
 }
 
 void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
 {
-    const char* url = m_downloaded_mp_map_url.c_str();
+    LPCSTR url = m_downloaded_mp_map_url.c_str();
 #ifdef WINDOWS
-    const char* params = NULL;
+    LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
 #else
@@ -962,7 +962,7 @@ void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
 #endif
 }
 
-demo_info const* CMainMenu::GetDemoInfo(const char* file_name)
+demo_info const* CMainMenu::GetDemoInfo(LPCSTR file_name)
 {
     if (!m_demo_info_loader)
     {

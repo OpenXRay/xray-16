@@ -10,5 +10,5 @@
 #endif
 
 extern "C" {
-IDirect3D9* WINAPI Direct3DCreate9(unsigned int SDKVersion);
+IDirect3D9* WINAPI Direct3DCreate9(UINT SDKVersion);
 };

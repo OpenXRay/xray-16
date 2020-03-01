@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC bool CAI_Stalker::UsedAI_Locations() { return (TRUE); }
+IC BOOL CAI_Stalker::UsedAI_Locations() { return (TRUE); }
 IC CStalkerAnimationManager& CAI_Stalker::animation() const
 {
     VERIFY(m_animation_manager);
@@ -27,7 +27,7 @@ IC CSightManager& CAI_Stalker::sight() const
     return (*m_sight_manager);
 }
 
-IC const char* CAI_Stalker::Name() const { return (CInventoryOwner::Name()); }
+IC LPCSTR CAI_Stalker::Name() const { return (CInventoryOwner::Name()); }
 IC stalker_movement_manager_smart_cover& CAI_Stalker::movement() const
 {
     VERIFY(m_movement_manager);

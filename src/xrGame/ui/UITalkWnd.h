@@ -20,7 +20,7 @@ class CUITalkWnd : public CUIDialogWnd
 private:
     typedef CUIDialogWnd inherited;
     ref_sound m_sound;
-    void PlaySnd(const char* text);
+    void PlaySnd(LPCSTR text);
     void StopSnd();
 
 public:
@@ -49,7 +49,7 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     void SwitchToTrade();
     void SwitchToUpgrade();
-    void AddIconedMessage(const char* caption, const char* text, const char* texture_name, const char* templ_name);
+    void AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
     void AddIconedMessage(cpcstr text, cpcstr texture_name, Frect texture_rect, cpcstr templ_name);
 
 protected:
@@ -62,7 +62,7 @@ protected:
     // Функции добавления строк в листы вопросов и ответов
 public:
     void AddQuestion(const shared_str& text, const shared_str& id, int number, bool b_finalizer);
-    void AddAnswer(const shared_str& text, const char* SpeakerName);
+    void AddAnswer(const shared_str& text, LPCSTR SpeakerName);
     bool b_disable_break;
 
 protected:

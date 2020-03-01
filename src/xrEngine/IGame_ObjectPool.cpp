@@ -40,7 +40,7 @@ void IGame_ObjectPool::clear()
     m_PrefetchObjects.clear();
 }
 
-IGameObject* IGame_ObjectPool::create(const char* name)
+IGameObject* IGame_ObjectPool::create(LPCSTR name)
 {
     CLASS_ID CLS = pSettings->r_clsid(name, "class");
     IGameObject* O = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
@@ -101,7 +101,7 @@ xr_delete (it->second);
 map_POOL.clear();
 }
 
-IGameObject* IGame_ObjectPool::create ( const char* name )
+IGameObject* IGame_ObjectPool::create ( LPCSTR name )
 {
 string256 l_name;
 POOL_IT it = map_POOL.find (shared_str(xr_strlwr(xr_strcpy(l_name,name))));

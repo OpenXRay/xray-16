@@ -67,7 +67,7 @@ CInventoryOwner::~CInventoryOwner()
     xr_delete(m_purchase_list);
 }
 
-void CInventoryOwner::Load(const char* section)
+void CInventoryOwner::Load(LPCSTR section)
 {
     if (pSettings->line_exist(section, "inv_max_weight"))
         m_inventory->SetMaxWeight(pSettings->r_float(section, "inv_max_weight"));
@@ -82,7 +82,7 @@ void CInventoryOwner::Load(const char* section)
     }
 }
 
-void CInventoryOwner::reload(const char* section)
+void CInventoryOwner::reload(LPCSTR section)
 {
     inventory().Clear();
     inventory().m_pOwner = this;
@@ -104,7 +104,7 @@ void CInventoryOwner::reinit()
 }
 
 // call this after CGameObject::net_Spawn
-bool CInventoryOwner::net_Spawn(CSE_Abstract* DC)
+BOOL CInventoryOwner::net_Spawn(CSE_Abstract* DC)
 {
     if (!m_pTrade)
         m_pTrade = new CTrade(this);
@@ -365,13 +365,13 @@ void CInventoryOwner::spawn_supplies()
 }
 
 //игровое имя
-const char* CInventoryOwner::Name() const
+LPCSTR CInventoryOwner::Name() const
 {
     //	return CharacterInfo().Name();
     return m_game_name.c_str();
 }
 
-const char* CInventoryOwner::IconName() const { return CharacterInfo().IconName().c_str(); }
+LPCSTR CInventoryOwner::IconName() const { return CharacterInfo().IconName().c_str(); }
 void CInventoryOwner::NewPdaContact(CInventoryOwner* pInvOwner) {}
 void CInventoryOwner::LostPdaContact(CInventoryOwner* pInvOwner) {}
 //////////////////////////////////////////////////////////////////////////
@@ -484,7 +484,7 @@ void CInventoryOwner::on_weapon_shot_update() {}
 void CInventoryOwner::on_weapon_shot_stop() {}
 void CInventoryOwner::on_weapon_shot_remove(CWeapon* weapon) {}
 void CInventoryOwner::on_weapon_hide(CWeapon* weapon) {}
-const char* CInventoryOwner::trade_section() const
+LPCSTR CInventoryOwner::trade_section() const
 {
     const CGameObject* game_object = smart_cast<const CGameObject*>(this);
     VERIFY(game_object);
@@ -499,7 +499,7 @@ float CInventoryOwner::deficit_factor(const shared_str& section) const
     return (m_purchase_list->deficit(section));
 }
 
-void CInventoryOwner::buy_supplies(CInifile& ini_file, const char* section)
+void CInventoryOwner::buy_supplies(CInifile& ini_file, LPCSTR section)
 {
     if (!m_purchase_list)
         m_purchase_list = new CPurchaseList();

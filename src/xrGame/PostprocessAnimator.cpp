@@ -16,14 +16,14 @@ void CPostprocessAnimator::Stop(float speed)
     BasicPostProcessAnimator::Stop(speed);
 }
 
-void CPostprocessAnimator::Load(const char* name, bool internalFs /*= true*/)
+void CPostprocessAnimator::Load(LPCSTR name, bool internalFs /*= true*/)
 {
     BasicPostProcessAnimator::Load(name, internalFs);
     if (!m_bCyclic)
         fLifeTime = f_length;
 }
 
-bool CPostprocessAnimator::Valid()
+BOOL CPostprocessAnimator::Valid()
 {
     if (m_bCyclic)
         return TRUE;
@@ -31,7 +31,7 @@ bool CPostprocessAnimator::Valid()
     return CEffectorPP::Valid();
 }
 
-bool CPostprocessAnimator::Process(SPPInfo& PPInfo)
+BOOL CPostprocessAnimator::Process(SPPInfo& PPInfo)
 {
     if (m_bCyclic)
         fLifeTime = 100000;
@@ -92,14 +92,14 @@ bool CPostprocessAnimator::Process(SPPInfo& PPInfo)
     return TRUE;
 }
 
-bool CPostprocessAnimatorLerp::Process(SPPInfo& PPInfo)
+BOOL CPostprocessAnimatorLerp::Process(SPPInfo& PPInfo)
 {
     if (!m_bStop)
         m_factor = m_get_factor_func();
     return CPostprocessAnimator::Process(PPInfo);
 }
 
-bool CPostprocessAnimatorLerpConst::Process(SPPInfo& PPInfo)
+BOOL CPostprocessAnimatorLerpConst::Process(SPPInfo& PPInfo)
 {
     if (!m_bStop)
         m_factor = m_power;
@@ -113,4 +113,4 @@ CPostprocessAnimatorControlled::CPostprocessAnimatorControlled(CEffectorControll
 }
 
 CPostprocessAnimatorControlled::~CPostprocessAnimatorControlled() { m_controller->SetPP(NULL); }
-bool CPostprocessAnimatorControlled::Valid() { return m_controller->Valid(); }
+BOOL CPostprocessAnimatorControlled::Valid() { return m_controller->Valid(); }

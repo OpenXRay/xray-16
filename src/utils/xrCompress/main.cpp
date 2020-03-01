@@ -7,7 +7,7 @@ extern int ProcessDifference();
 
 int __cdecl main(int argc, char* argv[])
 {
-    const char* params = GetCommandLine();
+    LPCSTR params = GetCommandLine();
 
     xrDebug::Initialize(params);
     Core.Initialize("xrCompress", 0, FALSE);
@@ -56,7 +56,7 @@ int __cdecl main(int argc, char* argv[])
         C.SetFastMode(NULL != strstr(params, "-fast"));
         C.SetTargetName(argv[1]);
 
-        const char* p = strstr(params, "-ltx");
+        LPCSTR p = strstr(params, "-ltx");
 
         if (0 != p)
         {

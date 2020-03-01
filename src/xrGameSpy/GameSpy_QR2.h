@@ -34,5 +34,5 @@ public:
     void KeyBufferAdd(void* keybuffer, int keyid);
 
     const char* GetGameVersion();
-    const char* RegisteredKey(unsigned int KeyID);
+    const char* RegisteredKey(DWORD KeyID);
 };

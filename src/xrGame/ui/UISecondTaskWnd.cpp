@@ -33,7 +33,7 @@ UITaskListWnd::UITaskListWnd()
       m_caption(nullptr), m_bt_close(nullptr), m_orig_h(0) {}
 
 UITaskListWnd::~UITaskListWnd() {}
-void UITaskListWnd::init_from_xml(CUIXml& xml, const char* path)
+void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     VERIFY(hint_wnd);
     CUIXmlInit::InitWindow(xml, path, 0, this);

@@ -15,11 +15,11 @@
 #define CBaseAction CActionBase<_object_type>
 
 TEMPLATE_SPECIALIZATION
-IC CBaseAction::CActionBase(_object_type* object, const char* action_name) { init(object, action_name); }
+IC CBaseAction::CActionBase(_object_type* object, LPCSTR action_name) { init(object, action_name); }
 TEMPLATE_SPECIALIZATION
 CBaseAction::~CActionBase() {}
 TEMPLATE_SPECIALIZATION
-void CBaseAction::init(_object_type* object, const char* action_name)
+void CBaseAction::init(_object_type* object, LPCSTR action_name)
 {
     m_storage = 0;
     m_object = object;
@@ -158,7 +158,7 @@ typename CBaseAction::edge_value_type CBaseAction::weight(
 
 #ifdef LOG_ACTION
 TEMPLATE_SPECIALIZATION
-IC void CBaseAction::show(const char* offset) {}
+IC void CBaseAction::show(LPCSTR offset) {}
 #endif
 
 TEMPLATE_SPECIALIZATION

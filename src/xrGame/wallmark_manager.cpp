@@ -51,7 +51,7 @@ void CWalmarkManager::PlaceWallmark(const Fvector& dir, const Fvector& start_pos
                                       SHADER_VECTOR& wallmarks_vector,IGameObject* ignore_obj)
 {
     collide::rq_result	result;
-    bool				reach_wall =
+    BOOL				reach_wall =
         Level().ObjectSpace.RayPick(
         start_pos,
         dir,
@@ -74,7 +74,7 @@ void CWalmarkManager::PlaceWallmark(const Fvector& dir, const Fvector& start_pos
 void CWalmarkManager::PlaceWallmarks(const Fvector& start_pos)
 {
     m_pos = start_pos;
-    //.	const char*				sect				= pSettings->r_string(m_owner->cNameSect(), "wallmark_section");
+    //.	LPCSTR				sect				= pSettings->r_string(m_owner->cNameSect(), "wallmark_section");
     Load("explosion_marks");
 
     //.	Device.seqParallel.push_back	(fastdelegate::FastDelegate0<>(this,&CWalmarkManager::StartWorkflow));
@@ -87,7 +87,7 @@ float Distance(
 
 void CWalmarkManager::StartWorkflow()
 {
-    const char* sect = "explosion_marks";
+    LPCSTR sect = "explosion_marks";
     float m_trace_dist = pSettings->r_float(sect, "dist");
     float m_wallmark_size = pSettings->r_float(sect, "size");
     u32 max_wallmarks_count = pSettings->r_u32(sect, "max_count");
@@ -184,11 +184,11 @@ void CWalmarkManager::StartWorkflow()
     */
 }
 
-void CWalmarkManager::Load(const char* section)
+void CWalmarkManager::Load(LPCSTR section)
 {
     //кровавые отметки на стенах
     //	string256	tmp;
-    const char* wallmarks_name = pSettings->r_string(section, "wallmarks");
+    LPCSTR wallmarks_name = pSettings->r_string(section, "wallmarks");
     m_wallmarks->AppendMark(wallmarks_name);
 }
 

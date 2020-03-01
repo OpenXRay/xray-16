@@ -21,7 +21,7 @@ using smart_cover::target_idle;
 using smart_cover::target_fire;
 using smart_cover::target_fire_no_lookout;
 
-target_provider::target_provider(animation_planner* object, const char* name,
+target_provider::target_provider(animation_planner* object, LPCSTR name,
     StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value)
     : inherited(object, name), m_world_property(world_property), m_loophole_value(loophole_value)
 {
@@ -41,7 +41,7 @@ void target_provider::finalize() { inherited::finalize(); }
 //	class target_idle
 ////////////////////////////////////////////////////////////////////////////
 
-target_idle::target_idle(animation_planner* object, const char* name,
+target_idle::target_idle(animation_planner* object, LPCSTR name,
     StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value)
     : inherited(object, name, world_property, loophole_value)
 {
@@ -61,7 +61,7 @@ void target_idle::execute()
 //	class target_fire
 ////////////////////////////////////////////////////////////////////////////
 
-target_fire::target_fire(animation_planner* object, const char* name,
+target_fire::target_fire(animation_planner* object, LPCSTR name,
     StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value)
     : inherited(object, name, world_property, loophole_value)
 {
@@ -104,7 +104,7 @@ void target_fire::execute()
 //	class target_fire_no_lookout
 ////////////////////////////////////////////////////////////////////////////
 
-target_fire_no_lookout::target_fire_no_lookout(animation_planner* object, const char* name,
+target_fire_no_lookout::target_fire_no_lookout(animation_planner* object, LPCSTR name,
     StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value)
     : inherited(object, name, world_property, loophole_value)
 {

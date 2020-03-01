@@ -163,20 +163,20 @@ public:
     CScriptGameObject* Parent() const;
     void Hit(CScriptHit* tLuaHit);
     int clsid() const;
-    void play_cycle(const char* anim, bool mix_in);
-    void play_cycle(const char* anim);
+    void play_cycle(LPCSTR anim, bool mix_in);
+    void play_cycle(LPCSTR anim);
     Fvector Center();
     _DECLARE_FUNCTION10(Position, Fvector);
     _DECLARE_FUNCTION10(Direction, Fvector);
     _DECLARE_FUNCTION10(Mass, float);
     _DECLARE_FUNCTION10(ID, u16);
-    _DECLARE_FUNCTION10(getVisible, bool);
-    _DECLARE_FUNCTION10(getEnabled, bool);
+    _DECLARE_FUNCTION10(getVisible, BOOL);
+    _DECLARE_FUNCTION10(getEnabled, BOOL);
     _DECLARE_FUNCTION10(story_id, ALife::_STORY_ID);
 
-    const char* Name() const;
+    LPCSTR Name() const;
     shared_str cName() const;
-    const char* Section() const;
+    LPCSTR Section() const;
     // CInventoryItem
     u32 Cost() const;
     float GetCondition() const;
@@ -223,9 +223,9 @@ public:
 
     // CScriptEntity
 
-    _DECLARE_FUNCTION12(SetScriptControl, void, bool, const char*);
+    _DECLARE_FUNCTION12(SetScriptControl, void, bool, LPCSTR);
     _DECLARE_FUNCTION10(GetScriptControl, bool);
-    _DECLARE_FUNCTION10(GetScriptControlName, const char*);
+    _DECLARE_FUNCTION10(GetScriptControlName, LPCSTR);
     _DECLARE_FUNCTION10(GetEnemyStrength, int);
     _DECLARE_FUNCTION10(can_script_capture, bool);
 
@@ -243,8 +243,8 @@ public:
     // CCustomMonster
     bool CheckObjectVisibility(const CScriptGameObject* tpLuaGameObject);
     bool CheckTypeVisibility(const char* section_name);
-    const char* WhoHitName();
-    const char* WhoHitSectionName();
+    LPCSTR WhoHitName();
+    LPCSTR WhoHitSectionName();
 
     void ChangeTeam(u8 team, u8 squad, u8 group);
     void SetVisualMemoryEnabled(bool enabled);
@@ -284,7 +284,7 @@ public:
     void set_enemy(CScriptGameObject* e);
     void set_vis_state(float value);
     void off_collision(bool val);
-    void bloodsucker_drag_jump(CScriptGameObject* e, const char* e_str, const Fvector& position, float factor);
+    void bloodsucker_drag_jump(CScriptGameObject* e, LPCSTR e_str, const Fvector& position, float factor);
 
     // Zombie
     bool fake_death_fall_down();
@@ -292,7 +292,7 @@ public:
 
     // CBaseMonster
     void skip_transfer_enemy(bool val);
-    void set_home(const char* name, float r_min, float r_max, bool aggressive, float r_mid);
+    void set_home(LPCSTR name, float r_min, float r_max, bool aggressive, float r_mid);
     void set_home(u32 lv_ID, float r_min, float r_max, bool aggressive, float r_mid);
     void remove_home();
     void berserk();
@@ -300,10 +300,10 @@ public:
     void set_default_panic_threshold();
 
     // CAI_Trader
-    void set_trader_global_anim(const char* anim);
-    void set_trader_head_anim(const char* anim);
-    void set_trader_sound(const char* sound, const char* anim);
-    void external_sound_start(const char* sound);
+    void set_trader_global_anim(LPCSTR anim);
+    void set_trader_head_anim(LPCSTR anim);
+    void set_trader_sound(LPCSTR sound, LPCSTR anim);
+    void external_sound_start(LPCSTR sound);
     void external_sound_stop();
 
     template <typename T>
@@ -313,35 +313,35 @@ public:
     Fvector GetCurrentDirection();
 
     bool IsInvBoxEmpty();
-    bool inv_box_closed(bool status, const char* reason);
+    bool inv_box_closed(bool status, LPCSTR reason);
     bool inv_box_closed_status();
     bool inv_box_can_take(bool status);
     bool inv_box_can_take_status();
 
     //передача порции информации InventoryOwner
-    bool GiveInfoPortion(const char* info_id);
-    bool DisableInfoPortion(const char* info_id);
+    bool GiveInfoPortion(LPCSTR info_id);
+    bool DisableInfoPortion(LPCSTR info_id);
 
-    void GiveGameNews(const char* caption, const char* news, const char* texture_name, int delay, int show_time);
-    void GiveGameNews(const char* caption, const char* news, const char* texture_name, int delay, int show_time, int type);
+    void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time);
+    void GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type);
     void ClearGameNews() const;
 
-    void AddIconedTalkMessage_old(const char* text, const char* texture_name, const char* templ_name){}
-    void AddIconedTalkMessage(const char* caption, const char* text, const char* texture_name, const char* templ_name);
+    void AddIconedTalkMessage_old(LPCSTR text, LPCSTR texture_name, LPCSTR templ_name){}
+    void AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
     void AddIconedTalkMessage(cpcstr text, cpcstr texture_name, Frect tex_rect, cpcstr templ_name);
 
     //предикаты наличия/отсутствия порции информации у персонажа
-    bool HasInfo(const char* info_id);
-    bool DontHasInfo(const char* info_id);
-    xrTime GetInfoTime(const char* info_id);
+    bool HasInfo(LPCSTR info_id);
+    bool DontHasInfo(LPCSTR info_id);
+    xrTime GetInfoTime(LPCSTR info_id);
 
     //работа с заданиями
-    ETaskState GetGameTaskState(const char* task_id);
-    void SetGameTaskState(ETaskState state, const char* task_id);
+    ETaskState GetGameTaskState(LPCSTR task_id);
+    void SetGameTaskState(ETaskState state, LPCSTR task_id);
     void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting, u32 t_timer);
     void SetActiveTask(CGameTask* t);
     bool IsActiveTask(CGameTask* t);
-    CGameTask* GetTask(const char* id, bool only_inprocess);
+    CGameTask* GetTask(LPCSTR id, bool only_inprocess);
 
     bool IsTalking();
     void StopTalk();
@@ -378,8 +378,8 @@ public:
     float GetSympathy();
     void SetSympathy(float sympathy);
 
-    int GetCommunityGoodwill_obj(const char* community);
-    void SetCommunityGoodwill_obj(const char* community, int goodwill);
+    int GetCommunityGoodwill_obj(LPCSTR community);
+    void SetCommunityGoodwill_obj(LPCSTR community, int goodwill);
 
     int GetAttitude(CScriptGameObject* pToWho);
 
@@ -388,7 +388,7 @@ public:
     void ForceSetGoodwill(int goodwill, CScriptGameObject* pWhoToSet);
     void ChangeGoodwill(int delta_goodwill, CScriptGameObject* pWhoToSet);
 
-    void SetStartDialog(const char* dialog_id);
+    void SetStartDialog(LPCSTR dialog_id);
     void GetStartDialog();
     void RestoreDefaultStartDialog();
 
@@ -410,23 +410,23 @@ public:
     int Weapon_Scope_Status();
     int Weapon_Silencer_Status();
 
-    const char* ProfileName();
-    const char* CharacterName();
-    const char* CharacterIcon();
-    const char* CharacterCommunity();
+    LPCSTR ProfileName();
+    LPCSTR CharacterName();
+    LPCSTR CharacterIcon();
+    LPCSTR CharacterCommunity();
     int CharacterRank();
     int CharacterReputation();
 
     void SetCharacterRank(int);
     void ChangeCharacterRank(int);
     void ChangeCharacterReputation(int);
-    void SetCharacterCommunity(const char*, int, int);
+    void SetCharacterCommunity(LPCSTR, int, int);
 
     u32 GetInventoryObjectCount() const;
 
     CScriptGameObject* GetActiveItem();
 
-    CScriptGameObject* GetObjectByName(const char* caObjectName) const;
+    CScriptGameObject* GetObjectByName(LPCSTR caObjectName) const;
     CScriptGameObject* GetObjectByIndex(int iIndex) const;
 
     // Callbacks
@@ -445,7 +445,7 @@ public:
 
     //////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////use calback///////////////////////////////////////////////
-    void SetTipText(const char* tip_text);
+    void SetTipText(LPCSTR tip_text);
     void SetTipTextDefault();
     void SetNonscriptUsable(bool nonscript_usable);
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -453,7 +453,7 @@ public:
     void set_const_force(const Fvector& dir, float value, u32 time_interval);
     //////////////////////////////////////////////////////////////////////////
 
-    const char* GetPatrolPathName();
+    LPCSTR GetPatrolPathName();
     u32 GetAmmoElapsed();
     void SetAmmoElapsed(int ammo_elapsed);
     u32 GetSuitableAmmoTotal() const;
@@ -473,7 +473,7 @@ public:
     //////////////////////////////////////////////////////////////////////////
     Flags32 get_actor_relation_flags() const;
     void set_actor_relation_flags(Flags32);
-    const char* sound_voice_prefix() const;
+    LPCSTR sound_voice_prefix() const;
 
     //////////////////////////////////////////////////////////////////////////
     u32 memory_time(const CScriptGameObject& lua_game_object);
@@ -517,12 +517,12 @@ public:
     DetailPathManager::EDetailPathType detail_path_type() const;
 
     u32 add_sound(
-        const char* prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, const char* bone_name);
-    u32 add_sound(const char* prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type);
-    u32 add_sound(const char* prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type,
-        const char* bone_name, const char* head_anim);
+        LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name);
+    u32 add_sound(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type);
+    u32 add_sound(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type,
+        LPCSTR bone_name, LPCSTR head_anim);
     u32 add_combat_sound(
-        const char* prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, const char* bone_name);
+        LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type, LPCSTR bone_name);
     void remove_sound(u32 internal_type);
     void set_sound_mask(u32 sound_mask);
     void set_sight(SightManager::ESightType sight_type, Fvector* vector3d, u32 dwLookOverDelay);
@@ -552,7 +552,7 @@ public:
     void set_desired_position(const Fvector* desired_position);
     void set_desired_direction();
     void set_desired_direction(const Fvector* desired_direction);
-    void set_patrol_path(const char* path_name, const EPatrolStartType patrol_start_type,
+    void set_patrol_path(LPCSTR path_name, const EPatrolStartType patrol_start_type,
         const EPatrolRouteType patrol_route_type, bool random);
     void inactualize_patrol_path();
     void set_dest_level_vertex_id(u32 level_vertex_id);
@@ -560,8 +560,8 @@ public:
     void set_movement_selection_type(ESelectionType selection_type);
     u32 level_vertex_id() const;
     u32 game_vertex_id() const;
-    void add_animation(const char* animation, bool hand_usage, bool use_movement_controller);
-    void add_animation(const char* animation, bool hand_usage, Fvector position, Fvector rotation, bool local_animation);
+    void add_animation(LPCSTR animation, bool hand_usage, bool use_movement_controller);
+    void add_animation(LPCSTR animation, bool hand_usage, Fvector position, Fvector rotation, bool local_animation);
     void clear_animations();
     int animation_count() const;
     int animation_slot() const;
@@ -583,13 +583,13 @@ public:
     bool active_zone_contact(u16 id);
 
     ///
-    void add_restrictions(const char* out, const char* in);
-    void remove_restrictions(const char* out, const char* in);
+    void add_restrictions(LPCSTR out, LPCSTR in);
+    void remove_restrictions(LPCSTR out, LPCSTR in);
     void remove_all_restrictions();
-    const char* in_restrictions();
-    const char* out_restrictions();
-    const char* base_in_restrictions();
-    const char* base_out_restrictions();
+    LPCSTR in_restrictions();
+    LPCSTR out_restrictions();
+    LPCSTR base_in_restrictions();
+    LPCSTR base_out_restrictions();
     bool accessible_position(const Fvector& position);
     bool accessible_vertex_id(u32 level_vertex_id);
     u32 accessible_nearest(const Fvector& position, Fvector& result);
@@ -611,7 +611,7 @@ public:
     void enable_torch(bool value);
     bool torch_enabled() const;
 
-    void attachable_item_load_attach(const char* section);
+    void attachable_item_load_attach(LPCSTR section);
     // CustomZone
     void EnableAnomaly();
     void DisableAnomaly();
@@ -627,13 +627,13 @@ public:
     CHolderCustom* get_custom_holder();
     CHolderCustom* get_current_holder(); // actor only
 
-    void start_particles(const char* pname, const char* bone);
-    void stop_particles(const char* pname, const char* bone);
+    void start_particles(LPCSTR pname, LPCSTR bone);
+    void stop_particles(LPCSTR pname, LPCSTR bone);
 
-    Fvector bone_position(const char* bone_name) const;
+    Fvector bone_position(LPCSTR bone_name) const;
     bool is_body_turning() const;
     cphysics_shell_scripted* get_physics_shell() const;
-    u16 get_bone_id(const char* bone_name) const;
+    u16 get_bone_id(LPCSTR bone_name) const;
     bool weapon_strapped() const;
     bool weapon_unstrapped() const;
     void eat(CScriptGameObject* item);
@@ -643,7 +643,7 @@ public:
     Fvector head_orientation() const;
     u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance) const;
 
-    void info_add(const char* text);
+    void info_add(LPCSTR text);
     void info_clear();
 
     // Monster Jumper
@@ -664,21 +664,21 @@ public:
     void activate_slot(u32 slot_id);
     void enable_level_changer(bool b);
     bool is_level_changer_enabled();
-    void set_level_changer_invitation(const char* str);
+    void set_level_changer_invitation(LPCSTR str);
 #ifdef DEBUG
     void debug_planner(const script_planner* planner);
 #endif
 
-    void sell_condition(CScriptIniFile* ini_file, const char* section);
+    void sell_condition(CScriptIniFile* ini_file, LPCSTR section);
     void sell_condition(float friend_factor, float enemy_factor);
-    void buy_condition(CScriptIniFile* ini_file, const char* section);
+    void buy_condition(CScriptIniFile* ini_file, LPCSTR section);
     void buy_condition(float friend_factor, float enemy_factor);
-    void show_condition(CScriptIniFile* ini_file, const char* section);
-    void buy_supplies(CScriptIniFile* ini_file, const char* section);
+    void show_condition(CScriptIniFile* ini_file, LPCSTR section);
+    void buy_supplies(CScriptIniFile* ini_file, LPCSTR section);
     void buy_item_condition_factor(float factor);
 
-    const char* sound_prefix() const;
-    void sound_prefix(const char* sound_prefix);
+    LPCSTR sound_prefix() const;
+    void sound_prefix(LPCSTR sound_prefix);
 
     u32 location_on_path(float distance, Fvector* location);
     bool is_there_items_to_pickup() const;
@@ -696,8 +696,8 @@ public:
     bool invulnerable() const;
     void invulnerable(bool invulnerable);
     pcstr get_smart_cover_description() const;
-    void set_visual_name(const char* visual);
-    const char* get_visual_name() const;
+    void set_visual_name(LPCSTR visual);
+    LPCSTR get_visual_name() const;
 
     bool can_throw_grenades() const;
     void can_throw_grenades(bool can_throw_grenades);
@@ -723,8 +723,8 @@ public:
     void sniper_fire_mode(bool value);
     bool sniper_fire_mode() const;
 
-    void aim_bone_id(const char* value);
-    const char* aim_bone_id() const;
+    void aim_bone_id(LPCSTR value);
+    LPCSTR aim_bone_id() const;
 
     void register_in_combat();
     void unregister_in_combat();
@@ -736,12 +736,12 @@ public:
 
     bool in_smart_cover() const;
 
-    void set_dest_smart_cover(const char* cover_id);
+    void set_dest_smart_cover(LPCSTR cover_id);
     void set_dest_smart_cover();
     CCoverPoint const* get_dest_smart_cover();
-    const char* get_dest_smart_cover_name();
+    LPCSTR get_dest_smart_cover_name();
 
-    void set_dest_loophole(const char* loophole_id);
+    void set_dest_loophole(LPCSTR loophole_id);
     void set_dest_loophole();
 
     void set_smart_cover_target(Fvector position);
@@ -767,9 +767,9 @@ public:
     float const lookout_max_time() const;
     void lookout_max_time(float value);
 
-    bool in_loophole_fov(const char* cover_id, const char* loophole_id, Fvector object_position) const;
+    bool in_loophole_fov(LPCSTR cover_id, LPCSTR loophole_id, Fvector object_position) const;
     bool in_current_loophole_fov(Fvector object_position) const;
-    bool in_loophole_range(const char* cover_id, const char* loophole_id, Fvector object_position) const;
+    bool in_loophole_range(LPCSTR cover_id, LPCSTR loophole_id, Fvector object_position) const;
     bool in_current_loophole_range(Fvector object_position) const;
 
     float apply_loophole_direction_distance() const;
@@ -897,8 +897,8 @@ public:
     doors::door* m_door;
 };
 
-extern void sell_condition(CScriptIniFile* ini_file, const char* section);
+extern void sell_condition(CScriptIniFile* ini_file, LPCSTR section);
 extern void sell_condition(float friend_factor, float enemy_factor);
-extern void buy_condition(CScriptIniFile* ini_file, const char* section);
+extern void buy_condition(CScriptIniFile* ini_file, LPCSTR section);
 extern void buy_condition(float friend_factor, float enemy_factor);
-extern void show_condition(CScriptIniFile* ini_file, const char* section);
+extern void show_condition(CScriptIniFile* ini_file, LPCSTR section);

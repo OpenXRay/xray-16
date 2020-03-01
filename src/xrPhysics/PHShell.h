@@ -102,7 +102,7 @@ public:
     virtual void SetRagDoll();
     virtual void SetIgnoreRagDoll();
 
-    virtual void CreateShellAnimator(CInifile const* ini, const char* section);
+    virtual void CreateShellAnimator(CInifile const* ini, LPCSTR section);
     virtual void SetIgnoreAnimated();
 
     virtual void SetSmall();
@@ -175,11 +175,11 @@ public:
     virtual void set_ApplyByGravity(bool flag);
     virtual bool get_ApplyByGravity();
     virtual void SetMaterial(u16 m);
-    virtual void SetMaterial(const char* m);
+    virtual void SetMaterial(LPCSTR m);
     virtual ELEMENT_STORAGE& Elements() { return elements; }
     virtual CPhysicsElement* get_Element(u16 bone_id);
     virtual CPhysicsElement* get_Element(const shared_str& bone_name);
-    virtual CPhysicsElement* get_Element(const char* bone_name);
+    virtual CPhysicsElement* get_Element(LPCSTR bone_name);
     virtual const CPhysicsElement* get_ElementByStoreOrder(u16 num) const;
     virtual CPhysicsElement* get_ElementByStoreOrder(u16 num);
     CPhysicsElement* get_PhysicsParrentElement(u16 bone_id);
@@ -190,7 +190,7 @@ public:
     virtual CPhysicsElement* NearestToPoint(const Fvector& point, NearestToPointCallback* cb = 0);
     virtual CPhysicsJoint* get_Joint(u16 bone_id);
     virtual CPhysicsJoint* get_Joint(const shared_str& bone_name);
-    virtual CPhysicsJoint* get_Joint(const char* bone_name);
+    virtual CPhysicsJoint* get_Joint(LPCSTR bone_name);
     virtual CPhysicsJoint* get_JointByStoreOrder(u16 num);
     virtual u16 get_JointsNumber();
     virtual CODEGeom* get_GeomByID(u16 bone_id);
@@ -229,7 +229,7 @@ public:
     virtual void ResetCallbacks(u16 id, Flags64& mask);
     void PlaceBindToElForms();
     virtual void SetCallbacks();
-    virtual void EnabledCallbacks(bool val);
+    virtual void EnabledCallbacks(BOOL val);
     virtual void set_DisableParams(const SAllDDOParams& params);
     virtual void UpdateRoot();
     virtual void SmoothElementsInertia(float k);

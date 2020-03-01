@@ -134,7 +134,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                         vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
                         vis_data v_copy = v_orig;
                         v_copy.box.xform(renderable->GetRenderData().xform);
-                        bool bVisible = HOM.visible(v_copy);
+                        BOOL bVisible = HOM.visible(v_copy);
                         v_orig.marker = v_copy.marker;
                         v_orig.accept_frame = v_copy.accept_frame;
                         v_orig.hom_frame = v_copy.hom_frame;
@@ -172,7 +172,7 @@ void CRender::render_menu()
 
     // Distort
     {
-        float ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
+        FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
         Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, HW.pBaseZB); // Now RT is a distortion mask
         HW.pDevice->ClearRenderTargetView(Target->rt_Generic_1->pRT, ColorRGBA);
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
@@ -245,7 +245,7 @@ void CRender::Render()
     // Configure
     RImplementation.o.distortion = FALSE; // disable distorion
     Fcolor sun_color = ((light*)Lights.sun._get())->color;
-    bool bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS;
+    BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS;
     if (o.sunstatic) bSUN = FALSE;
     // Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
 
@@ -316,7 +316,7 @@ void CRender::Render()
     r_pmask(true, false); // disable priority "1"
     BasicStats.Culling.End();
 
-    bool split_the_scene_to_minimize_wait = FALSE;
+    BOOL split_the_scene_to_minimize_wait = FALSE;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE)) split_the_scene_to_minimize_wait = TRUE;
 
     //******* Main render :: PART-0	-- first

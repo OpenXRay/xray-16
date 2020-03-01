@@ -180,7 +180,7 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     {
 #ifndef LINUX // FIXME!!!
         Msg("* download screenshot aborted by peer [%u]", m_chearer_id.value());
-        const char* error_msg;
+        LPCSTR error_msg;
         char bufforint[16];
         STRCONCAT(
             error_msg, "download screenshot terminated by peer [", ultoa(m_chearer_id.value(), bufforint, 10), "]");
@@ -190,7 +190,7 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     break;
     case file_transfer::receiving_timeout:
     {
-        const char* error_msg = "* download screenshot incomplete - timeout";
+        LPCSTR error_msg = "* download screenshot incomplete - timeout";
         Msg(error_msg);
         notify_admin(e_screenshot_error_notif, error_msg);
     }
@@ -240,7 +240,7 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     {
 #ifndef LINUX // FIXME!!!
         Msg("* download config aborted by peer [%u]", m_chearer_id.value());
-        const char* error_msg;
+        LPCSTR error_msg;
         char bufforint[16];
         STRCONCAT(error_msg, "download config terminated by peer [", ultoa(m_chearer_id.value(), bufforint, 10), "]");
         notify_admin(e_configs_error_notif, error_msg);
@@ -249,7 +249,7 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     break;
     case file_transfer::receiving_timeout:
     {
-        const char* error_msg = "* download config incomplete - timeout";
+        LPCSTR error_msg = "* download config incomplete - timeout";
         Msg(error_msg);
         notify_admin(e_configs_error_notif, error_msg);
     }

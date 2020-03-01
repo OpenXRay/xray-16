@@ -3,7 +3,7 @@
 #include "game_cl_mp_snd_messages.h"
 #include "Level.h"
 
-void game_cl_mp::LoadSndMessage(const char* caSection, const char* caLine, u32 ID)
+void game_cl_mp::LoadSndMessage(LPCSTR caSection, LPCSTR caLine, u32 ID)
 {
     if (!pSettings->section_exist(caSection))
         return;
@@ -22,7 +22,7 @@ void game_cl_mp::LoadSndMessage(const char* caSection, const char* caLine, u32 I
     m_pSndMessages.back()->Load(ID, atol(Prior), Name);
 }
 
-void game_cl_mp::AddSoundMessage(const char* sound_name, u32 const sound_priority, u32 const soundID)
+void game_cl_mp::AddSoundMessage(LPCSTR sound_name, u32 const sound_priority, u32 const soundID)
 {
     m_pSndMessages.push_back(new SND_Message());
     m_pSndMessages.back()->Load(soundID, sound_priority, sound_name);

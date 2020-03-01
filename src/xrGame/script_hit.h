@@ -26,7 +26,7 @@ public:
     IC CScriptHit();
     IC CScriptHit(const CScriptHit* tpLuaHit);
     virtual ~CScriptHit();
-    IC void set_bone_name(const char* bone_name);
+    IC void set_bone_name(LPCSTR bone_name);
 };
 
 #include "script_hit_inline.h"

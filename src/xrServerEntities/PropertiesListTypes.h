@@ -286,9 +286,9 @@ public:
 #ifdef __BORLANDC__
     IC TElTreeItem* Item() { return (TElTreeItem*)item; }
 #endif
-    const char* Key() { return key.c_str(); }
-    void Enable(bool val) { m_Flags.set(flDisabled, !val); }
-    bool Enabled() { return !m_Flags.is(flDisabled); }
+    LPCSTR Key() { return key.c_str(); }
+    void Enable(BOOL val) { m_Flags.set(flDisabled, !val); }
+    BOOL Enabled() { return !m_Flags.is(flDisabled); }
 
     void OnChange()
     {
@@ -455,7 +455,7 @@ class CTextValue : public PropValue
     xr_string init_value;
 
 public:
-    char* value;
+    LPSTR value;
 
     typedef fastdelegate::FastDelegate2<PropValue*, xr_string&> TOnBeforeEditEvent;
     typedef fastdelegate::FastDelegate2<PropValue*, xr_string&, bool> TOnAfterEditEvent;
@@ -465,7 +465,7 @@ public:
 
     int lim;
 
-    CTextValue(char* val, int _lim) : value(val), init_value(val), lim(_lim)
+    CTextValue(LPSTR val, int _lim) : value(val), init_value(val), lim(_lim)
     {
         OnBeforeEditEvent = nullptr;
         OnAfterEditEvent = nullptr;
@@ -480,7 +480,7 @@ public:
 
     virtual bool Equal(PropValue* val) { return (0 == xr_strcmp(value, ((CTextValue*)val)->value)); }
 
-    bool ApplyValue(const char* val)
+    bool ApplyValue(LPCSTR val)
     {
         if (0 != xr_strcmp(value, val))
         {
@@ -490,7 +490,7 @@ public:
         return false;
     }
 
-    char* GetValue() { return value; }
+    LPSTR GetValue() { return value; }
     virtual void ResetValue() { xr_strcpy(value, init_value.size() + 1, init_value.c_str()); }
 };
 //------------------------------------------------------------------------------
@@ -508,19 +508,19 @@ public:
     TOnDrawThumbnail OnDrawThumbnailEvent;
     void* m_FillParam;
     // utils
-    void AppendChooseItem(const char* name, const char* hint)
+    void AppendChooseItem(LPCSTR name, LPCSTR hint)
     {
         VERIFY(m_Items);
         m_Items->push_back(SChooseItem(name, hint));
     }
 
-    ChooseValue(shared_str* val, u32 cid, const char* path, void* param, u32 sub_item_count, u32 choose_flags)
+    ChooseValue(shared_str* val, u32 cid, LPCSTR path, void* param, u32 sub_item_count, u32 choose_flags)
         : RTextValue(val), m_ChooseID(cid), m_StartPath(path), subitem(sub_item_count), m_Items(nullptr), m_FillParam(param),
           OnChooseFillEvent(nullptr), OnDrawThumbnailEvent(nullptr), m_ChooseFlags(choose_flags)
     {}
 };
 
-typedef CustomValue<bool> BOOLValue;
+typedef CustomValue<BOOL> BOOLValue;
 //------------------------------------------------------------------------------
 
 IC bool operator==(const WaveForm& A, const WaveForm& B) { return !!A.Similar(B); }
@@ -655,7 +655,7 @@ public:
     };
     Flags32 m_Flags;
 
-    FlagValueCustom(u32 mask, const char* c0, const char* c1)
+    FlagValueCustom(u32 mask, LPCSTR c0, LPCSTR c1)
     {
         caption[0] = c0;
         caption[1] = c1;
@@ -674,7 +674,7 @@ public:
 
     FLAG_TYPE mask;
 
-    FlagValue(T* val, FLAG_TYPE _mask, const char* c0, const char* c1, u32 flags)
+    FlagValue(T* val, FLAG_TYPE _mask, LPCSTR c0, LPCSTR c1, u32 flags)
         : CustomValue<T>(val), FlagValueCustom(flags, c0, c1), mask(_mask)
     {}
 
@@ -823,7 +823,7 @@ public:
     xr_string* items;
     u32 item_count;
 
-    CListValue(char* val, u32 sz, xr_string* _items, u32 cnt) : CTextValue(val, sz), items(_items), item_count(cnt){};
+    CListValue(LPSTR val, u32 sz, xr_string* _items, u32 cnt) : CTextValue(val, sz), items(_items), item_count(cnt){};
     virtual bool Equal(PropValue* val)
     {
         if (items != ((CListValue*)val)->items)

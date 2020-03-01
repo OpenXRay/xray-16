@@ -151,9 +151,9 @@ void DXTCGen::BuildCodes3(cbVector *pVects, cbVector &v1, cbVector &v2)
 	//pVects[0] = v1;
 	//pVects[2] = v2;
 	//pVects[1][0] = v1[0];
-	//pVects[1][1] = (unsigned char)( ((long)v1[1] + (long)v2[1]) / 2 );
-	//pVects[1][2] = (unsigned char)( ((long)v1[2] + (long)v2[2]) / 2 );
-	//pVects[1][3] = (unsigned char)( ((long)v1[3] + (long)v2[3]) / 2 );
+	//pVects[1][1] = (BYTE)( ((long)v1[1] + (long)v2[1]) / 2 );
+	//pVects[1][2] = (BYTE)( ((long)v1[2] + (long)v2[2]) / 2 );
+	//pVects[1][3] = (BYTE)( ((long)v1[3] + (long)v2[3]) / 2 );
 
 	__asm {
 		mov			ecx, dword ptr pVects
@@ -191,14 +191,14 @@ void DXTCGen::BuildCodes4(cbVector *pVects, cbVector &v1, cbVector &v2)
 // 	pVects[3] = v2;
 // 
 // 	pVects[1][0] = v1[0];
-// 	pVects[1][1] = (unsigned char)( ((long)v1[1] * 2 + (long)v2[1]) / 3 );
-// 	pVects[1][2] = (unsigned char)( ((long)v1[2] * 2 + (long)v2[2]) / 3 );
-// 	pVects[1][3] = (unsigned char)( ((long)v1[3] * 2 + (long)v2[3]) / 3 );
+// 	pVects[1][1] = (BYTE)( ((long)v1[1] * 2 + (long)v2[1]) / 3 );
+// 	pVects[1][2] = (BYTE)( ((long)v1[2] * 2 + (long)v2[2]) / 3 );
+// 	pVects[1][3] = (BYTE)( ((long)v1[3] * 2 + (long)v2[3]) / 3 );
 // 
 // 	pVects[2][0] = v1[0];
-// 	pVects[2][1] = (unsigned char)( ((long)v2[1] * 2 + (long)v1[1]) / 3 );
-// 	pVects[2][2] = (unsigned char)( ((long)v2[2] * 2 + (long)v1[2]) / 3 );
-// 	pVects[2][3] = (unsigned char)( ((long)v2[3] * 2 + (long)v1[3]) / 3 );
+// 	pVects[2][1] = (BYTE)( ((long)v2[1] * 2 + (long)v1[1]) / 3 );
+// 	pVects[2][2] = (BYTE)( ((long)v2[2] * 2 + (long)v1[2]) / 3 );
+// 	pVects[2][3] = (BYTE)( ((long)v2[3] * 2 + (long)v1[3]) / 3 );
 
 	__asm {
 		mov			ecx, dword ptr pVects

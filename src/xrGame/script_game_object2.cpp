@@ -126,14 +126,14 @@ void CScriptGameObject::set_item(
             queue_size, queue_interval, queue_interval);
 }
 
-void CScriptGameObject::play_cycle(const char* anim, bool mix_in)
+void CScriptGameObject::play_cycle(LPCSTR anim, bool mix_in)
 {
     IKinematicsAnimated* sa = smart_cast<IKinematicsAnimated*>(object().Visual());
     if (sa)
     {
         MotionID m = sa->ID_Cycle(anim);
         if (m)
-            sa->PlayCycle(m, (bool)mix_in);
+            sa->PlayCycle(m, (BOOL)mix_in);
         else
         {
             GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject : has not cycle %s", anim);
@@ -145,7 +145,7 @@ void CScriptGameObject::play_cycle(const char* anim, bool mix_in)
     }
 }
 
-void CScriptGameObject::play_cycle(const char* anim) { play_cycle(anim, true); }
+void CScriptGameObject::play_cycle(LPCSTR anim) { play_cycle(anim, true); }
 void CScriptGameObject::Hit(CScriptHit* tpLuaHit)
 {
     CScriptHit& tLuaHit = *tpLuaHit;
@@ -316,7 +316,7 @@ void CScriptGameObject::restore_sound_threshold()
     monster->memory().sound().restore_threshold();
 }
 
-void CScriptGameObject::SetStartDialog(const char* dialog_id)
+void CScriptGameObject::SetStartDialog(LPCSTR dialog_id)
 {
     CAI_PhraseDialogManager* pDialogManager = smart_cast<CAI_PhraseDialogManager*>(&object());
     if (!pDialogManager)

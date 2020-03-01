@@ -4,7 +4,7 @@
 
 bool net_task_callback::test_connection()
 {
-    VERIFY(_session != unsigned int(-1));
+    VERIFY(_session != DWORD(-1));
 #ifdef NET_CMP
     _agent.TestConnection(_session);
 #else

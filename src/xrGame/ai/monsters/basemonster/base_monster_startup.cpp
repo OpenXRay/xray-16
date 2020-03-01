@@ -50,7 +50,7 @@ const float aom_prediction_factor = 1.3f;
 
 } // namespace detail
 
-void CBaseMonster::Load(const char* section)
+void CBaseMonster::Load(LPCSTR section)
 {
     m_section = section;
     // load parameters from ".ltx" file
@@ -131,7 +131,7 @@ void CBaseMonster::Load(const char* section)
     m_fHitFracMonster = 0.1f;
     if (pSettings->line_exist(section, "protections_sect"))
     {
-        const char* protections_sect = pSettings->r_string(section, "protections_sect");
+        LPCSTR protections_sect = pSettings->r_string(section, "protections_sect");
         m_fSkinArmor = READ_IF_EXISTS(pSettings, r_float, protections_sect, "skin_armor", 0.f);
         float defaultHitFraction = 0.1f;
         if (ShadowOfChernobylMode || ClearSkyMode)
@@ -144,7 +144,7 @@ void CBaseMonster::Load(const char* section)
     m_force_anti_aim = false;
 }
 
-void CBaseMonster::PostLoad(const char* section)
+void CBaseMonster::PostLoad(LPCSTR section)
 {
     //------------------------------------
     // Atack On Move (AOM) Parameters
@@ -206,7 +206,7 @@ steering_behaviour::manager* CBaseMonster::get_steer_manager()
         sound().add(pSettings->r_string(section, sound_name), DEFAULT_SAMPLE_COUNT, _type, _prior, u32(_mask), \
             _int_type, m_head_bone_name);
 
-void CBaseMonster::reload(const char* section)
+void CBaseMonster::reload(LPCSTR section)
 {
     CCustomMonster::reload(section);
 
@@ -320,7 +320,7 @@ void CBaseMonster::reinit()
     anim().clear_override_animation();
 }
 
-bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
+BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -403,7 +403,7 @@ void CBaseMonster::net_Destroy()
     \
 }
 
-void CBaseMonster::settings_read(CInifile const* ini, const char* section, SMonsterSettings& data)
+void CBaseMonster::settings_read(CInifile const* ini, LPCSTR section, SMonsterSettings& data)
 {
     READ_SETTINGS(data.m_fSoundThreshold, "SoundThreshold", r_float, ini, section);
 
@@ -438,7 +438,7 @@ void CBaseMonster::settings_read(CInifile const* ini, const char* section, SMons
     // Load attack postprocess
     if (ini->line_exist(section, "attack_effector"))
     {
-        const char* ppi_section = ini->r_string(section, "attack_effector");
+        LPCSTR ppi_section = ini->r_string(section, "attack_effector");
 
         READ_SETTINGS(data.m_attack_effector.ppi.duality.h, "duality_h", r_float, ini, ppi_section);
         READ_SETTINGS(data.m_attack_effector.ppi.duality.v, "duality_v", r_float, ini, ppi_section);
@@ -471,7 +471,7 @@ void CBaseMonster::settings_read(CInifile const* ini, const char* section, SMons
     }
 }
 
-void CBaseMonster::settings_load(const char* section)
+void CBaseMonster::settings_load(LPCSTR section)
 {
     SMonsterSettings data;
 
@@ -527,9 +527,9 @@ void CBaseMonster::load_critical_wound_bones()
     }
 }
 
-void CBaseMonster::fill_bones_body_parts(const char* body_part, CriticalWoundType wound_type)
+void CBaseMonster::fill_bones_body_parts(LPCSTR body_part, CriticalWoundType wound_type)
 {
-    const char* body_parts_section = pSettings->r_string(cNameSect(), body_part);
+    LPCSTR body_parts_section = pSettings->r_string(cNameSect(), body_part);
 
     IKinematics* kinematics = smart_cast<IKinematics*>(Visual());
     VERIFY(kinematics);

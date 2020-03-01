@@ -3,7 +3,7 @@
 #include "XR_IOConsole.h"
 
 extern void msRead();
-extern void msCreate(const char* name);
+extern void msCreate(LPCSTR name);
 
 //---------------------------------------------------------------------
 class ENGINE_API CEvent
@@ -19,9 +19,9 @@ public:
     CEvent(const char* S);
     ~CEvent();
 
-    const char* GetFull() { return Name; }
+    LPCSTR GetFull() { return Name; }
     u32 RefCount() { return dwRefCount; }
-    bool Equal(CEvent& E) { return xr_stricmp(Name, E.Name) == 0; }
+    BOOL Equal(CEvent& E) { return xr_stricmp(Name, E.Name) == 0; }
     void Attach(IEventReceiver* H)
     {
         if (std::find(Handlers.begin(), Handlers.end(), H) == Handlers.end())
@@ -114,7 +114,7 @@ void CEventAPI::Signal(EVENT E, u64 P1, u64 P2)
     E->Signal(P1, P2);
     CS.Leave();
 }
-void CEventAPI::Signal(const char* N, u64 P1, u64 P2)
+void CEventAPI::Signal(LPCSTR N, u64 P1, u64 P2)
 {
     CS.Enter();
     EVENT E = Create(N);
@@ -132,7 +132,7 @@ void CEventAPI::Defer(EVENT E, u64 P1, u64 P2)
     Events_Deferred.back().P2 = P2;
     CS.Leave();
 }
-void CEventAPI::Defer(const char* N, u64 P1, u64 P2)
+void CEventAPI::Defer(LPCSTR N, u64 P1, u64 P2)
 {
     CS.Enter();
     EVENT E = Create(N);
@@ -142,7 +142,7 @@ void CEventAPI::Defer(const char* N, u64 P1, u64 P2)
 }
 
 #ifdef DEBUG
-void msParse(const char* c)
+void msParse(LPCSTR c)
 {
     if (0 == xr_stricmp(c, "exit"))
     {
@@ -179,7 +179,7 @@ void CEventAPI::OnFrame()
     CS.Leave();
 }
 
-bool CEventAPI::Peek(const char* EName)
+BOOL CEventAPI::Peek(LPCSTR EName)
 {
     CS.Enter();
     if (Events_Deferred.empty())

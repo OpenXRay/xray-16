@@ -2,8 +2,8 @@ protected:
 using MESSAGEMENUS = xr_vector<cl_MessageMenu>;
 MESSAGEMENUS m_aMessageMenus;
 
-virtual void AddMessageMenu(const char* menu_section, const char* snd_path, const char* team_prefix);
-virtual void LoadMessagesMenu(const char* menus_section);
+virtual void AddMessageMenu(LPCSTR menu_section, LPCSTR snd_path, LPCSTR team_prefix);
+virtual void LoadMessagesMenu(LPCSTR menus_section);
 virtual void DestroyMessagesMenus();
 virtual void HideMessageMenus();
 

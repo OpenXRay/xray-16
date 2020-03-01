@@ -121,8 +121,8 @@ public:
     IC void SetAutoDelete(bool auto_delete) { m_bAutoDelete = auto_delete; }
     // Name of the window
     const shared_str WindowName() const { return m_windowName; }
-    void SetWindowName(const char* wn) { m_windowName = wn; }
-    const char* WindowName_script() { return m_windowName.c_str(); }
+    void SetWindowName(LPCSTR wn) { m_windowName = wn; }
+    LPCSTR WindowName_script() { return m_windowName.c_str(); }
     CUIWindow* FindChild(const shared_str name);
 
     IC bool CursorOverWindow() const { return m_bCursorOverWindow; }

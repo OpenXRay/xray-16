@@ -55,7 +55,7 @@ public:
 
     IC float ffGetMaxResultValue() { return (m_fMaxResultValue); }
     IC float ffGetMinResultValue() { return (m_fMinResultValue); }
-    IC const char* Name() { return (m_caName); }
+    IC LPCSTR Name() { return (m_caName); }
     IC CLASS_ID clsid_member() const;
     IC CLASS_ID clsid_enemy() const;
     IC CLASS_ID clsid_member_item() const;

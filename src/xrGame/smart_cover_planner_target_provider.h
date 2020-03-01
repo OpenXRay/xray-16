@@ -22,7 +22,7 @@ private:
     typedef CActionBase<animation_planner> inherited;
 
 public:
-    target_provider(animation_planner* object, const char* name,
+    target_provider(animation_planner* object, LPCSTR name,
         StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value);
     virtual void setup(animation_planner* object, CPropertyStorage* storage);
     virtual void initialize();
@@ -43,7 +43,7 @@ private:
     typedef target_provider inherited;
 
 public:
-    target_idle(animation_planner* object, const char* name, StalkerDecisionSpace::EWorldProperties const& world_property,
+    target_idle(animation_planner* object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const& world_property,
         u32 const& loophole_value);
     virtual void execute();
 };
@@ -58,7 +58,7 @@ private:
     typedef target_provider inherited;
 
 public:
-    target_fire(animation_planner* object, const char* name, StalkerDecisionSpace::EWorldProperties const& world_property,
+    target_fire(animation_planner* object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const& world_property,
         u32 const& loophole_value);
     virtual void initialize();
     virtual void execute();
@@ -74,7 +74,7 @@ private:
     typedef target_provider inherited;
 
 public:
-    target_fire_no_lookout(animation_planner* object, const char* name,
+    target_fire_no_lookout(animation_planner* object, LPCSTR name,
         StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value);
     virtual void initialize();
 

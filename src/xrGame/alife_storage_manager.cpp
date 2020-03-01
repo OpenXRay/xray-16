@@ -29,13 +29,13 @@ using namespace ALife;
 extern string_path g_last_saved_game;
 
 CALifeStorageManager::~CALifeStorageManager() { *g_last_saved_game = 0; }
-void CALifeStorageManager::save(const char* save_name_no_check, bool update_name)
+void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;
     if (ShadowOfChernobylMode || ClearSkyMode)
         gameSaveExtension = SAVE_EXTENSION_LEGACY;
 
-    const char* game_saves_path = FS.get_path("$game_saves$")->m_Path;
+    LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;
 
     string_path save_name;
     strncpy_s(save_name, sizeof(save_name), save_name_no_check,
@@ -97,7 +97,7 @@ void CALifeStorageManager::save(const char* save_name_no_check, bool update_name
         xr_strcpy(m_save_name, saveBackup);
 }
 
-void CALifeStorageManager::load(void* buffer, const u32& buffer_size, const char* file_name)
+void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR file_name)
 {
     IReader source(buffer, buffer_size);
     header().load(source);
@@ -130,13 +130,13 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, const char
     Level().autosave_manager().on_game_loaded();
 }
 
-bool CALifeStorageManager::load(const char* save_name_no_check)
+bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;
     if (ShadowOfChernobylMode || ClearSkyMode)
         gameSaveExtension = SAVE_EXTENSION_LEGACY;
 
-    const char* game_saves_path = FS.get_path("$game_saves$")->m_Path;
+    LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;
 
     string_path save_name;
     strncpy_s(save_name, sizeof(save_name), save_name_no_check,

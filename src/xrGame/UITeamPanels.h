@@ -30,7 +30,7 @@ public:
     virtual ~UITeamPanels();
     virtual void Update();
 
-    void Init(const char* xmlName, const char* panelsRootNode);
+    void Init(LPCSTR xmlName, LPCSTR panelsRootNode);
 
     void AddPlayer(ClientID const& clientId);
     void RemovePlayer(ClientID const& clientId);

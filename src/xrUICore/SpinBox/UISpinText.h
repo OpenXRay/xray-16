@@ -16,7 +16,7 @@ public:
     virtual void OnBtnDownClick();
 
     void AddItem_(const char* item, int id);
-    const char* GetTokenText();
+    LPCSTR GetTokenText();
 
 protected:
     virtual bool CanPressUp();

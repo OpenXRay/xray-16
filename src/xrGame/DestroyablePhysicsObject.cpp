@@ -38,13 +38,13 @@ void CDestroyablePhysicsObject::net_Destroy()
     CPHCollisionDamageReceiver::Clear();
 }
 
-bool CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
+BOOL CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
 {
     BOOL res = inherited::net_Spawn(DC);
     IKinematics* K = smart_cast<IKinematics*>(Visual());
     CInifile* ini = K->LL_UserData();
     // R_ASSERT2(ini->section_exist("destroyed"),"destroyable_object must have -destroyed- section in model user data");
-     CPHDestroyable::Init();
+    CPHDestroyable::Init();
     if (ini && ini->section_exist("destroyed"))
         CPHDestroyable::Load(ini, "destroyed");
 

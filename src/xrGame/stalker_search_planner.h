@@ -23,7 +23,7 @@ private:
     void add_actions();
 
 public:
-    CStalkerSearchPlanner(CAI_Stalker* object = 0, const char* action_name = "");
+    CStalkerSearchPlanner(CAI_Stalker* object = 0, LPCSTR action_name = "");
     virtual void setup(CAI_Stalker* object, CPropertyStorage* storage);
     virtual void update();
     virtual void initialize();

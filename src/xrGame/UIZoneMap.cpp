@@ -195,7 +195,7 @@ void CUIZoneMap::SetupCurrentMap()
     Fvector2 wnd_size;
     float zoom_factor = float(m_clipFrame.GetWidth()) / 100.0f;
 
-    const char* ln = Level().name().c_str();
+    LPCSTR ln = Level().name().c_str();
     if (pGameIni->section_exist(ln))
     {
         if (pGameIni->line_exist(ln, "minimap_zoom"))

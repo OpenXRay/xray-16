@@ -783,7 +783,7 @@ void CBaseMonster::create_base_controls()
 
 void CBaseMonster::set_action(EAction action) { anim().m_tAction = action; }
 CParticlesObject* CBaseMonster::PlayParticles(
-    const shared_str& name, const Fvector& position, const Fvector& dir, bool auto_remove, bool xformed)
+    const shared_str& name, const Fvector& position, const Fvector& dir, BOOL auto_remove, BOOL xformed)
 {
     CParticlesObject* ps = CParticlesObject::Create(name.c_str(), auto_remove);
 
@@ -809,9 +809,9 @@ void CBaseMonster::on_restrictions_change()
         StateMan->reinit();
 }
 
-void CBaseMonster::load_effector(const char* section, const char* line, SAttackEffector& effector)
+void CBaseMonster::load_effector(LPCSTR section, LPCSTR line, SAttackEffector& effector)
 {
-    const char* ppi_section = pSettings->r_string(section, line);
+    LPCSTR ppi_section = pSettings->r_string(section, line);
     effector.ppi.duality.h = pSettings->r_float(ppi_section, "duality_h");
     effector.ppi.duality.v = pSettings->r_float(ppi_section, "duality_v");
     effector.ppi.gray = pSettings->r_float(ppi_section, "gray");

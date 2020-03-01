@@ -29,7 +29,7 @@ IFactoryObject* CAttachableItem::_construct()
 }
 
 CAttachableItem::~CAttachableItem() {}
-void CAttachableItem::reload(const char* section)
+void CAttachableItem::reload(LPCSTR section)
 {
 #ifdef DEBUG
     m_valid = true;
@@ -39,7 +39,7 @@ void CAttachableItem::reload(const char* section)
         enable(false);
 }
 
-bool CAttachableItem::load_attach_position(const char* section)
+bool CAttachableItem::load_attach_position(LPCSTR section)
 {
     if (!pSettings->line_exist(section, "attach_angle_offset"))
         return false;

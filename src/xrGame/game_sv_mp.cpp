@@ -49,7 +49,8 @@ extern const xr_token round_end_result_str[];
 #include "ui/UIBuyWndShared.h"
 
 game_sv_mp::game_sv_mp()
-    : inherited(), m_bRankUp_Allowed(false), m_bVotingReal(false), m_uVoteStartTime(0), m_u8SpectatorModes(0)
+    : inherited(), m_bRankUp_Allowed(false), m_bVotingReal(false),
+      m_uVoteStartTime(0), m_u8SpectatorModes(0)
 {
     m_strWeaponsData = new CItemMgr();
     m_bVotingActive = false;
@@ -329,14 +330,16 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
         OnPlayerReady(l_pC->ID);
     }
     break;
-    case GAME_EVENT_PLAYER_BUY_SPAWN: {
+    case GAME_EVENT_PLAYER_BUY_SPAWN:
+    {
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (!l_pC)
             break;
         OnPlayerBuySpawn(l_pC->ID);
     }
     break;
-    case GAME_EVENT_VOTE_START: {
+    case GAME_EVENT_VOTE_START:
+    {
         if (!IsVotingEnabled())
             break;
         string1024 VoteCommand;
@@ -346,33 +349,35 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
         OnVoteStart(VoteCommand, sender);
     }
     break;
-    case GAME_EVENT_VOTE_YES: {
+    case GAME_EVENT_VOTE_YES:
+    {
         if (!IsVotingEnabled())
             break;
         OnVoteYes(sender);
     }
     break;
-    case GAME_EVENT_VOTE_NO: {
+    case GAME_EVENT_VOTE_NO:
+    {
         if (!IsVotingEnabled())
             break;
         OnVoteNo(sender);
     }
     break;
-    case GAME_EVENT_GET_ACTIVE_VOTE: {
+    case GAME_EVENT_GET_ACTIVE_VOTE:
+    {
         if (!IsVotingActive())
             break;
         SendActiveVotingTo(sender);
     }
     break;
-    case GAME_EVENT_PLAYER_NAME: {
-        OnPlayerChangeName(P, sender);
+    case GAME_EVENT_PLAYER_NAME: { OnPlayerChangeName(P, sender);
     }
     break;
-    case GAME_EVENT_SPEECH_MESSAGE: {
-        OnPlayerSpeechMessage(P, sender);
+    case GAME_EVENT_SPEECH_MESSAGE: { OnPlayerSpeechMessage(P, sender);
     }
     break;
-    case GAME_EVENT_PLAYER_GAME_MENU: {
+    case GAME_EVENT_PLAYER_GAME_MENU:
+    {
         OnPlayerGameMenu(P, sender);
         //			OnPlayerSelectSpectator(P, sender);
     }
@@ -388,7 +393,8 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
     }
     break;
     // THIS EVENTS PLAYER MUST RISE ONLY IN DEAD STATE
-    case GAME_EVENT_PLAYER_BUYMENU_OPEN: {
+    case GAME_EVENT_PLAYER_BUYMENU_OPEN:
+    {
         xrClientData const* pClient = (xrClientData const*)m_server->ID_to_client(sender);
         if (pClient)
         {
@@ -405,7 +411,8 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
         }
     }
     break;
-    case GAME_EVENT_PLAYER_BUYMENU_CLOSE: {
+    case GAME_EVENT_PLAYER_BUYMENU_CLOSE:
+    {
         xrClientData const* pClient = (xrClientData const*)m_server->ID_to_client(sender);
         if (pClient)
         {
@@ -441,7 +448,7 @@ bool game_sv_mp::CheckPlayerMapName(ClientID const& clientID, NET_Packet& P)
     return true;
 }
 
-const char* GameTypeToString(EGameIDs gt, bool bShort);
+LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 
 void game_sv_mp::ReconnectPlayer(ClientID const& clientID)
 {
@@ -560,7 +567,7 @@ void game_sv_mp::RespawnPlayer(ClientID id_who, bool NoSpectator)
     };
 };
 
-void game_sv_mp::SpawnPlayer(ClientID id, const char* N)
+void game_sv_mp::SpawnPlayer(ClientID id, LPCSTR N)
 {
     xrClientData* CL = m_server->ID_to_client(id);
     //-------------------------------------------------
@@ -727,19 +734,22 @@ TeamStruct* game_sv_mp::GetTeamData(u32 Team)
     return &(TeamList[Team]);
 };
 
-/*void	game_sv_mp::SpawnWeaponForActor		(u16 actorId,  const char* N, bool isScope, bool isGrenadeLauncher, bool
+/*void	game_sv_mp::SpawnWeaponForActor		(u16 actorId,  LPCSTR N, bool isScope, bool isGrenadeLauncher, bool
 isSilencer)
 {
         u8 addon_flags = 0;
         if(isScope)
             addon_flags |= CSE_ALifeItemWeapon::eWeaponAddonScope;
+
         if(isGrenadeLauncher)
             addon_flags |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
+
         if(isSilencer)
             addon_flags |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
+
         SpawnWeapon4Actor(actorId, N, addon_flags);
 }*/
-void game_sv_mp::ChargeAmmo(CSE_ALifeItemWeapon* weapon, const char* ammo_string,
+void game_sv_mp::ChargeAmmo(CSE_ALifeItemWeapon* weapon, LPCSTR ammo_string,
     game_PlayerState::PLAYER_ITEMS_LIST& playerItems, ammo_diff_t& ammo_diff)
 {
     int ammoc_count = _GetItemCount(ammo_string);
@@ -790,7 +800,7 @@ void game_sv_mp::ChargeAmmo(CSE_ALifeItemWeapon* weapon, const char* ammo_string
 }
 
 void game_sv_mp::ChargeGrenades(
-    CSE_ALifeItemWeapon* weapon, const char* grenade_string, game_PlayerState::PLAYER_ITEMS_LIST& playerItems)
+    CSE_ALifeItemWeapon* weapon, LPCSTR grenade_string, game_PlayerState::PLAYER_ITEMS_LIST& playerItems)
 {
     int grenades_count = _GetItemCount(grenade_string);
     R_ASSERT2(grenades_count <= 4,
@@ -871,7 +881,7 @@ void game_sv_mp::SpawnAmmoDifference(u16 actorId, ammo_diff_t const& ammo_diff)
     spawn_end(ammo_entity, m_server->GetServerClient()->ID);
 }
 
-void game_sv_mp::SpawnWeapon4Actor(u16 actorId, const char* N, u8 Addons, game_PlayerState::PLAYER_ITEMS_LIST& playerItems)
+void game_sv_mp::SpawnWeapon4Actor(u16 actorId, LPCSTR N, u8 Addons, game_PlayerState::PLAYER_ITEMS_LIST& playerItems)
 {
     if (!N)
         return;
@@ -992,7 +1002,7 @@ s32 game_sv_mp::ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vot
 struct SearcherClientByName
 {
     string128 player_name;
-    SearcherClientByName(const char* name)
+    SearcherClientByName(LPCSTR name)
     {
         strncpy_s(player_name, name, sizeof(player_name) - 1);
         xr_strlwr(player_name);
@@ -1010,7 +1020,7 @@ struct SearcherClientByName
     }
 };
 
-void game_sv_mp::OnVoteStart(const char* VoteCommand, ClientID sender)
+void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
 {
     if (!IsVotingEnabled())
         return;
@@ -1072,7 +1082,7 @@ void game_sv_mp::OnVoteStart(const char* VoteCommand, ClientID sender)
             LevelName[255] = 0;
             LevelVersion[255] = 0;
 
-            const char* sv_vote_command = NULL;
+            LPCSTR sv_vote_command = NULL;
             STRCONCAT(sv_vote_command, votecommands[i].command, " ", LevelName, " ", LevelVersion);
             m_pVoteCommand = sv_vote_command;
             xr_sprintf(resVoteCommand, "%s %s [%s]", votecommands[i].name, LevelName, LevelVersion);
@@ -1542,16 +1552,13 @@ void game_sv_mp::OnPlayerGameMenu(NET_Packet& P, ClientID sender)
     u8 SubEvent = P.r_u8();
     switch (SubEvent)
     {
-    case PLAYER_SELECT_SPECTATOR: {
-        OnPlayerSelectSpectator(P, sender);
+    case PLAYER_SELECT_SPECTATOR: { OnPlayerSelectSpectator(P, sender);
     }
     break;
-    case PLAYER_CHANGE_TEAM: {
-        OnPlayerSelectTeam(P, sender);
+    case PLAYER_CHANGE_TEAM: { OnPlayerSelectTeam(P, sender);
     }
     break;
-    case PLAYER_CHANGE_SKIN: {
-        OnPlayerSelectSkin(P, sender);
+    case PLAYER_CHANGE_SKIN: { OnPlayerSelectSkin(P, sender);
     }
     break;
     }
@@ -1731,7 +1738,8 @@ bool	game_sv_mp::GetTeamItem_ByID		(WeaponDataStruct** pRes, TEAM_WPN_LIST* pWpn
     *pRes = &(*pWpnI);
     return true;
 };
-bool	game_sv_mp::GetTeamItem_ByName		(WeaponDataStruct** pRes,TEAM_WPN_LIST* pWpnList, const char* ItemName)
+
+bool	game_sv_mp::GetTeamItem_ByName		(WeaponDataStruct** pRes,TEAM_WPN_LIST* pWpnList, LPCSTR ItemName)
 {
     if (!pWpnList) return false;
     TEAM_WPN_LIST_it pWpnI	= std::find(pWpnList->begin(), pWpnList->end(), ItemName);
@@ -1810,8 +1818,7 @@ void game_sv_mp::RenewAllActorsHealth()
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
-            VERIFY2(
-                l_pC && l_pC->ps, make_string("player state of client, ClientID = 0x%08x", l_pC->ID.value()).c_str());
+            VERIFY2(l_pC && l_pC->ps, make_string("player state of client, ClientID = 0x%08x", l_pC->ID.value()).c_str());
             if (!l_pC || !l_pC->ps)
             {
                 return;
@@ -1889,10 +1896,9 @@ void game_sv_mp::RejectGameItem(CSE_Abstract* entity)
 
     //	R_ASSERT2( e_parent, make_string( "RejectGameItem: parent not found. entity_id = [%d], parent_id = [%d]",
     // entity->ID, entity->ID_Parent ).c_str() );
-    VERIFY2(e_parent,
-        make_string(
-            "RejectGameItem: parent not found. entity_id = [%d], parent_id = [%d]", entity->ID, entity->ID_Parent)
-            .c_str());
+    VERIFY2(e_parent, make_string("RejectGameItem: parent not found. entity_id = [%d], parent_id = [%d]", entity->ID,
+                          entity->ID_Parent)
+                          .c_str());
     if (!e_parent)
     {
         Msg("! ERROR (RejectGameItem): parent not found. entity_id = [%d], parent_id = [%d]", entity->ID,
@@ -1979,7 +1985,7 @@ void game_sv_mp::DumpOnlineStatistic()
     WriteGameState(ini, current_section.c_str(), false);
 }
 
-void game_sv_mp::WritePlayerStats(CInifile& ini, const char* sect, xrClientData* pCl)
+void game_sv_mp::WritePlayerStats(CInifile& ini, LPCSTR sect, xrClientData* pCl)
 {
     ini.w_string(sect, "player_name", pCl->ps->getName());
     if (pCl->ps->m_account.is_online())
@@ -2016,7 +2022,7 @@ void game_sv_mp::WritePlayerStats(CInifile& ini, const char* sect, xrClientData*
     }
 }
 
-void game_sv_mp::WriteGameState(CInifile& ini, const char* sect, bool bRoundResult)
+void game_sv_mp::WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult)
 {
     if (!bRoundResult)
         ini.w_u32(sect, "online_time_sec", Device.dwTimeGlobal / 1000);
@@ -2224,7 +2230,7 @@ void game_sv_mp::DestroyAllPlayerItems(ClientID id_who) // except rukzak
     }
 }
 
-void game_sv_mp::SvSendChatMessage(const char* str)
+void game_sv_mp::SvSendChatMessage(LPCSTR str)
 {
     NET_Packet P;
     P.w_begin(M_CHAT_MESSAGE);

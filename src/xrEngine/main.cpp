@@ -430,7 +430,7 @@ void RunBenchmark(pcstr name)
     const size_t hyphenLtxLen = xr_strlen("-ltx ");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
-        const char* benchmarkName, *t;
+        LPCSTR benchmarkName, t;
         ini.r_line("benchmark", i, &benchmarkName, &t);
         xr_strcpy(g_sBenchmarkName, benchmarkName);
         shared_str benchmarkCommand = ini.r_string_wb("benchmark", benchmarkName);

@@ -9,8 +9,8 @@
 #endif
 
 #ifdef DEBUG
-static bool _cdb_bDebug = false;
-extern XRCDB_API bool* cdb_bDebug = &_cdb_bDebug;
+static BOOL _cdb_bDebug = false;
+extern XRCDB_API BOOL* cdb_bDebug = &_cdb_bDebug;
 bool bDebug() { return !!(*cdb_bDebug); }
 #endif
 using namespace collide;
@@ -18,16 +18,16 @@ using namespace collide;
 //--------------------------------------------------------------------------------
 // RayTest - Occluded/No
 //--------------------------------------------------------------------------------
-bool CObjectSpace::RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
+BOOL CObjectSpace::RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
     collide::ray_cache* cache, IGameObject* ignore_object)
 {
     lock->Enter();
-    bool _ret = _RayTest(start, dir, range, tgt, cache, ignore_object);
+    BOOL _ret = _RayTest(start, dir, range, tgt, cache, ignore_object);
     r_spatial.clear();
     lock->Leave();
     return _ret;
 }
-bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
+BOOL CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
     collide::ray_cache* cache, IGameObject* ignore_object)
 {
     VERIFY(_abs(dir.magnitude() - 1) < EPS);
@@ -111,16 +111,16 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
 //--------------------------------------------------------------------------------
 // RayPick
 //--------------------------------------------------------------------------------
-bool CObjectSpace::RayPick(
+BOOL CObjectSpace::RayPick(
     const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
     lock->Enter();
-    bool _res = _RayPick(start, dir, range, tgt, R, ignore_object);
+    BOOL _res = _RayPick(start, dir, range, tgt, R, ignore_object);
     r_spatial.clear();
     lock->Leave();
     return _res;
 }
-bool CObjectSpace::_RayPick(
+BOOL CObjectSpace::_RayPick(
     const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
     r_temp.r_clear();
@@ -181,16 +181,16 @@ bool CObjectSpace::_RayPick(
 //--------------------------------------------------------------------------------
 // RayQuery
 //--------------------------------------------------------------------------------
-bool CObjectSpace::RayQuery(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB,
+BOOL CObjectSpace::RayQuery(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
     lock->Enter();
-    bool _res = _RayQuery2(dest, R, CB, user_data, tb, ignore_object);
+    BOOL _res = _RayQuery2(dest, R, CB, user_data, tb, ignore_object);
     r_spatial.clear();
     lock->Leave();
     return (_res);
 }
-bool CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
+BOOL CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
     // initialize query
@@ -249,7 +249,7 @@ bool CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_de
     return r_dest.r_count();
 }
 
-bool CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
+BOOL CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
     // initialize query
@@ -343,7 +343,7 @@ bool CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_de
     return r_dest.r_count();
 }
 
-bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
+BOOL CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
 #ifdef DEBUG
@@ -454,14 +454,14 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
             if (s_res.range < r_temp.r_begin()->range)
             {
                 // static nearer
-                bool need_calc = CB ? CB(s_res, user_data) : TRUE;
+                BOOL need_calc = CB ? CB(s_res, user_data) : TRUE;
                 next_test = need_calc ? s_mask : rqtNone;
                 r_dest.append_result(s_res);
             }
             else
             {
                 // dynamic nearer
-                bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
+                BOOL need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
                 next_test = need_calc ? d_mask : rqtNone;
                 r_dest.append_result(*r_temp.r_begin());
             }
@@ -469,14 +469,14 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
         else if (s_res.valid())
         {
             // only static return result
-            bool need_calc = CB ? CB(s_res, user_data) : TRUE;
+            BOOL need_calc = CB ? CB(s_res, user_data) : TRUE;
             next_test = need_calc ? s_mask : rqtNone;
             r_dest.append_result(s_res);
         }
         else if (r_temp.r_count())
         {
             // only dynamic return result
-            bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
+            BOOL need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
             next_test = need_calc ? d_mask : rqtNone;
             r_dest.append_result(*r_temp.r_begin());
         }
@@ -491,7 +491,7 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
     return r_dest.r_count();
 }
 
-bool CObjectSpace::RayQuery(collide::rq_results& r_dest, ICollisionForm* target, const collide::ray_defs& R)
+BOOL CObjectSpace::RayQuery(collide::rq_results& r_dest, ICollisionForm* target, const collide::ray_defs& R)
 {
     VERIFY(target);
     r_dest.r_clear();

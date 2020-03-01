@@ -98,7 +98,7 @@ struct attachable_hud_item
     void render_item_ui();
     bool render_item_ui_query();
     bool need_renderable();
-    void set_bone_visible(const shared_str& bone_name, bool bVisibility, bool bSilent = FALSE);
+    void set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent = FALSE);
     void debug_draw_firedeps();
 
     // hands bind position
@@ -112,7 +112,7 @@ struct attachable_hud_item
     // props
     u32 m_upd_firedeps_frame;
     void tune(Ivector values);
-    u32 anim_play(const shared_str& anim_name, bool bMixIn, const CMotionDef*& md, u8& rnd);
+    u32 anim_play(const shared_str& anim_name, BOOL bMixIn, const CMotionDef*& md, u8& rnd);
 };
 
 class player_hud
@@ -126,7 +126,7 @@ public:
     void render_hud(IRenderable* root);
     void render_item_ui();
     bool render_item_ui_query();
-    u32 anim_play(u16 part, const MotionID& M, bool bMixIn, const CMotionDef*& md, float speed);
+    u32 anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed);
     const shared_str& section_name() const { return m_sect_name; }
     attachable_hud_item* create_hud_item(const shared_str& sect);
 

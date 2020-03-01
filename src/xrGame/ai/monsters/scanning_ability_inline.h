@@ -16,7 +16,7 @@ void CScanningAbilityAbstract::on_destroy()
 }
 
 TEMPLATE_SPECIALIZATION
-void CScanningAbilityAbstract::load(const char* section)
+void CScanningAbilityAbstract::load(LPCSTR section)
 {
     GEnv.Sound->create(sound_scan, pSettings->r_string(section, "scan_sound"), st_Effect, SOUND_TYPE_WORLD);
 
@@ -29,7 +29,7 @@ void CScanningAbilityAbstract::load(const char* section)
     VERIFY(!fis_zero(scan_trace_time_freq));
 
     // load scan effector
-    const char* ppi_section = pSettings->r_string(section, "scan_effector_section");
+    LPCSTR ppi_section = pSettings->r_string(section, "scan_effector_section");
     m_effector_info.duality.h = pSettings->r_float(ppi_section, "duality_h");
     m_effector_info.duality.v = pSettings->r_float(ppi_section, "duality_v");
     m_effector_info.gray = pSettings->r_float(ppi_section, "gray");

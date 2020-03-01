@@ -19,7 +19,7 @@
 #include "UIDragDropReferenceList.h"
 #include "xrUICore/EditBox/UIEditBox.h"
 
-CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical /*= true*/)
+CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -35,12 +35,12 @@ CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, const char* ui_path, CUIWin
     return ui;
 }
 
-CUIStatic* UIHelper::CreateStatic(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     return CreateStatic(xml, ui_path, 0, parent, critical);
 }
 
-CUIStatic* UIHelper::CreateStatic(CUIXml& xml, const char* ui_path, int index, CUIWindow* parent, bool critical)
+CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, index))
@@ -56,7 +56,7 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, const char* ui_path, int index, C
     return ui;
 }
 
-CUIScrollView* UIHelper::CreateScrollView(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical /*= true*/)
+CUIScrollView* UIHelper::CreateScrollView(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -72,7 +72,7 @@ CUIScrollView* UIHelper::CreateScrollView(CUIXml& xml, const char* ui_path, CUIW
     return ui;
 }
 
-CUITextWnd* UIHelper::CreateTextWnd(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUITextWnd* UIHelper::CreateTextWnd(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -88,7 +88,7 @@ CUITextWnd* UIHelper::CreateTextWnd(CUIXml& xml, const char* ui_path, CUIWindow*
     return ui;
 }
 
-CUIEditBox* UIHelper::CreateEditBox(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUIEditBox* UIHelper::CreateEditBox(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -104,7 +104,7 @@ CUIEditBox* UIHelper::CreateEditBox(CUIXml& xml, const char* ui_path, CUIWindow*
     return ui;
 }
 
-CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -124,7 +124,7 @@ CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, const char* ui_path, CU
     return ui;
 }
 
-CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical /*= true*/)
+CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -144,7 +144,7 @@ CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, const char* ui_path
     return ui;
 }
 
-CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -164,7 +164,7 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, const char* ui_path, CUI
     return ui;
 }
 
-CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -184,12 +184,12 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, const char* ui_path, CU
     return ui;
 }
 
-CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     return Create3tButton(xml, ui_path, 0, parent, critical);
 }
 
-CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, const char* ui_path, int index, CUIWindow* parent, bool critical /*= true*/)
+CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical /*= true*/)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, index))
@@ -202,7 +202,7 @@ CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, const char* ui_path, int inde
     return ui;
 }
 
-CUICheckButton* UIHelper::CreateCheck(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUICheckButton* UIHelper::CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -215,7 +215,7 @@ CUICheckButton* UIHelper::CreateCheck(CUIXml& xml, const char* ui_path, CUIWindo
     return ui;
 }
 
-UIHint* UIHelper::CreateHint(CUIXml& xml, const char* ui_path /*, CUIWindow* parent*/, bool critical)
+UIHint* UIHelper::CreateHint(CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*/, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))
@@ -227,12 +227,12 @@ UIHint* UIHelper::CreateHint(CUIXml& xml, const char* ui_path /*, CUIWindow* par
     return ui;
 }
 
-CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     return CreateDragDropListEx(xml, ui_path, 0, parent, critical);
 }
 
-CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, const char* ui_path, int index, CUIWindow* parent, bool critical /*= true*/)
+CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical /*= true*/)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, index))
@@ -245,7 +245,7 @@ CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, const char* ui_pa
     return ui;
 }
 
-CUIDragDropReferenceList* UIHelper::CreateDragDropReferenceList(CUIXml& xml, const char* ui_path, CUIWindow* parent, bool critical)
+CUIDragDropReferenceList* UIHelper::CreateDragDropReferenceList(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
     if (!critical && !xml.NavigateToNode(ui_path, 0))

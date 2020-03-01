@@ -8,5 +8,5 @@ public:
     virtual bool run_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream) = 0;
 };
 extern XRLC_LIGHT_API net_task_interface* g_net_task_interface;
-} // namespace lc_net
+}
 #endif

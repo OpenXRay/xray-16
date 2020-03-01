@@ -99,21 +99,21 @@ void CUIListItemServer::InitItemServer(LIST_SRV_ITEM& params)
 }
 
 #include "string_table.h"
-u32 CutStringByLength(CGameFont* font, const char* src, char* dst, u32 dstSize, float length);
+u32 CutStringByLength(CGameFont* font, LPCSTR src, LPSTR dst, u32 dstSize, float length);
 
 void CUIListItemServer::SetParams(LIST_SRV_ITEM& params)
 {
     string1024 buff;
 
-    const char* _srv_name = StringTable().translate(params.info.server).c_str();
+    LPCSTR _srv_name = StringTable().translate(params.info.server).c_str();
     CutStringByLength(m_map->GetFont(), _srv_name, buff, sizeof(buff), m_server->GetWidth());
     m_server->SetText(buff);
 
-    const char* _map_name = StringTable().translate(params.info.map).c_str();
+    LPCSTR _map_name = StringTable().translate(params.info.map).c_str();
     CutStringByLength(m_map->GetFont(), _map_name, buff, sizeof(buff), m_map->GetWidth());
     m_map->SetText(buff);
 
-    const char* _game_name = StringTable().translate(params.info.game).c_str();
+    LPCSTR _game_name = StringTable().translate(params.info.game).c_str();
     CutStringByLength(m_game->GetFont(), _game_name, buff, sizeof(buff), m_game->GetWidth());
     m_game->SetText(buff);
 
@@ -130,7 +130,7 @@ void CUIListItemServer::SetParams(LIST_SRV_ITEM& params)
 }
 
 void CUIListItemServer::CreateConsoleCommand(
-    xr_string& command, const char* player_name, const char* player_pass, const char* server_psw)
+    xr_string& command, LPCSTR player_name, LPCSTR player_pass, LPCSTR server_psw)
 {
     command = "start client(";
     command += *m_srv_info.info.address;

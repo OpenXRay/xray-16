@@ -17,7 +17,7 @@ public:
 
 public:
     virtual ~weapon_hud_value();
-    bool load(const shared_str& section, CHudItem* owner);
+    BOOL load(const shared_str& section, CHudItem* owner);
 };
 
 typedef shared_container<weapon_hud_value> weapon_hud_container;
@@ -30,7 +30,7 @@ protected:
     {
         CHudItem* owner;
         on_new_pred(CHudItem* _owner) : owner(_owner) {}
-        bool operator()(const shared_str& key, weapon_hud_value* val) const { return val->load(key, owner); }
+        BOOL operator()(const shared_str& key, weapon_hud_value* val) const { return val->load(key, owner); }
     };
 
 public:
@@ -41,7 +41,7 @@ public:
     // IKinematicsAnimated*	animations				(){return p_->m_animations;}
     IKinematicsAnimated* animations() { return p_->m_animations; }
     u32 motion_length(MotionID M);
-    MotionID motion_id(const char* name);
+    MotionID motion_id(LPCSTR name);
 };
 //---------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ public:
     ~CWeaponHUD();
 
     // misc
-    void Load(const char* section);
+    void Load(LPCSTR section);
     void net_DestroyHud();
     void Init();
 
@@ -96,9 +96,9 @@ public:
     void SetZoomRotateX(float zoom_rotate_x) { m_fZoomRotateX = zoom_rotate_x; }
     void SetZoomRotateY(float zoom_rotate_y) { m_fZoomRotateY = zoom_rotate_y; }
     // Animations
-    void animPlay(MotionID M, bool bMixIn /*=TRUE*/, CHudItem* W /*=0*/, u32 state);
-    void animDisplay(MotionID M, bool bMixIn);
-    MotionID animGet(const char* name);
+    void animPlay(MotionID M, BOOL bMixIn /*=TRUE*/, CHudItem* W /*=0*/, u32 state);
+    void animDisplay(MotionID M, BOOL bMixIn);
+    MotionID animGet(LPCSTR name);
 
     void UpdatePosition(const Fmatrix& transform);
 

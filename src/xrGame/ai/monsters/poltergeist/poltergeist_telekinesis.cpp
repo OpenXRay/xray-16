@@ -6,7 +6,7 @@
 #include "xrPhysics/IColisiondamageInfo.h"
 CPolterTele::CPolterTele(CPoltergeist* polter) : inherited(polter), m_pmt_object_collision_damage(0.5f) {}
 CPolterTele::~CPolterTele() {}
-void CPolterTele::load(const char* section)
+void CPolterTele::load(LPCSTR section)
 {
     inherited::load(section);
 

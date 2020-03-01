@@ -18,24 +18,24 @@ IFactoryObject* CInventoryItemObject::_construct()
     return (this);
 }
 
-void CInventoryItemObject::Load(const char* section)
+void CInventoryItemObject::Load(LPCSTR section)
 {
     CPhysicItem::Load(section);
     CInventoryItem::Load(section);
 }
 /* remove
-const char* CInventoryItemObject::Name			()
+LPCSTR CInventoryItemObject::Name			()
 {
     return						(CInventoryItem::Name());
 }
 
-const char* CInventoryItemObject::NameShort		()
+LPCSTR CInventoryItemObject::NameShort		()
 {
     return						(CInventoryItem::NameShort());
 }
 */
 /*
-const char* CInventoryItemObject::NameComplex	()
+LPCSTR CInventoryItemObject::NameComplex	()
 {
     return						(CInventoryItem::NameComplex());
 }
@@ -83,9 +83,9 @@ void CInventoryItemObject::OnEvent(NET_Packet& P, u16 type)
     CInventoryItem::OnEvent(P, type);
 }
 
-bool CInventoryItemObject::net_Spawn(CSE_Abstract* DC)
+BOOL CInventoryItemObject::net_Spawn(CSE_Abstract* DC)
 {
-    bool res = CPhysicItem::net_Spawn(DC);
+    BOOL res = CPhysicItem::net_Spawn(DC);
     CInventoryItem::net_Spawn(DC);
     return (res);
 }
@@ -116,7 +116,7 @@ void CInventoryItemObject::renderable_Render(IRenderable* root)
     CInventoryItem::renderable_Render(root);
 }
 
-void CInventoryItemObject::reload(const char* section)
+void CInventoryItemObject::reload(LPCSTR section)
 {
     CPhysicItem::reload(section);
     CInventoryItem::reload(section);

@@ -45,7 +45,7 @@ public:
     void clear();
     void propagade();
     u32 rasterize(occTri* T);
-    bool test(float x0, float y0, float x1, float y1, float z);
+    BOOL test(float x0, float y0, float x1, float y1, float z);
 
     occTri** get_frame() { return &(bufFrame[0][0]); }
     float* get_depth() { return &(bufDepth[0][0]); }

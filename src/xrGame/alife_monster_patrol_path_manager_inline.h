@@ -20,7 +20,7 @@ IC void CALifeMonsterPatrolPathManager::path(const CPatrolPath* path)
     m_path = path;
 }
 
-IC void CALifeMonsterPatrolPathManager::path(const char* path_name) { path(shared_str(path_name)); }
+IC void CALifeMonsterPatrolPathManager::path(LPCSTR path_name) { path(shared_str(path_name)); }
 IC bool CALifeMonsterPatrolPathManager::actual() const { return (m_actual); }
 IC bool CALifeMonsterPatrolPathManager::completed() const { return (actual() && m_completed); }
 IC void CALifeMonsterPatrolPathManager::start_type(const EPatrolStartType& start_type) { m_start_type = start_type; }

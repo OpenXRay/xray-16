@@ -123,7 +123,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
 
     pos_tries.clear();
     dReal neg_depth = dInfinity, b_neg_depth = dInfinity;
-    unsigned int b_count = 0;
+    UINT b_count = 0;
     bool intersect = false;
 
 #ifdef DEBUG

@@ -107,14 +107,14 @@ protected:
     CBlend* IBlend_Create();
 
 private:
-    void IBlendSetup(CBlend& B, u16 part, u8 channel, MotionID motion_ID, bool bMixing, float blendAccrue,
-        float blendFalloff, float Speed, bool noloop, PlayCallback Callback, LPVOID CallbackParam);
+    void IBlendSetup(CBlend& B, u16 part, u8 channel, MotionID motion_ID, BOOL bMixing, float blendAccrue,
+        float blendFalloff, float Speed, BOOL noloop, PlayCallback Callback, LPVOID CallbackParam);
     void IFXBlendSetup(
         CBlend& B, MotionID motion_ID, float blendAccrue, float blendFalloff, float Power, float Speed, u16 bone);
-    //.	bool						LoadMotions				(const char* N, IReader *data);
+    //.	bool						LoadMotions				(LPCSTR N, IReader *data);
 public:
 #if (defined DEBUG || defined _EDITOR)
-    std::pair<const char*, const char*> LL_MotionDefName_dbg(MotionID ID);
+    std::pair<LPCSTR, LPCSTR> LL_MotionDefName_dbg(MotionID ID);
     void LL_DumpBlends_dbg();
 #endif
     u32 LL_PartBlendsCount(u32 bone_part_id);
@@ -123,7 +123,7 @@ public:
 
     void SetUpdateTracksCalback(IUpdateTracksCallback* callback);
     IUpdateTracksCallback* GetUpdateTracksCalback() { return m_update_tracks_callback; }
-//	const char*						LL_MotionDefName_dbg	(LPVOID		ptr);
+//	LPCSTR						LL_MotionDefName_dbg	(LPVOID		ptr);
 
 #ifdef _EDITOR
     u32 LL_CycleCount()
@@ -141,7 +141,7 @@ public:
         return cnt;
     }
     accel_map* LL_Motions(u32 slot) { return m_Motions[slot].motions.motion_map(); }
-    MotionID ID_Motion(const char* N, u16 slot);
+    MotionID ID_Motion(LPCSTR N, u16 slot);
 #endif
     u16 LL_MotionsSlotCount() { return (u16)m_Motions.size(); }
     const shared_motions& LL_MotionsSlot(u16 idx) { return m_Motions[idx].motions; }
@@ -151,14 +151,14 @@ public:
     virtual IBlendDestroyCallback* GetBlendDestroyCallback();
     virtual void SetBlendDestroyCallback(IBlendDestroyCallback* cb);
     // Low level interface
-    MotionID LL_MotionID(const char* B);
-    u16 LL_PartID(const char* B);
+    MotionID LL_MotionID(LPCSTR B);
+    u16 LL_PartID(LPCSTR B);
 
     CBlend* LL_PlayFX(u16 bone, MotionID motion, float blendAccrue, float blendFalloff, float Speed, float Power);
-    CBlend* LL_PlayCycle(u16 partition, MotionID motion, bool bMixing, float blendAccrue, float blendFalloff,
-        float Speed, bool noloop, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0);
+    CBlend* LL_PlayCycle(u16 partition, MotionID motion, BOOL bMixing, float blendAccrue, float blendFalloff,
+        float Speed, BOOL noloop, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0);
     CBlend* LL_PlayCycle(
-        u16 partition, MotionID motion, bool bMixIn, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0);
+        u16 partition, MotionID motion, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0);
     void LL_FadeCycle(u16 partition, float falloff, u8 mask_channel = (1 << 0));
     void LL_CloseCycle(u16 partition, u8 mask_channel = (1 << 0));
     void LL_SetChannelFactor(u16 channel, float factor);
@@ -175,21 +175,21 @@ public:
     void DestroyCycle(CBlend& B);
 
     // cycles
-    MotionID ID_Cycle(const char* N);
-    MotionID ID_Cycle_Safe(const char* N);
+    MotionID ID_Cycle(LPCSTR N);
+    MotionID ID_Cycle_Safe(LPCSTR N);
     MotionID ID_Cycle(shared_str N);
     MotionID ID_Cycle_Safe(shared_str N);
     CBlend* PlayCycle(
-        const char* N, bool bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0);
+        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0);
     CBlend* PlayCycle(
-        MotionID M, bool bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0);
-    CBlend* PlayCycle(u16 partition, MotionID M, bool bMixIn = TRUE, PlayCallback Callback = nullptr,
+        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0);
+    CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr,
         LPVOID CallbackParam = nullptr, u8 channel = 0);
     // fx'es
-    MotionID ID_FX(const char* N);
-    MotionID ID_FX_Safe(const char* N);
+    MotionID ID_FX(LPCSTR N);
+    MotionID ID_FX_Safe(LPCSTR N);
 
-    CBlend* PlayFX(const char* N, float power_scale);
+    CBlend* PlayFX(LPCSTR N, float power_scale);
     CBlend* PlayFX(MotionID M, float power_scale);
 
     CBlend* PlayFX_Safe(cpcstr N, float power_scale) override;

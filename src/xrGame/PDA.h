@@ -21,8 +21,8 @@ public:
     CPda();
     virtual ~CPda();
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
-    virtual void Load(const char* section);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void Load(LPCSTR section);
     virtual void net_Destroy();
 
     virtual void OnH_A_Chield();
@@ -57,7 +57,7 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
-    //*	virtual const char*							Name					();
+    //*	virtual LPCSTR							Name					();
 
 protected:
     void UpdateActiveContacts();

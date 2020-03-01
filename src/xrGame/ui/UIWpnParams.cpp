@@ -112,7 +112,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         ai().template Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
 
-    const char* cur_section = cur_wpn.object().cNameSect().c_str();
+    LPCSTR cur_section = cur_wpn.object().cNameSect().c_str();
     string2048 str_upgrades;
     str_upgrades[0] = 0;
     cur_wpn.get_upgrades_str(str_upgrades);
@@ -131,7 +131,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 
     if (slot_wpn && (slot_wpn != &cur_wpn))
     {
-        const char* slot_section = slot_wpn->object().cNameSect().c_str();
+        LPCSTR slot_section = slot_wpn->object().cNameSect().c_str();
         str_upgrades[0] = 0;
         slot_wpn->get_upgrades_str(str_upgrades);
 

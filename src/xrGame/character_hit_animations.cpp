@@ -66,7 +66,7 @@ IC void set_blend_params(CBlend* B)
 
 IC void play_cycle(IKinematicsAnimated* CA, const MotionID& m, u8 channel, CBlend*& blend_block, float base_power)
 {
-    const bool mixin = TRUE;
+    const BOOL mixin = TRUE;
     float power = base_power;
     if (blend_block && blend_block->blend_state() != CBlend::eFREE_SLOT)
     {

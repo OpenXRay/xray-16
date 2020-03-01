@@ -13,7 +13,7 @@ namespace inventory
 {
 namespace upgrade
 {
-IC const char* Root::scheme() const { return m_upgrade_scheme.c_str(); }
+IC LPCSTR Root::scheme() const { return m_upgrade_scheme.c_str(); }
 } // namespace upgrade
 } // namespace inventory
 

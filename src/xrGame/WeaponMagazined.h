@@ -20,8 +20,8 @@ protected:
     shared_str m_sSndShotCurrent;
 
     //дополнительная информация о глушителе
-    const char* m_sSilencerFlameParticles;
-    const char* m_sSilencerSmokeParticles;
+    LPCSTR m_sSilencerFlameParticles;
+    LPCSTR m_sSilencerSmokeParticles;
 
     ESoundTypes m_eSoundShow;
     ESoundTypes m_eSoundHide;
@@ -71,7 +71,7 @@ public:
     CWeaponMagazined(ESoundTypes eSoundType = SOUND_TYPE_WEAPON_SUBMACHINEGUN);
     virtual ~CWeaponMagazined();
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     void LoadSilencerKoeffs();
     virtual CWeaponMagazined* cast_weapon_magazined() { return this; }
     virtual void SetDefaults();
@@ -156,7 +156,7 @@ public:
     virtual void load(IReader& input_packet);
 
 protected:
-    virtual bool install_upgrade_impl(const char* section, bool test);
+    virtual bool install_upgrade_impl(LPCSTR section, bool test);
 
     virtual bool AllowFireWhileWorking() { return false; }
     //виртуальные функции для проигрывания анимации HUD

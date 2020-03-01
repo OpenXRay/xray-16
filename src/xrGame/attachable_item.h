@@ -36,12 +36,12 @@ public:
     virtual ~CAttachableItem();
     virtual IFactoryObject* _construct();
     virtual CAttachableItem* cast_attachable_item() { return this; }
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void OnH_A_Chield();
     virtual void OnH_A_Independent();
     virtual void renderable_Render(IRenderable* root);
     virtual bool can_be_attached() const;
-    bool load_attach_position(const char* section);
+    bool load_attach_position(LPCSTR section);
     virtual void afterAttach();
     virtual void afterDetach();
     IC CInventoryItem& item() const;

@@ -150,7 +150,7 @@ bool CEnemyManager::expedient(const CEntityAlive* object) const
     return (false);
 }
 
-void CEnemyManager::reload(const char* section)
+void CEnemyManager::reload(LPCSTR section)
 {
     m_ignore_monster_threshold = READ_IF_EXISTS(pSettings, r_float, section, "ignore_monster_threshold", 1.f);
     m_max_ignore_distance = READ_IF_EXISTS(pSettings, r_float, section, "max_ignore_distance", 0.f);

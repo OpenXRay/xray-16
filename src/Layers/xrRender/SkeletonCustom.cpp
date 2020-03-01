@@ -24,8 +24,8 @@ Lock UCalc_Mutex
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-bool pred_N(const std::pair<shared_str, u32>& N, const char* B) { return xr_strcmp(*N.first, B) < 0; }
-u16 CKinematics::LL_BoneID(const char* B)
+bool pred_N(const std::pair<shared_str, u32>& N, LPCSTR B) { return xr_strcmp(*N.first, B) < 0; }
+u16 CKinematics::LL_BoneID(LPCSTR B)
 {
     accel::iterator I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, pred_N);
     if (I == bone_map_N->end())
@@ -46,7 +46,7 @@ u16 CKinematics::LL_BoneID(const shared_str& B)
 }
 
 //
-const char* CKinematics::LL_BoneName_dbg(u16 ID)
+LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 {
     CKinematics::accel::iterator _I, _E = bone_map_N->end();
     for (_I = bone_map_N->begin(); _I != _E; ++_I)
@@ -354,7 +354,7 @@ IC void iBuildGroups(CBoneData* B, U16Vec& tgt, u16 id, u16& last_id)
 void CKinematics::LL_Validate()
 {
     // check breakable
-    bool bCheckBreakable = FALSE;
+    BOOL bCheckBreakable = FALSE;
     for (u16 k = 0; k < LL_BoneCount(); k++)
     {
         if (LL_GetData(k).IK_data.ik_flags.is(SJointIKData::flBreakable) && (LL_GetData(k).IK_data.type != jtNone))
@@ -366,7 +366,7 @@ void CKinematics::LL_Validate()
 
     if (bCheckBreakable)
     {
-        bool bValidBreakable = TRUE;
+        BOOL bValidBreakable = TRUE;
 
 #pragma todo("container is created in stack!")
         xr_vector<xr_vector<u16>> groups;
@@ -489,7 +489,7 @@ void CKinematics::Release()
     inherited::Release();
 }
 
-void CKinematics::LL_SetBoneVisible(u16 bone_id, bool val, bool bRecursive)
+void CKinematics::LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive)
 {
     VERIFY(bone_id < LL_BoneCount());
     u64 mask = u64(1) << bone_id;
@@ -639,7 +639,7 @@ void CKinematics::AddWallmark(
     P.transform_dir(D, dir);
     // find pick point
     float dist = flt_max;
-    bool picked = FALSE;
+    BOOL picked = FALSE;
 
     using OBBVec = xr_vector<Fobb>;
     OBBVec cache_obb;

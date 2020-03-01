@@ -49,7 +49,7 @@ class CAI_Crow : public CEntity
         typedef svector<ref_sound, MAX_SND_COUNT> SoundSVec;
         SoundSVec m_Sounds;
         ref_sound& GetRandom() { return m_Sounds[Random.randI(0, m_Sounds.size())]; }
-        void Load(const char* prefix);
+        void Load(LPCSTR prefix);
         void SetPosition(const Fvector& pos);
         void Unload();
     };
@@ -115,12 +115,12 @@ public:
 public:
     CAI_Crow();
     virtual ~CAI_Crow();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     void init();
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual bool renderable_ShadowGenerate() { return FALSE; }
-    virtual bool renderable_ShadowReceive() { return FALSE; }
+    virtual BOOL renderable_ShadowGenerate() { return FALSE; }
+    virtual BOOL renderable_ShadowReceive() { return FALSE; }
     void renderable_Render(IRenderable* root) override;
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();
@@ -138,9 +138,9 @@ public:
     virtual void Die(IGameObject* who);
     virtual float ffGetFov() const { return 150.f; }
     virtual float ffGetRange() const { return 30.f; }
-    virtual bool IsVisibleForHUD() { return FALSE; }
+    virtual BOOL IsVisibleForHUD() { return FALSE; }
     virtual bool IsVisibleForZones() { return false; }
-    virtual bool UsedAI_Locations();
+    virtual BOOL UsedAI_Locations();
     virtual void create_physic_shell();
 };
 

@@ -141,7 +141,7 @@ void restore_actor()
 }
 
 template <typename planner_type>
-void draw_planner(const planner_type& brain, const char* start_indent, const char* indent, const char* planner_id)
+void draw_planner(const planner_type& brain, LPCSTR start_indent, LPCSTR indent, LPCSTR planner_id)
 {
     planner_type& _brain = const_cast<planner_type&>(brain);
     if (brain.solution().empty())
@@ -194,17 +194,17 @@ void draw_planner(const planner_type& brain, const char* start_indent, const cha
     }
 }
 
-const char* animation_name(CAI_Stalker* self, const MotionID& animation)
+LPCSTR animation_name(CAI_Stalker* self, const MotionID& animation)
 {
     if (!animation)
         return ("");
     IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(self->Visual());
     VERIFY(skeleton_animated);
-    const char* name = skeleton_animated->LL_MotionDefName_dbg(animation).first;
+    LPCSTR name = skeleton_animated->LL_MotionDefName_dbg(animation).first;
     return (name);
 }
 
-void draw_restrictions(const shared_str& restrictions, const char* start_indent, const char* indent, const char* header)
+void draw_restrictions(const shared_str& restrictions, LPCSTR start_indent, LPCSTR indent, LPCSTR header)
 {
     DBG_OutText("%s%s%s", start_indent, indent, header);
     string256 temp;
@@ -212,7 +212,7 @@ void draw_restrictions(const shared_str& restrictions, const char* start_indent,
         DBG_OutText("%s%s%s%s", start_indent, indent, indent, _GetItem(*restrictions, i, temp));
 }
 
-const char* movement_type(const MonsterSpace::EMovementType& movement_type)
+LPCSTR movement_type(const MonsterSpace::EMovementType& movement_type)
 {
     switch (movement_type)
     {
@@ -224,7 +224,7 @@ const char* movement_type(const MonsterSpace::EMovementType& movement_type)
     return ("invalid");
 }
 
-const char* danger_type(const CDangerObject::EDangerType& danger_type)
+LPCSTR danger_type(const CDangerObject::EDangerType& danger_type)
 {
     switch (danger_type)
     {
@@ -261,7 +261,7 @@ void CAI_Stalker::debug_text()
     }
 
     float up_indent = 40.f;
-    const char* indent = "  ";
+    LPCSTR indent = "  ";
 
     DBG_TextSetColor(color_xrgb(0, 255, 0));
     DBG_TextOutSet(0, up_indent);
@@ -376,7 +376,7 @@ void CAI_Stalker::debug_text()
         if (g_Alive())
         {
             float interval = (1.f - panic_threshold()) * .25f, left = -1.f, right = -1.f;
-            const char* description = "invalid";
+            LPCSTR description = "invalid";
             u32 result = dwfChooseAction(2000, 1.f - interval, 1.f - 2 * interval, 1.f - 3 * interval,
                 panic_threshold(), g_Team(), g_Squad(), g_Group(), 0, 1, 2, 3, 4, this, 300.f);
             switch (result)
@@ -580,7 +580,7 @@ void CAI_Stalker::debug_text()
     DBG_OutText("%smovement", indent);
     DBG_OutText("%s%senabled         : %s", indent, indent, movement().enabled() ? "+" : "-");
 
-    const char* mental_state = "invalid";
+    LPCSTR mental_state = "invalid";
     switch (movement().mental_state())
     {
     case MonsterSpace::eMentalStateFree:
@@ -602,7 +602,7 @@ void CAI_Stalker::debug_text()
     }
     DBG_OutText("%s%smental state    : %s", indent, indent, mental_state);
 
-    const char* body_state = "invalid";
+    LPCSTR body_state = "invalid";
     switch (movement().body_state())
     {
     case MonsterSpace::eBodyStateStand:
@@ -621,7 +621,7 @@ void CAI_Stalker::debug_text()
     DBG_OutText("%s%smovement type   : %s (current)", indent, indent, movement_type(movement().movement_type()));
     DBG_OutText("%s%smovement type   : %s (target)", indent, indent, movement_type(movement().target_movement_type()));
 
-    const char* path_type = "invalid";
+    LPCSTR path_type = "invalid";
     switch (movement().path_type())
     {
     case MovementManager::ePathTypeGamePath:
@@ -833,7 +833,7 @@ void CAI_Stalker::debug_text()
     DBG_OutText(" ");
     DBG_OutText("%ssight", indent);
 
-    const char* sight_type = "invalid";
+    LPCSTR sight_type = "invalid";
     switch (sight().current_action().sight_type())
     {
     case SightManager::eSightTypeCurrentDirection:
@@ -1020,7 +1020,7 @@ public:
     }
 };
 
-bool _ray_query_callback(collide::rq_result& result, LPVOID params)
+BOOL _ray_query_callback(collide::rq_result& result, LPVOID params)
 {
     ray_query_param* param = (ray_query_param*)params;
     param->m_points->push_back(Fvector().mad(param->m_start_position, param->m_direction, result.range));
@@ -1260,7 +1260,7 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
 }
 
 static void fill_bones(CAI_Stalker& self, Fmatrix const& transform, IKinematicsAnimated* kinematics_animated,
-    const char* animation_id, bool const local)
+    LPCSTR animation_id, bool const local)
 {
     IKinematics* kinematics = smart_cast<IKinematics*>(kinematics_animated);
     u16 bone_count = kinematics->LL_BoneCount();
@@ -1369,7 +1369,7 @@ static void draw_bones(IKinematics& kinematics, Fvector const& box_size, u32 con
 #endif // #ifdef DEBUG_RENDER
 
 static void draw_animation_bones(
-    CAI_Stalker& self, Fmatrix const& transform, IKinematicsAnimated* kinematics_animated, const char* animation_id)
+    CAI_Stalker& self, Fmatrix const& transform, IKinematicsAnimated* kinematics_animated, LPCSTR animation_id)
 {
     IKinematics* kinematics = smart_cast<IKinematics*>(kinematics_animated);
 

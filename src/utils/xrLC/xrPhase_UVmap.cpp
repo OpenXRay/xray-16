@@ -154,7 +154,7 @@ void CBuild::mem_Compact()
     /*
     u32					bytes,blocks_used,blocks_free;
     bytes				= Memory.mem_usage(&blocks_used,&blocks_free);
-    const char* h_status		= 0;
+    LPCSTR h_status		= 0;
     if (HeapValidate	(GetProcessHeap(),0,0))	h_status = "OK";
     else										h_status = "DAMAGED";
     clMsg				("::MEMORY(%s):: %d MB, %d Bused, %d Bfree",

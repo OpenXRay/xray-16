@@ -6,7 +6,7 @@ void CLevel::SLS_Default() // Default/Editor Load
 {
     // Signal main actor spawn
     /*
-        const char*		s_cmd			= Engine.Params;
+        LPCSTR		s_cmd			= Engine.Params;
         string64	s_name			= "actor";
         if (strstr(s_cmd,"-actor "))	{
             sscanf(strstr(s_cmd,"-actor ")+xr_strlen("-actor "),"%s",s_name);

@@ -4,9 +4,9 @@
 class CBlender_rain : public IBlender
 {
 public:
-    virtual const char* getComment() { return "INTERNAL: DX10 rain blender"; }
-    virtual bool canBeDetailed() { return FALSE; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "INTERNAL: DX10 rain blender"; }
+    virtual BOOL canBeDetailed() { return FALSE; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -18,14 +18,14 @@ public:
         Name = 0;
         Definition = 0;
     }
-    virtual const char* getComment() { return "INTERNAL: DX10 MSAA rain blender"; }
-    virtual bool canBeDetailed() { return FALSE; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "INTERNAL: DX10 MSAA rain blender"; }
+    virtual BOOL canBeDetailed() { return FALSE; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
-    virtual void SetDefine(const char* Name, const char* Definition);
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition);
 
-    const char* Name;
-    const char* Definition;
+    LPCSTR Name;
+    LPCSTR Definition;
 };
 
 #endif //	dx10RainBlender_included

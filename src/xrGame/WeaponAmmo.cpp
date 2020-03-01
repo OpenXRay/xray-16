@@ -21,7 +21,7 @@ CCartridge::CCartridge()
     bullet_material_idx = u16(-1);
 }
 
-void CCartridge::Load(const char* section, u8 LocalAmmoType)
+void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
 {
     m_ammoSect = section;
     m_LocalAmmoType = LocalAmmoType;
@@ -88,7 +88,7 @@ float CCartridge::Weight() const
 
 CWeaponAmmo::CWeaponAmmo(void) {}
 CWeaponAmmo::~CWeaponAmmo(void) {}
-void CWeaponAmmo::Load(const char* section)
+void CWeaponAmmo::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -115,9 +115,9 @@ void CWeaponAmmo::Load(const char* section)
     m_boxCurr = m_boxSize;
 }
 
-bool CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
+BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
 {
-    bool bResult = inherited::net_Spawn(DC);
+    BOOL bResult = inherited::net_Spawn(DC);
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeItemAmmo* l_pW = smart_cast<CSE_ALifeItemAmmo*>(e);
     m_boxCurr = l_pW->a_elapsed;

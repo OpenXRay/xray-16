@@ -31,13 +31,13 @@ static const float SQUARE_PARTICLE_EFFECT_DIST = PARTICLE_EFFECT_DIST * PARTICLE
 static const float SQUARE_SOUND_EFFECT_DIST = SOUND_EFFECT_DIST * SOUND_EFFECT_DIST;
 class CPHParticlesPlayCall : public CPHAction
 {
-    const char* ps_name;
+    LPCSTR ps_name;
 
 protected:
     dContactGeom c;
 
 public:
-    CPHParticlesPlayCall(const dContactGeom& contact, bool invert_n, const char* psn)
+    CPHParticlesPlayCall(const dContactGeom& contact, bool invert_n, LPCSTR psn)
     {
         ps_name = psn;
         c = contact;
@@ -70,7 +70,7 @@ class CPHLiquidParticlesPlayCall : public CPHParticlesPlayCall, public CPHReqCom
     bool b_called;
 
 public:
-    CPHLiquidParticlesPlayCall(const dContactGeom& contact, bool invert_n, const char* psn)
+    CPHLiquidParticlesPlayCall(const dContactGeom& contact, bool invert_n, LPCSTR psn)
         : CPHParticlesPlayCall(contact, invert_n, psn), b_called(false)
     {
         static const u32 time_to_call_remove = 3000;
@@ -193,7 +193,7 @@ IC bool play_liquid_particle_criteria(dxGeomUserData& data, float vel_cret)
 
 template <class Pars>
 void play_particles(float vel_cret, dxGeomUserData* data, const dContactGeom* c, bool b_invert_normal,
-    const SGameMtl* static_mtl, const char* ps_name)
+    const SGameMtl* static_mtl, LPCSTR ps_name)
 {
     VERIFY(c);
     VERIFY(static_mtl);
@@ -266,7 +266,7 @@ void TContactShotMark(CDB::TRI* T, dContactGeom* c)
             {
                 SGameMtl* static_mtl = GMLib.GetMaterialByIdx(T->material);
                 VERIFY(static_mtl);
-                const char* ps_name = *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];
+                LPCSTR ps_name = *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];
                 play_particles<Pars>(vel_cret, data, c, b_invert_normal, static_mtl, ps_name);
             }
         }

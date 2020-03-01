@@ -18,8 +18,8 @@ class net_global_data
 {
 public:
     virtual void on_task_send(IGenericStream* outStream) const = 0;
-    virtual bool on_task_receive(IAgent* agent, unsigned int sessionId, IGenericStream* inStream) = 0;
-    virtual const char* files(string_path& buf) = 0;
+    virtual bool on_task_receive(IAgent* agent, DWORD sessionId, IGenericStream* inStream) = 0;
+    virtual LPCSTR files(string_path& buf) = 0;
     virtual void add_ref() = 0;
     virtual void free_ref() = 0;
 };

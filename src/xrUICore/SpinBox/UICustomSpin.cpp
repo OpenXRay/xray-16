@@ -174,6 +174,6 @@ void CUICustomSpin::Update()
     }
 }
 
-const char* CUICustomSpin::GetText() { return m_pLines->GetText(); }
+LPCSTR CUICustomSpin::GetText() { return m_pLines->GetText(); }
 void CUICustomSpin::SetTextColor(u32 color) { m_textColor[0] = color; }
 void CUICustomSpin::SetTextColorD(u32 color) { m_textColor[1] = color; }

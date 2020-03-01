@@ -3,7 +3,7 @@
 
 struct SControlCriticalWoundData : public ControlCom::IComData
 {
-    const char* animation;
+    LPCSTR animation;
 };
 
 class CControlCriticalWound : public CControl_ComCustom<SControlCriticalWoundData>

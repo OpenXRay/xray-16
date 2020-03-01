@@ -19,7 +19,7 @@ IC static void CScriptActionPlannerAction_Export(lua_State* luaState)
         CScriptActionPlannerActionWrapper>("planner_action")
                          .def(constructor<>())
                          .def(constructor<CScriptGameObject*>())
-                         .def(constructor<CScriptGameObject*, const char*>())
+                         .def(constructor<CScriptGameObject*, LPCSTR>())
                          .def("setup", &CScriptActionPlannerAction::setup,
                              &CScriptActionPlannerActionWrapper::setup_static)
                          .def("initialize", &CScriptActionPlannerAction::initialize,

@@ -17,7 +17,7 @@ UIWarState::UIWarState()
     //m_def_texture._set( NULL );
 }
 
-void UIWarState::InitXML(CUIXml& xml, const char* att_name, CUIWindow* parent)
+void UIWarState::InitXML(CUIXml& xml, LPCSTR att_name, CUIWindow* parent)
 {
     VERIFY( parent );
     parent->AttachChild(this);
@@ -48,7 +48,7 @@ void UIWarState::ClearInfo()
     //m_static->InitTexture( m_def_texture.c_str() );
 }
 
-bool UIWarState::UpdateInfo(const char* icon, const char* hint_text)
+bool UIWarState::UpdateInfo(LPCSTR icon, LPCSTR hint_text)
 {
     if (!icon || !xr_strlen(icon))
     {

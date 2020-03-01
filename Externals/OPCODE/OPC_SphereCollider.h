@@ -88,11 +88,11 @@ protected:
     void _Collide(const AABBQuantizedNoLeafNode* node);
     void _Collide(const AABBTreeNode* node);
     // Overlap tests
-    inline_ bool SphereContainsBox(const Point& bc, const Point& be);
-    inline_ bool SphereAABBOverlap(const Point& center, const Point& extents);
-    bool SphereTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
+    inline_ BOOL SphereContainsBox(const Point& bc, const Point& be);
+    inline_ BOOL SphereAABBOverlap(const Point& center, const Point& extents);
+    BOOL SphereTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
     // Init methods
-    bool InitQuery(
+    BOOL InitQuery(
         SphereCache& cache, const Sphere& sphere, const Matrix4x4* worlds = nullptr, const Matrix4x4* worldm = nullptr);
 };
 

@@ -18,7 +18,7 @@
 #endif
 #endif
 
-const const char* main_function = "console_command_run_string_main_thread_function";
+const LPCSTR main_function = "console_command_run_string_main_thread_function";
 
 // void print_stack_(lua_State *L)
 //{
@@ -29,7 +29,7 @@ const const char* main_function = "console_command_run_string_main_thread_functi
 
 // extern "C" XR_IMPORT lua_State *lua_newcthread(lua_State *OL, int cstacksize);
 
-CScriptThread::CScriptThread(CScriptEngine* scriptEngine, const char* caNamespaceName, bool do_string, bool reload)
+CScriptThread::CScriptThread(CScriptEngine* scriptEngine, LPCSTR caNamespaceName, bool do_string, bool reload)
 #ifdef DEBUG
     : CScriptStackTracker(scriptEngine)
 #endif

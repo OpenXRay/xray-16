@@ -29,8 +29,8 @@ extern "C" {
 //--------------------------------------------------------------------------------------
 // DXGetErrorString
 //--------------------------------------------------------------------------------------
-XRCORE_API const wchar_t* WINAPI DXGetErrorStringW(_In_ HRESULT hr);
-XRCORE_API const char* WINAPI DXGetErrorStringA(_In_ HRESULT hr);
+XRCORE_API const WCHAR* WINAPI DXGetErrorStringW(_In_ HRESULT hr);
+XRCORE_API const CHAR* WINAPI DXGetErrorStringA(_In_ HRESULT hr);
 #ifdef UNICODE
 #define DXGetErrorString DXGetErrorStringW
 #else
@@ -40,8 +40,8 @@ XRCORE_API const char* WINAPI DXGetErrorStringA(_In_ HRESULT hr);
 // DXGetErrorDescription has to be modified to return a copy in a buffer rather than
 // the original static string.
 //--------------------------------------------------------------------------------------
-XRCORE_API void WINAPI DXGetErrorDescriptionW(_In_ HRESULT hr, _Out_cap_(count) wchar_t* desc, _In_ size_t count);
-XRCORE_API void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) char* desc, _In_ size_t count);
+XRCORE_API void WINAPI DXGetErrorDescriptionW(_In_ HRESULT hr, _Out_cap_(count) WCHAR* desc, _In_ size_t count);
+XRCORE_API void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) CHAR* desc, _In_ size_t count);
 #ifdef UNICODE
 #define DXGetErrorDescription DXGetErrorDescriptionW
 #else
@@ -52,20 +52,20 @@ XRCORE_API void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) 
 //
 //  Desc:  Outputs a formatted error message to the debug stream
 //
-//  Args:  wchar_t* strFile   The current file, typically passed in using the
+//  Args:  WCHAR* strFile   The current file, typically passed in using the
 //                         __FILEW__ macro.
-//         unsigned int dwLine    The current line number, typically passed in using the
+//         DWORD dwLine    The current line number, typically passed in using the
 //                         __LINE__ macro.
 //         HRESULT hr      An HRESULT that will be traced to the debug stream.
-//         char* strMsg    A string that will be traced to the debug stream (may be NULL)
-//         bool bPopMsgBox If TRUE, then a message box will popup also containing the passed info.
+//         CHAR* strMsg    A string that will be traced to the debug stream (may be NULL)
+//         BOOL bPopMsgBox If TRUE, then a message box will popup also containing the passed info.
 //
 //  Return: The hr that was passed in.
 //--------------------------------------------------------------------------------------
-XRCORE_API HRESULT WINAPI DXTraceW(_In_z_ const wchar_t* strFile, _In_ unsigned int dwLine, _In_ HRESULT hr,
-    _In_opt_ const wchar_t* strMsg, _In_ bool bPopMsgBox);
+XRCORE_API HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr,
+    _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox);
 XRCORE_API HRESULT WINAPI DXTraceA(
-    _In_z_ const char* strFile, _In_ unsigned int dwLine, _In_ HRESULT hr, _In_opt_ const char* strMsg, _In_ bool bPopMsgBox);
+    _In_z_ const CHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr, _In_opt_ const CHAR* strMsg, _In_ bool bPopMsgBox);
 #ifdef UNICODE
 #define DXTrace DXTraceW
 #else
@@ -78,13 +78,13 @@ XRCORE_API HRESULT WINAPI DXTraceA(
 //--------------------------------------------------------------------------------------
 #if defined(DEBUG) || defined(_DEBUG)
 #ifdef UNICODE
-#define DXTRACE_MSG(str) DXTrace(__FILEW__, (unsigned int)__LINE__, 0, str, false)
-#define DXTRACE_ERR(str, hr) DXTrace(__FILEW__, (unsigned int)__LINE__, hr, str, false)
-#define DXTRACE_ERR_MSGBOX(str, hr) DXTrace(__FILEW__, (unsigned int)__LINE__, hr, str, true)
+#define DXTRACE_MSG(str) DXTrace(__FILEW__, (DWORD)__LINE__, 0, str, false)
+#define DXTRACE_ERR(str, hr) DXTrace(__FILEW__, (DWORD)__LINE__, hr, str, false)
+#define DXTRACE_ERR_MSGBOX(str, hr) DXTrace(__FILEW__, (DWORD)__LINE__, hr, str, true)
 #else
-#define DXTRACE_MSG(str) DXTrace(__FILE__, (unsigned int)__LINE__, 0, str, false)
-#define DXTRACE_ERR(str, hr) DXTrace(__FILE__, (unsigned int)__LINE__, hr, str, false)
-#define DXTRACE_ERR_MSGBOX(str, hr) DXTrace(__FILE__, (unsigned int)__LINE__, hr, str, true)
+#define DXTRACE_MSG(str) DXTrace(__FILE__, (DWORD)__LINE__, 0, str, false)
+#define DXTRACE_ERR(str, hr) DXTrace(__FILE__, (DWORD)__LINE__, hr, str, false)
+#define DXTRACE_ERR_MSGBOX(str, hr) DXTrace(__FILE__, (DWORD)__LINE__, hr, str, true)
 #endif
 #else
 #define DXTRACE_MSG(str) (0L)

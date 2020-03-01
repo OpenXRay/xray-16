@@ -28,7 +28,7 @@ using namespace StalkerDecisionSpace;
 // CStalkerActionDead
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionDead::CStalkerActionDead(CAI_Stalker* object, const char* action_name) : inherited(object, action_name) {}
+CStalkerActionDead::CStalkerActionDead(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 bool CStalkerActionDead::fire() const
 {
     if (object().inventory().TotalWeight() <= 0)

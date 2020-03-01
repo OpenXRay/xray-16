@@ -22,11 +22,11 @@ protected:
     typedef _unknown_type SERVER_TYPE;
 
 public:
-    IC CObjectItemSingle(const CLASS_ID& clsid, const char* script_clsid);
+    IC CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid);
 #ifndef NO_XR_GAME
     virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
 #endif
-    virtual ObjectFactory::ServerObjectBaseClass* server_object(const char* section) const;
+    virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
 };
 
 #ifndef NO_XR_GAME
@@ -38,9 +38,9 @@ protected:
     typedef _unknown_type CLIENT_TYPE;
 
 public:
-    IC CObjectItemSingle(const CLASS_ID& clsid, const char* script_clsid);
+    IC CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid);
     virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
-    virtual ObjectFactory::ServerObjectBaseClass* server_object(const char* section) const;
+    virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
 };
 #endif
 

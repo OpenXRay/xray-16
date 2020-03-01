@@ -42,7 +42,7 @@ void CUIPropertiesBox::InitPropertiesBox(Fvector2 pos, Fvector2 size)
         R_ASSERT2(xml_doc.NavigateToNode("properties_box"), "Can't find properties_box in [actor_menu.xml]");
     }
 
-    const char* t = xml_doc.Read("properties_box:texture", 0, nullptr);
+    LPCSTR t = xml_doc.Read("properties_box:texture", 0, nullptr);
     R_ASSERT2(t, "Please, specify texture for properties_box");
     InitTexture(t);
 
@@ -107,7 +107,7 @@ void CUIPropertiesBox::OnItemReceivedFocus(CUIWindow* w, void* d)
     }
 }
 
-bool CUIPropertiesBox::AddItem(const char* str, void* pData, u32 tag_value)
+bool CUIPropertiesBox::AddItem(LPCSTR str, void* pData, u32 tag_value)
 {
     CUIListBoxItem* itm = m_UIListWnd.AddTextItem(str);
     itm->SetTAG(tag_value);

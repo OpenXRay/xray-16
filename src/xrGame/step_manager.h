@@ -31,7 +31,7 @@ public:
 
     // init on construction
     virtual IFactoryObject* _construct();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
 
     // call on set animation
     void on_animation_start(MotionID motion_id, CBlend* blend);

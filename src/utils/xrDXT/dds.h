@@ -62,18 +62,18 @@ sizeof(DDS_PIXELFORMAT), DDS_RGB, 0, 16, 0x0000f800, 0x000007e0, 0x0000001f, 0x0
 
 struct DDS_HEADER
 {
-    unsigned int dwSize;
-    unsigned int dwHeaderFlags;
-    unsigned int dwHeight;
-    unsigned int dwWidth;
-    unsigned int dwPitchOrLinearSize;
-    unsigned int dwDepth; // only if DDS_HEADER_FLAGS_VOLUME is set in dwHeaderFlags
-    unsigned int dwMipMapCount;
-    unsigned int dwReserved1[11];
+    DWORD dwSize;
+    DWORD dwHeaderFlags;
+    DWORD dwHeight;
+    DWORD dwWidth;
+    DWORD dwPitchOrLinearSize;
+    DWORD dwDepth; // only if DDS_HEADER_FLAGS_VOLUME is set in dwHeaderFlags
+    DWORD dwMipMapCount;
+    DWORD dwReserved1[11];
     DDS_PIXELFORMAT ddspf;
-    unsigned int dwSurfaceFlags;
-    unsigned int dwCubemapFlags;
-    unsigned int dwReserved2[3];
+    DWORD dwSurfaceFlags;
+    DWORD dwCubemapFlags;
+    DWORD dwReserved2[3];
 };
 
 enum DDS_HEADER_FLAGS

@@ -46,11 +46,11 @@ public:
     void construct(const shared_str& upgrade_id, Manager& manager_r);
 
     IC const shared_str& id() const;
-    IC const char* id_str() const;
+    IC LPCSTR id_str() const;
     IC bool is_known() const;
 
 #ifdef DEBUG
-    virtual void log_hierarchy(const char* nest);
+    virtual void log_hierarchy(LPCSTR nest);
 //	virtual		void		test_all_upgrades( CInventoryItem& item );
 #endif // DEBUG
 
@@ -75,7 +75,7 @@ protected:
     Groups_type m_depended_groups;
 
 protected:
-    void add_dependent_groups(const char* groups_str, Manager& manager_r);
+    void add_dependent_groups(LPCSTR groups_str, Manager& manager_r);
 
 }; // class UpgradeBase
 

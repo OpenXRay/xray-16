@@ -202,7 +202,7 @@ void CLightR_Manager::render_point(u32 _priority)
             RImplementation.r_pmask(true, true);
 
         // 4. Analyze if HUD intersects light volume
-        bool bHUD = FALSE;
+        BOOL bHUD = FALSE;
         CFrustum F;
         F.CreateFromMatrix(L_combine, FRUSTUM_P_ALL);
         bHUD = F.testSphere_dirty(Device.vCameraPosition, 2.f);
@@ -280,7 +280,7 @@ void CLightR_Manager::render_spot(u32 _priority)
             RImplementation.r_pmask(true, true);
 
         // 4. Analyze if HUD intersects light volume
-        bool bHUD = FALSE;
+        BOOL bHUD = FALSE;
         CFrustum F;
         F.CreateFromMatrix(L_combine, FRUSTUM_P_ALL);
         bHUD = F.testSphere_dirty(Device.vCameraPosition, 2.f);

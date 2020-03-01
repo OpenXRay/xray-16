@@ -20,9 +20,9 @@ public:
     CUIMapLocationHint() : m_owner(NULL){};
     virtual ~CUIMapLocationHint(){};
 
-    void Init(CUIXml& uiXml, const char* path);
+    void Init(CUIXml& uiXml, LPCSTR path);
 
-    void SetInfoStr(const char* text);
+    void SetInfoStr(LPCSTR text);
     void SetInfoMSpot(CMapSpot* spot);
     void SetInfoTask(CGameTask* task);
 

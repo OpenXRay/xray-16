@@ -4,8 +4,8 @@
 #include "xrCore/FileCRC32.h"
 
 template <typename T>
-static HRESULT create_shader(const char* const pTarget, DWORD const* buffer, size_t const buffer_size,
-    const char* const file_name, T*& result, bool const disasm)
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
+    T*& result, bool const disasm)
 {
     HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
     if (!SUCCEEDED(_hr))
@@ -33,8 +33,8 @@ static HRESULT create_shader(const char* const pTarget, DWORD const* buffer, siz
     return _hr;
 }
 
-static HRESULT create_shader(const char* const pTarget, DWORD const* buffer, size_t const buffer_size,
-    const char* const file_name, void*& result, bool const disasm)
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
+    void*& result, bool const disasm)
 {
     // XXX: what's going on with casts here???
     HRESULT _result = E_FAIL;
@@ -93,7 +93,7 @@ class includer : public ID3DInclude
 {
 public:
     HRESULT __stdcall Open(
-        D3D10_INCLUDE_TYPE IncludeType, const char* pFileName, const void* pParentData, const void** ppData, unsigned int* pBytes)
+        D3D10_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
         strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
@@ -117,7 +117,7 @@ public:
         *pBytes = size;
         return D3D_OK;
     }
-    HRESULT __stdcall Close(const void* pData)
+    HRESULT __stdcall Close(LPCVOID pData)
     {
         xr_free(pData);
         return D3D_OK;
@@ -125,14 +125,13 @@ public:
 };
 
 static inline bool match_shader_id(
-    const char* const debug_shader_id, const char* const full_shader_id, FS_FileSet const& file_set, string_path& result);
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
-HRESULT CRender::shader_compile(
-    const char* name, IReader* fs, const char* pFunctionName, const char* pTarget, DWORD Flags, void*& result)
+HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void*& result)
 {
     D3D_SHADER_MACRO defines[128];
     int def_it = 0;
-
+    
     // Don't move these variables to lower scope!
     string32 c_smapsize;
     string32 c_gloss;
@@ -719,7 +718,7 @@ HRESULT CRender::shader_compile(
         {
             Log("! ", file_name);
             if (pErrorBuf)
-                Log("! error: ", (const char*)pErrorBuf->GetBufferPointer());
+                Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
             else
                 Msg("Can't compile shader hr=0x%08x", _result);
         }
@@ -729,7 +728,7 @@ HRESULT CRender::shader_compile(
 }
 
 static inline bool match_shader(
-    const char* const debug_shader_id, const char* const full_shader_id, const char* const mask, size_t const mask_length)
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, LPCSTR const mask, size_t const mask_length)
 {
     size_t const full_shader_id_length = xr_strlen(full_shader_id);
     if (full_shader_id_length == mask_length)
@@ -757,14 +756,14 @@ static inline bool match_shader(
 }
 
 static inline bool match_shader_id(
-    const char* const debug_shader_id, const char* const full_shader_id, FS_FileSet const& file_set, string_path& result)
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
 {
 #if 0
     strcpy_s(result, "");
     return false;
 #else // #if 1
 #ifdef DEBUG
-    const char* temp = "";
+    LPCSTR temp = "";
     bool found = false;
     FS_FileSet::const_iterator i = file_set.begin();
     FS_FileSet::const_iterator const e = file_set.end();

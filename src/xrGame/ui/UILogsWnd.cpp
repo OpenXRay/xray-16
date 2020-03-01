@@ -190,7 +190,7 @@ void CUILogsWnd::ReLoadNews()
         return;
     }
 
-    const char* date_str = InventoryUtilities::GetDateAsString(m_selected_period, InventoryUtilities::edpDateToDay).c_str();
+    LPCSTR date_str = InventoryUtilities::GetDateAsString(m_selected_period, InventoryUtilities::edpDateToDay).c_str();
     m_period->SetText(date_str);
     Fvector2 pos = m_period_caption->GetWndPos();
     pos.x = m_period->GetWndPos().x - m_period_caption->GetWidth() - m_prev_period->GetWidth() - 5.0f;

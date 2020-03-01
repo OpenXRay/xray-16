@@ -64,7 +64,7 @@ bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_
     u32 dst_size = static_cast<u32>((data + data_size) - (u8*)dst_buffer);
     u32 src_data_size = data_size - dst_size;
 
-    const char* add_str = nullptr;
+    LPCSTR add_str = nullptr;
     STRCONCAT(add_str, tmp_ini.r_string(cd_info_secion, cd_player_name_key),
         tmp_ini.r_string(cd_info_secion, cd_player_digest_key), tmp_ini.r_string(cd_info_secion, cd_creation_date));
 
@@ -82,7 +82,7 @@ bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_
     return true;
 }
 
-const char* configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifile& active_params, string256& dst_diff)
+LPCSTR configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifile& active_params, string256& dst_diff)
 {
     pcstr diff_str = nullptr;
     bool tmp_active_param = false;
@@ -133,7 +133,7 @@ const char* configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifil
     return nullptr;
 }
 
-const char* configs_verifyer::get_diff(CInifile& received, CInifile& active_params, string256& dst_diff)
+LPCSTR configs_verifyer::get_diff(CInifile& received, CInifile& active_params, string256& dst_diff)
 {
     pcstr diff_str = nullptr;
     for (auto sit = received.sections().begin(), siet = received.sections().end(); sit != siet; ++sit)
@@ -170,7 +170,7 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
     xr_sprintf(tmp_digit, "%d", ap_index);
     while (tmp_ini.line_exist(active_params_section, tmp_digit))
     {
-        const char* tmp_ap_section = tmp_ini.r_string(active_params_section, tmp_digit);
+        LPCSTR tmp_ap_section = tmp_ini.r_string(active_params_section, tmp_digit);
         tmp_active_params.w_string(active_params_section, tmp_digit, tmp_ap_section);
         m_original_ap.load_to(tmp_ap_section, tmp_active_params);
         ++ap_index;
@@ -189,7 +189,7 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
         return false;
     }
 
-    const char* add_str = nullptr;
+    LPCSTR add_str = nullptr;
     STRCONCAT(add_str, tmp_ini.r_string(cd_info_secion, cd_player_name_key),
         tmp_ini.r_string(cd_info_secion, cd_player_digest_key), tmp_ini.r_string(cd_info_secion, cd_creation_date));
 

@@ -17,13 +17,13 @@
 #include "xrSE_Factory_import_export.h"
 #include "script_properties_list_helper.h"
 
-extern CSE_Abstract* F_entity_Create(const char* section);
+extern CSE_Abstract* F_entity_Create(LPCSTR section);
 
 extern CScriptPropertiesListHelper* g_property_list_helper;
 extern XRay::Module prop_helper_module;
 
 extern "C" {
-FACTORY_API IServerEntity* __stdcall create_entity(const char* section) { return F_entity_Create(section); }
+FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section) { return F_entity_Create(section); }
 FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
 {
     auto object = smart_cast<CSE_Abstract*>(abstract);
@@ -32,7 +32,7 @@ FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
 }
 };
 
-bool APIENTRY DllMain(HANDLE module_handle, unsigned int call_reason, LPVOID reserved)
+BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
 {
     switch (call_reason)
     {

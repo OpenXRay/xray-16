@@ -57,10 +57,10 @@ protected:
 public:
     CObjectHandler();
     virtual ~CObjectHandler();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit(CAI_Stalker* object);
-    virtual void reload(const char* section);
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual void reload(LPCSTR section);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void update();
     virtual void OnItemTake(CInventoryItem* inventory_item);
     virtual void OnItemDrop(CInventoryItem* inventory_item, bool just_before_destroy);

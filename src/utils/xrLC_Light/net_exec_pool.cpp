@@ -10,7 +10,7 @@
 #include "lcnet_task_manager.h"
 #define LOG_ALL_NET_TASKS
 
-const char* make_time(string64& buf, float fsec)
+LPCSTR make_time(string64& buf, float fsec)
 {
     // char		buf[64];
 
@@ -195,7 +195,7 @@ run_task:;
     return;
 }
 
-net_execution* exec_pool::receive_task(IAgent* agent, unsigned int sessionId, IGenericStream* inStream)
+net_execution* exec_pool::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
 {
     __try
     {

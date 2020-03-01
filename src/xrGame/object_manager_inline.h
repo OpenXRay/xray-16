@@ -23,7 +23,7 @@ CAbstractObjectManager::CObjectManager()
 TEMPLATE_SPECIALIZATION
 CAbstractObjectManager::~CObjectManager() {}
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::Load(const char* section) {}
+void CAbstractObjectManager::Load(LPCSTR section) {}
 TEMPLATE_SPECIALIZATION
 void CAbstractObjectManager::reinit()
 {
@@ -32,7 +32,7 @@ void CAbstractObjectManager::reinit()
 }
 
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::reload(const char* section) {}
+void CAbstractObjectManager::reload(LPCSTR section) {}
 TEMPLATE_SPECIALIZATION
 void CAbstractObjectManager::update()
 {

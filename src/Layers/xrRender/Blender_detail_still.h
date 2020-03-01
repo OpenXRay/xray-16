@@ -12,8 +12,8 @@ public:
     xrP_BOOL oBlend;
 
 public:
-    virtual const char* getComment() { return "LEVEL: detail objects"; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "LEVEL: detail objects"; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

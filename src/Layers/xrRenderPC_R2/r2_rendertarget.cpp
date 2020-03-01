@@ -47,7 +47,7 @@ void CRenderTarget::u_setrt(
     //RImplementation.rmNormal();
 }
 
-void CRenderTarget::u_stencil_optimize(bool common_stencil)
+void CRenderTarget::u_stencil_optimize(BOOL common_stencil)
 {
     VERIFY(RImplementation.o.nvstencil);
     RCache.set_ColorWriteEnable(FALSE);
@@ -160,7 +160,7 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void generate_jitter(unsigned int* dest, u32 elem_count)
+void generate_jitter(DWORD* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -168,7 +168,7 @@ void generate_jitter(unsigned int* dest, u32 elem_count)
     {
         Ivector2 test;
         test.set(::Random.randI(0, 256), ::Random.randI(0, 256));
-        bool valid = TRUE;
+        BOOL valid = TRUE;
         for (u32 t = 0; t < samples.size(); t++)
         {
             int dist = _abs(test.x - samples[t].x) + _abs(test.y - samples[t].y);
@@ -448,7 +448,7 @@ CRenderTarget::CRenderTarget()
                 {
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
-                        u16* p = (u16*)((unsigned char*)(R.pBits) + slice * R.SlicePitch + y * R.RowPitch + x * 2);
+                        u16* p = (u16*)(LPBYTE(R.pBits) + slice * R.SlicePitch + y * R.RowPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
                         float ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
                         ls *= powf(ld, 1 / 32.f);
@@ -524,11 +524,11 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    unsigned int data[TEX_jitter_count - 1];
+                    DWORD data[TEX_jitter_count - 1];
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it2 = 0; it2 < TEX_jitter_count - 1; it2++)
                     {
-                        u32* p = (u32*)((unsigned char*)(R[it2].pBits) + y * R[it2].Pitch + x * 4);
+                        u32* p = (u32*)(LPBYTE(R[it2].pBits) + y * R[it2].Pitch + x * 4);
                         *p = data[it2];
                     }
                 }
@@ -565,7 +565,7 @@ CRenderTarget::CRenderTarget()
                     float dist = ::Random.randF(0.0f, 1.0f);
                     // float dest[4];
 
-                    float* p = (float*)((unsigned char*)(R[it].pBits) + y * R[it].Pitch + x * 4 * sizeof(float));
+                    float* p = (float*)(LPBYTE(R[it].pBits) + y * R[it].Pitch + x * 4 * sizeof(float));
                     *p = (float)(_cos(angle));
                     *(p + 1) = (float)(_sin(angle));
                     *(p + 2) = (float)(dist);

@@ -83,7 +83,7 @@ HRESULT		xrIDirect3DQuery9::HRESULT_Proc(HRESULT ret)
     return ret;
 }
 
-unsigned int		xrIDirect3DQuery9::ULONG_Proc(unsigned int ret)
+ULONG		xrIDirect3DQuery9::ULONG_Proc(ULONG ret)
 {
     return ret;
 }

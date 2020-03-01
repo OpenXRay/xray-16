@@ -97,7 +97,7 @@ private:
     void SM_CheckViewSwitching();
 
     void LoadAnomalySet();
-    bool LoadAnomaliesItems(const char* ini_set_id, TAnomaliesVector& dest_vector);
+    bool LoadAnomaliesItems(LPCSTR ini_set_id, TAnomaliesVector& dest_vector);
 
     void StopPreviousAnomalies();
     void ReStartRandomAnomaly();
@@ -107,7 +107,7 @@ private:
     void CheckAnomalyUpdate(u32 current_time);
     void CheckForWarmap(u32 current_time);
 
-    u16 GetMinUsedAnomalyID(const char* zone_name);
+    u16 GetMinUsedAnomalyID(LPCSTR zone_name);
     //----------------------------------------------------
 
     void LoadTeamData(ETeam eteam, const shared_str& caSection);
@@ -209,13 +209,13 @@ protected:
     virtual void FillDeathActorRejectItems(CSE_ActorMP* actor, xr_vector<CSE_Abstract*>& to_reject);
     shared_str m_not_free_ammo_str;
     virtual bool CanChargeFreeAmmo(char const* ammo_section);
-    virtual void WriteGameState(CInifile& ini, const char* sect, bool bRoundResult);
+    virtual void WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult);
 
 public:
     game_sv_CaptureTheArtefact();
     virtual ~game_sv_CaptureTheArtefact();
 
-    virtual const char* type_name() const;
+    virtual LPCSTR type_name() const;
     virtual void Create(shared_str& options);
     virtual void OnPlayerConnect(ClientID id_who);
     virtual void OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID);

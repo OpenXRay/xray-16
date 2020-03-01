@@ -28,7 +28,7 @@ public:
     void set_position(const Fvector& /*P*/) override { }
     void set_direction(const Fvector& /*D*/) override { }
     void set_radius(float /*R*/) override { }
-    void set_texture(const char* /*name*/) override { }
+    void set_texture(LPCSTR /*name*/) override { }
     void set_color(const Fcolor& /*C*/) override { }
     void set_color(float /*r*/, float /*g*/, float /*b*/) override { }
 };
@@ -115,8 +115,8 @@ static class cl_alpha_ref : public R_constant_setup
     }
 } binder_alpha_ref;
 
-extern ENGINE_API bool r2_sun_static;
-extern ENGINE_API bool r2_advanced_pp; //	advanced post process and effects
+extern ENGINE_API BOOL r2_sun_static;
+extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -485,11 +485,11 @@ void CRender::MakeContextCurrent(RenderContext context)
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
 void CRender::ros_destroy(IRender_ObjectSpecific* & p) { xr_delete(p); }
-IRenderVisual* CRender::model_Create(const char* name, IReader* data) { return Models->Create(name, data); }
-IRenderVisual* CRender::model_CreateChild(const char* name, IReader* data) { return Models->CreateChild(name, data); }
+IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
+IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
 
-void CRender::model_Delete(IRenderVisual* & V, bool bDiscard)
+void CRender::model_Delete(IRenderVisual* & V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
@@ -514,14 +514,14 @@ void CRender::model_Delete(IRender_DetailModel* & F)
     }
 }
 
-IRenderVisual* CRender::model_CreatePE(const char* name)
+IRenderVisual* CRender::model_CreatePE(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     R_ASSERT3(SE,"Particle effect doesn't exist",name);
     return Models->CreatePE(SE);
 }
 
-IRenderVisual* CRender::model_CreateParticles(const char* name)
+IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     if (SE) return Models->CreatePE(SE);
@@ -531,7 +531,7 @@ IRenderVisual* CRender::model_CreateParticles(const char* name)
 }
 
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
 
 ref_shader CRender::getShader(int id)
 {
@@ -559,7 +559,7 @@ IRenderVisual* CRender::getVisual(int id)
     return Visuals[id];
 }
 
-VertexElement* CRender::getVB_Format(int id, bool _alt)
+VertexElement* CRender::getVB_Format(int id, BOOL _alt)
 {
     if (_alt)
     {
@@ -570,7 +570,7 @@ VertexElement* CRender::getVB_Format(int id, bool _alt)
     return nDC[id].begin();
 }
 
-VertexStagingBuffer* CRender::getVB(int id, bool _alt)
+VertexStagingBuffer* CRender::getVB(int id, BOOL _alt)
 {
     if (_alt)
     {
@@ -581,7 +581,7 @@ VertexStagingBuffer* CRender::getVB(int id, bool _alt)
     return &nVB[id];
 }
 
-IndexStagingBuffer* CRender::getIB(int id, bool _alt)
+IndexStagingBuffer* CRender::getIB(int id, BOOL _alt)
 {
     if (_alt)
     {
@@ -605,9 +605,9 @@ IRender_Glow* CRender::glow_create() { return new CGlow(); }
 
 void CRender::flush() { r_dsgraph_render_graph(0); }
 
-bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {

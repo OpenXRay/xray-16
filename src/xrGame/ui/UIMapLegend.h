@@ -28,7 +28,7 @@ public:
     UIMapLegend();
     virtual ~UIMapLegend();
 
-    void init_from_xml(CUIXml& xml, const char* path);
+    void init_from_xml(CUIXml& xml, LPCSTR path);
 
     virtual void Show(bool status);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);

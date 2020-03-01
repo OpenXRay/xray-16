@@ -8,7 +8,7 @@ CBlender_accum_reflected::~CBlender_accum_reflected() {}
 void CBlender_accum_reflected::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    bool blend = RImplementation.o.fp16_blend;
+    BOOL blend = RImplementation.o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     C.r_Pass("accum_volume", "accum_indirect_nomsaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -32,7 +32,7 @@ CBlender_accum_reflected_msaa::~CBlender_accum_reflected_msaa() {}
 void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    bool blend = RImplementation.o.fp16_blend;
+    BOOL blend = RImplementation.o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)

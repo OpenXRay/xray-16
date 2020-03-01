@@ -78,7 +78,7 @@ public:
      *	\return		true if inside the sphere
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline_ bool Contains(const AABB& aabb) const
+    inline_ BOOL Contains(const AABB& aabb) const
     {
         // I assume if all 8 box vertices are inside the sphere, so does the whole box.
         // Sounds ok but maybe there's a better way?

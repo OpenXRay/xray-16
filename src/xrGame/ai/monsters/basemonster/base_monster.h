@@ -75,24 +75,24 @@ public:
     virtual CGameObject* cast_game_object() { return this; }
 
 public:
-    virtual bool renderable_ShadowReceive() { return TRUE; }
+    virtual BOOL renderable_ShadowReceive() { return TRUE; }
     virtual void Die(IGameObject* who);
     virtual void HitSignal(float amount, Fvector& vLocalDir, IGameObject* who, s16 element);
     virtual void Hit(SHit* pHDS);
     virtual void PHHit(SHit& H);
     virtual void SelectAnimation(const Fvector& _view, const Fvector& _move, float speed);
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
 
     // must be called at the end of most derived's Load
-    virtual void PostLoad(const char* section);
+    virtual void PostLoad(LPCSTR section);
 
     virtual IFactoryObject* _construct();
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Save(NET_Packet& P);
-    virtual bool net_SaveRelevant();
+    virtual BOOL net_SaveRelevant();
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     virtual void net_Relcase(IGameObject* O);
@@ -106,7 +106,7 @@ public:
     virtual void InitThink() {}
     virtual void Think();
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
 
     virtual void init() {}
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
@@ -124,7 +124,7 @@ public:
     virtual CPHSynchronize* PHGetSyncItem(u16 item) { return inherited::PHGetSyncItem(item); }
     virtual void PHUnFreeze() { return inherited::PHUnFreeze(); }
     virtual void PHFreeze() { return inherited::PHFreeze(); }
-    virtual bool UsedAI_Locations() { return inherited::UsedAI_Locations(); }
+    virtual BOOL UsedAI_Locations() { return inherited::UsedAI_Locations(); }
     virtual const SRotation Orientation() const { return inherited::Orientation(); }
     virtual void on_restrictions_change();
 
@@ -232,8 +232,8 @@ public:
     ref_smem<SMonsterSettings> m_base_settings;
     ref_smem<SMonsterSettings> m_current_settings;
 
-    void settings_read(CInifile const* ini, const char* section, SMonsterSettings& data);
-    void settings_load(const char* section);
+    void settings_read(CInifile const* ini, LPCSTR section, SMonsterSettings& data);
+    void settings_load(LPCSTR section);
     void settings_overrides();
 
     SMonsterSettings& db() { return *(*m_current_settings); }
@@ -305,7 +305,7 @@ public:
     //	// Spawn Inventory Item
     //	//-----------------------------------------------------------------
     // private:
-    //	const char*					m_item_section;
+    //	LPCSTR					m_item_section;
     //	float					m_spawn_probability;
 
     //--------------------------------------------------------------------
@@ -333,8 +333,8 @@ public:
     void Hit_Psy(IGameObject* object, float value);
     void Hit_Wound(IGameObject* object, float value, const Fvector& dir, float impulse);
     CParticlesObject* PlayParticles(const shared_str& name, const Fvector& position, const Fvector& dir,
-        bool auto_remove = TRUE, bool xformed = TRUE);
-    void load_effector(const char* section, const char* line, SAttackEffector& effector);
+        BOOL auto_remove = TRUE, BOOL xformed = TRUE);
+    void load_effector(LPCSTR section, LPCSTR line, SAttackEffector& effector);
 
     // --------------------------------------------------------------------------------------
     // Kill From Here
@@ -411,11 +411,11 @@ protected:
     virtual bool critical_wound_external_conditions_suitable();
     virtual void critical_wounded_state_start();
 
-    void fill_bones_body_parts(const char* body_part, CriticalWoundType wound_type);
+    void fill_bones_body_parts(LPCSTR body_part, CriticalWoundType wound_type);
 
-    const char* m_critical_wound_anim_head;
-    const char* m_critical_wound_anim_torso;
-    const char* m_critical_wound_anim_legs;
+    LPCSTR m_critical_wound_anim_head;
+    LPCSTR m_critical_wound_anim_torso;
+    LPCSTR m_critical_wound_anim_legs;
 
     //////////////////////////////////////////////////////////////////////////
 public:

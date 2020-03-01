@@ -273,7 +273,7 @@ void CUIGameCustom::OnConnected()
     UIMainIngameWnd->OnConnected();
 }
 
-void CUIGameCustom::CommonMessageOut(const char* text) { m_pMessagesWnd->AddLogMessage(text); }
+void CUIGameCustom::CommonMessageOut(LPCSTR text) { m_pMessagesWnd->AddLogMessage(text); }
 void CUIGameCustom::UpdatePda() { GetPdaMenu().UpdatePda(); }
 void CUIGameCustom::update_fake_indicators(u8 type, float power)
 {
@@ -390,7 +390,7 @@ void CMapListHelper::Load()
         LoadMapInfo(cfgFileName, cfg.name);
     }
     // scan all not loaded archieves
-    const char* tempRoot = "temporary_gamedata" DELIMITER;
+    LPCSTR tempRoot = "temporary_gamedata" DELIMITER;
     FS_Path* levelsPath = FS.get_path("$game_levels$");
     xr_string prevRoot = levelsPath->m_Root;
     levelsPath->_set_root(tempRoot);

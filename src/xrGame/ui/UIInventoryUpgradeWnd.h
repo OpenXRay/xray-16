@@ -12,7 +12,7 @@
 #include "xrUICore/Static/UIStatic.h"
 #include "UIInvUpgrade.h"
 
-extern const const char* g_inventory_upgrade_xml;
+extern const LPCSTR g_inventory_upgrade_xml;
 #define MAX_UI_UPGRADE_CELLS 25
 
 namespace inventory
@@ -60,8 +60,8 @@ public:
     void InitInventory(CUICellItem* item, bool can_upgrade);
 
     IC CInventoryItem const* get_inventory() const { return m_inv_item; }
-    IC const char* get_cell_texture(UIUpgrade::ViewState state) const { return m_cell_textures[state].c_str(); }
-    IC const char* get_point_texture(UIUpgrade::ViewState state) const { return m_point_textures[state].c_str(); }
+    IC LPCSTR get_cell_texture(UIUpgrade::ViewState state) const { return m_cell_textures[state].c_str(); }
+    IC LPCSTR get_point_texture(UIUpgrade::ViewState state) const { return m_point_textures[state].c_str(); }
     Fvector2 get_scheme_position() const { return m_scheme_wnd->GetWndPos(); }
     Fvector2 get_item_position() const { return m_item->GetWndPos(); }
     virtual void Show(bool status);
@@ -70,7 +70,7 @@ public:
     void UpdateAllUpgrades();
 
     bool DBClickOnUIUpgrade(Upgrade_type const* upgr);
-    void AskUsing(const char* text, const char* upgrade_name);
+    void AskUsing(LPCSTR text, LPCSTR upgrade_name);
     void OnMesBoxYes();
 
     void HighlightHierarchy(shared_str const& upgrade_id);
@@ -80,9 +80,9 @@ public:
 
 private:
     void LoadCellsBacks(CUIXml& uiXml);
-    void LoadCellStates(const char* state_str, const char* texture_name, const char* texture_name2, u32 color);
-    UIUpgrade::ViewState SelectCellState(const char* state_str);
-    void SetCellState(UIUpgrade::ViewState state, const char* texture_name, const char* texture_name2, u32 color);
+    void LoadCellStates(LPCSTR state_str, LPCSTR texture_name, LPCSTR texture_name2, u32 color);
+    UIUpgrade::ViewState SelectCellState(LPCSTR state_str);
+    void SetCellState(UIUpgrade::ViewState state, LPCSTR texture_name, LPCSTR texture_name2, u32 color);
     bool VerirfyCells();
 
     void LoadSchemes(CUIXml& uiXml);
@@ -107,7 +107,7 @@ protected:
 
     SCHEMES m_schemes;
     Scheme* m_current_scheme;
-    const char* m_cur_upgrade_id;
+    LPCSTR m_cur_upgrade_id;
     CUIWindow* m_scheme_wnd;
 
 public:

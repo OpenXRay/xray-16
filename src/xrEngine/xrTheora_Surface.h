@@ -24,13 +24,13 @@ class ENGINE_API CTheoraSurface
     u32 tm_start;
     u32 tm_play;
     u32 tm_total;
-    bool ready;
-    bool bShaderYUV2RGB;
+    BOOL ready;
+    BOOL bShaderYUV2RGB;
     int prefetch;
 
 public:
-    bool playing;
-    bool looped;
+    BOOL playing;
+    BOOL looped;
 
 protected:
     void Reset();
@@ -43,20 +43,20 @@ public:
     CTheoraSurface();
     virtual ~CTheoraSurface();
 
-    bool Valid();
-    bool Load(const char* fname);
+    BOOL Valid();
+    BOOL Load(const char* fname);
 
-    bool Update(u32 _time);
+    BOOL Update(u32 _time);
     void DecompressFrame(u32* dst, u32 _width, int& count);
 
-    void Play(bool _looped, u32 _time);
-    void Pause(bool _pause) { playing = !_pause; }
+    void Play(BOOL _looped, u32 _time);
+    void Pause(BOOL _pause) { playing = !_pause; }
     void Stop()
     {
         playing = FALSE;
         Reset();
     }
-    bool IsPlaying() { return playing; }
+    BOOL IsPlaying() { return playing; }
     u32 Width(bool bRealSize);
     u32 Height(bool bRealSize);
 };

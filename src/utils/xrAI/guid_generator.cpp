@@ -39,7 +39,7 @@ xrGUID generate_guid()
     return (result);
 }
 
-const char* generate_guid(const xrGUID& guid, char* buffer, const size_t& buffer_size)
+LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const size_t& buffer_size)
 {
 #ifdef WINVER
     static_assert(sizeof(xrGUID) == sizeof(GUID), "Different GUID types.");
@@ -53,8 +53,8 @@ const char* generate_guid(const xrGUID& guid, char* buffer, const size_t& buffer
     case RPC_S_OUT_OF_MEMORY: NODEFAULT;
     default: NODEFAULT;
     }
-    VERIFY(buffer_size > xr_strlen((const char*)temp2));
-    xr_strcpy(buffer, buffer_size, (const char*)temp2);
+    VERIFY(buffer_size > xr_strlen((LPCSTR)temp2));
+    xr_strcpy(buffer, buffer_size, (LPCSTR)temp2);
     RpcStringFree(&temp2);
     return (buffer);
 #else

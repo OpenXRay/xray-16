@@ -7,8 +7,8 @@ class CBlender_Editor_Wire : public IBlender
     string64 oT_Factor;
 
 public:
-    virtual const char* getComment() { return "EDITOR: wire"; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "EDITOR: wire"; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

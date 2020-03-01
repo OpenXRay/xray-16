@@ -16,7 +16,7 @@ CWeaponBinoculars::CWeaponBinoculars()
 }
 
 CWeaponBinoculars::~CWeaponBinoculars() { xr_delete(m_binoc_vision); }
-void CWeaponBinoculars::Load(const char* section)
+void CWeaponBinoculars::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -66,11 +66,12 @@ void CWeaponBinoculars::OnZoomOut()
     inherited::OnZoomOut();
 }
 
-bool CWeaponBinoculars::net_Spawn(CSE_Abstract* DC)
+BOOL CWeaponBinoculars::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     return TRUE;
 }
+
 void CWeaponBinoculars::net_Destroy()
 {
     inherited::net_Destroy();

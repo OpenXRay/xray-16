@@ -49,7 +49,7 @@ shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
 // action_base
 //////////////////////////////////////////////////////////////////////////
 
-action_base::action_base(CAI_Stalker* object, const char* action_name) : inherited(object, action_name) {}
+action_base::action_base(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 void action_base::on_mark() {}
 void action_base::on_no_mark() {}
 bool action_base::is_animated_action() { return (true); }
@@ -64,7 +64,7 @@ void action_base::setup_orientation()
 // change_loophole
 //////////////////////////////////////////////////////////////////////////
 
-change_loophole::change_loophole(CAI_Stalker* object, const char* action_name) : inherited(object, action_name) {}
+change_loophole::change_loophole(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 void change_loophole::initialize()
 {
     inherited::initialize();
@@ -112,7 +112,7 @@ void change_loophole::on_animation_end()
 // non_animated_change_loophole
 //////////////////////////////////////////////////////////////////////////
 
-non_animated_change_loophole::non_animated_change_loophole(CAI_Stalker* object, const char* action_name)
+non_animated_change_loophole::non_animated_change_loophole(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -143,7 +143,7 @@ void non_animated_change_loophole::on_animation_end() {}
 // exit
 //////////////////////////////////////////////////////////////////////////
 
-exit::exit(CAI_Stalker* object, const char* action_name) : inherited(object, action_name) {}
+exit::exit(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 void exit::initialize()
 {
     inherited::initialize();

@@ -27,7 +27,7 @@ void CxImage::SelectionGetBox(RECT& r)
 /**
  * Empties the selection.
  */
-bool CxImage::SelectionClear(unsigned char level)
+bool CxImage::SelectionClear(BYTE level)
 {
 	if (pSelection){
 		if (level==0){
@@ -52,7 +52,7 @@ bool CxImage::SelectionClear(unsigned char level)
 bool CxImage::SelectionCreate()
 {
 	SelectionDelete();
-	pSelection = (unsigned char*)calloc(head.biWidth * head.biHeight, 1);
+	pSelection = (BYTE*)calloc(head.biWidth * head.biHeight, 1);
 	return (pSelection!=0);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ bool CxImage::BlindSelectionIsInside(long x, long y)
 /**
  * Adds a rectangle to the existing selection.
  */
-bool CxImage::SelectionAddRect(RECT r, unsigned char level)
+bool CxImage::SelectionAddRect(RECT r, BYTE level)
 {
 	if (pSelection==NULL) SelectionCreate();
 	if (pSelection==NULL) return false;
@@ -132,7 +132,7 @@ bool CxImage::SelectionAddRect(RECT r, unsigned char level)
 /**
  * Adds an ellipse to the existing selection.
  */
-bool CxImage::SelectionAddEllipse(RECT r, unsigned char level)
+bool CxImage::SelectionAddEllipse(RECT r, BYTE level)
 {
 	if (pSelection==NULL) SelectionCreate();
 	if (pSelection==NULL) return false;
@@ -177,10 +177,10 @@ bool CxImage::SelectionAddEllipse(RECT r, unsigned char level)
 bool CxImage::SelectionInvert()
 {
 	if (pSelection) {
-		unsigned char *iSrc=pSelection;
+		BYTE *iSrc=pSelection;
 		long n=head.biHeight*head.biWidth;
 		for(long i=0; i < n; i++){
-			*iSrc=(unsigned char)~(*(iSrc));
+			*iSrc=(BYTE)~(*(iSrc));
 			iSrc++;
 		}
 
@@ -197,7 +197,7 @@ bool CxImage::SelectionInvert()
 bool CxImage::SelectionCopy(CxImage &from)
 {
 	if (from.pSelection == NULL || head.biWidth != from.head.biWidth || head.biHeight != from.head.biHeight) return false;
-	if (pSelection==NULL) pSelection = (unsigned char*)cxalloc(head.biWidth * head.biHeight);//malloc(head.biWidth * head.biHeight);
+	if (pSelection==NULL) pSelection = (BYTE*)cxalloc(head.biWidth * head.biHeight);//malloc(head.biWidth * head.biHeight);
 	if (pSelection==NULL) return false;
 	memcpy(pSelection,from.pSelection,head.biWidth * head.biHeight);
 	memcpy(&info.rSelectionBox,&from.info.rSelectionBox,sizeof(RECT));
@@ -209,14 +209,14 @@ bool CxImage::SelectionCopy(CxImage &from)
  * Each structure specifies the x-coordinate and y-coordinate of one vertex of the polygon.
  * npoints specifies the number of POINT structures in the array pointed to by points.
  */
-bool CxImage::SelectionAddPolygon(POINT *points, long npoints, unsigned char level)
+bool CxImage::SelectionAddPolygon(POINT *points, long npoints, BYTE level)
 {
 	if (points==NULL || npoints<3) return false;
 
 	if (pSelection==NULL) SelectionCreate();
 	if (pSelection==NULL) return false;
 
-	unsigned char* plocal = (unsigned char*)calloc(head.biWidth*head.biHeight, 1);
+	BYTE* plocal = (BYTE*)calloc(head.biWidth*head.biHeight, 1);
 	RECT localbox = {head.biWidth,0,0,head.biHeight};
 
 	long x,y,i=0;
@@ -279,7 +279,7 @@ bool CxImage::SelectionAddPolygon(POINT *points, long npoints, unsigned char lev
 	//fill the outer region
 	long npix=(localbox.right - localbox.left)*(localbox.top - localbox.bottom);
 	POINT* pix = (POINT*)calloc(npix,sizeof(POINT));
-	unsigned char back=0, mark=1;
+	BYTE back=0, mark=1;
 	long fx, fy, fxx, fyy, first, last;
 	long xmin = 0;
 	long xmax = 0;
@@ -399,7 +399,7 @@ bool CxImage::SelectionAddPolygon(POINT *points, long npoints, unsigned char lev
 /**
  * Adds to the selection all the pixels matching the specified color.
  */
-bool CxImage::SelectionAddColor(RGBQUAD c, unsigned char level)
+bool CxImage::SelectionAddColor(RGBQUAD c, BYTE level)
 {
     if (pSelection==NULL) SelectionCreate();
 	if (pSelection==NULL) return false;
@@ -434,7 +434,7 @@ bool CxImage::SelectionAddColor(RGBQUAD c, unsigned char level)
 /**
  * Adds a single pixel to the existing selection.
  */
-bool CxImage::SelectionAddPixel(long x, long y, unsigned char level)
+bool CxImage::SelectionAddPixel(long x, long y, BYTE level)
 {
     if (pSelection==NULL) SelectionCreate();
 	if (pSelection==NULL) return false;
@@ -489,10 +489,10 @@ bool CxImage::SelectionSet(CxImage &from)
 		return false;
 	}
 
-	if (pSelection==NULL) pSelection = (unsigned char*)cxalloc(head.biWidth * head.biHeight);//malloc(head.biWidth * head.biHeight);
+	if (pSelection==NULL) pSelection = (BYTE*)cxalloc(head.biWidth * head.biHeight);//malloc(head.biWidth * head.biHeight);
 
-	unsigned char* src = from.info.pImage;
-	unsigned char* dst = pSelection;
+	BYTE* src = from.info.pImage;
+	BYTE* dst = pSelection;
 	if (src==NULL || dst==NULL){
 		strcpy(info.szLastError,"CxImage::SelectionSet: null pointer");
 		return false;
@@ -513,7 +513,7 @@ bool CxImage::SelectionSet(CxImage &from)
  * Sets the Selection level for a single pixel
  * internal use only: doesn't set SelectionBox. Use SelectionAddPixel
  */
-void CxImage::SelectionSet(const long x,const long y,const unsigned char level)
+void CxImage::SelectionSet(const long x,const long y,const BYTE level)
 {
 	if (pSelection && IsInside(x,y)) pSelection[x+y*head.biWidth]=level;
 }
@@ -521,7 +521,7 @@ void CxImage::SelectionSet(const long x,const long y,const unsigned char level)
 /**
  * Gets the Selection level for a single pixel 
  */
-unsigned char CxImage::SelectionGet(const long x,const long y)
+BYTE CxImage::SelectionGet(const long x,const long y)
 {
 	if (pSelection && IsInside(x,y)) return pSelection[x+y*head.biWidth];
 	return 0;
@@ -583,7 +583,7 @@ void CxImage::SelectionRebuildBox()
  * Gets the Selection level for a single pixel 
  * "blind" version assumes that (x,y) is inside to the image.
  */
-unsigned char CxImage::BlindSelectionGet(const long x,const long y)
+BYTE CxImage::BlindSelectionGet(const long x,const long y)
 {
 #ifdef _DEBUG
 	if (!IsInside(x,y) || (pSelection==0))
@@ -599,7 +599,7 @@ unsigned char CxImage::BlindSelectionGet(const long x,const long y)
 /**
  * Returns pointer to selection data for pixel (x,y).
  */
-unsigned char* CxImage::SelectionGetPointer(const long x,const long y)
+BYTE* CxImage::SelectionGetPointer(const long x,const long y)
 {
 	if (pSelection && IsInside(x,y)) return pSelection+x+y*head.biWidth;
 	return 0;
@@ -609,10 +609,10 @@ bool CxImage::SelectionFlip()
 {
 	if (!pSelection) return false;
 
-	unsigned char *buff = (unsigned char*)cxalloc(head.biWidth);//malloc(head.biWidth);
+	BYTE *buff = (BYTE*)cxalloc(head.biWidth);//malloc(head.biWidth);
 	if (!buff) return false;
 
-	unsigned char *iSrc,*iDst;
+	BYTE *iSrc,*iDst;
 	iSrc = pSelection + (head.biHeight-1)*head.biWidth;
 	iDst = pSelection;
 	for (long i=0; i<(head.biHeight/2); ++i)
@@ -635,10 +635,10 @@ bool CxImage::SelectionFlip()
 bool CxImage::SelectionMirror()
 {
 	if (!pSelection) return false;
-	unsigned char* pSelection2 = (unsigned char*)cxalloc(head.biWidth * head.biHeight);//malloc(head.biWidth * head.biHeight);
+	BYTE* pSelection2 = (BYTE*)cxalloc(head.biWidth * head.biHeight);//malloc(head.biWidth * head.biHeight);
 	if (!pSelection2) return false;
 	
-	unsigned char *iSrc,*iDst;
+	BYTE *iSrc,*iDst;
 	long wdt=head.biWidth-1;
 	iSrc=pSelection + wdt;
 	iDst=pSelection2;

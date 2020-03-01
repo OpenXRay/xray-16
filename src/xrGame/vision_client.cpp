@@ -109,5 +109,5 @@ float vision_client::feel_vision_mtl_transp(IGameObject* O, u32 element)
 }
 
 void vision_client::reinit() { visual().reinit(); }
-void vision_client::reload(const char* section) { visual().reload(section); }
+void vision_client::reload(LPCSTR section) { visual().reload(section); }
 void vision_client::remove_links(IGameObject* object) { visual().remove_links(object); }

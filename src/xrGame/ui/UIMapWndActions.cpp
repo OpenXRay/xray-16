@@ -15,7 +15,7 @@ private:
     typedef WORLD_OPERATOR inherited;
 
 public:
-    CSomeMapAction(const char* action_name) : inherited((CUIMapWnd*)NULL, action_name) {}
+    CSomeMapAction(LPCSTR action_name) : inherited((CUIMapWnd*)NULL, action_name) {}
     virtual void initialize() { inherited::initialize(); };
     virtual void execute() { inherited::execute(); };
     virtual void finalize() { inherited::finalize(); };
@@ -34,7 +34,7 @@ protected:
     void update_target_state();
 
 public:
-    CMapActionZoomControl(const char* action_name) : inherited(action_name) {}
+    CMapActionZoomControl(LPCSTR action_name) : inherited(action_name) {}
     virtual void execute();
     virtual void initialize();
     virtual void finalize();
@@ -46,7 +46,7 @@ private:
     typedef CMapActionZoomControl inherited;
 
 public:
-    CMapActionResize(const char* action_name) : inherited(action_name) {}
+    CMapActionResize(LPCSTR action_name) : inherited(action_name) {}
     virtual void initialize();
     virtual void finalize();
 };
@@ -57,7 +57,7 @@ private:
     typedef CMapActionZoomControl inherited;
 
 public:
-    CMapActionMinimize(const char* action_name) : inherited(action_name) {}
+    CMapActionMinimize(LPCSTR action_name) : inherited(action_name) {}
     virtual void initialize();
     virtual void finalize();
 };
@@ -68,7 +68,7 @@ private:
     typedef CSomeMapAction inherited;
 
 public:
-    CMapActionIdle(const char* action_name) : inherited(action_name) {}
+    CMapActionIdle(LPCSTR action_name) : inherited(action_name) {}
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -81,7 +81,7 @@ private:
     typedef CPropertyEvaluator<CUIMapWnd> inherited;
 
 public:
-    CSomeMapEvaluator(const char* evaluator_name) : inherited((CUIMapWnd*)NULL, evaluator_name) {}
+    CSomeMapEvaluator(LPCSTR evaluator_name) : inherited((CUIMapWnd*)NULL, evaluator_name) {}
     virtual ~CSomeMapEvaluator(){};
 };
 
@@ -91,7 +91,7 @@ private:
     typedef CSomeMapEvaluator inherited;
 
 public:
-    CEvaluatorTargetMapShown(const char* evaluator_name = 0) : inherited(evaluator_name){};
+    CEvaluatorTargetMapShown(LPCSTR evaluator_name = 0) : inherited(evaluator_name){};
     virtual bool evaluate();
 };
 
@@ -101,7 +101,7 @@ private:
     typedef CSomeMapEvaluator inherited;
 
 public:
-    CEvaluatorMapMinimized(const char* evaluator_name = 0) : inherited(evaluator_name){};
+    CEvaluatorMapMinimized(LPCSTR evaluator_name = 0) : inherited(evaluator_name){};
     virtual bool evaluate();
 };
 
@@ -111,7 +111,7 @@ private:
     typedef CSomeMapEvaluator inherited;
 
 public:
-    CEvaluatorMapResized(const char* evaluator_name = 0) : inherited(evaluator_name){};
+    CEvaluatorMapResized(LPCSTR evaluator_name = 0) : inherited(evaluator_name){};
     virtual bool evaluate();
 };
 
@@ -122,7 +122,7 @@ private:
     bool ret_value;
 
 public:
-    CEvaluatorMapConst(bool val = false, const char* evaluator_name = 0) : inherited(evaluator_name) { ret_value = val; };
+    CEvaluatorMapConst(bool val = false, LPCSTR evaluator_name = 0) : inherited(evaluator_name) { ret_value = val; };
     virtual bool evaluate() { return ret_value; };
 };
 
@@ -130,7 +130,7 @@ using namespace UIMapWndActionsSpace;
 
 CMapActionPlanner::CMapActionPlanner() {}
 CMapActionPlanner::~CMapActionPlanner() {}
-const char* CMapActionPlanner::object_name() const { return (""); }
+LPCSTR CMapActionPlanner::object_name() const { return (""); }
 void CMapActionPlanner::setup(CUIMapWnd* object)
 {
 #ifdef LOG_ACTION

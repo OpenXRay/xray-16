@@ -42,15 +42,15 @@ public:
     virtual CParticlesPlayer* cast_particles_player() { return this; }
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual IFactoryObject* _construct();
-    virtual void Load(const char* section);
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual void Load(LPCSTR section);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     virtual void net_Destroy();
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    virtual bool net_SaveRelevant() { return inherited::net_SaveRelevant(); }
+    virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     virtual void Die(IGameObject* who);
     virtual void Think();
     virtual void HitSignal(float /**P**/, Fvector& /**local_dir**/, IGameObject* /**who**/, s16 /**element**/){};
@@ -67,7 +67,7 @@ public:
     virtual void DropItemSendMessage(IGameObject* O);
     virtual void shedule_Update(u32 dt);
 
-    virtual bool UsedAI_Locations();
+    virtual BOOL UsedAI_Locations();
 
     ///////////////////////////////////////////////////////////////////////
     virtual u16 PHGetSyncItemsNumber() { return inherited::PHGetSyncItemsNumber(); }
@@ -77,7 +77,7 @@ public:
     ///////////////////////////////////////////////////////////////////////
 
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
 
     static void BoneCallback(CBoneInstance* B);
 
@@ -87,7 +87,7 @@ public:
     void OnStopTrade();
 
     //игровое имя
-    virtual const char* Name() const { return CInventoryOwner::Name(); }
+    virtual LPCSTR Name() const { return CInventoryOwner::Name(); }
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
     virtual bool use_bolts() const;
     virtual void spawn_supplies();
@@ -120,7 +120,7 @@ public:
     virtual bool natural_detector() const { return false; }
     virtual bool AllowItemToTrade(CInventoryItem const* item, const SInvItemPlace& place) const;
 
-    void dialog_sound_start(const char* phrase);
+    void dialog_sound_start(LPCSTR phrase);
     void dialog_sound_stop();
 
 private:

@@ -24,7 +24,7 @@ void gsc_dsigned_ltx_writer::sign_and_save(IWriter& writer)
     shared_str tmp_sign_value = sign(m_mem_writer.pointer(), m_mem_writer.tell());
 
     m_mem_writer.seek(tmp_write_pos);
-    const char* append_value = NULL;
+    LPCSTR append_value = NULL;
     STRCONCAT(append_value, "\r\n[", dsign_secion, "]\r\n	date		=	", dsign_time, "\r\n	sign_hash	=	",
         tmp_sign_value.c_str());
     m_ltx.save_as(writer);

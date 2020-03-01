@@ -14,7 +14,7 @@ CWeaponAutomaticShotgun::CWeaponAutomaticShotgun()
 }
 
 CWeaponAutomaticShotgun::~CWeaponAutomaticShotgun() {}
-void CWeaponAutomaticShotgun::Load(const char* section)
+void CWeaponAutomaticShotgun::Load(LPCSTR section)
 {
     inherited::Load(section);
 

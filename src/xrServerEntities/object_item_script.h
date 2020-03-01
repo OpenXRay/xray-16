@@ -28,10 +28,10 @@ public:
 #ifndef NO_XR_GAME
         luabind::object client_creator,
 #endif
-        luabind::object server_creator, const CLASS_ID& clsid, const char* script_clsid);
+        luabind::object server_creator, const CLASS_ID& clsid, LPCSTR script_clsid);
 #ifndef NO_XR_GAME
-    CObjectItemScript(luabind::object creator, const CLASS_ID& clsid, const char* script_clsid);
+    CObjectItemScript(luabind::object creator, const CLASS_ID& clsid, LPCSTR script_clsid);
     virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
 #endif
-    virtual ObjectFactory::ServerObjectBaseClass* server_object(const char* section) const;
+    virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
 };

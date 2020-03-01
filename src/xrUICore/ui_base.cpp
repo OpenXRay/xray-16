@@ -317,7 +317,7 @@ float UICore::get_current_kx()
     return res;
 }
 
-shared_str UICore::get_xml_name(const char* fn)
+shared_str UICore::get_xml_name(LPCSTR fn)
 {
     string_path str;
     if (!is_widescreen())

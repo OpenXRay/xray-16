@@ -17,7 +17,7 @@ protected:
     IGameObject* parent;
 
 public:
-    bool bClampYaw, bClampPitch, bClampRoll;
+    BOOL bClampYaw, bClampPitch, bClampRoll;
     float yaw, pitch, roll;
 
     enum
@@ -51,7 +51,7 @@ public:
 public:
     CCameraBase(IGameObject* p, u32 flags);
     virtual ~CCameraBase();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     void SetParent(IGameObject* p)
     {
         parent = p;

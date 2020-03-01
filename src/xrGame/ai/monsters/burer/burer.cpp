@@ -56,7 +56,7 @@ void CBurer::reinit()
 }
 
 void CBurer::net_Destroy() { inherited::net_Destroy(); }
-void CBurer::reload(const char* section)
+void CBurer::reload(LPCSTR section)
 {
     inherited::reload(section);
 
@@ -70,7 +70,7 @@ void CBurer::reload(const char* section)
 
 void CBurer::ActivateShield() { m_shield_active = true; }
 void CBurer::DeactivateShield() { m_shield_active = false; }
-void CBurer::Load(const char* section)
+void CBurer::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -225,7 +225,7 @@ void CBurer::Load(const char* section)
     PostLoad(section);
 }
 
-void CBurer::PostLoad(const char* section)
+void CBurer::PostLoad(LPCSTR section)
 {
     inherited::PostLoad(section);
     m_anti_aim->set_callback(anti_aim_ability::hit_callback(this, &CBurer::StaminaHit));

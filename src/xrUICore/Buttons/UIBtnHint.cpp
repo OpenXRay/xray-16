@@ -34,7 +34,7 @@ void CUIButtonHint::OnRender()
     }
 }
 
-void CUIButtonHint::SetHintText(CUIWindow* w, const char* text)
+void CUIButtonHint::SetHintText(CUIWindow* w, LPCSTR text)
 {
     m_ownerWnd = w;
     m_text->SetTextST(text);

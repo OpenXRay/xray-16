@@ -153,7 +153,7 @@ void dxUIRender::GetActiveTextureResolution(Fvector2& res)
     res.set(float(T->get_Width()), float(T->get_Height()));
 }
 
-const char* dxUIRender::UpdateShaderName(const char* tex_name, const char* sh_name)
+LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
 {
     string_path buff;
     u32 v_dev = CAP_VERSION(HW.Caps.raster_major, HW.Caps.raster_minor);

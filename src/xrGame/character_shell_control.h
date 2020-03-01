@@ -10,7 +10,7 @@ public:
     void set_fatal_impulse(SHit& H) const;
     void set_start_shell_params(CPhysicsShell* sh) const;
     void apply_start_velocity_factor(IGameObject* who, Fvector& velocity) const;
-    void Load(const char* section);
+    void Load(LPCSTR section);
     void TestForWounded(const Fmatrix& xform, IKinematics* CKA);
     void UpdateFrictionAndJointResistanse(CPhysicsShell* sh);
     void CalculateTimeDelta();
@@ -43,7 +43,7 @@ private:
     float m_Pred_Time; //Для вычисления дельта времени между пересчётами сопротивления в джоинтах и коэффициента NPC
     float m_time_delta;
     float pelvis_factor_low_pose_detect;
-    bool character_have_wounded_state;
+    BOOL character_have_wounded_state;
     bool m_was_wounded;
     // gray_wolf<
 

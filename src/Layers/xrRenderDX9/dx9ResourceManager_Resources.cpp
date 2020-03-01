@@ -19,7 +19,7 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 template <class T>
-bool reclaim(xr_vector<T*>& vec, const T* ptr)
+BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
 {
     auto it = vec.begin();
     auto end = vec.end();
@@ -57,7 +57,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-static bool dcl_equal(VertexElement* a, VertexElement* b)
+static BOOL dcl_equal(VertexElement* a, VertexElement* b)
 {
     // check sizes
     u32 a_size = GetDeclLength(a);
@@ -116,7 +116,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullpt
 void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 
 //--------------------------------------------------------------------------------------------------------------
-SPS* CResourceManager::_CreatePS(const char* name) { return CreateShader<SPS>(name, nullptr, nullptr); }
+SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr, nullptr); }
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ class includer : public ID3DXInclude
 {
 public:
     HRESULT __stdcall Open(
-        D3DXINCLUDE_TYPE IncludeType, const char* pFileName, const void* pParentData, const void** ppData, unsigned int* pBytes)
+        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
         strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
@@ -182,14 +182,14 @@ public:
         *pBytes = size;
         return D3D_OK;
     }
-    HRESULT __stdcall Close(const void* pData)
+    HRESULT __stdcall Close(LPCVOID pData)
     {
         xr_free(pData);
         return D3D_OK;
     }
 };
 
-SVS* CResourceManager::_CreateVS(const char* _name)
+SVS* CResourceManager::_CreateVS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
@@ -203,7 +203,7 @@ SVS* CResourceManager::_CreateVS(const char* _name)
         xr_strcat(name, "_3");
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
-    char* N = char*(name);
+    LPSTR N = LPSTR(name);
     map_VS::iterator I = m_vs.find(N);
     if (I != m_vs.end())
         return I->second;
@@ -226,14 +226,14 @@ SVS* CResourceManager::_CreateVS(const char* _name)
         string_path cname;
         strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), _name, ".vs");
         FS.update_path(cname, "$game_shaders$", cname);
-        //		const char*						target		= NULL;
+        //		LPCSTR						target		= NULL;
 
         IReader* fs = FS.r_open(cname);
         R_ASSERT3(fs, "shader file doesnt exist", cname);
 
         // Select target
-        const char* c_target = "vs_2_0";
-        const char* c_entry = "main";
+        LPCSTR c_target = "vs_2_0";
+        LPCSTR c_entry = "main";
         /*if (HW.Caps.geometry.dwVersion>=CAP_VERSION(3,0))			target="vs_3_0";
 		else*/ if (HW.Caps.geometry_major >= 2)
             c_target = "vs_2_0";
@@ -241,8 +241,8 @@ SVS* CResourceManager::_CreateVS(const char* _name)
             c_target = "vs_1_1";
 
         u32 needed_len = fs->length() + 1;
-        char* pfs = xr_alloc<char>(needed_len);
-        strncpy_s(pfs, needed_len, (const char*)fs->pointer(), fs->length());
+        LPSTR pfs = xr_alloc<char>(needed_len);
+        strncpy_s(pfs, needed_len, (LPCSTR)fs->pointer(), fs->length());
         pfs[fs->length()] = 0;
 
         if (strstr(pfs, "main_vs_1_1"))
@@ -260,10 +260,10 @@ SVS* CResourceManager::_CreateVS(const char* _name)
 
         // vertex
         R_ASSERT2(fs, cname);
-        _hr = GEnv.Render->shader_compile(name, const char*(fs->pointer()), fs->length(), NULL, &Includer, c_entry,
+        _hr = GEnv.Render->shader_compile(name, LPCSTR(fs->pointer()), fs->length(), NULL, &Includer, c_entry,
             c_target, D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR /*| D3DXSHADER_PREFER_FLOW_CONTROL*/,
             &pShaderBuf, &pErrorBuf, NULL);
-        //		_hr = D3DXCompileShader		(const char*(fs->pointer()),fs->length(), NULL, &Includer, "main", target,
+        //		_hr = D3DXCompileShader		(LPCSTR(fs->pointer()),fs->length(), NULL, &Includer, "main", target,
         // D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);
         FS.r_close(fs);
 
@@ -271,12 +271,12 @@ SVS* CResourceManager::_CreateVS(const char* _name)
         {
             if (pShaderBuf)
             {
-                _hr = HW.pDevice->CreateVertexShader((unsigned int*)pShaderBuf->GetBufferPointer(), &_vs->vs);
+                _hr = HW.pDevice->CreateVertexShader((DWORD*)pShaderBuf->GetBufferPointer(), &_vs->vs);
                 if (SUCCEEDED(_hr))
                 {
-                    const void* data = NULL;
+                    LPCVOID data = NULL;
                     _hr = D3DXFindShaderComment(
-                        (unsigned int*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
+                        (DWORD*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
                     if (SUCCEEDED(_hr) && data)
                     {
                         pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
@@ -306,7 +306,7 @@ SVS* CResourceManager::_CreateVS(const char* _name)
         {
             Log("! VS: ", _name);
             if (pErrorBuf)
-                Log("! error: ", (const char*)pErrorBuf->GetBufferPointer());
+                Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
             else
                 Msg("Can't compile shader hr=0x%08x", _hr);
         }
@@ -322,9 +322,9 @@ SVS* CResourceManager::_CreateVS(const char* _name)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SPS* CResourceManager::_CreatePS(const char* name)
+SPS* CResourceManager::_CreatePS(LPCSTR name)
 {
-    char* N = char*(name);
+    LPSTR N = LPSTR(name);
     map_PS::iterator I = m_ps.find(N);
     if (I != m_ps.end())
         return I->second;
@@ -342,7 +342,7 @@ SPS* CResourceManager::_CreatePS(const char* name)
         // Open file
         includer Includer;
         string_path cname;
-        const char* shader_path = GEnv.Render->getShaderPath();
+        LPCSTR shader_path = GEnv.Render->getShaderPath();
         strconcat(sizeof(cname), cname, shader_path, name, ".ps");
         FS.update_path(cname, "$game_shaders$", cname);
 
@@ -356,8 +356,8 @@ SPS* CResourceManager::_CreatePS(const char* name)
         FS.r_close(R);
 
         // Select target
-        const char* c_target = "ps_2_0";
-        const char* c_entry = "main";
+        LPCSTR c_target = "ps_2_0";
+        LPCSTR c_entry = "main";
         if (strstr(data, "main_ps_1_1"))
         {
             c_target = "ps_1_1";
@@ -399,12 +399,12 @@ SPS* CResourceManager::_CreatePS(const char* name)
         {
             if (pShaderBuf)
             {
-                _hr = HW.pDevice->CreatePixelShader((unsigned int*)pShaderBuf->GetBufferPointer(), &_ps->ps);
+                _hr = HW.pDevice->CreatePixelShader((DWORD*)pShaderBuf->GetBufferPointer(), &_ps->ps);
                 if (SUCCEEDED(_hr))
                 {
-                    const void* data = NULL;
+                    LPCVOID data = NULL;
                     _hr = D3DXFindShaderComment(
-                        (unsigned int*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
+                        (DWORD*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
                     if (SUCCEEDED(_hr) && data)
                     {
                         pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
@@ -434,7 +434,7 @@ SPS* CResourceManager::_CreatePS(const char* name)
         {
             Log("! PS: ", name);
             if (pErrorBuf)
-                Log("! error: ", (const char*)pErrorBuf->GetBufferPointer());
+                Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
             else
                 Msg("Can't compile shader hr=0x%08x", _hr);
         }

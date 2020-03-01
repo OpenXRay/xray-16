@@ -73,7 +73,7 @@ public:
     void exit_position(Fvector& position) const;
 
 private:
-    void add_action(const char* type, luabind::adl::object const& table);
+    void add_action(LPCSTR type, luabind::adl::object const& table);
     void fill_transitions(luabind::adl::object const& transitions_table);
 };
 

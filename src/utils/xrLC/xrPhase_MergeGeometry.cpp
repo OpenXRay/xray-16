@@ -5,7 +5,7 @@
 
 extern void Detach(vecFace* S);
 
-IC bool FaceEqual(Face* F1, Face* F2)
+IC BOOL FaceEqual(Face* F1, Face* F2)
 {
     if (F1->dwMaterial != F2->dwMaterial)
         return FALSE;
@@ -16,7 +16,7 @@ IC bool FaceEqual(Face* F1, Face* F2)
     return TRUE;
 }
 
-bool NeedMerge(vecFace& subdiv, Fbox& bb_base)
+BOOL NeedMerge(vecFace& subdiv, Fbox& bb_base)
 {
     // 1. Amount of polygons
     if (subdiv.size() >= u32(3 * c_SS_HighVertLimit / 4))
@@ -73,7 +73,7 @@ IC void MakeCube(Fbox& BB_dest, const Fbox& BB_src)
     BB_dest.grow(max);
 }
 
-IC bool ValidateMergeLinearSize(const Fvector& merged, const Fvector& orig1, const Fvector& orig2, int iAxis)
+IC BOOL ValidateMergeLinearSize(const Fvector& merged, const Fvector& orig1, const Fvector& orig2, int iAxis)
 {
     if ((merged[iAxis] > (4 * c_SS_maxsize / 3)) && (merged[iAxis] > (orig1[iAxis] + 1)) &&
         (merged[iAxis] > (orig2[iAxis] + 1)))
@@ -82,7 +82,7 @@ IC bool ValidateMergeLinearSize(const Fvector& merged, const Fvector& orig1, con
         return TRUE;
 }
 
-IC bool ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32 f2, const Fbox& bb, float& volume)
+IC BOOL ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32 f2, const Fbox& bb, float& volume)
 {
     // Polygons
     if ((f1 + f2) > u32(4 * c_SS_HighVertLimit / 3))
@@ -138,7 +138,7 @@ typedef struct MERGEGM_PARAMS
 } * LP_MERGEGM_PARAMS;
 
 static CRITICAL_SECTION mergegm_cs;
-static bool mergegm_threads_initialized = FALSE;
+static BOOL mergegm_threads_initialized = FALSE;
 static u32 mergegm_threads_count = 0;
 static LPHANDLE mergegm_threads_handles = NULL;
 static LPHANDLE mergegm_ready_events = NULL;

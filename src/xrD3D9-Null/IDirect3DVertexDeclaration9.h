@@ -7,7 +7,7 @@ extern "C" {
 class xrIDirect3DVertexDeclaration9 : public IDirect3DVertexDeclaration9
 {
 protected:
-    signed int m_refCount;
+    LONG m_refCount;
     IDirect3DDevice9* m_pIDirect3DDevice9;
 
 public:
@@ -19,7 +19,7 @@ public:
 
     /*** IDirect3DVertexDeclaration9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice);
-    HRESULT __stdcall GetDeclaration(D3DVERTEXELEMENT9* pD3DVertexElement9, unsigned int* pNumElements);
+    HRESULT __stdcall GetDeclaration(D3DVERTEXELEMENT9* pD3DVertexElement9, UINT* pNumElements);
 };
 
 #ifdef __cplusplus

@@ -28,7 +28,7 @@ protected:
 
 public:
     CUIDetectorWave() : m_curr_v(0.0f), m_step(0.0f){};
-    void InitFromXML(CUIXml& xml, const char* path);
+    void InitFromXML(CUIXml& xml, LPCSTR path);
     void SetVelocity(float v);
     virtual void Update();
 };

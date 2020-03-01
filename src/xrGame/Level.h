@@ -324,7 +324,7 @@ public:
     void IR_OnActivate(void) override;
 
     // Returns respawn point ID
-    int get_RPID(const char* name); // Xottab_DUTY: Seems to be deprecated
+    int get_RPID(LPCSTR name); // Xottab_DUTY: Seems to be deprecated
 
     // Game
     void InitializeClientGame(NET_Packet& P);
@@ -334,11 +334,11 @@ public:
     void ClientSave();
     u32 Objects_net_Save(NET_Packet* _Packet, u32 start, u32 count);
     void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0) override;
-    void g_cl_Spawn(const char* name, u8 rp, u16 flags, Fvector pos); // only ask server
+    void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos); // only ask server
     void g_sv_Spawn(CSE_Abstract* E); // server reply/command spawning
 
     // Save/Load/State
-    void SLS_Load(const char* name); // Game Load
+    void SLS_Load(LPCSTR name); // Game Load
     void SLS_Default(); // Default/Editor Load
     IC CSpaceRestrictionManager& space_restriction_manager();
     IC CSeniorityHierarchyHolder& seniority_holder();
@@ -400,7 +400,7 @@ public:
     bool IsServer();
     bool IsClient();
     CSE_Abstract* spawn_item(
-        const char* section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item = false);
+        LPCSTR section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item = false);
 
 protected:
     u32 m_dwCL_PingDeltaSend = 1000;

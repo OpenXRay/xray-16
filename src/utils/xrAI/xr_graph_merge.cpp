@@ -18,14 +18,14 @@
 #include <direct.h>
 #include <random>
 
-extern const char* GAME_CONFIG;
+extern LPCSTR GAME_CONFIG;
 
 using namespace SpawnConstructorSpace;
 using namespace ALife;
 
 typedef struct tagSConnectionVertex
 {
-    char* caConnectName;
+    LPSTR caConnectName;
     GameGraph::_GRAPH_ID tGraphID;
     GameGraph::_GRAPH_ID tOldGraphID;
     u32 dwLevelID;
@@ -38,12 +38,12 @@ CGameGraph::CHeader tGraphHeader;
 class CCompareVertexPredicate
 {
 public:
-    IC bool operator()(const char* S1, const char* S2) const { return (xr_strcmp(S1, S2) < 0); }
+    IC bool operator()(LPCSTR S1, LPCSTR S2) const { return (xr_strcmp(S1, S2) < 0); }
 };
 
-u32 dwfGetIDByLevelName(CInifile* Ini, const char* caLevelName)
+u32 dwfGetIDByLevelName(CInifile* Ini, LPCSTR caLevelName)
 {
-    const char* N, *V;
+    LPCSTR N, V;
     for (u32 k = 0; Ini->r_line("levels", k, &N, &V); k++)
     {
         R_ASSERT3(Ini->section_exist(N), "Fill section properly!", N);
@@ -56,7 +56,7 @@ u32 dwfGetIDByLevelName(CInifile* Ini, const char* caLevelName)
 }
 
 using GRAPH_P_MAP = xr_map<u32, ::CLevelGameGraph*>;
-using VERTEX_MAP = xr_map<char*, SConnectionVertex, CCompareVertexPredicate>;
+using VERTEX_MAP = xr_map<LPSTR, SConnectionVertex, CCompareVertexPredicate>;
 
 typedef struct tagSDynamicGraphVertex
 {
@@ -85,7 +85,7 @@ public:
     CGameGraph* m_tpGraph;
     CMemoryWriter m_cross_table;
 
-    CLevelGameGraph(const char* graph_file_name, const char* raw_cross_table_file_name, CGameGraph::SLevel* tLevel, const char* S, u32 dwOffset, u32 dwLevelID, CInifile* Ini)
+    CLevelGameGraph(LPCSTR graph_file_name, LPCSTR raw_cross_table_file_name, CGameGraph::SLevel* tLevel, LPCSTR S, u32 dwOffset, u32 dwLevelID, CInifile* Ini)
     {
         m_tLevel = *tLevel;
         m_dwOffset = dwOffset;
@@ -227,7 +227,7 @@ public:
                     if (fMinDistance < EPS_L)
                     {
                         SConnectionVertex T;
-                        char* S;
+                        LPSTR S;
                         S = xr_strdup(tpGraphPoint->name_replace());
                         T.caConnectName = xr_strdup(*tpGraphPoint->m_caConnectionPointName);
                         T.dwLevelID = dwfGetIDByLevelName(Ini, *tpGraphPoint->m_caConnectionLevelName);
@@ -383,12 +383,12 @@ public:
 class CGraphMerger
 {
 public:
-    CGraphMerger(const char* game_graph_id, const char* name, bool rebuild);
+    CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild);
 };
 
-void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, xr_vector<const char*>* needed_levels)
+void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, xr_vector<LPCSTR>* needed_levels)
 {
-    const char* _N, *V;
+    LPCSTR _N, V;
     string_path caFileName, file_name;
     for (u32 k = 0; Ini->r_line("levels", k, &_N, &V); k++)
     {
@@ -494,7 +494,7 @@ void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, 
     }
 }
 
-const char* generate_temp_file_name(const char* header0, const char* header1, string_path& buffer)
+LPCSTR generate_temp_file_name(LPCSTR header0, LPCSTR header1, string_path& buffer)
 {
     string_path path;
     FS.update_path(path, "$app_data_root$", "temp");
@@ -506,7 +506,7 @@ const char* generate_temp_file_name(const char* header0, const char* header1, st
     return (buffer);
 }
 
-void fill_needed_levels(char* levels, xr_vector<const char*>& result)
+void fill_needed_levels(LPSTR levels, xr_vector<LPCSTR>& result)
 {
     auto I = levels;
     for (auto J = I;; ++I)
@@ -526,7 +526,7 @@ void fill_needed_levels(char* levels, xr_vector<const char*>& result)
     }
 }
 
-CGraphMerger::CGraphMerger(const char* game_graph_id, const char* name, bool rebuild)
+CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
 {
     // load all the graphs
     Logger.Phase("Processing level graphs");
@@ -545,7 +545,7 @@ CGraphMerger::CGraphMerger(const char* game_graph_id, const char* name, bool reb
     l_tpLevelPoints.clear();
 
     xr_set<CLevelInfo> levels;
-    xr_vector<const char*> needed_levels;
+    xr_vector<LPCSTR> needed_levels;
     string4096 levels_string;
     xr_strcpy(levels_string, name);
     xr_strlwr(levels_string);
@@ -692,4 +692,4 @@ CGraphMerger::CGraphMerger(const char* game_graph_id, const char* name, bool reb
     xr_delete(Ini);
 }
 
-void xrMergeGraphs(const char* game_graph_id, const char* name, bool rebuild) { CGraphMerger A(game_graph_id, name, rebuild); }
+void xrMergeGraphs(LPCSTR game_graph_id, LPCSTR name, bool rebuild) { CGraphMerger A(game_graph_id, name, rebuild); }

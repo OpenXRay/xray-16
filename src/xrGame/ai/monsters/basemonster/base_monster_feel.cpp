@@ -356,7 +356,7 @@ void CBaseMonster::critical_wounded_state_start()
 {
     VERIFY(m_critical_wound_type != u32(-1));
 
-    const char* anim = 0;
+    LPCSTR anim = 0;
     switch (m_critical_wound_type)
     {
     case critical_wound_type_head: anim = m_critical_wound_anim_head; break;

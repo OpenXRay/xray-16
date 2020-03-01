@@ -38,14 +38,14 @@
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
-ENGINE_API bool g_bRendering = FALSE;
+ENGINE_API BOOL g_bRendering = FALSE;
 
 const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
 extern int ps_always_active;
 
-bool g_bLoaded = FALSE;
+BOOL g_bLoaded = FALSE;
 ref_light precache_light = 0;
 
 bool CRenderDevice::RenderBegin()
@@ -621,10 +621,10 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.FrameEnd();
 }
 
-ENGINE_API bool bShowPauseString = TRUE;
+ENGINE_API BOOL bShowPauseString = TRUE;
 #include "IGame_Persistent.h"
 
-void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, const char* reason)
+void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 {
     static int snd_emitters_ = -1;
     if (g_bBenchmark || GEnv.isDedicatedServer)
@@ -673,21 +673,21 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, const char* reason
     }
 }
 
-bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
+BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
     u16 fActive = LOWORD(wParam);
-    const bool fMinimized = (bool)HIWORD(wParam);
+    const BOOL fMinimized = (BOOL)HIWORD(wParam);
 
-    const bool isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
+    const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
 
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);
 
-    const bool isGameActive = ps_always_active || isWndActive;
+    const BOOL isGameActive = ps_always_active || isWndActive;
 
     if (isGameActive != Device.b_is_Active)
     {

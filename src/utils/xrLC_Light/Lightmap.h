@@ -23,8 +23,8 @@ public:
     ~CLightmap();
     void read(INetReader& r);
     void write(IWriter& w) const;
-    void Capture(CDeflector* D, int b_u, int b_v, int s_u, int s_v, bool bRotate);
-    void Save(const char* path);
+    void Capture(CDeflector* D, int b_u, int b_v, int s_u, int s_v, BOOL bRotate);
+    void Save(LPCSTR path);
     static CLightmap* read_create();
 };
 

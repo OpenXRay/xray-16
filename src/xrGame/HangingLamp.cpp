@@ -56,7 +56,7 @@ void CHangingLamp::Center(Fvector& C) const
 }
 
 float CHangingLamp::Radius() const { return (renderable.visual) ? renderable.visual->getVisData().sphere.R : EPS; }
-void CHangingLamp::Load(const char* section) { inherited::Load(section); }
+void CHangingLamp::Load(LPCSTR section) { inherited::Load(section); }
 void CHangingLamp::net_Destroy()
 {
     light_render.destroy();
@@ -68,7 +68,7 @@ void CHangingLamp::net_Destroy()
     inherited::net_Destroy();
 }
 
-bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
+BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectHangingLamp* lamp = smart_cast<CSE_ALifeObjectHangingLamp*>(e);
@@ -154,8 +154,8 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
         TurnOff(); // -> and here is disable :)
     }
 
-    setVisible((bool) !!Visual());
-    setEnabled((bool) !!CForm);
+    setVisible((BOOL) !!Visual());
+    setEnabled((BOOL) !!CForm);
 
     return (TRUE);
 }
@@ -186,7 +186,7 @@ void CHangingLamp::net_Save(NET_Packet& P)
     CPHSkeleton::SaveNetState(P);
 }
 
-bool CHangingLamp::net_SaveRelevant() { return (TRUE); }
+BOOL CHangingLamp::net_SaveRelevant() { return (TRUE); }
 void CHangingLamp::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
@@ -332,7 +332,7 @@ void CHangingLamp::Hit(SHit* pHDS)
     SHit HDS = *pHDS;
     callback(GameObject::eHit)(
         lua_game_object(), HDS.power, HDS.dir, smart_cast<const CGameObject*>(HDS.who)->lua_game_object(), HDS.bone());
-    bool bWasAlive = Alive();
+    BOOL bWasAlive = Alive();
 
     if (m_pPhysicsShell)
         m_pPhysicsShell->applyHit(pHDS->p_in_bone_space, pHDS->dir, pHDS->impulse, pHDS->boneID, pHDS->hit_type);
@@ -359,7 +359,7 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
     m_pPhysicsShell = P_create_Shell();
 
     bone_map.clear();
-    const char* fixed_bones = *lamp->fixed_bones;
+    LPCSTR fixed_bones = *lamp->fixed_bones;
     if (fixed_bones)
     {
         int count = _GetItemCount(fixed_bones);
@@ -406,7 +406,7 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
 
 void CHangingLamp::net_Export(NET_Packet& P) { VERIFY(Local()); }
 void CHangingLamp::net_Import(NET_Packet& P) { VERIFY(Remote()); }
-bool CHangingLamp::UsedAI_Locations() { return (FALSE); }
+BOOL CHangingLamp::UsedAI_Locations() { return (FALSE); }
 SCRIPT_EXPORT(CHangingLamp, (CGameObject), {
     luabind::module(luaState)[luabind::class_<CHangingLamp, CGameObject>("hanging_lamp")
                                   .def(luabind::constructor<>())

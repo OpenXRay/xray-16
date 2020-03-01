@@ -48,7 +48,7 @@ CUIXmlInitBase::CUIXmlInitBase() { InitColorDefs(); }
 CUIXmlInitBase::~CUIXmlInitBase() {}
 //////////////////////////////////////////////////////////////////////////
 
-Frect CUIXmlInitBase::GetFRect(CUIXml& xml_doc, const char* path, int index)
+Frect CUIXmlInitBase::GetFRect(CUIXml& xml_doc, LPCSTR path, int index)
 {
     R_ASSERT4(xml_doc.NavigateToNode(path, index), "XML node not found", path, xml_doc.m_xml_file_name);
     Frect rect;
@@ -61,7 +61,7 @@ Frect CUIXmlInitBase::GetFRect(CUIXml& xml_doc, const char* path, int index)
     return rect;
 }
 
-bool CUIXmlInitBase::InitWindow(CUIXml& xml_doc, const char* path, int index, CUIWindow* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitWindow(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pWnd, bool fatal /*= true*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);
     if (!nodeExist)
@@ -93,7 +93,7 @@ bool CUIXmlInitBase::InitWindow(CUIXml& xml_doc, const char* path, int index, CU
 
 //////////////////////////////////////////////////////////////////////////
 
-bool CUIXmlInitBase::InitFrameWindow(CUIXml& xml_doc, const char* path, int index, CUIFrameWindow* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitFrameWindow(CUIXml& xml_doc, LPCSTR path, int index, CUIFrameWindow* pWnd, bool fatal /*= true*/)
 {
     bool result = InitWindow(xml_doc, path, index, pWnd, fatal);
     result &= InitTexture(xml_doc, path, index, pWnd, fatal);
@@ -101,7 +101,7 @@ bool CUIXmlInitBase::InitFrameWindow(CUIXml& xml_doc, const char* path, int inde
     return result;
 }
 
-bool CUIXmlInitBase::InitOptionsItem(CUIXml& xml_doc, const char* path, int index, CUIOptionsItem* pWnd)
+bool CUIXmlInitBase::InitOptionsItem(CUIXml& xml_doc, LPCSTR path, int index, CUIOptionsItem* pWnd)
 {
     string256 buf;
     strconcat(sizeof(buf), buf, path, ":options_item");
@@ -112,7 +112,7 @@ bool CUIXmlInitBase::InitOptionsItem(CUIXml& xml_doc, const char* path, int inde
         shared_str group = xml_doc.ReadAttrib(buf, index, "group");
         pWnd->AssignProps(entry, group);
 
-        const char* depends = xml_doc.ReadAttrib(buf, index, "depend", NULL);
+        LPCSTR depends = xml_doc.ReadAttrib(buf, index, "depend", NULL);
         if (depends)
         {
             CUIOptionsItem::ESystemDepends d = CUIOptionsItem::sdNothing;
@@ -138,7 +138,7 @@ bool CUIXmlInitBase::InitOptionsItem(CUIXml& xml_doc, const char* path, int inde
     return false;
 }
 
-bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, const char* path, int index, CUIStatic* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd, bool fatal /*= true*/)
 {
     if (!InitWindow(xml_doc, path, index, pWnd, fatal))
         return false;
@@ -159,7 +159,7 @@ bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, const char* path, int index, CU
         pWnd->SetHeading(deg2rad(heading_angle));
     }
 
-    const char* str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
+    LPCSTR str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
     int flag_cyclic = xml_doc.ReadAttribInt(path, index, "la_cyclic", 1);
     int flag_text = xml_doc.ReadAttribInt(path, index, "la_text", 1);
     int flag_texture = xml_doc.ReadAttribInt(path, index, "la_texture", 1);
@@ -191,7 +191,7 @@ bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, const char* path, int index, CU
     return true;
 }
 
-bool CUIXmlInitBase::InitTextWnd(CUIXml& xml_doc, const char* path, int index, CUITextWnd* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitTextWnd(CUIXml& xml_doc, LPCSTR path, int index, CUITextWnd* pWnd, bool fatal /*= true*/)
 {
     if (!InitWindow(xml_doc, path, index, pWnd, fatal))
         return false;
@@ -199,7 +199,7 @@ bool CUIXmlInitBase::InitTextWnd(CUIXml& xml_doc, const char* path, int index, C
     string256 buf;
     InitText(xml_doc, strconcat(sizeof(buf), buf, path, ":text"), index, &pWnd->TextItemControl());
 
-    const char* str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
+    LPCSTR str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
     int flag_cyclic = xml_doc.ReadAttribInt(path, index, "la_cyclic", 1);
     int flag_alpha = xml_doc.ReadAttribInt(path, index, "la_alpha", 0);
 
@@ -222,14 +222,14 @@ bool CUIXmlInitBase::InitTextWnd(CUIXml& xml_doc, const char* path, int index, C
 
 }
 
-bool CUIXmlInitBase::InitCheck(CUIXml& xml_doc, const char* path, int index, CUICheckButton* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitCheck(CUIXml& xml_doc, LPCSTR path, int index, CUICheckButton* pWnd, bool fatal /*= true*/)
 {
     if (!InitStatic(xml_doc, path, index, pWnd, fatal))
         return false;
 
     string256 buf;
     strconcat(sizeof(buf), buf, path, ":texture");
-    const char* texture = xml_doc.Read(buf, index, "ui_checker");
+    LPCSTR texture = xml_doc.Read(buf, index, "ui_checker");
 
     pWnd->InitCheckButton(pWnd->GetWndPos(), pWnd->GetWndSize(), texture);
 
@@ -267,7 +267,7 @@ bool CUIXmlInitBase::InitCheck(CUIXml& xml_doc, const char* path, int index, CUI
     return true;
 }
 
-bool CUIXmlInitBase::InitSpin(CUIXml& xml_doc, const char* path, int index, CUICustomSpin* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitSpin(CUIXml& xml_doc, LPCSTR path, int index, CUICustomSpin* pWnd, bool fatal /*= true*/)
 {
     if (!InitWindow(xml_doc, path, index, pWnd, fatal))
         return false;
@@ -293,7 +293,7 @@ bool CUIXmlInitBase::InitSpin(CUIXml& xml_doc, const char* path, int index, CUIC
     return true;
 }
 
-bool CUIXmlInitBase::InitText(CUIXml& xml_doc, const char* path, int index, CUIStatic* pWnd)
+bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd)
 {
     if (!xml_doc.NavigateToNode(path, index))
         return false;
@@ -301,7 +301,7 @@ bool CUIXmlInitBase::InitText(CUIXml& xml_doc, const char* path, int index, CUIS
     return InitText(xml_doc, path, index, pWnd->TextItemControl());
 }
 
-bool CUIXmlInitBase::InitText(CUIXml& xml_doc, const char* path, int index, CUILines* pLines)
+bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines* pLines)
 {
     if (!xml_doc.NavigateToNode(path, index))
         return false;
@@ -346,7 +346,7 @@ bool CUIXmlInitBase::InitText(CUIXml& xml_doc, const char* path, int index, CUIL
     return true;
 }
 
-bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, const char* path, int index, CUI3tButton* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButton* pWnd, bool fatal /*= true*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);
     if (!nodeExist)
@@ -398,7 +398,7 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, const char* path, int index, 
     InitTextureOffset(xml_doc, path, index, pWnd);
     InitSound(xml_doc, path, index, pWnd);
 
-    const char* accel = xml_doc.ReadAttrib(path, index, "accel", NULL);
+    LPCSTR accel = xml_doc.ReadAttrib(path, index, "accel", NULL);
     if (accel)
     {
         int acc = KeynameToDik(accel);
@@ -411,14 +411,14 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, const char* path, int index, 
         pWnd->SetAccelerator(acc, 1);
     }
 
-    const char* text_hint = xml_doc.ReadAttrib(path, index, "hint", NULL);
+    LPCSTR text_hint = xml_doc.ReadAttrib(path, index, "hint", NULL);
     if (text_hint)
         pWnd->m_hint_text = gStringTable->translate(text_hint);
 
     return true;
 }
 
-bool CUIXmlInitBase::InitSound(CUIXml& xml_doc, const char* path, int index, CUI3tButton* pWnd)
+bool CUIXmlInitBase::InitSound(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButton* pWnd)
 {
     string256 sound_h;
     string256 sound_t;
@@ -437,7 +437,7 @@ bool CUIXmlInitBase::InitSound(CUIXml& xml_doc, const char* path, int index, CUI
     return true;
 }
 
-bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, const char* path, int index, CUIProgressBar* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CUIProgressBar* pWnd, bool fatal /*= true*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);
     if (!nodeExist)
@@ -460,7 +460,7 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, const char* path, int inde
 
     CUIProgressBar::EOrientMode mode = CUIProgressBar::om_vert;
     int mode_horz = xml_doc.ReadAttribInt(path, index, "horz", 0);
-    const char* mode_str = xml_doc.ReadAttrib(path, index, "mode");
+    LPCSTR mode_str = xml_doc.ReadAttrib(path, index, "mode");
     if (mode_horz == 1) // om_horz
     {
         mode = CUIProgressBar::om_horz;
@@ -543,7 +543,7 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, const char* path, int inde
     return true;
 }
 
-bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, const char* path, int index, CUIProgressShape* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, CUIProgressShape* pWnd, bool fatal /*= true*/)
 {
     if (!InitStatic(xml_doc, path, index, pWnd, fatal))
         return false;
@@ -581,7 +581,7 @@ bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, const char* path, int in
     return true;
 }
 
-void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, const char* path, int index, CUIWindow* pParentWnd)
+void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pParentWnd)
 {
     XML_NODE _stored_root = xml_doc.GetLocalRoot();
     xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
@@ -598,7 +598,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, const char* path, int 
 
     while (node)
     {
-        const char* node_name = node->Value();
+        LPCSTR node_name = node->Value();
         if (0 == xr_stricmp(node_name, "auto_static"))
         {
             CUIStatic* pUIStatic = new CUIStatic();
@@ -644,7 +644,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, const char* path, int 
     xml_doc.SetLocalRoot(_stored_root);
 }
 
-void CUIXmlInitBase::InitAutoFrameLineGroup(CUIXml& xml_doc, const char* path, int index, CUIWindow* pParentWnd)
+void CUIXmlInitBase::InitAutoFrameLineGroup(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pParentWnd)
 {
     int items_num = xml_doc.GetNodesNum(path, index, "auto_frameline");
     if (items_num == 0)
@@ -670,11 +670,11 @@ void CUIXmlInitBase::InitAutoFrameLineGroup(CUIXml& xml_doc, const char* path, i
     xml_doc.SetLocalRoot(_stored_root);
 }
 
-bool CUIXmlInitBase::InitFont(CUIXml& xml_doc, const char* path, int index, u32& color, CGameFont*& pFnt)
+bool CUIXmlInitBase::InitFont(CUIXml& xml_doc, LPCSTR path, int index, u32& color, CGameFont*& pFnt)
 {
     color = GetColor(xml_doc, path, index, 0xff);
 
-    const char* font_name = xml_doc.ReadAttrib(path, index, "font", NULL);
+    LPCSTR font_name = xml_doc.ReadAttrib(path, index, "font", NULL);
     if (!font_name)
     {
         pFnt = NULL;
@@ -735,7 +735,7 @@ bool CUIXmlInitBase::InitFont(CUIXml& xml_doc, const char* path, int index, u32&
     return true;
 }
 
-bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, const char* path, int index, CUITabControl* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUITabControl* pWnd, bool fatal /*= true*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);
     if (!nodeExist)
@@ -778,7 +778,7 @@ bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, const char* path, int index
 
 //////////////////////////////////////////////////////////////////////////
 
-bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, const char* path, int index, CUIFrameLineWnd* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUIFrameLineWnd* pWnd, bool fatal /*= true*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);
     if (!nodeExist)
@@ -819,7 +819,7 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, const char* path, int index,
     return pWnd->InitFrameLineWnd(*base_name, pos, size, !vertical, fatal);
 }
 
-bool CUIXmlInitBase::InitTextFrameLine(CUIXml& xml_doc, const char* path, int index, CUITextFrameLineWnd* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitTextFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUITextFrameLineWnd* pWnd, bool fatal /*= true*/)
 {
     string256 buf;
     strconcat(sizeof(buf), buf, path, ":title");
@@ -828,7 +828,7 @@ bool CUIXmlInitBase::InitTextFrameLine(CUIXml& xml_doc, const char* path, int in
     return InitFrameLine(xml_doc, path, index, &pWnd->m_frameline, fatal);
 }
 
-bool CUIXmlInitBase::InitCustomEdit(CUIXml& xml_doc, const char* path, int index, CUICustomEdit* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitCustomEdit(CUIXml& xml_doc, LPCSTR path, int index, CUICustomEdit* pWnd, bool fatal /*= true*/)
 {
     if (!InitStatic(xml_doc, path, index, pWnd, fatal))
         return false;
@@ -865,7 +865,7 @@ bool CUIXmlInitBase::InitCustomEdit(CUIXml& xml_doc, const char* path, int index
     return true;
 }
 
-bool CUIXmlInitBase::InitEditBox(CUIXml& xml_doc, const char* path, int index, CUIEditBox* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitEditBox(CUIXml& xml_doc, LPCSTR path, int index, CUIEditBox* pWnd, bool fatal /*= true*/)
 {
     if (!InitCustomEdit(xml_doc, path, index, pWnd))
         return false;
@@ -878,7 +878,7 @@ bool CUIXmlInitBase::InitEditBox(CUIXml& xml_doc, const char* path, int index, C
 
 //////////////////////////////////////////////////////////////////////////
 
-bool CUIXmlInitBase::InitAnimatedStatic(CUIXml& xml_doc, const char* path, int index, CUIAnimatedStatic* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitAnimatedStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIAnimatedStatic* pWnd, bool fatal /*= true*/)
 {
     if (!InitStatic(xml_doc, path, index, pWnd, fatal))
         return false;
@@ -906,13 +906,13 @@ bool CUIXmlInitBase::InitAnimatedStatic(CUIXml& xml_doc, const char* path, int i
     return true;
 }
 
-bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, const char* path, int index, ITextureOwner* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOwner* pWnd, bool fatal /*= true*/)
 {
     bool result = true;
 
     string256 buf;
-    const char* texture = NULL;
-    const char* shader = NULL;
+    LPCSTR texture = NULL;
+    LPCSTR shader = NULL;
     strconcat(sizeof(buf), buf, path, ":texture");
     if (xml_doc.NavigateToNode(buf))
     {
@@ -945,7 +945,7 @@ bool CUIXmlInitBase::InitTexture(CUIXml& xml_doc, const char* path, int index, I
     return result;
 }
 
-bool CUIXmlInitBase::InitTextureOffset(CUIXml& xml_doc, const char* path, int index, CUIStatic* pWnd)
+bool CUIXmlInitBase::InitTextureOffset(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd)
 {
     string256 textureOffset;
     if (0 == xr_strcmp(path, ""))
@@ -961,7 +961,7 @@ bool CUIXmlInitBase::InitTextureOffset(CUIXml& xml_doc, const char* path, int in
     return true;
 }
 
-bool CUIXmlInitBase::InitMultiTexture(CUIXml& xml_doc, const char* path, int index, CUI3tButton* pWnd)
+bool CUIXmlInitBase::InitMultiTexture(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButton* pWnd)
 {
     string256 buff;
     bool success = false;
@@ -1117,7 +1117,7 @@ void CUIXmlInitBase::InitColorDefs()
     }
 }
 
-bool CUIXmlInitBase::InitScrollView(CUIXml& xml_doc, const char* path, int index, CUIScrollView* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUIScrollView* pWnd, bool fatal /*= true*/)
 {
     if (!InitWindow(xml_doc, path, index, pWnd, fatal))
         return false;
@@ -1224,7 +1224,7 @@ bool CUIXmlInitBase::InitListWnd(CUIXml& xml_doc, pcstr path, int index, CUIList
     return true;
 }
 
-bool CUIXmlInitBase::InitListBox(CUIXml& xml_doc, const char* path, int index, CUIListBox* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitListBox(CUIXml& xml_doc, LPCSTR path, int index, CUIListBox* pWnd, bool fatal /*= true*/)
 {
     if (!InitScrollView(xml_doc, path, index, pWnd))
         return false;
@@ -1243,7 +1243,7 @@ bool CUIXmlInitBase::InitListBox(CUIXml& xml_doc, const char* path, int index, C
     return true;
 }
 
-bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, const char* path, int index, CUITrackBar* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, LPCSTR path, int index, CUITrackBar* pWnd, bool fatal /*= true*/)
 {
     if (!InitWindow(xml_doc, path, 0, pWnd, fatal))
         return false;
@@ -1294,7 +1294,7 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, const char* path, int index, 
     return true;
 }
 
-bool CUIXmlInitBase::InitComboBox(CUIXml& xml_doc, const char* path, int index, CUIComboBox* pWnd)
+bool CUIXmlInitBase::InitComboBox(CUIXml& xml_doc, LPCSTR path, int index, CUIComboBox* pWnd)
 {
     u32 color;
     CGameFont* pFont;
@@ -1333,10 +1333,10 @@ bool CUIXmlInitBase::InitComboBox(CUIXml& xml_doc, const char* path, int index, 
     return true;
 }
 
-void CUIXmlInitBase::AssignColor(const char* name, u32 clr) { (*m_pColorDefs)[name] = clr; }
-u32 CUIXmlInitBase::GetColor(CUIXml& xml_doc, const char* path, int index, u32 def_clr)
+void CUIXmlInitBase::AssignColor(LPCSTR name, u32 clr) { (*m_pColorDefs)[name] = clr; }
+u32 CUIXmlInitBase::GetColor(CUIXml& xml_doc, LPCSTR path, int index, u32 def_clr)
 {
-    const char* clr_def = xml_doc.ReadAttrib(path, index, "color", NULL);
+    LPCSTR clr_def = xml_doc.ReadAttrib(path, index, "color", NULL);
     if (clr_def)
     {
         VERIFY(GetColorDefs()->find(clr_def) != GetColorDefs()->end());

@@ -12,11 +12,11 @@
 #define CEvaluator CPropertyEvaluator<_object_type>
 
 TEMPLATE_SPECIALIZATION
-IC CEvaluator::CPropertyEvaluator(_object_type* object, const char* evaluator_name) { init(object, evaluator_name); }
+IC CEvaluator::CPropertyEvaluator(_object_type* object, LPCSTR evaluator_name) { init(object, evaluator_name); }
 TEMPLATE_SPECIALIZATION
 IC CEvaluator::~CPropertyEvaluator() {}
 TEMPLATE_SPECIALIZATION
-IC void CEvaluator::init(_object_type* object, const char* evaluator_name)
+IC void CEvaluator::init(_object_type* object, LPCSTR evaluator_name)
 {
     m_object = object;
 #if 1//def LOG_ACTION //Alundaio: m_evaluator_name
@@ -33,7 +33,7 @@ void CEvaluator::setup(_object_type* object, CPropertyStorage* storage)
 }
 
 TEMPLATE_SPECIALIZATION
-void CEvaluator::Load(const char* section) {}
+void CEvaluator::Load(LPCSTR section) {}
 TEMPLATE_SPECIALIZATION
 typename CEvaluator::_value_type CEvaluator::evaluate() { return (0); }
 TEMPLATE_SPECIALIZATION

@@ -348,7 +348,7 @@ ICF void BeginStream(const ref_geom& hGeom, u32& w_offset, FVF::LIT*& w_verts, F
 }
 
 ICF u32 FlushStream(
-    ref_geom hGeom, ref_shader shader, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start, bool bSuppressCull)
+    ref_geom hGeom, ref_shader shader, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start, BOOL bSuppressCull)
 {
     u32 w_count = u32(w_verts - w_start);
     RCache.Vertex.Unlock(w_count, hGeom->vb_stride);

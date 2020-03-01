@@ -68,11 +68,11 @@ public:
     };
 
 private:
-    char* s_name_replace;
+    LPSTR s_name_replace;
 
 public:
-    bool net_Ready;
-    bool net_Processed; // Internal flag for connectivity-graph
+    BOOL net_Ready;
+    BOOL net_Processed; // Internal flag for connectivity-graph
 
     u16 m_wVersion;
     u16 m_script_version;
@@ -113,12 +113,12 @@ public:
 
     //////////////////////////////////////////////////////////////////////////
 
-    CSE_Abstract(const char* caSection);
+    CSE_Abstract(LPCSTR caSection);
     virtual ~CSE_Abstract();
     virtual void OnEvent(NET_Packet& /*tNetPacket*/, u16 /*type*/, u32 /*time*/, ClientID /*sender*/){}
 #ifndef XRGAME_EXPORTS
-    virtual void FillProps(const char* pref, PropItemVec& items);
-    virtual void __stdcall FillProp(const char* pref, PropItemVec& items);
+    virtual void FillProps(LPCSTR pref, PropItemVec& items);
+    virtual void __stdcall FillProp(LPCSTR pref, PropItemVec& items);
     virtual void __stdcall on_render(CDUInterface* /*du*/, IServerEntityLEOwner* /*owner*/, bool /*bSelected*/,
         const Fmatrix& /*parent*/, int /*priority*/, bool /*strictB2F*/)
     {
@@ -127,14 +127,14 @@ public:
     virtual u32 __stdcall visual_collection_size() const { return 0; }
     virtual void __stdcall set_additional_info(void* /*info*/) {};
 #endif // #ifndef XRGAME_EXPORTS
-    virtual bool Net_Relevant() { return FALSE; } // !!!! WARNING!!!
+    virtual BOOL Net_Relevant() { return FALSE; } // !!!! WARNING!!!
     //
-    virtual void __stdcall Spawn_Write(NET_Packet& tNetPacket, bool bLocal);
-    virtual bool __stdcall Spawn_Read(NET_Packet& tNetPacket);
-    virtual const char* __stdcall name() const;
-    virtual const char* __stdcall name_replace() const;
-    virtual void __stdcall set_name(const char* s) { s_name = s; }
-    virtual void __stdcall set_name_replace(const char* s)
+    virtual void __stdcall Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal);
+    virtual BOOL __stdcall Spawn_Read(NET_Packet& tNetPacket);
+    virtual LPCSTR __stdcall name() const;
+    virtual LPCSTR __stdcall name_replace() const;
+    virtual void __stdcall set_name(LPCSTR s) { s_name = s; }
+    virtual void __stdcall set_name_replace(LPCSTR s)
     {
         xr_free(s_name_replace);
         s_name_replace = xr_strdup(s);

@@ -78,8 +78,8 @@ protected:
     bool m_bStopAtEndAnimIsRunning;
 
 public:
-    virtual void Load(const char* section);
-    virtual bool net_Spawn(CSE_Abstract* DC) { return TRUE; };
+    virtual void Load(LPCSTR section);
+    virtual BOOL net_Spawn(CSE_Abstract* DC) { return TRUE; };
     virtual void net_Destroy(){};
     virtual void OnEvent(NET_Packet& P, u16 type);
 
@@ -88,14 +88,14 @@ public:
     virtual void OnH_B_Independent(bool just_before_destroy);
     virtual void OnH_A_Independent();
 
-    virtual void PlaySound(const char* alias, const Fvector& position);
+    virtual void PlaySound(LPCSTR alias, const Fvector& position);
     virtual void PlaySound(pcstr alias, const Fvector& position, u8 index); //Alundaio: Play at index
     virtual bool Action(u16 cmd, u32 flags) { return false; }
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 
     virtual u8 GetCurrentHudOffsetIdx() { return 0; }
-    bool GetHUDmode();
-    IC bool IsPending() const { return !!m_huditem_flags.test(fl_pending); }
+    BOOL GetHUDmode();
+    IC BOOL IsPending() const { return !!m_huditem_flags.test(fl_pending); }
     virtual bool ActivateItem();
     virtual void DeactivateItem();
     virtual void SendDeactivateItem();
@@ -127,18 +127,18 @@ public:
 
     virtual void UpdateXForm() = 0;
 
-    u32 PlayHUDMotion(const shared_str& M, bool bMixIn, CHudItem* W, u32 state);
-    u32 PlayHUDMotion(const shared_str& M, const shared_str& M2, bool bMixIn, CHudItem* W, u32 state);
-    u32 PlayHUDMotion_noCB(const shared_str& M, bool bMixIn);
+    u32 PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem* W, u32 state);
+    u32 PlayHUDMotion(const shared_str& M, const shared_str& M2, BOOL bMixIn, CHudItem* W, u32 state);
+    u32 PlayHUDMotion_noCB(const shared_str& M, BOOL bMixIn);
     void StopCurrentAnimWithoutCallback();
 
-    IC void RenderHud(bool B) { m_huditem_flags.set(fl_renderhud, B); }
-    IC bool RenderHud() { return m_huditem_flags.test(fl_renderhud); }
+    IC void RenderHud(BOOL B) { m_huditem_flags.set(fl_renderhud, B); }
+    IC BOOL RenderHud() { return m_huditem_flags.test(fl_renderhud); }
     attachable_hud_item* HudItemData();
     virtual void on_a_hud_attach();
     virtual void on_b_hud_detach();
-    IC bool HudInertionEnabled() const { return m_huditem_flags.test(fl_inertion_enable); }
-    IC bool HudInertionAllowed() const { return m_huditem_flags.test(fl_inertion_allow); }
+    IC BOOL HudInertionEnabled() const { return m_huditem_flags.test(fl_inertion_enable); }
+    IC BOOL HudInertionAllowed() const { return m_huditem_flags.test(fl_inertion_allow); }
     virtual float GetInertionFactor() { return 1.f; }; //--#SM+#--
     virtual float GetInertionPowerFactor() { return 1.f; }; //--#SM+#--
     virtual void render_hud_mode(){};
@@ -147,15 +147,15 @@ public:
     virtual bool render_item_3d_ui_query() { return false; }
     virtual bool CheckCompatibility(CHudItem*) { return true; }
 protected:
-    IC void SetPending(bool H) { m_huditem_flags.set(fl_pending, H); }
+    IC void SetPending(BOOL H) { m_huditem_flags.set(fl_pending, H); }
     shared_str hud_sect;
 
     //кадры момента пересчета XFORM и FirePos
     u32 dwFP_Frame;
     u32 dwXF_Frame;
 
-    IC void EnableHudInertion(bool B) { m_huditem_flags.set(fl_inertion_enable, B); }
-    IC void AllowHudInertion(bool B) { m_huditem_flags.set(fl_inertion_allow, B); }
+    IC void EnableHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_enable, B); }
+    IC void AllowHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_allow, B); }
     u32 m_animation_slot;
 
     HUD_SOUND_COLLECTION m_sounds;

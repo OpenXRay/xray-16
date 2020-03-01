@@ -70,7 +70,7 @@ public:
     int GetMaxScrollPos();
     int GetCurrentScrollPos();
     void SetScrollPos(int value);
-    void SetScrollBarProfile(const char* profile);
+    void SetScrollBarProfile(LPCSTR profile);
     IC bool NeedShowScrollBar(); // no comment
     float GetHorizIndent(); // left + right indent
     float GetVertIndent(); // top + bottom indent

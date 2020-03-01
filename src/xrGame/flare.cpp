@@ -3,13 +3,13 @@
 #include "player_hud.h"
 #include "xrEngine/LightAnimLibrary.h"
 
-void CFlare::Load(const char* section)
+void CFlare::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_work_time_sec = pSettings->r_float(section, "work_time_sec");
 }
 
-bool CFlare::net_Spawn(CSE_Abstract* DC)
+BOOL CFlare::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     SwitchState(eFlareHidden);

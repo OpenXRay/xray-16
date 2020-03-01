@@ -49,13 +49,13 @@ return osvi.dwMajorVersion >= 6;
 }
 
 
-typedef bool (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, bool*);
+typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
 static bool isWow32()
 {
 LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle("kernel32"), "IsWow64Process");
 
-bool bIsWow64 = FALSE;
+BOOL bIsWow64 = FALSE;
 
 if (NULL != fnIsWow64Process)
 {

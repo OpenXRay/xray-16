@@ -26,7 +26,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> targ
     m_anim_storage[ma] = new_item;
 }
 
-void CControlAnimationBase::AddAnim(EMotionAnim ma, const char* tn, int s_id, SVelocityParam* vel, EPState p_s,
+void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s,
     std::pair<cpcstr, bool> fx_front, std::pair<cpcstr, bool> fx_back,
     std::pair<cpcstr, bool> fx_left, std::pair<cpcstr, bool> fx_right)
 {
@@ -53,8 +53,8 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, const char* tn, int s_id, SV
     m_anim_storage[ma] = new_item;
 }
 
-void CControlAnimationBase::AddAnim(EMotionAnim ma, const char* tn, int s_id, SVelocityParam* vel, EPState p_s,
-    const char* fx_front, const char* fx_back, const char* fx_left, const char* fx_right)
+void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s,
+    LPCSTR fx_front, LPCSTR fx_back, LPCSTR fx_left, LPCSTR fx_right)
 {
     SAnimItem* new_item = new SAnimItem();
 
@@ -77,7 +77,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, const char* tn, int s_id, SV
 }
 
 void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> target, int s_id, SVelocityParam* vel, EPState p_s,
-    const char* fx_front, const char* fx_back, const char* fx_left, const char* fx_right)
+    LPCSTR fx_front, LPCSTR fx_back, LPCSTR fx_left, LPCSTR fx_right)
 {
     SAnimItem* new_item = new SAnimItem();
 
@@ -130,7 +130,7 @@ void CControlAnimationBase::AddAnim2(EMotionAnim ma, std::pair<cpcstr, cpcstr> t
     m_anim_storage[ma] = new_item;
 }
 
-void CControlAnimationBase::AddAnim(EMotionAnim ma, const char* tn, int s_id, SVelocityParam* vel, EPState p_s)
+void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s)
 {
     SAnimItem* new_item = new SAnimItem();
 

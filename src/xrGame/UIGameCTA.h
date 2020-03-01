@@ -149,25 +149,25 @@ public:
 
     void SetReinforcementTimes(u32 curTime, u32 maxTime);
 
-    virtual void ChangeTotalMoneyIndicator(const char* newMoneyString);
-    virtual void DisplayMoneyChange(const char* deltaMoney);
+    virtual void ChangeTotalMoneyIndicator(LPCSTR newMoneyString);
+    virtual void DisplayMoneyChange(LPCSTR deltaMoney);
     virtual void DisplayMoneyBonus(KillMessageStruct* bonus);
 
     void SetRank(ETeam team, u8 rank);
     void SetScore(s32 max_score, s32 greenTeamScore, s32 blueTeamScore);
 
-    void SetRoundResultCaption(const char* str);
-    void SetPressBuyMsgCaption(const char* str);
-    void SetPressJumpMsgCaption(const char* str);
-    void SetSpectatorMsgCaption(const char* str);
-    void SetSpectrModeMsgCaption(const char* str);
-    void SetWarmUpCaption(const char* str);
-    void SetTimeMsgCaption(const char* str);
-    void SetDemoPlayCaption(const char* str);
+    void SetRoundResultCaption(LPCSTR str);
+    void SetPressBuyMsgCaption(LPCSTR str);
+    void SetPressJumpMsgCaption(LPCSTR str);
+    void SetSpectatorMsgCaption(LPCSTR str);
+    void SetSpectrModeMsgCaption(LPCSTR str);
+    void SetWarmUpCaption(LPCSTR str);
+    void SetTimeMsgCaption(LPCSTR str);
+    void SetDemoPlayCaption(LPCSTR str);
     void ResetCaptions();
 
-    void SetVoteMessage(const char* str);
-    void SetVoteTimeResultMsg(const char* str);
+    void SetVoteMessage(LPCSTR str);
+    void SetVoteTimeResultMsg(LPCSTR str);
 };
 
 #endif

@@ -28,17 +28,17 @@ SCRIPT_EXPORT(CPatrolPathParams, (), {
                           value("next", int(ePatrolStartTypeNext)), value("dummy", int(ePatrolStartTypeDummy))]
                       .enum_("stop")[value("stop", int(ePatrolRouteTypeStop)),
                           value("continue", int(ePatrolRouteTypeContinue)), value("dummy", int(ePatrolRouteTypeDummy))]
-                      .def(constructor<const char*>())
-                      .def(constructor<const char*, EPatrolStartType>())
-                      .def(constructor<const char*, EPatrolStartType, EPatrolRouteType>())
-                      .def(constructor<const char*, EPatrolStartType, EPatrolRouteType, bool>())
-                      .def(constructor<const char*, EPatrolStartType, EPatrolRouteType, bool, u32>())
+                      .def(constructor<LPCSTR>())
+                      .def(constructor<LPCSTR, EPatrolStartType>())
+                      .def(constructor<LPCSTR, EPatrolStartType, EPatrolRouteType>())
+                      .def(constructor<LPCSTR, EPatrolStartType, EPatrolRouteType, bool>())
+                      .def(constructor<LPCSTR, EPatrolStartType, EPatrolRouteType, bool, u32>())
                       .def("count", &CPatrolPathParams::count)
                       .def("level_vertex_id", &CPatrolPathParams::level_vertex_id)
                       .def("game_vertex_id", &CPatrolPathParams::game_vertex_id)
                       .def("point", &CPatrolPathParams__point)
                       .def("name", &CPatrolPathParams::name)
-                      .def("index", (u32(CPatrolPathParams::*)(const char*) const)(&CPatrolPathParams::point))
+                      .def("index", (u32(CPatrolPathParams::*)(LPCSTR) const)(&CPatrolPathParams::point))
                       .def("get_nearest", (u32(CPatrolPathParams::*)(const Fvector&) const)(&CPatrolPathParams::point))
                       .def("flag", &CPatrolPathParams::flag)
                       .def("flags", &CPatrolPathParams::flags)

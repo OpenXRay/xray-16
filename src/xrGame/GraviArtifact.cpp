@@ -42,7 +42,7 @@ CGraviArtefact::CGraviArtefact(void)
 }
 
 CGraviArtefact::~CGraviArtefact(void) {}
-void CGraviArtefact::Load(const char* section)
+void CGraviArtefact::Load(LPCSTR section)
 {
     inherited::Load(section);
 

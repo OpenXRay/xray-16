@@ -10,7 +10,7 @@
 
 CExplosiveItem::CExplosiveItem(void) {}
 CExplosiveItem::~CExplosiveItem(void) {}
-void CExplosiveItem::Load(const char* section)
+void CExplosiveItem::Load(LPCSTR section)
 {
     inherited::Load(section);
     CExplosive::Load(section);

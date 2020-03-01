@@ -57,7 +57,7 @@ public:
         cpoint.clear();
     }
 
-    bool push(SMAP_Rect& R, u32 _size)
+    BOOL push(SMAP_Rect& R, u32 _size)
     {
         VERIFY (_size<=psize && _size>4);
 
@@ -77,7 +77,7 @@ public:
             R.setup(cpoint[it], _size);
             if (R.max.x >= int(psize)) continue;
             if (R.max.y >= int(psize)) continue;
-            bool bIntersect = false;
+            BOOL bIntersect = false;
             for (u32 t = 0; t < stack.size(); t++)
                 if (stack[t].intersect(R))
                 {

@@ -4,7 +4,7 @@
 #include "dx10StateCache.h"
 
 dx10State::dx10State()
-    : m_pRasterizerState(0), m_pDepthStencilState(0), m_pBlendState(0), m_uiStencilRef(unsigned int(-1)), m_uiAlphaRef(0)
+    : m_pRasterizerState(0), m_pDepthStencilState(0), m_pBlendState(0), m_uiStencilRef(UINT(-1)), m_uiAlphaRef(0)
 {
 }
 
@@ -62,8 +62,8 @@ HRESULT dx10State::Apply()
     SSManager.CSApplySamplers(m_CSSamplers);
 #endif
 
-    //	static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
-    //	static const unsigned int SampleMask = 0xffffffff;
+    //	static const FLOAT BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
+    //	static const UINT SampleMask = 0xffffffff;
 
     //	VERIFY(m_pRasterizerState);
     //	HW.pDevice->RSSetState(m_pRasterizerState);

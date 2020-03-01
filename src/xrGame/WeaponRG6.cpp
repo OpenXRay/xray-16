@@ -11,9 +11,9 @@
 #endif
 
 CWeaponRG6::~CWeaponRG6() {}
-bool CWeaponRG6::net_Spawn(CSE_Abstract* DC)
+BOOL CWeaponRG6::net_Spawn(CSE_Abstract* DC)
 {
-    bool l_res = inheritedSG::net_Spawn(DC);
+    BOOL l_res = inheritedSG::net_Spawn(DC);
     if (!l_res)
         return l_res;
 
@@ -37,7 +37,7 @@ bool CWeaponRG6::net_Spawn(CSE_Abstract* DC)
     return l_res;
 };
 
-void CWeaponRG6::Load(const char* section)
+void CWeaponRG6::Load(LPCSTR section)
 {
     inheritedRL::Load(section);
     inheritedSG::Load(section);
@@ -80,7 +80,7 @@ void CWeaponRG6::FireStart()
             setEnabled(FALSE);
 
             collide::rq_result RQ;
-            bool HasPick = Level().ObjectSpace.RayPick(p1, d, 300.0f, collide::rqtStatic, RQ, this);
+            BOOL HasPick = Level().ObjectSpace.RayPick(p1, d, 300.0f, collide::rqtStatic, RQ, this);
 
             setEnabled(TRUE);
             H_Parent()->setEnabled(TRUE);

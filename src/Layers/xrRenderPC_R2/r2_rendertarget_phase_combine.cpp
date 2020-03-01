@@ -56,7 +56,7 @@ void CRenderTarget::phase_combine()
     u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
     RCache.set_Stencil(FALSE);
 
-    bool split_the_scene_to_minimize_wait = FALSE;
+    BOOL split_the_scene_to_minimize_wait = FALSE;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))
         split_the_scene_to_minimize_wait = TRUE;
 
@@ -239,7 +239,7 @@ void CRenderTarget::phase_combine()
     phase_bloom(); // HDR RT invalidated here
 
     // Distortion filter
-    bool bDistort = RImplementation.o.distortion_enabled; // This can be modified
+    BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
     {
         if ((0 == RImplementation.mapDistort.size()) && !_menu_pp)
             bDistort = FALSE;
@@ -258,7 +258,7 @@ void CRenderTarget::phase_combine()
 
     // PP enabled ?
     //  Render to RT texture to be able to copy RT even in windowed mode.
-    bool PP_Complex = u_need_PP() | (bool)RImplementation.m_bMakeAsyncSS;
+    BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
     if (_menu_pp)
         PP_Complex = FALSE;
 

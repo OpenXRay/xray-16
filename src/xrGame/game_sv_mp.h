@@ -75,9 +75,9 @@ protected:
     virtual void SetSkin(CSE_Abstract* E, u16 Team, u16 ID);
     bool GetPosAngleFromActor(ClientID id, Fvector& Pos, Fvector& Angle);
     void AllowDeadBodyRemove(ClientID id, u16 GameID);
-    void SpawnWeapon4Actor(u16 actorId, const char* N, u8 Addons, game_PlayerState::PLAYER_ITEMS_LIST& playerItems);
+    void SpawnWeapon4Actor(u16 actorId, LPCSTR N, u8 Addons, game_PlayerState::PLAYER_ITEMS_LIST& playerItems);
     virtual bool CanChargeFreeAmmo(char const* ammo_section) { return false; };
-    // void				SpawnWeaponForActor		(u16 actorId,  const char* N, bool isScope, bool isGrenadeLauncher, bool
+    // void				SpawnWeaponForActor		(u16 actorId,  LPCSTR N, bool isScope, bool isGrenadeLauncher, bool
     // isSilencer);
     void SetCanOpenBuyMenu(ClientID id);
 
@@ -85,16 +85,16 @@ protected:
     typedef std::pair<shared_str, u16> ammo_diff_t;
     virtual void SetAmmoForWeapon(CSE_ALifeItemWeapon* weapon, u8 Addons,
         game_PlayerState::PLAYER_ITEMS_LIST& playerItems, ammo_diff_t& ammo_diff);
-    void ChargeAmmo(CSE_ALifeItemWeapon* weapon, const char* ammo_string, game_PlayerState::PLAYER_ITEMS_LIST& playerItems,
+    void ChargeAmmo(CSE_ALifeItemWeapon* weapon, LPCSTR ammo_string, game_PlayerState::PLAYER_ITEMS_LIST& playerItems,
         ammo_diff_t& ammo_diff);
     void ChargeGrenades(
-        CSE_ALifeItemWeapon* weapon, const char* grenades_string, game_PlayerState::PLAYER_ITEMS_LIST& playerItems);
+        CSE_ALifeItemWeapon* weapon, LPCSTR grenades_string, game_PlayerState::PLAYER_ITEMS_LIST& playerItems);
     void SpawnAmmoDifference(u16 actorId, ammo_diff_t const& ammo_diff);
     // ----------------
 
     //	virtual		bool				GetTeamItem_ByID		(WeaponDataStruct** pRes, TEAM_WPN_LIST* pWpnList, u16
     // ItemID);
-    //	virtual		bool				GetTeamItem_ByName		(WeaponDataStruct** pRes,TEAM_WPN_LIST* pWpnList, const char*
+    //	virtual		bool				GetTeamItem_ByName		(WeaponDataStruct** pRes,TEAM_WPN_LIST* pWpnList, LPCSTR
     // ItemName);
 
     virtual void Player_AddBonusMoney(game_PlayerState* ps, s32 MoneyAmount, SPECIAL_KILL_TYPE Reason, u8 Kill = 0);
@@ -136,7 +136,7 @@ public:
     virtual bool OnNextMap();
     virtual void OnPrevMap();
 
-    virtual void OnVoteStart(const char* VoteCommand, ClientID sender);
+    virtual void OnVoteStart(LPCSTR VoteCommand, ClientID sender);
     void SendActiveVotingTo(ClientID const& receiver);
     virtual bool IsVotingActive() { return m_bVotingActive; };
     virtual void SetVotingActive(bool Active) { m_bVotingActive = Active; };
@@ -196,7 +196,7 @@ public:
     async_statistics_collector m_async_stats;
     u32 m_async_stats_request_time;
 
-    void SvSendChatMessage(const char* str);
+    void SvSendChatMessage(LPCSTR str);
     bool IsPlayerBanned(char const* hexstr_digest, shared_str& by_who);
     IClient* BanPlayer(ClientID const& client_id, s32 ban_time_sec, xrClientData* initiator);
     void BanPlayerDirectly(char const* client_hex_digest, s32 ban_time_sec, xrClientData* initiator);
@@ -204,7 +204,7 @@ public:
     void PrintBanList(char const* filter);
 
 protected:
-    virtual void WriteGameState(CInifile& ini, const char* sect, bool bRoundResult);
+    virtual void WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult);
     bool CheckPlayerMapName(ClientID const& clientID, NET_Packet& P);
     void ReconnectPlayer(ClientID const& clientID);
 
@@ -215,9 +215,9 @@ protected:
     s32 ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vote_str, u32 new_vote_str_size);
 
 public:
-    virtual void WritePlayerStats(CInifile& ini, const char* sect, xrClientData* pCl);
+    virtual void WritePlayerStats(CInifile& ini, LPCSTR sect, xrClientData* pCl);
     virtual void Player_AddExperience(game_PlayerState* ps, float Exp);
     virtual void Player_ExperienceFin(game_PlayerState* ps);
     virtual void Player_AddMoney(game_PlayerState* ps, s32 MoneyAmount);
-    void SpawnPlayer(ClientID id, const char* N);
+    void SpawnPlayer(ClientID id, LPCSTR N);
 };

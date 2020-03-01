@@ -115,7 +115,7 @@ private:
     static void FormatLastError(char* buffer, const size_t& bufferSize);
     static void SetupExceptionHandler();
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
-    static void WINAPI PreErrorHandler(intptr_t);
+    static void WINAPI PreErrorHandler(INT_PTR);
 #if defined(WINDOWS)
     static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
     static bool GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr);
@@ -126,7 +126,7 @@ private:
 
 // forward declaration
 // Definition is in xrCore/_std_extensions.h
-inline int __cdecl xr_sprintf(char* destination, size_t const buffer_size, const char* format_string, ...);
+inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...);
 
 // for debug purposes only
 template<typename... Args>

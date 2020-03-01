@@ -12,22 +12,22 @@ bool get_renderer_command_state(void)
     return renderer_allow_override;
 }
 
-int get_console_integer(CConsole* c, const char* cmd)
+int get_console_integer(CConsole* c, LPCSTR cmd)
 {
     int min = 0, max = 0;
     int val = c->GetInteger(cmd, min, max);
     return val;
 }
 
-float get_console_float(CConsole* c, const char* cmd)
+float get_console_float(CConsole* c, LPCSTR cmd)
 {
     float min = 0.0f, max = 0.0f;
     float val = c->GetFloat(cmd, min, max);
     return val;
 }
 
-bool get_console_bool(CConsole* c, const char* cmd) { return c->GetBool(cmd); }
-void execute_console_command_deferred(CConsole* c, const char* string_to_execute)
+bool get_console_bool(CConsole* c, LPCSTR cmd) { return c->GetBool(cmd); }
+void execute_console_command_deferred(CConsole* c, LPCSTR string_to_execute)
 {
     Engine.Event.Defer("KERNEL:console", size_t(xr_strdup(string_to_execute)));
 }

@@ -107,8 +107,8 @@ public:
     CEntityCondition(CEntityAlive* object);
     virtual ~CEntityCondition();
 
-    virtual void LoadCondition(const char* section);
-    virtual void LoadTwoHitsDeathParams(const char* section);
+    virtual void LoadCondition(LPCSTR section);
+    virtual void LoadTwoHitsDeathParams(LPCSTR section);
     virtual void remove_links(const IGameObject* object);
 
     virtual void save(NET_Packet& output_packet);
@@ -217,7 +217,7 @@ protected:
         float m_fV_Bleeding;
         float m_fV_WoundIncarnation;
         float m_fV_HealthRestore;
-        void load(const char* sect, const char* prefix);
+        void load(LPCSTR sect, LPCSTR prefix);
     };
 
     SConditionChangeV m_change_v;

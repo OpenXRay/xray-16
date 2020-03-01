@@ -14,7 +14,7 @@ public:
 typedef	xr_resorce_ptr<test_resource>	test_ptr;
 
 // the test itself
-bool	AAA_test		()
+BOOL	AAA_test		()
 {
     test_ptr	A		(new test_resource());
     test_ptr	B		= new test_resource	();

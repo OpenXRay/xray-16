@@ -21,17 +21,17 @@ protected:
 
 protected:
     string_path m_save_name;
-    const char* m_section;
+    LPCSTR m_section;
 
 private:
     void prepare_objects_for_save();
-    void load(void* buffer, const u32& buffer_size, const char* file_name);
+    void load(void* buffer, const u32& buffer_size, LPCSTR file_name);
 
 public:
-    IC CALifeStorageManager(IPureServer* server, const char* section);
+    IC CALifeStorageManager(IPureServer* server, LPCSTR section);
     virtual ~CALifeStorageManager();
-    bool load(const char* save_name = 0);
-    void save(const char* save_name = 0, bool update_name = true);
+    bool load(LPCSTR save_name = 0);
+    void save(LPCSTR save_name = 0, bool update_name = true);
     void save(NET_Packet& net_packet);
 };
 

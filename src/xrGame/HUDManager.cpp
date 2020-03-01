@@ -132,7 +132,7 @@ void CHUDManager::RenderActiveItemUI()
     g_player_hud->render_item_ui();
 }
 
-extern ENGINE_API bool bShowPauseString;
+extern ENGINE_API BOOL bShowPauseString;
 //отрисовка элементов интерфейса
 void CHUDManager::RenderUI()
 {
@@ -157,7 +157,7 @@ void CHUDManager::RenderUI()
     {
         CGameFont* pFont = UI().Font().pFontGraffiti50Russian;
         pFont->SetColor(0x80FF0000);
-        const char* _str = StringTable().translate("st_game_paused").c_str();
+        LPCSTR _str = StringTable().translate("st_game_paused").c_str();
 
         Fvector2 _pos;
         _pos.set(UI_BASE_WIDTH / 2.0f, UI_BASE_HEIGHT / 2.0f);
@@ -192,8 +192,8 @@ void CHUDManager::HitMarked(int idx, float power, const Fvector& dir)
 
 bool CHUDManager::AddGrenade_ForMark(CGrenade* grn) { return HitMarker.AddGrenade_ForMark(grn); }
 void CHUDManager::Update_GrenadeView(Fvector& pos_actor) { HitMarker.Update_GrenadeView(pos_actor); }
-void CHUDManager::SetHitmarkType(const char* tex_name) { HitMarker.InitShader(tex_name); }
-void CHUDManager::SetGrenadeMarkType(const char* tex_name) { HitMarker.InitShader_Grenade(tex_name); }
+void CHUDManager::SetHitmarkType(LPCSTR tex_name) { HitMarker.InitShader(tex_name); }
+void CHUDManager::SetGrenadeMarkType(LPCSTR tex_name) { HitMarker.InitShader_Grenade(tex_name); }
 // ------------------------------------------------------------------------------------
 
 #include "ui/UIMainIngameWnd.h"

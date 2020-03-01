@@ -79,7 +79,7 @@ public:
             Fmatrix combine;
             s32 minX, maxX;
             s32 minY, maxY;
-            bool transluent;
+            BOOL transluent;
         } D;
         struct _P
         {
@@ -96,7 +96,7 @@ public:
             u32 size;
             u32 posX;
             u32 posY;
-            bool transluent;
+            BOOL transluent;
         } S;
     } X;
 #endif //	(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
@@ -117,7 +117,7 @@ public:
     virtual void set_virtual_size(float R) { virtual_size = R; }
     virtual void set_color(const Fcolor& C) { color.set(C); }
     virtual void set_color(float r, float g, float b) { color.set(r, g, b, 1); }
-    virtual void set_texture(const char* name);
+    virtual void set_texture(LPCSTR name);
     virtual void set_hud_mode(bool b) { flags.bHudMode = b; }
     virtual bool get_hud_mode() { return flags.bHudMode; };
     virtual void spatial_move();

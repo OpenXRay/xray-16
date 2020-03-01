@@ -27,7 +27,7 @@
 // CStalkerActionRunToCover
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionRunToCover::CStalkerActionRunToCover(CAI_Stalker* object, const char* action_name)
+CStalkerActionRunToCover::CStalkerActionRunToCover(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -99,7 +99,7 @@ void CStalkerActionRunToCover::finalize() { inherited::finalize(); }
 // CStalkerActionWaitInCover
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionWaitInCover::CStalkerActionWaitInCover(CAI_Stalker* object, const char* action_name)
+CStalkerActionWaitInCover::CStalkerActionWaitInCover(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }

@@ -12,7 +12,7 @@
 
 CCameraFirstEye::CCameraFirstEye(IGameObject* p, u32 flags) : CCameraBase(p, flags), lookat_active(false) {}
 CCameraFirstEye::~CCameraFirstEye() {}
-void CCameraFirstEye::Load(const char* section)
+void CCameraFirstEye::Load(LPCSTR section)
 {
     inherited::Load(section);
     style = csFirstEye;

@@ -47,7 +47,7 @@ void CMPPlayersBag::OnEvent(NET_Packet& P, u16 type)
     }
 }
 
-extern signed int g_iWeaponRemove;
+extern INT g_iWeaponRemove;
 bool CMPPlayersBag::NeedToDestroyObject() const
 {
     if (GameID() == eGameIDSingle)

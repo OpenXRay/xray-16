@@ -22,12 +22,12 @@
 #define MAP_ICONS "ui" DELIMITER "ui_icons_map"
 #define MP_CHAR_ICONS "ui" DELIMITER "ui_models_multiplayer"
 
-const const char* relationsLtxSection = "game_relations";
-const const char* ratingField = "rating_names";
-const const char* reputationgField = "reputation_names";
-const const char* goodwillField = "goodwill_names";
+const LPCSTR relationsLtxSection = "game_relations";
+const LPCSTR ratingField = "rating_names";
+const LPCSTR reputationgField = "reputation_names";
+const LPCSTR goodwillField = "goodwill_names";
 
-const const char* st_months[12] = // StringTable for GetDateAsString()
+const LPCSTR st_months[12] = // StringTable for GetDateAsString()
     {"month_january", "month_february", "month_march", "month_april", "month_may", "month_june", "month_july",
         "month_august", "month_september", "month_october", "month_november", "month_december"};
 
@@ -240,8 +240,8 @@ const shared_str InventoryUtilities::GetGameTimeAsString(ETimePrecision timePrec
 const shared_str InventoryUtilities::GetTimeAndDateAsString(ALife::_TIME_ID time)
 {
     string256 buf;
-    const char* time_str = GetTimeAsString(time, etpTimeToMinutes).c_str();
-    const char* date_str = GetDateAsString(time, edpDateToDay).c_str();
+    LPCSTR time_str = GetTimeAsString(time, etpTimeToMinutes).c_str();
+    LPCSTR date_str = GetDateAsString(time, edpDateToDay).c_str();
     strconcat(sizeof(buf), buf, time_str, ", ", date_str);
     return buf;
 }
@@ -316,7 +316,7 @@ const shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID date, EDate
 
     split_time(date, year, month, day, hours, mins, secs, milisecs);
     VERIFY(1 <= month && month <= 12);
-    const char* month_str = StringTable().translate(st_months[month - 1]).c_str();
+    LPCSTR month_str = StringTable().translate(st_months[month - 1]).c_str();
 
     // Date
     switch (datePrec)
@@ -330,7 +330,7 @@ const shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID date, EDate
     return bufDate;
 }
 
-const char* InventoryUtilities::GetTimePeriodAsString(char* _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to)
+LPCSTR InventoryUtilities::GetTimePeriodAsString(LPSTR _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to)
 {
     u32 year1, month1, day1, hours1, mins1, secs1, milisecs1;
     u32 year2, month2, day2, hours2, mins2, secs2, milisecs2;
@@ -397,7 +397,7 @@ void InventoryUtilities::UpdateWeightStr(CUITextWnd& wnd, CUITextWnd& wnd_max, C
     float total = pInvOwner->inventory().CalcTotalWeight();
     float max = pInvOwner->MaxCarryWeight();
 
-    const char* kg_str = StringTable().translate("st_kg").c_str();
+    LPCSTR kg_str = StringTable().translate("st_kg").c_str();
     xr_sprintf(buf, "%.1f %s", total, kg_str);
     wnd.SetText(buf);
 
@@ -407,11 +407,11 @@ void InventoryUtilities::UpdateWeightStr(CUITextWnd& wnd, CUITextWnd& wnd_max, C
 
 //////////////////////////////////////////////////////////////////////////
 
-void LoadStrings(CharInfoStrings* container, const char* section, const char* field)
+void LoadStrings(CharInfoStrings* container, LPCSTR section, LPCSTR field)
 {
     R_ASSERT(container);
 
-    const char* cfgRecord = pSettings->r_string(section, field);
+    LPCSTR cfgRecord = pSettings->r_string(section, field);
     u32 count = _GetItemCount(cfgRecord);
     R_ASSERT3(count % 2, "there're must be an odd number of elements", field);
     string64 singleThreshold;
@@ -479,7 +479,7 @@ void InventoryUtilities::ClearCharacterInfoStrings()
 
 //////////////////////////////////////////////////////////////////////////
 
-const char* InventoryUtilities::GetRankAsText(CHARACTER_RANK_VALUE rankID)
+LPCSTR InventoryUtilities::GetRankAsText(CHARACTER_RANK_VALUE rankID)
 {
     InitCharacterInfoStrings();
     CharInfoStrings::const_iterator cit = charInfoRankStrings->upper_bound(rankID);
@@ -490,7 +490,7 @@ const char* InventoryUtilities::GetRankAsText(CHARACTER_RANK_VALUE rankID)
 
 //////////////////////////////////////////////////////////////////////////
 
-const char* InventoryUtilities::GetReputationAsText(CHARACTER_REPUTATION_VALUE rankID)
+LPCSTR InventoryUtilities::GetReputationAsText(CHARACTER_REPUTATION_VALUE rankID)
 {
     InitCharacterInfoStrings();
 
@@ -503,7 +503,7 @@ const char* InventoryUtilities::GetReputationAsText(CHARACTER_REPUTATION_VALUE r
 
 //////////////////////////////////////////////////////////////////////////
 
-const char* InventoryUtilities::GetGoodwillAsText(CHARACTER_GOODWILL goodwill)
+LPCSTR InventoryUtilities::GetGoodwillAsText(CHARACTER_GOODWILL goodwill)
 {
     InitCharacterInfoStrings();
 
@@ -517,7 +517,7 @@ const char* InventoryUtilities::GetGoodwillAsText(CHARACTER_GOODWILL goodwill)
 //////////////////////////////////////////////////////////////////////////
 // специальная функция для передачи info_portions при нажатии кнопок UI
 // (для tutorial)
-void InventoryUtilities::SendInfoToActor(const char* info_id)
+void InventoryUtilities::SendInfoToActor(LPCSTR info_id)
 {
     if (GameID() != eGameIDSingle)
         return;

@@ -7,11 +7,11 @@
 class DLL_EXP CxMemFile : public CxFile
 {
 public:
-	CxMemFile(unsigned char* pBuffer = NULL, unsigned int size = 0);
+	CxMemFile(BYTE* pBuffer = NULL, DWORD size = 0);
 	~CxMemFile();
 
 	bool Open();
-	unsigned char* GetBuffer(bool bDetachBuffer = true);
+	BYTE* GetBuffer(bool bDetachBuffer = true);
 
 	virtual bool	Close();
 	virtual size_t	Read(void *buffer, size_t size, size_t count);
@@ -28,11 +28,11 @@ public:
 	virtual long	Scanf(const char *format, void* output);
 
 protected:
-	bool	Alloc(unsigned int nBytes);
+	bool	Alloc(DWORD nBytes);
 	void	Free();
 
-	unsigned char*	m_pBuffer;
-	unsigned int	m_Size;
+	BYTE*	m_pBuffer;
+	DWORD	m_Size;
 	bool	m_bFreeOnClose;
 	long	m_Position;	//current position
 	long	m_Edge;		//buffer size

@@ -67,14 +67,14 @@ void CControl_Manager::init_external()
     //	it->second->init_external(this, m_object);
 }
 
-void CControl_Manager::load(const char* section)
+void CControl_Manager::load(LPCSTR section)
 {
     init_external();
 
     for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
         it->second->load(section);
 }
-void CControl_Manager::reload(const char* section)
+void CControl_Manager::reload(LPCSTR section)
 {
     for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
         it->second->reload(section);

@@ -23,8 +23,8 @@ public:
     void compile_3c(CBlender_Compile& C);
 
 public:
-    virtual const char* getComment() { return "LEVEL: (lmap+env*const)*base"; }
-    virtual bool canBeLMAPped() { return TRUE; }
+    virtual LPCSTR getComment() { return "LEVEL: (lmap+env*const)*base"; }
+    virtual BOOL canBeLMAPped() { return TRUE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

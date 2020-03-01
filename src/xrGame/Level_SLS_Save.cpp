@@ -3,7 +3,7 @@
 #include "Level.h"
 #include "xrServer.h"
 
-void CLevel::net_Save(const char* name) // Game Save
+void CLevel::net_Save(LPCSTR name) // Game Save
 {
     if (0 == Server)
     {

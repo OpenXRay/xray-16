@@ -1,7 +1,7 @@
 #include "xmemfile.h"
 
 //////////////////////////////////////////////////////////
-CxMemFile::CxMemFile(unsigned char* pBuffer, unsigned int size)
+CxMemFile::CxMemFile(BYTE* pBuffer, DWORD size)
 {
 	m_pBuffer = pBuffer;
 	m_Position = 0;
@@ -29,13 +29,13 @@ bool CxMemFile::Open()
 	if (m_pBuffer) return false;	// Can't re-open without closing first
 
 	m_Position = m_Size = m_Edge = 0;
-	m_pBuffer=(unsigned char*)cxalloc(1);//malloc(1);
+	m_pBuffer=(BYTE*)cxalloc(1);//malloc(1);
 	m_bFreeOnClose = true;
 
 	return (m_pBuffer!=0);
 }
 //////////////////////////////////////////////////////////
-unsigned char* CxMemFile::GetBuffer(bool bDetachBuffer)
+BYTE* CxMemFile::GetBuffer(bool bDetachBuffer)
 {
 	//can only detach, avoid inadvertantly attaching to
 	// memory that may not be ours [Jason De Arte]
@@ -155,7 +155,7 @@ bool CxMemFile::PutC(unsigned char c)
 long CxMemFile::GetC()
 {
 	if (Eof()) return EOF;
-	return *(unsigned char*)((unsigned char*)m_pBuffer + m_Position++);
+	return *(BYTE*)((BYTE*)m_pBuffer + m_Position++);
 }
 //////////////////////////////////////////////////////////
 char * CxMemFile::GetS(char *string, int n)
@@ -177,16 +177,16 @@ long	CxMemFile::Scanf(const char *format, void* output)
 	return 0;
 }
 //////////////////////////////////////////////////////////
-bool CxMemFile::Alloc(unsigned int dwNewLen)
+bool CxMemFile::Alloc(DWORD dwNewLen)
 {
-	if (dwNewLen > (unsigned int)m_Edge)
+	if (dwNewLen > (DWORD)m_Edge)
 	{
 		// find new buffer size
-		unsigned int dwNewBufferSize = (unsigned int)(((dwNewLen>>16)+1)<<16);
+		DWORD dwNewBufferSize = (DWORD)(((dwNewLen>>16)+1)<<16);
 
 		// allocate new buffer
-		if (m_pBuffer == NULL) m_pBuffer = (unsigned char*)cxalloc(dwNewBufferSize);//malloc(dwNewBufferSize);
-		else	m_pBuffer = (unsigned char*)cxrealloc(m_pBuffer, dwNewBufferSize);//realloc(m_pBuffer, dwNewBufferSize);
+		if (m_pBuffer == NULL) m_pBuffer = (BYTE*)cxalloc(dwNewBufferSize);//malloc(dwNewBufferSize);
+		else	m_pBuffer = (BYTE*)cxrealloc(m_pBuffer, dwNewBufferSize);//realloc(m_pBuffer, dwNewBufferSize);
 		// I own this buffer now (caller knows nothing about it)
 		m_bFreeOnClose = true;
 

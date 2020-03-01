@@ -19,7 +19,7 @@ void CSE_ALifeMonsterBase::on_spawn()
     if (!pSettings->line_exist(s_name, "Spawn_Inventory_Item_Section"))
         return;
 
-    const char* item_section = pSettings->r_string(s_name, "Spawn_Inventory_Item_Section");
+    LPCSTR item_section = pSettings->r_string(s_name, "Spawn_Inventory_Item_Section");
     float spawn_probability = pSettings->r_float(s_name, "Spawn_Inventory_Item_Probability");
     float probability = randF();
     if ((probability >= spawn_probability) && !fsimilar(spawn_probability, 1.f))

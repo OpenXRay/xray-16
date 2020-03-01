@@ -216,13 +216,13 @@ public:
 
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
-    VertexElement* getVB_Format(int id, bool _alt = FALSE);
-    VertexStagingBuffer* getVB(int id, bool _alt = FALSE);
-    IndexStagingBuffer* getIB(int id, bool _alt = FALSE);
+    VertexElement* getVB_Format(int id, BOOL _alt = FALSE);
+    VertexStagingBuffer* getVB(int id, BOOL _alt = FALSE);
+    IndexStagingBuffer* getIB(int id, BOOL _alt = FALSE);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();
-    IRenderVisual* model_CreatePE(const char* name);
+    IRenderVisual* model_CreatePE(LPCSTR name);
     IRender_Sector* detectSector(const Fvector& P, Fvector& D);
     int translateSector(IRender_Sector* pSector);
 
@@ -284,18 +284,18 @@ public:
     void level_Load(IReader*) override;
     void level_Unload() override;
 
-    GLuint texture_load(const char* fname, u32& msize, GLenum& ret_desc);
+    GLuint texture_load(LPCSTR fname, u32& msize, GLenum& ret_desc);
     HRESULT shader_compile(
-        const char* name,
+        LPCSTR name,
         IReader* fs,
-        const char* pFunctionName,
-        const char* pTarget,
+        LPCSTR pFunctionName,
+        LPCSTR pTarget,
         DWORD Flags,
         void*& result) override;
 
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    const char* getShaderPath() override { return "gl" DELIMITER; }
+    LPCSTR getShaderPath() override { return "gl" DELIMITER; }
     virtual ref_shader getShader(int id);
     IRender_Sector* getSector(int id) override;
     IRenderVisual* getVisual(int id) override;
@@ -332,28 +332,28 @@ public:
     IRender_Glow* glow_create() override;
 
     // Models
-    IRenderVisual* model_CreateParticles(const char* name) override;
+    IRenderVisual* model_CreateParticles(LPCSTR name) override;
     virtual IRender_DetailModel* model_CreateDM(IReader* F);
-    IRenderVisual* model_Create(const char* name, IReader* data = nullptr) override;
-    IRenderVisual* model_CreateChild(const char* name, IReader* data) override;
+    IRenderVisual* model_Create(LPCSTR name, IReader* data = nullptr) override;
+    IRenderVisual* model_CreateChild(LPCSTR name, IReader* data) override;
     IRenderVisual* model_Duplicate(IRenderVisual* V) override;
-    void model_Delete(IRenderVisual* & V, bool bDiscard) override;
+    void model_Delete(IRenderVisual* & V, BOOL bDiscard) override;
     virtual void model_Delete(IRender_DetailModel* & F);
-    void model_Logging(bool bEnable) override { Models->Logging(bEnable); }
+    void model_Logging(BOOL bEnable) override { Models->Logging(bEnable); }
     void models_Prefetch() override;
-    void models_Clear(bool b_complete) override;
+    void models_Clear(BOOL b_complete) override;
 
     // Occlusion culling
-    bool occ_visible(vis_data& V) override;
-    bool occ_visible(Fbox& B) override;
-    bool occ_visible(sPoly& P) override;
+    BOOL occ_visible(vis_data& V) override;
+    BOOL occ_visible(Fbox& B) override;
+    BOOL occ_visible(sPoly& P) override;
 
     // Main
     void BeforeFrame() override;
 
     void Calculate() override;
     void Render() override;
-    void Screenshot(ScreenshotMode mode = SM_NORMAL, const char* name = nullptr) override;
+    void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
     void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override;
     void ScreenshotAsyncBegin() override;
     void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
@@ -383,7 +383,7 @@ private:
     xr_string m_ShaderOptions;
 
 protected:
-    void ScreenshotImpl(ScreenshotMode mode, const char* name, CMemoryWriter* memory_writer) override;
+    void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 
 private:
     FS_FileSet m_file_set;

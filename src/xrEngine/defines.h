@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef DEBUG
-ENGINE_API extern bool bDebug;
+ENGINE_API extern BOOL bDebug;
 #else
 #define bDebug 0
 #endif

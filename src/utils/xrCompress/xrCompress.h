@@ -16,7 +16,7 @@ class xrCompressor
 
     struct ALIAS
     {
-        const char* path;
+        LPCSTR path;
         u32 crc;
         u32 c_ptr;
         u32 c_size_real;
@@ -25,22 +25,22 @@ class xrCompressor
     xr_multimap<u32, ALIAS> aliases;
 
     xr_vector<shared_str> exclude_exts;
-    bool testSKIP(const char* path);
+    bool testSKIP(LPCSTR path);
     ALIAS* testALIAS(IReader* base, u32 crc, u32& a_tests);
-    bool testEqual(const char* path, IReader* base);
-    bool testVFS(const char* path);
-    bool IsFolderAccepted(CInifile& ltx, const char* path, bool& recurse);
+    bool testEqual(LPCSTR path, IReader* base);
+    bool testVFS(LPCSTR path);
+    bool IsFolderAccepted(CInifile& ltx, LPCSTR path, BOOL& recurse);
 
-    void GatherFiles(const char* folder);
+    void GatherFiles(LPCSTR folder);
 
     void write_file_header(
-        const char* file_name, const u32& crc, const u32& ptr, const u32& size_real, const u32& size_compressed);
+        LPCSTR file_name, const u32& crc, const u32& ptr, const u32& size_real, const u32& size_compressed);
     void ClosePack();
-    void OpenPack(const char* tgt_folder, int num);
+    void OpenPack(LPCSTR tgt_folder, int num);
 
     void PerformWork();
 
-    void CompressOne(const char* path);
+    void CompressOne(LPCSTR path);
 
     u32 bytesSRC;
     u32 bytesDST;
@@ -60,8 +60,8 @@ public:
     void SetFastMode(bool b) { bFast = b; }
     void SetStoreFiles(bool b) { bStoreFiles = b; }
     void SetMaxVolumeSize(u32 sz) { XRP_MAX_SIZE = sz; }
-    void SetTargetName(const char* n) { target_name = n; }
-    void SetPackHeaderName(const char* n);
+    void SetTargetName(LPCSTR n) { target_name = n; }
+    void SetPackHeaderName(LPCSTR n);
 
     void ProcessLTX(CInifile& ini);
     void ProcessTargetFolder();

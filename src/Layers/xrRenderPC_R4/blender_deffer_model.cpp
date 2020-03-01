@@ -64,7 +64,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    bool bForward = FALSE;
+    BOOL bForward = FALSE;
     if (oBlend.value && oAREF.value < 16)
         bForward = TRUE;
     if (oStrictSorting.value)
@@ -73,7 +73,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
     if (bForward)
     {
         // forward rendering
-        const char* vsname, *psname;
+        LPCSTR vsname, psname;
         switch (C.iElement)
         {
         case 0: //
@@ -91,7 +91,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
     }
     else
     {
-        bool bAref = oBlend.value;
+        BOOL bAref = oBlend.value;
         // deferred rendering
         // codepath is the same, only the shaders differ
 

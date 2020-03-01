@@ -69,7 +69,7 @@ bool should_process(CAI_Stalker& object, const CEntityAlive* enemy)
 // CStalkerActionReachWounded
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionReachWounded::CStalkerActionReachWounded(CAI_Stalker* object, const char* action_name)
+CStalkerActionReachWounded::CStalkerActionReachWounded(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -158,7 +158,7 @@ void CStalkerActionReachWounded::execute()
 // CStalkerActionAimWounded
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionAimWounded::CStalkerActionAimWounded(CAI_Stalker* object, const char* action_name)
+CStalkerActionAimWounded::CStalkerActionAimWounded(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -224,7 +224,7 @@ void CStalkerActionAimWounded::finalize()
 // CStalkerActionPrepareWounded
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionPrepareWounded::CStalkerActionPrepareWounded(CAI_Stalker* object, const char* action_name)
+CStalkerActionPrepareWounded::CStalkerActionPrepareWounded(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -282,7 +282,7 @@ void CStalkerActionPrepareWounded::execute()
 // CStalkerActionKillWounded
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionKillWounded::CStalkerActionKillWounded(CAI_Stalker* object, const char* action_name)
+CStalkerActionKillWounded::CStalkerActionKillWounded(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }
@@ -342,7 +342,7 @@ void CStalkerActionKillWounded::execute()
 // CStalkerActionPauseAfterKill
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionPauseAfterKill::CStalkerActionPauseAfterKill(CAI_Stalker* object, const char* action_name)
+CStalkerActionPauseAfterKill::CStalkerActionPauseAfterKill(CAI_Stalker* object, LPCSTR action_name)
     : inherited(object, action_name)
 {
 }

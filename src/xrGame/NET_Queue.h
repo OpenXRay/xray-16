@@ -2,7 +2,7 @@
 #include "xrMessages.h"
 #include "xrCommon/xr_deque.h"
 
-extern bool g_bCheckTime;
+extern BOOL g_bCheckTime;
 extern int g_dwEventDelay;
 
 class NET_Event
@@ -106,7 +106,7 @@ public:
         //-------------------------------------------
         //*/
     }
-    IC bool available(u32 T)
+    IC BOOL available(u32 T)
     {
         //		if (queue.empty()/* || (T<queue.begin()->timestamp)*/)	return FALSE;
         //		else												return TRUE;

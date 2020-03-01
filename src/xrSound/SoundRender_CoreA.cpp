@@ -32,10 +32,10 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
 {
     EAXLISTENERPROPERTIES ep;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(signed int)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(LONG)))
         return false;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(signed int)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(LONG)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMROLLOFFFACTOR,
                          &ep.flRoomRolloffFactor, sizeof(float)))
@@ -47,13 +47,13 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
                          &ep.flDecayHFRatio, sizeof(float)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONS,
-                         &ep.lReflections, sizeof(signed int)))
+                         &ep.lReflections, sizeof(LONG)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONSDELAY,
                          &ep.flReflectionsDelay, sizeof(float)))
         return false;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(signed int)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(LONG)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERBDELAY,
                          &ep.flReverbDelay, sizeof(float)))
@@ -65,7 +65,7 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
                          &ep.flAirAbsorptionHF, sizeof(float)))
         return false;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(unsigned int)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD)))
         return false;
     return true;
 }

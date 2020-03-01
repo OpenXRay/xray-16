@@ -47,12 +47,12 @@ void __cpuidex(int regs[4], int i, int j)
 #endif
 
 #ifdef WINDOWS
-unsigned int countSetBits(ULONG_PTR bitMask)
+DWORD countSetBits(ULONG_PTR bitMask)
 {
-    unsigned int LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
-    unsigned int bitSetCount = 0;
+    DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
+    DWORD bitSetCount = 0;
     ULONG_PTR bitTest = static_cast<ULONG_PTR>(1) << LSHIFT;
-    unsigned int i;
+    DWORD i;
 
     for (i = 0; i <= LSHIFT; ++i)
     {
@@ -172,7 +172,7 @@ unsigned int query_processor_info(processor_info* pinfo)
 
 #ifdef WINDOWS
     DWORD returnedLength = 0;
-    unsigned int byteOffset = 0;
+    DWORD byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
 
     auto buffer = xr_make_unique<u8[]>(returnedLength);

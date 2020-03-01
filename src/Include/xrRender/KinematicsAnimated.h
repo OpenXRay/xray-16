@@ -41,7 +41,7 @@ public:
     virtual void OnCalculateBones() = 0;
 
 #ifdef DEBUG
-    virtual std::pair<const char*, const char*> LL_MotionDefName_dbg(MotionID ID) = 0;
+    virtual std::pair<LPCSTR, LPCSTR> LL_MotionDefName_dbg(MotionID ID) = 0;
     virtual void LL_DumpBlends_dbg() = 0;
 #endif
 
@@ -71,14 +71,14 @@ public:
     virtual IUpdateTracksCallback* GetUpdateTracksCalback() = 0;
 
     // Low level interface
-    virtual MotionID LL_MotionID(const char* B) = 0;
-    virtual u16 LL_PartID(const char* B) = 0;
+    virtual MotionID LL_MotionID(LPCSTR B) = 0;
+    virtual u16 LL_PartID(LPCSTR B) = 0;
 
     //CBlend* LL_PlayFX(u16 bone, MotionID motion, float blendAccrue, float blendFalloff, float Speed, float Power);
-    virtual CBlend* LL_PlayCycle(u16 partition, MotionID motion, bool bMixing, float blendAccrue, float blendFalloff,
-        float Speed, bool noloop, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0) = 0;
+    virtual CBlend* LL_PlayCycle(u16 partition, MotionID motion, BOOL bMixing, float blendAccrue, float blendFalloff,
+        float Speed, BOOL noloop, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0) = 0;
     virtual CBlend* LL_PlayCycle(
-        u16 partition, MotionID motion, bool bMixIn, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0) = 0;
+        u16 partition, MotionID motion, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0) = 0;
     //void LL_FadeCycle(u16 partition, float falloff, u8 mask_channel = (1 << 0));
     virtual void LL_CloseCycle(u16 partition, u8 mask_channel = (1 << 0)) = 0;
     virtual void LL_SetChannelFactor(u16 channel, float factor) = 0;
@@ -90,22 +90,22 @@ public:
     //void DestroyCycle(CBlend& B);
 
     // cycles
-    virtual MotionID ID_Cycle(const char* N) = 0;
-    virtual MotionID ID_Cycle_Safe(const char* N) = 0;
+    virtual MotionID ID_Cycle(LPCSTR N) = 0;
+    virtual MotionID ID_Cycle_Safe(LPCSTR N) = 0;
     virtual MotionID ID_Cycle(shared_str N) = 0;
     virtual MotionID ID_Cycle_Safe(shared_str N) = 0;
     virtual CBlend* PlayCycle(
-        const char* N, bool bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
+        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
     virtual CBlend* PlayCycle(
-        MotionID M, bool bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
-    virtual CBlend* PlayCycle(u16 partition, MotionID M, bool bMixIn = TRUE, PlayCallback Callback = nullptr,
+        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
+    virtual CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr,
         LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
 
     // fx'es
-    virtual MotionID ID_FX(const char* N) = 0;
-    virtual MotionID ID_FX_Safe(const char* N) = 0;
+    virtual MotionID ID_FX(LPCSTR N) = 0;
+    virtual MotionID ID_FX_Safe(LPCSTR N) = 0;
 
-    virtual CBlend* PlayFX(const char* N, float power_scale) = 0;
+    virtual CBlend* PlayFX(LPCSTR N, float power_scale) = 0;
     virtual CBlend* PlayFX(MotionID M, float power_scale) = 0;
 
     virtual CBlend* PlayFX_Safe(cpcstr N, float power_scale) = 0;

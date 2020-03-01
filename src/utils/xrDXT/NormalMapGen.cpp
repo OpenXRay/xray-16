@@ -99,7 +99,7 @@ void CalculateNormalMap(NVI_Image* pSrc, ConvolutionKernel* pKernels, int num_ke
     conv.Initialize(&pSrc, pKernels, num_kernels, wrap);
     int size_x = (int)pSrc->GetWidth();
     int size_y = (int)pSrc->GetHeight();
-    auto pArray = (unsigned int*)pSrc->GetImageDataPointer();
+    auto pArray = (DWORD*)pSrc->GetImageDataPointer();
     assert(pArray != NULL);
     // Now run the kernel over the source image area and write out the values.
     // coordinates of source image (not padded)
@@ -510,10 +510,10 @@ u32 hsample(s32 w, s32 h, s32 p, s32 x, s32 y, u8* src)
 #include "Layers/xrRender/ETextureParams.h"
 #include "Image_DXTC.h"
 
-extern int DXTCompressImage(const char* out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
+extern int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
 int DXTCompressBump(
-    const char* out_name, u8* T_height_gloss, u8* T_normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth)
+    LPCSTR out_name, u8* T_height_gloss, u8* T_normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth)
 {
     VERIFY(4 == depth);
     NVI_Image* pSrc = new NVI_Image();

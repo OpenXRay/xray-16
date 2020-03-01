@@ -76,7 +76,7 @@ inline bool CTorch::can_use_dynamic_lights()
     return (owner->can_use_dynamic_lights());
 }
 
-void CTorch::Load(const char* section)
+void CTorch::Load(LPCSTR section)
 {
     inherited::Load(section);
     light_trace_bone = pSettings->r_string(section, "light_trace_bone");
@@ -106,8 +106,8 @@ void CTorch::SwitchNightVision(bool vision_on, bool use_sounds)
     if (!m_night_vision)
         m_night_vision = new CNightVisionEffector(cNameSect());
 
-    const char* disabled_names = pSettings->r_string(cNameSect(), "disabled_maps");
-    const char* curr_map = *Level().name();
+    LPCSTR disabled_names = pSettings->r_string(cNameSect(), "disabled_maps");
+    LPCSTR curr_map = *Level().name();
     u32 cnt = _GetItemCount(disabled_names);
     bool b_allow = true;
     string512 tmp;
@@ -195,7 +195,7 @@ void CTorch::Switch(bool light_on)
     }
 }
 bool CTorch::torch_active() const { return (m_switched_on); }
-bool CTorch::net_Spawn(CSE_Abstract* DC)
+BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeItemTorch* torch = smart_cast<CSE_ALifeItemTorch*>(e);
@@ -429,7 +429,7 @@ void CTorch::net_Export(NET_Packet& P)
     inherited::net_Export(P);
     //	P.w_u8						(m_switched_on ? 1 : 0);
 
-    unsigned char F = 0;
+    BYTE F = 0;
     F |= (m_switched_on ? eTorchActive : 0);
     F |= (m_bNightVisionOn ? eNightVisionActive : 0);
     const CActor* pA = smart_cast<const CActor*>(H_Parent());
@@ -446,7 +446,7 @@ void CTorch::net_Import(NET_Packet& P)
 {
     inherited::net_Import(P);
 
-    unsigned char F = P.r_u8();
+    BYTE F = P.r_u8();
     bool new_m_switched_on = !!(F & eTorchActive);
     bool new_m_bNightVisionOn = !!(F & eNightVisionActive);
 

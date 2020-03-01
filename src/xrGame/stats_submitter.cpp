@@ -417,14 +417,14 @@ void stats_submitter::save_file(gamespy_gp::profile const* profile)
 
     for (all_awards_t::const_iterator i = tmp_awards.begin(), ie = tmp_awards.end(); i != ie; ++i)
     {
-        const char* tmp_award_name = get_award_name(i->first);
+        LPCSTR tmp_award_name = get_award_name(i->first);
         ltx_to_write.w_u16(tmp_award_name, award_count_line, i->second.m_count);
         ltx_to_write.w_u32(tmp_award_name, award_rdate_line, i->second.m_last_reward_date);
     }
 
     for (all_best_scores_t::const_iterator i = tmp_best_scores.begin(), ie = tmp_best_scores.end(); i != ie; ++i)
     {
-        const char* tmp_bs_name = get_best_score_name(i->first);
+        LPCSTR tmp_bs_name = get_best_score_name(i->first);
         ltx_to_write.w_u32(tmp_bs_name, best_score_value_line, i->second);
     }
 

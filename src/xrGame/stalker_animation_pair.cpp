@@ -180,7 +180,7 @@ void CStalkerAnimationPair::play(IKinematicsAnimated* skeleton_animated, PlayCal
     {
         CMotionDef* motion = skeleton_animated->LL_GetMotionDef(animation());
         VERIFY(motion);
-        const char* name = skeleton_animated->LL_MotionDefName_dbg(animation()).first;
+        LPCSTR name = skeleton_animated->LL_MotionDefName_dbg(animation()).first;
         Msg("%6d [%s][%s][%s][%d][%c][%c][%c][%f][%f][%f]", Device.dwTimeGlobal, m_object_name, m_animation_type_name,
             name, motion->bone_or_part, (!(motion->flags & esmStopAtEnd)) ? '+' : '-',
             use_animation_movement_control ? '+' : '-', local_animation ? '+' : '-',
@@ -190,8 +190,8 @@ void CStalkerAnimationPair::play(IKinematicsAnimated* skeleton_animated, PlayCal
 }
 
 #ifdef DEBUG
-std::pair<const char*, const char*>* CStalkerAnimationPair::blend_id(
-    IKinematicsAnimated* skeleton_animated, std::pair<const char*, const char*>& result) const
+std::pair<LPCSTR, LPCSTR>* CStalkerAnimationPair::blend_id(
+    IKinematicsAnimated* skeleton_animated, std::pair<LPCSTR, LPCSTR>& result) const
 {
     if (!blend())
         return (0);

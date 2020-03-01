@@ -60,10 +60,10 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 {
     instance
         .def("add_sound",
-            (u32(CScriptGameObject::*)(const char*, u32, ESoundTypes, u32, u32, u32))(&CScriptGameObject::add_sound))
+            (u32(CScriptGameObject::*)(LPCSTR, u32, ESoundTypes, u32, u32, u32))(&CScriptGameObject::add_sound))
         .def("add_sound",
-            (u32(CScriptGameObject::*)(const char*, u32, ESoundTypes, u32, u32, u32, const char*))(&CScriptGameObject::add_sound))
-        .def("add_combat_sound", (u32(CScriptGameObject::*)(const char*, u32, ESoundTypes, u32, u32, u32, const char*))(
+            (u32(CScriptGameObject::*)(LPCSTR, u32, ESoundTypes, u32, u32, u32, LPCSTR))(&CScriptGameObject::add_sound))
+        .def("add_combat_sound", (u32(CScriptGameObject::*)(LPCSTR, u32, ESoundTypes, u32, u32, u32, LPCSTR))(
                                      &CScriptGameObject::add_combat_sound))
         .def("remove_sound", &CScriptGameObject::remove_sound)
         .def("set_sound_mask", &CScriptGameObject::set_sound_mask)
@@ -165,19 +165,19 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
 
         .def("give_game_news",
-            (void (CScriptGameObject::*)(const char*, const char*, const char*, int, int))(&CScriptGameObject::GiveGameNews))
+            (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int))(&CScriptGameObject::GiveGameNews))
         .def("give_game_news",
-            (void (CScriptGameObject::*)(const char*, const char*, const char*, int, int, int))(&CScriptGameObject::GiveGameNews))
+            (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int, int))(&CScriptGameObject::GiveGameNews))
 
         .def("clear_game_news", &CScriptGameObject::ClearGameNews)
 
         .def("give_talk_message", (void (CScriptGameObject::*)(cpcstr, cpcstr, Frect, cpcstr))
             (&CScriptGameObject::AddIconedTalkMessage))
 
-        .def("give_talk_message", (void (CScriptGameObject::*)(const char*, const char*, const char*))
+        .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))
             (&CScriptGameObject::AddIconedTalkMessage_old)) // old version, must remove!
 
-        .def("give_talk_message2", (void (CScriptGameObject::*)(const char*, const char*, const char*, const char*))
+        .def("give_talk_message2", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))
             (&CScriptGameObject::AddIconedTalkMessage))
 
         .def("has_info", &CScriptGameObject::HasInfo)
@@ -327,17 +327,17 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 
         .def("make_object_visible_somewhen", &CScriptGameObject::make_object_visible_somewhen)
 
-        .def("buy_condition", (void (CScriptGameObject::*)(CScriptIniFile*, const char*))(&CScriptGameObject::buy_condition))
+        .def("buy_condition", (void (CScriptGameObject::*)(CScriptIniFile*, LPCSTR))(&CScriptGameObject::buy_condition))
         .def("buy_condition", (void (CScriptGameObject::*)(float, float))(&CScriptGameObject::buy_condition))
         .def("show_condition", &CScriptGameObject::show_condition)
         .def("sell_condition",
-            (void (CScriptGameObject::*)(CScriptIniFile*, const char*))(&CScriptGameObject::sell_condition))
+            (void (CScriptGameObject::*)(CScriptIniFile*, LPCSTR))(&CScriptGameObject::sell_condition))
         .def("sell_condition", (void (CScriptGameObject::*)(float, float))(&CScriptGameObject::sell_condition))
         .def("buy_supplies", &CScriptGameObject::buy_supplies)
         .def("buy_item_condition_factor", &CScriptGameObject::buy_item_condition_factor)
 
-        .def("sound_prefix", (const char*(CScriptGameObject::*)() const)(&CScriptGameObject::sound_prefix))
-        .def("sound_prefix", (void (CScriptGameObject::*)(const char*))(&CScriptGameObject::sound_prefix))
+        .def("sound_prefix", (LPCSTR(CScriptGameObject::*)() const)(&CScriptGameObject::sound_prefix))
+        .def("sound_prefix", (void (CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::sound_prefix))
 
         .def("location_on_path", &CScriptGameObject::location_on_path)
         .def("is_there_items_to_pickup", &CScriptGameObject::is_there_items_to_pickup)
@@ -372,8 +372,8 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("sniper_fire_mode", (void (CScriptGameObject::*)(bool)) & CScriptGameObject::sniper_fire_mode)
         .def("sniper_fire_mode", (bool (CScriptGameObject::*)() const) & CScriptGameObject::sniper_fire_mode)
 
-        .def("aim_bone_id", (void (CScriptGameObject::*)(const char*)) & CScriptGameObject::aim_bone_id)
-        .def("aim_bone_id", (const char*(CScriptGameObject::*)() const) & CScriptGameObject::aim_bone_id)
+        .def("aim_bone_id", (void (CScriptGameObject::*)(LPCSTR)) & CScriptGameObject::aim_bone_id)
+        .def("aim_bone_id", (LPCSTR(CScriptGameObject::*)() const) & CScriptGameObject::aim_bone_id)
 
         .def("actor_look_at_point", &CScriptGameObject::ActorLookAtPoint)
         .def("enable_level_changer", &CScriptGameObject::enable_level_changer)

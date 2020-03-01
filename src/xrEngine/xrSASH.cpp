@@ -125,7 +125,7 @@ void xrSASH::LoopNative()
         FS.r_close(R);
 
         int test_count = ini.line_count("benchmark");
-        const char* test_name, *t;
+        LPCSTR test_name, t;
         shared_str test_command;
 
         for (int i = 0; i < test_count; ++i)
@@ -151,7 +151,7 @@ void xrSASH::LoopNative()
     FlushLog();
 }
 
-void xrSASH::ReportNative(const char* pszTestName)
+void xrSASH::ReportNative(LPCSTR pszTestName)
 {
     string_path fname;
     xr_sprintf(fname, sizeof(fname), "%s.result", pszTestName);
@@ -435,7 +435,7 @@ void xrSASH::GetBenchmarks()
 
 void Startup();
 
-void xrSASH::RunBenchmark(const char* pszName)
+void xrSASH::RunBenchmark(LPCSTR pszName)
 {
     Msg("SASH:: RunBenchmark.");
 

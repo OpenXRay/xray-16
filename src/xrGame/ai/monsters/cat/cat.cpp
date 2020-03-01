@@ -8,7 +8,7 @@
 
 CCat::CCat() { StateMan = new CStateManagerCat(this); }
 CCat::~CCat() { xr_delete(StateMan); }
-void CCat::Load(const char* section)
+void CCat::Load(LPCSTR section)
 {
     inherited::Load(section);
 

@@ -75,7 +75,7 @@ CEntityAlive::~CEntityAlive()
     xr_delete(m_material_manager);
 }
 
-void CEntityAlive::Load(const char* section)
+void CEntityAlive::Load(LPCSTR section)
 {
     CEntity::Load(section);
     conditions().LoadCondition(section);
@@ -94,7 +94,7 @@ void CEntityAlive::Load(const char* section)
     monster_community->set(pSettings->r_string(section, "species"));
 }
 
-void CEntityAlive::LoadBloodyWallmarks(const char* section)
+void CEntityAlive::LoadBloodyWallmarks(LPCSTR section)
 {
     VERIFY(0 == m_pBloodMarksVector);
     VERIFY(0 == m_pBloodDropsVector);
@@ -103,7 +103,7 @@ void CEntityAlive::LoadBloodyWallmarks(const char* section)
 
     //кровавые отметки на стенах
     string256 tmp;
-    const char* wallmarks_name = pSettings->r_string(section, "wallmarks");
+    LPCSTR wallmarks_name = pSettings->r_string(section, "wallmarks");
 
     int cnt = _GetItemCount(wallmarks_name);
 
@@ -149,12 +149,12 @@ void CEntityAlive::UnloadBloodyWallmarks()
     }
 }
 
-void CEntityAlive::LoadFireParticles(const char* section)
+void CEntityAlive::LoadFireParticles(LPCSTR section)
 {
     m_pFireParticlesVector = new STR_VECTOR();
 
     string256 tmp;
-    const char* particles_name = pSettings->r_string(section, "fire_particles");
+    LPCSTR particles_name = pSettings->r_string(section, "fire_particles");
 
     int cnt = _GetItemCount(particles_name);
 
@@ -188,7 +188,7 @@ void CEntityAlive::reinit()
     m_fIntelligence = 25.f;
 }
 
-void CEntityAlive::reload(const char* section)
+void CEntityAlive::reload(LPCSTR section)
 {
     CEntity::reload(section);
     //	CEntityCondition::reload(section);
@@ -231,7 +231,7 @@ void CEntityAlive::shedule_Update(u32 dt)
     }
 }
 
-bool CEntityAlive::net_Spawn(CSE_Abstract* DC)
+BOOL CEntityAlive::net_Spawn(CSE_Abstract* DC)
 {
     //установить команду в соответствии с community
     /*	if(monster_community->team() != 255)
@@ -392,7 +392,7 @@ void CEntityAlive::PlaceBloodWallmark(const Fvector& dir, const Fvector& start_p
     float wallmark_size, IWallMarkArray* pwallmarks_vector)
 {
     collide::rq_result result;
-    bool reach_wall =
+    BOOL reach_wall =
         Level().ObjectSpace.RayPick(start_pos, dir, trace_dist, collide::rqtBoth, result, this) && !result.O;
 
     //если кровь долетела до статического объекта
@@ -571,7 +571,7 @@ void CEntityAlive::load(IReader& input_packet)
     conditions().load(input_packet);
 }
 
-bool CEntityAlive::net_SaveRelevant() { return (TRUE); }
+BOOL CEntityAlive::net_SaveRelevant() { return (TRUE); }
 CEntityConditionSimple* CEntityAlive::create_entity_condition(CEntityConditionSimple* ec)
 {
     if (!ec)

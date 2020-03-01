@@ -152,7 +152,7 @@ void CActorMP::process_packet(net_update& N)
 
     if (g_Alive())
     {
-        setVisible((bool)!HUDview());
+        setVisible((BOOL)!HUDview());
         setEnabled(TRUE);
     };
 

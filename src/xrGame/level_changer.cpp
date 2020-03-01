@@ -35,7 +35,7 @@ void CLevelChanger::net_Destroy()
 }
 #define DEF_INVITATION "level_changer_invitation"
 
-bool CLevelChanger::net_Spawn(CSE_Abstract* DC)
+BOOL CLevelChanger::net_Spawn(CSE_Abstract* DC)
 {
     m_entrance_time = 0;
     m_b_enabled = true;
@@ -80,7 +80,7 @@ bool CLevelChanger::net_Spawn(CSE_Abstract* DC)
         }
     }
 
-    bool bOk = inherited::net_Spawn(DC);
+    BOOL bOk = inherited::net_Spawn(DC);
     if (bOk)
     {
         l_pShape->ComputeBounds();
@@ -143,7 +143,7 @@ bool CLevelChanger::get_reject_pos(Fvector& p, Fvector& r)
 
     if (m_ini_file && m_ini_file->section_exist("pt_move_if_reject"))
     {
-        const char* p_name = m_ini_file->r_string("pt_move_if_reject", "path");
+        LPCSTR p_name = m_ini_file->r_string("pt_move_if_reject", "path");
         const CPatrolPath* patrol_path = ai().patrol_paths().path(p_name);
         VERIFY(patrol_path);
 
@@ -211,7 +211,7 @@ void CLevelChanger::load(IReader& input_packet)
     m_b_enabled = !!input_packet.r_u8();
 }
 
-bool CLevelChanger::net_SaveRelevant()
+BOOL CLevelChanger::net_SaveRelevant()
 {
     if (!m_b_enabled || m_invite_str != DEF_INVITATION)
         return TRUE;

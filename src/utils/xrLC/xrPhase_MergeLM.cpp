@@ -8,7 +8,7 @@
 #include "utils/xrLC_Light/lightmap.h"
 // Surface access
 extern void _InitSurface();
-extern bool _rect_place(L_rect& r, lm_layer* D);
+extern BOOL _rect_place(L_rect& r, lm_layer* D);
 
 IC int compare_defl(CDeflector* D1, CDeflector* D2)
 {
@@ -168,7 +168,7 @@ void CBuild::xrPhase_MergeLM()
             rT = rS;
             if (_rect_place(rT, &L))
             {
-                bool bRotated;
+                BOOL bRotated;
                 if (rT.SizeX() == rS.SizeX())
                 {
                     R_ASSERT(rT.SizeY() == rS.SizeY());
@@ -219,7 +219,7 @@ void CBuild::xrPhase_MergeLM()
 #include "utils/xrLC_Light/lightmap.h"
 // Surface access
 extern void _InitSurface	();
-extern bool _rect_place		(L_rect &r, lm_layer*		D);
+extern BOOL _rect_place		(L_rect &r, lm_layer*		D);
 
 IC int	compare_defl		(CDeflector* D1, CDeflector* D2)
 {
@@ -293,13 +293,13 @@ typedef struct MERGELM_PARAMS
 } * LP_MERGELM_PARAMS;
 
 static CRITICAL_SECTION mergelm_cs;
-static bool mergelm_threads_initialized = FALSE;
+static BOOL mergelm_threads_initialized = FALSE;
 static u32 mergelm_threads_count = 0;
 static LPHANDLE mergelm_threads_handles = NULL;
 static LPHANDLE mergelm_ready_events = NULL;
 static LP_MERGELM_PARAMS mergelm_params = NULL;
 
-unsigned int WINAPI MergeThreadProc( LPVOID lpParameter )
+DWORD WINAPI MergeThreadProc( LPVOID lpParameter )
 {
     LP_MERGELM_PARAMS pParams = ( LP_MERGELM_PARAMS ) lpParameter;
 
@@ -416,7 +416,7 @@ void MergeLM_process( u32 m_from , u32 m_to , vecDefl* pLayer , CLightmap* lmap 
         rS.iArea = L.Area();
         rT = rS;
         if ( _rect_place( rT , &L ) ) {
-            bool		bRotated;
+            BOOL		bRotated;
             if ( rT.SizeX() == rS.SizeX() ) {
                 R_ASSERT(rT.SizeY() == rS.SizeY());
                 bRotated = FALSE;

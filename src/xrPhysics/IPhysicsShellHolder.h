@@ -37,9 +37,9 @@ class IPhysicsShellHolder
 public:
     virtual Fmatrix& ObjectXFORM() = 0;
     virtual Fvector& ObjectPosition() = 0;
-    virtual const char* ObjectName() const = 0;
-    virtual const char* ObjectNameVisual() const = 0;
-    virtual const char* ObjectNameSect() const = 0;
+    virtual LPCSTR ObjectName() const = 0;
+    virtual LPCSTR ObjectNameVisual() const = 0;
+    virtual LPCSTR ObjectNameSect() const = 0;
     virtual bool ObjectGetDestroy() const = 0;
     virtual ICollisionHitCallback* ObjectGetCollisionHitCallback() = 0;
     virtual u16 ObjectID() const = 0;

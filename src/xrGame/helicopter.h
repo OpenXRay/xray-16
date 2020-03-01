@@ -36,7 +36,7 @@ struct SHeliEnemy
     void Update();
     void save(NET_Packet& output_packet);
     void load(IReader& input_packet);
-    void Load(const char* section);
+    void Load(LPCSTR section);
 };
 
 enum EHeliBodyState
@@ -64,7 +64,7 @@ struct SHeliBodyState
 
     void save(NET_Packet& output_packet);
     void load(IReader& input_packet);
-    void Load(const char* section);
+    void Load(LPCSTR section);
 };
 
 enum EHeilMovementState
@@ -138,11 +138,11 @@ public:
     float GetDistanceToDestPosition();
     void getPathAltitude(Fvector& point, float base_altitude);
     void SetDestPosition(Fvector* pos);
-    void goPatrolByPatrolPath(const char* path_name, int start_idx);
+    void goPatrolByPatrolPath(LPCSTR path_name, int start_idx);
     void CreateRoundPoints(Fvector center, float radius, float start_h, float end_h, xr_vector<STmpPt>& round_points);
     void save(NET_Packet& output_packet);
     void load(IReader& input_packet);
-    void Load(const char* section);
+    void Load(LPCSTR section);
     void net_Destroy();
 };
 
@@ -286,10 +286,10 @@ public:
     void init();
     virtual void reinit();
 
-    virtual void Load(const char* section);
-    virtual void reload(const char* section);
+    virtual void Load(LPCSTR section);
+    virtual void reload(LPCSTR section);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P){};
     virtual void net_Import(NET_Packet& P){};
@@ -300,13 +300,13 @@ public:
     virtual void SpawnInitPhysics(CSE_Abstract* D);
     virtual CPhysicsShellHolder* PPhysicsShellHolder() { return PhysicsShellHolder(); }
     virtual void net_Save(NET_Packet& P);
-    virtual bool net_SaveRelevant()
+    virtual BOOL net_SaveRelevant()
     {
-        return (inherited::net_SaveRelevant() && bool(PPhysicsShell() != NULL)) || m_exploded;
+        return (inherited::net_SaveRelevant() && BOOL(PPhysicsShell() != NULL)) || m_exploded;
     };
 
-    virtual bool renderable_ShadowGenerate() { return FALSE; }
-    virtual bool renderable_ShadowReceive() { return TRUE; }
+    virtual BOOL renderable_ShadowGenerate() { return FALSE; }
+    virtual BOOL renderable_ShadowReceive() { return TRUE; }
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void UpdateCL();
     virtual void shedule_Update(u32 time_delta);
@@ -328,7 +328,7 @@ public:
     bool isVisible(CScriptGameObject* O);
     bool isObjectVisible(IGameObject* O);
     bool isOnAttack() { return m_enemy.type != eEnemyNone; }
-    void goPatrolByPatrolPath(const char* path_name, int start_idx);
+    void goPatrolByPatrolPath(LPCSTR path_name, int start_idx);
     void goByRoundPath(Fvector center, float radius, bool clockwise);
     void LookAtPoint(Fvector point, bool do_it);
     void SetDestPosition(Fvector* pos);

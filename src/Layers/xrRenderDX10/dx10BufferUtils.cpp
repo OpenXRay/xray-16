@@ -6,7 +6,7 @@ u32 GetFVFVertexSize(u32 FVF)
     return D3DXGetFVFVertexSize(FVF);
 }
 
-u32 GetDeclVertexSize(const VertexElement* decl, unsigned int Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
 {
     return D3DXGetDeclVertexSize(decl, Stream);
 }
@@ -18,7 +18,7 @@ u32 GetDeclLength(const VertexElement* decl)
 
 namespace BufferUtils
 {
-HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, unsigned int DataSize, bool /*bImmutable*/, bool bIndexBuffer)
+HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT DataSize, bool /*bImmutable*/, bool bIndexBuffer)
 {
     D3D_BUFFER_DESC desc;
     desc.ByteWidth = DataSize;
@@ -36,17 +36,17 @@ HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, unsigned int D
     return res;
 }
 
-HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, unsigned int DataSize, bool bImmutable)
+HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, false);
 }
 
-HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, unsigned int DataSize, bool bImmutable)
+HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
 {
     return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, true);
 }
 
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, unsigned int DataSize)
+HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize)
 {
     D3D_BUFFER_DESC desc;
     desc.ByteWidth = DataSize;
@@ -72,8 +72,8 @@ VertexFormatPairs VertexFormatList[] = {{D3DDECLTYPE_FLOAT1, DXGI_FORMAT_R32_FLO
     {D3DDECLTYPE_FLOAT4, DXGI_FORMAT_R32G32B32A32_FLOAT},
     {D3DDECLTYPE_D3DCOLOR,
         DXGI_FORMAT_R8G8B8A8_UNORM}, // Warning. Explicit RGB component swizzling is nesessary	//	Not available
-    {D3DDECLTYPE_UBYTE4, DXGI_FORMAT_R8G8B8A8_UINT}, // Note: Shader gets unsigned int values, but if Direct3D 9 style integral
-    // floats are needed (0.0f, 1.0f... 255.f), unsigned int can just be converted
+    {D3DDECLTYPE_UBYTE4, DXGI_FORMAT_R8G8B8A8_UINT}, // Note: Shader gets UINT values, but if Direct3D 9 style integral
+    // floats are needed (0.0f, 1.0f... 255.f), UINT can just be converted
     // to float32 in shader.
     {D3DDECLTYPE_SHORT2,
         DXGI_FORMAT_R16G16_SINT}, // Note: Shader gets SINT values, but if Direct3D 9 style integral floats
@@ -105,7 +105,7 @@ DXGI_FORMAT ConvertVertexFormat(D3DDECLTYPE dx9FMT)
 struct VertexSemanticPairs
 {
     D3DDECLUSAGE m_dx9Semantic;
-    const char* m_dx10Semantic;
+    LPCSTR m_dx10Semantic;
 };
 
 VertexSemanticPairs VertexSemanticList[] = {
@@ -125,7 +125,7 @@ VertexSemanticPairs VertexSemanticList[] = {
     // D3DDECLUSAGE_SAMPLE,        // 13
 };
 
-const char* ConvertSemantic(D3DDECLUSAGE Semantic)
+LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
 {
     size_t arrayLength = sizeof(VertexSemanticList) / sizeof(VertexSemanticList[0]);
     for (size_t i = 0; i < arrayLength; ++i)

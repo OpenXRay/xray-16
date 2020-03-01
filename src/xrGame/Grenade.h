@@ -11,9 +11,9 @@ public:
     CGrenade();
     virtual ~CGrenade();
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Relcase(IGameObject* O);
 
@@ -61,7 +61,7 @@ private:
 protected:
     virtual void UpdateXForm() { CMissile::UpdateXForm(); };
 public:
-    virtual bool UsedAI_Locations();
+    virtual BOOL UsedAI_Locations();
     virtual CExplosive* cast_explosive() { return this; }
     virtual CMissile* cast_missile() { return this; }
     virtual CHudItem* cast_hud_item() { return this; }

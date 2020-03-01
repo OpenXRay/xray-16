@@ -297,7 +297,7 @@ bool RayCollider::Collide(const Ray& world_ray, OPCODE_Model* model, const Matri
  *	\warning	SCALE NOT SUPPORTED. The matrix must contain rotation & translation parts only.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool RayCollider::InitQuery(const Ray& world_ray, const Matrix4x4* world, udword* faceid)
+BOOL RayCollider::InitQuery(const Ray& world_ray, const Matrix4x4* world, udword* faceid)
 {
     // Reset stats & contact status
     Collider::InitQueryEx();

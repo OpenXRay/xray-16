@@ -8,7 +8,7 @@
 #include "IPhysicsShellHolder.h"
 #include "xrCore/Animation/Bone.hpp"
 
-CPhysicsShellAnimator::CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CInifile const* ini, const char* section)
+CPhysicsShellAnimator::CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CInifile const* ini, LPCSTR section)
     : m_pPhysicsShell(_pPhysicsShell)
 {
     VERIFY(ini->section_exist(section));
@@ -17,7 +17,7 @@ CPhysicsShellAnimator::CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CIni
     bool all_bones = true;
     if (ini->line_exist(section, "controled_bones"))
     {
-        const char* controled = ini->r_string(section, "controled_bones");
+        LPCSTR controled = ini->r_string(section, "controled_bones");
         all_bones = xr_strcmp(controled, "all") == 0;
         if (!all_bones)
             CreateJoints(controled);
@@ -44,7 +44,7 @@ CPhysicsShellAnimator::~CPhysicsShellAnimator()
         dJointDestroy(it.m_anim_fixed_dJointID);
     }
 }
-void CPhysicsShellAnimator::CreateJoints(const char* controled)
+void CPhysicsShellAnimator::CreateJoints(LPCSTR controled)
 {
     IPhysicsShellHolder* obj = (*(m_pPhysicsShell->Elements().begin()))->PhysicsRefObject();
     const u16 nb = (u16)_GetItemCount(controled);

@@ -26,7 +26,7 @@ private:
 
 public:
     void init_external(CBaseMonster* obj) { m_object = obj; }
-    IC void load(const char* section);
+    IC void load(LPCSTR section);
 
     // инициализировано состояние атаки
     IC void init_attack();

@@ -62,7 +62,7 @@ void CWeaponStatMgun::ResetBoneCallbacks()
     m_pPhysicsShell->EnabledCallbacks(TRUE);
 }
 
-void CWeaponStatMgun::Load(const char* section)
+void CWeaponStatMgun::Load(LPCSTR section)
 {
     inheritedPH::Load(section);
     inheritedShooting::Load(section);
@@ -78,7 +78,7 @@ void CWeaponStatMgun::Load(const char* section)
     VERIFY(!fis_zero(camRelaxSpeed));
 }
 
-bool CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
+BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 {
     if (!inheritedPH::net_Spawn(DC))
         return FALSE;

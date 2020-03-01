@@ -91,7 +91,7 @@ int CObjectSpace::GetNearest(xr_vector<IGameObject*>& q_nearest, ICollisionForm*
 //----------------------------------------------------------------------
 
 void CObjectSpace::Load(CDB::build_callback build_callback) { Load("$level$", "level.cform", build_callback); }
-void CObjectSpace::Load(const char* path, const char* fname, CDB::build_callback build_callback)
+void CObjectSpace::Load(LPCSTR path, LPCSTR fname, CDB::build_callback build_callback)
 {
     IReader* F = FS.r_open(path, fname);
     R_ASSERT(F);

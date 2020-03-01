@@ -31,7 +31,7 @@ CPsyDog::~CPsyDog()
     xr_free(m_phantoms_die_time);
 }
 
-void CPsyDog::Load(const char* section)
+void CPsyDog::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -50,7 +50,7 @@ void CPsyDog::Load(const char* section)
     pSettings->read_if_exists(m_time_phantom_respawn, section, "Time_Phantom_Respawn", "Time_Phantom_Appear", true);
 }
 
-bool CPsyDog::net_Spawn(CSE_Abstract* dc)
+BOOL CPsyDog::net_Spawn(CSE_Abstract* dc)
 {
     if (!inherited::net_Spawn(dc))
         return FALSE;
@@ -62,7 +62,7 @@ void CPsyDog::reinit()
     inherited::reinit();
     m_aura->reinit();
 }
-void CPsyDog::reload(const char* section) { inherited::reload(section); }
+void CPsyDog::reload(LPCSTR section) { inherited::reload(section); }
 //////////////////////////////////////////////////////////////////////////
 // Register/Unregister
 //////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ u8 CPsyDog::get_phantoms_count() { return u8(m_storage.size()); }
 //////////////////////////////////////////////////////////////////////////
 CPsyDogPhantom::CPsyDogPhantom() {}
 CPsyDogPhantom::~CPsyDogPhantom() {}
-bool CPsyDogPhantom::net_Spawn(CSE_Abstract* dc)
+BOOL CPsyDogPhantom::net_Spawn(CSE_Abstract* dc)
 {
     if (!inherited::net_Spawn(dc))
         return FALSE;

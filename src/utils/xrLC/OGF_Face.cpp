@@ -17,7 +17,7 @@ void set_status(char* N, int id, int f, int v)
     Logger.clMsg(status_str);
 }
 
-bool OGF_Vertex::similar(OGF* ogf, OGF_Vertex& V)
+BOOL OGF_Vertex::similar(OGF* ogf, OGF_Vertex& V)
 {
     const float ntb = _cos(deg2rad(5.f));
     if (!P.similar(V.P))
@@ -45,7 +45,7 @@ void OGF_Vertex::dump(u32 id)
 {
     //	Msg	("%d: ");
 }
-bool x_vertex::similar(OGF* ogf, x_vertex& V) { return P.similar(V.P); }
+BOOL x_vertex::similar(OGF* ogf, x_vertex& V) { return P.similar(V.P); }
 u16 OGF::x_BuildVertex(x_vertex& V1)
 {
     for (itXV it = fast_path_data.vertices.begin(); it != fast_path_data.vertices.end(); ++it)
@@ -112,7 +112,7 @@ void OGF::_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_)
             data.vertices.erase(data.vertices.begin() + VertCount, data.vertices.end());
     }
 }
-bool OGF::dbg_SphereContainsVertex(Fvector& c, float R)
+BOOL OGF::dbg_SphereContainsVertex(Fvector& c, float R)
 {
     Fsphere S;
     S.set(c, R);
@@ -145,7 +145,7 @@ void OGF::adjacent_select(xr_vector<u32>& dest, xr_vector<bool>& vmark, xr_vecto
         else
         {
             // check connectivity
-            bool bConnected = FALSE;
+            BOOL bConnected = FALSE;
             for (size_t vid = 0; vid < 3; vid++)
             {
                 const size_t id = F.v[vid]; // search in already registered verts
@@ -536,7 +536,7 @@ void OGF_Node::Save(IWriter& fs)
     fs.close_chunk();
 }
 
-extern u16 RegisterShader(const char* T);
+extern u16 RegisterShader(LPCSTR T);
 
 void OGF_LOD::Save(IWriter& fs)
 {

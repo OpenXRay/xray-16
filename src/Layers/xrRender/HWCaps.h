@@ -37,10 +37,10 @@ public:
 
 public:
     // force flags
-    bool bForceGPU_REF;
-    bool bForceGPU_SW;
-    bool bForceGPU_NonPure;
-    bool SceneMode;
+    BOOL bForceGPU_REF;
+    BOOL bForceGPU_SW;
+    BOOL bForceGPU_NonPure;
+    BOOL SceneMode;
 
     u32 iGPUNum;
 
@@ -60,9 +60,9 @@ public:
     u32 id_vendor;
     u32 id_device;
 
-    bool bStencil; // stencil buffer present
-    bool bScissor; // scissor rect supported
-    bool bTableFog; //
+    BOOL bStencil; // stencil buffer present
+    BOOL bScissor; // scissor rect supported
+    BOOL bTableFog; //
 
     // some precalculated values
     D3DSTENCILOP soDec, soInc; // best stencil OPs for shadows

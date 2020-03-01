@@ -9,7 +9,7 @@ public:
     CCat();
     virtual ~CCat();
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
 
     virtual void UpdateCL();

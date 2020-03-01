@@ -37,7 +37,7 @@ extern float gCheckHitK;
 // test callback функция
 //  object - object for testing
 // return TRUE-тестировать объект / FALSE-пропустить объект
-bool CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* object, LPVOID params)
+BOOL CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* object, LPVOID params)
 {
     if (!object)
         return TRUE;
@@ -49,7 +49,7 @@ bool CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* obj
         (!bullet->flags.ricochet_was))
         return FALSE;
 
-    bool bRes = TRUE;
+    BOOL bRes = TRUE;
     CEntity* entity = smart_cast<CEntity*>(object);
     if (entity && entity->g_Alive() && (entity->ID() != bullet->parent_id))
     {
@@ -227,12 +227,12 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
         bullet->m_mtl_snd.play_at_pos(O, vEnd, 0);
     }
 
-    const char* ps_name = (!mtl_pair || mtl_pair->CollideParticles.empty()) ?
+    LPCSTR ps_name = (!mtl_pair || mtl_pair->CollideParticles.empty()) ?
         NULL :
         *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];
 
     SGameMtl* tgt_mtl = GMLib.GetMaterialByIdx(target_material);
-    bool bStatic = !tgt_mtl->Flags.test(SGameMtl::flDynamic);
+    BOOL bStatic = !tgt_mtl->Flags.test(SGameMtl::flDynamic);
 
     if ((ps_name && ShowMark) || (bullet->flags.explosive && bStatic))
     {

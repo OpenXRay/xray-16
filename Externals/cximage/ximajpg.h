@@ -133,7 +133,7 @@ class DLL_EXP CxExifInfo
 {
 
 typedef struct tag_Section_t{
-    unsigned char*    Data;
+    BYTE*    Data;
     int      Type;
     unsigned Size;
 } Section_t;
@@ -148,8 +148,8 @@ public:
 	void DiscardAllButExif();
 protected:
 	bool process_EXIF(unsigned char * CharBuf, unsigned int length);
-	void process_COM (const unsigned char * Data, int length);
-	void process_SOFn (const unsigned char * Data, int marker);
+	void process_COM (const BYTE * Data, int length);
+	void process_SOFn (const BYTE * Data, int marker);
 	int Get16u(void * Short);
 	int Get16m(void * Short);
 	long Get32s(void * Long);

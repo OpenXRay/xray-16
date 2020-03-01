@@ -130,7 +130,7 @@ RGBQUAD CxImage::GetPixelColorWithOverflow(long x, long y, OverflowMethod const 
       case OM_BACKGROUND:
 		  //return background color (if it exists, otherwise input value)
 		  if (info.nBkgndIndex >= 0) {
-			  if (head.biBitCount<24) color = GetPaletteColor((unsigned char)info.nBkgndIndex);
+			  if (head.biBitCount<24) color = GetPaletteColor((BYTE)info.nBkgndIndex);
 			  else color = info.nBkgndColor;
 		  }//if
 		  return color;
@@ -214,28 +214,28 @@ RGBQUAD CxImage::GetPixelColorInterpolated(
       //get four neighbouring pixels
       if ((xi+1)<head.biWidth && xi>=0 && (yi+1)<head.biHeight && yi>=0 && head.biClrUsed==0) {
         //all pixels are inside RGB24 image... optimize reading (and use fixed point arithmetic)
-        unsigned short wt1=(unsigned short)((x-xi)*256.0f), wt2=(unsigned short)((y-yi)*256.0f);
-        unsigned short wd=wt1*wt2>>8;
-        unsigned short wb=wt1-wd;
-        unsigned short wc=wt2-wd;
-        unsigned short wa=256-wt1-wc;
-        unsigned short wrr,wgg,wbb;
-        unsigned char *pxptr=(unsigned char*)info.pImage+yi*info.dwEffWidth+xi*3;
+        WORD wt1=(WORD)((x-xi)*256.0f), wt2=(WORD)((y-yi)*256.0f);
+        WORD wd=wt1*wt2>>8;
+        WORD wb=wt1-wd;
+        WORD wc=wt2-wd;
+        WORD wa=256-wt1-wc;
+        WORD wrr,wgg,wbb;
+        BYTE *pxptr=(BYTE*)info.pImage+yi*info.dwEffWidth+xi*3;
         wbb=wa*(*pxptr++); wgg=wa*(*pxptr++); wrr=wa*(*pxptr++);
         wbb+=wb*(*pxptr++); wgg+=wb*(*pxptr++); wrr+=wb*(*pxptr);
         pxptr+=(info.dwEffWidth-5); //move to next row
         wbb+=wc*(*pxptr++); wgg+=wc*(*pxptr++); wrr+=wc*(*pxptr++); 
         wbb+=wd*(*pxptr++); wgg+=wd*(*pxptr++); wrr+=wd*(*pxptr); 
-        color.rgbRed=(unsigned char) (wrr>>8); color.rgbGreen=(unsigned char) (wgg>>8); color.rgbBlue=(unsigned char) (wbb>>8);
+        color.rgbRed=(BYTE) (wrr>>8); color.rgbGreen=(BYTE) (wgg>>8); color.rgbBlue=(BYTE) (wbb>>8);
 #if CXIMAGE_SUPPORT_ALPHA
         if (pAlpha) {
-          unsigned short waa;
+          WORD waa;
           //image has alpha layer... we have to do the same for alpha data
           pxptr=AlphaGetPointer(xi,yi);                           //pointer to first byte
           waa=wa*(*pxptr++); waa+=wb*(*pxptr);   //first two pixels
           pxptr+=(head.biWidth-1);                                //move to next row
           waa+=wc*(*pxptr++); waa+=wd*(*pxptr);   //and second row pixels
-          color.rgbReserved=(unsigned char) (waa>>8);
+          color.rgbReserved=(BYTE) (waa>>8);
         } else
 #endif
 		{ //Alpha not supported or no alpha at all
@@ -255,12 +255,12 @@ RGBQUAD CxImage::GetPixelColorInterpolated(
         rgb12=GetPixelColorWithOverflow(xi, yi+1, ofMethod, rplColor);
         rgb22=GetPixelColorWithOverflow(xi+1, yi+1, ofMethod, rplColor);
         //calculate linear interpolation
-        color.rgbRed=(unsigned char) (a*rgb11.rgbRed+b*rgb21.rgbRed+c*rgb12.rgbRed+d*rgb22.rgbRed);
-        color.rgbGreen=(unsigned char) (a*rgb11.rgbGreen+b*rgb21.rgbGreen+c*rgb12.rgbGreen+d*rgb22.rgbGreen);
-        color.rgbBlue=(unsigned char) (a*rgb11.rgbBlue+b*rgb21.rgbBlue+c*rgb12.rgbBlue+d*rgb22.rgbBlue);
+        color.rgbRed=(BYTE) (a*rgb11.rgbRed+b*rgb21.rgbRed+c*rgb12.rgbRed+d*rgb22.rgbRed);
+        color.rgbGreen=(BYTE) (a*rgb11.rgbGreen+b*rgb21.rgbGreen+c*rgb12.rgbGreen+d*rgb22.rgbGreen);
+        color.rgbBlue=(BYTE) (a*rgb11.rgbBlue+b*rgb21.rgbBlue+c*rgb12.rgbBlue+d*rgb22.rgbBlue);
 #if CXIMAGE_SUPPORT_ALPHA
         if (AlphaIsValid())
-			color.rgbReserved=(unsigned char) (a*rgb11.rgbReserved+b*rgb21.rgbReserved+c*rgb12.rgbReserved+d*rgb22.rgbReserved);
+			color.rgbReserved=(BYTE) (a*rgb11.rgbReserved+b*rgb21.rgbReserved+c*rgb12.rgbReserved+d*rgb22.rgbReserved);
 		else
 #endif
 		{ //Alpha not supported or no alpha at all
@@ -401,9 +401,9 @@ RGBQUAD CxImage::GetPixelColorInterpolated(
       rr=gg=bb=aa=0;
       if (((xi+2)<head.biWidth) && xi>=1 && ((yi+2)<head.biHeight) && (yi>=1) && !IsIndexed()) {
         //optimized interpolation (faster pixel reads) for RGB24 images with all pixels inside bounds
-        unsigned char *pxptr, *pxptra;
+        BYTE *pxptr, *pxptra;
         for (yii=yi-1; yii<yi+3; yii++) {
-          pxptr=(unsigned char *)BlindGetPixelPointer(xi-1, yii);    //calculate pointer to first byte in row
+          pxptr=(BYTE *)BlindGetPixelPointer(xi-1, yii);    //calculate pointer to first byte in row
           kernelyc=kernely[yii-(yi-1)];
 #if CXIMAGE_SUPPORT_ALPHA
           if (AlphaIsValid()) {
@@ -449,12 +449,12 @@ RGBQUAD CxImage::GetPixelColorInterpolated(
         }//yii
       }//if
       //for all colors, clip to 0..255 and assign to RGBQUAD
-      if (rr>255) rr=255; if (rr<0) rr=0; color.rgbRed=(unsigned char) rr;
-      if (gg>255) gg=255; if (gg<0) gg=0; color.rgbGreen=(unsigned char) gg;
-      if (bb>255) bb=255; if (bb<0) bb=0; color.rgbBlue=(unsigned char) bb;
+      if (rr>255) rr=255; if (rr<0) rr=0; color.rgbRed=(BYTE) rr;
+      if (gg>255) gg=255; if (gg<0) gg=0; color.rgbGreen=(BYTE) gg;
+      if (bb>255) bb=255; if (bb<0) bb=0; color.rgbBlue=(BYTE) bb;
 #if CXIMAGE_SUPPORT_ALPHA
       if (AlphaIsValid()) {
-        if (aa>255) aa=255; if (aa<0) aa=0; color.rgbReserved=(unsigned char) aa;
+        if (aa>255) aa=255; if (aa<0) aa=0; color.rgbReserved=(BYTE) aa;
       } else
 #endif
 		{ //Alpha not supported or no alpha at all
@@ -483,9 +483,9 @@ RGBQUAD CxImage::GetPixelColorInterpolated(
 
       if (((xi+6)<head.biWidth) && ((xi-5)>=0) && ((yi+6)<head.biHeight) && ((yi-5)>=0) && !IsIndexed()) {
         //optimized interpolation (faster pixel reads) for RGB24 images with all pixels inside bounds
-        unsigned char *pxptr, *pxptra;
+        BYTE *pxptr, *pxptra;
         for (yii=yi-5; yii<yi+7; yii++) {
-          pxptr=(unsigned char *)BlindGetPixelPointer(xi-5, yii);    //calculate pointer to first byte in row
+          pxptr=(BYTE *)BlindGetPixelPointer(xi-5, yii);    //calculate pointer to first byte in row
           kernelyc=KernelLanczosSinc((float)(yii-y),6.0f);
 #if CXIMAGE_SUPPORT_ALPHA
           if (AlphaIsValid()) {
@@ -523,12 +523,12 @@ RGBQUAD CxImage::GetPixelColorInterpolated(
         }//yii
       }//if
       //for all colors, clip to 0..255 and assign to RGBQUAD
-      if (rr>255) rr=255; if (rr<0) rr=0; color.rgbRed=(unsigned char) rr;
-      if (gg>255) gg=255; if (gg<0) gg=0; color.rgbGreen=(unsigned char) gg;
-      if (bb>255) bb=255; if (bb<0) bb=0; color.rgbBlue=(unsigned char) bb;
+      if (rr>255) rr=255; if (rr<0) rr=0; color.rgbRed=(BYTE) rr;
+      if (gg>255) gg=255; if (gg<0) gg=0; color.rgbGreen=(BYTE) gg;
+      if (bb>255) bb=255; if (bb<0) bb=0; color.rgbBlue=(BYTE) bb;
 #if CXIMAGE_SUPPORT_ALPHA
       if (AlphaIsValid()) {
-        if (aa>255) aa=255; if (aa<0) aa=0; color.rgbReserved=(unsigned char) aa;   
+        if (aa>255) aa=255; if (aa<0) aa=0; color.rgbReserved=(BYTE) aa;   
       } else
 #endif
 		{ //Alpha not supported or no alpha at all
@@ -660,12 +660,12 @@ RGBQUAD CxImage::GetAreaColorInterpolated(
 		
 		s=area.Surface();
 		rr/=s; gg/=s; bb/=s; aa/=s;
-		if (rr>255) rr=255; if (rr<0) rr=0; color.rgbRed=(unsigned char) rr;
-		if (gg>255) gg=255; if (gg<0) gg=0; color.rgbGreen=(unsigned char) gg;
-		if (bb>255) bb=255; if (bb<0) bb=0; color.rgbBlue=(unsigned char) bb;
+		if (rr>255) rr=255; if (rr<0) rr=0; color.rgbRed=(BYTE) rr;
+		if (gg>255) gg=255; if (gg<0) gg=0; color.rgbGreen=(BYTE) gg;
+		if (bb>255) bb=255; if (bb<0) bb=0; color.rgbBlue=(BYTE) bb;
 #if CXIMAGE_SUPPORT_ALPHA
 		if (AlphaIsValid()) {
-			if (aa>255) aa=255; if (aa<0) aa=0; color.rgbReserved=(unsigned char) aa;
+			if (aa>255) aa=255; if (aa<0) aa=0; color.rgbReserved=(BYTE) aa;
 		}//if
 #endif
 	}//if

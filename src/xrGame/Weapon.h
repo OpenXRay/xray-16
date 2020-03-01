@@ -33,9 +33,9 @@ public:
     virtual ~CWeapon();
 
     // Generic
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
@@ -45,7 +45,7 @@ public:
     // serialization
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    virtual bool net_SaveRelevant() { return inherited::net_SaveRelevant(); }
+    virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
 
@@ -65,7 +65,7 @@ public:
     virtual void Hit(SHit* pHDS);
 
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void create_physic_shell();
     virtual void activate_physic_shell();
     virtual void setup_physic_shell();
@@ -115,14 +115,14 @@ public:
         undefined_ammo_type = u8(-1)
     };
 
-    IC bool IsValid() const { return iAmmoElapsed; }
+    IC BOOL IsValid() const { return iAmmoElapsed; }
     // Does weapon need's update?
-    bool IsUpdating();
+    BOOL IsUpdating();
 
-    bool IsMisfire() const;
-    bool CheckForMisfire();
+    BOOL IsMisfire() const;
+    BOOL CheckForMisfire();
 
-    bool AutoSpawnAmmo() const { return m_bAutoSpawnAmmo; };
+    BOOL AutoSpawnAmmo() const { return m_bAutoSpawnAmmo; };
     bool IsTriStateReload() const { return m_bTriStateReload; }
     EWeaponSubStates GetReloadState() const { return (EWeaponSubStates)m_sub_state; }
 protected:
@@ -131,7 +131,7 @@ protected:
     // a misfire happens, you'll need to rearm weapon
     bool bMisfire;
 
-    bool m_bAutoSpawnAmmo;
+    BOOL m_bAutoSpawnAmmo;
     virtual bool AllowBore();
 
 public:
@@ -241,13 +241,13 @@ public:
     virtual EHandDependence HandDependence() const { return eHandDependence; }
     bool IsSingleHanded() const { return m_bIsSingleHanded; }
 public:
-    IC const char* strap_bone0() const { return m_strap_bone0; }
-    IC const char* strap_bone1() const { return m_strap_bone1; }
+    IC LPCSTR strap_bone0() const { return m_strap_bone0; }
+    IC LPCSTR strap_bone1() const { return m_strap_bone1; }
     IC void strapped_mode(bool value) { m_strapped_mode = value; }
     IC bool strapped_mode() const { return m_strapped_mode; }
 protected:
-    const char* m_strap_bone0;
-    const char* m_strap_bone1;
+    LPCSTR m_strap_bone0;
+    LPCSTR m_strap_bone1;
     Fmatrix m_StrapOffset;
     bool m_strapped_mode;
     bool m_can_be_strapped;
@@ -277,7 +277,7 @@ protected:
         UpdateFireDependencies_internal();
     };
 
-    virtual void LoadFireParams(const char* section);
+    virtual void LoadFireParams(LPCSTR section);
 
 public:
     IC const Fvector& get_LastFP()
@@ -414,7 +414,7 @@ public:
     void SetAmmoElapsed(int ammo_count);
 
     virtual void OnMagazineEmpty();
-    void SpawnAmmo(u32 boxCurr = 0xffffffff, const char* ammoSect = NULL, u32 ParentID = 0xffffffff);
+    void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL, u32 ParentID = 0xffffffff);
     bool SwitchAmmoType(u32 flags);
 
     virtual float Get_PDM_Base() const { return m_pdm.m_fPDM_disp_base; };
@@ -497,17 +497,17 @@ public:
     virtual bool use_crosshair() const { return true; }
     bool show_crosshair();
     bool show_indicators();
-    virtual bool ParentMayHaveAimBullet();
-    virtual bool ParentIsActor();
+    virtual BOOL ParentMayHaveAimBullet();
+    virtual BOOL ParentIsActor();
 
 private:
-    virtual bool install_upgrade_ammo_class(const char* section, bool test);
-    bool install_upgrade_disp(const char* section, bool test);
-    bool install_upgrade_hit(const char* section, bool test);
-    bool install_upgrade_addon(const char* section, bool test);
+    virtual bool install_upgrade_ammo_class(LPCSTR section, bool test);
+    bool install_upgrade_disp(LPCSTR section, bool test);
+    bool install_upgrade_hit(LPCSTR section, bool test);
+    bool install_upgrade_addon(LPCSTR section, bool test);
 
 protected:
-    virtual bool install_upgrade_impl(const char* section, bool test);
+    virtual bool install_upgrade_impl(LPCSTR section, bool test);
 
 private:
     float m_hit_probability[egdCount];

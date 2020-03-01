@@ -20,22 +20,22 @@ protected:
     float m_Speed;
 
     COMotion* m_Current;
-    void LoadMotions(const char* fname);
+    void LoadMotions(LPCSTR fname);
     void SetActiveMotion(COMotion* mot);
-    COMotion* FindMotionByName(const char* name);
+    COMotion* FindMotionByName(LPCSTR name);
 
 public:
     CObjectAnimator();
     virtual ~CObjectAnimator();
 
     void Clear();
-    void Load(const char* name);
-    IC const char* Name() const { return *m_Name; }
+    void Load(LPCSTR name);
+    IC LPCSTR Name() const { return *m_Name; }
     float& Speed() { return m_Speed; }
-    COMotion* Play(bool bLoop, const char* name = 0);
+    COMotion* Play(bool bLoop, LPCSTR name = 0);
     void Pause(bool val) { return m_MParam.Pause(val); }
     void Stop();
-    IC bool IsPlaying() const { return m_MParam.bPlay; }
+    IC BOOL IsPlaying() const { return m_MParam.bPlay; }
     IC const Fmatrix& XFORM() const { return m_XFORM; }
     float GetLength() const;
     // Update

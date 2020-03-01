@@ -3,9 +3,9 @@
 class CBlender_accum_direct_mask : public IBlender
 {
 public:
-    const char* getComment() override { return "INTERNAL: mask direct light"; }
-    bool canBeDetailed() override { return FALSE; }
-    bool canBeLMAPped() override { return FALSE; }
+    LPCSTR getComment() override { return "INTERNAL: mask direct light"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
     void Compile(CBlender_Compile& C) override;
 
@@ -17,11 +17,11 @@ class CBlender_accum_direct_mask_msaa : public IBlender
 {
 public:
 
-    const char* getComment() override { return "INTERNAL: mask direct light msaa"; }
-    bool canBeDetailed() override { return FALSE; }
-    bool canBeLMAPped() override { return FALSE; }
+    LPCSTR getComment() override { return "INTERNAL: mask direct light msaa"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-    virtual void SetDefine(const char* Name, const char* Definition)
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
     {
         this->Name = Name;
         this->Definition = Definition;
@@ -32,6 +32,6 @@ public:
     CBlender_accum_direct_mask_msaa();
     virtual ~CBlender_accum_direct_mask_msaa();
 
-    const char* Name;
-    const char* Definition;
+    LPCSTR Name;
+    LPCSTR Definition;
 };

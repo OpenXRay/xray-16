@@ -25,7 +25,7 @@ public:
 
     struct SSource : public SFlare
     {
-        bool ignore_color;
+        BOOL ignore_color;
     };
     using FlareVec = xr_vector<SFlare>;
 
@@ -48,10 +48,10 @@ public:
     float m_StateBlendUpSpeed;
     float m_StateBlendDnSpeed;
 
-    void SetGradient(float fMaxRadius, float fOpacity, const char* tex_name, const char* sh_name);
-    void SetSource(float fRadius, bool ign_color, const char* tex_name, const char* sh_name);
-    void AddFlare(float fRadius, float fOpacity, float fPosition, const char* tex_name, const char* sh_name);
-    // ref_shader CreateShader (const char* tex_name, const char* sh_name);
+    void SetGradient(float fMaxRadius, float fOpacity, LPCSTR tex_name, LPCSTR sh_name);
+    void SetSource(float fRadius, BOOL ign_color, LPCSTR tex_name, LPCSTR sh_name);
+    void AddFlare(float fRadius, float fOpacity, float fPosition, LPCSTR tex_name, LPCSTR sh_name);
+    // ref_shader CreateShader (LPCSTR tex_name, LPCSTR sh_name);
 
     shared_str section;
 
@@ -91,7 +91,7 @@ protected:
     Fvector vSunDir;
     Fvector vecLight;
     Fvector vecX, vecY, vecDir, vecAxis, vecCenter;
-    bool bRender;
+    BOOL bRender;
 
     // variable
     Fcolor LightColor;
@@ -120,7 +120,7 @@ public:
     virtual ~CLensFlare();
 
     void OnFrame(shared_str id);
-    void __fastcall Render(bool bSun, bool bFlares, bool bGradient);
+    void __fastcall Render(BOOL bSun, BOOL bFlares, BOOL bGradient);
     void OnDeviceCreate();
     void OnDeviceDestroy();
 

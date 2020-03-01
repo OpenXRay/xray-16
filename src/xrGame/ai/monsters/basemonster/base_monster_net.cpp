@@ -13,7 +13,7 @@ void CBaseMonster::net_Save(NET_Packet& P)
     m_pPhysics_support->in_NetSave(P);
 }
 
-bool CBaseMonster::net_SaveRelevant() { return (inherited::net_SaveRelevant() || bool(PPhysicsShell() != NULL)); }
+BOOL CBaseMonster::net_SaveRelevant() { return (inherited::net_SaveRelevant() || BOOL(PPhysicsShell() != NULL)); }
 void CBaseMonster::net_Export(NET_Packet& P)
 {
     R_ASSERT(Local());

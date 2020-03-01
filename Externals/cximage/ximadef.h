@@ -95,7 +95,7 @@ typedef struct tagcomplex {
 #include <string.h>
 #include <ctype.h>
 
-typedef unsigned int          COLORREF;
+typedef DWORD          COLORREF;
 typedef void*          HRGN;
 typedef void*          HDC;
 
@@ -103,8 +103,8 @@ typedef int boolean;
 
 #define _tfopen fopen
 
-#ifndef bool
-#define	bool bool
+#ifndef BOOL
+#define	BOOL bool
 #endif
 
 #ifndef TRUE
@@ -121,48 +121,48 @@ typedef int boolean;
 #endif
 
 typedef struct tagRGBQUAD {
-	unsigned char    rgbBlue;
-	unsigned char    rgbGreen;
-	unsigned char    rgbRed;
-	unsigned char    rgbReserved;
+	BYTE    rgbBlue;
+	BYTE    rgbGreen;
+	BYTE    rgbRed;
+	BYTE    rgbReserved;
 } RGBQUAD;
 
 #pragma pack(1)
 
 typedef struct tagBITMAPINFOHEADER{
-	unsigned int      biSize;
+	DWORD      biSize;
 	long       biWidth;
 	long       biHeight;
-	unsigned short       biPlanes;
-	unsigned short       biBitCount;
-	unsigned int      biCompression;
-	unsigned int      biSizeImage;
+	WORD       biPlanes;
+	WORD       biBitCount;
+	DWORD      biCompression;
+	DWORD      biSizeImage;
 	long       biXPelsPerMeter;
 	long       biYPelsPerMeter;
-	unsigned int      biClrUsed;
-	unsigned int      biClrImportant;
+	DWORD      biClrUsed;
+	DWORD      biClrImportant;
 } BITMAPINFOHEADER;
 
 typedef struct tagBITMAPFILEHEADER {
-	unsigned short    bfType;
-	unsigned int   bfSize;
-	unsigned short    bfReserved1;
-	unsigned short    bfReserved2;
-	unsigned int   bfOffBits;
+	WORD    bfType;
+	DWORD   bfSize;
+	WORD    bfReserved1;
+	WORD    bfReserved2;
+	DWORD   bfOffBits;
 } BITMAPFILEHEADER;
 
 typedef struct tagBITMAPCOREHEADER {
-	unsigned int   bcSize;
-	unsigned short    bcWidth;
-	unsigned short    bcHeight;
-	unsigned short    bcPlanes;
-	unsigned short    bcBitCount;
+	DWORD   bcSize;
+	WORD    bcWidth;
+	WORD    bcHeight;
+	WORD    bcPlanes;
+	WORD    bcBitCount;
 } BITMAPCOREHEADER;
 
 typedef struct tagRGBTRIPLE {
-	unsigned char    rgbtBlue;
-	unsigned char    rgbtGreen;
-	unsigned char    rgbtRed;
+	BYTE    rgbtBlue;
+	BYTE    rgbtGreen;
+	BYTE    rgbtRed;
 } RGBTRIPLE;
 
 #pragma pack()
@@ -172,9 +172,9 @@ typedef struct tagRGBTRIPLE {
 #define BI_RLE4       2L
 #define BI_BITFIELDS  3L
 
-#define GetRValue(rgb)      ((unsigned char)(rgb))
-#define GetGValue(rgb)      ((unsigned char)(((unsigned short)(rgb)) >> 8))
-#define GetBValue(rgb)      ((unsigned char)((rgb)>>16))
+#define GetRValue(rgb)      ((BYTE)(rgb))
+#define GetGValue(rgb)      ((BYTE)(((WORD)(rgb)) >> 8))
+#define GetBValue(rgb)      ((BYTE)((rgb)>>16))
 
 #ifndef _COMPLEX_DEFINED
 

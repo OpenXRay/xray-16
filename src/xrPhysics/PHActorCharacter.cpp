@@ -11,7 +11,7 @@
 const float JUMP_UP_VELOCITY = 6.0f; // 5.6f;
 const float JUMP_INCREASE_VELOCITY_RATE = 1.2f;
 //#ifdef DEBUG
-// XRPHYSICS_API bool use_controllers_separation = TRUE;
+// XRPHYSICS_API BOOL use_controllers_separation = TRUE;
 //#endif
 CPHActorCharacter::CPHActorCharacter(bool single_game) : b_single_game(single_game)
 {

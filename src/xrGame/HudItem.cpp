@@ -50,7 +50,7 @@ void CHudItem::Load(cpcstr section)
     m_sounds.LoadSound(section, "snd_bore", "sndBore", true);
 }
 
-void CHudItem::PlaySound(const char* alias, const Fvector& position)
+void CHudItem::PlaySound(LPCSTR alias, const Fvector& position)
 {
     m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode());
 }
@@ -264,7 +264,7 @@ void CHudItem::on_a_hud_attach()
     }
 }
 
-u32 CHudItem::PlayHUDMotion(const shared_str& M, bool bMixIn, CHudItem* W, u32 state)
+u32 CHudItem::PlayHUDMotion(const shared_str& M, BOOL bMixIn, CHudItem* W, u32 state)
 {
     u32 anim_time = PlayHUDMotion_noCB(M, bMixIn);
     if (anim_time > 0)
@@ -281,7 +281,7 @@ u32 CHudItem::PlayHUDMotion(const shared_str& M, bool bMixIn, CHudItem* W, u32 s
     return anim_time;
 }
 
-u32 CHudItem::PlayHUDMotion(const shared_str& M, const shared_str& M2, bool bMixIn, CHudItem* W, u32 state)
+u32 CHudItem::PlayHUDMotion(const shared_str& M, const shared_str& M2, BOOL bMixIn, CHudItem* W, u32 state)
 {
     u32 time = 0;
 
@@ -293,7 +293,7 @@ u32 CHudItem::PlayHUDMotion(const shared_str& M, const shared_str& M2, bool bMix
     return time;
 }
 
-u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, bool bMixIn)
+u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, BOOL bMixIn)
 {
     m_current_motion = motion_name;
 
@@ -322,7 +322,7 @@ void CHudItem::StopCurrentAnimWithoutCallback()
     m_current_motion_def = NULL;
 }
 
-bool CHudItem::GetHUDmode()
+BOOL CHudItem::GetHUDmode()
 {
     if (object().H_Parent())
     {

@@ -54,9 +54,9 @@ private:
 public:
     IC CHitMemoryManager(CCustomMonster* object, CAI_Stalker* stalker);
     virtual ~CHitMemoryManager();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void update();
     void remove_links(IGameObject* object);
 

@@ -12,9 +12,9 @@ public:
     CAI_Dog();
     virtual ~CAI_Dog();
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     virtual void UpdateCL();
 
     virtual void CheckSpecParams(u32 spec_params);
@@ -56,7 +56,7 @@ private:
     u32 min_move_dist;
     u32 max_move_dist;
 
-    const char* get_current_animation();
+    LPCSTR get_current_animation();
     static void animation_end(CBlend* B);
 #ifdef _DEBUG
     virtual void debug_on_key(int key);

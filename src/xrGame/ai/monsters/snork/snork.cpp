@@ -32,7 +32,7 @@ CSnork::CSnork()
 }
 
 CSnork::~CSnork() { xr_delete(StateMan); }
-void CSnork::Load(const char* section)
+void CSnork::Load(LPCSTR section)
 {
     inherited::Load(section);
 

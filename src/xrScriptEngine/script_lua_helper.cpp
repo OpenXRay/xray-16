@@ -446,7 +446,7 @@ void CDbgLuaHelper::DrawVariable(lua_State* l, const char* name, bool bOpenTable
     debugger()->AddLocalVariable(var);
 }
 
-void CDbgLuaHelper::DrawTable(lua_State* l, const char* S, bool bRecursive)
+void CDbgLuaHelper::DrawTable(lua_State* l, LPCSTR S, bool bRecursive)
 {
     // char str[1024];
     if (!lua_istable(l, -1))

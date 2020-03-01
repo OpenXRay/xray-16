@@ -18,16 +18,16 @@ IFactoryObject* CExplosiveRocket::_construct()
     return (this);
 }
 
-void CExplosiveRocket::Load(const char* section)
+void CExplosiveRocket::Load(LPCSTR section)
 {
     inherited::Load(section);
     CInventoryItem::Load(section);
     CExplosive::Load(section);
 }
 
-bool CExplosiveRocket::net_Spawn(CSE_Abstract* DC)
+BOOL CExplosiveRocket::net_Spawn(CSE_Abstract* DC)
 {
-    bool result = inherited::net_Spawn(DC);
+    BOOL result = inherited::net_Spawn(DC);
     result = result && CInventoryItem::net_Spawn(DC);
     Fvector box;
     BoundingBox().getsize(box);
@@ -120,7 +120,7 @@ void CExplosiveRocket::reinit()
     CInventoryItem::reinit();
 }
 
-void CExplosiveRocket::reload(const char* section)
+void CExplosiveRocket::reload(LPCSTR section)
 {
     inherited::reload(section);
     CInventoryItem::reload(section);

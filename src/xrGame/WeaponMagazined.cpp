@@ -79,7 +79,7 @@ bool CWeaponMagazined::WeaponSoundExist(pcstr section, pcstr sound_name) const
 
 //-AVO
 
-void CWeaponMagazined::Load(const char* section)
+void CWeaponMagazined::Load(LPCSTR section)
 {
     inherited::Load(section);
 
@@ -286,12 +286,12 @@ void CWeaponMagazined::OnMagazineEmpty()
 
 void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 {
-    xr_map<const char*, u16> l_ammo;
+    xr_map<LPCSTR, u16> l_ammo;
 
     while (!m_magazine.empty())
     {
         CCartridge& l_cartridge = m_magazine.back();
-        xr_map<const char*, u16>::iterator l_it;
+        xr_map<LPCSTR, u16>::iterator l_it;
         for (l_it = l_ammo.begin(); l_ammo.end() != l_it; ++l_it)
         {
             if (!xr_strcmp(*l_cartridge.m_ammoSect, l_it->first))
@@ -312,7 +312,7 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
     if (!spawn_ammo)
         return;
 
-    xr_map<const char*, u16>::iterator l_it;
+    xr_map<LPCSTR, u16>::iterator l_it;
     for (l_it = l_ammo.begin(); l_ammo.end() != l_it; ++l_it)
     {
         if (m_pInventory)
@@ -357,7 +357,7 @@ void CWeaponMagazined::ReloadMagazine()
         if (m_ammoTypes.size() <= m_ammoType)
             return;
 
-        const char* tmp_sect_name = m_ammoTypes[m_ammoType].c_str();
+        LPCSTR tmp_sect_name = m_ammoTypes[m_ammoType].c_str();
 
         if (!tmp_sect_name)
             return;
@@ -747,7 +747,7 @@ void CWeaponMagazined::PlayReloadSound()
     {
         if (bMisfire)
         {
-            //TODO: make sure correct sound is loaded in CWeaponMagazined::Load(const char* section)
+            //TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
             if (m_sounds.FindSoundItem("sndReloadMisfire", false))
                 PlaySound("sndReloadMisfire", get_LastFP());
             else
@@ -960,7 +960,7 @@ bool CWeaponMagazined::DetachScope(const char* item_section_name, bool b_spawn_i
     auto it = m_scopes.begin();
     for (; it != m_scopes.end(); ++it)
     {
-        const char* iter_scope_name = pSettings->r_string((*it), "scope_name");
+        LPCSTR iter_scope_name = pSettings->r_string((*it), "scope_name");
         if (!xr_strcmp(iter_scope_name, item_section_name))
         {
             m_cur_scope = 0;
@@ -1100,7 +1100,7 @@ void CWeaponMagazined::LoadSilencerKoeffs()
 {
     if (m_eSilencerStatus == ALife::eAddonAttachable)
     {
-        const char* sect = m_sSilencerName.c_str();
+        LPCSTR sect = m_sSilencerName.c_str();
         m_silencer_koef.hit_power = READ_IF_EXISTS(pSettings, r_float, sect, "bullet_hit_power_k", 1.0f);
         m_silencer_koef.hit_impulse = READ_IF_EXISTS(pSettings, r_float, sect, "bullet_hit_impulse_k", 1.0f);
         m_silencer_koef.bullet_speed = READ_IF_EXISTS(pSettings, r_float, sect, "bullet_speed_k", 1.0f);
@@ -1396,24 +1396,24 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
 
     if (ae != 0 && m_magazine.size() != 0)
     {
-        const char* ammo_type = m_ammoTypes[m_magazine.back().m_LocalAmmoType].c_str();
+        LPCSTR ammo_type = m_ammoTypes[m_magazine.back().m_LocalAmmoType].c_str();
         info.name = StringTable().translate(pSettings->r_string(ammo_type, "inv_name_short"));
         info.icon = ammo_type;
     }
     else
     {
-        const char* ammo_type = m_ammoTypes[m_ammoType].c_str();
+        LPCSTR ammo_type = m_ammoTypes[m_ammoType].c_str();
         info.name = StringTable().translate(pSettings->r_string(ammo_type, "inv_name_short"));
         info.icon = ammo_type;
     }
     return true;
 }
 
-bool CWeaponMagazined::install_upgrade_impl(const char* section, bool test)
+bool CWeaponMagazined::install_upgrade_impl(LPCSTR section, bool test)
 {
     bool result = inherited::install_upgrade_impl(section, test);
 
-    const char* str;
+    LPCSTR str;
     // fire_modes = 1, 2, -1
     bool result2 = process_if_exists_set(section, "fire_modes", &CInifile::r_string, str, test);
     if (result2 && !test)

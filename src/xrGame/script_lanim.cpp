@@ -17,8 +17,8 @@ struct lanim_wrapper
     CLAItem* item;
 
 public:
-    lanim_wrapper(const char* name) { load(name); }
-    void load(const char* name)
+    lanim_wrapper(LPCSTR name) { load(name); }
+    void load(LPCSTR name)
     {
         item = LALib.FindItem(name);
         R_ASSERT3(item, "Can't find color anim:", name);
@@ -38,7 +38,7 @@ public:
 
 SCRIPT_EXPORT(lanim_wrapper, (), {
     module(luaState)[class_<lanim_wrapper>("color_animator")
-                         .def(constructor<const char*>())
+                         .def(constructor<LPCSTR>())
                          .def("load", &lanim_wrapper::load)
                          .def("calculate", &lanim_wrapper::calculate)
                          .def("length", &lanim_wrapper::length)];

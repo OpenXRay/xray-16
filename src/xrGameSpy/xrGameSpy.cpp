@@ -13,7 +13,7 @@ void FillSecretKey(char* secretKey)
 }
 
 const char* GetGameVersion() { return GAME_VERSION; }
-// unsigned short: Bit masks for languages
+// WORD: Bit masks for languages
 #define SKU_HAS_E 0x0001 // English
 #define SKU_HAS_F 0x0002 // French
 #define SKU_HAS_I 0x0004 // Italian
@@ -24,7 +24,7 @@ const char* GetGameVersion() { return GAME_VERSION; }
 #define SKU_HAS_C 0x0080 // Czech
 #define SKU_HAS_H 0x0100 // China
 
-// unsigned char: Bit masks for protection
+// BYTE: Bit masks for protection
 #define SKU_PRT_NONE 0x10 // Without protection
 #define SKU_PRT_SECU 0x20 // SecuROM
 #define SKU_PRT_STAR 0x40 // StarForce
@@ -44,12 +44,12 @@ int GetGameDistribution()
 
     //	char	KeyValue[1024] = "";
 
-     DWORD KeyValueSize = 1024;
+    DWORD KeyValueSize = 1024;
     DWORD KeyValueType = REG_DWORD;
     if (res == ERROR_SUCCESS && KeyCDKey != 0)
     {
         res = RegQueryValueEx(
-            KeyCDKey, REGISTRY_VALUE_INSTALL_PATCH_ID, NULL, &KeyValueType, (unsigned char*)&KeyValue, &KeyValueSize);
+            KeyCDKey, REGISTRY_VALUE_INSTALL_PATCH_ID, NULL, &KeyValueType, (LPBYTE)&KeyValue, &KeyValueSize);
     };
     if (KeyCDKey != 0)
         RegCloseKey(KeyCDKey);

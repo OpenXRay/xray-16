@@ -12,9 +12,9 @@
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
-void fix_texture_name(char* fn)
+void fix_texture_name(LPSTR fn)
 {
-    char* _ext = strext(fn);
+    LPSTR _ext = strext(fn);
     if (_ext && (!xr_stricmp(_ext, ".tga") || !xr_stricmp(_ext, ".dds") ||
         !xr_stricmp(_ext, ".bmp") || !xr_stricmp(_ext, ".ogm")))
     {
@@ -28,7 +28,7 @@ ENGINE_API bool is_enough_address_space_available();
 bool is_enough_address_space_available() { return true; }
 #endif
 
-int get_texture_load_lod(const char* fn)
+int get_texture_load_lod(LPCSTR fn)
 {
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
     auto it_ = sect.Data.cbegin();
@@ -116,7 +116,7 @@ IC void Reduce(int& w, int& h, int& l, int& skip)
         h = 1;
 }
 
-void TW_Save(ID3DTexture2D* T, const char* name, const char* prefix, const char* postfix)
+void TW_Save(ID3DTexture2D* T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
 {
     string256 fn;
     strconcat(sizeof(fn), fn, name, "_", prefix, "-", postfix);
@@ -176,9 +176,9 @@ ID3DTexture2D* TW_LoadTextureFromTexture(
 template <class _It>
 void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
 {
-    unsigned int mips = t_dst->GetLevelCount();
+    DWORD mips = t_dst->GetLevelCount();
     R_ASSERT(mips == t_src->GetLevelCount());
-    for (unsigned int i = 0; i < mips; i++)
+    for (DWORD i = 0; i < mips; i++)
     {
         D3DLOCKED_RECT Rsrc, Rdst;
         D3DSURFACE_DESC desc, descS;
@@ -193,8 +193,8 @@ void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
         {
             for (u32 x = 0; x < desc.Width; x++)
             {
-                unsigned int& pSrc = *(((unsigned int*)((unsigned char*)Rsrc.pBits + (y * Rsrc.Pitch))) + x);
-                unsigned int& pDst = *(((unsigned int*)((unsigned char*)Rdst.pBits + (y * Rdst.Pitch))) + x);
+                DWORD& pSrc = *(((DWORD*)((BYTE*)Rsrc.pBits + (y * Rsrc.Pitch))) + x);
+                DWORD& pDst = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch))) + x);
                 pDst = pred(pDst, pSrc);
             }
         }
@@ -205,10 +205,10 @@ void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
 template <class _It>
 void TW_Iterate_2OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src0, ID3DTexture2D* t_src1, const _It pred)
 {
-    unsigned int mips = t_dst->GetLevelCount();
+    DWORD mips = t_dst->GetLevelCount();
     R_ASSERT(mips == t_src0->GetLevelCount());
     R_ASSERT(mips == t_src1->GetLevelCount());
-    for (unsigned int i = 0; i < mips; i++)
+    for (DWORD i = 0; i < mips; i++)
     {
         D3DLOCKED_RECT Rsrc0, Rsrc1, Rdst;
         D3DSURFACE_DESC desc, descS0, descS1;
@@ -226,9 +226,9 @@ void TW_Iterate_2OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src0, ID3DTexture2D* 
         {
             for (u32 x = 0; x < desc.Width; x++)
             {
-                unsigned int& pSrc0 = *(((unsigned int*)((unsigned char*)Rsrc0.pBits + (y * Rsrc0.Pitch))) + x);
-                unsigned int& pSrc1 = *(((unsigned int*)((unsigned char*)Rsrc1.pBits + (y * Rsrc1.Pitch))) + x);
-                unsigned int& pDst = *(((unsigned int*)((unsigned char*)Rdst.pBits + (y * Rdst.Pitch))) + x);
+                DWORD& pSrc0 = *(((DWORD*)((BYTE*)Rsrc0.pBits + (y * Rsrc0.Pitch))) + x);
+                DWORD& pSrc1 = *(((DWORD*)((BYTE*)Rsrc1.pBits + (y * Rsrc1.Pitch))) + x);
+                DWORD& pDst = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch))) + x);
                 pDst = pred(pDst, pSrc0, pSrc1);
             }
         }
@@ -273,7 +273,7 @@ IC u32 it_height_rev_base(u32 d, u32 s)
         (color_get_R(s) + color_get_G(s) + color_get_B(s)) / 3); // height
 }
 
-ID3DBaseTexture* CRender::texture_load(const char* fRName, u32& ret_msize)
+ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     HRESULT result;
     ID3DTexture2D* pTexture2D = nullptr;

@@ -12,7 +12,7 @@
 #include "Include/xrRender/UIRender.h"
 #include "xrUICore/Cursor/UICursor.h"
 
-extern ENGINE_API bool bShowPauseString;
+extern ENGINE_API BOOL bShowPauseString;
 
 //-----------------------------------------------------------------------------
 // Tutorial Item
@@ -45,7 +45,7 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
     XML_NODE _stored_root = xml->GetLocalRoot();
     xml->SetLocalRoot(xml->NavigateToNode("item", idx));
 
-    const char* str = xml->Read("pause_state", 0, "ignore");
+    LPCSTR str = xml->Read("pause_state", 0, "ignore");
     m_flags.set(etiNeedPauseOn, 0 == xr_stricmp(str, "on"));
     m_flags.set(etiNeedPauseOff, 0 == xr_stricmp(str, "off"));
     m_flags.set(etiNeedPauseSound, 0 == xr_stricmp(str, "on"));
@@ -155,7 +155,7 @@ void CUISequenceVideoItem::Update()
 
     if (m_texture->HasTexture())
     {
-        const bool is_playing = m_sound[0]._handle() ? !!m_sound[0]._feedback() : m_texture->video_IsPlaying();
+        const BOOL is_playing = m_sound[0]._handle() ? !!m_sound[0]._feedback() : m_texture->video_IsPlaying();
         if (is_playing)
         {
             m_texture->video_Sync(m_sync_time);

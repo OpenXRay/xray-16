@@ -161,17 +161,17 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
 public:
     void init();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
-    virtual void LoadSounds(const char* section);
+    virtual void reload(LPCSTR section);
+    virtual void LoadSounds(LPCSTR section);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     virtual void net_Destroy();
     virtual void net_Save(NET_Packet& P);
-    virtual bool net_SaveRelevant();
+    virtual BOOL net_SaveRelevant();
     virtual void net_Relcase(IGameObject* O);
 
     // save/load server serialization
@@ -182,7 +182,7 @@ public:
     virtual void shedule_Update(u32 dt);
     virtual void Think();
     virtual void SelectAnimation(const Fvector& _view, const Fvector& _move, float speed);
-    virtual bool UsedAI_Locations();
+    virtual BOOL UsedAI_Locations();
 
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
     virtual void g_fireParams(const CHudItem* pHudItem, Fvector& P, Fvector& D);
@@ -285,7 +285,7 @@ public:
     IC float start_pick_distance() const;
     bool fire_make_sense();
 
-    virtual const char* Name() const;
+    virtual LPCSTR Name() const;
     virtual bool feel_touch_contact(IGameObject* O);
     virtual bool feel_touch_on_contact(IGameObject* O);
 
@@ -712,7 +712,7 @@ private:
     virtual bool critical_wound_external_conditions_suitable();
     virtual void critical_wounded_state_start();
 
-    void fill_bones_body_parts(const char* bone_id, const ECriticalWoundType& wound_type);
+    void fill_bones_body_parts(LPCSTR bone_id, const ECriticalWoundType& wound_type);
 
 public:
     typedef xr_vector<float> CRITICAL_WOUND_WEIGHTS;
@@ -786,7 +786,7 @@ public:
     typedef fastdelegate::FastDelegate<void(Fmatrix&)> EyeMatrixCallback;
 
 private:
-    virtual bool AlwaysTheCrow();
+    virtual BOOL AlwaysTheCrow();
 
 public:
     IC void take_items_enabled(bool value);

@@ -29,7 +29,7 @@ public:
     void Destroy();
 
 private:
-    virtual bool Process(SPPInfo& pp);
+    virtual BOOL Process(SPPInfo& pp);
 };
 
 CAlienEffectorPP::CAlienEffectorPP(const SPPInfo& ppi, EEffectorPPType type) : CEffectorPP(type, flt_max, false)
@@ -42,7 +42,7 @@ CAlienEffectorPP::CAlienEffectorPP(const SPPInfo& ppi, EEffectorPPType type) : C
 CAlienEffectorPP::~CAlienEffectorPP() {}
 #define PERIOD_SPEED 0.3f
 
-bool CAlienEffectorPP::Process(SPPInfo& pp)
+BOOL CAlienEffectorPP::Process(SPPInfo& pp)
 {
     inherited::Process(pp);
 
@@ -84,7 +84,7 @@ class CAlienEffector : public CEffectorCam
 
 public:
     CAlienEffector(ECamEffectorType type, CAI_Bloodsucker* obj);
-    virtual bool ProcessCam(SCamEffectorInfo& info);
+    virtual BOOL ProcessCam(SCamEffectorInfo& info);
 };
 
 #define DELTA_ANGLE_X 10 * PI / 180
@@ -112,7 +112,7 @@ CAlienEffector::CAlienEffector(ECamEffectorType type, CAI_Bloodsucker* obj) : in
     m_current_fov = MIN_FOV;
 }
 
-bool CAlienEffector::ProcessCam(SCamEffectorInfo& info)
+BOOL CAlienEffector::ProcessCam(SCamEffectorInfo& info)
 {
     // Инициализация
     Fmatrix Mdef;

@@ -34,7 +34,7 @@ IC CAbstractOperator::COperatorAbstract(const CSConditionState& conditions, cons
 TEMPLATE_SPECIALIZATION
 CAbstractOperator::~COperatorAbstract() {}
 TEMPLATE_SPECIALIZATION
-void CAbstractOperator::Load(const char* section) {}
+void CAbstractOperator::Load(LPCSTR section) {}
 TEMPLATE_SPECIALIZATION
 void CAbstractOperator::setup(bool* actuality)
 {

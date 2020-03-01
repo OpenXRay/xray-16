@@ -20,7 +20,7 @@ protected:
     typedef CStalkerActionCombatBase inherited;
 
 public:
-    CStalkerActionReachWounded(CAI_Stalker* object, const char* action_name = "");
+    CStalkerActionReachWounded(CAI_Stalker* object, LPCSTR action_name = "");
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -39,7 +39,7 @@ private:
     //	float				m_speed;
 
 public:
-    CStalkerActionAimWounded(CAI_Stalker* object, const char* action_name = "");
+    CStalkerActionAimWounded(CAI_Stalker* object, LPCSTR action_name = "");
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -55,7 +55,7 @@ protected:
     typedef CStalkerActionCombatBase inherited;
 
 public:
-    CStalkerActionPrepareWounded(CAI_Stalker* object, const char* action_name = "");
+    CStalkerActionPrepareWounded(CAI_Stalker* object, LPCSTR action_name = "");
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -71,7 +71,7 @@ protected:
     typedef CStalkerActionCombatBase inherited;
 
 public:
-    CStalkerActionKillWounded(CAI_Stalker* object, const char* action_name = "");
+    CStalkerActionKillWounded(CAI_Stalker* object, LPCSTR action_name = "");
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
@@ -87,7 +87,7 @@ protected:
     typedef CStalkerActionCombatBase inherited;
 
 public:
-    CStalkerActionPauseAfterKill(CAI_Stalker* object, const char* action_name = "");
+    CStalkerActionPauseAfterKill(CAI_Stalker* object, LPCSTR action_name = "");
     virtual void initialize();
     virtual void execute();
 };

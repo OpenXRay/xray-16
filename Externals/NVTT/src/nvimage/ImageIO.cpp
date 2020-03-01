@@ -1134,7 +1134,7 @@ FloatImage * nv::ImageIO::loadFloatEXR(const char * fileName, Stream & s)
 	uint i = 0;
 	for (Imf::ChannelList::ConstIterator it = channels.begin(); it != channels.end(); ++it, ++i)
 	{
-		frameBuffer.insert(it.name(), Imf::Slice(Imf::float, (char *)fimage->channel(i), sizeof(float), sizeof(float) * width));
+		frameBuffer.insert(it.name(), Imf::Slice(Imf::FLOAT, (char *)fimage->channel(i), sizeof(float), sizeof(float) * width));
 	}
 	
 	// Read it.
@@ -1160,7 +1160,7 @@ bool nv::ImageIO::saveFloatEXR(const char * fileName, const FloatImage * fimage,
 	
 	for (uint c = 0; c < num_components; c++)
 	{
-		header.channels().insert(channelNames[c], Imf::Channel(Imf::float));
+		header.channels().insert(channelNames[c], Imf::Channel(Imf::FLOAT));
 	}
 	
     Imf::OutputFile file(fileName, header);
@@ -1169,7 +1169,7 @@ bool nv::ImageIO::saveFloatEXR(const char * fileName, const FloatImage * fimage,
 	for (uint c = 0; c < num_components; c++)
 	{
 		char * channel = (char *) fimage->channel(base_component + c);
-		frameBuffer.insert(channelNames[c], Imf::Slice(Imf::float, channel, sizeof(float), sizeof(float) * w));
+		frameBuffer.insert(channelNames[c], Imf::Slice(Imf::FLOAT, channel, sizeof(float), sizeof(float) * w));
 	}
 	
 	file.setFrameBuffer(frameBuffer);

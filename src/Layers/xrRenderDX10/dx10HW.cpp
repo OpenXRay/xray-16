@@ -80,7 +80,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     Caps.id_vendor = Desc.VendorId;
     Caps.id_device = Desc.DeviceId;
 
-    unsigned int createDeviceFlags = 0;
+    UINT createDeviceFlags = 0;
 
 #ifdef DEBUG
     if (xrDebug::DebuggerIsPresent())
@@ -374,9 +374,9 @@ void CHW::Reset()
     UpdateViews();
 }
 
-bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const unsigned int feature) const
+bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const UINT feature) const
 {
-    unsigned int supports;
+    UINT supports;
 
     if (SUCCEEDED(pDevice->CheckFormatSupport(format, &supports)))
     {

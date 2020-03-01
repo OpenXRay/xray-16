@@ -9,7 +9,7 @@ public:
     CWeaponPistol();
     virtual ~CWeaponPistol();
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
 
     virtual void switch2_Reload();
 

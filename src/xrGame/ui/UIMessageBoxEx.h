@@ -9,16 +9,16 @@ class CUIMessageBoxEx : public CUIDialogWnd, public CUIWndCallback
 public:
     CUIMessageBoxEx();
     virtual ~CUIMessageBoxEx();
-    void SetText(const char* text);
-    const char* GetText();
-    virtual bool InitMessageBox(const char* xml_template);
+    void SetText(LPCSTR text);
+    LPCSTR GetText();
+    virtual bool InitMessageBox(LPCSTR xml_template);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
-    const char* GetHost();
-    const char* GetPassword();
+    LPCSTR GetHost();
+    LPCSTR GetPassword();
 
-    void SetTextEditURL(const char* text);
-    const char* GetTextEditURL();
+    void SetTextEditURL(LPCSTR text);
+    LPCSTR GetTextEditURL();
 
     CUIWndCallback::void_function func_on_ok;
     CUIWndCallback::void_function func_on_no;

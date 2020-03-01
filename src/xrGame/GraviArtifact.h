@@ -16,7 +16,7 @@ public:
     CGraviArtefact(void);
     virtual ~CGraviArtefact(void);
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
 
 protected:
     virtual void UpdateCLChild();

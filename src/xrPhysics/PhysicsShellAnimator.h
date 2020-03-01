@@ -10,11 +10,11 @@ class CPhysicsShellAnimator
     CPhysicsShell* m_pPhysicsShell;
     Fmatrix m_StartXFORM;
 
-    void CreateJoints(const char* controled);
+    void CreateJoints(LPCSTR controled);
     void CreateJoint(CPHElement* e);
 
 public:
-    CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CInifile const* ini, const char* section);
+    CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CInifile const* ini, LPCSTR section);
     ~CPhysicsShellAnimator();
     void OnFrame();
 };

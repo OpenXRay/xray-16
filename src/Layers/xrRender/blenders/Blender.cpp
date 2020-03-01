@@ -10,7 +10,7 @@
 
 #include "Blender.h"
 
-void CBlender_DESC::Setup(const char* N)
+void CBlender_DESC::Setup(LPCSTR N)
 {
     // Name
     VERIFY(xr_strlen(N) < 128);

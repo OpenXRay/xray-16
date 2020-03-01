@@ -83,9 +83,9 @@ private:
 
 public:
     CSightManager(CAI_Stalker* object);
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
     void remove_links(IGameObject* object);
     void Exec_Look(float dt);
     void SetPointLookAngles(const Fvector& tPosition, float& yaw, float& pitch, Fvector const& look_position,

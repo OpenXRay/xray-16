@@ -14,7 +14,7 @@ class dxUIShader : public IUIShader
 public:
     virtual ~dxUIShader() { ; }
     virtual void Copy(IUIShader& _in);
-    virtual void create(const char* sh, const char* tex = nullptr);
+    virtual void create(LPCSTR sh, LPCSTR tex = nullptr);
     virtual bool inited() { return hShader; }
     virtual void destroy();
 

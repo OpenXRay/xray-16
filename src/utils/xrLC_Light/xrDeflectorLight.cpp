@@ -13,7 +13,7 @@
 #include "base_face_ptr_storage.h"
 
 // const	u32	rms_discard			= 8;
-// extern	bool		gl_linear	;
+// extern	BOOL		gl_linear	;
 
 void Jitter_Select(Fvector2*& Jitter, u32& Jcount)
 {
@@ -200,7 +200,7 @@ void GET(const lm_line& l, int x, u32 width, u32 ref, u32& count, base_color_c& 
     count++;
 }
 
-bool NEW_ApplyBorders(lm_layer& lm, u32 ref)
+BOOL NEW_ApplyBorders(lm_layer& lm, u32 ref)
 {
     bool bNeedContinue = false;
 
@@ -282,9 +282,9 @@ bool NEW_ApplyBorders(lm_layer& lm, u32 ref)
     return bNeedContinue;
 }
 
-bool OLD_ApplyBorders(lm_layer& lm, u32 ref)
+BOOL OLD_ApplyBorders(lm_layer& lm, u32 ref)
 {
-    bool bNeedContinue = FALSE;
+    BOOL bNeedContinue = FALSE;
 
     try
     {
@@ -328,12 +328,12 @@ bool OLD_ApplyBorders(lm_layer& lm, u32 ref)
     return bNeedContinue;
 }
 
-bool ApplyBorders(lm_layer& lm, u32 ref)
+BOOL ApplyBorders(lm_layer& lm, u32 ref)
 {
     // lm_layer r_new = lm;
-    // bool bres_new = NEW_ApplyBorders( r_new, ref );
+    // BOOL bres_new = NEW_ApplyBorders( r_new, ref );
     // lm_layer r_old = lm;
-    // bool bres_old = OLD_ApplyBorders( r_old, ref );
+    // BOOL bres_old = OLD_ApplyBorders( r_old, ref );
 
     // R_ASSERT( r_old.similar( r_new, 0 ) );
     // R_ASSERT( bres_new == bres_old );
@@ -346,7 +346,7 @@ bool ApplyBorders(lm_layer& lm, u32 ref)
     return NEW_ApplyBorders(lm, ref);
 }
 
-float getLastRP_Scale(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Face* skip, bool bUseFaceDisable)
+float getLastRP_Scale(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Face* skip, BOOL bUseFaceDisable)
 {
     u32 tris_count = DB->r_count();
     float scale = 1.f;
@@ -423,7 +423,7 @@ float getLastRP_Scale(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Face* skip
 }
 
 float rayTrace(
-    CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Fvector& P, Fvector& D, float R, Face* skip, bool bUseFaceDisable)
+    CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Fvector& P, Fvector& D, float R, Face* skip, BOOL bUseFaceDisable)
 {
     R_ASSERT(DB);
 
@@ -457,7 +457,7 @@ void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c& C, Fvector& P,
     Fvector Ldir, Pnew;
     Pnew.mad(P, N, 0.01f);
 
-    bool bUseFaceDisable = flags & LP_UseFaceDisable;
+    BOOL bUseFaceDisable = flags & LP_UseFaceDisable;
 
     if (0 == (flags & LP_dont_rgb))
     {
@@ -640,7 +640,7 @@ IC u32 rms_diff(u32 a, u32 b)
         return b - a;
 }
 
-bool __stdcall rms_test(lm_layer& lm, u32 w, u32 h, u32 rms)
+BOOL __stdcall rms_test(lm_layer& lm, u32 w, u32 h, u32 rms)
 {
     if ((w <= 1) || (h <= 1))
         return FALSE;
@@ -717,7 +717,7 @@ bool __stdcall rms_test(lm_layer& lm, u32 w, u32 h, u32 rms)
     return TRUE;
 }
 
-bool __stdcall rms_test(lm_layer& lm, u32 _r, u32 _g, u32 _b, u32 _s, u32 _h, u32 rms)
+BOOL __stdcall rms_test(lm_layer& lm, u32 _r, u32 _g, u32 _b, u32 _s, u32 _h, u32 rms)
 {
     u32 x, y;
     for (y = 0; y < lm.height; y++)
@@ -766,7 +766,7 @@ u32 __stdcall rms_average(lm_layer& lm, base_color_c& C)
     return _count;
 }
 
-bool compress_Zero(lm_layer& lm, u32 rms)
+BOOL compress_Zero(lm_layer& lm, u32 rms)
 {
     // Average color
     base_color_c _c;
@@ -801,7 +801,7 @@ bool compress_Zero(lm_layer& lm, u32 rms)
     return FALSE;
 }
 
-bool compress_RMS(lm_layer& lm, u32 rms, u32& w, u32& h)
+BOOL compress_RMS(lm_layer& lm, u32 rms, u32& w, u32& h)
 {
     // *** Try to bilinearly filter lightmap down and up
     w = 0, h = 0;

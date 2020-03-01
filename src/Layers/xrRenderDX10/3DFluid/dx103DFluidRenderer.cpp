@@ -24,10 +24,10 @@ shared_str strRTHeight("RTHeight");
 shared_str strDiffuseLight("DiffuseLight");
 }
 
-const char* dx103DFluidRenderer::m_pRTNames[RRT_NumRT] = {
+LPCSTR dx103DFluidRenderer::m_pRTNames[RRT_NumRT] = {
     "$user$rayDataTex", "$user$rayDataTexSmall", "$user$rayCastTex", "$user$edgeTex"};
 
-const char* dx103DFluidRenderer::m_pResourceRTNames[RRT_NumRT] = {"rayDataTex", "rayDataTexSmall", "rayCastTex", "edgeTex"};
+LPCSTR dx103DFluidRenderer::m_pResourceRTNames[RRT_NumRT] = {"rayDataTex", "rayDataTexSmall", "rayCastTex", "edgeTex"};
 
 dx103DFluidRenderer::dx103DFluidRenderer() : m_bInited(false)
 {
@@ -128,7 +128,7 @@ void dx103DFluidRenderer::CreateGridBox()
     m_iGridBoxVertNum = sizeof(vertices) / sizeof(vertices[0]);
 
     m_pGridBoxVertexBuffer.Create(sizeof(vertices));
-    unsigned char* pData = static_cast<unsigned char*>(m_pGridBoxVertexBuffer.Map());
+    BYTE* pData = static_cast<BYTE*>(m_pGridBoxVertexBuffer.Map());
     CopyMemory(pData, vertices, sizeof(vertices));
     m_pGridBoxVertexBuffer.Unmap(true);
 
@@ -138,7 +138,7 @@ void dx103DFluidRenderer::CreateGridBox()
     m_iGridBoxFaceNum = (sizeof(indices) / sizeof(indices[0])) / 3;
 
     m_pGridBoxIndexBuffer.Create(sizeof(indices));
-    pData = static_cast<unsigned char*>(m_pGridBoxIndexBuffer.Map());
+    pData = static_cast<BYTE*>(m_pGridBoxIndexBuffer.Map());
     CopyMemory(pData, indices, sizeof(indices));
     m_pGridBoxIndexBuffer.Unmap(true);
 
@@ -164,7 +164,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
     svQuad[3].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
 
     m_pQuadVertexBuffer.Create(sizeof(svQuad));
-    unsigned char* pData = static_cast<unsigned char*>(m_pQuadVertexBuffer.Map());
+    BYTE* pData = static_cast<BYTE*>(m_pQuadVertexBuffer.Map());
     CopyMemory(pData, svQuad, sizeof(svQuad));
     m_pQuadVertexBuffer.Unmap(true);
     m_GeomQuadVertex.create(quadlayout, m_pQuadVertexBuffer, 0);
@@ -172,7 +172,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
 
 void dx103DFluidRenderer::CreateJitterTexture()
 {
-    unsigned char data[256 * 256];
+    BYTE data[256 * 256];
     for (int i = 0; i < 256 * 256; i++)
     {
         data[i] = (unsigned char)(rand() / float(RAND_MAX) * 256);
@@ -337,7 +337,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 
     // Raycast into the temporary render target:
     //  raycasting is done at the smaller resolution, using a fullscreen quad
-    float ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     HW.pContext->ClearRenderTargetView(RT[RRT_RayCastTex]->pRT, ColorRGBA);
 
     pTarget->u_setrt(RT[RRT_RayCastTex], nullptr, nullptr, nullptr); // LDR RT
@@ -377,7 +377,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 void dx103DFluidRenderer::ComputeRayData(const dx103DFluidData &FluidData)
 {
     // Clear the color buffer to 0
-    float ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     HW.pContext->ClearRenderTargetView(RT[RRT_RayDataTex]->pRT, ColorRGBA);
 
     CRenderTarget* pTarget = RImplementation.Target;

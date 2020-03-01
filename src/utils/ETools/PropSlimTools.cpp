@@ -8,7 +8,7 @@
 static Object* g_pObject = 0;
 static ArbitraryList<MeshPt*> g_ppTempPts = 0;
 static float g_fSlidingWindowErrorTolerance = 0.1f;
-static bool g_bOptimiseVertexOrder = FALSE;
+static BOOL g_bOptimiseVertexOrder = FALSE;
 static u32 g_bMaxSlidingWindow = u32(-1);
 static VIPM_Result* g_pResult = 0;
 
@@ -66,7 +66,7 @@ void CalculateAllCollapses(
             if (0 == ppt->FirstEdge())
                 continue;
             // Disallow any pts that are on an edge - shouldn't be collapsing them.
-            bool bAllowed = TRUE;
+            BOOL bAllowed = TRUE;
             for (pedge = ppt->FirstEdge(); pedge != NULL; pedge = ppt->NextEdge())
             {
                 if ((pedge->pTri12 == NULL) || (pedge->pTri21 == NULL))
@@ -79,7 +79,7 @@ void CalculateAllCollapses(
             if (!bAllowed)
                 continue;
 
-            bool bRequiresNewLevel = FALSE;
+            BOOL bRequiresNewLevel = FALSE;
             if (!m_pObject->CollapseAllowedForLevel(ppt, m_pObject->iCurSlidingWindowLevel))
             {
                 // This collapse would force a new level.

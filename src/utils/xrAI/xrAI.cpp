@@ -16,8 +16,8 @@
 CreateEntity* create_entity = nullptr;
 DestroyEntity* destroy_entity = nullptr;
 
-extern void xrCompiler(const char* name, bool draft_mode, bool pure_covers, const char* out_name);
-extern void verify_level_graph(const char* name, bool verbose);
+extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
+extern void verify_level_graph(LPCSTR name, bool verbose);
 
 static const char* h_str =
     "-? or -h == this help\n"
@@ -28,11 +28,11 @@ static const char* h_str =
 void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 string_path INI_FILE;
 
-const char* GAME_CONFIG = "game.ltx";
+LPCSTR GAME_CONFIG = "game.ltx";
 
 extern void clear_temp_folder();
 
-void execute(char* cmd)
+void execute(LPSTR cmd)
 {
     // Load project
     string4096 name;
@@ -132,7 +132,7 @@ void execute(char* cmd)
     }
 }
 
-void Startup(char* lpCmdLine)
+void Startup(LPSTR lpCmdLine)
 {
     string4096 cmd;
 
@@ -160,7 +160,7 @@ void Startup(char* lpCmdLine)
     Logger.Destroy();
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     xrDebug::Initialize(lpCmdLine);
     Core.Initialize("xrAI");

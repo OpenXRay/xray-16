@@ -65,9 +65,9 @@ class CUIRankingWnd : public CUIWindow, public CUIWndCallback
     u32 m_delay;
     u32 m_previous_time;
     u32 m_stat_count;
-    const char* m_last_monster_icon_back;
-    const char* m_last_monster_icon;
-    const char* m_last_weapon_icon;
+    LPCSTR m_last_monster_icon_back;
+    LPCSTR m_last_monster_icon;
+    LPCSTR m_last_weapon_icon;
 
 public:
     CUIRankingWnd();

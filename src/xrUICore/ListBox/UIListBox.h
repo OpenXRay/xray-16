@@ -8,20 +8,20 @@ class XRUICORE_API CUIListBox : public CUIScrollView
 public:
     CUIListBox();
     CUIListBoxItem* AddItem();
-    CUIListBoxItem* AddTextItem(const char* text);
+    CUIListBoxItem* AddTextItem(LPCSTR text);
     void AddExistingItem(CUIListBoxItem*);
 
     CUIListBoxItem* GetItemByTAG(u32 tag_value);
     int GetIdxByTAG(u32 tag_value);
     CUIListBoxItem* GetItemByIDX(int idx);
-    CUIListBoxItem* GetItemByText(const char* text);
+    CUIListBoxItem* GetItemByText(LPCSTR text);
     CUIListBoxItem* GetSelectedItem();
 
-    const char* GetSelectedText();
-    const char* GetText(int idx);
+    LPCSTR GetSelectedText();
+    LPCSTR GetText(int idx);
     void MoveSelectedUp();
     void MoveSelectedDown();
-    void SetSelectionTexture(const char* texture);
+    void SetSelectionTexture(LPCSTR texture);
     void SetItemHeight(float h);
     float GetItemHeight();
     float GetLongestLength();
@@ -30,7 +30,7 @@ public:
     u32 GetSelectedIDX();
     void SetSelectedIDX(u32 idx);
     void SetSelectedTAG(u32 tag_val);
-    void SetSelectedText(const char* txt);
+    void SetSelectedText(LPCSTR txt);
     void SetImmediateSelection(bool f);
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);

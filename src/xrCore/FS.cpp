@@ -26,7 +26,7 @@ u32 g_file_mapped_count = 0;
 typedef xr_map<u32, std::pair<u32, shared_str>> FILE_MAPPINGS;
 FILE_MAPPINGS g_file_mappings;
 
-void register_file_mapping(void* address, const u32& size, const char* file_name)
+void register_file_mapping(void* address, const u32& size, LPCSTR file_name)
 {
     FILE_MAPPINGS::const_iterator I = g_file_mappings.find(*(u32*)&address);
     VERIFY(I == g_file_mappings.end());
@@ -213,9 +213,9 @@ void CMemoryWriter::w(const void* ptr, size_t count)
         while (mem_size <= (position + count))
             mem_size *= 2;
         if (0 == data)
-            data = (unsigned char*)xr_malloc(mem_size);
+            data = (BYTE*)xr_malloc(mem_size);
         else
-            data = (unsigned char*)xr_realloc(data, mem_size);
+            data = (BYTE*)xr_realloc(data, mem_size);
     }
     CopyMemory(data + position, ptr, count);
     position += count;
@@ -224,7 +224,7 @@ void CMemoryWriter::w(const void* ptr, size_t count)
 }
 
 // static const u32 mb_sz = 0x1000000;
-bool CMemoryWriter::save_to(const char* fn)
+bool CMemoryWriter::save_to(LPCSTR fn)
 {
     IWriter* F = FS.w_open(fn);
     if (F)
@@ -261,7 +261,7 @@ size_t IWriter::chunk_size()
 
 void IWriter::w_compressed(void* ptr, size_t count)
 {
-    unsigned char* dest = 0;
+    BYTE* dest = 0;
     size_t dest_sz = 0;
     _compressLZ(&dest, &dest_sz, ptr, count);
 
@@ -325,7 +325,7 @@ IReader* IReader::open_chunk(u32 ID)
     {
         if (bCompressed)
         {
-            unsigned char* dest;
+            BYTE* dest;
             size_t dest_sz;
             _decompressLZ(&dest, &dest_sz, pointer(), dwSize);
             return new CTempReader(dest, dest_sz, tell() + dwSize);

@@ -4,7 +4,7 @@
 struct STextureParams;
 
 extern "C" bool XR_IMPORT __stdcall DXTCompress(
-    const char* out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
+    LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
 #include "utils/xrLC_Light/b_build_texture.h"
 #include "utils/xrLC_Light/xrfacedefs.h"
@@ -39,7 +39,7 @@ public:
     xr_vector<b_portal> portals;
     xr_vector<b_lod> lods;
     string_path path;
-    xr_vector<const char*> g_Shaders;
+    xr_vector<LPCSTR> g_Shaders;
 
     xr_vector<b_material>& materials();
     xr_vector<b_BuildTexture>& textures();
@@ -54,7 +54,7 @@ public:
 
 public:
     void Load(const b_params& P, const IReader& fs);
-    void Run(const char* path);
+    void Run(LPCSTR path);
     void StartMu();
     void RunAfterLight(IWriter* fs);
     void Tesselate();
@@ -71,10 +71,10 @@ public:
 
     void BuildCForm();
     void BuildPortals(IWriter& fs);
-    void BuildRapid(bool bSave);
+    void BuildRapid(BOOL bSave);
     void xrPhase_Radiosity();
 
-    void IsolateVertices(bool bProgress);
+    void IsolateVertices(BOOL bProgress);
     void xrPhase_ResolveMaterials();
     void xrPhase_UVmap();
     void xrPhase_Subdivide();

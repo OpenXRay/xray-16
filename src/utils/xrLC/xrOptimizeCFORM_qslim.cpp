@@ -8,7 +8,7 @@
 #define MAX_DECIMATE_ERROR 0.0005f
 #define COMPACTNESS_RATIO 0.001f
 
-void SaveAsSMF(const char* fname, CDB::CollectorPacked& CL)
+void SaveAsSMF(LPCSTR fname, CDB::CollectorPacked& CL)
 {
     IWriter* W = FS.w_open(fname);
     string256 tmp;

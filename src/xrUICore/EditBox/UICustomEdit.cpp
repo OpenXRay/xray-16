@@ -180,10 +180,10 @@ void CUICustomEdit::Draw()
     {
         float ui_width = GetWidth();
 
-        const char* cursor_str = ec().str_before_cursor();
+        LPCSTR cursor_str = ec().str_before_cursor();
         u32 cursor_str_size = xr_strlen(cursor_str);
 
-        const char* istr = cursor_str;
+        LPCSTR istr = cursor_str;
         float str_length = font->SizeOf_(istr);
         UI().ClientToScreenScaledWidth(str_length);
 
@@ -196,7 +196,7 @@ void CUICustomEdit::Draw()
             ++ix;
         }
         istr = cursor_str + ix;
-        const char* astr = ec().str_edit() + ix;
+        LPCSTR astr = ec().str_edit() + ix;
         u32 str_size = xr_strlen(ec().str_edit());
 
         u32 jx = 1;
@@ -254,8 +254,8 @@ void CUICustomEdit::Show(bool status)
 }
 
 void CUICustomEdit::ClearText() { ec().set_edit(""); }
-void CUICustomEdit::SetText(const char* str) { ec().set_edit(str); }
-const char* CUICustomEdit::GetText() const { return ec().str_edit(); }
+void CUICustomEdit::SetText(LPCSTR str) { ec().set_edit(str); }
+LPCSTR CUICustomEdit::GetText() const { return ec().str_edit(); }
 void CUICustomEdit::Enable(bool status)
 {
     inherited::Enable(status);

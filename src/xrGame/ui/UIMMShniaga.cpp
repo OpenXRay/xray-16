@@ -81,7 +81,7 @@ CUIMMShniaga::~CUIMMShniaga()
     delete_data(m_buttons_new_network);
 }
 
-void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, const char* path)
+void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
 {
     string256 _path;
 
@@ -141,7 +141,7 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, const char* path)
 
 void CUIMMShniaga::OnDeviceReset() {}
 
-void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, const char* path, bool required /*= true*/)
+void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path, bool required /*= true*/)
 {
     u32 color;
     CGameFont* pF;
@@ -192,7 +192,7 @@ void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, cons
     xml_doc.SetLocalRoot(xml_doc.GetRoot());
 }
 
-void CUIMMShniaga::SetPage(enum_page_id page_id, const char* xml_file, const char* xml_path)
+void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_path)
 {
     VERIFY(m_page != page_id);
     xr_vector<CUITextWnd*>* lst = NULL;

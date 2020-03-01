@@ -13,7 +13,7 @@
 #include "xrScriptEngine/DebugMacros.hpp" // for THROW3 // XXX: move debug macros to xrCore
 #include "AISpaceBase.hpp"
 
-CPatrolPathParams::CPatrolPathParams(const char* caPatrolPathToGo, EPatrolStartType tPatrolPathStart,
+CPatrolPathParams::CPatrolPathParams(LPCSTR caPatrolPathToGo, EPatrolStartType tPatrolPathStart,
     EPatrolRouteType tPatrolPathStop, bool bRandom, u32 index)
     : m_path_name(caPatrolPathToGo)
 {
@@ -60,7 +60,7 @@ GameGraph::_GRAPH_ID CPatrolPathParams::game_vertex_id(u32 index) const
     return (m_path->vertex(index)->data().game_vertex_id());
 }
 
-u32 CPatrolPathParams::point(const char* name) const
+u32 CPatrolPathParams::point(LPCSTR name) const
 {
     if (m_path->point(name))
         return (m_path->point(name)->vertex_id());
@@ -80,7 +80,7 @@ Flags32 CPatrolPathParams::flags(u32 index) const
     return (Flags32().assign(m_path->vertex(index)->data().flags()));
 }
 
-const char* CPatrolPathParams::name(u32 index) const
+LPCSTR CPatrolPathParams::name(u32 index) const
 {
     VERIFY(m_path->vertex(index));
     return (*m_path->vertex(index)->data().name());

@@ -23,9 +23,9 @@ xrCompressor::~xrCompressor()
         FS.r_close(pPackHeader);
 }
 
-bool is_tail(const char* name, const char* tail, const u32 tlen)
+bool is_tail(LPCSTR name, LPCSTR tail, const u32 tlen)
 {
-    const char* p = strstr(name, tail);
+    LPCSTR p = strstr(name, tail);
     if (!p)
         return false;
 
@@ -33,7 +33,7 @@ bool is_tail(const char* name, const char* tail, const u32 tlen)
     return (p == name + nlen - tlen);
 }
 
-bool xrCompressor::testSKIP(const char* path)
+bool xrCompressor::testSKIP(LPCSTR path)
 {
     string256 p_name;
     string256 p_ext;
@@ -95,7 +95,7 @@ bool xrCompressor::testSKIP(const char* path)
     return false;
 }
 
-bool xrCompressor::testVFS(const char* path)
+bool xrCompressor::testVFS(LPCSTR path)
 {
     if (bStoreFiles)
         return (true);
@@ -115,7 +115,7 @@ bool xrCompressor::testVFS(const char* path)
     return (TRUE);
 }
 
-bool xrCompressor::testEqual(const char* path, IReader* base)
+bool xrCompressor::testEqual(LPCSTR path, IReader* base)
 {
     bool res = false;
     IReader* test = FS.r_open(path);
@@ -149,7 +149,7 @@ xrCompressor::ALIAS* xrCompressor::testALIAS(IReader* base, u32 crc, u32& a_test
 }
 
 void xrCompressor::write_file_header(
-    const char* file_name, const u32& crc, const u32& ptr, const u32& size_real, const u32& size_compressed)
+    LPCSTR file_name, const u32& crc, const u32& ptr, const u32& size_real, const u32& size_compressed)
 {
     size_t file_name_size = (xr_strlen(file_name) + 0) * sizeof(char);
     size_t buffer_size = file_name_size + 4 * sizeof(u32);
@@ -177,7 +177,7 @@ void xrCompressor::write_file_header(
     fs_desc.w(buffer_start, full_buffer_size);
 }
 
-void xrCompressor::CompressOne(const char* path)
+void xrCompressor::CompressOne(LPCSTR path)
 {
     filesTOTAL++;
 
@@ -325,7 +325,7 @@ void xrCompressor::CompressOne(const char* path)
     FS.r_close(src);
 }
 
-void xrCompressor::OpenPack(const char* tgt_folder, int num)
+void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
 {
     VERIFY(0 == fs_pack_writer);
 
@@ -383,7 +383,7 @@ void xrCompressor::OpenPack(const char* tgt_folder, int num)
     fs_pack_writer->open_chunk(0);
 }
 
-void xrCompressor::SetPackHeaderName(const char* n)
+void xrCompressor::SetPackHeaderName(LPCSTR n)
 {
     pPackHeader = FS.r_open(n);
     R_ASSERT2(pPackHeader, n);
@@ -475,7 +475,7 @@ void xrCompressor::ProcessTargetFolder()
     FS.file_list_close(files_list);
 }
 
-void xrCompressor::GatherFiles(const char* path)
+void xrCompressor::GatherFiles(LPCSTR path)
 {
     auto i_list = FS.file_list_open("$target_folder$", path, FS_ListFiles | FS_RootOnly);
     if (!i_list)
@@ -498,7 +498,7 @@ void xrCompressor::GatherFiles(const char* path)
     FS.file_list_close(i_list);
 }
 
-bool xrCompressor::IsFolderAccepted(CInifile& ltx, const char* path, bool& recurse)
+bool xrCompressor::IsFolderAccepted(CInifile& ltx, LPCSTR path, BOOL& recurse)
 {
     // exclude folders
     if (ltx.section_exist("exclude_folders"))
@@ -537,11 +537,11 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
         CInifile::Sect& if_sect = ltx.r_section("include_folders");
         for (const auto &it : if_sect.Data)
         {
-            bool ifRecurse = CInifile::isBool(it.second.c_str());
+            BOOL ifRecurse = CInifile::isBool(it.second.c_str());
             u32 folder_mask = FS_ListFolders | (ifRecurse ? 0 : FS_RootOnly);
 
             string_path path;
-            const char* _path = 0 == xr_strcmp(it.first.c_str(), ".\\") ? "" : it.first.c_str();
+            LPCSTR _path = 0 == xr_strcmp(it.first.c_str(), ".\\") ? "" : it.first.c_str();
             xr_strcpy(path, _path);
             size_t path_len = xr_strlen(path);
             if ((0 != path_len) && (path[path_len - 1] != '\\'))
@@ -549,8 +549,8 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
 
             Msg("");
             Msg("Processing folder: '%s'", path);
-            bool efRecurse;
-            bool val = IsFolderAccepted(ltx, path, efRecurse);
+            BOOL efRecurse;
+            BOOL val = IsFolderAccepted(ltx, path, efRecurse);
             if (val || (!val && !efRecurse))
             {
                 if (val)

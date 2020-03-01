@@ -14,8 +14,8 @@ public:
     xrP_BOOL oBlend;
 
 public:
-    virtual const char* getComment() { return "MODEL: env^base"; }
-    virtual bool canBeLMAPped() { return FALSE; }
+    virtual LPCSTR getComment() { return "MODEL: env^base"; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 

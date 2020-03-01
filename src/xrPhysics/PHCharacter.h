@@ -132,7 +132,7 @@ public:
     virtual const Fvector& CamDir() const = 0;
     virtual Fvector GetAcceleration() = 0;
     virtual void SetPosition(const Fvector& pos) = 0;
-    virtual void SetApplyGravity(bool flag) { dBodySetGravityMode(m_body, flag); }
+    virtual void SetApplyGravity(BOOL flag) { dBodySetGravityMode(m_body, flag); }
     virtual void SetObjectContactCallbackData(void* callback) = 0;
     virtual void SetObjectContactCallback(ObjectContactCallbackFun* callback) = 0;
     virtual void SetWheelContactCallback(ObjectContactCallbackFun* callback) = 0;

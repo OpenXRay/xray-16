@@ -30,7 +30,7 @@ public:
 
     virtual void Init(int stage);
     virtual void UnLoad();
-    void SetBuyMsgCaption(const char* str);
+    void SetBuyMsgCaption(LPCSTR str);
 
 protected:
     CUITextWnd* m_buy_msg_caption;

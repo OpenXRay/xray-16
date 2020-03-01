@@ -23,7 +23,7 @@ protected:
     _value_type m_value;
 
 public:
-    CPropertyEvaluatorConst(_value_type value, const char* evaluator_name = "") : m_value(value)
+    CPropertyEvaluatorConst(_value_type value, LPCSTR evaluator_name = "") : m_value(value)
     {
 #if 1//def LOG_ACTION //Alundaio: m_evaluator_name
         this->m_evaluator_name = evaluator_name;

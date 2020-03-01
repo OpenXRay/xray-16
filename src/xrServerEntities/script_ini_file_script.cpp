@@ -14,7 +14,7 @@ using namespace luabind;
 using namespace luabind::policy;
 
 CScriptIniFile* get_system_ini() { return ((CScriptIniFile*)pSettings); }
-bool r_line(CScriptIniFile* self, const char* S, int L, luabind::string& N, luabind::string& V)
+bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::string& V)
 {
     THROW3(self->section_exist(S), "Cannot find section", S);
     THROW2((int)self->line_count(S) > L, "Invalid line number");
@@ -22,7 +22,7 @@ bool r_line(CScriptIniFile* self, const char* S, int L, luabind::string& N, luab
     N = "";
     V = "";
 
-    const char* n, *v;
+    LPCSTR n, v;
     bool result = !!self->r_line(S, L, &n, &v);
     if (!result)
         return (false);
@@ -51,7 +51,7 @@ bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind
 
 #pragma warning(push)
 #pragma warning(disable : 4238)
-CScriptIniFile* create_ini_file(const char* ini_string)
+CScriptIniFile* create_ini_file(LPCSTR ini_string)
 {
     IReader reader((void*)ini_string, xr_strlen(ini_string));
     return ((CScriptIniFile*)new CInifile(&reader, FS.get_path("$game_config$")->m_Path));
@@ -78,7 +78,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
     module(luaState)
     [
         class_<CScriptIniFile>("ini_file")
-            .def(constructor<const char*>())
+            .def(constructor<LPCSTR>())
             //Alundaio: Extend script ini file
             .def("w_bool", &CScriptIniFile::w_bool)
             .def("w_color", &CScriptIniFile::w_color)
@@ -103,7 +103,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("section_count", &CScriptIniFile::section_count)
             //Alundaio: END
             .def("section_exist", &CScriptIniFile::section_exist)
-            .def("line_exist", (bool (CScriptIniFile::*)(const char*, const char*) const)&CScriptIniFile::line_exist)
+            .def("line_exist", (bool (CScriptIniFile::*)(LPCSTR, LPCSTR) const)&CScriptIniFile::line_exist)
             .def("r_clsid", &CScriptIniFile::r_clsid)
             .def("r_bool", &CScriptIniFile::r_bool)
             .def("r_token", &CScriptIniFile::r_token)

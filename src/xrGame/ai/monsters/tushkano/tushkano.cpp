@@ -13,7 +13,7 @@ CTushkano::CTushkano()
 }
 
 CTushkano::~CTushkano() { xr_delete(StateMan); }
-void CTushkano::Load(const char* section)
+void CTushkano::Load(LPCSTR section)
 {
     inherited::Load(section);
 

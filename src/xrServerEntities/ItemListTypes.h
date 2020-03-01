@@ -45,12 +45,12 @@ public:
         m_Flags.zero();
     }
     virtual ~ListItem(){};
-    void SetName(const char* _key) { key = _key; }
-    IC void Visible(bool val) { m_Flags.set(flHidden, !val); }
-    IC bool Visible() const { return !m_Flags.test(flHidden); }
+    void SetName(LPCSTR _key) { key = _key; }
+    IC void Visible(BOOL val) { m_Flags.set(flHidden, !val); }
+    IC BOOL Visible() const { return !m_Flags.test(flHidden); }
     IC int Type() { return type; }
     IC void* Item() { return item; }
-    IC const char* Key() { return key.c_str(); }
+    IC LPCSTR Key() { return key.c_str(); }
     IC void SetIcon(int index) { icon_index = index; }
 };
 

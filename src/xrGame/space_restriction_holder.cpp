@@ -42,8 +42,8 @@ shared_str CSpaceRestrictionHolder::normalize_string(shared_str space_restrictor
     LPSTR* strings = (LPSTR*)xr_alloca(MAX_RESTRICTION_PER_TYPE_COUNT * sizeof(LPSTR));
     LPSTR* string_current = strings;
 
-    char* temp_string = (char*)xr_alloca((n + 1) * sizeof(char));
-    const char* I = *space_restrictors;
+    LPSTR temp_string = (LPSTR)xr_alloca((n + 1) * sizeof(char));
+    LPCSTR I = *space_restrictors;
     LPSTR i = temp_string, j = i;
     for (; *I; ++I, ++i)
     {
@@ -71,14 +71,14 @@ shared_str CSpaceRestrictionHolder::normalize_string(shared_str space_restrictor
     std::sort(strings, string_current, pred_str());
 
     // 3. copy back to another temp string, based on sorted vector
-    char* result_string = (char*)xr_alloca((n + 1) * sizeof(char));
-    char* pointer = result_string;
+    LPSTR result_string = (LPSTR)xr_alloca((n + 1) * sizeof(char));
+    LPSTR pointer = result_string;
     {
-        char** I = strings;
-        char** E = string_current;
+        LPSTR* I = strings;
+        LPSTR* E = string_current;
         for (; I != E; ++I)
         {
-            for (char* i = *I; *i; ++i, ++pointer)
+            for (LPSTR i = *I; *i; ++i, ++pointer)
                 *pointer = *i;
 
             *pointer = ',';

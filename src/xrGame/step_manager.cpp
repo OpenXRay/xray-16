@@ -24,10 +24,10 @@ IFactoryObject* CStepManager::_construct()
     return (m_object);
 }
 
-void CStepManager::reload(const char* section)
+void CStepManager::reload(LPCSTR section)
 {
     m_legs_count = pSettings->r_u8(section, "LegsCount");
-    const char* anim_section = pSettings->r_string(section, "step_params");
+    LPCSTR anim_section = pSettings->r_string(section, "step_params");
 
     if (!pSettings->section_exist(anim_section))
     {
@@ -41,7 +41,7 @@ void CStepManager::reload(const char* section)
     SStepParam param;
     param.step[0].time = 0.1f; // avoid warning
 
-    const char* anim_name, *val;
+    LPCSTR anim_name, val;
     string16 cur_elem;
 
     IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
@@ -88,7 +88,7 @@ void CStepManager::reload(const char* section)
         {
             IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
             VERIFY(KA);
-            std::pair<const char*, const char*> anim_name = KA->LL_MotionDefName_dbg(motion_id);
+            std::pair<LPCSTR, LPCSTR> anim_name = KA->LL_MotionDefName_dbg(motion_id);
             Msg("step_params loaded for object :%s, visual: %s, motion: %s, anim set: %s  ", m_object->cName().c_str(),
                 m_object->cNameVisual().c_str(), anim_name.first, anim_name.second);
         }
@@ -130,7 +130,7 @@ void CStepManager::on_animation_start(MotionID motion_id, CBlend* blend)
         {
             IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
             VERIFY(KA);
-            std::pair<const char*, const char*> anim_name = KA->LL_MotionDefName_dbg(motion_id);
+            std::pair<LPCSTR, LPCSTR> anim_name = KA->LL_MotionDefName_dbg(motion_id);
             Msg("! no step_params found for object :%s, visual: %s, motion: %s, anim set: %s  ",
                 m_object->cName().c_str(), m_object->cNameVisual().c_str(), anim_name.first, anim_name.second);
         }
@@ -203,7 +203,7 @@ void CStepManager::update(bool b_hud_view)
             // Играть партиклы
             if (b_play && !mtl_pair->CollideParticles.empty())
             {
-                const char* ps_name = *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];
+                LPCSTR ps_name = *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];
 
                 //отыграть партиклы столкновения материалов
                 CParticlesObject* ps = CParticlesObject::Create(ps_name, TRUE);

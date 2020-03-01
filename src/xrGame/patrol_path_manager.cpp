@@ -22,7 +22,7 @@
 #if 1 // def DEBUG
 #include "space_restriction_manager.h"
 
-static void show_restrictions(const char* restrictions)
+static void show_restrictions(LPCSTR restrictions)
 {
     string256 temp;
     for (int i = 0, n = _GetItemCount(restrictions); i < n; ++i)

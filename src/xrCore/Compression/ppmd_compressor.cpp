@@ -6,9 +6,9 @@
 #if defined(LINUX) || defined(FREEBSD)
 
 
-signed int InterlockedExchange(signed int volatile *dest, signed int val)
+LONG InterlockedExchange(LONG volatile *dest, LONG val)
 {
-       signed int ret;
+       LONG ret;
     __asm__ __volatile__( "lock; xchg %0,(%1)" : "=r" (ret) :"r" (dest), "0" (val) : "memory" );
     return ret;
 }

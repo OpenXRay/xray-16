@@ -76,7 +76,7 @@ public:
     u32 dwTime_LastUpdate;
 
     ip_address m_cAddress;
-    unsigned int m_dwPort;
+    DWORD m_dwPort;
     u32 process_id;
 
     IPureServer* server;
@@ -191,7 +191,7 @@ protected:
     IClient* ID_to_client(ClientID ID, bool ScanAll = false);
 
     virtual IClient* new_client(SClientConnectData* cl_data) = 0;
-    bool GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, unsigned int* pPort = nullptr);
+    bool GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, DWORD* pPort = nullptr);
 
     IBannedClient* GetBannedClient(const ip_address& Address);
     void BannedList_Save();
@@ -242,7 +242,7 @@ public:
     bool HasBandwidth(IClient* C);
 
     int GetPort() const { return psNET_Port; }
-    bool GetClientAddress(ClientID ID, ip_address& Address, unsigned int* pPort = nullptr);
+    bool GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort = nullptr);
     //bool DisconnectClient(IClient* C);
     virtual bool DisconnectClient(IClient* C, pcstr Reason);
     virtual bool DisconnectAddress(const ip_address& Address, pcstr reason);

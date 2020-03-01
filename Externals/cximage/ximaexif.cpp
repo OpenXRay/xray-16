@@ -49,7 +49,7 @@ bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
         int itemlen;
         int marker = 0;
         int ll,lh, got;
-        unsigned char * Data;
+        BYTE * Data;
 
         if (SectionsRead >= MAX_SECTIONS){
 			strcpy(m_szLastError,"Too many sections in jpg file");
@@ -87,7 +87,7 @@ bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
 
         Sections[SectionsRead].Size = itemlen;
 
-        Data = (unsigned char *)cxalloc(itemlen);//malloc(itemlen);
+        Data = (BYTE *)cxalloc(itemlen);//malloc(itemlen);
         if (Data == NULL){
             strcpy(m_szLastError,"Could not allocate memory");
 			return false;
@@ -95,8 +95,8 @@ bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
         Sections[SectionsRead].Data = Data;
 
         // Store first two pre-read bytes.
-        Data[0] = (unsigned char)lh;
-        Data[1] = (unsigned char)ll;
+        Data[0] = (BYTE)lh;
+        Data[1] = (BYTE)ll;
 
         got = hFile->Read(Data+2, 1, itemlen-2); // Read the whole section.
         if (got != itemlen-2){
@@ -118,7 +118,7 @@ bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
                     hFile->Seek(cp, SEEK_SET);
 
                     size = ep-cp;
-                    Data = (unsigned char *)cxalloc(size);//malloc(size);
+                    Data = (BYTE *)cxalloc(size);//malloc(size);
                     if (Data == NULL){
                         strcpy(m_szLastError,"could not allocate data for entire image");
 						return false;
@@ -166,7 +166,7 @@ bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
                 // that uses marker 31 for non exif stuff.  Thus make sure 
                 // it says 'Exif' in the section before treating it as exif.
                 if ((nReadMode & EXIF_READ_EXIF) && memcmp(Data+2, "Exif", 4) == 0){
-                    m_exifinfo->IsExif = process_EXIF((unsigned char *)Data+2, itemlen);
+                    m_exifinfo->IsExif = process_EXIF((BYTE *)Data+2, itemlen);
                 }else{
                     // Discard this section.
                     cxfree(Sections[--SectionsRead].Data);//free(Sections[--SectionsRead].Data);
@@ -733,7 +733,7 @@ double CxImageJPG::CxExifInfo::ConvertAnyFormat(void * ValuePtr, int Format)
     return Value;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void CxImageJPG::CxExifInfo::process_COM (const unsigned char * Data, int length)
+void CxImageJPG::CxExifInfo::process_COM (const BYTE * Data, int length)
 {
     int ch;
     char Comment[MAX_COMMENT+1];
@@ -763,7 +763,7 @@ void CxImageJPG::CxExifInfo::process_COM (const unsigned char * Data, int length
     strcpy(m_exifinfo->Comments,Comment);
 }
 ////////////////////////////////////////////////////////////////////////////////
-void CxImageJPG::CxExifInfo::process_SOFn (const unsigned char * Data, int marker)
+void CxImageJPG::CxExifInfo::process_SOFn (const BYTE * Data, int marker)
 {
     int data_precision, num_components;
 
@@ -813,7 +813,7 @@ bool CxImageJPG::CxExifInfo::EncodeExif(CxFile * hFile)
     
     if (Sections[0].Type != M_EXIF && Sections[0].Type != M_JFIF){
         // The image must start with an exif or jfif marker.  If we threw those away, create one.
-        static unsigned char JfifHead[18] = {
+        static BYTE JfifHead[18] = {
             0xff, M_JFIF,
             0x00, 0x10, 'J' , 'F' , 'I' , 'F' , 0x00, 0x01, 
             0x01, 0x01, 0x01, 0x2C, 0x01, 0x2C, 0x00, 0x00 

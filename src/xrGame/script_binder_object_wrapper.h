@@ -20,8 +20,8 @@ public:
     virtual ~CScriptBinderObjectWrapper();
     virtual void reinit();
     static void reinit_static(CScriptBinderObject* script_binder_object);
-    virtual void reload(const char* section);
-    static void reload_static(CScriptBinderObject* script_binder_object, const char* section);
+    virtual void reload(LPCSTR section);
+    static void reload_static(CScriptBinderObject* script_binder_object, LPCSTR section);
     virtual bool net_Spawn(SpawnType DC);
     static bool net_Spawn_static(CScriptBinderObject* script_binder_object, SpawnType DC);
     virtual void net_Destroy();

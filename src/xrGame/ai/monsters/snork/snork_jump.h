@@ -17,7 +17,7 @@ class CSnorkJump
 public:
     //			CSnorkJump			(CSnork *monster);
     //			~CSnorkJump			();
-    //	void	load				(const char* section);
+    //	void	load				(LPCSTR section);
     //	void	update_frame		();
     //	void	try_to_jump			(u32 velocity_mask);
     //

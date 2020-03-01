@@ -74,7 +74,7 @@ GHTTPBool __cdecl CompletedHandler(
     return GHTTPTrue;
 }
 
-void CGameSpy_HTTP::DownloadFile(const char* URL, const char* FileName, CompletionCallback& completed, ProgressCallback& progress)
+void CGameSpy_HTTP::DownloadFile(LPCSTR URL, LPCSTR FileName, CompletionCallback& completed, ProgressCallback& progress)
 {
     DownloadContext ctx(completed, progress);
     //	GHTTPRequest res = xrGS_ghttpSaveA(URL, FileName, GHTTPFalse, CompletedCallBack, this);

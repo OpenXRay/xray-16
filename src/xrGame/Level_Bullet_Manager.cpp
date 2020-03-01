@@ -134,7 +134,7 @@ void CBulletManager::Load()
         g_bullet_time_factor = pSettings->r_float(bullet_manager_sect, "bullet_velocity_time_factor");
     }
 
-    const char* whine_sounds = pSettings->r_string(bullet_manager_sect, "whine_sounds");
+    LPCSTR whine_sounds = pSettings->r_string(bullet_manager_sect, "whine_sounds");
     int cnt = _GetItemCount(whine_sounds);
     xr_string tmp;
     for (int k = 0; k < cnt; ++k)
@@ -143,7 +143,7 @@ void CBulletManager::Load()
         m_WhineSounds.back().create(_GetItem(whine_sounds, k, tmp), st_Effect, sg_SourceType);
     }
 
-    const char* explode_particles = pSettings->r_string(bullet_manager_sect, "explode_particles");
+    LPCSTR explode_particles = pSettings->r_string(bullet_manager_sect, "explode_particles");
     cnt = _GetItemCount(explode_particles);
     for (int k = 0; k < cnt; ++k)
         m_ExplodeParticles.push_back(_GetItem(explode_particles, k, tmp));
@@ -280,7 +280,7 @@ static Fvector parabolic_position(Fvector const& start_position, Fvector const& 
                 .mad(gravity, sqr_t_div_2));
 }
 
-// bool g_use_new_ballistics	= 0;
+// BOOL g_use_new_ballistics	= 0;
 #ifdef DEBUG
 float dbg_bullet_time_factor = 1.f;
 #endif
@@ -567,7 +567,7 @@ static void update_bullet(
     update_bullet_parabolic(bullet, data, gravity, air_resistance);
 }
 
-bool CBulletManager::firetrace_callback(collide::rq_result& result, LPVOID params)
+BOOL CBulletManager::firetrace_callback(collide::rq_result& result, LPVOID params)
 {
     bullet_test_callback_data& data = *(bullet_test_callback_data*)params;
     SBullet& bullet = *data.pBullet;
@@ -629,7 +629,7 @@ bool CBulletManager::trajectory_check_error(Fvector& previous_position, collide:
     bullet.dir = start_to_target;
 
     collide::ray_defs RD(start, start_to_target, distance, CDB::OPT_FULL_TEST, collide::rqtBoth);
-    bool const result = Level().ObjectSpace.RayQuery(
+    BOOL const result = Level().ObjectSpace.RayQuery(
         storage, RD, CBulletManager::firetrace_callback, &data, CBulletManager::test_callback, NULL);
     if (!result || (data.collide_time == 0.f))
     {
@@ -957,7 +957,7 @@ void CBulletManager::CommitEvents() // @ the start of frame
 }
 
 void CBulletManager::RegisterEvent(
-    EventType Type, bool _dynamic, SBullet* bullet, const Fvector& end_point, collide::rq_result& R, u16 tgt_material)
+    EventType Type, BOOL _dynamic, SBullet* bullet, const Fvector& end_point, collide::rq_result& R, u16 tgt_material)
 {
 #if 0 // def DEBUG
     if (m_Events.size() > 1000) {

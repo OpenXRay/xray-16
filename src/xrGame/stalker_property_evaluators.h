@@ -31,7 +31,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorALife(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorALife(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -45,7 +45,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorAlive(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorAlive(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -59,7 +59,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorItems(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorItems(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -78,7 +78,7 @@ protected:
 
 public:
     CStalkerPropertyEvaluatorEnemies(
-        CAI_Stalker* object = 0, const char* evaluator_name = "", u32 time_to_wait = 0, const bool* dont_wait = 0);
+        CAI_Stalker* object = 0, LPCSTR evaluator_name = "", u32 time_to_wait = 0, const bool* dont_wait = 0);
     virtual _value_type evaluate();
 };
 
@@ -92,7 +92,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorSeeEnemy(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorSeeEnemy(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -106,7 +106,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorEnemySeeMe(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorEnemySeeMe(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -120,7 +120,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorItemToKill(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorItemToKill(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -134,7 +134,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorItemCanKill(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorItemCanKill(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -148,7 +148,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorFoundItemToKill(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorFoundItemToKill(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -162,7 +162,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorFoundAmmo(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorFoundAmmo(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -179,7 +179,7 @@ private:
     u32 m_min_ammo_count;
 
 public:
-    CStalkerPropertyEvaluatorReadyToKill(CAI_Stalker* object = 0, const char* evaluator_name = "", u32 min_ammo_count = 0);
+    CStalkerPropertyEvaluatorReadyToKill(CAI_Stalker* object = 0, LPCSTR evaluator_name = "", u32 min_ammo_count = 0);
     virtual _value_type evaluate();
 };
 
@@ -194,7 +194,7 @@ protected:
 
 public:
     CStalkerPropertyEvaluatorReadyToKillSmartCover(
-        CAI_Stalker* object = 0, const char* evaluator_name = "", u32 min_ammo_count = 0);
+        CAI_Stalker* object = 0, LPCSTR evaluator_name = "", u32 min_ammo_count = 0);
     virtual _value_type evaluate();
 };
 
@@ -208,7 +208,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorReadyToDetour(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorReadyToDetour(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -222,7 +222,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorAnomaly(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorAnomaly(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -236,7 +236,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorInsideAnomaly(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorInsideAnomaly(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -250,7 +250,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorPanic(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorPanic(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -264,7 +264,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorSmartTerrainTask(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorSmartTerrainTask(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -278,7 +278,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorEnemyReached(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorEnemyReached(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -292,7 +292,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorPlayerOnThePath(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorPlayerOnThePath(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -306,7 +306,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorEnemyCriticallyWounded(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorEnemyCriticallyWounded(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -320,7 +320,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorShouldThrowGrenade(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorShouldThrowGrenade(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -334,7 +334,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorTooFarToKillEnemy(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorTooFarToKillEnemy(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 
@@ -348,7 +348,7 @@ protected:
     typedef CStalkerPropertyEvaluator inherited;
 
 public:
-    CStalkerPropertyEvaluatorLowCover(CAI_Stalker* object = 0, const char* evaluator_name = "");
+    CStalkerPropertyEvaluatorLowCover(CAI_Stalker* object = 0, LPCSTR evaluator_name = "");
     virtual _value_type evaluate();
 };
 

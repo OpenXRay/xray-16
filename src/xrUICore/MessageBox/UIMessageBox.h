@@ -27,18 +27,18 @@ public:
         MESSAGEBOX_YES_NO_COPY
     } E_MESSAGEBOX_STYLE;
 
-    virtual bool InitMessageBox(const char* xml_template);
+    virtual bool InitMessageBox(LPCSTR xml_template);
     void Clear();
-    virtual void SetText(const char* str);
-    virtual const char* GetText();
-    const char* GetHost();
-    const char* GetPassword();
-    const char* GetUserPassword();
+    virtual void SetText(LPCSTR str);
+    virtual LPCSTR GetText();
+    LPCSTR GetHost();
+    LPCSTR GetPassword();
+    LPCSTR GetUserPassword();
     void SetUserPasswordMode(bool);
     void SetPasswordMode(bool);
     E_MESSAGEBOX_STYLE GetBoxStyle() { return m_eMessageBoxStyle; };
-    void SetTextEditURL(const char* text);
-    const char* GetTextEditURL();
+    void SetTextEditURL(LPCSTR text);
+    LPCSTR GetTextEditURL();
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);

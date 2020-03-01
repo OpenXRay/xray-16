@@ -11,7 +11,7 @@
 #include "ai_debug.h"
 #include "xrServerEntities/xrMessages.h"
 
-CALifeObjectRegistry::CALifeObjectRegistry(const char* section) {}
+CALifeObjectRegistry::CALifeObjectRegistry(LPCSTR section) {}
 CALifeObjectRegistry::~CALifeObjectRegistry()
 {
     OBJECT_REGISTRY::iterator const B = m_objects.begin();

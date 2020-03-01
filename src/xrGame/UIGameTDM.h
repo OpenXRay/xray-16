@@ -39,7 +39,7 @@ public:
     virtual void UnLoad();
     virtual void Init(int stage);
     void SetScoreCaption(int t1, int t2);
-    void SetBuyMsgCaption(const char* str);
+    void SetBuyMsgCaption(LPCSTR str);
     virtual void SetFraglimit(int local_frags, int fraglimit);
     virtual void Render();
     virtual void OnFrame();

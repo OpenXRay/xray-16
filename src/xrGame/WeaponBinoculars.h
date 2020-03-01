@@ -18,14 +18,14 @@ public:
     CWeaponBinoculars();
     virtual ~CWeaponBinoculars();
 
-    void Load(const char* section);
+    void Load(LPCSTR section);
 
     virtual void OnZoomIn();
     virtual void OnZoomOut();
     virtual void ZoomInc();
     virtual void ZoomDec();
     virtual void net_Destroy();
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     bool can_kill() const;
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);

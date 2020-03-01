@@ -265,7 +265,7 @@ void ELightAnimLibrary::Reload()
     Load();
 }
 
-LAItemIt ELightAnimLibrary::FindItemI(const char* name)
+LAItemIt ELightAnimLibrary::FindItemI(LPCSTR name)
 {
     if (name && name[0])
         for (LAItemIt it = Items.begin(); it != Items.end(); ++it)
@@ -274,13 +274,13 @@ LAItemIt ELightAnimLibrary::FindItemI(const char* name)
     return Items.end();
 }
 
-CLAItem* ELightAnimLibrary::FindItem(const char* name)
+CLAItem* ELightAnimLibrary::FindItem(LPCSTR name)
 {
     LAItemIt it = FindItemI(name);
     return (it != Items.end()) ? *it : 0;
 }
 
-CLAItem* ELightAnimLibrary::AppendItem(const char* name, CLAItem* src)
+CLAItem* ELightAnimLibrary::AppendItem(LPCSTR name, CLAItem* src)
 {
     VERIFY2(FindItem(name) == 0, "Duplicate name found.");
     CLAItem* I = new CLAItem();
@@ -294,7 +294,7 @@ CLAItem* ELightAnimLibrary::AppendItem(const char* name, CLAItem* src)
 }
 
 #ifdef _EDITOR
-void ELightAnimLibrary::RemoveObject(const char* _fname, EItemType type, bool& res)
+void ELightAnimLibrary::RemoveObject(LPCSTR _fname, EItemType type, bool& res)
 {
     if (TYPE_FOLDER == type)
     {
@@ -318,7 +318,7 @@ void ELightAnimLibrary::RemoveObject(const char* _fname, EItemType type, bool& r
 }
 //---------------------------------------------------------------------------
 
-void ELightAnimLibrary::RenameObject(const char* nm0, const char* nm1, EItemType type)
+void ELightAnimLibrary::RenameObject(LPCSTR nm0, LPCSTR nm1, EItemType type)
 {
     if (TYPE_FOLDER == type)
     {

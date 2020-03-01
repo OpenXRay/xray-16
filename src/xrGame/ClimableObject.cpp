@@ -50,13 +50,13 @@ IC void OrientToNorm(const Fvector& normal, Fmatrix& form, Fobb& box)
 
 CClimableObject::CClimableObject() : m_pStaticShell(nullptr), m_radius(0), m_material(u16(-1)) {}
 CClimableObject::~CClimableObject() {}
-void CClimableObject::Load(const char* section) { inherited::Load(section); }
-bool CClimableObject::net_Spawn(CSE_Abstract* DC)
+void CClimableObject::Load(LPCSTR section) { inherited::Load(section); }
+BOOL CClimableObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectClimable* CLB = smart_cast<CSE_ALifeObjectClimable*>(e);
     R_ASSERT(CLB);
-m_material = GMLib.GetMaterialIdx(CLB->material.c_str());
+    m_material = GMLib.GetMaterialIdx(CLB->material.c_str());
     const Fmatrix& b = CLB->shapes[0].data.box;
     m_box.m_halfsize.set(b._11, b._22, b._33);
     m_radius = _max(_max(m_box.m_halfsize.x, m_box.m_halfsize.y), m_box.m_halfsize.z);
@@ -297,12 +297,12 @@ bool CClimableObject::BeforeLadder(CPHCharacter* actor, float tolerance /*=0.f*/
     return d.dotproduct(n) < -(width + actor->FootRadius() / 2.f + tolerance);
 }
 
-bool CClimableObject::UsedAI_Locations() { return FALSE; }
+BOOL CClimableObject::UsedAI_Locations() { return FALSE; }
 void CClimableObject::ObjectContactCallback(
     bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
 {
     dxGeomUserData* usr_data_1 = PHRetrieveGeomUserData(c.geom.g1);
-dxGeomUserData* usr_data_2 = PHRetrieveGeomUserData(c.geom.g2);
+    dxGeomUserData* usr_data_2 = PHRetrieveGeomUserData(c.geom.g2);
     dxGeomUserData* usr_data_ch = NULL;
     dxGeomUserData* usr_data_lad = NULL;
     CClimableObject* this_object = NULL;

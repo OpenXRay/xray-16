@@ -213,7 +213,7 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void generate_jitter(unsigned int* dest, u32 elem_count)
+void generate_jitter(DWORD* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -221,7 +221,7 @@ void generate_jitter(unsigned int* dest, u32 elem_count)
     {
         Ivector2 test;
         test.set(Random.randI(0, 256), Random.randI(0, 256));
-        bool valid = TRUE;
+        BOOL valid = TRUE;
         for (u32 t = 0; t < samples.size(); t++)
         {
             int dist = _abs(test.x - samples[t].x) + _abs(test.y - samples[t].y);
@@ -300,7 +300,7 @@ CRenderTarget::CRenderTarget()
 
         for (int i = 0; i < bound; ++i)
         {
-            static const char* SampleDefs[] = {"0","1","2","3","4","5","6","7"};
+            static LPCSTR SampleDefs[] = {"0","1","2","3","4","5","6","7"};
             b_combine_msaa[i] = new CBlender_combine_msaa();
             b_accum_mask_msaa[i] = new CBlender_accum_direct_mask_msaa();
             b_accum_direct_msaa[i] = new CBlender_accum_direct_msaa();
@@ -437,7 +437,7 @@ CRenderTarget::CRenderTarget()
 
             if (RImplementation.o.dx10_msaa)
             {
-                static const char* snames[] = {
+                static LPCSTR snames[] = {
                     "accum_volumetric_sun_msaa0",
                     "accum_volumetric_sun_msaa1",
                     "accum_volumetric_sun_msaa2",
@@ -483,7 +483,7 @@ CRenderTarget::CRenderTarget()
 
         if (RImplementation.o.dx10_msaa)
         {
-            static const char* SampleDefs[] = {"0","1","2","3","4","5","6","7"};
+            static LPCSTR SampleDefs[] = {"0","1","2","3","4","5","6","7"};
             CBlender_rain_msaa TempBlender2[8];
 
             int bound = RImplementation.o.dx10_msaa_samples;
@@ -592,7 +592,7 @@ CRenderTarget::CRenderTarget()
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
             //u_setrt						(rt_LUM_pool[it],	0,	0,	0			);
             //CHK_DX						(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0x7f7f7f7f,	1.0f, 0L));
-            float ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
+            FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
             HW.pDevice->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
         }
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
@@ -710,7 +710,7 @@ CRenderTarget::CRenderTarget()
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
                         u16* p = (u16*)
-                        ((unsigned char*)(pBits)
+                        (LPBYTE(pBits)
                             + slice * SlicePitch
                             + y * RowPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
@@ -798,11 +798,11 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    unsigned int data [TEX_jitter_count - 1];
+                    DWORD data [TEX_jitter_count - 1];
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it2 = 0; it2 < TEX_jitter_count - 1; it2++)
                     {
-                        u32* p = (u32*)((unsigned char*)(tempData[it2]) + y * Pitch + x * 4);
+                        u32* p = (u32*)(LPBYTE(tempData[it2]) + y * Pitch + x * 4);
                         *p = data [it2];
                     }
                 }
@@ -848,7 +848,7 @@ CRenderTarget::CRenderTarget()
                     //float dest[4];
 
                     float* p = (float*)
-                    ((unsigned char*)(tempDataHBAO)
+                    (LPBYTE(tempDataHBAO)
                         + y * HBAOPitch
                         + x * 4 * sizeof(float));
                     *p = (float)cos(angle);

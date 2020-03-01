@@ -18,7 +18,7 @@ CMercuryBall::CMercuryBall(void)
 }
 
 CMercuryBall::~CMercuryBall(void) {}
-void CMercuryBall::Load(const char* section)
+void CMercuryBall::Load(LPCSTR section)
 {
     inherited::Load(section);
 

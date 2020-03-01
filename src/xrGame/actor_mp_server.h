@@ -17,12 +17,12 @@ private:
     void fill_state(actor_mp_state& state);
 
 public:
-    CSE_ActorMP(const char* section);
+    CSE_ActorMP(LPCSTR section);
     virtual void UPDATE_Read(NET_Packet& packet);
     virtual void UPDATE_Write(NET_Packet& packet);
     virtual void STATE_Read(NET_Packet& packet, u16 size);
     virtual void STATE_Write(NET_Packet& packet);
-    virtual bool Net_Relevant();
+    virtual BOOL Net_Relevant();
 
 #ifdef XRGAME_EXPORTS
     virtual void on_death(CSE_Abstract* killer);

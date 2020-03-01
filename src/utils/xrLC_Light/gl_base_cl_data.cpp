@@ -12,7 +12,7 @@
 
 namespace lc_net
 {
-void net_global_data_impl<gl_base_cl_data>::create_data_file(const char* path)
+void net_global_data_impl<gl_base_cl_data>::create_data_file(LPCSTR path)
 {
     FPU::m64r();
     Memory.mem_compact();
@@ -26,7 +26,7 @@ void net_global_data_impl<gl_base_cl_data>::create_data_file(const char* path)
     // inlc_global_data()->create_read_faces();
     // inlc_global_data()->create_write_faces();
 }
-bool net_global_data_impl<gl_base_cl_data>::create_data(const char* path)
+bool net_global_data_impl<gl_base_cl_data>::create_data(LPCSTR path)
 {
     decompress(path);
     INetReaderFile r_global(path);

@@ -5,9 +5,9 @@
 #ifndef LINUX // FIXME!!!
 static HANDLE hLocalSlot = INVALID_HANDLE_VALUE;
 #endif
-extern void msParse(const char* cmd);
+extern void msParse(LPCSTR cmd);
 
-void msCreate(const char* name)
+void msCreate(LPCSTR name)
 {
 #ifndef LINUX // FIXME!!!
     string256 fn;
@@ -26,8 +26,8 @@ void msRead(void)
 {
 #ifndef LINUX // FIXME!!!
     DWORD cbMessage, cMessage, cbRead;
-    bool fResult;
-    char* lpszBuffer;
+    BOOL fResult;
+    LPSTR lpszBuffer;
 
     cbMessage = cMessage = cbRead = 0;
     fResult = GetMailslotInfo(hLocalSlot, // mailslot handle
@@ -42,7 +42,7 @@ void msRead(void)
     while (cMessage != 0) // retrieve all messages
     {
         // Allocate memory for the message.
-        lpszBuffer = (char*)GlobalAlloc(GPTR, cbMessage);
+        lpszBuffer = (LPSTR)GlobalAlloc(GPTR, cbMessage);
         lpszBuffer[0] = '\0';
         fResult = ReadFile(hLocalSlot, lpszBuffer, cbMessage, &cbRead, (LPOVERLAPPED)NULL);
         if (!fResult)
@@ -68,7 +68,7 @@ void msWrite(char* name, char* dest, char* msg)
 #ifndef LINUX // FIXME!!!
     HANDLE hFile;
     DWORD cbWritten;
-    bool fResult;
+    BOOL fResult;
     char cName[256];
 
     xr_sprintf(cName, sizeof(cName), "\\\\%s\\mailslot\\%s", name, dest);

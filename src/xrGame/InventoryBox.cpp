@@ -79,7 +79,7 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 void CInventoryBox::UpdateCL() { inherited::UpdateCL(); }
 void CInventoryBox::net_Destroy() { inherited::net_Destroy(); }
 #include "xrServerEntities/xrServer_Objects_ALife.h"
-bool CInventoryBox::net_Spawn(CSE_Abstract* DC)
+BOOL CInventoryBox::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     setVisible(TRUE);
@@ -118,7 +118,7 @@ void CInventoryBox::set_can_take(bool status)
     SE_update_status();
 }
 
-void CInventoryBox::set_closed(bool status, const char* reason)
+void CInventoryBox::set_closed(bool status, LPCSTR reason)
 {
     m_closed = status;
 

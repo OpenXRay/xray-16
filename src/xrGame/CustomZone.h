@@ -42,10 +42,10 @@ public:
     CCustomZone();
     virtual ~CCustomZone();
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Import(NET_Packet& P);
     virtual void net_Export(NET_Packet& P);
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void net_Destroy();
 
     virtual void save(NET_Packet& output_packet);
@@ -303,7 +303,7 @@ public:
     virtual bool register_schedule() const { return true; }
     // optimization FAST/SLOW mode
 public:
-    virtual bool AlwaysTheCrow();
+    virtual BOOL AlwaysTheCrow();
     void o_switch_2_fast();
     void o_switch_2_slow();
 

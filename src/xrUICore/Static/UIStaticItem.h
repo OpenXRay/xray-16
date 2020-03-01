@@ -31,9 +31,9 @@ public:
     shared_str dbg_tex_name;
 #endif
 
-    void CreateShader(const char* tex, const char* sh = "hud" DELIMITER "default");
+    void CreateShader(LPCSTR tex, LPCSTR sh = "hud" DELIMITER "default");
     void SetShader(const ui_shader& sh) { hShader = sh; };
-    void Init(const char* tex, const char* sh, float left, float top);
+    void Init(LPCSTR tex, LPCSTR sh, float left, float top);
     void Render();
     void Render(float angle);
 

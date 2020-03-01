@@ -9,7 +9,7 @@
 #include "map_location.h"
 #include "UIGameCustom.h"
 
-void game_cl_mp::AddMessageMenu(const char* menu_section, const char* snd_path, const char* team_prefix)
+void game_cl_mp::AddMessageMenu(LPCSTR menu_section, LPCSTR snd_path, LPCSTR team_prefix)
 {
     if (!menu_section)
         return;
@@ -77,7 +77,7 @@ void game_cl_mp::AddMessageMenu(const char* menu_section, const char* snd_path, 
     //-----------------------------------------------
 };
 
-void game_cl_mp::LoadMessagesMenu(const char* menus_section)
+void game_cl_mp::LoadMessagesMenu(LPCSTR menus_section)
 {
     if (!menus_section)
         return;

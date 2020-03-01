@@ -12,7 +12,7 @@
 #include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
 
 IC bool p_sort(const ref_constant& C1, const ref_constant& C2) { return xr_strcmp(C1->name, C2->name) < 0; }
-bool R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination)
+BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination)
 {
     // VERIFY(_desc);
     // ID3D10ShaderReflectionConstantBuffer *pTable = (ID3D10ShaderReflectionConstantBuffer *)_desc;
@@ -21,8 +21,8 @@ bool R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
     CHK_DX(pTable->GetDesc(&TableDesc));
 
     // D3DXSHADER_CONSTANTTABLE* desc   = (D3DXSHADER_CONSTANTTABLE*) _desc;
-    // D3DXSHADER_CONSTANTINFO* it      = (D3DXSHADER_CONSTANTINFO*) (unsigned char*(desc)+desc->ConstantInfo);
-    // unsigned char*                    ptr    = unsigned char*(desc);
+    // D3DXSHADER_CONSTANTINFO* it      = (D3DXSHADER_CONSTANTINFO*) (LPBYTE(desc)+desc->ConstantInfo);
+    // LPBYTE                    ptr    = LPBYTE(desc);
     // for (u32 dwCount = desc->Constants; dwCount; dwCount--,it++)
     for (u32 i = 0; i < TableDesc.Variables; ++i)
     {
@@ -39,8 +39,8 @@ bool R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         pType->GetDesc(&TypeDesc);
 
         // Name
-        // const char*   name        =   const char*(ptr+it->Name);
-        const char* name = VarDesc.Name;
+        // LPCSTR   name        =   LPCSTR(ptr+it->Name);
+        LPCSTR name = VarDesc.Name;
 
         // Type
         // u16      type        =   RC_float;
@@ -62,7 +62,7 @@ bool R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
 
         // TypeInfo + class
         // D3DXSHADER_TYPEINFO* T   = (D3DXSHADER_TYPEINFO*)(ptr+it->TypeInfo);
-        bool bSkip = FALSE;
+        BOOL bSkip = FALSE;
         // switch (T->Class)
         switch (TypeDesc.Class)
         {
@@ -190,7 +190,7 @@ bool R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
     return TRUE;
 }
 
-bool R_constant_table::parseResources(ID3DShaderReflection* pReflection, int ResNum, u32 destination)
+BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int ResNum, u32 destination)
 {
     for (int i = 0; i < ResNum; ++i)
     {
@@ -303,7 +303,7 @@ IC u32 dest_to_cbuf_type(u32 destination)
     return 0;
 }
 
-bool R_constant_table::parse(void* _desc, u32 destination)
+BOOL R_constant_table::parse(void* _desc, u32 destination)
 {
     ID3DShaderReflection* pReflection = (ID3DShaderReflection*)_desc;
 

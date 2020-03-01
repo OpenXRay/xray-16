@@ -14,7 +14,7 @@
 #include "xrCommon/xr_vector.h"
 
 #ifndef XRGAME_EXPORTS
-#define SERVER_ENTITY_EDITOR_METHODS virtual void FillProps(const char* pref, PropItemVec& values);
+#define SERVER_ENTITY_EDITOR_METHODS virtual void FillProps(LPCSTR pref, PropItemVec& values);
 #else // #ifdef XRGAME_EXPORTS
 #define SERVER_ENTITY_EDITOR_METHODS
 #endif // #ifndef XRGAME_EXPORTS
@@ -30,7 +30,7 @@ enum EPOType
 using DWORD_VECTOR = xr_vector<u32>;
 using BOOL_VECTOR = xr_vector<bool>;
 using FLOAT_VECTOR = xr_vector<float>;
-using LPSTR_VECTOR = xr_vector<char*>;
+using LPSTR_VECTOR = xr_vector<LPSTR>;
 using FVECTOR_VECTOR = xr_vector<Fvector>;
 
 #ifdef XRGAME_EXPORTS

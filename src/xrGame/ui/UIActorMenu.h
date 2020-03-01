@@ -330,7 +330,7 @@ protected:
     bool ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos);
 
     void AttachAddon(PIItem item_to_upgrade);
-    void DetachAddon(const char* addon_name, PIItem itm = NULL);
+    void DetachAddon(LPCSTR addon_name, PIItem itm = NULL);
 
     void SendEvent_Item2Slot(PIItem pItem, u16 parent, u16 slot_id);
     void SendEvent_Item2Belt(PIItem pItem, u16 parent);
@@ -365,8 +365,8 @@ public:
 
     void ShowMessage(pcstr message, pcstr staticMessage = nullptr, float staticMsgTtl = -1.0f);
 
-    void CallMessageBoxYesNo(const char* text);
-    void CallMessageBoxOK(const char* text);
+    void CallMessageBoxYesNo(LPCSTR text);
+    void CallMessageBoxOK(LPCSTR text);
     void xr_stdcall OnMesBoxYes(CUIWindow*, void*);
     void xr_stdcall OnMesBoxNo(CUIWindow*, void*);
 

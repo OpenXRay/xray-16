@@ -15,7 +15,7 @@ CAmebaZone::CAmebaZone() : m_fVelocityLimit(1.f) {}
 
 CAmebaZone::~CAmebaZone() {}
 
-void CAmebaZone::Load(const char* section)
+void CAmebaZone::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_fVelocityLimit = pSettings->r_float(section, "max_velocity_in_zone");

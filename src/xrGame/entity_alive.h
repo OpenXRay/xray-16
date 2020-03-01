@@ -41,17 +41,17 @@ public:
 
     // Core events
     virtual IFactoryObject* _construct();
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void reinit();
-    virtual void reload(const char* section);
+    virtual void reload(LPCSTR section);
 
     // object serialization
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
-    virtual bool net_Spawn(CSE_Abstract* DC);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual bool net_SaveRelevant();
+    virtual BOOL net_SaveRelevant();
 
     virtual void shedule_Update(u32 dt);
     virtual void create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool local_animation);
@@ -100,7 +100,7 @@ protected:
 
     virtual void StartFireParticles(CWound* pWound);
     virtual void UpdateFireParticles();
-    virtual void LoadFireParticles(const char* section);
+    virtual void LoadFireParticles(LPCSTR section);
 
 public:
     static void UnloadFireParticles();
@@ -112,7 +112,7 @@ protected:
     static float m_fStopBurnWoundSize;
 
     virtual void BloodyWallmarks(float P, const Fvector& dir, s16 element, const Fvector& position_in_object_space);
-    static void LoadBloodyWallmarks(const char* section);
+    static void LoadBloodyWallmarks(LPCSTR section);
 
 public:
     static void UnloadBloodyWallmarks();

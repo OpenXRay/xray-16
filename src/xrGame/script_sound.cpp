@@ -14,7 +14,7 @@
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 
-CScriptSound::CScriptSound(const char* caSoundName, ESoundTypes sound_type)
+CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
 {
     m_bIsNoSound = strstr(Core.Params, "-nosound");
     m_caSoundToPlay = caSoundName;

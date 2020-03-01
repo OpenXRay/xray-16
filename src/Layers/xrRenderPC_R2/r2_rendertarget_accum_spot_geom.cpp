@@ -68,7 +68,7 @@ void CRenderTarget::accum_spot_geom_create()
         u32 vSize = 3 * 4;
 
         g_accum_spot_vb.Create(vCount * vSize);
-        unsigned char* pData = static_cast<unsigned char*>(g_accum_spot_vb.Map());
+        BYTE* pData = static_cast<BYTE*>(g_accum_spot_vb.Map());
         CopyMemory(pData, du_cone_vertices, vCount * vSize);
         g_accum_spot_vb.Unmap(true); // upload vertex data
     }
@@ -78,7 +78,7 @@ void CRenderTarget::accum_spot_geom_create()
         u32 iCount = DU_CONE_NUMFACES * 3;
 
         g_accum_spot_ib.Create(iCount * 2);
-        unsigned char* pData = static_cast<unsigned char*>(g_accum_spot_ib.Map());
+        BYTE* pData = static_cast<BYTE*>(g_accum_spot_ib.Map());
         CopyMemory(pData, du_cone_faces, iCount * 2);
         g_accum_spot_ib.Unmap(true); // upload index data
     }
@@ -110,7 +110,7 @@ void CRenderTarget::accum_volumetric_geom_create()
         u32 vSize = 3 * 4;
         g_accum_volumetric_vb.Create(vCount * vSize);
 
-        unsigned char* pData = static_cast<unsigned char*>(g_accum_volumetric_vb.Map());
+        BYTE* pData = static_cast<BYTE*>(g_accum_volumetric_vb.Map());
         Slice* pSlice = (Slice*)pData;
         float t = 0;
         float dt = 1.0f / (VOLUMETRIC_SLICES - 1);

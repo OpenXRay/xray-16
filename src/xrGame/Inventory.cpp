@@ -901,7 +901,7 @@ PIItem CInventory::SameSlot(const u16 slot, PIItem pIItem, bool bSearchRuck) con
 }
 
 //найти в инвенторе вещь с указанным именем
-PIItem CInventory::Get(const char* name, bool bSearchRuck) const
+PIItem CInventory::Get(LPCSTR name, bool bSearchRuck) const
 {
     const TIItemContainer& list = bSearchRuck ? m_ruck : m_belt;
 
@@ -941,7 +941,7 @@ PIItem CInventory::Get(const u16 id, bool bSearchRuck) const
 }
 
 // search both (ruck and belt)
-PIItem CInventory::GetAny(const char* name) const
+PIItem CInventory::GetAny(LPCSTR name) const
 {
     PIItem itm = Get(name, false);
     if (!itm)
@@ -978,7 +978,7 @@ float CInventory::CalcTotalWeight()
     return m_fTotalWeight;
 }
 
-u32 CInventory::dwfGetSameItemCount(const char* caSection, bool SearchAll)
+u32 CInventory::dwfGetSameItemCount(LPCSTR caSection, bool SearchAll)
 {
     u32 l_dwCount = 0;
     TIItemContainer& l_list = SearchAll ? m_all : m_ruck;
@@ -991,7 +991,7 @@ u32 CInventory::dwfGetSameItemCount(const char* caSection, bool SearchAll)
 
     return (l_dwCount);
 }
-u32 CInventory::dwfGetGrenadeCount(const char* caSection, bool SearchAll)
+u32 CInventory::dwfGetGrenadeCount(LPCSTR caSection, bool SearchAll)
 {
     u32 l_dwCount = 0;
     TIItemContainer& l_list = SearchAll ? m_all : m_ruck;
@@ -1204,7 +1204,7 @@ CInventoryItem* CInventory::tpfGetObjectByIndex(int iIndex)
     return (0);
 }
 
-CInventoryItem* CInventory::GetItemFromInventory(const char* caItemName)
+CInventoryItem* CInventory::GetItemFromInventory(LPCSTR caItemName)
 {
     TIItemContainer& l_list = m_all;
 

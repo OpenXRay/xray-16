@@ -50,8 +50,8 @@ public:
     int GetTextureDepth() const { return m_iTextureDepth; }
     //	float	GetDecay() { return m_fDecay; }
     float GetImpulseSize() const { return m_fImpulseSize; }
-    static const char** GetEngineTextureNames() { return m_pEngineTextureNames; }
-    static const char** GetShaderTextureNames() { return m_pShaderTextureNames; }
+    static LPCSTR* GetEngineTextureNames() { return m_pEngineTextureNames; }
+    static LPCSTR* GetShaderTextureNames() { return m_pShaderTextureNames; }
 //	Allow real-time config reload
 #ifdef DEBUG
     void RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName);
@@ -111,8 +111,8 @@ private:
     DXGI_FORMAT RenderTargetFormats[NUM_RENDER_TARGETS];
     ID3DRenderTargetView* pRenderTargetViews[NUM_RENDER_TARGETS];
     ref_texture pRTTextures[NUM_RENDER_TARGETS];
-    static const char* m_pEngineTextureNames[NUM_RENDER_TARGETS];
-    static const char* m_pShaderTextureNames[NUM_RENDER_TARGETS];
+    static LPCSTR m_pEngineTextureNames[NUM_RENDER_TARGETS];
+    static LPCSTR m_pShaderTextureNames[NUM_RENDER_TARGETS];
 
     ref_selement m_SimulationTechnique[SS_NumShaders];
 

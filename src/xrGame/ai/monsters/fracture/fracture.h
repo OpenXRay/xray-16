@@ -11,7 +11,7 @@ public:
     CFracture();
     virtual ~CFracture();
 
-    virtual void Load(const char* section);
+    virtual void Load(LPCSTR section);
     virtual void CheckSpecParams(u32 spec_params);
 
     pcstr get_monster_class_name() override { return "fracture"; }

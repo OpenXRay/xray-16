@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-bool xrRender_test_hw()
+BOOL xrRender_test_hw()
 {
     CHW _HW;
     HRESULT hr;

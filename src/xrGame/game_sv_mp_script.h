@@ -14,7 +14,7 @@ private:
 public:
     game_sv_mp_script() : inherited(){};
     virtual ~game_sv_mp_script(){};
-    virtual void Create(const char* options){};
+    virtual void Create(LPCSTR options){};
     virtual void Update() { inherited::Update(); };
     virtual void OnPlayerConnect(ClientID id_who);
     virtual void OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID);
@@ -35,5 +35,5 @@ protected:
     float GetHitParamsPower(NET_Packet* P);
     float GetHitParamsImpulse(NET_Packet* P);
     virtual void switch_Phase(u32 new_phase);
-    void SpawnPlayer(ClientID id, const char* N, const char* SkinName, RPoint rp);
+    void SpawnPlayer(ClientID id, LPCSTR N, LPCSTR SkinName, RPoint rp);
 };

@@ -142,7 +142,7 @@ void CLightProjector::calculate()
     for (u32 r_it = 0; r_it < receivers.size(); r_it++)
     {
         // validate
-        bool bValid = TRUE;
+        BOOL bValid = TRUE;
         IRenderable* O = receivers[r_it];
         CROS_impl* LT = (CROS_impl*)O->renderable_ROS();
         int slot = LT->shadow_recv_slot;

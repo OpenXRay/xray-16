@@ -26,10 +26,10 @@ private:
     Fvector m_vVelocity;
     Fvector m_vAngularVelocity;
 
-    bool m_bMakeCubeMap;
-    bool m_bMakeScreenshot;
+    BOOL m_bMakeCubeMap;
+    BOOL m_bMakeScreenshot;
     int m_iLMScreenshotFragment;
-    bool m_bMakeLevelMap;
+    BOOL m_bMakeLevelMap;
 
     float m_fSpeed0;
     float m_fSpeed1;
@@ -46,7 +46,7 @@ private:
     void RecordKey();
     void MakeCubemap();
     void MakeScreenshot();
-    void MakeLevelMapScreenshot(bool bHQ);
+    void MakeLevelMapScreenshot(BOOL bHQ);
 
 public:
     CDemoRecord(const char* name, float life_time = 60 * 60 * 1000);
@@ -57,10 +57,10 @@ public:
     virtual void IR_OnMouseMove(int dx, int dy);
     virtual void IR_OnMouseHold(int btn);
 
-    virtual bool ProcessCam(SCamEffectorInfo& info);
+    virtual BOOL ProcessCam(SCamEffectorInfo& info);
     static void SetGlobalPosition(const Fvector& p) { g_position.p.set(p), g_position.set_position = true; }
     static void GetGlobalPosition(Fvector& p) { p.set(g_position.p); }
-    bool m_b_redirect_input_to_level;
+    BOOL m_b_redirect_input_to_level;
     virtual void OnRender();
 };
 

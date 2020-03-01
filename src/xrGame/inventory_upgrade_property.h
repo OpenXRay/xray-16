@@ -21,7 +21,7 @@ public:
     typedef xr_vector<shared_str> FunctorParams_type;
 
 private:
-    typedef detail::functor2<const char*> StrFunctor;
+    typedef detail::functor2<LPCSTR> StrFunctor;
 
 public:
     Property();
@@ -29,13 +29,13 @@ public:
 
     void construct(const shared_str& property_id, Manager& manager_r);
     IC shared_str const& id() const;
-    IC const char* id_str() const;
-    IC const char* icon_name() const;
-    IC const char* name() const;
+    IC LPCSTR id_str() const;
+    IC LPCSTR icon_name() const;
+    IC LPCSTR name() const;
 
     IC FunctorParams_type const& functor_params() const;
 
-    bool run_functor(const char* parameter, string256& result);
+    bool run_functor(LPCSTR parameter, string256& result);
 
 public:
 protected:

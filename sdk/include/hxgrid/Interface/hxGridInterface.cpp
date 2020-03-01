@@ -1,13 +1,14 @@
 #include "hxGridInterface.h"
 #include "assert.h"
 
-typedef IGridUser* (__cdecl TCreateGridUserObject)(unsigned int version);
+typedef IGridUser* (__cdecl TCreateGridUserObject)(DWORD version);
 
 typedef IGenericStream* (__cdecl TCreateGenericStream)();
 
 //==============================================================
 //==============================================================
-IGridUser* CreateGridUserObject(DWORD version) {
+IGridUser* CreateGridUserObject(DWORD version)
+{
  static HINSTANCE DLLHandle(0);
  
  if (DLLHandle==0)

@@ -316,7 +316,7 @@ void CUIWeaponCellItem::OnAfterChild(CUIDragDropListEx* parent_list)
             parent_list->GetVerticalPlacement());
 }
 
-void CUIWeaponCellItem::InitAddon(CUIStatic* s, const char* section, Fvector2 addon_offset, bool b_rotate)
+void CUIWeaponCellItem::InitAddon(CUIStatic* s, LPCSTR section, Fvector2 addon_offset, bool b_rotate)
 {
     Frect tex_rect;
     Fvector2 base_scale;
@@ -435,7 +435,7 @@ bool CUIWeaponCellItem::EqualTo(CUICellItem* itm)
     return true;
 }
 
-CBuyItemCustomDrawCell::CBuyItemCustomDrawCell(const char* str, CGameFont* pFont)
+CBuyItemCustomDrawCell::CBuyItemCustomDrawCell(LPCSTR str, CGameFont* pFont)
 {
     m_pFont = pFont;
     VERIFY(xr_strlen(str) < 16);

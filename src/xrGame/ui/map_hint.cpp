@@ -11,7 +11,7 @@
 #include "string_table.h"
 #include "UIHelper.h"
 
-void CUIMapLocationHint::Init(CUIXml& uiXml, const char* path)
+void CUIMapLocationHint::Init(CUIXml& uiXml, LPCSTR path)
 {
     CUIXmlInit::InitFrameWindow(uiXml, path, 0, this);
 
@@ -44,7 +44,7 @@ void CUIMapLocationHint::SetInfoMode(u8 mode)
 }
 
 void CUIMapLocationHint::Draw_() { inherited::Draw(); }
-void CUIMapLocationHint::SetInfoStr(const char* text)
+void CUIMapLocationHint::SetInfoStr(LPCSTR text)
 {
     SetInfoMode(1);
     CUIStatic* S = m_info["simple_text"];

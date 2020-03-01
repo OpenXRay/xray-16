@@ -4,7 +4,7 @@
 shared_str CGameSpy_GP::TryToTranslate(GPResult const& res)
 {
     VERIFY(res != GP_NO_ERROR);
-    const char* tmp_string = NULL;
+    LPCSTR tmp_string = NULL;
     switch (res)
     {
     case GP_MEMORY_ERROR: { STRCONCAT(tmp_string, "mp_gp_memory_error");

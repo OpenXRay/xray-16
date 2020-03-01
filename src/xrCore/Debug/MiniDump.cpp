@@ -15,10 +15,10 @@ typedef struct tag_DUMPTHREADPARAMS
 {
     MINIDUMP_TYPE eType;
     wchar_t* szFileName;
-    unsigned int dwThreadID;
+    DWORD dwThreadID;
     EXCEPTION_POINTERS* pExceptInfo;
     WriteMiniDumpResult eReturnValue;
-    unsigned int dwMiniDumpWriteDumpLastError;
+    DWORD dwMiniDumpWriteDumpLastError;
 } DUMPTHREADPARAMS, *LPDUMPTHREADPARAMS;
 
 // The dumper function.
@@ -42,7 +42,7 @@ unsigned __stdcall DumpThread(LPVOID pData)
             pMDEI = &stMDEI;
         }
         // Got the file open.  Write it.
-        bool bRet =
+        BOOL bRet =
             MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, pParams->eType, pMDEI, NULL, NULL);
         if (bRet == TRUE)
         {
@@ -64,7 +64,7 @@ unsigned __stdcall DumpThread(LPVOID pData)
 }
 
 WriteMiniDumpResult __stdcall WriteMiniDumpA(
-    MINIDUMP_TYPE eType, char* szFileName, unsigned int dwThread, EXCEPTION_POINTERS* pExceptInfo)
+    MINIDUMP_TYPE eType, char* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo)
 {
     // Check the string parameter because I am paranoid.
     if (IsBadStringPtrA(szFileName, MAX_PATH) == TRUE)
@@ -97,7 +97,7 @@ WriteMiniDumpResult __stdcall WriteMiniDumpA(
 }
 
 WriteMiniDumpResult __stdcall WriteMiniDumpW(
-    MINIDUMP_TYPE eType, wchar_t* szFileName, unsigned int dwThread, EXCEPTION_POINTERS* pExceptInfo)
+    MINIDUMP_TYPE eType, wchar_t* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo)
 {
     // Check the string parameter because I am paranoid.  I can't check
     // the eType as that might change in the future.

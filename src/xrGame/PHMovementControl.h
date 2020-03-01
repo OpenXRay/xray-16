@@ -103,7 +103,7 @@ private:
     IPHCapture* m_capture;
 
     float m_fGroundDelayFactor;
-    bool bIsAffectedByGravity;
+    BOOL bIsAffectedByGravity;
     //------------------------------
     IGameObject* pObject;
     EEnvironment eOldEnvironment;
@@ -114,7 +114,7 @@ private:
     u32 trying_times[4];
     Fvector trying_poses[4];
     u64 block_damage_step_end;
-    unsigned int m_dwCurBox;
+    DWORD m_dwCurBox;
 
     float fMass;
     float fMinCrashSpeed;
@@ -142,9 +142,9 @@ private:
 public:
     Fvector vExternalImpulse;
     bool bExernalImpulse;
-    bool bSleep;
+    BOOL bSleep;
     bool bNonInteractiveMode;
-    bool gcontact_Was; // Приземление
+    BOOL gcontact_Was; // Приземление
     float gcontact_Power; // Насколько сильно ударились
     float gcontact_HealthLost; // Скоко здоровья потеряли
 
@@ -153,7 +153,7 @@ public:
     void DeleteCharacterObject();
     void CreateCharacter();
     void DestroyCharacter();
-    void Load(const char* section);
+    void Load(LPCSTR section);
 #ifdef DEBUG
     void dbg_Draw();
 #endif
@@ -197,17 +197,17 @@ public:
     void SetNonInteractive(bool v);
     void CalcMaximumVelocity(Fvector& /**dest**/, Fvector& /**accel**/, float /**friction**/){};
     void CalcMaximumVelocity(float& /**dest**/, float /**accel**/, float /**friction**/){};
-    void ActivateBox(unsigned int id, bool Check = false);
-    bool ActivateBoxDynamic(unsigned int id, int num_it = 9, int num_steps = 5, float resolve_depth = 0.01f);
-    void InterpolateBox(unsigned int id, float k);
+    void ActivateBox(DWORD id, BOOL Check = false);
+    bool ActivateBoxDynamic(DWORD id, int num_it = 9, int num_steps = 5, float resolve_depth = 0.01f);
+    void InterpolateBox(DWORD id, float k);
     EEnvironment Environment() { return eEnvironment; }
     EEnvironment OldEnvironment() { return eOldEnvironment; }
     const Fbox& Box() { return aabb; }
-    unsigned int BoxID() const { return m_dwCurBox; }
+    DWORD BoxID() const { return m_dwCurBox; }
     const Fbox* Boxes() { return boxes; }
     float FootRadius();
-    void CollisionEnable(bool enable);
-    void SetBox(unsigned int id, const Fbox& BB)
+    void CollisionEnable(BOOL enable);
+    void SetBox(DWORD id, const Fbox& BB)
     {
         boxes[id].set(BB);
         aabb.set(BB);
@@ -270,8 +270,8 @@ public:
     void CorrectPathDir(const Fvector& real_path_dir, const xr_vector<DetailPathManager::STravelPathPoint>& path,
         int index, Fvector& corrected_path_dir);
 
-    //	void				Move					(Fvector& Dest, Fvector& Motion, bool bDynamic=FALSE){};
-    void SetApplyGravity(bool flag);
+    //	void				Move					(Fvector& Dest, Fvector& Motion, BOOL bDynamic=FALSE){};
+    void SetApplyGravity(BOOL flag);
     void GetDeathPosition(Fvector& pos);
     void SetEnvironment(int enviroment, int old_enviroment);
     void SetFrictionFactor(float f);
@@ -283,7 +283,7 @@ public:
     void EnableCharacter();
     void SetOjectContactCallback(ObjectContactCallbackFun* callback);
     void SetFootCallBack(ObjectContactCallbackFun* callback);
-    static bool BorderTraceCallback(collide::rq_result& result, LPVOID params);
+    static BOOL BorderTraceCallback(collide::rq_result& result, LPVOID params);
     ObjectContactCallbackFun* ObjectContactCallback();
     u16 ContactBone();
     const ICollisionDamageInfo* CollisionDamageInfo() const;

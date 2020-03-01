@@ -74,10 +74,10 @@ void CCustomRocket::reinit()
     m_vPrevVel.set(0, 0, 0);
 }
 
-bool CCustomRocket::net_Spawn(CSE_Abstract* DC)
+BOOL CCustomRocket::net_Spawn(CSE_Abstract* DC)
 {
     m_eState = eInactive;
-    bool result = inherited::net_Spawn(DC);
+    BOOL result = inherited::net_Spawn(DC);
     m_LaunchXForm.set(XFORM());
     return result;
 }
@@ -292,14 +292,14 @@ void CCustomRocket::ObjectContactCallback(
     }
 }
 
-void CCustomRocket::Load(const char* section)
+void CCustomRocket::Load(LPCSTR section)
 {
     inherited::Load(section);
 
     reload(section);
 }
 
-void CCustomRocket::reload(const char* section)
+void CCustomRocket::reload(LPCSTR section)
 {
     inherited::reload(section);
     m_eState = eInactive;

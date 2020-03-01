@@ -271,7 +271,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
         // check player move state
         if (mstate_real & mcAnyMove)
         {
-            bool bAccelerated = isActorAccelerated(mstate_real, IsZoomAimingMode()) && CanAccelerate();
+            BOOL bAccelerated = isActorAccelerated(mstate_real, IsZoomAimingMode()) && CanAccelerate();
 
             // correct "mstate_real" if opposite keys pressed
             if (_abs(vControlAccel.z) < EPS)
@@ -315,7 +315,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
     if (IsGameTypeSingle() && cam_eff_factor > EPS)
     {
-        const char* state_anm = NULL;
+        LPCSTR state_anm = NULL;
 
         if (mstate_real & mcSprint && !(mstate_old & mcSprint))
             state_anm = "sprint";

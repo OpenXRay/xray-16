@@ -41,8 +41,8 @@ void CPhysicItem::reinit()
     m_ready_to_destroy = false;
 }
 
-void CPhysicItem::Load(const char* section) { inherited::Load(section); }
-void CPhysicItem::reload(const char* section) { inherited::reload(section); }
+void CPhysicItem::Load(LPCSTR section) { inherited::Load(section); }
+void CPhysicItem::reload(LPCSTR section) { inherited::reload(section); }
 void CPhysicItem::OnH_B_Independent(bool just_before_destroy)
 {
     inherited::OnH_B_Independent(just_before_destroy);
@@ -67,7 +67,7 @@ void CPhysicItem::OnH_B_Chield()
     inherited::deactivate_physics_shell();
 }
 
-bool CPhysicItem::net_Spawn(CSE_Abstract* DC)
+BOOL CPhysicItem::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

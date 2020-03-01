@@ -18,7 +18,7 @@
 #include "xrPhysics/IPHWorld.h"
 #include "doors_manager.h"
 
-void CScriptGameObject::SetTipText(const char* tip_text) { object().set_tip_text(tip_text); }
+void CScriptGameObject::SetTipText(LPCSTR tip_text) { object().set_tip_text(tip_text); }
 void CScriptGameObject::SetTipTextDefault() { object().set_tip_text_default(); }
 void CScriptGameObject::SetNonscriptUsable(bool nonscript_usable) { object().set_nonscript_usable(nonscript_usable); }
 Fvector CScriptGameObject::GetCurrentDirection()
@@ -56,9 +56,9 @@ CScriptGameObject* CScriptGameObject::Parent() const
 }
 
 int CScriptGameObject::clsid() const { return (object().clsid()); }
-const char* CScriptGameObject::Name() const { return (*object().cName()); }
+LPCSTR CScriptGameObject::Name() const { return (*object().cName()); }
 shared_str CScriptGameObject::cName() const { return (object().cName()); }
-const char* CScriptGameObject::Section() const { return (*object().cNameSect()); }
+LPCSTR CScriptGameObject::Section() const { return (*object().cNameSect()); }
 void CScriptGameObject::Kill(CScriptGameObject* who, bool bypass_actor_check /*AVO: added for actor before death callback*/)
 {
     CEntity* l_tpEntity = smart_cast<CEntity*>(&object());

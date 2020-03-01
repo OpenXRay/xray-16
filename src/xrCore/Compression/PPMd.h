@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-bool _STDCALL StartSubAllocator(unsigned int SubAllocatorSize);
+bool _STDCALL StartSubAllocator(UINT SubAllocatorSize);
 void _STDCALL StopSubAllocator(); /* it can be called once        */
 DWORD _STDCALL GetUsedMemory(); /* for information only         */
 

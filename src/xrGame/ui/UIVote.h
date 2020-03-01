@@ -18,7 +18,7 @@ public:
     void OnBtnYes();
     void OnBtnNo();
     void OnBtnCancel();
-    void SetVoting(const char* txt);
+    void SetVoting(LPCSTR txt);
 
 protected:
     CUITextWnd* msg;

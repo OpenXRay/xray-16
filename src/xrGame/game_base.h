@@ -106,14 +106,14 @@ struct game_PlayerState
     bool testFlag(u16 f) const;
     void setFlag(u16 f);
     void resetFlag(u16 f);
-    const char* getName() const { return m_account.name().c_str(); }
+    LPCSTR getName() const { return m_account.name().c_str(); }
     void setName(pcstr s) { m_account.set_player_name(s); }
     void SetGameID(u16 NewID);
     bool HasOldID(u16 ID);
     bool IsSkip() const { return testFlag(GAME_PLAYER_FLAG_SKIP); }
     s16 frags() const { return m_iRivalKills - m_iSelfKills - m_iTeamKills; }
 #ifndef AI_COMPILER
-    virtual void net_Export(NET_Packet& P, bool Full = FALSE);
+    virtual void net_Export(NET_Packet& P, BOOL Full = FALSE);
     virtual void net_Import(NET_Packet& P);
     static void skip_Import(NET_Packet& P);
 #endif
@@ -216,7 +216,7 @@ public:
     virtual void SetEnvironmentGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor) override;
     // ~IGameState
     // for scripting enhancement
-    static CLASS_ID getCLASS_ID(const char* game_type_name, bool bServer);
+    static CLASS_ID getCLASS_ID(LPCSTR game_type_name, bool bServer);
 
     // moved from game_sv_base (time routines)
 private:

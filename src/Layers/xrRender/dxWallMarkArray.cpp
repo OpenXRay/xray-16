@@ -10,7 +10,7 @@ dxWallMarkArray::~dxWallMarkArray()
         it->destroy();
 }
 
-void dxWallMarkArray::AppendMark(const char* s_textures)
+void dxWallMarkArray::AppendMark(LPCSTR s_textures)
 {
     ref_shader s;
     s.create("effects" DELIMITER "wallmark", s_textures);

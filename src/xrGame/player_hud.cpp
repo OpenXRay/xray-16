@@ -123,10 +123,10 @@ Fvector& attachable_hud_item::hands_offset_rot()
     return m_measures.m_hands_offset[1][idx];
 }
 
-void attachable_hud_item::set_bone_visible(const shared_str& bone_name, bool bVisibility, bool bSilent)
+void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent)
 {
     u16 bone_id;
-    bool bVisibleNow;
+    BOOL bVisibleNow;
     bone_id = m_model->LL_BoneID(bone_name);
     if (bone_id == BI_NONE)
     {
@@ -326,7 +326,7 @@ void attachable_hud_item::load(const shared_str& sect_name)
     m_measures.load(sect_name, m_model);
 }
 
-u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, bool bMixIn, const CMotionDef*& md, u8& rnd_idx)
+u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, const CMotionDef*& md, u8& rnd_idx)
 {
     float speed = CalcMotionSpeed(anm_name_b);
 
@@ -598,7 +598,7 @@ void player_hud::update(const Fmatrix& cam_trans)
         m_attached_items[1]->update(true);
 }
 
-u32 player_hud::anim_play(u16 part, const MotionID& M, bool bMixIn, const CMotionDef*& md, float speed)
+u32 player_hud::anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed)
 {
     u16 part_id = u16(-1);
     if (attached_item(0) && attached_item(1))

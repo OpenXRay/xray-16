@@ -17,7 +17,7 @@ IC bool p_sort(const ref_constant& C1, const ref_constant& C2)
 }
 
 // TODO: OGL: Use constant buffers like DX10.
-bool R_constant_table::parse(void* _desc, u32 destination)
+BOOL R_constant_table::parse(void* _desc, u32 destination)
 {
     GLuint program = *(GLuint*)_desc;
 
@@ -61,7 +61,7 @@ bool R_constant_table::parse(void* _desc, u32 destination)
         GLuint r_location = glGetUniformLocation(program, name);
 
         // TypeInfo + class
-        bool bSkip = FALSE;
+        BOOL bSkip = FALSE;
         switch (reg)
         {
         case GL_FLOAT:

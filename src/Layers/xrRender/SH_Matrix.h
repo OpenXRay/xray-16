@@ -50,7 +50,7 @@ public:
     }
     void Calculate();
 
-    bool Similar(CMatrix& M) // comare by modes and params
+    BOOL Similar(CMatrix& M) // comare by modes and params
     {
         if (dwMode != M.dwMode)
             return FALSE;

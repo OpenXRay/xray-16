@@ -3,14 +3,14 @@
 #include "xrCore/xr_token.h"
 #include "xrCore/_std_extensions.h"
 
-char* _TrimLeft(char* str, char whatToTrim /*= ' '*/)
+LPSTR _TrimLeft(LPSTR str, char whatToTrim /*= ' '*/)
 {
-    char* p = str;
+    LPSTR p = str;
     while (*p && (u8(*p) <= u8(whatToTrim)))
         p++;
     if (p != str)
     {
-        char* t = str;
+        LPSTR t = str;
         for (; *p; t++, p++)
             *t = *p;
         *t = 0;
@@ -18,25 +18,25 @@ char* _TrimLeft(char* str, char whatToTrim /*= ' '*/)
     return str;
 }
 
-char* _TrimRight(char* str, char whatToTrim /*= ' '*/)
+LPSTR _TrimRight(LPSTR str, char whatToTrim /*= ' '*/)
 {
-    char* p = str + xr_strlen(str);
+    LPSTR p = str + xr_strlen(str);
     while ((p != str) && (u8(*p) <= u8(whatToTrim)))
         p--;
     *(++p) = 0;
     return str;
 }
 
-char* _Trim(char* str, char whatToTrim /*= ' '*/)
+LPSTR _Trim(LPSTR str, char whatToTrim /*= ' '*/)
 {
     _TrimLeft(str, whatToTrim);
     _TrimRight(str, whatToTrim);
     return str;
 }
 
-const char* _SetPos(const char* src, u32 pos, char separator)
+LPCSTR _SetPos(LPCSTR src, u32 pos, char separator)
 {
-    const char* res = src;
+    LPCSTR res = src;
     u32 p = 0;
     while ((p < pos) && (0 != (res = strchr(res, separator))))
     {
@@ -46,9 +46,9 @@ const char* _SetPos(const char* src, u32 pos, char separator)
     return res;
 }
 
-const char* _CopyVal(const char* src, char* dst, char separator)
+LPCSTR _CopyVal(LPCSTR src, LPSTR dst, char separator)
 {
-    const char* p;
+    LPCSTR p;
     size_t n;
     p = strchr(src, separator);
     n = (p != nullptr) ? (p - src) : xr_strlen(src);
@@ -57,13 +57,13 @@ const char* _CopyVal(const char* src, char* dst, char separator)
     return dst;
 }
 
-int _GetItemCount(const char* src, char separator)
+int _GetItemCount(LPCSTR src, char separator)
 {
     u32 cnt = 0;
     if (src && src[0])
     {
-        const char* res = src;
-        const char* last_res = res;
+        LPCSTR res = src;
+        LPCSTR last_res = res;
         while (0 != (res = strchr(res, separator)))
         {
             res++;
@@ -78,9 +78,9 @@ int _GetItemCount(const char* src, char separator)
     return cnt;
 }
 
-char* _GetItem(const char* src, int index, char* dst, u32 const dst_size, char separator, const char* def, bool trim)
+LPSTR _GetItem(LPCSTR src, int index, LPSTR dst, u32 const dst_size, char separator, LPCSTR def, bool trim)
 {
-    const char* ptr;
+    LPCSTR ptr;
     ptr = _SetPos(src, index, separator);
     if (ptr)
         _CopyVal(ptr, dst, separator);
@@ -91,11 +91,11 @@ char* _GetItem(const char* src, int index, char* dst, u32 const dst_size, char s
     return dst;
 }
 
-char* _GetItems(const char* src, int idx_start, int idx_end, char* dst, char separator)
+LPSTR _GetItems(LPCSTR src, int idx_start, int idx_end, LPSTR dst, char separator)
 {
-    char* n = dst;
+    LPSTR n = dst;
     int level = 0;
-    for (const char* p = src; *p != 0; p++)
+    for (LPCSTR p = src; *p != 0; p++)
     {
         if ((level >= idx_start) && (level < idx_end))
             *n++ = *p;
@@ -123,7 +123,7 @@ pcstr _GetItems(pcstr src, int idx_start, int idx_end, xr_string& dst, char sepa
     return dst.c_str();
 }
 
-u32 _ParseItem(const char* src, xr_token* token_list)
+u32 _ParseItem(LPCSTR src, xr_token* token_list)
 {
     for (int i = 0; token_list[i].name; i++)
         if (!xr_stricmp(src, token_list[i].name))
@@ -131,25 +131,25 @@ u32 _ParseItem(const char* src, xr_token* token_list)
     return u32(-1);
 }
 
-u32 _ParseItem(char* src, int ind, xr_token* token_list)
+u32 _ParseItem(LPSTR src, int ind, xr_token* token_list)
 {
     char dst[128];
     _GetItem(src, ind, dst);
     return _ParseItem(dst, token_list);
 }
 
-char* _ReplaceItems(const char* src, int idx_start, int idx_end, const char* new_items, char* dst, char separator)
+LPSTR _ReplaceItems(LPCSTR src, int idx_start, int idx_end, LPCSTR new_items, LPSTR dst, char separator)
 {
-    char* n = dst;
+    LPSTR n = dst;
     int level = 0;
     bool bCopy = true;
-    for (const char* p = src; *p != 0; p++)
+    for (LPCSTR p = src; *p != 0; p++)
     {
         if ((level >= idx_start) && (level < idx_end))
         {
             if (bCopy)
             {
-                for (const char* itm = new_items; *itm != 0;)
+                for (LPCSTR itm = new_items; *itm != 0;)
                     *n++ = *itm++;
                 bCopy = false;
             }
@@ -195,18 +195,18 @@ xr_string& _ReplaceItems(pcstr src, int idx_start, int idx_end, pcstr new_items,
     return dst;
 }
 
-char* _ReplaceItem(const char* src, int index, const char* new_item, char* dst, char separator)
+LPSTR _ReplaceItem(LPCSTR src, int index, LPCSTR new_item, LPSTR dst, char separator)
 {
-    char* n = dst;
+    LPSTR n = dst;
     int level = 0;
     bool bCopy = true;
-    for (const char* p = src; *p != 0; p++)
+    for (LPCSTR p = src; *p != 0; p++)
     {
         if (level == index)
         {
             if (bCopy)
             {
-                for (const char* itm = new_item; *itm != 0;)
+                for (LPCSTR itm = new_item; *itm != 0;)
                     *n++ = *itm++;
                 bCopy = false;
             }
@@ -252,7 +252,7 @@ xr_string& _ReplaceItem(pcstr src, int index, pcstr new_item, xr_string& dst, ch
     return dst;
 }
 
-char* _ChangeSymbol(char* name, char src, char dest)
+LPSTR _ChangeSymbol(LPSTR name, char src, char dest)
 {
     char* sTmpName = name;
     while (sTmpName[0])
@@ -274,9 +274,9 @@ xr_string& _ChangeSymbol(xr_string& name, char src, char dest)
 
 #ifdef M_BORLAND
 AnsiString& _Trim(AnsiString& str) { return str = str.Trim(); }
-const char* _CopyVal(const char* src, AnsiString& dst, char separator)
+LPCSTR _CopyVal(LPCSTR src, AnsiString& dst, char separator)
 {
-    const char* p;
+    LPCSTR p;
     u32 n;
     p = strchr(src, separator);
     n = (p != nullptr) ? (p - src) : xr_strlen(src);
@@ -287,9 +287,9 @@ const char* _CopyVal(const char* src, AnsiString& dst, char separator)
 
 
 
-const char* _GetItem(const char* src, int index, AnsiString& dst, char separator, const char* def, bool trim)
+LPCSTR _GetItem(LPCSTR src, int index, AnsiString& dst, char separator, LPCSTR def, bool trim)
 {
-    const char* ptr;
+    LPCSTR ptr;
     ptr = _SetPos(src, index, separator);
     if (ptr)
         _CopyVal(ptr, dst, separator);
@@ -328,7 +328,7 @@ AnsiString _ListToSequence2(const AStringVec& lst)
     return out;
 }
 
-void _SequenceToList(AStringVec& lst, const char* in, char separator)
+void _SequenceToList(AStringVec& lst, LPCSTR in, char separator)
 {
     lst.clear();
     int t_cnt = _GetItemCount(in, separator);
@@ -374,7 +374,7 @@ AnsiString FloatTimeToStrTime(float v, bool _h, bool _m, bool _s, bool _ms)
     return buf;
 }
 
-float StrTimeToFloatTime(const char* buf, bool _h, bool _m, bool _s, bool _ms)
+float StrTimeToFloatTime(LPCSTR buf, bool _h, bool _m, bool _s, bool _ms)
 {
     float t[4] = {0.f, 0.f, 0.f, 0.f};
     int rm[4];
@@ -398,7 +398,7 @@ float StrTimeToFloatTime(const char* buf, bool _h, bool _m, bool _s, bool _ms)
 }
 #endif
 
-void _SequenceToList(LPSTRVec& lst, const char* in, char separator)
+void _SequenceToList(LPSTRVec& lst, LPCSTR in, char separator)
 {
     int t_cnt = _GetItemCount(in, separator);
     string1024 T;
@@ -411,7 +411,7 @@ void _SequenceToList(LPSTRVec& lst, const char* in, char separator)
     }
 }
 
-void _SequenceToList(xr_vector<shared_str>& lst, const char* in, char separator)
+void _SequenceToList(xr_vector<shared_str>& lst, LPCSTR in, char separator)
 {
     lst.clear();
     int t_cnt = _GetItemCount(in, separator);
@@ -425,7 +425,7 @@ void _SequenceToList(xr_vector<shared_str>& lst, const char* in, char separator)
     }
 }
 
-void _SequenceToList(SStringVec& lst, const char* in, char separator)
+void _SequenceToList(SStringVec& lst, LPCSTR in, char separator)
 {
     lst.clear();
     const int t_cnt = _GetItemCount(in, separator);
@@ -454,8 +454,8 @@ xr_string _ListToSequence(const SStringVec& lst)
 
 xr_string& _TrimLeft(xr_string& str)
 {
-    const char* b = str.c_str();
-    const char* p = str.c_str();
+    LPCSTR b = str.c_str();
+    LPCSTR p = str.c_str();
     while (*p && (u8(*p) <= u8(' ')))
         p++;
     if (p != b)
@@ -465,11 +465,11 @@ xr_string& _TrimLeft(xr_string& str)
 
 xr_string& _TrimRight(xr_string& str)
 {
-    const char* b = str.c_str();
+    LPCSTR b = str.c_str();
     size_t l = str.length();
     if (l)
     {
-        const char* p = str.c_str() + l - 1;
+        LPCSTR p = str.c_str() + l - 1;
         while ((p != b) && (u8(*p) <= u8(' ')))
             p--;
         if (p != (str + b))
@@ -485,9 +485,9 @@ xr_string& _Trim(xr_string& str)
     return str;
 }
 
-const char* _CopyVal(const char* src, xr_string& dst, char separator)
+LPCSTR _CopyVal(LPCSTR src, xr_string& dst, char separator)
 {
-    const char* p;
+    LPCSTR p;
     std::ptrdiff_t n;
     p = strchr(src, separator);
     n = (p != nullptr) ? (p - src) : xr_strlen(src);
@@ -496,9 +496,9 @@ const char* _CopyVal(const char* src, xr_string& dst, char separator)
     return dst.c_str();
 }
 
-const char* _GetItem(const char* src, int index, xr_string& dst, char separator, const char* def, bool trim)
+LPCSTR _GetItem(LPCSTR src, int index, xr_string& dst, char separator, LPCSTR def, bool trim)
 {
-    const char* ptr;
+    LPCSTR ptr;
     ptr = _SetPos(src, index, separator);
     if (ptr)
         _CopyVal(ptr, dst, separator);

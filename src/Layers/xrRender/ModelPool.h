@@ -41,9 +41,9 @@ class ECORE_API CModelPool
     xr_vector<dxRender_Visual*> ModelsToDelete; //
     REGISTRY Registry; // Just pairing of pointer / Name
     POOL Pool; // Unused / Inactive
-    bool bLogging;
-    bool bForceDiscard;
-    bool bAllowChildrenDuplicate;
+    BOOL bLogging;
+    BOOL bForceDiscard;
+    BOOL bAllowChildrenDuplicate;
 
     void Destroy();
 
@@ -52,23 +52,23 @@ public:
     virtual ~CModelPool();
     dxRender_Visual* Instance_Create(u32 Type);
     dxRender_Visual* Instance_Duplicate(dxRender_Visual* V);
-    dxRender_Visual* Instance_Load(const char* N, bool allow_register);
-    dxRender_Visual* Instance_Load(const char* N, IReader* data, bool allow_register);
-    void Instance_Register(const char* N, dxRender_Visual* V);
-    dxRender_Visual* Instance_Find(const char* N);
+    dxRender_Visual* Instance_Load(LPCSTR N, BOOL allow_register);
+    dxRender_Visual* Instance_Load(LPCSTR N, IReader* data, BOOL allow_register);
+    void Instance_Register(LPCSTR N, dxRender_Visual* V);
+    dxRender_Visual* Instance_Find(LPCSTR N);
 
     dxRender_Visual* CreatePE(PS::CPEDef* source);
     dxRender_Visual* CreatePG(PS::CPGDef* source);
-    dxRender_Visual* Create(const char* name, IReader* data = nullptr);
-    dxRender_Visual* CreateChild(const char* name, IReader* data);
-    void Delete(dxRender_Visual*& V, bool bDiscard = FALSE);
+    dxRender_Visual* Create(LPCSTR name, IReader* data = nullptr);
+    dxRender_Visual* CreateChild(LPCSTR name, IReader* data);
+    void Delete(dxRender_Visual*& V, BOOL bDiscard = FALSE);
     void Discard(dxRender_Visual*& V, BOOL b_complete);
-    void DeleteInternal(dxRender_Visual*& V, bool bDiscard = FALSE);
+    void DeleteInternal(dxRender_Visual*& V, BOOL bDiscard = FALSE);
     void DeleteQueue();
 
-    void Logging(bool bEnable) { bLogging = bEnable; }
+    void Logging(BOOL bEnable) { bLogging = bEnable; }
     void Prefetch();
-    void ClearPool(bool b_complete);
+    void ClearPool(BOOL b_complete);
 
     void dump();
 

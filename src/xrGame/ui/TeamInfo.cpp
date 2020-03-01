@@ -18,7 +18,7 @@ u32 CTeamInfo::GetTeam1_color()
 
     string256 _buff;
 
-    const char* tm_col = pSettings->r_string("team1", "color");
+    LPCSTR tm_col = pSettings->r_string("team1", "color");
     team1_color = color_argb(
         155, atoi(_GetItem(tm_col, 0, _buff)), atoi(_GetItem(tm_col, 1, _buff)), atoi(_GetItem(tm_col, 2, _buff)));
     flags.set(flTeam1_color, true);
@@ -33,7 +33,7 @@ u32 CTeamInfo::GetTeam2_color()
 
     string256 _buff;
 
-    const char* tm_col = pSettings->r_string("team2", "color");
+    LPCSTR tm_col = pSettings->r_string("team2", "color");
     team2_color = color_argb(
         155, atoi(_GetItem(tm_col, 0, _buff)), atoi(_GetItem(tm_col, 1, _buff)), atoi(_GetItem(tm_col, 2, _buff)));
     flags.set(flTeam2_color, true);
@@ -63,7 +63,7 @@ shared_str CTeamInfo::GetTeam2_name()
     return team2_name;
 }
 
-const char* CTeamInfo::GetTeam_name(int team)
+LPCSTR CTeamInfo::GetTeam_name(int team)
 {
     string32 tmp;
     R_ASSERT2(team == 1 || team == 2 || team == 3, xr_itoa(team, tmp, 10));
@@ -73,7 +73,7 @@ const char* CTeamInfo::GetTeam_name(int team)
         return *GetTeam2_name();
 }
 
-const char* CTeamInfo::GetTeam_color_tag(int team)
+LPCSTR CTeamInfo::GetTeam_color_tag(int team)
 {
     string32 tmp;
     R_ASSERT2(team == 1 || team == 2 || team == 3, xr_itoa(team, tmp, 10));
@@ -88,7 +88,7 @@ const char* CTeamInfo::GetTeam_color_tag(int team)
 
     //"%c[255,64,255,64]", "%c[255,64,64,255]"
 
-    const char* tm_col;
+    LPCSTR tm_col;
     if (team == 1)
         tm_col = pSettings->r_string("team1", "color");
     else

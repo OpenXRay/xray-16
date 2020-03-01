@@ -10,9 +10,9 @@
 #include "alife_time_manager.h"
 #include "date_time.h"
 
-CALifeTimeManager::CALifeTimeManager(const char* section) { init(section); }
+CALifeTimeManager::CALifeTimeManager(LPCSTR section) { init(section); }
 CALifeTimeManager::~CALifeTimeManager() {}
-void CALifeTimeManager::init(const char* section)
+void CALifeTimeManager::init(LPCSTR section)
 {
     u32 years, months, days, hours, minutes, seconds;
     sscanf(pSettings->r_string(section, "start_time"), "%d:%d:%d", &hours, &minutes, &seconds);
