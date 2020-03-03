@@ -98,8 +98,7 @@ void clean_game_globals()
     // static shader for blood
     CEntityAlive::UnloadBloodyWallmarks();
     CEntityAlive::UnloadFireParticles();
-    // Очищение таблицы цветов
-    CUIXmlInit::DeleteColorDefs();
+
     // Очищение таблицы идентификаторов рангов и отношений сталкеров
     InventoryUtilities::ClearCharacterInfoStrings();
 
@@ -116,5 +115,4 @@ void clean_game_globals()
     xr_delete(g_uiSpotXml);
     DestroyUIGeom();
     xr_delete(pWpnScopeXml);
-    CUITextureMaster::FreeTexInfo();
 }

@@ -233,6 +233,9 @@ void UICore::OnDeviceReset()
 
 void UICore::OnUIReset()
 {
+    CUIXmlInitBase::DeleteColorDefs();
+    CUITextureMaster::FreeTexInfo();
+
     ReadTextureInfo();
     CUIXmlInitBase::InitColorDefs();
 }
@@ -241,6 +244,8 @@ UICore::~UICore()
 {
     xr_delete(m_pFontManager);
     xr_delete(m_pUICursor);
+    CUIXmlInitBase::DeleteColorDefs();
+    CUITextureMaster::FreeTexInfo();
 }
 
 void UICore::ReadTextureInfo()
