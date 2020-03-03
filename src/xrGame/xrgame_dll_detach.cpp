@@ -56,7 +56,6 @@ void init_game_globals()
 }
 
 extern CUIXml* g_uiSpotXml;
-extern CUIXml* pWpnScopeXml;
 
 void clean_game_globals()
 {
@@ -111,5 +110,4 @@ void clean_game_globals()
     clean_wnd_rects();
     xr_delete(g_uiSpotXml);
     DestroyUIGeom();
-    xr_delete(pWpnScopeXml);
 }

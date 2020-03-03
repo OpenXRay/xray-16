@@ -23,17 +23,6 @@
 #include "script_game_object.h"
 #include "HudSound.h"
 
-CUIXml* pWpnScopeXml = nullptr;
-
-void createWpnScopeXML()
-{
-    if (!pWpnScopeXml)
-    {
-        pWpnScopeXml = new CUIXml();
-        pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
-    }
-}
-
 CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
 {
     m_eSoundShow = ESoundTypes(SOUND_TYPE_ITEM_TAKING | eSoundType);
@@ -1054,8 +1043,7 @@ void CWeaponMagazined::InitAddons()
             if (!GEnv.isDedicatedServer)
             {
                 m_UIScope = new CUIWindow();
-                createWpnScopeXML();
-                CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
+                LoadScope(scope_tex_name);
             }
         }
     }

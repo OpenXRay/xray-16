@@ -197,7 +197,6 @@ void CHUDManager::SetGrenadeMarkType(LPCSTR tex_name) { HitMarker.InitShader_Gre
 // ------------------------------------------------------------------------------------
 
 #include "ui/UIMainIngameWnd.h"
-extern CUIXml* pWpnScopeXml;
 
 void CHUDManager::Load()
 {
@@ -214,8 +213,6 @@ void CHUDManager::Load()
 void CHUDManager::OnUIReset()
 {
     pUIGame->HideShownDialogs();
-
-    xr_delete(pWpnScopeXml);
 
     pUIGame->UnLoad();
     pUIGame->Load();
