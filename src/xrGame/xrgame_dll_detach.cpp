@@ -55,8 +55,6 @@ void init_game_globals()
     MONSTER_COMMUNITY::InitInternal();
 }
 
-extern CUIXml* g_uiSpotXml;
-
 void clean_game_globals()
 {
     // destroy ai space
@@ -108,6 +106,5 @@ void clean_game_globals()
     RELATION_REGISTRY::clear_relation_registry();
 
     clean_wnd_rects();
-    xr_delete(g_uiSpotXml);
     DestroyUIGeom();
 }

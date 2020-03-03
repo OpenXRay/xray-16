@@ -65,7 +65,6 @@ protected:
 private:
     CMapLocation(const CMapLocation&) { R_ASSERT(0); } // disable copy ctor
 protected:
-    void LoadSpot(LPCSTR type, bool bReload);
     void UpdateSpot(CUICustomMap* map, CMapSpot* sp);
     void UpdateSpotPointer(CUICustomMap* map, CMapSpotPointer* sp);
     void CalcLevelName();
@@ -76,6 +75,8 @@ public:
     CMapLocation(LPCSTR type, u16 object_id);
     virtual ~CMapLocation();
     virtual void destroy();
+
+    void LoadSpot(LPCSTR type);
 
     IC bool HintEnabled() { return !!m_flags.test(eHintEnabled); }
     LPCSTR GetHint();

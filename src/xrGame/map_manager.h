@@ -6,7 +6,7 @@ class CMapLocationWrapper;
 class CInventoryOwner;
 class CMapLocation;
 
-class CMapManager
+class CMapManager : public CUIResetNotifier 
 {
     CMapLocationWrapper* m_locations_wrapper;
     vLocations* m_locations;
@@ -33,4 +33,6 @@ public:
     void Dump();
 #endif
     void Destroy(CMapLocation*);
+
+    void OnUIReset() override;
 };
