@@ -45,8 +45,13 @@ void CUIZoneMap::Init()
     m_activeMap = new CUIMiniMap();
     m_clipFrame.AttachChild(m_activeMap);
     m_activeMap->SetAutoDelete(true);
-
     m_activeMap->EnableHeading(true);
+
+    // Clear Sky and Shadow of Chernobyl compatibility
+    // Check for m_pointerDistanceText reduces flexibility
+    // But it's all we can, probably.
+    m_activeMap->SetRounded(!m_pointerDistanceText);
+
     CUIXmlInit::InitStatic(uiXml, "minimap:compass", 0, &m_compass);
     m_background.AttachChild(&m_compass);
 
