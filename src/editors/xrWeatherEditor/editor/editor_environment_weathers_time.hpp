@@ -58,6 +58,8 @@ private:
     void xr_stdcall sun_longitude_setter(float value);
     float xr_stdcall sky_rotation_getter() const;
     void xr_stdcall sky_rotation_setter(float value);
+    float xr_stdcall clouds_rotation_getter() const;
+    void xr_stdcall clouds_rotation_setter(float value);
     float xr_stdcall wind_direction_getter() const;
     void xr_stdcall wind_direction_setter(float value);
     pcstr xr_stdcall ambient_getter() const;

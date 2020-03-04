@@ -72,6 +72,7 @@ void time::load(const CInifile& config)
     // rain_density = config.r_float(m_identifier, "rain_density");
     // sky_color = config.r_fvector3(m_identifier, "sky_color");
     // sky_rotation = config.r_float(m_identifier, "sky_rotation");
+    // clouds_rotation = config.r_float(m_identifier, "clouds_rotation");
 
     // sky_texture_name = config.r_string(m_identifier, "sky_texture");
     // string_path st_env;
@@ -117,6 +118,7 @@ void time::save(CInifile& config)
     config.w_float(m_identifier.c_str(), "rain_density", rain_density);
     config.w_fvector3(m_identifier.c_str(), "sky_color", sky_color);
     config.w_float(m_identifier.c_str(), "sky_rotation", rad2deg(sky_rotation));
+    config.w_float(m_identifier.c_str(), "clouds_rotation", rad2deg(clouds_rotation));
     config.w_string(m_identifier.c_str(), "sky_texture", sky_texture_name.c_str());
     config.w_fvector3(m_identifier.c_str(), "sun_color", sun_color);
     config.w_float(m_identifier.c_str(), "sun_shafts_intensity", m_fSunShaftsIntensity);
@@ -237,6 +239,8 @@ void time::clouds_texture_setter(pcstr value)
 
 float time::sky_rotation_getter() const { return (rad2deg(sky_rotation)); }
 void time::sky_rotation_setter(float value) { sky_rotation = deg2rad(value); }
+float time::clouds_rotation_getter() const { return (rad2deg(clouds_rotation)); }
+void time::clouds_rotation_setter(float value) { clouds_rotation = deg2rad(value); }
 float time::wind_direction_getter() const { return (rad2deg(wind_direction)); }
 void time::wind_direction_setter(float value) { wind_direction = deg2rad(value); }
 void time::fill(XRay::Editor::property_holder_collection* collection)
@@ -319,6 +323,11 @@ void time::fill(XRay::Editor::property_holder_collection* collection)
     float_setter.bind(this, &time::sky_rotation_setter);
     m_property_holder->add_property("sky rotation", "hemisphere", "this option is responsible for sky rotation",
         sky_rotation, float_getter, float_setter, -360.0f, 360.f);
+
+    float_getter.bind(this, &time::clouds_rotation_getter);
+    float_setter.bind(this, &time::clouds_rotation_setter);
+    m_property_holder->add_property("clouds rotation", "hemisphere", "this option is responsible for clouds rotation",
+        clouds_rotation, float_getter, float_setter, -360.0f, 360.f);
 
     string_getter.bind(this, &time::clouds_texture_getter);
     string_setter.bind(this, &time::clouds_texture_setter);

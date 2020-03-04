@@ -140,6 +140,7 @@ public:
     FactoryPtr<IEnvDescriptorRender> m_pDescriptor;
 
     Fvector4 clouds_color;
+    float clouds_rotation;
     Fvector3 sky_color;
     float sky_rotation;
 

@@ -347,6 +347,11 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     else
         sky_rotation = 0.0f;
 
+    if (config.line_exist(identifier, "clouds_rotation"))
+        clouds_rotation = deg2rad(config.r_float(identifier, "clouds_rotation"));
+    else
+        clouds_rotation = sky_rotation;
+
     far_plane = config.r_float(identifier, "far_plane");
     fog_color = config.r_fvector3(identifier, "fog_color");
     fog_density = config.r_float(identifier, "fog_density");
@@ -475,6 +480,7 @@ void CEnvDescriptorMixer::lerp(
     clouds_color.lerp(A.clouds_color, B.clouds_color, f);
 
     sky_rotation = (fi * A.sky_rotation + f * B.sky_rotation);
+    clouds_rotation = (fi * A.clouds_rotation + f * B.clouds_rotation);
 
     //. far_plane = (fi*A.far_plane + f*B.far_plane + Mdf.far_plane)*psVisDistance*modif_power;
     if (Mdf.use_flags.test(eViewDist))
