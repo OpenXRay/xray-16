@@ -46,7 +46,6 @@ void init_game_globals()
         CInfoPortion::InitInternal(ShadowOfChernobylMode || ClearSkyMode);
         CEncyclopediaArticle::InitInternal(ShadowOfChernobylMode);
         CPhraseDialog::InitInternal();
-        InventoryUtilities::CreateShaders();
     };
     CCharacterInfo::InitInternal();
     CSpecificCharacter::InitInternal();
@@ -81,8 +80,6 @@ void clean_game_globals()
 
         CPhraseDialog::DeleteSharedData();
         CPhraseDialog::DeleteIdToIndexData();
-
-        InventoryUtilities::DestroyShaders();
     }
     CCharacterInfo::DeleteSharedData();
     CCharacterInfo::DeleteIdToIndexData();

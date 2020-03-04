@@ -45,6 +45,30 @@ CharInfoStrings* charInfoReputationStrings = NULL;
 CharInfoStrings* charInfoRankStrings = NULL;
 CharInfoStrings* charInfoGoodwillStrings = NULL;
 
+static class InventoryUtilitiesReset : public CUIResetNotifier, public pureAppStart, public pureAppEnd
+{
+public:
+    void OnAppStart() override
+    {
+        if (GEnv.isDedicatedServer)
+            return;
+        InventoryUtilities::CreateShaders();
+    }
+
+    void OnAppEnd() override
+    {
+        if (GEnv.isDedicatedServer)
+            return;
+        InventoryUtilities::DestroyShaders();
+    }
+
+    void OnUIReset() override
+    {
+        OnAppEnd();
+        OnAppStart();
+    }
+} s_inventory_utilities_reset;
+
 void InventoryUtilities::CreateShaders()
 {
     // Nothing here. All needed shaders will be created on demand
