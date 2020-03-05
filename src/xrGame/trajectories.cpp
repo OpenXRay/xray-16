@@ -58,7 +58,7 @@ static float trajectory_select_pick_time(const float& start_low, float high, con
     return (low);
 }
 
-IC BOOL trajectory_query_callback(collide::rq_result& result, LPVOID params)
+IC bool trajectory_query_callback(collide::rq_result& result, LPVOID params)
 {
     *(float*)params = result.range;
     return (false);

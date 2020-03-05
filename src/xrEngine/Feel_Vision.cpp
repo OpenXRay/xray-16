@@ -21,7 +21,7 @@ struct SFeelParam
     {
     }
 };
-IC BOOL feel_vision_callback(collide::rq_result& result, LPVOID params)
+IC bool feel_vision_callback(collide::rq_result& result, LPVOID params)
 {
     SFeelParam* fp = (SFeelParam*)params;
     float vis = fp->parent->feel_vision_mtl_transp(result.O, result.element);
@@ -210,13 +210,13 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
                     if (g_pGameLevel->ObjectSpace.RayQuery(RQR, RD, feel_vision_callback, &feel_params, NULL, NULL))
                     {
                         I->Cache_vis = feel_params.vis;
-                        I->Cache.set(P, D, f, TRUE);
+                        I->Cache.set(P, D, f, true);
                     }
                     else
                     {
                         // feel_params.vis = 0.f;
                         // I->Cache_vis = feel_params.vis ;
-                        I->Cache.set(P, D, f, FALSE);
+                        I->Cache.set(P, D, f, false);
                     }
                     // Log("query");
                 }

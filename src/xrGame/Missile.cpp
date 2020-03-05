@@ -69,7 +69,7 @@ void CMissile::Load(LPCSTR section)
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
 }
 
-BOOL CMissile::net_Spawn(CSE_Abstract* DC)
+bool CMissile::net_Spawn(CSE_Abstract* DC)
 {
     BOOL l_res = inherited::net_Spawn(DC);
 

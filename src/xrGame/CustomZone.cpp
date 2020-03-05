@@ -288,7 +288,7 @@ void CCustomZone::Load(LPCSTR section)
     m_zone_flags.set(eAffectPickDOF, pSettings->read_if_exists<bool>(section, "pick_dof_effector", false));
 }
 
-BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
+bool CCustomZone::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -1368,7 +1368,7 @@ bool CCustomZone::feel_touch_on_contact(IGameObject* O)
     return (inherited::feel_touch_on_contact(O));
 }
 
-BOOL CCustomZone::AlwaysTheCrow()
+bool CCustomZone::AlwaysTheCrow()
 {
     bool b_idle = ZoneState() == eZoneStateIdle || ZoneState() == eZoneStateDisabled;
     if (!b_idle || (m_zone_flags.test(eAlwaysFastmode) && IsEnabled()))

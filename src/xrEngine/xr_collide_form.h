@@ -99,7 +99,7 @@ public:
     ICollisionForm(IGameObject* _owner, ECollisionFormType tp);
     virtual ~ICollisionForm();
 
-    virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R) = 0;
+    virtual bool _RayQuery(const collide::ray_defs& Q, collide::rq_results& R) = 0;
     // virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags) = 0;
 
     IC IGameObject* Owner() const { return owner; }
@@ -135,7 +135,7 @@ public:
 
         SElement() : elem_id(u16(-1)), type(0) {}
         SElement(u16 id, u16 t) : elem_id(id), type(t) {}
-        BOOL valid() const { return (elem_id != (u16(-1))) && (type != 0); }
+        bool valid() const { return (elem_id != (u16(-1))) && (type != 0); }
         void center(Fvector& center) const;
     };
     using ElementVec = xr_vector<SElement>;
@@ -153,7 +153,7 @@ private:
 public:
     CCF_Skeleton(IGameObject* _owner);
 
-    virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
+    virtual bool _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     bool _ElementCenter(u16 elem_id, Fvector& e_center);
     const ElementVec& _GetElements() { return elements; }
 #ifdef DEBUG
@@ -172,10 +172,10 @@ class ENGINE_API CCF_EventBox : public ICollisionForm
 public:
     CCF_EventBox(IGameObject* _owner);
 
-    virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
+    virtual bool _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     // virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
 
-    BOOL Contact(IGameObject* O);
+    bool Contact(IGameObject* O);
 };
 
 class ENGINE_API CCF_Shape : public ICollisionForm
@@ -199,13 +199,13 @@ public:
 
     CCF_Shape(IGameObject* _owner);
 
-    virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
+    virtual bool _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     // virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
 
     void add_sphere(Fsphere& S);
     void add_box(Fmatrix& B);
     void ComputeBounds();
-    BOOL Contact(IGameObject* O);
+    bool Contact(IGameObject* O);
     xr_vector<shape_def>& Shapes() { return shapes; }
 };
 

@@ -59,7 +59,7 @@ void SThunderboltDesc::load(const CInifile& pIni, shared_str const& sect)
     color_anim->fFPS = (float)color_anim->iFrameCount;
 
     // models
-    LPCSTR m_name = pIni.r_string(sect, "lightning_model");
+    pcstr m_name = pIni.r_string(sect, "lightning_model");
     string_path tmp;
     xr_strcpy(tmp, m_name);
     m_pRender->CreateModel(tmp);
@@ -80,7 +80,7 @@ void SThunderboltCollection::load(CInifile const* pIni, CInifile const* thunderb
     int tb_count = pIni->line_count(sect);
     for (int tb_idx = 0; tb_idx < tb_count; tb_idx++)
     {
-        LPCSTR N, V;
+        pcstr N, V;
         if (pIni->r_line(sect, tb_idx, &N, &V))
             palette.push_back(g_pGamePersistent->Environment().thunderbolt_description(*thunderbolts, N));
     }
@@ -102,7 +102,7 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
     life_time = 0.f;
     state = stIdle;
     next_lightning_time = 0.f;
-    bEnabled = FALSE;
+    bEnabled = false;
 
     // params
     // p_var_alt = pSettings->r_fvector2 ( "environment","altitude" );
@@ -141,7 +141,7 @@ shared_str CEffect_Thunderbolt::AppendDef(
 
 bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& range)
 {
-    BOOL bRes = TRUE;
+    bool bRes = true;
 #ifdef _EDITOR
     bRes = Tools->RayPick(s, d, range, 0, 0);
 #else
@@ -223,7 +223,7 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
 
 void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
 {
-    BOOL enabled = !!(id.size());
+    bool enabled = !!(id.size());
     if (bEnabled != enabled)
     {
         bEnabled = enabled;

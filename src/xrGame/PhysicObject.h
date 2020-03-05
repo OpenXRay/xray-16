@@ -86,15 +86,15 @@ public:
     virtual void Interpolate();
     float interpolate_states(net_update_PItem const& first, net_update_PItem const& last, SPHNetState& current);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void CreatePhysicsShell(CSE_Abstract* e);
     virtual void net_Destroy();
     virtual void Load(LPCSTR section);
     virtual void shedule_Update(u32 dt); //
     virtual void UpdateCL();
     virtual void net_Save(NET_Packet& P);
-    virtual BOOL net_SaveRelevant();
-    virtual BOOL UsedAI_Locations();
+    virtual bool net_SaveRelevant();
+    virtual bool UsedAI_Locations();
     virtual ICollisionHitCallback* get_collision_hit_callback();
     virtual void set_collision_hit_callback(ICollisionHitCallback* cc);
     virtual bool is_ai_obstacle() const;

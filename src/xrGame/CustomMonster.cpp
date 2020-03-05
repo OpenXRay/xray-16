@@ -699,13 +699,13 @@ void CCustomMonster::Die(IGameObject* who)
     SetActorVisibility(ID(), 0.f);
 }
 
-BOOL CCustomMonster::net_Spawn(CSE_Abstract* DC)
+bool CCustomMonster::net_Spawn(CSE_Abstract* DC)
 {
     memory().reload(*cNameSect());
     memory().reinit();
 
     if (!movement().net_Spawn(DC) || !inherited::net_Spawn(DC) || !CScriptEntity::net_Spawn(DC))
-        return (FALSE);
+        return (false);
 
     ISpatial* self = smart_cast<ISpatial*>(this);
     if (self)
@@ -780,7 +780,7 @@ BOOL CCustomMonster::net_Spawn(CSE_Abstract* DC)
 
     m_moving_object = new moving_object(this);
 
-    return TRUE;
+    return true;
 }
 
 #ifdef DEBUG
@@ -816,7 +816,7 @@ void CCustomMonster::net_Destroy()
     SetActorVisibility(ID(), 0.0f);
 }
 
-BOOL CCustomMonster::UsedAI_Locations() { return (TRUE); }
+bool CCustomMonster::UsedAI_Locations() { return (true); }
 void CCustomMonster::PitchCorrection()
 {
     CLevelGraph::SContour contour;

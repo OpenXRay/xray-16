@@ -573,7 +573,7 @@ LPCSTR CScriptEntity::GetPatrolPathName()
     return (*m_tpActionQueue.back()->m_tMovementAction.m_path_name);
 }
 
-BOOL CScriptEntity::net_Spawn(CSE_Abstract* DC)
+bool CScriptEntity::net_Spawn(CSE_Abstract* DC)
 {
     m_initialized = true;
     object().setVisible(TRUE);

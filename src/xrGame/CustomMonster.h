@@ -139,7 +139,7 @@ public:
     virtual CEntity* cast_entity() { return this; }
 public:
     virtual IFactoryObject* _construct();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void Die(IGameObject* who);
 
     virtual void HitSignal(float P, Fvector& vLocalDir, IGameObject* who);
@@ -177,7 +177,7 @@ public:
 
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void net_Destroy();
-    virtual BOOL UsedAI_Locations();
+    virtual bool UsedAI_Locations();
     ///////////////////////////////////////////////////////////////////////
     virtual u16 PHGetSyncItemsNumber() { return inherited::PHGetSyncItemsNumber(); }
     virtual CPHSynchronize* PHGetSyncItem(u16 item) { return inherited::PHGetSyncItem(item); }
@@ -195,7 +195,7 @@ public:
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
+    virtual bool net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     virtual const MonsterSpace::SBoneRotation& head_orientation() const;
 
     virtual void UpdatePositionAnimation();

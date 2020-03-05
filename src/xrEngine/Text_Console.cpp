@@ -25,17 +25,17 @@ CTextConsole::CTextConsole()
 
 CTextConsole::~CTextConsole() { m_pMainWnd = NULL; }
 //-------------------------------------------------------------------------------------------
-LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam);
 void CTextConsole::CreateConsoleWnd()
 {
     HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
     //----------------------------------
     RECT cRc;
     GetClientRect(*m_pMainWnd, &cRc);
-    INT lX = cRc.left;
-    INT lY = cRc.top;
-    INT lWidth = cRc.right - cRc.left;
-    INT lHeight = cRc.bottom - cRc.top;
+    signed int lX = cRc.left;
+    signed int lY = cRc.top;
+    signed int lWidth = cRc.right - cRc.left;
+    signed int lHeight = cRc.bottom - cRc.top;
     //----------------------------------
     const char* wndclass = "TEXT_CONSOLE";
 
@@ -50,7 +50,7 @@ void CTextConsole::CreateConsoleWnd()
     // Set the window's initial width
     RECT rc;
     SetRect(&rc, lX, lY, lWidth, lHeight);
-    // AdjustWindowRect( &rc, dwWindowStyle, FALSE );
+    // AdjustWindowRect( &rc, dwWindowStyle, false );
 
     // Create the render window
     m_hConsoleWnd = CreateWindow(
@@ -59,17 +59,17 @@ void CTextConsole::CreateConsoleWnd()
     R_ASSERT2(m_hConsoleWnd, "Unable to Create TextConsole Window!");
 };
 //-------------------------------------------------------------------------------------------
-LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam);
 void CTextConsole::CreateLogWnd()
 {
     HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
     //----------------------------------
     RECT cRc;
     GetClientRect(m_hConsoleWnd, &cRc);
-    INT lX = cRc.left;
-    INT lY = cRc.top;
-    INT lWidth = cRc.right - cRc.left;
-    INT lHeight = cRc.bottom - cRc.top;
+    signed int lX = cRc.left;
+    signed int lY = cRc.top;
+    signed int lWidth = cRc.right - cRc.left;
+    signed int lHeight = cRc.bottom - cRc.top;
     //----------------------------------
     const char* wndclass = "TEXT_CONSOLE_LOG_WND";
 
@@ -85,7 +85,7 @@ void CTextConsole::CreateLogWnd()
     // Set the window's initial width
     RECT rc;
     SetRect(&rc, lX, lY, lWidth, lHeight);
-    // AdjustWindowRect( &rc, dwWindowStyle, FALSE );
+    // AdjustWindowRect( &rc, dwWindowStyle, false );
 
     // Create the render window
     m_hLogWnd = CreateWindow(
@@ -241,8 +241,8 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     int y_top_max = (int)(0.32f * Height);
 
     //---------------------------------------------------------------------------------
-    LPCSTR s_edt = ec().str_edit();
-    LPCSTR s_cur = ec().str_before_cursor();
+    pcstr s_edt = ec().str_edit();
+    pcstr s_cur = ec().str_before_cursor();
 
     u32 cur_len = xr_strlen(s_cur) + xr_strlen(ch_cursor) + 1;
     PSTR buf = (PSTR)xr_alloca(cur_len * sizeof(char));
@@ -286,7 +286,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         {
             break;
         }
-        LPCSTR ls = LogFile[i].c_str();
+        pcstr ls = LogFile[i].c_str();
 
         if (!ls)
         {
@@ -296,9 +296,9 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         COLORREF c2 = (COLORREF)bgr2rgb(get_mark_color(cm));
         SetTextColor(hDC, c2);
         u8 b = (is_mark(cm)) ? 2 : 0;
-        LPCSTR pOut = ls + b;
+        pcstr pOut = ls + b;
 
-        BOOL res = TextOut(hDC, 10, ypos, pOut, xr_strlen(pOut));
+        bool res = TextOut(hDC, 10, ypos, pOut, xr_strlen(pOut));
         if (!res)
         {
             R_ASSERT2(0, "TextOut(..) return NULL");
@@ -340,7 +340,7 @@ void CTextConsole::OnFrame()
      {
      return;
      }
-     */ InvalidateRect(m_hConsoleWnd, NULL, FALSE);
+     */ InvalidateRect(m_hConsoleWnd, NULL, false);
     SetCursor(LoadCursor(NULL, IDC_ARROW));
     // m_bNeedUpdate = true;
 }

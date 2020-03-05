@@ -130,7 +130,7 @@ void CHUDManager::RenderActiveItemUI()
     g_player_hud->render_item_ui();
 }
 
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 //отрисовка элементов интерфейса
 void CHUDManager::RenderUI()
 {

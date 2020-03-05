@@ -18,7 +18,7 @@ public:
     CDestroyablePhysicsObject();
     virtual ~CDestroyablePhysicsObject();
     virtual CPhysicsShellHolder* PPhysicsShellHolder();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void Hit(SHit* pHDS);
     virtual void InitServerObject(CSE_Abstract* D);

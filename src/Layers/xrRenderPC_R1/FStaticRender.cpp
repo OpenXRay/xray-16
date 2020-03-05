@@ -183,7 +183,7 @@ void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
 IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
 IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
-void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
+void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
@@ -224,7 +224,7 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
     }
 }
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
 ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
@@ -294,9 +294,9 @@ IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return new CGlow(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
-BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     set_Object(root);

@@ -7,7 +7,7 @@
 
 CVisualZone::CVisualZone() {}
 CVisualZone::~CVisualZone() {}
-BOOL CVisualZone::net_Spawn(CSE_Abstract* DC)
+bool CVisualZone::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

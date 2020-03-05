@@ -14,7 +14,7 @@
 #include "xrServerEntities/smart_cast.h"
 
 ENGINE_API IGame_Level* g_pGameLevel = NULL;
-extern BOOL g_bLoaded;
+extern bool g_bLoaded;
 
 IGame_Level::IGame_Level()
 {
@@ -197,13 +197,13 @@ void IGame_Level::OnFrame()
 void IGame_Level::DumpStatistics(IGameFont& font, IPerformanceAlert* alert) { Objects.DumpStatistics(font, alert); }
 // ==================================================================================================
 
-void CServerInfo::AddItem(LPCSTR name_, LPCSTR value_, u32 color_)
+void CServerInfo::AddItem(pcstr name_, pcstr value_, u32 color_)
 {
     shared_str s_name(name_);
     AddItem(s_name, value_, color_);
 }
 
-void CServerInfo::AddItem(shared_str& name_, LPCSTR value_, u32 color_)
+void CServerInfo::AddItem(shared_str& name_, pcstr value_, u32 color_)
 {
     SItem_ServerInfo it;
     // shared_str s_name = CStringTable().translate( name_ );

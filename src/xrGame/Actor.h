@@ -81,7 +81,7 @@ public:
     virtual ~CActor();
 
 public:
-    virtual BOOL AlwaysTheCrow() { return TRUE; }
+    virtual bool AlwaysTheCrow() { return true; }
     virtual CAttachmentOwner* cast_attachment_owner() { return this; }
     virtual CInventoryOwner* cast_inventory_owner() { return this; }
     virtual CActor* cast_actor() { return this; }
@@ -101,7 +101,7 @@ public:
 
     // Render
     void renderable_Render(IRenderable* root) override;
-    virtual BOOL renderable_ShadowGenerate();
+    virtual bool renderable_ShadowGenerate();
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
         const Fvector& position, float power) override;
     virtual Feel::Sound* dcast_FeelSound() { return this; }
@@ -505,18 +505,18 @@ protected:
     void ConvState(u32 mstate_rl, string128* buf);
 
 public:
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P); // export to server
     virtual void net_Import(NET_Packet& P); // import from server
     virtual void net_Destroy();
-    virtual BOOL net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
+    virtual bool net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
     virtual void net_Relcase(IGameObject* O); //
     virtual void xr_stdcall on_requested_spawn(IGameObject* object);
     // object serialization
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     virtual void net_Save(NET_Packet& P);
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
 
 protected:
     xr_deque<net_update> NET;
@@ -720,7 +720,7 @@ public:
     IC float HitProbability() { return m_hit_probability; }
     virtual CVisualMemoryManager* visual_memory() const;
 
-    virtual BOOL BonePassBullet(int boneID);
+    virtual bool BonePassBullet(int boneID);
     virtual void On_B_NotCurrentEntity();
 
 private:

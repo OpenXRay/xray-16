@@ -10,7 +10,7 @@ static void DestroySounds(SoundVec& lst)
 }
 
 static void DestroyPSs(PSVec& lst) {}
-static void CreateSounds(SoundVec& lst, LPCSTR buf)
+static void CreateSounds(SoundVec& lst, pcstr buf)
 {
     string128 tmp;
     int cnt = _GetItemCount(buf);
@@ -20,7 +20,7 @@ static void CreateSounds(SoundVec& lst, LPCSTR buf)
         lst[k].create(_GetItem(buf, k, tmp), st_Effect, sg_SourceType);
 }
 
-static void CreateMarks(IWallMarkArray* pMarks, LPCSTR buf)
+static void CreateMarks(IWallMarkArray* pMarks, pcstr buf)
 {
     string256 tmp;
     int cnt = _GetItemCount(buf);
@@ -29,7 +29,7 @@ static void CreateMarks(IWallMarkArray* pMarks, LPCSTR buf)
         pMarks->AppendMark(_GetItem(buf, k, tmp));
 }
 
-static void CreatePSs(PSVec& lst, LPCSTR buf)
+static void CreatePSs(PSVec& lst, pcstr buf)
 {
     string256 tmp;
     int cnt = _GetItemCount(buf);

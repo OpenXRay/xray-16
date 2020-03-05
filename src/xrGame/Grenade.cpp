@@ -49,7 +49,7 @@ void CGrenade::Hit(SHit* pHDS)
     inherited::Hit(pHDS);
 }
 
-BOOL CGrenade::net_Spawn(CSE_Abstract* DC)
+bool CGrenade::net_Spawn(CSE_Abstract* DC)
 {
     m_dwGrenadeIndependencyTime = 0;
     BOOL ret = inherited::net_Spawn(DC);
@@ -332,7 +332,7 @@ ALife::_TIME_ID CGrenade::TimePassedAfterIndependant() const
         return 0;
 }
 
-BOOL CGrenade::UsedAI_Locations()
+bool CGrenade::UsedAI_Locations()
 {
 #pragma todo( \
     \

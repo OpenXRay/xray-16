@@ -891,7 +891,7 @@ bool CWeaponKnife::SelectBestHitVictim(
     return !m_spartial_query_res.empty();
 }
 
-BOOL CWeaponKnife::RayQueryCallback(collide::rq_result& result, LPVOID this_ptr)
+bool CWeaponKnife::RayQueryCallback(collide::rq_result& result, LPVOID this_ptr)
 {
     CWeaponKnife* me = static_cast<CWeaponKnife*>(this_ptr);
     if (result.O && (result.O->ID() != me->m_except_id))

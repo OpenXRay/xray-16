@@ -2,7 +2,7 @@
 #include "Text_Console.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
-LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
@@ -36,7 +36,7 @@ LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {

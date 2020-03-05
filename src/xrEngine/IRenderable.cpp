@@ -7,7 +7,7 @@ RenderableBase::RenderableBase()
     renderable.xform.identity();
     renderable.visual = NULL;
     renderable.pROS = NULL;
-    renderable.pROS_Allowed = TRUE;
+    renderable.pROS_Allowed = true;
     renderable.invisible = false;
     renderable.hud = false;
     ISpatial* self = dynamic_cast<ISpatial*>(this);
@@ -15,7 +15,7 @@ RenderableBase::RenderableBase()
         self->GetSpatialData().type |= STYPE_RENDERABLE;
 }
 
-extern ENGINE_API BOOL g_bRendering;
+extern ENGINE_API bool g_bRendering;
 RenderableBase::~RenderableBase()
 {
     VERIFY(!g_bRendering);

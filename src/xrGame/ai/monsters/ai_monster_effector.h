@@ -19,7 +19,7 @@ class CMonsterEffector : public CEffectorPP
 public:
     CMonsterEffector(const SPPInfo& ppi, float life_time, float attack_time = 0.0f, float release_time = 0.0f,
         float spec_factor = 1.f);
-    virtual BOOL Process(SPPInfo& pp);
+    virtual bool Process(SPPInfo& pp);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -36,5 +36,5 @@ class CMonsterEffectorHit : public CEffectorCam
 
 public:
     CMonsterEffectorHit(float time, float amp, float periods, float power);
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
 };

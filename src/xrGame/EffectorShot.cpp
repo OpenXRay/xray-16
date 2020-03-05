@@ -188,7 +188,7 @@ CCameraShotEffector::CCameraShotEffector(const CameraRecoil& cam_recoil) : CEffe
 }
 
 CCameraShotEffector::~CCameraShotEffector() {}
-BOOL CCameraShotEffector::ProcessCam(SCamEffectorInfo& info)
+bool CCameraShotEffector::ProcessCam(SCamEffectorInfo& info)
 {
     Update();
     return TRUE;

@@ -21,25 +21,25 @@ Flags32 g_stats_flags = {0};
 class optimizer
 {
     float average_;
-    BOOL enabled_;
+    bool enabled_;
 
 public:
     optimizer()
     {
         average_ = 30.f;
-        //  enabled_ = TRUE;
+        //  enabled_ = true;
         //  disable ();
         // because Engine is not exist
-        enabled_ = FALSE;
+        enabled_ = false;
     }
 
-    BOOL enabled() { return enabled_; }
+    bool enabled() { return enabled_; }
     void enable()
     {
         if (!enabled_)
         {
             Engine.External.tune_resume();
-            enabled_ = TRUE;
+            enabled_ = true;
         }
     }
     void disable()
@@ -47,7 +47,7 @@ public:
         if (enabled_)
         {
             Engine.External.tune_pause();
-            enabled_ = FALSE;
+            enabled_ = false;
         }
     }
     void update(float value)
@@ -69,7 +69,7 @@ static optimizer vtune;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-ENGINE_API BOOL g_bDisableRedText = FALSE;
+ENGINE_API bool g_bDisableRedText = false;
 CStats::CStats()
 {
     statsFont = nullptr;

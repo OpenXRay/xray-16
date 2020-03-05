@@ -25,7 +25,7 @@ public:
     void prefetch();
     void clear();
 
-    IGameObject* create(LPCSTR name);
+    IGameObject* create(pcstr name);
     void destroy(IGameObject* O);
 
     IGame_ObjectPool();

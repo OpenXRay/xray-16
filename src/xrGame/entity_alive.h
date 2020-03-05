@@ -49,9 +49,9 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
 
     virtual void shedule_Update(u32 dt);
     virtual void create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool local_animation);

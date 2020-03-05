@@ -320,7 +320,7 @@ void CBaseMonster::reinit()
     anim().clear_override_animation();
 }
 
-BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
+bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

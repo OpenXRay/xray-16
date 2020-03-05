@@ -289,7 +289,7 @@ public:
     virtual void Load(LPCSTR section);
     virtual void reload(LPCSTR section);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P){};
     virtual void net_Import(NET_Packet& P){};
@@ -300,13 +300,13 @@ public:
     virtual void SpawnInitPhysics(CSE_Abstract* D);
     virtual CPhysicsShellHolder* PPhysicsShellHolder() { return PhysicsShellHolder(); }
     virtual void net_Save(NET_Packet& P);
-    virtual BOOL net_SaveRelevant()
+    virtual bool net_SaveRelevant()
     {
         return (inherited::net_SaveRelevant() && BOOL(PPhysicsShell() != NULL)) || m_exploded;
     };
 
-    virtual BOOL renderable_ShadowGenerate() { return FALSE; }
-    virtual BOOL renderable_ShadowReceive() { return TRUE; }
+    virtual bool renderable_ShadowGenerate() { return FALSE; }
+    virtual bool renderable_ShadowReceive() { return TRUE; }
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void UpdateCL();
     virtual void shedule_Update(u32 time_delta);

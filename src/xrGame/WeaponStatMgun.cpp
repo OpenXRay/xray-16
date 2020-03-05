@@ -78,7 +78,7 @@ void CWeaponStatMgun::Load(LPCSTR section)
     VERIFY(!fis_zero(camRelaxSpeed));
 }
 
-BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
+bool CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 {
     if (!inheritedPH::net_Spawn(DC))
         return FALSE;

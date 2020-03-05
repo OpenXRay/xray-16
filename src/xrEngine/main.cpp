@@ -362,7 +362,7 @@ ENGINE_API int RunApplication()
     if (!GEnv.isDedicatedServer)
     {
 #if defined(XR_PLATFORM_WINDOWS)
-        CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
+        CreateMutex(nullptr, true, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
             return 2;
 #elif defined(XR_PLATFORM_LINUX)
@@ -409,7 +409,7 @@ ENGINE_API int RunApplication()
         PROCESS_INFORMATION pi = {};
         // We use CreateProcess to setup working folder
         pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
-        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
+        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, false, 0, nullptr, tempDir, &si, &pi);
 #endif
     }
     return 0;
@@ -454,7 +454,7 @@ void RunBenchmark(pcstr name)
     const size_t hyphenLtxLen = xr_strlen("-ltx ");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
-        LPCSTR benchmarkName, t;
+        pcstr benchmarkName, t;
         ini.r_line("benchmark", i, &benchmarkName, &t);
         xr_strcpy(g_sBenchmarkName, benchmarkName);
         shared_str benchmarkCommand = ini.r_string_wb("benchmark", benchmarkName);

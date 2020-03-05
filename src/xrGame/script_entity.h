@@ -68,7 +68,7 @@ public:
     virtual ~CScriptEntity();
     void init();
     virtual void reinit();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();

@@ -31,11 +31,11 @@ public:
     virtual void Load(LPCSTR section);
     virtual bool feel_touch_on_contact(IGameObject*) { return FALSE; }
     virtual bool use(CGameObject* who_use) { return false; }
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
     virtual bool IsVisibleForZones() { return false; }
-    virtual BOOL UsedAI_Locations() { return true; }
+    virtual bool UsedAI_Locations() { return true; }
     virtual bool can_validate_position_on_spawn() { return false; }
     virtual bool use_parent_ai_locations() const { return false; }
     virtual bool is_ai_obstacle() const { return false; }

@@ -120,7 +120,7 @@ void CZoneCampfire::StopIdleParticles(bool bIdleLight)
         inherited::StopIdleParticles(bIdleLight);
 }
 
-BOOL CZoneCampfire::AlwaysTheCrow()
+bool CZoneCampfire::AlwaysTheCrow()
 {
     if (m_turn_time)
         return TRUE;

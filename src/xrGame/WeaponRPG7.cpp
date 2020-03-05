@@ -48,7 +48,7 @@ void CWeaponRPG7::UpdateMissileVisibility()
     pWeaponVisual->LL_SetBoneVisible(pWeaponVisual->LL_BoneID("grenade"), vis_weap, TRUE);
 }
 
-BOOL CWeaponRPG7::net_Spawn(CSE_Abstract* DC)
+bool CWeaponRPG7::net_Spawn(CSE_Abstract* DC)
 {
     BOOL l_res = inherited::net_Spawn(DC);
 

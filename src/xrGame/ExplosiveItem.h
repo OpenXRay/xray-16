@@ -19,7 +19,7 @@ public:
     virtual ~CExplosiveItem(void);
 
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC) { return CInventoryItemObject::net_Spawn(DC); }
+    virtual bool net_Spawn(CSE_Abstract* DC) { return CInventoryItemObject::net_Spawn(DC); }
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P) { CInventoryItemObject::net_Export(P); }
     virtual void net_Import(NET_Packet& P) { CInventoryItemObject::net_Import(P); }

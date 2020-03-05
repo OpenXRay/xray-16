@@ -9,7 +9,7 @@
 
 CGrenadeLauncher::CGrenadeLauncher() { m_fGrenadeVel = 0.f; }
 CGrenadeLauncher::~CGrenadeLauncher() {}
-BOOL CGrenadeLauncher::net_Spawn(CSE_Abstract* DC) { return (inherited::net_Spawn(DC)); }
+bool CGrenadeLauncher::net_Spawn(CSE_Abstract* DC) { return (inherited::net_Spawn(DC)); }
 void CGrenadeLauncher::Load(LPCSTR section)
 {
     m_fGrenadeVel = pSettings->r_float(section, "grenade_vel");

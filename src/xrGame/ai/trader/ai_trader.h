@@ -43,14 +43,14 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual IFactoryObject* _construct();
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     virtual void net_Destroy();
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
+    virtual bool net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     virtual void Die(IGameObject* who);
     virtual void Think();
     virtual void HitSignal(float /**P**/, Fvector& /**local_dir**/, IGameObject* /**who**/, s16 /**element**/){};
@@ -67,7 +67,7 @@ public:
     virtual void DropItemSendMessage(IGameObject* O);
     virtual void shedule_Update(u32 dt);
 
-    virtual BOOL UsedAI_Locations();
+    virtual bool UsedAI_Locations();
 
     ///////////////////////////////////////////////////////////////////////
     virtual u16 PHGetSyncItemsNumber() { return inherited::PHGetSyncItemsNumber(); }

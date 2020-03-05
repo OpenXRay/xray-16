@@ -1431,7 +1431,7 @@ void CActor::renderable_Render(IRenderable* root)
     //VERIFY(_valid(XFORM()));
 }
 
-BOOL CActor::renderable_ShadowGenerate()
+bool CActor::renderable_ShadowGenerate()
 {
     if (m_holder)
         return FALSE;

@@ -12,7 +12,7 @@
 
 CInfoDocument::CInfoDocument(void) { m_Info = NULL; }
 CInfoDocument::~CInfoDocument(void) {}
-BOOL CInfoDocument::net_Spawn(CSE_Abstract* DC)
+bool CInfoDocument::net_Spawn(CSE_Abstract* DC)
 {
     BOOL res = inherited::net_Spawn(DC);
 

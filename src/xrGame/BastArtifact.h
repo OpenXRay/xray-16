@@ -26,7 +26,7 @@ public:
     virtual void Load(LPCSTR section);
     virtual void shedule_Update(u32 dt);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void Hit(SHit* pHDS);

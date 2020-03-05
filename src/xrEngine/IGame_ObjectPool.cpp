@@ -12,7 +12,7 @@ void IGame_ObjectPool::prefetch()
     R_ASSERT(m_PrefetchObjects.empty());
 
     int p_count = 0;
-    GEnv.Render->model_Logging(FALSE);
+    GEnv.Render->model_Logging(false);
 
     string256 section;
     // prefetch objects
@@ -29,7 +29,7 @@ void IGame_ObjectPool::prefetch()
     }
 
     // out statistic
-    GEnv.Render->model_Logging(TRUE);
+    GEnv.Render->model_Logging(true);
 }
 
 void IGame_ObjectPool::clear()
@@ -40,7 +40,7 @@ void IGame_ObjectPool::clear()
     m_PrefetchObjects.clear();
 }
 
-IGameObject* IGame_ObjectPool::create(LPCSTR name)
+IGameObject* IGame_ObjectPool::create(pcstr name)
 {
     CLASS_ID CLS = pSettings->r_clsid(name, "class");
     IGameObject* O = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
@@ -59,7 +59,7 @@ R_ASSERT (map_POOL.empty());
 u32 mem_0 = Memory.mem_usage();
 float p_time = 1000.f*Device.GetTimerGlobal()->GetElapsed_sec();
 int p_count = 0;
-GlobalEnv.Render->model_Logging (FALSE);
+GlobalEnv.Render->model_Logging (false);
 
 string256 section;
 // prefetch objects
@@ -81,7 +81,7 @@ map_POOL.insert (std::make_pair(pObject->cNameSect(),pObject));
 }
 
 // out statistic
-GlobalEnv.Render->model_Logging (TRUE);
+GlobalEnv.Render->model_Logging (true);
 p_time = 1000.f*Device.GetTimerGlobal()->GetElapsed_sec() - p_time;
 u32 p_mem = Memory.mem_usage() - mem_0;
 if (p_count){
@@ -101,7 +101,7 @@ xr_delete (it->second);
 map_POOL.clear();
 }
 
-IGameObject* IGame_ObjectPool::create ( LPCSTR name )
+IGameObject* IGame_ObjectPool::create ( pcstr name )
 {
 string256 l_name;
 POOL_IT it = map_POOL.find (shared_str(xr_strlwr(xr_strcpy(l_name,name))));

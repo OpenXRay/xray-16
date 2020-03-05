@@ -50,7 +50,7 @@ void CPsyDog::Load(LPCSTR section)
     pSettings->read_if_exists(m_time_phantom_respawn, section, "Time_Phantom_Respawn", "Time_Phantom_Appear", true);
 }
 
-BOOL CPsyDog::net_Spawn(CSE_Abstract* dc)
+bool CPsyDog::net_Spawn(CSE_Abstract* dc)
 {
     if (!inherited::net_Spawn(dc))
         return FALSE;
@@ -175,7 +175,7 @@ u8 CPsyDog::get_phantoms_count() { return u8(m_storage.size()); }
 //////////////////////////////////////////////////////////////////////////
 CPsyDogPhantom::CPsyDogPhantom() {}
 CPsyDogPhantom::~CPsyDogPhantom() {}
-BOOL CPsyDogPhantom::net_Spawn(CSE_Abstract* dc)
+bool CPsyDogPhantom::net_Spawn(CSE_Abstract* dc)
 {
     if (!inherited::net_Spawn(dc))
         return FALSE;

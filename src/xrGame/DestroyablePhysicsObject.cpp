@@ -38,7 +38,7 @@ void CDestroyablePhysicsObject::net_Destroy()
     CPHCollisionDamageReceiver::Clear();
 }
 
-BOOL CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
+bool CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
 {
     BOOL res = inherited::net_Spawn(DC);
     IKinematics* K = smart_cast<IKinematics*>(Visual());

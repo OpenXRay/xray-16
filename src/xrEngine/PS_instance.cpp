@@ -11,13 +11,13 @@ CPS_Instance::CPS_Instance(bool destroy_on_game_load)
     : SpatialBase(g_SpatialSpace), m_destroy_on_game_load(destroy_on_game_load)
 {
     g_pGamePersistent->ps_active.insert(this);
-    renderable.pROS_Allowed = FALSE;
+    renderable.pROS_Allowed = false;
 
     m_iLifeTime = int_max;
-    m_bAutoRemove = TRUE;
-    m_bDead = FALSE;
+    m_bAutoRemove = true;
+    m_bDead = false;
 }
-extern ENGINE_API BOOL g_bRendering;
+extern ENGINE_API bool g_bRendering;
 
 //----------------------------------------------------
 CPS_Instance::~CPS_Instance()
@@ -53,7 +53,7 @@ void CPS_Instance::shedule_Update(u32 dt)
 //----------------------------------------------------
 void CPS_Instance::PSI_destroy()
 {
-    m_bDead = TRUE;
+    m_bDead = true;
     m_iLifeTime = 0;
     g_pGamePersistent->ps_destroy.push_back(this);
 }

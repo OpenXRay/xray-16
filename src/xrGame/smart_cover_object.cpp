@@ -28,7 +28,7 @@ void object::Load(LPCSTR section)
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
 }
 
-BOOL object::net_Spawn(CSE_Abstract* server_entity)
+bool object::net_Spawn(CSE_Abstract* server_entity)
 {
     CSE_SmartCover* smart_cover = smart_cast<CSE_SmartCover*>(server_entity);
     VERIFY(smart_cover);

@@ -50,7 +50,7 @@ void CProjector::BoneCallbackY(CBoneInstance* B)
     B->mTransform.mulB_43(M);
 }
 
-BOOL CProjector::net_Spawn(CSE_Abstract* DC)
+bool CProjector::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectProjector* slight = smart_cast<CSE_ALifeObjectProjector*>(e);
@@ -166,7 +166,7 @@ void CProjector::UpdateCL()
     angle_lerp(_current.pitch, _target.pitch, bone_y.velocity, Device.fTimeDelta);
 }
 
-BOOL CProjector::UsedAI_Locations() { return (FALSE); }
+bool CProjector::UsedAI_Locations() { return (FALSE); }
 bool CProjector::bfAssignWatch(CScriptEntityAction* tpEntityAction)
 {
     if (!inherited::bfAssignWatch(tpEntityAction))
