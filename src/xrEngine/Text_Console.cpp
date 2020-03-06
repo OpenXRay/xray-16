@@ -50,7 +50,7 @@ void CTextConsole::CreateConsoleWnd()
     // Set the window's initial width
     RECT rc;
     SetRect(&rc, lX, lY, lWidth, lHeight);
-    // AdjustWindowRect( &rc, dwWindowStyle, false );
+    // AdjustWindowRect( &rc, dwWindowStyle, FALSE );
 
     // Create the render window
     m_hConsoleWnd = CreateWindow(
@@ -340,7 +340,7 @@ void CTextConsole::OnFrame()
      {
      return;
      }
-     */ InvalidateRect(m_hConsoleWnd, NULL, false);
+     */ InvalidateRect(m_hConsoleWnd, NULL, FALSE);
     SetCursor(LoadCursor(NULL, IDC_ARROW));
     // m_bNeedUpdate = true;
 }
