@@ -67,7 +67,6 @@ void CHUDManager::Render_First()
     O->renderable_Invisible(GEnv.CurrentRenderer == 1);
 
     O->renderable_Render(O->H_Root());
-    GEnv.Render->set_Object(nullptr);
 
     O->renderable_Invisible(false);
 }
@@ -106,7 +105,6 @@ void CHUDManager::Render_Last()
     O->renderable_HUD(true);
     O->OnHUDDraw(this, O->H_Root());
     O->renderable_HUD(false);
-    GEnv.Render->set_Object(nullptr);
 }
 
 #include "player_hud.h"
