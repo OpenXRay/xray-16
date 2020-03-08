@@ -409,7 +409,7 @@ ENGINE_API int RunApplication()
         PROCESS_INFORMATION pi = {};
         // We use CreateProcess to setup working folder
         pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
-        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, false, 0, nullptr, tempDir, &si, &pi);
+        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
 #endif
     }
     return 0;

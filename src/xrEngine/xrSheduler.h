@@ -20,8 +20,8 @@ private:
     };
     struct ItemReg
     {
-        bool OP;
-        bool RT;
+        BOOL OP;
+        BOOL RT;
         ISheduled* Object;
     };
 

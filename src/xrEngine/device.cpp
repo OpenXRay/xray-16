@@ -606,7 +606,7 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     u16 fActive = LOWORD(wParam);
     const bool fMinimized = (bool)HIWORD(wParam);
 
-    const bool isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? true : false;
+    const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
 
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
         pInput->GrabInput(true);

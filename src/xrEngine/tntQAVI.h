@@ -55,10 +55,10 @@ typedef struct
     u32 dwSampleSize;
     struct
     {
-        unsigned short left;
-        unsigned short top;
-        unsigned short right;
-        unsigned short bottom;
+        u16 left;
+        u16 top;
+        u16 right;
+        u16 bottom;
     };
     // RECT rcFrame; - лажа в MSDN
 } AVIStreamHeaderCustom;
@@ -98,9 +98,9 @@ public:
     void GetSize(u32* dwWidth, u32* dwHeight);
 
     bool Load(char* fname);
-    bool GetFrame(unsigned char** pDest);
+    bool GetFrame(u8** pDest);
 
     bool NeedUpdate() { return CalcFrame() != m_dwFrameCurrent; }
-    signed int SetSpeed(signed int nPercent);
+    int SetSpeed(int nPercent);
 };
 #endif

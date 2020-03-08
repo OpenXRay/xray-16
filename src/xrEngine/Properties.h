@@ -48,8 +48,8 @@ struct xrP_Float
 
 struct xrP_BOOL
 {
-    bool value;
-    xrP_BOOL() : value(false) {}
+    BOOL value;
+    xrP_BOOL() : value(FALSE) {}
 };
 
 struct xrP_TOKEN

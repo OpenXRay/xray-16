@@ -665,7 +665,7 @@ void CAI_Stalker::net_Save(NET_Packet& P)
     m_pPhysics_support->in_NetSave(P);
 }
 
-bool CAI_Stalker::net_SaveRelevant() { return (inherited::net_SaveRelevant() || bool(PPhysicsShell() != NULL)); }
+bool CAI_Stalker::net_SaveRelevant() { return (inherited::net_SaveRelevant() || (PPhysicsShell() != NULL)); }
 void CAI_Stalker::net_Export(NET_Packet& P)
 {
     R_ASSERT(Local());

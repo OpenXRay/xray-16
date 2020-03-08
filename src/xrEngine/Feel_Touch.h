@@ -18,7 +18,7 @@ public:
     struct DenyTouch
     {
         IGameObject* O;
-        /*u32*/ unsigned long Expire;
+        /*DWORD*/ unsigned long Expire;
     };
 
 protected:

@@ -25,7 +25,7 @@ CTextConsole::CTextConsole()
 
 CTextConsole::~CTextConsole() { m_pMainWnd = NULL; }
 //-------------------------------------------------------------------------------------------
-LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void CTextConsole::CreateConsoleWnd()
 {
     HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
@@ -59,17 +59,17 @@ void CTextConsole::CreateConsoleWnd()
     R_ASSERT2(m_hConsoleWnd, "Unable to Create TextConsole Window!");
 };
 //-------------------------------------------------------------------------------------------
-LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void CTextConsole::CreateLogWnd()
 {
     HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
     //----------------------------------
     RECT cRc;
     GetClientRect(m_hConsoleWnd, &cRc);
-    signed int lX = cRc.left;
-    signed int lY = cRc.top;
-    signed int lWidth = cRc.right - cRc.left;
-    signed int lHeight = cRc.bottom - cRc.top;
+    int lX = cRc.left;
+    int lY = cRc.top;
+    int lWidth = cRc.right - cRc.left;
+    int lHeight = cRc.bottom - cRc.top;
     //----------------------------------
     const char* wndclass = "TEXT_CONSOLE_LOG_WND";
 
@@ -85,7 +85,7 @@ void CTextConsole::CreateLogWnd()
     // Set the window's initial width
     RECT rc;
     SetRect(&rc, lX, lY, lWidth, lHeight);
-    // AdjustWindowRect( &rc, dwWindowStyle, false );
+    // AdjustWindowRect( &rc, dwWindowStyle, FALSE );
 
     // Create the render window
     m_hLogWnd = CreateWindow(
@@ -298,7 +298,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         u8 b = (is_mark(cm)) ? 2 : 0;
         pcstr pOut = ls + b;
 
-        bool res = TextOut(hDC, 10, ypos, pOut, xr_strlen(pOut));
+        bool res = !!TextOut(hDC, 10, ypos, pOut, xr_strlen(pOut));
         if (!res)
         {
             R_ASSERT2(0, "TextOut(..) return NULL");

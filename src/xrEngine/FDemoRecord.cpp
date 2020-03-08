@@ -154,7 +154,7 @@ void CDemoRecord::MakeScreenshotFace()
     m_Stage++;
 }
 
-void GetLM_BBox(Fbox& bb, signed int Step)
+void GetLM_BBox(Fbox& bb, int Step)
 {
     float half_x = bb.vMin.x + (bb.vMax.x - bb.vMin.x) / 2;
     float half_z = bb.vMin.z + (bb.vMax.z - bb.vMin.z) / 2;

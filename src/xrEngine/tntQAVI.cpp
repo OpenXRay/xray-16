@@ -300,7 +300,7 @@ bool CAviPlayerCustom::DecompressFrame(u32 dwFrameNum)
     if (alpha)
     {
         // update
-        unsigned char* alpha_buf;
+        u8* alpha_buf;
         alpha->GetFrame(&alpha_buf);
         u32* dst = (u32*)m_pDecompressedBuf;
         u32* src = (u32*)alpha_buf;
@@ -457,9 +457,9 @@ void CAviPlayerCustom::GetSize(u32* dwWidth, u32* dwHeight)
         *dwHeight = m_dwHeight;
 }
 
-signed int CAviPlayerCustom::SetSpeed(signed int nPercent)
+int CAviPlayerCustom::SetSpeed(int nPercent)
 {
-    signed int res = signed int(m_fCurrentRate / m_fRate * 100);
+    int res = int(m_fCurrentRate / m_fRate * 100);
 
     m_fCurrentRate = m_fRate * FLOAT(nPercent / 100.0f);
 

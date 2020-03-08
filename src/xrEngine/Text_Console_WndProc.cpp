@@ -36,7 +36,7 @@ LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {

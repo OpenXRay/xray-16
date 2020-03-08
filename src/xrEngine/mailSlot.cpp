@@ -26,7 +26,7 @@ void msRead(void)
 {
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
     DWORD cbMessage, cMessage, cbRead;
-    bool fResult;
+    BOOL fResult;
     pstr lpszBuffer;
 
     cbMessage = cMessage = cbRead = 0;
@@ -68,7 +68,7 @@ void msWrite(char* name, char* dest, char* msg)
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
     HANDLE hFile;
     DWORD cbWritten;
-    bool fResult;
+    BOOL fResult;
     char cName[256];
 
     xr_sprintf(cName, sizeof(cName), "\\\\%s\\mailslot\\%s", name, dest);
