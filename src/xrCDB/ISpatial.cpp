@@ -10,6 +10,7 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrCore/Threading/Lock.hpp"
+#include "xrCore/Threading/ScopeLock.hpp"
 
 ISpatial_DB* g_SpatialSpace = NULL;
 ISpatial_DB* g_SpatialSpacePhysic = NULL;
@@ -153,9 +154,7 @@ void ISpatial_NODE::_remove(ISpatial* S)
 
 ISpatial_DB::ISpatial_DB(const char* name) :
 #ifdef CONFIG_PROFILE_LOCKS
-    pcs(new Lock(MUTEX_PROFILE_ID(ISpatial_DB))),
-#else
-    pcs(new Lock),
+    cs(MUTEX_PROFILE_ID(ISpatial_DB)),
 #endif // CONFIG_PROFILE_LOCKS
     rt_insert_object(nullptr), m_root(nullptr),
     m_bounds(0), q_result(nullptr)
@@ -175,8 +174,6 @@ ISpatial_DB::~ISpatial_DB()
         allocator.destroy(allocator_pool.back());
         allocator_pool.pop_back();
     }
-
-    delete pcs;
 }
 
 void ISpatial_DB::initialize(Fbox& BB)
@@ -268,7 +265,7 @@ void ISpatial_DB::_insert(ISpatial_NODE* N, Fvector& n_C, float n_R)
 
 void ISpatial_DB::insert(ISpatial* S)
 {
-    pcs->Enter();
+    ScopeLock scope(&cs);
 #ifdef DEBUG
     Stats.Insert.Begin();
 
@@ -317,7 +314,6 @@ void ISpatial_DB::insert(ISpatial* S)
 #ifdef DEBUG
     Stats.Insert.End();
 #endif
-    pcs->Leave();
 }
 
 void ISpatial_DB::_remove(ISpatial_NODE* N, ISpatial_NODE* N_sub)
@@ -354,7 +350,7 @@ void ISpatial_DB::_remove(ISpatial_NODE* N, ISpatial_NODE* N_sub)
 
 void ISpatial_DB::remove(ISpatial* S)
 {
-    pcs->Enter();
+    ScopeLock scope(&cs);
 #ifdef DEBUG
     Stats.Remove.Begin();
 #endif
@@ -368,7 +364,6 @@ void ISpatial_DB::remove(ISpatial* S)
 #ifdef DEBUG
     Stats.Remove.End();
 #endif
-    pcs->Leave();
 }
 
 void ISpatial_DB::update(u32 /*nodes = 8 */)
@@ -376,8 +371,7 @@ void ISpatial_DB::update(u32 /*nodes = 8 */)
 #ifdef DEBUG
     if (0 == m_root)
         return;
-    pcs->Enter();
+    ScopeLock scope(&cs);
     VERIFY(verify());
-    pcs->Leave();
 #endif
 }
