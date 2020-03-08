@@ -5,6 +5,15 @@
 #include "Common/LevelStructure.hpp"
 #include "xrEngine/xr_collide_form.h"
 
+
+//----------------------------------------------------------------------
+// Class	: CObjectSpaceData
+// Purpose	: stores thread sensitive data
+//----------------------------------------------------------------------
+thread_local xrXRC CObjectSpaceData::xrc("object space");
+thread_local collide::rq_results CObjectSpaceData::r_temp;
+thread_local xr_vector<ISpatial*> CObjectSpaceData::r_spatial;
+
 using namespace collide;
 
 //----------------------------------------------------------------------
@@ -12,14 +21,8 @@ using namespace collide;
 // Purpose	: stores space slots
 //----------------------------------------------------------------------
 CObjectSpace::CObjectSpace()
-    : xrc("object space")
-#ifdef CONFIG_PROFILE_LOCKS
-      , lock(new Lock(MUTEX_PROFILE_ID(CObjectSpace::Lock)))
-#else
-      , lock(new Lock)
-#endif // CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-      , m_pRender(0)
+      : m_pRender(nullptr)
 #endif
 {
 #ifdef DEBUG
@@ -41,7 +44,6 @@ CObjectSpace::~CObjectSpace()
     // sh_debug.destroy			();
     xr_delete(m_pRender);
 #endif
-    delete lock;
 }
 //----------------------------------------------------------------------
 

@@ -16,17 +16,28 @@ class Lock;
 //-----------------------------------------------------------------------------------------------------------
 // Space Area
 //-----------------------------------------------------------------------------------------------------------
-struct hdrCFORM;
-class XRCDB_API CObjectSpace : Noncopyable
+#ifdef _MANAGED
+class CObjectSpaceData
 {
-private:
+    // You should not try to create CObjectSpace in the managed environment.
+    CObjectSpaceData() = delete;
+};
+#else
+struct CObjectSpaceData
+{
+    thread_local static xrXRC xrc;
+    thread_local static collide::rq_results r_temp;
+    thread_local static xr_vector<ISpatial*> r_spatial;
+};
+#endif
+
+struct hdrCFORM;
+class XRCDB_API CObjectSpace : protected CObjectSpaceData, public Noncopyable
+{
     // Debug
-    Lock* lock;
     CDB::MODEL Static;
     Fbox m_BoundingVolume;
-    xrXRC xrc; // MT: dangerous
-    collide::rq_results r_temp; // MT: dangerous
-    xr_vector<ISpatial*> r_spatial; // MT: dangerous
+
 public:
 #ifdef DEBUG
     FactoryPtr<IObjectSpaceRender>* m_pRender;
