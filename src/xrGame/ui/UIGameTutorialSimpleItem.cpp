@@ -267,6 +267,11 @@ void CUISequenceSimpleItem::Start()
             pda.SetActiveSubdialog("eptTasks");
             bShowPda = true;
         }
+        else if (!xr_stricmp(m_pda_section, "pda_fraction_war"))
+        {
+            pda.SetActiveSubdialog("eptFractionWar");
+            bShowPda = true;
+        }
         else if (!xr_stricmp(m_pda_section, "pda_statistics"))
         {
             pda.SetActiveSubdialog("eptStatistics");
