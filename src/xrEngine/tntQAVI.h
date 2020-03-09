@@ -70,9 +70,9 @@ protected:
 
 protected:
     AVIINDEXENTRY* m_pMovieIndex;
-    unsigned char* m_pMovieData;
+    u8* m_pMovieData;
     HIC m_aviIC;
-    unsigned char* m_pDecompressedBuf;
+    u8* m_pDecompressedBuf;
 
     BITMAPINFOHEADER m_biOutFormat;
     BITMAPINFOHEADER m_biInFormat;

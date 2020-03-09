@@ -104,7 +104,7 @@ bool CAviPlayerCustom::Load(char* fname)
 
     AVIStreamHeaderCustom strh;
     ZeroMemory(&strh, sizeof(strh));
-    if (mmckinfoParent.cksize != (u32)mmioRead(hmmioFile, (HPSTR)&strh, mmckinfoParent.cksize))
+    if (mmckinfoParent.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)&strh, mmckinfoParent.cksize))
     {
         mmioClose(hmmioFile, 0);
         return false;
@@ -133,7 +133,7 @@ bool CAviPlayerCustom::Load(char* fname)
 
     R_ASSERT(m_dwWidth && m_dwHeight);
 
-    m_pDecompressedBuf = (unsigned char*)xr_malloc(m_dwWidth * m_dwHeight * 4 + 4);
+    m_pDecompressedBuf = (u8*)xr_malloc(m_dwWidth * m_dwHeight * 4 + 4);
 
     //++strf
     ZeroMemory(&mmckinfoParent, sizeof(mmckinfoParent));
@@ -145,7 +145,7 @@ bool CAviPlayerCustom::Load(char* fname)
     }
 
     // получаем входной формат декомпрессора в BITMAPINFOHEADER
-    if (mmckinfoParent.cksize != (u32)mmioRead(hmmioFile, (HPSTR)&m_biInFormat, mmckinfoParent.cksize))
+    if (mmckinfoParent.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)&m_biInFormat, mmckinfoParent.cksize))
     {
         mmioClose(hmmioFile, 0);
         return false;
@@ -209,14 +209,14 @@ bool CAviPlayerCustom::Load(char* fname)
     mmioSeek(hmmioFile, mmckinfoSubchunk.dwDataOffset, SEEK_SET);
 
     // Выделить память под сжатые данные всего клипа
-    m_pMovieData = (unsigned char*)xr_malloc(mmckinfoSubchunk.cksize);
+    m_pMovieData = (u8*)xr_malloc(mmckinfoSubchunk.cksize);
     if (m_pMovieData == NULL)
     {
         mmioClose(hmmioFile, 0);
         return false;
     }
 
-    if (mmckinfoSubchunk.cksize != (u32)mmioRead(hmmioFile, (HPSTR)m_pMovieData, mmckinfoSubchunk.cksize))
+    if (mmckinfoSubchunk.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)m_pMovieData, mmckinfoSubchunk.cksize))
     {
         xr_free(m_pMovieData);
         m_pMovieData = NULL;
@@ -255,7 +255,7 @@ bool CAviPlayerCustom::Load(char* fname)
         return false;
     }
 
-    if (mmckinfoSubchunk.cksize != (u32)mmioRead(hmmioFile, (HPSTR)m_pMovieIndex, mmckinfoSubchunk.cksize))
+    if (mmckinfoSubchunk.cksize != (DWORD)mmioRead(hmmioFile, (HPSTR)m_pMovieIndex, mmckinfoSubchunk.cksize))
     {
         xr_free(m_pMovieIndex);
         m_pMovieIndex = NULL;
@@ -322,7 +322,7 @@ GetFrame
 
 возвращает true если кадр изменился, иначе false
 */
-bool CAviPlayerCustom::GetFrame(unsigned char** pDest)
+bool CAviPlayerCustom::GetFrame(u8** pDest)
 {
     R_ASSERT(pDest);
 
