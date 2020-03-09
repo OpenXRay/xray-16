@@ -32,10 +32,10 @@ void CTextConsole::CreateConsoleWnd()
     //----------------------------------
     RECT cRc;
     GetClientRect(*m_pMainWnd, &cRc);
-    signed int lX = cRc.left;
-    signed int lY = cRc.top;
-    signed int lWidth = cRc.right - cRc.left;
-    signed int lHeight = cRc.bottom - cRc.top;
+    int lX = cRc.left;
+    int lY = cRc.top;
+    int lWidth = cRc.right - cRc.left;
+    int lHeight = cRc.bottom - cRc.top;
     //----------------------------------
     const char* wndclass = "TEXT_CONSOLE";
 
