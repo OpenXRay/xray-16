@@ -256,39 +256,40 @@ void CUISequenceSimpleItem::Start()
             return;
         }
 
+        CUIPdaWnd& pda = ui_game_sp->GetPdaMenu();
         if (!xr_stricmp(m_pda_section, "pda_map"))
         {
-            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptMap");
+            pda.SetActiveSubdialog("eptMap");
             bShowPda = true;
         }
         else if (!xr_stricmp(m_pda_section, "pda_tasks"))
         {
-            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
+            pda.SetActiveSubdialog("eptTasks");
             bShowPda = true;
         }
         else if (!xr_stricmp(m_pda_section, "pda_statistics"))
         {
-            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptStatistics");
+            pda.SetActiveSubdialog("eptStatistics");
             bShowPda = true;
         }
         else if (!xr_stricmp(m_pda_section, "pda_ranking"))
         {
-            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptRanking");
+            pda.SetActiveSubdialog("eptRanking");
             bShowPda = true;
         }
         else if (!xr_stricmp(m_pda_section, "pda_logs"))
         {
-            ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptLogs");
+            pda.SetActiveSubdialog("eptLogs");
             bShowPda = true;
         }
         else if (!xr_stricmp(m_pda_section, "pda_show_second_task_wnd"))
         {
-            ui_game_sp->GetPdaMenu().Show_SecondTaskWnd(true);
+            pda.Show_SecondTaskWnd(true);
             bShowPda = true;
         }
 
-        if ((!ui_game_sp->GetPdaMenu().IsShown() && bShowPda) || (ui_game_sp->GetPdaMenu().IsShown() && !bShowPda))
-            ui_game_sp->GetPdaMenu().HideDialog();
+        if ((!pda.IsShown() && bShowPda) || (pda.IsShown() && !bShowPda))
+            pda.HideDialog();
     }
 }
 
