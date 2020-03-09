@@ -49,6 +49,14 @@ bool CUIDialogWnd::IR_process()
 
 CDialogHolder* CurrentDialogHolder();
 
+void CUIDialogWnd::ShowOrHideDialog(bool bDoHideIndicators)
+{
+    if (IsShown())
+        GetHolder()->StopDialog(this);
+    else
+        CurrentDialogHolder()->StartDialog(this, bDoHideIndicators);
+}
+
 void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 {
     if (!IsShown())

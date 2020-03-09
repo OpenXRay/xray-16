@@ -289,7 +289,7 @@ void CUISequenceSimpleItem::Start()
         }
 
         if ((!pda.IsShown() && bShowPda) || (pda.IsShown() && !bShowPda))
-            pda.HideDialog();
+            pda.ShowOrHideDialog(true);
     }
 }
 
