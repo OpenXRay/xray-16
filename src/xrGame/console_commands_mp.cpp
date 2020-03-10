@@ -116,7 +116,8 @@ extern s32 lag_simmulator_max_ping;
 #endif
 
 extern BOOL g_sv_write_updates_bin;
-extern u32 g_sv_traffic_optimization_level;
+extern Flags8 g_sv_traffic_optimization_level;
+extern Flags8 g_sv_available_traffic_optimization_level;
 
 void XRNETSERVER_API DumpNetCompressorStats(bool brief);
 BOOL XRNETSERVER_API g_net_compressor_enabled;
@@ -2033,6 +2034,21 @@ public:
     virtual void Info(TInfo& I) { xr_strcpy(I, "valid arguments is [info info_full on off]"); }
 };
 
+class CCC_TrafficOptimizationLevel : public CCC_Integer
+{
+    int dummy;
+
+public:
+    CCC_TrafficOptimizationLevel(pcstr name) : CCC_Integer(name, &dummy, 0, 7) {}
+
+    void Execute(pcstr args) override
+    {
+        CCC_Integer::Execute(args);
+        g_sv_traffic_optimization_level._and(g_sv_available_traffic_optimization_level, static_cast<u8>(dummy));
+        dummy = g_sv_traffic_optimization_level.get();
+    }
+};
+
 void register_mp_console_commands()
 {
     CMD1(CCC_Restart, "g_restart");
@@ -2240,5 +2256,5 @@ void register_mp_console_commands()
     CMD1(CCC_GameSpyRegisterUniqueNick, "gs_register_unique_nick");
     CMD1(CCC_GameSpyProfile, "gs_profile");
     CMD4(CCC_Integer, "sv_write_update_bin", &g_sv_write_updates_bin, 0, 1);
-    CMD4(CCC_Integer, "sv_traffic_optimization_level", (int*)&g_sv_traffic_optimization_level, 0, 7);
+    CMD1(CCC_TrafficOptimizationLevel, "sv_traffic_optimization_level");
 }

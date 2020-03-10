@@ -11,7 +11,7 @@ class stream;
 }; // namespace ppmd
 
 using ppmd_trained_stream = ppmd::stream;
-void init_ppmd_trained_stream(ppmd_trained_stream*& dest);
+bool init_ppmd_trained_stream(ppmd_trained_stream*& dest);
 void deinit_ppmd_trained_stream(ppmd_trained_stream*& src);
 
 struct lzo_dictionary_buffer
@@ -20,7 +20,7 @@ struct lzo_dictionary_buffer
     u32 size;
 };
 
-void init_lzo(u8*& dest_wm, u8*& wm_buffer, lzo_dictionary_buffer& dest_dict);
+bool init_lzo(u8*& dest_wm, u8*& wm_buffer, lzo_dictionary_buffer& dest_dict);
 void deinit_lzo(u8*& src_wm_buffer, lzo_dictionary_buffer& src_dict);
 
 } // namespace compression
@@ -32,5 +32,3 @@ enum enum_traffic_optimization
     eto_lzo_compression = 1 << 1,
     eto_last_change = 1 << 2,
 }; // enum enum_traffic_optimization
-
-extern u32 g_sv_traffic_optimization_level;
