@@ -1,0 +1,95 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-2019
+    strategy:
+      fail-fast: false
+      matrix:
+        Configuration: [Debug, Mixed, Release]
+        Platform: [x64, x86]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+    - name: Setup NuGet.exe
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: '5.x'
+    - name: Setup
+      run: |
+        git submodule update --init --recursive
+        nuget restore src\engine.sln
+    - name: MSBuild
+      working-directory: src
+      run: msbuild /p:Configuration=${{ matrix.Configuration }} /p:Platform=${{ matrix.Platform }} engine.sln 
+    - name: Prepare artifacts
+      shell: cmd
+      run: |
+        set CONFIGURATION=${{ matrix.Configuration }}
+        set PLATFORM=${{ matrix.Platform }}
+        echo ::set-env name=Build_type::%CONFIGURATION:~0,1%%PLATFORM%
+        xr_pack_build.cmd
+    - name: Upload OpenXRay artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: OpenXRay.${{ env.Build_type }}.7z
+        path: res\OpenXRay.${{ env.Build_type }}.7z
+    - name: Upload Symbols
+      uses: actions/upload-artifact@v1
+      with:
+        name: Symbols.${{ env.Build_type }}.7z
+        path: res\Symbols.${{ env.Build_type }}.7z
+
+  build-linux:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        Platform: [x64, x86]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup
+      run: |
+        git submodule update --init --recursive
+        git submodule deinit Externals/cryptopp
+    - name: Build
+      run: |
+        export CC=gcc-8
+        export CXX=g++-8
+        ${CXX} --version
+        export core_count=$(nproc || echo 4) && echo core_count = $core_count
+        mkdir bin && cd bin
+        if [ "${{ matrix.Platform }}" = "x64" ]; then
+        sudo apt-get update &&
+        sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev libfreeimageplus-dev &&
+        sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libsdl2-dev &&
+        CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
+        fi
+        if [ "${{ matrix.Platform }}" = "x86" ]; then
+        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-8-multilib libpulse-dev:i386 libglib2.0-dev:i386 &&
+        sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386 libfreeimageplus-dev:i386 &&
+        sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386 libsdl2-dev:i386 &&
+        CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
+        fi
+        make -j $core_count package
+        file openxray_1.6.02_*.deb
+    - name: Prepare artifacts
+      run: |
+        if [ "${{ matrix.Platform }}" = "x64" ]; then
+        echo ::set-env name=Build_type::amd64
+        elif [ "${{ matrix.Platform }}" = "x86" ]; then
+        echo ::set-env name=Build_type::i386
+        fi
+    - name: Upload OpenXRay artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ env.Build_type }}.deb
+        path: bin/openxray_1.6.02_${{ env.Build_type }}.deb
