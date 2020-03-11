@@ -57,9 +57,9 @@ void CUIScrollView::InitScrollView()
     }
     m_pad->SetWndPos(Fvector2().set(0, 0));
 
-    CUIFixedScrollBar* tmp_scroll = smart_cast<CUIFixedScrollBar*>(m_VScrollBar);
-    if (tmp_scroll)
+    if (smart_cast<CUIFixedScrollBar*>(m_VScrollBar))
     {
+        CUIFixedScrollBar* tmp_scroll = smart_cast<CUIFixedScrollBar*>(m_VScrollBar);
         if (!tmp_scroll->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f), false, *m_scrollbar_profile))
         {
             Msg("! Failed to init ScrollView with FixedScrollBar, trying to init with ScrollBar");
@@ -75,17 +75,17 @@ void CUIScrollView::InitScrollView()
         AttachChild(m_VScrollBar);
         Register(m_VScrollBar);
         AddCallback(m_VScrollBar, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIScrollView::OnScrollV));
-    }
 
-    if (!!m_scrollbar_profile && !tmp_scroll)
-    {
-        m_VScrollBar->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f),
-            GetWndSize().y, false, *m_scrollbar_profile);
-    }
-    else
-    {
-        m_VScrollBar->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f),
-            GetWndSize().y, false);
+        if (!!m_scrollbar_profile)
+        {
+            m_VScrollBar->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f),
+                GetWndSize().y, false, *m_scrollbar_profile);
+        }
+        else
+        {
+            m_VScrollBar->InitScrollBar(Fvector2().set(GetWndSize().x, 0.0f),
+                GetWndSize().y, false);
+        }
     }
 
     Fvector2 sc_pos = {m_VScrollBar->GetWndPos().x - m_VScrollBar->GetWndSize().x, m_VScrollBar->GetWndPos().y};
