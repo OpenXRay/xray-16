@@ -23,10 +23,7 @@ SAKEStartupResult xrGS_sakeStartup(SAKE* sakePtr)
     SAKEStartupResult tmp_res = sakeStartup(sakePtr);
     if (tmp_res == SAKEStartupResult_SUCCESS)
     {
-        char secret_key[32];
-        memset(secret_key, 0, sizeof(secret_key));
-        FillSecretKey(secret_key);
-        sakeSetGame(*sakePtr, GAMESPY_GAMENAME, GAMESPY_GAMEID, secret_key);
+        sakeSetGame(*sakePtr, GAMESPY_GAMENAME, GAMESPY_GAMEID, GAMESPY_GAMEKEY);
     }
     return tmp_res;
 }
@@ -36,10 +33,7 @@ void CGameSpy_SAKE::Init()
     SAKEStartupResult result = sakeStartup(&m_sake_inst);
     if (result == SAKEStartupResult_SUCCESS)
     {
-        char secret_key[32];
-        memset(secret_key, 0, sizeof(secret_key));
-        FillSecretKey(secret_key);
-        sakeSetGame(m_sake_inst, GAMESPY_GAMENAME, GAMESPY_GAMEID, secret_key);
+        sakeSetGame(m_sake_inst, GAMESPY_GAMENAME, GAMESPY_GAMEID, GAMESPY_GAMEKEY);
     }
     else
         Msg("! GameSpy SAKE: failed to initialize, error code: %d", result);

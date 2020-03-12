@@ -306,6 +306,16 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort)
     }
 }
 
+LPCSTR GameTypeToStringEx(u32 gt, bool bShort)
+{
+    switch (gt)
+    {
+    case eGameIDTeamDeathmatch_SoC: gt = eGameIDTeamDeathmatch; break;
+    case eGameIDArtefactHunt_SoC: gt = eGameIDArtefactHunt; break;
+    }
+    return GameTypeToString(static_cast<EGameIDs>(gt), bShort);
+}
+
 void CGamePersistent::UpdateGameType()
 {
     inherited::UpdateGameType();
