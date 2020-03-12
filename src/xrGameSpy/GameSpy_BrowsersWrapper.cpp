@@ -18,11 +18,11 @@ GSUpdateStatus CGSUpdateStatusAccumulator::GetOptimistic() const
 {
     ScopeLock sl(&lock);
     GSUpdateStatus res = GSUpdateStatus::Unknown;
-    for (auto s : accumulator)
+    for (auto status : accumulator)
     {
-        if (s < res)
+        if (status < res)
         {
-            res = s;
+            res = status;
             if (res == GSUpdateStatus::Success)
                 break;
         }
@@ -34,11 +34,11 @@ GSUpdateStatus CGSUpdateStatusAccumulator::GetPessimistic() const
 {
     ScopeLock sl(&lock);
     GSUpdateStatus res = GSUpdateStatus::Success;
-    for (auto s : accumulator)
+    for (auto status : accumulator)
     {
-        if (s > res)
+        if (status > res)
         {
-            res = s;
+            res = status;
             if (res == GSUpdateStatus::Unknown)
                 break;
         }
