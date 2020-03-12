@@ -54,11 +54,11 @@ struct SBrowserConfig
     bool active;
 };
 
-static constexpr SBrowserConfig cop_master_bro = { {GAMESPY_GAMENAME, GAMESPY_GAMEKEY}, true};
-static constexpr SBrowserConfig cs_master_bro  = { {GAMESPY_GAMENAME_CS, GAMESPY_GAMEKEY_CS}, true};
-static constexpr SBrowserConfig soc_master_bro = { {GAMESPY_GAMENAME_SOC, GAMESPY_GAMEKEY_SOC}, true};
+static constexpr SBrowserConfig cop_master_bro = { { GAMESPY_GAMENAME, GAMESPY_GAMEKEY }, true };
+static constexpr SBrowserConfig cs_master_bro  = { { GAMESPY_GAMENAME_CS, GAMESPY_GAMEKEY_CS }, true };
+static constexpr SBrowserConfig soc_master_bro = { { GAMESPY_GAMENAME_SOC, GAMESPY_GAMEKEY_SOC }, true };
 
-static constexpr xr_array<SBrowserConfig, 3> master_lists = {cop_master_bro, cs_master_bro, soc_master_bro};
+static constexpr xr_array<SBrowserConfig, 3> master_lists = { cop_master_bro, cs_master_bro, soc_master_bro };
 
 CGameSpy_BrowsersWrapper::CGameSpy_BrowsersWrapper()
 {
