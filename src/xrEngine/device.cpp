@@ -437,7 +437,6 @@ void CRenderDevice::message_loop()
                     UpdateWindowRects();
                     break;
 
-                case SDL_WINDOWEVENT_RESIZED:
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                 {
                     if (!psDeviceFlags.is(rsFullscreen))
