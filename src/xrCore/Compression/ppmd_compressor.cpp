@@ -8,9 +8,13 @@
 
 LONG InterlockedExchange(LONG volatile *dest, LONG val)
 {
-       LONG ret;
+#if defined(XR_ARM64)
+    return __sync_lock_test_and_set(dest, val); // maybe this the best solution for all platforms?
+#else
+    LONG ret;
     __asm__ __volatile__( "lock; xchg %0,(%1)" : "=r" (ret) :"r" (dest), "0" (val) : "memory" );
     return ret;
+#endif
 }
 #endif
 

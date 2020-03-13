@@ -1619,7 +1619,11 @@ extern void noise3Init();
 
 #ifndef _EDITOR
 
+#if defined(XR_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
+#else
 #include <xmmintrin.h>
+#endif
 
 ICF __m128 _mm_load_fvector(const Fvector& v)
 {

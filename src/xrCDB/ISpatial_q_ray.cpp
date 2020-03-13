@@ -8,7 +8,11 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#if defined(XR_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
+#else
 #include <xmmintrin.h>
+#endif
 #pragma warning(pop)
 
 struct alignas(16) vec_t : public Fvector3

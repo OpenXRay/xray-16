@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.8.0)
 project(OpenXRay)
 
+EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+message(STATUS "Detected platform: " ${ARCHITECTURE})
+if(${ARCHITECTURE} STREQUAL "aarch64")
+	set(PROJECT_PLATFORM_ARM64 TRUE)
+endif()
+
 include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -118,8 +124,12 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpmath=sse -msse3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")
+if(PROJECT_PLATFORM_ARM64)
+    set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpmath=sse -msse3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")
+endif()
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold")

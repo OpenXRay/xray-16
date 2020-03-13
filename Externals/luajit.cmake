@@ -166,7 +166,13 @@ set ( DASM_T ${LUAJIT_DIR}/host/buildvm_arch.h )
 # 2DO: Proper detection of flags
 set ( DASM_VER "" )
 set ( DASM_FLAGS -D FPU -D HFABI )
-set ( DASM_ARCH x86 )
+
+EXECUTE_PROCESS ( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+if ( ${ARCHITECTURE} STREQUAL "aarch64")
+	set ( DASM_ARCH arm64 )
+else ( ${ACHITECTURE} STREQUAL "x86_64" OR ${ACHITECTURE} STREQUAL "x86" )
+	set ( DASM_ARCH x86 )
+endif()
 
 # Raspberry PI, ARM
 if ( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv6l" )

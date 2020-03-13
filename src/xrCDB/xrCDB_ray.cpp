@@ -3,7 +3,11 @@
 #include "xrCore/_fbox.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
+#if defined(XR_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
+#else
 #include <xmmintrin.h>
+#endif
 #pragma warning(pop)
 
 #include "xrCDB.h"

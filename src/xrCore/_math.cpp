@@ -16,7 +16,9 @@
 #endif
 
 #elif defined(LINUX) || defined(FREEBSD)
+#if defined(XR_X86) || defined(XR_X64)
 #include <x86intrin.h> // __rdtsc
+#endif
 #ifdef LINUX
 #include <fpu_control.h>
 #elif defined(FREEBSD)
@@ -44,6 +46,13 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #endif
 #include <thread>
 #include "SDL.h"
+
+#if defined(XR_ARM64)
+#define _FPU_EXTENDED 0
+#define _FPU_DOUBLE 0
+#define _FPU_SINGLE 0
+#define _FPU_RC_NEAREST 0
+#endif
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
@@ -208,7 +217,13 @@ XRCORE_API u64 QPC() noexcept
 
 XRCORE_API u64 GetCLK()
 {
+#if defined(XR_ARM64)
+  int64_t virtual_timer_value;
+  asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
+  return virtual_timer_value;
+#else
     return __rdtsc();
+#endif
 }
 
 XRCORE_API u32 GetCurrentCPU()
@@ -326,13 +341,20 @@ void _initialize_cpu()
 }
 
 // per-thread initialization
+#if defined(XR_ARM64)
+#define _MM_SET_FLUSH_ZERO_MODE(mode)
+#define _MM_SET_DENORMALS_ZERO_MODE(mode)
+#else
 #include <xmmintrin.h>
+#define _MM_SET_FLUSH_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_FLUSH_ZERO_MASK) | (mode))
+#define _MM_SET_DENORMALS_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (mode))
+#endif
+
 #define _MM_DENORMALS_ZERO_MASK 0x0040
 #define _MM_DENORMALS_ZERO_ON 0x0040
 #define _MM_FLUSH_ZERO_MASK 0x8000
 #define _MM_FLUSH_ZERO_ON 0x8000
-#define _MM_SET_FLUSH_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_FLUSH_ZERO_MASK) | (mode))
-#define _MM_SET_DENORMALS_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (mode))
+
 static BOOL _denormals_are_zero_supported = TRUE;
 extern void __cdecl _terminate();
 
