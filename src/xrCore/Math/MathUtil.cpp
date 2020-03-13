@@ -51,9 +51,9 @@ void Initialize()
     Skin3W = Skin3W_CPP;
     Skin4W = Skin4W_CPP;
 #if defined(XR_ARM64)
-	PLCCalc = PLCCalc_CPP;
+    PLCCalc = PLCCalc_CPP;
 #else
-	PLCCalc = PLCCalc_SSE;
+    PLCCalc = PLCCalc_SSE;
 #endif
     //PLCCalc = PLCCalc_CPP;
 #endif
