@@ -14,6 +14,8 @@
 #define XR_X64
 #elif defined (__aarch64__)
 #define XR_ARM64
+#elif defined(__arm__)
+#define XR_ARM
 #else
 #define XR_X86
 #endif

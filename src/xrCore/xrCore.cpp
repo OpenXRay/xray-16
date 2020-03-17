@@ -281,7 +281,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         PrintBuildInfo();
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
-#if !defined(XR_ARM64)
+#if defined(XR_X86) || defined(XR_X64)
         R_ASSERT(SDL_HasSSE());
 #endif
         XRay::Math::Initialize();

@@ -21,11 +21,11 @@
 
 #if defined(XR_X64)
 #define _finddata_t _finddata64i32_t
-#elif defined(XR_ARM64)
+#elif defined(XR_ARM) || defined(XR_ARM64)
 #define _finddata_t _finddata32_t
 #elif defined(XR_X86)
 #define _finddata_t _finddata32_t
-#endif // XR_X64, XR_X86 or XR_ARM64
+#endif
 
 typedef int64_t __int64;
 typedef __int64 __time64_t;
