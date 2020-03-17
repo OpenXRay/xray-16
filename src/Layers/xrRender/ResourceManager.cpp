@@ -268,41 +268,46 @@ Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR
     return nullptr;
 }
 
-void CResourceManager::CompatibilityCheck()
+IReader* open_shader(pcstr shader)
 {
-    cpcstr shader = "skin.h";
     string_path shaderPath;
 
     FS.update_path(shaderPath, "$game_shaders$", GEnv.Render->getShaderPath());
     xr_strcat(shaderPath, shader);
 
-    IReader* file = FS.r_open(shaderPath);
-    R_ASSERT3(file, "Can't open skin.h shader", shaderPath);
+    return FS.r_open(shaderPath);
+}
 
-    // search for (12.f / 32768.f)
-    bool hq_skinning = true;
-    while (true)
+void CResourceManager::CompatibilityCheck()
+{
+    // Check Shoker HQ Geometry Fix support
     {
-        pcstr begin = strstr((cpcstr)file->pointer(), "u_position");
-        if (!begin)
+        IReader* skinh = open_shader("skin.h");
+        R_ASSERT3(skinh, "Can't open shader", "skin.h");
+        // search for (12.f / 32768.f)
+        bool hq_skinning = true;
+        do
+        {
+            pcstr begin = strstr((cpcstr)skinh->pointer(), "u_position");
+            if (!begin)
+                break;
+
+            cpcstr end = strstr(begin, "sbones_array");
+            if (!end)
+                break;
+
+            xr_string str(begin, end);
+            pcstr ptr = str.data();
+
+            if ((ptr = strstr(ptr, "12.f")))    // 12.f
+                if ((ptr = strstr(ptr, "/")))   // /
+                    if (strstr(ptr, "32768.f")) // 32768.f
+                        hq_skinning = false;    // found
             break;
-
-        cpcstr end = strstr(begin, "sbones_array");
-        if (!end)
-            break;
-
-        xr_string str(begin, end);
-        pcstr ptr = str.data();
-
-        if ((ptr = strstr(ptr, "12.f")))    // 12.f
-            if ((ptr = strstr(ptr, "/")))   // /
-                if (strstr(ptr, "32768.f")) // 32768.f
-                    hq_skinning = false;    // found
-        break;
+        } while (false);
+        RImplementation.m_hq_skinning = hq_skinning;
+        FS.r_close(skinh);
     }
-    RImplementation.m_hq_skinning = hq_skinning;
-
-    FS.r_close(file);
 }
 
 Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
