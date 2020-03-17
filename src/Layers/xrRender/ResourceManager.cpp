@@ -308,6 +308,52 @@ void CResourceManager::CompatibilityCheck()
         RImplementation.m_hq_skinning = hq_skinning;
         FS.r_close(skinh);
     }
+#if RENDER != R_R1
+    // Check shadow cascades type (old SOC/CS or new COP)
+    if (psDeviceFlags.test(rsR2))
+    {
+        // Check for new cascades support on R2
+        IReader* accumSunNearCascade = open_shader("accum_sun_near_cascade.ps");
+        RImplementation.o.oldshadowcascades = !accumSunNearCascade;
+        ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, !accumSunNearCascade);
+        FS.r_close(accumSunNearCascade);
+    }
+    else if (!psDeviceFlags.test(rsR1))
+    {
+        IReader* accumSunNear = open_shader("accum_sun_near.ps");
+        R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
+        bool oldCascades = false;
+        do
+        {
+            pcstr begin = strstr((cpcstr)accumSunNear->pointer(), "float4");
+            if (!begin)
+                break;
+
+            begin = strstr(begin, "main");
+            if (!begin)
+                break;
+
+            cpcstr end = strstr(begin, "SV_Target");
+            if (!end)
+                break;
+
+            xr_string str(begin, end);
+            pcstr ptr = str.data();
+
+            if (strstr(ptr, "v2p_TL2uv"))
+            {
+                oldCascades = true;
+            }
+            else if (strstr(ptr, "v2p_volume"))
+            {
+                oldCascades = false;
+            }
+        } while (false);
+        RImplementation.o.oldshadowcascades = oldCascades;
+        ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, oldCascades);
+        FS.r_close(accumSunNear);
+    }
+#endif
 }
 
 Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)

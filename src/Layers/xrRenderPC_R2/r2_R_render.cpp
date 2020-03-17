@@ -447,7 +447,7 @@ void CRender::Render()
     if (bSUN)
     {
         RImplementation.Stats.l_visible++;
-        if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
+        if (!RImplementation.o.oldshadowcascades)
             render_sun_cascades();
         else
         {

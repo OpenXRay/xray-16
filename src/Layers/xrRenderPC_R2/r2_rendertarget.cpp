@@ -185,6 +185,24 @@ void generate_jitter(DWORD* dest, u32 elem_count)
         *dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
 
+void CRenderTarget::reinit_cascades()
+{
+    if (RImplementation.o.oldshadowcascades)
+    {
+        b_accum_direct = new CBlender_accum_direct();
+        s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct");
+        if (RImplementation.o.advancedpp)
+            s_accum_direct_volumetric.create("accum_volumetric_sun");
+    }
+    else
+    {
+        b_accum_direct = new CBlender_accum_direct_cascade();
+        s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct_cascade");
+        if (RImplementation.o.advancedpp)
+            s_accum_direct_volumetric.create("accum_volumetric_sun_cascade");
+    }
+}
+
 CRenderTarget::CRenderTarget()
 {
     param_blur = 0.f;
@@ -209,8 +227,6 @@ CRenderTarget::CRenderTarget()
     // Blenders
     b_occq = new CBlender_light_occq();
     b_accum_mask = new CBlender_accum_direct_mask();
-    b_accum_direct = new CBlender_accum_direct();
-    b_accum_direct_cascade = new CBlender_accum_direct_cascade();
     b_accum_point = new CBlender_accum_point();
     b_accum_spot = new CBlender_accum_spot();
     b_accum_reflected = new CBlender_accum_reflected();
@@ -278,13 +294,6 @@ CRenderTarget::CRenderTarget()
         rt_smap_surf.create(r2_RT_smap_surf, size, size, nullrt);
         rt_smap_ZB = NULL;
         s_accum_mask.create(b_accum_mask, "r2" DELIMITER "accum_mask");
-        s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct");
-        s_accum_direct_cascade.create(b_accum_direct_cascade, "r2" DELIMITER "accum_direct_cascade");
-        if (RImplementation.o.advancedpp)
-        {
-            s_accum_direct_volumetric.create("accum_volumetric_sun");
-            s_accum_direct_volumetric_cascade.create("accum_volumetric_sun_cascade");
-        }
     }
     else
     {
@@ -294,14 +303,8 @@ CRenderTarget::CRenderTarget()
         R_CHK(HW.pDevice->CreateDepthStencilSurface(
             size, size, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, TRUE, &rt_smap_ZB, NULL));
         s_accum_mask.create(b_accum_mask, "r2" DELIMITER "accum_mask");
-        s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct");
-        s_accum_direct_cascade.create(b_accum_direct_cascade, "r2" DELIMITER "accum_direct_cascade");
-        if (RImplementation.o.advancedpp)
-        {
-            s_accum_direct_volumetric.create("accum_volumetric_sun");
-            s_accum_direct_volumetric_cascade.create("accum_volumetric_sun_cascade");
-        }
     }
+    reinit_cascades();
 
     // POINT
     {
@@ -664,7 +667,6 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_accum_spot);
     xr_delete(b_accum_point);
     xr_delete(b_accum_direct);
-    xr_delete(b_accum_direct_cascade);
     xr_delete(b_accum_mask);
     xr_delete(b_occq);
 }

@@ -82,6 +82,7 @@ public:
         u32 sjitter : 1;
         u32 noshadows : 1;
         u32 Tshadows : 1; // transluent shadows
+        u32 oldshadowcascades : 1;
         u32 disasm : 1;
         u32 advancedpp : 1; //	advanced post process (DOF, SSAO, volumetrics, etc.)
         u32 volumetricfog : 1;
