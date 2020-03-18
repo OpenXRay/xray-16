@@ -1,5 +1,5 @@
 #pragma once
-
+#ifdef DEBUG
 class XRayObjectSpaceRender:public IObjectSpaceRender
 {
 public:
@@ -10,3 +10,4 @@ public:
 	virtual void dbgAddSphere(const Fsphere &sphere, u32 colour);;
 	virtual void SetShader();;
 };
+#endif

@@ -1,5 +1,5 @@
 #include "pch.h"
-
+#ifdef DEBUG
 XRayObjectSpaceRender::XRayObjectSpaceRender()
 {
 }
@@ -19,3 +19,4 @@ void XRayObjectSpaceRender::dbgAddSphere(const Fsphere & sphere, u32 colour)
 void XRayObjectSpaceRender::SetShader()
 {
 }
+#endif

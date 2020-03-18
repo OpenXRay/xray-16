@@ -1,5 +1,5 @@
 #include "pch.h"
-
+#ifdef DEBUG
 XRayDebugRender::XRayDebugRender()
 {
 }
@@ -51,3 +51,4 @@ void XRayDebugRender::DestroyDebugShader(dbgShaderHandle shdHandle)
 void XRayDebugRender::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C)
 {
 }
+#endif

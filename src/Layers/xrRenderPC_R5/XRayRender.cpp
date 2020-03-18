@@ -5,9 +5,9 @@
 //const bchar* GGraphicsAPI[] = { TEXT("bear_render_dx11"),TEXT("bear_render_dx12"),TEXT("bear_render_dx12_1"),TEXT("bear_render_vulkan1_0"),TEXT("bear_render_vulkan1_1") };
 XRayRenderFactory BRenderFactory;
 XRayDUInterface  BDUInterface;
-
+#ifdef DEBUG
 XRayDebugRender BDebugRender;
-
+#endif
 extern "C" {
 XR_EXPORT void SetupEnv()
 {
