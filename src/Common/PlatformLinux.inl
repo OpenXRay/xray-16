@@ -486,6 +486,7 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define S_OK 0x00000000
 #define S_FALSE 0x10000000
 #define E_FAIL 0x80004005
+#define E_NOTIMPL 0x80004001
 
 #define _MAX_DRIVE	3
 #define _MAX_DIR	256

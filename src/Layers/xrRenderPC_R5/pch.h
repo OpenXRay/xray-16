@@ -19,12 +19,13 @@
 #include "../../Include/xrRender/DebugRender.h"
 
 #define REGISTER(name,byte,size,a1,a2) name=byte,
+#if defined(WINDOWS)
 enum D3DVertexState
 {
 #include "D3D9VertexState.h"
 };
 #undef REGISTER
-
+#endif
 
 
 
