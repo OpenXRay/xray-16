@@ -234,8 +234,6 @@ void CEngineAPI::CreateRendererList()
             // Test availability
             if (checkSupport && checkSupport())
                 modes.emplace_back(mode, index);
-            else // Close the handle if test is failed
-                renderers[library] = nullptr;
         }
     };
 
