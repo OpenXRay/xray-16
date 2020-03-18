@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{da3f2b17-cfd6-48c7-9bdc-d8a28d3425cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Factory">
+      <UniqueIdentifier>{9eed731e-799c-4e66-8d24-258cd6563062}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Engine\XRayUIRender.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\XRayDebugRender.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\XRayDUInterface.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\XRayRenderFactory.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\XRayRenderInterface.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayConsoleRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayEnvDescriptorMixerRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayEnvDescriptorRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayEnvironmentRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayFlareRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayFontRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayLensFlareRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayObjectSpaceRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayRainRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayRenderDeviceRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayStatGraphRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayStatsRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayThunderboltDescRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayThunderboltRender.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayUISequenceVideoItem.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayUIShader.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Factory\XRayWallMarkArray.cpp">
+      <Filter>Engine\Factory</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine\XRayUIRender.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\XRayDebugRender.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\XRayDUInterface.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\XRayRenderFactory.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\XRayRenderInterface.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayWallMarkArray.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayConsoleRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayEnvDescriptorMixerRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayEnvDescriptorRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayEnvironmentRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayFlareRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayFontRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayLensFlareRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayObjectSpaceRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayRainRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayRenderDeviceRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayStatGraphRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayStatsRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayThunderboltDescRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayThunderboltRender.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayUISequenceVideoItem.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Factory\XRayUIShader.h">
+      <Filter>Engine\Factory</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

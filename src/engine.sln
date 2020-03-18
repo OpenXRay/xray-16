@@ -98,6 +98,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrPhysics", "xrPhysics\xrPh
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R4", "Layers\xrRenderPC_R4\xrRender_R4.vcxproj", "{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R5", "Layers\xrRenderPC_R5\xrRender_R5.vcxproj", "{BDE6EB08-0939-4077-A57F-9D7960CC93BC}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp_screenshots_info", "utils\mp_screenshots_info\mp_screenshots_info.vcxproj", "{032A10AB-E44C-4751-A290-001EF99E664A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mp_configs_verifyer", "utils\mp_configs_verifyer\mp_configs_verifyer.vcxproj", "{1924EF23-A05E-40E5-93F2-6CCD64BE1F8B}"
@@ -573,6 +575,18 @@ Global
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.Release|x64.Build.0 = Release|x64
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.Release|x86.ActiveCfg = Release|Win32
 		{AC9B12ED-A2D7-4337-A981-5BD8430E96D8}.Release|x86.Build.0 = Release|Win32
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Debug|x64.ActiveCfg = Debug|x64
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Debug|x64.Build.0 = Debug|x64
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Debug|x86.ActiveCfg = Debug|Win32
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Debug|x86.Build.0 = Debug|Win32
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Mixed|x64.ActiveCfg = Mixed|x64
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Mixed|x64.Build.0 = Mixed|x64
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Mixed|x86.ActiveCfg = Mixed|Win32
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Mixed|x86.Build.0 = Mixed|Win32
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Release|x64.ActiveCfg = Release|x64
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Release|x64.Build.0 = Release|x64
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Release|x86.ActiveCfg = Release|Win32
+		{BDE6EB08-0939-4077-A57F-9D7960CC93BC}.Release|x86.Build.0 = Release|Win32
 		{032A10AB-E44C-4751-A290-001EF99E664A}.Debug|x64.ActiveCfg = Debug|x64
 		{032A10AB-E44C-4751-A290-001EF99E664A}.Debug|x86.ActiveCfg = Debug|Win32
 		{032A10AB-E44C-4751-A290-001EF99E664A}.Mixed|x64.ActiveCfg = Mixed|x64
