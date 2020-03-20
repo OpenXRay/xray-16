@@ -80,7 +80,6 @@ public:
     RenderStatistics BasicStats;
 
 public:
-    void set_Object(IRenderable* /*O*/) override { /* nothing here */ }
     void set_Feedback(R_feedback* V, u32 id)
     {
         val_feedback_breakp = id;

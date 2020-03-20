@@ -311,7 +311,6 @@ public:
 
     // Main
     virtual void flush() = 0;
-    virtual void set_Object(IRenderable* O) = 0;
     virtual void add_Occluder(Fbox2& bb_screenspace) = 0; // mask screen region as oclluded (-1..1, -1..1)
     virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
     virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)

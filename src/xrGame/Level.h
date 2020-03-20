@@ -302,7 +302,7 @@ public:
     void cl_Process_Spawn(NET_Packet& P);
     void ProcessGameEvents();
     void ProcessGameSpawns();
-    void ProcessCompressedUpdate(NET_Packet& P, u8 const compression_type);
+    void ProcessCompressedUpdate(NET_Packet& P, const Flags8& compression_type);
 
     // Input
     void IR_OnKeyboardPress(int key) override;

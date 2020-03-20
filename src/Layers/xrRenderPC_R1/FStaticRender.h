@@ -127,7 +127,7 @@ public:
 
     // Main
     virtual void flush() override;
-    void set_Object(IRenderable* O) override;
+    void set_Object(IRenderable* O);
     virtual void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf (no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)

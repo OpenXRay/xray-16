@@ -567,8 +567,6 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
     if (_dynamic && psDeviceFlags.test(rsDrawDynamic))
     {
-        set_Object(nullptr);
-
         // Traverse object database
         g_SpatialSpace->q_frustum(lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE, ViewBase);
 

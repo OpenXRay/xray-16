@@ -172,6 +172,7 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
     xrDebug::SetDialogHandler(OnErrorDialog);
 
     SDL_StopTextInput(); // sanity
+    SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
 
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);

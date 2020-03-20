@@ -67,7 +67,6 @@ void CHUDManager::Render_First()
     O->renderable_Invisible(GEnv.CurrentRenderer == 1);
 
     O->renderable_Render(O->H_Root());
-    GEnv.Render->set_Object(nullptr);
 
     O->renderable_Invisible(false);
 }
@@ -106,7 +105,6 @@ void CHUDManager::Render_Last()
     O->renderable_HUD(true);
     O->OnHUDDraw(this, O->H_Root());
     O->renderable_HUD(false);
-    GEnv.Render->set_Object(nullptr);
 }
 
 #include "player_hud.h"
@@ -197,7 +195,6 @@ void CHUDManager::SetGrenadeMarkType(LPCSTR tex_name) { HitMarker.InitShader_Gre
 // ------------------------------------------------------------------------------------
 
 #include "ui/UIMainIngameWnd.h"
-extern CUIXml* pWpnScopeXml;
 
 void CHUDManager::Load()
 {
@@ -214,8 +211,6 @@ void CHUDManager::Load()
 void CHUDManager::OnUIReset()
 {
     pUIGame->HideShownDialogs();
-
-    xr_delete(pWpnScopeXml);
 
     pUIGame->UnLoad();
     pUIGame->Load();

@@ -35,7 +35,7 @@ enum EWindowAlignment
     waCenter = 16
 };
 
-class CUISimpleWindow : public CUIResetNotifier, public Noncopyable
+class CUISimpleWindow : public Noncopyable
 {
 public:
     CUISimpleWindow() : m_bShowMe(false)

@@ -295,6 +295,7 @@ void CRender::create()
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
     o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;
     o.Tshadows = (strstr(Core.Params, "-tsh")) ? TRUE : FALSE;
+    o.oldshadowcascades = ps_r2_ls_flags_ext.test(R2FLAGEXT_SUN_OLD);
     o.mblur = (strstr(Core.Params, "-mblur")) ? TRUE : FALSE;
     o.distortion_enabled = (strstr(Core.Params, "-nodistort")) ? FALSE : TRUE;
     o.distortion = o.distortion_enabled;

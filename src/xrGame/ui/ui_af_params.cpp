@@ -11,20 +11,6 @@
 u32 const red_clr = color_argb(255, 210, 50, 50);
 u32 const green_clr = color_argb(255, 170, 170, 170);
 
-CUIArtefactParams::CUIArtefactParams()
-{
-    for (u32 i = 0; i < ALife::infl_max_count; ++i)
-    {
-        m_immunity_item[i] = NULL;
-    }
-    for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
-    {
-        m_restore_item[i] = NULL;
-    }
-    m_additional_weight = NULL;
-    m_Prop_line = nullptr;
-}
-
 CUIArtefactParams::~CUIArtefactParams()
 {
     delete_data(m_immunity_item);
@@ -33,50 +19,33 @@ CUIArtefactParams::~CUIArtefactParams()
     xr_delete(m_Prop_line);
 }
 
-LPCSTR af_immunity_section_names[] = // ALife::EInfluenceType
+constexpr std::tuple<ALife::EInfluenceType, cpcstr, cpcstr, float, bool, cpcstr> af_immunity[] =
 {
-    "radiation_immunity", // infl_rad=0
-    "burn_immunity", // infl_fire=1
-    "chemical_burn_immunity", // infl_acid=2
-    "telepatic_immunity", // infl_psi=3
-    "shock_immunity", // infl_electra=4
-
-    //"strike_immunity",
-    //Alundaio: Uncommented
-    "wound_immunity",
-    "explosion_immunity",
-    "fire_wound_immunity",
+    //{ ALife::infl_,           "section",                  "caption",                                  magnitude, sign_inverse, "unit" }
+    { ALife::infl_rad,          "radiation_immunity",       "ui_inv_outfit_radiation_protection",       1.0f,      false,        "%" },
+    { ALife::infl_fire,         "burn_immunity",            "ui_inv_outfit_burn_protection",            1.0f,      false,        "%" },
+    { ALife::infl_acid,         "chemical_burn_immunity",   "ui_inv_outfit_chemical_burn_protection",   1.0f,      false,        "%" },
+    { ALife::infl_psi,          "telepatic_immunity",       "ui_inv_outfit_telepatic_protection",       1.0f,      false,        "%" },
+    { ALife::infl_electra,      "shock_immunity",           "ui_inv_outfit_shock_protection",           1.0f,      false,        "%" },
+    //{ ALife::infl_strike,     "strike_immunity",          "ui_inv_outfit_strike_protection",          1.0f,      false,        "%" }
+    //{ ALife::infl_wound,      "wound_immunity",           "ui_inv_outfit_wound_protection",           1.0f,      false,        "%" }
+    //{ ALife::infl_explosion,  "explosion_immunity",       "ui_inv_outfit_explosion_protection",       1.0f,      false,        "%" }
+    //{ ALife::infl_fire_wound, "fire_wound_immunity",      "ui_inv_outfit_fire_wound_protection",      1.0f,      false,        "%" }
 };
+static_assert(std::size(af_immunity) == ALife::infl_max_count,
+    "All influences should be listed in the tuple above.");
 
-LPCSTR af_restore_section_names[] = // ALife::EConditionRestoreType
-    {
-        "health_restore_speed", // eHealthRestoreSpeed=0
-        "satiety_restore_speed", // eSatietyRestoreSpeed=1
-        "power_restore_speed", // ePowerRestoreSpeed=2
-        "bleeding_restore_speed", // eBleedingRestoreSpeed=3
-        "radiation_restore_speed", // eRadiationRestoreSpeed=4
-};
-
-LPCSTR af_immunity_caption[] = // ALife::EInfluenceType
+constexpr std::tuple<ALife::EConditionRestoreType, cpcstr, cpcstr, float, bool, cpcstr> af_restore[] =
 {
-    "ui_inv_outfit_radiation_protection", // "(radiation_imm)",
-    "ui_inv_outfit_burn_protection", // "(burn_imm)",
-    "ui_inv_outfit_chemical_burn_protection", // "(chemical_burn_imm)",
-    "ui_inv_outfit_telepatic_protection", // "(telepatic_imm)",
-    "ui_inv_outfit_shock_protection", // "(shock_imm)",
-
-    //"ui_inv_outfit_strike_protection",	 // "(strike_imm)",
-
-    //Alundaio: Uncommented
-    "ui_inv_outfit_wound_protection", // "(wound_imm)",
-    "ui_inv_outfit_explosion_protection", // "(explosion_imm)",
-    "ui_inv_outfit_fire_wound_protection", // "(fire_wound_imm)",
+    //{ ALife::EConditionRestoreType,   "section",                  "caption",          magnitude, sign_inverse, "unit" }
+    { ALife::eHealthRestoreSpeed,       "health_restore_speed",     "ui_inv_health",    1.0f,      false,        "%" },
+    { ALife::eSatietyRestoreSpeed,      "satiety_restore_speed",    "ui_inv_satiety",   1.0f,      false,        "%" },
+    { ALife::ePowerRestoreSpeed,        "power_restore_speed",      "ui_inv_power",     1.0f,      false,        nullptr },
+    { ALife::eBleedingRestoreSpeed,     "bleeding_restore_speed",   "ui_inv_bleeding", -1.0f,      true,         "%" },
+    { ALife::eRadiationRestoreSpeed,    "radiation_restore_speed",  "ui_inv_radiation", 1.0f,      true,         nullptr },
 };
-
-LPCSTR af_restore_caption[] = // ALife::EConditionRestoreType
-{
-    "ui_inv_health", "ui_inv_satiety", "ui_inv_power", "ui_inv_bleeding", "ui_inv_radiation",
-};
+static_assert(std::size(af_restore) == ALife::eRestoreTypeMax,
+    "All restore types should be listed in the tuple above.");
 
 /*
 LPCSTR af_actor_param_names[]=
@@ -89,68 +58,72 @@ LPCSTR af_actor_param_names[]=
 };
 */
 
+constexpr pcstr af_params = "af_params";
+
 bool CUIArtefactParams::InitFromXml(CUIXml& xml)
 {
-    LPCSTR base = "af_params";
-
     XML_NODE stored_root = xml.GetLocalRoot();
-    XML_NODE base_node = xml.NavigateToNode(base, 0);
+    XML_NODE base_node = xml.NavigateToNode(af_params, 0);
     if (!base_node)
     {
         return false;
     }
-    CUIXmlInit::InitWindow(xml, base, 0, this);
+    CUIXmlInit::InitWindow(xml, af_params, 0, this);
     xml.SetLocalRoot(base_node);
 
     if ((m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false)))
         m_Prop_line->SetAutoDelete(false);
 
-    for (u32 i = 0; i < ALife::infl_max_count; ++i)
+    for (auto [id, section, caption, magnitude, sign_inverse, unit] : af_immunity)
     {
-        m_immunity_item[i] = new UIArtefactParamItem();
-        m_immunity_item[i]->Init(xml, af_immunity_section_names[i]);
-        m_immunity_item[i]->SetAutoDelete(false);
-
-        LPCSTR name = StringTable().translate(af_immunity_caption[i]).c_str();
-        m_immunity_item[i]->SetCaption(name);
-
-        xml.SetLocalRoot(base_node);
+        m_immunity_item[id] = CreateItem(xml, section, magnitude, sign_inverse, unit, caption);
     }
-
-    for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
+    for (auto [id, section, caption, magnitude, sign_inverse, unit] : af_restore)
     {
-        m_restore_item[i] = new UIArtefactParamItem();
-        m_restore_item[i]->Init(xml, af_restore_section_names[i]);
-        m_restore_item[i]->SetAutoDelete(false);
-
-        LPCSTR name = StringTable().translate(af_restore_caption[i]).c_str();
-        m_restore_item[i]->SetCaption(name);
-
-        xml.SetLocalRoot(base_node);
+        m_restore_item[id] = CreateItem(xml, section, magnitude, sign_inverse, unit, caption);
     }
-
-    {
-        m_additional_weight = new UIArtefactParamItem();
-        m_additional_weight->Init(xml, "additional_weight");
-        m_additional_weight->SetAutoDelete(false);
-
-        // use either ui_inv_weight or ui_inv_outfit_additional_weight
-        // but set ui_inv_weight if both unavailable
-        LPCSTR name = StringTable().translate("ui_inv_weight").c_str();
-        LPCSTR add_name = StringTable().translate("ui_inv_outfit_additional_weight").c_str();
-        if (0 == xr_strcmp(name, "ui_inv_weight") &&
-            0 != xr_strcmp(add_name, "ui_inv_outfit_additional_weight"))
-        {
-            m_additional_weight->SetCaption(add_name);
-        }
-        else
-            m_additional_weight->SetCaption(name);
-
-        // xml.SetLocalRoot( base_node );
-    }
+    m_additional_weight = CreateItem(xml, "additional_weight", "ui_inv_weight", "ui_inv_outfit_additional_weight");
 
     xml.SetLocalRoot(stored_root);
     return true;
+}
+
+UIArtefactParamItem* CUIArtefactParams::CreateItem(CUIXml& uiXml, pcstr section,
+    float magnitude, bool isSignInverse, const shared_str& unit,
+    const shared_str& translationId, const shared_str& translationId2 /*= nullptr*/)
+{
+    UIArtefactParamItem* item = new UIArtefactParamItem();
+
+    const UIArtefactParamItem::InitResult result = item->Init(uiXml, section);
+    switch (result)
+    {
+    case UIArtefactParamItem::InitResult::Failed:
+        xr_delete(item);
+        return nullptr;
+
+    case UIArtefactParamItem::InitResult::Plain:
+        item->SetDefaultValuesPlain(magnitude, isSignInverse, unit);
+        break;
+    }
+
+    // use either translationId or translationId2
+    // but set translationId if both unavailable
+    shared_str name = StringTable().translate(translationId);
+    shared_str name2 = translationId2 != nullptr ? StringTable().translate(translationId2) : nullptr;
+
+    if (name != translationId && name2 != translationId2)
+        item->SetCaption(name2.c_str());
+    else
+        item->SetCaption(name.c_str());
+
+    item->SetAutoDelete(false);
+    return item;
+}
+
+UIArtefactParamItem* CUIArtefactParams::CreateItem(CUIXml& uiXml, pcstr section,
+    const shared_str& translationId, const shared_str& translationId2 /*= nullptr*/)
+{
+    return CreateItem(uiXml, section, 1.0f, false, nullptr, translationId, translationId2);
 }
 
 bool CUIArtefactParams::Check(const shared_str& af_section)
@@ -171,60 +144,55 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
     }
 
     float val = 0.0f, max_val = 1.0f, h = 0.0f;
-    Fvector2 pos;
     if (m_Prop_line)
         h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
 
-    for (u32 i = 0; i < ALife::infl_max_count; ++i)
+    const auto setValue = [&](UIArtefactParamItem* item)
     {
-        shared_str const& sect = pSettings->r_string(af_section, "hit_absorbation_sect");
-        val = pSettings->r_float(sect, af_immunity_section_names[i]);
-        if (fis_zero(val))
-        {
-            continue;
-        }
-        max_val = actor->conditions().GetZoneMaxPower((ALife::EInfluenceType)i);
-        val /= max_val;
-        m_immunity_item[i]->SetValue(val);
+        item->SetValue(val);
 
-        pos.set(m_immunity_item[i]->GetWndPos());
+        Fvector2 pos = item->GetWndPos();
         pos.y = h;
-        m_immunity_item[i]->SetWndPos(pos);
+        item->SetWndPos(pos);
 
-        h += m_immunity_item[i]->GetWndSize().y;
-        AttachChild(m_immunity_item[i]);
+        h += item->GetWndSize().y;
+        AttachChild(item);
+    };
+
+    for (auto [id, immunity_section, immunity_caption, magnitude, sign_inverse, unit] : af_immunity)
+    {
+        if (!m_immunity_item[id])
+            continue;
+
+        shared_str const& hit_absorbation_sect = pSettings->r_string(af_section, "hit_absorbation_sect");
+        val = pSettings->r_float(hit_absorbation_sect, immunity_section);
+        if (fis_zero(val))
+            continue;
+
+        max_val = actor->conditions().GetZoneMaxPower(id);
+        val /= max_val;
+        setValue(m_immunity_item[id]);
     }
 
+    if (m_additional_weight)
     {
         val = pSettings->r_float(af_section, "additional_inventory_weight");
         if (!fis_zero(val))
         {
-            m_additional_weight->SetValue(val);
-
-            pos.set(m_additional_weight->GetWndPos());
-            pos.y = h;
-            m_additional_weight->SetWndPos(pos);
-
-            h += m_additional_weight->GetWndSize().y;
-            AttachChild(m_additional_weight);
+            setValue(m_additional_weight);
         }
     }
 
-    for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
+    for (auto [id, restore_section, restore_caption, magnitude, sign_inverse, unit] : af_restore)
     {
-        val = pSettings->r_float(af_section, af_restore_section_names[i]);
-        if (fis_zero(val))
-        {
+        if (!m_restore_item[id])
             continue;
-        }
-        m_restore_item[i]->SetValue(val);
 
-        pos.set(m_restore_item[i]->GetWndPos());
-        pos.y = h;
-        m_restore_item[i]->SetWndPos(pos);
+        val = pSettings->r_float(af_section, restore_section);
+        if (fis_zero(val))
+            continue;
 
-        h += m_restore_item[i]->GetWndSize().y;
-        AttachChild(m_restore_item[i]);
+        setValue(m_restore_item[id]);
     }
 
     SetHeight(h);
@@ -233,21 +201,15 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
 /// ----------------------------------------------------------------
 
 UIArtefactParamItem::UIArtefactParamItem()
-{
-    m_caption = NULL;
-    m_value = NULL;
-    m_magnitude = 1.0f;
-    m_sign_inverse = false;
+    : m_magnitude(1.0f), m_sign_inverse(false), m_unit_str(""),
+      m_texture_minus(""), m_texture_plus("") {}
 
-    m_unit_str._set("");
-    m_texture_minus._set("");
-    m_texture_plus._set("");
-}
-
-UIArtefactParamItem::~UIArtefactParamItem() {}
-void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
+UIArtefactParamItem::InitResult UIArtefactParamItem::Init(CUIXml& xml, pcstr section)
 {
-    CUIXmlInit::InitWindow(xml, section, 0, this);
+    if (!CUIXmlInit::InitStatic(xml, section, 0, this, false))
+        return InitPlain(xml, section);
+
+    const XML_NODE base_node = xml.GetLocalRoot();
     xml.SetLocalRoot(xml.NavigateToNode(section));
 
     m_caption = UIHelper::CreateStatic(xml, "caption", this);
@@ -267,9 +229,42 @@ void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
         m_texture_plus._set(texture_plus);
         VERIFY(m_texture_plus.size());
     }
+    xml.SetLocalRoot(base_node);
+    return InitResult::Normal;
 }
 
-void UIArtefactParamItem::SetCaption(LPCSTR name) { m_caption->TextItemControl()->SetText(name); }
+UIArtefactParamItem::InitResult UIArtefactParamItem::InitPlain(CUIXml& xml, pcstr section)
+{
+    string256 buf;
+    strconcat(sizeof(buf), buf, af_params, ":static_", section);
+    if (!CUIXmlInit::InitStatic(xml, buf, 0, this, false))
+        return InitResult::Failed;
+
+    m_caption = new CUIStatic();
+    m_caption->SetAutoDelete(true);
+    AttachChild(m_caption);
+    m_caption->Show(false); // hack
+
+    m_value = new CUITextWnd();
+    m_value->SetAutoDelete(true);
+    AttachChild(m_value);
+    m_value->Show(false); // hack
+
+    return InitResult::Plain;
+}
+
+void UIArtefactParamItem::SetDefaultValuesPlain(float magnitude, bool isSignInverse, const shared_str& unit)
+{
+    m_magnitude = magnitude;
+    m_sign_inverse = isSignInverse;
+    m_unit_str = unit;
+}
+
+void UIArtefactParamItem::SetCaption(LPCSTR name)
+{
+    m_caption->SetText(name);
+}
+
 void UIArtefactParamItem::SetValue(float value)
 {
     value *= m_magnitude;
@@ -302,5 +297,12 @@ void UIArtefactParamItem::SetValue(float value)
         {
             m_caption->InitTexture(m_texture_minus.c_str());
         }
+    }
+
+    // hack
+    if (!m_caption->IsShown() && !m_value->IsShown())
+    {
+        xr_sprintf(buf, "%s %s", m_caption->GetText(), m_value->GetText());
+        SetText(buf);
     }
 }

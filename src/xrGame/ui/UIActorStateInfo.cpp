@@ -313,7 +313,8 @@ void ui_actor_state_wnd::UpdateHitZone()
 void ui_actor_state_wnd::Draw()
 {
     inherited::Draw();
-    m_hint_wnd->Draw();
+    if (m_hint_wnd)
+        m_hint_wnd->Draw();
 }
 
 void ui_actor_state_wnd::Show(bool status)

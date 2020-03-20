@@ -90,6 +90,7 @@ protected:
     ALife::_TIME_ID m_dwWeaponIndependencyTime;
 
     virtual bool IsHudModeNow();
+    void LoadScope(const shared_str& section);
 
 public:
     void signal_HideComplete();

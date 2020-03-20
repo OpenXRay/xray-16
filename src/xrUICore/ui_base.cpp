@@ -112,13 +112,6 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
     return dest;
 }
 
-void UICore::OnDeviceReset()
-{
-    m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
-
-    m_2DFrustum.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth), float(Device.dwHeight)));
-}
-
 void UICore::ClientToScreenScaled(Fvector2& dest, float left, float top) const
 {
     if (m_currentPointType != IUIRender::pttLIT)
@@ -224,10 +217,25 @@ UICore::UICore()
     m_bPostprocess = false;
 
     OnDeviceReset();
+    OnUIReset();
 
     m_current_scale = &m_scale_;
     g_current_font_scale.set(1.0f, 1.0f);
     m_currentPointType = IUIRender::pttTL;
+}
+
+void UICore::OnDeviceReset()
+{
+    m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
+
+    m_2DFrustum.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth), float(Device.dwHeight)));
+}
+
+void UICore::OnUIReset()
+{
+    CUIXmlInitBase::DeleteColorDefs();
+    CUITextureMaster::FreeTexInfo();
+
     ReadTextureInfo();
     CUIXmlInitBase::InitColorDefs();
 }
@@ -236,6 +244,8 @@ UICore::~UICore()
 {
     xr_delete(m_pFontManager);
     xr_delete(m_pUICursor);
+    CUIXmlInitBase::DeleteColorDefs();
+    CUITextureMaster::FreeTexInfo();
 }
 
 void UICore::ReadTextureInfo()
@@ -317,7 +327,7 @@ float UICore::get_current_kx()
     return res;
 }
 
-shared_str UICore::get_xml_name(LPCSTR fn)
+shared_str UICore::get_xml_name(pcstr path, pcstr fn)
 {
     string_path str;
     if (!is_widescreen())
@@ -328,7 +338,6 @@ shared_str UICore::get_xml_name(LPCSTR fn)
     }
     else
     {
-        string_path str_;
         if (strext(fn))
         {
             xr_strcpy(str, fn);
@@ -338,7 +347,8 @@ shared_str UICore::get_xml_name(LPCSTR fn)
         else
             xr_sprintf(str, "%s_16", fn);
 
-        if (!FS.exist(str_, "$game_config$", UI_PATH_WITH_DELIMITER, str))
+        string_path str_;
+        if (!FS.exist(str_, "$game_config$", path, str))
         {
             xr_sprintf(str, "%s", fn);
             if (nullptr == strext(fn))

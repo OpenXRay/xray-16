@@ -506,6 +506,7 @@ void CRender::Calculate()
 
     // Main process
     marker++;
+    set_Object(nullptr);
     if (pLastSector)
     {
         // Traverse sector/portal structure
@@ -536,7 +537,6 @@ void CRender::Calculate()
             std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
 
             // Determine visibility for dynamic part of scene
-            set_Object(nullptr);
             g_hud->Render_First(); // R1 shadows
             g_hud->Render_Last();
             u32 uID_LTRACK = 0xffffffff;
@@ -613,7 +613,6 @@ void CRender::Calculate()
                                 T->update(renderable);
                             }
                             renderable->renderable_Render(renderable);
-                            set_Object(nullptr); //? is it needed at all
                         }
                         break; // exit loop on frustums
                     }
@@ -645,10 +644,6 @@ void CRender::Calculate()
         BasicStats.Projectors.Begin();
         L_Projector->calculate();
         BasicStats.Projectors.End();
-    }
-    else
-    {
-        set_Object(nullptr);
     }
 
     // End calc

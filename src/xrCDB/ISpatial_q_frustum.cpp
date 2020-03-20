@@ -3,6 +3,7 @@
 #include "Frustum.h"
 #include "xrCore/_fbox.h"
 #include "xrCore/Threading/Lock.hpp"
+#include "xrCore/Threading/ScopeLock.hpp"
 
 extern Fvector c_spatial_offset[8];
 
@@ -60,12 +61,11 @@ public:
 
 void ISpatial_DB::q_frustum(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const CFrustum& _frustum)
 {
-    pcs->Enter();
+    ScopeLock scope(&cs);
     Stats.Query.Begin();
     q_result = &R;
     q_result->clear();
     walker W(this, _mask, &_frustum);
     W.walk(m_root, m_center, m_bounds, _frustum.getMask());
     Stats.Query.End();
-    pcs->Leave();
 }

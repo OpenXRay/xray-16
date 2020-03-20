@@ -18,6 +18,27 @@ void CDetail::Unload()
     shader.destroy();
 }
 
+/** Dirty hack - transfer indices (in 32bit lines) (2 indices by pass)
+ * @brief CDetail::transfer_indices
+ * @param iDest
+ * @param iOffset
+ */
+void CDetail::transfer_indices(u16* iDest, u32 iOffset)
+{
+    VERIFY(iOffset < 65535);
+    {
+        u32 item = (iOffset << 16) | iOffset;
+        u32 count = number_indices / 2;
+        u32* sit = (u32*)(indices);
+        u32* send = sit + count;
+        u32* dit = (u32*)(iDest);
+        for (; sit != send; dit++, sit++)
+            *dit = *sit + item;
+        if (number_indices & 1)
+            iDest[number_indices - 1] = u16(indices[number_indices - 1] + u16(iOffset));
+    }
+}
+
 void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, u32 iOffset)
 {
     // Transfer vertices
@@ -33,19 +54,7 @@ void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, 
         }
     }
 
-    // Transfer indices (in 32bit lines)
-    VERIFY(iOffset < 65535);
-    {
-        u32 item = (iOffset << 16) | iOffset;
-        u32 count = number_indices / 2;
-        LPDWORD sit = LPDWORD(indices);
-        LPDWORD send = sit + count;
-        LPDWORD dit = LPDWORD(iDest);
-        for (; sit != send; dit++, sit++)
-            *dit = *sit + item;
-        if (number_indices & 1)
-            iDest[number_indices - 1] = u16(indices[number_indices - 1] + u16(iOffset));
-    }
+    transfer_indices(iDest, iOffset);
 }
 
 void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, u32 iOffset, float du, float dv)
@@ -63,19 +72,7 @@ void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, 
         }
     }
 
-    // Transfer indices (in 32bit lines)
-    VERIFY(iOffset < 65535);
-    {
-        u32 item = (iOffset << 16) | iOffset;
-        u32 count = number_indices / 2;
-        LPDWORD sit = LPDWORD(indices);
-        LPDWORD send = sit + count;
-        LPDWORD dit = LPDWORD(iDest);
-        for (; sit != send; dit++, sit++)
-            *dit = *sit + item;
-        if (number_indices & 1)
-            iDest[number_indices - 1] = u16(indices[number_indices - 1] + u16(iOffset));
-    }
+    transfer_indices(iDest, iOffset);
 }
 
 void CDetail::Load(IReader* S)

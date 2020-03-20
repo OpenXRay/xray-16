@@ -71,14 +71,14 @@ void CUIActorMenu::InitPartnerInfo()
     if (m_pPartnerInvOwner)
     {
         if (m_pPartnerInvOwner->use_simplified_visual())
-            GetModeSpecificPartnerInfo()->ClearInfo();
+            GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
         else
-            GetModeSpecificPartnerInfo()->InitCharacter(m_pPartnerInvOwner->object_id());
+            GetModeSpecificPartnerInfo(m_currMenuMode)->InitCharacter(m_pPartnerInvOwner->object_id());
 
         SetInvBox(nullptr);
     }
     else
-        GetModeSpecificPartnerInfo()->ClearInfo();
+        GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
 }
 
 void CUIActorMenu::SetInvBox(CInventoryBox* box)
@@ -95,7 +95,8 @@ void CUIActorMenu::SetInvBox(CInventoryBox* box)
 void CUIActorMenu::SetMenuMode(EMenuMode mode)
 {
     SetCurrentItem(NULL);
-    m_hint_wnd->set_text(NULL);
+    if (m_hint_wnd)
+        m_hint_wnd->set_text(NULL);
     m_message_static = nullptr;
 
     if (mode != m_currMenuMode)
@@ -144,7 +145,8 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         default: R_ASSERT(0); break;
         }
         InitActorInfo();
-        InitPartnerInfo();
+        if (m_currMenuMode != mmUndefined && m_currMenuMode != mmInventory)
+            InitPartnerInfo();
         CurModeToScript();
     } // if
 
@@ -189,7 +191,8 @@ void CUIActorMenu::Draw()
     inherited::Draw();
     if (m_ItemInfo)
         m_ItemInfo->Draw();
-    m_hint_wnd->Draw();
+    if (m_hint_wnd)
+        m_hint_wnd->Draw();
     if (m_message_static)
         m_message_static->Draw();
 }
@@ -250,7 +253,8 @@ void CUIActorMenu::Update()
     inherited::Update();
     if (m_ItemInfo)
         m_ItemInfo->Update();
-    m_hint_wnd->Update();
+    if (m_hint_wnd)
+        m_hint_wnd->Update();
 }
 
 bool CUIActorMenu::StopAnyMove() // true = актёр не идёт при открытом меню
@@ -308,7 +312,7 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
         return iActorSlot;
     if (l == m_pLists[eInventoryHelmetList] && m_pLists[eInventoryHelmetList] != nullptr)
         return iActorSlot;
-    if (l == m_pLists[eInventoryDetectorList])
+    if (l == m_pLists[eInventoryDetectorList] && m_pLists[eInventoryDetectorList] != nullptr)
         return iActorSlot;
 
     if (l == m_pLists[eTradeActorBagList])
@@ -470,14 +474,21 @@ CUICharacterInfo* CUIActorMenu::GetModeSpecificActorInfo() const
     return m_ActorCharacterInfo;
 }
 
-CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo() const
+CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo(EMenuMode fallback) const
 {
     switch (m_currMenuMode)
     {
     case mmTrade:          return m_TradePartnerCharacterInfo;
     case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
     }
-    return m_PartnerCharacterInfo;
+    if (m_PartnerCharacterInfo)
+        return m_PartnerCharacterInfo;
+    switch (fallback)
+    {
+    case mmTrade:          return m_TradePartnerCharacterInfo;
+    case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
+    }
+    return nullptr;
 }
 
 void CUIActorMenu::UpdateItemsPlace()
@@ -508,7 +519,8 @@ void CUIActorMenu::clear_highlight_lists()
     if (m_pLists[eInventoryHelmetList])
         m_pLists[eInventoryHelmetList]->Highlight(false);
     m_pLists[eInventoryOutfitList]->Highlight(false);
-    m_pLists[eInventoryDetectorList]->Highlight(false);
+    if (m_pLists[eInventoryDetectorList])
+        m_pLists[eInventoryDetectorList]->Highlight(false);
     m_pLists[eInventoryBeltList]->Highlight(false);
     m_pLists[eInventoryBagList]->clear_select_armament();
     if (m_pQuickSlot)
@@ -568,7 +580,8 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     }
     if (detector && slot_id == DETECTOR_SLOT)
     {
-        m_pLists[eInventoryDetectorList]->Highlight(true);
+        if (m_pLists[eInventoryDetectorList])
+            m_pLists[eInventoryDetectorList]->Highlight(true);
         return;
     }
     if (eatable)
@@ -836,7 +849,8 @@ void CUIActorMenu::ClearAllLists()
     m_pLists[eInventoryOutfitList]->ClearAll(true);
     if (m_pLists[eInventoryHelmetList])
         m_pLists[eInventoryHelmetList]->ClearAll(true);
-    m_pLists[eInventoryDetectorList]->ClearAll(true);
+    if (m_pLists[eInventoryDetectorList])
+        m_pLists[eInventoryDetectorList]->ClearAll(true);
     m_pLists[eInventoryPistolList]->ClearAll(true);
     m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)

@@ -20,6 +20,13 @@
 #define GAME_VERSION "1.6.02"
 #define REGISTRY_PATH "Software\\GSC Game World\\STALKER-COP\\"
 #endif
+#define GAMESPY_GAMEKEY "LTU2z2"
+
+#define GAMESPY_GAMENAME_CS "stalkercs"
+#define GAMESPY_GAMEKEY_CS "PQ7tFU"
+
+#define GAMESPY_GAMENAME_SOC "stalkersc"
+#define GAMESPY_GAMEKEY_SOC "t9Fj3Mx"
 
 #define GAMESPY_GP_NAMESPACE_ID 1 /*gamespy global namespace*/
 

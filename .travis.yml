@@ -82,7 +82,7 @@ before_script:
        wget http://launchpadlibrarian.net/297657456/libsdl2-dev_2.0.5+dfsg1-1ubuntu1_i386.deb;
        sudo dpkg -i *.deb;
        sudo apt-get -f -y install;
-       CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_ASM_FLAGS=-m32;
+       CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32;
     fi
 
 script:

@@ -29,6 +29,43 @@
 #include "ActorHelmet.h"
 #include "Inventory.h"
 
+static class CUISpotXmlManager : public CUIResetNotifier, public pureAppEnd
+{
+    CUIXml m_xml;
+    bool m_loaded{};
+
+public:
+    void Load()
+    {
+        if (m_loaded)
+            return;
+        m_loaded = m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_spots.xml");
+    }
+
+    void OnAppEnd() override
+    {
+        m_xml.ClearInternal();
+        m_loaded = false;
+    }
+
+    void OnUIReset() override
+    {
+        OnAppEnd();
+        if (g_pGameLevel)
+            Load();
+    }
+
+    operator CUIXml*()
+    {
+        return &m_xml;
+    }
+
+    CUIXml* operator->()
+    {
+        return &m_xml;
+    }
+} g_uiSpotXml;
+
 CMapLocation::CMapLocation(LPCSTR type, u16 object_id)
 {
     m_flags.zero();
@@ -52,7 +89,7 @@ CMapLocation::CMapLocation(LPCSTR type, u16 object_id)
     m_actual_time = 0;
     m_owner_se_object = (ai().get_alife()) ? ai().alife().objects().object(m_objectID, true) : NULL;
     m_flags.set(eHintEnabled, TRUE);
-    LoadSpot(type, false);
+    LoadSpot(type);
 
     DisablePointer();
 
@@ -83,14 +120,9 @@ void CMapLocation::destroy()
     delete_data(m_complex_spot_border_na);
 }
 
-CUIXml* g_uiSpotXml = NULL;
-void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
+void CMapLocation::LoadSpot(LPCSTR type)
 {
-    if (!g_uiSpotXml)
-    {
-        g_uiSpotXml = new CUIXml();
-        g_uiSpotXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_spots.xml");
-    }
+    g_uiSpotXml.Load();
 
     string512 path_base, path;
     xr_strcpy(path_base, type);
@@ -130,7 +162,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
-            if (!bReload)
+            if (!m_level_spot)
             {
                 m_level_spot = new CMapSpot(this);
             }
@@ -138,7 +170,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         }
         else
         {
-            VERIFY(!(bReload && m_level_spot));
+            xr_delete(m_level_spot);
         }
 
         m_spot_border_names[0] = g_uiSpotXml->ReadAttrib(path, 0, "spot_a", "level_map_spot_border");
@@ -147,7 +179,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         str = g_uiSpotXml->ReadAttrib(path, 0, "pointer", "");
         if (xr_strlen(str))
         {
-            if (!bReload)
+            if (!m_level_spot_pointer)
             {
                 m_level_spot_pointer = new CMapSpotPointer(this);
             }
@@ -155,8 +187,13 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         }
         else
         {
-            VERIFY(!(bReload && m_level_spot_pointer));
+            xr_delete(m_level_spot_pointer);
         }
+    }
+    else
+    {
+        xr_delete(m_level_spot);
+        xr_delete(m_level_spot_pointer);
     }
 
     strconcat(sizeof(path), path, path_base, ":mini_map");
@@ -166,7 +203,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
-            if (!bReload)
+            if (!m_minimap_spot)
             {
                 m_minimap_spot = new CMiniMapSpot(this);
             }
@@ -174,7 +211,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         }
         else
         {
-            VERIFY(!(bReload && m_minimap_spot));
+            xr_delete(m_minimap_spot);
         }
         m_spot_border_names[2] = g_uiSpotXml->ReadAttrib(path, 0, "spot_a", "mini_map_spot_border");
         m_spot_border_names[3] = g_uiSpotXml->ReadAttrib(path, 0, "spot_na", "");
@@ -182,7 +219,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         str = g_uiSpotXml->ReadAttrib(path, 0, "pointer", "");
         if (xr_strlen(str))
         {
-            if (!bReload)
+            if (!m_minimap_spot_pointer)
             {
                 m_minimap_spot_pointer = new CMapSpotPointer(this);
             }
@@ -190,8 +227,13 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         }
         else
         {
-            VERIFY(!(bReload && m_minimap_spot_pointer));
+            xr_delete(m_minimap_spot_pointer);
         }
+    }
+    else
+    {
+        xr_delete(m_minimap_spot);
+        xr_delete(m_minimap_spot_pointer);
     }
 
     strconcat(sizeof(path), path, path_base, ":complex_spot");
@@ -201,7 +243,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
-            if (!bReload)
+            if (!m_complex_spot)
             {
                 m_complex_spot = new CComplexMapSpot(this);
             }
@@ -209,7 +251,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         }
         else
         {
-            VERIFY(!(bReload && m_complex_spot));
+            xr_delete(m_complex_spot);
         }
         m_spot_border_names[4] = g_uiSpotXml->ReadAttrib(path, 0, "spot_a", "complex_map_spot_border");
         m_spot_border_names[5] = g_uiSpotXml->ReadAttrib(path, 0, "spot_na", "");
@@ -217,7 +259,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         str = g_uiSpotXml->ReadAttrib(path, 0, "pointer", "");
         if (xr_strlen(str))
         {
-            if (!bReload)
+            if (!m_complex_spot_pointer)
             {
                 m_complex_spot_pointer = new CMapSpotPointer(this);
             }
@@ -225,8 +267,13 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
         }
         else
         {
-            VERIFY(!(bReload && m_complex_spot_pointer));
+            xr_delete(m_complex_spot_pointer);
         }
+    }
+    else
+    {
+        xr_delete(m_complex_spot);
+        xr_delete(m_complex_spot_pointer);
     }
 
     if (m_minimap_spot == NULL && m_level_spot == NULL && m_complex_spot == NULL)
@@ -775,7 +822,7 @@ bool CRelationMapLocation::Update()
 
     if (m_curr_spot_name != sname)
     {
-        LoadSpot(*sname, true);
+        LoadSpot(*sname);
         m_curr_spot_name = sname;
     }
     // update visibility

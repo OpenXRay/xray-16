@@ -46,7 +46,6 @@ void init_game_globals()
         CInfoPortion::InitInternal(ShadowOfChernobylMode || ClearSkyMode);
         CEncyclopediaArticle::InitInternal(ShadowOfChernobylMode);
         CPhraseDialog::InitInternal();
-        InventoryUtilities::CreateShaders();
     };
     CCharacterInfo::InitInternal();
     CSpecificCharacter::InitInternal();
@@ -55,9 +54,6 @@ void init_game_globals()
     CHARACTER_REPUTATION::InitInternal();
     MONSTER_COMMUNITY::InitInternal();
 }
-
-extern CUIXml* g_uiSpotXml;
-extern CUIXml* pWpnScopeXml;
 
 void clean_game_globals()
 {
@@ -81,8 +77,6 @@ void clean_game_globals()
 
         CPhraseDialog::DeleteSharedData();
         CPhraseDialog::DeleteIdToIndexData();
-
-        InventoryUtilities::DestroyShaders();
     }
     CCharacterInfo::DeleteSharedData();
     CCharacterInfo::DeleteIdToIndexData();
@@ -98,8 +92,7 @@ void clean_game_globals()
     // static shader for blood
     CEntityAlive::UnloadBloodyWallmarks();
     CEntityAlive::UnloadFireParticles();
-    // Очищение таблицы цветов
-    CUIXmlInit::DeleteColorDefs();
+
     // Очищение таблицы идентификаторов рангов и отношений сталкеров
     InventoryUtilities::ClearCharacterInfoStrings();
 
@@ -113,8 +106,5 @@ void clean_game_globals()
     RELATION_REGISTRY::clear_relation_registry();
 
     clean_wnd_rects();
-    xr_delete(g_uiSpotXml);
     DestroyUIGeom();
-    xr_delete(pWpnScopeXml);
-    CUITextureMaster::FreeTexInfo();
 }

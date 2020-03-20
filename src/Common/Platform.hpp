@@ -12,6 +12,8 @@
 
 #if defined(_M_X64) || defined(__amd64__) || defined(__x86_64__)
 #define XR_X64
+#elif defined (__aarch64__)
+#define XR_ARM64
 #else
 #define XR_X86
 #endif

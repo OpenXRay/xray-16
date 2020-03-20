@@ -20,7 +20,7 @@ ENGINE_API extern Flags32 psHUD_Flags;
 class IGameObject;
 
 class ENGINE_API CCustomHUD : public FactoryObjectBase, public IEventReceiver,
-                              public CUIResetAndResolutionNotifier
+                              public CUIResetNotifier
 {
 public:
     CCustomHUD();

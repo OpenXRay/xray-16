@@ -23,6 +23,14 @@ enum EGameIDs
     eGameIDTeamDominationZone = u32(1) << 6,
 };
 
+// This enum should "extend" EGameIDs with the values which are defined in SoC.
+// It's necessary for correct displaying game types in the unified master-list
+enum EGameIDs_ext
+{
+    eGameIDTeamDeathmatch_SoC = u32(6),
+    eGameIDArtefactHunt_SoC = u32(7),
+};
+
 inline EGameIDs ParseStringToGameType(pcstr str)
 {
     auto IS = [&](pcstr name)

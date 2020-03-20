@@ -85,7 +85,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
 }
 }
 
-CGameSpy_Browser::CGameSpy_Browser()
+CGameSpy_Browser::CGameSpy_Browser(const SMasterListConfig& masterListCfg)
 #ifdef CONFIG_PROFILE_LOCKS
     : m_refresh_lock(MUTEX_PROFILE_ID(CGameSpy_Browser::m_refresh_lock))
 #endif // CONFIG_PROFILE_LOCKS
@@ -94,13 +94,11 @@ CGameSpy_Browser::CGameSpy_Browser()
     m_pGSBrowser = NULL;
     m_pQR2 = new CGameSpy_QR2();
     m_pQR2->RegisterAdditionalKeys();
-    m_bAbleToConnectToMasterServer = true;
     m_bTryingToConnectToMasterServer = false;
     m_bShowCMSErr = false;
-    char secretKey[16];
-    FillSecretKey(secretKey);
-    m_pGSBrowser = ServerBrowserNewA(GAMESPY_GAMENAME, GAMESPY_GAMENAME, secretKey, 0, GAMESPY_BROWSER_MAX_UPDATES,
-        QVERSION_QR2, SBFalse, SBCallback, this);
+    m_inited = false;
+    m_pGSBrowser = ServerBrowserNewA(masterListCfg.gamename, masterListCfg.gamename, masterListCfg.secretkey, 0,
+        GAMESPY_BROWSER_MAX_UPDATES, QVERSION_QR2, SBFalse, SBCallback, this);
     if (!m_pGSBrowser)
     {
         Msg("! Unable to init Server Browser!");
@@ -111,9 +109,6 @@ CGameSpy_Browser::CGameSpy_Browser()
 
 CGameSpy_Browser::~CGameSpy_Browser()
 {
-    if (onDestroy)
-        onDestroy(this);
-
     Clear();
 
     delete_data(m_pQR2);
@@ -126,19 +121,19 @@ CGameSpy_Browser::~CGameSpy_Browser()
 
 static bool services_checked = false;
 
-bool CGameSpy_Browser::Init(UpdateCallback updateCb, DestroyCallback destroyCb)
+bool CGameSpy_Browser::Init(UpdateCallback updateCb)
 {
-    if (onDestroy)
-        onDestroy(this);
+    if (m_inited)
+        Clear();
     onUpdate = updateCb;
-    onDestroy = destroyCb;
+    m_inited = true;
     return true;
 };
 
 void CGameSpy_Browser::Clear()
 {
     onUpdate.clear();
-    onDestroy.clear();
+    m_inited = false;
 };
 
 struct RefreshData
@@ -161,7 +156,6 @@ void CGameSpy_Browser::RefreshListInternet(const char* FilterStr)
     const int fieldCount = sizeof(targetFields) / sizeof(targetFields[0]);
     SBError error =
         ServerBrowserUpdateA(m_pGSBrowser, onUpdate ? SBTrue : SBFalse, SBFalse, targetFields, fieldCount, FilterStr);
-    m_bAbleToConnectToMasterServer = (error == sbe_noerror);
     m_bShowCMSErr = (error != sbe_noerror);
     m_bTryingToConnectToMasterServer = false;
 
@@ -185,8 +179,6 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
     {
         m_refresh_lock.Enter();
         m_refresh_lock.Leave();
-        if (!m_bAbleToConnectToMasterServer)
-            return GSUpdateStatus::MasterUnreachable;
         RefreshData* pRData = new RefreshData();
         xr_strcpy(pRData->FilterStr, FilterStr);
         pRData->pGSBrowser = this;
@@ -392,7 +384,7 @@ GSUpdateStatus CGameSpy_Browser::Update()
 void CGameSpy_Browser::UpdateServerList()
 {
     if (onUpdate)
-        onUpdate();
+        onUpdate(this);
 }
 
 void CGameSpy_Browser::SortBrowserByPing() { ServerBrowserSortA(m_pGSBrowser, SBTrue, "ping", sbcm_int); }

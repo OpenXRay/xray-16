@@ -51,7 +51,7 @@ struct TipString
 };
 
 class ENGINE_API CConsole : public pureRender, public pureFrame,
-                            public CUIResetAndResolutionNotifier
+                            public CUIResetNotifier
 {
 public:
     struct str_pred

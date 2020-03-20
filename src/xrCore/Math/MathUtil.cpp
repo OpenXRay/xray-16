@@ -11,7 +11,9 @@
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/light.h"
 #endif
+#if defined(XR_X86) || defined(XR_X64)
 #include "PLC_SSE.hpp"
+#endif
 #if defined(WINDOWS) && defined(XR_X86)
 #include "SkinXW_SSE.hpp"
 #else
@@ -48,9 +50,14 @@ void Initialize()
     Skin2W = Skin2W_CPP;
     Skin3W = Skin3W_CPP;
     Skin4W = Skin4W_CPP;
+#if defined(XR_ARM64)
+    PLCCalc = PLCCalc_CPP;
+#else
     PLCCalc = PLCCalc_SSE;
+#endif
     //PLCCalc = PLCCalc_CPP;
 #endif
+
     // XXX: use PLC_energy and iCeil too
     // SSE implementations of this functions is not used.
     // Found duplicate implementation in src\Layers\xrRenderPC_R1\LightShadows.cpp

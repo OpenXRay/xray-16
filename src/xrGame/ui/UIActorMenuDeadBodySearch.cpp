@@ -57,7 +57,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     ShowIfExist(m_LeftBackground, true);
     m_PartnerWeightBar->Show(true);
     m_takeall_button->Show(true);
-    GetModeSpecificPartnerInfo()->Show(nullptr != m_pPartnerInvOwner);
+    GetModeSpecificPartnerInfo(mmDeadBodySearch)->Show(nullptr != m_pPartnerInvOwner);
 
     InitInventoryContents(m_pLists[eSearchLootActorBagList],
         m_pLists[eSearchLootActorBagList] != m_pLists[eInventoryBagList]);
@@ -114,7 +114,7 @@ void CUIActorMenu::DeInitDeadBodySearchMode() const
     ShowIfExist(m_pSearchLootWnd, false);
     m_pLists[eSearchLootBagList]->Show(false);
     m_pLists[eSearchLootActorBagList]->Show(false);
-    GetModeSpecificPartnerInfo()->Show(false);
+    GetModeSpecificPartnerInfo(mmDeadBodySearch)->Show(false);
     ShowIfExist(m_LeftBackground, false);
     m_PartnerWeightBar->Show(false);
     m_takeall_button->Show(false);
