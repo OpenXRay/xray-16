@@ -5,10 +5,10 @@
 #include "tbb/blocked_range.h"
 
 #ifndef _EDITOR
-#if defined(XR_ARM) || defined(XR_ARM64)
-#include "Externals/sse2neon/sse2neon.h"
-#else
+#if defined(XR_X86) || defined(XR_X64)
 #include <xmmintrin.h>
+#elif defined(XR_ARM) || defined(XR_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
 #endif
 #endif
 
@@ -277,8 +277,6 @@ void CParticleEffect::OnDeviceDestroy()
     }
 }
 
-#ifndef _EDITOR
-//----------------------------------------------------
 IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float angle)
 {
@@ -313,8 +311,49 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const 
     pv++;
 }
 
+IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const Fvector2& lt, const Fvector2& rb,
+    float r1, float r2, u32 clr, float angle)
+{
+    float sa = _sin(angle);
+    float ca = _cos(angle);
+    const Fvector& T = dir;
+
+    Fvector R;
+    R.crossproduct(T, RDEVICE.vCameraDirection).normalize_safe();
+
+    Fvector Vr, Vt;
+
+    Vr.x = T.x * r1 * sa + R.x * r1 * ca;
+    Vr.y = T.y * r1 * sa + R.y * r1 * ca;
+    Vr.z = T.z * r1 * sa + R.z * r1 * ca;
+
+    Vt.x = T.x * r2 * ca - R.x * r2 * sa;
+    Vt.y = T.y * r2 * ca - R.y * r2 * sa;
+    Vt.z = T.z * r2 * ca - R.z * r2 * sa;
+
+    Fvector a, b, c, d;
+
+    a.sub(Vt, Vr);
+    b.add(Vt, Vr);
+
+    c.invert(a);
+    d.invert(b);
+
+    pv->set(d.x + pos.x, d.y + pos.y, d.z + pos.z, clr, lt.x, rb.y);
+    pv++;
+    pv->set(a.x + pos.x, a.y + pos.y, a.z + pos.z, clr, lt.x, lt.y);
+    pv++;
+    pv->set(c.x + pos.x, c.y + pos.y, c.z + pos.z, clr, rb.x, rb.y);
+    pv++;
+    pv->set(b.x + pos.x, b.y + pos.y, b.z + pos.z, clr, rb.x, lt.y);
+    pv++;
+}
+
+#ifndef _EDITOR
+//----------------------------------------------------
 Lock m_sprite_section;
 
+#if defined(XR_X86) || defined(XR_X64)
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -430,6 +469,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
 
     FillSprite(pv, T, R, pos, lt, rb, r1, r2, clr, sina, cosa);
 }
+#endif // defined(XR_X86) || defined(XR_X64)
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -442,6 +482,7 @@ struct PRS_PARAMS
     CParticleEffect* pPE;
 };
 
+#if defined(XR_X86) || defined(XR_X64)
 __forceinline void magnitude_sse(Fvector& vec, float& res)
 {
     __m128 tv, tu;
@@ -456,6 +497,7 @@ __forceinline void magnitude_sse(Fvector& vec, float& res)
     tv = _mm_sqrt_ss(tv); // tv = zz | yy | 0 | sqrt( xx + yy + zz )
     _mm_store_ss((float*)&res, tv);
 }
+#endif
 
 void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, CParticleEffect * pPE)
 {
@@ -492,7 +534,11 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
 
             if (pPE->m_Def->m_Flags.is(CPEDef::dfVelocityScale))
             {
+#if defined(XR_X86) || defined(XR_X64)
                 magnitude_sse(m.vel, speed);
+#else
+                speed = m.vel.magnitude();
+#endif
                 speed_calculated = true;
                 r_x += speed * pPE->m_Def->m_VelocityScale.x;
                 r_y += speed * pPE->m_Def->m_VelocityScale.y;
@@ -501,7 +547,11 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
             if (pPE->m_Def->m_Flags.is(CPEDef::dfAlignToPath))
             {
                 if (!speed_calculated)
+#if defined(XR_X86) || defined(XR_X64)
                     magnitude_sse(m.vel, speed);
+#else
+                    speed = m.vel.magnitude();
+#endif
                 if ((speed < EPS_S) && pPE->m_Def->m_Flags.is(CPEDef::dfWorldAlign))
                 {
                     Fmatrix M;
@@ -511,11 +561,19 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                         Fvector p;
                         pPE->m_XFORM.transform_tiny(p, m.pos);
                         M.mulA_43(pPE->m_XFORM);
+#if defined(XR_X86) || defined(XR_X64)
                         FillSprite(pv, M.k, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                        FillSprite_fpu(pv, M.k, M.i, p, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                     }
                     else
                     {
+#if defined(XR_X86) || defined(XR_X64)
                         FillSprite(pv, M.k, M.i, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                        FillSprite_fpu(pv, M.k, M.i, m.pos, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                     }
                 }
                 else if ((speed >= EPS_S) && pPE->m_Def->m_Flags.is(CPEDef::dfFaceAlign))
@@ -535,11 +593,19 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                         Fvector p;
                         pPE->m_XFORM.transform_tiny(p, m.pos);
                         M.mulA_43(pPE->m_XFORM);
+#if defined(XR_X86) || defined(XR_X64)
                         FillSprite(pv, M.j, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                        FillSprite_fpu(pv, M.j, M.i, p, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                     }
                     else
                     {
+#if defined(XR_X86) || defined(XR_X64)
                         FillSprite(pv, M.j, M.i, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                        FillSprite_fpu(pv, M.j, M.i, m.pos, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                     }
                 }
                 else
@@ -554,11 +620,19 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                         Fvector p, d;
                         pPE->m_XFORM.transform_tiny(p, m.pos);
                         pPE->m_XFORM.transform_dir(d, dir);
+#if defined(XR_X86) || defined(XR_X64)
                         FillSprite(pv, p, d, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                        FillSprite_fpu(pv, p, d, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                     }
                     else
                     {
+#if defined(XR_X86) || defined(XR_X64)
                         FillSprite(pv, m.pos, dir, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                        FillSprite_fpu(pv, m.pos, dir, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                     }
                 }
             }
@@ -568,11 +642,19 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                 {
                     Fvector p;
                     pPE->m_XFORM.transform_tiny(p, m.pos);
+#if defined(XR_X86) || defined(XR_X64)
                     FillSprite(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, p, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                    FillSprite_fpu(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, p, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                 }
                 else
                 {
+#if defined(XR_X86) || defined(XR_X64)
                     FillSprite(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
+#else
+                    FillSprite_fpu(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, m.rot.x);
+#endif
                 }
             }
         }
@@ -642,66 +724,19 @@ void CParticleEffect::Render(float)
     }
 }
 
-#else
+#else // _EDITOR
 
 //----------------------------------------------------
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float angle)
 {
-    float sa = _sin(angle);
-    float ca = _cos(angle);
-    Fvector Vr, Vt;
-    Vr.x = T.x * r1 * sa + R.x * r1 * ca;
-    Vr.y = T.y * r1 * sa + R.y * r1 * ca;
-    Vr.z = T.z * r1 * sa + R.z * r1 * ca;
-    Vt.x = T.x * r2 * ca - R.x * r2 * sa;
-    Vt.y = T.y * r2 * ca - R.y * r2 * sa;
-    Vt.z = T.z * r2 * ca - R.z * r2 * sa;
-
-    Fvector a, b, c, d;
-    a.sub(Vt, Vr);
-    b.add(Vt, Vr);
-    c.invert(a);
-    d.invert(b);
-    pv->set(d.x + pos.x, d.y + pos.y, d.z + pos.z, clr, lt.x, rb.y);
-    pv++;
-    pv->set(a.x + pos.x, a.y + pos.y, a.z + pos.z, clr, lt.x, lt.y);
-    pv++;
-    pv->set(c.x + pos.x, c.y + pos.y, c.z + pos.z, clr, rb.x, rb.y);
-    pv++;
-    pv->set(b.x + pos.x, b.y + pos.y, b.z + pos.z, clr, rb.x, lt.y);
-    pv++;
+    FillSprite_fpu(pv, T, R, pos, lt, rb, r1, r2, clr, angle);
 }
 
 IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const Fvector2& lt, const Fvector2& rb,
     float r1, float r2, u32 clr, float angle)
 {
-    float sa = _sin(angle);
-    float ca = _cos(angle);
-    const Fvector& T = dir;
-    Fvector R;
-    R.crossproduct(T, RDEVICE.vCameraDirection).normalize_safe();
-    Fvector Vr, Vt;
-    Vr.x = T.x * r1 * sa + R.x * r1 * ca;
-    Vr.y = T.y * r1 * sa + R.y * r1 * ca;
-    Vr.z = T.z * r1 * sa + R.z * r1 * ca;
-    Vt.x = T.x * r2 * ca - R.x * r2 * sa;
-    Vt.y = T.y * r2 * ca - R.y * r2 * sa;
-    Vt.z = T.z * r2 * ca - R.z * r2 * sa;
-
-    Fvector a, b, c, d;
-    a.sub(Vt, Vr);
-    b.add(Vt, Vr);
-    c.invert(a);
-    d.invert(b);
-    pv->set(d.x + pos.x, d.y + pos.y, d.z + pos.z, clr, lt.x, rb.y);
-    pv++;
-    pv->set(a.x + pos.x, a.y + pos.y, a.z + pos.z, clr, lt.x, lt.y);
-    pv++;
-    pv->set(c.x + pos.x, c.y + pos.y, c.z + pos.z, clr, rb.x, rb.y);
-    pv++;
-    pv->set(b.x + pos.x, b.y + pos.y, b.z + pos.z, clr, rb.x, lt.y);
-    pv++;
+    FillSprite_fpu(pv, pos, dir, lt, rb, r1, r2, clr, angle);
 }
 
 extern ENGINE_API float psHUD_FOV;
