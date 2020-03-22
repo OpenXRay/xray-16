@@ -5,7 +5,11 @@
 #include "tbb/blocked_range.h"
 
 #ifndef _EDITOR
+#if defined(XR_ARM) || defined(XR_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
+#else
 #include <xmmintrin.h>
+#endif
 #endif
 
 #if defined(LINUX)
