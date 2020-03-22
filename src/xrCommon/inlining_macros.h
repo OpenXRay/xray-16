@@ -4,7 +4,7 @@
 #define NO_INLINE __attribute__((noinline))
 #define FORCE_INLINE __attribute__((always_inline)) inline
 #define ALIGN(a) __attribute__((aligned(a)))
-#define DEBUG_BREAK __builtin_trap()
+#define DEBUG_BREAK __asm__ volatile ("int $3");
 #elif defined(_MSC_VER)
 #define NO_INLINE __declspec(noinline)
 #define FORCE_INLINE __forceinline
