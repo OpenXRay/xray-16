@@ -14,7 +14,29 @@
 #define XR_IMPORT __declspec(dllimport)
 #endif
 
-#include "xrCommon/inlining_macros.h"
+#if defined(__GNUC__)
+  #define NO_INLINE             __attribute__((noinline))
+  #define FORCE_INLINE          __attribute__((always_inline)) inline
+  #define ALIGN(a)              __attribute__((aligned(a)))
+
+  // Debugger trap implementation
+  #if defined(XR_X86) || defined(XR_X64)
+    #define DEBUG_BREAK         do { __asm__ volatile ("int $3"); } while(0)
+  #else
+    // XXX: put remain platform specifics here
+  #endif
+#elif defined(_MSC_VER)
+  #define NO_INLINE             __declspec(noinline)
+  #define FORCE_INLINE          __forceinline
+  #define ALIGN(a)              __declspec(align(a))
+  #define DEBUG_BREAK           __debugbreak()
+  #define __thread              __declspec(thread)
+#endif
+
+// XXX: remove IC/ICF/ICN
+#define IC                      inline
+#define ICF                     FORCE_INLINE
+#define ICN                     NO_INLINE
 
 #if defined(__GNUC__)
 #define XR_ASSUME(expr)  if (expr){} else __builtin_unreachable()

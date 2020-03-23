@@ -42,9 +42,6 @@
     <ClInclude Include="Compiler.inl">
       <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrCommon\inlining_macros.h">
-      <Filter>xrCommon</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrCommon\math_funcs.h">
       <Filter>xrCommon</Filter>
     </ClInclude>

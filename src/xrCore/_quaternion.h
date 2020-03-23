@@ -1,7 +1,6 @@
 #pragma once
 #ifndef __Q__
 #define __Q__
-#include "xrCommon/inlining_macros.h"
 #include "_vector3d.h"
 
 /***************************************************************************
