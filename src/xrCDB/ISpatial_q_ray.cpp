@@ -8,10 +8,10 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(XR_ARM) || defined(XR_ARM64)
-#include "Externals/sse2neon/sse2neon.h"
-#else
+#if defined(XR_X86) || defined(XR_X64)
 #include <xmmintrin.h>
+#elif defined(XR_ARM) || defined(XR_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
 #endif
 #pragma warning(pop)
 
