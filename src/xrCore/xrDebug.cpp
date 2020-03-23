@@ -49,6 +49,8 @@ static BOOL bException = FALSE;
 #elif defined(LINUX)
 #include <sys/user.h>
 #include <sys/ptrace.h>
+#include <cxxabi.h>
+#include <dlfcn.h>
 #include <execinfo.h>
 #endif
 #pragma comment(lib, "FaultRep.lib")
@@ -436,14 +438,31 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     char **strings = backtrace_symbols(array, nptrs);
 
     if(strings)
+    {
         for (size_t i = 0; i < nptrs; i++)
         {
-            Log(strings[i]);
+            char *functionName = strings[i];
+            char *demangledName = nullptr;
+            Dl_info info;
+
+            if (dladdr(array[i], &info))
+            {
+                int status = -1;
+                demangledName = abi::__cxa_demangle(info.dli_sname, nullptr,
+                    nullptr, &status);
+                if (status == 0)
+                {
+                    functionName = demangledName;
+                }
+            }
+            Log(functionName);
     #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-            buffer += xr_sprintf(buffer, bufferSize, "%s\n", strings[i]);
+            buffer += xr_sprintf(buffer, bufferSize, "%s\n", functionName);
     #endif // USE_OWN_ERROR_MESSAGE_WINDOW
+            ::free(demangledName);
         }
 #endif
+    }
     FlushLog();
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
