@@ -284,7 +284,15 @@ bool g_initialize_cpu_called = false;
 u32 cpufreq()
 {
     u32 cpuFreq = 0;
-
+#if defined(XR_ARM64) || defined(XR_ARM)
+    xr_string parcedFreq;
+    std::ifstream cpuMaxFreq("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
+    if(cpuMaxFreq.is_open())
+    {
+        getline(cpuMaxFreq, parcedFreq);
+        cpuFreq = atol(parcedFreq.c_str()) / 1000;
+    }
+#else
     // CPU frequency is stored in /proc/cpuinfo in lines beginning with "cpu MHz"
     pcstr pattern = "^cpu MHz\\s*:\\s*(\\d+)";
     pcstr pcreErrorStr = nullptr;
@@ -319,6 +327,7 @@ u32 cpufreq()
     }
 
     pcre_free(reCompiled);
+#endif
     return cpuFreq;
 }
 #elif defined(FREEBSD)
