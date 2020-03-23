@@ -23,7 +23,7 @@ shared_str xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const
 
     std::string signature;
     CryptoPP::DSA::Signer signer(private_key);
-    CryptoPP::StringSource(data, data_size, true,\
+    CryptoPP::StringSource(data, data_size, true,
         new CryptoPP::SignerFilter(m_rng, signer, new CryptoPP::StringSink(signature)) // SignerFilter
     ); // StringSource
 
