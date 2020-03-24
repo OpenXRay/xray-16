@@ -22,9 +22,21 @@
 // Debugger trap implementation
 #if defined(XR_X86) || defined(XR_X64)
 #define DEBUG_BREAK             do { __asm__ volatile ("int $3"); } while(0)
+#elif defined(XR_ARM)
+#define DEBUG_BREAK             do { __asm__ volatile (".inst 0xe7f001f0"); } while(0)
+#elif defined(XR_ARM64)
+#define DEBUG_BREAK             do { __asm__ volatile (".inst 0xd4200000"); } while(0)
+#elif __has_include(<signal.h>)
+#include <signal.h>
+#if defined(SIGTRAP)
+#define DEBUG_BREAK             raise(SIGTRAP) // SIGTRAP is preferred
 #else
-// XXX: put remain platform specifics here
+#define DEBUG_BREAK             __builtin_trap() // raises SIGILL
 #endif
+#else
+#define DEBUG_BREAK             __builtin_trap() // raises SIGILL
+#endif
+
 #elif defined(_MSC_VER)
 #define NO_INLINE               __declspec(noinline)
 #define FORCE_INLINE            __forceinline
