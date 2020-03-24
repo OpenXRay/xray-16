@@ -18,7 +18,11 @@
 #elif defined(LINUX) || defined(FREEBSD)
 #if defined(XR_X86) || defined(XR_X64)
 #include <x86intrin.h> // __rdtsc
-#endif
+#elif defined(XR_ARM)
+#include <sys/syscall.h>
+#include <linux/perf_event.h>
+#endif // defined(XR_ARM)
+
 #ifdef LINUX
 #include <fpu_control.h>
 #elif defined(FREEBSD)
@@ -47,12 +51,33 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <thread>
 #include "SDL.h"
 
-#if defined(XR_ARM64)
+#if defined(XR_ARM) || defined(XR_ARM64)
 #define _FPU_EXTENDED 0
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
 #define _FPU_RC_NEAREST 0
-#endif
+
+#if defined(XR_ARM)
+static class PerfInit
+{
+public:
+    int fddev = -1;
+
+public:
+    PerfInit()
+    {
+        static struct perf_event_attr attr;
+        attr.type = PERF_TYPE_HARDWARE;
+        attr.config = PERF_COUNT_HW_CPU_CYCLES;
+        fddev = syscall(__NR_perf_event_open, &attr, 0, -1, -1, 0);
+    }
+    ~PerfInit()
+    {
+        close(fddev);
+    }
+} s_perf_init;
+#endif // defined(XR_ARM)
+#endif // defined(XR_ARM) || defined(XR_ARM64)
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
@@ -217,7 +242,12 @@ XRCORE_API u64 QPC() noexcept
 
 XRCORE_API u64 GetCLK()
 {
-#if defined(XR_ARM64)
+#if defined(XR_ARM)
+    long long result = 0;
+    if (read(s_perf_init.fddev, &result, sizeof(result)) < sizeof(result))
+        return 0;
+    return result;
+#elif defined(XR_ARM64)
     int64_t virtual_timer_value;
     asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
     return virtual_timer_value;
@@ -244,7 +274,15 @@ bool g_initialize_cpu_called = false;
 u32 cpufreq()
 {
     u32 cpuFreq = 0;
-
+#if defined(XR_ARM64) || defined(XR_ARM)
+    xr_string parcedFreq;
+    std::ifstream cpuMaxFreq("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
+    if (cpuMaxFreq.is_open())
+    {
+        getline(cpuMaxFreq, parcedFreq);
+        cpuFreq = atol(parcedFreq.c_str()) / 1000;
+    }
+#else
     // CPU frequency is stored in /proc/cpuinfo in lines beginning with "cpu MHz"
     pcstr pattern = "^cpu MHz\\s*:\\s*(\\d+)";
     pcstr pcreErrorStr = nullptr;
@@ -279,6 +317,7 @@ u32 cpufreq()
     }
 
     pcre_free(reCompiled);
+#endif
     return cpuFreq;
 }
 #elif defined(FREEBSD)
@@ -341,7 +380,7 @@ void _initialize_cpu()
 }
 
 // per-thread initialization
-#if defined(XR_ARM64)
+#if defined(XR_ARM) || defined(XR_ARM64)
 #define _MM_SET_FLUSH_ZERO_MODE(mode)
 #define _MM_SET_DENORMALS_ZERO_MODE(mode)
 #else
