@@ -15,7 +15,7 @@ xr_dsa::xr_dsa(u8 const p[public_key_length], u8 const q[private_key_length], u8
 }
 
 xr_dsa::~xr_dsa() {}
-shared_str const xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size)
+shared_str xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size)
 {
     CryptoPP::Integer exp(priv_key.m_value, sizeof(priv_key.m_value));
     CryptoPP::DSA::PrivateKey private_key;
@@ -23,9 +23,9 @@ shared_str const xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32
 
     std::string signature;
     CryptoPP::DSA::Signer signer(private_key);
-    CryptoPP::StringSource(data, data_size, true, new CryptoPP::SignerFilter(m_rng, signer,
-                                                      new CryptoPP::StringSink(signature)) // SignerFilter
-        ); // StringSource
+    CryptoPP::StringSource(data, data_size, true,
+        new CryptoPP::SignerFilter(m_rng, signer, new CryptoPP::StringSink(signature)) // SignerFilter
+    ); // StringSource
 
     return shared_str(signature.c_str());
 }

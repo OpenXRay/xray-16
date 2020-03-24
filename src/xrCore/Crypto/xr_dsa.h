@@ -30,7 +30,7 @@ public:
         u8 m_value[public_key_length];
     }; // struct public_key_t
 
-    shared_str const sign(private_key_t const& priv_key, u8 const* data, u32 const data_size);
+    shared_str sign(private_key_t const& priv_key, u8 const* data, u32 const data_size);
     bool verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign);
 
 #ifdef DEBUG

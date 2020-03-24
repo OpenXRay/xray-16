@@ -2,6 +2,8 @@
 #ifndef XR_DSA_VERIFYER_INCLUDED
 #define XR_DSA_VERIFYER_INCLUDED
 
+#include <optional>
+
 #include <cryptopp/dsa.h>
 
 #include "xr_dsa.h"
@@ -16,14 +18,12 @@ public:
 
     ~xr_dsa_verifyer();
 
-    bool verify(u8 const* data, u32 data_size, shared_str const& dsign);
-    u8 const* get_sha_checksum() const { return m_sha.pointer(); };
+    std::optional<crypto::xr_sha1::hash_t> verify(u8 const* data, u32 data_size, shared_str const& dsign);
 protected:
     crypto::xr_dsa::public_key_t m_public_key;
 
 private:
     crypto::xr_dsa m_dsa;
-    crypto::xr_sha256 m_sha;
 }; // class xr_dsa_verifyer
 
 #endif //#ifndef XR_DSA_VERIFYER_INCLUDED
