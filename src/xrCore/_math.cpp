@@ -16,7 +16,6 @@
 #endif
 
 #elif defined(LINUX) || defined(FREEBSD)
-
 #if defined(XR_X86) || defined(XR_X64)
 #include <x86intrin.h> // __rdtsc
 #elif defined(XR_ARM)
@@ -278,7 +277,7 @@ u32 cpufreq()
 #if defined(XR_ARM64) || defined(XR_ARM)
     xr_string parcedFreq;
     std::ifstream cpuMaxFreq("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
-    if(cpuMaxFreq.is_open())
+    if (cpuMaxFreq.is_open())
     {
         getline(cpuMaxFreq, parcedFreq);
         cpuFreq = atol(parcedFreq.c_str()) / 1000;
