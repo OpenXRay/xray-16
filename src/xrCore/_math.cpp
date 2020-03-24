@@ -19,35 +19,10 @@
 
 #if defined(XR_X86) || defined(XR_X64)
 #include <x86intrin.h> // __rdtsc
-#elif defined(XR_ARM) || defined(XR_ARM64)
-#define _FPU_EXTENDED 0
-#define _FPU_DOUBLE 0
-#define _FPU_SINGLE 0
-#define _FPU_RC_NEAREST 0
-
-#if defined(XR_ARM)
+#elif defined(XR_ARM)
 #include <sys/syscall.h>
 #include <linux/perf_event.h>
-static class PerfInit
-{
-public:
-    int fddev = -1;
-
-public:
-    PerfInit()
-    {
-        static struct perf_event_attr attr;
-        attr.type = PERF_TYPE_HARDWARE;
-        attr.config = PERF_COUNT_HW_CPU_CYCLES;
-        fddev = syscall(__NR_perf_event_open, &attr, 0, -1, -1, 0);
-    }
-    ~PerfInit()
-    {
-        close(fddev);
-    }
-} s_perf_init;
 #endif // defined(XR_ARM)
-#endif // defined(XR_X86) || defined(XR_X64)
 
 #ifdef LINUX
 #include <fpu_control.h>
@@ -76,6 +51,34 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #endif
 #include <thread>
 #include "SDL.h"
+
+#if defined(XR_ARM) || defined(XR_ARM64)
+#define _FPU_EXTENDED 0
+#define _FPU_DOUBLE 0
+#define _FPU_SINGLE 0
+#define _FPU_RC_NEAREST 0
+
+#if defined(XR_ARM)
+static class PerfInit
+{
+public:
+    int fddev = -1;
+
+public:
+    PerfInit()
+    {
+        static struct perf_event_attr attr;
+        attr.type = PERF_TYPE_HARDWARE;
+        attr.config = PERF_COUNT_HW_CPU_CYCLES;
+        fddev = syscall(__NR_perf_event_open, &attr, 0, -1, -1, 0);
+    }
+    ~PerfInit()
+    {
+        close(fddev);
+    }
+} s_perf_init;
+#endif // defined(XR_ARM)
+#endif // defined(XR_ARM) || defined(XR_ARM64)
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
