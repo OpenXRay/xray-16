@@ -16,9 +16,39 @@
 #endif
 
 #elif defined(LINUX) || defined(FREEBSD)
+
 #if defined(XR_X86) || defined(XR_X64)
 #include <x86intrin.h> // __rdtsc
-#endif
+#elif defined(XR_ARM) || defined(XR_ARM64)
+#define _FPU_EXTENDED 0
+#define _FPU_DOUBLE 0
+#define _FPU_SINGLE 0
+#define _FPU_RC_NEAREST 0
+
+#if defined(XR_ARM)
+#include <sys/syscall.h>
+#include <linux/perf_event.h>
+static class PerfInit
+{
+public:
+    int fddev = -1;
+
+public:
+    PerfInit()
+    {
+        static struct perf_event_attr attr;
+        attr.type = PERF_TYPE_HARDWARE;
+        attr.config = PERF_COUNT_HW_CPU_CYCLES;
+        fddev = syscall(__NR_perf_event_open, &attr, 0, -1, -1, 0);
+    }
+    ~PerfInit()
+    {
+        close(fddev);
+    }
+} s_perf_init;
+#endif // defined(XR_ARM)
+#endif // defined(XR_X86) || defined(XR_X64)
+
 #ifdef LINUX
 #include <fpu_control.h>
 #elif defined(FREEBSD)
@@ -46,13 +76,6 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #endif
 #include <thread>
 #include "SDL.h"
-
-#if defined(XR_ARM) || defined(XR_ARM64)
-#define _FPU_EXTENDED 0
-#define _FPU_DOUBLE 0
-#define _FPU_SINGLE 0
-#define _FPU_RC_NEAREST 0
-#endif
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
@@ -215,48 +238,13 @@ XRCORE_API u64 QPC() noexcept
     return _dest;
 }
 
-#if defined(XR_ARM)
-#include <sys/syscall.h>
-#include <linux/perf_event.h>
-
-static int fddev = -1;
-__attribute__((constructor)) static void
-init(void)
-{
-    static struct perf_event_attr attr;
-    attr.type = PERF_TYPE_HARDWARE;
-    attr.config = PERF_COUNT_HW_CPU_CYCLES;
-    fddev = syscall(__NR_perf_event_open, &attr, 0, -1, -1, 0);
-}
-
-__attribute__((destructor)) static void
-fini(void)
-{
-    close(fddev);
-}
-#endif
-
 XRCORE_API u64 GetCLK()
 {
 #if defined(XR_ARM)
     long long result = 0;
-    if (read(fddev, &result, sizeof(result)) < sizeof(result)) return 0;
+    if (read(s_perf_init.fddev, &result, sizeof(result)) < sizeof(result))
+        return 0;
     return result;
-/*
-    uint32_t pmccntr;
-    uint32_t pmuseren;
-    uint32_t pmcntenset;
-    // Read the user mode perf monitor counter access permissions.
-    asm volatile("mrc p15, 0, %0, c9, c14, 0" : "=r"(pmuseren));
-    if (pmuseren & 1) {  // Allows reading perfmon counters for user mode code.
-        asm volatile("mrc p15, 0, %0, c9, c12, 1" : "=r"(pmcntenset));
-        if (pmcntenset & 0x80000000ul) {  // Is it counting?
-            asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(pmccntr));
-            // The counter is set up to count every 64th cycle
-            return static_cast<int64_t>(pmccntr) * 64;  // Should optimize to << 6
-        }
-    }
-*/
 #elif defined(XR_ARM64)
     int64_t virtual_timer_value;
     asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
