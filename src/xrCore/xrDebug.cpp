@@ -461,8 +461,8 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     #endif // USE_OWN_ERROR_MESSAGE_WINDOW
             ::free(demangledName);
         }
-#endif
     }
+#endif
     FlushLog();
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
