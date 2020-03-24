@@ -441,8 +441,8 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     {
         for (size_t i = 0; i < nptrs; i++)
         {
-            char *functionName = strings[i];
-            char *demangledName = nullptr;
+            char* functionName = strings[i];
+            char* demangledName = nullptr;
             Dl_info info;
 
             if (dladdr(array[i], &info))
