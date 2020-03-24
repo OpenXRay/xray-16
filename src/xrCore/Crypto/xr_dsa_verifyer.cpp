@@ -21,6 +21,6 @@ std::optional<crypto::xr_sha1::hash_t> xr_dsa_verifyer::verify(u8 const* data, u
     verify_data->w(hash.data(), crypto::xr_sha1::DigestSize);
     FS.w_close(verify_data);
 #endif
-    bool success = m_dsa.verify(m_public_key, hash.data(), crypto::xr_sha1::DigestSize, dsign);
+    const bool success = m_dsa.verify(m_public_key, hash.data(), crypto::xr_sha1::DigestSize, dsign);
     return success ? std::optional<crypto::xr_sha1::hash_t>{hash} : std::nullopt;
 }

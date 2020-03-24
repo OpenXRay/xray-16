@@ -198,7 +198,7 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
     m_orig_config_body.w_stringZ(add_str);
     auto hash = crypto::xr_sha1::calculate(m_orig_config_body.pointer(), m_orig_config_body.tell());
 
-    crypto::xr_sha1::hash_t tmp_checksum{};
+    crypto::xr_sha1::hash_t tmp_checksum;
     if (!verify_dsign(data, data_size, tmp_checksum))
     {
         xr_strcpy(diff, "invalid digital sign");
