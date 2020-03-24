@@ -1,7 +1,6 @@
 #pragma once
 #include "xrCore/_types.h"
 #include "xrCore/xrDebug_macros.h"
-#include "xrCommon/inlining_macros.h"
 
 // deprecated, use xr_array instead
 template <class T, std::size_t dim>

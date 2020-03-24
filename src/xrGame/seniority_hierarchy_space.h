@@ -10,7 +10,6 @@
 #include "xrCore/_types.h"
 #include "Common/Platform.hpp" // xr_itoa
 #include "xrCore/xrstring.h"
-#include "xrCommon/inlining_macros.h"
 
 #define SQUAD_HIERARCHY_HOLDER_USE_LEADER
 

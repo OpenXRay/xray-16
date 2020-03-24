@@ -8,7 +8,6 @@
 
 #pragma once
 #include "xrCore/_types.h"
-#include "xrCommon/inlining_macros.h"
 
 class NET_Packet;
 class IReader;
