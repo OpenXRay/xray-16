@@ -1,11 +1,3 @@
-#if defined(_MSC_VER)
-#define XR_COMPILER_MSVC
-#elif defined(__GNUC__)
-#define XR_COMPILER_GCC
-#else
-#error Unsupported compiler
-#endif
-
 #if defined(__GNUC__)
 #define NO_INLINE               __attribute__((noinline))
 #define FORCE_INLINE            __attribute__((always_inline)) inline
@@ -37,6 +29,8 @@
 #define ALIGN(a)                __declspec(align(a))
 #define DEBUG_BREAK             __debugbreak()
 #define __thread                __declspec(thread)
+#else
+#error Provide your definitions here
 #endif
 
 // XXX: remove IC/ICF/ICN
@@ -56,6 +50,8 @@
 
 #define XR_EXPORT __declspec(dllexport)
 #define XR_IMPORT __declspec(dllimport)
+#else
+#error Provide your definitions here
 #endif
 
 #ifndef _CPPUNWIND//def NDEBUG

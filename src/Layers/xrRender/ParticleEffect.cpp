@@ -22,7 +22,7 @@ using namespace PS;
 const u32 PS::uDT_STEP = 33;
 const float PS::fDT_STEP = float(uDT_STEP) / 1000.f;
 
-#ifdef _MSC_VER
+#ifdef XR_COMPILER_MSVC
 #pragma warning(disable : 4701) // " potentially uninitialized local variable" (magnitude_sse does initialize it)
 #endif
 

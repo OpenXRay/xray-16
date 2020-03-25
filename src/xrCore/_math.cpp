@@ -5,9 +5,9 @@
 #include <intrin.h> // __rdtsc
 #include <process.h>
 
-#if defined(_MSC_VER)
+#if defined(XR_COMPILER_MSVC)
 #include <powerbase.h>
-#elif defined(__GNUC__)
+#elif defined(XR_COMPILER_GCC)
 #include <float.h> // _controlfp
 //#include_next <float.h>
 //how to include mingw32\i686-w64-mingw32\include\float.h

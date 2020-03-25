@@ -20,6 +20,13 @@
 #define XR_ARCHITECTURE_X86
 #endif
 
+#if defined(_MSC_VER)
+#define XR_COMPILER_MSVC _MSC_VER
+#elif defined(__GNUC__)
+#define XR_COMPILER_GCC __GNUC__
+#else
+#error Unsupported compiler
+#endif
 #include "Common/Compiler.inl"
 
 #include <ctime>

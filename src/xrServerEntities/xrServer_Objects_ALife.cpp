@@ -14,7 +14,7 @@
 #include "restriction_space.h"
 #include "xrCore/xr_token.h"
 
-#ifdef _MSC_VER
+#ifdef XR_COMPILER_MSVC
 #pragma warning(disable: 4100) // unreferenced formal parameter
 #endif
 #ifndef AI_COMPILER

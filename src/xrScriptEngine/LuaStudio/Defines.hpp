@@ -10,11 +10,11 @@
 
 // DECLSPEC_NOVTABLE macro
 #ifndef DECLSPEC_NOVTABLE
-#if (_MSC_VER >= 1100) && defined(__cplusplus)
+#if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
 #define DECLSPEC_NOVTABLE __declspec(novtable)
-#else // #if (_MSC_VER >= 1100) && defined(__cplusplus)
+#else // #if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
 #define DECLSPEC_NOVTABLE
-#endif // #if (_MSC_VER >= 1100) && defined(__cplusplus)
+#endif // #if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
 #endif // #ifndef DECLSPEC_NOVTABLE
 
 // CS_STRING_CONCAT macro
