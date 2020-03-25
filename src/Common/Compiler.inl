@@ -1,4 +1,8 @@
-#if !defined(__GNUC__) && !defined(_MSC_VER)
+#if defined(_MSC_VER)
+#define XR_COMPILER_MSVC
+#elif defined(__GNUC__)
+#define XR_COMPILER_GCC
+#else
 #error Unsupported compiler
 #endif
 
