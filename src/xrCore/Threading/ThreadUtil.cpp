@@ -6,7 +6,7 @@
 
 namespace Threading
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 ThreadId GetCurrThreadId() { return GetCurrentThreadId(); }
 
 ThreadHandle GetCurrentThreadHandle() { return GetCurrentThread(); }

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #define ANSEL_SDK_DELAYLOAD
 #include "AnselSDK.h"
 #endif
@@ -45,7 +45,7 @@ void AnselManager::Unload()
 
 bool AnselManager::Init() const
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (anselModule->IsLoaded() && ansel::isAnselAvailable())
     {
         ansel::Configuration config;

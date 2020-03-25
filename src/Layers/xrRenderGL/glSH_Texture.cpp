@@ -3,7 +3,7 @@
 
 #include "../xrRender/ResourceManager.h"
 
-#ifdef WINDOWS // TODO
+#ifdef XR_PLATFORM_WINDOWS // TODO
 #include "../../xrEngine/tntQAVI.h"
 #endif
 #include "../../xrEngine/xrTheora_Surface.h"
@@ -104,7 +104,7 @@ void CTexture::apply_avi(u32 dwStage)
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
 
-#ifdef WINDOWS // TODO
+#ifdef XR_PLATFORM_WINDOWS // TODO
     if (pAVI->NeedUpdate())
     {
         // AVI
@@ -217,7 +217,7 @@ void CTexture::Load()
     }
     else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
     {
-#ifdef WINDOWS // TODO
+#ifdef XR_PLATFORM_WINDOWS // TODO
         // AVI
         pAVI = new CAviPlayerCustom();
 

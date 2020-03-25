@@ -11,14 +11,14 @@ CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
     pDevice = nullptr;
     pDeviceList = nullptr;
     pContext = nullptr;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     eaxSet = nullptr;
     eaxGet = nullptr;
 #endif
 }
 
 CSoundRender_CoreA::~CSoundRender_CoreA() {}
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 bool CSoundRender_CoreA::EAXQuerySupport(bool isDeferred, const GUID* guid, u32 prop, void* val, u32 sz)
 {
     if (AL_NO_ERROR != eaxGet(guid, prop, 0, val, sz))
@@ -120,7 +120,7 @@ void CSoundRender_CoreA::_initialize()
     Fvector orient[2] = {{0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}};
     A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&orient[0].x));
     A_CHK(alListenerf(AL_GAIN, 1.f));
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // Check for EAX extension
     bEAX = deviceDesc.props.eax && !deviceDesc.props.eax_unwanted;
 
@@ -185,7 +185,7 @@ void CSoundRender_CoreA::_clear()
     xr_delete(pDeviceList);
 }
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 void CSoundRender_CoreA::i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) { eaxSet(guid, prop, 0, val, sz); }
 void CSoundRender_CoreA::i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) { eaxGet(guid, prop, 0, val, sz); }
 #endif

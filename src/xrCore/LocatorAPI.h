@@ -2,7 +2,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #endif
 #pragma warning(pop)
@@ -101,7 +101,7 @@ public:
         size_t size = 0;
         size_t vfs_idx = size_t(-1);
         shared_str path;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
 #elif defined(LINUX) || defined(FREEBSD)

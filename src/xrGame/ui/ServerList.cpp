@@ -18,7 +18,7 @@ LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
 CServerList::CServerList()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;
     updateCb.bind(this, &CServerList::OnUpdate);
     m_subscriber_id = browser().SubscribeUpdates(updateCb);
@@ -82,7 +82,7 @@ CServerList::~CServerList()
 
 CGameSpy_BrowsersWrapper* CServerList::browser_LL()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     auto mm = MainMenu();
     if (mm)
     {
@@ -595,7 +595,7 @@ void CServerList::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 
 void CServerList::ConnectToSelected()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager const* lmngr = MainMenu()->GetLoginMngr();
     R_ASSERT(lmngr);
     gamespy_gp::profile const* tmp_profile = lmngr->get_current_profile();

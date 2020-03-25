@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "cderr.h"
 #include "commdlg.h"
 #include "vfw.h"
@@ -111,7 +111,7 @@ void MakeFilter(string1024& dest, LPCSTR info, LPCSTR ext)
 // start_flt_ext = -1-all 0..n-indices
 //------------------------------------------------------------------------------
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 
 // Vista uses this hook for old-style save dialog
 UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
@@ -125,7 +125,7 @@ bool EFS_Utils::GetOpenNameInternal(
     LPCSTR initial, LPSTR buffer, size_t sz_buf, bool bMulti /*= false*/, LPCSTR offset /*= 0*/, int start_flt_ext /*= -1*/)
 {
     VERIFY(buffer && (sz_buf > 0));
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     FS_Path& P = *FS.get_path(initial);
     string1024 flt;
     MakeFilter(flt, P.m_FilterCaption ? P.m_FilterCaption : "", P.m_DefExt);
@@ -220,7 +220,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
 {
     // unsigned int dwVersion = GetVersion();
     // unsigned int dwWindowsMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     FS_Path& P = *FS.get_path(initial);
     string1024 flt;
 

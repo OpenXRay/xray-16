@@ -212,7 +212,7 @@ IC void xr_strlwr(shared_str& src)
     if (*src)
     {
         char* lp = xr_strdup(*src);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         xr_strlwr(lp);
 #elif defined(LINUX)
         size_t i = 0;

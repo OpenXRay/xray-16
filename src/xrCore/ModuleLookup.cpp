@@ -27,7 +27,7 @@ void* ModuleHandle::Open(pcstr moduleName)
 
     xr_string buf(moduleName);
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     buf += ".dll";
 #elif defined(LINUX) || defined(FREEBSD)
     buf += ".so";

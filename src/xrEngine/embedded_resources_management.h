@@ -28,7 +28,7 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
     return source;
 }
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 inline HANDLE ExtractImage(int idx, UINT type)
 {
     return LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(idx),
@@ -131,4 +131,4 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
     if (surface)
         SDL_SetWindowIcon(wnd, surface);
 }
-#endif // WINDOWS
+#endif // XR_PLATFORM_WINDOWS

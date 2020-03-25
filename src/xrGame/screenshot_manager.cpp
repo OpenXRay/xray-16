@@ -9,7 +9,7 @@
 #define CXIMAGE_AS_SHARED_LIBRARY
 #endif
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #include <ddraw.h>
 #endif
 

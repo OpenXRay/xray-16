@@ -58,7 +58,7 @@ CEngineAPI::~CEngineAPI()
 
 bool is_enough_address_space_available()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     SYSTEM_INFO system_info;
     GetSystemInfo(&system_info);
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
@@ -91,7 +91,7 @@ void CEngineAPI::SelectRenderer()
 
     select(gl_library, rsRGL, 5, rsR4);
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     select(r4_library, rsR4, 4, rsR3);
     select(r3_library, rsR3, 3, rsR2);
     select(r2_library, rsR2, 2, rsR1);
@@ -175,7 +175,7 @@ void CEngineAPI::Destroy(void)
 void CEngineAPI::CloseUnusedLibraries()
 {
     // Only windows because on linux only one library is loaded - xrRender_GL
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (GEnv.CurrentRenderer != 5)
         renderers[gl_library] = nullptr;
 
@@ -199,13 +199,13 @@ void CEngineAPI::CreateRendererList()
         return;
 
     renderers[gl_library] = XRay::LoadModule(gl_library);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     renderers[r1_library] = XRay::LoadModule(r1_library);
 #endif
 
     if (GEnv.isDedicatedServer)
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         R_ASSERT2(renderers[r1_library]->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
         VidQualityToken.emplace_back(renderer_r1, 0);
 #elif defined(LINUX)
@@ -218,7 +218,7 @@ void CEngineAPI::CreateRendererList()
 
     auto& modes = VidQualityToken;
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     renderers[r2_library] = XRay::LoadModule(r2_library);
     renderers[r3_library] = XRay::LoadModule(r3_library);
     renderers[r4_library] = XRay::LoadModule(r4_library);
@@ -237,7 +237,7 @@ void CEngineAPI::CreateRendererList()
         }
     };
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     checkRenderer(r1_library, renderer_r1, 0);
     if (renderers[r2_library]->IsLoaded())
     {

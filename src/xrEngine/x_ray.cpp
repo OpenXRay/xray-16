@@ -470,7 +470,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         if (A.hSrcFile == nullptr)
 #elif defined(LINUX)
         if (A.hSrcFile == 0)

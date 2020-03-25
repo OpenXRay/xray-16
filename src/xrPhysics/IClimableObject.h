@@ -39,7 +39,7 @@ public:
     virtual IPhysicsShellHolder* cast_IPhysicsShellHolder() = 0;
 
 protected:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     virtual ~IClimableObject() = 0 {}
 #elif defined(LINUX)
     virtual ~IClimableObject() {}

@@ -59,7 +59,7 @@ constexpr double dbl_eps = type_epsilon<double>;
 
 #if defined(LINUX) || defined(FREEBSD)
 constexpr size_t max_path = PATH_MAX;
-#elif defined(WINDOWS)
+#elif defined(XR_PLATFORM_WINDOWS)
 constexpr size_t max_path = MAX_PATH;
 #else
 #error Define here lenght of the file paths strings for your platform
@@ -78,7 +78,7 @@ using string4096 = char[4096];
 using string_path = char[2 * max_path];
 
 // XXX: Replace __interface with either struct or class. MS defines it as struct for COM, but this project is C++.
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #define xr_pure_interface __interface
 #elif defined(LINUX)
 #define xr_pure_interface struct

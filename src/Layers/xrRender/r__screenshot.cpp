@@ -2,7 +2,7 @@
 #include "xr_effgamma.h"
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <FreeImage/FreeImagePlus.h>
 #else
 #include <FreeImagePlus.h>

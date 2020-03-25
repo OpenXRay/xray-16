@@ -8,7 +8,7 @@ class CFileStreamReader : public CStreamReader
     using inherited = CStreamReader;
 
 private:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     HANDLE m_file_handle;
 #elif defined(LINUX)
     int m_file_handle;

@@ -3,11 +3,11 @@
 #pragma once
 
 #include "lzhuf.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #endif
 #include <fcntl.h>
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <sys\stat.h>
 #include <share.h>
 #endif
@@ -57,7 +57,7 @@ public:
         {
             fclose(hf);
             // release RO attrib
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
             DWORD dwAttr = GetFileAttributes(fName.c_str());
             if ((dwAttr != u32(-1)) && (dwAttr & FILE_ATTRIBUTE_READONLY))
             {
@@ -133,7 +133,7 @@ public:
 class CVirtualFileReader : public IReader
 {
 private:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     void *hSrcFile, *hSrcMap;
 #elif defined(LINUX)
     int hSrcFile;

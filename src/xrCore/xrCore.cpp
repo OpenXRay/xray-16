@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <mmsystem.h>
 #include <objbase.h>
 #pragma comment(lib, "winmm.lib")
@@ -198,7 +198,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         CoInitializeMultithreaded();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         string_path fn, dr, di;
 
         // application path
@@ -221,7 +221,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         }
 #endif
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #else
         getcwd(WorkingPath, sizeof(WorkingPath));
@@ -251,7 +251,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
             symlink("/usr/share/openxray/gamedata", tmp);
 #endif
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         // User/Comp Name
         DWORD sz_user = sizeof(UserName);
         GetUserName(UserName, &sz_user);
@@ -378,7 +378,7 @@ constexpr pcstr xrCore::GetBuildConfiguration()
 
 void xrCore::CoInitializeMultithreaded() const
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     if (!strstr(Params, "-weather"))
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
@@ -412,7 +412,7 @@ void xrCore::CalculateBuildId()
         buildId -= daysInMonth[i];
 }
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifdef _EDITOR
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #else

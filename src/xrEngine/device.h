@@ -142,7 +142,7 @@ class ENGINE_API CRenderDevice : public CRenderDeviceBase, public IWindowHandler
     void _SetupStates();
 
 public:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 #endif
     // u32 dwFrame;

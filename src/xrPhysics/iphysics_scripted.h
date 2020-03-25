@@ -29,7 +29,7 @@ protected:
 #ifdef _EDITOR
     virtual ~iphysics_scripted_class() {}
 #else
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     virtual ~iphysics_scripted_class() = 0 {}
 #elif defined(LINUX)
     virtual ~iphysics_scripted_class() {}

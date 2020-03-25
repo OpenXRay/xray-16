@@ -100,7 +100,7 @@ using RTokenVec = xr_vector<xr_rtoken>;
 #include "FileSystem.h"
 #include "FTimer.h"
 #include "fastdelegate.h"
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #include "intrusive_ptr.h"
 #endif
 

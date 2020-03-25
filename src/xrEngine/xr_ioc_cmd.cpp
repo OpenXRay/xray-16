@@ -215,7 +215,7 @@ public:
         xr_strcat(cfg_full_name, ".ltx");
 
         BOOL b_allow = TRUE;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         if (FS.exist(cfg_full_name))
             b_allow = SetFileAttributes(cfg_full_name, FILE_ATTRIBUTE_NORMAL);
 #endif

@@ -6,7 +6,7 @@
 
 void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     m_file_handle = CreateFile(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 
     VERIFY(m_file_handle != INVALID_HANDLE_VALUE);
@@ -31,7 +31,7 @@ void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
 
 void CFileStreamReader::destroy()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     const auto file_mapping_handle = this->file_mapping_handle();
     inherited::destroy();
     CloseHandle(file_mapping_handle);

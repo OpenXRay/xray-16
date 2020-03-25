@@ -4,7 +4,7 @@
 #include "xrCore/xrCore.h"
 #include "xrCore/_std_extensions.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 // mmsystem.h
 #define MMNOSOUND
 #define MMNOMIDI

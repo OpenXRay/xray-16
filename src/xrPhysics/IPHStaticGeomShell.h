@@ -3,7 +3,7 @@
 class IPHStaticGeomShell
 {
 protected:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     virtual ~IPHStaticGeomShell() = 0 {}
 #elif defined(LINUX)
     virtual ~IPHStaticGeomShell() {}

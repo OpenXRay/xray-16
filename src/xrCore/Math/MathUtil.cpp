@@ -14,7 +14,7 @@
 #if defined(XR_X86) || defined(XR_X64)
 #include "PLC_SSE.hpp"
 #endif
-#if defined(WINDOWS) && defined(XR_X86)
+#if defined(XR_PLATFORM_WINDOWS) && defined(XR_X86)
 #include "SkinXW_SSE.hpp"
 #else
 #include "SkinXW_CPP.hpp"
@@ -39,7 +39,7 @@ void Initialize()
     static bool initialized = false;
     if (initialized)
         return;
-#if defined(WINDOWS) && defined(XR_X86)
+#if defined(XR_PLATFORM_WINDOWS) && defined(XR_X86)
     Skin1W = Skin1W_SSE;
     Skin2W = Skin2W_SSE;
     Skin3W = Skin3W_SSE;

@@ -7,7 +7,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <direct.h>
 #include <sys/stat.h>
 #endif
@@ -167,7 +167,7 @@ CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
 #endif // CONFIG_PROFILE_LOCKS
 {
     m_Flags.zero();
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // get page size
     SYSTEM_INFO sys_inf;
     GetSystemInfo(&sys_inf);
@@ -265,7 +265,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
     return &*result;
 }
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType = INVALID_SET_FILE_POINTER;
@@ -478,7 +478,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
 void CLocatorAPI::archive::open()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // Open the file
     if (hSrcFile && hSrcMap)
         return;
@@ -507,7 +507,7 @@ void CLocatorAPI::archive::open()
 
 void CLocatorAPI::archive::close()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     CloseHandle(hSrcMap);
     hSrcMap = nullptr;
     CloseHandle(hSrcFile);
@@ -575,7 +575,7 @@ bool CLocatorAPI::load_all_unloaded_archives()
     bool res = false;
     for (auto& archive : m_archives)
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         if (archive.hSrcFile == nullptr)
 #elif defined(LINUX) || defined(FREEBSD)
         if (archive.hSrcFile == 0)
@@ -592,7 +592,7 @@ bool CLocatorAPI::load_all_unloaded_archives()
 void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 {
     string_path N;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     xr_strcpy(N, sizeof N, path);
     xr_strcat(N, entry.name);
 #elif defined(LINUX) || defined(FREEBSD)
@@ -657,7 +657,7 @@ bool ignore_name(const char* _name)
 
 bool ignore_path(pcstr _path)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     HANDLE h = CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 
     if (h != INVALID_HANDLE_VALUE)
@@ -694,7 +694,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     xr_strcat(scanPath, "*");
     _finddata_t findData;
     convert_path_separators(scanPath);
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
         return false;
@@ -735,7 +735,7 @@ bool CLocatorAPI::Recurse(pcstr path)
         bool ignore = false;
         if (m_Flags.test(flNeedCheck))
         {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
             xr_strcpy(fullPath, sizeof fullPath, path);
             xr_strcat(fullPath, findData.name);
             ignore = ignore_name(findData.name) || ignore_path(fullPath);
@@ -750,13 +750,13 @@ bool CLocatorAPI::Recurse(pcstr path)
         }
         if (!ignore)
             rec_files.push_back(findData);
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
         done = _findnext(handle, &findData);
 #elif defined(LINUX) || defined(FREEBSD)
         done--;
 #endif
     }
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     _findclose(handle);
 #elif defined(LINUX) || defined(FREEBSD)
     globfree(&globbuf);
@@ -801,7 +801,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
 
     string_path full_current_directory;
     
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
 #elif defined(LINUX) || defined(FREEBSD)
     if (SDL_strlen(fs_path) != 0)
@@ -1366,7 +1366,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     if (end > A.size)
         end = A.size;
     const size_t sz = end - start;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
     VERIFY3(ptr, "cannot create file mapping on file", fname);
 #elif defined(LINUX) || defined(FREEBSD)
@@ -1392,7 +1392,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     u8* dest = xr_alloc<u8>(desc.size_real);
     rtc_decompress(dest, desc.size_real, ptr + ptr_offs, desc.size_compressed);
     R = new CTempReader(dest, desc.size_real, 0);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile(ptr);
 #elif defined(LINUX) || defined(FREEBSD)
     ::munmap(ptr, sz);
@@ -1410,7 +1410,7 @@ void CLocatorAPI::file_from_archive(CStreamReader*& R, pcstr fname, const file& 
         make_string("cannot use stream reading for compressed data %s, do not compress data to be streamed", fname));
 
     R = new CStreamReader();
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     R->construct(A.hSrcMap, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
 #elif defined(LINUX) || defined(FREEBSD)
     R->construct(A.hSrcFile, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
@@ -1620,7 +1620,7 @@ void CLocatorAPI::w_close(IWriter*& S)
 
         if (bReg)
         {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
             struct _stat st;
             _stat(fname, &st);
             Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);

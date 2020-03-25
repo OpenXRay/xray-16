@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #pragma hdrstop
 
 #include <intrin.h> // __rdtsc
@@ -113,7 +113,7 @@ namespace FPU
 {
 XRCORE_API void m24()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifndef XR_X64
     _controlfp(_PC_24, MCW_PC);
 #endif
@@ -128,7 +128,7 @@ XRCORE_API void m24()
 
 XRCORE_API void m24r()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifndef XR_X64
     _controlfp(_PC_24, MCW_PC);
 #endif
@@ -143,7 +143,7 @@ XRCORE_API void m24r()
 
 XRCORE_API void m53()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifndef XR_X64
     _controlfp(_PC_53, MCW_PC);
 #endif
@@ -158,7 +158,7 @@ XRCORE_API void m53()
 
 XRCORE_API void m53r()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifndef XR_X64
     _controlfp(_PC_53, MCW_PC);
 #endif
@@ -173,7 +173,7 @@ XRCORE_API void m53r()
 
 XRCORE_API void m64()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifndef XR_X64
     _controlfp(_PC_64, MCW_PC);
 #endif
@@ -188,7 +188,7 @@ XRCORE_API void m64()
 
 XRCORE_API void m64r()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifndef XR_X64
     _controlfp(_PC_64, MCW_PC);
 #endif
@@ -203,7 +203,7 @@ XRCORE_API void m64r()
 
 void initialize()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     _clearfp();
 #elif defined(LINUX) || defined(FREEBSD)
     fpu_control_t fpu_cw;
@@ -217,7 +217,7 @@ void initialize()
     else
         m24r();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
 #elif defined(LINUX) || defined(FREEBSD)
     ::Random.seed(u32(CPU::GetCLK() % ((u64)0x1 << 32)));
@@ -258,7 +258,7 @@ XRCORE_API u64 GetCLK()
 
 XRCORE_API u32 GetCurrentCPU()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     return GetCurrentProcessorNumber();
 #elif defined(LINUX)
     return static_cast<u32>(sched_getcpu());
@@ -351,7 +351,7 @@ void _initialize_cpu()
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d", SDL_GetCPUCount(), std::thread::hardware_concurrency());
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
     const size_t cpusCount = sysInfo.dwNumberOfProcessors;
@@ -413,7 +413,7 @@ void _initialize_cpu_thread()
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
         if (_denormals_are_zero_supported)
         {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
             __try
             {
                 _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);

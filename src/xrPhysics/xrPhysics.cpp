@@ -23,7 +23,7 @@ static void load(int argc, char** argv, char** envp)
     dSetFreeHandler(ode_free);
 }
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     lpReserved;
@@ -38,7 +38,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     }
     return TRUE;
 }
-#endif //WINDOWS
+#endif //XR_PLATFORM_WINDOWS
 
 #ifdef _MANAGED
 #pragma managed(pop)

@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "vfw.h"
 #include "mmsystem.h"
 #elif defined(LINUX)

@@ -4,7 +4,7 @@
 #include "xrEngine/xr_collide_form.h"
 #include "xrEngine/xr_object.h"
 #include "Intersect.hpp"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "d3d9types.h"
 #endif
 

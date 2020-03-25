@@ -221,7 +221,7 @@ void CreateLog(BOOL nl)
         LogWriter = FS.w_open(logFName);
         if (LogWriter == nullptr)
         {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
             MessageBox(NULL, "Can't create log file.", "Error", MB_ICONERROR);
 #endif
             abort();

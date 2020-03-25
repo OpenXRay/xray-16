@@ -29,7 +29,7 @@ inline xr_string xr_substrreplace(const xr_string& src, const xr_string& src_sub
     return res;
 }
 
-#if !defined(WINDOWS)
+#if !defined(XR_PLATFORM_WINDOWS)
 namespace std
 {
 template<>

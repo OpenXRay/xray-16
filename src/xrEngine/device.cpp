@@ -9,7 +9,7 @@
 #define MMNOAUX
 #define MMNOMIXER
 #define MMNOJOY
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <mmsystem.h>
 #endif
 #include "SDL.h"

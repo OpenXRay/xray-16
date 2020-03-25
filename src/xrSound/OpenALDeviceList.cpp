@@ -26,7 +26,7 @@
 #include "OpenALDeviceList.h"
 #include "xrCore/xr_token.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <objbase.h>
@@ -40,7 +40,7 @@ log_fn_ptr_type* pLog = nullptr;
 void __cdecl al_log(char* msg) { Log(msg); }
 ALDeviceList::ALDeviceList()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     pLog = al_log;
 #endif
     snd_device_id = (u32)-1;
@@ -70,7 +70,7 @@ void ALDeviceList::Enumerate()
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     CoUninitialize();
 #endif
     // grab function pointers for 1.0-API functions, and if successful proceed to enumerate all devices
@@ -92,7 +92,7 @@ void ALDeviceList::Enumerate()
         // Also we assume that if "Generic Hardware" exists, than "Generic Software" is also exists
         // Maybe wrong
 
-#if defined(WINDOWS) //Maybe in Linux this not?
+#if defined(XR_PLATFORM_WINDOWS) //Maybe in Linux this not?
         if (0 == xr_stricmp(m_defaultDeviceName, AL_GENERIC_HARDWARE))
         {
             xr_strcpy(m_defaultDeviceName, AL_GENERIC_SOFTWARE);

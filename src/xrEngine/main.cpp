@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "main.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
 #elif defined(LINUX)
 #include <lockfile.h>
@@ -18,7 +18,7 @@
 
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
 #elif defined(LINUX)
 #define CTextConsole CConsole
@@ -276,7 +276,7 @@ void CheckPrivilegySlowdown()
 void CreateApplication()
 {
     pApp = new CApplication();
-#ifdef WINDOWS // XXX: Remove this macro check
+#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
     if (GEnv.isDedicatedServer)
         pApp->SetLoadingScreen(new TextLoadingScreen());
 #endif
@@ -361,7 +361,7 @@ ENGINE_API int RunApplication()
 #ifdef NO_MULTI_INSTANCES
     if (!GEnv.isDedicatedServer)
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
             return 2;
@@ -402,7 +402,7 @@ ENGINE_API int RunApplication()
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         // CreateProcess need to return results to next two structures
         STARTUPINFO si = {};
         si.cb = sizeof(si);

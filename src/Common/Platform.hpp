@@ -5,7 +5,7 @@
 #elif defined(__FreeBSD__)
 #define FREEBSD
 #elif defined(_WIN32)
-#define WINDOWS
+#define XR_PLATFORM_WINDOWS
 #else
 #error Unsupported platform
 #endif
@@ -28,6 +28,6 @@
 #include "Common/PlatformLinux.inl"
 #elif defined(FREEBSD)
 #include "Common/PlatformBSD.inl"
-#elif defined(WINDOWS)
+#elif defined(XR_PLATFORM_WINDOWS)
 #include "Common/PlatformWindows.inl"
 #endif

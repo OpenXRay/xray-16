@@ -5,7 +5,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #include <direct.h>
 #elif defined(LINUX)
@@ -109,7 +109,7 @@ bool file_handle_internal(pcstr file_name, size_t& size, int& hFile)
 #else // EDITOR
 static int open_internal(pcstr fn, int& handle)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
 #elif defined(LINUX) || defined(FREEBSD)
     pstr conv_fn = xr_strdup(fn);
@@ -430,7 +430,7 @@ void IReader::r_string(char* dest, size_t tgt_sz)
     char* src = (char*)data + Pos;
     size_t sz = advance_term_string();
     R_ASSERT2(sz < (tgt_sz - 1), "Dest string less than needed.");
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     R_ASSERT(!IsBadReadPtr((void*)src, sz));
 #endif
 
@@ -486,7 +486,7 @@ CPackReader::~CPackReader()
 #ifdef FS_DEBUG
     unregister_file_mapping(base_address, Size);
 #endif // DEBUG
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile(base_address);
 #elif defined(LINUX)
     ::munmap(base_address, Size);
@@ -510,7 +510,7 @@ CCompressedReader::CCompressedReader(const char* name, const char* sign)
 CCompressedReader::~CCompressedReader() { xr_free(data); };
 CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
@@ -545,7 +545,7 @@ CVirtualFileRW::~CVirtualFileRW()
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
 #endif // DEBUG
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
@@ -558,7 +558,7 @@ CVirtualFileRW::~CVirtualFileRW()
 
 CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
@@ -594,7 +594,7 @@ CVirtualFileReader::~CVirtualFileReader()
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
 #endif // DEBUG
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
