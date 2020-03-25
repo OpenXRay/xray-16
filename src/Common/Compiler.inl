@@ -6,18 +6,6 @@
 #error Unsupported compiler
 #endif
 
-#ifdef _MSC_VER
-#include <intrin.h> // for __debugbreak
-#endif
-
-#if defined(__GNUC__)
-#define XR_EXPORT __attribute__ ((visibility("default")))
-#define XR_IMPORT __attribute__ ((visibility("default")))
-#elif defined(_MSC_VER)
-#define XR_EXPORT __declspec(dllexport)
-#define XR_IMPORT __declspec(dllimport)
-#endif
-
 #if defined(__GNUC__)
 #define NO_INLINE               __attribute__((noinline))
 #define FORCE_INLINE            __attribute__((always_inline)) inline
@@ -42,6 +30,8 @@
 #endif
 
 #elif defined(_MSC_VER)
+#include <intrin.h> // for __debugbreak
+
 #define NO_INLINE               __declspec(noinline)
 #define FORCE_INLINE            __forceinline
 #define ALIGN(a)                __declspec(align(a))
@@ -54,13 +44,19 @@
 #define ICF                     FORCE_INLINE
 #define ICN                     NO_INLINE
 
+#define UNUSED(...) (void)(__VA_ARGS__)
+
 #if defined(__GNUC__)
 #define XR_ASSUME(expr)  if (expr){} else __builtin_unreachable()
+
+#define XR_EXPORT __attribute__ ((visibility("default")))
+#define XR_IMPORT __attribute__ ((visibility("default")))
 #elif defined(_MSC_VER)
 #define XR_ASSUME(expr) __assume(expr)
-#endif
 
-#define UNUSED(...) (void)(__VA_ARGS__)
+#define XR_EXPORT __declspec(dllexport)
+#define XR_IMPORT __declspec(dllimport)
+#endif
 
 #ifndef _CPPUNWIND//def NDEBUG
 #define XR_NOEXCEPT throw()
