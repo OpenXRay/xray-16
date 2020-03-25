@@ -3,7 +3,7 @@
 #include "xrPhase_MergeLM_Rect.h"
 #include "utils/xrLC_Light/xrdeflector.h"
 
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
 #include <intrin.h>
 #else
 #include <mmintrin.h>
@@ -74,7 +74,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
             for (x = 0; x < s_x - 8; x += 8, P += 8, S += 8)
             {
                 // if ( (*P) && ( *S >= alpha_ref ) ) goto r_false;	// overlap
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
                 __m128i regS = _mm_set1_epi64x(*((__int64*)S));
                 __m128i regP = _mm_set1_epi64x(*((__int64*)P));
                 __m128i mm_max = _mm_max_epu8(regS, mm_alpha_ref);

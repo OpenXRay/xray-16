@@ -281,7 +281,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         PrintBuildInfo();
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
         R_ASSERT(SDL_HasSSE());
 #endif
         XRay::Math::Initialize();
@@ -356,19 +356,19 @@ void xrCore::_destroy()
 constexpr pcstr xrCore::GetBuildConfiguration()
 {
 #ifdef NDEBUG
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     return "Rx64";
 #else
     return "Rx86";
 #endif
 #elif defined(MIXED)
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     return "Mx64";
 #else
     return "Mx86";
 #endif
 #else
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     return "Dx64";
 #else
     return "Dx86";

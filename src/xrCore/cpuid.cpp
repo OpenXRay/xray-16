@@ -26,7 +26,7 @@ void nativeCpuId(int regs[4], int i)
 #elif (defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)) && defined(GCC)
     __cpuid((int)i, (int *)regs);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
     asm volatile("cpuid" :
     "=eax" (regs[0]),
     "=ebx" (regs[1]),

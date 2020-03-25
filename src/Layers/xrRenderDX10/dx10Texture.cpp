@@ -459,7 +459,7 @@ _DDS_2D:
     LoadInfo.Height = IMG.Height;
 
     // x64 crash workaround
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     LoadInfo.FirstMipLevel = img_loaded_lod;
 #else
     if (img_loaded_lod)

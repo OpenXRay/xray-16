@@ -5,7 +5,7 @@
 #include "tbb/blocked_range.h"
 
 #ifndef _EDITOR
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
 #include <xmmintrin.h>
 #elif defined(XR_ARM) || defined(XR_ARM64)
 #include "Externals/sse2neon/sse2neon.h"
@@ -348,7 +348,7 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, co
 //----------------------------------------------------
 Lock m_sprite_section;
 
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -475,7 +475,7 @@ ICF void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const
 {
     FillSprite_fpu(pv, pos, dir, lt, rb, r1, r2, clr, sina, cosa);
 }
-#endif // defined(XR_X86) || defined(XR_X64)
+#endif // defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -488,7 +488,7 @@ struct PRS_PARAMS
     CParticleEffect* pPE;
 };
 
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
 ICF void magnitude_sse(Fvector& vec, float& res)
 {
     __m128 tv, tu;

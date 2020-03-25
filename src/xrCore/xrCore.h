@@ -39,7 +39,7 @@
 #pragma warning(disable : 4345)
 //#pragma warning (disable : 4530 ) // C++ exception handler used, but unwind semantics are not enabled
 
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
 #pragma warning(disable : 4512)
 #endif
 

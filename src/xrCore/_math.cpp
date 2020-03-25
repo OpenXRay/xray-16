@@ -16,7 +16,7 @@
 #endif
 
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
 #include <x86intrin.h> // __rdtsc
 #elif defined(XR_ARM)
 #include <sys/syscall.h>
@@ -114,7 +114,7 @@ namespace FPU
 XRCORE_API void m24()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_X64
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_24, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
@@ -129,7 +129,7 @@ XRCORE_API void m24()
 XRCORE_API void m24r()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_X64
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_24, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
@@ -144,7 +144,7 @@ XRCORE_API void m24r()
 XRCORE_API void m53()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_X64
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_53, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
@@ -159,7 +159,7 @@ XRCORE_API void m53()
 XRCORE_API void m53r()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_X64
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_53, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
@@ -174,7 +174,7 @@ XRCORE_API void m53r()
 XRCORE_API void m64()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_X64
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_64, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
@@ -189,7 +189,7 @@ XRCORE_API void m64()
 XRCORE_API void m64r()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_X64
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_64, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
