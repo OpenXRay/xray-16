@@ -1,11 +1,11 @@
 #pragma once
 
-#if defined(__linux__)
+#if defined(_WIN32)
+#define XR_PLATFORM_WINDOWS
+#elif defined(__linux__)
 #define XR_PLATFORM_LINUX
 #elif defined(__FreeBSD__)
 #define XR_PLATFORM_FREEBSD
-#elif defined(_WIN32)
-#define XR_PLATFORM_WINDOWS
 #else
 #error Unsupported platform
 #endif
