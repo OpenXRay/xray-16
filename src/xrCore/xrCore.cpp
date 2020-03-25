@@ -206,19 +206,18 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #else
-
-        char* pref_path = SDL_GetBasePath();
-        if (!strstr(Core.Params, "-fsltx"))   // Если введён ключь fsltx то ничего не делаем переменной pref_path уже присвоенно необходимое значение (это необходимо для возможности указать относительный путь, а не полный начинающийся от корня)
+        char* pref_path = nullptr;
+        if (strstr(Core.Params, "-fsltx"))
+            pref_path = SDL_GetBasePath();
+        else
         {
-            SDL_free(pref_path);
-            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))                // Оставил такие же ключи для запуска ТЧ как и у Султана
-                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
-            else if (strstr(Core.Params, "-cs"))
-                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
-            else
-                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
-        }
-
+        if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+            pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
+        else if (strstr(Core.Params, "-cs"))
+            pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
+        else
+            pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
+}
         SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
         SDL_free(pref_path);
 #endif
@@ -247,7 +246,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         string_path tmp;
         xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);                           // записать в tmp путь ApplicationPath/fsgame.ltx
         struct stat statbuf;
-        ZeroMemory(&statbuf, sizeof(statbuf));                                         // очистить память
+        ZeroMemory(&statbuf, sizeof(statbuf));                                      // очистить память
 //memset(&statbuf, 0, sizeof(struct stat));
         int res = lstat(tmp, &statbuf);                                             // проверить существует ли линк fsgame.ltx
         
@@ -271,7 +270,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         else                                                                        // если запускаем ЗП
         {
             xr_sprintf(tmp, "%sgamedata", ApplicationPath);                         // записать в tmp путь ApplicationPath/gamedata
-            ZeroMemory(&statbuf, sizeof(statbuf));                                     // очистить память
+            ZeroMemory(&statbuf, sizeof(statbuf));                                  // очистить память
 //memset(&statbuf, 0, sizeof(struct stat));
             res = lstat(tmp, &statbuf);                                             // проверить существует ли линк ApplicationPath/gamedata
             if (-1 == res || !S_ISLNK(statbuf.st_mode))                             // если не существует
