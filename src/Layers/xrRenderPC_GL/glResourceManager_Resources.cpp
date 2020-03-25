@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#ifndef _EDITOR
-#include "../../xrEngine/Render.h"
-#endif
-
 #include "../xrRender/ResourceManager.h"
 #include "../xrRender/tss.h"
 #include "../xrRender/blenders/Blender.h"

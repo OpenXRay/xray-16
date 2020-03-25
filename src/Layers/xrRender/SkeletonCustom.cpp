@@ -5,9 +5,6 @@
 #include "SkeletonCustom.h"
 #include "SkeletonX.h"
 #include "xrCore/FMesh.hpp"
-#ifndef _EDITOR
-#include "xrEngine/Render.h"
-#endif
 int psSkeletonUpdate = 32;
 Lock UCalc_Mutex
 #ifdef CONFIG_PROFILE_LOCKS

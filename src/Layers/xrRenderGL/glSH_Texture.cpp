@@ -3,10 +3,6 @@
 
 #include "../xrRender/ResourceManager.h"
 
-#ifndef _EDITOR
-#include "../../xrEngine/Render.h"
-#endif
-
 #ifdef WINDOWS // TODO
 #include "../../xrEngine/tntQAVI.h"
 #endif
