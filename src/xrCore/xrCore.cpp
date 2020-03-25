@@ -247,7 +247,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         string_path tmp;
         xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);                           // записать в tmp путь ApplicationPath/fsgame.ltx
         struct stat statbuf;
-        ZeroMemory(&statbuf, sizeof(stat));                                         // очистить память
+        ZeroMemory(&statbuf, sizeof(statbuf));                                         // очистить память
+//memset(&statbuf, 0, sizeof(struct stat));
         int res = lstat(tmp, &statbuf);                                             // проверить существует ли линк fsgame.ltx
         
         if (-1 == res || !S_ISLNK(statbuf.st_mode))                                 // если не существует
@@ -257,7 +258,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
                                        || strstr(Core.Params, "-soc"))              // если запускаем ЧН или ТЧ то
         {
             xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);              // записать в tmp путь ApplicationPath/gamedata/shaders/gl
-            ZeroMemory(&statbuf, sizeof(stat));                                     // очистить память
+           ZeroMemory(&statbuf, sizeof(statbuf));                                     // очистить память
+//memset(&statbuf, 0, sizeof(struct stat));
             res = lstat(tmp, &statbuf);                                             // проверить существует ли линк gamedata/shaders/gl
             if (-1 == res || !S_ISLNK(statbuf.st_mode))                             // если не существует
             {
@@ -269,7 +271,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         else                                                                        // если запускаем ЗП
         {
             xr_sprintf(tmp, "%sgamedata", ApplicationPath);                         // записать в tmp путь ApplicationPath/gamedata
-            ZeroMemory(&statbuf, sizeof(stat));                                     // очистить память
+            ZeroMemory(&statbuf, sizeof(statbuf));                                     // очистить память
+//memset(&statbuf, 0, sizeof(struct stat));
             res = lstat(tmp, &statbuf);                                             // проверить существует ли линк ApplicationPath/gamedata
             if (-1 == res || !S_ISLNK(statbuf.st_mode))                             // если не существует
                 symlink("/usr/share/openxray/gamedata", tmp);                       // создать линк на gamedata
