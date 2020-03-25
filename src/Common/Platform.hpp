@@ -17,7 +17,7 @@
 #elif defined(__arm__) || defined(_M_ARM)
 #define XR_ARM
 #else
-#define XR_X86
+#define XR_ARCHITECTURE_X86
 #endif
 
 #include "Common/Compiler.inl"

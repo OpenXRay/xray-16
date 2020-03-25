@@ -24,7 +24,7 @@
 #define ALIGN(a)                __attribute__((aligned(a)))
 
 // Debugger trap implementation
-#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #define DEBUG_BREAK             do { __asm__ volatile ("int $3"); } while(0)
 #elif defined(XR_ARM)
 #define DEBUG_BREAK             do { __asm__ volatile (".inst 0xe7f001f0"); } while(0)

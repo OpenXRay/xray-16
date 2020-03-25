@@ -61,7 +61,7 @@ static BOOL bException = FALSE;
 
 #if defined XR_ARCHITECTURE_X64
 #define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
-#elif defined XR_X86
+#elif defined XR_ARCHITECTURE_X86
 #define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
 #elif defined XR_ARM64
 #define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM64
@@ -326,7 +326,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
     stackFrame.AddrStack.Offset = threadCtx->Rsp;
     stackFrame.AddrFrame.Mode = AddrModeFlat;
     stackFrame.AddrFrame.Offset = threadCtx->Rbp;
-#elif defined XR_X86
+#elif defined XR_ARCHITECTURE_X86
     stackFrame.AddrPC.Mode = AddrModeFlat;
     stackFrame.AddrPC.Offset = threadCtx->Eip;
     stackFrame.AddrStack.Mode = AddrModeFlat;

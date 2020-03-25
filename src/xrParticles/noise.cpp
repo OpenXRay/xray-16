@@ -3,7 +3,7 @@
 #include "noise.h"
 
 #ifndef _EDITOR
-#if defined(XR_X86) || defined(XR_ARCHITECTURE_X64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include <xmmintrin.h>
 #elif defined(XR_ARM) || defined(XR_ARM64)
 #include "Externals/sse2neon/sse2neon.h"
