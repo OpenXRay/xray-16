@@ -15,7 +15,7 @@ public:
 protected:
 #if defined(XR_PLATFORM_WINDOWS)
     virtual ~ICollisionDamageReceiver() = 0 {}
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     virtual ~ICollisionDamageReceiver() {}
 #endif
 };

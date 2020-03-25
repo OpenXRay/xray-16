@@ -26,7 +26,7 @@
 
 #include "xrEngine/TaskScheduler.hpp"
 
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
 #endif
 #include "IGame_Persistent.h"
@@ -115,7 +115,7 @@ void CRenderDevice::RenderEnd(void)
     g_bRendering = FALSE;
     // end scene
     // Present goes here, so call OA Frame end.
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(Device.fTimeGlobal);
 #endif
@@ -251,7 +251,7 @@ bool CRenderDevice::BeforeFrame()
         return false;
     }
 
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
 #endif

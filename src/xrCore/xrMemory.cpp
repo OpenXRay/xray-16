@@ -4,7 +4,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -91,7 +91,7 @@ XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
         }
         memory_info.BaseAddress = (char*)memory_info.BaseAddress + memory_info.RegionSize;
     }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     struct sysinfo si;
     sysinfo(&si);
     *_free = si.freeram * si.mem_unit;
@@ -117,7 +117,7 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;

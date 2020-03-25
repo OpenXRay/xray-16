@@ -4,7 +4,7 @@
 #include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
 #endif
 
@@ -33,7 +33,7 @@ void IConsole_Command::InvalidSyntax()
     Msg("~ Invalid syntax in call to '%s'", cName);
     Msg("~ Valid arguments: %s", I);
 
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
     g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
 #endif
@@ -945,7 +945,7 @@ void CCC_Register()
 #endif
 
     CMD1(CCC_ExclusiveMode, "input_exclusive_mode");
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     extern int g_svTextConsoleUpdateRate;
     CMD4(CCC_Integer, "sv_console_update_rate", &g_svTextConsoleUpdateRate, 1, 100);
 #endif

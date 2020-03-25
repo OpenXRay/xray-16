@@ -5,7 +5,7 @@
 #include "Threading/Lock.hpp"
 
 #include <string>
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
 #include <cstdio>
 #elif defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)

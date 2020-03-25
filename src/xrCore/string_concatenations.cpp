@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "string_concatenations.h"
 
-#if defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 int _cdecl _resetstkoflw(void)
 {
     int stack_addr;

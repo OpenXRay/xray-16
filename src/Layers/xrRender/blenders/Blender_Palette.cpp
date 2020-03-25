@@ -11,7 +11,7 @@ IC bool p_sort(IBlender* A, IBlender* B) { return xr_stricmp(A->getComment(), B-
 #else
 #if defined(XR_PLATFORM_WINDOWS)
 #define TYPES_EQUAL(A, B) (typeid(A).raw_name() == typeid(B).raw_name())
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #define TYPES_EQUAL(A, B) (typeid(A).name() == typeid(B).name())
 #endif
 #endif

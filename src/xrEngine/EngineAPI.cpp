@@ -208,7 +208,7 @@ void CEngineAPI::CreateRendererList()
 #if defined(XR_PLATFORM_WINDOWS)
         R_ASSERT2(renderers[r1_library]->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
         VidQualityToken.emplace_back(renderer_r1, 0);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         R_ASSERT2(renderers[gl_library]->IsLoaded(), "Dedicated server needs xrRender_GL to work");
         VidQualityToken.emplace_back(renderer_gl, 0);
 #endif

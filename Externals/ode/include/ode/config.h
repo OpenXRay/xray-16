@@ -23,7 +23,7 @@
 
 /* per-machine configuration */
 
-#ifdef LINUX
+#ifdef XR_PLATFORM_LINUX
 #include <stdint.h>
 #endif
 

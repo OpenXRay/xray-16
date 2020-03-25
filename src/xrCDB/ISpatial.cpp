@@ -279,7 +279,7 @@ void ISpatial_DB::insert(ISpatial* S)
             xrDebug::Fatal(DEBUG_INFO, "Invalid OBJECT position or radius (%s)", O->cName().c_str());
         else
         {
-#ifndef LINUX
+#ifndef XR_PLATFORM_LINUX
             CPS_Instance* P = dynamic_cast<CPS_Instance*>(S);
             if (P)
                 xrDebug::Fatal(DEBUG_INFO, "Invalid PS spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",
@@ -291,7 +291,7 @@ void ISpatial_DB::insert(ISpatial* S)
             // In Linux there is a linking issue because `CPS_Instance` belongs to xrEngine
             // and is not available to xrCDB due to source code organization
             xrDebug::Fatal(DEBUG_INFO, "Invalid PS or other spatial position");
-#endif // ifndef LINUX
+#endif // ifndef XR_PLATFORM_LINUX
         }
     }
 #endif

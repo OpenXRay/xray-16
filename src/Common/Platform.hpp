@@ -1,7 +1,7 @@
 #pragma once
 
 #if defined(__linux__)
-#define LINUX
+#define XR_PLATFORM_LINUX
 #elif defined(__FreeBSD__)
 #define XR_PLATFORM_FREEBSD
 #elif defined(_WIN32)
@@ -24,7 +24,7 @@
 
 #include <ctime>
 
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
 #include "Common/PlatformLinux.inl"
 #elif defined(XR_PLATFORM_FREEBSD)
 #include "Common/PlatformBSD.inl"

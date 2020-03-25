@@ -46,7 +46,7 @@ static BOOL bException = FALSE;
 #include <new.h> // for _set_new_mode
 #include <signal.h> // for signals
 #include <errorrep.h> // ReportFault
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <sys/user.h>
 #include <sys/ptrace.h>
 #include <cxxabi.h>
@@ -193,7 +193,7 @@ Lock xrDebug::dbgHelpLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
 #endif
 
@@ -434,7 +434,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, bufferSize, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     void *array[20];
     int nptrs = backtrace(array, 20);     // get void*'s for all entries on the stack
     char **strings = backtrace_symbols(array, nptrs);

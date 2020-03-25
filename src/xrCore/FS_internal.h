@@ -135,7 +135,7 @@ class CVirtualFileReader : public IReader
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     void *hSrcFile, *hSrcMap;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     int hSrcFile;
 #endif
 

@@ -23,9 +23,9 @@ void nativeCpuId(int regs[4], int i)
 {
 #ifdef XR_PLATFORM_WINDOWS
     __cpuid((int *)regs, (int)i);
-#elif (defined(LINUX) || defined(XR_PLATFORM_FREEBSD)) && defined(GCC)
+#elif (defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)) && defined(GCC)
     __cpuid((int)i, (int *)regs);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #if defined(XR_X86) || defined(XR_X64)
     asm volatile("cpuid" :
     "=eax" (regs[0]),
@@ -161,7 +161,7 @@ unsigned int query_processor_info(processor_info* pinfo)
 #ifdef XR_PLATFORM_WINDOWS
     ULONG_PTR pa_mask_save, sa_mask_stub = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     unsigned int pa_mask_save = 0;
     cpu_set_t my_set;
     CPU_ZERO(&my_set);
@@ -202,7 +202,7 @@ unsigned int query_processor_info(processor_info* pinfo)
         byteOffset += sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
         ptr++;
     }
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     int logicalProcessorCount = std::thread::hardware_concurrency();
 
     //not sure about processorCoreCount - is it really cores or threads

@@ -266,7 +266,7 @@ void profile_store::check_sake_actuality()
 {
     if (!m_awards_store->is_sake_equal_to_file() || !m_best_scores_store->is_sake_equal_to_file())
     {
-#ifndef LINUX // FIXME!!!
+#ifndef XR_PLATFORM_LINUX // FIXME!!!
         __time32_t current_time;
         _time32(&current_time);
 

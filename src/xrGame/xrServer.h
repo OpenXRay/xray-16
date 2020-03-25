@@ -9,7 +9,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Server.h"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include "xrNetServer/empty/NET_Server.h"
 #endif
 #include "game_sv_base.h"

@@ -6,7 +6,7 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include "vfw.h"
 #include "mmsystem.h"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <FreeImage.h>
 #endif
 

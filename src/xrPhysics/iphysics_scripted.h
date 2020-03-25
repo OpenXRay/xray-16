@@ -31,7 +31,7 @@ protected:
 #else
 #if defined(XR_PLATFORM_WINDOWS)
     virtual ~iphysics_scripted_class() = 0 {}
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     virtual ~iphysics_scripted_class() {}
 #endif
 #endif

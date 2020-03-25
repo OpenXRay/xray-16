@@ -12,7 +12,7 @@
 #endif
 #endif
 
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
 #include <math.h>
 #endif
 

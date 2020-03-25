@@ -2,7 +2,7 @@
 #include "resource.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -83,7 +83,7 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
     }
     return result;
 }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;

@@ -307,7 +307,7 @@ private:
     void CalcFrameStats();
 
 public:
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif
 

@@ -102,7 +102,7 @@ inline HANDLE CreateMailSlotByName(LPCSTR slotName)
         MAILSLOT_WAIT_FOREVER, // no time-out for operations
         (LPSECURITY_ATTRIBUTES)NULL); // no security attributes
     return hSlot;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     return NULL;
 #endif
 }

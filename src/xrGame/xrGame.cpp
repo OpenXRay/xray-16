@@ -33,7 +33,7 @@ DLL_API void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
 
 void CCC_RegisterCommands();
 
-#ifdef LINUX
+#ifdef XR_PLATFORM_LINUX
 __attribute__((constructor))
 #endif
 static void load(int argc, char** argv, char** envp)
@@ -51,7 +51,7 @@ static void load(int argc, char** argv, char** envp)
     StringTable().Init();
 }
 
-#ifdef LINUX
+#ifdef XR_PLATFORM_LINUX
 __attribute__((destructor))
 #endif
 static void unload()

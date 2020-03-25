@@ -10,7 +10,7 @@ class CFileStreamReader : public CStreamReader
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     HANDLE m_file_handle;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     int m_file_handle;
 #endif
 

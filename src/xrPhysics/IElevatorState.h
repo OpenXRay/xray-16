@@ -21,7 +21,7 @@ public:
 protected:
 #if defined(XR_PLATFORM_WINDOWS)
     virtual ~IElevatorState() = 0 {}
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     virtual ~IElevatorState() {}
 #endif
 };

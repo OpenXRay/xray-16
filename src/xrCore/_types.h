@@ -57,7 +57,7 @@ constexpr double dbl_min = type_min<double>;
 constexpr double dbl_zero = type_zero<double>;
 constexpr double dbl_eps = type_epsilon<double>;
 
-#if defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 constexpr size_t max_path = PATH_MAX;
 #elif defined(XR_PLATFORM_WINDOWS)
 constexpr size_t max_path = MAX_PATH;
@@ -80,7 +80,7 @@ using string_path = char[2 * max_path];
 // XXX: Replace __interface with either struct or class. MS defines it as struct for COM, but this project is C++.
 #if defined(XR_PLATFORM_WINDOWS)
 #define xr_pure_interface __interface
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #define xr_pure_interface struct
 #endif
 #endif

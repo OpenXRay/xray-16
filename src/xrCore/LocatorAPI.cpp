@@ -20,7 +20,7 @@
 #include "xrCore/Threading/Lock.hpp"
 #include "Crypto/trivial_encryptor.h"
 
-#if defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include "SDL.h"
 #include "xrstring.h"
 #include <glob.h>
@@ -172,7 +172,7 @@ CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
     SYSTEM_INFO sys_inf;
     GetSystemInfo(&sys_inf);
     dwAllocGranularity = sys_inf.dwAllocationGranularity;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     dwAllocGranularity = sysconf(_SC_PAGE_SIZE);
 #endif
     m_iLockRescan = 0;
@@ -329,7 +329,7 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bo
 };
 #endif
 
-#if defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType;
@@ -488,7 +488,7 @@ void CLocatorAPI::archive::open()
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
     size = GetFileSize(hSrcFile, nullptr);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     // Open the file
     if (hSrcFile)
         return;
@@ -512,7 +512,7 @@ void CLocatorAPI::archive::close()
     hSrcMap = nullptr;
     CloseHandle(hSrcFile);
     hSrcFile = nullptr;
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     ::close(hSrcFile);
     hSrcFile = -1;
 #endif
@@ -577,7 +577,7 @@ bool CLocatorAPI::load_all_unloaded_archives()
     {
 #if defined(XR_PLATFORM_WINDOWS)
         if (archive.hSrcFile == nullptr)
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
         if (archive.hSrcFile == 0)
 #endif
         {
@@ -595,7 +595,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 #if defined(XR_PLATFORM_WINDOWS)
     xr_strcpy(N, sizeof N, path);
     xr_strcat(N, entry.name);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     xr_strcpy(N, sizeof N, entry.name);
 #endif
 
@@ -667,7 +667,7 @@ bool ignore_path(pcstr _path)
     }
     else
         return true;
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     pstr conv_path = xr_strdup(_path);
     convert_path_separators(conv_path);
     int h = ::open(conv_path, O_RDONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -698,7 +698,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
         return false;
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     glob_t globbuf;
 
     globbuf.gl_offs = 256;
@@ -715,7 +715,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     intptr_t done = handle;
     while (done != -1)
     {
-#if defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
         xr_strcpy(findData.name, globbuf.gl_pathv[handle - done]);
         struct stat fi;
         stat(findData.name, &fi);
@@ -739,7 +739,7 @@ bool CLocatorAPI::Recurse(pcstr path)
             xr_strcpy(fullPath, sizeof fullPath, path);
             xr_strcat(fullPath, findData.name);
             ignore = ignore_name(findData.name) || ignore_path(fullPath);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
             xr_strcpy(fullPath, sizeof fullPath, findData.name); // glob return full path to file
             ignore = ignore_name(findData.name);
 #endif
@@ -752,13 +752,13 @@ bool CLocatorAPI::Recurse(pcstr path)
             rec_files.push_back(findData);
 #ifdef XR_PLATFORM_WINDOWS
         done = _findnext(handle, &findData);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
         done--;
 #endif
     }
 #ifdef XR_PLATFORM_WINDOWS
     _findclose(handle);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     globfree(&globbuf);
 #endif
     size_t newSize = rec_files.size();
@@ -803,7 +803,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     
 #if defined(XR_PLATFORM_WINDOWS)
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     if (SDL_strlen(fs_path) != 0)
     {
         char *tmp_path = realpath(fs_path, NULL);
@@ -1369,7 +1369,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
 #if defined(XR_PLATFORM_WINDOWS)
     u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
     VERIFY3(ptr, "cannot create file mapping on file", fname);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     u8* ptr = (u8*)::mmap(NULL, sz, PROT_READ, MAP_SHARED, A.hSrcFile, start);
     VERIFY3(ptr && ptr != MAP_FAILED, "cannot create file mapping on file", fname);
 #endif
@@ -1394,7 +1394,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     R = new CTempReader(dest, desc.size_real, 0);
 #if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile(ptr);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     ::munmap(ptr, sz);
 #endif
 
@@ -1412,7 +1412,7 @@ void CLocatorAPI::file_from_archive(CStreamReader*& R, pcstr fname, const file& 
     R = new CStreamReader();
 #if defined(XR_PLATFORM_WINDOWS)
     R->construct(A.hSrcMap, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     R->construct(A.hSrcFile, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
 #endif
 }
@@ -1624,7 +1624,7 @@ void CLocatorAPI::w_close(IWriter*& S)
             struct _stat st;
             _stat(fname, &st);
             Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
-#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
             struct stat st;
             ::stat(fname, &st);
             Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);

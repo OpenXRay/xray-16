@@ -15,7 +15,7 @@
 #include "std_classes.h"
 #include "GameFont.h"
 #include "xrCDB/ISpatial.h"
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
 #endif
 #include "xrServerEntities/smart_cast.h"
@@ -163,7 +163,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     {
         if (pInput != nullptr)
             pInput->GrabInput(false);
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
         g_SASH.EndBenchmark();
 #endif
         SDL_Event quit = { SDL_QUIT };
@@ -472,7 +472,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
         CLocatorAPI::archive& A = *it;
 #if defined(XR_PLATFORM_WINDOWS)
         if (A.hSrcFile == nullptr)
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         if (A.hSrcFile == 0)
 #endif
         {

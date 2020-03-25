@@ -7,7 +7,7 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #pragma comment(lib, "winmm.lib")
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -258,7 +258,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
         if(pw)
@@ -322,7 +322,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         EFS._initialize();
 #ifdef DEBUG
 #ifndef _EDITOR
-#ifndef LINUX // FIXME!!!
+#ifndef XR_PLATFORM_LINUX // FIXME!!!
         Msg("Process heap 0x%08x", GetProcessHeap());
 #endif
 #endif

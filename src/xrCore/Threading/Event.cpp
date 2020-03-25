@@ -13,7 +13,7 @@ bool Event::Wait(u32 millisecondsTimeout) noexcept
 {
     return WaitForSingleObject(handle, millisecondsTimeout) != WAIT_TIMEOUT;
 }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <pthread.h>
 Event::Event() noexcept
 {
