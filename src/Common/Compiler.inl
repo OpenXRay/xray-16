@@ -26,9 +26,9 @@
 // Debugger trap implementation
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #define DEBUG_BREAK             do { __asm__ volatile ("int $3"); } while(0)
-#elif defined(XR_ARM)
+#elif defined(XR_ARCHITECTURE_ARM)
 #define DEBUG_BREAK             do { __asm__ volatile (".inst 0xe7f001f0"); } while(0)
-#elif defined(XR_ARM64)
+#elif defined(XR_ARCHITECTURE_ARM64)
 #define DEBUG_BREAK             do { __asm__ volatile (".inst 0xd4200000"); } while(0)
 #elif __has_include(<signal.h>)
 #include <signal.h>

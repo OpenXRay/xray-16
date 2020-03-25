@@ -18,10 +18,10 @@
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include <x86intrin.h> // __rdtsc
-#elif defined(XR_ARM)
+#elif defined(XR_ARCHITECTURE_ARM)
 #include <sys/syscall.h>
 #include <linux/perf_event.h>
-#endif // defined(XR_ARM)
+#endif // defined(XR_ARCHITECTURE_ARM)
 
 #ifdef XR_PLATFORM_LINUX
 #include <fpu_control.h>
@@ -51,13 +51,13 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <thread>
 #include "SDL.h"
 
-#if defined(XR_ARM) || defined(XR_ARM64)
+#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #define _FPU_EXTENDED 0
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
 #define _FPU_RC_NEAREST 0
 
-#if defined(XR_ARM)
+#if defined(XR_ARCHITECTURE_ARM)
 static class PerfInit
 {
 public:
@@ -76,8 +76,8 @@ public:
         close(fddev);
     }
 } s_perf_init;
-#endif // defined(XR_ARM)
-#endif // defined(XR_ARM) || defined(XR_ARM64)
+#endif // defined(XR_ARCHITECTURE_ARM)
+#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
@@ -242,12 +242,12 @@ XRCORE_API u64 QPC() noexcept
 
 XRCORE_API u64 GetCLK()
 {
-#if defined(XR_ARM)
+#if defined(XR_ARCHITECTURE_ARM)
     long long result = 0;
     if (read(s_perf_init.fddev, &result, sizeof(result)) < sizeof(result))
         return 0;
     return result;
-#elif defined(XR_ARM64)
+#elif defined(XR_ARCHITECTURE_ARM64)
     int64_t virtual_timer_value;
     asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
     return virtual_timer_value;
@@ -274,7 +274,7 @@ bool g_initialize_cpu_called = false;
 u32 cpufreq()
 {
     u32 cpuFreq = 0;
-#if defined(XR_ARM64) || defined(XR_ARM)
+#if defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_ARM)
     xr_string parcedFreq;
     std::ifstream cpuMaxFreq("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
     if (cpuMaxFreq.is_open())
@@ -380,7 +380,7 @@ void _initialize_cpu()
 }
 
 // per-thread initialization
-#if defined(XR_ARM) || defined(XR_ARM64)
+#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #define _MM_SET_FLUSH_ZERO_MODE(mode)
 #define _MM_SET_DENORMALS_ZERO_MODE(mode)
 #else

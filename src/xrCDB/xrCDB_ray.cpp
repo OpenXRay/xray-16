@@ -5,7 +5,7 @@
 #pragma warning(disable : 4995)
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include <xmmintrin.h>
-#elif defined(XR_ARM) || defined(XR_ARM64)
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "Externals/sse2neon/sse2neon.h"
 #endif
 #pragma warning(pop)

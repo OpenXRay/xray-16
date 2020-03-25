@@ -225,7 +225,7 @@ typedef struct tagTOGGLEKEYS
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
 
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARM64)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64)
 typedef int64_t INT_PTR;
 typedef uint64_t UINT_PTR;
 typedef int64_t LONG_PTR;

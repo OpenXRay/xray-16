@@ -21,7 +21,7 @@
 
 #if defined(XR_ARCHITECTURE_X64)
 #define _finddata_t _finddata64i32_t
-#elif defined(XR_ARCHITECTURE_X86) || defined(XR_ARM) || defined(XR_ARM64)
+#elif defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #define _finddata_t _finddata32_t
 #endif
 

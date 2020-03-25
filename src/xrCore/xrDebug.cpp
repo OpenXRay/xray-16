@@ -63,9 +63,9 @@ static BOOL bException = FALSE;
 #define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
 #elif defined XR_ARCHITECTURE_X86
 #define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
-#elif defined XR_ARM64
+#elif defined XR_ARCHITECTURE_ARM64
 #define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM64
-#elif defined XR_ARM
+#elif defined XR_ARCHITECTURE_ARM
 #define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM
 #else
 #error CPU architecture is not supported.
