@@ -14,9 +14,9 @@
 #define XR_ARCHITECTURE_X86
 #elif defined(_M_X64) || defined(__amd64__) || defined(__x86_64__)
 #define XR_ARCHITECTURE_X64
-#elif defined(__arm__) || defined(_M_ARM)
+#elif defined(_M_ARM) || defined(__arm__)
 #define XR_ARCHITECTURE_ARM
-#elif defined (__aarch64__) || defined(_M_ARM64)
+#elif defined (_M_ARM64) || defined(__aarch64__)
 #define XR_ARCHITECTURE_ARM64
 #else
 #error Unsupported architecture
