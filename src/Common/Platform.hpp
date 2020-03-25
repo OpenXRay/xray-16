@@ -39,4 +39,6 @@
 #include "Common/PlatformBSD.inl"
 #elif defined(XR_PLATFORM_WINDOWS)
 #include "Common/PlatformWindows.inl"
+#else
+#error Provide Platform.inl file for your platform
 #endif
