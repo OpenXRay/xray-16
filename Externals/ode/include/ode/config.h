@@ -23,7 +23,7 @@
 
 /* per-machine configuration */
 
-#ifdef XR_PLATFORM_LINUX
+#ifdef LINUX
 #include <stdint.h>
 #endif
 
@@ -58,7 +58,7 @@ extern "C" {
 
 #include <stdarg.h>
 
-#ifndef XR_PLATFORM_FREEBSD
+#ifndef FREEBSD
 #include <malloc.h>		// for alloca under windows
 #endif
 
