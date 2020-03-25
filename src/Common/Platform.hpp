@@ -33,12 +33,12 @@
 
 #include <ctime>
 
-#if defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_WINDOWS)
+#include "Common/PlatformWindows.inl"
+#elif defined(XR_PLATFORM_LINUX)
 #include "Common/PlatformLinux.inl"
 #elif defined(XR_PLATFORM_FREEBSD)
 #include "Common/PlatformBSD.inl"
-#elif defined(XR_PLATFORM_WINDOWS)
-#include "Common/PlatformWindows.inl"
 #else
 #error Provide Platform.inl file for your platform
 #endif
