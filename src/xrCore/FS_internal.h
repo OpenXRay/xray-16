@@ -12,7 +12,7 @@
 #include <share.h>
 #endif
 
-#if defined(FREEBSD)
+#if defined(XR_PLATFORM_FREEBSD)
 #define _sys_errlist sys_errlist
 #endif
 

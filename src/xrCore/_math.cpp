@@ -15,7 +15,7 @@
 //?
 #endif
 
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
 #if defined(XR_X86) || defined(XR_X64)
 #include <x86intrin.h> // __rdtsc
 #elif defined(XR_ARM)
@@ -25,7 +25,7 @@
 
 #ifdef LINUX
 #include <fpu_control.h>
-#elif defined(FREEBSD)
+#elif defined(XR_PLATFORM_FREEBSD)
 #include <sys/sysctl.h>
 #include <fenv.h>
 typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
@@ -94,7 +94,7 @@ XRCORE_API Fmatrix Fidentity;
 XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
 DWORD timeGetTime()
 {
     return SDL_GetTicks();
@@ -118,7 +118,7 @@ XRCORE_API void m24()
     _controlfp(_PC_24, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE;
@@ -133,7 +133,7 @@ XRCORE_API void m24r()
     _controlfp(_PC_24, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE | _FPU_RC_NEAREST;
@@ -148,7 +148,7 @@ XRCORE_API void m53()
     _controlfp(_PC_53, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE;
@@ -163,7 +163,7 @@ XRCORE_API void m53r()
     _controlfp(_PC_53, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE | _FPU_RC_NEAREST;
@@ -178,7 +178,7 @@ XRCORE_API void m64()
     _controlfp(_PC_64, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED;
@@ -193,7 +193,7 @@ XRCORE_API void m64r()
     _controlfp(_PC_64, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED | _FPU_RC_NEAREST;
@@ -205,7 +205,7 @@ void initialize()
 {
 #if defined(XR_PLATFORM_WINDOWS)
     _clearfp();
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     fpu_cw = _FPU_DEFAULT;
     _FPU_SETCW(fpu_cw);
@@ -219,7 +219,7 @@ void initialize()
 
 #if defined(XR_PLATFORM_WINDOWS)
     ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(LINUX) || defined(XR_PLATFORM_FREEBSD)
     ::Random.seed(u32(CPU::GetCLK() % ((u64)0x1 << 32)));
 #endif
 }
@@ -320,7 +320,7 @@ u32 cpufreq()
 #endif
     return cpuFreq;
 }
-#elif defined(FREEBSD)
+#elif defined(XR_PLATFORM_FREEBSD)
 u32 cpufreq()
 {
     u32 cpuFreq = 0;

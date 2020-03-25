@@ -58,7 +58,7 @@ extern "C" {
 
 #include <stdarg.h>
 
-#ifndef FREEBSD
+#ifndef XR_PLATFORM_FREEBSD
 #include <malloc.h>		// for alloca under windows
 #endif
 

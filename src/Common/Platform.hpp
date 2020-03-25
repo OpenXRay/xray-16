@@ -3,7 +3,7 @@
 #if defined(__linux__)
 #define LINUX
 #elif defined(__FreeBSD__)
-#define FREEBSD
+#define XR_PLATFORM_FREEBSD
 #elif defined(_WIN32)
 #define XR_PLATFORM_WINDOWS
 #else
@@ -26,7 +26,7 @@
 
 #if defined(LINUX)
 #include "Common/PlatformLinux.inl"
-#elif defined(FREEBSD)
+#elif defined(XR_PLATFORM_FREEBSD)
 #include "Common/PlatformBSD.inl"
 #elif defined(XR_PLATFORM_WINDOWS)
 #include "Common/PlatformWindows.inl"

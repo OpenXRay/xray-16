@@ -205,7 +205,7 @@ public:
 typedef _vector4<float> Fvector4;
 typedef _vector4<double> Dvector4;
 typedef _vector4<s32> Ivector4;
-#ifdef FREEBSD
+#ifdef XR_PLATFORM_FREEBSD
 alignas(16) inline _vector4<float> Fvector4a;
 alignas(16) inline _vector4<double> Dvector4a;
 alignas(16) inline _vector4<s32> Ivector4a;
