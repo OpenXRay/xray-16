@@ -333,6 +333,10 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
     stackFrame.AddrStack.Offset = threadCtx->Esp;
     stackFrame.AddrFrame.Mode = AddrModeFlat;
     stackFrame.AddrFrame.Offset = threadCtx->Ebp;
+#elif defined XR_ARCHITECTURE_ARM
+#error TODO
+#elif defined XR_ARCHITECTURE_ARM64
+#error TODO
 #else
 #error CPU architecture is not supported.
 #endif

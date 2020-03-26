@@ -51,7 +51,7 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <thread>
 #include "SDL.h"
 
-#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)) && !defined(XR_COMPILER_MSVC)
 #define _FPU_EXTENDED 0
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
@@ -242,7 +242,21 @@ XRCORE_API u64 QPC() noexcept
 
 XRCORE_API u64 GetCLK()
 {
-#if defined(XR_ARCHITECTURE_ARM)
+#if defined(XR_COMPILER_MSVC)
+
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+    return __rdtsc();
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+    return __rdpmccntr64();
+#else
+#error Unsupported architecture
+#endif
+
+#elif defined(XR_COMPILER_GCC)
+
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+    return __rdtsc();
+#elif defined(XR_ARCHITECTURE_ARM)
     long long result = 0;
     if (read(s_perf_init.fddev, &result, sizeof(result)) < sizeof(result))
         return 0;
@@ -251,9 +265,12 @@ XRCORE_API u64 GetCLK()
     int64_t virtual_timer_value;
     asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
     return virtual_timer_value;
-#else
-    return __rdtsc();
 #endif
+
+#else
+#error Unsupported compiler
+#endif
+    return 0;
 }
 
 XRCORE_API u32 GetCurrentCPU()
