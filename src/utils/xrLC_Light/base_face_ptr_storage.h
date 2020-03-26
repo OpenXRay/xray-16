@@ -11,7 +11,6 @@ inline void store_base_face_pointer(CDB::TRI& tri, base_Face* face)
     if constexpr (sizeof(u32) == sizeof(base_Face*))
     {
         tri.dummy = *reinterpret_cast<u32*>(&face);
-        u32 dummy = reinterpret_cast<u32>(face);
         return;
     }
     const u32 idx = g_base_face_index++; // It's important to have postfix increment!
@@ -27,9 +26,7 @@ inline base_Face* get_base_face_pointer(const CDB::TRI& tri)
 {
     if constexpr (sizeof(u32) == sizeof(base_Face*))
     {
-        auto ptr = reinterpret_cast<base_Face*>(tri.dummy);
-        auto ppp = *reinterpret_cast<base_Face* const*>(&tri.dummy);
-        return ppp;
+        return *reinterpret_cast<base_Face* const*>(&tri.dummy);
     }
     if (tri.dummy < g_base_face_pointers.size())
         return g_base_face_pointers[tri.dummy];

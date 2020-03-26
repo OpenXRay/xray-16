@@ -25,7 +25,7 @@ XRCORE_API xrCore Core;
 
 static u32 init_counter = 0;
 
-#define DO_EXPAND(VAL) VAL##1
+#define DO_EXPAND(...) __VA_ARGS__##1
 #define EXPAND(VAL) DO_EXPAND(VAL)
 
 #ifdef CI
