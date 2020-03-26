@@ -814,7 +814,6 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     }
     else
     {
-
         char* pref_path = nullptr;
         if (strstr(Core.Params, "-fsltx"))
             pref_path = SDL_GetBasePath();
