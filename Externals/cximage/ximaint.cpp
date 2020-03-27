@@ -853,7 +853,7 @@ float CxImage::KernelBessel_J1(const float x)
 {
 	double p, q;
 	
-	register long i;
+	long i;
 	
 	static const double
 	Pone[] =
@@ -895,7 +895,7 @@ float CxImage::KernelBessel_P1(const float x)
 {
 	double p, q;
 	
-	register long i;
+	long i;
 	
 	static const double
 	Pone[] =
@@ -931,7 +931,7 @@ float CxImage::KernelBessel_Q1(const float x)
 {
 	double p, q;
 	
-	register long i;
+	long i;
 	
 	static const double
 	Pone[] =
