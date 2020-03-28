@@ -74,7 +74,6 @@ public:
     // smap
     ref_rt rt_smap_surf; // 32bit,		color
     ref_rt rt_smap_depth; // 24(32) bit,	depth
-    IDirect3DSurface9* rt_smap_ZB; //
 
     // Textures
     IDirect3DVolumeTexture9* t_material_surf;

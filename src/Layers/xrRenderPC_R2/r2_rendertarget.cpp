@@ -281,30 +281,29 @@ CRenderTarget::CRenderTarget()
     s_occq.create(b_occq, "r2" DELIMITER "occq");
 
     // DIRECT (spot)
-    D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
-
-    if (RImplementation.o.HW_smap)
     {
-        D3DFORMAT nullrt = D3DFMT_R5G6B5;
-        if (RImplementation.o.nullrt)
-            nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
+        const u32 smapsize = RImplementation.o.smapsize;
+        D3DFORMAT depth_format = D3DFMT_D24X8;
+        D3DFORMAT surf_format = D3DFMT_R32F;
 
-        u32 size = RImplementation.o.smapsize;
-        rt_smap_depth.create(r2_RT_smap_depth, size, size, depth_format);
-        rt_smap_surf.create(r2_RT_smap_surf, size, size, nullrt);
-        rt_smap_ZB = NULL;
-        s_accum_mask.create(b_accum_mask, "r2" DELIMITER "accum_mask");
+        Flags32 flags{};
+        if (!RImplementation.o.HW_smap)
+            flags.flags = CRT::CreateSurface;
+        else
+        {
+            depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
+            if (RImplementation.o.nullrt) // use nullrt if possible
+                surf_format = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
+            else
+                surf_format = D3DFMT_R5G6B5;
+        }
+
+        // Create D3DFMT_D24X8 depth-stencil surface if HW smap is not supported,
+        // otherwise - create texture with specified HW_smap_FORMAT
+        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
+        rt_smap_surf.create(r2_RT_smap_surf, smapsize, smapsize, surf_format);
+        reinit_cascades();
     }
-    else
-    {
-        u32 size = RImplementation.o.smapsize;
-        rt_smap_surf.create(r2_RT_smap_surf, size, size, D3DFMT_R32F);
-        rt_smap_depth = NULL;
-        R_CHK(HW.pDevice->CreateDepthStencilSurface(
-            size, size, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, TRUE, &rt_smap_ZB, NULL));
-        s_accum_mask.create(b_accum_mask, "r2" DELIMITER "accum_mask");
-    }
-    reinit_cascades();
 
     // POINT
     {
@@ -639,8 +638,6 @@ CRenderTarget::~CRenderTarget()
     t_envmap_1->surface_set(NULL);
     t_envmap_0.destroy();
     t_envmap_1.destroy();
-
-    _RELEASE(rt_smap_ZB);
 
     // Jitter
     for (int it = 0; it < TEX_jitter_count; it++)
