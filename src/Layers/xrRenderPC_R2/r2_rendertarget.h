@@ -175,7 +175,6 @@ private:
 public:
     CRenderTarget();
     ~CRenderTarget();
-    void reinit_cascades();
 
     void accum_point_geom_create();
     void accum_point_geom_destroy();

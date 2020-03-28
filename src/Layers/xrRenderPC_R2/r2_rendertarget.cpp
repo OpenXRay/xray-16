@@ -185,24 +185,6 @@ void generate_jitter(DWORD* dest, u32 elem_count)
         *dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
 
-void CRenderTarget::reinit_cascades()
-{
-    if (RImplementation.o.oldshadowcascades)
-    {
-        b_accum_direct = new CBlender_accum_direct();
-        s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct");
-        if (RImplementation.o.advancedpp)
-            s_accum_direct_volumetric.create("accum_volumetric_sun");
-    }
-    else
-    {
-        b_accum_direct = new CBlender_accum_direct_cascade();
-        s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct_cascade");
-        if (RImplementation.o.advancedpp)
-            s_accum_direct_volumetric.create("accum_volumetric_sun_cascade");
-    }
-}
-
 CRenderTarget::CRenderTarget()
 {
     param_blur = 0.f;
@@ -304,7 +286,20 @@ CRenderTarget::CRenderTarget()
         rt_smap_surf.create(r2_RT_smap_surf, smapsize, smapsize, surf_format);
 
         s_accum_mask.create(b_accum_mask, "r2" DELIMITER "accum_mask");
-        reinit_cascades();
+        if (RImplementation.o.oldshadowcascades)
+        {
+            b_accum_direct = new CBlender_accum_direct();
+            s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct");
+            if (RImplementation.o.advancedpp)
+                s_accum_direct_volumetric.create("accum_volumetric_sun");
+        }
+        else
+        {
+            b_accum_direct = new CBlender_accum_direct_cascade();
+            s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct_cascade");
+            if (RImplementation.o.advancedpp)
+                s_accum_direct_volumetric.create("accum_volumetric_sun_cascade");
+        }
     }
 
     // POINT
