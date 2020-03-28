@@ -37,7 +37,7 @@ bool CRT::used_as_depth() const
     }
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 0*/, Flags32 flags /*= {}*/)
 {
     if (pSurface)
         return;
@@ -134,10 +134,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool u
     }
 
 #ifdef USE_DX11
+    const bool useUAV = flags.test(CreateUAV);
     if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1 && useUAV)
         desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 #else
-    UNUSED(useUAV);
+    UNUSED(flags);
 #endif
 
     CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));
@@ -224,17 +225,11 @@ void CRT::destroy()
 }
 void CRT::reset_begin() { destroy(); }
 void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
-#ifdef USE_DX11
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
+
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 0*/, Flags32 flags /*= 0*/)
 {
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, useUAV));
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
 }
-#else
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
-{
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount));
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 /*	DX10 cut

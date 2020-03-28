@@ -661,7 +661,7 @@ CRenderTarget::CRenderTarget()
 
         if (ssao_hdao_ultra)
         {
-            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, true);
+            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, { CRT::CreateUAV });
             s_hdao_cs.create(b_hdao_cs, "r2" DELIMITER "ssao");
             if (RImplementation.o.dx10_msaa)
                 s_hdao_cs_msaa.create(b_hdao_msaa_cs, "r2" DELIMITER "ssao");
