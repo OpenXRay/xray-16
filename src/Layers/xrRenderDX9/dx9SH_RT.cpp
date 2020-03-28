@@ -37,7 +37,7 @@ bool CRT::used_as_depth() const
     }
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount = 1*/, Flags32 /*flags = {}*/)
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount = 1*/, Flags32 flags /*= {}*/)
 {
     if (pSurface)
         return;
@@ -50,6 +50,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount = 1*/
     dwWidth = w;
     dwHeight = h;
     fmt = f;
+
+    const D3DRESOURCETYPE type = flags.test(CreateSurface) ? D3DRTYPE_SURFACE : D3DRTYPE_TEXTURE;
 
     // Get caps
     D3DCAPS9 caps;
@@ -69,27 +71,45 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount = 1*/
         return;
 
     // Select usage
-    u32 usage = D3DUSAGE_RENDERTARGET;
-    if (used_as_depth())
-        usage = D3DUSAGE_DEPTHSTENCIL;
+    const bool useAsDepth = used_as_depth();
+    const u32 usage = useAsDepth ? D3DUSAGE_DEPTHSTENCIL : D3DUSAGE_RENDERTARGET;
 
     // Validate render-target usage
-    _hr = HW.pD3D->CheckDeviceFormat(HW.DevAdapter, HW.m_DriverType, HW.Caps.fTarget, usage, D3DRTYPE_TEXTURE, f);
+    _hr = HW.pD3D->CheckDeviceFormat(HW.DevAdapter, HW.m_DriverType, HW.Caps.fTarget, usage, type, f);
     if (FAILED(_hr))
         return;
 
     // Try to create texture/surface
     RImplementation.Resources->Evict();
-    _hr = HW.pDevice->CreateTexture(w, h, 1, usage, f, D3DPOOL_DEFAULT, &pSurface, NULL);
-    HW.stats_manager.increment_stats_rtarget(pSurface);
 
-    if (FAILED(_hr) || (0 == pSurface))
+    switch (type)
+    {
+    case D3DRTYPE_TEXTURE:
+    {
+        _hr = HW.pDevice->CreateTexture(w, h, 1, usage, f, D3DPOOL_DEFAULT, &pSurface, nullptr);
+        break;
+    }
+    case D3DRTYPE_SURFACE:
+    {
+        if (useAsDepth)
+            _hr = HW.pDevice->CreateDepthStencilSurface(w, h, f, D3DMULTISAMPLE_NONE, 0, TRUE, &pRT, nullptr);
+        else
+            _hr = HW.pDevice->CreateOffscreenPlainSurface(w, h, f, D3DPOOL_SYSTEMMEM, &pRT, nullptr);
+        break;
+    }
+    default: NODEFAULT;
+    }
+    if (FAILED(_hr))
         return;
 
     // OK
+    HW.stats_manager.increment_stats_rtarget(pSurface);
 #ifdef DEBUG
     Msg("* created RT(%s), %dx%d", Name, w, h);
-#endif // DEBUG
+#endif
+    if (!pSurface)
+        return; // special case (when type == D3DRTYPE_SURFACE)
+
     R_CHK(pSurface->GetSurfaceLevel(0, &pRT));
     pTexture = RImplementation.Resources->_CreateTexture(Name);
     pTexture->surface_set(pSurface);

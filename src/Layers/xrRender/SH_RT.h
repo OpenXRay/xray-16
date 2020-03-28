@@ -9,6 +9,7 @@ public:
     enum CreationFlags : u32
     {
         CreateUAV = 1 << 0, // Self descriptive. DX11-specific.
+        CreateSurface = 1 << 1, // Creates depth-stencil or offscreen plain surface instead of texture. DX9-specific.
     };
 
     CRT();
