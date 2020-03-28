@@ -407,11 +407,6 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
     };
 }
 
-D3DFORMAT CHW::GetSurfaceFormat() const
-{
-    return DevPP.BackBufferFormat;
-}
-
 void CHW::Present()
 {
     pDevice->Present(nullptr, nullptr, nullptr, nullptr);

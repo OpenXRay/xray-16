@@ -355,7 +355,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     D3DLOCKED_RECT D;
     HRESULT hr;
     hr = HW.pDevice->CreateOffscreenPlainSurface(
-        Device.dwWidth, Device.dwHeight, HW.GetSurfaceFormat(), D3DPOOL_SYSTEMMEM, &pFB, nullptr);
+        Device.dwWidth, Device.dwHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, nullptr);
     if (FAILED(hr))
         return;
     hr = HW.pDevice->GetRenderTargetData(HW.pBaseRT, pFB);

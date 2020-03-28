@@ -26,7 +26,6 @@ public:
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 
     std::pair<u32, u32> GetSurfaceSize() const;
-    D3DFORMAT GetSurfaceFormat() const;
     void Present();
     DeviceState GetDeviceState();
 
