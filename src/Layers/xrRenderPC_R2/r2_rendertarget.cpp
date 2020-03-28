@@ -302,6 +302,8 @@ CRenderTarget::CRenderTarget()
         // otherwise - create texture with specified HW_smap_FORMAT
         rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
         rt_smap_surf.create(r2_RT_smap_surf, smapsize, smapsize, surf_format);
+
+        s_accum_mask.create(b_accum_mask, "r2" DELIMITER "accum_mask");
         reinit_cascades();
     }
 
