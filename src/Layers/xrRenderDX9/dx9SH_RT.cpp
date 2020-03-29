@@ -37,7 +37,7 @@ bool CRT::used_as_depth() const
     }
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount = 1*/, Flags32 flags /*= {}*/)
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
 {
     if (pSurface)
         return;
@@ -50,8 +50,14 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount = 1*/
     dwWidth = w;
     dwHeight = h;
     fmt = f;
+    sampleCount = SampleCount;
 
-    const D3DRESOURCETYPE type = flags.test(CreateSurface) ? D3DRTYPE_SURFACE : D3DRTYPE_TEXTURE;
+    D3DRESOURCETYPE type = D3DRTYPE_TEXTURE;
+    if (flags.test(CreateSurface))
+    {
+        type = D3DRTYPE_SURFACE;
+        dwFlags |= CreateSurface;
+    }
 
     // Get caps
     D3DCAPS9 caps;
@@ -130,7 +136,7 @@ void CRT::destroy()
 }
 
 void CRT::reset_begin() { destroy(); }
-void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
+void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags }); }
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
 {

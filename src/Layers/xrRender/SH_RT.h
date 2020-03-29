@@ -6,10 +6,11 @@
 class CRT : public xr_resource_named
 {
 public:
-    enum CreationFlags : u32
+    enum : u32 // extends xr_resource_flagged flags
     {
-        CreateUAV = 1 << 0, // Self descriptive. DX11-specific.
-        CreateSurface = 1 << 1, // Creates depth-stencil or offscreen plain surface instead of texture. DX9-specific.
+        /*RF_REGISTERED = xr_resource_flagged::RF_REGISTERED,*/
+        CreateUAV = 1 << 1, // Self descriptive. DX11-specific.
+        CreateSurface = 1 << 2, // Creates depth-stencil or offscreen plain surface instead of texture. DX9-specific.
     };
 
     CRT();
@@ -43,6 +44,7 @@ public:
     u32 dwWidth;
     u32 dwHeight;
     D3DFORMAT fmt;
+    u32 sampleCount;
 
     u64 _order;
 };

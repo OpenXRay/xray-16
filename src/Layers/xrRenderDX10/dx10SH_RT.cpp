@@ -48,6 +48,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     dwWidth = w;
     dwHeight = h;
     fmt = f;
+    sampleCount = SampleCount;
 
     //	DirectX 10 supports non-power of two textures
     // Pow2
@@ -135,8 +136,13 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
 #ifdef USE_DX11
     const bool useUAV = flags.test(CreateUAV);
-    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1 && useUAV)
-        desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+    if (useUAV)
+    {
+        dwFlags |= CreateUAV;
+
+        if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1)
+            desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+    }
 #else
     UNUSED(flags);
 #endif
@@ -223,8 +229,9 @@ void CRT::destroy()
     _RELEASE(pUAView);
 #endif
 }
+
 void CRT::reset_begin() { destroy(); }
-void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
+void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags }); }
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= 0*/)
 {

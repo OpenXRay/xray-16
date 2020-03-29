@@ -48,6 +48,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     dwWidth = w;
     dwHeight = h;
     fmt = f;
+    sampleCount = SampleCount;
 
     // Get caps
     GLint max_width, max_height;
@@ -94,7 +95,7 @@ void CRT::reset_begin()
 
 void CRT::reset_end()
 {
-    create(*cName, dwWidth, dwHeight, fmt);
+    create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags });
 }
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
