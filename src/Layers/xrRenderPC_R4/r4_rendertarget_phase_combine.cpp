@@ -14,7 +14,7 @@ void CRenderTarget::DoAsyncScreenshot()
         HRESULT hr;
 
         //	HACK: unbind RT. CopyResourcess needs src and targetr to be unbound.
-        // u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB);
+        // u_setrt				( Device.dwWidth,Device.dwHeight,get_base_rt(),NULL,NULL,get_base_zb());
 
         // ID3DTexture2D *pTex = 0;
         // if (RImplementation.o.dx10_msaa)
@@ -73,7 +73,7 @@ void CRenderTarget::phase_combine()
     {
         HW.pContext->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
         HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
-        u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
+        u_setrt(rt_Generic_0, rt_Generic_1, 0, get_base_zb());
     }
     else
     {
@@ -291,7 +291,7 @@ void CRenderTarget::phase_combine()
     {
         PIX_EVENT(Forward_rendering);
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
+            u_setrt(rt_Generic_0, 0, 0, get_base_zb()); // LDR RT
         else
             u_setrt(rt_Generic_0_r, 0, 0, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
         RCache.set_CullMode(CULL_CCW);
@@ -325,7 +325,7 @@ void CRenderTarget::phase_combine()
     phase_bloom(); // HDR RT invalidated here
 
     // RImplementation.rmNormal();
-    // u_setrt(rt_Generic_1,0,0,HW.pBaseZB);
+    // u_setrt(rt_Generic_1,0,0,get_base_zb());
 
     // Distortion filter
     BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
@@ -338,7 +338,7 @@ void CRenderTarget::phase_combine()
             FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
             if (!RImplementation.o.dx10_msaa)
             {
-                u_setrt(rt_Generic_1, 0, 0, HW.pBaseZB); // Now RT is a distortion mask
+                u_setrt(rt_Generic_1, 0, 0, get_base_zb()); // Now RT is a distortion mask
                 HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
             }
             else
@@ -381,18 +381,18 @@ void CRenderTarget::phase_combine()
     if (RImplementation.o.dx10_msaa)
     {
         if (PP_Complex)
-            u_setrt(rt_Generic, 0, 0, HW.pBaseZB); // LDR RT
+            u_setrt(rt_Generic, 0, 0, get_base_zb()); // LDR RT
         else
-            u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
+            u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
     }
     else
     {
         if (PP_Complex)
-            u_setrt(rt_Color, 0, 0, HW.pBaseZB); // LDR RT
+            u_setrt(rt_Color, 0, 0, get_base_zb()); // LDR RT
         else
-            u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
+            u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
     }
-    //. u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB);
+    //. u_setrt				( Device.dwWidth,Device.dwHeight,get_base_rt(),NULL,NULL,get_base_zb());
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(FALSE);
 
@@ -639,7 +639,7 @@ void CRenderTarget::phase_wallmarks()
     RCache.set_RT(NULL, 2);
     RCache.set_RT(NULL, 1);
     if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Color, NULL, NULL, HW.pBaseZB);
+        u_setrt(rt_Color, NULL, NULL, get_base_zb());
     else
         u_setrt(rt_Color, NULL, NULL, rt_MSAADepth->pZRT);
     // Stencil	- draw only where stencil >= 0x1
@@ -656,9 +656,9 @@ void CRenderTarget::phase_combine_volumetric()
 
     //	TODO: DX10: Remove half pixel offset here
 
-    // u_setrt(rt_Generic_0,0,0,HW.pBaseZB );			// LDR RT
+    // u_setrt(rt_Generic_0,0,0,get_base_zb() );			// LDR RT
     if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Generic_0, rt_Generic_1, 0, HW.pBaseZB);
+        u_setrt(rt_Generic_0, rt_Generic_1, 0, get_base_zb());
     else
         u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);
     //	Sets limits to both render targets

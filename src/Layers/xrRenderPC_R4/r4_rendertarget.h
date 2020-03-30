@@ -65,6 +65,10 @@ public:
     xr_vector<Fplane> dbg_planes;
 #endif
 
+    // Base targets
+    xr_vector<ref_rt> rt_Base;
+    ref_rt rt_Base_Depth;
+
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
     ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
@@ -238,6 +242,9 @@ public:
     //	Igor: used for volumetric lights
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
+
+    ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
+    ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pZRT; }
 
     void u_stencil_optimize(eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(Fmatrix& dest);

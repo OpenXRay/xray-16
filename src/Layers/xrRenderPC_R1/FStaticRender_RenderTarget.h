@@ -12,6 +12,12 @@ private:
     u32 curWidth;
     u32 curHeight;
 
+public:
+    // Base targets
+    xr_vector<ref_rt> rt_Base;
+    ref_rt rt_Base_Depth;
+
+private:
     ref_rt RT;
     ref_rt RT_color_map;
     ref_rt RT_distort;
@@ -71,6 +77,9 @@ public:
     void End();
 
     void DoAsyncScreenshot();
+
+    ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
+    ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pRT; }
 
     virtual void set_blur(float f) { param_blur = f; }
     virtual void set_gray(float f) { param_gray = f; }

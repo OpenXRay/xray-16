@@ -37,9 +37,10 @@ private:
 public:
     CHWCaps Caps;
 
+    u32 BackBufferCount{};
+    u32 CurrentBackBuffer{};
+
     ID3DDevice* pDevice = nullptr; // render device
-    ID3DRenderTargetView* pBaseRT = nullptr; // base render target
-    ID3DDepthStencilView* pBaseZB = nullptr; // base depth-stencil buffer
 
     D3D_DRIVER_TYPE m_DriverType;
 

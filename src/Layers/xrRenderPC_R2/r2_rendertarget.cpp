@@ -220,6 +220,11 @@ CRenderTarget::CRenderTarget()
     //  NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
+        rt_Base.resize(HW.BackBufferCount);
+        for (u32 i = 0; i < HW.BackBufferCount; i++)
+            rt_Base[i].create(BASE_RT(i), w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
+
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F);
         rt_Normal.create(r2_RT_N, w, h, D3DFMT_A16B16G16R16F);
 
@@ -396,7 +401,7 @@ CRenderTarget::CRenderTarget()
             u_setrt(rt_LUM_pool[it], 0, 0, 0);
             CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, 0x7f7f7f7f, 1.0f, 0L));
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
     }
 
     // COMBINE
@@ -589,7 +594,7 @@ CRenderTarget::CRenderTarget()
     //  Igor: TMP
     //  Create an RT for online screenshot makining
     D3DSURFACE_DESC desc;
-    HW.pBaseRT->GetDesc(&desc);
+    get_base_rt()->GetDesc(&desc);
     pFB.create(r2_async_ss, Device.dwWidth, Device.dwHeight, desc.Format, 1, { CRT::CreateSurface });
 
     //

@@ -22,8 +22,8 @@ void r_pixel_calculator::end()
 {
     Device.RenderEnd();
 
-    RCache.set_RT(HW.pBaseRT);
-    RCache.set_ZB(HW.pBaseZB);
+    RCache.set_RT(RImplementation.Target->get_base_rt());
+    RCache.set_ZB(RImplementation.Target->get_base_zb());
 
     zb = nullptr;
     rt = nullptr;

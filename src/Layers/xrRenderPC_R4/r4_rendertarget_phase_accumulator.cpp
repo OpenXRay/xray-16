@@ -9,9 +9,9 @@ void CRenderTarget::phase_accumulator()
         if (!RImplementation.o.dx10_msaa)
         {
             if (RImplementation.o.fp16_blend)
-                u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
+                u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
             else
-                u_setrt(rt_Accumulator_temp, NULL, NULL, HW.pBaseZB);
+                u_setrt(rt_Accumulator_temp, NULL, NULL, get_base_zb());
         }
         else
         {
@@ -28,7 +28,7 @@ void CRenderTarget::phase_accumulator()
 
         // clear
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
+            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
         else
             u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
         // dwLightMarkerID						= 5;					// start from 5, increment in 2 units
@@ -74,7 +74,7 @@ void CRenderTarget::phase_vol_accumulator()
     {
         m_bHasActiveVolumetric = true;
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_2, NULL, NULL, HW.pBaseZB);
+            u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
         else
             u_setrt(rt_Generic_2, NULL, NULL, RImplementation.Target->rt_MSAADepth->pZRT);
         // u32		clr4clearVol				= color_rgba(0,0,0,0);	// 0x00
@@ -85,7 +85,7 @@ void CRenderTarget::phase_vol_accumulator()
     else
     {
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_2, NULL, NULL, HW.pBaseZB);
+            u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
         else
             u_setrt(rt_Generic_2, NULL, NULL, RImplementation.Target->rt_MSAADepth->pZRT);
     }

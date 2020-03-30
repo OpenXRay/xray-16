@@ -44,8 +44,8 @@ void CBackend::OnFrameBegin()
 #ifndef USE_OGL
         RImplementation.rmNormal();
 #endif
-        set_RT(HW.pBaseRT);
-        set_ZB(HW.pBaseZB);
+        set_RT(RImplementation.Target->get_base_rt());
+        set_ZB(RImplementation.Target->get_base_zb());
 #endif
 
         ZeroMemory(&stat, sizeof(stat));
