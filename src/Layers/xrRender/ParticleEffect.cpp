@@ -464,7 +464,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
 
     FillSprite(pv, T, R, pos, lt, rb, r1, r2, clr, sina, cosa);
 }
-#else
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 ICF void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -475,6 +475,8 @@ ICF void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const
 {
     FillSprite_fpu(pv, pos, dir, lt, rb, r1, r2, clr, sina, cosa);
 }
+#else
+#error Specify your platform explicitly
 #endif // defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 
 extern ENGINE_API float psHUD_FOV;
@@ -489,7 +491,7 @@ struct PRS_PARAMS
 };
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
-ICF void magnitude_sse(Fvector& vec, float& res)
+ICF void magnitude_sse(Fvector& vec, float& res) // XXX: move this to Fvector class
 {
     __m128 tv, tu;
 
@@ -503,11 +505,13 @@ ICF void magnitude_sse(Fvector& vec, float& res)
     tv = _mm_sqrt_ss(tv); // tv = zz | yy | 0 | sqrt( xx + yy + zz )
     _mm_store_ss((float*)&res, tv);
 }
-#else
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 ICF void magnitude_sse(Fvector& vec, float& res)
 {
     res = vec.magnitude();
 }
+#else
+#error Specify your platform explicitly
 #endif
 
 void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, CParticleEffect * pPE)
