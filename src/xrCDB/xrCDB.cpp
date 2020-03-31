@@ -197,8 +197,7 @@ COLLIDER::COLLIDER()
 COLLIDER::~COLLIDER() { r_free(); }
 RESULT& COLLIDER::r_add()
 {
-    rd.push_back(RESULT());
-    return rd.back();
+    return rd.emplace_back(RESULT());
 }
 
 void COLLIDER::r_free() { rd.clear(); }
