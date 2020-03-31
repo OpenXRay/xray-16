@@ -26,16 +26,10 @@ public:
     virtual iphysics_scripted& get_scripted() = 0;
 
 protected:
-#ifdef _EDITOR
-    virtual ~iphysics_scripted_class() {}
-#else
-#if defined(XR_PLATFORM_WINDOWS)
-    virtual ~iphysics_scripted_class() = 0 {}
-#elif defined(XR_PLATFORM_LINUX)
-    virtual ~iphysics_scripted_class() {}
-#endif
-#endif
+    virtual ~iphysics_scripted_class() = 0;
 };
+
+inline iphysics_scripted_class::~iphysics_scripted_class() {}
 
 template <class T>
 class cphysics_game_scripted : public iphysics_game_scripted, private Noncopyable
