@@ -260,11 +260,16 @@ void CEngineAPI::CreateRendererList()
             Log(mode.name);
 }
 
+bool is_r2_available()
+{
+    return r2_available;
+}
+
 SCRIPT_EXPORT(CheckRendererSupport, (),
 {
     using namespace luabind;
     module(luaState)
     [
-        def("xrRender_test_r2_hw", +[]() { return r2_available; })
+        def("xrRender_test_r2_hw", &is_r2_available)
     ];
 });

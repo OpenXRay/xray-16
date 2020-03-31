@@ -35,8 +35,8 @@ public:
 
 // Class creation/destroying interface
 extern "C" {
-using Factory_Create = DLL_API IFactoryObject* __cdecl(CLASS_ID CLS_ID);
-using Factory_Destroy = DLL_API void __cdecl(IFactoryObject* O);
+using Factory_Create = IFactoryObject* __cdecl(CLASS_ID CLS_ID);
+using Factory_Destroy = void __cdecl(IFactoryObject* O);
 };
 
 // Tuning interface
