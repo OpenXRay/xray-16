@@ -52,6 +52,24 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     fmt = f;
     sampleCount = SampleCount;
 
+    if (flags.test(CreateBase))
+    {
+        dwFlags |= CreateBase;
+        if (used_as_depth())
+            R_CHK(HW.pDevice->GetDepthStencilSurface(&pRT));
+        else
+        {
+            u32 idx;
+            char const* str = strrchr(Name, '_');
+            sscanf(++str, "%d", &idx);
+            R_CHK(HW.pDevice->GetRenderTarget(idx, &pRT));
+        }
+#ifdef DEBUG
+        Msg("* created RT(%s), %dx%d", Name, w, h);
+#endif
+        return;
+    }
+
     D3DRESOURCETYPE type = D3DRTYPE_TEXTURE;
     if (flags.test(CreateSurface))
     {

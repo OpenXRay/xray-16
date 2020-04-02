@@ -4,7 +4,7 @@
 void CRenderTarget::phase_scene_prepare()
 {
     // Clear depth & stencil
-    // u_setrt  ( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB );
+    // u_setrt  ( Device.dwWidth,Device.dwHeight,get_base_rt(),NULL,NULL,get_base_zb() );
     // CHK_DX   ( HW.pDevice->Clear ( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
     //  Igor: soft particles
 
@@ -16,12 +16,12 @@ void CRenderTarget::phase_scene_prepare()
     if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
         ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
-        u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, HW.pBaseZB);
+        u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, get_base_zb());
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
     }
     else
     {
-        u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
     }
 
@@ -39,9 +39,9 @@ void CRenderTarget::phase_scene_begin()
 
     // Targets, use accumulator for temporary storage
     if (RImplementation.o.albedo_wo)
-        u_setrt(rt_Position, rt_Normal, rt_Accumulator, HW.pBaseZB);
+        u_setrt(rt_Position, rt_Normal, rt_Accumulator, get_base_zb());
     else
-        u_setrt(rt_Position, rt_Normal, rt_Color, HW.pBaseZB);
+        u_setrt(rt_Position, rt_Normal, rt_Color, get_base_zb());
 
     // Stencil - write 0x1 at pixel pos
     RCache.set_Stencil(
@@ -69,7 +69,7 @@ void CRenderTarget::phase_scene_end()
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
-    u_setrt(rt_Color, 0, 0, HW.pBaseZB);
+    u_setrt(rt_Color, 0, 0, get_base_zb());
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil)

@@ -11,6 +11,7 @@ public:
         /*RF_REGISTERED = xr_resource_flagged::RF_REGISTERED,*/
         CreateUAV = 1 << 1, // Self descriptive. DX11-specific.
         CreateSurface = 1 << 2, // Creates depth-stencil or offscreen plain surface instead of texture. DX9-specific.
+        CreateBase = 1 << 3, // Creates basic RTV from backbuffer or DSV (depending on format)
     };
 
     CRT();

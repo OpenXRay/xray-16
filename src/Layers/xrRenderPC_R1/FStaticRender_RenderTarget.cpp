@@ -2,6 +2,11 @@
 #include "fstaticrender_rendertarget.h"
 #include "xrEngine/IGame_Persistent.h"
 
+// Base targets
+#define r1_RT_base "$user$base_"
+#define r1_RT_base_depth "$user$base_depth"
+#define BASE_RT(a) r1_RT_base #a
+
 static LPCSTR RTname = "$user$rendertarget";
 static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
 static LPCSTR RTname_distort = "$user$distort";
@@ -57,6 +62,11 @@ BOOL CRenderTarget::Create()
     Msg("* SSample: %dx%d", rtWidth, rtHeight);
 
     // Bufferts
+    rt_Base.resize(HW.BackBufferCount);
+    for (u32 i = 0; i < HW.BackBufferCount; i++)
+        rt_Base[i].create(BASE_RT(i), curWidth, curHeight, HW.Caps.fTarget, 1, { CRT::CreateBase });
+    rt_Base_Depth.create(r1_RT_base_depth, curWidth, curHeight, HW.Caps.fDepth, 1, { CRT::CreateBase });
+
     RT.create(RTname, rtWidth, rtHeight, HW.Caps.fTarget);
     RT_distort.create(RTname_distort, rtWidth, rtHeight, HW.Caps.fTarget);
     if (RImplementation.o.color_mapping)
@@ -73,7 +83,7 @@ BOOL CRenderTarget::Create()
     }
     else
     {
-        ZB = HW.pBaseZB;
+        ZB = get_base_zb();
         ZB->AddRef();
     }
 
@@ -253,8 +263,8 @@ void CRenderTarget::Begin()
     if (!Perform())
     {
         // Base RT
-        RCache.set_RT(HW.pBaseRT);
-        RCache.set_ZB(HW.pBaseZB);
+        RCache.set_RT(get_base_rt());
+        RCache.set_ZB(get_base_zb());
         curWidth = Device.dwWidth;
         curHeight = Device.dwHeight;
     }
@@ -295,7 +305,7 @@ void CRenderTarget::DoAsyncScreenshot()
     {
         HRESULT hr;
 
-        IDirect3DSurface9* pFBSrc = HW.pBaseRT;
+        IDirect3DSurface9* pFBSrc = get_base_rt();
         //  Don't addref, no need to release.
         // ID3DTexture2D *pTex = RT->pSurface;
 
@@ -326,8 +336,8 @@ void CRenderTarget::End()
         phase_distortion();
 
     // combination/postprocess
-    RCache.set_RT(HW.pBaseRT);
-    RCache.set_ZB(HW.pBaseZB);
+    RCache.set_RT(get_base_rt());
+    RCache.set_ZB(get_base_zb());
     curWidth = Device.dwWidth;
     curHeight = Device.dwHeight;
 
@@ -379,7 +389,7 @@ void CRenderTarget::End()
         RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0, 0);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
-        RCache.set_RT(HW.pBaseRT);
+        RCache.set_RT(get_base_rt());
         // return;
     }
 
