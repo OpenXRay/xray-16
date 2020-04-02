@@ -34,6 +34,12 @@ static u32 init_counter = 0;
 #endif
 #endif
 
+#ifdef APPVEYOR
+#if EXPAND(APPVEYOR) == 1
+#undef APPVEYOR
+#endif
+#endif
+
 void PrintBuildInfo()
 {
     pcstr name = "Custom";
