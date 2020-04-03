@@ -1,11 +1,11 @@
 #pragma once
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
 #endif
 
 namespace Threading
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 using ThreadHandle = HANDLE;
 using ThreadId = u32;
 #else

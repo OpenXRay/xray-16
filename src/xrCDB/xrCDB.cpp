@@ -14,7 +14,7 @@ namespace Opcode
 using namespace CDB;
 using namespace Opcode;
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
@@ -197,8 +197,7 @@ COLLIDER::COLLIDER()
 COLLIDER::~COLLIDER() { r_free(); }
 RESULT& COLLIDER::r_add()
 {
-    rd.push_back(RESULT());
-    return rd.back();
+    return rd.emplace_back(RESULT());
 }
 
 void COLLIDER::r_free() { rd.clear(); }

@@ -27,10 +27,10 @@ public:
     ISoundManager* Sound;
     UICore* UI;
 
+    int CurrentRenderer;
+
     bool isEditor;
     bool isDedicatedServer;
-
-    int CurrentRenderer;
 };
 
 extern XRAPI_API EngineGlobalEnvironment GEnv;

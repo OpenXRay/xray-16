@@ -180,8 +180,19 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         CreateSwapChain(hwnd);
     }
 
-    //  Create render target and depth-stencil views here
-    UpdateViews();
+    // Select depth-stencil format
+    constexpr DXGI_FORMAT formats[] =
+    {
+        DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
+        DXGI_FORMAT_D24_UNORM_S8_UINT,
+        DXGI_FORMAT_D32_FLOAT,
+        DXGI_FORMAT_D16_UNORM
+    };
+    const DXGI_FORMAT selectedFormat = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
+    CHECK_OR_EXIT(selectedFormat != DXGI_FORMAT_UNKNOWN,
+        "Failed to initialize graphics hardware: failed to select depth-stencil format."
+        "\nPlease try to restart the game.");
+    Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(selectedFormat);
 
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
@@ -211,7 +222,8 @@ void CHW::CreateSwapChain(HWND hwnd)
     Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(sd.BufferDesc.Format);
 
     // Buffering
-    sd.BufferCount = 1;
+    BackBufferCount = 1;
+    sd.BufferCount = BackBufferCount;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
     // Multisample
@@ -266,7 +278,8 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(desc.Format);
 
     // Buffering
-    desc.BufferCount = 1; // For DXGI_SWAP_EFFECT_FLIP_DISCARD we need at least two
+    BackBufferCount = 1; // For DXGI_SWAP_EFFECT_FLIP_DISCARD we need at least two
+    desc.BufferCount = BackBufferCount;
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
     // Multisample
@@ -316,12 +329,6 @@ void CHW::DestroyDevice()
     BSManager.ClearStateArray();
     SSManager.ClearStateArray();
 
-    _SHOW_REF("refCount:pBaseZB", pBaseZB);
-    _RELEASE(pBaseZB);
-
-    _SHOW_REF("refCount:pBaseRT", pBaseRT);
-    _RELEASE(pBaseRT);
-
     //  Must switch to windowed mode to release swap chain
     if (!m_ChainDesc.Windowed)
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
@@ -364,14 +371,8 @@ void CHW::Reset()
     desc.Height = Device.dwHeight;
 
     CHK_DX(m_pSwapChain->ResizeTarget(&desc));
-
-    _SHOW_REF("refCount:pBaseZB", pBaseZB);
-    _SHOW_REF("refCount:pBaseRT", pBaseRT);
-    _RELEASE(pBaseZB);
-    _RELEASE(pBaseRT);
     CHK_DX(m_pSwapChain->ResizeBuffers(
         cd.BufferCount, desc.Width, desc.Height, desc.Format, cd.Flags));
-    UpdateViews();
 }
 
 bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const UINT feature) const
@@ -405,68 +406,6 @@ bool CHW::UsingFlipPresentationModel() const
     ;
 }
 
-void CHW::UpdateViews()
-{
-    const DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;
-
-    HRESULT R;
-
-    // Create a render target view
-    ID3DTexture2D* pBuffer;
-    R = m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (LPVOID*)&pBuffer);
-    R_CHK(R);
-
-    R = pDevice->CreateRenderTargetView(pBuffer, NULL, &pBaseRT);
-    _RELEASE(pBuffer);
-    R_CHK(R);
-
-    //  Create Depth/stencil buffer
-    ID3DTexture2D* pDepthStencil = NULL;
-    D3D_TEXTURE2D_DESC descDepth;
-    descDepth.Width = sd.BufferDesc.Width;
-    descDepth.Height = sd.BufferDesc.Height;
-    descDepth.MipLevels = 1;
-    descDepth.ArraySize = 1;
-
-    // Select depth-stencil format
-    constexpr DXGI_FORMAT formats[] =
-    {
-        DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
-        DXGI_FORMAT_D24_UNORM_S8_UINT,
-        DXGI_FORMAT_D32_FLOAT,
-        DXGI_FORMAT_D16_UNORM
-    };
-    descDepth.Format = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
-    Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(descDepth.Format);
-
-    descDepth.SampleDesc.Count = sd.SampleDesc.Count;
-    descDepth.SampleDesc.Quality = sd.SampleDesc.Quality;
-    descDepth.Usage = D3D_USAGE_DEFAULT;
-    descDepth.BindFlags = D3D_BIND_DEPTH_STENCIL;
-    descDepth.CPUAccessFlags = 0;
-    descDepth.MiscFlags = 0;
-    R = pDevice->CreateTexture2D(&descDepth, // Texture desc
-        NULL, // Initial data
-        &pDepthStencil); // [out] Texture
-    R_CHK(R);
-
-    D3D_DEPTH_STENCIL_VIEW_DESC descDSV;
-    ZeroMemory(&descDSV, sizeof(descDSV));
-
-    descDSV.Format = descDepth.Format;
-    if (descDepth.SampleDesc.Count > 1)
-        descDSV.ViewDimension = D3D_DSV_DIMENSION_TEXTURE2DMS;
-    else
-        descDSV.ViewDimension = D3D_DSV_DIMENSION_TEXTURE2D;
-    descDSV.Texture2D.MipSlice = 0;
-
-    //  Create Depth/stencil view
-    R = pDevice->CreateDepthStencilView(pDepthStencil, &descDSV, &pBaseZB);
-    R_CHK(R);
-
-    _RELEASE(pDepthStencil);
-}
-
 std::pair<u32, u32> CHW::GetSurfaceSize() const
 {
     return
@@ -491,6 +430,7 @@ void CHW::Present()
             m_pSwapChain2->SetSourceSize(Device.dwWidth * 0.7f, Device.dwHeight * 0.7f);
     }
 #endif
+    CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
 DeviceState CHW::GetDeviceState()

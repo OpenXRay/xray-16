@@ -78,7 +78,7 @@ void WeaponUsageStatistic::SaveData()
     case eGameIDCaptureTheArtefact: xr_sprintf(GameType, "cta"); break;
     default: return; break;
     };
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     SYSTEMTIME Time;
     GetLocalTime(&Time);
     xr_sprintf(mFileName, "(%s)_(%s)_%02d.%02d.%02d_%02d.%02d.%02d.wus", *(Level().name()), GameType, Time.wMonth,

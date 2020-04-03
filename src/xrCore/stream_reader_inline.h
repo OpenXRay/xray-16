@@ -1,16 +1,16 @@
 #ifndef STREAM_READER_INLINE_H
 #define STREAM_READER_INLINE_H
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include <sys/mman.h>
 #endif
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 IC const int& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
 #endif
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 IC void CStreamReader::unmap() { UnmapViewOfFile(m_current_map_view_of_file); }
 #else
 IC void CStreamReader::unmap() { ::munmap(const_cast<u8*>(m_current_map_view_of_file), m_current_window_size); }

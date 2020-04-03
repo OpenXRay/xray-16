@@ -1,17 +1,5 @@
 #include "stdafx.h"
 
-
-#if defined(WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#ifndef _EDITOR
-#pragma comment(lib, "d3dx9.lib")
-#include "xrEngine/Render.h"
-#endif
-#pragma warning(pop)
-#endif
-
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
 #include "Layers/xrRender/blenders/Blender.h"

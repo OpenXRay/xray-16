@@ -18,7 +18,7 @@ struct profile;
 
 namespace gamespy_profile
 {
-class stats_submitter : public ScheduledBase, private Noncopyable
+class stats_submitter : public ScheduledBase
 {
 public:
     stats_submitter(CGameSpy_Full* fullgs);

@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #define _WIN32_ENVIRONMENT_
 //#define _DOS32_ENVIRONMENT_
 //#define _POSIX_ENVIRONMENT_

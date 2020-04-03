@@ -3,13 +3,13 @@
 #include "noise.h"
 
 #ifndef _EDITOR
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include <xmmintrin.h>
-#elif defined(XR_ARM) || defined(XR_ARM64)
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "Externals/sse2neon/sse2neon.h"
 #endif
 
-#if defined(XR_ARM) || defined(XR_ARM64)
+#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 ICF int iFloor_SSE(float const x) { return floor(x); }
 #else
 ICF int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }

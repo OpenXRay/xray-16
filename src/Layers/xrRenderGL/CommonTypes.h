@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO: Get rid of D3D types.
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <d3d9types.h>
 #endif
 

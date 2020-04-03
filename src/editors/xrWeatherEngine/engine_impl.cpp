@@ -13,11 +13,12 @@
 #include "xrEngine/xr_input.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/IGame_Level.h"
-#include "editor/editor_environment_weathers_time.hpp"
-#include "editor/editor_environment_manager.hpp"
-#include "editor/editor_environment_weathers_manager.hpp"
+#include "editor_environment_weathers_time.hpp"
+#include "editor_environment_manager.hpp"
+#include "editor_environment_weathers_manager.hpp"
 
 ENGINE_API extern CConsole* Console;
+engine_impl g_engine;
 
 engine_impl::engine_impl() : m_input_receiver(new IInputReceiver()), m_input_captured(false) {}
 engine_impl::~engine_impl()
@@ -72,6 +73,12 @@ bool engine_impl::quit_requested() const
 
 void engine_impl::value(LPCSTR value, shared_str& result) { result = value; }
 LPCSTR engine_impl::value(shared_str const& value) { return (value.c_str()); }
+
+CEnvironment* engine_impl::environment()
+{
+    return new editor::environment::manager();
+}
+
 void engine_impl::weather(LPCSTR value)
 {
     if (!g_pGamePersistent)

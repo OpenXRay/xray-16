@@ -88,6 +88,10 @@
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">false</ConformanceMode>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">false</ConformanceMode>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">true</TreatWarningAsError>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
@@ -96,6 +100,8 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ConformanceMode>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</TreatWarningAsError>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

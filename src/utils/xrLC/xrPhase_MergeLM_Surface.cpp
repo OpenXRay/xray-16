@@ -3,7 +3,7 @@
 #include "xrPhase_MergeLM_Rect.h"
 #include "utils/xrLC_Light/xrdeflector.h"
 
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
 #include <intrin.h>
 #else
 #include <mmintrin.h>
@@ -74,7 +74,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
             for (x = 0; x < s_x - 8; x += 8, P += 8, S += 8)
             {
                 // if ( (*P) && ( *S >= alpha_ref ) ) goto r_false;	// overlap
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
                 __m128i regS = _mm_set1_epi64x(*((__int64*)S));
                 __m128i regP = _mm_set1_epi64x(*((__int64*)P));
                 __m128i mm_max = _mm_max_epu8(regS, mm_alpha_ref);
@@ -100,7 +100,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
             for (; x < s_x; x++, P++, S++)
                 if ((*P) && (*S >= alpha_ref))
                 {
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
                     _mm_empty();
 #endif
                     return false;
@@ -116,7 +116,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
             for (x = 0; x < s_y; x++, P++)
                 if ((*P) && (lm[x * s_x + y] >= alpha_ref))
                 {
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
                     _mm_empty();
 #endif
                     return false;
@@ -125,7 +125,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
     }
 
     // It's OK to place it
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
     _mm_empty();
 #endif
     return true;
@@ -182,7 +182,7 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, FALSE);
                     r.set(R);
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
                     _mm_empty();
 #endif
                     return TRUE;
@@ -198,7 +198,7 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, FALSE);
                     r.set(R);
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
                     _mm_empty();
 #endif
                     return TRUE;
@@ -251,7 +251,7 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, TRUE);
                     r.set(R);
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
                     _mm_empty();
 #endif
                     return TRUE;
@@ -267,7 +267,7 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, TRUE);
                     r.set(R);
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
                     _mm_empty();
 #endif
                     return TRUE;
@@ -276,7 +276,7 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
         }
     }
 
-#ifdef XR_X86
+#ifdef XR_ARCHITECTURE_X86
     _mm_empty();
 #endif
     return FALSE;

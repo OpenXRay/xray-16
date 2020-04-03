@@ -506,7 +506,7 @@ public:
     }
 };
 
-#if RENDER != R_R1 && RENDER != R_GL
+#if RENDER != R_R1
 #include "r__pixel_calculator.h"
 class CCC_BuildSSA : public IConsole_Command
 {
@@ -514,11 +514,8 @@ public:
     CCC_BuildSSA(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR /*args*/)
     {
-#if !defined(USE_DX10) && !defined(USE_DX11)
-        //  TODO: DX10: Implement pixel calculator
         r_pixel_calculator c;
         c.run();
-#endif //   USE_DX10
     }
 };
 #endif
@@ -695,7 +692,7 @@ void xrRender_initconsole()
     CMD1(CCC_Screenshot, "screenshot");
 
 #ifdef DEBUG
-#if RENDER != R_R1 && RENDER != R_GL
+#if RENDER != R_R1
     CMD1(CCC_BuildSSA, "build_ssa");
 #endif
     CMD4(CCC_Integer, "r__lsleep_frames", &ps_r__LightSleepFrames, 4, 30);

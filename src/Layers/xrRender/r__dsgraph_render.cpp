@@ -443,7 +443,7 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
     const ref_rt rt_null;
     RCache.set_RT(0, 1);
     RCache.set_RT(0, 2);
-    auto zb = HW.pBaseZB;
+    auto zb = RImplementation.Target->get_base_zb();
 
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
     if (RImplementation.o.dx10_msaa)

@@ -1,13 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#if defined(WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#pragma warning(pop)
-#endif
-
 #include "xrCDB/Frustum.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -51,8 +44,8 @@ void CBackend::OnFrameBegin()
 #ifndef USE_OGL
         RImplementation.rmNormal();
 #endif
-        set_RT(HW.pBaseRT);
-        set_ZB(HW.pBaseZB);
+        set_RT(RImplementation.Target->get_base_rt());
+        set_ZB(RImplementation.Target->get_base_zb());
 #endif
 
         ZeroMemory(&stat, sizeof(stat));

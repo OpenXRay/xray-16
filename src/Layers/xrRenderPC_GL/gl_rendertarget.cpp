@@ -328,6 +328,11 @@ CRenderTarget::CRenderTarget()
     //	NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
+        rt_Base.resize(HW.BackBufferCount);
+        for (u32 i = 0; i < HW.BackBufferCount; i++)
+            rt_Base[i].create(BASE_RT(i), w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
+
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
         if (RImplementation.o.dx10_msaa)
@@ -595,7 +600,7 @@ CRenderTarget::CRenderTarget()
             FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
             HW.pDevice->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
     }
 
     // HBAO
@@ -897,7 +902,7 @@ CRenderTarget::CRenderTarget()
 
     // Flip
     t_base = RImplementation.Resources->_CreateTexture(r2_base);
-    t_base->surface_set(GL_TEXTURE_2D, HW.pBaseRT);
+    t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
     s_flip.create("effects" DELIMITER "screen_set", r2_base);
     g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 

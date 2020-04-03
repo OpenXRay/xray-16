@@ -11,5 +11,5 @@
 #include "Common/GUID.hpp"
 
 // XXX: move to xrCore
-ENGINE_API extern xrGUID generate_guid();
-ENGINE_API extern LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const size_t& buffer_size);
+xrGUID generate_guid();
+LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const size_t& buffer_size);

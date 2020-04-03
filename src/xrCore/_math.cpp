@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #pragma hdrstop
 
 #include <intrin.h> // __rdtsc
 #include <process.h>
 
-#if defined(_MSC_VER)
+#if defined(XR_COMPILER_MSVC)
 #include <powerbase.h>
-#elif defined(__GNUC__)
+#elif defined(XR_COMPILER_GCC)
 #include <float.h> // _controlfp
 //#include_next <float.h>
 //how to include mingw32\i686-w64-mingw32\include\float.h
@@ -15,17 +15,17 @@
 //?
 #endif
 
-#elif defined(LINUX) || defined(FREEBSD)
-#if defined(XR_X86) || defined(XR_X64)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include <x86intrin.h> // __rdtsc
-#elif defined(XR_ARM)
+#elif defined(XR_ARCHITECTURE_ARM)
 #include <sys/syscall.h>
 #include <linux/perf_event.h>
-#endif // defined(XR_ARM)
+#endif // defined(XR_ARCHITECTURE_ARM)
 
-#ifdef LINUX
+#ifdef XR_PLATFORM_LINUX
 #include <fpu_control.h>
-#elif defined(FREEBSD)
+#elif defined(XR_PLATFORM_FREEBSD)
 #include <sys/sysctl.h>
 #include <fenv.h>
 typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
@@ -51,13 +51,13 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <thread>
 #include "SDL.h"
 
-#if defined(XR_ARM) || defined(XR_ARM64)
+#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)) && !defined(XR_COMPILER_MSVC)
 #define _FPU_EXTENDED 0
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
 #define _FPU_RC_NEAREST 0
 
-#if defined(XR_ARM)
+#if defined(XR_ARCHITECTURE_ARM)
 static class PerfInit
 {
 public:
@@ -76,8 +76,8 @@ public:
         close(fddev);
     }
 } s_perf_init;
-#endif // defined(XR_ARM)
-#endif // defined(XR_ARM) || defined(XR_ARM64)
+#endif // defined(XR_ARCHITECTURE_ARM)
+#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
@@ -94,7 +94,7 @@ XRCORE_API Fmatrix Fidentity;
 XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 DWORD timeGetTime()
 {
     return SDL_GetTicks();
@@ -113,12 +113,12 @@ namespace FPU
 {
 XRCORE_API void m24()
 {
-#if defined(WINDOWS)
-#ifndef XR_X64
+#if defined(XR_PLATFORM_WINDOWS)
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_24, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE;
@@ -128,12 +128,12 @@ XRCORE_API void m24()
 
 XRCORE_API void m24r()
 {
-#if defined(WINDOWS)
-#ifndef XR_X64
+#if defined(XR_PLATFORM_WINDOWS)
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_24, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE | _FPU_RC_NEAREST;
@@ -143,12 +143,12 @@ XRCORE_API void m24r()
 
 XRCORE_API void m53()
 {
-#if defined(WINDOWS)
-#ifndef XR_X64
+#if defined(XR_PLATFORM_WINDOWS)
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_53, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE;
@@ -158,12 +158,12 @@ XRCORE_API void m53()
 
 XRCORE_API void m53r()
 {
-#if defined(WINDOWS)
-#ifndef XR_X64
+#if defined(XR_PLATFORM_WINDOWS)
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_53, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE | _FPU_RC_NEAREST;
@@ -173,12 +173,12 @@ XRCORE_API void m53r()
 
 XRCORE_API void m64()
 {
-#if defined(WINDOWS)
-#ifndef XR_X64
+#if defined(XR_PLATFORM_WINDOWS)
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_64, MCW_PC);
 #endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED;
@@ -188,12 +188,12 @@ XRCORE_API void m64()
 
 XRCORE_API void m64r()
 {
-#if defined(WINDOWS)
-#ifndef XR_X64
+#if defined(XR_PLATFORM_WINDOWS)
+#ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_64, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED | _FPU_RC_NEAREST;
@@ -203,9 +203,9 @@ XRCORE_API void m64r()
 
 void initialize()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     _clearfp();
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     fpu_control_t fpu_cw;
     fpu_cw = _FPU_DEFAULT;
     _FPU_SETCW(fpu_cw);
@@ -217,9 +217,9 @@ void initialize()
     else
         m24r();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     ::Random.seed(u32(CPU::GetCLK() % ((u64)0x1 << 32)));
 #endif
 }
@@ -242,25 +242,42 @@ XRCORE_API u64 QPC() noexcept
 
 XRCORE_API u64 GetCLK()
 {
-#if defined(XR_ARM)
+#if defined(XR_COMPILER_MSVC)
+
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+    return __rdtsc();
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+    return __rdpmccntr64();
+#else
+#error Unsupported architecture
+#endif
+
+#elif defined(XR_COMPILER_GCC)
+
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+    return __rdtsc();
+#elif defined(XR_ARCHITECTURE_ARM)
     long long result = 0;
     if (read(s_perf_init.fddev, &result, sizeof(result)) < sizeof(result))
         return 0;
     return result;
-#elif defined(XR_ARM64)
+#elif defined(XR_ARCHITECTURE_ARM64)
     int64_t virtual_timer_value;
     asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
     return virtual_timer_value;
-#else
-    return __rdtsc();
 #endif
+
+#else
+#error Unsupported compiler
+#endif
+    return 0;
 }
 
 XRCORE_API u32 GetCurrentCPU()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     return GetCurrentProcessorNumber();
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     return static_cast<u32>(sched_getcpu());
 #else
     return 0;
@@ -270,11 +287,11 @@ XRCORE_API u32 GetCurrentCPU()
 
 bool g_initialize_cpu_called = false;
 
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
 u32 cpufreq()
 {
     u32 cpuFreq = 0;
-#if defined(XR_ARM64) || defined(XR_ARM)
+#if defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_ARM)
     xr_string parcedFreq;
     std::ifstream cpuMaxFreq("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
     if (cpuMaxFreq.is_open())
@@ -320,7 +337,7 @@ u32 cpufreq()
 #endif
     return cpuFreq;
 }
-#elif defined(FREEBSD)
+#elif defined(XR_PLATFORM_FREEBSD)
 u32 cpufreq()
 {
     u32 cpuFreq = 0;
@@ -329,7 +346,7 @@ u32 cpufreq()
     sysctlbyname("dev.cpu.0.freq", &cpuFreq, &cpuFreqSz, nullptr, 0);
     return cpuFreq;
 }
-#endif // #ifdef LINUX
+#endif // #ifdef XR_PLATFORM_LINUX
 
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
@@ -351,7 +368,7 @@ void _initialize_cpu()
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d", SDL_GetCPUCount(), std::thread::hardware_concurrency());
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
     const size_t cpusCount = sysInfo.dwNumberOfProcessors;
@@ -380,7 +397,7 @@ void _initialize_cpu()
 }
 
 // per-thread initialization
-#if defined(XR_ARM) || defined(XR_ARM64)
+#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #define _MM_SET_FLUSH_ZERO_MODE(mode)
 #define _MM_SET_DENORMALS_ZERO_MODE(mode)
 #else
@@ -413,7 +430,7 @@ void _initialize_cpu_thread()
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
         if (_denormals_are_zero_supported)
         {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
             __try
             {
                 _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);

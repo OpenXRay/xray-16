@@ -8,7 +8,7 @@ struct r_aabb_ssa
 class r_pixel_calculator
 {
     ref_rt rt;
-    IDirect3DSurface9* zb;
+    ref_rt zb;
 
 public:
     void begin();

@@ -76,8 +76,7 @@ class CMainMenu : public IMainMenu,
     gamespy_gp::login_manager* m_login_mngr;
     gamespy_profile::profile_store* m_profile_store;
 
-#ifdef WINDOWS
-
+#ifdef XR_PLATFORM_WINDOWS
     gamespy_profile::stats_submitter* m_stats_submitter;
     atlas_submit_queue* m_atlas_submit_queue;
 #endif
@@ -115,7 +114,7 @@ public:
     gamespy_gp::login_manager* GetLoginMngr() { return m_login_mngr; }
     gamespy_profile::profile_store* GetProfileStore() { return m_profile_store; }
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     CGameSpy_Full* GetGS() { return m_pGameSpyFull; };
     gamespy_profile::stats_submitter* GetStatsSubmitter() { return m_stats_submitter; };
     atlas_submit_queue* GetSubmitQueue() { return m_atlas_submit_queue; };

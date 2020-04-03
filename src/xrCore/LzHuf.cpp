@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #pragma hdrstop
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #endif
 #include <fcntl.h>

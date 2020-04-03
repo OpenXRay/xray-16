@@ -73,7 +73,7 @@ void CAutosaveManager::shedule_Update(u32 dt)
     FS.update_path(S1, "$game_saves$", temp);
 
     MainMenu()->Screenshot(IRender::SM_FOR_GAMESAVE, S1);
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     SetFileAttributes(S1, FILE_ATTRIBUTE_HIDDEN);
 #endif
     const bool compat = ClearSkyMode || ShadowOfChernobylMode;

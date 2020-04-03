@@ -681,6 +681,9 @@
     <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\r__pixel_calculator.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1123,6 +1126,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\r__pixel_calculator.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

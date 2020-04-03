@@ -3,10 +3,6 @@
 
 #include "Layers/xrRender/ResourceManager.h"
 
-#ifndef _EDITOR
-#include "xrEngine/Render.h"
-#endif
-
 #include "xrEngine/tntQAVI.h"
 #include "xrEngine/xrTheora_Surface.h"
 #include "StateManager/dx10ShaderResourceStateCache.h"

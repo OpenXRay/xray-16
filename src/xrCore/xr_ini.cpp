@@ -7,7 +7,7 @@ XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;
 XRCORE_API CInifile const* pSettingsOpenXRay = nullptr;
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include <stdint.h>
 #define MSVCRT_EINVAL	22
 #define MSVCRT_ERANGE	34

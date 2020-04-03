@@ -20,7 +20,7 @@ namespace gamespy_profile
 class awards_store;
 class best_scores_store;
 
-class profile_store : public ScheduledBase, private Noncopyable
+class profile_store : public ScheduledBase
 {
 public:
     explicit profile_store(CGameSpy_Full* fullgs_obj);

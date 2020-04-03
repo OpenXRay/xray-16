@@ -2,7 +2,7 @@
 #include "xr_effgamma.h"
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <FreeImage/FreeImagePlus.h>
 #else
 #include <FreeImagePlus.h>
@@ -149,7 +149,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
     ID3DResource* pSrcTexture;
-    HW.pBaseRT->GetResource(&pSrcTexture);
+    Target->get_base_rt()->GetResource(&pSrcTexture);
 
     VERIFY(pSrcTexture);
 
@@ -355,10 +355,10 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     D3DLOCKED_RECT D;
     HRESULT hr;
     hr = HW.pDevice->CreateOffscreenPlainSurface(
-        Device.dwWidth, Device.dwHeight, HW.GetSurfaceFormat(), D3DPOOL_SYSTEMMEM, &pFB, nullptr);
+        Device.dwWidth, Device.dwHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, nullptr);
     if (FAILED(hr))
         return;
-    hr = HW.pDevice->GetRenderTargetData(HW.pBaseRT, pFB);
+    hr = HW.pDevice->GetRenderTargetData(Target->get_base_rt(), pFB);
     if (FAILED(hr))
         goto _end_;
     hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
@@ -624,13 +624,10 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 
     VERIFY(!m_bMakeAsyncSS);
 
+    IDirect3DSurface9* pFB = Target->pFB->pRT;
+
     D3DLOCKED_RECT D;
-    HRESULT hr;
-    IDirect3DSurface9* pFB;
-
-    pFB = Target->pFB;
-
-    hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
+    const HRESULT hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
     if (hr != D3D_OK)
         return;
 
@@ -687,7 +684,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         memory_writer.w(pOrigin, (rtWidth * rtHeight) * 4);
     }
 
-    hr = pFB->UnlockRect();
+    CHK_DX(pFB->UnlockRect());
 }
 
 #endif // USE_DX10

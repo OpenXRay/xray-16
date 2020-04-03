@@ -115,7 +115,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         }
 
         e_current.lerp(e_current, e_target, dt_sec);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         i_eax_listener_set(&e_current);
         i_eax_commit_setting();
 #endif

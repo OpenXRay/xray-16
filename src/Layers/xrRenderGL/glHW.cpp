@@ -20,7 +20,7 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
 }
 
 CHW::CHW()
-    : pDevice(this), pContext(this), m_pSwapChain(this), pBaseRT(0), pBaseZB(0), pPP(0), pFB(0)
+    : pDevice(this), pContext(this), m_pSwapChain(this), pPP(0), pFB(0)
 {
 }
 
@@ -132,10 +132,6 @@ void CHW::Reset()
 {
     CHK_GL(glDeleteProgramPipelines(1, &pPP));
     CHK_GL(glDeleteFramebuffers(1, &pFB));
-
-    CHK_GL(glDeleteTextures(1, &pBaseRT));
-    CHK_GL(glDeleteTextures(1, &pBaseZB));
-
     UpdateViews();
 }
 
@@ -188,15 +184,7 @@ void CHW::UpdateViews()
     glGenFramebuffers(1, &pFB);
     CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
 
-    // Create a color render target
-    glGenTextures(1, &HW.pBaseRT);
-    CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseRT));
-    CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, psCurrentVidMode[0], psCurrentVidMode[1]));
-
-    // Create depth/stencil buffer
-    glGenTextures(1, &HW.pBaseZB);
-    CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseZB));
-    CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
+    BackBufferCount = 1;
 }
 
 void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
@@ -244,6 +232,7 @@ void CHW::Present()
 {
     RImplementation.Target->phase_flip();
     SDL_GL_SwapWindow(m_window);
+    CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
 DeviceState CHW::GetDeviceState()

@@ -142,7 +142,7 @@ class ENGINE_API CRenderDevice : public CRenderDeviceBase, public IWindowHandler
     void _SetupStates();
 
 public:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 #endif
     // u32 dwFrame;
@@ -307,7 +307,7 @@ private:
     void CalcFrameStats();
 
 public:
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif
 

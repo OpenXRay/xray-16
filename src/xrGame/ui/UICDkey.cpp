@@ -9,7 +9,7 @@
 #include "player_name_modifyer.h"
 #include "xrGameSpy/GameSpy_GP.h"
 #include "xrCore/os_clipboard.h"
-#ifdef LINUX
+#ifdef XR_PLATFORM_LINUX
 #include <sys/types.h>
 #include <pwd.h>
 #endif
@@ -229,7 +229,7 @@ void WriteCDKey_ToRegistry(LPSTR cdkey)
 void GetPlayerName_FromRegistry(char* name, u32 const name_size)
 {
     string256 new_name;
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
     uid_t uid = geteuid();
     struct passwd *pw = getpwuid(uid);
     if(pw)

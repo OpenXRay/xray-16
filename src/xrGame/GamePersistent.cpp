@@ -242,7 +242,7 @@ void CGamePersistent::OnAppStart()
     if (!GEnv.isDedicatedServer)
         pApp->SetLoadingScreen(new UILoadingScreen());
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     ansel = new AnselManager();
     ansel->Load();
     ansel->Init();
@@ -501,7 +501,7 @@ void CGamePersistent::WeathersUpdate()
 
 bool allow_intro()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
 #else
     if (0 != strstr(Core.Params, "-nointro"))
