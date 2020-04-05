@@ -5,7 +5,7 @@
 // Base targets
 #define r1_RT_base "$user$base_"
 #define r1_RT_base_depth "$user$base_depth"
-#define BASE_RT_HELPER(a) r2_RT_base#a
+#define BASE_RT_HELPER(a) r1_RT_base#a
 #define BASE_RT(a) BASE_RT_HELPER(a)
 
 static LPCSTR RTname = "$user$rendertarget";
