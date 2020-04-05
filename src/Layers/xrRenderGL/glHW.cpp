@@ -110,6 +110,9 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
 
+    Caps.fTarget = D3DFMT_A8R8G8B8;
+    Caps.fDepth = D3DFMT_D24S8;
+
     //	Create render target and depth-stencil views here
     UpdateViews();
 }
