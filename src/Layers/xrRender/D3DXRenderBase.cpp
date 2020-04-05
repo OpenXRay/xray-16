@@ -2,6 +2,7 @@
 
 #include "D3DXRenderBase.h"
 #include "D3DUtils.h"
+#include "dxUIRender.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
@@ -55,6 +56,7 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 {
     if (!GEnv.isDedicatedServer)
     {
+        UIRenderImpl.DestroyUIGeom();
         DUImpl.OnDeviceDestroy();
         m_SelectionShader.destroy();
         m_WireShader.destroy();
@@ -113,6 +115,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
         m_WireShader.create("editor" DELIMITER "wire");
         m_SelectionShader.create("editor" DELIMITER "selection");
         DUImpl.OnDeviceCreate();
+        UIRenderImpl.CreateUIGeom();
     }
 }
 
