@@ -222,7 +222,11 @@ CRenderTarget::CRenderTarget()
         u32 w = Device.dwWidth, h = Device.dwHeight;
         rt_Base.resize(HW.BackBufferCount);
         for (u32 i = 0; i < HW.BackBufferCount; i++)
-            rt_Base[i].create(BASE_RT(i), w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        {
+            string32 temp;
+            xr_sprintf(temp, "%s%d", r2_RT_base, i);
+            rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F);

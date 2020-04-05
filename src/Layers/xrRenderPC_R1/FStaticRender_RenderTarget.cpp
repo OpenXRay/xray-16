@@ -5,8 +5,6 @@
 // Base targets
 #define r1_RT_base "$user$base_"
 #define r1_RT_base_depth "$user$base_depth"
-#define BASE_RT_HELPER(a) r1_RT_base#a
-#define BASE_RT(a) BASE_RT_HELPER(a)
 
 static LPCSTR RTname = "$user$rendertarget";
 static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
@@ -65,7 +63,11 @@ BOOL CRenderTarget::Create()
     // Bufferts
     rt_Base.resize(HW.BackBufferCount);
     for (u32 i = 0; i < HW.BackBufferCount; i++)
-        rt_Base[i].create(BASE_RT(i), curWidth, curHeight, HW.Caps.fTarget, 1, { CRT::CreateBase });
+    {
+        string32 temp;
+        xr_sprintf(temp, "%s%d", r1_RT_base, i);
+        rt_Base[i].create(temp, curWidth, curHeight, HW.Caps.fTarget, 1, { CRT::CreateBase });
+    }
     rt_Base_Depth.create(r1_RT_base_depth, curWidth, curHeight, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
     RT.create(RTname, rtWidth, rtHeight, HW.Caps.fTarget);

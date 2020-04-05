@@ -53,8 +53,7 @@
 #define r2_sunmask "sunmask"
 
 #define JITTER(a) r2_jitter #a
-#define BASE_RT_HELPER(a) r2_RT_base#a
-#define BASE_RT(a) BASE_RT_HELPER(a)
+
 const float SMAP_near_plane = .1f;
 
 const u32 SMAP_adapt_min = 32;
