@@ -57,7 +57,8 @@
 #define		r2_base				"$user$base"
 
 #define		JITTER(a) r2_jitter #a
-#define		BASE_RT(a) r2_RT_base #a
+#define		BASE_RT_HELPER(a) r2_RT_base#a
+#define		BASE_RT(a) BASE_RT_HELPER(a)
 
 const float SMAP_near_plane = .1f;
 
