@@ -6,6 +6,8 @@
 #define r1_RT_base "$user$base_"
 #define r1_RT_base_depth "$user$base_depth"
 
+#define r1_RT_ZB "$user$zb"
+
 static LPCSTR RTname = "$user$rendertarget";
 static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
 static LPCSTR RTname_distort = "$user$distort";
@@ -81,13 +83,11 @@ BOOL CRenderTarget::Create()
 
     if ((rtHeight != Device.dwHeight) || (rtWidth != Device.dwWidth))
     {
-        R_CHK(HW.pDevice->CreateDepthStencilSurface(
-            rtWidth, rtHeight, HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &ZB, NULL));
+        ZB.create(r1_RT_ZB, rtWidth, rtHeight, HW.Caps.fDepth, 0, { CRT::CreateSurface });
     }
     else
     {
-        ZB = get_base_zb();
-        ZB->AddRef();
+        ZB = rt_Base_Depth;
     }
 
     // Temp ZB, used by some of the shadowing code
@@ -122,7 +122,7 @@ BOOL CRenderTarget::Create()
 
 CRenderTarget::~CRenderTarget()
 {
-    _RELEASE(ZB);
+    ZB.destroy();
     s_postprocess_D[1].destroy();
     s_postprocess[1].destroy();
     s_postprocess_D[0].destroy();
@@ -275,7 +275,7 @@ void CRenderTarget::Begin()
     {
         // Our
         RCache.set_RT(RT->pRT);
-        RCache.set_ZB(ZB);
+        RCache.set_ZB(ZB->pRT);
         curWidth = rtWidth;
         curHeight = rtHeight;
     }
@@ -417,7 +417,7 @@ void CRenderTarget::phase_distortion()
 {
     frame_distort = Device.dwFrame;
     RCache.set_RT(RT_distort->pRT);
-    RCache.set_ZB(ZB);
+    RCache.set_ZB(ZB->pRT);
     RCache.set_CullMode(CULL_CCW);
     RCache.set_ColorWriteEnable();
     CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, color_rgba(127, 127, 127, 127), 1.0f, 0L));

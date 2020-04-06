@@ -21,7 +21,7 @@ private:
     ref_rt RT;
     ref_rt RT_color_map;
     ref_rt RT_distort;
-    IDirect3DSurface9* ZB;
+    ref_rt ZB;
 
     //	Can't implement in a single pass of a shader since
     //	should be compiled only for the hardware that supports it.
