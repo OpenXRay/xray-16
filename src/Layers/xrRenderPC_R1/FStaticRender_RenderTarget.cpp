@@ -91,11 +91,11 @@ BOOL CRenderTarget::Create()
     }
 
     // Temp ZB, used by some of the shadowing code
-    pTempZB.create(RTname_temp_zb, 512, 512, HW.Caps.fDepth, 1, { CRT::CreateSurface });
+    pTempZB.create(RTname_temp_zb, 512, 512, HW.Caps.fDepth, 0, { CRT::CreateSurface });
 
     // Igor: TMP
     // Create an RT for online screenshot makining
-    pFB.create(RTname_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 1, { CRT::CreateSurface });
+    pFB.create(RTname_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 0, { CRT::CreateSurface });
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
