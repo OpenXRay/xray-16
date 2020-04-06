@@ -429,7 +429,7 @@ void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
-    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
 
     if (!m_AllowReadBack)
     {
