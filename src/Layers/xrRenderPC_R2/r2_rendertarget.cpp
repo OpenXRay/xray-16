@@ -599,7 +599,7 @@ CRenderTarget::CRenderTarget()
     //  Create an RT for online screenshot makining
     D3DSURFACE_DESC desc;
     get_base_rt()->GetDesc(&desc);
-    pFB.create(r2_async_ss, Device.dwWidth, Device.dwHeight, desc.Format, 1, { CRT::CreateSurface });
+    rt_async_ss.create(r2_async_ss, Device.dwWidth, Device.dwHeight, desc.Format, 1, { CRT::CreateSurface });
 
     //
     dwWidth = Device.dwWidth;

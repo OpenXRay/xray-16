@@ -56,7 +56,7 @@ public:
     ref_rt pTempZB;
 
     //	Igor: for async screenshots
-    ref_rt pFB; // 32bit		(r,g,b,a) is situated in the system memory
+    ref_rt rt_async_ss; // 32bit		(r,g,b,a) is situated in the system memory
 
 private:
     BOOL Create();

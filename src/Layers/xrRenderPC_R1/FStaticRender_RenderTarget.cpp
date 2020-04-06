@@ -21,7 +21,6 @@ CRenderTarget::CRenderTarget()
     RT_color_map = nullptr;
     pTempZB = nullptr;
     ZB = nullptr;
-    pFB = nullptr;
 
     param_blur = 0.f;
     param_gray = 0.f;
@@ -95,7 +94,7 @@ BOOL CRenderTarget::Create()
 
     // Igor: TMP
     // Create an RT for online screenshot makining
-    pFB.create(RTname_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 0, { CRT::CreateSurface });
+    rt_async_ss.create(RTname_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 0, { CRT::CreateSurface });
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
@@ -315,7 +314,7 @@ void CRenderTarget::DoAsyncScreenshot()
         // hr = pTex->GetSurfaceLevel(0, &pFBSrc);
 
         //  SHould be async function
-        hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB->pRT);
+        hr = HW.pDevice->GetRenderTargetData(pFBSrc, rt_async_ss->pRT);
 
         // pFBSrc->Release();
 
