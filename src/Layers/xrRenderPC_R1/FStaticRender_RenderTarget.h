@@ -18,10 +18,11 @@ public:
     ref_rt rt_Base_Depth;
 
 private:
-    ref_rt RT;
-    ref_rt RT_color_map;
-    ref_rt RT_distort;
-    ref_rt ZB;
+    ref_rt rt_Generic;
+    ref_rt rt_Depth;
+
+    ref_rt rt_color_map;
+    ref_rt rt_distort;
 
     //	Can't implement in a single pass of a shader since
     //	should be compiled only for the hardware that supports it.
@@ -53,7 +54,7 @@ private:
     u32 frame_distort;
 
 public:
-    ref_rt pTempZB;
+    ref_rt rt_temp_zb;
 
     //	Igor: for async screenshots
     ref_rt rt_async_ss; // 32bit		(r,g,b,a) is situated in the system memory

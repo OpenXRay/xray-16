@@ -313,6 +313,7 @@
     <ClInclude Include="Blender_Vertex_aref.h" />
     <ClInclude Include="FStaticRender.h" />
     <ClInclude Include="FStaticRender_RenderTarget.h" />
+    <ClInclude Include="FStaticRender_Types.h" />
     <ClInclude Include="GlowManager.h" />
     <ClInclude Include="LightPPA.h" />
     <ClInclude Include="LightProjector.h" />

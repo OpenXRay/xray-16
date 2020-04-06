@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "LightShadows.h"
+#include "FStaticRender_Types.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "xrEngine/xr_object.h"
 #include "Layers/xrRender/FBasicVisual.h"
@@ -26,18 +27,19 @@ const u32 cache_old = 30 * 1000; // 30 secs
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-constexpr cpcstr RTname = "$user$shadow";
-constexpr cpcstr RTtemp = "$user$temp";
 
 void CLightShadows::recreate_rt()
 {
-    RT.destroy();
-    RT_temp.destroy();
+    rt_shadow.destroy();
+    rt_temp.destroy();
 
     rt_size = ps_r2_smapsize / 2;
-    RT.create(RTname, rt_size, rt_size, S_rtf);
-    RT_temp.create(RTtemp, rt_size, rt_size, S_rtf);
+    rt_shadow.create(r1_RT_shadow, rt_size, rt_size, S_rtf);
+    rt_temp.create(r1_RT_temp, rt_size, rt_size, S_rtf);
 }
+
+#define TWO_TEMP_TEXTURES r1_RT_temp "," r1_RT_temp
+#define TWO_SHADOW_TEXTURES r1_RT_shadow "," r1_RT_shadow
 
 // XXX: add to statistics
 CLightShadows::CLightShadows() : xrc("LightShadows")
@@ -45,21 +47,18 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
     current = nullptr;
     rt_size = 0;
 
-    string128 RTname2;
-    strconcat(sizeof(RTname2), RTname2, RTname, ",", RTname);
-    string128 RTtemp2;
-    strconcat(sizeof(RTtemp2), RTtemp2, RTtemp, ",", RTtemp);
-
     //
     recreate_rt();
-    sh_World.create("effects" DELIMITER "shadow_world", RTname);
+
+    sh_World.create("effects" DELIMITER "shadow_world", r1_RT_shadow);
     geom_World.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
-    sh_BlurTR.create("blur4", RTtemp2);
-    sh_BlurRT.create("blur4", RTname2);
+
+    sh_BlurTR.create("blur4", TWO_TEMP_TEXTURES);
+    sh_BlurRT.create("blur4", TWO_SHADOW_TEXTURES);
     geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // Debug
-    sh_Screen.create("effects" DELIMITER "screen_set", RTname);
+    sh_Screen.create("effects" DELIMITER "screen_set", r1_RT_shadow);
     geom_Screen.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 }
 
@@ -75,8 +74,8 @@ CLightShadows::~CLightShadows()
     sh_BlurRT.destroy();
     sh_BlurTR.destroy();
     sh_World.destroy();
-    RT_temp.destroy();
-    RT.destroy();
+    rt_temp.destroy();
+    rt_shadow.destroy();
 
     // casters
     for (u32 it = 0; it < casters_pool.size(); it++)
@@ -197,8 +196,8 @@ void CLightShadows::calculate()
             if (!bRTS)
             {
                 bRTS = TRUE;
-                RCache.set_RT(RT_temp->pRT);
-                RCache.set_ZB(RImplementation.Target->pTempZB->pRT);
+                RCache.set_RT(rt_temp->pRT);
+                RCache.set_ZB(RImplementation.Target->rt_temp_zb->pRT);
                 HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 255, 255), 1, 0);
             }
 
@@ -336,8 +335,8 @@ void CLightShadows::calculate()
         RCache.Vertex.Unlock(4, geom_Blur.stride());
 
         // Actual rendering (pass0, temp2real)
-        RCache.set_RT(RT->pRT);
-        RCache.set_ZB(RImplementation.Target->pTempZB->pRT);
+        RCache.set_RT(rt_shadow->pRT);
+        RCache.set_ZB(RImplementation.Target->rt_temp_zb->pRT);
         RCache.set_Shader(sh_BlurTR);
         RCache.set_Geometry(geom_Blur);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
