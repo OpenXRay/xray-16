@@ -22,6 +22,7 @@ XR_EXPORT DWORD NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT DWORD AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
+
 int entry_point(pcstr commandLine)
 {
     xrDebug::Initialize(commandLine);
@@ -44,11 +45,17 @@ int entry_point(pcstr commandLine)
 #endif
 
     pcstr fsltx = "-fsltx ";
-    string_path fsgame = "";
+    string_path fsgame;
     if (strstr(commandLine, fsltx))
     {
         const size_t sz = xr_strlen(fsltx);
-        sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
+        pcstr str_begin = strstr(commandLine, fsltx);
+        xr_strcpy(fsgame, sizeof fsgame, str_begin + sz);
+        pstr str_end = strstr(fsgame, " -");
+        if (!str_end)
+            _TrimRight(fsgame, ' ');
+        else
+            *str_end = '\0';
     }
     Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);
 
