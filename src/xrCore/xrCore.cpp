@@ -246,24 +246,24 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
 * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
 
-    if (!strstr(Core.Params, "-fsltx"))                                             // Если пользователь указывает расположение ресурсов то ничего не делаем
-    {                                                                               // впротивном случае
-        chdir(ApplicationPath);                                                     // перейти в рабочий каталог ApplicationPath
+    if (!strstr(Core.Params, "-fsltx"))
+    {
+        chdir(ApplicationPath);
         string_path tmp;
-        xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);                           // записать в tmp путь ApplicationPath/fsgame.ltx
+        xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
         struct stat statbuf;
-        ZeroMemory(&statbuf, sizeof(statbuf));                                      // очистить память
+        ZeroMemory(&statbuf, sizeof(statbuf));
         int res = lstat(tmp, &statbuf);
-        if (-1 == res || !S_ISLNK(statbuf.st_mode))                                 // проверить существует ли линк fsgame.ltx если не существует
-            symlink("/usr/share/openxray/fsgame.ltx", tmp);                         // создать линк на fsgame.ltx
-            xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);              // записать в tmp путь ApplicationPath/gamedata/shaders/gl
-            ZeroMemory(&statbuf, sizeof(statbuf));                                  // очистить память
-            res = lstat(tmp, &statbuf);                                             // проверить существует ли линк gamedata/shaders/gl
-            if (-1 == res || !S_ISLNK(statbuf.st_mode))                             // если не существует
+        if (-1 == res || !S_ISLNK(statbuf.st_mode))
+            symlink("/usr/share/openxray/fsgame.ltx", tmp);
+            xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);
+            ZeroMemory(&statbuf, sizeof(statbuf));
+            res = lstat(tmp, &statbuf);
+            if (-1 == res || !S_ISLNK(statbuf.st_mode))
             {
-                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);           // создать древо каталогов в ApplicationPath
-                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);   // делаю в два захода поскольку функция mkdir() может работать только с одним каталогом
-                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);            // создать линк на шейдеры в gamedata/shaders
+                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
             }
     }
 #endif

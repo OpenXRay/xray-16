@@ -3,7 +3,7 @@
 Version=1.0
 Type=Application
 Terminal=false
-Categories = Game
+Categories = Game;
 Icon=openxray_cs
 Exec=xr_3da -cs
 Name = S.T.A.L.K.E.R.: Clear Sky (OpenXRay)
