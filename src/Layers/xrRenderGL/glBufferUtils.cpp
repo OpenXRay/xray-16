@@ -1,29 +1,32 @@
 #include "stdafx.h"
 #include "Layers/xrRender/BufferUtils.h"
 
-namespace BufferUtils
+enum
 {
-HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer)
+    LOCKFLAGS_FLUSH  = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
+    LOCKFLAGS_APPEND = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT, // TODO: Implement buffer object appending using glBufferSubData
+};
+
+static HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, UINT dataSize, bool bDynamic, bool bIndexBuffer)
 {
-    GLenum usage = bImmutable ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
-    GLenum target = bIndexBuffer ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
+    const GLenum usage = bDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
+    const GLenum target = bIndexBuffer ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
 
     glGenBuffers(1, pBuffer);
     glBindBuffer(target, *pBuffer);
-    CHK_GL(glBufferData(target, DataSize, pData, usage));
+    CHK_GL(glBufferData(target, dataSize, pData, usage));
     return S_OK;
 }
 
-HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
+static inline HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, UINT dataSize, bool bDynamic)
 {
-    return CreateBuffer(pBuffer, pData, DataSize, bImmutable, false);
+    return CreateBuffer(pBuffer, pData, dataSize, bDynamic, false);
 }
 
-HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT DataSize, bool bImmutable)
+static inline HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT dataSize, bool bDynamic)
 {
-    return CreateBuffer(static_cast<GLuint*>(pBuffer), pData, DataSize, bImmutable, true);
+    return CreateBuffer(static_cast<GLuint*>(pBuffer), pData, dataSize, bDynamic, true);
 }
-} // namespace glBufferUtils
 
 const GLsizei VertexSizeList[] =
 {
@@ -330,8 +333,8 @@ void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
     VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
-    // Upload data to device
-    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+    // Upload data to the device
+    CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
 
     if (!m_AllowReadBack)
     {
@@ -428,8 +431,8 @@ void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
     VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
-    // Upload data to device
-    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, true);
+    // Upload data to the device
+    CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
 
     if (!m_AllowReadBack)
     {
@@ -475,4 +478,110 @@ size_t IndexStagingBuffer::GetVideoMemoryUsage() const
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
     CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize));
     return bufferSize;
+}
+
+//-----------------------------------------------------------------------------
+VertexStreamBuffer::VertexStreamBuffer()
+    : m_DeviceBuffer(0)
+{
+}
+
+VertexStreamBuffer::~VertexStreamBuffer()
+{
+    Destroy();
+}
+
+void VertexStreamBuffer::Create(size_t size)
+{
+    CreateVertexBuffer(&m_DeviceBuffer, nullptr, size, true);
+    AddRef();
+}
+
+void VertexStreamBuffer::Destroy()
+{
+    if (m_DeviceBuffer == 0)
+        return;
+
+    glDeleteBuffers(1, &m_DeviceBuffer);
+}
+
+void* VertexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
+{
+    VERIFY(m_DeviceBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_DeviceBuffer);
+
+    void *pData = nullptr;
+    const auto flags = flush ? LOCKFLAGS_FLUSH : LOCKFLAGS_APPEND;
+    CHK_GL(pData = (void*)glMapBufferRange(
+        GL_ARRAY_BUFFER,
+        offset,
+        size,
+        flags));
+
+    return pData;
+}
+
+void VertexStreamBuffer::Unmap()
+{
+    VERIFY(m_DeviceBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_DeviceBuffer);
+    CHK_GL(glUnmapBuffer(GL_ARRAY_BUFFER));
+}
+
+bool VertexStreamBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
+}
+
+//-----------------------------------------------------------------------------
+IndexStreamBuffer::IndexStreamBuffer()
+    : m_DeviceBuffer(0)
+{
+}
+
+IndexStreamBuffer::~IndexStreamBuffer()
+{
+    Destroy();
+}
+
+void IndexStreamBuffer::Create(size_t size)
+{
+    CreateIndexBuffer(&m_DeviceBuffer, nullptr, size, true);
+    AddRef();
+}
+
+void IndexStreamBuffer::Destroy()
+{
+    if (m_DeviceBuffer == 0)
+        return;
+
+    glDeleteBuffers(1, &m_DeviceBuffer);
+}
+
+void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
+{
+    VERIFY(m_DeviceBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
+
+    void *pData = nullptr;
+    const auto flags = flush ? LOCKFLAGS_FLUSH : LOCKFLAGS_APPEND;
+    CHK_GL(pData = (void*)glMapBufferRange(
+        GL_ELEMENT_ARRAY_BUFFER,
+        offset,
+        size,
+        flags));
+
+    return pData;
+}
+
+void IndexStreamBuffer::Unmap()
+{
+    VERIFY(m_DeviceBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
+    CHK_GL(glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER));
+}
+
+bool IndexStreamBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
 }
