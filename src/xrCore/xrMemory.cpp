@@ -10,9 +10,12 @@
 #include <sys/resource.h>
 #endif
 
-#define USE_MIMALLOC
-//#define USE_TBB_MALLOC
-//#define USE_PURE_ALLOC
+// On other platforms these options are controlled by CMake
+#if defined(XR_PLATFORM_WINDOWS)
+#  define USE_MIMALLOC
+//#  define USE_TBB_MALLOC
+//#  define USE_PURE_ALLOC
+#endif
 
 #if defined(USE_MIMALLOC)
 #include "mimalloc.h"
