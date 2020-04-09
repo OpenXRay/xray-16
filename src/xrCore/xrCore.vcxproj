@@ -553,6 +553,9 @@ if not exist "$(OutDir)tbbmalloc_proxy.dll" copy /y "$(xrSdkDir)binaries\$(Platf
     <ProjectReference Include="..\Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
     </ProjectReference>
+    <ProjectReference Include="Memory\xrMemoryNew.vcxproj">
+      <Project>{1e7e9cff-bcac-48d7-a0f4-ee61825fde9a}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
