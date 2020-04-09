@@ -16,48 +16,48 @@ u32 GetDeclLength(const VertexElement* decl)
     return D3DXGetDeclLength(decl);
 }
 
-namespace BufferUtils
-{
-HRESULT IC CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT DataSize, bool /*bImmutable*/, bool bIndexBuffer)
+static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT dataSize,
+    bool bDynamic, D3D_BIND_FLAG bufferType)
 {
     D3D_BUFFER_DESC desc;
-    desc.ByteWidth = DataSize;
-    // desc.Usage = bImmutable ? D3D_USAGE_IMMUTABLE : D3D_USAGE_DEFAULT;
-    desc.Usage = D3D_USAGE_DEFAULT;
-    desc.BindFlags = bIndexBuffer ? D3D_BIND_INDEX_BUFFER : D3D_BIND_VERTEX_BUFFER;
-    desc.CPUAccessFlags = 0;
-    desc.MiscFlags = 0;
+    desc.ByteWidth      = dataSize;
+    desc.Usage          = bDynamic ? D3D_USAGE_DYNAMIC : D3D_USAGE_DEFAULT;
+    desc.BindFlags      = bufferType;
+    desc.CPUAccessFlags = bDynamic ? D3D_CPU_ACCESS_WRITE : 0;
+    desc.MiscFlags      = 0;
 
     D3D_SUBRESOURCE_DATA subData;
     subData.pSysMem = pData;
 
-    HRESULT res = HW.pDevice->CreateBuffer(&desc, &subData, ppBuffer);
-    // R_CHK(res);
+    HRESULT res = HW.pDevice->CreateBuffer(
+        &desc,
+        pData ? &subData : nullptr,
+        ppBuffer);
+
     return res;
 }
 
-HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+static inline HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, UINT dataSize, bool bDynamic)
 {
-    return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, false);
+    return CreateBuffer(ppBuffer, pData, dataSize, bDynamic, D3D_BIND_VERTEX_BUFFER);
 }
 
-HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+static inline HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, UINT dataSize, bool bDynamic)
 {
-    return CreateBuffer(ppBuffer, pData, DataSize, bImmutable, true);
+    return CreateBuffer(ppBuffer, pData, dataSize, bDynamic, D3D_BIND_INDEX_BUFFER);
 }
 
+static inline HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT dataSize)
+{
+    return CreateBuffer(ppBuffer, nullptr, dataSize, true, D3D_BIND_CONSTANT_BUFFER);
+}
+
+namespace BufferUtils
+{
+// TODO: replace by streaming buffer instance in `dx10ConstantBuffer`
 HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize)
 {
-    D3D_BUFFER_DESC desc;
-    desc.ByteWidth = DataSize;
-    desc.Usage = D3D_USAGE_DYNAMIC;
-    desc.BindFlags = D3D_BIND_CONSTANT_BUFFER;
-    desc.CPUAccessFlags = D3D_CPU_ACCESS_WRITE;
-    desc.MiscFlags = 0;
-
-    HRESULT res = HW.pDevice->CreateBuffer(&desc, 0, ppBuffer);
-    // R_CHK(res);
-    return res;
+    return ::CreateConstantBuffer(ppBuffer, DataSize);
 }
 };
 
@@ -211,7 +211,8 @@ void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
-    BufferUtils::CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
+    R_CHK(CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false));
+    VERIFY(m_DeviceBuffer);
     HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
 
     if (!m_AllowReadBack)
@@ -308,7 +309,8 @@ void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
     VERIFY(m_HostBuffer && m_Size);
 
     // Upload data to device
-    BufferUtils::CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false);
+    R_CHK(CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false));
+    VERIFY(m_DeviceBuffer);
     HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
 
     if (!m_AllowReadBack)
@@ -353,4 +355,124 @@ size_t IndexStagingBuffer::GetVideoMemoryUsage() const
     }
 
     return 0;
+}
+
+//-----------------------------------------------------------------------------
+VertexStreamBuffer::VertexStreamBuffer()
+    : m_DeviceBuffer(nullptr)
+{
+}
+
+VertexStreamBuffer::~VertexStreamBuffer()
+{
+    Destroy();
+}
+
+void VertexStreamBuffer::Create(size_t size)
+{
+    R_CHK(CreateVertexBuffer(&m_DeviceBuffer, nullptr, size, true));
+    VERIFY(m_DeviceBuffer);
+    AddRef();
+    HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
+}
+
+void VertexStreamBuffer::Destroy()
+{
+    if (m_DeviceBuffer == nullptr)
+        return;
+
+    HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
+    _RELEASE(m_DeviceBuffer);
+}
+
+void* VertexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= false*/)
+{
+    VERIFY(m_DeviceBuffer);
+
+    u8* pData = nullptr;
+    const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
+#if defined(USE_DX10)
+    R_CHK(m_DeviceBuffer->Map(flag, 0, reinterpret_cast<void**>(&pData)));
+#else
+    D3D11_MAPPED_SUBRESOURCE MappedSubRes;
+    HW.pContext->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes);
+    pData = static_cast<u8*>(MappedSubRes.pData);
+#endif
+    pData += offset;
+    return static_cast<void*>(pData);
+}
+
+void VertexStreamBuffer::Unmap()
+{
+    VERIFY(m_DeviceBuffer);
+#if defined(USE_DX10)
+    m_DeviceBuffer->Unmap();
+#else
+    HW.pContext->Unmap(m_DeviceBuffer, 0);
+#endif
+}
+
+bool VertexStreamBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
+}
+
+//-----------------------------------------------------------------------------
+IndexStreamBuffer::IndexStreamBuffer()
+    : m_DeviceBuffer(nullptr)
+{
+}
+
+IndexStreamBuffer::~IndexStreamBuffer()
+{
+    Destroy();
+}
+
+void IndexStreamBuffer::Create(size_t size)
+{
+    R_CHK(CreateIndexBuffer(&m_DeviceBuffer, nullptr, size, true));
+    VERIFY(m_DeviceBuffer);
+    AddRef();
+    HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
+}
+
+void IndexStreamBuffer::Destroy()
+{
+    if (m_DeviceBuffer == nullptr)
+        return;
+
+    HW.stats_manager.decrement_stats_ib(m_DeviceBuffer);
+    _RELEASE(m_DeviceBuffer);
+}
+
+void* IndexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= false*/)
+{
+    VERIFY(m_DeviceBuffer);
+
+    u8* pData = nullptr;
+    const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
+#if defined(USE_DX10)
+    R_CHK(m_DeviceBuffer->Map(flag, 0, reinterpret_cast<void**>(&pData)));
+#else
+    D3D11_MAPPED_SUBRESOURCE MappedSubRes;
+    HW.pContext->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes);
+    pData = static_cast<u8*>(MappedSubRes.pData);
+#endif
+    pData += offset;
+    return static_cast<void*>(pData);
+}
+
+void IndexStreamBuffer::Unmap()
+{
+    VERIFY(m_DeviceBuffer);
+#if defined(USE_DX10)
+    m_DeviceBuffer->Unmap();
+#else
+    HW.pContext->Unmap(m_DeviceBuffer, 0);
+#endif
+}
+
+bool IndexStreamBuffer::IsValid() const
+{
+    return !!m_DeviceBuffer;
 }
