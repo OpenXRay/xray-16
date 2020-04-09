@@ -89,17 +89,6 @@ void _VertexStream::reset_end()
     //old_pVB = NULL;
 }
 
-_VertexStream::_VertexStream() { _clear(); };
-void _VertexStream::_clear()
-{
-    mSize = 0;
-    mPosition = 0;
-    mDiscardID = 0;
-#ifdef DEBUG
-    dbg_lock = 0;
-#endif
-}
-
 //////////////////////////////////////////////////////////////////////////
 void _IndexStream::Create()
 {
