@@ -57,7 +57,18 @@ cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${PROJECT_NAME} xrMiscMath dl pthread mimalloc-static ${PCRE_LIBRARIES} ${SDL_LIBRARIES} ${LZO_LIBRARIES} ${CRYPTO++_LIBRARIES} ${TBB_LIBRARIES})
+target_link_libraries(
+    ${PROJECT_NAME}
+    xrMiscMath
+    dl
+    pthread
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
+    ${PCRE_LIBRARIES}
+    ${SDL_LIBRARIES}
+    ${LZO_LIBRARIES}
+    ${CRYPTO++_LIBRARIES}
+    ${TBB_LIBRARIES}
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
     GROUP_READ 

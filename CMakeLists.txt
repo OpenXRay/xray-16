@@ -39,7 +39,17 @@ if(NOT WIN32)
 endif()
 
 option ( TBB_PARALLEL "Use tbb::parallel for prarticle and skinning acceleration on SMP." ON )
-option ( NO_TBB_MALLOC "Use standard memory allocation instead of tbbmalloc" ON )
+
+# Memory allocator option
+set ( MEMORY_ALLOCATOR "mimalloc" CACHE STRING "Use specific memory allocator (mimalloc/tbb/standard)" )
+message( "Using ${MEMORY_ALLOCATOR} memory allocator" )
+if ( MEMORY_ALLOCATOR STREQUAL "mimalloc" )
+    add_definitions ( -DUSE_MIMALLOC )
+elseif ( MEMORY_ALLOCATOR STREQUAL "tbb" )
+    add_definitions ( -DUSE_TBB_MALLOC )
+else()
+    add_definitions ( -DUSE_PURE_ALLOC )
+endif()
 
 include(cotire)
 
@@ -140,10 +150,6 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold")
 
 if( TBB_PARALLEL )
   add_definitions ( -DUSE_TBB_PARALLEL )
-endif()
-
-if( NO_TBB_MALLOC )
-  add_definitions ( -DNO_TBB_MALLOC )
 endif()
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
