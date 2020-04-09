@@ -84,7 +84,7 @@ before_script:
     fi
 
   - if [ $TARGET_CPU == x64 ]; then
-       sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libpugixml-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev libfreeimageplus-dev;
+       sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev libfreeimageplus-dev;
        sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev;
        sudo dpkg -i *.deb;
        sudo apt-get -f -y install;
@@ -93,7 +93,7 @@ before_script:
 
   - if [ $TARGET_CPU == x86 ]; then
        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-8-multilib libpulse-dev:i386 libglib2.0-dev:i386;
-       sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libpugixml-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386 libfreeimageplus-dev:i386;
+       sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386 libfreeimageplus-dev:i386;
        sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386;
        wget http://launchpadlibrarian.net/297657459/libsdl2-2.0-0_2.0.5+dfsg1-1ubuntu1_i386.deb;
        wget http://launchpadlibrarian.net/297657456/libsdl2-dev_2.0.5+dfsg1-1ubuntu1_i386.deb;
