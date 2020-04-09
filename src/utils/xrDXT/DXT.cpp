@@ -1,6 +1,11 @@
 #include "stdafx.h"
-#include <nvtt/nvtt.h>
 #include "Layers/xrRender/ETextureParams.h"
+
+#ifdef XR_PLATFORM_WINDOWS
+#define NVTT_SHARED 1
+#endif
+#include <nvtt/nvtt.h>
+#undef NVTT_SHARED
 
 class DDSErrorHandler : public nvtt::ErrorHandler
 {
