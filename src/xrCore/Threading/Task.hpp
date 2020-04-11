@@ -13,7 +13,7 @@ namespace tbb
 class task
 {
 public:
-    virtual ~task = default;
+    virtual ~task() = default;
     virtual task* execute() = 0;
 };
 }
