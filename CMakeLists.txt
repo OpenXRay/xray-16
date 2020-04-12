@@ -187,7 +187,7 @@ if (NOT WIN32)
     find_package(JPEG REQUIRED)
     if ( TBB_PARALLEL )
         find_package(TBB REQUIRED)
-    endif ()
+    endif()
     find_package(PCRE REQUIRED)
 endif()
 
