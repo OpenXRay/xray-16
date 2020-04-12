@@ -63,28 +63,6 @@ SCRIPT_EXPORT(KeyBindings, (),
         class_<KeyBindingRegistrator>("DIK_keys")
             .enum_("dik_keys")
             [
-                value("MOUSE_1", int(MOUSE_1)),
-                value("MOUSE_2", int(MOUSE_2)),
-                value("MOUSE_3", int(MOUSE_3)),
-                value("MOUSE_4", int(MOUSE_4)),
-                value("MOUSE_5", int(MOUSE_5)),
-
-                value("GAMEPAD_A", int(XR_CONTROLLER_BUTTON_A)),
-                value("GAMEPAD_B", int(XR_CONTROLLER_BUTTON_B)),
-                value("GAMEPAD_X", int(XR_CONTROLLER_BUTTON_X)),
-                value("GAMEPAD_Y", int(XR_CONTROLLER_BUTTON_Y)),
-                value("GAMEPAD_BACK", int(XR_CONTROLLER_BUTTON_BACK)),
-                value("GAMEPAD_GUIDE", int(XR_CONTROLLER_BUTTON_GUIDE)),
-                value("GAMEPAD_START", int(XR_CONTROLLER_BUTTON_START)),
-                value("GAMEPAD_LEFTSTICK", int(XR_CONTROLLER_BUTTON_LEFTSTICK)),
-                value("GAMEPAD_RIGHTSTICK", int(XR_CONTROLLER_BUTTON_RIGHTSTICK)),
-                value("GAMEPAD_LEFTSHOULDER", int(XR_CONTROLLER_BUTTON_LEFTSHOULDER)),
-                value("GAMEPAD_RIGHTSHOULDER", int(XR_CONTROLLER_BUTTON_RIGHTSHOULDER)),
-                value("GAMEPAD_DPAD_UP", int(XR_CONTROLLER_BUTTON_DPAD_UP)),
-                value("GAMEPAD_DPAD_DOWN", int(XR_CONTROLLER_BUTTON_DPAD_DOWN)),
-                value("GAMEPAD_DPAD_LEFT", int(XR_CONTROLLER_BUTTON_DPAD_LEFT)),
-                value("GAMEPAD_DPAD_RIGHT", int(XR_CONTROLLER_BUTTON_DPAD_RIGHT)),
-
                 value("DIK_A", int(SDL_SCANCODE_A)),
                 value("DIK_B", int(SDL_SCANCODE_B)),
                 value("DIK_C", int(SDL_SCANCODE_C)),
@@ -368,6 +346,28 @@ SCRIPT_EXPORT(KeyBindings, (),
                
                 value("DIK_APP1", int(SDL_SCANCODE_APP1)),
                 value("DIK_APP2", int(SDL_SCANCODE_APP2))
+
+                value("MOUSE_1", int(MOUSE_1)),
+                value("MOUSE_2", int(MOUSE_2)),
+                value("MOUSE_3", int(MOUSE_3)),
+                value("MOUSE_4", int(MOUSE_4)),
+                value("MOUSE_5", int(MOUSE_5)),
+
+                value("GAMEPAD_A", int(XR_CONTROLLER_BUTTON_A)),
+                value("GAMEPAD_B", int(XR_CONTROLLER_BUTTON_B)),
+                value("GAMEPAD_X", int(XR_CONTROLLER_BUTTON_X)),
+                value("GAMEPAD_Y", int(XR_CONTROLLER_BUTTON_Y)),
+                value("GAMEPAD_BACK", int(XR_CONTROLLER_BUTTON_BACK)),
+                value("GAMEPAD_GUIDE", int(XR_CONTROLLER_BUTTON_GUIDE)),
+                value("GAMEPAD_START", int(XR_CONTROLLER_BUTTON_START)),
+                value("GAMEPAD_LEFTSTICK", int(XR_CONTROLLER_BUTTON_LEFTSTICK)),
+                value("GAMEPAD_RIGHTSTICK", int(XR_CONTROLLER_BUTTON_RIGHTSTICK)),
+                value("GAMEPAD_LEFTSHOULDER", int(XR_CONTROLLER_BUTTON_LEFTSHOULDER)),
+                value("GAMEPAD_RIGHTSHOULDER", int(XR_CONTROLLER_BUTTON_RIGHTSHOULDER)),
+                value("GAMEPAD_DPAD_UP", int(XR_CONTROLLER_BUTTON_DPAD_UP)),
+                value("GAMEPAD_DPAD_DOWN", int(XR_CONTROLLER_BUTTON_DPAD_DOWN)),
+                value("GAMEPAD_DPAD_LEFT", int(XR_CONTROLLER_BUTTON_DPAD_LEFT)),
+                value("GAMEPAD_DPAD_RIGHT", int(XR_CONTROLLER_BUTTON_DPAD_RIGHT)),
         ]
     ];
 });

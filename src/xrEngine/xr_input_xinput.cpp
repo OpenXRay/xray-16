@@ -138,28 +138,6 @@ game_action actions[] = {
 
 keyboard_key keyboards[] =
 {
-    { "mouse1",                 MOUSE_1,                         "LMB" },
-    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake cause init algorithm was changed.
-    { "mouse2",                 MOUSE_2,                         "RMB" },
-    { "mouse4",                 MOUSE_4,                         "Mouse X1" },
-    { "mouse5",                 MOUSE_5,                         "Mouse X2" },
-
-    { "kGAMEPAD_A",                    XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
-    { "kGAMEPAD_B",                    XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
-    { "kGAMEPAD_X",                    XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
-    { "kGAMEPAD_Y",                    XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
-    { "kGAMEPAD_BACK",                 XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
-    { "kGAMEPAD_GUIDE",                XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
-    { "kGAMEPAD_START",                XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
-    { "kGAMEPAD_LEFTSTICK",            XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
-    { "kGAMEPAD_RIGHTSTICK",           XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
-    { "kGAMEPAD_LEFTSHOULDER",         XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
-    { "kGAMEPAD_RIGHTSHOULDER",        XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
-    { "kGAMEPAD_DPAD_UP",              XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
-    { "kGAMEPAD_DPAD_DOWN",            XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
-    { "kGAMEPAD_DPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
-    { "kGAMEPAD_DPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
-
     { "kA",                     SDL_SCANCODE_A,                  "A" },
     { "kB",                     SDL_SCANCODE_B,                  "B" },
     { "kC",                     SDL_SCANCODE_C,                  "C" },
@@ -443,6 +421,28 @@ keyboard_key keyboards[] =
 
     { "kAPP1",                  SDL_SCANCODE_APP1,               "App 1" },
     { "kAPP2",                  SDL_SCANCODE_APP2,               "App 2" },
+
+    { "mouse1",                 MOUSE_1,                         "LMB" },
+    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake because init algorithm was changed.
+    { "mouse2",                 MOUSE_2,                         "RMB" },
+    { "mouse4",                 MOUSE_4,                         "Mouse X1" },
+    { "mouse5",                 MOUSE_5,                         "Mouse X2" },
+
+    { "kGAMEPAD_A",             XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
+    { "kGAMEPAD_B",             XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
+    { "kGAMEPAD_X",             XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
+    { "kGAMEPAD_Y",             XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
+    { "kGAMEPAD_BACK",          XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
+    { "kGAMEPAD_GUIDE",         XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
+    { "kGAMEPAD_START",         XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
+    { "kGAMEPAD_LEFTSTICK",     XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
+    { "kGAMEPAD_RIGHTSTICK",    XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
+    { "kGAMEPAD_LEFTSHOULDER",  XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
+    { "kGAMEPAD_RIGHTSHOULDER", XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
+    { "kGAMEPAD_DPAD_UP",       XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
+    { "kGAMEPAD_DPAD_DOWN",     XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
+    { "kGAMEPAD_DPAD_LEFT",     XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
+    { "kGAMEPAD_DPAD_RIGHT",    XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
 
     { nullptr,                  -1,                              "(null)" }
 };
