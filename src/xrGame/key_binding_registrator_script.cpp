@@ -85,8 +85,6 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("GCB_DPAD_LEFT", int(XR_CONTROLLER_BUTTON_DPAD_LEFT)),
                 value("GCB_DPAD_RIGHT", int(XR_CONTROLLER_BUTTON_DPAD_RIGHT)),
 
-                value("DIK_UNKNOWN", int(SDL_SCANCODE_UNKNOWN)),
-
                 value("DIK_A", int(SDL_SCANCODE_A)),
                 value("DIK_B", int(SDL_SCANCODE_B)),
                 value("DIK_C", int(SDL_SCANCODE_C)),

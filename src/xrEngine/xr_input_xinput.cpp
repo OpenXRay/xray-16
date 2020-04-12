@@ -160,8 +160,6 @@ keyboard_key keyboards[] =
     { "ckDPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
     { "ckDPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
 
-    { "kUNKNOWN",               SDL_SCANCODE_UNKNOWN,            "Unknown" },
-
     { "kA",                     SDL_SCANCODE_A,                  "A" },
     { "kB",                     SDL_SCANCODE_B,                  "B" },
     { "kC",                     SDL_SCANCODE_C,                  "C" },
