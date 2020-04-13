@@ -347,7 +347,7 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("DIK_SLEEP",                  int(SDL_SCANCODE_SLEEP)),
                
                 value("DIK_APP1",                   int(SDL_SCANCODE_APP1)),
-                value("DIK_APP2",                   int(SDL_SCANCODE_APP2))
+                value("DIK_APP2",                   int(SDL_SCANCODE_APP2)),
 
                 value("MOUSE_1",                    int(MOUSE_1)),
                 value("MOUSE_2",                    int(MOUSE_2)),
@@ -369,7 +369,7 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("GAMEPAD_DPAD_UP",            int(XR_CONTROLLER_BUTTON_DPAD_UP)),
                 value("GAMEPAD_DPAD_DOWN",          int(XR_CONTROLLER_BUTTON_DPAD_DOWN)),
                 value("GAMEPAD_DPAD_LEFT",          int(XR_CONTROLLER_BUTTON_DPAD_LEFT)),
-                value("GAMEPAD_DPAD_RIGHT",         int(XR_CONTROLLER_BUTTON_DPAD_RIGHT)),
+                value("GAMEPAD_DPAD_RIGHT",         int(XR_CONTROLLER_BUTTON_DPAD_RIGHT))
         ]
     ];
 });
