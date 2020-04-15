@@ -153,7 +153,7 @@ public:
     void _DeleteInputSignature(const SInputSignature* pSignature);
 #endif //	USE_DX10
 
-    CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
+    CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {});
     void _DeleteRT(const CRT* RT);
 
 //	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);

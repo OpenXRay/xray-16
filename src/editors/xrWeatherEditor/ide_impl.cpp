@@ -17,7 +17,6 @@
 #include "property_holder.hpp"
 #include "property_container.hpp"
 #include "property_holder_include.hpp"
-#include "editor/editor_environment_manager.hpp"
 
 using editor::window_ide;
 
@@ -61,7 +60,7 @@ HWND ide_impl::view_handle() { return ((HWND)m_window->view().draw_handle().ToIn
 #endif
 CEnvironment* ide_impl::environment()
 {
-    return new editor::environment::manager();
+    return m_engine->environment();
 }
 void ide_impl::run() { Application::Run(m_window); }
 void ide_impl::on_load_finished()

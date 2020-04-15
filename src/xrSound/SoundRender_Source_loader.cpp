@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <msacm.h>
 #endif
 #include "SoundRender_Core.h"
@@ -126,7 +126,7 @@ bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
 {
     string_path fn, N;
     xr_strcpy(N, name);
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     xr_strlwr(N);
 #endif
 

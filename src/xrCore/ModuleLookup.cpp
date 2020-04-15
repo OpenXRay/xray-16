@@ -27,9 +27,9 @@ void* ModuleHandle::Open(pcstr moduleName)
 
     xr_string buf(moduleName);
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     buf += ".dll";
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     buf += ".so";
 #else
 #error add your platform-specific extension here

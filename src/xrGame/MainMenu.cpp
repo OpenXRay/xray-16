@@ -26,7 +26,7 @@
 
 #include "ui/UICDkey.h"
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
 #endif
@@ -97,7 +97,7 @@ CMainMenu::CMainMenu()
     m_deactivated_frame = 0;
 
     m_sPatchURL = "";
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     m_pGameSpyFull = NULL;
     m_account_mngr = NULL;
     m_login_mngr = NULL;
@@ -124,7 +124,7 @@ CMainMenu::CMainMenu()
         g_statHint = new CUIButtonHint();
         m_pGameSpyFull = new CGameSpy_Full();
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
         for (cpcstr name : ErrMsgBoxTemplate)
         {
             CUIMessageBoxEx* msgBox = m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
@@ -154,7 +154,7 @@ CMainMenu::CMainMenu()
         m_account_mngr = new gamespy_gp::account_manager(m_pGameSpyFull->GetGameSpyGP());
         m_login_mngr = new gamespy_gp::login_manager(m_pGameSpyFull);
         m_profile_store = new gamespy_profile::profile_store(m_pGameSpyFull);
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
         m_stats_submitter = new gamespy_profile::stats_submitter(m_pGameSpyFull);
         m_atlas_submit_queue = new atlas_submit_queue(m_stats_submitter);
 #endif
@@ -172,7 +172,7 @@ CMainMenu::~CMainMenu()
     xr_delete(m_startDialog);
     g_pGamePersistent->m_pMainMenu = nullptr;
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     xr_delete(m_account_mngr);
     xr_delete(m_login_mngr);
     xr_delete(m_profile_store);
@@ -560,7 +560,7 @@ void CMainMenu::OnFrame()
             Console->Show();
     }
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (IsActive() || m_sPDProgress.IsInProgress)
     {
         GSUpdateStatus status = m_pGameSpyFull->Update();
@@ -670,7 +670,7 @@ void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
 
 void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     CGameSpy_Available GSA;
     shared_str result_string;
     if (!GSA.CheckAvailableServices(result_string))
@@ -765,7 +765,7 @@ void CMainMenu::OnRunDownloadedPatch(CUIWindow*, void*)
 
 void CMainMenu::CancelDownload()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     m_pGameSpyFull->GetGameSpyHTTP()->StopDownload();
     m_sPDProgress.IsInProgress = false;
 #endif
@@ -834,7 +834,7 @@ LPCSTR DelHyphens(LPCSTR c)
 
 bool CMainMenu::IsCDKeyIsValid()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (!m_pGameSpyFull || !m_pGameSpyFull->GetGameSpyHTTP())
         return false;
     string64 CDKey = "";
@@ -894,7 +894,7 @@ LPCSTR CMainMenu::GetGSVer()
 
 LPCSTR CMainMenu::GetPlayerName()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager* l_mngr = GetLoginMngr();
     gamespy_gp::profile const* tmp_prof = l_mngr ? l_mngr->get_current_profile() : NULL;
 
@@ -947,7 +947,7 @@ void CMainMenu::OnDownloadMPMap_CopyURL(CUIWindow* w, void* d)
 void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
 {
     LPCSTR url = m_downloaded_mp_map_url.c_str();
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);

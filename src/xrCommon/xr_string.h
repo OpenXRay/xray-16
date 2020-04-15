@@ -29,15 +29,16 @@ inline xr_string xr_substrreplace(const xr_string& src, const xr_string& src_sub
     return res;
 }
 
+#if !defined(XR_PLATFORM_WINDOWS)
 namespace std
 {
 template<>
 struct hash<xr_string>
 {
-    // XXX: enable C++17 for all projects to be able to use nodiscard attribute
-    /*[[nodiscard]]*/ size_t operator()(const xr_string& str) const noexcept
+    [[nodiscard]] size_t operator()(const xr_string& str) const noexcept
     {
-        return std::hash<pcstr>{}(str.c_str());
+        return std::hash<std::string_view>{}(str.c_str());
     }
 };
 }
+#endif

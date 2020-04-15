@@ -79,12 +79,12 @@ IC bool _valid(const float x) noexcept
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
-#if defined(WINDOWS) && defined(_MSC_VER)
-#if defined(XR_X64)
+#if defined(XR_PLATFORM_WINDOWS) && defined(XR_COMPILER_MSVC)
+#if defined(XR_ARCHITECTURE_X64)
     const int cls = _fpclassf(x);
 #else
     const int cls = _fpclass(static_cast<double>(x));
-#endif // XR_X64
+#endif // XR_ARCHITECTURE_X64
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;
 #else
@@ -116,7 +116,7 @@ IC bool _valid(const double x)
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( ???INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
-#if defined(WINDOWS) && defined(_MSC_VER)
+#if defined(XR_PLATFORM_WINDOWS) && defined(XR_COMPILER_MSVC)
     const int cls = _fpclass(x);
     if (cls & (_FPCLASS_SNAN + _FPCLASS_QNAN + _FPCLASS_NINF + _FPCLASS_PINF + _FPCLASS_ND + _FPCLASS_PD))
         return false;

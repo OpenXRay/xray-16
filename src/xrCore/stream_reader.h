@@ -4,9 +4,9 @@
 class XRCORE_API CStreamReader : public IReaderBase<CStreamReader>, Noncopyable
 {
 private:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     HANDLE m_file_mapping_handle;
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     int m_file_mapping_handle;
 #endif
     size_t m_start_offset;
@@ -29,19 +29,19 @@ private:
 public:
     IC CStreamReader() = default;
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     virtual void construct(const HANDLE& file_mapping_handle, const size_t& start_offset, const size_t& file_size,
         const size_t& archive_size, const size_t& window_size);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     virtual void construct(int file_mapping_handle, const size_t& start_offset, const size_t& file_size,
         const size_t& archive_size, const size_t& window_size);
 #endif
     virtual void destroy();
 
 public:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     IC const HANDLE& file_mapping_handle() const;
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     IC const int& file_mapping_handle() const;
 #endif
     IC intptr_t elapsed() const;

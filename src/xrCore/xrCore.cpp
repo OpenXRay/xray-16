@@ -3,11 +3,11 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <mmsystem.h>
 #include <objbase.h>
 #pragma comment(lib, "winmm.lib")
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -25,12 +25,18 @@ XRCORE_API xrCore Core;
 
 static u32 init_counter = 0;
 
-#define DO_EXPAND(VAL) VAL##1
+#define DO_EXPAND(...) __VA_ARGS__##1
 #define EXPAND(VAL) DO_EXPAND(VAL)
 
 #ifdef CI
 #if EXPAND(CI) == 1
 #undef CI
+#endif
+#endif
+
+#ifdef APPVEYOR
+#if EXPAND(APPVEYOR) == 1
+#undef APPVEYOR
 #endif
 #endif
 
@@ -198,7 +204,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         CoInitializeMultithreaded();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         string_path fn, dr, di;
 
         // application path
@@ -221,7 +227,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         }
 #endif
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #else
         getcwd(WorkingPath, sizeof(WorkingPath));
@@ -251,14 +257,14 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
             symlink("/usr/share/openxray/gamedata", tmp);
 #endif
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         // User/Comp Name
         DWORD sz_user = sizeof(UserName);
         GetUserName(UserName, &sz_user);
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
         if(pw)
@@ -281,7 +287,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         PrintBuildInfo();
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
-#if !defined(XR_ARM64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
         R_ASSERT(SDL_HasSSE());
 #endif
         XRay::Math::Initialize();
@@ -322,7 +328,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         EFS._initialize();
 #ifdef DEBUG
 #ifndef _EDITOR
-#ifndef LINUX // FIXME!!!
+#ifndef XR_PLATFORM_LINUX // FIXME!!!
         Msg("Process heap 0x%08x", GetProcessHeap());
 #endif
 #endif
@@ -356,19 +362,19 @@ void xrCore::_destroy()
 constexpr pcstr xrCore::GetBuildConfiguration()
 {
 #ifdef NDEBUG
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     return "Rx64";
 #else
     return "Rx86";
 #endif
 #elif defined(MIXED)
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     return "Mx64";
 #else
     return "Mx86";
 #endif
 #else
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     return "Dx64";
 #else
     return "Dx86";
@@ -378,7 +384,7 @@ constexpr pcstr xrCore::GetBuildConfiguration()
 
 void xrCore::CoInitializeMultithreaded() const
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     if (!strstr(Params, "-weather"))
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
@@ -412,7 +418,7 @@ void xrCore::CalculateBuildId()
         buildId -= daysInMonth[i];
 }
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #ifdef _EDITOR
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #else

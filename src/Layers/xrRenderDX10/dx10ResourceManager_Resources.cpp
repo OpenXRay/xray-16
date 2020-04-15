@@ -1,17 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#ifndef _EDITOR
-#pragma comment(lib, "d3dx9.lib")
-#include "xrEngine/Render.h"
-#endif
-#pragma warning(pop)
-
-#include <D3DX10Core.h>
-
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
 #include "Layers/xrRender/blenders/blender.h"

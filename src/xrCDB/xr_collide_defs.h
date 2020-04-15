@@ -169,8 +169,7 @@ public:
             }
             return FALSE;
         }
-        results.push_back(rq_result());
-        rq_result& rq = results.back();
+        rq_result& rq = results.emplace_back(rq_result());
         rq.range = _range;
         rq.element = _element;
         rq.O = _who;

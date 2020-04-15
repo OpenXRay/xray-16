@@ -2,17 +2,20 @@
 
 #include "SDL.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
 
-#define USE_MIMALLOC
-//#define USE_TBB_MALLOC
-//#define USE_PURE_ALLOC
+// On other platforms these options are controlled by CMake
+#if defined(XR_PLATFORM_WINDOWS)
+#  define USE_MIMALLOC
+//#  define USE_TBB_MALLOC
+//#  define USE_PURE_ALLOC
+#endif
 
 #if defined(USE_MIMALLOC)
 #include "mimalloc.h"
@@ -77,7 +80,7 @@ void xrMemory::_destroy()
 
 XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     MEMORY_BASIC_INFORMATION memory_info;
     memory_info.BaseAddress = nullptr;
     *_free = *reserved = *committed = 0;
@@ -91,7 +94,7 @@ XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
         }
         memory_info.BaseAddress = (char*)memory_info.BaseAddress + memory_info.RegionSize;
     }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     struct sysinfo si;
     sysinfo(&si);
     *_free = si.freeram * si.mem_unit;
@@ -109,7 +112,7 @@ XRCORE_API void log_vminfo()
 
 size_t xrMemory::mem_usage()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     PROCESS_MEMORY_COUNTERS pmc = {};
     if (HANDLE h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId()))
     {
@@ -117,7 +120,7 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
@@ -126,7 +129,7 @@ size_t xrMemory::mem_usage()
 
 void xrMemory::mem_compact()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
 #endif
@@ -147,7 +150,7 @@ void xrMemory::mem_compact()
     if (g_pSharedMemoryContainer)
         g_pSharedMemoryContainer->clean();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     if (strstr(Core.Params, "-swap_on_compact"))
         SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
 #endif

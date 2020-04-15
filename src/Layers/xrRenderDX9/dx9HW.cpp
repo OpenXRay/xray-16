@@ -123,8 +123,9 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     P.BackBufferHeight = Device.dwHeight;
 
     // Back buffer
+    BackBufferCount = 1;
     P.BackBufferFormat = fTarget;
-    P.BackBufferCount = 1;
+    P.BackBufferCount = BackBufferCount;
 
     // Multisample
     P.MultiSampleType = D3DMULTISAMPLE_NONE;
@@ -202,8 +203,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
-    R_CHK(pDevice->GetRenderTarget(0, &pBaseRT));
-    R_CHK(pDevice->GetDepthStencilSurface(&pBaseZB));
     u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
@@ -211,11 +210,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
 void CHW::DestroyDevice()
 {
-    _SHOW_REF("refCount:pBaseZB", pBaseZB);
-    _RELEASE(pBaseZB);
-
-    _SHOW_REF("refCount:pBaseRT", pBaseRT);
-    _RELEASE(pBaseRT);
 #ifdef DEBUG
     _SHOW_REF("refCount:dwDebugSB", dwDebugSB);
     _RELEASE(dwDebugSB);
@@ -234,17 +228,11 @@ void CHW::Reset()
 #ifdef DEBUG
     _RELEASE(dwDebugSB);
 #endif
-    _SHOW_REF("refCount:pBaseZB", pBaseZB);
-    _SHOW_REF("refCount:pBaseRT", pBaseRT);
-    _RELEASE(pBaseZB);
-    _RELEASE(pBaseRT);
-
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
-
     DevPP.BackBufferWidth = Device.dwWidth;
     DevPP.BackBufferHeight = Device.dwHeight;
 
     // Windoze
+    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
@@ -268,8 +256,6 @@ void CHW::Reset()
         Msg("! ERROR: [%dx%d]: %s", DevPP.BackBufferWidth, DevPP.BackBufferHeight, xrDebug::ErrorToString(result));
         Sleep(100);
     }
-    R_CHK(pDevice->GetRenderTarget(0, &pBaseRT));
-    R_CHK(pDevice->GetDepthStencilSurface(&pBaseZB));
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
@@ -407,14 +393,10 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
     };
 }
 
-D3DFORMAT CHW::GetSurfaceFormat() const
-{
-    return DevPP.BackBufferFormat;
-}
-
 void CHW::Present()
 {
     pDevice->Present(nullptr, nullptr, nullptr, nullptr);
+    CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
 DeviceState CHW::GetDeviceState()

@@ -1773,7 +1773,7 @@ public:
         if (mm == nullptr)
             return;
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
         if (!m_checkInProgress.exchange(true))
         {
             SetupCallParams(arguments);

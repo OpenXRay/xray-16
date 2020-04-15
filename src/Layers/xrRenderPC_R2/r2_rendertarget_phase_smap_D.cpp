@@ -3,10 +3,7 @@
 void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
 {
     // Targets
-    if (RImplementation.o.HW_smap)
-        u_setrt(rt_smap_surf, NULL, NULL, rt_smap_depth->pRT);
-    else
-        u_setrt(rt_smap_surf, NULL, NULL, rt_smap_ZB);
+    u_setrt(rt_smap_surf, NULL, NULL, rt_smap_depth->pRT);
 
     // Clear
     if (SE_SUN_NEAR == sub_phase)

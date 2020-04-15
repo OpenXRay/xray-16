@@ -2,7 +2,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #endif
 #pragma warning(pop)
@@ -14,18 +14,16 @@
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include <stdint.h>
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
 
-#if defined(XR_X64)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #define _finddata_t _finddata64i32_t
-#elif defined(XR_ARM64)
+#elif defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #define _finddata_t _finddata32_t
-#elif defined(XR_X86)
-#define _finddata_t _finddata32_t
-#endif // XR_X64, XR_X86 or XR_ARM64
+#endif
 
 typedef int64_t __int64;
 typedef __int64 __time64_t;
@@ -103,10 +101,10 @@ public:
         size_t size = 0;
         size_t vfs_idx = size_t(-1);
         shared_str path;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
         int hSrcFile = 0;
 #endif
         CInifile* header = nullptr;

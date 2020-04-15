@@ -17,7 +17,11 @@
 #else
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include <xmmintrin.h>
+#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#include "Externals/sse2neon/sse2neon.h"
+#endif
 #endif
 
 const float dbgOffset = 0.f;

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "resource.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -37,7 +37,7 @@ int entry_point(pcstr commandLine)
     if (strstr(commandLine, "-dedicated"))
         GEnv.isDedicatedServer = true;
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     AccessibilityShortcuts shortcuts;
     if (!GEnv.isDedicatedServer)
         shortcuts.Disable();
@@ -60,7 +60,7 @@ int entry_point(pcstr commandLine)
     return result;
 }
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 int StackoverflowFilter(const int exceptionCode)
 {
     if (exceptionCode == EXCEPTION_STACK_OVERFLOW)
@@ -83,7 +83,7 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
     }
     return result;
 }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;

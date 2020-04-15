@@ -121,7 +121,7 @@ CScriptDebugger::CScriptDebugger(CScriptEngine* scriptEngine)
     //	m_pDebugger					= this;
     m_nLevel = 0;
     m_mailSlot = CreateMailSlotByName(DEBUGGER_MAIL_SLOT);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     if (m_mailSlot == INVALID_HANDLE_VALUE)
     {
         m_bIdePresent = false;
@@ -150,7 +150,7 @@ CScriptDebugger::~CScriptDebugger()
 {
     if (Active())
         _SendMessage(DMSG_CLOSE_CONNECTION, 0, 0);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     CloseHandle(m_mailSlot);
 #endif
     xr_delete(m_threads);

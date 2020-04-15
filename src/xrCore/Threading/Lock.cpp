@@ -4,7 +4,7 @@
 
 struct LockImpl
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     CRITICAL_SECTION cs;
 
     LockImpl() { InitializeCriticalSection(&cs); }

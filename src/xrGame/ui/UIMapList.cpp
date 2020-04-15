@@ -66,7 +66,7 @@ CUIMapList::CUIMapList()
 CUIMapList::~CUIMapList() {}
 void CUIMapList::StartDedicatedServer()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     strconcat(g_sLaunchOnExit_app, Core.ApplicationPath, "xrEngine.exe");
 #else
     strconcat(g_sLaunchOnExit_app, Core.ApplicationPath, "xrEngine");

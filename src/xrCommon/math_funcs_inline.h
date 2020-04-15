@@ -1,7 +1,6 @@
 #pragma once
 #include <math.h>
 #include "xrCore/math_constants.h"
-#include "xrCommon/inlining_macros.h"
 #include "xrCore/_bitwise.h" // iFloor
 
 inline float _abs(float x) noexcept { return fabsf(x); }

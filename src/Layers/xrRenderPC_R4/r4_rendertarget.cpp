@@ -367,6 +367,15 @@ CRenderTarget::CRenderTarget()
     //	NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
+        rt_Base.resize(HW.BackBufferCount);
+        for (u32 i = 0; i < HW.BackBufferCount; i++)
+        {
+            string32 temp;
+            xr_sprintf(temp, "%s%d", r2_RT_base, i);
+            rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        }
+        rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
+
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
         if (RImplementation.o.dx10_msaa)
@@ -627,7 +636,7 @@ CRenderTarget::CRenderTarget()
             FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
             HW.pContext->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
     }
 
     // HBAO
@@ -661,7 +670,7 @@ CRenderTarget::CRenderTarget()
 
         if (ssao_hdao_ultra)
         {
-            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, true);
+            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, { CRT::CreateUAV });
             s_hdao_cs.create(b_hdao_cs, "r2" DELIMITER "ssao");
             if (RImplementation.o.dx10_msaa)
                 s_hdao_cs_msaa.create(b_hdao_msaa_cs, "r2" DELIMITER "ssao");

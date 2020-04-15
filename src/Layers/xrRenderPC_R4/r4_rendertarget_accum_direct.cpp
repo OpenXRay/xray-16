@@ -729,7 +729,7 @@ void CRenderTarget::accum_direct_blend()
     {
         VERIFY(0);
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
+            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
         else
             u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
 
@@ -812,7 +812,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     }
     phase_accumulator();
     if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Generic_0, NULL, NULL, HW.pBaseZB);
+        u_setrt(rt_Generic_0, NULL, NULL, get_base_zb());
     else
         u_setrt(rt_Generic_0_r, NULL, NULL, RImplementation.Target->rt_MSAADepth->pZRT);
 
@@ -922,7 +922,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     // Perform lighting
     {
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_0, NULL, NULL, HW.pBaseZB); // enshure RT setup
+            u_setrt(rt_Generic_0, NULL, NULL, get_base_zb()); // enshure RT setup
         else
             u_setrt(rt_Generic_0_r, NULL, NULL, RImplementation.Target->rt_MSAADepth->pZRT); // enshure RT setup
         RCache.set_CullMode(CULL_NONE);

@@ -11,10 +11,10 @@
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/light.h"
 #endif
-#if defined(XR_X86) || defined(XR_X64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #include "PLC_SSE.hpp"
 #endif
-#if defined(WINDOWS) && defined(XR_X86)
+#if defined(XR_PLATFORM_WINDOWS) && defined(XR_ARCHITECTURE_X86)
 #include "SkinXW_SSE.hpp"
 #else
 #include "SkinXW_CPP.hpp"
@@ -39,7 +39,7 @@ void Initialize()
     static bool initialized = false;
     if (initialized)
         return;
-#if defined(WINDOWS) && defined(XR_X86)
+#if defined(XR_PLATFORM_WINDOWS) && defined(XR_ARCHITECTURE_X86)
     Skin1W = Skin1W_SSE;
     Skin2W = Skin2W_SSE;
     Skin3W = Skin3W_SSE;
@@ -50,10 +50,10 @@ void Initialize()
     Skin2W = Skin2W_CPP;
     Skin3W = Skin3W_CPP;
     Skin4W = Skin4W_CPP;
-#if defined(XR_ARM64)
-    PLCCalc = PLCCalc_CPP;
-#else
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
     PLCCalc = PLCCalc_SSE;
+#else
+    PLCCalc = PLCCalc_CPP;
 #endif
     //PLCCalc = PLCCalc_CPP;
 #endif

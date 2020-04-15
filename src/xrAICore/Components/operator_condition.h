@@ -8,7 +8,6 @@
 
 #pragma once
 #include "xrCore/_types.h"
-#include "xrCommon/inlining_macros.h"
 
 template <typename _condition_type, typename _value_type>
 class COperatorConditionAbstract

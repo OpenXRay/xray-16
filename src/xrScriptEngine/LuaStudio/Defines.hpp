@@ -10,11 +10,11 @@
 
 // DECLSPEC_NOVTABLE macro
 #ifndef DECLSPEC_NOVTABLE
-#if (_MSC_VER >= 1100) && defined(__cplusplus)
+#if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
 #define DECLSPEC_NOVTABLE __declspec(novtable)
-#else // #if (_MSC_VER >= 1100) && defined(__cplusplus)
+#else // #if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
 #define DECLSPEC_NOVTABLE
-#endif // #if (_MSC_VER >= 1100) && defined(__cplusplus)
+#endif // #if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
 #endif // #ifndef DECLSPEC_NOVTABLE
 
 // CS_STRING_CONCAT macro
@@ -30,7 +30,7 @@ STATIC_CHECK(false, CS_STRING_CONCAT_or_CS_STRING_CONCAT_HELPER_or_CS_STRING_CON
 STATIC_CHECK(false, CS_MAKE_STRING_or_CS_MAKE_STRING_HELPER_macro_already_defined);
 #endif // #if defined(CS_MAKE_STRING) || defined(CS_MAKE_STRING_HELPER)
 
-#define CS_MAKE_STRING_HELPER(a) #a
+#define CS_MAKE_STRING_HELPER(...) #__VA_ARGS__
 #define CS_MAKE_STRING(a) CS_MAKE_STRING_HELPER(a)
 
 #define CS_LIBRARY_NAME(library, extension) \

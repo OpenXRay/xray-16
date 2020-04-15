@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "string_concatenations.h"
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 int _cdecl _resetstkoflw(void)
 {
     int stack_addr;
@@ -78,7 +78,7 @@ int stack_overflow_exception_filter(int exception_code)
 
 void check_stack_overflow(u32 stack_increment)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     __try
     {
         void* p = xr_alloca(stack_increment);

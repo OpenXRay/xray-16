@@ -4,7 +4,6 @@
 #include <locale>
 
 #include "_types.h"
-#include "xrCommon/inlining_macros.h"
 #include "xrMemory.h"
 
 #define BREAK_AT_STRCMP
@@ -213,9 +212,9 @@ IC void xr_strlwr(shared_str& src)
     if (*src)
     {
         char* lp = xr_strdup(*src);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         xr_strlwr(lp);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         size_t i = 0;
         while(lp[i])
         {

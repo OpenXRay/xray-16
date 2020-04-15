@@ -12,7 +12,7 @@
 #include "ui/UICDkey.h"
 #include "secure_messaging.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <shellapi.h>
 #endif
 //#pragma comment(lib, "shell32.lib")
@@ -206,7 +206,7 @@ void login_manager::logout()
 
 void login_manager::reinit_connection_tasks()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     account_manager* tmp_acc_mngr = MainMenu()->GetAccountMngr();
     if (tmp_acc_mngr->is_get_account_profiles_active())
     {
@@ -409,7 +409,7 @@ bool login_manager::get_remember_me_from_registry()
 
 void login_manager::forgot_password(char const* url)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);

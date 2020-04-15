@@ -170,7 +170,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\xrCommon\inlining_macros.h" />
     <ClInclude Include="..\xrCommon\math_funcs.h" />
     <ClInclude Include="..\xrCommon\math_funcs_inline.h" />
     <ClInclude Include="..\xrCommon\misc_math_types.h" />

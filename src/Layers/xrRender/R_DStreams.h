@@ -1,109 +1,79 @@
-#ifndef r_DStreamsH
-#define r_DStreamsH
 #pragma once
 
-#ifdef USE_OGL
-enum
-{
-    LOCKFLAGS_FLUSH = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
-    LOCKFLAGS_APPEND = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT // TODO: Implement buffer object appending using glBufferSubData
-};
-#else
-enum
-{
-    LOCKFLAGS_FLUSH = D3DLOCK_DISCARD,
-    LOCKFLAGS_APPEND = D3DLOCK_NOOVERWRITE
-};
-#endif // USE_OGL
+#include "BufferUtils.h"
 
 class ECORE_API _VertexStream
 {
-private:
-#ifdef USE_OGL
-    GLuint pVB;
-#else
-    ID3DVertexBuffer* pVB;
-#endif // USE_OGL
-    u32 mSize; // size in bytes
-    u32 mPosition; // position in bytes
-    u32 mDiscardID; // ID of discard - usually for caching
-public:
-#ifdef USE_OGL
-    GLuint old_pVB;
-#else
-    ID3DVertexBuffer* old_pVB;
-#endif // USE_OGL
+    VertexStreamBuffer pVB;
+    u32 mSize{}; // size in bytes
+    u32 mPosition{}; // position in bytes
+    u32 mDiscardID{}; // ID of discard - usually for caching
 #ifdef DEBUG
-    u32 dbg_lock;
+    u32 dbg_lock{};
 #endif
-private:
-    void _clear();
 
 public:
+    VertexBufferHandle old_pVB{};
+
+public:
+    _VertexStream() = default;
+    ~_VertexStream() = default;
+
     void Create();
     void Destroy();
     void reset_begin();
     void reset_end();
 
-#ifdef USE_OGL
-    IC GLuint Buffer() { return pVB; }
-#else
-    ID3DVertexBuffer* Buffer() { return pVB; }
-#endif // USE_OGL
-    u32 DiscardID() { return mDiscardID; }
+    VertexBufferHandle Buffer() const { return pVB; }
+    u32 DiscardID() const { return mDiscardID; }
     void Flush() { mPosition = mSize; }
     void* Lock(u32 vl_Count, u32 Stride, u32& vOffset);
     void Unlock(u32 Count, u32 Stride);
-    u32 GetSize() { return mSize; }
-    _VertexStream();
-    ~_VertexStream() { Destroy(); };
-};
-
-class ECORE_API _IndexStream
-{
-private:
-#ifdef USE_OGL
-    GLuint pIB;
-#else
-    ID3DIndexBuffer* pIB;
-#endif // USE_OGL
-    u32 mSize; // real size (usually mCount, aligned on 512b boundary)
-    u32 mPosition;
-    u32 mDiscardID;
-
-public:
-#ifdef USE_OGL
-    GLuint old_pIB;
-#else
-    ID3DIndexBuffer* old_pIB;
-#endif // USE_OGL
+    u32 GetSize() const { return mSize; }
 
 private:
     void _clear()
     {
-        pIB = 0;
         mSize = 0;
         mPosition = 0;
         mDiscardID = 0;
+#ifdef DEBUG
+        dbg_lock = 0;
+#endif
     }
+};
+
+class ECORE_API _IndexStream
+{
+    IndexStreamBuffer pIB;
+    u32 mSize{}; // real size (usually mCount, aligned on 512b boundary)
+    u32 mPosition{};
+    u32 mDiscardID{};
 
 public:
+    IndexBufferHandle old_pIB{};
+
+public:
+    _IndexStream() = default;
+    ~_IndexStream() = default;
+
     void Create();
     void Destroy();
     void reset_begin();
     void reset_end();
 
-#ifdef USE_OGL
-    IC GLuint Buffer() { return pIB; }
-#else
-    ID3DIndexBuffer* Buffer() { return pIB; }
-#endif // USE_OGL
-    u32 DiscardID() { return mDiscardID; }
+    IndexBufferHandle Buffer() const { return pIB; }
+    u32 DiscardID() const { return mDiscardID; }
     void Flush() { mPosition = mSize; }
     u16* Lock(u32 Count, u32& vOffset);
     void Unlock(u32 RealCount);
+    u32 GetSize() const { return mSize; }
 
-    _IndexStream() { _clear(); };
-    ~_IndexStream() { Destroy(); };
+private:
+    void _clear()
+    {
+        mSize = 0;
+        mPosition = 0;
+        mDiscardID = 0;
+    }
 };
-#endif

@@ -36,7 +36,7 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
     return nullptr;
 }
 
-bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_t& sha_checksum)
+bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::hash_t& sha_checksum)
 {
     char* tmp_info_sect = search_info_section(data, data_size);
     if (!tmp_info_sect)
@@ -69,11 +69,11 @@ bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_
     xr_strcat(dst_buffer, dst_size, add_str);
     src_data_size += xr_strlen(dst_buffer) + 1; // zero ending
 
-    bool ret = m_verifyer.verify(data, src_data_size, tmp_dsign);
-    if (!ret)
+    auto hash = m_verifyer.verify(data, src_data_size, tmp_dsign);
+    if (!hash)
         return false;
 
-    CopyMemory(sha_checksum, m_verifyer.get_sha_checksum(), sizeof(sha_checksum));
+    CopyMemory(sha_checksum.data(), hash.value().data(), crypto::xr_sha1::DigestSize);
 
     return true;
 }
@@ -196,21 +196,16 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
         tmp_ini.r_string(cd_info_secion, cd_player_digest_key), tmp_ini.r_string(cd_info_secion, cd_creation_date));
 
     m_orig_config_body.w_stringZ(add_str);
+    auto hash = crypto::xr_sha1::calculate(m_orig_config_body.pointer(), m_orig_config_body.tell());
 
-    crypto::xr_sha256 tmp_sha_checksum;
-    tmp_sha_checksum.start_calculate(m_orig_config_body.pointer(), m_orig_config_body.tell());
-    while (!tmp_sha_checksum.continue_calculate())
-    {
-    };
-
-    u8 tmp_checksum[crypto::xr_sha256::digest_length];
+    crypto::xr_sha1::hash_t tmp_checksum;
     if (!verify_dsign(data, data_size, tmp_checksum))
     {
         xr_strcpy(diff, "invalid digital sign");
         return false;
     }
 
-    if (memcmp(tmp_checksum, tmp_sha_checksum.pointer(), sizeof(tmp_checksum)))
+    if (memcmp(tmp_checksum.data(), hash.data(), crypto::xr_sha1::DigestSize))
     {
         get_diff(tmp_ini, tmp_active_params, diff);
         return false;

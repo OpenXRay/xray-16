@@ -9,6 +9,12 @@
 
 #include "Include/editor/engine.hpp"
 
+#ifdef XRWEATHER_ENGINE_EXPORTS
+#define XRWEATHER_ENGINE_API XR_EXPORT
+#else
+#define XRWEATHER_ENGINE_API XR_IMPORT
+#endif
+
 class IInputReceiver;
 
 class engine_impl : public XRay::Editor::engine_base
@@ -30,6 +36,9 @@ private:
 
     virtual void value(LPCSTR value, shared_str& result);
     virtual LPCSTR value(shared_str const& value);
+
+    // manager
+    CEnvironment* environment() override;
 
     virtual void weather(LPCSTR value);
     virtual LPCSTR weather();
@@ -76,3 +85,5 @@ private:
     IInputReceiver* m_input_receiver;
     bool m_input_captured;
 }; // class engine_impl
+
+XRWEATHER_ENGINE_API extern engine_impl g_engine;

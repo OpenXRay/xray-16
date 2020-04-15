@@ -10,7 +10,7 @@ player_account::player_account() : m_player_name(""), m_clan_name(""), m_clan_le
 player_account::~player_account() {}
 void player_account::load_account()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_profile::profile_store* tmp_store = MainMenu()->GetProfileStore();

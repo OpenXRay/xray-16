@@ -26,7 +26,7 @@ int GetGameDistribution()
 {
     int KeyValue = 0;
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     HKEY KeyCDKey = 0;
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_READ, &KeyCDKey);

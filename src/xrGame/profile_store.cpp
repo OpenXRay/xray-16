@@ -61,7 +61,7 @@ void profile_store::set_current_profile(int profileId, char const* loginTicket)
 
 void profile_store::load_current_profile(store_operation_cb progress_indicator_cb, store_operation_cb complete_cb)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (!complete_cb)
     {
         complete_cb.bind(this, &profile_store::onlylog_completion);
@@ -135,7 +135,7 @@ void profile_store::load_profile(store_operation_cb progress_indicator_cb)
             FS.r_close(tmp_reader);
         }
     }
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (m_valid_ltx)
     {
         s32 tmp_profile_id = m_dsigned_reader.get_ltx().r_s32(profile_data_section, profile_id_line);
@@ -266,7 +266,7 @@ void profile_store::check_sake_actuality()
 {
     if (!m_awards_store->is_sake_equal_to_file() || !m_best_scores_store->is_sake_equal_to_file())
     {
-#ifndef LINUX // FIXME!!!
+#ifndef XR_PLATFORM_LINUX // FIXME!!!
         __time32_t current_time;
         _time32(&current_time);
 

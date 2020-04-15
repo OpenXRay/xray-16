@@ -1,18 +1,6 @@
 
 out gl_PerVertex { vec4 gl_Position; };
 
-struct v_static
-{
-	float4	Nh	; // NORMAL;		// (nx,ny,nz,hemi occlusion)
-	float4	T	; // TANGENT;		// tangent
-	float4	B	; // BINORMAL;		// binormal
-	float2	tc	; // TEXCOORD0;		// (u,v)
-#ifdef	USE_LM_HEMI
-	float2	lmh	; // TEXCOORD1;		// (lmu,lmv)
-#endif
-	float4	P	; // POSITION;		// (float,float,float,1)
-};
-
 struct v2p
 {
 	float4  hpos	; // SV_Position;
