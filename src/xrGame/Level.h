@@ -2,9 +2,9 @@
 
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Client.h"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include "xrNetServer/empty/NET_Client.h"
 #endif
 #include "xrEngine/StatGraph.h"

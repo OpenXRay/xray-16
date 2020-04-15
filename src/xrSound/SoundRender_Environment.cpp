@@ -2,7 +2,7 @@
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <eax/eax.h>
@@ -18,7 +18,7 @@ CSoundRender_Environment::CSoundRender_Environment()
 CSoundRender_Environment::~CSoundRender_Environment() {}
 void CSoundRender_Environment::set_default()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     Environment = EAX_ENVIRONMENT_GENERIC;
     Room = EAXLISTENER_DEFAULTROOM;
     RoomHF = EAXLISTENER_DEFAULTROOMHF;
@@ -38,7 +38,7 @@ void CSoundRender_Environment::set_default()
 void CSoundRender_Environment::set_identity()
 {
     set_default();
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     Room = EAXLISTENER_MINROOM;
 #endif
     clamp();
@@ -87,7 +87,7 @@ initial reflection
 */
 void CSoundRender_Environment::clamp()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     ::clamp(Room, (float)EAXLISTENER_MINROOM, (float)EAXLISTENER_MAXROOM);
     ::clamp(RoomHF, (float)EAXLISTENER_MINROOMHF, (float)EAXLISTENER_MAXROOMHF);
     ::clamp(RoomRolloffFactor, EAXLISTENER_MINROOMROLLOFFFACTOR, EAXLISTENER_MAXROOMROLLOFFFACTOR);

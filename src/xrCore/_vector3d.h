@@ -3,7 +3,6 @@
 #define __V3D__
 #include <algorithm>
 #include <cmath>
-#include "xrCommon/inlining_macros.h"
 #include "_types.h"
 #include "_random.h"
 #include "math_constants.h"

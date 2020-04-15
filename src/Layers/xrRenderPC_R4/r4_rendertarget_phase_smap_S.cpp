@@ -14,12 +14,7 @@ void CRenderTarget::phase_smap_spot_clear()
 void CRenderTarget::phase_smap_spot(light* L)
 {
     // Targets + viewport
-    //	TODO: DX10: CHeck if we don't need old-style SMAP
-    if (RImplementation.o.HW_smap)
-        u_setrt(rt_smap_surf, NULL, NULL, rt_smap_depth->pZRT);
-    // else								u_setrt	(rt_smap_surf, NULL, NULL, rt_smap_ZB);
-    else
-        VERIFY(!"Use HW SMap only for DX10!");
+    u_setrt(rt_smap_surf, nullptr, nullptr, rt_smap_depth->pZRT);
     const D3D_VIEWPORT viewport = { L->X.S.posX, L->X.S.posY, L->X.S.size, L->X.S.size, 0.f, 1.f };
     RCache.SetViewport(viewport);
 

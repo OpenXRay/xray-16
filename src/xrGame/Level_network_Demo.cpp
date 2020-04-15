@@ -18,7 +18,7 @@ void CLevel::PrepareToSaveDemo()
     R_ASSERT(!m_DemoPlay);
     string_path demo_name = "";
     string_path demo_path;
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     SYSTEMTIME Time;
     GetLocalTime(&Time);
     xr_sprintf(demo_name, "xray_%02d-%02d-%02d_%02d-%02d-%02d.demo", Time.wMonth, Time.wDay, Time.wYear, Time.wHour,

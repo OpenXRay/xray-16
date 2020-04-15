@@ -12,7 +12,7 @@
 #include "xrAICore/Navigation/graph_edge.h"
 #include "Common/object_broker.h"
 #include "xrCommon/xr_map.h"
-#ifdef LINUX
+#ifdef XR_PLATFORM_LINUX
 #include "xrCore/FS.h"
 #endif
 

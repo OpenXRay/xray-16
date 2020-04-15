@@ -5,9 +5,9 @@
 #include "Threading/Lock.hpp"
 
 #include <string>
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
 #include <cstdio>
-#elif defined(WINDOWS)
+#elif defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared
 #include <DbgHelp.h>
@@ -116,12 +116,12 @@ private:
     static void SetupExceptionHandler();
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
     static bool GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr);
     static bool InitializeSymbolEngine();
     static void DeinitializeSymbolEngine(void);
-#endif //WINDOWS
+#endif //XR_PLATFORM_WINDOWS
 };
 
 // forward declaration

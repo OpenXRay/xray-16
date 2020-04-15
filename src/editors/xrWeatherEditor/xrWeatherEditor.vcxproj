@@ -155,41 +155,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="editor\editor_environment_ambients_ambient.cpp" />
-    <ClCompile Include="editor\editor_environment_ambients_effect_id.cpp" />
-    <ClCompile Include="editor\editor_environment_ambients_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_ambients_sound_id.cpp" />
-    <ClCompile Include="editor\editor_environment_detail.cpp" />
-    <ClCompile Include="editor\editor_environment_effects_effect.cpp" />
-    <ClCompile Include="editor\editor_environment_effects_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_levels_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_manager_properties.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="editor\editor_environment_sound_channels_channel.cpp" />
-    <ClCompile Include="editor\editor_environment_sound_channels_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_sound_channels_source.cpp" />
-    <ClCompile Include="editor\editor_environment_suns_blend.cpp" />
-    <ClCompile Include="editor\editor_environment_suns_flare.cpp" />
-    <ClCompile Include="editor\editor_environment_suns_flares.cpp" />
-    <ClCompile Include="editor\editor_environment_suns_gradient.cpp" />
-    <ClCompile Include="editor\editor_environment_suns_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_suns_sun.cpp" />
-    <ClCompile Include="editor\editor_environment_thunderbolts_collection.cpp" />
-    <ClCompile Include="editor\editor_environment_thunderbolts_gradient.cpp" />
-    <ClCompile Include="editor\editor_environment_thunderbolts_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_thunderbolts_thunderbolt.cpp" />
-    <ClCompile Include="editor\editor_environment_thunderbolts_thunderbolt_id.cpp" />
-    <ClCompile Include="editor\editor_environment_weathers_manager.cpp" />
-    <ClCompile Include="editor\editor_environment_weathers_time.cpp" />
-    <ClCompile Include="editor\editor_environment_weathers_weather.cpp" />
-    <ClCompile Include="engine_impl.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="entry_point.cpp" />
     <ClCompile Include="ide_impl.cpp" />
@@ -278,37 +243,6 @@
     <ClInclude Include="..\..\Include\editor\ide.hpp" />
     <ClInclude Include="..\..\Include\editor\interfaces.hpp" />
     <ClInclude Include="..\..\Include\editor\property_holder_base.hpp" />
-    <ClInclude Include="editor\editor_environment_ambients_ambient.hpp" />
-    <ClInclude Include="editor\editor_environment_ambients_effect_id.hpp" />
-    <ClInclude Include="editor\editor_environment_ambients_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_ambients_sound_id.hpp" />
-    <ClInclude Include="editor\editor_environment_detail.hpp" />
-    <ClInclude Include="editor\editor_environment_effects_effect.hpp" />
-    <ClInclude Include="editor\editor_environment_effects_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_levels_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_sound_channels_channel.hpp" />
-    <ClInclude Include="editor\editor_environment_sound_channels_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_sound_channels_source.hpp" />
-    <ClInclude Include="editor\editor_environment_suns_blend.hpp" />
-    <ClInclude Include="editor\editor_environment_suns_flare.hpp" />
-    <ClInclude Include="editor\editor_environment_suns_flares.hpp" />
-    <ClInclude Include="editor\editor_environment_suns_gradient.hpp" />
-    <ClInclude Include="editor\editor_environment_suns_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_suns_sun.hpp" />
-    <ClInclude Include="editor\editor_environment_thunderbolts_collection.hpp" />
-    <ClInclude Include="editor\editor_environment_thunderbolts_gradient.hpp" />
-    <ClInclude Include="editor\editor_environment_thunderbolts_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_thunderbolts_thunderbolt.hpp" />
-    <ClInclude Include="editor\editor_environment_thunderbolts_thunderbolt_id.hpp" />
-    <ClInclude Include="editor\editor_environment_weathers_manager.hpp" />
-    <ClInclude Include="editor\editor_environment_weathers_time.hpp" />
-    <ClInclude Include="editor\editor_environment_weathers_weather.hpp" />
-    <ClInclude Include="engine_impl.hpp" />
-    <ClInclude Include="editor\ide.hpp" />
-    <ClInclude Include="editor\property_collection.hpp" />
-    <ClInclude Include="editor\property_collection_forward.hpp" />
-    <ClInclude Include="editor\property_collection_inline.hpp" />
     <ClInclude Include="engine_include.hpp" />
     <ClInclude Include="ide_impl.hpp" />
     <ClInclude Include="pch.hpp" />
@@ -430,17 +364,11 @@
     <ProjectReference Include="$(SolutionDir)editors\xrSdkControls\xrSdkControls.csproj">
       <Project>{e9dc16a3-d0fa-4924-af6e-f6fdf3ea0661}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Layers\xrAPI\xrAPI.vcxproj">
-      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
-      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrEngine\xrEngine.vcxproj">
-      <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
+    <ProjectReference Include="..\xrWeatherEngine\xrWeatherEngine.vcxproj">
+      <Project>{fabd5bbf-ea6f-4633-a34f-95cdc553ca36}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

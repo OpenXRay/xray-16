@@ -26,7 +26,6 @@ public:
     BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
 
     std::pair<u32, u32> GetSurfaceSize() const;
-    D3DFORMAT GetSurfaceFormat() const;
     void Present();
     DeviceState GetDeviceState();
 
@@ -38,9 +37,10 @@ private:
 public:
     CHWCaps Caps;
 
+    u32 BackBufferCount{};
+    u32 CurrentBackBuffer{};
+
     ID3DDevice* pDevice = nullptr; // render device
-    ID3DRenderTargetView* pBaseRT = nullptr; // base render target
-    ID3DDepthStencilView* pBaseZB = nullptr; // base depth-stencil buffer
 
     D3D_DRIVER_TYPE m_DriverType;
 

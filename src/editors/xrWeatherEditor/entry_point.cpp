@@ -3,7 +3,7 @@
 #pragma managed(push, off)
 #include "Include/editor/engine.hpp"
 #include "ide_impl.hpp"
-#include "engine_impl.hpp"
+#include "editors/xrWeatherEngine/engine_impl.hpp"
 #pragma managed(pop)
 
 #include "window_ide.h"
@@ -63,14 +63,12 @@ private:
 };
 
 ide_impl* g_ide = nullptr;
-engine_impl* g_engine = nullptr;
 static void initialize_impl(ide_base*& ide)
 {
     VERIFY(!g_ide);
-    g_engine = new engine_impl();
-    g_ide = new ide_impl(g_engine);
+    g_ide = new ide_impl(&g_engine);
     ide = g_ide;
-    g_ide->window(gcnew window_ide_final(ide, g_engine));
+    g_ide->window(gcnew window_ide_final(ide, &g_engine));
 }
 } // namespace Editor
 } // namespace XRay
@@ -90,7 +88,6 @@ extern "C" XR_EXPORT void finalize(XRay::Editor::ide_base*& ide)
 {
     delete (ide);
     ide = nullptr;
-    XRay::Editor::g_engine = nullptr;
     XRay::Editor::g_ide = nullptr;
 }
 #pragma managed

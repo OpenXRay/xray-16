@@ -26,7 +26,7 @@
 #include <ode/error.h>
 #include <math.h>
 
-#ifdef LINUX
+#ifdef XR_PLATFORM_LINUX
 #include <alloca.h>
 #endif
 

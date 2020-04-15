@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#pragma warning(pop)
-
 #include <D3DX10Tex.h>
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
@@ -464,7 +459,7 @@ _DDS_2D:
     LoadInfo.Height = IMG.Height;
 
     // x64 crash workaround
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     LoadInfo.FirstMipLevel = img_loaded_lod;
 #else
     if (img_loaded_lod)

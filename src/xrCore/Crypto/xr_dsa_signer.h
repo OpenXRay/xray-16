@@ -7,8 +7,6 @@
 #include "xr_dsa.h"
 #include "xr_sha.h"
 
-typedef fastdelegate::FastDelegate1<long> sha_process_yielder;
-
 class XRCORE_API xr_dsa_signer
 {
 public:
@@ -17,7 +15,7 @@ public:
     ~xr_dsa_signer();
 
     shared_str const sign(u8 const* data, u32 data_size);
-    shared_str const sign_mt(u8 const* data, u32 data_size, sha_process_yielder yielder);
+    shared_str const sign_mt(u8 const* data, u32 data_size, crypto::yielder_t yielder);
 
 protected:
     crypto::xr_dsa::private_key_t m_private_key;
@@ -26,7 +24,6 @@ private:
     xr_dsa_signer() : m_private_key(), m_dsa(nullptr, nullptr, nullptr){}
 
     crypto::xr_dsa m_dsa;
-    crypto::xr_sha256 m_sha;
 
 }; // xr_dsa_signer
 

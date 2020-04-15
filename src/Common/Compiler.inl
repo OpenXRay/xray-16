@@ -1,28 +1,58 @@
-#if !defined(__GNUC__) && !defined(_MSC_VER)
-#error Unsupported compiler
-#endif
-
-#ifdef _MSC_VER
-#include <intrin.h> // for __debugbreak
-#endif
-
 #if defined(__GNUC__)
-#define XR_EXPORT __attribute__ ((visibility("default")))
-#define XR_IMPORT __attribute__ ((visibility("default")))
-#elif defined(_MSC_VER)
-#define XR_EXPORT __declspec(dllexport)
-#define XR_IMPORT __declspec(dllimport)
+#define NO_INLINE               __attribute__((noinline))
+#define FORCE_INLINE            __attribute__((always_inline)) inline
+#define ALIGN(a)                __attribute__((aligned(a)))
+
+// Debugger trap implementation
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+#define DEBUG_BREAK             do { __asm__ volatile ("int $3"); } while(0)
+#elif defined(XR_ARCHITECTURE_ARM)
+#define DEBUG_BREAK             do { __asm__ volatile (".inst 0xe7f001f0"); } while(0)
+#elif defined(XR_ARCHITECTURE_ARM64)
+#define DEBUG_BREAK             do { __asm__ volatile (".inst 0xd4200000"); } while(0)
+#elif __has_include(<signal.h>)
+#include <signal.h>
+#if defined(SIGTRAP)
+#define DEBUG_BREAK             raise(SIGTRAP) // SIGTRAP is preferred
+#else
+#define DEBUG_BREAK             __builtin_trap() // raises SIGILL
+#endif
+#else
+#define DEBUG_BREAK             __builtin_trap() // raises SIGILL
 #endif
 
-#include "xrCommon/inlining_macros.h"
+#elif defined(_MSC_VER)
+#include <intrin.h> // for __debugbreak
+
+#define NO_INLINE               __declspec(noinline)
+#define FORCE_INLINE            __forceinline
+#define ALIGN(a)                __declspec(align(a))
+#define DEBUG_BREAK             __debugbreak()
+#define __thread                __declspec(thread)
+#else
+#error Provide your definitions here
+#endif
+
+// XXX: remove IC/ICF/ICN
+#define IC                      inline
+#define ICF                     FORCE_INLINE
+#define ICN                     NO_INLINE
+
+#define UNUSED(...) (void)(__VA_ARGS__)
 
 #if defined(__GNUC__)
 #define XR_ASSUME(expr)  if (expr){} else __builtin_unreachable()
+
+#define XR_EXPORT __attribute__ ((visibility("default")))
+#define XR_IMPORT __attribute__ ((visibility("default")))
 #elif defined(_MSC_VER)
 #define XR_ASSUME(expr) __assume(expr)
-#endif
 
-#define UNUSED(...) (void)(__VA_ARGS__)
+#define XR_EXPORT __declspec(dllexport)
+#define XR_IMPORT __declspec(dllimport)
+#else
+#error Provide your definitions here
+#endif
 
 #ifndef _CPPUNWIND//def NDEBUG
 #define XR_NOEXCEPT throw()

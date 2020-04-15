@@ -7,9 +7,9 @@ void CRenderTarget::phase_accumulator()
     {
         // normal operation - setup
         if (RImplementation.o.fp16_blend)
-            u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
+            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
         else
-            u_setrt(rt_Accumulator_temp, NULL, NULL, HW.pBaseZB);
+            u_setrt(rt_Accumulator_temp, NULL, NULL, get_base_zb());
     }
     else
     {
@@ -17,7 +17,7 @@ void CRenderTarget::phase_accumulator()
         dwAccumulatorClearMark = Device.dwFrame;
 
         // clear
-        u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
+        u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
         // dwLightMarkerID						= 5;					// start from 5, increment in 2 units
         reset_light_marker();
         u32 clr4clear = color_rgba(0, 0, 0, 0); // 0x00
@@ -51,12 +51,12 @@ void CRenderTarget::phase_vol_accumulator()
     {
         m_bHasActiveVolumetric = true;
 
-        u_setrt(rt_Generic_2, NULL, NULL, HW.pBaseZB);
+        u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
         u32 clr4clearVol = color_rgba(0, 0, 0, 0); // 0x00
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, clr4clearVol, 1.0f, 0L));
     }
     else
-        u_setrt(rt_Generic_2, NULL, NULL, HW.pBaseZB);
+        u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
 
     RCache.set_Stencil(FALSE);
     RCache.set_CullMode(CULL_NONE);

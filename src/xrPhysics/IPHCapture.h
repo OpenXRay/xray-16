@@ -8,9 +8,9 @@ public:
     virtual void Release() = 0;
 
 protected:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     virtual ~IPHCapture() = 0 {}
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     virtual ~IPHCapture() {}
 #endif
 };

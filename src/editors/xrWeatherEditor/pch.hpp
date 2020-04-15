@@ -10,7 +10,6 @@
 
 #pragma managed(push, off)
 #include "Common/Common.hpp"
-#include "xrCommon/inlining_macros.h"
 #include "xrCore/xrMemory.h"
 #include "xrCore/xrstring.h"
 #pragma managed(pop)

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #define ANSEL_SDK_DELAYLOAD
 #include "AnselSDK.h"
 #endif
@@ -28,7 +28,7 @@ AnselManager::AnselManager() : anselModule(nullptr), camera(this, 0), timeDelta(
 
 bool AnselManager::Load()
 {
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     constexpr pcstr anselName = "AnselSDK64";
 #else
     constexpr pcstr anselName = "AnselSDK32";
@@ -45,7 +45,7 @@ void AnselManager::Unload()
 
 bool AnselManager::Init() const
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (anselModule->IsLoaded() && ansel::isAnselAvailable())
     {
         ansel::Configuration config;

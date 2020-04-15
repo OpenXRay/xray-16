@@ -688,7 +688,7 @@ void line_edit_control::SwitchKL()
     // if SDL_HINT_GRAB_KEYBOARD is not set to 1 then return;
     if (!hint || 0 != xr_strcmp("1", hint))
         return; // System will handle it
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (pInput->IsExclusiveMode())
         ActivateKeyboardLayout((HKL)HKL_NEXT, 0);
 #endif

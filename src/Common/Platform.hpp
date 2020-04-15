@@ -1,31 +1,44 @@
 #pragma once
 
-#if defined(__linux__)
-#define LINUX
+#if defined(_WIN32)
+#define XR_PLATFORM_WINDOWS
+#elif defined(__linux__)
+#define XR_PLATFORM_LINUX
 #elif defined(__FreeBSD__)
-#define FREEBSD
-#elif defined(_WIN32)
-#define WINDOWS
+#define XR_PLATFORM_FREEBSD
 #else
 #error Unsupported platform
 #endif
 
-#if defined(_M_X64) || defined(__amd64__) || defined(__x86_64__)
-#define XR_X64
-#elif defined (__aarch64__)
-#define XR_ARM64
+#if defined(_M_IX86) || defined(__i386__) || defined(_X86_)
+#define XR_ARCHITECTURE_X86
+#elif defined(_M_X64) || defined(__amd64__) || defined(__x86_64__)
+#define XR_ARCHITECTURE_X64
+#elif defined(_M_ARM) || defined(__arm__)
+#define XR_ARCHITECTURE_ARM
+#elif defined (_M_ARM64) || defined(__aarch64__)
+#define XR_ARCHITECTURE_ARM64
 #else
-#define XR_X86
+#error Unsupported architecture
 #endif
 
+#if defined(_MSC_VER)
+#define XR_COMPILER_MSVC _MSC_VER
+#elif defined(__GNUC__)
+#define XR_COMPILER_GCC __GNUC__
+#else
+#error Unsupported compiler
+#endif
 #include "Common/Compiler.inl"
 
 #include <ctime>
 
-#if defined(LINUX)
-#include "Common/PlatformLinux.inl"
-#elif defined(FREEBSD)
-#include "Common/PlatformBSD.inl"
-#elif defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "Common/PlatformWindows.inl"
+#elif defined(XR_PLATFORM_LINUX)
+#include "Common/PlatformLinux.inl"
+#elif defined(XR_PLATFORM_FREEBSD)
+#include "Common/PlatformBSD.inl"
+#else
+#error Provide Platform.inl file for your platform
 #endif

@@ -12,7 +12,7 @@
 
 void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (!args || (xr_strlen(args) == 0))
     {
         TInfo tmp_info;
@@ -45,7 +45,7 @@ void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
 
 void CCC_GapySpyListProfiles::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (!args || (xr_strlen(args) == 0))
     {
         TInfo tmp_info;
@@ -68,7 +68,7 @@ void CCC_GapySpyListProfiles::Execute(LPCSTR args)
 
 void CCC_GameSpyLogin::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (!args || (xr_strlen(args) == 0))
     {
         TInfo tmp_info;
@@ -93,7 +93,7 @@ void CCC_GameSpyLogin::Execute(LPCSTR args)
 
 void CCC_GameSpyLogout::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
@@ -111,7 +111,7 @@ static char const* print_time(time_t const& src_time, string64& dest_time)
 
 void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     gamespy_gp::profile const* tmp_profile = tmp_lmngr->get_current_profile();
@@ -159,7 +159,7 @@ void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
 
 void CCC_GameSpySuggestUNicks::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     string256 tmp_unick;
     sscanf(args, "%s", tmp_unick);
@@ -171,7 +171,7 @@ void CCC_GameSpySuggestUNicks::Execute(LPCSTR args)
 
 void CCC_GameSpyRegisterUniqueNick::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::login_manager::unique_nick_t tmp_unick;
     sscanf(args, "%s", tmp_unick);
@@ -183,7 +183,7 @@ void CCC_GameSpyRegisterUniqueNick::Execute(LPCSTR args)
 
 void CCC_GameSpyDeleteProfile::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::account_manager* tmp_amngr = MainMenu()->GetAccountMngr();
     VERIFY(tmp_amngr);
@@ -195,7 +195,7 @@ static gamespy_profile::all_best_scores_t debug_best_scores;
 
 void CCC_GameSpyProfile::Execute(LPCSTR args)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     VERIFY(MainMenu());
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);

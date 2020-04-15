@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "xrEngine/Render.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
 #include "Layers/xrRender/blenders/blender.h"

@@ -7,9 +7,7 @@
 
 #include "FHierrarhyVisual.h"
 #include "xrCore/FMesh.hpp"
-#ifndef _EDITOR
-#include "xrEngine/Render.h"
-#else
+#ifdef _EDITOR
 #include "Include/xrAPI/xrAPI.h"
 #endif
 

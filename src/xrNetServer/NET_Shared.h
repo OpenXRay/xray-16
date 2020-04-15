@@ -36,7 +36,7 @@ enum
 IC u32 TimeGlobal(CTimer* timer) { return timer->GetElapsed_ms(); }
 IC u32 TimerAsync(CTimer* timer) { return TimeGlobal(timer); }
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 // DPlay
 extern "C"
 {
@@ -54,7 +54,7 @@ public:
     IClientStatistic(const IClientStatistic& rhs); // Required due to probable bug in CLevel::ProcessCompressedUpdate
     ~IClientStatistic();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     void Update(DPN_CONNECTION_INFO& CI);
 #endif
 

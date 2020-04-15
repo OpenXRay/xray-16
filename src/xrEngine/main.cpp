@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "main.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <lockfile.h>
 #endif
 #include <locale.h>
@@ -18,13 +18,13 @@
 
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
 #endif
 #include "xr_ioc_cmd.h"
@@ -209,7 +209,7 @@ ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
     lockfile_remove("/var/lock/stalker-cop.lock");
 #endif
 }
@@ -276,7 +276,7 @@ void CheckPrivilegySlowdown()
 void CreateApplication()
 {
     pApp = new CApplication();
-#ifdef WINDOWS // XXX: Remove this macro check
+#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
     if (GEnv.isDedicatedServer)
         pApp->SetLoadingScreen(new TextLoadingScreen());
 #endif
@@ -336,16 +336,16 @@ ENGINE_API void Startup()
     Engine.Event.Dump();
     // Destroying
     destroyInput();
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
         destroySettings();
     LALib.OnDestroy();
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
         destroyConsole();
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     else
         Console->Destroy();
 #endif
@@ -361,11 +361,11 @@ ENGINE_API int RunApplication()
 #ifdef NO_MULTI_INSTANCES
     if (!GEnv.isDedicatedServer)
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
             return 2;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         int lock_res = lockfile_create("/var/lock/stalker-cop.lock", 0, L_PID);
         if(L_ERROR == lock_res)
             return 2;
@@ -402,7 +402,7 @@ ENGINE_API int RunApplication()
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         // CreateProcess need to return results to next two structures
         STARTUPINFO si = {};
         si.cb = sizeof(si);
@@ -435,7 +435,7 @@ bool CheckBenchmark()
         const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
         g_SASH.Init(sashArg);
         g_SASH.MainLoop();
 #endif

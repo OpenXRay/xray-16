@@ -4,7 +4,7 @@
 #include "LocatorAPI_defs.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #include <direct.h>
 #include <sys\stat.h>

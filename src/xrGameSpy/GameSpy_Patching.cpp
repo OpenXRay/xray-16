@@ -3,7 +3,7 @@
 
 static char const* QueryPatchVersionString(char* dest, u32 dest_size)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     HKEY KeyCDKey = 0;
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_READ, &KeyCDKey);

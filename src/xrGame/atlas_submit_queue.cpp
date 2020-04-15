@@ -15,7 +15,7 @@ atlas_submit_queue::atlas_submit_queue(gamespy_profile::stats_submitter* stats_s
 atlas_submit_queue::~atlas_submit_queue() {}
 void atlas_submit_queue::submit_all()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
@@ -33,7 +33,7 @@ void atlas_submit_queue::submit_all()
 
 void atlas_submit_queue::submit_reward(gamespy_profile::enum_awards_t const award_id)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     using namespace gamespy_profile;
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
@@ -63,7 +63,7 @@ void atlas_submit_queue::submit_reward(gamespy_profile::enum_awards_t const awar
 
 void atlas_submit_queue::submit_best_results()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
@@ -83,7 +83,7 @@ void atlas_submit_queue::submit_best_results()
 
 void atlas_submit_queue::update()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (m_reward_tasks.empty() || is_active())
         return;
 
@@ -120,7 +120,7 @@ void atlas_submit_queue::do_atlas_reward(
     VERIFY(!m_atlas_in_process);
 
     m_atlas_in_process = true;
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     m_stats_submitter->reward_with_award(award_id, count, profile, m_atlas_submitted);
 #endif
 }
@@ -132,14 +132,14 @@ void atlas_submit_queue::do_atlas_best_results(
     VERIFY(!m_atlas_in_process);
 
     m_atlas_in_process = true;
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     m_stats_submitter->set_best_scores(br_ptr, profile, m_atlas_submitted);
 #endif
 }
 
 void atlas_submit_queue::do_atlas_submit_all(gamespy_gp::profile const* profile)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     VERIFY(m_stats_submitter);
     VERIFY(!m_atlas_in_process);
 

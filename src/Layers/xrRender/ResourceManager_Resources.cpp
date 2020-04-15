@@ -110,7 +110,7 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
     Msg("! ERROR: Failed to find compiled constant-table");
 }
 
-CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, bool useUAV /*= false*/)
+CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, Flags32 flags /*= {}*/)
 {
     R_ASSERT(Name && Name[0] && w && h);
 
@@ -125,7 +125,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets.emplace(RT->set_name(Name), RT);
         if (RDEVICE.b_is_Ready)
-            RT->create(Name, w, h, f, sampleCount, useUAV);
+            RT->create(Name, w, h, f, sampleCount, flags);
         return RT;
     }
 }

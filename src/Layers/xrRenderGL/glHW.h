@@ -35,11 +35,12 @@ public:
 public:
     CHWCaps Caps;
 
+    u32 BackBufferCount{};
+    u32 CurrentBackBuffer{};
+
     CHW* pDevice;
     CHW* pContext;
     CHW* m_pSwapChain;
-    GLuint pBaseRT;
-    GLuint pBaseZB;
     GLuint pPP;
     GLuint pFB;
 

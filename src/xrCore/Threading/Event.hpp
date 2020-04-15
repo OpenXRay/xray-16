@@ -4,7 +4,7 @@
 class XRCORE_API Event
 {
     void* handle;
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
     struct EventHandle
     {
         pthread_mutex_t mutex;

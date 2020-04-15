@@ -3,7 +3,7 @@
 
 Event::Event(std::nullptr_t) noexcept { handle = nullptr; }
 Event::Event(void* event) noexcept { handle = event; }
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 Event::Event() noexcept { handle = (void*)CreateEvent(NULL, FALSE, FALSE, NULL); }
 Event::~Event() noexcept { CloseHandle(handle); }
 void Event::Reset() noexcept { ResetEvent(handle); }
@@ -13,7 +13,7 @@ bool Event::Wait(u32 millisecondsTimeout) noexcept
 {
     return WaitForSingleObject(handle, millisecondsTimeout) != WAIT_TIMEOUT;
 }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <pthread.h>
 Event::Event() noexcept
 {

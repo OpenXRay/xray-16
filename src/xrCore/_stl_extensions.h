@@ -16,7 +16,6 @@
 #include "xrCommon/xr_list.h"
 #include "xrCommon/xr_deque.h"
 #include "xrstring.h"
-#include "xrCommon/inlining_macros.h"
 #include "xrCommon/xr_string.h"
 #include "xrCommon/xr_unordered_map.h"
 #include "xrDebug_macros.h" // only for pragma todo. Remove once handled.

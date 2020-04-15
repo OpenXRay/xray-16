@@ -10,6 +10,7 @@
 #define EDITOR_ENGINE_HPP_INCLUDED
 
 class shared_str;
+class CEnvironment;
 
 namespace XRay
 {
@@ -33,6 +34,9 @@ public:
     // weather editor
 
 public:
+    // manager
+    virtual CEnvironment* environment() = 0;
+
     // weather
     virtual void weather(LPCSTR value) = 0;
     virtual LPCSTR weather() = 0;

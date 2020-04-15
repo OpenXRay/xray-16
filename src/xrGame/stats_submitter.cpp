@@ -293,7 +293,7 @@ bool stats_submitter::add_player_name_to_report()
 
 bool stats_submitter::create_award_inc_report()
 {
-#ifdef LINUX // FIXME!!
+#ifdef XR_PLATFORM_LINUX // FIXME!!
     return false;
 #else
     __time32_t tmp_time = 0;
@@ -372,7 +372,7 @@ void stats_submitter::quick_reward_with_award(enum_awards_t award_id, gamespy_gp
     all_awards_t::iterator award_iter = tmp_awards.find(award_id);
     R_ASSERT(award_iter != tmp_awards.end());
     ++award_iter->second.m_count;
-#ifndef LINUX // FIXME!!!
+#ifndef XR_PLATFORM_LINUX // FIXME!!!
     __time32_t tmp_time = 0;
     _time32(&tmp_time);
     award_iter->second.m_last_reward_date = static_cast<u32>(tmp_time);
@@ -428,7 +428,7 @@ void stats_submitter::save_file(gamespy_gp::profile const* profile)
         ltx_to_write.w_u32(tmp_bs_name, best_score_value_line, i->second);
     }
 
-#ifndef LINUX // FIXME!!!
+#ifndef XR_PLATFORM_LINUX // FIXME!!!
     __time32_t tmp_time = 0;
     _time32(&tmp_time);
 

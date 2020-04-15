@@ -21,12 +21,12 @@ unsgined int query_processor_info(processor_info* pinfo)
 
 void nativeCpuId(int regs[4], int i)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     __cpuid((int *)regs, (int)i);
-#elif (defined(LINUX) || defined(FREEBSD)) && defined(GCC)
+#elif (defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)) && defined(GCC)
     __cpuid((int)i, (int *)regs);
-#elif defined(LINUX) || defined(FREEBSD)
-#if defined(XR_X86) || defined(XR_X64)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
     asm volatile("cpuid" :
     "=eax" (regs[0]),
     "=ebx" (regs[1]),
@@ -39,7 +39,7 @@ void nativeCpuId(int regs[4], int i)
 #endif
 }
 
-#ifndef WINDOWS
+#ifndef XR_PLATFORM_WINDOWS
 #include <thread>
 
 void __cpuidex(int regs[4], int i, int j)
@@ -48,7 +48,7 @@ void __cpuidex(int regs[4], int i, int j)
 }
 #endif
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 DWORD countSetBits(ULONG_PTR bitMask)
 {
     DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
@@ -158,10 +158,10 @@ unsigned int query_processor_info(processor_info* pinfo)
     pinfo->stepping = cpui[0] & 0xf;
 
     // Calculate available processors
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     ULONG_PTR pa_mask_save, sa_mask_stub = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     unsigned int pa_mask_save = 0;
     cpu_set_t my_set;
     CPU_ZERO(&my_set);
@@ -170,9 +170,9 @@ unsigned int query_processor_info(processor_info* pinfo)
 #else
 #warning "No Function to obtain process affinity"
     unsigned int pa_mask_save = 0;
-#endif // WINDOWS
+#endif // XR_PLATFORM_WINDOWS
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     DWORD returnedLength = 0;
     DWORD byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
@@ -202,7 +202,7 @@ unsigned int query_processor_info(processor_info* pinfo)
         byteOffset += sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
         ptr++;
     }
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     int logicalProcessorCount = std::thread::hardware_concurrency();
 
     //not sure about processorCoreCount - is it really cores or threads

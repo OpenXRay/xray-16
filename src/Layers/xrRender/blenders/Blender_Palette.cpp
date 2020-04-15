@@ -9,9 +9,9 @@ IC bool p_sort(IBlender* A, IBlender* B) { return xr_stricmp(A->getComment(), B-
 #ifdef __BORLANDC__
 #define TYPES_EQUAL(A, B) (typeid(A) == typeid(B))
 #else
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #define TYPES_EQUAL(A, B) (typeid(A).raw_name() == typeid(B).raw_name())
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #define TYPES_EQUAL(A, B) (typeid(A).name() == typeid(B).name())
 #endif
 #endif
@@ -62,7 +62,6 @@ void IBlender::CreatePalette(xr_vector<IBlender*>& palette)
 
 #ifndef _EDITOR
 // Engine
-#include "xrEngine/Render.h"
 IBlender* IBlender::Create(CLASS_ID cls) { return ::RImplementation.blender_create(cls); }
 void IBlender::Destroy(IBlender*& B) { ::RImplementation.blender_destroy(B); }
 #else

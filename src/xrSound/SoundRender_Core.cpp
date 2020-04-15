@@ -5,7 +5,7 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 #include "SoundRender_Emitter.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <eax/eax.h>
@@ -488,7 +488,7 @@ void CSoundRender_Core::env_apply()
 }
 
 void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) {}
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
 {
     VERIFY(bEAX);
@@ -555,7 +555,7 @@ void CSoundRender_Core::i_eax_listener_get(CSound_environment* _E)
 }
 #endif
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 void CSoundRender_Core::i_eax_commit_setting()
 {
     // commit eax
@@ -618,7 +618,7 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
     {
         CSoundRender_Environment* SE = static_cast<CSoundRender_Environment*>(src_env);
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         // set environment
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
             DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &SE->EnvironmentSize,
@@ -638,7 +638,7 @@ void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
     if (bEAX)
     {
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         // set environment
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
             DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &id, sizeof(id));
