@@ -1,5 +1,17 @@
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.12.0)
 project(OpenXRay)
+
+# Option to enable support for link libraries from current execution folder for app.
+# If it is on, the linker will search libs in system folder.
+option(CMAKE_BUILD_WITH_INSTALL_RPATH "Option for use current directory as link directory when run app." FALSE)
+# --------------------------------------------------------------------------
+# Changes behaviour of output placement of compiled libraries,
+# now all binaries and libraries placed into <project_root>/bin folder
+# --------------------------------------------------------------------------
+set(COMPILE_OUTPUT_FOLDER ${PROJECT_BINARY_DIR}/../bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv*")
