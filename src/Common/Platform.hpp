@@ -18,6 +18,8 @@
 #define XR_ARCHITECTURE_ARM
 #elif defined (_M_ARM64) || defined(__aarch64__)
 #define XR_ARCHITECTURE_ARM64
+#elif defined (__e2k__)
+#define XR_ARCHITECTURE_E2K
 #else
 #error Unsupported architecture
 #endif

@@ -51,7 +51,7 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <thread>
 #include "SDL.h"
 
-#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)) && !defined(XR_COMPILER_MSVC)
+#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)) && !defined(XR_COMPILER_MSVC)
 #define _FPU_EXTENDED 0
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
@@ -77,7 +77,7 @@ public:
     }
 } s_perf_init;
 #endif // defined(XR_ARCHITECTURE_ARM)
-#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
