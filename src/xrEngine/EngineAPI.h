@@ -4,12 +4,13 @@
 // Support for extension DLLs
 //****************************************************************************
 #pragma once
-#include <memory>
 
 #include "xrEngine/Engine.h"
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/clsid.h"
 #include "xrCore/xrCore_benchmark_macros.h"
+
+#include <memory>
 
 class IFactoryObject
 {
@@ -76,6 +77,7 @@ public:
     void Destroy();
 
     void CreateRendererList();
+    bool CanSkipGameModuleLoading() const { return !!strstr(Core.Params, "-nogame"); }
 
     CEngineAPI();
     ~CEngineAPI();

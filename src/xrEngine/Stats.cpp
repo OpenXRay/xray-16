@@ -139,7 +139,10 @@ void CStats::Show()
         Engine.Scheduler.DumpStatistics(font, alertPtr);
         if (TaskScheduler)
             TaskScheduler->DumpStatistics(font, alertPtr);
-        g_pGamePersistent->DumpStatistics(font, alertPtr);
+        if (g_pGamePersistent)
+        {
+            g_pGamePersistent->DumpStatistics(font, alertPtr);
+        }
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
         if (physics_world())

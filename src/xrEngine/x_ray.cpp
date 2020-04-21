@@ -218,8 +218,10 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
                 Console->Execute("main_menu on");
             }
         }
-        R_ASSERT(nullptr != g_pGamePersistent);
-        g_pGamePersistent->Disconnect();
+        if (g_pGamePersistent)
+        {
+            g_pGamePersistent->Disconnect();
+        }
     }
     else if (E == eConsole)
     {
@@ -393,7 +395,11 @@ void CApplication::Level_Scan()
     Levels.clear();
 
     xr_vector<char*>* folder = FS.file_list_open("$game_levels$", FS_ListFolders | FS_RootOnly);
-    //. R_ASSERT (folder&&folder->size());
+    if (!folder)
+    {
+        Log("! No levels found in game data");
+        return;
+    }
 
     for (u32 i = 0; i < folder->size(); ++i)
         Level_Append((*folder)[i]);
