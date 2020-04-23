@@ -1,9 +1,25 @@
 #pragma once
 #include "xrCore/xrCore.h"
-#include <cryptopp/sha.h>
 
 #include <optional>
 #include <array>
+
+#ifdef USE_CRYPTOPP
+#include <cryptopp/sha.h>
+#else // hack
+namespace CryptoPP
+{
+class SHA1
+{
+public:
+    static constexpr size_t DIGESTSIZE = 20;
+    static constexpr size_t BLOCKSIZE = 64;
+
+    static void Update(const u8* /*input*/, size_t /*len*/) {}
+    static void Final(u8* /*digest*/) {}
+};
+}
+#endif
 
 namespace crypto
 {
