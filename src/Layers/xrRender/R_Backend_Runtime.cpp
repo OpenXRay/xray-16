@@ -21,7 +21,6 @@ void CBackend::OnFrameEnd()
         CHK_DX(HW.pDevice->SetIndices(nullptr));
         CHK_DX(HW.pDevice->SetVertexShader(nullptr));
         CHK_DX(HW.pDevice->SetPixelShader(nullptr));
-        CHK_DX(HW.pDevice->EndScene());
 #endif
         Invalidate();
     }
