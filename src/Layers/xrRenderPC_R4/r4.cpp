@@ -307,6 +307,10 @@ void CRender::create()
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
 
+    o.managed_tex_disabled = (strstr(Core.Params, "-nomanagedtex")) ? TRUE : psDeviceFlags.test(rsDisableManagedTex);
+    if (o.managed_tex_disabled)
+        Msg("* Managed textures disabled");
+
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);

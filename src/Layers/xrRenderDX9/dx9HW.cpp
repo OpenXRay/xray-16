@@ -246,15 +246,27 @@ void CHW::Reset()
         DevPP.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
 
+    bool bNoManagedTex = !!RImplementation.o.managed_tex_disabled;
     while (true)
     {
-        const HRESULT result = HW.pDevice->Reset(&DevPP);
-        
+        HRESULT result;
+
+        if (bNoManagedTex)
+        {
+            GEnv.Render->ResourcesDeferredUnload();
+            result = HW.pDevice->Reset(&DevPP);
+            GEnv.Render->ResourcesDeferredUpload();
+        } 
+        else
+        {
+            result = HW.pDevice->Reset(&DevPP);
+        }
+
         if (SUCCEEDED(result))
             break;
 
         Msg("! ERROR: [%dx%d]: %s", DevPP.BackBufferWidth, DevPP.BackBufferHeight, xrDebug::ErrorToString(result));
-        Sleep(100);
+        Sleep((bNoManagedTex ? 3000 : 100)); // xxx: it's better to crash the game
     }
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));

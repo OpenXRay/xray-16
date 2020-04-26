@@ -91,6 +91,10 @@ void CRender::create()
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
     c_ldynamic_props = "L_dynamic_props";
 
+    o.managed_tex_disabled = (strstr(Core.Params, "-nomanagedtex")) ? TRUE : psDeviceFlags.test(rsDisableManagedTex);
+    if (o.managed_tex_disabled)
+        Msg("* Managed textures disabled");
+
     m_bMakeAsyncSS = false;
 
     Target = new CRenderTarget(); // Main target
