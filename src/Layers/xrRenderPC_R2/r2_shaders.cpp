@@ -469,7 +469,7 @@ HRESULT CRender::shader_compile(
     if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
-        strconcat(sizeof(file), file, "shaders_cache" DELIMITER, filename, DELIMITER, sh_name);
+        strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename, DELIMITER, sh_name);
         strconcat(sizeof(filename), filename, filename, DELIMITER, sh_name);
         FS.update_path(file_name, "$app_data_root$", file);
     }
