@@ -286,7 +286,7 @@ void CConsole::OnRender()
     pFont->OutI(-1.0f + out_pos * scr_x, ypos, "%s", ioc_prompt);
     out_pos += ioc_d;
 
-    if (!m_disable_tips && m_tips.size())
+    if (bGame && !m_disable_tips && m_tips.size())
     {
         pFont->SetColor(tips_font_color);
 
