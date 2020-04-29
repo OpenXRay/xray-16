@@ -904,11 +904,13 @@ CRenderTarget::CRenderTarget()
     s_menu.create("distort");
     g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 
+#if 0 // kept for historical reasons
     // Flip
     t_base = RImplementation.Resources->_CreateTexture(r2_base);
     t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
     s_flip.create("effects" DELIMITER "screen_set", r2_base);
     g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+#endif
 
     //
     dwWidth = Device.dwWidth;

@@ -201,8 +201,10 @@ public:
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;
+#if 0 // kept for historical reasons
     ref_shader s_flip;
     ref_geom g_flip;
+#endif
 private:
     float im_noise_time;
     u32 im_noise_shift_w;
@@ -304,7 +306,9 @@ public:
     void phase_combine();
     void phase_combine_volumetric();
     void phase_pp();
+#if 0 // kept for historical reasons
     void phase_flip();
+#endif
 
     void set_blur(float f) override { param_blur = f; }
     void set_gray(float f) override { param_gray = f; }
