@@ -286,7 +286,7 @@ void CConsole::OnRender()
     pFont->OutI(-1.0f + out_pos * scr_x, ypos, "%s", ioc_prompt);
     out_pos += ioc_d;
 
-    if (!m_disable_tips && m_tips.size())
+    if (bGame && !m_disable_tips && m_tips.size())
     {
         pFont->SetColor(tips_font_color);
 
@@ -371,11 +371,12 @@ void CConsole::DrawBackgrounds(bool bGame)
 
     GEnv.UIRender->SetShader(**m_hShader_back);
     // 6 = back, 12 = tips, (VIEW_TIPS_COUNT+1)*6 = highlight_words, 12 = scroll
-    GEnv.UIRender->StartPrimitive(6 + 12 + (VIEW_TIPS_COUNT + 1) * 6 + 12, IUIRender::ptTriList, IUIRender::pttTL);
+    const u32 numVertices = 6 + (bGame ? 12 + (VIEW_TIPS_COUNT + 1) * 6 + 12 : 0);
+    GEnv.UIRender->StartPrimitive(numVertices, IUIRender::ptTriList, IUIRender::pttTL);
 
     DrawRect(r, back_color);
 
-    if (m_tips.size() == 0 || m_disable_tips)
+    if (!bGame || m_tips.size() == 0 || m_disable_tips)
     {
         GEnv.UIRender->FlushPrimitive();
         return;
