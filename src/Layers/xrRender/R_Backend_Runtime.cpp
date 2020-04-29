@@ -43,6 +43,8 @@ void CBackend::OnFrameBegin()
         // Getting broken HUD hands for OpenGL after calling rmNormal()
 #ifndef USE_OGL
         RImplementation.rmNormal();
+#else
+        set_FB(HW.pFB);
 #endif
         set_RT(RImplementation.Target->get_base_rt());
         set_ZB(RImplementation.Target->get_base_zb());
@@ -62,6 +64,9 @@ void CBackend::Invalidate()
     pRT[2] = 0;
     pRT[3] = 0;
     pZB = 0;
+#if defined(USE_OGL)
+    pFB = 0;
+#endif
 
     decl = nullptr;
     vb = 0;
