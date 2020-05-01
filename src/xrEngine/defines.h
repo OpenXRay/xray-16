@@ -47,8 +47,7 @@ enum
 
     rsShowFPS = (1ul << 24ul), // 24 was reserved for editor
     rsDrawParticles = (1ul << 25ul), // 25 was reserved for editor
-    rsDisableManagedTex = (1ul << 26ul), // 26 was reserved for editor
-    // 27-32 bit - reserved to Editor
+    // 26-32 bit - reserved to Editor
 };
 
 //. ENGINE_API extern u32 psCurrentMode ;

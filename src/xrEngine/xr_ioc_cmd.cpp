@@ -881,7 +881,6 @@ void CCC_Register()
     // Texture manager
     CMD4(CCC_Integer, "texture_lod", &psTextureLOD, 0, 4);
     CMD4(CCC_Integer, "net_dedicated_sleep", &psNET_DedicatedSleep, 0, 64);
-    CMD3(CCC_Mask, "texture_disable_managed", &psDeviceFlags, rsDisableManagedTex);
 
     // General video control
     CMD1(CCC_VidMode, "vid_mode");
