@@ -1490,6 +1490,7 @@
     <ClInclude Include="ui\UIActorInfo.h" />
     <ClInclude Include="ui\UIActorMenu.h" />
     <ClInclude Include="ui\UIActorStateInfo.h" />
+    <ClInclude Include="ui\UIArtefactPanel.h" />
     <ClInclude Include="ui\UIBoosterInfo.h" />
     <ClInclude Include="ui\UIBuyWeaponTab.h" />
     <ClInclude Include="ui\UIBuyWndBase.h" />
@@ -3456,6 +3457,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ui\UIActorStateInfo.cpp" />
+    <ClCompile Include="ui\UIArtefactPanel.cpp" />
     <ClCompile Include="ui\UIBoosterInfo.cpp" />
     <ClCompile Include="ui\UIBuyWeaponTab.cpp" />
     <ClCompile Include="ui\UIBuyWndShared.cpp" />
