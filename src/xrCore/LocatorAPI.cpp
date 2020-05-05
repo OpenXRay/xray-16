@@ -826,7 +826,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
             pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
         else
             pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
-}
+        }
         SDL_strlcpy(full_current_directory, pref_path, sizeof full_current_directory);
         SDL_free(pref_path);
     }

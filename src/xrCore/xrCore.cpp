@@ -223,7 +223,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
             pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
         else
             pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
-}
+        }
         SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
         SDL_free(pref_path);
 #endif
