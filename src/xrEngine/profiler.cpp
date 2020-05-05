@@ -14,7 +14,7 @@
 #include "xrEngine/GameFont.h"
 
 #ifdef CONFIG_PROFILE_LOCKS
-static volatile LONG critical_section_counter = 0;
+static volatile LONG                    critical_section_counter = 0;
 
 void add_profile_portion				(pcstr id, const u64 &time)
 {
