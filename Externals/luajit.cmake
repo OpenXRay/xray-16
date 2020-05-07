@@ -327,7 +327,7 @@ endif()
 	add_library( ${LIB_NAME} SHARED ${LJCORE_C} ${DEPS} )
 	set_target_properties ( ${LIB_NAME} PROPERTIES PREFIX "" )
 	target_link_libraries ( ${LIB_NAME} ${LIBS} )
-    install(TARGETS ${LIB_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+    install(TARGETS ${LIB_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
         GROUP_READ 
         WORLD_READ )
 #endif()

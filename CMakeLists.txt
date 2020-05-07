@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 2.8.0)
+#Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
+set(CMAKE_INSTALL_PREFIX /usr)
 project(OpenXRay)
+
+#installation paths
+include(GNUInstallDirs)
 
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv*")
@@ -15,7 +20,6 @@ include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 if(NOT WIN32)
-	set(CMAKE_INSTALL_PREFIX "") # Skip all *nix-style installing for a while. Use DESTDIR
     IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         set(CPACK_PACKAGE_NAME "openxray")
         set(CPACK_FILE_NAME "openxray")
@@ -228,3 +232,13 @@ if (UNIX)
         add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
     endif()
 endif()
+
+
+get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
+
+if ("${LIB64}" STREQUAL "TRUE")
+    set(LIBSUFFIX 64)
+else()
+    set(LIBSUFFIX "")
+endif()
+

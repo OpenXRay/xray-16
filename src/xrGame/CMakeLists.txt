@@ -118,6 +118,6 @@ cotire(${PROJECT_NAME})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PROJECT_NAME} xrCore xrEngine xrMiscMath xrLuabind xrAPI xrAICore xrUICore xrSound xrScriptEngine cximage xrGameSpy ${LUA_LIBRARIES} xrCDB xrPhysics xrNetServer ${SDL_LIBRARIES})
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
     GROUP_READ 
     WORLD_READ )
