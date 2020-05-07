@@ -645,7 +645,7 @@ void CParticleEffect::Render(float)
 
 #ifdef USE_OGL
     // Due to the big impact on performance
-    float distSQ = RDEVICE.vCameraPosition.distance_to_sqr(m_InitialPosition) + EPS;
+    const float distSQ = RDEVICE.vCameraPosition.distance_to_sqr(m_InitialPosition) + EPS;
     if (distSQ > _sqr(100.f*psVisDistance))
         return;
 #endif
