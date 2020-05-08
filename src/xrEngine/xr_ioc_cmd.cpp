@@ -835,7 +835,6 @@ void CCC_Register()
     CMD1(CCC_E_Dump, "e_list");
     CMD1(CCC_E_Signal, "e_signal");
 
-    CMD3(CCC_Mask, "rs_wireframe", &psDeviceFlags, rsWireframe);
     CMD3(CCC_Mask, "rs_clear_bb", &psDeviceFlags, rsClearBB);
     CMD3(CCC_Mask, "rs_occlusion", &psDeviceFlags, rsOcclusion);
 
@@ -850,6 +849,7 @@ void CCC_Register()
         CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
         CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
         CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
+        CMD3(CCC_Mask, "rs_wireframe", &psDeviceFlags, rsWireframe);
     }
 
     // Render device states

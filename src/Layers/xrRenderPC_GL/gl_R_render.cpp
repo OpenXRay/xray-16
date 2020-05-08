@@ -320,6 +320,9 @@ void CRender::Render()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE)) split_the_scene_to_minimize_wait = TRUE;
 
     //******* Main render :: PART-0	-- first
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     if (!split_the_scene_to_minimize_wait)
     {
         PIX_EVENT(DEFER_PART0_NO_SPLIT);
@@ -339,6 +342,9 @@ void CRender::Render()
         r_dsgraph_render_graph(0);
         Target->disable_aniso();
     }
+
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     //******* Occlusion testing of volume-limited light-sources
     Target->phase_occq();
