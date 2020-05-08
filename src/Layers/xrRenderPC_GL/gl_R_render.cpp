@@ -291,7 +291,7 @@ void CRender::Render()
     // Sync point
     BasicStats.WaitS.Begin();
 
-    if (true)
+    if (false) // !!! Sync rendering drop performance !!!
     {
         CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
         CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500 * 1000 * 1000));
