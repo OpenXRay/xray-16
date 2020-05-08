@@ -2,8 +2,9 @@
 
 #include "RenderFactory.h"
 
-#ifdef __GNUC__ // At least GCC call destructor of members at call parent destructor
-#define FACTORY_PTR_INSTANCIATE_GNUC(Class)\
+// XXX: should be revisited.
+#ifdef XR_COMPILER_GCC // At least GCC call destructor of members at call parent destructor
+#define FACTORY_PTR_INSTANCIATE(Class)\
     template <>\
     inline void FactoryPtr<I##Class>::CreateObject(void)\
     { m_pObject = GEnv.RenderFactory->Create##Class(); }\
@@ -12,8 +13,7 @@
     {\
         m_pObject = NULL;\
     }
-#endif
-
+#else
 #define FACTORY_PTR_INSTANCIATE(Class)\
     template <>\
     inline void FactoryPtr<I##Class>::CreateObject(void)\
@@ -24,6 +24,7 @@
         GEnv.RenderFactory->Destroy##Class(m_pObject);\
         m_pObject = NULL;\
     }
+#endif
 
 template <class T>
 class FactoryPtr
@@ -59,11 +60,7 @@ private:
 
 #ifndef _EDITOR
 FACTORY_PTR_INSTANCIATE(UISequenceVideoItem)
-#ifdef __GNUC__ 
-FACTORY_PTR_INSTANCIATE_GNUC(UIShader)
-#else
 FACTORY_PTR_INSTANCIATE(UIShader)
-#endif
 FACTORY_PTR_INSTANCIATE(StatGraphRender)
 FACTORY_PTR_INSTANCIATE(ConsoleRender)
 #ifdef DEBUG
