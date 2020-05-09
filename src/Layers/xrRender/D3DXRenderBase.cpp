@@ -83,7 +83,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Memory.mem_compact();
 
 #ifdef USE_DX9
-    bool noTexturesInRAM = RImplementation.o.no_ram_textures;
+    const bool noTexturesInRAM = RImplementation.o.no_ram_textures;
     if (noTexturesInRAM)
         ResourcesDeferredUnload();
 #endif
