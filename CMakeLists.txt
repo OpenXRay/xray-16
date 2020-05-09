@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.0)
-#Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
+# Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
 set(CMAKE_INSTALL_PREFIX /usr)
 project(OpenXRay)
 
-#installation paths
+# Installation paths
 include(GNUInstallDirs)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
