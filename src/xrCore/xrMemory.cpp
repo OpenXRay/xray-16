@@ -67,9 +67,9 @@ void xrMemory::_initialize()
 {
     stat_calls = 0;
 
-    g_pStringContainer = new str_container();
+    g_pStringContainer = xr_new<str_container>();
     shared_str_initialized = true;
-    g_pSharedMemoryContainer = new smem_container();
+    g_pSharedMemoryContainer = xr_new<smem_container>();
 }
 
 void xrMemory::_destroy()

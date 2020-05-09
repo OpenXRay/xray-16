@@ -68,13 +68,13 @@ namespace xrDelegateBinder
 
         static auto BindPtr(T function)
         {
-            return new DelegateType(function);
+            return xr_new<DelegateType>(function);
         }
 
         template<typename V>
         static auto BindPtr(V ptr, T function)
         {
-            return new DelegateType(ptr, function);
+            return xr_new<DelegateType>(ptr, function);
         }
 
     };
@@ -154,5 +154,5 @@ static xrDelegateArgumentsTypes<Args...> BindDelegateArgs(Args...args)
 template<typename ... Args>
 static xrDelegateArgumentsTypes<Args...>* BindDelegateArgsPtr(Args&&...args)
 {
-    return new xrDelegateArgumentsTypes<Args...>(std::forward<Args>(args)...);
+    return xr_new<xrDelegateArgumentsTypes<Args...>>(std::forward<Args>(args)...);
 }

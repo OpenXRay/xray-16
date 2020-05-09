@@ -126,7 +126,7 @@ CStreamReader* CStreamReader::open_chunk(const size_t& chunk_id)
         return nullptr;
 
     R_ASSERT2(!compressed, "cannot use CStreamReader on compressed chunks");
-    CStreamReader* result = new CStreamReader();
+    CStreamReader* result = xr_new<CStreamReader>();
     result->construct(file_mapping_handle(), m_start_offset + tell(), size, m_archive_size, m_window_size);
     return (result);
 }

@@ -140,7 +140,7 @@ struct str_container_impl
 };
 
 str_container::str_container() :
-    impl(new str_container_impl())
+    impl(xr_new<str_container_impl>())
 #ifdef CONFIG_PROFILE_LOCKS
     , cs(MUTEX_PROFILE_ID(str_container))
 #endif
@@ -262,7 +262,7 @@ struct str_container_impl
 };
 
 str_container::str_container() :
-    impl(new str_container_impl())
+    impl(xr_new<str_container_impl>())
 #ifdef CONFIG_PROFILE_LOCKS
     , cs(MUTEX_PROFILE_ID(str_container))
 #endif

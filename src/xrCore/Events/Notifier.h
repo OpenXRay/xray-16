@@ -113,7 +113,7 @@ private:
             ScopeLock lock(&m_lock);
 
             auto cid = FindFreeCid();
-            CB* cb = new CB((cid == CEventNotifierCallback::INVALID_CID) ? m_callbacks.size() : cid, args...);
+            CB* cb = xr_new<CB>((cid == CEventNotifierCallback::INVALID_CID) ? m_callbacks.size() : cid, args...);
 
             if (cid == CEventNotifierCallback::INVALID_CID)
             {

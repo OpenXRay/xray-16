@@ -30,7 +30,7 @@ shared_str xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const
     std::string signature;
     CryptoPP::DSA::Signer signer(private_key);
     CryptoPP::StringSource(data, data_size, true,
-        new CryptoPP::SignerFilter(m_rng, signer, new CryptoPP::StringSink(signature)) // SignerFilter
+        xr_new<CryptoPP::SignerFilter>(m_rng, signer, xr_new<CryptoPP::StringSink>(signature)) // SignerFilter
     ); // StringSource
 
     return shared_str(signature.c_str());
@@ -53,7 +53,7 @@ bool xr_dsa::verify(public_key_t const& pub_key, u8 const* data, u32 const data_
     std::string message((const char*)data, data_size);
     CryptoPP::DSA::Verifier verifier(public_key);
     CryptoPP::SignatureVerificationFilter svf(verifier);
-    CryptoPP::StringSource(signature + message, true, new CryptoPP::Redirector(svf));
+    CryptoPP::StringSource(signature + message, true, xr_new<CryptoPP::Redirector>(svf));
 
     return svf.GetLastResult();
 #else
@@ -139,17 +139,17 @@ void xr_dsa::generate_params()
 
     std::string signature;
     CryptoPP::DSA::Signer signer(priv_key);
-    CryptoPP::StringSource(debug_digest, true, new CryptoPP::SignerFilter(rng, signer,
-                                                   new CryptoPP::StringSink(signature)) // SignerFilter
+    CryptoPP::StringSource(debug_digest, true, xr_new<CryptoPP::SignerFilter>(rng, signer,
+                                                   xr_new<CryptoPP::StringSink>(signature)) // SignerFilter
         ); // StringSource
 
     CryptoPP::DSA::Verifier verifier(pub_key);
     CryptoPP::SignatureVerificationFilter svf(verifier);
 
-    CryptoPP::StringSource(signature + debug_digest, true, new CryptoPP::Redirector(svf));
+    CryptoPP::StringSource(signature + debug_digest, true, xr_new<CryptoPP::Redirector>(svf));
     VERIFY(svf.GetLastResult() == true);
 
-    CryptoPP::StringSource(signature + debug_bad_digest, true, new CryptoPP::Redirector(svf));
+    CryptoPP::StringSource(signature + debug_bad_digest, true, xr_new<CryptoPP::Redirector>(svf));
     VERIFY(svf.GetLastResult() == false);
 }
 #else // USE_CRYPTOPP
