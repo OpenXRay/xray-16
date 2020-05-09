@@ -541,8 +541,11 @@ void CRender::Calculate()
             std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
 
             // Determine visibility for dynamic part of scene
-            g_hud->Render_First(); // R1 shadows
+            if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
+                g_hud->Render_First(); // R1 shadows
+
             g_hud->Render_Last();
+
             u32 uID_LTRACK = 0xffffffff;
             if (phase == PHASE_NORMAL)
             {
