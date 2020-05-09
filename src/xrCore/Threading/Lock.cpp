@@ -49,7 +49,7 @@ struct profiler
     }
 };
 
-Lock::Lock(const char* id) : impl(xr_new<LockImpl>), lockCounter(0), id(id) {}
+Lock::Lock(const char* id) : impl(xr_new<LockImpl>()), lockCounter(0), id(id) {}
 
 void Lock::Enter()
 {

@@ -154,5 +154,5 @@ static xrDelegateArgumentsTypes<Args...> BindDelegateArgs(Args...args)
 template<typename ... Args>
 static xrDelegateArgumentsTypes<Args...>* BindDelegateArgsPtr(Args&&...args)
 {
-    return xr_new<xrDelegateArgumentsTypes<Args...>(std::forward<Args>(args)...)>();
+    return xr_new<xrDelegateArgumentsTypes<Args...>>(std::forward<Args>(args)...);
 }

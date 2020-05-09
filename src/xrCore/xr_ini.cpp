@@ -478,7 +478,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             }
             Current = xr_new<Sect>();
             Current->Name = nullptr;
-            // start xr_new<section>
+            // start new section
             R_ASSERT3(strchr(str, ']'), "Bad ini section found: ", str);
             pcstr inherited_names = strstr(str, "]:");
             if (nullptr != inherited_names)
