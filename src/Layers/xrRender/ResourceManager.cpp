@@ -414,14 +414,20 @@ void CResourceManager::DeferredUpload()
         texture.second->Load();
 #endif
 }
-/*
-void	CResourceManager::DeferredUnload	()
+
+void CResourceManager::DeferredUnload()
 {
-    if (!RDEVICE.b_is_Ready)				return;
-    for (auto t=m_textures.begin(); t!=m_textures.end(); t++)
-        t->second->Unload();
+    if (!RDEVICE.b_is_Ready)
+        return;
+
+#ifndef USE_OGL
+    tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
+#else
+    for (auto& texture : m_textures)
+        texture.second->Unload();
+#endif
 }
-*/
+
 #ifdef _EDITOR
 void CResourceManager::ED_UpdateTextures(AStringVec* names)
 {

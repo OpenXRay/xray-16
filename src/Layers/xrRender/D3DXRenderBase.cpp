@@ -81,7 +81,19 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 
     Resources->reset_begin();
     Memory.mem_compact();
+
+#ifdef USE_DX9
+    const bool noTexturesInRAM = RImplementation.o.no_ram_textures;
+    if (noTexturesInRAM)
+        ResourcesDeferredUnload();
+#endif
+
     HW.Reset();
+
+#ifdef USE_DX9
+    if (noTexturesInRAM)
+        ResourcesDeferredUpload();
+#endif
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 
@@ -154,6 +166,10 @@ void D3DXRenderBase::DeferredLoad(bool E)
 void D3DXRenderBase::ResourcesDeferredUpload()
 {
     Resources->DeferredUpload();
+}
+void D3DXRenderBase::ResourcesDeferredUnload()
+{
+    Resources->DeferredUnload();
 }
 void D3DXRenderBase::ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps)
 {
