@@ -595,7 +595,10 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
             }
         }
 #if RENDER != R_R1
-        if (g_pGameLevel && (phase == RImplementation.PHASE_SMAP) && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
+        // Actor Shadow (Sun + Light)
+        if (g_pGameLevel && (phase == RImplementation.PHASE_SMAP)
+            && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)
+            && psDeviceFlags.test(rsDrawDynamic))
         {
             do
             {
