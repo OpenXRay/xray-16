@@ -54,6 +54,7 @@ public:
         u32 nvdbt : 1;
 
         u32 nullrt : 1;
+        u32 no_ram_textures : 1; // don't keep textures in RAM
 
         u32 distortion : 1;
         u32 distortion_enabled : 1;
@@ -67,8 +68,6 @@ public:
         u32 oldshadowcascades : 1;
         u32 disasm : 1;
         u32 advancedpp : 1; //	advanced post process (DOF, SSAO, volumetrics, etc.)
-
-        u32 no_ram_textures : 1; // don't keep textures in RAM
 
         u32 forcegloss : 1;
         u32 forceskinw : 1;

@@ -80,7 +80,7 @@ const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autod
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
 
-Flags32 ps_r__common_flags = {0 /* | RFLAG_NO_RAM_TEXTURES */}; // All renders
+Flags32 ps_r__common_flags = {/*RFLAG_NO_RAM_TEXTURES*/}; // All renders
 
 //int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
@@ -204,7 +204,6 @@ float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
-//AVO: detail draw radius
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
 

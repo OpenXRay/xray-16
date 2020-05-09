@@ -82,16 +82,18 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Resources->reset_begin();
     Memory.mem_compact();
 
-#if (RENDER == R_R1) || (RENDER == R_R2)
-    bool bNoRamTex = RImplementation.o.no_ram_textures;
-    if (bNoRamTex) ResourcesDeferredUnload();
-#endif //(RENDER == R_R1) || (RENDER == R_R2)
+#ifdef USE_DX9
+    bool noTexturesInRAM = RImplementation.o.no_ram_textures;
+    if (noTexturesInRAM)
+        ResourcesDeferredUnload();
+#endif
 
     HW.Reset();
 
-#if (RENDER == R_R1) || (RENDER == R_R2)
-    if (bNoRamTex) ResourcesDeferredUpload();
-#endif //(RENDER == R_R1) || (RENDER == R_R2)
+#ifdef USE_DX9
+    if (noTexturesInRAM)
+        ResourcesDeferredUpload();
+#endif
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 
