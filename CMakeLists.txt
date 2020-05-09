@@ -238,7 +238,6 @@ if (UNIX)
     endif()
 endif()
 
-
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 
 if ("${LIB64}" STREQUAL "TRUE")
@@ -246,4 +245,3 @@ if ("${LIB64}" STREQUAL "TRUE")
 else()
     set(LIBSUFFIX "")
 endif()
-
