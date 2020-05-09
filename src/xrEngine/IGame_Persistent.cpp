@@ -43,9 +43,9 @@ IGame_Persistent::IGame_Persistent()
     if (RDEVICE.editor())
         pEnvironment = RDEVICE.editor()->environment();
     else
-        pEnvironment = new CEnvironment();
+        pEnvironment = xr_new<CEnvironment>();
 
-    m_pGShaderConstants = new ShadersExternalData(); //--#SM+#--
+    m_pGShaderConstants = xr_new<ShadersExternalData>(); //--#SM+#--
 }
 
 IGame_Persistent::~IGame_Persistent()
