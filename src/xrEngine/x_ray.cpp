@@ -82,7 +82,7 @@ void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
     LPCSTR sh_name = pSettings->r_string(section, "shader");
     if (!F)
     {
-        F = new CGameFont(sh_name, font_tex_name, flags);
+        F = xr_new<CGameFont>(sh_name, font_tex_name, flags);
     }
     else
         F->Initialize(sh_name, font_tex_name);

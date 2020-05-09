@@ -47,7 +47,7 @@ void CRenderDevice::CreateInternal()
     if (b_is_Ready)
         return; // prevent double call
 
-    Statistic = new CStats();
+    Statistic = xr_new<CStats>();
     bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
     bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
     bool gpuRef = !!strstr(Core.Params, "-gpu_ref");

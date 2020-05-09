@@ -71,7 +71,7 @@ EVENT CEventAPI::Create(const char* N)
         }
     }
 
-    EVENT X = new CEvent(N);
+    EVENT X = xr_new<CEvent>(N);
     Events.push_back(X);
     CS.Leave();
     return X;
