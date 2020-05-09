@@ -161,9 +161,9 @@ XRCORE_API void _dump_open_files(int mode)
 
 CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
 #ifdef CONFIG_PROFILE_LOCKS
-    m_auth_lock(new Lock(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock)))
+    m_auth_lock(xr_new<Lock>(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock)))
 #else
-    m_auth_lock(new Lock)
+    m_auth_lock(xr_new<Lock>())
 #endif // CONFIG_PROFILE_LOCKS
 {
     m_Flags.zero();
@@ -316,9 +316,9 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bo
                 R_ASSERT3(result, "Can't decompress archive", archiveName);
 
                 xr_free(src_data);
-                return new CTempReader(dest, dest_sz, 0);
+                return xr_new<CTempReader>(dest, dest_sz, 0);
             }
-            return new CTempReader(src_data, dwSize, 0);
+            return xr_new<CTempReader>(src_data, dwSize, 0);
         }
 
         pt = SetFilePointer(ptr, dwSize, nullptr, FILE_CURRENT);
@@ -374,9 +374,9 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
                 R_ASSERT3(result, "Can't decompress archive", archiveName);
 
                 xr_free(src_data);
-                return new CTempReader(dest, dest_sz, 0);
+                return xr_new<CTempReader>(dest, dest_sz, 0);
             }
-            return new CTempReader(src_data, dwSize, 0);
+            return xr_new<CTempReader>(src_data, dwSize, 0);
         }
 
         if(-1 == ::lseek(fd, dwSize, SEEK_CUR))
@@ -540,7 +540,7 @@ void CLocatorAPI::ProcessArchive(pcstr _path)
 
     if (hdr)
     {
-        A.header = new CInifile(hdr, "archive_header");
+        A.header = xr_new<CInifile>(hdr, "archive_header");
         hdr->close();
         bProcessArchiveLoading = A.header->r_bool("header", "auto_load");
     }
@@ -816,7 +816,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
         SDL_strlcpy(full_current_directory, SDL_GetPrefPath("GSC", "SCOP"), sizeof full_current_directory);
 #endif
 
-    FS_Path* path = new FS_Path(full_current_directory, "", "", "", 0);
+    FS_Path* path = xr_new<FS_Path>(full_current_directory, "", "", "", 0);
 
 #ifdef DEBUG
     Msg("initial $fs_root$ = %s", full_current_directory);
@@ -893,7 +893,7 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 #endif
 
     void* buffer = FileDownload(fs_file_name, file_handle, file_size);
-    result = new CTempReader(buffer, file_size, 0);
+    result = xr_new<CTempReader>(buffer, file_size, 0);
 
 #ifdef DEBUG
     if (result && m_Flags.is(flBuildCopy | flReady))
@@ -982,7 +982,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
 
             auto p_it = m_paths.find(root);
 
-            FS_Path* P = new FS_Path(p_it != m_paths.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
+            FS_Path* P = xr_new<FS_Path>(p_it != m_paths.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
             bNoRecurse = !(fl & FS_Path::flRecurse);
             Recurse(P->m_Path);
             auto I = m_paths.insert(std::make_pair(xr_strdup(id), P));
@@ -1127,7 +1127,7 @@ xr_vector<pstr>* CLocatorAPI::file_list_open(pcstr _path, u32 flags)
     if (I == m_files.end())
         return nullptr;
 
-    xr_vector<char*>* dest = new xr_vector<char*>();
+    xr_vector<char*>* dest = xr_new<xr_vector<char*>>();
 
     size_t base_len = xr_strlen(N);
     for (++I; I != m_files.end(); ++I)
@@ -1309,10 +1309,10 @@ void CLocatorAPI::check_cached_files(pstr fname, const size_t& fname_size, const
     {
         IReader* _src;
         if (desc.size_real < 256 * 1024)
-            _src = new CFileReader(fname);
+            _src = xr_new<CFileReader>(fname);
         else
-            _src = new CVirtualFileReader(fname);
-        IWriter* _dst = new CFileWriter(fname_in_cache, false);
+            _src = xr_new<CVirtualFileReader>(fname);
+        IWriter* _dst = xr_new<CFileWriter>(fname_in_cache, false);
         _dst->w(_src->pointer(), _src->length());
         xr_delete(_dst);
         xr_delete(_src);
@@ -1330,16 +1330,16 @@ void CLocatorAPI::file_from_cache_impl(IReader*& R, LPSTR fname, const file& des
 {
     if (desc.size_real < 16 * 1024)
     {
-        R = new CFileReader(fname);
+        R = xr_new<CFileReader>(fname);
         return;
     }
 
-    R = new CVirtualFileReader(fname);
+    R = xr_new<CVirtualFileReader>(fname);
 }
 
 void CLocatorAPI::file_from_cache_impl(CStreamReader*& R, LPSTR fname, const file& desc)
 {
-    CFileStreamReader* r = new CFileStreamReader();
+    CFileStreamReader* r = xr_new<CFileStreamReader>();
     r->construct(fname, BIG_FILE_READER_WINDOW_SIZE);
     R = r;
 }
@@ -1384,14 +1384,14 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     size_t ptr_offs = desc.ptr - start;
     if (desc.size_real == desc.size_compressed)
     {
-        R = new CPackReader(ptr, ptr + ptr_offs, desc.size_real);
+        R = xr_new<CPackReader>(ptr, ptr + ptr_offs, desc.size_real);
         return;
     }
 
     // Compressed
     u8* dest = xr_alloc<u8>(desc.size_real);
     rtc_decompress(dest, desc.size_real, ptr + ptr_offs, desc.size_compressed);
-    R = new CTempReader(dest, desc.size_real, 0);
+    R = xr_new<CTempReader>(dest, desc.size_real, 0);
 #if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile(ptr);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
@@ -1409,7 +1409,7 @@ void CLocatorAPI::file_from_archive(CStreamReader*& R, pcstr fname, const file& 
     R_ASSERT2(desc.size_compressed == desc.size_real,
         make_string("cannot use stream reading for compressed data %s, do not compress data to be streamed", fname));
 
-    R = new CStreamReader();
+    R = xr_new<CStreamReader>();
 #if defined(XR_PLATFORM_WINDOWS)
     R->construct(A.hSrcMap, desc.ptr, desc.size_compressed, A.size, BIG_FILE_READER_WINDOW_SIZE);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
@@ -1586,7 +1586,7 @@ IWriter* CLocatorAPI::w_open(pcstr path, pcstr _fname)
     xr_strcpy(fname, _fname);
     if (path && path[0])
         update_path(fname, path, fname);
-    CFileWriter* W = new CFileWriter(fname, false);
+    CFileWriter* W = xr_new<CFileWriter>(fname, false);
 #ifdef _EDITOR
     if (!W->valid())
         xr_delete(W);
@@ -1600,7 +1600,7 @@ IWriter* CLocatorAPI::w_open_ex(pcstr path, pcstr _fname)
     xr_strcpy(fname, _fname);
     if (path && path[0])
         update_path(fname, path, fname);
-    CFileWriter* W = new CFileWriter(fname, true);
+    CFileWriter* W = xr_new<CFileWriter>(fname, true);
 #ifdef _EDITOR
     if (!W->valid())
         xr_delete(W);
@@ -1789,7 +1789,7 @@ FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool 
 {
     VERIFY(root /**&&root[0]**/);
     VERIFY(false == path_exist(path_alias));
-    FS_Path* P = new FS_Path(root, add, nullptr, nullptr, 0);
+    FS_Path* P = xr_new<FS_Path>(root, add, nullptr, nullptr, 0);
     bNoRecurse = !recursive;
     Recurse(P->m_Path);
     m_paths.insert(std::make_pair(xr_strdup(path_alias), P));
