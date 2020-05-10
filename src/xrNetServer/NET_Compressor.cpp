@@ -251,9 +251,9 @@ void NET_Compressor::done_decoding()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 #ifdef CONFIG_PROFILE_LOCKS
-NET_Compressor::NET_Compressor() : pcs(new Lock(MUTEX_PROFILE_ID(NET_Compressor))) {}
+NET_Compressor::NET_Compressor() : pcs(xr_new<Lock>(MUTEX_PROFILE_ID(NET_Compressor))) {}
 #else
-NET_Compressor::NET_Compressor() : pcs(new Lock) {}
+NET_Compressor::NET_Compressor() : pcs(xr_new<Lock>()) {}
 #endif
 
 NET_Compressor::~NET_Compressor()

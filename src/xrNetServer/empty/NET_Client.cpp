@@ -14,15 +14,15 @@ static INetLog* pClNetLog = nullptr;
 
 #ifdef CONFIG_PROFILE_LOCKS
 INetQueue::INetQueue()
-    : pcs(new Lock(MUTEX_PROFILE_ID(INetQueue)))
+    : pcs(xr_new<Lock>(MUTEX_PROFILE_ID(INetQueue)))
 #else
 INetQueue::INetQueue()
-    : pcs(new Lock)
+    : pcs(xr_new<Lock>())
 #endif
 {
     unused.reserve(128);
     for (int i = 0; i < 16; i++)
-        unused.push_back(new NET_Packet());
+        unused.push_back(xr_new<NET_Packet>());
 }
 
 INetQueue::~INetQueue()
@@ -44,7 +44,7 @@ NET_Packet* INetQueue::Create()
     NET_Packet* P = nullptr;
 
     if (unused.empty()) {
-        ready.push_back(new NET_Packet());
+        ready.push_back(xr_new<NET_Packet>());
         P = ready.back();
         //---------------------------------------------
         // LastTimeCreate = SDL_GetTicks();
@@ -63,7 +63,7 @@ NET_Packet* INetQueue::Create(const NET_Packet& _other)
     NET_Packet* P = nullptr;
     pcs->Enter();
     if (unused.empty()) {
-        ready.push_back(new NET_Packet());
+        ready.push_back(xr_new<NET_Packet>());
         P = ready.back();
         //---------------------------------------------
         //        LastTimeCreate = SDL_GetTicks();
@@ -223,7 +223,7 @@ void IPureClient::_Recieve(const void* data, u32 data_size, u32 /*param*/)
 
         if (psNET_Flags.test(NETFLAG_LOG_CL_PACKETS)) {
             if (!pClNetLog)
-                pClNetLog = new INetLog("logs//net_cl_log.log", timeServer());
+                pClNetLog = xr_new<INetLog>("logs//net_cl_log.log", timeServer());
 
             if (pClNetLog)
                 pClNetLog->LogData(timeServer(), const_cast<void*>(data), data_size,
@@ -239,11 +239,11 @@ void IPureClient::_Recieve(const void* data, u32 data_size, u32 /*param*/)
 IPureClient::IPureClient(CTimer* timer)
     : net_Statistic(timer)
     , net_csEnumeration(
-          new Lock(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration)))
+          xr_new<Lock>(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration)))
 #else
 IPureClient::IPureClient(CTimer* timer)
     : net_Statistic(timer)
-    , net_csEnumeration(new Lock)
+    , net_csEnumeration(xr_new<Lock>())
 #endif
 {
     device_timer = timer;
@@ -486,7 +486,7 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 
     if (psNET_Flags.test(NETFLAG_LOG_CL_PACKETS)) {
         if (!pClNetLog)
-            pClNetLog = new INetLog("logs" DELIMITER "net_cl_log.log", timeServer());
+            pClNetLog = xr_new<INetLog>("logs" DELIMITER "net_cl_log.log", timeServer());
         if (pClNetLog)
             pClNetLog->LogData(timeServer(), data, size);
     }
