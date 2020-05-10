@@ -44,7 +44,7 @@ const CUISubLine* CUISubLine::Cut2Pos(int i)
         make_string("CUISubLine::Cut2Pos - invalid parameter [%d][%d]", i, m_text.size()).c_str());
 
     if (!m_pTempLine)
-        m_pTempLine = new CUISubLine();
+        m_pTempLine = xr_new<CUISubLine>();
     m_pTempLine->m_color = m_color;
     m_pTempLine->m_text.assign(m_text, 0, i + 1);
     m_text.replace(0, i + 1, "");
