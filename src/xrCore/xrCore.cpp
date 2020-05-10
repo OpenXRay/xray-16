@@ -243,29 +243,29 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #else
         getcwd(WorkingPath, sizeof(WorkingPath));
 
-    /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
-    * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
-    * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
-    if (!strstr(Core.Params, "-fsltx"))
-    {
-        chdir(ApplicationPath);
-        string_path tmp;
-        xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
-        struct stat statbuf;
-        ZeroMemory(&statbuf, sizeof(statbuf));
-        int res = lstat(tmp, &statbuf);
-        if (-1 == res || !S_ISLNK(statbuf.st_mode))
-            symlink("/usr/share/openxray/fsgame.ltx", tmp);
-        xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);
-        ZeroMemory(&statbuf, sizeof(statbuf));
-        res = lstat(tmp, &statbuf);
-        if (-1 == res || !S_ISLNK(statbuf.st_mode))
+        /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
+        * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
+        * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
+        if (!strstr(Core.Params, "-fsltx"))
         {
-            mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-            mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-            symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
+            chdir(ApplicationPath);
+            string_path tmp;
+            xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
+            struct stat statbuf;
+            ZeroMemory(&statbuf, sizeof(statbuf));
+            int res = lstat(tmp, &statbuf);
+            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+                symlink("/usr/share/openxray/fsgame.ltx", tmp);
+            xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);
+            ZeroMemory(&statbuf, sizeof(statbuf));
+            res = lstat(tmp, &statbuf);
+            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+            {
+                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
+            }
         }
-    }
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
