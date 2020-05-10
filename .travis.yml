@@ -23,9 +23,9 @@ matrix:
           packages:
             - g++-8
 
-    - arch: arm64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      addons: *gcc8
+#    - arch: arm64
+#      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
+#      addons: *gcc8
 
     - arch: amd64
       env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
