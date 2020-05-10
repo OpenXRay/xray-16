@@ -18,19 +18,19 @@ CGameSpy_Full::CGameSpy_Full()
     m_pGS_GP = NULL;
     m_bServicesAlreadyChecked = false;
     //---------------------------------------
-    m_pGSA = new CGameSpy_Available();
+    m_pGSA = xr_new<CGameSpy_Available>();
     //-----------------------------------------------------
     shared_str resultstr;
     m_bServicesAlreadyChecked = m_pGSA->CheckAvailableServices(resultstr);
     //-----------------------------------------------------
     gsCoreInitialize();
-    m_pGS_Patching = new CGameSpy_Patching();
-    m_pGS_HTTP = new CGameSpy_HTTP();
-    m_pGS_SB = new CGameSpy_BrowsersWrapper();
+    m_pGS_Patching = xr_new<CGameSpy_Patching>();
+    m_pGS_HTTP = xr_new<CGameSpy_HTTP>();
+    m_pGS_SB = xr_new<CGameSpy_BrowsersWrapper>();
 
-    m_pGS_GP = new CGameSpy_GP();
-    m_pGS_SAKE = new CGameSpy_SAKE();
-    m_pGS_ATLAS = new CGameSpy_ATLAS();
+    m_pGS_GP = xr_new<CGameSpy_GP>();
+    m_pGS_SAKE = xr_new<CGameSpy_SAKE>();
+    m_pGS_ATLAS = xr_new<CGameSpy_ATLAS>();
 }
 
 CGameSpy_Full::~CGameSpy_Full()

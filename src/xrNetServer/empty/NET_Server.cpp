@@ -98,20 +98,20 @@ struct ClientStatisticImpl {
 };
 
 IClientStatistic::IClientStatistic()
-    : m_pimpl(new ClientStatisticImpl)
+    : m_pimpl(xr_new<ClientStatisticImpl>())
 {
 }
 
 IClientStatistic::IClientStatistic(CTimer* timer)
 {
     ZeroMemory(this, sizeof(*this));
-    m_pimpl = new ClientStatisticImpl;
+    m_pimpl = xr_new<ClientStatisticImpl>();
     m_pimpl->device_timer = timer;
     m_pimpl->dwBaseTime = TimeGlobal(m_pimpl->device_timer);
 }
 
 IClientStatistic::IClientStatistic(const IClientStatistic& rhs)
-    : m_pimpl(new ClientStatisticImpl)
+    : m_pimpl(xr_new<ClientStatisticImpl>())
 {
     *m_pimpl = *rhs.m_pimpl;
 }
@@ -183,7 +183,7 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
     //---------------------------------------
     if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) {
         if (!pSvNetLog)
-            pSvNetLog = new INetLog("logs" DELIMITER "net_sv_log.log", TimeGlobal(device_timer));
+            pSvNetLog = xr_new<INetLog>("logs" DELIMITER "net_sv_log.log", TimeGlobal(device_timer));
 
         if (pSvNetLog)
             pSvNetLog->LogPacket(TimeGlobal(device_timer), &packet, true);
@@ -374,7 +374,7 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
     //	if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
     if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) {
         if (!pSvNetLog)
-            pSvNetLog = new INetLog("logs" DELIMITER "net_sv_log.log", TimeGlobal(device_timer));
+            pSvNetLog = xr_new<INetLog>("logs" DELIMITER "net_sv_log.log", TimeGlobal(device_timer));
         if (pSvNetLog)
             pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
     }
@@ -597,7 +597,7 @@ void IPureServer::BanAddress(const ip_address& Address, u32 BanTimeSec)
         return;
     }
 
-    IBannedClient* pNewClient = new IBannedClient();
+    IBannedClient* pNewClient = xr_new<IBannedClient>();
     pNewClient->HAddr = Address;
     time(&pNewClient->BanTime);
     pNewClient->BanTime += BanTimeSec;
@@ -661,7 +661,7 @@ void IPureServer::BannedList_Load()
 
     for (; it != it_e; ++it) {
         const shared_str& sect_name = (*it)->Name;
-        IBannedClient* Cl = new IBannedClient();
+        IBannedClient* Cl = xr_new<IBannedClient>();
         Cl->Load(ini, sect_name);
         BannedAddresses.push_back(Cl);
     }

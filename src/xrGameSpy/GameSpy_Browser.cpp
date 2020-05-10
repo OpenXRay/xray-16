@@ -92,7 +92,7 @@ CGameSpy_Browser::CGameSpy_Browser(const SMasterListConfig& masterListCfg)
 {
     m_pQR2 = NULL;
     m_pGSBrowser = NULL;
-    m_pQR2 = new CGameSpy_QR2();
+    m_pQR2 = xr_new<CGameSpy_QR2>();
     m_pQR2->RegisterAdditionalKeys();
     m_bTryingToConnectToMasterServer = false;
     m_bShowCMSErr = false;
@@ -179,7 +179,7 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
     {
         m_refresh_lock.Enter();
         m_refresh_lock.Leave();
-        RefreshData* pRData = new RefreshData();
+        RefreshData* pRData = xr_new<RefreshData>();
         xr_strcpy(pRData->FilterStr, FilterStr);
         pRData->pGSBrowser = this;
         m_bTryingToConnectToMasterServer = true;
