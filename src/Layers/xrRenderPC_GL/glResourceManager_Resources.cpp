@@ -15,7 +15,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
         if (pass->equal(proto))
             return pass;
 
-    SPass* P = v_passes.emplace_back(new SPass());
+    SPass* P = v_passes.emplace_back(xr_new<SPass>());
     P->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     P->state = proto.state;
     P->ps = proto.ps;
@@ -50,7 +50,7 @@ SDeclaration* CResourceManager::_CreateDecl(u32 FVF)
             return D;
     }
 
-    SDeclaration* D = v_declarations.emplace_back(new SDeclaration());
+    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
     glGenVertexArrays(1, &D->dcl);
 
     D->FVF = FVF;
@@ -69,7 +69,7 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
             return D;
     }
 
-    SDeclaration* D = v_declarations.emplace_back(new SDeclaration());
+    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
     glGenVertexArrays(1, &D->dcl);
 
     D->FVF = 0;
@@ -176,7 +176,7 @@ SGeometry* CResourceManager::CreateGeom(VertexElement* decl, GLuint vb, GLuint i
         if (G.dcl == dcl && G.vb == vb && G.ib == ib && G.vb_stride == vb_stride) return geom;
     }
 
-    SGeometry* Geom = v_geoms.emplace_back(new SGeometry());
+    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
     Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     Geom->dcl = dcl;
     Geom->vb = vb;
@@ -200,7 +200,7 @@ SGeometry* CResourceManager::CreateGeom(u32 FVF, GLuint vb, GLuint ib)
         if (G.dcl == dcl && G.vb == vb && G.ib == ib && G.vb_stride == vb_stride) return geom;
     }
 
-    SGeometry* Geom = v_geoms.emplace_back(new SGeometry());
+    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
     Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     Geom->dcl = dcl;
     Geom->vb = vb;
