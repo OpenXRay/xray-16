@@ -80,6 +80,8 @@ const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autod
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
 
+Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW }; // All renders
+
 //int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
 
@@ -202,8 +204,6 @@ float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
-//AVO: detail draw radius
-Flags32 ps_common_flags = {0}; // r1-only
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
 
@@ -727,6 +727,9 @@ void xrRender_initconsole()
     tw_max.set(2, 2, 2);
     CMD4(CCC_Vector3, "r__d_tree_wave", &ps_r__Tree_Wave, tw_min, tw_max);
 #endif // DEBUG
+
+    CMD3(CCC_Mask, "r__no_ram_textures", &ps_r__common_flags, RFLAG_NO_RAM_TEXTURES);
+    CMD3(CCC_Mask, "r__actor_shadow", &ps_r__common_flags, RFLAG_ACTOR_SHADOW);
 
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
     CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}

@@ -61,7 +61,7 @@ void CPsyDogAura::reinit()
 
 void CPsyDogAura::update_schedule()
 {
-    if (!m_object->g_Alive())
+    if (!m_object->g_Alive() || !m_actor)
         return;
 
     m_time_phantom_saw_actor = 0;

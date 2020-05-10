@@ -10,9 +10,9 @@ XRCORE_API smem_container* g_pSharedMemoryContainer = NULL;
 
 smem_container::smem_container() :
 #ifdef CONFIG_PROFILE_LOCKS
-    pcs(new Lock(MUTEX_PROFILE_ID(smem_container)))
+    pcs(xr_new<Lock>(MUTEX_PROFILE_ID(smem_container)))
 #else
-    pcs(new Lock)
+    pcs(xr_new<Lock>())
 #endif // CONFIG_PROFILE_LOCKS
 {
 }

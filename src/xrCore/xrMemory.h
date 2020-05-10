@@ -2,6 +2,8 @@
 
 #include "_types.h"
 
+#include <utility>
+
 class XRCORE_API xrMemory
 {
 public:
@@ -97,6 +99,12 @@ inline void xr_free(T*& ptr) noexcept
         Memory.mem_free((void*)ptr);
         ptr = nullptr;
     }
+}
+
+template <typename T, typename... Args>
+inline T* xr_new(Args&&... args)
+{
+    return new T(std::forward<Args>(args)...);
 }
 
 inline void* xr_malloc            (size_t size) { return Memory.mem_alloc       (size); }

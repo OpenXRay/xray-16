@@ -192,8 +192,8 @@ void CStats::OnDeviceCreate()
 
     if (!GEnv.isDedicatedServer)
     {
-        statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
-        fpsFont = new CGameFont("hud_font_di", CGameFont::fsDeviceIndependent);
+        statsFont = xr_new<CGameFont>("stat_font", CGameFont::fsDeviceIndependent);
+        fpsFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
         fpsFont->SetHeightI(0.025f);
         fpsFont->SetColor(color_rgba(250, 250, 15, 180));
     }

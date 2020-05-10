@@ -81,7 +81,19 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 
     Resources->reset_begin();
     Memory.mem_compact();
+
+#ifdef USE_DX9
+    const bool noTexturesInRAM = RImplementation.o.no_ram_textures;
+    if (noTexturesInRAM)
+        ResourcesDeferredUnload();
+#endif
+
     HW.Reset();
+
+#ifdef USE_DX9
+    if (noTexturesInRAM)
+        ResourcesDeferredUpload();
+#endif
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 
@@ -154,6 +166,10 @@ void D3DXRenderBase::DeferredLoad(bool E)
 void D3DXRenderBase::ResourcesDeferredUpload()
 {
     Resources->DeferredUpload();
+}
+void D3DXRenderBase::ResourcesDeferredUnload()
+{
+    Resources->DeferredUnload();
 }
 void D3DXRenderBase::ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps)
 {
@@ -260,8 +276,8 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("Calc:         %2.2fms, %2.1f%%", BasicStats.Culling.result, PPP(BasicStats.Culling.result));
     font.OutNext("Skeletons:    %2.2fms, %d", BasicStats.Animation.result, BasicStats.Animation.count);
     font.OutNext("Primitives:   %2.2fms, %2.1f%%", BasicStats.Primitives.result, PPP(BasicStats.Primitives.result));
-    font.OutNext("Wait-L:       %2.2fms", BasicStats.Wait.result);
-    font.OutNext("Wait-S:       %2.2fms", BasicStats.WaitS.result);
+    font.OutNext("Wait-L:       %2.2fms, %2.1f%%", BasicStats.Wait.result, PPP(BasicStats.Wait.result));
+    font.OutNext("Wait-S:       %2.2fms, %2.1f%%", BasicStats.WaitS.result, PPP(BasicStats.WaitS.result));
     font.OutNext("Skinning:     %2.2fms", BasicStats.Skinning.result);
     font.OutNext("DT_Vis/Cnt:   %2.2fms/%d", BasicStats.DetailVisibility.result, BasicStats.DetailCount);
     font.OutNext("DT_Render:    %2.2fms", BasicStats.DetailRender.result);

@@ -92,7 +92,7 @@ bool CConsole::is_mark(Console_mark type)
 
 CConsole::CConsole() : m_hShader_back(NULL)
 {
-    m_editor = new text_editor::line_editor(CONSOLE_BUF_SIZE);
+    m_editor = xr_new<text_editor::line_editor>(CONSOLE_BUF_SIZE);
     m_cmd_history_max = cmd_history_max;
     m_disable_tips = false;
     Register_callbacks();
@@ -216,13 +216,13 @@ void CConsole::OnRender()
 
     if (!m_hShader_back)
     {
-        m_hShader_back = new FactoryPtr<IUIShader>();
+        m_hShader_back = xr_new<FactoryPtr<IUIShader>>();
         (*m_hShader_back)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_console"); // "ui/ui_empty"
     }
 
     if (!pFont)
     {
-        pFont = new CGameFont("hud_font_di", CGameFont::fsDeviceIndependent);
+        pFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
         pFont->SetHeightI(0.025f);
     }
     if (!pFont2)
@@ -230,7 +230,7 @@ void CConsole::OnRender()
         pcstr fontSection = "hud_font_di2";
         if (!pSettings->section_exist(fontSection))
             fontSection = "hud_font_di";
-        pFont2 = new CGameFont(fontSection, CGameFont::fsDeviceIndependent);
+        pFont2 = xr_new<CGameFont>(fontSection, CGameFont::fsDeviceIndependent);
         pFont2->SetHeightI(0.025f);
     }
 

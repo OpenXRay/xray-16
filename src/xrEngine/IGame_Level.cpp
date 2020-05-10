@@ -18,7 +18,7 @@ extern bool g_bLoaded;
 
 IGame_Level::IGame_Level()
 {
-    m_pCameras = new CCameraManager(true);
+    m_pCameras = xr_new<CCameraManager>(true);
     g_pGameLevel = this;
     pLevel = NULL;
     bReady = false;
@@ -84,7 +84,7 @@ bool IGame_Level::Load(u32 dwNum)
     string_path temp;
     if (!FS.exist(temp, "$level$", "level.ltx"))
         xrDebug::Fatal(DEBUG_INFO, "Can't find level configuration file '%s'.", temp);
-    pLevel = new CInifile(temp);
+    pLevel = xr_new<CInifile>(temp);
 
     // Open
     g_pGamePersistent->SetLoadStageTitle("st_opening_stream");

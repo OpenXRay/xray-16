@@ -47,7 +47,7 @@ void CObjectAnimator::LoadMotions(pcstr fname)
         Clear();
         if (0 == xr_strcmp(ext, ".anm"))
         {
-            COMotion* M = new COMotion();
+            COMotion* M = xr_new<COMotion>();
             if (M->LoadMotion(full_path))
                 m_Motions.push_back(M);
             else
@@ -60,7 +60,7 @@ void CObjectAnimator::LoadMotions(pcstr fname)
             VERIFY(dwMCnt);
             for (u32 i = 0; i < dwMCnt; i++)
             {
-                COMotion* M = new COMotion();
+                COMotion* M = xr_new<COMotion>();
                 bool bRes = M->Load(*F);
                 if (!bRes)
                     FATAL("ERROR: Can't load motion. Incorrect file version.");

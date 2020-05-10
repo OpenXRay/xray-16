@@ -91,6 +91,10 @@ void CRender::create()
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
     c_ldynamic_props = "L_dynamic_props";
 
+    o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
+    if (o.no_ram_textures)
+        Msg("* Managed textures disabled");
+
     m_bMakeAsyncSS = false;
 
     Target = new CRenderTarget(); // Main target
@@ -537,8 +541,11 @@ void CRender::Calculate()
             std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
 
             // Determine visibility for dynamic part of scene
-            g_hud->Render_First(); // R1 shadows
+            if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
+                g_hud->Render_First(); // R1 shadows
+
             g_hud->Render_Last();
+
             u32 uID_LTRACK = 0xffffffff;
             if (phase == PHASE_NORMAL)
             {
