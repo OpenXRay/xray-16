@@ -9,5 +9,5 @@ class ENGINE_API CCF_DynamicMesh : public CCF_Skeleton
 public:
     CCF_DynamicMesh(IGameObject* _owner) : CCF_Skeleton(_owner){};
 
-    virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
+    virtual bool _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
 };

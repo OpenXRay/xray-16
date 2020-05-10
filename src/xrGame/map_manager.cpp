@@ -63,8 +63,8 @@ void CMapLocationRegistry::save(IWriter& stream)
     for (; I != E; ++I)
     {
         u32 size = 0;
-        Locations::iterator i = (*I).second.begin();
-        Locations::iterator e = (*I).second.end();
+        vLocations::iterator i = (*I).second.begin();
+        vLocations::iterator e = (*I).second.end();
         for (; i != e; ++i)
         {
             VERIFY((*i).location);
@@ -126,6 +126,15 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
 }
 
 void CMapManager::Destroy(CMapLocation* ml) { m_deffered_destroy_queue.push_back(ml); }
+
+void CMapManager::OnUIReset()
+{
+    for (const SLocationKey& locationKey : Locations())
+    {
+        locationKey.location->LoadSpot(locationKey.spot_type.c_str());
+    }
+}
+
 void CMapManager::RemoveMapLocation(const shared_str& spot_type, u16 id)
 {
     FindLocationBySpotID key(spot_type, id);
@@ -249,7 +258,7 @@ void CMapManager::DisableAllPointers()
         (*it).location->DisablePointer();
 }
 
-Locations& CMapManager::Locations()
+vLocations& CMapManager::Locations()
 {
     if (!m_locations)
     {

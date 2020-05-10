@@ -68,7 +68,7 @@ IC u8 btwCount1(u8 v)
 // same for 32bit
 IC u32 btwCount1(u32 v)
 {
-#ifdef __GNUC__
+#ifdef XR_COMPILER_GCC
     return __builtin_popcount(v);
 #else
     const u32 g31 = 0x49249249ul; // = 0100_1001_0010_0100_1001_0010_0100_1001
@@ -81,7 +81,7 @@ IC u32 btwCount1(u32 v)
 
 IC u64 btwCount1(u64 v)
 {
-#ifdef __GNUC__
+#ifdef XR_COMPILER_GCC
     return __builtin_popcountll(v);
 #else
     return btwCount1(u32(v & u32(-1))) + btwCount1(u32(v >> u64(32))); 
@@ -90,7 +90,7 @@ IC u64 btwCount1(u64 v)
 
 IC int iFloor(float x)
 {
-    return std::floor(x);
+    return static_cast<int>(std::floor(x));
 }
 
 /* intCeil() is a non-interesting variant, since effectively
@@ -98,7 +98,7 @@ IC int iFloor(float x)
  */
 IC int iCeil(float x)
 {
-    return std::ceil(x);
+    return static_cast<int>(std::ceil(x));
 }
 
 // Validity checks

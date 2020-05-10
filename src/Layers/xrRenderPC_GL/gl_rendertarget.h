@@ -50,7 +50,6 @@ public:
     IBlender* b_accum_reflected_msaa[8];
     IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
-    IBlender* b_fxaa;
 
 #ifdef DEBUG
 	struct		dbg_line_t		{
@@ -61,6 +60,10 @@ public:
 	xr_vector<dbg_line_t>										dbg_lines;
 	xr_vector<Fplane>												dbg_planes;
 #endif
+
+    // Base targets
+    xr_vector<ref_rt> rt_Base;
+    ref_rt rt_Base_Depth;
 
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
@@ -98,8 +101,6 @@ public:
     ref_rt rt_smap_surf; // 32bit,		color
     ref_rt rt_smap_depth; // 24(32) bit,	depth 
     ref_rt rt_smap_depth_minmax; //	is used for min/max sm
-    //	TODO: DX10: CHeck if we need old-style SMAP
-    //	IDirect3DSurface9*			rt_smap_ZB;		//
 
     //	Igor: for async screenshots
     GLuint t_ss_async; //32bit		(r,g,b,a) is situated in the system memory
@@ -124,10 +125,6 @@ private:
     ref_rt rt_half_depth;
     ref_shader s_ssao;
     ref_shader s_ssao_msaa[8];
-
-    //FXAA
-    ref_shader s_fxaa;
-    ref_geom g_fxaa;
 
     // Accum
     ref_shader s_accum_mask;
@@ -204,8 +201,10 @@ public:
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;
+#if 0 // kept for historical reasons
     ref_shader s_flip;
     ref_geom g_flip;
+#endif
 private:
     float im_noise_time;
     u32 im_noise_shift_w;
@@ -242,6 +241,9 @@ public:
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
 
+    GLuint get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
+    GLuint get_base_zb() { return rt_Base_Depth->pZRT; }
+
     void u_stencil_optimize(eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);
@@ -260,7 +262,6 @@ public:
     void phase_scene_end();
     void phase_occq();
     void phase_ssao();
-    void phase_fxaa();
     void phase_downsamp();
     void phase_wallmarks();
     void phase_smap_direct(light* L, u32 sub_phase);
@@ -305,7 +306,9 @@ public:
     void phase_combine();
     void phase_combine_volumetric();
     void phase_pp();
+#if 0 // kept for historical reasons
     void phase_flip();
+#endif
 
     void set_blur(float f) override { param_blur = f; }
     void set_gray(float f) override { param_gray = f; }

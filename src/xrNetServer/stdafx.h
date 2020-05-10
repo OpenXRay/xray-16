@@ -4,7 +4,7 @@
 #include "xrCore/xrCore.h"
 #include "xrCore/_std_extensions.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <DPlay/dplay8.h>

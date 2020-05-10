@@ -10,3 +10,13 @@ macro(add_dir DIRS)
     list( APPEND ${PROJECT_NAME}__SOURCES ${${dir}__SOURCES_C} ${${dir}__SOURCES_CPP} )
   endforeach()
 endmacro()
+
+
+# ------------------------------------------
+# Detect arch type ( x86 or x64 )
+# ------------------------------------------
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(ARCH_TYPE x64)
+else(CMAKE_SIZEOF_VOID_P EQUAL 4)
+  set(ARCH_TYPE x86)
+endif()

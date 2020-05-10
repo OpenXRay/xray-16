@@ -5,10 +5,9 @@
 #include "Threading/Lock.hpp"
 
 #include <string>
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
 #include <cstdio>
-#include "xrCore/_std_extensions.h" // Supress many of warnings
-#elif defined(WINDOWS)
+#elif defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4091) /// 'typedef ': ignored on left of '' when no variable is declared
 #include <DbgHelp.h>
@@ -117,20 +116,24 @@ private:
     static void SetupExceptionHandler();
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
     static bool GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr);
     static bool InitializeSymbolEngine();
     static void DeinitializeSymbolEngine(void);
-#endif //WINDOWS
+#endif //XR_PLATFORM_WINDOWS
 };
+
+// forward declaration
+// Definition is in xrCore/_std_extensions.h
+inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...);
 
 // for debug purposes only
 template<typename... Args>
 std::string make_string(cpcstr format, Args... args)
 {
     string4096 log;
-    xr_sprintf(log, format, std::forward<Args>(args)...);
+    xr_sprintf(log, std::size(log), format, std::forward<Args>(args)...);
     return log;
 }
 

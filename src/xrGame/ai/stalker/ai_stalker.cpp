@@ -525,7 +525,7 @@ void CAI_Stalker::Load(LPCSTR section)
     m_can_select_items = !!pSettings->r_bool(section, "can_select_items");
 }
 
-BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)
+bool CAI_Stalker::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeHumanStalker* tpHuman = smart_cast<CSE_ALifeHumanStalker*>(e);
@@ -540,7 +540,7 @@ BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)
     m_group_behaviour = !!tpHuman->m_flags.test(CSE_ALifeObject::flGroupBehaviour);
 
     if (!CObjectHandler::net_Spawn(DC) || !inherited::net_Spawn(DC))
-        return (FALSE);
+        return (false);
 
     set_money(tpHuman->m_dwMoney, false);
 
@@ -630,7 +630,7 @@ BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)
 
     m_pPhysics_support->in_NetSpawn(e);
 
-    return (TRUE);
+    return (true);
 }
 
 void CAI_Stalker::net_Destroy()
@@ -639,7 +639,16 @@ void CAI_Stalker::net_Destroy()
     CInventoryOwner::net_Destroy();
     m_pPhysics_support->in_NetDestroy();
 
-    TaskScheduler->RemoveTask({ this, &CAI_Stalker::update_object_handler });
+    // XXX: task scheduler
+    //TaskScheduler->RemoveTask({ this, &CAI_Stalker::update_object_handler });
+    Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler));
+
+#ifdef DEBUG
+    fastdelegate::FastDelegate0<> f = fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler);
+    xr_vector<fastdelegate::FastDelegate0<>>::const_iterator I;
+    I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), f);
+    VERIFY(I == Device.seqParallel.end());
+#endif
 
     xr_delete(m_ce_close);
     xr_delete(m_ce_far);
@@ -656,7 +665,7 @@ void CAI_Stalker::net_Save(NET_Packet& P)
     m_pPhysics_support->in_NetSave(P);
 }
 
-BOOL CAI_Stalker::net_SaveRelevant() { return (inherited::net_SaveRelevant() || BOOL(PPhysicsShell() != NULL)); }
+bool CAI_Stalker::net_SaveRelevant() { return (inherited::net_SaveRelevant() || (PPhysicsShell() != NULL)); }
 void CAI_Stalker::net_Export(NET_Packet& P)
 {
     R_ASSERT(Local());
@@ -827,9 +836,17 @@ void CAI_Stalker::UpdateCL()
     {
         if (g_mt_config.test(mtObjectHandler) && CObjectHandler::planner().initialized())
         {
-            TaskScheduler->AddTask("CAI_Stalker::update_object_handler",
-                { this, &CAI_Stalker::update_object_handler },
-                { this, &CAI_Stalker::mt_object_handler_update_allowed });
+            // XXX: task scheduler
+            //TaskScheduler->AddTask("CAI_Stalker::update_object_handler",
+            //    { this, &CAI_Stalker::update_object_handler },
+            //    { this, &CAI_Stalker::mt_object_handler_update_allowed });
+            fastdelegate::FastDelegate0<> f = fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler);
+#ifdef DEBUG
+            xr_vector<fastdelegate::FastDelegate0<>>::const_iterator I;
+            I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), f);
+            VERIFY(I == Device.seqParallel.end());
+#endif
+            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CAI_Stalker::update_object_handler));
         }
         else
         {
@@ -1284,7 +1301,7 @@ void CAI_Stalker::aim_target(Fvector& result, const CGameObject* object)
     ::aim_target(m_aim_bone_id, result, object);
 }
 
-BOOL CAI_Stalker::AlwaysTheCrow()
+bool CAI_Stalker::AlwaysTheCrow()
 {
     VERIFY(character_physics_support());
     return (character_physics_support()->is_interactive_motion());

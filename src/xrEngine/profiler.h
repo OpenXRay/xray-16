@@ -21,14 +21,14 @@
 class IGameFont;
 
 #ifdef CONFIG_PROFILE_LOCKS
-extern void add_profile_portion(LPCSTR id, const u64 &time);
+extern void add_profile_portion(pcstr id, const u64 &time);
 #endif
 
 #pragma pack(push, 4)
 struct CProfileResultPortion
 {
     u64 m_time;
-    LPCSTR m_timer_id;
+    pcstr m_timer_id;
 };
 #pragma pack(pop)
 
@@ -76,8 +76,8 @@ protected:
     u32 m_call_count;
 
 protected:
-    void setup_timer(LPCSTR timer_id, const u64 &timer_time, const u32 &call_count);
-    inline void convert_string(LPCSTR str, shared_str &out, u32 max_string_size);
+    void setup_timer(pcstr timer_id, const u64 &timer_time, const u32 &call_count);
+    inline void convert_string(pcstr str, shared_str &out, u32 max_string_size);
 
 public:
     CProfiler();

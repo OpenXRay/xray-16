@@ -664,13 +664,15 @@ void CPHSimpleCharacter::PhTune(dReal step)
 
     const dReal* velocity = dBodyGetLinearVel(m_body);
     dReal linear_vel_smag = dDOT(velocity, velocity);
-    if (b_lose_control && ((b_on_ground && (m_ground_contact_normal[1] > (M_SQRT1_2 / 2.f)))
-                              //&&
-                              //			!b_external_impulse
-                              /*&&
-                dSqrt(velocity[0]*velocity[0]+velocity[2]*velocity[2])<5.*/
-                              || fis_zero(linear_vel_smag) || m_elevator_state.ClimbingState()))
-        b_lose_control = false;
+    if (b_lose_control)
+    {
+        if ((b_on_ground && (m_ground_contact_normal[1] > (M_SQRT1_2 / 2.f))
+            /* && !b_external_impulse && (dSqrt(velocity[0] * velocity[0] + velocity[2] * velocity[2]) < 5.f) */)
+            || fis_zero(linear_vel_smag) || m_elevator_state.ClimbingState())
+        {
+            b_lose_control = false;
+        }
+    }
 
     if ((b_jumping && b_good_graund) ||
         (m_elevator_state.ClimbingState() &&

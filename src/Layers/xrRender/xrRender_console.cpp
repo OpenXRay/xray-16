@@ -72,8 +72,6 @@ const xr_token qmsaa__atest_token[] = {
 u32 ps_r3_minmax_sm = 3; // = 0;
 const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autodetect", 3}, {nullptr, 0}};
 
-int ps_r2_fxaa = 0;
-
 // “Off”
 // “DX10.0 style [Standard]”
 // “DX10.1 style [Higher quality]”
@@ -81,6 +79,8 @@ int ps_r2_fxaa = 0;
 // Common
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
+
+Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW }; // All renders
 
 //int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
@@ -200,13 +200,10 @@ Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
 
-int ps_r3_dyn_wet_surf_opt = 1;
 float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
-//AVO: detail draw radius
-Flags32 ps_common_flags = {0}; // r1-only
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
 
@@ -509,7 +506,7 @@ public:
     }
 };
 
-#if RENDER != R_R1 && RENDER != R_GL
+#if RENDER != R_R1
 #include "r__pixel_calculator.h"
 class CCC_BuildSSA : public IConsole_Command
 {
@@ -517,11 +514,8 @@ public:
     CCC_BuildSSA(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR /*args*/)
     {
-#if !defined(USE_DX10) && !defined(USE_DX11)
-        //  TODO: DX10: Implement pixel calculator
         r_pixel_calculator c;
         c.run();
-#endif //   USE_DX10
     }
 };
 #endif
@@ -698,7 +692,7 @@ void xrRender_initconsole()
     CMD1(CCC_Screenshot, "screenshot");
 
 #ifdef DEBUG
-#if RENDER != R_R1 && RENDER != R_GL
+#if RENDER != R_R1
     CMD1(CCC_BuildSSA, "build_ssa");
 #endif
     CMD4(CCC_Integer, "r__lsleep_frames", &ps_r__LightSleepFrames, 4, 30);
@@ -733,6 +727,9 @@ void xrRender_initconsole()
     tw_max.set(2, 2, 2);
     CMD4(CCC_Vector3, "r__d_tree_wave", &ps_r__Tree_Wave, tw_min, tw_max);
 #endif // DEBUG
+
+    CMD3(CCC_Mask, "r__no_ram_textures", &ps_r__common_flags, RFLAG_NO_RAM_TEXTURES);
+    CMD3(CCC_Mask, "r__actor_shadow", &ps_r__common_flags, RFLAG_ACTOR_SHADOW);
 
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
     CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
@@ -910,8 +907,6 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_msaa_alphatest", &ps_r3_msaa_atest, qmsaa__atest_token);
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
 
-    CMD4(CCC_Integer, "r2_fxaa", &ps_r2_fxaa, 0, 1);
-
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
 #ifdef DEBUG
@@ -920,7 +915,6 @@ void xrRender_initconsole()
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
-    CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_opt", &ps_r3_dyn_wet_surf_opt, 0, 1);
     CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);
     CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 20, 100);
     CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_sm_res", &ps_r3_dyn_wet_surf_sm_res, 64, 2048);

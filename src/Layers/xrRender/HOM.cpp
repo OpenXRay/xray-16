@@ -427,6 +427,10 @@ void CHOM::OnRender()
             // draw solid
             Device.SetNearer(TRUE);
             RCache.set_Shader(RImplementation.m_SelectionShader);
+#ifndef USE_DX9
+            RCache.set_c("tfactor", float(color_get_R(0x80FFFFFF)) / 255.f, float(color_get_G(0x80FFFFFF)) / 255.f, \
+                float(color_get_B(0x80FFFFFF)) / 255.f, float(color_get_A(0x80FFFFFF)) / 255.f);
+#endif // !USE_DX9
             RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*poly.begin(), poly.size() / 3);
             Device.SetNearer(FALSE);
             // draw wire
@@ -439,6 +443,9 @@ void CHOM::OnRender()
                 Device.SetNearer(TRUE);
             }
             RCache.set_Shader(RImplementation.m_SelectionShader);
+#ifndef USE_DX9
+            RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
+#endif // !USE_DX9
             RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
             if (bDebug)
             {

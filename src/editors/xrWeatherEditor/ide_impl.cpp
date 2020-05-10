@@ -58,6 +58,10 @@ HWND ide_impl::view_handle() { return ((HWND)m_window->view().draw_handle().ToIn
 HWND ide_impl::main_handle() { return ((HWND)m_window->Handle.ToInt32()); }
 HWND ide_impl::view_handle() { return ((HWND)m_window->view().draw_handle().ToInt32()); }
 #endif
+CEnvironment* ide_impl::environment()
+{
+    return m_engine->environment();
+}
 void ide_impl::run() { Application::Run(m_window); }
 void ide_impl::on_load_finished()
 {

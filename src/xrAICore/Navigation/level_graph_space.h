@@ -26,7 +26,7 @@ public:
 
 typedef NodePosition CPosition;
 
-class CVertex : public NodeCompressed
+class CLevelVertex : public NodeCompressed
 {
 private:
     friend class CRenumbererConverter;
@@ -37,9 +37,9 @@ public:
     ICF u16 low_cover(u8 index) const;
     ICF u16 plane() const;
     ICF const CPosition& position() const;
-    ICF bool operator<(const LevelGraph::CVertex& vertex) const;
-    ICF bool operator>(const LevelGraph::CVertex& vertex) const;
-    ICF bool operator==(const LevelGraph::CVertex& vertex) const;
+    ICF bool operator<(const LevelGraph::CLevelVertex& vertex) const;
+    ICF bool operator>(const LevelGraph::CLevelVertex& vertex) const;
+    ICF bool operator==(const LevelGraph::CLevelVertex& vertex) const;
     friend class CLevelGraph;
 };
 

@@ -372,6 +372,11 @@ IC void CBackend::set_Scissor(Irect* R)
     }
 }
 
+IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
+{
+    HW.pContext->RSSetViewports(1, &viewport);
+}
+
 IC void CBackend::set_Stencil(
     u32 _enable, u32 _func, u32 _ref, u32 _mask, u32 _writemask, u32 _fail, u32 _pass, u32 _zfail)
 {
@@ -452,6 +457,11 @@ ICF void CBackend::set_CullMode(u32 _mode)
     // D3DRS_CULLMODE,
     // _mode
     // )); }
+}
+
+ICF void CBackend::set_FillMode(u32 _mode)
+{
+    StateManager.SetFillMode(_mode);
 }
 
 IC void CBackend::ApplyVertexLayout()

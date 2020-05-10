@@ -4,12 +4,13 @@
 // Support for extension DLLs
 //****************************************************************************
 #pragma once
-#include <memory>
 
 #include "xrEngine/Engine.h"
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/clsid.h"
 #include "xrCore/xrCore_benchmark_macros.h"
+
+#include <memory>
 
 class IFactoryObject
 {
@@ -35,8 +36,8 @@ public:
 
 // Class creation/destroying interface
 extern "C" {
-using Factory_Create = DLL_API IFactoryObject* __cdecl(CLASS_ID CLS_ID);
-using Factory_Destroy = DLL_API void __cdecl(IFactoryObject* O);
+using Factory_Create = IFactoryObject* __cdecl(CLASS_ID CLS_ID);
+using Factory_Destroy = void __cdecl(IFactoryObject* O);
 };
 
 // Tuning interface
@@ -76,6 +77,7 @@ public:
     void Destroy();
 
     void CreateRendererList();
+    bool CanSkipGameModuleLoading() const { return !!strstr(Core.Params, "-nogame"); }
 
     CEngineAPI();
     ~CEngineAPI();

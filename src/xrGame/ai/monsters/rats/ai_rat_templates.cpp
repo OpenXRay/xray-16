@@ -28,7 +28,7 @@
 IC bool CAI_Rat::bfCheckIfOutsideAIMap(Fvector& tTemp1)
 {
     u32 dwNewNode = ai_location().level_vertex_id();
-    const CLevelGraph::CVertex* tpNewNode = ai_location().level_vertex();
+    const CLevelGraph::CLevelVertex* tpNewNode = ai_location().level_vertex();
     CLevelGraph::CPosition QueryPos;
     if (!ai().level_graph().valid_vertex_position(tTemp1))
         return (false);
@@ -197,7 +197,7 @@ void CAI_Rat::set_firing(bool b_val) { m_bFiring = b_val; }
 bool CAI_Rat::calc_node(Fvector const& next_position)
 {
     u32 dwNewNode = ai_location().level_vertex_id();
-    const CLevelGraph::CVertex* tpNewNode = ai_location().level_vertex();
+    const CLevelGraph::CLevelVertex* tpNewNode = ai_location().level_vertex();
     CLevelGraph::CPosition QueryPos;
     bool a = !ai().level_graph().valid_vertex_id(dwNewNode) || !ai().level_graph().valid_vertex_position(next_position);
     if (!a)

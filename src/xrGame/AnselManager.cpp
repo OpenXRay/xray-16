@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #define ANSEL_SDK_DELAYLOAD
 #include "AnselSDK.h"
 #endif
@@ -10,8 +10,8 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
-ENGINE_API extern BOOL bShowPauseString;
-ENGINE_API extern BOOL g_bDisableRedText;
+ENGINE_API extern bool bShowPauseString;
+ENGINE_API extern bool g_bDisableRedText;
 BOOL stored_red_text;
 
 /* XXX: Support camera move
@@ -28,7 +28,7 @@ AnselManager::AnselManager() : anselModule(nullptr), camera(this, 0), timeDelta(
 
 bool AnselManager::Load()
 {
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     constexpr pcstr anselName = "AnselSDK64";
 #else
     constexpr pcstr anselName = "AnselSDK32";
@@ -45,7 +45,7 @@ void AnselManager::Unload()
 
 bool AnselManager::Init() const
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (anselModule->IsLoaded() && ansel::isAnselAvailable())
     {
         ansel::Configuration config;
@@ -192,7 +192,7 @@ AnselCamera::AnselCamera(IGameObject* p, u32 flags) : CCameraBase(p, flags) {}
 AnselCameraEffector::AnselCameraEffector()
     : CEffectorCam(cefAnsel, std::numeric_limits<float>::infinity()) {}
 
-BOOL AnselCameraEffector::ProcessCam(SCamEffectorInfo& info)
+bool AnselCameraEffector::ProcessCam(SCamEffectorInfo& info)
 {
     info.dont_apply = false;
 

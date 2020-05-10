@@ -3,6 +3,22 @@
 
 namespace glStateUtils
 {
+GLenum ConvertFillMode(u32 Mode)
+{
+    switch (Mode)
+    {
+    case D3DFILL_POINT:
+    	return GL_POINT;
+    case D3DFILL_WIREFRAME:
+        return GL_LINE;
+    case D3DFILL_SOLID:
+        return GL_FILL;
+    default:
+        VERIFY(!"Unexpected fill mode!");
+        return GL_FILL;
+    }
+}
+
 GLenum ConvertCullMode(u32 Mode)
 {
     switch (Mode)

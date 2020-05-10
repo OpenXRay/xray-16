@@ -115,8 +115,8 @@ static class cl_alpha_ref : public R_constant_setup
     }
 } binder_alpha_ref;
 
-extern ENGINE_API BOOL r2_sun_static;
-extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
+extern ENGINE_API bool r2_sun_static;
+extern ENGINE_API bool r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -250,6 +250,7 @@ void CRender::create()
     o.depth16 = strstr(Core.Params, "-depth16") ? TRUE : FALSE;
     o.noshadows = strstr(Core.Params, "-noshadows") ? TRUE : FALSE;
     o.Tshadows = strstr(Core.Params, "-tsh") ? TRUE : FALSE;
+    o.oldshadowcascades = ps_r2_ls_flags_ext.test(R2FLAGEXT_SUN_OLD);
     o.mblur = strstr(Core.Params, "-mblur") ? TRUE : FALSE;
     o.distortion_enabled = strstr(Core.Params, "-nodistort") ? FALSE : TRUE;
     o.distortion = o.distortion_enabled;
@@ -313,9 +314,7 @@ void CRender::create()
         }
     }
 
-    // XXX: temporary disabled, need to fix it
-    //o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
-    o.dx10_gbuffer_opt = FALSE;
+    o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
 
     o.dx10_minmax_sm = ps_r3_minmax_sm;
     o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
@@ -362,9 +361,9 @@ void CRender::create()
 
     m_bMakeAsyncSS = false;
 
-    Target = new CRenderTarget(); // Main target
+    Target = xr_new<CRenderTarget>(); // Main target
 
-    Models = new CModelPool();
+    Models = xr_new<CModelPool>();
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
@@ -439,7 +438,7 @@ void CRender::reset_end()
     //	R_CHK(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[i]));
     HWOCC.occq_create(occq_size);
 
-    Target = new CRenderTarget();
+    Target = xr_new<CRenderTarget>();
 
     //FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 
@@ -453,8 +452,7 @@ void CRender::BeforeFrame()
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;
     // MT-HOM (@front)
-    TaskScheduler->AddTask("CHOM::MT_RENDER", { &HOM, &CHOM::MT_RENDER },
-        { &Device, &CRenderDevice::IsMTProcessingAllowed });
+    Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(&HOM, &CHOM::MT_RENDER));
 }
 
 void CRender::OnFrame()
@@ -465,9 +463,8 @@ void CRender::OnFrame()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         // MT-details (@front)
-        TaskScheduler->AddTask("CDetailManager::MT_CALC",
-            { Details, &CDetailManager::MT_CALC },
-            { &HOM, &CHOM::MT_Synced });
+        Device.seqParallel.insert(
+            Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
     }
 }
 
@@ -487,13 +484,13 @@ void CRender::MakeContextCurrent(RenderContext context)
 }
 
 // Implementation
-IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
+IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new<CROS_impl>(); }
 void CRender::ros_destroy(IRender_ObjectSpecific* & p) { xr_delete(p); }
 IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
 IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
 
-void CRender::model_Delete(IRenderVisual* & V, BOOL bDiscard)
+void CRender::model_Delete(IRenderVisual* & V, bool bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
@@ -502,7 +499,7 @@ void CRender::model_Delete(IRenderVisual* & V, BOOL bDiscard)
 
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
-    CDetail* D = new CDetail();
+    CDetail* D = xr_new<CDetail>();
     D->Load(F);
     return D;
 }
@@ -535,7 +532,7 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 }
 
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
 
 ref_shader CRender::getShader(int id)
 {
@@ -605,13 +602,13 @@ FSlideWindowItem* CRender::getSWI(int id)
 IRender_Target* CRender::getTarget() { return Target; }
 
 IRender_Light* CRender::light_create() { return Lights.Create(); }
-IRender_Glow* CRender::glow_create() { return new CGlow(); }
+IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 
 void CRender::flush() { r_dsgraph_render_graph(0); }
 
-BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
@@ -675,25 +672,22 @@ void CRender::add_Occluder(Fbox2& bb_screenspace)
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.f, 0.02f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = {0, 0, static_cast<GLsizei>(T->get_width()), static_cast<GLsizei>(T->get_height()), 0, 0.02f};
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.99999f, 1.f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, static_cast<GLsizei>(T->get_width()), static_cast<GLsizei>(T->get_height()), 0.99999f, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    CHK_GL(glViewport(0, 0, T->get_width(), T->get_height()));
-    CHK_GL(glDepthRangef(0.f, 1.f));
-    //CHK_DX				(HW.pDevice->SetViewport(&VP));
+    const D3D_VIEWPORT viewport = { 0, 0, static_cast<GLsizei>(T->get_width()), static_cast<GLsizei>(T->get_height()), 0, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 //////////////////////////////////////////////////////////////////////

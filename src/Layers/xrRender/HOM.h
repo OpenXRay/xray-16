@@ -57,16 +57,15 @@ public:
 
     bool MT_Synced() const
     {
-        return MT_frame_rendered == Device.dwFrame || IGame_Persistent::MainMenuActiveOrLevelNotExist();
+        return IGame_Persistent::MainMenuActiveOrLevelNotExist();
     }
 
     void __stdcall MT_RENDER();
-    ICF bool MT_Sync()
+    ICF void MT_Sync()
     {
-        if (!MT_Synced())
-            MT_RENDER();
-
-        return true;
+        if (MT_Synced())
+            return;
+        MT_RENDER();
     }
 
     BOOL visible(vis_data& vis);

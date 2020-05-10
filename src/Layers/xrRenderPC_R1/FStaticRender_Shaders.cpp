@@ -99,7 +99,7 @@ static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 
-HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void*& result)
+HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result)
 {
     D3DXMACRO defines[128];
     int def_it = 0;
@@ -205,7 +205,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, 
     if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
-        strconcat(sizeof(file), file, "shaders_cache" DELIMITER, filename, DELIMITER, sh_name);
+        strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename, DELIMITER, sh_name);
         strconcat(sizeof(filename), filename, filename, DELIMITER, sh_name);
         FS.update_path(file_name, "$app_data_root$", file);
     }

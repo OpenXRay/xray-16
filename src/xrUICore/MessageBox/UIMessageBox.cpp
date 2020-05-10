@@ -48,11 +48,14 @@ bool CUIMessageBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return inherited::OnMouseAction(x, y, mouse_action);
 }
 
-void CUIMessageBox::InitMessageBox(LPCSTR box_template)
+bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
 {
     Clear();
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "message_box.xml");
+
+    if (!uiXml.NavigateToNode(box_template))
+        return false;
 
     string512 str;
     strconcat(sizeof(str), str, box_template, ":picture");
@@ -290,7 +293,8 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         }
     }
     break;
-    };
+    }
+    return true;
 }
 
 void CUIMessageBox::OnYesOk()

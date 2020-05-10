@@ -35,13 +35,12 @@ void CRenderDevice::Destroy()
 
 void CRenderDevice::Reset(bool precache /*= true*/)
 {
-    shouldReset = true;
-    precacheWhileReset = precache;
+    ResetInternal(precache);
 }
 
 #include "IGame_Level.h"
 #include "CustomHUD.h"
-extern BOOL bNeed_re_create_env;
+extern bool bNeed_re_create_env;
 
 void CRenderDevice::ResetInternal(bool precache)
 {
@@ -74,11 +73,8 @@ void CRenderDevice::ResetInternal(bool precache)
 
     seqDeviceReset.Process();
     if (dwWidth_before != dwWidth || dwHeight_before != dwHeight)
-        seqResolutionChanged.Process();
+        seqUIReset.Process();
 
     if (!GEnv.isDedicatedServer)
         pInput->GrabInput(true);
-
-    shouldReset = false;
-    precacheWhileReset = false;
 }

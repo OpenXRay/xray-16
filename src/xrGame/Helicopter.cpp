@@ -128,7 +128,7 @@ void CollisionCallbackAlife(bool& do_colide, bool bo1, dContact& c, SGameMtl* ma
 }
 
 void ContactCallbackAlife(CDB::TRI* T, dContactGeom* c) {}
-BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
+bool CHelicopter::net_Spawn(CSE_Abstract* DC)
 {
     SetfHealth(100.0f);
     setState(CHelicopter::eAlive);

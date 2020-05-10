@@ -70,7 +70,7 @@ public:
     };
     using EffectVec = xr_vector<SEffect*>;
 
-    struct SSndChannel
+    struct ENGINE_API SSndChannel
     {
         shared_str m_load_section;
         Fvector2 m_sound_dist;
@@ -140,6 +140,7 @@ public:
     FactoryPtr<IEnvDescriptorRender> m_pDescriptor;
 
     Fvector4 clouds_color;
+    float clouds_rotation;
     Fvector3 sky_color;
     float sky_rotation;
 
@@ -247,7 +248,7 @@ protected:
 
 public:
     FactoryPtr<IEnvironmentRender> m_pRender;
-    BOOL bNeed_re_create_env;
+    bool bNeed_re_create_env;
 
     float wind_strength_factor;
     float wind_gust_factor;

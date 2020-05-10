@@ -14,7 +14,7 @@ inline void CGameGraph::Initialize(IReader& stream, bool own)
     m_reader = &stream;
     m_header.load(m_reader);
     ASSERT_XRAI_VERSION_MATCH(header().version(), "Game graph version mismatch!");
-    m_nodes = (CVertex*)m_reader->pointer();
+    m_nodes = (CGameVertex*)m_reader->pointer();
     m_current_level_some_vertex_id = _GRAPH_ID(-1);
     m_enabled.assign(header().vertex_count(), true);
 
@@ -103,7 +103,7 @@ IC const CGameGraph::_GRAPH_ID& CGameGraph::value(u32 const /*vertex_id*/, const
 }
 
 IC const float& CGameGraph::edge_weight(const_iterator i) const { return (i->distance()); }
-IC const CGameGraph::CVertex* CGameGraph::vertex(u32 const vertex_id) const { return (m_nodes + vertex_id); }
+IC const CGameGraph::CGameVertex* CGameGraph::vertex(u32 const vertex_id) const { return (m_nodes + vertex_id); }
 IC const u8& CGameGraph::CHeader::version() const { return (m_version); }
 IC GameGraph::_LEVEL_ID GameGraph::CHeader::level_count() const
 {
@@ -165,20 +165,20 @@ IC const GameGraph::SLevel* GameGraph::CHeader::level(LPCSTR level_name, bool) c
 }
 
 IC const xrGUID& CGameGraph::CHeader::guid() const { return (m_guid); }
-IC const Fvector& GameGraph::CVertex::level_point() const { return (tLocalPoint); }
-IC const Fvector& GameGraph::CVertex::game_point() const { return (tGlobalPoint); }
-IC GameGraph::_LEVEL_ID GameGraph::CVertex::level_id() const { return (tLevelID); }
-IC u32 GameGraph::CVertex::level_vertex_id() const { return (tNodeID); }
-IC const u8* GameGraph::CVertex::vertex_type() const { return (tVertexTypes); }
-IC const u8& GameGraph::CVertex::edge_count() const { return (tNeighbourCount); }
-IC const u8& GameGraph::CVertex::death_point_count() const { return (tDeathPointCount); }
-IC const u32& GameGraph::CVertex::edge_offset() const { return (dwEdgeOffset); }
-IC const u32& GameGraph::CVertex::death_point_offset() const { return (dwPointOffset); }
+IC const Fvector& GameGraph::CGameVertex::level_point() const { return (tLocalPoint); }
+IC const Fvector& GameGraph::CGameVertex::game_point() const { return (tGlobalPoint); }
+IC GameGraph::_LEVEL_ID GameGraph::CGameVertex::level_id() const { return (tLevelID); }
+IC u32 GameGraph::CGameVertex::level_vertex_id() const { return (tNodeID); }
+IC const u8* GameGraph::CGameVertex::vertex_type() const { return (tVertexTypes); }
+IC const u8& GameGraph::CGameVertex::edge_count() const { return (tNeighbourCount); }
+IC const u8& GameGraph::CGameVertex::death_point_count() const { return (tDeathPointCount); }
+IC const u32& GameGraph::CGameVertex::edge_offset() const { return (dwEdgeOffset); }
+IC const u32& GameGraph::CGameVertex::death_point_offset() const { return (dwPointOffset); }
 IC const GameGraph::_GRAPH_ID& GameGraph::CEdge::vertex_id() const { return (m_vertex_id); }
 IC const float& GameGraph::CEdge::distance() const { return (m_path_distance); }
 IC void CGameGraph::begin_spawn(u32 const vertex_id, const_spawn_iterator& start, const_spawn_iterator& end) const
 {
-    const CVertex* object = vertex(vertex_id);
+    const CGameVertex* object = vertex(vertex_id);
     start = (const_spawn_iterator)((u8*)m_nodes + object->death_point_offset());
     end = start + object->death_point_count();
 }
@@ -189,7 +189,7 @@ IC void CGameGraph::set_invalid_vertex(_GRAPH_ID& vertex_id) const
     VERIFY(!valid_vertex_id(vertex_id));
 }
 
-IC GameGraph::_GRAPH_ID CGameGraph::vertex_id(const CGameGraph::CVertex* vertex) const
+IC GameGraph::_GRAPH_ID CGameGraph::vertex_id(const CGameGraph::CGameVertex* vertex) const
 {
     VERIFY(valid_vertex_id(_GRAPH_ID(vertex - m_nodes)));
     return (_GRAPH_ID(vertex - m_nodes));
@@ -307,8 +307,8 @@ IC void CGameGraph::save(IWriter& stream)
     m_header.save(&stream);
 
     u8* buffer = (u8*)m_nodes;
-    stream.w(buffer, header().vertex_count() * sizeof(CVertex));
-    buffer += header().vertex_count() * sizeof(CVertex);
+    stream.w(buffer, header().vertex_count() * sizeof(CGameVertex));
+    buffer += header().vertex_count() * sizeof(CGameVertex);
 
     stream.w(buffer, header().edge_count() * sizeof(CGameGraph::CEdge));
     buffer += header().edge_count() * sizeof(CGameGraph::CEdge);

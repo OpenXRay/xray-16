@@ -684,9 +684,6 @@
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="blender_fxaa.h">
-      <Filter>Shading templates</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
@@ -1268,12 +1265,6 @@
     <ClCompile Include="r3_R_sun.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="blender_fxaa.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
-    <ClCompile Include="r3_rendertarget_phase_FXAA.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r3_shaders.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1282,6 +1273,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX10\dx10HWCaps.cpp">
       <Filter>Refactored\HW</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

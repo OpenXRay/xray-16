@@ -6,7 +6,7 @@ ScheduledBase::ScheduledBase()
 {
     shedule.t_min = 20;
     shedule.t_max = 1000;
-    shedule.b_locked = FALSE;
+    shedule.b_locked = false;
 #ifdef DEBUG
     shedule.dbg_startframe = 1;
     shedule.dbg_update_shedule = 0;
@@ -32,7 +32,7 @@ void ScheduledBase::shedule_Update(u32 dt)
 #ifdef DEBUG
     if (shedule.dbg_startframe == shedule.dbg_update_shedule)
     {
-        LPCSTR name = "unknown";
+        pcstr name = "unknown";
         const auto object = dynamic_cast<IGameObject*>(this);
         if (object)
             name = object->cName().c_str();

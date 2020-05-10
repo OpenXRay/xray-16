@@ -41,13 +41,24 @@ void CUIActorMenu::SetActor(CInventoryOwner* io)
     R_ASSERT(!IsShown());
     m_last_time = Device.dwTimeGlobal;
     m_pActorInvOwner = io;
+}
 
+void CUIActorMenu::SetPartner(CInventoryOwner* io)
+{
+    R_ASSERT(!IsShown());
+    m_pPartnerInvOwner = io;
+}
+
+void CUIActorMenu::InitActorInfo()
+{
+    if (!GetModeSpecificActorInfo())
+        return;
     if (IsGameTypeSingle())
     {
-        if (io)
-            m_ActorCharacterInfo->InitCharacter(m_pActorInvOwner->object_id());
+        if (m_pActorInvOwner)
+            GetModeSpecificActorInfo()->InitCharacter(m_pActorInvOwner->object_id());
         else
-            m_ActorCharacterInfo->ClearInfo();
+            GetModeSpecificActorInfo()->ClearInfo();
     }
     else
     {
@@ -55,21 +66,19 @@ void CUIActorMenu::SetActor(CInventoryOwner* io)
     }
 }
 
-void CUIActorMenu::SetPartner(CInventoryOwner* io)
+void CUIActorMenu::InitPartnerInfo()
 {
-    R_ASSERT(!IsShown());
-    m_pPartnerInvOwner = io;
     if (m_pPartnerInvOwner)
     {
         if (m_pPartnerInvOwner->use_simplified_visual())
-            m_PartnerCharacterInfo->ClearInfo();
+            GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
         else
-            m_PartnerCharacterInfo->InitCharacter(m_pPartnerInvOwner->object_id());
+            GetModeSpecificPartnerInfo(m_currMenuMode)->InitCharacter(m_pPartnerInvOwner->object_id());
 
-        SetInvBox(NULL);
+        SetInvBox(nullptr);
     }
     else
-        m_PartnerCharacterInfo->ClearInfo();
+        GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
 }
 
 void CUIActorMenu::SetInvBox(CInventoryBox* box)
@@ -79,14 +88,16 @@ void CUIActorMenu::SetInvBox(CInventoryBox* box)
     if (box)
     {
         m_pInvBox->set_in_use(true);
-        SetPartner(NULL);
+        SetPartner(nullptr);
     }
 }
 
 void CUIActorMenu::SetMenuMode(EMenuMode mode)
 {
     SetCurrentItem(NULL);
-    m_hint_wnd->set_text(NULL);
+    if (m_hint_wnd)
+        m_hint_wnd->set_text(NULL);
+    m_message_static = nullptr;
 
     if (mode != m_currMenuMode)
     {
@@ -133,7 +144,9 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
             break;
         default: R_ASSERT(0); break;
         }
-        UpdateConditionProgressBars();
+        InitActorInfo();
+        if (m_currMenuMode != mmUndefined && m_currMenuMode != mmInventory)
+            InitPartnerInfo();
         CurModeToScript();
     } // if
 
@@ -167,6 +180,7 @@ void CUIActorMenu::Show(bool status)
         SetMenuMode(mmUndefined);
     }
     m_ActorStateInfo->Show(status);
+    m_message_static = nullptr;
 }
 
 void CUIActorMenu::Draw()
@@ -175,8 +189,12 @@ void CUIActorMenu::Draw()
     CurrentGameUI()->UIMainIngameWnd->DrawMainIndicatorsForInventory();
 
     inherited::Draw();
-    m_ItemInfo->Draw();
-    m_hint_wnd->Draw();
+    if (m_ItemInfo)
+        m_ItemInfo->Draw();
+    if (m_hint_wnd)
+        m_hint_wnd->Draw();
+    if (m_message_static)
+        m_message_static->Draw();
 }
 
 void CUIActorMenu::Update()
@@ -205,6 +223,16 @@ void CUIActorMenu::Update()
         if (m_pPartnerInvOwner->inventory().ModifyFrame() != m_trade_partner_inventory_state)
             InitPartnerInventoryContents();
         CheckDistance();
+        if (m_message_static)
+        {
+            m_message_static->Update();
+            if (!m_message_static->IsActual())
+            {
+                CurrentGameUI()->RemoveCustomStatic("not_enough_money_mine");
+                CurrentGameUI()->RemoveCustomStatic("not_enough_money_other");
+                m_message_static = nullptr;
+            }
+        }
         break;
     }
     case mmUpgrade:
@@ -223,8 +251,10 @@ void CUIActorMenu::Update()
     }
 
     inherited::Update();
-    m_ItemInfo->Update();
-    m_hint_wnd->Update();
+    if (m_ItemInfo)
+        m_ItemInfo->Update();
+    if (m_hint_wnd)
+        m_hint_wnd->Update();
 }
 
 bool CUIActorMenu::StopAnyMove() // true = актёр не идёт при открытом меню
@@ -269,36 +299,38 @@ void CUIActorMenu::CheckDistance()
 
 EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 {
-    if (l == m_pInventoryBagList)
+    if (l == m_pLists[eInventoryBagList])
         return iActorBag;
-    if (l == m_pInventoryBeltList)
+    if (l == m_pLists[eInventoryBeltList])
         return iActorBelt;
 
-    if (l == m_pInventoryAutomaticList)
+    if (l == m_pLists[eInventoryAutomaticList])
         return iActorSlot;
-    if (l == m_pInventoryPistolList)
+    if (l == m_pLists[eInventoryPistolList])
         return iActorSlot;
-    if (l == m_pInventoryOutfitList)
+    if (l == m_pLists[eInventoryOutfitList])
         return iActorSlot;
-    if (l == m_pInventoryHelmetList && m_pInventoryHelmetList != nullptr)
+    if (l == m_pLists[eInventoryHelmetList] && m_pLists[eInventoryHelmetList] != nullptr)
         return iActorSlot;
-    if (l == m_pInventoryDetectorList)
+    if (l == m_pLists[eInventoryDetectorList] && m_pLists[eInventoryDetectorList] != nullptr)
         return iActorSlot;
 
-    if (l == m_pTradeActorBagList)
+    if (l == m_pLists[eTradeActorBagList])
         return iActorBag;
-    if (l == m_pTradeActorList)
+    if (l == m_pLists[eTradeActorList])
         return iActorTrade;
-    if (l == m_pTradePartnerBagList)
+    if (l == m_pLists[eTradePartnerBagList])
         return iPartnerTradeBag;
-    if (l == m_pTradePartnerList)
+    if (l == m_pLists[eTradePartnerList])
         return iPartnerTrade;
-    if (l == m_pDeadBodyBagList)
+    if (l == m_pLists[eSearchLootBagList])
         return iDeadBodyBag;
+    if (l == m_pLists[eSearchLootActorBagList])
+        return iActorBag;
 
     if (l == m_pQuickSlot && m_pQuickSlot != nullptr)
         return iQuickSlot;
-    if (l == m_pTrashList && m_pTrashList != nullptr)
+    if (l == m_pLists[eTrashList] && m_pLists[eTrashList] != nullptr)
         return iTrashSlot;
 
     NODEFAULT;
@@ -313,15 +345,17 @@ CUIDragDropListEx* CUIActorMenu::GetListByType(EDDListType t)
     case iActorBag:
     {
         if (m_currMenuMode == mmTrade)
-            return m_pTradeActorBagList;
+            return m_pLists[eTradeActorBagList];
+        else if (m_currMenuMode == mmDeadBodySearch)
+            return m_pLists[eSearchLootActorBagList];
         else
-            return m_pInventoryBagList;
+            return m_pLists[eInventoryBagList];
     }
     break;
-    case iDeadBodyBag: { return m_pDeadBodyBagList;
+    case iDeadBodyBag: { return m_pLists[eSearchLootBagList];
     }
     break;
-    case iActorBelt: { return m_pInventoryBeltList;
+    case iActorBelt: { return m_pLists[eInventoryBeltList];
     }
     break;
     default: { R_ASSERT("invalid call");
@@ -343,6 +377,9 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
     }
     TryHidePropertiesBox();
 
+    if (GetModeSpecificItemInfo())
+        GetModeSpecificItemInfo()->InitItem(itm);
+
     if (m_currMenuMode == mmUpgrade)
     {
         SetupUpgradeItem();
@@ -351,6 +388,8 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
 
 void CUIActorMenu::InfoCurItem(CUICellItem* cell_item)
 {
+    if (!m_ItemInfo)
+        return;
     if (!cell_item)
     {
         m_ItemInfo->InitItem(nullptr);
@@ -414,6 +453,44 @@ void CUIActorMenu::InfoCurItem(CUICellItem* cell_item)
     fit_in_rect(m_ItemInfo, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH - dx_pos, UI_BASE_HEIGHT), 10.0f, dx_pos);
 }
 
+CUIItemInfo* CUIActorMenu::GetModeSpecificItemInfo()
+{
+    switch (m_currMenuMode)
+    {
+    case mmInventory:      return m_ItemInfoInventoryMode;
+    case mmTrade:          return m_ItemInfoTradeMode;
+    case mmDeadBodySearch: return m_ItemInfoSearchLootMode;
+    }
+    return nullptr;
+}
+
+CUICharacterInfo* CUIActorMenu::GetModeSpecificActorInfo() const
+{
+    switch (m_currMenuMode)
+    {
+    case mmTrade:          return m_TradeActorCharacterInfo;
+    case mmDeadBodySearch: return m_SearchLootActorCharacterInfo;
+    }
+    return m_ActorCharacterInfo;
+}
+
+CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo(EMenuMode fallback) const
+{
+    switch (m_currMenuMode)
+    {
+    case mmTrade:          return m_TradePartnerCharacterInfo;
+    case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
+    }
+    if (m_PartnerCharacterInfo)
+        return m_PartnerCharacterInfo;
+    switch (fallback)
+    {
+    case mmTrade:          return m_TradePartnerCharacterInfo;
+    case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
+    }
+    return nullptr;
+}
+
 void CUIActorMenu::UpdateItemsPlace()
 {
     switch (m_currMenuMode)
@@ -437,46 +514,33 @@ void CUIActorMenu::UpdateItemsPlace()
 
 void CUIActorMenu::clear_highlight_lists()
 {
-    if (m_InvSlot2Highlight)
-        m_InvSlot2Highlight->Show(false);
-
-    if (m_InvSlot3Highlight)
-        m_InvSlot3Highlight->Show(false);
-
-    if (m_HelmetSlotHighlight)
-        m_HelmetSlotHighlight->Show(false);
-
-    if (m_OutfitSlotHighlight)
-        m_OutfitSlotHighlight->Show(false);
-
-    if (m_DetectorSlotHighlight)
-        m_DetectorSlotHighlight->Show(false);
-
-    if (m_QuickSlotsHighlight[0])
-    {
-        for (u8 i = 0; i < 4; i++)
-            m_QuickSlotsHighlight[i]->Show(false);
-    }
-    if (m_ArtefactSlotsHighlight[0])
-    {
-        for (u8 i = 0; i < e_af_count; i++)
-            m_ArtefactSlotsHighlight[i]->Show(false);
-    }
-
-    m_pInventoryBagList->clear_select_armament();
+    m_pLists[eInventoryPistolList]->Highlight(false);
+    m_pLists[eInventoryAutomaticList]->Highlight(false);
+    if (m_pLists[eInventoryHelmetList])
+        m_pLists[eInventoryHelmetList]->Highlight(false);
+    m_pLists[eInventoryOutfitList]->Highlight(false);
+    if (m_pLists[eInventoryDetectorList])
+        m_pLists[eInventoryDetectorList]->Highlight(false);
+    m_pLists[eInventoryBeltList]->Highlight(false);
+    m_pLists[eInventoryBagList]->clear_select_armament();
+    if (m_pQuickSlot)
+        m_pQuickSlot->Highlight(false);
 
     switch (m_currMenuMode)
     {
     case mmUndefined: break;
     case mmInventory: break;
     case mmTrade:
-        m_pTradeActorBagList->clear_select_armament();
-        m_pTradeActorList->clear_select_armament();
-        m_pTradePartnerBagList->clear_select_armament();
-        m_pTradePartnerList->clear_select_armament();
+        m_pLists[eTradeActorBagList]->clear_select_armament();
+        m_pLists[eTradeActorList]->clear_select_armament();
+        m_pLists[eTradePartnerBagList]->clear_select_armament();
+        m_pLists[eTradePartnerList]->clear_select_armament();
         break;
     case mmUpgrade: break;
-    case mmDeadBodySearch: m_pDeadBodyBagList->clear_select_armament(); break;
+    case mmDeadBodySearch:
+        m_pLists[eSearchLootBagList]->clear_select_armament();
+        m_pLists[eSearchLootActorBagList]->clear_select_armament();
+        break;
     }
     m_highlight_clear = true;
 }
@@ -499,28 +563,25 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     u16 slot_id = item->BaseSlot();
     if (weapon && (slot_id == INV_SLOT_2 || slot_id == INV_SLOT_3))
     {
-        if (m_InvSlot2Highlight)
-            m_InvSlot2Highlight->Show(true);
-        if (m_InvSlot3Highlight)
-            m_InvSlot3Highlight->Show(true);
+        m_pLists[eInventoryPistolList]->Highlight(true);
+        m_pLists[eInventoryAutomaticList]->Highlight(true);
         return;
     }
     if (helmet && slot_id == HELMET_SLOT)
     {
-        if (m_HelmetSlotHighlight)
-            m_HelmetSlotHighlight->Show(true);
+        if (m_pLists[eInventoryHelmetList])
+            m_pLists[eInventoryHelmetList]->Highlight(true);
         return;
     }
     if (outfit && slot_id == OUTFIT_SLOT)
     {
-        if (m_OutfitSlotHighlight)
-            m_OutfitSlotHighlight->Show(true);
+        m_pLists[eInventoryOutfitList]->Highlight(true);
         return;
     }
     if (detector && slot_id == DETECTOR_SLOT)
     {
-        if (m_DetectorSlotHighlight)
-            m_DetectorSlotHighlight->Show(true);
+        if (m_pLists[eInventoryDetectorList])
+            m_pLists[eInventoryDetectorList]->Highlight(true);
         return;
     }
     if (eatable)
@@ -528,11 +589,8 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
         if (cell_item->OwnerList() && GetListType(cell_item->OwnerList()) == iQuickSlot)
             return;
 
-        if (m_QuickSlotsHighlight[0])
-        {
-            for (u8 i = 0; i < 4; i++)
-                m_QuickSlotsHighlight[i]->Show(true);
-        }
+        if (m_pQuickSlot)
+            m_pQuickSlot->Highlight(true);
         return;
     }
     if (artefact)
@@ -540,12 +598,7 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
         if (cell_item->OwnerList() && GetListType(cell_item->OwnerList()) == iActorBelt)
             return;
 
-        if (m_ArtefactSlotsHighlight[0])
-        {
-            Ivector2 cap = m_pInventoryBeltList->CellsCapacity();
-            for (u8 i = 0; i < cap.x; i++)
-                m_ArtefactSlotsHighlight[i]->Show(true);
-        }
+        m_pLists[eInventoryBeltList]->Highlight(true);
         return;
     }
 }
@@ -564,21 +617,21 @@ void CUIActorMenu::set_highlight_item(CUICellItem* cell_item)
     case mmInventory:
     case mmUpgrade:
     {
-        highlight_armament(item, m_pInventoryBagList);
+        highlight_armament(item, m_pLists[eInventoryBagList]);
         break;
     }
     case mmTrade:
     {
-        highlight_armament(item, m_pTradeActorBagList);
-        highlight_armament(item, m_pTradeActorList);
-        highlight_armament(item, m_pTradePartnerBagList);
-        highlight_armament(item, m_pTradePartnerList);
+        highlight_armament(item, m_pLists[eTradeActorBagList]);
+        highlight_armament(item, m_pLists[eTradeActorList]);
+        highlight_armament(item, m_pLists[eTradePartnerBagList]);
+        highlight_armament(item, m_pLists[eTradePartnerList]);
         break;
     }
     case mmDeadBodySearch:
     {
-        highlight_armament(item, m_pInventoryBagList);
-        highlight_armament(item, m_pDeadBodyBagList);
+        highlight_armament(item, m_pLists[eSearchLootBagList]);
+        highlight_armament(item, m_pLists[eSearchLootActorBagList]);
         break;
     }
     }
@@ -790,31 +843,44 @@ void CUIActorMenu::highlight_weapons_for_addon(PIItem addon_item, CUIDragDropLis
 
 void CUIActorMenu::ClearAllLists()
 {
-    // Xottab_DUTY: Let others can launch SOC without debugger
-    // XXX: to be removed
-    if (ShadowOfChernobylMode)
-        return;
-    m_pInventoryBagList->ClearAll(true);
+    m_pLists[eInventoryBagList]->ClearAll(true);
 
-    m_pInventoryBeltList->ClearAll(true);
-    m_pInventoryOutfitList->ClearAll(true);
-    if (m_pInventoryHelmetList)
-        m_pInventoryHelmetList->ClearAll(true);
-    m_pInventoryDetectorList->ClearAll(true);
-    m_pInventoryPistolList->ClearAll(true);
-    m_pInventoryAutomaticList->ClearAll(true);
+    m_pLists[eInventoryBeltList]->ClearAll(true);
+    m_pLists[eInventoryOutfitList]->ClearAll(true);
+    if (m_pLists[eInventoryHelmetList])
+        m_pLists[eInventoryHelmetList]->ClearAll(true);
+    if (m_pLists[eInventoryDetectorList])
+        m_pLists[eInventoryDetectorList]->ClearAll(true);
+    m_pLists[eInventoryPistolList]->ClearAll(true);
+    m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)
         m_pQuickSlot->ClearAll(true);
 
-    m_pTradeActorBagList->ClearAll(true);
-    m_pTradeActorList->ClearAll(true);
-    m_pTradePartnerBagList->ClearAll(true);
-    m_pTradePartnerList->ClearAll(true);
-    m_pDeadBodyBagList->ClearAll(true);
+    m_pLists[eTradeActorBagList]->ClearAll(true);
+    m_pLists[eTradeActorList]->ClearAll(true);
+    m_pLists[eTradePartnerBagList]->ClearAll(true);
+    m_pLists[eTradePartnerList]->ClearAll(true);
+    m_pLists[eSearchLootBagList]->ClearAll(true);
+    m_pLists[eSearchLootActorBagList]->ClearAll(true);
+}
+
+void CUIActorMenu::ShowMessage(pcstr text, pcstr staticMessage /*= nullptr*/, float staticMsgTtl /*= -1.0f*/)
+{
+    if (m_message_box_ok)
+        CallMessageBoxOK(text);
+    else if (staticMessage && ShadowOfChernobylMode)
+    {
+        m_message_static = CurrentGameUI()->AddCustomStatic(staticMessage, true, staticMsgTtl);
+    }
 }
 
 void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)
 {
+    if (!m_message_box_yes_no)
+    {
+        OnMesBoxYes(this, nullptr);
+        return;
+    }
     m_message_box_yes_no->SetText(text);
     m_message_box_yes_no->func_on_ok = CUIWndCallback::void_function(this, &CUIActorMenu::OnMesBoxYes);
     m_message_box_yes_no->func_on_no = CUIWndCallback::void_function(this, &CUIActorMenu::OnMesBoxNo);
@@ -823,6 +889,8 @@ void CUIActorMenu::CallMessageBoxYesNo(LPCSTR text)
 
 void CUIActorMenu::CallMessageBoxOK(LPCSTR text)
 {
+    if (!m_message_box_ok)
+        return;
     m_message_box_ok->SetText(text);
     m_message_box_ok->ShowDialog(false);
 }
@@ -839,7 +907,7 @@ void CUIActorMenu::UpdateActorMP()
 {
     if (!&Level() || !Level().game || !Game().local_player || !m_pActorInvOwner || IsGameTypeSingle())
     {
-        m_ActorCharacterInfo->ClearInfo();
+        GetModeSpecificActorInfo()->ClearInfo();
         m_ActorMoney->SetText("");
         return;
     }
@@ -850,7 +918,7 @@ void CUIActorMenu::UpdateActorMP()
     xr_sprintf(buf, "%d RU", money);
     m_ActorMoney->SetText(buf);
 
-    m_ActorCharacterInfo->InitCharacterMP(Game().local_player->getName(), "ui_npc_u_nebo_1");
+    GetModeSpecificActorInfo()->InitCharacterMP(Game().local_player->getName(), "ui_npc_u_nebo_1");
 }
 
 bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_slot)
@@ -862,59 +930,17 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
         return true;
     }
 
-    if (item_slot == INV_SLOT_3 && l == m_pInventoryPistolList)
+    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList])
     {
         ret_slot = INV_SLOT_2;
         return true;
     }
 
-    if (item_slot == INV_SLOT_2 && l == m_pInventoryAutomaticList)
+    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList])
     {
         ret_slot = INV_SLOT_3;
         return true;
     }
 
     return false;
-}
-void CUIActorMenu::UpdateConditionProgressBars()
-{
-    PIItem itm;
-    
-    if (m_WeaponSlot1_progress)
-    {
-        itm = m_pActorInvOwner->inventory().ItemFromSlot(INV_SLOT_2);
-        if (itm)
-        {
-            m_WeaponSlot1_progress->SetProgressPos(iCeil(itm->GetCondition() * 15.0f) / 15.0f);
-        }
-        else
-            m_WeaponSlot1_progress->SetProgressPos(0);
-    }
-
-    if (m_WeaponSlot2_progress)
-    {
-        itm = m_pActorInvOwner->inventory().ItemFromSlot(INV_SLOT_3);
-        if (itm)
-            m_WeaponSlot2_progress->SetProgressPos(iCeil(itm->GetCondition() * 15.0f) / 15.0f);
-        else
-            m_WeaponSlot2_progress->SetProgressPos(0);
-    }
-
-    if (m_Outfit_progress)
-    {
-        itm = m_pActorInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT);
-        if (itm)
-            m_Outfit_progress->SetProgressPos(iCeil(itm->GetCondition() * 15.0f) / 15.0f);
-        else
-            m_Outfit_progress->SetProgressPos(0);
-    }
-
-    if (m_Helmet_progress)
-    {
-        itm = m_pActorInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
-        if (itm)
-            m_Helmet_progress->SetProgressPos(iCeil(itm->GetCondition() * 15.0f) / 15.0f);
-        else
-            m_Helmet_progress->SetProgressPos(0);
-    }
 }

@@ -87,6 +87,8 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -102,6 +104,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -117,6 +121,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -132,6 +138,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -148,6 +156,8 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <ResourceCompile />
     <Link>
@@ -164,6 +174,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -183,39 +195,12 @@
     <ClInclude Include="CustomHUD.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="device.h" />
-    <ClInclude Include="editor_environment_ambients_ambient.hpp" />
-    <ClInclude Include="editor_environment_ambients_effect_id.hpp" />
-    <ClInclude Include="editor_environment_ambients_manager.hpp" />
-    <ClInclude Include="editor_environment_ambients_sound_id.hpp" />
-    <ClInclude Include="editor_environment_detail.hpp" />
-    <ClInclude Include="editor_environment_effects_effect.hpp" />
-    <ClInclude Include="editor_environment_effects_manager.hpp" />
-    <ClInclude Include="editor_environment_levels_manager.hpp" />
-    <ClInclude Include="editor_environment_manager.hpp" />
-    <ClInclude Include="editor_environment_sound_channels_channel.hpp" />
-    <ClInclude Include="editor_environment_sound_channels_manager.hpp" />
-    <ClInclude Include="editor_environment_sound_channels_source.hpp" />
-    <ClInclude Include="editor_environment_suns_blend.hpp" />
-    <ClInclude Include="editor_environment_suns_flare.hpp" />
-    <ClInclude Include="editor_environment_suns_flares.hpp" />
-    <ClInclude Include="editor_environment_suns_gradient.hpp" />
-    <ClInclude Include="editor_environment_suns_manager.hpp" />
-    <ClInclude Include="editor_environment_suns_sun.hpp" />
-    <ClInclude Include="editor_environment_thunderbolts_collection.hpp" />
-    <ClInclude Include="editor_environment_thunderbolts_gradient.hpp" />
-    <ClInclude Include="editor_environment_thunderbolts_manager.hpp" />
-    <ClInclude Include="editor_environment_thunderbolts_thunderbolt.hpp" />
-    <ClInclude Include="editor_environment_thunderbolts_thunderbolt_id.hpp" />
-    <ClInclude Include="editor_environment_weathers_manager.hpp" />
-    <ClInclude Include="editor_environment_weathers_time.hpp" />
-    <ClInclude Include="editor_environment_weathers_weather.hpp" />
     <ClInclude Include="edit_actions.h" />
     <ClInclude Include="Effector.h" />
     <ClInclude Include="EffectorPP.h" />
     <ClInclude Include="embedded_resources_management.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EngineAPI.h" />
-    <ClInclude Include="engine_impl.hpp" />
     <ClInclude Include="EnnumerateVertices.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="EventAPI.h" />
@@ -227,7 +212,6 @@
     <ClInclude Include="GameFont.h" />
     <ClInclude Include="GameMtlLib.h" />
     <ClInclude Include="ICollidable.h" />
-    <ClInclude Include="ide.hpp" />
     <ClInclude Include="IGameFont.hpp" />
     <ClInclude Include="IGame_Level.h" />
     <ClInclude Include="IGame_ObjectPool.h" />
@@ -254,9 +238,6 @@
     <ClInclude Include="profiler.h" />
     <ClInclude Include="profiler_inline.h" />
     <ClInclude Include="Properties.h" />
-    <ClInclude Include="property_collection.hpp" />
-    <ClInclude Include="property_collection_forward.hpp" />
-    <ClInclude Include="property_collection_inline.hpp" />
     <ClInclude Include="PS_instance.h" />
     <ClInclude Include="pure.h" />
     <ClInclude Include="pure_relcase.h" />
@@ -306,41 +287,11 @@
     <ClCompile Include="Device_Misc.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />
     <ClCompile Include="Device_wndproc.cpp" />
-    <ClCompile Include="editor_environment_ambients_ambient.cpp" />
-    <ClCompile Include="editor_environment_ambients_effect_id.cpp" />
-    <ClCompile Include="editor_environment_ambients_manager.cpp" />
-    <ClCompile Include="editor_environment_ambients_sound_id.cpp" />
-    <ClCompile Include="editor_environment_detail.cpp" />
-    <ClCompile Include="editor_environment_effects_effect.cpp" />
-    <ClCompile Include="editor_environment_effects_manager.cpp" />
-    <ClCompile Include="editor_environment_levels_manager.cpp" />
-    <ClCompile Include="editor_environment_manager.cpp" />
-    <ClCompile Include="editor_environment_manager_properties.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="editor_environment_sound_channels_channel.cpp" />
-    <ClCompile Include="editor_environment_sound_channels_manager.cpp" />
-    <ClCompile Include="editor_environment_sound_channels_source.cpp" />
-    <ClCompile Include="editor_environment_suns_blend.cpp" />
-    <ClCompile Include="editor_environment_suns_flare.cpp" />
-    <ClCompile Include="editor_environment_suns_flares.cpp" />
-    <ClCompile Include="editor_environment_suns_gradient.cpp" />
-    <ClCompile Include="editor_environment_suns_manager.cpp" />
-    <ClCompile Include="editor_environment_suns_sun.cpp" />
-    <ClCompile Include="editor_environment_thunderbolts_collection.cpp" />
-    <ClCompile Include="editor_environment_thunderbolts_gradient.cpp" />
-    <ClCompile Include="editor_environment_thunderbolts_manager.cpp" />
-    <ClCompile Include="editor_environment_thunderbolts_thunderbolt.cpp" />
-    <ClCompile Include="editor_environment_thunderbolts_thunderbolt_id.cpp" />
-    <ClCompile Include="editor_environment_weathers_manager.cpp" />
-    <ClCompile Include="editor_environment_weathers_time.cpp" />
-    <ClCompile Include="editor_environment_weathers_weather.cpp" />
     <ClCompile Include="edit_actions.cpp" />
     <ClCompile Include="Effector.cpp" />
     <ClCompile Include="EffectorPP.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="EngineAPI.cpp" />
-    <ClCompile Include="engine_impl.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Environment_misc.cpp" />
     <ClCompile Include="Environment_render.cpp" />
@@ -466,8 +417,8 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
-    <Import Project="..\packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('..\packages\sdl2.2.0.5\build\native\sdl2.targets')" />
+    <Import Project="..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
@@ -478,7 +429,7 @@
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

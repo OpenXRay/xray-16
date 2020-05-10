@@ -9,7 +9,7 @@
 #define MMNOAUX
 #define MMNOMIXER
 #define MMNOJOY
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <mmsystem.h>
 #endif
 #include "SDL.h"
@@ -23,11 +23,10 @@
 #include "xrCore/FS_impl.h"
 
 #include "Include/editor/ide.hpp"
-#include "engine_impl.hpp"
 
 #include "xrEngine/TaskScheduler.hpp"
 
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
 #endif
 #include "IGame_Persistent.h"
@@ -39,14 +38,14 @@
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
-ENGINE_API BOOL g_bRendering = FALSE;
+ENGINE_API bool g_bRendering = false;
 
 const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
 extern int ps_always_active;
 
-BOOL g_bLoaded = FALSE;
+bool g_bLoaded = false;
 ref_light precache_light = 0;
 
 bool CRenderDevice::RenderBegin()
@@ -54,11 +53,7 @@ bool CRenderDevice::RenderBegin()
     if (GEnv.isDedicatedServer)
         return true;
 
-    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-    if (!isDX9Renderer)
-        LastDeviceState = GEnv.Render->GetDeviceState();
-
-    switch (LastDeviceState)
+    switch (GEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
@@ -75,7 +70,7 @@ bool CRenderDevice::RenderBegin()
     }
     GEnv.Render->Begin();
     FPU::m24r();
-    g_bRendering = TRUE;
+    g_bRendering = true;
 
     return true;
 }
@@ -113,14 +108,14 @@ void CRenderDevice::RenderEnd(void)
             {
                 Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
                 if ((flags & SDL_WINDOW_INPUT_FOCUS) == 0)
-                    Pause(TRUE, TRUE, TRUE, "application start");
+                    Pause(true, true, true, "application start");
             }
         }
     }
-    g_bRendering = FALSE;
+    g_bRendering = false;
     // end scene
     // Present goes here, so call OA Frame end.
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(Device.fTimeGlobal);
 #endif
@@ -161,43 +156,6 @@ void CRenderDevice::RenderThreadProc(void* context)
             device.stats.RenderTotal.accum = renderTotalReal.accum;
         }
         device.renderFrameDone.Set();
-    }
-}
-
-void CRenderDevice::PrimaryThreadProc(void* context)
-{
-    auto& device = *static_cast<CRenderDevice*>(context);
-
-    Core.CoInitializeMultithreaded();
-
-    device.CreateInternal();
-
-    GEnv.Render->MakeContextCurrent(IRender::NoContext);
-    device.deviceCreated.Set();
-
-    device.deviceReadyToRun.Wait();
-    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
-
-    GEnv.Render->ClearTarget();
-
-    while (true)
-    {
-        device.primaryProcessFrame.Wait();
-        if (device.mt_bMustExit)
-        {
-            GEnv.Render->MakeContextCurrent(IRender::NoContext);
-            device.primaryThreadExit.Set();
-            return;
-        }
-
-        if (device.shouldReset) // never happen on DX9, will be done in message_loop()
-        {
-            device.ResetInternal(device.precacheWhileReset);
-        }
-
-        device.ProcessFrame();
-
-        device.primaryFrameDone.Set();
     }
 }
 
@@ -293,7 +251,7 @@ bool CRenderDevice::BeforeFrame()
         return false;
     }
 
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
 #endif
@@ -366,7 +324,7 @@ void CRenderDevice::ProcessFrame()
 
     // renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
-    mtProcessingAllowed = true;
+    //mtProcessingAllowed = true;
 
     DoRender();
 
@@ -386,9 +344,9 @@ void CRenderDevice::ProcessFrame()
 
     syncFrameDone.Wait(); // wait until secondary thread finish its job
     // renderFrameDone.Wait(); // wait until render thread finish its job
-    while (!TaskScheduler->TaskQueueIsEmpty())
-        std::this_thread::yield();
-    mtProcessingAllowed = false;
+    //while (!TaskScheduler->TaskQueueIsEmpty())
+    //    std::this_thread::yield();
+    //mtProcessingAllowed = false;
 
     if (!b_is_Active)
         Sleep(1);
@@ -398,7 +356,6 @@ void CRenderDevice::message_loop_weather_editor()
 {
     m_editor->run();
     m_editor_finalize(m_editor);
-    xr_delete(m_engine);
 }
 
 void CRenderDevice::message_loop()
@@ -409,21 +366,14 @@ void CRenderDevice::message_loop()
         return;
     }
 
-    const static bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-
-    bool timedOut = false;
     bool canCallActivate = false;
     bool shouldActivate = false;
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
         SDL_Event events[MAX_WINDOW_EVENTS];
-        int count = 0;
-        if (!timedOut)
-        {
-            count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-                SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
-        }
+        const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
 
         for (int i = 0; i < count; ++i)
         {
@@ -439,7 +389,6 @@ void CRenderDevice::message_loop()
                     UpdateWindowRects();
                     break;
 
-                case SDL_WINDOWEVENT_RESIZED:
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                 {
                     if (!psDeviceFlags.is(rsFullscreen))
@@ -489,7 +438,6 @@ void CRenderDevice::message_loop()
             }
             }
         }
-
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
@@ -497,30 +445,13 @@ void CRenderDevice::message_loop()
             canCallActivate = false;
         }
 
-        if (isDX9Renderer)
-        {
-            LastDeviceState = GEnv.Render->GetDeviceState();
-        }
-
-        if (!timedOut)
-        {
-            if (isDX9Renderer && shouldReset)
-            {
-                ResetInternal(precacheWhileReset);
-            }
-            primaryProcessFrame.Set();
-        }
-
-        timedOut = !primaryFrameDone.Wait(MaximalWaitTime);
+        ProcessFrame();
     }
-
-    if (timedOut)
-        primaryFrameDone.Wait();
 }
 
 void CRenderDevice::Run()
 {
-    g_bLoaded = FALSE;
+    g_bLoaded = false;
     Log("Starting engine...");
 
     // Startup timers and calculate timer delta
@@ -547,18 +478,11 @@ void CRenderDevice::Run()
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     OnWM_Activate(1, 0);
 
-    GEnv.Render->MakeContextCurrent(IRender::NoContext);
-    deviceReadyToRun.Set();
-
     // Message cycle
     message_loop();
 
     // Stop Balance-Thread
-    mt_bMustExit = TRUE;
-
-    primaryProcessFrame.Set();
-    primaryThreadExit.Wait();
-    GEnv.Render->MakeContextCurrent(IRender::PrimaryContext);
+    mt_bMustExit = true;
 
     seqAppEnd.Process();
     
@@ -616,17 +540,17 @@ void CRenderDevice::FrameMove()
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
     Device.seqFrame.Process();
-    g_bLoaded = TRUE;
+    g_bLoaded = true;
     // else
     // seqFrame.Process(rp_Frame);
     stats.EngineTotal.End();
     stats.EngineTotal.FrameEnd();
 }
 
-ENGINE_API BOOL bShowPauseString = TRUE;
+ENGINE_API bool bShowPauseString = true;
 #include "IGame_Persistent.h"
 
-void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
+void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
 {
     static int snd_emitters_ = -1;
     if (g_bBenchmark || GEnv.isDedicatedServer)
@@ -637,10 +561,10 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
         if (!Paused())
         {
             if (bShowPauseString && editor())
-                bShowPauseString = FALSE;
+                bShowPauseString = false;
 #ifdef DEBUG
             else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
-                bShowPauseString = FALSE;
+                bShowPauseString = false;
 #endif
         }
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
@@ -675,21 +599,21 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     }
 }
 
-BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
+bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
     u16 fActive = LOWORD(wParam);
-    const BOOL fMinimized = (BOOL)HIWORD(wParam);
+    const bool fMinimized = (bool)HIWORD(wParam);
 
-    const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
+    const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
 
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);
 
-    const BOOL isGameActive = ps_always_active || isWndActive;
+    const bool isGameActive = ps_always_active || isWndActive;
 
     if (isGameActive != Device.b_is_Active)
     {

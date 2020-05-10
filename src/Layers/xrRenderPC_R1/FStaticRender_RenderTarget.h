@@ -12,10 +12,17 @@ private:
     u32 curWidth;
     u32 curHeight;
 
-    ref_rt RT;
-    ref_rt RT_color_map;
-    ref_rt RT_distort;
-    IDirect3DSurface9* ZB;
+public:
+    // Base targets
+    xr_vector<ref_rt> rt_Base;
+    ref_rt rt_Base_Depth;
+
+private:
+    ref_rt rt_Generic;
+    ref_rt rt_Depth;
+
+    ref_rt rt_color_map;
+    ref_rt rt_distort;
 
     //	Can't implement in a single pass of a shader since
     //	should be compiled only for the hardware that supports it.
@@ -47,10 +54,10 @@ private:
     u32 frame_distort;
 
 public:
-    IDirect3DSurface9* pTempZB;
+    ref_rt rt_temp_zb;
 
     //	Igor: for async screenshots
-    IDirect3DSurface9* pFB; // 32bit		(r,g,b,a) is situated in the system memory
+    ref_rt rt_async_ss; // 32bit		(r,g,b,a) is situated in the system memory
 
 private:
     BOOL Create();
@@ -71,6 +78,9 @@ public:
     void End();
 
     void DoAsyncScreenshot();
+
+    ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
+    ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pRT; }
 
     virtual void set_blur(float f) { param_blur = f; }
     virtual void set_gray(float f) { param_gray = f; }

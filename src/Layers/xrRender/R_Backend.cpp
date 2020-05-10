@@ -40,6 +40,9 @@ void CBackend::OnDeviceCreate()
     Vertex.Create();
     Index.Create();
 
+    // Debug Draw
+    InitializeDebugDraw();
+
     // invalidate caching
     Invalidate();
 }
@@ -52,4 +55,7 @@ void CBackend::OnDeviceDestroy()
 
     // Quad
     QuadIB.Release();
+
+    // Debug Draw
+    DestroyDebugDraw();
 }

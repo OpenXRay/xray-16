@@ -5,11 +5,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#pragma warning(pop)
-
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
 void fix_texture_name(LPSTR fn)
@@ -144,7 +139,9 @@ ID3DTexture2D* TW_LoadTextureFromTexture(
     // Create HW-surface
     if (D3DX_DEFAULT == t_dest_fmt)
         t_dest_fmt = t_from_desc0.Format;
-    R_CHK(D3DXCreateTexture(HW.pDevice, top_width, top_height, levels_exist, 0, t_dest_fmt, D3DPOOL_MANAGED, &t_dest));
+    R_CHK(D3DXCreateTexture(HW.pDevice, top_width, top_height, levels_exist, 0, t_dest_fmt,
+        (RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED),
+    &t_dest));
 
     // Copy surfaces & destroy temporary
     ID3DTexture2D* T_src = t_from;
@@ -284,6 +281,8 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     int img_loaded_lod = 0;
     D3DFORMAT fmt;
     u32 mip_cnt = u32(-1);
+    bool dummyTextureExist;
+
     // validation
     R_ASSERT(fRName);
     R_ASSERT(fRName[0]);
@@ -309,7 +308,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 #else
 
     Msg("! Can't find texture '%s'", fname);
-    const bool dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
+    dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
     if (!ShadowOfChernobylMode)
         R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
@@ -350,7 +349,9 @@ _DDS:
 _DDS_CUBE:
 {
     result = D3DXCreateCubeTextureFromFileInMemoryEx(HW.pDevice, S->pointer(), S->length(), D3DX_DEFAULT,
-        IMG.MipLevels, 0, IMG.Format, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &pTextureCUBE);
+        IMG.MipLevels, 0, IMG.Format,
+       (RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED),
+        D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &pTextureCUBE);
     FS.r_close(S);
 
     if (FAILED(result))

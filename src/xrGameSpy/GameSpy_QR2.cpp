@@ -20,10 +20,7 @@ qr2_error_t xrGS_qr2_initA(qr2_t* qrec, const gsi_char* ip, int baseport, int is
             BasePort = END_PORT;
     }
 
-    char SecretKey[16];
-    FillSecretKey(SecretKey);
-
-    qr2_error_t res = qr2_initA(qrec, ip, BasePort, GAMESPY_GAMENAME, SecretKey, ispublic, natnegotiate,
+    qr2_error_t res = qr2_initA(qrec, ip, BasePort, GAMESPY_GAMENAME, GAMESPY_GAMEKEY, ispublic, natnegotiate,
         server_key_callback, player_key_callback, team_key_callback, key_list_callback, playerteam_count_callback,
         adderror_callback, userdata);
 

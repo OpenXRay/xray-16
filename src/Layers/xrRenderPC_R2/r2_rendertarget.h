@@ -23,13 +23,11 @@ public:
     IBlender* b_occq;
     IBlender* b_accum_mask;
     IBlender* b_accum_direct;
-    IBlender* b_accum_direct_cascade;
     IBlender* b_accum_point;
     IBlender* b_accum_spot;
     IBlender* b_accum_reflected;
     IBlender* b_bloom;
     IBlender* b_ssao;
-    IBlender* b_fxaa;
     IBlender* b_luminance;
     IBlender* b_combine;
 
@@ -43,6 +41,10 @@ public:
     xr_vector<dbg_line_t> dbg_lines;
     xr_vector<Fplane> dbg_planes;
 #endif
+
+    // Base targets
+    xr_vector<ref_rt> rt_Base;
+    ref_rt rt_Base_Depth;
 
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
@@ -63,7 +65,7 @@ public:
     ref_rt rt_LUM_8; // 64bit, 8x8,		log-average in all components
 
     //	Igor: for async screenshots
-    IDirect3DSurface9* pFB; // 32bit		(r,g,b,a) is situated in the system memory
+    ref_rt rt_async_ss; // 32bit		(r,g,b,a) is situated in the system memory
 
     ref_rt rt_LUM_pool[CHWCaps::MAX_GPUS * 2]; // 1xfp32,1x1,		exp-result -> scaler
     ref_texture t_LUM_src; // source
@@ -76,7 +78,6 @@ public:
     // smap
     ref_rt rt_smap_surf; // 32bit,		color
     ref_rt rt_smap_depth; // 24(32) bit,	depth
-    IDirect3DSurface9* rt_smap_ZB; //
 
     // Textures
     IDirect3DVolumeTexture9* t_material_surf;
@@ -92,9 +93,7 @@ private:
     // Accum
     ref_shader s_accum_mask;
     ref_shader s_accum_direct;
-    ref_shader s_accum_direct_cascade;
     ref_shader s_accum_direct_volumetric;
-    ref_shader s_accum_direct_volumetric_cascade;
     ref_shader s_accum_point;
     ref_shader s_accum_spot;
     ref_shader s_accum_reflected;
@@ -121,10 +120,6 @@ private:
     ref_shader s_ssao;
     ref_rt rt_ssao_temp;
     ref_rt rt_half_depth;
-
-    //FXAA
-    ref_shader s_fxaa;
-    ref_geom g_fxaa;
 
     // Bloom
     ref_geom g_bloom_build;
@@ -184,6 +179,7 @@ private:
 public:
     CRenderTarget();
     ~CRenderTarget();
+
     void accum_point_geom_create();
     void accum_point_geom_destroy();
     void accum_omnip_geom_create();
@@ -193,6 +189,9 @@ public:
     //	Igor: used for volumetric lights
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
+
+    ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
+    ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pRT; }
 
     void u_stencil_optimize(BOOL common_stencil = TRUE);
     void u_compute_texgen_screen(Fmatrix& dest);
@@ -209,7 +208,6 @@ public:
     void u_DBT_disable();
 
     void phase_ssao();
-    void phase_fxaa();
     void phase_downsamp();
     void phase_scene_prepare();
     void phase_scene_begin();

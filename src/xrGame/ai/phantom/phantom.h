@@ -68,7 +68,7 @@ public:
     virtual ~CPhantom();
 
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void net_Export(NET_Packet& P);
@@ -85,7 +85,7 @@ public:
 
     virtual BOOL IsVisibleForHUD() { return false; }
     virtual bool IsVisibleForZones() { return false; }
-    virtual BOOL UsedAI_Locations() { return false; }
+    virtual bool UsedAI_Locations() { return false; }
     virtual CEntity* cast_entity() { return this; }
 
     void SetEnemy(IGameObject* enemy) { m_enemy = enemy; } //Alundaio

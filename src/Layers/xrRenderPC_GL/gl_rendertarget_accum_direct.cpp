@@ -703,7 +703,7 @@ void CRenderTarget::accum_direct_blend()
     {
         VERIFY(0);
         if (! RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator,NULL,NULL, HW.pBaseZB);
+            u_setrt(rt_Accumulator,NULL,NULL, get_base_zb());
         else
             u_setrt(rt_Accumulator,NULL,NULL, rt_MSAADepth->pZRT);
 
@@ -775,7 +775,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     }
     phase_accumulator();
     if (! RImplementation.o.dx10_msaa)
-        u_setrt(rt_Generic_0,NULL,NULL, HW.pBaseZB);
+        u_setrt(rt_Generic_0,NULL,NULL, get_base_zb());
     else
         u_setrt(rt_Generic_0_r,NULL,NULL, RImplementation.Target->rt_MSAADepth->pZRT);
 
@@ -875,7 +875,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     // Perform lighting
     {
         if (! RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_0,NULL,NULL, HW.pBaseZB); // enshure RT setup
+            u_setrt(rt_Generic_0,NULL,NULL, get_base_zb()); // enshure RT setup
         else
             u_setrt(rt_Generic_0_r,NULL,NULL, RImplementation.Target->rt_MSAADepth->pZRT); // enshure RT setup
         RCache.set_CullMode(CULL_NONE);
@@ -1140,8 +1140,9 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
     ref_selement Element = s_accum_direct_volumetric->E[0];
 
+    const bool useMinMaxSMThisFrame = use_minmax_sm_this_frame();
     //if ( (sub_phase==SE_SUN_NEAR) && use_minmax_sm_this_frame())
-    if (use_minmax_sm_this_frame())
+    if (useMinMaxSMThisFrame)
         Element = s_accum_direct_volumetric_minmax->E[0];
 
     //	Assume everything was recalculated before this call by accum_direct
@@ -1162,7 +1163,10 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         // setup
         //RCache.set_Element			(s_accum_direct_volumetric->E[sub_phase]);
         RCache.set_Element(Element);
-        RCache.set_CullMode(CULL_CCW);
+        if (useMinMaxSMThisFrame || !RImplementation.o.oldshadowcascades)
+        {
+            RCache.set_CullMode(CULL_CCW);
+        }
         RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0);
         RCache.set_c("m_shadow", mShadow);
@@ -1199,7 +1203,10 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         else
         {
             extern float OLES_SUN_LIMIT_27_01_07;
-            zMin = 0; /////*****************************************************************************************
+            if (RImplementation.o.oldshadowcascades)
+                zMin = ps_r2_sun_near;
+            else
+                zMin = 0; /////*****************************************************************************************
             zMax = OLES_SUN_LIMIT_27_01_07;
         }
 
@@ -1241,7 +1248,12 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         // setup stencil: we have to draw to both lit and unlit pixels
         //RCache.set_Stencil			(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
         //if( ! RImplementation.o.dx10_msaa )
-        RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
+        {
+            if (RImplementation.o.oldshadowcascades)
+                RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+            else
+                RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
+        }
         /*
      else 
      {

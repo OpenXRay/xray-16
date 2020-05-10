@@ -154,7 +154,7 @@ _DDS:
                 for (std::size_t level = 0; level < texture.levels(); ++level)
                 {
                     glm::tvec3<GLsizei> const tex_level_extent(texture.extent(level));
-                    target = gli::is_target_cube(texture.target())
+                    GLenum sub_target = gli::is_target_cube(texture.target())
                              ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face)
                              : target;
 
@@ -165,14 +165,14 @@ _DDS:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
-                            CHK_GL(glCompressedTexSubImage2D(target, static_cast<GLint>(level),
+                            CHK_GL(glCompressedTexSubImage2D(sub_target, static_cast<GLint>(level),
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
                                         texture.data(layer, face, level)));
                         }
                         else
                         {
-                            CHK_GL(glTexSubImage2D(target, static_cast<GLint>(level),
+                            CHK_GL(glTexSubImage2D(sub_target, static_cast<GLint>(level),
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.External, format.Type,
                                         texture.data(layer, face, level)));

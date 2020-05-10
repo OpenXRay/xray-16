@@ -5,7 +5,7 @@
 #pragma hdrstop
 
 #include "FileSystem.h"
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #include <io.h>
 #include <fcntl.h>
 #include <sys\stat.h>

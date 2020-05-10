@@ -204,6 +204,8 @@ void R_constant_table::merge(R_constant_table* T)
         dx9compatibility = true;
 
     // Real merge
+    xr_vector<ref_constant> table_tmp;
+    table_tmp.reserve(table.size());
     for (u32 it = 0; it < T->table.size(); it++)
     {
         ref_constant src = T->table[it];
@@ -226,7 +228,7 @@ void R_constant_table::merge(R_constant_table* T)
 #endif
             C->samp = src->samp;
             C->handler = src->handler;
-            table.push_back(C);
+            table_tmp.push_back(C);
         }
         else
         {
@@ -245,8 +247,14 @@ void R_constant_table::merge(R_constant_table* T)
         }
     }
 
-    // Sort
-    std::sort(table.begin(), table.end(), p_sort);
+    if (!table_tmp.empty())
+    {
+        // Append
+        std::move(table_tmp.begin(), table_tmp.end(), std::back_inserter(table));
+
+        // Sort
+        std::sort(table.begin(), table.end(), p_sort);
+    }
 
 #if defined(USE_DX10) || defined(USE_DX11)
     //	TODO:	DX10:	Implement merge with validity check

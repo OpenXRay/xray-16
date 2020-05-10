@@ -3,6 +3,9 @@
 
 #include "traffic_optimization.h"
 
+extern Flags8 g_sv_traffic_optimization_level;
+extern Flags8 g_sv_available_traffic_optimization_level;
+
 class last_updates_cache : private Noncopyable
 {
 public:
@@ -49,8 +52,6 @@ private:
     static u16 const max_eq_packets = 3;
     static u32 const entities_count = 32;
     static u32 const start_compress_buffer_size = 1024 * 150 * entities_count;
-
-    enum_traffic_optimization m_traffic_optimization;
 
     NET_Packet m_acc_buff;
     NET_Packet m_compress_buf;

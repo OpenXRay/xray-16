@@ -16,7 +16,7 @@
 namespace LevelGraph
 {
 class CHeader;
-class CVertex;
+class CLevelVertex;
 struct SSegment;
 struct SContour;
 
@@ -39,7 +39,7 @@ private:
 public:
     typedef LevelGraph::CPosition CPosition;
     typedef LevelGraph::CHeader CHeader;
-    typedef LevelGraph::CVertex CVertex;
+    typedef LevelGraph::CLevelVertex CLevelVertex;
     typedef LevelGraph::SSegment SSegment;
     typedef LevelGraph::SContour SContour;
     typedef LevelGraph::ELineIntersections ELineIntersections;
@@ -68,12 +68,12 @@ public:
     typedef u32 const_iterator;
     typedef u32 const_spawn_iterator;
     typedef u32 const_death_iterator;
-    typedef const CVertex* const_vertex_iterator;
+    typedef const CLevelVertex* const_vertex_iterator;
 
     struct vertex
     {
-        static IC bool predicate(const u32& value, const CVertex& vertex) { return (value < vertex.position().xz()); }
-        static IC bool predicate2(const CVertex& vertex, const u32& value) { return (vertex.position().xz() < value); }
+        static IC bool predicate(const u32& value, const CLevelVertex& vertex) { return (value < vertex.position().xz()); }
+        static IC bool predicate2(const CLevelVertex& vertex, const u32& value) { return (vertex.position().xz() < value); }
     };
 
 private:
@@ -103,11 +103,11 @@ public:
     IC void level_id(const GameGraph::_LEVEL_ID& level_id);
     IC u32 max_x() const;
     IC u32 max_z() const;
-    IC void begin(const CVertex& vertex, const_iterator& begin, const_iterator& end) const;
-    IC void begin(const CVertex* vertex, const_iterator& begin, const_iterator& end) const;
+    IC void begin(const CLevelVertex& vertex, const_iterator& begin, const_iterator& end) const;
+    IC void begin(const CLevelVertex* vertex, const_iterator& begin, const_iterator& end) const;
     IC void begin(u32 vertex_id, const_iterator& begin, const_iterator& end) const;
-    IC u32 value(const CVertex& vertex, const_iterator& i) const;
-    IC u32 value(const CVertex* vertex, const_iterator& i) const;
+    IC u32 value(const CLevelVertex& vertex, const_iterator& i) const;
+    IC u32 value(const CLevelVertex* vertex, const_iterator& i) const;
     IC u32 value(const u32 vertex_id, const_iterator& i) const;
     IC const CHeader& header() const;
     ICF bool valid_vertex_id(u32 vertex_id) const;
@@ -116,49 +116,49 @@ public:
     IC void unpack_xz(const CLevelGraph::CPosition& vertex_position, int& x, int& z) const;
     IC void unpack_xz(const CLevelGraph::CPosition& vertex_position, float& x, float& z) const;
     template <typename T>
-    IC void unpack_xz(const CLevelGraph::CVertex& vertex, T& x, T& z) const;
+    IC void unpack_xz(const CLevelGraph::CLevelVertex& vertex, T& x, T& z) const;
     template <typename T>
-    IC void unpack_xz(const CLevelGraph::CVertex* vertex, T& x, T& z) const;
-    ICF CVertex* vertex(u32 vertex_id) const;
-    ICF u32 vertex(const CVertex* vertex_p) const;
-    ICF u32 vertex(const CVertex& vertex_r) const;
+    IC void unpack_xz(const CLevelGraph::CLevelVertex* vertex, T& x, T& z) const;
+    ICF CLevelVertex* vertex(u32 vertex_id) const;
+    ICF u32 vertex(const CLevelVertex* vertex_p) const;
+    ICF u32 vertex(const CLevelVertex& vertex_r) const;
     IC const Fvector vertex_position(const CLevelGraph::CPosition& source_position) const;
     IC const Fvector& vertex_position(Fvector& dest_position, const CLevelGraph::CPosition& source_position) const;
     IC const CLevelGraph::CPosition& vertex_position(
         CLevelGraph::CPosition& dest_position, const Fvector& source_position) const;
     IC const CLevelGraph::CPosition vertex_position(const Fvector& position) const;
     IC const Fvector vertex_position(u32 vertex_id) const;
-    IC const Fvector vertex_position(const CVertex& vertex) const;
-    IC const Fvector vertex_position(const CVertex* vertex) const;
-    IC float vertex_plane_y(const CVertex& vertex, const float X, const float Z) const;
-    IC float vertex_plane_y(const CVertex* vertex, const float X, const float Z) const;
+    IC const Fvector vertex_position(const CLevelVertex& vertex) const;
+    IC const Fvector vertex_position(const CLevelVertex* vertex) const;
+    IC float vertex_plane_y(const CLevelVertex& vertex, const float X, const float Z) const;
+    IC float vertex_plane_y(const CLevelVertex* vertex, const float X, const float Z) const;
     IC float vertex_plane_y(const u32 vertex_id, const float X, const float Z) const;
-    IC float vertex_plane_y(const CVertex& vertex) const;
-    IC float vertex_plane_y(const CVertex* vertex) const;
+    IC float vertex_plane_y(const CLevelVertex& vertex) const;
+    IC float vertex_plane_y(const CLevelVertex* vertex) const;
     IC float vertex_plane_y(const u32 vertex_id) const;
-    IC bool inside(const CVertex& vertex, const CLevelGraph::CPosition& vertex_position) const;
-    IC bool inside(const CVertex& vertex, const Fvector& vertex_position) const;
-    IC bool inside(const CVertex* vertex, const CLevelGraph::CPosition& vertex_position) const;
-    IC bool inside(const CVertex* vertex, const Fvector& vertex_position) const;
+    IC bool inside(const CLevelVertex& vertex, const CLevelGraph::CPosition& vertex_position) const;
+    IC bool inside(const CLevelVertex& vertex, const Fvector& vertex_position) const;
+    IC bool inside(const CLevelVertex* vertex, const CLevelGraph::CPosition& vertex_position) const;
+    IC bool inside(const CLevelVertex* vertex, const Fvector& vertex_position) const;
     IC bool inside(const u32 vertex_id, const CLevelGraph::CPosition& vertex_position) const;
     IC bool inside(const u32 vertex_id, const Fvector& position) const;
     IC bool inside(const u32 vertex_id, const Fvector2& position) const;
-    IC bool inside(const CVertex& vertex, const CLevelGraph::CPosition& vertex_position, const float epsilon) const;
-    IC bool inside(const CVertex& vertex, const Fvector& vertex_position, const float epsilon) const;
-    IC bool inside(const CVertex* vertex, const CLevelGraph::CPosition& vertex_position, const float epsilon) const;
-    IC bool inside(const CVertex* vertex, const Fvector& vertex_position, const float epsilon) const;
+    IC bool inside(const CLevelVertex& vertex, const CLevelGraph::CPosition& vertex_position, const float epsilon) const;
+    IC bool inside(const CLevelVertex& vertex, const Fvector& vertex_position, const float epsilon) const;
+    IC bool inside(const CLevelVertex* vertex, const CLevelGraph::CPosition& vertex_position, const float epsilon) const;
+    IC bool inside(const CLevelVertex* vertex, const Fvector& vertex_position, const float epsilon) const;
     IC bool inside(const u32 vertex_id, const CLevelGraph::CPosition& vertex_position, const float epsilon) const;
     IC bool inside(const u32 vertex_id, const Fvector& position, const float epsilon) const;
     IC void project_point(const Fplane& plane, Fvector& point) const;
     IC u32 row_length() const;
-    float distance(const Fvector& position, const CVertex* vertex) const;
+    float distance(const Fvector& position, const CLevelVertex* vertex) const;
     float distance(const Fvector& position, const u32 vertex_id) const;
     float distance(const u32 vertex_id, const Fvector& position) const;
     IC float distance(const Fvector& position, const Fvector& point0, const Fvector& point1) const;
     IC float distance(u32 vertex_id0, u32 vertex_id1) const;
-    IC float distance(const CVertex* tpNode0, u32 vertex_id1) const;
-    IC float distance(u32 vertex_id0, const CVertex* vertex) const;
-    IC float distance(const CVertex* node0, const CVertex* node1) const;
+    IC float distance(const CLevelVertex* tpNode0, u32 vertex_id1) const;
+    IC float distance(u32 vertex_id0, const CLevelVertex* vertex) const;
+    IC float distance(const CLevelVertex* node0, const CLevelVertex* node1) const;
     IC float distance(const u32 vertex_id, const CPosition& position) const;
     IC float distance(const CPosition& position, const u32 vertex_id) const;
     IC ELineIntersections intersect(
@@ -170,23 +170,23 @@ public:
     IC void intersect(SSegment& segment, const SContour& contour0, const SContour& contour1) const;
     IC float nearest(Fvector& destination, const Fvector& position, const Fvector& point0, const Fvector& point1) const;
     IC void contour(SContour& contour, u32 vertex_id) const;
-    IC void contour(SContour& contour, const CVertex* vertex) const;
+    IC void contour(SContour& contour, const CLevelVertex* vertex) const;
     IC float nearest(Fvector& destination, const Fvector& position, const SContour& contour) const;
     IC bool intersect(
         Fvector& destination, const Fvector& v1, const Fvector& v2, const Fvector& v3, const Fvector& v4) const;
     IC float square(float a1, float b1, float alpha = PI_DIV_2) const;
     IC float compute_square(float angle, float AOV, float b0, float b1, float b2, float b3) const;
-    IC float compute_high_square(float angle, float AOV, const CVertex* vertex) const;
-    IC float compute_low_square(float angle, float AOV, const CVertex* vertex) const;
+    IC float compute_high_square(float angle, float AOV, const CLevelVertex* vertex) const;
+    IC float compute_low_square(float angle, float AOV, const CLevelVertex* vertex) const;
     IC float compute_high_square(float angle, float AOV, u32 dwNodeID) const;
     IC float compute_low_square(float angle, float AOV, u32 dwNodeID) const;
-    IC float vertex_high_cover(const CLevelGraph::CVertex* vertex) const;
-    IC float vertex_low_cover(const CLevelGraph::CVertex* vertex) const;
+    IC float vertex_high_cover(const CLevelGraph::CLevelVertex* vertex) const;
+    IC float vertex_low_cover(const CLevelGraph::CLevelVertex* vertex) const;
     IC float vertex_high_cover(const u32 vertex_id) const;
     IC float vertex_low_cover(const u32 vertex_id) const;
     float cover_in_direction(float angle, float b0, float b1, float b2, float b3) const;
-    IC float high_cover_in_direction(float angle, const CVertex* vertex) const;
-    IC float low_cover_in_direction(float angle, const CVertex* vertex) const;
+    IC float high_cover_in_direction(float angle, const CLevelVertex* vertex) const;
+    IC float low_cover_in_direction(float angle, const CLevelVertex* vertex) const;
     IC float high_cover_in_direction(float angle, u32 vertex_id) const;
     IC float low_cover_in_direction(float angle, u32 vertex_id) const;
 
@@ -194,8 +194,8 @@ public:
     IC float vertex_high_cover_angle(u32 vertex_id, float inc_angle, _predicate compare_predicate) const;
     template <class _predicate>
     IC float vertex_low_cover_angle(u32 vertex_id, float inc_angle, _predicate compare_predicate) const;
-    IC void set_invalid_vertex(u32& vertex_id, CVertex** vertex = NULL) const;
-    IC const u32 vertex_id(const CLevelGraph::CVertex* vertex) const;
+    IC void set_invalid_vertex(u32& vertex_id, CLevelVertex** vertex = NULL) const;
+    IC const u32 vertex_id(const CLevelGraph::CLevelVertex* vertex) const;
     u32 vertex_id(const Fvector& position) const;
 
 private:
@@ -243,15 +243,15 @@ public:
     IC bool valid_vertex_position(const Fvector& position) const;
     bool neighbour_in_direction(const Fvector& direction, u32 start_vertex_id) const;
 
-    IC CVertex* vertices() { return m_nodes->front(); }
+    IC CLevelVertex* vertices() { return m_nodes->front(); }
 };
 
-IC bool operator<(const CLevelGraph::CVertex& vertex, const u32& vertex_xz);
-IC bool operator>(const CLevelGraph::CVertex& vertex, const u32& vertex_xz);
-IC bool operator==(const CLevelGraph::CVertex& vertex, const u32& vertex_xz);
-IC bool operator<(const u32& vertex_xz, const CLevelGraph::CVertex& vertex);
-IC bool operator>(const u32& vertex_xz, const CLevelGraph::CVertex& vertex);
-IC bool operator==(const u32& vertex_xz, const CLevelGraph::CVertex& vertex);
+IC bool operator<(const CLevelGraph::CLevelVertex& vertex, const u32& vertex_xz);
+IC bool operator>(const CLevelGraph::CLevelVertex& vertex, const u32& vertex_xz);
+IC bool operator==(const CLevelGraph::CLevelVertex& vertex, const u32& vertex_xz);
+IC bool operator<(const u32& vertex_xz, const CLevelGraph::CLevelVertex& vertex);
+IC bool operator>(const u32& vertex_xz, const CLevelGraph::CLevelVertex& vertex);
+IC bool operator==(const u32& vertex_xz, const CLevelGraph::CLevelVertex& vertex);
 
 #if defined(DEBUG) && !defined(AI_COMPILER)
 extern BOOL g_bDebugNode;

@@ -24,7 +24,6 @@ DECLARE_MESSAGE(AppStart);
 DECLARE_MESSAGE(AppEnd);
 DECLARE_MESSAGE(DeviceReset);
 DECLARE_MESSAGE(UIReset);
-DECLARE_MESSAGE(ScreenResolutionChanged);
 
 template<class T>
 class MessageRegistry

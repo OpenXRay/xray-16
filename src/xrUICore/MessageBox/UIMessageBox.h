@@ -27,7 +27,7 @@ public:
         MESSAGEBOX_YES_NO_COPY
     } E_MESSAGEBOX_STYLE;
 
-    virtual void InitMessageBox(LPCSTR xml_template);
+    virtual bool InitMessageBox(LPCSTR xml_template);
     void Clear();
     virtual void SetText(LPCSTR str);
     virtual LPCSTR GetText();

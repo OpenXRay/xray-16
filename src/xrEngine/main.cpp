@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "main.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <lockfile.h>
 #endif
 #include <locale.h>
@@ -18,17 +18,18 @@
 
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
 #endif
 #include "xr_ioc_cmd.h"
 #include "MonitorManager.hpp"
+#include "TaskScheduler.hpp"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -86,7 +87,7 @@ void InitConfig(T& config, pcstr name, bool fatal = true,
 {
     string_path fname;
     FS.update_path(fname, "$game_config$", name);
-    config = new CInifile(fname, readOnly, loadAtStart, saveAtEnd, sectCount, allowIncludeFunc);
+    config = xr_new<CInifile>(fname, readOnly, loadAtStart, saveAtEnd, sectCount, allowIncludeFunc);
 
     CHECK_OR_EXIT(config->section_count() || !fatal,
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
@@ -160,9 +161,9 @@ ENGINE_API void InitSettings()
 ENGINE_API void InitConsole()
 {
     if (GEnv.isDedicatedServer)
-        Console = new CTextConsole();
+        Console = xr_new<CTextConsole>();
     else
-        Console = new CConsole();
+        Console = xr_new<CConsole>();
 
     Console->Initialize();
     xr_strcpy(Console->ConfigFile, "user.ltx");
@@ -177,7 +178,7 @@ ENGINE_API void InitConsole()
 ENGINE_API void InitInput()
 {
     bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
-    pInput = new CInput(captureInput);
+    pInput = xr_new<CInput>(captureInput);
 }
 
 ENGINE_API void destroyInput() { xr_delete(pInput); }
@@ -208,7 +209,7 @@ ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
-#if defined(LINUX)
+#if defined(XR_PLATFORM_LINUX)
     lockfile_remove("/var/lock/stalker-cop.lock");
 #endif
 }
@@ -272,6 +273,21 @@ void CheckPrivilegySlowdown()
 #endif
 }
 
+void CreateApplication()
+{
+    pApp = xr_new<CApplication>();
+#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
+    if (GEnv.isDedicatedServer)
+        pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
+#endif
+}
+
+void CreateSpatialSpace()
+{
+    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
+    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
+}
+
 ENGINE_API void Startup()
 {
     execUserScript();
@@ -285,22 +301,30 @@ ENGINE_API void Startup()
     if (loadArgs)
         Console->Execute(loadArgs + 1);
 
+    // Create task scheduler
+    TaskScheduler = std::make_unique<TaskManager>();
+    TaskScheduler->Initialize();
+
     // Initialize APP
+    Event lightAnimCreated, applicationCreated, spatialCreated;
+    TaskScheduler->AddTask("LALib.OnCreate()", [&]()
+    {
+        LALib.OnCreate();
+    }, nullptr, nullptr, &lightAnimCreated);
+
+    TaskScheduler->AddTask("CreateApplication()", CreateApplication,
+        nullptr, nullptr, &applicationCreated);
+
+    TaskScheduler->AddTask("CreateSpatialSpace()", CreateSpatialSpace,
+        nullptr, nullptr, &spatialCreated);
+
     Device.Create();
-    LALib.OnCreate();
-
-    pApp = new CApplication();
-#ifdef WINDOWS // XXX: Remove this macro check
-    if (GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new TextLoadingScreen());
-#endif
-
-    g_SpatialSpace = new ISpatial_DB("Spatial obj");
-    g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
-    Device.WaitUntilCreated();
+    Device.WaitEvent(lightAnimCreated);
+    Device.WaitEvent(applicationCreated);
+    Device.WaitEvent(spatialCreated);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
-    R_ASSERT(g_pGamePersistent);
+    R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
 
     // Main cycle
     Device.Run();
@@ -312,16 +336,16 @@ ENGINE_API void Startup()
     Engine.Event.Dump();
     // Destroying
     destroyInput();
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
         destroySettings();
     LALib.OnDestroy();
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
         destroyConsole();
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     else
         Console->Destroy();
 #endif
@@ -337,11 +361,11 @@ ENGINE_API int RunApplication()
 #ifdef NO_MULTI_INSTANCES
     if (!GEnv.isDedicatedServer)
     {
-#if defined(WINDOWS)
-        CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
+#if defined(XR_PLATFORM_WINDOWS)
+        CreateMutex(nullptr, true, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
             return 2;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         int lock_res = lockfile_create("/var/lock/stalker-cop.lock", 0, L_PID);
         if(L_ERROR == lock_res)
             return 2;
@@ -378,7 +402,7 @@ ENGINE_API int RunApplication()
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         // CreateProcess need to return results to next two structures
         STARTUPINFO si = {};
         si.cb = sizeof(si);
@@ -411,7 +435,7 @@ bool CheckBenchmark()
         const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
         g_SASH.Init(sashArg);
         g_SASH.MainLoop();
 #endif
@@ -430,7 +454,7 @@ void RunBenchmark(pcstr name)
     const size_t hyphenLtxLen = xr_strlen("-ltx ");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
-        LPCSTR benchmarkName, t;
+        pcstr benchmarkName, t;
         ini.r_line("benchmark", i, &benchmarkName, &t);
         xr_strcpy(g_sBenchmarkName, benchmarkName);
         shared_str benchmarkCommand = ini.r_string_wb("benchmark", benchmarkName);

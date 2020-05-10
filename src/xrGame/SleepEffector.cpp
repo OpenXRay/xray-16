@@ -24,7 +24,7 @@ CSleepEffectorPP::CSleepEffectorPP(const SPPInfo& ppi, float life_time, float at
     m_eSleepState = BEGIN_SLEEP;
 }
 
-BOOL CSleepEffectorPP::Process(SPPInfo& pp)
+bool CSleepEffectorPP::Process(SPPInfo& pp)
 {
     inherited::Process(pp);
 

@@ -40,13 +40,13 @@ public:
     void Handler_Detach(EVENT& E, IEventReceiver* H);
 
     void Signal(EVENT E, u64 P1 = 0, u64 P2 = 0);
-    void Signal(LPCSTR E, u64 P1 = 0, u64 P2 = 0);
+    void Signal(pcstr E, u64 P1 = 0, u64 P2 = 0);
     void Defer(EVENT E, u64 P1 = 0, u64 P2 = 0);
-    void Defer(LPCSTR E, u64 P1 = 0, u64 P2 = 0);
+    void Defer(pcstr E, u64 P1 = 0, u64 P2 = 0);
 
     void OnFrame();
     void Dump();
-    BOOL Peek(LPCSTR EName);
+    bool Peek(pcstr EName);
 
     void _destroy();
 };

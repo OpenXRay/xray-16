@@ -218,7 +218,7 @@ XR_EXPORT void ELightAnimLibrary::Load()
             IReader* O = OBJ->open_chunk(0);
             for (int count = 1; O; count++)
             {
-                CLAItem* I = new CLAItem();
+                CLAItem* I = xr_new<CLAItem>();
                 I->Load(*O);
                 if (version == 0)
                 {
@@ -265,7 +265,7 @@ void ELightAnimLibrary::Reload()
     Load();
 }
 
-LAItemIt ELightAnimLibrary::FindItemI(LPCSTR name)
+LAItemIt ELightAnimLibrary::FindItemI(pcstr name)
 {
     if (name && name[0])
         for (LAItemIt it = Items.begin(); it != Items.end(); ++it)
@@ -274,16 +274,16 @@ LAItemIt ELightAnimLibrary::FindItemI(LPCSTR name)
     return Items.end();
 }
 
-CLAItem* ELightAnimLibrary::FindItem(LPCSTR name)
+CLAItem* ELightAnimLibrary::FindItem(pcstr name)
 {
     LAItemIt it = FindItemI(name);
     return (it != Items.end()) ? *it : 0;
 }
 
-CLAItem* ELightAnimLibrary::AppendItem(LPCSTR name, CLAItem* src)
+CLAItem* ELightAnimLibrary::AppendItem(pcstr name, CLAItem* src)
 {
     VERIFY2(FindItem(name) == 0, "Duplicate name found.");
-    CLAItem* I = new CLAItem();
+    CLAItem* I = xr_new<CLAItem>();
     if (src)
         *I = *src;
     else
@@ -294,7 +294,7 @@ CLAItem* ELightAnimLibrary::AppendItem(LPCSTR name, CLAItem* src)
 }
 
 #ifdef _EDITOR
-void ELightAnimLibrary::RemoveObject(LPCSTR _fname, EItemType type, bool& res)
+void ELightAnimLibrary::RemoveObject(pcstr _fname, EItemType type, bool& res)
 {
     if (TYPE_FOLDER == type)
     {
@@ -318,7 +318,7 @@ void ELightAnimLibrary::RemoveObject(LPCSTR _fname, EItemType type, bool& res)
 }
 //---------------------------------------------------------------------------
 
-void ELightAnimLibrary::RenameObject(LPCSTR nm0, LPCSTR nm1, EItemType type)
+void ELightAnimLibrary::RenameObject(pcstr nm0, pcstr nm1, EItemType type)
 {
     if (TYPE_FOLDER == type)
     {

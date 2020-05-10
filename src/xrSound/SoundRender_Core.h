@@ -73,7 +73,7 @@ public:
     u32 cache_bytes_per_line;
 
 protected:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     virtual void i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) = 0;
     virtual void i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) = 0;
 #endif
@@ -123,7 +123,7 @@ public:
     // listener
     //	virtual const Fvector&				listener_position		( )=0;
     virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) = 0;
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // eax listener
     void i_eax_commit_setting();
     void i_eax_listener_set(CSound_environment* E);

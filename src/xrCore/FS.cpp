@@ -5,10 +5,10 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #include <direct.h>
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <sys/mman.h>
 #endif
 #include <sys/stat.h>
@@ -109,9 +109,9 @@ bool file_handle_internal(pcstr file_name, size_t& size, int& hFile)
 #else // EDITOR
 static int open_internal(pcstr fn, int& handle)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     pstr conv_fn = xr_strdup(fn);
     convert_path_separators(conv_fn);
     handle = open(conv_fn, _O_RDONLY);
@@ -328,11 +328,11 @@ IReader* IReader::open_chunk(u32 ID)
             BYTE* dest;
             size_t dest_sz;
             _decompressLZ(&dest, &dest_sz, pointer(), dwSize);
-            return new CTempReader(dest, dest_sz, tell() + dwSize);
+            return xr_new<CTempReader>(dest, dest_sz, tell() + dwSize);
         }
         else
         {
-            return new IReader(pointer(), dwSize, tell() + dwSize);
+            return xr_new<IReader>(pointer(), dwSize, tell() + dwSize);
         }
     }
     else
@@ -380,12 +380,12 @@ IReader* IReader::open_chunk_iterator(u32& ID, IReader* _prev)
         u8* dest;
         size_t dest_sz;
         _decompressLZ(&dest, &dest_sz, pointer(), _size);
-        return new CTempReader(dest, dest_sz, tell() + _size);
+        return xr_new<CTempReader>(dest, dest_sz, tell() + _size);
     }
     else
     {
         // normal
-        return new IReader(pointer(), _size, tell() + _size);
+        return xr_new<IReader>(pointer(), _size, tell() + _size);
     }
 }
 
@@ -430,7 +430,7 @@ void IReader::r_string(char* dest, size_t tgt_sz)
     char* src = (char*)data + Pos;
     size_t sz = advance_term_string();
     R_ASSERT2(sz < (tgt_sz - 1), "Dest string less than needed.");
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     R_ASSERT(!IsBadReadPtr((void*)src, sz));
 #endif
 
@@ -486,9 +486,9 @@ CPackReader::~CPackReader()
 #ifdef FS_DEBUG
     unregister_file_mapping(base_address, Size);
 #endif // DEBUG
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile(base_address);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     ::munmap(base_address, Size);
 #endif
 };
@@ -510,7 +510,7 @@ CCompressedReader::CCompressedReader(const char* name, const char* sign)
 CCompressedReader::~CCompressedReader() { xr_free(data); };
 CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
@@ -522,7 +522,7 @@ CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     pstr conv_path = xr_strdup(cFileName);
     convert_path_separators(conv_path);
     hSrcFile = ::open(conv_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
@@ -545,11 +545,11 @@ CVirtualFileRW::~CVirtualFileRW()
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
 #endif // DEBUG
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     ::munmap((void*)data, Size);
     ::close(hSrcFile);
     hSrcFile = -1;
@@ -558,7 +558,7 @@ CVirtualFileRW::~CVirtualFileRW()
 
 CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
@@ -570,7 +570,7 @@ CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     pstr conv_path = xr_strdup(cFileName);
     convert_path_separators(conv_path);
     hSrcFile = ::open(conv_path, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
@@ -594,11 +594,11 @@ CVirtualFileReader::~CVirtualFileReader()
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
 #endif // DEBUG
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     ::munmap((void*)data, Size);
     ::close(hSrcFile);
     hSrcFile = -1;

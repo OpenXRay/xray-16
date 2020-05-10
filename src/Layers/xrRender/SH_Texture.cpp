@@ -3,10 +3,6 @@
 
 #include "ResourceManager.h"
 
-#ifndef _EDITOR
-#include "xrEngine/Render.h"
-#endif
-
 #include "xrEngine/tntQAVI.h"
 #include "xrEngine/xrTheora_Surface.h"
 
@@ -160,7 +156,9 @@ void CTexture::Load()
     flags.MemoryUsage = 0;
     if (0 == xr_stricmp(*cName, "$null"))
         return;
-    if (nullptr != strstr(*cName, "$user$"))
+    // we need to check only the beginning of the string,
+    // so let's use strncmp instead of strstr.
+    if (0 == strncmp(cName.c_str(), "$user$", sizeof("$user$") - 1))
     {
         flags.bUser = true;
         return;

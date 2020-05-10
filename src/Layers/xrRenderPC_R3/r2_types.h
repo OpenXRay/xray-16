@@ -1,5 +1,9 @@
 #pragma once
 
+// Base targets
+#define r2_RT_base "$user$base_"
+#define r2_RT_base_depth "$user$base_depth"
+
 // r3xx code-path (MRT)
 #define r2_RT_depth "$user$depth" // MRT
 #define r2_RT_MSAAdepth "$user$msaadepth" // MRT

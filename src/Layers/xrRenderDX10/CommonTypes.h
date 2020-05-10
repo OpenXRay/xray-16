@@ -13,6 +13,7 @@ typedef D3D10_TEXTURE_ADDRESS_MODE D3D_TEXTURE_ADDRESS_MODE;
 typedef D3D10_COMPARISON_FUNC D3D_COMPARISON_FUNC;
 typedef D3D10_STENCIL_OP D3D_STENCIL_OP;
 typedef D3D10_CULL_MODE D3D_CULL_MODE;
+typedef D3D10_FILL_MODE D3D_FILL_MODE;
 typedef D3D10_FILTER D3D_FILTER;
 
 typedef D3D10_SAMPLER_DESC D3D_SAMPLER_DESC;
@@ -39,7 +40,6 @@ typedef D3D10_PRIMITIVE_TOPOLOGY D3D_PRIMITIVE_TOPOLOGY;
 typedef D3D10_VIEWPORT D3D_VIEWPORT;
 typedef D3D10_USAGE D3D_USAGE;
 
-typedef ID3D10ShaderResourceView ID3DShaderResourceView;
 typedef ID3D10RasterizerState ID3DRasterizerState;
 typedef ID3D10DepthStencilState ID3DDepthStencilState;
 typedef ID3D10BlendState ID3DBlendState;
@@ -53,6 +53,7 @@ typedef ID3D10Query ID3DQuery;
 typedef ID3D10Texture2D ID3DTexture2D;
 typedef ID3D10RenderTargetView ID3DRenderTargetView;
 typedef ID3D10DepthStencilView ID3DDepthStencilView;
+typedef ID3D10ShaderResourceView ID3DShaderResourceView;
 typedef ID3D10Resource ID3DBaseTexture;
 typedef ID3D10Buffer ID3DVertexBuffer;
 typedef ID3D10Buffer ID3DIndexBuffer;
@@ -158,6 +159,7 @@ typedef ID3D10Resource ID3DResource;
 
 #define D3D_INPUT_PER_VERTEX_DATA D3D10_INPUT_PER_VERTEX_DATA
 
+using D3D_BIND_FLAG = D3D10_BIND_FLAG;
 #define D3D_BIND_INDEX_BUFFER D3D10_BIND_INDEX_BUFFER
 #define D3D_BIND_VERTEX_BUFFER D3D10_BIND_VERTEX_BUFFER
 #define D3D_BIND_CONSTANT_BUFFER D3D10_BIND_CONSTANT_BUFFER

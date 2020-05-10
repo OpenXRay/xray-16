@@ -10,7 +10,6 @@
 
 #pragma managed(push, off)
 #include "Common/Common.hpp"
-#include "xrCommon/inlining_macros.h"
 #include "xrCore/xrMemory.h"
 #include "xrCore/xrstring.h"
 #pragma managed(pop)
@@ -48,6 +47,11 @@ typedef char* LPSTR;
 
 #pragma warning(disable : 4127)
 #pragma warning(disable : 4100)
+
+#include "xrCore/xrCore.h"
+#include "xrEngine/Engine.h"
+#include "xrEngine/device.h"
+#include "xrSound/Sound.h"
 
 // do not forget to call
 // 'cs_free'

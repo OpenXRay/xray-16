@@ -14,7 +14,7 @@
 
 namespace LevelGraph
 {
-class CVertex;
+class CLevelVertex;
 };
 
 class CAI_Stalker;
@@ -93,8 +93,8 @@ public:
     void SetFirePointLookAngles(const Fvector& tPosition, float& yaw, float& pitch, Fvector const& look_position,
         const CGameObject* object = 0);
     void SetDirectionLook();
-    void SetLessCoverLook(const LevelGraph::CVertex* tpNode, bool bDifferenceLook);
-    void SetLessCoverLook(const LevelGraph::CVertex* tpNode, float fMaxHeadTurnAngle, bool bDifferenceLook);
+    void SetLessCoverLook(const LevelGraph::CLevelVertex* tpNode, bool bDifferenceLook);
+    void SetLessCoverLook(const LevelGraph::CLevelVertex* tpNode, float fMaxHeadTurnAngle, bool bDifferenceLook);
     void vfValidateAngleDependency(float x1, float& x2, float x3);
     IC bool GetDirectionAnglesByPrevPositions(float& yaw, float& pitch);
     bool GetDirectionAngles(float& yaw, float& pitch);

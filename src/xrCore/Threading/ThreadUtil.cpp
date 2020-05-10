@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "ThreadUtil.h"
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include <pthread.h>
 #endif
 
 namespace Threading
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 ThreadId GetCurrThreadId() { return GetCurrentThreadId(); }
 
 ThreadHandle GetCurrentThreadHandle() { return GetCurrentThread(); }
@@ -58,7 +58,7 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 {
     xrDebug::Initialize(Core.Params);
 
-    SThreadStartupInfo* info = new SThreadStartupInfo();
+    SThreadStartupInfo* info = xr_new<SThreadStartupInfo>();
     info->threadName = name;
     info->entryFunc = entry;
     info->argList = arglist;
@@ -85,7 +85,7 @@ void CloseThreadHandle(ThreadHandle& threadHandle)
         threadHandle = nullptr;
     }
 }
-#elif defined(LINUX) || defined(FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 ThreadId GetCurrThreadId() { return pthread_self(); }
 
 ThreadHandle GetCurrentThreadHandle() { return pthread_self(); }
@@ -120,7 +120,7 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 {
     xrDebug::Initialize(Core.Params);
 
-    SThreadStartupInfo* info = new SThreadStartupInfo();
+    SThreadStartupInfo* info = xr_new<SThreadStartupInfo>();
     info->threadName = name;
     info->entryFunc = entry;
     info->argList = arglist;

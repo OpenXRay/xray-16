@@ -2,13 +2,8 @@
 
 void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
 {
-    //	TODO: DX10: Check thst we will never need old SMap implementation
     // Targets
-    if (RImplementation.o.HW_smap)
-        u_setrt(rt_smap_surf, NULL, NULL, rt_smap_depth->pZRT);
-    // else								u_setrt	(rt_smap_surf, NULL, NULL, rt_smap_ZB);
-    else
-        VERIFY(!"Use HW SMap only for DX10!");
+    u_setrt(rt_smap_surf, nullptr, nullptr, rt_smap_depth->pZRT);
 
     //	Don't have rect clear for DX10
     //	TODO: DX9:	Full clear must be faster for the near phase for SLI
@@ -34,10 +29,9 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
         RImplementation.rmNormal();
     else
     {
-        D3D_VIEWPORT VP = {(float)L->X.D.minX, (float)L->X.D.minY, (float)(L->X.D.maxX - L->X.D.minX),
-            (float)(L->X.D.maxY - L->X.D.minY), 0, 1};
-        // CHK_DX								(HW.pDevice->SetViewport(&VP));
-        HW.pContext->RSSetViewports(1, &VP);
+        RCache.SetViewport({ (float)L->X.D.minX, (float)L->X.D.minY,
+            (float)(L->X.D.maxX - L->X.D.minX), (float)(L->X.D.maxY - L->X.D.minY),
+            0.f, 1.f });
     }
 
     // Stencil	- disable

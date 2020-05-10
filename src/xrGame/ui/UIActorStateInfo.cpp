@@ -31,8 +31,22 @@
 #include "Artefact.h"
 #include "string_table.h"
 
-ui_actor_state_wnd::ui_actor_state_wnd() {}
 ui_actor_state_wnd::~ui_actor_state_wnd() { delete_data(m_hint_wnd); }
+
+void ui_actor_state_wnd::init_from_xml(CUIXml& xml)
+{
+    for (int i = 0; i < stt_count; ++i)
+    {
+        m_state[i] = new ui_actor_state_item();
+        m_state[i]->SetAutoDelete(true);
+        AttachChild(m_state[i]);
+        m_state[i]->set_hint_wnd(m_hint_wnd);
+    }
+    m_state[stt_health]->init_from_xml_plain(xml, "progress_bar_health");
+    m_state[stt_psi]->init_from_xml_plain(xml, "progress_bar_psy");
+    m_state[stt_radia]->init_from_xml_plain(xml, "progress_bar_radiation");
+}
+
 void ui_actor_state_wnd::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     XML_NODE stored_root = xml.GetLocalRoot();
@@ -299,7 +313,8 @@ void ui_actor_state_wnd::UpdateHitZone()
 void ui_actor_state_wnd::Draw()
 {
     inherited::Draw();
-    m_hint_wnd->Draw();
+    if (m_hint_wnd)
+        m_hint_wnd->Draw();
 }
 
 void ui_actor_state_wnd::Show(bool status)
@@ -309,19 +324,8 @@ void ui_actor_state_wnd::Show(bool status)
 }
 
 /// =============================================================================================
-ui_actor_state_item::ui_actor_state_item()
-{
-    m_static = NULL;
-    m_static2 = NULL;
-    m_static3 = NULL;
-    m_progress = NULL;
-    m_sensor = NULL;
-    m_arrow = NULL;
-    m_arrow_shadow = NULL;
-    m_magnitude = 1.0f;
-}
+ui_actor_state_item::ui_actor_state_item() : m_magnitude(1.0f) {}
 
-ui_actor_state_item::~ui_actor_state_item() {}
 void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical /*= true*/)
 {
     if (!CUIXmlInit::InitWindow(xml, path, 0, this, critical))
@@ -377,6 +381,11 @@ void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical 
     }
     set_arrow(0.0f);
     xml.SetLocalRoot(stored_root);
+}
+
+void ui_actor_state_item::init_from_xml_plain(CUIXml& xml, LPCSTR path)
+{
+    m_progress = UIHelper::CreateProgressBar(xml, path, this);
 }
 
 bool ui_actor_state_item::set_text(float value)

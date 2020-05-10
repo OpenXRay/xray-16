@@ -48,6 +48,9 @@
     <ClCompile Include="GameSpy_SAKE.cpp">
       <Filter>Wrapper</Filter>
     </ClCompile>
+    <ClCompile Include="GameSpy_BrowsersWrapper.cpp">
+      <Filter>Wrapper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xrGameSpy.h">
@@ -93,6 +96,9 @@
       <Filter>Wrapper</Filter>
     </ClInclude>
     <ClInclude Include="GameSpy_SAKE.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSpy_BrowsersWrapper.h">
       <Filter>Wrapper</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,7 +16,7 @@
 
 #include "xrPhysics.h"
 
-#if defined(DEBUG) && defined(WINDOWS)
+#if defined(DEBUG) && defined(XR_PLATFORM_WINDOWS)
 #include <d3d9types.h>
 #endif
 

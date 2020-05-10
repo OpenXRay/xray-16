@@ -1,5 +1,9 @@
 #pragma once
 
+// Base targets
+#define r2_RT_base "$user$base_"
+#define r2_RT_base_depth "$user$base_depth"
+
 // r3xx code-path (MRT)
 #define r2_RT_depth "$user$depth" // MRT
 #define r2_RT_P "$user$position" // MRT
@@ -35,6 +39,8 @@
 
 #define r2_RT_smap_surf "$user$smap_surf" // --- directional
 #define r2_RT_smap_depth "$user$smap_depth" // ---directional
+
+#define r2_async_ss "$user$async_ss"
 
 #define r2_material "$user$material" // ---
 #define r2_ds2_fade "$user$ds2_fade" // ---

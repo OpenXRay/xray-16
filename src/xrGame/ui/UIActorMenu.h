@@ -21,9 +21,12 @@ class CInventoryBox;
 class CUIInventoryUpgradeWnd;
 class UIInvUpgradeInfo;
 class CUIMessageBoxEx;
+class StaticDrawableWrapper;
 class CUIPropertiesBox;
 class CTrade;
 class CUIProgressBar;
+class CUITradeBar;
+class CUIWeightBar;
 
 namespace inventory
 {
@@ -79,116 +82,117 @@ protected:
         eSndMax
     };
 
+    enum eActorMenuListType
+    {
+        eInventoryPistolList,
+        eInventoryAutomaticList,
+
+        eInventoryOutfitList,
+        eInventoryHelmetList,
+
+        eInventoryBeltList,
+        eInventoryDetectorList,
+
+        eInventoryBagList,
+
+        eTradeActorList,
+        eTradeActorBagList,
+
+        eTradePartnerList,
+        eTradePartnerBagList,
+
+        eSearchLootBagList,
+        eSearchLootActorBagList,
+
+        eTrashList,
+
+        eListCount
+    };
+
     EMenuMode m_currMenuMode;
     ref_sound sounds[eSndMax];
     void PlaySnd(eActorMenuSndAction a);
 
-    UIHint* m_hint_wnd;
-    CUIItemInfo* m_ItemInfo;
-    CUICellItem* m_InfoCellItem;
-    u32 m_InfoCellItem_timer;
-    CUICellItem* m_pCurrentCellItem;
+    CInventoryOwner* m_pActorInvOwner{};
+    CInventoryOwner* m_pPartnerInvOwner{};
+    CInventoryBox* m_pInvBox{};
 
-    CUICellItem* m_upgrade_selected;
-    CUIPropertiesBox* m_UIPropertiesBox;
+    CTrade* m_actor_trade{};
+    CTrade* m_partner_trade{};
 
-    ui_actor_state_wnd* m_ActorStateInfo;
-    CUICharacterInfo* m_ActorCharacterInfo;
-    CUICharacterInfo* m_PartnerCharacterInfo;
+    CUICellItem* m_pCurrentCellItem{};
 
-    CUIDragDropListEx* m_pInventoryBeltList;
-    CUIDragDropListEx* m_pInventoryPistolList;
-    CUIDragDropListEx* m_pInventoryAutomaticList;
-    CUIDragDropListEx* m_pInventoryOutfitList;
-    CUIDragDropListEx* m_pInventoryHelmetList;
-    CUIDragDropListEx* m_pInventoryDetectorList;
-    CUIDragDropListEx* m_pInventoryBagList;
+    // Messages
+    CUIPropertiesBox* m_UIPropertiesBox{};
+    CUIMessageBoxEx* m_message_box_yes_no{};
+    CUIMessageBoxEx* m_message_box_ok{};
+    StaticDrawableWrapper* m_message_static{};
 
-    CUIDragDropListEx* m_pTradeActorBagList;
-    CUIDragDropListEx* m_pTradeActorList;
-    CUIDragDropListEx* m_pTradePartnerBagList;
-    CUIDragDropListEx* m_pTradePartnerList;
-    CUIDragDropListEx* m_pDeadBodyBagList;
-    CUIDragDropListEx* m_pTrashList;
+    // Windows
+    CUIWindow* m_pInventoryWnd{};
+    CUIWindow* m_pTradeWnd{};
+    CUIWindow* m_pSearchLootWnd{};
+    CUIInventoryUpgradeWnd* m_pUpgradeWnd{};
+    UIInvUpgradeInfo* m_upgrade_info{};
+    CUICellItem* m_upgrade_selected{};
 
-    enum
-    {
-        e_af_count = 5
-    };
+    // Left side
+    CUIStatic* m_LeftBackground{};
 
-    CUIStatic* m_belt_list_over[e_af_count];
-    CUIStatic* m_HelmetOver;
+    // Character infos
+    CUICharacterInfo* m_ActorCharacterInfo{};
+    CUICharacterInfo* m_PartnerCharacterInfo{};
+    CUICharacterInfo* m_TradeActorCharacterInfo{};
+    CUICharacterInfo* m_TradePartnerCharacterInfo{};
+    CUICharacterInfo* m_SearchLootActorCharacterInfo{};
+    CUICharacterInfo* m_SearchLootPartnerCharacterInfo{};
 
-    CUIStatic* m_InvSlot2Highlight;
-    CUIStatic* m_InvSlot3Highlight;
-    CUIStatic* m_HelmetSlotHighlight;
-    CUIStatic* m_OutfitSlotHighlight;
-    CUIStatic* m_DetectorSlotHighlight;
-    CUIStatic* m_QuickSlotsHighlight[4];
-    CUIStatic* m_ArtefactSlotsHighlight[e_af_count];
+    // Item infos
+    CUIItemInfo* m_ItemInfo{};
+    CUIItemInfo* m_ItemInfoInventoryMode{};
+    CUIItemInfo* m_ItemInfoTradeMode{};
+    CUIItemInfo* m_ItemInfoSearchLootMode{};
 
-    CUIInventoryUpgradeWnd* m_pUpgradeWnd;
+    // Money
+    CUIStatic* m_ActorMoney{};
+    CUIStatic* m_TradeActorMoney{};
+    CUIStatic* m_PartnerMoney{};
 
-    CUIStatic* m_LeftBackground;
+    // Trade bar
+    CUITradeBar* m_ActorTradeBar;
+    CUITradeBar* m_PartnerTradeBar;
 
-    UIInvUpgradeInfo* m_upgrade_info;
-    CUIMessageBoxEx* m_message_box_yes_no;
-    CUIMessageBoxEx* m_message_box_ok;
+    // Weight bar
+    CUIWeightBar* m_ActorWeightBar;
+    CUIWeightBar* m_PartnerWeightBar;
 
-    CInventoryOwner* m_pActorInvOwner;
-    CInventoryOwner* m_pPartnerInvOwner;
-    CInventoryBox* m_pInvBox;
+    // Drag&Drop lists
+    CUIDragDropListEx* m_pLists[eListCount]{};
 
-    CUITextWnd* m_ActorMoney;
-    CUITextWnd* m_PartnerMoney;
-    CUITextWnd* m_QuickSlot1;
-    CUITextWnd* m_QuickSlot2;
-    CUITextWnd* m_QuickSlot3;
-    CUITextWnd* m_QuickSlot4;
+public:
+    CUIDragDropReferenceList* m_pQuickSlot{};
 
-    CUIProgressBar* m_WeaponSlot1_progress;
-    CUIProgressBar* m_WeaponSlot2_progress;
-    CUIProgressBar* m_Helmet_progress;
-    CUIProgressBar* m_Outfit_progress;
-    // bottom ---------------------------------
-    CUIStatic* m_ActorBottomInfo;
-    CUITextWnd* m_ActorWeight;
-    CUITextWnd* m_ActorWeightMax;
+protected:
+    // Condition bars
+    ui_actor_state_wnd* m_ActorStateInfo{};
 
-    CUIStatic* m_PartnerBottomInfo;
-    CUITextWnd* m_PartnerWeight;
-    float m_PartnerWeight_end_x;
-    //*	CUIStatic*					m_PartnerWeightMax;
+    // Buttons
+    CUI3tButton* m_trade_button{};
+    CUI3tButton* m_trade_buy_button{};
+    CUI3tButton* m_trade_sell_button{};
+    CUI3tButton* m_takeall_button{};
+    CUI3tButton* m_exit_button{};
 
-    // delimiter ------------------------------
-    CUIStatic* m_LeftDelimiter;
-    CUITextWnd* m_PartnerTradeCaption;
-    CUITextWnd* m_PartnerTradePrice;
-    CUITextWnd* m_PartnerTradeWeightMax;
+    // Helpers
+    CUIStatic* m_clock_value{};
+    UIHint* m_hint_wnd{};
 
-    CUIStatic* m_RightDelimiter;
-    CUITextWnd* m_ActorTradeCaption;
-    CUITextWnd* m_ActorTradePrice;
-    CUITextWnd* m_ActorTradeWeightMax;
-
-    CTrade* m_actor_trade;
-    CTrade* m_partner_trade;
-
-    CUI3tButton* m_trade_button;
-    CUI3tButton* m_trade_buy_button;
-    CUI3tButton* m_trade_sell_button;
-    CUI3tButton* m_takeall_button;
-    CUI3tButton* m_exit_button;
-    CUIStatic* m_clock_value;
-
+protected:
     u32 m_last_time;
     bool m_repair_mode;
     bool m_item_info_view;
     bool m_highlight_clear;
     u32 m_trade_partner_inventory_state;
-
-public:
-    CUIDragDropReferenceList* m_pQuickSlot;
 
 public:
     void SetMenuMode(EMenuMode mode);
@@ -220,12 +224,27 @@ private:
 
 protected:
     void Construct();
+    void InitializeUniversal(CUIXml& uiXml);
+    void InitializeUpgradeMode(CUIXml& uiXml);
+
+    // Old style UI
+    void InitializeInventoryMode(CUIXml& uiXml);
+    void InitializeTradeMode(CUIXml& uiXml);
+    void InitializeSearchLootMode(CUIXml& uiXml);
+    // Old style UI
+
+    void InitSounds(CUIXml& uiXml);
+    void InitAllowedDrops();
     void InitCallbacks();
 
     void InitCellForSlot(u16 slot_idx);
-    void InitInventoryContents(CUIDragDropListEx* pBagList);
+    void InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyBagList = false);
     void ClearAllLists();
+
     void BindDragDropListEvents(CUIDragDropListEx* lst);
+    void RegisterCallback(CUIWindow* window, s16 event, const CUIWndCallback::void_function& callback);
+
+    static bool ShowIfExist(CUIWindow* window, bool status); // sorry
 
     EDDListType GetListType(CUIDragDropListEx* l);
 
@@ -260,6 +279,9 @@ protected:
     void InitDeadBodySearchMode();
     void DeInitDeadBodySearchMode() const;
 
+    void InitActorInfo();
+    void InitPartnerInfo();
+
     void CurModeToScript();
     void RepairEffect_CurItem();
 
@@ -272,6 +294,9 @@ protected:
     PIItem CurrentIItem();
 
     void InfoCurItem(CUICellItem* cell_item); // on update item
+    CUIItemInfo* GetModeSpecificItemInfo();
+    CUICharacterInfo* GetModeSpecificActorInfo() const;
+    CUICharacterInfo* GetModeSpecificPartnerInfo(EMenuMode fallback) const;
 
     void ActivatePropertiesBox();
     void TryHidePropertiesBox();
@@ -338,6 +363,8 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
 
+    void ShowMessage(pcstr message, pcstr staticMessage = nullptr, float staticMsgTtl = -1.0f);
+
     void CallMessageBoxYesNo(LPCSTR text);
     void CallMessageBoxOK(LPCSTR text);
     void xr_stdcall OnMesBoxYes(CUIWindow*, void*);
@@ -360,7 +387,6 @@ public:
     void xr_stdcall OnBtnExitClicked(CUIWindow* w, void* d);
     void xr_stdcall TakeAllFromPartner(CUIWindow* w, void* d);
     void TakeAllFromInventoryBox();
-    void UpdateConditionProgressBars();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
 

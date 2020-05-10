@@ -59,7 +59,7 @@ void CWeaponMagazinedWGrenade::Load(LPCSTR section)
 }
 
 void CWeaponMagazinedWGrenade::net_Destroy() { inherited::net_Destroy(); }
-BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
+bool CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
 {
     CSE_ALifeItemWeapon* const weapon = smart_cast<CSE_ALifeItemWeapon*>(DC);
     R_ASSERT(weapon);

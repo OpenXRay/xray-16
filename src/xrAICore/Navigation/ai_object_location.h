@@ -12,15 +12,15 @@
 
 namespace LevelGraph
 {
-class CVertex;
+class CLevelVertex;
 };
 
 class CAI_ObjectLocation
 {
 public:
     using _GRAPH_ID = GameGraph::_GRAPH_ID;
-    using CVertex = GameGraph::CVertex;
-    using CLevelVertex = LevelGraph::CVertex;
+    using CGameVertex = GameGraph::CGameVertex;
+    using CLevelVertex = LevelGraph::CLevelVertex;
 
 private:
     u32 m_level_vertex_id;
@@ -30,9 +30,9 @@ public:
     IC CAI_ObjectLocation();
     IC void init();
     IC void reinit();
-    IC void game_vertex(CVertex const* game_vertex);
+    IC void game_vertex(CGameVertex const* game_vertex);
     IC void game_vertex(_GRAPH_ID const& game_vertex_id);
-    IC const CVertex* game_vertex() const;
+    IC const CGameVertex* game_vertex() const;
     IC const _GRAPH_ID game_vertex_id() const;
     IC void level_vertex(CLevelVertex const* level_vertex);
     IC void level_vertex(u32 const& level_vertex_id);

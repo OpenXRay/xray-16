@@ -13,6 +13,7 @@ class CMissile;
 class CInventoryItem;
 class CUIHudStatesWnd;
 class CUIMotionIcon;
+class CUIArtefactPanel;
 
 class CUIMainIngameWnd : public CUIWindow
 {
@@ -49,6 +50,8 @@ public:
     CUIStatic* m_ind_boost_health;
     CUIStatic* m_ind_boost_power;
     CUIStatic* m_ind_boost_rad;
+
+    CUIArtefactPanel* UIArtefactPanel;
 
     void ShowZoneMap(bool status);
     void DrawZoneMap();

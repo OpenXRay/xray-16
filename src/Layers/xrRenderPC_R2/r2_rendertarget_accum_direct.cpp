@@ -414,7 +414,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_Geometry(g_combine_cuboid);
 
         // setup
-        RCache.set_Element(s_accum_direct_cascade->E[sub_phase]);
+        RCache.set_Element(s_accum_direct->E[sub_phase]);
 
         RCache.set_c("m_texgen", m_Texgen);
         RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
@@ -513,7 +513,7 @@ void CRenderTarget::accum_direct_blend()
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
+        u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
 
         // Common calc for quad-rendering
         u32 Offset;
@@ -554,7 +554,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         return;
     }
     phase_accumulator();
-    u_setrt(rt_Generic_0, NULL, NULL, HW.pBaseZB);
+    u_setrt(rt_Generic_0, NULL, NULL, get_base_zb());
 
     // *** assume accumulator setted up ***
     light* fuckingsun = (light*)RImplementation.Lights.sun._get();
@@ -623,7 +623,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
     // Perform lighting
     {
-        u_setrt(rt_Generic_0, NULL, NULL, HW.pBaseZB); // enshure RT setup
+        u_setrt(rt_Generic_0, NULL, NULL, get_base_zb()); // enshure RT setup
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 
@@ -837,7 +837,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     //  Set correct depth surface
     //  It's slow. Make this when shader is created
     {
-        char* pszSMapName;
+        pcstr pszSMapName;
         BOOL b_HW_smap = RImplementation.o.HW_smap;
         BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
         if (b_HW_smap)
@@ -851,10 +851,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
             pszSMapName = r2_RT_smap_surf;
         // s_smap
 
-        STextureList* _T = &*s_accum_direct_volumetric_cascade->E[0]->passes[0]->T;
-
-        if (ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
-            _T = &*s_accum_direct_volumetric->E[0]->passes[0]->T;
+        STextureList* _T = &*s_accum_direct_volumetric->E[0]->passes[0]->T;
 
         STextureList::iterator _it = _T->begin();
         STextureList::iterator _end = _T->end();
@@ -884,12 +881,9 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         //  RCache.set_Geometry         (g_combine_2UV);
 
         // setup
-
-        if (ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
-            RCache.set_Element(s_accum_direct_volumetric->E[0]);
-        else
+        RCache.set_Element(s_accum_direct_volumetric->E[0]);
+        if (!RImplementation.o.oldshadowcascades)
         {
-            RCache.set_Element(s_accum_direct_volumetric_cascade->E[0]);
             RCache.set_CullMode(CULL_CCW);
         }
 
@@ -916,11 +910,10 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         else
         {
             extern float OLES_SUN_LIMIT_27_01_07;
-            if (ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
+            if (RImplementation.o.oldshadowcascades)
                 zMin = ps_r2_sun_near;
             else
                 zMin = 0; /////*****************************************************************************************
-
             zMax = OLES_SUN_LIMIT_27_01_07;
         }
 
@@ -960,7 +953,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         // setup stencil: we have to draw to both lit and unlit pixels
         // RCache.set_Stencil           (TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
 
-        if (ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
+        if (RImplementation.o.oldshadowcascades)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         else
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);

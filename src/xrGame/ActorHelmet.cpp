@@ -65,7 +65,7 @@ void CHelmet::ReloadBonesProtection()
         m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
 }
 
-BOOL CHelmet::net_Spawn(CSE_Abstract* DC)
+bool CHelmet::net_Spawn(CSE_Abstract* DC)
 {
     if (IsGameTypeSingle())
         ReloadBonesProtection();

@@ -36,6 +36,7 @@
 
 #include "map_manager.h"
 #include "ui/UIMainIngameWnd.h"
+#include "ui/UIArtefactPanel.h"
 #include "GamePersistent.h"
 #include "game_object_space.h"
 #include "GametaskManager.h"
@@ -532,7 +533,7 @@ void CActor::net_Import_Physic_proceed()
     CrPr_SetActivationStep(0);
 };
 
-BOOL CActor::net_Spawn(CSE_Abstract* DC)
+bool CActor::net_Spawn(CSE_Abstract* DC)
 {
     m_holder_id = ALife::_OBJECT_ID(-1);
     m_feel_touch_characters = 0;
@@ -571,15 +572,15 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     game_news_registry->registry().init(ID());
 
     if (!CInventoryOwner::net_Spawn(DC))
-        return FALSE;
+        return false;
     if (!inherited::net_Spawn(DC))
-        return FALSE;
+        return false;
 
     CSE_ALifeTraderAbstract* pTA = smart_cast<CSE_ALifeTraderAbstract*>(e);
     set_money(pTA->m_dwMoney, false);
 
-    //.	if(	TRUE == E->s_flags.test(M_SPAWN_OBJECT_LOCAL) && TRUE == E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER))
-    //.		CurrentGameUI()->UIMainIngameWnd->m_artefactPanel->InitIcons(m_ArtefactsOnBelt);
+    // clear artefacts on belt
+    m_ArtefactsOnBelt.clear();
 
     ROS()->force_mode(IRender_ObjectSpecific::TRACE_ALL);
 
@@ -729,7 +730,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     {
         setLocal(FALSE);
     };
-    return TRUE;
+    return true;
 }
 
 void CActor::net_Destroy()
@@ -771,6 +772,10 @@ void CActor::net_Destroy()
     m_holder = NULL;
     m_holderID = u16(-1);
 
+    m_ArtefactsOnBelt.clear();
+    if (Level().CurrentViewEntity() == this && CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel)
+        CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel->InitIcons(m_ArtefactsOnBelt);
+
     SetDefaultVisualOutfit(NULL);
 
     if (g_actor == this)
@@ -810,7 +815,7 @@ void CActor::net_Relcase(IGameObject* O)
     HUD().net_Relcase(O);
 }
 
-BOOL CActor::net_Relevant() // relevant for export to server
+bool CActor::net_Relevant() // relevant for export to server
 {
     if (OnServer())
     {
@@ -1866,7 +1871,7 @@ void CActor::net_Save(NET_Packet& P)
 #endif
 }
 
-BOOL CActor::net_SaveRelevant() { return TRUE; }
+bool CActor::net_SaveRelevant() { return true; }
 void CActor::SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir)
 {
     m_iLastHitterID = (who != NULL) ? who->ID() : u16(-1);
@@ -2084,7 +2089,7 @@ bool CActor::InventoryAllowSprint()
     return true;
 };
 
-BOOL CActor::BonePassBullet(int boneID)
+bool CActor::BonePassBullet(int boneID)
 {
     if (GameID() == eGameIDSingle)
         return inherited::BonePassBullet(boneID);

@@ -30,17 +30,17 @@ class ENGINE_API CTheoraStream
 
 protected:
     int ReadData();
-    BOOL ParseHeaders();
+    bool ParseHeaders();
 
 public:
     CTheoraStream();
     virtual ~CTheoraStream();
 
-    BOOL Load(const char* fname);
+    bool Load(const char* fname);
 
     void Reset();
 
-    BOOL Decode(u32 tm_play);
+    bool Decode(u32 tm_play);
 
     yuv_buffer* CurrentFrame() { return &t_yuv_buffer; }
 };

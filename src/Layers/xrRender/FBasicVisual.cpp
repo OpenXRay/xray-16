@@ -5,10 +5,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#ifndef _EDITOR
-#include "xrEngine/Render.h"
-#endif // #ifndef _EDITOR
-
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 

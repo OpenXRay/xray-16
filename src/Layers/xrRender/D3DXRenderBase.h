@@ -80,7 +80,6 @@ public:
     RenderStatistics BasicStats;
 
 public:
-    void set_Object(IRenderable* /*O*/) override { /* nothing here */ }
     void set_Feedback(R_feedback* V, u32 id)
     {
         val_feedback_breakp = id;
@@ -196,6 +195,7 @@ public:
     //	Resources control
     virtual void DeferredLoad(bool E) override;
     virtual void ResourcesDeferredUpload() override;
+    virtual void ResourcesDeferredUnload() override;
     virtual void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) override;
     virtual void ResourcesDestroyNecessaryTextures() override;
     virtual void ResourcesStoreNecessaryTextures() override;

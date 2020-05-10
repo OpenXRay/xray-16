@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#pragma warning(pop)
-
 #include <D3DX10Tex.h>
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
@@ -313,7 +308,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
     ZeroMemory(&IMG, sizeof(IMG));
 
     //  Staging control
-    static bool bAllowStaging = !strstr(Core.Params, "-no_staging");
+    static bool bAllowStaging = !RImplementation.o.no_ram_textures;
     bStaging &= bAllowStaging;
 
     ID3DBaseTexture* pTexture2D = NULL;
@@ -324,6 +319,8 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
     int img_loaded_lod = 0;
     // D3DFORMAT                fmt;
     u32 mip_cnt = u32(-1);
+    bool dummyTextureExist;
+
     // validation
     R_ASSERT(fRName);
     R_ASSERT(fRName[0]);
@@ -348,7 +345,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
 #else
 
     Msg("! Can't find texture '%s'", fname);
-    const bool dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
+    dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
     if (!ShadowOfChernobylMode)
         R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
@@ -411,7 +408,7 @@ _DDS_CUBE:
     }
     else
     {
-        LoadInfo.Usage = D3D_USAGE_DEFAULT;
+        LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
         LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
     }
 
@@ -462,7 +459,7 @@ _DDS_2D:
     LoadInfo.Height = IMG.Height;
 
     // x64 crash workaround
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     LoadInfo.FirstMipLevel = img_loaded_lod;
 #else
     if (img_loaded_lod)
@@ -478,7 +475,7 @@ _DDS_2D:
     }
     else
     {
-        LoadInfo.Usage = D3D_USAGE_DEFAULT;
+        LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
         LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
     }
     LoadInfo.pSrcInfo = &IMG;

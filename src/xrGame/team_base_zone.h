@@ -22,7 +22,7 @@ public:
     CTeamBaseZone();
     virtual ~CTeamBaseZone();
     virtual void reinit();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void Center(Fvector& C) const;

@@ -166,12 +166,12 @@ public:
     virtual void reload(LPCSTR section);
     virtual void LoadSounds(LPCSTR section);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     virtual void net_Destroy();
     virtual void net_Save(NET_Packet& P);
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
     virtual void net_Relcase(IGameObject* O);
 
     // save/load server serialization
@@ -182,7 +182,7 @@ public:
     virtual void shedule_Update(u32 dt);
     virtual void Think();
     virtual void SelectAnimation(const Fvector& _view, const Fvector& _move, float speed);
-    virtual BOOL UsedAI_Locations();
+    virtual bool UsedAI_Locations();
 
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
     virtual void g_fireParams(const CHudItem* pHudItem, Fvector& P, Fvector& D);
@@ -786,7 +786,7 @@ public:
     typedef fastdelegate::FastDelegate<void(Fmatrix&)> EyeMatrixCallback;
 
 private:
-    virtual BOOL AlwaysTheCrow();
+    virtual bool AlwaysTheCrow();
 
 public:
     IC void take_items_enabled(bool value);

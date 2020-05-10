@@ -25,7 +25,7 @@ class point
 {
 public:
     point() : m_time(-FLT_MAX) {}
-    IC const pose& pose() const { return p; }
+    IC const pose& get_pose() const { return p; }
     IC float time() const { return m_time; }
     IC point& set(const extrapolation::pose& p_, float time)
     {

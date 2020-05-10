@@ -21,14 +21,14 @@ void points::init(const Fmatrix& m)
 
 static void spline_coefs_linar(const point& p0, const point& p1, pose& a0, pose& a1)
 {
-    a1 = p0.pose();
+    a1 = p0.get_pose();
     if (p1.time() - p0.time() > EPS_S)
-        a1.invert().add(p1.pose()).mul(1.f / (p1.time() - p0.time())); // ( y0^(-1) * y1 ) * ( t1 - t0 )
+        a1.invert().add(p1.get_pose()).mul(1.f / (p1.time() - p0.time())); // ( y0^(-1) * y1 ) * ( t1 - t0 )
     else
         a1.identity();
 
     a0 = a1;
-    a0.mul(p1.time()).invert().add(p0.pose()); // (a1*t1)^1 * y0
+    a0.mul(p1.time()).invert().add(p0.get_pose()); // (a1*t1)^1 * y0
 }
 
 static void spline_linear(const point& p0, const point& p1, float t, pose& p)

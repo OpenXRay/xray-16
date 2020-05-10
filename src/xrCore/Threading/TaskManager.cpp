@@ -5,45 +5,54 @@
 #include "Task.hpp"
 #include "TaskManager.hpp"
 
+#ifdef USE_TBB_PARALLEL
 #include <thread>
-
 #include <tbb/task_scheduler_init.h>
+#endif
 
 xr_unique_ptr<TaskManagerBase> TaskScheduler;
 
+#ifdef USE_TBB_PARALLEL
 TaskManagerBase::TaskManagerBase() : taskerSleepTime(2), shouldStop(true) {}
+#else
+TaskManagerBase::TaskManagerBase() {}
+#endif // USE_TBB_PARALLEL
 
 void TaskManagerBase::Initialize()
 {
+#ifdef USE_TBB_PARALLEL
     if (!shouldStop)
         return;
 
     shouldStop = false;
     Threading::SpawnThread(taskManagerThread, "X-Ray Task Scheduler thread", 0, this);
-    Threading::SpawnThread(taskWatcherThread, "X-Ray Task Watcher thread", 0, this);
+#endif
 }
 
 void TaskManagerBase::Destroy()
 {
+#ifdef USE_TBB_PARALLEL
     if (shouldStop)
         return;
 
     shouldStop = true;
     mainThreadExit.Wait();
-    watcherThreadExit.Wait();
+#endif
 }
 
 bool TaskManagerBase::TaskQueueIsEmpty() const
 {
-    return tasks.empty() && tasksInExecution.empty();
+#ifdef USE_TBB_PARALLEL
+    return tasks.empty();
+#else
+    return true;
+#endif // USE_TBB_PARALLEL
 }
 
+#ifdef USE_TBB_PARALLEL
 void TaskManagerBase::taskManagerThread(void* thisPtr)
 {
-    int threads = tbb::task_scheduler_init::default_num_threads();
-    if (threads < 4)
-        threads = 4;
-    tbb::task_scheduler_init init(threads);
+    tbb::task_scheduler_init init;
 
     TaskManagerBase& self = *static_cast<TaskManagerBase*>(thisPtr);
 
@@ -69,90 +78,13 @@ void TaskManagerBase::taskManagerThread(void* thisPtr)
     }
     self.mainThreadExit.Set();
 }
-
-void TaskManagerBase::taskWatcherThread(void* thisPtr)
-{
-    TaskManagerBase& self = *static_cast<TaskManagerBase*>(thisPtr);
-    bool calmDown = false;
-
-    while (!self.shouldStop)
-    {
-        self.executionLock.Enter();
-        if (self.tasksInExecution.empty())
-        {
-            self.executionLock.Leave();
-            Sleep(WATCHER_CALM_DOWN_PERIOD);
-            continue;
-        }
-
-#ifndef MASTER_GOLD
-        for (Task* task : self.tasksInExecution)
-        {
-            if (!task->IsStarted())
-                continue;
-
-            const u64 time = task->GetElapsedMs();
-
-            if (time > ABNORMAL_EXECUTION_TIME)
-            {
-                calmDown = true;
-                Msg("! Abnormal task execution time [%dms] in [ %s ]", time, task->GetName());
-            }
-
-#ifdef PROFILE_TASKS
-            bool tooLong;
-            bool veryLong;
-
-            else if (task->IsComplex())
-            {
-                tooLong = time > COMPLEX_TASK_ACCEPTABLE_EXECUTION_TIME;
-                veryLong = time > COMPLEX_TASK_ACCEPTABLE_EXECUTION_TIME * 2;
-            }
-            else
-            {
-                tooLong = time > SIMPLE_TASK_ACCEPTABLE_EXECUTION_TIME;
-                veryLong = time > SIMPLE_TASK_ACCEPTABLE_EXECUTION_TIME * 2;
-            }
-
-            if (veryLong)
-            {
-                calmDown = true;
-                Msg("! Task [%s] runs too long %dms", task->GetName(), time);
-            }
-            else if (tooLong)
-            {
-                calmDown = true;
-                Msg("~ Task [%s] runs very long %dms", task->GetName(), time);
-            }
-#endif // PROFILE_TASKS
-        }
-#endif // MASTER_GOLD
-        self.executionLock.Leave();
-        if (calmDown)
-        {
-            Sleep(WATCHER_CALM_DOWN_PERIOD);
-            calmDown = false;
-        }
-    }
-
-    // Wait until last task is done
-    while (true)
-    {
-        ScopeLock scope(&self.executionLock);
-        
-        if (self.tasksInExecution.empty())
-            break;
-
-        Sleep(WATCHER_CALM_DOWN_PERIOD);
-    }
-
-    self.watcherThreadExit.Set();
-}
+#endif // USE_TBB_PARALLEL
 
 void TaskManagerBase::AddTask(pcstr name, Task::TaskFunc taskFunc,
     Task::IsAllowedCallback callback /*= nullptr*/, Task::DoneCallback done /*= nullptr*/,
     Event* doneEvent /*= nullptr*/)
 {
+#ifdef USE_TBB_PARALLEL
     Task* task = new (tbb::task::allocate_root()) Task(name, std::move(taskFunc),
         std::move(callback), std::move(done), doneEvent);
 
@@ -165,10 +97,15 @@ void TaskManagerBase::AddTask(pcstr name, Task::TaskFunc taskFunc,
     lock.Enter();
     tasks.emplace_back(task);
     lock.Leave();
+#else
+    Task task(name, std::move(taskFunc), std::move(callback), std::move(done), doneEvent);
+    SpawnTask(&task); // SpawnTask can be overriden, so let's call it and execute there
+#endif // USE_TBB_PARALLEL
 }
 
 void TaskManagerBase::RemoveTask(Task::TaskFunc&& func)
 {
+#ifdef USE_TBB_PARALLEL
     ScopeLock scope(&lock);
 
     xr_vector<Task*>::iterator it;
@@ -185,10 +122,12 @@ void TaskManagerBase::RemoveTask(Task::TaskFunc&& func)
         Task::destroy(**it);
         tasks.erase(it);
     }
+#endif // USE_TBB_PARALLEL
 }
 
 void TaskManagerBase::RemoveTasksWithName(pcstr name)
 {
+#ifdef USE_TBB_PARALLEL
     ScopeLock scope(&lock);
 
     xr_vector<Task*>::iterator it;
@@ -206,10 +145,12 @@ void TaskManagerBase::RemoveTasksWithName(pcstr name)
         Task::destroy(**it);
         tasks.erase(it);
     }
+#endif // USE_TBB_PARALLEL
 }
 
 void TaskManagerBase::SpawnTask(Task* task, bool shortcut /*= false*/)
 {
+#ifdef USE_TBB_PARALLEL
     if (!shortcut)
     {
         const auto it = std::find(tasks.begin(), tasks.end(), task);
@@ -219,25 +160,16 @@ void TaskManagerBase::SpawnTask(Task* task, bool shortcut /*= false*/)
         tasks.erase(it);
     }
 
-    executionLock.Enter();
-    tasksInExecution.emplace_back(task);
-    executionLock.Leave();
-
     // Run it
     tbb::task::spawn(*task);
+#else
+    UNUSED(shortcut);
+    task->execute();
+#endif // USE_TBB_PARALLEL
 }
 
 void TaskManagerBase::TaskDone(Task* task, u64 executionTime)
 {
-    executionLock.Enter();
-
-    const auto it = std::find(tasksInExecution.begin(), tasksInExecution.end(), task);
-    R_ASSERT3(it != tasksInExecution.end(), "Task is deleted from the task watcher", task->GetName());
-
-    tasksInExecution.erase(it);
-
-    executionLock.Leave();
-
     if (executionTime > ABNORMAL_EXECUTION_TIME)
     {
         Msg("! Task done after abnormal execution time [%dms] in [%s]", time, task->GetName());

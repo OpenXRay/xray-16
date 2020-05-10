@@ -31,7 +31,38 @@
 #define ROTATION_TIME 0.25f
 
 BOOL b_toggle_weapon_aim = FALSE;
-extern CUIXml* pWpnScopeXml;
+
+static class CUIWpnScopeXmlManager : public CUIResetNotifier, public pureAppEnd
+{
+    CUIXml m_xml;
+    bool m_loaded{};
+
+public:
+    void Load()
+    {
+        if (m_loaded)
+            return;
+        m_loaded = m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
+    }
+
+    void OnAppEnd()
+    {
+        m_xml.ClearInternal();
+        m_loaded = false;
+    }
+
+    void OnUIReset() override
+    {
+        OnAppEnd();
+        if (g_pGameLevel)
+            Load();
+    }
+
+    CUIXml& operator*()
+    {
+        return m_xml;
+    }
+} pWpnScopeXml;
 
 CWeapon::CWeapon()
 {
@@ -411,17 +442,11 @@ void CWeapon::Load(LPCSTR section)
     else if (m_eScopeStatus == ALife::eAddonPermanent)
     {
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
-        // Xottab_DUTY: Let others can launch SOC without debugger
-        if (!GEnv.isDedicatedServer && !ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
+        if (!GEnv.isDedicatedServer)
         {
             m_UIScope = new CUIWindow();
-            if (!pWpnScopeXml)
-            {
-                pWpnScopeXml = new CUIXml();
-                pWpnScopeXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
-            }
             shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
-            CUIXmlInit::InitWindow(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
+            LoadScope(scope_tex_name);
         }
     }
 
@@ -481,6 +506,15 @@ void CWeapon::Load(LPCSTR section)
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", true));
 }
 
+void CWeapon::LoadScope(const shared_str& section)
+{
+    if (ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
+        return;
+    pWpnScopeXml.Load();
+    R_ASSERT(m_UIScope);
+    CUIXmlInit::InitWindow(*pWpnScopeXml, section.c_str(), 0, m_UIScope);
+}
+
 void CWeapon::LoadFireParams(LPCSTR section)
 {
     cam_recoil.Dispersion = deg2rad(pSettings->r_float(section, "cam_dispersion"));
@@ -506,10 +540,10 @@ void CWeapon::LoadFireParams(LPCSTR section)
     CShootingObject::LoadFireParams(section);
 };
 
-BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
+bool CWeapon::net_Spawn(CSE_Abstract* DC)
 {
     m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
-    BOOL bResult = inherited::net_Spawn(DC);
+    const bool bResult = inherited::net_Spawn(DC);
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeItemWeapon* E = smart_cast<CSE_ALifeItemWeapon*>(e);
 

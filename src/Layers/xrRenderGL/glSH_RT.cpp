@@ -20,7 +20,23 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool /*useUAV = false*/)
+bool CRT::used_as_depth() const
+{
+    switch (fmt)
+    {
+    case D3DFMT_D16:
+    case D3DFMT_D16_LOCKABLE:
+    case D3DFMT_D15S1:
+    case D3DFMT_D24X8:
+    case D3DFMT_D24S8:
+    case MAKEFOURCC('D', 'F', '2', '4'):
+        return true;
+    default:
+        return false;
+    }
+}
+
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 /*flags = {}*/)
 {
     if (pRT) return;
 
@@ -32,6 +48,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool /
     dwWidth = w;
     dwHeight = h;
     fmt = f;
+    sampleCount = SampleCount;
 
     // Get caps
     GLint max_width, max_height;
@@ -78,10 +95,10 @@ void CRT::reset_begin()
 
 void CRT::reset_end()
 {
-    create(*cName, dwWidth, dwHeight, fmt);
+    create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags });
 }
 
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
 {
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f));
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
 }

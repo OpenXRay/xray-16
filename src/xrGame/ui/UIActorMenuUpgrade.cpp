@@ -17,13 +17,13 @@
 
 void CUIActorMenu::InitUpgradeMode()
 {
-    m_PartnerCharacterInfo->Show(true);
+    ShowIfExist(GetModeSpecificPartnerInfo(mmUpgrade), true);
     m_PartnerMoney->Show(false);
-    m_pUpgradeWnd->Show(true);
-    if (m_pQuickSlot)
-        m_pQuickSlot->Show(true);
+    ShowIfExist(m_pUpgradeWnd, true);
+    ShowIfExist(m_pQuickSlot, true);
+    m_pLists[eInventoryBagList]->Show(true);
 
-    InitInventoryContents(m_pInventoryBagList);
+    InitInventoryContents(m_pLists[eInventoryBagList]);
     VERIFY(m_pPartnerInvOwner);
     m_pPartnerInvOwner->StartTrading();
     //-	UpdateUpgradeItem();
@@ -31,10 +31,13 @@ void CUIActorMenu::InitUpgradeMode()
 
 void CUIActorMenu::DeInitUpgradeMode()
 {
-    m_PartnerCharacterInfo->Show(false);
-    m_pUpgradeWnd->Show(false);
-    m_pUpgradeWnd->set_info_cur_upgrade(NULL);
-    m_pUpgradeWnd->m_btn_repair->Enable(false);
+    ShowIfExist(GetModeSpecificPartnerInfo(mmUpgrade), false);
+    if (m_pUpgradeWnd)
+    {
+        m_pUpgradeWnd->Show(false);
+        m_pUpgradeWnd->set_info_cur_upgrade(NULL);
+        m_pUpgradeWnd->m_btn_repair->Enable(false);
+    }
 
     if (m_upgrade_selected)
     {

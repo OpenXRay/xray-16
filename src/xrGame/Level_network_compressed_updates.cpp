@@ -4,7 +4,7 @@
 #include "xrPhysics/IPHWorld.h"
 #include "xrServer_updates_compressor.h"
 
-void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
+void CLevel::ProcessCompressedUpdate(NET_Packet& P, const Flags8& compress_type)
 {
     NET_Packet uncompressed_packet;
     u16 next_size;
@@ -12,13 +12,13 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
     stats.ClientCompressor.Begin();
     while (next_size)
     {
-        if (compress_type & eto_ppmd_compression)
+        if (compress_type.test(eto_ppmd_compression))
         {
             R_ASSERT(m_trained_stream);
             uncompressed_packet.B.count = ppmd_trained_decompress(uncompressed_packet.B.data,
                 sizeof(uncompressed_packet.B.data), P.B.data + P.r_tell(), next_size, m_trained_stream);
         }
-        else if (compress_type & eto_lzo_compression)
+        else if (compress_type.test(eto_lzo_compression))
         {
             R_ASSERT(m_lzo_dictionary.data);
             uncompressed_packet.B.count = sizeof(uncompressed_packet.B.data);
@@ -62,6 +62,9 @@ void CLevel::init_compression()
 {
     compression::init_ppmd_trained_stream(m_trained_stream);
     compression::init_lzo(m_lzo_working_memory, m_lzo_working_buffer, m_lzo_dictionary);
+    // XXX: if client doesn't support compression, server should know about that
+    // and either allow connection (and send only uncompressed packets to such client)
+    // or kick the client with descriptive message
 }
 
 void CLevel::deinit_compression()

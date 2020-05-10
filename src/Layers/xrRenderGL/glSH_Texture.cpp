@@ -3,11 +3,7 @@
 
 #include "../xrRender/ResourceManager.h"
 
-#ifndef _EDITOR
-#include "../../xrEngine/Render.h"
-#endif
-
-#ifdef WINDOWS // TODO
+#ifdef XR_PLATFORM_WINDOWS // TODO
 #include "../../xrEngine/tntQAVI.h"
 #endif
 #include "../../xrEngine/xrTheora_Surface.h"
@@ -108,7 +104,7 @@ void CTexture::apply_avi(u32 dwStage)
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
 
-#ifdef WINDOWS // TODO
+#ifdef XR_PLATFORM_WINDOWS // TODO
     if (pAVI->NeedUpdate())
     {
         // AVI
@@ -164,7 +160,9 @@ void CTexture::Load()
     if (nullptr == *cName)
         return;
     if (0 == xr_stricmp(*cName, "$null")) return;
-    if (nullptr != strstr(*cName, "$user$"))
+    // we need to check only the beginning of the string,
+    // so let's use strncmp instead of strstr.
+    if (0 == strncmp(cName.c_str(), "$user$", sizeof("$user$") - 1))
     {
         flags.bUser = true;
         return;
@@ -219,7 +217,7 @@ void CTexture::Load()
     }
     else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
     {
-#ifdef WINDOWS // TODO
+#ifdef XR_PLATFORM_WINDOWS // TODO
         // AVI
         pAVI = new CAviPlayerCustom();
 
@@ -336,7 +334,7 @@ void CTexture::Unload()
 void CTexture::desc_update()
 {
     desc_cache = pSurface;
-    if (pSurface && GL_TEXTURE_2D == desc)
+    if (pSurface && (GL_TEXTURE_2D == desc || GL_TEXTURE_2D_MULTISAMPLE == desc))
     {
         glBindTexture(desc, pSurface);
         CHK_GL(glGetTexLevelParameteriv(desc, 0, GL_TEXTURE_WIDTH, &m_width));

@@ -10,7 +10,7 @@
 #define NOMINMAX
 #include <windows.h>
 
-#define WINDOWS
+#define XR_PLATFORM_WINDOWS
 #include "xrCore/_types.h"
 #undef FLT_MAX
 #undef FLT_MIN

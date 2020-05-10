@@ -2,37 +2,41 @@
 
 #include "SDL.h"
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
 
-// XXX: fix xrMemory_align on Linux
-// and enable it
-#ifdef WINDOWS
-#define USE_XR_ALIGNED_MALLOC
+// On other platforms these options are controlled by CMake
+#if defined(XR_PLATFORM_WINDOWS)
+#  define USE_MIMALLOC
+//#  define USE_TBB_MALLOC
+//#  define USE_PURE_ALLOC
 #endif
 
-// Define this if you want to use TBB allocator
-//#define USE_TBB_MALLOC
-
-#if defined(USE_XR_ALIGNED_MALLOC)
+#if defined(USE_MIMALLOC)
+#include "mimalloc.h"
+#define xr_internal_malloc(size, alignment) mi_malloc_aligned(size, alignment);
+#define xr_internal_malloc_nothrow(size, alignment) mi_malloc_aligned(size, alignment);
+#define xr_internal_realloc(ptr, size, alignment) mi_realloc_aligned(ptr, size, alignment);
+#define xr_internal_free(ptr, alignment) mi_free_aligned(ptr, alignment);
+#elif defined(USE_XR_ALIGNED_MALLOC)
 #include "Memory/xrMemory_align.h"
-constexpr size_t xr_default_alignment = 16;
-
-#define xr_internal_malloc(size) xr_aligned_malloc(size, xr_default_alignment)
-#define xr_internal_realloc(ptr, size) xr_aligned_realloc(ptr, size, xr_default_alignment)
-#define xr_internal_free(ptr) xr_aligned_free(ptr)
+#define xr_internal_malloc(size, alignment) xr_aligned_malloc(size, alignment)
+#define xr_internal_malloc_nothrow(size, alignment) xr_aligned_malloc(size, alignment)
+#define xr_internal_realloc(ptr, size, alignment) xr_aligned_realloc(ptr, size, alignment)
+#define xr_internal_free(ptr, alignment) xr_aligned_free(ptr)
 #elif defined(USE_TBB_MALLOC)
 #include <tbb/scalable_allocator.h>
 
-#define xr_internal_malloc(size) scalable_malloc(size)
-#define xr_internal_realloc(ptr, size) scalable_realloc(ptr, size)
-#define xr_internal_free(ptr) scalable_free(ptr)
-#else
+#define xr_internal_malloc(size, alignment) scalable_malloc(size)
+#define xr_internal_malloc_nothrow(size, alignment) scalable_malloc(size)
+#define xr_internal_realloc(ptr, size, alignment) scalable_realloc(ptr, size)
+#define xr_internal_free(ptr, alignment) scalable_free(ptr)
+#elif defined(USE_PURE_ALLOC)
 // Additional bytes of memory to hide memory problems on Release
 // But for Debug we don't need this if we want to find these problems
 #ifdef NDEBUG
@@ -41,10 +45,15 @@ constexpr size_t xr_reserved_tail = 8;
 constexpr size_t xr_reserved_tail = 0;
 #endif
 
-#define xr_internal_malloc(size) malloc(size + xr_reserved_tail)
-#define xr_internal_realloc(ptr, size) realloc(ptr, size + xr_reserved_tail)
-#define xr_internal_free(ptr) free(ptr)
+#define xr_internal_malloc(size, alignment) malloc(size + xr_reserved_tail)
+#define xr_internal_malloc_nothrow(size, alignment) malloc(size + xr_reserved_tail)
+#define xr_internal_realloc(ptr, size, alignment) realloc(ptr, size + xr_reserved_tail)
+#define xr_internal_free(ptr, alignment) free(ptr)
+#else
+#error Please, define explicitly which allocator you want to use
 #endif
+
+constexpr size_t DEFAULT_ALIGNMENT = 16;
 
 xrMemory Memory;
 // Also used in src\xrCore\xrDebug.cpp to prevent use of g_pStringContainer before it initialized
@@ -58,9 +67,9 @@ void xrMemory::_initialize()
 {
     stat_calls = 0;
 
-    g_pStringContainer = new str_container();
+    g_pStringContainer = xr_new<str_container>();
     shared_str_initialized = true;
-    g_pSharedMemoryContainer = new smem_container();
+    g_pSharedMemoryContainer = xr_new<smem_container>();
 }
 
 void xrMemory::_destroy()
@@ -71,7 +80,7 @@ void xrMemory::_destroy()
 
 XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     MEMORY_BASIC_INFORMATION memory_info;
     memory_info.BaseAddress = nullptr;
     *_free = *reserved = *committed = 0;
@@ -85,7 +94,7 @@ XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
         }
         memory_info.BaseAddress = (char*)memory_info.BaseAddress + memory_info.RegionSize;
     }
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     struct sysinfo si;
     sysinfo(&si);
     *_free = si.freeram * si.mem_unit;
@@ -103,7 +112,7 @@ XRCORE_API void log_vminfo()
 
 size_t xrMemory::mem_usage()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     PROCESS_MEMORY_COUNTERS pmc = {};
     if (HANDLE h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId()))
     {
@@ -111,7 +120,7 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
@@ -120,7 +129,7 @@ size_t xrMemory::mem_usage()
 
 void xrMemory::mem_compact()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
 #endif
@@ -141,7 +150,7 @@ void xrMemory::mem_compact()
     if (g_pSharedMemoryContainer)
         g_pSharedMemoryContainer->clean();
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     if (strstr(Core.Params, "-swap_on_compact"))
         SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
 #endif
@@ -150,27 +159,61 @@ void xrMemory::mem_compact()
 void* xrMemory::mem_alloc(size_t size)
 {
     stat_calls++;
-    return xr_internal_malloc(size);
+    return xr_internal_malloc(size, DEFAULT_ALIGNMENT);
+}
+
+void* xrMemory::mem_alloc(size_t size, size_t alignment)
+{
+    stat_calls++;
+    return xr_internal_malloc(size, alignment);
+}
+
+void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&) noexcept
+{
+    stat_calls++;
+    return xr_internal_malloc_nothrow(size, DEFAULT_ALIGNMENT);
+}
+
+void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) noexcept
+{
+    stat_calls++;
+    return xr_internal_malloc_nothrow(size, alignment);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)
 {
     stat_calls++;
-    return xr_internal_realloc(ptr, size);
+    return xr_internal_realloc(ptr, size, DEFAULT_ALIGNMENT);
+}
+
+void* xrMemory::mem_realloc(void* ptr, size_t size, size_t alignment)
+{
+    stat_calls++;
+    return xr_internal_realloc(ptr, size, alignment);
 }
 
 void xrMemory::mem_free(void* ptr)
 {
     stat_calls++;
-    xr_internal_free(ptr);
+    xr_internal_free(ptr, DEFAULT_ALIGNMENT);
+}
+
+void xrMemory::mem_free(void* ptr, size_t alignment)
+{
+    stat_calls++;
+    xr_internal_free(ptr, alignment);
 }
 
 // xr_strdup
 XRCORE_API pstr xr_strdup(pcstr string)
 {
+#ifdef USE_MIMALLOC
+    return mi_strdup(string);
+#else
     VERIFY(string);
     size_t len = xr_strlen(string) + 1;
     char* memory = (char*)xr_malloc(len);
     CopyMemory(memory, string, len);
     return memory;
+#endif
 }

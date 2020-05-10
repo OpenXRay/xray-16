@@ -5,7 +5,7 @@
 
 CTorridZone::CTorridZone() { m_animator = new CObjectAnimator(); }
 CTorridZone::~CTorridZone() { xr_delete(m_animator); }
-BOOL CTorridZone::net_Spawn(CSE_Abstract* DC)
+bool CTorridZone::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -64,4 +64,4 @@ bool CTorridZone::Disable()
 
 // Lain: added
 bool CTorridZone::light_in_slow_mode() { return false; }
-BOOL CTorridZone::AlwaysTheCrow() { return true; }
+bool CTorridZone::AlwaysTheCrow() { return true; }

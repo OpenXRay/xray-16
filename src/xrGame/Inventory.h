@@ -133,6 +133,7 @@ public:
     float GetMaxWeight() const { return m_fMaxWeight; }
     void SetMaxWeight(float weight) { m_fMaxWeight = weight; }
     u32 BeltWidth() const;
+    u32 BeltMaxWidth() const;
 
     inline CInventoryOwner* GetOwner() const { return m_pOwner; }
     friend class CInventoryOwner;
@@ -164,6 +165,9 @@ protected:
     float m_fMaxWeight;
     // текущий вес в инвентаре
     float m_fTotalWeight;
+
+    // Максимальное кол-во объектов на поясе
+    u32 m_iMaxBelt;
 
     //кадр на котором произошло последнее изменение в инвенторе
     u32 m_dwModifyFrame;

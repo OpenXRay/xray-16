@@ -26,7 +26,7 @@
 
 #include "ui/UICDkey.h"
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
 #endif
@@ -43,7 +43,7 @@
 #include "xrEngine/xr_input.h"
 
 // fwd. decl.
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 
 //#define DEMO_BUILD
 
@@ -73,7 +73,7 @@ extern bool b_shniaganeed_pp;
 
 CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 
-CMainMenu::CMainMenu() : languageChanged(false)
+CMainMenu::CMainMenu()
 {
     class CResetEventCb : public CEventNotifierCallbackWithCid
     {
@@ -97,7 +97,7 @@ CMainMenu::CMainMenu() : languageChanged(false)
     m_deactivated_frame = 0;
 
     m_sPatchURL = "";
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     m_pGameSpyFull = NULL;
     m_account_mngr = NULL;
     m_login_mngr = NULL;
@@ -124,11 +124,15 @@ CMainMenu::CMainMenu() : languageChanged(false)
         g_statHint = new CUIButtonHint();
         m_pGameSpyFull = new CGameSpy_Full();
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
         for (cpcstr name : ErrMsgBoxTemplate)
         {
-            m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
-            m_pMB_ErrDlgs.back()->InitMessageBox(name);
+            CUIMessageBoxEx* msgBox = m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
+            if (!msgBox->InitMessageBox(name))
+            {
+                m_pMB_ErrDlgs.pop_back();
+                xr_delete(msgBox);
+            }
         }
 
         m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_YES_CLICKED,
@@ -136,17 +140,21 @@ CMainMenu::CMainMenu() : languageChanged(false)
         m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_OK_CLICKED,
             CUIWndCallback::void_function(this, &CMainMenu::OnConnectToMasterServerOkClicked));
 
-        m_pMB_ErrDlgs[DownloadMPMap]->AddCallbackStr("button_copy", MESSAGE_BOX_COPY_CLICKED,
-            CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap_CopyURL));
-        m_pMB_ErrDlgs[DownloadMPMap]->AddCallbackStr(
-            "button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap));
+        CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap];
+        if (downloadMsg)
+        {
+            downloadMsg->AddCallbackStr("button_copy", MESSAGE_BOX_COPY_CLICKED,
+                CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap_CopyURL));
+            downloadMsg->AddCallbackStr(
+                "button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap));
+        }
 
 #endif
 
         m_account_mngr = new gamespy_gp::account_manager(m_pGameSpyFull->GetGameSpyGP());
         m_login_mngr = new gamespy_gp::login_manager(m_pGameSpyFull);
         m_profile_store = new gamespy_profile::profile_store(m_pGameSpyFull);
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
         m_stats_submitter = new gamespy_profile::stats_submitter(m_pGameSpyFull);
         m_atlas_submit_queue = new atlas_submit_queue(m_stats_submitter);
 #endif
@@ -164,7 +172,7 @@ CMainMenu::~CMainMenu()
     xr_delete(m_startDialog);
     g_pGamePersistent->m_pMainMenu = nullptr;
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     xr_delete(m_account_mngr);
     xr_delete(m_login_mngr);
     xr_delete(m_profile_store);
@@ -330,16 +338,11 @@ bool CMainMenu::ReloadUI()
     VERIFY(m_startDialog);
     m_startDialog->m_bWorkInPause = true;
     m_startDialog->ShowDialog(true);
-
-    m_activatedScreenRatio = (float)Device.dwWidth / (float)Device.dwHeight > (UI_BASE_WIDTH / UI_BASE_HEIGHT + 0.01f);
     return true;
 }
 
 bool CMainMenu::IsActive() const { return m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
-
-bool CMainMenu::IsLanguageChanged() { return languageChanged; }
-void CMainMenu::SetLanguageChanged(bool status) { languageChanged = status; }
 
 // IInputReceiver
 void CMainMenu::IR_OnMousePress(int btn)
@@ -557,7 +560,7 @@ void CMainMenu::OnFrame()
             Console->Show();
     }
 
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (IsActive() || m_sPDProgress.IsInProgress)
     {
         GSUpdateStatus status = m_pGameSpyFull->Update();
@@ -576,11 +579,9 @@ void CMainMenu::OnFrame()
     if (IsActive())
     {
         CheckForErrorDlg();
-        bool b_is_16_9 = (float)Device.dwWidth / (float)Device.dwHeight > (UI_BASE_WIDTH / UI_BASE_HEIGHT + 0.01f);
-        if (b_is_16_9 != m_activatedScreenRatio || languageChanged)
+        if (m_wasForceReloaded)
         {
-            languageChanged = false;
-            ReloadUI();
+            m_wasForceReloaded = false;
             m_startDialog->SendMessage(m_startDialog, MAIN_MENU_RELOADED, NULL);
         }
     }
@@ -669,7 +670,7 @@ void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
 
 void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     CGameSpy_Available GSA;
     shared_str result_string;
     if (!GSA.CheckAvailableServices(result_string))
@@ -764,7 +765,7 @@ void CMainMenu::OnRunDownloadedPatch(CUIWindow*, void*)
 
 void CMainMenu::CancelDownload()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     m_pGameSpyFull->GetGameSpyHTTP()->StopDownload();
     m_sPDProgress.IsInProgress = false;
 #endif
@@ -779,10 +780,12 @@ void CMainMenu::OnDeviceReset()
 
 void CMainMenu::OnUIReset()
 {
-    // XXX: move to UICore
-    CUIXmlInitBase::InitColorDefs();
-    GEnv.UI->ReadTextureInfo();
+    const bool main_menu_is_active = IsActive();
+    VERIFY2(main_menu_is_active, "Trying to reload main menu while it's inactive. That's unsupported.");
+    if (!main_menu_is_active)
+        return;
     ReloadUI();
+    m_wasForceReloaded = true;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -831,7 +834,7 @@ LPCSTR DelHyphens(LPCSTR c)
 
 bool CMainMenu::IsCDKeyIsValid()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (!m_pGameSpyFull || !m_pGameSpyFull->GetGameSpyHTTP())
         return false;
     string64 CDKey = "";
@@ -891,7 +894,7 @@ LPCSTR CMainMenu::GetGSVer()
 
 LPCSTR CMainMenu::GetPlayerName()
 {
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager* l_mngr = GetLoginMngr();
     gamespy_gp::profile const* tmp_prof = l_mngr ? l_mngr->get_current_profile() : NULL;
 
@@ -919,14 +922,20 @@ LPCSTR CMainMenu::GetCDKeyFromRegistry()
 
 void CMainMenu::Show_DownloadMPMap(LPCSTR text, LPCSTR url)
 {
-    VERIFY(m_pMB_ErrDlgs[DownloadMPMap]);
-
     m_downloaded_mp_map_url._set(url);
 
-    m_pMB_ErrDlgs[DownloadMPMap]->SetText(text);
-    m_pMB_ErrDlgs[DownloadMPMap]->SetTextEditURL(url);
+    CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap];
+    if (downloadMsg)
+    {
+        m_pMB_ErrDlgs[DownloadMPMap]->SetText(text);
+        m_pMB_ErrDlgs[DownloadMPMap]->SetTextEditURL(url);
 
-    m_pMB_ErrDlgs[DownloadMPMap]->ShowDialog(false);
+        m_pMB_ErrDlgs[DownloadMPMap]->ShowDialog(false);
+    }
+    else
+    {
+        OnDownloadMPMap(nullptr, nullptr);
+    }
 }
 
 void CMainMenu::OnDownloadMPMap_CopyURL(CUIWindow* w, void* d)
@@ -938,7 +947,7 @@ void CMainMenu::OnDownloadMPMap_CopyURL(CUIWindow* w, void* d)
 void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
 {
     LPCSTR url = m_downloaded_mp_map_url.c_str();
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     LPCSTR params = NULL;
     STRCONCAT(params, "/C start ", url);
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);

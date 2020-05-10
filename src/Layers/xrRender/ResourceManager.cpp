@@ -5,13 +5,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#if defined(WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#pragma warning(pop)
-#endif
-
 #include <tbb/parallel_for_each.h>
 
 #include "ResourceManager.h"
@@ -197,7 +190,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_HQ] = _CreateElement(E);
     }
 
     // Compile element	(LOD1)
@@ -206,7 +199,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_LQ] = _CreateElement(E);
     }
 
     // Compile element
@@ -215,7 +208,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LPOINT] = _CreateElement(E);
     }
 
     // Compile element
@@ -224,7 +217,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LSPOT] = _CreateElement(E);
     }
 
     // Compile element
@@ -233,7 +226,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = TRUE; //.$$$ HACK :)
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[SE_R1_LMODELS] = _CreateElement(E);
     }
 
     // Compile element
@@ -242,7 +235,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = FALSE;
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[C.iElement] = _CreateElement(E);
+        S.E[5] = _CreateElement(E);
     }
 
     // Search equal in shaders array
@@ -268,29 +261,92 @@ Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR
     return nullptr;
 }
 
-void CResourceManager::CompatibilityCheck()
+IReader* open_shader(pcstr shader)
 {
-    cpcstr shader = "skin.h";
     string_path shaderPath;
 
     FS.update_path(shaderPath, "$game_shaders$", GEnv.Render->getShaderPath());
     xr_strcat(shaderPath, shader);
 
-    IReader* file = FS.r_open(shaderPath);
-    R_ASSERT3(file, "Can't open skin.h shader", shaderPath);
+    return FS.r_open(shaderPath);
+}
 
-    cpcstr begin = strstr((cpcstr)file->pointer(), "v_model_skinned_1");
-    cpcstr end = strstr(begin, "POSITION");
+void CResourceManager::CompatibilityCheck()
+{
+    // Check Shoker HQ Geometry Fix support
+    {
+        IReader* skinh = open_shader("skin.h");
+        R_ASSERT3(skinh, "Can't open shader", "skin.h");
+        // search for (12.f / 32768.f)
+        bool hq_skinning = true;
+        do
+        {
+            pcstr begin = strstr((cpcstr)skinh->pointer(), "u_position");
+            if (!begin)
+                break;
 
-    xr_string str(begin, end);
-    if (strstr(str.data(), "float4"))
-        RImplementation.m_hq_skinning = true;
-    else if (strstr(str.data(), "int4"))
-        RImplementation.m_hq_skinning = false;
-    else
-        R_ASSERT2(0, "Custom skinning is unsupported. Please, correct this compatibility check manually");
+            cpcstr end = strstr(begin, "sbones_array");
+            if (!end)
+                break;
 
-    FS.r_close(file);
+            xr_string str(begin, end);
+            pcstr ptr = str.data();
+
+            if ((ptr = strstr(ptr, "12.f")))    // 12.f
+                if ((ptr = strstr(ptr, "/")))   // /
+                    if (strstr(ptr, "32768.f")) // 32768.f
+                        hq_skinning = false;    // found
+            break;
+        } while (false);
+        RImplementation.m_hq_skinning = hq_skinning;
+        FS.r_close(skinh);
+    }
+#if RENDER != R_R1
+    // Check shadow cascades type (old SOC/CS or new COP)
+    if (psDeviceFlags.test(rsR2))
+    {
+        // Check for new cascades support on R2
+        IReader* accumSunNearCascade = open_shader("accum_sun_near_cascade.ps");
+        RImplementation.o.oldshadowcascades = !accumSunNearCascade;
+        ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, !accumSunNearCascade);
+        FS.r_close(accumSunNearCascade);
+    }
+    else if (!psDeviceFlags.test(rsR1))
+    {
+        IReader* accumSunNear = open_shader("accum_sun_near.ps");
+        R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
+        bool oldCascades = false;
+        do
+        {
+            pcstr begin = strstr((cpcstr)accumSunNear->pointer(), "float4");
+            if (!begin)
+                break;
+
+            begin = strstr(begin, "main");
+            if (!begin)
+                break;
+
+            cpcstr end = strstr(begin, "SV_Target");
+            if (!end)
+                break;
+
+            xr_string str(begin, end);
+            pcstr ptr = str.data();
+
+            if (strstr(ptr, "v2p_TL2uv"))
+            {
+                oldCascades = true;
+            }
+            else if (strstr(ptr, "v2p_volume"))
+            {
+                oldCascades = false;
+            }
+        } while (false);
+        RImplementation.o.oldshadowcascades = oldCascades;
+        ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, oldCascades);
+        FS.r_close(accumSunNear);
+    }
+#endif
 }
 
 Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
@@ -358,14 +414,20 @@ void CResourceManager::DeferredUpload()
         texture.second->Load();
 #endif
 }
-/*
-void	CResourceManager::DeferredUnload	()
+
+void CResourceManager::DeferredUnload()
 {
-    if (!RDEVICE.b_is_Ready)				return;
-    for (auto t=m_textures.begin(); t!=m_textures.end(); t++)
-        t->second->Unload();
+    if (!RDEVICE.b_is_Ready)
+        return;
+
+#ifndef USE_OGL
+    tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
+#else
+    for (auto& texture : m_textures)
+        texture.second->Unload();
+#endif
 }
-*/
+
 #ifdef _EDITOR
 void CResourceManager::ED_UpdateTextures(AStringVec* names)
 {

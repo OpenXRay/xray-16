@@ -4,6 +4,16 @@
 
 namespace dx10StateUtils
 {
+D3D_FILL_MODE ConvertFillMode(D3DFILLMODE Mode)
+{
+    switch (Mode)
+    {
+    case D3DFILL_WIREFRAME: return D3D_FILL_SOLID;
+    case D3DFILL_SOLID: return D3D_FILL_WIREFRAME;
+    default: VERIFY(!"Unexpected fill mode!"); return D3D_FILL_SOLID;
+    }
+}
+
 D3D_CULL_MODE ConvertCullMode(D3DCULL Mode)
 {
     switch (Mode)
@@ -238,34 +248,43 @@ bool operator==(const D3D_DEPTH_STENCIL_DESC& desc1, const D3D_DEPTH_STENCIL_DES
 {
     if (desc1.DepthEnable != desc2.DepthEnable)
         return false;
-    if (desc1.DepthWriteMask != desc2.DepthWriteMask)
-        return false;
-    if (desc1.DepthFunc != desc2.DepthFunc)
-        return false;
+
+    if (desc1.DepthEnable)
+    {
+        if (desc1.DepthWriteMask != desc2.DepthWriteMask)
+            return false;
+        if (desc1.DepthFunc != desc2.DepthFunc)
+            return false;
+    }
+
     if (desc1.StencilEnable != desc2.StencilEnable)
         return false;
-    if (desc1.StencilReadMask != desc2.StencilReadMask)
-        return false;
-    if (desc1.StencilWriteMask != desc2.StencilWriteMask)
-        return false;
 
-    if (desc1.FrontFace.StencilFailOp != desc2.FrontFace.StencilFailOp)
-        return false;
-    if (desc1.FrontFace.StencilDepthFailOp != desc2.FrontFace.StencilDepthFailOp)
-        return false;
-    if (desc1.FrontFace.StencilPassOp != desc2.FrontFace.StencilPassOp)
-        return false;
-    if (desc1.FrontFace.StencilFunc != desc2.FrontFace.StencilFunc)
-        return false;
+    if (desc1.StencilEnable)
+    {
+        if (desc1.StencilReadMask != desc2.StencilReadMask)
+            return false;
+        if (desc1.StencilWriteMask != desc2.StencilWriteMask)
+            return false;
 
-    if (desc1.BackFace.StencilFailOp != desc2.BackFace.StencilFailOp)
-        return false;
-    if (desc1.BackFace.StencilDepthFailOp != desc2.BackFace.StencilDepthFailOp)
-        return false;
-    if (desc1.BackFace.StencilPassOp != desc2.BackFace.StencilPassOp)
-        return false;
-    if (desc1.BackFace.StencilFunc != desc2.BackFace.StencilFunc)
-        return false;
+        if (desc1.FrontFace.StencilFailOp != desc2.FrontFace.StencilFailOp)
+            return false;
+        if (desc1.FrontFace.StencilDepthFailOp != desc2.FrontFace.StencilDepthFailOp)
+            return false;
+        if (desc1.FrontFace.StencilPassOp != desc2.FrontFace.StencilPassOp)
+            return false;
+        if (desc1.FrontFace.StencilFunc != desc2.FrontFace.StencilFunc)
+            return false;
+
+        if (desc1.BackFace.StencilFailOp != desc2.BackFace.StencilFailOp)
+            return false;
+        if (desc1.BackFace.StencilDepthFailOp != desc2.BackFace.StencilDepthFailOp)
+            return false;
+        if (desc1.BackFace.StencilPassOp != desc2.BackFace.StencilPassOp)
+            return false;
+        if (desc1.BackFace.StencilFunc != desc2.BackFace.StencilFunc)
+            return false;
+    }
 
     return true;
 }

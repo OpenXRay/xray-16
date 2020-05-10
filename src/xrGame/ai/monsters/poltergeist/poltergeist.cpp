@@ -351,7 +351,7 @@ void CPoltergeist::shedule_Update(u32 dt)
     ability()->update_schedule();
 }
 
-BOOL CPoltergeist::net_Spawn(CSE_Abstract* DC)
+bool CPoltergeist::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

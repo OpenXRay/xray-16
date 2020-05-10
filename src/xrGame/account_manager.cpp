@@ -234,7 +234,7 @@ void account_manager::delete_profile(account_operation_cb dpcb)
     {
         m_profile_deleting_cb = dpcb;
     }
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     if (!tmp_lmngr->get_current_profile())
@@ -447,7 +447,7 @@ void __cdecl account_manager::delete_profile_cb(GPConnection* connection, void* 
         return;
     }
     VERIFY(tmp_inst->m_gamespy_gp);
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     tmp_lmngr->delete_profile_obj();

@@ -25,25 +25,25 @@ CPhysicsShell::~CPhysicsShell()
 
 CPhysicsElement* P_create_Element()
 {
-    CPHElement* element = new CPHElement();
+    CPHElement* element = xr_new<CPHElement>();
     return element;
 }
 
 CPhysicsShell* P_create_Shell()
 {
-    CPhysicsShell* shell = new CPHShell();
+    CPhysicsShell* shell = xr_new<CPHShell>();
     return shell;
 }
 
 CPhysicsShell* P_create_splited_Shell()
 {
-    CPhysicsShell* shell = new CPHSplitedShell();
+    CPhysicsShell* shell = xr_new<CPHSplitedShell>();
     return shell;
 }
 
 CPhysicsJoint* P_create_Joint(CPhysicsJoint::enumType type, CPhysicsElement* first, CPhysicsElement* second)
 {
-    CPhysicsJoint* joint = new CPHJoint(type, first, second);
+    CPhysicsJoint* joint = xr_new<CPHJoint>(type, first, second);
     return joint;
 }
 

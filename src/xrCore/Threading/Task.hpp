@@ -3,8 +3,21 @@
 #include "xrCore/xrDelegate/xrDelegate.h"
 #include "xrCore/FTimer.h"
 
-#include <tbb/task.h>
 #include "Event.hpp"
+
+#ifdef USE_TBB_PARALLEL
+#include <tbb/task.h>
+#else // hack
+namespace tbb
+{
+class task
+{
+public:
+    virtual ~task() = default;
+    virtual task* execute() = 0;
+};
+}
+#endif
 
 class XRCORE_API Task : public tbb::task
 {

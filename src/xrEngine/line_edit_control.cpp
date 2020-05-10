@@ -245,14 +245,14 @@ void line_edit_control::create_key_state(int const dik, key_state state)
     //{
     // xr_delete( m_actions[dik] );
     //}
-    m_actions[dik] = new text_editor::key_state_base(state, prev);
+    m_actions[dik] = xr_new<text_editor::key_state_base>(state, prev);
 }
 
 void line_edit_control::assign_callback(int const dik, key_state state, Callback const& callback)
 {
     VERIFY(dik < CInput::COUNT_KB_BUTTONS);
     Base* prev_action = m_actions[dik];
-    m_actions[dik] = new text_editor::callback_base(callback, state);
+    m_actions[dik] = xr_new<text_editor::callback_base>(callback, state);
     m_actions[dik]->on_assign(prev_action);
 }
 
@@ -688,7 +688,7 @@ void line_edit_control::SwitchKL()
     // if SDL_HINT_GRAB_KEYBOARD is not set to 1 then return;
     if (!hint || 0 != xr_strcmp("1", hint))
         return; // System will handle it
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (pInput->IsExclusiveMode())
         ActivateKeyboardLayout((HKL)HKL_NEXT, 0);
 #endif

@@ -24,7 +24,7 @@ public:
     CBlackGraviArtefact(void);
     virtual ~CBlackGraviArtefact(void);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
 
     virtual void Load(LPCSTR section);
 

@@ -23,7 +23,7 @@ CPhysicObject::CPhysicObject(void)
       bones_snd_player(nullptr), m_net_updateData(nullptr), m_just_after_spawn(false), m_activated(false) {}
 
 CPhysicObject::~CPhysicObject(void) { xr_delete(m_net_updateData); }
-BOOL CPhysicObject::net_Spawn(CSE_Abstract* DC)
+bool CPhysicObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectPhysic* po = smart_cast<CSE_ALifeObjectPhysic*>(e);
@@ -455,12 +455,12 @@ void CPhysicObject::CreateBody(CSE_ALifeObjectPhysic* po)
     // m_pPhysicsShell->SetAirResistance(0.002f, 0.3f);
 }
 
-BOOL CPhysicObject::net_SaveRelevant()
+bool CPhysicObject::net_SaveRelevant()
 {
     return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
-BOOL CPhysicObject::UsedAI_Locations() { return (FALSE); }
+bool CPhysicObject::UsedAI_Locations() { return (FALSE); }
 void CPhysicObject::InitServerObject(CSE_Abstract* D)
 {
     CPHSkeleton::InitServerObject(D);

@@ -289,7 +289,7 @@ public:
     void vfSaveVertices(
         CMemoryWriter& tMemoryStream, u32& dwOffset, u32& dwPointOffset, LEVEL_POINT_STORAGE* tpLevelPoints)
     {
-        GameGraph::CVertex tVertex;
+        GameGraph::CGameVertex tVertex;
 
         for (auto &i : m_tpVertices)
         {
@@ -650,7 +650,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
     tGraphHeader.save(&F);
 
     u32 vertex_count = 0;
-    dwOffset *= sizeof(CGameGraph::CVertex);
+    dwOffset *= sizeof(CGameGraph::CGameVertex);
     u32 l_dwOffset = F.size();
     l_dwPointOffset = dwOffset + tGraphHeader.edge_count() * sizeof(CGameGraph::CEdge);
     u32 l_dwStartPointOffset = l_dwPointOffset;

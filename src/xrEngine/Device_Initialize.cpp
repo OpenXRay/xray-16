@@ -3,7 +3,6 @@
 #include "SDL.h"
 
 #include "Include/editor/ide.hpp"
-#include "engine_impl.hpp"
 #include "xr_input.h"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
@@ -22,9 +21,8 @@ void CRenderDevice::initialize_weather_editor()
 
     m_editor_finalize = (finalize_function_ptr)m_editor_module->GetProcAddress("finalize");
     VERIFY(m_editor_finalize);
-#if !defined(LINUX)
-    m_engine = new engine_impl();
-    m_editor_initialize(m_editor, m_engine);
+#if !defined(XR_PLATFORM_LINUX)
+    m_editor_initialize(m_editor);
 #endif
     VERIFY(m_editor);
 

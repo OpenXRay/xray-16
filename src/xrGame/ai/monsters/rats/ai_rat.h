@@ -365,9 +365,9 @@ public:
     virtual CWeapon* cast_weapon() { return NULL; }
     virtual CAI_Rat* dcast_Rat() { return this; };
 public:
-    virtual BOOL renderable_ShadowReceive();
-    virtual BOOL renderable_ShadowGenerate();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool renderable_ShadowReceive();
+    virtual bool renderable_ShadowGenerate();
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
@@ -397,7 +397,7 @@ public:
     virtual void OnH_A_Independent();
     virtual void OnEvent(NET_Packet& P, u16 type) { inherited::OnEvent(P, type); }
     virtual bool Useful() const;
-    virtual BOOL UsedAI_Locations();
+    virtual bool UsedAI_Locations();
     ///////////////////////////////////////////////////////////////////////
     virtual u16 PHGetSyncItemsNumber() { return inherited::PHGetSyncItemsNumber(); }
     virtual CPHSynchronize* PHGetSyncItem(u16 item) { return inherited::PHGetSyncItem(item); }
@@ -432,7 +432,7 @@ public:
     // serialization
     virtual void save(NET_Packet& output_packet) { inherited::save(output_packet); }
     virtual void load(IReader& input_packet) { inherited::load(input_packet); }
-    virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
+    virtual bool net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     bool can_stand_here();
     bool can_stand_in_position();
     Fvector get_next_target_point();

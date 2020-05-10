@@ -258,9 +258,6 @@
     <ClCompile Include="Crypto\xr_dsa.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>
-    <ClCompile Include="Crypto\xr_sha.cpp">
-      <Filter>Crypto</Filter>
-    </ClCompile>
     <ClCompile Include="Crypto\xr_dsa_signer.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>

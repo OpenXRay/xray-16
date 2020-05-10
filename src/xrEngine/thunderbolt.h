@@ -17,7 +17,7 @@ class ENGINE_API CLAItem;
 
 class CEnvironment;
 
-struct SThunderboltDesc
+struct ENGINE_API SThunderboltDesc
 {
     // geom
     // IRender_DetailModel* l_model;
@@ -45,20 +45,20 @@ struct SThunderboltDesc
     CLAItem* color_anim;
 
 public:
-    SThunderboltDesc();
+    SThunderboltDesc() = default;
     virtual ~SThunderboltDesc();
     void load(const CInifile& pIni, shared_str const& sect);
     virtual void create_top_gradient(const CInifile& pIni, shared_str const& sect);
     virtual void create_center_gradient(const CInifile& pIni, shared_str const& sect);
 };
 
-struct SThunderboltCollection
+struct ENGINE_API SThunderboltCollection
 {
     using DescVec = xr_vector<SThunderboltDesc*>;
     DescVec palette;
     shared_str section;
 
-    SThunderboltCollection();
+    SThunderboltCollection() = default;
     ~SThunderboltCollection();
     void load(CInifile const* pIni, CInifile const* thunderbolts, pcstr sect);
     SThunderboltDesc* GetRandomDesc()
@@ -102,7 +102,7 @@ private:
     float life_time;
     float current_time;
     float next_lightning_time;
-    BOOL bEnabled;
+    bool bEnabled;
 
     // params
     // Fvector2 p_var_alt;

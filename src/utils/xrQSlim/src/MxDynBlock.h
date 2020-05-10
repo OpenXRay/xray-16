@@ -48,7 +48,7 @@ public:
     T& drop() { return (*this)[--fill]; }
     void drop(int d) { fill -= d; }
     void remove(int i) { (*this)[i] = (*this)[--fill]; }
-#if defined(WINDOWS) // Не буду удалять потому как не понимаю как оно собирается на винде
+#if defined(XR_PLATFORM_WINDOWS) // Не буду удалять потому как не понимаю как оно собирается на винде
     void remove_inorder(int i) { Memory.mem_move(&(*this)[i], &(*this)[i + 1], (--fill - i) * sizeof(T)); }
 #endif
     // Restricted STL-like interface for interoperability with

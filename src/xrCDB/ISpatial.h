@@ -79,7 +79,6 @@ class Sound;
 }
 class IRenderable;
 class IRender_Light;
-class Lock;
 
 class SpatialData
 {
@@ -203,7 +202,7 @@ public:
     };
 
 private:
-    Lock* pcs;
+    Lock cs;
 
     poolSS<ISpatial_NODE, 128> allocator;
 

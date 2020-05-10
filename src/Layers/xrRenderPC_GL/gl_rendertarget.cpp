@@ -10,7 +10,6 @@
 #include "blender_bloom_build.h"
 #include "blender_luminance.h"
 #include "blender_ssao.h"
-#include "blender_fxaa.h"
 #include "Layers/xrRenderDX10/dx10MinMaxSMBlender.h"
 #include "Layers/xrRenderDX10/MSAA/dx10MSAABlender.h"
 #include "Layers/xrRenderDX10/DX10 Rain/dx10RainBlender.h"
@@ -276,24 +275,21 @@ CRenderTarget::CRenderTarget()
     RImplementation.Resources->Evict();
 
     // Blenders
-    b_occq = new CBlender_light_occq();
-    b_accum_mask = new CBlender_accum_direct_mask();
-    b_accum_direct = new CBlender_accum_direct();
-    b_accum_point = new CBlender_accum_point();
-    b_accum_spot = new CBlender_accum_spot();
-    b_accum_reflected = new CBlender_accum_reflected();
-    b_bloom = new CBlender_bloom_build();
+    b_occq = xr_new<CBlender_light_occq>();
+    b_accum_mask = xr_new<CBlender_accum_direct_mask>();
+    b_accum_direct = xr_new<CBlender_accum_direct>();
+    b_accum_point = xr_new<CBlender_accum_point>();
+    b_accum_spot = xr_new<CBlender_accum_spot>();
+    b_accum_reflected = xr_new<CBlender_accum_reflected>();
+    b_bloom = xr_new<CBlender_bloom_build>();
     if (RImplementation.o.dx10_msaa)
     {
-        b_bloom_msaa = new CBlender_bloom_build_msaa();
-        b_postprocess_msaa = new CBlender_postprocess_msaa();
+        b_bloom_msaa = xr_new<CBlender_bloom_build_msaa>();
+        b_postprocess_msaa = xr_new<CBlender_postprocess_msaa>();
     }
-    b_luminance = new CBlender_luminance();
-    b_combine = new CBlender_combine();
-    b_ssao = new CBlender_SSAO_noMSAA();
-
-    //FXAA
-    b_fxaa = new CBlender_FXAA();
+    b_luminance = xr_new<CBlender_luminance>();
+    b_combine = xr_new<CBlender_combine>();
+    b_ssao = xr_new<CBlender_SSAO_noMSAA>();
 
     if (RImplementation.o.dx10_msaa)
     {
@@ -305,16 +301,16 @@ CRenderTarget::CRenderTarget()
         for (int i = 0; i < bound; ++i)
         {
             static LPCSTR SampleDefs[] = {"0","1","2","3","4","5","6","7"};
-            b_combine_msaa[i] = new CBlender_combine_msaa();
-            b_accum_mask_msaa[i] = new CBlender_accum_direct_mask_msaa();
-            b_accum_direct_msaa[i] = new CBlender_accum_direct_msaa();
-            b_accum_direct_volumetric_msaa[i] = new CBlender_accum_direct_volumetric_msaa();
+            b_combine_msaa[i] = xr_new<CBlender_combine_msaa>();
+            b_accum_mask_msaa[i] = xr_new<CBlender_accum_direct_mask_msaa>();
+            b_accum_direct_msaa[i] = xr_new<CBlender_accum_direct_msaa>();
+            b_accum_direct_volumetric_msaa[i] = xr_new<CBlender_accum_direct_volumetric_msaa>();
             //b_accum_direct_volumetric_sun_msaa[i]	= new CBlender_accum_direct_volumetric_sun_msaa			();
-            b_accum_spot_msaa[i] = new CBlender_accum_spot_msaa();
-            b_accum_volumetric_msaa[i] = new CBlender_accum_volumetric_msaa();
-            b_accum_point_msaa[i] = new CBlender_accum_point_msaa();
-            b_accum_reflected_msaa[i] = new CBlender_accum_reflected_msaa();
-            b_ssao_msaa[i] = new CBlender_SSAO_MSAA();
+            b_accum_spot_msaa[i] = xr_new<CBlender_accum_spot_msaa>();
+            b_accum_volumetric_msaa[i] = xr_new<CBlender_accum_volumetric_msaa>();
+            b_accum_point_msaa[i] = xr_new<CBlender_accum_point_msaa>();
+            b_accum_reflected_msaa[i] = xr_new<CBlender_accum_reflected_msaa>();
+            b_ssao_msaa[i] = xr_new<CBlender_SSAO_MSAA>();
             static_cast<CBlender_accum_direct_mask_msaa*>(b_accum_mask_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_direct_volumetric_msaa*>(b_accum_direct_volumetric_msaa[i])->SetDefine(
                 "ISAMPLE", SampleDefs[i]);
@@ -332,6 +328,15 @@ CRenderTarget::CRenderTarget()
     //	NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
+        rt_Base.resize(HW.BackBufferCount);
+        for (u32 i = 0; i < HW.BackBufferCount; i++)
+        {
+            string32 temp;
+            xr_sprintf(temp, "%s%d", r2_RT_base, i);
+            rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        }
+        rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
+
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
         if (RImplementation.o.dx10_msaa)
@@ -599,12 +604,8 @@ CRenderTarget::CRenderTarget()
             FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f};
             HW.pDevice->ClearRenderTargetView(rt_LUM_pool[it]->pRT, ColorRGBA);
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
     }
-
-    //FXAA
-    s_fxaa.create(b_fxaa, "gl" DELIMITER "fxaa");
-    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // HBAO
     if (RImplementation.o.ssao_opt_data)
@@ -903,11 +904,13 @@ CRenderTarget::CRenderTarget()
     s_menu.create("distort");
     g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 
+#if 0 // kept for historical reasons
     // Flip
     t_base = RImplementation.Resources->_CreateTexture(r2_base);
-    t_base->surface_set(GL_TEXTURE_2D, HW.pBaseRT);
+    t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
     s_flip.create("effects" DELIMITER "screen_set", r2_base);
     g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+#endif
 
     //
     dwWidth = Device.dwWidth;
@@ -958,7 +961,6 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_accum_point);
     xr_delete(b_accum_direct);
     xr_delete(b_ssao);
-    xr_delete(b_fxaa); //FXAA
 
     if (RImplementation.o.dx10_msaa)
     {

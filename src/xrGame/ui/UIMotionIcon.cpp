@@ -218,10 +218,9 @@ void CUIMotionIcon::Update()
     }
     inherited::Update();
 
-    // m_luminosity_progress_shape
-    if (m_cur_pos != m_luminosity)
+    if (m_luminosity_progress_shape)
     {
-        if (m_luminosity_progress_shape)
+        if (m_cur_pos != m_luminosity)
         {
             const float _diff = _abs(m_luminosity - m_cur_pos);
             if (m_luminosity > m_cur_pos)
@@ -236,24 +235,24 @@ void CUIMotionIcon::Update()
             // XXX: make it like progress bar so we can remove m_cur_pos
             m_luminosity_progress_shape->SetPos(m_cur_pos / 100.f);
         }
-        else if (m_luminosity_progress_bar)
+    }
+    else if (m_luminosity_progress_bar)
+    {
+        const float len = m_luminosity_progress_bar->GetRange_max() - m_luminosity_progress_bar->GetRange_min();
+        m_cur_pos = m_luminosity_progress_bar->GetProgressPos();
+        if (m_cur_pos != m_luminosity)
         {
-            const float len = m_luminosity_progress_bar->GetRange_max() - m_luminosity_progress_bar->GetRange_min();
-            m_cur_pos = m_luminosity_progress_bar->GetProgressPos();
-            if (m_cur_pos != m_luminosity)
+            const float _diff = _abs(m_luminosity - m_cur_pos);
+            if (m_luminosity > m_cur_pos)
             {
-                const float _diff = _abs(m_luminosity - m_cur_pos);
-                if (m_luminosity > m_cur_pos)
-                {
-                    m_cur_pos += _min(len * Device.fTimeDelta, _diff);
-                }
-                else
-                {
-                    m_cur_pos -= _min(len * Device.fTimeDelta, _diff);
-                }
-                clamp(m_cur_pos, m_luminosity_progress_bar->GetRange_min(), m_luminosity_progress_bar->GetRange_max());
-                m_luminosity_progress_bar->SetProgressPos(m_cur_pos);
+                m_cur_pos += _min(len * Device.fTimeDelta, _diff);
             }
+            else
+            {
+                m_cur_pos -= _min(len * Device.fTimeDelta, _diff);
+            }
+            clamp(m_cur_pos, m_luminosity_progress_bar->GetRange_min(), m_luminosity_progress_bar->GetRange_max());
+            m_luminosity_progress_bar->SetProgressPos(m_cur_pos);
         }
     }
 }

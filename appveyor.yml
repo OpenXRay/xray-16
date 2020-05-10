@@ -7,6 +7,7 @@ skip_tags: true
 
 image:
 - Visual Studio 2019
+- Ubuntu
 
 configuration:
 - Debug
@@ -18,60 +19,67 @@ platform:
 - x86
 
 matrix:
-  allow_failures:
-    - platform: x86
+  exclude:
+    - image: Ubuntu
       configuration: Mixed
-    - platform: x86
-      configuration: Release
-    - platform: x64
-      configuration: Mixed
-    - platform: x64
-      configuration: Release
 
 cache:
 - src/packages -> **/packages.config
 
-before_build:
-- cmd: >-
-    nuget restore src\engine.sln
-
-    git submodule update --init --recursive
-
-build:
-  project: src/engine.sln
-  parallel: true
-  verbosity: minimal
-
-after_build:
-- cmd: xr_pack_build.cmd
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2019
+  before_build:
+    - git submodule update --init --recursive
+    - nuget restore src\engine.sln
+  build:
+    project: src/engine.sln
+    parallel: true
+    verbosity: minimal
+  after_build:
+    - cmd: xr_pack_build.cmd
+  artifacts:
+    - path: res/OpenXRay.*.7z
+      name: OpenXRay.*.7z
+    - path: res/Symbols.*.7z
+      name: Symbols.*.7z
+-
+  matrix:
+    only:
+      - image: Ubuntu
+  before_build:
+    - git submodule update --init --recursive
+    - git submodule deinit Externals/cryptopp
+  build_script:
+    - export CC=gcc-8
+    - export CXX=g++-8
+    - ${CXX} --version
+    - export core_count=$(nproc || echo 4) && echo core_count = $core_count
+    - mkdir bin
+    - cd bin
+    - sh: |
+        if [ "$PLATFORM" = "x64" ]; then
+        sudo apt-get update &&
+        sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev libfreeimageplus-dev &&
+        sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libsdl2-dev &&
+        CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
+        fi
+    - sh: |
+        if [ "$PLATFORM" = "x86" ]; then
+        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-8-multilib libpulse-dev:i386 libglib2.0-dev:i386 &&
+        sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386 libfreeimageplus-dev:i386 &&
+        sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386 libsdl2-dev:i386 &&
+        CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
+        fi
+    - make -j $core_count package
+    - file openxray_1.6.02_*.deb
+  artifacts:
+    - path: bin/openxray_1.6.02_*.deb
+      name: openxray_1.6.02_*.deb
 
 test: off
-
-artifacts:
-- path: res/OpenXRay.Dx86.7z
-  name: OpenXRay.Dx86.7z
-- path: res/OpenXRay.Dx64.7z
-  name: OpenXRay.Dx64.7z
-- path: res/OpenXRay.Mx86.7z
-  name: OpenXRay.Mx86.7z
-- path: res/OpenXRay.Mx64.7z
-  name: OpenXRay.Mx64.7z
-- path: res/OpenXRay.Rx86.7z
-  name: OpenXRay.Rx86.7z
-- path: res/OpenXRay.Rx64.7z
-  name: OpenXRay.Rx64.7z
-- path: res/Symbols.Dx86.7z
-  name: Symbols.Dx86.7z
-- path: res/Symbols.Dx64.7z
-  name: Symbols.Dx64.7z
-- path: res/Symbols.Mx86.7z
-  name: Symbols.Mx86.7z
-- path: res/Symbols.Mx64.7z
-  name: Symbols.Mx64.7z
-- path: res/Symbols.Rx86.7z
-  name: Symbols.Rx86.7z
-- path: res/Symbols.Rx64.7z
-  name: Symbols.Rx64.7z
 
 deploy:
 - provider: GitHub
@@ -81,7 +89,6 @@ deploy:
   auth_token:
     secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
   artifact:
-    OpenXRay.Dx86.7z, OpenXRay.Dx64.7z, OpenXRay.Mx86.7z, OpenXRay.Mx64.7z, OpenXRay.Rx86.7z, OpenXRay.Rx64.7z,
-    Symbols.Dx86.7z, Symbols.Dx64.7z, Symbols.Mx86.7z, Symbols.Mx64.7z, Symbols.Rx86.7z, Symbols.Rx64.7z
+    OpenXRay.*.7z, Symbols.*.7z
   draft: true
   force_update: true

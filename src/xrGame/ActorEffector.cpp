@@ -167,14 +167,14 @@ void CAnimatorCamEffector::Start(LPCSTR fn)
     fLifeTime = m_objectAnimator->GetLength();
 }
 
-BOOL CAnimatorCamEffector::Valid()
+bool CAnimatorCamEffector::Valid()
 {
     if (Cyclic())
         return TRUE;
     return inherited::Valid();
 }
 
-BOOL CAnimatorCamEffector::ProcessCam(SCamEffectorInfo& info)
+bool CAnimatorCamEffector::ProcessCam(SCamEffectorInfo& info)
 {
     if (!inherited::ProcessCam(info))
         return FALSE;
@@ -209,7 +209,7 @@ BOOL CAnimatorCamEffector::ProcessCam(SCamEffectorInfo& info)
     return TRUE;
 }
 
-BOOL CAnimatorCamLerpEffector::ProcessCam(SCamEffectorInfo& info)
+bool CAnimatorCamLerpEffector::ProcessCam(SCamEffectorInfo& info)
 {
     if (!CEffectorCam::ProcessCam(info))
         return FALSE;
@@ -263,7 +263,7 @@ CCameraEffectorControlled::CCameraEffectorControlled(CEffectorController* c) : m
 }
 
 CCameraEffectorControlled::~CCameraEffectorControlled() { m_controller->SetCam(NULL); }
-BOOL CCameraEffectorControlled::Valid() { return m_controller->Valid(); }
+bool CCameraEffectorControlled::Valid() { return m_controller->Valid(); }
 #define SND_MIN_VOLUME_FACTOR (0.1f)
 
 SndShockEffector::SndShockEffector() : m_end_time(0), m_life_time(0)
@@ -353,7 +353,7 @@ CControllerPsyHitCamEffector::CControllerPsyHitCamEffector(ECamEffectorType type
     m_direction.normalize();
 }
 
-BOOL CControllerPsyHitCamEffector::ProcessCam(SCamEffectorInfo& info)
+bool CControllerPsyHitCamEffector::ProcessCam(SCamEffectorInfo& info)
 {
     Fmatrix Mdef;
     Mdef.identity();

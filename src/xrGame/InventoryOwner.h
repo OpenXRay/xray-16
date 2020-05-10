@@ -38,7 +38,7 @@ public:
     virtual CInventoryOwner* cast_inventory_owner() { return this; }
 public:
     virtual IFactoryObject* _construct();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     void Init();
     virtual void Load(LPCSTR section);

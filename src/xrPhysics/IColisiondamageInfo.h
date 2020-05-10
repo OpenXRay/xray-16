@@ -18,9 +18,9 @@ public:
     virtual bool GetAndResetInitiated() = 0;
 
 protected:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     virtual ~ICollisionDamageInfo() = 0 {}
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
     virtual ~ICollisionDamageInfo() {}
 #endif
 };

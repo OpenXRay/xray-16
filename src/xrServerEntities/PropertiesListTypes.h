@@ -154,7 +154,7 @@ public:
 
 private:
     PropValueVec values;
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     TProperties* m_Owner;
 #endif
     // events
@@ -193,7 +193,7 @@ public:
         for (auto it = values.begin(); values.end() != it; ++it)
             xr_delete(*it);
     }
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     TProperties* Owner() { return m_Owner; }
 #endif
     void SetName(const shared_str& name) { key = name; }

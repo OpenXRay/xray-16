@@ -34,20 +34,20 @@ void CObjectAnimator::SetActiveMotion(COMotion* mot)
     m_XFORM.identity();
 }
 
-void CObjectAnimator::LoadMotions(LPCSTR fname)
+void CObjectAnimator::LoadMotions(pcstr fname)
 {
     string_path full_path;
     if (!FS.exist(full_path, "$level$", fname))
         if (!FS.exist(full_path, "$game_anims$", fname))
             xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", fname);
 
-    LPCSTR ext = strext(full_path);
+    pcstr ext = strext(full_path);
     if (ext)
     {
         Clear();
         if (0 == xr_strcmp(ext, ".anm"))
         {
-            COMotion* M = new COMotion();
+            COMotion* M = xr_new<COMotion>();
             if (M->LoadMotion(full_path))
                 m_Motions.push_back(M);
             else
@@ -60,7 +60,7 @@ void CObjectAnimator::LoadMotions(LPCSTR fname)
             VERIFY(dwMCnt);
             for (u32 i = 0; i < dwMCnt; i++)
             {
-                COMotion* M = new COMotion();
+                COMotion* M = xr_new<COMotion>();
                 bool bRes = M->Load(*F);
                 if (!bRes)
                     FATAL("ERROR: Can't load motion. Incorrect file version.");
@@ -91,7 +91,7 @@ void CObjectAnimator::Update(float dt)
     }
 }
 
-COMotion* CObjectAnimator::Play(bool loop, LPCSTR name)
+COMotion* CObjectAnimator::Play(bool loop, pcstr name)
 {
     if (name && name[0])
     {

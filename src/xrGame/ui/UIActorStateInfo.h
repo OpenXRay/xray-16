@@ -45,12 +45,13 @@ private:
         stt_power,
         stt_count
     };
-    ui_actor_state_item* m_state[stt_count];
-    UIHint* m_hint_wnd;
+    ui_actor_state_item* m_state[stt_count]{};
+    UIHint* m_hint_wnd{};
 
 public:
-    ui_actor_state_wnd();
-    virtual ~ui_actor_state_wnd();
+    ui_actor_state_wnd() = default;
+    ~ui_actor_state_wnd() override;
+    void init_from_xml(CUIXml& xml);
     void init_from_xml(CUIXml& xml, LPCSTR path);
     void UpdateActorInfo(CInventoryOwner* owner);
     void UpdateHitZone();
@@ -67,19 +68,20 @@ class ui_actor_state_item : public UIHintWindow
     typedef UIHintWindow inherited;
 
 protected:
-    CUIStatic* m_static;
-    CUIStatic* m_static2;
-    CUIStatic* m_static3;
-    CUIProgressBar* m_progress;
-    CUIProgressShape* m_sensor;
-    UI_Arrow* m_arrow;
-    UI_Arrow* m_arrow_shadow;
+    CUIStatic* m_static{};
+    CUIStatic* m_static2{};
+    CUIStatic* m_static3{};
+    CUIProgressBar* m_progress{};
+    CUIProgressShape* m_sensor{};
+    UI_Arrow* m_arrow{};
+    UI_Arrow* m_arrow_shadow{};
     float m_magnitude;
 
 public:
     ui_actor_state_item();
-    virtual ~ui_actor_state_item();
+    ~ui_actor_state_item() override = default;
     void init_from_xml(CUIXml& xml, LPCSTR path, bool critical = true);
+    void init_from_xml_plain(CUIXml& xml, LPCSTR path);
 
     bool set_text(float value); // 0..1
     bool set_progress(float value); // 0..1

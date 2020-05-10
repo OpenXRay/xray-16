@@ -22,7 +22,7 @@ public:
     IC bool operator()(IGameObject* O) { return cls == O->GetClassId(); }
 };
 #ifdef DEBUG
-ENGINE_API BOOL debug_destroy = TRUE;
+ENGINE_API BOOL debug_destroy = true;
 #endif
 
 void CObjectList::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
@@ -64,7 +64,7 @@ IGameObject* CObjectList::FindObjectByName(shared_str name)
 
     return nullptr;
 }
-IGameObject* CObjectList::FindObjectByName(LPCSTR name) { return FindObjectByName(shared_str(name)); }
+IGameObject* CObjectList::FindObjectByName(pcstr name) { return FindObjectByName(shared_str(name)); }
 IGameObject* CObjectList::FindObjectByCLS_ID(CLASS_ID cls)
 {
     {
@@ -482,7 +482,7 @@ void CObjectList::Unload()
     }
 }
 
-IGameObject* CObjectList::Create(LPCSTR name)
+IGameObject* CObjectList::Create(pcstr name)
 {
     IGameObject* O = g_pGamePersistent->ObjectPool.create(name);
     // Msg("CObjectList::Create [%x]%s", O, name);
@@ -566,7 +566,7 @@ void CObjectList::relcase_unregister(int* ID)
     m_relcase_callbacks.pop_back();
 }
 
-void CObjectList::dump_list(Objects& v, LPCSTR reason)
+void CObjectList::dump_list(Objects& v, pcstr reason)
 {
 #ifdef DEBUG
     for (auto& it : v)

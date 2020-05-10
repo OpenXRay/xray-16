@@ -20,13 +20,18 @@ add_dir("${DIRS}")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/pugixml/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/mimalloc/include
     ${SDL_INCLUDE_DIRS}
     ${TBB_INCLUDE_DIRS}
 )
 
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Memory/xrMemory_align.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/Memory/xrMemory_align.h")
+
+if(PROJECT_PLATFORM_ARM OR PROJECT_PLATFORM_ARM64)
+	list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Math/PLC_SSE.cpp")
+	list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/Math/PLC_SSE.hpp")
+endif()
 
 execute_process(COMMAND git rev-parse --verify HEAD
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -52,7 +57,18 @@ cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${PROJECT_NAME} xrMiscMath dl pthread ${PCRE_LIBRARIES} ${SDL_LIBRARIES} ${LZO_LIBRARIES} ${CRYPTO++_LIBRARIES} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
+target_link_libraries(
+    ${PROJECT_NAME}
+    xrMiscMath
+    dl
+    pthread
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
+    ${PCRE_LIBRARIES}
+    ${SDL_LIBRARIES}
+    ${LZO_LIBRARIES}
+    ${CRYPTO++_LIBRARIES}
+    ${TBB_LIBRARIES}
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
     GROUP_READ 

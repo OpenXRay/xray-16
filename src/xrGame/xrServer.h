@@ -7,9 +7,9 @@
 #define AFX_XRSERVER_H__65728A25_16FC_4A7B_8CCE_D798CA5EC64E__INCLUDED_
 #pragma once
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Server.h"
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
 #include "xrNetServer/empty/NET_Server.h"
 #endif
 #include "game_sv_base.h"

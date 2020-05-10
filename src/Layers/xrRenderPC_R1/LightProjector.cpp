@@ -181,7 +181,7 @@ void CLightProjector::calculate()
 
     // Begin
     RCache.set_RT(RT->pRT);
-    RCache.set_ZB(RImplementation.Target->pTempZB);
+    RCache.set_ZB(RImplementation.Target->rt_temp_zb->pRT);
     CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), 0, 1, 0));
     RCache.set_xform_world(Fidentity);
 
@@ -285,8 +285,8 @@ void CLightProjector::calculate()
         // Select slot, set viewport
         int s_x = c_it % P_o_line;
         int s_y = c_it / P_o_line;
-        D3DVIEWPORT9 VP = {s_x * P_o_size, s_y * P_o_size, P_o_size, P_o_size, 0, 1};
-        CHK_DX(HW.pDevice->SetViewport(&VP));
+        const D3D_VIEWPORT viewport = { s_x * P_o_size, s_y * P_o_size, P_o_size, P_o_size, 0.f, 1.f };
+        RCache.SetViewport(viewport);
 
         // Clear color to ambience
         Fvector& cap = LT->get_approximate();

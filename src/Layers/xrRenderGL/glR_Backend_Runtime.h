@@ -245,6 +245,12 @@ IC void CBackend::set_Scissor(Irect* R)
     }
 }
 
+IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
+{
+    glViewport(viewport.TopLeftX, viewport.TopLeftY, viewport.Width, viewport.Height);
+    glDepthRangef(viewport.MinDepth, viewport.MaxDepth);
+}
+
 IC void CBackend::set_Stencil(u32 _enable, u32 _func, u32 _ref, u32 _mask, u32 _writemask, u32 _fail, u32 _pass,
                               u32 _zfail)
 {
@@ -316,6 +322,15 @@ ICF void CBackend::set_CullMode(u32 _mode)
             glEnable(GL_CULL_FACE);
             CHK_GL(glCullFace(glStateUtils::ConvertCullMode(_mode)));
         }
+    }
+}
+
+ICF void CBackend::set_FillMode(u32 _mode)
+{
+    if (fill_mode != _mode)
+    {
+        fill_mode = _mode;
+        glPolygonMode(GL_FRONT_AND_BACK, glStateUtils::ConvertFillMode(_mode));
     }
 }
 

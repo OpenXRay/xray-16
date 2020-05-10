@@ -35,7 +35,7 @@ void CLevelChanger::net_Destroy()
 }
 #define DEF_INVITATION "level_changer_invitation"
 
-BOOL CLevelChanger::net_Spawn(CSE_Abstract* DC)
+bool CLevelChanger::net_Spawn(CSE_Abstract* DC)
 {
     m_entrance_time = 0;
     m_b_enabled = true;
@@ -211,7 +211,7 @@ void CLevelChanger::load(IReader& input_packet)
     m_b_enabled = !!input_packet.r_u8();
 }
 
-BOOL CLevelChanger::net_SaveRelevant()
+bool CLevelChanger::net_SaveRelevant()
 {
     if (!m_b_enabled || m_invite_str != DEF_INVITATION)
         return TRUE;

@@ -169,8 +169,7 @@ public:
             }
             return FALSE;
         }
-        results.push_back(rq_result());
-        rq_result& rq = results.back();
+        rq_result& rq = results.emplace_back(rq_result());
         rq.range = _range;
         rq.element = _element;
         rq.O = _who;
@@ -193,6 +192,6 @@ public:
     IC rqVec& r_results() { return results; }
 };
 
-typedef BOOL rq_callback(rq_result& result, LPVOID user_data);
+typedef bool rq_callback(rq_result& result, LPVOID user_data);
 typedef BOOL test_callback(const ray_defs& rd, IGameObject* object, LPVOID user_data);
 }

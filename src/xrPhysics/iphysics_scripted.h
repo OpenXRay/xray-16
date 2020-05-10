@@ -26,32 +26,13 @@ public:
     virtual iphysics_scripted& get_scripted() = 0;
 
 protected:
-#ifdef _EDITOR
-    virtual ~iphysics_scripted_class() {}
-#else
-#if defined(WINDOWS)
-    virtual ~iphysics_scripted_class() = 0 {}
-#elif defined(LINUX)
-    virtual ~iphysics_scripted_class() {}
-#endif
-#endif
+    virtual ~iphysics_scripted_class() = 0;
 };
 
-namespace non_copy
-{
-class noncopyable
-{
-protected:
-    noncopyable() {}
-    ~noncopyable() {}
-private: // emphasize the following members are private
-    noncopyable(const noncopyable&);
-    const noncopyable& operator=(const noncopyable&);
-};
-};
+inline iphysics_scripted_class::~iphysics_scripted_class() {}
 
 template <class T>
-class cphysics_game_scripted : public iphysics_game_scripted, private non_copy::noncopyable
+class cphysics_game_scripted : public iphysics_game_scripted, private Noncopyable
 {
     T& impl;
 
@@ -73,7 +54,7 @@ wrap* get_script_wrapper(typename wrap::type_impl& E)
     if (e)
         return e;
 
-    e = new wrap(&E);
+    e = xr_new<wrap>(&E);
     E.get_scripted().set(e);
 
     VERIFY(smart_cast<wrap*>(E.get_scripted().get()) == e);

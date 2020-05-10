@@ -9,11 +9,10 @@
 #include "xrUICore/EditBox/UIEditBox.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 #include "mixed_delegate.h"
+#include "xrGameSpy/GameSpy_BrowsersWrapper.h"
 
 class CUIXml;
-class CGameSpy_Browser;
 class CUIMessageBoxEx;
-class CGameSpy_Browser;
 struct ServerInfo;
 struct GameInfo;
 
@@ -45,6 +44,23 @@ public:
 class CServerList : public CUIWindow
 {
 public:
+    enum ESortingMode
+    {
+        SORT_SERVERNAME,
+        SORT_MAP,
+        SORT_GAMETYPE,
+        SORT_PLAYERSCOUNT,
+        SORT_PING,
+        SORT_GAMEVERSION,
+    };
+
+    enum ESortingType
+    {
+        SORT_TYPE_ASCENDING,
+        SORT_TYPE_DESCENDING,
+        SORT_TYPE_AUTO,
+    };
+
     CServerList();
     virtual ~CServerList();
 
@@ -69,7 +85,6 @@ public:
 
 private:
     void xr_stdcall OnUpdate() { RefreshList(); }
-    void xr_stdcall OnBrowserDestroy(CGameSpy_Browser* browser);
 
 protected:
     bool IsValidItem(ServerInfo& item);
@@ -90,6 +105,7 @@ protected:
     void AddTimeKey(void* s, const char* keyName, const char* format, const char* suffix, int k);
     void AddString(const char* key, const char* value);
     void AddStringSt(const char* key, const char* value);
+    void SetSortFunc_internal(ESortingMode sort_mode, ESortingType sorting_type, bool make_sort);
 
     void FillUpDetailedServerInfo();
     void ClearDetailedServerInfo();
@@ -98,13 +114,6 @@ protected:
     void RestoreCurItem();
     void ResetCurItem();
     bool NeedToRefreshCurServer();
-
-    static bool sort_by_ServerName(int p1, int p2);
-    static bool sort_by_Map(int p1, int p2);
-    static bool sort_by_GameType(int p1, int p2);
-    static bool sort_by_Players(int p1, int p2);
-    static bool sort_by_Ping(int p1, int p2);
-    static bool sort_by_Version(int p1, int p2);
 
     LIST_SRV_ITEM m_itemInfo;
     SServerFilters m_sf;
@@ -125,8 +134,9 @@ protected:
 
     CUIMessageBoxEx* m_message_box;
     CUIMessageBoxEx* m_version_switch_msgbox;
-    CGameSpy_Browser* m_GSBrowser;
-    shared_str m_sort_func;
+
+    ESortingMode m_sort_mode;
+    bool m_sort_ascending;
     xr_vector<int> m_tmp_srv_lst;
     struct SrvItem
     {
@@ -149,7 +159,10 @@ protected:
     u32 m_need_refresh_fr;
     void RefreshList_internal();
 
+    CGameSpy_BrowsersWrapper::SubscriberIdx m_subscriber_id;
+
 private:
     connect_error_cb m_connect_cb;
-    inline CGameSpy_Browser& browser() const;
+    static inline CGameSpy_BrowsersWrapper* browser_LL();
+    static inline CGameSpy_BrowsersWrapper& browser();
 };

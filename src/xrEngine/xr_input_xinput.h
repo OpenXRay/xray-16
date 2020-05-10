@@ -178,6 +178,6 @@ ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
 ENGINE_API int KeynameToDik(pcstr name);
 ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
 
-ENGINE_API void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz);
+ENGINE_API void GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz);
 
 ENGINE_API std::pair<int, int> GetKeysBindedTo(EGameActions action_id);

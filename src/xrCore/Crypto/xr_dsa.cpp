@@ -1,37 +1,50 @@
 #include "stdafx.h"
 #include "xr_dsa.h"
+
+#ifdef USE_CRYPTOPP
 #include <cryptopp/dsa.h>
 #include <cryptopp/integer.h>
+#endif
 
 namespace crypto
 {
 xr_dsa::xr_dsa(u8 const p[public_key_length], u8 const q[private_key_length], u8 const g[public_key_length])
 {
+#ifdef USE_CRYPTOPP
     CryptoPP::Integer p_number(p, public_key_length);
     CryptoPP::Integer q_number(q, private_key_length);
     CryptoPP::Integer g_number(g, public_key_length);
 
     m_dsa.Initialize(p_number, q_number, g_number);
+#endif // USE_CRYPTOPP
 }
 
 xr_dsa::~xr_dsa() {}
-shared_str const xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size)
+shared_str xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size)
 {
+#ifdef USE_CRYPTOPP
     CryptoPP::Integer exp(priv_key.m_value, sizeof(priv_key.m_value));
     CryptoPP::DSA::PrivateKey private_key;
     private_key.Initialize(m_dsa, exp);
 
     std::string signature;
     CryptoPP::DSA::Signer signer(private_key);
-    CryptoPP::StringSource(data, data_size, true, new CryptoPP::SignerFilter(m_rng, signer,
-                                                      new CryptoPP::StringSink(signature)) // SignerFilter
-        ); // StringSource
+    CryptoPP::StringSource(data, data_size, true,
+        xr_new<CryptoPP::SignerFilter>(m_rng, signer, xr_new<CryptoPP::StringSink>(signature)) // SignerFilter
+    ); // StringSource
 
     return shared_str(signature.c_str());
+#else // USE_CRYPTOPP
+    UNUSED(priv_key);
+    UNUSED(data);
+    UNUSED(data_size);
+    return shared_str("(null signature)");
+#endif // USE_CRYPTOPP
 }
 
 bool xr_dsa::verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign)
 {
+#ifdef USE_CRYPTOPP
     CryptoPP::Integer exp(pub_key.m_value, sizeof(pub_key.m_value));
     CryptoPP::DSA::PublicKey public_key;
     public_key.Initialize(m_dsa, exp);
@@ -40,13 +53,20 @@ bool xr_dsa::verify(public_key_t const& pub_key, u8 const* data, u32 const data_
     std::string message((const char*)data, data_size);
     CryptoPP::DSA::Verifier verifier(public_key);
     CryptoPP::SignatureVerificationFilter svf(verifier);
-    CryptoPP::StringSource(signature + message, true, new CryptoPP::Redirector(svf));
+    CryptoPP::StringSource(signature + message, true, xr_new<CryptoPP::Redirector>(svf));
 
     return svf.GetLastResult();
+#else
+    UNUSED(pub_key);
+    UNUSED(data);
+    UNUSED(data_size);
+    UNUSED(dsign);
+    return true;
+#endif // USE_CRYPTOPP
 }
 
 #ifdef DEBUG
-
+#ifdef USE_CRYPTOPP
 void print_big_number(CryptoPP::Integer big_num, u32 max_columns = 8)
 {
     u8 bin_buff[xr_dsa::public_key_length]; // public_key_length is the max
@@ -119,20 +139,22 @@ void xr_dsa::generate_params()
 
     std::string signature;
     CryptoPP::DSA::Signer signer(priv_key);
-    CryptoPP::StringSource(debug_digest, true, new CryptoPP::SignerFilter(rng, signer,
-                                                   new CryptoPP::StringSink(signature)) // SignerFilter
+    CryptoPP::StringSource(debug_digest, true, xr_new<CryptoPP::SignerFilter>(rng, signer,
+                                                   xr_new<CryptoPP::StringSink>(signature)) // SignerFilter
         ); // StringSource
 
     CryptoPP::DSA::Verifier verifier(pub_key);
     CryptoPP::SignatureVerificationFilter svf(verifier);
 
-    CryptoPP::StringSource(signature + debug_digest, true, new CryptoPP::Redirector(svf));
+    CryptoPP::StringSource(signature + debug_digest, true, xr_new<CryptoPP::Redirector>(svf));
     VERIFY(svf.GetLastResult() == true);
 
-    CryptoPP::StringSource(signature + debug_bad_digest, true, new CryptoPP::Redirector(svf));
+    CryptoPP::StringSource(signature + debug_bad_digest, true, xr_new<CryptoPP::Redirector>(svf));
     VERIFY(svf.GetLastResult() == false);
 }
-
+#else // USE_CRYPTOPP
+void xr_dsa::generate_params() {}
+#endif // USE_CRYPTOPP
 #endif //#ifdef DEBUG
 
 } // namespace crypto

@@ -51,13 +51,19 @@ private:
     };
     Flags8 m_flags;
     Ivector2 m_orig_cell_capacity;
+    Ivector2 m_max_cell_capacity;
     Ivector2 m_virtual_cells_alignment;
+    Fvector2 m_blocker_spacing;
+    Fvector2 m_highlighter_spacing;
     bool m_bConditionProgBarVisible;
 
 protected:
     CUICellItem* m_selected_item;
     CUICellContainer* m_container;
     CUIScrollBar* m_vScrollBar;
+    CUIStatic* m_highlighter{};
+    CUIStatic* m_blocker{};
+    CUIProgressBar* m_condition_indicator{};
 
     virtual void __stdcall OnScrollV(CUIWindow* w, void* pData);
     virtual void __stdcall OnItemStartDragging(CUIWindow* w, void* pData);
@@ -104,6 +110,13 @@ public:
         VERIFY(ItemsCount() == 0);
         SetCellsCapacity(m_orig_cell_capacity);
     };
+
+    void SetMaxCellsCapacity(const Ivector2& c);
+    const Ivector2& MaxCellsCapacity() const
+    {
+        return m_max_cell_capacity;
+    }
+
     const Ivector2& CellSize();
     void SetCellSize(const Ivector2 new_sz);
     const Ivector2& CellsSpacing();
@@ -129,6 +142,35 @@ public:
     bool GetVirtualCells();
     void SetVirtualCells(bool b);
 
+    void SetHighlighter(CUIStatic* highlighter, Fvector2 spacing);
+    CUIStatic* GetHighlighter() const
+    {
+        return m_highlighter;
+    }
+    const Fvector2& GetHighlighterSpacing() const
+    {
+        return m_highlighter_spacing;
+    }
+    void Highlight(bool highlight);
+
+    void SetBlocker(CUIStatic* blocker, Fvector2 spacing);
+    CUIStatic* GetBlocker() const
+    {
+        return m_blocker;
+    }
+    const Fvector2& GetBlockerSpacing() const
+    {
+        return m_blocker_spacing;
+    }
+
+    void SetConditionIndicator(CUIProgressBar* indicator);
+    CUIProgressBar* GetConditionIndicator() const
+    {
+        return m_condition_indicator;
+    }
+
+    Ivector2 CalculateCapacity(int desiredCells);
+
     bool GetConditionProgBarVisibility() { return m_bConditionProgBarVisible; };
     void SetConditionProgBarVisibility(bool b) { m_bConditionProgBarVisible = b; };
 public:
@@ -149,6 +191,7 @@ public:
     bool IsOwner(CUICellItem* itm);
     void clear_select_armament();
     Ivector2 PickCell(const Fvector2& abs_pos);
+    CUICell& GetCellIdx(size_t idx);
     CUICell& GetCellAt(const Ivector2& pos);
     CUICellContainer* GetContainer() { return m_container; }; //Alundaio
 
@@ -175,9 +218,9 @@ private:
 protected:
     CUIDragDropListEx* m_pParentDragDropList;
 
-    Ivector2 m_cellsCapacity; // count		(col,	row)
-    Ivector2 m_cellSize; // pixels	(width, height)
-    Ivector2 m_cellSpacing; // pixels	(width, height)
+    Ivector2 m_cellsCapacity;        // count      (col, row)
+    Ivector2 m_cellSize;             // pixels (width, height)
+    Ivector2 m_cellSpacing;          // pixels (width, height)
 
     UI_CELLS_VEC m_cells;
 
@@ -191,6 +234,7 @@ public:
 
 protected:
     virtual void Draw();
+    void DrawBlocker() const;
 
     IC const Ivector2& CellsCapacity() { return m_cellsCapacity; };
     void SetCellsCapacity(const Ivector2& c);
@@ -199,6 +243,7 @@ protected:
     IC const Ivector2& CellsSpacing() { return m_cellSpacing; };
     void SetCellsSpacing(const Ivector2& new_sz);
     Ivector2 TopVisibleCell();
+    CUICell& GetCellIdx(size_t idx);
     CUICell& GetCellAt(const Ivector2& pos);
     Ivector2 PickCell(const Fvector2& abs_pos);
     Ivector2 GetItemPos(CUICellItem* itm);

@@ -36,7 +36,7 @@ protected:
     //	float				size_y;
     float m_sqr_distance_xz;
     float m_distance_xz;
-    _Graph::CVertex* best_node;
+    _Graph::CLevelVertex* best_node;
 
 public:
     using const_iterator = typename inherited::const_iterator;

@@ -4,9 +4,11 @@
 
 #include "xrCore/xrCore.h"
 
+#ifdef USE_CRYPTOPP
 #include <cryptopp/dsa.h>
 #include <cryptopp/sha.h>
 #include <cryptopp/osrng.h>
+#endif
 
 namespace crypto
 {
@@ -30,7 +32,7 @@ public:
         u8 m_value[public_key_length];
     }; // struct public_key_t
 
-    shared_str const sign(private_key_t const& priv_key, u8 const* data, u32 const data_size);
+    shared_str sign(private_key_t const& priv_key, u8 const* data, u32 const data_size);
     bool verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign);
 
 #ifdef DEBUG
@@ -38,8 +40,10 @@ public:
 #endif
 
 private:
+#ifdef USE_CRYPTOPP
     CryptoPP::DL_GroupParameters_DSA m_dsa;
     CryptoPP::AutoSeededRandomPool m_rng;
+#endif // USE_CRYPTOPP
 }; // class xr_dsa
 
 } // namespace crypto

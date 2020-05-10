@@ -31,7 +31,7 @@ public:
 
 public:
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Relcase(IGameObject* O);
     virtual void OnH_A_Independent();
@@ -44,12 +44,12 @@ public:
 
     virtual void Hit(SHit* pHDS) { inherited::Hit(pHDS); };
 public:
-    virtual BOOL UsedAI_Locations() { return inherited::UsedAI_Locations(); }
+    virtual bool UsedAI_Locations() { return inherited::UsedAI_Locations(); }
     virtual void net_Import(NET_Packet& P) { inherited::net_Import(P); }
     virtual void net_Export(NET_Packet& P) { inherited::net_Export(P); }
     virtual void save(NET_Packet& output_packet) { inherited::save(output_packet); }
     virtual void load(IReader& input_packet) { inherited::load(input_packet); }
-    virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
+    virtual bool net_SaveRelevant() { return inherited::net_SaveRelevant(); }
     virtual void OnH_A_Chield() { inherited::OnH_A_Chield(); }
     virtual void OnH_B_Chield() { inherited::OnH_B_Chield(); }
     virtual void make_Interpolation();

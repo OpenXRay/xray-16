@@ -45,6 +45,30 @@ CharInfoStrings* charInfoReputationStrings = NULL;
 CharInfoStrings* charInfoRankStrings = NULL;
 CharInfoStrings* charInfoGoodwillStrings = NULL;
 
+static class InventoryUtilitiesReset : public CUIResetNotifier, public pureAppStart, public pureAppEnd
+{
+public:
+    void OnAppStart() override
+    {
+        if (GEnv.isDedicatedServer)
+            return;
+        InventoryUtilities::CreateShaders();
+    }
+
+    void OnAppEnd() override
+    {
+        if (GEnv.isDedicatedServer)
+            return;
+        InventoryUtilities::DestroyShaders();
+    }
+
+    void OnUIReset() override
+    {
+        OnAppEnd();
+        OnAppStart();
+    }
+} s_inventory_utilities_reset;
+
 void InventoryUtilities::CreateShaders()
 {
     // Nothing here. All needed shaders will be created on demand
@@ -359,6 +383,32 @@ LPCSTR InventoryUtilities::GetTimePeriodAsString(LPSTR _buff, u32 buff_sz, ALife
         cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", secs2 - secs1, *StringTable().translate("ui_st_secs"));
 
     return _buff;
+}
+
+void InventoryUtilities::UpdateWeight(CUIStatic& wnd, CInventoryOwner* pInvOwner, bool withPrefix /*= false*/)
+{
+    R_ASSERT(pInvOwner);
+    string128 buf;
+
+    float total = pInvOwner->inventory().CalcTotalWeight();
+    float max = pInvOwner->MaxCarryWeight();
+
+    string16 cl;
+
+    if (total > max)
+        xr_strcpy(cl, "%c[red]");
+    else
+        xr_strcpy(cl, "%c[UI_orange]");
+
+    string32 prefix;
+
+    if (withPrefix)
+        xr_sprintf(prefix, "%%c[default]%s ", StringTable().translate("ui_inv_weight"));
+    else
+        xr_strcpy(prefix, "");
+
+    xr_sprintf(buf, "%s%s%3.1f %s/%5.1f", prefix, cl, total, "%c[UI_orange]", max);
+    wnd.SetText(buf);
 }
 
 //////////////////////////////////////////////////////////////////////////

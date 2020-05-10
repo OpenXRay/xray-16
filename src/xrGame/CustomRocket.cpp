@@ -74,7 +74,7 @@ void CCustomRocket::reinit()
     m_vPrevVel.set(0, 0, 0);
 }
 
-BOOL CCustomRocket::net_Spawn(CSE_Abstract* DC)
+bool CCustomRocket::net_Spawn(CSE_Abstract* DC)
 {
     m_eState = eInactive;
     BOOL result = inherited::net_Spawn(DC);

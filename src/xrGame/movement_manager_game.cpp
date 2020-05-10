@@ -29,7 +29,7 @@ void CMovementManager::show_game_path_info()
     Msg("! CURRENT LEVEL : %s", *Level().name());
     Fvector temp = ai().game_graph().vertex(object().ai_location().game_vertex_id())->level_point();
     Msg("! CURRENT game point position : [%f][%f][%f]", VPUSH(temp));
-    const GameGraph::CVertex* vertex = ai().game_graph().vertex(game_dest_vertex_id());
+    const GameGraph::CGameVertex* vertex = ai().game_graph().vertex(game_dest_vertex_id());
     Msg("! TARGET LEVEL : %s", *ai().game_graph().header().level(vertex->level_id()).name());
     temp = vertex->level_point();
     Msg("! TARGET  game point position : [%f][%f][%f]", VPUSH(temp));

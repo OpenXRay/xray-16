@@ -61,10 +61,11 @@ CUIInventoryUpgradeWnd::~CUIInventoryUpgradeWnd()
     // m_OutfitIconsShader = 0;
 }
 
-void CUIInventoryUpgradeWnd::Init()
+bool CUIInventoryUpgradeWnd::Init()
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, g_inventory_upgrade_xml);
+    if (!uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, g_inventory_upgrade_xml, false))
+        return false;
 
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
     m_border_texture = uiXml.ReadAttrib("border", 0, "texture");
@@ -96,6 +97,7 @@ void CUIInventoryUpgradeWnd::Init()
 
     LoadCellsBacks(uiXml);
     LoadSchemes(uiXml);
+    return true;
 }
 
 void CUIInventoryUpgradeWnd::InitInventory(CUICellItem* cellItem, bool can_upgrade)

@@ -166,13 +166,16 @@ set ( DASM_T ${LUAJIT_DIR}/host/buildvm_arch.h )
 # 2DO: Proper detection of flags
 set ( DASM_VER "" )
 set ( DASM_FLAGS -D FPU -D HFABI )
-set ( DASM_ARCH x86 )
 
 # Raspberry PI, ARM
-if ( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv6l" )
+if ( ${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv*" )
   set ( DASM_ARCH arm )
   list ( APPEND DASM_FLAGS -D DUALNUM )
   set ( DASM_VER 60 )
+elseif ( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
+  set ( DASM_ARCH arm64 )
+else ( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86" )
+  set ( DASM_ARCH x86 )
 endif ()
 
 # Windows is ... special
@@ -229,8 +232,9 @@ if ( WIN32 AND NOT CYGWIN )
   add_buildvm_target ( lj_vm.obj peobj )
   set (LJ_VM_SRC ${CMAKE_CURRENT_BINARY_DIR}/lj_vm.obj)
 else ()
-  add_buildvm_target ( lj_vm.s ${LJVM_MODE} )
-  set (LJ_VM_SRC ${CMAKE_CURRENT_BINARY_DIR}/lj_vm.s)
+  add_buildvm_target ( lj_vm.sx ${LJVM_MODE} )
+  set (LJ_VM_SRC ${CMAKE_CURRENT_BINARY_DIR}/lj_vm.sx)
+  set_source_files_properties(${LJ_VM_SRC} PROPERTIES LANGUAGE CXX)
 endif ()
 
 add_buildvm_target ( lj_ffdef.h   ffdef   ${LJLIB_C} )

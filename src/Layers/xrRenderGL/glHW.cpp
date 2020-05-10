@@ -20,7 +20,7 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
 }
 
 CHW::CHW()
-    : pDevice(this), pContext(this), m_pSwapChain(this), pBaseRT(0), pBaseZB(0), pPP(0), pFB(0)
+    : pDevice(this), pContext(this), m_pSwapChain(this), pPP(0), pFB(0)
 {
 }
 
@@ -96,16 +96,22 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &iMaxVTFUnits);
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &iMaxCTIUnits);
 
+    glGetIntegerv(GL_MAJOR_VERSION, &(std::get<0>(OpenGLVersion)));
+    glGetIntegerv(GL_MINOR_VERSION, &(std::get<1>(OpenGLVersion)));
+
     AdapterName = reinterpret_cast<pcstr>(glGetString(GL_RENDERER));
-    OpenGLVersion = reinterpret_cast<pcstr>(glGetString(GL_VERSION));
+    OpenGLVersionString = reinterpret_cast<pcstr>(glGetString(GL_VERSION));
     ShadingVersion = reinterpret_cast<pcstr>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     Msg("* GPU vendor: [%s] device: [%s]", glGetString(GL_VENDOR), AdapterName);
-    Msg("* GPU OpenGL version: %s", OpenGLVersion);
+    Msg("* GPU OpenGL version: %s", OpenGLVersionString);
     Msg("* GPU OpenGL shading language version: %s", ShadingVersion);
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
+
+    Caps.fTarget = D3DFMT_A8R8G8B8;
+    Caps.fDepth = D3DFMT_D24S8;
 
     //	Create render target and depth-stencil views here
     UpdateViews();
@@ -129,16 +135,18 @@ void CHW::Reset()
 {
     CHK_GL(glDeleteProgramPipelines(1, &pPP));
     CHK_GL(glDeleteFramebuffers(1, &pFB));
-
-    CHK_GL(glDeleteTextures(1, &pBaseRT));
-    CHK_GL(glDeleteTextures(1, &pBaseZB));
-
     UpdateViews();
 }
 
 void CHW::SetPrimaryAttributes()
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -179,15 +187,7 @@ void CHW::UpdateViews()
     glGenFramebuffers(1, &pFB);
     CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
 
-    // Create a color render target
-    glGenTextures(1, &HW.pBaseRT);
-    CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseRT));
-    CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, psCurrentVidMode[0], psCurrentVidMode[1]));
-
-    // Create depth/stencil buffer
-    glGenTextures(1, &HW.pBaseZB);
-    CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseZB));
-    CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
+    BackBufferCount = 1;
 }
 
 void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
@@ -233,8 +233,19 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 
 void CHW::Present()
 {
+#if 0 // kept for historical reasons
     RImplementation.Target->phase_flip();
+#else
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, pFB);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(
+        0, 0, Device.dwWidth, Device.dwHeight,
+        0, 0, Device.dwWidth, Device.dwHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+#endif
+
     SDL_GL_SwapWindow(m_window);
+    CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
 DeviceState CHW::GetDeviceState()

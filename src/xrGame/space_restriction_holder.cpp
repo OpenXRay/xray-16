@@ -25,7 +25,7 @@ const u32 time_to_delete = 300000;
 CSpaceRestrictionHolder::~CSpaceRestrictionHolder() { clear(); }
 void CSpaceRestrictionHolder::clear()
 {
-#ifndef __GNUC__ // At least GCC call destructor of members at call parent destructor
+#ifndef XR_COMPILER_GCC // At least GCC call destructor of members at call parent destructor
     delete_data(m_restrictions);
 #endif
     m_default_out_restrictions = "";

@@ -219,7 +219,7 @@ void CRenderTarget::accum_spot(light* L)
     if (!RImplementation.o.fp16_blend)
     {
         if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
+            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
         else
             u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
@@ -440,7 +440,7 @@ void CRenderTarget::accum_volumetric(light* L)
         //	Set correct depth surface
         //	It's slow. Make this when shader is created
         {
-            char* pszSMapName;
+            pcstr pszSMapName;
             BOOL b_HW_smap = RImplementation.o.HW_smap;
             BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
             if (b_HW_smap)
@@ -602,7 +602,7 @@ void CRenderTarget::accum_volumetric(light* L)
     /*
         // blend-copy
         if (!RImplementation.o.fp16_blend)	{
-            u_setrt						(rt_Accumulator,NULL,NULL,HW.pBaseZB);
+            u_setrt						(rt_Accumulator,NULL,NULL,get_base_zb());
             RCache.set_Element			(s_accum_mask->E[SE_MASK_ACCUM_VOL]	);
             RCache.set_c				("m_texgen",		m_Texgen);
             RCache.set_c				("m_texgen_J",		m_Texgen_J	);

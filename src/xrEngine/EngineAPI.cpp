@@ -38,14 +38,20 @@ static bool r2_available = false;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+namespace
+{
 void __cdecl dummy(void) {}
+IFactoryObject* __cdecl dummy(CLASS_ID) { return nullptr; }
+template<typename T>
+void __cdecl dummy(T* p) { R_ASSERT2(p == nullptr, "Attempting to release an object that shouldn't be allocated"); }
+};
 
 CEngineAPI::CEngineAPI()
 {
     hGame = nullptr;
     hTuner = nullptr;
-    pCreate = nullptr;
-    pDestroy = nullptr;
+    pCreate = dummy;
+    pDestroy = dummy;
     tune_enabled = false;
     tune_pause = dummy;
     tune_resume = dummy;
@@ -58,7 +64,7 @@ CEngineAPI::~CEngineAPI()
 
 bool is_enough_address_space_available()
 {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     SYSTEM_INFO system_info;
     GetSystemInfo(&system_info);
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
@@ -91,7 +97,7 @@ void CEngineAPI::SelectRenderer()
 
     select(gl_library, rsRGL, 5, rsR4);
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     select(r4_library, rsR4, 4, rsR3);
     select(r3_library, rsR3, 3, rsR2);
     select(r2_library, rsR2, 2, rsR1);
@@ -130,13 +136,16 @@ void CEngineAPI::Initialize(void)
     InitializeRenderers();
 
     hGame = XRay::LoadModule("xrGame");
-    R_ASSERT2(hGame->IsLoaded(), "Game DLL raised exception during loading or there is no game DLL at all");
+    if (!CanSkipGameModuleLoading())
+    {
+        R_ASSERT2(hGame->IsLoaded(), "! Game DLL raised exception during loading or there is no game DLL at all");
 
-    pCreate = (Factory_Create*)hGame->GetProcAddress("xrFactory_Create");
-    R_ASSERT(pCreate);
+        pCreate = reinterpret_cast<Factory_Create*>(hGame->GetProcAddress("xrFactory_Create"));
+        R_ASSERT(pCreate);
 
-    pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
-    R_ASSERT(pDestroy);
+        pDestroy = reinterpret_cast<Factory_Destroy*>(hGame->GetProcAddress("xrFactory_Destroy"));
+        R_ASSERT(pDestroy);
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // vTune
@@ -175,7 +184,7 @@ void CEngineAPI::Destroy(void)
 void CEngineAPI::CloseUnusedLibraries()
 {
     // Only windows because on linux only one library is loaded - xrRender_GL
-#ifdef WINDOWS
+#ifdef XR_PLATFORM_WINDOWS
     if (GEnv.CurrentRenderer != 5)
         renderers[gl_library] = nullptr;
 
@@ -199,16 +208,16 @@ void CEngineAPI::CreateRendererList()
         return;
 
     renderers[gl_library] = XRay::LoadModule(gl_library);
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     renderers[r1_library] = XRay::LoadModule(r1_library);
 #endif
 
     if (GEnv.isDedicatedServer)
     {
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
         R_ASSERT2(renderers[r1_library]->IsLoaded(), "Dedicated server needs xrRender_R1 to work");
         VidQualityToken.emplace_back(renderer_r1, 0);
-#elif defined(LINUX)
+#elif defined(XR_PLATFORM_LINUX)
         R_ASSERT2(renderers[gl_library]->IsLoaded(), "Dedicated server needs xrRender_GL to work");
         VidQualityToken.emplace_back(renderer_gl, 0);
 #endif
@@ -218,7 +227,7 @@ void CEngineAPI::CreateRendererList()
 
     auto& modes = VidQualityToken;
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     renderers[r2_library] = XRay::LoadModule(r2_library);
     renderers[r3_library] = XRay::LoadModule(r3_library);
     renderers[r4_library] = XRay::LoadModule(r4_library);
@@ -234,12 +243,10 @@ void CEngineAPI::CreateRendererList()
             // Test availability
             if (checkSupport && checkSupport())
                 modes.emplace_back(mode, index);
-            else // Close the handle if test is failed
-                renderers[library] = nullptr;
         }
     };
 
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     checkRenderer(r1_library, renderer_r1, 0);
     if (renderers[r2_library]->IsLoaded())
     {
@@ -262,11 +269,16 @@ void CEngineAPI::CreateRendererList()
             Log(mode.name);
 }
 
+bool is_r2_available()
+{
+    return r2_available;
+}
+
 SCRIPT_EXPORT(CheckRendererSupport, (),
 {
     using namespace luabind;
     module(luaState)
     [
-        def("xrRender_test_r2_hw", +[]() { return r2_available; })
+        def("xrRender_test_r2_hw", &is_r2_available)
     ];
 });

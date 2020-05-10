@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO: Get rid of D3D types.
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #include <d3d9types.h>
 #endif
 
@@ -22,6 +22,15 @@ typedef enum D3D_COMPARISON_FUNC {
     D3D_COMPARISON_GREATER_EQUAL = GL_GEQUAL,
     D3D_COMPARISON_ALWAYS = GL_ALWAYS
 } D3D_COMPARISON_FUNC;
+
+using D3D_VIEWPORT = struct XR_GL_VIEWPORT
+{
+    GLint TopLeftX, TopLeftY;
+    GLsizei Width, Height;
+    GLclampf MinDepth, MaxDepth;
+};
+
+using ID3DState = glState;
 
 #define DX10_ONLY(expr)			do {} while (0)
 

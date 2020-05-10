@@ -149,7 +149,7 @@ void CEntity::Load(LPCSTR section)
     //////////////////////////////////////
 }
 
-BOOL CEntity::net_Spawn(CSE_Abstract* DC)
+bool CEntity::net_Spawn(CSE_Abstract* DC)
 {
     m_level_death_time = 0;
     m_game_death_time = 0;

@@ -15,7 +15,7 @@ xr_vector<xr_token> ControllersToken;
 
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
-ENGINE_API Flags32 psMouseInvert = {FALSE};
+ENGINE_API Flags32 psMouseInvert = {false};
 
 // Max events per frame
 constexpr size_t MAX_KEYBOARD_EVENTS = 64;
@@ -172,6 +172,7 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
     xrDebug::SetDialogHandler(OnErrorDialog);
 
     SDL_StopTextInput(); // sanity
+    SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
 
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);

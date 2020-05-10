@@ -1,13 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#if defined(WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#pragma warning(pop)
-#endif
-
 #include "xrCDB/Frustum.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -50,9 +43,11 @@ void CBackend::OnFrameBegin()
         // Getting broken HUD hands for OpenGL after calling rmNormal()
 #ifndef USE_OGL
         RImplementation.rmNormal();
+#else
+        set_FB(HW.pFB);
 #endif
-        set_RT(HW.pBaseRT);
-        set_ZB(HW.pBaseZB);
+        set_RT(RImplementation.Target->get_base_rt());
+        set_ZB(RImplementation.Target->get_base_zb());
 #endif
 
         ZeroMemory(&stat, sizeof(stat));
@@ -69,6 +64,9 @@ void CBackend::Invalidate()
     pRT[2] = 0;
     pRT[3] = 0;
     pZB = 0;
+#if defined(USE_OGL)
+    pFB = 0;
+#endif
 
     decl = nullptr;
     vb = 0;
@@ -99,6 +97,7 @@ void CBackend::Invalidate()
     stencil_pass = u32(-1);
     stencil_zfail = u32(-1);
     cull_mode = u32(-1);
+    fill_mode = u32(-1);
     z_enable = u32(-1);
     z_func = u32(-1);
     alpha_ref = u32(-1);
@@ -406,6 +405,8 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + _last_ps));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        if (RImplementation.o.dx10_msaa)
+            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #elif defined(USE_DX10) || defined(USE_DX11)
@@ -427,6 +428,8 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + CTexture::rstVertex + _last_vs));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        if (RImplementation.o.dx10_msaa)
+            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #elif defined(USE_DX10) || defined(USE_DX11)

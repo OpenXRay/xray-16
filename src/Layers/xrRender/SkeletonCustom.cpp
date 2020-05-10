@@ -5,9 +5,6 @@
 #include "SkeletonCustom.h"
 #include "SkeletonX.h"
 #include "xrCore/FMesh.hpp"
-#ifndef _EDITOR
-#include "xrEngine/Render.h"
-#endif
 int psSkeletonUpdate = 32;
 Lock UCalc_Mutex
 #ifdef CONFIG_PROFILE_LOCKS
@@ -58,6 +55,10 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 #ifdef DEBUG
 void CKinematics::DebugRender(Fmatrix& XFORM)
 {
+#ifndef USE_DX9
+    RCache.set_Shader(RImplementation.m_WireShader);
+#endif
+
     CalculateBones();
 
     CBoneData::BoneDebug dbgLines;

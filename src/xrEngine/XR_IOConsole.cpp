@@ -92,7 +92,7 @@ bool CConsole::is_mark(Console_mark type)
 
 CConsole::CConsole() : m_hShader_back(NULL)
 {
-    m_editor = new text_editor::line_editor(CONSOLE_BUF_SIZE);
+    m_editor = xr_new<text_editor::line_editor>(CONSOLE_BUF_SIZE);
     m_cmd_history_max = cmd_history_max;
     m_disable_tips = false;
     Register_callbacks();
@@ -162,7 +162,7 @@ void CConsole::OnFrame()
     }
 }
 
-void CConsole::OutFont(LPCSTR text, float& pos_y)
+void CConsole::OutFont(pcstr text, float& pos_y)
 {
     float str_length = pFont->SizeOf_(text);
     float scr_width = 1.98f * Device.fWidth_2;
@@ -216,13 +216,13 @@ void CConsole::OnRender()
 
     if (!m_hShader_back)
     {
-        m_hShader_back = new FactoryPtr<IUIShader>();
+        m_hShader_back = xr_new<FactoryPtr<IUIShader>>();
         (*m_hShader_back)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_console"); // "ui/ui_empty"
     }
 
     if (!pFont)
     {
-        pFont = new CGameFont("hud_font_di", CGameFont::fsDeviceIndependent);
+        pFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
         pFont->SetHeightI(0.025f);
     }
     if (!pFont2)
@@ -230,7 +230,7 @@ void CConsole::OnRender()
         pcstr fontSection = "hud_font_di2";
         if (!pSettings->section_exist(fontSection))
             fontSection = "hud_font_di";
-        pFont2 = new CGameFont(fontSection, CGameFont::fsDeviceIndependent);
+        pFont2 = xr_new<CGameFont>(fontSection, CGameFont::fsDeviceIndependent);
         pFont2->SetHeightI(0.025f);
     }
 
@@ -268,10 +268,10 @@ void CConsole::OnRender()
     float ioc_d = pFont->SizeOf_(ioc_prompt);
     float d1 = pFont->SizeOf_("_");
 
-    LPCSTR s_cursor = ec().str_before_cursor();
-    LPCSTR s_b_mark = ec().str_before_mark();
-    LPCSTR s_mark = ec().str_mark();
-    LPCSTR s_mark_a = ec().str_after_mark();
+    pcstr s_cursor = ec().str_before_cursor();
+    pcstr s_b_mark = ec().str_before_mark();
+    pcstr s_mark = ec().str_mark();
+    pcstr s_mark_a = ec().str_after_mark();
 
     // strncpy_s( buf1, cur_pos, editor, MAX_LEN );
     float str_length = ioc_d + pFont->SizeOf_(s_cursor);
@@ -286,7 +286,7 @@ void CConsole::OnRender()
     pFont->OutI(-1.0f + out_pos * scr_x, ypos, "%s", ioc_prompt);
     out_pos += ioc_d;
 
-    if (!m_disable_tips && m_tips.size())
+    if (bGame && !m_disable_tips && m_tips.size())
     {
         pFont->SetColor(tips_font_color);
 
@@ -339,7 +339,7 @@ void CConsole::OnRender()
         {
             break;
         }
-        LPCSTR ls = LogFile[i].c_str();
+        pcstr ls = LogFile[i].c_str();
 
         if (!ls)
         {
@@ -371,11 +371,12 @@ void CConsole::DrawBackgrounds(bool bGame)
 
     GEnv.UIRender->SetShader(**m_hShader_back);
     // 6 = back, 12 = tips, (VIEW_TIPS_COUNT+1)*6 = highlight_words, 12 = scroll
-    GEnv.UIRender->StartPrimitive(6 + 12 + (VIEW_TIPS_COUNT + 1) * 6 + 12, IUIRender::ptTriList, IUIRender::pttTL);
+    const u32 numVertices = 6 + (bGame ? 12 + (VIEW_TIPS_COUNT + 1) * 6 + 12 : 0);
+    GEnv.UIRender->StartPrimitive(numVertices, IUIRender::ptTriList, IUIRender::pttTL);
 
     DrawRect(r, back_color);
 
-    if (m_tips.size() == 0 || m_disable_tips)
+    if (!bGame || m_tips.size() == 0 || m_disable_tips)
     {
         GEnv.UIRender->FlushPrimitive();
         return;
@@ -511,7 +512,7 @@ void CConsole::DrawRect(Frect const& r, u32 color)
     GEnv.UIRender->PushPoint(r.x1, r.y2, 0.0f, color, 0.0f, 1.0f);
 }
 
-void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
+void CConsole::ExecuteCommand(pcstr cmd_str, bool record_cmd)
 {
     u32 str_size = xr_strlen(cmd_str);
     PSTR edt = (PSTR)xr_alloca((str_size + 1) * sizeof(char));
@@ -574,7 +575,7 @@ void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
                 cc->Execute(last);
                 if (record_cmd)
                 {
-                    cc->add_to_LRU((LPCSTR)last);
+                    cc->add_to_LRU((pcstr)last);
                 }
             }
         }
@@ -665,8 +666,8 @@ void CConsole::SelectCommand()
     reset_selected_tip();
 }
 
-void CConsole::Execute(LPCSTR cmd) { ExecuteCommand(cmd, false); }
-void CConsole::ExecuteScript(LPCSTR str)
+void CConsole::Execute(pcstr cmd) { ExecuteCommand(cmd, false); }
+void CConsole::ExecuteScript(pcstr str)
 {
     u32 str_size = xr_strlen(str);
     PSTR buf = (PSTR)xr_alloca((str_size + 10) * sizeof(char));
@@ -677,33 +678,33 @@ void CConsole::ExecuteScript(LPCSTR str)
 
 // -------------------------------------------------------------------------------------------------
 
-IConsole_Command* CConsole::find_next_cmd(LPCSTR in_str, shared_str& out_str)
+IConsole_Command* CConsole::find_next_cmd(pcstr in_str, shared_str& out_str)
 {
-    LPCSTR radmin_cmd_name = "ra ";
+    pcstr radmin_cmd_name = "ra ";
     bool b_ra = (in_str == strstr(in_str, radmin_cmd_name));
     u32 offset = (b_ra) ? xr_strlen(radmin_cmd_name) : 0;
 
-    LPSTR t2;
+    pstr t2;
     STRCONCAT(t2, in_str + offset, " ");
 
     vecCMD_IT it = Commands.lower_bound(t2);
     if (it != Commands.end())
     {
         IConsole_Command* cc = it->second;
-        LPCSTR name_cmd = cc->Name();
+        pcstr name_cmd = cc->Name();
         u32 name_cmd_size = xr_strlen(name_cmd);
         PSTR new_str = (PSTR)xr_alloca((offset + name_cmd_size + 2) * sizeof(char));
 
         xr_strcpy(new_str, offset + name_cmd_size + 2, (b_ra) ? radmin_cmd_name : "");
         xr_strcat(new_str, offset + name_cmd_size + 2, name_cmd);
 
-        out_str._set((LPCSTR)new_str);
+        out_str._set((pcstr)new_str);
         return cc;
     }
     return NULL;
 }
 
-bool CConsole::add_next_cmds(LPCSTR in_str, vecTipsEx& out_v)
+bool CConsole::add_next_cmds(pcstr in_str, vecTipsEx& out_v)
 {
     u32 cur_count = out_v.size();
     if (cur_count >= MAX_TIPS_COUNT)
@@ -711,7 +712,7 @@ bool CConsole::add_next_cmds(LPCSTR in_str, vecTipsEx& out_v)
         return false;
     }
 
-    LPSTR t2;
+    pstr t2;
     STRCONCAT(t2, in_str, " ");
 
     shared_str temp;
@@ -736,7 +737,7 @@ bool CConsole::add_next_cmds(LPCSTR in_str, vecTipsEx& out_v)
         {
             break; // for
         }
-        LPSTR t3;
+        pstr t3;
         STRCONCAT(t3, out_v.back().text.c_str(), " ");
         cc = find_next_cmd(t3, temp);
         if (!cc)
@@ -747,7 +748,7 @@ bool CConsole::add_next_cmds(LPCSTR in_str, vecTipsEx& out_v)
     return res;
 }
 
-bool CConsole::add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v)
+bool CConsole::add_internal_cmds(pcstr in_str, vecTipsEx& out_v)
 {
     u32 cur_count = out_v.size();
     if (cur_count >= MAX_TIPS_COUNT)
@@ -763,7 +764,7 @@ bool CConsole::add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v)
     vecCMD_IT ite = Commands.end();
     for (; itb != ite; ++itb)
     {
-        LPCSTR name = itb->first;
+        pcstr name = itb->first;
         u32 name_sz = xr_strlen(name);
         if (name_sz >= in_sz)
         {
@@ -792,8 +793,8 @@ bool CConsole::add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v)
     ite = Commands.end();
     for (; itb != ite; ++itb)
     {
-        LPCSTR name = itb->first;
-        LPCSTR fd_str = strstr(name, in_str);
+        pcstr name = itb->first;
+        pcstr fd_str = strstr(name, in_str);
         if (fd_str)
         {
             shared_str temp;
@@ -827,7 +828,7 @@ void CConsole::update_tips()
         return;
     }
 
-    LPCSTR cur = ec().str_edit();
+    pcstr cur = ec().str_edit();
     u32 cur_length = xr_strlen(cur);
 
     if (cur_length == 0)
@@ -905,7 +906,7 @@ void CConsole::update_tips()
     }
 }
 
-void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v)
+void CConsole::select_for_filter(pcstr filter_str, vecTips& in_v, vecTipsEx& out_v)
 {
     out_v.clear();
     u32 in_count = in_v.size();

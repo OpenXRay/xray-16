@@ -166,20 +166,20 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, HW.pBaseZB); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->get_base_zb()); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
 
     // Distort
     {
         FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
-        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, HW.pBaseZB); // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
         HW.pDevice->ClearRenderTargetView(Target->rt_Generic_1->pRT, ColorRGBA);
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
 
     // Actual Display
-    Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
+    Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
     RCache.set_Shader(Target->s_menu);
     RCache.set_Geometry(Target->g_menu);
 
@@ -230,7 +230,7 @@ void CRender::Render()
     if (!(g_pGameLevel && g_hud)
         || bMenu)
     {
-        Target->u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, 0, 0, HW.pBaseZB);
+        Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
         return;
     }
 
@@ -291,7 +291,7 @@ void CRender::Render()
     // Sync point
     BasicStats.WaitS.Begin();
 
-    if (true)
+    if (false) // !!! Sync rendering drop performance !!!
     {
         CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
         CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500 * 1000 * 1000));
@@ -320,6 +320,9 @@ void CRender::Render()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE)) split_the_scene_to_minimize_wait = TRUE;
 
     //******* Main render :: PART-0	-- first
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     if (!split_the_scene_to_minimize_wait)
     {
         PIX_EVENT(DEFER_PART0_NO_SPLIT);
@@ -339,6 +342,9 @@ void CRender::Render()
         r_dsgraph_render_graph(0);
         Target->disable_aniso();
     }
+
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     //******* Occlusion testing of volume-limited light-sources
     Target->phase_occq();
@@ -397,7 +403,7 @@ void CRender::Render()
         if (false)
         {
             if (!RImplementation.o.dx10_msaa)
-                Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, nullptr, HW.pBaseZB);
+                Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, nullptr, Target->get_base_zb());
             else
                 Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1, nullptr,
                                 RImplementation.Target->rt_MSAADepth->pZRT);
@@ -473,7 +479,7 @@ void CRender::Render()
     {
         PIX_EVENT(DEFER_SUN);
         RImplementation.Stats.l_visible ++;
-        if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
+        if (!RImplementation.o.oldshadowcascades)
             render_sun_cascades();
         else
         {

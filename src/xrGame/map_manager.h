@@ -6,17 +6,17 @@ class CMapLocationWrapper;
 class CInventoryOwner;
 class CMapLocation;
 
-class CMapManager
+class CMapManager : public CUIResetNotifier 
 {
     CMapLocationWrapper* m_locations_wrapper;
-    Locations* m_locations;
+    vLocations* m_locations;
     xr_vector<CMapLocation*> m_deffered_destroy_queue;
 
 public:
     CMapManager();
     ~CMapManager();
     void __stdcall Update();
-    /*ICF */ Locations& Locations(); //{return *m_locations;}
+    /*ICF */ vLocations& Locations(); //{return *m_locations;}
     CMapLocation* AddMapLocation(const shared_str& spot_type, u16 id);
     CMapLocation* AddRelationLocation(CInventoryOwner* pInvOwner);
     void RemoveMapLocation(const shared_str& spot_type, u16 id);
@@ -28,9 +28,11 @@ public:
     void DisableAllPointers();
     bool GetMapLocationsForObject(u16 id, xr_vector<CMapLocation*>& res);
     void OnObjectDestroyNotify(u16 id);
-    void ResetStorage() { m_locations = NULL; };
+    void ResetStorage() { m_locations = nullptr; }
 #ifdef DEBUG
     void Dump();
 #endif
     void Destroy(CMapLocation*);
+
+    void OnUIReset() override;
 };

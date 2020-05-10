@@ -277,7 +277,7 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     rtViewport.Width = m_iTextureWidth;
     rtViewport.Height = m_iTextureHeight;
 #endif // #ifdef USE_DX11
-    HW.pContext->RSSetViewports(1, &rtViewport);
+    RCache.SetViewport(rtViewport);
 
     RCache.set_ZB(0);
 
@@ -347,7 +347,7 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     //  Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, pTarget->get_base_zb()); // LDR RT
     else
         pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
@@ -729,7 +729,7 @@ void dx103DFluidManager::RenderFluid(dx103DFluidData& FluidData)
     //  Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, pTarget->get_base_zb()); // LDR RT
     else
         pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 

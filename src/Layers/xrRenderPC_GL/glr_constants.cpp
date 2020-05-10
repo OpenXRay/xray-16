@@ -30,7 +30,6 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
     GLint uniformCount;
     CHK_GL(glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount));
 
-    u16 r_stage = 0;
     for (GLint i = 0; i < uniformCount; i++)
     {
         GLint size;
@@ -111,13 +110,13 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             ref_constant C = get(name);
             if (!C)
             {
-                C = table.emplace_back(new R_constant());//.g_constant_allocator.create();
+                C = table.emplace_back(xr_new<R_constant>());//.g_constant_allocator.create();
                 C->name = name;
                 C->destination = RC_dest_sampler;
                 C->type = RC_sampler;
                 C->handler = &binder_sampler;
                 R_constant_load& L = C->samp;
-                L.index = r_stage++;
+                L.index = u16(r_index + ((destination & 1) ? 0 : CTexture::rstVertex));
                 L.cls = RC_sampler;
                 L.location = r_location;
                 L.program = program;
@@ -128,7 +127,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 R_ASSERT(C->type == RC_sampler);
                 R_ASSERT(C->handler == &binder_sampler);
                 R_constant_load& L = C->samp;
-                R_ASSERT(L.index == r_stage);
+                R_ASSERT(L.index == r_index);
                 R_ASSERT(L.cls == RC_sampler);
                 R_ASSERT(L.location == r_location);
                 R_ASSERT(L.program == program);
@@ -147,7 +146,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         ref_constant C = get(name);
         if (!C)
         {
-            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
+            C = table.emplace_back(xr_new<R_constant>()); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;

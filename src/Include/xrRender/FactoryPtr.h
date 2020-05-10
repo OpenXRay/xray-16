@@ -2,6 +2,18 @@
 
 #include "RenderFactory.h"
 
+// XXX: should be revisited.
+#ifdef XR_COMPILER_GCC // At least GCC call destructor of members at call parent destructor
+#define FACTORY_PTR_INSTANCIATE(Class)\
+    template <>\
+    inline void FactoryPtr<I##Class>::CreateObject(void)\
+    { m_pObject = GEnv.RenderFactory->Create##Class(); }\
+    template <>\
+    inline void FactoryPtr<I##Class>::DestroyObject(void)\
+    {\
+        m_pObject = NULL;\
+    }
+#else
 #define FACTORY_PTR_INSTANCIATE(Class)\
     template <>\
     inline void FactoryPtr<I##Class>::CreateObject(void)\
@@ -12,6 +24,7 @@
         GEnv.RenderFactory->Destroy##Class(m_pObject);\
         m_pObject = NULL;\
     }
+#endif
 
 template <class T>
 class FactoryPtr

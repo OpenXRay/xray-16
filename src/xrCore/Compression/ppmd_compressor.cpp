@@ -3,14 +3,12 @@
 #include "PPMd.h"
 #include "SDL.h"
 
-#if defined(LINUX) || defined(FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 
 
 LONG InterlockedExchange(LONG volatile *dest, LONG val)
 {
-       LONG ret;
-    __asm__ __volatile__( "lock; xchg %0,(%1)" : "=r" (ret) :"r" (dest), "0" (val) : "memory" );
-    return ret;
+    return __sync_lock_test_and_set(dest, val);
 }
 #endif
 

@@ -71,8 +71,8 @@ public:
     SDL_Rect m_rcWindowClient;
 
     u32 dwPrecacheFrame;
-    BOOL b_is_Ready;
-    BOOL b_is_Active;
+    bool b_is_Ready;
+    bool b_is_Active;
     bool IsAnselActive;
     bool AllowWindowDrag; // For windowed mode
 
@@ -120,7 +120,6 @@ public:
     MessageRegistry<pureAppStart> seqAppStart;
     MessageRegistry<pureAppEnd> seqAppEnd;
     MessageRegistry<pureFrame> seqFrame;
-    MessageRegistry<pureScreenResolutionChanged> seqResolutionChanged;
 
     SDL_Window* m_sdlWnd;
 };
@@ -143,7 +142,7 @@ class ENGINE_API CRenderDevice : public CRenderDeviceBase, public IWindowHandler
     void _SetupStates();
 
 public:
-#if defined(WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 #endif
     // u32 dwFrame;
@@ -152,24 +151,24 @@ public:
 
     // u32 dwWidth, dwHeight;
     float fWidth_2, fHeight_2;
-    // BOOL b_is_Ready;
-    // BOOL b_is_Active;
+    // bool b_is_Ready;
+    // bool b_is_Active;
     void OnWM_Activate(WPARAM wParam, LPARAM lParam);
 
     // ref_shader m_WireShader;
     // ref_shader m_SelectionShader;
 
-    BOOL m_bNearer;
-    void SetNearer(BOOL enabled)
+    bool m_bNearer;
+    void SetNearer(bool enabled)
     {
         if (enabled && !m_bNearer)
         {
-            m_bNearer = TRUE;
+            m_bNearer = true;
             mProject._43 -= EPS_L;
         }
         else if (!enabled && m_bNearer)
         {
-            m_bNearer = FALSE;
+            m_bNearer = false;
             mProject._43 += EPS_L;
         }
         GEnv.Render->SetCacheXform(mView, mProject);
@@ -190,17 +189,17 @@ public:
     CRenderDevice()
         : fWidth_2(0), fHeight_2(0), mtProcessingAllowed(false),
           m_editor_module(nullptr), m_editor_initialize(nullptr),
-          m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
+          m_editor_finalize(nullptr), m_editor(nullptr)
     {
         m_sdlWnd = NULL;
-        b_is_Active = FALSE;
-        b_is_Ready = FALSE;
+        b_is_Active = false;
+        b_is_Ready = false;
         Timer.Start();
-        m_bNearer = FALSE;
+        m_bNearer = false;
     };
 
-    void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);
-    BOOL Paused();
+    void Pause(bool bOn, bool bTimer, bool bSound, pcstr reason);
+    bool Paused();
 
 private:
     static void PrimaryThreadProc(void* context);
@@ -238,7 +237,6 @@ private:
 
 public:
     void Create();
-    void WaitUntilCreated();
 
     void Run(void);
     void Destroy(void);
@@ -270,18 +268,13 @@ public:
     }
 
 private:
-    std::atomic<DeviceState> LastDeviceState;
-    std::atomic<bool> shouldReset;
-    std::atomic<bool> precacheWhileReset;
     std::atomic<bool> mtProcessingAllowed;
-    Event deviceCreated, deviceReadyToRun;
-    Event primaryReadyToRun, primaryProcessFrame, primaryFrameDone, primaryThreadExit; // Primary thread events
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 
 public:
     Event PresentationFinished = nullptr;
-    volatile BOOL mt_bMustExit;
+    volatile bool mt_bMustExit;
 
     bool IsMTProcessingAllowed() const
     {
@@ -314,7 +307,7 @@ private:
     void CalcFrameStats();
 
 public:
-#if !defined(LINUX)
+#if !defined(XR_PLATFORM_LINUX)
     bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif
 
@@ -338,7 +331,6 @@ private:
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
     XRay::Editor::ide_base* m_editor;
-    engine_impl* m_engine;
 };
 
 extern ENGINE_API CRenderDevice Device;
@@ -379,28 +371,17 @@ public:
 class CUIResetNotifier : public pureUIReset
 {
 public:
-    CUIResetNotifier(const int prio = REG_PRIORITY_NORMAL) { Device.seqUIReset.Add(this, prio); }
-    virtual ~CUIResetNotifier() { Device.seqUIReset.Remove(this); }
-    void OnUIReset() override {}
-};
-
-class CUIResetAndResolutionNotifier : public pureUIReset, pureScreenResolutionChanged
-{
-public:
-    CUIResetAndResolutionNotifier(const int uiResetPrio = REG_PRIORITY_NORMAL, const int resolutionChangedPrio = REG_PRIORITY_NORMAL)
+    CUIResetNotifier(const int uiResetPrio = REG_PRIORITY_NORMAL)
     {
         Device.seqUIReset.Add(this, uiResetPrio);
-        Device.seqResolutionChanged.Add(this, resolutionChangedPrio);
     }
 
-    virtual ~CUIResetAndResolutionNotifier()
+    virtual ~CUIResetNotifier()
     {
         Device.seqUIReset.Remove(this);
-        Device.seqResolutionChanged.Remove(this);
     }
 
     void OnUIReset() override {}
-    void OnScreenResolutionChanged() override { OnUIReset(); }
 };
 
 #endif

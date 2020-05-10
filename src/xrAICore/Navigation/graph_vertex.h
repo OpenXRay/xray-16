@@ -12,14 +12,14 @@
 #include "xrCommon/xr_vector.h"
 
 template <typename _data_type, typename _vertex_id_type, typename _graph_type>
-class CVertex
+class CGraphVertex
 {
 public:
     typedef _vertex_id_type vertex_id_type;
     typedef typename _graph_type::CEdge edge_type;
     typedef typename _graph_type::CEdge::edge_weight_type edge_weight_type;
     typedef xr_vector<edge_type> EDGES;
-    typedef xr_vector<CVertex*> VERTICES;
+    typedef xr_vector<CGraphVertex*> VERTICES;
 
 private:
     _vertex_id_type m_vertex_id;
@@ -32,13 +32,13 @@ private:
     size_t* m_edge_count;
 
 public:
-    IC CVertex(const _data_type& data, const _vertex_id_type& vertex_id, size_t* edge_count);
-    IC ~CVertex();
-    IC bool operator==(const CVertex& obj) const;
-    IC void add_edge(CVertex* vertex, const typename _graph_type::CEdge::edge_weight_type& edge_weight);
+    IC CGraphVertex(const _data_type& data, const _vertex_id_type& vertex_id, size_t* edge_count);
+    IC ~CGraphVertex();
+    IC bool operator==(const CGraphVertex& obj) const;
+    IC void add_edge(CGraphVertex* vertex, const typename _graph_type::CEdge::edge_weight_type& edge_weight);
     IC void remove_edge(const _vertex_id_type& vertex_id);
-    IC void on_edge_addition(CVertex* vertex);
-    IC void on_edge_removal(const CVertex* vertex);
+    IC void on_edge_addition(CGraphVertex* vertex);
+    IC void on_edge_removal(const CGraphVertex* vertex);
     IC const _vertex_id_type& vertex_id() const;
     IC const _data_type& data() const;
     IC _data_type& data();

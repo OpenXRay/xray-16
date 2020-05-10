@@ -32,9 +32,7 @@ public:
     typedef _condition_state CState;
     typedef _condition_evaluator CConditionEvaluator;
     typedef _operator_ptr operator_ptr;
-#ifdef WINDOWS
-    typedef _condition_evaluator_ptr _condition_evaluator_ptr;
-#endif
+    typedef _condition_evaluator_ptr condition_evaluator_ptr_type;
     typedef typename _operator_condition::condition_type condition_type;
     typedef typename _operator_condition::value_type value_type;
     typedef typename _operator::edge_value_type edge_value_type;
@@ -56,7 +54,7 @@ public:
     };
     typedef xr_vector<SOperator> OPERATOR_VECTOR;
     typedef typename OPERATOR_VECTOR::const_iterator const_iterator;
-    typedef AssociativeVector<condition_type, _condition_evaluator_ptr> EVALUATORS;
+    typedef AssociativeVector<condition_type, condition_evaluator_ptr_type> EVALUATORS;
 
 protected:
     OPERATOR_VECTOR m_operators;
@@ -138,9 +136,9 @@ public:
     IC const CState& target_state() const;
 
     // evaluator interface
-    IC virtual void add_evaluator(const condition_type& condition_id, _condition_evaluator_ptr evaluator);
+    IC virtual void add_evaluator(const condition_type& condition_id, condition_evaluator_ptr_type evaluator);
     IC virtual void remove_evaluator(const condition_type& condition_id);
-    IC _condition_evaluator_ptr evaluator(const condition_type& condition_id) const;
+    IC condition_evaluator_ptr_type evaluator(const condition_type& condition_id) const;
     IC const EVALUATORS& evaluators() const;
     IC void evaluate_condition(typename xr_vector<_operator_condition>::const_iterator& I,
         typename xr_vector<_operator_condition>::const_iterator& E, const condition_type& condition_id) const;

@@ -3,7 +3,7 @@
 
 namespace mp_anticheat
 {
-static char* important_sections[] = {"mp_actor", "mp_actor_damage", "mp_actor_immunities", "mp_actor_condition",
+static pcstr important_sections[] = {"mp_actor", "mp_actor_damage", "mp_actor_immunities", "mp_actor_condition",
     "rank_base", "rank_0", "rank_1", "rank_2", "rank_3", "rank_4", "deathmatch_gamedata", "deathmatch_team0",
     "teamdeathmatch_team1", "teamdeathmatch_team2", "artefacthunt_gamedata", "artefacthunt_team1", "artefacthunt_team2",
     "capturetheartefact_gamedata", "capturetheartefact_team1", "capturetheartefact_team2", "deathmatch_base_cost",
