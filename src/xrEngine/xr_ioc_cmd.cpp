@@ -956,6 +956,6 @@ void CCC_Register()
 
 #ifdef DEBUG
     extern BOOL debug_destroy;
-    CMD4(CCC_Integer, "debug_destroy", &debug_destroy, false, true);
+    CMD4(CCC_Integer, "debug_destroy", &debug_destroy, 0, 1);
 #endif
 };
