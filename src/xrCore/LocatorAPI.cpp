@@ -802,7 +802,6 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     string_path full_current_directory;
 
 #if defined(XR_PLATFORM_WINDOWS)
-
     _fullpath(full_current_directory, fs_path, sizeof full_current_directory);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     if (SDL_strlen(fs_path) != 0)
@@ -820,12 +819,12 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
             pref_path = SDL_GetBasePath();
         else
         {
-        if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
-            pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
-        else if (strstr(Core.Params, "-cs"))
-            pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
-        else
-            pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
+            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
+            else if (strstr(Core.Params, "-cs"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
+            else
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
         }
         SDL_strlcpy(full_current_directory, pref_path, sizeof full_current_directory);
         SDL_free(pref_path);
