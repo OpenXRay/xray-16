@@ -54,7 +54,7 @@ wrap* get_script_wrapper(typename wrap::type_impl& E)
     if (e)
         return e;
 
-    e = new wrap(&E);
+    e = xr_new<wrap>(&E);
     E.get_scripted().set(e);
 
     VERIFY(smart_cast<wrap*>(E.get_scripted().get()) == e);
