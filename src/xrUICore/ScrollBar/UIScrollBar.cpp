@@ -18,19 +18,19 @@ CUIScrollBar::CUIScrollBar()
     m_b_enabled = true;
     m_mouse_state = 0;
 
-    m_DecButton = new CUI3tButton();
+    m_DecButton = xr_new<CUI3tButton>();
     m_DecButton->SetAutoDelete(true);
     AttachChild(m_DecButton);
 
-    m_IncButton = new CUI3tButton();
+    m_IncButton = xr_new<CUI3tButton>();
     m_IncButton->SetAutoDelete(true);
     AttachChild(m_IncButton);
 
-    m_ScrollBox = new CUIScrollBox();
+    m_ScrollBox = xr_new<CUIScrollBox>();
     m_ScrollBox->SetAutoDelete(true);
     AttachChild(m_ScrollBox);
 
-    m_FrameBackground = new CUIFrameLineWnd();
+    m_FrameBackground = xr_new<CUIFrameLineWnd>();
     m_FrameBackground->SetAutoDelete(true);
     AttachChild(m_FrameBackground);
 }
@@ -77,7 +77,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         strconcat(sizeof(_path), _path, profile, ":box");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_ScrollBox, false))
         {
-            tempScroll = new CUIStatic();
+            tempScroll = xr_new<CUIStatic>();
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempScroll, false))
                 tempScroll->Show(true);
         }
@@ -88,7 +88,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
         {
-            tempBackground = new CUIStatic();
+            tempBackground = xr_new<CUIStatic>();
             tempBackground->SetWndRect(GetWndRect());
             strconcat(sizeof(_path), _path, profile, ":back");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempBackground, false))
@@ -114,7 +114,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         strconcat(sizeof(_path), _path, profile, ":box_v");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_ScrollBox, false))
         {
-            tempScroll = new CUIStatic();
+            tempScroll = xr_new<CUIStatic>();
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempScroll, false))
                 tempScroll->Show(true);
         }
@@ -125,7 +125,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
 
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
         {
-            tempBackground = new CUIStatic();
+            tempBackground = xr_new<CUIStatic>();
             tempBackground->SetWndRect(GetWndRect());
             strconcat(sizeof(_path), _path, profile, ":back_v");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempBackground, false))

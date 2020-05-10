@@ -46,7 +46,7 @@ bool CUITabControl::IsChangedOptValue() const { return GetActiveId() != m_opt_ba
 // добавление кнопки-закладки в список закладок контрола
 bool CUITabControl::AddItem(LPCSTR pItemName, LPCSTR pTexName, Fvector2 pos, Fvector2 size)
 {
-    CUITabButton* pNewButton = new CUITabButton();
+    CUITabButton* pNewButton = xr_new<CUITabButton>();
     pNewButton->SetAutoDelete(true);
     pNewButton->InitButton(pos, size);
     pNewButton->InitTexture(pTexName);
