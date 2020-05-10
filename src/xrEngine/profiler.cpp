@@ -1,4 +1,4 @@
-   ////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 //	Module 		: profiler.cpp
 //	Created 	: 23.07.2004
 //  Modified 	: 23.07.2004
@@ -14,7 +14,7 @@
 #include "xrEngine/GameFont.h"
 
 #ifdef CONFIG_PROFILE_LOCKS
-static volatile LONG                    critical_section_counter = 0;
+static volatile LONG					critical_section_counter = 0;
 
 void add_profile_portion				(pcstr id, const u64 &time)
 {

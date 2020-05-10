@@ -29,7 +29,7 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
 }
 
 #ifdef XR_PLATFORM_WINDOWS
-inline HANDLE ExtractImage(int idx, unsigned int type)
+inline HANDLE ExtractImage(int idx, UINT type)
 {
     return LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(idx),
         type, 0, 0, LR_CREATEDIBSECTION);

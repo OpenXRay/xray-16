@@ -143,7 +143,7 @@ class ENGINE_API CRenderDevice : public CRenderDeviceBase, public IWindowHandler
 
 public:
 #if defined(XR_PLATFORM_WINDOWS)
-    LRESULT MsgProc(HWND, unsigned int, WPARAM, LPARAM);
+    LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 #endif
     // u32 dwFrame;
     // u32 dwPrecacheFrame;
@@ -308,7 +308,7 @@ private:
 
 public:
 #if !defined(XR_PLATFORM_LINUX)
-    bool xr_stdcall on_message(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
+    bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif
 
 private:

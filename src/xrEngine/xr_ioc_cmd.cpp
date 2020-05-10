@@ -543,9 +543,9 @@ public:
 //-----------------------------------------------------------------------
 /*
 #ifdef DEBUG
-extern signed int g_bDR_LM_UsePointsBBox;
-extern signed int g_bDR_LM_4Steps;
-extern signed int g_iDR_LM_Step;
+extern int g_bDR_LM_UsePointsBBox;
+extern int g_bDR_LM_4Steps;
+extern int g_iDR_LM_Step;
 extern Fvector g_DR_LM_Min, g_DR_LM_Max;
 
 class CCC_DR_ClearPoint : public IConsole_Command

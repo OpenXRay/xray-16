@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
-bool CRenderDevice::on_message(HWND hWnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+bool CRenderDevice::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
     switch (uMsg)
     {
