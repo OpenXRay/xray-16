@@ -540,10 +540,10 @@ void CWeapon::LoadFireParams(LPCSTR section)
     CShootingObject::LoadFireParams(section);
 };
 
-BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
+bool CWeapon::net_Spawn(CSE_Abstract* DC)
 {
     m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
-    BOOL bResult = inherited::net_Spawn(DC);
+    const bool bResult = inherited::net_Spawn(DC);
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeItemWeapon* E = smart_cast<CSE_ALifeItemWeapon*>(e);
 

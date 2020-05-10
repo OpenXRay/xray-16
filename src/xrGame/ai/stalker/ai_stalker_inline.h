@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC BOOL CAI_Stalker::UsedAI_Locations() { return (TRUE); }
+IC bool CAI_Stalker::UsedAI_Locations() { return (true); }
 IC CStalkerAnimationManager& CAI_Stalker::animation() const
 {
     VERIFY(m_animation_manager);

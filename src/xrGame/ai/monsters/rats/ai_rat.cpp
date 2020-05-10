@@ -204,7 +204,7 @@ void CAI_Rat::Load(LPCSTR section)
     m_dwActiveScheduleMax = shedule.t_max;
 }
 
-BOOL CAI_Rat::net_Spawn(CSE_Abstract* DC)
+bool CAI_Rat::net_Spawn(CSE_Abstract* DC)
 {
     //////////////////////////////////////////////////////////////////////////
     CSE_Abstract* e = (CSE_Abstract*)(DC);
@@ -602,7 +602,7 @@ void CAI_Rat::OnRender()
 }
 #endif
 
-BOOL CAI_Rat::UsedAI_Locations() { return (TRUE); }
+bool CAI_Rat::UsedAI_Locations() { return (TRUE); }
 void CAI_Rat::make_Interpolation()
 {
     inherited::make_Interpolation();
@@ -669,8 +669,8 @@ float CAI_Rat::get_custom_pitch_speed(float def_speed)
     return (PI_DIV_2);
 }
 
-BOOL CAI_Rat::renderable_ShadowReceive() { return TRUE; }
-BOOL CAI_Rat::renderable_ShadowGenerate() { return FALSE; }
+bool CAI_Rat::renderable_ShadowReceive() { return TRUE; }
+bool CAI_Rat::renderable_ShadowGenerate() { return FALSE; }
 IFactoryObject* CAI_Rat::_construct()
 {
     CCustomMonster::_construct();

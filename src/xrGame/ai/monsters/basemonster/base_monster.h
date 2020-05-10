@@ -75,7 +75,7 @@ public:
     virtual CGameObject* cast_game_object() { return this; }
 
 public:
-    virtual BOOL renderable_ShadowReceive() { return TRUE; }
+    virtual bool renderable_ShadowReceive() { return TRUE; }
     virtual void Die(IGameObject* who);
     virtual void HitSignal(float amount, Fvector& vLocalDir, IGameObject* who, s16 element);
     virtual void Hit(SHit* pHDS);
@@ -89,10 +89,10 @@ public:
 
     virtual IFactoryObject* _construct();
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Save(NET_Packet& P);
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
     virtual void net_Relcase(IGameObject* O);
@@ -124,7 +124,7 @@ public:
     virtual CPHSynchronize* PHGetSyncItem(u16 item) { return inherited::PHGetSyncItem(item); }
     virtual void PHUnFreeze() { return inherited::PHUnFreeze(); }
     virtual void PHFreeze() { return inherited::PHFreeze(); }
-    virtual BOOL UsedAI_Locations() { return inherited::UsedAI_Locations(); }
+    virtual bool UsedAI_Locations() { return inherited::UsedAI_Locations(); }
     virtual const SRotation Orientation() const { return inherited::Orientation(); }
     virtual void on_restrictions_change();
 

@@ -78,7 +78,7 @@ public:
     virtual void Die(IGameObject* who);
 
     virtual void net_Destroy();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Relcase(IGameObject* O);
 
     virtual void CheckSpecParams(u32 spec_params);

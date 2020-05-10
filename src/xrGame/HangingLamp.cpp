@@ -68,7 +68,7 @@ void CHangingLamp::net_Destroy()
     inherited::net_Destroy();
 }
 
-BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
+bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectHangingLamp* lamp = smart_cast<CSE_ALifeObjectHangingLamp*>(e);
@@ -186,7 +186,7 @@ void CHangingLamp::net_Save(NET_Packet& P)
     CPHSkeleton::SaveNetState(P);
 }
 
-BOOL CHangingLamp::net_SaveRelevant() { return (TRUE); }
+bool CHangingLamp::net_SaveRelevant() { return (TRUE); }
 void CHangingLamp::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
@@ -406,7 +406,7 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
 
 void CHangingLamp::net_Export(NET_Packet& P) { VERIFY(Local()); }
 void CHangingLamp::net_Import(NET_Packet& P) { VERIFY(Remote()); }
-BOOL CHangingLamp::UsedAI_Locations() { return (FALSE); }
+bool CHangingLamp::UsedAI_Locations() { return (FALSE); }
 SCRIPT_EXPORT(CHangingLamp, (CGameObject), {
     luabind::module(luaState)[luabind::class_<CHangingLamp, CGameObject>("hanging_lamp")
                                   .def(luabind::constructor<>())

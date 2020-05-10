@@ -231,7 +231,7 @@ void CEntityAlive::shedule_Update(u32 dt)
     }
 }
 
-BOOL CEntityAlive::net_Spawn(CSE_Abstract* DC)
+bool CEntityAlive::net_Spawn(CSE_Abstract* DC)
 {
     //установить команду в соответствии с community
     /*	if(monster_community->team() != 255)
@@ -571,7 +571,7 @@ void CEntityAlive::load(IReader& input_packet)
     conditions().load(input_packet);
 }
 
-BOOL CEntityAlive::net_SaveRelevant() { return (TRUE); }
+bool CEntityAlive::net_SaveRelevant() { return (TRUE); }
 CEntityConditionSimple* CEntityAlive::create_entity_condition(CEntityConditionSimple* ec)
 {
     if (!ec)

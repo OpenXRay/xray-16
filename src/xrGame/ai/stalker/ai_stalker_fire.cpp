@@ -602,7 +602,7 @@ public:
     }
 };
 
-IC BOOL ray_query_callback(collide::rq_result& result, LPVOID params)
+IC bool ray_query_callback(collide::rq_result& result, LPVOID params)
 {
     ray_query_param* param = (ray_query_param*)params;
     float power = param->m_holder->feel_vision_mtl_transp(result.O, result.element);

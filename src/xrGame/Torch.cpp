@@ -195,7 +195,7 @@ void CTorch::Switch(bool light_on)
     }
 }
 bool CTorch::torch_active() const { return (m_switched_on); }
-BOOL CTorch::net_Spawn(CSE_Abstract* DC)
+bool CTorch::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeItemTorch* torch = smart_cast<CSE_ALifeItemTorch*>(e);

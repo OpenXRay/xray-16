@@ -111,7 +111,7 @@ void CAI_Trader::LookAtActor(CBoneInstance* B)
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOL CAI_Trader::net_Spawn(CSE_Abstract* DC)
+bool CAI_Trader::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeTrader* l_tpTrader = smart_cast<CSE_ALifeTrader*>(e);
@@ -285,7 +285,7 @@ void CAI_Trader::UpdateCL()
         animation().update_frame();
 }
 
-BOOL CAI_Trader::UsedAI_Locations() { return (TRUE); }
+bool CAI_Trader::UsedAI_Locations() { return (TRUE); }
 void CAI_Trader::OnStartTrade()
 {
     m_busy_now = true;

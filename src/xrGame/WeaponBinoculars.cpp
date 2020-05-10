@@ -66,7 +66,7 @@ void CWeaponBinoculars::OnZoomOut()
     inherited::OnZoomOut();
 }
 
-BOOL CWeaponBinoculars::net_Spawn(CSE_Abstract* DC)
+bool CWeaponBinoculars::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     return TRUE;

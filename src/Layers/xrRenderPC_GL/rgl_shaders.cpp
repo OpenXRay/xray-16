@@ -262,8 +262,8 @@ private:
     }
 };
 
-HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
-    LPCSTR pTarget, DWORD Flags, void*& result)
+HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
+    pcstr pTarget, u32 Flags, void*& result)
 {
     shader_options_holder options;
     shader_name_holder sh_name;

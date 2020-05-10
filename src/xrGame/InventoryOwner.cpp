@@ -104,7 +104,7 @@ void CInventoryOwner::reinit()
 }
 
 // call this after CGameObject::net_Spawn
-BOOL CInventoryOwner::net_Spawn(CSE_Abstract* DC)
+bool CInventoryOwner::net_Spawn(CSE_Abstract* DC)
 {
     if (!m_pTrade)
         m_pTrade = new CTrade(this);

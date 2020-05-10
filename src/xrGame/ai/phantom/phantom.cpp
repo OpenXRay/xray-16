@@ -54,7 +54,7 @@ void CPhantom::Load(LPCSTR section)
     if (snd_name && snd_name[0])
         m_state_data[stShoot].sound.create(snd_name, st_Effect, sg_SourceType);
 }
-BOOL CPhantom::net_Spawn(CSE_Abstract* DC)
+bool CPhantom::net_Spawn(CSE_Abstract* DC)
 {
     CSE_ALifeCreaturePhantom* OBJ = smart_cast<CSE_ALifeCreaturePhantom*>(DC);
     VERIFY(OBJ);

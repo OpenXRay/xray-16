@@ -151,7 +151,7 @@ void CCar::Load(LPCSTR section)
         self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
 }
 
-BOOL CCar::net_Spawn(CSE_Abstract* DC)
+bool CCar::net_Spawn(CSE_Abstract* DC)
 {
 #ifdef DEBUG
     InitDebug();
@@ -263,7 +263,7 @@ void CCar::net_Save(NET_Packet& P)
     SaveNetState(P);
 }
 
-BOOL CCar::net_SaveRelevant()
+bool CCar::net_SaveRelevant()
 {
     return TRUE;
     // return
@@ -415,7 +415,7 @@ void CCar::UpdateEx(float fov)
     }
 }
 
-BOOL CCar::AlwaysTheCrow() { return (m_car_weapon && m_car_weapon->IsActive()); }
+bool CCar::AlwaysTheCrow() { return (m_car_weapon && m_car_weapon->IsActive()); }
 void CCar::UpdateCL()
 {
     inherited::UpdateCL();
@@ -1738,7 +1738,7 @@ void CCar::PhDataUpdate(float step)
     VERIFY(_valid(m_steer_angle));
 }
 
-BOOL CCar::UsedAI_Locations() { return (FALSE); }
+bool CCar::UsedAI_Locations() { return (FALSE); }
 u16 CCar::DriverAnimationType() { return m_driver_anim_type; }
 void CCar::OnAfterExplosion() {}
 void CCar::OnBeforeExplosion() { setEnabled(FALSE); }

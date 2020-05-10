@@ -62,7 +62,7 @@ public:
             for (int i = 0; i < 4; ++i)
                 xr_strcpy(m_params[i], "");
         }
-        void parse_cmd_line(LPCSTR cmd_line)
+        void parse_cmd_line(pcstr cmd_line)
         {
             reset();
             int n = _min(4, _GetItemCount(cmd_line, '/'));
@@ -84,8 +84,8 @@ public:
     void destroy_particles(const bool& all_particles);
 
 public:
-    virtual void PreStart(LPCSTR op);
-    virtual void Start(LPCSTR op);
+    virtual void PreStart(pcstr op);
+    virtual void Start(pcstr op);
     virtual void Disconnect();
 #ifndef _EDITOR
     IGame_ObjectPool ObjectPool;
@@ -102,7 +102,7 @@ public:
     ShadersExternalData* m_pGShaderConstants; //--#SM+#--
 
     const ParticleStatistics& GetStats() { return stats; }
-    virtual bool OnRenderPPUI_query() { return FALSE; }; // should return true if we want to have second function called
+    virtual bool OnRenderPPUI_query() { return false; }; // should return true if we want to have second function called
     virtual void OnRenderPPUI_main(){};
     virtual void OnRenderPPUI_PP(){};
 

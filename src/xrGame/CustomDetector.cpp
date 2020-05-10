@@ -189,7 +189,7 @@ CCustomDetector::~CCustomDetector()
     xr_delete(m_ui);
 }
 
-BOOL CCustomDetector::net_Spawn(CSE_Abstract* DC)
+bool CCustomDetector::net_Spawn(CSE_Abstract* DC)
 {
     TurnDetectorInternal(false);
     return (inherited::net_Spawn(DC));

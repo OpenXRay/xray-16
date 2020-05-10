@@ -15,7 +15,7 @@ xr_vector<xr_token> ControllersToken;
 
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
-ENGINE_API Flags32 psMouseInvert = {FALSE};
+ENGINE_API Flags32 psMouseInvert = {false};
 
 // Max events per frame
 constexpr size_t MAX_KEYBOARD_EVENTS = 64;

@@ -13,7 +13,7 @@ public:
 
     virtual void Load(LPCSTR section);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Relcase(IGameObject* O);
 
@@ -61,7 +61,7 @@ private:
 protected:
     virtual void UpdateXForm() { CMissile::UpdateXForm(); };
 public:
-    virtual BOOL UsedAI_Locations();
+    virtual bool UsedAI_Locations();
     virtual CExplosive* cast_explosive() { return this; }
     virtual CMissile* cast_missile() { return this; }
     virtual CHudItem* cast_hud_item() { return this; }

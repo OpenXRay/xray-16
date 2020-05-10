@@ -128,7 +128,7 @@ public:
     CCustomDetector();
     virtual ~CCustomDetector();
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void Load(LPCSTR section);
 
     virtual void OnH_A_Chield();

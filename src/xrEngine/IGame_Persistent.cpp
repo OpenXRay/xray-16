@@ -83,7 +83,7 @@ void IGame_Persistent::OnAppEnd()
 #endif
 }
 
-void IGame_Persistent::PreStart(LPCSTR op)
+void IGame_Persistent::PreStart(pcstr op)
 {
     string256 prev_type;
     params new_game_params;
@@ -96,7 +96,7 @@ void IGame_Persistent::PreStart(LPCSTR op)
         OnGameEnd();
     }
 }
-void IGame_Persistent::Start(LPCSTR op)
+void IGame_Persistent::Start(pcstr op)
 {
     string256 prev_type;
     xr_strcpy(prev_type, m_game_params.m_game_type);
@@ -173,7 +173,7 @@ void IGame_Persistent::OnGameEnd()
 {
 #ifndef _EDITOR
     ObjectPool.clear();
-    GEnv.Render->models_Clear(TRUE);
+    GEnv.Render->models_Clear(true);
 #endif
 }
 

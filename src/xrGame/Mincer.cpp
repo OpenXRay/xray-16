@@ -44,7 +44,7 @@ void CMincer::Load(LPCSTR section)
     // pSettings->r_fvector3(section,whirlwind_center);
 }
 
-BOOL CMincer::net_Spawn(CSE_Abstract* DC)
+bool CMincer::net_Spawn(CSE_Abstract* DC)
 {
     BOOL result = inherited::net_Spawn(DC);
     Fvector C;

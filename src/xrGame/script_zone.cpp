@@ -22,7 +22,7 @@
 CScriptZone::CScriptZone() {}
 CScriptZone::~CScriptZone() {}
 void CScriptZone::reinit() { inherited::reinit(); }
-BOOL CScriptZone::net_Spawn(CSE_Abstract* DC)
+bool CScriptZone::net_Spawn(CSE_Abstract* DC)
 {
     feel_touch.clear();
 

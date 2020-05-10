@@ -40,7 +40,7 @@ const float MAX_DIST_FACTOR = 0.95f;
 // environment
 CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
 {
-    bNeed_re_create_env = FALSE;
+    bNeed_re_create_env = false;
     bWFX = false;
     Current[0] = 0;
     Current[1] = 0;
@@ -109,7 +109,7 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     if (environmentFolderExist)
     {
         config = xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "environment.ltx"),
-            TRUE, TRUE, FALSE);
+            true, true, false);
         section = "environment";
     }
     else
@@ -142,17 +142,17 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
         return;
 
     m_ambients_config =
-        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "ambients.ltx"), TRUE, TRUE, FALSE);
+        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "ambients.ltx"), true, true, false);
     m_sound_channels_config =
-        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), TRUE, TRUE, FALSE);
+        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), true, true, false);
     m_effects_config =
-        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "effects.ltx"), TRUE, TRUE, FALSE);
+        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "effects.ltx"), true, true, false);
     m_suns_config =
-        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "suns.ltx"), TRUE, TRUE, FALSE);
+        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "suns.ltx"), true, true, false);
     m_thunderbolt_collections_config = xr_new<CInifile>(
-        FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
+        FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolt_collections.ltx"), true, true, false);
     m_thunderbolts_config =
-        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), TRUE, TRUE, FALSE);
+        xr_new<CInifile>(FS.update_path(filePath, "$game_config$", "environment" DELIMITER "thunderbolts.ltx"), true, true, false);
 }
 
 CEnvironment::~CEnvironment()
@@ -246,11 +246,11 @@ float CEnvironment::NormalizeTime(float tm)
 
 void CEnvironment::SetWeather(shared_str name, bool forced)
 {
-    //. static BOOL bAlready = FALSE;
+    //. static bool bAlready = false;
     //. if(bAlready) return;
     if (name.size())
     {
-        //. bAlready = TRUE;
+        //. bAlready = true;
         auto it = WeatherCycles.find(name);
         if (it == WeatherCycles.end())
         {

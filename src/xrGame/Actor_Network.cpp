@@ -533,7 +533,7 @@ void CActor::net_Import_Physic_proceed()
     CrPr_SetActivationStep(0);
 };
 
-BOOL CActor::net_Spawn(CSE_Abstract* DC)
+bool CActor::net_Spawn(CSE_Abstract* DC)
 {
     m_holder_id = ALife::_OBJECT_ID(-1);
     m_feel_touch_characters = 0;
@@ -572,9 +572,9 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     game_news_registry->registry().init(ID());
 
     if (!CInventoryOwner::net_Spawn(DC))
-        return FALSE;
+        return false;
     if (!inherited::net_Spawn(DC))
-        return FALSE;
+        return false;
 
     CSE_ALifeTraderAbstract* pTA = smart_cast<CSE_ALifeTraderAbstract*>(e);
     set_money(pTA->m_dwMoney, false);
@@ -730,7 +730,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     {
         setLocal(FALSE);
     };
-    return TRUE;
+    return true;
 }
 
 void CActor::net_Destroy()
@@ -815,7 +815,7 @@ void CActor::net_Relcase(IGameObject* O)
     HUD().net_Relcase(O);
 }
 
-BOOL CActor::net_Relevant() // relevant for export to server
+bool CActor::net_Relevant() // relevant for export to server
 {
     if (OnServer())
     {
@@ -1871,7 +1871,7 @@ void CActor::net_Save(NET_Packet& P)
 #endif
 }
 
-BOOL CActor::net_SaveRelevant() { return TRUE; }
+bool CActor::net_SaveRelevant() { return true; }
 void CActor::SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir)
 {
     m_iLastHitterID = (who != NULL) ? who->ID() : u16(-1);
@@ -2089,7 +2089,7 @@ bool CActor::InventoryAllowSprint()
     return true;
 };
 
-BOOL CActor::BonePassBullet(int boneID)
+bool CActor::BonePassBullet(int boneID)
 {
     if (GameID() == eGameIDSingle)
         return inherited::BonePassBullet(boneID);

@@ -455,7 +455,7 @@ void CAI_Bloodsucker::CheckSpecParams(u32 spec_params)
     }
 }
 
-BOOL CAI_Bloodsucker::net_Spawn(CSE_Abstract* DC)
+bool CAI_Bloodsucker::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

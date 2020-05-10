@@ -23,7 +23,7 @@ class ENGINE_API CDemoPlay : public CEffectorCam
     u32 dwCyclesLeft;
 
     // statistics
-    BOOL stat_started;
+    bool stat_started;
     CTimer stat_Timer_frame;
     CTimer stat_Timer_total;
     u32 stat_StartFrame;
@@ -33,7 +33,7 @@ class ENGINE_API CDemoPlay : public CEffectorCam
     void stat_Stop();
 
 public:
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
 
     CDemoPlay(const char* name, float ms, u32 cycles, float life_time = 60 * 60 * 1000);
     virtual ~CDemoPlay();

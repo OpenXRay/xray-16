@@ -66,7 +66,7 @@ bool CActor::feel_touch_on_contact(IGameObject* O)
     return (false);
 }
 
-ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
+ICF static bool info_trace_callback(collide::rq_result& result, LPVOID params)
 {
     BOOL& bOverlaped = *(BOOL*)params;
     if (result.O)

@@ -279,7 +279,7 @@ bool CController::is_community_friend_overrides(const CEntityAlive* entity_alive
                 IO->CharacterInfo().Community().id()) != m_friend_community_overrides.end());
 }
 
-BOOL CController::net_Spawn(CSE_Abstract* DC)
+bool CController::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

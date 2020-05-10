@@ -28,7 +28,7 @@ class CEffectorBobbing : public CEffectorCam
 public:
     CEffectorBobbing();
     virtual ~CEffectorBobbing();
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
     void SetState(u32 st, bool limping, bool ZoomMode);
 };
 

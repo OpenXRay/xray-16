@@ -313,7 +313,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 }
 
 /////////// network ///////////////////////////////
-BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
+bool CInventoryItem::net_Spawn(CSE_Abstract* DC)
 {
     VERIFY(!m_pInventory);
 

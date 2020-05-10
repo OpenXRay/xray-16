@@ -78,9 +78,9 @@ void CEffect_Rain::Born(Item& dest, float radius)
     RenewItem(dest, height, RayPick(dest.P, dest.D, height, collide::rqtBoth));
 }
 
-BOOL CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt)
+bool CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt)
 {
-    BOOL bRes = TRUE;
+    bool bRes = true;
 #ifdef _EDITOR
     Tools->RayPick(s, d, range);
 #else
@@ -93,7 +93,7 @@ BOOL CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, col
     return bRes;
 }
 
-void CEffect_Rain::RenewItem(Item& dest, float height, BOOL bHit)
+void CEffect_Rain::RenewItem(Item& dest, float height, bool bHit)
 {
     dest.uv_set = Random.randI(2);
     if (bHit)

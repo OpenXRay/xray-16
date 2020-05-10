@@ -5,9 +5,9 @@
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
 static HANDLE hLocalSlot = INVALID_HANDLE_VALUE;
 #endif
-extern void msParse(LPCSTR cmd);
+extern void msParse(pcstr cmd);
 
-void msCreate(LPCSTR name)
+void msCreate(pcstr name)
 {
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
     string256 fn;
@@ -27,7 +27,7 @@ void msRead(void)
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
     DWORD cbMessage, cMessage, cbRead;
     BOOL fResult;
-    LPSTR lpszBuffer;
+    pstr lpszBuffer;
 
     cbMessage = cMessage = cbRead = 0;
     fResult = GetMailslotInfo(hLocalSlot, // mailslot handle
@@ -42,7 +42,7 @@ void msRead(void)
     while (cMessage != 0) // retrieve all messages
     {
         // Allocate memory for the message.
-        lpszBuffer = (LPSTR)GlobalAlloc(GPTR, cbMessage);
+        lpszBuffer = (pstr)GlobalAlloc(GPTR, cbMessage);
         lpszBuffer[0] = '\0';
         fResult = ReadFile(hLocalSlot, lpszBuffer, cbMessage, &cbRead, (LPOVERLAPPED)NULL);
         if (!fResult)

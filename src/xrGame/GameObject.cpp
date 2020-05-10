@@ -178,7 +178,7 @@ void CGameObject::processing_deactivate()
         g_pGameLevel->Objects.o_sleep(this);
 }
 
-void CGameObject::setEnabled(BOOL _enabled)
+void CGameObject::setEnabled(bool _enabled)
 {
     if (_enabled)
     {
@@ -193,7 +193,7 @@ void CGameObject::setEnabled(BOOL _enabled)
     }
 }
 
-void CGameObject::setVisible(BOOL _visible)
+void CGameObject::setVisible(bool _visible)
 {
     if (_visible)
     {
@@ -429,7 +429,7 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
 
 void VisualCallback(IKinematics* tpKinematics);
 
-BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
+bool CGameObject::net_Spawn(CSE_Abstract* DC)
 {
     VERIFY(!m_spawned);
     m_spawned = true;
@@ -1026,7 +1026,7 @@ void CGameObject::OnH_B_Independent(bool just_before_destroy)
         validate_ai_locations(false);
 }
 
-void CGameObject::setDestroy(BOOL _destroy)
+void CGameObject::setDestroy(bool _destroy)
 {
     if (_destroy == (BOOL)Props.bDestroy)
         return;
@@ -1109,8 +1109,8 @@ void CGameObject::u_EventGen(NET_Packet& P, u32 type, u32 dest)
 void CGameObject::u_EventSend(NET_Packet& P, u32 dwFlags) { Level().Send(P, dwFlags); }
 #include "Bolt.h"
 
-BOOL CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
-BOOL CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }
+bool CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
+bool CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }
 void CGameObject::add_visual_callback(visual_callback callback)
 {
     VERIFY(smart_cast<IKinematics*>(Visual()));
@@ -1209,7 +1209,7 @@ void CGameObject::shedule_Update(u32 dt)
         scriptBinder.shedule_Update(dt);
 }
 
-BOOL CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
+bool CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
 //игровое имя объекта
 LPCSTR CGameObject::Name() const { return (*cName()); }
 u32 CGameObject::ef_creature_type() const

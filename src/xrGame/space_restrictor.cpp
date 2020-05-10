@@ -29,7 +29,7 @@ BOOL g_ai_die_in_anomaly = 0;
 CSpaceRestrictor::~CSpaceRestrictor() {}
 void CSpaceRestrictor::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCForm()->getSphere().P); }
 float CSpaceRestrictor::Radius() const { return (GetCForm()->getRadius()); }
-BOOL CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
+bool CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
 {
     actual(false);
 
@@ -108,7 +108,7 @@ bool CSpaceRestrictor::inside(const Fsphere& sphere) const
     return (prepared_inside(sphere));
 }
 
-BOOL CSpaceRestrictor::UsedAI_Locations() { return (FALSE); }
+bool CSpaceRestrictor::UsedAI_Locations() { return (FALSE); }
 void CSpaceRestrictor::spatial_move()
 {
     inherited::spatial_move();

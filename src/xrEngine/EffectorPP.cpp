@@ -18,8 +18,8 @@ CEffectorPP::CEffectorPP(EEffectorPPType type, f32 lifeTime, bool free_on_remove
 }
 
 CEffectorPP::~CEffectorPP() {}
-BOOL CEffectorPP::Process(SPPInfo& PPInfo)
+bool CEffectorPP::Process(SPPInfo& PPInfo)
 {
     fLifeTime -= Device.fTimeDelta;
-    return TRUE;
+    return true;
 }

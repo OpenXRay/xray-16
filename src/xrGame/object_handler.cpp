@@ -52,7 +52,7 @@ void CObjectHandler::reinit(CAI_Stalker* object)
 }
 
 void CObjectHandler::reload(LPCSTR section) { inherited::reload(section); }
-BOOL CObjectHandler::net_Spawn(CSE_Abstract* DC)
+bool CObjectHandler::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

@@ -43,35 +43,35 @@ float CEnvModifier::sum(CEnvModifier& M, Fvector3& view)
     if (M.use_flags.test(eViewDist))
     {
         far_plane += M.far_plane * _power;
-        use_flags.set(eViewDist, TRUE);
+        use_flags.set(eViewDist, true);
     }
     if (M.use_flags.test(eFogColor))
     {
         fog_color.mad(M.fog_color, _power);
-        use_flags.set(eFogColor, TRUE);
+        use_flags.set(eFogColor, true);
     }
     if (M.use_flags.test(eFogDensity))
     {
         fog_density += M.fog_density * _power;
-        use_flags.set(eFogDensity, TRUE);
+        use_flags.set(eFogDensity, true);
     }
 
     if (M.use_flags.test(eAmbientColor))
     {
         ambient.mad(M.ambient, _power);
-        use_flags.set(eAmbientColor, TRUE);
+        use_flags.set(eAmbientColor, true);
     }
 
     if (M.use_flags.test(eSkyColor))
     {
         sky_color.mad(M.sky_color, _power);
-        use_flags.set(eSkyColor, TRUE);
+        use_flags.set(eSkyColor, true);
     }
 
     if (M.use_flags.test(eHemiColor))
     {
         hemi_color.mad(M.hemi_color, _power);
-        use_flags.set(eHemiColor, TRUE);
+        use_flags.set(eHemiColor, true);
     }
 
     return _power;
@@ -614,7 +614,7 @@ void CEnvironment::load_level_specific_ambients()
     strconcat(sizeof(path), path, "environment" DELIMITER "ambients" DELIMITER, level_name.c_str(), ".ltx");
 
     string_path full_path;
-    CInifile* level_ambients = xr_new<CInifile>(FS.update_path(full_path, "$game_config$", path), TRUE, TRUE, FALSE);
+    CInifile* level_ambients = xr_new<CInifile>(FS.update_path(full_path, "$game_config$", path), true, true, false);
 
     if (level_ambients->section_count() == 0)
     {

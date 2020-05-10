@@ -81,8 +81,8 @@ void CConsole::Find_cmd() // SDL_SCANCODE_TAB
 
 void CConsole::Find_cmd_back() // SDL_SCANCODE_TAB+shift
 {
-    LPCSTR edt = ec().str_edit();
-    LPCSTR radmin_cmd_name = "ra ";
+    pcstr edt = ec().str_edit();
+    pcstr radmin_cmd_name = "ra ";
     bool b_ra = (edt == strstr(edt, radmin_cmd_name));
     u32 offset = (b_ra) ? xr_strlen(radmin_cmd_name) : 0;
 
@@ -91,7 +91,7 @@ void CConsole::Find_cmd_back() // SDL_SCANCODE_TAB+shift
     {
         --it;
         IConsole_Command& cc = *(it->second);
-        LPCSTR name_cmd = cc.Name();
+        pcstr name_cmd = cc.Name();
         u32 name_cmd_size = xr_strlen(name_cmd);
         PSTR new_str = (PSTR)xr_alloca((offset + name_cmd_size + 2) * sizeof(char));
 
@@ -167,13 +167,13 @@ void CConsole::Execute_cmd() // SDL_SCANCODE_RETURN, SDL_SCANCODE_KP_ENTER
         shared_str const& str = m_tips[m_select_tip].text;
         if (m_tips_mode == 1)
         {
-            LPSTR buf;
+            pstr buf;
             STRCONCAT(buf, str.c_str(), " ");
             ec().set_edit(buf);
         }
         else if (m_tips_mode == 2)
         {
-            LPSTR buf;
+            pstr buf;
             STRCONCAT(buf, m_cur_cmd.c_str(), " ", str.c_str());
             ec().set_edit(buf);
         }

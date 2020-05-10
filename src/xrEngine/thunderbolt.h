@@ -102,7 +102,7 @@ private:
     float life_time;
     float current_time;
     float next_lightning_time;
-    BOOL bEnabled;
+    bool bEnabled;
 
     // params
     // Fvector2 p_var_alt;

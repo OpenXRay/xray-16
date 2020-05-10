@@ -9,7 +9,7 @@
 
 CSilencer::CSilencer() {}
 CSilencer::~CSilencer() {}
-BOOL CSilencer::net_Spawn(CSE_Abstract* DC) { return (inherited::net_Spawn(DC)); }
+bool CSilencer::net_Spawn(CSE_Abstract* DC) { return (inherited::net_Spawn(DC)); }
 void CSilencer::Load(LPCSTR section) { inherited::Load(section); }
 void CSilencer::net_Destroy() { inherited::net_Destroy(); }
 void CSilencer::UpdateCL() { inherited::UpdateCL(); }
