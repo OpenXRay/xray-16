@@ -55,14 +55,14 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
     m_spawn_id = 0;
 
     // init spawn graph
-    m_spawn_graph = new SPAWN_GRAPH();
+    m_spawn_graph = xr_new<SPAWN_GRAPH>();
 
     // init ini file
-    m_game_info = new CInifile(INI_FILE);
+    m_game_info = xr_new<CInifile>(INI_FILE);
     R_ASSERT(m_game_info->section_exist("levels"));
 
     // init patrol path storage
-    m_patrol_path_storage = new CPatrolPathStorage();
+    m_patrol_path_storage = xr_new<CPatrolPathStorage>();
     xr_vector<LPCSTR> needed_levels;
     string4096 levels_string;
     xr_strcpy(levels_string, name);
@@ -75,7 +75,7 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
     // init game graph
     generate_temp_file_name("game_graph", "", m_game_graph_id);
     xrMergeGraphs(m_game_graph_id, name, false);
-    m_game_graph = new CGameGraph(m_game_graph_id);
+    m_game_graph = xr_new<CGameGraph>(m_game_graph_id);
 
     // load levels
     GameGraph::SLevel level;
@@ -85,7 +85,7 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
         level.m_name = i.m_name;
         level.m_id = i.m_id;
         Msg("%9s %2d %s", "level", level.id(), *i.m_name);
-        m_level_spawns.push_back(new CLevelSpawnConstructor(level, this, no_separator_check));
+        m_level_spawns.push_back(xr_new<CLevelSpawnConstructor>(level, this, no_separator_check));
     }
 
     string256 temp;
@@ -216,7 +216,7 @@ void CGameSpawnConstructor::add_object(CSE_Abstract* object)
 {
     m_critical_section.Enter();
     object->m_tSpawnID = spawn_id();
-    spawn_graph().add_vertex(new CServerEntityWrapper(object), object->m_tSpawnID);
+    spawn_graph().add_vertex(xr_new<CServerEntityWrapper>(object), object->m_tSpawnID);
     m_critical_section.Leave();
 }
 
@@ -246,7 +246,7 @@ void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
     const auto& level = game_graph().header().level(start_level_name);
     auto dest = GameGraph::_GRAPH_ID(-1);
     GraphEngineSpace::CGameLevelParams evaluator(level.id());
-    auto graph_engine = new CGraphEngine(game_graph().header().vertex_count());
+    auto graph_engine = xr_new<CGraphEngine>(game_graph().header().vertex_count());
 
     bool failed = !graph_engine->search(game_graph(), m_actor->m_tGraphID, GameGraph::_GRAPH_ID(-1), nullptr, evaluator);
     if (failed)

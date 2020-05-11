@@ -432,7 +432,7 @@ void compute_non_covers()
             if ((I.low_cover[0] + I.low_cover[1] + I.low_cover[2] + I.low_cover[3]) >= 4 * .999f)
                 continue;
 
-        covers.insert(new CCoverPoint(I.Pos, std::distance(&g_nodes.front(), &I)));
+        covers.insert(xr_new<CCoverPoint>(I.Pos, std::distance(&g_nodes.front(), &I)));
     }
 
     VERIFY(covers.size());
@@ -541,7 +541,7 @@ void xrCover(bool pure_covers)
     u32 last = g_nodes.size() - stride * (NUM_THREADS - 1);
     for (u32 thID = 0; thID < NUM_THREADS; thID++)
         Threads.start(
-            new CoverThread(thID, thID * stride, thID * stride + ((thID == (NUM_THREADS - 1)) ? last : stride)));
+            xr_new<CoverThread>(thID, thID * stride, thID * stride + ((thID == (NUM_THREADS - 1)) ? last : stride)));
     Threads.wait();
     Logger.clMsg("%d seconds elapsed.", (timeGetTime() - start_time) / 1000);
 

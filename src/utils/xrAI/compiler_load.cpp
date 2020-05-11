@@ -59,7 +59,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
     {
         // shaders
         FS.update_path(file_name, "$game_data$", "shaders_xrlc.xr");
-        g_shaders_xrlc = new Shader_xrLC_LIB();
+        g_shaders_xrlc = xr_new<Shader_xrLC_LIB>();
         g_shaders_xrlc->Load(file_name);
 
         // Load CFORM
