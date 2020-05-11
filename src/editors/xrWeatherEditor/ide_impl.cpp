@@ -73,7 +73,7 @@ void ide_impl::pause() { m_window->view().pause(); }
 property_holder_base* ide_impl::create_property_holder(
     LPCSTR display_name, property_holder_collection* collection, property_holder_holder* holder)
 {
-    return (new ::property_holder(m_engine, display_name, collection, holder));
+    return (xr_new<::property_holder>(m_engine, display_name, collection, holder));
 }
 
 void ide_impl::destroy(property_holder*& property_holder)

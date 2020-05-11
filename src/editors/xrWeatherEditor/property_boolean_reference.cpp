@@ -9,7 +9,7 @@
 #include "pch.hpp"
 #include "property_boolean_reference.hpp"
 
-property_boolean_reference::property_boolean_reference(bool& value) : m_value(new value_holder<bool>(value)) {}
+property_boolean_reference::property_boolean_reference(bool& value) : m_value(xr_new<value_holder<bool>>(value)) {}
 property_boolean_reference::~property_boolean_reference() { this->!property_boolean_reference(); }
 property_boolean_reference::!property_boolean_reference() { delete (m_value); }
 System::Object ^ property_boolean_reference::GetValue() { return (m_value->get()); }

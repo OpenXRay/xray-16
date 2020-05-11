@@ -100,16 +100,16 @@ void window_weather_editor::weathers_ids(weathers_getter_type const& weathers_ge
     frames_size_getter_type const& frames_size_getter)
 {
     VERIFY(!m_weathers_getter);
-    m_weathers_getter = new weathers_getter_type(weathers_getter);
+    m_weathers_getter = xr_new<weathers_getter_type>(weathers_getter);
 
     VERIFY(!m_weathers_size_getter);
-    m_weathers_size_getter = new weathers_size_getter_type(weathers_size_getter);
+    m_weathers_size_getter = xr_new<weathers_size_getter_type>(weathers_size_getter);
 
     VERIFY(!m_frames_getter);
-    m_frames_getter = new frames_getter_type(frames_getter);
+    m_frames_getter = xr_new<frames_getter_type>(frames_getter);
 
     VERIFY(!m_frames_size_getter);
-    m_frames_size_getter = new frames_size_getter_type(frames_size_getter);
+    m_frames_size_getter = xr_new<frames_size_getter_type>(frames_size_getter);
 
     fill_weathers();
 }

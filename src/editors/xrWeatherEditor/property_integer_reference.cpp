@@ -9,7 +9,7 @@
 #include "pch.hpp"
 #include "property_integer_reference.hpp"
 
-property_integer_reference::property_integer_reference(int& value) : m_value(new value_holder<int>(value)) {}
+property_integer_reference::property_integer_reference(int& value) : m_value(xr_new<value_holder<int>>(value)) {}
 property_integer_reference::~property_integer_reference() { this->!property_integer_reference(); }
 property_integer_reference::!property_integer_reference() { delete (m_value); }
 System::Object ^ property_integer_reference::GetValue() { return (m_value->get()); }

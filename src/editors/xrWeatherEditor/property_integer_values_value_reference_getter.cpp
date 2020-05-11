@@ -17,8 +17,8 @@ using System::String;
 property_integer_values_value_reference_getter::property_integer_values_value_reference_getter(int& value,
     string_collection_getter_type const& collection_getter,
     string_collection_size_getter_type const& collection_size_getter)
-    : inherited(value), m_collection_getter(new string_collection_getter_type(collection_getter)),
-      m_collection_size_getter(new string_collection_size_getter_type(collection_size_getter))
+    : inherited(value), m_collection_getter(xr_new<string_collection_getter_type>(collection_getter)),
+      m_collection_size_getter(xr_new<string_collection_size_getter_type>(collection_size_getter))
 {
 }
 
