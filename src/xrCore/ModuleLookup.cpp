@@ -25,7 +25,12 @@ void* ModuleHandle::Open(pcstr moduleName)
 
     Log("Loading module:", moduleName);
 
+#ifdef BUILD_WITH_INSTALL_RPATH
+    xr_string buf("./");
+    buf += moduleName;
+#else
     xr_string buf(moduleName);
+#endif
 
 #ifdef XR_PLATFORM_WINDOWS
     buf += ".dll";

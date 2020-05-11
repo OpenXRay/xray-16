@@ -9,6 +9,10 @@ include(GNUInstallDirs)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
 
+# Option to enable support for link libraries from current execution folder for app.
+# If it is on, the linker will search libs in system folder.
+option(CMAKE_BUILD_WITH_INSTALL_RPATH "Use current directory as link directory when running the engine." OFF)
+
 # Output all libraries and executable to one folder
 set(COMPILE_OUTPUT_FOLDER ${CMAKE_SOURCE_DIR}/bin/${ARCH_TYPE}/${CMAKE_BUILD_TYPE})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
@@ -144,6 +148,10 @@ endif()
 
 if( USE_CRYPTOPP )
   add_definitions ( -DUSE_CRYPTOPP )
+endif()
+
+if (CMAKE_BUILD_WITH_INSTALL_RPATH)
+  add_definitions (-DBUILD_WITH_INSTALL_RPATH)
 endif()
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
