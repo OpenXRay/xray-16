@@ -183,7 +183,7 @@ struct it
     static const e_net_globals next_et = (e_net_globals)(i + 1);
     typedef it<next_et> next;
     next ni;
-    it(xr_vector<net_global_data*>& data) : ni(data) { data[et] = new tnet_global_data<et>(); }
+    it(xr_vector<net_global_data*>& data) : ni(data) { data[et] = xr_new<tnet_global_data<et>>(); }
     static void cleanup(xr_vector<net_global_data*>& data)
     {
         tnet_global_data<et>* gd = static_cast<tnet_global_data<et>*>(data[et]);

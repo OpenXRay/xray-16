@@ -30,7 +30,7 @@ private:
 
 void RunNetCompileDataPrepare()
 {
-    cl_data_prepare.start(new NetCompileDetaPrepare());
+    cl_data_prepare.start(xr_new<NetCompileDetaPrepare>());
     SartupNetTaskManager(); //.
 }
 
