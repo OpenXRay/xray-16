@@ -77,6 +77,12 @@ inline void operator delete(void* ptr, size_t, std::align_val_t alignment) noexc
     Memory.mem_free(ptr, static_cast<size_t>(alignment));
 }
 
+template <typename T, typename... Args>
+inline T* xr_new(Args&&... args)
+{
+    return new T(std::forward<Args>(args)...);
+}
+
 template <class T>
 inline void xr_delete(T*& ptr) noexcept
 {
@@ -99,12 +105,6 @@ inline void xr_free(T*& ptr) noexcept
         Memory.mem_free((void*)ptr);
         ptr = nullptr;
     }
-}
-
-template <typename T, typename... Args>
-inline T* xr_new(Args&&... args)
-{
-    return new T(std::forward<Args>(args)...);
 }
 
 inline void* xr_malloc            (size_t size) { return Memory.mem_alloc       (size); }
