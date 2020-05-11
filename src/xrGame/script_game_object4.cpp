@@ -78,7 +78,7 @@ u32 CScriptGameObject::add_combat_sound(
     }
     else
         return (stalker->sound().add(
-            prefix, max_count, type, priority, mask, internal_type, bone_name, new CStalkerSoundData(stalker)));
+            prefix, max_count, type, priority, mask, internal_type, bone_name, xr_new<CStalkerSoundData>(stalker)));
 }
 
 u32 CScriptGameObject::add_sound(

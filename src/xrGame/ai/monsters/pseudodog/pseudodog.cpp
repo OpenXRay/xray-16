@@ -170,4 +170,4 @@ void CAI_PseudoDog::HitEntityInJump(const CEntity* pEntity)
 void CAI_PseudoDog::debug_on_key(int key) {}
 #endif
 
-IStateManagerBase* CAI_PseudoDog::create_state_manager() { return new CStateManagerPseudodog(this); }
+IStateManagerBase* CAI_PseudoDog::create_state_manager() { return xr_new<CStateManagerPseudodog>(this); }

@@ -109,14 +109,14 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         CUIWindow* rect_parent = m_UIMainFrame; // m_UILevelFrame;
         Frect r = rect_parent->GetWndRect();
 
-        auto tempScroll = new CUIFixedScrollBar();
+        auto tempScroll = xr_new<CUIFixedScrollBar>();
         if (tempScroll->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), true))
             m_UIMainScrollH = tempScroll;
         else
         {
             Msg("! Failed to init m_UIMainScrollH as FixedScrollBar, trying to initialize it as ScrollBar");
             xr_delete(tempScroll);
-            m_UIMainScrollH = new CUIScrollBar();
+            m_UIMainScrollH = xr_new<CUIScrollBar>();
             m_UIMainScrollH->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), r.right - r.left - dx * 2 - sx, true, "pda");
         }
 
@@ -127,14 +127,14 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         Register(m_UIMainScrollH);
         AddCallback(m_UIMainScrollH, SCROLLBAR_HSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollH));
 
-        tempScroll = new CUIFixedScrollBar();
+        tempScroll = xr_new<CUIFixedScrollBar>();
         if (tempScroll->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), false))
             m_UIMainScrollV = tempScroll;
         else
         {
             Msg("! Failed to init m_UIMainScrollV as FixedScrollBar, trying to initialize it as ScrollBar");
             xr_delete(tempScroll);
-            m_UIMainScrollV = new CUIScrollBar();
+            m_UIMainScrollV = xr_new<CUIScrollBar>();
             m_UIMainScrollV->InitScrollBar(Fvector2().set(r.right - sx, r.top + dy), r.bottom - r.top - dy * 2, false, "pda");
         }
 
@@ -146,14 +146,14 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         AddCallback(m_UIMainScrollV, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollV));
     }
 
-    m_map_location_hint = new CUIMapLocationHint();
+    m_map_location_hint = xr_new<CUIMapLocationHint>();
     strconcat(sizeof(pth), pth, start_from, ":map_hint_item");
     m_map_location_hint->Init(uiXml, pth);
     m_map_location_hint->SetAutoDelete(false);
 
     // Load maps
 
-    m_GlobalMap = new CUIGlobalMap(this);
+    m_GlobalMap = xr_new<CUIGlobalMap>(this);
     m_GlobalMap->SetAutoDelete(true);
     m_GlobalMap->Initialize();
 
@@ -183,7 +183,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
 
             CUICustomMap*& l = m_GameMaps[map_name];
 
-            l = new CUILevelMap(this);
+            l = xr_new<CUILevelMap>(this);
             R_ASSERT2(pGameIni->section_exist(map_name), map_name.c_str());
             l->Initialize(map_name, "hud" DELIMITER "default");
 
@@ -218,7 +218,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
 #endif
 
     Register(m_GlobalMap);
-    m_ActionPlanner = new CMapActionPlanner();
+    m_ActionPlanner = xr_new<CMapActionPlanner>();
     m_ActionPlanner->setup(this);
     m_view_actor = true;
 

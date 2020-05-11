@@ -420,7 +420,7 @@ void game_sv_GameState::Create(shared_str& options)
         scriptEngine.remove_script_process(ScriptProcessor::Game);
         string_path S;
         FS.update_path(S, "$game_config$", "script.ltx");
-        CInifile* l_tpIniFile = new CInifile(S);
+        CInifile* l_tpIniFile = xr_new<CInifile>(S);
         R_ASSERT(l_tpIniFile);
 
         if (l_tpIniFile->section_exist(type_name()))
@@ -631,7 +631,7 @@ game_sv_GameState::game_sv_GameState()
 {
     VERIFY(g_pGameLevel);
     m_server = Level().Server;
-    m_event_queue = new GameEventQueue();
+    m_event_queue = xr_new<GameEventQueue>();
 
     m_bMapRotation = false;
     m_bMapSwitched = false;

@@ -95,7 +95,7 @@ bool AnselManager::Init() const
             stored_red_text = g_bDisableRedText;
             g_bDisableRedText = TRUE;
             
-            g_pGameLevel->Cameras().AddCamEffector(new AnselCameraEffector());
+            g_pGameLevel->Cameras().AddCamEffector(xr_new<AnselCameraEffector>());
             Device.seqFrame.Add(mutable_this, REG_PRIORITY_CAPTURE);
 
             CCameraBase* C = NULL;

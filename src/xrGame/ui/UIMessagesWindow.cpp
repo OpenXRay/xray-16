@@ -50,7 +50,7 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
 {
     CUIXml xml;
     xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "messages_window.xml");
-    m_pGameLog = new CUIGameLog();
+    m_pGameLog = xr_new<CUIGameLog>();
     m_pGameLog->SetAutoDelete(true);
     m_pGameLog->Show(true);
     AttachChild(m_pGameLog);
@@ -63,11 +63,11 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
         u32 color;
         CGameFont* pFont;
 
-        m_pChatLog = new CUIGameLog();
+        m_pChatLog = xr_new<CUIGameLog>();
         m_pChatLog->SetAutoDelete(true);
         m_pChatLog->Show(true);
         AttachChild(m_pChatLog);
-        m_pChatWnd = new CUIChatWnd();
+        m_pChatWnd = xr_new<CUIChatWnd>();
         m_pChatWnd->SetAutoDelete(true);
         AttachChild(m_pChatWnd);
 

@@ -88,7 +88,7 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
         VERIFY(light_bone != BI_NONE);
         ambient_bone = K->LL_BoneID(*lamp->light_ambient_bone);
         VERIFY(ambient_bone != BI_NONE);
-        CForm = new CCF_Skeleton(this);
+        CForm = xr_new<CCF_Skeleton>(this);
     }
     fBrightness = lamp->brightness;
     clr.set(lamp->color);

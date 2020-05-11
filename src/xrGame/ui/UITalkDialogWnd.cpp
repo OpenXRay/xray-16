@@ -39,7 +39,7 @@ CUITalkDialogWnd::CUITalkDialogWnd()
 CUITalkDialogWnd::~CUITalkDialogWnd() { xr_delete(m_uiXml); }
 void CUITalkDialogWnd::InitTalkDialogWnd()
 {
-    m_uiXml = new CUIXml();
+    m_uiXml = xr_new<CUIXml>();
     m_uiXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TALK_XML);
 
     CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this, false);
@@ -80,7 +80,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
         if (m_uiXml->NavigateToNode("frame_line_window", 1))
         {
             // XXX: Don't replace this with UI helper, until it's missing needed functionality to select the index
-            UIOurPhrasesFrame = new CUIFrameLineWnd();
+            UIOurPhrasesFrame = xr_new<CUIFrameLineWnd>();
             UIOurPhrasesFrame->SetAutoDelete(true);
             AttachChild(UIOurPhrasesFrame);
             CUIXmlInitBase::InitFrameLine(*m_uiXml, "frame_line_window", 1, UIOurPhrasesFrame); // index for field is 1 (one) !!!
@@ -203,7 +203,7 @@ void CUITalkDialogWnd::ClearAll()
 void CUITalkDialogWnd::ClearQuestions() { UIQuestionsList->Clear(); }
 void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_finalizer)
 {
-    CUIQuestionItem* itm = new CUIQuestionItem(m_uiXml, "question_item");
+    CUIQuestionItem* itm = xr_new<CUIQuestionItem>(m_uiXml, "question_item");
     itm->Init(value, str);
     ++number; // zero-based index
     if (number <= 10)
@@ -227,7 +227,7 @@ void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_
 
 void CUITalkDialogWnd::AddAnswer(LPCSTR SpeakerName, LPCSTR str, bool bActor)
 {
-    CUIAnswerItem* itm = new CUIAnswerItem(m_uiXml, bActor ? "actor_answer_item" : "other_answer_item");
+    CUIAnswerItem* itm = xr_new<CUIAnswerItem>(m_uiXml, bActor ? "actor_answer_item" : "other_answer_item");
     itm->Init(str, SpeakerName);
     UIAnswersList->AddWindow(itm, true);
     UIAnswersList->ScrollToEnd();
@@ -251,7 +251,7 @@ void CUITalkDialogWnd::AddAnswer(LPCSTR SpeakerName, LPCSTR str, bool bActor)
 
 void CUITalkDialogWnd::AddIconedAnswer(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
 {
-    CUIAnswerItemIconed* itm = new CUIAnswerItemIconed(m_uiXml, templ_name);
+    CUIAnswerItemIconed* itm = xr_new<CUIAnswerItemIconed>(m_uiXml, templ_name);
     itm->Init(text, caption, texture_name);
     UIAnswersList->AddWindow(itm, true);
     UIAnswersList->ScrollToEnd();
@@ -269,7 +269,7 @@ void CUITalkDialogWnd::AddIconedAnswer(LPCSTR caption, LPCSTR text, LPCSTR textu
 
 void CUITalkDialogWnd::AddIconedAnswer(cpcstr text, cpcstr texture_name, Frect texture_rect, cpcstr templ_name)
 {
-    CUIAnswerItemIconed* itm = new CUIAnswerItemIconed(m_uiXml, templ_name);
+    CUIAnswerItemIconed* itm = xr_new<CUIAnswerItemIconed>(m_uiXml, templ_name);
     itm->Init(text, texture_name, texture_rect);
     UIAnswersList->AddWindow(itm, true);
     UIAnswersList->ScrollToEnd();
@@ -400,7 +400,7 @@ void CUIAnswerItem::Init(LPCSTR text, LPCSTR name)
 
 CUIAnswerItemIconed::CUIAnswerItemIconed(CUIXml* xml_doc, LPCSTR path) : CUIAnswerItem(xml_doc, path)
 {
-    m_icon = new CUIStatic();
+    m_icon = xr_new<CUIStatic>();
     m_icon->SetAutoDelete(true);
     CUIWindow::AttachChild(m_icon);
 

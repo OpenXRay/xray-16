@@ -230,20 +230,20 @@ void CGamePersistent::OnAppStart()
     }, nullptr, nullptr, &materialsLoaded);
 
     SetupUIStyle();
-    GEnv.UI = new UICore();
+    GEnv.UI = xr_new<UICore>();
 
     TaskScheduler->AddTask("CMainMenu::CMainMenu()", [&]()
     {
-        m_pMainMenu = new CMainMenu();
+        m_pMainMenu = xr_new<CMainMenu>();
     }, nullptr, nullptr, &menuCreated);
 
     inherited::OnAppStart();
 
     if (!GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new UILoadingScreen());
+        pApp->SetLoadingScreen(xr_new<UILoadingScreen>());
 
 #ifdef XR_PLATFORM_WINDOWS
-    ansel = new AnselManager();
+    ansel = xr_new<AnselManager>();
     ansel->Load();
     ansel->Init();
 #endif
@@ -528,7 +528,7 @@ void CGamePersistent::start_logo_intro()
         if (!GEnv.isDedicatedServer && 0 == xr_strlen(m_game_params.m_game_or_spawn) && NULL == g_pGameLevel)
         {
             VERIFY(NULL == m_intro);
-            m_intro = new CUISequencer();
+            m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_logo_intro);
             m_intro->Start("intro_logo");
             Console->Hide();
@@ -552,7 +552,7 @@ void CGamePersistent::game_loaded()
             load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
         {
             VERIFY(NULL == m_intro);
-            m_intro = new CUISequencer();
+            m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
             if (!m_intro->Start("game_loaded"))
                 m_intro->Destroy();
@@ -579,7 +579,7 @@ void CGamePersistent::start_game_intro()
         {
             VERIFY(NULL == m_intro);
             Log("intro_start intro_game");
-            m_intro = new CUISequencer();
+            m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_intro);
             m_intro->Start("intro_game");
         }

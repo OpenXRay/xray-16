@@ -28,7 +28,7 @@ void CStoreHierarchy::LoadLevel(CUIXml& xml, int index, item* _item, int depth_l
 
     if (depth_level > 0 && _item->m_btn_xml_name.size())
     {
-        CUITabButtonMP* btn = new CUITabButtonMP();
+        CUITabButtonMP* btn = xr_new<CUITabButtonMP>();
         _item->m_button = btn;
         btn->SetAutoDelete(false);
 
@@ -53,7 +53,7 @@ void CStoreHierarchy::LoadLevel(CUIXml& xml, int index, item* _item, int depth_l
     for (int i = 0; i < cnt; ++i)
     {
         xml.SetLocalRoot(node);
-        item* it = new CStoreHierarchy::item();
+        item* it = xr_new<CStoreHierarchy::item>();
         it->m_parent = _item;
         _item->m_childs.push_back(it);
         LoadLevel(xml, i, it, depth_level + 1);
@@ -68,7 +68,7 @@ void CStoreHierarchy::Init(CUIXml& xml, LPCSTR path)
     XML_NODE node = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(node);
 
-    m_root = new CStoreHierarchy::item();
+    m_root = xr_new<CStoreHierarchy::item>();
     LoadLevel(xml, 0, m_root, 0);
     xml.SetLocalRoot(p_stored_root);
     m_current_level = m_root;

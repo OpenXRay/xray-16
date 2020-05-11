@@ -18,7 +18,7 @@ void UIGameMP::ShowDemoPlayControl()
 {
     if (!m_pDemoPlayControl)
     {
-        m_pDemoPlayControl = new CUIDemoPlayControl();
+        m_pDemoPlayControl = xr_new<CUIDemoPlayControl>();
         m_pDemoPlayControl->Init();
     }
     m_pDemoPlayControl->ShowDialog(false);
@@ -110,8 +110,8 @@ void UIGameMP::SetClGame(game_cl_GameState* g)
 
         xr_delete(m_pServerInfo);
     }
-    m_pServerInfo = new CUIServerInfo();
-    m_pAchivementIdicator = new CUIAchivementIndicator();
+    m_pServerInfo = xr_new<CUIServerInfo>();
+    m_pAchivementIdicator = xr_new<CUIAchivementIndicator>();
     m_pAchivementIdicator->SetAutoDelete(true);
     Window->AttachChild(m_pAchivementIdicator);
 }

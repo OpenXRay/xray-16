@@ -1042,7 +1042,7 @@ void CWeaponMagazined::InitAddons()
 
             if (!GEnv.isDedicatedServer)
             {
-                m_UIScope = new CUIWindow();
+                m_UIScope = xr_new<CUIWindow>();
                 LoadScope(scope_tex_name);
             }
         }
@@ -1181,7 +1181,7 @@ void CWeaponMagazined::OnZoomIn()
         CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(pActor->Cameras().GetCamEffector(eCEZoom));
         if (!S)
         {
-            S = (CEffectorZoomInertion*)pActor->Cameras().AddCamEffector(new CEffectorZoomInertion());
+            S = (CEffectorZoomInertion*)pActor->Cameras().AddCamEffector(xr_new<CEffectorZoomInertion>());
             S->Init(this);
         };
         S->SetRndSeed(pActor->GetZoomRndSeed());

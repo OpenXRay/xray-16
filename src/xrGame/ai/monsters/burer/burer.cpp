@@ -33,9 +33,9 @@ bool CBurer::can_scan = true;
 
 CBurer::CBurer()
 {
-    StateMan = new CStateManagerBurer(this);
+    StateMan = xr_new<CStateManagerBurer>(this);
 
-    m_fast_gravi = new CBurerFastGravi();
+    m_fast_gravi = xr_new<CBurerFastGravi>();
 
     control().add(m_fast_gravi, ControlCom::eComCustom1);
 }

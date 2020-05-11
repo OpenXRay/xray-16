@@ -95,19 +95,19 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
 
     if (uiXml.NavigateToNode("descr_list", 0))
     {
-        UIConditionWnd = new CUIConditionParams();
+        UIConditionWnd = xr_new<CUIConditionParams>();
         if (!UIConditionWnd->InitFromXml(uiXml))
             xr_delete(UIConditionWnd);
 
-        UIWpnParams = new CUIWpnParams();
+        UIWpnParams = xr_new<CUIWpnParams>();
         if (!UIWpnParams->InitFromXml(uiXml))
             xr_delete(UIWpnParams);
 
-        UIArtefactParams = new CUIArtefactParams();
+        UIArtefactParams = xr_new<CUIArtefactParams>();
         if (!UIArtefactParams->InitFromXml(uiXml))
             xr_delete(UIArtefactParams);
 
-        UIBoosterInfo = new CUIBoosterInfo();
+        UIBoosterInfo = xr_new<CUIBoosterInfo>();
         if (!UIBoosterInfo->InitFromXml(uiXml))
             xr_delete(UIBoosterInfo);
 
@@ -118,11 +118,11 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
 
         if (ai().get_alife()) // (-designer)
         {
-            UIProperties = new UIInvUpgPropertiesWnd();
+            UIProperties = xr_new<UIInvUpgPropertiesWnd>();
             UIProperties->init_from_xml("actor_menu_item.xml");
         }
 
-        UIDesc = new CUIScrollView();
+        UIDesc = xr_new<CUIScrollView>();
         AttachChild(UIDesc);
         UIDesc->SetAutoDelete(true);
         m_desc_info.bShowDescrText = !!uiXml.ReadAttribInt("descr_list", 0, "only_text_info", 1);
@@ -133,7 +133,7 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
 
     if (uiXml.NavigateToNode("image_static", 0))
     {
-        UIItemImage = new CUIStatic();
+        UIItemImage = xr_new<CUIStatic>();
         AttachChild(UIItemImage);
         UIItemImage->SetAutoDelete(true);
         CUIXmlInit::InitStatic(uiXml, "image_static", 0, UIItemImage);
@@ -144,7 +144,7 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
     }
     if (uiXml.NavigateToNode("outfit_info", 0))
     {
-        UIOutfitInfo = new CUIOutfitInfo();
+        UIOutfitInfo = xr_new<CUIOutfitInfo>();
         UIOutfitInfo->InitFromXml(uiXml);
     }
 
@@ -269,7 +269,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         VERIFY(0 == UIDesc->GetSize());
         if (m_desc_info.bShowDescrText)
         {
-            CUITextWnd* pItem = new CUITextWnd();
+            CUITextWnd* pItem = xr_new<CUITextWnd>();
             pItem->SetTextColor(m_desc_info.uDescClr);
             pItem->SetFont(m_desc_info.pDescFont);
             pItem->SetWidth(UIDesc->GetDesiredChildWidth());

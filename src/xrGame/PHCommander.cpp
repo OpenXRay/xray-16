@@ -130,12 +130,12 @@ void CPHCommander::add_call_threadsafety(CPHCondition* condition, CPHAction* act
 
 void CPHCommander::add_call(CPHCondition* condition, CPHAction* action)
 {
-    m_calls.push_back(new CPHCall(condition, action));
+    m_calls.push_back(xr_new<CPHCall>(condition, action));
 }
 
 void CPHCommander::AddCallDeferred(CPHCondition* condition, CPHAction* action)
 {
-    m_callsUpdateDeferred.insert({new CPHCall(condition, action), true});
+    m_callsUpdateDeferred.insert({xr_new<CPHCall>(condition, action), true});
 }
 
 struct SFEqualPred

@@ -92,7 +92,7 @@ UIArtefactParamItem* CUIArtefactParams::CreateItem(CUIXml& uiXml, pcstr section,
     float magnitude, bool isSignInverse, const shared_str& unit,
     const shared_str& translationId, const shared_str& translationId2 /*= nullptr*/)
 {
-    UIArtefactParamItem* item = new UIArtefactParamItem();
+    UIArtefactParamItem* item = xr_new<UIArtefactParamItem>();
 
     const UIArtefactParamItem::InitResult result = item->Init(uiXml, section);
     switch (result)
@@ -240,12 +240,12 @@ UIArtefactParamItem::InitResult UIArtefactParamItem::InitPlain(CUIXml& xml, pcst
     if (!CUIXmlInit::InitStatic(xml, buf, 0, this, false))
         return InitResult::Failed;
 
-    m_caption = new CUIStatic();
+    m_caption = xr_new<CUIStatic>();
     m_caption->SetAutoDelete(true);
     AttachChild(m_caption);
     m_caption->Show(false); // hack
 
-    m_value = new CUITextWnd();
+    m_value = xr_new<CUITextWnd>();
     m_value->SetAutoDelete(true);
     AttachChild(m_value);
     m_value->Show(false); // hack

@@ -108,7 +108,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
             }
         };
 
-        g_lua_wpn_params = new SLuaWpnParams();
+        g_lua_wpn_params = xr_new<SLuaWpnParams>();
         ai().template Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET);
     }
 

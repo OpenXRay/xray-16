@@ -110,7 +110,7 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
 void loophole::add_action(LPCSTR type, luabind::object const& table)
 {
     VERIFY(luabind::type(table) == LUA_TTABLE);
-    smart_cover::action* action = new smart_cover::action(table);
+    smart_cover::action* action = xr_new<smart_cover::action>(table);
 
     shared_str id = shared_str(type);
     VERIFY(m_actions.end() == std::find_if(m_actions.begin(), m_actions.end(),

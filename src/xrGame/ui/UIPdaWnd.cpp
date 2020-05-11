@@ -82,7 +82,7 @@ void CUIPdaWnd::Init()
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
     {
-        m_anim_static = new CUIAnimatedStatic();
+        m_anim_static = xr_new<CUIAnimatedStatic>();
         AttachChild(m_anim_static);
         m_anim_static->SetAutoDelete(true);
         CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, m_anim_static);
@@ -93,38 +93,38 @@ void CUIPdaWnd::Init()
 
     if (IsGameTypeSingle())
     {
-        pUIMapWnd = new CUIMapWnd(m_hint_wnd);
+        pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
         if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
             xr_delete(pUIMapWnd);
 
-        pUITaskWnd = new CUITaskWnd(m_hint_wnd);
+        pUITaskWnd = xr_new<CUITaskWnd>(m_hint_wnd);
         if (!pUITaskWnd->Init())
             xr_delete(pUITaskWnd);
 
-        pUIFactionWarWnd = new CUIFactionWarWnd(m_hint_wnd);
+        pUIFactionWarWnd = xr_new<CUIFactionWarWnd>(m_hint_wnd);
         if (!pUIFactionWarWnd->Init())
             xr_delete(pUIFactionWarWnd);
 
-        pUIActorInfo = new CUIActorInfoWnd();
+        pUIActorInfo = xr_new<CUIActorInfoWnd>();
         if (!pUIActorInfo->Init())
             xr_delete(pUIActorInfo);
 
-        pUIRankingWnd = new CUIRankingWnd();
+        pUIRankingWnd = xr_new<CUIRankingWnd>();
         if (!pUIRankingWnd->Init())
             xr_delete(pUIRankingWnd);
 
-        pUILogsWnd = new CUILogsWnd();
+        pUILogsWnd = xr_new<CUILogsWnd>();
         if (!pUILogsWnd->Init())
             xr_delete(pUILogsWnd);
     }
 
-    UITabControl = new CUITabControl();
+    UITabControl = xr_new<CUITabControl>();
     UITabControl->SetAutoDelete(true);
     AttachChild(UITabControl);
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
     UITabControl->SetMessageTarget(this);
 
-    UINoice = new CUIStatic();
+    UINoice = xr_new<CUIStatic>();
     UINoice->SetAutoDelete(true);
     CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice);
 

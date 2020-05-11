@@ -22,51 +22,51 @@ extern const xr_token g_ban_times[] = {{"ui_mp_am_10_minutes", 600}, {"ui_mp_am_
 
 CUIMpPlayersAdm::CUIMpPlayersAdm()
 {
-    m_pPlayersList = new CUIListBox();
+    m_pPlayersList = xr_new<CUIListBox>();
     m_pPlayersList->SetAutoDelete(true);
     AttachChild(m_pPlayersList);
 
-    m_pRefreshBtn = new CUI3tButton();
+    m_pRefreshBtn = xr_new<CUI3tButton>();
     m_pRefreshBtn->SetAutoDelete(true);
     AttachChild(m_pRefreshBtn);
 
-    m_pScreenAllBtn = new CUI3tButton();
+    m_pScreenAllBtn = xr_new<CUI3tButton>();
     m_pScreenAllBtn->SetAutoDelete(true);
     AttachChild(m_pScreenAllBtn);
 
-    m_pConfigAllBtn = new CUI3tButton();
+    m_pConfigAllBtn = xr_new<CUI3tButton>();
     m_pConfigAllBtn->SetAutoDelete(true);
     AttachChild(m_pConfigAllBtn);
 
-    m_pPingLimitBtn = new CUI3tButton();
+    m_pPingLimitBtn = xr_new<CUI3tButton>();
     m_pPingLimitBtn->SetAutoDelete(true);
     AttachChild(m_pPingLimitBtn);
 
-    m_pPingLimitTrack = new CUITrackBar();
+    m_pPingLimitTrack = xr_new<CUITrackBar>();
     m_pPingLimitTrack->SetAutoDelete(true);
     AttachChild(m_pPingLimitTrack);
 
-    m_pPingLimitText = new CUITextWnd();
+    m_pPingLimitText = xr_new<CUITextWnd>();
     m_pPingLimitText->SetAutoDelete(true);
     AttachChild(m_pPingLimitText);
 
-    m_pScreenPlayerBtn = new CUI3tButton();
+    m_pScreenPlayerBtn = xr_new<CUI3tButton>();
     m_pScreenPlayerBtn->SetAutoDelete(true);
     AttachChild(m_pScreenPlayerBtn);
 
-    m_pConfigPlayerBtn = new CUI3tButton();
+    m_pConfigPlayerBtn = xr_new<CUI3tButton>();
     m_pConfigPlayerBtn->SetAutoDelete(true);
     AttachChild(m_pConfigPlayerBtn);
 
-    m_pKickPlayerBtn = new CUI3tButton();
+    m_pKickPlayerBtn = xr_new<CUI3tButton>();
     m_pKickPlayerBtn->SetAutoDelete(true);
     AttachChild(m_pKickPlayerBtn);
 
-    m_pBanPlayerBtn = new CUI3tButton();
+    m_pBanPlayerBtn = xr_new<CUI3tButton>();
     m_pBanPlayerBtn->SetAutoDelete(true);
     AttachChild(m_pBanPlayerBtn);
 
-    m_pBanPlayerCombo = new CUIComboBox();
+    m_pBanPlayerCombo = xr_new<CUIComboBox>();
     m_pBanPlayerCombo->SetAutoDelete(true);
     AttachChild(m_pBanPlayerCombo);
 

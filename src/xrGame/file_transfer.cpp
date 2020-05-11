@@ -195,7 +195,7 @@ void server_site::start_transfer_file(shared_str const& file_name, ClientID cons
         Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client.value());
         return;
     }
-    filetransfer_node* ftnode = new filetransfer_node(file_name, data_max_chunk_size, tstate_callback);
+    filetransfer_node* ftnode = xr_new<filetransfer_node>(file_name, data_max_chunk_size, tstate_callback);
     dst_src_pair_t tkey = std::make_pair(to_client, from_client);
     m_transfers.insert(std::make_pair(tkey, ftnode));
     if (!ftnode->opened())
@@ -214,7 +214,7 @@ void server_site::start_transfer_file(CMemoryWriter& mem_writer, u32 mem_writer_
         return;
     }
     filetransfer_node* ftnode =
-        new filetransfer_node(&mem_writer, mem_writer_max_size, data_max_chunk_size, tstate_callback, user_param);
+        xr_new<filetransfer_node>(&mem_writer, mem_writer_max_size, data_max_chunk_size, tstate_callback, user_param);
     m_transfers.insert(std::make_pair(std::make_pair(to_client, from_client), ftnode));
 }
 
@@ -227,7 +227,7 @@ void server_site::start_transfer_file(u8* data_ptr, u32 const data_size, ClientI
         return;
     }
     filetransfer_node* ftnode =
-        new filetransfer_node(data_ptr, data_size, data_max_chunk_size, tstate_callback, user_param);
+        xr_new<filetransfer_node>(data_ptr, data_size, data_max_chunk_size, tstate_callback, user_param);
     m_transfers.insert(std::make_pair(std::make_pair(to_client, from_client), ftnode));
 }
 void server_site::start_transfer_file(buffer_vector<mutable_buffer_t>& vector_of_buffers, ClientID const& to_client,
@@ -239,7 +239,7 @@ void server_site::start_transfer_file(buffer_vector<mutable_buffer_t>& vector_of
         return;
     }
     filetransfer_node* ftnode =
-        new filetransfer_node(&vector_of_buffers, data_max_chunk_size, tstate_callback, user_param);
+        xr_new<filetransfer_node>(&vector_of_buffers, data_max_chunk_size, tstate_callback, user_param);
     m_transfers.insert(std::make_pair(std::make_pair(to_client, from_client), ftnode));
 }
 
@@ -273,7 +273,7 @@ filereceiver_node* server_site::start_receive_file(
         Msg("! ERROR: SV: file already receiving from client [%d]", from_client.value());
         return NULL;
     }
-    filereceiver_node* frnode = new filereceiver_node(file_name, rstate_callback);
+    filereceiver_node* frnode = xr_new<filereceiver_node>(file_name, rstate_callback);
     m_receivers.insert(std::make_pair(from_client, frnode));
     if (!frnode->get_writer())
     {
@@ -293,7 +293,7 @@ filereceiver_node* server_site::start_receive_file(
         Msg("! ERROR: SV: file already receiving from client [%d]", from_client.value());
         return NULL;
     }
-    filereceiver_node* frnode = new filereceiver_node(&mem_writer, rstate_callback);
+    filereceiver_node* frnode = xr_new<filereceiver_node>(&mem_writer, rstate_callback);
     m_receivers.insert(std::make_pair(from_client, frnode));
     return frnode;
 }
@@ -449,7 +449,7 @@ void client_site::start_transfer_file(shared_str const& file_name, sending_state
         Msg("! ERROR: CL: transfering file already active.");
         return;
     }
-    m_transfering = new filetransfer_node(file_name, data_min_chunk_size, tstate_callback);
+    m_transfering = xr_new<filetransfer_node>(file_name, data_min_chunk_size, tstate_callback);
     if (!m_transfering->opened())
     {
         Msg("! ERROR: CL: failed to open file [%s]", file_name.c_str());
@@ -469,7 +469,7 @@ void client_site::start_transfer_file(
         Msg("! ERROR: CL: no data to transfer ...");
         return;
     }
-    m_transfering = new filetransfer_node(data, size, data_min_chunk_size, tstate_callback, size_to_allocate);
+    m_transfering = xr_new<filetransfer_node>(data, size, data_min_chunk_size, tstate_callback, size_to_allocate);
 }
 
 void client_site::stop_transfer_file()
@@ -494,7 +494,7 @@ filereceiver_node* client_site::start_receive_file(
         Msg("! ERROR: CL: file already receiving from client [%d]", from_client.value());
         return NULL;
     }
-    filereceiver_node* frnode = new filereceiver_node(file_name, rstate_callback);
+    filereceiver_node* frnode = xr_new<filereceiver_node>(file_name, rstate_callback);
     m_receivers.insert(std::make_pair(from_client, frnode));
     if (!frnode->get_writer())
     {
@@ -514,7 +514,7 @@ filereceiver_node* client_site::start_receive_file(
         return NULL;
     }
     mem_writer.clear();
-    filereceiver_node* frnode = new filereceiver_node(&mem_writer, rstate_callback);
+    filereceiver_node* frnode = xr_new<filereceiver_node>(&mem_writer, rstate_callback);
     m_receivers.insert(std::make_pair(from_client, frnode));
     return frnode;
 }
@@ -586,7 +586,7 @@ void client_site::dbg_init_statgraph()
     F->OutNext("%d", (int)data_max_chunk_size);
     F->OutSet(360.f, 760.f);
     F->OutNext("%d", (int)data_min_chunk_size);
-    m_stat_graph = new CStatGraph();
+    m_stat_graph = xr_new<CStatGraph>();
     m_stat_graph->SetRect(400, 700, 200, 68, 0xff000000, 0xff000000);
     m_stat_graph->SetMinMax(float(data_min_chunk_size), float(data_max_chunk_size), 1000);
     m_stat_graph->SetStyle(CStatGraph::stBarLine);

@@ -443,7 +443,7 @@ public:
         string_path fn;
         FS.update_path(fn, "$game_saves$", fn_);
 
-        g_pGameLevel->Cameras().AddCamEffector(new CDemoRecord(fn));
+        g_pGameLevel->Cameras().AddCamEffector(xr_new<CDemoRecord>(fn));
     }
 };
 
@@ -501,7 +501,7 @@ public:
             }
             strconcat(sizeof(fn), fn, args, ".xrdemo");
             FS.update_path(fn, "$game_saves$", fn);
-            g_pGameLevel->Cameras().AddCamEffector(new CDemoPlay(fn, 1.0f, loops));
+            g_pGameLevel->Cameras().AddCamEffector(xr_new<CDemoPlay>(fn, 1.0f, loops));
         }
     }
 };
@@ -1024,7 +1024,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         // BUG: leak
-        (new CUIDebugFonts())->ShowDialog(true);
+        (xr_new<CUIDebugFonts>())->ShowDialog(true);
     }
 };
 

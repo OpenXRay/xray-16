@@ -5,13 +5,13 @@
 
 void UIVoteStatusWnd::InitFromXML(CUIXml& xml_doc)
 {
-    m_str_message = new CUITextWnd();
+    m_str_message = xr_new<CUITextWnd>();
     m_str_message->SetAutoDelete(true);
     AttachChild(m_str_message);
-    m_hint = new CUITextWnd();
+    m_hint = xr_new<CUITextWnd>();
     m_hint->SetAutoDelete(true);
     AttachChild(m_hint);
-    m_time_message = new CUITextWnd();
+    m_time_message = xr_new<CUITextWnd>();
     m_time_message->SetAutoDelete(true);
     AttachChild(m_time_message);
 

@@ -20,7 +20,7 @@
 extern CUIGameCustom* CurrentGameUI() { return HUD().GetGameUI(); }
 
 //--------------------------------------------------------------------
-CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(new CHUDTarget()), b_online(false) {}
+CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(xr_new<CHUDTarget>()), b_online(false) {}
 //--------------------------------------------------------------------
 CHUDManager::~CHUDManager()
 {

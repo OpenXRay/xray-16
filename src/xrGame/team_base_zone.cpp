@@ -30,7 +30,7 @@ void CTeamBaseZone::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCFor
 float CTeamBaseZone::Radius() const { return (GetCForm()->getRadius()); }
 bool CTeamBaseZone::net_Spawn(CSE_Abstract* DC)
 {
-    CCF_Shape* l_pShape = new CCF_Shape(this);
+    CCF_Shape* l_pShape = xr_new<CCF_Shape>(this);
     SetCForm(l_pShape);
 
     CSE_Abstract* l_tpAbstract = (CSE_Abstract*)(DC);

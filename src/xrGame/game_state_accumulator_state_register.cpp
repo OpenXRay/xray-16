@@ -31,7 +31,7 @@
 #include "killer_victim_velocity_angle.h"
 
 #define INIT_ACCUMULATIVE_VALUE(Kind, SomeClass) \
-    m_accumulative_values.insert(std::make_pair(Kind, new SomeClass(this)));
+    m_accumulative_values.insert(std::make_pair(Kind, xr_new<SomeClass>(this)));
 
 namespace award_system
 {

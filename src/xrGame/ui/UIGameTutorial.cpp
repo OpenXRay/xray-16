@@ -118,7 +118,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
-    m_UIWindow = new CUIWindow();
+    m_UIWindow = xr_new<CUIWindow>();
 
     m_flags.set(etsPlayEachItem, !!uiXml.ReadInt("play_each_item", 0, 0));
     m_flags.set(etsPersistent, !!uiXml.Read("persistent", 0, 0));
@@ -161,9 +161,9 @@ bool CUISequencer::Start(LPCSTR tutor_name)
         bool bVideo = 0 == xr_stricmp(_tp, "video");
         CUISequenceItem* pItem = 0;
         if (bVideo)
-            pItem = new CUISequenceVideoItem(this);
+            pItem = xr_new<CUISequenceVideoItem>(this);
         else
-            pItem = new CUISequenceSimpleItem(this);
+            pItem = xr_new<CUISequenceSimpleItem>(this);
         m_sequencer_items.push_back(pItem);
         pItem->Load(&uiXml, i);
     }

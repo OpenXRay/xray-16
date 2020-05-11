@@ -444,7 +444,7 @@ void CWeapon::Load(LPCSTR section)
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
         if (!GEnv.isDedicatedServer)
         {
-            m_UIScope = new CUIWindow();
+            m_UIScope = xr_new<CUIWindow>();
             shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
             LoadScope(scope_tex_name);
         }
@@ -1388,7 +1388,7 @@ void CWeapon::OnZoomIn()
         GamePersistent().SetPickableEffectorDOF(true);
 
     if (m_zoom_params.m_sUseBinocularVision.size() && IsScopeAttached() && nullptr == m_zoom_params.m_pVision)
-        m_zoom_params.m_pVision = new CBinocularsVision(m_zoom_params.m_sUseBinocularVision /*"wpn_binoc"*/);
+        m_zoom_params.m_pVision = xr_new<CBinocularsVision>(m_zoom_params.m_sUseBinocularVision /*"wpn_binoc"*/);
 
     if (m_zoom_params.m_sUseZoomPostprocess.size() && IsScopeAttached())
     {
@@ -1398,7 +1398,7 @@ void CWeapon::OnZoomIn()
             if (nullptr == m_zoom_params.m_pNight_vision)
             {
                 m_zoom_params.m_pNight_vision =
-                    new CNightVisionEffector(m_zoom_params.m_sUseZoomPostprocess /*"device_torch"*/);
+                    xr_new<CNightVisionEffector>(m_zoom_params.m_sUseZoomPostprocess /*"device_torch"*/);
             }
         }
     }
@@ -1876,10 +1876,10 @@ void CWeapon::OnStateSwitch(u32 S, u32 oldState)
         if (current_actor && H_Parent() == Level().CurrentEntity())
             if (iAmmoElapsed == 0)
                 if (!fsimilar(m_zoom_params.m_ReloadEmptyDof.w, -1.0f))
-                    current_actor->Cameras().AddCamEffector(new CEffectorDOF(m_zoom_params.m_ReloadEmptyDof));
+                    current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadEmptyDof));
             else
                 if (!fsimilar(m_zoom_params.m_ReloadDof.w, -1.0f))
-                    current_actor->Cameras().AddCamEffector(new CEffectorDOF(m_zoom_params.m_ReloadDof));
+                    current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadDof));
     }
 }
 

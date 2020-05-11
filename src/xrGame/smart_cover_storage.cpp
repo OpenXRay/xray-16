@@ -28,7 +28,7 @@ DescriptionPtr storage::description(shared_str const& table_id)
     if (found != m_descriptions.end())
         return (*found);
 
-    ::description* description = new ::description(table_id);
+    ::description* description = xr_new<::description>(table_id);
     m_descriptions.push_back(description);
     return (description);
 }

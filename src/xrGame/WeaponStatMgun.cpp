@@ -30,8 +30,8 @@ void CWeaponStatMgun::BoneCallbackY(CBoneInstance* B)
 
 CWeaponStatMgun::CWeaponStatMgun()
 {
-    m_Ammo = new CCartridge();
-    camera = new CCameraFirstEye(
+    m_Ammo = xr_new<CCartridge>();
+    camera = xr_new<CCameraFirstEye>(
         this, CCameraBase::flRelativeLink | CCameraBase::flPositionRigid | CCameraBase::flDirectionRigid);
     camera->Load("mounted_weapon_cam");
 }

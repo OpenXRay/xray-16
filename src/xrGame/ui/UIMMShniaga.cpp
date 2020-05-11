@@ -45,13 +45,13 @@ void CUIMMMagnifer::ResetPPMode()
 
 CUIMMShniaga::CUIMMShniaga()
 {
-    m_sound = new CMMSound();
+    m_sound = xr_new<CMMSound>();
 
-    m_view = new CUIScrollView();
+    m_view = xr_new<CUIScrollView>();
     AttachChild(m_view);
-    m_shniaga = new CUIStatic();
+    m_shniaga = xr_new<CUIStatic>();
     AttachChild(m_shniaga);
-    m_magnifier = new CUIMMMagnifer();
+    m_magnifier = xr_new<CUIMMMagnifer>();
     m_shniaga->AttachChild(m_magnifier);
     m_magnifier->SetPPMode();
     m_mag_pos = 0;
@@ -170,7 +170,7 @@ void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCS
 
     for (int i = 0; i < nodes_num; ++i)
     {
-        st = new CUITextWnd();
+        st = xr_new<CUITextWnd>();
         st->SetWndPos(Fvector2().set(0, 0));
         st->SetWndSize(Fvector2().set(m_view->GetDesiredChildWidth(), button_height));
         st->SetFont(pF);
