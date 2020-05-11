@@ -31,9 +31,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 // Model building
 MODEL::MODEL() :
 #ifdef CONFIG_PROFILE_LOCKS
-    pcs(new Lock(MUTEX_PROFILE_ID(MODEL)))
+    pcs(xr_new<Lock>(MUTEX_PROFILE_ID(MODEL)))
 #else
-    pcs(new Lock)
+    pcs(xr_new<Lock>())
 #endif // CONFIG_PROFILE_LOCKS
 {
     tree = 0;
@@ -159,7 +159,7 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     OPCC.NoLeaf = true;
     OPCC.Quantized = false;
 
-    tree = new OPCODE_Model();
+    tree = xr_new<OPCODE_Model>();
     if (!tree->Build(OPCC))
     {
         xr_free(verts);

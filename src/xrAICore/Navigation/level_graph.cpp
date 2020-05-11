@@ -32,7 +32,7 @@ void CLevelGraph::Initialize(const char* filePath)
     ASSERT_XRAI_VERSION_MATCH(header().version(), "Level graph version mismatch");
     m_reader->advance(sizeof(CHeader));
     const auto& box = header().box();
-    m_nodes = new CLevelGraphManager(m_reader, header().vertex_count(), header().version());
+    m_nodes = xr_new<CLevelGraphManager>(m_reader, header().vertex_count(), header().version());
     m_row_length = iFloor((box.vMax.z - box.vMin.z) / header().cell_size() + EPS_L + 1.5f);
     m_column_length = iFloor((box.vMax.x - box.vMin.x) / header().cell_size() + EPS_L + 1.5f);
     m_access_mask.assign(header().vertex_count(), true);
