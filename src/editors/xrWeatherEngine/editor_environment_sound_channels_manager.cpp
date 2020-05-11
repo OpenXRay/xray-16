@@ -27,14 +27,14 @@ void property_collection<manager::channel_container_type, manager>::display_name
 template <>
 XRay::Editor::property_holder_base* property_collection<manager::channel_container_type, manager>::create()
 {
-    channel* object = new channel(m_holder, generate_unique_id("sound_channel_unique_id_").c_str());
+    channel* object = xr_new<channel>(m_holder, generate_unique_id("sound_channel_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
 
 manager::manager() : m_collection(0), m_changed(true)
 {
-    m_collection = new collection_type(&m_channels, this, &m_changed);
+    m_collection = xr_new<collection_type>(&m_channels, this, &m_changed);
 }
 
 manager::~manager()
@@ -47,7 +47,7 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), true, true, false);
+    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), true, true, false);
 
     VERIFY(m_channels.empty());
 
@@ -57,7 +57,7 @@ void manager::load()
 
     for (const auto &i : sections)
     {
-        channel* object = new channel(*this, i->Name);
+        channel* object = xr_new<channel>(*this, i->Name);
         object->load(*config);
         object->fill(m_collection);
         m_channels.push_back(object);
@@ -69,7 +69,7 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), false, false, true);
+    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), false, false, true);
 
     for (const auto &i : m_channels)
         i->save(*config);
