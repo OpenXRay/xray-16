@@ -83,10 +83,10 @@ class execution_type_creator : public base_execution_type_creator
 
     virtual void set_pool_size(u32 size){};
     virtual void free_pool() { pool.clear(); }
-    virtual net_execution* create(u32 _net_id) { return new execution(_net_id); }
+    virtual net_execution* create(u32 _net_id) { return xr_new<execution>(_net_id); }
     virtual net_execution* pool_create()
     {
-        return new execution(u32(-1));
+        return xr_new<execution>(u32(-1));
         // return pool.create() ;
         return pool.create(); // spool<execution>::pool.create() ;
     }
@@ -105,7 +105,7 @@ class execution_type_creator : public base_execution_type_creator
 template <typename execution>
 static void register_type()
 {
-    execution_factory.register_type(new execution_type_creator<execution>());
+    execution_factory.register_type(xr_new<execution_type_creator<execution>>());
 }
 
 template <execution_types i>

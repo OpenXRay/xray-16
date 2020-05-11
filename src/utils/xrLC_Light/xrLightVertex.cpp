@@ -158,7 +158,7 @@ void RunLightVertexNet();
 }
 void LightVertex(bool net)
 {
-    g_trans = new mapVert();
+    g_trans = xr_new<mapVert>();
 
     // Start threads, wait, continue --- perform all the work
     Logger.Status("Calculating...");
@@ -169,7 +169,7 @@ void LightVertex(bool net)
         CTimer start_time;
         start_time.Start();
         for (u32 thID = 0; thID < NUM_THREADS; thID++)
-            Threads.start(new CVertexLightThread(thID));
+            Threads.start(xr_new<CVertexLightThread>(thID));
         Threads.wait();
         Logger.clMsg("%f seconds", start_time.GetElapsed_sec());
     }
