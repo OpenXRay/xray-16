@@ -44,7 +44,7 @@ void load_prop_helper()
         return;
     }
 
-    g_property_list_helper = new CScriptPropertiesListHelper();
+    g_property_list_helper = xr_new<CScriptPropertiesListHelper>();
 }
 
 IPropHelper& PHelper()

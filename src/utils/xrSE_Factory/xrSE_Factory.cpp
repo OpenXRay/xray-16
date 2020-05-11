@@ -42,7 +42,7 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
         //Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
         string_path SYSTEM_LTX;
         FS.update_path(SYSTEM_LTX, "$game_config$", "system.ltx");
-        pSettings = new CInifile(SYSTEM_LTX);
+        pSettings = xr_new<CInifile>(SYSTEM_LTX);
 
         CCharacterInfo::InitInternal();
         CSpecificCharacter::InitInternal();
