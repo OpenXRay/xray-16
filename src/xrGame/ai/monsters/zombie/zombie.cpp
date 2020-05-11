@@ -11,7 +11,7 @@
 
 CZombie::CZombie()
 {
-    StateMan = new CStateManagerZombie(this);
+    StateMan = xr_new<CStateManagerZombie>(this);
 
     CControlled::init_external(this);
 }

@@ -52,7 +52,7 @@ smart_cover::action::~action() { delete_data(m_animations); }
 void smart_cover::action::add_animation(LPCSTR type, luabind::object const& table)
 {
     VERIFY(luabind::type(table) == LUA_TTABLE);
-    Animations* animations = new Animations();
+    Animations* animations = xr_new<Animations>();
     for (luabind::iterator I(table), E; I != E; ++I)
     {
         luabind::object string = *I;

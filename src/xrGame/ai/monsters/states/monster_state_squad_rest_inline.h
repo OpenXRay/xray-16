@@ -21,8 +21,8 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterSquadRestAbstract::CStateMonsterSquadRest(_Object* obj) : inherited(obj)
 {
-    this->add_state(eStateSquad_Rest_Idle, new CStateMonsterCustomAction<_Object>(obj));
-    this->add_state(eStateSquad_Rest_WalkAroundLeader, new CStateMonsterMoveToPoint<_Object>(obj));
+    this->add_state(eStateSquad_Rest_Idle, xr_new<CStateMonsterCustomAction<_Object>>(obj));
+    this->add_state(eStateSquad_Rest_WalkAroundLeader, xr_new<CStateMonsterMoveToPoint<_Object>>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

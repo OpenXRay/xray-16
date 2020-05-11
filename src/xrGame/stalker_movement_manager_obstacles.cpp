@@ -29,7 +29,7 @@ static const u32 fail_check_time = 1000;
 stalker_movement_manager_obstacles::stalker_movement_manager_obstacles(CAI_Stalker* object)
     : inherited(object), m_last_dest_vertex_id(u32(-1)), m_last_fail_time(0), m_failed_to_build_path(false)
 {
-    m_doors_actor = new doors::actor(*object);
+    m_doors_actor = xr_new<doors::actor>(*object);
     m_static_obstacles.construct(this, m_failed_to_build_path);
     m_dynamic_obstacles.construct(this, m_failed_to_build_path);
 }
@@ -45,7 +45,7 @@ void stalker_movement_manager_obstacles::Load(LPCSTR section)
 CRestrictedObject* stalker_movement_manager_obstacles::create_restricted_object()
 {
     m_restricted_object =
-        new CRestrictedObjectObstacle(&object(), m_static_obstacles.active_query(), m_dynamic_obstacles.active_query());
+        xr_new<CRestrictedObjectObstacle>(&object(), m_static_obstacles.active_query(), m_dynamic_obstacles.active_query());
 
     return (m_restricted_object);
 }

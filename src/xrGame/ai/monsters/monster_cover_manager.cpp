@@ -150,7 +150,7 @@ CMonsterCoverManager::CMonsterCoverManager(CBaseMonster* monster) : m_object(mon
 CMonsterCoverManager::~CMonsterCoverManager() { xr_delete(m_ce_best); }
 void CMonsterCoverManager::load()
 {
-    m_ce_best = new CCoverEvaluator(&(m_object->control().path_builder().restrictions()));
+    m_ce_best = xr_new<CCoverEvaluator>(&(m_object->control().path_builder().restrictions()));
 }
 
 const CCoverPoint* CMonsterCoverManager::find_cover(

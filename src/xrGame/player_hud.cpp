@@ -400,7 +400,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
             if (ec)
                 current_actor->Cameras().RemoveCamEffector(eCEWeaponAction);
             
-            CAnimatorCamEffector* e = new CAnimatorCamEffector();
+            CAnimatorCamEffector* e = xr_new<CAnimatorCamEffector>();
             e->SetType(eCEWeaponAction);
             e->SetHudAffect(false);
             e->SetCyclic(false);
@@ -735,7 +735,7 @@ attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
         if (itm->m_sect_name == sect)
             return itm;
     }
-    attachable_hud_item* res = new attachable_hud_item(this);
+    attachable_hud_item* res = xr_new<attachable_hud_item>(this);
     res->load(sect);
     IKinematicsAnimated* animatedHudItem = smart_cast<IKinematicsAnimated*>(res->m_model);
     res->m_hand_motions.load(m_model ? m_model : animatedHudItem, sect);

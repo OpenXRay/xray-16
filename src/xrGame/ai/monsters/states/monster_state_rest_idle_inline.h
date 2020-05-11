@@ -17,9 +17,9 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterRestIdleAbstract::CStateMonsterRestIdle(_Object* obj) : inherited(obj)
 {
-    this->add_state(eStateRest_WalkToCover, new CStateMonsterMoveToPointEx<_Object>(obj));
-    this->add_state(eStateRest_LookOpenPlace, new CStateMonsterLookToPoint<_Object>(obj));
-    this->add_state(eStateRest_Idle, new CStateMonsterCustomAction<_Object>(obj));
+    this->add_state(eStateRest_WalkToCover, xr_new<CStateMonsterMoveToPointEx<_Object>>(obj));
+    this->add_state(eStateRest_LookOpenPlace, xr_new<CStateMonsterLookToPoint<_Object>>(obj));
+    this->add_state(eStateRest_Idle, xr_new<CStateMonsterCustomAction<_Object>>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

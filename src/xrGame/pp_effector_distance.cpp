@@ -25,4 +25,4 @@ void CPPEffectorDistance::update_factor()
     m_effector->set_factor(factor);
 }
 
-CPPEffectorControlled* CPPEffectorDistance::create_effector() { return new CPPEffectorControlled(this, m_state); }
+CPPEffectorControlled* CPPEffectorDistance::create_effector() { return xr_new<CPPEffectorControlled>(this, m_state); }

@@ -4,14 +4,14 @@
 
 GameEventQueue::GameEventQueue() :
 #ifdef CONFIG_PROFILE_LOCKS
-    pcs(new Lock(MUTEX_PROFILE_ID(GameEventQueue)))
+    pcs(xr_new<Lock>(MUTEX_PROFILE_ID(GameEventQueue)))
 #else
-    pcs(new Lock)
+    pcs(xr_new<Lock>())
 #endif // CONFIG_PROFILE_LOCKS
 {
     unused.reserve(128);
     for (int i = 0; i < 16; i++)
-        unused.push_back(new GameEvent());
+        unused.push_back(xr_new<GameEvent>());
 }
 GameEventQueue::~GameEventQueue()
 {
@@ -32,7 +32,7 @@ GameEvent* GameEventQueue::Create()
     pcs->Enter();
     if (unused.empty())
     {
-        ready.push_back(new GameEvent());
+        ready.push_back(xr_new<GameEvent>());
         ge = ready.back();
 //---------------------------------------------
 #ifdef _DEBUG
@@ -72,7 +72,7 @@ GameEvent* GameEventQueue::Create(NET_Packet& P, u16 type, u32 time, ClientID cl
     pcs->Enter();
     if (unused.empty())
     {
-        ready.push_back(new GameEvent());
+        ready.push_back(xr_new<GameEvent>());
         ge = ready.back();
 //---------------------------------------------
 #ifdef _DEBUG

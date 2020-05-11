@@ -76,7 +76,7 @@ bool CUIInventoryUpgradeWnd::Init()
     m_back = UIHelper::CreateNormalWindow(uiXml, "back", this, false);
     m_scheme_wnd = UIHelper::CreateNormalWindow(uiXml, "scheme", this);
     
-    m_item_info = new CUIItemInfo();
+    m_item_info = xr_new<CUIItemInfo>();
     if (m_item_info->InitItemInfo("inventory_upgrade_info.xml"))
     {
         m_item_info->SetAutoDelete(true);

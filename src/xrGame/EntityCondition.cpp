@@ -351,7 +351,7 @@ CWound* CEntityCondition::AddWound(float hit_power, ALife::EHitType hit_type, u1
     //новая рана
     if (it == m_WoundVector.end())
     {
-        pWound = new CWound(element);
+        pWound = xr_new<CWound>(element);
         pWound->AddHit(hit_power * ::Random.randF(0.5f, 1.5f), hit_type);
         m_WoundVector.push_back(pWound);
     }
@@ -559,7 +559,7 @@ void CEntityCondition::load(IReader& input_packet)
         if (!m_WoundVector.empty())
             for (u32 i = 0; i < m_WoundVector.size(); i++)
             {
-                CWound* pWound = new CWound(BI_NONE);
+                CWound* pWound = xr_new<CWound>(BI_NONE);
                 pWound->load(input_packet);
                 m_WoundVector[i] = pWound;
             }

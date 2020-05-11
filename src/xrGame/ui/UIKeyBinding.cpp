@@ -19,7 +19,7 @@ void CUIKeyBinding::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 {
     CUIXmlInit::InitWindow(xml_doc, path, 0, this);
     string256 buf;
-    m_scroll_wnd = new CUIScrollView();
+    m_scroll_wnd = xr_new<CUIScrollView>();
     m_scroll_wnd->SetAutoDelete(true);
     AttachChild(m_scroll_wnd);
     CUIXmlInit::InitScrollView(xml_doc, strconcat(sizeof(buf), buf, path, ":scroll_view"), 0, m_scroll_wnd);
@@ -48,7 +48,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
         shared_str grp_name = xml_doc.ReadAttrib("group", i, "name");
         R_ASSERT(xr_strlen(grp_name));
 
-        CUIStatic* item = new CUIStatic();
+        CUIStatic* item = xr_new<CUIStatic>();
         CUIXmlInit::InitStatic(xml_doc_ui, strconcat(sizeof(buf), buf, path_ui, ":scroll_view:item_group"), 0, item);
         item->TextItemControl()->SetTextST(grp_name.c_str());
         m_scroll_wnd->AddWindow(item, true);
@@ -63,7 +63,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
             // first field of list item
             shared_str command_id = xml_doc.ReadAttrib("command", j, "id");
 
-            item = new CUIStatic();
+            item = xr_new<CUIStatic>();
             CUIXmlInit::InitStatic(xml_doc_ui, strconcat(sizeof(buf), buf, path_ui, ":scroll_view:item_key"), 0, item);
             item->TextItemControl()->SetTextST(command_id.c_str());
             m_scroll_wnd->AddWindow(item, true);
@@ -82,9 +82,9 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
             float item_pos = m_header[1].GetWndPos().x;
             CUIEditKeyBind* editKB;
             if (!m_isGamepadBinds)
-                editKB = new CUIEditKeyBind(true);
+                editKB = xr_new<CUIEditKeyBind>(true);
             else
-                editKB = new CUIEditKeyBind(false, true);
+                editKB = xr_new<CUIEditKeyBind>(false, true);
             editKB->SetAutoDelete(true);
             editKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, item->GetWndSize().y));
             if (!m_isGamepadBinds)
@@ -97,7 +97,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
             {
                 item_width = m_header[2].GetWidth() - 3.0f;
                 item_pos = m_header[2].GetWndPos().x;
-                editKB = new CUIEditKeyBind(false);
+                editKB = xr_new<CUIEditKeyBind>(false);
                 editKB->SetAutoDelete(true);
                 editKB->InitKeyBind(Fvector2().set(item_pos, 0.0f), Fvector2().set(item_width, item->GetWndSize().y));
                 editKB->AssignProps(exe, "key_binding");
@@ -126,7 +126,7 @@ void CUIKeyBinding::CheckStructure(CUIXml& xml_doc)
             {
                 if (first)
                 {
-                    item = new CUITextWnd();
+                    item = xr_new<CUITextWnd>();
                     item->SetWndPos(Fvector2().set(0, 0));
                     item->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
                     item->SetText("NEXT ITEMS NOT DESCRIBED IN COMMAND DESC LIST");
@@ -135,7 +135,7 @@ void CUIKeyBinding::CheckStructure(CUIXml& xml_doc)
                     m_scroll_wnd->AddWindow(item, true);
                 }
 
-                item = new CUITextWnd();
+                item = xr_new<CUITextWnd>();
                 item->SetWndPos(Fvector2().set(0, 0));
                 item->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
                 item->SetText(action_name);

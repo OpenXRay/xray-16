@@ -256,7 +256,7 @@ CPhrase* CPhraseDialog::AddPhrase(
     CPhraseGraph::CVertex* _vertex = data()->m_PhraseGraph.vertex(phrase_id);
     if (!_vertex)
     {
-        phrase = new CPhrase();
+        phrase = xr_new<CPhrase>();
         VERIFY(phrase);
         phrase->SetID(phrase_id);
 

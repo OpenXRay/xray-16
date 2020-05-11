@@ -94,7 +94,7 @@ SBuyItemInfo* CUIMpTradeWnd::CreateItem(const shared_str& name_sect, SBuyItemInf
     if (iinfo)
         return iinfo;
 
-    iinfo = new SBuyItemInfo();
+    iinfo = xr_new<SBuyItemInfo>();
     m_all_items.push_back(iinfo);
     iinfo->m_name_sect = name_sect;
     iinfo->SetState(type);

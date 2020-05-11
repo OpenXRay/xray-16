@@ -20,9 +20,9 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterDangerMoveToHomePointAbstract::CStateMonsterDangerMoveToHomePoint(_Object* obj) : inherited(obj)
 {
-    this->add_state(eStatePanic_HomePoint_Hide, new CStateMonsterMoveToPointEx<_Object>(obj));
-    this->add_state(eStatePanic_HomePoint_LookOpenPlace, new CStateMonsterLookToPoint<_Object>(obj));
-    this->add_state(eStatePanic_HomePoint_Camp, new CStateMonsterCustomAction<_Object>(obj));
+    this->add_state(eStatePanic_HomePoint_Hide, xr_new<CStateMonsterMoveToPointEx<_Object>>(obj));
+    this->add_state(eStatePanic_HomePoint_LookOpenPlace, xr_new<CStateMonsterLookToPoint<_Object>>(obj));
+    this->add_state(eStatePanic_HomePoint_Camp, xr_new<CStateMonsterCustomAction<_Object>>(obj));
 }
 
 //////////////////////////////////////////////////////////////////////////

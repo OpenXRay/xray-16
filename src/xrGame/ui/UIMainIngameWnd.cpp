@@ -71,7 +71,7 @@ CUIMainIngameWnd::CUIMainIngameWnd()
       m_pMPLogWnd(nullptr), UIArtefactPanel(nullptr)
 
 {
-    UIZoneMap = new CUIZoneMap();
+    UIZoneMap = xr_new<CUIZoneMap>();
 }
 
 extern CUIProgressShape* g_MissileForceShape;
@@ -224,7 +224,7 @@ void CUIMainIngameWnd::Init()
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
-    UIMotionIcon = new CUIMotionIcon();
+    UIMotionIcon = xr_new<CUIMotionIcon>();
     UIMotionIcon->SetAutoDelete(true);
     const bool independent = UIMotionIcon->Init(UIZoneMap->MapFrame().GetWndRect());
     if (!independent)
@@ -236,12 +236,12 @@ void CUIMainIngameWnd::Init()
 
     if (IsGameTypeSingle() && uiXml.NavigateToNode("artefact_panel", 0))
     {
-        UIArtefactPanel = new CUIArtefactPanel();
+        UIArtefactPanel = xr_new<CUIArtefactPanel>();
         UIArtefactPanel->InitFromXML(uiXml, "artefact_panel", 0);
         this->AttachChild(UIArtefactPanel);
     }
 
-    m_ui_hud_states = new CUIHudStatesWnd();
+    m_ui_hud_states = xr_new<CUIHudStatesWnd>();
     m_ui_hud_states->SetAutoDelete(true);
     AttachChild(m_ui_hud_states);
     m_ui_hud_states->InitFromXml(uiXml, "hud_states");
@@ -517,7 +517,7 @@ void CUIMainIngameWnd::InitFlashingIcons(CUIXml* node)
     // Пробегаемся по всем нодам и инициализируем из них статики
     for (int i = 0; i < staticsCount; ++i)
     {
-        pIcon = new CUIStatic();
+        pIcon = xr_new<CUIStatic>();
         CUIXmlInit::InitStatic(*node, flashingIconNodeName, i, pIcon);
         shared_str iconType = node->ReadAttrib(flashingIconNodeName, i, "type", "none");
 

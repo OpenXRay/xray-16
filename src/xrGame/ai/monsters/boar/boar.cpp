@@ -17,7 +17,7 @@
 
 CAI_Boar::CAI_Boar()
 {
-    StateMan = new CStateManagerBoar(this);
+    StateMan = xr_new<CStateManagerBoar>(this);
 
     CControlled::init_external(this);
 }

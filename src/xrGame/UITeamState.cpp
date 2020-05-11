@@ -94,9 +94,9 @@ int UITeamState::InitScrollPanels()
 
         mainUiXml->SetLocalRoot(panel_root);
 
-        temp_panel.first = new CUIScrollView();
+        temp_panel.first = xr_new<CUIScrollView>();
         temp_panel.first->m_sort_function = fastdelegate::MakeDelegate(this, &UITeamState::SortingLessFunction);
-        temp_panel.second = new UITeamHeader(this);
+        temp_panel.second = xr_new<UITeamHeader>(this);
         temp_panel.first->SetAutoDelete(true);
         temp_panel.second->SetAutoDelete(true);
 
@@ -172,7 +172,7 @@ void UITeamState::AddPlayer(ClientID const& clientId)
     Msg("--- UITeamState: adding player (ClientID = 0x%08x) to %d team (0x%08x)", clientId.value(), myTeam, this);
 #endif // #ifdef DEBUG
 
-    UIPlayerItem* tempPlayerItem = new UIPlayerItem(static_cast<ETeam>(ps->team), clientId, this, m_teamPanels);
+    UIPlayerItem* tempPlayerItem = xr_new<UIPlayerItem>(static_cast<ETeam>(ps->team), clientId, this, m_teamPanels);
 
     VERIFY2(tempPlayerItem, make_string("failed to create player with ClientID = 0x%08x", clientId.value()).c_str());
 

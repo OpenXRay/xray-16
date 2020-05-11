@@ -50,7 +50,7 @@ void CUICellItem::init()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml");
 
-    m_text = new CUIStatic();
+    m_text = xr_new<CUIStatic>();
     m_text->SetAutoDelete(true);
     AttachChild(m_text);
     CUIXmlInit::InitStatic(uiXml, "cell_item_text", 0, m_text);
@@ -62,7 +62,7 @@ void CUICellItem::init()
         CUIXmlInit::InitStatic	( uiXml, "cell_item_mark", 0, m_mark );
         m_mark->Show			( false );*/
 
-    m_upgrade = new CUIStatic();
+    m_upgrade = xr_new<CUIStatic>();
     m_upgrade->SetAutoDelete(true);
     AttachChild(m_upgrade);
     CUIXmlInit::InitStatic(uiXml, "cell_item_upgrade", 0, m_upgrade);
@@ -177,7 +177,7 @@ bool CUICellItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 CUIDragItem* CUICellItem::CreateDragItem()
 {
     CUIDragItem* tmp;
-    tmp = new CUIDragItem(this);
+    tmp = xr_new<CUIDragItem>(this);
     Frect r;
     GetAbsoluteRect(r);
 

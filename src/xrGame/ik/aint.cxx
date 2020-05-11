@@ -218,7 +218,7 @@ int AngleInt::merge(const AngleInt& a, AngleInt& b, float eps) const
 float AngleInt::Range() const { return (low < high) ? (high - low) : high + (2 * M_PI - low); }
 void AngleIntList::add(float l, float h)
 {
-    AngleIntListNode* t = new AngleIntListNode(l, h, (AngleIntListNode*)0);
+    AngleIntListNode* t = xr_new<AngleIntListNode>(l, h, (AngleIntListNode*)0);
 
     if (!head)
         head = tail = t;

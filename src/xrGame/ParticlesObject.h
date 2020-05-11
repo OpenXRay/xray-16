@@ -51,7 +51,7 @@ public:
 public:
     static CParticlesObject* Create(LPCSTR p_name, BOOL bAutoRemove = TRUE, bool remove_on_game_load = true)
     {
-        return new CParticlesObject(p_name, bAutoRemove, remove_on_game_load);
+        return xr_new<CParticlesObject>(p_name, bAutoRemove, remove_on_game_load);
     }
     static void Destroy(CParticlesObject*& p)
     {

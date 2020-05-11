@@ -234,7 +234,7 @@ bool game_cl_mp::OnKeyboardPress(int key)
         case kSHOW_ADMIN_MENU:
         {
             if (!m_pAdminMenuWindow)
-                m_pAdminMenuWindow = new CUIMpAdminMenu();
+                m_pAdminMenuWindow = xr_new<CUIMpAdminMenu>();
 
             if (local_player && local_player->testFlag(GAME_PLAYER_HAS_ADMIN_RIGHTS))
                 m_pAdminMenuWindow->ShowDialog(true);
@@ -309,7 +309,7 @@ bool game_cl_mp::OnKeyboardPress(int key)
 void game_cl_mp::VotingBegin()
 {
     if (!m_pVoteStartWindow)
-        m_pVoteStartWindow = new CUIVotingCategory();
+        m_pVoteStartWindow = xr_new<CUIVotingCategory>();
 
     m_pVoteStartWindow->ShowDialog(true);
 }
@@ -317,7 +317,7 @@ void game_cl_mp::VotingBegin()
 void game_cl_mp::Vote()
 {
     if (!m_pVoteRespondWindow)
-        m_pVoteRespondWindow = new CUIVote();
+        m_pVoteRespondWindow = xr_new<CUIVote>();
 
     m_pVoteRespondWindow->ShowDialog(true);
 }
@@ -1441,7 +1441,7 @@ void game_cl_mp::OnRadminMessage(u16 type, NET_Packet* P)
         if (!GEnv.isDedicatedServer)
         {
             if (!m_pAdminMenuWindow)
-                m_pAdminMenuWindow = new CUIMpAdminMenu();
+                m_pAdminMenuWindow = xr_new<CUIMpAdminMenu>();
 
             if (0 == xr_stricmp(buff, "Access permitted."))
                 m_pAdminMenuWindow->ShowDialog(true);
@@ -1895,8 +1895,8 @@ void game_cl_mp::ReInitRewardGenerator(game_PlayerState* local_ps)
 {
     if (!m_reward_generator)
     {
-        m_reward_generator = new award_system::reward_event_generator(u32(-1));
-        m_reward_manager = new award_system::reward_manager(this);
+        m_reward_generator = xr_new<award_system::reward_event_generator>(u32(-1));
+        m_reward_manager = xr_new<award_system::reward_manager>(this);
     }
     m_reward_generator->init_player(local_ps);
 }

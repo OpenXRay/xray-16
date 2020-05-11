@@ -38,7 +38,7 @@ stalker_movement_manager_smart_cover::stalker_movement_manager_smart_cover(CAI_S
       m_enter_loophole_id(""), m_check_can_kill_enemy(false), m_combat_behaviour(false)
 {
     m_target.construct(this);
-    m_target_selector = new target_selector_type();
+    m_target_selector = xr_new<target_selector_type>();
 }
 
 stalker_movement_manager_smart_cover::~stalker_movement_manager_smart_cover()
@@ -58,7 +58,7 @@ void stalker_movement_manager_smart_cover::reinit()
     }
     else
     {
-        m_animation_selector = new animation_selector_type(&object());
+        m_animation_selector = xr_new<animation_selector_type>(&object());
         m_animation_selector->setup(&object(), m_property_storage);
     }
 

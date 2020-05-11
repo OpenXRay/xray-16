@@ -99,7 +99,7 @@ server_updates_compressor::server_updates_compressor()
     u32 const need_to_reserve = (start_compress_buffer_size / sizeof(m_acc_buff.B.data)) + 1;
     for (u32 i = 0; i < need_to_reserve; ++i)
     {
-        m_ready_for_send.push_back(new NET_Packet());
+        m_ready_for_send.push_back(xr_new<NET_Packet>());
     }
 
     m_trained_stream = NULL;
@@ -170,7 +170,7 @@ NET_Packet* server_updates_compressor::goto_next_dest()
 
     if (m_ready_for_send.size() == m_current_update)
     {
-        new_dest = m_ready_for_send.emplace_back(new NET_Packet());
+        new_dest = m_ready_for_send.emplace_back(xr_new<NET_Packet>());
     }
     else
     {

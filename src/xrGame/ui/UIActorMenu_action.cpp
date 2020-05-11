@@ -64,7 +64,7 @@ public:
 void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
 {
     if (b_receive && !CurrentIItem()->IsQuestItem())
-        item->SetCustomDraw(new CUITrashIcon());
+        item->SetCustomDraw(xr_new<CUITrashIcon>());
     else
         item->SetCustomDraw(NULL);
 }

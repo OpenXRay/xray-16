@@ -88,11 +88,11 @@ void CPhysicObject::create_collision_model()
     CInifile* ini = K->LL_UserData();
     if (ini && ini->section_exist("collide") && ini->line_exist("collide", "mesh") && ini->r_bool("collide", "mesh"))
     {
-        CForm = new CCF_DynamicMesh(this);
+        CForm = xr_new<CCF_DynamicMesh>(this);
         return;
     }
 
-    CForm = new CCF_Skeleton(this);
+    CForm = xr_new<CCF_Skeleton>(this);
 
     /*
     switch(m_type) {
@@ -509,7 +509,7 @@ bool CPhysicObject::is_ai_obstacle() const
 net_updatePhData* CPhysicObject::NetSync()
 {
     if (!m_net_updateData)
-        m_net_updateData = new net_updatePhData();
+        m_net_updateData = xr_new<net_updatePhData>();
     return m_net_updateData;
 }
 

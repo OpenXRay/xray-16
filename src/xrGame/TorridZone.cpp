@@ -3,7 +3,7 @@
 #include "xrEngine/ObjectAnimator.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 
-CTorridZone::CTorridZone() { m_animator = new CObjectAnimator(); }
+CTorridZone::CTorridZone() { m_animator = xr_new<CObjectAnimator>(); }
 CTorridZone::~CTorridZone() { xr_delete(m_animator); }
 bool CTorridZone::net_Spawn(CSE_Abstract* DC)
 {

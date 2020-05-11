@@ -243,7 +243,7 @@ void CBinocularsVision::Update()
         }
         else
         {
-            m_active_objects.push_back(new SBinocVisibleObj());
+            m_active_objects.push_back(xr_new<SBinocVisibleObj>());
             SBinocVisibleObj* new_vis_obj = m_active_objects.back();
             new_vis_obj->m_flags.set(flVisObjNotValid, false);
             new_vis_obj->m_object = object_;

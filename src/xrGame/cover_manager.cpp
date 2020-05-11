@@ -73,7 +73,7 @@ void CCoverManager::compute_static_cover()
 {
     clear();
     xr_delete(m_covers);
-    m_covers = new CPointQuadTree(
+    m_covers = xr_new<CPointQuadTree>(
         ai().level_graph().header().box(), ai().level_graph().header().cell_size() * .5f, 8 * 65536, 4 * 65536);
     m_temp.resize(ai().level_graph().header().vertex_count());
 
@@ -101,10 +101,10 @@ void CCoverManager::compute_static_cover()
 
     for (u32 i = 0; i < levelVertexCount; ++i)
         if (m_temp[i] && critical_cover(i))
-            m_covers->insert(new CCoverPoint(ai().level_graph().vertex_position(ai().level_graph().vertex(i)), i));
+            m_covers->insert(xr_new<CCoverPoint>(ai().level_graph().vertex_position(ai().level_graph().vertex(i)), i));
 
     VERIFY(!m_smart_covers_storage);
-    m_smart_covers_storage = new smart_cover::storage();
+    m_smart_covers_storage = xr_new<smart_cover::storage>();
 }
 
 void CCoverManager::clear_covers(PointVector& covers)
@@ -180,7 +180,7 @@ CCoverManager::Cover const* CCoverManager::add_smart_cover(LPCSTR table_name, sm
     bool const& is_combat_cover, bool const& can_fire, luabind::adl::object const& loopholes) const
 {
     Cover* smart_cover =
-        new Cover(object, m_smart_covers_storage->description(table_name), is_combat_cover, can_fire, loopholes);
+        xr_new<Cover>(object, m_smart_covers_storage->description(table_name), is_combat_cover, can_fire, loopholes);
 
     remove_nearby_covers(*smart_cover, object);
     m_covers->insert(smart_cover);
