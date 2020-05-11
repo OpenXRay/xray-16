@@ -271,7 +271,7 @@ IC void CGameGraph::set_current_level(u32 const level_id)
                 continue;
             }
 
-            m_current_level_cross_table = new CGameLevelCrossTable(current_cross_table + 1, *current_cross_table);
+            m_current_level_cross_table = xr_new<CGameLevelCrossTable>(current_cross_table + 1, *current_cross_table);
             break;
         }
     }
@@ -279,7 +279,7 @@ IC void CGameGraph::set_current_level(u32 const level_id)
     {
         string_path fName;
         FS.update_path(fName, "$level$", CROSS_TABLE_NAME);
-        m_current_level_cross_table = new CGameLevelCrossTable(fName);
+        m_current_level_cross_table = xr_new<CGameLevelCrossTable>(fName);
     }
     VERIFY(m_current_level_cross_table);
 
