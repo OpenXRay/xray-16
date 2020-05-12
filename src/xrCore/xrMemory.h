@@ -80,7 +80,8 @@ inline void operator delete(void* ptr, size_t, std::align_val_t alignment) noexc
 template <typename T, typename... Args>
 inline T* xr_new(Args&&... args)
 {
-    return new T(std::forward<Args>(args)...);
+    auto ptr = static_cast<T*>(Memory.mem_alloc(sizeof(T)));
+    return new (ptr) T(std::forward<Args>(args)...);
 }
 
 template <class T>
