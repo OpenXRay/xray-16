@@ -171,7 +171,7 @@ void CDetailManager::Load()
     IReader* m_fs = dtFS->open_chunk(1);
     for (u32 m_id = 0; m_id < m_count; m_id++)
     {
-        CDetail* dt = new CDetail();
+        CDetail* dt = xr_new<CDetail>();
         IReader* S = m_fs->open_chunk(m_id);
         dt->Load(S);
         objects.push_back(dt);

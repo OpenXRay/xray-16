@@ -109,7 +109,7 @@ void load_hw(Fvisual& V, TSrc* src)
     V.vStride = GetDeclVertexSize(get_decl<TDst>(), 0);
     VERIFY(nullptr == V.p_rm_Vertices);
 
-    V.p_rm_Vertices = new VertexStagingBuffer;
+    V.p_rm_Vertices = xr_new<VertexStagingBuffer>();
     V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
 
     TDst* dst = static_cast<TDst*>(V.p_rm_Vertices->Map());

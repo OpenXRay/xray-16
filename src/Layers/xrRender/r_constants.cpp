@@ -140,7 +140,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 ref_constant C = get(name);
                 if (!C)
                 {
-                    C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
+                    C = table.emplace_back(xr_new<R_constant>()); //.g_constant_allocator.create();
                     C->name = name;
                     C->destination = RC_dest_sampler;
                     C->type = RC_sampler;
@@ -172,7 +172,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         ref_constant C = get(name);
         if (!C)
         {
-            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
+            C = table.emplace_back(xr_new<R_constant>()); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
@@ -212,7 +212,7 @@ void R_constant_table::merge(R_constant_table* T)
         ref_constant C = get(*src->name, dx9compatibility ? src->type : u16(-1));
         if (!C || (dx9compatibility && C->type != src->type))
         {
-            C = new R_constant(); //.g_constant_allocator.create();
+            C = xr_new<R_constant>(); //.g_constant_allocator.create();
             C->name = src->name;
             C->destination = src->destination;
             C->type = src->type;

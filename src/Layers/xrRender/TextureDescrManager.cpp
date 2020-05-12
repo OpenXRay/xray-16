@@ -63,7 +63,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             if (desc.m_assoc)
                 xr_delete(desc.m_assoc);
 
-            desc.m_assoc = new texture_assoc();
+            desc.m_assoc = xr_new<texture_assoc>();
 
             string_path T;
             float s;
@@ -74,7 +74,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             if (dts)
                 dts->scale = s;
             else
-                dts = new cl_dt_scaler(s);
+                dts = xr_new<cl_dt_scaler>(s);
 
             if (strstr(item.second.c_str(), "usage[diffuse_or_bump]"))
                 desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail | texture_assoc::flBumpDetail);
@@ -106,7 +106,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             if (desc.m_spec)
                 xr_delete(desc.m_spec);
 
-            desc.m_spec = new texture_spec();
+            desc.m_spec = xr_new<texture_spec>();
 
             string_path bmode;
             const int res =
@@ -170,12 +170,12 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
                 if (desc.m_assoc)
                     xr_delete(desc.m_assoc);
 
-                desc.m_assoc = new texture_assoc();
+                desc.m_assoc = xr_new<texture_assoc>();
                 desc.m_assoc->detail_name = tp.detail_name;
                 if (dts)
                     dts->scale = tp.detail_scale;
                 else
-                    dts = new cl_dt_scaler(tp.detail_scale);
+                    dts = xr_new<cl_dt_scaler>(tp.detail_scale);
 
                 if (tp.flags.is(STextureParams::flDiffuseDetail))
                     desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
@@ -186,7 +186,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
             if (desc.m_spec)
                 xr_delete(desc.m_spec);
 
-            desc.m_spec = new texture_spec();
+            desc.m_spec = xr_new<texture_spec>();
             desc.m_spec->m_material = tp.material + tp.material_weight;
             desc.m_spec->m_use_steep_parallax = false;
 

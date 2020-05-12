@@ -172,7 +172,7 @@ void CTexture::Load()
         if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
         {
             // AVI
-            pTheora = new CTheoraSurface();
+            pTheora = xr_new<CTheoraSurface>();
             m_play_time = 0xFFFFFFFF;
 
             if (!pTheora->Load(fn))
@@ -207,7 +207,7 @@ void CTexture::Load()
         else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
         {
             // AVI
-            pAVI = new CAviPlayerCustom();
+            pAVI = xr_new<CAviPlayerCustom>();
 
             if (!pAVI->Load(fn))
             {

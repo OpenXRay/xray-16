@@ -129,7 +129,7 @@ void CLight_DB::Unload()
 
 light* CLight_DB::Create()
 {
-    light* L = new light();
+    light* L = xr_new<light>();
     L->flags.bStatic = false;
     L->flags.bActive = false;
     L->flags.bShadow = true;
