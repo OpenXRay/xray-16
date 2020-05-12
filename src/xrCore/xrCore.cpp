@@ -212,7 +212,18 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #else
-        char *pref_path = SDL_GetPrefPath("GSC", "SCOP");
+        char* pref_path = nullptr;
+        if (strstr(Core.Params, "-fsltx"))
+            pref_path = SDL_GetBasePath();
+        else
+        {
+            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
+            else if (strstr(Core.Params, "-cs"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
+            else
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
+        }
         SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
         SDL_free(pref_path);
 #endif
@@ -231,30 +242,30 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #else
         getcwd(WorkingPath, sizeof(WorkingPath));
-        chdir(ApplicationPath);
-        string_path tmp;
-        xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
-        struct stat statbuf;
-        memset(&statbuf, 0, sizeof(struct stat));
 
-        int res = lstat(tmp, &statbuf);
-
-        if(!S_ISLNK(statbuf.st_mode)) // If not symlink (original fsgame.ltx at first run), remove it
-            unlink(tmp);
-
-        if(-1 == res || !S_ISLNK(statbuf.st_mode))
-            symlink("/usr/share/openxray/fsgame.ltx", tmp);
-
-        xr_sprintf(tmp, "%sgamedata", ApplicationPath);
-
-        memset(&statbuf, 0, sizeof(struct stat));
-        res = lstat(tmp, &statbuf);
-
-        if(S_ISDIR(statbuf.st_mode)) // If folder (custom gamedata), remove it
-            rmdir(tmp);
-
-        if(-1 == res || !S_ISLNK(statbuf.st_mode))
-            symlink("/usr/share/openxray/gamedata", tmp);
+        /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
+        * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
+        * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
+        if (!strstr(Core.Params, "-fsltx"))
+        {
+            chdir(ApplicationPath);
+            string_path tmp;
+            xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
+            struct stat statbuf;
+            ZeroMemory(&statbuf, sizeof(statbuf));
+            int res = lstat(tmp, &statbuf);
+            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+                symlink("/usr/share/openxray/fsgame.ltx", tmp);
+            xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);
+            ZeroMemory(&statbuf, sizeof(statbuf));
+            res = lstat(tmp, &statbuf);
+            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+            {
+                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
+            }
+        }
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
