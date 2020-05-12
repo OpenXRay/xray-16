@@ -74,7 +74,7 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
 void CSoundRender_CoreA::_restart() { inherited::_restart(); }
 void CSoundRender_CoreA::_initialize()
 {
-    pDeviceList = new ALDeviceList();
+    pDeviceList = xr_new<ALDeviceList>();
 
     if (0 == pDeviceList->GetNumDevices())
     {
@@ -143,7 +143,7 @@ void CSoundRender_CoreA::_initialize()
     CSoundRender_Target* T = nullptr;
     for (u32 tit = 0; tit < u32(psSoundTargets); tit++)
     {
-        T = new CSoundRender_TargetA();
+        T = xr_new<CSoundRender_TargetA>();
         if (T->_initialize())
         {
             s_targets.push_back(T);

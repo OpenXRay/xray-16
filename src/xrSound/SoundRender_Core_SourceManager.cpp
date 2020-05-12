@@ -33,7 +33,7 @@ bool CSoundRender_Core::i_create_source(CSoundRender_Source*& result, pcstr name
     }
 
     // Load a _new one
-    CSoundRender_Source* S = new CSoundRender_Source();
+    CSoundRender_Source* S = xr_new<CSoundRender_Source>();
     const bool itIsFound = S->load(id, replaceWithNoSound);
 
     if (!itIsFound && !replaceWithNoSound)
@@ -90,7 +90,7 @@ void CSoundRender_Core::i_create_all_sources()
                 return;
         }
 
-        CSoundRender_Source* S = new CSoundRender_Source();
+        CSoundRender_Source* S = xr_new<CSoundRender_Source>();
         S->load(id);
 
         DO_MT_LOCK(lock);
