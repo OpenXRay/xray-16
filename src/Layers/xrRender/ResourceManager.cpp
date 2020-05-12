@@ -141,7 +141,7 @@ ShaderElement* CResourceManager::_CreateElement(ShaderElement& S)
             return v_elements[it];
 
     // Create _new_ entry
-    ShaderElement* N = v_elements.emplace_back(new ShaderElement(S));
+    ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(S));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     return N;
 }
@@ -244,7 +244,7 @@ Shader* CResourceManager::_cpp_Create(
             return v_shaders[it];
 
     // Create _new_ entry
-    Shader* N = v_shaders.emplace_back(new Shader(S));
+    Shader* N = v_shaders.emplace_back(xr_new<Shader>(S));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     return N;
 }

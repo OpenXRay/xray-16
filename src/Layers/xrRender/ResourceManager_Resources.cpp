@@ -52,7 +52,7 @@ SState* CResourceManager::_CreateState(SimulatorStates& state_code)
     }
 
     // Create New
-    SState* S = v_states.emplace_back(new SState());
+    SState* S = v_states.emplace_back(xr_new<SState>());
     state_code.record(S->state); // S->state will be assigned here
     S->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     S->state_code = state_code;
@@ -95,7 +95,7 @@ R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)
         if (table->equal(C))
             return table;
 
-    R_constant_table* table = v_constant_tables.emplace_back(new R_constant_table(C));
+    R_constant_table* table = v_constant_tables.emplace_back(xr_new<R_constant_table>(C));
     table->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return table;
@@ -121,7 +121,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
         return I->second;
     else
     {
-        CRT* RT = new CRT();
+        CRT* RT = xr_new<CRT>();
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets.emplace(RT->set_name(Name), RT);
         if (RDEVICE.b_is_Ready)
@@ -157,7 +157,7 @@ CRTC* CResourceManager::_CreateRTC(LPCSTR Name, u32 size, D3DFORMAT f)
         return I->second;
     else
     {
-        CRTC* RT = new CRTC();
+        CRTC* RT = xr_new<CRTC>();
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets_c.emplace(RT->set_name(Name), RT);
         if (Device.b_is_Ready)
@@ -226,7 +226,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     if (I != m_textures.end())
         return I->second;
 
-    CTexture* T = new CTexture();
+    CTexture* T = xr_new<CTexture>();
     T->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     m_textures.emplace(T->set_name(Name), T);
     T->Preload();
@@ -278,7 +278,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
         return I->second;
     else
     {
-        CMatrix* M = new CMatrix();
+        CMatrix* M = xr_new<CMatrix>();
         M->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         M->dwReference = 1;
         m_matrices.emplace(M->set_name(Name), M);
@@ -318,7 +318,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
         return I->second;
     else
     {
-        CConstant* C = new CConstant();
+        CConstant* C = xr_new<CConstant>();
         C->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         C->dwReference = 1;
         m_constants.emplace(C->set_name(Name), C);
@@ -359,7 +359,7 @@ STextureList* CResourceManager::_CreateTextureList(STextureList& L)
             return base;
     }
 
-    STextureList* lst = lst_textures.emplace_back(new STextureList(L));
+    STextureList* lst = lst_textures.emplace_back(xr_new<STextureList>(L));
     lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return lst;
@@ -395,7 +395,7 @@ SMatrixList* CResourceManager::_CreateMatrixList(SMatrixList& L)
             return base;
     }
 
-    SMatrixList* lst = lst_matrices.emplace_back(new SMatrixList(L));
+    SMatrixList* lst = lst_matrices.emplace_back(xr_new<SMatrixList>(L));
     lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return lst;
@@ -430,7 +430,7 @@ SConstantList* CResourceManager::_CreateConstantList(SConstantList& L)
             return base;
     }
 
-    SConstantList* lst = lst_constants.emplace_back(new SConstantList(L));
+    SConstantList* lst = lst_constants.emplace_back(xr_new<SConstantList>(L));
     lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return lst;

@@ -596,7 +596,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         return iterator->second;
     else
     {
-        T* sh = new T();
+        T* sh = xr_new<T>();
 
         sh->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         sh_map.insert(std::make_pair(sh->set_name(name), sh));

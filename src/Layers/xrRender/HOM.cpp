@@ -123,7 +123,7 @@ void CHOM::Load()
     FOR_END
 
     // Create AABB-tree
-    m_pModel = new CDB::MODEL();
+    m_pModel = xr_new<CDB::MODEL>();
     m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
     bEnabled = TRUE;
     S->close();

@@ -331,7 +331,7 @@ void light::Export(light_Package& package)
             // tough: create/update 6 shadowed lights
             if (0 == omnipart[0])
                 for (int f = 0; f < 6; f++)
-                    omnipart[f] = new light();
+                    omnipart[f] = xr_new<light>();
             for (int f = 0; f < 6; f++)
             {
                 light* L = omnipart[f];
