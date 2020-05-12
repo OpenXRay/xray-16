@@ -29,7 +29,7 @@ void property_collection<manager::ambient_container_type, manager>::display_name
 template <>
 XRay::Editor::property_holder_base* property_collection<manager::ambient_container_type, manager>::create()
 {
-    ambient* object = new ambient(m_holder, generate_unique_id("ambient_unique_id_").c_str());
+    ambient* object = xr_new<ambient>(m_holder, generate_unique_id("ambient_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
@@ -37,7 +37,7 @@ XRay::Editor::property_holder_base* property_collection<manager::ambient_contain
 manager::manager(::editor::environment::manager const& manager)
     : m_manager(manager), m_property_holder(0), m_collection(0), m_changed(true)
 {
-    m_collection = new collection_type(&m_ambients, this, &m_changed);
+    m_collection = xr_new<collection_type>(&m_ambients, this, &m_changed);
 }
 
 manager::~manager()
@@ -61,7 +61,7 @@ void manager::load()
     m_ambients.reserve(sections.size());
     for (const auto &i : sections)
     {
-        ambient* object = new ambient(*this, i->Name);
+        ambient* object = xr_new<ambient>(*this, i->Name);
         object->load(*m_manager.m_ambients_config, *m_manager.m_sound_channels_config, *m_manager.m_effects_config, i->Name);
         object->fill(m_collection);
         m_ambients.push_back(object);
@@ -71,7 +71,7 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), false, false, true);
+    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), false, false, true);
 
     for (const auto &i : m_ambients)
         i->save(*config);

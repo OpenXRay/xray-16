@@ -28,7 +28,7 @@ void property_collection<collection::container_type, collection>::display_name(
 template <>
 XRay::Editor::property_holder_base* property_collection<collection::container_type, collection>::create()
 {
-    thunderbolt_id* object = new thunderbolt_id(m_holder.m_manager, "");
+    thunderbolt_id* object = xr_new<thunderbolt_id>(m_holder.m_manager, "");
     object->fill(this);
     return (object->object());
 }
@@ -37,7 +37,7 @@ collection::collection(manager const& manager, shared_str const& id)
     : m_manager(manager), m_collection(0), m_property_holder(0)
 {
     section = id;
-    m_collection = new collection_type(&m_ids, this);
+    m_collection = xr_new<collection_type>(&m_ids, this);
 }
 
 collection::~collection()
@@ -60,7 +60,7 @@ void collection::load(CInifile& config)
 
     for (const auto &i : items.Data)
     {
-        thunderbolt_id* object = new thunderbolt_id(m_manager, i.first);
+        thunderbolt_id* object = xr_new<thunderbolt_id>(m_manager, i.first);
         object->fill(m_collection);
         m_ids.push_back(object);
 

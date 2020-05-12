@@ -20,7 +20,7 @@
 ENGINE_API extern CConsole* Console;
 engine_impl g_engine;
 
-engine_impl::engine_impl() : m_input_receiver(new IInputReceiver()), m_input_captured(false) {}
+engine_impl::engine_impl() : m_input_receiver(xr_new<IInputReceiver>()), m_input_captured(false) {}
 engine_impl::~engine_impl()
 {
     capture_input(false);
@@ -76,7 +76,7 @@ LPCSTR engine_impl::value(shared_str const& value) { return (value.c_str()); }
 
 CEnvironment* engine_impl::environment()
 {
-    return new editor::environment::manager();
+    return xr_new<editor::environment::manager>();
 }
 
 void engine_impl::weather(LPCSTR value)
