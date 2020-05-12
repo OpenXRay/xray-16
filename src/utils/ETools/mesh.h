@@ -317,7 +317,7 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     if ((pEdge12 == NULL) && (pEdgeListRoot != NULL))
     {
         // Autocreate the edge.
-        pEdge12 = new MeshEdge(pPt1, pPt2, pEdgeListRoot);
+        pEdge12 = xr_new<MeshEdge>(pPt1, pPt2, pEdgeListRoot);
     }
     VERIFY(pEdge12 != NULL);
     {
@@ -328,7 +328,7 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     if ((pEdge23 == NULL) && (pEdgeListRoot != NULL))
     {
         // Autocreate the edge.
-        pEdge23 = new MeshEdge(pPt2, pPt3, pEdgeListRoot);
+        pEdge23 = xr_new<MeshEdge>(pPt2, pPt3, pEdgeListRoot);
     }
     VERIFY(pEdge23 != NULL);
     {
@@ -339,7 +339,7 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     if ((pEdge31 == NULL) && (pEdgeListRoot != NULL))
     {
         // Autocreate the edge.
-        pEdge31 = new MeshEdge(pPt3, pPt1, pEdgeListRoot);
+        pEdge31 = xr_new<MeshEdge>(pPt3, pPt1, pEdgeListRoot);
     }
     VERIFY(pEdge31 != NULL);
     {
