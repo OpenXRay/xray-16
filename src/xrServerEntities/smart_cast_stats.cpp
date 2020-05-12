@@ -57,7 +57,7 @@ CSmartCastStats* CSmartCastStats::m_instance = 0;
 IC CSmartCastStats* CSmartCastStats::instance()
 {
     if (!m_instance)
-        m_instance = new CSmartCastStats();
+        m_instance = xr_new<CSmartCastStats>();
     return (m_instance);
 }
 
@@ -69,7 +69,7 @@ CSmartCastStats* g_smart_cast_opt = 0;
 IC CSmartCastStats& stats_all()
 {
     if (!g_smart_cast_opt)
-        g_smart_cast_opt = new CSmartCastStats();
+        g_smart_cast_opt = xr_new<CSmartCastStats>();
     return (*g_smart_cast_opt);
 }
 #endif

@@ -308,7 +308,7 @@ void CSE_SmartCover::fill_visuals()
             return;
         }
 
-        CSE_Visual* visual = new CSE_SmartVisual();
+        CSE_Visual* visual = xr_new<CSE_SmartVisual>();
         visual->set_visual("actors" DELIMITER "stalker_neutral" DELIMITER "stalker_neutral_1");
         visual->startup_animation = I->animation_id;
 

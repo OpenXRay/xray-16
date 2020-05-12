@@ -162,7 +162,7 @@ CInifile& CSE_Abstract::spawn_ini()
 #pragma warning(disable : 4238)
         // XXX: what a casting mess.. Do we need to use shared_str for m_ini_string?
         IReader reader((void*)(*(m_ini_string)), m_ini_string.size());
-        m_ini_file = new CInifile(&reader, FS.get_path(_game_config_)->m_Path);
+        m_ini_file = xr_new<CInifile>(&reader, FS.get_path(_game_config_)->m_Path);
 #pragma warning(pop)
     }
     return (*m_ini_file);
