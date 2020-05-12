@@ -45,7 +45,7 @@ struct CLoader
         static void load_data(std::enable_if_t<pointer, T&> data, M& stream, const P& p)
         {
             if (!data)
-                data = new typename object_type_traits::remove_pointer<T>::type();
+                data = xr_new<typename object_type_traits::remove_pointer<T>::type>();
             CLoader<M, P>::load_data(*data, stream, p);
         }
     };
