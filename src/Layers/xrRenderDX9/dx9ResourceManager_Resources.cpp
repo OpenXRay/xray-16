@@ -29,7 +29,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
         if (pass->equal(proto))
             return pass;
 
-    SPass* P = v_passes.emplace_back(new SPass());
+    SPass* P = v_passes.emplace_back(xr_new<SPass>());
     P->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     P->state = proto.state;
     P->ps = proto.ps;
@@ -65,7 +65,7 @@ SDeclaration* CResourceManager::_CreateDecl(VertexElement* dcl)
     }
 
     // Create _new
-    SDeclaration* D = v_declarations.emplace_back(new SDeclaration());
+    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
     u32 dcl_size = GetDeclLength(dcl) + 1;
     CHK_DX(HW.pDevice->CreateVertexDeclaration(dcl, &D->dcl));
     D->dcl_code.assign(dcl, dcl + dcl_size);
@@ -123,7 +123,7 @@ SGeometry* CResourceManager::CreateGeom(VertexElement* decl, VertexBufferHandle 
             return v_geom;
     }
 
-    SGeometry* Geom = v_geoms.emplace_back(new SGeometry());
+    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
     Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     Geom->dcl = dcl;
     Geom->vb = vb;
@@ -197,7 +197,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         return I->second;
     else
     {
-        SVS* _vs = new SVS();
+        SVS* _vs = xr_new<SVS>();
         _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         if (0 == xr_stricmp(_name, "null"))
@@ -318,7 +318,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         return I->second;
     else
     {
-        SPS* _ps = new SPS();
+        SPS* _ps = xr_new<SPS>();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
         if (0 == xr_stricmp(name, "null"))
