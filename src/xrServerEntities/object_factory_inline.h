@@ -15,7 +15,7 @@ IC const CObjectFactory& object_factory()
 {
     if (!g_object_factory)
     {
-        g_object_factory = new CObjectFactory();
+        g_object_factory = xr_new<CObjectFactory>();
         g_object_factory->init();
 
         class CResetEventCb : public CEventNotifierCallbackWithCid

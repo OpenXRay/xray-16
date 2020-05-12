@@ -33,7 +33,7 @@ void CObjectFactory::register_script_class(LPCSTR client_class, LPCSTR server_cl
         return;
     }
 
-    add(new CObjectItemScript(
+    add(xr_new<CObjectItemScript>(
 #ifndef NO_XR_GAME
         client,
 #endif
@@ -51,7 +51,7 @@ void CObjectFactory::register_script_class(LPCSTR unknown_class, LPCSTR clsid, L
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Cannot register class %s", unknown_class);
         return;
     }
-    add(new CObjectItemScript(
+    add(xr_new<CObjectItemScript>(
 #ifndef NO_XR_GAME
         creator,
 #endif

@@ -127,7 +127,7 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/)
     VERIFY(!m_pItemDataVector);
     T_INIT::InitXmlIdToIndex();
 
-    m_pItemDataVector = new T_VECTOR();
+    m_pItemDataVector = xr_new<T_VECTOR>();
 
     VERIFY(file_str);
     VERIFY(tag_name);
@@ -139,7 +139,7 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/)
     {
         _GetItem(file_str, it, xml_file);
 
-        CUIXml* uiXml = new CUIXml();
+        CUIXml* uiXml = xr_new<CUIXml>();
         xr_string xml_file_full;
         xml_file_full = xml_file;
         xml_file_full += ".xml";
