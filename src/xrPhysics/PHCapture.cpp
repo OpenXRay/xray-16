@@ -24,12 +24,12 @@ IPHCapture* phcapture_create(CPHCharacter* ch, IPhysicsShellHolder* object, Near
     VERIFY(ch);
     // VERIFY( object );
     // VERIFY( cb );
-    return new CPHCapture(ch, object, cb);
+    return xr_new<CPHCapture>(ch, object, cb);
 }
 IPHCapture* phcapture_create(CPHCharacter* ch, IPhysicsShellHolder* object, u16 element)
 {
     VERIFY(ch);
-    return new CPHCapture(ch, object, element);
+    return xr_new<CPHCapture>(ch, object, element);
 }
 void phcapture_destroy(IPHCapture*& c)
 {

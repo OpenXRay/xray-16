@@ -43,7 +43,7 @@
 #include "xrEngine/xr_input.h"
 
 // fwd. decl.
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 
 //#define DEMO_BUILD
 
@@ -120,14 +120,14 @@ CMainMenu::CMainMenu()
 
     if (!GEnv.isDedicatedServer)
     {
-        g_btnHint = new CUIButtonHint();
-        g_statHint = new CUIButtonHint();
-        m_pGameSpyFull = new CGameSpy_Full();
+        g_btnHint = xr_new<CUIButtonHint>();
+        g_statHint = xr_new<CUIButtonHint>();
+        m_pGameSpyFull = xr_new<CGameSpy_Full>();
 
 #ifdef XR_PLATFORM_WINDOWS
         for (cpcstr name : ErrMsgBoxTemplate)
         {
-            CUIMessageBoxEx* msgBox = m_pMB_ErrDlgs.emplace_back(new CUIMessageBoxEx());
+            CUIMessageBoxEx* msgBox = m_pMB_ErrDlgs.emplace_back(xr_new<CUIMessageBoxEx>());
             if (!msgBox->InitMessageBox(name))
             {
                 m_pMB_ErrDlgs.pop_back();
@@ -151,12 +151,12 @@ CMainMenu::CMainMenu()
 
 #endif
 
-        m_account_mngr = new gamespy_gp::account_manager(m_pGameSpyFull->GetGameSpyGP());
-        m_login_mngr = new gamespy_gp::login_manager(m_pGameSpyFull);
-        m_profile_store = new gamespy_profile::profile_store(m_pGameSpyFull);
+        m_account_mngr = xr_new<gamespy_gp::account_manager>(m_pGameSpyFull->GetGameSpyGP());
+        m_login_mngr = xr_new<gamespy_gp::login_manager>(m_pGameSpyFull);
+        m_profile_store = xr_new<gamespy_profile::profile_store>(m_pGameSpyFull);
 #ifdef XR_PLATFORM_WINDOWS
-        m_stats_submitter = new gamespy_profile::stats_submitter(m_pGameSpyFull);
-        m_atlas_submit_queue = new atlas_submit_queue(m_stats_submitter);
+        m_stats_submitter = xr_new<gamespy_profile::stats_submitter>(m_pGameSpyFull);
+        m_atlas_submit_queue = xr_new<atlas_submit_queue>(m_stats_submitter);
 #endif
     }
 
@@ -653,7 +653,7 @@ void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
     }
     if (!m_pMB_ErrDlgs[NewPatchFound])
     {
-        m_pMB_ErrDlgs[NewPatchFound] = new CUIMessageBoxEx();
+        m_pMB_ErrDlgs[NewPatchFound] = xr_new<CUIMessageBoxEx>();
         m_pMB_ErrDlgs[NewPatchFound]->InitMessageBox("msg_box_new_patch");
 
         shared_str tmpText;
@@ -961,7 +961,7 @@ demo_info const* CMainMenu::GetDemoInfo(LPCSTR file_name)
 {
     if (!m_demo_info_loader)
     {
-        m_demo_info_loader = new demo_info_loader();
+        m_demo_info_loader = xr_new<demo_info_loader>();
     }
     return m_demo_info_loader->get_demofile_info(file_name);
 }

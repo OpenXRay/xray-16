@@ -84,12 +84,12 @@ void CArtefact::Load(LPCSTR section)
     m_additional_weight = pSettings->read_if_exists<float>(section, "additional_inventory_weight", 0.0f);
 }
 
-BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
+bool CArtefact::net_Spawn(CSE_Abstract* DC)
 {
     if (pSettings->read_if_exists<bool>(cNameSect(), "can_be_controlled", false))
-        m_detectorObj = new SArtefactDetectorsSupport(this);
+        m_detectorObj = xr_new<SArtefactDetectorsSupport>(this);
 
-    BOOL result = inherited::net_Spawn(DC);
+    bool result = inherited::net_Spawn(DC);
     SwitchAfParticles(true);
 
     StartLights();
@@ -493,7 +493,7 @@ void CArtefact::CreateArtefactActivation()
     {
         return;
     }
-    m_activationObj = new SArtefactActivation(this, H_Parent()->ID());
+    m_activationObj = xr_new<SArtefactActivation>(this, H_Parent()->ID());
 }
 
 SArtefactDetectorsSupport::SArtefactDetectorsSupport(CArtefact* A)

@@ -21,7 +21,7 @@ void game_sv_Single::Create(shared_str& options)
 {
     inherited::Create(options);
     if (strstr(*options, "/alife"))
-        m_alife_simulator = new CALifeSimulator(&server(), &options);
+        m_alife_simulator = xr_new<CALifeSimulator>(&server(), &options);
     switch_Phase(GAME_PHASE_INPROGRESS);
 }
 
@@ -332,7 +332,7 @@ void game_sv_Single::restart_simulator(LPCSTR saved_game_name)
     xr_strcpy(g_pGamePersistent->m_game_params.m_new_or_load, "load");
 
     pApp->LoadBegin();
-    m_alife_simulator = new CALifeSimulator(&server(), &options);
+    m_alife_simulator = xr_new<CALifeSimulator>(&server(), &options);
     g_pGamePersistent->SetLoadStageTitle("st_client_synchronising");
     g_pGamePersistent->LoadTitle();
     Device.PreCache(60, true, true);

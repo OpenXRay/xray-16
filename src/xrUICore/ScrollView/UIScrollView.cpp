@@ -51,7 +51,7 @@ void CUIScrollView::InitScrollView()
 {
     if (!m_pad)
     {
-        m_pad = new CUIWindow();
+        m_pad = xr_new<CUIWindow>();
         m_pad->SetAutoDelete(true);
         AttachChild(m_pad);
     }
@@ -70,7 +70,7 @@ void CUIScrollView::InitScrollView()
 
     if (!m_VScrollBar)
     {
-        m_VScrollBar = new CUIScrollBar();
+        m_VScrollBar = xr_new<CUIScrollBar>();
         m_VScrollBar->SetAutoDelete(true);
         AttachChild(m_VScrollBar);
         Register(m_VScrollBar);

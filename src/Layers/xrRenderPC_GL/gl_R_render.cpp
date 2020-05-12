@@ -291,7 +291,7 @@ void CRender::Render()
     // Sync point
     BasicStats.WaitS.Begin();
 
-    if (true)
+    if (false) // !!! Sync rendering drop performance !!!
     {
         CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
         CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500 * 1000 * 1000));
@@ -320,6 +320,9 @@ void CRender::Render()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE)) split_the_scene_to_minimize_wait = TRUE;
 
     //******* Main render :: PART-0	-- first
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     if (!split_the_scene_to_minimize_wait)
     {
         PIX_EVENT(DEFER_PART0_NO_SPLIT);
@@ -339,6 +342,9 @@ void CRender::Render()
         r_dsgraph_render_graph(0);
         Target->disable_aniso();
     }
+
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     //******* Occlusion testing of volume-limited light-sources
     Target->phase_occq();

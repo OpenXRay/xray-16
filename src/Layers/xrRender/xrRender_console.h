@@ -55,6 +55,14 @@ extern ECORE_API float ps_r__ssaHZBvsTEX;
 extern ECORE_API int ps_r__tf_Anisotropic;
 extern ECORE_API float ps_r__tf_Mipbias;
 
+enum
+{
+    RFLAG_NO_RAM_TEXTURES = (1 << 0),
+    RFLAG_ACTOR_SHADOW = (1 << 1),
+};
+
+extern ECORE_API Flags32 ps_r__common_flags;
+
 // R1
 extern ECORE_API float ps_r1_ssaLOD_A;
 extern ECORE_API float ps_r1_ssaLOD_B;

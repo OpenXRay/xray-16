@@ -13,7 +13,7 @@ using XRay::Editor::color;
 
 property_color::property_color(
     color_getter_type const& getter, color_setter_type const& setter, array<System::Attribute ^> ^ attributes)
-    : m_getter(new color_getter_type(getter)), m_setter(new color_setter_type(setter)), inherited(getter(), attributes)
+    : m_getter(xr_new<color_getter_type>(getter)), m_setter(xr_new<color_setter_type>(setter)), inherited(getter(), attributes)
 {
 }
 

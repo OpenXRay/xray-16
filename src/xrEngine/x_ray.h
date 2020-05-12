@@ -33,7 +33,7 @@ private:
     EVENT eConsole;
     EVENT eStartMPDemo;
 
-    void Level_Append(LPCSTR lname);
+    void Level_Append(pcstr lname);
 
 public:
     CGameFont* pFontSystem;
@@ -43,15 +43,15 @@ public:
     xr_vector<sLevelInfo> Levels;
     u32 Level_Current;
     void Level_Scan();
-    int Level_ID(LPCSTR name, LPCSTR ver, bool bSet);
+    int Level_ID(pcstr name, pcstr ver, bool bSet);
     void Level_Set(u32 ID);
     void LoadAllArchives();
-    static CInifile* GetArchiveHeader(LPCSTR name, LPCSTR ver);
+    static CInifile* GetArchiveHeader(pcstr name, pcstr ver);
 
     // Loading
     void LoadBegin();
     void LoadEnd();
-    void LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3);
+    void LoadTitleInt(pcstr str1, pcstr str2, pcstr str3);
     void LoadStage();
     void LoadSwitch();
     void LoadDraw();

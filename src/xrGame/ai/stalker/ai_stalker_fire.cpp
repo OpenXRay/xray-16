@@ -287,7 +287,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
                 !fis_zero(HDS.damage()) && brain().affect_cover())
             {
                 agent_manager().location().add(
-                    new CDangerCoverLocation(cover, Device.dwTimeGlobal, DANGER_INTERVAL, DANGER_DISTANCE));
+                    xr_new<CDangerCoverLocation>(cover, Device.dwTimeGlobal, DANGER_INTERVAL, DANGER_DISTANCE));
             }
         }
 
@@ -602,7 +602,7 @@ public:
     }
 };
 
-IC BOOL ray_query_callback(collide::rq_result& result, LPVOID params)
+IC bool ray_query_callback(collide::rq_result& result, LPVOID params)
 {
     ray_query_param* param = (ray_query_param*)params;
     float power = param->m_holder->feel_vision_mtl_transp(result.O, result.element);

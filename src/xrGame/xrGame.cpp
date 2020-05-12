@@ -45,9 +45,9 @@ static void load(int argc, char** argv, char** envp)
     // keyboard binding
     CCC_RegisterInput();
 #ifdef DEBUG
-    g_profiler = new CProfiler();
+    g_profiler = xr_new<CProfiler>();
 #endif
-    gStringTable = new CStringTable();
+    gStringTable = xr_new<CStringTable>();
     StringTable().Init();
 }
 

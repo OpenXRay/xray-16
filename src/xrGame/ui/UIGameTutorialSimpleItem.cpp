@@ -15,7 +15,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 
 CUISequenceSimpleItem::~CUISequenceSimpleItem()
 {
@@ -100,7 +100,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     }
 
     // ui-components
-    m_UIWindow = new CUIWindow();
+    m_UIWindow = xr_new<CUIWindow>();
     m_UIWindow->SetAutoDelete(false);
     XML_NODE _lsr = xml->GetLocalRoot();
 

@@ -34,7 +34,7 @@ void create_force_progress()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "grenade.xml");
 
-    g_MissileForceShape = new CUIProgressShape();
+    g_MissileForceShape = xr_new<CUIProgressShape>();
     CUIXmlInit::InitProgressShape(uiXml, "progress", 0, g_MissileForceShape);
 }
 
@@ -69,7 +69,7 @@ void CMissile::Load(LPCSTR section)
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
 }
 
-BOOL CMissile::net_Spawn(CSE_Abstract* DC)
+bool CMissile::net_Spawn(CSE_Abstract* DC)
 {
     BOOL l_res = inherited::net_Spawn(DC);
 

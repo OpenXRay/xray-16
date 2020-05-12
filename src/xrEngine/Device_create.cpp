@@ -12,7 +12,7 @@
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;
 
-extern XRCDB_API BOOL* cdb_bDebug;
+extern XRCDB_API bool* cdb_bDebug;
 
 void CRenderDevice::_SetupStates()
 {
@@ -33,7 +33,7 @@ void CRenderDevice::Create()
         return; // prevent double call
 
     // Start all threads
-    mt_bMustExit = FALSE;
+    mt_bMustExit = false;
 
     Threading::SetThreadName(NULL, "X-Ray Primary thread");
     Threading::SpawnThread(SecondaryThreadProc, "X-Ray Secondary thread", 0, this);
@@ -47,7 +47,7 @@ void CRenderDevice::CreateInternal()
     if (b_is_Ready)
         return; // prevent double call
 
-    Statistic = new CStats();
+    Statistic = xr_new<CStats>();
     bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
     bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
     bool gpuRef = !!strstr(Core.Params, "-gpu_ref");
@@ -67,7 +67,7 @@ void CRenderDevice::CreateInternal()
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     Memory.mem_compact();
-    b_is_Ready = TRUE;
+    b_is_Ready = true;
 
     _SetupStates();
     string_path fname;

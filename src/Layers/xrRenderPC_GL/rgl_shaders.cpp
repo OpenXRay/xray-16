@@ -262,8 +262,8 @@ private:
     }
 };
 
-HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
-    LPCSTR pTarget, DWORD Flags, void*& result)
+HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
+    pcstr pTarget, u32 Flags, void*& result)
 {
     shader_options_holder options;
     shader_name_holder sh_name;
@@ -536,7 +536,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     if (HW.ShaderBinarySupported)
     {
         string_path file;
-        strconcat(sizeof(file), file, "shaders_cache" DELIMITER, filename);
+        strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename);
         FS.update_path(full_path, "$app_data_root$", file);
 
         string_path shadersFolder;

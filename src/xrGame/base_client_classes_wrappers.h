@@ -86,7 +86,7 @@ public:
     static void net_Import_static(CGameObject* self, NET_Packet* packet) { self->CGameObject::net_Import(*packet); }
     virtual void net_Export(NET_Packet& packet) { call<void>("net_Export", &packet); }
     static void net_Export_static(CGameObject* self, NET_Packet* packet) { self->CGameObject::net_Export(*packet); }
-    virtual BOOL net_Spawn(CSE_Abstract* data) { return (luabind::call_member<bool>(this, "net_Spawn", data)); }
+    virtual bool net_Spawn(CSE_Abstract* data) { return (luabind::call_member<bool>(this, "net_Spawn", data)); }
     static bool net_Spawn_static(CGameObject* self, CSE_Abstract* abstract)
     {
         return (!!self->CGameObject::net_Spawn(abstract));

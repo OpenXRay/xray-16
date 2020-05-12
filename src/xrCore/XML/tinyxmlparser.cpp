@@ -825,21 +825,21 @@ TiXmlNode* TiXmlNode::Identify(const char* p, TiXmlEncoding encoding)
 #ifdef DEBUG_PARSER
         TIXML_LOG("XML parsing Declaration\n");
 #endif
-        returnNode = new TiXmlDeclaration();
+        returnNode = xr_new<TiXmlDeclaration>();
     }
     else if (StringEqual(p, commentHeader, false, encoding))
     {
 #ifdef DEBUG_PARSER
         TIXML_LOG("XML parsing Comment\n");
 #endif
-        returnNode = new TiXmlComment();
+        returnNode = xr_new<TiXmlComment>();
     }
     else if (StringEqual(p, cdataHeader, false, encoding))
     {
 #ifdef DEBUG_PARSER
         TIXML_LOG("XML parsing CDATA\n");
 #endif
-        TiXmlText* text = new TiXmlText("");
+        TiXmlText* text = xr_new<TiXmlText>("");
         text->SetCDATA(true);
         returnNode = text;
     }
@@ -848,21 +848,21 @@ TiXmlNode* TiXmlNode::Identify(const char* p, TiXmlEncoding encoding)
 #ifdef DEBUG_PARSER
         TIXML_LOG("XML parsing Unknown(1)\n");
 #endif
-        returnNode = new TiXmlUnknown();
+        returnNode = xr_new<TiXmlUnknown>();
     }
     else if (IsAlpha(*(p + 1), encoding) || *(p + 1) == '_')
     {
 #ifdef DEBUG_PARSER
         TIXML_LOG("XML parsing Element\n");
 #endif
-        returnNode = new TiXmlElement("");
+        returnNode = xr_new<TiXmlElement>("");
     }
     else
     {
 #ifdef DEBUG_PARSER
         TIXML_LOG("XML parsing Unknown(2)\n");
 #endif
-        returnNode = new TiXmlUnknown();
+        returnNode = xr_new<TiXmlUnknown>();
     }
 
     if (returnNode)
@@ -1117,7 +1117,7 @@ const char* TiXmlElement::Parse(TiXmlDocument* document, const char* p, TiXmlPar
         else
         {
             // Try to read an attribute:
-            TiXmlAttribute* attrib = new TiXmlAttribute();
+            TiXmlAttribute* attrib = xr_new<TiXmlAttribute>();
             if (!attrib)
             {
                 if (document)
@@ -1168,7 +1168,7 @@ const char* TiXmlElement::ReadValue(const char* p, TiXmlParsingData* data, TiXml
         if (*p != '<')
         {
             // Take what we have, make a text element.
-            TiXmlText* textNode = new TiXmlText("");
+            TiXmlText* textNode = xr_new<TiXmlText>("");
 
             if (!textNode)
             {

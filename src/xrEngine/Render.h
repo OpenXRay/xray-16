@@ -57,7 +57,7 @@ public:
     virtual void set_cone(float angle) = 0;
     virtual void set_range(float R) = 0;
     virtual void set_virtual_size(float R) = 0;
-    virtual void set_texture(LPCSTR name) = 0;
+    virtual void set_texture(pcstr name) = 0;
     virtual void set_color(const Fcolor& C) = 0;
     virtual void set_color(float r, float g, float b) = 0;
     virtual void set_hud_mode(bool b) = 0;
@@ -80,7 +80,7 @@ public:
     virtual void set_position(const Fvector& P) = 0;
     virtual void set_direction(const Fvector& P) = 0;
     virtual void set_radius(float R) = 0;
-    virtual void set_texture(LPCSTR name) = 0;
+    virtual void set_texture(pcstr name) = 0;
     virtual void set_color(const Fcolor& C) = 0;
     virtual void set_color(float r, float g, float b) = 0;
     virtual ~IRender_Glow();
@@ -280,7 +280,7 @@ public:
     virtual GenerationLevel get_generation() = 0;
 
     virtual bool is_sun_static() = 0;
-    virtual DWORD get_dx_level() = 0;
+    virtual u32 get_dx_level() = 0;
 
     // Loading / Unloading
     virtual void create() = 0;
@@ -294,15 +294,15 @@ public:
     virtual void level_Load(IReader* fs) = 0;
     virtual void level_Unload() = 0;
 
-    // virtual IDirect3DBaseTexture9* texture_load (LPCSTR fname, u32& msize) = 0;
+    // virtual IDirect3DBaseTexture9* texture_load (pcstr fname, u32& msize) = 0;
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
-    virtual HRESULT shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags,
+    virtual HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags,
         void*& result) = 0;
 
     // Information
     virtual void DumpStatistics(IGameFont& font, IPerformanceAlert* alert) = 0;
 
-    virtual LPCSTR getShaderPath() = 0;
+    virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
     virtual IRender_Sector* getSector(int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
@@ -339,24 +339,24 @@ public:
     virtual void glow_destroy(IRender_Glow* p_){};
 
     // Models
-    virtual IRenderVisual* model_CreateParticles(LPCSTR name) = 0;
+    virtual IRenderVisual* model_CreateParticles(pcstr name) = 0;
     // virtual IRender_DetailModel* model_CreateDM (IReader* F) = 0;
     // virtual IRenderDetailModel* model_CreateDM (IReader* F) = 0;
-    // virtual IRenderVisual* model_Create (LPCSTR name, IReader* data=0) = 0;
-    virtual IRenderVisual* model_Create(LPCSTR name, IReader* data = 0) = 0;
-    virtual IRenderVisual* model_CreateChild(LPCSTR name, IReader* data) = 0;
+    // virtual IRenderVisual* model_Create (pcstr name, IReader* data=0) = 0;
+    virtual IRenderVisual* model_Create(pcstr name, IReader* data = 0) = 0;
+    virtual IRenderVisual* model_CreateChild(pcstr name, IReader* data) = 0;
     virtual IRenderVisual* model_Duplicate(IRenderVisual* V) = 0;
-    // virtual void model_Delete (IRenderVisual* & V, BOOL bDiscard=FALSE) = 0;
-    virtual void model_Delete(IRenderVisual*& V, BOOL bDiscard = FALSE) = 0;
+    // virtual void model_Delete (IRenderVisual* & V, bool bDiscard=false) = 0;
+    virtual void model_Delete(IRenderVisual*& V, bool bDiscard = false) = 0;
     // virtual void model_Delete (IRender_DetailModel* & F) = 0;
-    virtual void model_Logging(BOOL bEnable) = 0;
+    virtual void model_Logging(bool bEnable) = 0;
     virtual void models_Prefetch() = 0;
-    virtual void models_Clear(BOOL b_complete) = 0;
+    virtual void models_Clear(bool b_complete) = 0;
 
     // Occlusion culling
-    virtual BOOL occ_visible(vis_data& V) = 0;
-    virtual BOOL occ_visible(Fbox& B) = 0;
-    virtual BOOL occ_visible(sPoly& P) = 0;
+    virtual bool occ_visible(vis_data& V) = 0;
+    virtual bool occ_visible(Fbox& B) = 0;
+    virtual bool occ_visible(sPoly& P) = 0;
 
     // Main
     virtual void Calculate() = 0;
@@ -365,7 +365,7 @@ public:
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
-    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0) = 0;
+    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = 0) = 0;
     virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) = 0;
     virtual void ScreenshotAsyncBegin() = 0;
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
@@ -380,7 +380,7 @@ public:
     virtual ~IRender() {}
 
 protected:
-    virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) = 0;
+    virtual void ScreenshotImpl(ScreenshotMode mode, pcstr name, CMemoryWriter* memory_writer) = 0;
 
 public:
     //	Gamma correction functions
@@ -396,7 +396,7 @@ public:
 
     //	Init
     virtual void SetupStates() = 0;
-    virtual void OnDeviceCreate(LPCSTR shName) = 0;
+    virtual void OnDeviceCreate(pcstr shName) = 0;
     virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
     virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) = 0;
 
@@ -407,6 +407,7 @@ public:
     //	Resources control
     virtual void DeferredLoad(bool E) = 0;
     virtual void ResourcesDeferredUpload() = 0;
+    virtual void ResourcesDeferredUnload() = 0;
     virtual void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) = 0;
     virtual void ResourcesDestroyNecessaryTextures() = 0;
     virtual void ResourcesStoreNecessaryTextures() = 0;

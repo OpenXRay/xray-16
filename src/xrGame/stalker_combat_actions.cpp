@@ -138,9 +138,9 @@ void CStalkerActionMakeItemKilling::initialize()
 
     object().sight().clear();
     object().sight().add_action(eSightActionTypeWatchItem,
-        new CSightControlAction(1.f, 3000, CSightAction(SightManager::eSightTypePathDirection)));
+        xr_new<CSightControlAction>(1.f, 3000, CSightAction(SightManager::eSightTypePathDirection)));
     object().sight().add_action(eSightActionTypeWatchEnemy,
-        new CSightControlAction(1.f, 3000,
+        xr_new<CSightControlAction>(1.f, 3000,
             CSightAction(SightManager::eSightTypePosition, object().memory().enemy().selected()->Position(), false)));
 
     object().movement().set_mental_state(eMentalStateDanger);
@@ -811,7 +811,7 @@ void CStalkerActionDetourEnemy::initialize()
 #ifdef DISABLE_COVER_BEFORE_DETOUR
     if (/**(Random.randF(1.f) < .8f) && **/ object().agent_manager().member().member(m_object).cover())
         object().agent_manager().location().add(
-            new CDangerCoverLocation(object().agent_manager().member().member(m_object).cover(), Device.dwTimeGlobal,
+            xr_new<CDangerCoverLocation>(object().agent_manager().member().member(m_object).cover(), Device.dwTimeGlobal,
                 TEMP_DANGER_INTERVAL, TEMP_DANGER_DISTANCE, object().agent_manager().member().mask(&object())));
 #endif
 

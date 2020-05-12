@@ -10,7 +10,7 @@ bool CRenderDevice::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     {
         if (editor())
         {
-            Device.b_is_Active = TRUE;
+            Device.b_is_Active = true;
             break;
         }
 

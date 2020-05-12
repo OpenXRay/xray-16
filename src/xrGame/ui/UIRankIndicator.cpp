@@ -17,11 +17,11 @@ void CUIRankIndicator::InitFromXml(CUIXml& xml_doc)
     for (u8 i = 0; i < max_rank; ++i)
     {
         CUIStatic*& s = m_ranks[i];
-        s = new CUIStatic();
+        s = xr_new<CUIStatic>();
         xr_sprintf(str, "rank_wnd:rank_%d", i);
         CUIXmlInit::InitStatic(xml_doc, str, 0, s);
     }
-    CUIStatic* back = new CUIStatic();
+    CUIStatic* back = xr_new<CUIStatic>();
     back->SetAutoDelete(true);
     CUIXmlInit::InitStatic(xml_doc, "rank_wnd:background", 0, back);
     AttachChild(back);

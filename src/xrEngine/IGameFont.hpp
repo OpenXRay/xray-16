@@ -45,7 +45,7 @@ public:
     virtual void MasterOut(bool bCheckDevice, bool bUseCoords, bool bScaleCoords, bool bUseSkip, float _x, float _y,
         float _skip, pcstr fmt, va_list p) = 0;
     virtual u32 smart_strlen(pcstr S) = 0;
-    virtual BOOL IsMultibyte() const = 0;
+    virtual bool IsMultibyte() const = 0;
     virtual u16 SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, pcstr pszText) = 0;
     virtual u16 GetCutLengthPos(float fTargetWidth, pcstr pszText) = 0;
     virtual void OutI(float _x, float _y, pcstr fmt, ...) = 0;

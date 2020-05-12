@@ -1,8 +1,6 @@
 #include "pch.hpp"
 #include "UIStaticItem.h"
 
-XRUICORE_API void CreateUIGeom() { GEnv.UIRender->CreateUIGeom(); }
-XRUICORE_API void DestroyUIGeom() { GEnv.UIRender->DestroyUIGeom(); }
 CUIStaticItem::CUIStaticItem()
 {
     uFlags.zero();

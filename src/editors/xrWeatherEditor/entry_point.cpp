@@ -66,7 +66,7 @@ ide_impl* g_ide = nullptr;
 static void initialize_impl(ide_base*& ide)
 {
     VERIFY(!g_ide);
-    g_ide = new ide_impl(&g_engine);
+    g_ide = xr_new<ide_impl>(&g_engine);
     ide = g_ide;
     g_ide->window(gcnew window_ide_final(ide, &g_engine));
 }

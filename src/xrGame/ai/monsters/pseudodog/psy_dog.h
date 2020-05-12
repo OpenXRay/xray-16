@@ -32,7 +32,7 @@ public:
     virtual ~CPsyDog();
 
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* dc);
+    virtual bool net_Spawn(CSE_Abstract* dc);
     virtual void reinit();
     virtual void reload(LPCSTR section);
     virtual void net_Destroy();
@@ -86,7 +86,7 @@ class CPsyDogPhantom : public CAI_PseudoDog
 public:
     CPsyDogPhantom();
     virtual ~CPsyDogPhantom();
-    virtual BOOL net_Spawn(CSE_Abstract* dc);
+    virtual bool net_Spawn(CSE_Abstract* dc);
     virtual void Think();
     virtual void Hit(SHit* pHDS);
 

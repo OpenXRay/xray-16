@@ -26,7 +26,7 @@ IC CTradeParameters& CTradeParameters::instance()
     if (m_instance)
         return (*m_instance);
 
-    m_instance = new CTradeParameters();
+    m_instance = xr_new<CTradeParameters>();
     return (*m_instance);
 }
 

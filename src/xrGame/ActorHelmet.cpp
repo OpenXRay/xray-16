@@ -13,7 +13,7 @@ CHelmet::CHelmet()
     for (int i = 0; i < ALife::eHitTypeMax; i++)
         m_HitTypeProtection[i] = 1.0f;
 
-    m_boneProtection = new SBoneProtections();
+    m_boneProtection = xr_new<SBoneProtections>();
 }
 
 CHelmet::~CHelmet() { xr_delete(m_boneProtection); }
@@ -65,7 +65,7 @@ void CHelmet::ReloadBonesProtection()
         m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
 }
 
-BOOL CHelmet::net_Spawn(CSE_Abstract* DC)
+bool CHelmet::net_Spawn(CSE_Abstract* DC)
 {
     if (IsGameTypeSingle())
         ReloadBonesProtection();

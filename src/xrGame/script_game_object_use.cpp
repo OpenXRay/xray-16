@@ -174,8 +174,8 @@ void CScriptGameObject::SetCallback(
 void CScriptGameObject::SetCallback(GameObject::ECallbackType type) { object().callback(type).clear(); }
 void CScriptGameObject::set_fastcall(const luabind::functor<bool>& functor, const luabind::object& object)
 {
-    CPHScriptGameObjectCondition* c = new CPHScriptGameObjectCondition(object, functor, m_game_object);
-    CPHDummiAction* a = new CPHDummiAction();
+    CPHScriptGameObjectCondition* c = xr_new<CPHScriptGameObjectCondition>(object, functor, m_game_object);
+    CPHDummiAction* a = xr_new<CPHDummiAction>();
     CPHSriptReqGObjComparer cmpr(m_game_object);
     Level().ph_commander_scripts().RemoveCallsDeferred(&cmpr);
     Level().ph_commander_scripts().AddCallDeferred(c, a);
@@ -202,8 +202,8 @@ void CScriptGameObject::set_const_force(const Fvector& dir, float value, u32 tim
     Fvector force;
     force.set(dir);
     force.mul(value);
-    CPHConstForceAction* a = new CPHConstForceAction(shell, force);
-    CPHExpireOnStepCondition* cn = new CPHExpireOnStepCondition();
+    CPHConstForceAction* a = xr_new<CPHConstForceAction>(shell, force);
+    CPHExpireOnStepCondition* cn = xr_new<CPHExpireOnStepCondition>();
     cn->set_time_interval(time_interval);
     // ph_world->AddCall(cn,a);
     Level().ph_commander_physics_worldstep().add_call_threadsafety(cn, a);

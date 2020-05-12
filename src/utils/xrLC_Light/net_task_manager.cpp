@@ -28,7 +28,7 @@ void DumpDiff()
 net_task_manager* g_net_task_manager = 0;
 
 net_task_manager* get_net_task_manager() { return g_net_task_manager; }
-void create_net_task_manager() { g_net_task_manager = new net_task_manager(); }
+void create_net_task_manager() { g_net_task_manager = xr_new<net_task_manager>(); }
 void destroy_net_task_manager() { xr_delete(g_net_task_manager); }
 net_task_manager::net_task_manager() : thProgress(0) {}
 void __cdecl Finalize(IGenericStream* outStream)
@@ -109,7 +109,7 @@ void net_task_manager::create_global_data_write(LPCSTR save_path)
     // gl_data_write->w_close();
     string_path lfile_name;
     FS.update_path(lfile_name, "$level$", "tmp_global_data");
-    g_net_data = new CVirtualFileRW(lfile_name);
+    g_net_data = xr_new<CVirtualFileRW>(lfile_name);
 #endif
 
 // send_receive_data_lock.Leave();
@@ -127,7 +127,7 @@ void __cdecl GetDataCallback(const char* dataDesc, IGenericStream** stream)
     time.Start();
     // R_ASSERT(gl_data_write);
 
-    *stream = new CGenStreamOnFile(g_net_data); // CreateGenericStream();
+    *stream = xr_new<CGenStreamOnFile>(g_net_data); // CreateGenericStream();
     //*stream = gl_data_write->net_stream();
 
     // gl_data_write->send_not_clear(*stream);
@@ -239,7 +239,7 @@ void net_task_manager::receive(INetReader& r)
     VERIFY(inlc_global_data());
 // inlc_global_data()->create_read_faces();
 #ifdef NET_CMP
-    CDeflector* netD = new CDeflector();
+    CDeflector* netD = xr_new<CDeflector>();
     CDeflector* D = inlc_global_data()->g_deflectors()[id];
     netD->read(r);
     if (!netD->similar(*D))

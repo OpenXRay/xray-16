@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "xrEngine/IRenderable.h"
+#include "xrEngine/xr_object.h"
 #include "xrEngine/CustomHUD.h"
 
 #include "FBasicVisual.h"
@@ -593,6 +594,33 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
                 renderable->renderable_Render(renderable);
             }
         }
+#if RENDER != R_R1
+        // Actor Shadow (Sun + Light)
+        if (g_pGameLevel && phase == RImplementation.PHASE_SMAP
+            && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
+        {
+            do
+            {
+                IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
+                if (viewEntity == nullptr)
+                    break;
+                viewEntity->spatial_updatesector();
+                CSector* sector = (CSector*)viewEntity->GetSpatialData().sector;
+                if (nullptr == sector)
+                    break; // disassociated from S/P structure
+                if (PortalTraverser.i_marker != sector->r_marker)
+                    break; // inactive (untouched) sector
+                for (const CFrustum& view : sector->r_frustums)
+                {
+                    if (!view.testSphere_dirty(viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
+                        continue;
+
+                    // renderable
+                    g_hud->Render_First();
+                }
+            } while (0);
+        }
+#endif
     }
 
     // Restore

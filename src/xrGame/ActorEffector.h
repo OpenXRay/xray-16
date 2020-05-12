@@ -66,9 +66,9 @@ public:
     CAnimatorCamEffector();
     virtual ~CAnimatorCamEffector();
     void Start(LPCSTR fn);
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
     void SetCyclic(bool b) { m_bCyclic = b; }
-    virtual BOOL Valid();
+    virtual bool Valid();
     float GetAnimatorLength() { return fLifeTime; };
     virtual bool AbsolutePositioning() { return m_bAbsolutePositioning; }
 };
@@ -82,8 +82,8 @@ protected:
 
 public:
     CAnimatorCamEffectorScriptCB(LPCSTR _cb) { cb_name = _cb; };
-    virtual BOOL Valid();
-    virtual BOOL AllowProcessingIfInvalid() { return m_bAbsolutePositioning; }
+    virtual bool Valid();
+    virtual bool AllowProcessingIfInvalid() { return m_bAbsolutePositioning; }
     virtual void ProcessIfInvalid(SCamEffectorInfo& info);
 };
 
@@ -95,7 +95,7 @@ protected:
 
 public:
     void SetFactorFunc(GET_KOEFF_FUNC f) { m_func = f; }
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
 };
 
 class CAnimatorCamLerpEffectorConst : public CAnimatorCamLerpEffector
@@ -120,7 +120,7 @@ class CCameraEffectorControlled : public CAnimatorCamLerpEffector
 public:
     CCameraEffectorControlled(CEffectorController* c);
     virtual ~CCameraEffectorControlled();
-    virtual BOOL Valid();
+    virtual bool Valid();
 };
 
 class SndShockEffector : public CEffectorController
@@ -167,6 +167,6 @@ private:
 public:
     CControllerPsyHitCamEffector(ECamEffectorType type, const Fvector& src_pos, const Fvector& target_pos, float time,
         float base_fov, float dest_fov);
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
 };
 //////////////////////////////////////////////////////////////////////////

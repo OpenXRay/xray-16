@@ -9,7 +9,7 @@ void CFlare::Load(LPCSTR section)
     m_work_time_sec = pSettings->r_float(section, "work_time_sec");
 }
 
-BOOL CFlare::net_Spawn(CSE_Abstract* DC)
+bool CFlare::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     SwitchState(eFlareHidden);

@@ -424,7 +424,7 @@ void MxEdgeQSlim::compute_edge_info(MxQSlimEdge* info)
 
 void MxEdgeQSlim::create_edge(MxVertexID i, MxVertexID j)
 {
-    MxQSlimEdge* info = new MxQSlimEdge();
+    MxQSlimEdge* info = xr_new<MxQSlimEdge>();
 
     edge_links(i).add(info);
     edge_links(j).add(info);

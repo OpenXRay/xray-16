@@ -31,7 +31,7 @@ void property_collection<manager::container_type, manager>::display_name(
 template <>
 XRay::Editor::property_holder_base* property_collection<manager::container_type, manager>::create()
 {
-    sun* object = new sun(m_holder, generate_unique_id("sun_unique_id_").c_str());
+    sun* object = xr_new<sun>(m_holder, generate_unique_id("sun_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
@@ -39,7 +39,7 @@ XRay::Editor::property_holder_base* property_collection<manager::container_type,
 manager::manager(::editor::environment::manager* environment)
     : m_environment(*environment), m_collection(0), m_changed(true)
 {
-    m_collection = new collection_type(&m_suns, this, &m_changed);
+    m_collection = xr_new<collection_type>(&m_suns, this, &m_changed);
 }
 
 manager::~manager()
@@ -53,7 +53,7 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), true, true, false);
+    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
@@ -68,7 +68,7 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), false, false, true);
+    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), false, false, true);
 
     for (const auto &i : m_suns)
         i->save(*config);
@@ -88,7 +88,7 @@ void manager::add(CInifile& config, shared_str const& section)
 
     VERIFY(std::find_if(m_suns.begin(), m_suns.end(), predicate(section)) == m_suns.end());
 
-    sun* object = new sun(*this, section);
+    sun* object = xr_new<sun>(*this, section);
     object->load(config);
     object->fill(m_collection);
     m_suns.push_back(object);

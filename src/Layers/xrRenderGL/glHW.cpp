@@ -110,6 +110,9 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
 
+    Caps.fTarget = D3DFMT_A8R8G8B8;
+    Caps.fDepth = D3DFMT_D24S8;
+
     //	Create render target and depth-stencil views here
     UpdateViews();
 }
@@ -230,7 +233,17 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 
 void CHW::Present()
 {
+#if 0 // kept for historical reasons
     RImplementation.Target->phase_flip();
+#else
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, pFB);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(
+        0, 0, Device.dwWidth, Device.dwHeight,
+        0, 0, Device.dwWidth, Device.dwHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+#endif
+
     SDL_GL_SwapWindow(m_window);
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }

@@ -18,7 +18,7 @@
 //////////////////////////////////////////////////////////////////////
 
 CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
-    : CEffectorCam(cefDemo, life_time /*,FALSE*/)
+    : CEffectorCam(cefDemo, life_time /*,false*/)
 {
     Msg("*** Playing demo: %s", name);
     Console->Execute("hud_weapon 0");
@@ -33,15 +33,15 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
     m_MParam = 0;
     string_path nm, fn;
     xr_strcpy(nm, sizeof(nm), name);
-    LPSTR extp = strext(nm);
+    pstr extp = strext(nm);
     if (extp)
         xr_strcpy(nm, sizeof(nm) - (extp - nm), ".anm");
 
     if (FS.exist(fn, "$level$", nm) || FS.exist(fn, "$game_anims$", nm))
     {
-        m_pMotion = new COMotion();
+        m_pMotion = xr_new<COMotion>();
         m_pMotion->LoadMotion(fn);
-        m_MParam = new SAnimParams();
+        m_MParam = xr_new<SAnimParams>();
         m_MParam->Set(m_pMotion);
         m_MParam->Play();
     }
@@ -67,7 +67,7 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
         FS.r_close(fs);
         Log("~ Total key-frames: ", m_count);
     }
-    stat_started = FALSE;
+    stat_started = false;
     Device.PreCache(50, true, false);
 }
 
@@ -87,7 +87,7 @@ void CDemoPlay::stat_Start()
 {
     // if (stat_started) return;
     VERIFY(!stat_started);
-    stat_started = TRUE;
+    stat_started = true;
     Sleep(1);
     stat_StartFrame = Device.dwFrame;
     stat_Timer_frame.Start();
@@ -106,7 +106,7 @@ void CDemoPlay::stat_Stop()
 
     // g_SASH.EndBenchmark();
 
-    stat_started = FALSE;
+    stat_started = false;
     float stat_total = stat_Timer_total.GetElapsed_sec();
 
     float rfps_min, rfps_max, rfps_middlepoint, rfps_average;
@@ -178,7 +178,7 @@ void CDemoPlay::stat_Stop()
             xr_strcpy(fname, sizeof(fname), "benchmark.result");
 
         FS.update_path(fname, "$app_data_root$", fname);
-        CInifile res(fname, FALSE, FALSE, TRUE);
+        CInifile res(fname, false, false, true);
         res.w_float("general", "renderer", float(GEnv.Render->get_generation()) / 10.f, "dx-level required");
         res.w_float("general", "min", rfps_min, "absolute minimum");
         res.w_float("general", "max", rfps_max, "absolute maximum");
@@ -223,11 +223,11 @@ void spline1(float t, Fvector* p, Fvector* ret)
     }
 }
 
-BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
+bool CDemoPlay::ProcessCam(SCamEffectorInfo& info)
 {
     // skeep a few frames before counting
     if (Device.dwPrecacheFrame)
-        return TRUE;
+        return true;
 
     if (stat_started)
     {
@@ -267,7 +267,7 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
         if (seq.empty())
         {
             g_pGameLevel->Cameras().RemoveCamEffector(cefDemo);
-            return TRUE;
+            return true;
         }
 
         fStartTime += Device.fTimeDelta;
@@ -282,7 +282,7 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
         {
             dwCyclesLeft--;
             if (0 == dwCyclesLeft)
-                return FALSE;
+                return false;
             fStartTime = 0;
             // just continue
             // stat_Stop ();
@@ -330,5 +330,5 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
 
         fLifeTime -= Device.fTimeDelta;
     }
-    return TRUE;
+    return true;
 }

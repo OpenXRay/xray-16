@@ -11,7 +11,7 @@
 #include "Common/object_broker.h"
 #include "Include/xrRender/Kinematics.h"
 
-CStalkerAnimationState::CStalkerAnimationState() { m_in_place = new IN_PLACE_ANIMATIONS(); }
+CStalkerAnimationState::CStalkerAnimationState() { m_in_place = xr_new<IN_PLACE_ANIMATIONS>(); }
 CStalkerAnimationState::CStalkerAnimationState(const CStalkerAnimationState& stalker_animation_state)
 {
     clone(stalker_animation_state.m_in_place, m_in_place);

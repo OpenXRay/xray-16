@@ -19,7 +19,7 @@ CPPEffectorCustom::CPPEffectorCustom(const SPPInfo& ppi, bool one_instance, bool
 
 #define SET_VALUE(def, target, factor) (def + (target - def) * factor)
 
-BOOL CPPEffectorCustom::Process(SPPInfo& pp)
+bool CPPEffectorCustom::Process(SPPInfo& pp)
 {
     if (!inherited::Process(pp))
         return FALSE;
@@ -41,7 +41,7 @@ CPPEffectorControlled::CPPEffectorControlled(
 {
     m_controller = controller;
 }
-BOOL CPPEffectorControlled::update()
+bool CPPEffectorControlled::update()
 {
     m_controller->update_factor();
     return TRUE;

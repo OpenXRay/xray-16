@@ -3,7 +3,7 @@
 #include "XR_IOConsole.h"
 
 extern void msRead();
-extern void msCreate(LPCSTR name);
+extern void msCreate(pcstr name);
 
 //---------------------------------------------------------------------
 class ENGINE_API CEvent
@@ -19,9 +19,9 @@ public:
     CEvent(const char* S);
     ~CEvent();
 
-    LPCSTR GetFull() { return Name; }
+    pcstr GetFull() { return Name; }
     u32 RefCount() { return dwRefCount; }
-    BOOL Equal(CEvent& E) { return xr_stricmp(Name, E.Name) == 0; }
+    bool Equal(CEvent& E) { return xr_stricmp(Name, E.Name) == 0; }
     void Attach(IEventReceiver* H)
     {
         if (std::find(Handlers.begin(), Handlers.end(), H) == Handlers.end())
@@ -71,7 +71,7 @@ EVENT CEventAPI::Create(const char* N)
         }
     }
 
-    EVENT X = new CEvent(N);
+    EVENT X = xr_new<CEvent>(N);
     Events.push_back(X);
     CS.Leave();
     return X;
@@ -114,7 +114,7 @@ void CEventAPI::Signal(EVENT E, u64 P1, u64 P2)
     E->Signal(P1, P2);
     CS.Leave();
 }
-void CEventAPI::Signal(LPCSTR N, u64 P1, u64 P2)
+void CEventAPI::Signal(pcstr N, u64 P1, u64 P2)
 {
     CS.Enter();
     EVENT E = Create(N);
@@ -132,7 +132,7 @@ void CEventAPI::Defer(EVENT E, u64 P1, u64 P2)
     Events_Deferred.back().P2 = P2;
     CS.Leave();
 }
-void CEventAPI::Defer(LPCSTR N, u64 P1, u64 P2)
+void CEventAPI::Defer(pcstr N, u64 P1, u64 P2)
 {
     CS.Enter();
     EVENT E = Create(N);
@@ -142,7 +142,7 @@ void CEventAPI::Defer(LPCSTR N, u64 P1, u64 P2)
 }
 
 #ifdef DEBUG
-void msParse(LPCSTR c)
+void msParse(pcstr c)
 {
     if (0 == xr_stricmp(c, "exit"))
     {
@@ -179,13 +179,13 @@ void CEventAPI::OnFrame()
     CS.Leave();
 }
 
-BOOL CEventAPI::Peek(LPCSTR EName)
+bool CEventAPI::Peek(pcstr EName)
 {
     CS.Enter();
     if (Events_Deferred.empty())
     {
         CS.Leave();
-        return FALSE;
+        return false;
     }
     for (u32 I = 0; I < Events_Deferred.size(); I++)
     {
@@ -193,11 +193,11 @@ BOOL CEventAPI::Peek(LPCSTR EName)
         if (xr_stricmp(DEF.E->GetFull(), EName) == 0)
         {
             CS.Leave();
-            return TRUE;
+            return true;
         }
     }
     CS.Leave();
-    return FALSE;
+    return false;
 }
 
 void CEventAPI::_destroy()

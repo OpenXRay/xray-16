@@ -15,7 +15,7 @@ void ImplicitCalcGlobs::read(INetReader& r)
     R_ASSERT(read_faces);
     NetClear();
     Allocate();
-    defl = new ImplicitDeflector();
+    defl = xr_new<ImplicitDeflector>();
     ImplicitHash->read(r, *read_faces);
     defl->read(r);
 
@@ -34,7 +34,7 @@ void ImplicitCalcGlobs::write(IWriter& w) const
     ImplicitHash->write(w, *write_faces);
     defl->write(w);
 }
-void ImplicitCalcGlobs::Allocate() { ImplicitHash = new IHASH(); }
+void ImplicitCalcGlobs::Allocate() { ImplicitHash = xr_new<IHASH>(); }
 void ImplicitCalcGlobs::Deallocate() { xr_delete(ImplicitHash); }
 void ImplicitCalcGlobs::Initialize(ImplicitDeflector& d)
 {

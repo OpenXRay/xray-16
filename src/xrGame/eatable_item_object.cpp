@@ -98,7 +98,7 @@ void CEatableItemObject::OnEvent(NET_Packet& P, u16 type)
     CEatableItem::OnEvent(P, type);
 }
 
-BOOL CEatableItemObject::net_Spawn(CSE_Abstract* DC)
+bool CEatableItemObject::net_Spawn(CSE_Abstract* DC)
 {
     BOOL res = CPhysicItem::net_Spawn(DC);
     CEatableItem::net_Spawn(DC);

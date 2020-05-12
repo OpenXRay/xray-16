@@ -33,6 +33,7 @@ public:
         u32 disasm : 1; // config
         u32 forceskinw : 1; // config
         u32 no_detail_textures : 1; // config
+        u32 no_ram_textures : 1; // don't keep textures in RAM
     } o;
 
 public:
@@ -101,7 +102,7 @@ public:
 public:
     // feature level
     virtual GenerationLevel get_generation() override { return IRender::GENERATION_R1; }
-    virtual DWORD get_dx_level() override { return 0x00090000; }
+    virtual u32 get_dx_level() override { return 0x00090000; }
     virtual bool is_sun_static() override { return true; }
     // Loading / Unloading
     virtual void create() override;
@@ -112,7 +113,7 @@ public:
     virtual void level_Unload() override;
 
     virtual IDirect3DBaseTexture9* texture_load(LPCSTR fname, u32& msize);
-    virtual HRESULT shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags,
+    virtual HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags,
         void*& result) override;
 
     // Information
@@ -164,16 +165,16 @@ public:
     virtual IRenderVisual* model_Create(LPCSTR name, IReader* data = nullptr) override;
     virtual IRenderVisual* model_CreateChild(LPCSTR name, IReader* data) override;
     virtual IRenderVisual* model_Duplicate(IRenderVisual* V) override;
-    virtual void model_Delete(IRenderVisual*& V, BOOL bDiscard) override;
+    virtual void model_Delete(IRenderVisual*& V, bool bDiscard) override;
     virtual void model_Delete(IRender_DetailModel*& F);
-    virtual void model_Logging(BOOL bEnable) override { Models->Logging(bEnable); }
+    virtual void model_Logging(bool bEnable) override { Models->Logging(bEnable); }
     virtual void models_Prefetch() override;
-    virtual void models_Clear(BOOL b_complete) override;
+    virtual void models_Clear(bool b_complete) override;
 
     // Occlusion culling
-    virtual BOOL occ_visible(vis_data& V) override;
-    virtual BOOL occ_visible(Fbox& B) override;
-    virtual BOOL occ_visible(sPoly& P) override;
+    virtual bool occ_visible(vis_data& V) override;
+    virtual bool occ_visible(Fbox& B) override;
+    virtual bool occ_visible(sPoly& P) override;
 
     // Main
     void BeforeFrame() override;

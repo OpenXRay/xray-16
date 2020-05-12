@@ -30,6 +30,7 @@ bool CRT::used_as_depth() const
     {
     case D3DFMT_D15S1:
     case D3DFMT_D24X8:
+    case D3DFMT_D32S8X24:
     case MAKEFOURCC('D', 'F', '2', '4'):
         return true;
     default:
@@ -109,6 +110,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
         break;
     }
+    if (createBaseTarget) // just override
+        dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
 
     const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
 
@@ -208,9 +211,10 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         case DXGI_FORMAT_R32G8X24_TYPELESS:
             ViewDesc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
             break;
-        }
-        if (createBaseTarget) // override
+
+        default:
             ViewDesc.Format = desc.Format;
+        }
 
         CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &pZRT));
     }
@@ -229,6 +233,13 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         CHK_DX(HW.pDevice->CreateUnorderedAccessView(pSurface, &UAVDesc, &pUAView));
     }
 #endif
+    if (createBaseTarget)
+    {
+        // pTexture->surface_set(pSurface) creates shader resource view
+        // which requires D3D_BIND_SHADER_RESOURCE flag to be set,
+        // but it isn't set for Base target.
+        return;
+    }
 
     pTexture = RImplementation.Resources->_CreateTexture(Name);
     pTexture->surface_set(pSurface);

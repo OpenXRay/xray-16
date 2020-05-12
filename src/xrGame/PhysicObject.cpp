@@ -23,7 +23,7 @@ CPhysicObject::CPhysicObject(void)
       bones_snd_player(nullptr), m_net_updateData(nullptr), m_just_after_spawn(false), m_activated(false) {}
 
 CPhysicObject::~CPhysicObject(void) { xr_delete(m_net_updateData); }
-BOOL CPhysicObject::net_Spawn(CSE_Abstract* DC)
+bool CPhysicObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectPhysic* po = smart_cast<CSE_ALifeObjectPhysic*>(e);
@@ -88,11 +88,11 @@ void CPhysicObject::create_collision_model()
     CInifile* ini = K->LL_UserData();
     if (ini && ini->section_exist("collide") && ini->line_exist("collide", "mesh") && ini->r_bool("collide", "mesh"))
     {
-        CForm = new CCF_DynamicMesh(this);
+        CForm = xr_new<CCF_DynamicMesh>(this);
         return;
     }
 
-    CForm = new CCF_Skeleton(this);
+    CForm = xr_new<CCF_Skeleton>(this);
 
     /*
     switch(m_type) {
@@ -455,12 +455,12 @@ void CPhysicObject::CreateBody(CSE_ALifeObjectPhysic* po)
     // m_pPhysicsShell->SetAirResistance(0.002f, 0.3f);
 }
 
-BOOL CPhysicObject::net_SaveRelevant()
+bool CPhysicObject::net_SaveRelevant()
 {
     return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
-BOOL CPhysicObject::UsedAI_Locations() { return (FALSE); }
+bool CPhysicObject::UsedAI_Locations() { return (FALSE); }
 void CPhysicObject::InitServerObject(CSE_Abstract* D)
 {
     CPHSkeleton::InitServerObject(D);
@@ -509,7 +509,7 @@ bool CPhysicObject::is_ai_obstacle() const
 net_updatePhData* CPhysicObject::NetSync()
 {
     if (!m_net_updateData)
-        m_net_updateData = new net_updatePhData();
+        m_net_updateData = xr_new<net_updatePhData>();
     return m_net_updateData;
 }
 

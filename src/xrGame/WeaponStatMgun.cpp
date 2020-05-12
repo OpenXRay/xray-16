@@ -30,8 +30,8 @@ void CWeaponStatMgun::BoneCallbackY(CBoneInstance* B)
 
 CWeaponStatMgun::CWeaponStatMgun()
 {
-    m_Ammo = new CCartridge();
-    camera = new CCameraFirstEye(
+    m_Ammo = xr_new<CCartridge>();
+    camera = xr_new<CCameraFirstEye>(
         this, CCameraBase::flRelativeLink | CCameraBase::flPositionRigid | CCameraBase::flDirectionRigid);
     camera->Load("mounted_weapon_cam");
 }
@@ -78,7 +78,7 @@ void CWeaponStatMgun::Load(LPCSTR section)
     VERIFY(!fis_zero(camRelaxSpeed));
 }
 
-BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
+bool CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 {
     if (!inheritedPH::net_Spawn(DC))
         return FALSE;

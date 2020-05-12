@@ -40,7 +40,7 @@ public:
     void play_at_pos(const Fvector& pos, BOOL xform = FALSE);
     virtual void Play(bool bHudMode);
     void Stop(BOOL bDefferedStop = TRUE);
-    virtual BOOL Locked() { return mt_dt; }
+    virtual bool Locked() { return mt_dt; }
     bool IsLooped() { return m_bLooped; }
     bool IsAutoRemove();
     bool IsPlaying();
@@ -51,7 +51,7 @@ public:
 public:
     static CParticlesObject* Create(LPCSTR p_name, BOOL bAutoRemove = TRUE, bool remove_on_game_load = true)
     {
-        return new CParticlesObject(p_name, bAutoRemove, remove_on_game_load);
+        return xr_new<CParticlesObject>(p_name, bAutoRemove, remove_on_game_load);
     }
     static void Destroy(CParticlesObject*& p)
     {

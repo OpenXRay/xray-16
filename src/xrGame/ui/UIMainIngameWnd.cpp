@@ -43,6 +43,7 @@
 #include "UIHudStatesWnd.h"
 #include "UIActorMenu.h"
 #include "xrUICore/ProgressBar/UIProgressShape.h"
+#include "UIArtefactPanel.h"
 
 void test_draw();
 void test_key(int dik);
@@ -66,10 +67,11 @@ const u32 g_clWhite = 0xffffffff;
 #define MAININGAME_XML "maingame.xml"
 
 CUIMainIngameWnd::CUIMainIngameWnd()
-    : /*m_pGrenade(NULL),m_pItem(NULL),*/ m_pPickUpItem(NULL), m_pMPChatWnd(NULL), UIArtefactIcon(NULL),
-      m_pMPLogWnd(NULL)
+    : /*m_pGrenade(NULL),m_pItem(NULL),*/ m_pPickUpItem(nullptr), m_pMPChatWnd(nullptr), UIArtefactIcon(nullptr),
+      m_pMPLogWnd(nullptr), UIArtefactPanel(nullptr)
+
 {
-    UIZoneMap = new CUIZoneMap();
+    UIZoneMap = xr_new<CUIZoneMap>();
 }
 
 extern CUIProgressShape* g_MissileForceShape;
@@ -83,6 +85,7 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
     xr_delete(UIWeaponJammedIcon);
     xr_delete(UIInvincibleIcon);
     xr_delete(UIArtefactIcon);
+    xr_delete(UIArtefactPanel);
 }
 
 void CUIMainIngameWnd::Init()
@@ -221,7 +224,7 @@ void CUIMainIngameWnd::Init()
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
-    UIMotionIcon = new CUIMotionIcon();
+    UIMotionIcon = xr_new<CUIMotionIcon>();
     UIMotionIcon->SetAutoDelete(true);
     const bool independent = UIMotionIcon->Init(UIZoneMap->MapFrame().GetWndRect());
     if (!independent)
@@ -231,7 +234,14 @@ void CUIMainIngameWnd::Init()
 
     UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this);
 
-    m_ui_hud_states = new CUIHudStatesWnd();
+    if (IsGameTypeSingle() && uiXml.NavigateToNode("artefact_panel", 0))
+    {
+        UIArtefactPanel = xr_new<CUIArtefactPanel>();
+        UIArtefactPanel->InitFromXML(uiXml, "artefact_panel", 0);
+        this->AttachChild(UIArtefactPanel);
+    }
+
+    m_ui_hud_states = xr_new<CUIHudStatesWnd>();
     m_ui_hud_states->SetAutoDelete(true);
     AttachChild(m_ui_hud_states);
     m_ui_hud_states->InitFromXml(uiXml, "hud_states");
@@ -507,7 +517,7 @@ void CUIMainIngameWnd::InitFlashingIcons(CUIXml* node)
     // Пробегаемся по всем нодам и инициализируем из них статики
     for (int i = 0; i < staticsCount; ++i)
     {
-        pIcon = new CUIStatic();
+        pIcon = xr_new<CUIStatic>();
         CUIXmlInit::InitStatic(*node, flashingIconNodeName, i, pIcon);
         shared_str iconType = node->ReadAttrib(flashingIconNodeName, i, "type", "none");
 

@@ -29,7 +29,7 @@ void CUIDialogWndEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 bool CUIDialogWndEx::Load(LPCSTR xml_name) { return true; }
 SCallbackInfo* CUIDialogWndEx::NewCallback()
 {
-    m_callbacks.push_back(new SCallbackInfo());
+    m_callbacks.push_back(xr_new<SCallbackInfo>());
     return m_callbacks.back();
 }
 

@@ -451,7 +451,7 @@ bool CDeflector::similar(const CDeflector& D, float eps /* =EPS */) const
     return layer.similar(D.layer, eps);
 }
 
-CDeflector* CDeflector::read_create() { return new CDeflector(); }
+CDeflector* CDeflector::read_create() { return xr_new<CDeflector>(); }
 void DumpDeflctor(u32 id)
 {
     VERIFY(inlc_global_data()->g_deflectors().size() > id);

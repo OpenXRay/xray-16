@@ -125,7 +125,7 @@ void xrSASH::LoopNative()
         FS.r_close(R);
 
         int test_count = ini.line_count("benchmark");
-        LPCSTR test_name, t;
+        pcstr test_name, t;
         shared_str test_command;
 
         for (int i = 0; i < test_count; ++i)
@@ -151,12 +151,12 @@ void xrSASH::LoopNative()
     FlushLog();
 }
 
-void xrSASH::ReportNative(LPCSTR pszTestName)
+void xrSASH::ReportNative(pcstr pszTestName)
 {
     string_path fname;
     xr_sprintf(fname, sizeof(fname), "%s.result", pszTestName);
     FS.update_path(fname, "$app_data_root$", fname);
-    CInifile res(fname, FALSE, FALSE, TRUE);
+    CInifile res(fname, false, false, true);
 
     // min/max/average
     float fMinFps = flt_max;
@@ -435,7 +435,7 @@ void xrSASH::GetBenchmarks()
 
 void Startup();
 
-void xrSASH::RunBenchmark(LPCSTR pszName)
+void xrSASH::RunBenchmark(pcstr pszName)
 {
     Msg("SASH:: RunBenchmark.");
 
@@ -479,7 +479,7 @@ void xrSASH::TryInitEngine(bool bNoRun)
         Console->Execute("renderer renderer_r2");
     else
     {
-        CCC_LoadCFG_custom* pTmp = new CCC_LoadCFG_custom("renderer ");
+        CCC_LoadCFG_custom* pTmp = xr_new<CCC_LoadCFG_custom>("renderer ");
         pTmp->Execute(Console->ConfigFile);
         if (m_bOpenAutomate)
             pTmp->Execute("SASH.ltx");

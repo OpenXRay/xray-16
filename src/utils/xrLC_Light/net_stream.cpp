@@ -230,7 +230,7 @@ void INetBuffWriter::save_buffer(LPCSTR fn) const
 
 INetFileBuffWriter::INetFileBuffWriter(LPCSTR _file_name, size_t block_size, bool _reopen) : INetBuffWriter()
 {
-    mem_writter = new CFileWriteBlock(_file_name, block_size, _reopen);
+    mem_writter = xr_new<CFileWriteBlock>(_file_name, block_size, _reopen);
 }
 
 INetFileBuffWriter::~INetFileBuffWriter() { xr_delete(mem_writter); }

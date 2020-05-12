@@ -107,8 +107,8 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
-extern ENGINE_API BOOL r2_sun_static;
-extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
+extern ENGINE_API bool r2_sun_static;
+extern ENGINE_API bool r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -253,6 +253,10 @@ void CRender::create()
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
 
+    o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
+    if (o.no_ram_textures)
+        Msg("* Managed textures disabled");
+
     // options (smap-pool-size)
     if (strstr(Core.Params, "-smap1024"))
         o.smapsize = 1024;
@@ -316,9 +320,9 @@ void CRender::create()
 
     m_bMakeAsyncSS = false;
 
-    Target = new CRenderTarget(); // Main target
+    Target = xr_new<CRenderTarget>(); // Main target
 
-    Models = new CModelPool();
+    Models = xr_new<CModelPool>();
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
@@ -395,12 +399,12 @@ void CRender::reset_end()
         R_CHK(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT, &q_sync_point[i]));
     HWOCC.occq_create(occq_size);
 
-    Target = new CRenderTarget();
+    Target = xr_new<CRenderTarget>();
 
     //AVO: let's reload details while changed details options on vid_restart
     if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
     {
-        Details = new CDetailManager();
+        Details = xr_new<CDetailManager>();
         Details->Load();
     }
     //-AVO
@@ -432,12 +436,12 @@ void CRender::OnFrame()
 }
 
 // Implementation
-IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
+IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new<CROS_impl>(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
 IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
 IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
-void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
+void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
@@ -445,7 +449,7 @@ void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 }
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
-    CDetail* D = new CDetail();
+    CDetail* D = xr_new<CDetail>();
     D->Load(F);
     return D;
 }
@@ -478,7 +482,7 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
     }
 }
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
 ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
@@ -546,11 +550,11 @@ FSlideWindowItem* CRender::getSWI(int id)
 }
 IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return Lights.Create(); }
-IRender_Glow* CRender::glow_create() { return new CGlow(); }
+IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
-BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     add_leafs_Dynamic(root, (dxRender_Visual*)V, m);

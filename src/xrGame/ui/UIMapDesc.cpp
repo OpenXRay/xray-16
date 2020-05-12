@@ -14,28 +14,28 @@
 
 CUIMapDesc::CUIMapDesc()
 {
-    m_pBackground = new CUIStatic();
+    m_pBackground = xr_new<CUIStatic>();
     AttachChild(m_pBackground);
-    m_pCaption = new CUIStatic();
+    m_pCaption = xr_new<CUIStatic>();
     AttachChild(m_pCaption);
 
-    m_pImage = new CUIStatic();
+    m_pImage = xr_new<CUIStatic>();
     AttachChild(m_pImage);
-    m_pTextDesc = new CUIScrollView();
+    m_pTextDesc = xr_new<CUIScrollView>();
     AttachChild(m_pTextDesc);
 
-    m_pBtnSpectator = new CUI3tButton();
+    m_pBtnSpectator = xr_new<CUI3tButton>();
     AttachChild(m_pBtnSpectator);
-    m_pBtnNext = new CUI3tButton();
+    m_pBtnNext = xr_new<CUI3tButton>();
     AttachChild(m_pBtnNext);
 
     for (int i = 0; i < 3; i++)
     {
-        m_pFrame[i] = new CUIStatic();
+        m_pFrame[i] = xr_new<CUIStatic>();
         AttachChild(m_pFrame[i]);
     }
 
-    m_pMapInfo = new CUIMapInfo();
+    m_pMapInfo = xr_new<CUIMapInfo>();
     AttachChild(m_pMapInfo);
 
     Init();

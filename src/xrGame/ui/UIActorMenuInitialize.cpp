@@ -61,11 +61,11 @@ CUIActorMenu::~CUIActorMenu()
 
 void CUIActorMenu::Construct()
 {
-    m_UIPropertiesBox = new CUIPropertiesBox();
+    m_UIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
     m_UIPropertiesBox->SetWindowName("property_box");
 
-    m_message_box_yes_no = new CUIMessageBoxEx();
+    m_message_box_yes_no = xr_new<CUIMessageBoxEx>();
     if (!m_message_box_yes_no->InitMessageBox("message_box_yes_no"))
         xr_delete(m_message_box_yes_no);
     else
@@ -74,7 +74,7 @@ void CUIActorMenu::Construct()
         m_message_box_yes_no->SetText("");
     }
 
-    m_message_box_ok = new CUIMessageBoxEx();
+    m_message_box_ok = xr_new<CUIMessageBoxEx>();
     if (!m_message_box_ok->InitMessageBox("message_box_ok"))
         xr_delete(m_message_box_ok);
     else
@@ -83,17 +83,17 @@ void CUIActorMenu::Construct()
         m_message_box_ok->SetText("");
     }
 
-    m_ActorTradeBar = new CUITradeBar();
-    m_PartnerTradeBar = new CUITradeBar();
+    m_ActorTradeBar = xr_new<CUITradeBar>();
+    m_PartnerTradeBar = xr_new<CUITradeBar>();
     m_ActorTradeBar->SetAutoDelete(true);
     m_PartnerTradeBar->SetAutoDelete(true);
 
-    m_ActorWeightBar = new CUIWeightBar();
-    m_PartnerWeightBar = new CUIWeightBar();
+    m_ActorWeightBar = xr_new<CUIWeightBar>();
+    m_PartnerWeightBar = xr_new<CUIWeightBar>();
     m_ActorWeightBar->SetAutoDelete(true);
     m_PartnerWeightBar->SetAutoDelete(true);
 
-    m_ActorStateInfo = new ui_actor_state_wnd();
+    m_ActorStateInfo = xr_new<ui_actor_state_wnd>();
     m_ActorStateInfo->SetAutoDelete(true);
 
     if (ShadowOfChernobylMode)
@@ -150,14 +150,14 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
     m_LeftBackground = UIHelper::CreateStatic(uiXml, "left_background", this);
 
-    m_ActorCharacterInfo = new CUICharacterInfo();
+    m_ActorCharacterInfo = xr_new<CUICharacterInfo>();
     m_TradeActorCharacterInfo = m_ActorCharacterInfo;
     m_SearchLootActorCharacterInfo = m_ActorCharacterInfo;
     m_ActorCharacterInfo->SetAutoDelete(true);
     AttachChild(m_ActorCharacterInfo);
     m_ActorCharacterInfo->InitCharacterInfo(&uiXml, "actor_ch_info");
 
-    m_PartnerCharacterInfo = new CUICharacterInfo();
+    m_PartnerCharacterInfo = xr_new<CUICharacterInfo>();
     m_TradePartnerCharacterInfo = m_PartnerCharacterInfo;
     m_SearchLootPartnerCharacterInfo = m_PartnerCharacterInfo;
     m_PartnerCharacterInfo->SetAutoDelete(true);
@@ -258,7 +258,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
     m_clock_value = UIHelper::CreateStatic(uiXml, "clock_value", this, false);
 
-    m_ItemInfo = new CUIItemInfo();
+    m_ItemInfo = xr_new<CUIItemInfo>();
     m_ItemInfo->InitItemInfo(ACTOR_MENU_ITEM_XML);
     //-	m_ItemInfo->SetAutoDelete			(true);
     //-	AttachChild							(m_ItemInfo);
@@ -266,7 +266,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
 void CUIActorMenu::InitializeUpgradeMode(CUIXml& /*uiXml*/)
 {
-    m_pUpgradeWnd = new CUIInventoryUpgradeWnd();
+    m_pUpgradeWnd = xr_new<CUIInventoryUpgradeWnd>();
     if (!m_pUpgradeWnd->Init())
         xr_delete(m_pUpgradeWnd);
     else
@@ -277,7 +277,7 @@ void CUIActorMenu::InitializeUpgradeMode(CUIXml& /*uiXml*/)
 
     if (ai().get_alife())
     {
-        m_upgrade_info = new UIInvUpgradeInfo();
+        m_upgrade_info = xr_new<UIInvUpgradeInfo>();
         m_upgrade_info->SetAutoDelete(true);
         AttachChild(m_upgrade_info);
         m_upgrade_info->init_from_xml(ACTOR_MENU_ITEM_XML);
@@ -299,7 +299,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     m_ActorMoney = UIHelper::CreateStatic(uiXml, "money_static", m_pInventoryWnd);
 
     CUIStatic* descWnd = UIHelper::CreateStatic(uiXml, "descr_static", m_pInventoryWnd);
-    m_ItemInfoInventoryMode = new CUIItemInfo();
+    m_ItemInfoInventoryMode = xr_new<CUIItemInfo>();
     m_ItemInfoInventoryMode->SetAutoDelete(true);
     descWnd->AttachChild(m_ItemInfoInventoryMode);
     m_ItemInfoInventoryMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), INVENTORY_ITEM_XML);
@@ -311,7 +311,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     CUIFrameWindow* personalWnd = UIHelper::CreateFrameWindow(uiXml, "character_frame_window", m_pInventoryWnd);
     UIHelper::CreateStatic(uiXml, "static_personal", personalWnd);
 
-    CUIItemInfo* outfitInfo = new CUIItemInfo();
+    CUIItemInfo* outfitInfo = xr_new<CUIItemInfo>();
     outfitInfo->SetAutoDelete(true);
     m_pInventoryWnd->AttachChild(outfitInfo);
 
@@ -330,7 +330,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
             m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, parent);
         else // eInventoryOutfitList
         {
-            CUIOutfitDragDropList* list = new CUIOutfitDragDropList();
+            CUIOutfitDragDropList* list = xr_new<CUIOutfitDragDropList>();
             list->SetAutoDelete(true);
             parent->AttachChild(list);
             CUIXmlInit::InitDragDropListEx(uiXml, section, 0, list);
@@ -357,8 +357,8 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
     CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pTradeWnd);
     CUIStatic* partnerIcon = UIHelper::CreateStatic(uiXml, "static_icon", 1, m_pTradeWnd);
 
-    m_TradeActorCharacterInfo = new CUICharacterInfo();
-    m_TradePartnerCharacterInfo = new CUICharacterInfo();
+    m_TradeActorCharacterInfo = xr_new<CUICharacterInfo>();
+    m_TradePartnerCharacterInfo = xr_new<CUICharacterInfo>();
 
     actorIcon->AttachChild(m_TradeActorCharacterInfo);
     m_TradeActorCharacterInfo->SetAutoDelete(true);
@@ -392,7 +392,7 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
     }
 
     CUIStatic* descWnd = UIHelper::CreateStatic(uiXml, "desc_static", m_pTradeWnd);
-    m_ItemInfoTradeMode = new CUIItemInfo();
+    m_ItemInfoTradeMode = xr_new<CUIItemInfo>();
     m_ItemInfoTradeMode->SetAutoDelete(true);
     descWnd->AttachChild(m_ItemInfoTradeMode);
     m_ItemInfoTradeMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), TRADE_ITEM_XML);
@@ -413,8 +413,8 @@ void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
     CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pSearchLootWnd);
     CUIStatic* partnerIcon = UIHelper::CreateStatic(uiXml, "static_icon", 1, m_pSearchLootWnd);
 
-    m_SearchLootActorCharacterInfo = new CUICharacterInfo();
-    m_SearchLootPartnerCharacterInfo = new CUICharacterInfo();
+    m_SearchLootActorCharacterInfo = xr_new<CUICharacterInfo>();
+    m_SearchLootPartnerCharacterInfo = xr_new<CUICharacterInfo>();
 
     actorIcon->AttachChild(m_SearchLootActorCharacterInfo);
     m_SearchLootActorCharacterInfo->SetAutoDelete(true);
@@ -433,7 +433,7 @@ void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
     // Item info
     CUIFrameWindow* descWnd = UIHelper::CreateFrameWindow(uiXml, "frame_window", m_pSearchLootWnd);
     UIHelper::CreateStatic(uiXml, "descr_static", descWnd);
-    m_ItemInfoSearchLootMode = new CUIItemInfo();
+    m_ItemInfoSearchLootMode = xr_new<CUIItemInfo>();
     m_ItemInfoSearchLootMode->SetAutoDelete(true);
     descWnd->AttachChild(m_ItemInfoSearchLootMode);
     m_ItemInfoSearchLootMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), CARBODY_ITEM_XML);

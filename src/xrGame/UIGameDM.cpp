@@ -62,12 +62,12 @@ void CUIGameDM::Init(int stage)
 {
     if (stage == 0)
     { // shared
-        m_pTeamPanels = new UITeamPanels();
-        m_pMoneyIndicator = new CUIMoneyIndicator();
+        m_pTeamPanels = xr_new<UITeamPanels>();
+        m_pMoneyIndicator = xr_new<CUIMoneyIndicator>();
         m_pMoneyIndicator->SetAutoDelete(true);
-        m_pRankIndicator = new CUIRankIndicator();
+        m_pRankIndicator = xr_new<CUIRankIndicator>();
         m_pRankIndicator->SetAutoDelete(true);
-        m_pFragLimitIndicator = new CUITextWnd();
+        m_pFragLimitIndicator = xr_new<CUITextWnd>();
         m_pFragLimitIndicator->SetAutoDelete(true);
 
         inherited::Init(stage);
@@ -145,7 +145,7 @@ void CUIGameDM::SetVoteMessage(LPCSTR str)
         {
             CUIXml uiXml;
             uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml");
-            m_voteStatusWnd = new UIVoteStatusWnd();
+            m_voteStatusWnd = xr_new<UIVoteStatusWnd>();
             m_voteStatusWnd->InitFromXML(uiXml);
         }
         m_voteStatusWnd->Show(true);

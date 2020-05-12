@@ -4,7 +4,7 @@
 
 CTheoraSurface::CTheoraSurface()
 {
-    ready = FALSE;
+    ready = false;
     // streams
     m_rgb = 0;
     m_alpha = 0;
@@ -17,9 +17,9 @@ CTheoraSurface::CTheoraSurface()
     sdl_yuv_overlay = 0;
 #endif
     // controls
-    playing = FALSE;
-    looped = FALSE;
-    bShaderYUV2RGB = TRUE;
+    playing = false;
+    looped = false;
+    bShaderYUV2RGB = true;
     prefetch = -2;
 }
 
@@ -41,19 +41,19 @@ void CTheoraSurface::Reset()
     tm_play = 0;
 }
 
-BOOL CTheoraSurface::Valid() { return ready; }
-void CTheoraSurface::Play(BOOL _looped, u32 _time)
+bool CTheoraSurface::Valid() { return ready; }
+void CTheoraSurface::Play(bool _looped, u32 _time)
 {
-    playing = TRUE;
+    playing = true;
     looped = _looped;
     tm_start = _time;
     prefetch = -2;
 }
 
-BOOL CTheoraSurface::Update(u32 _time)
+bool CTheoraSurface::Update(u32 _time)
 {
     VERIFY(Valid());
-    BOOL redraw = FALSE;
+    bool redraw = false;
 
     if (prefetch < 0) // fake. first updated frame is data loading
     {
@@ -80,7 +80,7 @@ BOOL CTheoraSurface::Update(u32 _time)
             else
             {
                 Stop();
-                return FALSE;
+                return false;
             }
         }
         if (m_rgb)
@@ -92,11 +92,11 @@ BOOL CTheoraSurface::Update(u32 _time)
     return redraw;
 }
 
-BOOL CTheoraSurface::Load(const char* fname)
+bool CTheoraSurface::Load(const char* fname)
 {
-    VERIFY(FALSE == ready);
-    m_rgb = new CTheoraStream();
-    BOOL res = m_rgb->Load(fname);
+    VERIFY(false == ready);
+    m_rgb = xr_new<CTheoraStream>();
+    bool res = m_rgb->Load(fname);
     if (res)
     {
         string_path alpha, ext;
@@ -110,9 +110,9 @@ BOOL CTheoraSurface::Load(const char* fname)
         strconcat(sizeof(alpha), alpha, alpha, "#alpha", ext);
         if (FS.exist(alpha))
         {
-            m_alpha = new CTheoraStream();
+            m_alpha = xr_new<CTheoraStream>();
             if (!m_alpha->Load(alpha))
-                res = FALSE;
+                res = false;
         }
     }
     if (res)
@@ -135,7 +135,7 @@ BOOL CTheoraSurface::Load(const char* fname)
 #ifdef SDL_OUTPUT
         open_sdl_video();
 #endif
-        ready = TRUE;
+        ready = true;
     }
     else
     {

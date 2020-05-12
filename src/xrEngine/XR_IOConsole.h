@@ -35,7 +35,7 @@ struct TipString
         HL_start = start_pos;
         HL_finish = finish_pos;
     }
-    TipString(LPCSTR tips_text, int start_pos, int finish_pos)
+    TipString(pcstr tips_text, int start_pos, int finish_pos)
     {
         text._set(tips_text);
         HL_start = start_pos;
@@ -58,7 +58,7 @@ public:
     {
         IC bool operator()(const char* x, const char* y) const { return (xr_strcmp(x, y) < 0); }
     };
-    typedef xr_map<LPCSTR, IConsole_Command*, str_pred> vecCMD;
+    typedef xr_map<pcstr, IConsole_Command*, str_pred> vecCMD;
     typedef vecCMD::iterator vecCMD_IT;
     typedef vecCMD::const_iterator vecCMD_CIT;
     typedef fastdelegate::FastDelegate0<void> Callback;
@@ -127,20 +127,20 @@ public:
     void Show();
     void Hide();
 
-    void Execute(LPCSTR cmd);
-    void ExecuteScript(LPCSTR str);
-    void ExecuteCommand(LPCSTR cmd, bool record_cmd = true);
+    void Execute(pcstr cmd);
+    void ExecuteScript(pcstr str);
+    void ExecuteCommand(pcstr cmd, bool record_cmd = true);
     void SelectCommand();
 
-    bool GetBool(LPCSTR cmd) const;
-    float GetFloat(LPCSTR cmd, float& min, float& max) const;
-    int GetInteger(LPCSTR cmd, int& min, int& max) const;
-    LPCSTR GetString(LPCSTR cmd) const;
-    LPCSTR GetToken(LPCSTR cmd) const;
-    const xr_token* GetXRToken(LPCSTR cmd) const;
-    Fvector GetFVector(LPCSTR cmd) const;
-    Fvector* GetFVectorPtr(LPCSTR cmd) const;
-    IConsole_Command* GetCommand(LPCSTR cmd) const;
+    bool GetBool(pcstr cmd) const;
+    float GetFloat(pcstr cmd, float& min, float& max) const;
+    int GetInteger(pcstr cmd, int& min, int& max) const;
+    pcstr GetString(pcstr cmd) const;
+    pcstr GetToken(pcstr cmd) const;
+    const xr_token* GetXRToken(pcstr cmd) const;
+    Fvector GetFVector(pcstr cmd) const;
+    Fvector* GetFVectorPtr(pcstr cmd) const;
+    IConsole_Command* GetCommand(pcstr cmd) const;
 
 protected:
     text_editor::line_editor* m_editor;
@@ -171,7 +171,7 @@ protected:
 
     void DrawBackgrounds(bool bGame);
     void DrawRect(Frect const& r, u32 color);
-    void OutFont(LPCSTR text, float& pos_y);
+    void OutFont(pcstr text, float& pos_y);
     void Register_callbacks();
 
 protected:
@@ -211,12 +211,12 @@ protected:
     void check_prev_selected_tip();
     void reset_selected_tip();
 
-    IConsole_Command* find_next_cmd(LPCSTR in_str, shared_str& out_str);
-    bool add_next_cmds(LPCSTR in_str, vecTipsEx& out_v);
-    bool add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v);
+    IConsole_Command* find_next_cmd(pcstr in_str, shared_str& out_str);
+    bool add_next_cmds(pcstr in_str, vecTipsEx& out_v);
+    bool add_internal_cmds(pcstr in_str, vecTipsEx& out_v);
 
     void update_tips();
-    void select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v);
+    void select_for_filter(pcstr filter_str, vecTips& in_v, vecTipsEx& out_v);
 
 }; // class CConsole
 

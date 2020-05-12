@@ -151,7 +151,7 @@ void CBuild::xrPhase_MergeLM()
         // Startup
         Logger.Status("Processing...");
         _InitSurface();
-        CLightmap* lmap = new CLightmap();
+        CLightmap* lmap = xr_new<CLightmap>();
         VERIFY(lc_global_data());
         lc_global_data()->lightmaps().push_back(lmap);
 
@@ -485,7 +485,7 @@ _max(D->layer.Area(),materials()[D->GetBaseMaterial()].internal_max_area);
         // Startup
         Status		("Processing...");
         _InitSurface			();
-        CLightmap*	lmap		= new CLightmap ();
+        CLightmap*	lmap		= xr_new<CLightmap> ();
         VERIFY( lc_global_data() );
         lc_global_data()->lightmaps().push_back	(lmap);
 

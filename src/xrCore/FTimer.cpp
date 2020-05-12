@@ -11,7 +11,7 @@ void CStatTimer::FrameStart()
 
 void CStatTimer::FrameEnd()
 {
-    const float time = GetElapsed_sec();
+    const float time = GetElapsed_sec() * 1000.0f;
     if (time > result)
         result = time;
     else

@@ -181,7 +181,7 @@ void CSoundPlayer::play(
     sound_single.m_bone_id = smart_cast<IKinematics*>(m_object->Visual())->LL_BoneID(sound.m_bone_name);
     R_ASSERT(sound_single.m_bone_id != BI_NONE);
 
-    sound_single.m_sound = new ref_sound();
+    sound_single.m_sound = xr_new<ref_sound>();
     /**
     sound_single.m_sound->clone	(
         *(*I).second.second->m_sounds[

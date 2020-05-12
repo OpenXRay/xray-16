@@ -38,14 +38,20 @@ static bool r2_available = false;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+namespace
+{
 void __cdecl dummy(void) {}
+IFactoryObject* __cdecl dummy(CLASS_ID) { return nullptr; }
+template<typename T>
+void __cdecl dummy(T* p) { R_ASSERT2(p == nullptr, "Attempting to release an object that shouldn't be allocated"); }
+};
 
 CEngineAPI::CEngineAPI()
 {
     hGame = nullptr;
     hTuner = nullptr;
-    pCreate = nullptr;
-    pDestroy = nullptr;
+    pCreate = dummy;
+    pDestroy = dummy;
     tune_enabled = false;
     tune_pause = dummy;
     tune_resume = dummy;
@@ -130,13 +136,16 @@ void CEngineAPI::Initialize(void)
     InitializeRenderers();
 
     hGame = XRay::LoadModule("xrGame");
-    R_ASSERT2(hGame->IsLoaded(), "Game DLL raised exception during loading or there is no game DLL at all");
+    if (!CanSkipGameModuleLoading())
+    {
+        R_ASSERT2(hGame->IsLoaded(), "! Game DLL raised exception during loading or there is no game DLL at all");
 
-    pCreate = (Factory_Create*)hGame->GetProcAddress("xrFactory_Create");
-    R_ASSERT(pCreate);
+        pCreate = reinterpret_cast<Factory_Create*>(hGame->GetProcAddress("xrFactory_Create"));
+        R_ASSERT(pCreate);
 
-    pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
-    R_ASSERT(pDestroy);
+        pDestroy = reinterpret_cast<Factory_Destroy*>(hGame->GetProcAddress("xrFactory_Destroy"));
+        R_ASSERT(pDestroy);
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // vTune

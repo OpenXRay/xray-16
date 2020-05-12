@@ -59,17 +59,19 @@ static BOOL bException = FALSE;
 #define USE_OWN_ERROR_MESSAGE_WINDOW
 #endif
 
-#if defined XR_ARCHITECTURE_X64
-#define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
-#elif defined XR_ARCHITECTURE_X86
-#define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
-#elif defined XR_ARCHITECTURE_ARM64
-#define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM64
-#elif defined XR_ARCHITECTURE_ARM
-#define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM
-#else
-#error CPU architecture is not supported.
-#endif
+#if defined(XR_PLATFORM_WINDOWS)
+#   if defined(XR_ARCHITECTURE_X86)
+#       define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
+#   elif defined(XR_ARCHITECTURE_X64)
+#       define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
+#   elif defined(XR_ARCHITECTURE_ARM)
+#       define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM
+#   elif defined(XR_ARCHITECTURE_ARM64)
+#       define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM64
+#   else
+#       error CPU architecture is not supported.
+#   endif
+#endif // XR_PLATFORM_WINDOWS
 
 constexpr SDL_MessageBoxButtonData buttons[] =
 {

@@ -7,7 +7,7 @@
 
 CUIMapInfo::CUIMapInfo()
 {
-    m_view = new CUIScrollView();
+    m_view = xr_new<CUIScrollView>();
     AttachChild(m_view);
 }
 
@@ -63,7 +63,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
         xr_string text;
 
         // map name
-        st = new CUITextWnd();
+        st = xr_new<CUITextWnd>();
         CUIXmlInit::InitTextWnd(xml_doc, "map_name", 0, st);
 
         xr_string S = StringTable().translate(map_name).c_str();
@@ -116,7 +116,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
 
         text += "%c[default]\\n";
 
-        st = new CUITextWnd();
+        st = xr_new<CUITextWnd>();
         st->SetTextComplexMode(true);
         st->SetFont(txt_font);
         st->SetTextColor(header_color);
@@ -132,7 +132,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
     }
     else
     {
-        st = new CUITextWnd();
+        st = xr_new<CUITextWnd>();
         CUIXmlInit::InitTextWnd(xml_doc, "map_name", 0, st);
         st->SetTextST(map_name);
         st->SetWidth(m_view->GetDesiredChildWidth());

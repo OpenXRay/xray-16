@@ -55,6 +55,7 @@
 #include "material_manager.h"
 #include "xrPhysics/IColisiondamageInfo.h"
 #include "ui/UIMainIngameWnd.h"
+#include "ui/UIArtefactPanel.h"
 #include "map_manager.h"
 #include "GametaskManager.h"
 #include "actor_memory.h"
@@ -102,11 +103,11 @@ int psActorSleepTime = 1;
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 {
-    encyclopedia_registry = new CEncyclopediaRegistryWrapper();
-    game_news_registry = new CGameNewsRegistryWrapper();
+    encyclopedia_registry = xr_new<CEncyclopediaRegistryWrapper>();
+    game_news_registry = xr_new<CGameNewsRegistryWrapper>();
 
     // Cameras
-    cameras[eacFirstEye] = new CCameraFirstEye(this);
+    cameras[eacFirstEye] = xr_new<CCameraFirstEye>(this);
     cameras[eacFirstEye]->Load("actor_firsteye_cam");
 
     if (strstr(Core.Params, "-psp"))
@@ -116,17 +117,17 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 
     if (psActorFlags.test(AF_PSP))
     {
-        cameras[eacLookAt] = new CCameraLook2(this);
+        cameras[eacLookAt] = xr_new<CCameraLook2>(this);
         cameras[eacLookAt]->Load("actor_look_cam_psp");
     }
     else
     {
-        cameras[eacLookAt] = new CCameraLook(this);
+        cameras[eacLookAt] = xr_new<CCameraLook>(this);
         cameras[eacLookAt]->Load("actor_look_cam");
     }
-    cameras[eacFreeLook] = new CCameraLook(this);
+    cameras[eacFreeLook] = xr_new<CCameraLook>(this);
     cameras[eacFreeLook]->Load("actor_free_cam");
-    cameras[eacFixedLookAt] = new CCameraFixedLook(this);
+    cameras[eacFixedLookAt] = xr_new<CCameraFixedLook>(this);
     cameras[eacFixedLookAt]->Load("actor_look_cam");
 
     cam_active = eacFirstEye;
@@ -189,23 +190,23 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 
     m_pUsableObject = NULL;
 
-    m_anims = new SActorMotions();
+    m_anims = xr_new<SActorMotions>();
     //Alundaio: Needed for car
-    m_vehicle_anims = new SActorVehicleAnims();
+    m_vehicle_anims = xr_new<SActorVehicleAnims>();
 	//-Alundaio
     m_entity_condition = NULL;
     m_iLastHitterID = u16(-1);
     m_iLastHittingWeaponID = u16(-1);
     m_statistic_manager = NULL;
     //-----------------------------------------------------------------------------------
-    m_memory = GEnv.isDedicatedServer ? 0 : new CActorMemory(this);
+    m_memory = GEnv.isDedicatedServer ? 0 : xr_new<CActorMemory>(this);
     m_bOutBorder = false;
     m_hit_probability = 1.f;
     m_feel_touch_characters = 0;
     //-----------------------------------------------------------------------------------
     m_dwILastUpdateTime = 0;
 
-    m_location_manager = new CLocationManager(this);
+    m_location_manager = xr_new<CLocationManager>(this);
     m_block_sprint_counter = 0;
 
     m_disabled_hitmarks = false;
@@ -541,7 +542,7 @@ void CActor::Hit(SHit* pHDS)
                 S.set_volume(10.0f);
                 if (!m_sndShockEffector)
                 {
-                    m_sndShockEffector = new SndShockEffector();
+                    m_sndShockEffector = xr_new<SndShockEffector>();
                     m_sndShockEffector->Start(this, float(S.get_length_sec() * 1000.0f), HDS.damage());
                 }
             }
@@ -904,7 +905,7 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
     if (Local() && g_Alive())
     {
         if (character_physics_support()->movement()->gcontact_Was)
-            Cameras().AddCamEffector(new CEffectorFall(character_physics_support()->movement()->gcontact_Power));
+            Cameras().AddCamEffector(xr_new<CEffectorFall>(character_physics_support()->movement()->gcontact_Power));
 
         if (!fis_zero(character_physics_support()->movement()->gcontact_HealthLost))
         {
@@ -1252,7 +1253,7 @@ void CActor::shedule_Update(u32 DT)
     //эффектор включаемый при ходьбе
     if (!pCamBobbing)
     {
-        pCamBobbing = new CEffectorBobbing();
+        pCamBobbing = xr_new<CEffectorBobbing>();
         Cameras().AddCamEffector(pCamBobbing);
     }
     pCamBobbing->SetState(mstate_real, conditions().IsLimping(), IsZoomAimingMode());
@@ -1430,7 +1431,7 @@ void CActor::renderable_Render(IRenderable* root)
     //VERIFY(_valid(XFORM()));
 }
 
-BOOL CActor::renderable_ShadowGenerate()
+bool CActor::renderable_ShadowGenerate()
 {
     if (m_holder)
         return FALSE;
@@ -1701,6 +1702,10 @@ void CActor::OnItemDrop(CInventoryItem* inventory_item, bool just_before_destroy
         if (grenade)
             inventory().Slot(GRENADE_SLOT, grenade, true, true);
     }
+
+    CArtefact* artefact = smart_cast<CArtefact*>(inventory_item);
+    if (artefact && artefact->m_ItemCurrPlace.type == eItemPlaceBelt)
+        MoveArtefactBelt(artefact, false);
 }
 
 void CActor::OnItemDropUpdate()
@@ -1715,11 +1720,38 @@ void CActor::OnItemDropUpdate()
 void CActor::OnItemRuck(CInventoryItem* inventory_item, const SInvItemPlace& previous_place)
 {
     CInventoryOwner::OnItemRuck(inventory_item, previous_place);
+
+    CArtefact* artefact = smart_cast<CArtefact*>(inventory_item);
+    if (artefact && previous_place.type == eItemPlaceBelt)
+        MoveArtefactBelt(artefact, false);
 }
 
 void CActor::OnItemBelt(CInventoryItem* inventory_item, const SInvItemPlace& previous_place)
 {
     CInventoryOwner::OnItemBelt(inventory_item, previous_place);
+
+    CArtefact* artefact = smart_cast<CArtefact*>(inventory_item);
+    if (artefact)
+        MoveArtefactBelt(artefact, true);
+}
+
+void CActor::MoveArtefactBelt(const CArtefact* artefact, bool on_belt)
+{
+    VERIFY(artefact);
+
+    if (on_belt)
+    {
+        VERIFY(m_ArtefactsOnBelt.end() == std::find(m_ArtefactsOnBelt.begin(), m_ArtefactsOnBelt.end(), artefact));
+        m_ArtefactsOnBelt.push_back(artefact);
+    }
+    else
+    {
+        auto it = std::remove(m_ArtefactsOnBelt.begin(), m_ArtefactsOnBelt.end(), artefact);
+        VERIFY(it != m_ArtefactsOnBelt.end());
+        m_ArtefactsOnBelt.erase(it);
+    }
+    if (Level().CurrentViewEntity() && Level().CurrentViewEntity() == this && CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel)
+        CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel->InitIcons(m_ArtefactsOnBelt);
 }
 
 #define ARTEFACTS_UPDATE_TIME 0.100f
@@ -1876,7 +1908,7 @@ CPHDestroyable* CActor::ph_destroyable() { return smart_cast<CPHDestroyable*>(ch
 CEntityConditionSimple* CActor::create_entity_condition(CEntityConditionSimple* ec)
 {
     if (!ec)
-        m_entity_condition = new CActorCondition(this);
+        m_entity_condition = xr_new<CActorCondition>(this);
     else
         m_entity_condition = smart_cast<CActorCondition*>(ec);
 
@@ -1885,7 +1917,7 @@ CEntityConditionSimple* CActor::create_entity_condition(CEntityConditionSimple* 
 
 IFactoryObject* CActor::_construct()
 {
-    m_pPhysics_support = new CCharacterPhysicsSupport(CCharacterPhysicsSupport::etActor, this);
+    m_pPhysics_support = xr_new<CCharacterPhysicsSupport>(CCharacterPhysicsSupport::etActor, this);
     CEntityAlive::_construct();
     CInventoryOwner::_construct();
     CStepManager::_construct();

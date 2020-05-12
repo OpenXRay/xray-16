@@ -60,7 +60,7 @@ public:
     virtual void clear_notrelevant();
     virtual CTelekineticObject* alloc_tele_object()
     {
-        return static_cast<CTelekineticObject*>(new CTeleWhirlwindObject());
+        return static_cast<CTelekineticObject*>(xr_new<CTeleWhirlwindObject>());
     }
     float keep_radius() { return m_keep_radius; }
     void set_throw_power(float throw_pow);

@@ -68,7 +68,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
 {
     CPHShellSplitterHolder*& dest_holder = dest->m_spliter_holder;
     if (!dest_holder)
-        dest_holder = new CPHShellSplitterHolder(dest);
+        dest_holder = xr_new<CPHShellSplitterHolder>(dest);
 
     ELEMENT_STORAGE& source_elements = m_pShell->elements;
     ELEMENT_STORAGE& dest_elements = dest->elements;

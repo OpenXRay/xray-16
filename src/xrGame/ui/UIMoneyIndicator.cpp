@@ -9,7 +9,7 @@ CUIMoneyIndicator::CUIMoneyIndicator()
     AttachChild(&m_back);
     AttachChild(&m_money_amount);
     AttachChild(&m_money_change);
-    m_pBonusMoney = new CUIGameLog();
+    m_pBonusMoney = xr_new<CUIGameLog>();
     AttachChild(m_pBonusMoney);
     //	m_pAnimChange = new CUIColorAnimatorWrapper("ui_mp_chat");
     //	m_pAnimChange->Cyclic(false);

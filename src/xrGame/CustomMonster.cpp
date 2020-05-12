@@ -699,13 +699,13 @@ void CCustomMonster::Die(IGameObject* who)
     SetActorVisibility(ID(), 0.f);
 }
 
-BOOL CCustomMonster::net_Spawn(CSE_Abstract* DC)
+bool CCustomMonster::net_Spawn(CSE_Abstract* DC)
 {
     memory().reload(*cNameSect());
     memory().reinit();
 
     if (!movement().net_Spawn(DC) || !inherited::net_Spawn(DC) || !CScriptEntity::net_Spawn(DC))
-        return (FALSE);
+        return (false);
 
     ISpatial* self = smart_cast<ISpatial*>(this);
     if (self)
@@ -778,9 +778,9 @@ BOOL CCustomMonster::net_Spawn(CSE_Abstract* DC)
     shedule.t_min = 100;
     shedule.t_max = 250; // This equaltiy is broken by Dima :-( // 30 * NET_Latency / 4;
 
-    m_moving_object = new moving_object(this);
+    m_moving_object = xr_new<moving_object>(this);
 
-    return TRUE;
+    return true;
 }
 
 #ifdef DEBUG
@@ -816,7 +816,7 @@ void CCustomMonster::net_Destroy()
     SetActorVisibility(ID(), 0.0f);
 }
 
-BOOL CCustomMonster::UsedAI_Locations() { return (TRUE); }
+bool CCustomMonster::UsedAI_Locations() { return (true); }
 void CCustomMonster::PitchCorrection()
 {
     CLevelGraph::SContour contour;
@@ -944,20 +944,20 @@ float CCustomMonster::evaluate(const CDangerManager* manager, const CDangerObjec
     return (memory().danger().evaluate(object));
 }
 
-CMovementManager* CCustomMonster::create_movement_manager() { return (new CMovementManager(this)); }
+CMovementManager* CCustomMonster::create_movement_manager() { return (xr_new<CMovementManager>(this)); }
 CSound_UserDataVisitor* CCustomMonster::create_sound_visitor()
 {
-    return (m_sound_user_data_visitor = new CSound_UserDataVisitor());
+    return (m_sound_user_data_visitor = xr_new<CSound_UserDataVisitor>());
 }
 
-CMemoryManager* CCustomMonster::create_memory_manager() { return (new CMemoryManager(this, create_sound_visitor())); }
+CMemoryManager* CCustomMonster::create_memory_manager() { return (xr_new<CMemoryManager>(this, create_sound_visitor())); }
 const SRotation CCustomMonster::Orientation() const { return (movement().m_body.current); };
 const MonsterSpace::SBoneRotation& CCustomMonster::head_orientation() const { return (movement().m_body); }
 IFactoryObject* CCustomMonster::_construct()
 {
     m_memory_manager = create_memory_manager();
     m_movement_manager = create_movement_manager();
-    m_sound_player = new CSoundPlayer(this);
+    m_sound_player = xr_new<CSoundPlayer>(this);
 
     inherited::_construct();
     CScriptEntity::_construct();

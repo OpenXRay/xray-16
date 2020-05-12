@@ -274,7 +274,7 @@ public:
     GenerationLevel get_generation() override { return GENERATION_R2; }
 
     bool is_sun_static() override { return o.sunstatic; }
-    DWORD get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }
+    u32 get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }
 
     // Loading / Unloading
     void create() override;
@@ -287,11 +287,11 @@ public:
 
     GLuint texture_load(LPCSTR fname, u32& msize, GLenum& ret_desc);
     HRESULT shader_compile(
-        LPCSTR name,
+        pcstr name,
         IReader* fs,
-        LPCSTR pFunctionName,
-        LPCSTR pTarget,
-        DWORD Flags,
+        pcstr pFunctionName,
+        pcstr pTarget,
+        u32 Flags,
         void*& result) override;
 
     // Information
@@ -338,16 +338,16 @@ public:
     IRenderVisual* model_Create(LPCSTR name, IReader* data = nullptr) override;
     IRenderVisual* model_CreateChild(LPCSTR name, IReader* data) override;
     IRenderVisual* model_Duplicate(IRenderVisual* V) override;
-    void model_Delete(IRenderVisual* & V, BOOL bDiscard) override;
+    void model_Delete(IRenderVisual* & V, bool bDiscard) override;
     virtual void model_Delete(IRender_DetailModel* & F);
-    void model_Logging(BOOL bEnable) override { Models->Logging(bEnable); }
+    void model_Logging(bool bEnable) override { Models->Logging(bEnable); }
     void models_Prefetch() override;
-    void models_Clear(BOOL b_complete) override;
+    void models_Clear(bool b_complete) override;
 
     // Occlusion culling
-    BOOL occ_visible(vis_data& V) override;
-    BOOL occ_visible(Fbox& B) override;
-    BOOL occ_visible(sPoly& P) override;
+    bool occ_visible(vis_data& V) override;
+    bool occ_visible(Fbox& B) override;
+    bool occ_visible(sPoly& P) override;
 
     // Main
     void BeforeFrame() override;

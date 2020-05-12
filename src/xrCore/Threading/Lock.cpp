@@ -49,7 +49,7 @@ struct profiler
     }
 };
 
-Lock::Lock(const char* id) : impl(new LockImpl), lockCounter(0), id(id) {}
+Lock::Lock(const char* id) : impl(xr_new<LockImpl>()), lockCounter(0), id(id) {}
 
 void Lock::Enter()
 {
@@ -63,7 +63,7 @@ void Lock::Enter()
     isLocked = true;
 }
 #else
-Lock::Lock() : impl(new LockImpl), lockCounter(0) {}
+Lock::Lock() : impl(xr_new<LockImpl>()), lockCounter(0) {}
 
 Lock::~Lock() { delete impl; }
 

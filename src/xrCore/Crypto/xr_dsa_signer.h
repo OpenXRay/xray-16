@@ -2,8 +2,6 @@
 #ifndef XR_DSA_SIGNER_INCLUDED
 #define XR_DSA_SIGNER_INCLUDED
 
-#include <cryptopp/dsa.h>
-
 #include "xr_dsa.h"
 #include "xr_sha.h"
 

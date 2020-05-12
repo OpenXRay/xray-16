@@ -18,10 +18,10 @@
 
 CUICustomSpin::CUICustomSpin()
 {
-    m_pFrameLine = new CUIFrameLineWnd();
-    m_pBtnUp = new CUI3tButton();
-    m_pBtnDown = new CUI3tButton();
-    m_pLines = new CUILines();
+    m_pFrameLine = xr_new<CUIFrameLineWnd>();
+    m_pBtnUp = xr_new<CUI3tButton>();
+    m_pBtnDown = xr_new<CUI3tButton>();
+    m_pLines = xr_new<CUILines>();
 
     m_pFrameLine->SetAutoDelete(true);
     m_pBtnUp->SetAutoDelete(true);

@@ -11,13 +11,13 @@
 
 ButtonListDialog::ButtonListDialog()
 {
-    Background = new CUIStatic();
+    Background = xr_new<CUIStatic>();
     Background->SetAutoDelete(true);
     AttachChild(Background);
-    Header = new CUITextWnd();
+    Header = xr_new<CUITextWnd>();
     Header->SetAutoDelete(true);
     AttachChild(Header);
-    CancelButton = new CUI3tButton();
+    CancelButton = xr_new<CUI3tButton>();
     CancelButton->SetAutoDelete(true);
     AttachChild(CancelButton);
 }
@@ -28,10 +28,10 @@ void ButtonListDialog::Initialize(int buttonCount)
     for (int i = 0; i < buttonCount; i++)
     {
         NamedButton btn;
-        btn.Button = new CUI3tButton();
+        btn.Button = xr_new<CUI3tButton>();
         btn.Button->SetAutoDelete(true);
         AttachChild(btn.Button);
-        btn.Text = new CUITextWnd();
+        btn.Text = xr_new<CUITextWnd>();
         btn.Text->SetAutoDelete(true);
         AttachChild(btn.Text);
         buttons.push_back(btn);

@@ -12,10 +12,10 @@ public:
     CPPEffectorCustom(const SPPInfo& ppi, bool one_instance = false, bool destroy_from_engine = true);
     EEffectorPPType get_type() { return m_type; }
 protected:
-    virtual BOOL Process(SPPInfo& pp);
+    virtual bool Process(SPPInfo& pp);
 
     // update factor; if return FALSE - destroy
-    virtual BOOL update() { return TRUE; }
+    virtual bool update() { return true; }
 private:
     SPPInfo m_state;
     EEffectorPPType m_type;
@@ -77,7 +77,7 @@ class CPPEffectorControlled : public CPPEffectorCustom
 public:
     CPPEffectorControlled(CPPEffectorController* controller, const SPPInfo& ppi, bool one_instance = false,
         bool destroy_from_engine = true);
-    virtual BOOL update();
+    virtual bool update();
     IC void set_factor(float value) { m_factor = value; }
 };
 

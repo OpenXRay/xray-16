@@ -32,7 +32,7 @@ public:
             result = I->second;
         if (0 == result)
         {
-            result = new T();
+            result = xr_new<T>();
             result->m_ref_cnt = 0;
             if (p(key, result))
                 container.insert(std::make_pair(key, result));

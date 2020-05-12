@@ -78,7 +78,7 @@ void CHitMarker::Hit(const Fvector& dir)
 {
     Fvector hit_dir = dir;
     hit_dir.mul(-1.0f);
-    m_HitMarks.push_back(new SHitMark(hShader2, hit_dir));
+    m_HitMarks.push_back(xr_new<SHitMark>(hShader2, hit_dir));
 }
 
 bool CHitMarker::AddGrenade_ForMark(CGrenade* grn)
@@ -98,7 +98,7 @@ bool CHitMarker::AddGrenade_ForMark(CGrenade* grn)
             return false;
     }
 
-    m_GrenadeMarks.push_back(new SGrenadeMark(hShader_Grenade, grn));
+    m_GrenadeMarks.push_back(xr_new<SGrenadeMark>(hShader_Grenade, grn));
 
     return true;
 }
@@ -158,7 +158,7 @@ SHitMark::SHitMark(const ui_shader& sh, const Fvector& dir)
     m_StartTime = Device.fTimeGlobal;
     m_lanim = LALib.FindItem("hud_hit_mark");
     m_HitDirection = dir.getH();
-    m_UIStaticItem = new CUIStaticItem();
+    m_UIStaticItem = xr_new<CUIStaticItem>();
     m_UIStaticItem->SetShader(sh);
     m_UIStaticItem->SetPos(256.0f, 128.0f);
     m_UIStaticItem->SetSize(Fvector2().set(512.0f, 512.0f));
@@ -185,7 +185,7 @@ SGrenadeMark::SGrenadeMark(const ui_shader& sh, CGrenade* grn)
     m_LightAnim = LALib.FindItem("hud_hit_mark");
     m_Angle = 0.0f;
 
-    m_UIStaticItem = new CUIStaticItem();
+    m_UIStaticItem = xr_new<CUIStaticItem>();
     m_UIStaticItem->SetShader(sh);
     float xs = 640.0f;
     float ys = 640.0f;

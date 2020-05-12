@@ -27,7 +27,7 @@ CObjectSpace::CObjectSpace()
 {
 #ifdef DEBUG
     if (GEnv.RenderFactory)
-        m_pRender = new FactoryPtr<IObjectSpaceRender>();
+        m_pRender = xr_new<FactoryPtr<IObjectSpaceRender>>();
 
 // sh_debug.create				("debug\\wireframe","$null");
 #endif

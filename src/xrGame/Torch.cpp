@@ -104,7 +104,7 @@ void CTorch::SwitchNightVision(bool vision_on, bool use_sounds)
         return;
     }
     if (!m_night_vision)
-        m_night_vision = new CNightVisionEffector(cNameSect());
+        m_night_vision = xr_new<CNightVisionEffector>(cNameSect());
 
     LPCSTR disabled_names = pSettings->r_string(cNameSect(), "disabled_maps");
     LPCSTR curr_map = *Level().name();
@@ -195,7 +195,7 @@ void CTorch::Switch(bool light_on)
     }
 }
 bool CTorch::torch_active() const { return (m_switched_on); }
-BOOL CTorch::net_Spawn(CSE_Abstract* DC)
+bool CTorch::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeItemTorch* torch = smart_cast<CSE_ALifeItemTorch*>(e);
@@ -204,7 +204,7 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 
     R_ASSERT(!GetCForm());
     R_ASSERT(smart_cast<IKinematics*>(Visual()));
-    CForm = new CCF_Skeleton(this);
+    CForm = xr_new<CCF_Skeleton>(this);
 
     if (!inherited::net_Spawn(DC))
         return (FALSE);

@@ -12,7 +12,7 @@ public:
     virtual ~CAI_Flesh();
 
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
 
     virtual void CheckSpecParams(u32 spec_params);
 

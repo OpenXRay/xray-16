@@ -50,7 +50,7 @@ void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
     m_desc = UIHelper::CreateTextWnd(ui_xml, "info_desc", this);
     m_prereq = UIHelper::CreateTextWnd(ui_xml, "info_prerequisites", this);
 
-    m_properties_wnd = new UIInvUpgPropertiesWnd();
+    m_properties_wnd = xr_new<UIInvUpgPropertiesWnd>();
     AttachChild(m_properties_wnd);
     m_properties_wnd->SetAutoDelete(true);
     m_properties_wnd->init_from_xml(xml_name);

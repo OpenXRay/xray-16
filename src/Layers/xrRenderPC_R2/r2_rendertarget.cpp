@@ -207,22 +207,26 @@ CRenderTarget::CRenderTarget()
     RImplementation.Resources->Evict();
 
     // Blenders
-    b_occq = new CBlender_light_occq();
-    b_accum_mask = new CBlender_accum_direct_mask();
-    b_accum_point = new CBlender_accum_point();
-    b_accum_spot = new CBlender_accum_spot();
-    b_accum_reflected = new CBlender_accum_reflected();
-    b_bloom = new CBlender_bloom_build();
-    b_ssao = new CBlender_SSAO();
-    b_luminance = new CBlender_luminance();
-    b_combine = new CBlender_combine();
+    b_occq = xr_new<CBlender_light_occq>();
+    b_accum_mask = xr_new<CBlender_accum_direct_mask>();
+    b_accum_point = xr_new<CBlender_accum_point>();
+    b_accum_spot = xr_new<CBlender_accum_spot>();
+    b_accum_reflected = xr_new<CBlender_accum_reflected>();
+    b_bloom = xr_new<CBlender_bloom_build>();
+    b_ssao = xr_new<CBlender_SSAO>();
+    b_luminance = xr_new<CBlender_luminance>();
+    b_combine = xr_new<CBlender_combine>();
 
     //  NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
         rt_Base.resize(HW.BackBufferCount);
         for (u32 i = 0; i < HW.BackBufferCount; i++)
-            rt_Base[i].create(BASE_RT(i), w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        {
+            string32 temp;
+            xr_sprintf(temp, "%s%d", r2_RT_base, i);
+            rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+        }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F);
@@ -293,14 +297,14 @@ CRenderTarget::CRenderTarget()
         s_accum_mask.create(b_accum_mask, "r2" DELIMITER "accum_mask");
         if (RImplementation.o.oldshadowcascades)
         {
-            b_accum_direct = new CBlender_accum_direct();
+            b_accum_direct = xr_new<CBlender_accum_direct>();
             s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct");
             if (RImplementation.o.advancedpp)
                 s_accum_direct_volumetric.create("accum_volumetric_sun");
         }
         else
         {
-            b_accum_direct = new CBlender_accum_direct_cascade();
+            b_accum_direct = xr_new<CBlender_accum_direct_cascade>();
             s_accum_direct.create(b_accum_direct, "r2" DELIMITER "accum_direct_cascade");
             if (RImplementation.o.advancedpp)
                 s_accum_direct_volumetric.create("accum_volumetric_sun_cascade");
@@ -595,7 +599,7 @@ CRenderTarget::CRenderTarget()
     //  Create an RT for online screenshot makining
     D3DSURFACE_DESC desc;
     get_base_rt()->GetDesc(&desc);
-    pFB.create(r2_async_ss, Device.dwWidth, Device.dwHeight, desc.Format, 1, { CRT::CreateSurface });
+    rt_async_ss.create(r2_async_ss, Device.dwWidth, Device.dwHeight, desc.Format, 1, { CRT::CreateSurface });
 
     //
     dwWidth = Device.dwWidth;

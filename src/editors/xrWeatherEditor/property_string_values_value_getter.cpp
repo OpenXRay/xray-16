@@ -14,8 +14,8 @@ typedef property_string_values_value_getter::collection_type collection_type;
 property_string_values_value_getter::property_string_values_value_getter(string_getter_type const& getter,
     string_setter_type const& setter, string_collection_getter_type const& collection_getter,
     string_collection_size_getter_type const& collection_size_getter)
-    : inherited(getter, setter), m_collection_getter(new string_collection_getter_type(collection_getter)),
-      m_collection_size_getter(new string_collection_size_getter_type(collection_size_getter))
+    : inherited(getter, setter), m_collection_getter(xr_new<string_collection_getter_type>(collection_getter)),
+      m_collection_size_getter(xr_new<string_collection_size_getter_type>(collection_size_getter))
 {
 }
 

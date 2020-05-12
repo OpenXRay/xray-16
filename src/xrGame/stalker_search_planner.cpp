@@ -46,12 +46,12 @@ void CStalkerSearchPlanner::update() { inherited::update(); }
 void CStalkerSearchPlanner::finalize() { inherited::finalize(); }
 void CStalkerSearchPlanner::add_evaluators()
 {
-    add_evaluator(eWorldPropertyPureEnemy, new CStalkerPropertyEvaluatorConst(true, "is_there_enemies_delayed"));
+    add_evaluator(eWorldPropertyPureEnemy, xr_new<CStalkerPropertyEvaluatorConst>(true, "is_there_enemies_delayed"));
     add_evaluator(eWorldPropertyEnemyLocationReached,
-        new CStalkerPropertyEvaluatorMember(
+        xr_new<CStalkerPropertyEvaluatorMember>(
             (CPropertyStorage*)0, eWorldPropertyEnemyLocationReached, true, true, "enemy location reached"));
     add_evaluator(eWorldPropertyAmbushLocationReached,
-        new CStalkerPropertyEvaluatorMember(
+        xr_new<CStalkerPropertyEvaluatorMember>(
             (CPropertyStorage*)0, eWorldPropertyAmbushLocationReached, true, true, "ambush location reached"));
 }
 
@@ -59,20 +59,20 @@ void CStalkerSearchPlanner::add_actions()
 {
     CStalkerActionBase* action;
 
-    action = new CStalkerActionReachEnemyLocation(
+    action = xr_new<CStalkerActionReachEnemyLocation>(
         m_object, CActionBase<CScriptGameObject>::m_storage, "reach enemy location");
     add_condition(action, eWorldPropertyEnemyLocationReached, false);
     add_effect(action, eWorldPropertyEnemyLocationReached, true);
     add_operator(eWorldOperatorReachEnemyLocation, action);
 
-    action = new CStalkerActionReachAmbushLocation(
+    action = xr_new<CStalkerActionReachAmbushLocation>(
         m_object, CActionBase<CScriptGameObject>::m_storage, "reach ambush location");
     add_condition(action, eWorldPropertyEnemyLocationReached, true);
     add_condition(action, eWorldPropertyAmbushLocationReached, false);
     add_effect(action, eWorldPropertyAmbushLocationReached, true);
     add_operator(eWorldOperatorReachAmbushLocation, action);
 
-    action = new CStalkerActionHoldAmbushLocation(
+    action = xr_new<CStalkerActionHoldAmbushLocation>(
         m_object, CActionBase<CScriptGameObject>::m_storage, "hold ambush location");
     add_condition(action, eWorldPropertyAmbushLocationReached, true);
     add_effect(action, eWorldPropertyPureEnemy, false);

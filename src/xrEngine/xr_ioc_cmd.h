@@ -41,7 +41,7 @@ public:
     typedef xr_vector<shared_str> vecLRU;
 
 protected:
-    LPCSTR cName;
+    pcstr cName;
     bool bEnabled;
     bool bLowerCaseArgs;
     bool bEmptyArgsHandled;
@@ -53,9 +53,9 @@ protected:
         LRU_MAX_COUNT = 10
     };
 
-    IC bool EQ(LPCSTR S1, LPCSTR S2) { return xr_strcmp(S1, S2) == 0; }
+    IC bool EQ(pcstr S1, pcstr S2) { return xr_strcmp(S1, S2) == 0; }
 public:
-    IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(FALSE), bEmptyArgsHandled(FALSE)
+    IConsole_Command(pcstr N BENCH_SEC_SIGN) : cName(N), bEnabled(true), bLowerCaseArgs(false), bEmptyArgsHandled(false)
     {
         m_LRU.reserve(LRU_MAX_COUNT + 1);
         m_LRU.clear();
@@ -68,9 +68,9 @@ public:
 
     BENCH_SEC_SCRAMBLEVTBL3
 
-    LPCSTR Name() { return cName; }
+    pcstr Name() { return cName; }
     void InvalidSyntax();
-    virtual void Execute(LPCSTR args) = 0;
+    virtual void Execute(pcstr args) = 0;
     virtual void GetStatus(TStatus& S) { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_strcpy(I, "(no arguments)"); }
     virtual void Save(IWriter* F)
@@ -97,18 +97,18 @@ protected:
     u32 mask;
 
 public:
-    CCC_Mask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M){};
-    const BOOL GetValue() const { return value->test(mask); }
-    virtual void Execute(LPCSTR args)
+    CCC_Mask(pcstr N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M){};
+    const bool GetValue() const { return value->test(mask); }
+    virtual void Execute(pcstr args)
     {
         if (EQ(args, "on"))
-            value->set(mask, TRUE);
+            value->set(mask, true);
         else if (EQ(args, "off"))
-            value->set(mask, FALSE);
+            value->set(mask, false);
         else if (EQ(args, "1"))
-            value->set(mask, TRUE);
+            value->set(mask, true);
         else if (EQ(args, "0"))
-            value->set(mask, FALSE);
+            value->set(mask, false);
         else
             InvalidSyntax();
     }
@@ -129,9 +129,9 @@ protected:
     u32 mask;
 
 public:
-    CCC_ToggleMask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = TRUE; }
-    const BOOL GetValue() const { return value->test(mask); }
-    virtual void Execute(LPCSTR /*args*/)
+    CCC_ToggleMask(pcstr N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = true; }
+    const bool GetValue() const { return value->test(mask); }
+    virtual void Execute(pcstr /*args*/)
     {
         value->set(mask, !GetValue());
         TStatus S;
@@ -155,9 +155,9 @@ protected:
     const xr_token* tokens;
 
 public:
-    CCC_Token(LPCSTR N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){}
+    CCC_Token(pcstr N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){}
 
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(pcstr args)
     {
         const xr_token* tok = GetToken();
         if (!tok)
@@ -240,7 +240,7 @@ protected:
     float min, max;
 
 public:
-    CCC_Float(LPCSTR N, float* V, float _min = 0, float _max = 1)
+    CCC_Float(pcstr N, float* V, float _min = 0, float _max = 1)
         : IConsole_Command(N), value(V), min(_min), max(_max){}
     const float GetValue() const { return *value; }
     void GetBounds(float& fmin, float& fmax) const
@@ -249,7 +249,7 @@ public:
         fmax = max;
     }
 
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(pcstr args)
     {
         float v = float(atof(args));
         if (v < (min - EPS) || v > (max + EPS))
@@ -280,14 +280,14 @@ protected:
     Fvector min, max;
 
 public:
-    CCC_Vector3(LPCSTR N, Fvector* V, const Fvector _min, const Fvector _max) : IConsole_Command(N), value(V)
+    CCC_Vector3(pcstr N, Fvector* V, const Fvector _min, const Fvector _max) : IConsole_Command(N), value(V)
     {
         min.set(_min);
         max.set(_max);
     };
     const Fvector GetValue() const { return *value; }
     Fvector* GetValuePtr() const { return value; }
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(pcstr args)
     {
         Fvector v;
         if (3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z))
@@ -339,9 +339,9 @@ public:
         imax = max;
     }
 
-    CCC_Integer(LPCSTR N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max){}
+    CCC_Integer(pcstr N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max){}
 
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(pcstr args)
     {
         int v = atoi(args);
         if (v < min || v > max)
@@ -363,23 +363,23 @@ public:
 class ENGINE_API CCC_String : public IConsole_Command
 {
 protected:
-    LPSTR value;
+    pstr value;
     int size;
 
 public:
-    CCC_String(LPCSTR N, LPSTR V, int _size = 2) : IConsole_Command(N), value(V), size(_size)
+    CCC_String(pcstr N, pstr V, int _size = 2) : IConsole_Command(N), value(V), size(_size)
     {
-        bLowerCaseArgs = FALSE;
+        bLowerCaseArgs = false;
         R_ASSERT(V);
         R_ASSERT(size > 1);
     };
 
-    virtual void Execute(LPCSTR args) { strncpy_s(value, size, args, size - 1); }
+    virtual void Execute(pcstr args) { strncpy_s(value, size, args, size - 1); }
     virtual void GetStatus(TStatus& S) { xr_strcpy(S, value); }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "string with up to %d characters", size); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
-        tips.push_back((LPCSTR)value);
+        tips.push_back((pcstr)value);
         IConsole_Command::fill_tips(tips, mode);
     }
 };
@@ -387,9 +387,9 @@ public:
 class ENGINE_API CCC_LoadCFG : public IConsole_Command
 {
 public:
-    virtual bool allow(LPCSTR /*cmd*/) { return true; }
-    CCC_LoadCFG(LPCSTR N);
-    virtual void Execute(LPCSTR args);
+    virtual bool allow(pcstr /*cmd*/) { return true; }
+    CCC_LoadCFG(pcstr N);
+    virtual void Execute(pcstr args);
 };
 
 class ENGINE_API CCC_LoadCFG_custom : public CCC_LoadCFG
@@ -397,6 +397,6 @@ class ENGINE_API CCC_LoadCFG_custom : public CCC_LoadCFG
     string64 m_cmd;
 
 public:
-    CCC_LoadCFG_custom(LPCSTR cmd);
-    virtual bool allow(LPCSTR cmd);
+    CCC_LoadCFG_custom(pcstr cmd);
+    virtual bool allow(pcstr cmd);
 };

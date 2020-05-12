@@ -121,15 +121,15 @@ public:
 #endif
     virtual void MakeMeCrow() override;
     virtual void IAmNotACrowAnyMore() override { Props.crow = false; }
-    virtual BOOL AlwaysTheCrow() override { return FALSE; }
+    virtual bool AlwaysTheCrow() override { return FALSE; }
     virtual bool AmICrow() const override { return !!Props.crow; }
     // Network
-    virtual BOOL Local() const override { return Props.net_Local; }
-    virtual BOOL Remote() const override { return !Props.net_Local; }
+    virtual bool Local() const override { return Props.net_Local; }
+    virtual bool Remote() const override { return !Props.net_Local; }
     virtual u16 ID() const override { return Props.net_ID; }
     virtual void setID(u16 _ID) override { Props.net_ID = _ID; }
-    virtual BOOL GetTmpPreDestroy() const override { return Props.bPreDestroy; }
-    virtual void SetTmpPreDestroy(BOOL b) override { Props.bPreDestroy = b; }
+    virtual bool GetTmpPreDestroy() const override { return Props.bPreDestroy; }
+    virtual void SetTmpPreDestroy(bool b) override { Props.bPreDestroy = b; }
     virtual float shedule_Scale() override { return Device.vCameraPosition.distance_to(Position()) / 200.f; }
     virtual bool shedule_Needed() override;
     virtual void shedule_Update(u32 dt) override;
@@ -161,8 +161,8 @@ public:
     virtual const Fbox& BoundingBox() const override;
     virtual IRender_Sector* Sector() override { return H_Root()->GetSpatialData().sector; }
     virtual IRender_ObjectSpecific* ROS() override { return RenderableBase::renderable_ROS(); }
-    virtual BOOL renderable_ShadowGenerate() override { return TRUE; }
-    virtual BOOL renderable_ShadowReceive() override { return TRUE; }
+    virtual bool renderable_ShadowGenerate() override { return TRUE; }
+    virtual bool renderable_ShadowReceive() override { return TRUE; }
     // Accessors and converters
     virtual IRenderVisual* Visual() const override { return renderable.visual; }
     virtual IPhysicsShell* physics_shell() override { return nullptr; }
@@ -180,18 +180,18 @@ public:
     virtual void processing_activate() override; // request to enable UpdateCL
     virtual void processing_deactivate() override; // request to disable UpdateCL
     virtual bool processing_enabled() override { return !!Props.bActiveCounter; }
-    virtual void setVisible(BOOL _visible) override;
-    virtual BOOL getVisible() const override { return Props.bVisible; }
-    virtual void setEnabled(BOOL _enabled) override;
-    virtual BOOL getEnabled() const override { return Props.bEnabled; }
-    virtual void setDestroy(BOOL _destroy) override;
-    virtual BOOL getDestroy() const override { return Props.bDestroy; }
-    virtual void setLocal(BOOL _local) override { Props.net_Local = _local ? 1 : 0; }
-    virtual BOOL getLocal() const override { return Props.net_Local; }
-    virtual void setSVU(BOOL _svu) override { Props.net_SV_Update = _svu ? 1 : 0; }
-    virtual BOOL getSVU() const override { return Props.net_SV_Update; }
-    virtual void setReady(BOOL _ready) override { Props.net_Ready = _ready ? 1 : 0; }
-    virtual BOOL getReady() const override { return Props.net_Ready; }
+    virtual void setVisible(bool _visible) override;
+    virtual bool getVisible() const override { return Props.bVisible; }
+    virtual void setEnabled(bool _enabled) override;
+    virtual bool getEnabled() const override { return Props.bEnabled; }
+    virtual void setDestroy(bool _destroy) override;
+    virtual bool getDestroy() const override { return Props.bDestroy; }
+    virtual void setLocal(bool _local) override { Props.net_Local = _local ? 1 : 0; }
+    virtual bool getLocal() const override { return Props.net_Local; }
+    virtual void setSVU(bool _svu) override { Props.net_SV_Update = _svu ? 1 : 0; }
+    virtual bool getSVU() const override { return Props.net_SV_Update; }
+    virtual void setReady(bool _ready) override { Props.net_Ready = _ready ? 1 : 0; }
+    virtual bool getReady() const override { return Props.net_Ready; }
     // functions used for avoiding most of the smart_cast
     virtual CAttachmentOwner* cast_attachment_owner() override { return NULL; }
     virtual CInventoryOwner* cast_inventory_owner() override { return NULL; }
@@ -230,13 +230,13 @@ public:
     // object serialization
     virtual void net_Save(NET_Packet& packet) override;
     virtual void net_Load(IReader& reader) override;
-    virtual BOOL net_SaveRelevant() override;
+    virtual bool net_SaveRelevant() override;
     virtual void net_Export(NET_Packet& packet) override {} // export to server
     virtual void net_Import(NET_Packet& packet) override {} // import from server
-    virtual BOOL net_Spawn(CSE_Abstract* entity) override;
+    virtual bool net_Spawn(CSE_Abstract* entity) override;
     virtual void net_Destroy() override;
     virtual void net_ImportInput(NET_Packet& packet) override {}
-    virtual BOOL net_Relevant() override { return getLocal(); } // send messages only if active and local
+    virtual bool net_Relevant() override { return getLocal(); } // send messages only if active and local
     virtual void net_MigrateInactive(NET_Packet& packet) override { Props.net_Local = FALSE; }
     virtual void net_MigrateActive(NET_Packet& packet) override { Props.net_Local = TRUE; }
     virtual void net_Relcase(IGameObject* O) override; // destroy all links to another objects
@@ -252,12 +252,12 @@ public:
     void OnHUDDraw(CCustomHUD* /*hud*/, IRenderable* /*root*/) override {}
     void OnRenderHUD(IGameObject* pCurViewEntity) override {} //--#SM+#--
     void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) override  {} //--#SM+#--
-    virtual BOOL Ready() override { return getReady(); } // update only if active and fully initialized by/for network
+    virtual bool Ready() override { return getReady(); } // update only if active and fully initialized by/for network
     void renderable_Render(IRenderable* root) override;
     virtual void OnEvent(NET_Packet& P, u16 type) override;
     virtual void Hit(SHit* pHDS) override {}
     virtual void SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir) override {}
-    virtual BOOL BonePassBullet(int boneID) override { return FALSE; }
+    virtual bool BonePassBullet(int boneID) override { return FALSE; }
     //игровое имя объекта
     virtual LPCSTR Name() const override;
     // Active/non active
@@ -281,8 +281,8 @@ public:
     virtual const animation_movement_controller* animation_movement() const override { return m_anim_mov_ctrl; }
     virtual animation_movement_controller* animation_movement() override { return m_anim_mov_ctrl; }
     // Game-specific events
-    virtual BOOL UsedAI_Locations() override;
-    virtual BOOL TestServerFlag(u32 Flag) const override;
+    virtual bool UsedAI_Locations() override;
+    virtual bool TestServerFlag(u32 Flag) const override;
     virtual bool can_validate_position_on_spawn() override { return true; }
 #ifdef DEBUG
     bool ShouldProcessOnRender() const override { return m_should_process_onrender; }

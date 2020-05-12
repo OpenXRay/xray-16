@@ -20,7 +20,7 @@
 extern CUIGameCustom* CurrentGameUI() { return HUD().GetGameUI(); }
 
 //--------------------------------------------------------------------
-CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(new CHUDTarget()), b_online(false) {}
+CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(xr_new<CHUDTarget>()), b_online(false) {}
 //--------------------------------------------------------------------
 CHUDManager::~CHUDManager()
 {
@@ -130,7 +130,7 @@ void CHUDManager::RenderActiveItemUI()
     g_player_hud->render_item_ui();
 }
 
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 //отрисовка элементов интерфейса
 void CHUDManager::RenderUI()
 {

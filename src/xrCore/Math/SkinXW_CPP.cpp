@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "SkinXW_CPP.hpp"
+#ifdef USE_TBB_PARALLEL
 #include "tbb/parallel_for.h"
 #include "tbb/blocked_range.h"
+#endif // USE_TBB_PARALLEL
 #ifdef _EDITOR
 #include "SkeletonX.h"
 #include "SkeletonCustom.h"

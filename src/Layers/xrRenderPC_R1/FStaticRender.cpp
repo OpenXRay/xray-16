@@ -91,12 +91,16 @@ void CRender::create()
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
     c_ldynamic_props = "L_dynamic_props";
 
+    o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
+    if (o.no_ram_textures)
+        Msg("* Managed textures disabled");
+
     m_bMakeAsyncSS = false;
 
-    Target = new CRenderTarget(); // Main target
+    Target = xr_new<CRenderTarget>(); // Main target
 
-    Models = new CModelPool();
-    L_Dynamic = new CLightR_Manager();
+    Models = xr_new<CModelPool>();
+    L_Dynamic = xr_new<CLightR_Manager>();
     PSLibrary.OnCreate();
     //.	HWOCC.occq_create			(occq_size);
 
@@ -134,14 +138,14 @@ void CRender::reset_begin()
 void CRender::reset_end()
 {
     //.	HWOCC.occq_create			(occq_size);
-    Target = new CRenderTarget();
+    Target = xr_new<CRenderTarget>();
     if (L_Projector)
         L_Projector->invalidate();
 
     // let's reload details while changed details options on vid_restart
     if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
     {
-        Details = new CDetailManager();
+        Details = xr_new<CDetailManager>();
         Details->Load();
     }
 
@@ -178,12 +182,12 @@ void CRender::BeforeWorldRender() {}
 void CRender::AfterWorldRender() {}
 
 // Implementation
-IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
+IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new<CROS_impl>(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
 IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
 IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
-void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
+void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
@@ -191,7 +195,7 @@ void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 }
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
-    CDetail* D = new CDetail();
+    CDetail* D = xr_new<CDetail>();
     D->Load(F);
     return D;
 }
@@ -224,7 +228,7 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
     }
 }
 void CRender::models_Prefetch() { Models->Prefetch(); }
-void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
 ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
@@ -292,11 +296,11 @@ FSlideWindowItem* CRender::getSWI(int id)
 }
 IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return Lights.Create(); }
-IRender_Glow* CRender::glow_create() { return new CGlow(); }
+IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
-BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
-BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
+bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     set_Object(root);
@@ -537,8 +541,11 @@ void CRender::Calculate()
             std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
 
             // Determine visibility for dynamic part of scene
-            g_hud->Render_First(); // R1 shadows
+            if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
+                g_hud->Render_First(); // R1 shadows
+
             g_hud->Render_Last();
+
             u32 uID_LTRACK = 0xffffffff;
             if (phase == PHASE_NORMAL)
             {

@@ -30,7 +30,7 @@ CEntity::~CEntity() { xr_delete(m_entity_condition); }
 CEntityConditionSimple* CEntity::create_entity_condition(CEntityConditionSimple* ec)
 {
     if (!ec)
-        m_entity_condition = new CEntityConditionSimple();
+        m_entity_condition = xr_new<CEntityConditionSimple>();
     else
         m_entity_condition = smart_cast<CEntityCondition*>(ec);
 
@@ -149,7 +149,7 @@ void CEntity::Load(LPCSTR section)
     //////////////////////////////////////
 }
 
-BOOL CEntity::net_Spawn(CSE_Abstract* DC)
+bool CEntity::net_Spawn(CSE_Abstract* DC)
 {
     m_level_death_time = 0;
     m_game_death_time = 0;

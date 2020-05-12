@@ -6,7 +6,7 @@
 #include "ai/monsters/control_animation_base.h"
 #include "ai/monsters/control_movement_base.h"
 
-CCat::CCat() { StateMan = new CStateManagerCat(this); }
+CCat::CCat() { StateMan = xr_new<CStateManagerCat>(this); }
 CCat::~CCat() { xr_delete(StateMan); }
 void CCat::Load(LPCSTR section)
 {

@@ -1327,7 +1327,7 @@ struct STraceBorderQParams
     }
 };
 
-BOOL CPHMovementControl::BorderTraceCallback(collide::rq_result& result, LPVOID params)
+bool CPHMovementControl::BorderTraceCallback(collide::rq_result& result, LPVOID params)
 {
     STraceBorderQParams& p = *(STraceBorderQParams*)params;
     u16 mtl_idx = GAMEMTL_NONE_IDX;

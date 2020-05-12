@@ -67,7 +67,7 @@ void CPhysicItem::OnH_B_Chield()
     inherited::deactivate_physics_shell();
 }
 
-BOOL CPhysicItem::net_Spawn(CSE_Abstract* DC)
+bool CPhysicItem::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

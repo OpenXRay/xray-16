@@ -67,7 +67,7 @@ public:
     void remove_links(IGameObject* O);
 
 protected:
-    virtual CTelekineticObject* alloc_tele_object() { return new CTelekineticObject(); }
+    virtual CTelekineticObject* alloc_tele_object() { return xr_new<CTelekineticObject>(); }
 private:
     // обновление на шагах физики
     virtual void PhDataUpdate(float step);

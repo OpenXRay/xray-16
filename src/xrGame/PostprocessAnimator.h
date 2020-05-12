@@ -9,8 +9,8 @@ public:
     CPostprocessAnimator();
     virtual void Stop(float speed) override;
     virtual void Load(LPCSTR name, bool internalFs = true) override;
-    virtual BOOL Valid();
-    virtual BOOL Process(SPPInfo& PPInfo);
+    virtual bool Valid();
+    virtual bool Process(SPPInfo& PPInfo);
 };
 
 class CPostprocessAnimatorLerp : public CPostprocessAnimator
@@ -20,7 +20,7 @@ protected:
 
 public:
     void SetFactorFunc(fastdelegate::FastDelegate0<float> f) { m_get_factor_func = f; }
-    virtual BOOL Process(SPPInfo& PPInfo);
+    virtual bool Process(SPPInfo& PPInfo);
 };
 
 class CPostprocessAnimatorLerpConst : public CPostprocessAnimator
@@ -31,7 +31,7 @@ protected:
 public:
     CPostprocessAnimatorLerpConst() { m_power = 1.0f; }
     void SetPower(float val) { m_power = val; }
-    virtual BOOL Process(SPPInfo& PPInfo);
+    virtual bool Process(SPPInfo& PPInfo);
 };
 
 class CEffectorController;
@@ -43,5 +43,5 @@ class CPostprocessAnimatorControlled : public CPostprocessAnimatorLerp
 public:
     virtual ~CPostprocessAnimatorControlled();
     CPostprocessAnimatorControlled(CEffectorController* c);
-    virtual BOOL Valid();
+    virtual bool Valid();
 };

@@ -32,7 +32,7 @@ game_cl_GameState::game_cl_GameState()
     m_u16VotingEnabled = 0;
     m_bServerControlHits = true;
 
-    m_WeaponUsageStatistic = new WeaponUsageStatistic();
+    m_WeaponUsageStatistic = xr_new<WeaponUsageStatistic>();
 }
 
 game_cl_GameState::~game_cl_GameState()

@@ -31,7 +31,7 @@ class CALifeRegistryWrapperObject
     T* m_registry;
 
 public:
-    IC CALifeRegistryWrapperObject() { m_registry = new T(); }
+    IC CALifeRegistryWrapperObject() { m_registry = xr_new<T>(); }
     virtual ~CALifeRegistryWrapperObject() { xr_delete(m_registry); }
     IC T& registry() const
     {

@@ -42,7 +42,7 @@ struct _SoundProcessor : public pureFrame
     }
 } SoundProcessor;
 
-LPCSTR _GetFontTexName(LPCSTR section)
+pcstr _GetFontTexName(pcstr section)
 {
     static const char* tex_names[] = {"texture800", "texture", "texture1600"};
     int def_idx = 1; // default 1024x768
@@ -74,15 +74,15 @@ LPCSTR _GetFontTexName(LPCSTR section)
     return pSettings->r_string(section, tex_names[def_idx]);
 }
 
-void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
+void _InitializeFont(CGameFont*& F, pcstr section, u32 flags)
 {
-    LPCSTR font_tex_name = _GetFontTexName(section);
+    pcstr font_tex_name = _GetFontTexName(section);
     R_ASSERT(font_tex_name);
 
-    LPCSTR sh_name = pSettings->r_string(section, "shader");
+    pcstr sh_name = pSettings->r_string(section, "shader");
     if (!F)
     {
-        F = new CGameFont(sh_name, font_tex_name, flags);
+        F = xr_new<CGameFont>(sh_name, font_tex_name, flags);
     }
     else
         F->Initialize(sh_name, font_tex_name);
@@ -178,8 +178,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     }
     else if (E == eStart)
     {
-        LPSTR op_server = LPSTR(P1);
-        LPSTR op_client = LPSTR(P2);
+        pstr op_server = pstr(P1);
+        pstr op_client = pstr(P2);
         Level_Current = u32(-1);
         R_ASSERT(nullptr == g_pGameLevel);
         R_ASSERT(nullptr != g_pGamePersistent);
@@ -202,7 +202,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     }
     else if (E == eDisconnect)
     {
-        if (pInput != nullptr && TRUE == Engine.Event.Peek("KERNEL:quit"))
+        if (pInput != nullptr && true == Engine.Event.Peek("KERNEL:quit"))
             pInput->GrabInput(false);
 
         if (g_pGameLevel)
@@ -212,24 +212,26 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
             DEL_INSTANCE(g_pGameLevel);
             Console->Show();
 
-            if ((FALSE == Engine.Event.Peek("KERNEL:quit")) && (FALSE == Engine.Event.Peek("KERNEL:start")))
+            if ((false == Engine.Event.Peek("KERNEL:quit")) && (false == Engine.Event.Peek("KERNEL:start")))
             {
                 Console->Execute("main_menu off");
                 Console->Execute("main_menu on");
             }
         }
-        R_ASSERT(nullptr != g_pGamePersistent);
-        g_pGamePersistent->Disconnect();
+        if (g_pGamePersistent)
+        {
+            g_pGamePersistent->Disconnect();
+        }
     }
     else if (E == eConsole)
     {
-        LPSTR command = (LPSTR)P1;
+        pstr command = (pstr)P1;
         Console->ExecuteCommand(command, false);
         xr_free(command);
     }
     else if (E == eStartMPDemo)
     {
-        LPSTR demo_file = LPSTR(P1);
+        pstr demo_file = pstr(P1);
 
         R_ASSERT(nullptr == g_pGameLevel);
         R_ASSERT(nullptr != g_pGamePersistent);
@@ -333,7 +335,7 @@ void CApplication::SetLoadStageTitle(pcstr _ls_title)
     loadingScreen->SetStageTitle(_ls_title);
 }
 
-void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
+void CApplication::LoadTitleInt(pcstr str1, pcstr str2, pcstr str3)
 {
     loadingScreen->SetStageTip(str1, str2, str3);
 }
@@ -366,7 +368,7 @@ void CApplication::OnFrame()
         g_pGameLevel->SoundEvent_Dispatch();
 }
 
-void CApplication::Level_Append(LPCSTR folder)
+void CApplication::Level_Append(pcstr folder)
 {
     string_path N1, N2, N3, N4;
     strconcat(sizeof(N1), N1, folder, "level");
@@ -393,7 +395,11 @@ void CApplication::Level_Scan()
     Levels.clear();
 
     xr_vector<char*>* folder = FS.file_list_open("$game_levels$", FS_ListFolders | FS_RootOnly);
-    //. R_ASSERT (folder&&folder->size());
+    if (!folder)
+    {
+        Log("! No levels found in game data");
+        return;
+    }
 
     for (u32 i = 0; i < folder->size(); ++i)
         Level_Append((*folder)[i]);
@@ -401,7 +407,7 @@ void CApplication::Level_Scan()
     FS.file_list_close(folder);
 }
 
-void gen_logo_name(string_path& dest, LPCSTR level_name, int num = -1)
+void gen_logo_name(string_path& dest, pcstr level_name, int num = -1)
 {
     strconcat(sizeof(dest), dest, "intro" DELIMITER "intro_", level_name);
 
@@ -460,7 +466,7 @@ void CApplication::Level_Set(u32 L)
         loadingScreen->SetLevelLogo(path);
 }
 
-int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
+int CApplication::Level_ID(pcstr name, pcstr ver, bool bSet)
 {
     int result = -1;
     auto it = FS.m_archives.begin();
@@ -476,8 +482,8 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
         if (A.hSrcFile == 0)
 #endif
         {
-            LPCSTR ln = A.header->r_string("header", "level_name");
-            LPCSTR lv = A.header->r_string("header", "level_ver");
+            pcstr ln = A.header->r_string("header", "level_name");
+            pcstr lv = A.header->r_string("header", "level_ver");
             if (0 == xr_stricmp(ln, name) && 0 == xr_stricmp(lv, ver))
             {
                 FS.LoadArchive(A);
@@ -508,7 +514,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
     return result;
 }
 
-CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
+CInifile* CApplication::GetArchiveHeader(pcstr name, pcstr ver)
 {
     auto it = FS.m_archives.begin();
     auto it_e = FS.m_archives.end();
@@ -519,8 +525,8 @@ CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
         if (!A.header)
             continue;
 
-        LPCSTR ln = A.header->r_string("header", "level_name");
-        LPCSTR lv = A.header->r_string("header", "level_ver");
+        pcstr ln = A.header->r_string("header", "level_name");
+        pcstr lv = A.header->r_string("header", "level_ver");
         if (0 == xr_stricmp(ln, name) && 0 == xr_stricmp(lv, ver))
         {
             return A.header;

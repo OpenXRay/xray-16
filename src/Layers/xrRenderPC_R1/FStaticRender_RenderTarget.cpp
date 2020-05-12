@@ -1,26 +1,15 @@
 #include "stdafx.h"
 #include "fstaticrender_rendertarget.h"
+#include "FStaticRender_Types.h"
 #include "xrEngine/IGame_Persistent.h"
-
-// Base targets
-#define r1_RT_base "$user$base_"
-#define r1_RT_base_depth "$user$base_depth"
-#define BASE_RT(a) r1_RT_base #a
-
-static LPCSTR RTname = "$user$rendertarget";
-static LPCSTR RTname_color_map = "$user$rendertarget_color_map";
-static LPCSTR RTname_distort = "$user$distort";
-static LPCSTR RTname_temp_zb = "$user$temp_zb";
-static LPCSTR RTname_async_ss = "$user$async_ss";
 
 CRenderTarget::CRenderTarget()
 {
     bAvailable = FALSE;
-    RT = nullptr;
-    RT_color_map = nullptr;
-    pTempZB = nullptr;
-    ZB = nullptr;
-    pFB = nullptr;
+    rt_Generic = nullptr;
+    rt_color_map = nullptr;
+    rt_temp_zb = nullptr;
+    rt_Depth = nullptr;
 
     param_blur = 0.f;
     param_gray = 0.f;
@@ -64,35 +53,37 @@ BOOL CRenderTarget::Create()
     // Bufferts
     rt_Base.resize(HW.BackBufferCount);
     for (u32 i = 0; i < HW.BackBufferCount; i++)
-        rt_Base[i].create(BASE_RT(i), curWidth, curHeight, HW.Caps.fTarget, 1, { CRT::CreateBase });
+    {
+        string32 temp;
+        xr_sprintf(temp, "%s%d", r1_RT_base, i);
+        rt_Base[i].create(temp, curWidth, curHeight, HW.Caps.fTarget, 1, { CRT::CreateBase });
+    }
     rt_Base_Depth.create(r1_RT_base_depth, curWidth, curHeight, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
-    RT.create(RTname, rtWidth, rtHeight, HW.Caps.fTarget);
-    RT_distort.create(RTname_distort, rtWidth, rtHeight, HW.Caps.fTarget);
+    rt_Generic.create(r1_RT_generic, rtWidth, rtHeight, HW.Caps.fTarget);
+    rt_distort.create(rt_RT_distort, rtWidth, rtHeight, HW.Caps.fTarget);
     if (RImplementation.o.color_mapping)
     {
-        // RT_color_map.create  (RTname_color_map,  rtWidth,rtHeight,HW.Caps.fTarget);
-        RT_color_map.create(RTname_color_map, curWidth, curHeight, HW.Caps.fTarget);
+        //rt_color_map.create(rt_RT_color_map, rtWidth, rtHeight, HW.Caps.fTarget);
+        rt_color_map.create(rt_RT_color_map, curWidth, curHeight, HW.Caps.fTarget);
     }
     // RImplementation.o.color_mapping = RT_color_map->valid();
 
     if ((rtHeight != Device.dwHeight) || (rtWidth != Device.dwWidth))
     {
-        R_CHK(HW.pDevice->CreateDepthStencilSurface(
-            rtWidth, rtHeight, HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &ZB, NULL));
+        rt_Depth.create(r1_RT_depth, rtWidth, rtHeight, HW.Caps.fDepth, 0, { CRT::CreateSurface });
     }
     else
     {
-        ZB = get_base_zb();
-        ZB->AddRef();
+        rt_Depth = rt_Base_Depth;
     }
 
     // Temp ZB, used by some of the shadowing code
-    pTempZB.create(RTname_temp_zb, 512, 512, HW.Caps.fDepth, 1, { CRT::CreateSurface });
+    rt_temp_zb.create(rt_RT_temp_zb, 512, 512, HW.Caps.fDepth, 0, { CRT::CreateSurface });
 
     // Igor: TMP
     // Create an RT for online screenshot makining
-    pFB.create(RTname_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 1, { CRT::CreateSurface });
+    rt_async_ss.create(r1_RT_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 0, { CRT::CreateSurface });
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
@@ -108,26 +99,26 @@ BOOL CRenderTarget::Create()
             Log("~ Color mapping disabled due to lack of one shader or both shaders");
             s_postprocess[1].destroy();
             s_postprocess_D[1].destroy();
-            RT_color_map->destroy();
+            rt_color_map->destroy();
             RImplementation.o.color_mapping = FALSE;
         }
     }
     g_postprocess.create(
         D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
-    return RT->valid() && RT_distort->valid();
+    return rt_Generic->valid() && rt_distort->valid();
 }
 
 CRenderTarget::~CRenderTarget()
 {
-    _RELEASE(ZB);
+    rt_Depth.destroy();
     s_postprocess_D[1].destroy();
     s_postprocess[1].destroy();
     s_postprocess_D[0].destroy();
     s_postprocess[1].destroy();
     g_postprocess.destroy();
-    RT_distort.destroy();
-    RT_color_map.destroy();
-    RT.destroy();
+    rt_distort.destroy();
+    rt_color_map.destroy();
+    rt_Generic.destroy();
 }
 
 void CRenderTarget::calc_tc_noise(Fvector2& p0, Fvector2& p1)
@@ -271,8 +262,8 @@ void CRenderTarget::Begin()
     else
     {
         // Our
-        RCache.set_RT(RT->pRT);
-        RCache.set_ZB(ZB);
+        RCache.set_RT(rt_Generic->pRT);
+        RCache.set_ZB(rt_Depth->pRT);
         curWidth = rtWidth;
         curHeight = rtHeight;
     }
@@ -312,7 +303,7 @@ void CRenderTarget::DoAsyncScreenshot()
         // hr = pTex->GetSurfaceLevel(0, &pFBSrc);
 
         //  SHould be async function
-        hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB->pRT);
+        hr = HW.pDevice->GetRenderTargetData(pFBSrc, rt_async_ss->pRT);
 
         // pFBSrc->Release();
 
@@ -381,7 +372,7 @@ void CRenderTarget::End()
     static shared_str s_colormap = "c_colormap";
     if (bCMap)
     {
-        RCache.set_RT(RT_color_map->pRT);
+        RCache.set_RT(rt_color_map->pRT);
 
         //  Prepare colormapped buffer
         RCache.set_Element(bDistort ? s_postprocess_D[1]->E[4] : s_postprocess[1]->E[4]);
@@ -413,8 +404,8 @@ void CRenderTarget::End()
 void CRenderTarget::phase_distortion()
 {
     frame_distort = Device.dwFrame;
-    RCache.set_RT(RT_distort->pRT);
-    RCache.set_ZB(ZB);
+    RCache.set_RT(rt_distort->pRT);
+    RCache.set_ZB(rt_Depth->pRT);
     RCache.set_CullMode(CULL_CCW);
     RCache.set_ColorWriteEnable();
     CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, color_rgba(127, 127, 127, 127), 1.0f, 0L));

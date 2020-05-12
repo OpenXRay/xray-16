@@ -326,7 +326,7 @@ void CSoundMemoryManager::update()
         u32 cur_priority = this->priority(*I);
         if (cur_priority < priority)
         {
-            m_selected_sound = new CSoundObject(*I);
+            m_selected_sound = xr_new<CSoundObject>(*I);
             priority = cur_priority;
         }
     }

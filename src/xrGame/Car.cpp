@@ -39,15 +39,15 @@ CCar::CCar()
     m_driver_anim_type = 0;
     m_bone_steer = BI_NONE;
     active_camera = 0;
-    camera[ectFirst] = new CCameraFirstEye(this, CCameraBase::flRelativeLink | CCameraBase::flPositionRigid);
+    camera[ectFirst] = xr_new<CCameraFirstEye>(this, CCameraBase::flRelativeLink | CCameraBase::flPositionRigid);
     camera[ectFirst]->tag = ectFirst;
     camera[ectFirst]->Load("car_firsteye_cam");
 
-    camera[ectChase] = new CCameraLook(this, CCameraBase::flRelativeLink);
+    camera[ectChase] = xr_new<CCameraLook>(this, CCameraBase::flRelativeLink);
     camera[ectChase]->tag = ectChase;
     camera[ectChase]->Load("car_look_cam");
 
-    camera[ectFree] = new CCameraLook(this);
+    camera[ectFree] = xr_new<CCameraLook>(this);
     camera[ectFree]->tag = ectFree;
     camera[ectFree]->Load("car_free_cam");
     OnCameraChange(ectFirst);
@@ -71,10 +71,10 @@ CCar::CCar()
     //////////////////////////////
     /////////////////////////////
     m_exhaust_particles = "vehiclefx" DELIMITER "exhaust_1";
-    m_car_sound = new SCarSound(this);
+    m_car_sound = xr_new<SCarSound>(this);
 
     //у машины слотов в инвентаре нет
-    inventory = new CInventory();
+    inventory = xr_new<CInventory>();
     inventory->SetSlotsUseful(false);
     m_doors_torque_factor = 2.f;
     m_power_increment_factor = 0.5f;
@@ -151,7 +151,7 @@ void CCar::Load(LPCSTR section)
         self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
 }
 
-BOOL CCar::net_Spawn(CSE_Abstract* DC)
+bool CCar::net_Spawn(CSE_Abstract* DC)
 {
 #ifdef DEBUG
     InitDebug();
@@ -182,11 +182,11 @@ BOOL CCar::net_Spawn(CSE_Abstract* DC)
     if (pUserData->section_exist("destroyed"))
         CPHDestroyable::Load(pUserData, "destroyed");
     if (pUserData->section_exist("mounted_weapon_definition"))
-        m_car_weapon = new CCarWeapon(this);
+        m_car_weapon = xr_new<CCarWeapon>(this);
 
     if (pUserData->section_exist("visual_memory_definition"))
     {
-        m_memory = new car_memory(this);
+        m_memory = xr_new<car_memory>(this);
         m_memory->reload(pUserData->r_string("visual_memory_definition", "section"));
     }
 
@@ -263,7 +263,7 @@ void CCar::net_Save(NET_Packet& P)
     SaveNetState(P);
 }
 
-BOOL CCar::net_SaveRelevant()
+bool CCar::net_SaveRelevant()
 {
     return TRUE;
     // return
@@ -415,7 +415,7 @@ void CCar::UpdateEx(float fov)
     }
 }
 
-BOOL CCar::AlwaysTheCrow() { return (m_car_weapon && m_car_weapon->IsActive()); }
+bool CCar::AlwaysTheCrow() { return (m_car_weapon && m_car_weapon->IsActive()); }
 void CCar::UpdateCL()
 {
     inherited::UpdateCL();
@@ -1738,7 +1738,7 @@ void CCar::PhDataUpdate(float step)
     VERIFY(_valid(m_steer_angle));
 }
 
-BOOL CCar::UsedAI_Locations() { return (FALSE); }
+bool CCar::UsedAI_Locations() { return (FALSE); }
 u16 CCar::DriverAnimationType() { return m_driver_anim_type; }
 void CCar::OnAfterExplosion() {}
 void CCar::OnBeforeExplosion() { setEnabled(FALSE); }

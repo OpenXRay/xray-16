@@ -340,7 +340,7 @@ bool ESceneAIMapTool::LoadStream(IReader& F)
     m_Nodes.resize(F.r_u32());
     for (AINodeIt it = m_Nodes.begin(); it != m_Nodes.end(); it++)
     {
-        *it = new SAINode();
+        *it = xr_new<SAINode>();
         (*it)->LoadStream(F, this);
     }
     DenumerateNodes();

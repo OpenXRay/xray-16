@@ -43,35 +43,35 @@ float CEnvModifier::sum(CEnvModifier& M, Fvector3& view)
     if (M.use_flags.test(eViewDist))
     {
         far_plane += M.far_plane * _power;
-        use_flags.set(eViewDist, TRUE);
+        use_flags.set(eViewDist, true);
     }
     if (M.use_flags.test(eFogColor))
     {
         fog_color.mad(M.fog_color, _power);
-        use_flags.set(eFogColor, TRUE);
+        use_flags.set(eFogColor, true);
     }
     if (M.use_flags.test(eFogDensity))
     {
         fog_density += M.fog_density * _power;
-        use_flags.set(eFogDensity, TRUE);
+        use_flags.set(eFogDensity, true);
     }
 
     if (M.use_flags.test(eAmbientColor))
     {
         ambient.mad(M.ambient, _power);
-        use_flags.set(eAmbientColor, TRUE);
+        use_flags.set(eAmbientColor, true);
     }
 
     if (M.use_flags.test(eSkyColor))
     {
         sky_color.mad(M.sky_color, _power);
-        use_flags.set(eSkyColor, TRUE);
+        use_flags.set(eSkyColor, true);
     }
 
     if (M.use_flags.test(eHemiColor))
     {
         hemi_color.mad(M.hemi_color, _power);
-        use_flags.set(eHemiColor, TRUE);
+        use_flags.set(eHemiColor, true);
     }
 
     return _power;
@@ -143,7 +143,7 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect, pcstr se
 
 CEnvAmbient::SEffect* CEnvAmbient::create_effect(const CInifile& config, pcstr id)
 {
-    SEffect* result = new SEffect();
+    SEffect* result = xr_new<SEffect>();
     result->life_time = iFloor(config.r_float(id, "life_time") * 1000.f);
     result->particles = config.r_string(id, "particles");
     VERIFY(result->particles.size());
@@ -172,7 +172,7 @@ CEnvAmbient::SEffect* CEnvAmbient::create_effect(const CInifile& config, pcstr i
 
 CEnvAmbient::SSndChannel* CEnvAmbient::create_sound_channel(const CInifile& config, pcstr id, pcstr sectionToReadFrom)
 {
-    SSndChannel* result = new SSndChannel();
+    SSndChannel* result = xr_new<SSndChannel>();
     result->load(config, id, sectionToReadFrom);
     return (result);
 }
@@ -568,7 +568,7 @@ CEnvAmbient* CEnvironment::AppendEnvAmb(const shared_str& sect, CInifile const* 
         if (ambient->name().equal(sect))
             return ambient;
 
-    CEnvAmbient* ambient = Ambients.emplace_back(new CEnvAmbient());
+    CEnvAmbient* ambient = Ambients.emplace_back(xr_new<CEnvAmbient>());
     ambient->load(pIni ? *pIni : *m_ambients_config,
         pIni ? *pIni : *m_sound_channels_config,
         pIni ? *pIni : *m_effects_config, sect);
@@ -614,7 +614,7 @@ void CEnvironment::load_level_specific_ambients()
     strconcat(sizeof(path), path, "environment" DELIMITER "ambients" DELIMITER, level_name.c_str(), ".ltx");
 
     string_path full_path;
-    CInifile* level_ambients = new CInifile(FS.update_path(full_path, "$game_config$", path), TRUE, TRUE, FALSE);
+    CInifile* level_ambients = xr_new<CInifile>(FS.update_path(full_path, "$game_config$", path), true, true, false);
 
     if (level_ambients->section_count() == 0)
     {
@@ -656,7 +656,7 @@ void CEnvironment::load_level_specific_ambients()
 CEnvDescriptor* CEnvironment::create_descriptor(shared_str const& identifier,
     CInifile const* config, pcstr section /*= nullptr*/)
 {
-    CEnvDescriptor* result = new CEnvDescriptor(identifier);
+    CEnvDescriptor* result = xr_new<CEnvDescriptor>(identifier);
     if (config)
         result->load(*this, *config, section);
     return result;
@@ -816,11 +816,11 @@ void CEnvironment::load()
     m_pRender->OnLoad();
 
     if (!eff_Rain)
-        eff_Rain = new CEffect_Rain();
+        eff_Rain = xr_new<CEffect_Rain>();
     if (!eff_LensFlare)
-        eff_LensFlare = new CLensFlare();
+        eff_LensFlare = xr_new<CLensFlare>();
     if (!eff_Thunderbolt)
-        eff_Thunderbolt = new CEffect_Thunderbolt();
+        eff_Thunderbolt = xr_new<CEffect_Thunderbolt>();
 
     load_weathers();
     load_weather_effects();

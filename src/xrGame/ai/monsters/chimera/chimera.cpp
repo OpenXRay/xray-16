@@ -11,7 +11,7 @@
 
 CChimera::CChimera()
 {
-    StateMan = new CStateManagerChimera(this);
+    StateMan = xr_new<CStateManagerChimera>(this);
     com_man().add_ability(ControlCom::eControlJump);
 }
 

@@ -10,7 +10,7 @@
 #include "property_float_reference.hpp"
 
 property_float_reference::property_float_reference(float& value, float const % increment_factor)
-    : m_value(new value_holder<float>(value)), m_increment_factor(increment_factor)
+    : m_value(xr_new<value_holder<float>>(value)), m_increment_factor(increment_factor)
 {
     VERIFY(m_increment_factor > 0.f);
 }

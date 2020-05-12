@@ -42,7 +42,7 @@ bool CAI_Stalker::useful(const CItemManager* manager, const CGameObject* object)
     const CExplosive* explosive = smart_cast<const CExplosive*>(object);
 
     if (explosive && smart_cast<const CInventoryItem*>(object))
-        agent_manager().location().add(new CDangerObjectLocation(
+        agent_manager().location().add(xr_new<CDangerObjectLocation>(
             object, Device.dwTimeGlobal, DANGER_INFINITE_INTERVAL, DANGER_EXPLOSIVE_DISTANCE));
 
     if (explosive && (explosive->CurrentParentID() != 0xffff))

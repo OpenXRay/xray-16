@@ -7,7 +7,7 @@
 
 CTushkano::CTushkano()
 {
-    StateMan = new CStateManagerTushkano(this);
+    StateMan = xr_new<CStateManagerTushkano>(this);
 
     CControlled::init_external(this);
 }

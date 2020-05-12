@@ -19,7 +19,7 @@
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
 
-#if defined(XR_ARCHITECTURE_X64)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #define _finddata_t _finddata64i32_t
 #elif defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #define _finddata_t _finddata32_t

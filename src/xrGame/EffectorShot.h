@@ -74,7 +74,7 @@ public:
     CCameraShotEffector(const CameraRecoil& cam_recoil);
     virtual ~CCameraShotEffector();
 
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
     virtual void SetActor(CActor* pActor) { m_pActor = pActor; };
     virtual CCameraShotEffector* cast_effector_shot() { return this; }
     u16 m_WeaponID;

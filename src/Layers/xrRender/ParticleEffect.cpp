@@ -643,6 +643,13 @@ void CParticleEffect::Render(float)
     TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");
 #endif // _GPA_ENABLED
 
+#ifdef USE_OGL
+    // Due to the big impact on performance
+    const float distSQ = RDEVICE.vCameraPosition.distance_to_sqr(m_InitialPosition) + EPS;
+    if (distSQ > _sqr(100.f*psVisDistance))
+        return;
+#endif
+
     u32 dwOffset, dwCount;
     // Get a pointer to the particles in gp memory
     PAPI::Particle* particles;

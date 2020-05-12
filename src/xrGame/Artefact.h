@@ -17,7 +17,7 @@ public:
     virtual ~CArtefact();
 
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
 
     virtual void OnH_A_Chield();
@@ -31,8 +31,8 @@ public:
 
     virtual bool CanTake() const;
 
-    virtual BOOL renderable_ShadowGenerate() { return FALSE; }
-    virtual BOOL renderable_ShadowReceive() { return TRUE; }
+    virtual bool renderable_ShadowGenerate() { return false; }
+    virtual bool renderable_ShadowReceive() { return true; }
     virtual void create_physic_shell();
 
     virtual CArtefact* cast_artefact() { return this; }

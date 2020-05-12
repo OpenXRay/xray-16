@@ -262,7 +262,7 @@ public:
         material_pairs.clear();
     }
 
-    GameMtlIt GetMaterialIt(LPCSTR name)
+    GameMtlIt GetMaterialIt(pcstr name)
     {
         auto pred = [&](const SGameMtl* mtl) { return !xr_strcmpi(mtl->m_Name.c_str(), name); };
         return std::find_if(materials.begin(), materials.end(), pred);
@@ -277,12 +277,12 @@ public:
         auto pred = [&](const SGameMtl* mtl) { return mtl->ID == id; };
         return std::find_if(materials.begin(), materials.end(), pred);
     }
-    u32 GetMaterialID(LPCSTR name)
+    u32 GetMaterialID(pcstr name)
     {
         auto it = GetMaterialIt(name);
         return it == materials.end() ? GAMEMTL_NONE_ID : (*it)->ID;
     }
-    SGameMtl* GetMaterial(LPCSTR name)
+    SGameMtl* GetMaterial(pcstr name)
     {
         auto it = GetMaterialIt(name);
         return materials.end() != it ? *it : 0;
@@ -298,7 +298,7 @@ public:
         VERIFY(materials.end() != it);
         return u16(it - materials.begin());
     }
-    u16 GetMaterialIdx(LPCSTR name)
+    u16 GetMaterialIdx(pcstr name)
     {
         auto it = GetMaterialIt(name);
         VERIFY(materials.end() != it);
@@ -314,16 +314,16 @@ public:
     u32 CountMaterial() const { return materials.size(); }
 #ifdef EDITOR
     SGameMtl* AppendMaterial(SGameMtl* parent);
-    void RemoveMaterial(LPCSTR name);
+    void RemoveMaterial(pcstr name);
     void CopyMtlPairs(SGameMtl* src, SGameMtl* dst);
-    BOOL UpdateMtlPairs(SGameMtl* src);
-    BOOL UpdateMtlPairs();
-    LPCSTR MtlPairToName(int mtl0, int mtl1);
-    void NameToMtlPair(LPCSTR name, int& mtl0, int& mtl1);
-    void MtlNameToMtlPair(LPCSTR name, int& mtl0, int& mtl1);
+    bool UpdateMtlPairs(SGameMtl* src);
+    bool UpdateMtlPairs();
+    pcstr MtlPairToName(int mtl0, int mtl1);
+    void NameToMtlPair(pcstr name, int& mtl0, int& mtl1);
+    void MtlNameToMtlPair(pcstr name, int& mtl0, int& mtl1);
     SGameMtlPair* CreateMaterialPair(int m0, int m1, SGameMtlPair* parent = nullptr);
     SGameMtlPair* AppendMaterialPair(int m0, int m1, SGameMtlPair* parent = nullptr);
-    void RemoveMaterialPair(LPCSTR name);
+    void RemoveMaterialPair(pcstr name);
     void RemoveMaterialPair(GameMtlPairIt rem_it);
     void RemoveMaterialPair(int mtl);
     void RemoveMaterialPair(int mtl0, int mtl1);

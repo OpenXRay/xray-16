@@ -342,7 +342,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 strconcat(sizeof(anm_name), anm_name, "camera_effects" DELIMITER "actor_move" DELIMITER, eff_name);
                 if (FS.exist(ce_path, "$game_anims$", anm_name))
                 {
-                    CAnimatorCamLerpEffectorConst* e = new CAnimatorCamLerpEffectorConst();
+                    CAnimatorCamLerpEffectorConst* e = xr_new<CAnimatorCamLerpEffectorConst>();
                     float max_scale = 70.0f;
                     float factor = cam_eff_factor / max_scale;
                     e->SetFactor(factor);

@@ -44,7 +44,7 @@ manager::~manager() { VERIFY2(m_doors.empty(), make_string("there are %d still r
 //
 door* manager::register_door(CPhysicObject& object)
 {
-    door* const result = new door(&object);
+    door* const result = xr_new<door>(&object);
     // if ( !xr_strcmp(result->get_name(),"shkaf_work_01_door_0000") ) {
     //	Msg					( "registering door[\"shkaf_work_01_door_0000\"][%f][%f][%f]", VPUSH(result->position()) );
     //}

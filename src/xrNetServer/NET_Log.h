@@ -62,7 +62,7 @@ public:
 
     static T* Instance()
     {
-        if (!_self) _self = new T();
+        if (!_self) _self = xr_new<T>();
         ++_refcount;
         return _self;
     }

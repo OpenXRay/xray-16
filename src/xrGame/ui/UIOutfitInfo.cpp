@@ -123,7 +123,7 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 
     for (u32 i = 0; i < max_count; ++i)
     {
-        auto immunity = new CUIOutfitImmunity();
+        auto immunity = xr_new<CUIOutfitImmunity>();
         if (!immunity->InitFromXml(xml_doc, base_str, i))
         {
             xr_delete(immunity);

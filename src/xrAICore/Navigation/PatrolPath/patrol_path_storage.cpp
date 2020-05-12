@@ -34,7 +34,7 @@ void CPatrolPathStorage::load_raw(
         const_iterator I = m_registry.find(patrol_name);
         VERIFY3(I == m_registry.end(), "Duplicated patrol path found", *patrol_name);
         m_registry.insert(std::make_pair(
-            patrol_name, &(new CPatrolPath(patrol_name))->load_raw(level_graph, cross, game_graph, *sub_chunk)));
+            patrol_name, &(xr_new<CPatrolPath>(patrol_name))->load_raw(level_graph, cross, game_graph, *sub_chunk)));
     }
 
     chunk->close();

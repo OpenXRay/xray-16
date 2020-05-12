@@ -45,13 +45,13 @@ CServerList::CServerList()
     m_bAnimation = false;
 
     m_sort_mode = SORT_PING;
-    m_message_box = new CUIMessageBoxEx();
+    m_message_box = xr_new<CUIMessageBoxEx>();
     m_message_box->InitMessageBox("message_box_password");
     m_message_box->SetMessageTarget(this);
 
     if (CVersionSwitcher::GetVerCount() > 0)
     {
-        m_version_switch_msgbox = new CUIMessageBoxEx();
+        m_version_switch_msgbox = xr_new<CUIMessageBoxEx>();
         m_version_switch_msgbox->SetMessageTarget(this);
         if (!m_version_switch_msgbox->InitMessageBox("message_box_version_switch"))
             xr_delete(m_version_switch_msgbox);

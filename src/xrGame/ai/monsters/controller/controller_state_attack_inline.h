@@ -19,9 +19,9 @@
 TEMPLATE_SPECIALIZATION
 CStateControllerAttackAbstract::CStateControllerAttack(_Object* obj) : inherited(obj)
 {
-    this->add_state(eStateAttack_MoveToHomePoint, new CStateMonsterAttackMoveToHomePoint<CController>(obj));
-    this->add_state(eStateAttack_Run, new CStateMonsterAttackRun<CController>(obj));
-    this->add_state(eStateAttack_Melee, new CStateMonsterAttackMelee<CController>(obj));
+    this->add_state(eStateAttack_MoveToHomePoint, xr_new<CStateMonsterAttackMoveToHomePoint<CController>>(obj));
+    this->add_state(eStateAttack_Run, xr_new<CStateMonsterAttackRun<CController>>(obj));
+    this->add_state(eStateAttack_Melee, xr_new<CStateMonsterAttackMelee<CController>>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

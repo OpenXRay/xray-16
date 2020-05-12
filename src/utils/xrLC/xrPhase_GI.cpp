@@ -229,7 +229,7 @@ void CBuild::xrPhase_Radiosity()
     u32 setup_old = task->size();
     for (int t = 0; t < NUM_THREADS; t++)
     {
-        gi.start(new CGI(t));
+        gi.start(xr_new<CGI>(t));
         Sleep(10);
     }
     gi.wait();

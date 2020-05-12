@@ -29,7 +29,7 @@
 
 CObjectHandler::CObjectHandler()
 {
-    m_planner = new CObjectHandlerPlanner();
+    m_planner = xr_new<CObjectHandlerPlanner>();
     m_inventory_actual = false;
     //	m_last_enemy_for_best_weapon= 0;
 }
@@ -52,7 +52,7 @@ void CObjectHandler::reinit(CAI_Stalker* object)
 }
 
 void CObjectHandler::reload(LPCSTR section) { inherited::reload(section); }
-BOOL CObjectHandler::net_Spawn(CSE_Abstract* DC)
+bool CObjectHandler::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

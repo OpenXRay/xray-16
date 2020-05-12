@@ -83,10 +83,10 @@ CGameObject::CGameObject() : SpatialBase(g_SpatialSpace), scriptBinder(this)
     m_bCrPr_Activated = false;
     m_dwCrPr_ActivationStep = 0;
     m_spawn_time = 0;
-    m_ai_location = !GEnv.isDedicatedServer ? new CAI_ObjectLocation() : 0;
+    m_ai_location = !GEnv.isDedicatedServer ? xr_new<CAI_ObjectLocation>() : 0;
     m_server_flags.one();
 
-    m_callbacks = new CALLBACK_MAP();
+    m_callbacks = xr_new<CALLBACK_MAP>();
     m_anim_mov_ctrl = 0;
 }
 
@@ -178,7 +178,7 @@ void CGameObject::processing_deactivate()
         g_pGameLevel->Objects.o_sleep(this);
 }
 
-void CGameObject::setEnabled(BOOL _enabled)
+void CGameObject::setEnabled(bool _enabled)
 {
     if (_enabled)
     {
@@ -193,7 +193,7 @@ void CGameObject::setEnabled(BOOL _enabled)
     }
 }
 
-void CGameObject::setVisible(BOOL _visible)
+void CGameObject::setVisible(bool _visible)
 {
     if (_visible)
     {
@@ -429,12 +429,12 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
 
 void VisualCallback(IKinematics* tpKinematics);
 
-BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
+bool CGameObject::net_Spawn(CSE_Abstract* DC)
 {
     VERIFY(!m_spawned);
     m_spawned = true;
     m_spawn_time = Device.dwFrame;
-    m_ai_obstacle = new ai_obstacle(this);
+    m_ai_obstacle = xr_new<ai_obstacle>(this);
 
     CSE_Abstract* E = (CSE_Abstract*)DC;
     VERIFY(E);
@@ -495,7 +495,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 #pragma warning(push)
 #pragma warning(disable : 4238)
         IReader reader((void*)(*(O->m_ini_string)), O->m_ini_string.size());
-        m_ini_file = new CInifile(&reader, FS.get_path("$game_config$")->m_Path);
+        m_ini_file = xr_new<CInifile>(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
     }
 
@@ -599,7 +599,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
         if (pSettings->line_exist(cNameSect(), "cform"))
         {
             VERIFY3(*NameVisual, "Model isn't assigned for object, but cform requisted", *cName());
-            CForm = new CCF_Skeleton(this);
+            CForm = xr_new<CCF_Skeleton>(this);
         }
     }
     R_ASSERT(spatial.space);
@@ -1026,7 +1026,7 @@ void CGameObject::OnH_B_Independent(bool just_before_destroy)
         validate_ai_locations(false);
 }
 
-void CGameObject::setDestroy(BOOL _destroy)
+void CGameObject::setDestroy(bool _destroy)
 {
     if (_destroy == (BOOL)Props.bDestroy)
         return;
@@ -1109,8 +1109,8 @@ void CGameObject::u_EventGen(NET_Packet& P, u32 type, u32 dest)
 void CGameObject::u_EventSend(NET_Packet& P, u32 dwFlags) { Level().Send(P, dwFlags); }
 #include "Bolt.h"
 
-BOOL CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
-BOOL CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }
+bool CGameObject::UsedAI_Locations() { return (m_server_flags.test(CSE_ALifeObject::flUsedAI_Locations)); }
+bool CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(Flag)); }
 void CGameObject::add_visual_callback(visual_callback callback)
 {
     VERIFY(smart_cast<IKinematics*>(Visual()));
@@ -1160,7 +1160,7 @@ CScriptGameObject* CGameObject::lua_game_object() const
 #endif
     THROW(m_spawned);
     if (!m_lua_game_object)
-        m_lua_game_object = new CScriptGameObject(const_cast<CGameObject*>(this));
+        m_lua_game_object = xr_new<CScriptGameObject>(const_cast<CGameObject*>(this));
     return (m_lua_game_object);
 }
 
@@ -1209,7 +1209,7 @@ void CGameObject::shedule_Update(u32 dt)
         scriptBinder.shedule_Update(dt);
 }
 
-BOOL CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
+bool CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
 //игровое имя объекта
 LPCSTR CGameObject::Name() const { return (*cName()); }
 u32 CGameObject::ef_creature_type() const
@@ -1332,7 +1332,7 @@ void CGameObject::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool loca
         IKinematics* K = Visual()->dcast_PKinematics();
         VERIFY(K);
 
-        m_anim_mov_ctrl = new animation_movement_controller(&XFORM(), *start_pose, K, b);
+        m_anim_mov_ctrl = xr_new<animation_movement_controller>(&XFORM(), *start_pose, K, b);
     }
 }
 

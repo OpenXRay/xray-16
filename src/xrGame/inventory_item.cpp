@@ -36,7 +36,7 @@ constexpr pcstr DESCRIPTION_KEY = "description";
 net_updateInvData* CInventoryItem::NetSync()
 {
     if (!m_net_updateData)
-        m_net_updateData = new net_updateInvData();
+        m_net_updateData = xr_new<net_updateInvData>();
     return m_net_updateData;
 }
 
@@ -313,7 +313,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 }
 
 /////////// network ///////////////////////////////
-BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
+bool CInventoryItem::net_Spawn(CSE_Abstract* DC)
 {
     VERIFY(!m_pInventory);
 

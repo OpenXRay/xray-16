@@ -20,7 +20,7 @@ CPda::CPda(void)
 }
 
 CPda::~CPda() {}
-BOOL CPda::net_Spawn(CSE_Abstract* DC)
+bool CPda::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     CSE_Abstract* abstract = (CSE_Abstract*)(DC);

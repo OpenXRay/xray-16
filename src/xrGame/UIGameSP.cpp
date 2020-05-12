@@ -24,8 +24,8 @@
 
 CUIGameSP::CUIGameSP() : m_game(NULL), m_game_objective(NULL)
 {
-    TalkMenu = new CUITalkWnd();
-    UIChangeLevelWnd = new CChangeLevelWnd();
+    TalkMenu = xr_new<CUITalkWnd>();
+    UIChangeLevelWnd = xr_new<CChangeLevelWnd>();
 }
 
 CUIGameSP::~CUIGameSP()
@@ -48,9 +48,9 @@ void CUIGameSP::HideShownDialogs()
 void CUIGameSP::ReinitDialogs()
 {
     delete_data(TalkMenu);
-    TalkMenu = new CUITalkWnd();
+    TalkMenu = xr_new<CUITalkWnd>();
     delete_data(UIChangeLevelWnd);
-    UIChangeLevelWnd = new CChangeLevelWnd();
+    UIChangeLevelWnd = xr_new<CChangeLevelWnd>();
 }
 
 void CUIGameSP::SetClGame(game_cl_GameState* g)
@@ -238,7 +238,7 @@ void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryBox* pBox) //
     ActorMenu->ShowDialog(true);
 }
 
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id, Fvector pos, Fvector ang,
     Fvector pos2, Fvector ang2, bool b_use_position_cancel, const shared_str& message_str, bool b_allow_change_level)
 {
@@ -260,7 +260,7 @@ void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id
 
 CChangeLevelWnd::CChangeLevelWnd()
 {
-    m_messageBox = new CUIMessageBox();
+    m_messageBox = xr_new<CUIMessageBox>();
     m_messageBox->SetAutoDelete(true);
     AttachChild(m_messageBox);
 }
