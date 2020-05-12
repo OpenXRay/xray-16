@@ -32,7 +32,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
         if (pass->equal(proto))
             return pass;
 
-    SPass* P = v_passes.emplace_back(new SPass());
+    SPass* P = v_passes.emplace_back(xr_new<SPass>());
     P->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     P->state = proto.state;
     P->ps = proto.ps;
@@ -171,7 +171,7 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
     }
 
     // Create _new
-    SDeclaration* D = v_declarations.emplace_back(new SDeclaration());
+    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
     u32 dcl_size = GetDeclLength(dcl) + 1;
     //	Don't need it for DirectX 10 here
     // CHK_DX					(HW.pDevice->CreateVertexDeclaration(dcl,&D->dcl));
@@ -198,7 +198,7 @@ SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffe
             return v_geom;
     }
 
-    SGeometry* Geom = v_geoms.emplace_back(new SGeometry());
+    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
     Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     Geom->dcl = dcl;
     Geom->vb = vb;
@@ -220,7 +220,7 @@ SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndex
 dx10ConstantBuffer* CResourceManager::_CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable)
 {
     VERIFY(pTable);
-    dx10ConstantBuffer* pTempBuffer = new dx10ConstantBuffer(pTable);
+    dx10ConstantBuffer* pTempBuffer = xr_new<dx10ConstantBuffer>(pTable);
 
     for (dx10ConstantBuffer* buf : v_constant_buffer)
     {
@@ -259,7 +259,7 @@ SInputSignature* CResourceManager::_CreateInputSignature(ID3DBlob* pBlob)
         }
     }
 
-    SInputSignature* pSign = v_input_signature.emplace_back(new SInputSignature(pBlob));
+    SInputSignature* pSign = v_input_signature.emplace_back(xr_new<SInputSignature>(pBlob));
     pSign->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return pSign;

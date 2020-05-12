@@ -32,7 +32,7 @@ glState::glState()
 
 glState* glState::Create()
 {
-    return new glState();
+    return xr_new<glState>();
 }
 
 //	TODO: OGL: Does the render cache provide enough state management?
