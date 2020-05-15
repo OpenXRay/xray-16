@@ -8,6 +8,7 @@
 CMakeCache.txt
 cmake_install.cmake
 cmake-build-debug
+build
 install_manifest.txt
 bin/
 intermediate/

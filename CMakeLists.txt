@@ -24,31 +24,6 @@ elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "e2k")
 	set(PROJECT_PLATFORM_E2K TRUE)
 endif()
 
-if(NOT WIN32)
-    IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
-        set(CPACK_PACKAGE_NAME "openxray")
-        set(CPACK_FILE_NAME "openxray")
-        set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
-        set(CPACK_PACKAGE_VERSION "1.6.02")
-        set(CPACK_PACKAGE_CONTACT "OpenXRay <openxray@yahoo.com>")
-        set(CPACK_PACKAGE_DESCRIPTION "OpenXRay is an improved version of the X-Ray Engine, the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World.")
-        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_DESCRIPTION})
-        set(CPACK_DEBIAN_PACKAGE_SECTION "games")
-        set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/OpenXRay/xray-16")
-        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-        set(CPACK_STRIP_FILES TRUE)
-        set(CPACK_GENERATOR DEB)
-        set(CPACK_SOURCE_IGNORE_FILES "/.gitattributes")
-        set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
-        set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
-        set(CPACK_DEBIAN_REVISON "ubuntu-bionic-a1")
-        set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_REVISON}_${_OS_ARCH}")
-        set(CPACK_DEBIAN_PACKAGE_SOURCE "OpenXRay")
-        INCLUDE(CPack)
-    ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
-endif()
-
 option ( TBB_PARALLEL "Use tbb::parallel for prarticle and skinning acceleration on SMP." ON )
 option ( USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" ON )
 
@@ -218,25 +193,6 @@ include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/Common )
 add_subdirectory(Externals)
 add_subdirectory(src)
 add_subdirectory(res)
-
-# Unix system configuration
-if (UNIX)
-    # --------------------------------------------------
-    # Uninstall target
-    # --------------------------------------------------
-    # To clean system folder from libraries and binaries
-    # that was installed with `sudo make install`
-    # just run `sudo make uninstall`
-    #
-    if(NOT TARGET uninstall)
-        configure_file(
-                "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-                IMMEDIATE @ONLY)
-
-        add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-    endif()
-endif()
 
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 
