@@ -175,7 +175,7 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
     SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(bullet->bullet_material_idx, target_material);
     Fvector particle_dir = vNormal;
 
-    if (R.O && ps_r__WallmarksOnSkeleton)
+    if (R.O)
     {
         particle_dir = vDir;
         particle_dir.invert();
@@ -188,7 +188,7 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
         if (R.O->renderable_HUD())
             return;
 
-        if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
+        if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark && ps_r__WallmarksOnSkeleton)
         {
             //добавить отметку на материале
             Fvector p;
