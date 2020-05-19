@@ -24,12 +24,12 @@ endif()
 # Unix system configuration
 if (UNIX)
   # Try to find specific OS files to determine type of linux distribution
-  find_file (FEDORA_FOUND fedora-release PATHS /etc)
-  find_file (REDHAT_FOUND redhat-release inittab.RH PATHS /etc)
-  find_file (CENTOS_FOUND centos-release PATHS /etc)
+  find_file(FEDORA_FOUND fedora-release PATHS /etc)
+  find_file(REDHAT_FOUND redhat-release inittab.RH PATHS /etc)
+  find_file(CENTOS_FOUND centos-release PATHS /etc)
   # If we found debian then we don't need to check further for ubuntu
   # as it uses debian core.
-  find_file (DEBIAN_FOUND debian_version debconf.conf PATHS /etc)
+  find_file(DEBIAN_FOUND debian_version debconf.conf PATHS /etc)
 
   # --------------------------------------------------
   # Uninstall target
