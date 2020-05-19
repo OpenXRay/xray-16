@@ -4,8 +4,8 @@ set(PACKAGE_PROJECT_CONTACT      "OpenXRay <openxray@yahoo.com>")
 set(PACKAGE_PROJECT_VERSION      "1.6.02")
 set(PACKAGE_PROJECT_HOME_URL     "https://github.com/OpenXRay/xray-16")
 
-if( UNIX )
-    if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
+if (UNIX)
+    if (EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
         set(CPACK_PACKAGE_NAME ${PACKAGE_PROJECT_NAME})
         set(CPACK_FILE_NAME "openxray")
         set(CPACK_PACKAGE_VERSION ${PACKAGE_PROJECT_VERSION})
@@ -31,7 +31,7 @@ if( UNIX )
             set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
         endif()
 
-        if ( FEDORA_FOUND OR REDHAT_FOUND OR CENTOS_FOUND)
+        if (FEDORA_FOUND OR REDHAT_FOUND OR CENTOS_FOUND)
             set(CPACK_GENERATOR RPM)
 
             set(CPACK_RPM_PACKAGE_NAME ${PACKAGE_PROJECT_NAME})
@@ -47,10 +47,10 @@ if( UNIX )
 endif()
 
 # TODO: Need to be implemented in future
-if ( WIN32 )
+if (WIN32)
     #set(CPACK_GENERATOR NSIS)
 endif()
 
-if ( APPLE )
+if (APPLE)
     #set(CPACK_GENERATOR "DRAGNDROP")
 endif()
