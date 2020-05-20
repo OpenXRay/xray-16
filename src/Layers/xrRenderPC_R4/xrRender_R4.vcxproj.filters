@@ -306,10 +306,10 @@
     <ClInclude Include="..\xrRender\blenders\blender_ssao.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="dx11HDAOCSBlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx11HDAOCSBlender.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="dx11MinMaxSMBlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\uber_deffer.h">
@@ -333,7 +333,7 @@
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.h">
       <Filter>Shading templates\3dFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx10RainBlender.h">
       <Filter>Shading templates\DX10 Rain</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ModelPool.h">
@@ -642,7 +642,7 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h">
       <Filter>Interfase implementations\UI\UISequenceVideoItem</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\MSAA\dx10MSAABlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx10MSAABlender.h">
       <Filter>Interfase implementations\MSAARender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderDX10\dx10StateUtils.h">
@@ -893,10 +893,10 @@
     <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="dx11HDAOCSBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx11HDAOCSBlender.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="dx11MinMaxSMBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx11MinMaxSMBlender.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp">
@@ -920,7 +920,7 @@
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.cpp">
       <Filter>Shading templates\3dFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx10RainBlender.cpp">
       <Filter>Shading templates\DX10 Rain</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ModelPool.cpp">
@@ -1244,7 +1244,7 @@
     <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp">
       <Filter>Interfase implementations\UI\UISequenceVideoItem</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\MSAA\dx10MSAABlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx10MSAABlender.cpp">
       <Filter>Interfase implementations\MSAARender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX10\dx10BufferUtils.cpp">

@@ -657,13 +657,13 @@
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderGL\GL Rain\glRainBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\glRainBlender.cpp">
       <Filter>Shading templates\GL Rain</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderGL\glMinMaxSMBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\glMinMaxSMBlender.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderGL\MSAA\glMSAABlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\glMSAABlender.cpp">
       <Filter>Interface implementations\MSAARender</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_flip.cpp">
@@ -1106,13 +1106,13 @@
     <ClInclude Include="r3_R_sun_support.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h">
+    <ClInclude Include="..\xrRender\blenders\glRainBlender.h">
       <Filter>Shading templates\GL Rain</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderGL\glMinMaxSMBlender.h">
+    <ClInclude Include="..\xrRender\blenders\glMinMaxSMBlender.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderGL\MSAA\glMSAABlender.h">
+    <ClInclude Include="..\xrRender\blenders\glMSAABlender.h">
       <Filter>Interface implementations\MSAARender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderGL\glHW.h">

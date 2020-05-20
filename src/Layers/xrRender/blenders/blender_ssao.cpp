@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Blender_SSAO.h"
+#include "blender_ssao.h"
 
 #if RENDER == R_R2
 CBlender_SSAO::CBlender_SSAO() { description.CLS = 0; }

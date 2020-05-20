@@ -10,9 +10,9 @@
 #include "Layers/xrRender/blenders/blender_bloom_build.h"
 #include "Layers/xrRender/blenders/blender_luminance.h"
 #include "Layers/xrRender/blenders/blender_ssao.h"
-#include "Layers/xrRenderDX10/dx10MinMaxSMBlender.h"
-#include "Layers/xrRenderDX10/MSAA/dx10MSAABlender.h"
-#include "Layers/xrRenderDX10/DX10 Rain/dx10RainBlender.h"
+#include "Layers/xrRender/blenders/dx10MinMaxSMBlender.h"
+#include "Layers/xrRender/blenders/dx10MSAABlender.h"
+#include "Layers/xrRender/blenders/dx10RainBlender.h"
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb)
 {

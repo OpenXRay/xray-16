@@ -205,7 +205,7 @@
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidObstacles.h" />
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidRenderer.h" />
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.h" />
-    <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h" />
+    <ClInclude Include="..\xrRender\blenders\dx10RainBlender.h" />
     <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer.h" />
     <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer_impl.h" />
     <ClInclude Include="..\xrRenderDX10\dx10HW.h" />
@@ -213,7 +213,7 @@
     <ClInclude Include="..\xrRenderDX10\dx10r_constants_cache.h" />
     <ClInclude Include="..\xrRenderDX10\dx10StateUtils.h" />
     <ClInclude Include="..\xrRenderDX10\dx10TextureUtils.h" />
-    <ClInclude Include="..\xrRenderDX10\MSAA\dx10MSAABlender.h" />
+    <ClInclude Include="..\xrRender\blenders\dx10MSAABlender.h" />
     <ClInclude Include="..\xrRenderDX10\StateManager\dx10SamplerStateCache.h" />
     <ClInclude Include="..\xrRenderDX10\StateManager\dx10ShaderResourceStateCache.h" />
     <ClInclude Include="..\xrRenderDX10\StateManager\dx10State.h" />
@@ -340,8 +340,8 @@
     <ClInclude Include="..\xrRender\blenders\blender_ssao.h" />
     <ClInclude Include="ComputeShader.h" />
     <ClInclude Include="CSCompiler.h" />
-    <ClInclude Include="dx11HDAOCSBlender.h" />
-    <ClInclude Include="dx11MinMaxSMBlender.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11HDAOCSBlender.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRender\light_gi.h" />
     <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
     <ClInclude Include="..\xrRender\light_smapvis.h" />
@@ -364,7 +364,7 @@
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidRenderer.cpp" />
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.cpp" />
     <ClCompile Include="..\xrRenderDX10\Blender_Recorder_R3.cpp" />
-    <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx10RainBlender.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10BufferUtils.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10ConstantBuffer.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10DetailManager_VS.cpp" />
@@ -379,7 +379,7 @@
     <ClCompile Include="..\xrRenderDX10\dx10StateUtils.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10Texture.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10TextureUtils.cpp" />
-    <ClCompile Include="..\xrRenderDX10\MSAA\dx10MSAABlender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx10MSAABlender.cpp" />
     <ClCompile Include="..\xrRenderDX10\StateManager\dx10SamplerStateCache.cpp" />
     <ClCompile Include="..\xrRenderDX10\StateManager\dx10ShaderResourceStateCache.cpp" />
     <ClCompile Include="..\xrRenderDX10\StateManager\dx10State.cpp" />
@@ -505,8 +505,8 @@
     <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="CSCompiler.cpp" />
-    <ClCompile Include="dx11HDAOCSBlender.cpp" />
-    <ClCompile Include="dx11MinMaxSMBlender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11HDAOCSBlender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11MinMaxSMBlender.cpp" />
     <ClCompile Include="..\xrRender\light_GI.cpp" />
     <ClCompile Include="..\xrRender\Light_Render_Direct.cpp" />
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />

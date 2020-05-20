@@ -5,8 +5,6 @@ list(APPEND DIRS
     "../xrRender"
     "../xrRender/blenders"
     "../xrRenderGL"
-    "../xrRenderGL/MSAA"
-    "../xrRenderGL/GL Rain"
     "../../Include/xrRender"
     )
 
@@ -30,6 +28,19 @@ list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRend
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/SH_Texture.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/xr_effgamma.cpp")
 list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/ResourceManager_Scripting.cpp")
+
+# Unused blenders
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/BlenderDefault.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/Blender_default_aref.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/Blender_LaEmB.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/Blender_Model.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/Blender_Vertex.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/Blender_Vertex_aref.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/dx10MinMaxSMBlender.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/dx10MSAABlender.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/dx10RainBlender.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/dx11HDAOCSBlender.cpp")
+list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/blenders/dx11MinMaxSMBlender.cpp")
 
 list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/stats_manager.h")
 list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../xrRender/xr_effgamma.h")
