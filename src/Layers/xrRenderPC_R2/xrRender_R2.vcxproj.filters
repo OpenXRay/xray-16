@@ -225,22 +225,22 @@
     <ClInclude Include="..\xrRender\WallmarksEngine.h">
       <Filter>Wallmarks</Filter>
     </ClInclude>
-    <ClInclude Include="blender_bloom_build.h">
+    <ClInclude Include="..\xrRender\blenders\blender_bloom_build.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\Blender_BmmD.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_combine.h">
+    <ClInclude Include="..\xrRender\blenders\blender_combine.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_deffer_aref.h">
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_aref.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_deffer_flat.h">
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_flat.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_deffer_model.h">
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_model.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\Blender_Editor_Selection.h">
@@ -249,34 +249,34 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Editor_Wire.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_direct.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_direct.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_direct_cascade.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_direct_cascade.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_mask.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_mask.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_occq.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_occq.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_point.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_point.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_reflected.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_reflected.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_spot.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_spot.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_luminance.h">
+    <ClInclude Include="..\xrRender\blenders\blender_luminance.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\Blender_Particle.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_ssao.h">
+    <ClInclude Include="..\xrRender\blenders\blender_ssao.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\uber_deffer.h">
@@ -740,22 +740,22 @@
     <ClCompile Include="..\xrRender\WallmarksEngine.cpp">
       <Filter>Wallmarks</Filter>
     </ClCompile>
-    <ClCompile Include="blender_bloom_build.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_bloom_build.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_combine.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_combine.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_deffer_aref.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_aref.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_deffer_flat.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_flat.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_deffer_model.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_model.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Selection.cpp">
@@ -764,34 +764,34 @@
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Wire.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_direct.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_direct.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_direct_cascade.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_direct_cascade.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_mask.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_mask.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_occq.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_occq.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_point.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_point.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_reflected.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_reflected.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_spot.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_spot.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_luminance.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_luminance.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Particle.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_ssao.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp">
