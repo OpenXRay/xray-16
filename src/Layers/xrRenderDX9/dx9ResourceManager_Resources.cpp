@@ -2,8 +2,8 @@
 
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
-#include "Layers/xrRender/blenders/Blender.h"
-#include "Layers/xrRender/blenders/Blender_Recorder.h"
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_Recorder.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 template <class T>

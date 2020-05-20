@@ -3,8 +3,8 @@
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/Blender.h"
-#include "blenders/Blender_Recorder.h"
+#include "Blender.h"
+#include "Blender_Recorder.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "luabind/return_reference_to_policy.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"

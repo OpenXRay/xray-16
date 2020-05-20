@@ -3,8 +3,8 @@
 
 #include	"Layers/xrRender/ResourceManager.h"
 #include	"Layers/xrRender/tss.h"
-#include	"Layers/xrRender/blenders/Blender.h"
-#include	"Layers/xrRender/blenders/Blender_Recorder.h"
+#include	"Layers/xrRender/Blender.h"
+#include	"Layers/xrRender/Blender_Recorder.h"
 //	adopt_compiler don't have = operator And it can't have = operator
 #include	"xrScriptEngine/script_engine.hpp"
 #include	"luabind/return_reference_to_policy.hpp"
