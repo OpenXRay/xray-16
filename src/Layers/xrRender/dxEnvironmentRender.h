@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Include/xrRender/EnvironmentRender.h"
-#include "blenders/Blender.h"
+#include "Blender.h"
 
 class CBlender_skybox : public IBlender
 {

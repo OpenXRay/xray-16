@@ -9,8 +9,8 @@
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/Blender.h"
-#include "blenders/Blender_Recorder.h"
+#include "Blender.h"
+#include "Blender_Recorder.h"
 
 //	Already defined in Texture.cpp
 void fix_texture_name(LPSTR fn);
