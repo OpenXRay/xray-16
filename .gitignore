@@ -3,6 +3,7 @@
 !.git*
 !.appveyor*
 !.travis.yml
+!.editorconfig
 
 # exclude binaries and temporary files
 CMakeCache.txt
