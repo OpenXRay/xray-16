@@ -446,3 +446,9 @@ DeviceState CHW::GetDeviceState()
 
     return DeviceState::Normal;
 }
+
+void CHW::LoadOldD3DCompile() 
+{
+    d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
+    oldD3DCompile = (oldD3DCompileType*)d3dCompiler37->GetProcAddress("D3DCompileFromMemory");
+}

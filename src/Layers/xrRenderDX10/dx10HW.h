@@ -40,6 +40,7 @@ public:
 
     void OnAppActivate() override;
     void OnAppDeactivate() override;
+    void LoadOldD3DCompile();
 
 private:
     void CreateSwapChain(HWND hwnd);
@@ -64,6 +65,11 @@ public:
     bool DoublePrecisionFloatShaderOps;
     bool SAD4ShaderInstructions;
     bool ExtendedDoublesShaderInstructions;
+
+    using oldD3DCompileType = HRESULT(LPCVOID, SIZE_T, LPCSTR, const D3D_SHADER_MACRO*, ID3DInclude*, LPCSTR, LPCSTR,
+        UINT, UINT, ID3DBlob**, ID3DBlob**);
+    oldD3DCompileType* oldD3DCompile = nullptr;
+
 #ifdef HAS_DX11_2
     IDXGIFactory2* m_pFactory2 = nullptr;
     IDXGISwapChain2* m_pSwapChain2 = nullptr;
@@ -81,6 +87,7 @@ public:
 #endif
 private:
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
+    XRay::Module d3dCompiler37;
 };
 
 extern ECORE_API CHW HW;

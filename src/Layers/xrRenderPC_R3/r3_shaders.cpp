@@ -688,9 +688,19 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
         includer Includer;
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
-        _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget, Flags, 0,
-            &pShaderBuf, &pErrorBuf);
 
+        if (ClearSkyMode)
+        {
+            if (!HW.oldD3DCompile)
+            HW.LoadOldD3DCompile();
+           _result = HW.oldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
+               Flags, 0, &pShaderBuf, &pErrorBuf);
+        }
+        else
+        {
+            _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
+                Flags, 0, &pShaderBuf, &pErrorBuf);
+        }
 #if 0
         if (pErrorBuf)
         {
