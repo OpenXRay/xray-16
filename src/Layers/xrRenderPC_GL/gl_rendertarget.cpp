@@ -386,7 +386,12 @@ CRenderTarget::CRenderTarget()
         rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
         rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
         rt_secondVP.create(r2_RT_secondVP, w, h, D3DFMT_A8R8G8B8, 1); //--#SM+#-- +SecondVP+
-        if (RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.dx10_msaa)
+        {
+            rt_Generic_0_r = rt_Generic_0;
+            rt_Generic_1_r = rt_Generic_1;
+        }
+        else
         {
             rt_Generic_0_r.create(r2_RT_generic0_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
             rt_Generic_1_r.create(r2_RT_generic1_r, w, h, D3DFMT_A8R8G8B8, SampleCount);

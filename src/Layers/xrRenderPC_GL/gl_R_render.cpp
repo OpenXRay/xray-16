@@ -402,11 +402,7 @@ void CRender::Render()
         // skybox can be drawn here
         if (false)
         {
-            if (!RImplementation.o.dx10_msaa)
-                Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, nullptr, Target->get_base_zb());
-            else
-                Target->u_setrt(
-                    Target->rt_Generic_0_r, Target->rt_Generic_1_r, nullptr, Target->rt_MSAADepth->pZRT);
+            Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1_r, nullptr, Target->rt_MSAADepth->pZRT);
             RCache.set_CullMode(CULL_NONE);
             RCache.set_Stencil(FALSE);
 

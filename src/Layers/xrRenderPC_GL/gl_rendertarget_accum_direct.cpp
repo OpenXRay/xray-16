@@ -770,10 +770,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         return;
     }
     phase_accumulator();
-    if (! RImplementation.o.dx10_msaa)
-        u_setrt(rt_Generic_0,NULL,NULL, get_base_zb());
-    else
-        u_setrt(rt_Generic_0_r,NULL,NULL, rt_MSAADepth->pZRT);
+    u_setrt(rt_Generic_0_r, NULL, NULL, rt_MSAADepth->pZRT);
 
     // *** assume accumulator setted up ***
     light* fuckingsun = (light*)RImplementation.Lights.sun._get();
@@ -870,10 +867,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
     // Perform lighting
     {
-        if (! RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_0,NULL,NULL, get_base_zb()); // enshure RT setup
-        else
-            u_setrt(rt_Generic_0_r,NULL,NULL, rt_MSAADepth->pZRT); // enshure RT setup
+        u_setrt(rt_Generic_0_r, NULL, NULL, rt_MSAADepth->pZRT); // ensure RT is set
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 
