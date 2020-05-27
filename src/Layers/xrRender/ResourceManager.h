@@ -203,7 +203,7 @@ public:
     SConstantList* _CreateConstantList(SConstantList& L);
     void _DeleteConstantList(const SConstantList* L);
 
-    ShaderElement* _CreateElement(ShaderElement& L);
+    ShaderElement* _CreateElement(ShaderElement&& L);
     void _DeleteElement(const ShaderElement* L);
 
     Shader* _cpp_Create(LPCSTR s_shader, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
