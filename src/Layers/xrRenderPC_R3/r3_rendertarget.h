@@ -66,7 +66,7 @@ public:
 
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
-    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
+    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
     ref_rt rt_Generic_0_r; // MRT generic 0
     ref_rt rt_Generic_1_r; // MRT generic 1
     ref_rt rt_Generic;

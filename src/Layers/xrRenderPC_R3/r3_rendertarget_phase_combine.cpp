@@ -73,7 +73,7 @@ void CRenderTarget::phase_combine()
         FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         HW.pDevice->ClearRenderTargetView(rt_Generic_0_r->pRT, ColorRGBA);
         HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
-        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, rt_MSAADepth->pZRT);
     }
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(FALSE);
@@ -287,7 +287,7 @@ void CRenderTarget::phase_combine()
         if (!RImplementation.o.dx10_msaa)
             u_setrt(rt_Generic_0, 0, 0, get_base_zb()); // LDR RT
         else
-            u_setrt(rt_Generic_0_r, 0, 0, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
+            u_setrt(rt_Generic_0_r, 0, 0, rt_MSAADepth->pZRT); // LDR RT
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
@@ -338,7 +338,7 @@ void CRenderTarget::phase_combine()
             else
             {
                 u_setrt(
-                    rt_Generic_1_r, 0, 0, RImplementation.Target->rt_MSAADepth->pZRT); // Now RT is a distortion mask
+                    rt_Generic_1_r, 0, 0, rt_MSAADepth->pZRT); // Now RT is a distortion mask
                 HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
             }
             RCache.set_CullMode(CULL_CCW);
@@ -631,10 +631,7 @@ void CRenderTarget::phase_wallmarks()
     // Targets
     RCache.set_RT(NULL, 2);
     RCache.set_RT(NULL, 1);
-    if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Color, NULL, NULL, get_base_zb());
-    else
-        u_setrt(rt_Color, NULL, NULL, rt_MSAADepth->pZRT);
+    u_setrt(rt_Color, NULL, NULL, rt_MSAADepth->pZRT);
     // Stencil	- draw only where stencil >= 0x1
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
     RCache.set_CullMode(CULL_CCW);
@@ -653,7 +650,7 @@ void CRenderTarget::phase_combine_volumetric()
     if (!RImplementation.o.dx10_msaa)
         u_setrt(rt_Generic_0, rt_Generic_1, 0, get_base_zb());
     else
-        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, rt_MSAADepth->pZRT);
     //	Sets limits to both render targets
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
     {

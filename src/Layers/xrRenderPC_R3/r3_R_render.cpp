@@ -415,7 +415,7 @@ void CRender::Render()
                 Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, 0, Target->get_base_zb());
             else
                 Target->u_setrt(
-                    Target->rt_Generic_0_r, Target->rt_Generic_1, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+                    Target->rt_Generic_0_r, Target->rt_Generic_1, 0, Target->rt_MSAADepth->pZRT);
             RCache.set_CullMode(CULL_NONE);
             RCache.set_Stencil(FALSE);
 

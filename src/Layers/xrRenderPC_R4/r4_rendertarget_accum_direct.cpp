@@ -727,11 +727,7 @@ void CRenderTarget::accum_direct_blend()
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        VERIFY(0);
-        if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
-        else
-            u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
 
         //	TODO: DX10: remove half pixel offset
         // Common calc for quad-rendering
@@ -814,7 +810,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     if (!RImplementation.o.dx10_msaa)
         u_setrt(rt_Generic_0, NULL, NULL, get_base_zb());
     else
-        u_setrt(rt_Generic_0_r, NULL, NULL, RImplementation.Target->rt_MSAADepth->pZRT);
+        u_setrt(rt_Generic_0_r, NULL, NULL, rt_MSAADepth->pZRT);
 
     // *** assume accumulator setted up ***
     light* fuckingsun = (light*)RImplementation.Lights.sun._get();
@@ -924,7 +920,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         if (!RImplementation.o.dx10_msaa)
             u_setrt(rt_Generic_0, NULL, NULL, get_base_zb()); // enshure RT setup
         else
-            u_setrt(rt_Generic_0_r, NULL, NULL, RImplementation.Target->rt_MSAADepth->pZRT); // enshure RT setup
+            u_setrt(rt_Generic_0_r, NULL, NULL, rt_MSAADepth->pZRT); // enshure RT setup
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 

@@ -369,7 +369,9 @@ CRenderTarget::CRenderTarget()
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
-        if (RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.dx10_msaa)
+            rt_MSAADepth = rt_Base_Depth;
+        else
             rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 
         if (!RImplementation.o.dx10_gbuffer_opt)
