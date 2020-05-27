@@ -27,17 +27,7 @@ public:
 
     u32 dwLightMarkerID;
     //
-    IBlender* b_occq;
-    IBlender* b_accum_mask;
-    IBlender* b_accum_direct;
-    IBlender* b_accum_point;
     IBlender* b_accum_spot;
-    IBlender* b_accum_reflected;
-    IBlender* b_bloom;
-    IBlender* b_luminance;
-    IBlender* b_combine;
-    IBlender* b_postprocess_msaa;
-    IBlender* b_bloom_msaa;
     IBlender* b_combine_msaa[8];
     IBlender* b_accum_mask_msaa[8];
     IBlender* b_accum_spot_msaa[8];
@@ -47,12 +37,7 @@ public:
     IBlender* b_accum_volumetric_msaa[8];
     IBlender* b_accum_point_msaa[8];
     IBlender* b_accum_reflected_msaa[8];
-    IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
-
-    // compute shader for hdao
-    IBlender* b_hdao_cs;
-    IBlender* b_hdao_msaa_cs;
 
 #ifdef DEBUG
     struct dbg_line_t
@@ -126,8 +111,8 @@ private:
     ref_rt rt_half_depth;
     ref_shader s_ssao;
     ref_shader s_ssao_msaa[8];
-    ref_shader s_hdao_cs;
-    ref_shader s_hdao_cs_msaa;
+    ref_shader s_hdao_cs;      // compute shader
+    ref_shader s_hdao_cs_msaa; // for hdao
 
     // Accum
     ref_shader s_accum_mask;

@@ -20,16 +20,7 @@ private:
 public:
     u32 dwLightMarkerID;
     //
-    IBlender* b_occq;
-    IBlender* b_accum_mask;
-    IBlender* b_accum_direct;
-    IBlender* b_accum_point;
     IBlender* b_accum_spot;
-    IBlender* b_accum_reflected;
-    IBlender* b_bloom;
-    IBlender* b_ssao;
-    IBlender* b_luminance;
-    IBlender* b_combine;
 
 #ifdef DEBUG
     struct dbg_line_t

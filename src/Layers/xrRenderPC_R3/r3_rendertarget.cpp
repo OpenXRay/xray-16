@@ -304,21 +304,7 @@ CRenderTarget::CRenderTarget()
     RImplementation.Resources->Evict();
 
     // Blenders
-    b_occq = xr_new<CBlender_light_occq>();
-    b_accum_mask = xr_new<CBlender_accum_direct_mask>();
-    b_accum_direct = xr_new<CBlender_accum_direct>();
-    b_accum_point = xr_new<CBlender_accum_point>();
     b_accum_spot = xr_new<CBlender_accum_spot>();
-    b_accum_reflected = xr_new<CBlender_accum_reflected>();
-    b_bloom = xr_new<CBlender_bloom_build>();
-    if (RImplementation.o.dx10_msaa)
-    {
-        b_bloom_msaa = xr_new<CBlender_bloom_build_msaa>();
-        b_postprocess_msaa = xr_new<CBlender_postprocess_msaa>();
-    }
-    b_luminance = xr_new<CBlender_luminance>();
-    b_combine = xr_new<CBlender_combine>();
-    b_ssao = xr_new<CBlender_SSAO_noMSAA>();
 
     if (RImplementation.o.dx10_msaa)
     {
@@ -434,7 +420,10 @@ CRenderTarget::CRenderTarget()
     }
 
     // OCCLUSION
-    s_occq.create(b_occq, "r2" DELIMITER "occq");
+    {
+        CBlender_light_occq b_occq;
+        s_occq.create(&b_occq, "r2" DELIMITER "occq");
+    }
 
     // DIRECT (spot)
     D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
@@ -457,8 +446,12 @@ CRenderTarget::CRenderTarget()
 
         // rt_smap_surf.create			(r2_RT_smap_surf,			size,size,nullrt		);
         // rt_smap_ZB					= NULL;
-        s_accum_mask.create(b_accum_mask, "r3" DELIMITER "accum_mask");
-        s_accum_direct.create(b_accum_direct, "r3" DELIMITER "accum_direct");
+        {
+            CBlender_accum_direct_mask b_accum_mask;
+            CBlender_accum_direct b_accum_direct;
+            s_accum_mask.create(&b_accum_mask, "r3" DELIMITER "accum_mask");
+            s_accum_direct.create(&b_accum_direct, "r3" DELIMITER "accum_direct");
+        }
 
         if (RImplementation.o.dx10_msaa)
         {
@@ -553,7 +546,8 @@ CRenderTarget::CRenderTarget()
 
     // POINT
     {
-        s_accum_point.create(b_accum_point, "r2" DELIMITER "accum_point_s");
+        CBlender_accum_point b_accum_point;
+        s_accum_point.create(&b_accum_point, "r2" DELIMITER "accum_point_s");
         accum_point_geom_create();
         g_accum_point.create(D3DFVF_XYZ, g_accum_point_vb, g_accum_point_ib);
         accum_omnip_geom_create();
@@ -575,7 +569,8 @@ CRenderTarget::CRenderTarget()
 
     // REFLECTED
     {
-        s_accum_reflected.create(b_accum_reflected, "r2" DELIMITER "accum_refl");
+        CBlender_accum_reflected b_accum_reflected;
+        s_accum_reflected.create(&b_accum_reflected, "r2" DELIMITER "accum_refl");
         if (RImplementation.o.dx10_msaa)
         {
             int bound = RImplementation.o.dx10_msaa_samples;
@@ -605,10 +600,13 @@ CRenderTarget::CRenderTarget()
         g_bloom_filter.create(fvf_filter, RCache.Vertex.Buffer(), RCache.QuadIB);
         s_bloom_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_bloom1);
         s_bloom_dbg_2.create("effects" DELIMITER "screen_set", r2_RT_bloom2);
-        s_bloom.create(b_bloom, "r2" DELIMITER "bloom");
+
+        CBlender_bloom_build b_bloom;
+        s_bloom.create(&b_bloom, "r2" DELIMITER "bloom");
         if (RImplementation.o.dx10_msaa)
         {
-            s_bloom_msaa.create(b_bloom_msaa, "r2" DELIMITER "bloom");
+            CBlender_bloom_build_msaa b_bloom_msaa;
+            s_bloom_msaa.create(&b_bloom_msaa, "r2" DELIMITER "bloom");
         }
         f_bloom_factor = 0.5f;
     }
@@ -617,7 +615,9 @@ CRenderTarget::CRenderTarget()
     {
         rt_LUM_64.create(r2_RT_luminance_t64, 64, 64, D3DFMT_A16B16G16R16F);
         rt_LUM_8.create(r2_RT_luminance_t8, 8, 8, D3DFMT_A16B16G16R16F);
-        s_luminance.create(b_luminance, "r2" DELIMITER "luminance");
+
+        CBlender_luminance b_luminance;
+        s_luminance.create(&b_luminance, "r2" DELIMITER "luminance");
         f_luminance_adapt = 0.5f;
 
         t_LUM_src.create(r2_RT_luminance_src);
@@ -656,14 +656,17 @@ CRenderTarget::CRenderTarget()
         D3DFORMAT fmt = HW.Caps.id_vendor == 0x10DE ? D3DFMT_R32F : D3DFMT_R16F;
         rt_half_depth.create(r2_RT_half_depth, w, h, fmt);
 
-        s_ssao.create(b_ssao, "r2" DELIMITER "ssao");
+        CBlender_SSAO_noMSAA b_ssao;
+        s_ssao.create(&b_ssao, "r2" DELIMITER "ssao");
     }
 
     if (RImplementation.o.ssao_blur_on)
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
         rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
-        s_ssao.create(b_ssao, "r2" DELIMITER "ssao");
+
+        CBlender_SSAO_noMSAA b_ssao;
+        s_ssao.create(&b_ssao, "r2" DELIMITER "ssao");
 
         /* Should be used in r3_rendertarget_phase_ssao.cpp but it's commented there.
         if (RImplementation.o.dx10_msaa)
@@ -680,7 +683,8 @@ CRenderTarget::CRenderTarget()
         static D3DVERTEXELEMENT9 dwDecl[] = {
             {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos+uv
             D3DDECL_END()};
-        s_combine.create(b_combine, "r2" DELIMITER "combine");
+        CBlender_combine b_combine;
+        s_combine.create(&b_combine, "r2" DELIMITER "combine");
         s_combine_volumetric.create("combine_volumetric");
         s_combine_dbg_0.create("effects" DELIMITER "screen_set", r2_RT_smap_surf);
         s_combine_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_luminance_t8);
@@ -978,7 +982,8 @@ CRenderTarget::CRenderTarget()
         D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
     if (RImplementation.o.dx10_msaa)
     {
-        s_postprocess_msaa.create(b_postprocess_msaa, "r2" DELIMITER "post");
+        CBlender_postprocess_msaa b_postprocess_msaa;
+        s_postprocess_msaa.create(&b_postprocess_msaa, "r2" DELIMITER "post");
     }
 
     // Menu
@@ -1051,14 +1056,7 @@ CRenderTarget::~CRenderTarget()
     accum_volumetric_geom_destroy();
 
     // Blenders
-    xr_delete(b_combine);
-    xr_delete(b_luminance);
-    xr_delete(b_bloom);
-    xr_delete(b_accum_reflected);
     xr_delete(b_accum_spot);
-    xr_delete(b_accum_point);
-    xr_delete(b_accum_direct);
-    xr_delete(b_ssao);
 
     if (RImplementation.o.dx10_msaa)
     {
@@ -1081,8 +1079,6 @@ CRenderTarget::~CRenderTarget()
             xr_delete(b_ssao_msaa[i]);
         }
     }
-    xr_delete(b_accum_mask);
-    xr_delete(b_occq);
 }
 
 void CRenderTarget::reset_light_marker(bool bResetStencil)

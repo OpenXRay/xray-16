@@ -26,17 +26,7 @@ public:
 
     u32 dwLightMarkerID;
     //
-    IBlender* b_occq;
-    IBlender* b_accum_mask;
-    IBlender* b_accum_direct;
-    IBlender* b_accum_point;
     IBlender* b_accum_spot;
-    IBlender* b_accum_reflected;
-    IBlender* b_bloom;
-    IBlender* b_luminance;
-    IBlender* b_combine;
-    IBlender* b_postprocess_msaa;
-    IBlender* b_bloom_msaa;
     IBlender* b_combine_msaa[8];
     IBlender* b_accum_mask_msaa[8];
     IBlender* b_accum_spot_msaa[8];
@@ -46,7 +36,6 @@ public:
     IBlender* b_accum_volumetric_msaa[8];
     IBlender* b_accum_point_msaa[8];
     IBlender* b_accum_reflected_msaa[8];
-    IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
 
 #ifdef DEBUG
