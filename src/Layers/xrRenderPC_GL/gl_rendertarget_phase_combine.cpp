@@ -292,18 +292,9 @@ void CRenderTarget::phase_combine()
 
     if (RImplementation.o.dx10_msaa)
     {
-        glReadBuffer(GL_COLOR_ATTACHMENT0);
-        glDrawBuffer(GL_COLOR_ATTACHMENT1);
-
-        // we need to resolve rt_Generic_1_r into rt_Generic_1
-        u_setrt(rt_Generic_1_r, rt_Generic_1, 0, rt_MSAADepth->pZRT);
-        CHK_GL(glBlitFramebuffer(0, 0, Device.dwWidth, Device.dwHeight, 0, 0, Device.dwWidth, Device.dwHeight,
-            GL_COLOR_BUFFER_BIT, GL_NEAREST));
-
-        // we need to resolve rt_Generic_0_r into rt_Generic_0
-        u_setrt(rt_Generic_0_r, rt_Generic_0, 0, rt_MSAADepth->pZRT);
-        CHK_GL(glBlitFramebuffer(0, 0, Device.dwWidth, Device.dwHeight, 0, 0, Device.dwWidth, Device.dwHeight,
-            GL_COLOR_BUFFER_BIT, GL_NEAREST));
+        // we need to resolve rt_Generic_1 into rt_Generic_1_r
+        rt_Generic_0->resolve_into(*rt_Generic_0_r);
+        rt_Generic_1->resolve_into(*rt_Generic_1_r);
     }
 
     // for msaa we need a resolved color buffer - Holger
