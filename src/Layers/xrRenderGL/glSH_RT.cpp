@@ -103,7 +103,7 @@ void CRT::resolve_into(CRT& destination) const
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
-    constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT0 };
+    constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     RCache.set_RT(pRT, 0);
     RCache.set_RT(destination.pRT, 1);
 
