@@ -70,9 +70,9 @@ void CRenderTarget::phase_combine()
     // low/hi RTs
     {
         FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        HW.pContext->ClearRenderTargetView(rt_Generic_0_r->pRT, ColorRGBA);
-        HW.pContext->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
-        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, rt_MSAADepth->pZRT);
+        HW.pContext->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
+        HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
+        u_setrt(rt_Generic_0, rt_Generic_1, 0, rt_MSAADepth->pZRT);
     }
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(FALSE);
@@ -283,7 +283,7 @@ void CRenderTarget::phase_combine()
     // Forward rendering
     {
         PIX_EVENT(Forward_rendering);
-        u_setrt(rt_Generic_0_r, 0, 0, rt_MSAADepth->pZRT); // LDR RT
+        u_setrt(rt_Generic_0, 0, 0, rt_MSAADepth->pZRT); // LDR RT
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
@@ -324,8 +324,8 @@ void CRenderTarget::phase_combine()
         {
             PIX_EVENT(render_distort_objects);
             FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
-            u_setrt(rt_Generic_1_r, 0, 0, rt_MSAADepth->pZRT); // Now RT is a distortion mask
-            HW.pContext->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
+            u_setrt(rt_Generic_1, 0, 0, rt_MSAADepth->pZRT); // Now RT is a distortion mask
+            HW.pContext->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
@@ -336,15 +336,6 @@ void CRenderTarget::phase_combine()
         }
     }
 
-    /*
-       if( RImplementation.o.dx10_msaa )
-       {
-          // we need to resolve rt_Generic_1 into rt_Generic_1_r
-          if( bDistort )
-             HW.pDevice->ResolveSubresource( rt_Generic_1_r->pTexture->surface_get(), 0,
-       rt_Generic_1->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM );
-       }
-       */
     RCache.set_Stencil(FALSE);
 
     // PP enabled ?
@@ -633,7 +624,7 @@ void CRenderTarget::phase_combine_volumetric()
     //	TODO: DX10: Remove half pixel offset here
 
     // u_setrt(rt_Generic_0,0,0,get_base_zb() );			// LDR RT
-    u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, rt_MSAADepth->pZRT);
+    u_setrt(rt_Generic_0, rt_Generic_1, 0, rt_MSAADepth->pZRT);
 
     //	Sets limits to both render targets
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);

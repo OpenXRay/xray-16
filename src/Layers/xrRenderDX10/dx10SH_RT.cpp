@@ -268,8 +268,8 @@ void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dw
 void CRT::resolve_into(CRT& destination) const
 {
     VERIFY(fmt == destination.fmt); // only RTs with same format supported
-    HW.pContext->ResolveSubresource(pTexture->surface_get(), 0,
-        destination.pTexture->surface_get(), 0, dx10TextureUtils::ConvertTextureFormat(fmt));
+    HW.pContext->ResolveSubresource(destination.pTexture->surface_get(), 0,
+        pTexture->surface_get(), 0, dx10TextureUtils::ConvertTextureFormat(fmt));
 }
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= 0*/)
