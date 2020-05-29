@@ -306,7 +306,7 @@ void CResourceManager::CompatibilityCheck()
     if (psDeviceFlags.test(rsR2))
     {
         // Check for new cascades support on R2
-        IReader* accumSunNearCascade = open_shader("accum_sun_near_cascade.ps");
+        IReader* accumSunNearCascade = open_shader("accum_sun_cascade.ps");
         RImplementation.o.oldshadowcascades = !accumSunNearCascade;
         ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, !accumSunNearCascade);
         FS.r_close(accumSunNearCascade);
