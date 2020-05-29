@@ -44,9 +44,10 @@ struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std
     }
     virtual void clear();
 
-    // Avoid using this function.
+    // Avoid using these functions.
     // If possible use precompiled texture list.
     u32 find_texture_stage(const shared_str& TexName) const;
+    void create_texture(u32 stage, pcstr textureName);
 };
 typedef resptr_core<STextureList, resptr_base<STextureList>> ref_texture_list;
 //////////////////////////////////////////////////////////////////////////

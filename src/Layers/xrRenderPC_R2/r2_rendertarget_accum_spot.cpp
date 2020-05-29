@@ -346,39 +346,6 @@ void CRenderTarget::accum_volumetric(light* L)
         RCache.set_Element			(shader->E[ _id ]	);
         */
 
-        //	Set correct depth surface
-        //	It's slow. Make this when shader is created
-        {
-            pcstr pszSMapName;
-            BOOL b_HW_smap = RImplementation.o.HW_smap;
-            BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
-            if (b_HW_smap)
-            {
-                if (b_HW_PCF)
-                    pszSMapName = r2_RT_smap_depth;
-                else
-                    pszSMapName = r2_RT_smap_depth;
-            }
-            else
-                pszSMapName = r2_RT_smap_surf;
-            // s_smap
-            STextureList* _T = &*s_accum_volume->E[0]->passes[0]->T;
-
-            STextureList::iterator _it = _T->begin();
-            STextureList::iterator _end = _T->end();
-            for (; _it != _end; ++_it)
-            {
-                std::pair<u32, ref_texture>& loader = *_it;
-                u32 load_id = loader.first;
-                //	Shadowmap texture always uses 0 texture unit
-                if (load_id == 0)
-                {
-                    //	Assign correct texture
-                    loader.second.create(pszSMapName);
-                }
-            }
-        }
-
         RCache.set_Element(shader->E[0]);
 
         // Constants
