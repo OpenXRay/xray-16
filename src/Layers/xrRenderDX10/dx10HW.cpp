@@ -451,4 +451,3 @@ DeviceState CHW::GetDeviceState()
 
     return DeviceState::Normal;
 }
-

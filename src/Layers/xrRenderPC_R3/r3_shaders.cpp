@@ -695,7 +695,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
         if (FAILED(_result) && HW.OldD3DCompile)
         {
             _result = HW.OldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
-               Flags, 0, &pShaderBuf, &pErrorBuf);
+                Flags, 0, &pShaderBuf, &pErrorBuf);
             if (SUCCEEDED(_result))
             {
                 Msg("! error: Can't compile shader %s", name);
