@@ -158,11 +158,11 @@ u32 STextureList::find_texture_stage(const shared_str& TexName) const
     return dwTextureStage;
 }
 
-void STextureList::create_texture(u32 stage, pcstr textureName)
+void STextureList::create_texture(u32 stage, pcstr textureName, bool evenIfNotNull)
 {
     for (auto& loader : *this)
     {
-        if (loader.first == stage)
+        if (loader.first == stage && (!loader.second || evenIfNotNull))
         {
             //  Assign correct texture
             loader.second.create(textureName);

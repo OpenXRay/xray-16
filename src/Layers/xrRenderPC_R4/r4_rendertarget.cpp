@@ -278,7 +278,7 @@ void manually_assign_texture(ref_shader& shader, pcstr dx10textureName, pcstr re
         return;
     }
     const auto index = constant->samp.index;
-    pass.T->create_texture(index, rendertargetTextureName);
+    pass.T->create_texture(index, rendertargetTextureName, false);
 }
 
 CRenderTarget::CRenderTarget()
