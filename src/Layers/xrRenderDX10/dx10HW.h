@@ -66,9 +66,8 @@ public:
     bool SAD4ShaderInstructions;
     bool ExtendedDoublesShaderInstructions;
 
-    using oldD3DCompileType = HRESULT(LPCVOID, SIZE_T, LPCSTR, const D3D_SHADER_MACRO*, ID3DInclude*, LPCSTR, LPCSTR,
-        UINT, UINT, ID3DBlob**, ID3DBlob**);
-    oldD3DCompileType* oldD3DCompile = nullptr;
+    using D3DCompileFunc = decltype(&D3DCompile);
+    oldD3DCompileFunc OldD3DCompile = nullptr;
 
 #ifdef HAS_DX11_2
     IDXGIFactory2* m_pFactory2 = nullptr;

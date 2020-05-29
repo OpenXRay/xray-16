@@ -689,17 +689,17 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
 
-        if (ClearSkyMode)
+        _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget, Flags, 0,
+            &pShaderBuf, &pErrorBuf);
+            
+        if (FAILED(_result) && HW.OldD3DCompile)
         {
-            if (!HW.oldD3DCompile)
-            HW.LoadOldD3DCompile();
-           _result = HW.oldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
+           _result = HW.OldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
                Flags, 0, &pShaderBuf, &pErrorBuf);
-        }
-        else
-        {
-            _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
-                Flags, 0, &pShaderBuf, &pErrorBuf);
+           if (SUCCEEDED(_result))
+           {
+               // TODO: Add log about errors and successful fallback to the old compiler
+           }
         }
 #if 0
         if (pErrorBuf)
