@@ -49,6 +49,11 @@ void CHW::CreateD3D()
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
     R_CHK(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&m_pFactory)));
     R_CHK(m_pFactory->EnumAdapters1(0, &m_pAdapter));
+    if (ClearSkyMode)
+    {
+        d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
+        OldD3DCompile = static_cast<D3DCompileFunc>(d3dCompiler37->GetProcAddress("D3DCompileFromMemory"));
+    }
 }
 
 void CHW::DestroyD3D()
@@ -193,11 +198,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         "Failed to initialize graphics hardware: failed to select depth-stencil format."
         "\nPlease try to restart the game.");
     Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(selectedFormat);
-
-    if (ClearSkyMode)
-    {
-        LoadOldD3DCompile();
-    }
 
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
@@ -452,8 +452,3 @@ DeviceState CHW::GetDeviceState()
     return DeviceState::Normal;
 }
 
-void CHW::LoadOldD3DCompile() 
-{
-    d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
-    OldD3DCompile = static_cast<D3DCompileFunc*>(d3dCompiler37->GetProcAddress("D3DCompileFromMemory"));
-}

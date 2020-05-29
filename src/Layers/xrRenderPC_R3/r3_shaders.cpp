@@ -694,13 +694,13 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
             
         if (FAILED(_result) && HW.OldD3DCompile)
         {
-           _result = HW.OldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
+            _result = HW.OldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
                Flags, 0, &pShaderBuf, &pErrorBuf);
-           if (SUCCEEDED(_result))
-           {
-               Msg("Fallback to the old compiler for %s", name);
-               // TODO: Add log about errors and successful fallback to the old compiler
-           }
+            if (SUCCEEDED(_result))
+            {
+                Msg("! error: Can't compile shader %s", name);
+                Msg("Fallback to the old compiler for %s", name);
+            }
         }
 #if 0
         if (pErrorBuf)
