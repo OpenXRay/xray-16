@@ -698,6 +698,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
                Flags, 0, &pShaderBuf, &pErrorBuf);
            if (SUCCEEDED(_result))
            {
+               Msg("Fallback to the old compiler for %s", name);
                // TODO: Add log about errors and successful fallback to the old compiler
            }
         }

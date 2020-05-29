@@ -194,6 +194,11 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         "\nPlease try to restart the game.");
     Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(selectedFormat);
 
+    if (ClearSkyMode)
+    {
+        LoadOldD3DCompile();
+    }
+
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     //Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
@@ -450,5 +455,5 @@ DeviceState CHW::GetDeviceState()
 void CHW::LoadOldD3DCompile() 
 {
     d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
-    oldD3DCompile = (oldD3DCompileType*)d3dCompiler37->GetProcAddress("D3DCompileFromMemory");
+    OldD3DCompile = static_cast<D3DCompileFunc*>(d3dCompiler37->GetProcAddress("D3DCompileFromMemory"));
 }
