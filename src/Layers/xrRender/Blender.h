@@ -55,7 +55,7 @@ public:
     virtual LPCSTR getComment() = 0;
 
     virtual BOOL canBeDetailed() { return FALSE; }
-    virtual BOOL canBeLMAPped() = 0;
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual BOOL canUseSteepParallax() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
