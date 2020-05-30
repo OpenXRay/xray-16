@@ -49,7 +49,6 @@ protected:
 public:
     static IBlender* Create(CLASS_ID cls);
     static void Destroy(IBlender*& B);
-    static void CreatePalette(xr_vector<IBlender*>& palette);
 
     CBlender_DESC& getDescription() { return description; }
     virtual LPCSTR getName() { return description.cName; }
