@@ -9,6 +9,8 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
+void fix_texture_name(LPSTR);
+
 static int ParseName(LPCSTR N)
 {
     if (0 == xr_strcmp(N, "$null"))
@@ -377,4 +379,80 @@ void CBlender_Compile::Stage_Constant(LPCSTR name)
     sh_list& lst = L_constants;
     int id = ParseName(name);
     passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
+}
+
+
+void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
+{
+    VERIFY(stage != InvalidStage);
+
+    u32 minFliter   = D3DTEXF_LINEAR;
+    u32 mipFilter   = D3DTEXF_LINEAR;
+    u32 magFilter   = D3DTEXF_LINEAR;
+    u32 addressMode = D3DTADDRESS_WRAP;
+
+    if (xr_strcmp(sampler, "smp_nofilter") == 0)
+    {
+        addressMode = D3DTADDRESS_CLAMP;
+        minFliter   = D3DTEXF_POINT;
+        mipFilter   = D3DTEXF_NONE;
+        magFilter   = D3DTEXF_POINT;
+    }
+    else if (xr_strcmp(sampler, "smp_rtlinear") == 0)
+    {
+        addressMode = D3DTADDRESS_CLAMP;
+        mipFilter   = D3DTEXF_NONE;
+    }
+    else if ((xr_strcmp(sampler, "s_detail") == 0) || (xr_strcmp(sampler, "s_base") == 0))
+    {
+        minFliter = D3DTEXF_ANISOTROPIC;
+        magFilter = D3DTEXF_ANISOTROPIC;
+    }
+    else if (0 == xr_strcmp(sampler, "smp_material"))
+    {
+        addressMode = D3DTADDRESS_CLAMP;
+        mipFilter   = D3DTEXF_NONE;
+        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+    }
+
+    i_Address(stage, addressMode);
+    i_Filter(stage, minFliter, mipFilter, magFilter);
+}
+
+
+u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str texture)
+{
+    const auto& findResource = [&](pcstr name, u32 type) -> u32
+    {
+        ref_constant C = ctable.get(name, type);
+        if (!C)
+        {
+            return InvalidStage;
+        }
+
+        R_ASSERT(C->type == type);
+        return C->samp.index;
+    };
+
+    /* Setup sampler */
+    auto samplerName = HW.Caps.useCombinedSamplers ? image : sampler;
+    const u32 samplerStage = findResource(samplerName, RC_sampler);
+    if (samplerStage != InvalidStage)
+    {
+        SetupSampler(samplerStage, sampler);
+    }
+
+    /* Setup assigned texture */
+    const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findResource(image, RC_dx10texture);
+    if ((textureStage != InvalidStage) && (texture.size() != 0))
+    {
+        string256 name;
+        xr_strcpy(name, texture.c_str());
+        fix_texture_name(name);
+
+        ref_texture textureResource = RImplementation.Resources->_CreateTexture(name);
+        passTextures.emplace_back(std::make_pair(textureStage, textureResource));
+    }
+
+    return samplerStage;
 }
