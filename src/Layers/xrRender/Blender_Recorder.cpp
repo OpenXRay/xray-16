@@ -156,14 +156,25 @@ void CBlender_Compile::SetParams(int iPriority, bool bStrictB2F)
 //
 void CBlender_Compile::PassBegin()
 {
+    // Clear resources
     RS.Invalidate();
     passTextures.clear();
     passMatrices.clear();
     passConstants.clear();
+    ctable.clear();
+
+    // Set default pipeline state
+    PassSET_ZB(TRUE, TRUE);
+    PassSET_Blend(FALSE, D3DBLEND_ONE, D3DBLEND_ZERO, FALSE, 0);
+
+    // Set default shaders
     xr_strcpy(pass_ps, "null");
     xr_strcpy(pass_vs, "null");
+    xr_strcpy(pass_gs, "null");
+    xr_strcpy(pass_hs, "null");
+    xr_strcpy(pass_ds, "null");
+    xr_strcpy(pass_cs, "null");
     dwStage = 0;
-    ctable.clear();
 }
 
 void CBlender_Compile::PassEnd()
@@ -173,11 +184,16 @@ void CBlender_Compile::PassEnd()
     RS.SetTSS(Stage(), D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
     // Create pass
-    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
-    dest.ps = RImplementation.Resources->_CreatePS(pass_ps);
-    dest.vs = RImplementation.Resources->_CreateVS(pass_vs);
-    ctable.merge(&dest.ps->constants);
-    ctable.merge(&dest.vs->constants);
+    if (!dest.vs)
+    {
+        dest.vs = RImplementation.Resources->_CreateVS("null");
+    }
+
+    if (!dest.ps)
+    {
+        dest.ps = RImplementation.Resources->_CreatePS("null");
+    }
+
 #ifndef USE_DX9
     dest.gs = RImplementation.Resources->_CreateGS(pass_gs);
     ctable.merge(&dest.gs->constants);
@@ -191,6 +207,7 @@ void CBlender_Compile::PassEnd()
 #endif
 #endif //	USE_DX10
     SetMapping();
+    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
 #ifdef _EDITOR
@@ -206,12 +223,16 @@ void CBlender_Compile::PassSET_PS(LPCSTR name)
 {
     xr_strcpy(pass_ps, name);
     xr_strlwr(pass_ps);
+    dest.ps = RImplementation.Resources->_CreatePS(pass_ps);
+    ctable.merge(&dest.ps->constants);
 }
 
 void CBlender_Compile::PassSET_VS(LPCSTR name)
 {
     xr_strcpy(pass_vs, name);
     xr_strlwr(pass_vs);
+    dest.vs = RImplementation.Resources->_CreateVS(pass_vs);
+    ctable.merge(&dest.vs->constants);
 }
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)

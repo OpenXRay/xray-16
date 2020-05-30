@@ -53,14 +53,10 @@ private:
 
     string128 pass_vs;
     string128 pass_ps;
-#ifndef USE_DX9
     string128 pass_gs;
-#if defined(USE_DX11) || defined(USE_DX12)
     string128 pass_hs;
     string128 pass_ds;
     string128 pass_cs;
-#endif
-#endif //	USE_DX10
 
     u32 BC(BOOL v) { return v ? 0x01 : 0; }
 
