@@ -901,7 +901,7 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 #endif // MASTER_GOLD
 
     CHECK_OR_EXIT(fsltx_is_available,
-        make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_file_name));
+        make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_name ? fs_name : fs_file_name));
 
 #ifdef DEBUG
     Msg("final $fs_root$ = %s", get_path("$fs_root$")->m_Path);

@@ -590,12 +590,12 @@ void xrDebug::DoExit(const std::string& message)
 
     if (ShowErrorMessage)
     {
-        const auto result = ShowMessage("Error", message.c_str(), false);
+        const auto result = ShowMessage(Core.ApplicationName, message.c_str(), false);
         if (result != AssertionResult::abort && DebuggerIsPresent())
             DEBUG_BREAK;
     }
     else
-        ShowMessage("Error", message.c_str());
+        ShowMessage(Core.ApplicationName, message.c_str());
 
 #if defined(XR_PLATFORM_WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
