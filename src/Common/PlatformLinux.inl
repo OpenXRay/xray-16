@@ -1109,6 +1109,9 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
+#define xr_fs_strlwr(str) str
+#define xr_fs_nostrlwr(str) xr_strlwr(str)
+
 /** For backward compability of FS, for real filesystem delimiter set to back
  * @brief restore_path_separators
  * @param path

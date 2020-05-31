@@ -34,6 +34,9 @@
 #include <windowsx.h>
 #include <ctime>
 
+#define xr_fs_strlwr(str) xr_strlwr(str)
+#define xr_fs_nostrlwr(str) str
+
 inline void convert_path_separators(char* /*path*/) {}
 inline void restore_path_separators(char* /*path*/) {}
 
