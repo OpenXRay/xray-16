@@ -4,6 +4,10 @@ class CBlender_Vertex_aref : public IBlender
 {
     xrP_Integer oAREF;
     xrP_BOOL oBlend;
+
+private:
+    void CompileForEditor(CBlender_Compile& C);
+
 public:
     CBlender_Vertex_aref();
     ~CBlender_Vertex_aref() override = default;

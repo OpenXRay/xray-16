@@ -48,9 +48,37 @@ void CBlender_Vertex_aref::Load(IReader& fs, u16 version)
     }
 }
 
+void CBlender_Vertex_aref::CompileForEditor(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
+        const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
+
+        C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
+        C.PassSET_LightFog(true, true);
+
+        // Stage1 - Base texture
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.Stage_Texture(oT_Name);
+        C.Stage_Matrix(oT_xform, 0);
+        C.Stage_Constant("$null");
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
 void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
+
+    if (C.bEditor)
+    {
+        CompileForEditor(C);
+        return;
+    }
 
     const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
     const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;

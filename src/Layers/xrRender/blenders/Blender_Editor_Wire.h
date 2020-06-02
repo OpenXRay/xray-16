@@ -3,6 +3,10 @@
 class CBlender_Editor_Wire : public IBlender
 {
     string64 oT_Factor;
+
+private:
+    void CompileForEditor(CBlender_Compile& C);
+
 public:
     CBlender_Editor_Wire();
     ~CBlender_Editor_Wire() override = default;

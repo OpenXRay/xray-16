@@ -381,7 +381,6 @@ void CBlender_Compile::Stage_Constant(LPCSTR name)
     passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
 }
 
-
 void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
 {
     VERIFY(stage != InvalidStage);
@@ -419,7 +418,6 @@ void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
     i_Filter(stage, minFliter, mipFilter, magFilter);
 }
 
-
 u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str texture)
 {
     const auto& findResource = [&](pcstr name, u32 type) -> u32
@@ -444,7 +442,7 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
 
     /* Setup assigned texture */
     const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findResource(image, RC_dx10texture);
-    if ((textureStage != InvalidStage) && (texture.size() != 0))
+    if (textureStage != InvalidStage && texture.size() != 0)
     {
         string256 name;
         xr_strcpy(name, texture.c_str());

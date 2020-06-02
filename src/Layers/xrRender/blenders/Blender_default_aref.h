@@ -4,6 +4,10 @@ class CBlender_default_aref : public IBlender
 {
     xrP_Integer oAREF;
     xrP_BOOL oBlend;
+
+private:
+    void CompileForEditor(CBlender_Compile& C);
+
 public:
     CBlender_default_aref();
     ~CBlender_default_aref() override = default;

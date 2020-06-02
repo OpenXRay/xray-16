@@ -56,9 +56,33 @@ void CBlender_Vertex::Load(IReader& fs, u16 version)
     }
 }
 
+void CBlender_Vertex::CompileForEditor(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_LightFog(true, true);
+
+        // Stage0 - Base texture
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.Stage_Texture(oT_Name);
+        C.Stage_Matrix(oT_xform, 0);
+        C.Stage_Constant("$null");
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
 void CBlender_Vertex::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
+
+    if (C.bEditor)
+    {
+        CompileForEditor(C);
+        return;
+    }
 
     switch (C.iElement)
     {

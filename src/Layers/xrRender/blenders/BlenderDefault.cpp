@@ -50,6 +50,7 @@ void CBlender_default::Save(IWriter& fs)
     xr_strcpy(I.str, "TESS_PN+HM");
     fs.w(&I, sizeof(I));
 }
+
 void CBlender_default::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
@@ -59,11 +60,36 @@ void CBlender_default::Load(IReader& fs, u16 version)
         xrPREAD_PROP(fs, xrPID_TOKEN, oTessellation);
     }
 }
+
+void CBlender_default::CompileForEditor(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(true, true);
+        C.PassSET_Blend(false, D3DBLEND_ONE, D3DBLEND_ZERO, false, 0);
+        C.PassSET_LightFog(true, true);
+
+        // Stage1 - Base texture
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
 void CBlender_default::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    R_ASSERT2(C.L_textures.size() >= 3, "Not enough textures for shader");
+    if (C.bEditor)
+    {
+        CompileForEditor(C);
+        return;
+    }
+
+    R_ASSERT2(C.L_textures.size() >= 3, "Not enought textures for shader");
 
     switch (C.iElement)
     {

@@ -3,6 +3,10 @@
 class CBlender_Vertex : public IBlender
 {
     xrP_TOKEN oTessellation;
+
+private:
+    void CompileForEditor(CBlender_Compile& C);
+
 public:
     CBlender_Vertex();
     ~CBlender_Vertex() override = default;

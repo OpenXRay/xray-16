@@ -60,9 +60,10 @@ private:
     string128 pass_ds;
     string128 pass_cs;
 
-    u32 BC(BOOL v) { return v ? 0x01 : 0; }
-
+private:
+    inline u32 BC(BOOL v) const { return v ? 1 : 0; }
     void SetupSampler(u32 stage, pcstr sampler);
+
 public:
     u32 SampledImage(pcstr sampler, pcstr image, shared_str texture);
 

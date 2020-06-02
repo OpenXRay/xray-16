@@ -79,12 +79,10 @@ void IBlender::Compile(CBlender_Compile& C)
         C.SetParams(oPriority.value, oStrictSorting.value ? true : false);
 }
 
-
 IBlender* IBlender::Create(CLASS_ID cls)
 {
     return ::RImplementation.blender_create(cls);
 }
-
 
 void IBlender::Destroy(IBlender*& B)
 {

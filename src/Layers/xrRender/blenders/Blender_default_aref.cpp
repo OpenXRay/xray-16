@@ -55,9 +55,37 @@ void CBlender_default_aref::Load(IReader& fs, u16 version)
     }
 }
 
+void CBlender_default_aref::CompileForEditor(CBlender_Compile& C)
+{
+    C.PassBegin();
+    {
+        const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
+        const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
+
+        C.PassSET_ZB(true, true);
+        C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
+        C.PassSET_LightFog(true, true);
+
+        // Stage0 - Base texture
+        C.StageBegin();
+        C.StageSET_Address(D3DTADDRESS_WRAP);
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
 void CBlender_default_aref::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
+
+    if (C.bEditor)
+    {
+        CompileForEditor(C);
+        return;
+    }
 
     R_ASSERT2(C.L_textures.size() >= 2, "Not enough textures for shader");
 

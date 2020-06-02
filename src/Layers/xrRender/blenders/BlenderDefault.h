@@ -4,6 +4,10 @@
 class CBlender_default : public IBlender
 {
     xrP_TOKEN oTessellation;
+
+private:
+    void CompileForEditor(CBlender_Compile& C);
+
 public:
     CBlender_default();
     ~CBlender_default() override = default;
