@@ -87,11 +87,6 @@ void CBlender_Screen_SET::Load(IReader& fs, u16 version)
         oBlend.Count = VER_5_oBlendCount;
         break;
 
-    case 3:
-        oBlend.Count = VER_5_oBlendCount;
-        xrPREAD_PROP(fs, xrPID_BOOL, oClamp);
-        break;
-
     default:
         oBlend.Count = VER_5_oBlendCount;
         xrPREAD_PROP(fs, xrPID_BOOL, oClamp);

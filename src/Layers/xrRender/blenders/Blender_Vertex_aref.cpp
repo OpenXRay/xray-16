@@ -127,11 +127,8 @@ void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
     case SE_R1_LPOINT:
         C.PassBegin();
         {
-            cpcstr tsv_point = C.bDetail_Diffuse ? "vert_point_dt" : "vert_point";
-            cpcstr tsp_point = C.bDetail_Diffuse ? "add_point_dt"  : "add_point";
-
-            C.PassSET_VS(tsv_point);
-            C.PassSET_PS(tsp_point);
+            C.PassSET_VS("vert_point");
+            C.PassSET_PS("add_point");
 
             C.PassSET_ZB(true, false);
             C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
@@ -151,11 +148,8 @@ void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
     case SE_R1_LSPOT:
         C.PassBegin();
         {
-            cpcstr tsv_spot = C.bDetail_Diffuse ? "vert_spot_dt" : "vert_spot";
-            cpcstr tsp_spot = C.bDetail_Diffuse ? "add_spot_dt"  : "add_spot";
-
-            C.PassSET_VS(tsv_spot);
-            C.PassSET_PS(tsp_spot);
+            C.PassSET_VS("vert_spot");
+            C.PassSET_PS("add_spot");
 
             C.PassSET_ZB(true, false);
             C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);

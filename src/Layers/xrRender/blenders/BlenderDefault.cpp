@@ -65,8 +65,6 @@ void CBlender_default::CompileForEditor(CBlender_Compile& C)
 {
     C.PassBegin();
     {
-        C.PassSET_ZB(true, true);
-        C.PassSET_Blend(false, D3DBLEND_ONE, D3DBLEND_ZERO, false, 0);
         C.PassSET_LightFog(true, true);
 
         // Stage1 - Base texture
@@ -135,13 +133,10 @@ void CBlender_default::Compile(CBlender_Compile& C)
 
     case SE_R1_LPOINT:
     {
-        pcstr const tsv_point = C.bDetail_Diffuse ? "lmap_point_dt" : "lmap_point";
-        pcstr const tsp_point = C.bDetail_Diffuse ? "add_point_dt"  : "add_point";
-
         C.PassBegin();
         {
-            C.PassSET_VS(tsv_point);
-            C.PassSET_PS(tsp_point);
+            C.PassSET_VS("lmap_point");
+            C.PassSET_PS("add_point");
 
             C.PassSET_ZB(true, false);
             C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
@@ -150,10 +145,6 @@ void CBlender_default::Compile(CBlender_Compile& C)
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
             C.SampledImage("smp_rtlinear", "s_lmap", TEX_POINT_ATT);
             C.SampledImage("smp_rtlinear", "s_att", TEX_POINT_ATT);
-            if (C.bDetail_Diffuse)
-            {
-                C.SampledImage("s_detail", "s_detail", C.detail_texture);
-            }
         }
         C.PassEnd();
         break;
@@ -161,13 +152,10 @@ void CBlender_default::Compile(CBlender_Compile& C)
 
     case SE_R1_LSPOT:
     {
-        pcstr const tsv_spot = C.bDetail_Diffuse ? "lmap_spot_dt" : "lmap_spot";
-        pcstr const tsp_spot = C.bDetail_Diffuse ? "add_spot_dt"  : "add_spot";
-
         C.PassBegin();
         {
-            C.PassSET_VS(tsv_spot);
-            C.PassSET_PS(tsp_spot);
+            C.PassSET_VS("lmap_spot");
+            C.PassSET_PS("add_spot");
 
             C.PassSET_ZB(true, false);
             C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
@@ -179,10 +167,6 @@ void CBlender_default::Compile(CBlender_Compile& C)
                 C.i_Projective(stage, true);
             }
             C.SampledImage("smp_rtlinear", "s_att", TEX_SPOT_ATT);
-            if (C.bDetail_Diffuse)
-            {
-                C.SampledImage("s_detail", "s_detail", C.detail_texture);
-            }
         }
         C.PassEnd();
         break;

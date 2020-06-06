@@ -166,8 +166,9 @@ void CBlender_Compile::PassBegin()
     ctable.clear();
 
     // Set default pipeline state
-    PassSET_ZB(TRUE, TRUE);
-    PassSET_Blend(FALSE, D3DBLEND_ONE, D3DBLEND_ZERO, FALSE, 0);
+    PassSET_ZB(true, true);
+    PassSET_Blend(false, D3DBLEND_ONE, D3DBLEND_ZERO, false, 0);
+    PassSET_LightFog(false, false);
 
     // Set default shaders
     xr_strcpy(pass_ps, "null");
@@ -449,7 +450,7 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
         fix_texture_name(name);
 
         ref_texture textureResource = RImplementation.Resources->_CreateTexture(name);
-        passTextures.emplace_back(std::make_pair(textureStage, textureResource));
+        passTextures.emplace_back(textureStage, textureResource);
     }
 
     return samplerStage;
