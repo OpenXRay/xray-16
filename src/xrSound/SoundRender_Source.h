@@ -25,13 +25,13 @@ public:
 
 private:
     void i_decompress_fr(OggVorbis_File* ovf, char* dest, u32 size);
-    void LoadWave(pcstr name);
+    void LoadWave(pcstr name, bool preCache);
 
 public:
     CSoundRender_Source();
     ~CSoundRender_Source();
 
-    bool load(pcstr name, bool warnOnNotFound = true);
+    bool load(pcstr name, bool preCache = false, bool warnOnNotFound = true);
     void unload();
     void decompress(u32 line, OggVorbis_File* ovf);
 

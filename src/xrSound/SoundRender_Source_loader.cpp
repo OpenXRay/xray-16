@@ -47,7 +47,7 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
     i_decompress_fr(ovf, dest, left);
 }
 
-void CSoundRender_Source::LoadWave(pcstr pName)
+void CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
 {
     pname = pName;
 
@@ -61,8 +61,16 @@ void CSoundRender_Source::LoadWave(pcstr pName)
     vorbis_info* ovi = ov_info(&ovf, -1);
     // verify
     R_ASSERT3(ovi, "Invalid source info:", pName);
-    R_ASSERT3(ovi->rate == 44100, "Invalid source rate:", pName);
-
+    if (ovi->rate != 44100)
+    {
+        if (preCache)
+        {
+            Msg("Invalid source rate in wave file %s", pname.c_str());
+            return;
+        }
+        else
+            R_ASSERT3(ovi->rate == 44100, "Invalid source rate:", pName);
+    }
 #ifdef DEBUG
     if (ovi->channels == 2)
         Msg("stereo sound source [%s]", pName);
@@ -122,7 +130,7 @@ void CSoundRender_Source::LoadWave(pcstr pName)
     FS.r_close(wave);
 }
 
-bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
+bool CSoundRender_Source::load(pcstr name, bool preCache /*= false*/, bool replaceWithNoSound /*= true*/)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -148,7 +156,7 @@ bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
     
     if (soundExist || replaceWithNoSound)
     {
-        LoadWave(fn);
+        LoadWave(fn, preCache);
         SoundRender->cache.cat_create(CAT, dwBytesTotal);
     }
 
