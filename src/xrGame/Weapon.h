@@ -207,6 +207,7 @@ protected:
         Fvector m_ZoomDof;
         Fvector4 m_ReloadDof;
         Fvector4 m_ReloadEmptyDof;
+
         bool m_bUseDynamicZoom;
         shared_str m_sUseZoomPostprocess;
         shared_str m_sUseBinocularVision;
