@@ -222,12 +222,16 @@ void CGamePersistent::OnAppStart()
         nullptr, nullptr, &globalsInitialized);
 
     // load game materials
+#ifndef XR_PLATFORM_WINDOWS
+    GMLib.Load();
+#else
     TaskScheduler->AddTask("GMLib.Load()", [&]()
     {
         GEnv.Render->MakeContextCurrent(IRender::HelperContext); // free to use, so let's use it
         GMLib.Load();
         GEnv.Render->MakeContextCurrent(IRender::NoContext); // release it for other users
     }, nullptr, nullptr, &materialsLoaded);
+#endif
 
     SetupUIStyle();
     GEnv.UI = xr_new<UICore>();
