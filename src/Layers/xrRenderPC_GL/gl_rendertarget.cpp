@@ -237,6 +237,20 @@ void generate_jitter(DWORD* dest, u32 elem_count)
         *dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
 
+void manually_assign_texture(ref_shader& shader, pcstr samplerName, pcstr rendertargetTextureName)
+{
+    SPass& pass = *shader->E[0]->passes[0];
+    ref_constant constant = pass.constants->get(samplerName);
+    if (!constant)
+    {
+        Msg("! Trying to manually assign a texture[%s] to [%s] but %s doesn't exist.",
+            rendertargetTextureName, samplerName, samplerName);
+        return;
+    }
+    const auto index = constant->samp.index;
+    pass.T->create_texture(index, rendertargetTextureName, false);
+}
+
 CRenderTarget::CRenderTarget()
 {
     u32 SampleCount = 1;
@@ -396,6 +410,7 @@ CRenderTarget::CRenderTarget()
     }
 
     // DIRECT (spot)
+    pcstr smapTarget = r2_RT_smap_depth;
     D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
 
     if (RImplementation.o.HW_smap)
@@ -439,9 +454,13 @@ CRenderTarget::CRenderTarget()
         if (RImplementation.o.advancedpp)
         {
             s_accum_direct_volumetric.create("accum_volumetric_sun_nomsaa");
+            manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
             if (RImplementation.o.dx10_minmax_sm)
+            {
                 s_accum_direct_volumetric_minmax.create("accum_volumetric_sun_nomsaa_minmax");
+                manually_assign_texture(s_accum_direct_volumetric_minmax, "s_smap", smapTarget);
+            }
 
             if (RImplementation.o.dx10_msaa)
             {
@@ -464,6 +483,7 @@ CRenderTarget::CRenderTarget()
                 {
                     //s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],			"r3" DELIMITER "accum_direct");
                     s_accum_direct_volumetric_msaa[i].create(snames[i]);
+                    manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
             }
         }
@@ -472,6 +492,7 @@ CRenderTarget::CRenderTarget()
     {
         //	TODO: DX10: Check if we need old-style SMap
         VERIFY(!"Use HW SMAPs only!");
+        //smapTarget = r2_RT_smap_surf;
         //u32	size					=RImplementation.o.smapsize	;
         //rt_smap_surf.create			(r2_RT_smap_surf,			size,size,D3DFMT_R32F);
         //rt_smap_depth				= NULL;
@@ -538,6 +559,7 @@ CRenderTarget::CRenderTarget()
 
     {
         s_accum_volume.create("accum_volumetric", "lights" DELIMITER "lights_spot01");
+        manually_assign_texture(s_accum_volume, "s_smap", smapTarget);
         accum_volumetric_geom_create();
         g_accum_volumetric.create(D3DFVF_XYZ, g_accum_volumetric_vb, g_accum_volumetric_ib);
     }
