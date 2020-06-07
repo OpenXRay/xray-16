@@ -168,5 +168,4 @@ void STextureList::create_texture(u32 stage, pcstr textureName, bool evenIfNotNu
             loader.second.create(textureName);
         }
     }
-
 }
