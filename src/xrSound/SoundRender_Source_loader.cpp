@@ -47,7 +47,7 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
     i_decompress_fr(ovf, dest, left);
 }
 
-void CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
+bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache, bool crashOnError /*= true*/)
 {
     pname = pName;
 
@@ -55,21 +55,31 @@ void CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     OggVorbis_File ovf;
     ov_callbacks ovc = {ov_read_func, ov_seek_func, ov_close_func, ov_tell_func};
     IReader* wave = FS.r_open(pname.c_str());
-    R_ASSERT3(wave && wave->length(), "Can't open wave file:", pname.c_str());
+    if (!wave && !wave->length())
+    {
+        R_ASSERT3(!crashOnError, "Can't open wave file:", pname.c_str());
+        return false;
+    }
     ov_open_callbacks(wave, &ovf, nullptr, 0, ovc);
 
     vorbis_info* ovi = ov_info(&ovf, -1);
     // verify
-    R_ASSERT3(ovi, "Invalid source info:", pName);
+    if (!ovi)
+    {
+        R_ASSERT3(!crashOnError, "Invalid source info:", pName);
+        return false;
+    }
     if (ovi->rate != 44100)
     {
         if (preCache)
         {
             Msg("Invalid source rate in wave file %s", pname.c_str());
-            return;
         }
         else
-            R_ASSERT3(ovi->rate == 44100, "Invalid source rate:", pName);
+        {
+            R_ASSERT3(!crashOnError, "Invalid source rate:", pName);
+        }
+        return false;
     }
 #ifdef DEBUG
     if (ovi->channels == 2)
@@ -124,10 +134,14 @@ void CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     }
     else
         Log("! Missing ogg-comment, file: ", pName);
-    R_ASSERT3(m_fMaxAIDist >= 0.1f && m_fMaxDist >= 0.1f, "Invalid max distance.", pName);
-
+    if (m_fMaxAIDist < 0.1f && m_fMaxDist < 0.1f)
+    {
+        R_ASSERT3(!crashOnError, "Invalid max distance.", pName);
+        return false;
+    }
     ov_clear(&ovf);
     FS.r_close(wave);
+    return true;
 }
 
 bool CSoundRender_Source::load(pcstr name, bool preCache /*= false*/, bool replaceWithNoSound /*= true*/)
