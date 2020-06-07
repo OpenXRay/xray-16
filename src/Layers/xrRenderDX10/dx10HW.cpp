@@ -49,6 +49,11 @@ void CHW::CreateD3D()
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
     R_CHK(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&m_pFactory)));
     R_CHK(m_pFactory->EnumAdapters1(0, &m_pAdapter));
+    if (ClearSkyMode)
+    {
+        d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
+        OldD3DCompile = static_cast<D3DCompileFunc>(d3dCompiler37->GetProcAddress("D3DCompileFromMemory"));
+    }
 }
 
 void CHW::DestroyD3D()

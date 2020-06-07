@@ -690,7 +690,17 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
         LPD3DBLOB pErrorBuf = NULL;
         _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget, Flags, 0,
             &pShaderBuf, &pErrorBuf);
-
+        if (FAILED(_result) && HW.OldD3DCompile)
+        {
+            Log("! ", file_name);
+            if (pErrorBuf)
+                Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
+            else
+                Msg("Can't compile shader hr=0x%08x", _result);
+            Msg("Fallback to the old compiler for %s", name);
+            _result = HW.OldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
+                Flags, 0, &pShaderBuf, &pErrorBuf);      
+        }
 #if 0
         if (pErrorBuf)
         {

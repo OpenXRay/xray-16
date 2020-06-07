@@ -64,6 +64,10 @@ public:
     bool DoublePrecisionFloatShaderOps;
     bool SAD4ShaderInstructions;
     bool ExtendedDoublesShaderInstructions;
+
+    using D3DCompileFunc = decltype(&D3DCompile);
+    D3DCompileFunc OldD3DCompile = nullptr;
+
 #ifdef HAS_DX11_2
     IDXGIFactory2* m_pFactory2 = nullptr;
     IDXGISwapChain2* m_pSwapChain2 = nullptr;
@@ -81,6 +85,7 @@ public:
 #endif
 private:
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
+    XRay::Module d3dCompiler37;
 };
 
 extern ECORE_API CHW HW;
