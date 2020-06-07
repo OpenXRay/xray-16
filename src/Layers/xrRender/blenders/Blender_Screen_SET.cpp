@@ -173,38 +173,35 @@ void CBlender_Screen_SET::CompileFixed(CBlender_Compile& C)
 
 void CBlender_Screen_SET::CompileProgrammed(CBlender_Compile& C)
 {
-    if (oBlend.IDselected == 6)
+    switch (oBlend.IDselected)
     {
+    case 6:
+        // Usually for wallmarks
         C.PassSET_VS("stub_notransform_t");
         C.PassSET_PS("stub_default_ma");
-    }
-    else
-    {
-        if (9 == oBlend.IDselected)
-        {
-            C.PassSET_VS("stub_notransform_t_m4");
-            C.PassSET_PS("stub_default");
-        }
-        else
-        {
-            if ((7 == oBlend.IDselected) || (8 == oBlend.IDselected))
-            {
-                C.PassSET_VS("stub_notransform_t_m2");
-                C.PassSET_PS("stub_default");
-            }
-            else
-            {
-                C.PassSET_VS("stub_notransform_t");
-                C.PassSET_PS("stub_default");
-            }
-        }
 
-        VERIFY2(C.L_textures.size() > 0, "Not enough textures");
-        const u32 stage = C.SampledImage("s_base", "s_base", C.L_textures[0]);
-        if (oClamp.value)
-        {
-            C.i_Address(stage, D3DTADDRESS_CLAMP);
-        }
+    case 9:
+        // 4x R
+        C.PassSET_VS("stub_notransform_t_m4");
+        C.PassSET_PS("stub_default");
+
+    case 7:
+    case 8:
+        // 2x R
+        C.PassSET_VS("stub_notransform_t_m2");
+        C.PassSET_PS("stub_default");
+
+    default:
+        // 1x R
+        C.PassSET_VS("stub_notransform_t");
+        C.PassSET_PS("stub_default");
+    }
+
+    VERIFY2(C.L_textures.size() > 0, "Not enough textures");
+    const u32 stage = C.SampledImage("s_base", "s_base", C.L_textures[0]);
+    if (oClamp.value)
+    {
+        C.i_Address(stage, D3DTADDRESS_CLAMP);
     }
 }
 
