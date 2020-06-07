@@ -3,17 +3,34 @@
 
 #include "Blender_Blur.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+/*
+ * TODO: Seems there is no use for this blender even in R1.
+ * Consider removing.
+ */
 
-CBlender_Blur::CBlender_Blur() { description.CLS = B_BLUR; }
-CBlender_Blur::~CBlender_Blur() {}
-void CBlender_Blur::Save(IWriter& fs) { IBlender::Save(fs); }
-void CBlender_Blur::Load(IReader& fs, u16 version) { IBlender::Load(fs, version); }
+#if RENDER != R_R1
+#error "The blender can't be used in this renderer generation"
+#endif
+
+CBlender_Blur::CBlender_Blur()
+{
+    description.CLS = B_BLUR;
+}
+
+LPCSTR CBlender_Blur::getComment()
+{
+    return "INTERNAL: blur";
+}
+
+BOOL CBlender_Blur::canBeLMAPped()
+{
+    return FALSE;
+}
+
 void CBlender_Blur::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
+
     C.PassBegin();
     {
         C.PassSET_ZB(FALSE, FALSE);
@@ -38,7 +55,6 @@ void CBlender_Blur::Compile(CBlender_Compile& C)
         C.Stage_Constant("$null");
         C.StageEnd();
 
-        //
         C.R().SetRS(D3DRS_TEXTUREFACTOR, color_rgba(127, 127, 127, 127));
     }
     C.PassEnd();

@@ -9,6 +9,8 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
+void fix_texture_name(LPSTR);
+
 static int ParseName(LPCSTR N)
 {
     if (0 == xr_strcmp(N, "$null"))
@@ -156,14 +158,26 @@ void CBlender_Compile::SetParams(int iPriority, bool bStrictB2F)
 //
 void CBlender_Compile::PassBegin()
 {
+    // Clear resources
     RS.Invalidate();
     passTextures.clear();
     passMatrices.clear();
     passConstants.clear();
+    ctable.clear();
+
+    // Set default pipeline state
+    PassSET_ZB(true, true);
+    PassSET_Blend(false, D3DBLEND_ONE, D3DBLEND_ZERO, false, 0);
+    PassSET_LightFog(false, false);
+
+    // Set default shaders
     xr_strcpy(pass_ps, "null");
     xr_strcpy(pass_vs, "null");
+    xr_strcpy(pass_gs, "null");
+    xr_strcpy(pass_hs, "null");
+    xr_strcpy(pass_ds, "null");
+    xr_strcpy(pass_cs, "null");
     dwStage = 0;
-    ctable.clear();
 }
 
 void CBlender_Compile::PassEnd()
@@ -173,11 +187,16 @@ void CBlender_Compile::PassEnd()
     RS.SetTSS(Stage(), D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
     // Create pass
-    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
-    dest.ps = RImplementation.Resources->_CreatePS(pass_ps);
-    dest.vs = RImplementation.Resources->_CreateVS(pass_vs);
-    ctable.merge(&dest.ps->constants);
-    ctable.merge(&dest.vs->constants);
+    if (!dest.vs)
+    {
+        dest.vs = RImplementation.Resources->_CreateVS("null");
+    }
+
+    if (!dest.ps)
+    {
+        dest.ps = RImplementation.Resources->_CreatePS("null");
+    }
+
 #ifndef USE_DX9
     dest.gs = RImplementation.Resources->_CreateGS(pass_gs);
     ctable.merge(&dest.gs->constants);
@@ -191,6 +210,7 @@ void CBlender_Compile::PassEnd()
 #endif
 #endif //	USE_DX10
     SetMapping();
+    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
 #ifdef _EDITOR
@@ -206,12 +226,16 @@ void CBlender_Compile::PassSET_PS(LPCSTR name)
 {
     xr_strcpy(pass_ps, name);
     xr_strlwr(pass_ps);
+    dest.ps = RImplementation.Resources->_CreatePS(pass_ps);
+    ctable.merge(&dest.ps->constants);
 }
 
 void CBlender_Compile::PassSET_VS(LPCSTR name)
 {
     xr_strcpy(pass_vs, name);
     xr_strlwr(pass_vs);
+    dest.vs = RImplementation.Resources->_CreateVS(pass_vs);
+    ctable.merge(&dest.vs->constants);
 }
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
@@ -356,4 +380,78 @@ void CBlender_Compile::Stage_Constant(LPCSTR name)
     sh_list& lst = L_constants;
     int id = ParseName(name);
     passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
+}
+
+void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
+{
+    VERIFY(stage != InvalidStage);
+
+    u32 minFliter   = D3DTEXF_LINEAR;
+    u32 mipFilter   = D3DTEXF_LINEAR;
+    u32 magFilter   = D3DTEXF_LINEAR;
+    u32 addressMode = D3DTADDRESS_WRAP;
+
+    if (xr_strcmp(sampler, "smp_nofilter") == 0)
+    {
+        addressMode = D3DTADDRESS_CLAMP;
+        minFliter   = D3DTEXF_POINT;
+        mipFilter   = D3DTEXF_NONE;
+        magFilter   = D3DTEXF_POINT;
+    }
+    else if (xr_strcmp(sampler, "smp_rtlinear") == 0)
+    {
+        addressMode = D3DTADDRESS_CLAMP;
+        mipFilter   = D3DTEXF_NONE;
+    }
+    else if ((xr_strcmp(sampler, "s_detail") == 0) || (xr_strcmp(sampler, "s_base") == 0))
+    {
+        minFliter = D3DTEXF_ANISOTROPIC;
+        magFilter = D3DTEXF_ANISOTROPIC;
+    }
+    else if (0 == xr_strcmp(sampler, "smp_material"))
+    {
+        addressMode = D3DTADDRESS_CLAMP;
+        mipFilter   = D3DTEXF_NONE;
+        RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+    }
+
+    i_Address(stage, addressMode);
+    i_Filter(stage, minFliter, mipFilter, magFilter);
+}
+
+u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str texture)
+{
+    const auto& findResource = [&](pcstr name, u32 type) -> u32
+    {
+        ref_constant C = ctable.get(name, type);
+        if (!C)
+        {
+            return InvalidStage;
+        }
+
+        R_ASSERT(C->type == type);
+        return C->samp.index;
+    };
+
+    /* Setup sampler */
+    auto samplerName = HW.Caps.useCombinedSamplers ? image : sampler;
+    const u32 samplerStage = findResource(samplerName, RC_sampler);
+    if (samplerStage != InvalidStage)
+    {
+        SetupSampler(samplerStage, sampler);
+    }
+
+    /* Setup assigned texture */
+    const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findResource(image, RC_dx10texture);
+    if (textureStage != InvalidStage && texture.size() != 0)
+    {
+        string256 name;
+        xr_strcpy(name, texture.c_str());
+        fix_texture_name(name);
+
+        ref_texture textureResource = RImplementation.Resources->_CreateTexture(name);
+        passTextures.emplace_back(textureStage, textureResource);
+    }
+
+    return samplerStage;
 }

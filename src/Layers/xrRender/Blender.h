@@ -49,14 +49,13 @@ protected:
 public:
     static IBlender* Create(CLASS_ID cls);
     static void Destroy(IBlender*& B);
-    static void CreatePalette(xr_vector<IBlender*>& palette);
 
     CBlender_DESC& getDescription() { return description; }
     virtual LPCSTR getName() { return description.cName; }
     virtual LPCSTR getComment() = 0;
 
     virtual BOOL canBeDetailed() { return FALSE; }
-    virtual BOOL canBeLMAPped() = 0;
+    virtual BOOL canBeLMAPped() { return FALSE; }
     virtual BOOL canUseSteepParallax() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);

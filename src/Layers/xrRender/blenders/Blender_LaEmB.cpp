@@ -1,15 +1,16 @@
-// BlenderDefault.cpp: implementation of the CBlender_LaEmB class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #pragma hdrstop
 
 #include "blender_LaEmB.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+/*
+ * TODO: Seems there is no use for this blender even in R1.
+ * Consider removing.
+ */
+
+#if RENDER != R_R1
+#error "The blender can't be used in this renderer generation"
+#endif
 
 CBlender_LaEmB::CBlender_LaEmB()
 {
@@ -19,10 +20,20 @@ CBlender_LaEmB::CBlender_LaEmB()
     xr_strcpy(oT2_const, "$null");
 }
 
-CBlender_LaEmB::~CBlender_LaEmB() {}
+LPCSTR CBlender_LaEmB::getComment() 
+{
+    return "LEVEL: (lmap+env*const)*base";
+}
+
+BOOL CBlender_LaEmB::canBeLMAPped()
+{
+    return TRUE;
+}
+
 void CBlender_LaEmB::Save(IWriter& fs)
 {
     IBlender::Save(fs);
+
     xrPWRITE_MARKER(fs, "Environment map");
     xrPWRITE_PROP(fs, "Name", xrPID_TEXTURE, oT2_Name);
     xrPWRITE_PROP(fs, "Transform", xrPID_MATRIX, oT2_xform);
@@ -32,53 +43,11 @@ void CBlender_LaEmB::Save(IWriter& fs)
 void CBlender_LaEmB::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
+
     xrPREAD_MARKER(fs);
     xrPREAD_PROP(fs, xrPID_TEXTURE, oT2_Name);
     xrPREAD_PROP(fs, xrPID_MATRIX, oT2_xform);
     xrPREAD_PROP(fs, xrPID_CONSTANT, oT2_const);
-}
-
-void CBlender_LaEmB::Compile(CBlender_Compile& C)
-{
-    IBlender::Compile(C);
-
-    BOOL bConstant = (0 != xr_stricmp(oT2_const, "$null"));
-    if (C.bEditor)
-    {
-        if (bConstant)
-            compile_EDc(C);
-        else
-            compile_ED(C);
-    }
-    else
-    {
-        if (2 == C.iElement)
-        {
-            if (bConstant)
-                compile_Lc(C);
-            else
-                compile_L(C);
-        }
-        else
-        {
-            switch (HW.Caps.raster.dwStages)
-            {
-            case 2: // Geforce1/2/MX
-                if (bConstant)
-                    compile_2c(C);
-                else
-                    compile_2(C);
-                break;
-            case 3: // Kyro, Radeon, Radeon2, Geforce3/4
-            default:
-                if (bConstant)
-                    compile_3c(C);
-                else
-                    compile_3(C);
-                break;
-            }
-        }
-    }
 }
 
 // EDITOR --- NO CONSTANT
@@ -86,9 +55,9 @@ void CBlender_LaEmB::compile_ED(CBlender_Compile& C)
 {
     C.PassBegin();
     {
-        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_ZB(true, true);
         C.PassSET_Blend_SET();
-        C.PassSET_LightFog(TRUE, TRUE);
+        C.PassSET_LightFog(true, true);
 
         // Stage1 - Env texture
         C.StageBegin();
@@ -113,9 +82,9 @@ void CBlender_LaEmB::compile_EDc(CBlender_Compile& C)
     // Pass0 - (lmap+env*const)
     C.PassBegin();
     {
-        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_ZB(true, true);
         C.PassSET_Blend_SET();
-        C.PassSET_LightFog(TRUE, TRUE);
+        C.PassSET_LightFog(true, true);
 
         // Stage1 - Env texture * constant
         C.StageBegin();
@@ -138,9 +107,9 @@ void CBlender_LaEmB::compile_EDc(CBlender_Compile& C)
     // Pass1 - *base
     C.PassBegin();
     {
-        C.PassSET_ZB(TRUE, FALSE);
+        C.PassSET_ZB(true, false);
         C.PassSET_Blend_MUL();
-        C.PassSET_LightFog(FALSE, TRUE);
+        C.PassSET_LightFog(false, true);
 
         // Stage2 - Diffuse color
         C.StageBegin();
@@ -152,6 +121,48 @@ void CBlender_LaEmB::compile_EDc(CBlender_Compile& C)
     C.PassEnd();
 }
 
+void CBlender_LaEmB::Compile(CBlender_Compile& C)
+{
+    IBlender::Compile(C);
+
+    const bool bConstant = (0 != xr_stricmp(oT2_const, "$null"));
+
+    if (C.bEditor)
+    {
+        if (bConstant)
+            compile_EDc(C);
+        else
+            compile_ED(C);
+        return;
+    }
+
+    if (2 == C.iElement)
+    {
+        if (bConstant)
+            compile_Lc(C);
+        else
+            compile_L(C);
+    }
+    else
+    {
+        switch (HW.Caps.raster.dwStages)
+        {
+        case 2: // Geforce1/2/MX
+            if (bConstant)
+                compile_2c(C);
+            else
+                compile_2(C);
+            break;
+        case 3: // Kyro, Radeon, Radeon2, Geforce3/4
+        default:
+            if (bConstant)
+                compile_3c(C);
+            else
+                compile_3(C);
+            break;
+        }
+    }
+}
 //
 void CBlender_LaEmB::compile_2(CBlender_Compile& C)
 {

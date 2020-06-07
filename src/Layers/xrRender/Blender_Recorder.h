@@ -13,6 +13,8 @@
 class CBlender_Compile
 {
 public:
+    static constexpr auto InvalidStage = std::numeric_limits<u32>::max();
+
     sh_list L_textures;
     sh_list L_constants;
     sh_list L_matrices;
@@ -53,18 +55,18 @@ private:
 
     string128 pass_vs;
     string128 pass_ps;
-#ifndef USE_DX9
     string128 pass_gs;
-#if defined(USE_DX11) || defined(USE_DX12)
     string128 pass_hs;
     string128 pass_ds;
     string128 pass_cs;
-#endif
-#endif //	USE_DX10
 
-    u32 BC(BOOL v) { return v ? 0x01 : 0; }
+private:
+    inline u32 BC(BOOL v) const { return v ? 1 : 0; }
+    void SetupSampler(u32 stage, pcstr sampler);
 
 public:
+    u32 SampledImage(pcstr sampler, pcstr image, shared_str texture);
+
     CSimulator& R() { return RS; }
     void SetParams(int iPriority, bool bStrictB2F);
     void SetMapping();

@@ -3,20 +3,33 @@
 
 #include "Blender_Screen_GRAY.h"
 
+/*
+ * TODO: Seems there is no use for this blender even in R1.
+ * Consider removing.
+ */
+
+#if RENDER != R_R1
+#error "The blender can't be used in this renderer generation"
+#endif
+
 // Y =  0.299*Red+0.587*Green+0.114*Blue
 // Y =  76.544*R +150.272*G  +29.184*B
 // Y =  76(4C)    150(96)     29(1D)
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
-CBlender_Screen_GRAY::CBlender_Screen_GRAY() { description.CLS = B_SCREEN_GRAY; }
-CBlender_Screen_GRAY::~CBlender_Screen_GRAY() {}
-void CBlender_Screen_GRAY::Save(IWriter& fs) { IBlender::Save(fs); }
-void CBlender_Screen_GRAY::Load(IReader& fs, u16 version) { IBlender::Load(fs, version); }
+CBlender_Screen_GRAY::CBlender_Screen_GRAY()
+{
+    description.CLS = B_SCREEN_GRAY;
+}
+
+LPCSTR CBlender_Screen_GRAY::getComment()
+{
+    return "INTERNAL: gray-scale effect";
+}
+
 void CBlender_Screen_GRAY::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
+
     C.PassBegin();
     {
         C.PassSET_ZB(FALSE, FALSE);

@@ -218,4 +218,7 @@ void CHWCaps::Update()
     // DEV INFO
 
     iGPUNum = GetGpuNum();
+
+    hasFixedPipeline    = true;
+    useCombinedSamplers = true;
 }

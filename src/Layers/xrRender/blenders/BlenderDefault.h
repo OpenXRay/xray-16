@@ -1,27 +1,23 @@
-// BlenderDefault.h: interface for the CBlenderDefault class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_)
-#define AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_
 #pragma once
+
 
 class CBlender_default : public IBlender
 {
-public:
-    virtual LPCSTR getComment() { return "LEVEL: lmap*base (default)"; }
-    virtual BOOL canBeDetailed() { return TRUE; }
-    virtual BOOL canBeLMAPped() { return TRUE; }
-    virtual void Save(IWriter& fs);
-    virtual void Load(IReader& fs, u16 version);
-
-    virtual void Compile(CBlender_Compile& C);
-
-    CBlender_default();
-    virtual ~CBlender_default();
+    xrP_TOKEN oTessellation;
 
 private:
-    xrP_TOKEN oTessellation;
-};
+    void CompileForEditor(CBlender_Compile& C);
 
-#endif // !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_)
+public:
+    CBlender_default();
+    ~CBlender_default() override = default;
+
+    LPCSTR getComment() override;
+    BOOL canBeDetailed() override;
+    BOOL canBeLMAPped() override;
+
+    void Save(IWriter& fs) override;
+    void Load(IReader& fs, u16 version) override;
+
+    void Compile(CBlender_Compile& C) override;
+};

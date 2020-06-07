@@ -1,21 +1,21 @@
-#ifndef BLENDER_EDITOR_SELECTION_H
-#define BLENDER_EDITOR_SELECTION_H
 #pragma once
 
 class CBlender_Editor_Selection : public IBlender
 {
     string64 oT_Factor;
 
+private:
+    void CompileForEditor(CBlender_Compile& C);
+
 public:
-    virtual LPCSTR getComment() { return "EDITOR: selection"; }
-    virtual BOOL canBeLMAPped() { return FALSE; }
-    virtual void Save(IWriter& fs);
-    virtual void Load(IReader& fs, u16 version);
-
-    virtual void Compile(CBlender_Compile& C);
-
     CBlender_Editor_Selection();
-    virtual ~CBlender_Editor_Selection();
-};
+    ~CBlender_Editor_Selection() override = default;
 
-#endif // BLENDER_EDITOR_SELECTION_H
+    LPCSTR getComment() override;
+    BOOL canBeLMAPped() override;
+    
+    void Save(IWriter& fs) override;
+    void Load(IReader& fs, u16 version) override;
+    
+    void Compile(CBlender_Compile& C) override;
+};
