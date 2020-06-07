@@ -222,7 +222,7 @@ void CGamePersistent::OnAppStart()
         nullptr, nullptr, &globalsInitialized);
 
     // load game materials
-#ifdef XR_PLATFORM_LINUX
+#ifndef XR_PLATFORM_WINDOWS
     GMLib.Load();
 #else
     TaskScheduler->AddTask("GMLib.Load()", [&]()
