@@ -64,12 +64,12 @@ void CRenderTarget::phase_combine()
     if (1)
     {
         RCache.set_ColorWriteEnable();
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, FALSE));
+        RCache.set_Z(false);
         g_pGamePersistent->Environment().RenderSky();
         //  Igor: Render clouds before compine without Z-test
         //  to avoid siluets. HOwever, it's a bit slower process.
         g_pGamePersistent->Environment().RenderClouds();
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE));
+        RCache.set_Z(true);
     }
 
     //
@@ -423,8 +423,8 @@ void CRenderTarget::phase_combine()
     else
         dbg_lines = saved_dbg_lines;
 
-    HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-    HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+    RCache.set_Z(true);
+    RCache.set_ZFunc(D3DCMP_LESSEQUAL);
     HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
     if (1)
         for (u32 it = 0; it < dbg_lines.size(); it++)

@@ -162,7 +162,7 @@ void CLightShadows::calculate()
         return;
 
     BOOL bRTS = FALSE;
-    HW.pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+    RCache.set_Z(false);
 
     if (rt_size != ps_r2_smapsize / 2)
         recreate_rt();
@@ -343,7 +343,7 @@ void CLightShadows::calculate()
     }
 
     // Finita la comedia
-    HW.pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+    RCache.set_Z(true);
 
     RCache.set_xform_project(Device.mProject);
     RCache.set_xform_view(Device.mView);

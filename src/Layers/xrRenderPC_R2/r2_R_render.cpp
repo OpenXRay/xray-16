@@ -396,9 +396,9 @@ void CRender::Render()
 
             // draw skybox
             RCache.set_ColorWriteEnable();
-            CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, FALSE));
+            RCache.set_Z(false);
             g_pGamePersistent->Environment().RenderSky();
-            CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE));
+            RCache.set_Z(true);
         }
 
         // level

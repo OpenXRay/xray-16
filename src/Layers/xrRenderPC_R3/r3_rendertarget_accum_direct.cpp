@@ -267,7 +267,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         //	TODO: DX10: Check if DX10 has analog for NV DBT
         //		if (u_DBT_enable(zMin,zMax))	{
         // z-test always
-        //			HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+        //			RCache.set_ZFunc(D3DCMP_ALWAYS);
         //			HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         //		}
 
@@ -618,7 +618,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         //	TODO: DX10: Check if DX10 has analog for NV DBT
         //		if (u_DBT_enable(zMin,zMax))	{
         // z-test always
-        //			HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+        //			RCache.set_ZFunc(D3DCMP_ALWAYS);
         //			HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         //		}
 
@@ -1264,17 +1264,15 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         //	TODO: DX10: Check if DX10 has analog for NV DBT
         //		if (u_DBT_enable(zMin,zMax))	{
         // z-test always
-        //			HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+        //			RCache.set_ZFunc(D3DCMP_ALWAYS);
         //			HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         //		}
         //		else
         {
             //	TODO: DX10: Implement via different passes
             if (SE_SUN_NEAR == sub_phase)
-                // HW.pDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_GREATER);
                 RCache.set_ZFunc(D3DCMP_GREATER);
             else
-                // HW.pDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
                 RCache.set_ZFunc(D3DCMP_ALWAYS);
         }
 

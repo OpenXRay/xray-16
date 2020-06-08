@@ -26,7 +26,7 @@ void CRenderTarget::phase_luminance()
     RCache.set_Stencil(FALSE);
     RCache.set_CullMode(CULL_NONE);
     RCache.set_ColorWriteEnable();
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, FALSE));
+    RCache.set_Z(false);
 
     // 000: Perform LUM-SAT, pass 0, 256x256 => 64x64
     u_setrt(rt_LUM_64, NULL, NULL, NULL);
@@ -166,5 +166,5 @@ void CRenderTarget::phase_luminance()
     }
 
     // Cleanup states
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE));
+    RCache.set_Z(true);
 }

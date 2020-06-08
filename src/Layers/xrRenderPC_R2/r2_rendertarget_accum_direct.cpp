@@ -200,7 +200,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         if (u_DBT_enable(zMin, zMax))
         {
             // z-test always
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
             HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         }
 
@@ -461,17 +461,17 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         if (u_DBT_enable(zMin, zMax))
         {
             // z-test always
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
             HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         }
 
         // Enable Z function only for near and middle cascades, the far one is restricted by only stencil.
         if ((SE_SUN_NEAR == sub_phase || SE_SUN_MIDDLE == sub_phase))
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATEREQUAL);
+            RCache.set_ZFunc(D3DCMP_GREATEREQUAL);
         else if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_ZCULLING))
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
         else
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+            RCache.set_ZFunc(D3DCMP_LESS);
 
         // Fetch4 : enable
         if (RImplementation.o.HW_smap_FETCH4)
@@ -897,15 +897,15 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         if (u_DBT_enable(zMin, zMax))
         {
             // z-test always
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
             HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         }
         else
         {
             if (SE_SUN_NEAR == sub_phase)
-                HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
+                RCache.set_ZFunc(D3DCMP_GREATER);
             else
-                HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+                RCache.set_ZFunc(D3DCMP_ALWAYS);
         }
 
         // Fetch4 : enable
