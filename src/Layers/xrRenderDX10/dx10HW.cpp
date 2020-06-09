@@ -127,6 +127,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     if (SUCCEEDED(R))
     {
+        pContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&pContext1));
 #ifdef HAS_DX11_3
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
 #endif
@@ -345,6 +346,7 @@ void CHW::DestroyDevice()
 #endif
 
 #ifdef USE_DX11
+    _RELEASE(pContext1);
     _RELEASE(pContext);
 #endif
 

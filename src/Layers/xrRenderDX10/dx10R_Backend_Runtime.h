@@ -61,6 +61,41 @@ IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil)
     HW.pContext->ClearDepthStencilView(zb, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, depth, stencil);
 }
 
+IC bool CBackend::ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects)
+{
+#ifdef USE_DX11
+    if (HW.pContext1)
+    {
+        HW.pContext1->ClearView(rt, reinterpret_cast<const FLOAT*>(&color),
+            reinterpret_cast<const D3D_RECT*>(rects), numRects);
+        return true;
+    }
+#else
+    UNUSED(numRects);
+    UNUSED(rects);
+#endif
+
+    return false;
+}
+
+IC bool CBackend::ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects)
+{
+#ifdef USE_DX11
+    if (HW.pContext1)
+    {
+        Fcolor color = { depth, depth, depth, depth };
+        HW.pContext1->ClearView(zb, reinterpret_cast<FLOAT*>(&color),
+            reinterpret_cast<const D3D_RECT*>(rects), numRects);
+        return true;
+    }
+#else
+    UNUSED(numRects);
+    UNUSED(rects);
+#endif
+
+    return false;
+}
+
 ICF void CBackend::set_Format(SDeclaration* _decl)
 {
     if (decl != _decl)

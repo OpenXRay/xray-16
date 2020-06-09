@@ -48,6 +48,20 @@ IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil)
     CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), 0, depth, stencil));
 }
 
+IC bool CBackend::ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects)
+{
+    VERIFY(rt == pRT[0]);
+    CHK_DX(HW.pDevice->Clear(numRects, reinterpret_cast<const D3DRECT*>(rects), D3DCLEAR_TARGET, color.get(), 1.0f, 0));
+    return true;
+}
+
+IC bool CBackend::ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects)
+{
+    VERIFY(zb == pZB);
+    CHK_DX(HW.pDevice->Clear(numRects, reinterpret_cast<const D3DRECT*>(rects), D3DCLEAR_ZBUFFER, 0, depth, 0));
+    return true;
+}
+
 ICF void CBackend::set_Format(SDeclaration* _decl)
 {
     if (decl != _decl)
