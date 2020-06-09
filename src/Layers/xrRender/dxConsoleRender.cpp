@@ -3,7 +3,7 @@
 
 dxConsoleRender::dxConsoleRender()
 {
-#ifndef USE_DX9
+#if defined(USE_DX10) || defined(USE_DX11)
     m_Shader.create("hud" DELIMITER "crosshair");
     m_Geom.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 #endif
@@ -11,8 +11,8 @@ dxConsoleRender::dxConsoleRender()
 
 void dxConsoleRender::Copy(IConsoleRender& _in) { *this = *(dxConsoleRender*)&_in; }
 
-#ifndef USE_DX9
-ICF void ClearWithShader(const D3DRECT& rect, const Fcolor& color, ref_geom& geom, ref_shader& shader)
+#if defined(USE_DX10) || defined(USE_DX11)
+ICF void ClearWithShader(const Irect& rect, const Fcolor& color, ref_geom& geom, ref_shader& shader)
 {
     u32 vOffset = 0;
     FVF::TL* verts = (FVF::TL*)RCache.Vertex.Lock(4, geom->vb_stride, vOffset);
@@ -31,17 +31,19 @@ ICF void ClearWithShader(const D3DRECT& rect, const Fcolor& color, ref_geom& geo
 
     RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, 4, 0, 2);
 }
-#endif // !USE_DX9
+#endif // defined(USE_DX10) || defined(USE_DX11)
 
 void dxConsoleRender::OnRender(bool bGame)
 {
-    D3DRECT rect = { 0, 0, static_cast<LONG>(Device.dwWidth), static_cast<LONG>(Device.dwHeight) };
+    Irect rect = { 0, 0, Device.dwWidth, Device.dwHeight };
     if (bGame)
         rect.y2 /= 2;
 
-#ifndef USE_DX9
-    ClearWithShader(rect, color_xrgb(32, 32, 32), m_Geom, m_Shader);
-#else //	USE_DX10
-    CHK_DX(HW.pDevice->Clear(1, &rect, D3DCLEAR_TARGET, color_xrgb(32, 32, 32), 1, 0));
-#endif //	USE_DX10
+    const bool result = RCache.ClearRTRect(RCache.get_RT(), color_xrgb(32, 32, 32), 1, &rect);
+#if defined(USE_DX10) || defined(USE_DX11)
+    if (!result)
+        ClearWithShader(rect, color_xrgb(32, 32, 32), m_Geom, m_Shader);
+#else
+    UNUSED(result);
+#endif
 }
