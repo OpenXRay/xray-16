@@ -74,7 +74,6 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeObjectHangingLamp* lamp = smart_cast<CSE_ALifeObjectHangingLamp*>(e);
     R_ASSERT(lamp);
     inherited::net_Spawn(DC);
-    Fcolor clr;
 
     // set bone id
     //	CInifile* pUserData		= K->LL_UserData();
@@ -91,7 +90,7 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
         CForm = xr_new<CCF_Skeleton>(this);
     }
     fBrightness = lamp->brightness;
-    clr.set(lamp->color);
+    Fcolor clr(lamp->color);
     clr.a = 1.f;
     clr.mul_rgb(fBrightness);
 

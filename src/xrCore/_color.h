@@ -58,23 +58,41 @@ struct Fcolor
 {
     float r, g, b, a;
 
+    Fcolor() noexcept = default;
+
+    Fcolor(float _r, float _g, float _b, float _a) noexcept
+        : r(_r), g(_g), b(_b), a(_a) {}
+
+    Fcolor(u32 dw) noexcept
+    {
+        constexpr float f = 1.f / 255.f;
+        a = f * float((dw >> 24) & 0xff);
+        r = f * float((dw >> 16) & 0xff);
+        g = f * float((dw >> 8) & 0xff);
+        b = f * float((dw >> 0) & 0xff);
+    }
+
     Fcolor& set(u32 dw) noexcept
     {
-        const float f = float(1.0) / float(255.0);
+        constexpr float f = 1.f / 255.f;
         a = f * float((dw >> 24) & 0xff);
         r = f * float((dw >> 16) & 0xff);
         g = f * float((dw >> 8) & 0xff);
         b = f * float((dw >> 0) & 0xff);
         return *this;
     }
-    Fcolor& set(float _r, float _g, float _b, float _a)
+
+    Fcolor& operator=(u32 dw) noexcept { return set(dw); }
+
+    Fcolor& set(float _r, float _g, float _b, float _a) noexcept
     {
         r = _r;
         g = _g;
         b = _b;
         a = _a;
         return *this;
-    };
+    }
+
     Fcolor& set(const Fcolor& rhs) noexcept
     {
         r = rhs.r;

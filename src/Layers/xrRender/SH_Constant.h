@@ -37,13 +37,13 @@ public:
 
     void set_float(Fcolor& c)
     {
-        const_float.set(c);
+        const_float = c;
         const_dword = const_float.get();
     }
 
     void set_dword(u32 c)
     {
-        const_float.set(c);
+        const_float = c;
         const_dword = c;
     }
     void Calculate();

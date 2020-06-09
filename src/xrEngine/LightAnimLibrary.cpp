@@ -127,15 +127,16 @@ u32 CLAItem::InterpolateRGB(int frame)
     }
 
     R_ASSERT(Keys.size() > 1);
+
     // интерполируем цвет
-    Fcolor c, c0, c1;
-    float a0 = static_cast<float>(A->first);
-    float a1 = static_cast<float>(B->first);
-    c0.set(A->second);
-    c1.set(B->second);
-    float t = float(frame - a0) / float(a1 - a0);
-    c.lerp(c0, c1, t);
-    return c.get();
+    Fcolor c0 = A->second;
+    Fcolor c1 = B->second;
+
+    const float a0 = static_cast<float>(A->first);
+    const float a1 = static_cast<float>(B->first);
+    const float t = float(frame - a0) / float(a1 - a0);
+
+    return c0.lerp(c0, c1, t).get();
 }
 
 u32 CLAItem::InterpolateBGR(int frame)
