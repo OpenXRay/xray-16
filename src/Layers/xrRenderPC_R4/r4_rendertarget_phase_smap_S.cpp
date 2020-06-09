@@ -38,9 +38,7 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
     if (IRender_Light::OMNIPART == L->flags.type)
     {
         // omni-part
-        // CHK_DX							(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0xffffffff,	1.0f, 0L));
-        FLOAT ColorRGBA[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-        HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
+        RCache.ClearRT(RCache.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f });
     }
     else
     {

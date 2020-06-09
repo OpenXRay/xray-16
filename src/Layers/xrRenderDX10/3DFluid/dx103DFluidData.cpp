@@ -78,9 +78,8 @@ void dx103DFluidData::CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC Te
 
     CHK_DX(HW.pDevice->CreateRenderTargetView(m_pRTTextures[rtIndex], &DescRT, &m_pRenderTargetViews[rtIndex]));
 
-    float color[4] = {0, 0, 0, 0};
-
-    HW.pContext->ClearRenderTargetView(m_pRenderTargetViews[rtIndex], color);
+    // Clear to zero
+    RCache.ClearRT(m_pRenderTargetViews[rtIndex], {});
 }
 
 void dx103DFluidData::DestroyRTTextureAndViews(int rtIndex)

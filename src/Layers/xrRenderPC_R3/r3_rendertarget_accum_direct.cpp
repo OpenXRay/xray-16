@@ -835,9 +835,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     if (SE_SUN_NEAR == sub_phase) //.
     {
         // For sun-filter - clear to zero
-        // CHK_DX	(HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0L));
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        HW.pDevice->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
+        RCache.ClearRT(RCache.get_RT(), {});
 
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);

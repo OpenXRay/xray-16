@@ -26,10 +26,7 @@ void CRenderTarget::phase_accumulator()
         //{
         //	HW.pDevice->OMSetRenderTargets(1, &(rt_Accumulator->pRT), 0);
         //}
-        //		u32		clr4clear					= color_rgba(0,0,0,0);	// 0x00
-        //CHK_DX	(HW.pDevice->Clear			( 0L, NULL, D3DCLEAR_TARGET, clr4clear, 1.0f, 0L));
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        HW.pDevice->ClearRenderTargetView(rt_Accumulator->pRT, ColorRGBA);
+        RCache.ClearRT(rt_Accumulator, {}); // black
 
         //	render this after sun to avoid troubles with sun
         /*
@@ -60,8 +57,7 @@ void CRenderTarget::phase_vol_accumulator()
     if (!m_bHasActiveVolumetric)
     {
         m_bHasActiveVolumetric = true;
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        HW.pDevice->ClearRenderTargetView(rt_Generic_2->pRT, ColorRGBA);
+        RCache.ClearRT(rt_Generic_2, {}); // black
     }
 
     RCache.set_Stencil(FALSE);

@@ -22,26 +22,25 @@ void CRenderTarget::phase_scene_prepare()
         //	TODO: DX10: Check if we need to set RT here.
         u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, rt_MSAADepth->pZRT);
 
-        // CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        HW.pDevice->ClearRenderTargetView(rt_Position->pRT, ColorRGBA);
-        // HW.pDevice->ClearRenderTargetView(rt_Normal->pRT, ColorRGBA);
-        // HW.pDevice->ClearRenderTargetView(rt_Color->pRT, ColorRGBA);
+        const Fcolor color{}; // black
+        RCache.ClearRT(rt_Position, color);
+        // RCache.ClearRT(rt_Normal, color);
+        // RCache.ClearRT(rt_Color, color);
         if (!RImplementation.o.dx10_msaa)
-            HW.pDevice->ClearDepthStencilView(get_base_zb(), D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
+            RCache.ClearZB(get_base_zb(), 1.0f, 0);
         else
         {
-            HW.pDevice->ClearRenderTargetView(rt_Color->pRT, ColorRGBA);
-            HW.pDevice->ClearRenderTargetView(rt_Accumulator->pRT, ColorRGBA);
-            HW.pDevice->ClearDepthStencilView(rt_MSAADepth->pZRT, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
-            HW.pDevice->ClearDepthStencilView(get_base_zb(), D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
+            RCache.ClearRT(rt_Color, color);
+            RCache.ClearRT(rt_Accumulator, color);
+            RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
+            RCache.ClearZB(get_base_zb(), 1.0f, 0);
         }
     }
     else
     {
         //	TODO: DX10: Check if we need to set RT here.
         u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, rt_MSAADepth->pZRT);
-        HW.pDevice->ClearDepthStencilView(rt_MSAADepth->pZRT, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
+        RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
     }
 
     //	Igor: for volumetric lights

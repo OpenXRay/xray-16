@@ -7,7 +7,7 @@ void CRenderTarget::phase_smap_spot_clear()
     else
         VERIFY(!"Use HW SMap only for DX10!");
 
-    HW.pDevice->ClearDepthStencilView(rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
+    RCache.ClearZB(rt_smap_depth, 1.0f);
 }
 
 void CRenderTarget::phase_smap_spot(light* L)
@@ -23,9 +23,8 @@ void CRenderTarget::phase_smap_spot(light* L)
     // no transparency
 #pragma todo("can optimize for multi-lights covering more than say 50%...")
     if (RImplementation.o.HW_smap) RCache.set_ColorWriteEnable(FALSE);
-    //CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_ZBUFFER,	0xffffffff,	1.0f, 0L));
     //	Do it once per smap generation pass in phase_smap_spot_clear
-    //HW.pDevice->ClearDepthStencilView( rt_smap_depth->pZRT, D3D10_CLEAR_DEPTH, 1.0f, 0L);
+    // RCache.ClearZB(rt_smap_depth, 1.0f);
 }
 
 void CRenderTarget::phase_smap_spot_tsh(light* L)
@@ -36,9 +35,7 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
     if (IRender_Light::OMNIPART == L->flags.type)
     {
         // omni-part
-        //CHK_DX							(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0xffffffff,	1.0f, 0L));
-        FLOAT ColorRGBA[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-        HW.pDevice->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
+        RCache.ClearRT(RCache.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f });
     }
     else
     {

@@ -68,9 +68,9 @@ void CRenderTarget::phase_combine()
     // low/hi RTs
     if (RImplementation.o.dx10_msaa)
     {
-        FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        HW.pDevice->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
-        HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
+        // Clear to zero
+        RCache.ClearRT(rt_Generic_0, {});
+        RCache.ClearRT(rt_Generic_1, {});
     }
     u_setrt(rt_Generic_0, rt_Generic_1, 0, rt_MSAADepth->pZRT);
 
@@ -323,13 +323,11 @@ void CRenderTarget::phase_combine()
         if (bDistort)
         {
             PIX_EVENT(render_distort_objects);
-            FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
             u_setrt(rt_Generic_1, 0, 0, rt_MSAADepth->pZRT); // Now RT is a distortion mask
-            HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
+            RCache.ClearRT(rt_Generic_1, color_rgba(127, 127, 0, 127));
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
-            // CHK_DX(HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET, color_rgba(127,127,0,127), 1.0f, 0L));
             RImplementation.r_dsgraph_render_distort();
             if (g_pGamePersistent)
                 g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
