@@ -270,6 +270,26 @@ public:
     IC ID3DDepthStencilView* get_ZB();
 #endif // USE_OGL
 
+#ifdef USE_OGL
+    IC void ClearRT(GLuint rt, const Fcolor& color);
+    IC void ClearZB(GLuint zb, float depth);
+    IC void ClearZB(GLuint zb, float depth, u8 stencil);
+#else
+    IC void ClearRT(ID3DRenderTargetView* rt, const Fcolor& color);
+    IC void ClearZB(ID3DDepthStencilView* zb, float depth);
+    IC void ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil);
+#endif
+
+    ICF void ClearRT(ref_rt& rt, const Fcolor& color) { ClearRT(rt->pRT, color); }
+
+#if defined(USE_DX10) || defined(USE_DX11)
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT, depth);}
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT, depth, stencil);}
+#else
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pRT, depth);}
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pRT, depth, stencil);}
+#endif
+
     IC void set_Constants(R_constant_table* C);
     void set_Constants(ref_ctable& C) { set_Constants(&*C); }
 

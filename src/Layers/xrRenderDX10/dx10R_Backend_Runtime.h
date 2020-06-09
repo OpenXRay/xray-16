@@ -46,6 +46,21 @@ IC void CBackend::set_ZB(ID3DDepthStencilView* ZB)
     }
 }
 
+IC void CBackend::ClearRT(ID3DRenderTargetView* rt, const Fcolor& color)
+{
+    HW.pContext->ClearRenderTargetView(rt, reinterpret_cast<const FLOAT*>(&color));
+}
+
+IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth)
+{
+    HW.pContext->ClearDepthStencilView(zb, D3D_CLEAR_DEPTH, depth, 0);
+}
+
+IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil)
+{
+    HW.pContext->ClearDepthStencilView(zb, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, depth, stencil);
+}
+
 ICF void CBackend::set_Format(SDeclaration* _decl)
 {
     if (decl != _decl)

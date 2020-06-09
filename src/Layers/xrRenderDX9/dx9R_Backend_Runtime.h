@@ -30,6 +30,24 @@ IC void CBackend::set_ZB(ID3DDepthStencilView* ZB)
     }
 }
 
+IC void CBackend::ClearRT(ID3DRenderTargetView* rt, const Fcolor& color)
+{
+    VERIFY(rt == pRT[0]);
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color.get(), 1.0f, 0));
+}
+
+IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth)
+{
+    VERIFY(zb == pZB);
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER, 0, depth, 0));
+}
+
+IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil)
+{
+    VERIFY(zb == pZB);
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), 0, depth, stencil));
+}
+
 ICF void CBackend::set_Format(SDeclaration* _decl)
 {
     if (decl != _decl)

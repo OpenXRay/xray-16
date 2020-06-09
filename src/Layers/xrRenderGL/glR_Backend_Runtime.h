@@ -50,6 +50,42 @@ IC void CBackend::set_ZB(GLuint ZB)
     }
 }
 
+IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glClearColor(color.r, color.g, color.b, color.a);
+
+    CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
+}
+
+IC void CBackend::ClearZB(GLuint zb, float depth)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+
+    glDepthMask(GL_TRUE);
+    glClearDepthf(depth);
+
+    CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
+}
+
+IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+
+    glDepthMask(GL_TRUE);
+    glClearDepthf(depth);
+
+    glStencilMask(~0);
+    glClearStencil(stencil);
+
+    CHK_GL(glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+}
+
 ICF void CBackend::set_Format(SDeclaration* _decl)
 {
     if (decl != _decl)
