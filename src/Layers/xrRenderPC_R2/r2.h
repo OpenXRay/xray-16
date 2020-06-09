@@ -1,18 +1,24 @@
 #pragma once
+
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+
 #include "Layers/xrRender/PSLibrary.h"
+
 #include "r2_types.h"
 #include "r2_rendertarget.h"
+
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
+
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
 #include "Layers/xrRender/light_render_direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
+
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
 
@@ -73,6 +79,7 @@ public:
         u32 forceskinw : 1;
         float forcegloss_v;
     } o;
+
     struct RenderR2Statistics
     {
         u32 l_total;
@@ -118,7 +125,7 @@ public:
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
     xr_vector<ref_shader> Shaders;
-    typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
+    typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<VertexStagingBuffer> nVB, xVB;
     xr_vector<IndexStagingBuffer> nIB, xIB;
@@ -194,22 +201,23 @@ public:
     IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
     IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
     IC u32 occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+
     ICF void apply_object(IRenderable* O)
     {
-        if (0 == O)
+        if (!O || !O->renderable_ROS())
             return;
-        if (0 == O->renderable_ROS())
-            return;
-        CROS_impl& LT = *((CROS_impl*)O->renderable_ROS());
+
+        CROS_impl& LT = *static_cast<CROS_impl*>(O->renderable_ROS());
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
         o_sun = 0.75f * LT.get_sun();
         CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
+
     IC void apply_lmaterial()
     {
         R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (0 == C)
+        if (!C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
         VERIFY(RC_sampler == C->type);
@@ -221,10 +229,12 @@ public:
             mtl = ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X], o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X], o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
+        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
+        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
     }
 
 public:
@@ -232,6 +242,7 @@ public:
     virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
     virtual bool is_sun_static() { return o.sunstatic; }
     virtual u32 get_dx_level() { return 0x00090000; }
+
     // Loading / Unloading
     virtual void create();
     virtual void destroy();

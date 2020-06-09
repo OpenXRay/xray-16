@@ -13,7 +13,6 @@ class light;
 
 class CRenderTarget : public IRender_Target
 {
-private:
     u32 dwWidth;
     u32 dwHeight;
     u32 dwAccumulatorClearMark;

@@ -1,18 +1,24 @@
 #pragma once
+
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+
 #include "Layers/xrRender/PSLibrary.h"
+
 #include "r2_types.h"
 #include "r3_rendertarget.h"
+
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
+
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
 #include "Layers/xrRender/light_render_direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
+
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
 
@@ -44,6 +50,7 @@ public:
         MMSM_AUTODETECT
     };
 
+public:
     struct _options
     {
         u32 bug : 1;
@@ -103,6 +110,7 @@ public:
         u32 forceskinw : 1;
         float forcegloss_v;
     } o;
+
     struct RenderR3Statistics
     {
         u32 l_total;
@@ -136,6 +144,7 @@ public:
         void FrameEnd() {}
     };
 
+public:
     RenderR3Statistics Stats;
     // Sector detection and visibility
     CSector* pLastSector;
@@ -151,7 +160,7 @@ public:
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
     xr_vector<ref_shader> Shaders;
-    typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
+    typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<VertexStagingBuffer> nVB, xVB;
     xr_vector<IndexStagingBuffer> nIB, xIB;
@@ -212,6 +221,7 @@ public:
     void init_cacades();
     void render_sun_cascades();
 
+public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
     VertexElement* getVB_Format(int id, bool alternative = false);
@@ -231,11 +241,10 @@ public:
 
     ICF void apply_object(IRenderable* O)
     {
-        if (nullptr == O)
+        if (!O || !O->renderable_ROS())
             return;
-        if (nullptr == O->renderable_ROS())
-            return;
-        CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
+
+        CROS_impl& LT = *static_cast<CROS_impl*>(O->renderable_ROS());
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
         // o_hemi						= 0.5f*LT.get_hemi			()	;
@@ -246,7 +255,7 @@ public:
     void apply_lmaterial()
     {
         R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (nullptr == C)
+        if (!C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
         VERIFY(RC_dx10texture == C->type);
@@ -266,10 +275,12 @@ public:
                                   o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
     }
 
+public:
     // feature level
     virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
     virtual bool is_sun_static() { return o.sunstatic; }
     virtual u32 get_dx_level() { return /*HW.pDevice1?0x000A0001:*/ 0x000A0000; }
+
     // Loading / Unloading
     virtual void create();
     virtual void destroy();
