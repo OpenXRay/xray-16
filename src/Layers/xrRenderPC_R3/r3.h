@@ -254,7 +254,7 @@ public:
 
     void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
+        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
         if (!C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
