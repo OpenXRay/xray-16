@@ -27,14 +27,15 @@ build() {
 #  rm -f -R bin
    mkdir -p bin
    cd bin
-   cmake ..
+   cmake .. -DCMAKE_BUILD_TYPE=Release \
+   -DCMAKE_INSTALL_PREFIX=/usr \
+   -DCMAKE_INSTALL_LIBDIR=lib
    make
 }
 
 package() {
     cd ../../bin
     make DESTDIR="${pkgdir}/" install
-    mv "${pkgdir}/usr/games/" "${pkgdir}/usr/bin"
     mkdir -p "${pkgdir}/usr/share/licenses/$pkgname/"
     cp ../License.txt "${pkgdir}/usr/share/licenses/$pkgname/"
 }
