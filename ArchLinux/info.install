@@ -6,12 +6,11 @@ The OpenXRay project continues the non-official support and development of the X
 
 Attention!!! Be advised that this project is not sanctioned by GSC Game World in any way – and they remain the copyright holders of all the original source code.
 
-This package does not provide game resources, to start the game you will need the original game resources of a licensed copy of S.T.A.L.K.E.R.: Call of Pripyat.
-From the original licensed version of S.T.A.L.K.E.R.: Call of Pripyat copy the following directories levels, localization, mp, patches, resources to ~/.local/share/GSC/SCOP You can use the resources from a physical DVD media, GOG or Steam.
+This package does not provide game resources, to start the game you will need the original game resources of a licensed copy of S.T.A.L.K.E.R.: Call of Pripyat version 1.6.02 and S.T.A.L.K.E.R.: Clear Sky
+
+From the original licensed version of the game, copy the following directories, localization, mp, patches and resources to ~/.local/share/GSC Game World/S.T.A.L.K.E.R. - Call of Pripyat for S.T.A.L.K.E.R.: Call of Pripyat and ~/.local/share/GSC Game World/S.T.A.L.K.E.R. - Clear Sky for S.T.A.L.K.E.R.: Clear Sky respectively. You can use resources from Steam or physical DVD media, GOG to unpack the distribution of the game, you can use the innoextract program.
 
 Attention!!! All directory and file names inside directories must be lowercase.
-
-It is also possible to launch fan modifications for the vanilla version of S.T.A.L.K.E.R.: Call of Pripyat however, it may be necessary to adapt them.
 
 EOF
 	
