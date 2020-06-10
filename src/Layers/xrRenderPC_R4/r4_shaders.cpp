@@ -210,6 +210,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     string32 c_sun_shafts;
     string32 c_ssao;
     string32 c_sun_quality;
+    char c_msaa_samples[2];
+    char c_msaa_current_sample[2];
 
     // options:
     const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value)
@@ -301,29 +303,6 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
             options.add("USE_HBAO", "1");
         }
-    }
-
-    if (o.dx10_msaa)
-    {
-        static string256 def;
-        // if( m_MSAASample < 0 )
-        //{
-        def[0] = '0';
-        //	sh_name[len]='0'; ++len;
-        //}
-        // else
-        //{
-        //	def[0]= '0' + char(m_MSAASample);
-        //	sh_name[len]='0' + char(m_MSAASample); ++len;
-        //}
-        def[1] = 0;
-
-        options.add("ISAMPLE", def);
-        sh_name.append(static_cast<u32>(0));
-    }
-    else
-    {
-        sh_name.append(static_cast<u32>(0));
     }
 
     // skinning
@@ -427,11 +406,22 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     {
         appendShaderOption(o.dx10_msaa, "USE_MSAA", "1");
 
+        // Number of samples
         {
-            static char samples[2];
-            samples[0] = char(o.dx10_msaa_samples) + '0';
-            samples[1] = 0;
-            appendShaderOption(o.dx10_msaa_samples, "MSAA_SAMPLES", samples);
+            c_msaa_samples[0] = char(o.dx10_msaa_samples) + '0';
+            c_msaa_samples[1] = 0;
+            appendShaderOption(o.dx10_msaa_samples, "MSAA_SAMPLES", c_msaa_samples);
+        }
+        // Current sample
+        {
+            if (m_MSAASample < 0)
+                c_msaa_current_sample[0] = '0';
+            else
+                c_msaa_current_sample[0] = '0' + char(m_MSAASample);
+            c_msaa_current_sample[1] = 0;
+
+            appendShaderOption(m_MSAASample >= 0 ? m_MSAASample : 0,
+                "ISAMPLE", c_msaa_current_sample);
         }
 
         appendShaderOption(o.dx10_msaa_opt, "MSAA_OPTIMIZATION", "1");
