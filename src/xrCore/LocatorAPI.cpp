@@ -405,7 +405,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
                 // R_ASSERT3 (root, "path not found ", read_path.c_str());
                 xr_strcpy(fs_entry_point, sizeof fs_entry_point, root->m_Path);
             }
-            xr_strcat(fs_entry_point, "gamedata//");
+            xr_strcat(fs_entry_point, "gamedata" DELIMITER);
         }
         else
         {
