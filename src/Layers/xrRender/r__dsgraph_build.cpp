@@ -72,9 +72,11 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
     if (root && root->renderable_HUD())
     {
         if (sh->flags.bStrictB2F)
+        {
             mapHUDSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
-        else
-            mapHUD      .insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
+            return;
+        }
+        mapHUD.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
 
 #if RENDER != R_R1
         if (sh->flags.bEmissive)
