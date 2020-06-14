@@ -417,6 +417,9 @@ void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
 
     i_Address(stage, addressMode);
     i_Filter(stage, minFliter, mipFilter, magFilter);
+
+    if (stage < 4)
+        i_Projective(stage, false); // disable projective division by default
 }
 
 u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str texture)
