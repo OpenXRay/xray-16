@@ -218,20 +218,19 @@ void CGamePersistent::OnAppStart()
     Event materialsLoaded, globalsInitialized, menuCreated;
 
     // init game globals
+#ifndef XR_PLATFORM_WINDOWS
+    init_game_globals();
+#else
     TaskScheduler->AddTask("init_game_globals()", init_game_globals,
         nullptr, nullptr, &globalsInitialized);
-
+#endif
     // load game materials
-#ifndef XR_PLATFORM_WINDOWS
-    GMLib.Load();
-#else
     TaskScheduler->AddTask("GMLib.Load()", [&]()
     {
         GEnv.Render->MakeContextCurrent(IRender::HelperContext); // free to use, so let's use it
         GMLib.Load();
         GEnv.Render->MakeContextCurrent(IRender::NoContext); // release it for other users
     }, nullptr, nullptr, &materialsLoaded);
-#endif
 
     SetupUIStyle();
     GEnv.UI = xr_new<UICore>();
@@ -252,7 +251,10 @@ void CGamePersistent::OnAppStart()
     ansel->Init();
 #endif
 
+
+#ifdef XR_PLATFORM_WINDOWS
     Device.WaitEvent(globalsInitialized);
+#endif
     Device.WaitEvent(menuCreated);
     Device.WaitEvent(materialsLoaded);
 }
