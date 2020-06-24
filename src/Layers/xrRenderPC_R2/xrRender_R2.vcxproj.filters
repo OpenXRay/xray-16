@@ -743,9 +743,6 @@
     <ClCompile Include="..\xrRender\blenders\blender_bloom_build.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\blenders\blender_combine.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
@@ -1108,6 +1105,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX9\dx9ResourceManager_Resources.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp">
+      <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

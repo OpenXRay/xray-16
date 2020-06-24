@@ -1,9 +1,3 @@
-// BlenderDefault.h: interface for the CBlenderDefault class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_BmmD)
-#define AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_BmmD
 #pragma once
 
 class CBlender_BmmD : public IBlender
@@ -16,16 +10,14 @@ public:
     string64 oB_Name; //. задел на будущее
     string64 oA_Name; //. задел на будущее
 public:
-    virtual LPCSTR getComment() { return "LEVEL: Implicit**detail"; }
-    virtual BOOL canBeDetailed() { return TRUE; }
-    virtual BOOL canBeLMAPped() { return TRUE; }
-    virtual void Save(IWriter& fs);
-    virtual void Load(IReader& fs, u16 version);
+    LPCSTR getComment() override;
+    BOOL canBeDetailed() override;
+    BOOL canBeLMAPped() override;
+    void Save(IWriter& fs) override;
+    void Load(IReader& fs, u16 version) override;
 
-    virtual void Compile(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
     CBlender_BmmD();
-    virtual ~CBlender_BmmD();
+    ~CBlender_BmmD() override = default;
 };
-
-#endif // !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_BmmD)

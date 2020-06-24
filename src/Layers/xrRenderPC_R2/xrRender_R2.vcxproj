@@ -340,8 +340,8 @@
     <ClCompile Include="..\xrRenderDX9\dx9SH_RT.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Selection.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Wire.cpp" />
