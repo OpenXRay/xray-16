@@ -785,9 +785,6 @@
     <ClCompile Include="..\xrRender\blenders\blender_luminance.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_Particle.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
@@ -1107,6 +1104,9 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
