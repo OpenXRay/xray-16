@@ -342,11 +342,11 @@
     <ClCompile Include="..\xrRender\Blender.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Selection.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Wire.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Lm(EbB).cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Particle.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder_R2.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder_StandartBinding.cpp" />
