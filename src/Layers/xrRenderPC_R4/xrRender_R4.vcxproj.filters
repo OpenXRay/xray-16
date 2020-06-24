@@ -321,9 +321,6 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.h">
       <Filter>Shading templates\3dFluid</Filter>
     </ClInclude>
@@ -717,6 +714,9 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Model_EbB.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -900,9 +900,6 @@
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_tree.cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.cpp">
@@ -1305,6 +1302,9 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>

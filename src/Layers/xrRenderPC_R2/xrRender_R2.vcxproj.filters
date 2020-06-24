@@ -288,9 +288,6 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\ModelPool.h">
       <Filter>Models</Filter>
     </ClInclude>
@@ -621,6 +618,9 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Model_EbB.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -795,9 +795,6 @@
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_tree.cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ModelPool.cpp">
@@ -1107,6 +1104,9 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>

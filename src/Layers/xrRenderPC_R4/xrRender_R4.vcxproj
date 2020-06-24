@@ -368,6 +368,7 @@
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\dx10RainBlender.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10BufferUtils.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10ConstantBuffer.cpp" />
@@ -398,7 +399,6 @@
     <ClCompile Include="..\xrRender\Blender_Recorder_R2.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder_StandartBinding.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_tree.cpp" />
     <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp" />
