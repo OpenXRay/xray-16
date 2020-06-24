@@ -309,9 +309,6 @@
     <ClInclude Include="..\xrRender\blenders\uber_deffer.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_detail_still.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\blenders\Blender_Lm(EbB).h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
@@ -699,6 +696,9 @@
     <ClInclude Include="..\xrRender\FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_detail_still.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -877,9 +877,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp">
       <Filter>Shading templates</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_detail_still.cpp">
-      <Filter>Shading templates\R1</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Lm(EbB).cpp">
       <Filter>Shading templates\R1</Filter>
@@ -1272,6 +1269,9 @@
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
