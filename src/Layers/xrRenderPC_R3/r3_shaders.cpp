@@ -676,8 +676,13 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
                 u32 savedBytecodeCrc = file->r_u32();
                 u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                 if (bytecodeCrc == savedBytecodeCrc)
+                {
+#ifdef DEBUG
+                    Log("* Loading shader:", file_name);
+#endif
                     _result =
                         create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), filename, result, o.disasm);
+                }
             }
         }
         file->close();
@@ -715,12 +720,14 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
             file->w_u32(fileCrc);
 
             u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
-            file->w_u32(bytecodeCrc);
+            file->w_u32(bytecodeCrc); // Do not write anything below this line, take a look at reading (crc32)
 
             file->w(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
 
             FS.w_close(file);
-
+#ifdef DEBUG
+            Log("- Compile shader:", file_name);
+#endif
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
                 filename, result, o.disasm);
         }
