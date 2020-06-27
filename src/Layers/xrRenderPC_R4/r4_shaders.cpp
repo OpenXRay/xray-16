@@ -512,6 +512,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         IReader* file = FS.r_open(file_name);
         if (file->length() > 4)
         {
+            const bool dx9compatibility = file->r_u32();
+
             u32 savedFileCrc = file->r_u32();
             if (savedFileCrc == fileCrc)
             {
@@ -519,8 +521,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                 u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                 if (bytecodeCrc == savedBytecodeCrc)
                 {
-                    const bool dx9compatibility = file->r_u32();
-
+#ifdef DEBUG
+                    Log("* Loading shader:", file_name);
+#endif
                     _result =
                         create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(),
                             filename, result, o.disasm, dx9compatibility);
@@ -555,16 +558,17 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             const bool dx9compatibility = Flags & D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
             IWriter* file = FS.w_open(file_name);
 
+            file->w_u32(dx9compatibility);
             file->w_u32(fileCrc);
 
             u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
-            file->w_u32(bytecodeCrc);
-
-            file->w_u32(dx9compatibility);
+            file->w_u32(bytecodeCrc); // Do not write anything below this line, take a look at reading (crc32)
 
             file->w(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
             FS.w_close(file);
-
+#ifdef DEBUG
+            Log("- Compile shader:", file_name);
+#endif
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
                 filename, result, o.disasm, dx9compatibility);
         }
