@@ -61,13 +61,13 @@ float4 proj_to_screen(float4 proj)
 
 half is_sky(float depth)
 {
-	return step(abs(depth - 10000.f), 0.001);
+	return step(abs(depth - 10000.0), 0.001);
 }
 
 float3 hash(float3 a)
 {
 	a *= timers.x;
-    a = frac(a * 0.8f);
+    a = frac(a * 0.8);
     a += dot(a, a.yxz + 19.19);
     return frac((a.xxy + a.yxx)*a.zyx);
 }
@@ -76,7 +76,7 @@ float3 hash(float3 a)
 #ifndef SSR_QUALITY
 float4 compute_ssr(float3 position, float3 normal, float3 skybox)
 {
-	return float4(skybox.xyz, 1.0f);
+	return float4(skybox.xyz, 1.0);
 }
 
 #else
@@ -84,7 +84,7 @@ float4 compute_ssr(float3 position, float3 normal, float3 skybox)
 float4 compute_ssr(float3 position, float3 normal, float3 skybox)
 {
 	/*Initialize step size and error*/
-	float step = 1.0f/float(SSR_SAMPLES);
+	float step = 1.0/float(SSR_SAMPLES);
 
 	/*Initialize reflected TC*/
 	float2 refl_tc = float2(0.0,0.0);
@@ -105,7 +105,7 @@ float4 compute_ssr(float3 position, float3 normal, float3 skybox)
 	#endif
 
 		/*Convert new position to texcoord*/
-		float4 proj_position = mul(m_VP, float4(new_position, 1.f));
+		float4 proj_position = mul(m_VP, float4(new_position, 1.0));
 		float4 p2ss = proj_to_screen(proj_position);
 		refl_tc.xy = p2ss.xy /= p2ss.w;
 
@@ -122,14 +122,14 @@ float4 compute_ssr(float3 position, float3 normal, float3 skybox)
 	#endif
 
 		/*Intersect sky from hit depth*/
-		hit_depth = lerp(hit_depth, 0.f, is_sky(hit_depth));
+		hit_depth = lerp(hit_depth, 0.0, is_sky(hit_depth));
 
 		/*Sample depth*/
-		float depth = mul(m_V, float4(position, 1.f)).z;
+		float depth = mul(m_V, float4(position, 1.0)).z;
 
 		/*Fixing incorrect refls*/
-		if((depth - hit_depth) > 0.0f || (hit_depth > SSR_DISTANCE))
-			return float4(skybox.xyz, 1.0f);
+		if((depth - hit_depth) > 0.0 || (hit_depth > SSR_DISTANCE))
+			return float4(skybox.xyz, 1.0);
 
 		/*Depth difference*/
 		step = length(hit_depth - depth);
