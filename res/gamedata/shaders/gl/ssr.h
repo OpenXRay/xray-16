@@ -17,14 +17,8 @@ By LVutner for X-Ray Oxygen project (2020)
 #ifndef SSR_H
 #define SSR_H
 
-#define SSR_QUALITY 3
-
-#define SSR_HALF_DEPTH		//Enables half-res depth
-#define SSR_JITTER			//Enables jittering
-
 #define SSR_EDGE_ATTENUATION float(0.09) //Edge attenuation intensity
 #define SSR_JITTER_INTENSITY float(0.05) //Jittering intensity
-
 
 #include "common.h"
 

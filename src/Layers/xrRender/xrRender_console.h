@@ -16,7 +16,9 @@ extern ECORE_API u32 ps_r_ssao_mode;
 extern ECORE_API const xr_token qssao_mode_token[];
 
 extern ECORE_API u32 ps_r_sun_quality; //	=	0;
+extern ECORE_API u32 ps_r_water_reflection; //	=	0;
 extern ECORE_API const xr_token qsun_quality_token[];
+extern ECORE_API const xr_token qwater_reflection_quality_token[];
 
 extern ECORE_API u32 ps_r3_msaa; //	=	0;
 extern ECORE_API const xr_token qmsaa_token[];
@@ -205,6 +207,8 @@ enum
     R_FLAGEXT_HOM_DEPTH_DRAW = (1 << 7),
     R2FLAGEXT_SUN_ZCULLING = (1 << 8),
     R2FLAGEXT_SUN_OLD = (1 << 9),
+    R3FLAGEXT_SSR_HALF_DEPTH = (1 << 10),
+    R3FLAGEXT_SSR_JITTER = (1 << 11),
 };
 
 extern void xrRender_initconsole();
