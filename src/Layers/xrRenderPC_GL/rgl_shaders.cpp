@@ -408,7 +408,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         appendShaderOption(ssrJitter, "SSR_JITTER", "1");
     }
     else
+{
         sh_name.append(static_cast<u32>(0));
+}
 
     // Soft particles
     {
