@@ -1,8 +1,11 @@
 # X-Ray blending template
 *.s text linguist-language=Lua diff=Lua
 
+# Git assumes ps is binary, but we use it as a shader file extension
+*.ps -binary text linguist-language=HLSL diff=HLSL
+
 # DirectX renderer shader extension names
-r*/*.ps text linguist-language=HLSL diff=HLSL
+r*/*.ps -binary text linguist-language=HLSL diff=HLSL
 r*/*.vs text linguist-language=HLSL diff=HLSL
 r*/*.gs text linguist-language=HLSL diff=HLSL
 r*/*.cs text linguist-language=HLSL diff=HLSL
@@ -10,7 +13,7 @@ r*/*.hs text linguist-language=HLSL diff=HLSL
 r*/*.ds text linguist-language=HLSL diff=HLSL
 
 # OpenGL renderer uses the same extensions
-gl/*.ps text linguist-language=GLSL diff=GLSL
+gl/*.ps -binary text linguist-language=GLSL diff=GLSL
 gl/*.vs text linguist-language=GLSL diff=GLSL
 gl/*.gs text linguist-language=GLSL diff=GLSL
 gl/*.cs text linguist-language=GLSL diff=GLSL
