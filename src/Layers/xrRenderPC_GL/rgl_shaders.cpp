@@ -397,7 +397,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Water reflections
-	if (RImplementation.o.advancedpp && ps_r_water_reflection)
+    if (RImplementation.o.advancedpp && ps_r_water_reflection)
     {
         xr_sprintf(c_water_reflection, "%d", ps_r_water_reflection);
         options.add("SSR_QUALITY", c_water_reflection);
