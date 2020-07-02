@@ -410,7 +410,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     else
 {
         sh_name.append(static_cast<u32>(0));
-}
+    }
 
     // Soft particles
     {
