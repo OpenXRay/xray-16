@@ -4,7 +4,9 @@
 Texture2D   s_half_depth;
 uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
 
+#if SSR_QUALITY > 0
 #include "ssr.h"
+#endif
 
 Texture2D	s_nmap;
 TextureCube	s_env0;
