@@ -23,7 +23,9 @@ struct v2p
 #if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 	float4	tctexgen;	// TEXCOORD7;
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
+#if SSR_QUALITY > 0
 	float4	position_w;	// POSITION0;
+#endif
 	float4	c0	;	// COLOR0;
 	float	fog	;	// FOG;
 };
@@ -45,7 +47,9 @@ layout(location = TEXCOORD6) 		out float3	v2p_vert_v2point	; // TEXCOORD6;
 #if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 layout(location = TEXCOORD7) 		out float4	v2p_vert_tctexgen	; // TEXCOORD7;
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
+#if SSR_QUALITY > 0
 layout(location = POSITION0) 		out float4	v2p_vert_pos	; // POSITION0;
+#endif
 layout(location = COLOR0) 		out float4	v2p_vert_c0		; // COLOR0;
 layout(location = FOG) 			out float	v2p_vert_fog		; // FOG;
 
@@ -75,6 +79,8 @@ void main()
 #endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
 	v2p_vert_c0	= O.c0;
 	v2p_vert_fog	= O.fog;
-	v2p_vert_pos =  O.position_w;
+#if SSR_QUALITY > 0
+	v2p_vert_pos	=  O.position_w;
+#endif
 	gl_Position	= O.hpos;
 }
