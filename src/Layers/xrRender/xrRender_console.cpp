@@ -62,8 +62,15 @@ const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, 
     {nullptr, 0}};
 
 u32 ps_r_water_reflection = 3;
-const xr_token qwater_reflection_quality_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2},
-    {"st_opt_high", 3}, {"st_opt_ultra", 4}, {nullptr, 0}};
+const xr_token qwater_reflection_quality_token[] =
+{
+    { "st_opt_off", 0 },
+    { "st_opt_low", 1 },
+    { "st_opt_medium", 2 },
+    { "st_opt_high", 3 },
+    { "st_opt_ultra", 4 },
+    { nullptr, -1 }
+};
 
 u32 ps_r3_msaa = 0; // = 0;
 const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2}, {"8x", 3},
