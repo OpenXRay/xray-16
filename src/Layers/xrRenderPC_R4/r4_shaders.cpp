@@ -181,6 +181,15 @@ class shader_options_holder
     D3D_SHADER_MACRO m_options[128];
 
 public:
+    void add(const xr_vector<D3D_SHADER_MACRO>& macros)
+    {
+        for (auto macro : macros)
+        {
+            m_options[pos] = std::move(macro);
+            ++pos;
+        }
+    }
+
     void add(cpcstr name, cpcstr value)
     {
         m_options[pos] = { name, value };
@@ -221,6 +230,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
         sh_name.append(option);
     };
+
+    // External defines
+    options.add(m_ShaderOptions);
 
     // Shadow map size
     {
