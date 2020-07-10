@@ -569,7 +569,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                     const u32 savedBytecodeCrc = file->r_u32();
                     const u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                     if (bytecodeCrc == savedBytecodeCrc)
+                    {
+#ifdef DEBUG
+                        Log("* Loading shader:", full_path);
+#endif
                         program = create_shader(pTarget, (pcstr*)file->pointer(), file->elapsed(), filename, result, &binaryFormat);
+                    }
                 }
             }
         }
@@ -579,6 +584,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     // Failed to use cached shader, then:
     if (!program)
     {
+#ifdef DEBUG
+        Log("- Compile shader:", full_path);
+#endif
         // Compile sources list
         shader_sources_manager sources(name);
         sources.compile(fs, options);
@@ -608,7 +616,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                 file->w_u32(fileCrc);
 
                 const u32 bytecodeCrc = crc32(binary, binaryLength);
-                file->w_u32(bytecodeCrc);
+                file->w_u32(bytecodeCrc); // Do not write anything below this line, take a look at reading (crc32)
 
                 file->w(binary, binaryLength);
                 FS.w_close(file);

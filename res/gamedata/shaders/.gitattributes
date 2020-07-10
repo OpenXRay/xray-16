@@ -1,18 +1,21 @@
 # X-Ray blending template
-*.s text linguist-language=Lua diff=Lua
+*.s text diff linguist-language=Lua
+
+# Just an additional fix: unset binary attribute
+*.ps -binary
 
 # DirectX renderer shader extension names
-r*/*.ps text linguist-language=HLSL diff=HLSL
-r*/*.vs text linguist-language=HLSL diff=HLSL
-r*/*.gs text linguist-language=HLSL diff=HLSL
-r*/*.cs text linguist-language=HLSL diff=HLSL
-r*/*.hs text linguist-language=HLSL diff=HLSL
-r*/*.ds text linguist-language=HLSL diff=HLSL
+r*/*.ps text diff=cpp linguist-language=HLSL
+r*/*.vs text diff=cpp linguist-language=HLSL
+r*/*.gs text diff=cpp linguist-language=HLSL
+r*/*.cs text diff=cpp linguist-language=HLSL
+r*/*.hs text diff=cpp linguist-language=HLSL
+r*/*.ds text diff=cpp linguist-language=HLSL
 
 # OpenGL renderer uses the same extensions
-gl/*.ps text linguist-language=GLSL diff=GLSL
-gl/*.vs text linguist-language=GLSL diff=GLSL
-gl/*.gs text linguist-language=GLSL diff=GLSL
-gl/*.cs text linguist-language=GLSL diff=GLSL
-gl/*.hs text linguist-language=GLSL diff=GLSL
-gl/*.ds text linguist-language=GLSL diff=GLSL
+gl/*.ps text diff=cpp linguist-language=GLSL
+gl/*.vs text diff=cpp linguist-language=GLSL
+gl/*.gs text diff=cpp linguist-language=GLSL
+gl/*.cs text diff=cpp linguist-language=GLSL
+gl/*.hs text diff=cpp linguist-language=GLSL
+gl/*.ds text diff=cpp linguist-language=GLSL
