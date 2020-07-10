@@ -200,7 +200,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         if (u_DBT_enable(zMin, zMax))
         {
             // z-test always
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
             HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         }
 
@@ -461,17 +461,17 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         if (u_DBT_enable(zMin, zMax))
         {
             // z-test always
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
             HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         }
 
         // Enable Z function only for near and middle cascades, the far one is restricted by only stencil.
         if ((SE_SUN_NEAR == sub_phase || SE_SUN_MIDDLE == sub_phase))
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATEREQUAL);
+            RCache.set_ZFunc(D3DCMP_GREATEREQUAL);
         else if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_ZCULLING))
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
         else
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+            RCache.set_ZFunc(D3DCMP_LESS);
 
         // Fetch4 : enable
         if (RImplementation.o.HW_smap_FETCH4)
@@ -582,7 +582,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     if (SE_SUN_NEAR == sub_phase) //.
     {
         // For sun-filter - clear to zero
-        CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0L));
+        RCache.ClearRT(rt_Generic_0, {});
 
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
@@ -834,40 +834,6 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
     //  Assume everything was recalculated before this call by accum_direct
 
-    //  Set correct depth surface
-    //  It's slow. Make this when shader is created
-    {
-        pcstr pszSMapName;
-        BOOL b_HW_smap = RImplementation.o.HW_smap;
-        BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
-        if (b_HW_smap)
-        {
-            if (b_HW_PCF)
-                pszSMapName = r2_RT_smap_depth;
-            else
-                pszSMapName = r2_RT_smap_depth;
-        }
-        else
-            pszSMapName = r2_RT_smap_surf;
-        // s_smap
-
-        STextureList* _T = &*s_accum_direct_volumetric->E[0]->passes[0]->T;
-
-        STextureList::iterator _it = _T->begin();
-        STextureList::iterator _end = _T->end();
-        for (; _it != _end; ++_it)
-        {
-            std::pair<u32, ref_texture>& loader = *_it;
-            u32 load_id = loader.first;
-            //  Shadowmap texture always uses 0 texture unit
-            if (load_id == 0)
-            {
-                //  Assign correct texture
-                loader.second.create(pszSMapName);
-            }
-        }
-    }
-
     // Perform lighting
     {
         // *** assume accumulator setted up ***
@@ -931,15 +897,15 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         if (u_DBT_enable(zMin, zMax))
         {
             // z-test always
-            HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            RCache.set_ZFunc(D3DCMP_ALWAYS);
             HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         }
         else
         {
             if (SE_SUN_NEAR == sub_phase)
-                HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
+                RCache.set_ZFunc(D3DCMP_GREATER);
             else
-                HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+                RCache.set_ZFunc(D3DCMP_ALWAYS);
         }
 
         // Fetch4 : enable

@@ -215,10 +215,7 @@ void CRenderTarget::accum_spot(light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
-        else
-            u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
         RCache.set_c("m_texgen_J", m_Texgen_J);
@@ -249,7 +246,6 @@ void CRenderTarget::accum_spot(light* L)
     }
 
     RCache.set_Scissor(0);
-    //CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
     //dwLightMarkerID					+=	2;	// keep lowest bit always setted up
     increment_light_marker();
 
@@ -542,7 +538,6 @@ void CRenderTarget::accum_volumetric(light* L)
         //		}
 
         //	Restore clip planes
-        //HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, 0);
         RCache.set_ClipPlanes(FALSE, (Fmatrix *)0, 0);
     }
     /*
@@ -555,6 +550,5 @@ void CRenderTarget::accum_volumetric(light* L)
             draw_volume					(L);
         }
     */
-    //CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
     RCache.set_Scissor(0);
 }

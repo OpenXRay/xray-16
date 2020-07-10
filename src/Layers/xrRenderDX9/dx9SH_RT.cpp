@@ -156,6 +156,14 @@ void CRT::destroy()
 void CRT::reset_begin() { destroy(); }
 void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags }); }
 
+void CRT::resolve_into(CRT& destination) const
+{
+    RECT rect    { 0, 0, dwWidth, dwHeight };
+    RECT dstRect { 0, 0, destination.dwWidth, destination.dwHeight };
+
+    HW.pDevice->StretchRect(pRT, &rect, destination.pRT, &dstRect, D3DTEXF_POINT);
+}
+
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));

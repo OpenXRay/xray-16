@@ -49,6 +49,11 @@ void CHW::CreateD3D()
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
     R_CHK(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&m_pFactory)));
     R_CHK(m_pFactory->EnumAdapters1(0, &m_pAdapter));
+    if (ClearSkyMode)
+    {
+        d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
+        OldD3DCompile = static_cast<D3DCompileFunc>(d3dCompiler37->GetProcAddress("D3DCompileFromMemory"));
+    }
 }
 
 void CHW::DestroyD3D()
@@ -122,6 +127,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     if (SUCCEEDED(R))
     {
+        pContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&pContext1));
 #ifdef HAS_DX11_3
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
 #endif
@@ -340,6 +346,7 @@ void CHW::DestroyDevice()
 #endif
 
 #ifdef USE_DX11
+    _RELEASE(pContext1);
     _RELEASE(pContext);
 #endif
 

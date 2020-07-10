@@ -366,12 +366,9 @@ void CRenderTarget::phase_bloom()
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
     if (_menu_pp)
     {
-        // CHK_DX				(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	0,	1.0f, 0L));
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
-    };
+        RCache.ClearRT(RCache.get_RT(), {}); // black
+    }
 
     // re-enable z-buffer
-    // CHK_DX		(HW.pDevice->SetRenderState	( D3DRS_ZENABLE,	TRUE				));
     RCache.set_Z(TRUE);
 }

@@ -218,9 +218,12 @@ void CGamePersistent::OnAppStart()
     Event materialsLoaded, globalsInitialized, menuCreated;
 
     // init game globals
+#ifndef XR_PLATFORM_WINDOWS
+    init_game_globals();
+#else
     TaskScheduler->AddTask("init_game_globals()", init_game_globals,
         nullptr, nullptr, &globalsInitialized);
-
+#endif
     // load game materials
     TaskScheduler->AddTask("GMLib.Load()", [&]()
     {
@@ -248,7 +251,10 @@ void CGamePersistent::OnAppStart()
     ansel->Init();
 #endif
 
+
+#ifdef XR_PLATFORM_WINDOWS
     Device.WaitEvent(globalsInitialized);
+#endif
     Device.WaitEvent(menuCreated);
     Device.WaitEvent(materialsLoaded);
 }

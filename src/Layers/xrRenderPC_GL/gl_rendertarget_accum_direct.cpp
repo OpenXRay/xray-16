@@ -269,7 +269,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         //	TODO: DX10: Check if DX10 has analog for NV DBT
         //		if (u_DBT_enable(zMin,zMax))	{
         // z-test always
-        //			HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+        //			RCache.set_ZFunc(D3DCMP_ALWAYS);
         //			HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         //		}
 
@@ -607,7 +607,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         //	TODO: DX10: Check if DX10 has analog for NV DBT
         //		if (u_DBT_enable(zMin,zMax))	{
         // z-test always
-        //			HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+        //			RCache.set_ZFunc(D3DCMP_ALWAYS);
         //			HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         //		}
 
@@ -701,11 +701,7 @@ void CRenderTarget::accum_direct_blend()
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        VERIFY(0);
-        if (! RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator,NULL,NULL, get_base_zb());
-        else
-            u_setrt(rt_Accumulator,NULL,NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
 
         //	TODO: DX10: remove half pixel offset
         // Common calc for quad-rendering
@@ -774,10 +770,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         return;
     }
     phase_accumulator();
-    if (! RImplementation.o.dx10_msaa)
-        u_setrt(rt_Generic_0,NULL,NULL, get_base_zb());
-    else
-        u_setrt(rt_Generic_0_r,NULL,NULL, RImplementation.Target->rt_MSAADepth->pZRT);
+    u_setrt(rt_Generic_0, NULL, NULL, rt_MSAADepth->pZRT);
 
     // *** assume accumulator setted up ***
     light* fuckingsun = (light*)RImplementation.Lights.sun._get();
@@ -805,9 +798,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     if (SE_SUN_NEAR == sub_phase) //.
     {
         // For sun-filter - clear to zero
-        //CHK_DX	(HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0L));
-        FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        HW.pDevice->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
+        RCache.ClearRT(rt_Generic_0, {});
 
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
@@ -874,10 +865,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
     // Perform lighting
     {
-        if (! RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_0,NULL,NULL, get_base_zb()); // enshure RT setup
-        else
-            u_setrt(rt_Generic_0_r,NULL,NULL, RImplementation.Target->rt_MSAADepth->pZRT); // enshure RT setup
+        u_setrt(rt_Generic_0, NULL, NULL, rt_MSAADepth->pZRT); // ensure RT is set
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 
@@ -1224,17 +1212,15 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         //	TODO: DX10: Check if DX10 has analog for NV DBT
         //		if (u_DBT_enable(zMin,zMax))	{
         // z-test always
-        //			HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+        //			RCache.set_ZFunc(D3DCMP_ALWAYS);
         //			HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
         //		}
         //		else
         {
             //	TODO: DX10: Implement via different passes
             if (SE_SUN_NEAR == sub_phase)
-                //HW.pDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_GREATER);
                 RCache.set_ZFunc(D3DCMP_GREATER);
             else
-                //HW.pDevice->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
                 RCache.set_ZFunc(D3DCMP_ALWAYS);
         }
 

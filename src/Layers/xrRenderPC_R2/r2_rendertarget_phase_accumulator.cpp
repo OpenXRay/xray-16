@@ -20,8 +20,7 @@ void CRenderTarget::phase_accumulator()
         u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
         // dwLightMarkerID						= 5;					// start from 5, increment in 2 units
         reset_light_marker();
-        u32 clr4clear = color_rgba(0, 0, 0, 0); // 0x00
-        CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, clr4clear, 1.0f, 0L));
+        RCache.ClearRT(rt_Accumulator, {}); // black
 
         //	Do it after the sun to preserve data.
         /*
@@ -52,8 +51,7 @@ void CRenderTarget::phase_vol_accumulator()
         m_bHasActiveVolumetric = true;
 
         u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
-        u32 clr4clearVol = color_rgba(0, 0, 0, 0); // 0x00
-        CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, clr4clearVol, 1.0f, 0L));
+        RCache.ClearRT(rt_Generic_2, {}); // black
     }
     else
         u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());

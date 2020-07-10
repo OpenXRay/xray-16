@@ -23,10 +23,17 @@ void getFileCrc32(IReader* F, LPCSTR filePath, u32& outCrc, bool parseIncludes)
                     const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
                     IReader* I = FS.r_open(fn);
                     R_ASSERT3(I, "Can't find include file:", inc_name);
-                    getFileCrc32(I, inc_path.c_str(), outCrc, true);
+                    addFileCrc32(I, inc_path.c_str(), outCrc, true);
                     FS.r_close(I);
                 }
             }
         }
     }
+}
+
+void addFileCrc32(IReader* F, LPCSTR filePath, u32& outCrc, bool parseIncludes)
+{
+    u32 fileCrc = 0;
+    getFileCrc32(F, filePath, fileCrc, parseIncludes);
+    outCrc += fileCrc;
 }

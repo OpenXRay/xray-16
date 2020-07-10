@@ -1874,12 +1874,11 @@ void CWeapon::OnStateSwitch(u32 S, u32 oldState)
     {
         CActor* current_actor = smart_cast<CActor*>(H_Parent());
         if (current_actor && H_Parent() == Level().CurrentEntity())
-            if (iAmmoElapsed == 0)
-                if (!fsimilar(m_zoom_params.m_ReloadEmptyDof.w, -1.0f))
-                    current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadEmptyDof));
-            else
-                if (!fsimilar(m_zoom_params.m_ReloadDof.w, -1.0f))
-                    current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadDof));
+        {
+            const Fvector4& reloadDof = iAmmoElapsed == 0 ? m_zoom_params.m_ReloadEmptyDof : m_zoom_params.m_ReloadDof;
+            if (!fsimilar(reloadDof.w, -1.0f))
+                current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(reloadDof));
+        }
     }
 }
 

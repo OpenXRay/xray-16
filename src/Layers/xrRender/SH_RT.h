@@ -23,6 +23,8 @@ public:
     BOOL valid() { return !!pTexture; }
     bool used_as_depth() const;
 
+    void resolve_into(CRT& destination) const; // only RTs with same format supported
+
 public:
 #ifdef USE_OGL
     GLuint pRT;

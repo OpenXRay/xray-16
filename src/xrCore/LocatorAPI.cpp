@@ -199,6 +199,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
 {
     string256 temp_file_name;
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
+    xr_fs_strlwr(temp_file_name);
 
     restore_path_separators(temp_file_name);
     //Msg("Register[%d] [%s]",vfs,temp_file_name);
@@ -404,7 +405,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
                 // R_ASSERT3 (root, "path not found ", read_path.c_str());
                 xr_strcpy(fs_entry_point, sizeof fs_entry_point, root->m_Path);
             }
-            xr_strcat(fs_entry_point, "gamedata//");
+            xr_strcat(fs_entry_point, "gamedata" DELIMITER);
         }
         else
         {
@@ -598,6 +599,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     xr_strcpy(N, sizeof N, entry.name);
 #endif
+    xr_fs_strlwr(N);
 
     if (entry.attrib & _A_HIDDEN)
         return;
@@ -901,7 +903,7 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 #endif // MASTER_GOLD
 
     CHECK_OR_EXIT(fsltx_is_available,
-        make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_file_name));
+        make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_name ? fs_name : fs_file_name));
 
 #ifdef DEBUG
     Msg("final $fs_root$ = %s", get_path("$fs_root$")->m_Path);
@@ -991,7 +993,8 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
             _GetItem(temp, 5, capt, _delimiter);
             xr_strlwr(id);
 
-            lp_add = cnt >= 4 ? add : 0;
+            xr_fs_strlwr(root);
+            lp_add = cnt >= 4 ? xr_fs_strlwr(add) : 0;
             lp_def = cnt >= 5 ? def : 0;
             lp_capt = cnt >= 6 ? capt : 0;
 
@@ -1527,6 +1530,8 @@ bool CLocatorAPI::check_for_file(pcstr path, pcstr _fname, string_path& fname, c
 
     // correct path
     xr_strcpy(fname, _fname);
+    xr_fs_strlwr(fname);
+
     if (path && path[0])
         update_path(fname, path, fname);
 
@@ -1599,6 +1604,8 @@ IWriter* CLocatorAPI::w_open(pcstr path, pcstr _fname)
 {
     string_path fname;
     xr_strcpy(fname, _fname);
+    xr_fs_strlwr(fname); //,".$");
+
     if (path && path[0])
         update_path(fname, path, fname);
     CFileWriter* W = xr_new<CFileWriter>(fname, false);
@@ -1613,6 +1620,8 @@ IWriter* CLocatorAPI::w_open_ex(pcstr path, pcstr _fname)
 {
     string_path fname;
     xr_strcpy(fname, _fname);
+    xr_fs_strlwr(fname); //,".$");
+
     if (path && path[0])
         update_path(fname, path, fname);
     CFileWriter* W = xr_new<CFileWriter>(fname, true);
@@ -1772,7 +1781,7 @@ void CLocatorAPI::file_rename(pcstr src, pcstr dest, bool overwrite)
         xr_free(str);
         m_files.erase(S);
         // insert updated item
-        new_desc.name = xr_strdup(dest);
+        new_desc.name = xr_fs_strlwr(xr_strdup(dest));
         m_files.insert(new_desc);
 
         // physically rename file

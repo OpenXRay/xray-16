@@ -676,8 +676,13 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
                 u32 savedBytecodeCrc = file->r_u32();
                 u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                 if (bytecodeCrc == savedBytecodeCrc)
+                {
+#ifdef DEBUG
+                    Log("* Loading shader:", file_name);
+#endif
                     _result =
                         create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), filename, result, o.disasm);
+                }
             }
         }
         file->close();
@@ -690,7 +695,17 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
         LPD3DBLOB pErrorBuf = NULL;
         _result = D3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget, Flags, 0,
             &pShaderBuf, &pErrorBuf);
-
+        if (FAILED(_result) && HW.OldD3DCompile)
+        {
+            Log("! ", file_name);
+            if (pErrorBuf)
+                Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
+            else
+                Msg("Can't compile shader hr=0x%08x", _result);
+            Msg("Fallback to the old compiler for %s", name);
+            _result = HW.OldD3DCompile(fs->pointer(), fs->length(), "", defines, &Includer, pFunctionName, pTarget,
+                Flags, 0, &pShaderBuf, &pErrorBuf);      
+        }
 #if 0
         if (pErrorBuf)
         {
@@ -705,12 +720,14 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
             file->w_u32(fileCrc);
 
             u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
-            file->w_u32(bytecodeCrc);
+            file->w_u32(bytecodeCrc); // Do not write anything below this line, take a look at reading (crc32)
 
             file->w(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
 
             FS.w_close(file);
-
+#ifdef DEBUG
+            Log("- Compile shader:", file_name);
+#endif
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
                 filename, result, o.disasm);
         }

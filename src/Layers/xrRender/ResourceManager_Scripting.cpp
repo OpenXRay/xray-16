@@ -3,8 +3,8 @@
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/Blender.h"
-#include "blenders/Blender_Recorder.h"
+#include "Blender.h"
+#include "Blender_Recorder.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "luabind/return_reference_to_policy.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"
@@ -435,6 +435,6 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     adopt_compiler ac = adopt_compiler(this);
     element(ac, t_0, t_1, t_d);
     r_End();
-    ShaderElement* _r = RImplementation.Resources->_CreateElement(E);
+    ShaderElement* _r = RImplementation.Resources->_CreateElement(std::move(E));
     return _r;
 }

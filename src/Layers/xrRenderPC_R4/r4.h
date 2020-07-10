@@ -8,10 +8,10 @@
 #include "r2_types.h"
 #include "r4_rendertarget.h"
 
-#include "Layers/xrRender/hom.h"
-#include "Layers/xrRender/detailmanager.h"
-#include "Layers/xrRender/modelpool.h"
-#include "Layers/xrRender/wallmarksengine.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/DetailManager.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/WallmarksEngine.h"
 
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
@@ -240,10 +240,9 @@ public:
 
     ICF void apply_object(IRenderable* O)
     {
-        if (!O)
+        if (!O || !O->renderable_ROS())
             return;
-        if (!O->renderable_ROS())
-            return;
+
         CROS_impl& LT = *static_cast<CROS_impl*>(O->renderable_ROS());
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
@@ -254,7 +253,7 @@ public:
     
     void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
+        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
         if (!C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
@@ -267,10 +266,12 @@ public:
             mtl = ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X], o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X], o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
+        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
+        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
     }
 
 public:
@@ -278,6 +279,7 @@ public:
     virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
     virtual bool is_sun_static() { return o.sunstatic; }
     virtual u32 get_dx_level() { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
+
     // Loading / Unloading
     virtual void create();
     virtual void destroy();

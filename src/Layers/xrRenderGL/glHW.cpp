@@ -19,10 +19,7 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
-CHW::CHW()
-    : pDevice(this), pContext(this), m_pSwapChain(this), pPP(0), pFB(0)
-{
-}
+CHW::CHW() : pDevice(this), pPP(0), pFB(0) {}
 
 CHW::~CHW() {}
 //////////////////////////////////////////////////////////////////////
@@ -188,47 +185,6 @@ void CHW::UpdateViews()
     CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
 
     BackBufferCount = 1;
-}
-
-void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
-{
-    if (pRenderTargetView == 0)
-        return;
-
-    // Attach the render target
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pRenderTargetView, 0));
-
-    // Clear the color buffer without affecting the global state
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glClearColor(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]);
-    CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
-}
-
-void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
-{
-    if (pDepthStencilView == 0)
-        return;
-
-    // Attach the depth buffer
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, pDepthStencilView, 0));
-
-    u32 mask = 0;
-    if (ClearFlags & D3D_CLEAR_DEPTH)
-        mask |= (u32)GL_DEPTH_BUFFER_BIT;
-    if (ClearFlags & D3D_CLEAR_STENCIL)
-        mask |= (u32)GL_STENCIL_BUFFER_BIT;
-
-    if (ClearFlags & D3D_CLEAR_DEPTH)
-    {
-        glDepthMask(GL_TRUE);
-        glClearDepthf(Depth);
-    }
-    if (ClearFlags & D3D_CLEAR_STENCIL)
-    {
-        glStencilMask(~0);
-        glClearStencil(Stencil);
-    }
-    CHK_GL(glClear(mask));
 }
 
 void CHW::Present()

@@ -270,6 +270,46 @@ public:
     IC ID3DDepthStencilView* get_ZB();
 #endif // USE_OGL
 
+#ifdef USE_OGL
+    IC void ClearRT(GLuint rt, const Fcolor& color);
+
+    IC void ClearZB(GLuint zb, float depth);
+    IC void ClearZB(GLuint zb, float depth, u8 stencil);
+
+    IC bool ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects);
+    IC bool ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects);
+#else
+    IC void ClearRT(ID3DRenderTargetView* rt, const Fcolor& color);
+
+    IC void ClearZB(ID3DDepthStencilView* zb, float depth);
+    IC void ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil);
+
+    IC bool ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects);
+    IC bool ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects);
+#endif
+
+    ICF void ClearRT(ref_rt& rt, const Fcolor& color) { ClearRT(rt->pRT, color); }
+    ICF bool ClearRTRect(ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects)
+    {
+        return ClearRTRect(rt->pRT, color, numRects, rects);
+    }
+
+#if defined(USE_DX10) || defined(USE_DX11)
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT, depth);}
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT, depth, stencil);}
+    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
+    {
+        return ClearZBRect(zb->pZRT, depth, numRects, rects);
+    }
+#else
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pRT, depth);}
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pRT, depth, stencil);}
+    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
+    {
+        return ClearZBRect(zb->pRT, depth, numRects, rects);
+    }
+#endif
+
     IC void set_Constants(R_constant_table* C);
     void set_Constants(ref_ctable& C) { set_Constants(&*C); }
 

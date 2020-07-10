@@ -408,7 +408,7 @@ void CRenderTarget::phase_distortion()
     RCache.set_ZB(rt_Depth->pRT);
     RCache.set_CullMode(CULL_CCW);
     RCache.set_ColorWriteEnable();
-    CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, color_rgba(127, 127, 127, 127), 1.0f, 0L));
+    RCache.ClearRT(rt_distort, color_rgba(127, 127, 127, 127));
 
     if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->OnRenderPPUI_query())
         RImplementation.r_dsgraph_render_distort();

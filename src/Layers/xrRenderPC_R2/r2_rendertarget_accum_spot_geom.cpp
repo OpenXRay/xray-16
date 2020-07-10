@@ -62,10 +62,10 @@ u16 du_cone_faces[DU_CONE_NUMFACES*3]=
 
 void CRenderTarget::accum_spot_geom_create()
 {
-    // vertices
+    // Vertices
     {
-        u32 vCount = DU_CONE_NUMVERTEX;
-        u32 vSize = 3 * 4;
+        constexpr size_t vCount = DU_CONE_NUMVERTEX;
+        constexpr size_t vSize = 3 * 4;
 
         g_accum_spot_vb.Create(vCount * vSize);
         BYTE* pData = static_cast<BYTE*>(g_accum_spot_vb.Map());
@@ -75,7 +75,7 @@ void CRenderTarget::accum_spot_geom_create()
 
     // Indices
     {
-        u32 iCount = DU_CONE_NUMFACES * 3;
+        constexpr size_t iCount = DU_CONE_NUMFACES * 3;
 
         g_accum_spot_ib.Create(iCount * 2);
         BYTE* pData = static_cast<BYTE*>(g_accum_spot_ib.Map());
@@ -88,11 +88,12 @@ void CRenderTarget::accum_spot_geom_destroy()
 {
 #ifdef DEBUG
     _SHOW_REF("g_accum_spot_ib", &g_accum_spot_ib);
-#endif // DEBUG
+#endif
     g_accum_spot_ib.Release();
+
 #ifdef DEBUG
     _SHOW_REF("g_accum_spot_vb", &g_accum_spot_vb);
-#endif // DEBUG
+#endif
     g_accum_spot_vb.Release();
 }
 
@@ -103,17 +104,17 @@ struct Slice
 
 void CRenderTarget::accum_volumetric_geom_create()
 {
-    // vertices
+    // Vertices
     {
         //	VOLUMETRIC_SLICES quads
-        const u32 vCount = VOLUMETRIC_SLICES * 4;
-        u32 vSize = 3 * 4;
-        g_accum_volumetric_vb.Create(vCount * vSize);
+        constexpr size_t vCount = VOLUMETRIC_SLICES * 4;
+        constexpr size_t vSize = 3 * 4;
+        constexpr float dt = 1.0f / (VOLUMETRIC_SLICES - 1);
 
+        g_accum_volumetric_vb.Create(vCount * vSize);
         BYTE* pData = static_cast<BYTE*>(g_accum_volumetric_vb.Map());
         Slice* pSlice = (Slice*)pData;
         float t = 0;
-        float dt = 1.0f / (VOLUMETRIC_SLICES - 1);
         for (int i = 0; i < VOLUMETRIC_SLICES; ++i)
         {
             pSlice[i].m_Vert[0] = Fvector().set(0, 0, t);
@@ -127,7 +128,7 @@ void CRenderTarget::accum_volumetric_geom_create()
 
     // Indices
     {
-        const u32 iCount = VOLUMETRIC_SLICES * 6;
+        constexpr size_t iCount = VOLUMETRIC_SLICES * 6;
 
         g_accum_volumetric_ib.Create(iCount * 2);
         u16* pInd = static_cast<u16*>(g_accum_volumetric_ib.Map());

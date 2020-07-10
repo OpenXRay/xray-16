@@ -24,11 +24,6 @@ public:
 
     void UpdateViews();
 
-    // TODO: OGL: Implement this into a compatibility layer?
-    void ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4]);
-
-    void ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil);
-
     void Present();
     DeviceState GetDeviceState();
 
@@ -39,8 +34,6 @@ public:
     u32 CurrentBackBuffer{};
 
     CHW* pDevice;
-    CHW* pContext;
-    CHW* m_pSwapChain;
     GLuint pPP;
     GLuint pFB;
 

@@ -247,12 +247,7 @@ void CBackend::dbg_OverdrawEnd()
         D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
 
     // Set the background to black
-#ifndef USE_DX9
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    HW.pContext->ClearRenderTargetView(get_RT(), ColorRGBA);
-#else
-    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
-#endif
+    RCache.ClearRT(get_RT(), color_xrgb(255, 0, 0)); // XXX: it's red, not black. Check why.
 
     OnFrameEnd();
 

@@ -50,6 +50,97 @@ IC void CBackend::set_ZB(GLuint ZB)
     }
 }
 
+IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glClearColor(color.r, color.g, color.b, color.a);
+
+    CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
+}
+
+IC void CBackend::ClearZB(GLuint zb, float depth)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+
+    glDepthMask(GL_TRUE);
+    glClearDepthf(depth);
+
+    CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
+}
+
+IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+
+    glDepthMask(GL_TRUE);
+    glClearDepthf(depth);
+
+    glStencilMask(~0);
+    glClearStencil(stencil);
+
+    CHK_GL(glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+}
+
+IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+
+    CHK_GL(glEnable(GL_SCISSOR_TEST));
+
+    for (size_t i = 0; i < numRects; ++i, ++rects)
+    {
+        // The window space is inverted compared to DX
+        // so we have to invert our vertical coordinates
+        const u32 bottom = Device.dwHeight - rects->bottom;
+
+        // The origin of the scissor box is lower-left
+        CHK_GL(glScissor(rects->left, bottom, rects->width(), rects->height()));
+
+        // Clear the color buffer without affecting the global state
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glClearColor(color.r, color.g, color.b, color.a);
+
+        CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
+    }
+
+    CHK_GL(glDisable(GL_SCISSOR_TEST));
+
+    return true;
+}
+
+IC bool CBackend::ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects)
+{
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+
+    CHK_GL(glEnable(GL_SCISSOR_TEST));
+
+    for (size_t i = 0; i < numRects; ++i, ++rects)
+    {
+        // The window space is inverted compared to DX
+        // so we have to invert our vertical coordinates
+        const u32 bottom = Device.dwHeight - rects->bottom;
+
+        // The origin of the scissor box is lower-left
+        CHK_GL(glScissor(rects->left, bottom, rects->width(), rects->height()));
+
+        glDepthMask(GL_TRUE);
+        glClearDepthf(depth);
+
+        CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
+    }
+
+    CHK_GL(glDisable(GL_SCISSOR_TEST));
+
+    return true;
+}
+
 ICF void CBackend::set_Format(SDeclaration* _decl)
 {
     if (decl != _decl)

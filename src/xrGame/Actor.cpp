@@ -1413,22 +1413,7 @@ void CActor::renderable_Render(IRenderable* root)
 {
     VERIFY(_valid(XFORM()));
     inherited::renderable_Render(root);
-
-    if ((cam_active == eacFirstEye && // first eye cam
-            GEnv.Render->get_generation() == GEnv.Render->GENERATION_R2 && // R2
-            GEnv.Render->active_phase() == 1) // shadow map rendering on R2	
-        ||
-        !(IsFocused() && cam_active == eacFirstEye &&
-            (!m_holder || (m_holder && m_holder->allowWeapon() && m_holder->HUDView())))
-    )
-        CInventoryOwner::renderable_Render(root);
-
-
-    //if (1 /*!HUDview()*/)
-    //{
-    //    CInventoryOwner::renderable_Render(root);
-    //}
-    //VERIFY(_valid(XFORM()));
+    CInventoryOwner::renderable_Render(root);
 }
 
 bool CActor::renderable_ShadowGenerate()

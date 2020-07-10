@@ -2,8 +2,8 @@
 
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
-#include "Layers/xrRender/blenders/blender.h"
-#include "Layers/xrRender/blenders/blender_recorder.h"
+#include "Layers/xrRender/blender.h"
+#include "Layers/xrRender/blender_recorder.h"
 //	adopt_compiler don't have = operator And it can't have = operator
 #include "xrScriptEngine/script_engine.hpp"
 #include "luabind/return_reference_to_policy.hpp"
@@ -570,6 +570,6 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     adopt_compiler ac = adopt_compiler(this, bFirstPass);
     element(ac, t_0, t_1, t_d);
     r_End();
-    ShaderElement* _r = RImplementation.Resources->_CreateElement(E);
+    ShaderElement* _r = RImplementation.Resources->_CreateElement(std::move(E));
     return _r;
 }

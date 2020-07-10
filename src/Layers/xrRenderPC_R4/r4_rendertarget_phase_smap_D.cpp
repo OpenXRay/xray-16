@@ -53,11 +53,8 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
 void CRenderTarget::phase_smap_direct_tsh(light* L, u32 sub_phase)
 {
     VERIFY(RImplementation.o.Tshadows);
-    // u32		_clr						= 0xffffffff;	//color_rgba(127,127,12,12);
-    FLOAT ColorRGBA[4] = {1.0f, 1.0f, 1.0f, 1.0f};
     RCache.set_ColorWriteEnable();
     //	Prepare viewport for shadow map rendering
     RImplementation.rmNormal();
-    HW.pContext->ClearRenderTargetView(RCache.get_RT(0), ColorRGBA);
-    // CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	_clr,	1.0f, 0L));
+    RCache.ClearRT(RCache.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
 }

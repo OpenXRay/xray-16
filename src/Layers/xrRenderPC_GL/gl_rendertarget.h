@@ -28,17 +28,7 @@ public:
 
     u32 dwLightMarkerID;
     // 
-    IBlender* b_occq;
-    IBlender* b_accum_mask;
-    IBlender* b_accum_direct;
-    IBlender* b_accum_point;
     IBlender* b_accum_spot;
-    IBlender* b_accum_reflected;
-    IBlender* b_bloom;
-    IBlender* b_luminance;
-    IBlender* b_combine;
-    IBlender* b_postprocess_msaa;
-    IBlender* b_bloom_msaa;
     IBlender* b_combine_msaa[8];
     IBlender* b_accum_mask_msaa[8];
     IBlender* b_accum_spot_msaa[8];
@@ -48,7 +38,6 @@ public:
     IBlender* b_accum_volumetric_msaa[8];
     IBlender* b_accum_point_msaa[8];
     IBlender* b_accum_reflected_msaa[8];
-    IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
 
 #ifdef DEBUG
@@ -67,7 +56,7 @@ public:
 
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
-    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
+    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
     ref_rt rt_Generic_0_r; // MRT generic 0
     ref_rt rt_Generic_1_r; // MRT generic 1
     ref_rt rt_Generic;
@@ -80,8 +69,6 @@ public:
     ref_rt rt_Accumulator_temp;// only for HW which doesn't feature fp16 blend
     ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Generic_1; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
-    //  Second viewport
-    ref_rt rt_secondVP; // 32bit		(r,g,b,a)				// #SM+#-- +SecondVP+
     //	Igor: for volumetric lights
     ref_rt rt_Generic_2; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Bloom_1; // 32bit, dim/4	(r,g,b,?)

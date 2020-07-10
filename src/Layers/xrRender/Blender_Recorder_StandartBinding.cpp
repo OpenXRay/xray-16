@@ -2,8 +2,8 @@
 #pragma hdrstop
 
 #include "ResourceManager.h"
-#include "blenders/Blender_Recorder.h"
-#include "blenders/Blender.h"
+#include "Blender_Recorder.h"
+#include "Blender.h"
 
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"

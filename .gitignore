@@ -3,6 +3,7 @@
 !.git*
 !.appveyor*
 !.travis.yml
+!.editorconfig
 
 # exclude binaries and temporary files
 CMakeCache.txt
@@ -10,6 +11,7 @@ cmake_install.cmake
 cmake-build-debug
 install_manifest.txt
 bin/
+build/
 intermediate/
 intermediate_plugs/
 lib/

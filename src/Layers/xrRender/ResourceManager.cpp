@@ -9,8 +9,8 @@
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders/Blender.h"
-#include "blenders/Blender_Recorder.h"
+#include "Blender.h"
+#include "Blender_Recorder.h"
 
 //	Already defined in Texture.cpp
 void fix_texture_name(LPSTR fn);
@@ -130,7 +130,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     }
 }
 
-ShaderElement* CResourceManager::_CreateElement(ShaderElement& S)
+ShaderElement* CResourceManager::_CreateElement(ShaderElement&& S)
 {
     if (S.passes.empty())
         return nullptr;
@@ -141,7 +141,7 @@ ShaderElement* CResourceManager::_CreateElement(ShaderElement& S)
             return v_elements[it];
 
     // Create _new_ entry
-    ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(S));
+    ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(std::move(S)));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     return N;
 }
@@ -190,7 +190,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[SE_R1_NORMAL_HQ] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_HQ] = _CreateElement(std::move(E));
     }
 
     // Compile element	(LOD1)
@@ -199,7 +199,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[SE_R1_NORMAL_LQ] = _CreateElement(E);
+        S.E[SE_R1_NORMAL_LQ] = _CreateElement(std::move(E));
     }
 
     // Compile element
@@ -208,7 +208,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[SE_R1_LPOINT] = _CreateElement(E);
+        S.E[SE_R1_LPOINT] = _CreateElement(std::move(E));
     }
 
     // Compile element
@@ -217,7 +217,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[SE_R1_LSPOT] = _CreateElement(E);
+        S.E[SE_R1_LSPOT] = _CreateElement(std::move(E));
     }
 
     // Compile element
@@ -226,7 +226,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = TRUE; //.$$$ HACK :)
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[SE_R1_LMODELS] = _CreateElement(E);
+        S.E[SE_R1_LMODELS] = _CreateElement(std::move(E));
     }
 
     // Compile element
@@ -235,7 +235,7 @@ Shader* CResourceManager::_cpp_Create(
         C.bDetail = FALSE;
         ShaderElement E;
         C._cpp_Compile(&E);
-        S.E[5] = _CreateElement(E);
+        S.E[5] = _CreateElement(std::move(E));
     }
 
     // Search equal in shaders array
@@ -244,7 +244,7 @@ Shader* CResourceManager::_cpp_Create(
             return v_shaders[it];
 
     // Create _new_ entry
-    Shader* N = v_shaders.emplace_back(xr_new<Shader>(S));
+    Shader* N = v_shaders.emplace_back(xr_new<Shader>(std::move(S)));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     return N;
 }
@@ -306,7 +306,7 @@ void CResourceManager::CompatibilityCheck()
     if (psDeviceFlags.test(rsR2))
     {
         // Check for new cascades support on R2
-        IReader* accumSunNearCascade = open_shader("accum_sun_near_cascade.ps");
+        IReader* accumSunNearCascade = open_shader("accum_sun_cascade.ps");
         RImplementation.o.oldshadowcascades = !accumSunNearCascade;
         ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, !accumSunNearCascade);
         FS.r_close(accumSunNearCascade);

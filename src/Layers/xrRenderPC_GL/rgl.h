@@ -1,18 +1,24 @@
 #pragma once
+
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+
 #include "Layers/xrRender/PSLibrary.h"
+
 #include "r2_types.h"
 #include "gl_rendertarget.h"
+
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
+
 #include "SMAP_Allocator.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/Light_Render_Direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
+
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
 
@@ -234,10 +240,9 @@ public:
 
     ICF void apply_object(IRenderable* O)
     {
-        if (nullptr == O)
+        if (!O || !O->renderable_ROS())
             return;
-        if (nullptr == O->renderable_ROS())
-            return;
+
         CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
@@ -248,8 +253,8 @@ public:
 
     void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (nullptr == C)
+        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
+        if (!C)
             return;
         VERIFY (RC_dest_sampler == C->destination);
         VERIFY (RC_sampler == C->type);

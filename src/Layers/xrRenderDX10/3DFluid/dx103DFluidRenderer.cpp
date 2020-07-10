@@ -337,8 +337,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 
     // Raycast into the temporary render target:
     //  raycasting is done at the smaller resolution, using a fullscreen quad
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    HW.pContext->ClearRenderTargetView(RT[RRT_RayCastTex]->pRT, ColorRGBA);
+    RCache.ClearRT(RT[RRT_RayCastTex], {}); // black
 
     pTarget->u_setrt(RT[RRT_RayCastTex], nullptr, nullptr, nullptr); // LDR RT
 
@@ -355,10 +354,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     // Render to the back buffer sampling from the raycast texture that we just created
     //  If and edge was detected at the current pixel we will raycast again to avoid
     //  smoke aliasing artifacts at scene edges
-    if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, nullptr, nullptr, pTarget->get_base_zb()); // LDR RT
-    else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, nullptr, nullptr, pTarget->rt_MSAADepth->pZRT); // LDR RT
+    pTarget->u_setrt(pTarget->rt_Generic_0_r, nullptr, nullptr, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     if (bRenderFire)
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastCopyFire]);
@@ -376,9 +372,8 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 
 void dx103DFluidRenderer::ComputeRayData(const dx103DFluidData &FluidData)
 {
-    // Clear the color buffer to 0
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    HW.pContext->ClearRenderTargetView(RT[RRT_RayDataTex]->pRT, ColorRGBA);
+    // Clear the color buffer to zero
+    RCache.ClearRT(RT[RRT_RayDataTex], {});
 
     CRenderTarget* pTarget = RImplementation.Target;
     pTarget->u_setrt(RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT

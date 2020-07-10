@@ -4,8 +4,8 @@ void CRenderTarget::phase_ssao()
 {
     u32 Offset = 0;
 
-    FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    HW.pDevice->ClearRenderTargetView(rt_ssao_temp->pRT, ColorRGBA);
+    // Clear to zero
+    RCache.ClearRT(rt_ssao_temp, {});
 
     // low/hi RTs
     if (!RImplementation.o.dx10_msaa)
@@ -106,8 +106,7 @@ void CRenderTarget::phase_downsamp()
     u32 Offset = 0;
 
     u_setrt(rt_half_depth, nullptr, nullptr, 0/*get_base_zb()*/);
-    FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    HW.pContext->ClearRenderTargetView(rt_half_depth->pRT, ColorRGBA);
+    RCache.ClearRT(rt_half_depth, {}); // black
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 

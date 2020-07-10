@@ -242,10 +242,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
 
         //	Use for intermediate results
         //	Patch normal
-        if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
-        else
-            u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
 
         // u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
         RCache.set_Element(s_rain->E[1]);
@@ -314,18 +311,12 @@ void CRenderTarget::draw_rain(light& RainSetup)
             //	Do this in blender!
             // StateManager.SetColorWriteEnable( D3Dxx_COLOR_WRITE_ENABLE_RED | D3Dxx_COLOR_WRITE_ENABLE_GREEN |
             // D3Dxx_COLOR_WRITE_ENABLE_BLUE );
-            if (!RImplementation.o.dx10_msaa)
-                u_setrt(rt_Normal, NULL, NULL, get_base_zb());
-            else
-                u_setrt(rt_Normal, NULL, NULL, rt_MSAADepth->pZRT);
+            u_setrt(rt_Normal, NULL, NULL, rt_MSAADepth->pZRT);
         }
         else
         {
             // StateManager.SetColorWriteEnable( D3Dxx_COLOR_WRITE_ENABLE_RED | D3Dxx_COLOR_WRITE_ENABLE_GREEN );
-            if (!RImplementation.o.dx10_msaa)
-                u_setrt(rt_Position, NULL, NULL, get_base_zb());
-            else
-                u_setrt(rt_Position, NULL, NULL, rt_MSAADepth->pZRT);
+            u_setrt(rt_Position, NULL, NULL, rt_MSAADepth->pZRT);
         }
 
         if (!RImplementation.o.dx10_msaa)
@@ -369,10 +360,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
 
         //	It is restored automatically by a set_Element call
         // StateManager.SetColorWriteEnable( D3Dxx_COLOR_WRITE_ENABLE_ALL );
-        if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Color, NULL, NULL, get_base_zb());
-        else
-            u_setrt(rt_Color, NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Color, NULL, NULL, rt_MSAADepth->pZRT);
 
         if (!RImplementation.o.dx10_msaa)
         {

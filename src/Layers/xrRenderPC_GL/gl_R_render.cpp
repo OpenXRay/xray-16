@@ -166,15 +166,14 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->get_base_zb()); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0_r, nullptr, nullptr, Target->get_base_zb()); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
 
     // Distort
     {
-        FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
-        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
-        HW.pDevice->ClearRenderTargetView(Target->rt_Generic_1->pRT, ColorRGBA);
+        Target->u_setrt(Target->rt_Generic_1_r, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
+        RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
 
@@ -402,11 +401,7 @@ void CRender::Render()
         // skybox can be drawn here
         if (false)
         {
-            if (!RImplementation.o.dx10_msaa)
-                Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, nullptr, Target->get_base_zb());
-            else
-                Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1, nullptr,
-                                RImplementation.Target->rt_MSAADepth->pZRT);
+            Target->u_setrt(Target->rt_Generic_0, Target->rt_Generic_1, nullptr, Target->rt_MSAADepth->pZRT);
             RCache.set_CullMode(CULL_NONE);
             RCache.set_Stencil(FALSE);
 

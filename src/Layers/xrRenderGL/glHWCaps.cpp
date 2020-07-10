@@ -64,4 +64,6 @@ void CHWCaps::Update()
     // DEV INFO
 
     iGPUNum = GetGpuNum();
+
+    useCombinedSamplers = true;
 }
