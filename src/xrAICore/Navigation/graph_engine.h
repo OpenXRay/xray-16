@@ -51,7 +51,7 @@ public:
 
 #ifndef AI_COMPILER
     // solver algorithm
-    static const size_t SolverMaxVertexCount = 16 * 1024;
+    static constexpr size_t SolverMaxVertexCount = 16 * 1024;
     using CSolverPriorityQueue = CDataStorageBinaryHeap;
     // XXX: originally CSolverAlgorithm is constructed with 16*1024 limit
     // while the following definitions use 8*1024 limit -- check if that's a mistake
@@ -61,7 +61,7 @@ public:
     using CSolverAlgorithm = CAStar<_solver_dist_type, CSolverPriorityQueue, CSolverVertexManager,
         CSolverVertexAllocator, true, SolverAlgorithmStorage>;
     // string algorithm
-    static const size_t StringMaxVertexCount = 1024;
+    static constexpr size_t StringMaxVertexCount = 1024;
     using CStringPriorityQueue = CDataStorageBinaryHeap;
     using CStringVertexManager = CVertexManagerHashFixed<u32, shared_str, 128, StringMaxVertexCount>;
     using CStringVertexAllocator = CVertexAllocatorFixed<StringMaxVertexCount>;
