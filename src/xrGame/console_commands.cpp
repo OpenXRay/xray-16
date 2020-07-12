@@ -501,6 +501,18 @@ public:
             }
             strconcat(sizeof(fn), fn, args, ".xrdemo");
             FS.update_path(fn, "$game_saves$", fn);
+            if (!FS.exist(fn))
+            {
+                strconcat(sizeof(fn), fn, args, ".xrdemo");
+                FS.update_path(fn, "$game_anims$", fn);
+            }
+                
+            if (!FS.exist(fn))
+            {
+                Console->Show();
+                Msg("! Error: *.xrdemo file not found!");
+                return;
+            }
             g_pGameLevel->Cameras().AddCamEffector(xr_new<CDemoPlay>(fn, 1.0f, loops));
         }
     }
