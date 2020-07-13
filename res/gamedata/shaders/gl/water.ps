@@ -1,10 +1,14 @@
 #include "common.h"
 #include "iostructs\p_water.h"
 
+// Used only in ssr.h
+// Should be hidden under (SSR_QUALITY > 0) check, but I'm not sure if it won't crash
+// when engine will try to use s_half_depth when SSLR is off.
 Texture2D   s_half_depth;
-uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
 
 #if SSR_QUALITY > 0
+uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
+
 #include "ssr.h"
 #endif
 
