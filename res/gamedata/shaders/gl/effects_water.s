@@ -19,7 +19,9 @@ function normal                (shader, t_base, t_second, t_detail)
 	shader:sampler        ("s_nmap")       :texture  (tex_nmap)
 	shader:sampler        ("s_env0")       :texture  (tex_env0)   : clamp()
 	shader:sampler        ("s_env1")       :texture  (tex_env1)   : clamp()
-	shader:sampler        ("s_position")       :texture  ("$user$position")
+	shader:sampler        ("s_position")   :texture  ("$user$position")
+	shader:sampler        ("s_half_depth") :texture  ("$user$half_depth")
+	shader:sampler        ("s_image")       :texture  ("$user$generic0")   : clamp()
 
 	shader:sampler        ("s_leaves")     :texture  (tex_leaves)
 end

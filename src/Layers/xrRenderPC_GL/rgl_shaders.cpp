@@ -274,6 +274,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     string32 c_sun_shafts;
     string32 c_ssao;
     string32 c_sun_quality;
+    string32 c_water_reflection;
 
     // TODO: OGL: Implement these parameters.
     UNUSED(pFunctionName);
@@ -393,6 +394,22 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     {
         const bool softWater = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER);
         appendShaderOption(softWater, "USE_SOFT_WATER", "1");
+    }
+
+    // Water reflections
+    if (RImplementation.o.advancedpp && ps_r_water_reflection)
+    {
+        xr_sprintf(c_water_reflection, "%d", ps_r_water_reflection);
+        options.add("SSR_QUALITY", c_water_reflection);
+        sh_name.append(ps_r_water_reflection);
+        const bool sshHalfDepth = ps_r2_ls_flags_ext.test(R3FLAGEXT_SSR_HALF_DEPTH);
+        appendShaderOption(sshHalfDepth, "SSR_HALF_DEPTH", "1");
+        const bool ssrJitter = ps_r2_ls_flags_ext.test(R3FLAGEXT_SSR_JITTER);
+        appendShaderOption(ssrJitter, "SSR_JITTER", "1");
+    }
+    else
+    {
+        sh_name.append(static_cast<u32>(0));
     }
 
     // Soft particles
