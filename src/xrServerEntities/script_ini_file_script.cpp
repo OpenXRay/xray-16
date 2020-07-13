@@ -115,6 +115,8 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("r_float", &CScriptIniFile::r_float)
             .def("r_vector", &CScriptIniFile::r_fvector3)
             .def("r_line", &::r_line, policy_list<out_value<4>, out_value<5>>())
+            // Graff46
+            .def("iterate_sections", &CScriptIniFile::iterate_sections)
             // XXX: uncomment after we check that out_value policy is working
             //.def("r_line", &::r_line2, policy_list<out_value<4>, out_value<5>>())
             ,

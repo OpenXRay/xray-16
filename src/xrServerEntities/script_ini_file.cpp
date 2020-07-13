@@ -217,3 +217,11 @@ u32 CScriptIniFile::section_count()
 {
     return(inherited::section_count());
 }
+
+void CScriptIniFile::iterate_sections(const luabind::functor<void>& functor)
+{
+    for (const auto& it : inherited::sections())
+    {
+        functor(it->Name.c_str());
+    }
+}
