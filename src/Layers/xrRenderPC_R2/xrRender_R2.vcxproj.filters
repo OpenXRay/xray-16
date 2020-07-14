@@ -282,19 +282,10 @@
     <ClInclude Include="..\xrRender\blenders\uber_deffer.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_detail_still.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\blenders\Blender_Lm(EbB).h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_Model_EbB.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ModelPool.h">
@@ -621,6 +612,15 @@
     <ClInclude Include="..\xrRender\FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_detail_still.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_Model_EbB.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -743,9 +743,6 @@
     <ClCompile Include="..\xrRender\blenders\blender_bloom_build.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\blenders\blender_combine.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
@@ -788,28 +785,16 @@
     <ClCompile Include="..\xrRender\blenders\blender_luminance.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_Particle.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_detail_still.cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Lm(EbB).cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB.cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_tree.cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ModelPool.cpp">
@@ -1108,6 +1093,21 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX9\dx9ResourceManager_Resources.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp">
+      <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

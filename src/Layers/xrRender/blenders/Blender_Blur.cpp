@@ -22,11 +22,6 @@ LPCSTR CBlender_Blur::getComment()
     return "INTERNAL: blur";
 }
 
-BOOL CBlender_Blur::canBeLMAPped()
-{
-    return FALSE;
-}
-
 void CBlender_Blur::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

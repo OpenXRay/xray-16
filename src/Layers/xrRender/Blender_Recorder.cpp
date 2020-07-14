@@ -408,7 +408,7 @@ void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
         minFliter = D3DTEXF_ANISOTROPIC;
         magFilter = D3DTEXF_ANISOTROPIC;
     }
-    else if (0 == xr_strcmp(sampler, "smp_material"))
+    else if (xr_strcmp(sampler, "smp_material") == 0)
     {
         addressMode = D3DTADDRESS_CLAMP;
         mipFilter   = D3DTEXF_NONE;

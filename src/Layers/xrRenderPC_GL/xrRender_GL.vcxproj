@@ -160,6 +160,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\glRainBlender.cpp" />
     <ClCompile Include="..\xrRenderGL\glHW.cpp" />
     <ClCompile Include="..\xrRenderGL\glBufferUtils.cpp" />
@@ -252,17 +257,12 @@
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_detail_still.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Selection.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Editor_Wire.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Lm(EbB).cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_Particle.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder_R2.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder_StandartBinding.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_tree.cpp" />
     <ClCompile Include="..\xrRender\DetailManager.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp" />
