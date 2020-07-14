@@ -838,7 +838,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     Msg("$fs_root$ = %s", full_current_directory);
 #endif // #ifdef DEBUG
 
-    m_paths.insert(std::make_pair(xr_strdup("$fs_root$"), path));
+    m_paths.emplace(xr_strdup("$fs_root$"), path);
 }
 
 IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
@@ -856,14 +856,13 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 
     Log("using fs-ltx", fs_file_name);
 
-    IReader* result = nullptr;
     int file_handle;
     size_t file_size;
     CHECK_OR_EXIT(file_handle_internal(fs_file_name, file_size, file_handle),
         make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_file_name));
 
     void* buffer = FileDownload(fs_file_name, file_handle, file_size);
-    result = xr_new<CTempReader>(buffer, file_size, 0);
+    IReader* result = xr_new<CTempReader>(buffer, file_size, 0);
 
 #ifdef DEBUG
     if (result && m_Flags.is(flBuildCopy | flReady))
@@ -953,7 +952,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
             FS_Path* P = xr_new<FS_Path>(p_it != m_paths.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
             bNoRecurse = !(fl & FS_Path::flRecurse);
             Recurse(P->m_Path);
-            auto I = m_paths.insert(std::make_pair(xr_strdup(id), P));
+            auto I = m_paths.emplace(xr_strdup(id), P);
 #ifndef DEBUG
             m_Flags.set(flCacheFiles, false);
 #endif // DEBUG
@@ -1766,7 +1765,7 @@ FS_Path* CLocatorAPI::append_path(pcstr path_alias, pcstr root, pcstr add, bool 
     FS_Path* P = xr_new<FS_Path>(root, add, nullptr, nullptr, 0);
     bNoRecurse = !recursive;
     Recurse(P->m_Path);
-    m_paths.insert(std::make_pair(xr_strdup(path_alias), P));
+    m_paths.emplace(xr_strdup(path_alias), P);
     return P;
 }
 
