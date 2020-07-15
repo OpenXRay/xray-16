@@ -834,11 +834,9 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
 #endif
 
     FS_Path* path = xr_new<FS_Path>(full_current_directory, "", "", "", 0);
-#ifdef DEBUG
-    Msg("$fs_root$ = %s", full_current_directory);
-#endif // #ifdef DEBUG
-
     m_paths.emplace(xr_strdup("$fs_root$"), path);
+
+    Msg("$fs_root$ = %s", full_current_directory);
 }
 
 IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
