@@ -18,6 +18,11 @@
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
 
+ENGINE_API CStatTimer gTestTimer0;
+ENGINE_API CStatTimer gTestTimer1;
+ENGINE_API CStatTimer gTestTimer2;
+ENGINE_API CStatTimer gTestTimer3;
+
 class optimizer
 {
     float average_;
@@ -102,6 +107,11 @@ static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISp
 
 void CStats::Show()
 {
+    gTestTimer0.FrameEnd();
+    gTestTimer1.FrameEnd();
+    gTestTimer2.FrameEnd();
+    gTestTimer3.FrameEnd();
+
     float memCalls = float(Memory.stat_calls);
     if (memCalls > fMem_calls)
         fMem_calls = memCalls;
@@ -154,6 +164,11 @@ void CStats::Show()
         font.OutSkip();
         pInput->DumpStatistics(font, alertPtr);
         font.OutSkip();
+        font.OutNext("TEST 0:      %2.2fms, %d", gTestTimer0.result, gTestTimer0.count);
+        font.OutNext("TEST 1:      %2.2fms, %d", gTestTimer1.result, gTestTimer1.count);
+        font.OutNext("TEST 2:      %2.2fms, %d", gTestTimer2.result, gTestTimer2.count);
+        font.OutNext("TEST 3:      %2.2fms, %d", gTestTimer3.result, gTestTimer3.count);
+        font.OutSkip();
         font.OutNext("CPU: %u", CPU::GetCurrentCPU());
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
@@ -184,6 +199,10 @@ void CStats::Show()
         fpsFont->Out(Device.dwWidth - 40, 5, "%3d", fps);
         fpsFont->OnRender();
     }
+    gTestTimer0.FrameStart();
+    gTestTimer1.FrameStart();
+    gTestTimer2.FrameStart();
+    gTestTimer3.FrameStart();
 }
 
 void CStats::OnDeviceCreate()
