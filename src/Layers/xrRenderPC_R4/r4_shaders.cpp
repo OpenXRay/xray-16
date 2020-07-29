@@ -426,7 +426,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         }
         // Current sample
         {
-            if (m_MSAASample < 0)
+            if (m_MSAASample < 0 || o.dx10_msaa_opt)
                 c_msaa_current_sample[0] = '0';
             else
                 c_msaa_current_sample[0] = '0' + char(m_MSAASample);
