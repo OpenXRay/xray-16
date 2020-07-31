@@ -48,7 +48,8 @@ CUICellItem::~CUICellItem()
 void CUICellItem::init()
 {
     CUIXml uiXml;
-    uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml");
+    if (!uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml", false))
+        return;
 
     m_text = xr_new<CUIStatic>();
     m_text->SetAutoDelete(true);
@@ -111,22 +112,25 @@ void CUICellItem::Update()
     }
 
     PIItem item = (PIItem)m_pData;
-    if (item)
+    m_has_upgrade = item ? item->has_any_upgrades() : false;
+    if (m_upgrade)
     {
-        m_has_upgrade = item->has_any_upgrades();
-
-        //		Fvector2 size      = GetWndSize();
-        //		Fvector2 up_size = m_upgrade->GetWndSize();
-        //		pos.x = size.x - up_size.x - 4.0f;
-        Fvector2 pos;
-        pos.set(m_upgrade_pos);
-        if (ChildsCount())
+        if (item)
         {
-            pos.x += m_text->GetWndSize().x + 2.0f;
+            //		Fvector2 size      = GetWndSize();
+            //		Fvector2 up_size = m_upgrade->GetWndSize();
+            //		pos.x = size.x - up_size.x - 4.0f;
+            Fvector2 pos;
+            pos.set(m_upgrade_pos);
+            if (ChildsCount())
+            {
+                const float textSize = m_text ? m_text->GetWndSize().x : 0.f;
+                pos.x += textSize + 2.0f;
+            }
+            m_upgrade->SetWndPos(pos);
         }
-        m_upgrade->SetWndPos(pos);
+        m_upgrade->Show(m_has_upgrade);
     }
-    m_upgrade->Show(m_has_upgrade);
 }
 
 bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -298,17 +302,22 @@ bool CUICellItem::HasChild(CUICellItem* item)
 
 void CUICellItem::UpdateItemText()
 {
+    string32 tempStr;
+    pcstr finalText = nullptr;
     if (ChildsCount())
     {
-        string32 str;
-        xr_sprintf(str, "x%d", ChildsCount() + 1);
-        m_text->TextItemControl()->SetText(str);
-        m_text->Show(true);
+        xr_sprintf(tempStr, "x%d", ChildsCount() + 1);
+        finalText = tempStr;
+    }
+
+    if (m_text)
+    {
+        m_text->Show(nullptr != finalText);
+        m_text->SetText(finalText);
     }
     else
     {
-        m_text->TextItemControl()->SetText("");
-        m_text->Show(false);
+        this->SetText(finalText);
     }
 }
 
