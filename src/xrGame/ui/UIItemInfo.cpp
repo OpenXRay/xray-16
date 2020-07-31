@@ -119,7 +119,8 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
         if (ai().get_alife()) // (-designer)
         {
             UIProperties = xr_new<UIInvUpgPropertiesWnd>();
-            UIProperties->init_from_xml("actor_menu_item.xml");
+            if (!UIProperties->init_from_xml("actor_menu_item.xml"))
+                xr_delete(UIProperties);
         }
 
         UIDesc = xr_new<CUIScrollView>();
