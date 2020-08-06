@@ -228,7 +228,7 @@ void CStalkerAnimationManager::update()
     }
     catch (...)
     {
-        Msg("! error in stalker with visual %s and ID %s", *object().cNameVisual(), object().ID());
+        Msg("! error in stalker with visual %s and ID %u", *object().cNameVisual(), object().ID());
         head().reset();
         torso().reset();
         legs().reset();
