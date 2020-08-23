@@ -563,7 +563,6 @@ CRenderTarget::CRenderTarget()
     if (RImplementation.o.dx10_msaa)
     {
         CBlender_msaa TempBlender;
-
         s_mark_msaa_edges.create(&TempBlender, "null");
     }
 
