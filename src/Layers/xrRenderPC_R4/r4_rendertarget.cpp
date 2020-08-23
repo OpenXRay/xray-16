@@ -270,13 +270,13 @@ void generate_jitter(DWORD* dest, u32 elem_count)
 void manually_assign_texture(ref_shader& shader, pcstr dx10textureName, pcstr rendertargetTextureName)
 {
     SPass& pass = *shader->E[0]->passes[0];
-    ref_constant constant = pass.constants->get(dx10textureName);
-    if (!constant)
-    {
-        Msg("! Trying to manually assign a texture[%s] to [%s] but %s doesn't exist.",
-            rendertargetTextureName, dx10textureName, dx10textureName);
+    if (!pass.constants)
         return;
-    }
+
+    const ref_constant constant = pass.constants->get(dx10textureName);
+    if (!constant)
+        return;
+
     const auto index = constant->samp.index;
     pass.T->create_texture(index, rendertargetTextureName, false);
 }
