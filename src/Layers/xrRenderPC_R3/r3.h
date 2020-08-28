@@ -120,8 +120,6 @@ public:
         s32 s_used;
         s32 s_merged;
         s32 s_finalclip;
-        u32 o_queries;
-        u32 o_culled;
         u32 ic_total;
         u32 ic_culled;
 
@@ -135,8 +133,6 @@ public:
             s_used = 0;
             s_merged = 0;
             s_finalclip = 0;
-            o_queries = 0;
-            o_culled = 0;
             ic_total = 0;
             ic_culled = 0;
         }
