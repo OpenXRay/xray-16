@@ -8,7 +8,7 @@ void CRenderTarget::phase_smap_spot_clear()
     CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_ZBUFFER,	0xffffffff,	1.0f, 0L));
     */
 
-    HW.pContext->ClearDepthStencilView(rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
+    RCache.ClearZB(rt_smap_depth, 1.0f);
 }
 
 void CRenderTarget::phase_smap_spot(light* L)
@@ -25,9 +25,9 @@ void CRenderTarget::phase_smap_spot(light* L)
 #pragma todo("can optimize for multi-lights covering more than say 50%...")
     if (RImplementation.o.HW_smap)
         RCache.set_ColorWriteEnable(FALSE);
-    // CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_ZBUFFER,	0xffffffff,	1.0f, 0L));
+
     //	Do it once per smap generation pass in phase_smap_spot_clear
-    // HW.pContext->ClearDepthStencilView( rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
+    // RCache.ClearZB(rt_smap_depth, 1.0f);
 }
 
 void CRenderTarget::phase_smap_spot_tsh(light* L)
