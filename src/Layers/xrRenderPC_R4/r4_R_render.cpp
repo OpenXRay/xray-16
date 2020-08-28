@@ -287,7 +287,7 @@ void CRender::Render()
     // Sync point
     BasicStats.WaitS.Begin();
     {
-        q_sync_point.Wait(ps_r2_wait_sleep, 500);
+        q_sync_point.Wait(ps_r2_wait_sleep, ps_r2_wait_timeout);
     }
     BasicStats.WaitS.End();
     q_sync_point.End();
