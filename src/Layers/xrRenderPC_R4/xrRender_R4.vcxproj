@@ -304,6 +304,7 @@
     <ClInclude Include="..\xrRender\r__occlusion.h" />
     <ClInclude Include="..\xrRender\r__pixel_calculator.h" />
     <ClInclude Include="..\xrRender\r__sector.h" />
+    <ClInclude Include="..\xrRender\r__sync_point.h" />
     <ClInclude Include="..\xrRender\Shader.h" />
     <ClInclude Include="..\xrRender\ShaderResourceTraits.h" />
     <ClInclude Include="..\xrRender\SH_Atomic.h" />
@@ -471,6 +472,7 @@
     <ClCompile Include="..\xrRender\r__screenshot.cpp" />
     <ClCompile Include="..\xrRender\r__sector.cpp" />
     <ClCompile Include="..\xrRender\r__sector_traversal.cpp" />
+    <ClCompile Include="..\xrRender\r__sync_point.cpp" />
     <ClCompile Include="..\xrRender\Shader.cpp" />
     <ClCompile Include="..\xrRender\SH_Atomic.cpp" />
     <ClCompile Include="..\xrRender\SH_Constant.cpp" />

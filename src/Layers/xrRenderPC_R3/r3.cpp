@@ -14,6 +14,7 @@
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
+
 #include "D3DX10Core.h"
 
 CRender RImplementation;
@@ -417,20 +418,7 @@ void CRender::create()
 
     rmNormal();
     marker = 0;
-    D3D_QUERY_DESC qdesc;
-    qdesc.MiscFlags = 0;
-    qdesc.Query = D3D_QUERY_EVENT;
-    ZeroMemory(q_sync_point, sizeof(q_sync_point));
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
-    //	Prevent error on first get data
-    // q_sync_point[0]->End();
-    // q_sync_point[1]->End();
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[1]));
-    for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
-        R_CHK(HW.pDevice->CreateQuery(&qdesc, &q_sync_point[i]));
-    q_sync_point[0]->End();
+    q_sync_point.Create();
 
     ::PortalTraverser.initialize();
     FluidManager.Initialize(70, 70, 70);
@@ -443,10 +431,7 @@ void CRender::destroy()
     m_bMakeAsyncSS = false;
     FluidManager.Destroy();
     ::PortalTraverser.destroy();
-    //_RELEASE					(q_sync_point[1]);
-    //_RELEASE					(q_sync_point[0]);
-    for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
-        _RELEASE(q_sync_point[i]);
+    q_sync_point.Destroy();
     HWOCC.occq_destroy();
     xr_delete(Models);
     xr_delete(Target);
@@ -487,27 +472,12 @@ void CRender::reset_begin()
 
     xr_delete(Target);
     HWOCC.occq_destroy();
-    //_RELEASE					(q_sync_point[1]);
-    //_RELEASE					(q_sync_point[0]);
-    for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
-        _RELEASE(q_sync_point[i]);
+    q_sync_point.Destroy();
 }
 
 void CRender::reset_end()
 {
-    D3D_QUERY_DESC qdesc;
-    qdesc.MiscFlags = 0;
-    qdesc.Query = D3D_QUERY_EVENT;
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
-    for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
-        R_CHK(HW.pDevice->CreateQuery(&qdesc, &q_sync_point[i]));
-    //	Prevent error on first get data
-    q_sync_point[0]->End();
-    // q_sync_point[1]->End();
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[0]));
-    // R_CHK						(HW.pDevice->CreateQuery(D3DQUERYTYPE_EVENT,&q_sync_point[1]));
-    HWOCC.occq_create(occq_size);
+    q_sync_point.Create();
 
     Target = xr_new<CRenderTarget>();
 

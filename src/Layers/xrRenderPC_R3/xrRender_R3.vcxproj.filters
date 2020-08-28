@@ -699,6 +699,9 @@
     <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\r__sync_point.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1273,6 +1276,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp">
       <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\r__sync_point.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -289,19 +289,11 @@ void CRender::Render()
     //*******
     // Sync point
     BasicStats.WaitS.Begin();
-
-    if (true)
     {
-        CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
-        CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500 * 1000 * 1000));
-        CHK_GL(glDeleteSync(q_sync_point[q_sync_count]));
+        q_sync_point.Wait(ps_r2_wait_sleep, 500);
     }
-
     BasicStats.WaitS.End();
-    // TODO: OGL: Implement SLI/Crossfire support.
-    q_sync_count								= (q_sync_count+1)%HW.Caps.iGPUNum;
-    //CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
-    //CHK_DX										(EndQuery(q_sync_point[q_sync_count]));
+    q_sync_point.End();
 
     //******* Main calc - DEFERRER RENDERER
     // Main calc

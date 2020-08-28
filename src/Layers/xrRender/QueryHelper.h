@@ -4,7 +4,7 @@
 
 //	Interface
 #ifdef USE_OGL
-IC HRESULT CreateQuery(GLuint* pQuery);
+IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type);
 IC HRESULT GetData(GLuint query, void* pData, UINT DataSize);
 IC HRESULT BeginQuery(GLuint query);
 IC HRESULT EndQuery(GLuint query);
@@ -21,8 +21,9 @@ IC HRESULT ReleaseQuery(ID3DQuery *pQuery);
 
 #if defined(USE_OGL)
 
-IC HRESULT CreateQuery(GLuint* pQuery)
+IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type)
 {
+    R_ASSERT(type == D3D_QUERY_OCCLUSION);
     glGenQueries(1, pQuery);
     return S_OK;
 }
@@ -56,11 +57,11 @@ IC HRESULT ReleaseQuery(GLuint query)
 
 #elif defined(USE_DX11)
 
-IC HRESULT CreateQuery(ID3DQuery** ppQuery)
+IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type)
 {
     D3D_QUERY_DESC desc;
     desc.MiscFlags = 0;
-    desc.Query = D3D_QUERY_OCCLUSION;
+    desc.Query = type;
     return HW.pDevice->CreateQuery(&desc, ppQuery);
 }
 
@@ -90,11 +91,11 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
 
 #elif defined(USE_DX10)
 
-IC HRESULT CreateQuery(ID3DQuery** ppQuery)
+IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type)
 {
     D3D_QUERY_DESC desc;
     desc.MiscFlags = 0;
-    desc.Query = D3D_QUERY_OCCLUSION;
+    desc.Query = type;
     return HW.pDevice->CreateQuery(&desc, ppQuery);
 }
 
@@ -124,7 +125,7 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
 
 #else //	USE_DX10
 
-IC HRESULT CreateQuery(ID3DQuery** ppQuery) { return HW.pDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, ppQuery); }
+IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type) { return HW.pDevice->CreateQuery(type, ppQuery); }
 IC HRESULT GetData(ID3DQuery* pQuery, void* pData, UINT DataSize)
 {
     return pQuery->GetData(pData, DataSize, D3DGETDATA_FLUSH);

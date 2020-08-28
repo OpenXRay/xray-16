@@ -14,7 +14,7 @@ void R_occlusion::occq_create(u32 limit)
     {
         _Q q;
         q.order = it;
-        if (FAILED(CreateQuery(&q.Q)))
+        if (FAILED(CreateQuery(&q.Q, D3D_QUERY_OCCLUSION)))
             break;
         pool.push_back(q);
     }

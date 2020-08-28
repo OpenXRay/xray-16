@@ -19,6 +19,10 @@ typedef IDirect3DIndexBuffer9 ID3DIndexBuffer;
 typedef IDirect3DVolumeTexture9 ID3DTexture3D;
 typedef IDirect3DStateBlock9 ID3DState;
 
+using D3D_QUERY = D3DQUERYTYPE;
+constexpr auto D3D_QUERY_EVENT = D3DQUERYTYPE_EVENT;
+constexpr auto D3D_QUERY_OCCLUSION = D3DQUERYTYPE_OCCLUSION;
+
 #define DX10_ONLY(expr) do {} while (0)
 
 using unused_t = int[0];

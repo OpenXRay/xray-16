@@ -30,6 +30,12 @@ using D3D_VIEWPORT = struct XR_GL_VIEWPORT
     GLclampf MinDepth, MaxDepth;
 };
 
+using D3D_QUERY = enum XR_GL_QUERY
+{
+    D3D_QUERY_EVENT,
+    D3D_QUERY_OCCLUSION
+};
+
 using ID3DState = glState;
 
 #define DX10_ONLY(expr)			do {} while (0)

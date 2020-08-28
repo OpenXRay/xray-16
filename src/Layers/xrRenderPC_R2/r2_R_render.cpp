@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
+#include "Layers/xrRender/QueryHelper.h"
 
 IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 {
@@ -273,26 +274,11 @@ void CRender::Render()
     //*******
     // Sync point
     BasicStats.WaitS.Begin();
-    if (1)
     {
-        CTimer T;
-        T.Start();
-        BOOL result = FALSE;
-        HRESULT hr = S_FALSE;
-        while ((hr = q_sync_point[q_sync_count]->GetData(&result, sizeof(result), D3DGETDATA_FLUSH)) == S_FALSE)
-        {
-            if (!SwitchToThread())
-                Sleep(ps_r2_wait_sleep);
-            if (T.GetElapsed_ms() > 500)
-            {
-                result = FALSE;
-                break;
-            }
-        }
+        q_sync_point.Wait(ps_r2_wait_sleep, 500);
     }
     BasicStats.WaitS.End();
-    q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;
-    CHK_DX(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
+    q_sync_point.End();
 
     //******* Main calc - DEFERRER RENDERER
     // Main calc

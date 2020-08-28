@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+#include <Layers/xrRender/r__sync_point.h>
 
 #include "Layers/xrRender/PSLibrary.h"
 
@@ -185,9 +186,7 @@ public:
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
-//    GLuint q_sync_point[CHWCaps::MAX_GPUS];
-    GLsync q_sync_point[CHWCaps::MAX_GPUS];
-    u32 q_sync_count;
+    R_sync_point q_sync_point;
 
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
