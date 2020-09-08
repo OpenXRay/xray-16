@@ -25,7 +25,7 @@ public:
 
 private:
     void i_decompress_fr(OggVorbis_File* ovf, char* dest, u32 size);
-    bool LoadWave(pcstr name, bool preCache, bool crashOnError = true);
+    bool LoadWave(pcstr name, bool preCache);
 
 public:
     CSoundRender_Source();

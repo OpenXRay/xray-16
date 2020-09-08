@@ -47,7 +47,7 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
     i_decompress_fr(ovf, dest, left);
 }
 
-bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache, bool crashOnError /*= true*/)
+bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
 {
     pname = pName;
 
@@ -57,7 +57,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache, bool crashOnError
     IReader* wave = FS.r_open(pname.c_str());
     if (!wave && !wave->length())
     {
-        R_ASSERT3(!crashOnError, "Can't open wave file:", pname.c_str());
+        R_ASSERT3(preCache, "Can't open wave file:", pname.c_str());
         return false;
     }
     ov_open_callbacks(wave, &ovf, nullptr, 0, ovc);
@@ -66,7 +66,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache, bool crashOnError
     // verify
     if (!ovi)
     {
-        R_ASSERT3(!crashOnError, "Invalid source info:", pName);
+        R_ASSERT3(preCache, "Invalid source info:", pName);
         return false;
     }
     if (ovi->rate != 44100)
@@ -75,10 +75,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache, bool crashOnError
         {
             Msg("Invalid source rate in wave file %s", pname.c_str());
         }
-        else
-        {
-            R_ASSERT3(!crashOnError, "Invalid source rate:", pName);
-        }
+        R_ASSERT3(preCache, "Invalid source rate:", pName);
         return false;
     }
 #ifdef DEBUG
@@ -136,7 +133,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache, bool crashOnError
         Log("! Missing ogg-comment, file: ", pName);
     if (m_fMaxAIDist < 0.1f && m_fMaxDist < 0.1f)
     {
-        R_ASSERT3(!crashOnError, "Invalid max distance.", pName);
+        R_ASSERT3(preCache, "Invalid max distance.", pName);
         return false;
     }
     ov_clear(&ovf);
