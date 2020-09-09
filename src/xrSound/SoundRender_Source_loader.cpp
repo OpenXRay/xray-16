@@ -47,7 +47,7 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
     i_decompress_fr(ovf, dest, left);
 }
 
-bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
+bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
 {
     pname = pName;
 
@@ -57,7 +57,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     IReader* wave = FS.r_open(pname.c_str());
     if (!wave && !wave->length())
     {
-        R_ASSERT3(preCache, "Can't open wave file:", pname.c_str());
+        R_ASSERT3(crashOnError, "Can't open wave file:", pname.c_str());
         ov_clear(&ovf);
         FS.r_close(wave);
         return false;
@@ -68,18 +68,18 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     // verify
     if (!ovi)
     {
-        R_ASSERT3(preCache, "Invalid source info:", pName);
+        R_ASSERT3(crashOnError, "Invalid source info:", pName);
         ov_clear(&ovf);
         FS.r_close(wave);
         return false;
     }
     if (ovi->rate != 44100)
     {
-        if (preCache)
+        if (crashOnError)
         {
             Msg("Invalid source rate in wave file %s", pname.c_str());
         }
-        R_ASSERT3(preCache, "Invalid source rate:", pName);
+        R_ASSERT3(crashOnError, "Invalid source rate:", pName);
         ov_clear(&ovf);
         FS.r_close(wave);
         return false;
@@ -139,7 +139,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
         Log("! Missing ogg-comment, file: ", pName);
     if (m_fMaxAIDist < 0.1f && m_fMaxDist < 0.1f)
     {
-        R_ASSERT3(preCache, "Invalid max distance.", pName);
+        R_ASSERT3(crashOnError, "Invalid max distance.", pName);
         ov_clear(&ovf);
         FS.r_close(wave);
         return false;
@@ -149,7 +149,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     return true;
 }
 
-bool CSoundRender_Source::load(pcstr name, bool preCache /*= false*/, bool replaceWithNoSound /*= true*/)
+bool CSoundRender_Source::load(pcstr name, bool crashOnError /*= false*/, bool replaceWithNoSound /*= true*/)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -175,7 +175,7 @@ bool CSoundRender_Source::load(pcstr name, bool preCache /*= false*/, bool repla
     
     if (soundExist || replaceWithNoSound)
     {
-        if (LoadWave(fn, preCache))
+        if (LoadWave(fn, crashOnError))
             SoundRender->cache.cat_create(CAT, dwBytesTotal);
     }
 
