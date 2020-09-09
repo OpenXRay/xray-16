@@ -58,6 +58,8 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     if (!wave && !wave->length())
     {
         R_ASSERT3(preCache, "Can't open wave file:", pname.c_str());
+        ov_clear(&ovf);
+        FS.r_close(wave);
         return false;
     }
     ov_open_callbacks(wave, &ovf, nullptr, 0, ovc);
@@ -67,6 +69,8 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     if (!ovi)
     {
         R_ASSERT3(preCache, "Invalid source info:", pName);
+        ov_clear(&ovf);
+        FS.r_close(wave);
         return false;
     }
     if (ovi->rate != 44100)
@@ -76,6 +80,8 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
             Msg("Invalid source rate in wave file %s", pname.c_str());
         }
         R_ASSERT3(preCache, "Invalid source rate:", pName);
+        ov_clear(&ovf);
+        FS.r_close(wave);
         return false;
     }
 #ifdef DEBUG
@@ -134,6 +140,8 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool preCache)
     if (m_fMaxAIDist < 0.1f && m_fMaxDist < 0.1f)
     {
         R_ASSERT3(preCache, "Invalid max distance.", pName);
+        ov_clear(&ovf);
+        FS.r_close(wave);
         return false;
     }
     ov_clear(&ovf);
@@ -167,8 +175,8 @@ bool CSoundRender_Source::load(pcstr name, bool preCache /*= false*/, bool repla
     
     if (soundExist || replaceWithNoSound)
     {
-        LoadWave(fn, preCache);
-        SoundRender->cache.cat_create(CAT, dwBytesTotal);
+        if (LoadWave(fn, preCache))
+            SoundRender->cache.cat_create(CAT, dwBytesTotal);
     }
 
     return soundExist;
