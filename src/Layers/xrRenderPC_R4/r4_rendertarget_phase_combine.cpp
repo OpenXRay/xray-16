@@ -70,9 +70,9 @@ void CRenderTarget::phase_combine()
     // low/hi RTs
     {
         // Clear to zero
-        RCache.ClearRT(rt_Generic_0, {});
-        RCache.ClearRT(rt_Generic_1, {});
-        u_setrt(rt_Generic_0, rt_Generic_1, 0, rt_MSAADepth->pZRT);
+        RCache.ClearRT(rt_Generic_0_r, {});
+        RCache.ClearRT(rt_Generic_1_r, {});
+        u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, rt_MSAADepth->pZRT);
     }
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(FALSE);
@@ -283,7 +283,7 @@ void CRenderTarget::phase_combine()
     // Forward rendering
     {
         PIX_EVENT(Forward_rendering);
-        u_setrt(rt_Generic_0, 0, 0, rt_MSAADepth->pZRT); // LDR RT
+        u_setrt(rt_Generic_0_r, 0, 0, rt_MSAADepth->pZRT); // LDR RT
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
@@ -304,9 +304,9 @@ void CRenderTarget::phase_combine()
 
     if (RImplementation.o.dx10_msaa)
     {
-        // we need to resolve rt_Generic_1 into rt_Generic_1_r
-        rt_Generic_0->resolve_into(*rt_Generic_0_r);
-        rt_Generic_1->resolve_into(*rt_Generic_1_r);
+        // we need to resolve rt_Generic_1_r into rt_Generic_1
+        rt_Generic_0_r->resolve_into(*rt_Generic_0);
+        rt_Generic_1_r->resolve_into(*rt_Generic_1);
     }
 
     // for msaa we need a resolved color buffer - Holger
@@ -323,8 +323,8 @@ void CRenderTarget::phase_combine()
         if (bDistort)
         {
             PIX_EVENT(render_distort_objects);
-            u_setrt(rt_Generic_1, 0, 0, rt_MSAADepth->pZRT); // Now RT is a distortion mask
-            RCache.ClearRT(rt_Generic_1, color_rgba(127, 127, 0, 127));
+            u_setrt(rt_Generic_1_r, 0, 0, rt_MSAADepth->pZRT); // Now RT is a distortion mask
+            RCache.ClearRT(rt_Generic_1_r, color_rgba(127, 127, 0, 127));
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
@@ -622,7 +622,7 @@ void CRenderTarget::phase_combine_volumetric()
     //	TODO: DX10: Remove half pixel offset here
 
     // u_setrt(rt_Generic_0,0,0,get_base_zb() );			// LDR RT
-    u_setrt(rt_Generic_0, rt_Generic_1, 0, rt_MSAADepth->pZRT);
+    u_setrt(rt_Generic_0_r, rt_Generic_1_r, 0, rt_MSAADepth->pZRT);
 
     //	Sets limits to both render targets
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
