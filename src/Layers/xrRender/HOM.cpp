@@ -334,13 +334,15 @@ BOOL CHOM::visible(const Fbox2& B, float depth) const
     return Raster.test(B.min.x, B.min.y, B.max.x, B.max.y, depth);
 }
 
-BOOL CHOM::visible(vis_data& vis)
+BOOL CHOM::visible(vis_data& vis) const
 {
     if (Device.dwFrame < vis.hom_frame)
         return TRUE; // not at this time :)
     if (!bEnabled)
         return TRUE; // return - everything visible
-    stats.Total.Begin();
+
+    ScopeStatTimer scopeStats(stats.Total, stats.TotalTimerLock);
+
     // Now, the test time comes
     // 0. The object was hidden, and we must prove that each frame	- test		| frame-old, tested-new, hom_res =
     // false;
@@ -362,7 +364,6 @@ BOOL CHOM::visible(vis_data& vis)
     }
     vis.hom_frame = frame_current + delay;
     vis.hom_tested = frame_current;
-    stats.Total.End();
     return result;
 }
 
