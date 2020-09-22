@@ -5,6 +5,8 @@
 #include "xrCommon/xr_vector.h"
 #include "_math.h"
 #include "log.h"
+#include "Threading/ScopeLock.hpp"
+
 #include <chrono>
 
 class CTimer_paused;
@@ -186,6 +188,20 @@ public:
         accum += T.getElapsedTime();
     }
 
+    // Instead of making the entire timer thread-safe,
+    // we can create stat. timers on stack and append their results
+    // to the main timer
+    // Takes external lock because not every timer should be multi-threaded.
+    void AppendResults(Lock& lock, const CStatTimer& other) // thread-safe
+    {
+        if (!g_bEnableStatGather)
+            return;
+        ScopeLock scope(&lock);
+        VERIFY2(fis_zero(other.result), "Appended timer is supposed to not have frame result.");
+        accum += other.accum;
+        count += other.count;
+    }
+
     Duration getElapsedTime() const { return accum; }
 
     u64 GetElapsed_ns() const
@@ -204,5 +220,27 @@ public:
     {
         using namespace std::chrono;
         return duration_cast<duration<float>>(getElapsedTime()).count();
+    }
+};
+
+class ScopeStatTimer : public CStatTimer
+{
+    CStatTimer& baseTimer;
+    Lock& baseTimerLock;
+
+public:
+    ScopeStatTimer(CStatTimer& base, Lock& lock) : baseTimer(base), baseTimerLock(lock)
+    {
+        if (!g_bEnableStatGather)
+            return;
+        Begin();
+    }
+
+    ~ScopeStatTimer()
+    {
+        if (!g_bEnableStatGather)
+            return;
+        End();
+        baseTimer.AppendResults(baseTimerLock, *this);
     }
 };
