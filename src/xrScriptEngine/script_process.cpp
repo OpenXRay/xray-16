@@ -91,5 +91,5 @@ void CScriptProcess::update()
 
 void CScriptProcess::add_script(LPCSTR script_name, bool do_string, bool reload)
 {
-    m_scripts_to_run.push_back(CScriptToRun(script_name, do_string, reload));
+    m_scripts_to_run.emplace_back(script_name, do_string, reload);
 }
