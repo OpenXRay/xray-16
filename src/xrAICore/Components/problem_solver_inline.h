@@ -84,7 +84,7 @@ IC void CProblemSolverAbstract::add_operator(const _operator_id_type& operator_i
     validate_properties(_op->effects());
 #endif
     m_actuality = false;
-    m_operators.insert(I, SOperator(operator_id, _op));
+    m_operators.emplace(I, operator_id, _op);
 }
 
 #ifdef DEBUG
