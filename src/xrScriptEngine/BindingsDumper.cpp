@@ -156,7 +156,7 @@ void BindingsDumper::FormatMemberFunction(const SignatureFormatterParams& params
             stripReturnValue = true;
         }
         else
-            funcName = refFuncName.c_str();
+            funcName = refFuncName;
     }
     bool concat = !(options.IgnoreDerived || options.StripThis || stripReturnValue);
     int signLen = params.Function->format_signature(ls, funcName.c_str(), concat);
