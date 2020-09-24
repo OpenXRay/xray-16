@@ -11,6 +11,7 @@ lua_State* CDbgLuaHelper::L = nullptr;
 CDbgLuaHelper::CDbgLuaHelper(CScriptDebugger* d)
 {
     m_debugger = d;
+    m_pAr = nullptr;
     m_pThis = this;
 }
 
