@@ -73,19 +73,19 @@ ENGINE_API std::string dbg_object_props_dump_string(const IGameObject* obj)
         "net_ID :%d, bActiveCounter :%d, bEnabled :%s, bVisible :%s, bDestroy :%s, \n "
         "net_Local %s, net_Ready :%s, net_SV_Update :%s, crow :%s, bPreDestroy : %s \n "
         "dbg_update_cl: %d, dwFrame_UpdateCL: %d, dwFrame_AsCrow :%d, Device.dwFrame :%d, Device.dwTimeGlobal: %d \n";
-    auto enabled = get_string(bool(!!props.bEnabled)).c_str();
-    auto visible = get_string(bool(!!props.bVisible)).c_str();
-    auto destroy = get_string(bool(!!props.bDestroy)).c_str();
-    auto netLocal = get_string(bool(!!props.net_Local)).c_str();
-    auto netReady = get_string(bool(!!props.net_Ready)).c_str();
-    auto netSvUpdate = get_string(bool(!!props.net_SV_Update)).c_str();
-    auto crow = get_string(bool(!!props.crow)).c_str();
-    auto preDestroy = get_string(bool(!!props.bPreDestroy)).c_str();
+    auto enabled = get_string(bool(!!props.bEnabled));
+    auto visible = get_string(bool(!!props.bVisible));
+    auto destroy = get_string(bool(!!props.bDestroy));
+    auto netLocal = get_string(bool(!!props.net_Local));
+    auto netReady = get_string(bool(!!props.net_Ready));
+    auto netSvUpdate = get_string(bool(!!props.net_SV_Update));
+    auto crow = get_string(bool(!!props.crow));
+    auto preDestroy = get_string(bool(!!props.bPreDestroy));
     auto updateFrameDbg = obj->GetDbgUpdateFrame();
     auto updateFrame = obj->GetUpdateFrame();
     auto updateFrameCrow = obj->GetCrowUpdateFrame();
-    return make_string(format, props.net_ID, props.bActiveCounter, enabled, visible, destroy, netLocal, netReady,
-        netSvUpdate, crow, preDestroy, updateFrameDbg, updateFrame, updateFrameCrow, Device.dwFrame,
+    return make_string(format, props.net_ID, props.bActiveCounter, enabled.c_str(), visible.c_str(), destroy.c_str(), netLocal.c_str(), netReady.c_str(),
+        netSvUpdate.c_str(), crow.c_str(), preDestroy.c_str(), updateFrameDbg, updateFrame, updateFrameCrow, Device.dwFrame,
         Device.dwTimeGlobal);
 }
 ENGINE_API std::string dbg_object_full_dump_string(const IGameObject* obj)
