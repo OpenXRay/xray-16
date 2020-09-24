@@ -127,7 +127,7 @@ void CInput::DisplayDevicesList()
             size_t it = 0;
             for (auto& token : JoysticksToken)
             {
-                if (it <= ControllersToken.size())
+                if (it < ControllersToken.size())
                 {
                     if (token.id == ControllersToken[it].id)
                     {

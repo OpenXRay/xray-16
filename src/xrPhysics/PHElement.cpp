@@ -1182,7 +1182,6 @@ void CPHElement::add_Mass(
     }
     case SBoneShape::stSphere:
     {
-        shape.sphere;
         dMassSetSphere(&m, 1.f, shape.sphere.R);
         dMassAdjust(&m, mass);
         dMassTranslate(
