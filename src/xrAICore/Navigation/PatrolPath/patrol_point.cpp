@@ -22,6 +22,7 @@
 CPatrolPoint::CPatrolPoint(const CPatrolPath* path)
 {
 #ifdef DEBUG
+    m_flags = 0;
     m_level_vertex_id = 0;
     m_game_vertex_id = 0;
     m_initialized = false;
