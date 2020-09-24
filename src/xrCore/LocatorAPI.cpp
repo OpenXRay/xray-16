@@ -772,7 +772,7 @@ bool CLocatorAPI::Recurse(pcstr path)
         rec_files.erase(rec_files.begin() + oldSize, rec_files.end());
     }
     // insert self
-    if (path && path[0] != 0)
+    if (path[0] != '\0')
         Register(path, VFS_STANDARD_FILE, 0, 0, 0, 0, 0);
 
     return true;
