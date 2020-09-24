@@ -39,6 +39,8 @@ public:
         Function = function;
     }
 
+    ErrorLocation(const ErrorLocation& rhs) : ErrorLocation(rhs.File, rhs.Line, rhs.Function) { }
+
     ErrorLocation& operator=(const ErrorLocation& rhs)
     {
         File = rhs.File;
