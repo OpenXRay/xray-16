@@ -371,14 +371,14 @@ public:
     IC void seek(size_t ptr)
     {
         Pos = ptr;
-        VERIFY((Pos <= Size) && (Pos >= 0));
+        VERIFY(Pos <= Size);
     }
     IC size_t length() const { return Size; }
     IC void* pointer() const { return &(data[Pos]); }
     IC void advance(size_t cnt)
     {
         Pos += cnt;
-        VERIFY((Pos <= Size) && (Pos >= 0));
+        VERIFY(Pos <= Size);
     }
 
 public:
