@@ -388,36 +388,37 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         expr = "<no expression>";
     bool extendedDesc = desc && strchr(desc, '\n');
     pcstr prefix = "[error] ";
-    buffer += xr_sprintf(buffer, bufferSize, "\nFATAL ERROR\n\n");
-    buffer += xr_sprintf(buffer, bufferSize, "%sExpression    : %s\n", prefix, expr);
-    buffer += xr_sprintf(buffer, bufferSize, "%sFunction      : %s\n", prefix, loc.Function);
-    buffer += xr_sprintf(buffer, bufferSize, "%sFile          : %s\n", prefix, loc.File);
-    buffer += xr_sprintf(buffer, bufferSize, "%sLine          : %d\n", prefix, loc.Line);
+    const char* oneAboveBuffer = assertionInfo + bufferSize;
+    buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "\nFATAL ERROR\n\n");
+    buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sExpression    : %s\n", prefix, expr);
+    buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sFunction      : %s\n", prefix, loc.Function);
+    buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sFile          : %s\n", prefix, loc.File);
+    buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sLine          : %d\n", prefix, loc.Line);
     if (extendedDesc)
     {
-        buffer += xr_sprintf(buffer, bufferSize, "\n%s\n", desc);
+        buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "\n%s\n", desc);
         if (arg1)
         {
-            buffer += xr_sprintf(buffer, bufferSize, "%s\n", arg1);
+            buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", arg1);
             if (arg2)
-                buffer += xr_sprintf(buffer, bufferSize, "%s\n", arg2);
+                buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", arg2);
         }
     }
     else
     {
-        buffer += xr_sprintf(buffer, bufferSize, "%sDescription   : %s\n", prefix, desc);
+        buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sDescription   : %s\n", prefix, desc);
         if (arg1)
         {
             if (arg2)
             {
-                buffer += xr_sprintf(buffer, bufferSize, "%sArgument 0    : %s\n", prefix, arg1);
-                buffer += xr_sprintf(buffer, bufferSize, "%sArgument 1    : %s\n", prefix, arg2);
+                buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sArgument 0    : %s\n", prefix, arg1);
+                buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sArgument 1    : %s\n", prefix, arg2);
             }
             else
-                buffer += xr_sprintf(buffer, bufferSize, "%sArguments     : %s\n", prefix, arg1);
+                buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%sArguments     : %s\n", prefix, arg1);
         }
     }
-    buffer += xr_sprintf(buffer, bufferSize, "\n");
+    buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "\n");
     
     Log(assertionInfo);
     FlushLog();
@@ -429,7 +430,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
 #endif
     Log("stack trace:\n");
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    buffer += xr_sprintf(buffer, bufferSize, "stack trace:\n\n");
+    buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "stack trace:\n\n");
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
 #if defined(XR_PLATFORM_WINDOWS)
     xr_vector<xr_string> stackTrace = BuildStackTrace();
@@ -437,7 +438,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     {
         Log(stackTrace[i].c_str());
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        buffer += xr_sprintf(buffer, bufferSize, "%s\n", stackTrace[i].c_str());
+        buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
 #elif defined(XR_PLATFORM_LINUX)
