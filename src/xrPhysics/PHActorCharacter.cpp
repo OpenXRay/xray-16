@@ -296,7 +296,7 @@ static void BigVelSeparate(dContact* c, bool& do_collide)
 
 void CPHActorCharacter::InitContact(dContact* c, bool& do_collide, u16 material_idx_1, u16 material_idx_2)
 {
-    bool b1;
+    bool b1 = false;
     SFindPredicate fp(c, &b1);
     RESTRICTOR_I r = std::find_if(begin(m_restrictors), end(m_restrictors), fp);
     bool b_restrictor = (r != end(m_restrictors));
