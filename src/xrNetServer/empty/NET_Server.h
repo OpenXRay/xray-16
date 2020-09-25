@@ -67,7 +67,7 @@ public:
     u32 dwTime_LastUpdate;
 
     ip_address m_cAddress;
-    DWORD m_dwPort;
+    u32 m_dwPort;
     u32 process_id;
 
     IPureServer* server;
@@ -220,7 +220,7 @@ public:
     bool HasBandwidth(IClient* C);
 
     int GetPort() const { return psNET_Port; }
-    bool GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort = nullptr);
+    bool GetClientAddress(ClientID ID, ip_address& Address, u32* pPort = nullptr);
     //bool DisconnectClient(IClient* C);
     virtual bool DisconnectClient(IClient* C, pcstr Reason);
     virtual bool DisconnectAddress(const ip_address& Address, pcstr reason);

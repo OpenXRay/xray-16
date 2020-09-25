@@ -37,7 +37,7 @@ public:
     CUIFrameLine();
 
     void set_parent_wnd_size(Fvector2 const& size) { m_parent_wnd_size = size; }
-    void InitFrameLine(Fvector2 pos, float size, bool horizontal, DWORD align);
+    void InitFrameLine(Fvector2 pos, float size, bool horizontal, u32 align);
     void InitTexture(LPCSTR texture, LPCSTR sh_name);
     void SetColor(u32 cl);
     IC void SetPos(Fvector2 pos)

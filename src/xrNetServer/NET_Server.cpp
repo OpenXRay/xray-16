@@ -220,7 +220,7 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
 
     id.set(param);
     packet.construct(data, data_size);
-    // DWORD currentThreadId = Threading::GetCurrThreadId();
+    // u32 currentThreadId = Threading::GetCurrThreadId();
     // Msg("-S- Entering to csMessages from _Receive [%d]", currentThreadId);
     csMessage.Enter();
     // LogStackTrace(
@@ -421,7 +421,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
 
         CHK_DX(net_Address_device->SetSP(bSimulator ? &CLSID_NETWORKSIMULATOR_DP8SP_TCPIP : &CLSID_DP8SP_TCPIP));
 
-        DWORD dwTraversalMode = DPNA_TRAVERSALMODE_NONE;
+        u32 dwTraversalMode = DPNA_TRAVERSALMODE_NONE;
         CHK_DX(net_Address_device->AddComponent(DPNA_KEY_TRAVERSALMODE,
             &dwTraversalMode, sizeof(dwTraversalMode), DPNA_DATATYPE_DWORD));
 
@@ -895,7 +895,7 @@ bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_addre
 
     if (pPort != nullptr)
     {
-        DWORD dwPort = 0;
+        u32 dwPort = 0;
         DWORD dwPortSize = sizeof(dwPort);
         DWORD dwPortDataType = DPNA_DATATYPE_DWORD;
         CHK_DX(pClientAddress->GetComponentByName(DPNA_KEY_PORT, &dwPort, &dwPortSize, &dwPortDataType));

@@ -9,7 +9,7 @@ CUIFrameLine::CUIFrameLine() : uFlags(0), iSize(0), bHorizontalOrientation(true)
     m_parent_wnd_size.set(0.0f, 0.0f);
 }
 
-void CUIFrameLine::InitFrameLine(Fvector2 pos, float size, bool horizontal, DWORD align)
+void CUIFrameLine::InitFrameLine(Fvector2 pos, float size, bool horizontal, u32 align)
 {
     SetPos(pos);
     SetSize(size);

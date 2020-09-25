@@ -78,7 +78,7 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
         return false;
     }
 
-    DWORD KeyValueSize = 0;
+    u32 KeyValueSize = 0;
     switch (rKeyType)
     {
     case REG_DWORD: { KeyValueSize = 4;
@@ -117,13 +117,13 @@ void WriteRegistry_StrValue(LPCSTR rKeyName, const char* value)
     WriteRegistryValue(rKeyName, REG_SZ, value);
 #endif
 }
-void ReadRegistry_DWValue(LPCSTR rKeyName, DWORD& value)
+void ReadRegistry_DWValue(LPCSTR rKeyName, u32& value)
 {
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
     ReadRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
-void WriteRegistry_DWValue(LPCSTR rKeyName, const DWORD& value) 
+void WriteRegistry_DWValue(LPCSTR rKeyName, const u32& value) 
 {
 #ifndef XR_PLATFORM_LINUX // FIXME!!
     WriteRegistryValue(rKeyName, REG_DWORD, &value);

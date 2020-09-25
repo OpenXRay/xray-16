@@ -168,7 +168,7 @@ void screenshot_manager::shedule_Update(u32 dt)
         else
         {
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
-            DWORD thread_result = WaitForSingleObject(m_make_done_event, 0);
+            u32 thread_result = WaitForSingleObject(m_make_done_event, 0);
             R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
             if (thread_result == WAIT_OBJECT_0)
             {
@@ -283,7 +283,7 @@ void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
 {
     screenshot_manager* this_ptr = static_cast<screenshot_manager*>(arg_ptr);
 #ifndef XR_PLATFORM_LINUX // FIXME!!
-    DWORD wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
+    u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
         if (!this_ptr->is_active())

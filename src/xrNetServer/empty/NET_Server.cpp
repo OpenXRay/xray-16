@@ -478,7 +478,7 @@ bool IPureServer::HasBandwidth(IClient* C)
     HRESULT hr;
     if (psNET_ServerUpdate != 0 && (dwTime - C->dwTime_LastUpdate) > dwInterval) {
         // check queue for "empty" state
-        DWORD dwPending;
+        u32 dwPending;
         if (FAILED(hr))
             return false;
 
@@ -568,7 +568,7 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
     return true;
 }
 
-bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort)
+bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, u32* pPort)
 {
     return true;
 }

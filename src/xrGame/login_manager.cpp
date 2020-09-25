@@ -382,7 +382,7 @@ char const* login_manager::get_password_from_registry()
 
 void login_manager::save_remember_me_to_registry(bool remember)
 {
-    DWORD tmp_value = remember ? 1 : 0;
+    u32 tmp_value = remember ? 1 : 0;
     WriteRegistry_DWValue(REGISTRY_VALUE_REMEMBER_PROFILE, tmp_value);
 }
 
@@ -402,7 +402,7 @@ char const* login_manager::get_nick_from_registry()
 
 bool login_manager::get_remember_me_from_registry()
 {
-    DWORD tmp_value = 0;
+    u32 tmp_value = 0;
     ReadRegistry_DWValue(REGISTRY_VALUE_REMEMBER_PROFILE, tmp_value);
     return tmp_value != 0;
 }

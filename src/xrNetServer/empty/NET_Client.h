@@ -137,7 +137,7 @@ public:
     IClientStatistic& GetStatistic() { return net_Statistic; }
     void UpdateStatistic();
     ClientID const& GetClientID() const { return net_ClientID; }
-    bool GetServerAddress(ip_address& pAddress, DWORD* pPort);
+    bool GetServerAddress(ip_address& pAddress, u32* pPort);
 
     // time management
     u32 timeServer() const
