@@ -691,7 +691,7 @@ mat4& perspective(mat4& M, const nv_scalar fovy, const nv_scalar aspect, const n
 
 const quat quat::Identity(0, 0, 0, 1);
 
-quat::quat(nv_scalar x, nv_scalar y, nv_scalar z, nv_scalar w) : x(x), y(y), z(z), w(w) {}
+quat::quat(nv_scalar x_, nv_scalar y_, nv_scalar z_, nv_scalar w_) : x(x_), y(y_), z(z_), w(w_) {}
 quat::quat(const quat& quat)
 {
     x = quat.x;
