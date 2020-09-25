@@ -46,7 +46,7 @@ ETOOLS_API int __stdcall ogg_enc(const char* in_fn, const char* out_fn, float qu
     out = fopen(out_fn, "wb");
     if (out == NULL)
     {
-        fclose(out);
+        fclose(in);
         return 0;
     }
 
