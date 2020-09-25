@@ -14,7 +14,7 @@ LPCSTR make_time(string64& buf, float fsec)
 {
     // char		buf[64];
 
-    u32 sec = iFloor(fsec);
+    int sec = iFloor(fsec);
     if (sec < 0)
         sec = 0;
     xr_sprintf(buf, "%2.0d:%2.0d:%2.0d", sec / 3600, (sec % 3600) / 60, sec % 60);
