@@ -126,7 +126,7 @@ inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
 {
     BOOL fResult;
     HANDLE hFile;
-    DWORD cbWritten;
+    u32 cbWritten;
 #if defined(XR_PLATFORM_WINDOWS)
     hFile = CreateFile(slotName, GENERIC_WRITE,
         FILE_SHARE_READ, // required to write to a mailslot
@@ -144,7 +144,7 @@ inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
 
 inline BOOL CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
 {
-    DWORD cbMessage, cMessage, cbRead;
+    u32 cbMessage, cMessage, cbRead;
     BOOL fResult;
 #if defined(XR_PLATFORM_WINDOWS)
     HANDLE hEvent;
@@ -157,10 +157,10 @@ inline BOOL CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
     ov.OffsetHigh = 0;
     ov.hEvent = hEvent;
     fResult = GetMailslotInfo(hSlot, // mailslot handle
-        (LPDWORD)NULL, // no maximum message size
+        (u32*)NULL, // no maximum message size
         &cbMessage, // size of next message
         &cMessage, // number of messages
-        (LPDWORD)NULL); // no read time-out
+        (u32*)NULL); // no read time-out
     R_ASSERT(fResult);
     if (!fResult || cbMessage == MAILSLOT_NO_MESSAGE)
     {
