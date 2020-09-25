@@ -163,6 +163,9 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
         GLenum type = VertexTypeList[desc.Type];
         GLboolean normalized = VertexNormalizedList[desc.Type];
 
+        if (location < 0)
+            continue; // Unsupported
+
         location += desc.UsageIndex;
         CHK_GL(glVertexAttribFormat(location, size, type, normalized, desc.Offset));
         CHK_GL(glVertexAttribBinding(location, desc.Stream));
