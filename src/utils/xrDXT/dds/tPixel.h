@@ -639,7 +639,7 @@ typedef fpPixel* fp_i;
 
 inline int operator==(const fpPixel& v1, const fpPixel& v2)
 {
-    return v1.a == v2.a && v1.r == v2.r && v1.b == v2.g && v1.g == v2.b;
+    return v1.a == v2.a && v1.r == v2.r && v1.b == v2.b && v1.g == v2.g;
 }
 
 inline fpPixel& fpPixel::operator=(const fpPixel& v)
