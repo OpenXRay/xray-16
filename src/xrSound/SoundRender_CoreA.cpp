@@ -65,7 +65,7 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
                          &ep.flAirAbsorptionHF, sizeof(float)))
         return false;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(u32)))
         return false;
     return true;
 }
