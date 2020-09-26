@@ -30,7 +30,7 @@ Comments:
 #endif // defined(MAKEFOURCC)
 
 // Defined in this module:
-WORD GetNumberOfBits(u32 dwMask);
+u16 GetNumberOfBits(u32 dwMask);
 
 Image_DXTC::Image_DXTC()
 {
@@ -976,9 +976,9 @@ DXTColBlock* pBlock, Color8888* col_0, Color8888* col_1, Color8888* col_2, Color
 // Desc: Returns the number of bits set in a DWORD mask
 //	from microsoft mssdk d3dim sample "Compress"
 //-----------------------------------------------------------------------------
-WORD GetNumberOfBits(u32 dwMask)
+u16 GetNumberOfBits(u32 dwMask)
 {
-    WORD wBits = 0;
+    u16 wBits = 0;
     while (dwMask)
     {
         dwMask &= dwMask - 1;

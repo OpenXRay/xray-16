@@ -259,12 +259,12 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         {
             if (pShaderBuf)
             {
-                _hr = HW.pDevice->CreateVertexShader((u32*)pShaderBuf->GetBufferPointer(), &_vs->vs);
+                _hr = HW.pDevice->CreateVertexShader((DWORD*)pShaderBuf->GetBufferPointer(), &_vs->vs);
                 if (SUCCEEDED(_hr))
                 {
                     LPCVOID data = NULL;
                     _hr = D3DXFindShaderComment(
-                        (u32*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
+                        (DWORD*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
                     if (SUCCEEDED(_hr) && data)
                     {
                         pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
@@ -387,12 +387,12 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         {
             if (pShaderBuf)
             {
-                _hr = HW.pDevice->CreatePixelShader((u32*)pShaderBuf->GetBufferPointer(), &_ps->ps);
+                _hr = HW.pDevice->CreatePixelShader((DWORD*)pShaderBuf->GetBufferPointer(), &_ps->ps);
                 if (SUCCEEDED(_hr))
                 {
                     LPCVOID data = NULL;
                     _hr = D3DXFindShaderComment(
-                        (u32*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
+                        (DWORD*)pShaderBuf->GetBufferPointer(), MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
                     if (SUCCEEDED(_hr) && data)
                     {
                         pConstants = LPD3DXSHADER_CONSTANTTABLE(data);

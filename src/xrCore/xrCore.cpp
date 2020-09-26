@@ -431,9 +431,9 @@ void xrCore::CalculateBuildId()
 
 #if defined(XR_PLATFORM_WINDOWS)
 #ifdef _EDITOR
-BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, u32 ul_reason_for_call, LPVOID lpvReserved)
+BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #else
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, u32 ul_reason_for_call, LPVOID lpvReserved)
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #endif
 {
     switch (ul_reason_for_call)

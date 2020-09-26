@@ -117,13 +117,13 @@ void WriteRegistry_StrValue(LPCSTR rKeyName, const char* value)
     WriteRegistryValue(rKeyName, REG_SZ, value);
 #endif
 }
-void ReadRegistry_DWValue(LPCSTR rKeyName, u32& value)
+void ReadRegistry_DWValue(LPCSTR rKeyName, DWORD& value)
 {
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
     ReadRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
-void WriteRegistry_DWValue(LPCSTR rKeyName, const u32& value) 
+void WriteRegistry_DWValue(LPCSTR rKeyName, const DWORD& value) 
 {
 #ifndef XR_PLATFORM_LINUX // FIXME!!
     WriteRegistryValue(rKeyName, REG_DWORD, &value);

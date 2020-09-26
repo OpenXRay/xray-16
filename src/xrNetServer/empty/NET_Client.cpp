@@ -175,7 +175,7 @@ XRNETSERVER_API bool psNET_direct_connect = false;
  ****************************************************************************/
 
 static HRESULT WINAPI Handler(PVOID pvUserContext,
-    u32 dwMessageType,
+    DWORD dwMessageType,
     PVOID pMessage)
 {
     IPureClient* C = (IPureClient*)pvUserContext;
