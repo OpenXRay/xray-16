@@ -496,9 +496,9 @@ void CGhttpmfcDlg::OnIeSettings()
 {
 	HKEY key;
 	LONG result;
-	u32 type;
-	u32 data;
-	u32 len;
+	DWORD type;
+	DWORD data;
+	DWORD len;
 	CString str;
 	int nStart;
 	int nEnd;
@@ -512,7 +512,7 @@ void CGhttpmfcDlg::OnIeSettings()
 	{
 		// Is the proxy enabled?
 		////////////////////////
-		len = sizeof(u32);
+		len = sizeof(DWORD);
 		data = 0;
 		result = RegQueryValueEx(key, REGSTR_VAL_PROXYENABLE, 0, &type, (LPBYTE)&data, &len);
 		if(SUCCEEDED(result) && data)

@@ -66,9 +66,9 @@ RETURNS         :
     TRUE  - Mini dump functions are there.
 ----------------------------------------------------------------------*/
 WriteMiniDumpResult __stdcall WriteMiniDumpA(
-    MINIDUMP_TYPE eType, char* szFileName, u32 dwThread, EXCEPTION_POINTERS* pExceptInfo);
+    MINIDUMP_TYPE eType, char* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo);
 WriteMiniDumpResult __stdcall WriteMiniDumpW(
-    MINIDUMP_TYPE eType, wchar_t* szFileName, u32 dwThread, EXCEPTION_POINTERS* pExceptInfo);
+    MINIDUMP_TYPE eType, wchar_t* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo);
 
 #ifdef UNICODE
 #define WriteMiniDump WriteMiniDumpW

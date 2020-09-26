@@ -125,9 +125,9 @@ typedef struct ptw32_thread_t_ ptw32_thread_t;
 struct ptw32_thread_t_
 {
 #ifdef _UWIN
-  u32 dummy[5];
+  DWORD dummy[5];
 #endif
-  u32 thread;
+  DWORD thread;
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
   ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
@@ -265,7 +265,7 @@ struct pthread_barrierattr_t_
 
 struct pthread_key_t_
 {
-  u32 key;
+  DWORD key;
   void (*destructor) (void *);
   pthread_mutex_t keyLock;
   void *threads;
@@ -472,7 +472,7 @@ struct ThreadKeyAssoc
 #define SE_ERROR                0x03
 
 #define MAKE_SOFTWARE_EXCEPTION( _severity, _facility, _exception ) \
-( (u32) ( ( (_severity) << 30 ) |     /* Severity code        */ \
+( (DWORD) ( ( (_severity) << 30 ) |     /* Severity code        */ \
             ( 1 << 29 ) |               /* MS=0, User=1         */ \
             ( 0 << 28 ) |               /* Reserved             */ \
             ( (_facility) << 16 ) |     /* Facility Code        */ \
@@ -516,7 +516,7 @@ extern PTW32_INTERLOCKED_LONG (WINAPI *
   (PTW32_INTERLOCKED_LPLONG, PTW32_INTERLOCKED_LONG, PTW32_INTERLOCKED_LONG);
 
 /* Declared in pthread_cancel.c */
-extern u32 (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, u32);
+extern DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD);
 
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
 #define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *) 1)
@@ -576,9 +576,9 @@ extern "C"
     ptw32_InterlockedExchange (LPLONG location,
 			       LONG value);
 
-  u32
+  DWORD
     ptw32_RegisterCancelation (PAPCFUNC callback,
-			       HANDLE threadH, u32 callback_arg);
+			       HANDLE threadH, DWORD callback_arg);
 
   int ptw32_processInitialize (void);
 
@@ -615,7 +615,7 @@ extern "C"
 
   int ptw32_semwait (sem_t * sem);
 
-  u32 ptw32_relmillisecs (const struct timespec * abstime);
+  DWORD ptw32_relmillisecs (const struct timespec * abstime);
 
   void ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node);
 
@@ -633,7 +633,7 @@ extern "C"
 #endif
 
 /* Declared in private.c */
-  void ptw32_throw (u32 exception);
+  void ptw32_throw (DWORD exception);
 
 #ifdef __cplusplus
 }

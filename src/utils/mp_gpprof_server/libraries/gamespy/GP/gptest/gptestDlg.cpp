@@ -434,7 +434,7 @@ void RecvBuddyStatus(GPConnection * connection, void * arg_, void * param)
 
 	count = dlg->m_buddies.GetCount();
 	for(i = 0 ; i < count ; i++)
-		if(dlg->m_buddies.GetItemData(i) == (u32)arg->profile)
+		if(dlg->m_buddies.GetItemData(i) == (DWORD)arg->profile)
 			dlg->m_buddies.DeleteString(i);
 
 	CString text;
@@ -446,7 +446,7 @@ void RecvBuddyStatus(GPConnection * connection, void * arg_, void * param)
 			break;
 	}
 	index = dlg->m_buddies.InsertString(i, string);
-	dlg->m_buddies.SetItemData(index, (u32)arg->profile);
+	dlg->m_buddies.SetItemData(index, (DWORD)arg->profile);
 	GSI_UNUSED(param);
 }
 
@@ -729,7 +729,7 @@ void ProfileSearchResponse(GPConnection * connection, void * arg_, void * param)
 			// Add it to the list.
 			//////////////////////
 			dlg->m_results.InsertString(i, arg->matches[i].nick);
-			dlg->m_results.SetItemData(i, (u32)arg->matches[i].profile);
+			dlg->m_results.SetItemData(i, (DWORD)arg->matches[i].profile);
 			// Save the match.
 			//////////////////
 			memcpy(&searchMatches[i], &arg->matches[i], sizeof(GPProfileSearchMatch));
@@ -1014,7 +1014,7 @@ LPCSTR TypeToString(GPEnum type)
 void TransferCallback(GPConnection * connection, void * arg_, void * param)
 {
 	GPTransferCallbackArg * arg = (GPTransferCallbackArg *)arg_;
-	static u32 transferStart;
+	static DWORD transferStart;
 	char * name;
 	char * path;
 	GPEnum side;
@@ -1988,7 +1988,7 @@ void CGptestDlg::OnGetBlocked()
         CString string = intValue;
 
         int index = m_blocklist.InsertString(i, string);
-        m_blocklist.SetItemData(index, (u32)profile);
+        m_blocklist.SetItemData(index, (DWORD)profile);
     }
 }
 
@@ -2028,7 +2028,7 @@ void CGptestDlg::OnAddBlock()
         int count = m_buddies.GetCount();
         int i;
         for(i = 0 ; i < count ; i++)
-            if(m_buddies.GetItemData(i) == (u32)profile)
+            if(m_buddies.GetItemData(i) == (DWORD)profile)
                 m_buddies.DeleteString(i);
 
         CHECK(gpAddToBlockedList(&m_connection, profile));

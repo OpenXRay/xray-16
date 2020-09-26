@@ -173,7 +173,7 @@ unsigned int query_processor_info(processor_info* pinfo)
 #endif // XR_PLATFORM_WINDOWS
 
 #ifdef XR_PLATFORM_WINDOWS
-    u32 returnedLength = 0;
+    DWORD returnedLength = 0;
     u32 byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
 

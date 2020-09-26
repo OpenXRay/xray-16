@@ -1314,7 +1314,7 @@ void CGt2testDlg::OnAddressTo()
 	UpdateData();
 
 	// get the IP and port
-	u32 IP;
+	DWORD IP;
 	unsigned int port;
 	if(m_addressIP.GetAddress(IP) != 4)
 	{
@@ -1344,7 +1344,7 @@ void CGt2testDlg::OnAddressFrom()
 	}
 
 	// set the ip and port
-	m_addressIP.SetAddress((u32)gt2NetworkToHostInt(IP));
+	m_addressIP.SetAddress((DWORD)gt2NetworkToHostInt(IP));
 	m_addressPort.Format("%d", port);
 
 	UpdateData(FALSE);
@@ -1380,7 +1380,7 @@ void CGt2testDlg::OnGetIpHostInfo()
 	UpdateData();
 
 	// get the ip
-	u32 IP;
+	DWORD IP;
 	if(m_addressIP.GetAddress(IP) != 4)
 	{
 		MessageBox("No IP address");

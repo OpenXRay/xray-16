@@ -296,9 +296,9 @@ enum {
 # define PTW32__HANDLE_DEF
 # define HANDLE void *
 #endif
-#ifndef u32
+#ifndef DWORD
 # define PTW32__DWORD_DEF
-# define u32 unsigned long
+# define DWORD unsigned long
 #endif
 #endif
 
@@ -1203,7 +1203,7 @@ PTW32_DLLPORT HANDLE PTW32_CDECL pthread_getw32threadhandle_np(pthread_t thread)
  */
 PTW32_DLLPORT int PTW32_CDECL pthreadCancelableWait (HANDLE waitHandle);
 PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
-                                        u32 timeout);
+                                        DWORD timeout);
 
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
@@ -1282,7 +1282,7 @@ class ptw32_exception_exit   : public ptw32_exception {};
 /*
  * Get internal SEH tag
  */
-PTW32_DLLPORT u32 PTW32_CDECL ptw32_get_exception_services_code(void);
+PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
@@ -1357,7 +1357,7 @@ PTW32_DLLPORT u32 PTW32_CDECL ptw32_get_exception_services_code(void);
 # undef HANDLE
 #endif
 #ifdef PTW32__DWORD_DEF
-# undef u32
+# undef DWORD
 #endif
 
 #undef PTW32_LEVEL
