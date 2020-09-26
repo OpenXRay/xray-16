@@ -122,8 +122,8 @@ void CHWCaps::Update()
     geometry.bSoftware = (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) == 0;
     geometry.bPointSprites = FALSE;
     geometry.bNPatches = (caps.DevCaps & D3DDEVCAPS_NPATCHES) != 0;
-    DWORD cnt = (caps.MaxVertexShaderConst);
-    clamp<DWORD>(cnt, 0, 256);
+    u32 cnt = (caps.MaxVertexShaderConst);
+    clamp<u32>(cnt, 0, 256);
     geometry.dwRegisters = cnt;
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(caps.MaxUserClipPlanes, 15);

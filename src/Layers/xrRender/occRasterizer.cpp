@@ -13,8 +13,8 @@ occRasterizer Raster;
 
 void __stdcall fillDW_8x(void* _p, u32 size, u32 value)
 {
-    LPDWORD ptr = LPDWORD(_p);
-    LPDWORD end = ptr + size;
+    u32* ptr = (u32*)(_p);
+    u32* end = ptr + size;
     for (; ptr != end; ptr += 2)
     {
         ptr[0] = value;

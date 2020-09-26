@@ -26,8 +26,8 @@ private:
         Fvector UVclamp_min;
         Fvector UVclamp_max;
         Fbox BB;
-        DWORD dwFrame;
-        DWORD dwTimeValid;
+        u32 dwFrame;
+        u32 dwTimeValid;
     };
 
 private:

@@ -130,7 +130,7 @@ const GLuint VertexUsageList[] =
     ~0u, // D3DDECLUSAGE_SAMPLE
 };
 
-u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
     GLsizei size = 0;
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)

@@ -50,8 +50,8 @@ bool CRenderTarget::u_DBT_enable(float zMin, float zMax)
 
     // enable cheat
     HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X, MAKEFOURCC('N', 'V', 'D', 'B'));
-    HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z, *(DWORD*)&zMin);
-    HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W, *(DWORD*)&zMax);
+    HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_Z, *(u32*)&zMin);
+    HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_W, *(u32*)&zMax);
 
     return TRUE;
 }

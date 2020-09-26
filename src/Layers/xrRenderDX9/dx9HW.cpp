@@ -310,7 +310,7 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
     if (id_vendor == 0x8086) // Intel
     {
         constexpr auto GMA_SL_SIZE = 43;
-        constexpr DWORD IntelGMA_SoftList[GMA_SL_SIZE] =
+        constexpr u32 IntelGMA_SoftList[GMA_SL_SIZE] =
         {
             0x2782, 0x2582, 0x2792, 0x2592, 0x2772, 0x2776, 0x27A2, 0x27A6, 0x27AE,
             0x2982, 0x2983, 0x2992, 0x2993, 0x29A2, 0x29A3, 0x2972, 0x2973, 0x2A02,
@@ -376,7 +376,7 @@ u32 CHW::selectGPU()
     return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 }
 
-BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
+BOOL CHW::support(D3DFORMAT fmt, u32 type, u32 usage)
 {
     auto result = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
     if (FAILED(result))

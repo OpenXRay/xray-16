@@ -323,7 +323,7 @@ public:
         SSManager.SetMipLODBias(*value);
 #else // USE_DX10
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)value)));
+            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
 #endif // USE_DX10
     }
 

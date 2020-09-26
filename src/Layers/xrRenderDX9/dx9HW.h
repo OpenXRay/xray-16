@@ -23,7 +23,7 @@ public:
 
     void Reset();
 
-    BOOL support(D3DFORMAT fmt, DWORD type, DWORD usage);
+    BOOL support(D3DFORMAT fmt, u32 type, u32 usage);
 
     std::pair<u32, u32> GetSurfaceSize() const;
     void Present();
