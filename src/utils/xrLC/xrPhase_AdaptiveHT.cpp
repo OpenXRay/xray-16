@@ -143,7 +143,6 @@ public:
         for (u32 vit = _from; vit < _to; vit++)
         {
             base_color_c vC;
-            R_ASSERT(vit != u32(-1));
             vecVertex& verts = lc_global_data()->g_vertices();
             R_ASSERT(vit < verts.size());
             Vertex* V = verts[vit];
