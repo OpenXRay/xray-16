@@ -384,7 +384,7 @@ CGenStreamOnFile::~CGenStreamOnFile()
 {
     // fclose(file);
 }
-u32 __stdcall CGenStreamOnFile::GetLength()
+DWORD __stdcall CGenStreamOnFile::GetLength()
 {
     return file->length();
     // return _filelength( _fileno( file ) );
