@@ -13,8 +13,8 @@ static char const* QueryPatchVersionString(char* dest, u32 dest_size)
 
     // string128 SourceID;
     string256 LangID;
-    DWORD KeyValueSize = sizeof(LangID);
-    DWORD KeyValueType = REG_SZ;
+    u32 KeyValueSize = sizeof(LangID);
+    u32 KeyValueType = REG_SZ;
 
     // RegQueryValueEx(KeyCDKey, REGISTRY_VALUE_LANGUAGE, NULL, &KeyValueType, (LPBYTE)LangID, &KeyValueSize);
     RegQueryValueEx(KeyCDKey, REGISTRY_VALUE_SKU, NULL, &KeyValueType, (LPBYTE)LangID, &KeyValueSize);
