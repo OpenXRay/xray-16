@@ -322,7 +322,7 @@ public:
         return true;
     }
 
-    void _prim(DWORD prim)
+    void _prim(u32 prim)
     {
         float u, v, r;
         if (!_tri(tris[prim].verts, u, v, r))

@@ -16,10 +16,10 @@
 extern "C"
 {
 // https://docs.nvidia.com/gameworks/content/technologies/desktop/optimus.htm
-XR_EXPORT DWORD NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
+XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 
 // https://gpuopen.com/amdpowerxpressrequesthighperformance/
-XR_EXPORT DWORD AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
+XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
 int entry_point(pcstr commandLine)
