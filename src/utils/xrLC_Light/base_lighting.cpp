@@ -7,7 +7,7 @@ void base_lighting::select(xr_vector<R_Light>& dest, xr_vector<R_Light>& src, Fv
     Fsphere Sphere;
     Sphere.set(P, R);
     dest.clear();
-    for (auto &&L : src)
+    for (const R_Light& L : src)
     {
         if (L.type == LT_POINT)
         {
