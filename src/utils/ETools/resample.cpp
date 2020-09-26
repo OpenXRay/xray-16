@@ -240,9 +240,8 @@ static int push(res_state const* const state, SAMPLE* pool, int* const poolfill,
 
     SAMPLE *const destbase = dest, *poolhead = pool + *poolfill, *poolend = pool + state->taps, *newpool = pool;
     SAMPLE const *refill, *base, *endpoint;
-    int lencheck;
 
-    lencheck = res_push_check(state, srclen);
+    const int lencheck = res_push_check(state, srclen);
 
     /* fill the pool before diving in */
     while (poolhead < poolend && srclen > 0)
