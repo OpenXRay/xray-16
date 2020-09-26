@@ -15,10 +15,10 @@ typedef struct tag_DUMPTHREADPARAMS
 {
     MINIDUMP_TYPE eType;
     wchar_t* szFileName;
-    DWORD dwThreadID;
+    u32 dwThreadID;
     EXCEPTION_POINTERS* pExceptInfo;
     WriteMiniDumpResult eReturnValue;
-    DWORD dwMiniDumpWriteDumpLastError;
+    u32 dwMiniDumpWriteDumpLastError;
 } DUMPTHREADPARAMS, *LPDUMPTHREADPARAMS;
 
 // The dumper function.
@@ -64,7 +64,7 @@ unsigned __stdcall DumpThread(LPVOID pData)
 }
 
 WriteMiniDumpResult __stdcall WriteMiniDumpA(
-    MINIDUMP_TYPE eType, char* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo)
+    MINIDUMP_TYPE eType, char* szFileName, u32 dwThread, EXCEPTION_POINTERS* pExceptInfo)
 {
     // Check the string parameter because I am paranoid.
     if (IsBadStringPtrA(szFileName, MAX_PATH) == TRUE)
@@ -97,7 +97,7 @@ WriteMiniDumpResult __stdcall WriteMiniDumpA(
 }
 
 WriteMiniDumpResult __stdcall WriteMiniDumpW(
-    MINIDUMP_TYPE eType, wchar_t* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo)
+    MINIDUMP_TYPE eType, wchar_t* szFileName, u32 dwThread, EXCEPTION_POINTERS* pExceptInfo)
 {
     // Check the string parameter because I am paranoid.  I can't check
     // the eType as that might change in the future.

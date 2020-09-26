@@ -33,8 +33,8 @@ int GetGameDistribution()
 
     //	char	KeyValue[1024] = "";
 
-    u32 KeyValueSize = 1024;
-    u32 KeyValueType = REG_DWORD;
+    DWORD KeyValueSize = 1024;
+    DWORD KeyValueType = REG_DWORD;
     if (res == ERROR_SUCCESS && KeyCDKey != 0)
     {
         res = RegQueryValueEx(

@@ -13,15 +13,15 @@ ThreadHandle GetCurrentThreadHandle() { return GetCurrentThread(); }
 
 void SetThreadName(ThreadHandle threadHandle, pcstr name)
 {
-    const DWORD MSVC_EXCEPTION = 0x406D1388;
-    DWORD threadId = threadHandle != NULL ? GetThreadId(threadHandle) : DWORD(-1);
+    const u32 MSVC_EXCEPTION = 0x406D1388;
+    u32 threadId = threadHandle != NULL ? GetThreadId(threadHandle) : u32(-1);
 
     struct SThreadNameInfo
     {
-        DWORD dwType;
+        u32 dwType;
         LPCSTR szName;
-        DWORD dwThreadID;
-        DWORD dwFlags;
+        u32 dwThreadID;
+        u32 dwFlags;
     };
 
     SThreadNameInfo info;
@@ -32,7 +32,7 @@ void SetThreadName(ThreadHandle threadHandle, pcstr name)
 
     __try
     {
-        RaiseException(MSVC_EXCEPTION, 0, sizeof(info) / sizeof(DWORD), (ULONG_PTR*)&info);
+        RaiseException(MSVC_EXCEPTION, 0, sizeof(info) / sizeof(u32), (ULONG_PTR*)&info);
     }
     __except (EXCEPTION_CONTINUE_EXECUTION)
     {

@@ -58,7 +58,7 @@ public:
             fclose(hf);
             // release RO attrib
 #if defined(XR_PLATFORM_WINDOWS)
-            DWORD dwAttr = GetFileAttributes(fName.c_str());
+            u32 dwAttr = GetFileAttributes(fName.c_str());
             if ((dwAttr != u32(-1)) && (dwAttr & FILE_ATTRIBUTE_READONLY))
             {
                 dwAttr &= ~FILE_ATTRIBUTE_READONLY;

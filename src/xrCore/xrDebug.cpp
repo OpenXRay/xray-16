@@ -283,7 +283,7 @@ bool xrDebug::InitializeSymbolEngine()
 {
     if (!symEngineInitialized)
     {
-        DWORD dwOptions = SymGetOptions();
+        u32 dwOptions = SymGetOptions();
         SymSetOptions(dwOptions | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
 
         if (SymInitialize(GetCurrentProcess(), nullptr, TRUE))

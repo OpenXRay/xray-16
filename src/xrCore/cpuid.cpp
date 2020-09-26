@@ -49,12 +49,12 @@ void __cpuidex(int regs[4], int i, int j)
 #endif
 
 #ifdef XR_PLATFORM_WINDOWS
-DWORD countSetBits(ULONG_PTR bitMask)
+u32 countSetBits(ULONG_PTR bitMask)
 {
-    DWORD LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
-    DWORD bitSetCount = 0;
+    u32 LSHIFT = sizeof(ULONG_PTR) * 8 - 1;
+    u32 bitSetCount = 0;
     ULONG_PTR bitTest = static_cast<ULONG_PTR>(1) << LSHIFT;
-    DWORD i;
+    u32 i;
 
     for (i = 0; i <= LSHIFT; ++i)
     {
@@ -174,7 +174,7 @@ unsigned int query_processor_info(processor_info* pinfo)
 
 #ifdef XR_PLATFORM_WINDOWS
     DWORD returnedLength = 0;
-    DWORD byteOffset = 0;
+    u32 byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
 
     auto buffer = xr_make_unique<u8[]>(returnedLength);

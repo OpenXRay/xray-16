@@ -18,7 +18,7 @@ enum
 #pragma pack(1)
 struct BLK_NODE
 {
-    DWORD Stamp;
+    u32 Stamp;
     BLK_NODE* next;
 
     bool avail() const { return next != nullptr; }
@@ -44,12 +44,12 @@ struct BLK_NODE
 
 struct MEM_BLK : public BLK_NODE
 {
-    DWORD NU;
+    u32 NU;
 } _PACK_ATTR;
 #pragma pack()
 
 static BYTE Indx2Units[N_INDEXES], Units2Indx[128]; // constants
-static DWORD GlueCount, SubAllocatorSize = 0;
+static u32 GlueCount, SubAllocatorSize = 0;
 static BYTE *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 
 inline void PrefetchData(void* Addr)
@@ -86,9 +86,9 @@ inline void SplitBlock(void* pv, UINT OldIndx, UINT NewIndx)
     BList[Units2Indx[UDiff - 1]].insert(p, UDiff);
 }
 
-DWORD _STDCALL GetUsedMemory()
+u32 _STDCALL GetUsedMemory()
 {
-    DWORD RetVal = SubAllocatorSize - (HiUnit - LoUnit) - (UnitsStart - pText);
+    u32 RetVal = SubAllocatorSize - (HiUnit - LoUnit) - (UnitsStart - pText);
 
     for (size_t i = 0; i < N_INDEXES; i++)
         RetVal -= UNIT_SIZE * Indx2Units[i] * BList[i].Stamp;
@@ -107,7 +107,7 @@ void _STDCALL StopSubAllocator()
 
 bool _STDCALL StartSubAllocator(UINT SASize)
 {
-    DWORD t = SASize << 20U;
+    u32 t = SASize << 20U;
     if (SubAllocatorSize == t)
         return true;
 
@@ -230,7 +230,7 @@ inline void* AllocContext()
 
 inline void UnitsCpy(void* Dest, void* Src, UINT NU)
 {
-    auto *p1 = (DWORD *)Dest, *p2 = (DWORD *)Src;
+    auto *p1 = (u32 *)Dest, *p2 = (u32 *)Src;
 
     do
     {
@@ -287,7 +287,7 @@ inline void SpecialFreeUnit(void* ptr)
         BList->insert(ptr, 1);
     else
     {
-        *(DWORD*)ptr = ~0UL;
+        *(u32*)ptr = ~0UL;
         UnitsStart += UNIT_SIZE;
     }
 }
