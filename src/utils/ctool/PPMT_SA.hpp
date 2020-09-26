@@ -19,9 +19,9 @@ const UINT UNIT_SIZE = 20, N_INDEXES = N1 + N2 + N3 + N4;
 #pragma pack(1)
 struct MEM_BLK
 {
-    u32 Stamp, NU;
+    DWORD Stamp, NU;
     MEM_BLK *next, *prev;
-    u32 Dummy;
+    DWORD Dummy;
     void insertAt(MEM_BLK* p)
     {
         next = (prev = p)->next;
@@ -66,9 +66,9 @@ inline void SplitBlock(void* pv, int OldIndx, int NewIndx)
     }
     InsertNode(p, Units2Indx[UDiff - 1]);
 }
-u32 _STDCALL GetUsedMemory()
+DWORD _STDCALL GetUsedMemory()
 {
-    u32 i, k, RetVal = SubAllocatorSize - (HiUnit - LoUnit) - (UnitsStart - pText);
+    DWORD i, k, RetVal = SubAllocatorSize - (HiUnit - LoUnit) - (UnitsStart - pText);
     for (k = i = 0; i < N_INDEXES; i++, k = 0)
     {
         for (NODE* pn = FreeList + i; (pn = pn->next) != NULL; k++)
@@ -79,7 +79,7 @@ u32 _STDCALL GetUsedMemory()
 }
 BOOL _STDCALL StartSubAllocator(int SASize)
 {
-    u32 t = SASize << 20;
+    DWORD t = SASize << 20;
     if ((HeapStart = new BYTE[t]) == NULL)
         return FALSE;
     SubAllocatorSize = t;
@@ -121,7 +121,7 @@ static inline void GlueFreeBlocks()
             p->NU = Indx2Units[i];
         }
     for (p = s0.next; p != &s0; p = p->next)
-        while ((p1 = p + p->NU)->Stamp == u32(~0) && p->NU + p1->NU < 0x10000)
+        while ((p1 = p + p->NU)->Stamp == DWORD(~0) && p->NU + p1->NU < 0x10000)
         {
             p1->remove();
             p->NU += p1->NU;
