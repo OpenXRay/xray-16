@@ -10,6 +10,8 @@
 #include <windows.h>
 #pragma hdrstop
 #include "PPMT_SA.hpp"
+
+#define XR_PLATFORM_WINDOWS
 #include "xrCore/_types.h"
 
 const int MAX_O = 8;

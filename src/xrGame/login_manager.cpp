@@ -382,7 +382,7 @@ char const* login_manager::get_password_from_registry()
 
 void login_manager::save_remember_me_to_registry(bool remember)
 {
-    u32 tmp_value = remember ? 1 : 0;
+    DWORD tmp_value = remember ? 1 : 0;
     WriteRegistry_DWValue(REGISTRY_VALUE_REMEMBER_PROFILE, tmp_value);
 }
 
