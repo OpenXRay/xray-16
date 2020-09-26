@@ -15,7 +15,7 @@ void base_lighting::select(xr_vector<R_Light>& dest, xr_vector<R_Light>& src, Fv
             if (dist > (Sphere.R + L.range))
                 continue;
         }
-        dest.push_back(L);
+        dest.emplace_back(L);
     }
 }
 void base_lighting::select(base_lighting& from, Fvector& P, float R)
