@@ -32,7 +32,7 @@ FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
 }
 };
 
-BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
+BOOL APIENTRY DllMain(HANDLE module_handle, u32 call_reason, LPVOID reserved)
 {
     switch (call_reason)
     {

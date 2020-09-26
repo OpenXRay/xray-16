@@ -20,7 +20,7 @@ void __cdecl data_cleanup_callback(const char* dataDesc, IGenericStream** stream
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-void global_data_cleanup::on_net_receive(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+void global_data_cleanup::on_net_receive(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     u32 state = u32(-1);
     inStream->Read(&state, sizeof(id_state));

@@ -61,16 +61,16 @@ typedef struct _aTGAHEADER
 // TGA v2.0 file.
 typedef struct _aTGAFOOTER
 {
-	DWORD ExtensionOffset;		// Extension Area Offset
-	DWORD DeveloperOffset;		// Developer Directory Offset
+	u32 ExtensionOffset;		// Extension Area Offset
+	u32 DeveloperOffset;		// Developer Directory Offset
 	CHAR Signature[18];			// TGA Signature
 } TGAFOOTER;
 
 typedef struct _aTGATAG
 {
 	WORD  TagNumber;		// ID Number of the Tag
-	DWORD DataOffset;		// Offset Location of the Tag
-	DWORD DataSize;			// Size of the Tag Data in Bytes
+	u32 DataOffset;		// Offset Location of the Tag
+	u32 DataSize;			// Size of the Tag Data in Bytes
 } TGATAG;
 
 // The extension area is basically the second header in the TGA v2.0
@@ -93,14 +93,14 @@ typedef struct _aTGAEXTENSION
 	CHAR  SoftwareId[41];		// Software ID
 	WORD  VersionNumber;		// Version Number of Software
 	BYTE  VersionLetter;		// Version Letter of Software
-	DWORD KeyColor;				// Key Color
+	u32 KeyColor;				// Key Color
 	WORD  PixelNumerator;		// Pixel Aspect Ratio
 	WORD  PixelDenominator;		// Pixel Aspect Ratio
 	WORD  GammaNumerator;		// Gamma Value
 	WORD  GammaDenominator;		// Gamma Value
-	DWORD ColorOffset;			// Color Correction Offset
-	DWORD StampOffset;			// Postage Stamp Offset
-	DWORD ScanOffset;			// Scanline Table Offset
+	u32 ColorOffset;			// Color Correction Offset
+	u32 StampOffset;			// Postage Stamp Offset
+	u32 ScanOffset;			// Scanline Table Offset
 	BYTE  AttributesType;		// Attributes Type
 } TGAEXTENSION;
 
@@ -510,7 +510,7 @@ TGAFile::LoadTGA(const char * fileName, UINT32 * width, UINT32 * height)
 		pRGB = (BYTE *)pNew;
 
 	// RGB from image Data
-	//DWORD  destOffset = 0;
+	//u32  destOffset = 0;
 
 	RLECount = 0;
 	RLEFlag = 0;
@@ -791,7 +791,7 @@ RGBQUAD * pal) // Palette of RGBQUADS
 			}
 
 		// RGB from image Data
-		DWORD  destOffset = 0;
+		u32  destOffset = 0;
 
 		RLECount = 0;
 		RLEFlag = 0;
@@ -1076,14 +1076,14 @@ TGAFile::SaveTGA32
 		}
 
 	// Wrte the Bytes to file
-	DWORD  destOffset = 0;
+	u32  destOffset = 0;
 	BYTE   temp = 0;
-	DWORD  rowStride = tgahd.Width * 4;
+	u32  rowStride = tgahd.Width * 4;
 
 	for(UINT32 row = 0; row < tgahd.Height; row++)
 		{
-		//DWORD rowOffset = rowStride * row;
-		DWORD  rowOffset = rowStride *((tgahd.Height -1) -row);
+		//u32 rowOffset = rowStride * row;
+		u32  rowOffset = rowStride *((tgahd.Height -1) -row);
 
 		for(UINT32 col = 0; col < tgahd.Width; col++)
 			{
@@ -1209,7 +1209,7 @@ RGBQUAD * colormap) // array of RGBQUADs
 		}
 
 	// Wrte the Bytes to file
-	DWORD  destOffset = 0;
+	u32  destOffset = 0;
 	BYTE   temp = 0;
 
 	for(UINT32 row = 0; row < tgahd.Height; row++)

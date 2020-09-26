@@ -9,7 +9,7 @@ extern "C" {
 #include "lwo2.h"
 };
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) { return TRUE; }
+BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved) { return TRUE; }
 extern "C" {
 __declspec(dllexport) lwObject* LWOImportObject(char* filename)
 {

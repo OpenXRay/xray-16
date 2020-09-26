@@ -23,18 +23,18 @@ void __cdecl Finalize(IGenericStream* inStream)
 }
 
 task_manager::task_manager()
-    : _user(0), tasks_completed(0), current_pool(0), start(0), session_id(DWORD(-1)), _release(false)
+    : _user(0), tasks_completed(0), current_pool(0), start(0), session_id(u32(-1)), _release(false)
 {
     for (u8 i = 0; i < num_pools; ++i)
         pools[i] = 0;
     // create_global_data_write("");
 }
 
-bool task_manager::initialize_session(DWORD _session_id)
+bool task_manager::initialize_session(u32 _session_id)
 {
     init_lock.Enter();
     bool ret = false;
-    if (session_id == DWORD(-1))
+    if (session_id == u32(-1))
     {
         session_id = _session_id;
         ret = true;
@@ -60,7 +60,7 @@ void task_manager::send_result(u8 pool_id, IGenericStream* outStream, net_execut
     pools[pool_id]->send_result(outStream, e);
 }
 
-net_execution* task_manager::receive_task(u8& pool_id, IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+net_execution* task_manager::receive_task(u8& pool_id, IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     // u8 pool_id  ( u8(-1) );
     read_task_pool(inStream, pool_id);

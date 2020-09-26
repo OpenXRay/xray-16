@@ -384,12 +384,12 @@ CGenStreamOnFile::~CGenStreamOnFile()
 {
     // fclose(file);
 }
-DWORD __stdcall CGenStreamOnFile::GetLength()
+u32 __stdcall CGenStreamOnFile::GetLength()
 {
     return file->length();
     // return _filelength( _fileno( file ) );
 }
-DWORD __stdcall CGenStreamOnFile::Read(void* Data, DWORD count)
+u32 __stdcall CGenStreamOnFile::Read(void* Data, u32 count)
 {
     R_ASSERT(false);
     // fread( Data, 1, count, file );

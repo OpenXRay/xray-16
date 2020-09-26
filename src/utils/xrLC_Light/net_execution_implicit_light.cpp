@@ -13,7 +13,7 @@ void execution_implicit_light::send_task(IGenericStream* outStream)
         exec.write(w);
     }
 }
-bool execution_implicit_light::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+bool execution_implicit_light::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     u8 buff[send_receive_task_buffer_size];
     INetBlockReader r(inStream, buff, sizeof(buff));

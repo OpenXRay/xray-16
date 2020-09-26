@@ -36,7 +36,7 @@ public:
         return vec_cleanup[data];
     };
     void on_net_send(IGenericStream* outStream);
-    void on_net_receive(IAgent* agent, DWORD sessionId, IGenericStream* inStream);
+    void on_net_receive(IAgent* agent, u32 sessionId, IGenericStream* inStream);
 };
 global_data_cleanup& cleanup();
 }

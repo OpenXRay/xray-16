@@ -14,7 +14,7 @@ void execution_mu_ref_light::send_task(IGenericStream* outStream)
     R_ASSERT(mu_ref_id != u32(-1));
     outStream->Write(&mu_ref_id, sizeof(mu_ref_id));
 }
-bool execution_mu_ref_light::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+bool execution_mu_ref_light::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     inStream->Read(&mu_ref_id, sizeof(mu_ref_id));
     R_ASSERT(mu_ref_id != u32(-1));

@@ -6,7 +6,7 @@
 
 extern xr_vector<u32> net_pool;
 
-net_task::net_task(IAgent* agent, DWORD session) : net_task_callback(agent, session), _id(u32(-1)), _D(0) {}
+net_task::net_task(IAgent* agent, u32 session) : net_task_callback(agent, session), _id(u32(-1)), _D(0) {}
 net_task::~net_task() { VERIFY(!_D || !_D->_net_session); }
 bool net_task::receive(IGenericStream* inStream)
 {

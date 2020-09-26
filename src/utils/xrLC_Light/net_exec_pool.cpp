@@ -167,7 +167,7 @@ void exec_pool::send_task(IGridUser& user, IGenericStream* Stream, u8 pool_id, u
 
     e->send_task(user, outStream, id);
 
-    DWORD t_id = id;
+    u32 t_id = id;
     string_path data;
     string_path files;
     strconcat(sizeof(data), data, libraries, e->data_files(files));
@@ -195,7 +195,7 @@ run_task:;
     return;
 }
 
-net_execution* exec_pool::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+net_execution* exec_pool::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     __try
     {

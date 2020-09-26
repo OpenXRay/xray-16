@@ -325,11 +325,11 @@ private:
         R_ASSERT(false);
         return false;
     }
-    virtual DWORD __stdcall GetLength();
-    virtual void __stdcall Write(const void* Data, DWORD count) { R_ASSERT(false); }
-    virtual DWORD __stdcall Read(void* Data, DWORD count);
-    virtual void __stdcall Seek(DWORD pos) { R_ASSERT(false); }
-    virtual DWORD __stdcall GetPos()
+    virtual u32 __stdcall GetLength();
+    virtual void __stdcall Write(const void* Data, u32 count) { R_ASSERT(false); }
+    virtual u32 __stdcall Read(void* Data, u32 count);
+    virtual void __stdcall Seek(u32 pos) { R_ASSERT(false); }
+    virtual u32 __stdcall GetPos()
     {
         R_ASSERT(false);
         return false;
@@ -337,8 +337,8 @@ private:
     virtual void __stdcall Clear() { R_ASSERT(false); }
     virtual void __stdcall FastClear() { R_ASSERT(false); }
     virtual void __stdcall GrowToPos(int DestSize = -1) { R_ASSERT(false); }
-    virtual void __stdcall Skip(DWORD count) { R_ASSERT(false); }
-    virtual void __stdcall SetLength(DWORD newLength) { R_ASSERT(false); }
+    virtual void __stdcall Skip(u32 count) { R_ASSERT(false); }
+    virtual void __stdcall SetLength(u32 newLength) { R_ASSERT(false); }
     virtual void __stdcall Compact() { R_ASSERT(false); }
-    virtual DWORD __stdcall GetVersion() const { return CGenStreamOnFile::VERSION; }
+    virtual u32 __stdcall GetVersion() const { return CGenStreamOnFile::VERSION; }
 };
