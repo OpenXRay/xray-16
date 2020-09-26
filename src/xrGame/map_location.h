@@ -98,11 +98,14 @@ public:
     const Fvector2& CalcDirection();
     IC const shared_str& GetLevelName() { return m_cached.m_LevelName; }
     const Fvector2& GetPosition() { return m_cached.m_Position; }
+
     u16 ObjectID() { return m_objectID; }
     virtual bool Update();
+    void UpdateTTL();
     Fvector GetLastPosition() { return m_position_global; };
     bool Serializable() const { return !!m_flags.test(eSerailizable); }
     void SetSerializable(bool b) { m_flags.set(eSerailizable, b); }
+
     virtual void save(IWriter& stream);
     virtual void load(IReader& stream);
 

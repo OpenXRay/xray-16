@@ -118,7 +118,16 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
     if (!pEntAlive->g_Alive())
         sname = "deadbody_location";
 
-    R_ASSERT(!HasMapLocation(sname, pInvOwner->object_id()));
+    if (CMapLocation* location = GetMapLocation(sname, pInvOwner->object_id()); location)
+    {
+        const bool isCorrect = smart_cast<CRelationMapLocation*>(location);
+#ifdef DEBUG
+        Msg("~ CMapManager: Someone has already added relation location%s. [%s of %s]",
+            (isCorrect ? "" : " as map location"), sname.c_str(), pInvOwner->Name());
+#endif
+        location->UpdateTTL();
+        return location;
+    }
     CMapLocation* l = xr_new<CRelationMapLocation>(sname, pInvOwner->object_id(), pActor->object_id());
     Locations().push_back(SLocationKey(sname, pInvOwner->object_id()));
     Locations().back().location = l;

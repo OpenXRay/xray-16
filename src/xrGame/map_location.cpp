@@ -146,7 +146,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
     if (m_ttl > 0)
     {
         m_flags.set(eTTL, TRUE);
-        m_actual_time = Device.dwTimeGlobal + m_ttl * 1000;
+        UpdateTTL();
     }
 
     s = g_uiSpotXml->ReadAttrib(path_base, 0, "pos_to_actor", NULL);
@@ -388,6 +388,13 @@ bool CMapLocation::Update() // returns actual
 
     m_cached.m_updatedFrame = Device.dwFrame;
     return m_cached.m_Actuality;
+}
+
+void CMapLocation::UpdateTTL()
+{
+    if (!m_flags.test(eTTL))
+        return;
+    m_actual_time = Device.dwTimeGlobal + m_ttl * 1000;
 }
 
 extern xr_vector<CLevelChanger*> g_lchangers;
