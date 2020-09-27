@@ -245,6 +245,9 @@ void DataFace::AddChannel(Fvector2& p1, Fvector2& p2, Fvector2& p3)
 
 BOOL DataFace::hasImplicitLighting()
 {
+    if (nullptr == this)
+        return FALSE;
+
     if (!Shader().flags.bRendering)
         return FALSE;
     VERIFY(inlc_global_data());
