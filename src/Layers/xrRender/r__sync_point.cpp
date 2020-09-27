@@ -65,7 +65,7 @@ bool R_sync_point::Wait(u32 wait_sleep, u64 timeout)
     while ((hr = GetData((ID3DQuery*)q_sync_point[q_sync_count], &result, sizeof(result))) == S_FALSE)
     {
         if (!SwitchToThread())
-            Sleep(ps_r2_wait_sleep);
+            Sleep(wait_sleep);
         if (T.GetElapsed_ms() > timeout)
         {
             result = FALSE;
