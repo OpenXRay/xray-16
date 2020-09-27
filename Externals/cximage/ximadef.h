@@ -2,7 +2,6 @@
 #define __ximadefs_h
 
 #include "ximacfg.h"
-#include "Common/Platform.hpp"
 
 #if defined(_AFXDLL)||defined(_USRDLL)
  #define DLL_EXP __declspec(dllexport)

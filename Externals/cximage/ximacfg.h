@@ -5,16 +5,13 @@
 #endif
 
 #include "Common/Common.hpp"
+#include "Common/Platform.hpp"
+
 extern "C" void*	cxalloc(size_t size);
 extern "C" void		cxfree(void* ptr);
 extern "C" void*	cxrealloc(void* ptr, size_t size);
 
 #ifdef CXIMAGE_AS_SHARED_LIBRARY //must be defined in Release_Shared configuration
-// XXX: dirty hack.
-#undef max
-#undef min
-#include "xrCore/xrCore.h"
-
 #ifdef	CXIMAGE_BUILD
 #define	CXIMAGE_API	XR_EXPORT
 #else
