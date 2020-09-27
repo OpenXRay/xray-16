@@ -41,7 +41,7 @@ xrIDirect3DDevice9::xrIDirect3DDevice9(IDirect3D9* pDirect3D9, D3DPRESENT_PARAME
     memset(&ProjectionMatrix, 0, sizeof(ProjectionMatrix));
     memset(&ViewMatrix, 0, sizeof(ViewMatrix));
     memset(&WorldMatrix, 0, sizeof(WorldMatrix));
-    memset(&TextureMatrices[8], 0, sizeof(TextureMatrices));
+    memset(&TextureMatrices, 0, sizeof(TextureMatrices));
 
     FVF = 0;
     VertexSize = 0;
