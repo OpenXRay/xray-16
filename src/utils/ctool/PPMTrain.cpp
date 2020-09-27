@@ -7,13 +7,12 @@
  ****************************************************************************/
 #include <math.h>
 #include <stdio.h>
-#include <windows.h>
-#pragma hdrstop
-#include "PPMT_SA.hpp"
-
 #define NOMINMAX
+#include <windows.h>
 #define XR_PLATFORM_WINDOWS
 #include "xrCore/_types.h"
+#pragma hdrstop
+#include "PPMT_SA.hpp"
 
 const int MAX_O = 8;
 const int UP_FREQ = 5, INT_BITS = 7, PERIOD_BITS = 7, TOT_BITS = INT_BITS + PERIOD_BITS, INTERVAL = 1 << INT_BITS,
