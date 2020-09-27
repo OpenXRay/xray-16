@@ -336,7 +336,7 @@ char const* engine_impl::weather_current_time() const
 void engine_impl::weather_current_time(char const* time)
 {
     u32 hours, minutes, seconds;
-    sscanf(time, "%d:%d:%d", &hours, &minutes, &seconds);
+    sscanf(time, "%u:%u:%u", &hours, &minutes, &seconds);
     
     auto& environment = g_pGamePersistent->Environment();
 

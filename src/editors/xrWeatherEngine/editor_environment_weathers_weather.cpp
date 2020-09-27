@@ -234,7 +234,7 @@ shared_str weather::generate_unique_id(shared_str const& start) const
     VERIFY(is_digit(id[7]));
 
     u32 hours, minutes, seconds;
-    sscanf(id, "%02d:%02d:%02d", &hours, &minutes, &seconds);
+    sscanf(id, "%02u:%02u:%02u", &hours, &minutes, &seconds);
 
     shared_str result;
 
