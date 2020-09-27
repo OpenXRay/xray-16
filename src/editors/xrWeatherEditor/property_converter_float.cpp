@@ -54,10 +54,10 @@ bool property_converter_float::CanConvertFrom(ITypeDescriptorContext ^ context, 
 
 Object ^ property_converter_float::ConvertFrom(ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value)
 {
-    String ^ string = dynamic_cast<String ^>(value);
     if (!value)
         return (inherited::ConvertFrom(context, culture, value));
 
+    String ^ string = dynamic_cast<String ^>(value);
     try
     {
         return (float ::Parse(string));
