@@ -521,7 +521,7 @@ keyboard_key* KeynameToPtr(pcstr name)
 
 void GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
 {
-    int action_id = ActionNameToId(action);
+    const int action_id = ActionNameToId(action);
     key_binding* binding = &g_key_bindings[action_id];
 
     string128 prim;
@@ -543,14 +543,16 @@ void GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
     {
         xr_strcpy(gpad, binding->m_keyboard[2]->key_local_name.c_str());
     }
-    if (NULL == binding->m_keyboard[0] && NULL == binding->m_keyboard[1] && NULL == binding->m_keyboard[2])
+    if (!binding->m_keyboard[0] && !binding->m_keyboard[1] && !binding->m_keyboard[2])
     {
         xr_sprintf(dst_buff, dst_buff_sz, "%s", gStringTable->translate("st_key_notbinded").c_str());
     }
     else
-        xr_sprintf(dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "", 
-            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "", 
+    {
+        xr_sprintf(dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "",
+            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "",
             ((gpad[0] && prim[0]) || (gpad[0] && sec[0])) ? " , " : "", gpad[0] ? gpad : "");
+    }
 }
 
 #pragma todo("Artur to All: Gamepads has own bindings. Add m_keyboard[2]")
