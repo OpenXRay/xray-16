@@ -47,8 +47,8 @@ namespace XRay.SdkControls
             var descriptor_raw = SelectedGridItem.PropertyDescriptor;
             Debug.Assert(descriptor_raw != null);
             var descriptor = descriptor_raw as PropertyBag.PropertySpecDescriptor;
-            var container = descriptor.bag as IPropertyContainer;
-            IProperty property = container.GetProperty(descriptor.item);
+            var container = descriptor?.bag as IPropertyContainer;
+            IProperty property = container?.GetProperty(descriptor?.item);
             var mouseEvents = property as IMouseListener;
             if (mouseEvents == null)
                 return;
@@ -72,8 +72,8 @@ namespace XRay.SdkControls
             if (rawDescriptor == null)
                 return;
             var descriptor = rawDescriptor as PropertyBag.PropertySpecDescriptor;
-            var container = descriptor.bag as IPropertyContainer;
-            IProperty rawProperty = container.GetProperty(descriptor.item);
+            var container = descriptor?.bag as IPropertyContainer;
+            IProperty rawProperty = container?.GetProperty(descriptor?.item);
             Debug.Assert(rawProperty != null);
             var incrementable = rawProperty as IIncrementable;
             if (incrementable == null)
