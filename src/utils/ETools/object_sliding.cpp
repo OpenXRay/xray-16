@@ -22,7 +22,7 @@ void OptimiseVertexCoherencyTriList(WORD* pwList, int iHowManyTris, u32 optimize
 {
     if (iHowManyTris)
     {
-        u32* remap = xr_alloc<u32>(iHowManyTris);
+        DWORD* remap = xr_alloc<DWORD>(iHowManyTris);
         WORD max_idx = 0;
         for (int k = 0; k < iHowManyTris * 3; k++)
             max_idx = std::max(max_idx, pwList[k]);
