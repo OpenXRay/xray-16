@@ -64,7 +64,6 @@ public:
     // Returns the pointer to the first item.
     IC T* resize(u32 iNum)
     {
-        VERIFY(iNum >= 0);
         iSize = iNum;
         if (iNum <= iReservedSize)
         {

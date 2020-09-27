@@ -194,7 +194,7 @@ void glState::UpdateRenderState(u32 name, u32 value)
 
 void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
 {
-    if (stage < 0 || CTexture::mtMaxCombinedShaderTextures < stage)
+    if (stage < 0 || stage >= CTexture::mtMaxCombinedShaderTextures)
         return;
 
     GLint currentFilter = (GLint)GL_NEAREST;

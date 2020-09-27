@@ -14,10 +14,9 @@
 
 string4096 g_ca_stdout; // XXX: allocate dynamically for each CScriptEngine instance
 
-CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, shared_str scripts)
+CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, shared_str scripts) : m_name(name)
 {
     this->scriptEngine = scriptEngine;
-    m_name = name;
 #ifdef DEBUG
     Msg("* Initializing %s script process", *m_name);
 #endif
@@ -91,5 +90,5 @@ void CScriptProcess::update()
 
 void CScriptProcess::add_script(LPCSTR script_name, bool do_string, bool reload)
 {
-    m_scripts_to_run.push_back(CScriptToRun(script_name, do_string, reload));
+    m_scripts_to_run.emplace_back(script_name, do_string, reload);
 }

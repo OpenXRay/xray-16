@@ -832,7 +832,7 @@ u32 CInifile::r_color(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     u32 r = 0, g = 0, b = 0, a = 255;
-    sscanf(C, "%d,%d,%d,%d", &r, &g, &b, &a);
+    sscanf(C, "%u,%u,%u,%u", &r, &g, &b, &a);
     return color_rgba(r, g, b, a);
 }
 

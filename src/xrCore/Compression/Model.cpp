@@ -629,6 +629,8 @@ NO_LOOP:
     if (pps == ps)
         return pc;
     ct.NumStats = 0;
+    ct.SummFreq = 0;
+    ct.Stats = nullptr;
     ct.Flags = 0x10 * (sym >= 0x40);
     ct.oneState().Symbol = sym = *(BYTE*)UpBranch;
     ct.oneState().Successor = (PPM_CONTEXT*)(((BYTE*)UpBranch) + 1);

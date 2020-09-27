@@ -347,6 +347,7 @@ bool BattlEyeSystem::InitDLL(LPCSTR dll_name, string_path& out_file)
             return false;
         }
         fclose(ft);
+        return true;
     }
     fclose(ft);
     return true;

@@ -25,7 +25,7 @@ TEMPLATE_SPECIALIZATION
 IC void CAbstractGraph::add_vertex(const _data_type& data, const _vertex_id_type& vertex_id)
 {
     VERIFY(!vertex(vertex_id));
-    m_vertices.insert(std::make_pair(vertex_id, xr_new<CVertex>(data, vertex_id, &m_edge_count)));
+    m_vertices.emplace(vertex_id, xr_new<CVertex>(data, vertex_id, &m_edge_count));
 }
 
 TEMPLATE_SPECIALIZATION

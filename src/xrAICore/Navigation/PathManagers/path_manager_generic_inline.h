@@ -21,6 +21,8 @@ IC CGenericPathManager::CPathManagerGeneric()
     graph = 0;
     data_storage = 0;
     path = 0;
+    max_visited_node_count = 0;
+    best_node_index = nullptr;
 }
 
 TEMPLATE_SPECIALIZATION

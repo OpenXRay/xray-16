@@ -221,4 +221,3 @@ manager::manager()
             setter, s_properties7_enum, 3);
     }
 }
-#endif
