@@ -32,7 +32,7 @@ class FactoryPtr
 public:
     FactoryPtr() { CreateObject(); }
     ~FactoryPtr() { DestroyObject(); }
-    FactoryPtr(const FactoryPtr<T>& _in)
+    FactoryPtr(const FactoryPtr& _in)
     {
         CreateObject();
         m_pObject->Copy(*_in.m_pObject);
