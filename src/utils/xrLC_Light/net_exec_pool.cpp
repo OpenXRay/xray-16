@@ -167,7 +167,7 @@ void exec_pool::send_task(IGridUser& user, IGenericStream* Stream, u8 pool_id, u
 
     e->send_task(user, outStream, id);
 
-    u32 t_id = id;
+    DWORD t_id = id;
     string_path data;
     string_path files;
     strconcat(sizeof(data), data, libraries, e->data_files(files));

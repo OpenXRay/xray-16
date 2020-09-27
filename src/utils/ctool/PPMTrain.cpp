@@ -7,6 +7,7 @@
  ****************************************************************************/
 #include <math.h>
 #include <stdio.h>
+#define NOMINMAX
 #include <windows.h>
 #pragma hdrstop
 #include "PPMT_SA.hpp"
