@@ -91,7 +91,7 @@ try {
     {
         // alternative stripification - faces
         {
-            u32* remap = xr_alloc<u32>(fast_path_data.faces.size());
+            DWORD* remap = xr_alloc<DWORD>(fast_path_data.faces.size());
             HRESULT rhr = D3DXOptimizeFaces(&fast_path_data.faces.front(), fast_path_data.faces.size(),
                 fast_path_data.vertices.size(), FALSE, remap);
             R_CHK(rhr);
@@ -103,7 +103,7 @@ try {
 
         // alternative stripification - vertices
         {
-            u32* remap = xr_alloc<u32>(fast_path_data.vertices.size());
+            DWORD* remap = xr_alloc<DWORD>(fast_path_data.vertices.size());
             HRESULT rhr = D3DXOptimizeVertices(&fast_path_data.faces.front(), fast_path_data.faces.size(),
                 fast_path_data.vertices.size(), FALSE, remap);
             R_CHK(rhr);
