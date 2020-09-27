@@ -147,7 +147,6 @@ HRESULT xrIDirect3DDevice9::GetDeviceCaps(D3DCAPS9* pCaps)
     pCaps->MaxNpatchTessellationLevel = 32;
     pCaps->MasterAdapterOrdinal = 0;
     pCaps->AdapterOrdinalInGroup = 0;
-    pCaps->AdapterOrdinal = 0;
     pCaps->NumberOfAdaptersInGroup = 1;
 
     pCaps->DeclTypes = D3DDTCAPS_UBYTE4 | D3DDTCAPS_UBYTE4N | D3DDTCAPS_SHORT2N | D3DDTCAPS_SHORT4N |
