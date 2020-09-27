@@ -73,6 +73,7 @@ dReal dMatrixComparison::nextMatrix (dReal *A, int n, int m, int lower_tri,
     va_list ap;
     va_start (ap,name);
     vsprintf (mi->name, name, ap);
+    va_end (ap);
     if (strlen(mi->name) >= sizeof (mi->name)) dDebug (0,"name too long");
 
     mat.push (mi);
@@ -89,6 +90,7 @@ dReal dMatrixComparison::nextMatrix (dReal *A, int n, int m, int lower_tri,
     va_list ap;
     va_start (ap,name);
     vsprintf (mi.name, name, ap);
+    va_end (ap);
     if (strlen(mi.name) >= sizeof (mi.name)) dDebug (0,"name too long");
 
     if (strcmp(mp->name,mi.name) != 0)
