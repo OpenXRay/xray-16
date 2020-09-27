@@ -213,10 +213,10 @@ void CDetailManager::Unload()
 {
     hw_Unload();
 
-    for (DetailIt it = objects.begin(); it != objects.end(); it++)
+    for (CDetail* detailObject : objects)
     {
-        (*it)->Unload();
-        xr_delete(*it);
+        detailObject->Unload();
+        xr_delete(detailObject);
     }
 
     objects.clear();
