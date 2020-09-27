@@ -170,7 +170,7 @@ shared_str weather::unique_id(shared_str const& current, shared_str const& id) c
     return (generate_unique_id(id));
 }
 
-bool weather::try_hours(u32& hours, u32& minutes, u32& seconds, shared_str& result) const
+bool weather::try_hours(u32 hours, u32 minutes, u32 seconds, shared_str& result) const
 {
     for (u32 i = hours + 1; i < 24; ++i)
     {
@@ -186,7 +186,7 @@ bool weather::try_hours(u32& hours, u32& minutes, u32& seconds, shared_str& resu
     return (false);
 }
 
-bool weather::try_minutes(u32& hours, u32& minutes, u32& seconds, shared_str& result) const
+bool weather::try_minutes(u32 hours, u32 minutes, u32 seconds, shared_str& result) const
 {
     for (u32 i = minutes + 1; i < 60; ++i)
     {
@@ -202,7 +202,7 @@ bool weather::try_minutes(u32& hours, u32& minutes, u32& seconds, shared_str& re
     return (false);
 }
 
-shared_str weather::try_all(u32& hours_, u32& minutes_, u32& seconds_) const
+shared_str weather::try_all(u32 hours_, u32 minutes_, u32 seconds_) const
 {
     for (u32 hours = hours_; hours < 24; ++hours)
         for (u32 minutes = minutes_; minutes < 60; ++minutes)
