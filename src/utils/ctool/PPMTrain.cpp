@@ -7,11 +7,11 @@
  ****************************************************************************/
 #include <math.h>
 #include <stdio.h>
-#define NOMINMAX
 #include <windows.h>
 #pragma hdrstop
 #include "PPMT_SA.hpp"
 
+#define NOMINMAX
 #define XR_PLATFORM_WINDOWS
 #include "xrCore/_types.h"
 

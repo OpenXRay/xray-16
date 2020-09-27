@@ -511,7 +511,7 @@ TGAFile::LoadTGA(const char * fileName, UINT32 * width, UINT32 * height)
 
 	// RGB from image Data
 	//DWORD  destOffset = 0;
-	
+
 	RLECount = 0;
 	RLEFlag = 0;
 
