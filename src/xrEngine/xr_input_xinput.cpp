@@ -519,9 +519,15 @@ keyboard_key* KeynameToPtr(pcstr name)
     return NULL;
 }
 
-void GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
+bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
 {
     const int action_id = ActionNameToId(action);
+    if (action_id == kNOTBINDED)
+    {
+        // Just insert the unknown action name as is
+        xr_strcpy(dst_buff, dst_buff_sz, action);
+        return false;
+    }
     key_binding* binding = &g_key_bindings[action_id];
 
     string128 prim;
@@ -553,6 +559,7 @@ void GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
             (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "",
             ((gpad[0] && prim[0]) || (gpad[0] && sec[0])) ? " , " : "", gpad[0] ? gpad : "");
     }
+    return true;
 }
 
 #pragma todo("Artur to All: Gamepads has own bindings. Add m_keyboard[2]")
