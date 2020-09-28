@@ -19,11 +19,11 @@ public:
             if (right->Nodes->Count)
                 return (left->Text->CompareTo(right->Text));
 
-            return (false);
+            return 0;
         }
 
         if (right->Nodes->Count)
-            return (true);
+            return 1;
 
         return (left->Text->CompareTo(right->Text));
     }

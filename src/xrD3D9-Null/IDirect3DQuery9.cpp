@@ -73,7 +73,6 @@ HRESULT xrIDirect3DQuery9::Issue(DWORD dwIssueFlags)
 HRESULT xrIDirect3DQuery9::GetData(void* pData, DWORD dwSize, DWORD dwGetDataFlags)
 {
     APIDEBUG("xrIDirect3DQuery9::GetData");
-    dwSize = 0;
     return S_OK;
 };
 //-----------------------------------------------------------------------

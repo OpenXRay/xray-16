@@ -381,11 +381,11 @@ void FastClusterFit::Compress3( void* block )
 	int i = 0;
 
 	// check all possible clusters for this total order
-	for( int c0 = 0; c0 <= 16; c0++)
+	for( int c0 = 0; c0 < 16; c0++)
 	{	
 		x1 = Vec3(0);
 		
-		for( int c1 = 0; c1 <= 16-c0; c1++)
+		for( int c1 = 0; c1 < 16-c0; c1++)
 		{	
 			float const alpha2_sum = s_threeElement[i].alpha2_sum;
 			float const beta2_sum = s_threeElement[i].beta2_sum;

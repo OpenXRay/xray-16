@@ -126,6 +126,7 @@ public:
     }; // enum value_editor_enum
 
 public:
+    virtual ~property_holder_base() = default;
     virtual property_holder_holder* holder() = 0;
     virtual void clear() = 0;
     virtual property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,

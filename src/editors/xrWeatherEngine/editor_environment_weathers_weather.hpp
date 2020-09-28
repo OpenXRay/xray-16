@@ -44,9 +44,9 @@ public:
 
 private:
     bool valid_id(shared_str const& id_) const;
-    bool try_hours(u32& hours, u32& minutes, u32& seconds, shared_str& result) const;
-    bool try_minutes(u32& hours, u32& minutes, u32& seconds, shared_str& result) const;
-    shared_str try_all(u32& hours, u32& minutes, u32& seconds) const;
+    bool try_hours(u32 hours, u32 minutes, u32 seconds, shared_str& result) const;
+    bool try_minutes(u32 hours, u32 minutes, u32 seconds, shared_str& result) const;
+    shared_str try_all(u32 hours, u32 minutes, u32 seconds) const;
     shared_str generate_unique_id(shared_str const& start) const;
 
 private:

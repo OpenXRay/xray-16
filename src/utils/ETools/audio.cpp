@@ -226,7 +226,6 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
     unsigned char* buffer;
     unsigned char buf2[8];
     aiff_fmt format;
-    aifffile* aiff = (aifffile*)malloc(sizeof(aifffile));
 
     if (buf[11] == 'C')
         aifc = 1;
@@ -258,7 +257,7 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
     format.samplesize = READ_U16_BE(buffer + 6);
     format.rate = (int)read_IEEE80(buffer + 8);
 
-    aiff->bigendian = 1;
+    short bigendian = 1;
 
     if (aifc)
     {
@@ -270,11 +269,11 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
 
         if (!memcmp(buffer + 18, "NONE", 4))
         {
-            aiff->bigendian = 1;
+            bigendian = 1;
         }
         else if (!memcmp(buffer + 18, "sowt", 4))
         {
-            aiff->bigendian = 0;
+            bigendian = 0;
         }
         else
         {
@@ -314,6 +313,8 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
         opt->read_samples = wav_read; /* Similar enough, so we use the same */
         opt->total_samples_per_channel = format.totalframes;
 
+        aifffile* aiff = (aifffile*)malloc(sizeof(aifffile));
+        aiff->bigendian = bigendian;
         aiff->f = in;
         aiff->samplesread = 0;
         aiff->channels = format.channels;
@@ -357,7 +358,6 @@ int wav_open(FILE* in, oe_enc_opt* opt, unsigned char* oldbuf, int buflen)
     unsigned int len;
     int samplesize;
     wav_fmt format;
-    wavfile* wav = (wavfile*)malloc(sizeof(wavfile));
 
     /* Ok. At this point, we know we have a WAV file. Now we have to detect
      * whether we support the subtype, and we have to find the actual data
@@ -431,6 +431,7 @@ int wav_open(FILE* in, oe_enc_opt* opt, unsigned char* oldbuf, int buflen)
         opt->rate = format.samplerate;
         opt->channels = format.channels;
 
+        wavfile* wav = (wavfile*)malloc(sizeof(wavfile));
         wav->f = in;
         wav->samplesread = 0;
         wav->bigendian = 0;
@@ -771,14 +772,13 @@ static long read_downmix(void* data, float** buffer, int samples)
 
 void setup_downmix(oe_enc_opt* opt)
 {
-    downmix* d = (downmix*)calloc(1, sizeof(downmix));
-
     if (opt->channels != 2)
     {
         fprintf(stderr, "Internal error! Please report this bug.\n");
         return;
     }
 
+    downmix* d = (downmix*)calloc(1, sizeof(downmix));
     d->bufs = (float**)malloc(2 * sizeof(float*));
     d->bufs[0] = (float*)malloc(4096 * sizeof(float));
     d->bufs[1] = (float*)malloc(4096 * sizeof(float));

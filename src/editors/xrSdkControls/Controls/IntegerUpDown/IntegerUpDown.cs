@@ -465,10 +465,7 @@ namespace XRay.SdkControls
         protected virtual void OnValueChanged(EventArgs e)
         {
             // Call the event handler
-            if (onValueChanged != null)
-            {
-                onValueChanged(this, e);
-            }
+            onValueChanged?.Invoke(this, e);
         }
 
         protected override void OnLostFocus(EventArgs e)

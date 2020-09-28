@@ -17,15 +17,16 @@ namespace Editor
 private ref class window_ide_final : public editor::window_ide
 {
 public:
-    window_ide_final(ide_base*& ide, engine_base* engine) : editor::window_ide(engine)
+    window_ide_final(ide_base*& ide, engine_base* engine)
+        : editor::window_ide(engine), on_idle_handler(gcnew System::EventHandler(this, &window_ide_final::on_idle))
     {
         m_ide = ide;
-        System::Windows::Forms::Application::Idle += gcnew System::EventHandler(this, &window_ide_final::on_idle);
+        System::Windows::Forms::Application::Idle += on_idle_handler;
     }
 
     ~window_ide_final()
     {
-        System::Windows::Forms::Application::Idle -= gcnew System::EventHandler(this, &window_ide_final::on_idle);
+        System::Windows::Forms::Application::Idle -= on_idle_handler;
         m_engine = nullptr;
         m_ide = nullptr;
     }
@@ -46,6 +47,8 @@ protected:
     }
 
 private:
+    System::EventHandler ^ on_idle_handler;
+
     void on_idle(System::Object ^ sender, System::EventArgs ^ event_args)
     {
         ide_impl* impl = dynamic_cast<ide_impl*>(m_ide);

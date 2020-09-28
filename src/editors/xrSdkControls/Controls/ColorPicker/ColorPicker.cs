@@ -110,8 +110,7 @@ namespace XRay.SdkControls
 
         private void OnColorChanged()
         {
-            if (!ignoreOnChanged && ColorChanged != null)
-                ColorChanged(this, Value);
+            ColorChanged?.Invoke(this, Value);
         }
 
         private void UpdateColor()
