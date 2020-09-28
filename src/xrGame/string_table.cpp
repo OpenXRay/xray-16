@@ -221,8 +221,15 @@ STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
 
         strncpy_s(srcbuff, b + LEN, len);
         srcbuff[len] = 0;
-        GetActionAllBinding(srcbuff, buff, sizeof(buff));
-        res.append(buff, xr_strlen(buff));
+        if (ActionNameToPtr(srcbuff)) // if exist, get bindings
+        {
+            VERIFY(GetActionAllBinding(srcbuff, buff, sizeof(buff)));
+            res.append(buff, xr_strlen(buff));
+        }
+        else // doesn't exist, insert as is
+        {
+            res.append(b, LEN + len + 2);
+        }
 
         k = (int)(b - str);
         k += len;
