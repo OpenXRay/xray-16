@@ -7,7 +7,10 @@
  ****************************************************************************/
 #include <math.h>
 #include <stdio.h>
+#define NOMINMAX
 #include <windows.h>
+#define XR_PLATFORM_WINDOWS
+#include "xrCore/_types.h"
 #pragma hdrstop
 #include "PPMT_SA.hpp"
 
@@ -18,13 +21,13 @@ const int UP_FREQ = 5, INT_BITS = 7, PERIOD_BITS = 7, TOT_BITS = INT_BITS + PERI
 #pragma pack(1)
 static struct PPM_CONTEXT
 {
-    DWORD EscFreq;
+    u32 EscFreq;
     WORD NumStats, Dummy;
-    DWORD SummFreq;
+    u32 SummFreq;
     struct STATE
     {
         BYTE Symbol, Flag;
-        DWORD Freq;
+        u32 Freq;
         PPM_CONTEXT* Successor;
     } * Stats;
     PPM_CONTEXT* Suffix;
@@ -357,7 +360,7 @@ inline double GetExtraBits(double f, double e, double f1, double sf1, double sf0
         ExtraBits -= COD_ERR * e;
     return ExtraBits;
 }
-static DWORD SizeOfModel, nc;
+static u32 SizeOfModel, nc;
 PPM_CONTEXT* PPM_CONTEXT::cutOff(int o, int ob, double b)
 {
     STATE tmp, *p, *p1;

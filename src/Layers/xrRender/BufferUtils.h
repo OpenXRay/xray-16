@@ -1,7 +1,7 @@
 #pragma once
 
 u32 GetFVFVertexSize(u32 FVF);
-u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream);
+u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream);
 u32 GetDeclLength(const VertexElement* decl);
 
 struct SDeclaration;

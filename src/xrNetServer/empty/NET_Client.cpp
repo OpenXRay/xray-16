@@ -384,7 +384,7 @@ bool IPureClient::Connect(pcstr options)
             string64 EnumData;
             EnumData[0] = 0;
             xr_strcat(EnumData, "ToConnect");
-            DWORD EnumSize = xr_strlen(EnumData) + 1;
+            u32 EnumSize = xr_strlen(EnumData) + 1;
             // We now have the host address so lets enum
             u32 c_port = psCL_Port;
             HRESULT res = S_FALSE;
@@ -529,7 +529,7 @@ bool IPureClient::net_HasBandwidth()
     }
     if (0 != psNET_ClientUpdate && (dwTime - net_Time_LastUpdate) > dwInterval) {
         // check queue for "empty" state
-        DWORD dwPending = 0;
+        u32 dwPending = 0;
 
         if (dwPending > u32(psNET_ClientPending)) {
             net_Statistic.dwTimesBlocked++;
@@ -602,7 +602,7 @@ IPureClient::HOST_NODE::~HOST_NODE() noexcept
 {
 }
 
-bool IPureClient::GetServerAddress(ip_address& pAddress, DWORD* pPort)
+bool IPureClient::GetServerAddress(ip_address& pAddress, u32* pPort)
 {
     return true;
 };

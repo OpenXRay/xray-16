@@ -530,7 +530,7 @@ void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
               &ep.flEnvironmentDiffusion, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_AIRABSORPTIONHF,
               &ep.flAirAbsorptionHF, sizeof(float));
-    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD));
+    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(u32));
 }
 
 void CSoundRender_Core::i_eax_listener_get(CSound_environment* _E)

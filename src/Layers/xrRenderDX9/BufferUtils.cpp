@@ -11,7 +11,7 @@ u32 GetFVFVertexSize(u32 FVF)
     return D3DXGetFVFVertexSize(FVF);
 }
 
-u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
     return D3DXGetDeclVertexSize(decl, Stream);
 }
@@ -62,7 +62,7 @@ void* VertexStagingBuffer::Map(
     VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
     VERIFY(size <= m_Size);
 
-    DWORD mapMode = read ? D3DLOCK_READONLY : 0;
+    u32 mapMode = read ? D3DLOCK_READONLY : 0;
     R_CHK(m_DeviceBuffer->Lock(offset, size, const_cast<void**>(&m_HostBuffer), mapMode));
     return m_HostBuffer;
 }
@@ -158,7 +158,7 @@ void* IndexStagingBuffer::Map(
     VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
     VERIFY(size <= m_Size);
 
-    DWORD mapMode = read ? D3DLOCK_READONLY : 0;
+    u32 mapMode = read ? D3DLOCK_READONLY : 0;
     R_CHK(m_DeviceBuffer->Lock(offset, size, const_cast<void**>(&m_HostBuffer), mapMode));
     return m_HostBuffer;
 }

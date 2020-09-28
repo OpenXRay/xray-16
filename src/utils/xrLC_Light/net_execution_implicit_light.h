@@ -15,7 +15,7 @@ public:
     void construct(const ImplicitExecute& _e) { exec = _e; }
     void send_task(IGenericStream* outStream);
     void receive_result(IGenericStream* inStream);
-    bool receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream);
+    bool receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream);
     void send_result(IGenericStream* outStream);
     bool execute(net_task_callback& net_callback);
 };

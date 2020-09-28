@@ -95,7 +95,7 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-DWORD timeGetTime()
+u32 timeGetTime()
 {
     return SDL_GetTicks();
 }

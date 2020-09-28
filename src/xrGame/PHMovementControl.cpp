@@ -1242,7 +1242,7 @@ void CPHMovementControl::UnFreeze()
         m_character->UnFreeze();
 }
 
-void CPHMovementControl::ActivateBox(DWORD id, BOOL Check /*false*/)
+void CPHMovementControl::ActivateBox(u32 id, BOOL Check /*false*/)
 {
     if (Check && (m_dwCurBox == id))
         return;
@@ -1259,7 +1259,7 @@ void CPHMovementControl::ActivateBox(DWORD id, BOOL Check /*false*/)
     // m_character->SetVelocity(v);
     // m_character->SetPosition(vPosition);
 }
-void CPHMovementControl::InterpolateBox(DWORD id, float k)
+void CPHMovementControl::InterpolateBox(u32 id, float k)
 {
     if (m_dwCurBox == id)
         return;

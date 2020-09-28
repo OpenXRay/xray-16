@@ -160,7 +160,7 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void generate_jitter(DWORD* dest, u32 elem_count)
+void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -563,7 +563,7 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    DWORD data[TEX_jitter_count - 1];
+                    u32 data[TEX_jitter_count - 1];
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it2 = 0; it2 < TEX_jitter_count - 1; it2++)
                     {

@@ -39,7 +39,7 @@ defined(_UNKNOWN_ENVIRONMENT_) != \
 //typedef unsigned int UINT;
 #endif /* defined(_WIN32_ENVIRONMENT_)  */
 
-const DWORD PPMdSignature = 0x84ACAF8F, Variant = 'I';
+const u32 PPMdSignature = 0x84ACAF8F, Variant = 'I';
 const int MAX_O = 16; /* maximum allowed model order  */
 
 #define _USE_PREFETCHING /* for puzzling mainly          */

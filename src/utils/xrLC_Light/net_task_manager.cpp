@@ -207,7 +207,7 @@ void net_task_manager::send(IGridUser& user, u32 deflector_id)
         w.w_u32(deflector_id);
     }
 
-    DWORD t_id = deflector_id;
+    u32 t_id = deflector_id;
     string_path data;
     strconcat(sizeof(data), data, libraries, ",", gl_data_net_file_name);
     user.RunTask(data, "RunTask", stream, Finalize, &t_id, true);

@@ -6,7 +6,7 @@ u32 GetFVFVertexSize(u32 FVF)
     return D3DXGetFVFVertexSize(FVF);
 }
 
-u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream)
+u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
     return D3DXGetDeclVertexSize(decl, Stream);
 }

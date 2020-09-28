@@ -64,11 +64,11 @@ enum
 
 struct SUBRANGE
 {
-    DWORD low, high, scale;
+    u32 low, high, scale;
 };
 
 static SUBRANGE SubRange = {0, 0, 0};
-static DWORD low = 0, code = 0, range = 0;
+static u32 low = 0, code = 0, range = 0;
 
 inline void rcEncNormalize(_PPMD_FILE* stream)
 {
@@ -83,7 +83,7 @@ inline void rcEncNormalize(_PPMD_FILE* stream)
 static inline void rcInitEncoder()
 {
     low = 0;
-    range = DWORD(-1);
+    range = u32(-1);
 }
 /*
 #define RC_ENC_NORMALIZE(stream) {                                          \
@@ -111,7 +111,7 @@ static inline void rcFlushEncoder(_PPMD_FILE* stream)
 static inline void rcInitDecoder(_PPMD_FILE* stream)
 {
     low = code = 0;
-    range = DWORD(-1);
+    range = u32(-1);
     for (UINT i = 0; i < 4; i++)
         code = (code << 8) | _PPMD_D_GETC(stream);
 }

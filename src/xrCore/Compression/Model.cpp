@@ -157,7 +157,7 @@ inline PPMD_STARTUP::PPMD_STARTUP() // constants initialization
             m++;
         }
     }
-    (DWORD&)DummySEE2Cont = PPMdSignature;
+    (u32&)DummySEE2Cont = PPMdSignature;
 }
 
 void PPM_CONTEXT::makeSuffix()

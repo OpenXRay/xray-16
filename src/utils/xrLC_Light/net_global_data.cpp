@@ -15,7 +15,7 @@ static LPCSTR global_data_file_path(LPCSTR name, string_path& path_name)
     return path_name;
 }
 
-bool global_data_file_path(LPCSTR name, IAgent* agent, DWORD sessionId, string_path& path_name)
+bool global_data_file_path(LPCSTR name, IAgent* agent, u32 sessionId, string_path& path_name)
 {
     HRESULT rz = agent->GetSessionCacheDirectory(sessionId, path_name);
     if (rz != S_OK)
@@ -83,7 +83,7 @@ private:
         //
         outStream->Write(&_id, sizeof(_id));
     }
-    virtual bool on_task_receive(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+    virtual bool on_task_receive(IAgent* agent, u32 sessionId, IGenericStream* inStream)
     {
         //
         const xr_vector<e_net_globals>& v = gl_gl_reg().get_globals(gl_type);
@@ -135,7 +135,7 @@ private:
         impl::create_data_file(path_name);
     }
 
-    bool create_data(u32 id, IAgent* agent, DWORD sessionId)
+    bool create_data(u32 id, IAgent* agent, u32 sessionId)
     {
         if (_id == id)
             return true;

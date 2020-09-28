@@ -37,7 +37,7 @@ private:
     };
 
     virtual void receive_result(IGenericStream* outStream) { execution_impl.receive_result(outStream); };
-    virtual bool receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+    virtual bool receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
     {
         const xr_vector<e_net_globals>& v = exe_gl_reg().get_globals(etype);
         u32 size = v.size();
@@ -47,7 +47,7 @@ private:
         return execution_impl.receive_task(agent, sessionId, inStream);
     };
     virtual void send_result(IGenericStream* outStream) { execution_impl.send_result(outStream); };
-    virtual bool execute(IAgent* agent, DWORD sessionId)
+    virtual bool execute(IAgent* agent, u32 sessionId)
     {
         net_task_callback callback(agent, sessionId);
         return execution_impl.execute(callback) && !callback.break_all();

@@ -28,7 +28,7 @@ void execution_lightmaps::send_task(IGenericStream* outStream)
     }
 }
 
-bool execution_lightmaps::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+bool execution_lightmaps::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     u8 buff[send_receive_task_buff_size];
 
@@ -96,7 +96,7 @@ bool execution_lightmaps::execute(net_task_callback& net_callback)
     CTimer gtimer;
     gtimer.Start();
     // net_callback.agent().GetSessionCacheDirectory( net_callback.session(), statistics.dir );
-    DWORD sz = sizeof(statistics.dir);
+    u32 sz = sizeof(statistics.dir);
     GetComputerName(statistics.dir, &sz);
 #endif
 

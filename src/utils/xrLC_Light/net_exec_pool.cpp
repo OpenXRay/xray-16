@@ -195,7 +195,7 @@ run_task:;
     return;
 }
 
-net_execution* exec_pool::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+net_execution* exec_pool::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     __try
     {

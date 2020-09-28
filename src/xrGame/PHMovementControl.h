@@ -114,7 +114,7 @@ private:
     u32 trying_times[4];
     Fvector trying_poses[4];
     u64 block_damage_step_end;
-    DWORD m_dwCurBox;
+    u32 m_dwCurBox;
 
     float fMass;
     float fMinCrashSpeed;
@@ -197,17 +197,17 @@ public:
     void SetNonInteractive(bool v);
     void CalcMaximumVelocity(Fvector& /**dest**/, Fvector& /**accel**/, float /**friction**/){};
     void CalcMaximumVelocity(float& /**dest**/, float /**accel**/, float /**friction**/){};
-    void ActivateBox(DWORD id, BOOL Check = false);
-    bool ActivateBoxDynamic(DWORD id, int num_it = 9, int num_steps = 5, float resolve_depth = 0.01f);
-    void InterpolateBox(DWORD id, float k);
+    void ActivateBox(u32 id, BOOL Check = false);
+    bool ActivateBoxDynamic(u32 id, int num_it = 9, int num_steps = 5, float resolve_depth = 0.01f);
+    void InterpolateBox(u32 id, float k);
     EEnvironment Environment() { return eEnvironment; }
     EEnvironment OldEnvironment() { return eOldEnvironment; }
     const Fbox& Box() { return aabb; }
-    DWORD BoxID() const { return m_dwCurBox; }
+    u32 BoxID() const { return m_dwCurBox; }
     const Fbox* Boxes() { return boxes; }
     float FootRadius();
     void CollisionEnable(BOOL enable);
-    void SetBox(DWORD id, const Fbox& BB)
+    void SetBox(u32 id, const Fbox& BB)
     {
         boxes[id].set(BB);
         aabb.set(BB);

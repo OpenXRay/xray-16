@@ -47,7 +47,7 @@ public:
     void receive_result(IGenericStream* inStream);
     void remove_task(net_execution* e);
     void send_result(IGenericStream* outStream, net_execution& e);
-    net_execution* receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream);
+    net_execution* receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream);
 
 private:
 };

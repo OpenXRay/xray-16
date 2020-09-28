@@ -30,7 +30,7 @@ void net_execution_vertex_light::send_task(IGenericStream* outStream)
         w.w_u32(end);
     }
 }
-bool net_execution_vertex_light::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+bool net_execution_vertex_light::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     u8 buff[send_receive_task_buffer_size];
     INetBlockReader r(inStream, buff, sizeof(buff));

@@ -78,7 +78,7 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
         return false;
     }
 
-    DWORD KeyValueSize = 0;
+    u32 KeyValueSize = 0;
     switch (rKeyType)
     {
     case REG_DWORD: { KeyValueSize = 4;

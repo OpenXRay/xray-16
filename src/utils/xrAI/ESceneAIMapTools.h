@@ -12,7 +12,7 @@
 class ESceneAIMapTool;
 struct SAINode;
 
-const DWORD InvalidNode = (1 << 24) - 1;
+const u32 InvalidNode = (1 << 24) - 1;
 
 #pragma pack(push, 1)
 struct SAINode // definition of "patch" or "node"

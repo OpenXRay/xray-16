@@ -5,7 +5,7 @@
 #include "net_exec_pool.h"
 namespace lc_net
 {
-bool task_manager::run_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream)
+bool task_manager::run_task(IAgent* agent, u32 sessionId, IGenericStream* inStream, IGenericStream* outStream)
 {
     if (!initialize_session(sessionId))
         return false;
