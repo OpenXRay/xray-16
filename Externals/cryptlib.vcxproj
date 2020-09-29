@@ -152,6 +152,15 @@
   <ItemGroup>
     <ClCompile Include="cryptopp\cryptlib.cpp" />
     <ClCompile Include="cryptopp\cpu.cpp" />
+    <ClCompile Include="cryptopp\des.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="cryptopp\dessp.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="cryptopp\hmac.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="cryptopp\integer.cpp" />
     <ClCompile Include="cryptopp\algebra.cpp" />
     <ClCompile Include="cryptopp\algparam.cpp" />

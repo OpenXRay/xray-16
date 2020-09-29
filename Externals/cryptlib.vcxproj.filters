@@ -38,6 +38,12 @@
     <ClCompile Include="cryptopp\default.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cryptopp\des.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cryptopp\dessp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cryptopp\dll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\hex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cryptopp\hmac.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\hrtimer.cpp">
