@@ -612,7 +612,7 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
             return;
         if (0 == xr_strcmp(entry.name, ".."))
             return;
-        if (path[xr_strlen(path) - 1] != _DELIMITER && path[xr_strlen(path) - 1] != '/')
+        if (path[xr_strlen(path) - 1] != _DELIMITER || path[xr_strlen(path) - 1] != '/')
             xr_strcat(N, DELIMITER);
         Register(N, VFS_STANDARD_FILE, 0, 0, entry.size, entry.size, (u32)entry.time_write);
         Recurse(N);
