@@ -708,9 +708,9 @@ inline bool pointInBox(const dReal* point,const dReal* p,const dReal* R,const dR
 	dy=dFabs(dDOT14(dif,R+1));
 	dz=dFabs(dDOT14(dif,R+2));
 	return
-		(!(dFabs(dDOT14(dif,R+0))>side[0]/2.f))&&
-		(!(dFabs(dDOT14(dif,R+1))>side[1]/2.f))&&
-		(!(dFabs(dDOT14(dif,R+2))>side[2]/2.f));
+		(!(dx>side[0]/2.f))&&
+		(!(dy>side[1]/2.f))&&
+		(!(dz>side[2]/2.f));
 
 }
 
