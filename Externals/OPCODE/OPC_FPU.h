@@ -104,7 +104,7 @@ inline_ float fepsilon(float f)
 
 //! Is the float valid ?
 inline_ bool IsNAN(float value) { return ((*(udword*)&value) & 0x7f800000) == 0x7f800000; }
-#define NaN(value) (!((value >= 0) || (value < 0)))
+#define NaN(value) (!(((value) >= 0) || ((value) < 0)))
 
 /*
     //! FPU precision setting function.
