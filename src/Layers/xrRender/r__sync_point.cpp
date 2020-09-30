@@ -48,6 +48,8 @@ void R_sync_point::Create()
 {
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         R_CHK(CreateQuery((ID3DQuery**)&q_sync_point[i], D3D_QUERY_EVENT));
+    // Prevent error on first get data
+    CHK_DX(EndQuery((ID3DQuery*)q_sync_point[0]));
 }
 
 void R_sync_point::Destroy()
