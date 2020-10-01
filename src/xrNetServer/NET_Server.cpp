@@ -656,7 +656,7 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
     // send it
     DPN_BUFFER_DESC desc;
     desc.dwBufferSize = size;
-    desc.pBufferData = LPBYTE(data);
+    desc.pBufferData = (u8*)(data);
 
 #ifdef _DEBUG
     u32 time_global = TimeGlobal(device_timer);

@@ -191,7 +191,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         // Controlles/Layers
         {
             F = fs.open_chunk(EB_Light_control);
-            L_control_data.assign(LPBYTE(F->pointer()), LPBYTE(F->pointer()) + F->length());
+            L_control_data.assign((u8*)(F->pointer()), (u8*)(F->pointer()) + F->length());
 
             R_Layer temp;
 

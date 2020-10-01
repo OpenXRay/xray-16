@@ -784,7 +784,7 @@ CRenderTarget::CRenderTarget()
                 {
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
-                        u16* p = (u16*)(LPBYTE(subData.pSysMem) + slice * subData.SysMemSlicePitch +
+                        u16* p = (u16*)((u8*)(subData.pSysMem) + slice * subData.SysMemSlicePitch +
                             y * subData.SysMemPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
                         float ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
@@ -901,7 +901,7 @@ CRenderTarget::CRenderTarget()
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it = 0; it < TEX_jitter_count - 1; it++)
                     {
-                        u32* p = (u32*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);
+                        u32* p = (u32*)((u8*)(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);
 
                         *p = data[it];
                     }
@@ -962,7 +962,7 @@ CRenderTarget::CRenderTarget()
                     float dist = ::Random.randF(0.0f, 1.0f);
 
                     float* p =
-                        (float*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4 * sizeof(float));
+                        (float*)((u8*)(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4 * sizeof(float));
                     *p = (float)(_cos(angle));
                     *(p + 1) = (float)(_sin(angle));
                     *(p + 2) = (float)(dist);

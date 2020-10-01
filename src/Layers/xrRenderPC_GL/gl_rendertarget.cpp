@@ -747,7 +747,7 @@ CRenderTarget::CRenderTarget()
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
                         u16* p = (u16*)
-                        (LPBYTE(pBits)
+                        ((u8*)(pBits)
                             + slice * SlicePitch
                             + y * RowPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
@@ -839,7 +839,7 @@ CRenderTarget::CRenderTarget()
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it2 = 0; it2 < TEX_jitter_count - 1; it2++)
                     {
-                        u32* p = (u32*)(LPBYTE(tempData[it2]) + y * Pitch + x * 4);
+                        u32* p = (u32*)((u8*)(tempData[it2]) + y * Pitch + x * 4);
                         *p = data [it2];
                     }
                 }
@@ -885,7 +885,7 @@ CRenderTarget::CRenderTarget()
                     //float dest[4];
 
                     float* p = (float*)
-                    (LPBYTE(tempDataHBAO)
+                    ((u8*)(tempDataHBAO)
                         + y * HBAOPitch
                         + x * 4 * sizeof(float));
                     *p = (float)cos(angle);

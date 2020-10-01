@@ -17,7 +17,7 @@ static char const* QueryPatchVersionString(char* dest, u32 dest_size)
     DWORD KeyValueType = REG_SZ;
 
     // RegQueryValueEx(KeyCDKey, REGISTRY_VALUE_LANGUAGE, NULL, &KeyValueType, (LPBYTE)LangID, &KeyValueSize);
-    RegQueryValueEx(KeyCDKey, REGISTRY_VALUE_SKU, NULL, &KeyValueType, (LPBYTE)LangID, &KeyValueSize);
+    RegQueryValueEx(KeyCDKey, REGISTRY_VALUE_SKU, NULL, &KeyValueType, (u8*)LangID, &KeyValueSize);
 
     xr_sprintf(dest, dest_size, "-%s", LangID);
 

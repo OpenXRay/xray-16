@@ -75,7 +75,7 @@ void CSoundRender_Emitter::fill_data(u8* _dest, u32 offset, u32 size)
 void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
 {
     // Msg			("stream: %10s - [%X]:%d, p=%d, t=%d",*source->fname,ptr,size,position,source->dwBytesTotal);
-    LPBYTE dest = LPBYTE(ptr);
+    u8* dest = (u8*)(ptr);
     u32 dwBytesTotal = get_bytes_total();
 
     if ((get_cursor(true) + size) > dwBytesTotal)

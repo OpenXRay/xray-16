@@ -280,7 +280,7 @@ BOOL CSoundStream::Decompress(unsigned char* dest)
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
 void CSoundStream::AppWriteDataToBuffer(u32 dwOffset, // our own write cursor
-    LPBYTE lpbSoundData, // start of our data
+    u8* lpbSoundData, // start of our data
     u32 dwSoundBytes) // size of block to copy
 {
     LPVOID lpvPtr1, lpvPtr2;

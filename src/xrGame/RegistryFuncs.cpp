@@ -42,7 +42,7 @@ bool ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value)
     break;
     };
 
-    res = RegQueryValueEx(hKey, rKeyName, NULL, &rKeyType, (LPBYTE)rBuf, &KeyValueSize);
+    res = RegQueryValueEx(hKey, rKeyName, NULL, &rKeyType, (u8*)rBuf, &KeyValueSize);
     if (hKey != 0)
         RegCloseKey(hKey);
 
@@ -96,7 +96,7 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
     break;
     };
 
-    res = RegSetValueEx(hKey, rKeyName, NULL, rKeyType, (LPBYTE)value, KeyValueSize);
+    res = RegSetValueEx(hKey, rKeyName, NULL, rKeyType, (u8*)value, KeyValueSize);
 
     RegCloseKey(hKey);
     return true;

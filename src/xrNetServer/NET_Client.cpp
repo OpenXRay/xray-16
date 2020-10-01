@@ -1098,7 +1098,7 @@ void IPureClient::Sync_Thread()
             DPN_BUFFER_DESC desc;
             DPNHANDLE hAsync = 0;
             desc.dwBufferSize = sizeof(clPing);
-            desc.pBufferData = LPBYTE(&clPing);
+            desc.pBufferData = (u8*)(&clPing);
             if (nullptr == NET || net_Disconnected)
                 break;
 
