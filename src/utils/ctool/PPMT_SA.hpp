@@ -35,8 +35,8 @@ struct MEM_BLK
 } _PACK_ATTR;
 #pragma pack()
 static long SubAllocatorSize = 0;
-static BYTE Indx2Units[N_INDEXES], Units2Indx[128], GlueCount;
-static BYTE *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
+static u8 Indx2Units[N_INDEXES], Units2Indx[128], GlueCount;
+static u8 *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 static struct NODE
 {
     NODE* next;
@@ -57,7 +57,7 @@ inline UINT U2B(int NU) { return 16 * NU + 4 * NU; }
 inline void SplitBlock(void* pv, int OldIndx, int NewIndx)
 {
     int i, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
-    BYTE* p = ((BYTE*)pv) + U2B(Indx2Units[NewIndx]);
+    u8* p = ((u8*)pv) + U2B(Indx2Units[NewIndx]);
     if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff)
     {
         InsertNode(p, --i);
@@ -80,7 +80,7 @@ u32 _STDCALL GetUsedMemory()
 BOOL _STDCALL StartSubAllocator(int SASize)
 {
     u32 t = SASize << 20;
-    if ((HeapStart = new BYTE[t]) == NULL)
+    if ((HeapStart = new u8[t]) == NULL)
         return FALSE;
     SubAllocatorSize = t;
     return TRUE;

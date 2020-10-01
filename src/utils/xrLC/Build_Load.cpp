@@ -186,7 +186,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     Logger.Status("Loading lights...");
     {
         xr_vector<R_Layer> L_layers;
-        xr_vector<BYTE> L_control_data;
+        xr_vector<u8> L_control_data;
 
         // Controlles/Layers
         {

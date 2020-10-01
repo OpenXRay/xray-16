@@ -73,7 +73,7 @@ struct SCover
 
 using Nodes = xr_vector<vertex>;
 using Vectors = xr_vector<Fvector>;
-using Marks = xr_vector<BYTE>;
+using Marks = xr_vector<u8>;
 //using Lights = xr_vector<R_Light>;
 
 // data

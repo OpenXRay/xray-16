@@ -93,7 +93,7 @@ IC void CGameGraph::accessible(u32 const vertex_id, bool value) const
 IC bool CGameGraph::valid_vertex_id(u32 const vertex_id) const { return (vertex_id < header().vertex_count()); }
 IC void CGameGraph::begin(u32 const vertex_id, const_iterator& start, const_iterator& end) const
 {
-    end = (start = (const CEdge*)((BYTE*)m_nodes + vertex(_GRAPH_ID(vertex_id))->edge_offset())) +
+    end = (start = (const CEdge*)((u8*)m_nodes + vertex(_GRAPH_ID(vertex_id))->edge_offset())) +
         vertex(_GRAPH_ID(vertex_id))->edge_count();
 }
 

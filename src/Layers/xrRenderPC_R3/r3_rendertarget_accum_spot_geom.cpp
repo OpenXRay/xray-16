@@ -69,7 +69,7 @@ void CRenderTarget::accum_spot_geom_create()
         constexpr size_t vSize = 3 * 4;
 
         g_accum_spot_vb.Create(vCount * vSize);
-        BYTE* pData = static_cast<BYTE*>(g_accum_spot_vb.Map());
+        u8* pData = static_cast<u8*>(g_accum_spot_vb.Map());
         CopyMemory(pData, du_cone_vertices, vCount * vSize);
         g_accum_spot_vb.Unmap(true); // upload vertex data
     }
@@ -79,7 +79,7 @@ void CRenderTarget::accum_spot_geom_create()
         constexpr size_t iCount = DU_CONE_NUMFACES * 3;
 
         g_accum_spot_ib.Create(iCount * 2);
-        BYTE* pData = static_cast<BYTE*>(g_accum_spot_ib.Map());
+        u8* pData = static_cast<u8*>(g_accum_spot_ib.Map());
         CopyMemory(pData, du_cone_faces, iCount * 2);
         g_accum_spot_ib.Unmap(true); // upload index data
     }

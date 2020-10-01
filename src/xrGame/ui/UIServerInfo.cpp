@@ -106,7 +106,7 @@ void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
         return;
     }*/
 
-    CxMemFile tmp_memfile(const_cast<BYTE*>(data_ptr), data_size);
+    CxMemFile tmp_memfile(const_cast<u8*>(data_ptr), data_size);
     CxImage tmp_image;
     if (!tmp_image.Decode(&tmp_memfile, CXIMAGE_FORMAT_JPG))
     {

@@ -26,7 +26,7 @@ Comments:
 // should be in ddraw.h
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)\
-    ((u32)(BYTE)(ch0) | ((u32)(BYTE)(ch1) << 8) | ((u32)(BYTE)(ch2) << 16) | ((u32)(BYTE)(ch3) << 24))
+    ((u32)(u8)(ch0) | ((u32)(u8)(ch1) << 8) | ((u32)(u8)(ch2) << 16) | ((u32)(u8)(ch3) << 24))
 #endif // defined(MAKEFOURCC)
 
 // Defined in this module:
@@ -58,7 +58,7 @@ void Image_DXTC::SaveAsRaw()
     FILE* pf = fopen("decom.raw", "wb");
     VERIFY(pf);
     // writes only 32 bit format.
-    fwrite(m_pDecompBytes, m_nHeight * m_nWidth * 4, sizeof(BYTE), pf);
+    fwrite(m_pDecompBytes, m_nHeight * m_nWidth * 4, sizeof(u8), pf);
     fclose(pf);
     pf = NULL;
 }
@@ -145,7 +145,7 @@ bool Image_DXTC::LoadFromFile(LPCSTR filename)
     if (ddsd.dwHeaderFlags & DDSD_LINEARSIZE)
     {
         // TRACE("dwFlags  has DDSD_LINEARSIZE\n");
-        m_pCompBytes = (BYTE*)calloc(ddsd.dwPitchOrLinearSize, sizeof(BYTE));
+        m_pCompBytes = (u8*)calloc(ddsd.dwPitchOrLinearSize, sizeof(u8));
         if (m_pCompBytes == NULL)
         {
             // TRACE("Can't allocate m_pCompBytes on file read!\n");
@@ -157,7 +157,7 @@ bool Image_DXTC::LoadFromFile(LPCSTR filename)
     {
         // TRACE("dwFlags  file doesn't have linearsize set\n");
         u32 dwBytesPerRow = ddsd.dwWidth * ddsd.ddspf.dwRGBBitCount / 8;
-        m_pCompBytes = (BYTE*)calloc(ddsd.dwPitchOrLinearSize * ddsd.dwHeight, sizeof(BYTE));
+        m_pCompBytes = (u8*)calloc(ddsd.dwPitchOrLinearSize * ddsd.dwHeight, sizeof(u8));
         m_nCompSize = ddsd.dwPitchOrLinearSize * ddsd.dwHeight;
         m_nCompLineSz = dwBytesPerRow;
         if (m_pCompBytes == NULL)
@@ -165,7 +165,7 @@ bool Image_DXTC::LoadFromFile(LPCSTR filename)
             // TRACE("Can't allocate m_pCompBytes on file read!\n");
             return false;
         }
-        BYTE* pDest = m_pCompBytes;
+        u8* pDest = m_pCompBytes;
         for (u32 yp = 0; yp < ddsd.dwHeight; yp++)
         {
             fread(pDest, dwBytesPerRow, 1, file);
@@ -186,7 +186,7 @@ void Image_DXTC::AllocateDecompBytes()
         m_pDecompBytes = NULL;
     }
     // Allocate for 32 bit surface:
-    m_pDecompBytes = (BYTE*)calloc(m_DDSD.dwWidth * m_DDSD.dwHeight * 4, sizeof(BYTE));
+    m_pDecompBytes = (u8*)calloc(m_DDSD.dwWidth * m_DDSD.dwHeight * 4, sizeof(u8));
     if (m_pDecompBytes == NULL)
     {
         // TRACE("Error allocating decompressed byte storage\n");
@@ -227,7 +227,7 @@ void Image_DXTC::Decompress()
     {
         for (int x = 0; x < m_nWidth; x++)
         {
-            BYTE* ptr = m_pDecompBytes + (y * m_nWidth + x) * 4;
+            u8* ptr = m_pDecompBytes + (y * m_nWidth + x) * 4;
             std::swap(ptr[0], ptr[2]);
         }
     }
@@ -238,7 +238,7 @@ struct DXTColBlock
     WORD col0;
     WORD col1;
     // no bit fields - use bytes
-    BYTE row[4];
+    u8 row[4];
 };
 
 struct DXTAlphaBlockExplicit
@@ -248,18 +248,18 @@ struct DXTAlphaBlockExplicit
 
 struct DXTAlphaBlock3BitLinear
 {
-    BYTE alpha0;
-    BYTE alpha1;
-    BYTE stuff[6];
+    u8 alpha0;
+    u8 alpha1;
+    u8 stuff[6];
 };
 
 // use cast to struct instead of RGBA_MAKE as struct is  much
 struct Color8888
 {
-    BYTE r; // change the order of names to change the
-    BYTE g; //  order of the output ARGB or BGRA, etc...
-    BYTE b; //  Last one is MSB, 1st is LSB.
-    BYTE a;
+    u8 r; // change the order of names to change the
+    u8 g; //  order of the output ARGB or BGRA, etc...
+    u8 b; //  Last one is MSB, 1st is LSB.
+    u8 a;
 };
 
 struct Color565
@@ -308,18 +308,18 @@ DXTColBlock* pBlock, Color8888* col_0, Color8888* col_1, Color8888* col_2, Color
         wrd = ((WORD)col_0->r * 2 + (WORD)col_1->r) / 3;
         // no +1 for rounding
         // as bits have been shifted to 888
-        col_2->r = (BYTE)wrd;
+        col_2->r = (u8)wrd;
         wrd = ((WORD)col_0->g * 2 + (WORD)col_1->g) / 3;
-        col_2->g = (BYTE)wrd;
+        col_2->g = (u8)wrd;
         wrd = ((WORD)col_0->b * 2 + (WORD)col_1->b) / 3;
-        col_2->b = (BYTE)wrd;
+        col_2->b = (u8)wrd;
         col_2->a = 0xff;
         wrd = ((WORD)col_0->r + (WORD)col_1->r * 2) / 3;
-        col_3->r = (BYTE)wrd;
+        col_3->r = (u8)wrd;
         wrd = ((WORD)col_0->g + (WORD)col_1->g * 2) / 3;
-        col_3->g = (BYTE)wrd;
+        col_3->g = (u8)wrd;
         wrd = ((WORD)col_0->b + (WORD)col_1->b * 2) / 3;
-        col_3->b = (BYTE)wrd;
+        col_3->b = (u8)wrd;
         col_3->a = 0xff;
     }
     else
@@ -332,11 +332,11 @@ DXTColBlock* pBlock, Color8888* col_0, Color8888* col_1, Color8888* col_2, Color
         // explicit for each component, unlike some refrasts...
         // //TRACE("block has alpha\n");
         wrd = ((WORD)col_0->r + (WORD)col_1->r) / 2;
-        col_2->r = (BYTE)wrd;
+        col_2->r = (u8)wrd;
         wrd = ((WORD)col_0->g + (WORD)col_1->g) / 2;
-        col_2->g = (BYTE)wrd;
+        col_2->g = (u8)wrd;
         wrd = ((WORD)col_0->b + (WORD)col_1->b) / 2;
-        col_2->b = (BYTE)wrd;
+        col_2->b = (u8)wrd;
         col_2->a = 0xff;
         col_3->r = 0x00; // random color to indicate alpha
         col_3->g = 0xff;
@@ -431,7 +431,7 @@ inline void DecodeAlphaExplicit(u32* pImPos, DXTAlphaBlockExplicit* pAlphaBlock,
     }
 }
 
-BYTE gBits[4][4];
+u8 gBits[4][4];
 WORD gAlphas[8];
 Color8888 gACol[4][4];
 
@@ -467,44 +467,44 @@ inline void DecodeAlpha3BitLinear(u32* pImPos, DXTAlphaBlock3BitLinear* pAlphaBl
     // pRows = (Alpha3BitRows*) & ( pAlphaBlock->stuff[0] );
     const u32 mask = 0x00000007; // bits = 00 00 01 11
     u32 bits = *(u32*)&pAlphaBlock->stuff[0];
-    gBits[0][0] = (BYTE)(bits & mask);
+    gBits[0][0] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[0][1] = (BYTE)(bits & mask);
+    gBits[0][1] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[0][2] = (BYTE)(bits & mask);
+    gBits[0][2] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[0][3] = (BYTE)(bits & mask);
+    gBits[0][3] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[1][0] = (BYTE)(bits & mask);
+    gBits[1][0] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[1][1] = (BYTE)(bits & mask);
+    gBits[1][1] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[1][2] = (BYTE)(bits & mask);
+    gBits[1][2] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[1][3] = (BYTE)(bits & mask);
+    gBits[1][3] = (u8)(bits & mask);
     // now for last two rows:
     bits = *(u32*)&pAlphaBlock->stuff[3]; // last 3 bytes
-    gBits[2][0] = (BYTE)(bits & mask);
+    gBits[2][0] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[2][1] = (BYTE)(bits & mask);
+    gBits[2][1] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[2][2] = (BYTE)(bits & mask);
+    gBits[2][2] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[2][3] = (BYTE)(bits & mask);
+    gBits[2][3] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[3][0] = (BYTE)(bits & mask);
+    gBits[3][0] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[3][1] = (BYTE)(bits & mask);
+    gBits[3][1] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[3][2] = (BYTE)(bits & mask);
+    gBits[3][2] = (u8)(bits & mask);
     bits >>= 3;
-    gBits[3][3] = (BYTE)(bits & mask);
+    gBits[3][3] = (u8)(bits & mask);
     // decode the codes into alpha values
     for (int row = 0; row < 4; row++)
     {
         for (int pix = 0; pix < 4; pix++)
         {
-            gACol[row][pix].a = (BYTE)gAlphas[gBits[row][pix]];
+            gACol[row][pix].a = (u8)gAlphas[gBits[row][pix]];
             VERIFY(gACol[row][pix].r == 0);
             VERIFY(gACol[row][pix].g == 0);
             VERIFY(gACol[row][pix].b == 0);
@@ -737,18 +737,18 @@ DXTColBlock* pBlock, Color8888* col_0, Color8888* col_1, Color8888* col_2, Color
         wrd = ((WORD)col_0->r * 2 + (WORD)col_1->r) / 3;
         // no +1 for rounding
         // as bits have been shifted to 888
-        col_2->r = (BYTE)wrd;
+        col_2->r = (u8)wrd;
         wrd = ((WORD)col_0->g * 2 + (WORD)col_1->g) / 3;
-        col_2->g = (BYTE)wrd;
+        col_2->g = (u8)wrd;
         wrd = ((WORD)col_0->b * 2 + (WORD)col_1->b) / 3;
-        col_2->b = (BYTE)wrd;
+        col_2->b = (u8)wrd;
         col_2->a = 0xff;
         wrd = ((WORD)col_0->r + (WORD)col_1->r * 2) / 3;
-        col_3->r = (BYTE)wrd;
+        col_3->r = (u8)wrd;
         wrd = ((WORD)col_0->g + (WORD)col_1->g * 2) / 3;
-        col_3->g = (BYTE)wrd;
+        col_3->g = (u8)wrd;
         wrd = ((WORD)col_0->b + (WORD)col_1->b * 2) / 3;
-        col_3->b = (BYTE)wrd;
+        col_3->b = (u8)wrd;
         col_3->a = 0xff;
     }
     else
@@ -761,11 +761,11 @@ DXTColBlock* pBlock, Color8888* col_0, Color8888* col_1, Color8888* col_2, Color
         // explicit for each component, unlike some refrasts...
         // //TRACE("block has alpha\n");
         wrd = ((WORD)col_0->r + (WORD)col_1->r) / 2;
-        col_2->r = (BYTE)wrd;
+        col_2->r = (u8)wrd;
         wrd = ((WORD)col_0->g + (WORD)col_1->g) / 2;
-        col_2->g = (BYTE)wrd;
+        col_2->g = (u8)wrd;
         wrd = ((WORD)col_0->b + (WORD)col_1->b) / 2;
-        col_2->b = (BYTE)wrd;
+        col_2->b = (u8)wrd;
         col_2->a = 0xff;
         col_3->r = 0x00; // random color to indicate alpha
         col_3->g = 0xff;
@@ -934,18 +934,18 @@ DXTColBlock* pBlock, Color8888* col_0, Color8888* col_1, Color8888* col_2, Color
         wrd = ((WORD)col_0->r * 2 + (WORD)col_1->r) / 3;
         // no +1 for rounding
         // as bits have been shifted to 888
-        col_2->r = (BYTE)wrd;
+        col_2->r = (u8)wrd;
         wrd = ((WORD)col_0->g * 2 + (WORD)col_1->g) / 3;
-        col_2->g = (BYTE)wrd;
+        col_2->g = (u8)wrd;
         wrd = ((WORD)col_0->b * 2 + (WORD)col_1->b) / 3;
-        col_2->b = (BYTE)wrd;
+        col_2->b = (u8)wrd;
         col_2->a = 0xff;
         wrd = ((WORD)col_0->r + (WORD)col_1->r * 2) / 3;
-        col_3->r = (BYTE)wrd;
+        col_3->r = (u8)wrd;
         wrd = ((WORD)col_0->g + (WORD)col_1->g * 2) / 3;
-        col_3->g = (BYTE)wrd;
+        col_3->g = (u8)wrd;
         wrd = ((WORD)col_0->b + (WORD)col_1->b * 2) / 3;
-        col_3->b = (BYTE)wrd;
+        col_3->b = (u8)wrd;
         col_3->a = 0xff;
     }
     else
@@ -958,11 +958,11 @@ DXTColBlock* pBlock, Color8888* col_0, Color8888* col_1, Color8888* col_2, Color
         // explicit for each component, unlike some refrasts...
         // //TRACE("block has alpha\n");
         wrd = ((WORD)col_0->r + (WORD)col_1->r) / 2;
-        col_2->r = (BYTE)wrd;
+        col_2->r = (u8)wrd;
         wrd = ((WORD)col_0->g + (WORD)col_1->g) / 2;
-        col_2->g = (BYTE)wrd;
+        col_2->g = (u8)wrd;
         wrd = ((WORD)col_0->b + (WORD)col_1->b) / 2;
-        col_2->b = (BYTE)wrd;
+        col_2->b = (u8)wrd;
         col_2->a = 0xff;
         col_3->r = 0x00; // random color to indicate alpha
         col_3->g = 0xff;

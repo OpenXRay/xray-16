@@ -26,7 +26,7 @@ static struct PPM_CONTEXT
     u32 SummFreq;
     struct STATE
     {
-        BYTE Symbol, Flag;
+        u8 Symbol, Flag;
         u32 Freq;
         PPM_CONTEXT* Successor;
     } * Stats;
@@ -42,10 +42,10 @@ static struct PPM_CONTEXT
 } * MinContext, *MaxContext;
 #pragma pack()
 
-static BYTE QTable[260]; // constants
+static u8 QTable[260]; // constants
 static PPM_CONTEXT::STATE* FoundState; // found next state transition
 static int NumMasked, OrderFall, MaxOrder;
-static BYTE CharMask[256];
+static u8 CharMask[256];
 
 inline PPM_CONTEXT* PPM_CONTEXT::createChild(STATE* pStats, STATE& FirstState)
 {
@@ -128,9 +128,9 @@ static inline PPM_CONTEXT* CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p1)
 NO_LOOP:
     if (pps == ps)
         return pc;
-    UpState.Symbol = *(BYTE*)UpBranch;
+    UpState.Symbol = *(u8*)UpBranch;
     UpState.Freq = UpState.Flag = 0;
-    UpState.Successor = (PPM_CONTEXT*)(((BYTE*)UpBranch) + 1);
+    UpState.Successor = (PPM_CONTEXT*)(((u8*)UpBranch) + 1);
     do
     {
         pc = pc->createChild(*--pps, UpState);
@@ -159,7 +159,7 @@ static inline void UpdateModel()
         goto RESTART_MODEL;
     if (fs.Successor)
     {
-        if ((BYTE*)fs.Successor <= pText && (fs.Successor = CreateSuccessors(FALSE, p)) == NULL)
+        if ((u8*)fs.Successor <= pText && (fs.Successor = CreateSuccessors(FALSE, p)) == NULL)
             goto RESTART_MODEL;
         if (!--OrderFall)
         {
@@ -306,7 +306,7 @@ static void EncodeFile1(FILE* DecodedFile)
             } while (MinContext->NumStats == NumMasked);
             MinContext->encodeSymbol(c);
         }
-        if (!OrderFall && (BYTE*)FoundState->Successor > pText)
+        if (!OrderFall && (u8*)FoundState->Successor > pText)
             MinContext = MaxContext = FoundState->Successor;
         else if (UnitsStart - pText > 128 * UNIT_SIZE)
             UpdateModel();
@@ -326,9 +326,9 @@ void PPM_CONTEXT::clean(int o, BOOL FreqsOnly)
         EscFreq = SummFreq = 0;
     if (!NumStats)
     {
-        if (o != MaxOrder && (BYTE*)oneState().Successor >= UnitsStart)
+        if (o != MaxOrder && (u8*)oneState().Successor >= UnitsStart)
             oneState().Successor->clean(o + 1, FreqsOnly);
-        else if ((BYTE*)oneState().Successor < UnitsStart || !FreqsOnly)
+        else if ((u8*)oneState().Successor < UnitsStart || !FreqsOnly)
             oneState().Successor = NULL;
     }
     else
@@ -336,9 +336,9 @@ void PPM_CONTEXT::clean(int o, BOOL FreqsOnly)
         {
             if (FreqsOnly)
                 p->Freq = 0;
-            if (o != MaxOrder && (BYTE*)p->Successor >= UnitsStart)
+            if (o != MaxOrder && (u8*)p->Successor >= UnitsStart)
                 p->Successor->clean(o + 1, FreqsOnly);
-            else if ((BYTE*)p->Successor < UnitsStart || !FreqsOnly)
+            else if ((u8*)p->Successor < UnitsStart || !FreqsOnly)
                 p->Successor = NULL;
         }
 }

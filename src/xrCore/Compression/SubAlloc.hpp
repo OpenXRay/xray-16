@@ -48,14 +48,14 @@ struct MEM_BLK : public BLK_NODE
 } _PACK_ATTR;
 #pragma pack()
 
-static BYTE Indx2Units[N_INDEXES], Units2Indx[128]; // constants
+static u8 Indx2Units[N_INDEXES], Units2Indx[128]; // constants
 static u32 GlueCount, SubAllocatorSize = 0;
-static BYTE *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
+static u8 *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 
 inline void PrefetchData(void* Addr)
 {
 #if defined(_USE_PREFETCHING)
-    BYTE PrefetchByte = *(volatile BYTE*)Addr;
+    u8 PrefetchByte = *(volatile u8*)Addr;
 #endif /* defined(_USE_PREFETCHING) */
 }
 
@@ -73,7 +73,7 @@ inline UINT U2B(UINT NU) { return 8 * NU + 4 * NU; }
 inline void SplitBlock(void* pv, UINT OldIndx, UINT NewIndx)
 {
     UINT i, k, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
-    BYTE* p = (BYTE*)pv + U2B(Indx2Units[NewIndx]);
+    u8* p = (u8*)pv + U2B(Indx2Units[NewIndx]);
 
     if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff)
     {
@@ -113,7 +113,7 @@ bool _STDCALL StartSubAllocator(UINT SASize)
 
     StopSubAllocator();
 
-    if ((HeapStart = new BYTE[t]) == nullptr)
+    if ((HeapStart = new u8[t]) == nullptr)
         return false;
 
     SubAllocatorSize = t;
@@ -283,7 +283,7 @@ inline void FreeUnits(void* ptr, UINT NU)
 
 inline void SpecialFreeUnit(void* ptr)
 {
-    if ((BYTE*)ptr != UnitsStart)
+    if ((u8*)ptr != UnitsStart)
         BList->insert(ptr, 1);
     else
     {
@@ -295,12 +295,12 @@ inline void SpecialFreeUnit(void* ptr)
 inline void* MoveUnitsUp(void* OldPtr, UINT NU)
 {
     UINT indx = Units2Indx[NU - 1];
-    if ((BYTE*)OldPtr > UnitsStart + 16 * 1024 || (BLK_NODE*)OldPtr > BList[indx].next)
+    if ((u8*)OldPtr > UnitsStart + 16 * 1024 || (BLK_NODE*)OldPtr > BList[indx].next)
         return OldPtr;
     void* ptr = BList[indx].remove();
     UnitsCpy(ptr, OldPtr, NU);
     NU = Indx2Units[indx];
-    if ((BYTE*)OldPtr != UnitsStart)
+    if ((u8*)OldPtr != UnitsStart)
         BList[indx].insert(OldPtr, NU);
     else
         UnitsStart += U2B(NU);
@@ -316,7 +316,7 @@ static void ExpandTextArea()
     while ((p = (BLK_NODE*)UnitsStart)->Stamp == ~0UL)
     {
         MEM_BLK* pm = (MEM_BLK*)p;
-        UnitsStart = (BYTE*)(pm + pm->NU);
+        UnitsStart = (u8*)(pm + pm->NU);
         Count[Units2Indx[pm->NU - 1]]++;
         pm->Stamp = 0;
     }
