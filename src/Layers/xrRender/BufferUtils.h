@@ -12,7 +12,7 @@ void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<
 
 namespace BufferUtils
 {
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize);
+HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize);
 };
 
 /**

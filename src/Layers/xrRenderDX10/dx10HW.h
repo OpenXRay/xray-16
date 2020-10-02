@@ -27,7 +27,7 @@ public:
 
     std::pair<u32, u32> GetSurfaceSize() const;
 
-    bool CheckFormatSupport(DXGI_FORMAT format, UINT feature) const;
+    bool CheckFormatSupport(DXGI_FORMAT format, u32 feature) const;
     DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT formats[], size_t count) const;
     template <size_t count>
     inline DXGI_FORMAT SelectFormat(D3D_FORMAT_SUPPORT feature, const DXGI_FORMAT (&formats)[count]) const

@@ -20,8 +20,8 @@ public:
     void SetRasterizerState(ID3DRasterizerState* pRState);
     void SetDepthStencilState(ID3DDepthStencilState* pDSState);
     void SetBlendState(ID3DBlendState* pBlendState);
-    void SetStencilRef(UINT uiStencilRef);
-    void SetAlphaRef(UINT uiAlphaRef);
+    void SetStencilRef(u32 uiStencilRef);
+    void SetAlphaRef(u32 uiAlphaRef);
 
     void BindAlphaRef(R_constant* C);
 
@@ -57,8 +57,8 @@ private:
     ID3DDepthStencilState* m_pDepthStencilState; //	Weak link
     ID3DBlendState* m_pBlendState; //	Weak link
 
-    UINT m_uiStencilRef;
-    UINT m_uiAlphaRef;
+    u32 m_uiStencilRef;
+    u32 m_uiAlphaRef;
 
     //	If will need more constants create support class instead
     R_constant* m_cAlphaRef;
@@ -88,7 +88,7 @@ private:
 
     bool m_bOverrideScissoring;
     BOOL m_bOverrideScissoringValue;
-    UINT m_uiSampleMask;
+    u32 m_uiSampleMask;
 };
 
 extern dx10StateManager StateManager;

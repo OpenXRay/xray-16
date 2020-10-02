@@ -92,7 +92,7 @@ void dx10StateManager::SetBlendState(ID3DBlendState* pBlendState)
     }
 }
 
-void dx10StateManager::SetStencilRef(UINT uiStencilRef)
+void dx10StateManager::SetStencilRef(u32 uiStencilRef)
 {
     if (m_uiStencilRef != uiStencilRef)
     {
@@ -101,7 +101,7 @@ void dx10StateManager::SetStencilRef(UINT uiStencilRef)
     }
 }
 
-void dx10StateManager::SetAlphaRef(UINT uiAlphaRef)
+void dx10StateManager::SetAlphaRef(u32 uiAlphaRef)
 {
     if (m_uiAlphaRef != uiAlphaRef)
     {

@@ -145,7 +145,7 @@ static inline void UpdateModel()
     PPM_CONTEXT::STATE* p = NULL;
     fs = *FoundState;
     PPM_CONTEXT *pc, *Successor;
-    UINT ns1;
+    u32 ns1;
     if (!OrderFall)
     {
         MinContext = MaxContext = FoundState->Successor = CreateSuccessors(TRUE, p);

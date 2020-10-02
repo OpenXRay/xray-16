@@ -117,11 +117,11 @@ void glState::UpdateRenderState(u32 name, u32 value)
         break;
 
     case D3DRS_STENCILMASK:
-        m_pDepthStencilState.StencilMask = (UINT)value;
+        m_pDepthStencilState.StencilMask = (u32)value;
         break;
 
     case D3DRS_STENCILWRITEMASK:
-        m_pDepthStencilState.StencilWriteMask = (UINT)value;
+        m_pDepthStencilState.StencilWriteMask = (u32)value;
         break;
 
     case D3DRS_STENCILFAIL:
@@ -176,7 +176,7 @@ void glState::UpdateRenderState(u32 name, u32 value)
     case D3DRS_COLORWRITEENABLE1:
     case D3DRS_COLORWRITEENABLE2:
     case D3DRS_COLORWRITEENABLE3:
-        m_pBlendState.ColorMask = (UINT)value;
+        m_pBlendState.ColorMask = (u32)value;
         break;
 
     case D3DRS_LIGHTING:

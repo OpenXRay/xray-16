@@ -5,13 +5,13 @@
 //	Interface
 #ifdef USE_OGL
 IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type);
-IC HRESULT GetData(GLuint query, void* pData, UINT DataSize);
+IC HRESULT GetData(GLuint query, void* pData, u32 DataSize);
 IC HRESULT BeginQuery(GLuint query);
 IC HRESULT EndQuery(GLuint query);
 IC HRESULT ReleaseQuery(GLuint pQuery);
 #else
 IC HRESULT CreateQuery(ID3DQuery** ppQuery);
-IC HRESULT GetData(ID3DQuery* pQuery, void* pData, UINT DataSize);
+IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize);
 IC HRESULT BeginQuery(ID3DQuery* pQuery);
 IC HRESULT EndQuery(ID3DQuery* pQuery);
 IC HRESULT ReleaseQuery(ID3DQuery *pQuery);
@@ -28,7 +28,7 @@ IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type)
     return S_OK;
 }
 
-IC HRESULT GetData(GLuint query, void* pData, UINT DataSize)
+IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
 {
     if (DataSize == sizeof(GLint64))
         CHK_GL(glGetQueryObjecti64v(query, GL_QUERY_RESULT, (GLint64*)pData));
@@ -65,7 +65,7 @@ IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type)
     return HW.pDevice->CreateQuery(&desc, ppQuery);
 }
 
-IC HRESULT GetData(ID3DQuery* pQuery, void* pData, UINT DataSize)
+IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
 {
     //	Use D3Dxx_ASYNC_GETDATA_DONOTFLUSH for prevent flushing
     return HW.pContext->GetData(pQuery, pData, DataSize, 0);
@@ -99,7 +99,7 @@ IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type)
     return HW.pDevice->CreateQuery(&desc, ppQuery);
 }
 
-IC HRESULT GetData(ID3DQuery* pQuery, void* pData, UINT DataSize)
+IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
 {
     //	Use D3Dxx_ASYNC_GETDATA_DONOTFLUSH for prevent flushing
     return pQuery->GetData(pData, DataSize, 0);
@@ -126,7 +126,7 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
 #else //	USE_DX10
 
 IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type) { return HW.pDevice->CreateQuery(type, ppQuery); }
-IC HRESULT GetData(ID3DQuery* pQuery, void* pData, UINT DataSize)
+IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
 {
     return pQuery->GetData(pData, DataSize, D3DGETDATA_FLUSH);
 }

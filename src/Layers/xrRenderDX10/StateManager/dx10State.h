@@ -20,8 +20,8 @@ public:
     void Release();
 
     //	DX10 specific
-    void UpdateStencilRef(UINT Ref) { m_uiStencilRef = Ref; }
-    void UpdateAlphaRef(UINT Ref) { m_uiAlphaRef = Ref; }
+    void UpdateStencilRef(u32 Ref) { m_uiStencilRef = Ref; }
+    void UpdateAlphaRef(u32 Ref) { m_uiAlphaRef = Ref; }
     //	User restricted interface
 private:
     typedef dx10SamplerStateCache::HArray tSamplerHArray;
@@ -44,8 +44,8 @@ private:
     tSamplerHArray m_DSSamplers;
 #endif
 
-    UINT m_uiStencilRef;
-    UINT m_uiAlphaRef;
+    u32 m_uiStencilRef;
+    u32 m_uiAlphaRef;
 
     //	Private data
 private:

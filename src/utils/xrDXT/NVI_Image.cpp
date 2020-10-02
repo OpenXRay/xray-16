@@ -62,8 +62,8 @@ HRESULT NVI_Image::Initialize(int width, int height, NVI_PIXEL_FORMAT fmt, u8* d
     return S_OK;
 }
 
-UINT NVI_Image::GetNumPixels() { return GetHeight() * GetWidth(); }
-UINT NVI_Image::GetBytesPerPixel()
+u32 NVI_Image::GetNumPixels() { return GetHeight() * GetWidth(); }
+u32 NVI_Image::GetBytesPerPixel()
 {
     switch (m_Format)
     {
@@ -79,7 +79,7 @@ UINT NVI_Image::GetBytesPerPixel()
     return 0;
 }
 
-UINT NVI_Image::GetImageNumBytes()
+u32 NVI_Image::GetImageNumBytes()
 {
 #ifdef _DEBUG
     float numbytes = (float)m_nSizeX * (float)m_nSizeY * (float)GetBytesPerPixel();
@@ -99,12 +99,14 @@ bool NVI_Image::IsDataValid()
 void NVI_Image::FlipTopToBottom()
 {
     assert(IsDataValid());
-    UINT bpp = GetBytesPerPixel();
+    u32 bpp = GetBytesPerPixel();
     assert(bpp >= 1);
     UINT width = GetWidth();
     u8* swap = new u8[width * bpp];
+    u32 width = GetWidth();
+    u8* swap = new BYTE[width * bpp];
     assert(swap != NULL);
-    UINT height = GetHeight();
+    u32 height = GetHeight();
     for (u32 row = 0; row < GetHeight() / 2; row++)
     {
         u8* end_row = &(m_pArray[bpp * width * (height - row - 1)]);
@@ -146,8 +148,8 @@ void NVI_Image::ABGR8_To_ARGB8()
     // swaps RGB for all pixels
     assert(IsDataValid());
     assert(GetBytesPerPixel() == 4);
-    UINT hxw = GetNumPixels();
-    for (UINT i = 0; i < hxw; i++)
+    u32 hxw = GetNumPixels();
+    for (u32 i = 0; i < hxw; i++)
     {
         u32 col;
         GetPixel_ARGB8(&col, i);

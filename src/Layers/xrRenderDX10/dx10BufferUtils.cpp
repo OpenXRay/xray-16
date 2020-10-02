@@ -16,7 +16,7 @@ u32 GetDeclLength(const VertexElement* decl)
     return D3DXGetDeclLength(decl);
 }
 
-static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT dataSize,
+static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, u32 dataSize,
     bool bDynamic, D3D_BIND_FLAG bufferType)
 {
     D3D_BUFFER_DESC desc;
@@ -37,17 +37,17 @@ static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, UINT dataS
     return res;
 }
 
-static inline HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, UINT dataSize, bool bDynamic)
+static inline HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, u32 dataSize, bool bDynamic)
 {
     return CreateBuffer(ppBuffer, pData, dataSize, bDynamic, D3D_BIND_VERTEX_BUFFER);
 }
 
-static inline HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, UINT dataSize, bool bDynamic)
+static inline HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, u32 dataSize, bool bDynamic)
 {
     return CreateBuffer(ppBuffer, pData, dataSize, bDynamic, D3D_BIND_INDEX_BUFFER);
 }
 
-static inline HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT dataSize)
+static inline HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 dataSize)
 {
     return CreateBuffer(ppBuffer, nullptr, dataSize, true, D3D_BIND_CONSTANT_BUFFER);
 }
@@ -55,7 +55,7 @@ static inline HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT 
 namespace BufferUtils
 {
 // TODO: replace by streaming buffer instance in `dx10ConstantBuffer`
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize)
+HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize)
 {
     return ::CreateConstantBuffer(ppBuffer, DataSize);
 }

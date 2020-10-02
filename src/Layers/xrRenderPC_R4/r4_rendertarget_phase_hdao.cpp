@@ -22,7 +22,7 @@ void CRenderTarget::phase_hdao()
         RCache.set_CS(P.cs);
 
         // set the cs shader output
-        UINT UAVInitialCounts = 1;
+        u32 UAVInitialCounts = 1;
         ID3D11UnorderedAccessView* uav[1] = {0};
         ID3D11RenderTargetView* oldrtv[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         ID3D11DepthStencilView* olddsv;
