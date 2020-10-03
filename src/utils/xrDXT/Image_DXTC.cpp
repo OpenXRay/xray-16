@@ -433,8 +433,6 @@ inline void DecodeAlphaExplicit(u32* pImPos, DXTAlphaBlockExplicit* pAlphaBlock,
 
 u8 gBits[4][4];
 u16 gAlphas[8];
-BYTE gBits[4][4];
-u16 gAlphas[8];
 Color8888 gACol[4][4];
 
 inline void DecodeAlpha3BitLinear(u32* pImPos, DXTAlphaBlock3BitLinear* pAlphaBlock, int width, u32 alphazero)

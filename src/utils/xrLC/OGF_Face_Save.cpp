@@ -284,7 +284,7 @@ void OGF::PreSave(u32 tree_id)
     }
 
     // Faces
-    g_IB.Register(u16*(&*data.faces.begin()), u16*(&*data.faces.end()), &data.ib_id, &data.ib_start);
+    g_IB.Register((u16*)(&*data.faces.begin()), (u16*)(&*data.faces.end()), &data.ib_id, &data.ib_start);
 }
 
 template <typename ogf_data_type>

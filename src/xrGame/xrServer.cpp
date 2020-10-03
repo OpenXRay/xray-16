@@ -194,7 +194,7 @@ void xrServer::GetPooledState(xrClientData* xrCL)
 int g_Dump_Update_Write = 0;
 
 #ifdef DEBUG
-INT g_sv_SendUpdate = 0;
+int g_sv_SendUpdate = 0;
 #endif
 
 void xrServer::Update()
