@@ -231,7 +231,7 @@ bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCt
     ///
     /// Function info
     ///
-    BYTE arrSymBuffer[512];
+    u8 arrSymBuffer[512];
     ZeroMemory(arrSymBuffer, sizeof(arrSymBuffer));
     PIMAGEHLP_SYMBOL functionInfo = reinterpret_cast<PIMAGEHLP_SYMBOL>(arrSymBuffer);
     functionInfo->SizeOfStruct = sizeof(*functionInfo);

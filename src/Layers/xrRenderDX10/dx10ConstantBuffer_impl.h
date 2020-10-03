@@ -10,7 +10,7 @@ IC Fvector4* dx10ConstantBuffer::Access(u16 offset)
     //	Check buffer size in client code: don't know if actual data will cross
     //	buffer boundaries.
     VERIFY(offset < (int)m_uiBufferSize);
-    BYTE* res = ((BYTE*)m_pBufferData) + offset;
+    u8* res = ((u8*)m_pBufferData) + offset;
     return (Fvector4*)res;
 }
 
@@ -177,7 +177,7 @@ IC void* dx10ConstantBuffer::AccessDirect(R_constant_load& L, size_t DataSize)
     //	Check buffer size in client code: don't know if actual data will cross
     //	buffer boundaries.
     VERIFY(L.index < (int)m_uiBufferSize);
-    BYTE* res = ((BYTE*)m_pBufferData) + L.index;
+    u8* res = ((u8*)m_pBufferData) + L.index;
 
     if ((size_t)L.index + DataSize <= m_uiBufferSize)
     {

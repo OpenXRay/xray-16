@@ -126,7 +126,7 @@ void CRenderTarget::accum_volumetric_geom_create()
     {
         constexpr size_t iCount = VOLUMETRIC_SLICES * 6;
 
-        BYTE Datap[iCount * 2];
+        u8 Datap[iCount * 2];
 
         u16* pInd = (u16*)Datap;
         for (u16 i = 0; i < VOLUMETRIC_SLICES; ++i, pInd += 6)

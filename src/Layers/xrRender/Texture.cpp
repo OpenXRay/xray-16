@@ -190,8 +190,8 @@ void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
         {
             for (u32 x = 0; x < desc.Width; x++)
             {
-                u32& pSrc = *(((u32*)((BYTE*)Rsrc.pBits + (y * Rsrc.Pitch))) + x);
-                u32& pDst = *(((u32*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch))) + x);
+                u32& pSrc = *(((u32*)((u8*)Rsrc.pBits + (y * Rsrc.Pitch))) + x);
+                u32& pDst = *(((u32*)((u8*)Rdst.pBits + (y * Rdst.Pitch))) + x);
                 pDst = pred(pDst, pSrc);
             }
         }
@@ -223,9 +223,9 @@ void TW_Iterate_2OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src0, ID3DTexture2D* 
         {
             for (u32 x = 0; x < desc.Width; x++)
             {
-                u32& pSrc0 = *(((u32*)((BYTE*)Rsrc0.pBits + (y * Rsrc0.Pitch))) + x);
-                u32& pSrc1 = *(((u32*)((BYTE*)Rsrc1.pBits + (y * Rsrc1.Pitch))) + x);
-                u32& pDst = *(((u32*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch))) + x);
+                u32& pSrc0 = *(((u32*)((u8*)Rsrc0.pBits + (y * Rsrc0.Pitch))) + x);
+                u32& pSrc1 = *(((u32*)((u8*)Rsrc1.pBits + (y * Rsrc1.Pitch))) + x);
+                u32& pDst = *(((u32*)((u8*)Rdst.pBits + (y * Rdst.Pitch))) + x);
                 pDst = pred(pDst, pSrc0, pSrc1);
             }
         }

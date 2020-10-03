@@ -263,7 +263,7 @@ void ImplicitLightingExec(BOOL b_net)
             FS.update_path(out_name, "$game_levels$", out_name);
             Logger.clMsg("Saving texture '%s'...", out_name);
             VerifyPath(out_name);
-            BYTE* raw_data = LPBYTE(TEX.pSurface);
+            u8* raw_data = (u8*)(TEX.pSurface);
             u32 w = TEX.dwWidth;
             u32 h = TEX.dwHeight;
             u32 pitch = w * 4;
@@ -288,7 +288,7 @@ void ImplicitLightingExec(BOOL b_net)
             FS.update_path(out_name, "$game_levels$", out_name);
             Logger.clMsg("Saving texture '%s'...", out_name);
             VerifyPath(out_name);
-            BYTE* raw_data = LPBYTE(&*packed.begin());
+            u8* raw_data = (u8*)(&*packed.begin());
             u32 w = TEX.dwWidth;
             u32 h = TEX.dwHeight;
             u32 pitch = w * 4;

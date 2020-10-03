@@ -977,7 +977,7 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
     DPN_BUFFER_DESC desc;
 
     desc.dwBufferSize = size;
-    desc.pBufferData = (BYTE*)data;
+    desc.pBufferData = (u8*)data;
 
     net_Statistic.dwBytesSended += size;
 
@@ -1098,7 +1098,7 @@ void IPureClient::Sync_Thread()
             DPN_BUFFER_DESC desc;
             DPNHANDLE hAsync = 0;
             desc.dwBufferSize = sizeof(clPing);
-            desc.pBufferData = LPBYTE(&clPing);
+            desc.pBufferData = (u8*)(&clPing);
             if (nullptr == NET || net_Disconnected)
                 break;
 

@@ -327,7 +327,7 @@ void CTexture::apply_avi(u32 dwStage)
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
         R_ASSERT(mapData.RowPitch == int(pAVI->m_dwWidth * 4));
-        BYTE* ptr;
+        u8* ptr;
         pAVI->GetFrame(&ptr);
         CopyMemory(mapData.pData, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
 // R_CHK	(T2D->UnlockRect(0));

@@ -128,7 +128,7 @@ void dx103DFluidRenderer::CreateGridBox()
     m_iGridBoxVertNum = sizeof(vertices) / sizeof(vertices[0]);
 
     m_pGridBoxVertexBuffer.Create(sizeof(vertices));
-    BYTE* pData = static_cast<BYTE*>(m_pGridBoxVertexBuffer.Map());
+    u8* pData = static_cast<u8*>(m_pGridBoxVertexBuffer.Map());
     CopyMemory(pData, vertices, sizeof(vertices));
     m_pGridBoxVertexBuffer.Unmap(true);
 
@@ -138,7 +138,7 @@ void dx103DFluidRenderer::CreateGridBox()
     m_iGridBoxFaceNum = (sizeof(indices) / sizeof(indices[0])) / 3;
 
     m_pGridBoxIndexBuffer.Create(sizeof(indices));
-    pData = static_cast<BYTE*>(m_pGridBoxIndexBuffer.Map());
+    pData = static_cast<u8*>(m_pGridBoxIndexBuffer.Map());
     CopyMemory(pData, indices, sizeof(indices));
     m_pGridBoxIndexBuffer.Unmap(true);
 
@@ -164,7 +164,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
     svQuad[3].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
 
     m_pQuadVertexBuffer.Create(sizeof(svQuad));
-    BYTE* pData = static_cast<BYTE*>(m_pQuadVertexBuffer.Map());
+    u8* pData = static_cast<u8*>(m_pQuadVertexBuffer.Map());
     CopyMemory(pData, svQuad, sizeof(svQuad));
     m_pQuadVertexBuffer.Unmap(true);
     m_GeomQuadVertex.create(quadlayout, m_pQuadVertexBuffer, 0);
@@ -172,7 +172,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
 
 void dx103DFluidRenderer::CreateJitterTexture()
 {
-    BYTE data[256 * 256];
+    u8 data[256 * 256];
     for (int i = 0; i < 256 * 256; i++)
     {
         data[i] = (unsigned char)(rand() / float(RAND_MAX) * 256);

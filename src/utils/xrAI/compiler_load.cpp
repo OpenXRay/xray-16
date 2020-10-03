@@ -270,7 +270,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
         H.size_y = 1.f;
         H.aabb = LevelBB;
 
-        typedef BYTE NodeLink[3];
+        typedef u8 NodeLink[3];
         for (size_t i = 0; i < N; i++)
         {
             NodeLink id;

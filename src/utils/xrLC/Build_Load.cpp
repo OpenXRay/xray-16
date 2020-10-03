@@ -186,12 +186,12 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     Logger.Status("Loading lights...");
     {
         xr_vector<R_Layer> L_layers;
-        xr_vector<BYTE> L_control_data;
+        xr_vector<u8> L_control_data;
 
         // Controlles/Layers
         {
             F = fs.open_chunk(EB_Light_control);
-            L_control_data.assign(LPBYTE(F->pointer()), LPBYTE(F->pointer()) + F->length());
+            L_control_data.assign((u8*)(F->pointer()), (u8*)(F->pointer()) + F->length());
 
             R_Layer temp;
 

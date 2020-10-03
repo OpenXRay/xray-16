@@ -119,7 +119,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             vStride = GetFVFVertexSize(fvf);
             p_rm_Vertices = xr_new<VertexStagingBuffer>();
             p_rm_Vertices->Create(vCount * vStride);
-            BYTE* bytes = static_cast<BYTE*>(p_rm_Vertices->Map());
+            u8* bytes = static_cast<u8*>(p_rm_Vertices->Map());
             CopyMemory(bytes, data->pointer(), vCount * vStride);
             p_rm_Vertices->Unmap(true); // upload vertex data
         }
@@ -152,7 +152,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             VERIFY(nullptr == p_rm_Indices);
             p_rm_Indices = xr_new<IndexStagingBuffer>();
             p_rm_Indices->Create(iCount * 2, true); // indices are read in model-wallmarks code
-            BYTE* bytes = static_cast<BYTE*>(p_rm_Indices->Map());
+            u8* bytes = static_cast<u8*>(p_rm_Indices->Map());
             CopyMemory(bytes, data->pointer(), iCount * 2);
             p_rm_Indices->Unmap(true); // upload index data
         }

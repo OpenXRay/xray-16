@@ -49,7 +49,7 @@ HRESULT NVI_Image::Initialize(int width, int height, NVI_PIXEL_FORMAT fmt)
     m_nSizeX = width;
     m_nSizeY = height;
     int bytes_per_pixel = GetBytesPerPixel();
-    m_pArray = new BYTE[width * height * bytes_per_pixel];
+    m_pArray = new u8[width * height * bytes_per_pixel];
     VERIFY(m_pArray);
     return S_OK;
 }
@@ -102,13 +102,13 @@ void NVI_Image::FlipTopToBottom()
     UINT bpp = GetBytesPerPixel();
     assert(bpp >= 1);
     UINT width = GetWidth();
-    BYTE* swap = new BYTE[width * bpp];
+    u8* swap = new u8[width * bpp];
     assert(swap != NULL);
     UINT height = GetHeight();
     for (u32 row = 0; row < GetHeight() / 2; row++)
     {
-        BYTE* end_row = &(m_pArray[bpp * width * (height - row - 1)]);
-        BYTE* start_row = &(m_pArray[bpp * width * row]);
+        u8* end_row = &(m_pArray[bpp * width * (height - row - 1)]);
+        u8* start_row = &(m_pArray[bpp * width * row]);
         // copy row toward end of image into temporary swap buffer
         memcpy(swap, end_row, bpp * width);
         // copy row at beginning to row at end

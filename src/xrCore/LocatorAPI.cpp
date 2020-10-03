@@ -299,7 +299,7 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bo
             VERIFY(res && (read_byte == dwSize));
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest = nullptr;
+                u8* dest = nullptr;
                 size_t dest_sz = 0;
 
                 if (shouldDecrypt) // Try WW key first
@@ -358,7 +358,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
             VERIFY(read_byte == dwSize);
             if (dwType & CFS_CompressMark)
             {
-                BYTE* dest = nullptr;
+                u8* dest = nullptr;
                 size_t dest_sz = 0;
 
                 if (shouldDecrypt)

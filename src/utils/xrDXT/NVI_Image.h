@@ -59,7 +59,7 @@ public:
     UINT GetWidth() { return m_nSizeX; }
     UINT GetHeight() { return m_nSizeY; }
     UINT GetNumPixels();
-    BYTE* GetImageDataPointer() { return m_pArray; }
+    u8* GetImageDataPointer() { return m_pArray; }
     bool IsDataValid();
     void FlipTopToBottom();
     void AverageRGBToAlpha(); // write each pixels' avg r,g,b to alpha

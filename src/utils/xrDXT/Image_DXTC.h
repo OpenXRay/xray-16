@@ -38,8 +38,8 @@ enum PixFormat
 
 class Image_DXTC
 {
-    BYTE* m_pCompBytes; // compressed image bytes
-    BYTE* m_pDecompBytes;
+    u8* m_pCompBytes; // compressed image bytes
+    u8* m_pDecompBytes;
     int m_nCompSize;
     int m_nCompLineSz;
     string256 m_strFormat;
@@ -65,8 +65,8 @@ public:
     bool LoadFromFile(LPCSTR filename); // true if success
     void Decompress();
     void SaveAsRaw(); // save decompressed bits
-    BYTE* GetCompDataPointer() { return m_pCompBytes; };
-    BYTE* GetDecompDataPointer() { return m_pDecompBytes; };
+    u8* GetCompDataPointer() { return m_pCompBytes; };
+    u8* GetDecompDataPointer() { return m_pDecompBytes; };
     int Width() { return m_nWidth; }
     int Height() { return m_nHeight; }
     bool MipTexture() { return m_bMipTexture; }

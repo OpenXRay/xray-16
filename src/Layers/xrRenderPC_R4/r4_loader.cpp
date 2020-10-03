@@ -234,7 +234,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             //	TODO: DX10: Check fragmentation.
             //	Check if buffer is less then 2048 kb
             _VB[i].Create(vCount * vSize);
-            BYTE* pData = static_cast<BYTE*>(_VB[i].Map());
+            u8* pData = static_cast<u8*>(_VB[i].Map());
             fs->r(pData, vCount * vSize);
             _VB[i].Unmap(true); // upload vertex data
 
@@ -258,7 +258,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             //	TODO: DX10: Check fragmentation.
             //	Check if buffer is less then 2048 kb
             _IB[i].Create(iCount * 2);
-            BYTE* pData = static_cast<BYTE*>(_IB[i].Map());
+            u8* pData = static_cast<u8*>(_IB[i].Map());
             fs->r(pData, iCount * 2);
             _IB[i].Unmap(true); // upload index data
 

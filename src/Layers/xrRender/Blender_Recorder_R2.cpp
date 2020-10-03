@@ -62,7 +62,7 @@ void CBlender_Compile::r_Constant(LPCSTR name, R_constant_setup* s)
 
 void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
 {
-    BYTE Mask = 0;
+    u8 Mask = 0;
     Mask |= cR ? D3DCOLORWRITEENABLE_RED : 0;
     Mask |= cG ? D3DCOLORWRITEENABLE_GREEN : 0;
     Mask |= cB ? D3DCOLORWRITEENABLE_BLUE : 0;

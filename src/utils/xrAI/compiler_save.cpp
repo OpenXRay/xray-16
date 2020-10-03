@@ -2,11 +2,11 @@
 #include "compiler.h"
 #include "guid_generator.h"
 
-IC BYTE compress(float c, int max_value)
+IC u8 compress(float c, int max_value)
 {
     int cover = iFloor(c * float(max_value) + .5f);
     clamp(cover, 0, max_value);
-    return BYTE(cover);
+    return u8(cover);
 }
 
 struct CNodeCompressed

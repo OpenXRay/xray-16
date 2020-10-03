@@ -291,7 +291,7 @@ void CRenderTarget::accum_point_geom_create()
         u32 vSize = 3 * 4;
         g_accum_point_vb.Create(vCount * vSize);
 
-        BYTE* pData = static_cast<BYTE*>(g_accum_point_vb.Map());
+        u8* pData = static_cast<u8*>(g_accum_point_vb.Map());
         CopyMemory(pData, du_sphere_vertices, vCount * vSize);
         g_accum_point_vb.Unmap(true); // upload vertex data
     }
@@ -301,7 +301,7 @@ void CRenderTarget::accum_point_geom_create()
         u32 iCount = DU_SPHERE_NUMFACES * 3;
 
         g_accum_point_ib.Create(iCount * 2);
-        BYTE* pData = static_cast<BYTE*>(g_accum_point_ib.Map());
+        u8* pData = static_cast<u8*>(g_accum_point_ib.Map());
         CopyMemory(pData, du_sphere_faces, iCount * 2);
         g_accum_point_ib.Unmap(true); // upload index data
     }
