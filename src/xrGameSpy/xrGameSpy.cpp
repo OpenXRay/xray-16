@@ -38,7 +38,7 @@ int GetGameDistribution()
     if (res == ERROR_SUCCESS && KeyCDKey != 0)
     {
         res = RegQueryValueEx(
-            KeyCDKey, REGISTRY_VALUE_INSTALL_PATCH_ID, NULL, &KeyValueType, (u8*)&KeyValue, &KeyValueSize);
+            KeyCDKey, REGISTRY_VALUE_INSTALL_PATCH_ID, NULL, &KeyValueType, (LPBYTE)&KeyValue, &KeyValueSize);
     };
     if (KeyCDKey != 0)
         RegCloseKey(KeyCDKey);
