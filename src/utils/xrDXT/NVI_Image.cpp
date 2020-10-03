@@ -101,10 +101,8 @@ void NVI_Image::FlipTopToBottom()
     assert(IsDataValid());
     u32 bpp = GetBytesPerPixel();
     assert(bpp >= 1);
-    UINT width = GetWidth();
-    u8* swap = new u8[width * bpp];
     u32 width = GetWidth();
-    u8* swap = new BYTE[width * bpp];
+    u8* swap = new u8[width * bpp];
     assert(swap != NULL);
     u32 height = GetHeight();
     for (u32 row = 0; row < GetHeight() / 2; row++)
