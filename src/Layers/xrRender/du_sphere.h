@@ -8,8 +8,8 @@
 #define DU_SPHERE_NUMVERTEXL 60
 #define DU_SPHERE_NUMLINES 60
 extern ECORE_API Fvector du_sphere_vertices[];
-extern ECORE_API WORD du_sphere_faces[];
+extern ECORE_API u16 du_sphere_faces[];
 extern ECORE_API Fvector du_sphere_verticesl[];
-extern ECORE_API WORD du_sphere_lines[];
+extern ECORE_API u16 du_sphere_lines[];
 
 #endif

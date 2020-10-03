@@ -22,7 +22,7 @@ const int UP_FREQ = 5, INT_BITS = 7, PERIOD_BITS = 7, TOT_BITS = INT_BITS + PERI
 static struct PPM_CONTEXT
 {
     u32 EscFreq;
-    WORD NumStats, Dummy;
+    u16 NumStats, Dummy;
     u32 SummFreq;
     struct STATE
     {
