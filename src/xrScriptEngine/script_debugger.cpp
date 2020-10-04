@@ -25,7 +25,7 @@ LRESULT CScriptDebugger::_SendMessage(u32 message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-LRESULT CScriptDebugger::DebugMessage(u32 nMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CScriptDebugger::DebugMessage(UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
     CMailSlotMsg msg;
     switch (nMsg)
@@ -294,7 +294,7 @@ void CScriptDebugger::CheckNewMessages()
     }
 }
 
-void CScriptDebugger::WaitForReply(bool bWaitForModalResult) // u32 nMsg)
+void CScriptDebugger::WaitForReply(bool bWaitForModalResult) // UINT nMsg)
 {
     bool mr = false;
     do

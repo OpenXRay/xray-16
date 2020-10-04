@@ -14,7 +14,7 @@
 
 //#pragma comment(lib, "OSDialogB.lib")
 
-int CALLBACK BrowseCallbackProc(HWND hWnd, u32 uMsg, LPARAM lParam, LPARAM lpData)
+int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
     if (uMsg == BFFM_INITIALIZED)
         SendMessage(hWnd, BFFM_SETSELECTION, TRUE, lpData);

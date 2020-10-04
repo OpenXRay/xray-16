@@ -68,7 +68,7 @@ public:
     int GetStackTraceLevel();
     BOOL Active();
     // static CScriptDebugger* GetDebugger() { return m_pDebugger; }
-    LRESULT _SendMessage(u32 message, WPARAM wParam, LPARAM lParam);
+    LRESULT _SendMessage(UINT message, WPARAM wParam, LPARAM lParam);
 
 protected:
     void DrawVariableInfo(char* varName);
@@ -78,7 +78,7 @@ protected:
     void FillBreakPointsIn(CMailSlotMsg* msg);
     bool HasBreakPoint(const char* fileName, s32 lineNum);
     void CheckNewMessages();
-    LRESULT DebugMessage(u32 nMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT DebugMessage(UINT nMsg, WPARAM wParam, LPARAM lParam);
     void WaitForReply(bool bWaitForModalResult);
     bool TranslateIdeMessage(CMailSlotMsg*);
     void SendMessageToIde(CMailSlotMsg&);

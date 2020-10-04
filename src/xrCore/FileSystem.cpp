@@ -114,7 +114,7 @@ void MakeFilter(string1024& dest, LPCSTR info, LPCSTR ext)
 #if defined(XR_PLATFORM_WINDOWS)
 
 // Vista uses this hook for old-style save dialog
-UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, u32, WPARAM, LPARAM)
+UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
 {
     // let default hook work on this message
     return 0;
