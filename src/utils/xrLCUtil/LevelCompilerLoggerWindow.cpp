@@ -37,7 +37,7 @@ void LevelCompilerLoggerWindow::LogThreadProc(void* context)
     ptr->LogThreadProc();
 }
 
-static INT_PTR CALLBACK LevelCompilerLoggerWindowDlgProc(HWND hw, u32 msg, WPARAM wp, LPARAM lp)
+static INT_PTR CALLBACK LevelCompilerLoggerWindowDlgProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
     {

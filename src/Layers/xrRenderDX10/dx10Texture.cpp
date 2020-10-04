@@ -104,7 +104,7 @@ IC void Reduce(int& w, int& h, int& l, int& skip)
         h = 1;
 }
 
-IC void Reduce(u32& w, u32& h, int l, int skip)
+IC void Reduce(UINT& w, UINT& h, int l, int skip)
 {
     while ((l > 1) && skip)
     {

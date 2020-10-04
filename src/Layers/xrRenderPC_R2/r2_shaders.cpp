@@ -63,7 +63,7 @@ class includer : public ID3DXInclude
 {
 public:
     HRESULT __stdcall Open(
-        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, u32* pBytes)
+        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
         strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);

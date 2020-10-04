@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "xrCore/ModuleLookup.hpp"
 
-LRESULT CALLBACK WndProc(HWND hWnd, u32 message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
