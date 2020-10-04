@@ -123,7 +123,7 @@ void global_claculation_data::xrLoad()
 #endif
 
                 // load thumbnail
-                LPSTR N = BT.name;
+                pstr N = BT.name;
                 if (strchr(N, '.'))
                     *(strchr(N, '.')) = 0;
                 xr_strlwr(N);

@@ -589,7 +589,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
     pcstr fallbackShader /*= nullptr*/, u32 flags /*= 0*/)
 {
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
-    LPSTR N = LPSTR(name);
+    pstr N = pstr(name);
     auto iterator = sh_map.find(N);
 
     if (iterator != sh_map.end())
@@ -648,7 +648,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
 
         // Duplicate and zero-terminate
         const auto size = file->length();
-        char* const data = (LPSTR)xr_alloca(size + 1);
+        char* const data = (pstr)xr_alloca(size + 1);
         CopyMemory(data, file->pointer(), size);
         data[size] = 0;
 
@@ -686,7 +686,7 @@ bool CResourceManager::DestroyShader(const T* sh)
 
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
 
-    LPSTR N = LPSTR(*sh->cName);
+    pstr N = pstr(*sh->cName);
     auto iterator = sh_map.find(N);
 
     if (iterator != sh_map.end())

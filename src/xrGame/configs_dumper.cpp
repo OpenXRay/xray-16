@@ -161,7 +161,7 @@ char const* cd_creation_date = "creation_date";
 void configs_dumper::sign_configs()
 {
     string64 creation_date;
-    LPSTR tmp_player_name = NULL;
+    pstr tmp_player_name = NULL;
     CInifile tmp_ini(NULL, FALSE, FALSE, FALSE);
     game_cl_mp* tmp_cl_game = smart_cast<game_cl_mp*>(&Game());
     R_ASSERT(tmp_cl_game);

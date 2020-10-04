@@ -269,12 +269,12 @@ public:
 };
 #endif // DEBUG
 
-extern void WriteCDKey_ToRegistry(LPSTR cdkey);
+extern void WriteCDKey_ToRegistry(pstr cdkey);
 
 class CCC_GSCDKey : public CCC_String
 {
 public:
-    CCC_GSCDKey(LPCSTR N, LPSTR V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = true; };
+    CCC_GSCDKey(LPCSTR N, pstr V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR arguments)
     {
         string64 cdkey;
@@ -328,7 +328,7 @@ struct SearcherClientByName
     bool operator()(IClient* client)
     {
         xrClientData* temp_client = smart_cast<xrClientData*>(client);
-        LPSTR tmp_player = NULL;
+        pstr tmp_player = NULL;
         if (!temp_client->ps)
             return false;
 
@@ -475,7 +475,7 @@ static xrClientData* exclude_command_initiator(LPCSTR args)
     }
     return NULL;
 };
-static char const* exclude_raid_from_args(LPCSTR args, LPSTR dest, size_t dest_size)
+static char const* exclude_raid_from_args(LPCSTR args, pstr dest, size_t dest_size)
 {
     strncpy_s(dest, dest_size, args, dest_size - 1);
     char* tmp_str = strrchr(dest, ' ');
@@ -1053,7 +1053,7 @@ public:
             return;
 
         string1024 digits;
-        LPSTR p = buff + len - 1;
+        pstr p = buff + len - 1;
         while (isdigit(*p))
         {
             if (p == buff)
@@ -1120,7 +1120,7 @@ public:
             return;
 
         string1024 digits;
-        LPSTR p = buff + len - 1;
+        pstr p = buff + len - 1;
         while (isdigit(*p))
         {
             if (p == buff)
@@ -1991,7 +1991,7 @@ public:
             game_sv_mp* game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
             if (game)
             {
-                LPSTR msg;
+                pstr msg;
                 STRCONCAT(msg, args);
                 if (xr_strlen(msg) > 256)
                 {

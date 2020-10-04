@@ -135,7 +135,7 @@ extern BOOL g_bDrawFirstBulletCrosshair;
 float debug_on_frame_gather_stats_frequency = 0.f;
 #endif
 #ifdef DEBUG
-extern LPSTR dbg_stalker_death_anim;
+extern pstr dbg_stalker_death_anim;
 extern BOOL b_death_anim_velocity;
 extern BOOL death_anim_debug;
 extern BOOL dbg_imotion_draw_skeleton;
@@ -438,7 +438,7 @@ public:
         if (MainMenu()->IsActive())
             MainMenu()->Activate(false);
 
-        LPSTR fn_;
+        pstr fn_;
         STRCONCAT(fn_, args, ".xrdemo");
         string_path fn;
         FS.update_path(fn, "$game_saves$", fn_);
@@ -493,7 +493,7 @@ public:
             Console->Hide();
             string_path fn;
             u32 loops = 0;
-            LPSTR comma = strchr(const_cast<LPSTR>(args), ',');
+            pstr comma = strchr(const_cast<pstr>(args), ',');
             if (comma)
             {
                 loops = atoi(comma + 1);
@@ -618,7 +618,7 @@ public:
         const bool compat = ClearSkyMode || ShadowOfChernobylMode;
         StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true, compat ? 3.0f : -1.0f);
 
-        LPSTR save_name;
+        pstr save_name;
         STRCONCAT(save_name, StringTable().translate("st_game_saved").c_str(), ": ", S);
         _s->wnd()->TextItemControl()->SetText(save_name);
 
@@ -764,7 +764,7 @@ public:
             return;
         }
 
-        LPSTR command;
+        pstr command;
         if (ai().get_alife())
         {
             STRCONCAT(command, "load ", g_last_saved_game);

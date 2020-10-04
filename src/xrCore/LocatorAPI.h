@@ -181,8 +181,8 @@ public:
 private:
     void check_cached_files(pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);
 
-    void file_from_cache_impl(IReader*& R, LPSTR fname, const file& desc);
-    void file_from_cache_impl(CStreamReader*& R, LPSTR fname, const file& desc);
+    void file_from_cache_impl(IReader*& R, pstr fname, const file& desc);
+    void file_from_cache_impl(CStreamReader*& R, pstr fname, const file& desc);
     template <typename T>
     void file_from_cache(T*& R, pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);
 

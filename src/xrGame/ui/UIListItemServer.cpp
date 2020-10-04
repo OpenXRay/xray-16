@@ -99,7 +99,7 @@ void CUIListItemServer::InitItemServer(LIST_SRV_ITEM& params)
 }
 
 #include "string_table.h"
-u32 CutStringByLength(CGameFont* font, LPCSTR src, LPSTR dst, u32 dstSize, float length);
+u32 CutStringByLength(CGameFont* font, LPCSTR src, pstr dst, u32 dstSize, float length);
 
 void CUIListItemServer::SetParams(LIST_SRV_ITEM& params)
 {

@@ -66,7 +66,7 @@ void CUIMpChangeMapAdm::OnItemSelect()
 
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
     const shared_str& name = M.m_map_names[idx].map_name;
-    LPSTR map_ver = NULL;
+    pstr map_ver = NULL;
     STRCONCAT(map_ver, "[", M.m_map_names[idx].map_ver.c_str() ? M.m_map_names[idx].map_ver.c_str() : "unknown", "]");
     xr_string map_name = "intro" DELIMITER "intro_map_pic_";
     map_name += name.c_str();

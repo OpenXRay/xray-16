@@ -12,4 +12,4 @@
 
 // XXX: move to xrCore
 xrGUID generate_guid();
-LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const size_t& buffer_size);
+LPCSTR generate_guid(const xrGUID& guid, pstr buffer, const size_t& buffer_size);

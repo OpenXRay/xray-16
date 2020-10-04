@@ -560,7 +560,7 @@ void game_cl_mp::OnChatMessage(NET_Packet* P)
         team = 0;
     }
 
-    LPSTR colPlayerName;
+    pstr colPlayerName;
     STRCONCAT(colPlayerName, Color_Teams[team], PlayerName, ":%c[default]");
     if (Level().CurrentViewEntity() && CurrentGameUI())
         CurrentGameUI()->m_pMessagesWnd->AddChatMessage(ChatMsg, colPlayerName);
@@ -1073,7 +1073,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         CurrentGameUI()->m_pMessagesWnd->AddLogMessage(KMS);
 };
 
-extern void WritePlayerName_ToRegistry(LPSTR name);
+extern void WritePlayerName_ToRegistry(pstr name);
 
 void game_cl_mp::OnPlayerChangeName(NET_Packet& P)
 {

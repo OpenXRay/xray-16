@@ -128,7 +128,7 @@ private:
 
 // forward declaration
 // Definition is in xrCore/_std_extensions.h
-inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...);
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...);
 
 // for debug purposes only
 template<typename... Args>

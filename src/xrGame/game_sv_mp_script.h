@@ -17,7 +17,7 @@ public:
     virtual void Create(LPCSTR options){};
     virtual void Update() { inherited::Update(); };
     virtual void OnPlayerConnect(ClientID id_who);
-    virtual void OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID);
+    virtual void OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameID);
 
     virtual void net_Export_State(NET_Packet& P, ClientID id_to);
     virtual void OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender);

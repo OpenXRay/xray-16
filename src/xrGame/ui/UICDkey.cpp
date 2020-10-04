@@ -54,7 +54,7 @@ void CUICDkey::paste_from_clipboard()
 {
     string32 temp;
     os_clipboard::paste_from_clipboard(&temp[0], sizeof(temp));
-    LPSTR const new_end = std::remove_if(&temp[0], &temp[0] + xr_strlen(temp), inappropriate_characters());
+    pstr const new_end = std::remove_if(&temp[0], &temp[0] + xr_strlen(temp), inappropriate_characters());
     *new_end = 0;
     temp[16] = 0;
 
@@ -217,7 +217,7 @@ void GetCDKey_FromRegistry(char* cdkey)
     }
 }
 
-void WriteCDKey_ToRegistry(LPSTR cdkey)
+void WriteCDKey_ToRegistry(pstr cdkey)
 {
     if (xr_strlen(cdkey) > 64)
     {
@@ -264,7 +264,7 @@ void GetPlayerName_FromRegistry(char* name, u32 const name_size)
     strncpy_s(name, name_size, new_name, max_name_length);
 }
 
-void WritePlayerName_ToRegistry(LPSTR name)
+void WritePlayerName_ToRegistry(pstr name)
 {
     u32 const max_name_length = GP_UNIQUENICK_LEN - 1;
     if (xr_strlen(name) > max_name_length)

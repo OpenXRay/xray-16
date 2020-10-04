@@ -31,7 +31,7 @@ struct CComparer
     };
 
     IC static bool compare(LPCSTR s1, LPCSTR s2, const P& p) { return p(s1, s2); }
-    IC static bool compare(LPSTR s1, LPSTR s2, const P& p) { return p(s1, s2); }
+    IC static bool compare(pstr s1, pstr s2, const P& p) { return p(s1, s2); }
     IC static bool compare(const shared_str& s1, const shared_str& s2, const P& p) { return p(s1, s2); }
     template <typename T1, typename T2>
     IC static bool compare(const std::pair<T1, T2>& p1, const std::pair<T1, T2>& p2, const P& p)
@@ -152,13 +152,13 @@ struct CComparer
 };
 
 template <typename P>
-IC bool compare(LPCSTR p0, LPSTR p1, const P& p)
+IC bool compare(LPCSTR p0, pstr p1, const P& p)
 {
     return p(p0, p1);
 }
 
 template <typename P>
-IC bool compare(LPSTR p0, LPCSTR p1, const P& p)
+IC bool compare(pstr p0, LPCSTR p1, const P& p)
 {
     return p(p0, p1);
 }
@@ -183,9 +183,9 @@ struct comparer
     }
     IC bool operator()() const { return P<bool>()(false, true); }
     IC bool operator()(LPCSTR s1, LPCSTR s2) const { return (P<int>()(xr_strcmp(s1, s2), 0)); }
-    IC bool operator()(LPSTR s1, LPSTR s2) const { return (P<int>()(xr_strcmp(s1, s2), 0)); }
-    IC bool operator()(LPCSTR s1, LPSTR s2) const { return (P<int>()(xr_strcmp(s1, s2), 0)); }
-    IC bool operator()(LPSTR s1, LPCSTR s2) const { return (P<int>()(xr_strcmp(s1, s2), 0)); }
+    IC bool operator()(pstr s1, pstr s2) const { return (P<int>()(xr_strcmp(s1, s2), 0)); }
+    IC bool operator()(LPCSTR s1, pstr s2) const { return (P<int>()(xr_strcmp(s1, s2), 0)); }
+    IC bool operator()(pstr s1, LPCSTR s2) const { return (P<int>()(xr_strcmp(s1, s2), 0)); }
 };
 };
 };

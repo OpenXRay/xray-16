@@ -9,7 +9,7 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
-void fix_texture_name(LPSTR);
+void fix_texture_name(pstr);
 
 static int ParseName(LPCSTR N)
 {

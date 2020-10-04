@@ -55,7 +55,7 @@ private:
     void DecompressDXT3();
     void DecompressDXT4();
     void DecompressDXT5();
-    void DecodePixelFormat(LPSTR strPixelFormat, DDS_PIXELFORMAT* pddpf);
+    void DecodePixelFormat(pstr strPixelFormat, DDS_PIXELFORMAT* pddpf);
     void AllocateDecompBytes();
 
 public:

@@ -218,7 +218,7 @@ public:
     virtual LPCSTR type_name() const;
     virtual void Create(shared_str& options);
     virtual void OnPlayerConnect(ClientID id_who);
-    virtual void OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID);
+    virtual void OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameID);
     virtual void OnPlayerConnectFinished(ClientID id_who);
     virtual void OnPlayerHitted(NET_Packet P);
 
