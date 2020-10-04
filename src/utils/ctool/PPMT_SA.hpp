@@ -13,8 +13,8 @@ inline void SWAP(TMP_TYPE& t1, TMP_TYPE& t2)
     t2 = tmp;
 }
 
-const UINT N1 = 4, N2 = 4, N3 = 4, N4 = (128 + 3 - 1 * N1 - 2 * N2 - 3 * N3) / 4;
-const UINT UNIT_SIZE = 20, N_INDEXES = N1 + N2 + N3 + N4;
+const u32 N1 = 4, N2 = 4, N3 = 4, N4 = (128 + 3 - 1 * N1 - 2 * N2 - 3 * N3) / 4;
+const u32 UNIT_SIZE = 20, N_INDEXES = N1 + N2 + N3 + N4;
 
 #pragma pack(1)
 struct MEM_BLK
@@ -53,7 +53,7 @@ inline void* RemoveNode(int indx)
     FreeList[indx].next = RetVal->next;
     return RetVal;
 }
-inline UINT U2B(int NU) { return 16 * NU + 4 * NU; }
+inline u32 U2B(int NU) { return 16 * NU + 4 * NU; }
 inline void SplitBlock(void* pv, int OldIndx, int NewIndx)
 {
     int i, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
@@ -90,7 +90,7 @@ static inline void InitSubAllocator()
     int i, k;
     memset(FreeList, 0, sizeof(FreeList));
     HiUnit = (pText = HeapStart) + SubAllocatorSize;
-    UINT Diff = UNIT_SIZE * (SubAllocatorSize / 8 / UNIT_SIZE * 7);
+    u32 Diff = UNIT_SIZE * (SubAllocatorSize / 8 / UNIT_SIZE * 7);
     LoUnit = UnitsStart = HiUnit - Diff;
     for (i = 0, k = 1; i < N1; i++, k += 1)
         Indx2Units[i] = k;
@@ -196,10 +196,10 @@ inline void* ExpandUnits(void* OldPtr, int OldNU)
 }
 void _STDCALL PrintInfo(FILE* DecodedFile)
 {
-    UINT NDec = ftell(DecodedFile);
-    UINT UsedMemory = GetUsedMemory();
-    UINT m1 = UsedMemory >> 18;
-    UINT m2 = (10U * (UsedMemory - (m1 << 18)) + (1 << 17)) >> 18;
+    u32 NDec = ftell(DecodedFile);
+    u32 UsedMemory = GetUsedMemory();
+    u32 m1 = UsedMemory >> 18;
+    u32 m2 = (10U * (UsedMemory - (m1 << 18)) + (1 << 17)) >> 18;
     if (m2 == 10)
     {
         m1++;

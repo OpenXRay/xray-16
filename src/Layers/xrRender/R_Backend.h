@@ -466,7 +466,7 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
 #ifdef USE_DX11
-    ICF void Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ);
+    ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
 #endif
 
     // Device create / destroy / frame signaling

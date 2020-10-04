@@ -68,11 +68,11 @@ inline void BLK_NODE::insert(void* pv, int NU)
     Stamp++;
 }
 
-inline UINT U2B(UINT NU) { return 8 * NU + 4 * NU; }
+inline u32 U2B(u32 NU) { return 8 * NU + 4 * NU; }
 
-inline void SplitBlock(void* pv, UINT OldIndx, UINT NewIndx)
+inline void SplitBlock(void* pv, u32 OldIndx, u32 NewIndx)
 {
-    UINT i, k, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
+    u32 i, k, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
     u8* p = (u8*)pv + U2B(Indx2Units[NewIndx]);
 
     if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff)
@@ -105,7 +105,7 @@ void _STDCALL StopSubAllocator()
     }
 }
 
-bool _STDCALL StartSubAllocator(UINT SASize)
+bool _STDCALL StartSubAllocator(u32 SASize)
 {
     u32 t = SASize << 20U;
     if (SubAllocatorSize == t)
@@ -124,14 +124,14 @@ static void InitSubAllocator()
 {
     memset(BList, 0, sizeof BList);
     HiUnit = (pText = HeapStart) + SubAllocatorSize;
-    UINT Diff = UNIT_SIZE * (SubAllocatorSize / 8 / UNIT_SIZE * 7);
+    u32 Diff = UNIT_SIZE * (SubAllocatorSize / 8 / UNIT_SIZE * 7);
     LoUnit = UnitsStart = HiUnit - Diff;
     GlueCount = 0;
 }
 
 static void GlueFreeBlocks()
 {
-    UINT i, k, sz;
+    u32 i, k, sz;
     MEM_BLK s0, *p, *p0, *p1;
     if (LoUnit != HiUnit)
         *LoUnit = 0;
@@ -174,9 +174,9 @@ static void GlueFreeBlocks()
     GlueCount = 1 << 13;
 }
 
-static void* _STDCALL AllocUnitsRare(UINT indx)
+static void* _STDCALL AllocUnitsRare(u32 indx)
 {
-    UINT i = indx;
+    u32 i = indx;
     if (!GlueCount)
     {
         GlueFreeBlocks();
@@ -200,9 +200,9 @@ static void* _STDCALL AllocUnitsRare(UINT indx)
     return RetVal;
 }
 
-inline void* AllocUnits(UINT NU)
+inline void* AllocUnits(u32 NU)
 {
-    UINT indx = Units2Indx[NU - 1];
+    u32 indx = Units2Indx[NU - 1];
 
     if (BList[indx].avail())
         return BList[indx].remove();
@@ -228,7 +228,7 @@ inline void* AllocContext()
     return AllocUnitsRare(0);
 }
 
-inline void UnitsCpy(void* Dest, void* Src, UINT NU)
+inline void UnitsCpy(void* Dest, void* Src, u32 NU)
 {
     auto *p1 = (u32 *)Dest, *p2 = (u32 *)Src;
 
@@ -242,9 +242,9 @@ inline void UnitsCpy(void* Dest, void* Src, UINT NU)
     } while (--NU);
 }
 
-inline void* ExpandUnits(void* OldPtr, UINT OldNU)
+inline void* ExpandUnits(void* OldPtr, u32 OldNU)
 {
-    UINT i0 = Units2Indx[OldNU - 1], i1 = Units2Indx[OldNU - 1 + 1];
+    u32 i0 = Units2Indx[OldNU - 1], i1 = Units2Indx[OldNU - 1 + 1];
     if (i0 == i1)
         return OldPtr;
     void* ptr = AllocUnits(OldNU + 1);
@@ -256,9 +256,9 @@ inline void* ExpandUnits(void* OldPtr, UINT OldNU)
     return ptr;
 }
 
-inline void* ShrinkUnits(void* OldPtr, UINT OldNU, UINT NewNU)
+inline void* ShrinkUnits(void* OldPtr, u32 OldNU, u32 NewNU)
 {
-    UINT i0 = Units2Indx[OldNU - 1], i1 = Units2Indx[NewNU - 1];
+    u32 i0 = Units2Indx[OldNU - 1], i1 = Units2Indx[NewNU - 1];
 
     if (i0 == i1)
         return OldPtr;
@@ -275,9 +275,9 @@ inline void* ShrinkUnits(void* OldPtr, UINT OldNU, UINT NewNU)
     return OldPtr;
 }
 
-inline void FreeUnits(void* ptr, UINT NU)
+inline void FreeUnits(void* ptr, u32 NU)
 {
-    UINT indx = Units2Indx[NU - 1];
+    u32 indx = Units2Indx[NU - 1];
     BList[indx].insert(ptr, Indx2Units[indx]);
 }
 
@@ -292,9 +292,9 @@ inline void SpecialFreeUnit(void* ptr)
     }
 }
 
-inline void* MoveUnitsUp(void* OldPtr, UINT NU)
+inline void* MoveUnitsUp(void* OldPtr, u32 NU)
 {
-    UINT indx = Units2Indx[NU - 1];
+    u32 indx = Units2Indx[NU - 1];
     if ((u8*)OldPtr > UnitsStart + 16 * 1024 || (BLK_NODE*)OldPtr > BList[indx].next)
         return OldPtr;
     void* ptr = BList[indx].remove();
@@ -310,7 +310,7 @@ inline void* MoveUnitsUp(void* OldPtr, UINT NU)
 static void ExpandTextArea()
 {
     BLK_NODE* p;
-    UINT Count[N_INDEXES];
+    u32 Count[N_INDEXES];
     memset(Count, 0, sizeof Count);
 
     while ((p = (BLK_NODE*)UnitsStart)->Stamp == ~0UL)
@@ -321,7 +321,7 @@ static void ExpandTextArea()
         pm->Stamp = 0;
     }
 
-    for (UINT i = 0; i < N_INDEXES; i++)
+    for (u32 i = 0; i < N_INDEXES; i++)
         for (p = BList + i; Count[i] != 0; p = p->next)
             while (!p->next->Stamp)
             {

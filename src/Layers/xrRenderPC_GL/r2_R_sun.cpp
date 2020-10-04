@@ -85,7 +85,7 @@ struct BoundingBox
     BoundingBox(): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) { }
     BoundingBox(const BoundingBox& other): minPt(other.minPt), maxPt(other.maxPt) { }
 
-    explicit BoundingBox(const glm::vec3* points, UINT n): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
+    explicit BoundingBox(const glm::vec3* points, u32 n): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < n; i++)
             Merge(&points[i]);

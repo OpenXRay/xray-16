@@ -85,7 +85,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     Caps.id_vendor = Desc.VendorId;
     Caps.id_device = Desc.DeviceId;
 
-    UINT createDeviceFlags = 0;
+    u32 createDeviceFlags = 0;
 
 #ifdef DEBUG
     if (xrDebug::DebuggerIsPresent())
@@ -382,9 +382,9 @@ void CHW::Reset()
         cd.BufferCount, desc.Width, desc.Height, desc.Format, cd.Flags));
 }
 
-bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const UINT feature) const
+bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const u32 feature) const
 {
-    UINT supports;
+    u32 supports;
 
     if (SUCCEEDED(pDevice->CheckFormatSupport(format, &supports)))
     {

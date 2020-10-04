@@ -42,14 +42,14 @@ struct SEE2_CONTEXT
 {
     WORD Summ;
     u8 Shift, Count;
-    void init(UINT InitVal)
+    void init(u32 InitVal)
     {
         Summ = InitVal << (Shift = PERIOD_BITS - 4);
         Count = 7;
     }
-    UINT getMean()
+    u32 getMean()
     {
-        UINT RetVal = (Summ >> Shift);
+        u32 RetVal = (Summ >> Shift);
         Summ -= RetVal;
         return RetVal + (RetVal == 0);
     }
@@ -94,7 +94,7 @@ struct PPM_CONTEXT
     PPM_CONTEXT* removeBinConts(int Order);
     void makeSuffix();
     STATE& oneState() const { return (STATE&)SummFreq; }
-    void read(_PPMD_FILE* fp, UINT PrevSym);
+    void read(_PPMD_FILE* fp, u32 PrevSym);
 };
 PPM_CONTEXT _PACK_ATTR* MaxContext;
 #pragma pack()
@@ -128,7 +128,7 @@ struct PPMD_STARTUP
 } PPMd_StartUp;
 inline PPMD_STARTUP::PPMD_STARTUP() // constants initialization
 {
-    UINT i, k, m, Step;
+    u32 i, k, m, Step;
     for (i = 0, k = 1; i < N1; i++, k += 1)
         Indx2Units[i] = k;
     for (k++; i < N1 + N2; i++, k += 2)
@@ -203,7 +203,7 @@ void PPM_CONTEXT::makeSuffix()
     }
 }
 
-void PPM_CONTEXT::read(_PPMD_FILE* fp, UINT PrevSym)
+void PPM_CONTEXT::read(_PPMD_FILE* fp, u32 PrevSym)
 {
     STATE* p;
     Suffix = NULL;
@@ -525,7 +525,7 @@ static PPM_CONTEXT* _FASTCALL ReduceOrder(PPM_CONTEXT::STATE* p, PPM_CONTEXT* pc
 }
 void PPM_CONTEXT::rescale()
 {
-    UINT OldNU, Adder, EscFreq, i = NumStats;
+    u32 OldNU, Adder, EscFreq, i = NumStats;
     STATE tmp, *p1, *p;
     for (p = FoundState; p != Stats; p--)
         SWAP(p[0], p[-1]);
@@ -584,7 +584,7 @@ static PPM_CONTEXT* _FASTCALL CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p,
 {
     PPM_CONTEXT ct, *UpBranch = FoundState->Successor;
     PPM_CONTEXT::STATE *ps[MAX_O], **pps = ps;
-    UINT cf, s0;
+    u32 cf, s0;
     u8 tmp, sym = FoundState->Symbol;
     if (!Skip)
     {
@@ -672,7 +672,7 @@ static inline void UpdateModel(PPM_CONTEXT* MinContext)
     PPM_CONTEXT* pc = MinContext->Suffix;
     PPM_CONTEXT* pc1 = MaxContext;
 
-    UINT ns1, ns, cf, sf, s0, FFreq = FoundState->Freq;
+    u32 ns1, ns, cf, sf, s0, FFreq = FoundState->Freq;
     u8 Flag, sym, FSymbol = FoundState->Symbol;
 
     if (FFreq < MAX_FREQ / 4 && pc)
@@ -811,7 +811,7 @@ inline void PPM_CONTEXT::encodeBinSymbol(int symbol)
     u8 indx = NS2BSIndx[Suffix->NumStats] + PrevSuccess + Flags;
     STATE& rs = oneState();
     WORD& bs = BinSumm[QTable[rs.Freq - 1]][indx + ((RunLength >> 26) & 0x20)];
-    UINT tmp = rcBinStart(bs, TOT_BITS);
+    u32 tmp = rcBinStart(bs, TOT_BITS);
     if (rs.Symbol == symbol)
     {
         FoundState = &rs;
@@ -837,7 +837,7 @@ inline void PPM_CONTEXT::decodeBinSymbol() const
     STATE& rs = oneState();
 
     WORD& bs = BinSumm[QTable[rs.Freq - 1]][indx + ((RunLength >> 26) & 0x20)];
-    UINT tmp = rcBinStart(bs, TOT_BITS);
+    u32 tmp = rcBinStart(bs, TOT_BITS);
     if (!rcBinDecode(tmp))
     {
         FoundState = &rs;
@@ -871,7 +871,7 @@ inline void PPM_CONTEXT::update1(STATE* p)
 }
 inline void PPM_CONTEXT::encodeSymbol1(int symbol)
 {
-    UINT LoCnt, i = Stats->Symbol;
+    u32 LoCnt, i = Stats->Symbol;
     STATE* p = Stats;
     SubRange.scale = SummFreq;
     if (i == symbol)
@@ -912,7 +912,7 @@ inline void PPM_CONTEXT::encodeSymbol1(int symbol)
 }
 inline void PPM_CONTEXT::decodeSymbol1()
 {
-    UINT i, count, HiCnt = Stats->Freq;
+    u32 i, count, HiCnt = Stats->Freq;
     STATE* p = Stats;
     SubRange.scale = SummFreq;
     if ((count = rcGetCurrentCount()) < HiCnt)
@@ -965,7 +965,7 @@ inline void PPM_CONTEXT::update2(STATE* p)
 inline SEE2_CONTEXT* PPM_CONTEXT::makeEscFreq2() const
 {
     u8* pb = (u8*)Stats;
-    UINT t = 2 * NumStats;
+    u32 t = 2 * NumStats;
     PrefetchData(pb);
     PrefetchData(pb + t);
     PrefetchData(pb += 2 * t);
@@ -988,7 +988,7 @@ inline SEE2_CONTEXT* PPM_CONTEXT::makeEscFreq2() const
 inline void PPM_CONTEXT::encodeSymbol2(int symbol)
 {
     SEE2_CONTEXT* psee2c = makeEscFreq2();
-    UINT Sym, LoCnt = 0, i = NumStats - NumMasked;
+    u32 Sym, LoCnt = 0, i = NumStats - NumMasked;
     STATE *p1, *p = Stats - 1;
     do
     {
@@ -1025,7 +1025,7 @@ SYMBOL_FOUND:
 inline void PPM_CONTEXT::decodeSymbol2()
 {
     SEE2_CONTEXT* psee2c = makeEscFreq2();
-    UINT Sym, count, HiCnt = 0, i = NumStats - NumMasked;
+    u32 Sym, count, HiCnt = 0, i = NumStats - NumMasked;
     STATE *ps[256], **pps = ps, *p = Stats - 1;
     do
     {
@@ -1186,7 +1186,7 @@ static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod)
 
     if (first_time)
     {
-        UINT i, k, m;
+        u32 i, k, m;
 
         memset(CharMask, 0, sizeof(CharMask));
         EscCount = PrintCount = 1;
@@ -1250,7 +1250,7 @@ static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod)
     }
     else
     {
-        UINT i, k, m;
+        u32 i, k, m;
 
         memset(CharMask, 0, sizeof(CharMask));
         EscCount = PrintCount = 1;

@@ -7,7 +7,7 @@ enum
     LOCKFLAGS_APPEND = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT, // TODO: Implement buffer object appending using glBufferSubData
 };
 
-static HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, UINT dataSize, bool bDynamic, bool bIndexBuffer)
+static HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, u32 dataSize, bool bDynamic, bool bIndexBuffer)
 {
     const GLenum usage = bDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
     const GLenum target = bIndexBuffer ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
@@ -18,12 +18,12 @@ static HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, UINT dataSize, b
     return S_OK;
 }
 
-static inline HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, UINT dataSize, bool bDynamic)
+static inline HRESULT CreateVertexBuffer(VertexBufferHandle* pBuffer, const void* pData, u32 dataSize, bool bDynamic)
 {
     return CreateBuffer(pBuffer, pData, dataSize, bDynamic, false);
 }
 
-static inline HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, UINT dataSize, bool bDynamic)
+static inline HRESULT CreateIndexBuffer(IndexBufferHandle* pBuffer, const void* pData, u32 dataSize, bool bDynamic)
 {
     return CreateBuffer(static_cast<GLuint*>(pBuffer), pData, dataSize, bDynamic, true);
 }

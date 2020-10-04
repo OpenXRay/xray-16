@@ -53,12 +53,12 @@ public:
     virtual HRESULT Initialize(int width, int height, NVI_PIXEL_FORMAT format);
     virtual HRESULT Initialize(int width, int height, NVI_PIXEL_FORMAT format, u8* data);
     virtual HRESULT Free();
-    UINT GetBytesPerPixel();
-    UINT GetImageNumBytes();
+    u32 GetBytesPerPixel();
+    u32 GetImageNumBytes();
     NVI_PIXEL_FORMAT GetFormat() { return m_Format; }
-    UINT GetWidth() { return m_nSizeX; }
-    UINT GetHeight() { return m_nSizeY; }
-    UINT GetNumPixels();
+    u32 GetWidth() { return m_nSizeX; }
+    u32 GetHeight() { return m_nSizeY; }
+    u32 GetNumPixels();
     u8* GetImageDataPointer() { return m_pArray; }
     bool IsDataValid();
     void FlipTopToBottom();
@@ -66,10 +66,10 @@ public:
     void ABGR8_To_ARGB8();
 
 private:
-    void GetPixel_ARGB8(u32* outPix, UINT i, UINT j);
-    void SetPixel_ARGB8(UINT i, UINT j, u32 pix);
-    void GetPixel_ARGB8(u32* outPix, UINT index);
-    void SetPixel_ARGB8(UINT index, u32 pix);
+    void GetPixel_ARGB8(u32* outPix, u32 i, u32 j);
+    void SetPixel_ARGB8(u32 i, u32 j, u32 pix);
+    void GetPixel_ARGB8(u32* outPix, u32 index);
+    void SetPixel_ARGB8(u32 index, u32 pix);
 
     friend class NVI_PNG_File;
     friend class NVI_GraphicsFile;
@@ -79,7 +79,7 @@ private:
 // Inline functions
 // Should not do any new or delete here
 
-__forceinline void NVI_Image::GetPixel_ARGB8(u32* outPix, UINT i, UINT j)
+__forceinline void NVI_Image::GetPixel_ARGB8(u32* outPix, u32 i, u32 j)
 {
 #ifdef NVIHDEBUG
     // _ASSERT because that evaluates for debug only
@@ -90,7 +90,7 @@ __forceinline void NVI_Image::GetPixel_ARGB8(u32* outPix, UINT i, UINT j)
     *outPix = ((u32*)m_pArray)[j * m_nSizeX + i];
 }
 
-__forceinline void NVI_Image::SetPixel_ARGB8(UINT i, UINT j, u32 pix)
+__forceinline void NVI_Image::SetPixel_ARGB8(u32 i, u32 j, u32 pix)
 {
 #ifdef NVIHDEBUG
     _ASSERT(GetFormat() == NVI_A8_R8_G8_B8);
@@ -98,7 +98,7 @@ __forceinline void NVI_Image::SetPixel_ARGB8(UINT i, UINT j, u32 pix)
     ((u32*)m_pArray)[j * m_nSizeX + i] = pix;
 }
 
-__forceinline void NVI_Image::GetPixel_ARGB8(u32* outPix, UINT index)
+__forceinline void NVI_Image::GetPixel_ARGB8(u32* outPix, u32 index)
 {
 #ifdef NVIHDEBUG
     // _ASSERT because that evaluates for debug only
@@ -109,7 +109,7 @@ __forceinline void NVI_Image::GetPixel_ARGB8(u32* outPix, UINT index)
     *outPix = ((u32*)m_pArray)[index];
 }
 
-__forceinline void NVI_Image::SetPixel_ARGB8(UINT index, u32 pix)
+__forceinline void NVI_Image::SetPixel_ARGB8(u32 index, u32 pix)
 {
 #ifdef NVIHDEBUG
     _ASSERT(GetFormat() == NVI_A8_R8_G8_B8);

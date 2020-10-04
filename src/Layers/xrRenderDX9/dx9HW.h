@@ -50,7 +50,7 @@ public:
 
     IDirect3D9* pD3D = nullptr; // D3D
 
-    UINT DevAdapter;
+    u32 DevAdapter;
 
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;

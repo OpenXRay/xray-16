@@ -227,9 +227,9 @@ void SimulatorStates::UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const
 
             case D3DRS_STENCILENABLE: desc.StencilEnable = S.v2 ? 1 : 0; break;
 
-            case D3DRS_STENCILMASK: desc.StencilReadMask = (UINT8)S.v2; break;
+            case D3DRS_STENCILMASK: desc.StencilReadMask = (u8)S.v2; break;
 
-            case D3DRS_STENCILWRITEMASK: desc.StencilWriteMask = (UINT8)S.v2; break;
+            case D3DRS_STENCILWRITEMASK: desc.StencilWriteMask = (u8)S.v2; break;
 
             case D3DRS_STENCILFAIL:
                 desc.FrontFace.StencilFailOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
