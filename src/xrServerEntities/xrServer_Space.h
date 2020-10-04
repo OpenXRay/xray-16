@@ -30,7 +30,7 @@ enum EPOType
 using DWORD_VECTOR = xr_vector<u32>;
 using BOOL_VECTOR = xr_vector<bool>;
 using FLOAT_VECTOR = xr_vector<float>;
-using LPSTR_VECTOR = xr_vector<pstr>;
+using LPSTR_VECTOR = xr_vector<LPSTR>;
 using FVECTOR_VECTOR = xr_vector<Fvector>;
 
 #ifdef XRGAME_EXPORTS
