@@ -130,7 +130,7 @@ void Startup(pstr lpCmdLine)
     Logger.Destroy();
 }
 
-int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, pstr lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     // Initialize debugging
     xrDebug::Initialize(lpCmdLine);
