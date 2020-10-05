@@ -45,6 +45,8 @@ for:
       name: OpenXRay.*.7z
     - path: res/Symbols.*.7z
       name: Symbols.*.7z
+    - path: res/Utils.*.7z
+      name: Utils.*.7z
 -
   matrix:
     only:
@@ -89,6 +91,6 @@ deploy:
   auth_token:
     secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
   artifact:
-    OpenXRay.*.7z, Symbols.*.7z
+    OpenXRay.*.7z, Symbols.*.7z Utils.*.7z
   draft: true
   force_update: true

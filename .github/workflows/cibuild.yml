@@ -44,6 +44,11 @@ jobs:
       with:
         name: Symbols.${{ env.Build_type }}.7z
         path: res\Symbols.${{ env.Build_type }}.7z
+    - name: Upload Utils
+      uses: actions/upload-artifact@v1
+      with:
+        name: Utils.${{ env.Build_type }}.7z
+        path: res\Utils.${{ env.Build_type }}.7z
 
   build-linux:
     runs-on: ubuntu-18.04
