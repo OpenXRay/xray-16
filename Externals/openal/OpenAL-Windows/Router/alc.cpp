@@ -1690,7 +1690,7 @@ ALCAPI ALboolean ALCAPIENTRY alcMakeContextCurrent(ALCcontext* context)
 
                 else
                 {
-                    alCurrentContext->Device->AlcApi.alcMakeContextCurrent(0);
+                    context->Device->AlcApi.alcMakeContextCurrent(0);
                 }
             }
         }

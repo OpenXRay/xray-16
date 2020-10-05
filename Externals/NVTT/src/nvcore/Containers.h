@@ -345,7 +345,7 @@ namespace nv
 		/// Remove the element at the given index. This is an expensive operation!
 		void removeAt( uint index )
 		{
-			nvCheck(index >= 0 && index < m_size);
+			nvCheck(index < m_size);
 			
 			if( m_size == 1 ) {
 				clear();
@@ -370,7 +370,7 @@ namespace nv
 		/// Insert the given element at the given index shifting all the elements up.
 		void insertAt( uint index, const T & val = T() )
 		{
-			nvCheck( index >= 0 && index <= m_size );
+			nvCheck( index <= m_size );
 			
 			resize( m_size + 1 );
 			
