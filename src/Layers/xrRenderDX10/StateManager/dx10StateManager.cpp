@@ -195,7 +195,7 @@ void dx10StateManager::Apply()
             m_bBSChanged = false;
         }
 
-        static const FLOAT BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
+        static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
 
         HW.pContext->OMSetBlendState(m_pBlendState, BlendFactor, m_uiSampleMask);
         m_bBSNeedApply = false;

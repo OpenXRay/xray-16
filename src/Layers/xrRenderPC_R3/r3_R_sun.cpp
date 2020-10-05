@@ -27,7 +27,7 @@ static int facetable[6][4] = {
     {0, 3, 5, 7}, {1, 6, 4, 2},
 };
 //////////////////////////////////////////////////////////////////////////
-#define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
+#define DW_AS_FLT(DW) (*(float*)&(DW))
 #define FLT_AS_DW(F) (*(u32*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0)
