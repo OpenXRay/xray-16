@@ -108,7 +108,7 @@ void CTexture::apply_avi(u32 dwStage)
     if (pAVI->NeedUpdate())
     {
         // AVI
-        u8* ptr;
+        u8* ptr{};
         pAVI->GetFrame(&ptr);
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, m_width, m_height,
             GL_RGBA, GL_UNSIGNED_BYTE, ptr));
