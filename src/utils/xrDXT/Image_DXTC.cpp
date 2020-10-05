@@ -641,7 +641,7 @@ void Image_DXTC::DecompressDXT5()
     {
         // 8 bytes per block
         // 1 block for alpha, 1 block for color
-        DXTColBlock* pBlock = (DXTColBlock*)((uintptr_t)m_pCompBytes + j * xblocks * 16);
+        DXTColBlock* pBlock = (DXTColBlock*)((std::uintptr_t)m_pCompBytes + j * xblocks * 16);
         for (int i = 0; i < xblocks; i++, pBlock++)
         {
             // inline
