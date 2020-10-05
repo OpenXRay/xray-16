@@ -36,7 +36,7 @@ namespace
 const unsigned int NO_GROUP = 0xFFFFFFFF;
 
 // IC: Replacement for D3DXVec3Normalize so that we don't have dll dependancies.
-static D3DXVECTOR3* Vec3Normalize(D3DXVECTOR3* pOut, CONST D3DXVECTOR3* pV)
+static D3DXVECTOR3* Vec3Normalize(D3DXVECTOR3* pOut, const D3DXVECTOR3* pV)
 {
     assert(pOut != NULL);
     assert(pV != NULL);
