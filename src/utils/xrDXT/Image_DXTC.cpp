@@ -667,7 +667,7 @@ void Image_DXTC::DecompressDXT5()
 //	adapted from microsoft mssdk D3DIM Compress example
 //  PixelFormatToString()
 //-----------------------------------------------------------------------------
-VOID Image_DXTC::DecodePixelFormat(char* strPixelFormat, DDS_PIXELFORMAT* pddpf)
+void Image_DXTC::DecodePixelFormat(char* strPixelFormat, DDS_PIXELFORMAT* pddpf)
 {
     switch (pddpf->dwFourCC)
     {
