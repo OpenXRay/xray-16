@@ -88,6 +88,9 @@
   <PropertyGroup>
     <TargetName>xrEngine</TargetName>
   </PropertyGroup>
+  <PropertyGroup>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <ConformanceMode>true</ConformanceMode>
