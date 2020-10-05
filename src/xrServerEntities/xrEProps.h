@@ -148,14 +148,14 @@ public:
 
     virtual GameTypeValue* __stdcall CreateGameType(PropItemVec& items, shared_str key, GameTypeChooser* val) = 0;
     // obsolette
-    virtual CTextValue* __stdcall CreateCText(PropItemVec& items, shared_str key, LPSTR val, u32 sz) = 0;
+    virtual CTextValue* __stdcall CreateCText(PropItemVec& items, shared_str key, pstr val, u32 sz) = 0;
     virtual CListValue* __stdcall CreateCList(
-        PropItemVec& items, shared_str key, LPSTR val, u32 sz, xr_string* lst, u32 cnt) = 0;
+        PropItemVec& items, shared_str key, pstr val, u32 sz, xr_string* lst, u32 cnt) = 0;
     virtual CTextValue* __stdcall CreateCName(
-        PropItemVec& items, shared_str key, LPSTR val, u32 sz, ListItem* owner) = 0;
+        PropItemVec& items, shared_str key, pstr val, u32 sz, ListItem* owner) = 0;
     virtual TokenValueSH* __stdcall CreateTokenSH(
         PropItemVec& items, shared_str key, u32* val, const TokenValueSH::Item* lst, u32 cnt) = 0;
-    virtual CTextValue* __stdcall CreateTexture(PropItemVec& items, shared_str key, LPSTR val, u32 sz) = 0;
+    virtual CTextValue* __stdcall CreateTexture(PropItemVec& items, shared_str key, pstr val, u32 sz) = 0;
 };
 //---------------------------------------------------------------------------
 #ifdef __BORLANDC__

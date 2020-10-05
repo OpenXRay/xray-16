@@ -163,7 +163,7 @@ public:
     void GenerateNewName(char const* old_name, char* dest, u32 const dest_size);
     void CheckPlayerName(xrClientData* CL);
     virtual void OnPlayerConnect(ClientID id_who) override;
-    virtual void OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID) override;
+    virtual void OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameID) override;
     virtual void OnPlayerReady(ClientID id_who) override{};
     virtual void OnPlayerEnteredGame(ClientID id_who) override{};
     virtual void OnPlayerConnectFinished(ClientID id_who) override{};

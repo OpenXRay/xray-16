@@ -232,7 +232,7 @@ void UIBoosterInfoItem::SetValue(float value)
     else
         xr_sprintf(buf, "%.0f", value);
 
-    LPSTR str;
+    pstr str;
     if (m_unit_str.size())
         STRCONCAT(str, buf, " ", m_unit_str.c_str());
     else

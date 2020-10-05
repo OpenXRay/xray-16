@@ -5,9 +5,9 @@
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
-void fix_texture_name(LPSTR fn)
+void fix_texture_name(pstr fn)
 {
-    LPSTR _ext = strext(fn);
+    pstr _ext = strext(fn);
     if (_ext && (!xr_stricmp(_ext, ".tga") || !xr_stricmp(_ext, ".dds") || !xr_stricmp(_ext, ".bmp") ||
         !xr_stricmp(_ext, ".ogm")))
     {

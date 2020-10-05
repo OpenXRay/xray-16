@@ -6,7 +6,7 @@
 #include "Layers/xrRender/Blender.h"
 #include "Layers/xrRender/tss.h"
 
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(pstr fn);
 
 void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
 {

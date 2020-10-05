@@ -24,7 +24,7 @@ bool item_pred(const CInifileEx::Item& x, LPCSTR val)
 //------------------------------------------------------------------------------
 //Тело функций Inifile
 //------------------------------------------------------------------------------
-BOOL _parse(LPSTR dest, LPCSTR src)
+BOOL _parse(pstr dest, LPCSTR src)
 {
     BOOL bInsideSTR = false;
     if (src)
@@ -55,7 +55,7 @@ BOOL _parse(LPSTR dest, LPCSTR src)
     return bInsideSTR;
 }
 
-void _decorate(LPSTR dest, LPCSTR src)
+void _decorate(pstr dest, LPCSTR src)
 {
     if (src)
     {
@@ -186,8 +186,8 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
     {
         F->r_string(str, sizeof(str));
         _Trim(str);
-        LPSTR comm = strchr(str, ';');
-        LPSTR comm_1 = strchr(str, '/');
+        pstr comm = strchr(str, ';');
+        pstr comm_1 = strchr(str, '/');
 
         if (comm_1 && (*(comm_1 + 1) == '/') && ((!comm) || (comm && (comm_1 < comm))))
         {
@@ -195,7 +195,7 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
         }
 
 #ifdef DEBUG
-        LPSTR comment = 0;
+        pstr comment = 0;
 #endif
         if (comm)
         {

@@ -339,7 +339,7 @@ void game_sv_GameState::net_Export_GameTime(NET_Packet& P)
 };
 
 void game_sv_GameState::OnPlayerConnect(ClientID /**id_who**/) { signal_Syncronize(); }
-void game_sv_GameState::OnPlayerDisconnect(ClientID id_who, LPSTR, u16) { signal_Syncronize(); }
+void game_sv_GameState::OnPlayerDisconnect(ClientID id_who, pstr, u16) { signal_Syncronize(); }
 static float rpoints_Dist[TEAM_COUNT] = {1000.f, 1000.f, 1000.f, 1000.f};
 void game_sv_GameState::Create(shared_str& options)
 {

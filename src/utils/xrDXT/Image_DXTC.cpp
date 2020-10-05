@@ -541,14 +541,14 @@ void Image_DXTC::DecompressDXT1()
     for (int j = 0; j < yblocks; j++)
     {
         // 8 bytes per block
-        pBlock = (DXTColBlock*)((DWORD_PTR)m_pCompBytes + j * xblocks * 8);
+        pBlock = (DXTColBlock*)((std::uintptr_t)m_pCompBytes + j * xblocks * 8);
         for (int i = 0; i < xblocks; i++, pBlock++)
         {
             // inline func:
             GetColorBlockColors(pBlock, &col_0, &col_1, &col_2, &col_3, wrd);
             // now decode the color block into the bitmap bits
             // inline func:
-            pImPos = (u32*)((DWORD_PTR)pBase + i * 16 + (j * 4) * m_nWidth * 4);
+            pImPos = (u32*)((std::uintptr_t)pBase + i * 16 + (j * 4) * m_nWidth * 4);
             DecodeColorBlock(pImPos, pBlock, m_nWidth, (u32*)&col_0, (u32*)&col_1, (u32*)&col_2, (u32*)&col_3);
             if (false) // Set to RGB test pattern
             {
@@ -593,7 +593,7 @@ void Image_DXTC::DecompressDXT3()
     {
         // 8 bytes per block
         // 1 block for alpha, 1 block for color
-        pBlock = (DXTColBlock*)((DWORD_PTR)m_pCompBytes + j * xblocks * 16);
+        pBlock = (DXTColBlock*)((std::uintptr_t)m_pCompBytes + j * xblocks * 16);
         for (int i = 0; i < xblocks; i++, pBlock++)
         {
             // inline
@@ -604,7 +604,7 @@ void Image_DXTC::DecompressDXT3()
             pBlock++;
             GetColorBlockColors(pBlock, &col_0, &col_1, &col_2, &col_3, wrd);
             // Decode the color block into the bitmap bits inline func:
-            pImPos = (u32*)((DWORD_PTR)pBase + i * 16 + (j * 4) * m_nWidth * 4);
+            pImPos = (u32*)((std::uintptr_t)pBase + i * 16 + (j * 4) * m_nWidth * 4);
             DecodeColorBlock(pImPos, pBlock, m_nWidth, (u32*)&col_0, (u32*)&col_1, (u32*)&col_2, (u32*)&col_3);
             // Overwrite the previous alpha bits with the alpha block
             //  info
@@ -641,7 +641,7 @@ void Image_DXTC::DecompressDXT5()
     {
         // 8 bytes per block
         // 1 block for alpha, 1 block for color
-        DXTColBlock* pBlock = (DXTColBlock*)((DWORD_PTR)m_pCompBytes + j * xblocks * 16);
+        DXTColBlock* pBlock = (DXTColBlock*)((std::uintptr_t)m_pCompBytes + j * xblocks * 16);
         for (int i = 0; i < xblocks; i++, pBlock++)
         {
             // inline
@@ -653,7 +653,7 @@ void Image_DXTC::DecompressDXT5()
             // //TRACE("pBlock:   0x%.8x\n", pBlock );
             GetColorBlockColors(pBlock, &col_0, &col_1, &col_2, &col_3, wrd);
             // Decode the color block into the bitmap bits inline func:
-            pImPos = (u32*)((DWORD_PTR)pBase + i * 16 + (j * 4) * m_nWidth * 4);
+            pImPos = (u32*)((std::uintptr_t)pBase + i * 16 + (j * 4) * m_nWidth * 4);
             DecodeColorBlock(pImPos, pBlock, m_nWidth, (u32*)&col_0, (u32*)&col_1, (u32*)&col_2, (u32*)&col_3);
             // Overwrite the previous alpha bits with the alpha block info
             DecodeAlpha3BitLinear(pImPos, pAlphaBlock, m_nWidth, alphazero);
@@ -667,7 +667,7 @@ void Image_DXTC::DecompressDXT5()
 //	adapted from microsoft mssdk D3DIM Compress example
 //  PixelFormatToString()
 //-----------------------------------------------------------------------------
-VOID Image_DXTC::DecodePixelFormat(CHAR* strPixelFormat, DDS_PIXELFORMAT* pddpf)
+VOID Image_DXTC::DecodePixelFormat(char* strPixelFormat, DDS_PIXELFORMAT* pddpf)
 {
     switch (pddpf->dwFourCC)
     {

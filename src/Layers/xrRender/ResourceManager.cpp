@@ -13,7 +13,7 @@
 #include "Blender_Recorder.h"
 
 //	Already defined in Texture.cpp
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(pstr fn);
 /*
 void fix_texture_name(LPSTR fn)
 {
@@ -46,7 +46,7 @@ IBlender* CResourceManager::_GetBlender(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
 
-    LPSTR N = LPSTR(Name);
+    pstr N = pstr(Name);
     map_Blender::iterator I = m_blenders.find(N);
 
     if (I == m_blenders.end())
@@ -63,7 +63,7 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
     if (!(Name && Name[0]))
         return nullptr;
 
-    LPSTR N = LPSTR(Name);
+    pstr N = pstr(Name);
     map_Blender::iterator I = m_blenders.find(N);
     if (I == m_blenders.end())
         return nullptr;
@@ -73,7 +73,7 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
 
 void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
 {
-    LPSTR N = LPSTR(Name);
+    pstr N = pstr(Name);
     map_Blender::iterator I = m_blenders.find(N);
     if (I != m_blenders.end())
     {

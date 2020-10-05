@@ -25,7 +25,7 @@ using namespace ALife;
 
 typedef struct tagSConnectionVertex
 {
-    LPSTR caConnectName;
+    pstr caConnectName;
     GameGraph::_GRAPH_ID tGraphID;
     GameGraph::_GRAPH_ID tOldGraphID;
     u32 dwLevelID;
@@ -56,7 +56,7 @@ u32 dwfGetIDByLevelName(CInifile* Ini, LPCSTR caLevelName)
 }
 
 using GRAPH_P_MAP = xr_map<u32, ::CLevelGameGraph*>;
-using VERTEX_MAP = xr_map<LPSTR, SConnectionVertex, CCompareVertexPredicate>;
+using VERTEX_MAP = xr_map<pstr, SConnectionVertex, CCompareVertexPredicate>;
 
 typedef struct tagSDynamicGraphVertex
 {
@@ -227,7 +227,7 @@ public:
                     if (fMinDistance < EPS_L)
                     {
                         SConnectionVertex T;
-                        LPSTR S;
+                        pstr S;
                         S = xr_strdup(tpGraphPoint->name_replace());
                         T.caConnectName = xr_strdup(*tpGraphPoint->m_caConnectionPointName);
                         T.dwLevelID = dwfGetIDByLevelName(Ini, *tpGraphPoint->m_caConnectionLevelName);
@@ -506,7 +506,7 @@ LPCSTR generate_temp_file_name(LPCSTR header0, LPCSTR header1, string_path& buff
     return (buffer);
 }
 
-void fill_needed_levels(LPSTR levels, xr_vector<LPCSTR>& result)
+void fill_needed_levels(pstr levels, xr_vector<LPCSTR>& result)
 {
     auto I = levels;
     for (auto J = I;; ++I)

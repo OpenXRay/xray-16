@@ -78,7 +78,7 @@ struct CSaver
         }
     };
 
-    IC static void save_data(LPSTR data, M& stream, const P& /*p*/) { stream.w_stringZ(data); }
+    IC static void save_data(pstr data, M& stream, const P& /*p*/) { stream.w_stringZ(data); }
     IC static void save_data(LPCSTR data, M& stream, const P& /*p*/) { stream.w_stringZ(data); }
     IC static void save_data(const shared_str& data, M& stream, const P& /*p*/) { stream.w_stringZ(data); }
     IC static void save_data(const xr_string& data, M& stream, const P& /*p*/) { stream.w_stringZ(data.c_str()); }

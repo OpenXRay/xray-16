@@ -39,7 +39,7 @@ xrGUID generate_guid()
     return (result);
 }
 
-LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const size_t& buffer_size)
+LPCSTR generate_guid(const xrGUID& guid, pstr buffer, const size_t& buffer_size)
 {
 #ifdef WINVER
     static_assert(sizeof(xrGUID) == sizeof(GUID), "Different GUID types.");

@@ -29,7 +29,7 @@ struct CCloner
     };
 
     IC static void clone(LPCSTR _1, LPCSTR& _2) { _2 = _1; }
-    IC static void clone(LPSTR _1, LPSTR& _2) { _2 = xr_strdup(_1); }
+    IC static void clone(pstr _1, pstr& _2) { _2 = xr_strdup(_1); }
     IC static void clone(const shared_str& _1, shared_str& _2) { _2 = _1; }
     template <typename T1, typename T2>
     IC static void clone(const std::pair<T1, T2>& _1, std::pair<T1, T2>& _2)
@@ -174,7 +174,7 @@ struct CCloner
     }
 };
 
-IC void clone(LPCSTR p0, LPSTR& p1) { p1 = xr_strdup(p0); }
+IC void clone(LPCSTR p0, pstr& p1) { p1 = xr_strdup(p0); }
 template <typename T>
 IC void clone(const T& p0, T& p1)
 {

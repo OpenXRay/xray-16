@@ -5,7 +5,7 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(pstr fn);
 
 void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
     BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)

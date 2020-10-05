@@ -289,7 +289,7 @@ void CUILines::SetFont(CGameFont* pFont)
     m_pFont = pFont;
 }
 
-LPCSTR GetElipsisText(CGameFont* pFont, float width, LPCSTR source_text, LPSTR buff, int buff_len)
+LPCSTR GetElipsisText(CGameFont* pFont, float width, LPCSTR source_text, pstr buff, int buff_len)
 {
     float text_len = pFont->SizeOf_(source_text);
     UI().ClientToScreenScaledWidth(text_len);

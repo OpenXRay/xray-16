@@ -53,7 +53,7 @@ extern void Surface_Init();
 
 void xrLoad(LPCSTR name, bool draft_mode)
 {
-    FS.get_path("$level$")->_set((LPSTR)name);
+    FS.get_path("$level$")->_set((pstr)name);
     string_path file_name;
     if (!draft_mode)
     {
@@ -120,7 +120,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
                     // load thumbnail
                     string128& N = BT.name;
-                    LPSTR extension = strext(N);
+                    pstr extension = strext(N);
                     if (extension)
                         *extension = 0;
 

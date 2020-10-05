@@ -722,7 +722,7 @@ void CMainMenu::OnSessionTerminate(LPCSTR reason)
 
     m_start_time = Device.dwTimeGlobal;
     LPCSTR str = StringTable().translate("ui_st_kicked_by_server").c_str();
-    LPSTR text;
+    pstr text;
 
     if (reason && xr_strlen(reason) && reason[0] == '@')
     {

@@ -455,7 +455,7 @@ class CTextValue : public PropValue
     xr_string init_value;
 
 public:
-    LPSTR value;
+    pstr value;
 
     typedef fastdelegate::FastDelegate2<PropValue*, xr_string&> TOnBeforeEditEvent;
     typedef fastdelegate::FastDelegate2<PropValue*, xr_string&, bool> TOnAfterEditEvent;
@@ -465,7 +465,7 @@ public:
 
     int lim;
 
-    CTextValue(LPSTR val, int _lim) : value(val), init_value(val), lim(_lim)
+    CTextValue(pstr val, int _lim) : value(val), init_value(val), lim(_lim)
     {
         OnBeforeEditEvent = nullptr;
         OnAfterEditEvent = nullptr;
@@ -490,7 +490,7 @@ public:
         return false;
     }
 
-    LPSTR GetValue() { return value; }
+    pstr GetValue() { return value; }
     virtual void ResetValue() { xr_strcpy(value, init_value.size() + 1, init_value.c_str()); }
 };
 //------------------------------------------------------------------------------
@@ -823,7 +823,7 @@ public:
     xr_string* items;
     u32 item_count;
 
-    CListValue(LPSTR val, u32 sz, xr_string* _items, u32 cnt) : CTextValue(val, sz), items(_items), item_count(cnt){};
+    CListValue(pstr val, u32 sz, xr_string* _items, u32 cnt) : CTextValue(val, sz), items(_items), item_count(cnt){};
     virtual bool Equal(PropValue* val)
     {
         if (items != ((CListValue*)val)->items)

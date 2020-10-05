@@ -26,7 +26,7 @@ static pcstr h_str =
 void Help() { MessageBox(nullptr, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 typedef int __cdecl xrOptions(b_params* params, u32 version, bool bRunBuild);
 
-void Startup(LPSTR lpCmdLine)
+void Startup(pstr lpCmdLine)
 {
     create_global_data();
     string512 cmd;

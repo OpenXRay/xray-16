@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(pstr fn);
 
 void simplify_texture(string_path& fn)
 {
@@ -115,7 +115,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
     R_ASSERT(Name && Name[0] && w && h);
 
     // ***** first pass - search already created RT
-    LPSTR N = LPSTR(Name);
+    pstr N = pstr(Name);
     map_RT::iterator I = m_rtargets.find(N);
     if (I != m_rtargets.end())
         return I->second;
@@ -134,7 +134,7 @@ void CResourceManager::_DeleteRT(const CRT* RT)
 {
     if (0 == (RT->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    LPSTR N = LPSTR(*RT->cName);
+    pstr N = pstr(*RT->cName);
     map_RT::iterator I = m_rtargets.find(N);
     if (I != m_rtargets.end())
     {
@@ -221,7 +221,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 #endif //	DEBUG
 
     // ***** first pass - search already loaded texture
-    LPSTR N = LPSTR(Name);
+    pstr N = pstr(Name);
     auto I = m_textures.find(N);
     if (I != m_textures.end())
         return I->second;
@@ -241,7 +241,7 @@ void CResourceManager::_DeleteTexture(const CTexture* T)
 
     if (0 == (T->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    LPSTR N = LPSTR(*T->cName);
+    pstr N = pstr(*T->cName);
     map_Texture::iterator I = m_textures.find(N);
     if (I != m_textures.end())
     {
@@ -272,7 +272,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
     if (0 == xr_stricmp(Name, "$null"))
         return nullptr;
 
-    LPSTR N = LPSTR(Name);
+    pstr N = pstr(Name);
     map_Matrix::iterator I = m_matrices.find(N);
     if (I != m_matrices.end())
         return I->second;
@@ -290,7 +290,7 @@ void CResourceManager::_DeleteMatrix(const CMatrix* M)
 {
     if (0 == (M->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    LPSTR N = LPSTR(*M->cName);
+    pstr N = pstr(*M->cName);
     map_Matrix::iterator I = m_matrices.find(N);
     if (I != m_matrices.end())
     {
@@ -312,7 +312,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
     if (0 == xr_stricmp(Name, "$null"))
         return nullptr;
 
-    LPSTR N = LPSTR(Name);
+    pstr N = pstr(Name);
     map_Constant::iterator I = m_constants.find(N);
     if (I != m_constants.end())
         return I->second;
@@ -329,7 +329,7 @@ void CResourceManager::_DeleteConstant(const CConstant* C)
 {
     if (0 == (C->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    LPSTR N = LPSTR(*C->cName);
+    pstr N = pstr(*C->cName);
     map_Constant::iterator I = m_constants.find(N);
     if (I != m_constants.end())
     {

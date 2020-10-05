@@ -24,7 +24,7 @@
 #include "xrNetServer/NET_Messages.h"
 
 CRestrictedObject::~CRestrictedObject() {}
-IC void construct_string(LPSTR result, u32 const result_size, const xr_vector<ALife::_OBJECT_ID>& restrictions)
+IC void construct_string(pstr result, u32 const result_size, const xr_vector<ALife::_OBJECT_ID>& restrictions)
 {
     u32 count = xr_strlen(result) ? _GetItemCount(result) : 0;
     xr_vector<ALife::_OBJECT_ID>::const_iterator I = restrictions.begin();
@@ -43,7 +43,7 @@ IC void construct_string(LPSTR result, u32 const result_size, const xr_vector<AL
 }
 
 #if 0
-IC	void construct_id_string					(LPSTR result, const xr_vector<ALife::_OBJECT_ID> &restrictions)
+IC	void construct_id_string					(pstr result, const xr_vector<ALife::_OBJECT_ID> &restrictions)
 {
 	xr_strcpy			(result,"");
 	string16		temp;
@@ -256,7 +256,7 @@ IC void CRestrictedObject::remove_object_restriction(
 }
 
 template <typename P, bool value>
-IC void CRestrictedObject::construct_restriction_string(LPSTR temp_restrictions, u32 const temp_restrictions_size,
+IC void CRestrictedObject::construct_restriction_string(pstr temp_restrictions, u32 const temp_restrictions_size,
     const xr_vector<ALife::_OBJECT_ID>& restrictions, shared_str current_restrictions, const P& p)
 {
     u32 count = 0;

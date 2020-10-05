@@ -18,7 +18,7 @@
 #include "xrPhysics/IPHWorld.h"
 
 extern LPCSTR map_ver_string;
-LPSTR remove_version_option(LPCSTR opt_str, LPSTR new_opt_str, u32 new_opt_str_size)
+pstr remove_version_option(LPCSTR opt_str, pstr new_opt_str, u32 new_opt_str_size)
 {
     LPCSTR temp_substr = strstr(opt_str, map_ver_string);
     if (!temp_substr)

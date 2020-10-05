@@ -1291,7 +1291,7 @@ void CLocatorAPI::check_cached_files(pstr fname, const size_t& fname_size, const
     xr_strcpy(fname, fname_size, fname_in_cache);
 }
 
-void CLocatorAPI::file_from_cache_impl(IReader*& R, LPSTR fname, const file& desc)
+void CLocatorAPI::file_from_cache_impl(IReader*& R, pstr fname, const file& desc)
 {
     if (desc.size_real < 16 * 1024)
     {
@@ -1302,7 +1302,7 @@ void CLocatorAPI::file_from_cache_impl(IReader*& R, LPSTR fname, const file& des
     R = xr_new<CVirtualFileReader>(fname);
 }
 
-void CLocatorAPI::file_from_cache_impl(CStreamReader*& R, LPSTR fname, const file& desc)
+void CLocatorAPI::file_from_cache_impl(CStreamReader*& R, pstr fname, const file& desc)
 {
     CFileStreamReader* r = xr_new<CFileStreamReader>();
     r->construct(fname, BIG_FILE_READER_WINDOW_SIZE);

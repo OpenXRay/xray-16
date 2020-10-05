@@ -321,7 +321,7 @@ void CServerList::FillUpDetailedServerInfo()
 
     if (2 == teams)
     {
-        LPSTR _buff = NULL;
+        pstr _buff = NULL;
         CUIListBoxItem* pItemAdv;
         // TEAM 1
         xr_vector<PlayerInfo>::iterator it;

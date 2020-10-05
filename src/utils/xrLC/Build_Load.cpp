@@ -300,7 +300,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             b_BuildTexture BT(F);
 
             // load thumbnail
-            LPSTR N = BT.name;
+            pstr N = BT.name;
             if (strchr(N, '.'))
                 *(strchr(N, '.')) = 0;
             xr_strlwr(N);

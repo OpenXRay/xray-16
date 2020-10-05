@@ -399,7 +399,7 @@ u32 xrServer::OnDelayedMessage(NET_Packet& P, ClientID sender) // Non-Zero means
             Msg("* Radmin [%s] is running command: %s", CL->ps->getName(), buff);
             SetLogCB(LogCallback(console_log_cb, nullptr));
             _tmp_log.clear();
-            LPSTR result_command;
+            pstr result_command;
             string64 tmp_number_str;
             xr_sprintf(tmp_number_str, " raid:%u", CL->ID.value());
             STRCONCAT(result_command, buff, tmp_number_str);
@@ -1040,7 +1040,7 @@ void xrServer::PerformCheckClientsForMaxPing()
 
                 if (Client->m_ping_warn.m_maxPingWarnings >= g_sv_maxPingWarningsCount)
                 { // kick
-                    LPSTR reason;
+                    pstr reason;
                     STRCONCAT(reason, StringTable().translate("st_kicked_by_server").c_str());
                     Level().Server->DisconnectClient(Client, reason);
                 }

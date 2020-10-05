@@ -118,7 +118,7 @@ CSCompiler& CSCompiler::defSampler(LPCSTR ResourceName, const D3D_SAMPLER_DESC& 
     return *this;
 }
 
-void fix_texture_name(LPSTR);
+void fix_texture_name(pstr);
 
 CSCompiler& CSCompiler::defOutput(LPCSTR ResourceName, const ref_rt& rt)
 {

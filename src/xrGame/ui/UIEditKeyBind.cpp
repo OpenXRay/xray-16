@@ -18,7 +18,7 @@ CUIEditKeyBind::CUIEditKeyBind(bool primary, bool isGamepadBinds /*= false*/)
 
 CUIEditKeyBind::~CUIEditKeyBind() {}
 
-u32 CutStringByLength(CGameFont* font, LPCSTR src, LPSTR dst, u32 dst_size, float length)
+u32 CutStringByLength(CGameFont* font, LPCSTR src, pstr dst, u32 dst_size, float length)
 {
     if (font->IsMultibyte())
     {
