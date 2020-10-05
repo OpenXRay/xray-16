@@ -186,6 +186,7 @@ endif ()
 # 32bit vs 64bit
 if ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
   list ( APPEND DASM_FLAGS -D P64 )
+  add_definitions( -DLUAJIT_ENABLE_GC64 )
 endif ()
 
 if ( NOT LUAJIT_DISABLE_JIT )
