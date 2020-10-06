@@ -285,28 +285,35 @@ u16 du_sphere_faces[DU_SPHERE_NUMFACES*3]={
 
 void CRenderTarget::accum_point_geom_create()
 {
-    GLenum dwUsage = GL_STATIC_DRAW;
-
     // vertices
     {
         u32 vCount = DU_SPHERE_NUMVERTEX;
         u32 vSize = 3 * 4;
-        glGenBuffers(1, &g_accum_point_vb);
-        glBindBuffer(GL_ARRAY_BUFFER, g_accum_point_vb);
-        CHK_GL(glBufferData(GL_ARRAY_BUFFER, vCount*vSize, du_sphere_vertices, dwUsage));
+        g_accum_point_vb.Create(vCount * vSize);
+        u8* pData = static_cast<u8*>(g_accum_point_vb.Map());
+        CopyMemory(pData, du_sphere_vertices, vCount * vSize);
+        g_accum_point_vb.Unmap(true);
     }
 
     // Indices
     {
         u32 iCount = DU_SPHERE_NUMFACES * 3;
-        glGenBuffers(1, &g_accum_point_ib);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_accum_point_ib);
-        CHK_GL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, iCount*2, du_sphere_faces, dwUsage));
+        g_accum_point_ib.Create(iCount * 2);
+        u8* pData = static_cast<u8*>(g_accum_point_ib.Map());
+        CopyMemory(pData, du_sphere_faces, iCount * 2);
+        g_accum_point_ib.Unmap(true);
     }
 }
 
 void CRenderTarget::accum_point_geom_destroy()
 {
-    glDeleteBuffers(1, &g_accum_point_vb);
-    glDeleteBuffers(1, &g_accum_point_ib);
+#ifdef DEBUG
+    _SHOW_REF("g_accum_point_ib", &g_accum_point_ib);
+#endif
+    g_accum_point_ib.Release();
+
+#ifdef DEBUG
+    _SHOW_REF("g_accum_point_vb", &g_accum_point_vb);
+#endif
+    g_accum_point_vb.Release();
 }
