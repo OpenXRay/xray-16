@@ -559,6 +559,7 @@ void CGamePersistent::game_loaded()
         if (g_pGameLevel && g_pGameLevel->bReady && (allow_intro() && g_keypress_on_start) &&
             load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
         {
+            pApp->LoadForceFinish(); // hack
             VERIFY(NULL == m_intro);
             m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
@@ -571,6 +572,7 @@ void CGamePersistent::game_loaded()
 void CGamePersistent::update_game_loaded()
 {
     xr_delete(m_intro);
+    load_screen_renderer.stop();
     start_game_intro();
 }
 
@@ -628,12 +630,6 @@ void CGamePersistent::OnFrame()
 #endif
     if (!GEnv.isDedicatedServer && !m_intro_event.empty())
         m_intro_event();
-
-    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 1 && !m_intro && m_intro_event.empty())
-        pApp->LoadForceFinish(); // hack
-
-    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 0 && !m_intro && m_intro_event.empty())
-        load_screen_renderer.stop();
 
     if (!m_pMainMenu->IsActive())
         m_pMainMenu->DestroyInternal(false);
