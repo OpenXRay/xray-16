@@ -259,7 +259,7 @@ void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
         environment.CurrentEnv->sun_color.mad(fClr, environment.p_sun_color);
         environment.CurrentEnv->fog_color.mad(fClr, environment.p_fog_color);
 
-        if (GEnv.Render->get_generation() == IRender::GENERATION_R2)
+        if (GEnv.Render->GenerationIsR2OrHigher())
         {
             R_ASSERT(_valid(current_direction));
             g_pGamePersistent->Environment().CurrentEnv->sun_dir = current_direction;

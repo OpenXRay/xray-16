@@ -49,7 +49,7 @@ CTorch::CTorch(void)
 
     // Disabling shift by x and z axes for 1st render,
     // because we don't have dynamic lighting in it.
-    if (GEnv.CurrentRenderer == 1)
+    if (GEnv.Render->GenerationIsR1())
     {
         TORCH_OFFSET.x = 0;
         TORCH_OFFSET.z = 0;
@@ -209,7 +209,7 @@ bool CTorch::net_Spawn(CSE_Abstract* DC)
     if (!inherited::net_Spawn(DC))
         return (FALSE);
 
-    bool b_r2 = !psDeviceFlags.test(rsR1);
+    bool b_r2 = GEnv.Render->GenerationIsR2OrHigher();
 
     IKinematics* K = smart_cast<IKinematics*>(Visual());
     CInifile* pUserData = K->LL_UserData();

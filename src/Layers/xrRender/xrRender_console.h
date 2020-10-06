@@ -87,6 +87,9 @@ enum
 };
 
 // R2
+extern ECORE_API bool ps_r2_sun_static;
+extern ECORE_API bool ps_r2_advanced_pp; // advanced post process and effects
+
 extern ECORE_API float ps_r2_ssaLOD_A;
 extern ECORE_API float ps_r2_ssaLOD_B;
 

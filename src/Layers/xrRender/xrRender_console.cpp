@@ -139,6 +139,9 @@ float ps_r1_fog_luminance = 1.1f; // r1-only
 int ps_r1_SoftwareSkinning = 0; // r1-only
 
 // R2
+bool ps_r2_sun_static = false;
+bool ps_r2_advanced_pp = true; // advanced post process and effects
+
 float ps_r2_ssaLOD_A = 64.f;
 float ps_r2_ssaLOD_B = 48.f;
 

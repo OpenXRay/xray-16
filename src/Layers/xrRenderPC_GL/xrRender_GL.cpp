@@ -40,21 +40,7 @@ public:
     }
 };
 
-extern "C"
-{
-XR_EXPORT void SetupEnv()
-{
-    GEnv.Render = &RImplementation;
-    GEnv.RenderFactory = &RenderFactoryImpl;
-    GEnv.DU = &DUImpl;
-    GEnv.UIRender = &UIRenderImpl;
-#ifdef DEBUG
-    GEnv.DRender = &DebugRenderImpl;
-#endif
-    xrRender_initconsole();
-}
-
-XR_EXPORT bool CheckRendererSupport()
+bool TestSupportedModes()
 {
     // XXX: this check should be removed after implementing support for HLSL
     // https://github.com/OpenXRay/xray-16/issues/258
@@ -81,7 +67,55 @@ XR_EXPORT bool CheckRendererSupport()
         Log("~ GL_ARB_separate_shader_objects not supported");
         return false;
     }
-
     return true;
 }
-} // extern "C"
+
+constexpr pcstr RENDERER_RGL_MODE = "renderer_rgl";
+
+class RGLRendererModule final : public RendererModule
+{
+    xr_vector<pcstr> modes;
+
+public:
+    const xr_vector<pcstr>& ObtainSupportedModes() override
+    {
+        if (!modes.empty())
+        {
+            return modes;
+        }
+        if (TestSupportedModes())
+        {
+            modes.emplace_back(RENDERER_RGL_MODE);
+        }
+        return modes;
+    }
+
+    void CheckModeConsistency(pcstr mode) const
+    {
+        R_ASSERT3(0 == xr_strcmp(mode, RENDERER_RGL_MODE),
+            "Wrong mode passed to xrRender_GL.dll", mode);
+    }
+
+    void SetupEnv(pcstr mode) override
+    {
+        CheckModeConsistency(mode);
+        ps_r2_sun_static = false;
+        ps_r2_advanced_pp = true;
+        GEnv.Render = &RImplementation;
+        GEnv.RenderFactory = &RenderFactoryImpl;
+        GEnv.DU = &DUImpl;
+        GEnv.UIRender = &UIRenderImpl;
+#ifdef DEBUG
+        GEnv.DRender = &DebugRenderImpl;
+#endif
+        xrRender_initconsole();
+    }
+} static s_rgl_module;
+
+extern "C"
+{
+XR_EXPORT RendererModule* GetRendererModule()
+{
+    return &s_rgl_module;
+}
+}

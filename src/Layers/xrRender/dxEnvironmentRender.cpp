@@ -137,7 +137,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 {
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
 
-    if (GEnv.Render->get_generation() == IRender::GENERATION_R2)
+    if (GEnv.Render->GenerationIsR2OrHigher())
     {
         //. very very ugly hack
         if (HW.Caps.raster_major >= 3 && HW.Caps.geometry.bVTF)

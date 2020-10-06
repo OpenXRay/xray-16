@@ -64,7 +64,7 @@ void CHUDManager::Render_First()
 
     // On R1 render only shadow
     // On R2+ render everything
-    O->renderable_Invisible(GEnv.CurrentRenderer == 1);
+    O->renderable_Invisible(GEnv.Render->GenerationIsR1());
 
     O->renderable_Render(O->H_Root());
 

@@ -275,7 +275,8 @@ public:
 
 public:
     // feature level
-    GenerationLevel get_generation() override { return GENERATION_R2; }
+    GenerationLevel GetGeneration() const override { return GENERATION_R2; }
+    virtual BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::OpenGL; }
 
     bool is_sun_static() override { return o.sunstatic; }
     u32 get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }

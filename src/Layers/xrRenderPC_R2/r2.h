@@ -239,7 +239,8 @@ public:
 
 public:
     // feature level
-    virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
+    virtual GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
+    virtual BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D9; }
     virtual bool is_sun_static() { return o.sunstatic; }
     virtual u32 get_dx_level() { return 0x00090000; }
 

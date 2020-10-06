@@ -65,7 +65,7 @@ void CZoneCampfire::GoDisabledState()
 #define OVL_TIME 3000
 void CZoneCampfire::turn_on_script()
 {
-    if (!psDeviceFlags.test(rsR1))
+    if (GEnv.Render->GenerationIsR2OrHigher())
     {
         m_turn_time = Device.dwTimeGlobal + OVL_TIME;
         m_turned_on = true;
@@ -75,7 +75,7 @@ void CZoneCampfire::turn_on_script()
 
 void CZoneCampfire::turn_off_script()
 {
-    if (!psDeviceFlags.test(rsR1))
+    if (GEnv.Render->GenerationIsR2OrHigher())
     {
         m_turn_time = Device.dwTimeGlobal + OVL_TIME;
         m_turned_on = false;

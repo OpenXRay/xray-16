@@ -165,11 +165,17 @@ class ENGINE_API IRender
 public:
     enum GenerationLevel
     {
-        GENERATION_R1 = 81,
-        GENERATION_DX81 = 81,
-        GENERATION_R2 = 90,
-        GENERATION_DX90 = 90,
+        GENERATION_R1 = 1,
+        GENERATION_R2 = 2,
         GENERATION_forcedword = u32(-1)
+    };
+
+    enum class BackendAPI : u32
+    {
+        D3D9,
+        D3D10,
+        D3D11,
+        OpenGL
     };
 
     enum ScreenshotMode
@@ -277,7 +283,12 @@ public:
 
 public:
     // feature level
-    virtual GenerationLevel get_generation() = 0;
+    virtual GenerationLevel GetGeneration() const = 0;
+    bool GenerationIsR1() const { return GetGeneration() == GENERATION_R1; }
+    bool GenerationIsR2() const { return GetGeneration() == GENERATION_R2; }
+    bool GenerationIsR2OrHigher() const { return GetGeneration() >= GENERATION_R2; }
+
+    virtual BackendAPI GetBackendAPI() const = 0;
 
     virtual bool is_sun_static() = 0;
     virtual u32 get_dx_level() = 0;

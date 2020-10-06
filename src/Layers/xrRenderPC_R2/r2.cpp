@@ -107,8 +107,6 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
-extern ENGINE_API bool r2_sun_static;
-extern ENGINE_API bool r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -285,8 +283,8 @@ void CRender::create()
     o.bug = (strstr(Core.Params, "-bug")) ? TRUE : FALSE;
     o.sunfilter = (strstr(Core.Params, "-sunfilter")) ? TRUE : FALSE;
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
-    o.sunstatic = r2_sun_static;
-    o.advancedpp = r2_advanced_pp;
+    o.sunstatic = ps_r2_sun_static;
+    o.advancedpp = ps_r2_advanced_pp;
     o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
     o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;

@@ -87,7 +87,7 @@ void CShootingObject::Light_Create()
 {
     // lights
     light_render = GEnv.Render->light_create();
-    if (GEnv.Render->get_generation() == IRender::GENERATION_R2)
+    if (GEnv.Render->GenerationIsR2OrHigher())
         light_render->set_shadow(true);
     else
         light_render->set_shadow(false);

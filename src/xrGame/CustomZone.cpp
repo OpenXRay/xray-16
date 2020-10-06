@@ -312,8 +312,8 @@ bool CCustomZone::net_Spawn(CSE_Abstract* DC)
     m_zone_flags.set(eUseOnOffTime, (m_TimeToDisable != 0) && (m_TimeToEnable != 0));
 
     //добавить источники света
-    bool br1 = psDeviceFlags.test(rsR1);
-    bool render_ver_allowed = !br1 || (br1 && m_zone_flags.test(eIdleLightR1));
+    const bool br1 = GEnv.Render->GenerationIsR1();
+    const bool render_ver_allowed = !br1 || (br1 && m_zone_flags.test(eIdleLightR1));
 
     if (m_zone_flags.test(eIdleLight) && render_ver_allowed)
     {

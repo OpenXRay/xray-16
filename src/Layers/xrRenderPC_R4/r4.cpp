@@ -129,8 +129,6 @@ static class cl_alpha_ref : public R_constant_setup
     virtual void setup(R_constant* C) { StateManager.BindAlphaRef(C); }
 } binder_alpha_ref;
 
-extern ENGINE_API bool r2_sun_static;
-extern ENGINE_API bool r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -298,8 +296,8 @@ void CRender::create()
     o.bug = (strstr(Core.Params, "-bug")) ? TRUE : FALSE;
     o.sunfilter = (strstr(Core.Params, "-sunfilter")) ? TRUE : FALSE;
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
-    o.sunstatic = r2_sun_static;
-    o.advancedpp = r2_advanced_pp;
+    o.sunstatic = ps_r2_sun_static;
+    o.advancedpp = ps_r2_advanced_pp;
     o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
     o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;

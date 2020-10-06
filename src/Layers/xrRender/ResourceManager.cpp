@@ -303,9 +303,8 @@ void CResourceManager::CompatibilityCheck()
         RImplementation.m_hq_skinning = hq_skinning;
         FS.r_close(skinh);
     }
-#if RENDER != R_R1
     // Check shadow cascades type (old SOC/CS or new COP)
-    if (psDeviceFlags.test(rsR2))
+#if RENDER == R_R2
     {
         // Check for new cascades support on R2
         IReader* accumSunNearCascade = open_shader("accum_sun_cascade.ps");
@@ -313,7 +312,7 @@ void CResourceManager::CompatibilityCheck()
         ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, !accumSunNearCascade);
         FS.r_close(accumSunNearCascade);
     }
-    else if (!psDeviceFlags.test(rsR1))
+#elif RENDER != R_R1
     {
         IReader* accumSunNear = open_shader("accum_sun_near.ps");
         R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
