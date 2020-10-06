@@ -281,7 +281,9 @@ void CResourceManager::CompatibilityCheck()
         bool hq_skinning = true;
         do
         {
-            pcstr begin = strstr((cpcstr)skinh->pointer(), "u_position");
+            xr_string str(static_cast<pcstr>(skinh->pointer()), skinh->length());
+
+            cpcstr begin = strstr(str.c_str(), "u_position");
             if (!begin)
                 break;
 
@@ -289,7 +291,7 @@ void CResourceManager::CompatibilityCheck()
             if (!end)
                 break;
 
-            xr_string str(begin, end);
+            str.assign(begin, end);
             pcstr ptr = str.data();
 
             if ((ptr = strstr(ptr, "12.f")))    // 12.f
@@ -318,7 +320,9 @@ void CResourceManager::CompatibilityCheck()
         bool oldCascades = false;
         do
         {
-            pcstr begin = strstr((cpcstr)accumSunNear->pointer(), "float4");
+            xr_string str(static_cast<cpcstr>(accumSunNear->pointer()), accumSunNear->length());
+
+            pcstr begin = strstr(str.c_str(), "float4");
             if (!begin)
                 break;
 
@@ -330,8 +334,8 @@ void CResourceManager::CompatibilityCheck()
             if (!end)
                 break;
 
-            xr_string str(begin, end);
-            pcstr ptr = str.data();
+            str.assign(begin, end);
+            cpcstr ptr = str.data();
 
             if (strstr(ptr, "v2p_TL2uv"))
             {
