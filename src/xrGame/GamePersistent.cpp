@@ -521,11 +521,17 @@ bool allow_intro()
         return true;
 }
 
+bool allow_game_intro()
+{
+    return !strstr(Core.Params, "-nogameintro");
+}
+
 void CGamePersistent::start_logo_intro()
 {
-    if (!allow_intro()) // TODO this is dirty hack, rewrite!
+    if (!allow_intro())
     {
         m_intro_event = nullptr;
+        Console->Show();
         Console->Execute("main_menu on");
         return;
     }
@@ -556,7 +562,7 @@ void CGamePersistent::game_loaded()
     if (Device.dwPrecacheFrame <= 2)
     {
         m_intro_event = nullptr;
-        if (g_pGameLevel && g_pGameLevel->bReady && (allow_intro() && g_keypress_on_start) &&
+        if (g_pGameLevel && g_pGameLevel->bReady && (allow_game_intro() && g_keypress_on_start) &&
             load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
         {
             pApp->LoadForceFinish(); // hack
