@@ -207,8 +207,8 @@ void CBlender_Compile::PassEnd()
     ctable.merge(&dest.ds->constants);
     dest.cs = RImplementation.Resources->_CreateCS(pass_cs);
     ctable.merge(&dest.cs->constants);
-#endif
-#endif //	USE_DX10
+#endif // USE_DX11
+#endif // !USE_DX9
     SetMapping();
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
@@ -265,7 +265,7 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     //	alpha in DX10 identical to color.
     RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
-#endif //	USE_DX10
+#endif // !USE_DX9
 }
 void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {

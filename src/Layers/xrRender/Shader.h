@@ -97,7 +97,7 @@ struct ECORE_API SPass : public xr_resource_flagged
     ref_ds ds; // may be NULL = don't use domain shader at all
     ref_cs cs; // may be NULL = don't use compute shader at all
 #endif
-#endif // USE_DX10
+#endif // !USE_DX9
     ref_ctable constants; // may be NULL
 
     ref_texture_list T;

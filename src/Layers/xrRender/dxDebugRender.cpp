@@ -82,7 +82,7 @@ void dxDebugRender::NextSceneMode()
     // XXX: Fix overdraw on DX10+, OpenGL
 #ifdef USE_DX9
     HW.Caps.SceneMode = (HW.Caps.SceneMode + 1) % 3;
-#endif //	USE_DX10
+#endif
 }
 
 void dxDebugRender::ZEnable(bool bEnable)
@@ -101,9 +101,9 @@ void dxDebugRender::SetAmbient(u32 colour)
     //	TODO: DX10: Check if need this for DX10
     VERIFY(!"Not implemented for DX10");
     UNUSED(colour);
-#else //	USE_DX10
+#else
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
-#endif //	USE_DX10
+#endif
 }
 
 void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)

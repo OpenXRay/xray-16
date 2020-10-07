@@ -266,15 +266,10 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     D3D_VIEWPORT rtViewport;
     rtViewport.TopLeftX = 0;
     rtViewport.TopLeftY = 0;
-    rtViewport.MinDepth = 0.0f;
-    rtViewport.MaxDepth = 1.0f;
-#ifdef USE_DX11
     rtViewport.Width = (float)m_iTextureWidth;
     rtViewport.Height = (float)m_iTextureHeight;
-#else // #ifdef USE_DX11
-    rtViewport.Width = m_iTextureWidth;
-    rtViewport.Height = m_iTextureHeight;
-#endif // #ifdef USE_DX11
+    rtViewport.MinDepth = 0.0f;
+    rtViewport.MaxDepth = 1.0f;
     RCache.SetViewport(rtViewport);
 
     RCache.set_ZB(0);

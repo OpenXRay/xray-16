@@ -191,9 +191,9 @@ public:
     void hw_Render();
 #ifndef USE_DX9
     void hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
-#else //	USE_DX10
+#else
     void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
-#endif //	USE_DX10
+#endif
 
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);

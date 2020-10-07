@@ -78,12 +78,7 @@ public:
 #ifdef HAS_DX11_3
     ID3D11Device3* pDevice3 = nullptr;
 #endif
-#if defined(USE_DX10)
-    ID3D10Device1* pDevice1 = nullptr;
-    ID3D10Device1* pContext1 = nullptr;
-#elif defined (USE_DX11)
     ID3D11DeviceContext1* pContext1 = nullptr;
-#endif
 
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;

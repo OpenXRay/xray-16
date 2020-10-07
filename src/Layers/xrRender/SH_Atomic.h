@@ -1,20 +1,22 @@
 #ifndef sh_atomicH
 #define sh_atomicH
 #pragma once
+
 #include "xrCore/xr_resource.h"
 #include "tss_def.h"
-#if defined(USE_OGL)
+
+#ifdef USE_OGL
 #include "Layers/xrRenderGL/glState.h"
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
 #include "Layers/xrRenderDX10/StateManager/dx10State.h"
-#endif //	USE_DX10
+#endif
 
 #pragma pack(push, 4)
 
 //////////////////////////////////////////////////////////////////////////
 // Atomic resources
 //////////////////////////////////////////////////////////////////////////
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
 struct ECORE_API SInputSignature : public xr_resource_flagged
 {
     ID3DBlob* signature;
@@ -22,7 +24,7 @@ struct ECORE_API SInputSignature : public xr_resource_flagged
     ~SInputSignature();
 };
 typedef resptr_core<SInputSignature, resptr_base<SInputSignature>> ref_input_sign;
-#endif //	USE_DX10
+#endif // !USE_DX9 && !USE_OGL
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named
 {
@@ -32,9 +34,9 @@ struct ECORE_API SVS : public xr_resource_named
     ID3DVertexShader* sh;
 #endif
     R_constant_table constants;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     ref_input_sign signature;
-#endif //	USE_DX10
+#endif
     SVS();
     ~SVS();
 };
@@ -66,7 +68,7 @@ struct ECORE_API SGS : public xr_resource_named
     ~SGS();
 };
 typedef resptr_core<SGS, resptr_base<SGS>> ref_gs;
-#endif //	USE_DX10
+#endif // !USE_DX9
 
 #if defined(USE_DX11) || defined(USE_OGL)
 struct ECORE_API SHS : public xr_resource_named
@@ -123,14 +125,14 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
 #if defined(USE_OGL)
     u32 FVF;
     GLuint dcl;
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
     //	Maps input signature to input layout
     xr_map<ID3DBlob*, ID3DInputLayout*> vs_to_layout;
     xr_vector<D3D_INPUT_ELEMENT_DESC> dx10_dcl_code;
-#else //	USE_DX10	//	Don't need it: use ID3DInputLayout instead
+#else // USE_DX9	//	Don't need it: use ID3DInputLayout instead
     //	which is per ( declaration, VS input layout) pair
     IDirect3DVertexDeclaration9* dcl;
-#endif //	USE_DX10
+#endif // USE_OGL
 
     //	Use this for DirectX10 to cache DX9 declaration for comparison purpose only
     xr_vector<VertexElement> dcl_code;

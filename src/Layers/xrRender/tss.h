@@ -16,7 +16,7 @@ enum XRDX10RENDERSTATETYPE
 {
     XRDX10RS_ALPHATOCOVERAGE = 1024
 };
-#endif //	USE_DX10
+#endif // !USE_DX9
 
 class CSimulatorTSS
 {

@@ -93,14 +93,7 @@ struct ShaderTypeTraits<SVS>
     {
 #ifdef USE_DX9
         return D3DXGetVertexShaderProfile(HW.pDevice); // vertex "vs_2_a";
-#endif
-#ifdef USE_DX10
-        if (HW.pDevice1 == nullptr)
-            return D3D10GetVertexShaderProfile(HW.pDevice);
-        else
-            return "vs_4_1";
-#endif
-#ifdef USE_DX11
+#elif !defined(USE_DX9) && !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -156,8 +149,6 @@ struct ShaderTypeTraits<SVS>
             res = GLCompileShader<GL_VERTEX_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
         res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
-#elif defined(USE_DX10)
-        res = HW.pDevice->CreateVertexShader(buffer, size, &sh);
 #else
         res = HW.pDevice->CreateVertexShader(buffer, &sh);
 #endif
@@ -195,14 +186,7 @@ struct ShaderTypeTraits<SPS>
     {
 #ifdef USE_DX9
         return D3DXGetPixelShaderProfile(HW.pDevice); // pixel "ps_2_a";
-#endif
-#ifdef USE_DX10
-        if (HW.pDevice1 == nullptr)
-            return D3D10GetPixelShaderProfile(HW.pDevice);
-        else
-            return "ps_4_1";
-#endif
-#ifdef USE_DX11
+#elif !defined(USE_DX9) && !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -217,7 +201,7 @@ struct ShaderTypeTraits<SPS>
 #endif
             return "ps_5_0";
         }
-#endif // USE_DX11
+#endif
 
         return "ps_2_0";
     }
@@ -270,8 +254,6 @@ struct ShaderTypeTraits<SPS>
             res = GLCompileShader<GL_FRAGMENT_SHADER>(buffer, size, name);
 #elif defined(USE_DX11)
         res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
-#elif defined(USE_DX10)
-        res = HW.pDevice->CreatePixelShader(buffer, size, &sh);
 #else
         res = HW.pDevice->CreatePixelShader(buffer, &sh);
 #endif
@@ -308,12 +290,6 @@ struct ShaderTypeTraits<SGS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX10
-        if (HW.pDevice1 == nullptr)
-            return D3D10GetGeometryShaderProfile(HW.pDevice);
-        else
-            return "gs_4_1";
-#endif
 #ifdef USE_DX11
         switch (HW.FeatureLevel)
         {
@@ -363,7 +339,7 @@ struct ShaderTypeTraits<SGS>
 };
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 template <>
 struct ShaderTypeTraits<SHS>
 {
@@ -564,7 +540,7 @@ inline CResourceManager::map_GS& CResourceManager::GetShaderMap()
 }
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
 template <>
 inline CResourceManager::map_DS& CResourceManager::GetShaderMap()
 {
@@ -656,9 +632,9 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         pcstr c_target, c_entry;
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
         flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
-#elif  defined(USE_DX9)
+#elif defined(USE_DX9)
         flags |= D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR;
 #endif
 

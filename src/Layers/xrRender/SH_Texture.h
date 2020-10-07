@@ -32,7 +32,7 @@ public:
         + mtMaxComputeShaderTextures
 #	endif
     };
-#else	//	USE_DX10
+#else // USE_DX9
     enum MaxTextures
     {
         mtMaxPixelShaderTextures = 16,
@@ -41,7 +41,7 @@ public:
         mtMaxPixelShaderTextures
         + mtMaxVertexShaderTextures
     };
-#endif	//	USE_DX10
+#endif // !USE_DX9
 
 #ifdef USE_OGL
     //	Since OGL doesn't differentiate between stages,
@@ -113,9 +113,9 @@ public:
     CTexture();
     virtual ~CTexture();
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     ID3DShaderResourceView* get_SRView() { return m_pSRView; }
-#endif // USE_DX10
+#endif
 
 private:
     BOOL desc_valid() { return pSurface == desc_cache; }
@@ -127,11 +127,11 @@ private:
     }
 
     void desc_update();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     void Apply(u32 dwStage);
     void ProcessStaging();
     D3D_USAGE GetUsage();
-#endif // USE_DX10
+#endif
 
     //	Class data
 public: //	Public class members (must be encapsulated further)
@@ -141,9 +141,9 @@ public: //	Public class members (must be encapsulated further)
         u32 bUser : 1;
         u32 seqCycles : 1;
         u32 MemoryUsage : 28;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
         u32 bLoadedAsStaging : 1;
-#endif	//	USE_DX10
+#endif
     } flags;
 
     fastdelegate::FastDelegate1<u32> bind;
@@ -182,11 +182,11 @@ private:
     D3D_TEXTURE2D_DESC desc;
 #endif // USE_OGL
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     ID3DShaderResourceView* m_pSRView;
     // Sequence view data
     xr_vector<ID3DShaderResourceView*> m_seqSRView;
-#endif // USE_DX10
+#endif
 };
 
 struct resptrcode_texture : public resptr_base<CTexture>

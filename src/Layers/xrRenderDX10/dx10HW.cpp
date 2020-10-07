@@ -91,7 +91,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     HRESULT R;
 
-#ifdef USE_DX11
     D3D_FEATURE_LEVEL featureLevels[] =
     {
 #ifdef HAS_DX11_3
@@ -158,18 +157,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         SAD4ShaderInstructions = options.SAD4ShaderInstructions;
         ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
     }
-#else
-    R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
-
-    pContext = pDevice;
-    FeatureLevel = D3D_FEATURE_LEVEL_10_0;
-    if (!FAILED(R))
-    {
-        D3DX10GetFeatureLevel1(pDevice, &pDevice1);
-        FeatureLevel = D3D_FEATURE_LEVEL_10_1;
-    }
-    pContext1 = pDevice1;
-#endif
 
     if (FAILED(R))
     {
@@ -370,14 +357,9 @@ void CHW::DestroyDevice()
     _RELEASE(m_pSwapChain2);
 #endif
 
-#ifdef USE_DX11
     _RELEASE(pContext1);
     _RELEASE(pContext);
-#endif
 
-#ifdef USE_DX10
-    _RELEASE(pDevice1);
-#endif
     _SHOW_REF("refCount:pDevice:", pDevice);
     _RELEASE(pDevice);
 

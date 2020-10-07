@@ -89,41 +89,7 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
     return S_OK;
 }
 
-#elif defined(USE_DX10)
-
-IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type)
-{
-    D3D_QUERY_DESC desc;
-    desc.MiscFlags = 0;
-    desc.Query = type;
-    return HW.pDevice->CreateQuery(&desc, ppQuery);
-}
-
-IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
-{
-    //	Use D3Dxx_ASYNC_GETDATA_DONOTFLUSH for prevent flushing
-    return pQuery->GetData(pData, DataSize, 0);
-}
-
-IC HRESULT BeginQuery(ID3DQuery* pQuery)
-{
-    pQuery->Begin();
-    return S_OK;
-}
-
-IC HRESULT EndQuery(ID3DQuery* pQuery)
-{
-    pQuery->End();
-    return S_OK;
-}
-
-IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
-{
-    _RELEASE(pQuery);
-    return S_OK;
-}
-
-#else //	USE_DX10
+#else // USE_DX9
 
 IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type) { return HW.pDevice->CreateQuery(type, ppQuery); }
 IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
@@ -140,6 +106,6 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
     return S_OK;
 }
 
-#endif //	USE_DX10
+#endif
 
 #endif // QueryHelper_included

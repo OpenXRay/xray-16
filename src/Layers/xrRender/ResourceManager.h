@@ -66,7 +66,7 @@ private:
     map_GS m_gs;
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     map_DS m_ds;
     map_HS m_hs;
     map_CS m_cs;
@@ -79,10 +79,10 @@ private:
     xr_vector<SGeometry*> v_geoms;
     xr_vector<R_constant_table*> v_constant_tables;
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     xr_vector<dx10ConstantBuffer*> v_constant_buffer;
     xr_vector<SInputSignature*> v_input_signature;
-#endif //	USE_DX10
+#endif
 
     // lists
     xr_vector<STextureList*> lst_textures;
@@ -145,13 +145,13 @@ public:
     R_constant_table* _CreateConstantTable(R_constant_table& C);
     void _DeleteConstantTable(const R_constant_table* C);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     dx10ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
     void _DeleteConstantBuffer(const dx10ConstantBuffer* pBuffer);
 
     SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);
     void _DeleteInputSignature(const SInputSignature* pSignature);
-#endif //	USE_DX10
+#endif
 
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {});
     void _DeleteRT(const CRT* RT);
@@ -161,7 +161,7 @@ public:
 #ifndef USE_DX9
     SGS* _CreateGS(LPCSTR Name);
     void _DeleteGS(const SGS* GS);
-#endif //	USE_DX10
+#endif
 
 #if defined(USE_DX11) || defined(USE_OGL)
     SHS* _CreateHS(LPCSTR Name);

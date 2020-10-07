@@ -48,7 +48,7 @@ public:
     xr_vector<R_dsgraph::mapNormalVS::value_type *> nrmVS;
 #ifndef USE_DX9
     xr_vector<R_dsgraph::mapNormalGS::value_type *> nrmGS;
-#endif //	USE_DX10
+#endif
     xr_vector<R_dsgraph::mapNormalPS::value_type *> nrmPS;
     xr_vector<R_dsgraph::mapNormalCS::value_type *> nrmCS;
     xr_vector<R_dsgraph::mapNormalStates::value_type *> nrmStates;
@@ -58,7 +58,7 @@ public:
     xr_vector<R_dsgraph::mapMatrixVS::value_type *> matVS;
 #ifndef USE_DX9
     xr_vector<R_dsgraph::mapMatrixGS::value_type *> matGS;
-#endif //	USE_DX10
+#endif
     xr_vector<R_dsgraph::mapMatrixPS::value_type *> matPS;
     xr_vector<R_dsgraph::mapMatrixCS::value_type *> matCS;
     xr_vector<R_dsgraph::mapMatrixStates::value_type *> matStates;

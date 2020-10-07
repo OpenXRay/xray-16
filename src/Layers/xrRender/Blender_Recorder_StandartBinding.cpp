@@ -74,7 +74,7 @@ class cl_texgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f, 0.5f, 0.0f, 1.0f
         };
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         Fmatrix mTexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -82,7 +82,7 @@ class cl_texgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f, 0.5f, 0.0f, 1.0f
         };
-#else // USE_DX10
+#else // USE_DX9
         float _w = float(RDEVICE.dwWidth);
         float _h = float(RDEVICE.dwHeight);
         float o_w = (.5f / _w);
@@ -94,7 +94,7 @@ class cl_texgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };
-#endif // USE_DX10
+#endif // USE_OGL
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_wvp);
         RCache.set_c(C, mTexgen);
@@ -116,7 +116,7 @@ class cl_VPtexgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f, 0.5f, 0.0f, 1.0f
         };
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         Fmatrix mTexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -124,7 +124,7 @@ class cl_VPtexgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f, 0.5f, 0.0f, 1.0f
         };
-#else // USE_DX10
+#else // USE_DX9
         float _w = float(RDEVICE.dwWidth);
         float _h = float(RDEVICE.dwHeight);
         float o_w = (.5f / _w);
@@ -136,7 +136,7 @@ class cl_VPtexgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };
-#endif // USE_DX10
+#endif // USE_OGL
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_vp);
         RCache.set_c(C, mTexgen);

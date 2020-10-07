@@ -25,7 +25,7 @@ void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bF
     // Create shaders
     SPS* ps = RImplementation.Resources->_CreatePS(_ps);
     u32 flags = 0;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX11)
     if (ps->constants.dx9compatibility)
         flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 #endif
@@ -40,7 +40,7 @@ void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bF
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
 #endif
-#endif //	USE_DX10
+#endif // !USE_DX9
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);
 
@@ -130,7 +130,7 @@ u32 CBlender_Compile::r_Sampler(
     dwStage = i_Sampler(_name);
     if (u32(-1) != dwStage)
     {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX11)
         r_dx10Texture(_name, texture, true);
 #else
         i_Texture(dwStage, texture);

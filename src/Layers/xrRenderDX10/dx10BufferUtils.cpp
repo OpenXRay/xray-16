@@ -389,27 +389,21 @@ void* VertexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= fal
 {
     VERIFY(m_DeviceBuffer);
 
-    u8* pData = nullptr;
     const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
-#if defined(USE_DX10)
-    R_CHK(m_DeviceBuffer->Map(flag, 0, reinterpret_cast<void**>(&pData)));
-#else
+
     D3D11_MAPPED_SUBRESOURCE MappedSubRes;
     HW.pContext->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes);
-    pData = static_cast<u8*>(MappedSubRes.pData);
-#endif
+
+    u8* pData = static_cast<u8*>(MappedSubRes.pData);
     pData += offset;
+
     return static_cast<void*>(pData);
 }
 
 void VertexStreamBuffer::Unmap()
 {
     VERIFY(m_DeviceBuffer);
-#if defined(USE_DX10)
-    m_DeviceBuffer->Unmap();
-#else
     HW.pContext->Unmap(m_DeviceBuffer, 0);
-#endif
 }
 
 bool VertexStreamBuffer::IsValid() const
@@ -449,27 +443,21 @@ void* IndexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= fals
 {
     VERIFY(m_DeviceBuffer);
 
-    u8* pData = nullptr;
     const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
-#if defined(USE_DX10)
-    R_CHK(m_DeviceBuffer->Map(flag, 0, reinterpret_cast<void**>(&pData)));
-#else
+
     D3D11_MAPPED_SUBRESOURCE MappedSubRes;
     HW.pContext->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes);
-    pData = static_cast<u8*>(MappedSubRes.pData);
-#endif
+
+    u8* pData = static_cast<u8*>(MappedSubRes.pData);
     pData += offset;
+
     return static_cast<void*>(pData);
 }
 
 void IndexStreamBuffer::Unmap()
 {
     VERIFY(m_DeviceBuffer);
-#if defined(USE_DX10)
-    m_DeviceBuffer->Unmap();
-#else
     HW.pContext->Unmap(m_DeviceBuffer, 0);
-#endif
 }
 
 bool IndexStreamBuffer::IsValid() const

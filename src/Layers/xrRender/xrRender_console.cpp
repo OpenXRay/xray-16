@@ -248,9 +248,9 @@ float ps_r2_gloss_factor = 4.0f;
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
 #include "Layers/xrRenderDX10/StateManager/dx10SamplerStateCache.h"
-#endif // USE_DX10
+#endif
 
 //-----------------------------------------------------------------------
 
@@ -293,12 +293,12 @@ public:
         clamp(val, 1, 16);
 #if defined(USE_OGL)
         // TODO: OGL: Implement aniso filtering.
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         SSManager.SetMaxAnisotropy(val);
 #else
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
-#endif // USE_DX10
+#endif
     }
     CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
     virtual void Execute(LPCSTR args)
@@ -321,13 +321,13 @@ public:
             return;
 
 #if defined(USE_OGL)
-            // TODO: OGL: Implement mipmap bias control.
-#elif defined(USE_DX10) || defined(USE_DX11)
+        // TODO: OGL: Implement mipmap bias control.
+#elif !defined(USE_DX9)
         SSManager.SetMipLODBias(*value);
-#else // USE_DX10
+#else
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
-#endif // USE_DX10
+#endif
     }
 
     CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f) {}

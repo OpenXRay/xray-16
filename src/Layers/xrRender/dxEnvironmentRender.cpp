@@ -193,8 +193,8 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 
 // ******************** Environment params (setting)
 #ifndef USE_DX9
-//	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
-#else //	USE_DX10
+    //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
+#else
 
 #if RENDER == R_R1
     Fvector3 fog_color = env.CurrentEnv->fog_color;
@@ -206,7 +206,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGCOLOR, color_rgba_f(fog_color.x, fog_color.y, fog_color.z, 0)));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGSTART, *(u32*)(&env.CurrentEnv->fog_near)));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGEND, *(u32*)(&env.CurrentEnv->fog_far)));
-#endif //	USE_DX10
+#endif // !USE_DX9
 }
 
 void dxEnvironmentRender::OnLoad()

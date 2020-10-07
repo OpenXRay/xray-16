@@ -129,7 +129,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
         auto& Nvs = map[pass.vs->sh];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         auto& Nvs = map[&*pass.vs];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
@@ -275,7 +275,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         auto& Nvs = map[pass.vs->sh];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         auto& Nvs = map[&*pass.vs];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];

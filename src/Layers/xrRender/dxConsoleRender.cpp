@@ -3,7 +3,7 @@
 
 dxConsoleRender::dxConsoleRender()
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#ifdef USE_DX11
     m_Shader.create("hud" DELIMITER "crosshair");
     m_Geom.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 #endif
@@ -11,7 +11,7 @@ dxConsoleRender::dxConsoleRender()
 
 void dxConsoleRender::Copy(IConsoleRender& _in) { *this = *(dxConsoleRender*)&_in; }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#ifdef USE_DX11
 ICF void ClearWithShader(const Irect& rect, const Fcolor& color, ref_geom& geom, ref_shader& shader)
 {
     u32 vOffset = 0;
@@ -31,7 +31,7 @@ ICF void ClearWithShader(const Irect& rect, const Fcolor& color, ref_geom& geom,
 
     RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, 4, 0, 2);
 }
-#endif // defined(USE_DX10) || defined(USE_DX11)
+#endif // USE_DX11
 
 void dxConsoleRender::OnRender(bool bGame)
 {
@@ -40,7 +40,7 @@ void dxConsoleRender::OnRender(bool bGame)
         rect.y2 /= 2;
 
     const bool result = RCache.ClearRTRect(RCache.get_RT(), color_xrgb(32, 32, 32), 1, &rect);
-#if defined(USE_DX10) || defined(USE_DX11)
+#ifdef USE_DX11
     if (!result)
         ClearWithShader(rect, color_xrgb(32, 32, 32), m_Geom, m_Shader);
 #else
