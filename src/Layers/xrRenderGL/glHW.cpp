@@ -215,3 +215,8 @@ std::pair<u32, u32> CHW::GetSurfaceSize()
         psCurrentVidMode[1]
     };
 }
+
+bool CHW::ThisInstanceIsGlobal() const
+{
+    return this == &HW;
+}

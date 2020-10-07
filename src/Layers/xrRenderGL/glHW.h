@@ -27,6 +27,9 @@ public:
     void Present();
     DeviceState GetDeviceState() const;
 
+private:
+    bool ThisInstanceIsGlobal() const;
+
 public:
     CHWCaps Caps;
 

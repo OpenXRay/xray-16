@@ -24,6 +24,7 @@ public:
     void Reset();
 
     BOOL support(D3DFORMAT fmt, u32 type, u32 usage) const;
+    static bool GivenGPUIsIntelGMA(u32 id_vendor, u32 id_device);
 
     std::pair<u32, u32> GetSurfaceSize() const;
     void Present();
@@ -33,6 +34,7 @@ private:
     u32 selectPresentInterval() const;
     u32 selectGPU() const;
     D3DFORMAT selectDepthStencil(D3DFORMAT) const;
+    bool ThisInstanceIsGlobal() const;
 
 public:
     CHWCaps Caps;

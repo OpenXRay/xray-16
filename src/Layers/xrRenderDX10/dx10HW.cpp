@@ -25,7 +25,7 @@ void CHW::OnAppActivate()
     if (m_pSwapChain && !m_ChainDesc.Windowed)
     {
         ShowWindow(m_ChainDesc.OutputWindow, SW_RESTORE);
-        m_pSwapChain->SetFullscreenState(psDeviceFlags.is(rsFullscreen), NULL);
+        m_pSwapChain->SetFullscreenState(ThisInstanceIsGlobal() ? psDeviceFlags.is(rsFullscreen) : false, NULL);
     }
 }
 
@@ -162,6 +162,9 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     if (FAILED(R))
     {
+        Valid = false;
+        if (!ThisInstanceIsGlobal())
+            return;
         // Fatal error! Cannot create rendering device AT STARTUP !!!
         Msg("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
@@ -192,9 +195,16 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         DXGI_FORMAT_D16_UNORM
     };
     const DXGI_FORMAT selectedFormat = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
-    CHECK_OR_EXIT(selectedFormat != DXGI_FORMAT_UNKNOWN,
-        "Failed to initialize graphics hardware: failed to select depth-stencil format."
-        "\nPlease try to restart the game.");
+    if (selectedFormat == DXGI_FORMAT_UNKNOWN)
+    {
+        Valid = false;
+        if (!ThisInstanceIsGlobal())
+            return;
+        Log("Failed to initialize graphics hardware: "
+            "failed to select depth-stencil format.\n"
+            "Please try to restart the game.");
+        xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
+    }
     Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(selectedFormat);
 
     const auto memory = Desc.DedicatedVideoMemory;
@@ -244,7 +254,7 @@ void CHW::CreateSwapChain(HWND hwnd)
 
     sd.OutputWindow = hwnd;
 
-    sd.Windowed = !psDeviceFlags.is(rsFullscreen);
+    sd.Windowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
 
     //  Additional set up
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -295,7 +305,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.Scaling = DXGI_SCALING_STRETCH;
 
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc{};
-    fulldesc.Windowed = !psDeviceFlags.is(rsFullscreen);
+    fulldesc.Windowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
 
     // Additional setup
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -312,7 +322,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 
     m_pSwapChain->QueryInterface(__uuidof(IDXGISwapChain2), reinterpret_cast<void**>(&m_pSwapChain2));
 
-    if (m_pSwapChain2)
+    if (m_pSwapChain2 && ThisInstanceIsGlobal())
         Device.PresentationFinished = m_pSwapChain2->GetFrameLatencyWaitableObject();
 
     return true;
@@ -323,15 +333,22 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     return false;
 }
 
+bool CHW::ThisInstanceIsGlobal() const
+{
+    return this == &HW;
+}
+
 void CHW::DestroyDevice()
 {
     //  Destroy state managers
-    StateManager.Reset();
-    RSManager.ClearStateArray();
-    DSSManager.ClearStateArray();
-    BSManager.ClearStateArray();
-    SSManager.ClearStateArray();
-
+    if (ThisInstanceIsGlobal()) // only if we are global HW
+    {
+        StateManager.Reset();
+        RSManager.ClearStateArray();
+        DSSManager.ClearStateArray();
+        BSManager.ClearStateArray();
+        SSManager.ClearStateArray();
+    }
     //  Must switch to windowed mode to release swap chain
     if (!m_ChainDesc.Windowed)
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
@@ -367,7 +384,7 @@ void CHW::DestroyDevice()
 void CHW::Reset()
 {
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
     cd.Windowed = bWindowed;
     m_pSwapChain->SetFullscreenState(!bWindowed, NULL);
     DXGI_MODE_DESC& desc = m_ChainDesc.BufferDesc;

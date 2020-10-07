@@ -45,6 +45,8 @@ private:
     void CreateSwapChain(HWND hwnd);
     bool CreateSwapChain2(HWND hwnd);
 
+    bool ThisInstanceIsGlobal() const;
+
 public:
     CHWCaps Caps;
 
@@ -60,6 +62,7 @@ public:
     ID3DDeviceContext* pContext = nullptr;
     IDXGISwapChain* m_pSwapChain = nullptr;
     D3D_FEATURE_LEVEL FeatureLevel;
+    bool Valid = true;
     bool ComputeShadersSupported;
     bool DoublePrecisionFloatShaderOps;
     bool SAD4ShaderInstructions;

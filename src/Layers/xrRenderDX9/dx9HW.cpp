@@ -35,7 +35,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -229,7 +229,7 @@ void CHW::Reset()
     DevPP.BackBufferHeight = Device.dwHeight;
 
     // Windoze
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
@@ -290,6 +290,11 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const
     return D3DFMT_UNKNOWN;
 }
 
+bool CHW::ThisInstanceIsGlobal() const
+{
+    return this == &HW;
+}
+
 u32 CHW::selectPresentInterval() const
 {
     D3DCAPS9 caps;
@@ -305,10 +310,8 @@ u32 CHW::selectPresentInterval() const
     return D3DPRESENT_INTERVAL_DEFAULT;
 }
 
-void CheckForIntelGMA(u32 id_vendor, u32 id_device)
+bool CHW::GivenGPUIsIntelGMA(u32 id_vendor, u32 id_device)
 {
-    bool isIntelGMA = false;
-
     if (id_vendor == 0x8086) // Intel
     {
         constexpr u32 IntelGMA_SoftList[] =
@@ -323,13 +326,14 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
         for (u32 idx : IntelGMA_SoftList)
         {
             if (idx == id_device)
-            {
-                isIntelGMA = true;
-                break;
-            }
+                return true;
         }
     }
+    return false;
+}
 
+void AdjustSkinningMode(bool isIntelGMA)
+{
     if (isIntelGMA)
     {
         switch (ps_r1_SoftwareSkinning)
@@ -355,7 +359,8 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
 u32 CHW::selectGPU() const
 {
 #if RENDER == R_R1
-    CheckForIntelGMA(Caps.id_vendor, Caps.id_device);
+    if (ThisInstanceIsGlobal())
+        AdjustSkinningMode(GivenGPUIsIntelGMA(Caps.id_vendor, Caps.id_device));
 #endif
 
     if (Caps.bForceGPU_SW)
