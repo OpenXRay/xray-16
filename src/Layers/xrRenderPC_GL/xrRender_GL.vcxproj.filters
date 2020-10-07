@@ -684,6 +684,9 @@
     <ClCompile Include="..\xrRender\r__sync_point.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="r2_test_hw.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
