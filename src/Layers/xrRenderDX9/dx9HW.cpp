@@ -266,19 +266,24 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const
         return D3DFMT_D24S8;
 
     // R1 usual
-    static D3DFORMAT fDS_Try1[6] = { D3DFMT_D24S8, D3DFMT_D24X4S4, D3DFMT_D32, D3DFMT_D24X8, D3DFMT_D16, D3DFMT_D15S1 };
+    constexpr D3DFORMAT formats[] =
+    {
+        D3DFMT_D24S8,
+        D3DFMT_D24X4S4,
+        D3DFMT_D32,
+        D3DFMT_D24X8,
+        D3DFMT_D16,
+        D3DFMT_D15S1
+    };
 
-    D3DFORMAT* fDS_Try = fDS_Try1;
-    const int fDS_Cnt = 6;
-
-    for (int it = 0; it < fDS_Cnt; it++)
+    for (D3DFORMAT fmt : formats)
     {
         if (SUCCEEDED(pD3D->CheckDeviceFormat(
-            DevAdapter, m_DriverType, fTarget, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, fDS_Try[it])))
+            DevAdapter, m_DriverType, fTarget, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, fmt)))
         {
-            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, m_DriverType, fTarget, fTarget, fDS_Try[it])))
+            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, m_DriverType, fTarget, fTarget, fmt)))
             {
-                return fDS_Try[it];
+                return fmt;
             }
         }
     }
@@ -306,8 +311,7 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
 
     if (id_vendor == 0x8086) // Intel
     {
-        constexpr auto GMA_SL_SIZE = 43;
-        constexpr u32 IntelGMA_SoftList[GMA_SL_SIZE] =
+        constexpr u32 IntelGMA_SoftList[] =
         {
             0x2782, 0x2582, 0x2792, 0x2592, 0x2772, 0x2776, 0x27A2, 0x27A6, 0x27AE,
             0x2982, 0x2983, 0x2992, 0x2993, 0x29A2, 0x29A3, 0x2972, 0x2973, 0x2A02,
@@ -316,9 +320,9 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
             0x2E33, 0x2E42, 0x2E43, 0x2E92, 0x2E93, 0x0042, 0x0046
         };
 
-        for (int idx = 0; idx < GMA_SL_SIZE; ++idx)
+        for (u32 idx : IntelGMA_SoftList)
         {
-            if (IntelGMA_SoftList[idx] == id_device)
+            if (idx == id_device)
             {
                 isIntelGMA = true;
                 break;
