@@ -1,9 +1,6 @@
 #include "stdafx.h"
 
 #include "dx10HW.h"
-#include "xrEngine/xr_input.h"
-#include "xrEngine/XR_IOConsole.h"
-#include "xrCore/xr_token.h"
 
 #include "StateManager/dx10SamplerStateCache.h"
 #include "StateManager/dx10StateCache.h"

@@ -1,9 +1,6 @@
 #include "stdafx.h"
 
 #include "dx9HW.h"
-#include "xrEngine/xr_input.h"
-#include "xrEngine/XR_IOConsole.h"
-#include "xrCore/xr_token.h"
 
 ENGINE_API extern u32 Vid_SelectedRefreshRate;
 

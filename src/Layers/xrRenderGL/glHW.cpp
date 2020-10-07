@@ -4,11 +4,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRenderGL/glHW.h"
-#include "xrEngine/xr_input.h"
+#include "glHW.h"
 #include "xrEngine/XR_IOConsole.h"
-#include "Include/xrAPI/xrAPI.h"
-#include "xrCore/xr_token.h"
 
 CHW HW;
 
