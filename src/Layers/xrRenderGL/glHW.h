@@ -20,12 +20,12 @@ public:
 
     int  MakeContextCurrent(IRender::RenderContext context) const;
 
-    std::pair<u32, u32> GetSurfaceSize() const;
+    static std::pair<u32, u32> GetSurfaceSize();
 
     void UpdateViews();
 
     void Present();
-    DeviceState GetDeviceState();
+    DeviceState GetDeviceState() const;
 
 public:
     CHWCaps Caps;

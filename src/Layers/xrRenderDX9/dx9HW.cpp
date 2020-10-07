@@ -21,7 +21,7 @@ void CHW::CreateD3D()
     R_ASSERT2(hD3D->IsLoaded(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
 
     using _Direct3DCreate9 = IDirect3D9* WINAPI(UINT SDKVersion);
-    auto createD3D = (_Direct3DCreate9*)hD3D->GetProcAddress("Direct3DCreate9");
+    const auto createD3D = (_Direct3DCreate9*)hD3D->GetProcAddress("Direct3DCreate9");
     R_ASSERT(createD3D);
     pD3D = createD3D(D3D_SDK_VERSION);
     R_ASSERT2(pD3D, "Please install DirectX 9.0c");
@@ -203,7 +203,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
-    u32 memory = pDevice->GetAvailableTextureMem();
+    const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 }
@@ -261,7 +261,7 @@ void CHW::Reset()
 #endif
 }
 
-D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
+D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const
 {
     // R2 hack
 #pragma todo("R2 need to specify depth format")
@@ -272,7 +272,7 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
     static D3DFORMAT fDS_Try1[6] = { D3DFMT_D24S8, D3DFMT_D24X4S4, D3DFMT_D32, D3DFMT_D24X8, D3DFMT_D16, D3DFMT_D15S1 };
 
     D3DFORMAT* fDS_Try = fDS_Try1;
-    int fDS_Cnt = 6;
+    const int fDS_Cnt = 6;
 
     for (int it = 0; it < fDS_Cnt; it++)
     {
@@ -288,7 +288,7 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
     return D3DFMT_UNKNOWN;
 }
 
-u32 CHW::selectPresentInterval()
+u32 CHW::selectPresentInterval() const
 {
     D3DCAPS9 caps;
     pD3D->GetDeviceCaps(DevAdapter, m_DriverType, &caps);
@@ -351,7 +351,7 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
     }
 }
 
-u32 CHW::selectGPU()
+u32 CHW::selectGPU() const
 {
 #if RENDER == R_R1
     CheckForIntelGMA(Caps.id_vendor, Caps.id_device);
@@ -376,9 +376,9 @@ u32 CHW::selectGPU()
     return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 }
 
-BOOL CHW::support(D3DFORMAT fmt, u32 type, u32 usage)
+BOOL CHW::support(D3DFORMAT fmt, u32 type, u32 usage) const
 {
-    auto result = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
+    const HRESULT result = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
     if (FAILED(result))
         return FALSE;
     return TRUE;
@@ -399,7 +399,7 @@ void CHW::Present()
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
-DeviceState CHW::GetDeviceState()
+DeviceState CHW::GetDeviceState() const
 {
     const auto result = pDevice->TestCooperativeLevel();
 

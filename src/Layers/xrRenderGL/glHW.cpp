@@ -204,13 +204,13 @@ void CHW::Present()
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
-DeviceState CHW::GetDeviceState()
+DeviceState CHW::GetDeviceState() const
 {
     //  TODO: OGL: Implement GetDeviceState
     return DeviceState::Normal;
 }
 
-std::pair<u32, u32> CHW::GetSurfaceSize() const
+std::pair<u32, u32> CHW::GetSurfaceSize()
 {
     return
     {

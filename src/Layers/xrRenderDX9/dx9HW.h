@@ -23,16 +23,16 @@ public:
 
     void Reset();
 
-    BOOL support(D3DFORMAT fmt, u32 type, u32 usage);
+    BOOL support(D3DFORMAT fmt, u32 type, u32 usage) const;
 
     std::pair<u32, u32> GetSurfaceSize() const;
     void Present();
-    DeviceState GetDeviceState();
+    DeviceState GetDeviceState() const;
 
 private:
-    u32 selectPresentInterval();
-    u32 selectGPU();
-    D3DFORMAT selectDepthStencil(D3DFORMAT);
+    u32 selectPresentInterval() const;
+    u32 selectGPU() const;
+    D3DFORMAT selectDepthStencil(D3DFORMAT) const;
 
 public:
     CHWCaps Caps;

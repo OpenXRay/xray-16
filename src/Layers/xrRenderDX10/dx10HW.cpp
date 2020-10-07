@@ -304,7 +304,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     IDXGISwapChain1* swapchain = nullptr;
-    HRESULT result = m_pFactory2->CreateSwapChainForHwnd(pDevice, hwnd, &desc,
+    const HRESULT result = m_pFactory2->CreateSwapChainForHwnd(pDevice, hwnd, &desc,
         fulldesc.Windowed ? nullptr : &fulldesc, nullptr, &swapchain);
 
     if (FAILED(result))
@@ -440,7 +440,7 @@ void CHW::Present()
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
-DeviceState CHW::GetDeviceState()
+DeviceState CHW::GetDeviceState() const
 {
     const auto result = m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
 

@@ -36,7 +36,7 @@ public:
     }
     void Present();
     bool UsingFlipPresentationModel() const;
-    DeviceState GetDeviceState();
+    DeviceState GetDeviceState() const;
 
     void OnAppActivate() override;
     void OnAppDeactivate() override;
