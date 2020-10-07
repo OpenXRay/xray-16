@@ -4,6 +4,7 @@
 #include "Layers/xrRender/dxDebugRender.h"
 #include "Layers/xrRender/D3DUtils.h"
 
+constexpr pcstr RENDERER_R3_MODE = "renderer_r3";
 constexpr pcstr RENDERER_R4_MODE = "renderer_r4";
 
 class R4RendererModule final : public RendererModule
@@ -17,17 +18,27 @@ public:
         {
             return modes;
         }
-        if (xrRender_test_hw())
+        switch (xrRender_test_hw())
         {
-            modes.emplace_back(RENDERER_R4_MODE);
+        case TRUE:
+            modes.emplace_back(RENDERER_R3_MODE);
+            break;
+        case TRUE+TRUE: // XXX: remove hack
+            modes.emplace_back(RENDERER_R3_MODE); // don't optimize this switch with fallthrough, because
+            modes.emplace_back(RENDERER_R4_MODE); // order matters: R3 should be first, R4 should be second.
         }
         return modes;
     }
 
     void CheckModeConsistency(pcstr mode) const
     {
-        R_ASSERT3(0 == xr_strcmp(mode, RENDERER_R4_MODE),
-            "Wrong mode passed to xrRender_R4.dll", mode);
+        bool modeIsCorrect = false;
+        if (0 == xr_strcmp(mode, RENDERER_R3_MODE) ||
+            0 == xr_strcmp(mode, RENDERER_R4_MODE))
+        {
+            modeIsCorrect = true;
+        }
+        R_ASSERT3(modeIsCorrect, "Wrong mode passed to xrRender_R4.dll", mode);
     }
 
     void SetupEnv(pcstr mode) override
@@ -35,6 +46,7 @@ public:
         CheckModeConsistency(mode);
         ps_r2_sun_static = false;
         ps_r2_advanced_pp = true;
+        HW.DX10Only = xr_strcmp(mode, RENDERER_R3_MODE) == 0;
         GEnv.Render = &RImplementation;
         GEnv.RenderFactory = &RenderFactoryImpl;
         GEnv.DU = &DUImpl;

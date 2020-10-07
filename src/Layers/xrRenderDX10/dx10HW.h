@@ -70,7 +70,7 @@ public:
 
     using D3DCompileFunc = decltype(&D3DCompile);
     D3DCompileFunc OldD3DCompile = nullptr;
-
+    bool DX10Only = false;
 #ifdef HAS_DX11_2
     IDXGIFactory2* m_pFactory2 = nullptr;
     IDXGISwapChain2* m_pSwapChain2 = nullptr;

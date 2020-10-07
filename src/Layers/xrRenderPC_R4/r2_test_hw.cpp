@@ -40,6 +40,8 @@ BOOL xrRender_test_hw()
 
     const auto level = helper.GetHW().FeatureLevel;
     if (level >= D3D_FEATURE_LEVEL_11_0)
+        return TRUE + TRUE; // XXX: remove hack
+    if (level >= D3D_FEATURE_LEVEL_10_0)
         return TRUE;
     return FALSE;
 }

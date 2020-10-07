@@ -111,6 +111,12 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         D3D_FEATURE_LEVEL_10_0
     };
 
+    D3D_FEATURE_LEVEL featureLevels3[] =
+    {
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0
+    };
+
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
         return D3D11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
@@ -118,9 +124,14 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
     };
 
-    R = createDevice(featureLevels, std::size(featureLevels));
-    if (FAILED(R))
-        R = createDevice(featureLevels2, std::size(featureLevels2));
+    if (DX10Only)
+        R = createDevice(featureLevels3, std::size(featureLevels3));
+    else
+    {
+        R = createDevice(featureLevels, std::size(featureLevels));
+        if (FAILED(R))
+            R = createDevice(featureLevels2, std::size(featureLevels2));
+    }
 
     if (SUCCEEDED(R))
     {
