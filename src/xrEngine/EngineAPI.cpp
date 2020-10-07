@@ -116,10 +116,10 @@ void CEngineAPI::Initialize(void)
     {
         R_ASSERT2(hGame->IsLoaded(), "! Game DLL raised exception during loading or there is no game DLL at all");
 
-        pCreate = reinterpret_cast<Factory_Create*>(hGame->GetProcAddress("xrFactory_Create"));
+        pCreate = (Factory_Create*)hGame->GetProcAddress("xrFactory_Create");
         R_ASSERT(pCreate);
 
-        pDestroy = reinterpret_cast<Factory_Destroy*>(hGame->GetProcAddress("xrFactory_Destroy"));
+        pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
         R_ASSERT(pDestroy);
     }
 
@@ -177,7 +177,7 @@ void CEngineAPI::CreateRendererList()
         if (!handle->IsLoaded())
             return false;
 
-        const auto getModule = static_cast<GetRendererModule>(handle->GetProcAddress(GET_RENDERER_MODULE_FUNC));
+        const auto getModule = (GetRendererModule)handle->GetProcAddress(GET_RENDERER_MODULE_FUNC);
         RendererModule* module = getModule ? getModule() : nullptr;
         if (!module)
             return false;
