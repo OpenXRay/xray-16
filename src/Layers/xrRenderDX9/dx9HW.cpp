@@ -171,13 +171,13 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Create the device
     const auto GPU = selectGPU();
-    auto result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
+    auto result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
         GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
         &P, &pDevice);
 
     if (FAILED(result))
     {
-        result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
+        result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
             GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
             &P, &pDevice);
     }
@@ -190,7 +190,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
         xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     };
 
-    _SHOW_REF("* CREATE: DeviceREF:", HW.pDevice);
+    _SHOW_REF("* CREATE: DeviceREF:", pDevice);
     switch (GPU)
     {
     case D3DCREATE_SOFTWARE_VERTEXPROCESSING:                        Log("* Vertex Processor: SOFTWARE"     ); break;
@@ -214,8 +214,8 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:dwDebugSB", dwDebugSB);
     _RELEASE(dwDebugSB);
 #endif
-    _SHOW_REF("DeviceREF:", HW.pDevice);
-    _RELEASE(HW.pDevice);
+    _SHOW_REF("DeviceREF:", pDevice);
+    _RELEASE(pDevice);
 
     DestroyD3D();
 }
@@ -248,7 +248,7 @@ void CHW::Reset()
 
     while (true)
     {
-        const HRESULT result = HW.pDevice->Reset(&DevPP);
+        const HRESULT result = pDevice->Reset(&DevPP);
         
         if (SUCCEEDED(result))
             break;

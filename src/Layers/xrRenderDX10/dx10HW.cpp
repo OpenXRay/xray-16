@@ -351,14 +351,14 @@ void CHW::DestroyDevice()
 #endif
 
 #ifdef USE_DX10
-    _RELEASE(HW.pDevice1);
+    _RELEASE(pDevice1);
 #endif
-    _SHOW_REF("refCount:HW.pDevice:", HW.pDevice);
-    _RELEASE(HW.pDevice);
+    _SHOW_REF("refCount:pDevice:", pDevice);
+    _RELEASE(pDevice);
 
 #ifdef HAS_DX11_3
-    _SHOW_REF("refCount:HW.pDevice3:", HW.pDevice3);
-    _RELEASE(HW.pDevice3);
+    _SHOW_REF("refCount:pDevice3:", pDevice3);
+    _RELEASE(pDevice3);
 #endif
 
     DestroyD3D();
