@@ -634,9 +634,18 @@ void CGamePersistent::OnFrame()
 #ifdef DEBUG
     ++m_frame_counter;
 #endif
-    if (!GEnv.isDedicatedServer && !m_intro_event.empty())
-        m_intro_event();
-
+    if (!GEnv.isDedicatedServer)
+    {
+        if (!m_intro_event.empty())
+            m_intro_event();
+        else if (!m_intro)
+        {
+            if (Device.dwPrecacheFrame == 0)
+                load_screen_renderer.stop();
+            else if (Device.dwPrecacheFrame == 1)
+                pApp->LoadForceFinish(); // hack
+        }
+    }
     if (!m_pMainMenu->IsActive())
         m_pMainMenu->DestroyInternal(false);
 
