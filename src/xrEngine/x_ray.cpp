@@ -544,7 +544,6 @@ void CApplication::LoadAllArchives()
     }
 }
 
-#pragma optimize("g", off)
 void CApplication::load_draw_internal(bool precaching /*= false*/)
 {
     if (precaching)
