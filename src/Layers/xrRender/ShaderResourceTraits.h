@@ -633,9 +633,17 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
 #if !defined(USE_DX9) && !defined(USE_OGL)
-        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+#   ifdef NDEBUG
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+#   else
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0;
+#   endif
 #elif defined(USE_DX9)
-        flags |= D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR;
+#   ifdef NDEBUG
+        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | D3DXSHADER_OPTIMIZATION_LEVEL3;
+#   else
+        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0;
+#   endif
 #endif
 
         // Compile
