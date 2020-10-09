@@ -179,22 +179,26 @@ void CBlender_Screen_SET::CompileProgrammed(CBlender_Compile& C)
         // Usually for wallmarks
         C.PassSET_VS("stub_notransform_t");
         C.PassSET_PS("stub_default_ma");
+        break;
 
     case 9:
         // 4x R
         C.PassSET_VS("stub_notransform_t_m4");
         C.PassSET_PS("stub_default");
+        break;
 
     case 7:
     case 8:
         // 2x R
         C.PassSET_VS("stub_notransform_t_m2");
         C.PassSET_PS("stub_default");
+        break;
 
     default:
         // 1x R
         C.PassSET_VS("stub_notransform_t");
         C.PassSET_PS("stub_default");
+        break;
     }
 
     VERIFY2(C.L_textures.size() > 0, "Not enough textures");
