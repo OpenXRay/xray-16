@@ -636,13 +636,13 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
 #   ifdef NDEBUG
         flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #   else
-        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0;
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | (xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0);
 #   endif
 #elif defined(USE_DX9)
 #   ifdef NDEBUG
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | D3DXSHADER_OPTIMIZATION_LEVEL3;
 #   else
-        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0;
+        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | (xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0);
 #   endif
 #endif
 
