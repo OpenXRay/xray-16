@@ -640,7 +640,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
 #   endif
 #elif defined(USE_DX9)
 #   ifdef NDEBUG
-        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | D3DXSHADER_OPTIMIZATION_LEVEL3;
+        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
 #   else
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | (xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0);
 #   endif
