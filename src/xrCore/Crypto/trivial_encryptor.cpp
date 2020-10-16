@@ -1,24 +1,24 @@
 #include "stdafx.h"
 #include "trivial_encryptor.h"
+#include "Math/Random32.hpp"
 
 trivial_encryptor g_trivial_encryptor;
 
 class random32
 {
-    u32 m_seed;
+    CRandom32 generator;
 
 public:
     random32() = delete;
 
-    explicit random32(const u32& seed)
+    explicit random32(u32 seed)
     {
-        m_seed = seed;
+        generator.seed(seed);
     }
 
     u32 random(u32 range)
     {
-        m_seed = 0x08088405U * m_seed + 1U;
-        return u32((u64(m_seed) * u64(range)) >> 32U);
+        return generator.random(range);
     }
 };
 
