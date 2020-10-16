@@ -30,10 +30,11 @@ void CRender::Calculate()
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
     {
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
-        if (pSector && pSector != pLastSector)
+        if (pSector && (pSector != pLastSector))
             g_pGamePersistent->OnSectorChanged(translateSector(pSector));
 
-        if (nullptr == pSector) pSector = pLastSector;
+        if (!pSector)
+            pSector = pLastSector;
         pLastSector = pSector;
         vLastCameraPos.set(Device.vCameraPosition);
     }
@@ -64,7 +65,8 @@ void CRender::Calculate()
         ISpatial* spatial = lstRenderables[_it];
         spatial->spatial_updatesector();
         CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-        if (nullptr == sector) continue; // disassociated from S/P structure
+        if (!sector)
+            continue; // disassociated from S/P structure
 
         VERIFY(spatial->GetSpatialData().type & STYPE_LIGHTSOURCE);
         // lightsource

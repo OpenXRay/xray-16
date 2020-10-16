@@ -219,9 +219,6 @@
     <ClInclude Include="..\xrRender\LightTrack.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="SMAP_Allocator.h">
-      <Filter>Lights</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\WallmarksEngine.h">
       <Filter>Wallmarks</Filter>
     </ClInclude>
@@ -325,9 +322,6 @@
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClInclude>
     <ClInclude Include="r2_rendertarget.h">
-      <Filter>Core_Target</Filter>
-    </ClInclude>
-    <ClInclude Include="r2_rendertarget_wallmarks.h">
       <Filter>Core_Target</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ColorMapManager.h">
@@ -624,6 +618,12 @@
     <ClInclude Include="..\xrRender\r__sync_point.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h">
+      <Filter>Core_Target</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -641,13 +641,7 @@
     <ClCompile Include="r2.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r2_blenders.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r2_loader.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_R_calculate.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="r2_R_lights.cpp">
@@ -657,9 +651,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="r2_R_sun.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_sector_detect.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="r2_test_hw.cpp">
@@ -864,9 +855,6 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r2_rendertarget_accum_spot_geom.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_rendertarget_draw_volume.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r2_rendertarget_enable_scissor.cpp">
@@ -1113,6 +1101,18 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\r__sync_point.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_sector_detect.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_blenders.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

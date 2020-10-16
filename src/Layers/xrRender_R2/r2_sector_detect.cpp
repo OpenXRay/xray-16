@@ -21,18 +21,17 @@ int CRender::translateSector(IRender_Sector* pSector)
 
 IRender_Sector* CRender::detectSector(const Fvector& P)
 {
-    IRender_Sector* S = NULL;
     Fvector dir;
     Sectors_xrc.ray_options(CDB::OPT_ONLYNEAREST);
 
     dir.set(0, -1, 0);
-    S = detectSector(P, dir);
-    if (NULL == S)
+    IRender_Sector* sector = detectSector(P, dir);
+    if (!sector)
     {
         dir.set(0, 1, 0);
-        S = detectSector(P, dir);
+        sector = detectSector(P, dir);
     }
-    return S;
+    return sector;
 }
 
 IRender_Sector* CRender::detectSector(const Fvector& P, Fvector& dir)
@@ -74,7 +73,7 @@ IRender_Sector* CRender::detectSector(const Fvector& P, Fvector& dir)
     else if (id2 >= 0)
         ID = id2; // only id2 found
     else
-        return 0;
+        return nullptr;
 
     if (ID == id1)
     {
@@ -83,10 +82,7 @@ IRender_Sector* CRender::detectSector(const Fvector& P, Fvector& dir)
         CPortal* pPortal = (CPortal*)Portals[pTri->dummy];
         return pPortal->getSectorFacing(P);
     }
-    else
-    {
-        // Take triangle at ID and use it's Sector
-        CDB::TRI* pTri = g_pGameLevel->ObjectSpace.GetStaticTris() + ID;
-        return getSector(pTri->sector);
-    }
+    // Take triangle at ID and use it's Sector
+    CDB::TRI* pTri = g_pGameLevel->ObjectSpace.GetStaticTris() + ID;
+    return getSector(pTri->sector);
 }

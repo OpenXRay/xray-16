@@ -4,6 +4,7 @@ list(APPEND DIRS
     "."
     "../xrRender"
     "../xrRender/blenders"
+    "../xrRender_R2"
     "../xrRenderGL"
     "../../Include/xrRender"
     )

@@ -243,9 +243,6 @@
     <ClCompile Include="..\xrRender\Blender_Recorder_R2.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
-    <ClCompile Include="r2_blenders.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\R_Backend_xform.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
@@ -349,9 +346,6 @@
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
     </ClCompile>
     <ClCompile Include="rgl.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_R_calculate.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderGL\glStateUtils.cpp">
@@ -474,9 +468,6 @@
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp">
       <Filter>Details</Filter>
     </ClCompile>
-    <ClCompile Include="r2_sector_detect.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderGL\glState.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
@@ -484,9 +475,6 @@
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
     <ClCompile Include="r2_R_sun.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_R_lights.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp">
@@ -580,9 +568,6 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_draw_rain.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_draw_volume.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_enable_scissor.cpp">
@@ -686,6 +671,21 @@
     </ClCompile>
     <ClCompile Include="r2_test_hw.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_blenders.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_sector_detect.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp">
+      <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -977,9 +977,6 @@
     <ClInclude Include="..\xrRenderGL\glState.h">
       <Filter>StateManager</Filter>
     </ClInclude>
-    <ClInclude Include="SMAP_Allocator.h">
-      <Filter>Lights</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\Light_Render_Direct.h">
       <Filter>Lights</Filter>
     </ClInclude>
@@ -1088,9 +1085,6 @@
     <ClInclude Include="..\xrRender\D3DUtils.h">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClInclude>
-    <ClInclude Include="gl_rendertarget_wallmarks.h">
-      <Filter>Core_Target</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
       <Filter>Debug</Filter>
     </ClInclude>
@@ -1135,6 +1129,12 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\r__sync_point.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h">
+      <Filter>Core_Target</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
