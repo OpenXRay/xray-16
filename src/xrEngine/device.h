@@ -187,7 +187,7 @@ public:
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
-        : fWidth_2(0), fHeight_2(0),
+        : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
           mtProcessingAllowed(false), mt_bMustExit(false),
           m_editor_module(nullptr), m_editor_initialize(nullptr),
           m_editor_finalize(nullptr), m_editor(nullptr)
