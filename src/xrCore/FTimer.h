@@ -91,8 +91,8 @@ class XRCORE_API CTimer : public CTimerBase
     {
         const auto delta = current - realTime;
         const double deltaD = double(delta.count());
-        const double time = deltaD * m_time_factor + .5;
-        const auto result = u64(time);
+        const double elapsedTime = deltaD * m_time_factor + .5;
+        const auto result = u64(elapsedTime);
         return Duration(this->time.count() + result);
     }
 
