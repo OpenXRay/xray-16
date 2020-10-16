@@ -379,6 +379,7 @@ CRenderTarget::CRenderTarget()
 
         CBlender_bloom_build b_bloom;
         s_bloom.create(&b_bloom, "r2" DELIMITER "bloom");
+        s_bloom_msaa = s_bloom;
         f_bloom_factor = 0.5f;
     }
 
@@ -621,6 +622,7 @@ CRenderTarget::CRenderTarget()
     s_postprocess.create("postprocess");
     g_postprocess.create(
         D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
+    s_postprocess_msaa = s_postprocess;
 
     // Menu
     s_menu.create("distort");

@@ -462,9 +462,6 @@
     <ClCompile Include="..\xrRender\FProgressive.cpp">
       <Filter>Models\Visuals</Filter>
     </ClCompile>
-    <ClCompile Include="gl_loader.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp">
       <Filter>Details</Filter>
     </ClCompile>
@@ -546,13 +543,7 @@
     <ClCompile Include="gl_rendertarget_accum_direct.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_accum_omnipart_geom.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_accum_point.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_accum_point_geom.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_accum_reflected.cpp">
@@ -561,16 +552,10 @@
     <ClCompile Include="gl_rendertarget_accum_spot.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_accum_spot_geom.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_create_minmaxSM.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_draw_rain.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_enable_scissor.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_mark_msaa_edges.cpp">
@@ -579,19 +564,10 @@
     <ClCompile Include="gl_rendertarget_phase_accumulator.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_bloom.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_combine.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_luminance.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_occq.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_PP.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_rain.cpp">
@@ -685,6 +661,30 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_point_geom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_spot_geom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_enable_scissor.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_PP.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_bloom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_loader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
