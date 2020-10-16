@@ -10,15 +10,15 @@ class random32
 public:
     random32() = delete;
 
-    random32(const u32& seed)
+    explicit random32(const u32& seed)
     {
         m_seed = seed;
     }
 
-    u32 random(const u32& range)
+    u32 random(u32 range)
     {
-        m_seed = 0x08088405 * m_seed + 1;
-        return (u32(u64(m_seed) * u64(range) >> 32));
+        m_seed = 0x08088405U * m_seed + 1U;
+        return u32((u64(m_seed) * u64(range)) >> 32U);
     }
 };
 
