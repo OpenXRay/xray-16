@@ -162,7 +162,7 @@ private:
     ref_shader s_bloom_dbg_1;
     ref_shader s_bloom_dbg_2;
     ref_shader s_bloom;
-    ref_shader s_bloom_msaa;
+    ref_shader s_bloom_msaa; // if MSAA is disabled, just an alias of s_bloom
     float f_bloom_factor;
 
     // Luminance
@@ -185,7 +185,7 @@ private:
 
 public:
     ref_shader s_postprocess;
-    ref_shader s_postprocess_msaa;
+    ref_shader s_postprocess_msaa; // if MSAA is disabled, just an alias of s_bloom
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;

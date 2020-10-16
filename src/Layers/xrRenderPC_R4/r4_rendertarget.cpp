@@ -626,7 +626,9 @@ CRenderTarget::CRenderTarget()
 
         CBlender_bloom_build b_bloom;
         s_bloom.create(&b_bloom, "r2" DELIMITER "bloom");
-        if (RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.dx10_msaa)
+            s_bloom_msaa = s_bloom;
+        else
         {
             CBlender_bloom_build_msaa b_bloom_msaa;
             s_bloom_msaa.create(&b_bloom_msaa, "r2" DELIMITER "bloom");
@@ -1020,7 +1022,9 @@ CRenderTarget::CRenderTarget()
     s_postprocess.create("postprocess");
     g_postprocess.create(
         D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
-    if (RImplementation.o.dx10_msaa)
+    if (!RImplementation.o.dx10_msaa)
+        s_postprocess_msaa = s_postprocess;
+    else
     {
         CBlender_postprocess_msaa b_postprocess_msaa;
         s_postprocess_msaa.create(&b_postprocess_msaa, "r2" DELIMITER "post");
