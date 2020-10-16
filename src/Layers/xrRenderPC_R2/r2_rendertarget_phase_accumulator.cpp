@@ -46,15 +46,13 @@ void CRenderTarget::phase_accumulator()
 
 void CRenderTarget::phase_vol_accumulator()
 {
+    u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
+
     if (!m_bHasActiveVolumetric)
     {
         m_bHasActiveVolumetric = true;
-
-        u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
         RCache.ClearRT(rt_Generic_2, {}); // black
     }
-    else
-        u_setrt(rt_Generic_2, NULL, NULL, get_base_zb());
 
     RCache.set_Stencil(FALSE);
     RCache.set_CullMode(CULL_NONE);
