@@ -610,7 +610,7 @@ gpiProcessRecvBuddyList(
             {
                 buffer[j] = c;
             }
-            buffer[j] = '\0';
+            buffer[min(j, sizeof(buffer) - 1)] = '\0';
             index += j;
         }
         else
