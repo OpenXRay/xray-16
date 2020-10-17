@@ -29,23 +29,20 @@ static const float OPTIMIZATION_DISTANCE = 100.f;
 
 static bool stalker_use_dynamic_lights = false;
 
-CTorch::CTorch(void)
+CTorch::CTorch()
+    : fBrightness(1.f), lanim(nullptr), guid_bone(BI_NONE),
+      m_delta_h(0), m_switched_on(false),
+      light_render(GEnv.Render->light_create()),
+      light_omni(GEnv.Render->light_create()),
+      glow_render(GEnv.Render->glow_create()),
+      m_bNightVisionEnabled(false), m_bNightVisionOn(false), m_night_vision(nullptr)
 {
-    light_render = GEnv.Render->light_create();
+    m_prev_hp.set(0, 0);
+
     light_render->set_type(IRender_Light::SPOT);
     light_render->set_shadow(true);
-    light_omni = GEnv.Render->light_create();
     light_omni->set_type(IRender_Light::POINT);
     light_omni->set_shadow(false);
-
-    m_switched_on = false;
-    glow_render = GEnv.Render->glow_create();
-    lanim = 0;
-    fBrightness = 1.f;
-
-    m_prev_hp.set(0, 0);
-    m_delta_h = 0;
-    m_night_vision = NULL;
 
     // Disabling shift by x and z axes for 1st render,
     // because we don't have dynamic lighting in it.
