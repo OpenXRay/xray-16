@@ -12,17 +12,10 @@ class AccessibilityShortcuts
 
 public:
     AccessibilityShortcuts()
+        : screensaverState(false),
+          stickyKeys{ sizeof(stickyKeys) }, filterKeys{ sizeof(filterKeys) }, toggleKeys{ sizeof(toggleKeys) },
+          stickyKeysFlags(0), filterKeysFlags(0), toggleKeysFlags(0)
     {
-        screensaverState = false;
-        stickyKeysFlags = 0;
-        filterKeysFlags = 0;
-        toggleKeysFlags = 0;
-        stickyKeys = {};
-        filterKeys = {};
-        toggleKeys = {};
-        stickyKeys.cbSize = sizeof(stickyKeys);
-        filterKeys.cbSize = sizeof(filterKeys);
-        toggleKeys.cbSize = sizeof(toggleKeys);
     }
 
     void Disable()
