@@ -188,6 +188,8 @@ void gsDebugFormat(GSIDebugCategory theCat, GSIDebugType theType,
 	
 	// Pass to VA version
 	gsDebugVaList(theCat, theType, theLevel, theTokenStr, aParameterList);
+
+	va_end(aParameterList);
 }
 
 
