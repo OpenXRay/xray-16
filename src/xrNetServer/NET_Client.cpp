@@ -330,20 +330,13 @@ void IPureClient::_Recieve(const void* data, u32 data_size, u32 /*param*/)
 //==============================================================================
 
 IPureClient::IPureClient(CTimer* timer)
-    : net_Statistic(timer)
+    : device_timer(timer), NET(nullptr), net_Address_device(nullptr), net_Address_server(nullptr),
 #ifdef CONFIG_PROFILE_LOCKS
-    , net_csEnumeration(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration))
+    , net_csEnumeration(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration)),
 #endif // CONFIG_PROFILE_LOCKS
+      net_Connected(EnmConnectionFails), net_Syncronised(false), net_Disconnected(true), net_Statistic(timer),
+      net_Time_LastUpdate(0), net_TimeDelta(0), net_TimeDelta_Calculated(0), net_TimeDelta_User(0)
 {
-    NET = nullptr;
-    net_Address_server = nullptr;
-    net_Address_device = nullptr;
-    device_timer = timer;
-    net_TimeDelta_User = 0;
-    net_Time_LastUpdate = 0;
-    net_TimeDelta = 0;
-    net_TimeDelta_Calculated = 0;
-
     pClNetLog = nullptr; // new INetLog("logs\\net_cl_log.log", timeServer());
 }
 
