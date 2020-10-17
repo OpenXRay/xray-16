@@ -406,13 +406,13 @@ void CRender::create()
     }
 
     // constants
-    RImplementation.Resources->RegisterConstantSetup("parallax", &binder_parallax);
-    RImplementation.Resources->RegisterConstantSetup("water_intensity", &binder_water_intensity);
-    RImplementation.Resources->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
-    RImplementation.Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
-    RImplementation.Resources->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
-    RImplementation.Resources->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
-    RImplementation.Resources->RegisterConstantSetup("triLOD", &binder_LOD);
+    Resources->RegisterConstantSetup("parallax", &binder_parallax);
+    Resources->RegisterConstantSetup("water_intensity", &binder_water_intensity);
+    Resources->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
+    Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
+    Resources->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
+    Resources->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
+    Resources->RegisterConstantSetup("triLOD", &binder_LOD);
 
     c_lmaterial = "L_material";
     c_sbase = "s_base";

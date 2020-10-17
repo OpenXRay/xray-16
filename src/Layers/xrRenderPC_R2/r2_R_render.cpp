@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
+
 #include "Layers/xrRender/QueryHelper.h"
 
 IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
@@ -14,6 +15,7 @@ IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 
 void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 {
+    PIX_EVENT(render_main);
     //	Msg						("---begin");
     marker++;
 
@@ -156,6 +158,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 
 void CRender::render_menu()
 {
+    PIX_EVENT(render_menu);
     //	Globals
     RCache.set_CullMode(CULL_CCW);
     RCache.set_Stencil(FALSE);
@@ -204,6 +207,8 @@ void CRender::render_menu()
 extern u32 g_r;
 void CRender::Render()
 {
+    PIX_EVENT(CRender_Render);
+
     g_r = 1;
     VERIFY(0 == mapDistort.size());
 
@@ -229,7 +234,7 @@ void CRender::Render()
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
 
     // Configure
-    RImplementation.o.distortion = FALSE; // disable distorion
+    o.distortion = FALSE; // disable distorion
     Fcolor sun_color = ((light*)Lights.sun._get())->color;
     BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
     if (o.sunstatic)
@@ -247,6 +252,7 @@ void CRender::Render()
     //******* Z-prefill calc - DEFERRER RENDERER
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
     {
+        PIX_EVENT(DEFER_Z_FILL);
         BasicStats.Culling.Begin();
         float z_distance = ps_r2_zfill;
         Fmatrix m_zfill, m_project;
@@ -301,6 +307,7 @@ void CRender::Render()
     //******* Main render :: PART-0	-- first
     if (!split_the_scene_to_minimize_wait)
     {
+        PIX_EVENT(DEFER_PART0_NO_SPLIT);
         // level, DO NOT SPLIT
         Target->phase_scene_begin();
         r_dsgraph_render_hud();
@@ -312,6 +319,7 @@ void CRender::Render()
     }
     else
     {
+        PIX_EVENT(DEFER_PART0_SPLIT);
         // level, SPLIT
         Target->phase_scene_begin();
         r_dsgraph_render_graph(0);
@@ -323,6 +331,7 @@ void CRender::Render()
     LP_normal.clear();
     LP_pending.clear();
     {
+        PIX_EVENT(DEFER_TEST_LIGHT_VIS);
         // perform tests
         auto count = 0;
         light_Package& LP = Lights.package;
@@ -373,6 +382,7 @@ void CRender::Render()
     //******* Main render :: PART-1 (second)
     if (split_the_scene_to_minimize_wait)
     {
+        PIX_EVENT(DEFER_PART1_SPLIT);
         // skybox can be drawn here
         if (0)
         {
@@ -405,6 +415,7 @@ void CRender::Render()
     // Wall marks
     if (Wallmarks)
     {
+        PIX_EVENT(DEFER_WALLMARKS);
         Target->phase_wallmarks();
         g_r = 0;
         Wallmarks->Render(); // wallmarks has priority as normal geometry
@@ -412,6 +423,7 @@ void CRender::Render()
 
     // Update incremental shadowmap-visibility solver
     {
+        PIX_EVENT(DEFER_FLUSH_OCCLUSION);
         u32 it = 0;
         for (it = 0; it < Lights_LastFrame.size(); it++)
         {
@@ -432,7 +444,8 @@ void CRender::Render()
     // Directional light - fucking sun
     if (bSUN)
     {
-        RImplementation.Stats.l_visible++;
+        PIX_EVENT(DEFER_SUN);
+        Stats.l_visible++;
         if (!RImplementation.o.oldshadowcascades)
             render_sun_cascades();
         else
@@ -441,11 +454,11 @@ void CRender::Render()
             render_sun();
             render_sun_filtered();
         }
-
         Target->accum_direct_blend();
     }
 
     {
+        PIX_EVENT(DEFER_SELF_ILLUM);
         Target->phase_accumulator();
         // Render emissive geometry, stencil - write 0x0 at pixel pos
         RCache.set_xform_project(Device.mProject);
@@ -457,7 +470,7 @@ void CRender::Render()
         // (TRUE,D3DCMP_ALWAYS,0x00,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
         RCache.set_CullMode(CULL_CCW);
         RCache.set_ColorWriteEnable();
-        RImplementation.r_dsgraph_render_emissive();
+        r_dsgraph_render_emissive();
 
         // Stencil	- draw only where stencil >= 0x1
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
@@ -466,22 +479,32 @@ void CRender::Render()
     }
 
     // Lighting, non dependant on OCCQ
-    Target->phase_accumulator();
-    HOM.Disable();
-    render_lights(LP_normal);
+    {
+        PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
+        Target->phase_accumulator();
+        HOM.Disable();
+        render_lights(LP_normal);
+    }
 
     // Lighting, dependant on OCCQ
-    render_lights(LP_pending);
+    {
+        PIX_EVENT(DEFER_LIGHT_OCCQ);
+        render_lights(LP_pending);
+    }
 
     // Postprocess
-    Target->phase_combine();
+    {
+        PIX_EVENT(DEFER_LIGHT_COMBINE);
+        Target->phase_combine();
+    }
+
     VERIFY(0 == mapDistort.size());
 }
 
 void CRender::render_forward()
 {
     VERIFY(0 == mapDistort.size());
-    RImplementation.o.distortion = RImplementation.o.distortion_enabled; // enable distorion
+    o.distortion = o.distortion_enabled; // enable distorion
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
@@ -498,7 +521,7 @@ void CRender::render_forward()
         g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }
 
-    RImplementation.o.distortion = FALSE; // disable distorion
+    o.distortion = FALSE; // disable distorion
 }
 
 // Перед началом рендера мира --#SM+#--

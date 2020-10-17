@@ -46,6 +46,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
     // Perform masking (only once - on the first/near phase)
     RCache.set_CullMode(CULL_NONE);
+    PIX_EVENT(SE_SUN_NEAR_sub_phase);
     if (SE_SUN_NEAR == sub_phase) //.
     {
         // Fill vertex buffer
@@ -66,7 +67,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
         RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
-        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0);
+        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.f);
 
         // if (stencil>=1 && aref_pass) stencil = light_id
         RCache.set_ColorWriteEnable(FALSE);
@@ -84,6 +85,8 @@ void CRenderTarget::accum_direct(u32 sub_phase)
     // nv-stencil recompression
     if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
+
+    PIX_EVENT(Perform_lighting);
 
     // Perform lighting
     {
@@ -267,6 +270,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
     // Perform masking (only once - on the first/near phase)
     RCache.set_CullMode(CULL_NONE);
+    PIX_EVENT(SE_SUN_NEAR_sub_phase);
     if (SE_SUN_NEAR == sub_phase) //.
     {
         // Fill vertex buffer
@@ -305,6 +309,8 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
     // nv-stencil recompression
     if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
+
+    PIX_EVENT(Perform_lighting);
 
     // Perform lighting
     // if( sub_phase == SE_SUN_FAR ) //******************************************************************
@@ -370,6 +376,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             m_clouds_shadow.mulA_44(m_xform);
         }
 
+        // Compute textgen texture for pixel shader, for possitions texture.
         Fmatrix m_Texgen;
         m_Texgen.identity();
         RCache.xforms.set_W(m_Texgen);
@@ -417,7 +424,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_Element(s_accum_direct->E[sub_phase]);
 
         RCache.set_c("m_texgen", m_Texgen);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
@@ -510,6 +517,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
 void CRenderTarget::accum_direct_blend()
 {
+    PIX_EVENT(accum_direct_blend);
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
@@ -547,6 +555,7 @@ void CRenderTarget::accum_direct_blend()
 
 void CRenderTarget::accum_direct_f(u32 sub_phase)
 {
+    PIX_EVENT(accum_direct_f);
     // Select target
     if (SE_SUN_LUMINANCE == sub_phase)
     {
@@ -602,7 +611,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
         RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
-        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0);
+        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.f);
 
         // if (stencil>=1 && aref_pass) stencil = light_id
         RCache.set_ColorWriteEnable(FALSE);
@@ -623,7 +632,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
     // Perform lighting
     {
-        u_setrt(rt_Generic_0, NULL, NULL, get_base_zb()); // enshure RT setup
+        u_setrt(rt_Generic_0, NULL, NULL, get_base_zb()); // ensure RT is set
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 
@@ -679,7 +688,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
         // setup
         RCache.set_Element(s_accum_direct->E[sub_phase]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
 
@@ -694,6 +703,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
 void CRenderTarget::accum_direct_lum()
 {
+    PIX_EVENT(accum_direct_lum);
     // Select target
     phase_accumulator();
 
@@ -800,7 +810,7 @@ void CRenderTarget::accum_direct_lum()
 
     // setup
     RCache.set_Element(s_accum_direct->E[SE_SUN_LUMINANCE]);
-    RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
+    RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
     RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
 
     // setup stencil
@@ -810,6 +820,8 @@ void CRenderTarget::accum_direct_lum()
 
 void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, const Fmatrix& mShadow)
 {
+    PIX_EVENT(accum_direct_volumetric);
+    
     if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_MIDDLE) && (sub_phase != SE_SUN_FAR))
         return;
 
@@ -854,7 +866,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         }
 
         //      RCache.set_c                ("Ldynamic_dir",        L_dir.x,L_dir.y,L_dir.z,0 );
-        RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0);
+        RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0.f);
         RCache.set_c("m_shadow", mShadow);
         Fmatrix m_Texgen;
         m_Texgen.identity();
@@ -883,7 +895,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
             zMax = OLES_SUN_LIMIT_27_01_07;
         }
 
-        RCache.set_c("volume_range", zMin, zMax, 0, 0);
+        RCache.set_c("volume_range", zMin, zMax, 0.f, 0.f);
 
         Fvector center_pt;
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMin);

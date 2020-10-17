@@ -169,7 +169,6 @@ void CRender::render_menu()
         Target->u_setrt(Target->rt_Generic_0, 0, 0, Target->get_base_zb()); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
-
     // Distort
     {
         Target->u_setrt(Target->rt_Generic_1, 0, 0, Target->get_base_zb()); // Now RT is a distortion mask
@@ -400,11 +399,9 @@ void CRender::Render()
 
             // draw skybox
             RCache.set_ColorWriteEnable();
-            // CHK_DX(HW.pDevice->SetRenderState			( D3DRS_ZENABLE,	FALSE				));
-            RCache.set_Z(FALSE);
+            RCache.set_Z(false);
             g_pGamePersistent->Environment().RenderSky();
-            // CHK_DX(HW.pDevice->SetRenderState			( D3DRS_ZENABLE,	TRUE				));
-            RCache.set_Z(TRUE);
+            RCache.set_Z(true);
         }
 
         // level
