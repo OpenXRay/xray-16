@@ -44,10 +44,8 @@ CxRect2::CxRect2(float const x1_, float const y1_, float const x2_, float const 
   topRight.y=y2_;
 }
 
-CxRect2::CxRect2(CxRect2 const &p)
+CxRect2::CxRect2(CxRect2 const &p) : botLeft(p.botLeft), topRight(p.topRight)
 {
-  botLeft=p.botLeft;
-  topRight=p.topRight;
 }
 
 float CxRect2::Surface() const
