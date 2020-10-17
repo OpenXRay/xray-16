@@ -68,7 +68,7 @@ void CSkeletonX_ST::Load(const char* N, IReader* data, u32 dwFlags)
 }
 
 template <typename T>
-ICF void set_vertice_hw(vertHW_1W<T>* dst, vertBoned1W* src)
+ICF void set_vertice_hw(vertHW_1W<T>* dst, const vertBoned1W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
@@ -76,7 +76,7 @@ ICF void set_vertice_hw(vertHW_1W<T>* dst, vertBoned1W* src)
 }
 
 template <typename T>
-ICF void set_vertice_hw(vertHW_2W<T>* dst, vertBoned2W* src)
+ICF void set_vertice_hw(vertHW_2W<T>* dst, const vertBoned2W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
@@ -84,7 +84,7 @@ ICF void set_vertice_hw(vertHW_2W<T>* dst, vertBoned2W* src)
 }
 
 template <typename T>
-ICF void set_vertice_hw(vertHW_3W<T>* dst, vertBoned3W* src)
+ICF void set_vertice_hw(vertHW_3W<T>* dst, const vertBoned3W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
@@ -94,7 +94,7 @@ ICF void set_vertice_hw(vertHW_3W<T>* dst, vertBoned3W* src)
 }
 
 template <typename T>
-ICF void set_vertice_hw(vertHW_4W<T>* dst, vertBoned4W* src)
+ICF void set_vertice_hw(vertHW_4W<T>* dst, const vertBoned4W* src)
 {
     Fvector2 uv;
     uv.set(src->u, src->v);
@@ -104,7 +104,7 @@ ICF void set_vertice_hw(vertHW_4W<T>* dst, vertBoned4W* src)
 }
 
 template <typename TDst, typename TSrc>
-void load_hw(Fvisual& V, TSrc* src)
+void load_hw(Fvisual& V, const TSrc* src)
 {
     V.vStride = GetDeclVertexSize(get_decl<TDst>(), 0);
     VERIFY(nullptr == V.p_rm_Vertices);
