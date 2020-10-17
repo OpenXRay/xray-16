@@ -1,17 +1,19 @@
 #include "stdafx.h"
+
 #include "Layers/xrRender/blenders/uber_deffer.h"
-#include "Layers/xrRender/blenders/blender_BmmD.h"
+
+#include "Layers/xrRender/blenders/Blender_BmmD.h"
 #include "Layers/xrRender/blenders/blender_deffer_flat.h"
 #include "Layers/xrRender/blenders/blender_deffer_model.h"
 #include "Layers/xrRender/blenders/blender_deffer_aref.h"
-#include "Layers/xrRender/blenders/blender_screen_set.h"
-#include "Layers/xrRender/blenders/blender_editor_wire.h"
-#include "Layers/xrRender/blenders/blender_editor_selection.h"
-#include "Layers/xrRender/blenders/blender_tree.h"
-#include "Layers/xrRender/blenders/blender_detail_still.h"
-#include "Layers/xrRender/blenders/blender_particle.h"
+#include "Layers/xrRender/blenders/Blender_Screen_SET.h"
+#include "Layers/xrRender/blenders/Blender_Editor_Wire.h"
+#include "Layers/xrRender/blenders/Blender_Editor_Selection.h"
+#include "Layers/xrRender/blenders/Blender_tree.h"
+#include "Layers/xrRender/blenders/Blender_detail_still.h"
+#include "Layers/xrRender/blenders/Blender_Particle.h"
 #include "Layers/xrRender/blenders/Blender_Model_EbB.h"
-#include "Layers/xrRender/blenders/blender_Lm(EbB).h"
+#include "Layers/xrRender/blenders/Blender_Lm(EbB).h"
 
 IBlender* CRender::blender_create(CLASS_ID cls)
 {
