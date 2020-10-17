@@ -405,7 +405,7 @@ void CODEGeom::destroy()
     m_geom_transform = NULL;
 }
 
-CBoxGeom::CBoxGeom(const Fobb& box) { m_box = box; }
+CBoxGeom::CBoxGeom(const Fobb& box) : m_box(box) { }
 void CBoxGeom::get_mass(dMass& m)
 {
     Fvector& hside = m_box.m_halfsize;
@@ -590,7 +590,7 @@ void CSphereGeom::set_build_position(const Fvector& ref_point)
     dGeomSetPosition(geom(), local_position[0], local_position[1], local_position[2]);
 }
 
-CCylinderGeom::CCylinderGeom(const Fcylinder& cyl) { m_cylinder = cyl; }
+CCylinderGeom::CCylinderGeom(const Fcylinder& cyl) : m_cylinder(cyl) { }
 void CCylinderGeom::get_mass(dMass& m)
 {
     dMassSetCylinder(&m, 1.f, 2, m_cylinder.m_radius, m_cylinder.m_height);
