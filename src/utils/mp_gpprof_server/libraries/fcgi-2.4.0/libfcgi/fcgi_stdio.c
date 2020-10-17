@@ -340,7 +340,8 @@ FCGI_FILE *FCGI_freopen(const char *path, const char *mode,
                         FCGI_FILE *fp)
 {
     if(fp->stdio_stream) {
-        if(freopen(path, mode, fp->stdio_stream) == NULL)
+        fp->stdio_stream = freopen(path, mode, fp->stdio_stream);
+        if(fp->stdio_stream == NULL)
             return NULL;
         else
             return fp;
