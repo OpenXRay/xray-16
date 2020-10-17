@@ -49,7 +49,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 int SetSockBlocking(SOCKET sock, int isblocking)
 {
-	int rcode;
+	int rcode = -1;
 
 #if defined(_REVOLUTION)
 	int val;
