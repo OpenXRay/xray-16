@@ -18,6 +18,7 @@
 #include "ai/monsters/ai_monster_shared_data.h"
 #include "ai/monsters/monster_sound_defs.h"
 #include "ai/monsters/monster_aura.h"
+#include "InventoryOwner.h"
 
 class CCharacterPhysicsSupport;
 class CMonsterCorpseCoverEvaluator;
@@ -51,7 +52,7 @@ class text_tree;
 
 class anti_aim_ability;
 
-class CBaseMonster : public CCustomMonster, public CStepManager
+class CBaseMonster : public CCustomMonster, public CStepManager, public CInventoryOwner
 {
 protected:
     using inherited = CCustomMonster;
@@ -73,6 +74,13 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual CBaseMonster* cast_base_monster() { return this; }
     virtual CGameObject* cast_game_object() { return this; }
+    virtual CInventoryOwner* cast_inventory_owner() 
+    {
+        if (!CallOfPripyatMode)
+            return this;
+        else
+            return nullptr;
+    }
 
 public:
     virtual bool renderable_ShadowReceive() { return TRUE; }
@@ -126,6 +134,7 @@ public:
     virtual void PHFreeze() { return inherited::PHFreeze(); }
     virtual bool UsedAI_Locations() { return inherited::UsedAI_Locations(); }
     virtual const SRotation Orientation() const { return inherited::Orientation(); }
+    virtual void renderable_Render(IRenderable* root) { return inherited::renderable_Render(root); } 
     virtual void on_restrictions_change();
 
     virtual void SetAttackEffector();
@@ -582,6 +591,9 @@ private:
 public:
     virtual bool run_home_point_when_enemy_inaccessible() const { return true; }
     virtual bool need_shotmark() const { return true; }
+
+private:
+    virtual bool unlimited_ammo() { return false; }
 };
 
 //-------------------------------------------------------------------

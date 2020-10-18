@@ -213,6 +213,7 @@ void CBaseMonster::reload(LPCSTR section)
     if (!CCustomMonster::use_simplified_visual())
         CStepManager::reload(section);
 
+    CInventoryOwner::reload(section);
     movement().reload(section);
 
     // load base sounds
@@ -262,6 +263,7 @@ void CBaseMonster::reload(LPCSTR section)
 void CBaseMonster::reinit()
 {
     inherited::reinit();
+    CInventoryOwner::reinit();
 
     EnemyMemory.clear();
     SoundMemory.clear();
@@ -331,6 +333,10 @@ bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
     monster_squad().register_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
     settings_overrides();
 
+    CHARACTER_COMMUNITY community;
+    community.set("monster");
+    CInventoryOwner::SetCommunity(community.index());
+	
     if (GetScriptControl())
     {
         m_control_manager->animation().reset_data();
@@ -384,6 +390,7 @@ void CBaseMonster::net_Destroy()
         StateMan->critical_finalize();
 
     inherited::net_Destroy();
+    CInventoryOwner::net_Destroy();
 
     m_pPhysics_support->in_NetDestroy();
 

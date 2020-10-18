@@ -70,8 +70,17 @@ void CUIActorMenu::InitPartnerInfo()
 {
     if (m_pPartnerInvOwner)
     {
-        if (m_pPartnerInvOwner->use_simplified_visual())
+        CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
+        if (monster || m_pPartnerInvOwner->use_simplified_visual())
+        {
             GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
+            if (monster)
+            {
+                shared_str monster_tex_name = pSettings->r_string(monster->cNameSect(), "icon");
+                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().InitTexture(monster_tex_name.c_str());
+                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().SetStretchTexture(true);
+            }
+        }
         else
             GetModeSpecificPartnerInfo(m_currMenuMode)->InitCharacter(m_pPartnerInvOwner->object_id());
 
