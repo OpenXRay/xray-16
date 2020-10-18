@@ -374,7 +374,7 @@ gpiReadDiskProfile(
 			{
 				if(toupper(value[0]) == 'M')
 					infoCache.sex = GP_MALE;
-				else if(toupper(value[1]) == 'F')
+				else if(toupper(value[0]) == 'F')
 					infoCache.sex = GP_FEMALE;
 				else
 					infoCache.sex = GP_PAT;
