@@ -231,12 +231,21 @@ public:
     GLuint get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
     GLuint get_base_zb() { return rt_Base_Depth->pZRT; }
 
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb);
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
+    {
+        u_setrt(_1, _2, _3, _zb->pZRT);
+    }
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb);
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
+    {
+        u_setrt(_1, _2, _zb->pZRT);
+    }
+    void u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
+
     void u_stencil_optimize(eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);
-    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb);
-    void u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb);
-    void u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
     bool u_need_PP();
