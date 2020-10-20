@@ -451,9 +451,6 @@ void CRender::OnFrame()
     }
 }
 
-void CRender::BeforeWorldRender() {}
-void CRender::AfterWorldRender() {}
-
 void CRender::ObtainRequiredWindowFlags(u32& windowFlags)
 {
     windowFlags |= SDL_WINDOW_OPENGL;

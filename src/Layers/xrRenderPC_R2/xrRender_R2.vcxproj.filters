@@ -641,9 +641,6 @@
     <ClCompile Include="r2.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r2_R_render.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r2_R_sun.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -836,13 +833,7 @@
     <ClCompile Include="r2_rendertarget_accum_point.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="r2_rendertarget_accum_reflected.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r2_rendertarget_accum_spot.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_rendertarget_phase_accumulator.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r2_rendertarget_phase_combine.cpp">
@@ -855,9 +846,6 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r2_rendertarget_phase_smap_D.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r2_rendertarget_phase_ssao.cpp">
@@ -1111,6 +1099,18 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_reflected.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_accumulator.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>

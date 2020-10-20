@@ -417,9 +417,6 @@
     <ClCompile Include="..\xrRender\r__sector.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
-    <ClCompile Include="gl_R_render.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\WallmarksEngine.cpp">
       <Filter>Wallmarks</Filter>
     </ClCompile>
@@ -546,9 +543,6 @@
     <ClCompile Include="gl_rendertarget_accum_point.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_accum_reflected.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_accum_spot.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -559,9 +553,6 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_mark_msaa_edges.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_accumulator.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_combine.cpp">
@@ -577,9 +568,6 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_smap_D.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_ssao.cpp">
@@ -685,6 +673,18 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_reflected.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_accumulator.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,8 +4,6 @@
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
 
-#include "Layers/xrRender/QueryHelper.h"
-
 IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 {
     float d1 = _1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
@@ -100,7 +98,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
                 {
                     // lightsource
-                    light* L = (light*)(spatial->dcast_Light());
+                    light* L = (light*)spatial->dcast_Light();
                     VERIFY(L);
                     float lod = L->get_LOD();
                     if (lod > EPS_L)
@@ -145,9 +143,9 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                     break; // exit loop on frustums
                 }
             }
+            if (g_pGameLevel && (phase == PHASE_NORMAL))
+                g_hud->Render_Last(); // HUD
         }
-        if (g_pGameLevel && (phase == PHASE_NORMAL))
-            g_hud->Render_Last(); // HUD
     }
     else
     {
@@ -166,18 +164,18 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, 0, 0, Target->get_base_zb()); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->get_base_zb()); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, 0, 0, Target->get_base_zb()); // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
 
     // Actual Display
-    Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), NULL, NULL, Target->get_base_zb());
+    Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
     RCache.set_Shader(Target->s_menu);
     RCache.set_Geometry(Target->g_menu);
 
@@ -192,6 +190,16 @@ void CRender::render_menu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
+#ifdef USE_OGL
+    pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+    pv++;
+    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+    pv++;
+    pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+    pv++;
+    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+    pv++;
+#else
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -200,6 +208,7 @@ void CRender::render_menu()
     pv++;
     pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
     pv++;
+#endif // USE_OGL
     RCache.Vertex.Unlock(4, Target->g_menu->vb_stride);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
@@ -212,21 +221,25 @@ void CRender::Render()
     g_r = 1;
     VERIFY(0 == mapDistort.size());
 
+#ifndef USE_DX9
     rmNormal();
+#endif
 
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
     if (_menu_pp)
     {
         render_menu();
         return;
-    };
+    }
 
     IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;
     bool bMenu = pMainMenu ? pMainMenu->CanSkipSceneRendering() : false;
 
     if (!(g_pGameLevel && g_hud) || bMenu)
     {
-        Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), NULL, NULL, Target->get_base_zb());
+#ifndef USE_DX9 // XXX: probably we can just enable this on DX9 too
+        Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
+#endif
         return;
     }
 
@@ -241,9 +254,9 @@ void CRender::Render()
     // Configure
     o.distortion = FALSE; // disable distorion
     Fcolor sun_color = ((light*)Lights.sun._get())->color;
-    BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+    bool bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
     if (o.sunstatic)
-        bSUN = FALSE;
+        bSUN = false;
     // Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
 
     // HOM
@@ -261,11 +274,13 @@ void CRender::Render()
         BasicStats.Culling.Begin();
         float z_distance = ps_r2_zfill;
         Fmatrix m_zfill, m_project;
-        m_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
+        m_project.build_projection(
+            deg2rad(Device.fFOV/* *Device.fASPECT*/),
+            Device.fASPECT, VIEWPORT_NEAR,
             z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
         m_zfill.mul(m_project, Device.mView);
         r_pmask(true, false); // enable priority "0"
-        set_Recorder(NULL);
+        set_Recorder(nullptr);
         phase = PHASE_SMAP;
         render_main(m_zfill, false);
         r_pmask(true, false); // disable priority "1"
@@ -298,10 +313,10 @@ void CRender::Render()
     if (bSUN)
         set_Recorder(&main_coarse_structure);
     else
-        set_Recorder(NULL);
+        set_Recorder(nullptr);
     phase = PHASE_NORMAL;
     render_main(Device.mFullTransform, true);
-    set_Recorder(NULL);
+    set_Recorder(nullptr);
     r_pmask(true, false); // disable priority "1"
     BasicStats.Culling.End();
 
@@ -310,6 +325,10 @@ void CRender::Render()
         split_the_scene_to_minimize_wait = TRUE;
 
     //******* Main render :: PART-0	-- first
+#ifdef USE_OGL
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
     if (!split_the_scene_to_minimize_wait)
     {
         PIX_EVENT(DEFER_PART0_NO_SPLIT);
@@ -330,13 +349,21 @@ void CRender::Render()
         r_dsgraph_render_graph(0);
         Target->disable_aniso();
     }
+#ifdef USE_OGL
+    if (psDeviceFlags.test(rsWireframe))
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
 
     //******* Occlusion testing of volume-limited light-sources
     Target->phase_occq();
     LP_normal.clear();
     LP_pending.clear();
+#ifndef USE_DX9
     if (o.dx10_msaa)
+    {
         RCache.set_ZB(Target->rt_MSAADepth->pZRT);
+    }
+#endif
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
         // perform tests
@@ -391,9 +418,9 @@ void CRender::Render()
     {
         PIX_EVENT(DEFER_PART1_SPLIT);
         // skybox can be drawn here
-        if (0)
+        if (false)
         {
-            Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1_r, 0, Target->rt_MSAADepth->pZRT);
+            Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1_r, nullptr, Target->rt_MSAADepth);
             RCache.set_CullMode(CULL_NONE);
             RCache.set_Stencil(FALSE);
 
@@ -448,6 +475,7 @@ void CRender::Render()
         Lights_LastFrame.clear();
     }
 
+#ifndef USE_DX9
     // full screen pass to mark msaa-edge pixels in highest stencil bit
     if (o.dx10_msaa)
     {
@@ -461,6 +489,7 @@ void CRender::Render()
         PIX_EVENT(DEFER_RAIN);
         render_rain();
     }
+#endif // !USE_DX9
 
     // Directional light - fucking sun
     if (bSUN)
@@ -485,14 +514,21 @@ void CRender::Render()
         RCache.set_xform_project(Device.mProject);
         RCache.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
+#ifdef USE_DX9
+        RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
+            D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+#else
         if (!o.dx10_msaa)
-            RCache.set_Stencil(
-                TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+        {
+            RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
+                D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+        }
         else
-            RCache.set_Stencil(
-                TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-        // RCache.set_Stencil
-        // (TRUE,D3DCMP_ALWAYS,0x00,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
+        {
+            RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0x7f,
+                D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+        }
+#endif // USE_DX9
         RCache.set_CullMode(CULL_CCW);
         RCache.set_ColorWriteEnable();
         r_dsgraph_render_emissive();

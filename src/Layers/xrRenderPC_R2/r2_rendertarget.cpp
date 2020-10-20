@@ -234,6 +234,7 @@ CRenderTarget::CRenderTarget()
             rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
         }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
+        rt_MSAADepth = rt_Base_Depth;
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F);
         rt_Normal.create(r2_RT_N, w, h, D3DFMT_A16B16G16R16F);
@@ -267,6 +268,8 @@ CRenderTarget::CRenderTarget()
         // generic(LDR) RTs
         rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8);
         rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8);
+        rt_Generic_0_r = rt_Generic_0;
+        rt_Generic_1_r = rt_Generic_1;
         //  Igor: for volumetric lights
         // rt_Generic_2.create          (r2_RT_generic2,w,h,D3DFMT_A8R8G8B8     );
         //  temp: for higher quality blends
