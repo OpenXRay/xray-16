@@ -33,7 +33,7 @@ void CRenderTarget::phase_luminance()
     RCache.set_Z(false);
 
     // 000: Perform LUM-SAT, pass 0, 256x256 => 64x64
-    u_setrt(rt_LUM_64, NULL, NULL, NULL);
+    u_setrt(rt_LUM_64, 0, 0, 0);
     {
         float ts = 64;
         float _w = float(BLOOM_size_X);
@@ -51,6 +51,32 @@ void CRenderTarget::phase_luminance()
 
         // Fill vertex buffer
         v_build* pv = (v_build*)RCache.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
+#ifdef USE_OGL
+        pv->p.set(eps, eps, eps, 1.f);
+        pv->uv0.set(a_0.x, a_0.y);
+        pv->uv1.set(a_1.x, a_1.y);
+        pv->uv2.set(a_2.x, a_2.y);
+        pv->uv3.set(a_3.x, a_3.y);
+        pv++;
+        pv->p.set(eps, float(ts + eps), eps, 1.f);
+        pv->uv0.set(a_0.x, b_0.y);
+        pv->uv1.set(a_1.x, b_1.y);
+        pv->uv2.set(a_2.x, b_2.y);
+        pv->uv3.set(a_3.x, b_3.y);
+        pv++;
+        pv->p.set(float(ts + eps), eps, eps, 1.f);
+        pv->uv0.set(b_0.x, a_0.y);
+        pv->uv1.set(b_1.x, a_1.y);
+        pv->uv2.set(b_2.x, a_2.y);
+        pv->uv3.set(b_3.x, a_3.y);
+        pv++;
+        pv->p.set(float(ts + eps), float(ts + eps), eps, 1.f);
+        pv->uv0.set(b_0.x, b_0.y);
+        pv->uv1.set(b_1.x, b_1.y);
+        pv->uv2.set(b_2.x, b_2.y);
+        pv->uv3.set(b_3.x, b_3.y);
+        pv++;
+#else
         pv->p.set(eps, float(ts + eps), eps, 1.f);
         pv->uv0.set(a_0.x, b_0.y);
         pv->uv1.set(a_1.x, b_1.y);
@@ -75,6 +101,7 @@ void CRenderTarget::phase_luminance()
         pv->uv2.set(b_2.x, a_2.y);
         pv->uv3.set(b_3.x, a_3.y);
         pv++;
+#endif // USE_OGL
         RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
         RCache.set_Element(s_luminance->E[0]);
         RCache.set_Geometry(g_bloom_build);
@@ -82,7 +109,7 @@ void CRenderTarget::phase_luminance()
     }
 
     // 111: Perform LUM-SAT, pass 1, 64x64 => 8x8
-    u_setrt(rt_LUM_8, NULL, NULL, NULL);
+    u_setrt(rt_LUM_8, 0, 0, 0);
     {
         // Build filter-kernel
         float _ts = 8;
@@ -98,6 +125,24 @@ void CRenderTarget::phase_luminance()
 
         // Fill vertex buffer
         v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
+#ifdef USE_OGL
+        pv->p.set(eps, eps, eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(a[t].x, a[t].y, a[t + 8].y, a[t + 8].x); // xy/yx	- left+up
+        pv++;
+        pv->p.set(eps, float(_ts + eps), eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
+        pv++;
+        pv->p.set(float(_ts + eps), eps, eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x); // xy/yx	- right+up
+        pv++;
+        pv->p.set(float(_ts + eps), float(_ts + eps), eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x); // xy/yx	- right+down
+        pv++;
+#else
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
             pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
@@ -114,6 +159,7 @@ void CRenderTarget::phase_luminance()
         for (int t = 0; t < 8; t++)
             pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x); // xy/yx	- right+up
         pv++;
+#endif // USE_OGL
         RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
         RCache.set_Element(s_luminance->E[1]);
         RCache.set_Geometry(g_bloom_filter);
@@ -122,7 +168,7 @@ void CRenderTarget::phase_luminance()
 
     // 222: Perform LUM-SAT, pass 2, 8x8 => 1x1
     u32 gpu_id = Device.dwFrame % HW.Caps.iGPUNum;
-    u_setrt(rt_LUM_pool[gpu_id * 2 + 1], NULL, NULL, NULL);
+    u_setrt(rt_LUM_pool[gpu_id * 2 + 1], 0, 0, 0);
     {
         // Build filter-kernel
         float _ts = 1;
@@ -138,6 +184,24 @@ void CRenderTarget::phase_luminance()
 
         // Fill vertex buffer
         v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
+#ifdef USE_OGL
+        pv->p.set(eps, eps, eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(a[t].x, a[t].y, a[t + 8].y, a[t + 8].x); // xy/yx	- left+up
+        pv++;
+        pv->p.set(eps, float(_ts + eps), eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
+        pv++;
+        pv->p.set(float(_ts + eps), eps, eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x); // xy/yx	- right+up
+        pv++;
+        pv->p.set(float(_ts + eps), float(_ts + eps), eps, 1.f);
+        for (int t = 0; t < 8; t++)
+            pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x); // xy/yx	- right+down
+        pv++;
+#else
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
             pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
@@ -154,6 +218,7 @@ void CRenderTarget::phase_luminance()
         for (int t = 0; t < 8; t++)
             pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x); // xy/yx	- right+up
         pv++;
+#endif // USE_OGL
         RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
         f_luminance_adapt = .9f * f_luminance_adapt + .1f * Device.fTimeDelta * ps_r2_tonemap_adaptation;
