@@ -233,12 +233,12 @@ public:
     void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);
     void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
     {
-        u_setrt(_1, _2, _3, _zb->pZRT);
+        u_setrt(_1, _2, _3, _zb ? _zb->pZRT : nullptr);
     }
     void u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb);
     void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
     {
-        u_setrt(_1, _2, _zb->pZRT);
+        u_setrt(_1, _2, _zb ? _zb->pZRT : nullptr);
     }
     void u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
         ID3DDepthStencilView* zb);

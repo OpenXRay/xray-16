@@ -234,12 +234,12 @@ public:
     void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb);
     void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
     {
-        u_setrt(_1, _2, _3, _zb->pZRT);
+        u_setrt(_1, _2, _3, _zb ? _zb->pZRT : 0);
     }
     void u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb);
     void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
     {
-        u_setrt(_1, _2, _zb->pZRT);
+        u_setrt(_1, _2, _zb ? _zb->pZRT : 0);
     }
     void u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
 
