@@ -107,18 +107,6 @@ using RTokenVec = xr_vector<xr_rtoken>;
 #include "net_utils.h"
 #include "Threading/ThreadUtil.h"
 
-#if __has_include(".GitInfo.hpp")
-#include ".GitInfo.hpp"
-#endif
-
-#ifndef GIT_INFO_CURRENT_COMMIT
-#define GIT_INFO_CURRENT_COMMIT unknown
-#endif
-
-#ifndef GIT_INFO_CURRENT_BRANCH
-#define GIT_INFO_CURRENT_BRANCH unknown
-#endif
-
 // destructor
 template <class T>
 class destructor
@@ -134,10 +122,10 @@ public:
 // ***** The Core definition *****
 class XRCORE_API xrCore
 {
-    u32 buildId; // XXX: Make constexpr
-    static constexpr pcstr buildDate = __DATE__;
-    static constexpr pcstr buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
-    static constexpr pcstr buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
+    u32 buildId;
+    static const pcstr buildDate;
+    static const pcstr buildCommit;
+    static const pcstr buildBranch;
 
 public:
     xrCore();
@@ -157,9 +145,9 @@ public:
     void _destroy();
 
     u32 GetBuildId() const { return buildId; }
-    static constexpr pcstr GetBuildDate() { return buildDate; }
-    static constexpr pcstr GetBuildCommit() { return buildCommit; }
-    static constexpr pcstr GetBuildBranch() { return buildBranch; }
+    static pcstr GetBuildDate() { return buildDate; }
+    static pcstr GetBuildCommit() { return buildCommit; }
+    static pcstr GetBuildBranch() { return buildBranch; }
 
     static constexpr pcstr GetBuildConfiguration();
 

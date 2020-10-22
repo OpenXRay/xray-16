@@ -18,6 +18,10 @@
 #include "xrCore/_std_extensions.h"
 #include "SDL.h"
 
+#if __has_include(".GitInfo.hpp")
+#include ".GitInfo.hpp"
+#endif
+
 #include "Compression/compression_ppmd_stream.h"
 extern compression::ppmd::stream* trained_model;
 
@@ -38,6 +42,14 @@ static u32 init_counter = 0;
 #if EXPAND(APPVEYOR) == 1
 #undef APPVEYOR
 #endif
+#endif
+
+#ifndef GIT_INFO_CURRENT_COMMIT
+#define GIT_INFO_CURRENT_COMMIT unknown
+#endif
+
+#ifndef GIT_INFO_CURRENT_BRANCH
+#define GIT_INFO_CURRENT_BRANCH unknown
 #endif
 
 void PrintBuildInfo()
@@ -178,6 +190,10 @@ void SDLLogOutput(void* /*userdata*/,
     xr_sprintf(buf, size, format, mark, from, type, message);
     Log(buf);
 }
+
+const pcstr xrCore::buildDate = __DATE__;
+const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
+const pcstr xrCore::buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
 
 xrCore::xrCore()
     : ApplicationName{}, ApplicationPath{},
