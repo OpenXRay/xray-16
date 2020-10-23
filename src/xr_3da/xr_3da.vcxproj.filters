@@ -15,6 +15,9 @@
     <Filter Include="resources">
       <UniqueIdentifier>{ff5edb3a-265f-46de-b360-f24cfd97703c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dependecies">
+      <UniqueIdentifier>{6865aa32-039a-4a25-89fd-e1f88c548a3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -46,5 +49,31 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\FreeImage.dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\FreeImagePlus.dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbb.dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbb_debug.dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbbmalloc.dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbbmalloc_debug.dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\Externals\AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll">
+      <Filter>Dependecies</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
