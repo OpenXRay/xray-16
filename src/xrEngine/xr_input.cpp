@@ -216,6 +216,7 @@ void CInput::MouseUpdate()
     offs[0] = offs[1] = offs[2] = 0;
 
     SDL_Event events[MAX_MOUSE_EVENTS];
+    SDL_PumpEvents();
     const auto count = SDL_PeepEvents(events, MAX_MOUSE_EVENTS,
         SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
 
