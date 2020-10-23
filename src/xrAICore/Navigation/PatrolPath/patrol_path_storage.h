@@ -41,6 +41,8 @@ public:
         IReader& stream);
     IC const CPatrolPath* path(shared_str patrol_name, bool no_assert = false) const;
     IC const PATROL_REGISTRY& patrol_paths() const;
+
+    const CPatrolPath* add_alias_if_exist(shared_str patrol_name, shared_str duplicate_name);
 };
 
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage_inline.h"

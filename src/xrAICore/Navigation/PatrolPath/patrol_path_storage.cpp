@@ -107,3 +107,13 @@ void CPatrolPathStorage::save(IWriter& stream)
 
     stream.close_chunk();
 }
+
+const CPatrolPath* CPatrolPathStorage::add_alias_if_exist(shared_str patrol_name, shared_str duplicate_name)
+{
+    const_iterator it = patrol_paths().find(patrol_name);
+    if (it == patrol_paths().end())
+        return nullptr;
+
+    m_registry.insert({ duplicate_name, it->second });
+    return it->second;
+}
