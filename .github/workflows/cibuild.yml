@@ -35,17 +35,17 @@ jobs:
         echo ::set-env name=Build_type::%CONFIGURATION:~0,1%%PLATFORM%
         xr_pack_build.cmd
     - name: Upload OpenXRay artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: OpenXRay.${{ env.Build_type }}.7z
         path: res\OpenXRay.${{ env.Build_type }}.7z
     - name: Upload Symbols
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: Symbols.${{ env.Build_type }}.7z
         path: res\Symbols.${{ env.Build_type }}.7z
     - name: Upload Utils
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: Utils.${{ env.Build_type }}.7z
         path: res\Utils.${{ env.Build_type }}.7z
@@ -94,7 +94,7 @@ jobs:
         echo ::set-env name=Build_type::i386
         fi
     - name: Upload OpenXRay artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: openxray_1.6.02_${{ matrix.Configuration }}_${{ env.Build_type }}.deb
         path: bin/openxray_1.6.02_${{ env.Build_type }}.deb
