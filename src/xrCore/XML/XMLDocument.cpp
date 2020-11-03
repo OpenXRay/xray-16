@@ -107,8 +107,10 @@ bool XMLDocument::Set(pcstr text, bool fatal)
 
     if (m_Doc.Error())
     {
-        R_ASSERT3(!fatal, m_Doc.ErrorDesc(), m_xml_file_name);
-        return false;
+        const bool canSkipError = IgnoringMissingEndTagError() && m_Doc.ErrorId() == TiXmlBase::TIXML_ERROR_READING_END_TAG;
+        R_ASSERT3(!fatal || canSkipError, m_Doc.ErrorDesc(), m_xml_file_name);
+        if (!canSkipError)
+            return false;
     }
 
     m_root = m_Doc.FirstChildElement();

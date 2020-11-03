@@ -44,7 +44,7 @@ public:
     CXML_IdToIndex();
     virtual ~CXML_IdToIndex();
 
-    static void InitInternal(bool crashOnFail = true);
+    static void InitInternal(bool crashOnFail = true, bool ignoreMissingEndTagError = false);
 
     static const ITEM_DATA* GetById(const shared_str& str_id, bool no_assert = false);
     static const ITEM_DATA* GetByIndex(int index, bool no_assert = false);
@@ -122,7 +122,7 @@ void CSXML_IdToIndex::DeleteIdToIndexData()
 }
 
 TEMPLATE_SPECIALIZATION
-void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/)
+void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/, bool ignoreMissingEndTagError /*= false*/)
 {
     VERIFY(!m_pItemDataVector);
     T_INIT::InitXmlIdToIndex();
@@ -144,6 +144,7 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/)
         xml_file_full = xml_file;
         xml_file_full += ".xml";
 
+        uiXml->IgnoreMissingEndTagError(ignoreMissingEndTagError);
         const bool success = uiXml->Load(CONFIG_PATH, "gameplay", xml_file_full.c_str(), crashOnFail);
         if (!success)
         {

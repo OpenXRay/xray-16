@@ -82,9 +82,13 @@ public:
     XML_NODE GetLocalRoot() const { return m_pLocalRoot; }
     XML_NODE GetRoot() const { return m_root; }
 
+    bool IgnoringMissingEndTagError() const { return m_bIgnoreMissingEndTagError; }
+    void IgnoreMissingEndTagError(bool value) { m_bIgnoreMissingEndTagError = value; }
+
 protected:
     XML_NODE m_root;
     XML_NODE m_pLocalRoot;
+    bool m_bIgnoreMissingEndTagError;
 
     //буфферный вектор для проверки уникальность аттрибутов
     xr_vector<shared_str> m_AttribValues;
