@@ -336,6 +336,8 @@ class hud_transform_helper
 {
     Fmatrix Pold;
     Fmatrix FTold;
+    static u32 cullMode;
+    static bool isActive;
 
 public:
     hud_transform_helper()
@@ -369,6 +371,10 @@ public:
         RCache.set_xform_project(Device.mProject);
 
         RImplementation.rmNear();
+
+        // preserve culling mode
+        cullMode = RCache.get_CullMode();
+        isActive = true;
     }
 
     ~hud_transform_helper()
@@ -379,8 +385,33 @@ public:
         Device.mProject = Pold;
         Device.mFullTransform = FTold;
         RCache.set_xform_project(Device.mProject);
+        // restore culling mode
+        RCache.set_CullMode(cullMode);
+        isActive = false;
+    }
+
+    static void apply_custom_state()
+    {
+        if (!isActive)
+        {
+            return;
+        }
+
+        if (!psHUD_Flags.test(HUD_LEFT_HANDED))
+        {
+            return;
+        }
+
+        // Change culling mode if HUD meshes were flipped
+        if (cullMode != CULL_NONE)
+        {
+            RCache.set_CullMode(cullMode == CULL_CW ? CULL_CCW : CULL_CW);
+        }
     }
 };
+
+u32 hud_transform_helper::cullMode = CULL_NONE;
+bool hud_transform_helper::isActive = false;
 
 template<class T>
 void __fastcall render_item(const T& item)
@@ -391,6 +422,7 @@ void __fastcall render_item(const T& item)
     RCache.set_xform_world(item.second.Matrix);
     RImplementation.apply_object(item.second.pObject);
     RImplementation.apply_lmaterial();
+    hud_transform_helper::apply_custom_state();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     //RCache.hemi.c_update(V);
     V->Render(calcLOD(item.first, V->vis.sphere.R));

@@ -486,6 +486,7 @@ void CBackend::set_Textures(STextureList* _T) {}
 
 void CBackend::SetupStates()
 {
+    set_CullMode(CULL_CCW);
 #if defined(USE_OGL)
     // TODO: OGL: Implement SetupStates().
 #elif !defined(USE_DX9)
@@ -504,7 +505,6 @@ void CBackend::SetupStates()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_COLORVERTEX, TRUE));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD));
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_LOCALVIEWER, TRUE));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_MATERIAL));

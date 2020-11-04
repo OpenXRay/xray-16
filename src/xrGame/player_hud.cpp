@@ -558,6 +558,15 @@ u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float sp
 void player_hud::update(const Fmatrix& cam_trans)
 {
     Fmatrix trans = cam_trans;
+    if (psHUD_Flags.test(HUD_LEFT_HANDED))
+    {
+        // faster than multiplication by flip matrix
+        trans.m[0][0] = -trans.m[0][0];
+        trans.m[0][1] = -trans.m[0][1];
+        trans.m[0][2] = -trans.m[0][2];
+        trans.m[0][3] = -trans.m[0][3];
+    }
+
     update_inertion(trans);
     update_additional(trans);
 
