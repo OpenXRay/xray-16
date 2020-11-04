@@ -392,15 +392,8 @@ public:
 
     static void apply_custom_state()
     {
-        if (!isActive)
-        {
+        if (!isActive || !psHUD_Flags.test(HUD_LEFT_HANDED))
             return;
-        }
-
-        if (!psHUD_Flags.test(HUD_LEFT_HANDED))
-        {
-            return;
-        }
 
         // Change culling mode if HUD meshes were flipped
         if (cullMode != CULL_NONE)
