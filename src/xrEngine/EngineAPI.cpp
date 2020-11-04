@@ -17,13 +17,14 @@ extern xr_vector<xr_token> VidQualityToken;
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
 
 constexpr pcstr r1_library     = "xrRender_R1";
+constexpr pcstr r2_library     = "xrRender_R2";
 constexpr pcstr gl_library     = "xrRender_GL";
 
 constexpr pcstr RENDER_LIBRARIES[] =
 {
 #if defined(XR_PLATFORM_WINDOWS)
     r1_library,
-    "xrRender_R2",
+    r2_library,
     "xrRender_R4",
 #endif
     gl_library
@@ -199,6 +200,13 @@ void CEngineAPI::CreateRendererList()
         {
             loadLibrary(library);
         }
+
+        const auto it = std::find_if(renderers.begin(), renderers.end(), [](const RendererDesc& desc)
+        {
+            return desc.libraryName == r2_library;
+        });
+        if (it != renderers.end())
+            r2_available = true;
     }
 
     int modeIndex{};
