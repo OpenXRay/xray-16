@@ -134,7 +134,7 @@ float3	calc_reflection( float3 pos_w, float3 norm_w )
 #define USABLE_BIT_12               uint(0x01000000)   // This is because setting 0x47800000 sets all 5 FP16 exponent bits to 1 which means infinity
 #define USABLE_BIT_13               uint(0x02000000)   // This will be translated to a +/-MAX_FLOAT in the FP16 render target (0xFBFF/0x7BFF), overwriting the 
 #define USABLE_BIT_14               uint(0x04000000)   // mantissa bits where other bit flags are stored.
-#define USABLE_BIT_15               uint(0x80000000)
+#define USABLE_BIT_15               uint(   1 << 31)   // = uint(0x80000000) // fix for integrated Intel cards
 #define MUST_BE_SET                 uint(0x40000000)   // This flag *must* be stored in the floating-point representation of the bit flag to store
 
 /*
