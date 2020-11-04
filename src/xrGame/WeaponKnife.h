@@ -18,6 +18,7 @@ protected:
 
     virtual void OnAnimationEnd(u32 state);
     virtual void OnMotionMark(u32 state, const motion_marks&);
+    void OnKnifeStrike(u32 state);
     virtual void OnStateSwitch(u32 S, u32 oldState);
 
     void state_Attacking(float dt);
@@ -29,7 +30,7 @@ protected:
 
 protected:
     bool attackStarted;
-    bool hitEndAnimation;
+    bool attackMotionMarksAvailable;
     bool oldStrikeMethod;
 
     ALife::EHitType m_eHitType;

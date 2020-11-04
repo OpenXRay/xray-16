@@ -48,7 +48,7 @@ CWeaponKnife::CWeaponKnife()
     m_NextHitDivideFactor = 0.75f;
 
     oldStrikeMethod = false;
-    hitEndAnimation = false;
+    attackMotionMarksAvailable = true;
 }
 
 enum class FieldTypes
@@ -287,9 +287,8 @@ void CWeaponKnife::MakeShot(Fvector const& pos, Fvector const& dir, float const 
         ID(), m_eHitType, fireDistance, cartridge, 1.f, SendHit);
 }
 
-void CWeaponKnife::OnMotionMark(u32 state, const motion_marks& M)
+void CWeaponKnife::OnKnifeStrike(u32 state)
 {
-    inherited::OnMotionMark(state, M);
     switch (state)
     {
     case eFire:
@@ -320,15 +319,20 @@ void CWeaponKnife::OnMotionMark(u32 state, const motion_marks& M)
         return;
     }
 
-    Fvector p1, d;
-    p1.set(get_LastFP());
-    d.set(get_LastFD());
-
-    if (H_Parent() && !hitEndAnimation)
+    if (H_Parent())
     {
+        Fvector p1, d;
+        p1.set(get_LastFP());
+        d.set(get_LastFD());
         smart_cast<CEntity*>(H_Parent())->g_fireParams(this, p1, d);
         KnifeStrike(p1, d);
     }
+}
+
+void CWeaponKnife::OnMotionMark(u32 state, const motion_marks& M)
+{
+    inherited::OnMotionMark(state, M);
+    OnKnifeStrike(state);
 }
 
 void CWeaponKnife::OnAnimationEnd(u32 state)
@@ -344,15 +348,17 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
         if (attackStarted)
         {
             attackStarted = false;
+
             if (state == eFire)
                 time = PlayHUDMotion("anm_attack_end", "anim_shoot1_end", FALSE, this, state);
             else // eFire2
                 time = PlayHUDMotion("anm_attack2_end", "anim_shoot2_end", FALSE, this, state);
-            hitEndAnimation = time != 0;
+
+            if (time != 0 && !attackMotionMarksAvailable)
+                OnKnifeStrike(state);
         }
         if (time == 0)
         {
-            hitEndAnimation = false;
             SwitchState(eIdle);
         }
         break;
@@ -375,6 +381,8 @@ void CWeaponKnife::switch2_Attacking(u32 state)
     else // eFire2
         PlayHUDMotion("anm_attack2", "anim_shoot2_start", FALSE, this, state);
 
+    // XXX: could check it once at initialization stage (could use something like CHudItem::isHUDAnimationExist())
+    attackMotionMarksAvailable = !m_current_motion_def->marks.empty();
     attackStarted = true;
     SetPending(TRUE);
 }
