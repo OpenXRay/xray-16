@@ -225,7 +225,9 @@ STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
         srcbuff[len] = 0;
         if (ActionNameToPtr(srcbuff)) // if exist, get bindings
         {
-            VERIFY(GetActionAllBinding(srcbuff, buff, sizeof(buff)));
+            [[maybe_unused]] const bool result =
+                GetActionAllBinding(srcbuff, buff, sizeof(buff));
+            VERIFY(result);
             res.append(buff, xr_strlen(buff));
         }
         else // doesn't exist, insert as is
