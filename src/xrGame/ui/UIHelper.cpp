@@ -12,6 +12,7 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/Windows/UITextFrameLineWnd.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 #include "xrUICore/Buttons/UICheckButton.h"
@@ -152,6 +153,26 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindo
 
     auto ui = xr_new<CUIFrameLineWnd>();
     if (!CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create frame line");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
+    return ui;
+}
+
+CUITextFrameLineWnd* UIHelper::CreateTextFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
+{
+    // If it's not critical element, then don't crash if it doesn't exist
+    if (!critical && !xml.NavigateToNode(ui_path, 0))
+        return nullptr;
+
+    auto ui = xr_new<CUITextFrameLineWnd>();
+    if (!CUIXmlInit::InitTextFrameLine(xml, ui_path, 0, ui, critical))
     {
         R_ASSERT2(!critical, "Failed to create frame line");
         xr_delete(ui);
