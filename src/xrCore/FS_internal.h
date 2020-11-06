@@ -38,7 +38,7 @@ public:
             const int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
 #ifdef _EDITOR
             if (handle == -1)
-                Msg("!Can't create file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
+                Msg("!Can't create file: '%s'. Error: '%s'.", conv_fn, strerror(errno));
 #endif
             hf = _fdopen(handle, "wb");
         }
@@ -46,7 +46,7 @@ public:
         {
             hf = fopen(conv_fn, "wb");
             if (hf == 0)
-                Msg("!Can't write file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
+                Msg("!Can't write file: '%s'. Error: '%s'.", conv_fn, strerror(errno));
         }
         xr_free(conv_fn);
     }
@@ -78,12 +78,12 @@ public:
             for (req_size = count; req_size > mb_sz; req_size -= mb_sz, ptr += mb_sz)
             {
                 size_t W = fwrite(ptr, mb_sz, 1, hf);
-                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", _sys_errlist[errno]);
+                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", strerror(errno));
             }
             if (req_size)
             {
                 size_t W = fwrite(ptr, req_size, 1, hf);
-                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", _sys_errlist[errno]);
+                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", strerror(errno));
             }
         }
     };
