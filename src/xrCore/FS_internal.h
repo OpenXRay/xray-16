@@ -82,7 +82,7 @@ public:
             for (req_size = count; req_size > mb_sz; req_size -= mb_sz, ptr += mb_sz)
             {
                 size_t W = fwrite(ptr, mb_sz, 1, hf);
-                pstr error{};
+                string1024 error;
                 xr_strerror(errno, error, sizeof(error));
                 R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", error);
             }
