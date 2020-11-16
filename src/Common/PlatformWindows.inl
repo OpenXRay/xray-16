@@ -43,3 +43,5 @@ inline void restore_path_separators(char* /*path*/) {}
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_s(result, time) == 0 ? result : NULL; }
 
 #define tid_t DWORD
+
+#define xr_strerror(errno, buffer, bufferSize) strerror_s(buffer, sizeof(buffer), errno)

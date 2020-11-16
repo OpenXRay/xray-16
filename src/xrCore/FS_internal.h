@@ -45,8 +45,11 @@ public:
         else
         {
             hf = fopen(conv_fn, "wb");
+            pstr error{};
             if (hf == 0)
-                Msg("!Can't write file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
+            int temps_ee;
+                xr_strerror(errno, error, sizeof(error));
+                Msg("!Can't write file: '%s'. Error: '%s'.", conv_fn, error);
         }
         xr_free(conv_fn);
     }
@@ -78,12 +81,16 @@ public:
             for (req_size = count; req_size > mb_sz; req_size -= mb_sz, ptr += mb_sz)
             {
                 size_t W = fwrite(ptr, mb_sz, 1, hf);
-                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", _sys_errlist[errno]);
+                pstr error{};
+                xr_strerror(errno, error, sizeof(error));
+                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", error);
             }
             if (req_size)
             {
                 size_t W = fwrite(ptr, req_size, 1, hf);
-                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", _sys_errlist[errno]);
+                pstr error{};
+                xr_strerror(errno, error, sizeof(error));
+                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", error);
             }
         }
     };
