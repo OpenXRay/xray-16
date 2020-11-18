@@ -43,7 +43,6 @@ void CUIMapLocationHint::SetInfoMode(u8 mode)
     m_info["t_hint_text"]->Show(mode == 2);
 }
 
-void CUIMapLocationHint::Draw_() { inherited::Draw(); }
 void CUIMapLocationHint::SetInfoStr(LPCSTR text)
 {
     SetInfoMode(1);

@@ -150,6 +150,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     strconcat(sizeof(pth), pth, start_from, ":map_hint_item");
     m_map_location_hint->Init(uiXml, pth);
     m_map_location_hint->SetAutoDelete(false);
+    m_map_location_hint->SetCustomDraw(true);
 
     // Load maps
 
@@ -385,12 +386,12 @@ void CUIMapWnd::DrawHint()
         {
             if (ms->MapLocation() && ms->MapLocation()->HintEnabled())
             {
-                m_map_location_hint->Draw_();
+                m_map_location_hint->Draw();
             }
         }
         else
         {
-            m_map_location_hint->Draw_();
+            m_map_location_hint->Draw();
         }
     }
 }

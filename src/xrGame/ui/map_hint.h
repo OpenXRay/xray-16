@@ -26,8 +26,6 @@ public:
     void SetInfoMSpot(CMapSpot* spot);
     void SetInfoTask(CGameTask* task);
 
-    void Draw() override { /* do nothing */ } // XXX: check if we can use CUIWindow::SetCustomDraw() instead
-    void Draw_();
     void SetOwner(CUIWindow* w) { m_owner = w; }
     CUIWindow* GetOwner() const { return m_owner; }
 private:
