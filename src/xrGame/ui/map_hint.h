@@ -13,6 +13,7 @@ class CUIMapLocationHint : public CUIFrameWindow
     typedef CUIFrameWindow inherited;
 
     CUIWindow* m_owner{};
+    CUIFrameWindow* m_border;
     AssociativeVector<shared_str, CUIStatic*> m_info;
     void SetInfoMode(u8 mode);
 

@@ -307,6 +307,10 @@ void CUIPdaWnd::DrawHint()
     {
         pUITaskWnd->DrawHint();
     }
+    if (m_pActiveDialog == pUIMapWnd && pUIMapWnd)
+    {
+        pUIMapWnd->DrawHint();
+    }
     else if (m_pActiveDialog == pUIFactionWarWnd && pUIFactionWarWnd)
     {
         //m_hint_wnd->Draw();
