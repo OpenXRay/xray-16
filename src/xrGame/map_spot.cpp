@@ -39,7 +39,7 @@ void CMapSpot::Load(CUIXml* xml, LPCSTR path)
     if (m_bScale)
     {
         m_scale_bounds.y = xml->ReadAttribFlt(path, 0, "scale_max", -1.0f);
-        R_ASSERT2(m_scale_bounds.x > 0 && m_scale_bounds.y > 0, path);
+        R_ASSERT2((m_scale_bounds.x > 0 && m_scale_bounds.y > 0) || ShadowOfChernobylMode, path);
     }
     m_location_level = xml->ReadAttribInt(path, 0, "location_level", 0);
 
