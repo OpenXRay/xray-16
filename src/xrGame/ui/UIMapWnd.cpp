@@ -146,6 +146,8 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         AddCallback(m_UIMainScrollV, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollV));
     }
 
+    init_xml_nav(uiXml);
+
     m_map_location_hint = xr_new<CUIMapLocationHint>();
     strconcat(sizeof(pth), pth, start_from, ":map_hint_item");
     m_map_location_hint->Init(uiXml, pth);
@@ -162,8 +164,6 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     m_GlobalMap->OptimalFit(m_UILevelFrame->GetWndRect());
     m_GlobalMap->SetMinZoom(m_GlobalMap->GetCurrentZoom().x);
     m_currentZoom = m_GlobalMap->GetCurrentZoom().x;
-
-    init_xml_nav(uiXml);
 
     // initialize local maps
     xr_string sect_name;
