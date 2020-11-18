@@ -160,7 +160,8 @@ void CUITabControl::OnTabChange(const shared_str& sCur, const shared_str& sPrev)
     if (tb_prev)
         tb_prev->SendMessage(tb_cur, TAB_CHANGED, NULL);
 
-    tb_cur->SendMessage(tb_cur, TAB_CHANGED, NULL);
+    if (tb_cur)
+        tb_cur->SendMessage(tb_cur, TAB_CHANGED, NULL);
 
     GetMessageTarget()->SendMessage(this, TAB_CHANGED, NULL);
 }
