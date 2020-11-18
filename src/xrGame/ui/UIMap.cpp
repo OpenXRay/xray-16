@@ -22,7 +22,7 @@ CUICustomMap::CUICustomMap()
 
 void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
 {
-    CInifile* levelIni = nullptr;
+    const CInifile* levelIni{};
     if (name == g_pGameLevel->name())
         levelIni = g_pGameLevel->pLevel;
     else
@@ -65,7 +65,7 @@ void CUICustomMap::Draw()
     UI().PopScissor();
 }
 
-void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     m_name = name;
 
@@ -281,7 +281,7 @@ CUIGlobalMap::CUIGlobalMap(CUIMapWnd* pMapWnd)
 
 CUIGlobalMap::~CUIGlobalMap() {}
 void CUIGlobalMap::Initialize() { Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default"); }
-void CUIGlobalMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIGlobalMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     //	Fvector2 size = CUIStatic::GetWndSize();

@@ -64,7 +64,7 @@ public:
     void SetPointerDistance(float d) { m_pointer_dist = d; };
     float GetPointerDistance() { return m_pointer_dist; };
 protected:
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    virtual void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
     virtual void UpdateSpots(){};
 };
 
@@ -100,7 +100,7 @@ public:
     void Initialize();
 
 protected:
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    virtual void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
 };
 
 class CUILevelMap : public CUICustomMap
