@@ -56,7 +56,8 @@ public:
     static bool InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CUIProgressBar* pWnd, bool fatal = true);
     static bool InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, CUIProgressShape* pWnd, bool fatal = true);
     static bool InitFont(CUIXml& xml_doc, LPCSTR path, int index, u32& color, CGameFont*& pFnt);
-    static bool InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUITabControl* pWnd, bool fatal = true);
+    static bool InitTabControl(CUIXml& xml_doc, LPCSTR path,
+        int index, CUITabControl* pWnd, bool fatal = true, bool defaultIdsAllowed = false);
     static bool InitAnimatedStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIAnimatedStatic* pWnd, bool fatal = true);
     static bool InitTextureOffset(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd);
     static bool InitSound(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButton* pWnd);

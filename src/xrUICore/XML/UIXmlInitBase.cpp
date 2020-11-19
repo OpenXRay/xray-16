@@ -730,7 +730,8 @@ bool CUIXmlInitBase::InitFont(CUIXml& xml_doc, LPCSTR path, int index, u32& colo
     return true;
 }
 
-bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUITabControl* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path,
+    int index, CUITabControl* pWnd, bool fatal /*= true*/, bool defaultIdsAllowed /*= false*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);
     if (!nodeExist)
@@ -758,10 +759,12 @@ bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUI
         newButton->m_btn_id = xml_doc.ReadAttrib("button", i, "id");
         if (!newButton->m_btn_id.size())
         {
+            R_ASSERT4(defaultIdsAllowed, "Tab control tab doesn't have 'id' assigned.", xml_doc.m_xml_file_name, path);
+            Msg("~ [%s] doesn't have `id` tag in file [%s]", xml_doc.m_xml_file_name, path);
             string32 temp;
-            Msg("! [%s] doesn't have `id` tag in file [%s]", xml_doc.m_xml_file_name, path);
-            xr_sprintf(temp, "tab_button_%d", i);
+            xr_sprintf(temp, "%d", i);
             newButton->m_btn_id = temp;
+            newButton->m_btn_id_default_assigned = true;
         }
         pWnd->AddItem(newButton);
     }
