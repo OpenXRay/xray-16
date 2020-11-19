@@ -1825,7 +1825,9 @@ void CLocatorAPI::set_file_age(pcstr nm, u32 age)
     int res = _utime(nm, &tm);
     if (0 != res)
     {
-        Msg("!Can't set file age: '%s'. Error: '%s'", nm, _sys_errlist[errno]);
+        string1024 error;
+        xr_strerror(errno, error, sizeof(error));
+        Msg("! Can't set file age: '%s'. Error: '%s'", nm, error);
     }
     else
     {
