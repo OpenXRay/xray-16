@@ -28,27 +28,28 @@ jobs:
       working-directory: src
       run: msbuild /p:Configuration=${{ matrix.Configuration }} /p:Platform=${{ matrix.Platform }} engine.sln 
     - name: Prepare artifacts
+      id: windows-vars
       shell: cmd
       run: |
         set CONFIGURATION=${{ matrix.Configuration }}
         set PLATFORM=${{ matrix.Platform }}
-        echo ::set-env name=Build_type::%CONFIGURATION:~0,1%%PLATFORM%
+        echo ::set-output name=Build_type::%CONFIGURATION:~0,1%%PLATFORM%
         xr_pack_build.cmd
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@v2
       with:
-        name: OpenXRay.${{ env.Build_type }}.7z
-        path: res\OpenXRay.${{ env.Build_type }}.7z
+        name: OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
+        path: res\OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
     - name: Upload Symbols
       uses: actions/upload-artifact@v2
       with:
-        name: Symbols.${{ env.Build_type }}.7z
-        path: res\Symbols.${{ env.Build_type }}.7z
+        name: Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
+        path: res\Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
     - name: Upload Utils
       uses: actions/upload-artifact@v2
       with:
-        name: Utils.${{ env.Build_type }}.7z
-        path: res\Utils.${{ env.Build_type }}.7z
+        name: Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
+        path: res\Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
 
   build-linux:
     runs-on: ubuntu-18.04
@@ -87,14 +88,15 @@ jobs:
         make -j $core_count package
         file openxray_1.6.02_*.deb
     - name: Prepare artifacts
+      id: linux-vars
       run: |
         if [ "${{ matrix.Platform }}" = "x64" ]; then
-        echo ::set-env name=Build_type::amd64
+        echo ::set-output name=Build_type::amd64
         elif [ "${{ matrix.Platform }}" = "x86" ]; then
-        echo ::set-env name=Build_type::i386
+        echo ::set-output name=Build_type::i386
         fi
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@v2
       with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ env.Build_type }}.deb
-        path: bin/openxray_1.6.02_${{ env.Build_type }}.deb
+        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ steps.linux-vars.outputs.Build_type }}.deb
+        path: bin/openxray_1.6.02_${{ steps.linux-vars.outputs.Build_type }}.deb
