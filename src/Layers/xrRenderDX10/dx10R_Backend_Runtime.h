@@ -48,7 +48,7 @@ IC void CBackend::set_ZB(ID3DDepthStencilView* ZB)
 
 IC void CBackend::ClearRT(ID3DRenderTargetView* rt, const Fcolor& color)
 {
-    HW.pContext->ClearRenderTargetView(rt, reinterpret_cast<const float*>(&color));
+    HW.pContext->ClearRenderTargetView(rt, reinterpret_cast<const FLOAT*>(&color));
 }
 
 IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth)
@@ -66,7 +66,7 @@ IC bool CBackend::ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, siz
 #ifdef USE_DX11
     if (HW.pContext1)
     {
-        HW.pContext1->ClearView(rt, reinterpret_cast<const float*>(&color),
+        HW.pContext1->ClearView(rt, reinterpret_cast<const FLOAT*>(&color),
             reinterpret_cast<const D3D_RECT*>(rects), numRects);
         return true;
     }
@@ -84,7 +84,7 @@ IC bool CBackend::ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numR
     if (HW.pContext1)
     {
         Fcolor color = { depth, depth, depth, depth };
-        HW.pContext1->ClearView(zb, reinterpret_cast<float*>(&color),
+        HW.pContext1->ClearView(zb, reinterpret_cast<FLOAT*>(&color),
             reinterpret_cast<const D3D_RECT*>(rects), numRects);
         return true;
     }

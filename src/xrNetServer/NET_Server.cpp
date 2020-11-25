@@ -379,7 +379,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
         // Set server-player info
         DPN_APPLICATION_DESC dpAppDesc;
         DPN_PLAYER_INFO dpPlayerInfo;
-        wchar_t wszName[] = L"XRay Server";
+        WCHAR wszName[] = L"XRay Server";
 
         ZeroMemory(&dpPlayerInfo, sizeof(DPN_PLAYER_INFO));
         dpPlayerInfo.dwSize = sizeof(DPN_PLAYER_INFO);
@@ -392,7 +392,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
         CHK_DX(NET->SetServerInfo(&dpPlayerInfo, NULL, NULL, DPNSETSERVERINFO_SYNC));
 
         // Set server/session description
-        wchar_t SessionNameUNICODE[4096];
+        WCHAR SessionNameUNICODE[4096];
         CHK_DX(MultiByteToWideChar(CP_ACP, 0, session_name, -1, SessionNameUNICODE, 4096));
         // Set server/session description
 
@@ -406,7 +406,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
         dpAppDesc.pvApplicationReservedData = &game_descr;
         dpAppDesc.dwApplicationReservedDataSize = sizeof(game_descr);
 
-        wchar_t SessionPasswordUNICODE[4096];
+        WCHAR SessionPasswordUNICODE[4096];
         if (xr_strlen(password_str))
         {
             CHK_DX(MultiByteToWideChar(CP_ACP, 0, password_str, -1, SessionPasswordUNICODE, 4096));
@@ -883,7 +883,7 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
 
 bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, DWORD* pPort)
 {
-    wchar_t wstrHostname[256] = {0};
+    WCHAR wstrHostname[256] = {0};
     DWORD dwSize = sizeof(wstrHostname);
     DWORD dwDataType = 0;
     CHK_DX(pClientAddress->GetComponentByName(DPNA_KEY_HOSTNAME, wstrHostname, &dwSize, &dwDataType));

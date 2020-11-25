@@ -404,7 +404,7 @@ bool IPureClient::Connect(pcstr options)
                 return false;
             }
 
-            wchar_t SessionPasswordUNICODE[4096];
+            WCHAR SessionPasswordUNICODE[4096];
             if (xr_strlen(password_str)) {
             }
 

@@ -465,7 +465,7 @@ bool IPureClient::Connect(pcstr options)
         R_CHK(net_Address_device->SetSP(bSimulator ? &CLSID_NETWORKSIMULATOR_DP8SP_TCPIP : &CLSID_DP8SP_TCPIP));
 
         // Create our IDirectPlay8Address Server Address, --- Set the SP for our Server Address
-        wchar_t ServerNameUNICODE[256];
+        WCHAR ServerNameUNICODE[256];
         R_CHK(MultiByteToWideChar(CP_ACP, 0, server_name, -1, ServerNameUNICODE, 256));
 
         net_Address_server = nullptr;
@@ -494,7 +494,7 @@ bool IPureClient::Connect(pcstr options)
         xr_strcat( tmp, user_name_str );
         xr_strcat( tmp, "/" );*/
 
-        wchar_t ClientNameUNICODE[256];
+        WCHAR ClientNameUNICODE[256];
         R_CHK(MultiByteToWideChar(CP_ACP, 0, user_name_str, -1, ClientNameUNICODE, 256));
 
         {
@@ -517,7 +517,7 @@ bool IPureClient::Connect(pcstr options)
 
         if (xr_stricmp(server_name, "localhost") == 0)
         {
-            wchar_t SessionPasswordUNICODE[4096];
+            WCHAR SessionPasswordUNICODE[4096];
             if (xr_strlen(password_str))
             {
                 CHK_DX(MultiByteToWideChar(CP_ACP, 0, password_str, -1, SessionPasswordUNICODE, 4096));
@@ -665,7 +665,7 @@ bool IPureClient::Connect(pcstr options)
                 return false;
             }
 
-            wchar_t SessionPasswordUNICODE[4096];
+            WCHAR SessionPasswordUNICODE[4096];
             if (xr_strlen(password_str))
             {
                 CHK_DX(MultiByteToWideChar(CP_ACP, 0, password_str, -1, SessionPasswordUNICODE, 4096));
@@ -1204,7 +1204,7 @@ bool IPureClient::GetServerAddress(ip_address& pAddress, u32* pPort)
     if (!net_Address_server)
         return false;
 
-    wchar_t wstrHostname[2048] = {0};
+    WCHAR wstrHostname[2048] = {0};
     DWORD dwHostNameSize = sizeof(wstrHostname);
     DWORD dwHostNameDataType = DPNA_DATATYPE_STRING;
     CHK_DX(
