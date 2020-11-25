@@ -612,7 +612,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         static const int iMaxPixelsInARow = 1024;
         D3DXFLOAT16* pPixelElement16 = (D3DXFLOAT16*)pPixel;
 
-        FLOAT tmpArray[4 * iMaxPixelsInARow];
+        float tmpArray[4 * iMaxPixelsInARow];
         while (pPixel != pEnd)
         {
             const int iProcessPixels = _min(iMaxPixelsInARow, (s32)(pEnd - pPixel));
