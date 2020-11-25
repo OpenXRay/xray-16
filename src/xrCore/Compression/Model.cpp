@@ -40,7 +40,7 @@ inline TMP_TYPE CLAMP(const TMP_TYPE& X, const TMP_TYPE& LoX, const TMP_TYPE& Hi
 #pragma pack(1)
 struct SEE2_CONTEXT
 {
-    WORD Summ;
+    u16 Summ;
     u8 Shift, Count;
     void init(u32 InitVal)
     {
@@ -69,7 +69,7 @@ SEE2_CONTEXT _PACK_ATTR SEE2Cont[24][32], DummySEE2Cont;
 struct PPM_CONTEXT
 { // Notes:
     u8 NumStats, Flags; // 1. NumStats & NumMasked contain
-    WORD SummFreq; //  number of symbols minus 1
+    u16 SummFreq; //  number of symbols minus 1
     struct STATE
     { // 2. sizeof(BYTE) > sizeof(u8)
         u8 Symbol, Freq; // 3. contexts example:
@@ -103,23 +103,23 @@ static u8 NS2BSIndx[256], QTable[260]; // constants
 static PPM_CONTEXT::STATE* FoundState; // found next state transition
 static int InitEsc, OrderFall, RunLength, InitRL, MaxOrder;
 static u8 CharMask[256], NumMasked, PrevSuccess, EscCount, PrintCount;
-static WORD BinSumm[25][64]; // binary SEE-contexts
+static u16 BinSumm[25][64]; // binary SEE-contexts
 static MR_METHOD MRMethod;
 
 static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod);
 
 inline void SWAP(PPM_CONTEXT::STATE& s1, PPM_CONTEXT::STATE& s2)
 {
-    WORD t1 = (WORD&)s1;
+    u16 t1 = (u16&)s1;
     PPM_CONTEXT* t2 = s1.Successor;
-    (WORD&)s1 = (WORD&)s2;
+    (u16&)s1 = (u16&)s2;
     s1.Successor = s2.Successor;
-    (WORD&)s2 = t1;
+    (u16&)s2 = t1;
     s2.Successor = t2;
 }
 inline void StateCpy(PPM_CONTEXT::STATE& s1, const PPM_CONTEXT::STATE& s2)
 {
-    (WORD&)s1 = (WORD&)s2;
+    (u16&)s1 = (u16&)s2;
     s1.Successor = s2.Successor;
 }
 struct PPMD_STARTUP
@@ -810,7 +810,7 @@ inline void PPM_CONTEXT::encodeBinSymbol(int symbol)
 {
     u8 indx = NS2BSIndx[Suffix->NumStats] + PrevSuccess + Flags;
     STATE& rs = oneState();
-    WORD& bs = BinSumm[QTable[rs.Freq - 1]][indx + ((RunLength >> 26) & 0x20)];
+    u16& bs = BinSumm[QTable[rs.Freq - 1]][indx + ((RunLength >> 26) & 0x20)];
     u32 tmp = rcBinStart(bs, TOT_BITS);
     if (rs.Symbol == symbol)
     {
@@ -836,7 +836,7 @@ inline void PPM_CONTEXT::decodeBinSymbol() const
     u8 indx = NS2BSIndx[Suffix->NumStats] + PrevSuccess + Flags;
     STATE& rs = oneState();
 
-    WORD& bs = BinSumm[QTable[rs.Freq - 1]][indx + ((RunLength >> 26) & 0x20)];
+    u16& bs = BinSumm[QTable[rs.Freq - 1]][indx + ((RunLength >> 26) & 0x20)];
     u32 tmp = rcBinStart(bs, TOT_BITS);
     if (!rcBinDecode(tmp))
     {
@@ -1204,7 +1204,7 @@ static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod)
         InitSubAllocator();
         RunLength = InitRL = -((MaxOrder < 12) ? MaxOrder : 12) - 1;
 
-        static const WORD InitBinEsc[] = {0x3CDD, 0x1F3F, 0x59BF, 0x48F3, 0x64A1, 0x5ABC, 0x6632, 0x6051};
+        static const u16 InitBinEsc[] = {0x3CDD, 0x1F3F, 0x59BF, 0x48F3, 0x64A1, 0x5ABC, 0x6632, 0x6051};
 
         for (i = m = 0; m < 25; m++)
         {
@@ -1214,7 +1214,7 @@ static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod)
             for (k = 0; k < 8; k++)
                 BinSumm[m][k] = BIN_SCALE - InitBinEsc[k] / (i + 1);
             for (k = 8; k < 64; k += 8)
-                memcpy(BinSumm[m] + k, BinSumm[m], 8 * sizeof(WORD));
+                memcpy(BinSumm[m] + k, BinSumm[m], 8 * sizeof(u16));
         }
         for (i = m = 0; m < 24; m++)
         {

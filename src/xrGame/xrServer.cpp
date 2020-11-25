@@ -194,7 +194,7 @@ void xrServer::GetPooledState(xrClientData* xrCL)
 int g_Dump_Update_Write = 0;
 
 #ifdef DEBUG
-INT g_sv_SendUpdate = 0;
+bool g_sv_SendUpdate = false;
 #endif
 
 void xrServer::Update()
@@ -353,7 +353,7 @@ void xrServer::SendUpdatesToAll()
         SendUpdatePacketsToAll();
 
 #ifdef DEBUG
-        g_sv_SendUpdate = 0;
+        g_sv_SendUpdate = false;
 #endif
         if (game->sv_force_sync)
             Perform_game_export();
