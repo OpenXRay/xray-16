@@ -492,7 +492,6 @@ void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
 
     int k;
     FVF::L* pv;
-    u16* i;
     _VertexStream* Stream = &RCache.Vertex;
     _IndexStream* StreamI = &RCache.Index;
 
@@ -512,7 +511,7 @@ void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
     pv++;
     Stream->Unlock(6, vs_L->vb_stride);
 
-    i = StreamI->Lock(24, iBase);
+    u16* i = StreamI->Lock(24, iBase);
     for (k = 0; k < 24; k++, i++)
         *i = IT[k];
     StreamI->Unlock(24);
