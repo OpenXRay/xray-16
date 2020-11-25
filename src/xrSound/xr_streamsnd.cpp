@@ -65,7 +65,7 @@ void CSoundStream::Update()
     {
         fRealVolume = .5f * fRealVolume + .5f * fVolume;
 #if defined(WINDOWS)
-        pBuffer->SetVolume(int((1 - fRealVolume * psSoundVMusic * fBaseVolume) * float(DSBVOLUME_MIN)));
+        pBuffer->SetVolume(LONG((1 - fRealVolume * psSoundVMusic * fBaseVolume) * float(DSBVOLUME_MIN)));
 #endif
         bNeedUpdate = false;
     }
