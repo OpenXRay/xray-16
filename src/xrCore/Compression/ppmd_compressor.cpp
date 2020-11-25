@@ -6,7 +6,7 @@
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 
 
-int InterlockedExchange(LONG volatile *dest, LONG val)
+LONG InterlockedExchange(LONG volatile *dest, LONG val)
 {
     return __sync_lock_test_and_set(dest, val);
 }
