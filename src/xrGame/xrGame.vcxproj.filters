@@ -2254,6 +2254,15 @@
     <Filter Include="UI\Multiplayer\MM_MP\VersionList">
       <UniqueIdentifier>{04c90fd3-e247-4f21-b715-8dc556986837}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{2868f349-9c30-4ec9-b082-bd60883ae435}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Public">
+      <UniqueIdentifier>{26251104-9feb-449c-8dd8-c90ed39d9998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Private">
+      <UniqueIdentifier>{76fdd7d1-db63-4421-a546-6d3fa547ad01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
