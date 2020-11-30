@@ -229,6 +229,7 @@
     <ClCompile Include="..\xrRender\blenders\blender_light_spot.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_luminance.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_blenders.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_loader.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp" />
@@ -327,7 +328,6 @@
     <ClCompile Include="r2_test_hw.cpp" />
     <ClCompile Include="r3_R_rain.cpp" />
     <ClCompile Include="r3_R_sun_support.cpp" />
-    <ClCompile Include="rgl.cpp" />
     <ClCompile Include="rgl_shaders.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

@@ -638,9 +638,6 @@
     <ClCompile Include="..\xrRender\PSLibrary.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r2.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r2_R_sun.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1112,6 +1109,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

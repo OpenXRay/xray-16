@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "r4.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/xr_object.h"
 #include "xrEngine/CustomHUD.h"
@@ -12,10 +11,12 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
+#if !defined(USE_DX9) && !defined(USE_OGL)
+#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "D3DX10Core.h"
+#endif
 
 CRender RImplementation;
 
@@ -67,10 +68,12 @@ static class cl_parallax : public R_constant_setup
     }
 } binder_parallax;
 
+#if !defined(USE_DX9) && !defined(USE_OGL)
 static class cl_LOD : public R_constant_setup
 {
     virtual void setup(R_constant* C) { RCache.LOD.set_LOD(C); }
 } binder_LOD;
+#endif
 
 static class cl_pos_decompress_params : public R_constant_setup
 {
@@ -124,10 +127,18 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
+#ifndef USE_DX9
 static class cl_alpha_ref : public R_constant_setup
 {
-    virtual void setup(R_constant* C) { StateManager.BindAlphaRef(C); }
+    virtual void setup(R_constant* C)
+    {
+        // TODO: OGL: Implement AlphaRef.
+#   ifndef USE_OGL
+        StateManager.BindAlphaRef(C);
+#   endif
+    }
 } binder_alpha_ref;
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
@@ -136,7 +147,9 @@ void CRender::create()
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
+#ifndef USE_DX9
     m_MSAASample = -1;
+#endif
 
     // hardware
     o.smapsize = ps_r2_smapsize;
@@ -144,10 +157,12 @@ void CRender::create()
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
     // Check for NULL render target support
-    //	DX10 disabled
-    // D3DFORMAT	nullrt	= (D3DFORMAT)MAKEFOURCC('N','U','L','L');
-    // o.nullrt			= HW.support	(nullrt,			D3DRTYPE_SURFACE, D3DUSAGE_RENDERTARGET);
+#ifdef USE_DX9
+    D3DFORMAT nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
+    o.nullrt = HW.support(nullrt, D3DRTYPE_SURFACE, D3DUSAGE_RENDERTARGET);
+#else
     o.nullrt = false;
+#endif
     /*
     if (o.nullrt)		{
     Msg				("* NULLRT supported and used");
@@ -205,33 +220,55 @@ void CRender::create()
             }
             if (disable_nullrt)
                 o.nullrt = false;
-        };
+        }
         if (o.nullrt)
             Msg("* ...and used");
-    };
+    }
 
     // SMAP / DST
     o.HW_smap_FETCH4 = FALSE;
-    //	DX10 disabled
-    // o.HW_smap			= HW.support	(D3DFMT_D24X8,			D3DRTYPE_TEXTURE,D3DUSAGE_DEPTHSTENCIL);
+#ifdef USE_DX9
+    o.HW_smap = HW.support(D3DFMT_D24X8, D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
+#else
     o.HW_smap = true;
+#endif
     o.HW_smap_PCF = o.HW_smap;
     if (o.HW_smap)
     {
+#if !defined(USE_DX9) && !defined(USE_OGL)
         //	For ATI it's much faster on DX10 to use D32F format
         if (HW.Caps.id_vendor == 0x1002)
             o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
         else
+#endif
+        {
             o.HW_smap_FORMAT = D3DFMT_D24X8;
+        }
         Msg("* HWDST/PCF supported and used");
     }
 
-    //	DX10 disabled
-    // o.fp16_filter		= HW.support	(D3DFMT_A16B16G16R16F,	D3DRTYPE_TEXTURE,D3DUSAGE_QUERY_FILTER);
-    // o.fp16_blend		= HW.support	(D3DFMT_A16B16G16R16F,
-    // D3DRTYPE_TEXTURE,D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING);
+#ifdef USE_DX9
+    // search for ATI formats
+    if (!o.HW_smap && (0 == strstr(Core.Params, "-nodf24")))
+    {
+        o.HW_smap = HW.support((D3DFORMAT)(MAKEFOURCC('D', 'F', '2', '4')), D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
+        if (o.HW_smap)
+        {
+            o.HW_smap_FORMAT = MAKEFOURCC('D', 'F', '2', '4');
+            o.HW_smap_PCF = FALSE;
+            o.HW_smap_FETCH4 = TRUE;
+        }
+        Msg("* DF24/F4 supported and used [%X]", o.HW_smap_FORMAT);
+    }
+#endif
+
+#ifdef USE_DX9
+    o.fp16_filter = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_FILTER);
+    o.fp16_blend = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING);
+#else
     o.fp16_filter = true;
     o.fp16_blend = true;
+#endif
 
     // emulate ATI-R4xx series
     if (strstr(Core.Params, "-r4xx"))
@@ -252,21 +289,37 @@ void CRender::create()
         o.albedo_wo = TRUE;
 
     // nvstencil on NV40 and up
+    // nvstencil should be enabled only for GF 6xxx and GF 7xxx
+    // if hardware support early stencil (>= GF 8xxx) stencil reset trick only
+    // slows down.
     o.nvstencil = FALSE;
-    // if ((HW.Caps.id_vendor==0x10DE)&&(HW.Caps.id_device>=0x40))	o.nvstencil = TRUE;
+#ifdef USE_DX9
+    if ((HW.Caps.id_vendor == 0x10DE) && (HW.Caps.id_device >= 0x40))
+    {
+        // o.nvstencil = HW.support	((D3DFORMAT)MAKEFOURCC('R','A','W','Z'), D3DRTYPE_SURFACE, 0);
+        // o.nvstencil = TRUE;
+        o.nvstencil = (S_OK ==
+            HW.pD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, 0, D3DRTYPE_TEXTURE,
+                (D3DFORMAT MAKEFOURCC('R', 'A', 'W', 'Z'))));
+    }
+#endif
     if (strstr(Core.Params, "-nonvs"))
         o.nvstencil = FALSE;
 
     // nv-dbt
-    //	DX10 disabled
-    // o.nvdbt				= HW.support	((D3DFORMAT)MAKEFOURCC('N','V','D','B'), D3DRTYPE_SURFACE, 0);
+#ifdef USE_DX9
+    o.nvdbt = HW.support((D3DFORMAT)MAKEFOURCC('N', 'V', 'D', 'B'), D3DRTYPE_SURFACE, 0);
+#else
     o.nvdbt = false;
+#endif
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
 
+#if !defined(USE_OGL)
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)
         Msg("* Managed textures disabled");
+#endif
 
     // options (smap-pool-size)
     if (strstr(Core.Params, "-smap1024"))
@@ -298,7 +351,14 @@ void CRender::create()
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
     o.sunstatic = ps_r2_sun_static;
     o.advancedpp = ps_r2_advanced_pp;
+#ifndef USE_DX9
+#   ifdef USE_OGL
+    // TODO: OGL: temporary disabled, need to fix it
+    o.volumetricfog = false;
+#   else
     o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
+#   endif
+#endif
     o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
     o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;
@@ -313,26 +373,54 @@ void CRender::create()
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
+#ifdef USE_OGL
+    // TODO: OGL: temporary disabled HBAO/HDAO, need to fix it
+    o.ssao_hdao = false;
+    o.ssao_hdao = false;
+#else
+#   ifdef USE_DX9
+    o.ssao_hdao = false;
+#   else
     o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
+#   endif
     o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
+#endif
 
+#ifdef USE_DX9
+    if ((HW.Caps.id_vendor == 0x1002) && (HW.Caps.id_device <= 0x72FF))
+    {
+        o.ssao_opt_data = false;
+        o.ssao_hbao = false;
+    }
+#else
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
     o.hbao_vectorized = false;
-    if (o.ssao_hbao)
+    if (o.ssao_hdao)
+        o.ssao_opt_data = false;
+    else if (o.ssao_hbao)
     {
         if (HW.Caps.id_vendor == 0x1002)
             o.hbao_vectorized = true;
         o.ssao_opt_data = true;
     }
+#endif
 
-    if (o.ssao_hdao)
-        o.ssao_opt_data = false;
-
+#ifndef USE_DX9
+#   ifdef USE_OGL
+    o.dx10_sm4_1 = true;
+#   else
     o.dx10_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.dx10_sm4_1 = o.dx10_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+#   endif
 
     //	MSAA option dependencies
-
+#   ifdef USE_OGL
+    // TODO: OGL: temporary disabled, need to fix it
+    o.dx10_msaa = false;
+    o.dx10_msaa_samples = 0;
+    o.dx10_msaa_opt = o.dx10_msaa;
+    o.dx10_msaa_hybrid = false;
+#   else
     o.dx10_msaa = !!ps_r3_msaa;
     o.dx10_msaa_samples = (1 << ps_r3_msaa);
 
@@ -343,7 +431,7 @@ void CRender::create()
     // o.dx10_msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
     o.dx10_msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.dx10_msaa_hybrid &= !o.dx10_msaa_opt && o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
-
+#   endif
     //	Allow alpha test MSAA for DX10.0
 
     // o.dx10_msaa_alphatest= ps_r2_ls_flags.test((u32)R3FLAG_MSAA_ALPHATEST);
@@ -373,8 +461,10 @@ void CRender::create()
     o.dx10_minmax_sm = ps_r3_minmax_sm;
     o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
 
+#ifndef USE_OGL
     o.dx11_enable_tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+#endif
 
     if (o.dx10_minmax_sm == MMSM_AUTODETECT)
     {
@@ -396,7 +486,7 @@ void CRender::create()
         //	NVidia boards
         if (HW.Caps.id_vendor == 0x10DE)
         {
-            if ((ps_r_sun_shafts >= 2))
+            if (ps_r_sun_shafts >= 2)
             {
                 o.dx10_minmax_sm = MMSM_AUTODETECT;
                 //	Check resolution in runtime in use_minmax_sm_this_frame
@@ -404,15 +494,20 @@ void CRender::create()
             }
         }
     }
+#endif
 
     // constants
     Resources->RegisterConstantSetup("parallax", &binder_parallax);
     Resources->RegisterConstantSetup("water_intensity", &binder_water_intensity);
     Resources->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
-    Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
     Resources->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
     Resources->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
+#ifndef USE_DX9
+    Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
+#   ifndef USE_OGL
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
+#   endif
+#endif
 
     c_lmaterial = "L_material";
     c_sbase = "s_base";
@@ -425,21 +520,28 @@ void CRender::create()
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
+#ifndef USE_DX9
     rmNormal();
+#endif
     marker = 0;
     q_sync_point.Create();
 
-    ::PortalTraverser.initialize();
+    PortalTraverser.initialize();
+    //	TODO: OGL: Implement FluidManager.
+#if !defined(USE_DX9) && !defined(USE_OGL)
     FluidManager.Initialize(70, 70, 70);
     //	FluidManager.Initialize( 100, 100, 100 );
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
+#endif
 }
 
 void CRender::destroy()
 {
     m_bMakeAsyncSS = false;
+#if !defined(USE_DX9) && !defined(USE_OGL)
     FluidManager.Destroy();
-    ::PortalTraverser.destroy();
+#endif
+    PortalTraverser.destroy();
     q_sync_point.Destroy();
     HWOCC.occq_destroy();
     xr_delete(Models);
@@ -499,8 +601,9 @@ void CRender::reset_end()
     }
     //-AVO
 
+#if !defined(USE_DX9) && !defined(USE_OGL)
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
-
+#endif
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
     m_bFirstFrameAfterReset = true;
@@ -527,24 +630,41 @@ void CRender::OnFrame()
     }
 }
 
+#ifdef USE_OGL
+void CRender::ObtainRequiredWindowFlags(u32& windowFlags)
+{
+    windowFlags |= SDL_WINDOW_OPENGL;
+    HW.SetPrimaryAttributes();
+}
+
+void CRender::MakeContextCurrent(RenderContext context)
+{
+    R_ASSERT3(HW.MakeContextCurrent(context) == 0,
+        "Failed to switch OpenGL context", SDL_GetError());
+}
+#endif
+
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new<CROS_impl>(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
 IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
 IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
+
 void CRender::model_Delete(IRenderVisual*& V, bool bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
     V = nullptr;
 }
+
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
     CDetail* D = xr_new<CDetail>();
     D->Load(F);
     return D;
 }
+
 void CRender::model_Delete(IRender_DetailModel*& F)
 {
     if (F)
@@ -555,23 +675,23 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         F = nullptr;
     }
 }
+
 IRenderVisual* CRender::model_CreatePE(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     R_ASSERT3(SE, "Particle effect doesn't exist", name);
     return Models->CreatePE(SE);
 }
+
 IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
     if (SE)
         return Models->CreatePE(SE);
-    else
-    {
-        PS::CPGDef* SG = PSLibrary.FindPGD(name);
-        R_ASSERT3(SG, "Particle effect or group doesn't exist", name);
-        return Models->CreatePG(SG);
-    }
+
+    PS::CPGDef* SG = PSLibrary.FindPGD(name);
+    R_ASSERT3(SG, "Particle effect or group doesn't exist", name);
+    return Models->CreatePG(SG);
 }
 void CRender::models_Prefetch() { Models->Prefetch(); }
 void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
@@ -596,6 +716,7 @@ IRenderVisual* CRender::getVisual(int id)
     VERIFY(id < int(Visuals.size()));
     return Visuals[id];
 }
+
 VertexElement* CRender::getVB_Format(int id, bool alternative)
 {
     if (alternative)
@@ -603,25 +724,21 @@ VertexElement* CRender::getVB_Format(int id, bool alternative)
         VERIFY(id < int(xDC.size()));
         return xDC[id].begin();
     }
-    else
-    {
-        VERIFY(id < int(nDC.size()));
-        return nDC[id].begin();
-    }
+    VERIFY(id < int(nDC.size()));
+    return nDC[id].begin();
 }
+
 VertexStagingBuffer* CRender::getVB(int id, bool alternative)
 {
     if (alternative)
     {
-        VERIFY(id < int(xVB.size()));
+        VERIFY(id<int(xVB.size()));
         return &xVB[id];
     }
-    else
-    {
-        VERIFY(id < int(nVB.size()));
-        return &nVB[id];
-    }
+    VERIFY(id < int(nVB.size()));
+    return &nVB[id];
 }
+
 IndexStagingBuffer* CRender::getIB(int id, bool alternative)
 {
     if (alternative)
@@ -629,12 +746,10 @@ IndexStagingBuffer* CRender::getIB(int id, bool alternative)
         VERIFY(id < int(xIB.size()));
         return &xIB[id];
     }
-    else
-    {
-        VERIFY(id < int(nIB.size()));
-        return &nIB[id];
-    }
+    VERIFY(id < int(nIB.size()));
+    return &nIB[id];
 }
+
 FSlideWindowItem* CRender::getSWI(int id)
 {
     VERIFY(id < int(SWIs.size()));
@@ -657,9 +772,10 @@ void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
+    VERIFY2(T, "Invalid static wallmark triangle");
     if (T->suppress_wm)
         return;
-    VERIFY2(_valid(P) && _valid(s) && T && verts && (s > EPS_L), "Invalid static wallmark params");
+    VERIFY2(_valid(P) && _valid(s) && verts && (s > EPS_L), "Invalid static wallmark params");
     Wallmarks->AddStaticWallmark(T, verts, P, &*S, s);
 }
 
@@ -697,26 +813,34 @@ void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace);
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0.f, 0.f, (float)T->get_width(), (float)T->get_height(), 0.f, 0.02f });
+    const D3D_VIEWPORT viewport = { 0.f, 0.f, T->get_width(), T->get_height(), 0.f, 0.02f };
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0.f, 0.f, (float)T->get_width(), (float)T->get_height(), 0.99999f, 1.f });
+    const D3D_VIEWPORT viewport = { 0.f, 0.f, T->get_width(), T->get_height(), 0.99999f, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0.f, 0.f, (float)T->get_width(), (float)T->get_height(), 0.f, 1.f });
+    const D3D_VIEWPORT viewport = { 0.f, 0.f, T->get_width(), T->get_height(), 0.f, 1.f };
+    RCache.SetViewport(viewport);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CRender::CRender() : m_bFirstFrameAfterReset(false), Sectors_xrc("render") { init_cacades(); }
+CRender::CRender() : m_bFirstFrameAfterReset(false), Sectors_xrc("render")
+{
+    init_cacades();
+}
+
 CRender::~CRender() {}
+
 void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     D3DXRenderBase::DumpStatistics(font, alert);

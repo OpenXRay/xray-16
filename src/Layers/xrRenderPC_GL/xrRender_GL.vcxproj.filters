@@ -345,9 +345,6 @@
     <ClCompile Include="..\xrRender\FHierrarhyVisual.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
     </ClCompile>
-    <ClCompile Include="rgl.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderGL\glStateUtils.cpp">
       <Filter>dx9 to gl Utils</Filter>
     </ClCompile>
@@ -686,6 +683,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

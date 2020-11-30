@@ -740,9 +740,6 @@
     <ClCompile Include="r2_test_hw.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r4.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r4_R_rain.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1312,6 +1309,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

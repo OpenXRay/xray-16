@@ -464,6 +464,7 @@
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
     <ClCompile Include="..\xrRender\light_smapvis.cpp" />
     <ClCompile Include="..\xrRender\light_vis.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_blenders.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_loader.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp" />
@@ -481,7 +482,6 @@
     <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_sector_detect.cpp" />
-    <ClCompile Include="r2.cpp" />
     <ClCompile Include="r2_rendertarget.cpp" />
     <ClCompile Include="r2_rendertarget_accum_direct.cpp" />
     <ClCompile Include="r2_rendertarget_accum_point.cpp" />
