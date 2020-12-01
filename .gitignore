@@ -8,7 +8,8 @@
 # exclude binaries and temporary files
 CMakeCache.txt
 cmake_install.cmake
-cmake-build-debug
+cmake-build-*
+docker/docker-compose.yml
 install_manifest.txt
 bin/
 build/
