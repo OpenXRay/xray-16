@@ -1118,6 +1118,9 @@
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_bloom.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
+    <ClCompile Include="r2_rendertarget_u_set_rt.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
