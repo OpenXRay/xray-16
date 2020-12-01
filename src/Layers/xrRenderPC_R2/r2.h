@@ -77,6 +77,11 @@ public:
         u32 disasm : 1;
         u32 advancedpp : 1; //	advanced post process (DOF, SSAO, volumetrics, etc.)
 
+        u32 dx10_msaa : 1; // DX10.0 path
+        u32 dx10_msaa_opt : 1; // DX10.1 path
+        u32 dx10_gbuffer_opt : 1;
+        u32 dx10_msaa_samples : 4;
+
         u32 forcegloss : 1;
         u32 forceskinw : 1;
         float forcegloss_v;

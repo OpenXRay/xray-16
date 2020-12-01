@@ -11,17 +11,27 @@
 #include "Layers/xrRender/blenders/blender_luminance.h"
 #include "Layers/xrRender/blenders/blender_ssao.h"
 
-#include "Layers/xrRender/blenders/dx10MSAABlender.h"
-#include "Layers/xrRender/blenders/dx10RainBlender.h"
-
-#ifdef USE_DX11
-#include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
-#include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
-#else
-#include "Layers/xrRender/blenders/dx10MinMaxSMBlender.h"
+#ifdef RENDER == R_R2 // XXX: merge old/new cascade blenders into one file
+#include "Layers/xrRender/blenders/blender_light_direct_cascade.h"
 #endif
 
+#ifndef USE_DX9
+#   include "Layers/xrRender/blenders/dx10MSAABlender.h"
+#   include "Layers/xrRender/blenders/dx10RainBlender.h"
+
+#   ifdef USE_DX11
+#       include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
+#       include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
+#   else
+#       include "Layers/xrRender/blenders/dx10MinMaxSMBlender.h"
+#   endif
+#endif
+
+#ifdef USE_DX9
+void CRenderTarget::u_stencil_optimize(BOOL common_stencil)
+#else
 void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
+#endif
 {
 #ifdef USE_OGL
     //	TODO: OGL: should we implement stencil optimization?
@@ -29,17 +39,30 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
     UNUSED(eSOM);
 #else
-    //	TODO: DX10: remove half pixel offset?
+    // TODO: DX10: remove half pixel offset?
     VERIFY(RImplementation.o.nvstencil);
-    // RCache.set_ColorWriteEnable(FALSE);
+#   ifdef USE_DX9
+    RCache.set_ColorWriteEnable(false);
+#   endif
     u32 Offset;
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
     u32 C = color_rgba(255, 255, 255, 255);
+    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+#   ifdef USE_DX9
+    float eps = EPS_S;
+    pv->set(eps, float(_h + eps), eps, 1.f, C, 0, 0);
+    pv++;
+    pv->set(eps, eps, eps, 1.f, C, 0, 0);
+    pv++;
+    pv->set(float(_w + eps), float(_h + eps), eps, 1.f, C, 0, 0);
+    pv++;
+    pv->set(float(_w + eps), eps, eps, 1.f, C, 0, 0);
+    pv++;
+#   else
     float eps = 0;
     float _dw = 0.5f;
     float _dh = 0.5f;
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
     pv->set(-_dw, _h - _dh, eps, 1.f, C, 0, 0);
     pv++;
     pv->set(-_dw, -_dh, eps, 1.f, C, 0, 0);
@@ -48,15 +71,23 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     pv++;
     pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
     pv++;
+#   endif
     RCache.Vertex.Unlock(4, g_combine->vb_stride);
+#   ifdef USE_DX9
+    RCache.set_CullMode(CULL_NONE);
+    if (common_stencil)
+        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00); // keep/keep/keep
+#   endif
     RCache.set_Element(s_occq->E[1]);
 
+#   ifndef USE_DX9
     switch (eSOM)
     {
     case SO_Light: StateManager.SetStencilRef(dwLightMarkerID); break;
     case SO_Combine: StateManager.SetStencilRef(0x01); break;
     default: VERIFY(!"CRenderTarget::u_stencil_optimize. switch no default!");
     }
+#   endif
 
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -66,10 +97,12 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 // 2D texgen (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 {
-    // float	_w						= float(Device.dwWidth);
-    // float	_h						= float(Device.dwHeight);
-    // float	o_w						= (.5f / _w);
-    // float	o_h						= (.5f / _h);
+#ifdef USE_DX9
+    float _w = float(Device.dwWidth);
+    float _h = float(Device.dwHeight);
+    float o_w = (.5f / _w);
+    float o_h = (.5f / _h);
+#endif
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
@@ -79,7 +112,11 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
         0.0f, -0.5f, 0.0f, 0.0f,
 #endif
         0.0f, 0.0f, 1.0f, 0.0f,
+#ifdef USE_DX9
+        0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
+#else
         0.5f, 0.5f, 0.0f, 1.0f
+#endif
     };
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 }
@@ -104,9 +141,11 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
     // rescale - tile it
     float scale_X = float(Device.dwWidth) / float(TEX_jitter);
     float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
-    // float	offset			= (.5f / float(TEX_jitter));
     m_TexelAdjust.scale(scale_X, scale_Y, 1.f);
-    // m_TexelAdjust.translate_over(offset,	offset,	0	);
+#ifdef USE_DX9
+    float offset = (.5f / float(TEX_jitter));
+    m_TexelAdjust.translate_over(offset, offset, 0);
+#endif
     m_Texgen_J.mulA_44(m_TexelAdjust);
 }
 
@@ -195,7 +234,9 @@ CRenderTarget::CRenderTarget()
     if (ps_r_ssao_mode != 2 /*hdao*/)
         ps_r_ssao = _min(ps_r_ssao, 3);
 
+#ifndef USE_DX9
     RImplementation.o.ssao_ultra = ps_r_ssao > 3 && HW.ComputeShadersSupported;
+#endif
     if (RImplementation.o.dx10_msaa)
         SampleCount = RImplementation.o.dx10_msaa_samples;
 
@@ -205,7 +246,7 @@ CRenderTarget::CRenderTarget()
         Msg("dx10_MSAA_opt = on");
     if (RImplementation.o.dx10_gbuffer_opt)
         Msg("dx10_gbuffer_opt = on");
-#endif // DEBUG
+#endif
     param_blur = 0.f;
     param_gray = 0.f;
     param_noise = 0.f;
@@ -228,6 +269,7 @@ CRenderTarget::CRenderTarget()
     // Blenders
     b_accum_spot = xr_new<CBlender_accum_spot>();
 
+#ifndef USE_DX9
     if (RImplementation.o.dx10_msaa)
     {
         int bound = RImplementation.o.dx10_msaa_samples;
@@ -262,7 +304,8 @@ CRenderTarget::CRenderTarget()
             static_cast<CBlender_SSAO_MSAA*>(b_ssao_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
         }
     }
-    //	NORMAL
+#endif
+    // NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
         rt_Base.resize(HW.BackBufferCount);
@@ -274,13 +317,12 @@ CRenderTarget::CRenderTarget()
         }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
-        rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
-
         if (!RImplementation.o.dx10_msaa)
             rt_MSAADepth = rt_Base_Depth;
         else
             rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 
+        rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
         if (!RImplementation.o.dx10_gbuffer_opt)
             rt_Normal.create(r2_RT_N, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
@@ -321,8 +363,9 @@ CRenderTarget::CRenderTarget()
         // generic(LDR) RTs
         rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, 1);
         rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
+#ifndef USE_DX9
         rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
-
+#endif
         if (!RImplementation.o.dx10_msaa)
         {
             rt_Generic_0_r = rt_Generic_0;
@@ -348,38 +391,69 @@ CRenderTarget::CRenderTarget()
 
     // DIRECT (spot)
     pcstr smapTarget = r2_RT_smap_depth;
-    D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
-
-    if (RImplementation.o.HW_smap)
     {
-        D3DFORMAT nullrt = D3DFMT_R5G6B5;
-        if (RImplementation.o.nullrt)
-            nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
+        const u32 smapsize = RImplementation.o.smapsize;
 
-        u32 size = RImplementation.o.smapsize;
-        rt_smap_depth.create(r2_RT_smap_depth, size, size, depth_format);
+        D3DFORMAT depth_format = D3DFMT_D24X8;
+        D3DFORMAT surf_format = D3DFMT_R32F;
 
+        Flags32 flags{};
+        if (!RImplementation.o.HW_smap)
+        {
+            flags.flags = CRT::CreateSurface;
+            smapTarget = r2_RT_smap_surf;
+        }
+        else
+        {
+            depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
+            if (RImplementation.o.nullrt) // use nullrt if possible
+                surf_format = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
+            else
+                surf_format = D3DFMT_R5G6B5;
+        }
+
+        // We only need to create rt_smap_surf on DX9, on DX10+ it's always a NULL render target
+        // TODO: OGL: Don't create a color buffer for the shadow map.
+#if defined(USE_DX9) || defined(USE_OGL)
+        rt_smap_surf.create(r2_RT_smap_surf, smapsize, smapsize, surf_format);
+#endif
+
+        // Create D3DFMT_D24X8 depth-stencil surface if HW smap is not supported,
+        // otherwise - create texture with specified HW_smap_FORMAT
+        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
+#ifndef USE_DX9
         if (RImplementation.o.dx10_minmax_sm)
         {
-            rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, size / 4, size / 4, D3DFMT_R32F);
+            rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, smapsize / 4, smapsize / 4, D3DFMT_R32F);
             CBlender_createminmax TempBlender;
             s_create_minmax_sm.create(&TempBlender, "null");
         }
-
-#ifdef USE_OGL
-        // TODO: OGL: Don't create a color buffer for the shadow map.
-        rt_smap_surf.create(r2_RT_smap_surf, size, size, nullrt);
-#else
-        // We don't need to create rt to use nullrt on DX10+
-        // rt_smap_surf.create (r2_RT_smap_surf, size, size, nullrt);
 #endif
+        // Accum mask
         {
             CBlender_accum_direct_mask b_accum_mask;
-            CBlender_accum_direct b_accum_direct;
-            s_accum_mask.create(&b_accum_mask, "r3" DELIMITER "accum_mask");
-            s_accum_direct.create(&b_accum_direct, "r3" DELIMITER "accum_direct");
+            s_accum_mask.create(&b_accum_mask, "r2" DELIMITER "accum_mask");
         }
-
+        // Accum direct
+        {
+#if RENDER == R_R2
+            if (RImplementation.o.oldshadowcascades)
+            {
+                CBlender_accum_direct b_accum_direct;
+                s_accum_direct.create(&b_accum_direct, "r2" DELIMITER "accum_direct");
+            }
+            else
+            {
+                CBlender_accum_direct_cascade b_accum_direct;
+                s_accum_direct.create(&b_accum_direct, "r2" DELIMITER "accum_direct_cascade");
+            }
+#else
+            CBlender_accum_direct b_accum_direct;
+            s_accum_direct.create(&b_accum_direct, "r2" DELIMITER "accum_direct");
+#endif // RENDER == R_R2
+        }
+        // Accum direct/mask MSAA
+#ifndef USE_DX9
         if (RImplementation.o.dx10_msaa)
         {
             int bound = RImplementation.o.dx10_msaa_samples;
@@ -389,15 +463,25 @@ CRenderTarget::CRenderTarget()
 
             for (int i = 0; i < bound; ++i)
             {
-                s_accum_direct_msaa[i].create(b_accum_direct_msaa[i], "r3" DELIMITER "accum_direct");
-                s_accum_mask_msaa[i].create(b_accum_mask_msaa[i], "r3" DELIMITER "accum_direct");
+                s_accum_direct_msaa[i].create(b_accum_direct_msaa[i], "r2" DELIMITER "accum_direct");
+                s_accum_mask_msaa[i].create(b_accum_mask_msaa[i], "r2" DELIMITER "accum_direct");
             }
         }
+#endif // !USE_DX9
+        // Accum volumetric
         if (RImplementation.o.advancedpp)
         {
+#ifdef USE_DX9
+            if (RImplementation.o.oldshadowcascades)
+                s_accum_direct_volumetric.create("accum_volumetric_sun");
+            else
+                s_accum_direct_volumetric.create("accum_volumetric_sun_cascade");
+#else
             s_accum_direct_volumetric.create("accum_volumetric_sun_nomsaa");
+#endif
             manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
+#ifndef USE_DX9
             if (RImplementation.o.dx10_minmax_sm)
             {
                 s_accum_direct_volumetric_minmax.create("accum_volumetric_sun_nomsaa_minmax");
@@ -420,31 +504,19 @@ CRenderTarget::CRenderTarget()
 
                 for (int i = 0; i < bound; ++i)
                 {
-                    // s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],			"r3" DELIMITER "accum_direct");
+                    // s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],			"r2" DELIMITER "accum_direct");
                     s_accum_direct_volumetric_msaa[i].create(snames[i]);
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
             }
+#endif // !USE_DX9
         }
     }
-    else
-    {
-        //	TODO: DX10: Check if we need old-style SMap
-        VERIFY(!"Use HW SMAPs only!");
-        // smapTarget = r2_RT_smap_surf;
-        // u32	size					=RImplementation.o.smapsize	;
-        // rt_smap_surf.create			(r2_RT_smap_surf,			size,size,D3DFMT_R32F);
-        // rt_smap_depth				= NULL;
-        // R_CHK						(HW.pDevice->CreateDepthStencilSurface	(size,size,D3DFMT_D24X8,D3DMULTISAMPLE_NONE,0,TRUE,&rt_smap_ZB,NULL));
-        // s_accum_mask.create			(b_accum_mask,				"r2" DELIMITER "accum_mask");
-        // s_accum_direct.create		(b_accum_direct,			"r2" DELIMITER "accum_direct");
-        // if (RImplementation.o.advancedpp)
-        //	s_accum_direct_volumetric.create("accum_volumetric_sun");
-    }
 
-    //	RAIN
-    //	TODO: DX10: Create resources only when DX10 rain is enabled.
-    //	Or make DX10 rain switch dynamic?
+    // RAIN
+    // TODO: DX10: Create resources only when DX10 rain is enabled.
+    // Or make DX10 rain switch dynamic?
+#ifndef USE_DX9
     {
         CBlender_rain TempBlender;
         s_rain.create(&TempBlender, "null");
@@ -471,12 +543,15 @@ CRenderTarget::CRenderTarget()
             }
         }
     }
+#endif // !USE_DX9
 
+#ifndef USE_DX9
     if (RImplementation.o.dx10_msaa)
     {
         CBlender_msaa TempBlender;
         s_mark_msaa_edges.create(&TempBlender, "null");
     }
+#endif // !USE_DX9
 
     // POINT
     {
@@ -506,6 +581,7 @@ CRenderTarget::CRenderTarget()
     {
         CBlender_accum_reflected b_accum_reflected;
         s_accum_reflected.create(&b_accum_reflected, "r2" DELIMITER "accum_refl");
+#ifndef USE_DX9
         if (RImplementation.o.dx10_msaa)
         {
             int bound = RImplementation.o.dx10_msaa_samples;
@@ -518,11 +594,12 @@ CRenderTarget::CRenderTarget()
                 s_accum_reflected_msaa[i].create(b_accum_reflected_msaa[i], "null");
             }
         }
+#endif // !USE_DX9
     }
 
     // BLOOM
     {
-        D3DFORMAT fmt = D3DFMT_A8R8G8B8; //;		// D3DFMT_X8R8G8B8
+        D3DFORMAT fmt = D3DFMT_A8R8G8B8; // D3DFMT_X8R8G8B8;
         u32 w = BLOOM_size_X, h = BLOOM_size_Y;
         u32 fvf_build = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
@@ -542,34 +619,14 @@ CRenderTarget::CRenderTarget()
             s_bloom_msaa = s_bloom;
         else
         {
+#ifdef USE_DX9
+            NODEFAULT;
+#else
             CBlender_bloom_build_msaa b_bloom_msaa;
             s_bloom_msaa.create(&b_bloom_msaa, "r2" DELIMITER "bloom");
+#endif
         }
         f_bloom_factor = 0.5f;
-    }
-
-    // TONEMAP
-    {
-        rt_LUM_64.create(r2_RT_luminance_t64, 64, 64, D3DFMT_A16B16G16R16F);
-        rt_LUM_8.create(r2_RT_luminance_t8, 8, 8, D3DFMT_A16B16G16R16F);
-
-        CBlender_luminance b_luminance;
-        s_luminance.create(&b_luminance, "r2" DELIMITER "luminance");
-        f_luminance_adapt = 0.5f;
-
-        t_LUM_src.create(r2_RT_luminance_src);
-        t_LUM_dest.create(r2_RT_luminance_cur);
-
-        // create pool
-        for (u32 it = 0; it < HW.Caps.iGPUNum * 2; it++)
-        {
-            string256 name;
-            xr_sprintf(name, "%s_%d", r2_RT_luminance_pool, it);
-            rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
-            // u_setrt						(rt_LUM_pool[it],	0,	0,	0			);
-            RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
-        }
-        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
     }
 
     // HBAO
@@ -595,9 +652,13 @@ CRenderTarget::CRenderTarget()
         s_ssao.create(&b_ssao, "r2" DELIMITER "ssao");
     }
 
-    // HDAO
+    // HDAO/SSAO
     const bool ssao_blur_on = RImplementation.o.ssao_blur_on;
+#ifdef USE_DX9
+    constexpr bool ssao_hdao_ultra = false;
+#else
     const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra;
+#endif
     if (ssao_blur_on || ssao_hdao_ultra)
     {
         const u32 w = Device.dwWidth, h = Device.dwHeight;
@@ -632,13 +693,49 @@ CRenderTarget::CRenderTarget()
         }
     }
 
+    // TONEMAP
+    {
+        rt_LUM_64.create(r2_RT_luminance_t64, 64, 64, D3DFMT_A16B16G16R16F);
+        rt_LUM_8.create(r2_RT_luminance_t8, 8, 8, D3DFMT_A16B16G16R16F);
+
+        CBlender_luminance b_luminance;
+        s_luminance.create(&b_luminance, "r2" DELIMITER "luminance");
+        f_luminance_adapt = 0.5f;
+
+        t_LUM_src.create(r2_RT_luminance_src);
+        t_LUM_dest.create(r2_RT_luminance_cur);
+
+        // create pool
+        for (u32 it = 0; it < HW.Caps.iGPUNum * 2; it++)
+        {
+            string256 name;
+            xr_sprintf(name, "%s_%d", r2_RT_luminance_pool, it);
+            rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
+#ifdef USE_DX9
+            u_setrt(rt_LUM_pool[it], 0, 0, 0);
+#endif
+            RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
+        }
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
+    }
+
     // COMBINE
     {
+#ifdef USE_DX9
+        static D3DVERTEXELEMENT9 dwDecl[] =
+        {
+            { 0, 0,  D3DDECLTYPE_FLOAT4,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, // pos+uv
+            { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,    0 },
+            { 0, 20, D3DDECLTYPE_FLOAT2,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+            D3DDECL_END()
+        };
+#else
         static D3DVERTEXELEMENT9 dwDecl[] =
         {
             { 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, // pos+uv
             D3DDECL_END()
         };
+#endif
         CBlender_combine b_combine;
         s_combine.create(&b_combine, "r2" DELIMITER "combine");
         s_combine_volumetric.create("combine_volumetric");
@@ -648,8 +745,11 @@ CRenderTarget::CRenderTarget()
         g_combine_VP.create(dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
         g_combine.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
         g_combine_2UV.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+#ifdef USE_DX9
+        g_combine_cuboid.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+#else
         g_combine_cuboid.create(dwDecl, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-
+#endif
         u32 fvf_aa_blur = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
         g_aa_blur.create(fvf_aa_blur, RCache.Vertex.Buffer(), RCache.QuadIB);
@@ -674,8 +774,12 @@ CRenderTarget::CRenderTarget()
         s_postprocess_msaa = s_postprocess;
     else
     {
+#ifdef USE_DX9
+        NODEFAULT;
+#else
         CBlender_postprocess_msaa b_postprocess_msaa;
         s_postprocess_msaa.create(&b_postprocess_msaa, "r2" DELIMITER "post");
+#endif
     }
 
     // Menu
@@ -725,8 +829,9 @@ CRenderTarget::~CRenderTarget()
     t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &t_noise_surf_mipped);
 #else
+#   ifndef USE_DX9
     _RELEASE(t_ss_async);
-
+#   endif
     // Textures
     t_material->surface_set(NULL);
 
@@ -756,9 +861,6 @@ CRenderTarget::~CRenderTarget()
     t_envmap_0.destroy();
     t_envmap_1.destroy();
 
-    //	TODO: DX10: Check if we need old style SMAPs
-    //	_RELEASE					(rt_smap_ZB);
-
     // Jitter
     for (int it = 0; it < TEX_jitter_count; it++)
     {
@@ -769,13 +871,14 @@ CRenderTarget::~CRenderTarget()
         _RELEASE(t_noise_surf[it]);
     }
 
+#   ifndef USE_DX9
     t_noise_mipped->surface_set(NULL);
-#   ifdef DEBUG
+#       ifdef DEBUG
     _SHOW_REF("t_noise_surf_mipped", t_noise_surf_mipped);
-#   endif // DEBUG
+#       endif // DEBUG
     _RELEASE(t_noise_surf_mipped);
+#   endif
 #endif
-
     //
     accum_spot_geom_destroy();
     accum_omnip_geom_destroy();
@@ -785,6 +888,7 @@ CRenderTarget::~CRenderTarget()
     // Blenders
     xr_delete(b_accum_spot);
 
+#ifndef USE_DX9
     if (RImplementation.o.dx10_msaa)
     {
         int bound = RImplementation.o.dx10_msaa_samples;
@@ -806,6 +910,7 @@ CRenderTarget::~CRenderTarget()
             xr_delete(b_ssao_msaa[i]);
         }
     }
+#endif
 }
 
 void CRenderTarget::reset_light_marker(bool bResetStencil)
@@ -813,10 +918,31 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
     dwLightMarkerID = 5;
     if (bResetStencil)
     {
+#ifdef USE_DX9
+        RCache.set_ColorWriteEnable(FALSE);
+#endif
         u32 Offset;
         float _w = float(Device.dwWidth);
         float _h = float(Device.dwHeight);
         u32 C = color_rgba(255, 255, 255, 255);
+#ifdef USE_DX9
+        float eps = EPS_S;
+        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        pv->set(eps, float(_h + eps), eps, 1.f, C, 0, 0);
+        pv++;
+        pv->set(eps, eps, eps, 1.f, C, 0, 0);
+        pv++;
+        pv->set(float(_w + eps), float(_h + eps), eps, 1.f, C, 0, 0);
+        pv++;
+        pv->set(float(_w + eps), eps, eps, 1.f, C, 0, 0);
+        pv++;
+        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RCache.set_CullMode(CULL_NONE);
+        //  Clear everything except last bit
+        RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, dwLightMarkerID, 0x00, 0xFE,
+            D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
+        RCache.set_Element(s_occq->E[1]);
+#else
         float eps = 0;
         float _dw = 0.5f;
         float _dh = 0.5f;
@@ -831,6 +957,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Element(s_occq->E[2]);
+#endif
         RCache.set_Geometry(g_combine);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
@@ -840,7 +967,6 @@ void CRenderTarget::increment_light_marker()
 {
     dwLightMarkerID += 2;
 
-    // if (dwLightMarkerID>10)
     const u32 iMaxMarkerValue = RImplementation.o.dx10_msaa ? 127 : 255;
 
     if (dwLightMarkerID > iMaxMarkerValue)
@@ -855,7 +981,7 @@ bool CRenderTarget::need_to_render_sunshafts()
     {
         CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
         float fValue = E.m_fSunShaftsIntensity;
-        //	TODO: add multiplication by sun color here
+        // TODO: add multiplication by sun color here
         if (fValue < 0.0001)
             return false;
     }
@@ -863,6 +989,7 @@ bool CRenderTarget::need_to_render_sunshafts()
     return true;
 }
 
+#ifndef USE_DX9
 bool CRenderTarget::use_minmax_sm_this_frame()
 {
     switch (RImplementation.o.dx10_minmax_sm)
@@ -882,3 +1009,4 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     default: return false;
     }
 }
+#endif

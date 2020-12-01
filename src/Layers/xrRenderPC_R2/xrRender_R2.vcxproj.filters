@@ -821,9 +821,6 @@
     <ClCompile Include="..\xrRender\occRasterizer_core.cpp">
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClCompile>
-    <ClCompile Include="r2_rendertarget.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r2_rendertarget_accum_direct.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -1119,6 +1116,9 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r2_rendertarget_u_set_rt.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>

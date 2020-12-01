@@ -12,6 +12,7 @@ public:
     CBlender_SSAO();
     virtual ~CBlender_SSAO();
 };
+using CBlender_SSAO_noMSAA = CBlender_SSAO; // XXX: hack to get rid of ifdefs, later should get rid of this hack also.
 #else
 class CBlender_SSAO_noMSAA : public IBlender
 {
