@@ -161,10 +161,15 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
     // float	_h						= float(Device.dwHeight);
     // float	o_w						= (.5f / _w);
     // float	o_h						= (.5f / _h);
-    Fmatrix m_TexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
         //	Removing half pixel offset
-        // 0.5f + o_w,			0.5f + o_h,			0.0f,			1.0f
-        0.5f, 0.5f, 0.0f, 1.0f};
+        // 0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 }
 
@@ -172,8 +177,13 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
 {
     // place into	0..1 space
-    Fmatrix m_TexelAdjust = {
-        0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f};
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
     m_Texgen_J.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 
     // rescale - tile it
@@ -331,7 +341,7 @@ CRenderTarget::CRenderTarget()
 
         for (int i = 0; i < bound; ++i)
         {
-            static LPCSTR SampleDefs[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
+            static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
             b_combine_msaa[i] = xr_new<CBlender_combine_msaa>();
             b_accum_mask_msaa[i] = xr_new<CBlender_accum_direct_mask_msaa>();
             b_accum_direct_msaa[i] = xr_new<CBlender_accum_direct_msaa>();
@@ -496,9 +506,13 @@ CRenderTarget::CRenderTarget()
 
             if (RImplementation.o.dx10_msaa)
             {
-                static LPCSTR snames[] = {"accum_volumetric_sun_msaa0", "accum_volumetric_sun_msaa1",
-                    "accum_volumetric_sun_msaa2", "accum_volumetric_sun_msaa3", "accum_volumetric_sun_msaa4",
-                    "accum_volumetric_sun_msaa5", "accum_volumetric_sun_msaa6", "accum_volumetric_sun_msaa7"};
+                static pcstr snames[] =
+                {
+                    "accum_volumetric_sun_msaa0", "accum_volumetric_sun_msaa1",
+                    "accum_volumetric_sun_msaa2", "accum_volumetric_sun_msaa3",
+                    "accum_volumetric_sun_msaa4", "accum_volumetric_sun_msaa5",
+                    "accum_volumetric_sun_msaa6", "accum_volumetric_sun_msaa7"
+                };
                 int bound = RImplementation.o.dx10_msaa_samples;
 
                 if (RImplementation.o.dx10_msaa_opt)
@@ -539,8 +553,8 @@ CRenderTarget::CRenderTarget()
 
         if (RImplementation.o.dx10_msaa)
         {
-            static LPCSTR SampleDefs[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
-            CBlender_rain_msaa TempBlender[8];
+            static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
+            CBlender_rain_msaa TempBlenderMSAA[8];
 
             int bound = RImplementation.o.dx10_msaa_samples;
 
@@ -549,8 +563,8 @@ CRenderTarget::CRenderTarget()
 
             for (int i = 0; i < bound; ++i)
             {
-                TempBlender[i].SetDefine("ISAMPLE", SampleDefs[i]);
-                s_rain_msaa[i].create(&TempBlender[i], "null");
+                TempBlenderMSAA[i].SetDefine("ISAMPLE", SampleDefs[i]);
+                s_rain_msaa[i].create(&TempBlenderMSAA[i], "null");
                 s_accum_spot_msaa[i].create(b_accum_spot_msaa[i], "r2" DELIMITER "accum_spot_s", "lights" DELIMITER "lights_spot01");
                 s_accum_point_msaa[i].create(b_accum_point_msaa[i], "r2" DELIMITER "accum_point_s");
                 // s_accum_volume_msaa[i].create(b_accum_direct_volumetric_msaa[i], "lights" DELIMITER "lights_spot01");
@@ -722,9 +736,11 @@ CRenderTarget::CRenderTarget()
 
     // COMBINE
     {
-        static D3DVERTEXELEMENT9 dwDecl[] = {
-            {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos+uv
-            D3DDECL_END()};
+        static D3DVERTEXELEMENT9 dwDecl[] =
+        {
+            { 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, // pos+uv
+            D3DDECL_END()
+        };
         CBlender_combine b_combine;
         s_combine.create(&b_combine, "r2" DELIMITER "combine");
         s_combine_volumetric.create("combine_volumetric");
@@ -1020,8 +1036,8 @@ CRenderTarget::CRenderTarget()
 
     // PP
     s_postprocess.create("postprocess");
-    g_postprocess.create(
-        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
+    g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
+        RCache.Vertex.Buffer(), RCache.QuadIB);
     if (!RImplementation.o.dx10_msaa)
         s_postprocess_msaa = s_postprocess;
     else

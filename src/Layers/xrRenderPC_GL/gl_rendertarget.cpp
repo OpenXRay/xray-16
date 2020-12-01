@@ -112,18 +112,18 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode /*eSOM*/)
 // 2D texgen (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 {
-    //float	_w						= float(Device.dwWidth);
-    //float	_h						= float(Device.dwHeight);
-    //float	o_w						= (.5f / _w);
-    //float	o_h						= (.5f / _h);
+    // float	_w						= float(Device.dwWidth);
+    // float	_h						= float(Device.dwHeight);
+    // float	o_w						= (.5f / _w);
+    // float	o_h						= (.5f / _h);
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         //	Removing half pixel offset
-        //0.5f + o_w,			0.5f + o_h,			0.0f,			1.0f
-        0.5f, 0.5f , 0.0f, 1.0f
+        // 0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
+        0.5f, 0.5f, 0.0f, 1.0f
     };
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 }
@@ -144,15 +144,15 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
     // rescale - tile it
     float scale_X = float(Device.dwWidth) / float(TEX_jitter);
     float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
-    //float	offset			= (.5f / float(TEX_jitter));
+    // float	offset			= (.5f / float(TEX_jitter));
     m_TexelAdjust.scale(scale_X, scale_Y, 1.f);
-    //m_TexelAdjust.translate_over(offset,	offset,	0	);
+    // m_TexelAdjust.translate_over(offset,	offset,	0	);
     m_Texgen_J.mulA_44(m_TexelAdjust);
 }
 
 u8 fpack(float v)
 {
-    s32 _v = iFloor((v + 1) * .5f * 255.f + .5f);
+    s32 _v = iFloor(((v + 1) * .5f) * 255.f + .5f);
     clamp(_v, 0, 255);
     return u8(_v);
 }
@@ -188,7 +188,7 @@ Ivector vpack(const Fvector& src)
     float e_best = flt_max;
     int r = bx, g = by, b = bz;
 #ifdef DEBUG
-    int		d=0;
+    int d = 0;
 #else
     int d = 3;
 #endif
@@ -199,7 +199,8 @@ Ivector vpack(const Fvector& src)
                 _v = vunpack(x, y, z);
                 float m = _v.magnitude();
                 float me = _abs(m - 1.f);
-                if (me > 0.03f) continue;
+                if (me > 0.03f)
+                    continue;
                 _v.div(m);
                 float e = _abs(src.dotproduct(_v) - 1.f);
                 if (e < e_best)
@@ -231,7 +232,8 @@ void generate_jitter(u32* dest, u32 elem_count)
                 break;
             }
         }
-        if (valid) samples.push_back(test);
+        if (valid)
+            samples.push_back(test);
     }
     for (u32 it = 0; it < elem_count; it++, dest++)
         *dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
@@ -255,18 +257,18 @@ CRenderTarget::CRenderTarget()
 {
     u32 SampleCount = 1;
 
-    if (ps_r_ssao_mode != 2/*hdao*/)
+    if (ps_r_ssao_mode != 2 /*hdao*/)
         ps_r_ssao = _min(ps_r_ssao, 3);
 
     if (RImplementation.o.dx10_msaa)
         SampleCount = RImplementation.o.dx10_msaa_samples;
 
 #ifdef DEBUG
-    Msg			("MSAA samples = %d", SampleCount );
-   if( RImplementation.o.dx10_msaa_opt )
-       Msg		("dx10_MSAA_opt = on" );
-   if( RImplementation.o.dx10_gbuffer_opt )
-       Msg		("dx10_gbuffer_opt = on" );
+    Msg("MSAA samples = %d", SampleCount);
+    if (RImplementation.o.dx10_msaa_opt)
+        Msg("dx10_MSAA_opt = on");
+    if (RImplementation.o.dx10_gbuffer_opt)
+        Msg("dx10_gbuffer_opt = on");
 #endif // DEBUG
     param_blur = 0.f;
     param_gray = 0.f;
@@ -282,7 +284,6 @@ CRenderTarget::CRenderTarget()
 
     param_color_base = color_rgba(127, 127, 127, 0);
     param_color_gray = color_rgba(85, 85, 85, 0);
-    //param_color_add		= color_rgba(0,0,0,			0);
     param_color_add.set(0.0f, 0.0f, 0.0f);
 
     dwAccumulatorClearMark = 0;
@@ -300,24 +301,24 @@ CRenderTarget::CRenderTarget()
 
         for (int i = 0; i < bound; ++i)
         {
-            static LPCSTR SampleDefs[] = {"0","1","2","3","4","5","6","7"};
+            static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
             b_combine_msaa[i] = xr_new<CBlender_combine_msaa>();
             b_accum_mask_msaa[i] = xr_new<CBlender_accum_direct_mask_msaa>();
             b_accum_direct_msaa[i] = xr_new<CBlender_accum_direct_msaa>();
             b_accum_direct_volumetric_msaa[i] = xr_new<CBlender_accum_direct_volumetric_msaa>();
-            //b_accum_direct_volumetric_sun_msaa[i]	= new CBlender_accum_direct_volumetric_sun_msaa			();
+            // b_accum_direct_volumetric_sun_msaa[i]	= new CBlender_accum_direct_volumetric_sun_msaa			();
             b_accum_spot_msaa[i] = xr_new<CBlender_accum_spot_msaa>();
             b_accum_volumetric_msaa[i] = xr_new<CBlender_accum_volumetric_msaa>();
             b_accum_point_msaa[i] = xr_new<CBlender_accum_point_msaa>();
             b_accum_reflected_msaa[i] = xr_new<CBlender_accum_reflected_msaa>();
             b_ssao_msaa[i] = xr_new<CBlender_SSAO_MSAA>();
             static_cast<CBlender_accum_direct_mask_msaa*>(b_accum_mask_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_direct_volumetric_msaa*>(b_accum_direct_volumetric_msaa[i])->SetDefine(
-                "ISAMPLE", SampleDefs[i]);
-            //static_cast<CBlender_accum_direct_volumetric_sun_msaa*>(b_accum_direct_volumetric_sun_msaa[i])->SetDefine( "ISAMPLE", SampleDefs[i]);
+            static_cast<CBlender_accum_direct_volumetric_msaa*>(b_accum_direct_volumetric_msaa[i])
+                ->SetDefine("ISAMPLE", SampleDefs[i]);
+            // static_cast<CBlender_accum_direct_volumetric_sun_msaa*>(b_accum_direct_volumetric_sun_msaa[i])->SetDefine( "ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_direct_msaa*>(b_accum_direct_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_volumetric_msaa*>(b_accum_volumetric_msaa[i])->SetDefine(
-                "ISAMPLE", SampleDefs[i]);
+            static_cast<CBlender_accum_volumetric_msaa*>(b_accum_volumetric_msaa[i])
+                ->SetDefine("ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_spot_msaa*>(b_accum_spot_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_point_msaa*>(b_accum_point_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_reflected_msaa*>(b_accum_reflected_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
@@ -374,7 +375,7 @@ CRenderTarget::CRenderTarget()
             else
             {
                 // R4xx, no-fp-blend,-> albedo_wo
-                VERIFY (RImplementation.o.albedo_wo);
+                VERIFY(RImplementation.o.albedo_wo);
                 rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount); // normal
                 rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
                 rt_Accumulator_temp.create(r2_RT_accum_temp, w, h, D3DFMT_A16B16G16R16F, SampleCount);
@@ -397,7 +398,7 @@ CRenderTarget::CRenderTarget()
             rt_Generic_1_r.create(r2_RT_generic1_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
         }
         //	Igor: for volumetric lights
-        //rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
+        // rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
         //	temp: for higher quality blends
         if (RImplementation.o.advancedpp)
             rt_Generic_2.create(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
@@ -416,7 +417,8 @@ CRenderTarget::CRenderTarget()
     if (RImplementation.o.HW_smap)
     {
         D3DFORMAT nullrt = D3DFMT_R5G6B5;
-        if (RImplementation.o.nullrt) nullrt = (D3DFORMAT)MAKEFOURCC('N','U','L','L');
+        if (RImplementation.o.nullrt)
+            nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
 
         u32 size = RImplementation.o.smapsize;
         rt_smap_depth.create(r2_RT_smap_depth, size, size, depth_format);
@@ -430,7 +432,7 @@ CRenderTarget::CRenderTarget()
 
         // TODO: OGL: Don't create a color buffer for the shadow map.
         rt_smap_surf.create(r2_RT_smap_surf, size, size, nullrt);
-        //rt_smap_ZB					= NULL;
+        // rt_smap_ZB					= NULL;
         {
             CBlender_accum_direct_mask b_accum_mask;
             CBlender_accum_direct b_accum_direct;
@@ -464,15 +466,12 @@ CRenderTarget::CRenderTarget()
 
             if (RImplementation.o.dx10_msaa)
             {
-                static LPCSTR snames[] = {
-                    "accum_volumetric_sun_msaa0",
-                    "accum_volumetric_sun_msaa1",
-                    "accum_volumetric_sun_msaa2",
-                    "accum_volumetric_sun_msaa3",
-                    "accum_volumetric_sun_msaa4",
-                    "accum_volumetric_sun_msaa5",
-                    "accum_volumetric_sun_msaa6",
-                    "accum_volumetric_sun_msaa7"
+                static pcstr snames[] =
+                {
+                    "accum_volumetric_sun_msaa0", "accum_volumetric_sun_msaa1",
+                    "accum_volumetric_sun_msaa2", "accum_volumetric_sun_msaa3",
+                    "accum_volumetric_sun_msaa4", "accum_volumetric_sun_msaa5",
+                    "accum_volumetric_sun_msaa6", "accum_volumetric_sun_msaa7"
                 };
                 int bound = RImplementation.o.dx10_msaa_samples;
 
@@ -481,7 +480,7 @@ CRenderTarget::CRenderTarget()
 
                 for (int i = 0; i < bound; ++i)
                 {
-                    //s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],			"r3" DELIMITER "accum_direct");
+                    // s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],			"r3" DELIMITER "accum_direct");
                     s_accum_direct_volumetric_msaa[i].create(snames[i]);
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
@@ -492,14 +491,14 @@ CRenderTarget::CRenderTarget()
     {
         //	TODO: DX10: Check if we need old-style SMap
         VERIFY(!"Use HW SMAPs only!");
-        //smapTarget = r2_RT_smap_surf;
-        //u32	size					=RImplementation.o.smapsize	;
-        //rt_smap_surf.create			(r2_RT_smap_surf,			size,size,D3DFMT_R32F);
-        //rt_smap_depth				= NULL;
-        //R_CHK						(HW.pDevice->CreateDepthStencilSurface	(size,size,D3DFMT_D24X8,D3DMULTISAMPLE_NONE,0,TRUE,&rt_smap_ZB,NULL));
-        //s_accum_mask.create			(b_accum_mask,				"r2" DELIMITER "accum_mask");
-        //s_accum_direct.create		(b_accum_direct,			"r2" DELIMITER "accum_direct");
-        //if (RImplementation.o.advancedpp)
+        // smapTarget = r2_RT_smap_surf;
+        // u32	size					=RImplementation.o.smapsize	;
+        // rt_smap_surf.create			(r2_RT_smap_surf,			size,size,D3DFMT_R32F);
+        // rt_smap_depth				= NULL;
+        // R_CHK						(HW.pDevice->CreateDepthStencilSurface	(size,size,D3DFMT_D24X8,D3DMULTISAMPLE_NONE,0,TRUE,&rt_smap_ZB,NULL));
+        // s_accum_mask.create			(b_accum_mask,				"r2" DELIMITER "accum_mask");
+        // s_accum_direct.create		(b_accum_direct,			"r2" DELIMITER "accum_direct");
+        // if (RImplementation.o.advancedpp)
         //	s_accum_direct_volumetric.create("accum_volumetric_sun");
     }
 
@@ -512,8 +511,8 @@ CRenderTarget::CRenderTarget()
 
         if (RImplementation.o.dx10_msaa)
         {
-            static LPCSTR SampleDefs[] = {"0","1","2","3","4","5","6","7"};
-            CBlender_rain_msaa TempBlender2[8];
+            static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
+            CBlender_rain_msaa TempBlenderMSAA[8];
 
             int bound = RImplementation.o.dx10_msaa_samples;
 
@@ -522,11 +521,11 @@ CRenderTarget::CRenderTarget()
 
             for (int i = 0; i < bound; ++i)
             {
-                TempBlender2[i].SetDefine("ISAMPLE", SampleDefs[i]);
-                s_rain_msaa[i].create(&TempBlender2[i], "null");
+                TempBlenderMSAA[i].SetDefine("ISAMPLE", SampleDefs[i]);
+                s_rain_msaa[i].create(&TempBlenderMSAA[i], "null");
                 s_accum_spot_msaa[i].create(b_accum_spot_msaa[i], "r2" DELIMITER "accum_spot_s", "lights" DELIMITER "lights_spot01");
                 s_accum_point_msaa[i].create(b_accum_point_msaa[i], "r2" DELIMITER "accum_point_s");
-                //s_accum_volume_msaa[i].create(b_accum_direct_volumetric_msaa[i], "lights" DELIMITER "lights_spot01");
+                // s_accum_volume_msaa[i].create(b_accum_direct_volumetric_msaa[i], "lights" DELIMITER "lights_spot01");
                 s_accum_volume_msaa[i].create(b_accum_volumetric_msaa[i], "lights" DELIMITER "lights_spot01");
                 s_combine_msaa[i].create(b_combine_msaa[i], "r2" DELIMITER "combine");
             }
@@ -562,7 +561,6 @@ CRenderTarget::CRenderTarget()
         accum_volumetric_geom_create();
         g_accum_volumetric.create(D3DFVF_XYZ, g_accum_volumetric_vb, g_accum_volumetric_ib);
     }
-
 
     // REFLECTED
     {
@@ -628,7 +626,7 @@ CRenderTarget::CRenderTarget()
             string256 name;
             xr_sprintf(name, "%s_%d", r2_RT_luminance_pool, it);
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
-            //u_setrt						(rt_LUM_pool[it],	0,	0,	0			);
+            // u_setrt						(rt_LUM_pool[it],	0,	0,	0			);
             RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
         }
         u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
@@ -679,7 +677,7 @@ CRenderTarget::CRenderTarget()
     {
         static D3DVERTEXELEMENT9 dwDecl[] =
         {
-            {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos+uv
+            { 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, // pos+uv
             D3DDECL_END()
         };
         CBlender_combine b_combine;
@@ -711,7 +709,7 @@ CRenderTarget::CRenderTarget()
         // Texture for async sreenshots
         /* TODO: OGL: Implement screenshots
         {
-            D3D10_TEXTURE2D_DESC	desc;
+            D3D_TEXTURE2D_DESC desc;
             desc.Width = Device.dwWidth;
             desc.Height = Device.dwHeight;
             desc.MipLevels = 1;
@@ -719,12 +717,12 @@ CRenderTarget::CRenderTarget()
             desc.SampleDesc.Count = 1;
             desc.SampleDesc.Quality = 0;
             desc.Format = DXGI_FORMAT_R8G8B8A8_SNORM;
-            desc.Usage = D3D10_USAGE_STAGING;
+            desc.Usage = D3D_USAGE_STAGING;
             desc.BindFlags = 0;
-            desc.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
+            desc.CPUAccessFlags = D3D_CPU_ACCESS_READ;
             desc.MiscFlags = 0;
 
-            R_CHK( HW.pDevice->CreateTexture2D(&desc, 0, &t_ss_async) );
+            R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_ss_async));
         }*/
 
 
@@ -748,10 +746,8 @@ CRenderTarget::CRenderTarget()
                 {
                     for (u32 x = 0; x < TEX_material_LdotN; x++)
                     {
-                        u16* p = (u16*)
-                        ((u8*)(pBits)
-                            + slice * SlicePitch
-                            + y * RowPitch + x * 2);
+                        u16* p = (u16*)((u8*)(pBits) + slice * SlicePitch +
+                            y * RowPitch + x * 2);
                         float ld = float(x) / float(TEX_material_LdotN - 1);
                         float ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
                         ls *= powf(ld, 1 / 32.f);
@@ -760,29 +756,25 @@ CRenderTarget::CRenderTarget()
                         switch (slice)
                         {
                         case 0:
-                        {
-                            // looks like OrenNayar
+                        { // looks like OrenNayar
                             fd = powf(ld, 0.75f); // 0.75
                             fs = powf(ls, 16.f) * .5f;
                         }
-                            break;
+                        break;
                         case 1:
-                        {
-                            // looks like Blinn
+                        { // looks like Blinn
                             fd = powf(ld, 0.90f); // 0.90
                             fs = powf(ls, 24.f);
                         }
-                            break;
+                        break;
                         case 2:
-                        {
-                            // looks like Phong
+                        { // looks like Phong
                             fd = ld; // 1.0
                             fs = powf(ls * 1.01f, 128.f);
                         }
-                            break;
+                        break;
                         case 3:
-                        {
-                            // looks like Metal
+                        { // looks like Metal
                             float s0 = _abs(1 - _abs(0.05f * _sin(33.f * ld) + ld - ls));
                             float s1 = _abs(1 - _abs(0.05f * _cos(33.f * ld * ls) + ld - ls));
                             float s2 = _abs(1 - _abs(ld - ls));
@@ -790,13 +782,12 @@ CRenderTarget::CRenderTarget()
                             fs = powf(_max(_max(s0, s1), s2), 24.f);
                             fs *= powf(ld, 1 / 7.f);
                         }
-                            break;
-                        default:
-                            fd = fs = 0;
+                        break;
+                        default: fd = fs = 0;
                         }
                         s32 _d = clampr(iFloor(fd * 255.5f), 0, 255);
                         s32 _s = clampr(iFloor(fs * 255.5f), 0, 255);
-                        if (y == TEX_material_LdotH - 1 && x == TEX_material_LdotN - 1)
+                        if (y == (TEX_material_LdotH - 1) && x == (TEX_material_LdotN - 1))
                         {
                             _d = 255;
                             _s = 255;
@@ -837,7 +828,7 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    u32 data [TEX_jitter_count - 1];
+                    u32 data[TEX_jitter_count - 1];
                     generate_jitter(data, TEX_jitter_count - 1);
                     for (u32 it2 = 0; it2 < TEX_jitter_count - 1; it2++)
                     {
@@ -875,23 +866,17 @@ CRenderTarget::CRenderTarget()
                     float numDir = 1.0f;
                     switch (ps_r_ssao)
                     {
-                    case 1: numDir = 4.0f;
-                        break;
-                    case 2: numDir = 6.0f;
-                        break;
-                    case 3: numDir = 8.0f;
-                        break;
+                    case 1: numDir = 4.0f; break;
+                    case 2: numDir = 6.0f; break;
+                    case 3: numDir = 8.0f; break;
                     }
                     float angle = 2 * PI * Random.randF(0.0f, 1.0f) / numDir;
                     float dist = Random.randF(0.0f, 1.0f);
-                    //float dest[4];
 
-                    float* p = (float*)
-                    ((u8*)(tempDataHBAO)
-                        + y * HBAOPitch
-                        + x * 4 * sizeof(float));
-                    *p = (float)cos(angle);
-                    *(p + 1) = (float)sin(angle);
+                    float* p =
+                        (float*)((u8*)(tempDataHBAO) + y * HBAOPitch + x * 4 * sizeof(float));
+                    *p = (float)_cos(angle);
+                    *(p + 1) = (float)_sin(angle);
                     *(p + 2) = (float)dist;
                     *(p + 3) = 0;
 
@@ -923,8 +908,8 @@ CRenderTarget::CRenderTarget()
 
     // PP
     s_postprocess.create("postprocess");
-    g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(),
-                         RCache.QuadIB);
+    g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
+        RCache.Vertex.Buffer(), RCache.QuadIB);
     if (!RImplementation.o.dx10_msaa)
         s_postprocess_msaa = s_postprocess;
     else
@@ -972,7 +957,7 @@ CRenderTarget::~CRenderTarget()
     // Jitter
     for (int it = 0; it < TEX_jitter_count; it++)
     {
-        t_noise [it]->surface_set(GL_TEXTURE_2D, 0);
+        t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
     }
     glDeleteTextures(TEX_jitter_count, t_noise_surf);
 
@@ -1001,7 +986,7 @@ CRenderTarget::~CRenderTarget()
             xr_delete(b_accum_direct_msaa[i]);
             xr_delete(b_accum_mask_msaa[i]);
             xr_delete(b_accum_direct_volumetric_msaa[i]);
-            //xr_delete					(b_accum_direct_volumetric_sun_msaa[i]);
+            // xr_delete					(b_accum_direct_volumetric_sun_msaa[i]);
             xr_delete(b_accum_spot_msaa[i]);
             xr_delete(b_accum_volumetric_msaa[i]);
             xr_delete(b_accum_point_msaa[i]);
@@ -1043,7 +1028,7 @@ void CRenderTarget::increment_light_marker()
 {
     dwLightMarkerID += 2;
 
-    //if (dwLightMarkerID>10)
+    // if (dwLightMarkerID>10)
     const u32 iMaxMarkerValue = RImplementation.o.dx10_msaa ? 127 : 255;
 
     if (dwLightMarkerID > iMaxMarkerValue)
@@ -1052,14 +1037,15 @@ void CRenderTarget::increment_light_marker()
 
 bool CRenderTarget::need_to_render_sunshafts()
 {
-    if (! (RImplementation.o.advancedpp && ps_r_sun_shafts))
+    if (!(RImplementation.o.advancedpp && ps_r_sun_shafts))
         return false;
 
     {
         CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
         float fValue = E.m_fSunShaftsIntensity;
         //	TODO: add multiplication by sun color here
-        if (fValue < 0.0001) return false;
+        if (fValue < 0.0001)
+            return false;
     }
 
     return true;
@@ -1069,10 +1055,8 @@ bool CRenderTarget::use_minmax_sm_this_frame()
 {
     switch (RImplementation.o.dx10_minmax_sm)
     {
-    case CRender::MMSM_ON:
-        return true;
-    case CRender::MMSM_AUTO:
-        return need_to_render_sunshafts();
+    case CRender::MMSM_ON: return true;
+    case CRender::MMSM_AUTO: return need_to_render_sunshafts();
     case CRender::MMSM_AUTODETECT:
     {
         u32 dwScreenArea =
@@ -1084,7 +1068,6 @@ bool CRenderTarget::use_minmax_sm_this_frame()
         return false;
     }
 
-    default:
-        return false;
+    default: return false;
     }
 }
