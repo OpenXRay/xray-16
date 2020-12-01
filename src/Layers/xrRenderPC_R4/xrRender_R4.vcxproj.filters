@@ -192,9 +192,6 @@
     <ClInclude Include="..\xrRender\QueryHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="r2_types.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="r4.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -719,6 +716,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h">
       <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2_types.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

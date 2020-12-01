@@ -480,8 +480,8 @@
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
     <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h" />
+    <ClInclude Include="..\xrRender_R2\r2_types.h" />
     <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h" />
-    <ClInclude Include="r2_types.h" />
     <ClInclude Include="gl_rendertarget.h" />
     <ClInclude Include="r3_R_sun_support.h" />
     <ClInclude Include="rgl.h" />
