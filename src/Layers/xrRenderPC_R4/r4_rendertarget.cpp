@@ -175,7 +175,7 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 // 2D texgen for jitter (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
 {
-    // place into	0..1 space
+    // place into 0..1 space
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
@@ -200,12 +200,14 @@ u8 fpack(float v)
     clamp(_v, 0, 255);
     return u8(_v);
 }
+
 u8 fpackZ(float v)
 {
     s32 _v = iFloor(_abs(v) * 255.f + .5f);
     clamp(_v, 0, 255);
     return u8(_v);
 }
+
 Fvector vunpack(s32 x, s32 y, s32 z)
 {
     Fvector pck;
@@ -214,7 +216,12 @@ Fvector vunpack(s32 x, s32 y, s32 z)
     pck.z = -float(z) / 255.f;
     return pck;
 }
-Fvector vunpack(const Ivector& src) { return vunpack(src.x, src.y, src.z); }
+
+Fvector vunpack(const Ivector& src)
+{
+    return vunpack(src.x, src.y, src.z);
+}
+
 Ivector vpack(const Fvector& src)
 {
     Fvector _v;
@@ -291,13 +298,12 @@ CRenderTarget::CRenderTarget()
     param_noise_fps = 25.f;
     param_noise_scale = 1.f;
 
-    im_noise_time = 1.f / 100.0f;
+    im_noise_time = 1.0f / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 
     param_color_base = color_rgba(127, 127, 127, 0);
     param_color_gray = color_rgba(85, 85, 85, 0);
-    // param_color_add		= color_rgba(0,0,0,			0);
     param_color_add.set(0.0f, 0.0f, 0.0f);
 
     dwAccumulatorClearMark = 0;
@@ -329,8 +335,7 @@ CRenderTarget::CRenderTarget()
             static_cast<CBlender_accum_direct_mask_msaa*>(b_accum_mask_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_direct_volumetric_msaa*>(b_accum_direct_volumetric_msaa[i])
                 ->SetDefine("ISAMPLE", SampleDefs[i]);
-            // static_cast<CBlender_accum_direct_volumetric_sun_msaa*>(b_accum_direct_volumetric_sun_msaa[i])->SetDefine(
-            // "ISAMPLE", SampleDefs[i]);
+            // static_cast<CBlender_accum_direct_volumetric_sun_msaa*>(b_accum_direct_volumetric_sun_msaa[i])->SetDefine( "ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_direct_msaa*>(b_accum_direct_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
             static_cast<CBlender_accum_volumetric_msaa*>(b_accum_volumetric_msaa[i])
                 ->SetDefine("ISAMPLE", SampleDefs[i]);
@@ -448,7 +453,7 @@ CRenderTarget::CRenderTarget()
         // rt_smap_surf.create			(r2_RT_smap_surf,			size,size,nullrt		);
         // rt_smap_ZB					= NULL;
         {
-            CBlender_accum_direct_mask  b_accum_mask;
+            CBlender_accum_direct_mask b_accum_mask;
             CBlender_accum_direct b_accum_direct;
             s_accum_mask.create(&b_accum_mask, "r3" DELIMITER "accum_mask");
             s_accum_direct.create(&b_accum_direct, "r3" DELIMITER "accum_direct");
@@ -494,8 +499,7 @@ CRenderTarget::CRenderTarget()
 
                 for (int i = 0; i < bound; ++i)
                 {
-                    // s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],
-                    // "r3" DELIMITER "accum_direct");
+                    // s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],			"r3" DELIMITER "accum_direct");
                     s_accum_direct_volumetric_msaa[i].create(snames[i]);
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
@@ -510,8 +514,7 @@ CRenderTarget::CRenderTarget()
         // u32	size					=RImplementation.o.smapsize	;
         // rt_smap_surf.create			(r2_RT_smap_surf,			size,size,D3DFMT_R32F);
         // rt_smap_depth				= NULL;
-        // R_CHK						(HW.pDevice->CreateDepthStencilSurface
-        // (size,size,D3DFMT_D24X8,D3DMULTISAMPLE_NONE,0,TRUE,&rt_smap_ZB,NULL));
+        // R_CHK						(HW.pDevice->CreateDepthStencilSurface	(size,size,D3DFMT_D24X8,D3DMULTISAMPLE_NONE,0,TRUE,&rt_smap_ZB,NULL));
         // s_accum_mask.create			(b_accum_mask,				"r2" DELIMITER "accum_mask");
         // s_accum_direct.create		(b_accum_direct,			"r2" DELIMITER "accum_direct");
         // if (RImplementation.o.advancedpp)
@@ -645,7 +648,7 @@ CRenderTarget::CRenderTarget()
             // u_setrt						(rt_LUM_pool[it],	0,	0,	0			);
             RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
     }
 
     // HBAO
@@ -740,9 +743,9 @@ CRenderTarget::CRenderTarget()
     }
 
     // Build textures
-	build_textures();
+    build_textures();
 
-	// PP
+    // PP
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
         RCache.Vertex.Buffer(), RCache.QuadIB);
@@ -915,10 +918,9 @@ bool CRenderTarget::use_minmax_sm_this_frame()
         const auto& [width, height] = HW.GetSurfaceSize();
         u32 dwScreenArea = width * height;
 
-        if ((dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold))
+        if (dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold)
             return need_to_render_sunshafts();
-        else
-            return false;
+        return false;
     }
 
     default: return false;

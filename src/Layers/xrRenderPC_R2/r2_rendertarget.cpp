@@ -81,17 +81,27 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
     float _h = float(Device.dwHeight);
     float o_w = (.5f / _w);
     float o_h = (.5f / _h);
-    Fmatrix m_TexelAdjust = {
-        0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f};
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
+    };
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 }
 
 // 2D texgen for jitter (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
 {
-    // place into   0..1 space
-    Fmatrix m_TexelAdjust = {
-        0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f};
+    // place into 0..1 space
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
     m_Texgen_J.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 
     // rescale - tile it
@@ -109,12 +119,14 @@ u8 fpack(float v)
     clamp(_v, 0, 255);
     return u8(_v);
 }
+
 u8 fpackZ(float v)
 {
     s32 _v = iFloor(_abs(v) * 255.f + .5f);
     clamp(_v, 0, 255);
     return u8(_v);
 }
+
 Fvector vunpack(s32 x, s32 y, s32 z)
 {
     Fvector pck;
@@ -123,7 +135,12 @@ Fvector vunpack(s32 x, s32 y, s32 z)
     pck.z = -float(z) / 255.f;
     return pck;
 }
-Fvector vunpack(const Ivector& src) { return vunpack(src.x, src.y, src.z); }
+
+Fvector vunpack(const Ivector& src)
+{
+    return vunpack(src.x, src.y, src.z);
+}
+
 Ivector vpack(const Fvector& src)
 {
     Fvector _v;
@@ -184,7 +201,7 @@ CRenderTarget::CRenderTarget()
     param_noise_fps = 25.f;
     param_noise_scale = 1.f;
 
-    im_noise_time = 1.f / 100.0f;
+    im_noise_time = 1.0f / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 
@@ -376,6 +393,7 @@ CRenderTarget::CRenderTarget()
             w = Device.dwWidth;
             h = Device.dwHeight;
         }
+
         D3DFORMAT fmt = HW.Caps.id_vendor == 0x10DE ? D3DFMT_R32F : D3DFMT_R16F;
         rt_half_depth.create(r2_RT_half_depth, w, h, fmt);
 

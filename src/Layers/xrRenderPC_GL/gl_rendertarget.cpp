@@ -23,7 +23,6 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     }
     else
         VERIFY3(false, __FUNCTION__, "TODO: implement 'else' path");
-
     GLenum buffers[3] = {GL_NONE};
     if (_1)
     {
@@ -131,7 +130,7 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 // 2D texgen for jitter (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
 {
-    // place into	0..1 space
+    // place into 0..1 space
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,

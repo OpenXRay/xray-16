@@ -26,7 +26,8 @@ static void generate_jitter(u32* dest, u32 elem_count)
 }
 
 void CRenderTarget::build_textures()
-{    //  Igor: TMP
+{
+    //  Igor: TMP
     //  Create an RT for online screenshot makining
     {
         D3DSURFACE_DESC desc;
