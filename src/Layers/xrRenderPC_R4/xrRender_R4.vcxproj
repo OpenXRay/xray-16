@@ -531,6 +531,7 @@
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
     <ClCompile Include="..\xrRender\light_smapvis.cpp" />
     <ClCompile Include="..\xrRender\light_vis.cpp" />
+    <ClCompile Include="r4_rendertarget_build_textures.cpp" />
     <ClCompile Include="r4_R_sun.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />
     <ClCompile Include="r4_rendertarget.cpp" />

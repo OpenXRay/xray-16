@@ -27,7 +27,7 @@ public:
     };
 
     u32 dwLightMarkerID;
-    // 
+    //
     IBlender* b_accum_spot;
     IBlender* b_combine_msaa[8];
     IBlender* b_accum_mask_msaa[8];
@@ -64,7 +64,7 @@ public:
     ref_rt rt_Normal; // 64bit,	fat	(x,y,z,hemi)			(eye-space)
     ref_rt rt_Color; // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
 
-    // 
+    //
     ref_rt rt_Accumulator; // 64bit		(r,g,b,specular)
     ref_rt rt_Accumulator_temp;// only for HW which doesn't feature fp16 blend
     ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
@@ -86,7 +86,7 @@ public:
 
     // smap
     ref_rt rt_smap_surf; // 32bit,		color
-    ref_rt rt_smap_depth; // 24(32) bit,	depth 
+    ref_rt rt_smap_depth; // 24(32) bit,	depth
     ref_rt rt_smap_depth_minmax; //	is used for min/max sm
 
     //	Igor: for async screenshots
@@ -218,6 +218,9 @@ private:
 public:
     CRenderTarget();
     ~CRenderTarget();
+
+    void build_textures();
+
     void accum_point_geom_create();
     void accum_point_geom_destroy();
     void accum_omnip_geom_create();

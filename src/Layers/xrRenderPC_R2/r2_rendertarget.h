@@ -177,6 +177,8 @@ public:
     CRenderTarget();
     ~CRenderTarget();
 
+    void build_textures();
+
     void accum_point_geom_create();
     void accum_point_geom_destroy();
     void accum_omnip_geom_create();

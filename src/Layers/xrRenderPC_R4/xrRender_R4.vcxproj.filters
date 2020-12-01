@@ -1313,6 +1313,9 @@
     <ClCompile Include="..\xrRender_R2\r2.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="r4_rendertarget_build_textures.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

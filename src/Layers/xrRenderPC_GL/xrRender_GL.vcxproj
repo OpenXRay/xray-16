@@ -250,6 +250,7 @@
     <ClCompile Include="gl_rendertarget_accum_direct.cpp" />
     <ClCompile Include="gl_rendertarget_accum_point.cpp" />
     <ClCompile Include="gl_rendertarget_accum_spot.cpp" />
+    <ClCompile Include="gl_rendertarget_build_textures.cpp" />
     <ClCompile Include="gl_rendertarget_create_minmaxSM.cpp" />
     <ClCompile Include="gl_rendertarget_draw_rain.cpp" />
     <ClCompile Include="gl_rendertarget_mark_msaa_edges.cpp" />

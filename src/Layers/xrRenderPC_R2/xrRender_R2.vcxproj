@@ -486,6 +486,7 @@
     <ClCompile Include="r2_rendertarget_accum_direct.cpp" />
     <ClCompile Include="r2_rendertarget_accum_point.cpp" />
     <ClCompile Include="r2_rendertarget_accum_spot.cpp" />
+    <ClCompile Include="r2_rendertarget_build_textures.cpp" />
     <ClCompile Include="r2_rendertarget_phase_combine.cpp" />
     <ClCompile Include="r2_rendertarget_phase_occq.cpp" />
     <ClCompile Include="r2_rendertarget_phase_scene.cpp" />
