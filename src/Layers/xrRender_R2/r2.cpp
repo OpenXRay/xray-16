@@ -813,21 +813,21 @@ void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace);
 void CRender::rmNear()
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0.f, 0.f, T->get_width(), T->get_height(), 0.f, 0.02f };
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.f, 0.02f };
     RCache.SetViewport(viewport);
 }
 
 void CRender::rmFar()
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0.f, 0.f, T->get_width(), T->get_height(), 0.99999f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f };
     RCache.SetViewport(viewport);
 }
 
 void CRender::rmNormal()
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0.f, 0.f, T->get_width(), T->get_height(), 0.f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.f, 1.f };
     RCache.SetViewport(viewport);
 }
 
