@@ -507,6 +507,7 @@
     <ClCompile Include="..\xrRender_R2\r2.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_blenders.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_loader.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_point_geom.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_reflected.cpp" />
@@ -535,7 +536,6 @@
     <ClCompile Include="r4_rendertarget_u_set_rt.cpp" />
     <ClCompile Include="r4_R_sun.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />
-    <ClCompile Include="r4_rendertarget.cpp" />
     <ClCompile Include="r4_rendertarget_accum_direct.cpp" />
     <ClCompile Include="r4_rendertarget_accum_point.cpp" />
     <ClCompile Include="r4_rendertarget_accum_spot.cpp" />

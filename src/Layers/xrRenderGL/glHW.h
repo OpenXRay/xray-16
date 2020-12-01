@@ -51,6 +51,7 @@ public:
     pcstr ShadingVersion;
     std::pair<GLint, GLint> OpenGLVersion;
     bool ShaderBinarySupported;
+    bool ComputeShadersSupported;
 };
 
 extern ECORE_API CHW HW;

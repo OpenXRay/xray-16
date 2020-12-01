@@ -10,16 +10,28 @@
 #include "Layers/xrRender/blenders/blender_bloom_build.h"
 #include "Layers/xrRender/blenders/blender_luminance.h"
 #include "Layers/xrRender/blenders/blender_ssao.h"
-#include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
-#include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
+
 #include "Layers/xrRender/blenders/dx10MSAABlender.h"
 #include "Layers/xrRender/blenders/dx10RainBlender.h"
 
+#ifdef USE_DX11
+#include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
+#include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
+#else
+#include "Layers/xrRender/blenders/dx10MinMaxSMBlender.h"
+#endif
+
 void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 {
+#ifdef USE_OGL
+    //	TODO: OGL: should we implement stencil optimization?
+    VERIFY(RImplementation.o.nvstencil);
+    VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
+    UNUSED(eSom);
+#else
     //	TODO: DX10: remove half pixel offset?
     VERIFY(RImplementation.o.nvstencil);
-    // RCache.set_ColorWriteEnable	(FALSE);
+    // RCache.set_ColorWriteEnable(FALSE);
     u32 Offset;
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
@@ -48,6 +60,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+#endif
 }
 
 // 2D texgen (texture adjustment matrix)
@@ -60,10 +73,12 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
+#ifdef USE_OGL
+        0.0f, 0.5f, 0.0f, 0.0f,
+#else
         0.0f, -0.5f, 0.0f, 0.0f,
+#endif
         0.0f, 0.0f, 1.0f, 0.0f,
-        //	Removing half pixel offset
-        // 0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         0.5f, 0.5f, 0.0f, 1.0f
     };
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
@@ -76,7 +91,11 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
+#ifdef USE_OGL
+        0.0f, 0.5f, 0.0f, 0.0f,
+#else
         0.0f, -0.5f, 0.0f, 0.0f,
+#endif
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
@@ -155,13 +174,13 @@ Ivector vpack(const Fvector& src)
     return ipck;
 }
 
-void manually_assign_texture(ref_shader& shader, pcstr dx10textureName, pcstr rendertargetTextureName)
+void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr rendertargetTextureName)
 {
     SPass& pass = *shader->E[0]->passes[0];
     if (!pass.constants)
         return;
 
-    const ref_constant constant = pass.constants->get(dx10textureName);
+    const ref_constant constant = pass.constants->get(textureName);
     if (!constant)
         return;
 
@@ -347,8 +366,13 @@ CRenderTarget::CRenderTarget()
             s_create_minmax_sm.create(&TempBlender, "null");
         }
 
-        // rt_smap_surf.create			(r2_RT_smap_surf,			size,size,nullrt		);
-        // rt_smap_ZB					= NULL;
+#ifdef USE_OGL
+        // TODO: OGL: Don't create a color buffer for the shadow map.
+        rt_smap_surf.create(r2_RT_smap_surf, size, size, nullrt);
+#else
+        // We don't need to create rt to use nullrt on DX10+
+        // rt_smap_surf.create (r2_RT_smap_surf, size, size, nullrt);
+#endif
         {
             CBlender_accum_direct_mask b_accum_mask;
             CBlender_accum_direct b_accum_direct;
@@ -576,10 +600,11 @@ CRenderTarget::CRenderTarget()
     const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra;
     if (ssao_blur_on || ssao_hdao_ultra)
     {
-        const auto w = Device.dwWidth, h = Device.dwHeight;
+        const u32 w = Device.dwWidth, h = Device.dwHeight;
 
         if (ssao_hdao_ultra)
         {
+#if !defined(USE_DX9) && !defined(USE_OGL) // XXX: support compute shaders for OpenGL
             CBlender_CS_HDAO b_hdao_cs;
             s_hdao_cs.create(&b_hdao_cs, "r2" DELIMITER "ssao");
             if (RImplementation.o.dx10_msaa)
@@ -588,16 +613,14 @@ CRenderTarget::CRenderTarget()
                 s_hdao_cs_msaa.create(&b_hdao_msaa_cs, "r2" DELIMITER "ssao");
             }
             rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, { CRT::CreateUAV });
+#endif
         }
-
         else if (ssao_blur_on)
         {
-            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
-
             CBlender_SSAO_noMSAA b_ssao;
             s_ssao.create(&b_ssao, "r2" DELIMITER "ssao");
 
-            /* Should be used in r4_rendertarget_phase_ssao.cpp but it's commented there.
+            /* Should be used in r*_rendertarget_phase_ssao.cpp but it's commented there.
             if (RImplementation.o.dx10_msaa)
             {
                 const int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
@@ -605,6 +628,7 @@ CRenderTarget::CRenderTarget()
                 for (int i = 0; i < bound; ++i)
                     s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
             }*/
+            rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
         }
     }
 
@@ -658,6 +682,14 @@ CRenderTarget::CRenderTarget()
     s_menu.create("distort");
     g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 
+#if 0 // OpenGL: kept for historical reasons
+    // Flip
+    t_base = RImplementation.Resources->_CreateTexture(r2_base);
+    t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
+    s_flip.create("effects" DELIMITER "screen_set", r2_base);
+    g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+#endif
+
     //
     dwWidth = Device.dwWidth;
     dwHeight = Device.dwHeight;
@@ -665,6 +697,34 @@ CRenderTarget::CRenderTarget()
 
 CRenderTarget::~CRenderTarget()
 {
+#ifdef USE_OGL
+    glDeleteTextures(1, &t_ss_async);
+
+    // Textures
+    t_material->surface_set(GL_TEXTURE_3D, 0);
+    glDeleteTextures(1, &t_material_surf);
+    t_material.destroy();
+
+    t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
+    t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
+    t_LUM_src.destroy();
+    t_LUM_dest.destroy();
+
+    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    t_envmap_0.destroy();
+    t_envmap_1.destroy();
+
+    // Jitter
+    for (int it = 0; it < TEX_jitter_count; it++)
+    {
+        t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
+    }
+    glDeleteTextures(TEX_jitter_count, t_noise_surf);
+
+    t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &t_noise_surf_mipped);
+#else
     _RELEASE(t_ss_async);
 
     // Textures
@@ -678,7 +738,7 @@ CRenderTarget::~CRenderTarget()
     t_LUM_src->surface_set(NULL);
     t_LUM_dest->surface_set(NULL);
 
-#ifdef DEBUG
+#   ifdef DEBUG
     ID3DBaseTexture* pSurf = 0;
 
     pSurf = t_envmap_0->surface_get();
@@ -690,9 +750,7 @@ CRenderTarget::~CRenderTarget()
     if (pSurf)
         pSurf->Release();
     _SHOW_REF("t_envmap_1 - #small", pSurf);
-//_SHOW_REF("t_envmap_0 - #small",t_envmap_0->pSurface);
-//_SHOW_REF("t_envmap_1 - #small",t_envmap_1->pSurface);
-#endif // DEBUG
+#   endif // DEBUG
     t_envmap_0->surface_set(NULL);
     t_envmap_1->surface_set(NULL);
     t_envmap_0.destroy();
@@ -705,17 +763,18 @@ CRenderTarget::~CRenderTarget()
     for (int it = 0; it < TEX_jitter_count; it++)
     {
         t_noise[it]->surface_set(NULL);
-#ifdef DEBUG
+#   ifdef DEBUG
         _SHOW_REF("t_noise_surf[it]", t_noise_surf[it]);
-#endif // DEBUG
+#   endif // DEBUG
         _RELEASE(t_noise_surf[it]);
     }
 
     t_noise_mipped->surface_set(NULL);
-#ifdef DEBUG
+#   ifdef DEBUG
     _SHOW_REF("t_noise_surf_mipped", t_noise_surf_mipped);
-#endif // DEBUG
+#   endif // DEBUG
     _RELEASE(t_noise_surf_mipped);
+#endif
 
     //
     accum_spot_geom_destroy();

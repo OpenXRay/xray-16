@@ -103,6 +103,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
+    ComputeShadersSupported = false; // XXX: Implement compute shaders support
 
     Caps.fTarget = D3DFMT_A8R8G8B8;
     Caps.fDepth = D3DFMT_D24S8;

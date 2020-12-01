@@ -363,9 +363,6 @@
     <ClCompile Include="..\xrRender\r__occlusion.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderGL\glTextureUtils.cpp">
       <Filter>dx9 to gl Utils</Filter>
     </ClCompile>
@@ -691,6 +688,9 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_u_set_rt.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
