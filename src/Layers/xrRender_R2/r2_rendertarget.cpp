@@ -27,7 +27,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     //	TODO: OGL: should we implement stencil optimization?
     VERIFY(RImplementation.o.nvstencil);
     VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
-    UNUSED(eSom);
+    UNUSED(eSOM);
 #else
     //	TODO: DX10: remove half pixel offset?
     VERIFY(RImplementation.o.nvstencil);
