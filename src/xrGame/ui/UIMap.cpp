@@ -48,7 +48,6 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
         xr_delete(levelIni);
 }
 
-CUICustomMap::~CUICustomMap() {}
 void CUICustomMap::Update()
 {
     SetPointerDistance(0.0f);
@@ -279,7 +278,6 @@ CUIGlobalMap::CUIGlobalMap(CUIMapWnd* pMapWnd)
     Show(false);
 }
 
-CUIGlobalMap::~CUIGlobalMap() {}
 void CUIGlobalMap::Initialize() { Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default"); }
 void CUIGlobalMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
@@ -384,7 +382,6 @@ CUILevelMap::CUILevelMap(CUIMapWnd* p)
     Show(false);
 }
 
-CUILevelMap::~CUILevelMap() {}
 void CUILevelMap::Draw()
 {
     if (MapWnd())
@@ -571,8 +568,6 @@ CUIMiniMap::CUIMiniMap()
 {
     SetRounded(true);
 }
-
-CUIMiniMap::~CUIMiniMap() {}
 
 void CUIMiniMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
