@@ -438,7 +438,7 @@ void CUILevelMap::Draw()
     inherited::Draw();
 }
 
-void CUILevelMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     Fvector4 tmp = pGameIni->r_fvector4(MapName(), "global_rect");
@@ -574,7 +574,7 @@ CUIMiniMap::CUIMiniMap()
 
 CUIMiniMap::~CUIMiniMap() {}
 
-void CUIMiniMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     CUIStatic::SetTextureColor(0x7fffffff);
