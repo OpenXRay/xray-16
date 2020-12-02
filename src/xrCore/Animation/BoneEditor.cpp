@@ -85,10 +85,10 @@ void CBone::ShapeScale(const Fvector& _amount, bool /*parentCS = false*/)
 void CBone::ShapeRotate(const Fvector& _amount, bool parentCS /*= false*/)
 {
     Fvector amount = _amount;
-    Fmatrix _IT;
-    _IT.invert(_LTransform());
+    Fmatrix IT;
+    IT.invert(LTransform());
     if (parentCS)
-        _IT.transform_dir(amount);
+        IT.transform_dir(amount);
     switch (shape.type)
     {
     case SBoneShape::stBox:
@@ -112,17 +112,15 @@ void CBone::ShapeRotate(const Fvector& _amount, bool parentCS /*= false*/)
 void CBone::ShapeMove(const Fvector& _amount, bool parentCS /*= false*/)
 {
     Fvector amount = _amount;
-    Fmatrix _IT;
-    _IT.invert(_LTransform());
+    Fmatrix IT;
+    IT.invert(LTransform());
     if (parentCS)
-        _IT.transform_dir(amount);
+        IT.transform_dir(amount);
     switch (shape.type)
     {
     case SBoneShape::stBox: shape.box.m_translate.add(amount); break;
     case SBoneShape::stSphere: shape.sphere.P.add(amount); break;
-    case SBoneShape::stCylinder: { shape.cylinder.m_center.add(amount);
-    }
-    break;
+    case SBoneShape::stCylinder: shape.cylinder.m_center.add(amount); break;
     }
 }
 
@@ -132,7 +130,7 @@ bool CBone::Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix&
 {
     Fvector start, dir;
     Fmatrix M;
-    M.mul_43(parent, _LTransform());
+    M.mul_43(parent, LTransform());
     M.invert();
     M.transform_tiny(start, S);
     M.transform_dir(dir, D);
@@ -142,10 +140,10 @@ bool CBone::Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix&
     case SBoneShape::stSphere: return shape.sphere.intersect(start, dir, dist);
     case SBoneShape::stCylinder: return shape.cylinder.intersect(start, dir, dist);
     default:
-        Fsphere S;
-        S.P.set(0, 0, 0);
-        S.R = 0.025f;
-        return S.intersect(start, dir, dist);
+        Fsphere sphere;
+        sphere.P.set(0, 0, 0);
+        sphere.R = 0.025f;
+        return sphere.intersect(start, dir, dist);
     }
 }
 
@@ -190,11 +188,11 @@ void CBone::BoneRotate(const Fvector& _axis, float angle, bool parentCS /*= fals
             mBindI.invert(mBind);
 
             Fvector axis;
-            _MTransform().transform_dir(axis, _axis);
+            MTransform().transform_dir(axis, _axis);
 
             // rotation
             mRotate.rotation(axis, angle);
-            mLocal.mul(mRotate, _MTransform());
+            mLocal.mul(mRotate, MTransform());
             mLocal.getXYZi(mot_rotate);
 
             // local clamp
@@ -224,7 +222,7 @@ void CBone::BoneMove(const Fvector& _amount)
         clamp(mot_offset.z, rest_offset.z + IK_data.limits[0].limit.x, rest_offset.z + IK_data.limits[0].limit.y);
         rest_transform.transform(mot_offset);
         break;
-    }
+    } // XXX: other cases are missing
 }
 
 void CBone::ClampByLimits()

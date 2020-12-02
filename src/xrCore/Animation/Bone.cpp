@@ -22,7 +22,7 @@ static const Fobb dummy = Fobb().identity();
 
 const Fobb& CBone::get_obb() const { return dummy; }
 
-bool SBoneShape::Valid()
+bool SBoneShape::Valid() const
 {
     switch (type)
     {
@@ -40,22 +40,22 @@ bool SBoneShape::Valid()
 void SJointIKData::Export(IWriter& F)
 {
     F.w_u32(type);
-    for (int k = 0; k < 3; k++)
+    for (SJointLimit& joint_limit : limits)
     {
         // Kostya Slipchenko say:
         // направление вращения в ОДЕ отличается от направления вращение в X-Ray
         // поэтому меняем знак у лимитов
-        // F.w_float (std::min(-limits[k].limit.x,-limits[k].limit.y)); // min (swap special for ODE)
-        // F.w_float (std::max(-limits[k].limit.x,-limits[k].limit.y)); // max (swap special for ODE)
+        // F.w_float (std::min(-joint_limit.limit.x,-joint_limit.limit.y)); // min (swap special for ODE)
+        // F.w_float (std::max(-joint_limit.limit.x,-joint_limit.limit.y)); // max (swap special for ODE)
 
-        VERIFY(std::min(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.y);
-        VERIFY(std::max(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.x);
+        VERIFY(std::min(-joint_limit.limit.x, -joint_limit.limit.y) == -joint_limit.limit.y);
+        VERIFY(std::max(-joint_limit.limit.x, -joint_limit.limit.y) == -joint_limit.limit.x);
 
-        F.w_float(-limits[k].limit.y); // min (swap special for ODE)
-        F.w_float(-limits[k].limit.x); // max (swap special for ODE)
+        F.w_float(-joint_limit.limit.y); // min (swap special for ODE)
+        F.w_float(-joint_limit.limit.x); // max (swap special for ODE)
 
-        F.w_float(limits[k].spring_factor);
-        F.w_float(limits[k].damping_factor);
+        F.w_float(joint_limit.spring_factor);
+        F.w_float(joint_limit.damping_factor);
     }
     F.w_float(spring_factor);
     F.w_float(damping_factor);
@@ -94,7 +94,6 @@ CBone::CBone()
     ResetData();
 }
 
-CBone::~CBone() {}
 void CBone::ResetData()
 {
     IK_data.Reset();
@@ -102,7 +101,6 @@ void CBone::ResetData()
     shape.Reset();
 
     mass = 10.f;
-    ;
     center_of_mass.set(0.f, 0.f, 0.f);
 }
 
@@ -127,7 +125,7 @@ void CBone::Save(IWriter& F)
     SaveData(F);
 }
 
-void CBone::Load_0(IReader& F)
+[[maybe_unused]] void CBone::Load_0(IReader& F)
 {
     F.r_stringZ(name);
     xr_strlwr(name);
@@ -141,7 +139,7 @@ void CBone::Load_0(IReader& F)
     Reset();
 }
 
-void CBone::Load_1(IReader& F)
+[[maybe_unused]] void CBone::Load_1(IReader& F)
 {
     R_ASSERT(F.find_chunk(BONE_CHUNK_VERSION));
     u16 ver = F.r_u16();
@@ -269,11 +267,11 @@ float CBoneInstance::get_param(u32 idx)
 #ifdef DEBUG
 void CBoneData::DebugQuery(BoneDebug& L)
 {
-    for (u32 i = 0; i < children.size(); i++)
+    for (CBoneData* c : children)
     {
         L.push_back(SelfID);
-        L.push_back(children[i]->SelfID);
-        children[i]->DebugQuery(L);
+        L.push_back(c->SelfID);
+        c->DebugQuery(L);
     }
 }
 #endif
@@ -284,8 +282,8 @@ void CBoneData::CalculateM2B(const Fmatrix& parent)
     m2b_transform.mul_43(parent, bind_transform);
 
     // Calculate children
-    for (xr_vector<CBoneData*>::iterator C = children.begin(); C != children.end(); ++C)
-        (*C)->CalculateM2B(m2b_transform);
+    for (CBoneData* c : children)
+        c->CalculateM2B(m2b_transform);
 
     m2b_transform.invert();
 }
