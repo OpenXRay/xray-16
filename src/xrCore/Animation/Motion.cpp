@@ -508,12 +508,12 @@ void CSMotion::SortBonesBySkeleton(BoneVec& bones)
                 bm.envs[ch] = xr_new<CEnvelope>();
                 //. bm.envs[ch]->Load_2(F);
             }
-            bm.envs[ctPositionX]->InsertKey(0.0f, B->_Offset().x);
-            bm.envs[ctPositionY]->InsertKey(0.0f, B->_Offset().y);
-            bm.envs[ctPositionZ]->InsertKey(0.0f, B->_Offset().z);
-            bm.envs[ctRotationH]->InsertKey(0.0f, B->_Rotate().x);
-            bm.envs[ctRotationP]->InsertKey(0.0f, B->_Rotate().y);
-            bm.envs[ctRotationB]->InsertKey(0.0f, B->_Rotate().z);
+            bm.envs[ctPositionX]->InsertKey(0.0f, B->Offset().x);
+            bm.envs[ctPositionY]->InsertKey(0.0f, B->Offset().y);
+            bm.envs[ctPositionZ]->InsertKey(0.0f, B->Offset().z);
+            bm.envs[ctRotationH]->InsertKey(0.0f, B->Rotate().x);
+            bm.envs[ctRotationP]->InsertKey(0.0f, B->Rotate().y);
+            bm.envs[ctRotationB]->InsertKey(0.0f, B->Rotate().z);
             BM = &bm;
         };
         new_bone_mots.push_back(*BM);

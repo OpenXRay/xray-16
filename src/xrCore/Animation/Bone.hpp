@@ -42,14 +42,13 @@ private:
     u32 Callback_type;
 
 public:
-    float param[MAX_BONE_PARAMS]; //
-    //
-    // methods
+    float param[MAX_BONE_PARAMS];
+
 public:
     IC BoneCallback callback() { return Callback; }
     IC void* callback_param() { return Callback_Param; }
-    IC BOOL callback_overwrite() { return Callback_overwrite; } // performance hint - don't calc anims
-    IC u32 callback_type() { return Callback_type; }
+    [[nodiscard]] IC BOOL callback_overwrite() const { return Callback_overwrite; } // performance hint - don't calc anims
+    [[nodiscard]] IC u32 callback_type() const { return Callback_type; }
 public:
     IC void construct();
 
@@ -63,8 +62,8 @@ public:
 
     void reset_callback()
     {
-        Callback = 0;
-        Callback_Param = 0;
+        Callback = nullptr;
+        Callback_Param = nullptr;
         Callback_overwrite = FALSE;
         Callback_type = 0;
     }
@@ -88,7 +87,7 @@ struct XRCORE_API vertBoned1W // (3+3+3+3+2+1)*4 = 15*4 = 60 bytes
     void get_pos(Fvector& p) const { p.set(P); }
 #ifdef DEBUG
     static const u8 bones_count = 1;
-    u16 get_bone_id(u8 bone) const
+    [[nodiscard]] u16 get_bone_id(u8 bone) const
     {
         VERIFY(bone < bones_count);
         return u16(matrix);
@@ -108,7 +107,7 @@ struct XRCORE_API vertBoned2W // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
     void get_pos(Fvector& p) const { p.set(P); }
 #ifdef DEBUG
     static const u8 bones_count = 2;
-    u16 get_bone_id(u8 bone) const
+    [[nodiscard]] u16 get_bone_id(u8 bone) const
     {
         VERIFY(bone < bones_count);
         return bone == 0 ? matrix0 : matrix1;
@@ -127,7 +126,7 @@ struct XRCORE_API vertBoned3W // 70 bytes
     void get_pos(Fvector& p) const { p.set(P); }
 #ifdef DEBUG
     static const u8 bones_count = 3;
-    u16 get_bone_id(u8 bone) const
+    [[nodiscard]] u16 get_bone_id(u8 bone) const
     {
         VERIFY(bone < bones_count);
         return m[bone];
@@ -146,7 +145,7 @@ struct XRCORE_API vertBoned4W // 76 bytes
     void get_pos(Fvector& p) const { p.set(P); }
 #ifdef DEBUG
     static const u8 bones_count = 4;
-    u16 get_bone_id(u8 bone) const
+    [[nodiscard]] u16 get_bone_id(u8 bone) const
     {
         VERIFY(bone < bones_count);
         return m[bone];
@@ -194,10 +193,10 @@ struct XRCORE_API SBoneShape
 
     enum EShapeFlags
     {
-        sfNoPickable = (1 << 0), // use only in RayPick
-        sfRemoveAfterBreak = (1 << 1),
-        sfNoPhysics = (1 << 2),
-        sfNoFogCollider = (1 << 3),
+        sfNoPickable = (1u << 0u), // use only in RayPick
+        sfRemoveAfterBreak = (1u << 1u),
+        sfNoPhysics = (1u << 2u),
+        sfNoFogCollider = (1u << 3u),
     };
 
     u16 type; // 2
@@ -215,7 +214,7 @@ struct XRCORE_API SBoneShape
         sphere.R = 0.f;
         cylinder.invalidate();
     }
-	bool Valid();
+	bool Valid() const;
 };
 
 struct XRCORE_API SJointIKData
@@ -227,7 +226,7 @@ struct XRCORE_API SJointIKData
     float damping_factor;
     enum
     {
-        flBreakable = (1 << 0),
+        flBreakable = (1u << 0u),
     };
     Flags32 ik_flags;
     float break_force; // [0..+INF]
@@ -247,6 +246,7 @@ struct XRCORE_API SJointIKData
         ik_flags.zero();
         break_force = 0.f;
         break_torque = 0.f;
+        friction = 0.f;
     }
     void clamp_by_limits(Fvector& dest_xyz);
     void Export(IWriter& F);
@@ -257,25 +257,24 @@ struct XRCORE_API SJointIKData
 class XRCORE_API IBoneData
 {
 public:
-    virtual IBoneData& GetChild(u16 id) = 0;
-    virtual const IBoneData& GetChild(u16 id) const = 0;
-    virtual u16 GetSelfID() const = 0;
-    virtual u16 GetNumChildren() const = 0;
+    [[nodiscard]] virtual IBoneData& GetChild(u16 id) = 0;
+    [[nodiscard]] virtual const IBoneData& GetChild(u16 id) const = 0;
+    [[nodiscard]] virtual u16 GetSelfID() const = 0;
+    [[nodiscard]] virtual u16 GetNumChildren() const = 0; // XXX: maybe change return type to size_t instead of u16. Check later.
 
-    virtual const SJointIKData& get_IK_data() const = 0;
-    virtual const Fmatrix& get_bind_transform() const = 0;
-    virtual const SBoneShape& get_shape() const = 0;
-    virtual const Fobb& get_obb() const = 0;
-    virtual const Fvector& get_center_of_mass() const = 0;
-    virtual float get_mass() const = 0;
-    virtual u16 get_game_mtl_idx() const = 0;
-    virtual shared_str GetMaterialName() const = 0;
-    virtual u16 GetParentID() const = 0;
-    virtual float lo_limit(u8 k) const = 0;
-    virtual float hi_limit(u8 k) const = 0;
+    [[nodiscard]] virtual const SJointIKData& get_IK_data() const = 0;
+    [[nodiscard]] virtual const Fmatrix& get_bind_transform() const = 0;
+    [[nodiscard]] virtual const SBoneShape& get_shape() const = 0;
+    [[nodiscard]] virtual const Fobb& get_obb() const = 0;
+    [[nodiscard]] virtual const Fvector& get_center_of_mass() const = 0;
+    [[nodiscard]] virtual float get_mass() const = 0;
+    [[nodiscard]] virtual u16 get_game_mtl_idx() const = 0;
+    [[nodiscard]] virtual shared_str GetMaterialName() const = 0;
+    [[nodiscard]] virtual u16 GetParentID() const = 0;
+    [[nodiscard]] virtual float lo_limit(u8 k) const = 0;
+    [[nodiscard]] virtual float hi_limit(u8 k) const = 0;
 };
 
-// static const Fobb dummy ;//= Fobb().identity();
 // refs
 class CBone;
 using BoneVec = xr_vector<CBone*>;
@@ -304,8 +303,8 @@ private:
     Fmatrix rest_i_transform;
 
     // Fmatrix last_transform;
-
     // Fmatrix render_transform;
+
 public:
     int SelfID;
     CBone* parent;
@@ -316,7 +315,7 @@ public:
     Flags8 flags;
     enum
     {
-        flSelected = (1 << 0),
+        flSelected = (1u << 0u),
     };
     SJointIKData IK_data;
     shared_str game_mtl;
@@ -327,7 +326,7 @@ public:
 
 public:
     CBone();
-    virtual ~CBone();
+    virtual ~CBone() = default;
 
     void SetName(const char* p)
     {
@@ -350,23 +349,23 @@ public:
     shared_str Name() { return name; }
     shared_str ParentName() { return parent_name; }
     shared_str WMap() { return wmap; }
-    IC CBone* Parent() { return parent; }
-    IC BOOL IsRoot() { return (parent == 0); }
-    shared_str& NameRef() { return name; }
+    [[nodiscard]] IC CBone* Parent() const { return parent; }
+    [[nodiscard]] IC BOOL IsRoot() const { return (parent == nullptr); }
+    [[maybe_unused]] shared_str& NameRef() { return name; }
     // transformation
-    const Fvector& _Offset() { return mot_offset; }
-    const Fvector& _Rotate() { return mot_rotate; }
-    float _Length() { return mot_length; }
-    IC Fmatrix& _RTransform() { return rest_transform; }
-    IC Fmatrix& _RITransform() { return rest_i_transform; }
-    IC Fmatrix& _LRTransform() { return local_rest_transform; }
-    IC Fmatrix& _MTransform() { return mot_transform; }
-    IC Fmatrix& _LTransform() { return mTransform; } //{return last_transform;}
-    IC const Fmatrix& _LTransform() const { return mTransform; }
-    IC Fmatrix& _RenderTransform() { return mRenderTransform; } //{return render_transform;}
-    IC Fvector& _RestOffset() { return rest_offset; }
-    IC Fvector& _RestRotate() { return rest_rotate; }
-    void _Update(const Fvector& T, const Fvector& R)
+    const Fvector& Offset() { return mot_offset; }
+    const Fvector& Rotate() { return mot_rotate; }
+    [[nodiscard]] float Length() const { return mot_length; }
+    IC Fmatrix& RTransform() { return rest_transform; }
+    [[maybe_unused]] IC Fmatrix& RITransform() { return rest_i_transform; }
+    [[maybe_unused]] IC Fmatrix& LRTransform() { return local_rest_transform; }
+    IC Fmatrix& MTransform() { return mot_transform; }
+    IC Fmatrix& LTransform() { return mTransform; } // { return last_transform; }
+    [[maybe_unused]] [[nodiscard]] IC const Fmatrix& LTransform() const { return mTransform; }
+    [[maybe_unused]] IC Fmatrix& RenderTransform() { return mRenderTransform; } // { return render_transform; }
+    IC Fvector& RestOffset() { return rest_offset; }
+    IC Fvector& RestRotate() { return rest_rotate; }
+    void Update(const Fvector& T, const Fvector& R)
     {
         mot_offset.set(T);
         mot_rotate.set(R);
@@ -381,12 +380,12 @@ public:
 
     // IO
     void Save(IWriter& F);
-    void Load_0(IReader& F);
-    void Load_1(IReader& F);
-    IC float engine_lo_limit(u8 k) const { return -IK_data.limits[k].limit.y; }
-    IC float engine_hi_limit(u8 k) const { return -IK_data.limits[k].limit.x; }
-    IC float editor_lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
-    IC float editor_hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
+    [[maybe_unused]] void Load_0(IReader& F);
+    [[maybe_unused]] void Load_1(IReader& F);
+    [[nodiscard]] IC float engine_lo_limit(u8 k) const { return -IK_data.limits[k].limit.y; }
+    [[nodiscard]] IC float engine_hi_limit(u8 k) const { return -IK_data.limits[k].limit.x; }
+    [[nodiscard]] IC float editor_lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
+    [[nodiscard]] IC float editor_hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
     void SaveData(IWriter& F);
     void LoadData(IReader& F);
     void ResetData();
@@ -403,34 +402,28 @@ public:
     bool Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix& parent);
 
     void Select(BOOL flag) { flags.set(flSelected, flag); }
-    bool Selected() { return flags.is(flSelected); }
+    [[nodiscard]] bool Selected() const { return flags.is(flSelected); }
     void ClampByLimits();
 
-    bool ExportOGF(IWriter& F);
+    bool ExportOGF(IWriter& F); // XXX: implementation is missing. Probably it is in the SDK code?
 
 private:
-    IBoneData& GetChild(u16 id) { return *children[id]; }
-    const IBoneData& GetChild(u16 id) const { return *children[id]; }
-    u16 GetSelfID() const { return (u16)SelfID; }
-    u16 GetNumChildren() const { return u16(children.size()); }
-    const SJointIKData& get_IK_data() const { return IK_data; }
-    const Fmatrix& get_bind_transform() const { return local_rest_transform; }
-    const SBoneShape& get_shape() const { return shape; }
-    const Fobb& get_obb() const;
-    const Fvector& get_center_of_mass() const { return center_of_mass; }
-    float get_mass() const { return mass; }
+    [[nodiscard]] IBoneData& GetChild(u16 id) override { return *children[id]; }
+    [[nodiscard]] const IBoneData& GetChild(u16 id) const override { return *children[id]; }
+    [[nodiscard]] u16 GetSelfID() const override { return (u16)SelfID; }
+    [[nodiscard]] u16 GetNumChildren() const override { return u16(children.size()); }
+    [[nodiscard]] const SJointIKData& get_IK_data() const override { return IK_data; }
+    [[nodiscard]] const Fmatrix& get_bind_transform() const override { return local_rest_transform; }
+    [[nodiscard]] const SBoneShape& get_shape() const override { return shape; }
+    [[nodiscard]] const Fobb& get_obb() const override;
+    [[nodiscard]] const Fvector& get_center_of_mass() const override { return center_of_mass; }
+    [[nodiscard]] float get_mass() const override { return mass; }
     // the caller should use GMLib.GetMaterialIdx instead
-    virtual u16 get_game_mtl_idx() const override { return u16(-1); }
-    virtual shared_str GetMaterialName() const override { return game_mtl; }
-    u16 GetParentID() const
-    {
-        if (parent)
-            return u16(parent->SelfID);
-        else
-            return u16(-1);
-    };
-    float lo_limit(u8 k) const { return engine_lo_limit(k); }
-    float hi_limit(u8 k) const { return engine_hi_limit(k); }
+    [[nodiscard]] u16 get_game_mtl_idx() const override { return u16(-1); }
+    [[nodiscard]] shared_str GetMaterialName() const override { return game_mtl; }
+    [[nodiscard]] u16 GetParentID() const override { return parent ? u16(parent->SelfID) : u16(-1); }
+    [[nodiscard]] float lo_limit(u8 k) const override { return engine_lo_limit(k); }
+    [[nodiscard]] float hi_limit(u8 k) const override { return engine_hi_limit(k); }
 };
 
 //*** Shared Bone Data ****************************************************************************
@@ -465,51 +458,50 @@ public:
     using ChildFacesVec = xr_vector<FacesVec>;
     ChildFacesVec child_faces; // shared
 
-    CBoneData(u16 ID) : SelfID(ID) { VERIFY(SelfID != BI_NONE); }
-    virtual ~CBoneData() {}
+    explicit CBoneData(u16 ID) : SelfID(ID) { VERIFY(SelfID != BI_NONE); }
+    virtual ~CBoneData() = default;
 #ifdef DEBUG
     typedef svector<int, 128> BoneDebug;
     void DebugQuery(BoneDebug& L);
 #endif
     IC void SetParentID(u16 id) { ParentID = id; }
-    IC u16 GetSelfID() const { return SelfID; }
-    IC u16 GetParentID() const { return ParentID; }
+    [[nodiscard]] IC u16 GetSelfID() const override { return SelfID; }
+    [[nodiscard]] IC u16 GetParentID() const override { return ParentID; }
     // assign face
     void AppendFace(u16 child_idx, u16 idx) { child_faces[child_idx].push_back(idx); }
     // Calculation
     void CalculateM2B(const Fmatrix& Parent);
 
 private:
-    IBoneData& GetChild(u16 id) { return *children[id]; }
-    const IBoneData& GetChild(u16 id) const { return *children[id]; }
-    u16 GetNumChildren() const { return (u16)children.size(); }
-    const SJointIKData& get_IK_data() const { return IK_data; }
-    const Fmatrix& get_bind_transform() const { return bind_transform; }
-    const SBoneShape& get_shape() const { return shape; }
-    const Fobb& get_obb() const { return obb; }
-    const Fvector& get_center_of_mass() const { return center_of_mass; }
-    float get_mass() const { return mass; }
-    virtual u16 get_game_mtl_idx() const override { return game_mtl_idx; }
-    virtual shared_str GetMaterialName() const override { return name; }
-    float lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
-    float hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
+    [[nodiscard]] IBoneData& GetChild(u16 id) override { return *children[id]; }
+    [[nodiscard]] const IBoneData& GetChild(u16 id) const override { return *children[id]; }
+    [[nodiscard]] u16 GetNumChildren() const override { return (u16)children.size(); }
+    [[nodiscard]] const SJointIKData& get_IK_data() const override { return IK_data; }
+    [[nodiscard]] const Fmatrix& get_bind_transform() const override { return bind_transform; }
+    [[nodiscard]] const SBoneShape& get_shape() const override { return shape; }
+    [[nodiscard]] const Fobb& get_obb() const override { return obb; }
+    [[nodiscard]] const Fvector& get_center_of_mass() const override { return center_of_mass; }
+    [[nodiscard]] float get_mass() const override { return mass; }
+    [[nodiscard]] u16 get_game_mtl_idx() const override { return game_mtl_idx; }
+    [[nodiscard]] shared_str GetMaterialName() const override { return name; }
+    [[nodiscard]] float lo_limit(u8 k) const override { return IK_data.limits[k].limit.x; }
+    [[nodiscard]] float hi_limit(u8 k) const override { return IK_data.limits[k].limit.y; }
 
 public:
     virtual size_t mem_usage()
     {
         size_t sz = sizeof(*this) + sizeof(vecBones::value_type) * children.size();
-        for (auto c_it = child_faces.begin(); c_it != child_faces.end(); ++c_it)
-            sz += c_it->size() * sizeof(FacesVec::value_type) + sizeof(*c_it);
+        for (const FacesVec& c : child_faces)
+            sz += c.size() * sizeof(FacesVec::value_type) + sizeof(c);
         return sz;
     }
 };
 
-enum EBoneCallbackType
+enum EBoneCallbackType : u32
 {
-    bctDummy = u32(0), // 0 - required!!!
+    bctDummy,
     bctPhysics,
     bctCustom,
-    bctForceU32 = u32(-1),
 };
 
 IC void CBoneInstance::construct()
@@ -517,8 +509,8 @@ IC void CBoneInstance::construct()
     mTransform.identity();
     mRenderTransform.identity();
 
-    Callback = NULL;
-    Callback_Param = NULL;
+    Callback = nullptr;
+    Callback_Param = nullptr;
     Callback_overwrite = FALSE;
     Callback_type = 0;
 
