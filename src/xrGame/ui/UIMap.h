@@ -100,7 +100,7 @@ public:
     void Initialize();
 
 protected:
-    virtual void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };
 
 class CUILevelMap : public CUICustomMap
@@ -127,7 +127,7 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };
 
 // Rounded by default
@@ -146,5 +146,5 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };
