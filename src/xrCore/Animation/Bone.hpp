@@ -405,7 +405,7 @@ public:
     [[nodiscard]] bool Selected() const { return flags.is(flSelected); }
     void ClampByLimits();
 
-    bool ExportOGF(IWriter& F); // XXX: no implementation available, remove?
+    bool ExportOGF(IWriter& F); // XXX: implementation is missing. Probably it is in the SDK code?
 
 private:
     [[nodiscard]] IBoneData& GetChild(u16 id) override { return *children[id]; }
