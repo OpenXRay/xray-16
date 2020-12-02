@@ -502,7 +502,6 @@ enum EBoneCallbackType : u32
     bctDummy,
     bctPhysics,
     bctCustom,
-    bctForceU32 = u32(-1), // XXX: unused, remove?
 };
 
 IC void CBoneInstance::construct()
