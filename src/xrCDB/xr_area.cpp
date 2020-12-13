@@ -113,7 +113,23 @@ void CObjectSpace::Load(IReader* F, CDB::build_callback build_callback)
 void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback)
 {
     R_ASSERT(CFORM_CURRENT_VERSION == H.version);
-    Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+    if (strstr(Core.Params, "-cdb_cache"))
+    {
+        string_path fName;
+        strconcat(sizeof(fName), fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
+        FS.update_path(fName, "$app_data_root$", fName);
+        if (!FS.exist(fName))
+        {
+            Msg(" WARNING: ObjectSpace cache '%s' not found. Building the model from scratch..", fName);
+            Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+            Static.serialize(fName);
+        }
+        else
+            Static.deserialize(fName);
+    }
+    else
+        Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+    
     m_BoundingVolume.set(H.aabb);
     g_SpatialSpace->initialize(m_BoundingVolume);
     g_SpatialSpacePhysic->initialize(m_BoundingVolume);

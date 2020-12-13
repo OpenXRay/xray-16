@@ -185,6 +185,52 @@ u32 MODEL::memory()
     return tree->GetUsedBytes() + V + T + sizeof(*this) + sizeof(*tree);
 }
 
+bool MODEL::serialize(const char *fileName) const
+{
+    IWriter* wstream = FS.w_open(fileName);
+    if (!wstream)
+        return false;
+
+    wstream->w_u32(verts_count);
+    wstream->w(verts, sizeof(Fvector) * verts_count);
+    wstream->w_u32(tris_count);
+    wstream->w(tris, sizeof(TRI) * tris_count);
+
+    if (tree)
+        tree->Save(wstream);
+
+    return true;
+}
+
+bool MODEL::deserialize(const char *fileName)
+{
+    IReader* rstream = FS.r_open(fileName);
+    if (!rstream)
+        return false;
+
+    xr_free(verts);
+    xr_free(tris);
+    xr_free(tree);
+
+    verts_count = rstream->r_u32();
+    verts = xr_alloc<Fvector>(verts_count);
+    const u32 vertsSize = verts_count * sizeof(Fvector);
+    CopyMemory(verts, rstream->pointer(), vertsSize);
+    rstream->advance(vertsSize);
+
+    tris_count = rstream->r_u32();
+    tris = xr_alloc<TRI>(tris_count);
+    const u32 trisSize = tris_count * sizeof(TRI);
+    CopyMemory(tris, rstream->pointer(), trisSize);
+    rstream->advance(trisSize);
+
+    tree = xr_new<OPCODE_Model>();
+    tree->Load(rstream);
+    FS.r_close(rstream);
+    status = S_READY;
+    return true;
+}
+
 // This is the constructor of a class that has been exported.
 // see xrCDB.h for the class definition
 COLLIDER::COLLIDER()
