@@ -91,8 +91,8 @@ public:
     void build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
     u32 memory();
 
-    bool serialize(const char* fileName) const;
-    bool deserialize(const char* fileName);
+    bool serialize(pcstr fileName) const;
+    bool deserialize(pcstr fileName);
 
 private:
     void syncronize_impl() const;

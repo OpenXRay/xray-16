@@ -185,7 +185,7 @@ u32 MODEL::memory()
     return tree->GetUsedBytes() + V + T + sizeof(*this) + sizeof(*tree);
 }
 
-bool MODEL::serialize(const char *fileName) const
+bool MODEL::serialize(pcstr fileName) const
 {
     IWriter* wstream = FS.w_open(fileName);
     if (!wstream)
@@ -202,7 +202,7 @@ bool MODEL::serialize(const char *fileName) const
     return true;
 }
 
-bool MODEL::deserialize(const char *fileName)
+bool MODEL::deserialize(pcstr fileName)
 {
     IReader* rstream = FS.r_open(fileName);
     if (!rstream)

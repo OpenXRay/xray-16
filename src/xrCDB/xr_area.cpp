@@ -116,11 +116,11 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
     if (strstr(Core.Params, "-cdb_cache"))
     {
         string_path fName;
-        strconcat(sizeof(fName), fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
+        strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
         FS.update_path(fName, "$app_data_root$", fName);
         if (!FS.exist(fName))
         {
-            Msg(" WARNING: ObjectSpace cache '%s' not found. Building the model from scratch..", fName);
+            Msg("* ObjectSpace cache for '%s' not found. Building the model from scratch..", fName);
             Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
             Static.serialize(fName);
         }

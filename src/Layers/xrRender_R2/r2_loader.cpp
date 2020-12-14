@@ -350,7 +350,7 @@ void CRender::LoadSectors(IReader* fs)
         const bool use_cache = strstr(Core.Params, "-cdb_cache");
 
         string_path fName;
-        strconcat(sizeof(fName), fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
+        strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
         FS.update_path(fName, "$app_data_root$", fName);
 
         // build portal model
@@ -358,7 +358,7 @@ void CRender::LoadSectors(IReader* fs)
         if (use_cache)
         {
             if (!FS.exist(fName))
-                Msg(" WARNING: Portals cache '%s' not found. Building the model from scratch..", fName);
+                Msg("* Portals cache for '%s' not found. Building the model from scratch..", fName);
             else
             {
                 rmPortals->deserialize(fName);

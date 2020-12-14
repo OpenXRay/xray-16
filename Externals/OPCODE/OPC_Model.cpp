@@ -300,7 +300,7 @@ void OPCODE_Model::Load(IReader* stream)
     }
     else
     {
-        R_ASSERT(false); // Not used by engine so not supported
+        NODEFAULT; // Not used by engine so not supported
     }
 }
 
@@ -331,7 +331,7 @@ void OPCODE_Model::Save(IWriter* stream) const
     }
     else
     {
-        R_ASSERT(false); // Not used by engine so not supported
+        NODEFAULT; // Not used by engine so not supported
     }
     stream->w(pData, mTree->GetUsedBytes());
     xr_free(pData);

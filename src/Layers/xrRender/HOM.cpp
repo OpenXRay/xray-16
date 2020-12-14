@@ -126,11 +126,11 @@ void CHOM::Load()
     m_pModel = xr_new<CDB::MODEL>();
     if (strstr(Core.Params, "-cdb_cache"))
     {
-        strconcat(sizeof(fName), fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
+        strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
         FS.update_path(fName, "$app_data_root$", fName);
         if (!FS.exist(fName))
         {
-            Msg(" WARNING: HOM cache '%s' not found. Building the model from scratch..", fName);
+            Msg("* HOM cache for '%s' not found. Building the model from scratch..", fName);
             m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
             m_pModel->serialize(fName);
         }
