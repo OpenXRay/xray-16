@@ -506,6 +506,41 @@ public:
     }
 };
 
+class CCC_Spawn : public IConsole_Command
+{
+public:
+    CCC_Spawn(LPCSTR N) : IConsole_Command(N)  { };
+
+    virtual void Execute(LPCSTR args)
+    {
+        if (!g_pGameLevel) return;
+
+        if (GameID() != eGameIDSingle)
+        {
+                Msg("Spawn command is not available for multiplayer!");
+                return;
+        }
+
+        char object_name[128] = {0};
+        sscanf(args,"%s", object_name);
+
+        if (!pSettings->section_exist(object_name))
+        {
+            Msg("No such object \"%s\"", object_name);
+            return;
+        }
+
+        Fvector pos = Actor()->Position();
+        Level().g_cl_Spawn(object_name, 0xff, M_SPAWN_OBJECT_LOCAL, pos);
+    }
+
+    virtual void Info(TInfo& I)
+    {
+        xr_strcpy(I, "Spawn an object <object> at player position");
+    }
+};
+
+
 // helper functions --------------------------------------------
 
 bool valid_saved_game_name(LPCSTR file_name)
@@ -1881,6 +1916,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
     CMD3(CCC_Mask, "g_multi_item_pickup", &psActorFlags, AF_MULTI_ITEM_PICKUP);
+    CMD1(CCC_Spawn, "g_spawn");
 
     // alife
 #ifdef DEBUG
