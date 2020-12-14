@@ -284,7 +284,7 @@ void OPCODE_Model::Load(IReader* stream)
     const u32 nodesNum = stream->r_u32();
     if (mNoLeaf && !mQuantized)
     {
-        mTree = new AABBNoLeafTree();
+        mTree = xr_new<AABBNoLeafTree>();
         auto* ptr = xr_alloc<AABBNoLeafNode>(nodesNum);
         const u32 size = nodesNum * sizeof(AABBNoLeafNode);
         CopyMemory(ptr, stream->pointer(), size);
