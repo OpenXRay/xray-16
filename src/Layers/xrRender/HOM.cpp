@@ -124,7 +124,9 @@ void CHOM::Load()
 
     // Create AABB-tree
     m_pModel = xr_new<CDB::MODEL>();
-    if (strstr(Core.Params, "-cdb_cache"))
+    if (!strstr(Core.Params, "-cdb_cache"))
+        m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
+    else
     {
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
         FS.update_path(fName, "$app_data_root$", fName);
@@ -137,8 +139,6 @@ void CHOM::Load()
         else
             m_pModel->deserialize(fName);
     }
-    else
-        m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
 
     bEnabled = TRUE;
     S->close();

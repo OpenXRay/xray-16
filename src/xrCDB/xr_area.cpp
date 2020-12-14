@@ -113,7 +113,9 @@ void CObjectSpace::Load(IReader* F, CDB::build_callback build_callback)
 void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback)
 {
     R_ASSERT(CFORM_CURRENT_VERSION == H.version);
-    if (strstr(Core.Params, "-cdb_cache"))
+    if (!strstr(Core.Params, "-cdb_cache"))
+        Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+    else
     {
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
@@ -126,9 +128,7 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
         }
         else
             Static.deserialize(fName);
-    }
-    else
-        Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+    }        
     
     m_BoundingVolume.set(H.aabb);
     g_SpatialSpace->initialize(m_BoundingVolume);
