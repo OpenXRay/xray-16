@@ -275,3 +275,64 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
 #endif // __MESHMERIZER_H__
     return true;
 }
+
+void OPCODE_Model::Load(IReader* stream)
+{
+    mNoLeaf    = stream->r_u32();
+    mQuantized = stream->r_u32();
+
+    const u32 nodesNum = stream->r_u32();
+    if (mNoLeaf && !mQuantized)
+    {
+        mTree = xr_new<AABBNoLeafTree>();
+        auto* ptr = xr_alloc<AABBNoLeafNode>(nodesNum);
+        const u32 size = nodesNum * sizeof(AABBNoLeafNode);
+        CopyMemory(ptr, stream->pointer(), size);
+        for (int i = 0; i < nodesNum; ++i)
+        {
+            const auto* rootPtr = &ptr[0];
+            if (!ptr[i].HasLeaf())
+                ptr[i].mData  += (uintptr_t)rootPtr;
+            if (!ptr[i].HasLeaf2())
+                ptr[i].mData2 += (uintptr_t)rootPtr;
+        }
+        mTree->SetData(ptr, nodesNum);
+    }
+    else
+    {
+        NODEFAULT; // Not used by engine so not supported
+    }
+}
+
+void OPCODE_Model::Save(IWriter* stream) const
+{
+    stream->w_u32(mNoLeaf);
+    stream->w_u32(mQuantized);
+
+    const u32 nodesNum = mTree->GetNbNodes();
+    stream->w_u32(mTree->GetNbNodes());
+
+    void* pData = nullptr;
+    if (mNoLeaf && !mQuantized)
+    {
+        auto* ptr = xr_alloc<AABBNoLeafNode>(nodesNum);
+        const u32 size = nodesNum * sizeof(AABBNoLeafNode);
+        R_ASSERT(size == mTree->GetUsedBytes());
+        CopyMemory(ptr, mTree->GetData(), size);
+        pData = ptr;
+        for (int i = 0; i < nodesNum; ++i, ++ptr)
+        {
+            const auto* rootPtr = mTree->GetData();
+            if (!ptr->HasLeaf())
+                ptr->mData  -= (uintptr_t)rootPtr;
+            if (!ptr->HasLeaf2())
+                ptr->mData2 -= (uintptr_t)rootPtr;
+        }
+    }
+    else
+    {
+        NODEFAULT; // Not used by engine so not supported
+    }
+    stream->w(pData, mTree->GetUsedBytes());
+    xr_free(pData);
+}
