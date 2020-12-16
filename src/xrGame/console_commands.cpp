@@ -516,23 +516,20 @@ public:
         if (!g_pGameLevel)
             return;
 
-        if (IsGameTypeSingle())
+        if (!IsGameTypeSingle())
         {
-                Log("Spawn command is available only in singleplayer mode.");
-                return;
+            Log("Spawn command is available only in singleplayer mode.");
+            return;
         }
 
-        string128 object_name;
-        sscanf(args, "%s", object_name);
-
-        if (!pSettings->section_exist(object_name))
+        if (!pSettings->section_exist(args))
         {
             InvalidSyntax();
             return;
         }
 
         Fvector pos = Actor()->Position();
-        Level().g_cl_Spawn(object_name, 0xff, M_SPAWN_OBJECT_LOCAL, pos);
+        Level().g_cl_Spawn(args, 0xff, M_SPAWN_OBJECT_LOCAL, pos);
     }
 
     void Info(TInfo& I) override
