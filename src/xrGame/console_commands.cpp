@@ -1914,7 +1914,6 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
     CMD3(CCC_Mask, "g_multi_item_pickup", &psActorFlags, AF_MULTI_ITEM_PICKUP);
-    CMD1(CCC_Spawn, "g_spawn");
 
     // alife
 #ifdef DEBUG
@@ -2084,6 +2083,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_JumpToLevel, "jump_to_level");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
+    CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");
