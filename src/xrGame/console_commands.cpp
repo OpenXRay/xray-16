@@ -509,24 +509,25 @@ public:
 class CCC_Spawn : public IConsole_Command
 {
 public:
-    CCC_Spawn(LPCSTR N) : IConsole_Command(N)  { };
+    CCC_Spawn(pcstr name) : IConsole_Command(name) {}
 
-    virtual void Execute(LPCSTR args)
+    void Execute(pcstr args) override
     {
-        if (!g_pGameLevel) return;
+        if (!g_pGameLevel)
+            return;
 
-        if (GameID() != eGameIDSingle)
+        if (IsGameTypeSingle())
         {
-                Msg("Spawn command is not available for multiplayer!");
+                Log("Spawn command is available only in singleplayer mode.");
                 return;
         }
 
-        char object_name[128] = {0};
-        sscanf(args,"%s", object_name);
+        string128 object_name;
+        sscanf(args, "%s", object_name);
 
         if (!pSettings->section_exist(object_name))
         {
-            Msg("No such object \"%s\"", object_name);
+            InvalidSyntax();
             return;
         }
 
@@ -534,9 +535,9 @@ public:
         Level().g_cl_Spawn(object_name, 0xff, M_SPAWN_OBJECT_LOCAL, pos);
     }
 
-    virtual void Info(TInfo& I)
+    void Info(TInfo& I) override
     {
-        xr_strcpy(I, "Spawn an object <object> at player position");
+        xr_strcpy(I, "valid name of entity or item that can be spawned");
     }
 };
 
