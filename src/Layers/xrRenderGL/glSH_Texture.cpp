@@ -147,6 +147,9 @@ void CTexture::Preload()
 {
     m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
     m_material = RImplementation.Resources->m_textures_description.GetMaterial(cName);
+
+    if (glGetError() != GL_NO_ERROR)
+	    Msg("Warning: can't preload texture %s", cName.c_str());
 }
 
 void CTexture::Load()
