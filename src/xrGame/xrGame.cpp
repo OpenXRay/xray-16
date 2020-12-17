@@ -33,10 +33,7 @@ DLL_API void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
 
 void CCC_RegisterCommands();
 
-#ifdef XR_PLATFORM_LINUX
-__attribute__((constructor))
-#endif
-static void load(int argc, char** argv, char** envp)
+static void initialize_library()
 {
     // Fill ui style token
     FillUIStyleToken();
@@ -51,32 +48,37 @@ static void load(int argc, char** argv, char** envp)
     StringTable().Init();
 }
 
-#ifdef XR_PLATFORM_LINUX
-__attribute__((destructor))
-#endif
-static void unload()
+static void finalize_library()
 {
     CleanupUIStyleToken();
     xr_delete(gStringTable);
 }
 
 #ifdef XR_PLATFORM_WINDOWS
-BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HANDLE /*hModule*/, u32 ul_reason_for_call, LPVOID /*lpReserved*/)
 {
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-    {
-        load(0, nullptr, nullptr);
+        initialize_library();
         break;
-    }
 
     case DLL_PROCESS_DETACH:
-    {
-        unload();
+        finalize_library();
         break;
-    }
     }
     return (TRUE);
 }
+#elif defined(XR_PLATFORM_LINUX)
+__attribute__((constructor)) static void load(int /*argc*/, char** /*argv*/, char** /*envp*/)
+{
+    initialize_library();
+}
+
+__attribute__((destructor)) static void unload()
+{
+    finalize_library();
+}
+#else
+#error Add your platform here
 #endif
