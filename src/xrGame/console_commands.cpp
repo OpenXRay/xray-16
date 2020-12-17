@@ -506,6 +506,38 @@ public:
     }
 };
 
+class CCC_Spawn : public IConsole_Command
+{
+public:
+    CCC_Spawn(pcstr name) : IConsole_Command(name) {}
+
+    void Execute(pcstr args) override
+    {
+        if (!g_pGameLevel)
+            return;
+
+        if (!IsGameTypeSingle())
+        {
+            Log("Spawn command is available only in singleplayer mode.");
+            return;
+        }
+
+        if (!pSettings->section_exist(args))
+        {
+            InvalidSyntax();
+            return;
+        }
+
+        Fvector pos = Actor()->Position();
+        Level().g_cl_Spawn(args, 0xff, M_SPAWN_OBJECT_LOCAL, pos);
+    }
+
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, "valid name of entity or item that can be spawned");
+    }
+};
+
 // helper functions --------------------------------------------
 
 bool valid_saved_game_name(LPCSTR file_name)
@@ -2050,6 +2082,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_JumpToLevel, "jump_to_level");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
+    CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");
