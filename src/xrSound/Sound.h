@@ -255,8 +255,9 @@ The main class representing source/emitter interface
 This class in fact just hides internals and redirect calls to
 specific sub-systems
 */
-struct ref_sound
+class ref_sound
 {
+public:
     ref_sound_data_ptr _p;
 
     ref_sound() = default;

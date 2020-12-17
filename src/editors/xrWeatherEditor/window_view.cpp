@@ -261,7 +261,7 @@ System::Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^
     if (!color)
         return;
 
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
     HDC dc = GetWindowDC((HWND)ViewPanel->Handle.ToInt64());
 #else
     HDC dc = GetWindowDC((HWND)ViewPanel->Handle.ToInt32());
@@ -288,7 +288,7 @@ void window_view::pick_color_cursor(bool value)
     ViewPanel->Cursor = gcnew System::Windows::Forms::Cursor(
         (System::IntPtr)LoadCursor((HINSTANCE)System::Runtime::InteropServices::Marshal::GetHINSTANCE(
                                System::Reflection::Assembly::GetExecutingAssembly()->GetModules()[0])
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
                                .ToInt64(),
 #else
                                .ToInt32(),

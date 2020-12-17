@@ -106,7 +106,7 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect, pcstr se
         config.read_if_exists(period.y, m_load_section, "period1");
         config.read_if_exists(period.z, m_load_section, "period2");
         config.read_if_exists(period.w, m_load_section, "period3");
-        m_sound_period.set(period.mul(1000.f));
+        m_sound_period.set(period.mul(1000));
     }
     else if (config.read_if_exists(staticPeriod, m_load_section, "sound_period")) // SOC
     {
@@ -115,7 +115,7 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect, pcstr se
         config.read_if_exists(period.y, m_load_section, "period1");
         config.read_if_exists(period.z, m_load_section, "period2");
         config.read_if_exists(period.w, m_load_section, "period3");
-        m_sound_period.set(period.mul(1000.f));
+        m_sound_period.set(period.mul(1000));
     }
     else // COP
     {

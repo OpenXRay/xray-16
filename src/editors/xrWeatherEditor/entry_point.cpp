@@ -35,7 +35,7 @@ protected:
     virtual void WndProc(System::Windows::Forms::Message % m) override
     {
         LONG_PTR result;
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
         if (m_engine && m_engine->on_message((HWND)m.HWnd.ToInt64(), m.Msg, m.WParam.ToInt64(), m.LParam.ToInt64(), result))
             return;
 #else

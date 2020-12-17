@@ -1015,9 +1015,9 @@ public:
         }
         else
         {
-            // size_t ????? u32 maybe?
+            // XXX: size_t ????? u32 maybe?
             size_t player_index = 0;
-            if (sscanf(args_, "%u", &player_index) != 1)
+            if (sscanf(args_, "%zu", &player_index) != 1)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg(" Unban player. Format: \"sv_unbanplayer <banned player index | \'%s\'>. To receive list of banned "
@@ -2145,7 +2145,7 @@ void register_mp_console_commands()
 //	CMD4(CCC_Integer,		"sv_statistic_save_auto", &g_bStatisticSaveAuto, 0, 1);
 
 #ifndef MASTER_GOLD
-    // Using CCC_AuthCheck twice, yes. It's not a mistake. 
+    // Using CCC_AuthCheck twice, yes. It's not a mistake.
     CMD4(CCC_AuthCheck, "sv_no_auth_check", &g_SV_Disable_Auth_Check, 0, 1);
     CMD4(CCC_AuthCheck, "sv_ignore_version_mismatch", &g_sv_ignore_version_mismatch, 0, 1);
 #endif // MASTER_GOLD

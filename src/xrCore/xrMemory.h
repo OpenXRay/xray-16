@@ -42,7 +42,7 @@ extern XRCORE_API xrMemory Memory;
     return Memory.mem_alloc(size);
 }
 
-[[nodiscard]] inline void* operator new(size_t size, const std::nothrow_t&)
+[[nodiscard]] inline void* operator new(size_t size, const std::nothrow_t&) noexcept
 {
     return Memory.mem_alloc(size);
 }
@@ -52,7 +52,7 @@ extern XRCORE_API xrMemory Memory;
     return Memory.mem_alloc(size, static_cast<size_t>(alignment));
 }
 
-[[nodiscard]] inline void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&)
+[[nodiscard]] inline void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
     return Memory.mem_alloc(size, static_cast<size_t>(alignment));
 }

@@ -196,7 +196,7 @@ void CStats::Show()
     if (psDeviceFlags.test(rsShowFPS))
     {
         const auto fps = u32(Device.GetStats().fFPS);
-        fpsFont->Out(Device.dwWidth - 40, 5, "%3d", fps);
+        fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3d", fps);
         fpsFont->OnRender();
     }
     gTestTimer0.FrameStart();

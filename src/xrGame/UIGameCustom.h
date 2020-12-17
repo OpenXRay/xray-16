@@ -23,8 +23,9 @@ struct KillMessageStruct;
 class CUIMainIngameWnd;
 class CUIMessagesWindow;
 
-struct StaticDrawableWrapper : public IPureDestroyableObject
+class StaticDrawableWrapper : public IPureDestroyableObject
 {
+public:
     CUIStatic* m_static;
     float m_endTime;
     shared_str m_name;

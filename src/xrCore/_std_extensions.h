@@ -92,9 +92,7 @@ IC bool _valid(const float x) noexcept
     switch (cls)
     {
     case FP_NAN:
-        [[fallthrough]];
     case FP_INFINITE:
-        [[fallthrough]];
     case FP_SUBNORMAL:
         return false;
     default:

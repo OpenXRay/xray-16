@@ -823,7 +823,7 @@ bool CActor::net_Relevant() // relevant for export to server
     }
     else
     {
-        return Local() & g_Alive();
+        return Local() && g_Alive();
     };
 };
 
