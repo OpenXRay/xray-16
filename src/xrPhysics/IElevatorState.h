@@ -19,9 +19,7 @@ public:
     virtual void NetRelcase(IPhysicsShellHolder* O) = 0;
 
 protected:
-#if defined(XR_PLATFORM_WINDOWS)
-    virtual ~IElevatorState() = 0 {}
-#elif defined(XR_PLATFORM_LINUX)
-    virtual ~IElevatorState() {}
-#endif
+    virtual ~IElevatorState() = 0;
 };
+
+inline IElevatorState::~IElevatorState() = default;
