@@ -538,7 +538,6 @@ public:
     }
 };
 
-
 // helper functions --------------------------------------------
 
 bool valid_saved_game_name(LPCSTR file_name)
