@@ -13,7 +13,6 @@ protected:
 
 inline IPHCapture::~IPHCapture() = default;
 
-
 class CPHCharacter;
 struct NearestToPointCallback;
 XRPHYSICS_API IPHCapture* phcapture_create(
