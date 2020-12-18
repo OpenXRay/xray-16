@@ -11,6 +11,7 @@
 #include "xrEngine/profiler.h"
 
 CLevelGraph::CLevelGraph(const char* fileName)
+    : m_level_id(GameGraph::_LEVEL_ID(-1))
 {
     string256 filePath;
     strconcat(sizeof(filePath), filePath, fileName, LEVEL_GRAPH_NAME);

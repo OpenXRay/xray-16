@@ -8,23 +8,13 @@ const GUID DECLSPEC_SELECTANY IID_IDirect3DIndexBuffer9;
 
 xrIDirect3DIndexBuffer9::xrIDirect3DIndexBuffer9(
     IDirect3DDevice9* pIDirect3DDevice9, UINT iLength, DWORD iUsage, D3DFORMAT iFormat, D3DPOOL iPool)
-    : m_refCount(0)
+    : m_refCount(0), m_pIDirect3DDevice9(pIDirect3DDevice9)
+//#ifdef D3D_DEBUG_INFO
+    , Name(nullptr), Length(iLength), Usage(iUsage), Format(iFormat), Pool(iPool),
+      Priority(0), LockCount(0), CreationCallStack(nullptr)
+//#endif
 {
     APIDEBUG("xrIDirect3DIndexBuffer9::xrIDirect3DIndexBuffer9");
-    m_pIDirect3DDevice9 = pIDirect3DDevice9;
-
-    //#ifdef D3D_DEBUG_INFO
-    //-----------------------------------------------
-    Name = NULL;
-    Length = iLength;
-    Usage = iUsage;
-    Format = iFormat;
-    Pool = iPool;
-    Priority = 0;
-    LockCount = 0;
-    CreationCallStack = NULL;
-    //-----------------------------------------------
-    //#endif
 
     switch (Format)
     {

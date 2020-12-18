@@ -23,9 +23,8 @@ CUILine::~CUILine()
 }
 
 CUILine::CUILine(const CUILine& other)
+    : m_subLines(other.m_subLines), m_tmpLine(nullptr)
 {
-    m_subLines = other.m_subLines;
-    m_tmpLine = NULL;
 }
 
 CUILine& CUILine::operator=(const CUILine& other)

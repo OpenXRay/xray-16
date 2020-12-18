@@ -106,9 +106,9 @@ public:
     IC void begin(const CLevelVertex& vertex, const_iterator& begin, const_iterator& end) const;
     IC void begin(const CLevelVertex* vertex, const_iterator& begin, const_iterator& end) const;
     IC void begin(u32 vertex_id, const_iterator& begin, const_iterator& end) const;
-    IC u32 value(const CLevelVertex& vertex, const_iterator& i) const;
-    IC u32 value(const CLevelVertex* vertex, const_iterator& i) const;
-    IC u32 value(const u32 vertex_id, const_iterator& i) const;
+    IC u32 value(const CLevelVertex& vertex, const_iterator i) const;
+    IC u32 value(const CLevelVertex* vertex, const_iterator i) const;
+    IC u32 value(const u32 vertex_id, const_iterator i) const;
     IC const CHeader& header() const;
     ICF bool valid_vertex_id(u32 vertex_id) const;
     IC const GameGraph::_LEVEL_ID& level_id() const;

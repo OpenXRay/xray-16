@@ -610,7 +610,7 @@ gpiProcessRecvBuddyList(
             {
                 buffer[j] = c;
             }
-            buffer[j] = '\0';
+            buffer[min(j, sizeof(buffer) - 1)] = '\0';
             index += j;
         }
         else
@@ -1049,12 +1049,12 @@ gpiDeleteBuddy(
 		freeclear(pProfile->buddyStatusInfo->gameType);
 		freeclear(pProfile->buddyStatusInfo->gameVariant);
 		freeclear(pProfile->buddyStatusInfo->gameMapName);
-		freeclear(pProfile->buddyStatusInfo);
 		if (pProfile->buddyStatusInfo->extendedInfoKeys)
 		{
 			ArrayFree(pProfile->buddyStatusInfo->extendedInfoKeys);
 			pProfile->buddyStatusInfo->extendedInfoKeys = NULL;
 		}
+		freeclear(pProfile->buddyStatusInfo);
 
 		if(gpiCanFreeProfile(pProfile))
 			gpiRemoveProfile(connection, pProfile);

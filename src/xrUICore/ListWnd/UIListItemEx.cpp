@@ -11,11 +11,10 @@
 
 #include "UIListItemEx.h"
 
-CUIListItemEx::CUIListItemEx()
+CUIListItemEx::CUIListItemEx() : m_dwSelectionColor(color_argb(200, 95, 82, 74))
 {
     //.	InitTexture("ui\\hud_map_point");
     //.	SetStretchTexture(true);
-    m_dwSelectionColor = color_argb(200, 95, 82, 74);
     CUIStatic::SetColor(color_argb(0, 0, 0, 0));
 }
 

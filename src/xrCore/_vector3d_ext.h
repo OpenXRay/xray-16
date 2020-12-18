@@ -77,7 +77,7 @@ Fvector crossproduct(const Fvector& v1, const Fvector& v2);
 
 Fvector cr_vectorHP(float h, float p);
 
-float angle_between_vectors(Fvector const v1, Fvector const v2);
+float angle_between_vectors(Fvector const& v1, Fvector const& v2);
 
 Fvector rotate_point(Fvector const& point, float const angle);
 
