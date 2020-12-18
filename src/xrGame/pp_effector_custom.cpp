@@ -6,7 +6,8 @@
 #define TRANSLATE_TYPE(val) EEffectorPPType(val ? u32(u64(typeid(this).name())) : u32(u64(this) & u32(-1)))
 
 #pragma warning(push)
-#pragma warning(disable : 4355) // 'this' : used in base member initializer list
+// XXX: Do something with that cheap ID generation, remove warning
+#pragma warning(disable : 4355 4826) // 'this' : used in base member initializer list
 
 CPPEffectorCustom::CPPEffectorCustom(const SPPInfo& ppi, bool one_instance, bool destroy_from_engine)
     : inherited(TRANSLATE_TYPE(one_instance), flt_max, destroy_from_engine)

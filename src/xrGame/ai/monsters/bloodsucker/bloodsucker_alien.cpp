@@ -214,11 +214,14 @@ void CBloodsuckerAlien::activate()
         psHUD_Flags.set(HUD_CROSSHAIR_RT, FALSE);
 
     // Start effector
+#pragma warning(push)
+#pragma warning(disable : 4826) // XXX: Do something with that cheap ID generation, remove warning
     m_effector_pp = xr_new<CAlienEffectorPP>(m_object->pp_vampire_effector, EFFECTOR_ID_GEN(EEffectorPPType));
     Actor()->Cameras().AddPPEffector(m_effector_pp);
 
     m_effector = xr_new<CAlienEffector>(EFFECTOR_ID_GEN(ECamEffectorType), m_object);
     Actor()->Cameras().AddCamEffector(m_effector);
+#pragma warning(pop)
 
     // make invisible
     m_object->state_invisible = true;
@@ -238,6 +241,8 @@ void CBloodsuckerAlien::deactivate()
     if (m_crosshair_show)
         psHUD_Flags.set(HUD_CROSSHAIR_RT, TRUE);
 
+#pragma warning(push)
+#pragma warning(disable : 4826) // XXX: Do something with that cheap ID generation, remove warning
     // Stop camera effector
     Actor()->Cameras().RemoveCamEffector(EFFECTOR_ID_GEN(ECamEffectorType));
     m_effector = 0;
@@ -246,6 +251,7 @@ void CBloodsuckerAlien::deactivate()
     Actor()->Cameras().RemovePPEffector(EFFECTOR_ID_GEN(EEffectorPPType));
     m_effector_pp->Destroy();
     m_effector_pp = 0;
+#pragma warning(pop)
 
     m_active = false;
 

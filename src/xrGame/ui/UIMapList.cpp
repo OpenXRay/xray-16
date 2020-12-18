@@ -23,6 +23,9 @@ extern ENGINE_API string_path g_sLaunchWorkingFolder;
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 
+#pragma warning(push)
+#pragma warning(disable : 4826) // XXX: Do something with that __int64 cast
+
 CUIMapList::CUIMapList()
 {
     m_pMapInfo = NULL;
@@ -398,3 +401,5 @@ const MPLevelDesc& CUIMapList::GetMapNameInt(EGameIDs _type, u32 idx)
     R_ASSERT(M.m_map_names.size() > idx);
     return M.m_map_names[idx];
 }
+
+#pragma warning(pop) // XXX: Do something with that __int64 cast
