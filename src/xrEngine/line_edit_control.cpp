@@ -150,6 +150,7 @@ void line_edit_control::clear_states()
 
 void line_edit_control::on_ir_capture()
 {
+    SDL_PumpEvents();
     SDL_StartTextInput();
     SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
 }
