@@ -11,7 +11,7 @@
 #include "Layers/xrRender/blenders/blender_luminance.h"
 #include "Layers/xrRender/blenders/blender_ssao.h"
 
-#ifdef RENDER == R_R2 // XXX: merge old/new cascade blenders into one file
+#if RENDER == R_R2 // XXX: merge old/new cascade blenders into one file
 #include "Layers/xrRender/blenders/blender_light_direct_cascade.h"
 #endif
 
