@@ -23,11 +23,26 @@ typedef enum D3D_COMPARISON_FUNC {
     D3D_COMPARISON_ALWAYS = GL_ALWAYS
 } D3D_COMPARISON_FUNC;
 
-using D3D_VIEWPORT = struct XR_GL_VIEWPORT
+struct XR_GL_VIEWPORT
 {
     GLint TopLeftX, TopLeftY;
     GLsizei Width, Height;
     GLclampf MinDepth, MaxDepth;
+};
+
+struct D3D_VIEWPORT : XR_GL_VIEWPORT
+{
+    using XR_GL_VIEWPORT::XR_GL_VIEWPORT;
+
+    // Needed to suppress warnings
+    template <typename TopLeftCoords, typename Dimensions>
+    D3D_VIEWPORT(TopLeftCoords x, TopLeftCoords y, Dimensions w, Dimensions h, float minZ, float maxZ)
+        : XR_GL_VIEWPORT{
+            static_cast<GLint>(x), static_cast<GLint>(y),
+            static_cast<GLsizei>(w), static_cast<GLsizei>(h),
+            static_cast<GLclampf>(minZ), static_cast<GLclampf>(maxZ),
+        }
+    {}
 };
 
 using D3D_QUERY = enum XR_GL_QUERY

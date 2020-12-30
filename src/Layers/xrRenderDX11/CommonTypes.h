@@ -36,7 +36,6 @@ typedef D3D11_MAPPED_SUBRESOURCE D3D_MAPPED_TEXTURE3D;
 typedef D3D11_INPUT_ELEMENT_DESC D3D_INPUT_ELEMENT_DESC;
 
 typedef D3D11_PRIMITIVE_TOPOLOGY D3D_PRIMITIVE_TOPOLOGY;
-typedef D3D11_VIEWPORT D3D_VIEWPORT;
 typedef D3D11_USAGE D3D_USAGE;
 typedef D3D11_RECT D3D_RECT;
 
@@ -272,6 +271,21 @@ typedef ID3D11ShaderReflectionType ID3DShaderReflectionType;
 
 typedef dx10State ID3DState;
 #define DX10_ONLY(expr) expr
+
+struct D3D_VIEWPORT : D3D11_VIEWPORT
+{
+    using D3D11_VIEWPORT::D3D11_VIEWPORT;
+
+    // Needed to suppress warnings
+    template <typename TopLeftCoords, typename Dimensions>
+    D3D_VIEWPORT(TopLeftCoords x, TopLeftCoords y, Dimensions w, Dimensions h, float minZ, float maxZ)
+        : D3D11_VIEWPORT{
+            static_cast<float>(x), static_cast<float>(y),
+            static_cast<float>(w), static_cast<float>(h),
+            minZ, maxZ
+        }
+    {}
+};
 
 using VertexBufferHandle = ID3D11Buffer*;
 using IndexBufferHandle = ID3D11Buffer*;

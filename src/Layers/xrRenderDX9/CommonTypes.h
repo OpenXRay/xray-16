@@ -6,7 +6,6 @@ typedef ID3DXBuffer ID3DBlob;
 typedef D3DXMACRO D3D_SHADER_MACRO;
 typedef D3DDEVTYPE D3D_DRIVER_TYPE;
 typedef IDirect3DQuery9 ID3DQuery;
-typedef D3DVIEWPORT9 D3D_VIEWPORT;
 typedef ID3DXInclude ID3DInclude;
 typedef IDirect3DTexture9 ID3DTexture2D;
 typedef IDirect3DSurface9 ID3DRenderTargetView;
@@ -24,6 +23,21 @@ constexpr auto D3D_QUERY_EVENT = D3DQUERYTYPE_EVENT;
 constexpr auto D3D_QUERY_OCCLUSION = D3DQUERYTYPE_OCCLUSION;
 
 #define DX10_ONLY(expr) do {} while (0)
+
+struct D3D_VIEWPORT : D3DVIEWPORT9
+{
+    using D3DVIEWPORT9::D3DVIEWPORT9;
+
+    // Needed to suppress warnings
+    template <typename TopLeftCoords, typename Dimensions>
+    D3D_VIEWPORT(TopLeftCoords x, TopLeftCoords y, Dimensions w, Dimensions h, float minZ, float maxZ)
+        : D3DVIEWPORT9{
+            static_cast<DWORD>(x), static_cast<DWORD>(y),
+            static_cast<DWORD>(w), static_cast<DWORD>(h),
+            minZ, maxZ
+        }
+    {}
+};
 
 using unused_t = int[0];
 
