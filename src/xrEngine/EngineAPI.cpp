@@ -203,7 +203,7 @@ void CEngineAPI::CreateRendererList()
 
         const auto it = std::find_if(renderers.begin(), renderers.end(), [](const RendererDesc& desc)
         {
-            return desc.libraryName == r2_library;
+            return 0 == xr_strcmp(desc.libraryName, r2_library);
         });
         if (it != renderers.end())
             r2_available = true;
@@ -264,7 +264,7 @@ void CEngineAPI::CreateRendererList()
     modes.emplace_back(nullptr, -1);
 }
 
-bool is_r2_available()
+static bool is_r2_available()
 {
     return r2_available;
 }
