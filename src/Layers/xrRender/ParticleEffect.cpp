@@ -519,7 +519,7 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
     float sina = 0.0f, cosa = 0.0f;
     // Xottab_DUTY: changed angle to be float instead of DWORD
     // But it must be 0xFFFFFFFF or otherwise some particles won't play
-    float angle = 0xFFFFFFFF;
+    float angle = float(0xFFFFFFFF); // XXX: check if we can replace with flt_max
 
     FOR_START(u32, 0, count, i)
         {

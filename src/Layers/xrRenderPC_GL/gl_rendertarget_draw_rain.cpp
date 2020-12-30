@@ -81,7 +81,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         float fRange = 1;
         //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
         //float			fBias				= 0.00001;
-        float fBias = -0.0001;
+        float fBias = -0.0001f;
         float smapsize = float(RImplementation.o.smapsize);
         float fTexelOffs = (.5f / smapsize);
         //		float			view_dimX			= float(RainSetup.X.D.maxX-RainSetup.X.D.minX-2)/smapsize;

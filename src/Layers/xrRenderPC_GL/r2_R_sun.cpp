@@ -1191,7 +1191,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         float map_size = m_sun_cascades[cascade_ind].size;
         XRMatrixOrthoOffCenterLH(&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
-                                   map_size * 0.5f, 0.1, dist + /*sqrt(2)*/1.41421f * map_size);
+                                   map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/1.41421f * map_size);
 
         //////////////////////////////////////////////////////////////////////////
 

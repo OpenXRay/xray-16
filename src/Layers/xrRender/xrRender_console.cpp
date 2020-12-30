@@ -234,7 +234,7 @@ u32 dm_current_cache_line = 49; //dm_current_size+1+dm_current_size
 u32 dm_current_cache_size = 2401; //dm_current_cache_line*dm_current_cache_line
 float dm_current_fade = 47.5; //float(2*dm_current_size)-.5f;
 
-float ps_current_detail_density = 0.6;
+float ps_current_detail_density = 0.6f;
 float ps_current_detail_height = 1.f;
 
 xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},

@@ -319,7 +319,7 @@ void CROS_impl::smart_update(IRenderable* O)
     }
     else
     {
-        if (!last_position.similar(position, 0.15))
+        if (!last_position.similar(position, 0.15f))
         {
             sky_rays_uptodate = 0;
             update(O);

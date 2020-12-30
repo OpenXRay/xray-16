@@ -49,7 +49,7 @@ void CDetailManager::hw_Render()
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
     float fDelta = Device.fTimeGlobal - m_global_time_old;
     if ((fDelta < 0) || (fDelta > 1))
-        fDelta = 0.03;
+        fDelta = 0.03f;
     m_global_time_old = Device.fTimeGlobal;
 
     m_time_rot_1 += (PI_MUL_2 * fDelta / swing_current.rot1);

@@ -5,27 +5,30 @@
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
-static Fvector3 corners [8] = {
-    {-1, -1, 0.7}, {-1, -1, +1},
-    {-1, +1, +1}, {-1, +1, 0.7},
-    {+1, +1, +1}, {+1, +1, 0.7},
-    {+1, -1, +1}, {+1, -1, 0.7}
+static Fvector3 corners [8] =
+{
+    { -1, -1, 0.7f }, { -1, -1, +1   },
+    { -1, +1, +1   }, { -1, +1, 0.7f },
+    { +1, +1, +1   }, { +1, +1, 0.7f },
+    { +1, -1, +1   }, { +1, -1, 0.7f }
 };
-static u16 facetable[16][3] = {
-    {3, 2, 1},
-    {3, 1, 0},
-    {7, 6, 5},
-    {5, 6, 4},
-    {3, 5, 2},
-    {4, 2, 5},
-    {1, 6, 7},
-    {7, 0, 1},
 
-    {5, 3, 0},
-    {7, 5, 0},
+static u16 facetable[16][3] =
+{
+    { 3, 2, 1 },
+    { 3, 1, 0 },
+    { 7, 6, 5 },
+    { 5, 6, 4 },
+    { 3, 5, 2 },
+    { 4, 2, 5 },
+    { 1, 6, 7 },
+    { 7, 0, 1 },
 
-    {1, 4, 6},
-    {2, 4, 1},
+    { 5, 3, 0 },
+    { 7, 5, 0 },
+
+    { 1, 4, 6 },
+    { 2, 4, 1 },
 };
 
 void CRenderTarget::accum_direct(u32 sub_phase)
@@ -146,7 +149,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         //float			fTexelOffs			= (.5f / float(RImplementation.o.smapsize));
         //float			fRange				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_scale:ps_r2_sun_depth_far_scale;
         //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
-        //Fmatrix			m_TexelAdjust		= 
+        //Fmatrix			m_TexelAdjust		=
         //{
         //	0.5f,				0.0f,				0.0f,			0.0f,
         //	0.0f,				0.5f,				0.0f,			0.0f,
@@ -276,7 +279,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         // Fetch4 : enable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4') 
+        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
@@ -310,7 +313,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         // Fetch4 : disable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1') 
+        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
         //		}
 
@@ -443,7 +446,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         //float			fTexelOffs			= (.5f / float(RImplementation.o.smapsize));
         //float			fRange				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_scale:ps_r2_sun_depth_far_scale;
         //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
-        //Fmatrix			m_TexelAdjust		= 
+        //Fmatrix			m_TexelAdjust		=
         //{
         //	0.5f,				0.0f,				0.0f,			0.0f,
         //	0.0f,				0.5f,				0.0f,			0.0f,
@@ -614,7 +617,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // Fetch4 : enable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4') 
+        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
@@ -680,7 +683,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // Fetch4 : disable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1') 
+        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
         //		}
 
@@ -1227,7 +1230,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         // Fetch4 : enable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4') 
+        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
@@ -1241,11 +1244,11 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
         }
         /*
-     else 
+     else
      {
           // per pixel
           RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-          
+
           // per sample
         if( RImplementation.o.dx10_msaa_opt )
         {
@@ -1279,7 +1282,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         // Fetch4 : disable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1') 
+        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
         //		}
 
