@@ -117,7 +117,7 @@ void CLightProjector::setup(int id)
     Fvector& m = R.UVclamp_min;
     RCache.set_ca(c_clamp, 0, m.x, m.y, m.z, factor);
     Fvector& M = R.UVclamp_max;
-    RCache.set_ca(c_clamp, 1, M.x, M.y, M.z, 0);
+    RCache.set_ca(c_clamp, 1, M.x, M.y, M.z, 0.0f);
 }
 
 void CLightProjector::invalidate()

@@ -169,7 +169,7 @@ void CLightShadows::calculate()
 
     // iterate on objects
     int slot_id = 0;
-    int s_size = rt_size * ps_r2_ls_squality / (512 / 85);
+    int s_size = int(rt_size * ps_r2_ls_squality / (512 / 85));
     int slot_line = rt_size / s_size;
     int slot_max = slot_line * slot_line;
     const float eps = 2 * EPS_L;
@@ -415,7 +415,7 @@ void CLightShadows::render()
     CDB::TRI* TRIS = DB->get_tris();
     Fvector* VERTS = DB->get_verts();
 
-    int s_size = rt_size * ps_r2_ls_squality / (512 / 85);
+    int s_size = int(rt_size * ps_r2_ls_squality / (512 / 85));
     int slot_line = rt_size / s_size;
 
     // Projection and xform

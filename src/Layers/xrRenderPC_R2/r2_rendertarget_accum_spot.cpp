@@ -360,7 +360,7 @@ void CRenderTarget::accum_volumetric(light* L)
         RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
         RCache.set_c("vMinBounds", aabb.x1, aabb.y1, aabb.z1, 0.f);
         //	Increase camera-space aabb z size to compensate decrease of slices number
-        RCache.set_c("vMaxBounds", aabb.x2, aabb.y2, aabb.z1 + (aabb.z2 - aabb.z1) / fQuality, 0);
+        RCache.set_c("vMaxBounds", aabb.x2, aabb.y2, aabb.z1 + (aabb.z2 - aabb.z1) / fQuality, 0.0f);
 
         //	Set up user clip planes
         {

@@ -4,9 +4,9 @@
 
 class dx103DFluidGrid;
 class dx103DFluidData;
-__interface IPhysicsShell;
-__interface IPhysicsElement;
-__interface IPhysicsGeometry;
+class IPhysicsShell;
+class IPhysicsElement;
+class IPhysicsGeometry;
 
 class dx103DFluidObstacles
 {

@@ -377,7 +377,7 @@ void CRenderTarget::End()
         //  Prepare colormapped buffer
         RCache.set_Element(bDistort ? s_postprocess_D[1]->E[4] : s_postprocess[1]->E[4]);
         RCache.set_Geometry(g_postprocess);
-        RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0, 0);
+        RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0.0f, 0.0f);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
         RCache.set_RT(get_base_rt());
@@ -395,8 +395,8 @@ void CRenderTarget::End()
 
     // Actual rendering
     static shared_str s_brightness = "c_brightness";
-    RCache.set_c(s_brightness, p_brightness.x, p_brightness.y, p_brightness.z, 0);
-    RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0, 0);
+    RCache.set_c(s_brightness, p_brightness.x, p_brightness.y, p_brightness.z, 0.0f);
+    RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0.0f, 0.0f);
     RCache.set_Geometry(g_postprocess);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }

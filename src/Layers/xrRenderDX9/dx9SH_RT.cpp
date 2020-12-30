@@ -158,8 +158,8 @@ void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dw
 
 void CRT::resolve_into(CRT& destination) const
 {
-    RECT rect    { 0, 0, dwWidth, dwHeight };
-    RECT dstRect { 0, 0, destination.dwWidth, destination.dwHeight };
+    const RECT rect    { 0, 0, (int)dwWidth, (int)dwHeight };
+    const RECT dstRect { 0, 0, (int)destination.dwWidth, (int)destination.dwHeight };
 
     HW.pDevice->StretchRect(pRT, &rect, destination.pRT, &dstRect, D3DTEXF_POINT);
 }

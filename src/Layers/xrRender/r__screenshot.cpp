@@ -3,11 +3,17 @@
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 
+#pragma push_macro("DLL_API") // XXX: suppresses warning, it's better to remove this
+#ifdef DLL_API
+#   undef DLL_API
+#endif
+
 #if defined(XR_PLATFORM_WINDOWS)
 #include <FreeImage/FreeImagePlus.h>
 #else
 #include <FreeImagePlus.h>
 #endif
+#pragma pop_macro("DLL_API") // XXX: suppresses warning, it's better to remove this
 
 #if !defined(USE_DX9) && !defined(USE_OGL)
 #include "d3dx11tex.h"
@@ -61,8 +67,8 @@ bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWO
     const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     const u8 header[6] =
     {
-        width % 256, width / 256,
-        height % 256, height / 256,
+        u8(width % 256),  u8(width / 256),
+        u8(height % 256), u8(height / 256),
         bits, 0
     };
 
@@ -70,7 +76,7 @@ bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWO
 
     xr_vector<u8> pixels;
     pixels.resize(bitsSize + headerSize);
-    
+
     for (size_t i = 0; i < sizeof(tgaHeader); i++)
         pixels[i] = tgaHeader[i];
 
@@ -107,7 +113,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     DWORD bufferSize;
     fipMemoryIO output;
     IWriter* fs = nullptr;
-    
+
     switch (mode)
     {
     case SM_NORMAL:
@@ -494,7 +500,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         strconcat(sizeof(buf), buf, name, ".tga");
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
-        // TODO: DX10: This is totally incorrect but mimics 
+        // TODO: DX10: This is totally incorrect but mimics
         // original behavior. Fix later.
         hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
         if (hr != D3D_OK)

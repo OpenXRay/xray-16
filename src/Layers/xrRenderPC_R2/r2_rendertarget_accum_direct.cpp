@@ -174,7 +174,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
         // setup
         RCache.set_Element(s_accum_direct->E[sub_phase]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.0f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
@@ -291,7 +291,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
         RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
-        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0);
+        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.0f);
 
         //if (stencil>=1 && aref_pass) stencil = light_id
         RCache.set_ColorWriteEnable(FALSE);
@@ -424,7 +424,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_Element(s_accum_direct->E[sub_phase]);
 
         RCache.set_c("m_texgen", m_Texgen);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.0f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
@@ -434,11 +434,11 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         if (sub_phase == SE_SUN_FAR)
         {
             Fvector3 view_viewspace;
-            view_viewspace.set(0, 0, 1);
+            view_viewspace.set(0.0f, 0.0f, 1.0f);
 
             m_shadow.transform_dir(view_viewspace);
             Fvector4 view_projlightspace;
-            view_projlightspace.set(view_viewspace.x, view_viewspace.y, 0, 0);
+            view_projlightspace.set(view_viewspace.x, view_viewspace.y, 0.0f, 0.0f);
             view_projlightspace.normalize();
 
             RCache.set_c("view_shadow_proj", view_projlightspace);
@@ -821,7 +821,7 @@ void CRenderTarget::accum_direct_lum()
 void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, const Fmatrix& mShadow)
 {
     PIX_EVENT(accum_direct_volumetric);
-    
+
     if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_MIDDLE) && (sub_phase != SE_SUN_FAR))
         return;
 
