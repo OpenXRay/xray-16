@@ -12,8 +12,9 @@
 #include "serialize.h"
 #include "ETextureParams.h"
 
-extern "C" bool __declspec(dllimport) __stdcall DXTCompress(
-    LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
+extern "C" XR_IMPORT
+bool __stdcall DXTCompress(pcstr out_name, u8* raw_data, u8* normal_map,
+    u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
 // extern BOOL ApplyBorders	(lm_layer &lm, u32 ref);
 
