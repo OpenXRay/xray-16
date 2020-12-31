@@ -137,7 +137,7 @@ static void _InitLZO(const char* dic_name = _DefaultDictName)
 {
     lzo_init();
     _LZOWrkMem = new char[LZO1X_999_MEM_COMPRESS + 16];
-    _LZOWrkMem = (char*)((unsigned int)(_LZOWrkMem + 16) & (~(16 - 1)));
+    _LZOWrkMem = (char*)((std::uintptr_t)(_LZOWrkMem + 16) & (~(16 - 1)));
 
     FILE* dic = fopen(dic_name, "rb");
 
