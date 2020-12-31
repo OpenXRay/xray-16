@@ -46,7 +46,7 @@ static char const* current_time(string64& dest_time)
     return dest_time;
 }
 
-u32 const writer::write_info(sha_process_yielder* yielder)
+u32 const writer::write_info(crypto::yielder_t* yielder)
 {
     string64 time_string;
     m_info_data.w_string(ss_info_secion, ss_creation_date, current_time(time_string));
