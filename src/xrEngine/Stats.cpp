@@ -199,6 +199,17 @@ void CStats::Show()
         fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3d", fps);
         fpsFont->OnRender();
     }
+    if (psDeviceFlags.test(rsShowFPSGraph))
+    {
+        const auto fps = Device.GetStats().fFPS;
+        const auto fpsMidThr = 30;
+        const auto fpsMaxThr = 60;
+        fpsGraph->AppendItem(fps, color_xrgb(
+            fps <  fpsMaxThr ? 255 : 0,
+            fps >= fpsMidThr ? 255 : 0,
+            0));
+        fpsGraph->OnRender();
+    }
     gTestTimer0.FrameStart();
     gTestTimer1.FrameStart();
     gTestTimer2.FrameStart();
@@ -215,6 +226,13 @@ void CStats::OnDeviceCreate()
         fpsFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
         fpsFont->SetHeightI(0.025f);
         fpsFont->SetColor(color_rgba(250, 250, 15, 180));
+
+        fpsGraph = xr_make_unique<CStatGraph>(false);
+        fpsGraph->SetStyle(CStatGraph::EStyle::stBarLine);
+        fpsGraph->SetRect(Device.dwWidth - 390, 10 - Device.dwHeight, 300, 68, color_xrgb(255, 255, 255) , color_xrgb(50, 50, 50));
+        fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 60, color_xrgb(128, 128, 128)); // Max
+        fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 30, color_xrgb(70, 70, 70)); // Mid
+        fpsGraph->SetMinMax(0.0f, 100.0f, 500);
     }
 
 #ifdef DEBUG
@@ -234,6 +252,9 @@ void CStats::OnDeviceDestroy()
     SetLogCB(nullptr);
     xr_delete(statsFont);
     xr_delete(fpsFont);
+    if (fpsGraph)
+        fpsGraph->OnDeviceDestroy();
+    fpsGraph = nullptr;
 }
 
 void CStats::FilteredLog(const char* s)

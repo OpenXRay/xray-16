@@ -40,7 +40,8 @@ enum
     rsCameraPos = (1ul << 18ul),
 
     rsShowFPS = (1ul << 19ul),
-    rsDrawParticles = (1ul << 20ul),
+    rsShowFPSGraph = (1ul << 20ul),
+    rsDrawParticles = (1ul << 21ul),
     // 22-32 bit - reserved to Editor
 };
 
