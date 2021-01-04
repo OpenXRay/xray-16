@@ -33,7 +33,6 @@ if (UNIX)
 
         if (FEDORA_FOUND OR REDHAT_FOUND OR CENTOS_FOUND)
             set(CPACK_GENERATOR RPM)
-            
             # -- set(CPACK_RPM_PACKAGE_AUTOREQPROV ON)
             set(CPACK_RPM_PACKAGE_AUTOREQ ON)
             set(CPACK_RPM_PACKAGE_AUTOPROV YES)
