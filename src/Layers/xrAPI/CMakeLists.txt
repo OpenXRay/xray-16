@@ -1,15 +1,33 @@
 project(xrAPI)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../.. 
-    )
+set(SRC_FILES
+    "xrAPI.cpp"
+    "stdafx.h"
+    "stdafx.cpp"
+)
 
-add_definitions(-DXRAPI_EXPORTS)
+group_sources(SRC_FILES)
 
-add_library(${PROJECT_NAME} SHARED "xrAPI.cpp" "stdafx.h")
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
 
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRAPI_EXPORTS
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
+)
+
+cotire(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

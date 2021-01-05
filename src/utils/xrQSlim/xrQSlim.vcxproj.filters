@@ -15,147 +15,147 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\geom3d.h">
+    <ClInclude Include="geom3d.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\mat2.h">
+    <ClInclude Include="mat2.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\mat3.h">
+    <ClInclude Include="mat3.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\mat4.h">
+    <ClInclude Include="mat4.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\mixmops.h">
+    <ClInclude Include="mixmops.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\mixvops.h">
+    <ClInclude Include="mixvops.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxDefines.h">
+    <ClInclude Include="MxDefines.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxGeom3D.h">
+    <ClInclude Include="MxGeom3D.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxMat2.h">
+    <ClInclude Include="MxMat2.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxMat3.h">
+    <ClInclude Include="MxMat3.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxMat4.h">
+    <ClInclude Include="MxMat4.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxMatrix.h">
+    <ClInclude Include="MxMatrix.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxQMetric.h">
+    <ClInclude Include="MxQMetric.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxQMetric3.h">
+    <ClInclude Include="MxQMetric3.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxVec3.h">
+    <ClInclude Include="MxVec3.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxVec4.h">
+    <ClInclude Include="MxVec4.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxVector.h">
+    <ClInclude Include="MxVector.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\vec2.h">
+    <ClInclude Include="vec2.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\vec3.h">
+    <ClInclude Include="vec3.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\vec4.h">
+    <ClInclude Include="vec4.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxBlock.h">
+    <ClInclude Include="MxBlock.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxBlock2.h">
+    <ClInclude Include="MxBlock2.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxDynBlock.h">
+    <ClInclude Include="MxDynBlock.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxGeoPrims.h">
+    <ClInclude Include="MxGeoPrims.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxHeap.h">
+    <ClInclude Include="MxHeap.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="src\stdafx.h">
+    <ClInclude Include="stdafx.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxBlockModel.h">
+    <ClInclude Include="MxBlockModel.h">
       <Filter>Model</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxStdModel.h">
+    <ClInclude Include="MxStdModel.h">
       <Filter>Model</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxPropSlim.h">
+    <ClInclude Include="MxPropSlim.h">
       <Filter>QSlim</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxQSlim.h">
+    <ClInclude Include="MxQSlim.h">
       <Filter>QSlim</Filter>
     </ClInclude>
-    <ClInclude Include="src\MxStdSlim.h">
+    <ClInclude Include="MxStdSlim.h">
       <Filter>QSlim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\mat2.cpp">
+    <ClCompile Include="mat2.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\mat3.cpp">
+    <ClCompile Include="mat3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\mat4.cpp">
+    <ClCompile Include="mat4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\mixmops.cpp">
+    <ClCompile Include="mixmops.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxGeom3D.cpp">
+    <ClCompile Include="MxGeom3D.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxMat3-jacobi.cpp">
+    <ClCompile Include="MxMat3-jacobi.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxMat4-jacobi.cpp">
+    <ClCompile Include="MxMat4-jacobi.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxMatrix.cpp">
+    <ClCompile Include="MxMatrix.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxQMetric.cpp">
+    <ClCompile Include="MxQMetric.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxQMetric3.cpp">
+    <ClCompile Include="MxQMetric3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxHeap.cpp">
+    <ClCompile Include="MxHeap.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxBlockModel.cpp">
+    <ClCompile Include="MxBlockModel.cpp">
       <Filter>Model</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxStdModel.cpp">
+    <ClCompile Include="MxStdModel.cpp">
       <Filter>Model</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxPropSlim.cpp">
+    <ClCompile Include="MxPropSlim.cpp">
       <Filter>QSlim</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxQSlim.cpp">
+    <ClCompile Include="MxQSlim.cpp">
       <Filter>QSlim</Filter>
     </ClCompile>
-    <ClCompile Include="src\MxStdSlim.cpp">
+    <ClCompile Include="MxStdSlim.cpp">
       <Filter>QSlim</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,46 +1,56 @@
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.10)
+
 project(cximage)
 
-set(SOURCES
-    ximacfg.cpp
-    ximaenc.cpp
-    ximaexif.cpp
-    ximage.cpp
-    ximainfo.cpp
-    ximaint.cpp
-    ximajpg.cpp
-    ximalpha.cpp
-    ximalyr.cpp
-    ximapal.cpp
-    ximasel.cpp
-    ximath.cpp
-    xmemfile.cpp
+set(CMAKE_CXX_STANDARD 17)
+
+set(SRC_FILES
+    "xfile.h"
+    "ximacfg.cpp"
+    "ximacfg.h"
+    "ximadef.h"
+    "ximaenc.cpp"
+    "ximaexif.cpp"
+    "ximage.cpp"
+    "ximage.h"
+    "ximainfo.cpp"
+    "ximaint.cpp"
+    "ximaiter.h"
+    "ximajpg.cpp"
+    "ximajpg.h"
+    "ximalpha.cpp"
+    "ximalyr.cpp"
+    "ximapal.cpp"
+    "ximasel.cpp"
+    "ximath.cpp"
+    "ximath.h"
+    "xiofile.h"
+    "xmemfile.cpp"
+    "xmemfile.h"
 )
 
-set(HEADERS
-    xfile.h
-    ximacfg.h
-    ximadef.h
-    ximage.h
-    ximaiter.h
-    ximajpg.h
-    ximath.h
-    xiofile.h
-    xmemfile.h
-)
+group_sources(SRC_FILES)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++17")
-add_definitions(-DCXIMAGE_BUILD)
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
-include_directories(
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../src
+    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals
-    )
+)
 
-add_library(cximage STATIC ${SOURCES} ${HEADERS})
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    jpeg
+)
 
-set_target_properties(cximage PROPERTIES PREFIX "")
-target_link_libraries(cximage jpeg)
-set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DCXIMAGE_BUILD
+)
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    POSITION_INDEPENDENT_CODE ON
+)

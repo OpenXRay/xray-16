@@ -1,7 +1,6 @@
+set(SRC_FILES
+    "posh.c"
+    "posh.h"
+)
 
-SET(POSHLIB_SRCS
-	posh.c
-	posh.h)
-
-ADD_LIBRARY(posh STATIC ${POSHLIB_SRCS})
-
+add_library(posh STATIC ${SRC_FILES})

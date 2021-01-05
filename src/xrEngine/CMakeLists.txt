@@ -1,42 +1,225 @@
 project(xrEngine)
 
-list(APPEND DIRS
-    "."
-    "StringTable"
-    )
+set(SRC_FILES
+    "CameraBase.cpp"
+    "CameraBase.h"
+    "CameraDebug.h"
+    "CameraDefs.h"
+    "CameraManager.cpp"
+    "CameraManager.h"
+    "cf_dynamic_mesh.cpp"
+    "cf_dynamic_mesh.h"
+    "CustomHUD.cpp"
+    "CustomHUD.h"
+    "defines.cpp"
+    "defines.h"
+    "device.cpp"
+    "Device_create.cpp"
+    "Device_destroy.cpp"
+    "device.h"
+    "Device_Initialize.cpp"
+    "Device_Misc.cpp"
+    "Device_overdraw.cpp"
+    #"Device_wndproc.cpp"
+    "edit_actions.cpp"
+    "edit_actions.h"
+    "Effector.cpp"
+    "Effector.h"
+    "EffectorPP.cpp"
+    "EffectorPP.h"
+    "embedded_resources_management.h"
+    "EngineAPI.cpp"
+    "EngineAPI.h"
+    "Engine.cpp"
+    "Engine.h"
+    "EnnumerateVertices.h"
+    "Environment.cpp"
+    "Environment.h"
+    "Environment_misc.cpp"
+    "Environment_render.cpp"
+    "EventAPI.cpp"
+    "EventAPI.h"
+    "FDemoPlay.cpp"
+    "FDemoPlay.h"
+    "FDemoRecord.cpp"
+    "FDemoRecord.h"
+    "Feel_Sound.h"
+    "Feel_Touch.cpp"
+    "Feel_Touch.h"
+    "Feel_Vision.cpp"
+    "Feel_Vision.h"
+    "GameFont.cpp"
+    "GameFont.h"
+    "GameMtlLib.cpp"
+    "GameMtlLib_Engine.cpp"
+    "GameMtlLib.h"
+    "ICollidable.cpp"
+    "ICollidable.h"
+    "IGameFont.hpp"
+    "IGame_Level_check_textures.cpp"
+    "IGame_Level.cpp"
+    "IGame_Level.h"
+    "IGame_ObjectPool.cpp"
+    "IGame_ObjectPool.h"
+    "IGame_Persistent.cpp"
+    "IGame_Persistent.h"
+    "IInputReceiver.cpp"
+    "IInputReceiver.h"
+    "ILoadingScreen.h"
+    "IObjectPhysicsCollision.h"
+    "IPerformanceAlert.hpp"
+    "IPHdebug.h"
+    "IPhysicsGeometry.h"
+    "IPhysicsShell.h"
+    "IRenderable.cpp"
+    "IRenderable.h"
+    "ISheduled.cpp"
+    "ISheduled.h"
+    "LightAnimLibrary.cpp"
+    "LightAnimLibrary.h"
+    "line_edit_control.cpp"
+    "line_edit_control.h"
+    "line_editor.cpp"
+    "line_editor.h"
+    "mailSlot.cpp"
+    "main.cpp"
+    "main.h"
+    "MonitorManager.cpp"
+    "MonitorManager.hpp"
+    "mp_logging.h"
+    "ObjectAnimator.cpp"
+    "ObjectAnimator.h"
+    "ObjectDump.cpp"
+    "ObjectDump.h"
+    "PerformanceAlert.cpp"
+    "PerformanceAlert.hpp"
+    "perlin.cpp"
+    "perlin.h"
+    "phdebug.cpp"
+    "profiler.cpp"
+    "profiler.h"
+    "profiler_inline.h"
+    "Properties.h"
+    "PS_instance.cpp"
+    "PS_instance.h"
+    "pure.cpp"
+    "pure.h"
+    "pure_relcase.cpp"
+    "pure_relcase.h"
+    "Rain.cpp"
+    "Rain.h"
+    "Render.cpp"
+    "Render.h"
+    "ShadersExternalData.h"
+    "splash.cpp"
+    "splash.h"
+    "StatGraph.cpp"
+    "StatGraph.h"
+    "Stats.cpp"
+    "Stats.h"
+    "stdafx.cpp"
+    "stdafx.h"
+    "std_classes.h"
+    "TaskScheduler.cpp"
+    "TaskScheduler.hpp"
+    #"Text_Console.cpp"
+    #"Text_Console.h"
+    #"Text_Console_WndProc.cpp"
+    "thunderbolt.cpp"
+    "thunderbolt.h"
+    #"tntQAVI.cpp"
+    #"tntQAVI.h"
+    "vis_common.h"
+    "vis_object_data.h"
+    "WaveForm.h"
+    "x_ray.cpp"
+    "x_ray.h"
+    "xr_collide_form.cpp"
+    "xr_collide_form.h"
+    "xr_efflensflare.cpp"
+    "xr_efflensflare.h"
+    "xrHemisphere.cpp"
+    "xrHemisphere.h"
+    "xrImage_Resampler.cpp"
+    "xrImage_Resampler.h"
+    "xr_input.cpp"
+    "xr_input.h"
+    "xr_input_xinput.cpp"
+    "xr_input_xinput.h"
+    "xr_ioc_cmd.cpp"
+    "xr_ioc_cmd.h"
+    "XR_IOConsole_callback.cpp"
+    "XR_IOConsole_control.cpp"
+    "XR_IOConsole.cpp"
+    "XR_IOConsole_get.cpp"
+    "XR_IOConsole.h"
+    "xrLoadSurface.cpp"
+    "xr_object.cpp"
+    "xr_object.h"
+    "xr_object_list.cpp"
+    "xr_object_list.h"
+    #"xrSASH.cpp"
+    #"xrSASH.h"
+    "xrSheduler.cpp"
+    "xrSheduler.h"
+    "xrTheora_Stream.cpp"
+    "xrTheora_Stream.h"
+    "xrTheora_Surface.cpp"
+    "xrTheora_Surface.h"
+    "StringTable/IStringTable.cpp"
+    "StringTable/IStringTable.h"
+    "StringTable/IStringTableDefs.h"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/OpenAutomate/inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
+    ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${SDL_INCLUDE_DIRS}
     ${FREEIMAGE_INCLUDE_PATH}
     ${LOCKFILE_INCLUDE_DIR}
-    )
+)
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./tntQAVI.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./editor_environment_manager_properties.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./Text_Console.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./Text_Console_WndProc.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./Device_wndproc.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./xrSASH.cpp")
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    xrMiscMath #xrRenderGL ?
+    ${FREEIMAGE_LIBRARIES} #xrRenderGL
+    PRIVATE
+    xrCore
+    xrLuabind
+    xrAPI
+    xrSound
+    xrScriptEngine
+    xrNetServer
+    ${LUA_LIBRARIES}
+    ${THEORA_LIBRARY}
+    ${OGG_LIBRARIES}
+    xrCDB
+    xrPhysics
+    openal
+    ${LOCKFILE_LIBRARIES}
+    ${SDL_LIBRARIES}
+)
 
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./tntQAVI.h")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./Text_Console.h")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xrSASH.h")
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DENGINE_BUILD
+)
 
-add_definitions(-DENGINE_BUILD)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
 cotire(${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrLuabind xrAPI xrSound xrScriptEngine xrNetServer ${LUA_LIBRARIES} ${THEORA_LIBRARY} ${OGG_LIBRARIES} xrCDB xrPhysics ${FREEIMAGE_LIBRARIES} openal ${LOCKFILE_LIBRARIES} ${SDL_LIBRARIES})
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
-
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

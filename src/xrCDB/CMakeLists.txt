@@ -1,26 +1,65 @@
 project(xrCDB)
 
-list(APPEND DIRS
-    "."
-    )
+set(SRC_FILES
+    "Frustum.h"
+    "Frustum.cpp"
+    "Intersect.hpp"
+    "ISpatial.h"
+    "ISpatial.cpp"
+    "ISpatial_q_box.cpp"
+    "ISpatial_q_frustum.cpp"
+    "ISpatial_q_ray.cpp"
+    "ISpatial_verify.cpp"
+    "stdafx.h"
+    "StdAfx.cpp"
+    "xr_area.h"
+    "xr_area.cpp"
+    "xr_area_query.cpp"
+    "xr_area_raypick.cpp"
+    "xrCDB_box.cpp"
+    "xrCDB_Collector.cpp"
+    "xrCDB.cpp"
+    "xrCDB_frustum.cpp"
+    "xrCDB.h"
+    "xrCDB_ray.cpp"
+    "xr_collide_defs.h"
+    "xrXRC.h"
+    "xrXRC.cpp"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_SOURCE_DIR}/Externals
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/sse2neon/include
+    ${CMAKE_SOURCE_DIR}/Externals # for OPCODE
     ${SDL_INCLUDE_DIRS}
-    )
+)
 
-add_definitions(-DXRCDB_EXPORTS)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+    xrMiscMath
+    OPCODE
+    xrAPI
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRCDB_EXPORTS
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
+)
+
 cotire(${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath OPCODE xrAPI ${SDL_LIBRARIES})
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

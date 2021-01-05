@@ -1,90 +1,178 @@
 project(xrUICore)
 
-file(GLOB ARROW arrow/*.h arrow/*.cpp)
-file(GLOB BUTTONS Buttons/*.h Buttons/*.cpp)
-file(GLOB CALLBACKS Callbacks/*.h Callbacks/*.cpp)
-file(GLOB COMBO_BOX ComboBox/*.h ComboBox/*.cpp)
-file(GLOB CURSOR Cursor/*.h Cursor/*.cpp)
-file(GLOB EDIT_BOX EditBox/*.h EditBox/*.cpp)
-file(GLOB FONT_MANAGER FontManager/*.h FontManager/*.cpp)
-file(GLOB HINT Hint/*.h Hint/*.cpp)
-file(GLOB INTERACTIVE_BACKGROUND InteractiveBackground/*.h InteractiveBackground/*.cpp)
-file(GLOB LINES Lines/*.h Lines/*.cpp)
-file(GLOB LIST_BOX ListBox/*.h ListBox/*.cpp)
-file(GLOB LIST_WND ListWnd/*.h ListWnd/*.cpp)
-file(GLOB MESSAGE_BOX MessageBox/*.h MessageBox/*.cpp)
-file(GLOB OPTIONS Options/*.h Options/*.cpp)
-set(PCH pch.cpp pch.hpp)
-file(GLOB PROGRESS_BAR ProgressBar/*.h ProgressBar/*.cpp)
-file(GLOB PROPERTIES_BOX PropertiesBox/*.h PropertiesBox/*.cpp)
-file(GLOB SCROLL_BAR ScrollBar/*.h ScrollBar/*.cpp)
-file(GLOB SCROLL_VIEW ScrollView/*.h ScrollView/*.cpp)
-file(GLOB SPIN_BOX SpinBox/*.h SpinBox/*.cpp)
-file(GLOB STATIC_WINDS Static/*.h Static/*.cpp)
-file(GLOB TAB_CONTROL TabControl/*.h TabControl/*.cpp)
-file(GLOB TRACK_BAR TrackBar/*.h TrackBar/*.cpp)
-file(GLOB WINDOWS Windows/*.h Windows/*.cpp)
-file(GLOB XML XML/*.h XML/*.cpp)
-set(GENERAL ui_base.cpp ui_base.h ui_defs.h uiabstract.h UIMessages.h)
+set(SRC_FILES
+    "pch.cpp"
+    "pch.hpp"
+    "ui_base.cpp"
+    "ui_base.h"
+    "ui_defs.h"
+    "uiabstract.h"
+    "UIMessages.h"
+    "arrow/ui_arrow.cpp"
+    "arrow/ui_arrow.h"
+    "Buttons/UI3tButton.cpp"
+    "Buttons/UI3tButton.h"
+    "Buttons/UIBtnHint.cpp"
+    "Buttons/UIBtnHint.h"
+    "Buttons/UIButton.cpp"
+    "Buttons/UIButton.h"
+    "Buttons/UIButton_script.cpp"
+    "Buttons/UICheckButton.cpp"
+    "Buttons/UICheckButton.h"
+    "Buttons/UIRadioButton.cpp"
+    "Buttons/UIRadioButton.h"
+    "Callbacks/UIWndCallback.cpp"
+    "Callbacks/UIWndCallback.h"
+    "Callbacks/callback_info.h"
+    "ComboBox/UIComboBox.cpp"
+    "ComboBox/UIComboBox.h"
+    "ComboBox/UIComboBox_script.cpp"
+    "Cursor/UICursor.cpp"
+    "Cursor/UICursor.h"
+    "EditBox/UICustomEdit.cpp"
+    "EditBox/UICustomEdit.h"
+    "EditBox/UIEditBox.cpp"
+    "EditBox/UIEditBox.h"
+    "EditBox/UIEditBoxEx.cpp"
+    "EditBox/UIEditBoxEx.h"
+    "EditBox/UIEditBox_script.cpp"
+    "FontManager/FontManager.cpp"
+    "FontManager/FontManager.h"
+    "Hint/UIHint.cpp"
+    "Hint/UIHint.h"
+    "InteractiveBackground/UIInteractiveBackground.h"
+    "InteractiveBackground/UI_IB_Static.cpp"
+    "InteractiveBackground/UI_IB_Static.h"
+    "Lines/UILine.cpp"
+    "Lines/UILine.h"
+    "Lines/UILines.cpp"
+    "Lines/UILines.h"
+    "Lines/UISubLine.cpp"
+    "Lines/UISubLine.h"
+    "Lines/uilinestd.h"
+    "ListBox/UIListBox.cpp"
+    "ListBox/UIListBox.h"
+    "ListBox/UIListBoxItem.cpp"
+    "ListBox/UIListBoxItem.h"
+    "ListBox/UIListBoxItemMsgChain.cpp"
+    "ListBox/UIListBoxItemMsgChain.h"
+    "ListBox/UIListBox_script.cpp"
+    "ListWnd/UIListItem.cpp"
+    "ListWnd/UIListItem.h"
+    "ListWnd/UIListItemEx.cpp"
+    "ListWnd/UIListItemEx.h"
+    "ListWnd/UIListWnd.cpp"
+    "ListWnd/UIListWnd.h"
+    "ListWnd/UIListWnd_inline.h"
+    "ListWnd/UIListWnd_script.cpp"
+    "MessageBox/UIMessageBox.cpp"
+    "MessageBox/UIMessageBox.h"
+    "MessageBox/UIMessageBox_script.cpp"
+    "Options/UIOptionsItem.cpp"
+    "Options/UIOptionsItem.h"
+    "Options/UIOptionsManager.cpp"
+    "Options/UIOptionsManager.h"
+    "Options/UIOptionsManagerScript.cpp"
+    "Options/UIOptionsManagerScript.h"
+    "ProgressBar/UIDoubleProgressBar.cpp"
+    "ProgressBar/UIDoubleProgressBar.h"
+    "ProgressBar/UIProgressBar.cpp"
+    "ProgressBar/UIProgressBar.h"
+    "ProgressBar/UIProgressBar_script.cpp"
+    "ProgressBar/UIProgressShape.cpp"
+    "ProgressBar/UIProgressShape.h"
+    "PropertiesBox/UIPropertiesBox.cpp"
+    "PropertiesBox/UIPropertiesBox.h"
+    "PropertiesBox/UIPropertiesBox_script.cpp"
+    "ScrollBar/UIFixedScrollBar.cpp"
+    "ScrollBar/UIFixedScrollBar.h"
+    "ScrollBar/UIScrollBar.cpp"
+    "ScrollBar/UIScrollBar.h"
+    "ScrollBar/UIScrollBox.cpp"
+    "ScrollBar/UIScrollBox.h"
+    "ScrollView/UIScrollView.cpp"
+    "ScrollView/UIScrollView.h"
+    "SpinBox/UICustomSpin.cpp"
+    "SpinBox/UICustomSpin.h"
+    "SpinBox/UISpinNum.cpp"
+    "SpinBox/UISpinNum.h"
+    "SpinBox/UISpinText.cpp"
+    "SpinBox/UISpinText.h"
+    "Static/UIAnimatedStatic.cpp"
+    "Static/UIAnimatedStatic.h"
+    "Static/UILanimController.cpp"
+    "Static/UILanimController.h"
+    "Static/UIStatic.cpp"
+    "Static/UIStatic.h"
+    "Static/UIStaticItem.cpp"
+    "Static/UIStaticItem.h"
+    "Static/UIStatic_script.cpp"
+    "TabControl/UITabButton.cpp"
+    "TabControl/UITabButton.h"
+    "TabControl/UITabControl.cpp"
+    "TabControl/UITabControl.h"
+    "TabControl/UITabControl_script.cpp"
+    "TrackBar/UITrackBar.cpp"
+    "TrackBar/UITrackBar.h"
+    "Windows/UIFrameLineWnd.cpp"
+    "Windows/UIFrameLineWnd.h"
+    "Windows/UIFrameWindow.cpp"
+    "Windows/UIFrameWindow.h"
+    "Windows/UITextFrameLineWnd.cpp"
+    "Windows/UITextFrameLineWnd.h"
+    "Windows/UIWindow.cpp"
+    "Windows/UIWindow.h"
+    "Windows/UIWindow_script.cpp"
+    "XML/UITextureMaster.cpp"
+    "XML/UITextureMaster.h"
+    "XML/UIXmlInitBase.cpp"
+    "XML/UIXmlInitBase.h"
+    "XML/xrUIXmlParser.cpp"
+    "XML/xrUIXmlParser.h"
+)
 
-######################################################
+group_sources(SRC_FILES)
 
-source_group("arrow" FILES ${ARROW})
-source_group("Buttons" FILES ${BUTTONS})
-source_group("Callbacks" FILES ${CALLBACKS})
-source_group("ComboBox" FILES ${COMBO_BOX})
-source_group("Cursor" FILES ${CURSOR})
-source_group("EditBox" FILES ${EDIT_BOX})
-source_group("FontManager" FILES ${FONT_MANAGER})
-source_group("Hint" FILES ${HINT})
-source_group("InteractiveBackground" FILES ${INTERACTIVE_BACKGROUND})
-source_group("Lines" FILES ${LINES})
-source_group("ListBox" FILES ${LIST_BOX})
-source_group("ListWnd" FILES ${LIST_WND})
-source_group("MessageBox" FILES ${MESSAGE_BOX})
-source_group("Options" FILES ${OPTIONS})
-source_group("PCH" FILES ${PCH})
-source_group("ProgressBar" FILES ${PROGRESS_BAR})
-source_group("PropertiesBox" FILES ${PROPERTIES_BOX})
-source_group("ScrollBar" FILES ${SCROLL_BAR})
-source_group("ScrollView" FILES ${SCROLL_VIEW})
-source_group("SpinBox" FILES ${SPIN_BOX})
-source_group("Static" FILES ${STATIC_WINDS})
-source_group("TabControl" FILES ${TAB_CONTROL})
-source_group("TrackBar" FILES ${TRACK_BAR})
-source_group("Windows" FILES ${WINDOWS})
-source_group("XML" FILES ${XML})
-source_group("" FILES ${GENERAL})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
-##########################################
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/lzo/include
+    ${CMAKE_SOURCE_DIR}/Externals/luabind
+    ${SDL_INCLUDE_DIRS}
+)
 
-message("path "  ${CMAKE_CURRENT_SOURCE_DIR})
-
-add_definitions(-DXRUICORE_EXPORTS)
+target_link_libraries(xrUICore
+    PRIVATE
+    xrAPI
+    xrScriptEngine
+    xrEngine
+    xrMiscMath
+    xrCore
+    xrLuabind
+    ${SDL_LIBRARIES}
+)
 
 if (WIN32)
     add_compile_options(/fp:fast "/Yupch.hpp")
     set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp PROPERTIES COMPILE_FLAGS /Yc)
 endif()
 
-add_library(xrUICore SHARED ${ARROW} ${BUTTONS} ${CALLBACKS}
-                    ${COMBO_BOX} ${CURSOR}
-                    ${EDIT_BOX} ${FONT_MANAGER} ${HINT}
-                    ${INTERACTIVE_BACKGROUND} ${LINES} ${LIST_BOX} ${LIST_WND}
-                    ${MESSAGE_BOX} ${OPTIONS} ${PCH}
-                    ${PROGRESS_BAR} ${PROPERTIES_BOX} ${SCROLL_BAR} ${SCROLL_VIEW} ${SPIN_BOX}
-                    ${STATIC_WINDS} ${TAB_CONTROL} ${TRACK_BAR} ${WINDOWS} ${XML}
-                    ${GENERAL})
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRUICORE_EXPORTS
+)
 
-set_target_properties(xrUICore PROPERTIES PREFIX "")
-target_include_directories(xrUICore PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../
-    ../../Externals/lzo/include
-    ../../Externals/luabind
-    ${SDL_INCLUDE_DIRS})
-target_link_libraries(xrUICore xrAPI xrScriptEngine ${LUAJIT_LIBRARIES} xrEngine xrMiscMath xrCore xrLuabind ${SDL_LIBRARIES})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp"
+)
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
+cotire(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

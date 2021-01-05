@@ -1,38 +1,89 @@
 project(xrSound)
 
-list(APPEND DIRS
-    "."
-    )
+set(SRC_FILES
+    "guids.cpp"
+    #"MusicStream.cpp"
+    #"MusicStream.h"
+    "OpenALDeviceList.cpp"
+    "OpenALDeviceList.h"
+    "Sound.cpp"
+    "Sound.h"
+    "SoundRender_Cache.cpp"
+    "SoundRender_Cache.h"
+    "SoundRender_CoreA.cpp"
+    "SoundRender_CoreA.h"
+    "SoundRender_Core.cpp"
+    "SoundRender_CoreD.cpp"
+    "SoundRender_CoreD.h"
+    "SoundRender_Core.h"
+    "SoundRender_Core_Processor.cpp"
+    "SoundRender_Core_SourceManager.cpp"
+    "SoundRender_Core_StartStop.cpp"
+    "SoundRender_Emitter.cpp"
+    "SoundRender_Emitter_FSM.cpp"
+    "SoundRender_Emitter.h"
+    "SoundRender_Emitter_StartStop.cpp"
+    "SoundRender_Emitter_streamer.cpp"
+    "SoundRender_Environment.cpp"
+    "SoundRender_Environment.h"
+    "SoundRender.h"
+    "SoundRender_Source.cpp"
+    "SoundRender_Source.h"
+    "SoundRender_Source_loader.cpp"
+    "SoundRender_TargetA.cpp"
+    "SoundRender_TargetA.h"
+    "SoundRender_Target.cpp"
+    "SoundRender_TargetD.cpp"
+    "SoundRender_TargetD.h"
+    "SoundRender_Target.h"
+    "stdafx.cpp"
+    "stdafx.h"
+    #"xr_cda.cpp"
+    #"xr_cda.h"
+    #"xr_streamsnd.cpp"
+    #"xr_streamsnd.h"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../xrEngine
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/libvorbis/include
-#	${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/libogg/include
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/xrEngine
+    ${CMAKE_SOURCE_DIR}/Externals/libvorbis/include
+    ${CMAKE_SOURCE_DIR}/Externals/libogg/include
+    ${CMAKE_SOURCE_DIR}/Externals/openal/include
     ${OGG_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/openal/include
     ${SDL_INCLUDE_DIRS}
-    )
+)
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_streamsnd.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./MusicStream.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.h")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_streamsnd.h")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./MusicStream.h")
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+    xrMiscMath
+    xrAPI
+    xrCDB
+    ${OGG_LIBRARIES}
+    openal
+    vorbis
+    vorbisfile
+)
 
-add_definitions(-DXRSOUND_EXPORTS)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRSOUND_EXPORTS
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
+)
+
 cotire(${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath xrAPI xrCDB ${OGG_LIBRARIES} openal vorbis vorbisfile)
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
-
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)
