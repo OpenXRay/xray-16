@@ -283,11 +283,11 @@ void CResourceManager::CompatibilityCheck()
         {
             xr_string str(static_cast<pcstr>(skinh->pointer()), skinh->length());
 
-            cpcstr begin = strstr(str.c_str(), "u_position");
+            cpcstr begin = strstr(str.c_str(), "skinning_pos");
             if (!begin)
                 break;
 
-            cpcstr end = strstr(begin, "sbones_array");
+            cpcstr end = strstr(begin, "skinning_0");
             if (!end)
                 break;
 
