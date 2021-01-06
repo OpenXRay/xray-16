@@ -52,7 +52,7 @@ public:
 
 public:
     void advance(const int& offset);
-    void r(void* buffer, size_t buffer_size);
+    void r(void* buffer, size_t buffer_size) override;
     CStreamReader* open_chunk(const size_t& chunk_id);
     u32 find_chunk(u32 ID, bool* bCompressed = nullptr);
     //. CStreamReader*open_chunk_iterator(const u32 &chunk_id, CStreamReader *previous = 0); // 0 means first

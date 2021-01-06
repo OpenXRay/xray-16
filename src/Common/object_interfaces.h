@@ -21,7 +21,8 @@ public:
     virtual void destroy() = 0;
 };
 
-IC IPureDestroyableObject::~IPureDestroyableObject() {}
+inline IPureDestroyableObject::~IPureDestroyableObject() = default;
+
 class ISerializable
 {
 public:
@@ -30,18 +31,17 @@ public:
     virtual void save(IWriter& writer) = 0;
 };
 
-IC ISerializable::~ISerializable() {}
+inline ISerializable::~ISerializable() = default;
+
 class IPureServerObject : public ISerializable
 {
 public:
-    virtual ~IPureServerObject() = 0;
     virtual void STATE_Write(NET_Packet& tNetPacket) = 0;
     virtual void STATE_Read(NET_Packet& tNetPacket, u16 size) = 0;
     virtual void UPDATE_Write(NET_Packet& tNetPacket) = 0;
     virtual void UPDATE_Read(NET_Packet& tNetPacket) = 0;
 };
 
-IC IPureServerObject::~IPureServerObject() {}
 class IPureSchedulableObject
 {
 public:
@@ -49,4 +49,4 @@ public:
     virtual void update() = 0;
 };
 
-IC IPureSchedulableObject::~IPureSchedulableObject() {}
+inline IPureSchedulableObject::~IPureSchedulableObject() = default;

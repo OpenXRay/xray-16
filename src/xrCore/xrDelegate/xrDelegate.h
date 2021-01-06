@@ -154,7 +154,7 @@ public:
         bind(fx, tx);
     }
 
-    ~xrDelegate() = default;
+    ~xrDelegate() override = default;
 
     template<typename TClass, typename TFunction>
     void bind(TClass fx, TFunction tx)

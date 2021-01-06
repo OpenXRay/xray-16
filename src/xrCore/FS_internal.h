@@ -55,7 +55,7 @@ public:
         xr_free(conv_fn);
     }
 
-    virtual ~CFileWriter()
+    ~CFileWriter() override
     {
         if (0 != hf)
         {
@@ -116,7 +116,7 @@ class CTempReader : public IReader
 {
 public:
     CTempReader(void* _data, size_t _size, size_t _iterpos) : IReader(_data, _size, _iterpos) {}
-    virtual ~CTempReader();
+    ~CTempReader() override;
 };
 class CPackReader : public IReader
 {
@@ -124,19 +124,19 @@ class CPackReader : public IReader
 
 public:
     CPackReader(void* _base, void* _data, size_t _size) : IReader(_data, _size), base_address(_base) {}
-    virtual ~CPackReader();
+    ~CPackReader() override;
 };
 class XRCORE_API CFileReader : public IReader
 {
 public:
     CFileReader(pcstr name);
-    virtual ~CFileReader();
+    ~CFileReader() override;
 };
 class CCompressedReader : public IReader
 {
 public:
     CCompressedReader(const char* name, const char* sign);
-    virtual ~CCompressedReader();
+    ~CCompressedReader() override;
 };
 class CVirtualFileReader : public IReader
 {
@@ -149,7 +149,7 @@ private:
 
 public:
     CVirtualFileReader(pcstr cFileName);
-    virtual ~CVirtualFileReader();
+    ~CVirtualFileReader() override;
 };
 
 #endif

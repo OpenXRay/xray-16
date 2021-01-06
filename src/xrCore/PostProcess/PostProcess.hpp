@@ -51,25 +51,29 @@ protected:
 
 public:
     CPostProcessValue(float* pfparam) : m_pfParam(pfparam) {}
-    virtual void update(float dt) { *m_pfParam = m_Value.Evaluate(dt); }
-    virtual void load(IReader& pReader);
-    virtual void save(IWriter& pWriter);
-    virtual float get_length()
+    void update(float dt) override { *m_pfParam = m_Value.Evaluate(dt); }
+    void load(IReader& pReader) override;
+    void save(IWriter& pWriter) override;
+
+    float get_length() override
     {
         float mn, mx;
         return m_Value.GetLength(&mn, &mx);
     }
-    virtual size_t get_keys_count() { return m_Value.keys.size(); }
-    virtual void add_value(float time, float value, int index = 0);
-    virtual void delete_value(float time);
-    virtual void update_value(float time, float value, int index = 0);
-    virtual void get_value(float time, float& valueb, int index = 0);
-    virtual float get_key_time(size_t index)
+
+    size_t get_keys_count() override { return m_Value.keys.size(); }
+    void add_value(float time, float value, int index = 0) override;
+    void delete_value(float time) override;
+    void update_value(float time, float value, int index = 0) override;
+    void get_value(float time, float& valueb, int index = 0) override;
+
+    float get_key_time(size_t index) override
     {
         VERIFY(index < get_keys_count());
         return m_Value.keys[index]->time;
     }
-    virtual void clear_all_keys();
+
+    void clear_all_keys() override;
 };
 
 class XRCORE_API CPostProcessColor : public CPostProcessParam
@@ -83,31 +87,37 @@ protected:
 
 public:
     CPostProcessColor(SPPInfo::SColor* pcolor) : m_fBase(0.0),  m_pColor(pcolor) {}
-    virtual void update(float dt)
+
+    void update(float dt) override
     {
         m_pColor->r = m_Red.Evaluate(dt);
         m_pColor->g = m_Green.Evaluate(dt);
         m_pColor->b = m_Blue.Evaluate(dt);
     }
-    virtual void load(IReader& pReader);
-    virtual void save(IWriter& pWriter);
-    virtual float get_length()
+
+    void load(IReader& pReader) override;
+    void save(IWriter& pWriter) override;
+
+    float get_length() override
     {
         float mn, mx, r = m_Red.GetLength(&mn, &mx), g = m_Green.GetLength(&mn, &mx), b = m_Blue.GetLength(&mn, &mx);
         mn = (r > g ? r : g);
         return mn > b ? mn : b;
     }
-    virtual size_t get_keys_count() { return m_Red.keys.size(); }
-    virtual void add_value(float time, float value, int index = 0);
-    virtual void delete_value(float time);
-    virtual void update_value(float time, float value, int index = 0);
-    virtual void get_value(float time, float& value, int index = 0);
-    virtual float get_key_time(size_t index)
+
+    size_t get_keys_count() override { return m_Red.keys.size(); }
+    void add_value(float time, float value, int index = 0) override;
+    void delete_value(float time) override;
+    void update_value(float time, float value, int index = 0) override;
+    void get_value(float time, float& value, int index = 0) override;
+
+    float get_key_time(size_t index) override
     {
         VERIFY(index < get_keys_count());
         return m_Red.keys[index]->time;
     }
-    virtual void clear_all_keys();
+
+    void clear_all_keys() override;
 };
 
 class XRCORE_API BasicPostProcessAnimator

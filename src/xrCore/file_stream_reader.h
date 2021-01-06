@@ -16,7 +16,7 @@ private:
 
 public:
     virtual void construct(pcstr file_name, const size_t& window_size);
-    virtual void destroy();
+    void destroy() override;
 };
 
 #endif // FILE_STREAM_READER_H
