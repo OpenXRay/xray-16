@@ -151,7 +151,7 @@ public:
     }
 };
 
-class XRCORE_API CTimer_paused : public CTimer_paused_ex
+class XRCORE_API CTimer_paused final : public CTimer_paused_ex
 {
 public:
     CTimer_paused() { g_pauseMngr().Register(*this); }

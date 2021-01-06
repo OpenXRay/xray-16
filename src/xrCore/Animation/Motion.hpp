@@ -97,7 +97,7 @@ public:
 };
 
 //--------------------------------------------------------------------------
-class XRCORE_API COMotion : public CCustomMotion
+class XRCORE_API COMotion final : public CCustomMotion
 {
 protected:
     CEnvelope* envs[ctMaxChannel];
@@ -143,7 +143,7 @@ enum ESMFlags
 
 #include "SkeletonMotions.hpp"
 
-class XRCORE_API CSMotion : public CCustomMotion
+class XRCORE_API CSMotion final : public CCustomMotion
 {
 protected:
     BoneMotionVec bone_mots;

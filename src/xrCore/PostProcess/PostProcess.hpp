@@ -43,7 +43,7 @@ public:
     virtual void clear_all_keys() = 0;
 };
 
-class XRCORE_API CPostProcessValue : public CPostProcessParam
+class XRCORE_API CPostProcessValue final : public CPostProcessParam
 {
 protected:
     CEnvelope m_Value;
@@ -76,7 +76,7 @@ public:
     void clear_all_keys() override;
 };
 
-class XRCORE_API CPostProcessColor : public CPostProcessParam
+class XRCORE_API CPostProcessColor final : public CPostProcessParam
 {
 protected:
     float m_fBase;

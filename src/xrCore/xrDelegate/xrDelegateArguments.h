@@ -40,7 +40,7 @@ public:
 };
 
 template<typename ... Args>
-class xrDelegateArgumentsTypes : public xrDelegateArguments
+class xrDelegateArgumentsTypes final : public xrDelegateArguments
 {
 public:
     using tuple_type = std::tuple<Args...>;

@@ -13,8 +13,7 @@
 
 xr_unique_ptr<EFS_Utils> xr_EFS;
 //----------------------------------------------------
-EFS_Utils::EFS_Utils() {}
-EFS_Utils::~EFS_Utils() {}
+
 xr_string EFS_Utils::ExtractFileName(LPCSTR src)
 {
     string_path name;

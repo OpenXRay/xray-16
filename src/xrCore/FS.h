@@ -120,7 +120,7 @@ public:
     virtual void flush() = 0;
 };
 
-class XRCORE_API CMemoryWriter : public IWriter
+class XRCORE_API CMemoryWriter final : public IWriter
 {
     u8* data;
     size_t position;
@@ -411,7 +411,7 @@ private:
     typedef IReaderBase<IReader> inherited;
 };
 
-class XRCORE_API CVirtualFileRW : public IReader
+class XRCORE_API CVirtualFileRW final : public IReader
 {
 private:
 #if defined(XR_PLATFORM_WINDOWS)
