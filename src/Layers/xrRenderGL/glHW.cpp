@@ -185,6 +185,9 @@ void CHW::UpdateViews()
     BackBufferCount = 1;
 }
 
+void CHW::BeginScene() { }
+void CHW::EndScene() { }
+
 void CHW::Present()
 {
 #if 0 // kept for historical reasons

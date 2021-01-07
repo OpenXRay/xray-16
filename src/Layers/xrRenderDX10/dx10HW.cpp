@@ -429,6 +429,9 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
     };
 }
 
+void CHW::BeginScene() { }
+void CHW::EndScene() { }
+
 void CHW::Present()
 {
     const bool bUseVSync = psDeviceFlags.is(rsFullscreen) &&

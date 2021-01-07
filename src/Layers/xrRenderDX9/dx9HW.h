@@ -27,8 +27,12 @@ public:
     static bool GivenGPUIsIntelGMA(u32 id_vendor, u32 id_device);
 
     std::pair<u32, u32> GetSurfaceSize() const;
-    void Present();
     DeviceState GetDeviceState() const;
+
+public:
+    void BeginScene();
+    void EndScene();
+    void Present();
 
 private:
     u32 selectPresentInterval() const;

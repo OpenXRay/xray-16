@@ -34,10 +34,15 @@ public:
     {
         return SelectFormat(feature, formats, count);
     }
-    void Present();
     bool UsingFlipPresentationModel() const;
     DeviceState GetDeviceState() const;
 
+public:
+    void BeginScene();
+    void EndScene();
+    void Present();
+
+public:
     void OnAppActivate() override;
     void OnAppDeactivate() override;
 

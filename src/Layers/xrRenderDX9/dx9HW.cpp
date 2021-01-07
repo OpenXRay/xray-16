@@ -399,6 +399,16 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
     };
 }
 
+void CHW::BeginScene()
+{
+    CHK_DX(HW.pDevice->BeginScene());
+}
+
+void CHW::EndScene()
+{
+    CHK_DX(HW.pDevice->EndScene());
+}
+
 void CHW::Present()
 {
     pDevice->Present(nullptr, nullptr, nullptr, nullptr);
