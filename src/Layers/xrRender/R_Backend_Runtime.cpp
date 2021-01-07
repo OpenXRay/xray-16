@@ -36,12 +36,11 @@ void CBackend::OnFrameBegin()
 #if defined(USE_DX9)
         CHK_DX(HW.pDevice->BeginScene());
 #endif
-        // DX9 sets base rt and base zb by default
 #ifndef USE_DX9
         Invalidate();
-
-        // Getting broken HUD hands for OpenGL after calling rmNormal()
+        // DX9 sets base rt and base zb by default
 #ifndef USE_OGL
+        // Getting broken HUD hands for OpenGL after calling rmNormal()
         RImplementation.rmNormal();
 #else
         set_FB(HW.pFB);
