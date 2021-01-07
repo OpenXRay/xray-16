@@ -1,5 +1,5 @@
 # Based on https://github.com/ldionne/hana/blob/master/.travis.yml
-dist: xenial
+dist: focal
 cache: ccache
 language: cpp
 
@@ -32,15 +32,7 @@ matrix:
       addons: *gcc8
 
     - arch: amd64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x86 BUILD_CONFIGURATION=Release
-      addons: *gcc8
-
-    - arch: amd64
       env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      addons: *gcc8
-
-    - arch: amd64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x86 BUILD_CONFIGURATION=Debug
       addons: *gcc8
 
 #    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
@@ -74,32 +66,24 @@ before_script:
   - export core_count=$(nproc || echo 4) && echo core_count = $core_count
   - git submodule deinit Externals/cryptopp
   - mkdir bin && cd bin
-  - if [ $TARGET_CPU == x64 ] && [ $TRAVIS_CPU_ARCH = amd64 ]; then
-       wget http://launchpadlibrarian.net/297657749/libsdl2-2.0-0_2.0.5+dfsg1-1ubuntu1_amd64.deb;
-       wget http://launchpadlibrarian.net/297657747/libsdl2-dev_2.0.5+dfsg1-1ubuntu1_amd64.deb;
-    fi
-  - if [ $TARGET_CPU == x64 ] && [ $TRAVIS_CPU_ARCH = arm64 ]; then
-       wget https://launchpadlibrarian.net/297658410/libsdl2-2.0-0_2.0.5+dfsg1-1ubuntu1_arm64.deb;
-       wget https://launchpadlibrarian.net/297658409/libsdl2-dev_2.0.5+dfsg1-1ubuntu1_arm64.deb;
-    fi
 
   - if [ $TARGET_CPU == x64 ]; then
-       sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage-dev libfreeimageplus-dev;
-       sudo apt-get install -y cmake liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev;
-       sudo dpkg -i *.deb;
+       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage3 libfreeimage-dev libfreeimageplus-dev liblua5.1-0-dev libssl-dev libogg-dev libtheora-bin libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libpcre3-dev libsdl2-2.0-0 libsdl2-dev libgl1 libgl1-mesa-dev libgl1-mesa-dev libgl-dev;
+       
+       if [ $TRAVIS_CPU_ARCH == arm64 ]; then
+          sudo apt-get install -y snapd
+          sudo snap install cmake - --beta --classic
+          export PATH=/snap/cmake/current/bin:$PATH;
+
+          wget --no-check-certificate http://ftp.br.debian.org/debian/pool/main/g/glew/libglew2.1_2.1.0-4_arm64.deb;
+          wget --no-check-certificate http://ftp.br.debian.org/debian/pool/main/g/glew/libglew-dev_2.1.0-4_arm64.deb;
+          sudo dpkg -i *.deb;
+       else
+          sudo apt-get install -y cmake libglew2.1 libglew-dev;
+       fi
+       
        sudo apt-get -f -y install;
        CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
-    fi
-
-  - if [ $TARGET_CPU == x86 ]; then
-       sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-8-multilib libpulse-dev:i386 libglib2.0-dev:i386;
-       sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libopenal-dev:i386 libtbb-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386 libfreeimageplus-dev:i386;
-       sudo apt-get install -y cmake liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386;
-       wget http://launchpadlibrarian.net/297657459/libsdl2-2.0-0_2.0.5+dfsg1-1ubuntu1_i386.deb;
-       wget http://launchpadlibrarian.net/297657456/libsdl2-dev_2.0.5+dfsg1-1ubuntu1_i386.deb;
-       sudo dpkg -i *.deb;
-       sudo apt-get -f -y install;
-       CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32;
     fi
 
 script:
