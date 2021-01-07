@@ -65,6 +65,13 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
             xr_strcat(vs, "_d");
             xr_strcat(ps, "_d");
         }
+
+        if (hq && C.bUseSteepParallax && 0 == xr_strcmp(_pspec, "impl"))
+        {
+            string_path fn;
+            if (FS.exist(fn, _game_shaders_, ps, "_steep.ps"))
+                xr_strcat(ps, "_steep");
+        }
     }
     else
     {
