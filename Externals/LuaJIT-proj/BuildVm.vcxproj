@@ -32,17 +32,10 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <PostBuildEvent>
       <Command>$(OutDir)$(TargetName) -m peobj -o lj_vm_$(PlatformShortName).obj
@@ -51,7 +44,7 @@ $(OutDir)$(TargetName) -m ffdef -o lj_ffdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT
 $(OutDir)$(TargetName) -m libdef -o lj_libdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
 $(OutDir)$(TargetName) -m recdef -o lj_recdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
 $(OutDir)$(TargetName) -m folddef -o lj_folddef.h ..\LuaJIT\src\lj_opt_fold.c
-</Command>
+      </Command>
     </PostBuildEvent>
     <Link>
       <SubSystem>Console</SubSystem>

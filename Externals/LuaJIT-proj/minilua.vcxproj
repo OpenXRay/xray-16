@@ -33,38 +33,18 @@
     <ClCompile>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_STDIO_INLINE=__declspec(dllexport)__inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Message>Creating buildvm_arch_$(PlatformShortName).h</Message>
+      <Command Condition="'$(Platform)'=='Win32'">$(OutDir)$(TargetName) ..\LuaJIT\dynasm\dynasm.lua -LN -D WIN -D JIT -D FFI -o .\buildvm_arch_$(PlatformShortName).h ..\LuaJIT\src\vm_$(PlatformShortName).dasc</Command>
+      <Command Condition="'$(Platform)'=='x64'">$(OutDir)$(TargetName) ..\LuaJIT\dynasm\dynasm.lua -LN -D WIN -D JIT -D FFI -D P64 -o .\buildvm_arch_$(PlatformShortName).h ..\LuaJIT\src\vm_x86.dasc</Command>
     </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
-    <PostBuildEvent>
-      <Command>$(OutDir)$(TargetName) ..\LuaJIT\dynasm\dynasm.lua -LN -D WIN -D JIT -D FFI -o .\buildvm_arch_$(PlatformShortName).h ..\LuaJIT\src\vm_$(PlatformShortName).dasc</Command>
-    </PostBuildEvent>
-    <ClCompile>
-      <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp17</LanguageStandard>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ConformanceMode>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
-    <PostBuildEvent>
-      <Command>$(OutDir)$(TargetName) ..\LuaJIT\dynasm\dynasm.lua -LN -D WIN -D JIT -D FFI -D P64 -o .\buildvm_arch_$(PlatformShortName).h ..\LuaJIT\src\vm_x86.dasc</Command>
-    </PostBuildEvent>
-    <ClCompile>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp17</LanguageStandard>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ConformanceMode>
-    </ClCompile>
-    <ClCompile>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ConformanceMode>
-    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\LuaJIT\src\host\minilua.c" />
