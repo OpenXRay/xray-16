@@ -2,6 +2,12 @@
 #define _FVF_H_
 #pragma once
 
+#if defined(USE_OGL) || defined(USE_DX9)
+#   define FVF_COLOR(c) (c)
+#else
+#   define FVF_COLOR(c) ((c & 0xff00ff00) | ((c >> 16) & 0xff) | ((c & 0xff) << 16u))
+#endif
+
 //-----------------------------------------------------------------------------
 #pragma pack(push, 4)
 namespace FVF
@@ -16,6 +22,12 @@ struct L
     {
         p.set(x, y, z);
         color = C;
+    }
+
+    void set(float x, float y, u32 C)
+    {
+        p.set(x, y, 1.0f);
+        color = FVF_COLOR(C);
     }
 
     void set(const Fvector& _p, u32 C)
@@ -68,34 +80,6 @@ struct LIT
     }
 };
 const u32 F_LIT = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
-
-struct TL0uv
-{
-    Fvector4 p;
-    u32 color;
-    void set(const TL0uv& src) { *this = src; };
-    void set(float x, float y, u32 c) { set(x, y, .0001f, .9999f, c); };
-    void set(int x, int y, u32 c) { set(float(x), float(y), .0001f, .9999f, c); };
-
-    void set(float x, float y, float z, float w, u32 c)
-    {
-        p.set(x, y, z, w);
-        color = c;
-    };
-
-    void transform(const Fvector& v, const Fmatrix& matSet)
-    {
-        // Transform it through the matrix set. Takes in mean projection.
-        // Finally, scale the vertices to screen coords.
-        // Note 1: device coords range from -1 to +1 in the viewport.
-        // Note 2: the p.z-coordinate will be used in the z-buffer.
-        p.w = matSet._14 * v.x + matSet._24 * v.y + matSet._34 * v.z + matSet._44;
-        p.x = (matSet._11 * v.x + matSet._21 * v.y + matSet._31 * v.z + matSet._41) / p.w;
-        p.y = -(matSet._12 * v.x + matSet._22 * v.y + matSet._32 * v.z + matSet._42) / p.w;
-        p.z = (matSet._13 * v.x + matSet._23 * v.y + matSet._33 * v.z + matSet._43) / p.w;
-    };
-};
-const u32 F_TL0uv = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 
 struct TL
 {

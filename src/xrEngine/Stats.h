@@ -6,6 +6,7 @@
 #include "xrCore/_flags.h"
 #include "xrCore/xrstring.h"
 #include "xrCommon/xr_vector.h"
+#include "xrEngine/StatGraph.h"
 
 class ENGINE_API CGameFont;
 
@@ -16,6 +17,7 @@ class ENGINE_API CStats : public pureRender
 private:
     CGameFont* statsFont;
     CGameFont* fpsFont;
+    xr_unique_ptr<CStatGraph> fpsGraph;
     float fMem_calls;
     xr_vector<shared_str> errors;
 

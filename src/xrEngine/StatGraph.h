@@ -47,7 +47,7 @@ protected:
 
     float mn, mx;
     u32 max_item_count;
-    Ivector2 lt, rb;
+    Fvector2 lt, rb;
     Ivector2 grid;
     Fvector2 grid_step;
     u32 grid_color;
@@ -76,7 +76,7 @@ protected:
     //// virtual void RenderPoints ( FVF::TL0uv** ppv, ElementsDeq* pelements );
     // virtual void RenderMarkers ( FVF::TL0uv** ppv, MarkersDeq* pmarkers );
 public:
-    CStatGraph();
+    explicit CStatGraph(bool bRegister = true);
     ~CStatGraph();
     virtual void OnRender();
     void OnDeviceCreate();
