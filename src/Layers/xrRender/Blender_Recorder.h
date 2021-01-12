@@ -126,6 +126,7 @@ public:
     void i_Filter_Min(u32 s, u32 f);
     void i_Filter_Mip(u32 s, u32 f);
     void i_Filter_Mag(u32 s, u32 f);
+    void i_Filter_Aniso(u32 s, u32 f);
 #if defined(USE_DX11)
     void i_dx10FilterAnizo(u32 s, BOOL value);
 #endif

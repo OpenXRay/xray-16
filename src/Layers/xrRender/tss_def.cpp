@@ -14,6 +14,11 @@ void SimulatorStates::record(ID3DState*& state)
     state = ID3DState::Create();
     for (SimulatorStates::State& S : States)
     {
+        // Update aniso value
+        if (S.type == 2 && S.v2 == D3DSAMP_MAXANISOTROPY)
+            S.v3 = ps_r__tf_Anisotropic;
+
+        // Update states
         switch (S.type)
         {
         case 0:	state->UpdateRenderState(S.v1, S.v2); break;

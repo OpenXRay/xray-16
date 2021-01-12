@@ -28,6 +28,8 @@ glState::glState()
     m_pBlendState.BlendOp = D3DBLENDOP_ADD;
     m_pBlendState.BlendOpAlpha = D3DBLENDOP_ADD;
     m_pBlendState.ColorMask = 0xF;
+
+    m_uiMipLODBias = FLT_MAX;
 }
 
 glState* glState::Create()
@@ -42,8 +44,19 @@ void glState::Apply()
     for (size_t stage = 0; stage < CTexture::mtMaxCombinedShaderTextures; stage++)
     {
         if (m_samplerArray[stage])
+        {
             glBindSampler(stage, m_samplerArray[stage]);
+
+            if (!fsimilar(m_uiMipLODBias, ps_r__tf_Mipbias))
+            {
+                CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_MIN_LOD, 0.f));
+                CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_MAX_LOD, FLT_MAX));
+                CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, ps_r__tf_Mipbias));
+            }
+        }
     }
+
+    m_uiMipLODBias = ps_r__tf_Mipbias;
 
     RCache.set_CullMode(rasterizerCullMode);
     RCache.set_Z(m_pDepthStencilState.DepthEnable);

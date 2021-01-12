@@ -117,11 +117,16 @@ void CBlender_Compile::i_BorderColor(u32 s, u32 color) { RS.SetSAMP(s, D3DSAMP_B
 void CBlender_Compile::i_Filter_Min(u32 s, u32 f) { RS.SetSAMP(s, D3DSAMP_MINFILTER, f); }
 void CBlender_Compile::i_Filter_Mip(u32 s, u32 f) { RS.SetSAMP(s, D3DSAMP_MIPFILTER, f); }
 void CBlender_Compile::i_Filter_Mag(u32 s, u32 f) { RS.SetSAMP(s, D3DSAMP_MAGFILTER, f); }
+void CBlender_Compile::i_Filter_Aniso(u32 s, u32 f) { RS.SetSAMP(s, D3DSAMP_MAXANISOTROPY, f); }
 void CBlender_Compile::i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag)
 {
     i_Filter_Min(s, _min);
     i_Filter_Mip(s, _mip);
     i_Filter_Mag(s, _mag);
+#if defined(USE_OGL)
+    if (_min == D3DTEXF_ANISOTROPIC && _mag == D3DTEXF_ANISOTROPIC)
+        i_Filter_Aniso(s, ps_r__tf_Anisotropic);
+#endif
 }
 
 u32 CBlender_Compile::r_Sampler(
