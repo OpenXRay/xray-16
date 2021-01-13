@@ -1,28 +1,34 @@
 PROJECT(squish)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+set(SRC_FILES
+    "fastclusterfit.cpp"
+    "fastclusterfit.h"
+    "weightedclusterfit.cpp"
+    "weightedclusterfit.h"
+    "colourblock.cpp"
+    "colourblock.h"
+    "colourfit.cpp"
+    "colourfit.h"
+    "colourset.cpp"
+    "colourset.h"
+    "config.h"
+    "maths.cpp"
+    "maths.h"
+    "simd.h"
+    "simd_sse.h"
+    "simd_ve.h"
+)
 
-SET(SQUISH_SRCS
-	fastclusterfit.cpp
-	fastclusterfit.h
-	weightedclusterfit.cpp
-	weightedclusterfit.h
-	colourblock.cpp
-	colourblock.h
-	colourfit.cpp
-	colourfit.h
-	colourset.cpp
-	colourset.h
-	config.h
-	maths.cpp
-	maths.h
-	simd.h
-	simd_sse.h
-	simd_ve.h)
+group_sources(SRC_FILES)
 
-ADD_LIBRARY(squish STATIC ${SQUISH_SRCS})
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
-	SET_TARGET_PROPERTIES(squish PROPERTIES COMPILE_FLAGS -fPIC)
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    $<$<BOOL:CMAKE_COMPILER_IS_GNUCXX>:-fPIC>
+)

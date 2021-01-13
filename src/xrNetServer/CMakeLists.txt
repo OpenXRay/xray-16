@@ -1,31 +1,59 @@
 project(xrNetServer)
 
-list(APPEND DIRS
-    "."
-    "empty"
-    )
+set(SRC_FILES
+    "ip_filter.cpp"
+    "ip_filter.h"
+    "NET_AuthCheck.cpp"
+    "NET_AuthCheck.h"
+    #"NET_Client.cpp"
+    #"NET_Client.h"
+    "NET_Common.cpp"
+    "NET_Common.h"
+    "NET_Compressor.cpp"
+    "NET_Compressor.h"
+    "NET_Log.cpp"
+    "NET_Log.h"
+    "NET_Messages.h"
+    "NET_PlayersMonitor.h"
+    #"NET_Server.cpp"
+    #"NET_Server.h"
+    "NET_Shared.h"
+    "stdafx.cpp"
+    "stdafx.h"
+    "empty/NET_Client.cpp"
+    "empty/NET_Client.h"
+    "empty/NET_Server.cpp"
+    "empty/NET_Server.h"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    )
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./NET_Client.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./NET_Server.cpp")
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+)
 
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./NET_Client.h")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./NET_Server.h")
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+)
 
-add_definitions(-DXR_NETSERVER_EXPORTS)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXR_NETSERVER_EXPORTS
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
+)
+
 cotire(${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore)
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

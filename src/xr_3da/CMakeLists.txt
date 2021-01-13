@@ -1,24 +1,33 @@
 project(xr_3da)
 
-list(APPEND DIRS
-    "."
-    )
+set(SRC_FILES
+    "AccessibilityShortcuts.hpp"
+    "entry_point.cpp"
+    "resource.h"
+    "stdafx.h"
+    "stdafx.cpp"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/ode/include
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
     ${SDL_INCLUDE_DIRS}
-    )
+)
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./StickyKeyFilter.hpp")
-
-add_executable(${PROJECT_NAME} ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+    xrAPI
+    xrEngine
+)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrAPI xrEngine)
 
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-    GROUP_READ GROUP_EXECUTE
-    WORLD_READ WORLD_EXECUTE)
+install(TARGETS ${PROJECT_NAME} RUNTIME
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)

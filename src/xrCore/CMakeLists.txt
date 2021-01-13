@@ -1,75 +1,270 @@
 project(xrCore)
 
-list(APPEND DIRS
-    "."
-    "Animation"
-    "Compression"
-    "Containers"
-    "Crypto"
-    "Math"
-    "Media"
-    "Memory"
-    "PostProcess"
-    "Text"
-    "Threading"
-    "XML"
-    "../xrCommon"
-    )
+set(SRC_FILES
+    "_bitwise.h"
+    "buffer_vector.h"
+    "buffer_vector_inline.h"
+    "cdecl_cast.hpp"
+    "ChooseTypes.H"
+    "client_id.h"
+    "clsid.cpp"
+    "clsid.h"
+    "_color.h"
+    "_compressed_normal.cpp"
+    "_compressed_normal.h"
+    "cpuid.cpp"
+    "cpuid.h"
+    "crc32.cpp"
+    "_cylinder.h"
+    "dump_string.cpp"
+    "dump_string.h"
+    "fastdelegate.h"
+    "_fbox2.h"
+    "_fbox.h"
+    "FileCRC32.cpp"
+    "FileCRC32.h"
+    "file_stream_reader.cpp"
+    "file_stream_reader.h"
+    "FileSystem_borland.cpp"
+    "FileSystem.cpp"
+    "FileSystem.h"
+    "FixedVector.h"
+    "_flags.h"
+    "FMesh.cpp"
+    "FMesh.hpp"
+    "FS.cpp"
+    "FS.h"
+    "FS_impl.h"
+    "FS_internal.h"
+    "FTimer.cpp"
+    "FTimer.h"
+    "intrusive_ptr.h"
+    "LocatorAPI_auth.cpp"
+    "LocatorAPI.cpp"
+    "LocatorAPI_defs.cpp"
+    "LocatorAPI_defs.h"
+    "LocatorAPI.h"
+    "log.cpp"
+    "log.h"
+    "LzHuf.cpp"
+    "lzhuf.h"
+    "math_constants.h"
+    "_math.cpp"
+    "_math.h"
+    "_matrix33.h"
+    "_matrix.h"
+    "ModuleLookup.cpp"
+    "ModuleLookup.hpp"
+    "NET_utils.cpp"
+    "net_utils.h"
+    "_obb.h"
+    "os_clipboard.cpp"
+    "os_clipboard.h"
+    "_plane2.h"
+    "_plane.h"
+    "_quaternion.h"
+    "_random.h"
+    "_rect.h"
+    "resource.h"
+    "_sphere.cpp"
+    "_sphere.h"
+    "stdafx.cpp"
+    "stdafx.h"
+    "_std_extensions.cpp"
+    "_std_extensions.h"
+    "_stl_extensions.h"
+    "stream_reader.cpp"
+    "stream_reader.h"
+    "stream_reader_inline.h"
+    "string_concatenations.cpp"
+    "string_concatenations.h"
+    "string_concatenations_inline.h"
+    "_types.h"
+    "_vector2.h"
+    "_vector3d_ext.h"
+    "_vector3d.h"
+    "_vector4.h"
+    "vector.h"
+    "xrCore_benchmark_macros.h"
+    "xrCore.cpp"
+    "xrCore.h"
+    "xrDebug.cpp"
+    "xrDebug.h"
+    "xrDebug_macros.h"
+    "xr_ini.cpp"
+    "xr_ini.h"
+    "xrMemory.cpp"
+    "xrMemory.h"
+    "xrPool.h"
+    "xr_resource.h"
+    "xr_shared.cpp"
+    "xr_shared.h"
+    "xrsharedmem.cpp"
+    "xrsharedmem.h"
+    "xr_shortcut.h"
+    "xrstring.cpp"
+    "xrstring.h"
+    "xr_token.cpp"
+    "xr_token.h"
+    "xr_trims.cpp"
+    "xr_trims.h"
+    "xr_vector_defs.h"
+    "Animation/Bone.cpp"
+    "Animation/BoneEditor.cpp"
+    "Animation/Bone.hpp"
+    "Animation/Envelope.cpp"
+    "Animation/Envelope.hpp"
+    "Animation/interp.cpp"
+    "Animation/Motion.cpp"
+    "Animation/Motion.hpp"
+    "Animation/SkeletonMotionDefs.hpp"
+    "Animation/SkeletonMotions.cpp"
+    "Animation/SkeletonMotions.hpp"
+    "Compression/Coder.hpp"
+    "Compression/compression_ppmd_stream.h"
+    "Compression/compression_ppmd_stream_inline.h"
+    "Compression/lzo_compressor.cpp"
+    "Compression/lzo_compressor.h"
+    "Compression/Model.cpp"
+    "Compression/ppmd_compressor.cpp"
+    "Compression/ppmd_compressor.h"
+    "Compression/PPMd.h"
+    "Compression/PPMdType.h"
+    "Compression/rt_compressor9.cpp"
+    "Compression/rt_compressor.cpp"
+    "Compression/rt_compressor.h"
+    "Compression/SubAlloc.hpp"
+    "Containers/AssociativeVectorComparer.hpp"
+    "Containers/AssociativeVector.hpp"
+    "Containers/FixedMap.h"
+    "Crypto/trivial_encryptor.cpp"
+    "Crypto/trivial_encryptor.h"
+    "Crypto/xr_dsa.cpp"
+    "Crypto/xr_dsa.h"
+    "Crypto/xr_dsa_signer.cpp"
+    "Crypto/xr_dsa_signer.h"
+    "Crypto/xr_dsa_verifyer.cpp"
+    "Crypto/xr_dsa_verifyer.h"
+    "Crypto/xr_sha.h"
+    #"Debug/dxerr.cpp"
+    #"Debug/dxerr.h"
+    #"Debug/MiniDump.cpp"
+    #"Debug/MiniDump.h"
+    #"Events/Notifier.h"
+    "Math/MathUtil.cpp"
+    "Math/MathUtil.hpp"
+    "Math/PLC_CPP.cpp"
+    "Math/PLC_CPP.hpp"
+    "Math/PLC_SSE.cpp"
+    "Math/PLC_SSE.hpp"
+    "Math/Random32.hpp"
+    "Math/SkinXW_CPP.cpp"
+    "Math/SkinXW_CPP.hpp"
+    "Math/SkinXW_SSE.cpp"
+    "Math/SkinXW_SSE.hpp"
+    "Media/Image.cpp"
+    "Media/Image.hpp"
+    "Memory/xalloc.h"
+    #"Memory/xrMemory_align.cpp"
+    #"Memory/xrMemory_align.h"
+    "PostProcess/PostProcess.cpp"
+    "PostProcess/PostProcess.hpp"
+    "PostProcess/PPInfo.cpp"
+    "PostProcess/PPInfo.hpp"
+    "Text/StringConversion.cpp"
+    "Text/StringConversion.hpp"
+    "Threading/Event.cpp"
+    "Threading/Event.hpp"
+    "Threading/Lock.cpp"
+    "Threading/Lock.hpp"
+    "Threading/ScopeLock.cpp"
+    "Threading/ScopeLock.hpp"
+    "Threading/Task.cpp"
+    "Threading/Task.hpp"
+    "Threading/TaskManager.cpp"
+    "Threading/TaskManager.hpp"
+    "Threading/ThreadUtil.cpp"
+    "Threading/ThreadUtil.h"
+    "XML/tinystr.cpp"
+    "XML/tinystr.h"
+    "XML/tinyxml.cpp"
+    "XML/tinyxmlerror.cpp"
+    "XML/tinyxml.h"
+    "XML/tinyxmlparser.cpp"
+    "XML/XMLDocument.cpp"
+    "XML/XMLDocument.hpp"
+    #"xrDelegate/xrDelegateArguments.h"
+    #"xrDelegate/xrDelegateBinder.h"
+    #"xrDelegate/xrDelegate.h"
+    "../Common/Common.hpp"
+    "../Common/Config.hpp"
+    "../Common/_d3d_extensions.h"
+    "../Common/face_smoth_flags.h"
+    "../Common/FSMacros.hpp"
+    "../Common/GUID.hpp"
+    "../Common/LevelGameDef.h"
+    "../Common/LevelStructure.hpp"
+    "../Common/Noncopyable.hpp"
+    "../Common/object_broker.h"
+    "../Common/object_cloner.h"
+    "../Common/object_comparer.h"
+    "../Common/object_destroyer.h"
+    "../Common/object_interfaces.h"
+    "../Common/object_loader.h"
+    "../Common/object_saver.h"
+    "../Common/object_type_traits.h"
+    "../Common/Platform.hpp"
+    "../Common/Util.hpp"
+)
 
-add_dir("${DIRS}")
+if (PROJECT_PLATFORM_ARM OR PROJECT_PLATFORM_ARM64)
+  list(REMOVE_ITEM SRC_FILES "Math/PLC_SSE.cpp")
+  list(REMOVE_ITEM SRC_FILES "Math/PLC_SSE.hpp")
+endif()
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/mimalloc/include
+group_sources(SRC_FILES)
+
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
     ${SDL_INCLUDE_DIRS}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
     ${TBB_INCLUDE_DIRS}
 )
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Memory/xrMemory_align.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/Memory/xrMemory_align.h")
-
-if(PROJECT_PLATFORM_ARM OR PROJECT_PLATFORM_ARM64)
-	list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Math/PLC_SSE.cpp")
-	list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/Math/PLC_SSE.hpp")
-endif()
-
-execute_process(COMMAND git rev-parse --verify HEAD
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE GIT_SHA1
-    ERROR_QUIET
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-message( "commit: " ${GIT_SHA1})
-
-execute_process(COMMAND git rev-parse --abbrev-ref HEAD
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE GIT_BRANCH
-    ERROR_QUIET
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-message( "branch: " ${GIT_BRANCH} )
-
-add_definitions(-DXRCORE_EXPORTS -DGIT_INFO_CURRENT_COMMIT=${GIT_SHA1} -DGIT_INFO_CURRENT_BRANCH=${GIT_BRANCH})
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
-cotire(${PROJECT_NAME})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-
-target_link_libraries(
-    ${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    pthread
+    ${SDL_LIBRARIES}
+    ${TBB_LIBRARIES}
+    ${CRYPTO++_LIBRARIES}
+    PRIVATE
     xrMiscMath
     dl
-    pthread
     $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
     ${PCRE_LIBRARIES}
-    ${SDL_LIBRARIES}
     ${LZO_LIBRARIES}
-    ${CRYPTO++_LIBRARIES}
-    ${TBB_LIBRARIES}
 )
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRCORE_EXPORTS
+    -DGIT_INFO_CURRENT_COMMIT=${GIT_SHA1}
+    -DGIT_INFO_CURRENT_BRANCH=${GIT_BRANCH}
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
+)
+
+cotire(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

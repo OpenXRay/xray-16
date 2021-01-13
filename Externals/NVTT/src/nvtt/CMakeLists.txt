@@ -2,112 +2,142 @@ PROJECT(nvtt)
 
 ADD_SUBDIRECTORY(squish)
 
-SET(NVTT_SRCS
-	nvtt.h 
-	nvtt.cpp
-	Compressor.h
-	Compressor.cpp
-	nvtt_wrapper.h
-	nvtt_wrapper.cpp
-	CompressDXT.h
-	CompressDXT.cpp
-	CompressRGB.h
-	CompressRGB.cpp
-	QuickCompressDXT.h
-	QuickCompressDXT.cpp
-	OptimalCompressDXT.h
-	OptimalCompressDXT.cpp
-	SingleColorLookup.h
-	CompressionOptions.h
-	CompressionOptions.cpp
-	InputOptions.h
-	InputOptions.cpp
-	OutputOptions.h
-	OutputOptions.cpp
-	cuda/CudaUtils.h
-	cuda/CudaUtils.cpp
-	cuda/CudaMath.h
-	cuda/Bitmaps.h
-	cuda/CudaCompressDXT.h
-	cuda/CudaCompressDXT.cpp)
+set(NVTT_SHARED OFF)
+set(NVTT_TEST_EXECUTABLES ON)
 
-IF(CUDA_FOUND)
-	ADD_DEFINITIONS(-DHAVE_CUDA)
-	WRAP_CUDA(CUDA_SRCS cuda/CompressKernel.cu)
-	SET(NVTT_SRCS ${NVTT_SRCS} ${CUDA_SRCS})
-	SET(LIBS ${LIBS} ${CUDA_LIBRARIES})
-	INCLUDE_DIRECTORIES(${CUDA_INCLUDE_PATH})
-ENDIF(CUDA_FOUND)
+set(SRC_FILES
+    "nvtt.h"
+    "nvtt.cpp"
+    "Compressor.h"
+    "Compressor.cpp"
+    "nvtt_wrapper.h"
+    "nvtt_wrapper.cpp"
+    "CompressDXT.h"
+    "CompressDXT.cpp"
+    "CompressRGB.h"
+    "CompressRGB.cpp"
+    "QuickCompressDXT.h"
+    "QuickCompressDXT.cpp"
+    "OptimalCompressDXT.h"
+    "OptimalCompressDXT.cpp"
+    "SingleColorLookup.h"
+    "CompressionOptions.h"
+    "CompressionOptions.cpp"
+    "InputOptions.h"
+    "InputOptions.cpp"
+    "OutputOptions.h"
+    "OutputOptions.cpp"
+    "cuda/CudaUtils.h"
+    "cuda/CudaUtils.cpp"
+    "cuda/CudaMath.h"
+    "cuda/Bitmaps.h"
+    "cuda/CudaCompressDXT.h"
+    "cuda/CudaCompressDXT.cpp"
+)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
+# XXX: add "tests" and "tools" folders?
 
-ADD_DEFINITIONS(-DNVTT_EXPORTS)
+if (CUDA_FOUND)
+    WRAP_CUDA(CUDA_SRCS cuda/CompressKernel.cu)
+    list(APPEND SRC_FILES ${CUDA_SRCS})
+endif()
 
-IF(NVTT_SHARED)
-	ADD_DEFINITIONS(-DNVTT_SHARED=1)
-	ADD_LIBRARY(nvtt SHARED ${NVTT_SRCS})
-ELSE(NVTT_SHARED)
-	ADD_LIBRARY(nvtt ${NVTT_SRCS})
-ENDIF(NVTT_SHARED)
+group_sources(SRC_FILES)
 
-TARGET_LINK_LIBRARIES(nvtt ${LIBS} nvcore nvmath nvimage squish)
+if (NVTT_SHARED)
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+else()
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+endif()
 
-INSTALL(TARGETS nvtt 
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib/static)
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/Externals/NVTT/src
+    ${CMAKE_SOURCE_DIR}/Externals/NVTT/include
+    $<$<BOOL:CUDA_FOUND>:${CUDA_INCLUDE_PATH}>
+)
 
-INSTALL(FILES nvtt.h DESTINATION include/nvtt)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    nvcore
+    nvmath
+    nvimage
+    squish
+    $<$<BOOL:CUDA_FOUND>:${CUDA_LIBRARIES}>
+)
 
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DNVTT_EXPORTS
+    $<$<BOOL:NVTT_SHARED>:-DNVTT_SHARED=1>
+    $<$<BOOL:CUDA_FOUND>:-DHAVE_CUDA>
+)
 
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)
 
-# test executables
-ADD_EXECUTABLE(nvcompress tools/compress.cpp tools/cmdline.h)
-TARGET_LINK_LIBRARIES(nvcompress nvcore nvmath nvimage nvtt)
+install(FILES "nvtt.h" DESTINATION "include/nvtt")
 
-ADD_EXECUTABLE(nvdecompress tools/decompress.cpp tools/cmdline.h)
-TARGET_LINK_LIBRARIES(nvdecompress nvcore nvmath nvimage)
+if (NVTT_TEST_EXECUTABLES)
+    add_executable(nvcompress tools/compress.cpp tools/cmdline.h)
+    target_link_libraries(nvcompress nvcore nvmath nvimage nvtt)
 
-ADD_EXECUTABLE(nvddsinfo tools/ddsinfo.cpp tools/cmdline.h)
-TARGET_LINK_LIBRARIES(nvddsinfo nvcore nvmath nvimage)
+    add_executable(nvdecompress tools/decompress.cpp tools/cmdline.h)
+    target_link_libraries(nvdecompress nvcore nvmath nvimage)
 
-ADD_EXECUTABLE(nvimgdiff tools/imgdiff.cpp tools/cmdline.h)
-TARGET_LINK_LIBRARIES(nvimgdiff nvcore nvmath nvimage)
+    add_executable(nvddsinfo tools/ddsinfo.cpp tools/cmdline.h)
+    target_link_libraries(nvddsinfo nvcore nvmath nvimage)
 
-ADD_EXECUTABLE(nvassemble tools/assemble.cpp tools/cmdline.h)
-TARGET_LINK_LIBRARIES(nvassemble nvcore nvmath nvimage)
+    add_executable(nvimgdiff tools/imgdiff.cpp tools/cmdline.h)
+    target_link_libraries(nvimgdiff nvcore nvmath nvimage)
 
-ADD_EXECUTABLE(filtertest tests/filtertest.cpp tools/cmdline.h)
-TARGET_LINK_LIBRARIES(filtertest nvcore nvmath nvimage)
+    add_executable(nvassemble tools/assemble.cpp tools/cmdline.h)
+    target_link_libraries(nvassemble nvcore nvmath nvimage)
 
-ADD_EXECUTABLE(nvzoom tools/resize.cpp tools/cmdline.h)
-TARGET_LINK_LIBRARIES(nvzoom nvcore nvmath nvimage)
+    add_executable(filtertest tests/filtertest.cpp tools/cmdline.h)
+    target_link_libraries(filtertest nvcore nvmath nvimage)
 
-INSTALL(TARGETS nvcompress nvdecompress nvddsinfo nvimgdiff nvassemble nvzoom DESTINATION bin)
+    add_executable(nvzoom tools/resize.cpp tools/cmdline.h)
+    target_link_libraries(nvzoom nvcore nvmath nvimage)
+
+    install(TARGETS nvcompress nvdecompress nvddsinfo nvimgdiff nvassemble nvzoom
+        DESTINATION ${CMAKE_INSTALL_LIBDIR} # XXX: change LIBDIR to BINDIR?
+    )
+endif()
 
 # UI tools
-IF(QT4_FOUND AND NOT MSVC)
-	SET(QT_USE_QTOPENGL TRUE)
-	INCLUDE_DIRECTORIES(${QT_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-	
-	SET(SRCS
-		tools/main.cpp
-		tools/configdialog.h
-		tools/configdialog.cpp)
+# XXX: move to Qt5
+if (QT4_FOUND AND NOT MSVC)
+    set(QT_USE_QTOPENGL TRUE)
 
-	SET(LIBS
-		nvtt
-		${QT_QTCORE_LIBRARY}
-		${QT_QTGUI_LIBRARY}
-		${QT_QTOPENGL_LIBRARY})
+    set(SRC_FILES
+        "tools/main.cpp"
+        "tools/configdialog.h"
+        "tools/configdialog.cpp"
+    )
 
-	QT4_WRAP_UI(UICS tools/configdialog.ui)
-	QT4_WRAP_CPP(MOCS tools/configdialog.h)
-	#QT4_ADD_RESOURCES(RCCS tools/configdialog.rc)
+    group_sources(SRC_FILES)
 
-	ADD_EXECUTABLE(nvcompressui MACOSX_BUNDLE ${SRCS} ${UICS} ${MOCS})
-	TARGET_LINK_LIBRARIES(nvcompressui ${LIBS})
+    add_executable(nvcompressui MACOSX_BUNDLE ${SRC_FILES} ${UICS} ${MOCS})
 
-ENDIF(QT4_FOUND AND NOT MSVC)
+    target_include_directories(${PROJECT_NAME}
+        PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR} # XXX: why?
+        ${QT_INCLUDE_DIR} # XXX: check if variable is correct
+    )
 
+    target_link_libraries(nvcompressui
+        PRIVATE
+        nvtt
+        ${QT_QTCORE_LIBRARY} # XXX: check if variable is correct
+        ${QT_QTGUI_LIBRARY} # XXX: check if variable is correct
+        ${QT_QTOPENGL_LIBRARY} # XXX: check if variable is correct
+    )
 
+    QT4_WRAP_UI(UICS tools/configdialog.ui)
+    QT4_WRAP_CPP(MOCS tools/configdialog.h)
+    #QT4_ADD_RESOURCES(RCCS tools/configdialog.rc)
+endif()

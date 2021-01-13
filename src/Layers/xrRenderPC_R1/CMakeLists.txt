@@ -1,26 +1,66 @@
 project(xrRenderPC_R1)
 
-list(APPEND DIRS
-	"."
-	)
+set(SRC_FILES
+    "FStaticRender_Blenders.cpp"
+    "FStaticRender.cpp"
+    "FStaticRender_DetectSector.cpp"
+    "FStaticRender.h"
+    "FStaticRender_Loader.cpp"
+    "FStaticRender_RenderTarget.cpp"
+    "FStaticRender_RenderTarget.h"
+    "FStaticRender_Shaders.cpp"
+    "FStaticRender_Types.h"
+    "GlowManager.cpp"
+    "GlowManager.h"
+    "LightPPA.cpp"
+    "LightPPA.h"
+    "LightProjector.cpp"
+    "LightProjector.h"
+    "LightShadows.cpp"
+    "LightShadows.h"
+    "stdafx.cpp"
+    "stdafx.h"
+    "xrRender_R1.cpp"
+)
 
+group_sources(SRC_FILES)
 
-add_dir("${DIRS}")
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
-include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/../..
-	${CMAKE_CURRENT_SOURCE_DIR}/../../../Externals/luabind
-	${CMAKE_CURRENT_SOURCE_DIR}/../../../sdk/include
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/luabind
+    ${CMAKE_SOURCE_DIR}/sdk/include
     ${SDL_INCLUDE_DIRS}
-	)
+)
 
-#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.cpp")
-#list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.hpp")
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+    xrLuabind
+    xrCDB
+    xrEngine
+    xrParticles
+    xrScriptEngine
+    xrAPI
+    xrMiscMath
+    ${SDL_LIBRARIES}
+)
 
-add_definitions(-DXRRENDER_R1_EXPORTS)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRRENDER_R1_EXPORTS
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore luabind LuaJIT xrCDB xrEngine xrParticles xrScriptEngine xrAPI xrMiscMath  ${SDL_LIBRARIES})
-xr_install(${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
+)
 
+cotire(${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

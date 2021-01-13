@@ -1,31 +1,82 @@
 project(xrScriptEngine)
 
-list(APPEND DIRS
-    "."
-    "LuaStudio"
-    )
+set(SRC_FILES
+    "BindingsDumper.cpp"
+    "BindingsDumper.hpp"
+    "DebugMacros.hpp"
+    "Functor.hpp"
+    "mslotutils.h"
+    "pch.cpp"
+    "pch.hpp"
+    "script_callback_ex.h"
+    "script_callStack.cpp"
+    "script_callStack.hpp"
+    "script_debugger.cpp"
+    "script_debugger.hpp"
+    "script_debugger_messages.hpp"
+    "script_debugger_threads.cpp"
+    "script_debugger_threads.hpp"
+    "ScriptEngineConfig.hpp"
+    "script_engine.cpp"
+    "script_engine.hpp"
+    "ScriptEngineScript.cpp"
+    "ScriptEngineScript.hpp"
+    "ScriptExporter.cpp"
+    "ScriptExporter.hpp"
+    "ScriptExportMacros.hpp"
+    "script_lua_helper.cpp"
+    "script_lua_helper.hpp"
+    "script_process.cpp"
+    "script_process.hpp"
+    "script_space_forward.hpp"
+    "script_stack_tracker.cpp"
+    "script_stack_tracker.hpp"
+    "script_thread.cpp"
+    "script_thread.hpp"
+    "xrScriptEngine.cpp"
+    "xrScriptEngine.hpp"
+    "LuaStudio/Config.hpp"
+    "LuaStudio/Defines.hpp"
+    "LuaStudio/LuaStudio.cpp"
+    "LuaStudio/LuaStudio.hpp"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${SDL_INCLUDE_DIRS}
-    )
+)
 
-# uncomment next string for debug script engine
-#add_definitions(-DCONFIG_SCRIPT_ENGINE_LOG_EXPORTS -DCONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS)
-add_definitions(-DXRSCRIPTENGINE_EXPORTS)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrAPI
+    xrCore
+    xrLuabind
+    ${LUA_LIBRARIES}
+)
 
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRSCRIPTENGINE_EXPORTS
+    # Uncomment next string for debug script engine
+    #-DCONFIG_SCRIPT_ENGINE_LOG_EXPORTS
+    #-DCONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp")
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp"
+)
+
 cotire(${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrAPI xrCore xrLuabind ${LUA_LIBRARIES})
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
-
+install(TARGETS ${PROJECT_NAME} LIBRARY
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)

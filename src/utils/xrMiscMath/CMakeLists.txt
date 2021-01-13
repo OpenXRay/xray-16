@@ -1,22 +1,28 @@
 project(xrMiscMath)
 
-list(APPEND DIRS
-    "."
-    )
+set(SRC_FILES
+    "cylinder.cpp"
+    "matrix.cpp"
+    "quaternion.cpp"
+    "vector.cpp"
+    "vector3d_ext.cpp"
+    "xrMiscMath.cpp"
+    "pch.hpp"
+    "pch.cpp"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../..
-    ${SDL_INCLUDE_DIRS}
-    )
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
-#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.cpp")
-#ist(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.hpp")
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/src
+)
 
-add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
-set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp"
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp")
 cotire(${PROJECT_NAME})
-

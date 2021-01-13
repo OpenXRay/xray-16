@@ -1,36 +1,198 @@
 project(xrPhysics)
 
-list(APPEND DIRS
-    "."
-    "tri-colliderknoopc"
-    "dcylinder"
-    )
+set(SRC_FILES
+    "ActorCameraCollision.cpp"
+    "ActorCameraCollision.h"
+    "BlockAllocator.h"
+    "CalculateTriangle.h"
+    "collisiondamagereceiver.cpp"
+    "console_vars.cpp"
+    "console_vars.h"
+    "CycleConstStorage.h"
+    "DamageSource.h"
+    "debug_output.cpp"
+    "debug_output.h"
+    "DisablingParams.cpp"
+    "DisablingParams.h"
+    "dRayMotions.cpp"
+    "dRayMotions.h"
+    "ElevatorState.cpp"
+    "ElevatorState.h"
+    "ExtendedGeom.cpp"
+    "ExtendedGeom.h"
+    "GeometryBits.cpp"
+    "GeometryBits.h"
+    "Geometry.cpp"
+    "Geometry.h"
+    "IActivationShape.cpp"
+    "IActivationShape.h"
+    "IClimableObject.h"
+    "IColisiondamageInfo.h"
+    "ICollideValidator.h"
+    "icollisiondamagereceiver.h"
+    "IElevatorState.h"
+    "IPHCapture.h"
+    "IPHStaticGeomShell.h"
+    "IPHWorld.h"
+    "iphysics_scripted.h"
+    "IPhysicsShellHolder.h"
+    "MathUtils.cpp"
+    "MathUtils.h"
+    "MathUtilsOde.h"
+    "matrix_utils.h"
+    "MovementBoxDynamicActivate.cpp"
+    "MovementBoxDynamicActivate.h"
+    "ode_include.h"
+    "ode_redefine.h"
+    "params.cpp"
+    "params.h"
+    "PHActivationShape.cpp"
+    "PHActivationShape.h"
+    "PHActorCharacter.cpp"
+    "PHActorCharacter.h"
+    "PHActorCharacterInline.h"
+    "PHAICharacter.cpp"
+    "PHAICharacter.h"
+    "PHBaseBodyEffector.h"
+    "PHCapture.cpp"
+    "PHCapture.h"
+    "PHCaptureInit.cpp"
+    "PHCharacter.cpp"
+    "PHCharacter.h"
+    "PHCollideValidator.cpp"
+    "PHCollideValidator.h"
+    "PHContactBodyEffector.cpp"
+    "PHContactBodyEffector.h"
+    "PHDefs.h"
+    "PHDisabling.cpp"
+    "PHDisabling.h"
+    "PHDynamicData.cpp"
+    "PHDynamicData.h"
+    "PHElement.cpp"
+    "PHElement.h"
+    "PHElementInline.h"
+    "PHElementNetState.cpp"
+    "PHFracture.cpp"
+    "PHFracture.h"
+    "PHGeometryOwner.cpp"
+    "PHGeometryOwner.h"
+    "PHImpact.h"
+    "PHInterpolation.cpp"
+    "PHInterpolation.h"
+    "PHIsland.cpp"
+    "PHIsland.h"
+    "PHItemList.h"
+    "PHJoint.cpp"
+    "PHJointDestroyInfo.cpp"
+    "PHJointDestroyInfo.h"
+    "PHJoint.h"
+    "PHMoveStorage.cpp"
+    "PHMoveStorage.h"
+    "PHObject.cpp"
+    "PHObject.h"
+    "PHShellActivate.cpp"
+    "PHShellBuildJoint.h"
+    "PHShell.cpp"
+    "PHShell.h"
+    "PHShellNetState.cpp"
+    "PHShellSplitter.cpp"
+    "PHShellSplitter.h"
+    "PHSimpleCharacter.cpp"
+    "PHSimpleCharacter.h"
+    "PHSimpleCharacterInline.h"
+    "PHSplitedShell.cpp"
+    "PHSplitedShell.h"
+    "PHStaticGeomShell.cpp"
+    "PHStaticGeomShell.h"
+    "PHUpdateObject.h"
+    "phvalide.cpp"
+    "phvalide.h"
+    "PHValideValues.h"
+    "ph_valid_ode.h"
+    "PHWorld.cpp"
+    "PHWorld.h"
+    "PhysicsCommon.h"
+    "Physics.cpp"
+    "PhysicsExternalCommon.cpp"
+    "PhysicsExternalCommon.h"
+    "Physics.h"
+    "physics_scripted.cpp"
+    "physics_scripted.h"
+    "PhysicsShellAnimatorBoneData.h"
+    "PhysicsShellAnimator.cpp"
+    "PhysicsShellAnimator.h"
+    "PhysicsShell.cpp"
+    "PhysicsShell.h"
+    "ShellHit.cpp"
+    "SpaceUtils.h"
+    "stdafx.cpp"
+    "StdAfx.h"
+    "xrPhysics.cpp"
+    "xrPhysics.h"
+    "tri-colliderknoopc/__aabb_tri.h"
+    "tri-colliderknoopc/dcTriangle.h"
+    #"tri-colliderknoopc/dcTriListCollider.cpp"
+    #"tri-colliderknoopc/dcTriListCollider.h"
+    "tri-colliderknoopc/dSortTriPrimitive.cpp"
+    "tri-colliderknoopc/dSortTriPrimitive.h"
+    "tri-colliderknoopc/dTriBox.cpp"
+    "tri-colliderknoopc/dTriBox.h"
+    "tri-colliderknoopc/dTriCallideK.cpp"
+    "tri-colliderknoopc/dTriCollideK.h"
+    "tri-colliderknoopc/dTriColliderCommon.h"
+    "tri-colliderknoopc/dTriColliderMath.h"
+    "tri-colliderknoopc/dTriCylinder.cpp"
+    "tri-colliderknoopc/dTriCylinder.h"
+    "tri-colliderknoopc/dTriList.cpp"
+    "tri-colliderknoopc/dTriList.h"
+    "tri-colliderknoopc/dTriSphere.cpp"
+    "tri-colliderknoopc/dTriSphere.h"
+    "tri-colliderknoopc/dxTriList.h"
+    "tri-colliderknoopc/TriPrimitiveCollideClassDef.h"
+    "dcylinder/dCylinder.cpp"
+    "dcylinder/dCylinder.h"
+    "../xrServerEntities/PHNetState.cpp"
+    "../xrServerEntities/PHNetState.h"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/ode/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/ode/include
+    ${CMAKE_SOURCE_DIR}/Externals
     ${SDL_INCLUDE_DIRS}
-    )
+)
 
-list(APPEND ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../xrServerEntities/PHNetState.cpp")
-list(APPEND ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/../xrServerEntities/PHNetState.h")
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    ODE
+    PRIVATE
+    xrCore
+    xrMiscMath
+    xrScriptEngine
+    xrAPI
+    xrCDB
+    xrSound
+)
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tri-colliderknoopc/dcTriListCollider.cpp")
-#list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./xr_cda.h")
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRPHYSICS_EXPORTS
+)
 
-add_definitions(-DXRPHYSICS_EXPORTS)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    COTIRE_CXX_PREFIX_HEADER_INIT "StdAfx.h"
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "StdAfx.h")
 cotire(${PROJECT_NAME})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath ODE xrScriptEngine xrAPI xrCDB xrSound)
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
-
+install(TARGETS ${PROJECT_NAME} LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+)
