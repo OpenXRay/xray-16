@@ -15,6 +15,7 @@
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\src\xray.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\src\xray_project_configuration.props" />
