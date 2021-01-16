@@ -560,12 +560,14 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
     {
         if (!Paused())
         {
-            if (bShowPauseString && editor())
+            if (editor())
                 bShowPauseString = false;
 #ifdef DEBUG
             else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
                 bShowPauseString = false;
 #endif
+            else
+                bShowPauseString = true;
         }
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
         {

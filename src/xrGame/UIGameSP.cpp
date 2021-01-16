@@ -331,7 +331,7 @@ void CChangeLevelWnd::Show(bool status)
 
         g_block_pause = true;
         Device.Pause(TRUE, TRUE, TRUE, "CChangeLevelWnd_show");
-        bShowPauseString = FALSE;
+        bShowPauseString = false;
     }
     else
     {
@@ -354,7 +354,7 @@ void CChangeLevelWnd::ShowDialog(bool bDoHideIndicators)
 
     g_block_pause = true;
     Device.Pause(TRUE, TRUE, TRUE, "CChangeLevelWnd_show");
-    bShowPauseString = FALSE;
+    bShowPauseString = false;
     inherited::ShowDialog(bDoHideIndicators);
 }
 
