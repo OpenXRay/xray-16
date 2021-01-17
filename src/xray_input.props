@@ -8,10 +8,9 @@
         $(SolutionDir);
         $(xrSdkDir)include;
         $(xrExternals);
-        $(xrSdkDir)DXSDK/Include;
         $(xrExternals)luajit\src;
         $(xrExternals)luabind;
-        $(xrExternals)GameSpy\src;
+        $(xrSdkDir)DXSDK/Include;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
