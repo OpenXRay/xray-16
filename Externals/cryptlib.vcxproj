@@ -111,9 +111,6 @@
   </ItemDefinitionGroup>
   <!-- X86 Configurations -->
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'" Label="X86 Configuration">
-    <ClCompile>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-    </ClCompile>
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>

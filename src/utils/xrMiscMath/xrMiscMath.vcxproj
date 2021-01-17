@@ -30,11 +30,6 @@
     <ClCompile>
       <DisableSpecificWarnings>4251;4275;4458;4244</DisableSpecificWarnings>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
-      <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

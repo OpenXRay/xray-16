@@ -4,8 +4,6 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
 
   <ImportGroup Label="PropertySheets">

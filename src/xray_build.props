@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Common global settings -->
+  <PropertyGroup Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <!--
+        4251 : class 'x' needs to have dll-interface to be used by clients of class 'y'
+        4275 : non dll-interface class 'x' used as base for dll-interface class 'y'
+        4458 : declaration of 'x' hides class member
+        -->
+      <DisableSpecificWarnings>4251;4275;4458</DisableSpecificWarnings>
+      <!--
+        LUABIND_DYNAMIC_LINK : self-explanatory
+        MSVC;dSINGLE;WIN32 : for ODE and xrPhysics
+        _SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE : temporary workaround for deprecated API
+        -->
+      <PreprocessorDefinitions>
+        LUABIND_DYNAMIC_LINK;
+        MSVC;
+        dSINGLE;
+        WIN32;
+        _SECURE_SCL=0;
+        _CRT_SECURE_NO_WARNINGS;
+        _CRT_SECURE_NO_DEPRECATE;
+        USE_TBB_PARALLEL;
+        USE_CRYPTOPP;
+        %(PreprocessorDefinitions)
+      </PreprocessorDefinitions>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <WarningLevel>Level2</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <LargeAddressAware>true</LargeAddressAware>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- Common debug settings -->
+  <PropertyGroup Condition="$(Configuration.Contains('Debug'))" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="$(Configuration.Contains('Debug'))">
+    <ClCompile>
+      <PreprocessorDefinitions>DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <!-- MultiProcessorCompilation isn't compatible with LinkIncremental and UseDebugLibraries -->
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <!-- Common release settings -->
+  <PropertyGroup Condition="$(Configuration.Contains('Release'))" Label="Configuration">
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="$(Configuration.Contains('Release'))">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+
+    <Lib>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+  </ItemDefinitionGroup>
+
+  <!-- /Common settings -->
+
+  <!-- Custom settings -->
+
+  <!-- Mixed settings -->
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Mixed'">
+    <ClCompile>
+      <PreprocessorDefinitions>DEBUG;MIXED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <!-- Optimization is automatically enabled when UseDebugLibraries == false. That's why we'll turn it off manually -->
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ImportGroup Label="PropertySheets">
+    <Import Project="xray_build.user.props" Condition="Exists('xray_build.user.props')"/>
+  </ImportGroup>
+</Project>

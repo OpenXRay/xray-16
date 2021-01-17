@@ -32,8 +32,6 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Include;$(xrSdkDir)include\FreeImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>false</ConformanceMode>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>

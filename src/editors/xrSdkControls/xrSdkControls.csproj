@@ -3,6 +3,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(SolutionDir)Common.props" />
+    <Import Project="..\..\xray.props" />
   </ImportGroup>
   <PropertyGroup>
     <AssemblyName>xrSdkControls</AssemblyName>
