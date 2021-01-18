@@ -7,10 +7,6 @@
     <ProjectGuid>{848E8AB3-9962-4C04-B813-5690399C8A3E}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="$(SolutionDir)Common.props" />
-  <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>$(xrTargetPlatform)</WindowsTargetPlatformVersion>
-  </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="..\src\xray_project_configuration.props" />
   </ImportGroup>
