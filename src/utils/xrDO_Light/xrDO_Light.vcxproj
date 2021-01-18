@@ -22,7 +22,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir>$(xrBinDir)utils</OutDir>
+    <OutDir>$(xrBinDir)utils\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
