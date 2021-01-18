@@ -1,138 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Mixed|Win32">
-      <Configuration>Mixed</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Mixed|x64">
-      <Configuration>Mixed</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\src\xray_project_configurations.props" />
+  </ImportGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{848E8AB3-9962-4C04-B813-5690399C8A3E}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="$(SolutionDir)Common.props" />
-  <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>$(xrTargetPlatform)</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\src\xray_project_configuration.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+  <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\src\xray.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

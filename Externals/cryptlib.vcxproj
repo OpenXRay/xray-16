@@ -23,13 +23,11 @@
     <RootNamespace>cryptlib</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="$(SolutionDir)Common.props" />
-  <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>$(xrTargetPlatform)</WindowsTargetPlatformVersion>
-  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\src\xray_project_configuration.props" />
+  </ImportGroup>
   <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -37,6 +35,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\src\xray.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <!-- End of Visual Studio boilerplate -->
@@ -52,8 +51,10 @@
   <!-- All Configurations -->
   <ItemDefinitionGroup Label="All Configurations">
     <ClCompile>
+      <PreprocessorDefinitions>USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ErrorReporting>None</ErrorReporting>
+      <LanguageStandard>stdcpp14</LanguageStandard>
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -61,11 +62,14 @@
     <Lib>
       <ErrorReporting>NoErrorReport</ErrorReporting>
     </Lib>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <!-- Debug Configurations -->
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='DLL-Import Debug'" Label="Debug Configuration">
     <ClCompile>
-      <PreprocessorDefinitions>CRYPTOPP_DEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CRYPTOPP_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -73,13 +77,12 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <!-- Release Configurations -->
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='DLL-Import Release'" Label="Release Configuration">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OmitFramePointers>true</OmitFramePointers>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -89,25 +92,21 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <!-- DLL-Import Overrides for Preprocessor -->
   <ItemDefinitionGroup Condition="'$(Configuration)'=='DLL-Import Debug'" Label="DLL Debug Configuration">
     <ClCompile>
-      <PreprocessorDefinitions>USE_PRECOMPILED_HEADERS;CRYPTOPP_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CRYPTOPP_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='DLL-Import Release'" Label="DLL Debug Configuration">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;USE_PRECOMPILED_HEADERS;CRYPTOPP_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;CRYPTOPP_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <!-- X86 Configurations -->
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'" Label="X86 Configuration">
-    <ClCompile>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-    </ClCompile>
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
@@ -125,25 +124,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <LanguageStandard>stdcpp14</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <LanguageStandard>stdcpp14</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <!-- Original File with special treatment -->

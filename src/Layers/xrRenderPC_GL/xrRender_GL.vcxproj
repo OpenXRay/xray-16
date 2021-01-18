@@ -1,167 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Mixed|Win32">
-      <Configuration>Mixed</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Mixed|x64">
-      <Configuration>Mixed</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configurations.props" />
+  </ImportGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}</ProjectGuid>
     <RootNamespace>xrRender_GL</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="$(SolutionDir)Common.props" />
-  <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>$(xrTargetPlatform)</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configuration.props" />
+  </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\xray.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
-  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\x86;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <WarningLevel>Level2</WarningLevel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\amd64;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <WarningLevel>Level2</WarningLevel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\x86;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <WarningLevel>Level2</WarningLevel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\amd64;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <WarningLevel>Level2</WarningLevel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\x86;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <WarningLevel>Level2</WarningLevel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>glew32s.lib;oalib.lib;opengl32.lib;glu32.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)nvapi\amd64;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glu32.lib;oalib.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -1,44 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\src\xray_project_configurations.props" />
+  </ImportGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{58AE014E-0DA3-4D9B-9034-21984C305447}</ProjectGuid>
     <RootNamespace>BuildVm</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="$(SolutionDir)Common.props" />
-  <PropertyGroup Label="Globals">
-    <WindowsTargetPlatformVersion>$(xrTargetPlatform)</WindowsTargetPlatformVersion>
-  </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\src\xray.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\src\xray_project_configuration.props" />
   </ImportGroup>
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>$(xrPlatformToolset)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <OutDir>$(ProjectDir)bin\$(PlatformShortName)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
-    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -48,17 +29,8 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <EnableEnhancedInstructionSet Condition="'$(Platform)'=='Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp17</LanguageStandard>
-      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp17</LanguageStandard>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ConformanceMode>
-      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ConformanceMode>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <PostBuildEvent>
       <Command>$(OutDir)$(TargetName) -m peobj -o lj_vm_$(PlatformShortName).obj
@@ -67,7 +39,7 @@ $(OutDir)$(TargetName) -m ffdef -o lj_ffdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT
 $(OutDir)$(TargetName) -m libdef -o lj_libdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
 $(OutDir)$(TargetName) -m recdef -o lj_recdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
 $(OutDir)$(TargetName) -m folddef -o lj_folddef.h ..\LuaJIT\src\lj_opt_fold.c
-</Command>
+      </Command>
     </PostBuildEvent>
     <Link>
       <SubSystem>Console</SubSystem>

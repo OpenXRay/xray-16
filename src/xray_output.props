@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="OutputDirectories">
+    <OutDir Condition="'$(ConfigurationType)'=='Application'"   >$(xrBinDir)</OutDir>
+    <OutDir Condition="'$(ConfigurationType)'=='DynamicLibrary'">$(xrBinDir)</OutDir>
+    <OutDir Condition="'$(ConfigurationType)'=='StaticLibrary'" >$(xrLibDir)</OutDir>
+    <OutDir Condition="'$(ConfigurationType)'=='Makefile'"      >$(xrLibDir)</OutDir>
+
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="xray_output.user.props" Condition="Exists('xray_output.user.props')"/>
+  </ImportGroup>
+</Project>
