@@ -135,6 +135,7 @@ void CHOM::Load()
             Msg("* HOM cache for '%s' not found. Building the model from scratch..", fName);
             m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
             m_pModel->serialize(fName);
+            FS.rescan_path(fName, false);
         }
         else
             m_pModel->deserialize(fName);

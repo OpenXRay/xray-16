@@ -125,6 +125,7 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
             Msg("* ObjectSpace cache for '%s' not found. Building the model from scratch..", fName);
             Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
             Static.serialize(fName);
+            FS.rescan_path(fName, false);
         }
         else
             Static.deserialize(fName);

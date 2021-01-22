@@ -394,7 +394,10 @@ void CRender::LoadSectors(IReader* fs)
             }
             rmPortals->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
             if (use_cache)
+            {
                 rmPortals->serialize(fName);
+                FS.rescan_path(fName, false);
+            }
         }
     }
     else
