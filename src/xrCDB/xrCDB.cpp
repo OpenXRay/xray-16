@@ -184,7 +184,7 @@ bool MODEL::serialize(pcstr fileName) const
 
     if (tree)
         tree->Save(wstream);
-
+    FS.w_close(wstream);
     return true;
 }
 

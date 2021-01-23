@@ -127,7 +127,10 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
             Static.serialize(fName);
         }
         else
+        {
+            Msg("* Loading ObjectSpace cache...");
             Static.deserialize(fName);
+        }
     }        
     
     m_BoundingVolume.set(H.aabb);

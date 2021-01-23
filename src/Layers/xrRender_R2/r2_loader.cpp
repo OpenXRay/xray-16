@@ -361,6 +361,7 @@ void CRender::LoadSectors(IReader* fs)
                 Msg("* Portals cache for '%s' not found. Building the model from scratch..", fName);
             else
             {
+                Msg("* Loading portals cache...");
                 rmPortals->deserialize(fName);
                 do_rebuild = false;
             }
