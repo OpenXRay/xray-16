@@ -138,7 +138,7 @@ void CHOM::Load()
         }
         else
         {
-            Msg("* Loading HOM cache...");
+            Log("* Loading HOM cache...");
             m_pModel->deserialize(fName);
         }
     }
