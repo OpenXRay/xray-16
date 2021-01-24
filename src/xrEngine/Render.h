@@ -195,6 +195,15 @@ public:
         HelperContext
     };
 
+    class ENGINE_API ScopedContext
+    {
+        RenderContext previousContext;
+
+    public:
+        ScopedContext(RenderContext context);
+        ~ScopedContext();
+    };
+
     struct RenderStatistics
     {
         CStatTimer Culling; // portal traversal, frustum culling, entities "renderable_Render"
@@ -440,5 +449,6 @@ public:
     virtual void OnAssetsChanged() = 0;
 
     virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
+    virtual RenderContext GetCurrentContext() const = 0;
     virtual void MakeContextCurrent(RenderContext context) = 0;
 };

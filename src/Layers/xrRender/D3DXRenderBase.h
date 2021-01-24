@@ -216,6 +216,7 @@ public:
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     void ObtainRequiredWindowFlags(u32& /*windowFlags*/) override {}
+    RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
 public:

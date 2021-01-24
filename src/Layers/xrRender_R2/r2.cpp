@@ -641,6 +641,11 @@ void CRender::ObtainRequiredWindowFlags(u32& windowFlags)
     HW.SetPrimaryAttributes();
 }
 
+IRender::RenderContext CRender::GetCurrentContext() const
+{
+    return HW.GetCurrentContext();
+}
+
 void CRender::MakeContextCurrent(RenderContext context)
 {
     R_ASSERT3(HW.MakeContextCurrent(context) == 0,

@@ -153,6 +153,16 @@ void CHW::SetPrimaryAttributes()
     }
 }
 
+IRender::RenderContext CHW::GetCurrentContext() const
+{
+    const auto context = SDL_GL_GetCurrentContext();
+    if (context == m_context)
+        return IRender::PrimaryContext;
+    if (context == m_helper_context)
+        return IRender::HelperContext;
+    return IRender::NoContext;
+}
+
 int CHW::MakeContextCurrent(IRender::RenderContext context) const
 {
     switch (context)

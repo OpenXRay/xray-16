@@ -227,9 +227,8 @@ void CGamePersistent::OnAppStart()
     // load game materials
     TaskScheduler->AddTask("GMLib.Load()", [&]()
     {
-        GEnv.Render->MakeContextCurrent(IRender::HelperContext); // free to use, so let's use it
+        IRender::ScopedContext context(IRender::HelperContext);
         GMLib.Load();
-        GEnv.Render->MakeContextCurrent(IRender::NoContext); // release it for other users
     }, nullptr, nullptr, &materialsLoaded);
 
     SetupUIStyle();
