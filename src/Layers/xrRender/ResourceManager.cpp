@@ -277,29 +277,38 @@ void CResourceManager::CompatibilityCheck()
     {
         IReader* skinh = open_shader("skin.h");
         R_ASSERT3(skinh, "Can't open shader", "skin.h");
-        // search for (12.f / 32768.f)
+        xr_string str(static_cast<pcstr>(skinh->pointer()), skinh->length());
+
         bool hq_skinning = true;
-        do
+        // search for (12.f / 32768.f)
+        const auto check = [&](cpcstr searchBegin, cpcstr searchEnd) -> bool
         {
-            xr_string str(static_cast<pcstr>(skinh->pointer()), skinh->length());
-
-            cpcstr begin = strstr(str.c_str(), "skinning_pos");
+            cpcstr begin = strstr(str.c_str(), searchBegin);
             if (!begin)
-                break;
+                return false;
 
-            cpcstr end = strstr(begin, "skinning_0");
+            cpcstr end = strstr(begin, searchEnd);
             if (!end)
-                break;
+                return false;
 
             str.assign(begin, end);
             pcstr ptr = str.data();
 
             if ((ptr = strstr(ptr, "12.f")))    // 12.f
+            {
                 if ((ptr = strstr(ptr, "/")))   // /
                     if (strstr(ptr, "32768.f")) // 32768.f
+                    {
                         hq_skinning = false;    // found
-            break;
-        } while (false);
+                        return true;
+                    }
+            }
+            return false;
+        };
+        if (!check("u_position", "sbones_array"))
+        {
+            check("skinning_pos", "skinning_0");
+        }
         RImplementation.m_hq_skinning = hq_skinning;
         FS.r_close(skinh);
     }
