@@ -2,8 +2,7 @@
 
 OpenXRay [![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv) [![Supporters](https://opencollective.com/openxray/tiers/supporter/badge.svg?label=Supporter&color=brightgreen)](https://opencollective.com/openxray)
 ==========================
-
-OpenXRay is an improved version of the X-Ray engine, used in world famous S.T.A.L.K.E.R. game series by GSC Game World.
+OpenXRay is an improved version of the X-Ray Engine, the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World.
 
 ### Supported games
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
@@ -29,7 +28,7 @@ OpenXRay is an improved version of the X-Ray engine, used in world famous S.T.A.
 
 
 ### More details
-This repository contains X-Ray Engine sources based on version 1.6.02.
+This repository contains OpenXRay Engine sources based on the X-Ray Engine version 1.6.02.
 The original engine is used in S.T.A.L.K.E.R.: Call of Pripyat game released by GSC Game World.
 
 It is a place to share ideas on what to implement, gather people that want to work on the engine,
@@ -43,5 +42,5 @@ Pull requests appreciated! However, the following things should be taken into co
 * Major changes should be discussed before implementation
 * Follow the [procedures](doc/procedure)
 
-Be advised that this project is not sanctioned by GSC Game World in any way – and they remain the copyright holders
-of all the original source code.
+Be advised that this is a community project not sanctioned by GSC Game World in any way – and they remain the copyright holders
+of all the original source code and S.T.A.L.K.E.R. franchise.
