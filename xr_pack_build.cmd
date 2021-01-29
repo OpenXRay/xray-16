@@ -46,6 +46,22 @@ if "%CONFIGURATION%"=="Release" (
     )
 )
 
+if "%CONFIGURATION%"=="Release Master Gold" (
+    if %PLATFORM%==x86 (
+        set PLATFORM_FOLDER=Win32
+        set EDITION_NAME=Gold 32-bit
+        goto :START
+    )
+)
+
+if "%CONFIGURATION%"=="Release Master Gold" (
+    if %PLATFORM%==x64 (
+        set PLATFORM_FOLDER=Win64
+        set EDITION_NAME=Gold 64-bit
+        goto :START
+    )
+)
+
 echo ! Unknown configuration and/or platform
 goto :EOF
 

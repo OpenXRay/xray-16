@@ -13,6 +13,7 @@ configuration:
 - Debug
 - Mixed
 - Release
+- Release Master Gold
 
 platform:
 - x64
@@ -22,6 +23,8 @@ matrix:
   exclude:
     - image: Ubuntu
       configuration: Mixed
+    - image: Ubuntu
+      configuration: Release Master Gold
 
 cache:
 - src/packages -> **/packages.config
