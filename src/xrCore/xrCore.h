@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef DEBUG
-#define MASTER_GOLD
-#endif // DEBUG
-
 #include "xrCore_benchmark_macros.h"
 
 #if !defined(_CPPUNWIND)

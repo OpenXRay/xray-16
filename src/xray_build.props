@@ -108,6 +108,13 @@
     </Link>
   </ItemDefinitionGroup>
 
+  <!-- Master Gold settings -->
+  <ItemDefinitionGroup Condition="$(Configuration.Contains('Master Gold'))">
+    <ClCompile>
+      <PreprocessorDefinitions>MASTER_GOLD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
   <ImportGroup Label="PropertySheets">
     <Import Project="xray_build.user.props" Condition="Exists('xray_build.user.props')"/>
   </ImportGroup>
