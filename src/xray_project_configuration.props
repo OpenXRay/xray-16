@@ -10,6 +10,10 @@
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(Configuration.Contains('Static')) or $(Configuration.Contains('Master Gold'))" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+
   <ImportGroup Label="PropertySheets">
     <Import Project="xray_project_configuration.user.props" Condition="Exists('xray_project_configuration.user.props')"/>
   </ImportGroup>

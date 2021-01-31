@@ -524,7 +524,6 @@ Global
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed|x86.ActiveCfg = Mixed|Win32
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Mixed|x86.Build.0 = Mixed|Win32
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release Master Gold|x64.ActiveCfg = Release Master Gold|x64
-		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release Master Gold|x64.Build.0 = Release Master Gold|x64
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release Master Gold|x86.ActiveCfg = Release Master Gold|Win32
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release Master Gold|x86.Build.0 = Release Master Gold|Win32
 		{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}.Release|x64.ActiveCfg = Release|x64
@@ -540,7 +539,6 @@ Global
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Mixed|x86.ActiveCfg = Mixed|Win32
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Mixed|x86.Build.0 = Mixed|Win32
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release Master Gold|x64.ActiveCfg = Release Master Gold|x64
-		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release Master Gold|x64.Build.0 = Release Master Gold|x64
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release Master Gold|x86.ActiveCfg = Release Master Gold|Win32
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release Master Gold|x86.Build.0 = Release Master Gold|Win32
 		{963BA4E5-499A-454D-B002-1D5ECE0527A6}.Release|x64.ActiveCfg = Release|x64
@@ -1096,7 +1094,6 @@ Global
 		{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}.Mixed|x86.ActiveCfg = Mixed|Win32
 		{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}.Mixed|x86.Build.0 = Mixed|Win32
 		{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}.Release Master Gold|x64.ActiveCfg = Release Master Gold|x64
-		{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}.Release Master Gold|x64.Build.0 = Release Master Gold|x64
 		{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}.Release Master Gold|x86.ActiveCfg = Release Master Gold|Win32
 		{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}.Release Master Gold|x86.Build.0 = Release Master Gold|Win32
 		{2C5AF8C8-96A6-45B2-860B-5E9C9911DDD6}.Release|x64.ActiveCfg = Release|x64

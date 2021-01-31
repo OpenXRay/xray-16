@@ -107,6 +107,13 @@
     </Link>
   </ItemDefinitionGroup>
 
+  <!-- Any static configuration and Master Gold settings -->
+  <ItemDefinitionGroup Condition="$(Configuration.Contains('Static')) or $(Configuration.Contains('Master Gold'))" Label="Configuration">
+    <ClCompile>
+      <PreprocessorDefinitions>XRAY_STATIC_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
   <!-- Master Gold settings -->
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Master Gold'))">
     <ClCompile>
