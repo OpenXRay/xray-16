@@ -19,18 +19,15 @@ public:
         {
             return modes;
         }
-        modes.emplace_back(RENDERER_R2A_MODE);
-        modes.emplace_back(RENDERER_R2_MODE);
-
-        D3DCAPS9 caps;
-        CHW hw;
-        hw.CreateD3D();
-        hw.pD3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &caps);
-        hw.DestroyD3D();
-
-        u16 ps_ver_major = u16(u32(u32(caps.PixelShaderVersion) & u32(0xf << 8ul)) >> 8);
-        if (ps_ver_major >= 3)
+        switch (xrRender_test_hw())
         {
+        case TRUE:
+            modes.emplace_back(RENDERER_R2A_MODE);
+            modes.emplace_back(RENDERER_R2_MODE);
+            break;
+        case TRUE+TRUE: // XXX: remove hack
+            modes.emplace_back(RENDERER_R2A_MODE);  // don't optimize this switch with fallthrough,
+            modes.emplace_back(RENDERER_R2_MODE);   // because order matters.
             modes.emplace_back(RENDERER_R2_5_MODE);
         }
         return modes;

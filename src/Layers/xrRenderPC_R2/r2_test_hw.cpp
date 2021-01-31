@@ -19,5 +19,7 @@ BOOL xrRender_test_hw()
         return FALSE;
     if (mrt_count < 3)
         return FALSE;
+    if (ps_ver_major >= 3)
+        return TRUE+TRUE; // XXX: remove hack
     return TRUE;
 }
