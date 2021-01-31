@@ -23,6 +23,7 @@ public:
         {
             modes.emplace_back(RENDERER_R1_MODE);
         }
+        hw.DestroyD3D();
         return modes;
     }
 
