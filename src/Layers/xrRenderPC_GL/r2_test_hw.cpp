@@ -38,15 +38,6 @@ public:
 
 bool TestOpenGLSupport()
 {
-    // XXX: this check should be removed after implementing support for HLSL
-    // https://github.com/OpenXRay/xray-16/issues/258
-    // Check if shaders are available
-    if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
-    {
-        Log("~ No shaders found for OpenGL");
-        return false;
-    }
-
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
     if (!windowTest.successful())

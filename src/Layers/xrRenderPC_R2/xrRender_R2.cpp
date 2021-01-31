@@ -13,13 +13,25 @@ class R2RendererModule final : public RendererModule
     xr_vector<pcstr> modes;
 
 public:
-    const xr_vector<pcstr>& ObtainSupportedModes() override
+    BOOL CheckCanAddMode() const
     {
+        // don't duplicate
         if (!modes.empty())
         {
-            return modes;
+            return FALSE;
         }
-        switch (xrRender_test_hw())
+        // Check if shaders are available
+        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+        {
+            Log("~ No shaders found for xrRender_R2");
+            return FALSE;
+        }
+        return xrRender_test_hw();
+    }
+
+    const xr_vector<pcstr>& ObtainSupportedModes() override
+    {
+        switch (CheckCanAddMode())
         {
         case TRUE:
             modes.emplace_back(RENDERER_R2A_MODE);
@@ -42,7 +54,7 @@ public:
         {
             modeIsCorrect = true;
         }
-        R_ASSERT3(modeIsCorrect, "Wrong mode passed to xrRender_R2.dll", mode);
+        R_ASSERT3(modeIsCorrect, "Wrong mode passed to xrRender_R2", mode);
     }
 
     void SetupEnv(pcstr mode) override
