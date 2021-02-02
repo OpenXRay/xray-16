@@ -294,10 +294,10 @@ void CResourceManager::CompatibilityCheck()
             str.assign(begin, end);
             pcstr ptr = str.data();
 
-            if ((ptr = strstr(ptr, "12.f")))    // 12.f
+            if ((ptr = strstr(ptr, "12.")))     // 12.f or 12.0
             {
                 if ((ptr = strstr(ptr, "/")))   // /
-                    if (strstr(ptr, "32768.f")) // 32768.f
+                    if (strstr(ptr, "32768."))  // 32768.f or 32768.0
                     {
                         hq_skinning = false;    // found
                         return true;
