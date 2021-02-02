@@ -103,6 +103,7 @@ private:
 
     ref_texture tonemap;
     ref_texture tsky0, tsky1;
+    ref_texture tclouds0, tclouds1;
 };
 
 #endif //	EnvironmentRender_included

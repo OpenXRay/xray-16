@@ -131,6 +131,11 @@ dxEnvironmentRender::dxEnvironmentRender()
 {
     tsky0 = RImplementation.Resources->_CreateTexture("$user$sky0");
     tsky1 = RImplementation.Resources->_CreateTexture("$user$sky1");
+#ifdef USE_OGL
+    // These textures are specified in clouds.s
+    tclouds0 = RImplementation.Resources->_CreateTexture("$user$clouds0");
+    tclouds1 = RImplementation.Resources->_CreateTexture("$user$clouds1");
+#endif
 }
 
 void dxEnvironmentRender::OnFrame(CEnvironment& env)
@@ -181,6 +186,12 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
+
+    e0 = mixRen.clouds_r_textures[0].second->surface_get();
+    e1 = mixRen.clouds_r_textures[1].second->surface_get();
+
+    tclouds0->surface_set(GL_TEXTURE_2D, e0);
+    tclouds1->surface_set(GL_TEXTURE_2D, e1);
 #else // USE_OGL
     ID3DBaseTexture* e0 = mixRen.sky_r_textures[0].second->surface_get();
     ID3DBaseTexture* e1 = mixRen.sky_r_textures[1].second->surface_get();
@@ -336,8 +347,10 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_xform_world(mXFORM);
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);
+#ifndef USE_OGL
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
     RCache.set_Textures(&mixRen.clouds_r_textures);
+#endif
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, env.CloudsVerts.size(), i_offset, env.CloudsIndices.size() / 3);
 
     GEnv.Render->rmNormal();
@@ -356,6 +369,8 @@ void dxEnvironmentRender::OnDeviceDestroy()
 #ifdef USE_OGL
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    tclouds0->surface_set(GL_TEXTURE_2D, 0);
+    tclouds1->surface_set(GL_TEXTURE_2D, 0);
 #else
     tsky0->surface_set(nullptr);
     tsky1->surface_set(nullptr);
