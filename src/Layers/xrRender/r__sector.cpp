@@ -198,7 +198,7 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
         }
 
         // Clip by frustum
-        svector<Fvector, 8>& POLY = PORTAL->getPoly();
+        CPortal::Poly& POLY = PORTAL->getPoly();
         S.assign(&*POLY.begin(), POLY.size());
         D.clear();
         sPoly* P = F.ClipPoly(S, D);
