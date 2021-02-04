@@ -1058,9 +1058,6 @@
     <ClCompile Include="..\xrRender\r__sync_point.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r2_sector_detect.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1120,6 +1117,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp">
       <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\r__sector_detect.cpp">
+      <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

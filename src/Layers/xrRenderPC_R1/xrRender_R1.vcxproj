@@ -270,6 +270,7 @@
     <ClCompile Include="..\xrRender\r__dsgraph_render_lods.cpp" />
     <ClCompile Include="..\xrRender\r__screenshot.cpp" />
     <ClCompile Include="..\xrRender\r__sector.cpp" />
+    <ClCompile Include="..\xrRender\r__sector_detect.cpp" />
     <ClCompile Include="..\xrRender\r__sector_traversal.cpp" />
     <ClCompile Include="..\xrRender\Shader.cpp" />
     <ClCompile Include="..\xrRender\SH_Atomic.cpp" />
@@ -300,7 +301,6 @@
     <ClCompile Include="..\xrRender\blenders\Blender_Vertex_aref.cpp" />
     <ClCompile Include="FStaticRender.cpp" />
     <ClCompile Include="FStaticRender_Blenders.cpp" />
-    <ClCompile Include="FStaticRender_DetectSector.cpp" />
     <ClCompile Include="FStaticRender_Loader.cpp" />
     <ClCompile Include="FStaticRender_RenderTarget.cpp" />
     <ClCompile Include="FStaticRender_Shaders.cpp" />
