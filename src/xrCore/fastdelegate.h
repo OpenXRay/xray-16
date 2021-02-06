@@ -58,15 +58,6 @@
 ///////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-//      Configuration options
-//
-////////////////////////////////////////////////////////////////////////////////
-
-// Uncomment the next line to allow function declarator syntax.
-// It is automatically enabled for those compilers where it is known to work.
-//#define FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
-
-////////////////////////////////////////////////////////////////////////////////
 //      Compiler identification for workarounds
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,21 +79,6 @@
 // CodePlay doesn't have the __single/multi/virtual_inheritance keywords
 #define FASTDLGT_HASINHERITANCE_KEYWORDS
 #endif
-#endif
-
-// Does it allow function declarator syntax? The following compilers are known to work:
-#if defined(FASTDLGT_ISMSVC) && (_MSC_VER >= 1310) // VC 7.1
-#define FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
-#endif
-
-// Gcc(2.95+), and versions of Digital Mars, Intel and Comeau in common use.
-#if defined(__DMC__) || defined(__GNUC__) || defined(__ICL) || defined(__COMO__)
-#define FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
-#endif
-
-// It works on Metrowerks MWCC 3.2.2. From boost.Config it should work on earlier ones too.
-#if defined(__MWERKS__)
-#define FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1598,8 +1574,6 @@ private: // Invoker for static functions
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
-
 // Declare FastDelegate as a class template.  It will be specialized
 // later for all number of arguments.
 template <typename Signature>
@@ -1942,7 +1916,6 @@ public:
     void operator=(const BaseType& x) { *static_cast<BaseType*>(this) = x; }
 };
 
-#endif // FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
 
 ////////////////////////////////////////////////////////////////////////////////
 //      Fast Delegates, part 5:
