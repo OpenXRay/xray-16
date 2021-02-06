@@ -111,11 +111,6 @@
 #define FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
 #endif
 
-#ifdef __GNUC__ // Workaround GCC bug #8271
-// At present, GCC doesn't recognize constness of MFPs in templates
-#define FASTDELEGATE_GCC_BUG_8271
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 //      General tricks used in this code
 //
@@ -677,13 +672,6 @@ public:
         m_pthis =
             SimplifyMemFunc<sizeof(function_to_bind)>::Convert(const_cast<X*>(pthis), function_to_bind, m_pFunction);
     }
-#ifdef FASTDELEGATE_GCC_BUG_8271 // At present, GCC doesn't recognize constness of MFPs in templates
-    template <class X, class XMemFunc>
-    inline void bindmemfunc(const X* pthis, XMemFunc function_to_bind)
-    {
-        bindconstmemfunc(pthis, function_to_bind);
-    }
-#endif
     // These functions are required for invoking the stored function
     inline GenericClass* GetClosureThis() const { return m_pthis; }
     inline GenericMemFunc GetClosureMemPtr() const { return reinterpret_cast<GenericMemFunc>(m_pFunction); }
