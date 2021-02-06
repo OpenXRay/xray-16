@@ -1518,6 +1518,8 @@ T* CLocatorAPI::r_open_impl(pcstr path, pcstr _fname)
     else
         file_from_archive(R, fname, *desc);
 
+    R->set_age(desc->modif);
+
 #ifdef DEBUG
     if (R && m_Flags.is(flBuildCopy | flReady))
         copy_file_to_build(R, source_name);

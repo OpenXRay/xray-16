@@ -355,16 +355,20 @@ void CRender::LoadSectors(IReader* fs)
 
         // build portal model
         rmPortals = xr_new<CDB::MODEL>();
-        if (use_cache)
+        rmPortals->set_version(fs->get_age());
+        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName))
         {
-            if (!FS.exist(fName))
-                Msg("* Portals cache for '%s' not found. Building the model from scratch..", fName);
-            else
-            {
-                Log("* Loading portals cache...");
-                rmPortals->deserialize(fName);
-                do_rebuild = false;
-            }
+#ifndef MASTER_GOLD
+            Msg("* Loaded portals cache (%s)...", fName);
+#endif
+            do_rebuild = false;
+        }
+        else
+        {
+#ifndef MASTER_GOLD
+            Msg("* Portals cache for '%s' was not loaded. "
+                "Building the model from scratch..", fName);
+#endif
         }
 
         CDB::Collector CL;

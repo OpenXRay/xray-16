@@ -124,23 +124,27 @@ void CHOM::Load()
 
     // Create AABB-tree
     m_pModel = xr_new<CDB::MODEL>();
-    if (!strstr(Core.Params, "-cdb_cache"))
-        m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
+    m_pModel->set_version(fs->get_age());
+    bool bUseCache = strstr(Core.Params, "-cdb_cache");
+
+    strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
+    FS.update_path(fName, "$app_data_root$", fName);
+
+    if (bUseCache && FS.exist(fName) && m_pModel->deserialize(fName))
+    {
+#ifndef MASTER_GOLD
+        Msg("* Loaded HOM cache (%s)...", fName);
+#endif
+    }
     else
     {
-        strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
-        FS.update_path(fName, "$app_data_root$", fName);
-        if (!FS.exist(fName))
-        {
-            Msg("* HOM cache for '%s' not found. Building the model from scratch..", fName);
-            m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
+#ifndef MASTER_GOLD
+        Msg("* HOM cache for '%s' was not loaded. Building the model from scratch..", fName);
+#endif
+        m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
+
+        if (bUseCache)
             m_pModel->serialize(fName);
-        }
-        else
-        {
-            Log("* Loading HOM cache...");
-            m_pModel->deserialize(fName);
-        }
     }
 
     bEnabled = TRUE;
