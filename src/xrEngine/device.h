@@ -188,7 +188,7 @@ public:
 
     CRenderDevice()
         : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
-          mtProcessingAllowed(false), mt_bMustExit(false),
+          mt_bMustExit(false),
           m_editor_module(nullptr), m_editor_initialize(nullptr),
           m_editor_finalize(nullptr), m_editor(nullptr)
     {
@@ -269,18 +269,12 @@ public:
     }
 
 private:
-    std::atomic<bool> mtProcessingAllowed;
     Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
     Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 
 public:
     Event PresentationFinished = nullptr;
     volatile bool mt_bMustExit;
-
-    bool IsMTProcessingAllowed() const
-    {
-        return mtProcessingAllowed;
-    }
 
     // Usable only when called from thread, that initialized SDL
     // Calls SDL_PumpEvents() at least twice.

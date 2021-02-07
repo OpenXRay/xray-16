@@ -907,18 +907,8 @@ void CBulletManager::CommitRenderSet() // @ the end of frame
     m_BulletsRendered = m_Bullets;
     if (g_mt_config.test(mtBullets))
     {
-        if (true)
-        {
-            Device.seqParallel.push_back(
-                fastdelegate::FastDelegate0<>(this, &CBulletManager::UpdateWorkload));
-
-        }
-        else
-        {
-            TaskScheduler->AddTask("CBulletManager::UpdateWorkload",
-                { this, &CBulletManager::UpdateWorkload },
-                { &Device, &CRenderDevice::IsMTProcessingAllowed });
-        }
+        Device.seqParallel.push_back(
+            fastdelegate::FastDelegate0<>(this, &CBulletManager::UpdateWorkload));
     }
     else
     {
