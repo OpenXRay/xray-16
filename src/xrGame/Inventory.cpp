@@ -1318,7 +1318,6 @@ void CInventory::InvalidateState() throw()
     m_dwModifyFrame = Device.dwFrame;
 }
 
-//.#include "WeaponHUD.h"
 void CInventory::Items_SetCurrentEntityHud(bool current_entity)
 {
     TIItemContainer::iterator it;

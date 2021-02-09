@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "Missile.h"
-//.#include "WeaponHUD.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "Actor.h"
 #include "xrEngine/CameraBase.h"
