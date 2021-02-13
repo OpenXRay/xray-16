@@ -570,7 +570,7 @@ void CWeaponMagazinedWGrenade::PlayAnimShow()
             PlayHUDMotion("anm_show_g", "anim_draw_g", FALSE, this, GetState());
     }
     else
-        PlayHUDMotion("anm_show", "anim_draw", FALSE, this, GetState());
+        PlayHUDMotion("anm_show", "anim_show", FALSE, this, GetState());
 }
 
 void CWeaponMagazinedWGrenade::PlayAnimHide()

@@ -624,6 +624,8 @@ void game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
     SM_SwitchOnPlayer(pNewObject);
 };
 
+#include "WeaponHUD.h"
+
 void game_sv_Deathmatch::net_Relcase(IGameObject* O)
 {
     if (m_pSM_CurViewEntity == O)

@@ -75,7 +75,6 @@ struct attachable_hud_item
     player_hud* m_parent;
     CHudItem* m_parent_hud_item;
     shared_str m_sect_name;
-    shared_str m_visual_name;
     IKinematics* m_model;
     u16 m_attach_place_idx;
     hud_item_measures m_measures;
@@ -127,7 +126,7 @@ public:
     void render_hud(IRenderable* root);
     void render_item_ui();
     bool render_item_ui_query();
-    u32 anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel = nullptr);
+    u32 anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed);
     const shared_str& section_name() const { return m_sect_name; }
     attachable_hud_item* create_hud_item(const shared_str& sect);
 

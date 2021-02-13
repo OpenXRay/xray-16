@@ -132,7 +132,9 @@ void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVi
     {
         if (bSilent)
             return;
-        R_ASSERT2(0, make_string("model [%s] has no bone [%s]", m_visual_name.c_str(), bone_name.c_str()).c_str());
+        R_ASSERT2(0, make_string("model [%s] has no bone [%s]", pSettings->r_string(m_sect_name, "item_visual"),
+                         bone_name.c_str())
+                         .c_str());
     }
     bVisibleNow = m_model->LL_GetBoneVisible(bone_id);
     if (bVisibleNow != bVisibility)
@@ -145,7 +147,7 @@ void attachable_hud_item::update(bool bForce)
         return;
     bool is_16x9 = UI().is_widescreen();
 
-    if (m_measures.m_prop_flags.test(hud_item_measures::e_16x9_mode_now) != is_16x9)
+    if (!!m_measures.m_prop_flags.test(hud_item_measures::e_16x9_mode_now) != is_16x9)
         m_measures.load(m_sect_name, m_model);
 
     Fvector ypr = m_measures.m_item_attach[1];
@@ -231,139 +233,64 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     xr_sprintf(_prefix, "%s", is_16x9 ? "_16x9" : "");
     string128 val_name;
 
-    strconcat(val_name, "hands_position", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "hands_position");
-    m_hands_attach[0] = pSettings->read_if_exists<Fvector>(sect_name, val_name, Fvector().set(0.f, 0.f, 0.f));
+    strconcat(sizeof(val_name), val_name, "hands_position", _prefix);
+    m_hands_attach[0] = pSettings->r_fvector3(sect_name, val_name);
+    strconcat(sizeof(val_name), val_name, "hands_orientation", _prefix);
+    m_hands_attach[1] = pSettings->r_fvector3(sect_name, val_name);
 
-    strconcat(val_name, "hands_orientation", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "hands_orientation");
-    m_hands_attach[1] = pSettings->read_if_exists<Fvector>(sect_name, val_name, Fvector().set(0.f, 0.f, 0.f));
-
-    if (!pSettings->line_exist(sect_name, "item_position") && pSettings->line_exist(sect_name, "position"))
-        m_item_attach[0] = pSettings->r_fvector3(sect_name, "position");
-    else
-        m_item_attach[0] = pSettings->r_fvector3(sect_name, "item_position");
-
-    if (!pSettings->line_exist(sect_name, "item_orientation") && pSettings->line_exist(sect_name, "orientation"))
-        m_item_attach[1] = pSettings->r_fvector3(sect_name, "orientation");
-    else
-        m_item_attach[1] = pSettings->r_fvector3(sect_name, "item_orientation");
+    m_item_attach[0] = pSettings->r_fvector3(sect_name, "item_position");
+    m_item_attach[1] = pSettings->r_fvector3(sect_name, "item_orientation");
 
     shared_str bone_name;
-
-    if (ShadowOfChernobylMode)
+    m_prop_flags.set(e_fire_point, pSettings->line_exist(sect_name, "fire_bone"));
+    if (m_prop_flags.test(e_fire_point))
     {
-        m_prop_flags.set(e_fire_point, pSettings->line_exist(sect_name, "fire_bone") && pSettings->line_exist(sect_name, "fire_point"));
-        if (m_prop_flags.test(e_fire_point))
-        {
-            bone_name = pSettings->r_string(sect_name, "fire_bone");
-            m_fire_bone = K->LL_BoneID(bone_name);
-            m_fire_point_offset = pSettings->r_fvector3(sect_name, "fire_point");
-        }
-        else
-            m_fire_point_offset.set(0.f, 0.f, 0.f);
-
-        m_prop_flags.set(e_fire_point2, pSettings->line_exist(sect_name, "fire_bone") && pSettings->line_exist(sect_name, "fire_point2"));
-        if (m_prop_flags.test(e_fire_point2))
-        {
-            bone_name = pSettings->r_string(sect_name, "fire_bone");
-            m_fire_bone2 = K->LL_BoneID(bone_name);
-            m_fire_point2_offset = pSettings->r_fvector3(sect_name, "fire_point2");
-        }
-        else if (m_prop_flags.test(e_fire_point))
-            m_fire_point2_offset.set(m_fire_point_offset);
-        else
-            m_fire_point2_offset.set(0.f, 0.f, 0.f);
-
-        m_prop_flags.set(e_shell_point, pSettings->line_exist(sect_name, "fire_bone") && pSettings->line_exist(sect_name, "shell_point"));
-        if (m_prop_flags.test(e_shell_point))
-        {
-            bone_name = pSettings->r_string(sect_name, "fire_bone");
-            m_shell_bone = K->LL_BoneID(bone_name);
-            m_shell_point_offset = pSettings->r_fvector3(sect_name, "shell_point");
-        }
-        else
-            m_shell_point_offset.set(0.f, 0.f, 0.f);
+        bone_name = pSettings->r_string(sect_name, "fire_bone");
+        m_fire_bone = K->LL_BoneID(bone_name);
+        m_fire_point_offset = pSettings->r_fvector3(sect_name, "fire_point");
     }
     else
+        m_fire_point_offset.set(0, 0, 0);
+
+    m_prop_flags.set(e_fire_point2, pSettings->line_exist(sect_name, "fire_bone2"));
+    if (m_prop_flags.test(e_fire_point2))
     {
-        m_prop_flags.set(e_fire_point, pSettings->line_exist(sect_name, "fire_bone"));
-        if (m_prop_flags.test(e_fire_point))
-        {
-            bone_name = pSettings->r_string(sect_name, "fire_bone");
-            m_fire_bone = K->LL_BoneID(bone_name);
-            m_fire_point_offset = pSettings->r_fvector3(sect_name, "fire_point");
-        }
-        else
-            m_fire_point_offset.set(0.f, 0.f, 0.f);
-
-        m_prop_flags.set(e_fire_point2, pSettings->line_exist(sect_name, "fire_bone2"));
-        if (m_prop_flags.test(e_fire_point2))
-        {
-            bone_name = pSettings->r_string(sect_name, "fire_bone2");
-            m_fire_bone2 = K->LL_BoneID(bone_name);
-            m_fire_point2_offset = pSettings->r_fvector3(sect_name, "fire_point2");
-        }
-        else
-            m_fire_point2_offset.set(0.f, 0.f, 0.f);
-
-        m_prop_flags.set(e_shell_point, pSettings->line_exist(sect_name, "shell_bone"));
-        if (m_prop_flags.test(e_shell_point))
-        {
-            bone_name = pSettings->r_string(sect_name, "shell_bone");
-            m_shell_bone = K->LL_BoneID(bone_name);
-            m_shell_point_offset = pSettings->r_fvector3(sect_name, "shell_point");
-        }
-        else
-            m_shell_point_offset.set(0.f, 0.f, 0.f);
+        bone_name = pSettings->r_string(sect_name, "fire_bone2");
+        m_fire_bone2 = K->LL_BoneID(bone_name);
+        m_fire_point2_offset = pSettings->r_fvector3(sect_name, "fire_point2");
     }
-
-    m_hands_offset[0][0].set(0.f, 0.f, 0.f);
-    m_hands_offset[1][0].set(0.f, 0.f, 0.f);
-
-    strconcat(val_name, "aim_hud_offset_pos", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "aim_hud_offset_pos");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "zoom_offset"))
-        m_hands_offset[0][1] = pSettings->r_fvector3(sect_name, "zoom_offset");
     else
-        m_hands_offset[0][1] = pSettings->read_if_exists<Fvector>(sect_name, val_name, Fvector().set(0.f, 0.f, 0.f));
+        m_fire_point2_offset.set(0, 0, 0);
 
-    strconcat(val_name, "aim_hud_offset_rot", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "aim_hud_offset_rot");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "zoom_rotate_x") && pSettings->line_exist(sect_name, "zoom_rotate_y"))
-        m_hands_offset[1][1] = Fvector().set(pSettings->r_float(sect_name, "zoom_rotate_x"), pSettings->r_float(sect_name, "zoom_rotate_y"), 0.f);
-    else
-        m_hands_offset[1][1] = pSettings->read_if_exists<Fvector>(sect_name, val_name, Fvector().set(0.f, 0.f, 0.f));
-
-    strconcat(val_name, "gl_hud_offset_pos", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "gl_hud_offset_pos");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "grenade_zoom_offset"))
-        m_hands_offset[0][2] = pSettings->r_fvector3(sect_name, "grenade_zoom_offset");
-    else
-        m_hands_offset[0][2] = pSettings->read_if_exists<Fvector>(sect_name, val_name, Fvector().set(0.f, 0.f, 0.f));
-
-    strconcat(val_name, "gl_hud_offset_rot", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "gl_hud_offset_rot");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "grenade_zoom_rotate_x") && pSettings->line_exist(sect_name, "grenade_zoom_rotate_y"))
-        m_hands_offset[1][2] = Fvector().set(pSettings->r_float(sect_name, "grenade_zoom_rotate_x"), pSettings->r_float(sect_name, "grenade_zoom_rotate_y"), 0.f);
-    else
-        m_hands_offset[1][2] = pSettings->read_if_exists<Fvector>(sect_name, val_name, Fvector().set(0.f, 0.f, 0.f));
-
-    if (!ShadowOfChernobylMode)
+    m_prop_flags.set(e_shell_point, pSettings->line_exist(sect_name, "shell_bone"));
+    if (m_prop_flags.test(e_shell_point))
     {
-        R_ASSERT2(pSettings->line_exist(sect_name, "fire_point") == pSettings->line_exist(sect_name, "fire_bone"),
-            sect_name.c_str());
-        R_ASSERT2(pSettings->line_exist(sect_name, "fire_point2") == pSettings->line_exist(sect_name, "fire_bone2"),
-            sect_name.c_str());
-        R_ASSERT2(pSettings->line_exist(sect_name, "shell_point") == pSettings->line_exist(sect_name, "shell_bone"),
-            sect_name.c_str());
+        bone_name = pSettings->r_string(sect_name, "shell_bone");
+        m_shell_bone = K->LL_BoneID(bone_name);
+        m_shell_point_offset = pSettings->r_fvector3(sect_name, "shell_point");
     }
+    else
+        m_shell_point_offset.set(0, 0, 0);
+
+    m_hands_offset[0][0].set(0, 0, 0);
+    m_hands_offset[1][0].set(0, 0, 0);
+
+    strconcat(sizeof(val_name), val_name, "aim_hud_offset_pos", _prefix);
+    m_hands_offset[0][1] = pSettings->r_fvector3(sect_name, val_name);
+    strconcat(sizeof(val_name), val_name, "aim_hud_offset_rot", _prefix);
+    m_hands_offset[1][1] = pSettings->r_fvector3(sect_name, val_name);
+
+    strconcat(sizeof(val_name), val_name, "gl_hud_offset_pos", _prefix);
+    m_hands_offset[0][2] = pSettings->r_fvector3(sect_name, val_name);
+    strconcat(sizeof(val_name), val_name, "gl_hud_offset_rot", _prefix);
+    m_hands_offset[1][2] = pSettings->r_fvector3(sect_name, val_name);
+
+    R_ASSERT2(pSettings->line_exist(sect_name, "fire_point") == pSettings->line_exist(sect_name, "fire_bone"),
+        sect_name.c_str());
+    R_ASSERT2(pSettings->line_exist(sect_name, "fire_point2") == pSettings->line_exist(sect_name, "fire_bone2"),
+        sect_name.c_str());
+    R_ASSERT2(pSettings->line_exist(sect_name, "shell_point") == pSettings->line_exist(sect_name, "shell_bone"),
+        sect_name.c_str());
 
     m_prop_flags.set(e_16x9_mode_now, is_16x9);
 
@@ -392,14 +319,10 @@ void attachable_hud_item::load(const shared_str& sect_name)
     m_sect_name = sect_name;
 
     // Visual
-    if (!pSettings->line_exist(sect_name, "item_visual") && pSettings->line_exist(sect_name, "visual"))
-        m_visual_name = pSettings->r_string(sect_name, "visual");
-    else
-        m_visual_name = pSettings->r_string(sect_name, "item_visual");
+    const shared_str& visual_name = pSettings->r_string(sect_name, "item_visual");
+    m_model = smart_cast<IKinematics*>(GEnv.Render->model_Create(visual_name.c_str()));
 
-    m_model = smart_cast<IKinematics*>(GEnv.Render->model_Create(m_visual_name.c_str()));
-
-    m_attach_place_idx = pSettings->read_if_exists<u16>(sect_name, "attach_place_idx", 0);
+    m_attach_place_idx = pSettings->r_u16(sect_name, "attach_place_idx");
     m_measures.load(sect_name, m_model);
 }
 
@@ -407,26 +330,27 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 {
     float speed = CalcMotionSpeed(anm_name_b);
 
-    R_ASSERT(strstr(anm_name_b.c_str(), "anm_") == anm_name_b.c_str() || strstr(anm_name_b.c_str(), "anim_") == anm_name_b.c_str());
+    R_ASSERT(strstr(anm_name_b.c_str(), "anm_") == anm_name_b.c_str());
     string256 anim_name_r;
     bool is_16x9 = UI().is_widescreen();
     xr_sprintf(anim_name_r, "%s%s", anm_name_b.c_str(), ((m_attach_place_idx == 1) && is_16x9) ? "_16x9" : "");
 
     player_hud_motion* anm = m_hand_motions.find_motion(anim_name_r);
     R_ASSERT2(
-        anm, make_string("model [%s] has no motion alias defined [%s]", m_visual_name.c_str(), anim_name_r).c_str());
+        anm, make_string("model [%s] has no motion alias defined [%s]", m_sect_name.c_str(), anim_name_r).c_str());
     R_ASSERT2(anm->m_animations.size(), make_string("model [%s] has no motion defined in motion_alias [%s]",
-                                            m_visual_name.c_str(), anim_name_r)
+                                            pSettings->r_string(m_sect_name, "item_visual"), anim_name_r)
                                             .c_str());
 
     rnd_idx = (u8)Random.randI(anm->m_animations.size());
     const motion_descr& M = anm->m_animations[rnd_idx];
 
-    IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated();
-    u32 ret = g_player_hud->anim_play(m_attach_place_idx, M.mid, bMixIn, md, speed, ka);
+    u32 ret = g_player_hud->anim_play(m_attach_place_idx, M.mid, bMixIn, md, speed);
 
-    if (ka)
+    if (m_model->dcast_PKinematicsAnimated())
     {
+        IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated();
+
         shared_str item_anm_name;
         if (anm->m_base_name != anm->m_additional_name)
             item_anm_name = anm->m_additional_name;
@@ -439,16 +363,12 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
         else if (bDebug)
             Msg("playing item animation [%s]", item_anm_name.c_str());
 
-        R_ASSERT3(M2.valid(), "model has no motion [idle] ", m_visual_name.c_str());
+        R_ASSERT3(M2.valid(), "model has no motion [idle] ", pSettings->r_string(m_sect_name, "item_visual"));
 
-        // XXX: Need to add checks here to use ShadowOfChernobylMode + CoP hud weapon
-        if (!ShadowOfChernobylMode)
-        {
-            u16 root_id = m_model->LL_GetBoneRoot();
-            CBoneInstance& root_binst = m_model->LL_GetBoneInstance(root_id);
-            root_binst.set_callback_overwrite(TRUE);
-            root_binst.mTransform.identity();
-        }
+        u16 root_id = m_model->LL_GetBoneRoot();
+        CBoneInstance& root_binst = m_model->LL_GetBoneInstance(root_id);
+        root_binst.set_callback_overwrite(TRUE);
+        root_binst.mTransform.identity();
 
         u16 pc = ka->partitions().count();
         for (u16 pid = 0; pid < pc; ++pid)
@@ -501,12 +421,9 @@ player_hud::player_hud()
 
 player_hud::~player_hud()
 {
-    if (m_model)
-    {
-        IRenderVisual* v = m_model->dcast_RenderVisual();
-        GEnv.Render->model_Delete(v);
-        m_model = nullptr;
-    }
+    IRenderVisual* v = m_model->dcast_RenderVisual();
+    GEnv.Render->model_Delete(v);
+    m_model = nullptr;
 
     xr_vector<attachable_hud_item*>::iterator it = m_pool.begin();
     xr_vector<attachable_hud_item*>::iterator it_e = m_pool.end();
@@ -522,13 +439,11 @@ void player_hud::load(const shared_str& player_hud_sect)
 {
     if (player_hud_sect == m_sect_name)
         return;
-
     bool b_reload = (m_model != nullptr);
     if (m_model)
     {
         IRenderVisual* v = m_model->dcast_RenderVisual();
         GEnv.Render->model_Delete(v);
-        m_model = nullptr;
     }
 
     if (ShadowOfChernobylMode && !pSettings->line_exist(player_hud_sect, "visual"))
@@ -602,8 +517,7 @@ void player_hud::render_hud(IRenderable* root)
     if (!b_r0 && !b_r1)
         return;
 
-    if (m_model)
-        GEnv.Render->add_Visual(root, m_model->dcast_RenderVisual(), m_transform);
+    GEnv.Render->add_Visual(root, m_model->dcast_RenderVisual(), m_transform);
 
     if (m_attached_items[0])
         m_attached_items[0]->render(root);
@@ -693,28 +607,25 @@ void player_hud::update(const Fmatrix& cam_trans)
         m_attached_items[1]->update(true);
 }
 
-u32 player_hud::anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel)
+u32 player_hud::anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed)
 {
-    if (m_model)
+    u16 part_id = u16(-1);
+    if (attached_item(0) && attached_item(1))
+        part_id = m_model->partitions().part_id((part == 0) ? "right_hand" : "left_hand");
+
+    u16 pc = m_model->partitions().count();
+    for (u16 pid = 0; pid < pc; ++pid)
     {
-        u16 part_id = u16(-1);
-        if (attached_item(0) && attached_item(1))
-            part_id = m_model->partitions().part_id((part == 0) ? "right_hand" : "left_hand");
-
-        u16 pc = m_model->partitions().count();
-        for (u16 pid = 0; pid < pc; ++pid)
+        if (pid == 0 || pid == part_id || part_id == u16(-1))
         {
-            if (pid == 0 || pid == part_id || part_id == u16(-1))
-            {
-                CBlend* B = m_model->PlayCycle(pid, M, bMixIn);
-                R_ASSERT(B);
-                B->speed *= speed;
-            }
+            CBlend* B = m_model->PlayCycle(pid, M, bMixIn);
+            R_ASSERT(B);
+            B->speed *= speed;
         }
-        m_model->dcast_PKinematics()->CalculateBones_Invalidate();
     }
+    m_model->dcast_PKinematics()->CalculateBones_Invalidate();
 
-    return motion_length(M, md, speed, itemModel);
+    return motion_length(M, md, speed, nullptr);
 }
 
 void player_hud::update_additional(Fmatrix& trans)
@@ -881,7 +792,7 @@ void player_hud::detach_item_idx(u16 idx)
     m_attached_items[idx]->m_parent_hud_item = nullptr;
     m_attached_items[idx] = nullptr;
 
-    if (idx == 1 && attached_item(0) && m_model)
+    if (idx == 1 && attached_item(0))
     {
         u16 part_idR = m_model->partitions().part_id("right_hand");
         u32 bc = m_model->LL_PartBlendsCount(part_idR);
@@ -929,17 +840,9 @@ void player_hud::detach_item(CHudItem* item)
 
 void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result)
 {
-    if (m_model)
-    {
-        Fmatrix ancor_m = m_model->dcast_PKinematics()->LL_GetTransform(m_ancors[attach_slot_idx]);
-        result.mul(m_transform, ancor_m);
-        result.mulB_43(offset);
-    }
-    else
-    {
-        result.set(m_transform);
-        result.mulB_43(offset);
-    }
+    Fmatrix ancor_m = m_model->dcast_PKinematics()->LL_GetTransform(m_ancors[attach_slot_idx]);
+    result.mul(m_transform, ancor_m);
+    result.mulB_43(offset);
 }
 
 bool player_hud::inertion_allowed()

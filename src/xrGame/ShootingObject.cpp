@@ -234,12 +234,6 @@ void CShootingObject::StartParticles(
     {
         in_hud_mode = false;
     }
-    // XXX: Particle positions in Shoc configs were made for disabled hud mode
-    // Need to add checks here to use ShadowOfChernobylMode + CoP hud weapon
-    if (ShadowOfChernobylMode)
-    {
-        in_hud_mode = false;
-    }
     pParticles->Play(in_hud_mode);
 }
 void CShootingObject::StopParticles(CParticlesObject*& pParticles)
@@ -324,12 +318,6 @@ void CShootingObject::OnShellDrop(const Fvector& play_pos, const Fvector& parent
     {
         in_hud_mode = false;
     }
-    // XXX: Particle positions in Shoc configs were made for disabled hud mode
-    // Need to add checks here to use ShadowOfChernobylMode + CoP hud weapon
-    if (ShadowOfChernobylMode)
-    {
-        in_hud_mode = false;
-    }
     pShellParticles->Play(in_hud_mode);
 }
 
@@ -359,12 +347,6 @@ void CShootingObject::StartFlameParticles()
     CSpectator* tmp_spectr = smart_cast<CSpectator*>(Level().CurrentControlEntity());
     bool in_hud_mode = IsHudModeNow();
     if (in_hud_mode && tmp_spectr && (tmp_spectr->GetActiveCam() != CSpectator::eacFirstEye))
-    {
-        in_hud_mode = false;
-    }
-    // XXX: Particle positions in Shoc configs were made for disabled hud mode
-    // Need to add checks here to use ShadowOfChernobylMode + CoP hud weapon
-    if (ShadowOfChernobylMode)
     {
         in_hud_mode = false;
     }

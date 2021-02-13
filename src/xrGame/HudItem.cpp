@@ -357,7 +357,7 @@ bool CHudItem::TryPlayAnimIdle()
             }
             if (pActor->AnyMove())
             {
-                if (!st.bCrouch && isHUDAnimationExist("anm_idle_moving"))
+                if (!st.bCrouch)
                 {
                     PlayAnimIdleMoving();
                     return true;
@@ -380,7 +380,7 @@ bool CHudItem::isHUDAnimationExist(pcstr anim_name) const
     {
         string256 anim_name_r;
         bool is_16x9 = UI().is_widescreen();
-        u16 attach_place_idx = HudItemData()->m_attach_place_idx;
+        u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
         xr_sprintf(anim_name_r, "%s%s", anim_name, (attach_place_idx == 1 && is_16x9) ? "_16x9" : "");
         player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
         if (anm)
@@ -400,15 +400,7 @@ bool CHudItem::isHUDAnimationExist(pcstr anim_name) const
 
 void CHudItem::PlayAnimIdleMovingCrouch() { PlayHUDMotion("anm_idle_moving_crouch", "anim_idle", true, nullptr, GetState()); }
 void CHudItem::PlayAnimIdleMoving() { PlayHUDMotion("anm_idle_moving", "anim_idle", true, nullptr, GetState()); }
-void CHudItem::PlayAnimIdleSprint() 
-{ 
-    // XXX: Need to add checks here to use ShadowOfChernobylMode + CoP hud weapon
-    if (ShadowOfChernobylMode)
-        PlayHUDMotion("anim_idle_sprint", "anim_idle", true, nullptr, GetState()); 
-    else
-        PlayHUDMotion("anm_idle_sprint", "anm_idle", true, nullptr, GetState()); 
-}
-
+void CHudItem::PlayAnimIdleSprint() { PlayHUDMotion("anm_idle_sprint", "anim_idle", true, nullptr, GetState()); }
 void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 {
     if (GetState() == eIdle && !m_bStopAtEndAnimIsRunning)
