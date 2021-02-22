@@ -146,7 +146,6 @@ void CStats::Show()
         if (g_pGameLevel)
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
-        Engine.Scheduler.DumpStatistics(font, alertPtr);
         if (TaskScheduler)
             TaskScheduler->DumpStatistics(font, alertPtr);
         if (g_pGamePersistent)

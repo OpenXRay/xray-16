@@ -32,7 +32,6 @@ tbb::parallel_for(tbb::blocked_range<type>(start, finish), [&](const tbb::blocke
     for (type counter = range.begin(); counter != range.end(); ++counter)
         
 #define FOR_END });
-#define ACCELERATED_SORT tbb::parallel_sort
 #else
 #define DECLARE_MT_LOCK(lock)
 #define DECLARE_MT_SCOPE_LOCK(lock)
@@ -42,7 +41,6 @@ tbb::parallel_for(tbb::blocked_range<type>(start, finish), [&](const tbb::blocke
 #define FOR_START(type, start, finish, counter)\
     for (type counter = start; counter < finish; counter++)
 #define FOR_END
-#define ACCELERATED_SORT std::sort
 #endif
 
 

@@ -46,10 +46,3 @@ protected:
     virtual void shedule_register();
     virtual void shedule_unregister();
 };
-
-class ENGINE_API ScheduledBaseMT : public ScheduledBase
-{
-protected:
-    void shedule_register() override;
-    void shedule_unregister() override;
-};
