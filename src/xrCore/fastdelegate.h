@@ -2071,23 +2071,6 @@ FastDelegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, Re
 {
     return FastDelegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, RetType>(x, func);
 }
-
-#ifdef __BORLANDC__
-template <typename A, typename B>
-A bind(B b)
-{
-    A a;
-    a.bind(b);
-    return a;
-}
-template <typename A, typename B, typename C>
-A bind(B b, C c)
-{
-    A a;
-    a.bind(b, c);
-    return a;
-}
-#endif
 } // namespace fastdelegate
 
 #endif // !defined(FASTDELEGATE_H)
