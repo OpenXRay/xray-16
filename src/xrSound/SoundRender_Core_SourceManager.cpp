@@ -3,7 +3,10 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 #include "xrCore/Threading/ScopeLock.hpp"
+
+#ifdef USE_TBB_PARALLEL
 #include <tbb/parallel_for_each.h>
+#endif
 
 bool CSoundRender_Core::i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound /*= true*/)
 {
