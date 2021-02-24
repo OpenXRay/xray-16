@@ -787,7 +787,7 @@ public:
 private: // Invoker for static functions
     // this -- parameter, function
     // p1 - function,     parameter
-    RetType xr_stdcall InvokeStaticFunction(Arguments&&... args) const
+    RetType xr_stdcall InvokeStaticFunction(Arguments... args) const
     {
         return (*(m_Closure.GetStaticFunction()))(std::forward<Arguments>(args)...);
     }
