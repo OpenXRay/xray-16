@@ -4,9 +4,6 @@
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
 
-#include <tbb/parallel_for.h>
-#include <tbb/parallel_sort.h>
-
 //#define DEBUG_SCHEDULER
 //#define DEBUG_SCHEDULERMT
 
