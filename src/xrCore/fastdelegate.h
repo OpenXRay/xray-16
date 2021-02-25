@@ -770,17 +770,8 @@ public:
         return (m_Closure.GetClosureThis()->*(m_Closure.GetClosureMemPtr()))(std::forward<Arguments>(args)...);
     }
 
-private:
-    // Implicit conversion to "bool" using the safe_bool idiom
-    typedef struct SafeBoolStruct
-    {
-        int a_data_pointer_to_this_is_0_on_buggy_compilers;
-        StaticFunctionPtr m_nonzero;
-    } UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
-
 public:
-    operator unspecified_bool_type() const { return empty() ? 0 : &SafeBoolStruct::m_nonzero; }
+    explicit operator bool() const { return !empty(); }
 
     // necessary to allow ==0 to work despite the safe_bool idiom
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
