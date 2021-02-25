@@ -308,6 +308,7 @@ set(LJCORE_C
     ${LUAJIT_DIR}/lj_cparse.c
     ${LUAJIT_DIR}/lj_lib.c
     ${LUAJIT_DIR}/lj_alloc.c
+    ${LUAJIT_DIR}/lj_prng.c
     ${LUAJIT_DIR}/lib_aux.c
     ${LUAJIT_DIR}/lib_init.c
     ${LJLIB_C}
