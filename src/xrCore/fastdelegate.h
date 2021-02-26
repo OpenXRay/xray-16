@@ -765,9 +765,9 @@ public:
 
 public:
     // Invoke the delegate
-    RetType operator()(Arguments&&... args) const
+    RetType operator()(Arguments... args) const
     {
-        return (m_Closure.GetClosureThis()->*(m_Closure.GetClosureMemPtr()))(std::forward<Arguments>(args)...);
+        return (m_Closure.GetClosureThis()->*(m_Closure.GetClosureMemPtr()))(args...);
     }
 
 public:
@@ -791,7 +791,7 @@ private: // Invoker for static functions
     // p1 - function,     parameter
     RetType xr_stdcall InvokeStaticFunction(Arguments... args) const
     {
-        return (*(m_Closure.GetStaticFunction()))(std::forward<Arguments>(args)...);
+        return (*(m_Closure.GetStaticFunction()))(args...);
     }
 };
 
