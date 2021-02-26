@@ -763,6 +763,13 @@ public:
         m_Closure.bindstaticfunc(this, &FastDelegate::InvokeStaticFunction, function_to_bind);
     }
 
+    // Functors, lambda functions, etc
+    template <typename Invokable, std::enable_if_t<std::is_convertible_v<Invokable, StaticFunctionPtr>, int> = 0>
+    FastDelegate(Invokable&& invokable)
+    {
+        bind(static_cast<StaticFunctionPtr>(invokable));
+    }
+
 public:
     // Invoke the delegate
     RetType operator()(Arguments... args) const
