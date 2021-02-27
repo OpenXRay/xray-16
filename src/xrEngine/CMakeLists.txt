@@ -183,13 +183,15 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${SDL_INCLUDE_DIRS}
     ${FREEIMAGE_INCLUDE_PATH}
+    ${FREEIMAGEPLUS_INCLUDE_PATH}
     ${LOCKFILE_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     xrMiscMath #xrRenderGL ?
-    ${FREEIMAGE_LIBRARIES} #xrRenderGL
+    ${FREEIMAGE_LIBRARY} #xrRenderGL
+    ${FREEIMAGEPLUS_LIBRARY} #xrRenderGL
     PRIVATE
     xrCore
     xrLuabind
