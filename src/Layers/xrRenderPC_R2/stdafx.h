@@ -9,6 +9,8 @@
 #include "xrEngine/stdafx.h"
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <DDSTextureLoader/DDSTextureLoader9.h>
+#include <DirectXTex/DirectXTex.h>
 
 #include "Layers/xrRenderDX9/CommonTypes.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"

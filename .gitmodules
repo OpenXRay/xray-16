@@ -46,3 +46,6 @@
 [submodule "Externals/mimalloc"]
 	path = Externals/mimalloc
 	url = https://github.com/OpenXRay/mimalloc.git
+[submodule "Externals/DirectXTex"]
+	path = Externals/DirectXTex
+	url = https://github.com/HeapRaid/DirectXTex.git
