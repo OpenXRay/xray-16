@@ -2,6 +2,14 @@
 
 #include "ResourceManager.h"
 
+#ifndef D3DXSHADER_DEBUG
+#define D3DXSHADER_DEBUG                          (1 << 0)
+#endif
+
+#ifndef D3DXSHADER_PACKMATRIX_ROWMAJOR
+#define D3DXSHADER_PACKMATRIX_ROWMAJOR            (1 << 3)
+#endif
+
 #ifdef USE_OGL
 template<GLenum type>
 inline std::pair<GLuint, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr name)
@@ -92,7 +100,17 @@ struct ShaderTypeTraits<SVS>
     static inline const char* GetCompilationTarget()
     {
 #ifdef USE_DX9
-        return D3DXGetVertexShaderProfile(HW.pDevice); // vertex "vs_2_a";
+        switch (CAP_VERSION(HW.Caps.geometry_major, HW.Caps.geometry_minor))
+        {
+        case CAP_VERSION(1, 1):
+            return "vs_1_1";
+        case CAP_VERSION(2, 0):
+            return "vs_2_0";
+        case CAP_VERSION(2, 1):
+            return "vs_2_a";
+        case CAP_VERSION(3, 0):
+            return "vs_3_0";
+        }
 #elif !defined(USE_DX9) && !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {
@@ -185,7 +203,25 @@ struct ShaderTypeTraits<SPS>
     static inline const char* GetCompilationTarget()
     {
 #ifdef USE_DX9
-        return D3DXGetPixelShaderProfile(HW.pDevice); // pixel "ps_2_a";
+        switch (CAP_VERSION(HW.Caps.raster_major, HW.Caps.raster_minor))
+        {
+        case CAP_VERSION(1, 1):
+            return "ps_1_1";
+        case CAP_VERSION(1, 2):
+            return "ps_1_2";
+        case CAP_VERSION(1, 3):
+            return "ps_1_3";
+        case CAP_VERSION(1, 4):
+            return "ps_1_4";
+        case CAP_VERSION(2, 0):
+            return "ps_2_0";
+        case CAP_VERSION(2, 1):
+            return "ps_2_a";
+        case CAP_VERSION(2, 2):
+            return "ps_2_b";
+        case CAP_VERSION(3, 0):
+            return "ps_3_0";
+        }
 #elif !defined(USE_DX9) && !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {

@@ -60,7 +60,7 @@ SDeclaration* CResourceManager::_CreateDecl(u32 FVF)
     return D;
 }
 
-SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
+SDeclaration* CResourceManager::_CreateDecl(VertexElement* dcl)
 {
     // Search equal code
     for (SDeclaration* D : v_declarations)

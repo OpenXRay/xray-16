@@ -12,6 +12,7 @@
 #include <D3D11.h>
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>
+#include <DirectXMath.h>
 
 #if __has_include(<dxgi1_4.h>)
 #include <dxgi1_4.h>

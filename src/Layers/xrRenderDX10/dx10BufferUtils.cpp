@@ -16,6 +16,11 @@ u32 GetDeclLength(const VertexElement* decl)
     return D3DXGetDeclLength(decl);
 }
 
+bool DeclaratorFromFVF(u32 FVF, VertexElement* decl)
+{
+    return SUCCEEDED(D3DXDeclaratorFromFVF(FVF, decl));
+}
+
 static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, u32 dataSize,
     bool bDynamic, D3D_BIND_FLAG bufferType)
 {

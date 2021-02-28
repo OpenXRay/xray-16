@@ -3,6 +3,12 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 
+#include <d3dx9.h>
+
+typedef ID3DXBuffer ID3DBlob;
+typedef D3DXMACRO D3D_SHADER_MACRO;
+typedef ID3DXInclude ID3DInclude;
+
 template <typename T>
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     T*& result, bool const disasm)

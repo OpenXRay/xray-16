@@ -129,6 +129,14 @@ void CHWCaps::Update()
     geometry.dwClipPlanes = _min(caps.MaxUserClipPlanes, 15);
     geometry.bVTF = (geometry_major >= 3) && HW.support(D3DFMT_R32F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_VERTEXTEXTURE);
 
+    if (caps.VertexShaderVersion == D3DVS_VERSION(2, 0) &&
+        (caps.VS20Caps.NumTemps >= 13) &&
+        (caps.VS20Caps.DynamicFlowControlDepth == 24) &&
+        (caps.VS20Caps.Caps & D3DPS20CAPS_PREDICATION))
+    {
+        geometry_minor = 1;
+    }
+
     // ***************** PIXEL processing
     raster_major = u16(u32(u32(caps.PixelShaderVersion) & u32(0xf << 8ul)) >> 8);
     raster_minor = u16(u32(u32(caps.PixelShaderVersion) & u32(0xf)));
@@ -139,6 +147,23 @@ void CHWCaps::Update()
     raster.dwMRT_count = (caps.NumSimultaneousRTs);
     raster.b_MRT_mixdepth = (caps.PrimitiveMiscCaps & D3DPMISCCAPS_MRTINDEPENDENTBITDEPTHS) != 0;
     raster.dwInstructions = (caps.PS20Caps.NumInstructionSlots);
+
+    if (caps.PixelShaderVersion == D3DPS_VERSION(2, 0) &&
+        (caps.PS20Caps.NumTemps >= 22) &&
+        (caps.PS20Caps.Caps & D3DPS20CAPS_ARBITRARYSWIZZLE) &&
+        (caps.PS20Caps.Caps & D3DPS20CAPS_GRADIENTINSTRUCTIONS) &&
+        (caps.PS20Caps.Caps & D3DPS20CAPS_PREDICATION) &&
+        (caps.PS20Caps.Caps & D3DPS20CAPS_NODEPENDENTREADLIMIT) &&
+        (caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))
+    {
+        raster_minor = 1;
+    }
+
+    if ((caps.PS20Caps.NumTemps >= 32) &&
+        (caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))
+    {
+        raster_minor = 2;
+    }
 
     // ***************** Info
     Msg("* GPU shading: vs(%x/%d.%d/%d), ps(%x/%d.%d/%d)", caps.VertexShaderVersion, geometry_major, geometry_minor,
@@ -214,7 +239,7 @@ void CHWCaps::Update()
         soDec = (dwStencilCaps & D3DSTENCILCAPS_DECRSAT) ? D3DSTENCILOP_DECRSAT : D3DSTENCILOP_DECR;
         dwMaxStencilValue = (1 << 8) - 1;
     }
-
+    
     // DEV INFO
 
     iGPUNum = GetGpuNum();

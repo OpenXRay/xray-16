@@ -8,6 +8,10 @@
 #include "Layers/xrRenderDX10/StateManager/dx10ShaderResourceStateCache.h"
 #endif
 
+#ifdef USE_DX9
+using namespace DirectX;
+#endif
+
 void CBackend::OnFrameEnd()
 {
     if (!GEnv.isDedicatedServer)
@@ -166,16 +170,19 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
     if (count > HW.Caps.geometry.dwClipPlanes)
         count = HW.Caps.geometry.dwClipPlanes;
 
-    D3DXMATRIX worldToClipMatrixIT;
-    D3DXMatrixInverse(&worldToClipMatrixIT, nullptr, (D3DXMATRIX*)&RDEVICE.mFullTransform);
-    D3DXMatrixTranspose(&worldToClipMatrixIT, &worldToClipMatrixIT);
+    XMMATRIX transform = XMLoadFloat4x4((XMFLOAT4X4*)&RDEVICE.mFullTransform);
+    XMMATRIX worldToClipMatrixIT = XMMatrixInverse(nullptr, transform);
+    worldToClipMatrixIT = XMMatrixTranspose(worldToClipMatrixIT);
     for (u32 it = 0; it < count; it++)
     {
         Fplane& P = _planes[it];
-        D3DXPLANE planeWorld(-P.n.x, -P.n.y, -P.n.z, -P.d), planeClip;
-        D3DXPlaneNormalize(&planeWorld, &planeWorld);
-        D3DXPlaneTransform(&planeClip, &planeWorld, &worldToClipMatrixIT);
-        CHK_DX(HW.pDevice->SetClipPlane(it, planeClip));
+
+        XMFLOAT4 planeClip;
+        XMVECTOR planeWorld = XMVectorSet(-P.n.x, -P.n.y, -P.n.z, -P.d);
+        planeWorld = XMPlaneNormalize(planeWorld);
+        planeWorld = XMPlaneNormalize(planeWorld);
+        XMStoreFloat4(&planeClip, XMPlaneTransform(planeWorld, worldToClipMatrixIT));
+        CHK_DX(HW.pDevice->SetClipPlane(it, (float*)&planeClip));
     }
 
     // Enable them

@@ -593,14 +593,14 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
     if (Target->rt_Color->fmt == D3DFMT_A16B16G16R16F)
     {
         static const int iMaxPixelsInARow = 1024;
-        D3DXFLOAT16* pPixelElement16 = (D3DXFLOAT16*)pPixel;
+        PackedVector::HALF* pPixelElement16 = (PackedVector::HALF*)pPixel;
 
         float tmpArray[4 * iMaxPixelsInARow];
         while (pPixel != pEnd)
         {
             const int iProcessPixels = _min(iMaxPixelsInARow, (s32)(pEnd - pPixel));
 
-            D3DXFloat16To32Array(tmpArray, pPixelElement16, iProcessPixels * 4);
+            PackedVector::XMConvertHalfToFloatStream(tmpArray, sizeof(float), pPixelElement16, sizeof(PackedVector::HALF), iProcessPixels * 4);
 
             for (int i = 0; i < iProcessPixels; ++i)
             {

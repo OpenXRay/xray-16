@@ -11,6 +11,96 @@
 // R_constant_table::~R_constant_table	()	{	dxRenderDeviceRender::Instance().Resources->_DeleteConstantTable(this);
 // }
 
+#ifdef USE_DX9
+typedef struct _D3DXSHADER_CONSTANTTABLE
+{
+    DWORD Size;             // sizeof(D3DXSHADER_CONSTANTTABLE)
+    DWORD Creator;          // LPCSTR offset
+    DWORD Version;          // shader version
+    DWORD Constants;        // number of constants
+    DWORD ConstantInfo;     // D3DXSHADER_CONSTANTINFO[Constants] offset
+    DWORD Flags;            // flags shader was compiled with
+    DWORD Target;           // LPCSTR offset
+
+} D3DXSHADER_CONSTANTTABLE, * LPD3DXSHADER_CONSTANTTABLE;
+
+
+typedef struct _D3DXSHADER_CONSTANTINFO
+{
+    DWORD Name;             // LPCSTR offset
+    WORD  RegisterSet;      // D3DXREGISTER_SET
+    WORD  RegisterIndex;    // register number
+    WORD  RegisterCount;    // number of registers
+    WORD  Reserved;         // reserved
+    DWORD TypeInfo;         // D3DXSHADER_TYPEINFO offset
+    DWORD DefaultValue;     // offset of default value
+
+} D3DXSHADER_CONSTANTINFO, * LPD3DXSHADER_CONSTANTINFO;
+
+
+typedef struct _D3DXSHADER_TYPEINFO
+{
+    WORD  Class;            // D3DXPARAMETER_CLASS
+    WORD  Type;             // D3DXPARAMETER_TYPE
+    WORD  Rows;             // number of rows (matrices)
+    WORD  Columns;          // number of columns (vectors and matrices)
+    WORD  Elements;         // array dimension
+    WORD  StructMembers;    // number of struct members
+    DWORD StructMemberInfo; // D3DXSHADER_STRUCTMEMBERINFO[Members] offset
+
+} D3DXSHADER_TYPEINFO, * LPD3DXSHADER_TYPEINFO;
+
+
+typedef struct _D3DXSHADER_STRUCTMEMBERINFO
+{
+    DWORD Name;             // LPCSTR offset
+    DWORD TypeInfo;         // D3DXSHADER_TYPEINFO offset
+
+} D3DXSHADER_STRUCTMEMBERINFO, * LPD3DXSHADER_STRUCTMEMBERINFO;
+
+typedef enum _D3DXREGISTER_SET {
+    D3DXRS_BOOL,
+    D3DXRS_INT4,
+    D3DXRS_FLOAT4,
+    D3DXRS_SAMPLER,
+    D3DXRS_FORCE_DWORD = 0x7fffffff
+} D3DXREGISTER_SET, * LPD3DXREGISTER_SET;
+
+typedef enum D3DXPARAMETER_CLASS {
+    D3DXPC_SCALAR,
+    D3DXPC_VECTOR,
+    D3DXPC_MATRIX_ROWS,
+    D3DXPC_MATRIX_COLUMNS,
+    D3DXPC_OBJECT,
+    D3DXPC_STRUCT,
+    D3DXPC_FORCE_DWORD = 0x7fffffff
+} D3DXPARAMETER_CLASS, * LPD3DXPARAMETER_CLASS;
+
+typedef enum D3DXPARAMETER_TYPE {
+    D3DXPT_VOID,
+    D3DXPT_BOOL,
+    D3DXPT_INT,
+    D3DXPT_FLOAT,
+    D3DXPT_STRING,
+    D3DXPT_TEXTURE,
+    D3DXPT_TEXTURE1D,
+    D3DXPT_TEXTURE2D,
+    D3DXPT_TEXTURE3D,
+    D3DXPT_TEXTURECUBE,
+    D3DXPT_SAMPLER,
+    D3DXPT_SAMPLER1D,
+    D3DXPT_SAMPLER2D,
+    D3DXPT_SAMPLER3D,
+    D3DXPT_SAMPLERCUBE,
+    D3DXPT_PIXELSHADER,
+    D3DXPT_VERTEXSHADER,
+    D3DXPT_PIXELFRAGMENT,
+    D3DXPT_VERTEXFRAGMENT,
+    D3DXPT_UNSUPPORTED,
+    D3DXPT_FORCE_DWORD = 0x7fffffff
+} D3DXPARAMETER_TYPE, * LPD3DXPARAMETER_TYPE;
+#endif
+
 struct search_entry
 {
     cpcstr name;

@@ -3,6 +3,7 @@
 u32 GetFVFVertexSize(u32 FVF);
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream);
 u32 GetDeclLength(const VertexElement* decl);
+bool DeclaratorFromFVF(u32 FVF, VertexElement* decl);
 
 struct SDeclaration;
 

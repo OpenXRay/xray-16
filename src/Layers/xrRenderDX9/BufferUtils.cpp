@@ -8,17 +8,211 @@ enum
 
 u32 GetFVFVertexSize(u32 FVF)
 {
-    return D3DXGetFVFVertexSize(FVF);
+    u32 offset = 0;
+
+    // Position attribute
+    if (FVF & D3DFVF_XYZRHW)
+        offset += sizeof(Fvector4);
+    else if (FVF & D3DFVF_XYZ)
+        offset += sizeof(Fvector);
+
+    // Diffuse color attribute
+    if (FVF & D3DFVF_DIFFUSE)
+        offset += sizeof(u32);
+
+    // Specular color attribute
+    if (FVF & D3DFVF_SPECULAR)
+        offset += sizeof(u32);
+
+    // Texture coordinates
+    for (u32 i = 0; i < (FVF & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT; i++)
+    {
+        u32 size = 2;
+        if (FVF & D3DFVF_TEXCOORDSIZE1(i))
+            size = 1;
+        if (FVF & D3DFVF_TEXCOORDSIZE3(i))
+            size = 3;
+        if (FVF & D3DFVF_TEXCOORDSIZE4(i))
+            size = 4;
+
+        offset += size * sizeof(float);
+    }
+
+    return offset;
 }
+
+const u32 VertexSizeList[] =
+{
+    1, // D3DDECLTYPE_FLOAT1
+    2, // D3DDECLTYPE_FLOAT2
+    3, // D3DDECLTYPE_FLOAT3
+    4, // D3DDECLTYPE_FLOAT4
+    4, // D3DDECLTYPE_D3DCOLOR
+    4, // D3DDECLTYPE_UBYTE4
+    2, // D3DDECLTYPE_SHORT2
+    4, // D3DDECLTYPE_SHORT4
+    4, // D3DDECLTYPE_UBYTE4N
+    2, // D3DDECLTYPE_SHORT2N
+    4, // D3DDECLTYPE_SHORT4N
+    2, // D3DDECLTYPE_USHORT2N
+    4, // D3DDECLTYPE_USHORT4N
+    1, // D3DDECLTYPE_UDEC3
+    1, // D3DDECLTYPE_DEC3N
+    2, // D3DDECLTYPE_FLOAT16_2
+    4 // D3DDECLTYPE_FLOAT16_4
+};
+
+const u32 VertexTypeSizeList[] =
+{
+    sizeof(FLOAT), // D3DDECLTYPE_FLOAT1
+    sizeof(FLOAT), // D3DDECLTYPE_FLOAT2
+    sizeof(FLOAT), // D3DDECLTYPE_FLOAT3
+    sizeof(FLOAT), // D3DDECLTYPE_FLOAT4
+    sizeof(BYTE), // D3DDECLTYPE_D3DCOLOR
+    sizeof(BYTE), // D3DDECLTYPE_UBYTE4
+    sizeof(SHORT), // D3DDECLTYPE_SHORT2
+    sizeof(SHORT), // D3DDECLTYPE_SHORT4
+    sizeof(BYTE), // D3DDECLTYPE_UBYTE4N
+    sizeof(SHORT), // D3DDECLTYPE_SHORT2N
+    sizeof(SHORT), // D3DDECLTYPE_SHORT4N
+    sizeof(USHORT), // D3DDECLTYPE_USHORT2N
+    sizeof(USHORT), // D3DDECLTYPE_USHORT4N
+    sizeof(UINT), // D3DDECLTYPE_UDEC3
+    sizeof(INT), // D3DDECLTYPE_DEC3N
+    sizeof(DirectX::PackedVector::HALF), // D3DDECLTYPE_FLOAT16_2
+    sizeof(DirectX::PackedVector::HALF) // D3DDECLTYPE_FLOAT16_4
+};
 
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
-    return D3DXGetDeclVertexSize(decl, Stream);
+    u32 size = 0;
+    for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
+    {
+        const D3DVERTEXELEMENT9& desc = decl[i];
+
+        if (desc.Stream == 0xFF)
+            break;
+
+        size += VertexSizeList[desc.Type] * VertexTypeSizeList[desc.Type];
+    }
+    return size;
 }
 
 u32 GetDeclLength(const VertexElement* decl)
 {
-    return D3DXGetDeclLength(decl);
+    const D3DVERTEXELEMENT9* element;
+
+    for (element = decl; element->Stream != 0xff; ++element);
+
+    return element - decl;
+}
+
+static void AppendElement(VertexElement* declaration, UINT* idx, UINT* offset,
+    D3DDECLTYPE type, D3DDECLUSAGE usage, UINT usage_idx)
+{
+    declaration[*idx].Stream = 0;
+    declaration[*idx].Offset = *offset;
+    declaration[*idx].Type = type;
+    declaration[*idx].Method = D3DDECLMETHOD_DEFAULT;
+    declaration[*idx].Usage = usage;
+    declaration[*idx].UsageIndex = usage_idx;
+
+    *offset += VertexSizeList[type] * VertexTypeSizeList[type];
+    ++(*idx);
+}
+
+
+bool DeclaratorFromFVF(u32 fvf, VertexElement* decl)
+{
+    static const VertexElement end_element = D3DDECL_END();
+    DWORD tex_count = (fvf & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+    unsigned int offset = 0;
+    unsigned int idx = 0;
+    unsigned int i;
+
+    if (fvf & (D3DFVF_RESERVED0 | D3DFVF_RESERVED2)) return false;
+
+    if (fvf & D3DFVF_POSITION_MASK)
+    {
+        BOOL has_blend = (fvf & D3DFVF_XYZB5) >= D3DFVF_XYZB1;
+        DWORD blend_count = 1 + (((fvf & D3DFVF_XYZB5) - D3DFVF_XYZB1) >> 1);
+        BOOL has_blend_idx = (fvf & D3DFVF_LASTBETA_D3DCOLOR) || (fvf & D3DFVF_LASTBETA_UBYTE4);
+
+        if (has_blend_idx) --blend_count;
+
+        if ((fvf & D3DFVF_POSITION_MASK) == D3DFVF_XYZW
+            || (has_blend && blend_count > 4))
+            return false;
+
+        if ((fvf & D3DFVF_POSITION_MASK) == D3DFVF_XYZRHW)
+            AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT4, D3DDECLUSAGE_POSITIONT, 0);
+        else
+            AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT3, D3DDECLUSAGE_POSITION, 0);
+
+        if (has_blend)
+        {
+            switch (blend_count)
+            {
+            case 0:
+                break;
+            case 1:
+                AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT1, D3DDECLUSAGE_BLENDWEIGHT, 0);
+                break;
+            case 2:
+                AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT2, D3DDECLUSAGE_BLENDWEIGHT, 0);
+                break;
+            case 3:
+                AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT3, D3DDECLUSAGE_BLENDWEIGHT, 0);
+                break;
+            case 4:
+                AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT4, D3DDECLUSAGE_BLENDWEIGHT, 0);
+                break;
+            default:
+                return false;
+                break;
+            }
+
+            if (has_blend_idx)
+            {
+                if (fvf & D3DFVF_LASTBETA_UBYTE4)
+                    AppendElement(decl, &idx, &offset, D3DDECLTYPE_UBYTE4, D3DDECLUSAGE_BLENDINDICES, 0);
+                else if (fvf & D3DFVF_LASTBETA_D3DCOLOR)
+                    AppendElement(decl, &idx, &offset, D3DDECLTYPE_D3DCOLOR, D3DDECLUSAGE_BLENDINDICES, 0);
+            }
+        }
+    }
+
+    if (fvf & D3DFVF_NORMAL)
+        AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT3, D3DDECLUSAGE_NORMAL, 0);
+    if (fvf & D3DFVF_PSIZE)
+        AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT1, D3DDECLUSAGE_PSIZE, 0);
+    if (fvf & D3DFVF_DIFFUSE)
+        AppendElement(decl, &idx, &offset, D3DDECLTYPE_D3DCOLOR, D3DDECLUSAGE_COLOR, 0);
+    if (fvf & D3DFVF_SPECULAR)
+        AppendElement(decl, &idx, &offset, D3DDECLTYPE_D3DCOLOR, D3DDECLUSAGE_COLOR, 1);
+
+    for (i = 0; i < tex_count; ++i)
+    {
+        switch ((fvf >> (16 + 2 * i)) & 0x03)
+        {
+        case D3DFVF_TEXTUREFORMAT1:
+            AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT1, D3DDECLUSAGE_TEXCOORD, i);
+            break;
+        case D3DFVF_TEXTUREFORMAT2:
+            AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT2, D3DDECLUSAGE_TEXCOORD, i);
+            break;
+        case D3DFVF_TEXTUREFORMAT3:
+            AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT3, D3DDECLUSAGE_TEXCOORD, i);
+            break;
+        case D3DFVF_TEXTUREFORMAT4:
+            AppendElement(decl, &idx, &offset, D3DDECLTYPE_FLOAT4, D3DDECLUSAGE_TEXCOORD, i);
+            break;
+        }
+    }
+
+    decl[idx] = end_element;
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------

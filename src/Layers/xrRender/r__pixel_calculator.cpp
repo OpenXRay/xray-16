@@ -3,6 +3,10 @@
 #define rt_dimensions 1024
 #include "Layers/xrRender/FBasicVisual.h"
 
+#ifndef USE_OGL
+using namespace DirectX;
+#endif
+
 void r_pixel_calculator::begin()
 {
     rt.create("$user$pixel_calculator_rt", rt_dimensions, rt_dimensions, HW.Caps.fTarget);
@@ -57,8 +61,8 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
         // camera - left-to-right
         mView.build_camera_dir(vFrom.invert(cmDir[face]).mul(100.f), cmDir[face], cmNorm[face]);
         aabb.xform(V->vis.box, mView);
-        D3DXMatrixOrthoOffCenterLH(
-            (D3DXMATRIX*)&mProject, aabb.vMin.x, aabb.vMax.x, aabb.vMin.y, aabb.vMax.y, aabb.vMin.z, aabb.vMax.z);
+        XMMATRIX project = XMMatrixOrthographicOffCenterLH(aabb.vMin.x, aabb.vMax.x, aabb.vMin.y, aabb.vMax.y, aabb.vMin.z, aabb.vMax.z);
+        XMStoreFloat4x4((XMFLOAT4X4*)&mProject, project);
         RCache.set_xform_world(Fidentity);
         RCache.set_xform_view(mView);
         RCache.set_xform_project(mProject);

@@ -8,7 +8,8 @@
 
 #include "xrEngine/stdafx.h"
 #include <d3d9.h>
-#include <d3dx9.h>
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
 #include <DDSTextureLoader/DDSTextureLoader9.h>
 #include <DirectXTex/DirectXTex.h>
 
