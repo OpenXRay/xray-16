@@ -45,9 +45,8 @@ bool CSoundRender_Core::i_create_source(CSoundRender_Source*& result, pcstr name
     }
     else
     {
-        s_sources_lock.Enter();
+        ScopeLock scope(&s_sources_lock);
         s_sources.insert({ id, S });
-        s_sources_lock.Leave();
     }
 
     result = S;
