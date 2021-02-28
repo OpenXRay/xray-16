@@ -401,6 +401,8 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/Externals/gli
     ${CMAKE_SOURCE_DIR}/Externals/gli/external/glm
     ${SDL_INCLUDE_DIRS}
+    ${FREEIMAGE_INCLUDE_PATH}
+    ${FREEIMAGEPLUS_INCLUDE_PATH}
 )
 
 target_link_libraries(${PROJECT_NAME}
