@@ -19,7 +19,7 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <OutDir>$(ProjectDir)bin\$(PlatformShortName)\</OutDir>
+    <OutDir>$(ProjectDir)intermediate\$(PlatformShortName)\</OutDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -29,16 +29,20 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
+      <AdditionalIncludeDirectories>$(OutDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <PostBuildEvent>
-      <Command>$(OutDir)$(TargetName) -m peobj -o lj_vm_$(PlatformShortName).obj
-$(OutDir)$(TargetName) -m bcdef -o lj_bcdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m ffdef -o lj_ffdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m libdef -o lj_libdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m recdef -o lj_recdef.h ..\LuaJIT\src\lib_base.c ..\LuaJIT\src\lib_math.c ..\LuaJIT\src\lib_bit.c ..\LuaJIT\src\lib_string.c ..\LuaJIT\src\lib_table.c ..\LuaJIT\src\lib_io.c ..\LuaJIT\src\lib_os.c ..\LuaJIT\src\lib_package.c ..\LuaJIT\src\lib_debug.c ..\LuaJIT\src\lib_jit.c ..\LuaJIT\src\lib_ffi.c
-$(OutDir)$(TargetName) -m folddef -o lj_folddef.h ..\LuaJIT\src\lj_opt_fold.c
+      <Command>set ALL_LIB=lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c lib_ffi.c
+
+cd ..\LuaJIT\src
+"$(OutDir)$(TargetName)" -m peobj -o $(OutDir)lj_vm_$(PlatformShortName).obj
+"$(OutDir)$(TargetName)" -m bcdef -o $(OutDir)lj_bcdef.h %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m ffdef -o $(OutDir)lj_ffdef.h %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m libdef -o $(OutDir)lj_libdef.h %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m recdef -o $(OutDir)lj_recdef.h %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m folddef -o $(OutDir)lj_folddef.h lj_opt_fold.c
       </Command>
     </PostBuildEvent>
     <Link>
