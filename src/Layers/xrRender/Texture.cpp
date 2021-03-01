@@ -102,10 +102,11 @@ void TW_Save(ScratchImage& T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
     SaveToDDSFile(T.GetImages(), T.GetImageCount(), T.GetMetadata(), DDS_FLAGS_FORCE_DX9_LEGACY, fnw);
 }
 
-ID3DTexture2D* TW_LoadTextureFromTexture(ScratchImage& t_from, D3DFORMAT t_dest_fmt)
+ID3DTexture2D* TW_LoadTextureFromScratch(ScratchImage& t_from, D3DFORMAT t_dest_fmt)
 {
     // Calculate levels & dimensions
     ID3DTexture2D* t_dest = nullptr;
+    ID3DTexture2D* t_staging = nullptr;
     TexMetadata t_from_desc0;
     t_from_desc0 = t_from.GetMetadata();
     int levels_exist = t_from_desc0.mipLevels;
@@ -117,20 +118,37 @@ ID3DTexture2D* TW_LoadTextureFromTexture(ScratchImage& t_from, D3DFORMAT t_dest_
     R_CHK(HW.pDevice->CreateTexture(top_width, top_height, levels_exist, 0, t_dest_fmt,
         (RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED), &t_dest, NULL));
 
+    // Use staging texture for unmanaged textures
+    if (RImplementation.o.no_ram_textures)
+    {
+        R_CHK(HW.pDevice->CreateTexture(top_width, top_height, levels_exist, 0, t_dest_fmt,
+            D3DPOOL_SYSTEMMEM, &t_staging, NULL));
+    }
+    else
+    {
+        t_staging = t_dest;
+    }
+
     // Copy surfaces & destroy temporary
     for (int level = levels_exist; level >= 0; level--)
     {
         // Lock rect
         const Image* Isrc = t_from.GetImage(level, 0, 0);
         D3DLOCKED_RECT Rdst;
-        t_dest->LockRect(level, &Rdst, nullptr, 0);
+        t_staging->LockRect(level, &Rdst, nullptr, 0);
 
         // Copy
         R_ASSERT(Rdst.Pitch == Isrc->rowPitch);
         memcpy(Rdst.pBits, Isrc->pixels, Isrc->rowPitch * Isrc->height);
 
         // Unlock rect
-        t_dest->UnlockRect(level);
+        t_staging->UnlockRect(level);
+    }
+
+    if (RImplementation.o.no_ram_textures)
+    {
+        HW.pDevice->UpdateTexture(t_staging, t_dest);
+        _RELEASE(t_staging);
     }
 
     // OK
@@ -448,7 +466,7 @@ _BUMP_from_base:
     ScratchImage T_normal_2C;
     R_CHK(Compress(T_normal_1D.GetImages(), T_normal_1D.GetImageCount(), T_normal_1D.GetMetadata(),
         DXGI_FORMAT_BC5_UNORM, TEX_COMPRESS_DEFAULT, 0.0f, T_normal_2C));
-    ID3DTexture2D* pTexture2D = TW_LoadTextureFromTexture(T_normal_2C, D3DFMT_DXT5);
+    ID3DTexture2D* pTexture2D = TW_LoadTextureFromScratch(T_normal_2C, D3DFMT_DXT5);
     T_normal_1U.Release();
     T_normal_1D.Release();
 
@@ -464,6 +482,6 @@ _BUMP_from_base:
     T_base.Release();
     T_normal_1.Release();
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
-    return TW_LoadTextureFromTexture(T_normal_1C, D3DFMT_DXT5);
+    return TW_LoadTextureFromScratch(T_normal_1C, D3DFMT_DXT5);
 }
 }
