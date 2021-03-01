@@ -63,7 +63,11 @@ install:
   - ${CXX} --version
 
 before_script:
-  - export core_count=$(nproc || echo 4) && echo core_count = $core_count
+  - if [ $TRAVIS_CPU_ARCH == arm64 ]; then
+      export core_count=2 && echo core_count = $core_count;
+    else
+      export core_count=$(nproc || echo 4) && echo core_count = $core_count;
+    fi
   - git submodule deinit Externals/cryptopp
   - mkdir bin && cd bin
 
