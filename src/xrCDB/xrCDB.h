@@ -63,6 +63,7 @@ private:
     Lock* pcs;
     Opcode::OPCODE_Model* tree;
     volatile u32 status; // 0=ready, 1=init, 2=building
+    u32 version;
 
     // tris
     TRI* tris;
@@ -91,6 +92,7 @@ public:
     void build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
     u32 memory();
 
+    void set_version(u32 value) { version = value; }
     bool serialize(pcstr fileName) const;
     bool deserialize(pcstr fileName);
 
