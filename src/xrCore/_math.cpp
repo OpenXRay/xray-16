@@ -16,7 +16,7 @@
 #endif
 
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <x86intrin.h> // __rdtsc
 #elif defined(XR_ARCHITECTURE_ARM)
 #include <sys/syscall.h>
@@ -254,7 +254,7 @@ XRCORE_API u64 GetCLK()
 
 #elif defined(XR_COMPILER_GCC)
 
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
     return __rdtsc();
 #elif defined(XR_ARCHITECTURE_ARM)
     long long result = 0;

@@ -389,19 +389,19 @@ void xrCore::_destroy()
 constexpr pcstr xrCore::GetBuildConfiguration()
 {
 #ifdef NDEBUG
-#ifdef XR_ARCHITECTURE_X64
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
     return "Rx64";
 #else
     return "Rx86";
 #endif
 #elif defined(MIXED)
-#ifdef XR_ARCHITECTURE_X64
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
     return "Mx64";
 #else
     return "Mx86";
 #endif
 #else
-#ifdef XR_ARCHITECTURE_X64
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
     return "Dx64";
 #else
     return "Dx86";
