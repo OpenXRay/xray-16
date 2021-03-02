@@ -106,7 +106,7 @@ void execute(pstr cmd)
 
             R_ASSERT2(hFactory->IsLoaded(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 
-#ifdef XR_ARCHITECTURE_X64
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
             pcstr create_entity_name = "create_entity";
             pcstr destroy_entity_name = "destroy_entity";
 #else
