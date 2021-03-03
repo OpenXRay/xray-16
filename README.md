@@ -7,7 +7,7 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 ### Supported games
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
 |---|---|---|
-|Yes|Release Candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| Not yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
+|Yes|Release Candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
 
 
 ### Build status
