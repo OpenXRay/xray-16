@@ -4,6 +4,11 @@ project(OpenXRay)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+if (CMAKE_VERBOSE_MAKEFILE)
+	set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
+endif()
+
 # Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
 set(CMAKE_INSTALL_PREFIX /usr)
 
@@ -173,7 +178,7 @@ set(LUA_FOUND true)
 message("CMake build ${CMAKE_BUILD_TYPE}, CFLAGS=${CMAKE_C_FLAGS}, CXXFLAGS=${CMAKE_CXX_FLAGS}")
 
 add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION -DM_NOSTDCONTAINERS_EXT)
-add_definitions(-DLUABIND_DYNAMIC_LINK) #self-explanatory
+add_definitions(-DLUABIND_DYNAMIC_LINK)
 add_definitions(-DdSINGLE) # for ODE and xrPhysics
 
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
