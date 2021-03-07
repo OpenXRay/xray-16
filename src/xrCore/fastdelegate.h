@@ -862,6 +862,12 @@ using FastDelegate8 = FastDelegate<RetType(Param1, Param2, Param3, Param4, Param
 // That's why two classes (X and Y) appear in the definitions. Y must be implicitly
 // castable to X.
 
+template <typename Invokable>
+auto MakeDelegate(const Invokable& invokable)
+{
+    return FastDelegate(invokable);
+}
+
 template <typename RetType, typename... Arguments>
 FastDelegate<RetType(Arguments...)> MakeDelegate(RetType(xr_stdcall* func)(Arguments... args))
 {
