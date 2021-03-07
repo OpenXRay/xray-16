@@ -765,9 +765,12 @@ public:
 
     // Functors, lambda functions, etc
     template <typename Invokable, std::enable_if_t<std::is_convertible_v<Invokable, StaticFunctionPtr>, int> = 0>
-    FastDelegate(Invokable&& invokable)
+    FastDelegate(const Invokable& invokable)
     {
-        bind(static_cast<StaticFunctionPtr>(invokable));
+        if constexpr (std::is_convertible_v<Invokable, StaticFunctionPtr>)
+            bind(static_cast<StaticFunctionPtr>(invokable));
+        else
+            bind(&invokable, static_cast<GenericMemFn*>(&Invokable::operator()));
     }
 
 public:
