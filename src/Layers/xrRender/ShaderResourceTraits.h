@@ -2,13 +2,7 @@
 
 #include "ResourceManager.h"
 
-#ifndef D3DXSHADER_DEBUG
-#define D3DXSHADER_DEBUG                          (1 << 0)
-#endif
-
-#ifndef D3DXSHADER_PACKMATRIX_ROWMAJOR
-#define D3DXSHADER_PACKMATRIX_ROWMAJOR            (1 << 3)
-#endif
+#include <d3dcompiler.h>
 
 #ifdef USE_OGL
 template<GLenum type>
@@ -668,17 +662,11 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         pcstr c_target, c_entry;
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#ifndef USE_OGL
 #   ifdef NDEBUG
         flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #   else
         flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | (xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0);
-#   endif
-#elif defined(USE_DX9)
-#   ifdef NDEBUG
-        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
-#   else
-        flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | (xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0);
 #   endif
 #endif
 
