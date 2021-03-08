@@ -92,11 +92,11 @@ struct BoundingBox
 };
 
 ///////////////////////////////////////////////////////////////////////////
-/*BOOL LineIntersection2D(XMFLOAT2* result, const XMFLOAT2* lineA, const XMFLOAT2* lineB)
+BOOL LineIntersection2D(XMFLOAT2* result, const XMFLOAT2* lineA, const XMFLOAT2* lineB)
 {
     //  if the lines are parallel, the lines will not intersect in a point
     //  NOTE: assumes the rays are already normalized!!!!
-    VERIFY(_abs(D3DXVec2Dot(&lineA[1], &lineB[1])) < 1.f);
+    VERIFY(_abs(lineA[1].x * lineB[1].x + lineA[1].y * lineB[1].y) < 1.f);
 
     float x[2] = {lineA[0].x, lineB[0].x};
     float y[2] = {lineA[0].y, lineB[0].y};
@@ -109,9 +109,11 @@ struct BoundingBox
     float s = (x_diff - (dx[1] / dy[1]) * y_diff) / ((dx[1] * dy[0] / dy[1]) - dx[0]);
     // float t	= (x_diff + s*dx[0]) / dx[1];
 
-    *result = lineA[0] + s * lineA[1];
+    result->x = lineA[0].x + s * lineA[1].x;
+    result->y = lineA[0].y + s * lineA[1].y;
     return TRUE;
-}*/
+}
+
 ///////////////////////////////////////////////////////////////////////////
 //  PlaneIntersection
 //    computes the point where three planes intersect
