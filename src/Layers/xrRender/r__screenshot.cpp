@@ -10,6 +10,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <FreeImage/FreeImagePlus.h>
+#include <wincodec.h>
 #else
 #include <FreeImagePlus.h>
 #endif
@@ -458,16 +459,30 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         break;
     case IRender::SM_NORMAL:
     {
+#ifdef XR_PLATFORM_WINDOWS
         string64 t_stemp;
         string_path buf;
-        xr_sprintf(buf, sizeof buf, "ss_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
-                   g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
         Blob saved;
-        R_CHK(SaveToTGAMemory(*scratch.GetImage(0,0,0), saved));
+        xr_sprintf(buf, sizeof buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp),
+                   g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+        R_CHK(SaveToWICMemory(*scratch.GetImage(0,0,0), WIC_FLAGS_NONE, GUID_ContainerFormatJpeg, saved));
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
         fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
         FS.w_close(fs);
+        saved.Release();
+        if (strstr(Core.Params, "-ss_tga"))
+#endif
+        { // hq
+            xr_sprintf(buf, sizeof(buf), "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
+                (g_pGameLevel) ? g_pGameLevel->name().c_str() : "mainmenu");
+            R_CHK(SaveToTGAMemory(*scratch.GetImage(0, 0, 0), saved));
+            IWriter* fs = FS.w_open("$screenshots$", buf);
+            R_ASSERT(fs);
+            fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+            FS.w_close(fs);
+            saved.Release();
+        }
     }
         break;
     case IRender::SM_FOR_LEVELMAP:
