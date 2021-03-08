@@ -2,7 +2,9 @@
 
 #include "ResourceManager.h"
 
+#ifndef USE_OGL
 #include <d3dcompiler.h>
+#endif
 
 #ifdef USE_OGL
 template<GLenum type>
