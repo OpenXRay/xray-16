@@ -4,6 +4,11 @@ project(OpenXRay)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+if (CMAKE_VERBOSE_MAKEFILE)
+    set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
+endif()
+
 # Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
 set(CMAKE_INSTALL_PREFIX /usr)
 
