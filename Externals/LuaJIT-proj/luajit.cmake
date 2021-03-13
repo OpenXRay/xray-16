@@ -15,10 +15,11 @@ set(RELVER 5)
 set(ABIVER 5.1)
 set(NODOTABIVER 51)
 
-set(LUAJIT_DIR ${CMAKE_CURRENT_LIST_DIR}/LuaJIT/src CACHE PATH "Location of luajit sources")
+set(LUAJIT_DIR ${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
 
-option(BUILD_STATIC_LIB "Build static lib" OFF)
-option(BUILD_DYNAMIC_LIB "Build dynamic lib" ON)
+option(BUILD_STATIC_LIB "Build static library" OFF)
+option(BUILD_DYNAMIC_LIB "Build dynamic library" ON)
+option(BUILD_LIB_ONLY "Build library only" ON)
 
 # NOTE: Not working because there is no lib_package_rel.c file
 option(LUA_USE_RELATIVE_LOADLIB "Use modified loadlib.c with support for relative paths on posix systems (Not working)" OFF)
@@ -53,6 +54,12 @@ endif()
 set(LUA_PATH "LUA_PATH" CACHE STRING "Environment variable to use as package.path")
 set(LUA_CPATH "LUA_CPATH" CACHE STRING "Environment variable to use as package.cpath")
 set(LUA_INIT "LUA_INIT" CACHE STRING "Environment variable for initial script")
+
+# Clean unnecessary files in LuaJIT source directory
+execute_process(
+	COMMAND ${CMAKE_MAKE_PROGRAM} clean
+	WORKING_DIRECTORY ${LUAJIT_DIR}
+)
 
 # Compiler options
 set(CCOPT "-O2 -fomit-frame-pointer -fno-stack-protector")
@@ -117,16 +124,11 @@ string(REPLACE " " ";" TESTARCH_C_FLAGS "${TESTARCH_C_FLAGS}")
 set(TESTARCH_FLAGS "${TESTARCH_C_FLAGS} ${CCOPTIONS} -E lj_arch.h -dM")
 string(REPLACE " " ";" TESTARCH_FLAGS "${TESTARCH_FLAGS}")
 
-#message("${TESTARCH_FLAGS}")
-
 execute_process(
 	COMMAND ${CMAKE_C_COMPILER} ${TESTARCH_FLAGS}
 	WORKING_DIRECTORY ${LUAJIT_DIR}
 	OUTPUT_VARIABLE TARGET_TESTARCH
-	COMMAND_ECHO STDOUT
 )
-
-#message(FATAL_ERROR ${TARGET_TESTARCH})
 
 if ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_X64")
 	set(TARGET_LJARCH "x64")
@@ -509,6 +511,7 @@ set(LJCORE_C
 	"${LUAJIT_DIR}/lj_vmmath.c"
 	"${LUAJIT_DIR}/lua.h"
 	"${LUAJIT_DIR}/lua.hpp"
+	"${LUAJIT_DIR}/luaconf.h"
 	"${LUAJIT_DIR}/luajit.h"
 	"${LUAJIT_DIR}/lualib.h"
 )
@@ -569,7 +572,7 @@ install(TARGETS ${LIB_NAME} LIBRARY
 )
 
 if (NOT ${BUILD_LIB_ONLY})
-	add_executable(${PROJECT_NAME}
+	add_executable(luajit
 		"${LUAJIT_DIR}/luajit.c"
 	)
 
