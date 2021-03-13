@@ -17,6 +17,9 @@ set(NODOTABIVER 51)
 
 set(LUAJIT_DIR ${CMAKE_CURRENT_LIST_DIR}/LuaJIT/src CACHE PATH "Location of luajit sources")
 
+# delete the left over buildvm_arch.h file if we've built an old commit before
+file(REMOVE "${LUAJIT_DIR}/host/buildvm_arch.h")
+
 option(BUILD_STATIC_LIB "Build static lib" OFF)
 option(BUILD_DYNAMIC_LIB "Build dynamic lib" ON)
 
