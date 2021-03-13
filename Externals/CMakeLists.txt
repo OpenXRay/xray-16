@@ -1,5 +1,4 @@
-include(luajit.cmake)
-
+add_subdirectory(LuaJIT-proj)
 add_subdirectory(luabind)
 add_subdirectory(cximage)
 add_subdirectory(GameSpy)
