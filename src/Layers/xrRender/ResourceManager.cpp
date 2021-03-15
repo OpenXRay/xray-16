@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <tbb/parallel_for_each.h>
+#include <xrCore/Threading/ParallelForEach.hpp>
 
 #include "ResourceManager.h"
 #include "tss.h"
@@ -420,7 +420,7 @@ void CResourceManager::DeferredUpload()
         return;
 
 #ifndef USE_OGL
-    tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
+    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
 #else
     for (auto& texture : m_textures)
         texture.second->Load();
@@ -433,7 +433,7 @@ void CResourceManager::DeferredUnload()
         return;
 
 #ifndef USE_OGL
-    tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
+    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
 #else
     for (auto& texture : m_textures)
         texture.second->Unload();

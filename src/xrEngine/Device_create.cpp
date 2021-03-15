@@ -7,7 +7,6 @@
 #include "MonitorManager.hpp"
 #include "SDL.h"	
 #include "SDL_syswm.h"
-#include "TaskScheduler.hpp"
 
 extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;

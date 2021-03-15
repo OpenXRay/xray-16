@@ -16,6 +16,8 @@
 #include "xrCore.h"
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
+#include "Threading/TaskManager.hpp"
+
 #include "SDL.h"
 
 #if __has_include(".GitInfo.hpp")
@@ -317,6 +319,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
         R_ASSERT(SDL_HasSSE());
 #endif
+        TaskScheduler = xr_make_unique<TaskManager>();
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
@@ -381,6 +384,7 @@ void xrCore::_destroy()
             xr_free(buffer);
             xr_delete(trained_model);
         }
+        TaskScheduler = nullptr;
         xr_free(Params);
         Memory._destroy();
     }

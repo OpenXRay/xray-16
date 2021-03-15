@@ -15,7 +15,6 @@
 
 #include "Include/xrRender/UIRender.h"
 #include "Include/xrRender/Kinematics.h"
-#include "xrEngine/TaskScheduler.hpp"
 
 #ifdef DEBUG
 #include "debug_renderer.h"

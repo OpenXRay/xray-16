@@ -13,7 +13,7 @@
 #include "xrCore/cdecl_cast.hpp"
 #include "xrPhysics/IPHWorld.h"
 #include "PerformanceAlert.hpp"
-#include "TaskScheduler.hpp"
+#include "xrCore/Threading/TaskManager.hpp"
 
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
@@ -89,6 +89,33 @@ CStats::~CStats()
     xr_delete(statsFont);
 }
 
+static void DumpTaskManagerStatistics(IGameFont& font, IPerformanceAlert* alert)
+{
+    const auto allocated    = TaskScheduler->GetAllocatedCount();
+    const auto pushed       = TaskScheduler->GetPushedCount();
+    const auto finished     = TaskScheduler->GetFinishedCount();
+
+    static std::remove_const_t<decltype(allocated)> allocatedTasksPrev{};
+    static std::remove_const_t<decltype(pushed)>    pushedTasksPrev{};
+    static std::remove_const_t<decltype(finished)>  finishedTasksPrev{};
+
+    font.OutNext("Task scheduler:    ");
+    font.OutNext("- threads:       %u", TaskScheduler->GetWorkersCount());
+    font.OutNext("- tasks:           ");
+    font.OutNext("  - total:         ");
+    font.OutNext("    - allocated: %u", allocated);
+    font.OutNext("    - pushed:    %u", pushed);
+    font.OutNext("    - finished:  %zu", finished);
+    font.OutNext("  - this frame:    ");
+    font.OutNext("    - allocated: %u", allocated - allocatedTasksPrev);
+    font.OutNext("    - pushed     %u", pushed - pushedTasksPrev);
+    font.OutNext("    - finished:  %zu", finished - finishedTasksPrev);
+
+    allocatedTasksPrev = allocated;
+    pushedTasksPrev = pushed;
+    finishedTasksPrev = finished;
+}
+
 static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISpatial_DB& db, float engineTotal)
 {
 #ifdef DEBUG
@@ -146,8 +173,7 @@ void CStats::Show()
         if (g_pGameLevel)
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
-        if (TaskScheduler)
-            TaskScheduler->DumpStatistics(font, alertPtr);
+        DumpTaskManagerStatistics(font, alertPtr);
         if (g_pGamePersistent)
         {
             g_pGamePersistent->DumpStatistics(font, alertPtr);

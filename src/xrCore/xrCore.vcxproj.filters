@@ -749,6 +749,12 @@
     <ClInclude Include="Threading\ThreadUtil.h">
       <Filter>Threading\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\ParallelFor.hpp">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ParallelForEach.hpp">
+      <Filter>Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

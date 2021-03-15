@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "SkinXW_CPP.hpp"
-#ifdef USE_TBB_PARALLEL
-#include "tbb/parallel_for.h"
-#include "tbb/blocked_range.h"
-#endif // USE_TBB_PARALLEL
+
+#include "Threading/ParallelFor.hpp"
+
 #ifdef _EDITOR
 #include "SkeletonX.h"
 #include "SkeletonCustom.h"
@@ -197,9 +196,11 @@ void Skin4W_CPP(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 {
     // Prepare
     vertBoned4W* V = S;
-    Fvector P0, N0, P1, N1, P2, N2, P3, N3;
 
-    FOR_START(u32, 0, vCount, i)
+    xr_parallel_for(TaskRange<u32>(0, vCount), [&](const TaskRange<u32>& range) 
+    {
+        Fvector P0, N0, P1, N1, P2, N2, P3, N3;
+        for (u32 i = range.begin(); i != range.end(); ++i)
         {
             Fmatrix& M0 = Bones[S[i].m[0]].mRenderTransform;
             Fmatrix& M1 = Bones[S[i].m[1]].mRenderTransform;
@@ -241,7 +242,7 @@ void Skin4W_CPP(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
             D[i].u = S[i].u;
             D[i].v = S[i].v;
         }
-    FOR_END
+    });
 }
 } // namespace Math
 } // namespace XRay

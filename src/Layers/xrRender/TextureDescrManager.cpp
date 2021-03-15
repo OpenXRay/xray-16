@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
-#include <tbb/parallel_for_each.h>
-
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
+
+#include "xrCore/Threading/ParallelForEach.hpp"
 
 // eye-params
 float r__dtex_range = 50;
@@ -37,10 +37,10 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 #ifndef MASTER_GOLD
     Msg("Processing textures.ltx in [%s]", initial);
 #endif
-    DECLARE_MT_LOCK(lock);
 
     CInifile ini(fname);
 
+    Lock lock;
     if (ini.section_exist("association"))
     {
         CInifile::Sect& data = ini.r_section("association");
@@ -55,10 +55,10 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             if (listTHM)
                 Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
 
-            DO_MT_LOCK(lock);
+            lock.Enter();
             texture_desc& desc = m_texture_details[item.first];
             cl_dt_scaler*& dts = m_detail_scalers[item.first];
-            DO_MT_UNLOCK(lock);
+            lock.Leave();
 
             if (desc.m_assoc)
                 xr_delete(desc.m_assoc);
@@ -83,7 +83,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             else if (strstr(item.second.c_str(), "usage[diffuse]"))
                 desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
         };
-        DO_MT_PROCESS_RANGE(data.Data, processAssociation);
+        xr_parallel_for_each(data.Data, processAssociation);
     } // "association"
 
     if (ini.section_exist("specification"))
@@ -99,9 +99,9 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             if (listTHM)
                 Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
 
-            DO_MT_LOCK(lock);
+            lock.Enter();
             texture_desc& desc = m_texture_details[item.first];
-            DO_MT_UNLOCK(lock);
+            lock.Leave();
 
             if (desc.m_spec)
                 xr_delete(desc.m_spec);
@@ -118,7 +118,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
                 desc.m_spec->m_bump_name = bmode + 4;
             }
         };
-        DO_MT_PROCESS_RANGE(data.Data, processSpecification);
+        xr_parallel_for_each(data.Data, processSpecification);
     } // "specification"
 }
 
@@ -134,11 +134,11 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
     Msg("Processing %d .thm files in [%s]", flist.size(), initial);
 #endif
 
-    DECLARE_MT_LOCK(lock);
 
     m_texture_details.reserve(m_texture_details.size() + flist.size());
     m_detail_scalers.reserve(m_detail_scalers.size() + flist.size());
 
+    Lock lock;
     const auto processFile = [&](const FS_File& it)
     {
         // Alundaio: Print list of *.thm to find bad .thms!
@@ -165,10 +165,10 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         if (STextureParams::ttImage == tp.type || STextureParams::ttTerrain == tp.type ||
             STextureParams::ttNormalMap == tp.type)
         {
-            DO_MT_LOCK(lock);
+            lock.Enter();
             texture_desc& desc = m_texture_details[fn];
             cl_dt_scaler*& dts = m_detail_scalers[fn];
-            DO_MT_UNLOCK(lock);
+            lock.Leave();
 
             if (tp.detail_name.size() &&
                 tp.flags.is_any(STextureParams::flDiffuseDetail | STextureParams::flBumpDetail))
@@ -207,8 +207,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
             }
         }
     };
-
-    DO_MT_PROCESS_RANGE(flist, processFile);
+    xr_parallel_for_each(flist, processFile);
 }
 
 void CTextureDescrMngr::Load()

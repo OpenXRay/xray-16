@@ -2,11 +2,8 @@
 
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
-#include "xrCore/Threading/ScopeLock.hpp"
 
-#ifdef USE_TBB_PARALLEL
-#include <tbb/parallel_for_each.h>
-#endif
+#include "xrCore/Threading/ParallelForEach.hpp"
 
 bool CSoundRender_Core::i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound /*= true*/)
 {
@@ -75,7 +72,6 @@ void CSoundRender_Core::i_create_all_sources()
     FS.file_list(flist, "$game_sounds$", FS_ListFiles, "*.ogg");
     const size_t sizeBefore = s_sources.size();
 
-    DECLARE_MT_LOCK(lock);
     const auto processFile = [&](const FS_File& file)
     {
         string256 id;
@@ -86,7 +82,7 @@ void CSoundRender_Core::i_create_all_sources()
             *strext(id) = 0;
 
         {
-            DECLARE_MT_SCOPE_LOCK(lock);
+            ScopeLock scope(&s_sources_lock);
             const auto it = s_sources.find(id);
             if (it != s_sources.end())
                 return;
@@ -95,12 +91,11 @@ void CSoundRender_Core::i_create_all_sources()
         CSoundRender_Source* S = xr_new<CSoundRender_Source>();
         S->load(id);
 
-        DO_MT_LOCK(lock);
+        ScopeLock scope(&s_sources_lock);
         s_sources.insert({ id, S });
-        DO_MT_UNLOCK(lock);
     };
 
-    DO_MT_PROCESS_RANGE(flist, processFile);
+    xr_parallel_for_each(flist, processFile);
 
 #ifndef MASTER_GOLD
     Msg("Finished creating %d sound sources. Duration: %d ms",

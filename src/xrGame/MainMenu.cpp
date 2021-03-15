@@ -31,8 +31,6 @@
 #pragma comment(lib, "shell32.lib")
 #endif
 
-#include <tbb/parallel_for_each.h>
-
 #include "Common/object_broker.h"
 
 #include "account_manager.h"

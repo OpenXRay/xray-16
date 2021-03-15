@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "xrEngine/TaskScheduler.hpp"
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
 #include "IGame_Persistent.h"
@@ -18,7 +17,6 @@ void CRenderDevice::Destroy()
     GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
     GEnv.Render->Destroy();
-    TaskScheduler->Destroy();
     seqRender.Clear();
     seqAppActivate.Clear();
     seqAppDeactivate.Clear();

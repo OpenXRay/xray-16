@@ -24,8 +24,6 @@
 
 #include "Include/editor/ide.hpp"
 
-#include "xrEngine/TaskScheduler.hpp"
-
 #if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
 #endif

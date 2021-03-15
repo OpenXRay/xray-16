@@ -61,7 +61,6 @@
 #include "smart_cover_animation_selector.h"
 #include "smart_cover_animation_planner.h"
 #include "smart_cover_planner_target_selector.h"
-#include "xrEngine/TaskScheduler.hpp"
 
 #ifdef DEBUG
 #include "alife_simulator.h"

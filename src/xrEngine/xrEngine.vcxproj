@@ -92,7 +92,6 @@
     <ClInclude Include="std_classes.h" />
     <ClInclude Include="StringTable\IStringTable.h" />
     <ClInclude Include="StringTable\IStringTableDefs.h" />
-    <ClInclude Include="TaskScheduler.hpp" />
     <ClInclude Include="Text_Console.h" />
     <ClInclude Include="thunderbolt.h" />
     <ClInclude Include="tntQAVI.h" />
@@ -175,7 +174,6 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StringTable\IStringTable.cpp" />
-    <ClCompile Include="TaskScheduler.cpp" />
     <ClCompile Include="Text_Console.cpp" />
     <ClCompile Include="Text_Console_WndProc.cpp" />
     <ClCompile Include="thunderbolt.cpp" />

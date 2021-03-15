@@ -50,7 +50,6 @@
 #include "xrPhysics/console_vars.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrEngine/GameFont.h"
-#include "xrEngine/TaskScheduler.hpp"
 
 #ifdef DEBUG
 #include "level_debug.h"

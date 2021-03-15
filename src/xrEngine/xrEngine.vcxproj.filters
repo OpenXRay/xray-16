@@ -396,9 +396,6 @@
     <ClInclude Include="MonitorManager.hpp">
       <Filter>Interfaces\MonitorManager</Filter>
     </ClInclude>
-    <ClInclude Include="TaskScheduler.hpp">
-      <Filter>Interfaces\Sheduler</Filter>
-    </ClInclude>
     <ClInclude Include="embedded_resources_management.h">
       <Filter>General</Filter>
     </ClInclude>
@@ -643,9 +640,6 @@
     </ClCompile>
     <ClCompile Include="MonitorManager.cpp">
       <Filter>Interfaces\MonitorManager</Filter>
-    </ClCompile>
-    <ClCompile Include="TaskScheduler.cpp">
-      <Filter>Interfaces\Sheduler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,12 @@
 #include "xrEngine/splash.h"
 #include <SDL.h>
 
+//#define PROFILE_TASK_SYSTEM
+
+#ifdef PROFILE_TASK_SYSTEM
+#include "xrCore/Threading/ParallelForEach.hpp"
+#endif
+
 // Always request high performance GPU
 extern "C"
 {
@@ -31,7 +37,9 @@ int entry_point(pcstr commandLine)
     if (!strstr(commandLine, "-nosplash"))
     {
         const bool topmost = !strstr(commandLine, "-splashnotop");
+#ifndef PROFILE_TASK_SYSTEM
         splash::show(topmost);
+#endif
     }
 
     if (strstr(commandLine, "-dedicated"))
@@ -50,9 +58,22 @@ int entry_point(pcstr commandLine)
         const size_t sz = xr_strlen(fsltx);
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
+#ifdef PROFILE_TASK_SYSTEM
+    Core.Initialize("OpenXRay", commandLine, nullptr, false, *fsgame ? fsgame : nullptr);
+    CTimer timer;
+    static std::atomic_int i{};
+    const auto task = [](const TaskRange<int>&){ i.fetch_add(1, std::memory_order_relaxed); };
+    for (int i = 0; i < 50; ++i)
+        xr_parallel_for(TaskRange(0, 1048576, 1), task);
+    timer.Start();
+    xr_parallel_for(TaskRange(0, 1048576, 1), task);
+    Log("Time:", timer.GetElapsed_ns());
+    const auto result = 0;
+#else
     Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);
 
     const auto result = RunApplication();
+#endif // PROFILE_TASK_SYSTEM
 
     Core._destroy();
 

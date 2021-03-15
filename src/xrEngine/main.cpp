@@ -29,7 +29,8 @@
 #endif
 #include "xr_ioc_cmd.h"
 #include "MonitorManager.hpp"
-#include "TaskScheduler.hpp"
+
+#include "xrCore/Threading/TaskManager.hpp"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -273,21 +274,6 @@ void CheckPrivilegySlowdown()
 #endif
 }
 
-void CreateApplication()
-{
-    pApp = xr_new<CApplication>();
-#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
-    if (GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
-#endif
-}
-
-void CreateSpatialSpace()
-{
-    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-}
-
 ENGINE_API void Startup()
 {
     execUserScript();
@@ -301,27 +287,30 @@ ENGINE_API void Startup()
     if (loadArgs)
         Console->Execute(loadArgs + 1);
 
-    // Create task scheduler
-    TaskScheduler = std::make_unique<TaskManager>();
-    TaskScheduler->Initialize();
-
     // Initialize APP
-    Event lightAnimCreated, applicationCreated, spatialCreated;
-    TaskScheduler->AddTask("LALib.OnCreate()", [&]()
+    const auto& createLightAnim = TaskScheduler->AddTask("LALib.OnCreate()", [](Task&, void*)
     {
         LALib.OnCreate();
-    }, nullptr, nullptr, &lightAnimCreated);
+    });
 
-    TaskScheduler->AddTask("CreateApplication()", CreateApplication,
-        nullptr, nullptr, &applicationCreated);
-
-    TaskScheduler->AddTask("CreateSpatialSpace()", CreateSpatialSpace,
-        nullptr, nullptr, &spatialCreated);
+    const auto& createApplication = TaskScheduler->AddTask("CreateApplication()", [](Task&, void*)
+    {
+        pApp = xr_new<CApplication>();
+#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
+        if (GEnv.isDedicatedServer)
+            pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
+#endif
+    });
+    const auto& createSpatialSpace = TaskScheduler->AddTask("CreateSpatialSpace()", [](Task&, void*)
+    {
+        g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
+        g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
+    });
 
     Device.Create();
-    Device.WaitEvent(lightAnimCreated);
-    Device.WaitEvent(applicationCreated);
-    Device.WaitEvent(spatialCreated);
+    TaskScheduler->Wait(createLightAnim);
+    TaskScheduler->Wait(createApplication);
+    TaskScheduler->Wait(createSpatialSpace);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());

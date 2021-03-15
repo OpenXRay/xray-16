@@ -35,7 +35,7 @@
 #include "xrEngine/x_ray.h"
 #include "ui/UILoadingScreen.h"
 #include "AnselManager.h"
-#include "xrEngine/TaskScheduler.hpp"
+#include "xrCore/Threading/TaskManager.hpp"
 
 #ifndef MASTER_GOLD
 #include "CustomMonster.h"
@@ -213,31 +213,33 @@ void CGamePersistent::RegisterModel(IRenderVisual* V)
 extern void clean_game_globals();
 extern void init_game_globals();
 
+void CGamePersistent::create_main_menu(Task&, void*)
+{
+    m_pMainMenu = xr_new<CMainMenu>();
+}
+
 void CGamePersistent::OnAppStart()
 {
-    Event materialsLoaded, globalsInitialized, menuCreated;
-
     // init game globals
 #ifndef XR_PLATFORM_WINDOWS
     init_game_globals();
 #else
-    TaskScheduler->AddTask("init_game_globals()", init_game_globals,
-        nullptr, nullptr, &globalsInitialized);
+    const auto& initializeGlobals = TaskScheduler->AddTask("init_game_globals()", [](Task&, void*)
+    {
+        init_game_globals();
+    });
 #endif
     // load game materials
-    TaskScheduler->AddTask("GMLib.Load()", [&]()
+    const auto& loadMaterials = TaskScheduler->AddTask("GMLib.Load()", [](Task&, void*)
     {
         IRender::ScopedContext context(IRender::HelperContext);
         GMLib.Load();
-    }, nullptr, nullptr, &materialsLoaded);
+    });
 
     SetupUIStyle();
     GEnv.UI = xr_new<UICore>();
 
-    TaskScheduler->AddTask("CMainMenu::CMainMenu()", [&]()
-    {
-        m_pMainMenu = xr_new<CMainMenu>();
-    }, nullptr, nullptr, &menuCreated);
+    const auto& menuCreated = TaskScheduler->AddTask("CMainMenu::CMainMenu()", { this, &CGamePersistent::create_main_menu });
 
     inherited::OnAppStart();
 
@@ -250,12 +252,11 @@ void CGamePersistent::OnAppStart()
     ansel->Init();
 #endif
 
-
 #ifdef XR_PLATFORM_WINDOWS
-    Device.WaitEvent(globalsInitialized);
+    TaskScheduler->Wait(initializeGlobals);
 #endif
-    Device.WaitEvent(menuCreated);
-    Device.WaitEvent(materialsLoaded);
+    TaskScheduler->Wait(loadMaterials);
+    TaskScheduler->Wait(menuCreated);
 }
 
 void CGamePersistent::OnAppEnd()

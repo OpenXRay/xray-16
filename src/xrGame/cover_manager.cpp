@@ -7,8 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
-#include "tbb/parallel_for.h"
-#include "tbb/blocked_range.h"
+
+#include "xrCore/Threading/ParallelFor.hpp"
+
 #include "xrAICore/Navigation/level_graph.h"
 #include "cover_manager.h"
 #include "ai_space.h"
@@ -79,8 +80,10 @@ void CCoverManager::compute_static_cover()
 
     const CLevelGraph& graph = ai().level_graph();
     const u32 levelVertexCount = ai().level_graph().header().vertex_count();
-    
-    FOR_START(u32, 0, levelVertexCount, i)
+
+    xr_parallel_for(TaskRange<u32>(0, levelVertexCount), [&](const TaskRange<u32>& range)
+    {
+        for (u32 i = range.begin(); i != range.end(); ++i)
         {
             const CLevelGraph::CLevelVertex& vertex = *graph.vertex(i);
             if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3))
@@ -97,7 +100,7 @@ void CCoverManager::compute_static_cover()
 
             m_temp[i] = false;
         }
-    FOR_END
+    });
 
     for (u32 i = 0; i < levelVertexCount; ++i)
         if (m_temp[i] && critical_cover(i))

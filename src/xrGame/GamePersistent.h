@@ -3,6 +3,8 @@
 #pragma once
 
 #include "xrEngine/IGame_Persistent.h"
+
+class Task;
 class CMainMenu;
 class CUICursor;
 class CParticlesObject;
@@ -46,6 +48,8 @@ private:
 
     void xr_stdcall start_game_intro();
     void xr_stdcall update_game_intro();
+
+    void xr_stdcall create_main_menu(Task& task, void* data);
 
 #ifdef DEBUG
     u32 m_frame_counter;

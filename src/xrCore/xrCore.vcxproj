@@ -202,6 +202,8 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="string_concatenations_inline.h" />
     <ClInclude Include="Text\StringConversion.hpp" />
     <ClInclude Include="Threading\Event.hpp" />
+    <ClInclude Include="Threading\ParallelFor.hpp" />
+    <ClInclude Include="Threading\ParallelForEach.hpp" />
     <ClInclude Include="Threading\ScopeLock.hpp" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="Threading\Task.hpp" />
