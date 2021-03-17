@@ -120,8 +120,6 @@ set(SRC_FILES
     "stdafx.cpp"
     "stdafx.h"
     "std_classes.h"
-    "TaskScheduler.cpp"
-    "TaskScheduler.hpp"
     #"Text_Console.cpp"
     #"Text_Console.h"
     #"Text_Console_WndProc.cpp"

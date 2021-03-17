@@ -179,6 +179,8 @@ set(SRC_FILES
     "Threading/Lock.hpp"
     "Threading/ScopeLock.cpp"
     "Threading/ScopeLock.hpp"
+    "Threading/ParallelFor.hpp"
+    "Threading/ParallelForEach.hpp"
     "Threading/Task.cpp"
     "Threading/Task.hpp"
     "Threading/TaskManager.cpp"
