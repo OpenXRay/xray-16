@@ -14,7 +14,7 @@ url="https://github.com/OpenXRay/xray-16"
 license=('custom:Custom 3-сlause BSD')
 install="info.install"
 makedepends=(gcc git cmake libglvnd libjpeg6-turbo ncurses pcre2 pcre)
-depends=(glew sdl2 openal intel-tbb crypto++ liblockfile freeimage libogg libtheora libvorbis lzo lzop libjpeg-turbo)
+depends=(glew sdl2 openal crypto++ liblockfile freeimage libogg libtheora libvorbis lzo lzop libjpeg-turbo)
 conflicts=(openxray openxray-git)
 
 pkgver() {

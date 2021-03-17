@@ -2,11 +2,11 @@ Source: openxray
 Section: games
 Priority: optional
 Maintainer: lya Orlov <eagleivg@mail.ru>
-Build-Depends: cmake, build-essential, libglew-dev, libegl1-mesa-dev, libgles2-mesa-dev, libpugixml-dev, libopenal-dev, libtbb-dev, libcrypto++-dev, liblockfile-dev, libfreeimage-dev, libfreeimageplus-dev, libogg-dev, libtheora-dev, libvorbis-dev, liblzo2-dev, libjpeg-dev, libncurses5-dev, gcc-8, libpcre3-dev, libsdl2-dev, g++-8, debhelper, lsb-release
+Build-Depends: cmake, build-essential, libglew-dev, libegl1-mesa-dev, libgles2-mesa-dev, libopenal-dev, libcrypto++-dev, liblockfile-dev, libfreeimage-dev, libfreeimageplus-dev, libogg-dev, libtheora-dev, libvorbis-dev, liblzo2-dev, libjpeg-dev, libncurses5-dev, gcc-8, libpcre3-dev, libsdl2-dev, g++-8, debhelper, lsb-release
 Homepage: https://github.com/OpenXRay/xray-16
 
 Package: openxray
 Architecture: any
-Depends: libc6, libsdl2-2.0-0, libopenal1, libtbb2, libcrypto++6, liblockfile1, libfreeimage3, libfreeimageplus3, liblua5.1-0, libogg0, libtheora0, libvorbis0a, liblzo2-2, libjpeg-turbo8, libglew2.0
+Depends: libc6, libsdl2-2.0-0, libopenal1, libcrypto++6, liblockfile1, libfreeimage3, libfreeimageplus3, liblua5.1-0, libogg0, libtheora0, libvorbis0a, liblzo2-2, libjpeg-turbo8, libglew2.0
 Description: X-Ray Engine 1.6 expansion
  X-Ray Engine sources based on version 1.6.02. The original engine is used in S.T.A.L.K.E.R.: Call of Pripyat game released by GSC Game World.

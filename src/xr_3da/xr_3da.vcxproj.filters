@@ -60,18 +60,6 @@
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\FreeImagePlus.dll">
       <Filter>Dependecies</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbb.dll">
-      <Filter>Dependecies</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbb_debug.dll">
-      <Filter>Dependecies</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbbmalloc.dll">
-      <Filter>Dependecies</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\tbbmalloc_debug.dll">
-      <Filter>Dependecies</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\Externals\AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll">
       <Filter>Dependecies</Filter>
     </CopyFileToFolders>

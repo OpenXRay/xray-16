@@ -13,7 +13,6 @@
 // On other platforms these options are controlled by CMake
 #if defined(XR_PLATFORM_WINDOWS)
 #  define USE_MIMALLOC
-//#  define USE_TBB_MALLOC
 //#  define USE_PURE_ALLOC
 #endif
 
@@ -29,13 +28,6 @@
 #define xr_internal_malloc_nothrow(size, alignment) xr_aligned_malloc(size, alignment)
 #define xr_internal_realloc(ptr, size, alignment) xr_aligned_realloc(ptr, size, alignment)
 #define xr_internal_free(ptr, alignment) xr_aligned_free(ptr)
-#elif defined(USE_TBB_MALLOC)
-#include <tbb/scalable_allocator.h>
-
-#define xr_internal_malloc(size, alignment) scalable_malloc(size)
-#define xr_internal_malloc_nothrow(size, alignment) scalable_malloc(size)
-#define xr_internal_realloc(ptr, size, alignment) scalable_realloc(ptr, size)
-#define xr_internal_free(ptr, alignment) scalable_free(ptr)
 #elif defined(USE_PURE_ALLOC)
 // Additional bytes of memory to hide memory problems on Release
 // But for Debug we don't need this if we want to find these problems
@@ -135,15 +127,11 @@ void xrMemory::mem_compact()
 #endif
 
     /*
-    Следующие две команды в целом не нужны.
+    Следующая команда, в целом, не нужна.
     Современные аллокаторы достаточно грамотно и когда нужно возвращают память операционной системе.
-    Эта строчки нужны, скорее всего, в определённых ситуациях, вроде использования файлов отображаемых в память,
+    Эта строчка нужна, скорее всего, в определённых ситуациях, вроде использования файлов отображаемых в память,
     которые требуют большие свободные области памяти.
-    Но всё-же чистку tbb, возможно, стоит оставить. Но и это под большим вопросом.
     */
-#ifdef USE_TBB_MALLOC
-    scalable_allocation_command(TBBMALLOC_CLEAN_ALL_BUFFERS, nullptr);
-#endif
     //HeapCompact(GetProcessHeap(), 0);
     if (g_pStringContainer)
         g_pStringContainer->clean();

@@ -233,14 +233,12 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
-    ${TBB_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     pthread
     ${SDL_LIBRARIES}
-    ${TBB_LIBRARIES}
     ${CRYPTO++_LIBRARIES}
     PRIVATE
     xrMiscMath

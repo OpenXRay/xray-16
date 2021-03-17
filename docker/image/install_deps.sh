@@ -35,7 +35,6 @@ apt-get install -y \
   libfreeimageplus-dev \
   liblockfile-dev \
   libopenal-dev \
-  libtbb-dev \
   libcrypto++-dev \
   libogg-dev \
   libtheora-dev \
