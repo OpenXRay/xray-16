@@ -270,12 +270,12 @@ void TaskManager::ExecuteTask(Task& task)
 
 void TaskManager::FinalizeTask(Task& task)
 {
-    for (Task* it = &task; ; it = it->m_parent)
+    for (Task* it = &task; ; it = it->m_data.parent)
     {
-        const auto unfinishedJobs = it->m_jobs.fetch_sub(1, std::memory_order_acq_rel) - 1; // fetch_sub returns previous value
+        const auto unfinishedJobs = it->m_data.jobs.fetch_sub(1, std::memory_order_acq_rel) - 1; // fetch_sub returns previous value
         it->Finish();
         finishedTasks.fetch_add(1, std::memory_order_relaxed);
-        if (unfinishedJobs || !it->m_parent)
+        if (unfinishedJobs || !it->m_data.parent)
             break;
     }
 }
@@ -289,7 +289,7 @@ Task* TaskManager::AllocateTask()
 void TaskManager::IncrementTaskJobsCounter(Task& parent)
 {
     VERIFY2(parent.m_jobs.load(std::memory_order_relaxed) > 0, "Adding child task to a parent that has already finished.");
-    [[maybe_unused]] const auto prev = parent.m_jobs.fetch_add(1, std::memory_order_acq_rel);
+    [[maybe_unused]] const auto prev = parent.m_data.jobs.fetch_add(1, std::memory_order_acq_rel);
     VERIFY2(prev != std::numeric_limits<decltype(prev)>::max(), "Max jobs overflow. (too much children)");
 }
 

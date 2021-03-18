@@ -17,29 +17,35 @@
 
 #include "Task.hpp"
 
-Task::Task() : m_jobs(0) /* intentionally doesn't initialize other objects */ {}
+Task::Data::Data(pcstr name, const TaskFunc& task, Task* parent)
+    : task_func(task), on_finish_callback(nullptr), name(name), parent(parent), jobs(1) {}
+
+Task::Data::Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent)
+    : task_func(task), on_finish_callback(onFinishCallback), name(name), parent(parent), jobs(1) {}
 
 Task::Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* parent /*= nullptr*/)
-    : m_task_func(task), m_name(name), m_parent(parent), m_jobs(1)
+    : m_data(name, task, parent)
 {
-    VERIFY2(dataSize <= sizeof(m_data), "Cannot fit your data in the task");
-    CopyMemory(&m_data, data, std::min(dataSize, sizeof(m_data)));
+    VERIFY2(dataSize <= sizeof(m_user_data), "Cannot fit your data in the task");
+    CopyMemory(&m_user_data, data, std::min(dataSize, sizeof(m_user_data)));
 }
 
+Task::Task() : m_user_data() {}
+
 Task::Task(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent /*= nullptr*/)
-    : m_task_func(task), m_on_finish_callback(onFinishCallback), m_name(name), m_parent(parent), m_jobs(1)
+    : m_data(name, task, onFinishCallback, parent)
 {
-    VERIFY2(dataSize <= sizeof(m_data), "Cannot fit your data in the task");
-    CopyMemory(&m_data, data, std::min(dataSize, sizeof(m_data)));
+    VERIFY2(dataSize <= sizeof(m_user_data), "Cannot fit your data in the task");
+    CopyMemory(&m_user_data, data, std::min(dataSize, sizeof(m_user_data)));
 }
 
 void Task::Execute()
 {
-    m_task_func(*this, m_data);
+    m_data.task_func(*this, m_user_data);
 }
 
 void Task::Finish()
 {
-    if (m_on_finish_callback)
-        m_on_finish_callback(*this, &m_data);
+    if (m_data.on_finish_callback)
+        m_data.on_finish_callback(*this, m_user_data);
 }

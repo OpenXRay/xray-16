@@ -35,14 +35,20 @@ public:
 
 private:
     // ordered from biggest to smallest
-    TaskFunc            m_task_func;
-    OnFinishFunc        m_on_finish_callback;
-    pcstr               m_name;
-    Task*               m_parent;
-    std::atomic_int16_t m_jobs; // at least 1 (task itself), zero means task is done.
+    struct Data
+    {
+        TaskFunc            task_func{};
+        OnFinishFunc        on_finish_callback{};
+        pcstr               name{};
+        Task*               parent{};
+        std::atomic_int16_t jobs{}; // at least 1 (task itself), zero means task is done.
 
-    static constexpr size_t all_size = sizeof(m_task_func) + sizeof(m_on_finish_callback) + sizeof(m_name) + sizeof(m_parent) + sizeof(m_jobs);
-    u8                  m_data[RECOMMENDED_TASK_SIZE - all_size];
+        Data() = default;
+        Data(pcstr name, const TaskFunc& task, Task* parent);
+        Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent);
+    } m_data;
+
+    u8 m_user_data[RECOMMENDED_TASK_SIZE - sizeof(m_data)];
 
 private:
     // Used by TaskAllocator as Task initial state
@@ -55,14 +61,19 @@ private:
     Task(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent = nullptr);
 
 public:
+    static constexpr size_t GetAvailableDataStorageSize()
+    {
+        return sizeof(m_user_data);
+    }
+
     Task* GetParent() const
     {
-        return m_parent;
+        return m_data.parent;
     }
 
     auto GetJobsCount() const
     {
-        return m_jobs.load(std::memory_order_relaxed);
+        return m_data.jobs.load(std::memory_order_relaxed);
     }
 
     bool HasChildren() const
@@ -72,7 +83,7 @@ public:
 
     bool IsFinished() const
     {
-        return 0 == m_jobs.load(std::memory_order_relaxed);
+        return 0 == m_data.jobs.load(std::memory_order_relaxed);
     }
 
 private:
