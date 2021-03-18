@@ -106,7 +106,7 @@ game_action actions[] = {
 
     { "quick_save",        kQUICK_SAVE,        _sp },
     { "quick_load",        kQUICK_LOAD,        _sp },
-    //{ "alife_command",   kALIFE_CMD,         _sp},
+    { "alife_command",     kALIFE_CMD,         _sp },
 
     { "custom1",           kCUSTOM1,           _sp },
     { "custom2",           kCUSTOM2,           _sp },

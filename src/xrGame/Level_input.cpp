@@ -175,6 +175,18 @@ void CLevel::IR_OnKeyboardPress(int key)
         }
         return;
     }
+    case kALIFE_CMD:
+    {
+        luabind::functor<void> functor;
+        if (GEnv.ScriptEngine->functor("sim_combat.start_attack", functor))
+            functor();
+#ifndef MASTER_GOLD
+        else
+        {
+            Log("! failed to get sim_combat.start_attack functor");
+        }
+#endif
+    }
     break;
     };
 
