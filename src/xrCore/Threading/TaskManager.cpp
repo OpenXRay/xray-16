@@ -33,14 +33,14 @@ static u32 ttapi_dwFastIter = 0;
 
 class TaskStorageSize
 {
-    template <int E>
+    template <int E, typename Dummy = void> // XXX: remove Dummy workaround when gcc will finally match the standard
     struct PowerOfTwo
     {
         static constexpr size_t value = 2 * PowerOfTwo<E - 1>::value;
     };
 
-    template <>
-    struct PowerOfTwo<0>
+    template <typename Dummy>
+    struct PowerOfTwo<0, Dummy>
     {
         static constexpr size_t value = 1;
     };
@@ -136,6 +136,7 @@ public:
     }
 #else
     // XXX: add other platforms
+public:
     ThreadPriorityHelper() = default;
 #endif
 };

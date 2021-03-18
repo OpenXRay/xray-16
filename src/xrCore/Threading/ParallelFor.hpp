@@ -43,12 +43,12 @@ public:
             m_grain = 1;
     }
 
-    constexpr TaskRange(T begin, T end, size_t grain) : m_begin(begin), m_end(end), m_grain(grain > 0 ? grain : 1)
+    TaskRange(T begin, T end, size_t grain) : m_begin(begin), m_end(end), m_grain(grain > 0 ? grain : 1)
     {
         VERIFY2(grain > 0, "Grain should be positive");
     }
 
-    constexpr TaskRange(this_type& other, SplitTaskRange)
+    TaskRange(this_type& other, SplitTaskRange)
         : m_begin(other.m_begin), m_end(split(other)), m_grain(other.m_grain)
     {
         VERIFY2(m_end == other.m_begin, "range has been split incorrectly");
@@ -96,7 +96,7 @@ public:
     constexpr const_reverse_iterator crend() const noexcept { return rend(); }
 
 public:
-    constexpr size_type size() const noexcept
+    size_type size() const noexcept
     {
         size_t size;
         if constexpr (std::is_arithmetic_v<iterator>)
