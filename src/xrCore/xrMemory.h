@@ -2,7 +2,7 @@
 
 #include "_types.h"
 
-#include <utility>
+#include <new>
 
 class XRCORE_API xrMemory
 {
