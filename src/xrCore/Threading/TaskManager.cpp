@@ -274,10 +274,10 @@ void TaskManager::FinalizeTask(Task& task)
     {
         const auto unfinishedJobs = it->m_data.jobs.fetch_sub(1, std::memory_order_acq_rel) - 1; // fetch_sub returns previous value
         it->Finish();
-        finishedTasks.fetch_add(1, std::memory_order_relaxed);
         if (unfinishedJobs || !it->m_data.parent)
             break;
     }
+    finishedTasks.fetch_add(1, std::memory_order_relaxed);
 }
 
 Task* TaskManager::AllocateTask()

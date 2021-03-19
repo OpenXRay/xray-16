@@ -100,15 +100,15 @@ static void DumpTaskManagerStatistics(IGameFont& font, IPerformanceAlert* alert)
     static std::remove_const_t<decltype(finished)>  finishedTasksPrev{};
 
     font.OutNext("Task scheduler:    ");
-    font.OutNext("- threads:       %u", TaskScheduler->GetWorkersCount());
+    font.OutNext("- threads:       %zu", TaskScheduler->GetWorkersCount());
     font.OutNext("- tasks:           ");
     font.OutNext("  - total:         ");
-    font.OutNext("    - allocated: %u", allocated);
-    font.OutNext("    - pushed:    %u", pushed);
+    font.OutNext("    - allocated: %zu", allocated);
+    font.OutNext("    - pushed:    %zu", pushed);
     font.OutNext("    - finished:  %zu", finished);
     font.OutNext("  - this frame:    ");
-    font.OutNext("    - allocated: %u", allocated - allocatedTasksPrev);
-    font.OutNext("    - pushed     %u", pushed - pushedTasksPrev);
+    font.OutNext("    - allocated: %zu", allocated - allocatedTasksPrev);
+    font.OutNext("    - pushed     %zu", pushed - pushedTasksPrev);
     font.OutNext("    - finished:  %zu", finished - finishedTasksPrev);
 
     allocatedTasksPrev = allocated;
