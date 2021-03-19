@@ -34,7 +34,6 @@ void CRenderDevice::Create()
     // Start all threads
     mt_bMustExit = false;
 
-    Threading::SetThreadName(NULL, "X-Ray Primary thread");
     Threading::SpawnThread(SecondaryThreadProc, "X-Ray Secondary thread", 0, this);
     // Threading::SpawnThread(RenderThreadProc, "X-Ray Render thread", 0, this);
 

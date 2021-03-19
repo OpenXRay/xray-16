@@ -209,6 +209,7 @@ xrCore::xrCore()
 
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
+    Threading::SetThreadName(NULL, "X-Ray Primary thread");
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
     {
