@@ -7,6 +7,8 @@
 #include <bitset>
 #include <memory>
 
+#include <SDL_cpuinfo.h>
+
 #ifdef _EDITOR
 unsgined int query_processor_info(processor_info* pinfo)
 {
@@ -66,7 +68,7 @@ u32 countSetBits(ULONG_PTR bitMask)
 }
 #endif
 
-unsigned int query_processor_info(processor_info* pinfo)
+bool query_processor_info(processor_info* pinfo)
 {
     ZeroMemory(pinfo, sizeof(processor_info));
 
@@ -138,20 +140,34 @@ unsigned int query_processor_info(processor_info* pinfo)
         memcpy(pinfo->modelName + 32, data[4].data(), sizeof(cpui));
     }
 
-    if (f_1_EDX[23]) pinfo->features |= static_cast<u32>(CpuFeature::Mmx);
-    if (f_1_EDX[25]) pinfo->features |= static_cast<u32>(CpuFeature::Sse);
-    if (f_1_EDX[26]) pinfo->features |= static_cast<u32>(CpuFeature::Sse2);
-    if (isAmd && f_81_EDX[31]) pinfo->features |= static_cast<u32>(CpuFeature::_3dNow);
+    if (f_1_EDX[23])
+        pinfo->features.set(static_cast<u32>(CpuFeature::MMX), true);
+    if (isAmd && f_81_EDX[31])
+        pinfo->features.set(static_cast<u32>(CpuFeature::_3DNow), true);
 
-    if (f_1_ECX[0]) pinfo->features |= static_cast<u32>(CpuFeature::Sse3);
-    if (f_1_ECX[9]) pinfo->features |= static_cast<u32>(CpuFeature::Ssse3);
-    if (f_1_ECX[19]) pinfo->features |= static_cast<u32>(CpuFeature::Sse41);
-    if (f_1_ECX[20]) pinfo->features |= static_cast<u32>(CpuFeature::Sse42);
+    pinfo->features.set(static_cast<u32>(CpuFeature::AltiVec), SDL_HasAltiVec()); // XXX: replace
+
+    if (f_1_EDX[25])
+        pinfo->features.set(static_cast<u32>(CpuFeature::SSE), true);
+    if (f_1_EDX[26])
+        pinfo->features.set(static_cast<u32>(CpuFeature::SSE2), true);
+    if (f_1_ECX[0])
+        pinfo->features.set(static_cast<u32>(CpuFeature::SSE3), true);
+    if (f_1_ECX[9])
+        pinfo->features.set(static_cast<u32>(CpuFeature::SSSE3), true);
+    if (f_1_ECX[19])
+        pinfo->features.set(static_cast<u32>(CpuFeature::SSE41), true);
+    if (f_1_ECX[20])
+        pinfo->features.set(static_cast<u32>(CpuFeature::SSE42), true);
+
+    pinfo->features.set(static_cast<u32>(CpuFeature::AVX), SDL_HasAVX()); // XXX: replace
+    pinfo->features.set(static_cast<u32>(CpuFeature::AVX2), SDL_HasAVX2()); // XXX: replace
 
     nativeCpuId(cpui.data(), 1);
 
     const bool hasMWait = (cpui[2] & 0x8) > 0;
-    if (hasMWait) pinfo->features |= static_cast<u32>(CpuFeature::MWait);
+    if (hasMWait)
+        pinfo->features.set(static_cast<u32>(CpuFeature::MWait), true);
 
     pinfo->family = (cpui[0] >> 8) & 0xf;
     pinfo->model = (cpui[0] >> 4) & 0xf;
@@ -162,37 +178,36 @@ unsigned int query_processor_info(processor_info* pinfo)
     ULONG_PTR pa_mask_save, sa_mask_stub = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-    unsigned int pa_mask_save = 0;
+    u32 pa_mask_save = 0;
     cpu_set_t my_set;
     CPU_ZERO(&my_set);
     pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &my_set);
     pa_mask_save = CPU_COUNT(&my_set);
 #else
-#warning "No Function to obtain process affinity"
-    unsigned int pa_mask_save = 0;
+#pragma TODO("No function to obtain process affinity")
+    u32 pa_mask_save = 0;
 #endif // XR_PLATFORM_WINDOWS
+
+    u32 processorCoreCount = 0;
+    u32 logicalProcessorCount = 0;
 
 #ifdef XR_PLATFORM_WINDOWS
     DWORD returnedLength = 0;
-    u32 byteOffset = 0;
     GetLogicalProcessorInformation(nullptr, &returnedLength);
 
-    auto buffer = xr_make_unique<u8[]>(returnedLength);
-    auto ptr = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION>(buffer.get());
-    GetLogicalProcessorInformation(ptr, &returnedLength);
+    auto* buffer = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION*)xr_alloca(returnedLength);
+    GetLogicalProcessorInformation(buffer, &returnedLength);
 
-    auto processorCoreCount = 0u;
-    auto logicalProcessorCount = 0u;
-
+    u32 byteOffset = 0;
     while (byteOffset + sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION) <= returnedLength)
     {
-        switch (ptr->Relationship)
+        switch (buffer->Relationship)
         {
             case RelationProcessorCore:
                 processorCoreCount++;
 
                 // A hyperthreaded core supplies more than one logical processor.
-                logicalProcessorCount += countSetBits(ptr->ProcessorMask);
+                logicalProcessorCount += countSetBits(buffer->ProcessorMask);
                 break;
 
             default:
@@ -200,43 +215,25 @@ unsigned int query_processor_info(processor_info* pinfo)
         }
 
         byteOffset += sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
-        ptr++;
+        buffer++;
     }
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-    int logicalProcessorCount = std::thread::hardware_concurrency();
-
-    //not sure about processorCoreCount - is it really cores or threads
-    //https://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
-    int processorCoreCount = sysconf(_SC_NPROCESSORS_ONLN);
-
-    //2nd implementation
-    //
-    //#include <hwloc.h>
-    //// Allocate, initialize, and perform topology detection
-    //hwloc_topology_t topology;
-    //hwloc_topology_init(&topology);
-    //hwloc_topology_load(topology);
-    //
-    //// Try to get the number of CPU cores from topology
-    //int depth = hwloc_get_type_depth(topology, HWLOC_OBJ_CORE);
-    //int processorCoreCount = hwloc_get_nbobjs_by_depth(topology, depth);
-    //
-    //// Destroy topology object and return
-    //hwloc_topology_destroy(topology);
-
-    //3rd another implementation
-    //https://stackoverflow.com/questions/2901694/programmatically-detect-number-of-physical-processors-cores-or-if-hyper-threadin
-
+    processorCoreCount = sysconf(_SC_NPROCESSORS_ONLN);
+    logicalProcessorCount = std::thread::hardware_concurrency();
+#else
+#pragma TODO("No function to obtain processor's core count")
+    logicalProcessorCount = std::thread::hardware_concurrency();
+    processorCoreCount = logicalProcessorCount;
 #endif
 
-
-    if (logicalProcessorCount != processorCoreCount) pinfo->features |= static_cast<u32>(CpuFeature::HT);
+    if (logicalProcessorCount != processorCoreCount)
+        pinfo->features.set(static_cast<u32>(CpuFeature::HyperThreading), true);
 
     // All logical processors
     pinfo->n_threads = logicalProcessorCount;
     pinfo->affinity_mask = pa_mask_save;
     pinfo->n_cores = processorCoreCount;
 
-    return pinfo->features;
+    return pinfo->features.get() != 0;
 }
 #endif

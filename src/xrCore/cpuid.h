@@ -1,48 +1,51 @@
 #pragma once
-#ifndef _INC_CPUID
-#define _INC_CPUID
+
+#include "_flags.h"
 
 enum class CpuFeature : u32
 {
-    Mmx = 0x0001,
-    Sse = 0x0002,
-    Sse2 = 0x0004,
-    _3dNow = 0x0008,
+    MMX             = 1u << 0u,
+    _3DNow          = 1u << 1u,
+    AltiVec         = 1u << 2u,
 
-    Sse3 = 0x0010,
-    Ssse3 = 0x0020,
-    Sse41 = 0x0040,
-    Sse42 = 0x0080,
+    SSE             = 1u << 3u,
+    SSE2            = 1u << 4u,
+    SSE3            = 1u << 5u,
+    SSSE3           = 1u << 6u,
+    SSE41           = 1u << 7u,
+    SSE42           = 1u << 8u,
 
-    MWait = 0x1000,
-    HT = 0x0200
+    AVX             = 1u << 9u,
+    AVX2            = 1u << 10u,
+
+    MWait           = 1u << 11u,
+    HyperThreading  = 1u << 12u,
 };
+
 struct processor_info
 {
     string32 vendor; // vendor name
     string64 modelName; // Name of model eg. Intel_Pentium_Pro
 
-    unsigned char family; // family of the processor, eg. Intel_Pentium_Pro is family 6 processor
-    unsigned char model; // model of processor, eg. Intel_Pentium_Pro is model 1 of family 6 processor
-    unsigned char stepping; // Processor revision number
+    u8 family; // family of the processor, eg. Intel_Pentium_Pro is family 6 processor
+    u8 model; // model of processor, eg. Intel_Pentium_Pro is model 1 of family 6 processor
+    u8 stepping; // Processor revision number
 
-    unsigned int features; // processor Feature ( same as return value).
+    Flags32 features; // processor Feature (same as return value).
 
-    unsigned int n_cores; // number of available physical cores
-    unsigned int n_threads; // number of available logical threads
+    u32 n_cores; // number of available physical cores
+    u32 n_threads; // number of available logical threads
 
-    unsigned int affinity_mask; // recommended affinity mask
+    u32 affinity_mask; // recommended affinity mask
     // all processors available to process
     // except 2nd (and upper) logical threads
     // of the same physical core
 
-    bool hasFeature(const CpuFeature feature) const XR_NOEXCEPT
+    bool hasFeature(CpuFeature feature) const XR_NOEXCEPT
     {
-        return (features & static_cast<u32>(feature)) != 0;
+        return features.test(static_cast<u32>(feature));
     }
 };
 
+bool query_processor_info(processor_info*);
 
-
-unsigned int query_processor_info(processor_info*);
-#endif

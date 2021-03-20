@@ -429,7 +429,7 @@ void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvect
     const AABBNoLeafNode* N = T->GetNodes();
     r_clear();
 
-    if (CPU::ID.hasFeature(CpuFeature::Sse))
+    if (CPU::ID.hasFeature(CpuFeature::SSE))
     {
         // SSE
         // Binary dispatcher

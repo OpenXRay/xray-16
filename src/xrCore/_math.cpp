@@ -361,31 +361,31 @@ void _initialize_cpu()
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
 
-    if (CPU::ID.hasFeature(CpuFeature::Mmx))
+    if (CPU::ID.hasFeature(CpuFeature::MMX))
         xr_strcat(features, ", MMX");
-    if (CPU::ID.hasFeature(CpuFeature::_3dNow))
+    if (CPU::ID.hasFeature(CpuFeature::AltiVec))
+        xr_strcat(features, ", AltiVec");
+    if (CPU::ID.hasFeature(CpuFeature::_3DNow))
         xr_strcat(features, ", 3DNow!");
-    if (CPU::ID.hasFeature(CpuFeature::Sse))
+    if (CPU::ID.hasFeature(CpuFeature::SSE))
         xr_strcat(features, ", SSE");
-    if (CPU::ID.hasFeature(CpuFeature::Sse2))
+    if (CPU::ID.hasFeature(CpuFeature::SSE2))
         xr_strcat(features, ", SSE2");
-    if (CPU::ID.hasFeature(CpuFeature::Sse3))
+    if (CPU::ID.hasFeature(CpuFeature::SSE3))
         xr_strcat(features, ", SSE3");
     if (CPU::ID.hasFeature(CpuFeature::MWait))
         xr_strcat(features, ", MONITOR/MWAIT");
-    if (CPU::ID.hasFeature(CpuFeature::Ssse3))
+    if (CPU::ID.hasFeature(CpuFeature::SSSE3))
         xr_strcat(features, ", SSSE3");
-    if (CPU::ID.hasFeature(CpuFeature::Sse41))
+    if (CPU::ID.hasFeature(CpuFeature::SSE41))
         xr_strcat(features, ", SSE4.1");
-    if (CPU::ID.hasFeature(CpuFeature::Sse42))
+    if (CPU::ID.hasFeature(CpuFeature::SSE42))
         xr_strcat(features, ", SSE4.2");
-    if (CPU::ID.hasFeature(CpuFeature::HT))
+    if (CPU::ID.hasFeature(CpuFeature::HyperThreading))
         xr_strcat(features, ", HTT");
-    if (SDL_HasAltiVec())
-        xr_strcat(features, ", AltiVec");
-    if (SDL_HasAVX())
+    if (CPU::ID.hasFeature(CpuFeature::AVX))
         xr_strcat(features, ", AVX");
-    if (SDL_HasAVX2())
+    if (CPU::ID.hasFeature(CpuFeature::AVX2))
         xr_strcat(features, ", AVX2");
 
     Msg("* CPU features: %s", features);
@@ -447,7 +447,7 @@ void _initialize_cpu_thread()
     else
         FPU::m24r();
 
-    if (CPU::ID.hasFeature(CpuFeature::Sse))
+    if (CPU::ID.hasFeature(CpuFeature::SSE))
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
