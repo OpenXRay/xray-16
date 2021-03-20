@@ -361,6 +361,8 @@ void _initialize_cpu()
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
 
+    if (CPU::ID.hasFeature(CpuFeature::InvariantTSC))
+        xr_strcat(features, ", Invariant TSC");
     if (CPU::ID.hasFeature(CpuFeature::MMX))
         xr_strcat(features, ", MMX");
     if (CPU::ID.hasFeature(CpuFeature::AltiVec))

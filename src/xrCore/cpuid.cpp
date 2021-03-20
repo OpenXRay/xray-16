@@ -78,6 +78,8 @@ bool query_processor_info(processor_info* pinfo)
     std::bitset<32> f_7_ECX;
     std::bitset<32> f_81_ECX;*/
     std::bitset<32> f_81_EDX;
+    //std::bitset<32> f_87_ECX;
+    std::bitset<32> f_87_EDX;
 
     xr_vector<std::array<int, 4>> data;
     std::array<int, 4> cpui;
@@ -139,6 +141,16 @@ bool query_processor_info(processor_info* pinfo)
         memcpy(pinfo->modelName + 16, data[3].data(), sizeof(cpui));
         memcpy(pinfo->modelName + 32, data[4].data(), sizeof(cpui));
     }
+
+    // Read invariant TSC support
+    if (nExIds_ >= 0x80000007)
+    {
+        //f_87_ECX = data[7][2];
+        f_87_EDX = data[7][3];
+    }
+
+    if (f_87_EDX[8])
+        pinfo->features.set(static_cast<u32>(CpuFeature::InvariantTSC), true);
 
     if (f_1_EDX[23])
         pinfo->features.set(static_cast<u32>(CpuFeature::MMX), true);

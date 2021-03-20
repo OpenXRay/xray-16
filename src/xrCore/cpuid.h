@@ -20,6 +20,7 @@ enum class CpuFeature : u32
 
     MWait           = 1u << 11u,
     HyperThreading  = 1u << 12u,
+    InvariantTSC    = 1u << 13u,
 };
 
 struct processor_info
