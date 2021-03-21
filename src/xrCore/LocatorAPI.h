@@ -101,6 +101,7 @@ public:
         size_t size = 0;
         size_t vfs_idx = size_t(-1);
         shared_str path;
+        u32 modif = 0;
 #if defined(XR_PLATFORM_WINDOWS)
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
