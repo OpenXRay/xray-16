@@ -21,6 +21,7 @@
 #include "Render.h"
 
 #include "xrCore/FS_impl.h"
+#include "xrCore/Threading/TaskManager.hpp"
 
 #include "Include/editor/ide.hpp"
 
@@ -121,59 +122,6 @@ void CRenderDevice::RenderEnd(void)
 
     if (load_finished && m_editor)
         m_editor->on_load_finished();
-}
-
-// XXX: make it work correct in all situations
-void CRenderDevice::RenderThreadProc(void* context)
-{
-    auto& device = *static_cast<CRenderDevice*>(context);
-    while (true)
-    {
-        device.renderProcessFrame.Wait();
-        if (device.mt_bMustExit)
-        {
-            device.renderThreadExit.Set();
-            return;
-        }
-
-        if (!GEnv.isDedicatedServer)
-        {
-            // all rendering is done here
-            CStatTimer renderTotalReal;
-            renderTotalReal.FrameStart();
-            renderTotalReal.Begin();
-            if (device.b_is_Active && device.RenderBegin())
-            {
-                device.seqRender.Process();
-                device.CalcFrameStats();
-                device.Statistic->Show();
-                device.RenderEnd(); // Present goes here
-            }
-            renderTotalReal.End();
-            renderTotalReal.FrameEnd();
-            device.stats.RenderTotal.accum = renderTotalReal.accum;
-        }
-        device.renderFrameDone.Set();
-    }
-}
-
-void CRenderDevice::SecondaryThreadProc(void* context)
-{
-    auto& device = *static_cast<CRenderDevice*>(context);
-    while (true)
-    {
-        device.syncProcessFrame.Wait();
-        if (device.mt_bMustExit)
-        {
-            device.syncThreadExit.Set();
-            return;
-        }
-        for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
-            device.seqParallel[pit]();
-        device.seqParallel.clear();
-        device.seqFrameMT.Process();
-        device.syncFrameDone.Set();
-    }
 }
 
 #include "IGame_Level.h"
@@ -308,6 +256,14 @@ void CRenderDevice::DoRender()
     stats.RenderTotal.accum = renderTotalReal.accum;
 }
 
+void CRenderDevice::ProcessParallelSequence(Task&, void*)
+{
+    for (u32 pit = 0; pit < seqParallel.size(); pit++)
+        seqParallel[pit]();
+    seqParallel.clear();
+    seqFrameMT.Process();
+}
+
 void CRenderDevice::ProcessFrame()
 {
     if (!BeforeFrame())
@@ -320,9 +276,7 @@ void CRenderDevice::ProcessFrame()
 
     BeforeRender();
 
-    // renderProcessFrame.Set(); // allow render thread to do its job
-    syncProcessFrame.Set(); // allow secondary thread to do its job
-    //mtProcessingAllowed = true;
+    const auto& processSeqParallel = TaskScheduler->AddTask("Secondary Thread Proc", { this, &CRenderDevice::ProcessParallelSequence });
 
     DoRender();
 
@@ -340,11 +294,7 @@ void CRenderDevice::ProcessFrame()
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
 
-    syncFrameDone.Wait(); // wait until secondary thread finish its job
-    // renderFrameDone.Wait(); // wait until render thread finish its job
-    //while (!TaskScheduler->TaskQueueIsEmpty())
-    //    std::this_thread::yield();
-    //mtProcessingAllowed = false;
+    TaskScheduler->Wait(processSeqParallel);
 
     if (!b_is_Active)
         Sleep(1);
@@ -483,12 +433,6 @@ void CRenderDevice::Run()
     mt_bMustExit = true;
 
     seqAppEnd.Process();
-    
-    // renderProcessFrame.Set();
-    // renderThreadExit.Wait();
-    
-    syncProcessFrame.Set();
-    syncThreadExit.Wait();
 }
 
 u32 app_inactive_time = 0;

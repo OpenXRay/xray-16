@@ -27,6 +27,7 @@
 #include "Render.h"
 #include "SDL.h"
 
+class Task;
 class engine_impl;
 
 #pragma pack(push, 4)
@@ -203,9 +204,7 @@ public:
     bool Paused();
 
 private:
-    static void PrimaryThreadProc(void* context);
-    static void SecondaryThreadProc(void* context);
-    static void RenderThreadProc(void* context);
+    void xr_stdcall ProcessParallelSequence(Task&, void*);
 
 public:
     // Scene control
@@ -267,10 +266,6 @@ public:
         VERIFY(Timer.time_factor() == TimerGlobal.time_factor());
         return (Timer.time_factor());
     }
-
-private:
-    Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
-    Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 
 public:
     Event PresentationFinished = nullptr;

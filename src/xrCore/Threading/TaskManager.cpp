@@ -27,7 +27,7 @@
 
 xr_unique_ptr<TaskManager> TaskScheduler;
 
-static constexpr size_t OTHER_THREADS_COUNT = 1;
+static constexpr size_t OTHER_THREADS_COUNT = 1; // Primary thread
 
 static u32 ttapi_dwFastIter = 0;
 
