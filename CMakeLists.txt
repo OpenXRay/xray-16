@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 project(OpenXRay)
 
@@ -46,8 +46,6 @@ if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
 else()
     add_definitions(-DUSE_PURE_ALLOC)
 endif()
-
-include(cotire)
 
 function(xr_install tgt)
     if (NOT MSVC)
