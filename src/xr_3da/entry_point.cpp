@@ -60,14 +60,32 @@ int entry_point(pcstr commandLine)
     }
 #ifdef PROFILE_TASK_SYSTEM
     Core.Initialize("OpenXRay", commandLine, nullptr, false, *fsgame ? fsgame : nullptr);
+
+    const auto task = [](const TaskRange<int>&){};
+
+    constexpr int task_count = 1048576;
+    constexpr int iterations = 250;
+    u64 results[iterations];
+
     CTimer timer;
-    static std::atomic_int i{};
-    const auto task = [](const TaskRange<int>&){ i.fetch_add(1, std::memory_order_relaxed); };
-    for (int i = 0; i < 50; ++i)
-        xr_parallel_for(TaskRange(0, 1048576, 1), task);
-    timer.Start();
-    xr_parallel_for(TaskRange(0, 1048576, 1), task);
-    Log("Time:", timer.GetElapsed_ns());
+    for (int i = 0; i < iterations; ++i)
+    {
+        timer.Start();
+        xr_parallel_for(TaskRange(0, task_count, 1), task);
+        results[i] = timer.GetElapsed_ns();
+    }
+
+    u64 min = std::numeric_limits<u64>::max();
+    u64 average{};
+    for (int i = 0; i < iterations; ++i)
+    {
+        min = std::min(min, results[i]);
+        average += results[i] / 1000;
+        Log("Time:", results[i]);
+    }
+    Msg("Time min: %f microseconds", float(min) / 1000.f);
+    Msg("Time average: %f microseconds", float(average) / float(iterations));
+
     const auto result = 0;
 #else
     Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);

@@ -15,7 +15,6 @@
 */
 #pragma once
 
-
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM)
 constexpr size_t RECOMMENDED_TASK_SIZE = 64; // bytes
 #elif defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
@@ -24,10 +23,13 @@ constexpr size_t RECOMMENDED_TASK_SIZE = 128; // bytes
 #error Determine your platform requirements
 #endif
 
+constexpr size_t TASK_SIZE = std::max(RECOMMENDED_TASK_SIZE, std::hardware_destructive_interference_size);
+
 class XRCORE_API Task final : Noncopyable
 {
     friend class TaskManager;
     friend class TaskAllocator;
+    friend class FallbackTaskAllocator;
 
 public:
     using TaskFunc      = fastdelegate::FastDelegate<void(Task&, void*)>;
@@ -48,7 +50,7 @@ private:
         Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent);
     } m_data;
 
-    u8 m_user_data[RECOMMENDED_TASK_SIZE - sizeof(m_data)];
+    u8 m_user_data[TASK_SIZE - sizeof(m_data)];
 
 private:
     // Used by TaskAllocator as Task initial state

@@ -91,29 +91,36 @@ CStats::~CStats()
 
 static void DumpTaskManagerStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
-    const auto allocated    = TaskScheduler->GetAllocatedCount();
-    const auto pushed       = TaskScheduler->GetPushedCount();
-    const auto finished     = TaskScheduler->GetFinishedCount();
+    size_t allocated{}, allocatedWithFallback{}, pushed{}, finished{};
+    TaskScheduler->GetStats(allocated, allocatedWithFallback, pushed, finished);
 
-    static std::remove_const_t<decltype(allocated)> allocatedTasksPrev{};
-    static std::remove_const_t<decltype(pushed)>    pushedTasksPrev{};
-    static std::remove_const_t<decltype(finished)>  finishedTasksPrev{};
+    static size_t allocatedPrev{};
+    static size_t allocatedWithFallbackPrev{};
+    static size_t pushedPrev{};
+    static size_t finishedPrev{};
 
     font.OutNext("Task scheduler:    ");
     font.OutNext("- threads:       %zu", TaskScheduler->GetWorkersCount());
+    font.OutNext("  - active:      %zu", TaskScheduler->GetActiveWorkersCount());
     font.OutNext("- tasks:           ");
     font.OutNext("  - total:         ");
     font.OutNext("    - allocated: %zu", allocated);
+    font.OutNext("      - fallback:%zu", allocatedWithFallback);
     font.OutNext("    - pushed:    %zu", pushed);
     font.OutNext("    - finished:  %zu", finished);
     font.OutNext("  - this frame:    ");
-    font.OutNext("    - allocated: %zu", allocated - allocatedTasksPrev);
-    font.OutNext("    - pushed     %zu", pushed - pushedTasksPrev);
-    font.OutNext("    - finished:  %zu", finished - finishedTasksPrev);
+    font.OutNext("    - allocated: %zu", allocated - allocatedPrev);
+    font.OutNext("      - fallback:%zu", allocatedWithFallback - allocatedWithFallbackPrev);
+    font.OutNext("    - pushed     %zu", pushed - pushedPrev);
+    font.OutNext("    - finished:  %zu", finished - finishedPrev);
 
-    allocatedTasksPrev = allocated;
-    pushedTasksPrev = pushed;
-    finishedTasksPrev = finished;
+    if (allocatedWithFallback != allocatedWithFallbackPrev)
+        alert->Print(font, "Task scheduler overload!");
+
+    allocatedPrev = allocated;
+    allocatedWithFallbackPrev = allocatedWithFallback;
+    pushedPrev = pushed;
+    finishedPrev = finished;
 }
 
 static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISpatial_DB& db, float engineTotal)

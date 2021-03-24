@@ -23,20 +23,26 @@ Task::Data::Data(pcstr name, const TaskFunc& task, Task* parent)
 Task::Data::Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent)
     : task_func(task), on_finish_callback(onFinishCallback), name(name), parent(parent), jobs(1) {}
 
+Task::Task() : m_user_data() {}
+
 Task::Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* parent /*= nullptr*/)
     : m_data(name, task, parent)
 {
     VERIFY2(dataSize <= sizeof(m_user_data), "Cannot fit your data in the task");
-    CopyMemory(&m_user_data, data, std::min(dataSize, sizeof(m_user_data)));
+    if (data && dataSize)
+    {
+        CopyMemory(m_user_data, data, std::min(dataSize, sizeof(m_user_data)));
+    }
 }
-
-Task::Task() : m_user_data() {}
 
 Task::Task(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent /*= nullptr*/)
     : m_data(name, task, onFinishCallback, parent)
 {
     VERIFY2(dataSize <= sizeof(m_user_data), "Cannot fit your data in the task");
-    CopyMemory(&m_user_data, data, std::min(dataSize, sizeof(m_user_data)));
+    if (data && dataSize)
+    {
+        CopyMemory(m_user_data, data, std::min(dataSize, sizeof(m_user_data)));
+    }
 }
 
 void Task::Execute()

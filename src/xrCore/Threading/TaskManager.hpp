@@ -26,28 +26,28 @@ private:
     xr_vector<TaskWorker*> workers;
     Lock workersLock;
 
-    std::atomic_size_t currentWorker;
-    std::atomic_size_t workersCount;
+    std::atomic_size_t workersCount{};
+    std::atomic_size_t activeWorkersCount{};
 
-    std::atomic_bool shouldStop;
+    std::atomic_bool shouldStop{};
 
     CRandom random; // non-atomic intentionally, possible data-races can make it even more random
 
 private:
-    // Stats
-    std::atomic_size_t allocatedTasks{};
-    std::atomic_size_t pushedTasks{};
-    std::atomic_size_t finishedTasks{};
+    static void task_worker_entry(void* this_ptr);
+    ICN void TaskWorkerStart();
+
+    [[nodiscard]] Task* TryToSteal(TaskWorker* thief);
+
+    static void ExecuteTask(Task& task);
+    static void FinalizeTask(Task& task);
+
+    [[nodiscard]] ICF static Task* AllocateTask();
+    static void ICF IncrementTaskJobsCounter(Task& parent);
 
 private:
-    static void task_worker_entry(void* this_ptr);
-    ICF void TaskWorkerStart();
-
-    ICF void ExecuteTask(Task& task);
-    ICF void FinalizeTask(Task& task);
-
-    [[nodiscard]] ICF Task* AllocateTask();
-    static void ICF IncrementTaskJobsCounter(Task& parent);
+    void SetThreadStatus(bool active);
+    void WakeUpIfNeeded();
 
 public:
     TaskManager();
@@ -81,13 +81,8 @@ public:
 
 public:
     [[nodiscard]] size_t GetWorkersCount() const;
-    [[nodiscard]] size_t GetAllocatedCount() const;
-    [[nodiscard]] size_t GetPushedCount() const;
-    [[nodiscard]] size_t GetFinishedCount() const;
-
-private:
-    [[nodiscard]] TaskWorker* GetWorkerForWorkload();
-    [[nodiscard]] TaskWorker* GetWorkerToStealFrom(TaskWorker* thief);
+    [[nodiscard]] size_t GetActiveWorkersCount() const;
+    void GetStats(size_t& allocated, size_t& allocatedWithFallback, size_t& pushed, size_t& finished);
 };
 
 extern XRCORE_API xr_unique_ptr<TaskManager> TaskScheduler;
