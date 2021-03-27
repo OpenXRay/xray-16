@@ -154,6 +154,7 @@ public:
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
     CHOM HOM;
+    Task* ProcessHOMTask;
     R_occlusion HWOCC;
 
     // Global vertex-buffer container

@@ -39,8 +39,6 @@ private:
     Fmatrix m_xform;
     Fmatrix m_xform_01;
 
-    Lock MT;
-    volatile u32 MT_frame_rendered;
     mutable HOMStatistics stats;
 
     void Render_DB(CFrustum& base);
@@ -56,18 +54,7 @@ public:
     void Disable();
     void Enable();
 
-    bool MT_Synced() const
-    {
-        return IGame_Persistent::MainMenuActiveOrLevelNotExist();
-    }
-
-    void __stdcall MT_RENDER();
-    ICF void MT_Sync()
-    {
-        if (MT_Synced())
-            return;
-        MT_RENDER();
-    }
+    void xr_stdcall MT_RENDER(Task& /*thisTask*/, void* /*data*/);
 
     BOOL visible(vis_data& vis) const;
     BOOL visible(const Fbox3& B) const;

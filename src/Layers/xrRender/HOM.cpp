@@ -13,19 +13,6 @@
 
 float psOSSR = .001f;
 
-void __stdcall CHOM::MT_RENDER()
-{
-    MT.Enter();
-    if (MT_frame_rendered != Device.dwFrame)
-    {
-        CFrustum ViewBase;
-        ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-        Enable();
-        Render(ViewBase);
-    }
-    MT.Leave();
-}
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -279,8 +266,15 @@ void CHOM::Render(CFrustum& base)
     Raster.clear();
     Render_DB(base);
     Raster.propagade();
-    MT_frame_rendered = Device.dwFrame;
     stats.Total.End();
+}
+
+void xr_stdcall CHOM::MT_RENDER(Task& /*thisTask*/, void* /*data*/)
+{
+    CFrustum ViewBase;
+    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+    Enable();
+    Render(ViewBase);
 }
 
 ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)

@@ -1,8 +1,12 @@
 #include "stdafx.h"
+
+#include "xrCore/Threading/TaskManager.hpp"
+
 #include "xrEngine/IGame_Persistent.h"
-#include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
+
+#include "Layers/xrRender/FBasicVisual.h"
 
 IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 {
@@ -20,50 +24,6 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
     // Calculate sector(s) and their objects
     if (pLastSector)
     {
-        //!!!
-        //!!! BECAUSE OF PARALLEL HOM RENDERING TRY TO DELAY ACCESS TO HOM AS MUCH AS POSSIBLE
-        //!!!
-        if (psDeviceFlags.test(rsDrawDynamic))
-        {
-            // Traverse object database
-            g_SpatialSpace->q_frustum(
-                lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
-
-            // (almost) Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
-
-            // Determine visibility for dynamic part of scene
-            u32 uID_LTRACK = 0xffffffff;
-            if (phase == PHASE_NORMAL)
-            {
-                uLastLTRACK++;
-                if (lstRenderables.size())
-                    uID_LTRACK = uLastLTRACK % lstRenderables.size();
-
-                // update light-vis for current entity / actor
-                IGameObject* O = g_pGameLevel->CurrentViewEntity();
-                if (O)
-                {
-                    CROS_impl* R = (CROS_impl*)O->ROS();
-                    if (R)
-                        R->update(O);
-                }
-
-                // update light-vis for selected entity
-                // track lighting environment
-                if (lstRenderables.size())
-                {
-                    IRenderable* renderable = lstRenderables[uID_LTRACK]->dcast_Renderable();
-                    if (renderable)
-                    {
-                        CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
-                        if (T)
-                            T->update(renderable);
-                    }
-                }
-            }
-        }
-
         // Traverse sector/portal structure
         PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, m_ViewProjection,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE
@@ -87,6 +47,31 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         // Traverse frustums
         if (psDeviceFlags.test(rsDrawDynamic))
         {
+            // Traverse object database
+            g_SpatialSpace->q_frustum(
+                lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
+
+            // Exact sorting order (front-to-back)
+            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
+
+            // Determine visibility for dynamic part of scene
+            u32 uID_LTRACK = 0xffffffff;
+            if (phase == PHASE_NORMAL)
+            {
+                uLastLTRACK++;
+                if (lstRenderables.size())
+                    uID_LTRACK = uLastLTRACK % lstRenderables.size();
+
+                // update light-vis for current entity / actor
+                IGameObject* O = g_pGameLevel->CurrentViewEntity();
+                if (O)
+                {
+                    CROS_impl* R = (CROS_impl*)O->ROS();
+                    if (R)
+                        R->update(O);
+                }
+            }
+
             for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
             {
                 ISpatial* spatial = lstRenderables[o_it];
@@ -136,6 +121,14 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                         v_orig.hom_tested = v_copy.hom_tested;
                         if (!bVisible)
                             break; // exit loop on frustums
+
+                        // update light-vis for selected entity
+                        if (o_it == uID_LTRACK && renderable->renderable_ROS())
+                        {
+                            // track lighting environment
+                            CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
+                            T->update(renderable);
+                        }
 
                         // Rendering
                         renderable->renderable_Render(renderable);
@@ -282,6 +275,7 @@ void CRender::Render()
         r_pmask(true, false); // enable priority "0"
         set_Recorder(nullptr);
         phase = PHASE_SMAP;
+        TaskScheduler->Wait(*ProcessHOMTask);
         render_main(m_zfill, false);
         r_pmask(true, false); // disable priority "1"
         BasicStats.Culling.End();
@@ -315,6 +309,8 @@ void CRender::Render()
     else
         set_Recorder(nullptr);
     phase = PHASE_NORMAL;
+    if (!ps_r2_ls_flags.test(R2FLAG_ZFILL))
+        TaskScheduler->Wait(*ProcessHOMTask);
     render_main(Device.mFullTransform, true);
     set_Recorder(nullptr);
     r_pmask(true, false); // disable priority "1"

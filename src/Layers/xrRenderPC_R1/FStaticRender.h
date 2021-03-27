@@ -45,6 +45,7 @@ public:
     xr_vector<IRender_Sector*> Sectors;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
+    Task* ProcessHOMTask;
     CHOM HOM;
 
     // Global containers
