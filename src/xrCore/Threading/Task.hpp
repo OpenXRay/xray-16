@@ -15,6 +15,8 @@
 */
 #pragma once
 
+#include <new> // for std::hardware_destructive_interference_size
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM)
 constexpr size_t RECOMMENDED_TASK_SIZE = 64; // bytes
 #elif defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
