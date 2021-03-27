@@ -25,7 +25,14 @@ constexpr size_t RECOMMENDED_TASK_SIZE = 128; // bytes
 #error Determine your platform requirements
 #endif
 
+// Use hardware_destructive_interference_size if it is implemented
+// Note: libc++ 8.0 and later define __cpp_lib_hardware_interference_size but don't actually implement it
+// XXX: check for particular libc++ version, when interference size support will be implemented
+#if defined(__cpp_lib_hardware_interference_size) && !defined(_LIBCPP_VERSION)
 constexpr size_t TASK_SIZE = std::max(RECOMMENDED_TASK_SIZE, std::hardware_destructive_interference_size);
+#else
+constexpr size_t TASK_SIZE = RECOMMENDED_TASK_SIZE;
+#endif
 
 class XRCORE_API Task final : Noncopyable
 {
