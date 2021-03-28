@@ -471,14 +471,9 @@ void CRender::Calculate()
     r_ssaGLOD_end = _sqr(ps_r__GLOD_ssa_end / 3) / g_fSCREEN;
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
 
-    // Frustum & HOM rendering
+    // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
-    {
-        HOM.Enable();
-        HOM.Render(ViewBase);
-    }
     gm_SetNearer(FALSE);
     phase = PHASE_NORMAL;
 
