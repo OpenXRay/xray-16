@@ -32,43 +32,25 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Library Include="ColorPicker.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="audio.cpp" />
-    <ClCompile Include="CreateDX.cpp" />
-    <ClCompile Include="encode.cpp" />
     <ClCompile Include="ETools.cpp" />
-    <ClCompile Include="ETools_cm.cpp" />
-    <ClCompile Include="Intersect.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object_sliding.cpp" />
-    <ClCompile Include="ogg_enc.cpp" />
-    <ClCompile Include="platform.cpp" />
     <ClCompile Include="PropSlimTools.cpp" />
-    <ClCompile Include="resample.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="xrXRC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArbitraryList.h" />
-    <ClInclude Include="audio.h" />
     <ClInclude Include="BinaryHeap.h" />
-    <ClInclude Include="D3DX_Wrapper.h" />
     <ClInclude Include="DLink.h" />
-    <ClInclude Include="encode.h" />
     <ClInclude Include="ETools.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="object_sliding.h" />
-    <ClInclude Include="platform.h" />
     <ClInclude Include="PropSlimTools.h" />
     <ClInclude Include="quad.h" />
-    <ClInclude Include="resample.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="xrXRC.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">

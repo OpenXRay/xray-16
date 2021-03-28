@@ -1,5 +1,7 @@
 #include "stdafx.h"
+
 #include "PropSlimTools.h"
+
 #include "object.h"
 #include "object_sliding.h"
 
