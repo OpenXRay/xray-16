@@ -554,10 +554,6 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     PIX_EVENT(r_dsgraph_render_subspace);
     RImplementation.marker++; // !!! critical here
 
-    // Save and build new frustum, disable HOM
-    CFrustum ViewSave = ViewBase;
-    ViewBase = *_frustum;
-
     if (_precise_portals && RImplementation.rmPortals)
     {
         // Check if camera is too near to some portal - if so force DualRender
@@ -575,7 +571,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     }
 
     // Traverse sector/portal structure
-    PortalTraverser.traverse(_sector, ViewBase, _cop, mCombined, 0);
+    PortalTraverser.traverse(_sector, *_frustum, _cop, mCombined, 0);
 
     // Determine visibility for static geometry hierrarhy
     if (psDeviceFlags.test(rsDrawStatic))
@@ -594,7 +590,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     if (_dynamic && psDeviceFlags.test(rsDrawDynamic))
     {
         // Traverse object database
-        g_SpatialSpace->q_frustum(lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE, ViewBase);
+        g_SpatialSpace->q_frustum(lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE, *_frustum);
 
         // Determine visibility for dynamic part of scene
         for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
@@ -647,9 +643,6 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         }
 #endif
     }
-
-    // Restore
-    ViewBase = ViewSave;
 }
 
 #include "SkeletonCustom.h"
