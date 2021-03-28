@@ -140,6 +140,7 @@
     <ClInclude Include="..\xrRender\r_constants_cache.h" />
     <ClInclude Include="..\xrRender\R_DStreams.h" />
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
+    <ClInclude Include="..\xrRender\r__dsgraph_structure.h" />
     <ClInclude Include="..\xrRender\r__dsgraph_types.h" />
     <ClInclude Include="..\xrRender\r__sector.h" />
     <ClInclude Include="..\xrRender\Shader.h" />

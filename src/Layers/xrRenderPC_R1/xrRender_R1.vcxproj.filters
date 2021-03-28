@@ -585,6 +585,9 @@
     <ClInclude Include="FStaticRender_Types.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\r__dsgraph_structure.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

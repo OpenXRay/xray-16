@@ -277,6 +277,7 @@
     <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
     <ClInclude Include="..\xrRender\ModelPool.h" />
     <ClInclude Include="..\xrRender\r_sun_cascades.h" />
+    <ClInclude Include="..\xrRender\r__dsgraph_structure.h" />
     <ClInclude Include="..\xrRender\r__pixel_calculator.h" />
     <ClInclude Include="..\xrRender\blenders\blender_bloom_build.h" />
     <ClInclude Include="..\xrRender\blenders\blender_combine.h" />

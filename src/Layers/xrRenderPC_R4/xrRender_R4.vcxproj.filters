@@ -720,6 +720,9 @@
     <ClInclude Include="..\xrRender_R2\r2_types.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\r__dsgraph_structure.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
