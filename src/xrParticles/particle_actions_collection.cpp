@@ -1732,9 +1732,11 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
             _mm_store_fvector(m.vel, _mvel);
         }
     };
-    if (p_cnt > 1)
-        xr_parallel_for(TaskRange<u32>(0, p_cnt), processRange);
-    else
+    // XXX: it turned out that singlethreaded code works way faster
+    // But on processors with small caches it may work slower, profiling needed
+    //if (p_cnt > (TaskScheduler->GetWorkersCount() * 64))
+    //    xr_parallel_for(TaskRange<u32>(0, p_cnt), processRange);
+    //else
     {
         processRange(TaskRange<u32>(0, p_cnt));
     }

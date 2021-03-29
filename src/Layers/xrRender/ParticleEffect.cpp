@@ -628,9 +628,11 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
             }
         }
     };
-    if (count > 1)
-        xr_parallel_for(TaskRange<u32>(0, count), renderParticles);
-    else
+    // XXX: it turned out that singlethreaded code works way faster
+    // But on processors with small caches it may work slower, profiling needed
+    //if (count > (TaskScheduler->GetWorkersCount() * 64))
+    //    xr_parallel_for(TaskRange<u32>(0, count), renderParticles);
+    //else
     {
         renderParticles(TaskRange<u32>(0, count));
     }
