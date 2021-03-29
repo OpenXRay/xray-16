@@ -3,7 +3,9 @@ dist: focal
 cache: ccache
 language: cpp
 
-#branches:
+branches:
+  except:
+    - /^dependabot\/.*$/
 #  only:
 #  - linux
 #  - xd_dev

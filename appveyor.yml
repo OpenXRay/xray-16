@@ -19,6 +19,10 @@ platform:
 - x64
 - x86
 
+branches:
+  except:
+    - dependabot/*
+
 matrix:
   exclude:
     - image: Ubuntu
