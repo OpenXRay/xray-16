@@ -2663,16 +2663,20 @@ target_link_libraries(${PROJECT_NAME}
     xrNetServer
     ${SDL_LIBRARIES}
 )
+
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DXRGAME_EXPORTS
 )
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "StdAfx.h"
 )
 
-cotire(${PROJECT_NAME})
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:StdAfx.h>"
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}

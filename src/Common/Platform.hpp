@@ -33,8 +33,6 @@
 #endif
 #include "Common/Compiler.inl"
 
-#include <ctime>
-
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Common/PlatformWindows.inl"
 #elif defined(XR_PLATFORM_LINUX)
