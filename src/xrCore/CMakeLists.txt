@@ -234,6 +234,7 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/Externals/sse2neon/include
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
 )
 
