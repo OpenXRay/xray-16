@@ -211,6 +211,8 @@ execute_process(COMMAND git rev-parse --abbrev-ref HEAD
 
 message("git branch: " ${GIT_BRANCH})
 
+include_directories(${CMAKE_SOURCE_DIR}/Externals)
+
 add_subdirectory(Externals)
 add_subdirectory(src)
 add_subdirectory(res)

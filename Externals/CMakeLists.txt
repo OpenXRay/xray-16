@@ -1,5 +1,3 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 add_subdirectory(LuaJIT-proj)
 add_subdirectory(luabind)
 add_subdirectory(cximage)
