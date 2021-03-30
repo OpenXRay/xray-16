@@ -1622,6 +1622,8 @@ extern void noise3Init();
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#else
+#error Add your platform here
 #endif
 
 ICF __m128 _mm_load_fvector(const Fvector& v)

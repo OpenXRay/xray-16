@@ -2639,7 +2639,6 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/ode/include
     ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
-    ${CMAKE_SOURCE_DIR}/Externals
     ${CMAKE_SOURCE_DIR}/sdk/include
     ${SDL_INCLUDE_DIRS}
 )

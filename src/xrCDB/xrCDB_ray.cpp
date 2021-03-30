@@ -7,6 +7,8 @@
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#else
+#error Add your platform here
 #endif
 #pragma warning(pop)
 

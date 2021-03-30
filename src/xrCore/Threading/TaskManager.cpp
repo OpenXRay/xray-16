@@ -28,7 +28,7 @@
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
 #else
-#error Configure your platform
+#error Add your platform here
 #endif
 
 xr_unique_ptr<TaskManager> TaskScheduler;

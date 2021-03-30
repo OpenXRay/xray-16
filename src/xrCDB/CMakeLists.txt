@@ -34,8 +34,6 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/Externals/sse2neon/include
-    ${CMAKE_SOURCE_DIR}/Externals # for OPCODE
     ${SDL_INCLUDE_DIRS}
 )
 
