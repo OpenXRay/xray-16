@@ -1,7 +1,7 @@
 #pragma once
 
 #include "_types.h"
-#include "cpuid.h"
+#include "xr_cpuid.h"
 
 namespace FPU
 {

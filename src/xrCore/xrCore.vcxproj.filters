@@ -147,7 +147,7 @@
     <ClCompile Include="dump_string.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="cpuid.cpp">
+    <ClCompile Include="xr_cpuid.cpp">
       <Filter>Math\CPU</Filter>
     </ClCompile>
     <ClCompile Include="_std_extensions.cpp">
@@ -431,7 +431,7 @@
     <ClInclude Include="vector.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="cpuid.h">
+    <ClInclude Include="xr_cpuid.h">
       <Filter>Math\CPU</Filter>
     </ClInclude>
     <ClInclude Include="FixedVector.h">
