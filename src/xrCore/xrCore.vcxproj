@@ -53,7 +53,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Compression\ppmd_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor9.cpp" />
-    <ClCompile Include="cpuid.cpp" />
+    <ClCompile Include="xr_cpuid.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="Crypto\trivial_encryptor.cpp" />
     <ClCompile Include="Crypto\xr_dsa.cpp" />
@@ -152,7 +152,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="Containers\AssociativeVector.hpp" />
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="Containers\FixedMap.h" />
-    <ClInclude Include="cpuid.h" />
+    <ClInclude Include="xr_cpuid.h" />
     <ClInclude Include="Crypto\trivial_encryptor.h" />
     <ClInclude Include="Crypto\xr_dsa.h" />
     <ClInclude Include="Crypto\xr_dsa_signer.h" />
