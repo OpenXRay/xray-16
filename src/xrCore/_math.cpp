@@ -246,8 +246,10 @@ XRCORE_API u64 GetCLK()
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
     return __rdtsc();
-#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#elif defined(XR_ARCHITECTURE_ARM)
     return __rdpmccntr64();
+#elif defined(XR_ARCHITECTURE_ARM64)
+    return _ReadStatusReg(ARM64_PMCCNTR_EL0);
 #else
 #error Unsupported architecture
 #endif
@@ -263,7 +265,7 @@ XRCORE_API u64 GetCLK()
     return result;
 #elif defined(XR_ARCHITECTURE_ARM64)
     int64_t virtual_timer_value;
-    asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
+    asm volatile("mrs %0, pmccntr_el0" : "=r"(virtual_timer_value));
     return virtual_timer_value;
 #endif
 
