@@ -80,7 +80,7 @@ of all the original source code and S.T.A.L.K.E.R. franchise.
   * [Call of Chernobyl](https://github.com/revolucas/CoC-Xray) – for useful new features, bug fixes and optimizations.
   * Lost Alpha – for their effort on restoring the old game concept.
   * Lost Alpha DC – for continuing work on Lost Alpha.
-* Individuals
+* Individuals:
   * [Vincent](https://github.com/0xBADEAFFE) – for work on the Linux port.
   * [abramcumner](https://github.com/abramcumner) – for useful fixes and additions.
   * [Morrey](https://github.com/morrey) – for work on Clear Sky support and his Return to Clear Sky mod.
