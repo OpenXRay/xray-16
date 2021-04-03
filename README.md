@@ -62,7 +62,7 @@ of all the original source code and S.T.A.L.K.E.R. franchise.
     * [eagleivg](https://github.com/eagleivg) – main part of the work on Linux port.
     * [q4a](https://github.com/q4a) – main part of the work on Linux port.
     * [SkyLoader](https://github.com/SkyLoaderr) – OpenGL renderer improvements and polishing, other project work.
-    * [qweasdd136963](https://github.com/qweasdd136963) – supporting the [OXR_COC](https://github.com/qweasdd136963/OXR_CoC) project, other project work on new features, refacting and bug fixing.
+    * [qweasdd136963](https://github.com/qweasdd136963) – supporting the [OXR_COC](https://github.com/qweasdd136963/OXR_CoC) project, other project work on new features, refactoring and bug fixing.
     * JohnDoe_71Rus – our regular tester.
     * [Chip_exe](https://github.com/007exe) – work on Linux port, maintaing AUR package, our regular tester.
     * [a1batross](https://github.com/a1batross) – work on Linux port.
