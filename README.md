@@ -44,3 +44,49 @@ Pull requests appreciated! However, the following things should be taken into co
 
 Be advised that this is a community project not sanctioned by GSC Game World in any way – and they remain the copyright holders
 of all the original source code and S.T.A.L.K.E.R. franchise.
+
+### Thanks
+* [GSC Game World](https://gsc-game.com/) – for creating S.T.A.L.K.E.R. and supporting the community;
+* Loxotron – for making the engine sources available.
+* [All the OpenXRay contributors](https://github.com/OpenXRay/xray-16/graphs/contributors) – for making the project better.
+  * The first OpenXRay team (2014-2017) – for being at the origins of the project.
+    * [nitrocaster](https://github.com/nitrocaster) – original project creator.
+    * [Kaffeine](https://github.com/Kaffeine) – initial work on the Linux port, refactoring, polishing.
+    * [Armada651](https://github.com/CrossVR) – creation of the OpenGL renderer, work on the build system, other project maintenance work.
+    * [andrew-boyarshin](https://github.com/andrew-boyarshin) – work on the build system.
+    * Swartz27 – work on renderer features.
+    * [awdavies](https://github.com/awdavies) – project maintenance work.
+  * The second OpenXRay team (2017-now) – for continuing work on the project.
+    * [Xottab_DUTY](https://github.com/Xottab-DUTY) – current project leader.
+    * [intorr](https://github.com/intorr) – work on the project quality. (memory leaks, refactoring, optimizations)
+    * [eagleivg](https://github.com/eagleivg) – main part of the work on Linux port.
+    * [q4a](https://github.com/q4a) – main part of the work on Linux port.
+    * [SkyLoader](https://github.com/SkyLoaderr) – OpenGL renderer improvements and polishing, other project work.
+    * [qweasdd136963](https://github.com/qweasdd136963) – supporting the [OXR_COC](https://github.com/qweasdd136963/OXR_CoC) project, other project work on new features, refacting and bug fixing.
+    * JohnDoe_71Rus – our regular tester.
+    * [Chip_exe](https://github.com/007exe) – work on Linux port, maintaing AUR package, our regular tester.
+    * [a1batross](https://github.com/a1batross) – work on Linux port.
+    * [The Sin!](https://github.com/FreeZoneMods) – new features, refactoring, bug fixing polishing.
+    * [Zegeri](https://github.com/Zegeri) – work on Linux port, code quality, fixes, polishing.
+    * [drug007](https://github.com/drug007) – work on Linux port.
+    * [vTurbine](https://github.com/vTurbine) – work on renderer unification, refactoring, polishing.
+    * [Zigatun](https://github.com/Zigatun) – work on ARM port.
+    * [Masterkatze](https://github.com/Masterkatze) – work on the build system, bug fixing.
+* Particular projects:
+  * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
+  * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) and [Shoker](https://github.com/ShokerStlk) – for contributing new features, bug fixing.
+  * [Im-Dex](https://github.com/Im-dex/xray-162) – for the work on the engine.
+  * [OGSR](https://github.com/OGSR/OGSR-Engine) – for amazing work on Shadow of Chernobyl.
+  * [Call of Chernobyl](https://github.com/revolucas/CoC-Xray) – for useful new features, bug fixes and optimizations.
+  * Lost Alpha – for their effort on restoring the old game concept.
+  * Lost Alpha DC – for continuing work on Lost Alpha.
+* Individuals
+  * [Vincent](https://github.com/0xBADEAFFE) – for work on the Linux port.
+  * [abramcumner](https://github.com/abramcumner) – for useful fixes and additions.
+  * [Morrey](https://github.com/morrey) – for work on Clear Sky support and his Return to Clear Sky mod.
+  * [RainbowZerg](https://github.com/RainbowZerg) – for work on the renderer features, bug fixing.
+  * [FozeSt]((https://github.com/FozeSt) – for help with some fixes and features.
+  * [mrnotbadguy](https://github.com/mrnotbadguy) – for work on gamepads support and bug fixing.
+  * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
+
+If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you.
