@@ -72,21 +72,27 @@ of all the original source code and S.T.A.L.K.E.R. franchise.
     * [vTurbine](https://github.com/vTurbine) – work on renderer unification, refactoring, polishing.
     * [Zigatun](https://github.com/Zigatun) – work on ARM port.
     * [Masterkatze](https://github.com/Masterkatze) – work on the build system, bug fixing.
+  * Other contributors:
+    * [NeoAnomaly](https://github.com/) – for help with debug functionality on Windows.
+    * [RainbowZerg](https://github.com/RainbowZerg) – for work on the renderer features, bug fixing.
+    * [FozeSt](https://github.com/FozeSt) – for help with some fixes and features.
+    * [mrnotbadguy](https://github.com/mrnotbadguy) – for work on gamepads support and bug fixing.
+    * [ZeeWanderer](https://github.com/ZeeWanderer) – for work on the build system.
+    * [GeorgeIvlev](https://github.com/GeorgeIvlev) – for work on the build system, bug fixing.
+    * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
+    * [dimhotepus](https://github.com/dimhotepus) – for work on code quality.
 * Particular projects:
   * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
   * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) and [Shoker](https://github.com/ShokerStlk) – for contributing new features, bug fixing.
   * [Im-Dex](https://github.com/Im-dex/xray-162) – for the work on the engine.
   * [OGSR](https://github.com/OGSR/OGSR-Engine) – for amazing work on Shadow of Chernobyl.
-  * [Call of Chernobyl](https://github.com/revolucas/CoC-Xray) – for useful new features, bug fixes and optimizations.
+  * [Call of Chernobyl](https://github.com/revolucas/CoC-Xray) and its contributors – for useful new features, bug fixes and optimizations.
   * Lost Alpha – for their effort on restoring the old game concept.
   * Lost Alpha DC – for continuing work on Lost Alpha.
 * Individuals:
+  * [tamlin-mike](https://github.com/tamlin-mike) – for work on the build system.
   * [Vincent](https://github.com/0xBADEAFFE) – for work on the Linux port.
   * [abramcumner](https://github.com/abramcumner) – for useful fixes and additions.
   * [Morrey](https://github.com/morrey) – for work on Clear Sky support and his Return to Clear Sky mod.
-  * [RainbowZerg](https://github.com/RainbowZerg) – for work on the renderer features, bug fixing.
-  * [FozeSt](https://github.com/FozeSt) – for help with some fixes and features.
-  * [mrnotbadguy](https://github.com/mrnotbadguy) – for work on gamepads support and bug fixing.
-  * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
 
 If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you.
