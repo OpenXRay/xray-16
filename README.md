@@ -85,7 +85,7 @@ of all the original source code and S.T.A.L.K.E.R. franchise.
   * [abramcumner](https://github.com/abramcumner) – for useful fixes and additions.
   * [Morrey](https://github.com/morrey) – for work on Clear Sky support and his Return to Clear Sky mod.
   * [RainbowZerg](https://github.com/RainbowZerg) – for work on the renderer features, bug fixing.
-  * [FozeSt]((https://github.com/FozeSt) – for help with some fixes and features.
+  * [FozeSt](https://github.com/FozeSt) – for help with some fixes and features.
   * [mrnotbadguy](https://github.com/mrnotbadguy) – for work on gamepads support and bug fixing.
   * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
 
