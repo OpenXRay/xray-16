@@ -72,8 +72,8 @@ jobs:
         git submodule deinit Externals/cryptopp
     - name: Build
       run: |
-        export CC=gcc
-        export CXX=g++
+        export CC=gcc-9
+        export CXX=g++-9
         ${CXX} --version
         export core_count=$(nproc || echo 4) && echo core_count = $core_count
         mkdir bin && cd bin
