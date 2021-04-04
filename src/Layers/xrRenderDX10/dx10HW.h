@@ -77,7 +77,6 @@ public:
     D3DCompileFunc OldD3DCompile = nullptr;
     bool DX10Only = false;
 #ifdef HAS_DX11_2
-    IDXGIFactory2* m_pFactory2 = nullptr;
     IDXGISwapChain2* m_pSwapChain2 = nullptr;
 #endif
 #ifdef HAS_DX11_3
@@ -91,6 +90,8 @@ public:
 private:
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
     XRay::Module d3dCompiler37;
+    XRay::Module hDXGI;
+    XRay::Module hD3D;
 };
 
 extern ECORE_API CHW HW;

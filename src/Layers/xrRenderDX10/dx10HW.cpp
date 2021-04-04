@@ -43,9 +43,20 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
+    hDXGI = XRay::LoadModule("dxgi");
+    hD3D = XRay::LoadModule("d3d11");
+    if (!hD3D->IsLoaded() || !hDXGI->IsLoaded())
+    {
+        Valid = false;
+        return;
+    }
+
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
-    R_CHK(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&m_pFactory)));
+    const auto createDXGIFactory = static_cast<decltype(&CreateDXGIFactory1)>(hDXGI->GetProcAddress("CreateDXGIFactory1"));
+    R_CHK(createDXGIFactory(__uuidof(IDXGIFactory1), (void**)(&m_pFactory)));
+
     R_CHK(m_pFactory->EnumAdapters1(0, &m_pAdapter));
+
     if (ClearSkyMode)
     {
         d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
@@ -58,11 +69,6 @@ void CHW::DestroyD3D()
     _SHOW_REF("refCount:m_pAdapter", m_pAdapter);
     _RELEASE(m_pAdapter);
 
-#ifdef HAS_DX11_2
-    _SHOW_REF("refCount:m_pFactory2", m_pFactory2);
-    _RELEASE(m_pFactory2);
-#endif
-
     _SHOW_REF("refCount:m_pFactory", m_pFactory);
     _RELEASE(m_pFactory);
 }
@@ -70,6 +76,8 @@ void CHW::DestroyD3D()
 void CHW::CreateDevice(SDL_Window* sdlWnd)
 {
     CreateD3D();
+    if (!Valid)
+        return;
 
     m_DriverType = Caps.bForceGPU_REF ? D3D_DRIVER_TYPE_REFERENCE : D3D_DRIVER_TYPE_HARDWARE;
 
@@ -118,7 +126,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
-        return D3D11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
+        static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
+        return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
             nullptr, createDeviceFlags, level, levels,
             D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
     };
@@ -266,8 +275,9 @@ bool CHW::CreateSwapChain2(HWND hwnd)
         return false;
 
 #ifdef HAS_DX11_2
-    m_pAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&m_pFactory2);
-    if (!m_pFactory2)
+    IDXGIFactory2* pFactory2{};
+    m_pAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&pFactory2);
+    if (!pFactory2)
         return false;
 
     // Set up the presentation parameters
@@ -308,9 +318,10 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     // Additional setup
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    IDXGISwapChain1* swapchain = nullptr;
-    const HRESULT result = m_pFactory2->CreateSwapChainForHwnd(pDevice, hwnd, &desc,
+    IDXGISwapChain1* swapchain{};
+    const HRESULT result = pFactory2->CreateSwapChainForHwnd(pDevice, hwnd, &desc,
         fulldesc.Windowed ? nullptr : &fulldesc, nullptr, &swapchain);
+    _RELEASE(pFactory2);
 
     if (FAILED(result))
         return false;
