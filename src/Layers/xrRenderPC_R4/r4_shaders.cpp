@@ -486,11 +486,22 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     char extension[3];
     strncpy_s(extension, pTarget, 2);
 
+    pcstr renderer;
+    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+        renderer = "r4" DELIMITER;
+    else if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+        renderer = "r3" DELIMITER;
+    else
+    {
+        renderer = "r4_level9" DELIMITER;
+        R_ASSERT(!"Feature levels lower than 10.0 are unsupported");
+    }
+
     string_path filename;
-    strconcat(sizeof(filename), filename, "r4" DELIMITER, name, ".", extension);
+    strconcat(sizeof(filename), filename, renderer, name, ".", extension);
 
     string_path folder_name, folder;
-    strconcat(sizeof(folder), folder, "r4" DELIMITER "objects" DELIMITER, filename);
+    strconcat(sizeof(folder), folder, renderer, "objects" DELIMITER, filename);
 
     FS.update_path(folder_name, "$game_shaders$", folder);
     xr_strcat(folder_name, DELIMITER);
