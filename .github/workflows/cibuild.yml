@@ -72,8 +72,8 @@ jobs:
         git submodule deinit Externals/cryptopp
     - name: Build
       run: |
-        export CC=gcc-8
-        export CXX=g++-8
+        export CC=gcc
+        export CXX=g++
         ${CXX} --version
         export core_count=$(nproc || echo 4) && echo core_count = $core_count
         mkdir bin && cd bin
@@ -84,7 +84,7 @@ jobs:
         CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
         fi
         if [ "${{ matrix.Platform }}" = "x86" ]; then
-        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-8-multilib libpulse-dev:i386 libglib2.0-dev:i386 &&
+        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib libpulse-dev:i386 libglib2.0-dev:i386 &&
         sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libopenal-dev:i386 libcrypto++-dev:i386 liblockfile-dev:i386 libfreeimage-dev:i386 libfreeimageplus-dev:i386 &&
         sudo apt-get install -y cmake liblua5.1-0-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 libncurses5-dev:i386 libsdl2-dev:i386 &&
         CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
