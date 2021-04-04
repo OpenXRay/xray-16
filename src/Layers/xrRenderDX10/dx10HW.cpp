@@ -138,6 +138,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     if (SUCCEEDED(R))
     {
         pContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&pContext1));
+        pContext->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
 #ifdef HAS_DX11_3
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
 #endif
@@ -356,12 +357,14 @@ bool CHW::ThisInstanceIsGlobal() const
 
 void CHW::BeginPixEvent(LPCWSTR wszName) const
 {
-    D3DPERF_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName);
+    if (pAnnotation)
+        pAnnotation->BeginEvent(wszName);
 }
 
 void CHW::EndPixEvent() const
 {
-    D3DPERF_EndEvent();
+    if (pAnnotation)
+        pAnnotation->EndEvent();
 }
 
 void CHW::DestroyDevice()

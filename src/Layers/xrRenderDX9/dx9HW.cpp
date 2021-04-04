@@ -196,7 +196,11 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     case D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE: Log("* Vertex Processor: PURE HARDWARE"); break;
     }
 
-// Capture misc data
+    // Capture PIX events
+    d3dperf_BeginEvent = static_cast<decltype(d3dperf_BeginEvent)>(hD3D->GetProcAddress("D3DPERF_BeginEvent"));
+    d3dperf_EndEvent = static_cast<decltype(d3dperf_EndEvent)>(hD3D->GetProcAddress("D3DPERF_EndEvent"));
+
+    // Capture misc data
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
@@ -297,12 +301,14 @@ bool CHW::ThisInstanceIsGlobal() const
 
 void CHW::BeginPixEvent(LPCWSTR wszName) const
 {
-    D3DPERF_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName);
+    if (d3dperf_BeginEvent)
+        d3dperf_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName);
 }
 
 void CHW::EndPixEvent() const
 {
-    D3DPERF_EndEvent();
+    if (d3dperf_EndEvent)
+        d3dperf_EndEvent();
 }
 
 u32 CHW::selectPresentInterval() const

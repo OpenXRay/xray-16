@@ -85,6 +85,7 @@ public:
     ID3D11Device3* pDevice3 = nullptr;
 #endif
     ID3D11DeviceContext1* pContext1 = nullptr;
+    ID3DUserDefinedAnnotation* pAnnotation = nullptr;
 
     using D3DCompileFunc = decltype(&D3DCompile);
     D3DCompileFunc D3DCompile = nullptr;

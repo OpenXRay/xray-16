@@ -62,6 +62,9 @@ public:
 
     u32 DevAdapter;
 
+    decltype(&D3DPERF_BeginEvent) d3dperf_BeginEvent = nullptr;
+    decltype(&D3DPERF_EndEvent) d3dperf_EndEvent = nullptr;
+
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
