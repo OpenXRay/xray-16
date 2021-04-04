@@ -73,8 +73,6 @@ public:
     bool SAD4ShaderInstructions;
     bool ExtendedDoublesShaderInstructions;
 
-    using D3DCompileFunc = decltype(&D3DCompile);
-    D3DCompileFunc OldD3DCompile = nullptr;
     bool DX10Only = false;
 #ifdef HAS_DX11_2
     IDXGISwapChain2* m_pSwapChain2 = nullptr;
@@ -84,12 +82,15 @@ public:
 #endif
     ID3D11DeviceContext1* pContext1 = nullptr;
 
+    using D3DCompileFunc = decltype(&D3DCompile);
+    D3DCompileFunc D3DCompile = nullptr;
+
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
 private:
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
-    XRay::Module d3dCompiler37;
+    XRay::Module hD3DCompiler;
     XRay::Module hDXGI;
     XRay::Module hD3D;
 };

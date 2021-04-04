@@ -550,7 +550,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         includer Includer;
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
-        _result = D3DCompile(fs->pointer(), fs->length(), "", options.data(),
+        _result = HW.D3DCompile(fs->pointer(), fs->length(), "", options.data(),
             &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
 
         if (FAILED(_result) && pErrorBuf)
@@ -560,7 +560,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             {
                 pErrorBuf = nullptr;
                 Flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-                _result = D3DCompile(fs->pointer(), fs->length(), "", options.data(),
+                _result = HW.D3DCompile(fs->pointer(), fs->length(), "", options.data(),
                     &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
             }
         }

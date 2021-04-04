@@ -56,12 +56,6 @@ void CHW::CreateD3D()
     R_CHK(createDXGIFactory(__uuidof(IDXGIFactory1), (void**)(&m_pFactory)));
 
     R_CHK(m_pFactory->EnumAdapters1(0, &m_pAdapter));
-
-    if (ClearSkyMode)
-    {
-        d3dCompiler37 = XRay::LoadModule("d3dcompiler_37");
-        OldD3DCompile = static_cast<D3DCompileFunc>(d3dCompiler37->GetProcAddress("D3DCompileFromMemory"));
-    }
 }
 
 void CHW::DestroyD3D()
@@ -148,9 +142,22 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
 #endif
         if (FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+        {
+            D3DCompile = &::D3DCompile;
             ComputeShadersSupported = true;
+        }
         else
         {
+            if (ClearSkyMode)
+            {
+                hD3DCompiler = XRay::LoadModule("d3dcompiler_37");
+                D3DCompile = static_cast<D3DCompileFunc>(hD3DCompiler->GetProcAddress("D3DCompileFromMemory"));
+            }
+            else
+            {
+                D3DCompile = &::D3DCompile;
+            }
+
             D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
             pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS,
                 &data, sizeof(data));
