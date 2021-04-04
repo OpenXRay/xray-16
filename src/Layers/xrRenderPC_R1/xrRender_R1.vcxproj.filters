@@ -145,6 +145,9 @@
     <Filter Include="Models\Visuals">
       <UniqueIdentifier>{b4233fe2-78dd-48d9-94ff-620753340597}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{8b1f96de-4574-4866-a5c0-371b1d2d7a17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -587,6 +590,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\r__dsgraph_structure.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
+      <Filter>Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

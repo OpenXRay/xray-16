@@ -354,6 +354,16 @@ bool CHW::ThisInstanceIsGlobal() const
     return this == &HW;
 }
 
+void CHW::BeginPixEvent(LPCWSTR wszName) const
+{
+    D3DPERF_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName);
+}
+
+void CHW::EndPixEvent() const
+{
+    D3DPERF_EndEvent();
+}
+
 void CHW::DestroyDevice()
 {
     //  Destroy state managers

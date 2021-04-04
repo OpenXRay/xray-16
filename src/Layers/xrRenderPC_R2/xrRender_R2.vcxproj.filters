@@ -151,6 +151,9 @@
     <Filter Include="Interfase implementations\UI\UISequenceVideoItem">
       <UniqueIdentifier>{7b446f08-e762-4e42-9b67-0dd22dbfc8b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{6333f8ba-25fb-43b9-a4b6-e8aaf84692e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -626,6 +629,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\r__dsgraph_structure.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
+      <Filter>Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

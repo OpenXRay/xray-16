@@ -570,9 +570,6 @@
     <ClCompile Include="..\xrRender\r__screenshot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp">
-      <Filter>Debug</Filter>
-    </ClCompile>
     <ClCompile Include="r3_R_rain.cpp">
       <Filter>Core</Filter>
     </ClCompile>

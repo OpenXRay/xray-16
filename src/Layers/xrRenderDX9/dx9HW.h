@@ -34,6 +34,10 @@ public:
     void EndScene();
     void Present();
 
+public:
+    void BeginPixEvent(LPCWSTR wszName) const;
+    void EndPixEvent() const;
+
 private:
     u32 selectPresentInterval() const;
     u32 selectGPU() const;

@@ -34,6 +34,10 @@ private:
     bool ThisInstanceIsGlobal() const;
 
 public:
+    void BeginPixEvent(LPCWSTR wszName) const {}
+    void EndPixEvent() const {}
+
+public:
     CHWCaps Caps;
 
     u32 BackBufferCount{};

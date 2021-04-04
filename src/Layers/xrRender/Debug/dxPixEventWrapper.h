@@ -1,21 +1,15 @@
-#ifndef dxPixEventWrapper_included
-#define dxPixEventWrapper_included
 #pragma once
 
-#if !defined(MASTER_GOLD) && !defined(USE_OGL)
-
-#define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(L#Name)
+#if defined(MASTER_GOLD)
+#   define PIX_EVENT(Name) do { } while (false)
+#else
+#   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(L#Name)
 
 class dxPixEventWrapper
 {
 public:
-    dxPixEventWrapper(LPCWSTR wszName) { D3DPERF_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName); }
-    ~dxPixEventWrapper() { D3DPERF_EndEvent(); }
+    dxPixEventWrapper(LPCWSTR wszName) { HW.BeginPixEvent(wszName); }
+    ~dxPixEventWrapper() { HW.EndPixEvent(); }
 };
-#else //    DEBUG
+#endif // MASTER_GOLD
 
-#define PIX_EVENT(Name) { }
-
-#endif //   DEBUG
-
-#endif //   dxPixEventWrapper_included
