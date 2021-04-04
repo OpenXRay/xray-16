@@ -358,10 +358,8 @@ void AdjustSkinningMode(bool isIntelGMA)
 
 u32 CHW::selectGPU() const
 {
-#if RENDER == R_R1
     if (ThisInstanceIsGlobal())
         AdjustSkinningMode(GivenGPUIsIntelGMA(Caps.id_vendor, Caps.id_device));
-#endif
 
     if (Caps.bForceGPU_SW)
         return D3DCREATE_SOFTWARE_VERTEXPROCESSING;

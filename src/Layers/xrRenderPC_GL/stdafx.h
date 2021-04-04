@@ -8,6 +8,12 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
 
+#include "xrEngine/vis_common.h"
+#include "xrEngine/Render.h"
+#include "xrEngine/IGame_Level.h"
+
+#include "xrParticles/psystem.h"
+
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include "SDL_opengl.h"
@@ -15,7 +21,17 @@
 #include "SDL_opengl_glext.h"
 
 #include "Layers/xrRenderGL/CommonTypes.h"
+
+#include "Layers/xrRenderGL/glHW.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
+
+#include "Layers/xrRender/Shader.h"
+
+#include "Layers/xrRender/R_Backend.h"
+#include "Layers/xrRender/R_Backend_Runtime.h"
+
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_CLSID.h"
 
 #define R_GL 0
 #define R_R1 1
@@ -24,22 +40,11 @@
 #define R_R4 4
 #define RENDER R_GL
 
-#include "xrParticles/psystem.h"
-
-#include "Layers/xrRenderGL/glHW.h"
-#include "Layers/xrRender/Shader.h"
-#include "Layers/xrRender/R_Backend.h"
-#include "Layers/xrRender/R_Backend_Runtime.h"
+#include "Common/_d3d_extensions.h"
 
 #include "Layers/xrRender/ResourceManager.h"
-
-#include "xrEngine/vis_common.h"
-#include "xrEngine/Render.h"
-#include "Common/_d3d_extensions.h"
-#include "xrEngine/IGame_Level.h"
-#include "Layers/xrRender/Blender.h"
-#include "Layers/xrRender/Blender_CLSID.h"
 #include "Layers/xrRender/xrRender_console.h"
+
 #include "rgl.h"
 
 IC void jitter(CBlender_Compile& C)
