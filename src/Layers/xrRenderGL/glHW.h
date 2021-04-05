@@ -34,7 +34,7 @@ private:
     bool ThisInstanceIsGlobal() const;
 
 public:
-    void BeginPixEvent(LPCWSTR wszName) const {}
+    void BeginPixEvent(const wchar_t* wszName) const {}
     void EndPixEvent() const {}
 
 public:
