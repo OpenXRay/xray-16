@@ -8,7 +8,7 @@
 class dxPixEventWrapper
 {
 public:
-    dxPixEventWrapper(LPCWSTR wszName) { HW.BeginPixEvent(wszName); }
+    dxPixEventWrapper(const wchar_t* wszName) { HW.BeginPixEvent(wszName); }
     ~dxPixEventWrapper() { HW.EndPixEvent(); }
 };
 #endif // MASTER_GOLD
