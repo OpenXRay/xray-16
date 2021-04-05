@@ -96,6 +96,17 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
     if (object().best_weapon())
         weapon_type = object().best_weapon()->object().ef_weapon_type();
 
+    if (ClearSkyMode || ShadowOfChernobylMode)
+    {
+        // remap
+        switch (weapon_type)
+        {
+        case 6: weapon_type = 666; break; // random number so that we can get to the default case
+        case 7: weapon_type = 9; break; // shotguns
+        case 8: weapon_type = 11; break; // sniper rifles
+        }
+    }
+
     switch (weapon_type)
     {
     // pistols

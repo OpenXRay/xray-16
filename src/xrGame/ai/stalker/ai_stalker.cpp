@@ -322,111 +322,108 @@ void CAI_Stalker::reload(LPCSTR section)
         queue_sect = *cNameSect();
     }
 
-    const auto tryToRead = [&](pcstr lineToRead, u32 commonValue, u32 defaultValue) -> u32
+    const auto tryToRead = [&](pcstr lineToRead, u32 defaultValue) -> u32
     {
         const u32 value = pSettings->read_if_exists<u32>(queue_sect, lineToRead, u32(-1));
         if (value != u32(-1))
             return value;
-        if (commonValue != u32(-1))
-            return commonValue;
         return defaultValue;
     };
 
-    const u32 min_queue_size_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_size_far", u32(-1));
-    const u32 max_queue_size_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_size_far", u32(-1));
-    const u32 min_queue_interval_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_interval_far", u32(-1));
-    const u32 max_queue_interval_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_interval_far", u32(-1));
-
-    const u32 min_queue_size_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_size_medium", u32(-1));
-    const u32 max_queue_size_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_size_medium", u32(-1));
-    const u32 min_queue_interval_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_interval_medium", u32(-1));
-    const u32 max_queue_interval_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_interval_medium", u32(-1));
-
-    const u32 min_queue_size_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_size_close", u32(-1));
-    const u32 max_queue_size_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_size_close", u32(-1));
-    const u32 min_queue_interval_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_interval_close", u32(-1));
-    const u32 max_queue_interval_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_interval_close", u32(-1));
-
     {
-        m_pstl_min_queue_size_far = tryToRead("pstl_min_queue_size_far", min_queue_size_far,1);
-        m_pstl_min_queue_size_far = tryToRead("pstl_min_queue_size_far", min_queue_size_far, 1);
-        m_pstl_max_queue_size_far = tryToRead("pstl_max_queue_size_far", max_queue_size_far, 1);
-        m_pstl_min_queue_interval_far = tryToRead("pstl_min_queue_interval_far", min_queue_interval_far, 1000);
-        m_pstl_max_queue_interval_far = tryToRead("pstl_max_queue_interval_far", max_queue_interval_far, 1250);
+        m_pstl_min_queue_size_far = tryToRead("pstl_min_queue_size_far", 1);
+        m_pstl_max_queue_size_far = tryToRead("pstl_max_queue_size_far", 1);
+        m_pstl_min_queue_interval_far = tryToRead("pstl_min_queue_interval_far", 1000);
+        m_pstl_max_queue_interval_far = tryToRead("pstl_max_queue_interval_far", 1250);
 
-        m_pstl_min_queue_size_medium = tryToRead("pstl_min_queue_size_medium", min_queue_size_medium, 2);
-        m_pstl_max_queue_size_medium = tryToRead("pstl_max_queue_size_medium", max_queue_size_medium, 4);
-        m_pstl_min_queue_interval_medium = tryToRead("pstl_min_queue_interval_medium", min_queue_interval_medium, 750);
-        m_pstl_max_queue_interval_medium = tryToRead("pstl_max_queue_interval_medium", max_queue_interval_medium, 1000);
+        m_pstl_min_queue_size_medium = tryToRead("pstl_min_queue_size_medium", 2);
+        m_pstl_max_queue_size_medium = tryToRead("pstl_max_queue_size_medium", 4);
+        m_pstl_min_queue_interval_medium = tryToRead("pstl_min_queue_interval_medium", 750);
+        m_pstl_max_queue_interval_medium = tryToRead("pstl_max_queue_interval_medium", 1000);
 
-        m_pstl_min_queue_size_close = tryToRead("pstl_min_queue_size_close", min_queue_size_close, 3);
-        m_pstl_max_queue_size_close = tryToRead("pstl_max_queue_size_close", max_queue_size_close, 5);
-        m_pstl_min_queue_interval_close = tryToRead("pstl_min_queue_interval_close", min_queue_interval_close, 500);
-        m_pstl_max_queue_interval_close = tryToRead("pstl_max_queue_interval_close", max_queue_interval_close, 750);
+        m_pstl_min_queue_size_close = tryToRead("pstl_min_queue_size_close", 3);
+        m_pstl_max_queue_size_close = tryToRead("pstl_max_queue_size_close", 5);
+        m_pstl_min_queue_interval_close = tryToRead("pstl_min_queue_interval_close", 500);
+        m_pstl_max_queue_interval_close = tryToRead("pstl_max_queue_interval_close", 750);
     }
     {
-        m_shtg_min_queue_size_far = tryToRead("shtg_min_queue_size_far", min_queue_size_far, 1);
-        m_shtg_max_queue_size_far = tryToRead("shtg_max_queue_size_far", max_queue_size_far, 1);
-        m_shtg_min_queue_interval_far = tryToRead("shtg_min_queue_interval_far", min_queue_interval_far, 1250);
-        m_shtg_max_queue_interval_far = tryToRead("shtg_max_queue_interval_far", max_queue_interval_far, 1500);
+        m_shtg_min_queue_size_far = tryToRead("shtg_min_queue_size_far", 1);
+        m_shtg_max_queue_size_far = tryToRead("shtg_max_queue_size_far", 1);
+        m_shtg_min_queue_interval_far = tryToRead("shtg_min_queue_interval_far", 1250);
+        m_shtg_max_queue_interval_far = tryToRead("shtg_max_queue_interval_far", 1500);
 
-        m_shtg_min_queue_size_medium = tryToRead("shtg_min_queue_size_medium", min_queue_size_medium, 1);
-        m_shtg_max_queue_size_medium = tryToRead("shtg_max_queue_size_medium", max_queue_size_medium, 1);
-        m_shtg_min_queue_interval_medium = tryToRead("shtg_min_queue_interval_medium", min_queue_interval_medium, 750);
-        m_shtg_max_queue_interval_medium = tryToRead("shtg_max_queue_interval_medium", max_queue_interval_medium, 1250);
+        m_shtg_min_queue_size_medium = tryToRead("shtg_min_queue_size_medium", 1);
+        m_shtg_max_queue_size_medium = tryToRead("shtg_max_queue_size_medium", 1);
+        m_shtg_min_queue_interval_medium = tryToRead("shtg_min_queue_interval_medium", 750);
+        m_shtg_max_queue_interval_medium = tryToRead("shtg_max_queue_interval_medium", 1250);
 
-        m_shtg_min_queue_size_close = tryToRead("shtg_min_queue_size_close", min_queue_size_close, 1);
-        m_shtg_max_queue_size_close = tryToRead("shtg_max_queue_size_close", max_queue_size_close, 1);
-        m_shtg_min_queue_interval_close = tryToRead("shtg_min_queue_interval_close", min_queue_interval_close, 500);
-        m_shtg_max_queue_interval_close = tryToRead("shtg_max_queue_interval_close", max_queue_interval_close, 1000);
+        m_shtg_min_queue_size_close = tryToRead("shtg_min_queue_size_close", 1);
+        m_shtg_max_queue_size_close = tryToRead("shtg_max_queue_size_close", 1);
+        m_shtg_min_queue_interval_close = tryToRead("shtg_min_queue_interval_close", 500);
+        m_shtg_max_queue_interval_close = tryToRead("shtg_max_queue_interval_close", 1000);
     }
     {
-        m_snp_min_queue_size_far = tryToRead("snp_min_queue_size_far", min_queue_size_far, 1);
-        m_snp_max_queue_size_far = tryToRead("snp_max_queue_size_far", max_queue_size_far, 1);
-        m_snp_min_queue_interval_far = tryToRead("snp_min_queue_interval_far", min_queue_interval_far, 3000);
-        m_snp_max_queue_interval_far = tryToRead("snp_max_queue_interval_far", max_queue_interval_far, 4000);
+        m_snp_min_queue_size_far = tryToRead("snp_min_queue_size_far", 1);
+        m_snp_max_queue_size_far = tryToRead("snp_max_queue_size_far", 1);
+        m_snp_min_queue_interval_far = tryToRead("snp_min_queue_interval_far", 3000);
+        m_snp_max_queue_interval_far = tryToRead("snp_max_queue_interval_far", 4000);
 
-        m_snp_min_queue_size_medium = tryToRead("snp_min_queue_size_medium", min_queue_size_medium, 1);
-        m_snp_max_queue_size_medium = tryToRead("snp_max_queue_size_medium", max_queue_size_medium, 1);
-        m_snp_min_queue_interval_medium = tryToRead("snp_min_queue_interval_medium", min_queue_interval_medium, 3000);
-        m_snp_max_queue_interval_medium = tryToRead("snp_max_queue_interval_medium", max_queue_interval_medium, 4000);
+        m_snp_min_queue_size_medium = tryToRead("snp_min_queue_size_medium", 1);
+        m_snp_max_queue_size_medium = tryToRead("snp_max_queue_size_medium", 1);
+        m_snp_min_queue_interval_medium = tryToRead("snp_min_queue_interval_medium", 3000);
+        m_snp_max_queue_interval_medium = tryToRead("snp_max_queue_interval_medium", 4000);
 
-        m_snp_min_queue_size_close = tryToRead("snp_min_queue_size_close", min_queue_size_close, 1);
-        m_snp_max_queue_size_close = tryToRead("snp_max_queue_size_close", max_queue_size_close, 1);
-        m_snp_min_queue_interval_close = tryToRead("snp_min_queue_interval_close", min_queue_interval_close, 3000);
-        m_snp_max_queue_interval_close = tryToRead("snp_max_queue_interval_close", max_queue_interval_close, 4000);
+        m_snp_min_queue_size_close = tryToRead("snp_min_queue_size_close", 1);
+        m_snp_max_queue_size_close = tryToRead("snp_max_queue_size_close", 1);
+        m_snp_min_queue_interval_close = tryToRead("snp_min_queue_interval_close", 3000);
+        m_snp_max_queue_interval_close = tryToRead("snp_max_queue_interval_close", 4000);
     }
     {
-        m_mchg_min_queue_size_far = tryToRead("mchg_min_queue_size_far", min_queue_size_far, 1);
-        m_mchg_max_queue_size_far = tryToRead("mchg_max_queue_size_far", max_queue_size_far, 6);
-        m_mchg_min_queue_interval_far = tryToRead("mchg_min_queue_interval_far", min_queue_interval_far, 500);
-        m_mchg_max_queue_interval_far = tryToRead("mchg_max_queue_interval_far", max_queue_interval_far, 1000);
+        m_mchg_min_queue_size_far = tryToRead("mchg_min_queue_size_far", 1);
+        m_mchg_max_queue_size_far = tryToRead("mchg_max_queue_size_far", 6);
+        m_mchg_min_queue_interval_far = tryToRead("mchg_min_queue_interval_far", 500);
+        m_mchg_max_queue_interval_far = tryToRead("mchg_max_queue_interval_far", 1000);
 
-        m_mchg_min_queue_size_medium = tryToRead("mchg_min_queue_size_medium", min_queue_size_medium, 4);
-        m_mchg_max_queue_size_medium = tryToRead("mchg_max_queue_size_medium", max_queue_size_medium, 6);
-        m_mchg_min_queue_interval_medium = tryToRead("mchg_min_queue_interval_medium", min_queue_interval_medium, 500);
-        m_mchg_max_queue_interval_medium = tryToRead("mchg_max_queue_interval_medium", max_queue_interval_medium, 750);
+        m_mchg_min_queue_size_medium = tryToRead("mchg_min_queue_size_medium", 4);
+        m_mchg_max_queue_size_medium = tryToRead("mchg_max_queue_size_medium", 6);
+        m_mchg_min_queue_interval_medium = tryToRead("mchg_min_queue_interval_medium", 500);
+        m_mchg_max_queue_interval_medium = tryToRead("mchg_max_queue_interval_medium", 750);
 
-        m_mchg_min_queue_size_close = tryToRead("mchg_min_queue_size_close", min_queue_size_close, 4);
-        m_mchg_max_queue_size_close = tryToRead("mchg_max_queue_size_close", max_queue_size_close, 10);
-        m_mchg_min_queue_interval_close = tryToRead("mchg_min_queue_interval_close", min_queue_interval_close, 300);
-        m_mchg_max_queue_interval_close = tryToRead("mchg_max_queue_interval_close", max_queue_interval_close, 500);
+        m_mchg_min_queue_size_close = tryToRead("mchg_min_queue_size_close", 4);
+        m_mchg_max_queue_size_close = tryToRead("mchg_max_queue_size_close", 10);
+        m_mchg_min_queue_interval_close = tryToRead("mchg_min_queue_interval_close", 300);
+        m_mchg_max_queue_interval_close = tryToRead("mchg_max_queue_interval_close", 500);
     }
     {
-        m_auto_min_queue_size_far = tryToRead("auto_min_queue_size_far", min_queue_size_far, 1);
-        m_auto_max_queue_size_far = tryToRead("auto_max_queue_size_far", max_queue_size_far, 6);
-        m_auto_min_queue_interval_far = tryToRead("auto_min_queue_interval_far", min_queue_interval_far, 500);
-        m_auto_max_queue_interval_far = tryToRead("auto_max_queue_interval_far", max_queue_interval_far, 1000);
+        const u32 min_queue_size_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_size_far", 1);
+        const u32 max_queue_size_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_size_far", 6);
+        const u32 min_queue_interval_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_interval_far", 500);
+        const u32 max_queue_interval_far = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_interval_far", 1000);
 
-        m_auto_min_queue_size_medium = tryToRead("auto_min_queue_size_medium", min_queue_size_medium, 4);
-        m_auto_max_queue_size_medium = tryToRead("auto_max_queue_size_medium", max_queue_size_medium, 6);
-        m_auto_min_queue_interval_medium = tryToRead("auto_min_queue_interval_medium", min_queue_interval_medium, 500);
-        m_auto_max_queue_interval_medium = tryToRead("auto_max_queue_interval_medium", max_queue_interval_medium, 750);
+        const u32 min_queue_size_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_size_medium", 4);
+        const u32 max_queue_size_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_size_medium", 6);
+        const u32 min_queue_interval_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_interval_medium", 500);
+        const u32 max_queue_interval_medium = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_interval_medium", 750);
 
-        m_auto_min_queue_size_close = tryToRead("auto_min_queue_size_close", min_queue_size_close, 4);
-        m_auto_max_queue_size_close = tryToRead("auto_max_queue_size_close", max_queue_size_close, 10);
-        m_auto_min_queue_interval_close = tryToRead("auto_min_queue_interval_close", min_queue_interval_close, 300);
-        m_auto_max_queue_interval_close = tryToRead("auto_max_queue_interval_close", max_queue_interval_close, 500);
+        const u32 min_queue_size_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_size_close", 4);
+        const u32 max_queue_size_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_size_close", 10);
+        const u32 min_queue_interval_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_min_queue_interval_close", 300);
+        const u32 max_queue_interval_close = pSettings->read_if_exists<u32>(queue_sect, "weapon_max_queue_interval_close", 500);
+
+        m_auto_min_queue_size_far = tryToRead("auto_min_queue_size_far", min_queue_size_far);
+        m_auto_max_queue_size_far = tryToRead("auto_max_queue_size_far", max_queue_size_far);
+        m_auto_min_queue_interval_far = tryToRead("auto_min_queue_interval_far", min_queue_interval_far);
+        m_auto_max_queue_interval_far = tryToRead("auto_max_queue_interval_far", max_queue_interval_far);
+
+        m_auto_min_queue_size_medium = tryToRead("auto_min_queue_size_medium", min_queue_size_medium);
+        m_auto_max_queue_size_medium = tryToRead("auto_max_queue_size_medium", max_queue_size_medium);
+        m_auto_min_queue_interval_medium = tryToRead("auto_min_queue_interval_medium", min_queue_interval_medium);
+        m_auto_max_queue_interval_medium = tryToRead("auto_max_queue_interval_medium", max_queue_interval_medium);
+
+        m_auto_min_queue_size_close = tryToRead("auto_min_queue_size_close", min_queue_size_close);
+        m_auto_max_queue_size_close = tryToRead("auto_max_queue_size_close", max_queue_size_close);
+        m_auto_min_queue_interval_close = tryToRead("auto_min_queue_interval_close", min_queue_interval_close);
+        m_auto_max_queue_interval_close = tryToRead("auto_max_queue_interval_close", max_queue_interval_close);
     }
 
     {
@@ -450,8 +447,7 @@ void CAI_Stalker::reload(LPCSTR section)
         m_mchg_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, queue_sect, "mchg_queue_fire_dist_far", 30.0f);
     }
     {
-        // m_auto_queue_fire_dist_close =
-        // READ_IF_EXISTS(pSettings,r_float,queue_sect,"auto_queue_fire_dist_close", 15.0f);
+        // m_auto_queue_fire_dist_close = READ_IF_EXISTS(pSettings,r_float,queue_sect,"auto_queue_fire_dist_close", 15.0f);
         m_auto_queue_fire_dist_med = READ_IF_EXISTS(pSettings, r_float, queue_sect, "auto_queue_fire_dist_med", 15.0f);
         m_auto_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, queue_sect, "auto_queue_fire_dist_far", 30.0f);
     }
