@@ -234,3 +234,13 @@ bool CHW::ThisInstanceIsGlobal() const
 {
     return this == &HW;
 }
+
+void CHW::BeginPixEvent(pcstr name) const
+{
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
+}
+
+void CHW::EndPixEvent() const
+{
+    glPopDebugGroup();
+}

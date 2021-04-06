@@ -34,8 +34,8 @@ private:
     bool ThisInstanceIsGlobal() const;
 
 public:
-    void BeginPixEvent(const wchar_t* wszName) const {}
-    void EndPixEvent() const {}
+    void BeginPixEvent(pcstr name) const;
+    void EndPixEvent() const;
 
 public:
     CHWCaps Caps;
