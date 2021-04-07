@@ -2668,6 +2668,11 @@ target_compile_definitions(${PROJECT_NAME}
     -DXRGAME_EXPORTS
 )
 
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    -Wno-trigraphs
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
 )

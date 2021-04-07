@@ -429,14 +429,7 @@ void _initialize_cpu()
 #define _MM_SET_DENORMALS_ZERO_MODE(mode)
 #else
 #include <xmmintrin.h>
-#define _MM_SET_FLUSH_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_FLUSH_ZERO_MASK) | (mode))
-#define _MM_SET_DENORMALS_ZERO_MODE(mode) _mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (mode))
 #endif
-
-#define _MM_DENORMALS_ZERO_MASK 0x0040
-#define _MM_DENORMALS_ZERO_ON 0x0040
-#define _MM_FLUSH_ZERO_MASK 0x8000
-#define _MM_FLUSH_ZERO_ON 0x8000
 
 static BOOL _denormals_are_zero_supported = TRUE;
 extern void __cdecl _terminate();

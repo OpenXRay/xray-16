@@ -14,7 +14,7 @@
 #include "inventory_upgrade_group.h"
 #include "inventory_upgrade_property.h"
 
-extern int g_upgrades_log = 0;
+int g_upgrades_log = 0;
 
 namespace inventory
 {
