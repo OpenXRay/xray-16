@@ -218,7 +218,7 @@ TaskManager::TaskManager()
     workers.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread(task_worker_entry, "X-Ray Task Worker Thread", 0, this);
+        Threading::SpawnThread(task_worker_entry, "Task Worker", 0, this);
     }
     CalcIterations();
     while (threads != workersCount.load(std::memory_order_consume))
