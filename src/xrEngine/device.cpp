@@ -22,6 +22,7 @@
 
 #include "xrCore/FS_impl.h"
 #include "xrCore/Threading/TaskManager.hpp"
+#include "xrCore/command_line_key.h"
 
 #include "Include/editor/ide.hpp"
 
@@ -44,6 +45,8 @@ constexpr size_t MAX_WINDOW_EVENTS = 32;
 
 bool g_bLoaded = false;
 ref_light precache_light = 0;
+
+static command_line_key<bool> center_screen("-center_screen", "center_screen", false);
 
 bool CRenderDevice::RenderBegin()
 {
@@ -442,7 +445,7 @@ void CRenderDevice::Run()
     UpdateWindowProps();
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
-    if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
+    if (GEnv.isDedicatedServer || center_screen.OptionValue())
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
     // Message cycle

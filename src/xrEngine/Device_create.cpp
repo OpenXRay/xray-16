@@ -1,7 +1,13 @@
 #include "stdafx.h"
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
+#include "xrCore/command_line_key.h"
 #include "xrCDB/xrXRC.h"
+
+static command_line_key<bool> gpu_sw("-gpu_sw", "gpu_sw", false);
+static command_line_key<bool> gpu_nopure("-gpu_nopure", "gpu_nopure", false);
+static command_line_key<bool> gpu_ref("-gpu_ref", "gpu_ref", false);
+static command_line_key<bool> draw_borders("-draw_borders", "draw_borders", false);
 
 extern XRCDB_API bool* cdb_bDebug;
 
@@ -35,10 +41,8 @@ void CRenderDevice::CreateInternal()
         return; // prevent double call
 
     Statistic = xr_new<CStats>();
-    bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
-    bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
-    bool gpuRef = !!strstr(Core.Params, "-gpu_ref");
-    GEnv.Render->SetupGPU(gpuSW, gpuNonPure, gpuRef);
+    GEnv.Render->SetupGPU(gpu_sw.OptionValue(), gpu_nopure.OptionValue(),
+                          gpu_ref.OptionValue());
     Log("Starting RENDER device...");
 #ifdef _EDITOR
     psDeviceMode.Width = dwWidth;

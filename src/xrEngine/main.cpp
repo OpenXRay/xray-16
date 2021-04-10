@@ -28,6 +28,7 @@
 #include "xr_ioc_cmd.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
+#include "xrCore/command_line_key.h"
 
 // global variables
 ENGINE_API CInifile* pGameIni = nullptr;
@@ -40,6 +41,25 @@ ENGINE_API string_path g_sLaunchWorkingFolder;
 ENGINE_API bool CallOfPripyatMode = false;
 ENGINE_API bool ClearSkyMode = false;
 ENGINE_API bool ShadowOfChernobylMode = false;
+
+static command_line_key<bool> unlock_game_mode("-unlock_game_mode", "unlock_game_mode", false);
+static command_line_key<pstr> ltx_flag("-ltx", "ltx", "");
+static command_line_key<bool> captureInput("-i", "Capture input", false);
+static command_line_key<bool> gl_flag("-rgl", "opengl renderer", false);
+static command_line_key<bool> r4_flag("-r4", "r4 renderer", false);
+static command_line_key<bool> r3_flag("-r3", "r3 renderer", false);
+static command_line_key<bool> r25_flag("-r2.5", "r2.5 renderer", false);
+static command_line_key<bool> r2a_flag("-r2a", "r2a renderer", false);
+static command_line_key<bool> r2_flag("-r2", "r2 renderer", false);
+static command_line_key<bool> r1_flag("-r1", "r1 renderer", false);
+#ifdef DEBUG
+static command_line_key<bool> slowdown_flag("-slowdown", "slowdown", false);
+static command_line_key<bool> slowdown2x_flag("-slowdown2x", "slowdown2x", false);
+#endif
+
+
+extern command_line_key<pstr> fsltx_path;
+extern command_line_key<bool> shoc_flag, soc_flag, cs_flag, cop_flag;
 
 namespace
 {
@@ -130,13 +150,13 @@ ENGINE_API void InitSettings()
     InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
     InitConfig(pGameIni, "game.ltx");
 
-    if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+    if (shoc_flag.OptionValue() || soc_flag.OptionValue())
         set_shoc_mode();
-    else if (strstr(Core.Params, "-cs"))
+    else if (cs_flag.OptionValue())
         set_cs_mode();
-    else if (strstr(Core.Params, "-cop"))
+    else if (cop_flag.OptionValue())
         set_cop_mode();
-    else if (strstr(Core.Params, "-unlock_game_mode"))
+    else if (unlock_game_mode.OptionValue())
         set_free_mode();
     else
     {
@@ -161,18 +181,13 @@ ENGINE_API void InitConsole()
 
     Console->Initialize();
     xr_strcpy(Console->ConfigFile, "user.ltx");
-    if (strstr(Core.Params, "-ltx "))
-    {
-        string64 c_name;
-        sscanf(strstr(Core.Params, "-ltx ") + strlen("-ltx "), "%[^ ] ", c_name);
-        xr_strcpy(Console->ConfigFile, c_name);
-    }
+    if (ltx_flag.IsProvided())
+        xr_strcpy(Console->ConfigFile, ltx_flag.OptionValue());
 }
 
 ENGINE_API void InitInput()
 {
-    bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
-    pInput = xr_new<CInput>(captureInput);
+    pInput = xr_new<CInput>(captureInput.OptionValue());
 }
 
 ENGINE_API void destroyInput() { xr_delete(pInput); }
@@ -219,19 +234,19 @@ void CheckAndSetupRenderer()
         return;
     }
 
-    if (strstr(Core.Params, "-rgl"))
+    if (gl_flag.OptionValue())
         Console->Execute("renderer renderer_rgl");
-    else if (strstr(Core.Params, "-r4"))
+    else if (r4_flag.OptionValue())
         Console->Execute("renderer renderer_r4");
-    else if (strstr(Core.Params, "-r3"))
+    else if (r3_flag.OptionValue())
         Console->Execute("renderer renderer_r3");
-    else if (strstr(Core.Params, "-r2.5"))
+    else if (r25_flag.OptionValue())
         Console->Execute("renderer renderer_r2.5");
-    else if (strstr(Core.Params, "-r2a"))
+    else if (r2a_flag.OptionValue())
         Console->Execute("renderer renderer_r2a");
-    else if (strstr(Core.Params, "-r2"))
+    else if (r2_flag.OptionValue())
         Console->Execute("renderer renderer_r2");
-    else if (strstr(Core.Params, "-r1"))
+    else if (r1_flag.OptionValue())
         Console->Execute("renderer renderer_r1");
     else
     {
@@ -254,9 +269,9 @@ void slowdownthread(void*)
 void CheckPrivilegySlowdown()
 {
 #ifdef DEBUG
-    if (strstr(Core.Params, "-slowdown"))
+    if (slowdown_flag.OptionValue())
         Threading::SpawnThread(slowdownthread, "slowdown", 0, 0);
-    if (strstr(Core.Params, "-slowdown2x"))
+    if (slowdown2x_flag.OptionValue())
     {
         Threading::SpawnThread(slowdownthread, "slowdown", 0, 0);
         Threading::SpawnThread(slowdownthread, "slowdown", 0, 0);

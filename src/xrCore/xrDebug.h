@@ -82,7 +82,7 @@ private:
 
 public:
     xrDebug() = delete;
-    static void Initialize(pcstr commandLine);
+    static void Initialize();
     static void Destroy();
     static void OnThreadSpawn();
     static void OnFilesystemInitialized();

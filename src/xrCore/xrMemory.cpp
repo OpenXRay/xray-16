@@ -47,6 +47,11 @@ constexpr size_t xr_reserved_tail = 0;
 
 constexpr size_t DEFAULT_ALIGNMENT = 16;
 
+#if defined(XR_PLATFORM_WINDOWS)
+static command_line_key<bool> swap_on_compact("-swap_on_compact", "swap_on_compact", false);
+#endif
+
+
 xrMemory Memory;
 // Also used in src\xrCore\xrDebug.cpp to prevent use of g_pStringContainer before it initialized
 bool shared_str_initialized = false;
@@ -139,7 +144,7 @@ void xrMemory::mem_compact()
         g_pSharedMemoryContainer->clean();
 
 #if defined(XR_PLATFORM_WINDOWS)
-    if (strstr(Core.Params, "-swap_on_compact"))
+    if (swap_on_compact.OptionValue())
         SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
 #endif
 }

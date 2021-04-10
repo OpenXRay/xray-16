@@ -12,6 +12,8 @@
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
+static command_line_key<bool> ivtune("-tune", "intel vtune", false);
+
 extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
@@ -134,7 +136,7 @@ void CEngineAPI::Initialize(void)
     //////////////////////////////////////////////////////////////////////////
     // vTune
     tune_enabled = false;
-    if (strstr(Core.Params, "-tune"))
+    if (ivtune.OptionValue())
     {
         hTuner = XRay::LoadModule("vTuneAPI");
         tune_pause = (VTPause*)hTuner->GetProcAddress("VTPause");

@@ -8,12 +8,16 @@
 #include "Render.h"
 #include "GameFont.h"
 #include "Common/LevelStructure.hpp"
+#include "xrCore/command_line_key.h"
 #include "CameraManager.h"
 #include "xr_object.h"
 #include "Feel_Sound.h"
 #include "xrServerEntities/smart_cast.h"
 
 ENGINE_API IGame_Level* g_pGameLevel = NULL;
+
+static command_line_key<bool> nes_texture_storing("-nes_texture_storing",
+                                                  "nes_texture_storing", false);
 extern bool g_bLoaded;
 
 IGame_Level::IGame_Level()
@@ -31,7 +35,7 @@ IGame_Level::IGame_Level()
 
 IGame_Level::~IGame_Level()
 {
-    if (strstr(Core.Params, "-nes_texture_storing"))
+    if (nes_texture_storing.OptionValue())
         GEnv.Render->ResourcesStoreNecessaryTextures();
     xr_delete(pLevel);
 

@@ -18,6 +18,8 @@
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
 
+static command_line_key<bool> xclsx("-xclsx", "xclsx", false);
+
 ENGINE_API CStatTimer gTestTimer0;
 ENGINE_API CStatTimer gTestTimer1;
 ENGINE_API CStatTimer gTestTimer2;
@@ -249,7 +251,7 @@ void CStats::Show()
 
 void CStats::OnDeviceCreate()
 {
-    g_bDisableRedText = !!strstr(Core.Params, "-xclsx");
+    g_bDisableRedText = xclsx.OptionValue();
 
     if (!GEnv.isDedicatedServer)
     {

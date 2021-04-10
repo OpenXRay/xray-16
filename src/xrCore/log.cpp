@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "log.h"
 #include "xrCore/Threading/Lock.hpp"
+#include "command_line_key.h"
 
 BOOL LogExecCB = TRUE;
 string_path logFName = "engine.log";
@@ -21,6 +22,8 @@ LogCallback LogCB = 0;
 bool ForceFlushLog = false;
 IWriter* LogWriter = nullptr;
 //size_t CachedLog = 0;
+
+static command_line_key<bool> force_flushlog("-force_flushlog", "force_flushlog", false);
 
 void FlushLog()
 {
@@ -246,7 +249,7 @@ void CreateLog(BOOL nl)
         LogWriter->flush();
     }
 
-    if (strstr(Core.Params, "-force_flushlog"))
+    if (force_flushlog.OptionValue())
         ForceFlushLog = true;
 }
 

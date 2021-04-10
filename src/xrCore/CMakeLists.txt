@@ -6,6 +6,8 @@ set(SRC_FILES
     "buffer_vector_inline.h"
     "cdecl_cast.hpp"
     "ChooseTypes.H"
+    "command_line_key.cpp"
+    "command_line_key.h"
     "client_id.h"
     "clsid.cpp"
     "clsid.h"

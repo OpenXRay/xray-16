@@ -17,6 +17,7 @@
 #include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 #include "Threading/TaskManager.hpp"
+#include "command_line_key.h"
 
 #include "SDL.h"
 
@@ -28,6 +29,18 @@
 extern compression::ppmd::stream* trained_model;
 
 XRCORE_API xrCore Core;
+
+XRCORE_API command_line_key<pstr> fsltx_path("-fsltx", "path to game config ltx", "");
+XRCORE_API command_line_key<bool> shoc_flag("-shoc", "Shadow of Chernobyl Mode", false);
+XRCORE_API command_line_key<bool> soc_flag("-soc", "Shadow of Chernobyl Mode", false);
+XRCORE_API command_line_key<bool> cs_flag("-cs", "Clear Sky Mode", false);
+XRCORE_API command_line_key<bool> cop_flag("-cop", "Call of Pripyat Mode", false);
+
+static command_line_key<bool> build_flag("-build", "build", false);
+static command_line_key<bool> ebuild_flag("-ebuild", "ebuild", false);
+static command_line_key<bool> cache_flag("-cache", "cache files", false);
+static command_line_key<bool> file_activity("-file_activity", "dump file activity", false);
+static command_line_key<pstr> wdir_path("-wf", "work directory", "");
 
 static u32 init_counter = 0;
 
@@ -184,13 +197,13 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #else
         char* pref_path = nullptr;
-        if (strstr(Core.Params, "-fsltx"))
+        if (fsltx_path.IsProvided())
             pref_path = SDL_GetBasePath();
         else
         {
-            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+            if (shoc_flag.OptionValue() || soc_flag.OptionValue())
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
-            else if (strstr(Core.Params, "-cs"))
+            else if (soc_flag.OptionValue())
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
             else
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
@@ -201,12 +214,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
 #ifdef _EDITOR
         // working path
-        if (strstr(Params, "-wf"))
-        {
-            string_path c_name;
-            sscanf(strstr(Core.Params, "-wf ") + 4, "%[^ ] ", c_name);
-            SetCurrentDirectory(c_name);
-        }
+        if (wdir_path.IsProvided())
+            SetCurrentDirectory(wdir_path.OptionValue());
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -217,7 +226,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
         * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
         * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
-        if (!strstr(Core.Params, "-fsltx"))
+        if (!fsltx_path.IsProvided())
         {
             chdir(ApplicationPath);
             constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
@@ -302,15 +311,16 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         xr_EFS = xr_make_unique<EFS_Utils>();
         //. R_ASSERT (co_res==S_OK);
     }
+
     if (init_fs)
     {
         u32 flags = 0u;
-        if (strstr(Params, "-build") != nullptr)
+        if (build_flag.OptionValue())
             flags |= CLocatorAPI::flBuildCopy;
-        if (strstr(Params, "-ebuild") != nullptr)
+        if (ebuild_flag.OptionValue())
             flags |= CLocatorAPI::flBuildCopy | CLocatorAPI::flEBuildCopy;
 #ifdef DEBUG
-        if (strstr(Params, "-cache"))
+        if (cache_flag.OptionValue())
             flags |= CLocatorAPI::flCacheFiles;
         else
             flags &= ~CLocatorAPI::flCacheFiles;
@@ -322,7 +332,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
-        if (strstr(Params, "-file_activity") != nullptr)
+        if (file_activity.OptionValue())
             flags |= CLocatorAPI::flDumpFileActivity;
 #endif
 #endif

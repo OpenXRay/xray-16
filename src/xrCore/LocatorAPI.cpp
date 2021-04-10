@@ -19,6 +19,7 @@
 #include "file_stream_reader.h"
 #include "xrCore/Threading/Lock.hpp"
 #include "Crypto/trivial_encryptor.h"
+#include "command_line_key.h"
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include "SDL.h"
@@ -37,6 +38,14 @@ static constexpr pcstr FSLTX = "fs.ltx"
 #else
 static constexpr pcstr FSLTX = "fsgame.ltx";
 #endif
+
+static command_line_key<bool> auto_load_arch("-auto_load_arch", "auto_load_arch", false);
+static command_line_key<pstr> overlaypath("-overlaypath", "overlaypath", "");
+static command_line_key<bool> nolog("-nolog", "nolog", false);
+
+extern command_line_key<pstr> fsltx_path;
+extern command_line_key<bool> shoc_flag, soc_flag, cs_flag;
+
 
 struct _open_file
 {
@@ -547,7 +556,7 @@ void CLocatorAPI::ProcessArchive(pcstr _path)
         hdr->close();
         bProcessArchiveLoading = A.header->r_bool("header", "auto_load");
     }
-    if (bProcessArchiveLoading || strstr(Core.Params, "-auto_load_arch"))
+    if (bProcessArchiveLoading || auto_load_arch.OptionValue())
         LoadArchive(A);
     else
         A.close();
@@ -826,13 +835,13 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     else
     {
         char* pref_path = nullptr;
-        if (strstr(Core.Params, "-fsltx"))
+        if (fsltx_path.IsProvided())
             pref_path = SDL_GetBasePath();
         else
         {
-            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+            if (shoc_flag.IsProvided() || soc_flag.IsProvided())
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
-            else if (strstr(Core.Params, "-cs"))
+            else if (cs_flag.IsProvided())
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
             else
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
@@ -979,18 +988,17 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
 
     Msg("Init FileSystem %f sec", t.GetElapsed_sec());
     //-----------------------------------------------------------
-    if (strstr(Core.Params, "-overlaypath"))
+
+    if (overlaypath.IsProvided())
     {
-        string1024 c_newAppPathRoot;
-        sscanf(strstr(Core.Params, "-overlaypath ") + 13, "%[^ ] ", c_newAppPathRoot);
         FS_Path* pLogsPath = get_path("$logs$");
         FS_Path* pAppdataPath = get_path("$app_data_root$");
 
         if (pLogsPath)
-            pLogsPath->_set_root(c_newAppPathRoot);
+            pLogsPath->_set_root(overlaypath.OptionValue());
         if (pAppdataPath)
         {
-            pAppdataPath->_set_root(c_newAppPathRoot);
+            pAppdataPath->_set_root(overlaypath.OptionValue());
             rescan_path(pAppdataPath->m_Path, pAppdataPath->m_Flags.is(FS_Path::flRecurse));
         }
     }
@@ -998,7 +1006,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     rec_files.clear();
     //-----------------------------------------------------------
 
-    CreateLog(nullptr != strstr(Core.Params, "-nolog"));
+    CreateLog(nolog.OptionValue());
     xrDebug::OnFilesystemInitialized();
 }
 

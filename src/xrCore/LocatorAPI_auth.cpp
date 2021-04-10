@@ -2,6 +2,12 @@
 #pragma hdrstop // huh?
 #include "xrCore/Threading/Lock.hpp"
 
+#ifdef DEBUG
+static command_line_key<bool> auth_debug("auth_debug", "auth_debug", false);
+static command_line_key<int> b_extern_auth("asdf", "b_extern_auth", 0);
+#endif
+
+
 struct auth_options
 {
     xr_vector<shared_str> ignore;
@@ -35,7 +41,7 @@ void CLocatorAPI::auth_runtime(void* params)
     m_auth_code = crc32(writer.pointer(), writer.size());
 
 #ifdef DEBUG
-    if (strstr(Core.Params, "auth_debug"))
+    if (auth_debug.OptionValue())
     {
         string_path tmp_path;
         update_path(tmp_path, "$app_data_root$", "auth_psettings.ltx");
@@ -48,8 +54,7 @@ void CLocatorAPI::auth_runtime(void* params)
     bool do_break = false;
 
 #ifdef DEBUG
-    bool b_extern_auth = !!strstr(Core.Params, "asdf");
-    if (!b_extern_auth)
+    if (!b_extern_auth.OptionValue())
 #endif // DEBUG
     {
         for (auto it = m_files.begin(); it != m_files.end(); ++it)
@@ -82,7 +87,7 @@ void CLocatorAPI::auth_runtime(void* params)
                     u32 crc = crc32(r->pointer(), r->length());
 
 #ifdef DEBUG
-                    if (strstr(Core.Params, "auth_debug"))
+                    if (auth_debug.OptionValue())
                         Msg("auth %s = 0x%08x", f.name, crc);
 #endif // DEBUG
 
@@ -101,9 +106,7 @@ void CLocatorAPI::auth_runtime(void* params)
 #ifdef DEBUG
     else
     {
-        string64 c_auth_code;
-        sscanf(strstr(Core.Params, "asdf ") + 5, "%[^ ] ", c_auth_code);
-        m_auth_code = atoll(c_auth_code);
+        m_auth_code = b_extern_auth.OptionValue();
     }
 #endif // DEBUG
     xr_delete(_o);

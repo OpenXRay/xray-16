@@ -4,6 +4,7 @@
 #include "xrEngine/xr_object.h"
 #include "Common/LevelStructure.hpp"
 #include "xrEngine/xr_collide_form.h"
+#include "xrCore/command_line_key.h"
 
 
 //----------------------------------------------------------------------
@@ -15,6 +16,8 @@ thread_local collide::rq_results CObjectSpaceData::r_temp;
 thread_local xr_vector<ISpatial*> CObjectSpaceData::r_spatial;
 
 using namespace collide;
+
+static command_line_key<bool> cdb_cache("-cdb_cache", "Cache CDB data", false);
 
 //----------------------------------------------------------------------
 // Class	: CObjectSpace
@@ -119,7 +122,7 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
     bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
     FS.update_path(fName, "$app_data_root$", fName);
-    if (bUseCache && FS.exist(fName) && Static.deserialize(fName))
+    if (cdb_cache.OptionValue() && FS.exist(fName) && Static.deserialize(fName))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded ObjectSpace cache (%s)...", fName);
@@ -133,7 +136,7 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
 #endif
         Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
 
-        if (bUseCache)
+        if (cdb_cache.OptionValue())
             Static.serialize(fName);
     }
 

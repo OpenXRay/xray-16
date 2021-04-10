@@ -5,6 +5,7 @@
 
 #include "xrCDB.h"
 #include "xrCore/Threading/Lock.hpp"
+#include "xrCore/command_line_key.h"
 
 namespace Opcode
 {
@@ -13,6 +14,8 @@ namespace Opcode
 
 using namespace CDB;
 using namespace Opcode;
+
+static command_line_key<bool> mt_cdb("-mt_cdb", "mt_cdb", false);
 
 // Model building
 MODEL::MODEL() :
@@ -81,7 +84,7 @@ void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, vo
 #ifdef _EDITOR
     build_internal(V, Vcnt, T, Tcnt, bc, bcp);
 #else
-    if (!strstr(Core.Params, "-mt_cdb"))
+    if (!mt_cdb.OptionValue())
     {
         build_internal(V, Vcnt, T, Tcnt, bc, bcp);
         status = S_READY;

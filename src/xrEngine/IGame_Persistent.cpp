@@ -4,6 +4,7 @@
 #include "IGame_Persistent.h"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
+#include "xrCore/command_line_key.h"
 
 #ifndef _EDITOR
 #include "Environment.h"
@@ -16,6 +17,10 @@
 #endif
 
 #include "Include/editor/ide.hpp"
+
+#ifndef _EDITOR
+static command_line_key<bool> noprefetch("-noprefetch", "noprefetch", false);
+#endif
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
@@ -134,7 +139,7 @@ void IGame_Persistent::OnGameStart()
 #ifndef _EDITOR
     SetLoadStageTitle("st_prefetching_objects");
     LoadTitle();
-    if (!strstr(Core.Params, "-noprefetch"))
+    if (!noprefetch.OptionValue())
         Prefetch();
 #endif
 }

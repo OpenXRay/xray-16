@@ -7,6 +7,7 @@
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "log.h"
+#include "command_line_key.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Debug/dxerr.h"
 #endif
@@ -63,6 +64,9 @@ static BOOL bException = FALSE;
 #       error CPU architecture is not supported.
 #   endif
 #endif // XR_PLATFORM_WINDOWS
+
+static command_line_key<bool> show_error_window("-show_error_window",
+                                        "show error window", false);
 
 constexpr SDL_MessageBoxButtonData buttons[] =
 {
@@ -919,7 +923,7 @@ void xrDebug::OnThreadSpawn()
 #endif
 }
 
-void xrDebug::Initialize(pcstr commandLine)
+void xrDebug::Initialize()
 {
     *BugReportFile = 0;
     OnThreadSpawn();
@@ -932,6 +936,6 @@ void xrDebug::Initialize(pcstr commandLine)
 #ifdef DEBUG
     ShowErrorMessage = true;
 #else
-    ShowErrorMessage = commandLine ? !!strstr(commandLine, "-show_error_window") : false;
+    ShowErrorMessage = show_error_window.OptionValue();
 #endif
 }

@@ -1,7 +1,10 @@
+
 #include "stdafx.h"
 #include "resource.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
+#include <shellapi.h>
+#include <windows.h>
 #elif defined(XR_PLATFORM_LINUX)
 #include <unistd.h>
 #include <stdlib.h>
@@ -10,6 +13,7 @@
 #endif
 #include "xrEngine/main.h"
 #include "xrEngine/splash.h"
+#include "xrCore/command_line_key.h"
 #include <SDL.h>
 
 //#define PROFILE_TASK_SYSTEM
@@ -28,22 +32,38 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
+static command_line_key<bool> clhelp("-help", "print this help and exit", false);
+static command_line_key<bool> no_splash("-nosplash", "no splash screen", false);
+static command_line_key<bool> splash_notop("-splashnotop", "splash no top", false);
+static command_line_key<bool> sv_dedicated("-dedicated", "run dedicated server", false);
+
+extern command_line_key<pstr> fsltx_path;
+
+bool HandleArguments(int argc, char *argv[])
+{
+    return (ParseCommandLine(argc, argv) && CLCheckAllArguments());
+}
+
 int entry_point(pcstr commandLine)
 {
-    xrDebug::Initialize(commandLine);
+    if (clhelp.IsProvided()) {
+        CLPrintAllHelp();
+        return 0;
+    }
+
+    xrDebug::Initialize();
     R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
     SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "0");
 
-    if (!strstr(commandLine, "-nosplash"))
+    if (!no_splash.OptionValue())
     {
-        const bool topmost = !strstr(commandLine, "-splashnotop");
+        const bool topmost = !splash_notop.OptionValue();
 #ifndef PROFILE_TASK_SYSTEM
         splash::show(topmost);
 #endif
     }
 
-    if (strstr(commandLine, "-dedicated"))
-        GEnv.isDedicatedServer = true;
+    GEnv.isDedicatedServer = sv_dedicated.OptionValue();
 
 #ifdef XR_PLATFORM_WINDOWS
     AccessibilityShortcuts shortcuts;
@@ -51,15 +71,9 @@ int entry_point(pcstr commandLine)
         shortcuts.Disable();
 #endif
 
-    pcstr fsltx = "-fsltx ";
-    string_path fsgame = "";
-    if (strstr(commandLine, fsltx))
-    {
-        const size_t sz = xr_strlen(fsltx);
-        sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
-    }
 #ifdef PROFILE_TASK_SYSTEM
-    Core.Initialize("OpenXRay", commandLine, nullptr, false, *fsgame ? fsgame : nullptr);
+    Core.Initialize("OpenXRay",commandLine, nullptr, false,
+                    fsltx_path.IsProvided() ? fsltx_path.OptionValue() : nullptr);
 
     const auto task = [](const TaskRange<int>&){};
 
@@ -88,7 +102,8 @@ int entry_point(pcstr commandLine)
 
     const auto result = 0;
 #else
-    Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);
+    Core.Initialize("OpenXRay",commandLine, nullptr, true,
+                    fsltx_path.IsProvided() ? fsltx_path.OptionValue() : nullptr);
 
     const auto result = RunApplication();
 #endif // PROFILE_TASK_SYSTEM
@@ -110,10 +125,17 @@ int StackoverflowFilter(const int exceptionCode)
 int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int cmdShow)
 {
     int result = 0;
+    int argc;
+    char **argv
     // BugTrap can't handle stack overflow exception, so handle it here
     __try
     {
-        result = entry_point(commandLine);
+        argv = CommandLineToArgvW(commandLine, &argc);
+        if (HandleArguments(argc, argv))
+            result = entry_point(commandLine);
+        else
+            result = EXIT_FAILURE;
+        LocalFree(argv);
     }
     __except (StackoverflowFilter(GetExceptionCode()))
     {
@@ -126,6 +148,9 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;
+
+    if (!HandleArguments(argc, argv))
+        return EXIT_FAILURE;
 
     try
     {
