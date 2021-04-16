@@ -2673,6 +2673,13 @@ target_compile_options(${PROJECT_NAME}
     -Wno-trigraphs
 )
 
+if ((CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo") AND PROJECT_PLATFORM_E2K) # E2K: hack for debug compile (MCST lcc compiler does not support a file > 4Gb, this is a bug in EDG frontend)
+    target_compile_options(${PROJECT_NAME} 
+        PRIVATE
+        -g0 
+    )
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
 )
