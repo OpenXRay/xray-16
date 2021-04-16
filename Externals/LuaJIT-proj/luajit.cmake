@@ -309,14 +309,21 @@ target_link_libraries(minilua
 
 set(DASM_DASC ${LUAJIT_DIR}/vm_${DASM_ARCH}.dasc)
 set(DASM ${LUAJIT_DIR}/../dynasm/dynasm.lua)
-set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
+
+if (PROJECT_PLATFORM_E2K)
+    set(BUILDVM_ARCH "${LUAJIT_DIR}/host/buildvm_arch.h")
+else()
+    set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
+endif()
 
 # Generate buildvm arch header
-add_custom_target(buildvm_arch
-	COMMAND minilua ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
-	DEPENDS minilua
-	BYPRODUCTS ${BUILDVM_ARCH}
-)
+if (NOT PROJECT_PLATFORM_E2K)
+    add_custom_target(buildvm_arch
+        COMMAND minilua ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
+        DEPENDS minilua
+        BYPRODUCTS ${BUILDVM_ARCH}
+    )
+endif()
 
 # Buildvm
 set(BUILDVM_SRC
@@ -343,7 +350,9 @@ target_compile_options(buildvm
 	${HOST_ACFLAGS}
 )
 
-add_dependencies(buildvm buildvm_arch)
+if (NOT PROJECT_PLATFORM_E2K)
+    add_dependencies(buildvm buildvm_arch)
+endif()
 
 set(LJLIB_C
 	"${LUAJIT_DIR}/lib_base.c"
