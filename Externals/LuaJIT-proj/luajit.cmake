@@ -311,18 +311,22 @@ set(DASM_DASC ${LUAJIT_DIR}/vm_${DASM_ARCH}.dasc)
 set(DASM ${LUAJIT_DIR}/../dynasm/dynasm.lua)
 
 if (PROJECT_PLATFORM_E2K)
-    set(BUILDVM_ARCH "${LUAJIT_DIR}/host/buildvm_arch.h")
+	set(BUILDVM_ARCH "${LUAJIT_DIR}/host/buildvm_arch.h")
 else()
-    set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
+	set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 endif()
 
 # Generate buildvm arch header
 if (NOT PROJECT_PLATFORM_E2K)
-    add_custom_target(buildvm_arch
-        COMMAND minilua ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
-        DEPENDS minilua
-        BYPRODUCTS ${BUILDVM_ARCH}
-    )
+	add_custom_command(OUTPUT ${BUILDVM_ARCH}
+		COMMAND minilua ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
+		DEPENDS minilua
+	)
+
+	add_custom_target(
+		buildvm_arch
+		DEPENDS ${BUILDVM_ARCH}
+	)
 endif()
 
 # Buildvm
@@ -351,7 +355,7 @@ target_compile_options(buildvm
 )
 
 if (NOT PROJECT_PLATFORM_E2K)
-    add_dependencies(buildvm buildvm_arch)
+	add_dependencies(buildvm buildvm_arch)
 endif()
 
 set(LJLIB_C
@@ -378,7 +382,7 @@ macro(add_buildvm_target target mode)
 		COMMAND buildvm ARGS -m ${mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${target} ${ARGN}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		DEPENDS buildvm ${ARGN}
-)
+	)
 endmacro(add_buildvm_target)
 
 if (WIN32)
