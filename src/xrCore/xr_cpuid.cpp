@@ -289,10 +289,12 @@ bool query_processor_info(processor_info* pinfo)
 }
 
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
-
+bool query_processor_info(processor_info* pinfo)
+{
     *pinfo = {};
     
     return true;
+}
 
 #endif
 
