@@ -275,9 +275,7 @@ void TaskManager::WakeUpIfNeeded()
                 continue;
             if (worker->sleeps.load(std::memory_order_relaxed))
             {
-                // Acquire semantic guarantees that event won't be set
-                // earlier than steal_from will be assigned
-                worker->steal_from.store(steal_from, std::memory_order_acquire);
+                worker->steal_from.store(steal_from);
                 worker->event.Set();
                 break;
             }
