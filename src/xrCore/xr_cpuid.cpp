@@ -292,6 +292,8 @@ bool query_processor_info(processor_info* pinfo)
 bool query_processor_info(processor_info* pinfo)
 {
     *pinfo = {};
+
+    fillInAvailableCpus(pinfo);
     
     return true;
 }
