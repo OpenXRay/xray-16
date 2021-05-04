@@ -275,7 +275,7 @@ void TaskManager::WakeUpIfNeeded()
                 continue;
             if (worker->sleeps.load(std::memory_order_relaxed))
             {
-                worker->steal_from.store(steal_from);
+                worker->steal_from.store(steal_from, std::memory_order_relaxed);
                 worker->event.Set();
                 break;
             }
