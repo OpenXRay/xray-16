@@ -273,39 +273,39 @@ bool query_processor_info(processor_info* pinfo)
     xr_sprintf(pinfo->modelName, "%s (%s)", __builtin_cpu_name(), __builtin_cpu_arch());
     
 
-    #if (defined(__MMX__))
+    #if defined(__MMX__)
         pinfo->features.set(static_cast<u32>(CpuFeature::MMX), true);
     #endif
 
-    #if (defined(__SSE__))
+    #if defined(__SSE__)
     pinfo->features.set(static_cast<u32>(CpuFeature::SSE), true);
     #endif
 
-    #if (defined(__SSE2__))
+    #if defined(__SSE2__)
     pinfo->features.set(static_cast<u32>(CpuFeature::SSE2), true);
     #endif
 
-    #if (defined(__SSE3__))
+    #if defined(__SSE3__)
     pinfo->features.set(static_cast<u32>(CpuFeature::SSE3), true);
     #endif
 
-    #if (defined(__SSSE3__))
+    #if defined(__SSSE3__)
     pinfo->features.set(static_cast<u32>(CpuFeature::SSSE3), true);
     #endif
 
-    #if (defined(__SSE4_1__))
+    #if defined(__SSE4_1__)
     pinfo->features.set(static_cast<u32>(CpuFeature::SSE41), true);
     #endif
 
-    #if (defined(__SSE4_2__))
+    #if defined(__SSE4_2__)
     pinfo->features.set(static_cast<u32>(CpuFeature::SSE42), true);
     #endif
 
-    #if (defined(__AVX__))
+    #if defined(__AVX__)
     pinfo->features.set(static_cast<u32>(CpuFeature::AVX), true);
     #endif
 
-    #if (defined(__AVX2__))
+    #if defined(__AVX2__)
     pinfo->features.set(static_cast<u32>(CpuFeature::AVX2), true);
     #endif
 
