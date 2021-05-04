@@ -472,13 +472,14 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
         hdr->r(&ptr, sizeof(ptr)); // Obtain internal pointer to the file in archive
 
         strconcat(sizeof full, full, fs_entry_point, name);
-        Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, 0);
+        Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, A.modif);
     }
     hdr->close();
 } //-V773
 
 void CLocatorAPI::archive::open()
 {
+    struct stat file_info;
 #if defined(XR_PLATFORM_WINDOWS)
     // Open the file
     if (hSrcFile && hSrcMap)
@@ -488,7 +489,8 @@ void CLocatorAPI::archive::open()
     R_ASSERT(hSrcFile != INVALID_HANDLE_VALUE);
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
-    size = GetFileSize(hSrcFile, nullptr);
+    stat(*path, &file_info);
+    modif = file_info.st_mtime;
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     // Open the file
     if (hSrcFile)
@@ -497,12 +499,12 @@ void CLocatorAPI::archive::open()
     pstr conv_path = xr_strdup(path.c_str());
     convert_path_separators(conv_path);
     hSrcFile = ::open(conv_path, O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    xr_free(conv_path);
     R_ASSERT(hSrcFile != -1);
-    struct stat file_info;
-    ::fstat(hSrcFile, &file_info);
-    size = file_info.st_size;
+    stat(conv_path, &file_info);
+    modif = file_info.st_mtim.tv_sec;
+    xr_free(conv_path);
 #endif
+    size = file_info.st_size;
     R_ASSERT(size > 0);
 }
 
