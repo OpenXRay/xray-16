@@ -403,7 +403,7 @@ void InventoryUtilities::UpdateWeight(CUIStatic& wnd, CInventoryOwner* pInvOwner
     string32 prefix;
 
     if (withPrefix)
-        xr_sprintf(prefix, "%%c[default]%s ", StringTable().translate("ui_inv_weight"));
+        xr_sprintf(prefix, "%%c[default]%s ", StringTable().translate("ui_inv_weight").c_str());
     else
         xr_strcpy(prefix, "");
 

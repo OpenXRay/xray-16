@@ -221,7 +221,7 @@ void CUIRankingWnd::add_achievement(CUIXml& xml, shared_str const& achiev_id)
 {
     if (!pSettings->section_exist(achiev_id))
     {
-        Msg("~ Achievement section [%s] does not exist!", achiev_id);
+        Msg("~ Achievement section [%s] does not exist!", achiev_id.c_str());
         return;
     }
 
