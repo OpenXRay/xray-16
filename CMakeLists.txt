@@ -36,7 +36,7 @@ elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
     set(PROJECT_PLATFORM_E2K TRUE)
 endif()
 
-option(USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" ON)
+option(USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" OFF)
 
 # Memory allocator option
 set(MEMORY_ALLOCATOR "mimalloc" CACHE STRING "Use specific memory allocator (mimalloc/standard)")
