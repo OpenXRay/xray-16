@@ -9,6 +9,7 @@
 #pragma once
 
 #include "xrAICore/Components/problem_solver.h"
+#include "xrAICore/Components/problem_solver_inline.h"
 #include "xrAICore/Navigation/graph_engine.h"
 #include "action_base.h"
 #include "property_evaluator.h"

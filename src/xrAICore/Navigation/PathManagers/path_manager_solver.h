@@ -9,6 +9,7 @@
 #pragma once
 
 #include "xrAICore/Components/problem_solver.h"
+#include "xrAICore/Components/problem_solver_inline.h"
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5, bool T6, typename T7, typename T8,
     typename _DataStorage, typename _Parameters, typename _dist_type, typename _index_type, typename _iteration_type>

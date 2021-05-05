@@ -149,4 +149,3 @@ public:
     virtual void clear();
 };
 
-#include "xrAICore/Components/problem_solver_inline.h"
