@@ -5,6 +5,12 @@
 #include "xrCore/client_id.h"
 #include "xrCore/FTimer.h"
 
+#ifdef XR_NETSERVER_EXPORTS
+#   define XRNETSERVER_API XR_EXPORT
+#else
+#   define XRNETSERVER_API XR_IMPORT
+#endif
+
 // XXX: review and delete
 //#include "xrCore/net_utils.h"
 //#include <dplay/dplay8.h>

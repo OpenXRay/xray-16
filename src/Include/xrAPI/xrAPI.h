@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef XRAPI_EXPORTS
+#define XRAPI_API XR_EXPORT
+#else
+#define XRAPI_API XR_IMPORT
+#endif
+
 class IRender;
 class IRenderFactory;
 class IDebugRender;

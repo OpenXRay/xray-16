@@ -1,5 +1,6 @@
 #include "ximacfg.h"
 
+#define XRCORE_API XR_IMPORT
 #include "xrCore/xrMemory.h"
 
 #ifdef CXIMAGE_AS_SHARED_LIBRARY

@@ -1,5 +1,15 @@
 #pragma once
 
+#ifndef NO_ENGINE_API
+#    ifdef ENGINE_BUILD
+#        define ENGINE_API XR_EXPORT
+#    else
+#        define ENGINE_API XR_IMPORT
+#    endif
+#else
+#    define ENGINE_API
+#endif // !NO_ENGINE_API
+
 #include "EngineAPI.h"
 #include "EventAPI.h"
 #include "xrCore/xrCore_benchmark_macros.h"

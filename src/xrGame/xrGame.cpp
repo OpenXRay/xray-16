@@ -16,7 +16,7 @@ extern void FillUIStyleToken();
 extern void CleanupUIStyleToken();
 
 extern "C" {
-DLL_API IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
+XR_EXPORT IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
 {
     IFactoryObject* object = object_factory().client_object(clsid);
 #ifdef DEBUG
@@ -28,7 +28,7 @@ DLL_API IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
     return (object);
 }
 
-DLL_API void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
+XR_EXPORT void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
 };
 
 void CCC_RegisterCommands();

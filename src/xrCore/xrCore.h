@@ -1,7 +1,5 @@
 #pragma once
 
-#include "xrCore_benchmark_macros.h"
-
 #if !defined(_CPPUNWIND)
 #error Please enable exceptions...
 #endif
@@ -46,6 +44,14 @@
 #endif // frequently in release code due to large amount of VERIFY
 
 // Our headers
+#ifdef XRCORE_EXPORTS
+#   define XRCORE_API XR_EXPORT
+#else
+#   define XRCORE_API XR_IMPORT
+#endif
+
+#include "xrCore_benchmark_macros.h"
+
 #include "xrDebug.h"
 //#include "vector.h"
 

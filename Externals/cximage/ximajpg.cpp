@@ -286,6 +286,7 @@ bool CxImageJPG::Decode(CxFile * hFile)
 // XXX: dirty hack.
 #undef max
 #undef min
+#define XRCORE_API XR_IMPORT
 #include "xrCore/xrDebug_macros.h" // needed for VERIFY in FTimer.h
 #include "xrCommon/math_funcs_inline.h" // needed for fis_zero() in FTimer.h
 #include "xrCore/FTimer.h"

@@ -106,7 +106,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommonImportExport.inl" />
     <None Include="PlatformBSD.inl">
       <Filter>Platform</Filter>
     </None>

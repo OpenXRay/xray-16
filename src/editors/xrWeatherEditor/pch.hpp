@@ -8,11 +8,28 @@
 
 #pragma once
 
+typedef unsigned int u32;
+typedef char const* LPCSTR;
+typedef char* LPSTR;
+
+#pragma managed(push, off)
+#include <malloc.h>
+#pragma managed(pop)
+
+#include <stdlib.h>
+#include <vcclr.h>
+
+#pragma warning(disable : 4127)
+#pragma warning(disable : 4100)
+
 #pragma managed(push, off)
 #include "Common/Common.hpp"
-#include "xrCore/xrMemory.h"
-#include "xrCore/xrstring.h"
 #pragma managed(pop)
+
+#include "xrCore/xrCore.h"
+#include "xrEngine/Engine.h"
+#include "xrEngine/device.h"
+#include "xrSound/Sound.h"
 
 #ifdef DEBUG
 #define VERIFY(expression) \
@@ -33,25 +50,6 @@
     } while (0)
 #define NODEFAULT XR_ASSUME(0)
 #endif // #ifdef DEBUG
-
-typedef unsigned int u32;
-typedef char const* LPCSTR;
-typedef char* LPSTR;
-
-#pragma managed(push, off)
-#include <malloc.h>
-#pragma managed(pop)
-
-#include <stdlib.h>
-#include <vcclr.h>
-
-#pragma warning(disable : 4127)
-#pragma warning(disable : 4100)
-
-#include "xrCore/xrCore.h"
-#include "xrEngine/Engine.h"
-#include "xrEngine/device.h"
-#include "xrSound/Sound.h"
 
 // do not forget to call
 // 'cs_free'

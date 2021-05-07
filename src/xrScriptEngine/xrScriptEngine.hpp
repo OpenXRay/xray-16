@@ -29,3 +29,9 @@ extern "C" {
 #include <luabind/iterator_policy.hpp>
 
 #pragma warning(pop)
+
+#ifdef XRSCRIPTENGINE_EXPORTS
+#   define XRSCRIPTENGINE_API XR_EXPORT
+#else
+#   define XRSCRIPTENGINE_API XR_IMPORT
+#endif

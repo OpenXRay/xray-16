@@ -3,17 +3,11 @@
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 
-#pragma push_macro("DLL_API") // XXX: suppresses warning, it's better to remove this
-#ifdef DLL_API
-#   undef DLL_API
-#endif
-
 #if defined(XR_PLATFORM_WINDOWS)
 #include <FreeImage/FreeImagePlus.h>
 #else
 #include <FreeImagePlus.h>
 #endif
-#pragma pop_macro("DLL_API") // XXX: suppresses warning, it's better to remove this
 
 #if !defined(USE_DX9) && !defined(USE_OGL)
 #include "d3dx11tex.h"

@@ -3,7 +3,6 @@
 
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/Envelope.hpp"
-#include "xrEngine/GameMtlLib.h"
 
 void SJointIKData::clamp_by_limits(Fvector& dest_xyz)
 {

@@ -2,6 +2,12 @@
 
 #include "xrCore/xrCore.h"
 
+#ifdef XRAICORE_EXPORTS
+#   define XRAICORE_API XR_EXPORT
+#else
+#   define XRAICORE_API XR_IMPORT
+#endif
+
 class CGameGraph;
 class CGameLevelCrossTable;
 class CLevelGraph;

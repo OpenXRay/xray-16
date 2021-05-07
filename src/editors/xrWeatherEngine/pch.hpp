@@ -10,8 +10,6 @@
 
 #include "Common/Common.hpp"
 
-#include "xrCore/xrMemory.h"
-#include "xrCore/xrstring.h"
 #include "xrCore/xrCore.h"
 
 #include "xrEngine/Engine.h"
