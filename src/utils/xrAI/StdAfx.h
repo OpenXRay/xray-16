@@ -6,6 +6,8 @@
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 
+#include "xrAICore/AISpaceBase.hpp"
+
 #include <memory>
 
 #include <d3dx9.h>

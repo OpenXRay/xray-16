@@ -44,10 +44,14 @@
 #endif // frequently in release code due to large amount of VERIFY
 
 // Our headers
-#ifdef XRCORE_EXPORTS
-#   define XRCORE_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define XRCORE_API
 #else
-#   define XRCORE_API XR_IMPORT
+#   ifdef XRCORE_EXPORTS
+#      define XRCORE_API XR_EXPORT
+#   else
+#      define XRCORE_API XR_IMPORT
+#   endif
 #endif
 
 #include "xrCore_benchmark_macros.h"

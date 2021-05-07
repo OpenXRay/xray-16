@@ -12,10 +12,14 @@
 #include <GameSpy/sake/sake.h>
 #include <GameSpy/sc/sc.h>
 
-#ifdef XRGAMESPY_EXPORTS
-#   define XRGAMESPY_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define XRGAMESPY_API
 #else
-#   define XRGAMESPY_API XR_IMPORT
+#   ifdef XRGAMESPY_EXPORTS
+#      define XRGAMESPY_API XR_EXPORT
+#   else
+#      define XRGAMESPY_API XR_IMPORT
+#   endif
 #endif
 
 #include "xrGameSpy/xrGameSpy_MainDefs.h"

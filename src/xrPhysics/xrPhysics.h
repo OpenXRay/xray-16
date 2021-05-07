@@ -1,7 +1,11 @@
 #pragma once
 
-#ifdef XRPHYSICS_EXPORTS
-#   define XRPHYSICS_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define XRPHYSICS_API
 #else
-#   define XRPHYSICS_API XR_IMPORT
+#   ifdef XRPHYSICS_EXPORTS
+#      define XRPHYSICS_API XR_EXPORT
+#   else
+#      define XRPHYSICS_API XR_IMPORT
+#   endif
 #endif

@@ -7,10 +7,6 @@
 #include "xrCore/_cylinder.h"
 #include "xrCore/_sphere.h"
 
-// refs
-class ENGINE_API IGameObject;
-class ENGINE_API CInifile;
-
 // t-defs
 const u32 clGET_TRIS = (1 << 0);
 const u32 clGET_BOXES = (1 << 1);
@@ -76,13 +72,17 @@ struct clQueryCollision
     IC void AddBox(const Fobb& B) { boxes.push_back(B); }
 };
 
-enum /*ENGINE_API*/ ECollisionFormType
+enum ECollisionFormType
 {
     cftObject,
     cftShape
 };
 
-class ENGINE_API ICollisionForm
+//----------------------------------------------------------------------
+// Class : CXR_CFObject
+// Purpose : stores collision form
+//----------------------------------------------------------------------
+class ICollisionForm
 {
     friend class CObjectSpace;
 
@@ -96,8 +96,13 @@ private:
     ECollisionFormType m_type;
 
 public:
-    ICollisionForm(IGameObject* _owner, ECollisionFormType tp);
-    virtual ~ICollisionForm();
+    ICollisionForm(IGameObject* _owner, ECollisionFormType tp)
+      : owner(_owner), m_type(tp)
+    {
+        bv_sphere.identity();
+    }
+
+    virtual ~ICollisionForm() = default;
 
     virtual bool _RayQuery(const collide::ray_defs& Q, collide::rq_results& R) = 0;
     // virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags) = 0;
@@ -106,7 +111,7 @@ public:
     const Fbox& getBBox() const { return bv_box; }
     float getRadius() const { return bv_sphere.R; }
     const Fsphere& getSphere() const { return bv_sphere; }
-    const ECollisionFormType Type() const { return m_type; }
+    ECollisionFormType Type() const { return m_type; }
 };
 
 class ENGINE_API CCF_Skeleton : public ICollisionForm

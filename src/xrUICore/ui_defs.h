@@ -9,10 +9,14 @@
 #include "xrCore/FixedVector.h"
 #include "xrCDB/Frustum.h"
 
-#ifdef XRUICORE_EXPORTS
-#   define XRUICORE_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define XRUICORE_API
 #else
-#   define XRUICORE_API XR_IMPORT
+#   ifdef XRUICORE_EXPORTS
+#      define XRUICORE_API XR_EXPORT
+#   else
+#      define XRUICORE_API XR_IMPORT
+#   endif
 #endif
 
 typedef FactoryPtr<IUIShader> ui_shader;

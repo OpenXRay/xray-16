@@ -3,10 +3,14 @@
 
 #include "Common/Common.hpp"
 
-#ifdef XRSE_FACTORY_EXPORTS
-#define FACTORY_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define FACTORY_API
 #else
-#define FACTORY_API XR_IMPORT
+#   ifdef XRSE_FACTORY_EXPORTS
+#       define FACTORY_API XR_EXPORT
+#   else
+#       define FACTORY_API XR_IMPORT
+#   endif
 #endif
 
 extern "C" {

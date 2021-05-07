@@ -6,10 +6,14 @@
 #include "xrCore/_vector3d.h"
 #include "xrCommon/xr_vector.h"
 
-#ifdef XRCDB_EXPORTS
-#   define XRCDB_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define XRCDB_API
 #else
-#   define XRCDB_API XR_IMPORT
+#   ifdef XRCDB_EXPORTS
+#      define XRCDB_API XR_EXPORT
+#   else
+#      define XRCDB_API XR_IMPORT
+#   endif
 #endif
 
 // forward declarations

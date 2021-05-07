@@ -5,10 +5,14 @@
 #include "xrCore/client_id.h"
 #include "xrCore/FTimer.h"
 
-#ifdef XR_NETSERVER_EXPORTS
-#   define XRNETSERVER_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define XRNETSERVER_API
 #else
-#   define XRNETSERVER_API XR_IMPORT
+#   ifdef XR_NETSERVER_EXPORTS
+#      define XRNETSERVER_API XR_EXPORT
+#   else
+#      define XRNETSERVER_API XR_IMPORT
+#   endif
 #endif
 
 // XXX: review and delete

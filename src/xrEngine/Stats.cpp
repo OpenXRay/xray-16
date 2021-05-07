@@ -187,8 +187,6 @@ void CStats::Show()
         }
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
-        if (physics_world())
-            physics_world()->DumpStatistics(font, alertPtr);
         font.OutSet(200, 0);
         GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();

@@ -1,14 +1,14 @@
 #pragma once
 
-#ifndef NO_ENGINE_API
+#ifdef XRAY_STATIC_BUILD
+#    define ENGINE_API
+#else
 #    ifdef ENGINE_BUILD
 #        define ENGINE_API XR_EXPORT
 #    else
 #        define ENGINE_API XR_IMPORT
 #    endif
-#else
-#    define ENGINE_API
-#endif // !NO_ENGINE_API
+#endif
 
 #include "EngineAPI.h"
 #include "EventAPI.h"

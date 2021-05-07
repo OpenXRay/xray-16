@@ -6,7 +6,7 @@
 
 #define MTL_EXPORT_API
 #define ECORE_API
-#define NO_ENGINE_API
+
 #include "xrEngine/Engine.h"
 
 #include "xrServerEntities/smart_cast.h"

@@ -30,8 +30,12 @@ extern "C" {
 
 #pragma warning(pop)
 
-#ifdef XRSCRIPTENGINE_EXPORTS
-#   define XRSCRIPTENGINE_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#   define XRSCRIPTENGINE_API
 #else
-#   define XRSCRIPTENGINE_API XR_IMPORT
+#   ifdef XRSCRIPTENGINE_EXPORTS
+#      define XRSCRIPTENGINE_API XR_EXPORT
+#   else
+#      define XRSCRIPTENGINE_API XR_IMPORT
+#   endif
 #endif

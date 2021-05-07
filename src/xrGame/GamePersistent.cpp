@@ -37,6 +37,8 @@
 #include "AnselManager.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
+#include "xrPhysics/IPHWorld.h"
+
 #ifndef MASTER_GOLD
 #include "CustomMonster.h"
 #endif // MASTER_GOLD
@@ -826,6 +828,9 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
 void CGamePersistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     IGame_Persistent::DumpStatistics(font, alert);
+    if (physics_world())
+        physics_world()->DumpStatistics(font, alert);
+
 #ifdef DEBUG
 #ifndef _EDITOR
     const Fvector2 prev = font.GetPosition();
