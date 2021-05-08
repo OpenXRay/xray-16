@@ -13,7 +13,9 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
-set(CMAKE_INSTALL_PREFIX /usr)
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "/usr")
+endif()
 
 # Installation paths
 include(GNUInstallDirs)
