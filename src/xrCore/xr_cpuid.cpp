@@ -271,10 +271,13 @@ bool query_processor_info(processor_info* pinfo)
 
     strcpy(pinfo->vendor, "MCST");
     xr_sprintf(pinfo->modelName, "%s (%s)", __builtin_cpu_name(), __builtin_cpu_arch());
-    
 
 #if defined(__MMX__)
-        pinfo->features.set(static_cast<u32>(CpuFeature::MMX), true);
+    pinfo->features.set(static_cast<u32>(CpuFeature::MMX), true);
+#endif
+
+#if defined(__3dNOW__)
+    pinfo->features.set(static_cast<u32>(CpuFeature::_3DNow), true);
 #endif
 
 #if defined(__SSE__)
@@ -310,7 +313,7 @@ bool query_processor_info(processor_info* pinfo)
 #endif
 
     fillInAvailableCpus(pinfo);
-    
+
     return true;
 }
 
@@ -320,7 +323,7 @@ bool query_processor_info(processor_info* pinfo)
     *pinfo = {};
 
     fillInAvailableCpus(pinfo);
-    
+
     return true;
 }
 
