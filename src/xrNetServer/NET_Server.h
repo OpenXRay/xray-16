@@ -76,7 +76,7 @@ public:
     u32 dwTime_LastUpdate;
 
     ip_address m_cAddress;
-    DWORD m_dwPort;
+    u32 m_dwPort;
     u32 process_id;
 
     IPureServer* server;

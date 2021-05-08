@@ -1,80 +1,47 @@
 #include "stdafx.h"
-#include "xrCore/ModuleLookup.hpp"
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+class DX11TestHelper
 {
-    return DefWindowProc(hWnd, message, wParam, lParam);
-}
+    SDL_Window* m_window = nullptr;
+    CHW m_hw;
 
-bool TestDX11Present()
-{
-    // Register class
-    WNDCLASSEX wcex;
-    ZeroMemory(&wcex, sizeof(wcex));
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.lpfnWndProc = WndProc;
-    wcex.hInstance = GetModuleHandle(NULL);
-    wcex.lpszClassName = "TestDX11WindowClass";
-    if (!RegisterClassEx(&wcex))
+public:
+    DX11TestHelper()
     {
-        Log("* DX11: failed to register window class");
-        return false;
+        m_window = SDL_CreateWindow("TestDX11Window", 0, 0, 1, 1, SDL_WINDOW_HIDDEN);
+        if (!m_window)
+        {
+            Log("~ Cannot create helper window for DirectX 11 test:", SDL_GetError());
+            return;
+        }
+        m_hw.CreateDevice(m_window);
     }
 
-    // Create window
-    HWND hWnd = CreateWindow("TestDX11WindowClass", "", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, NULL, NULL);
-
-    if (!hWnd)
+    bool Successful() const
     {
-        Msg("* DX11: failed to create window");
-        return false;
+        return m_window && m_hw.Valid;
     }
 
-    DXGI_SWAP_CHAIN_DESC sd;
-    ZeroMemory(&sd, sizeof(sd));
-    sd.BufferCount = 1;
-    sd.BufferDesc.Width = 800;
-    sd.BufferDesc.Height = 600;
-    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    sd.BufferDesc.RefreshRate.Numerator = 60;
-    sd.BufferDesc.RefreshRate.Denominator = 1;
-    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = hWnd;
-    sd.SampleDesc.Count = 1;
-    sd.SampleDesc.Quality = 0;
-    sd.Windowed = TRUE;
+    const CHW& GetHW() const { return m_hw; }
 
-    D3D_FEATURE_LEVEL featureLevels[] =
+    ~DX11TestHelper()
     {
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0
-    };
-    D3D_FEATURE_LEVEL FeatureLevel;
+        m_hw.DestroyDevice();
+        SDL_DestroyWindow(m_window);
+    }
+};
 
-    ID3D11Device* pd3dDevice = NULL;
-    ID3D11DeviceContext* pContext = NULL;
-    IDXGISwapChain* pSwapChain = NULL;
-
-    HRESULT hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0,
-        featureLevels, sizeof(featureLevels) / sizeof(featureLevels[0]), D3D11_SDK_VERSION,
-        &sd, &pSwapChain, &pd3dDevice, &FeatureLevel, &pContext);
-
-    if (FAILED(hr))
-        Msg("* D3D11: device creation failed with hr=0x%08x", hr);
-
-    _RELEASE(pSwapChain);
-    _RELEASE(pd3dDevice);
-    _RELEASE(pContext);
-
-    DestroyWindow(hWnd);
-    UnregisterClass("TestDX11WindowClass", GetModuleHandle(NULL));
-
-    return SUCCEEDED(hr);
-}
 
 BOOL xrRender_test_hw()
 {
-    return TestDX11Present();
+    const DX11TestHelper helper;
+    if (!helper.Successful())
+        return FALSE;
+
+    const auto level = helper.GetHW().FeatureLevel;
+    if (level >= D3D_FEATURE_LEVEL_11_0)
+        return TRUE + TRUE; // XXX: remove hack
+    if (level >= D3D_FEATURE_LEVEL_10_0)
+        return TRUE;
+    return FALSE;
 }

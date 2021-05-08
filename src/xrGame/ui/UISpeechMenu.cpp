@@ -10,7 +10,7 @@
 
 CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
 {
-    m_pList = new CUIScrollView();
+    m_pList = xr_new<CUIScrollView>();
     AttachChild(m_pList);
     m_pList->SetAutoDelete(true);
     CUIXml xml_doc;

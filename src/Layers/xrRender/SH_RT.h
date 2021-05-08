@@ -23,6 +23,8 @@ public:
     BOOL valid() { return !!pTexture; }
     bool used_as_depth() const;
 
+    void resolve_into(CRT& destination) const; // only RTs with same format supported
+
 public:
 #ifdef USE_OGL
     GLuint pRT;
@@ -31,15 +33,12 @@ public:
 #else
     ID3DTexture2D* pSurface;
     ID3DRenderTargetView* pRT;
-#endif // USE_OGL
-#if defined(USE_DX10) || defined(USE_DX11)
-    ID3DDepthStencilView* pZRT;
-
 #ifdef USE_DX11
+    ID3DDepthStencilView* pZRT;
     ID3D11UnorderedAccessView* pUAView;
-#endif
+#endif // USE_DX11
+#endif // USE_OGL
 
-#endif //	USE_DX10
     ref_texture pTexture;
 
     u32 dwWidth;

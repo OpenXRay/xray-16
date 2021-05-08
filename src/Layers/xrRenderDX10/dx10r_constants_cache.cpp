@@ -36,7 +36,6 @@ dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_GeometryBuffer>(R_co
     return *RCache.m_aGeometryConstants[iBufferIndex];
 }
 
-#ifdef USE_DX11
 template<>
 dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_ComputeBuffer>(R_constant* C) const
 {
@@ -69,7 +68,6 @@ dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_DomainBuffer>(R_cons
     VERIFY(RCache.m_aDomainConstants[iBufferIndex]);
     return *RCache.m_aDomainConstants[iBufferIndex];
 }
-#endif // USE_DX11
 
 void R_constants::flush_cache()
 {

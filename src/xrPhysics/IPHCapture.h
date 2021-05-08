@@ -8,12 +8,11 @@ public:
     virtual void Release() = 0;
 
 protected:
-#if defined(XR_PLATFORM_WINDOWS)
-    virtual ~IPHCapture() = 0 {}
-#elif defined(XR_PLATFORM_LINUX)
-    virtual ~IPHCapture() {}
-#endif
+    virtual ~IPHCapture() = 0;
 };
+
+inline IPHCapture::~IPHCapture() = default;
+
 class CPHCharacter;
 struct NearestToPointCallback;
 XRPHYSICS_API IPHCapture* phcapture_create(

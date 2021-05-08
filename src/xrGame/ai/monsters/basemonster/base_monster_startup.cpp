@@ -60,9 +60,9 @@ void CBaseMonster::Load(LPCSTR section)
     m_left_eye_bone_name = READ_IF_EXISTS(pSettings, r_string, section, "bone_eye_left", 0);
     m_right_eye_bone_name = READ_IF_EXISTS(pSettings, r_string, section, "bone_eye_right", 0);
 
-    m_corpse_cover_evaluator = new CMonsterCorpseCoverEvaluator(&movement().restrictions());
-    m_enemy_cover_evaluator = new CCoverEvaluatorFarFromEnemy(&movement().restrictions());
-    m_cover_evaluator_close_point = new CCoverEvaluatorCloseToEnemy(&movement().restrictions());
+    m_corpse_cover_evaluator = xr_new<CMonsterCorpseCoverEvaluator>(&movement().restrictions());
+    m_enemy_cover_evaluator = xr_new<CCoverEvaluatorFarFromEnemy>(&movement().restrictions());
+    m_cover_evaluator_close_point = xr_new<CCoverEvaluatorCloseToEnemy>(&movement().restrictions());
 
     MeleeChecker.load(section);
     Morale.load(section);
@@ -107,12 +107,12 @@ void CBaseMonster::Load(LPCSTR section)
 
     if ((separate_factor > 0.0001f) && (separate_range > 0.01f))
     {
-        m_steer_manager = new steering_behaviour::manager();
+        m_steer_manager = xr_new<steering_behaviour::manager>();
 
-        m_grouping_behaviour = new squad_grouping_behaviour(
+        m_grouping_behaviour = xr_new<squad_grouping_behaviour>(
             this, Fvector3().set(0.f, 0.f, 0.f), Fvector3().set(0.f, separate_factor, 0.f), separate_range);
 
-        get_steer_manager()->add(new steering_behaviour::grouping(m_grouping_behaviour));
+        get_steer_manager()->add(xr_new<steering_behaviour::grouping>(m_grouping_behaviour));
     }
 
     //------------------------------------
@@ -185,7 +185,7 @@ void CBaseMonster::PostLoad(LPCSTR section)
     {
         SVelocityParam& velocity_stand = move().get_velocity(MonsterMovement::eVelocityParameterStand);
 
-        m_anti_aim = new anti_aim_ability(this);
+        m_anti_aim = xr_new<anti_aim_ability>(this);
         control().add(m_anti_aim, ControlCom::eAntiAim);
 
         pcstr anti_aim_animation = READ_IF_EXISTS(pSettings, r_string, section, "anti_aim_animation", "stand_attack_");
@@ -320,7 +320,7 @@ void CBaseMonster::reinit()
     anim().clear_override_animation();
 }
 
-BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
+bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

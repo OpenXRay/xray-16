@@ -29,16 +29,17 @@
 ///////////////////////////////////////////////////////////////////////
 //  SVS
 SVS::SVS() : sh(0)
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
 //  ,signature(0)
-#endif // USE_DX10
+#endif
 {}
 
 SVS::~SVS()
 {
     RImplementation.Resources->_DeleteVS(this);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
+    // XXX: check just in case
     //_RELEASE(signature);
     //	Now it is release automatically
 #endif
@@ -111,9 +112,9 @@ SCS::~SCS()
     RImplementation.Resources->_DeleteCS(this);
 }
 #endif
-#endif // USE_DX10
+#endif // !USE_DX9
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
 ///////////////////////////////////////////////////////////////////////
 //	SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)
@@ -128,7 +129,7 @@ SInputSignature::~SInputSignature()
     _RELEASE(signature);
     RImplementation.Resources->_DeleteInputSignature(this);
 }
-#endif	//	USE_DX10
+#endif // !USE_DX9 && !USE_OGL
 
 ///////////////////////////////////////////////////////////////////////
 //	SState
@@ -146,7 +147,7 @@ SDeclaration::~SDeclaration()
     //	Release vertex layout
 #ifdef USE_OGL
     glDeleteVertexArrays(1, &dcl);
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
     xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)
@@ -154,7 +155,7 @@ SDeclaration::~SDeclaration()
         //	Release vertex layout
         _RELEASE(iLayout->second);
     }
-#else // USE_DX10
+#else // USE_DX9
     _RELEASE(dcl);
-#endif // USE_DX10
+#endif
 }

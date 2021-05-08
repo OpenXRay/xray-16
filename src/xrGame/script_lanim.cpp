@@ -32,7 +32,7 @@ public:
     {
         int frame;
         VERIFY(item);
-        return Fcolor().set(item->CalculateRGB(T, frame));
+        return Fcolor(item->CalculateRGB(T, frame));
     }
 };
 

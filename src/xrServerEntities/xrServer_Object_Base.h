@@ -68,7 +68,7 @@ public:
     };
 
 private:
-    LPSTR s_name_replace;
+    pstr s_name_replace;
 
 public:
     BOOL net_Ready;

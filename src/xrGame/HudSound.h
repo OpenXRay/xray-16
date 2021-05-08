@@ -80,8 +80,6 @@ class HUD_SOUND_COLLECTION_LAYERED
     xr_vector<HUD_SOUND_COLLECTION> m_sound_layered_items;
 
 public:
-    ~HUD_SOUND_COLLECTION_LAYERED();
-
     HUD_SOUND_ITEM* FindSoundItem(pcstr alias, bool b_assert);
 
     void PlaySound(pcstr alias, const Fvector& position, const IGameObject* parent,

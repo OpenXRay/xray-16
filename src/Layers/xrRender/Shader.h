@@ -44,9 +44,10 @@ struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std
     }
     virtual void clear();
 
-    // Avoid using this function.
+    // Avoid using these functions.
     // If possible use precompiled texture list.
     u32 find_texture_stage(const shared_str& TexName) const;
+    void create_texture(u32 stage, pcstr textureName, bool evenIfNotNull);
 };
 typedef resptr_core<STextureList, resptr_base<STextureList>> ref_texture_list;
 //////////////////////////////////////////////////////////////////////////
@@ -96,7 +97,7 @@ struct ECORE_API SPass : public xr_resource_flagged
     ref_ds ds; // may be NULL = don't use domain shader at all
     ref_cs cs; // may be NULL = don't use compute shader at all
 #endif
-#endif // USE_DX10
+#endif // !USE_DX9
     ref_ctable constants; // may be NULL
 
     ref_texture_list T;

@@ -215,7 +215,7 @@ void CTexture::ProcessStaging()
     flags.bLoadedAsStaging = FALSE;
 
     //	Check if texture was not copied _before_ it was converted.
-    ULONG RefCnt = pSurface->Release();
+    u32 RefCnt = pSurface->Release();
     pSurface = 0;
 
     VERIFY(!RefCnt);
@@ -327,7 +327,7 @@ void CTexture::apply_avi(u32 dwStage)
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
         R_ASSERT(mapData.RowPitch == int(pAVI->m_dwWidth * 4));
-        BYTE* ptr;
+        u8* ptr{};
         pAVI->GetFrame(&ptr);
         CopyMemory(mapData.pData, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
 // R_CHK	(T2D->UnlockRect(0));
@@ -402,7 +402,7 @@ void CTexture::Load()
     if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
     {
         // AVI
-        pTheora = new CTheoraSurface();
+        pTheora = xr_new<CTheoraSurface>();
         m_play_time = 0xFFFFFFFF;
 
         if (!pTheora->Load(fn))
@@ -454,7 +454,7 @@ void CTexture::Load()
     else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
     {
         // AVI
-        pAVI = new CAviPlayerCustom();
+        pAVI = xr_new<CAviPlayerCustom>();
 
         if (!pAVI->Load(fn))
         {

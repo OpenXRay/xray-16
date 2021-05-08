@@ -195,6 +195,7 @@ void LevelCompilerLoggerWindow::clLog(const char* format, ...)
     char buf[1024];
     va_start(args, format);
     vsprintf(buf, format, args);
+    va_end(args);
     csLog.Enter();
     Log(buf);
     csLog.Leave();

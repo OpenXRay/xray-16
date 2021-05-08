@@ -20,8 +20,8 @@ void CHWCaps::Update()
     geometry.bSoftware = FALSE;
     geometry.bPointSprites = FALSE;
     geometry.bNPatches = FALSE;
-    DWORD cnt = 256;
-    clamp<DWORD>(cnt, 0, 256);
+    u32 cnt = 256;
+    clamp<u32>(cnt, 0, 256);
     geometry.dwRegisters = cnt;
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(6, 15);
@@ -64,4 +64,6 @@ void CHWCaps::Update()
     // DEV INFO
 
     iGPUNum = GetGpuNum();
+
+    useCombinedSamplers = true;
 }

@@ -117,10 +117,10 @@ public:
     virtual ~CAI_Crow();
     virtual void Load(LPCSTR section);
     void init();
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual BOOL renderable_ShadowGenerate() { return FALSE; }
-    virtual BOOL renderable_ShadowReceive() { return FALSE; }
+    virtual bool renderable_ShadowGenerate() { return FALSE; }
+    virtual bool renderable_ShadowReceive() { return FALSE; }
     void renderable_Render(IRenderable* root) override;
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();
@@ -140,7 +140,7 @@ public:
     virtual float ffGetRange() const { return 30.f; }
     virtual BOOL IsVisibleForHUD() { return FALSE; }
     virtual bool IsVisibleForZones() { return false; }
-    virtual BOOL UsedAI_Locations();
+    virtual bool UsedAI_Locations();
     virtual void create_physic_shell();
 };
 

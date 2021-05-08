@@ -111,11 +111,11 @@ bool CLevel::net_start1()
         // Connect
         if (!xr_strcmp(p.m_game_type, "single"))
         {
-            Server = new xrServer();
+            Server = xr_new<xrServer>();
         }
         else
         {
-            Server = new xrGameSpyServer();
+            Server = xr_new<xrGameSpyServer>();
         }
 
         if (xr_strcmp(p.m_alife, "alife"))

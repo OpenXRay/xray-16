@@ -74,8 +74,8 @@ void IConsole_Command::add_LRU_to_tips(vecTips& tips)
 class CCC_Quit : public IConsole_Command
 {
 public:
-    CCC_Quit(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
+    CCC_Quit(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args)
     {
         // TerminateProcess(GetCurrentProcess(),0);
         Console->Hide();
@@ -87,22 +87,22 @@ public:
 class CCC_DbgStrCheck : public IConsole_Command
 {
 public:
-    CCC_DbgStrCheck(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args) { g_pStringContainer->verify(); }
+    CCC_DbgStrCheck(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args) { g_pStringContainer->verify(); }
 };
 
 class CCC_DbgStrDump : public IConsole_Command
 {
 public:
-    CCC_DbgStrDump(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args) { g_pStringContainer->dump(); }
+    CCC_DbgStrDump(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args) { g_pStringContainer->dump(); }
 };
 //-----------------------------------------------------------------------
 class CCC_MotionsStat : public IConsole_Command
 {
 public:
-    CCC_MotionsStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
+    CCC_MotionsStat(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args)
     {
         // g_pMotionsContainer->dump();
         // TODO: move this console commant into renderer
@@ -112,8 +112,8 @@ public:
 class CCC_TexturesStat : public IConsole_Command
 {
 public:
-    CCC_TexturesStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
+    CCC_TexturesStat(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args)
     {
         Device.DumpResourcesMemoryUsage();
         // Device.Resources->_DumpMemoryUsage();
@@ -125,14 +125,14 @@ public:
 class CCC_E_Dump : public IConsole_Command
 {
 public:
-    CCC_E_Dump(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args) { Engine.Event.Dump(); }
+    CCC_E_Dump(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args) { Engine.Event.Dump(); }
 };
 class CCC_E_Signal : public IConsole_Command
 {
 public:
-    CCC_E_Signal(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR args)
+    CCC_E_Signal(pcstr N) : IConsole_Command(N){};
+    virtual void Execute(pcstr args)
     {
         char Event[128], Param[128];
         Event[0] = 0;
@@ -146,8 +146,8 @@ public:
 class CCC_Help : public IConsole_Command
 {
 public:
-    CCC_Help(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
+    CCC_Help(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args)
     {
         Log("- --- Command listing: start ---");
         CConsole::vecCMD_IT it;
@@ -187,8 +187,8 @@ XRCORE_API void _dump_open_files(int mode);
 class CCC_DumpOpenFiles : public IConsole_Command
 {
 public:
-    CCC_DumpOpenFiles(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = FALSE; };
-    virtual void Execute(LPCSTR args)
+    CCC_DumpOpenFiles(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(pcstr args)
     {
         int _mode = atoi(args);
         _dump_open_files(_mode);
@@ -199,8 +199,8 @@ public:
 class CCC_SaveCFG : public IConsole_Command
 {
 public:
-    CCC_SaveCFG(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
+    CCC_SaveCFG(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args)
     {
         string_path cfg_full_name;
         xr_strcpy(cfg_full_name, (xr_strlen(args) > 0) ? args : Console->ConfigFile);
@@ -214,7 +214,7 @@ public:
             *strext(cfg_full_name) = 0;
         xr_strcat(cfg_full_name, ".ltx");
 
-        BOOL b_allow = TRUE;
+        bool b_allow = true;
 #if defined(XR_PLATFORM_WINDOWS)
         if (FS.exist(cfg_full_name))
             b_allow = SetFileAttributes(cfg_full_name, FILE_ATTRIBUTE_NORMAL);
@@ -232,9 +232,9 @@ public:
             Msg("!Cannot store config file [%s]", cfg_full_name);
     }
 };
-CCC_LoadCFG::CCC_LoadCFG(LPCSTR N) : IConsole_Command(N){};
+CCC_LoadCFG::CCC_LoadCFG(pcstr N) : IConsole_Command(N){};
 
-void CCC_LoadCFG::Execute(LPCSTR args)
+void CCC_LoadCFG::Execute(pcstr args)
 {
     Msg("Executing config-script \"%s\"...", args);
     string_path cfg_name;
@@ -274,26 +274,26 @@ void CCC_LoadCFG::Execute(LPCSTR args)
     }
 }
 
-CCC_LoadCFG_custom::CCC_LoadCFG_custom(LPCSTR cmd) : CCC_LoadCFG(cmd) { xr_strcpy(m_cmd, cmd); };
-bool CCC_LoadCFG_custom::allow(LPCSTR cmd) { return (cmd == strstr(cmd, m_cmd)); };
+CCC_LoadCFG_custom::CCC_LoadCFG_custom(pcstr cmd) : CCC_LoadCFG(cmd) { xr_strcpy(m_cmd, cmd); };
+bool CCC_LoadCFG_custom::allow(pcstr cmd) { return (cmd == strstr(cmd, m_cmd)); };
 //-----------------------------------------------------------------------
 class CCC_Start : public IConsole_Command
 {
-    void parse(LPSTR dest, LPCSTR args, LPCSTR name)
+    void parse(pstr dest, pcstr args, pcstr name)
     {
         dest[0] = 0;
         if (strstr(args, name))
             sscanf(strstr(args, name) + xr_strlen(name), "(%[^)])", dest);
     }
 
-    void protect_Name_strlwr(LPSTR str)
+    void protect_Name_strlwr(pstr str)
     {
         string4096 out;
         xr_strcpy(out, sizeof(out), str);
         xr_strlwr(str);
 
-        LPCSTR name_str = "name=";
-        LPCSTR name1 = strstr(str, name_str);
+        pcstr name_str = "name=";
+        pcstr name1 = strstr(str, name_str);
         if (!name1 || !xr_strlen(name1))
         {
             return;
@@ -304,7 +304,7 @@ class CCC_Start : public IConsole_Command
             return;
         }
 
-        LPCSTR name2 = strchr(name1, '/');
+        pcstr name2 = strchr(name1, '/');
         int end_p = xr_strlen(str) - ((name2) ? xr_strlen(name2) : 0);
         if (begin_p >= end_p)
         {
@@ -317,8 +317,8 @@ class CCC_Start : public IConsole_Command
     }
 
 public:
-    CCC_Start(LPCSTR N) : IConsole_Command(N) { bLowerCaseArgs = false; };
-    virtual void Execute(LPCSTR args)
+    CCC_Start(pcstr N) : IConsole_Command(N) { bLowerCaseArgs = false; };
+    virtual void Execute(pcstr args)
     {
         /* if (g_pGameLevel) {
          Log ("! Please disconnect/unload first");
@@ -362,15 +362,15 @@ public:
 class CCC_Disconnect : public IConsole_Command
 {
 public:
-    CCC_Disconnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args) { Engine.Event.Defer("KERNEL:disconnect"); }
+    CCC_Disconnect(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args) { Engine.Event.Defer("KERNEL:disconnect"); }
 };
 //-----------------------------------------------------------------------
 class CCC_VID_Reset : public IConsole_Command
 {
 public:
-    CCC_VID_Reset(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
+    CCC_VID_Reset(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args)
     {
         if (Device.b_is_Ready)
         {
@@ -516,8 +516,8 @@ public:
 class CCC_SND_Restart : public IConsole_Command
 {
 public:
-    CCC_SND_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
+    CCC_SND_Restart(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(pcstr args)
     {
         if (GEnv.Sound)
             GEnv.Sound->_restart();
@@ -529,8 +529,8 @@ float ps_gamma = 1.f, ps_brightness = 1.f, ps_contrast = 1.f;
 class CCC_Gamma : public CCC_Float
 {
 public:
-    CCC_Gamma(LPCSTR N, float* V) : CCC_Float(N, V, 0.5f, 1.5f) {}
-    virtual void Execute(LPCSTR args)
+    CCC_Gamma(pcstr N, float* V) : CCC_Float(N, V, 0.5f, 1.5f) {}
+    virtual void Execute(pcstr args)
     {
         CCC_Float::Execute(args);
         GEnv.Render->setGamma(ps_gamma);
@@ -543,16 +543,16 @@ public:
 //-----------------------------------------------------------------------
 /*
 #ifdef DEBUG
-extern INT g_bDR_LM_UsePointsBBox;
-extern INT g_bDR_LM_4Steps;
-extern INT g_iDR_LM_Step;
+extern int g_bDR_LM_UsePointsBBox;
+extern int g_bDR_LM_4Steps;
+extern int g_iDR_LM_Step;
 extern Fvector g_DR_LM_Min, g_DR_LM_Max;
 
 class CCC_DR_ClearPoint : public IConsole_Command
 {
 public:
-CCC_DR_ClearPoint(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-virtual void Execute(LPCSTR args) {
+CCC_DR_ClearPoint(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+virtual void Execute(pcstr args) {
 g_DR_LM_Min.x = 1000000.0f;
 g_DR_LM_Min.z = 1000000.0f;
 
@@ -566,8 +566,8 @@ Msg("Local BBox (%f, %f) - (%f, %f)", g_DR_LM_Min.x, g_DR_LM_Min.z, g_DR_LM_Max.
 class CCC_DR_TakePoint : public IConsole_Command
 {
 public:
-CCC_DR_TakePoint(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-virtual void Execute(LPCSTR args) {
+CCC_DR_TakePoint(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+virtual void Execute(pcstr args) {
 Fvector CamPos = Device.vCameraPosition;
 
 if (g_DR_LM_Min.x > CamPos.x) g_DR_LM_Min.x = CamPos.x;
@@ -583,27 +583,25 @@ Msg("Local BBox (%f, %f) - (%f, %f)", g_DR_LM_Min.x, g_DR_LM_Min.z, g_DR_LM_Max.
 class CCC_DR_UsePoints : public CCC_Integer
 {
 public:
-CCC_DR_UsePoints(LPCSTR N, int* V, int _min=0, int _max=999) : CCC_Integer(N, V, _min, _max) {};
+CCC_DR_UsePoints(pcstr N, int* V, int _min=0, int _max=999) : CCC_Integer(N, V, _min, _max) {};
 virtual void Save (IWriter *F) {};
 };
 #endif
 */
 
-ENGINE_API BOOL r2_sun_static = TRUE;
-ENGINE_API BOOL r2_advanced_pp = FALSE; // advanced post process and effects
 ENGINE_API bool renderer_allow_override = false;
 
 class CCC_renderer : public CCC_Token
 {
     typedef CCC_Token inherited;
 
-    u32 renderer_value = 3;
+    u32 renderer_value = 0;
     static bool cmd_lock;
 
 public:
-    CCC_renderer(LPCSTR N) : inherited(N, &renderer_value, NULL) {};
+    CCC_renderer(pcstr N) : inherited(N, &renderer_value, NULL) {};
     ~CCC_renderer() override {}
-    void Execute(LPCSTR args) override
+    void Execute(pcstr args) override
     {
         if ((renderer_allow_override == false) && (cmd_lock == true))
         {
@@ -622,20 +620,6 @@ public:
         tokens = VidQualityToken.data();
 
         inherited::Execute(args);
-        // 0 - r1
-        // 1..3 - r2
-        // 4 - r3
-        // 5 - r4
-        // 6 - rgl
-        psDeviceFlags.set(rsR1, renderer_value == 0);
-        psDeviceFlags.set(rsR2, ((renderer_value > 0) && renderer_value < 4));
-        psDeviceFlags.set(rsR3, (renderer_value == 4));
-        psDeviceFlags.set(rsR4, (renderer_value == 5));
-        psDeviceFlags.set(rsRGL, (renderer_value == 6));
-
-        r2_sun_static = (renderer_value < 2);
-
-        r2_advanced_pp = (renderer_value >= 3);
     
         cmd_lock = true;
     }
@@ -673,7 +657,7 @@ public:
         if (0 != xr_strcmp(args, "apply"))
             inherited::Execute(args);
 
-        if (!psDeviceFlags.test(rsRGL))
+        if (GEnv.Render->GetBackendAPI() != IRender::BackendAPI::OpenGL)
             return;
 
         if (psDeviceFlags.test(rsVSync))
@@ -692,9 +676,9 @@ class CCC_soundDevice : public CCC_Token
     typedef CCC_Token inherited;
 
 public:
-    CCC_soundDevice(LPCSTR N) : inherited(N, &snd_device_id, NULL){};
+    CCC_soundDevice(pcstr N) : inherited(N, &snd_device_id, NULL){};
     virtual ~CCC_soundDevice() {}
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(pcstr args)
     {
         GetToken();
         if (!tokens)
@@ -733,8 +717,8 @@ private:
     typedef IConsole_Command inherited;
 
 public:
-    CCC_ExclusiveMode(LPCSTR N) : inherited(N) {}
-    virtual void Execute(LPCSTR args)
+    CCC_ExclusiveMode(pcstr N) : inherited(N) {}
+    virtual void Execute(pcstr args)
     {
         bool value = false;
         if (!xr_strcmp(args, "on"))
@@ -761,8 +745,8 @@ public:
 class ENGINE_API CCC_HideConsole : public IConsole_Command
 {
 public:
-    CCC_HideConsole(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
-    virtual void Execute(LPCSTR args) { Console->Hide(); }
+    CCC_HideConsole(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+    virtual void Execute(pcstr args) { Console->Hide(); }
     void GetStatus(TStatus& S) override { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "hide console"); }
 };
@@ -835,7 +819,6 @@ void CCC_Register()
     CMD1(CCC_E_Dump, "e_list");
     CMD1(CCC_E_Signal, "e_signal");
 
-    CMD3(CCC_Mask, "rs_wireframe", &psDeviceFlags, rsWireframe);
     CMD3(CCC_Mask, "rs_clear_bb", &psDeviceFlags, rsClearBB);
     CMD3(CCC_Mask, "rs_occlusion", &psDeviceFlags, rsOcclusion);
 
@@ -850,6 +833,7 @@ void CCC_Register()
         CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
         CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
         CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
+        CMD3(CCC_Mask, "rs_wireframe", &psDeviceFlags, rsWireframe);
     }
 
     // Render device states
@@ -956,6 +940,6 @@ void CCC_Register()
 
 #ifdef DEBUG
     extern BOOL debug_destroy;
-    CMD4(CCC_Integer, "debug_destroy", &debug_destroy, FALSE, TRUE);
+    CMD4(CCC_Integer, "debug_destroy", &debug_destroy, 0, 1);
 #endif
 };

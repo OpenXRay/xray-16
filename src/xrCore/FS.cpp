@@ -213,9 +213,9 @@ void CMemoryWriter::w(const void* ptr, size_t count)
         while (mem_size <= (position + count))
             mem_size *= 2;
         if (0 == data)
-            data = (BYTE*)xr_malloc(mem_size);
+            data = (u8*)xr_malloc(mem_size);
         else
-            data = (BYTE*)xr_realloc(data, mem_size);
+            data = (u8*)xr_realloc(data, mem_size);
     }
     CopyMemory(data + position, ptr, count);
     position += count;
@@ -261,7 +261,7 @@ size_t IWriter::chunk_size()
 
 void IWriter::w_compressed(void* ptr, size_t count)
 {
-    BYTE* dest = 0;
+    u8* dest = 0;
     size_t dest_sz = 0;
     _compressLZ(&dest, &dest_sz, ptr, count);
 
@@ -325,14 +325,14 @@ IReader* IReader::open_chunk(u32 ID)
     {
         if (bCompressed)
         {
-            BYTE* dest;
+            u8* dest;
             size_t dest_sz;
             _decompressLZ(&dest, &dest_sz, pointer(), dwSize);
-            return new CTempReader(dest, dest_sz, tell() + dwSize);
+            return xr_new<CTempReader>(dest, dest_sz, tell() + dwSize);
         }
         else
         {
-            return new IReader(pointer(), dwSize, tell() + dwSize);
+            return xr_new<IReader>(pointer(), dwSize, tell() + dwSize);
         }
     }
     else
@@ -380,12 +380,12 @@ IReader* IReader::open_chunk_iterator(u32& ID, IReader* _prev)
         u8* dest;
         size_t dest_sz;
         _decompressLZ(&dest, &dest_sz, pointer(), _size);
-        return new CTempReader(dest, dest_sz, tell() + _size);
+        return xr_new<CTempReader>(dest, dest_sz, tell() + _size);
     }
     else
     {
         // normal
-        return new IReader(pointer(), _size, tell() + _size);
+        return xr_new<IReader>(pointer(), _size, tell() + _size);
     }
 }
 

@@ -23,9 +23,9 @@ CPHActorCharacter::CPHActorCharacter(bool single_game) : b_single_game(single_ga
 
     {
         m_restrictors.resize(3);
-        m_restrictors[0] = (new stalker_restrictor());
-        m_restrictors[1] = new stalker_small_restrictor();
-        m_restrictors[2] = (new medium_monster_restrictor());
+        m_restrictors[0] = (xr_new<stalker_restrictor>());
+        m_restrictors[1] = xr_new<stalker_small_restrictor>();
+        m_restrictors[2] = (xr_new<medium_monster_restrictor>());
     }
 }
 
@@ -296,7 +296,7 @@ static void BigVelSeparate(dContact* c, bool& do_collide)
 
 void CPHActorCharacter::InitContact(dContact* c, bool& do_collide, u16 material_idx_1, u16 material_idx_2)
 {
-    bool b1;
+    bool b1 = false;
     SFindPredicate fp(c, &b1);
     RESTRICTOR_I r = std::find_if(begin(m_restrictors), end(m_restrictors), fp);
     bool b_restrictor = (r != end(m_restrictors));

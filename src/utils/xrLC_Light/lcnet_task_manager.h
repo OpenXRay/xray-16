@@ -24,7 +24,7 @@ class XRLC_LIGHT_API task_manager : public net_task_interface
 
     CTimer start_time;
     IGridUser* _user;
-    DWORD session_id;
+    u32 session_id;
     u32 tasks_completed;
     bool _release;
     Lock pool_lock;
@@ -34,11 +34,11 @@ class XRLC_LIGHT_API task_manager : public net_task_interface
 private:
     void send_task(IGridUser& user, u32 id);
     void receive_result(IGenericStream* inStream);
-    bool initialize_session(DWORD _session_id);
+    bool initialize_session(u32 _session_id);
 
     void send_result(u8 pool_id, IGenericStream* outStream, net_execution& e);
-    net_execution* receive_task(u8& pool_id, IAgent* agent, DWORD sessionId, IGenericStream* inStream);
-    virtual bool run_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream);
+    net_execution* receive_task(u8& pool_id, IAgent* agent, u32 sessionId, IGenericStream* inStream);
+    virtual bool run_task(IAgent* agent, u32 sessionId, IGenericStream* inStream, IGenericStream* outStream);
     xr_vector<net_execution*>::iterator find(u32 id);
 
 public:

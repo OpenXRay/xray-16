@@ -15,7 +15,7 @@
 #define CFixedVertexAllocator CVertexAllocatorFixed<ReserveSize>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
-inline CFixedVertexAllocator::CDataStorage() { m_vertices.resize(ReserveSize); }
+inline CFixedVertexAllocator::CDataStorage() : m_vertex_count(u32(-1)) { m_vertices.resize(ReserveSize); }
 TEMPLATE_SPECIALIZATION
 inline CFixedVertexAllocator::~CDataStorage() {}
 TEMPLATE_SPECIALIZATION

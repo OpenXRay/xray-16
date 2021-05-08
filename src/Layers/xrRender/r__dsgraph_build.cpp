@@ -72,9 +72,11 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
     if (root && root->renderable_HUD())
     {
         if (sh->flags.bStrictB2F)
+        {
             mapHUDSorted.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
-        else
-            mapHUD      .insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
+            return;
+        }
+        mapHUD.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
 
 #if RENDER != R_R1
         if (sh->flags.bEmissive)
@@ -127,7 +129,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
         auto& Nvs = map[pass.vs->sh];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         auto& Nvs = map[&*pass.vs];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
@@ -273,7 +275,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         auto& Nvs = map[pass.vs->sh];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         auto& Nvs = map[&*pass.vs];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];

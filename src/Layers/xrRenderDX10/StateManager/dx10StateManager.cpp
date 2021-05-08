@@ -92,7 +92,7 @@ void dx10StateManager::SetBlendState(ID3DBlendState* pBlendState)
     }
 }
 
-void dx10StateManager::SetStencilRef(UINT uiStencilRef)
+void dx10StateManager::SetStencilRef(u32 uiStencilRef)
 {
     if (m_uiStencilRef != uiStencilRef)
     {
@@ -101,7 +101,7 @@ void dx10StateManager::SetStencilRef(UINT uiStencilRef)
     }
 }
 
-void dx10StateManager::SetAlphaRef(UINT uiAlphaRef)
+void dx10StateManager::SetAlphaRef(u32 uiAlphaRef)
 {
     if (m_uiAlphaRef != uiAlphaRef)
     {
@@ -195,7 +195,7 @@ void dx10StateManager::Apply()
             m_bBSChanged = false;
         }
 
-        static const FLOAT BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
+        static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
 
         HW.pContext->OMSetBlendState(m_pBlendState, BlendFactor, m_uiSampleMask);
         m_bBSNeedApply = false;
@@ -239,7 +239,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
     // if (stencil_mask     != _mask)       { stencil_mask=_mask;           CHK_DX(HW.pDevice->SetRenderState   (
     // D3DRS_STENCILMASK,
     // _mask                )); }
-    UINT8 SMask = (UINT8)Mask;
+    u8 SMask = (u8)Mask;
     if (m_DSDesc.StencilReadMask != SMask)
     {
         m_bDSSChanged = true;
@@ -248,7 +248,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
 
     // if (stencil_writemask    != _writemask)  { stencil_writemask=_writemask; CHK_DX(HW.pDevice->SetRenderState   (
     // D3DRS_STENCILWRITEMASK,  _writemask          )); }
-    SMask = (UINT8)WriteMask;
+    SMask = (u8)WriteMask;
     if (m_DSDesc.StencilWriteMask != SMask)
     {
         m_bDSSChanged = true;
@@ -337,7 +337,7 @@ void dx10StateManager::SetColorWriteEnable(u32 WriteMask)
     //  CHK_DX(HW.pDevice->SetRenderState   ( D3DRS_COLORWRITEENABLE3,  _mask   ));
     //}
 
-    UINT8 WMask = (UINT8)WriteMask;
+    u8 WMask = (u8)WriteMask;
 
     bool bNeedUpdate = false;
     for (int i = 0; i < 4; ++i)

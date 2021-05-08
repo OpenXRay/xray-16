@@ -11,7 +11,7 @@
 
 CZombie::CZombie()
 {
-    StateMan = new CStateManagerZombie(this);
+    StateMan = xr_new<CStateManagerZombie>(this);
 
     CControlled::init_external(this);
 }
@@ -127,7 +127,7 @@ void CZombie::vfAssignBones()
     Bones.AddBone(bone_head, AXIS_Y);
 }
 
-BOOL CZombie::net_Spawn(CSE_Abstract* DC)
+bool CZombie::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

@@ -48,7 +48,7 @@ xr_string EFS_Utils::ExcludeBasePath(LPCSTR full_path, LPCSTR excl_path)
 xr_string EFS_Utils::ChangeFileExt(LPCSTR src, LPCSTR ext)
 {
     xr_string tmp;
-    LPSTR src_ext = strext(src);
+    pstr src_ext = strext(src);
     if (src_ext)
     {
         size_t ext_pos = src_ext - src;
@@ -122,7 +122,7 @@ UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
 #endif
 
 bool EFS_Utils::GetOpenNameInternal(
-    LPCSTR initial, LPSTR buffer, size_t sz_buf, bool bMulti /*= false*/, LPCSTR offset /*= 0*/, int start_flt_ext /*= -1*/)
+    LPCSTR initial, pstr buffer, size_t sz_buf, bool bMulti /*= false*/, LPCSTR offset /*= 0*/, int start_flt_ext /*= -1*/)
 {
     VERIFY(buffer && (sz_buf > 0));
 #if defined(XR_PLATFORM_WINDOWS)
@@ -282,7 +282,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
 #endif
 }
 //----------------------------------------------------
-LPCSTR EFS_Utils::AppendFolderToName(LPSTR tex_name, size_t const tex_name_size, int depth, BOOL full_name)
+LPCSTR EFS_Utils::AppendFolderToName(pstr tex_name, size_t const tex_name_size, int depth, BOOL full_name)
 {
     string256 _fn;
     xr_strcpy(tex_name, tex_name_size, AppendFolderToName(tex_name, _fn, sizeof(_fn), depth, full_name));
@@ -290,11 +290,11 @@ LPCSTR EFS_Utils::AppendFolderToName(LPSTR tex_name, size_t const tex_name_size,
 }
 
 LPCSTR EFS_Utils::AppendFolderToName(
-    LPCSTR src_name, LPSTR dest_name, size_t const dest_name_size, int depth, BOOL full_name)
+    LPCSTR src_name, pstr dest_name, size_t const dest_name_size, int depth, BOOL full_name)
 {
     shared_str tmp = src_name;
     LPCSTR s = src_name;
-    LPSTR d = dest_name;
+    pstr d = dest_name;
     int sv_depth = depth;
     for (; *s && depth; s++, d++)
     {
@@ -324,7 +324,7 @@ LPCSTR EFS_Utils::AppendFolderToName(
 }
 
 LPCSTR EFS_Utils::GenerateName(
-    LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, LPSTR out_name, size_t const out_name_size)
+    LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, pstr out_name, size_t const out_name_size)
 {
     int cnt = 0;
     string_path fn;

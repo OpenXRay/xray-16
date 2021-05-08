@@ -12,7 +12,7 @@ class AnselCameraEffector : public CEffectorCam
 public:
     AnselCameraEffector();
 
-    BOOL ProcessCam(SCamEffectorInfo& info) override;
+    bool ProcessCam(SCamEffectorInfo& info) override;
 };
 
 class AnselManager : public CGameObject, public pureFrame

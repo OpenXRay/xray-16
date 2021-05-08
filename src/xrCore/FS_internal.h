@@ -46,7 +46,11 @@ public:
         {
             hf = fopen(conv_fn, "wb");
             if (hf == 0)
-                Msg("!Can't write file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
+            {
+                string1024 error;
+                xr_strerror(errno, error, sizeof(error));
+                Msg("! Can't write file: '%s'. Error: '%s'.", conv_fn, error);
+            }
         }
         xr_free(conv_fn);
     }
@@ -58,7 +62,7 @@ public:
             fclose(hf);
             // release RO attrib
 #if defined(XR_PLATFORM_WINDOWS)
-            DWORD dwAttr = GetFileAttributes(fName.c_str());
+            u32 dwAttr = GetFileAttributes(fName.c_str());
             if ((dwAttr != u32(-1)) && (dwAttr & FILE_ATTRIBUTE_READONLY))
             {
                 dwAttr &= ~FILE_ATTRIBUTE_READONLY;
@@ -78,12 +82,16 @@ public:
             for (req_size = count; req_size > mb_sz; req_size -= mb_sz, ptr += mb_sz)
             {
                 size_t W = fwrite(ptr, mb_sz, 1, hf);
-                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", _sys_errlist[errno]);
+                string1024 error;
+                xr_strerror(errno, error, sizeof(error));
+                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", error);
             }
             if (req_size)
             {
                 size_t W = fwrite(ptr, req_size, 1, hf);
-                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", _sys_errlist[errno]);
+                string1024 error;
+                xr_strerror(errno, error, sizeof(error));
+                R_ASSERT3(W == 1, "Can't write mem block to file. Disk maybe full.", error);
             }
         }
     };

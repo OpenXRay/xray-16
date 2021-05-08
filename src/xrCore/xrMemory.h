@@ -2,6 +2,8 @@
 
 #include "_types.h"
 
+#include <utility>
+
 class XRCORE_API xrMemory
 {
 public:
@@ -40,7 +42,7 @@ extern XRCORE_API xrMemory Memory;
     return Memory.mem_alloc(size);
 }
 
-[[nodiscard]] inline void* operator new(size_t size, const std::nothrow_t&)
+[[nodiscard]] inline void* operator new(size_t size, const std::nothrow_t&) noexcept
 {
     return Memory.mem_alloc(size);
 }
@@ -50,7 +52,7 @@ extern XRCORE_API xrMemory Memory;
     return Memory.mem_alloc(size, static_cast<size_t>(alignment));
 }
 
-[[nodiscard]] inline void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&)
+[[nodiscard]] inline void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
     return Memory.mem_alloc(size, static_cast<size_t>(alignment));
 }
@@ -73,6 +75,13 @@ inline void operator delete(void* ptr, size_t) noexcept
 inline void operator delete(void* ptr, size_t, std::align_val_t alignment) noexcept
 {
     Memory.mem_free(ptr, static_cast<size_t>(alignment));
+}
+
+template <typename T, typename... Args>
+inline T* xr_new(Args&&... args)
+{
+    auto ptr = static_cast<T*>(Memory.mem_alloc(sizeof(T)));
+    return new (ptr) T(std::forward<Args>(args)...);
 }
 
 template <class T>

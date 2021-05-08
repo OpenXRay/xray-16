@@ -170,27 +170,27 @@ void BasicPostProcessAnimator::Create()
     m_factor_speed = 1.0f;
     f_length = 0.0f;
 
-    m_Params[0] = new CPostProcessColor(&m_EffectorParams.color_base); // base color
+    m_Params[0] = xr_new<CPostProcessColor>(&m_EffectorParams.color_base); // base color
     VERIFY(m_Params[0]);
-    m_Params[1] = new CPostProcessColor(&m_EffectorParams.color_add); // add color
+    m_Params[1] = xr_new<CPostProcessColor>(&m_EffectorParams.color_add); // add color
     VERIFY(m_Params[1]);
-    m_Params[2] = new CPostProcessColor(&m_EffectorParams.color_gray); // gray color
+    m_Params[2] = xr_new<CPostProcessColor>(&m_EffectorParams.color_gray); // gray color
     VERIFY(m_Params[2]);
-    m_Params[3] = new CPostProcessValue(&m_EffectorParams.gray); // gray value
+    m_Params[3] = xr_new<CPostProcessValue>(&m_EffectorParams.gray); // gray value
     VERIFY(m_Params[3]);
-    m_Params[4] = new CPostProcessValue(&m_EffectorParams.blur); // blur value
+    m_Params[4] = xr_new<CPostProcessValue>(&m_EffectorParams.blur); // blur value
     VERIFY(m_Params[4]);
-    m_Params[5] = new CPostProcessValue(&m_EffectorParams.duality.h); // duality horizontal
+    m_Params[5] = xr_new<CPostProcessValue>(&m_EffectorParams.duality.h); // duality horizontal
     VERIFY(m_Params[5]);
-    m_Params[6] = new CPostProcessValue(&m_EffectorParams.duality.v); // duality vertical
+    m_Params[6] = xr_new<CPostProcessValue>(&m_EffectorParams.duality.v); // duality vertical
     VERIFY(m_Params[6]);
-    m_Params[7] = new CPostProcessValue(&m_EffectorParams.noise.intensity); // noise intensity
+    m_Params[7] = xr_new<CPostProcessValue>(&m_EffectorParams.noise.intensity); // noise intensity
     VERIFY(m_Params[7]);
-    m_Params[8] = new CPostProcessValue(&m_EffectorParams.noise.grain); // noise granularity
+    m_Params[8] = xr_new<CPostProcessValue>(&m_EffectorParams.noise.grain); // noise granularity
     VERIFY(m_Params[8]);
-    m_Params[9] = new CPostProcessValue(&m_EffectorParams.noise.fps); // noise fps
+    m_Params[9] = xr_new<CPostProcessValue>(&m_EffectorParams.noise.fps); // noise fps
     VERIFY(m_Params[9]);
-    m_Params[10] = new CPostProcessValue(&m_EffectorParams.cm_influence);
+    m_Params[10] = xr_new<CPostProcessValue>(&m_EffectorParams.cm_influence);
     VERIFY(m_Params[10]);
 }
 
@@ -226,36 +226,36 @@ void BasicPostProcessAnimator::ResetParam(pp_params param)
     switch (param)
     {
     case pp_base_color:
-        m_Params[0] = new CPostProcessColor(&m_EffectorParams.color_base); // base color
+        m_Params[0] = xr_new<CPostProcessColor>(&m_EffectorParams.color_base); // base color
         break;
     case pp_add_color:
-        m_Params[1] = new CPostProcessColor(&m_EffectorParams.color_add); // add color
+        m_Params[1] = xr_new<CPostProcessColor>(&m_EffectorParams.color_add); // add color
         break;
     case pp_gray_color:
-        m_Params[2] = new CPostProcessColor(&m_EffectorParams.color_gray); // gray color
+        m_Params[2] = xr_new<CPostProcessColor>(&m_EffectorParams.color_gray); // gray color
         break;
     case pp_gray_value:
-        m_Params[3] = new CPostProcessValue(&m_EffectorParams.gray); // gray value
+        m_Params[3] = xr_new<CPostProcessValue>(&m_EffectorParams.gray); // gray value
         break;
     case pp_blur:
-        m_Params[4] = new CPostProcessValue(&m_EffectorParams.blur); // blur value
+        m_Params[4] = xr_new<CPostProcessValue>(&m_EffectorParams.blur); // blur value
         break;
     case pp_dual_h:
-        m_Params[5] = new CPostProcessValue(&m_EffectorParams.duality.h); // duality horizontal
+        m_Params[5] = xr_new<CPostProcessValue>(&m_EffectorParams.duality.h); // duality horizontal
         break;
     case pp_dual_v:
-        m_Params[6] = new CPostProcessValue(&m_EffectorParams.duality.v); // duality vertical
+        m_Params[6] = xr_new<CPostProcessValue>(&m_EffectorParams.duality.v); // duality vertical
         break;
     case pp_noise_i:
-        m_Params[7] = new CPostProcessValue(&m_EffectorParams.noise.intensity); // noise intensity
+        m_Params[7] = xr_new<CPostProcessValue>(&m_EffectorParams.noise.intensity); // noise intensity
         break;
     case pp_noise_g:
-        m_Params[8] = new CPostProcessValue(&m_EffectorParams.noise.grain); // noise granularity
+        m_Params[8] = xr_new<CPostProcessValue>(&m_EffectorParams.noise.grain); // noise granularity
         break;
     case pp_noise_f:
-        m_Params[9] = new CPostProcessValue(&m_EffectorParams.noise.fps); // noise fps
+        m_Params[9] = xr_new<CPostProcessValue>(&m_EffectorParams.noise.fps); // noise fps
         break;
-    case pp_cm_influence: m_Params[10] = new CPostProcessValue(&m_EffectorParams.cm_influence); break;
+    case pp_cm_influence: m_Params[10] = xr_new<CPostProcessValue>(&m_EffectorParams.cm_influence); break;
     }
     VERIFY(m_Params[param]);
 }

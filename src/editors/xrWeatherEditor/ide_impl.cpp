@@ -51,7 +51,7 @@ void ide_impl::on_idle_end()
 }
 
 bool ide_impl::idle() const { return (m_in_idle); }
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
 HWND ide_impl::main_handle() { return ((HWND)m_window->Handle.ToInt64()); }
 HWND ide_impl::view_handle() { return ((HWND)m_window->view().draw_handle().ToInt64()); }
 #else
@@ -73,7 +73,7 @@ void ide_impl::pause() { m_window->view().pause(); }
 property_holder_base* ide_impl::create_property_holder(
     LPCSTR display_name, property_holder_collection* collection, property_holder_holder* holder)
 {
-    return (new ::property_holder(m_engine, display_name, collection, holder));
+    return (xr_new<::property_holder>(m_engine, display_name, collection, holder));
 }
 
 void ide_impl::destroy(property_holder*& property_holder)

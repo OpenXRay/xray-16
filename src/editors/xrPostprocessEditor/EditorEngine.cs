@@ -6,17 +6,27 @@ using XRay.ManagedApi.Core;
 
 namespace xrPostprocessEditor
 {
-    public struct NoiseParams
+    public struct NoiseParams : IEquatable<NoiseParams>
     {
         public float Intensity;
         public float Grain;
         public float FPS;
+
+        public bool Equals(NoiseParams other)
+        {
+            return Intensity == other.Intensity && Grain == other.Grain && FPS == other.FPS;
+        }
     }
 
-    public struct ColorMappingParams
+    public struct ColorMappingParams : IEquatable<ColorMappingParams>
     {
         public float Influence;
         public string Texture;
+
+        public bool Equals(ColorMappingParams other)
+        {
+            return Influence == other.Influence && Texture == other.Texture;
+        }
     }
 
     public class EditorEngine : IDisposable

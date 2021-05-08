@@ -2,10 +2,10 @@
 #pragma hdrstop
 
 #include "ResourceManager.h"
-#include "blenders/Blender_Recorder.h"
-#include "blenders/Blender.h"
+#include "Blender_Recorder.h"
+#include "Blender.h"
 
-void fix_texture_name(LPSTR fn);
+void fix_texture_name(pstr fn);
 
 void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
     BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
@@ -25,7 +25,7 @@ void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bF
     // Create shaders
     SPS* ps = RImplementation.Resources->_CreatePS(_ps);
     u32 flags = 0;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX11)
     if (ps->constants.dx9compatibility)
         flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 #endif
@@ -40,7 +40,7 @@ void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bF
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
 #endif
-#endif //	USE_DX10
+#endif // !USE_DX9
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);
 
@@ -62,7 +62,7 @@ void CBlender_Compile::r_Constant(LPCSTR name, R_constant_setup* s)
 
 void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
 {
-    BYTE Mask = 0;
+    u8 Mask = 0;
     Mask |= cR ? D3DCOLORWRITEENABLE_RED : 0;
     Mask |= cG ? D3DCOLORWRITEENABLE_GREEN : 0;
     Mask |= cB ? D3DCOLORWRITEENABLE_BLUE : 0;
@@ -130,7 +130,7 @@ u32 CBlender_Compile::r_Sampler(
     dwStage = i_Sampler(_name);
     if (u32(-1) != dwStage)
     {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX11)
         r_dx10Texture(_name, texture, true);
 #else
         i_Texture(dwStage, texture);

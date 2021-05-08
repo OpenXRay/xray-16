@@ -32,19 +32,16 @@ extern STORY_PAIRS spawn_story_ids;
 
 extern void release_smart_cast_stats();
 extern void clean_wnd_rects();
-extern void CreateUIGeom();
-extern void DestroyUIGeom();
 extern void InitHudSoundSettings();
 
 #include "xrEngine/IGame_Persistent.h"
 void init_game_globals()
 {
-    CreateUIGeom();
     InitHudSoundSettings();
     if (!GEnv.isDedicatedServer)
     {
-        CInfoPortion::InitInternal(ShadowOfChernobylMode || ClearSkyMode);
-        CEncyclopediaArticle::InitInternal(ShadowOfChernobylMode);
+        CInfoPortion::InitInternal(ShadowOfChernobylMode || ClearSkyMode, true);
+        CEncyclopediaArticle::InitInternal(ShadowOfChernobylMode, true);
         CPhraseDialog::InitInternal();
     };
     CCharacterInfo::InitInternal();
@@ -106,5 +103,4 @@ void clean_game_globals()
     RELATION_REGISTRY::clear_relation_registry();
 
     clean_wnd_rects();
-    DestroyUIGeom();
 }

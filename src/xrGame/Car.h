@@ -570,7 +570,7 @@ public:
     // Core events
     virtual IFactoryObject* _construct();
     virtual void Load(LPCSTR section);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void UpdateCL();
     virtual void UpdateEx(float fov); // called by owner
@@ -583,8 +583,8 @@ public:
     // Network
     virtual void net_Export(NET_Packet& P); // export to server
     virtual void net_Import(NET_Packet& P); // import from server
-    virtual BOOL net_Relevant() { return getLocal(); }; // relevant for export to server
-    virtual BOOL UsedAI_Locations();
+    virtual bool net_Relevant() { return getLocal(); }; // relevant for export to server
+    virtual bool UsedAI_Locations();
     virtual void net_Relcase(IGameObject* O);
     // Input
     virtual void OnMouseMove(int x, int y);
@@ -628,7 +628,7 @@ public:
 protected:
     virtual void SpawnInitPhysics(CSE_Abstract* D);
     virtual void net_Save(NET_Packet& P);
-    virtual BOOL net_SaveRelevant();
+    virtual bool net_SaveRelevant();
     void SaveNetState(NET_Packet& P);
     virtual void RestoreNetState(CSE_PHSkeleton* po);
     void SetDefaultNetState(CSE_PHSkeleton* po);
@@ -637,7 +637,7 @@ protected:
 public:
     CCar(void);
     virtual ~CCar(void);
-    virtual BOOL AlwaysTheCrow();
+    virtual bool AlwaysTheCrow();
 
 public:
     virtual CEntity* cast_entity() { return this; }

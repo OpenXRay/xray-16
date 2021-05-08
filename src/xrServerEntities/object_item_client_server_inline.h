@@ -24,14 +24,14 @@ IC CSObjectItemClientServer::CObjectItemClientServer(const CLASS_ID& clsid, LPCS
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServer::client_object() const
 {
-    return (new CLIENT_TYPE())->_construct();
+    return (xr_new<CLIENT_TYPE>())->_construct();
 }
 #endif
 
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServer::server_object(LPCSTR section) const
 {
-    ObjectFactory::ServerObjectBaseClass* o = (new SERVER_TYPE(section))->init();
+    ObjectFactory::ServerObjectBaseClass* o = (xr_new<SERVER_TYPE>(section))->init();
     R_ASSERT(o);
     return (o);
 }
@@ -56,7 +56,7 @@ TEMPLATE_SPECIALIZATION
 ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServerSingleMp::client_object() const
 {
     ObjectFactory::ClientObjectBaseClass* result =
-        IsGameTypeSingle() ? new _client_type_single() : new _client_type_mp();
+        IsGameTypeSingle() ? xr_new<_client_type_single>() : xr_new<_client_type_mp>();
 
     return (result->_construct());
 }
@@ -65,7 +65,7 @@ TEMPLATE_SPECIALIZATION
 ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServerSingleMp::server_object(LPCSTR section) const
 {
     ObjectFactory::ServerObjectBaseClass* result =
-        IsGameTypeSingle() ? new _server_type_single(section) : new _server_type_mp(section);
+        IsGameTypeSingle() ? xr_new<_server_type_single>(section) : xr_new<_server_type_mp>(section);
 
     result = result->init();
     R_ASSERT(result);

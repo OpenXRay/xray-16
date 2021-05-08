@@ -118,7 +118,7 @@ static void _InitPPM(const char* model_file = 0)
 
             _ModelDataSize = ftell(mdl);
             _ModelData = new char[_ModelDataSize];
-            trained_model = new compression::ppmd::stream(_ModelData, _ModelDataSize);
+            trained_model = xr_new<compression::ppmd::stream>(_ModelData, _ModelDataSize);
 
             fseek(mdl, 0, SEEK_SET);
             fread(_ModelData, _ModelDataSize, 1, mdl);

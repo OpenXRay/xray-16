@@ -135,7 +135,7 @@ extern BOOL g_bDrawFirstBulletCrosshair;
 float debug_on_frame_gather_stats_frequency = 0.f;
 #endif
 #ifdef DEBUG
-extern LPSTR dbg_stalker_death_anim;
+extern pstr dbg_stalker_death_anim;
 extern BOOL b_death_anim_velocity;
 extern BOOL death_anim_debug;
 extern BOOL dbg_imotion_draw_skeleton;
@@ -438,12 +438,12 @@ public:
         if (MainMenu()->IsActive())
             MainMenu()->Activate(false);
 
-        LPSTR fn_;
+        pstr fn_;
         STRCONCAT(fn_, args, ".xrdemo");
         string_path fn;
         FS.update_path(fn, "$game_saves$", fn_);
 
-        g_pGameLevel->Cameras().AddCamEffector(new CDemoRecord(fn));
+        g_pGameLevel->Cameras().AddCamEffector(xr_new<CDemoRecord>(fn));
     }
 };
 
@@ -493,7 +493,7 @@ public:
             Console->Hide();
             string_path fn;
             u32 loops = 0;
-            LPSTR comma = strchr(const_cast<LPSTR>(args), ',');
+            pstr comma = strchr(const_cast<pstr>(args), ',');
             if (comma)
             {
                 loops = atoi(comma + 1);
@@ -501,8 +501,40 @@ public:
             }
             strconcat(sizeof(fn), fn, args, ".xrdemo");
             FS.update_path(fn, "$game_saves$", fn);
-            g_pGameLevel->Cameras().AddCamEffector(new CDemoPlay(fn, 1.0f, loops));
+            g_pGameLevel->Cameras().AddCamEffector(xr_new<CDemoPlay>(fn, 1.0f, loops));
         }
+    }
+};
+
+class CCC_Spawn : public IConsole_Command
+{
+public:
+    CCC_Spawn(pcstr name) : IConsole_Command(name) {}
+
+    void Execute(pcstr args) override
+    {
+        if (!g_pGameLevel)
+            return;
+
+        if (!IsGameTypeSingle())
+        {
+            Log("Spawn command is available only in singleplayer mode.");
+            return;
+        }
+
+        if (!pSettings->section_exist(args))
+        {
+            InvalidSyntax();
+            return;
+        }
+
+        Fvector pos = Actor()->Position();
+        Level().g_cl_Spawn(args, 0xff, M_SPAWN_OBJECT_LOCAL, pos);
+    }
+
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, "valid name of entity or item that can be spawned");
     }
 };
 
@@ -618,7 +650,7 @@ public:
         const bool compat = ClearSkyMode || ShadowOfChernobylMode;
         StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true, compat ? 3.0f : -1.0f);
 
-        LPSTR save_name;
+        pstr save_name;
         STRCONCAT(save_name, StringTable().translate("st_game_saved").c_str(), ": ", S);
         _s->wnd()->TextItemControl()->SetText(save_name);
 
@@ -764,7 +796,7 @@ public:
             return;
         }
 
-        LPSTR command;
+        pstr command;
         if (ai().get_alife())
         {
             STRCONCAT(command, "load ", g_last_saved_game);
@@ -1024,7 +1056,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         // BUG: leak
-        (new CUIDebugFonts())->ShowDialog(true);
+        (xr_new<CUIDebugFonts>())->ShowDialog(true);
     }
 };
 
@@ -1915,6 +1947,7 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
+    CMD3(CCC_Mask, "hud_left_handed", &psHUD_Flags, HUD_LEFT_HANDED);
 
     CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
@@ -2049,6 +2082,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_JumpToLevel, "jump_to_level");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
+    CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");

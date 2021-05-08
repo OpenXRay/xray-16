@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Layers/xrRender/ColorMapManager.h"
 
 class light;
@@ -20,16 +21,7 @@ private:
 public:
     u32 dwLightMarkerID;
     //
-    IBlender* b_occq;
-    IBlender* b_accum_mask;
-    IBlender* b_accum_direct;
-    IBlender* b_accum_point;
     IBlender* b_accum_spot;
-    IBlender* b_accum_reflected;
-    IBlender* b_bloom;
-    IBlender* b_ssao;
-    IBlender* b_luminance;
-    IBlender* b_combine;
 
 #ifdef DEBUG
     struct dbg_line_t
@@ -48,6 +40,9 @@ public:
 
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
+    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
+    ref_rt rt_Generic_0_r; // MRT generic 0, if MSAA is disabled, just an alias of rt_Generic_0
+    ref_rt rt_Generic_1_r; // MRT generic 1, if MSAA is disabled, just an alias of rt_Generic_1
     ref_rt rt_Position; // 64bit,	fat	(x,y,z,?)				(eye-space)
     ref_rt rt_Normal; // 64bit,	fat	(x,y,z,hemi)			(eye-space)
     ref_rt rt_Color; // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
@@ -65,7 +60,7 @@ public:
     ref_rt rt_LUM_8; // 64bit, 8x8,		log-average in all components
 
     //	Igor: for async screenshots
-    ref_rt pFB; // 32bit		(r,g,b,a) is situated in the system memory
+    ref_rt rt_async_ss; // 32bit		(r,g,b,a) is situated in the system memory
 
     ref_rt rt_LUM_pool[CHWCaps::MAX_GPUS * 2]; // 1xfp32,1x1,		exp-result -> scaler
     ref_texture t_LUM_src; // source
@@ -127,6 +122,7 @@ private:
     ref_shader s_bloom_dbg_1;
     ref_shader s_bloom_dbg_2;
     ref_shader s_bloom;
+    ref_shader s_bloom_msaa; // if MSAA is disabled, just an alias of s_bloom
     float f_bloom_factor;
 
     // Luminance
@@ -148,6 +144,7 @@ private:
 
 public:
     ref_shader s_postprocess;
+    ref_shader s_postprocess_msaa; // if MSAA is disabled, just an alias of s_bloom
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;
@@ -180,6 +177,8 @@ public:
     CRenderTarget();
     ~CRenderTarget();
 
+    void build_textures();
+
     void accum_point_geom_create();
     void accum_point_geom_destroy();
     void accum_omnip_geom_create();
@@ -193,13 +192,18 @@ public:
     ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
     ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pRT; }
 
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb);
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
+    {
+        u_setrt(_1, _2, _3, _zb ? _zb->pRT : nullptr);
+    }
+    void u_setrt(u32 W, u32 H, IDirect3DSurface9* _1, IDirect3DSurface9* _2, IDirect3DSurface9* _3,
+        IDirect3DSurface9* zb);
+
     void u_stencil_optimize(BOOL common_stencil = TRUE);
     void u_compute_texgen_screen(Fmatrix& dest);
     void u_compute_texgen_screen_asd(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);
-    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb);
-    void u_setrt(
-        u32 W, u32 H, IDirect3DSurface9* _1, IDirect3DSurface9* _2, IDirect3DSurface9* _3, IDirect3DSurface9* zb);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
     bool u_need_PP();

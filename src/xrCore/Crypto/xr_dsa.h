@@ -4,9 +4,11 @@
 
 #include "xrCore/xrCore.h"
 
+#ifdef USE_CRYPTOPP
 #include <cryptopp/dsa.h>
 #include <cryptopp/sha.h>
 #include <cryptopp/osrng.h>
+#endif
 
 namespace crypto
 {
@@ -38,8 +40,10 @@ public:
 #endif
 
 private:
+#ifdef USE_CRYPTOPP
     CryptoPP::DL_GroupParameters_DSA m_dsa;
     CryptoPP::AutoSeededRandomPool m_rng;
+#endif // USE_CRYPTOPP
 }; // class xr_dsa
 
 } // namespace crypto

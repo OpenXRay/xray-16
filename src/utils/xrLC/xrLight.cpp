@@ -93,7 +93,7 @@ void CBuild::LMapsLocal()
     CTimer start_time;
     start_time.Start();
     for (int L = 0; L < NUM_THREADS; L++)
-        threads.start(new CLMThread(L));
+        threads.start(xr_new<CLMThread>(L));
     threads.wait(500);
     Logger.clMsg("%f seconds", start_time.GetElapsed_sec());
 }

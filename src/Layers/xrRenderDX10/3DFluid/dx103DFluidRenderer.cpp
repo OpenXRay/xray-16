@@ -128,7 +128,7 @@ void dx103DFluidRenderer::CreateGridBox()
     m_iGridBoxVertNum = sizeof(vertices) / sizeof(vertices[0]);
 
     m_pGridBoxVertexBuffer.Create(sizeof(vertices));
-    BYTE* pData = static_cast<BYTE*>(m_pGridBoxVertexBuffer.Map());
+    u8* pData = static_cast<u8*>(m_pGridBoxVertexBuffer.Map());
     CopyMemory(pData, vertices, sizeof(vertices));
     m_pGridBoxVertexBuffer.Unmap(true);
 
@@ -138,7 +138,7 @@ void dx103DFluidRenderer::CreateGridBox()
     m_iGridBoxFaceNum = (sizeof(indices) / sizeof(indices[0])) / 3;
 
     m_pGridBoxIndexBuffer.Create(sizeof(indices));
-    pData = static_cast<BYTE*>(m_pGridBoxIndexBuffer.Map());
+    pData = static_cast<u8*>(m_pGridBoxIndexBuffer.Map());
     CopyMemory(pData, indices, sizeof(indices));
     m_pGridBoxIndexBuffer.Unmap(true);
 
@@ -164,7 +164,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
     svQuad[3].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
 
     m_pQuadVertexBuffer.Create(sizeof(svQuad));
-    BYTE* pData = static_cast<BYTE*>(m_pQuadVertexBuffer.Map());
+    u8* pData = static_cast<u8*>(m_pQuadVertexBuffer.Map());
     CopyMemory(pData, svQuad, sizeof(svQuad));
     m_pQuadVertexBuffer.Unmap(true);
     m_GeomQuadVertex.create(quadlayout, m_pQuadVertexBuffer, 0);
@@ -172,7 +172,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
 
 void dx103DFluidRenderer::CreateJitterTexture()
 {
-    BYTE data[256 * 256];
+    u8 data[256 * 256];
     for (int i = 0; i < 256 * 256; i++)
     {
         data[i] = (unsigned char)(rand() / float(RAND_MAX) * 256);
@@ -337,8 +337,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 
     // Raycast into the temporary render target:
     //  raycasting is done at the smaller resolution, using a fullscreen quad
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    HW.pContext->ClearRenderTargetView(RT[RRT_RayCastTex]->pRT, ColorRGBA);
+    RCache.ClearRT(RT[RRT_RayCastTex], {}); // black
 
     pTarget->u_setrt(RT[RRT_RayCastTex], nullptr, nullptr, nullptr); // LDR RT
 
@@ -355,10 +354,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     // Render to the back buffer sampling from the raycast texture that we just created
     //  If and edge was detected at the current pixel we will raycast again to avoid
     //  smoke aliasing artifacts at scene edges
-    if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, nullptr, nullptr, pTarget->get_base_zb()); // LDR RT
-    else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, nullptr, nullptr, pTarget->rt_MSAADepth->pZRT); // LDR RT
+    pTarget->u_setrt(pTarget->rt_Generic_0_r, nullptr, nullptr, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     if (bRenderFire)
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastCopyFire]);
@@ -376,9 +372,8 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 
 void dx103DFluidRenderer::ComputeRayData(const dx103DFluidData &FluidData)
 {
-    // Clear the color buffer to 0
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    HW.pContext->ClearRenderTargetView(RT[RRT_RayDataTex]->pRT, ColorRGBA);
+    // Clear the color buffer to zero
+    RCache.ClearRT(RT[RRT_RayDataTex], {});
 
     CRenderTarget* pTarget = RImplementation.Target;
     pTarget->u_setrt(RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT

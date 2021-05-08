@@ -129,8 +129,8 @@ public:
 // virtual RenderData &GetRenderData() override = 0;
 // virtual void renderable_Render(IRenderable* root) override = 0;
 // virtual IRender_ObjectSpecific *renderable_ROS() override = 0;
-// virtual BOOL renderable_ShadowGenerate() override = 0;
-// virtual BOOL renderable_ShadowReceive() override = 0;
+// virtual bool renderable_ShadowGenerate() override = 0;
+// virtual bool renderable_ShadowReceive() override = 0;
 // ~IRenderable
 // ICollidable
 // virtual void SetCForm(ICollisionForm *cform) override = 0;
@@ -153,16 +153,16 @@ public:
 #endif
     virtual void MakeMeCrow() = 0;
     virtual void IAmNotACrowAnyMore() = 0;
-    virtual BOOL AlwaysTheCrow() = 0;
+    virtual bool AlwaysTheCrow() = 0;
     virtual bool AmICrow() const = 0;
     // Network
-    virtual BOOL Local() const = 0;
-    virtual BOOL Remote() const = 0;
+    virtual bool Local() const = 0;
+    virtual bool Remote() const = 0;
     virtual u16 ID() const = 0;
     virtual void setID(u16 id) = 0;
-    virtual BOOL Ready() = 0;
-    virtual BOOL GetTmpPreDestroy() const = 0;
-    virtual void SetTmpPreDestroy(BOOL b) = 0;
+    virtual bool Ready() = 0;
+    virtual bool GetTmpPreDestroy() const = 0;
+    virtual void SetTmpPreDestroy(bool b) = 0;
     // Parentness
     virtual IGameObject* H_Parent() = 0;
     virtual const IGameObject* H_Parent() const = 0;
@@ -191,7 +191,7 @@ public:
     virtual shared_str cName() const = 0;
     virtual void cName_set(shared_str N) = 0;
     virtual shared_str cNameSect() const = 0;
-    virtual LPCSTR cNameSect_str() const = 0;
+    virtual pcstr cNameSect_str() const = 0;
     virtual void cNameSect_set(shared_str N) = 0;
     virtual shared_str cNameVisual() const = 0;
     virtual void cNameVisual_set(shared_str N) = 0;
@@ -199,21 +199,21 @@ public:
     virtual void processing_activate() = 0; // request to enable UpdateCL
     virtual void processing_deactivate() = 0; // request to disable UpdateCL
     virtual bool processing_enabled() = 0;
-    virtual void setVisible(BOOL _visible) = 0;
-    virtual BOOL getVisible() const = 0;
-    virtual void setEnabled(BOOL _enabled) = 0;
-    virtual BOOL getEnabled() const = 0;
-    virtual void setDestroy(BOOL _destroy) = 0;
-    virtual BOOL getDestroy() const = 0;
-    virtual void setLocal(BOOL _local) = 0;
-    virtual BOOL getLocal() const = 0;
-    virtual void setSVU(BOOL _svu) = 0;
-    virtual BOOL getSVU() const = 0;
-    virtual void setReady(BOOL _ready) = 0;
-    virtual BOOL getReady() const = 0;
+    virtual void setVisible(bool _visible) = 0;
+    virtual bool getVisible() const = 0;
+    virtual void setEnabled(bool _enabled) = 0;
+    virtual bool getEnabled() const = 0;
+    virtual void setDestroy(bool _destroy) = 0;
+    virtual bool getDestroy() const = 0;
+    virtual void setLocal(bool _local) = 0;
+    virtual bool getLocal() const = 0;
+    virtual void setSVU(bool _svu) = 0;
+    virtual bool getSVU() const = 0;
+    virtual void setReady(bool _ready) = 0;
+    virtual bool getReady() const = 0;
     // ~Properties
-    virtual void Load(LPCSTR section) = 0;
-    virtual void PostLoad(LPCSTR section) = 0; //--#SM+#--
+    virtual void Load(pcstr section) = 0;
+    virtual void PostLoad(pcstr section) = 0; //--#SM+#--
     // Update
     virtual void PreUpdateCL() = 0;
     virtual void UpdateCL() = 0; // Called each frame, so no need for dt
@@ -270,13 +270,13 @@ public:
     // object serialization
     virtual void net_Save(NET_Packet& packet) = 0;
     virtual void net_Load(IReader& reader) = 0;
-    virtual BOOL net_SaveRelevant() = 0;
+    virtual bool net_SaveRelevant() = 0;
     virtual void net_Export(NET_Packet& packet) = 0; // export to server
     virtual void net_Import(NET_Packet& packet) = 0; // import from server
-    virtual BOOL net_Spawn(CSE_Abstract* entity) = 0;
+    virtual bool net_Spawn(CSE_Abstract* entity) = 0;
     virtual void net_Destroy() = 0;
     virtual void net_ImportInput(NET_Packet& packet) = 0;
-    virtual BOOL net_Relevant() = 0; // relevant for export to server
+    virtual bool net_Relevant() = 0; // relevant for export to server
     virtual void net_MigrateInactive(NET_Packet& packet) = 0;
     virtual void net_MigrateActive(NET_Packet& packet) = 0;
     virtual void net_Relcase(IGameObject* obj) = 0; // destroy all links to another objects
@@ -285,9 +285,9 @@ public:
     virtual void OnEvent(NET_Packet& packet, u16 type) = 0;
     virtual void Hit(SHit* hit) = 0;
     virtual void SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector pos, Fvector dir) = 0;
-    virtual BOOL BonePassBullet(int boneId) = 0;
+    virtual bool BonePassBullet(int boneId) = 0;
     // игровое имя объекта
-    virtual LPCSTR Name() const = 0;
+    virtual pcstr Name() const = 0;
     virtual bool IsVisibleForZones() = 0;
     virtual bool NeedToDestroyObject() const = 0;
     virtual void DestroyObject() = 0;
@@ -299,8 +299,8 @@ public:
     virtual const animation_movement_controller* animation_movement() const = 0;
     virtual animation_movement_controller* animation_movement() = 0;
     // Game-specific events
-    virtual BOOL UsedAI_Locations() = 0;
-    virtual BOOL TestServerFlag(u32 flag) const = 0;
+    virtual bool UsedAI_Locations() = 0;
+    virtual bool TestServerFlag(u32 flag) const = 0;
     virtual bool can_validate_position_on_spawn() = 0;
 #ifdef DEBUG
     virtual bool ShouldProcessOnRender() const = 0;
@@ -308,7 +308,7 @@ public:
     virtual void OnRender() = 0;
 #endif
     virtual void reinit() = 0;
-    virtual void reload(LPCSTR section) = 0;
+    virtual void reload(pcstr section) = 0;
     // network
     virtual bool object_removed() const = 0;
     virtual void make_Interpolation() = 0; // interpolation from last visible to corrected position/rotation
@@ -346,7 +346,7 @@ public:
     virtual bool use_center_to_aim() const = 0;
     virtual void MoveTo(const Fvector& pos) = 0;
     virtual CScriptCallbackExVoid& callback(GameObject::ECallbackType type) const = 0;
-    virtual LPCSTR visual_name(CSE_Abstract* entity) = 0;
+    virtual pcstr visual_name(CSE_Abstract* entity) = 0;
     virtual void On_B_NotCurrentEntity() = 0;
     virtual bool is_ai_obstacle() const = 0;
     virtual ai_obstacle& obstacle() const = 0;
@@ -354,8 +354,8 @@ public:
     // UsableScriptObject functions
     virtual bool use(IGameObject* obj) = 0;
     // строчка появляющаяся при наведении на объект (если NULL, то нет)
-    virtual LPCSTR tip_text() = 0;
-    virtual void set_tip_text(LPCSTR text) = 0;
+    virtual pcstr tip_text() = 0;
+    virtual void set_tip_text(pcstr text) = 0;
     virtual void set_tip_text_default() = 0;
     // можно ли использовать объект стандартным (не скриптовым) образом
     virtual bool nonscript_usable() = 0;

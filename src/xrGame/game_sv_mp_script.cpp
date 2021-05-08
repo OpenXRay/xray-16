@@ -133,7 +133,7 @@ void game_sv_mp_script::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID send
     inherited::OnEvent(P, type, time, sender);
 };
 void game_sv_mp_script::OnPlayerConnect(ClientID id_who) { inherited::OnPlayerConnect(id_who); };
-void game_sv_mp_script::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID)
+void game_sv_mp_script::OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameID)
 {
     inherited::OnPlayerDisconnect(id_who, Name, GameID);
 };

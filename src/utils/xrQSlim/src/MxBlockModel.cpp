@@ -21,7 +21,7 @@
 MxBlockModel* MxBlockModel::clone(MxBlockModel* m)
 {
     if (!m)
-        m = new MxBlockModel(vert_count(), face_count());
+        m = xr_new<MxBlockModel>(vert_count(), face_count());
 
     unsigned int i;
 
@@ -193,7 +193,7 @@ void MxBlockModel::color_binding(unsigned char b)
         if (colors)
             colors->reset();
         else
-            colors = new MxDynBlock<MxColor>(size);
+            colors = xr_new<MxDynBlock<MxColor>>(size);
         binding_mask |= MX_COLOR_MASK;
     }
 
@@ -217,7 +217,7 @@ void MxBlockModel::normal_binding(unsigned char b)
         if (normals)
             normals->reset();
         else
-            normals = new MxDynBlock<MxNormal>(size);
+            normals = xr_new<MxDynBlock<MxNormal>>(size);
         binding_mask |= MX_NORMAL_MASK;
     }
 
@@ -233,7 +233,7 @@ void MxBlockModel::texcoord_binding(unsigned char b)
     if (tcoords)
         tcoords->reset();
     else
-        tcoords = new MxDynBlock<MxTexCoord>(size);
+        tcoords = xr_new<MxDynBlock<MxTexCoord>>(size);
 
     tbinding = b;
 }

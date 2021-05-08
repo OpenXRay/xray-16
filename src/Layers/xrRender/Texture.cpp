@@ -7,9 +7,9 @@
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
-void fix_texture_name(LPSTR fn)
+void fix_texture_name(pstr fn)
 {
-    LPSTR _ext = strext(fn);
+    pstr _ext = strext(fn);
     if (_ext && (!xr_stricmp(_ext, ".tga") || !xr_stricmp(_ext, ".dds") ||
         !xr_stricmp(_ext, ".bmp") || !xr_stricmp(_ext, ".ogm")))
     {
@@ -40,7 +40,7 @@ int get_texture_load_lod(LPCSTR fn)
         {
             if (psTextureLOD < 1)
             {
-                if (enough_address_space_available || GEnv.CurrentRenderer < 2)
+                if (enough_address_space_available || GEnv.Render->GenerationIsR1())
                     return 0;
                 else
                     return 1;
@@ -54,7 +54,7 @@ int get_texture_load_lod(LPCSTR fn)
 
     if (psTextureLOD < 2)
     {
-        //if (enough_address_space_available || GEnv.CurrentRenderer < 2)
+        //if (enough_address_space_available || GEnv.Render->GenerationIsR1())
         return 0;
         //else
         //    return 1;
@@ -139,7 +139,9 @@ ID3DTexture2D* TW_LoadTextureFromTexture(
     // Create HW-surface
     if (D3DX_DEFAULT == t_dest_fmt)
         t_dest_fmt = t_from_desc0.Format;
-    R_CHK(D3DXCreateTexture(HW.pDevice, top_width, top_height, levels_exist, 0, t_dest_fmt, D3DPOOL_MANAGED, &t_dest));
+    R_CHK(D3DXCreateTexture(HW.pDevice, top_width, top_height, levels_exist, 0, t_dest_fmt,
+        (RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED),
+    &t_dest));
 
     // Copy surfaces & destroy temporary
     ID3DTexture2D* T_src = t_from;
@@ -171,9 +173,9 @@ ID3DTexture2D* TW_LoadTextureFromTexture(
 template <class _It>
 void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
 {
-    DWORD mips = t_dst->GetLevelCount();
+    u32 mips = t_dst->GetLevelCount();
     R_ASSERT(mips == t_src->GetLevelCount());
-    for (DWORD i = 0; i < mips; i++)
+    for (u32 i = 0; i < mips; i++)
     {
         D3DLOCKED_RECT Rsrc, Rdst;
         D3DSURFACE_DESC desc, descS;
@@ -188,8 +190,8 @@ void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
         {
             for (u32 x = 0; x < desc.Width; x++)
             {
-                DWORD& pSrc = *(((DWORD*)((BYTE*)Rsrc.pBits + (y * Rsrc.Pitch))) + x);
-                DWORD& pDst = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch))) + x);
+                u32& pSrc = *(((u32*)((u8*)Rsrc.pBits + (y * Rsrc.Pitch))) + x);
+                u32& pDst = *(((u32*)((u8*)Rdst.pBits + (y * Rdst.Pitch))) + x);
                 pDst = pred(pDst, pSrc);
             }
         }
@@ -200,10 +202,10 @@ void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
 template <class _It>
 void TW_Iterate_2OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src0, ID3DTexture2D* t_src1, const _It pred)
 {
-    DWORD mips = t_dst->GetLevelCount();
+    u32 mips = t_dst->GetLevelCount();
     R_ASSERT(mips == t_src0->GetLevelCount());
     R_ASSERT(mips == t_src1->GetLevelCount());
-    for (DWORD i = 0; i < mips; i++)
+    for (u32 i = 0; i < mips; i++)
     {
         D3DLOCKED_RECT Rsrc0, Rsrc1, Rdst;
         D3DSURFACE_DESC desc, descS0, descS1;
@@ -221,9 +223,9 @@ void TW_Iterate_2OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src0, ID3DTexture2D* 
         {
             for (u32 x = 0; x < desc.Width; x++)
             {
-                DWORD& pSrc0 = *(((DWORD*)((BYTE*)Rsrc0.pBits + (y * Rsrc0.Pitch))) + x);
-                DWORD& pSrc1 = *(((DWORD*)((BYTE*)Rsrc1.pBits + (y * Rsrc1.Pitch))) + x);
-                DWORD& pDst = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch))) + x);
+                u32& pSrc0 = *(((u32*)((u8*)Rsrc0.pBits + (y * Rsrc0.Pitch))) + x);
+                u32& pSrc1 = *(((u32*)((u8*)Rsrc1.pBits + (y * Rsrc1.Pitch))) + x);
+                u32& pDst = *(((u32*)((u8*)Rdst.pBits + (y * Rdst.Pitch))) + x);
                 pDst = pred(pDst, pSrc0, pSrc1);
             }
         }
@@ -347,7 +349,9 @@ _DDS:
 _DDS_CUBE:
 {
     result = D3DXCreateCubeTextureFromFileInMemoryEx(HW.pDevice, S->pointer(), S->length(), D3DX_DEFAULT,
-        IMG.MipLevels, 0, IMG.Format, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &pTextureCUBE);
+        IMG.MipLevels, 0, IMG.Format,
+       (RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED),
+        D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &pTextureCUBE);
     FS.r_close(S);
 
     if (FAILED(result))

@@ -10,13 +10,9 @@
 //////////////////////////////////////////////////////////////////////////
 
 RELATION_REGISTRY::FIGHT_DATA::FIGHT_DATA()
+    : attacker(u16(-1)), defender(u16(-1)), total_hit(0), time(0), time_old(0),
+      attack_time(0), defender_to_attacker(ALife::eRelationTypeDummy)
 {
-    attacker = defender = 0xffff;
-    total_hit = 0;
-    time = 0;
-    time_old = 0;
-    attack_time = 0;
-    defender_to_attacker = ALife::eRelationTypeDummy;
 }
 
 //////////////////////////////////////////////////////////////////////////

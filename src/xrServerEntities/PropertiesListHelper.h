@@ -95,13 +95,13 @@ public:
     virtual GameTypeValue* __stdcall CreateGameType(PropItemVec& items, shared_str key, GameTypeChooser* val);
 
     // obsolette
-    virtual CTextValue* __stdcall CreateCText(PropItemVec& items, shared_str key, LPSTR val, u32 sz);
+    virtual CTextValue* __stdcall CreateCText(PropItemVec& items, shared_str key, pstr val, u32 sz);
     virtual CListValue* __stdcall CreateCList(
-        PropItemVec& items, shared_str key, LPSTR val, u32 sz, xr_string* lst, u32 cnt);
-    virtual CTextValue* __stdcall CreateCName(PropItemVec& items, shared_str key, LPSTR val, u32 sz, ListItem* owner);
+        PropItemVec& items, shared_str key, pstr val, u32 sz, xr_string* lst, u32 cnt);
+    virtual CTextValue* __stdcall CreateCName(PropItemVec& items, shared_str key, pstr val, u32 sz, ListItem* owner);
     virtual TokenValueSH* __stdcall CreateTokenSH(
         PropItemVec& items, shared_str key, u32* val, const TokenValueSH::Item* lst, u32 cnt);
-    virtual CTextValue* __stdcall CreateTexture(PropItemVec& items, shared_str key, LPSTR val, u32 sz);
+    virtual CTextValue* __stdcall CreateTexture(PropItemVec& items, shared_str key, pstr val, u32 sz);
 };
 //---------------------------------------------------------------------------
 #endif

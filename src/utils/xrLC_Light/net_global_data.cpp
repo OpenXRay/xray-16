@@ -15,7 +15,7 @@ static LPCSTR global_data_file_path(LPCSTR name, string_path& path_name)
     return path_name;
 }
 
-bool global_data_file_path(LPCSTR name, IAgent* agent, DWORD sessionId, string_path& path_name)
+bool global_data_file_path(LPCSTR name, IAgent* agent, u32 sessionId, string_path& path_name)
 {
     HRESULT rz = agent->GetSessionCacheDirectory(sessionId, path_name);
     if (rz != S_OK)
@@ -83,7 +83,7 @@ private:
         //
         outStream->Write(&_id, sizeof(_id));
     }
-    virtual bool on_task_receive(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+    virtual bool on_task_receive(IAgent* agent, u32 sessionId, IGenericStream* inStream)
     {
         //
         const xr_vector<e_net_globals>& v = gl_gl_reg().get_globals(gl_type);
@@ -135,7 +135,7 @@ private:
         impl::create_data_file(path_name);
     }
 
-    bool create_data(u32 id, IAgent* agent, DWORD sessionId)
+    bool create_data(u32 id, IAgent* agent, u32 sessionId)
     {
         if (_id == id)
             return true;
@@ -183,7 +183,7 @@ struct it
     static const e_net_globals next_et = (e_net_globals)(i + 1);
     typedef it<next_et> next;
     next ni;
-    it(xr_vector<net_global_data*>& data) : ni(data) { data[et] = new tnet_global_data<et>(); }
+    it(xr_vector<net_global_data*>& data) : ni(data) { data[et] = xr_new<tnet_global_data<et>>(); }
     static void cleanup(xr_vector<net_global_data*>& data)
     {
         tnet_global_data<et>* gd = static_cast<tnet_global_data<et>*>(data[et]);

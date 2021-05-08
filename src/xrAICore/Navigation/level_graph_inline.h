@@ -275,9 +275,9 @@ IC void CLevelGraph::begin(const u32 vertex_id, const_iterator& _begin, const_it
     begin(vertex(vertex_id), _begin, end);
 }
 
-IC u32 CLevelGraph::value(const CLevelVertex& vertex, const_iterator& i) const { return (vertex.link(i)); }
-IC u32 CLevelGraph::value(const CLevelVertex* vertex, const_iterator& i) const { return (value(*vertex, i)); }
-IC u32 CLevelGraph::value(const u32 vertex_id, const_iterator& i) const { return (value(vertex(vertex_id), i)); }
+IC u32 CLevelGraph::value(const CLevelVertex& vertex, const_iterator i) const { return (vertex.link(i)); }
+IC u32 CLevelGraph::value(const CLevelVertex* vertex, const_iterator i) const { return (value(*vertex, i)); }
+IC u32 CLevelGraph::value(const u32 vertex_id, const_iterator i) const { return (value(vertex(vertex_id), i)); }
 IC bool CLevelGraph::is_accessible(const u32 vertex_id) const
 {
     return (valid_vertex_id(vertex_id) && m_access_mask[vertex_id]);

@@ -98,7 +98,7 @@ static inline bool match_shader_id(
     LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 HRESULT CRender::shader_compile(
-    LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void*& result)
+    pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result)
 {
     D3DXMACRO defines[128];
     int def_it = 0;
@@ -469,7 +469,7 @@ HRESULT CRender::shader_compile(
     if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
-        strconcat(sizeof(file), file, "shaders_cache" DELIMITER, filename, DELIMITER, sh_name);
+        strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename, DELIMITER, sh_name);
         strconcat(sizeof(filename), filename, filename, DELIMITER, sh_name);
         FS.update_path(file_name, "$app_data_root$", file);
     }
@@ -497,8 +497,13 @@ HRESULT CRender::shader_compile(
                 u32 savedBytecodeCrc = file->r_u32();
                 u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                 if (bytecodeCrc == savedBytecodeCrc)
+                {
+#ifdef DEBUG
+                    Log("* Loading shader:", file_name);
+#endif
                     _result =
                         create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), filename, result, o.disasm);
+                }
             }
         }
         file->close();
@@ -521,12 +526,14 @@ HRESULT CRender::shader_compile(
             file->w_u32(fileCrc);
 
             u32 crc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
-            file->w_u32(crc);
+            file->w_u32(crc); // Do not write anything below this line, take a look at reading (crc32)
 
             file->w(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
 
             FS.w_close(file);
-
+#ifdef DEBUG
+            Log("- Compile shader:", file_name);
+#endif
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
                 filename, result, o.disasm);
         }

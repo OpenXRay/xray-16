@@ -4,8 +4,6 @@
 
 #include <optional>
 
-#include <cryptopp/dsa.h>
-
 #include "xr_dsa.h"
 #include "xr_sha.h"
 

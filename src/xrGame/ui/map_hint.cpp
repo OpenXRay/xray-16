@@ -11,9 +11,25 @@
 #include "string_table.h"
 #include "UIHelper.h"
 
+constexpr cpcstr HINT_ITEM_XML = "hint_item.xml";
+
 void CUIMapLocationHint::Init(CUIXml& uiXml, LPCSTR path)
 {
-    CUIXmlInit::InitFrameWindow(uiXml, path, 0, this);
+    CUIXml hintItemXml;
+    const bool xmlLoaded = hintItemXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "hint_item.xml", false);
+
+    const bool result = CUIXmlInit::InitFrameWindow(uiXml, path, 0, this, !xmlLoaded);
+    if (!result) // SOC
+    {
+        const bool windowInit = CUIXmlInit::InitWindow(hintItemXml, "hint_item", 0, this, false);
+        R_ASSERT4(windowInit, "Failed to initialize CUIMapLocationHint.\n"
+            "Was trying both COP and SOC style, both attempts failed.",
+            uiXml.m_xml_file_name, HINT_ITEM_XML);
+
+        m_border = UIHelper::CreateFrameWindow(hintItemXml, "hint_item:frame", this);
+        m_info["simple_text"] = UIHelper::CreateStatic(hintItemXml, "hint_item:description", this);
+        return;
+    }
 
     const auto init = [&](pcstr name)
     {
@@ -35,25 +51,38 @@ void CUIMapLocationHint::Init(CUIXml& uiXml, LPCSTR path)
 
 void CUIMapLocationHint::SetInfoMode(u8 mode)
 {
-    m_info["simple_text"]->Show(mode == 1);
-    m_info["t_icon"]->Show(mode == 2);
-    m_info["t_caption"]->Show(mode == 2);
-    m_info["t_time"]->Show(mode == 2);
-    m_info["t_time_rem"]->Show(mode == 2);
-    m_info["t_hint_text"]->Show(mode == 2);
+    const auto showIf = [&](pcstr name, bool condition)
+    {
+        if (m_info[name])
+            m_info[name]->Show(condition);
+    };
+    showIf("simple_text",   mode == 1);
+    showIf("t_icon",        mode == 2);
+    showIf("t_caption",     mode == 2);
+    showIf("t_time",        mode == 2);
+    showIf("t_time_rem",    mode == 2);
+    showIf("t_hint_text",   mode == 2);
 }
 
-void CUIMapLocationHint::Draw_() { inherited::Draw(); }
-void CUIMapLocationHint::SetInfoStr(LPCSTR text)
+void CUIMapLocationHint::SetInfoStr(pcstr info)
 {
     SetInfoMode(1);
-    CUIStatic* S = m_info["simple_text"];
-    S->TextItemControl()->SetTextST(text);
-    S->AdjustHeightToText();
-    float new_w = S->GetWndPos().x + S->GetWndSize().x + 20.0f;
 
-    float new_h = _max(64.0f, S->GetWndPos().y + S->GetWndSize().y + 20.0f);
-    SetWndSize(Fvector2().set(new_w, new_h));
+    CUIStatic* text = m_info["simple_text"];
+    text->SetTextST(info);
+    text->AdjustHeightToText();
+
+    const float new_w = text->GetWndPos().x + text->GetWndSize().x + 20.0f;
+    const float new_h = _max(64.0f, text->GetWndPos().y + text->GetWndSize().y + 20.0f);
+
+    if (!m_border)
+        SetWndSize(Fvector2().set(new_w, new_h));
+    else
+    {
+        SetWndSize(Fvector2().set(GetWndSize().x, new_h));
+        m_border->SetWidth(GetWndSize().x);
+        m_border->SetHeight(GetWndSize().y);
+    }
 }
 
 void CUIMapLocationHint::SetInfoMSpot(CMapSpot* spot)

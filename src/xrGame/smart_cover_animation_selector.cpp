@@ -30,7 +30,7 @@ animation_selector::animation_selector(CAI_Stalker* object)
 {
     m_skeleton_animated = smart_cast<IKinematicsAnimated*>(object->Visual());
     VERIFY(m_skeleton_animated);
-    m_planner = new animation_planner(object, "animation planner");
+    m_planner = xr_new<animation_planner>(object, "animation planner");
 }
 
 animation_selector::~animation_selector() { xr_delete(m_planner); }
@@ -117,7 +117,7 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
 		string16			animation_slot_string;
 		R_ASSERT			( !_itoa_s( hud_item->animation_slot(), animation_slot_string, sizeof(animation_slot_string), 10 ) );
 
-		LPSTR				result;
+		pstr				result;
 		STRCONCAT			( result, m_animation, "_slot_", animation_slot_string);
 
 		MotionID			animation_id = m_skeleton_animated->ID_Cycle_Safe( result );

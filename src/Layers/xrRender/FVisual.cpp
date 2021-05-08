@@ -61,7 +61,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             destructor<IReader> def(geomdef().open_chunk(OGF_GCONTAINER));
 
             // we have fast-mesh
-            m_fast = new IRender_Mesh();
+            m_fast = xr_new<IRender_Mesh>();
 
             // verts
             VertexElement* fmt = nullptr;
@@ -117,9 +117,9 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 
             VERIFY(nullptr == p_rm_Vertices);
             vStride = GetFVFVertexSize(fvf);
-            p_rm_Vertices = new VertexStagingBuffer{};
+            p_rm_Vertices = xr_new<VertexStagingBuffer>();
             p_rm_Vertices->Create(vCount * vStride);
-            BYTE* bytes = static_cast<BYTE*>(p_rm_Vertices->Map());
+            u8* bytes = static_cast<u8*>(p_rm_Vertices->Map());
             CopyMemory(bytes, data->pointer(), vCount * vStride);
             p_rm_Vertices->Unmap(true); // upload vertex data
         }
@@ -150,9 +150,9 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             dwPrimitives = iCount / 3;
 
             VERIFY(nullptr == p_rm_Indices);
-            p_rm_Indices = new IndexStagingBuffer{};
+            p_rm_Indices = xr_new<IndexStagingBuffer>();
             p_rm_Indices->Create(iCount * 2, true); // indices are read in model-wallmarks code
-            BYTE* bytes = static_cast<BYTE*>(p_rm_Indices->Map());
+            u8* bytes = static_cast<u8*>(p_rm_Indices->Map());
             CopyMemory(bytes, data->pointer(), iCount * 2);
             p_rm_Indices->Unmap(true); // upload index data
         }

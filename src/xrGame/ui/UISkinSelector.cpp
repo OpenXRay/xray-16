@@ -15,17 +15,17 @@ CUISkinSelectorWnd::CUISkinSelectorWnd(const char* strSectionName, s16 team)
 {
     m_team = team;
     m_iActiveIndex = -1;
-    m_pBackground = new CUIStatic();
+    m_pBackground = xr_new<CUIStatic>();
     AttachChild(m_pBackground);
-    m_pCaption = new CUIStatic();
+    m_pCaption = xr_new<CUIStatic>();
     AttachChild(m_pCaption);
 
-    m_pFrames = new CUIStatic();
+    m_pFrames = xr_new<CUIStatic>();
     AttachChild(m_pFrames);
 
     for (int i = 0; i < 6; i++)
     {
-        m_pImage[i] = new CUIStatix();
+        m_pImage[i] = xr_new<CUIStatix>();
         AttachChild(m_pImage[i]);
     }
     //	m_pAnims[0]		= new CUIAnimatedStatic(); m_pFrames->AttachChild(m_pAnims[0]);
@@ -35,11 +35,11 @@ CUISkinSelectorWnd::CUISkinSelectorWnd(const char* strSectionName, s16 team)
     //	m_pButtons[1]	= new CUI3tButton();	m_pFrames->AttachChild(m_pButtons[1]);
     // m_pButtons[1]->SetMessageTarget(this);
 
-    m_pBtnAutoSelect = new CUI3tButton();
+    m_pBtnAutoSelect = xr_new<CUI3tButton>();
     AttachChild(m_pBtnAutoSelect);
-    m_pBtnSpectator = new CUI3tButton();
+    m_pBtnSpectator = xr_new<CUI3tButton>();
     AttachChild(m_pBtnSpectator);
-    m_pBtnBack = new CUI3tButton();
+    m_pBtnBack = xr_new<CUI3tButton>();
     AttachChild(m_pBtnBack);
 
     m_firstSkin = 0;

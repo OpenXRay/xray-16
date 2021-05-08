@@ -20,7 +20,6 @@ add_dir("${DIRS}")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/pugixml/src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/mimalloc/include
     ${SDL_INCLUDE_DIRS}
     ${TBB_INCLUDE_DIRS}
@@ -58,8 +57,19 @@ cotire(${PROJECT_NAME})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${PROJECT_NAME} xrMiscMath dl pthread mimalloc-static ${PCRE_LIBRARIES} ${SDL_LIBRARIES} ${LZO_LIBRARIES} ${CRYPTO++_LIBRARIES} ${PUGIXML_LIBRARY} ${TBB_LIBRARIES})
+target_link_libraries(
+    ${PROJECT_NAME}
+    xrMiscMath
+    dl
+    pthread
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
+    ${PCRE_LIBRARIES}
+    ${SDL_LIBRARIES}
+    ${LZO_LIBRARIES}
+    ${CRYPTO++_LIBRARIES}
+    ${TBB_LIBRARIES}
+)
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION /usr/lib PERMISSIONS OWNER_READ OWNER_WRITE 
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
     GROUP_READ 
     WORLD_READ )

@@ -115,7 +115,7 @@ void CWeaponAmmo::Load(LPCSTR section)
     m_boxCurr = m_boxSize;
 }
 
-BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
+bool CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
 {
     BOOL bResult = inherited::net_Spawn(DC);
     CSE_Abstract* e = (CSE_Abstract*)(DC);

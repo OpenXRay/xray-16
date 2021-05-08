@@ -28,7 +28,7 @@ CAI_Space& CAI_Space::GetInstance()
 {
     if (!g_ai_space)
     {
-        g_ai_space = new CAI_Space();
+        g_ai_space = xr_new<CAI_Space>();
         g_ai_space->init();
     }
     return *g_ai_space;
@@ -47,7 +47,7 @@ void CAI_Space::init()
         m_moving_objects = xr_make_unique<::moving_objects>();
 
         VERIFY(!GEnv.ScriptEngine);
-        GEnv.ScriptEngine = new CScriptEngine();
+        GEnv.ScriptEngine = xr_new<CScriptEngine>();
         RestartScriptEngine();
     }
 
@@ -72,7 +72,7 @@ void CAI_Space::RegisterScriptClasses()
 #else
     string_path S;
     FS.update_path(S, "$game_config$", "script.ltx");
-    CInifile* l_tpIniFile = new CInifile(S);
+    CInifile* l_tpIniFile = xr_new<CInifile>(S);
     R_ASSERT(l_tpIniFile);
     if (!l_tpIniFile->section_exist("common"))
     {
@@ -104,7 +104,7 @@ void CAI_Space::LoadCommonScripts()
 #else
     string_path S;
     FS.update_path(S, "$game_config$", "script.ltx");
-    CInifile* l_tpIniFile = new CInifile(S);
+    CInifile* l_tpIniFile = xr_new<CInifile>(S);
     R_ASSERT(l_tpIniFile);
     if (!l_tpIniFile->section_exist("common"))
     {
@@ -169,7 +169,7 @@ void CAI_Space::load(LPCSTR level_name)
     m_cover_manager->compute_static_cover();
     m_moving_objects->on_level_load();
 
-    m_doors_manager.reset(new ::doors::manager(level_graph().header().box()));
+    m_doors_manager.reset(xr_new<::doors::manager>(level_graph().header().box()));
 
 #ifdef DEBUG
     Msg("* Loading ai space is successfully completed (%.3fs, %7.3f Mb)", timer.GetElapsed_sec(),

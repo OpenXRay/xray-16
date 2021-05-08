@@ -80,7 +80,7 @@ public:
     }
 
     // data members are left public
-    UINT m_refCount;
+    u32 m_refCount;
     NvFaceInfo *m_face0, *m_face1;
     int m_v0, m_v1;
     NvEdgeInfo *m_nextV0, *m_nextV1;

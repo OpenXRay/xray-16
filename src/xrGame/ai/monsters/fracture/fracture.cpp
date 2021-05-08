@@ -5,7 +5,7 @@
 #include "ai/monsters/control_animation_base.h"
 #include "ai/monsters/control_movement_base.h"
 
-CFracture::CFracture() { StateMan = new CStateManagerFracture(this); }
+CFracture::CFracture() { StateMan = xr_new<CStateManagerFracture>(this); }
 CFracture::~CFracture() { xr_delete(StateMan); }
 void CFracture::Load(LPCSTR section)
 {

@@ -31,7 +31,7 @@ public:
     static T* Instance()
     {
         if (!_self)
-            _self = new T();
+            _self = xr_new<T>();
         ++_refcount;
         return _self;
     }
@@ -81,7 +81,7 @@ public:
         // if not found - create appropriate shared data object
         if (_shared_tab.end() == shared_it)
         {
-            _data = new SHARED_TYPE();
+            _data = xr_new<SHARED_TYPE>();
             _shared_tab.insert(std::make_pair(id, _data));
         }
         else

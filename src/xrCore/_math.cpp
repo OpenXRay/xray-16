@@ -51,7 +51,7 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <thread>
 #include "SDL.h"
 
-#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)) && !defined(XR_COMPILER_MSVC)
+#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)) && !defined(XR_COMPILER_MSVC)
 #define _FPU_EXTENDED 0
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
@@ -77,16 +77,16 @@ public:
     }
 } s_perf_init;
 #endif // defined(XR_ARCHITECTURE_ARM)
-#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
 
 typedef struct _PROCESSOR_POWER_INFORMATION
 {
-    ULONG Number;
-    ULONG MaxMhz;
-    ULONG CurrentMhz;
-    ULONG MhzLimit;
-    ULONG MaxIdleState;
-    ULONG CurrentIdleState;
+    u32 Number;
+    u32 MaxMhz;
+    u32 CurrentMhz;
+    u32 MhzLimit;
+    u32 MaxIdleState;
+    u32 CurrentIdleState;
 } PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
 
 // Initialized on startup
@@ -95,7 +95,7 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-DWORD timeGetTime()
+u32 timeGetTime()
 {
     return SDL_GetTicks();
 }

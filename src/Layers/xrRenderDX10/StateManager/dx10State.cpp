@@ -4,7 +4,7 @@
 #include "dx10StateCache.h"
 
 dx10State::dx10State()
-    : m_pRasterizerState(0), m_pDepthStencilState(0), m_pBlendState(0), m_uiStencilRef(UINT(-1)), m_uiAlphaRef(0)
+    : m_pRasterizerState(0), m_pDepthStencilState(0), m_pBlendState(0), m_uiStencilRef(u32(-1)), m_uiAlphaRef(0)
 {
 }
 
@@ -17,7 +17,7 @@ dx10State::~dx10State()
 
 dx10State* dx10State::Create(SimulatorStates& state_code)
 {
-    dx10State* pState = new dx10State();
+    dx10State* pState = xr_new<dx10State>();
 
     state_code.UpdateState(*pState);
 

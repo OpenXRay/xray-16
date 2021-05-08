@@ -24,7 +24,7 @@ void SetActorVisibility(u16 who, float value);
 
 CPoltergeist::CPoltergeist()
 {
-    StateMan = new CStateManagerPoltergeist(this);
+    StateMan = xr_new<CStateManagerPoltergeist>(this);
 
     invisible_vel.set(0.1f, 0.1f);
 
@@ -132,12 +132,12 @@ void CPoltergeist::Load(LPCSTR section)
 
     if (xr_strcmp(polter_type, "flamer") == 0)
     {
-        m_flame = new CPolterFlame(this);
+        m_flame = xr_new<CPolterFlame>(this);
         m_flame->load(section);
     }
     else
     {
-        m_tele = new CPolterTele(this);
+        m_tele = xr_new<CPolterTele>(this);
         m_tele->load(section);
     }
 
@@ -351,7 +351,7 @@ void CPoltergeist::shedule_Update(u32 dt)
     ability()->update_schedule();
 }
 
-BOOL CPoltergeist::net_Spawn(CSE_Abstract* DC)
+bool CPoltergeist::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -448,7 +448,7 @@ void CPoltergeist::on_deactivate()
 
 CMovementManager* CPoltergeist::create_movement_manager()
 {
-    m_movement_manager = new CPoltergeisMovementManager(this);
+    m_movement_manager = xr_new<CPoltergeisMovementManager>(this);
 
     control().add(m_movement_manager, ControlCom::eControlPath);
     control().install_path_manager(m_movement_manager);

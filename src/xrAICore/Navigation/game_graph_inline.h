@@ -93,7 +93,7 @@ IC void CGameGraph::accessible(u32 const vertex_id, bool value) const
 IC bool CGameGraph::valid_vertex_id(u32 const vertex_id) const { return (vertex_id < header().vertex_count()); }
 IC void CGameGraph::begin(u32 const vertex_id, const_iterator& start, const_iterator& end) const
 {
-    end = (start = (const CEdge*)((BYTE*)m_nodes + vertex(_GRAPH_ID(vertex_id))->edge_offset())) +
+    end = (start = (const CEdge*)((u8*)m_nodes + vertex(_GRAPH_ID(vertex_id))->edge_offset())) +
         vertex(_GRAPH_ID(vertex_id))->edge_count();
 }
 
@@ -271,7 +271,7 @@ IC void CGameGraph::set_current_level(u32 const level_id)
                 continue;
             }
 
-            m_current_level_cross_table = new CGameLevelCrossTable(current_cross_table + 1, *current_cross_table);
+            m_current_level_cross_table = xr_new<CGameLevelCrossTable>(current_cross_table + 1, *current_cross_table);
             break;
         }
     }
@@ -279,7 +279,7 @@ IC void CGameGraph::set_current_level(u32 const level_id)
     {
         string_path fName;
         FS.update_path(fName, "$level$", CROSS_TABLE_NAME);
-        m_current_level_cross_table = new CGameLevelCrossTable(fName);
+        m_current_level_cross_table = xr_new<CGameLevelCrossTable>(fName);
     }
     VERIFY(m_current_level_cross_table);
 

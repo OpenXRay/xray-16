@@ -1,5 +1,7 @@
 #include "ximacfg.h"
 
+#include "xrCore/xrMemory.h"
+
 #ifdef CXIMAGE_AS_SHARED_LIBRARY
 void*	cxalloc(size_t size)
 {

@@ -49,7 +49,7 @@ u32 CAI_Bloodsucker::m_time_last_vampire = 0;
 
 CAI_Bloodsucker::CAI_Bloodsucker()
 {
-    StateMan = new CStateManagerBloodsucker(this);
+    StateMan = xr_new<CStateManagerBloodsucker>(this);
     m_alien_control.init_external(this);
     m_drag_anim_jump = false;
     m_animated = false;
@@ -419,8 +419,8 @@ void CAI_Bloodsucker::LookDirection(Fvector to_dir, float bone_turn_speed)
 void CAI_Bloodsucker::ActivateVampireEffector()
 {
     Actor()->Cameras().AddCamEffector(
-        new CVampireCameraEffector(6.0f, get_head_position(this), get_head_position(Actor())));
-    Actor()->Cameras().AddPPEffector(new CVampirePPEffector(pp_vampire_effector, 6.0f));
+        xr_new<CVampireCameraEffector>(6.0f, get_head_position(this), get_head_position(Actor())));
+    Actor()->Cameras().AddPPEffector(xr_new<CVampirePPEffector>(pp_vampire_effector, 6.0f));
 }
 
 bool CAI_Bloodsucker::WantVampire() { return !!fsimilar(m_vampire_want_value, 1.f); }
@@ -455,7 +455,7 @@ void CAI_Bloodsucker::CheckSpecParams(u32 spec_params)
     }
 }
 
-BOOL CAI_Bloodsucker::net_Spawn(CSE_Abstract* DC)
+bool CAI_Bloodsucker::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

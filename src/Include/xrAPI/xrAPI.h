@@ -27,8 +27,6 @@ public:
     ISoundManager* Sound;
     UICore* UI;
 
-    int CurrentRenderer;
-
     bool isEditor;
     bool isDedicatedServer;
 };

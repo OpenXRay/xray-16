@@ -61,6 +61,17 @@ const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, 
 #endif // !USE_DX9
     {nullptr, 0}};
 
+u32 ps_r_water_reflection = 3;
+const xr_token qwater_reflection_quality_token[] =
+{
+    { "st_opt_off", 0 },
+    { "st_opt_low", 1 },
+    { "st_opt_medium", 2 },
+    { "st_opt_high", 3 },
+    { "st_opt_ultra", 4 },
+    { nullptr, -1 }
+};
+
 u32 ps_r3_msaa = 0; // = 0;
 const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2}, {"8x", 3},
     {nullptr, 0}};
@@ -79,6 +90,8 @@ const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autod
 // Common
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
+
+Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW }; // All renders
 
 //int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
@@ -126,6 +139,9 @@ float ps_r1_fog_luminance = 1.1f; // r1-only
 int ps_r1_SoftwareSkinning = 0; // r1-only
 
 // R2
+bool ps_r2_sun_static = false;
+bool ps_r2_advanced_pp = true; // advanced post process and effects
+
 float ps_r2_ssaLOD_A = 64.f;
 float ps_r2_ssaLOD_B = 48.f;
 
@@ -140,7 +156,8 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
     R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS}; // r2-only
 
 Flags32 ps_r2_ls_flags_ext = {
-    /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION};
+    /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION | R3FLAGEXT_SSR_HALF_DEPTH |
+    R3FLAGEXT_SSR_JITTER};
 
 float ps_r2_df_parallax_h = 0.02f;
 float ps_r2_df_parallax_range = 75.f;
@@ -189,6 +206,7 @@ float ps_r2_dhemi_light_scale = 0.2f;
 float ps_r2_dhemi_light_flow = 0.1f;
 int ps_r2_dhemi_count = 5; // 5
 int ps_r2_wait_sleep = 0;
+int ps_r2_wait_timeout = 500;
 
 float ps_r2_lt_smooth = 1.f; // 1.f
 float ps_r2_slight_fade = 0.5f; // 1.f
@@ -202,8 +220,6 @@ float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
-//AVO: detail draw radius
-Flags32 ps_common_flags = {0}; // r1-only
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
 
@@ -232,9 +248,9 @@ float ps_r2_gloss_factor = 4.0f;
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
 #include "Layers/xrRenderDX10/StateManager/dx10SamplerStateCache.h"
-#endif // USE_DX10
+#endif
 
 //-----------------------------------------------------------------------
 
@@ -277,12 +293,12 @@ public:
         clamp(val, 1, 16);
 #if defined(USE_OGL)
         // TODO: OGL: Implement aniso filtering.
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
         SSManager.SetMaxAnisotropy(val);
 #else
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
-#endif // USE_DX10
+#endif
     }
     CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
     virtual void Execute(LPCSTR args)
@@ -305,13 +321,13 @@ public:
             return;
 
 #if defined(USE_OGL)
-            // TODO: OGL: Implement mipmap bias control.
-#elif defined(USE_DX10) || defined(USE_DX11)
+        // TODO: OGL: Implement mipmap bias control.
+#elif !defined(USE_DX9)
         SSManager.SetMipLODBias(*value);
-#else // USE_DX10
+#else
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)value)));
-#endif // USE_DX10
+            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
+#endif
     }
 
     CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f) {}
@@ -728,6 +744,9 @@ void xrRender_initconsole()
     CMD4(CCC_Vector3, "r__d_tree_wave", &ps_r__Tree_Wave, tw_min, tw_max);
 #endif // DEBUG
 
+    CMD3(CCC_Mask, "r__no_ram_textures", &ps_r__common_flags, RFLAG_NO_RAM_TEXTURES);
+    CMD3(CCC_Mask, "r__actor_shadow", &ps_r__common_flags, RFLAG_ACTOR_SHADOW);
+
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
     CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
     CMD2(CCC_tf_MipBias, "r2_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
@@ -824,6 +843,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_gi_refl", &ps_r2_GI_refl, EPS_L, 0.99f);
 
     CMD4(CCC_Integer, "r2_wait_sleep", &ps_r2_wait_sleep, 0, 1);
+    CMD4(CCC_Integer, "r2_wait_timeout", &ps_r2_wait_timeout, 100, 1000);
 
 #ifndef MASTER_GOLD
     CMD4(CCC_Integer, "r2_dhemi_count", &ps_r2_dhemi_count, 4, 25);
@@ -893,6 +913,10 @@ void xrRender_initconsole()
     //Igor: need restart
     CMD3(CCC_Mask, "r2_soft_water", &ps_r2_ls_flags, R2FLAG_SOFT_WATER);
     CMD3(CCC_Mask, "r2_soft_particles", &ps_r2_ls_flags, R2FLAG_SOFT_PARTICLES);
+
+    CMD3(CCC_Token, "r3_water_refl", &ps_r_water_reflection, qwater_reflection_quality_token);
+    CMD3(CCC_Mask, "r3_water_refl_half_depth", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_HALF_DEPTH);
+    CMD3(CCC_Mask, "r3_water_refl_jitter", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_JITTER);
 
     //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);

@@ -46,7 +46,7 @@ CUIGameCTA::CUIGameCTA()
     : teamPanels(NULL), m_pFragLimitIndicator(NULL), m_team1_score(NULL), m_team2_score(NULL), m_pCurBuyMenu(NULL),
       m_pCurSkinMenu(NULL), m_pBuySpawnMsgBox(NULL), m_game(NULL), m_voteStatusWnd(NULL), m_team_panels_shown(false)
 {
-    m_pUITeamSelectWnd = new CUISpawnWnd();
+    m_pUITeamSelectWnd = xr_new<CUISpawnWnd>();
 }
 
 void CUIGameCTA::Init(int stage)
@@ -62,7 +62,7 @@ void CUIGameCTA::Init(int stage)
         m_time_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_timelimit", Window);
         m_demo_play_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_demo_play", Window);
 
-        teamPanels = new UITeamPanels();
+        teamPanels = xr_new<UITeamPanels>();
         teamPanels->Init(TEAM_PANELS_XML_NAME, "team_panels_wnd");
 
         CUIXml uiXml;
@@ -70,31 +70,31 @@ void CUIGameCTA::Init(int stage)
 
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
 
-        m_pMoneyIndicator = new CUIMoneyIndicator();
+        m_pMoneyIndicator = xr_new<CUIMoneyIndicator>();
         m_pMoneyIndicator->SetAutoDelete(true);
         m_pMoneyIndicator->InitFromXML(uiXml);
 
-        m_pRankIndicator = new CUIRankIndicator();
+        m_pRankIndicator = xr_new<CUIRankIndicator>();
         m_pRankIndicator->SetAutoDelete(true);
         m_pRankIndicator->InitFromXml(uiXml);
 
-        m_pReinforcementInidcator = new CUITextWnd();
+        m_pReinforcementInidcator = xr_new<CUITextWnd>();
         m_pReinforcementInidcator->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
 
-        m_team1_icon = new CUIStatic();
-        m_team2_icon = new CUIStatic();
+        m_team1_icon = xr_new<CUIStatic>();
+        m_team2_icon = xr_new<CUIStatic>();
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
 
-        m_team1_score = new CUITextWnd();
-        m_team2_score = new CUITextWnd();
+        m_team1_score = xr_new<CUITextWnd>();
+        m_team2_score = xr_new<CUITextWnd>();
         m_team1_score->SetAutoDelete(true);
         m_team2_score->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(uiXml, "team1_score", 0, m_team1_score);
         CUIXmlInit::InitTextWnd(uiXml, "team2_score", 0, m_team2_score);
 
-        m_pFragLimitIndicator = new CUITextWnd();
+        m_pFragLimitIndicator = xr_new<CUITextWnd>();
         m_pFragLimitIndicator->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
     }
@@ -177,7 +177,7 @@ void CUIGameCTA::SetClGame(game_cl_GameState* g)
         delete_data(m_pBuySpawnMsgBox);
     }
 
-    m_pBuySpawnMsgBox = new CUIMessageBoxEx();
+    m_pBuySpawnMsgBox = xr_new<CUIMessageBoxEx>();
     m_pBuySpawnMsgBox->InitMessageBox("message_box_buy_spawn");
     m_pBuySpawnMsgBox->SetText("");
 
@@ -221,7 +221,7 @@ void CUIGameCTA::UpdateBuyMenu(shared_str const& teamSection, shared_str const& 
     }
     m_teamSectionForBuyMenu = teamSection;
     /// warning !!!
-    m_pCurBuyMenu = new BUY_WND_TYPE();
+    m_pCurBuyMenu = xr_new<BUY_WND_TYPE>();
     m_pCurBuyMenu->Init(m_teamSectionForBuyMenu, costSection);
     m_costSection = costSection;
 }
@@ -248,7 +248,7 @@ void CUIGameCTA::UpdateSkinMenu(shared_str const& teamSection)
         m_pCurSkinMenu = NULL;
     }
     m_teamSectionForSkinMenu = teamSection;
-    m_pCurSkinMenu = new CUISkinSelectorWnd(m_teamSectionForSkinMenu.c_str(), static_cast<s16>(tempPlayerState->team));
+    m_pCurSkinMenu = xr_new<CUISkinSelectorWnd>(m_teamSectionForSkinMenu.c_str(), static_cast<s16>(tempPlayerState->team));
 }
 
 void CUIGameCTA::HideBuyMenu()
@@ -761,7 +761,7 @@ void CUIGameCTA::SetVoteMessage(LPCSTR str)
     {
         CUIXml uiXml;
         uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml");
-        m_voteStatusWnd = new UIVoteStatusWnd();
+        m_voteStatusWnd = xr_new<UIVoteStatusWnd>();
         m_voteStatusWnd->InitFromXML(uiXml);
         m_voteStatusWnd->Show(true);
         m_voteStatusWnd->SetVoteMsg(str);

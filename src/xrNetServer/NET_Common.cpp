@@ -61,9 +61,9 @@ XRNETSERVER_API int psNET_GuaranteedPacketMode = NET_GUARANTEEDPACKET_DEFAULT;
 //------------------------------------------------------------------------------
 
 #ifdef CONFIG_PROFILE_LOCKS
-MultipacketSender::MultipacketSender() : _buf_cs(new Lock(MUTEX_PROFILE_ID(MultipacketSender))) {}
+MultipacketSender::MultipacketSender() : _buf_cs(xr_new<Lock>(MUTEX_PROFILE_ID(MultipacketSender))) {}
 #else
-MultipacketSender::MultipacketSender() : _buf_cs(new Lock) {}
+MultipacketSender::MultipacketSender() : _buf_cs(xr_new<Lock>()) {}
 #endif
 
 MultipacketSender::~MultipacketSender()

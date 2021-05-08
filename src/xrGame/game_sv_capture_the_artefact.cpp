@@ -445,7 +445,7 @@ void game_sv_CaptureTheArtefact::OnPlayerConnectFinished(ClientID id_who)
     xrCData->net_Ready = TRUE;
 }
 
-void game_sv_CaptureTheArtefact::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID)
+void game_sv_CaptureTheArtefact::OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameID)
 {
     CSE_Abstract* actor = m_server->ID_to_entity(GameID);
     if (!actor)
@@ -1382,7 +1382,7 @@ bool game_sv_CaptureTheArtefact::OnKillResult(KILL_RES KillResult, game_PlayerSt
                 IClient* tmp_client = m_server->FindClient(tmp_predicate);
                 if (tmp_client)
                 {
-                    LPSTR reason;
+                    pstr reason;
                     STRCONCAT(reason, StringTable().translate("st_kicked_by_server").c_str());
                     m_server->DisconnectClient(tmp_client, reason);
                 }

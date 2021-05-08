@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef DEBUG
-ENGINE_API extern BOOL bDebug;
+ENGINE_API extern bool bDebug;
 #else
 #define bDebug 0
 #endif
@@ -39,15 +39,9 @@ enum
 
     rsCameraPos = (1ul << 18ul),
 
-    rsR1 = (1ul << 19ul),
-    rsR2 = (1ul << 20ul),
-    rsR3 = (1ul << 21ul),
-    rsR4 = (1ul << 22ul), // 22 was reserved for editor
-    rsRGL = (1ul << 23ul), // 23 was reserved for editor
-
-    rsShowFPS = (1ul << 24ul), // 24 was reserved for editor
-    rsDrawParticles = (1ul << 25ul), // 25 was reserved for editor
-    // 26-32 bit - reserved to Editor
+    rsShowFPS = (1ul << 19ul),
+    rsDrawParticles = (1ul << 20ul),
+    // 22-32 bit - reserved to Editor
 };
 
 //. ENGINE_API extern u32 psCurrentMode ;

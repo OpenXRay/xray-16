@@ -20,13 +20,13 @@ CCustomOutfit::CCustomOutfit()
     for (int i = 0; i < ALife::eHitTypeMax; i++)
         m_HitTypeProtection[i] = 1.0f;
 
-    m_boneProtection = new SBoneProtections();
+    m_boneProtection = xr_new<SBoneProtections>();
     m_artefact_count = 0;
     m_BonesProtectionSect = NULL;
 }
 
 CCustomOutfit::~CCustomOutfit() { xr_delete(m_boneProtection); }
-BOOL CCustomOutfit::net_Spawn(CSE_Abstract* DC)
+bool CCustomOutfit::net_Spawn(CSE_Abstract* DC)
 {
     if (IsGameTypeSingle())
         ReloadBonesProtection();
@@ -189,7 +189,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     return NewHitPower;
 }
 
-BOOL CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection->getBonePassBullet(s16(boneID)); }
+bool CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection->getBonePassBullet(s16(boneID)); }
 #include "Torch.h"
 void CCustomOutfit::OnMoveToSlot(const SInvItemPlace& prev)
 {

@@ -495,8 +495,8 @@ void game_sv_Deathmatch::Update()
     }
 }
 
-INT g_sv_Pending_Wait_Time = 10000;
-INT g_sv_Wait_For_Players_Ready = 1;
+int g_sv_Pending_Wait_Time = 10000;
+int g_sv_Wait_For_Players_Ready = 1;
 
 bool game_sv_Deathmatch::checkForRoundStart()
 {
@@ -776,7 +776,7 @@ void game_sv_Deathmatch::OnPlayerReady(ClientID id)
     };
 }
 
-void game_sv_Deathmatch::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID)
+void game_sv_Deathmatch::OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameID)
 {
     inherited::OnPlayerDisconnect(id_who, Name, GameID);
 };
@@ -1923,7 +1923,7 @@ void game_sv_Deathmatch::RespawnPlayer(ClientID id_who, bool NoSpectator)
     SpawnWeapon4Actor(pA->ID, "mp_players_rukzak", 0, ps->pItemList);
 }
 
-INT G_DELAYED_ROUND_TIME = 7;
+int G_DELAYED_ROUND_TIME = 7;
 void game_sv_Deathmatch::OnDelayedRoundEnd(ERoundEnd_Result reason)
 {
     DumpRoundStatisticsAsync();
@@ -1973,7 +1973,7 @@ void game_sv_Deathmatch::check_ForceRespawn()
     m_server->ForEachClientDoSender(tmp_functor);
 };
 
-INT g_sv_Skip_Winner_Waiting = 0;
+int g_sv_Skip_Winner_Waiting = 0;
 bool game_sv_Deathmatch::HasChampion()
 {
     struct champion_searcher

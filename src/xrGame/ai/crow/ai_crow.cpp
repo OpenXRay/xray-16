@@ -144,7 +144,7 @@ void CAI_Crow::Load(LPCSTR section)
     VERIFY2(valid_pos(Position()), dbg_valide_pos_string(Position(), this, "CAI_Crow::Load( LPCSTR section )"));
 }
 
-BOOL CAI_Crow::net_Spawn(CSE_Abstract* DC)
+bool CAI_Crow::net_Spawn(CSE_Abstract* DC)
 {
     BOOL R = inherited::net_Spawn(DC);
     setVisible(TRUE);
@@ -486,7 +486,7 @@ void CAI_Crow::Hit(SHit* pHDS)
     callback(GameObject::eHit)(lua_game_object(), who_object ? who_object->lua_game_object() : 0);
 }
 
-BOOL CAI_Crow::UsedAI_Locations() { return (FALSE); }
+bool CAI_Crow::UsedAI_Locations() { return (FALSE); }
 void CAI_Crow::create_physic_shell()
 {
     // do not delete!!!

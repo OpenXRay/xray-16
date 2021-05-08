@@ -108,7 +108,7 @@ void CTexture::apply_avi(u32 dwStage)
     if (pAVI->NeedUpdate())
     {
         // AVI
-        BYTE* ptr;
+        u8* ptr{};
         pAVI->GetFrame(&ptr);
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, m_width, m_height,
             GL_RGBA, GL_UNSIGNED_BYTE, ptr));
@@ -177,7 +177,7 @@ void CTexture::Load()
     if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
     {
         // AVI
-        pTheora = new CTheoraSurface();
+        pTheora = xr_new<CTheoraSurface>();
         m_play_time = 0xFFFFFFFF;
 
         if (!pTheora->Load(fn))
@@ -219,7 +219,7 @@ void CTexture::Load()
     {
 #ifdef XR_PLATFORM_WINDOWS // TODO
         // AVI
-        pAVI = new CAviPlayerCustom();
+        pAVI = xr_new<CAviPlayerCustom>();
 
         if (!pAVI->Load(fn))
         {

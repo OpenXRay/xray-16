@@ -150,7 +150,7 @@ void initialize_core()
 
     string_path fname;
     FS.update_path(fname, "$game_config$", "system.ltx");
-    pSettings = new CInifile(fname, TRUE);
+    pSettings = xr_new<CInifile>(fname, TRUE);
 }
 void deinitialize_core()
 {

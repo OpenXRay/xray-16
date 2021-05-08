@@ -23,22 +23,25 @@ extern ENGINE_API string_path g_sLaunchWorkingFolder;
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 
+#pragma warning(push)
+#pragma warning(disable : 4826) // XXX: Do something with that __int64 cast
+
 CUIMapList::CUIMapList()
 {
     m_pMapInfo = NULL;
     m_pMapPic = NULL;
     m_pModeSelector = NULL;
     m_pWeatherSelector = NULL;
-    m_pList1 = new CUIListBox();
-    m_pList2 = new CUIListBox();
-    m_pFrame1 = new CUIFrameWindow();
-    m_pFrame2 = new CUIFrameWindow();
-    m_pLbl1 = new CUIFrameLineWnd();
-    m_pLbl2 = new CUIFrameLineWnd();
-    m_pBtnLeft = new CUI3tButton();
-    m_pBtnRight = new CUI3tButton();
-    m_pBtnUp = new CUI3tButton();
-    m_pBtnDown = new CUI3tButton();
+    m_pList1 = xr_new<CUIListBox>();
+    m_pList2 = xr_new<CUIListBox>();
+    m_pFrame1 = xr_new<CUIFrameWindow>();
+    m_pFrame2 = xr_new<CUIFrameWindow>();
+    m_pLbl1 = xr_new<CUIFrameLineWnd>();
+    m_pLbl2 = xr_new<CUIFrameLineWnd>();
+    m_pBtnLeft = xr_new<CUI3tButton>();
+    m_pBtnRight = xr_new<CUI3tButton>();
+    m_pBtnUp = xr_new<CUI3tButton>();
+    m_pBtnDown = xr_new<CUI3tButton>();
 
     m_pList1->SetAutoDelete(true);
     m_pList2->SetAutoDelete(true);
@@ -398,3 +401,5 @@ const MPLevelDesc& CUIMapList::GetMapNameInt(EGameIDs _type, u32 idx)
     R_ASSERT(M.m_map_names.size() > idx);
     return M.m_map_names[idx];
 }
+
+#pragma warning(pop) // XXX: Do something with that __int64 cast

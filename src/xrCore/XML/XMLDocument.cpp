@@ -5,7 +5,7 @@
 pcstr UI_PATH = UI_PATH_DEFAULT;
 pcstr UI_PATH_WITH_DELIMITER = UI_PATH_DEFAULT_WITH_DELIMITER;
 
-XMLDocument::XMLDocument() : m_root(nullptr), m_pLocalRoot(nullptr) {}
+XMLDocument::XMLDocument() : m_xml_file_name(), m_root(nullptr), m_pLocalRoot(nullptr) {}
 
 XMLDocument::~XMLDocument() { ClearInternal(); }
 
@@ -107,8 +107,10 @@ bool XMLDocument::Set(pcstr text, bool fatal)
 
     if (m_Doc.Error())
     {
-        R_ASSERT3(!fatal, m_Doc.ErrorDesc(), m_xml_file_name);
-        return false;
+        const bool canSkipError = IgnoringMissingEndTagError() && m_Doc.ErrorId() == TiXmlBase::TIXML_ERROR_READING_END_TAG;
+        R_ASSERT3(!fatal || canSkipError, m_Doc.ErrorDesc(), m_xml_file_name);
+        if (!canSkipError)
+            return false;
     }
 
     m_root = m_Doc.FirstChildElement();
@@ -116,10 +118,10 @@ bool XMLDocument::Set(pcstr text, bool fatal)
     return true;
 }
 
-XML_NODE XMLDocument::NavigateToNode(XML_NODE start_node, pcstr path, const size_t node_index) const
+XML_NODE XMLDocument::NavigateToNode(CONST_XML_NODE start_node, pcstr path, const size_t node_index) const
 {
     R_ASSERT3(start_node && path, "NavigateToNode failed in XML file ", m_xml_file_name);
-    XML_NODE node = nullptr;
+    CONST_XML_NODE node{};
     string_path buf_str;
     VERIFY(xr_strlen(path) < 200);
     buf_str[0] = 0;
@@ -147,12 +149,12 @@ XML_NODE XMLDocument::NavigateToNode(XML_NODE start_node, pcstr path, const size
         if (token != nullptr)
             if (node)
             {
-                const XML_NODE node_parent = node;
+                CONST_XML_NODE node_parent = node;
                 node = node_parent->FirstChild(token);
             }
     }
 
-    return node;
+    return const_cast<XML_NODE>(node);
 }
 
 XML_NODE XMLDocument::NavigateToNode(pcstr path, const size_t node_index) const
@@ -162,7 +164,7 @@ XML_NODE XMLDocument::NavigateToNode(pcstr path, const size_t node_index) const
 
 XML_NODE XMLDocument::NavigateToNodeWithAttribute(pcstr tag_name, pcstr attrib_name, pcstr attrib_value)
 {
-    const XML_NODE root = GetLocalRoot() ? GetLocalRoot() : GetRoot();
+    CONST_XML_NODE root = GetLocalRoot() ? GetLocalRoot() : GetRoot();
     int tabsCount = GetNodesNum(root, tag_name);
 
     for (int i = 0; i < tabsCount; ++i)
@@ -178,19 +180,19 @@ XML_NODE XMLDocument::NavigateToNodeWithAttribute(pcstr tag_name, pcstr attrib_n
 
 pcstr XMLDocument::Read(pcstr path, const size_t index, pcstr default_str_val) const
 {
-    const XML_NODE node = NavigateToNode(path, index);
+    CONST_XML_NODE node = NavigateToNode(path, index);
     pcstr result = Read(node, default_str_val);
     return result;
 }
 
-pcstr XMLDocument::Read(XML_NODE start_node, pcstr path, const size_t index, pcstr default_str_val) const
+pcstr XMLDocument::Read(CONST_XML_NODE start_node, pcstr path, const size_t index, pcstr default_str_val) const
 {
-    const XML_NODE node = NavigateToNode(start_node, path, index);
+    CONST_XML_NODE node = NavigateToNode(start_node, path, index);
     pcstr result = Read(node, default_str_val);
     return result;
 }
 
-pcstr XMLDocument::Read(XML_NODE node, pcstr default_str_val) const
+pcstr XMLDocument::Read(CONST_XML_NODE node, pcstr default_str_val) const
 {
     if (!node)
         return default_str_val;
@@ -206,7 +208,7 @@ pcstr XMLDocument::Read(XML_NODE node, pcstr default_str_val) const
     return default_str_val;
 }
 
-int XMLDocument::ReadInt(XML_NODE node, const int default_int_val) const
+int XMLDocument::ReadInt(CONST_XML_NODE node, const int default_int_val) const
 {
     pcstr result_str = Read(node, nullptr);
 
@@ -225,7 +227,7 @@ int XMLDocument::ReadInt(pcstr path, const size_t index, const int default_int_v
     return atoi(result_str);
 }
 
-int XMLDocument::ReadInt(XML_NODE start_node, pcstr path, const size_t index, const int default_int_val) const
+int XMLDocument::ReadInt(CONST_XML_NODE start_node, pcstr path, const size_t index, const int default_int_val) const
 {
     pcstr result_str = Read(start_node, path, index, nullptr);
     if (result_str == nullptr)
@@ -243,7 +245,7 @@ float XMLDocument::ReadFlt(pcstr path, const size_t index, float default_flt_val
     return static_cast<float>(atof(result_str));
 }
 
-float XMLDocument::ReadFlt(XML_NODE start_node, pcstr path, const size_t index, float default_flt_val) const
+float XMLDocument::ReadFlt(CONST_XML_NODE start_node, pcstr path, const size_t index, float default_flt_val) const
 {
     pcstr result_str = Read(start_node, path, index, nullptr);
     if (result_str == nullptr)
@@ -252,7 +254,7 @@ float XMLDocument::ReadFlt(XML_NODE start_node, pcstr path, const size_t index, 
     return static_cast<float>(atof(result_str));
 }
 
-float XMLDocument::ReadFlt(XML_NODE node, float default_flt_val) const
+float XMLDocument::ReadFlt(CONST_XML_NODE node, float default_flt_val) const
 {
     pcstr result_str = Read(node, nullptr);
 
@@ -262,19 +264,19 @@ float XMLDocument::ReadFlt(XML_NODE node, float default_flt_val) const
     return static_cast<float>(atof(result_str));
 }
 
-pcstr XMLDocument::ReadAttrib(XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, pcstr default_str_val) const
+pcstr XMLDocument::ReadAttrib(CONST_XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, pcstr default_str_val) const
 {
-    const XML_NODE node = NavigateToNode(start_node, path, index);
+    CONST_XML_NODE node = NavigateToNode(start_node, path, index);
     return ReadAttrib(node, attrib, default_str_val);
 }
 
 pcstr XMLDocument::ReadAttrib(pcstr path, const size_t index, pcstr attrib, pcstr default_str_val) const
 {
-    const XML_NODE node = NavigateToNode(path, index);
+    CONST_XML_NODE node = NavigateToNode(path, index);
     return ReadAttrib(node, attrib, default_str_val);
 }
 
-pcstr XMLDocument::ReadAttrib(XML_NODE node, pcstr attrib, pcstr default_str_val) const
+pcstr XMLDocument::ReadAttrib(CONST_XML_NODE node, pcstr attrib, pcstr default_str_val) const
 {
     pcstr result = nullptr;
     if (node)
@@ -289,7 +291,7 @@ pcstr XMLDocument::ReadAttrib(XML_NODE node, pcstr attrib, pcstr default_str_val
     return result ? result : default_str_val;
 }
 
-int XMLDocument::ReadAttribInt(XML_NODE node, pcstr attrib, const int default_int_val) const
+int XMLDocument::ReadAttribInt(CONST_XML_NODE node, pcstr attrib, const int default_int_val) const
 {
     pcstr result_str = ReadAttrib(node, attrib, nullptr);
 
@@ -309,7 +311,7 @@ int XMLDocument::ReadAttribInt(pcstr path, const size_t index, pcstr attrib, int
     return atoi(result_str);
 }
 
-int XMLDocument::ReadAttribInt(XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, const int default_int_val) const
+int XMLDocument::ReadAttribInt(CONST_XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, const int default_int_val) const
 {
     pcstr result_str = ReadAttrib(start_node, path, index, attrib, nullptr);
 
@@ -328,7 +330,7 @@ float XMLDocument::ReadAttribFlt(pcstr path, const size_t index, pcstr attrib, c
     return static_cast<float>(atof(result_str));
 }
 
-float XMLDocument::ReadAttribFlt(XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, const float default_flt_val) const
+float XMLDocument::ReadAttribFlt(CONST_XML_NODE start_node, pcstr path, const size_t index, pcstr attrib, const float default_flt_val) const
 {
     pcstr result_str = ReadAttrib(start_node, path, index, attrib, nullptr);
 
@@ -338,7 +340,7 @@ float XMLDocument::ReadAttribFlt(XML_NODE start_node, pcstr path, const size_t i
     return static_cast<float>(atof(result_str));
 }
 
-float XMLDocument::ReadAttribFlt(XML_NODE node, pcstr attrib, const float default_flt_val) const
+float XMLDocument::ReadAttribFlt(CONST_XML_NODE node, pcstr attrib, const float default_flt_val) const
 {
     pcstr result_str = ReadAttrib(node, attrib, nullptr);
 
@@ -350,8 +352,8 @@ float XMLDocument::ReadAttribFlt(XML_NODE node, pcstr attrib, const float defaul
 
 size_t XMLDocument::GetNodesNum(pcstr path, const size_t index, pcstr tag_name) const
 {
-    XML_NODE node;
-    const XML_NODE root = GetLocalRoot() ? GetLocalRoot() : GetRoot();
+    CONST_XML_NODE node;
+    CONST_XML_NODE root = GetLocalRoot() ? GetLocalRoot() : GetRoot();
 
     if (path != nullptr)
     {
@@ -369,12 +371,12 @@ size_t XMLDocument::GetNodesNum(pcstr path, const size_t index, pcstr tag_name) 
     return GetNodesNum(node, tag_name);
 }
 
-size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name, bool includingComments /*= true*/) const
+size_t XMLDocument::GetNodesNum(CONST_XML_NODE node, pcstr tag_name, bool includingComments /*= true*/) const
 {
     if (!node)
         return 0;
 
-    XML_NODE el;
+    CONST_XML_NODE el;
 
     if (!tag_name)
         el = node->FirstChild();
@@ -400,12 +402,12 @@ size_t XMLDocument::GetNodesNum(XML_NODE node, pcstr tag_name, bool includingCom
 XML_NODE XMLDocument::SearchForAttribute(
     pcstr path, const size_t index, pcstr tag_name, pcstr attrib, pcstr attrib_value_pattern) const
 {
-    const XML_NODE start_node = NavigateToNode(path, index);
+    CONST_XML_NODE start_node = NavigateToNode(path, index);
     return SearchForAttribute(start_node, tag_name, attrib, attrib_value_pattern);;
 }
 
 XML_NODE XMLDocument::SearchForAttribute(
-    XML_NODE start_node, pcstr tag_name, pcstr attrib, pcstr attrib_value_pattern) const
+    CONST_XML_NODE start_node, pcstr tag_name, pcstr attrib, pcstr attrib_value_pattern) const
 {
     while (start_node)
     {
@@ -419,14 +421,14 @@ XML_NODE XMLDocument::SearchForAttribute(
             if (attribStr && 0 == xr_strcmp(attribStr, attrib_value_pattern) && valueStr &&
                 0 == xr_strcmp(valueStr, tag_name))
             {
-                return el;
+                return const_cast<TiXmlElement*>(el);
             }
         }
 
-        XML_NODE newEl = start_node->FirstChild(tag_name);
+        CONST_XML_NODE newEl = start_node->FirstChild(tag_name);
         newEl = SearchForAttribute(newEl, tag_name, attrib, attrib_value_pattern);
         if (newEl)
-            return newEl;
+            return const_cast<XML_NODE>(newEl);
 
         start_node = start_node->NextSibling(tag_name);
     }
@@ -434,7 +436,7 @@ XML_NODE XMLDocument::SearchForAttribute(
     return nullptr;
 }
 
-pcstr XMLDocument::CheckUniqueAttrib(XML_NODE start_node, pcstr tag_name, pcstr attrib_name)
+pcstr XMLDocument::CheckUniqueAttrib(CONST_XML_NODE start_node, pcstr tag_name, pcstr attrib_name)
 {
     m_AttribValues.clear();
 

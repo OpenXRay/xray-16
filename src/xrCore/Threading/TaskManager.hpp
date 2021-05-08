@@ -20,6 +20,7 @@ constexpr u64 BIG_EXECUTION_TIME = 500; // ms
 
 class XRCORE_API TaskManagerBase
 {
+#ifdef USE_TBB_PARALLEL
     xr_vector<Task*> tasks;
 
     Lock lock;
@@ -28,7 +29,7 @@ class XRCORE_API TaskManagerBase
     bool shouldStop;
 
     static void taskManagerThread(void* thisPtr);
-
+#endif
 
 protected:
     friend class Task;

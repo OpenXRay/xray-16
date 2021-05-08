@@ -22,7 +22,7 @@ public:
 
     virtual void Load(LPCSTR section);
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Relcase(IGameObject* O);
 

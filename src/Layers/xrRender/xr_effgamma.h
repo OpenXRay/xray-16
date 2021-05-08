@@ -35,11 +35,11 @@ public:
     void Update();
 
 private:
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     void GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA_CONTROL& G);
-#else //	USE_DX10
+#else
     void GenLUT(D3DGAMMARAMP& G);
-#endif //	USE_DX10
+#endif
 };
 
 #endif

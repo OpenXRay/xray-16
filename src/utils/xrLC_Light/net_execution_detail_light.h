@@ -25,7 +25,7 @@ public:
     void construct(u32 _x, u32 _z); // { start = _start;end = _end; }
     void send_task(IGenericStream* outStream);
     void receive_result(IGenericStream* outStream);
-    bool receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream);
+    bool receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream);
     void send_result(IGenericStream* outStream);
     bool execute(net_task_callback& net_callback);
 };

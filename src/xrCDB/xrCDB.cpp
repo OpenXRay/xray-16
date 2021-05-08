@@ -14,26 +14,12 @@ namespace Opcode
 using namespace CDB;
 using namespace Opcode;
 
-#if defined(XR_PLATFORM_WINDOWS)
-BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH: break;
-    }
-    return TRUE;
-}
-#endif
-
 // Model building
 MODEL::MODEL() :
 #ifdef CONFIG_PROFILE_LOCKS
-    pcs(new Lock(MUTEX_PROFILE_ID(MODEL)))
+    pcs(xr_new<Lock>(MUTEX_PROFILE_ID(MODEL)))
 #else
-    pcs(new Lock)
+    pcs(xr_new<Lock>())
 #endif // CONFIG_PROFILE_LOCKS
 {
     tree = 0;
@@ -159,7 +145,7 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     OPCC.NoLeaf = true;
     OPCC.Quantized = false;
 
-    tree = new OPCODE_Model();
+    tree = xr_new<OPCODE_Model>();
     if (!tree->Build(OPCC))
     {
         xr_free(verts);
@@ -183,6 +169,52 @@ u32 MODEL::memory()
     u32 V = verts_count * sizeof(Fvector);
     u32 T = tris_count * sizeof(TRI);
     return tree->GetUsedBytes() + V + T + sizeof(*this) + sizeof(*tree);
+}
+
+bool MODEL::serialize(pcstr fileName) const
+{
+    IWriter* wstream = FS.w_open(fileName);
+    if (!wstream)
+        return false;
+
+    wstream->w_u32(verts_count);
+    wstream->w(verts, sizeof(Fvector) * verts_count);
+    wstream->w_u32(tris_count);
+    wstream->w(tris, sizeof(TRI) * tris_count);
+
+    if (tree)
+        tree->Save(wstream);
+
+    return true;
+}
+
+bool MODEL::deserialize(pcstr fileName)
+{
+    IReader* rstream = FS.r_open(fileName);
+    if (!rstream)
+        return false;
+
+    xr_free(verts);
+    xr_free(tris);
+    xr_free(tree);
+
+    verts_count = rstream->r_u32();
+    verts = xr_alloc<Fvector>(verts_count);
+    const u32 vertsSize = verts_count * sizeof(Fvector);
+    CopyMemory(verts, rstream->pointer(), vertsSize);
+    rstream->advance(vertsSize);
+
+    tris_count = rstream->r_u32();
+    tris = xr_alloc<TRI>(tris_count);
+    const u32 trisSize = tris_count * sizeof(TRI);
+    CopyMemory(tris, rstream->pointer(), trisSize);
+    rstream->advance(trisSize);
+
+    tree = xr_new<OPCODE_Model>();
+    tree->Load(rstream);
+    FS.r_close(rstream);
+    status = S_READY;
+    return true;
 }
 
 // This is the constructor of a class that has been exported.

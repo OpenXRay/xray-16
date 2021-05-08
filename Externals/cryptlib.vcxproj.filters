@@ -14,76 +14,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cryptopp\3way.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\adler32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\algebra.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\algparam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\arc4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\asn.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\authenc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\base32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\basecode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\bfinit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\blake2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\blowfish.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\blumshub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\camellia.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\cast.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\casts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\cbcmac.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\ccm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\chacha.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\channels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\cmac.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\cpu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\crc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\cryptlib.cpp">
@@ -98,40 +44,16 @@
     <ClCompile Include="cryptopp\dessp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\dh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\dh2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\dll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\dsa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\eax.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\ec2n.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\eccrypto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\ecp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\elgamal.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\emsa2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\eprecomp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\esign.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\files.cpp">
@@ -146,25 +68,10 @@
     <ClCompile Include="cryptopp\fipstest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\gcm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\gf256.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\gf2_32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\gf2n.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\gfpcrypt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\gost.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\gzip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\hex.cpp">
@@ -176,37 +83,10 @@
     <ClCompile Include="cryptopp\hrtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\ida.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\idea.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\integer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\iterhash.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\keccak.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\luc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\mars.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\marss.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\md2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\md4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\md5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\misc.cpp">
@@ -218,34 +98,13 @@
     <ClCompile Include="cryptopp\mqueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\mqv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\nbtheory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\network.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\oaep.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\osrng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\panama.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\pkcspad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\polynomi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\pssr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\pubkey.cpp">
@@ -254,19 +113,7 @@
     <ClCompile Include="cryptopp\queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\rabin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\randpool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\rc2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\rc5.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\rc6.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\rdrand.cpp">
@@ -278,118 +125,13 @@
     <ClCompile Include="cryptopp\rijndael.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\ripemd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\rng.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\rsa.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\rw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\safer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\salsa.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\seal.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\seed.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\serpent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\sha.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cryptopp\sha3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\shacal2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\shark.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\sharkbox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cryptopp\simple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\skipjack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\socketft.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\sosemanuk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\square.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\squaretb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\strciphr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\tea.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\tftables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\tiger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\tigertab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\trdlocal.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\ttmac.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\twofish.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\vmac.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\wait.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\wake.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\whrlpool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\winpipes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\xtr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\xtrcrypt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\zdeflate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\zinflate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cryptopp\zlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cryptopp\sha-simd.cpp">

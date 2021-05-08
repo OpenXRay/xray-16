@@ -6501,6 +6501,9 @@
     <ClInclude Include="ui\UIWeightBar.h">
       <Filter>UI\Common\Inventory</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIArtefactPanel.h">
+      <Filter>UI\Common\MainIngame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9868,6 +9871,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIWeightBar.cpp">
       <Filter>UI\Common\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIArtefactPanel.cpp">
+      <Filter>UI\Common\MainIngame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

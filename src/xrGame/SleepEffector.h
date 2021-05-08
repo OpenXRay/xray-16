@@ -24,7 +24,7 @@ class CSleepEffectorPP : public CEffectorPP
 
 public:
     CSleepEffectorPP(const SPPInfo& ppi, float life_time, float attack_time = 0.0f, float release_time = 0.0f);
-    virtual BOOL Process(SPPInfo& pp);
+    virtual bool Process(SPPInfo& pp);
 
     //текущий статус сна
     enum SLEEP_STATE

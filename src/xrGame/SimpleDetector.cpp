@@ -10,7 +10,7 @@ CSimpleDetector::~CSimpleDetector(void) {}
 void CSimpleDetector::CreateUI()
 {
     R_ASSERT(NULL == m_ui);
-    m_ui = new CUIArtefactDetectorSimple();
+    m_ui = xr_new<CUIArtefactDetectorSimple>();
     ui().construct(this);
 }
 
@@ -164,9 +164,7 @@ void CUIArtefactDetectorSimple::update()
             m_on_off_light->set_active(true);
 
         int frame = 0;
-        u32 clr = m_pOnOfLAnim->CalculateRGB(Device.fTimeGlobal, frame);
-        Fcolor fclr;
-        fclr.set(clr);
-        m_on_off_light->set_color(fclr);
+        const u32 clr = m_pOnOfLAnim->CalculateRGB(Device.fTimeGlobal, frame);
+        m_on_off_light->set_color(Fcolor(clr));
     }
 }

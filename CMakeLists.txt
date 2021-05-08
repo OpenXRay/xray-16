@@ -1,45 +1,42 @@
 cmake_minimum_required(VERSION 2.8.0)
+# Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
+set(CMAKE_INSTALL_PREFIX /usr)
 project(OpenXRay)
+
+# Installation paths
+include(GNUInstallDirs)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
+
+# Output all libraries and executable to one folder
+set(COMPILE_OUTPUT_FOLDER ${CMAKE_SOURCE_DIR}/bin/${ARCH_TYPE}/${CMAKE_BUILD_TYPE})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv*")
 	set(PROJECT_PLATFORM_ARM TRUE)
 elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
 	set(PROJECT_PLATFORM_ARM64 TRUE)
-endif()
-
-include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
-
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-if(NOT WIN32)
-	set(CMAKE_INSTALL_PREFIX "") # Skip all *nix-style installing for a while. Use DESTDIR
-    IF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
-        set(CPACK_PACKAGE_NAME "openxray")
-        set(CPACK_FILE_NAME "openxray")
-        set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
-        set(CPACK_PACKAGE_VERSION "1.6.02")
-        set(CPACK_PACKAGE_CONTACT "lya Orlov <eagleivg@mail.ru>")
-        set(CPACK_PACKAGE_DESCRIPTION "X-Ray Engine 1.6 expansion")
-        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_DESCRIPTION})
-        set(CPACK_DEBIAN_PACKAGE_SECTION "games")
-        set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/OpenXRay/xray-16")
-        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-        set(CPACK_STRIP_FILES TRUE)
-        set(CPACK_GENERATOR DEB)
-        set(CPACK_SOURCE_IGNORE_FILES "/.gitattributes")
-        set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
-        set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
-        set(CPACK_DEBIAN_REVISON "ubuntu-bionic-a1")
-        set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_DEBIAN_REVISON}_${_OS_ARCH}")
-        set(CPACK_DEBIAN_PACKAGE_SOURCE "OpenXRay")
-        INCLUDE(CPack)
-    ENDIF(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
+elseif(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "e2k")
+	set(PROJECT_PLATFORM_E2K TRUE)
 endif()
 
 option ( TBB_PARALLEL "Use tbb::parallel for prarticle and skinning acceleration on SMP." ON )
-option ( NO_TBB_MALLOC "Use standard memory allocation instead of tbbmalloc" ON )
+option ( USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" ON )
+
+# Memory allocator option
+set ( MEMORY_ALLOCATOR "mimalloc" CACHE STRING "Use specific memory allocator (mimalloc/tbb/standard)" )
+message( "Using ${MEMORY_ALLOCATOR} memory allocator" )
+if ( MEMORY_ALLOCATOR STREQUAL "mimalloc" )
+    add_definitions ( -DUSE_MIMALLOC )
+elseif ( MEMORY_ALLOCATOR STREQUAL "tbb" )
+    add_definitions ( -DUSE_TBB_MALLOC )
+else()
+    add_definitions ( -DUSE_PURE_ALLOC )
+endif()
 
 include(cotire)
 
@@ -130,6 +127,9 @@ if(PROJECT_PLATFORM_ARM)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon")
 elseif(PROJECT_PLATFORM_ARM64)
     set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+elseif(PROJECT_PLATFORM_E2K)
+    set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpmath=sse -msse3")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")
@@ -142,8 +142,8 @@ if( TBB_PARALLEL )
   add_definitions ( -DUSE_TBB_PARALLEL )
 endif()
 
-if( NO_TBB_MALLOC )
-  add_definitions ( -DNO_TBB_MALLOC )
+if( USE_CRYPTOPP )
+  add_definitions ( -DUSE_CRYPTOPP )
 endif()
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -169,18 +169,22 @@ add_definitions(-DdSINGLE) # for ODE
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
 if (NOT WIN32)
-find_package(GLEW REQUIRED)
-find_package(FreeImage REQUIRED)
-find_package(LockFile REQUIRED)
-find_package(OpenAL REQUIRED)
-find_package(Crypto++ REQUIRED)
-find_package(Theora REQUIRED)
-find_package(OGG REQUIRED)
-find_package(SDL2 REQUIRED)
-find_package(LZO REQUIRED)
-find_package(JPEG REQUIRED)
-find_package(TBB REQUIRED)
-find_package(PCRE REQUIRED)
+    find_package(GLEW REQUIRED)
+    find_package(FreeImage REQUIRED)
+    find_package(LockFile REQUIRED)
+    find_package(OpenAL REQUIRED)
+    if (USE_CRYPTOPP)
+        find_package(Crypto++ REQUIRED)
+    endif()
+    find_package(Theora REQUIRED)
+    find_package(OGG REQUIRED)
+    find_package(SDL2 REQUIRED)
+    find_package(LZO REQUIRED)
+    find_package(JPEG REQUIRED)
+    if (TBB_PARALLEL)
+        find_package(TBB REQUIRED)
+    endif()
+    find_package(PCRE REQUIRED)
 endif()
 
 include_directories(${LUA_INCLUDE_DIR})
@@ -190,21 +194,10 @@ add_subdirectory(Externals)
 add_subdirectory(src)
 add_subdirectory(res)
 
-# Unix system configuration
-if (UNIX)
-    # --------------------------------------------------
-    # Uninstall target
-    # --------------------------------------------------
-    # To clean system folder from libraries and binaries
-    # that was installed with `sudo make install`
-    # just run `sudo make uninstall`
-    #
-    if(NOT TARGET uninstall)
-        configure_file(
-                "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-                IMMEDIATE @ONLY)
+get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 
-        add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-    endif()
+if ("${LIB64}" STREQUAL "TRUE")
+    set(LIBSUFFIX 64)
+else()
+    set(LIBSUFFIX "")
 endif()

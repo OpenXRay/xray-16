@@ -94,7 +94,7 @@ void CGlowManager::Load(IReader* fs)
 
     for (; count; count--)
     {
-        CGlow* G = new CGlow();
+        CGlow* G = xr_new<CGlow>();
         fs->r(&G->position, sizeof(Fvector));
         fs->r(&G->radius, sizeof(float));
         G->spatial.sphere.set(G->position, G->radius);

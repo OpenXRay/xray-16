@@ -17,7 +17,7 @@
 
 CAI_Boar::CAI_Boar()
 {
-    StateMan = new CStateManagerBoar(this);
+    StateMan = xr_new<CStateManagerBoar>(this);
 
     CControlled::init_external(this);
 }
@@ -130,7 +130,7 @@ void CAI_Boar::BoneCallback(CBoneInstance* B)
     B->mTransform.mulB_43(M);
 }
 
-BOOL CAI_Boar::net_Spawn(CSE_Abstract* DC)
+bool CAI_Boar::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);

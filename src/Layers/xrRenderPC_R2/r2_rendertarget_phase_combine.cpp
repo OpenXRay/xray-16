@@ -19,7 +19,7 @@ void CRenderTarget::DoAsyncScreenshot()
         //  hr = pTex->GetSurfaceLevel(0, &pFBSrc);
 
         //  SHould be async function
-        hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB->pRT);
+        hr = HW.pDevice->GetRenderTargetData(pFBSrc, rt_async_ss->pRT);
 
         //  pFBSrc->Release();
 
@@ -30,6 +30,8 @@ void CRenderTarget::DoAsyncScreenshot()
 float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 void CRenderTarget::phase_combine()
 {
+    PIX_EVENT(phase_combine);
+
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
 
     u32 Offset = 0;
@@ -64,12 +66,12 @@ void CRenderTarget::phase_combine()
     if (1)
     {
         RCache.set_ColorWriteEnable();
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, FALSE));
+        RCache.set_Z(false);
         g_pGamePersistent->Environment().RenderSky();
         //  Igor: Render clouds before compine without Z-test
         //  to avoid siluets. HOwever, it's a bit slower process.
         g_pGamePersistent->Environment().RenderClouds();
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE));
+        RCache.set_Z(true);
     }
 
     //
@@ -193,8 +195,8 @@ void CRenderTarget::phase_combine()
         dxEnvDescriptorMixerRender& envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
 
         // Setup textures
-        IDirect3DBaseTexture9* e0 = _menu_pp ? 0 : envdescren.sky_r_textures_env[0].second->surface_get();
-        IDirect3DBaseTexture9* e1 = _menu_pp ? 0 : envdescren.sky_r_textures_env[1].second->surface_get();
+        ID3DBaseTexture* e0 = _menu_pp ? 0 : envdescren.sky_r_textures_env[0].second->surface_get();
+        ID3DBaseTexture* e1 = _menu_pp ? 0 : envdescren.sky_r_textures_env[1].second->surface_get();
         t_envmap_0->surface_set(e0);
         _RELEASE(e0);
         t_envmap_1->surface_set(e1);
@@ -219,6 +221,7 @@ void CRenderTarget::phase_combine()
 
     // Forward rendering
     {
+        PIX_EVENT(Forward_rendering);
         u_setrt(rt_Generic_0, 0, 0, get_base_zb()); // LDR RT
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
@@ -245,11 +248,12 @@ void CRenderTarget::phase_combine()
             bDistort = FALSE;
         if (bDistort)
         {
+            PIX_EVENT(render_distort_objects);
             u_setrt(rt_Generic_1, 0, 0, get_base_zb()); // Now RT is a distortion mask
+            RCache.ClearRT(rt_Generic_1, color_rgba(127, 127, 0, 127));
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
-            CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, color_rgba(127, 127, 0, 127), 1.0f, 0L));
             RImplementation.r_dsgraph_render_distort();
             if (g_pGamePersistent)
                 g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
@@ -272,6 +276,7 @@ void CRenderTarget::phase_combine()
     RCache.set_Stencil(FALSE);
     if (1)
     {
+        PIX_EVENT(combine_2);
         //
         struct v_aa
         {
@@ -342,17 +347,17 @@ void CRenderTarget::phase_combine()
             RCache.set_Element(s_combine->E[bDistort ? 3 : 1]); // look at blender_combine.cpp
         else
             RCache.set_Element(s_combine->E[bDistort ? 4 : 2]); // look at blender_combine.cpp
-        RCache.set_c("e_barrier", ps_r2_aa_barier.x, ps_r2_aa_barier.y, ps_r2_aa_barier.z, 0);
-        RCache.set_c("e_weights", ps_r2_aa_weight.x, ps_r2_aa_weight.y, ps_r2_aa_weight.z, 0);
-        RCache.set_c("e_kernel", ps_r2_aa_kernel, ps_r2_aa_kernel, ps_r2_aa_kernel, 0);
+        RCache.set_c("e_barrier", ps_r2_aa_barier.x, ps_r2_aa_barier.y, ps_r2_aa_barier.z, 0.f);
+        RCache.set_c("e_weights", ps_r2_aa_weight.x, ps_r2_aa_weight.y, ps_r2_aa_weight.z, 0.f);
+        RCache.set_c("e_kernel", ps_r2_aa_kernel, ps_r2_aa_kernel, ps_r2_aa_kernel, 0.f);
         RCache.set_c("m_current", m_current);
         RCache.set_c("m_previous", m_previous);
-        RCache.set_c("m_blur", m_blur_scale.x, m_blur_scale.y, 0, 0);
+        RCache.set_c("m_blur", m_blur_scale.x, m_blur_scale.y, 0.f, 0.f);
         Fvector3 dof;
         g_pGamePersistent->GetCurrentDof(dof);
         RCache.set_c("dof_params", dof.x, dof.y, dof.z, ps_r2_dof_sky);
         //.     RCache.set_c                ("dof_params",  ps_r2_dof.x, ps_r2_dof.y, ps_r2_dof.z, ps_r2_dof_sky);
-        RCache.set_c("dof_kernel", vDofKernel.x, vDofKernel.y, ps_r2_dof_kernel_size, 0);
+        RCache.set_c("dof_kernel", vDofKernel.x, vDofKernel.y, ps_r2_dof_kernel_size, 0.f);
 
         RCache.set_Geometry(g_aa_AA);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -370,6 +375,7 @@ void CRenderTarget::phase_combine()
     //  PP-if required
     if (PP_Complex)
     {
+        PIX_EVENT(phase_pp);
         phase_pp();
     }
 
@@ -423,8 +429,8 @@ void CRenderTarget::phase_combine()
     else
         dbg_lines = saved_dbg_lines;
 
-    HW.pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-    HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+    RCache.set_Z(true);
+    RCache.set_ZFunc(D3DCMP_LESSEQUAL);
     HW.pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
     if (1)
         for (u32 it = 0; it < dbg_lines.size(); it++)
@@ -517,6 +523,7 @@ void CRenderTarget::phase_wallmarks()
 
 void CRenderTarget::phase_combine_volumetric()
 {
+    PIX_EVENT(phase_combine_volumetric);
     u32 Offset = 0;
     Fvector2 p0, p1;
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "xrEngine/IRenderable.h"
+#include "xrEngine/xr_object.h"
 #include "xrEngine/CustomHUD.h"
 
 #include "FBasicVisual.h"
@@ -335,6 +336,8 @@ class hud_transform_helper
 {
     Fmatrix Pold;
     Fmatrix FTold;
+    static u32 cullMode;
+    static bool isActive;
 
 public:
     hud_transform_helper()
@@ -368,6 +371,10 @@ public:
         RCache.set_xform_project(Device.mProject);
 
         RImplementation.rmNear();
+
+        // preserve culling mode
+        cullMode = RCache.get_CullMode();
+        isActive = true;
     }
 
     ~hud_transform_helper()
@@ -378,8 +385,26 @@ public:
         Device.mProject = Pold;
         Device.mFullTransform = FTold;
         RCache.set_xform_project(Device.mProject);
+        // restore culling mode
+        RCache.set_CullMode(cullMode);
+        isActive = false;
+    }
+
+    static void apply_custom_state()
+    {
+        if (!isActive || !psHUD_Flags.test(HUD_LEFT_HANDED))
+            return;
+
+        // Change culling mode if HUD meshes were flipped
+        if (cullMode != CULL_NONE)
+        {
+            RCache.set_CullMode(cullMode == CULL_CW ? CULL_CCW : CULL_CW);
+        }
     }
 };
+
+u32 hud_transform_helper::cullMode = CULL_NONE;
+bool hud_transform_helper::isActive = false;
 
 template<class T>
 void __fastcall render_item(const T& item)
@@ -390,6 +415,7 @@ void __fastcall render_item(const T& item)
     RCache.set_xform_world(item.second.Matrix);
     RImplementation.apply_object(item.second.pObject);
     RImplementation.apply_lmaterial();
+    hud_transform_helper::apply_custom_state();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     //RCache.hemi.c_update(V);
     V->Render(calcLOD(item.first, V->vis.sphere.R));
@@ -593,6 +619,33 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
                 renderable->renderable_Render(renderable);
             }
         }
+#if RENDER != R_R1
+        // Actor Shadow (Sun + Light)
+        if (g_pGameLevel && phase == RImplementation.PHASE_SMAP
+            && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
+        {
+            do
+            {
+                IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
+                if (viewEntity == nullptr)
+                    break;
+                viewEntity->spatial_updatesector();
+                CSector* sector = (CSector*)viewEntity->GetSpatialData().sector;
+                if (nullptr == sector)
+                    break; // disassociated from S/P structure
+                if (PortalTraverser.i_marker != sector->r_marker)
+                    break; // inactive (untouched) sector
+                for (const CFrustum& view : sector->r_frustums)
+                {
+                    if (!view.testSphere_dirty(viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
+                        continue;
+
+                    // renderable
+                    g_hud->Render_First();
+                }
+            } while (0);
+        }
+#endif
     }
 
     // Restore

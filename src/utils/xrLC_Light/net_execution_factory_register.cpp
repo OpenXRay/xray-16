@@ -37,7 +37,7 @@ private:
     };
 
     virtual void receive_result(IGenericStream* outStream) { execution_impl.receive_result(outStream); };
-    virtual bool receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+    virtual bool receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
     {
         const xr_vector<e_net_globals>& v = exe_gl_reg().get_globals(etype);
         u32 size = v.size();
@@ -47,7 +47,7 @@ private:
         return execution_impl.receive_task(agent, sessionId, inStream);
     };
     virtual void send_result(IGenericStream* outStream) { execution_impl.send_result(outStream); };
-    virtual bool execute(IAgent* agent, DWORD sessionId)
+    virtual bool execute(IAgent* agent, u32 sessionId)
     {
         net_task_callback callback(agent, sessionId);
         return execution_impl.execute(callback) && !callback.break_all();
@@ -83,10 +83,10 @@ class execution_type_creator : public base_execution_type_creator
 
     virtual void set_pool_size(u32 size){};
     virtual void free_pool() { pool.clear(); }
-    virtual net_execution* create(u32 _net_id) { return new execution(_net_id); }
+    virtual net_execution* create(u32 _net_id) { return xr_new<execution>(_net_id); }
     virtual net_execution* pool_create()
     {
-        return new execution(u32(-1));
+        return xr_new<execution>(u32(-1));
         // return pool.create() ;
         return pool.create(); // spool<execution>::pool.create() ;
     }
@@ -105,7 +105,7 @@ class execution_type_creator : public base_execution_type_creator
 template <typename execution>
 static void register_type()
 {
-    execution_factory.register_type(new execution_type_creator<execution>());
+    execution_factory.register_type(xr_new<execution_type_creator<execution>>());
 }
 
 template <execution_types i>

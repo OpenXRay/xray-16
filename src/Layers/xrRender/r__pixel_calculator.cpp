@@ -9,7 +9,7 @@ void r_pixel_calculator::begin()
     zb.create("$user$pixel_calculator_zb", rt_dimensions, rt_dimensions, HW.Caps.fDepth, 1, { CRT::CreateSurface });
 
     RCache.set_RT(rt->pRT);
-#if defined(USE_DX10) || defined(USE_DX11)
+#ifdef USE_DX11
     RCache.set_ZB(zb->pZRT);
 #else
     RCache.set_ZB(zb->pRT);

@@ -32,10 +32,10 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
 {
     EAXLISTENERPROPERTIES ep;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(LONG)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(ep.lRoom)))
         return false;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(LONG)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(ep.lRoomHF)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMROLLOFFFACTOR,
                          &ep.flRoomRolloffFactor, sizeof(float)))
@@ -47,13 +47,13 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
                          &ep.flDecayHFRatio, sizeof(float)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONS,
-                         &ep.lReflections, sizeof(LONG)))
+                         &ep.lReflections, sizeof(ep.lReflections)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONSDELAY,
                          &ep.flReflectionsDelay, sizeof(float)))
         return false;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(LONG)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(ep.lReverb)))
         return false;
     if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERBDELAY,
                          &ep.flReverbDelay, sizeof(float)))
@@ -65,7 +65,7 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
                          &ep.flAirAbsorptionHF, sizeof(float)))
         return false;
     if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD)))
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(u32)))
         return false;
     return true;
 }
@@ -74,7 +74,7 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
 void CSoundRender_CoreA::_restart() { inherited::_restart(); }
 void CSoundRender_CoreA::_initialize()
 {
-    pDeviceList = new ALDeviceList();
+    pDeviceList = xr_new<ALDeviceList>();
 
     if (0 == pDeviceList->GetNumDevices())
     {
@@ -143,7 +143,7 @@ void CSoundRender_CoreA::_initialize()
     CSoundRender_Target* T = nullptr;
     for (u32 tit = 0; tit < u32(psSoundTargets); tit++)
     {
-        T = new CSoundRender_TargetA();
+        T = xr_new<CSoundRender_TargetA>();
         if (T->_initialize())
         {
             s_targets.push_back(T);

@@ -10,9 +10,12 @@
 #include <sys/resource.h>
 #endif
 
-#define USE_MIMALLOC
-//#define USE_TBB_MALLOC
-//#define USE_PURE_ALLOC
+// On other platforms these options are controlled by CMake
+#if defined(XR_PLATFORM_WINDOWS)
+#  define USE_MIMALLOC
+//#  define USE_TBB_MALLOC
+//#  define USE_PURE_ALLOC
+#endif
 
 #if defined(USE_MIMALLOC)
 #include "mimalloc.h"
@@ -64,9 +67,9 @@ void xrMemory::_initialize()
 {
     stat_calls = 0;
 
-    g_pStringContainer = new str_container();
+    g_pStringContainer = xr_new<str_container>();
     shared_str_initialized = true;
-    g_pSharedMemoryContainer = new smem_container();
+    g_pSharedMemoryContainer = xr_new<smem_container>();
 }
 
 void xrMemory::_destroy()

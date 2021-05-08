@@ -21,7 +21,7 @@
 
 CPsyDog::CPsyDog()
 {
-    m_aura = new CPsyDogAura(this);
+    m_aura = xr_new<CPsyDogAura>(this);
     m_max_phantoms_count = 0;
     m_phantoms_die_time = NULL;
 }
@@ -50,7 +50,7 @@ void CPsyDog::Load(LPCSTR section)
     pSettings->read_if_exists(m_time_phantom_respawn, section, "Time_Phantom_Respawn", "Time_Phantom_Appear", true);
 }
 
-BOOL CPsyDog::net_Spawn(CSE_Abstract* dc)
+bool CPsyDog::net_Spawn(CSE_Abstract* dc)
 {
     if (!inherited::net_Spawn(dc))
         return FALSE;
@@ -168,14 +168,14 @@ void CPsyDog::Die(IGameObject* who)
     delete_all_phantoms();
 }
 
-IStateManagerBase* CPsyDog::create_state_manager() { return new CStateManagerPsyDog(this); }
+IStateManagerBase* CPsyDog::create_state_manager() { return xr_new<CStateManagerPsyDog>(this); }
 u8 CPsyDog::get_phantoms_count() { return u8(m_storage.size()); }
 //////////////////////////////////////////////////////////////////////////
 // Phantom Psy Dog
 //////////////////////////////////////////////////////////////////////////
 CPsyDogPhantom::CPsyDogPhantom() {}
 CPsyDogPhantom::~CPsyDogPhantom() {}
-BOOL CPsyDogPhantom::net_Spawn(CSE_Abstract* dc)
+bool CPsyDogPhantom::net_Spawn(CSE_Abstract* dc)
 {
     if (!inherited::net_Spawn(dc))
         return FALSE;
@@ -265,9 +265,9 @@ void CPsyDogPhantom::Think()
     if (EnemyMan.get_enemy() != Actor())
         return;
 
-    Actor()->Cameras().AddCamEffector(new CMonsterEffectorHit(m_appear_effector.ce_time, m_appear_effector.ce_amplitude,
+    Actor()->Cameras().AddCamEffector(xr_new<CMonsterEffectorHit>(m_appear_effector.ce_time, m_appear_effector.ce_amplitude,
         m_appear_effector.ce_period_number, m_appear_effector.ce_power));
-    Actor()->Cameras().AddPPEffector(new CMonsterEffector(
+    Actor()->Cameras().AddPPEffector(xr_new<CMonsterEffector>(
         m_appear_effector.ppi, m_appear_effector.time, m_appear_effector.time_attack, m_appear_effector.time_release));
 }
 

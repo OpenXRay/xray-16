@@ -18,28 +18,33 @@
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
 
+ENGINE_API CStatTimer gTestTimer0;
+ENGINE_API CStatTimer gTestTimer1;
+ENGINE_API CStatTimer gTestTimer2;
+ENGINE_API CStatTimer gTestTimer3;
+
 class optimizer
 {
     float average_;
-    BOOL enabled_;
+    bool enabled_;
 
 public:
     optimizer()
     {
         average_ = 30.f;
-        //  enabled_ = TRUE;
+        //  enabled_ = true;
         //  disable ();
         // because Engine is not exist
-        enabled_ = FALSE;
+        enabled_ = false;
     }
 
-    BOOL enabled() { return enabled_; }
+    bool enabled() { return enabled_; }
     void enable()
     {
         if (!enabled_)
         {
             Engine.External.tune_resume();
-            enabled_ = TRUE;
+            enabled_ = true;
         }
     }
     void disable()
@@ -47,7 +52,7 @@ public:
         if (enabled_)
         {
             Engine.External.tune_pause();
-            enabled_ = FALSE;
+            enabled_ = false;
         }
     }
     void update(float value)
@@ -69,7 +74,7 @@ static optimizer vtune;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-ENGINE_API BOOL g_bDisableRedText = FALSE;
+ENGINE_API bool g_bDisableRedText = false;
 CStats::CStats()
 {
     statsFont = nullptr;
@@ -102,6 +107,11 @@ static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISp
 
 void CStats::Show()
 {
+    gTestTimer0.FrameEnd();
+    gTestTimer1.FrameEnd();
+    gTestTimer2.FrameEnd();
+    gTestTimer3.FrameEnd();
+
     float memCalls = float(Memory.stat_calls);
     if (memCalls > fMem_calls)
         fMem_calls = memCalls;
@@ -139,7 +149,10 @@ void CStats::Show()
         Engine.Scheduler.DumpStatistics(font, alertPtr);
         if (TaskScheduler)
             TaskScheduler->DumpStatistics(font, alertPtr);
-        g_pGamePersistent->DumpStatistics(font, alertPtr);
+        if (g_pGamePersistent)
+        {
+            g_pGamePersistent->DumpStatistics(font, alertPtr);
+        }
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
         if (physics_world())
@@ -150,6 +163,11 @@ void CStats::Show()
         GEnv.Sound->DumpStatistics(font, alertPtr);
         font.OutSkip();
         pInput->DumpStatistics(font, alertPtr);
+        font.OutSkip();
+        font.OutNext("TEST 0:      %2.2fms, %d", gTestTimer0.result, gTestTimer0.count);
+        font.OutNext("TEST 1:      %2.2fms, %d", gTestTimer1.result, gTestTimer1.count);
+        font.OutNext("TEST 2:      %2.2fms, %d", gTestTimer2.result, gTestTimer2.count);
+        font.OutNext("TEST 3:      %2.2fms, %d", gTestTimer3.result, gTestTimer3.count);
         font.OutSkip();
         font.OutNext("CPU: %u", CPU::GetCurrentCPU());
         font.OutNext("QPC: %u", CPU::qpc_counter);
@@ -178,9 +196,13 @@ void CStats::Show()
     if (psDeviceFlags.test(rsShowFPS))
     {
         const auto fps = u32(Device.GetStats().fFPS);
-        fpsFont->Out(Device.dwWidth - 40, 5, "%3d", fps);
+        fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3d", fps);
         fpsFont->OnRender();
     }
+    gTestTimer0.FrameStart();
+    gTestTimer1.FrameStart();
+    gTestTimer2.FrameStart();
+    gTestTimer3.FrameStart();
 }
 
 void CStats::OnDeviceCreate()
@@ -189,8 +211,8 @@ void CStats::OnDeviceCreate()
 
     if (!GEnv.isDedicatedServer)
     {
-        statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
-        fpsFont = new CGameFont("hud_font_di", CGameFont::fsDeviceIndependent);
+        statsFont = xr_new<CGameFont>("stat_font", CGameFont::fsDeviceIndependent);
+        fpsFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
         fpsFont->SetHeightI(0.025f);
         fpsFont->SetColor(color_rgba(250, 250, 15, 180));
     }

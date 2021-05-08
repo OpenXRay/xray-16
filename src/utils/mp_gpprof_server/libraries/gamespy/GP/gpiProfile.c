@@ -374,7 +374,7 @@ gpiReadDiskProfile(
 			{
 				if(toupper(value[0]) == 'M')
 					infoCache.sex = GP_MALE;
-				else if(toupper(value[1] == 'F'))
+				else if(toupper(value[0]) == 'F')
 					infoCache.sex = GP_FEMALE;
 				else
 					infoCache.sex = GP_PAT;
@@ -1173,12 +1173,12 @@ gpiAddToBlockedList(
             freeclear(profile->buddyStatusInfo->gameType);
             freeclear(profile->buddyStatusInfo->gameVariant);
             freeclear(profile->buddyStatusInfo->gameMapName);
-            freeclear(profile->buddyStatusInfo);
             if (profile->buddyStatusInfo->extendedInfoKeys)
             {
                 ArrayFree(profile->buddyStatusInfo->extendedInfoKeys);
                 profile->buddyStatusInfo->extendedInfoKeys = NULL;
             }
+            freeclear(profile->buddyStatusInfo);
 
             iconnection->profileList.numBuddies--;
             assert(iconnection->profileList.numBuddies >= 0);
@@ -1369,7 +1369,7 @@ gpiProcessRecvBlockedList(
             {
                 buffer[j] = c;
             }
-            buffer[j] = '\0';
+            buffer[min(j, sizeof(buffer) - 1)] = '\0';
             index += j;
         }
         else

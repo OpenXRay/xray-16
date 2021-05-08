@@ -13,15 +13,15 @@ inline void SWAP(TMP_TYPE& t1, TMP_TYPE& t2)
     t2 = tmp;
 }
 
-const UINT N1 = 4, N2 = 4, N3 = 4, N4 = (128 + 3 - 1 * N1 - 2 * N2 - 3 * N3) / 4;
-const UINT UNIT_SIZE = 20, N_INDEXES = N1 + N2 + N3 + N4;
+const u32 N1 = 4, N2 = 4, N3 = 4, N4 = (128 + 3 - 1 * N1 - 2 * N2 - 3 * N3) / 4;
+const u32 UNIT_SIZE = 20, N_INDEXES = N1 + N2 + N3 + N4;
 
 #pragma pack(1)
 struct MEM_BLK
 {
-    DWORD Stamp, NU;
+    u32 Stamp, NU;
     MEM_BLK *next, *prev;
-    DWORD Dummy;
+    u32 Dummy;
     void insertAt(MEM_BLK* p)
     {
         next = (prev = p)->next;
@@ -35,8 +35,8 @@ struct MEM_BLK
 } _PACK_ATTR;
 #pragma pack()
 static long SubAllocatorSize = 0;
-static BYTE Indx2Units[N_INDEXES], Units2Indx[128], GlueCount;
-static BYTE *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
+static u8 Indx2Units[N_INDEXES], Units2Indx[128], GlueCount;
+static u8 *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 static struct NODE
 {
     NODE* next;
@@ -53,11 +53,11 @@ inline void* RemoveNode(int indx)
     FreeList[indx].next = RetVal->next;
     return RetVal;
 }
-inline UINT U2B(int NU) { return 16 * NU + 4 * NU; }
+inline u32 U2B(int NU) { return 16 * NU + 4 * NU; }
 inline void SplitBlock(void* pv, int OldIndx, int NewIndx)
 {
     int i, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
-    BYTE* p = ((BYTE*)pv) + U2B(Indx2Units[NewIndx]);
+    u8* p = ((u8*)pv) + U2B(Indx2Units[NewIndx]);
     if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff)
     {
         InsertNode(p, --i);
@@ -66,9 +66,9 @@ inline void SplitBlock(void* pv, int OldIndx, int NewIndx)
     }
     InsertNode(p, Units2Indx[UDiff - 1]);
 }
-DWORD _STDCALL GetUsedMemory()
+u32 _STDCALL GetUsedMemory()
 {
-    DWORD i, k, RetVal = SubAllocatorSize - (HiUnit - LoUnit) - (UnitsStart - pText);
+    u32 i, k, RetVal = SubAllocatorSize - (HiUnit - LoUnit) - (UnitsStart - pText);
     for (k = i = 0; i < N_INDEXES; i++, k = 0)
     {
         for (NODE* pn = FreeList + i; (pn = pn->next) != NULL; k++)
@@ -79,8 +79,8 @@ DWORD _STDCALL GetUsedMemory()
 }
 BOOL _STDCALL StartSubAllocator(int SASize)
 {
-    DWORD t = SASize << 20;
-    if ((HeapStart = new BYTE[t]) == NULL)
+    u32 t = SASize << 20;
+    if ((HeapStart = new u8[t]) == NULL)
         return FALSE;
     SubAllocatorSize = t;
     return TRUE;
@@ -90,7 +90,7 @@ static inline void InitSubAllocator()
     int i, k;
     memset(FreeList, 0, sizeof(FreeList));
     HiUnit = (pText = HeapStart) + SubAllocatorSize;
-    UINT Diff = UNIT_SIZE * (SubAllocatorSize / 8 / UNIT_SIZE * 7);
+    u32 Diff = UNIT_SIZE * (SubAllocatorSize / 8 / UNIT_SIZE * 7);
     LoUnit = UnitsStart = HiUnit - Diff;
     for (i = 0, k = 1; i < N1; i++, k += 1)
         Indx2Units[i] = k;
@@ -121,7 +121,7 @@ static inline void GlueFreeBlocks()
             p->NU = Indx2Units[i];
         }
     for (p = s0.next; p != &s0; p = p->next)
-        while ((p1 = p + p->NU)->Stamp == DWORD(~0) && p->NU + p1->NU < 0x10000)
+        while ((p1 = p + p->NU)->Stamp == u32(~0) && p->NU + p1->NU < 0x10000)
         {
             p1->remove();
             p->NU += p1->NU;
@@ -196,10 +196,10 @@ inline void* ExpandUnits(void* OldPtr, int OldNU)
 }
 void _STDCALL PrintInfo(FILE* DecodedFile)
 {
-    UINT NDec = ftell(DecodedFile);
-    UINT UsedMemory = GetUsedMemory();
-    UINT m1 = UsedMemory >> 18;
-    UINT m2 = (10U * (UsedMemory - (m1 << 18)) + (1 << 17)) >> 18;
+    u32 NDec = ftell(DecodedFile);
+    u32 UsedMemory = GetUsedMemory();
+    u32 m1 = UsedMemory >> 18;
+    u32 m2 = (10U * (UsedMemory - (m1 << 18)) + (1 << 17)) >> 18;
     if (m2 == 10)
     {
         m1++;

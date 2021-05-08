@@ -95,14 +95,14 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     // XXX: replace with UIHelper
     if (xml.NavigateToNode("arrow"))
     {
-        m_arrow = new UI_Arrow();
+        m_arrow = xr_new<UI_Arrow>();
         m_arrow->init_from_xml(xml, "arrow", this);
     }
 
     // XXX: replace with UIHelper
     if (xml.NavigateToNode("arrow_shadow"))
     {
-        m_arrow_shadow = new UI_Arrow();
+        m_arrow_shadow = xr_new<UI_Arrow>();
         m_arrow_shadow->init_from_xml(xml, "arrow_shadow", this);
     }
 

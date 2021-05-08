@@ -159,7 +159,7 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         ref_constant C = get(name);
         if (!C)
         {
-            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
+            C = table.emplace_back(xr_new<R_constant>()); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
@@ -240,7 +240,7 @@ BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int Res
         ref_constant C = get(ResDesc.Name, dx9compatibility ? type : u16(-1));
         if (!C)
         {
-            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
+            C = table.emplace_back(xr_new<R_constant>()); //.g_constant_allocator.create();
             C->name = ResDesc.Name;
             C->destination = RC_dest_sampler;
             C->type = type;
@@ -266,14 +266,10 @@ IC u32 dest_to_shift_value(u32 destination)
     {
     case RC_dest_vertex: return RC_dest_vertex_cb_index_shift;
     case RC_dest_pixel: return RC_dest_pixel_cb_index_shift;
-#if defined(USE_DX10) || defined(USE_DX11)
     case RC_dest_geometry: return RC_dest_geometry_cb_index_shift;
-#ifdef USE_DX11
     case RC_dest_hull: return RC_dest_hull_cb_index_shift;
     case RC_dest_domain: return RC_dest_domain_cb_index_shift;
     case RC_dest_compute: return RC_dest_compute_cb_index_shift;
-#endif
-#endif
     default: FATAL("invalid enumeration for shader");
     }
     return 0;
@@ -285,14 +281,10 @@ IC u32 dest_to_cbuf_type(u32 destination)
     {
     case RC_dest_vertex: return CB_BufferVertexShader;
     case RC_dest_pixel: return CB_BufferPixelShader;
-#if defined(USE_DX10) || defined(USE_DX11)
     case RC_dest_geometry: return CB_BufferGeometryShader;
-#ifdef USE_DX11
     case RC_dest_hull: return CB_BufferHullShader;
     case RC_dest_domain: return CB_BufferDomainShader;
     case RC_dest_compute: return CB_BufferComputeShader;
-#endif
-#endif
     default: FATAL("invalid enumeration for shader");
     }
     return 0;

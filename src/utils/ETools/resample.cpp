@@ -230,10 +230,6 @@ static SAMPLE sum(
 static int push(res_state const* const state, SAMPLE* pool, int* const poolfill, int* const offset, SAMPLE* dest,
     int dststep, SAMPLE const* source, int srcstep, size_t srclen)
 {
-    SAMPLE *const destbase = dest, *poolhead = pool + *poolfill, *poolend = pool + state->taps, *newpool = pool;
-    SAMPLE const *refill, *base, *endpoint;
-    int lencheck;
-
     assert(state);
     assert(pool);
     assert(poolfill);
@@ -242,7 +238,10 @@ static int push(res_state const* const state, SAMPLE* pool, int* const poolfill,
 
     assert(state->poolfill != -1);
 
-    lencheck = res_push_check(state, srclen);
+    SAMPLE *const destbase = dest, *poolhead = pool + *poolfill, *poolend = pool + state->taps, *newpool = pool;
+    SAMPLE const *refill, *base, *endpoint;
+
+    const int lencheck = res_push_check(state, srclen);
 
     /* fill the pool before diving in */
     while (poolhead < poolend && srclen > 0)

@@ -32,7 +32,7 @@ xrGameSpyServer::~xrGameSpyServer()
 bool xrGameSpyServer::HasPassword() { return !!ServerFlags.test(server_flag_password); }
 bool xrGameSpyServer::HasProtected() { return !!ServerFlags.test(server_flag_protected); }
 //----------- xrGameSpyClientData -----------------------
-IClient* xrGameSpyServer::client_Create() { return new xrGameSpyClientData(); }
+IClient* xrGameSpyServer::client_Create() { return xr_new<xrGameSpyClientData>(); }
 xrGameSpyClientData::xrGameSpyClientData() : xrClientData()
 {
     m_bCDKeyAuth = false;

@@ -11,7 +11,7 @@ static const char* h_str =
     "NOTE: The last key is required for any functionality\n";
 
 void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
-void Startup(LPSTR lpCmdLine)
+void Startup(pstr lpCmdLine)
 {
     char cmd[512];
     bool bNet = false;

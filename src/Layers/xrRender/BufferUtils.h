@@ -1,7 +1,7 @@
 #pragma once
 
 u32 GetFVFVertexSize(u32 FVF);
-u32 GetDeclVertexSize(const VertexElement* decl, DWORD Stream);
+u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream);
 u32 GetDeclLength(const VertexElement* decl);
 
 struct SDeclaration;
@@ -12,7 +12,7 @@ void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<
 
 namespace BufferUtils
 {
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, UINT DataSize);
+HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize);
 };
 
 /**
@@ -137,4 +137,94 @@ private:
     size_t m_Size{ 0 };
     u32 m_RefCounter{ 0 };
     bool m_AllowReadBack{ false }; // specifies whether host will want to have the data back (e.g. skinning code)
+};
+
+/**
+ * Stream buffer is another abstraction for mutable GPU data. It uses mapping to provide access
+ * to its content. The buffer data is considered to be write only.
+ *
+ * There are two modes of mapping available:
+ * 1. Append (default)
+ *    All previous data kept untouched but can't be overwritten.
+ * 2. Flush
+ *    Previous buffer content is discarded.
+ */
+class VertexStreamBuffer
+{
+public:
+    VertexStreamBuffer();
+    ~VertexStreamBuffer();
+
+    void Create(size_t size);
+
+    void* Map(size_t offset, size_t size, bool flush = false);
+    void Unmap();
+    bool IsValid() const;
+
+    void AddRef()
+    {
+        ++m_RefCounter;
+    }
+
+    u32 Release()
+    {
+        VERIFY2(m_RefCounter, "Attempt to release unused object");
+        --m_RefCounter;
+        if (m_RefCounter == 0)
+        {
+            Destroy();
+        }
+        return m_RefCounter;
+    }
+
+    operator VertexBufferHandle() const
+    {
+        return m_DeviceBuffer;
+    }
+
+private:
+    void Destroy();
+
+    VertexBufferHandle m_DeviceBuffer;
+    u32 m_RefCounter{};
+};
+
+class IndexStreamBuffer
+{
+public:
+    IndexStreamBuffer();
+    ~IndexStreamBuffer();
+
+    void Create(size_t size);
+
+    void* Map(size_t offset, size_t size, bool flush = false);
+    void Unmap();
+    bool IsValid() const;
+
+    void AddRef()
+    {
+        ++m_RefCounter;
+    }
+
+    u32 Release()
+    {
+        VERIFY2(m_RefCounter, "Attempt to release unused object");
+        --m_RefCounter;
+        if (m_RefCounter == 0)
+        {
+            Destroy();
+        }
+        return m_RefCounter;
+    }
+
+    operator IndexBufferHandle() const
+    {
+        return m_DeviceBuffer;
+    }
+
+private:
+    void Destroy();
+
+    IndexBufferHandle m_DeviceBuffer;
+    u32 m_RefCounter{};
 };

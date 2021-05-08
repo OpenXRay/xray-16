@@ -49,7 +49,7 @@ class MeshTri
 
 private:
     DlinkDefine(MeshTri, List);
-    DWORD dwListId; // For use when doing consistency checks.
+    u32 dwListId; // For use when doing consistency checks.
 
     void InternalDelete(BOOL bBinUnusedEdges);
 
@@ -119,7 +119,7 @@ class MeshEdge
 
 private:
     DlinkDefine(MeshEdge, List);
-    DWORD dwListId; // For use when doing consistency checks.
+    u32 dwListId; // For use when doing consistency checks.
 
 public:
     MeshPt* pPt1;
@@ -192,7 +192,7 @@ private:
     int iCurProxNum; // Used with First/NextProx.
 
     DlinkDefine(MeshPt, List);
-    DWORD dwListId; // For use when doing consistency checks.
+    u32 dwListId; // For use when doing consistency checks.
 
 public:
     MESHPT_APP_DEFINED // App-defined data.
@@ -317,7 +317,7 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     if ((pEdge12 == NULL) && (pEdgeListRoot != NULL))
     {
         // Autocreate the edge.
-        pEdge12 = new MeshEdge(pPt1, pPt2, pEdgeListRoot);
+        pEdge12 = xr_new<MeshEdge>(pPt1, pPt2, pEdgeListRoot);
     }
     VERIFY(pEdge12 != NULL);
     {
@@ -328,7 +328,7 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     if ((pEdge23 == NULL) && (pEdgeListRoot != NULL))
     {
         // Autocreate the edge.
-        pEdge23 = new MeshEdge(pPt2, pPt3, pEdgeListRoot);
+        pEdge23 = xr_new<MeshEdge>(pPt2, pPt3, pEdgeListRoot);
     }
     VERIFY(pEdge23 != NULL);
     {
@@ -339,7 +339,7 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     if ((pEdge31 == NULL) && (pEdgeListRoot != NULL))
     {
         // Autocreate the edge.
-        pEdge31 = new MeshEdge(pPt3, pPt1, pEdgeListRoot);
+        pEdge31 = xr_new<MeshEdge>(pPt3, pPt1, pEdgeListRoot);
     }
     VERIFY(pEdge31 != NULL);
     {

@@ -15,7 +15,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 
 CUISequenceSimpleItem::~CUISequenceSimpleItem()
 {
@@ -100,7 +100,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     }
 
     // ui-components
-    m_UIWindow = new CUIWindow();
+    m_UIWindow = xr_new<CUIWindow>();
     m_UIWindow->SetAutoDelete(false);
     XML_NODE _lsr = xml->GetLocalRoot();
 
@@ -128,7 +128,13 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
         _si->m_wnd->TextItemControl()->SetTextComplexMode(true);
         _si->m_wnd->Show(false);
-        _si->m_wnd->SetWidth(_si->m_wnd->GetWidth() * UI().get_current_kx());
+        if (!ShadowOfChernobylMode)
+        {
+            if (!ClearSkyMode)
+                _si->m_wnd->SetWidth(_si->m_wnd->GetWidth() * UI().get_current_kx());
+            else if (UI().is_widescreen())
+                _si->m_wnd->SetWidth(_si->m_wnd->GetWidth() / 1.2f); // XXX: move 1.2f to UICore as a constant
+        }
 
         if (UI().is_widescreen())
         {

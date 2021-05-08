@@ -2,16 +2,17 @@
 
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+#include "Layers/xrRender/r__sync_point.h"
 
 #include "Layers/xrRender/PSLibrary.h"
 
 #include "r2_types.h"
 #include "r4_rendertarget.h"
 
-#include "Layers/xrRender/hom.h"
-#include "Layers/xrRender/detailmanager.h"
-#include "Layers/xrRender/modelpool.h"
-#include "Layers/xrRender/wallmarksengine.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/DetailManager.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/WallmarksEngine.h"
 
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
@@ -80,6 +81,7 @@ public:
         u32 nvdbt : 1;
 
         u32 nullrt : 1;
+        u32 no_ram_textures : 1; // don't keep textures in RAM
 
         u32 distortion : 1;
         u32 distortion_enabled : 1;
@@ -185,8 +187,7 @@ public:
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
-    ID3DQuery* q_sync_point[CHWCaps::MAX_GPUS];
-    u32 q_sync_count;
+    R_sync_point q_sync_point;
 
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
@@ -239,10 +240,9 @@ public:
 
     ICF void apply_object(IRenderable* O)
     {
-        if (!O)
+        if (!O || !O->renderable_ROS())
             return;
-        if (!O->renderable_ROS())
-            return;
+
         CROS_impl& LT = *static_cast<CROS_impl*>(O->renderable_ROS());
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
@@ -253,7 +253,7 @@ public:
     
     void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
+        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
         if (!C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
@@ -266,17 +266,21 @@ public:
             mtl = ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X], o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X], o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
+        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
+        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
     }
 
 public:
     // feature level
-    virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
+    virtual GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
+    virtual BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
     virtual bool is_sun_static() { return o.sunstatic; }
-    virtual DWORD get_dx_level() { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
+    virtual u32 get_dx_level() { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
+
     // Loading / Unloading
     virtual void create();
     virtual void destroy();
@@ -288,7 +292,7 @@ public:
 
     ID3DBaseTexture* texture_load(LPCSTR fname, u32& msize, bool bStaging = false);
     virtual HRESULT shader_compile(
-        LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void*& result);
+        pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result);
 
     // Information
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
@@ -334,16 +338,16 @@ public:
     virtual IRenderVisual* model_Create(LPCSTR name, IReader* data = 0);
     virtual IRenderVisual* model_CreateChild(LPCSTR name, IReader* data);
     virtual IRenderVisual* model_Duplicate(IRenderVisual* V);
-    virtual void model_Delete(IRenderVisual*& V, BOOL bDiscard);
+    virtual void model_Delete(IRenderVisual*& V, bool bDiscard);
     virtual void model_Delete(IRender_DetailModel*& F);
-    virtual void model_Logging(BOOL bEnable) { Models->Logging(bEnable); }
+    virtual void model_Logging(bool bEnable) { Models->Logging(bEnable); }
     virtual void models_Prefetch();
-    virtual void models_Clear(BOOL b_complete);
+    virtual void models_Clear(bool b_complete);
 
     // Occlusion culling
-    virtual BOOL occ_visible(vis_data& V);
-    virtual BOOL occ_visible(Fbox& B);
-    virtual BOOL occ_visible(sPoly& P);
+    virtual bool occ_visible(vis_data& V);
+    virtual bool occ_visible(Fbox& B);
+    virtual bool occ_visible(sPoly& P);
 
     // Main
     void BeforeFrame() override;

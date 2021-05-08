@@ -526,18 +526,13 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CU
     {
         pWnd->m_bUseColor = true;
 
-        u32 color = GetColor(xml_doc, buf, index, 0xff);
-        pWnd->m_minColor.set(color);
+        pWnd->m_minColor = GetColor(xml_doc, buf, index, 0xff);
 
         strconcat(sizeof(buf), buf, path, ":middle_color");
-
-        color = GetColor(xml_doc, buf, index, 0xff);
-        pWnd->m_middleColor.set(color);
+        pWnd->m_middleColor = GetColor(xml_doc, buf, index, 0xff);
 
         strconcat(sizeof(buf), buf, path, ":max_color");
-
-        color = GetColor(xml_doc, buf, index, 0xff);
-        pWnd->m_maxColor.set(color);
+        pWnd->m_maxColor = GetColor(xml_doc, buf, index, 0xff);
     }
 
     return true;
@@ -556,7 +551,7 @@ bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, 
     strconcat(sizeof(_path), _path, path, ":back");
     if (xml_doc.NavigateToNode(_path, index))
     {
-        pWnd->m_pBackground = new CUIStatic();
+        pWnd->m_pBackground = xr_new<CUIStatic>();
         pWnd->m_pBackground->SetAutoDelete(true);
         pWnd->AttachChild(pWnd->m_pBackground);
         InitStatic(xml_doc, _path, index, pWnd->m_pBackground);
@@ -565,7 +560,7 @@ bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, 
     strconcat(sizeof(_path), _path, path, ":front");
     if (xml_doc.NavigateToNode(_path, index))
     {
-        pWnd->m_pTexture = new CUIStatic();
+        pWnd->m_pTexture = xr_new<CUIStatic>();
         pWnd->m_pTexture->SetAutoDelete(true);
         pWnd->AttachChild(pWnd->m_pTexture);
         InitStatic(xml_doc, _path, index, pWnd->m_pTexture);
@@ -601,7 +596,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         LPCSTR node_name = node->Value();
         if (0 == xr_stricmp(node_name, "auto_static"))
         {
-            CUIStatic* pUIStatic = new CUIStatic();
+            CUIStatic* pUIStatic = xr_new<CUIStatic>();
             InitStatic(xml_doc, "auto_static", cnt_static, pUIStatic);
             xr_sprintf(buff, "auto_static_%d", cnt_static);
             pUIStatic->SetWindowName(buff);
@@ -612,7 +607,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         }
         else if (0 == xr_stricmp(node_name, "auto_frameline"))
         {
-            CUIFrameLineWnd* pUIFrameline = new CUIFrameLineWnd();
+            CUIFrameLineWnd* pUIFrameline = xr_new<CUIFrameLineWnd>();
             InitFrameLine(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
             xr_sprintf(buff, "auto_frameline_%d", cnt_frameline);
             pUIFrameline->SetWindowName(buff);
@@ -632,7 +627,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         string64							sname;
         for(int i=0; i<items_num; i++)
         {
-            pUIStatic						= new CUIStatic();
+            pUIStatic						= xr_new<CUIStatic>();
             InitStatic						(xml_doc, "auto_static", i, pUIStatic);
             xr_sprintf						(sname,"auto_static_%d", i);
             pUIStatic->SetWindowName		(sname);
@@ -658,7 +653,7 @@ void CUIXmlInitBase::InitAutoFrameLineGroup(CUIXml& xml_doc, LPCSTR path, int in
     string64 sname;
     for (int i = 0; i < items_num; ++i)
     {
-        pUIFL = new CUIFrameLineWnd();
+        pUIFL = xr_new<CUIFrameLineWnd>();
         InitFrameLine(xml_doc, "auto_frameline", i, pUIFL);
         xr_sprintf(sname, "auto_frameline_%d", i);
         pUIFL->SetWindowName(sname);
@@ -735,7 +730,8 @@ bool CUIXmlInitBase::InitFont(CUIXml& xml_doc, LPCSTR path, int index, u32& colo
     return true;
 }
 
-bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUITabControl* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path,
+    int index, CUITabControl* pWnd, bool fatal /*= true*/, bool defaultIdsAllowed /*= false*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);
     if (!nodeExist)
@@ -758,15 +754,17 @@ bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUI
 
     for (int i = 0; i < tabsCount; ++i)
     {
-        newButton = radio ? new CUIRadioButton() : new CUITabButton();
+        newButton = radio ? xr_new<CUIRadioButton>() : xr_new<CUITabButton>();
         status &= Init3tButton(xml_doc, "button", i, newButton);
         newButton->m_btn_id = xml_doc.ReadAttrib("button", i, "id");
         if (!newButton->m_btn_id.size())
         {
+            R_ASSERT4(defaultIdsAllowed, "Tab control tab doesn't have 'id' assigned.", xml_doc.m_xml_file_name, path);
+            Msg("~ [%s] doesn't have `id` tag in file [%s]", xml_doc.m_xml_file_name, path);
             string32 temp;
-            Msg("! [%s] doesn't have `id` tag in file [%s]", xml_doc.m_xml_file_name, path);
-            xr_sprintf(temp, "tab_button_%d", i);
+            xr_sprintf(temp, "%d", i);
             newButton->m_btn_id = temp;
+            newButton->m_btn_id_default_assigned = true;
         }
         pWnd->AddItem(newButton);
     }
@@ -1095,7 +1093,7 @@ bool CUIXmlInitBase::InitAlignment(CUIXml& xml_doc, const char* path, int index,
 void CUIXmlInitBase::InitColorDefs()
 {
     if (!m_pColorDefs)
-        m_pColorDefs = new ColorDefs();
+        m_pColorDefs = xr_new<ColorDefs>();
 
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, COLOR_DEFINITIONS);
@@ -1156,7 +1154,7 @@ bool CUIXmlInitBase::InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUI
 
     for (int i = 0; i < tabsCount; ++i)
     {
-        CUITextWnd* newText = new CUITextWnd();
+        CUITextWnd* newText = xr_new<CUITextWnd>();
         InitText(xml_doc, "text", i, &newText->TextItemControl());
         newText->SetTextComplexMode(true);
         newText->SetWidth(pWnd->GetDesiredChildWidth());

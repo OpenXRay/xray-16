@@ -38,7 +38,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
     Fmatrix mTexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
@@ -46,7 +46,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
-#else //	USE_DX10
+#else // USE_DX9
     float _w = float(RDEVICE.dwWidth);
     float _h = float(RDEVICE.dwHeight);
     float o_w = (.5f / _w);
@@ -58,7 +58,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
     };
-#endif //	USE_DX10
+#endif
 
     mTexgen.mul(mTexelAdjust, mVP);
     RCache.set_c("mVPTexgen", mTexgen);
@@ -642,6 +642,13 @@ void CParticleEffect::Render(float)
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");
 #endif // _GPA_ENABLED
+
+#ifdef USE_OGL
+    // Due to the big impact on performance
+    const float distSQ = RDEVICE.vCameraPosition.distance_to_sqr(m_InitialPosition) + EPS;
+    if (distSQ > _sqr(100.f*psVisDistance))
+        return;
+#endif
 
     u32 dwOffset, dwCount;
     // Get a pointer to the particles in gp memory

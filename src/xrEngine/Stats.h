@@ -42,4 +42,9 @@ enum
     st_sound_info_object = (1 << 5),
 };
 
+extern ENGINE_API CStatTimer gTestTimer0; // debug counter
+extern ENGINE_API CStatTimer gTestTimer1; // debug counter
+extern ENGINE_API CStatTimer gTestTimer2; // debug counter
+extern ENGINE_API CStatTimer gTestTimer3; // debug counter
+
 extern Flags32 g_stats_flags;

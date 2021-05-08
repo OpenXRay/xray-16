@@ -12,10 +12,8 @@
 
 //////////////////////////////////////////////////////////////////////////
 REPUTATION_DATA::REPUTATION_DATA(int idx, shared_str idn, LPCSTR threshold_str)
+    : id(idn), index(idx), threshold((CHARACTER_REPUTATION_VALUE)atoi(threshold_str))
 {
-    index = idx;
-    id = idn;
-    threshold = (CHARACTER_REPUTATION_VALUE)atoi(threshold_str);
 }
 //////////////////////////////////////////////////////////////////////////
 CHARACTER_REPUTATION::GOODWILL_TABLE CHARACTER_REPUTATION::m_relation_table;

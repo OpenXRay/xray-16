@@ -206,8 +206,8 @@ UICore::UICore()
 {
     if (!GEnv.isDedicatedServer)
     {
-        m_pUICursor = new CUICursor();
-        m_pFontManager = new CFontManager();
+        m_pUICursor = xr_new<CUICursor>();
+        m_pFontManager = xr_new<CFontManager>();
     }
     else
     {

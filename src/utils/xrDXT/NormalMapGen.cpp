@@ -99,7 +99,7 @@ void CalculateNormalMap(NVI_Image* pSrc, ConvolutionKernel* pKernels, int num_ke
     conv.Initialize(&pSrc, pKernels, num_kernels, wrap);
     int size_x = (int)pSrc->GetWidth();
     int size_y = (int)pSrc->GetHeight();
-    auto pArray = (DWORD*)pSrc->GetImageDataPointer();
+    auto pArray = (u32*)pSrc->GetImageDataPointer();
     assert(pArray != NULL);
     // Now run the kernel over the source image area and write out the values.
     // coordinates of source image (not padded)
@@ -516,7 +516,7 @@ int DXTCompressBump(
     LPCSTR out_name, u8* T_height_gloss, u8* T_normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth)
 {
     VERIFY(4 == depth);
-    NVI_Image* pSrc = new NVI_Image();
+    NVI_Image* pSrc = xr_new<NVI_Image>();
     pSrc->Initialize(w, h, NVI_A8_R8_G8_B8, T_height_gloss);
     pSrc->AverageRGBToAlpha();
     // stage 0
@@ -555,7 +555,7 @@ int DXTCompressBump(
     if (res == 1)
     {
         // Decompress (back)
-        Image_DXTC* img = new Image_DXTC();
+        Image_DXTC* img = xr_new<Image_DXTC>();
         if (img->LoadFromFile(out_name))
         {
             VERIFY(w == img->Width() && h == img->Height());

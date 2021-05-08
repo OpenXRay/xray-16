@@ -13,23 +13,23 @@
 
 CUIMpChangeMapAdm::CUIMpChangeMapAdm()
 {
-    map_pic = new CUIStatic();
+    map_pic = xr_new<CUIStatic>();
     map_pic->SetAutoDelete(true);
     AttachChild(map_pic);
 
-    map_frame = new CUIStatic();
+    map_frame = xr_new<CUIStatic>();
     map_frame->SetAutoDelete(true);
     AttachChild(map_frame);
 
-    map_version = new CUITextWnd();
+    map_version = xr_new<CUITextWnd>();
     map_version->SetAutoDelete(true);
     AttachChild(map_version);
 
-    lst = new CUIListBox();
+    lst = xr_new<CUIListBox>();
     lst->SetAutoDelete(true);
     AttachChild(lst);
 
-    btn_ok = new CUI3tButton();
+    btn_ok = xr_new<CUI3tButton>();
     btn_ok->SetAutoDelete(true);
     AttachChild(btn_ok);
 }
@@ -66,7 +66,7 @@ void CUIMpChangeMapAdm::OnItemSelect()
 
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
     const shared_str& name = M.m_map_names[idx].map_name;
-    LPSTR map_ver = NULL;
+    pstr map_ver = NULL;
     STRCONCAT(map_ver, "[", M.m_map_names[idx].map_ver.c_str() ? M.m_map_names[idx].map_ver.c_str() : "unknown", "]");
     xr_string map_name = "intro" DELIMITER "intro_map_pic_";
     map_name += name.c_str();

@@ -262,8 +262,8 @@ private:
     }
 };
 
-HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
-    LPCSTR pTarget, DWORD Flags, void*& result)
+HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
+    pcstr pTarget, u32 Flags, void*& result)
 {
     shader_options_holder options;
     shader_name_holder sh_name;
@@ -274,6 +274,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     string32 c_sun_shafts;
     string32 c_ssao;
     string32 c_sun_quality;
+    string32 c_water_reflection;
 
     // TODO: OGL: Implement these parameters.
     UNUSED(pFunctionName);
@@ -393,6 +394,22 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     {
         const bool softWater = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER);
         appendShaderOption(softWater, "USE_SOFT_WATER", "1");
+    }
+
+    // Water reflections
+    if (RImplementation.o.advancedpp && ps_r_water_reflection)
+    {
+        xr_sprintf(c_water_reflection, "%d", ps_r_water_reflection);
+        options.add("SSR_QUALITY", c_water_reflection);
+        sh_name.append(ps_r_water_reflection);
+        const bool sshHalfDepth = ps_r2_ls_flags_ext.test(R3FLAGEXT_SSR_HALF_DEPTH);
+        appendShaderOption(sshHalfDepth, "SSR_HALF_DEPTH", "1");
+        const bool ssrJitter = ps_r2_ls_flags_ext.test(R3FLAGEXT_SSR_JITTER);
+        appendShaderOption(ssrJitter, "SSR_JITTER", "1");
+    }
+    else
+    {
+        sh_name.append(static_cast<u32>(0));
     }
 
     // Soft particles
@@ -536,7 +553,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     if (HW.ShaderBinarySupported)
     {
         string_path file;
-        strconcat(sizeof(file), file, "shaders_cache" DELIMITER, filename);
+        strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename);
         FS.update_path(full_path, "$app_data_root$", file);
 
         string_path shadersFolder;
@@ -569,7 +586,12 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
                     const u32 savedBytecodeCrc = file->r_u32();
                     const u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
                     if (bytecodeCrc == savedBytecodeCrc)
+                    {
+#ifdef DEBUG
+                        Log("* Loading shader:", full_path);
+#endif
                         program = create_shader(pTarget, (pcstr*)file->pointer(), file->elapsed(), filename, result, &binaryFormat);
+                    }
                 }
             }
         }
@@ -579,6 +601,9 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
     // Failed to use cached shader, then:
     if (!program)
     {
+#ifdef DEBUG
+        Log("- Compile shader:", full_path);
+#endif
         // Compile sources list
         shader_sources_manager sources(name);
         sources.compile(fs, options);
@@ -608,7 +633,7 @@ HRESULT CRender::shader_compile(LPCSTR name, IReader* fs, LPCSTR pFunctionName,
                 file->w_u32(fileCrc);
 
                 const u32 bytecodeCrc = crc32(binary, binaryLength);
-                file->w_u32(bytecodeCrc);
+                file->w_u32(bytecodeCrc); // Do not write anything below this line, take a look at reading (crc32)
 
                 file->w(binary, binaryLength);
                 FS.w_close(file);

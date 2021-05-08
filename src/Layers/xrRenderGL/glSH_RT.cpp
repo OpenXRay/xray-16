@@ -98,6 +98,23 @@ void CRT::reset_end()
     create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags });
 }
 
+void CRT::resolve_into(CRT& destination) const
+{
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glDrawBuffer(GL_COLOR_ATTACHMENT1);
+
+    constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    RCache.set_RT(pRT, 0);
+    RCache.set_RT(destination.pRT, 1);
+
+    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+    CHK_GL(glDrawBuffers(std::size(buffers), buffers));
+
+    CHK_GL(glBlitFramebuffer(0, 0, dwWidth, dwHeight, 0, 0, destination.dwWidth, destination.dwHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST));
+}
+
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));

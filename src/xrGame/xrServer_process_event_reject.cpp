@@ -76,7 +76,7 @@ bool xrServer::Process_event_reject(
     // Signal to everyone (including sender)
     if (send_message)
     {
-        DWORD MODE = net_flags(TRUE, TRUE, FALSE, TRUE);
+        u32 MODE = net_flags(TRUE, TRUE, FALSE, TRUE);
         SendBroadcast(BroadcastCID, P, MODE);
     }
 

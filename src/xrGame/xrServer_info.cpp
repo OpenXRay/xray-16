@@ -27,7 +27,7 @@ server_info_uploader& xrServer::GetServerInfoUploader()
     }
     else
     {
-        result = new server_info_uploader(m_file_transfers);
+        result = xr_new<server_info_uploader>(m_file_transfers);
         m_info_uploaders.push_back(result);
     }
     return *result;
@@ -114,9 +114,9 @@ void server_info_uploader::start_upload_info(IReader const* svlogo, IReader cons
 
     buffer_vector<mutable_buffer_t> tmp_bufvec(xr_alloca(sizeof(mutable_buffer_t) * 2), 2);
 
-    tmp_bufvec.push_back(std::make_pair(static_cast<u8*>(svlogo->pointer()), svlogo->length()));
+    tmp_bufvec.push_back(std::make_pair(static_cast<u8*>(svlogo->pointer()), static_cast<u32>(svlogo->length())));
 
-    tmp_bufvec.push_back(std::make_pair(static_cast<u8*>(svrules->pointer()), svrules->length()));
+    tmp_bufvec.push_back(std::make_pair(static_cast<u8*>(svrules->pointer()), static_cast<u32>(svrules->length())));
 
     m_to_client = toclient;
 

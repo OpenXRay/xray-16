@@ -88,7 +88,7 @@ bool CUITaskWnd::Init()
     }
     m_bQuestNpcsEnabled = true;
 
-    m_pMapWnd = new CUIMapWnd(hint_wnd);
+    m_pMapWnd = xr_new<CUIMapWnd>(hint_wnd);
     m_pMapWnd->SetAutoDelete(false);
     m_pMapWnd->Init(PDA_TASK_XML, "map_wnd");
     AttachChild(m_pMapWnd);
@@ -96,7 +96,7 @@ bool CUITaskWnd::Init()
     m_center_background = UIHelper::CreateStatic(xml, "center_background", this);
     m_devider = UIHelper::CreateStatic(xml, "line_devider", this, false);
 
-    m_pStoryLineTaskItem = new CUITaskItem();
+    m_pStoryLineTaskItem = xr_new<CUITaskItem>();
     m_pStoryLineTaskItem->Init(xml, "storyline_task_item");
     AttachChild(m_pStoryLineTaskItem);
     m_pStoryLineTaskItem->SetAutoDelete(true);
@@ -106,7 +106,7 @@ bool CUITaskWnd::Init()
     if (xml.NavigateToNode("secondary_task_item")) // XXX: replace with UIHelper
     {
         Level().GameTaskManager().AllowMultipleTask(true);
-        m_pSecondaryTaskItem = new CUITaskItem();
+        m_pSecondaryTaskItem = xr_new<CUITaskItem>();
         m_pSecondaryTaskItem->Init(xml, "secondary_task_item");
         AttachChild(m_pSecondaryTaskItem);
         m_pSecondaryTaskItem->SetAutoDelete(true);
@@ -132,7 +132,7 @@ bool CUITaskWnd::Init()
 
     m_second_task_index = UIHelper::CreateStatic(xml, "second_task_index", this, false);
 
-    m_task_wnd = new UITaskListWnd();
+    m_task_wnd = xr_new<UITaskListWnd>();
     m_task_wnd->SetAutoDelete(true);
     m_task_wnd->hint_wnd = hint_wnd;
     m_task_wnd->init_from_xml(xml, "second_task_wnd");
@@ -142,7 +142,7 @@ bool CUITaskWnd::Init()
     m_task_wnd->Show(false);
     m_task_wnd_show = false;
 
-    m_map_legend_wnd = new UIMapLegend();
+    m_map_legend_wnd = xr_new<UIMapLegend>();
     m_map_legend_wnd->SetAutoDelete(true);
     m_map_legend_wnd->init_from_xml(xml, "map_legend_wnd");
     m_pMapWnd->AttachChild(m_map_legend_wnd);

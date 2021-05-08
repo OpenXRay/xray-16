@@ -248,7 +248,7 @@ protected:
 
 public:
     FactoryPtr<IEnvironmentRender> m_pRender;
-    BOOL bNeed_re_create_env;
+    bool bNeed_re_create_env;
 
     float wind_strength_factor;
     float wind_gust_factor;

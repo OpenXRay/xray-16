@@ -283,6 +283,11 @@ bool CxImageJPG::Decode(CxFile * hFile)
 #if CXIMAGE_SUPPORT_ENCODE
 
 #ifdef DEBUG
+// XXX: dirty hack.
+#undef max
+#undef min
+#include "xrCore/xrDebug_macros.h" // needed for VERIFY in FTimer.h
+#include "xrCommon/math_funcs_inline.h" // needed for fis_zero() in FTimer.h
 #include "xrCore/FTimer.h"
 #include "xrCore/log.h"
 #endif

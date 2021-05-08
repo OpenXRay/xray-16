@@ -25,14 +25,14 @@ f_deffer 	_main	( p_flat I 		)
 
 # ifdef	USE_TDETAIL
  # ifdef USE_4_DETAIL
-	float4	mask= tex2D		(s_mask, I.tcdh);
-	float 	mag	= dot 		(mask,float4(1));
-			mask= mask/mag	;
+	float4	mask_t= tex2D		(s_mask, I.tcdh);
+	float 	mag	= dot 		(mask_t,float4(1));
+			mask_t= mask_t/mag	;
 
-	float4	d_R	= tex2D		(s_dt_r, I.tcdbump)*mask.r;
-	float4	d_G	= tex2D		(s_dt_g, I.tcdbump)*mask.g;
-	float4	d_B	= tex2D		(s_dt_b, I.tcdbump)*mask.b;
-	float4	d_A	= tex2D		(s_dt_a, I.tcdbump)*mask.a;
+	float4	d_R	= tex2D		(s_dt_r, I.tcdbump)*mask_t.r;
+	float4	d_G	= tex2D		(s_dt_g, I.tcdbump)*mask_t.g;
+	float4	d_B	= tex2D		(s_dt_b, I.tcdbump)*mask_t.b;
+	float4	d_A	= tex2D		(s_dt_a, I.tcdbump)*mask_t.a;
 	float4	dt	= d_R+d_G+d_B+d_A;
 		D.rgb	= 2*D.rgb*dt.rgb	 ;
 
@@ -43,10 +43,10 @@ f_deffer 	_main	( p_flat I 		)
 	 float4	n_Bt = tex2D	(s_dn_b, I.tcdbump).wzyx;
 	 float4	n_At = tex2D	(s_dn_a, I.tcdbump).wzyx;
 	 
- 	 float3	n_R = (n_Rt.xyz-0.5)*mask.r; float g_R=n_Rt.w*mask.r;
-	 float3	n_G = (n_Gt.xyz-0.5)*mask.g; float g_G=n_Gt.w*mask.g;
-	 float3	n_B = (n_Bt.xyz-0.5)*mask.b; float g_B=n_Bt.w*mask.b;
-	 float3	n_A = (n_At.xyz-0.5)*mask.a; float g_A=n_At.w*mask.a;
+ 	 float3	n_R = (n_Rt.xyz-0.5)*mask_t.r; float g_R=n_Rt.w*mask_t.r;
+	 float3	n_G = (n_Gt.xyz-0.5)*mask_t.g; float g_G=n_Gt.w*mask_t.g;
+	 float3	n_B = (n_Bt.xyz-0.5)*mask_t.b; float g_B=n_Bt.w*mask_t.b;
+	 float3	n_A = (n_At.xyz-0.5)*mask_t.a; float g_A=n_At.w*mask_t.a;
 
 	 float3	mix		= 	n_R+n_G+n_B+n_A;
 			mix.z	*=	0.5;		//. make bump twice as contrast (fake, remove me if possible)

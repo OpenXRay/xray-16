@@ -109,7 +109,7 @@ public:
         [FieldOffset(1 * sizeof(float))] float g;
         [FieldOffset(2 * sizeof(float))] float b;
 
-        Color(float r, float g, float b) : r(r), g(g), b(b) {}
+        Color(float _r, float _g, float _b) : r(_r), g(_g), b(_b) {}
         operator UInt32()
         {
             int _r = clampr(iFloor(r * 255.0f + 0.5f), 0, 255);

@@ -72,7 +72,7 @@ if(inistream) R_ASSERT3(0, #what_to_do, "not implemented"); \
 
 struct NET_Buffer
 {
-    BYTE data[NET_PacketSizeLimit];
+    u8 data[NET_PacketSizeLimit];
     u32 count;
 };
 

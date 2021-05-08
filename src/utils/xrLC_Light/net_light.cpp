@@ -32,13 +32,13 @@ static struct unload
 */
 #pragma warning(push)
 #pragma warning(disable : 4995)
-DWORD g_sessionId = DWORD(-1);
+u32 g_sessionId = u32(-1);
 
 // bool  GetGlobalData( IAgent* agent,
-//				    DWORD sessionId );
-bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream* inStream);
+//				    u32 sessionId );
+bool TaskReceive(net_task& task, IAgent* agent, u32 sessionId, IGenericStream* inStream);
 
-bool GetGlobalData(IAgent* agent, DWORD sessionId)
+bool GetGlobalData(IAgent* agent, u32 sessionId)
 {
     if (!inlc_global_data())
     {
@@ -82,7 +82,7 @@ bool GetGlobalData(IAgent* agent, DWORD sessionId)
     return true;
 }
 
-bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+bool TaskReceive(net_task& task, IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     bool ret = false;
     __try
@@ -100,7 +100,7 @@ bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream*
 
 class net_task_interface_impl : public net_task_interface
 {
-    bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+    bool TaskReceive(net_task& task, IAgent* agent, u32 sessionId, IGenericStream* inStream)
     {
         return ::TaskReceive(task, agent, sessionId, inStream);
     }
@@ -124,7 +124,7 @@ class net_task_interface_impl : public net_task_interface
         return ret;
     }
 
-    bool RunTask(IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream)
+    bool RunTask(IAgent* agent, u32 sessionId, IGenericStream* inStream, IGenericStream* outStream)
     {
         block.Enter();
 

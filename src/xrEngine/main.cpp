@@ -87,7 +87,7 @@ void InitConfig(T& config, pcstr name, bool fatal = true,
 {
     string_path fname;
     FS.update_path(fname, "$game_config$", name);
-    config = new CInifile(fname, readOnly, loadAtStart, saveAtEnd, sectCount, allowIncludeFunc);
+    config = xr_new<CInifile>(fname, readOnly, loadAtStart, saveAtEnd, sectCount, allowIncludeFunc);
 
     CHECK_OR_EXIT(config->section_count() || !fatal,
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
@@ -161,9 +161,9 @@ ENGINE_API void InitSettings()
 ENGINE_API void InitConsole()
 {
     if (GEnv.isDedicatedServer)
-        Console = new CTextConsole();
+        Console = xr_new<CTextConsole>();
     else
-        Console = new CConsole();
+        Console = xr_new<CConsole>();
 
     Console->Initialize();
     xr_strcpy(Console->ConfigFile, "user.ltx");
@@ -178,7 +178,7 @@ ENGINE_API void InitConsole()
 ENGINE_API void InitInput()
 {
     bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
-    pInput = new CInput(captureInput);
+    pInput = xr_new<CInput>(captureInput);
 }
 
 ENGINE_API void destroyInput() { xr_delete(pInput); }
@@ -275,17 +275,17 @@ void CheckPrivilegySlowdown()
 
 void CreateApplication()
 {
-    pApp = new CApplication();
+    pApp = xr_new<CApplication>();
 #ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
     if (GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new TextLoadingScreen());
+        pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
 #endif
 }
 
 void CreateSpatialSpace()
 {
-    g_SpatialSpace = new ISpatial_DB("Spatial obj");
-    g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
+    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
+    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
 }
 
 ENGINE_API void Startup()
@@ -324,7 +324,7 @@ ENGINE_API void Startup()
     Device.WaitEvent(spatialCreated);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
-    R_ASSERT(g_pGamePersistent);
+    R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
 
     // Main cycle
     Device.Run();
@@ -362,7 +362,7 @@ ENGINE_API int RunApplication()
     if (!GEnv.isDedicatedServer)
     {
 #if defined(XR_PLATFORM_WINDOWS)
-        CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
+        CreateMutex(nullptr, true, "Local\\STALKER-COP");
         if (GetLastError() == ERROR_ALREADY_EXISTS)
             return 2;
 #elif defined(XR_PLATFORM_LINUX)
@@ -454,7 +454,7 @@ void RunBenchmark(pcstr name)
     const size_t hyphenLtxLen = xr_strlen("-ltx ");
     for (u32 i = 0; i < benchmarkCount; i++)
     {
-        LPCSTR benchmarkName, t;
+        pcstr benchmarkName, t;
         ini.r_line("benchmark", i, &benchmarkName, &t);
         xr_strcpy(g_sBenchmarkName, benchmarkName);
         shared_str benchmarkCommand = ini.r_string_wb("benchmark", benchmarkName);

@@ -29,7 +29,7 @@ BOOL g_ai_die_in_anomaly = 0;
 CSpaceRestrictor::~CSpaceRestrictor() {}
 void CSpaceRestrictor::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCForm()->getSphere().P); }
 float CSpaceRestrictor::Radius() const { return (GetCForm()->getRadius()); }
-BOOL CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
+bool CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
 {
     actual(false);
 
@@ -39,7 +39,7 @@ BOOL CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
 
     m_space_restrictor_type = se_shape->m_space_restrictor_type;
 
-    CCF_Shape* shape = new CCF_Shape(this);
+    CCF_Shape* shape = xr_new<CCF_Shape>(this);
     SetCForm(shape);
 
     for (u32 i = 0; i < se_shape->shapes.size(); ++i)
@@ -108,7 +108,7 @@ bool CSpaceRestrictor::inside(const Fsphere& sphere) const
     return (prepared_inside(sphere));
 }
 
-BOOL CSpaceRestrictor::UsedAI_Locations() { return (FALSE); }
+bool CSpaceRestrictor::UsedAI_Locations() { return (FALSE); }
 void CSpaceRestrictor::spatial_move()
 {
     inherited::spatial_move();

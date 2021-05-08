@@ -23,11 +23,11 @@ public:
     };
 
 public:
-    LPSTR m_Path;
-    LPSTR m_Root;
-    LPSTR m_Add;
-    LPSTR m_DefExt;
-    LPSTR m_FilterCaption;
+    pstr m_Path;
+    pstr m_Root;
+    pstr m_Add;
+    pstr m_DefExt;
+    pstr m_FilterCaption;
     Flags32 m_Flags;
 
 public:
@@ -65,7 +65,7 @@ struct XRCORE_API FS_File
     void set(const xr_string& nm, long sz, time_t modif, unsigned attr);
 
 public:
-    FS_File() {}
+    FS_File() : attrib(0), time_write(0), size(0) {}
     FS_File(const xr_string& nm);
     FS_File(const _FINDDATA_T& f);
     FS_File(const xr_string& nm, const _FINDDATA_T& f);

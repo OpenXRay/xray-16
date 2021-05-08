@@ -39,12 +39,12 @@ shared_str CSpaceRestrictionHolder::normalize_string(shared_str space_restrictor
         return ("");
 
     // 1. parse the string, copying to temp buffer with leading zeroes, storing pointers in vector
-    LPSTR* strings = (LPSTR*)xr_alloca(MAX_RESTRICTION_PER_TYPE_COUNT * sizeof(LPSTR));
-    LPSTR* string_current = strings;
+    pstr* strings = (pstr*)xr_alloca(MAX_RESTRICTION_PER_TYPE_COUNT * sizeof(pstr));
+    pstr* string_current = strings;
 
-    LPSTR temp_string = (LPSTR)xr_alloca((n + 1) * sizeof(char));
+    pstr temp_string = (pstr)xr_alloca((n + 1) * sizeof(char));
     LPCSTR I = *space_restrictors;
-    LPSTR i = temp_string, j = i;
+    pstr i = temp_string, j = i;
     for (; *I; ++I, ++i)
     {
         if (*I != ',')
@@ -71,14 +71,14 @@ shared_str CSpaceRestrictionHolder::normalize_string(shared_str space_restrictor
     std::sort(strings, string_current, pred_str());
 
     // 3. copy back to another temp string, based on sorted vector
-    LPSTR result_string = (LPSTR)xr_alloca((n + 1) * sizeof(char));
-    LPSTR pointer = result_string;
+    pstr result_string = (pstr)xr_alloca((n + 1) * sizeof(char));
+    pstr pointer = result_string;
     {
-        LPSTR* I = strings;
-        LPSTR* E = string_current;
+        pstr* I = strings;
+        pstr* E = string_current;
         for (; I != E; ++I)
         {
-            for (LPSTR i = *I; *i; ++i, ++pointer)
+            for (pstr i = *I; *i; ++i, ++pointer)
                 *pointer = *i;
 
             *pointer = ',';
@@ -104,8 +104,8 @@ SpaceRestrictionHolder::CBaseRestrictionPtr CSpaceRestrictionHolder::restriction
 
     collect_garbage();
 
-    CSpaceRestrictionBase* composition = new CSpaceRestrictionComposition(this, space_restrictors);
-    CSpaceRestrictionBridge* bridge = new CSpaceRestrictionBridge(composition);
+    CSpaceRestrictionBase* composition = xr_new<CSpaceRestrictionComposition>(this, space_restrictors);
+    CSpaceRestrictionBridge* bridge = xr_new<CSpaceRestrictionBridge>(composition);
     m_restrictions.insert(std::make_pair(space_restrictors, bridge));
     return (bridge);
 }
@@ -138,11 +138,11 @@ void CSpaceRestrictionHolder::register_restrictor(
     }
 
     CSpaceRestrictionShape* shape =
-        new CSpaceRestrictionShape(space_restrictor, restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone);
+        xr_new<CSpaceRestrictionShape>(space_restrictor, restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone);
     RESTRICTIONS::iterator I = m_restrictions.find(space_restrictors);
     if (I == m_restrictions.end())
     {
-        CSpaceRestrictionBridge* bridge = new CSpaceRestrictionBridge(shape);
+        CSpaceRestrictionBridge* bridge = xr_new<CSpaceRestrictionBridge>(shape);
         m_restrictions.insert(std::make_pair(space_restrictors, bridge));
         return;
     }
@@ -194,7 +194,7 @@ void CSpaceRestrictionHolder::unregister_restrictor(CSpaceRestrictor* space_rest
             on_default_restrictions_changed();
     }
 
-    CSpaceRestrictionBase* composition = new CSpaceRestrictionComposition(this, restrictor_id);
+    CSpaceRestrictionBase* composition = xr_new<CSpaceRestrictionComposition>(this, restrictor_id);
     bridge->change_implementation(composition);
     m_restrictions.insert(std::make_pair(restrictor_id, bridge));
 

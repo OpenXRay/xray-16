@@ -1,18 +1,25 @@
 #pragma once
+
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+#include "Layers/xrRender/r__sync_point.h"
+
 #include "Layers/xrRender/PSLibrary.h"
+
 #include "r2_types.h"
 #include "r2_rendertarget.h"
+
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
+
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
 #include "Layers/xrRender/light_render_direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
+
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
 
@@ -35,6 +42,7 @@ public:
         u32 ssao_blur_on : 1;
         u32 ssao_opt_data : 1;
         u32 ssao_half_data : 1;
+        u32 ssao_hdao : 1;
         u32 ssao_hbao : 1;
 
         u32 smapsize : 16;
@@ -54,6 +62,7 @@ public:
         u32 nvdbt : 1;
 
         u32 nullrt : 1;
+        u32 no_ram_textures : 1; // don't keep textures in RAM
 
         u32 distortion : 1;
         u32 distortion_enabled : 1;
@@ -68,10 +77,16 @@ public:
         u32 disasm : 1;
         u32 advancedpp : 1; //	advanced post process (DOF, SSAO, volumetrics, etc.)
 
+        u32 dx10_msaa : 1; // DX10.0 path
+        u32 dx10_msaa_opt : 1; // DX10.1 path
+        u32 dx10_gbuffer_opt : 1;
+        u32 dx10_msaa_samples : 4;
+
         u32 forcegloss : 1;
         u32 forceskinw : 1;
         float forcegloss_v;
     } o;
+
     struct RenderR2Statistics
     {
         u32 l_total;
@@ -117,7 +132,7 @@ public:
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
     xr_vector<ref_shader> Shaders;
-    typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
+    typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<VertexStagingBuffer> nVB, xVB;
     xr_vector<IndexStagingBuffer> nIB, xIB;
@@ -144,8 +159,7 @@ public:
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
-    IDirect3DQuery9* q_sync_point[CHWCaps::MAX_GPUS];
-    u32 q_sync_count;
+    R_sync_point q_sync_point;
 
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
@@ -193,22 +207,23 @@ public:
     IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
     IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
     IC u32 occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+
     ICF void apply_object(IRenderable* O)
     {
-        if (0 == O)
+        if (!O || !O->renderable_ROS())
             return;
-        if (0 == O->renderable_ROS())
-            return;
-        CROS_impl& LT = *((CROS_impl*)O->renderable_ROS());
+
+        CROS_impl& LT = *static_cast<CROS_impl*>(O->renderable_ROS());
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
         o_sun = 0.75f * LT.get_sun();
         CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
+
     IC void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (0 == C)
+        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
+        if (!C)
             return;
         VERIFY(RC_dest_sampler == C->destination);
         VERIFY(RC_sampler == C->type);
@@ -220,17 +235,21 @@ public:
             mtl = ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X], o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X], o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-            o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
+        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
+        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
+                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
     }
 
 public:
     // feature level
-    virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
+    virtual GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
+    virtual BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D9; }
     virtual bool is_sun_static() { return o.sunstatic; }
-    virtual DWORD get_dx_level() { return 0x00090000; }
+    virtual u32 get_dx_level() { return 0x00090000; }
+
     // Loading / Unloading
     virtual void create();
     virtual void destroy();
@@ -242,7 +261,7 @@ public:
 
     virtual IDirect3DBaseTexture9* texture_load(LPCSTR fname, u32& msize);
     virtual HRESULT shader_compile(
-        LPCSTR name, IReader* fs, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void*& result);
+        pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result);
 
     // Information
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
@@ -288,16 +307,16 @@ public:
     virtual IRenderVisual* model_Create(LPCSTR name, IReader* data = 0);
     virtual IRenderVisual* model_CreateChild(LPCSTR name, IReader* data);
     virtual IRenderVisual* model_Duplicate(IRenderVisual* V);
-    virtual void model_Delete(IRenderVisual*& V, BOOL bDiscard);
+    virtual void model_Delete(IRenderVisual*& V, bool bDiscard);
     virtual void model_Delete(IRender_DetailModel*& F);
-    virtual void model_Logging(BOOL bEnable) { Models->Logging(bEnable); }
+    virtual void model_Logging(bool bEnable) { Models->Logging(bEnable); }
     virtual void models_Prefetch();
-    virtual void models_Clear(BOOL b_complete);
+    virtual void models_Clear(bool b_complete);
 
     // Occlusion culling
-    virtual BOOL occ_visible(vis_data& V);
-    virtual BOOL occ_visible(Fbox& B);
-    virtual BOOL occ_visible(sPoly& P);
+    virtual bool occ_visible(vis_data& V);
+    virtual bool occ_visible(Fbox& B);
+    virtual bool occ_visible(sPoly& P);
 
     // Main
     void BeforeFrame() override;

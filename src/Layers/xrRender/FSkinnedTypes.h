@@ -177,7 +177,7 @@ struct vertHW_1W
     u32 _B;
     TVal _tc[2];
 
-    void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index)
+    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc, int index)
     {
         N.normalize_safe();
         T.normalize_safe();
@@ -224,7 +224,8 @@ struct vertHW_2W
     u32 _B;
     TVal _tc_i[4];
 
-    void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, float w)
+    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc,
+        int index0, int index1, float w)
     {
         N.normalize_safe();
         T.normalize_safe();
@@ -283,7 +284,8 @@ struct vertHW_3W
     u32 _B_i;
     TVal _tc_i[4];
 
-    void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
+    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc,
+        int index0, int index1, int index2,
         float w0, float w1)
     {
         N.normalize_safe();
@@ -366,8 +368,9 @@ struct vertHW_4W
     TVal _tc[2];
     u32 _i;
 
-    void set(Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, Fvector2& tc, int index0, int index1, int index2,
-        int index3, float w0, float w1, float w2)
+    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc,
+        int index0, int index1, int index2, int index3,
+        float w0, float w1, float w2)
     {
         N.normalize_safe();
         T.normalize_safe();

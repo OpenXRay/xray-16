@@ -29,7 +29,7 @@ public:
     void Destroy();
 
 private:
-    virtual BOOL Process(SPPInfo& pp);
+    virtual bool Process(SPPInfo& pp);
 };
 
 CAlienEffectorPP::CAlienEffectorPP(const SPPInfo& ppi, EEffectorPPType type) : CEffectorPP(type, flt_max, false)
@@ -42,7 +42,7 @@ CAlienEffectorPP::CAlienEffectorPP(const SPPInfo& ppi, EEffectorPPType type) : C
 CAlienEffectorPP::~CAlienEffectorPP() {}
 #define PERIOD_SPEED 0.3f
 
-BOOL CAlienEffectorPP::Process(SPPInfo& pp)
+bool CAlienEffectorPP::Process(SPPInfo& pp)
 {
     inherited::Process(pp);
 
@@ -84,7 +84,7 @@ class CAlienEffector : public CEffectorCam
 
 public:
     CAlienEffector(ECamEffectorType type, CAI_Bloodsucker* obj);
-    virtual BOOL ProcessCam(SCamEffectorInfo& info);
+    virtual bool ProcessCam(SCamEffectorInfo& info);
 };
 
 #define DELTA_ANGLE_X 10 * PI / 180
@@ -112,7 +112,7 @@ CAlienEffector::CAlienEffector(ECamEffectorType type, CAI_Bloodsucker* obj) : in
     m_current_fov = MIN_FOV;
 }
 
-BOOL CAlienEffector::ProcessCam(SCamEffectorInfo& info)
+bool CAlienEffector::ProcessCam(SCamEffectorInfo& info)
 {
     // Инициализация
     Fmatrix Mdef;
@@ -214,11 +214,14 @@ void CBloodsuckerAlien::activate()
         psHUD_Flags.set(HUD_CROSSHAIR_RT, FALSE);
 
     // Start effector
-    m_effector_pp = new CAlienEffectorPP(m_object->pp_vampire_effector, EFFECTOR_ID_GEN(EEffectorPPType));
+#pragma warning(push)
+#pragma warning(disable : 4826) // XXX: Do something with that cheap ID generation, remove warning
+    m_effector_pp = xr_new<CAlienEffectorPP>(m_object->pp_vampire_effector, EFFECTOR_ID_GEN(EEffectorPPType));
     Actor()->Cameras().AddPPEffector(m_effector_pp);
 
-    m_effector = new CAlienEffector(EFFECTOR_ID_GEN(ECamEffectorType), m_object);
+    m_effector = xr_new<CAlienEffector>(EFFECTOR_ID_GEN(ECamEffectorType), m_object);
     Actor()->Cameras().AddCamEffector(m_effector);
+#pragma warning(pop)
 
     // make invisible
     m_object->state_invisible = true;
@@ -238,6 +241,8 @@ void CBloodsuckerAlien::deactivate()
     if (m_crosshair_show)
         psHUD_Flags.set(HUD_CROSSHAIR_RT, TRUE);
 
+#pragma warning(push)
+#pragma warning(disable : 4826) // XXX: Do something with that cheap ID generation, remove warning
     // Stop camera effector
     Actor()->Cameras().RemoveCamEffector(EFFECTOR_ID_GEN(ECamEffectorType));
     m_effector = 0;
@@ -246,6 +251,7 @@ void CBloodsuckerAlien::deactivate()
     Actor()->Cameras().RemovePPEffector(EFFECTOR_ID_GEN(EEffectorPPType));
     m_effector_pp->Destroy();
     m_effector_pp = 0;
+#pragma warning(pop)
 
     m_active = false;
 

@@ -74,35 +74,35 @@ void CStalkerDangerPlanner::initialize()
 
 void CStalkerDangerPlanner::add_evaluators()
 {
-    add_evaluator(eWorldPropertyDanger, new CStalkerPropertyEvaluatorDangers(m_object, "danger"));
-    add_evaluator(eWorldPropertyDangerUnknown, new CStalkerPropertyEvaluatorDangerUnknown(m_object, "danger unknown"));
+    add_evaluator(eWorldPropertyDanger, xr_new<CStalkerPropertyEvaluatorDangers>(m_object, "danger"));
+    add_evaluator(eWorldPropertyDangerUnknown, xr_new<CStalkerPropertyEvaluatorDangerUnknown>(m_object, "danger unknown"));
     add_evaluator(eWorldPropertyDangerInDirection,
-        new CStalkerPropertyEvaluatorDangerInDirection(m_object, "danger in direction"));
+        xr_new<CStalkerPropertyEvaluatorDangerInDirection>(m_object, "danger in direction"));
     add_evaluator(
-        eWorldPropertyDangerGrenade, new CStalkerPropertyEvaluatorDangerWithGrenade(m_object, "danger with grenade"));
-    add_evaluator(eWorldPropertyDangerBySound, new CStalkerPropertyEvaluatorDangerBySound(m_object, "danger by sound"));
+        eWorldPropertyDangerGrenade, xr_new<CStalkerPropertyEvaluatorDangerWithGrenade>(m_object, "danger with grenade"));
+    add_evaluator(eWorldPropertyDangerBySound, xr_new<CStalkerPropertyEvaluatorDangerBySound>(m_object, "danger by sound"));
 }
 
 void CStalkerDangerPlanner::add_actions()
 {
     CActionPlannerActionScript<CAI_Stalker>* action;
 
-    action = new CStalkerDangerUnknownPlanner(m_object, "danger unknown planner");
+    action = xr_new<CStalkerDangerUnknownPlanner>(m_object, "danger unknown planner");
     add_condition(action, eWorldPropertyDangerUnknown, true);
     add_effect(action, eWorldPropertyDanger, false);
     add_operator(eWorldOperatorDangerUnknownPlanner, action);
 
-    action = new CStalkerDangerInDirectionPlanner(m_object, "danger in direction planner");
+    action = xr_new<CStalkerDangerInDirectionPlanner>(m_object, "danger in direction planner");
     add_condition(action, eWorldPropertyDangerInDirection, true);
     add_effect(action, eWorldPropertyDanger, false);
     add_operator(eWorldOperatorDangerInDirectionPlanner, action);
 
-    action = new CStalkerDangerGrenadePlanner(m_object, "danger grenade planner");
+    action = xr_new<CStalkerDangerGrenadePlanner>(m_object, "danger grenade planner");
     add_condition(action, eWorldPropertyDangerGrenade, true);
     add_effect(action, eWorldPropertyDanger, false);
     add_operator(eWorldOperatorDangerGrenadePlanner, action);
 
-    action = new CStalkerDangerBySoundPlanner(m_object, "danger by sound planner");
+    action = xr_new<CStalkerDangerBySoundPlanner>(m_object, "danger by sound planner");
     add_condition(action, eWorldPropertyDangerBySound, true);
     add_effect(action, eWorldPropertyDanger, false);
     add_operator(eWorldOperatorDangerBySoundPlanner, action);

@@ -27,7 +27,7 @@ public:
     shared_str m_shader_name;
 
     CUICustomMap();
-    virtual ~CUICustomMap();
+    virtual ~CUICustomMap() = default;
 
     virtual void SetActivePoint(const Fvector& vNewPoint);
 
@@ -64,7 +64,7 @@ public:
     void SetPointerDistance(float d) { m_pointer_dist = d; };
     float GetPointerDistance() { return m_pointer_dist; };
 protected:
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    virtual void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
     virtual void UpdateSpots(){};
 };
 
@@ -82,7 +82,6 @@ public:
         const Fvector2& src, bool for_drawing); // pixels->pixels (relatively own left-top pos)
 
     CUIGlobalMap(CUIMapWnd* pMapWnd);
-    virtual ~CUIGlobalMap();
 
     IC void SetMinZoom(float zoom) { m_minZoom = zoom; }
     IC float GetMinZoom() { return m_minZoom; }
@@ -100,7 +99,7 @@ public:
     void Initialize();
 
 protected:
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };
 
 class CUILevelMap : public CUICustomMap
@@ -113,7 +112,6 @@ class CUILevelMap : public CUICustomMap
     CUILevelMap& operator=(const CUILevelMap& obj) = delete;
 public:
     CUILevelMap(CUIMapWnd*);
-    virtual ~CUILevelMap();
     const Frect& GlobalRect() const { return m_GlobalRect; }
     virtual void Draw();
     virtual void Show(bool status);
@@ -127,7 +125,7 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };
 
 // Rounded by default
@@ -137,7 +135,6 @@ class CUIMiniMap : public CUICustomMap
 
 public:
     CUIMiniMap();
-    virtual ~CUIMiniMap();
     virtual void Draw();
     virtual bool GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos,
         float& heading); // position and heading for drawing pointer to src pos
@@ -146,5 +143,5 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    virtual void Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };

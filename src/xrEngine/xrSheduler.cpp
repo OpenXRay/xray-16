@@ -106,7 +106,7 @@ void CSheduler::internal_Registration()
     Registration.clear();
 }
 
-void CSheduler::internal_Register(ISheduled* object, BOOL realTime)
+void CSheduler::internal_Register(ISheduled* object, bool realTime)
 {
     VERIFY(!object->GetSchedulerData().b_locked);
 
@@ -119,19 +119,19 @@ void CSheduler::internal_Register(ISheduled* object, BOOL realTime)
 
     if (realTime)
     {
-        object->GetSchedulerData().b_RT = TRUE;
+        object->GetSchedulerData().b_RT = true;
         ItemsRT.emplace_back(std::move(item));
     }
     else
     {
-        object->GetSchedulerData().b_RT = FALSE;
+        object->GetSchedulerData().b_RT = false;
 
         // Insert into priority Queue
         Push(item);
     }
 }
 
-bool CSheduler::internal_Unregister(ISheduled* object, BOOL realTime, bool warn_on_not_found)
+bool CSheduler::internal_Unregister(ISheduled* object, bool realTime, bool warn_on_not_found)
 {
     // the object may be already dead
     // VERIFY (!O->shedule.b_locked);
@@ -247,12 +247,12 @@ bool CSheduler::Registered(ISheduled* object) const
 }
 #endif // DEBUG
 
-void CSheduler::Register(ISheduled* A, BOOL RT)
+void CSheduler::Register(ISheduled* A, bool RT)
 {
     VERIFY(!Registered(A));
 
     ItemReg R;
-    R.OP = TRUE;
+    R.OP = true;
     R.RT = RT;
     R.Object = A;
     R.Object->GetSchedulerData().b_RT = RT;
@@ -279,7 +279,7 @@ void CSheduler::Unregister(ISheduled* A)
     }
 
     ItemReg R;
-    R.OP = FALSE;
+    R.OP = false;
     R.RT = A->GetSchedulerData().b_RT;
     R.Object = A;
 
@@ -534,12 +534,12 @@ void Scheduler::internalRegister(ItemReg&& item)
 
     if (item.RealtimePriority)
     {
-        newItem.Object->GetSchedulerData().b_RT = TRUE;
+        newItem.Object->GetSchedulerData().b_RT = true;
         RealtimeUpdateQueue.emplace_back(std::move(newItem));
     }
     else
     {
-        newItem.Object->GetSchedulerData().b_RT = FALSE;
+        newItem.Object->GetSchedulerData().b_RT = false;
         UpdateQueue.emplace_back(std::move(newItem));
     }
 }

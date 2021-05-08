@@ -25,7 +25,7 @@ using namespace ALife;
 
 typedef struct tagSConnectionVertex
 {
-    LPSTR caConnectName;
+    pstr caConnectName;
     GameGraph::_GRAPH_ID tGraphID;
     GameGraph::_GRAPH_ID tOldGraphID;
     u32 dwLevelID;
@@ -56,7 +56,7 @@ u32 dwfGetIDByLevelName(CInifile* Ini, LPCSTR caLevelName)
 }
 
 using GRAPH_P_MAP = xr_map<u32, ::CLevelGameGraph*>;
-using VERTEX_MAP = xr_map<LPSTR, SConnectionVertex, CCompareVertexPredicate>;
+using VERTEX_MAP = xr_map<pstr, SConnectionVertex, CCompareVertexPredicate>;
 
 typedef struct tagSDynamicGraphVertex
 {
@@ -95,12 +95,12 @@ public:
 
         // loading graph
         xr_strcpy(caFileName, graph_file_name);
-        m_tpGraph = new CGameGraph(caFileName);
+        m_tpGraph = xr_new<CGameGraph>(caFileName);
 
         xr_strcpy(caFileName, raw_cross_table_file_name);
-        auto l_tpCrossTable = new CGameLevelCrossTable(caFileName);
+        auto l_tpCrossTable = xr_new<CGameLevelCrossTable>(caFileName);
 
-        auto l_tpAI_Map = new CLevelGraph(S);
+        auto l_tpAI_Map = xr_new<CLevelGraph>(S);
 
         VERIFY2(l_tpCrossTable->header().level_guid() == l_tpAI_Map->header().guid(),
             "cross table doesn't correspond to the AI-map, rebuild graph!");
@@ -158,7 +158,7 @@ public:
         // updating cross-table
         {
             xr_strcpy(caFileName, raw_cross_table_file_name);
-            auto tpCrossTable = new CGameLevelCrossTable(caFileName);
+            auto tpCrossTable = xr_new<CGameLevelCrossTable>(caFileName);
             xr_vector<CGameLevelCrossTable::CCell> tCrossTableUpdate;
             tCrossTableUpdate.resize(tpCrossTable->header().level_vertex_count());
             for (int i = 0; i < (int)tpCrossTable->header().level_vertex_count(); i++)
@@ -227,7 +227,7 @@ public:
                     if (fMinDistance < EPS_L)
                     {
                         SConnectionVertex T;
-                        LPSTR S;
+                        pstr S;
                         S = xr_strdup(tpGraphPoint->name_replace());
                         T.caConnectName = xr_strdup(*tpGraphPoint->m_caConnectionPointName);
                         T.dwLevelID = dwfGetIDByLevelName(Ini, *tpGraphPoint->m_caConnectionLevelName);
@@ -506,7 +506,7 @@ LPCSTR generate_temp_file_name(LPCSTR header0, LPCSTR header1, string_path& buff
     return (buffer);
 }
 
-void fill_needed_levels(LPSTR levels, xr_vector<LPCSTR>& result)
+void fill_needed_levels(pstr levels, xr_vector<LPCSTR>& result)
 {
     auto I = levels;
     for (auto J = I;; ++I)
@@ -531,7 +531,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
     // load all the graphs
     Logger.Phase("Processing level graphs");
 
-    CInifile* Ini = new CInifile(INI_FILE);
+    CInifile* Ini = xr_new<CInifile>(INI_FILE);
     R_ASSERT(Ini->section_exist("levels"));
 
     tGraphHeader.m_guid = generate_guid();
@@ -570,7 +570,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
         FS.update_path(level_folder, "$game_levels$", *tLevel.m_name);
         xr_strcat(level_folder, "\\");
         CGameGraphBuilder().build_graph(_0, _1, level_folder);
-        auto tpLevelGraph = new ::CLevelGameGraph(_0, _1, &tLevel, level_folder, dwOffset, tLevel.id(), Ini);
+        auto tpLevelGraph = xr_new<::CLevelGameGraph>(_0, _1, &tLevel, level_folder, dwOffset, tLevel.id(), Ini);
         dwOffset += tpLevelGraph->m_tpGraph->header().vertex_count();
         R_ASSERT2(tpGraphs.find(tLevel.id()) == tpGraphs.end(), "Level ids _MUST_ be different!");
         tpGraphs.insert(std::make_pair(tLevel.id(), tpLevelGraph));

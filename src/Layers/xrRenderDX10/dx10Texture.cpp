@@ -5,9 +5,9 @@
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
-void fix_texture_name(LPSTR fn)
+void fix_texture_name(pstr fn)
 {
-    LPSTR _ext = strext(fn);
+    pstr _ext = strext(fn);
     if (_ext && (!xr_stricmp(_ext, ".tga") || !xr_stricmp(_ext, ".dds") || !xr_stricmp(_ext, ".bmp") ||
         !xr_stricmp(_ext, ".ogm")))
     {
@@ -308,7 +308,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
     ZeroMemory(&IMG, sizeof(IMG));
 
     //  Staging control
-    static bool bAllowStaging = !strstr(Core.Params, "-no_staging");
+    static bool bAllowStaging = !RImplementation.o.no_ram_textures;
     bStaging &= bAllowStaging;
 
     ID3DBaseTexture* pTexture2D = NULL;
@@ -408,7 +408,7 @@ _DDS_CUBE:
     }
     else
     {
-        LoadInfo.Usage = D3D_USAGE_DEFAULT;
+        LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
         LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
     }
 
@@ -475,7 +475,7 @@ _DDS_2D:
     }
     else
     {
-        LoadInfo.Usage = D3D_USAGE_DEFAULT;
+        LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
         LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
     }
     LoadInfo.pSrcInfo = &IMG;

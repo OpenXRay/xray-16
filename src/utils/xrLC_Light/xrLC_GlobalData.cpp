@@ -35,7 +35,7 @@ xrLC_GlobalData* lc_global_data() { return data; }
 void create_global_data()
 {
     VERIFY(!inlc_global_data());
-    data = new xrLC_GlobalData();
+    data = xr_new<xrLC_GlobalData>();
 }
 void destroy_global_data()
 {
@@ -48,8 +48,8 @@ void destroy_global_data()
 xrLC_GlobalData::xrLC_GlobalData() : _b_nosun(false), _gl_linear(false), b_vert_not_register(false)
 {
     _cl_globs._RCAST_Model = 0;
-    write_faces = new twrite_faces(&_g_faces);
-    read_faces = new tread_faces(&_g_faces);
+    write_faces = xr_new<twrite_faces>(&_g_faces);
+    read_faces = xr_new<tread_faces>(&_g_faces);
 }
 
 // void xrLC_GlobalData	::create_write_faces() const
@@ -124,7 +124,7 @@ void xrLC_GlobalData::clear_build_textures_surface(const xr_vector<u32>& exept)
 void xrLC_GlobalData::create_rcmodel(CDB::CollectorPacked& CL)
 {
     VERIFY(!_cl_globs._RCAST_Model);
-    _cl_globs._RCAST_Model = new CDB::MODEL();
+    _cl_globs._RCAST_Model = xr_new<CDB::MODEL>();
     _cl_globs._RCAST_Model->build(CL.getV(), (int)CL.getVS(), CL.getT(), (int)CL.getTS());
 }
 
@@ -205,7 +205,7 @@ void read(INetReader& r, CDB::MODEL*& m, xrLC_GlobalData& lc_global_data)
         ::read(r, tris[i], lc_global_data);
 
     VERIFY(!m);
-    m = new CDB::MODEL();
+    m = xr_new<CDB::MODEL>();
     m->build(&*verts.begin(), (int)verts.size(), &*tris.begin(), (int)tris.size());
     verts.clear();
     tris.clear();
@@ -264,7 +264,7 @@ void xrLC_GlobalData::read_base(INetReader& r)
     r_pod_vector(r, _cl_globs._shaders.Library());
     //	CMemoryWriter					_err_invalid;
 
-    read_lightmaps = new tread_lightmaps(&_g_lightmaps);
+    read_lightmaps = xr_new<tread_lightmaps>(&_g_lightmaps);
     read_lightmaps->read(r);
 
     //
@@ -284,7 +284,7 @@ void xrLC_GlobalData::write_base(IWriter& w) const
     w_pod_vector(w, _cl_globs._materials);
     w_pod_vector(w, _cl_globs._shaders.Library());
     //	CMemoryWriter					_err_invalid;
-    write_lightmaps = new twrite_lightmaps(&_g_lightmaps);
+    write_lightmaps = xr_new<twrite_lightmaps>(&_g_lightmaps);
     write_lightmaps->write(w);
 
     write_mu_models(w);
@@ -328,7 +328,7 @@ void xrLC_GlobalData::mu_models_calc_materials()
 void xrLC_GlobalData::read_lm_data(INetReader& r)
 {
     read_vertices(r);
-    read_deflectors = new tread_deflectors(&_g_deflectors);
+    read_deflectors = xr_new<tread_deflectors>(&_g_deflectors);
     // create_read_faces();
     read_deflectors->read(r);
     // destroy_read_faces();
@@ -338,7 +338,7 @@ void xrLC_GlobalData::read_lm_data(INetReader& r)
 void xrLC_GlobalData::write_lm_data(IWriter& w) const
 {
     write_vertices(w);
-    write_deflectors = new twrite_deflectors(&_g_deflectors);
+    write_deflectors = xr_new<twrite_deflectors>(&_g_deflectors);
     // create_write_faces();
     write_deflectors->write(w);
     // destroy_write_faces();
@@ -349,7 +349,7 @@ void xrLC_GlobalData::write_lm_data(IWriter& w) const
 void xrLC_GlobalData::read_vertices(INetReader& r)
 {
     // not used for light//
-    ::read_vertices = new tread_vertices(&_g_vertices);
+    ::read_vertices = xr_new<tread_vertices>(&_g_vertices);
     ::read_vertices->read(r);
     vecFaceIt i = _g_faces.begin(), e = _g_faces.end();
     for (; e != i; ++i)
@@ -357,7 +357,7 @@ void xrLC_GlobalData::read_vertices(INetReader& r)
 }
 void xrLC_GlobalData::write_vertices(IWriter& w) const
 {
-    ::write_vertices = new twrite_vertices(&(_g_vertices));
+    ::write_vertices = xr_new<twrite_vertices>(&(_g_vertices));
     ::write_vertices->write(w);
     vecFaceCit i = _g_faces.begin(), e = _g_faces.end();
     for (; e != i; ++i)
@@ -365,13 +365,13 @@ void xrLC_GlobalData::write_vertices(IWriter& w) const
 }
 void xrLC_GlobalData::read_mu_models(INetReader& r)
 {
-    read_models = new tread_models(&_mu_models);
+    read_models = xr_new<tread_models>(&_mu_models);
     read_models->read(r);
     xr_delete(read_models);
 }
 void xrLC_GlobalData::write_mu_models(IWriter& w) const
 {
-    write_models = new twrite_models(&_mu_models);
+    write_models = xr_new<twrite_models>(&_mu_models);
     write_models->write(w);
     xr_delete(write_models);
 }
@@ -391,8 +391,8 @@ void xrLC_GlobalData::write_modes_color(IWriter& w) const
 
 void xrLC_GlobalData::read_mu_model_refs(INetReader& r)
 {
-    read_mu_refs = new tread_mu_refs(&_mu_refs);
-    read_models = new tread_models(&_mu_models);
+    read_mu_refs = xr_new<tread_mu_refs>(&_mu_refs);
+    read_models = xr_new<tread_models>(&_mu_models);
     //
 
     read_mu_refs->read(r);
@@ -402,8 +402,8 @@ void xrLC_GlobalData::read_mu_model_refs(INetReader& r)
 }
 void xrLC_GlobalData::write_mu_model_refs(IWriter& w) const
 {
-    write_mu_refs = new twrite_mu_refs(&_mu_refs);
-    write_models = new twrite_models(&_mu_models);
+    write_mu_refs = xr_new<twrite_mu_refs>(&_mu_refs);
+    write_models = xr_new<twrite_models>(&_mu_models);
 
     write_mu_refs->write(w);
 

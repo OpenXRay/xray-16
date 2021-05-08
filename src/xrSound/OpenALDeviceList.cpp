@@ -118,7 +118,7 @@ void ALDeviceList::Enumerate()
                     {
                         alcGetIntegerv(device, ALC_MAJOR_VERSION, sizeof(int), &major);
                         alcGetIntegerv(device, ALC_MINOR_VERSION, sizeof(int), &minor);
-                        m_devices.push_back(ALDeviceDesc(actualDeviceName, minor, major));
+                        m_devices.emplace_back(actualDeviceName, minor, major);
                         m_devices.back().props.eax = 0;
                         if (alIsExtensionPresent("EAX2.0"))
                             m_devices.back().props.eax = 2;

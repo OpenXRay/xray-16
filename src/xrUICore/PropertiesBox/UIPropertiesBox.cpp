@@ -33,9 +33,9 @@ void CUIPropertiesBox::InitPropertiesBox(Fvector2 pos, Fvector2 size)
     AttachChild(&m_UIListWnd);
 
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu.xml");
+    const bool loaded = xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu.xml", false);
 
-    if (!xml_doc.NavigateToNode("properties_box")) // SOC and CS compatibility
+    if (!loaded || !xml_doc.NavigateToNode("properties_box")) // SOC and CS compatibility
     {
         xml_doc.ClearInternal();
         xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "inventory_new.xml");

@@ -204,18 +204,18 @@
     <ClInclude Include="..\xrRenderDX9\dx9r_constants_cache.h" />
     <ClInclude Include="..\xrRender\Animation.h" />
     <ClInclude Include="..\xrRender\AnimationKeyCalculate.h" />
-    <ClInclude Include="..\xrRender\blenders\Blender.h" />
-    <ClInclude Include="..\xrRender\blenders\Blender_CLSID.h" />
-    <ClInclude Include="..\xrRender\blenders\Blender_Recorder.h" />
-    <ClInclude Include="..\xrRender\Blender_BmmD.h" />
-    <ClInclude Include="..\xrRender\Blender_detail_still.h" />
-    <ClInclude Include="..\xrRender\Blender_Editor_Selection.h" />
-    <ClInclude Include="..\xrRender\Blender_Editor_Wire.h" />
-    <ClInclude Include="..\xrRender\Blender_Lm(EbB).h" />
-    <ClInclude Include="..\xrRender\Blender_Model_EbB.h" />
-    <ClInclude Include="..\xrRender\Blender_Particle.h" />
-    <ClInclude Include="..\xrRender\Blender_Screen_SET.h" />
-    <ClInclude Include="..\xrRender\Blender_tree.h" />
+    <ClInclude Include="..\xrRender\Blender.h" />
+    <ClInclude Include="..\xrRender\Blender_CLSID.h" />
+    <ClInclude Include="..\xrRender\Blender_Recorder.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_BmmD.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_detail_still.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Editor_Selection.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Editor_Wire.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Lm(EbB).h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Model_EbB.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Particle.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_tree.h" />
     <ClInclude Include="..\xrRender\BufferUtils.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
@@ -302,17 +302,18 @@
     <ClInclude Include="..\xrRender\xrRender_console.h" />
     <ClInclude Include="..\xrRender\xrStripify.h" />
     <ClInclude Include="..\xrRender\xr_effgamma.h" />
-    <ClInclude Include="BlenderDefault.h" />
-    <ClInclude Include="Blender_Blur.h" />
-    <ClInclude Include="Blender_default_aref.h" />
-    <ClInclude Include="Blender_LaEmB.h" />
-    <ClInclude Include="Blender_Model.h" />
-    <ClInclude Include="Blender_Screen_GRAY.h" />
-    <ClInclude Include="Blender_Shadow_World.h" />
-    <ClInclude Include="Blender_Vertex.h" />
-    <ClInclude Include="Blender_Vertex_aref.h" />
+    <ClInclude Include="..\xrRender\blenders\BlenderDefault.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Blur.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_default_aref.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_LaEmB.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Model.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Screen_GRAY.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Shadow_World.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Vertex.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Vertex_aref.h" />
     <ClInclude Include="FStaticRender.h" />
     <ClInclude Include="FStaticRender_RenderTarget.h" />
+    <ClInclude Include="FStaticRender_Types.h" />
     <ClInclude Include="GlowManager.h" />
     <ClInclude Include="LightPPA.h" />
     <ClInclude Include="LightProjector.h" />
@@ -327,20 +328,19 @@
     <ClCompile Include="..\xrRenderDX9\dx9r_constants_cache.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9SH_RT.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_Palette.cpp" />
-    <ClCompile Include="..\xrRender\blenders\Blender_Recorder.cpp" />
-    <ClCompile Include="..\xrRender\Blender_BmmD.cpp" />
-    <ClCompile Include="..\xrRender\Blender_detail_still.cpp" />
-    <ClCompile Include="..\xrRender\Blender_Editor_Selection.cpp" />
-    <ClCompile Include="..\xrRender\Blender_Editor_Wire.cpp" />
-    <ClCompile Include="..\xrRender\Blender_Lm(EbB).cpp" />
-    <ClCompile Include="..\xrRender\Blender_Model_EbB.cpp" />
-    <ClCompile Include="..\xrRender\Blender_Particle.cpp" />
+    <ClCompile Include="..\xrRender\Blender.cpp" />
+    <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_detail_still.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Editor_Selection.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Editor_Wire.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Lm(EbB).cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Particle.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder_R2.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder_StandartBinding.cpp" />
-    <ClCompile Include="..\xrRender\Blender_Screen_SET.cpp" />
-    <ClCompile Include="..\xrRender\Blender_tree.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_tree.cpp" />
     <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp" />
@@ -429,15 +429,15 @@
     <ClCompile Include="..\xrRender\xrRender_console.cpp" />
     <ClCompile Include="..\xrRender\xrStripify.cpp" />
     <ClCompile Include="..\xrRender\xr_effgamma.cpp" />
-    <ClCompile Include="BlenderDefault.cpp" />
-    <ClCompile Include="Blender_Blur.cpp" />
-    <ClCompile Include="Blender_default_aref.cpp" />
-    <ClCompile Include="Blender_LaEmB.cpp" />
-    <ClCompile Include="Blender_Model.cpp" />
-    <ClCompile Include="Blender_Screen_GRAY.cpp" />
-    <ClCompile Include="Blender_Shadow_World.cpp" />
-    <ClCompile Include="Blender_Vertex.cpp" />
-    <ClCompile Include="Blender_Vertex_aref.cpp" />
+    <ClCompile Include="..\xrRender\blenders\BlenderDefault.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Blur.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_default_aref.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_LaEmB.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Model.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Screen_GRAY.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Shadow_World.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Vertex.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Vertex_aref.cpp" />
     <ClCompile Include="FStaticRender.cpp" />
     <ClCompile Include="FStaticRender_Blenders.cpp" />
     <ClCompile Include="FStaticRender_DetectSector.cpp" />
@@ -501,8 +501,8 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
@@ -513,7 +513,7 @@
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
   </Target>
 </Project>

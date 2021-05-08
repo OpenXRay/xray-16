@@ -109,18 +109,18 @@ struct ClientStatisticImpl
 };
 
 IClientStatistic::IClientStatistic() :
-    m_pimpl(new ClientStatisticImpl) {}
+    m_pimpl(xr_new<ClientStatisticImpl>()) {}
 
 IClientStatistic::IClientStatistic(CTimer* timer)
 {
     ZeroMemory(this, sizeof(*this));
-    m_pimpl = new ClientStatisticImpl;
+    m_pimpl = xr_new<ClientStatisticImpl>();
     m_pimpl->device_timer = timer;
     m_pimpl->dwBaseTime = TimeGlobal(m_pimpl->device_timer);
 }
 
 IClientStatistic::IClientStatistic(const IClientStatistic& rhs) :
-    m_pimpl(new ClientStatisticImpl)
+    m_pimpl(xr_new<ClientStatisticImpl>())
 {
     *m_pimpl = *rhs.m_pimpl;
 }
@@ -220,7 +220,7 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
 
     id.set(param);
     packet.construct(data, data_size);
-    // DWORD currentThreadId = Threading::GetCurrThreadId();
+    // u32 currentThreadId = Threading::GetCurrThreadId();
     // Msg("-S- Entering to csMessages from _Receive [%d]", currentThreadId);
     csMessage.Enter();
     // LogStackTrace(
@@ -229,7 +229,7 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
     if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS))
     {
         if (!pSvNetLog)
-            pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+            pSvNetLog = xr_new<INetLog>("logs\\net_sv_log.log", TimeGlobal(device_timer));
 
         if (pSvNetLog)
             pSvNetLog->LogPacket(TimeGlobal(device_timer), &packet, true);
@@ -421,7 +421,7 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
 
         CHK_DX(net_Address_device->SetSP(bSimulator ? &CLSID_NETWORKSIMULATOR_DP8SP_TCPIP : &CLSID_DP8SP_TCPIP));
 
-        DWORD dwTraversalMode = DPNA_TRAVERSALMODE_NONE;
+        u32 dwTraversalMode = DPNA_TRAVERSALMODE_NONE;
         CHK_DX(net_Address_device->AddComponent(DPNA_KEY_TRAVERSALMODE,
             &dwTraversalMode, sizeof(dwTraversalMode), DPNA_DATATYPE_DWORD));
 
@@ -648,7 +648,7 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
     if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS))
     {
         if (!pSvNetLog)
-            pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+            pSvNetLog = xr_new<INetLog>("logs\\net_sv_log.log", TimeGlobal(device_timer));
         if (pSvNetLog)
             pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
     }
@@ -656,7 +656,7 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
     // send it
     DPN_BUFFER_DESC desc;
     desc.dwBufferSize = size;
-    desc.pBufferData = LPBYTE(data);
+    desc.pBufferData = (u8*)(data);
 
 #ifdef _DEBUG
     u32 time_global = TimeGlobal(device_timer);
@@ -895,7 +895,7 @@ bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_addre
 
     if (pPort != nullptr)
     {
-        DWORD dwPort = 0;
+        u32 dwPort = 0;
         DWORD dwPortSize = sizeof(dwPort);
         DWORD dwPortDataType = DPNA_DATATYPE_DWORD;
         CHK_DX(pClientAddress->GetComponentByName(DPNA_KEY_PORT, &dwPort, &dwPortSize, &dwPortDataType));
@@ -939,7 +939,7 @@ void IPureServer::BanAddress(const ip_address& Address, u32 BanTimeSec)
         return;
     }
 
-    IBannedClient* pNewClient = new IBannedClient();
+    IBannedClient* pNewClient = xr_new<IBannedClient>();
     pNewClient->HAddr = Address;
     time(&pNewClient->BanTime);
     pNewClient->BanTime += BanTimeSec;
@@ -1010,7 +1010,7 @@ void IPureServer::BannedList_Load()
     for (; it != it_e; ++it)
     {
         const shared_str& sect_name = (*it)->Name;
-        IBannedClient* Cl = new IBannedClient();
+        IBannedClient* Cl = xr_new<IBannedClient>();
         Cl->Load(ini, sect_name);
         BannedAddresses.push_back(Cl);
     }

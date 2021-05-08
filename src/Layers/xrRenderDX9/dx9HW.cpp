@@ -1,9 +1,6 @@
 #include "stdafx.h"
 
 #include "dx9HW.h"
-#include "xrEngine/xr_input.h"
-#include "xrEngine/XR_IOConsole.h"
-#include "xrCore/xr_token.h"
 
 ENGINE_API extern u32 Vid_SelectedRefreshRate;
 
@@ -21,7 +18,7 @@ void CHW::CreateD3D()
     R_ASSERT2(hD3D->IsLoaded(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
 
     using _Direct3DCreate9 = IDirect3D9* WINAPI(UINT SDKVersion);
-    auto createD3D = (_Direct3DCreate9*)hD3D->GetProcAddress("Direct3DCreate9");
+    const auto createD3D = (_Direct3DCreate9*)hD3D->GetProcAddress("Direct3DCreate9");
     R_ASSERT(createD3D);
     pD3D = createD3D(D3D_SDK_VERSION);
     R_ASSERT2(pD3D, "Please install DirectX 9.0c");
@@ -38,7 +35,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -171,13 +168,13 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Create the device
     const auto GPU = selectGPU();
-    auto result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
+    auto result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
         GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
         &P, &pDevice);
 
     if (FAILED(result))
     {
-        result = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
+        result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
             GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
             &P, &pDevice);
     }
@@ -190,7 +187,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
         xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     };
 
-    _SHOW_REF("* CREATE: DeviceREF:", HW.pDevice);
+    _SHOW_REF("* CREATE: DeviceREF:", pDevice);
     switch (GPU)
     {
     case D3DCREATE_SOFTWARE_VERTEXPROCESSING:                        Log("* Vertex Processor: SOFTWARE"     ); break;
@@ -203,7 +200,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
-    u32 memory = pDevice->GetAvailableTextureMem();
+    const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 }
@@ -214,8 +211,8 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:dwDebugSB", dwDebugSB);
     _RELEASE(dwDebugSB);
 #endif
-    _SHOW_REF("DeviceREF:", HW.pDevice);
-    _RELEASE(HW.pDevice);
+    _SHOW_REF("DeviceREF:", pDevice);
+    _RELEASE(pDevice);
 
     DestroyD3D();
 }
@@ -232,7 +229,7 @@ void CHW::Reset()
     DevPP.BackBufferHeight = Device.dwHeight;
 
     // Windoze
-    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
@@ -248,7 +245,7 @@ void CHW::Reset()
 
     while (true)
     {
-        const HRESULT result = HW.pDevice->Reset(&DevPP);
+        const HRESULT result = pDevice->Reset(&DevPP);
         
         if (SUCCEEDED(result))
             break;
@@ -261,34 +258,44 @@ void CHW::Reset()
 #endif
 }
 
-D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
+D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const
 {
     // R2 hack
 #pragma todo("R2 need to specify depth format")
-    if (GEnv.CurrentRenderer == 2)
+    if (GEnv.Render->GenerationIsR2())
         return D3DFMT_D24S8;
 
     // R1 usual
-    static D3DFORMAT fDS_Try1[6] = { D3DFMT_D24S8, D3DFMT_D24X4S4, D3DFMT_D32, D3DFMT_D24X8, D3DFMT_D16, D3DFMT_D15S1 };
+    constexpr D3DFORMAT formats[] =
+    {
+        D3DFMT_D24S8,
+        D3DFMT_D24X4S4,
+        D3DFMT_D32,
+        D3DFMT_D24X8,
+        D3DFMT_D16,
+        D3DFMT_D15S1
+    };
 
-    D3DFORMAT* fDS_Try = fDS_Try1;
-    int fDS_Cnt = 6;
-
-    for (int it = 0; it < fDS_Cnt; it++)
+    for (D3DFORMAT fmt : formats)
     {
         if (SUCCEEDED(pD3D->CheckDeviceFormat(
-            DevAdapter, m_DriverType, fTarget, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, fDS_Try[it])))
+            DevAdapter, m_DriverType, fTarget, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, fmt)))
         {
-            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, m_DriverType, fTarget, fTarget, fDS_Try[it])))
+            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, m_DriverType, fTarget, fTarget, fmt)))
             {
-                return fDS_Try[it];
+                return fmt;
             }
         }
     }
     return D3DFMT_UNKNOWN;
 }
 
-u32 CHW::selectPresentInterval()
+bool CHW::ThisInstanceIsGlobal() const
+{
+    return this == &HW;
+}
+
+u32 CHW::selectPresentInterval() const
 {
     D3DCAPS9 caps;
     pD3D->GetDeviceCaps(DevAdapter, m_DriverType, &caps);
@@ -303,14 +310,11 @@ u32 CHW::selectPresentInterval()
     return D3DPRESENT_INTERVAL_DEFAULT;
 }
 
-void CheckForIntelGMA(u32 id_vendor, u32 id_device)
+bool CHW::GivenGPUIsIntelGMA(u32 id_vendor, u32 id_device)
 {
-    bool isIntelGMA = false;
-
     if (id_vendor == 0x8086) // Intel
     {
-        constexpr auto GMA_SL_SIZE = 43;
-        constexpr DWORD IntelGMA_SoftList[GMA_SL_SIZE] =
+        constexpr u32 IntelGMA_SoftList[] =
         {
             0x2782, 0x2582, 0x2792, 0x2592, 0x2772, 0x2776, 0x27A2, 0x27A6, 0x27AE,
             0x2982, 0x2983, 0x2992, 0x2993, 0x29A2, 0x29A3, 0x2972, 0x2973, 0x2A02,
@@ -319,16 +323,17 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
             0x2E33, 0x2E42, 0x2E43, 0x2E92, 0x2E93, 0x0042, 0x0046
         };
 
-        for (int idx = 0; idx < GMA_SL_SIZE; ++idx)
+        for (u32 idx : IntelGMA_SoftList)
         {
-            if (IntelGMA_SoftList[idx] == id_device)
-            {
-                isIntelGMA = true;
-                break;
-            }
+            if (idx == id_device)
+                return true;
         }
     }
+    return false;
+}
 
+void AdjustSkinningMode(bool isIntelGMA)
+{
     if (isIntelGMA)
     {
         switch (ps_r1_SoftwareSkinning)
@@ -351,10 +356,11 @@ void CheckForIntelGMA(u32 id_vendor, u32 id_device)
     }
 }
 
-u32 CHW::selectGPU()
+u32 CHW::selectGPU() const
 {
 #if RENDER == R_R1
-    CheckForIntelGMA(Caps.id_vendor, Caps.id_device);
+    if (ThisInstanceIsGlobal())
+        AdjustSkinningMode(GivenGPUIsIntelGMA(Caps.id_vendor, Caps.id_device));
 #endif
 
     if (Caps.bForceGPU_SW)
@@ -376,9 +382,9 @@ u32 CHW::selectGPU()
     return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 }
 
-BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
+BOOL CHW::support(D3DFORMAT fmt, u32 type, u32 usage) const
 {
-    auto result = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
+    const HRESULT result = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
     if (FAILED(result))
         return FALSE;
     return TRUE;
@@ -399,7 +405,7 @@ void CHW::Present()
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
-DeviceState CHW::GetDeviceState()
+DeviceState CHW::GetDeviceState() const
 {
     const auto result = pDevice->TestCooperativeLevel();
 

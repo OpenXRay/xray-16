@@ -82,6 +82,7 @@ bool OutputOptions::Private::openFile() const
 		DefaultOutputHandler * oh = new DefaultOutputHandler(fileName.str());
 		if (oh->stream.isError())
 		{
+			delete oh;
 			return false;
 		}
 		

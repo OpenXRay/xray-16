@@ -28,7 +28,7 @@ protected:
 
 private:
     friend class CMusicStream;
-    LPSTR fName;
+    pstr fName;
 
     float fVolume;
     float fRealVolume;
@@ -68,7 +68,7 @@ private:
     //-----------------------------------------------------
     BOOL Decompress(unsigned char* dest);
     void AppWriteDataToBuffer(u32 dwOffset, // our own write cursor
-        LPBYTE lpbSoundData, // start of our data
+        u8* lpbSoundData, // start of our data
         u32 dwSoundBytes); // size of block to copy
 
     void LoadADPCM();

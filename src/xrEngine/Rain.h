@@ -72,8 +72,8 @@ private:
     // Some methods
     void Born(Item& dest, float radius);
     void Hit(Fvector& pos);
-    BOOL RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt);
-    void RenewItem(Item& dest, float height, BOOL bHit);
+    bool RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt);
+    void RenewItem(Item& dest, float height, bool bHit);
 
 public:
     CEffect_Rain();

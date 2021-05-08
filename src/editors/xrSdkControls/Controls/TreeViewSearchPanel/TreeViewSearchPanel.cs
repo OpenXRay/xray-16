@@ -72,7 +72,7 @@ namespace XRay.SdkControls
                     MessageBox.Show("There is no matches!");
                 else if (findedNodes.Count == 1)
                     resultLabel.Text = "Result: 1 / 1";
-                else if (findedNodes.Count > 1)
+                else
                 {
                     resultLabel.Enabled = true;
                     searchNext.Enabled = true;
@@ -83,14 +83,6 @@ namespace XRay.SdkControls
                     findedNodes[0].EnsureVisible();
                     selectedNodePrevColor = findedNodes[0].BackColor;
                     findedNodes[0].BackColor = Color.Coral;
-                }
-                else
-                {
-                    resultLabel.Enabled = false;
-                    searchNext.Enabled = false;
-                    searchPrev.Enabled = false;
-                    findedNodes.Clear();
-                    searchResultIndex = -1;
                 }
             }
             if (Visible && e.KeyCode == Keys.Escape)

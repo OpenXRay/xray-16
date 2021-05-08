@@ -52,10 +52,10 @@ const float default_stamina_hit = 0.2f;
 
 CController::CController()
 {
-    StateMan = new CStateManagerController(this);
+    StateMan = xr_new<CStateManagerController>(this);
     time_control_hit_started = 0;
 
-    m_psy_hit = new CControllerPsyHit();
+    m_psy_hit = xr_new<CControllerPsyHit>();
 
     control().add(m_psy_hit, ControlCom::eComCustom1);
 
@@ -279,7 +279,7 @@ bool CController::is_community_friend_overrides(const CEntityAlive* entity_alive
                 IO->CharacterInfo().Community().id()) != m_friend_community_overrides.end());
 }
 
-BOOL CController::net_Spawn(CSE_Abstract* DC)
+bool CController::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return (FALSE);
@@ -402,9 +402,9 @@ void CController::control_hit()
     if (!pA)
         return;
 
-    Actor()->Cameras().AddCamEffector(new CMonsterEffectorHit(m_control_effector.ce_time,
+    Actor()->Cameras().AddCamEffector(xr_new<CMonsterEffectorHit>(m_control_effector.ce_time,
         m_control_effector.ce_amplitude, m_control_effector.ce_period_number, m_control_effector.ce_power));
-    Actor()->Cameras().AddPPEffector(new CMonsterEffector(m_control_effector.ppi, m_control_effector.time,
+    Actor()->Cameras().AddPPEffector(xr_new<CMonsterEffector>(m_control_effector.ppi, m_control_effector.time,
         m_control_effector.time_attack, m_control_effector.time_release));
 
     play_control_sound_hit();
@@ -648,14 +648,14 @@ void CController::test_covers()
 
 void CController::create_base_controls()
 {
-    m_custom_anim_base = new CControllerAnimation();
-    m_custom_dir_base = new CControllerDirection();
+    m_custom_anim_base = xr_new<CControllerAnimation>();
+    m_custom_dir_base = xr_new<CControllerDirection>();
 
     m_anim_base = m_custom_anim_base;
     m_dir_base = m_custom_dir_base;
 
-    m_move_base = new CControlMovementBase();
-    m_path_base = new CControlPathBuilderBase();
+    m_move_base = xr_new<CControlMovementBase>();
+    m_path_base = xr_new<CControlPathBuilderBase>();
 }
 
 void CController::TranslateActionToPathParams()

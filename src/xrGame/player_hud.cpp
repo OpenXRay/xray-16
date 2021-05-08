@@ -400,7 +400,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
             if (ec)
                 current_actor->Cameras().RemoveCamEffector(eCEWeaponAction);
             
-            CAnimatorCamEffector* e = new CAnimatorCamEffector();
+            CAnimatorCamEffector* e = xr_new<CAnimatorCamEffector>();
             e->SetType(eCEWeaponAction);
             e->SetHudAffect(false);
             e->SetCyclic(false);
@@ -558,6 +558,15 @@ u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float sp
 void player_hud::update(const Fmatrix& cam_trans)
 {
     Fmatrix trans = cam_trans;
+    if (psHUD_Flags.test(HUD_LEFT_HANDED))
+    {
+        // faster than multiplication by flip matrix
+        trans.m[0][0] = -trans.m[0][0];
+        trans.m[0][1] = -trans.m[0][1];
+        trans.m[0][2] = -trans.m[0][2];
+        trans.m[0][3] = -trans.m[0][3];
+    }
+
     update_inertion(trans);
     update_additional(trans);
 
@@ -735,7 +744,7 @@ attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
         if (itm->m_sect_name == sect)
             return itm;
     }
-    attachable_hud_item* res = new attachable_hud_item(this);
+    attachable_hud_item* res = xr_new<attachable_hud_item>(this);
     res->load(sect);
     IKinematicsAnimated* animatedHudItem = smart_cast<IKinematicsAnimated*>(res->m_model);
     res->m_hand_motions.load(m_model ? m_model : animatedHudItem, sect);

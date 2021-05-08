@@ -252,7 +252,7 @@ void CDrawUtilities::OnDeviceCreate()
     vs_TL.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.Index.Buffer());
     vs_LIT.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 
-    m_Font = new CGameFont("stat_font");
+    m_Font = xr_new<CGameFont>("stat_font");
 }
 
 void CDrawUtilities::OnDeviceDestroy()
@@ -484,18 +484,14 @@ void CDrawUtilities::DrawFlag(
 
 void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
 {
-    static const WORD IL[24] = {0, 2, 2, 5, 0, 5, 3, 5, 3, 0, 4, 3, 4, 0, 4, 2, 1, 2, 1, 5, 1, 3, 1, 4};
-    static const WORD IT[24] = {2, 4, 0, 4, 3, 0, 3, 5, 0, 5, 2, 0, 4, 2, 1, 2, 5, 1, 5, 3, 1, 3, 4, 1};
+    static const u16 IL[24] = {0, 2, 2, 5, 0, 5, 3, 5, 3, 0, 4, 3, 4, 0, 4, 2, 1, 2, 1, 5, 1, 3, 1, 4};
+    static const u16 IT[24] = {2, 4, 0, 4, 3, 0, 3, 5, 0, 5, 2, 0, 4, 2, 1, 2, 5, 1, 5, 3, 1, 3, 4, 1};
     u32 vBase, iBase;
 
-    Fcolor C;
-    C.set(c);
-    C.mul_rgb(0.75);
-    u32 c1 = C.get();
+    const u32 c1 = Fcolor(c).mul_rgb(0.75).get();
 
     int k;
     FVF::L* pv;
-    WORD* i;
     _VertexStream* Stream = &RCache.Vertex;
     _IndexStream* StreamI = &RCache.Index;
 
@@ -515,7 +511,7 @@ void CDrawUtilities::DrawRomboid(const Fvector& p, float r, u32 c)
     pv++;
     Stream->Unlock(6, vs_L->vb_stride);
 
-    i = StreamI->Lock(24, iBase);
+    u16* i = StreamI->Lock(24, iBase);
     for (k = 0; k < 24; k++, i++)
         *i = IT[k];
     StreamI->Unlock(24);
@@ -1505,8 +1501,8 @@ void CDrawUtilities::OutText(const Fvector& pos, LPCSTR text, u32 color, u32 sha
         p.y = (float)iFloor(_y2real(-p.y));
 
         m_Font->SetColor(shadow_color);
-        m_Font->Out(p.x, p.y, (LPSTR)text);
+        m_Font->Out(p.x, p.y, (pstr)text);
         m_Font->SetColor(color);
-        m_Font->Out(p.x - 1, p.y - 1, (LPSTR)text);
+        m_Font->Out(p.x - 1, p.y - 1, (pstr)text);
     }
 }

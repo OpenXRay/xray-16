@@ -17,12 +17,12 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
     //	R.y1		= L->X.D.minY;
     //	R.y2		= L->X.D.maxY;
     //	CHK_DX							(HW.pDevice->Clear( 1L, &R,	  D3DCLEAR_ZBUFFER,	0xFFFFFFFF, 1.0f, 0L));
-    //} else {
-    // full-clear
-    //	CHK_DX							(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_ZBUFFER,	0xFFFFFFFF, 1.0f, 0L));
-    //}
+    //} else
+    {
+        // full-clear
+        RCache.ClearZB(rt_smap_depth, 1.0f);
+    }
 
-    HW.pDevice->ClearDepthStencilView(rt_smap_depth->pZRT, D3D_CLEAR_DEPTH, 1.0f, 0L);
 
     //	Prepare viewport for shadow map rendering
     if (sub_phase != SE_SUN_RAIN_SMAP)
@@ -51,11 +51,8 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
 void CRenderTarget::phase_smap_direct_tsh(light* L, u32 sub_phase)
 {
     VERIFY (RImplementation.o.Tshadows);
-    //u32		_clr						= 0xffffffff;	//color_rgba(127,127,12,12);
-    FLOAT ColorRGBA[4] = {1.0f, 1.0f, 1.0f, 1.0f};
     RCache.set_ColorWriteEnable();
     //	Prepare viewport for shadow map rendering
     RImplementation.rmNormal();
-    HW.pDevice->ClearRenderTargetView(RCache.get_RT(0), ColorRGBA);
-    //CHK_DX								(HW.pDevice->Clear( 0L, NULL, D3DCLEAR_TARGET,	_clr,	1.0f, 0L));
+    RCache.ClearRT(RCache.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
 }

@@ -306,9 +306,9 @@ bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size
 {
     *b = 0;
     *c = 0;
-    LPSTR S2;
+    pstr S2;
     STRCONCAT(S2, caNamespaceName);
-    LPSTR S = S2;
+    pstr S = S2;
     for (int i = 0;; i++)
     {
         if (!xr_strlen(S))
@@ -316,7 +316,7 @@ bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size
             script_log(LuaMessageType::Error, "the namespace name %s is incorrect!", caNamespaceName);
             return false;
         }
-        LPSTR S1 = strchr(S, '.');
+        pstr S1 = strchr(S, '.');
         if (S1)
             *S1 = 0;
         if (i)
@@ -436,7 +436,7 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
     lua_rawget(lua(), LUA_GLOBALSINDEX);
     string256 S2 = { 0 };
     xr_strcpy(S2, name);
-    LPSTR S = S2;
+    pstr S = S2;
     for (;;)
     {
         if (!xr_strlen(S))
@@ -446,7 +446,7 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
             VERIFY(start == lua_gettop(lua()));
             return false;
         }
-        LPSTR S1 = strchr(S, '.');
+        pstr S1 = strchr(S, '.');
         if (S1)
             *S1 = 0;
         lua_pushstring(lua(), S);
@@ -523,13 +523,13 @@ luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
 {
     string256 S1 = { 0 };
     xr_strcpy(S1, namespace_name);
-    LPSTR S = S1;
+    pstr S = S1;
     luabind::object lua_namespace = luabind::globals(lua());
     for (;;)
     {
         if (!xr_strlen(S))
             return lua_namespace;
-        LPSTR I = strchr(S, '.');
+        pstr I = strchr(S, '.');
         if (!I)
             return lua_namespace[(const char*)S];
         *I = 0;
@@ -1101,7 +1101,7 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
     parse_script_namespace(function_to_call, name_space, sizeof(name_space), function, sizeof(function));
     if (xr_strcmp(name_space, GlobalNamespace))
     {
-        LPSTR file_name = strchr(name_space, '.');
+        pstr file_name = strchr(name_space, '.');
         if (!file_name)
             process_file(name_space);
         else

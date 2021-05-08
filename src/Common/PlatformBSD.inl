@@ -1092,6 +1092,9 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
+#define xr_fs_strlwr(str) str
+#define xr_fs_nostrlwr(str) xr_strlwr(str)
+
 inline void convert_path_separators(char * path)
 {
     while (char* sep = strchr(path, '\\')) *sep = '/';

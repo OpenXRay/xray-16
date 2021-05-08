@@ -110,7 +110,7 @@ void CTexture::apply_avi(u32 dwStage)
         R_CHK(T2D->LockRect(0, &R, NULL, 0));
         R_ASSERT(R.Pitch == int(pAVI->m_dwWidth * 4));
         //		R_ASSERT(pAVI->DecompressFrame((u32*)(R.pBits)));
-        BYTE* ptr;
+        u8* ptr{};
         pAVI->GetFrame(&ptr);
         CopyMemory(R.pBits, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
         //		R_ASSERT(pAVI->GetFrame((BYTE*)(&R.pBits)));
@@ -172,7 +172,7 @@ void CTexture::Load()
         if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
         {
             // AVI
-            pTheora = new CTheoraSurface();
+            pTheora = xr_new<CTheoraSurface>();
             m_play_time = 0xFFFFFFFF;
 
             if (!pTheora->Load(fn))
@@ -207,7 +207,7 @@ void CTexture::Load()
         else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
         {
             // AVI
-            pAVI = new CAviPlayerCustom();
+            pAVI = xr_new<CAviPlayerCustom>();
 
             if (!pAVI->Load(fn))
             {

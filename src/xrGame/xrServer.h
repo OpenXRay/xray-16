@@ -29,7 +29,16 @@ class CSE_Abstract;
 constexpr u32 NET_Latency = 50; // time in (ms)
 
 // XXX: check if u16 used for entity's id. If true, then this must be changed, if we want to increase the number of ID's.
+#ifdef XR_PLATFORM_WINDOWS
 using xrS_entities = xr_unordered_map<u16, CSE_Abstract*>;
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+// XXX: For the game engine to work correctly, the actor must always load first, the xr_unordered_map implementation for win 
+// provides this, but the CPP standard order of elements in the container is not defined, which leads to crashes when 
+// loading saved game under UNIX
+using xrS_entities = xr_map<u16, CSE_Abstract*>;
+#else
+#error add your platform-specific extension here
+#endif
 
 class xrClientData : public IClient
 {

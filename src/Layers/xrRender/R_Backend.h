@@ -79,20 +79,21 @@ public:
     R_LOD LOD;
 #endif
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     ref_cbuffer m_aVertexConstants[MaxCBuffers];
     ref_cbuffer m_aPixelConstants[MaxCBuffers];
+    
     ref_cbuffer m_aGeometryConstants[MaxCBuffers];
-#ifdef USE_DX11
+    ref_cbuffer m_aComputeConstants[MaxCBuffers];
+
     ref_cbuffer m_aHullConstants[MaxCBuffers];
     ref_cbuffer m_aDomainConstants[MaxCBuffers];
-    ref_cbuffer m_aComputeConstants[MaxCBuffers];
-#endif
+
     D3D_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
     ID3DInputLayout* m_pInputLayout;
-    DWORD dummy0; // Padding to avoid warning	
-    DWORD dummy1; // Padding to avoid warning	
-    DWORD dummy2; // Padding to avoid warning	
+    u32 dummy0; // Padding to avoid warning	
+    u32 dummy1; // Padding to avoid warning	
+    u32 dummy2; // Padding to avoid warning	
 #endif
 private:
     // Render-targets
@@ -124,14 +125,14 @@ private:
 #else
     ID3DPixelShader* ps;
     ID3DVertexShader* vs;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     ID3DGeometryShader* gs;
 #ifdef USE_DX11
     ID3D11HullShader* hs;
     ID3D11DomainShader* ds;
     ID3D11ComputeShader* cs;
 #endif
-#endif	//	USE_DX10
+#endif // !USE_DX9 && !USE_OGL
 #endif // USE_OGL
 
 #ifdef DEBUG
@@ -144,7 +145,7 @@ private:
     LPCSTR ds_name;
     LPCSTR cs_name;
 #endif
-#endif // USE_DX10
+#endif // !USE_DX9
 #endif
     u32 stencil_enable;
     u32 stencil_func;
@@ -177,7 +178,7 @@ private:
     CTexture* textures_ds[CTexture::mtMaxDomainShaderTextures]; // 4 vs
     CTexture* textures_cs[CTexture::mtMaxComputeShaderTextures]; // 4 vs
 #	endif
-#endif	//	USE_DX10
+#endif // !USE_DX9
 #ifdef _EDITOR
     CMatrix* matrices[8]; // matrices are supported only for FFP
 #endif
@@ -216,9 +217,7 @@ public:
 
         if (stage < CTexture::rstGeometry)
             return textures_vs[stage - CTexture::rstVertex];
-#ifdef USE_DX10
-        return textures_gs[stage - CTexture::rstGeometry];
-#elif USE_DX11
+#if !defined(USE_DX9) && !defined(USE_OGL)
         if (stage < CTexture::rstHull)
             return textures_gs[stage - CTexture::rstGeometry];
 
@@ -230,22 +229,19 @@ public:
 
         if (stage < CTexture::rstInvalid)
             return textures_cs[stage - CTexture::rstCompute];
+#endif // !USE_DX9 && !USE_OGL
         VERIFY(!"Invalid texture stage");
         return nullptr;
-#else // USE_DX10
-        VERIFY(!"Invalid texture stage");
-        return nullptr;
-#endif // USE_DX10
     }
 
-#if defined(USE_DX10) || defined(USE_DX11)
-    IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
-#else // USE_DX10
 #ifndef USE_OGL
+#if !defined(USE_DX9)
+    IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
+#else
     R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
     R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
-#endif // USE_OGL
-#endif // USE_DX10
+#endif // !USE_DX9
+#endif // !USE_OGL
 
     // API
     IC void set_xform(u32 ID, const Fmatrix& M);
@@ -269,6 +265,46 @@ public:
     IC ID3DRenderTargetView* get_RT(u32 ID = 0);
     IC ID3DDepthStencilView* get_ZB();
 #endif // USE_OGL
+
+#ifdef USE_OGL
+    IC void ClearRT(GLuint rt, const Fcolor& color);
+
+    IC void ClearZB(GLuint zb, float depth);
+    IC void ClearZB(GLuint zb, float depth, u8 stencil);
+
+    IC bool ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects);
+    IC bool ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects);
+#else
+    IC void ClearRT(ID3DRenderTargetView* rt, const Fcolor& color);
+
+    IC void ClearZB(ID3DDepthStencilView* zb, float depth);
+    IC void ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil);
+
+    IC bool ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects);
+    IC bool ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects);
+#endif
+
+    ICF void ClearRT(ref_rt& rt, const Fcolor& color) { ClearRT(rt->pRT, color); }
+    ICF bool ClearRTRect(ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects)
+    {
+        return ClearRTRect(rt->pRT, color, numRects, rects);
+    }
+
+#if !defined(USE_DX9) && !defined(USE_OGL)
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT, depth);}
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT, depth, stencil);}
+    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
+    {
+        return ClearZBRect(zb->pZRT, depth, numRects, rects);
+    }
+#else
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pRT, depth);}
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pRT, depth, stencil);}
+    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
+    {
+        return ClearZBRect(zb->pRT, depth, numRects, rects);
+    }
+#endif
 
     IC void set_Constants(R_constant_table* C);
     void set_Constants(ref_ctable& C) { set_Constants(&*C); }
@@ -318,7 +354,7 @@ public:
     ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
 #	endif
 
-#endif // USE_DX10
+#endif // !USE_DX9
 
 #ifdef USE_DX11
     ICF bool is_TessEnabled();
@@ -327,19 +363,23 @@ public:
 #endif
 
     ICF void set_VS(ref_vs& _vs);
-#if defined(USE_DX10) || defined(USE_DX11)
+
+#if !defined(USE_DX9) && !defined(USE_OGL)
     ICF void set_VS(SVS* _vs);
 
-protected: //	In DX10 we need input shader signature which is stored in ref_vs
-#endif // USE_DX10
+protected: //	In DX11+ we need input shader signature which is stored in ref_vs
+#endif // !USE_DX9 && !USE_OGL
+
 #ifdef USE_OGL
     ICF void set_VS(GLuint _vs, LPCSTR _n = 0);
 #else
     ICF void set_VS(ID3DVertexShader* _vs, LPCSTR _n = nullptr);
 #endif // USE_OGL
-#if defined(USE_DX10) || defined(USE_DX11)
+
+#if !defined(USE_DX9) && !defined(USE_OGL)
 public:
-#endif // USE_DX10
+#endif // !USE_DX9 && !USE_OGL
+
     ICF void set_Vertices(VertexBufferHandle _vb, u32 _vb_stride);
     ICF void set_Indices(IndexBufferHandle _ib);
     ICF void set_Geometry(SGeometry* _geom);
@@ -426,7 +466,7 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
 #ifdef USE_DX11
-    ICF void Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ);
+    ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
 #endif
 
     // Device create / destroy / frame signaling
@@ -477,9 +517,9 @@ private:
     ref_geom vs_TL;
 #endif
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
 private:
-    //	DirectX 10 internal functionality
+    //	DirectX 11+ internal functionality
     // void CreateConstantBuffers();
     // void DestroyConstantBuffers();
     void ApplyVertexLayout();
@@ -491,7 +531,7 @@ private:
     ID3DBlob* m_pInputSignature;
 
     bool m_bChangedRTorZB;
-#endif // USE_DX10
+#endif // !USE_DX9 && !USE_OGL
 };
 #pragma warning(pop)
 

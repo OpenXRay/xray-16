@@ -10,7 +10,7 @@
 // base patch used all the time up to merging
 const u32 InvalidNode = (1 << 24) - 1;
 const u32 UnkonnectedNode = 0xfffffff0;
-const WORD InvalidSector = 0xff;
+const u16 InvalidSector = 0xff;
 
 struct vertex // definition of "patch" or "node"
 {
@@ -24,7 +24,7 @@ struct vertex // definition of "patch" or "node"
     };
     Fplane Plane; // plane of patch
     Fvector Pos; // position of patch center
-    WORD Sector; //
+    u16 Sector; //
 
     u32 Group;
 
@@ -73,7 +73,7 @@ struct SCover
 
 using Nodes = xr_vector<vertex>;
 using Vectors = xr_vector<Fvector>;
-using Marks = xr_vector<BYTE>;
+using Marks = xr_vector<u8>;
 //using Lights = xr_vector<R_Light>;
 
 // data

@@ -146,7 +146,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
     if (m_ttl > 0)
     {
         m_flags.set(eTTL, TRUE);
-        m_actual_time = Device.dwTimeGlobal + m_ttl * 1000;
+        UpdateTTL();
     }
 
     s = g_uiSpotXml->ReadAttrib(path_base, 0, "pos_to_actor", NULL);
@@ -164,7 +164,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
         {
             if (!m_level_spot)
             {
-                m_level_spot = new CMapSpot(this);
+                m_level_spot = xr_new<CMapSpot>(this);
             }
             m_level_spot->Load(g_uiSpotXml, str);
         }
@@ -181,7 +181,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
         {
             if (!m_level_spot_pointer)
             {
-                m_level_spot_pointer = new CMapSpotPointer(this);
+                m_level_spot_pointer = xr_new<CMapSpotPointer>(this);
             }
             m_level_spot_pointer->Load(g_uiSpotXml, str);
         }
@@ -205,7 +205,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
         {
             if (!m_minimap_spot)
             {
-                m_minimap_spot = new CMiniMapSpot(this);
+                m_minimap_spot = xr_new<CMiniMapSpot>(this);
             }
             m_minimap_spot->Load(g_uiSpotXml, str);
         }
@@ -221,7 +221,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
         {
             if (!m_minimap_spot_pointer)
             {
-                m_minimap_spot_pointer = new CMapSpotPointer(this);
+                m_minimap_spot_pointer = xr_new<CMapSpotPointer>(this);
             }
             m_minimap_spot_pointer->Load(g_uiSpotXml, str);
         }
@@ -245,7 +245,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
         {
             if (!m_complex_spot)
             {
-                m_complex_spot = new CComplexMapSpot(this);
+                m_complex_spot = xr_new<CComplexMapSpot>(this);
             }
             m_complex_spot->Load(g_uiSpotXml, str);
         }
@@ -261,7 +261,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
         {
             if (!m_complex_spot_pointer)
             {
-                m_complex_spot_pointer = new CMapSpotPointer(this);
+                m_complex_spot_pointer = xr_new<CMapSpotPointer>(this);
             }
             m_complex_spot_pointer->Load(g_uiSpotXml, str);
         }
@@ -388,6 +388,13 @@ bool CMapLocation::Update() // returns actual
 
     m_cached.m_updatedFrame = Device.dwFrame;
     return m_cached.m_Actuality;
+}
+
+void CMapLocation::UpdateTTL()
+{
+    if (!m_flags.test(eTTL))
+        return;
+    m_actual_time = Device.dwTimeGlobal + m_ttl * 1000;
 }
 
 extern xr_vector<CLevelChanger*> g_lchangers;
@@ -704,7 +711,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
         {
             if (NULL == m_level_map_spot_border)
             {
-                m_level_map_spot_border = new CMapSpot(this);
+                m_level_map_spot_border = xr_new<CMapSpot>(this);
                 m_level_map_spot_border->Load(g_uiSpotXml, m_spot_border_names[0].c_str());
             }
             return m_level_map_spot_border;
@@ -713,7 +720,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
         {
             if (NULL == m_mini_map_spot_border)
             {
-                m_mini_map_spot_border = new CMapSpot(this);
+                m_mini_map_spot_border = xr_new<CMapSpot>(this);
                 m_mini_map_spot_border->Load(g_uiSpotXml, m_spot_border_names[2].c_str());
             }
             return m_mini_map_spot_border;
@@ -722,7 +729,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
         {
             if (NULL == m_complex_spot_border)
             {
-                m_complex_spot_border = new CMapSpot(this);
+                m_complex_spot_border = xr_new<CMapSpot>(this);
                 m_complex_spot_border->Load(g_uiSpotXml, m_spot_border_names[4].c_str());
             }
             return m_complex_spot_border;
@@ -734,7 +741,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
         {
             if (NULL == m_level_map_spot_border_na && m_spot_border_names[1].size())
             {
-                m_level_map_spot_border_na = new CMapSpot(this);
+                m_level_map_spot_border_na = xr_new<CMapSpot>(this);
                 m_level_map_spot_border_na->Load(g_uiSpotXml, m_spot_border_names[1].c_str());
             }
             return m_level_map_spot_border_na;
@@ -743,7 +750,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
         {
             if (NULL == m_mini_map_spot_border_na && m_spot_border_names[3].size())
             {
-                m_mini_map_spot_border_na = new CMapSpot(this);
+                m_mini_map_spot_border_na = xr_new<CMapSpot>(this);
                 m_mini_map_spot_border_na->Load(g_uiSpotXml, m_spot_border_names[3].c_str());
             }
             return m_mini_map_spot_border_na;
@@ -752,7 +759,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
         {
             if (NULL == m_complex_spot_border_na && m_spot_border_names[5].size())
             {
-                m_complex_spot_border_na = new CMapSpot(this);
+                m_complex_spot_border_na = xr_new<CMapSpot>(this);
                 m_complex_spot_border_na->Load(g_uiSpotXml, m_spot_border_names[5].c_str());
             }
             return m_complex_spot_border_na;

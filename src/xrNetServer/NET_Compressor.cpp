@@ -251,9 +251,9 @@ void NET_Compressor::done_decoding()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 #ifdef CONFIG_PROFILE_LOCKS
-NET_Compressor::NET_Compressor() : pcs(new Lock(MUTEX_PROFILE_ID(NET_Compressor))) {}
+NET_Compressor::NET_Compressor() : pcs(xr_new<Lock>(MUTEX_PROFILE_ID(NET_Compressor))) {}
 #else
-NET_Compressor::NET_Compressor() : pcs(new Lock) {}
+NET_Compressor::NET_Compressor() : pcs(xr_new<Lock>()) {}
 #endif
 
 NET_Compressor::~NET_Compressor()
@@ -316,7 +316,7 @@ u16 NET_Compressor::compressed_size(const u32& count) const
 XRNETSERVER_API BOOL g_net_compressor_enabled = FALSE;
 XRNETSERVER_API BOOL g_net_compressor_gather_stats = FALSE;
 
-u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count)
+u16 NET_Compressor::Compress(u8* dest, const u32& dest_size, u8* src, const u32& count)
 {
     SCompressorStats::SStatPacket* _p = nullptr;
     bool b_compress_packet = (count > 36);
@@ -418,11 +418,11 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 #endif // DEBUG
 
 #if 0 //def DEBUG
-    BYTE* src_back = (BYTE*)xr_alloca(count);
+    u8* src_back = (u8*)xr_alloca(count);
     Decompress(src_back, count, dest, compressed_size);
-    BYTE* I = src_back;
-    BYTE* E = src_back + count;
-    BYTE* J = src;
+    u8* I = src_back;
+    u8* E = src_back + count;
+    u8* J = src;
     for (; I != E; ++I , ++J)
     VERIFY (*I == *J);
 
@@ -434,7 +434,7 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 #endif // if !NET_USE_COMPRESSION
 }
 
-u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count)
+u16 NET_Compressor::Decompress(u8* dest, const u32& dest_size, u8* src, const u32& count)
 {
     VERIFY(dest);
     VERIFY(src);

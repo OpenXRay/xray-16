@@ -84,7 +84,7 @@ IC void CProblemSolverAbstract::add_operator(const _operator_id_type& operator_i
     validate_properties(_op->effects());
 #endif
     m_actuality = false;
-    m_operators.insert(I, SOperator(operator_id, _op));
+    m_operators.emplace(I, operator_id, _op);
 }
 
 #ifdef DEBUG
@@ -254,41 +254,44 @@ IC bool CProblemSolverAbstract::is_goal_reached_impl(const _index_type& vertex_i
     typename xr_vector<_operator_condition>::const_iterator E = vertex_index.conditions().end();
     typename xr_vector<_operator_condition>::const_iterator i = target_state().conditions().begin();
     typename xr_vector<_operator_condition>::const_iterator e = target_state().conditions().end();
-    typename xr_vector<_operator_condition>::const_iterator II = current_state().conditions().begin();
-    typename xr_vector<_operator_condition>::const_iterator EE = current_state().conditions().end();
-    for (; (i != e) && (I != E);)
+
     {
-        if ((*I).condition() < (*i).condition())
+        typename xr_vector<_operator_condition>::const_iterator II = current_state().conditions().begin();
+        typename xr_vector<_operator_condition>::const_iterator EE = current_state().conditions().end();
+        for (; (i != e) && (I != E);)
         {
-            ++I;
-        }
-        else if ((*I).condition() > (*i).condition())
-        {
-            for (; (II != EE) && ((*II).condition() < (*i).condition());)
+            if ((*I).condition() < (*i).condition())
+            {
+                ++I;
+            }
+            else if ((*I).condition() > (*i).condition())
+            {
+                for (; (II != EE) && ((*II).condition() < (*i).condition());)
+                    ++II;
+                if ((II == EE) || ((*II).condition() > (*i).condition()))
+                    evaluate_condition(II, EE, (*i).condition());
+                if ((*II).value() != (*i).value())
+                    return (false);
                 ++II;
-            if ((II == EE) || ((*II).condition() > (*i).condition()))
-                evaluate_condition(II, EE, (*i).condition());
-            if ((*II).value() != (*i).value())
-                return (false);
-            ++II;
-            ++i;
+                ++i;
+            }
+            else
+            {
+                if ((*I).value() != (*i).value())
+                    return (false);
+                ++I;
+                ++i;
+            }
+        }
+
+        if (I == E)
+        {
+            I = std::move(II);
+            E = std::move(EE);
         }
         else
-        {
-            if ((*I).value() != (*i).value())
-                return (false);
-            ++I;
-            ++i;
-        }
+            return (true);
     }
-
-    if (I == E)
-    {
-        I = II;
-        E = EE;
-    }
-    else
-        return (true);
 
     for (; i != e;)
     {

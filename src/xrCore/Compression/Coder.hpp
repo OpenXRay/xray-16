@@ -64,12 +64,14 @@ enum
 
 struct SUBRANGE
 {
-    DWORD low, high, scale;
+    u32 low, high, scale;
 };
 
 static SUBRANGE SubRange = {0, 0, 0};
-static DWORD low = 0, code = 0, range = 0;
+static u32 low = 0, code = 0, range = 0;
 
+#pragma warning(push)
+#pragma warning(disable : 4146)
 inline void rcEncNormalize(_PPMD_FILE* stream)
 {
     while ((low ^ (low + range)) < TOP || range < BOT && ((range = -low & (BOT - 1)), 1))
@@ -79,11 +81,12 @@ inline void rcEncNormalize(_PPMD_FILE* stream)
         low <<= 8;
     }
 }
+#pragma warning(pop)
 
 static inline void rcInitEncoder()
 {
     low = 0;
-    range = DWORD(-1);
+    range = u32(-1);
 }
 /*
 #define RC_ENC_NORMALIZE(stream) {                                          \
@@ -102,7 +105,7 @@ static inline void rcEncodeSymbol()
 
 static inline void rcFlushEncoder(_PPMD_FILE* stream)
 {
-    for (UINT i = 0; i < 4; i++)
+    for (u32 i = 0; i < 4; i++)
     {
         _PPMD_E_PUTC(low >> 24, stream);
         low <<= 8;
@@ -111,11 +114,13 @@ static inline void rcFlushEncoder(_PPMD_FILE* stream)
 static inline void rcInitDecoder(_PPMD_FILE* stream)
 {
     low = code = 0;
-    range = DWORD(-1);
-    for (UINT i = 0; i < 4; i++)
+    range = u32(-1);
+    for (u32 i = 0; i < 4; i++)
         code = (code << 8) | _PPMD_D_GETC(stream);
 }
 
+#pragma warning(push)
+#pragma warning(disable : 4146)
 inline void rcDecNormalize(_PPMD_FILE* stream)
 {
     while ((low ^ (low + range)) < TOP || range < BOT && ((range = -low & (BOT - 1)), 1))
@@ -125,6 +130,7 @@ inline void rcDecNormalize(_PPMD_FILE* stream)
         low <<= 8;
     }
 }
+#pragma warning(pop)
 
 /*
 #define RC_DEC_NORMALIZE(stream) {                                          \
@@ -136,17 +142,17 @@ inline void rcDecNormalize(_PPMD_FILE* stream)
 }
 */
 
-static inline UINT rcGetCurrentCount() { return (code - low) / (range /= SubRange.scale); }
+static inline u32 rcGetCurrentCount() { return (code - low) / (range /= SubRange.scale); }
 static inline void rcRemoveSubrange()
 {
     low += range * SubRange.low;
     range *= SubRange.high - SubRange.low;
 }
 
-static inline UINT rcBinStart(UINT f0, UINT Shift) { return f0 * (range >>= Shift); }
-static inline UINT rcBinDecode(UINT tmp) { return (code - low >= tmp); }
-static inline void rcBinCorrect0(UINT tmp) { range = tmp; }
-static inline void rcBinCorrect1(UINT tmp, UINT f1)
+static inline u32 rcBinStart(u32 f0, u32 Shift) { return f0 * (range >>= Shift); }
+static inline u32 rcBinDecode(u32 tmp) { return (code - low >= tmp); }
+static inline void rcBinCorrect0(u32 tmp) { range = tmp; }
+static inline void rcBinCorrect1(u32 tmp, u32 f1)
 {
     low += tmp;
     range *= f1;

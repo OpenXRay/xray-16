@@ -13,7 +13,7 @@ class ENGINE_API xrXRC
 
 public:
     IC CDB::COLLIDER* collider() { return &CL; }
-    IC void ray_options(DWORD f) { CL.ray_options(f); }
+    IC void ray_options(u32 f) { CL.ray_options(f); }
     IC void ray_query(const CDB::MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
     {
 #ifndef NO_XRC_STATS
@@ -34,7 +34,7 @@ public:
         ray_query(m_def, S, D, r_range);
     }
 
-    IC void box_options(DWORD f) { CL.box_options(f); }
+    IC void box_options(u32 f) { CL.box_options(f); }
     IC void box_query(const CDB::MODEL* m_def, const Fvector& b_center, const Fvector& b_dim)
     {
 #ifndef NO_XRC_STATS
@@ -55,7 +55,7 @@ public:
         box_query(m_def, c, d);
     }
 
-    IC void frustum_options(DWORD f) { CL.frustum_options(f); }
+    IC void frustum_options(u32 f) { CL.frustum_options(f); }
     IC void frustum_query(const CDB::MODEL* m_def, const CFrustum& F)
     {
 #ifndef NO_XRC_STATS

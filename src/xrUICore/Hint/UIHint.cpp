@@ -27,12 +27,12 @@ void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)
     XML_NODE new_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(new_root);
 
-    m_background = new CUIFrameWindow();
+    m_background = xr_new<CUIFrameWindow>();
     AttachChild(m_background);
     m_background->SetAutoDelete(true);
     CUIXmlInitBase::InitFrameWindow(xml, "background", 0, m_background);
 
-    m_text = new CUITextWnd();
+    m_text = xr_new<CUITextWnd>();
     AttachChild(m_text);
     m_text->SetAutoDelete(true);
     CUIXmlInitBase::InitTextWnd(xml, "text", 0, m_text);

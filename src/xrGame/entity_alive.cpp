@@ -55,7 +55,7 @@ CEntityAlive::CEntityAlive()
       m_entity_condition(nullptr), m_ef_creature_type(0),
       m_hit_bone_surface_areas_actual(false)
 {
-    monster_community = new MONSTER_COMMUNITY();
+    monster_community = xr_new<MONSTER_COMMUNITY>();
 
     m_ef_weapon_type = u32(-1);
     m_ef_detector_type = u32(-1);
@@ -98,8 +98,8 @@ void CEntityAlive::LoadBloodyWallmarks(LPCSTR section)
 {
     VERIFY(0 == m_pBloodMarksVector);
     VERIFY(0 == m_pBloodDropsVector);
-    m_pBloodMarksVector = new FactoryPtr<IWallMarkArray>();
-    m_pBloodDropsVector = new FactoryPtr<IWallMarkArray>();
+    m_pBloodMarksVector = xr_new<FactoryPtr<IWallMarkArray>>();
+    m_pBloodDropsVector = xr_new<FactoryPtr<IWallMarkArray>>();
 
     //кровавые отметки на стенах
     string256 tmp;
@@ -151,7 +151,7 @@ void CEntityAlive::UnloadBloodyWallmarks()
 
 void CEntityAlive::LoadFireParticles(LPCSTR section)
 {
-    m_pFireParticlesVector = new STR_VECTOR();
+    m_pFireParticlesVector = xr_new<STR_VECTOR>();
 
     string256 tmp;
     LPCSTR particles_name = pSettings->r_string(section, "fire_particles");
@@ -231,7 +231,7 @@ void CEntityAlive::shedule_Update(u32 dt)
     }
 }
 
-BOOL CEntityAlive::net_Spawn(CSE_Abstract* DC)
+bool CEntityAlive::net_Spawn(CSE_Abstract* DC)
 {
     //установить команду в соответствии с community
     /*	if(monster_community->team() != 255)
@@ -571,11 +571,11 @@ void CEntityAlive::load(IReader& input_packet)
     conditions().load(input_packet);
 }
 
-BOOL CEntityAlive::net_SaveRelevant() { return (TRUE); }
+bool CEntityAlive::net_SaveRelevant() { return (TRUE); }
 CEntityConditionSimple* CEntityAlive::create_entity_condition(CEntityConditionSimple* ec)
 {
     if (!ec)
-        m_entity_condition = new CEntityCondition(this);
+        m_entity_condition = xr_new<CEntityCondition>(this);
     else
         m_entity_condition = smart_cast<CEntityCondition*>(ec);
 
@@ -614,7 +614,7 @@ IFactoryObject* CEntityAlive::_construct()
 {
     inherited::_construct();
     if (character_physics_support())
-        m_material_manager = new CMaterialManager(this, character_physics_support()->movement());
+        m_material_manager = xr_new<CMaterialManager>(this, character_physics_support()->movement());
     return (this);
 }
 

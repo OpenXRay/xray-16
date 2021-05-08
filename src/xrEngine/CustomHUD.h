@@ -16,6 +16,7 @@ ENGINE_API extern Flags32 psHUD_Flags;
 #define HUD_DRAW_RT (1 << 10)
 #define HUD_WEAPON_RT2 (1 << 11)
 #define HUD_DRAW_RT2 (1 << 12)
+#define HUD_LEFT_HANDED (1 << 13)
 
 class IGameObject;
 

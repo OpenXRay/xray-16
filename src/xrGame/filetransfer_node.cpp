@@ -30,7 +30,7 @@ bool disk_file_reader::opened() const { return (m_reader != NULL); }
 // memory reader
 memory_reader::memory_reader(u8* data_ptr, u32 data_size)
 {
-    m_reader = new IReader(static_cast<void*>(data_ptr), static_cast<int>(data_size));
+    m_reader = xr_new<IReader>(static_cast<void*>(data_ptr), static_cast<int>(data_size));
 }
 memory_reader::~memory_reader() { xr_delete(m_reader); }
 bool memory_reader::make_data_packet(NET_Packet& packet, u32 chunk_size)
@@ -178,7 +178,7 @@ filetransfer_node::filetransfer_node(
     : m_chunk_size(chunk_size), m_last_peak_throughput(0), m_last_chunksize_update_time(0), m_user_param(0),
       m_process_callback(callback)
 {
-    m_reader = new disk_file_reader(file_name);
+    m_reader = xr_new<disk_file_reader>(file_name);
 }
 
 filetransfer_node::filetransfer_node(
@@ -186,7 +186,7 @@ filetransfer_node::filetransfer_node(
     : m_chunk_size(chunk_size), m_last_peak_throughput(0), m_last_chunksize_update_time(0), m_user_param(user_param),
       m_process_callback(callback)
 {
-    m_reader = new memory_reader(data, data_size);
+    m_reader = xr_new<memory_reader>(data, data_size);
 }
 
 filetransfer_node::filetransfer_node(CMemoryWriter* src_writer, u32 const max_size, u32 const chunk_size,
@@ -194,7 +194,7 @@ filetransfer_node::filetransfer_node(CMemoryWriter* src_writer, u32 const max_si
     : m_chunk_size(chunk_size), m_last_peak_throughput(0), m_last_chunksize_update_time(0), m_user_param(user_param),
       m_process_callback(callback)
 {
-    m_reader = new memory_writer_reader(src_writer, max_size);
+    m_reader = xr_new<memory_writer_reader>(src_writer, max_size);
 }
 
 filetransfer_node::filetransfer_node(buffer_vector<mutable_buffer_t>* vector_of_buffers, u32 const chunk_size,
@@ -203,7 +203,7 @@ filetransfer_node::filetransfer_node(buffer_vector<mutable_buffer_t>* vector_of_
       m_process_callback(callback)
 {
     VERIFY(vector_of_buffers);
-    m_reader = new buffers_vector_reader(vector_of_buffers);
+    m_reader = xr_new<buffers_vector_reader>(vector_of_buffers);
 }
 
 filetransfer_node::~filetransfer_node() { xr_delete(m_reader); }

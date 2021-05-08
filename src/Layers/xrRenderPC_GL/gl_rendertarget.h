@@ -27,18 +27,8 @@ public:
     };
 
     u32 dwLightMarkerID;
-    // 
-    IBlender* b_occq;
-    IBlender* b_accum_mask;
-    IBlender* b_accum_direct;
-    IBlender* b_accum_point;
+    //
     IBlender* b_accum_spot;
-    IBlender* b_accum_reflected;
-    IBlender* b_bloom;
-    IBlender* b_luminance;
-    IBlender* b_combine;
-    IBlender* b_postprocess_msaa;
-    IBlender* b_bloom_msaa;
     IBlender* b_combine_msaa[8];
     IBlender* b_accum_mask_msaa[8];
     IBlender* b_accum_spot_msaa[8];
@@ -48,7 +38,6 @@ public:
     IBlender* b_accum_volumetric_msaa[8];
     IBlender* b_accum_point_msaa[8];
     IBlender* b_accum_reflected_msaa[8];
-    IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
 
 #ifdef DEBUG
@@ -67,7 +56,7 @@ public:
 
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
-    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
+    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
     ref_rt rt_Generic_0_r; // MRT generic 0
     ref_rt rt_Generic_1_r; // MRT generic 1
     ref_rt rt_Generic;
@@ -75,13 +64,11 @@ public:
     ref_rt rt_Normal; // 64bit,	fat	(x,y,z,hemi)			(eye-space)
     ref_rt rt_Color; // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
 
-    // 
+    //
     ref_rt rt_Accumulator; // 64bit		(r,g,b,specular)
     ref_rt rt_Accumulator_temp;// only for HW which doesn't feature fp16 blend
     ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Generic_1; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
-    //  Second viewport
-    ref_rt rt_secondVP; // 32bit		(r,g,b,a)				// #SM+#-- +SecondVP+
     //	Igor: for volumetric lights
     ref_rt rt_Generic_2; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Bloom_1; // 32bit, dim/4	(r,g,b,?)
@@ -99,7 +86,7 @@ public:
 
     // smap
     ref_rt rt_smap_surf; // 32bit,		color
-    ref_rt rt_smap_depth; // 24(32) bit,	depth 
+    ref_rt rt_smap_depth; // 24(32) bit,	depth
     ref_rt rt_smap_depth_minmax; //	is used for min/max sm
 
     //	Igor: for async screenshots
@@ -157,17 +144,17 @@ private:
     ref_geom g_accum_omnipart;
     ref_geom g_accum_volumetric;
 
-    GLuint g_accum_point_vb;
-    GLuint g_accum_point_ib;
+    VertexStagingBuffer g_accum_point_vb;
+    IndexStagingBuffer g_accum_point_ib;
 
-    GLuint g_accum_omnip_vb;
-    GLuint g_accum_omnip_ib;
+    VertexStagingBuffer g_accum_omnip_vb;
+    IndexStagingBuffer g_accum_omnip_ib;
 
-    GLuint g_accum_spot_vb;
-    GLuint g_accum_spot_ib;
+    VertexStagingBuffer g_accum_spot_vb;
+    IndexStagingBuffer g_accum_spot_ib;
 
-    GLuint g_accum_volumetric_vb;
-    GLuint g_accum_volumetric_ib;
+    VertexStagingBuffer g_accum_volumetric_vb;
+    IndexStagingBuffer g_accum_volumetric_ib;
 
     // Bloom
     ref_geom g_bloom_build;
@@ -175,7 +162,7 @@ private:
     ref_shader s_bloom_dbg_1;
     ref_shader s_bloom_dbg_2;
     ref_shader s_bloom;
-    ref_shader s_bloom_msaa;
+    ref_shader s_bloom_msaa; // if MSAA is disabled, just an alias of s_bloom
     float f_bloom_factor;
 
     // Luminance
@@ -197,12 +184,14 @@ private:
     ref_shader s_combine_volumetric;
 public:
     ref_shader s_postprocess;
-    ref_shader s_postprocess_msaa;
+    ref_shader s_postprocess_msaa; // if MSAA is disabled, just an alias of s_bloom
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;
+#if 0 // kept for historical reasons
     ref_shader s_flip;
     ref_geom g_flip;
+#endif
 private:
     float im_noise_time;
     u32 im_noise_shift_w;
@@ -229,6 +218,9 @@ private:
 public:
     CRenderTarget();
     ~CRenderTarget();
+
+    void build_textures();
+
     void accum_point_geom_create();
     void accum_point_geom_destroy();
     void accum_omnip_geom_create();
@@ -242,17 +234,26 @@ public:
     GLuint get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
     GLuint get_base_zb() { return rt_Base_Depth->pZRT; }
 
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb);
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
+    {
+        u_setrt(_1, _2, _3, _zb ? _zb->pZRT : 0);
+    }
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb);
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
+    {
+        u_setrt(_1, _2, _zb ? _zb->pZRT : 0);
+    }
+    void u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
+
     void u_stencil_optimize(eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);
-    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb);
-    void u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb);
-    void u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
-    BOOL u_need_PP();
+    bool u_need_PP();
     bool u_need_CM();
-    BOOL u_DBT_enable(float zMin, float zMax);
+    bool u_DBT_enable(float zMin, float zMax);
     void u_DBT_disable();
 
     void phase_scene_prepare();
@@ -282,7 +283,7 @@ public:
     bool need_to_render_sunshafts();
     bool use_minmax_sm_this_frame();
 
-    BOOL enable_scissor(light* L); // true if intersects near plane
+    bool enable_scissor(light* L); // true if intersects near plane
     void enable_dbt_bounds(light* L);
 
     void disable_aniso();
@@ -304,7 +305,9 @@ public:
     void phase_combine();
     void phase_combine_volumetric();
     void phase_pp();
+#if 0 // kept for historical reasons
     void phase_flip();
+#endif
 
     void set_blur(float f) override { param_blur = f; }
     void set_gray(float f) override { param_gray = f; }

@@ -6,7 +6,7 @@ typedef enum CDA_STATE { CDA_STATE_PLAY, CDA_STATE_STOP, CDA_STATE_PAUSE, CDA_ST
 class CCDA
 {
     char retStr[64];
-    UINT retLen;
+    u32 retLen;
     MCIERROR err;
 
     u32 dwCurTrack;

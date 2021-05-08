@@ -1182,7 +1182,6 @@ void CPHElement::add_Mass(
     }
     case SBoneShape::stSphere:
     {
-        shape.sphere;
         dMassSetSphere(&m, 1.f, shape.sphere.R);
         dMassAdjust(&m, mass);
         dMassTranslate(
@@ -1448,7 +1447,7 @@ bool CPHElement::isBreakable() { return !!m_fratures_holder; }
 u16 CPHElement::setGeomFracturable(CPHFracture& fracture)
 {
     if (!m_fratures_holder)
-        m_fratures_holder = new CPHFracturesHolder();
+        m_fratures_holder = xr_new<CPHFracturesHolder>();
     return m_fratures_holder->AddFracture(fracture);
 }
 

@@ -17,15 +17,16 @@ namespace Editor
 private ref class window_ide_final : public editor::window_ide
 {
 public:
-    window_ide_final(ide_base*& ide, engine_base* engine) : editor::window_ide(engine)
+    window_ide_final(ide_base*& ide, engine_base* engine)
+        : editor::window_ide(engine), on_idle_handler(gcnew System::EventHandler(this, &window_ide_final::on_idle))
     {
         m_ide = ide;
-        System::Windows::Forms::Application::Idle += gcnew System::EventHandler(this, &window_ide_final::on_idle);
+        System::Windows::Forms::Application::Idle += on_idle_handler;
     }
 
     ~window_ide_final()
     {
-        System::Windows::Forms::Application::Idle -= gcnew System::EventHandler(this, &window_ide_final::on_idle);
+        System::Windows::Forms::Application::Idle -= on_idle_handler;
         m_engine = nullptr;
         m_ide = nullptr;
     }
@@ -34,7 +35,7 @@ protected:
     virtual void WndProc(System::Windows::Forms::Message % m) override
     {
         LONG_PTR result;
-#ifdef XR_X64
+#ifdef XR_ARCHITECTURE_X64
         if (m_engine && m_engine->on_message((HWND)m.HWnd.ToInt64(), m.Msg, m.WParam.ToInt64(), m.LParam.ToInt64(), result))
             return;
 #else
@@ -46,6 +47,8 @@ protected:
     }
 
 private:
+    System::EventHandler ^ on_idle_handler;
+
     void on_idle(System::Object ^ sender, System::EventArgs ^ event_args)
     {
         ide_impl* impl = dynamic_cast<ide_impl*>(m_ide);
@@ -66,7 +69,7 @@ ide_impl* g_ide = nullptr;
 static void initialize_impl(ide_base*& ide)
 {
     VERIFY(!g_ide);
-    g_ide = new ide_impl(&g_engine);
+    g_ide = xr_new<ide_impl>(&g_engine);
     ide = g_ide;
     g_ide->window(gcnew window_ide_final(ide, &g_engine));
 }

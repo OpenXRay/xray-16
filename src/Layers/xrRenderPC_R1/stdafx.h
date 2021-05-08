@@ -32,8 +32,8 @@
 #include "Common/_d3d_extensions.h"
 #ifndef _EDITOR
 #include "xrEngine/IGame_Level.h"
-#include "Layers/xrRender/blenders/Blender.h"
-#include "Layers/xrRender/blenders/Blender_CLSID.h"
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_CLSID.h"
 #include "xrParticles/psystem.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "FStaticRender.h"

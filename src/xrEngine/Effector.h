@@ -30,10 +30,10 @@ public:
     void SetHudAffect(bool val) { bHudAffect = val; }
     bool GetHudAffect() { return bHudAffect; }
     IC ECamEffectorType GetType() { return eType; }
-    virtual BOOL Valid() { return fLifeTime > 0.0f; }
+    virtual bool Valid() { return fLifeTime > 0.0f; }
     BENCH_SEC_SCRAMBLEVTBL1
 
-    virtual BOOL ProcessCam(SCamEffectorInfo& info)
+    virtual bool ProcessCam(SCamEffectorInfo& info)
     {
         fLifeTime -= Device.fTimeDelta;
         return Valid();
@@ -41,6 +41,6 @@ public:
     ;
 
     virtual void ProcessIfInvalid(SCamEffectorInfo& info){};
-    virtual BOOL AllowProcessingIfInvalid() { return FALSE; }
+    virtual bool AllowProcessingIfInvalid() { return false; }
     virtual bool AbsolutePositioning() { return false; }
 };

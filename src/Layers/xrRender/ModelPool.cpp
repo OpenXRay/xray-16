@@ -34,22 +34,22 @@ dxRender_Visual* CModelPool::Instance_Create(u32 type)
     switch (type)
     {
     case MT_NORMAL: // our base visual
-        V = new Fvisual();
+        V = xr_new<Fvisual>();
         break;
-    case MT_HIERRARHY: V = new FHierrarhyVisual(); break;
+    case MT_HIERRARHY: V = xr_new<FHierrarhyVisual>(); break;
     case MT_PROGRESSIVE: // dynamic-resolution visual
-        V = new FProgressive();
+        V = xr_new<FProgressive>();
         break;
-    case MT_SKELETON_ANIM: V = new CKinematicsAnimated(); break;
-    case MT_SKELETON_RIGID: V = new CKinematics(); break;
-    case MT_SKELETON_GEOMDEF_PM: V = new CSkeletonX_PM(); break;
-    case MT_SKELETON_GEOMDEF_ST: V = new CSkeletonX_ST(); break;
-    case MT_PARTICLE_EFFECT: V = new PS::CParticleEffect(); break;
-    case MT_PARTICLE_GROUP: V = new PS::CParticleGroup(); break;
+    case MT_SKELETON_ANIM: V = xr_new<CKinematicsAnimated>(); break;
+    case MT_SKELETON_RIGID: V = xr_new<CKinematics>(); break;
+    case MT_SKELETON_GEOMDEF_PM: V = xr_new<CSkeletonX_PM>(); break;
+    case MT_SKELETON_GEOMDEF_ST: V = xr_new<CSkeletonX_ST>(); break;
+    case MT_PARTICLE_EFFECT: V = xr_new<PS::CParticleEffect>(); break;
+    case MT_PARTICLE_GROUP: V = xr_new<PS::CParticleGroup>(); break;
 #ifndef _EDITOR
-    case MT_LOD: V = new FLOD(); break;
-    case MT_TREE_ST: V = new FTreeVisual_ST(); break;
-    case MT_TREE_PM: V = new FTreeVisual_PM(); break;
+    case MT_LOD: V = xr_new<FLOD>(); break;
+    case MT_TREE_ST: V = xr_new<FTreeVisual_ST>(); break;
+    case MT_TREE_PM: V = xr_new<FTreeVisual_PM>(); break;
 #endif
     default: FATAL("Unknown visual type"); break;
     }
@@ -186,7 +186,7 @@ CModelPool::CModelPool()
     bLogging = TRUE;
     bForceDiscard = FALSE;
     bAllowChildrenDuplicate = TRUE;
-    g_pMotionsContainer = new motions_container();
+    g_pMotionsContainer = xr_new<motions_container>();
 }
 
 CModelPool::~CModelPool()
@@ -284,7 +284,7 @@ dxRender_Visual* CModelPool::CreateChild(LPCSTR name, IReader* data)
     return Model;
 }
 
-extern BOOL ENGINE_API g_bRendering;
+extern bool ENGINE_API g_bRendering;
 void CModelPool::DeleteInternal(dxRender_Visual*& V, BOOL bDiscard)
 {
     VERIFY(!g_bRendering);

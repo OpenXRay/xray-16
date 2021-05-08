@@ -20,7 +20,7 @@
 extern CUIGameCustom* CurrentGameUI() { return HUD().GetGameUI(); }
 
 //--------------------------------------------------------------------
-CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(new CHUDTarget()), b_online(false) {}
+CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(xr_new<CHUDTarget>()), b_online(false) {}
 //--------------------------------------------------------------------
 CHUDManager::~CHUDManager()
 {
@@ -64,7 +64,7 @@ void CHUDManager::Render_First()
 
     // On R1 render only shadow
     // On R2+ render everything
-    O->renderable_Invisible(GEnv.CurrentRenderer == 1);
+    O->renderable_Invisible(GEnv.Render->GenerationIsR1());
 
     O->renderable_Render(O->H_Root());
 
@@ -130,7 +130,7 @@ void CHUDManager::RenderActiveItemUI()
     g_player_hud->render_item_ui();
 }
 
-extern ENGINE_API BOOL bShowPauseString;
+extern ENGINE_API bool bShowPauseString;
 //отрисовка элементов интерфейса
 void CHUDManager::RenderUI()
 {

@@ -17,7 +17,7 @@ CAI_Space& CAI_Space::GetInstance()
 {
     if (!g_ai_space)
     {
-        g_ai_space = new CAI_Space();
+        g_ai_space = xr_new<CAI_Space>();
         g_ai_space->init();
     }
     return *g_ai_space;
@@ -30,7 +30,7 @@ void CAI_Space::RegisterScriptClasses()
 #else
     string_path S;
     FS.update_path(S, "$game_config$", "script.ltx");
-    CInifile* l_tpIniFile = new CInifile(S);
+    CInifile* l_tpIniFile = xr_new<CInifile>(S);
     R_ASSERT(l_tpIniFile);
     if (!l_tpIniFile->section_exist("common"))
     {
@@ -60,7 +60,7 @@ void CAI_Space::init()
     R_ASSERT(!m_inited);
 
     VERIFY(!GEnv.ScriptEngine);
-    GEnv.ScriptEngine = new CScriptEngine(true);
+    GEnv.ScriptEngine = xr_new<CScriptEngine>(true);
     XRay::ScriptExporter::Reset(); // mark all nodes as undone
     GEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
     RegisterScriptClasses();

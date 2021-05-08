@@ -28,7 +28,7 @@ void object::Load(LPCSTR section)
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
 }
 
-BOOL object::net_Spawn(CSE_Abstract* server_entity)
+bool object::net_Spawn(CSE_Abstract* server_entity)
 {
     CSE_SmartCover* smart_cover = smart_cast<CSE_SmartCover*>(server_entity);
     VERIFY(smart_cover);
@@ -36,7 +36,7 @@ BOOL object::net_Spawn(CSE_Abstract* server_entity)
     if (!smart_cover->m_description.size())
         Msg("! smart cover %s has no description", smart_cover->name_replace());
 
-    CCF_Shape* shape = new CCF_Shape(this);
+    CCF_Shape* shape = xr_new<CCF_Shape>(this);
     SetCForm(shape);
 
     typedef CShapeData::ShapeVec ShapeVec;

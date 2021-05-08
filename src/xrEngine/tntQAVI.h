@@ -16,26 +16,26 @@
 // reverse enginered AVI index v.1 format
 /*struct AviIndex {
 
- DWORD dwChunkType; // chunk type, i.e. '##dc' - DIB compressed
- DWORD dwFlags; // key-frame etc.
- DWORD dwOffset; // sub-chunk offset from the begining of the LIST chunk
- DWORD dwLenght; // chunk lenght
+ u32 dwChunkType; // chunk type, i.e. '##dc' - DIB compressed
+ u32 dwFlags; // key-frame etc.
+ u32 dwOffset; // sub-chunk offset from the begining of the LIST chunk
+ u32 dwLenght; // chunk lenght
 
  };
 
  typedef struct {
  FOURCC fccType;
  FOURCC fccHandler;
- DWORD dwFlags;
- DWORD dwPriority;
- DWORD dwInitialFrames;
- DWORD dwScale;
- DWORD dwRate;
- DWORD dwStart;
- DWORD dwLength;
- DWORD dwSuggestedBufferSize;
- DWORD dwQuality;
- DWORD dwSampleSize;
+ u32 dwFlags;
+ u32 dwPriority;
+ u32 dwInitialFrames;
+ u32 dwScale;
+ u32 dwRate;
+ u32 dwStart;
+ u32 dwLength;
+ u32 dwSuggestedBufferSize;
+ u32 dwQuality;
+ u32 dwSampleSize;
  RECT rcFrame;
  } AVIStreamHeader;
  */
@@ -43,22 +43,22 @@ typedef struct
 {
     FOURCC fccType;
     FOURCC fccHandler;
-    DWORD dwFlags;
-    DWORD dwPriority;
-    DWORD dwInitialFrames;
-    DWORD dwScale;
-    DWORD dwRate;
-    DWORD dwStart;
-    DWORD dwLength;
-    DWORD dwSuggestedBufferSize;
-    DWORD dwQuality;
-    DWORD dwSampleSize;
+    u32 dwFlags;
+    u32 dwPriority;
+    u32 dwInitialFrames;
+    u32 dwScale;
+    u32 dwRate;
+    u32 dwStart;
+    u32 dwLength;
+    u32 dwSuggestedBufferSize;
+    u32 dwQuality;
+    u32 dwSampleSize;
     struct
     {
-        WORD left;
-        WORD top;
-        WORD right;
-        WORD bottom;
+        u16 left;
+        u16 top;
+        u16 right;
+        u16 bottom;
     };
     // RECT rcFrame; - лажа в MSDN
 } AVIStreamHeaderCustom;
@@ -70,9 +70,9 @@ protected:
 
 protected:
     AVIINDEXENTRY* m_pMovieIndex;
-    BYTE* m_pMovieData;
+    u8* m_pMovieData;
     HIC m_aviIC;
-    BYTE* m_pDecompressedBuf;
+    u8* m_pDecompressedBuf;
 
     BITMAPINFOHEADER m_biOutFormat;
     BITMAPINFOHEADER m_biInFormat;
@@ -80,27 +80,27 @@ protected:
     float m_fRate; // стандартная скорость, fps
     float m_fCurrentRate; // текущая скорость, fps
 
-    DWORD m_dwFrameTotal;
-    DWORD m_dwFrameCurrent;
+    u32 m_dwFrameTotal;
+    u32 m_dwFrameCurrent;
     u32 m_dwFirstFrameOffset;
 
-    DWORD CalcFrame();
+    u32 CalcFrame();
 
-    BOOL DecompressFrame(DWORD dwFrameNum);
-    VOID PreRoll(DWORD dwFrameNum);
+    bool DecompressFrame(u32 dwFrameNum);
+    void PreRoll(u32 dwFrameNum);
 
 public:
     CAviPlayerCustom();
     ~CAviPlayerCustom();
 
-    DWORD m_dwWidth, m_dwHeight;
+    u32 m_dwWidth, m_dwHeight;
 
-    VOID GetSize(DWORD* dwWidth, DWORD* dwHeight);
+    void GetSize(u32* dwWidth, u32* dwHeight);
 
-    BOOL Load(char* fname);
-    BOOL GetFrame(BYTE** pDest);
+    bool Load(char* fname);
+    bool GetFrame(u8** pDest);
 
-    BOOL NeedUpdate() { return CalcFrame() != m_dwFrameCurrent; }
-    INT SetSpeed(INT nPercent);
+    bool NeedUpdate() { return CalcFrame() != m_dwFrameCurrent; }
+    int SetSpeed(int nPercent);
 };
 #endif

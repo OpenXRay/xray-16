@@ -51,7 +51,7 @@ IC void OrientToNorm(const Fvector& normal, Fmatrix& form, Fobb& box)
 CClimableObject::CClimableObject() : m_pStaticShell(nullptr), m_radius(0), m_material(u16(-1)) {}
 CClimableObject::~CClimableObject() {}
 void CClimableObject::Load(LPCSTR section) { inherited::Load(section); }
-BOOL CClimableObject::net_Spawn(CSE_Abstract* DC)
+bool CClimableObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObjectClimable* CLB = smart_cast<CSE_ALifeObjectClimable*>(e);
@@ -297,7 +297,7 @@ bool CClimableObject::BeforeLadder(CPHCharacter* actor, float tolerance /*=0.f*/
     return d.dotproduct(n) < -(width + actor->FootRadius() / 2.f + tolerance);
 }
 
-BOOL CClimableObject::UsedAI_Locations() { return FALSE; }
+bool CClimableObject::UsedAI_Locations() { return FALSE; }
 void CClimableObject::ObjectContactCallback(
     bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
 {

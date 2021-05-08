@@ -47,7 +47,7 @@ configs_dumper::~configs_dumper()
 void configs_dumper::shedule_Update(u32 dt)
 {
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
-    DWORD thread_result = WaitForSingleObject(m_make_done_event, 0);
+    u32 thread_result = WaitForSingleObject(m_make_done_event, 0);
     R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
     R_ASSERT(m_state == ds_active);
     if (thread_result == WAIT_OBJECT_0)
@@ -161,7 +161,7 @@ char const* cd_creation_date = "creation_date";
 void configs_dumper::sign_configs()
 {
     string64 creation_date;
-    LPSTR tmp_player_name = NULL;
+    pstr tmp_player_name = NULL;
     CInifile tmp_ini(NULL, FALSE, FALSE, FALSE);
     game_cl_mp* tmp_cl_game = smart_cast<game_cl_mp*>(&Game());
     R_ASSERT(tmp_cl_game);
@@ -251,7 +251,7 @@ void configs_dumper::dumper_thread(void* my_ptr)
 {
     configs_dumper* this_ptr = static_cast<configs_dumper*>(my_ptr);
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
-    DWORD wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
+    u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
         if (!this_ptr->is_active())

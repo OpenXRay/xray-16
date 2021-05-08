@@ -3,6 +3,7 @@
 // startup
 void CRenderTarget::phase_scene_prepare()
 {
+    PIX_EVENT(phase_scene_prepare);
     // Clear depth & stencil
     // u_setrt  ( Device.dwWidth,Device.dwHeight,get_base_rt(),NULL,NULL,get_base_zb() );
     // CHK_DX   ( HW.pDevice->Clear ( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
@@ -22,7 +23,7 @@ void CRenderTarget::phase_scene_prepare()
     else
     {
         u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
-        CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
+        RCache.ClearZB(get_base_zb(), 1.f, 0);
     }
 
     //  Igor: for volumetric lights

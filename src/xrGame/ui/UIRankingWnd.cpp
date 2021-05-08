@@ -99,7 +99,7 @@ bool CUIRankingWnd::Init()
     m_center_background = UIHelper::CreateStatic(xml, "center_background", this, false);
     m_down_background = UIHelper::CreateFrameWindow(xml, "down_background", this, false);
 
-    m_actor_ch_info = new CUICharacterInfo();
+    m_actor_ch_info = xr_new<CUICharacterInfo>();
     m_actor_ch_info->SetAutoDelete(true);
     AttachChild(m_actor_ch_info);
     m_actor_ch_info->InitCharacterInfo(&xml, "actor_ch_info");
@@ -127,13 +127,13 @@ bool CUIRankingWnd::Init()
 
     for (u8 i = 0; i < m_stat_count; ++i)
     {
-        m_stat_caption[i] = new CUITextWnd();
+        m_stat_caption[i] = xr_new<CUITextWnd>();
         AttachChild(m_stat_caption[i]);
         m_stat_caption[i]->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(xml, "stat", i, m_stat_caption[i]);
         m_stat_caption[i]->AdjustWidthToText();
 
-        m_stat_info[i] = new CUITextWnd();
+        m_stat_info[i] = xr_new<CUITextWnd>();
         AttachChild(m_stat_info[i]);
         m_stat_info[i]->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(xml, "stat", i, m_stat_info[i]);
@@ -205,7 +205,7 @@ bool CUIRankingWnd::Init()
 
 void CUIRankingWnd::add_faction(CUIXml& xml, shared_str const& faction_id)
 {
-    CUIRankFaction* faction = new CUIRankFaction(faction_id);
+    CUIRankFaction* faction = xr_new<CUIRankFaction>(faction_id);
     faction->init_from_xml(xml);
     faction->SetWindowName("fraction_item");
     m_factions_list->AddWindow(faction, true);
@@ -225,7 +225,7 @@ void CUIRankingWnd::add_achievement(CUIXml& xml, shared_str const& achiev_id)
         return;
     }
 
-    CUIAchievements* achievement = m_achieves_vec.emplace_back(new CUIAchievements(m_achievements));
+    CUIAchievements* achievement = m_achieves_vec.emplace_back(xr_new<CUIAchievements>(m_achievements));
 
     achievement->init_from_xml(xml);
 

@@ -339,7 +339,7 @@ void game_sv_GameState::net_Export_GameTime(NET_Packet& P)
 };
 
 void game_sv_GameState::OnPlayerConnect(ClientID /**id_who**/) { signal_Syncronize(); }
-void game_sv_GameState::OnPlayerDisconnect(ClientID id_who, LPSTR, u16) { signal_Syncronize(); }
+void game_sv_GameState::OnPlayerDisconnect(ClientID id_who, pstr, u16) { signal_Syncronize(); }
 static float rpoints_Dist[TEAM_COUNT] = {1000.f, 1000.f, 1000.f, 1000.f};
 void game_sv_GameState::Create(shared_str& options)
 {
@@ -420,7 +420,7 @@ void game_sv_GameState::Create(shared_str& options)
         scriptEngine.remove_script_process(ScriptProcessor::Game);
         string_path S;
         FS.update_path(S, "$game_config$", "script.ltx");
-        CInifile* l_tpIniFile = new CInifile(S);
+        CInifile* l_tpIniFile = xr_new<CInifile>(S);
         R_ASSERT(l_tpIniFile);
 
         if (l_tpIniFile->section_exist(type_name()))
@@ -631,7 +631,7 @@ game_sv_GameState::game_sv_GameState()
 {
     VERIFY(g_pGameLevel);
     m_server = Level().Server;
-    m_event_queue = new GameEventQueue();
+    m_event_queue = xr_new<GameEventQueue>();
 
     m_bMapRotation = false;
     m_bMapSwitched = false;

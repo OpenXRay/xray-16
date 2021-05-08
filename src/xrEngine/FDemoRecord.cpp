@@ -11,13 +11,13 @@
 #include "CustomHUD.h"
 #include "CameraManager.h"
 
-extern BOOL g_bDisableRedText;
+extern bool g_bDisableRedText;
 static Flags32 s_hud_flag = {0};
 static Flags32 s_dev_flags = {0};
 
-BOOL stored_weapon;
-BOOL stored_cross;
-BOOL stored_red_text;
+bool stored_weapon;
+bool stored_cross;
+bool stored_red_text;
 
 CDemoRecord* xrDemoRecord = 0;
 CDemoRecord::force_position CDemoRecord::g_position = {false, {0, 0, 0}};
@@ -56,17 +56,17 @@ Fbox get_level_screenshot_bound()
 
     return res;
 }
-void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags);
-CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDemo, life_time /*,FALSE*/)
+void _InitializeFont(CGameFont*& F, pcstr section, u32 flags);
+CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDemo, life_time /*,false*/)
 {
     stored_red_text = g_bDisableRedText;
-    g_bDisableRedText = TRUE;
+    g_bDisableRedText = true;
     m_iLMScreenshotFragment = -1;
     /*
      stored_weapon = psHUD_Flags.test(HUD_WEAPON);
      stored_cross = psHUD_Flags.test(HUD_CROSSHAIR);
-     psHUD_Flags.set(HUD_WEAPON, FALSE);
-     psHUD_Flags.set(HUD_CROSSHAIR, FALSE);
+     psHUD_Flags.set(HUD_WEAPON, false);
+     psHUD_Flags.set(HUD_CROSSHAIR, false);
      */
     m_b_redirect_input_to_level = false;
     xr_unlink(name);
@@ -100,9 +100,9 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
 
         m_vT.set(0, 0, 0);
         m_vR.set(0, 0, 0);
-        m_bMakeCubeMap = FALSE;
-        m_bMakeScreenshot = FALSE;
-        m_bMakeLevelMap = FALSE;
+        m_bMakeCubeMap = false;
+        m_bMakeScreenshot = false;
+        m_bMakeLevelMap = false;
 
         m_fSpeed0 = pSettings->r_float("demo_record", "speed0");
         m_fSpeed1 = pSettings->r_float("demo_record", "speed1");
@@ -148,13 +148,13 @@ void CDemoRecord::MakeScreenshotFace()
     case 1:
         GEnv.Render->Screenshot();
         psHUD_Flags.assign(s_hud_flag);
-        m_bMakeScreenshot = FALSE;
+        m_bMakeScreenshot = false;
         break;
     }
     m_Stage++;
 }
 
-void GetLM_BBox(Fbox& bb, INT Step)
+void GetLM_BBox(Fbox& bb, int Step)
 {
     float half_x = bb.vMin.x + (bb.vMax.x - bb.vMin.x) / 2;
     float half_z = bb.vMin.z + (bb.vMax.z - bb.vMin.z) / 2;
@@ -199,7 +199,7 @@ void CDemoRecord::MakeLevelMapProcess()
         s_dev_flags = psDeviceFlags;
         s_hud_flag.assign(psHUD_Flags);
         psDeviceFlags.zero();
-        psDeviceFlags.set(rsClearBB | rsFullscreen | rsDrawStatic, TRUE);
+        psDeviceFlags.set(rsClearBB | rsFullscreen | rsDrawStatic, true);
         if (!psDeviceFlags.equal(s_dev_flags, rsFullscreen))
             Device.Reset();
     }
@@ -233,11 +233,11 @@ void CDemoRecord::MakeLevelMapProcess()
         {
             psHUD_Flags.assign(s_hud_flag);
 
-            BOOL bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
+            bool bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
             psDeviceFlags = s_dev_flags;
             if (bDevReset)
                 Device.Reset();
-            m_bMakeLevelMap = FALSE;
+            m_bMakeLevelMap = false;
             m_iLMScreenshotFragment = -1;
         }
     }
@@ -274,17 +274,17 @@ void CDemoRecord::MakeCubeMapFace(Fvector& D, Fvector& N)
         N.set(m_Camera.j);
         D.set(m_Camera.k);
         psHUD_Flags.assign(s_hud_flag);
-        m_bMakeCubeMap = FALSE;
+        m_bMakeCubeMap = false;
         break;
     }
     m_Stage++;
 }
 
-BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
+bool CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 {
     info.dont_apply = false;
     if (0 == file)
-        return TRUE;
+        return true;
 
     if (m_bMakeScreenshot)
     {
@@ -397,7 +397,7 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
         m_vT.set(0, 0, 0);
         m_vR.set(0, 0, 0);
     }
-    return TRUE;
+    return true;
 }
 
 void CDemoRecord::IR_OnKeyboardPress(int dik)
@@ -436,7 +436,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
 #endif
 
     if (dik == SDL_SCANCODE_PAUSE)
-        Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
+        Device.Pause(!Device.Paused(), true, true, "demo_record");
 }
 
 static void update_whith_timescale(Fvector& v, const Fvector& v_delta)
@@ -551,17 +551,17 @@ void CDemoRecord::RecordKey()
 
 void CDemoRecord::MakeCubemap()
 {
-    m_bMakeCubeMap = TRUE;
+    m_bMakeCubeMap = true;
     m_Stage = 0;
 }
 
 void CDemoRecord::MakeScreenshot()
 {
-    m_bMakeScreenshot = TRUE;
+    m_bMakeScreenshot = true;
     m_Stage = 0;
 }
 
-void CDemoRecord::MakeLevelMapScreenshot(BOOL bHQ)
+void CDemoRecord::MakeLevelMapScreenshot(bool bHQ)
 {
     Console->Execute("run_string level.set_weather(\"map\",true)");
 
@@ -573,7 +573,7 @@ void CDemoRecord::MakeLevelMapScreenshot(BOOL bHQ)
     curr_lm_fbox = get_level_screenshot_bound();
     GetLM_BBox(curr_lm_fbox, m_iLMScreenshotFragment);
 
-    m_bMakeLevelMap = TRUE;
+    m_bMakeLevelMap = true;
     m_Stage = 0;
 }
 

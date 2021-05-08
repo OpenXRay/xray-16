@@ -43,7 +43,7 @@ struct _LodItem
 using state_type = SState*;
 #ifndef USE_OGL
 using ps_type = ID3DPixelShader*;
-#if defined(USE_DX10) || defined(USE_DX11) // DX10 and DX11 needs shader signature to properly bind geometry to shader
+#if !defined(USE_DX9) // DX11+ needs shader signature to properly bind geometry to shader
 using vs_type = SVS*;
 using gs_type = ID3DGeometryShader*;
 #else
@@ -82,7 +82,7 @@ struct mapNormalCS : public xr_fixed_map<R_constant_table*, mapNormalStates>
     float ssa;
 };
 
-#ifdef USE_DX11
+#if !defined(USE_DX9) && !defined(USE_OGL)
 struct mapNormalAdvStages
 {
     hs_type hs;
@@ -99,7 +99,7 @@ struct mapNormalPS : public xr_fixed_map<ps_type, mapNormalCS>
 {
     float ssa;
 };
-#endif
+#endif // !USE_DX9 && !USE_OGL
 
 #ifndef USE_DX9
 struct mapNormalGS : public xr_fixed_map<gs_type, mapNormalPS>
@@ -110,7 +110,7 @@ struct mapNormalGS : public xr_fixed_map<gs_type, mapNormalPS>
 struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalGS> {};
 #else
 struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalPS> {};
-#endif
+#endif // !USE_DX9
 
 using mapNormal_T = mapNormalVS;
 using mapNormalPasses_T = mapNormal_T[SHADER_PASSES_MAX];
@@ -138,7 +138,7 @@ struct mapMatrixCS : public xr_fixed_map<R_constant_table*, mapMatrixStates>
     float ssa;
 };
 
-#ifdef USE_DX11
+#if !defined(USE_DX9) && !defined(USE_OGL)
 struct mapMatrixAdvStages
 {
     hs_type hs;
@@ -150,12 +150,12 @@ struct mapMatrixPS : public xr_fixed_map<ps_type, mapMatrixAdvStages>
 {
     float ssa;
 };
-#else
+#else 
 struct mapMatrixPS : public xr_fixed_map<ps_type, mapMatrixCS>
 {
     float ssa;
 };
-#endif
+#endif // !USE_DX9 && !USE_OGL
 
 #ifndef USE_DX9
 struct mapMatrixGS : public xr_fixed_map<gs_type, mapMatrixPS>
@@ -166,7 +166,7 @@ struct mapMatrixGS : public xr_fixed_map<gs_type, mapMatrixPS>
 struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixGS> {};
 #else
 struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixPS> {};
-#endif
+#endif // !USE_DX9
 
 using mapMatrix_T = mapMatrixVS;
 using mapMatrixPasses_T = mapMatrix_T[SHADER_PASSES_MAX];

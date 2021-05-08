@@ -71,8 +71,8 @@ public:
     SDL_Rect m_rcWindowClient;
 
     u32 dwPrecacheFrame;
-    BOOL b_is_Ready;
-    BOOL b_is_Active;
+    bool b_is_Ready;
+    bool b_is_Active;
     bool IsAnselActive;
     bool AllowWindowDrag; // For windowed mode
 
@@ -151,24 +151,24 @@ public:
 
     // u32 dwWidth, dwHeight;
     float fWidth_2, fHeight_2;
-    // BOOL b_is_Ready;
-    // BOOL b_is_Active;
+    // bool b_is_Ready;
+    // bool b_is_Active;
     void OnWM_Activate(WPARAM wParam, LPARAM lParam);
 
     // ref_shader m_WireShader;
     // ref_shader m_SelectionShader;
 
-    BOOL m_bNearer;
-    void SetNearer(BOOL enabled)
+    bool m_bNearer;
+    void SetNearer(bool enabled)
     {
         if (enabled && !m_bNearer)
         {
-            m_bNearer = TRUE;
+            m_bNearer = true;
             mProject._43 -= EPS_L;
         }
         else if (!enabled && m_bNearer)
         {
-            m_bNearer = FALSE;
+            m_bNearer = false;
             mProject._43 += EPS_L;
         }
         GEnv.Render->SetCacheXform(mView, mProject);
@@ -187,19 +187,20 @@ public:
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
-        : fWidth_2(0), fHeight_2(0), mtProcessingAllowed(false),
+        : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
+          mtProcessingAllowed(false), mt_bMustExit(false),
           m_editor_module(nullptr), m_editor_initialize(nullptr),
           m_editor_finalize(nullptr), m_editor(nullptr)
     {
         m_sdlWnd = NULL;
-        b_is_Active = FALSE;
-        b_is_Ready = FALSE;
+        b_is_Active = false;
+        b_is_Ready = false;
         Timer.Start();
-        m_bNearer = FALSE;
+        m_bNearer = false;
     };
 
-    void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);
-    BOOL Paused();
+    void Pause(bool bOn, bool bTimer, bool bSound, pcstr reason);
+    bool Paused();
 
 private:
     static void PrimaryThreadProc(void* context);
@@ -274,7 +275,7 @@ private:
 
 public:
     Event PresentationFinished = nullptr;
-    volatile BOOL mt_bMustExit;
+    volatile bool mt_bMustExit;
 
     bool IsMTProcessingAllowed() const
     {

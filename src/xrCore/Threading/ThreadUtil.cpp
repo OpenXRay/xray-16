@@ -58,7 +58,7 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 {
     xrDebug::Initialize(Core.Params);
 
-    SThreadStartupInfo* info = new SThreadStartupInfo();
+    SThreadStartupInfo* info = xr_new<SThreadStartupInfo>();
     info->threadName = name;
     info->entryFunc = entry;
     info->argList = arglist;
@@ -120,7 +120,7 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 {
     xrDebug::Initialize(Core.Params);
 
-    SThreadStartupInfo* info = new SThreadStartupInfo();
+    SThreadStartupInfo* info = xr_new<SThreadStartupInfo>();
     info->threadName = name;
     info->entryFunc = entry;
     info->argList = arglist;

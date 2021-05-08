@@ -112,7 +112,7 @@ void net_task_menager::send(IGridUser& user, u32 id)
         INetWriter w(stream, 100);
         w.w_u32(id);
     }
-    DWORD t_id = id;
+    u32 t_id = id;
 
     user.RunTask(libraries, "RunTask", stream, Finalize, &t_id, true);
 

@@ -138,30 +138,6 @@ game_action actions[] = {
 
 keyboard_key keyboards[] =
 {
-    { "mouse1",                 MOUSE_1,                         "LMB" },
-    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake cause init algorithm was changed.
-    { "mouse2",                 MOUSE_2,                         "RMB" },
-    { "mouse4",                 MOUSE_4,                         "Mouse X1" },
-    { "mouse5",                 MOUSE_5,                         "Mouse X2" },
-
-    { "ckA",                    XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
-    { "ckB",                    XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
-    { "ckX",                    XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
-    { "ckY",                    XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
-    { "ckBACK",                 XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
-    { "ckGUIDE",                XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
-    { "ckSTART",                XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
-    { "ckLEFTSTICK",            XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
-    { "ckRIGHTSTICK",           XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
-    { "ckLEFTSHOULDER",         XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
-    { "ckRIGHTSHOULDER",        XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
-    { "ckDPAD_UP",              XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
-    { "ckDPAD_DOWN",            XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
-    { "ckDPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
-    { "ckDPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
-
-    { "kUNKNOWN",               SDL_SCANCODE_UNKNOWN,            "Unknown" },
-
     { "kA",                     SDL_SCANCODE_A,                  "A" },
     { "kB",                     SDL_SCANCODE_B,                  "B" },
     { "kC",                     SDL_SCANCODE_C,                  "C" },
@@ -446,6 +422,28 @@ keyboard_key keyboards[] =
     { "kAPP1",                  SDL_SCANCODE_APP1,               "App 1" },
     { "kAPP2",                  SDL_SCANCODE_APP2,               "App 2" },
 
+    { "mouse1",                 MOUSE_1,                         "LMB" },
+    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake because init algorithm was changed.
+    { "mouse2",                 MOUSE_2,                         "RMB" },
+    { "mouse4",                 MOUSE_4,                         "Mouse X1" },
+    { "mouse5",                 MOUSE_5,                         "Mouse X2" },
+
+    { "kGAMEPAD_A",             XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
+    { "kGAMEPAD_B",             XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
+    { "kGAMEPAD_X",             XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
+    { "kGAMEPAD_Y",             XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
+    { "kGAMEPAD_BACK",          XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
+    { "kGAMEPAD_GUIDE",         XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
+    { "kGAMEPAD_START",         XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
+    { "kGAMEPAD_LEFTSTICK",     XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
+    { "kGAMEPAD_RIGHTSTICK",    XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
+    { "kGAMEPAD_LEFTSHOULDER",  XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
+    { "kGAMEPAD_RIGHTSHOULDER", XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
+    { "kGAMEPAD_DPAD_UP",       XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
+    { "kGAMEPAD_DPAD_DOWN",     XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
+    { "kGAMEPAD_DPAD_LEFT",     XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
+    { "kGAMEPAD_DPAD_RIGHT",    XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
+
     { nullptr,                  -1,                              "(null)" }
 };
 // clang-format on
@@ -521,9 +519,15 @@ keyboard_key* KeynameToPtr(pcstr name)
     return NULL;
 }
 
-void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz)
+bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
 {
-    int action_id = ActionNameToId(action);
+    const int action_id = ActionNameToId(action);
+    if (action_id == kNOTBINDED)
+    {
+        // Just insert the unknown action name as is
+        xr_strcpy(dst_buff, dst_buff_sz, action);
+        return false;
+    }
     key_binding* binding = &g_key_bindings[action_id];
 
     string128 prim;
@@ -545,14 +549,17 @@ void GetActionAllBinding(LPCSTR action, char* dst_buff, int dst_buff_sz)
     {
         xr_strcpy(gpad, binding->m_keyboard[2]->key_local_name.c_str());
     }
-    if (NULL == binding->m_keyboard[0] && NULL == binding->m_keyboard[1] && NULL == binding->m_keyboard[2])
+    if (!binding->m_keyboard[0] && !binding->m_keyboard[1] && !binding->m_keyboard[2])
     {
         xr_sprintf(dst_buff, dst_buff_sz, "%s", gStringTable->translate("st_key_notbinded").c_str());
     }
     else
-        xr_sprintf(dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "", 
-            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "", 
+    {
+        xr_sprintf(dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "",
+            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "",
             ((gpad[0] && prim[0]) || (gpad[0] && sec[0])) ? " , " : "", gpad[0] ? gpad : "");
+    }
+    return true;
 }
 
 #pragma todo("Artur to All: Gamepads has own bindings. Add m_keyboard[2]")

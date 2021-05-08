@@ -4,11 +4,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Layers/xrRenderGL/glHW.h"
-#include "xrEngine/xr_input.h"
+#include "glHW.h"
 #include "xrEngine/XR_IOConsole.h"
-#include "Include/xrAPI/xrAPI.h"
-#include "xrCore/xr_token.h"
 
 CHW HW;
 
@@ -19,10 +16,7 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
-CHW::CHW()
-    : pDevice(this), pContext(this), m_pSwapChain(this), pPP(0), pFB(0)
-{
-}
+CHW::CHW() : pDevice(this), pPP(0), pFB(0) {}
 
 CHW::~CHW() {}
 //////////////////////////////////////////////////////////////////////
@@ -109,6 +103,10 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
+    ComputeShadersSupported = false; // XXX: Implement compute shaders support
+
+    Caps.fTarget = D3DFMT_A8R8G8B8;
+    Caps.fDepth = D3DFMT_D24S8;
 
     //	Create render target and depth-stencil views here
     UpdateViews();
@@ -187,65 +185,39 @@ void CHW::UpdateViews()
     BackBufferCount = 1;
 }
 
-void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
-{
-    if (pRenderTargetView == 0)
-        return;
-
-    // Attach the render target
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pRenderTargetView, 0));
-
-    // Clear the color buffer without affecting the global state
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glClearColor(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]);
-    CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
-}
-
-void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
-{
-    if (pDepthStencilView == 0)
-        return;
-
-    // Attach the depth buffer
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, pDepthStencilView, 0));
-
-    u32 mask = 0;
-    if (ClearFlags & D3D_CLEAR_DEPTH)
-        mask |= (u32)GL_DEPTH_BUFFER_BIT;
-    if (ClearFlags & D3D_CLEAR_STENCIL)
-        mask |= (u32)GL_STENCIL_BUFFER_BIT;
-
-    if (ClearFlags & D3D_CLEAR_DEPTH)
-    {
-        glDepthMask(GL_TRUE);
-        glClearDepthf(Depth);
-    }
-    if (ClearFlags & D3D_CLEAR_STENCIL)
-    {
-        glStencilMask(~0);
-        glClearStencil(Stencil);
-    }
-    CHK_GL(glClear(mask));
-}
-
 void CHW::Present()
 {
+#if 0 // kept for historical reasons
     RImplementation.Target->phase_flip();
+#else
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, pFB);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(
+        0, 0, Device.dwWidth, Device.dwHeight,
+        0, 0, Device.dwWidth, Device.dwHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+#endif
+
     SDL_GL_SwapWindow(m_window);
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
-DeviceState CHW::GetDeviceState()
+DeviceState CHW::GetDeviceState() const
 {
     //  TODO: OGL: Implement GetDeviceState
     return DeviceState::Normal;
 }
 
-std::pair<u32, u32> CHW::GetSurfaceSize() const
+std::pair<u32, u32> CHW::GetSurfaceSize()
 {
     return
     {
         psCurrentVidMode[0],
         psCurrentVidMode[1]
     };
+}
+
+bool CHW::ThisInstanceIsGlobal() const
+{
+    return this == &HW;
 }

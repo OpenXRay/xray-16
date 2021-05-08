@@ -65,7 +65,7 @@ xrServer::EConnect xrServer::Connect(shared_str& session_name, GameDescriptionDa
     //	game->type				= type_id;
     if (game->Type() != eGameIDSingle)
     {
-        m_file_transfers = new file_transfer::server_site();
+        m_file_transfers = xr_new<file_transfer::server_site>();
         initialize_screenshot_proxies();
         LoadServerInfo();
         xr_auth_strings_t tmp_ignore;
@@ -166,7 +166,7 @@ void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
         R_ASSERT2(tmp_client != GetServerClient(), "can't disconnect server client");
         Msg("--- Client [%s] tried to connect - rejecting connection (he is banned by %s) ...",
             tmp_client->m_cAddress.to_string().c_str(), admin_name.size() ? admin_name.c_str() : "Server");
-        LPSTR message_to_user;
+        pstr message_to_user;
         if (admin_name.size())
         {
             STRCONCAT(message_to_user, "mp_you_have_been_banned_by ", admin_name.c_str());

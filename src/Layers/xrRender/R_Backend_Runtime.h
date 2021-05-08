@@ -7,15 +7,15 @@
 #include "SH_Constant.h"
 #include "SH_RT.h"
 
-#if defined(USE_OGL)
+#ifdef USE_OGL
 #include "Layers/xrRenderGL/glR_Backend_Runtime.h"
 #include "Layers/xrRenderGL/glState.h"
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
 #include "Layers/xrRenderDX10/dx10R_Backend_Runtime.h"
 #include "Layers/xrRenderDX10/StateManager/dx10State.h"
-#else //	USE_DX10
+#else // USE_DX9
 #include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
-#endif //	USE_DX10
+#endif // USE_OGL
 
 IC void R_xforms::set_c_w(R_constant* C)
 {
@@ -81,9 +81,9 @@ IC ID3DDepthStencilView* CBackend::get_ZB()
 ICF void CBackend::set_States(SState* _state)
 {
 //	DX10 Manages states using it's own algorithm. Don't mess with it.
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
+#ifdef USE_DX9
     if (state != _state->state)
-#endif //	USE_DX10
+#endif
     {
         PGO(Msg("PGO:state_block"));
 #ifdef DEBUG
@@ -124,14 +124,12 @@ IC void CBackend::set_Element(ShaderElement* S, u32 pass)
     set_States(P.state);
     set_PS(P.ps);
     set_VS(P.vs);
-#if defined(USE_DX10) || defined(USE_DX11)
-    set_GS(P.gs);
 #ifdef USE_DX11
+    set_GS(P.gs);
     set_HS(P.hs);
     set_DS(P.ds);
     set_CS(P.cs);
 #endif
-#endif //	USE_DX10
     set_Constants(P.constants);
     set_Textures(P.T);
 #ifdef _EDITOR

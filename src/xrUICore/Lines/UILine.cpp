@@ -23,9 +23,8 @@ CUILine::~CUILine()
 }
 
 CUILine::CUILine(const CUILine& other)
+    : m_subLines(other.m_subLines), m_tmpLine(nullptr)
 {
-    m_subLines = other.m_subLines;
-    m_tmpLine = NULL;
 }
 
 CUILine& CUILine::operator=(const CUILine& other)
@@ -104,7 +103,7 @@ int CUILine::GetSize()
 const CUILine* CUILine::GetEmptyLine()
 {
     xr_delete(m_tmpLine);
-    m_tmpLine = new CUILine();
+    m_tmpLine = xr_new<CUILine>();
 
     return m_tmpLine;
 }
@@ -112,7 +111,7 @@ const CUILine* CUILine::GetEmptyLine()
 const CUILine* CUILine::Cut2Pos(Position& pos, bool to_first)
 {
     xr_delete(m_tmpLine);
-    m_tmpLine = new CUILine();
+    m_tmpLine = xr_new<CUILine>();
 
     int last;
 

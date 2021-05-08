@@ -22,6 +22,7 @@ class property_holder_holder;
 class ide_base
 {
 public:
+    virtual ~ide_base() = default;
     virtual HWND main_handle() = 0;
     virtual HWND view_handle() = 0;
     virtual CEnvironment* environment() = 0;

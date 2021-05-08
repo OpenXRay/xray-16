@@ -3,7 +3,7 @@
 
 void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> target, int s_id, SVelocityParam* vel, EPState p_s, std::pair<cpcstr, bool> fx_front, std::pair<cpcstr, bool> fx_back, std::pair<cpcstr, bool> fx_left, std::pair<cpcstr, bool> fx_right)
 {
-    SAnimItem* new_item = new SAnimItem();
+    SAnimItem* new_item = xr_new<SAnimItem>();
 
     new_item->target_name = target.first;
     new_item->target_may_not_exist = target.second;
@@ -30,7 +30,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVeloci
     std::pair<cpcstr, bool> fx_front, std::pair<cpcstr, bool> fx_back,
     std::pair<cpcstr, bool> fx_left, std::pair<cpcstr, bool> fx_right)
 {
-    SAnimItem* new_item = new SAnimItem();
+    SAnimItem* new_item = xr_new<SAnimItem>();
 
     new_item->target_name = tn;
     new_item->target_may_not_exist = false;
@@ -56,7 +56,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVeloci
 void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s,
     LPCSTR fx_front, LPCSTR fx_back, LPCSTR fx_left, LPCSTR fx_right)
 {
-    SAnimItem* new_item = new SAnimItem();
+    SAnimItem* new_item = xr_new<SAnimItem>();
 
     new_item->target_name = tn;
     new_item->target_may_not_exist = false;
@@ -79,7 +79,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVeloci
 void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> target, int s_id, SVelocityParam* vel, EPState p_s,
     LPCSTR fx_front, LPCSTR fx_back, LPCSTR fx_left, LPCSTR fx_right)
 {
-    SAnimItem* new_item = new SAnimItem();
+    SAnimItem* new_item = xr_new<SAnimItem>();
 
     new_item->target_name = target.first;
     new_item->target_may_not_exist = target.second;
@@ -101,7 +101,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> targ
 
 void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> target, int s_id, SVelocityParam* vel, EPState p_s)
 {
-    SAnimItem* new_item = new SAnimItem();
+    SAnimItem* new_item = xr_new<SAnimItem>();
 
     new_item->target_name = target.first;
     new_item->target_may_not_exist = target.second;
@@ -116,7 +116,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, std::pair<cpcstr, bool> targ
 
 void CControlAnimationBase::AddAnim2(EMotionAnim ma, std::pair<cpcstr, cpcstr> target, int s_id, SVelocityParam* vel, EPState p_s)
 {
-    SAnimItem* new_item = new SAnimItem();
+    SAnimItem* new_item = xr_new<SAnimItem>();
 
     new_item->target_name = target.first;
     new_item->target_name2 = target.second;
@@ -132,7 +132,7 @@ void CControlAnimationBase::AddAnim2(EMotionAnim ma, std::pair<cpcstr, cpcstr> t
 
 void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam* vel, EPState p_s)
 {
-    SAnimItem* new_item = new SAnimItem();
+    SAnimItem* new_item = xr_new<SAnimItem>();
 
     new_item->target_name = tn;
     new_item->target_may_not_exist = false;

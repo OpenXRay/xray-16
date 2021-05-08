@@ -12,7 +12,7 @@
 using XRay::Editor::color;
 
 property_color_reference::property_color_reference(color& value, array<System::Attribute ^> ^ attributes)
-    : m_value(new value_holder<color>(value)), inherited(value, attributes)
+    : m_value(xr_new<value_holder<color>>(value)), inherited(value, attributes)
 {
 }
 

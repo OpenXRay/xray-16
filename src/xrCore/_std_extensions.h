@@ -92,9 +92,7 @@ IC bool _valid(const float x) noexcept
     switch (cls)
     {
     case FP_NAN:
-        [[fallthrough]];
     case FP_INFINITE:
-        [[fallthrough]];
     case FP_SUBNORMAL:
         return false;
     default:
@@ -125,9 +123,7 @@ IC bool _valid(const double x)
     switch (cls)
     {
     case FP_NAN:
-        [[fallthrough]];
     case FP_INFINITE:
-        [[fallthrough]];
     case FP_SUBNORMAL:
         return false;
     default:
@@ -174,17 +170,17 @@ IC size_t xr_strlen(const char* S) { return strlen(S); }
 //#ifndef _EDITOR
 #ifndef MASTER_GOLD
 
-inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(pstr destination, size_t const destination_size, LPCSTR source)
 {
     return strcpy_s(destination, destination_size, source);
 }
 
-inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
 {
     return strcat_s(destination, buffer_size, source);
 }
 
-inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -204,16 +200,16 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 }
 #else // #ifndef MASTER_GOLD
 
-inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(pstr destination, size_t const destination_size, LPCSTR source)
 {
     return strncpy_s(destination, destination_size, source, destination_size);
 }
 
-inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
 {
     size_t const destination_length = xr_strlen(destination);
-    LPSTR i = destination + destination_length;
-    LPSTR const e = destination + buffer_size - 1;
+    pstr i = destination + destination_length;
+    pstr const e = destination + buffer_size - 1;
     if (i > e)
         return 0;
 
@@ -224,7 +220,7 @@ inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
     return 0;
 }
 
-inline int __cdecl xr_sprintf(LPSTR destination, size_t const buffer_size, LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...)
 {
     va_list args;
     va_start(args, format_string);

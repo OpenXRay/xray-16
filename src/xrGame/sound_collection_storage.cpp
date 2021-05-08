@@ -34,6 +34,6 @@ const CSoundCollectionStorage::SOUND_COLLECTION_PAIR& CSoundCollectionStorage::o
     if (I != m_objects.end())
         return (*I);
 
-    m_objects.push_back(std::make_pair(params, new CSoundCollection(params)));
+    m_objects.push_back(std::make_pair(params, xr_new<CSoundCollection>(params)));
     return (m_objects.back());
 }

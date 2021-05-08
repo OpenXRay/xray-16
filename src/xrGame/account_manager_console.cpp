@@ -227,9 +227,9 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
         gamespy_profile::stats_submitter* tmp_ssubmitter = MainMenu()->GetStatsSubmitter();
         VERIFY(tmp_ssubmitter);
         char const* tmp_reward_id_str = args + xr_strlen(tmp_command);
-        int tmp_award_id = 0;
+        unsigned int tmp_award_id = 0;
 
-        if (!sscanf(tmp_reward_id_str, "%u", &tmp_award_id))
+        if (!sscanf(tmp_reward_id_str, "%u", &tmp_award_id) || tmp_award_id >= gamespy_profile::enum_awards_t::at_awards_count)
         {
             Msg("! Bad award id");
             return;
@@ -244,7 +244,7 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
         char const* tmp_scores_str = args + xr_strlen(tmp_command);
         unsigned int score_id = 0;
         int score_value = 0;
-        if (sscanf(tmp_scores_str, "%u %u", &score_id, &score_value) != 2)
+        if (sscanf(tmp_scores_str, "%u %d", &score_id, &score_value) != 2)
         {
             Msg("! Not enough parameters");
             return;
@@ -252,6 +252,10 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
         if (score_id >= gamespy_profile::bst_score_types_count)
         {
             Msg("! Bad scoreid");
+        }
+        if (score_value < 0)
+        {
+            Msg("! Bad score value");
         }
         debug_best_scores.clear();
         debug_best_scores.insert(

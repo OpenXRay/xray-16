@@ -25,7 +25,7 @@ static int facetable[6][4] = {
 };
 //////////////////////////////////////////////////////////////////////////
 #define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
-#define FLT_AS_DW(F) (*(DWORD*)&(F))
+#define FLT_AS_DW(F) (*(u32*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0)
 #define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0x7f800000L)
@@ -47,7 +47,7 @@ struct BoundingBox
 
     BoundingBox() : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) {}
     BoundingBox(const BoundingBox& other) : minPt(other.minPt), maxPt(other.maxPt) {}
-    explicit BoundingBox(const D3DXVECTOR3* points, UINT n) : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
+    explicit BoundingBox(const D3DXVECTOR3* points, u32 n) : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < n; i++)
             Merge(&points[i]);
@@ -684,10 +684,12 @@ struct DumbClipper
         }
         return true;
     }
+    
     D3DXVECTOR3 point(Fbox& bb, int i) const
     {
-        return D3DXVECTOR3(i&1 ? bb.vMin.x : bb.vMax.x, i&2 ? bb.vMin.y : bb.vMax.y, i&4 ? bb.vMin.z : bb.vMax.z);
+        return D3DXVECTOR3((i & 1) ? bb.vMin.x : bb.vMax.x, (i & 2) ? bb.vMin.y : bb.vMax.y, (i & 4) ? bb.vMin.z : bb.vMax.z);
     }
+
     Fbox clipped_AABB(xr_vector<Fbox>& src, Fmatrix& xf)
     {
         Fbox3 result;
@@ -756,6 +758,7 @@ D3DXVECTOR2 BuildTSMProjectionMatrix_caster_depth_bounds(D3DXMATRIX& lightSpaceB
 
 void CRender::render_sun()
 {
+    PIX_EVENT(render_sun);
     light* fuckingsun = (light*)Lights.sun._get();
     D3DXMATRIX m_LightViewProj;
 
@@ -765,6 +768,7 @@ void CRender::render_sun()
         float _far_ = std::min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv->far_plane);
         // ex_project.build_projection	(deg2rad(Device.fFOV/* *Device.fASPECT*/),Device.fASPECT,ps_r2_sun_near,_far_);
         ex_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, _far_);
+        // VIEWPORT_NEAR
         ex_full.mul(ex_project, Device.mView);
         D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
     }
@@ -1218,6 +1222,8 @@ void CRender::render_sun()
 
     // Accumulate
     Target->phase_accumulator();
+
+    PIX_EVENT(SE_SUN_FAR);
     Target->accum_direct(SE_SUN_FAR);
 
     // Restore XForms
@@ -1358,7 +1364,8 @@ void CRender::render_sun_near()
         }
         Fbox& bb = frustum_bb;
         bb.grow(EPS);
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
+        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project,
+            bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
             bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
 
         // build viewport xform
@@ -1453,6 +1460,8 @@ void CRender::render_sun_near()
 
     // Accumulate
     Target->phase_accumulator();
+
+    PIX_EVENT(SE_SUN_NEAR);
     Target->accum_direct(SE_SUN_NEAR);
 
     // Restore XForms
@@ -1466,6 +1475,7 @@ void CRender::render_sun_filtered()
     if (!RImplementation.o.sunfilter)
         return;
     Target->phase_accumulator();
+    PIX_EVENT(SE_SUN_LUMINANCE);
     Target->accum_direct(SE_SUN_LUMINANCE);
 }
 
@@ -1587,6 +1597,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                 for (int p = 0; p < 4; p++)
                 {
                     near_p = wform(fullxform_inv, corners[facetable[4][p]]);
+
                     edge_vec = wform(fullxform_inv, corners[facetable[5][p]]);
                     edge_vec.sub(near_p);
                     edge_vec.normalize();
@@ -1612,6 +1623,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
             map_size * 0.5f, 0.1, dist + map_size);
 
+        //////////////////////////////////////////////////////////////////////////
         // build viewport xform
         float view_dim = float(RImplementation.o.smapsize);
         Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
@@ -1619,6 +1631,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         Fmatrix m_viewport_inv;
         D3DXMatrixInverse((D3DXMATRIX*)&m_viewport_inv, 0, (D3DXMATRIX*)&m_viewport);
 
+        // snap view-position to pixel
         cull_xform.mul(mdir_Project, mdir_View);
         Fmatrix cull_xform_inv;
         cull_xform_inv.invert(cull_xform);
@@ -1774,15 +1787,26 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // Accumulate
     Target->phase_accumulator();
 
+    PIX_EVENT(SE_SUN_NEAR);
+
     if (cascade_ind == 0)
+    {
+        PIX_EVENT(SE_SUN_NEAR);
         Target->accum_direct_cascade(SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].xform,
             m_sun_cascades[cascade_ind].bias);
+    }
     else if (cascade_ind < m_sun_cascades.size() - 1)
+    {
+        PIX_EVENT(SE_SUN_MIDDLE);
         Target->accum_direct_cascade(SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
             m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
+    }
     else
+    {
+        PIX_EVENT(SE_SUN_FAR);
         Target->accum_direct_cascade(SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
             m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
+    }
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);

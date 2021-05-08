@@ -65,12 +65,12 @@ ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/)
     return nullptr;
 }
 
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
+#ifdef USE_DX9
 BOOL R_constant_table::parse(void* _desc, u32 destination)
 {
     D3DXSHADER_CONSTANTTABLE* desc = (D3DXSHADER_CONSTANTTABLE*)_desc;
-    D3DXSHADER_CONSTANTINFO* it = (D3DXSHADER_CONSTANTINFO*)(LPBYTE(desc) + desc->ConstantInfo);
-    LPBYTE ptr = LPBYTE(desc);
+    D3DXSHADER_CONSTANTINFO* it = (D3DXSHADER_CONSTANTINFO*)((u8*)(desc) + desc->ConstantInfo);
+    u8* ptr = (u8*)(desc);
     for (u32 dwCount = desc->Constants; dwCount; dwCount--, it++)
     {
         // Name
@@ -140,7 +140,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 ref_constant C = get(name);
                 if (!C)
                 {
-                    C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
+                    C = table.emplace_back(xr_new<R_constant>()); //.g_constant_allocator.create();
                     C->name = name;
                     C->destination = RC_dest_sampler;
                     C->type = RC_sampler;
@@ -172,7 +172,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         ref_constant C = get(name);
         if (!C)
         {
-            C = table.emplace_back(new R_constant()); //.g_constant_allocator.create();
+            C = table.emplace_back(xr_new<R_constant>()); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
@@ -192,7 +192,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
     std::sort(table.begin(), table.end(), p_sort);
     return TRUE;
 }
-#endif //	USE_DX10
+#endif // USE_DX9
 
 /// !!!!!!!!FIX THIS FOR DX11!!!!!!!!!
 void R_constant_table::merge(R_constant_table* T)
@@ -212,7 +212,7 @@ void R_constant_table::merge(R_constant_table* T)
         ref_constant C = get(*src->name, dx9compatibility ? src->type : u16(-1));
         if (!C || (dx9compatibility && C->type != src->type))
         {
-            C = new R_constant(); //.g_constant_allocator.create();
+            C = xr_new<R_constant>(); //.g_constant_allocator.create();
             C->name = src->name;
             C->destination = src->destination;
             C->type = src->type;
@@ -232,8 +232,6 @@ void R_constant_table::merge(R_constant_table* T)
         }
         else
         {
-            VERIFY2(!(C->destination & src->destination & RC_dest_sampler),
-                "Can't have samplers or textures with the same name for PS, VS and GS.");
             C->destination |= src->destination;
             VERIFY(C->type == src->type);
             R_constant_load& sL = src->get_load(src->destination);
@@ -256,12 +254,12 @@ void R_constant_table::merge(R_constant_table* T)
         std::sort(table.begin(), table.end(), p_sort);
     }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     //	TODO:	DX10:	Implement merge with validity check
     m_CBTable.reserve(m_CBTable.size() + T->m_CBTable.size());
     for (u32 i = 0; i < T->m_CBTable.size(); ++i)
         m_CBTable.push_back(T->m_CBTable[i]);
-#endif //	USE_DX10
+#endif
 }
 
 void R_constant_table::clear()
@@ -270,9 +268,9 @@ void R_constant_table::clear()
     for (u32 it = 0; it < table.size(); it++)
         table[it] = 0; //.g_constant_allocator.destroy(table[it]);
     table.clear();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if !defined(USE_DX9) && !defined(USE_OGL)
     m_CBTable.clear();
-#endif //
+#endif
 }
 
 BOOL R_constant_table::equal(R_constant_table& C)

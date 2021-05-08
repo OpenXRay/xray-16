@@ -13,12 +13,10 @@ public:
     virtual void CollisionHit(u16 source_id, u16 bone_id, float power, const Fvector& dir, Fvector& pos) = 0;
 
 protected:
-#if defined(XR_PLATFORM_WINDOWS)
-    virtual ~ICollisionDamageReceiver() = 0 {}
-#elif defined(XR_PLATFORM_LINUX)
-    virtual ~ICollisionDamageReceiver() {}
-#endif
+    virtual ~ICollisionDamageReceiver() = 0;
 };
+
+inline ICollisionDamageReceiver::~ICollisionDamageReceiver() = default;
 
 struct dContact;
 struct SGameMtl;

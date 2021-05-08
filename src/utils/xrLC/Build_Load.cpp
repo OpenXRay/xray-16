@@ -157,7 +157,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     {
         while (!F->eof())
         {
-            mu_models().push_back(new xrMU_Model());
+            mu_models().push_back(xr_new<xrMU_Model>());
             mu_models().back()->Load(*F, version);
         }
         F->close();
@@ -167,7 +167,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     {
         while (!F->eof())
         {
-            mu_refs().push_back(new xrMU_Reference());
+            mu_refs().push_back(xr_new<xrMU_Reference>());
             mu_refs().back()->Load(*F, mu_models());
         }
         F->close();
@@ -186,12 +186,12 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     Logger.Status("Loading lights...");
     {
         xr_vector<R_Layer> L_layers;
-        xr_vector<BYTE> L_control_data;
+        xr_vector<u8> L_control_data;
 
         // Controlles/Layers
         {
             F = fs.open_chunk(EB_Light_control);
-            L_control_data.assign(LPBYTE(F->pointer()), LPBYTE(F->pointer()) + F->length());
+            L_control_data.assign((u8*)(F->pointer()), (u8*)(F->pointer()) + F->length());
 
             R_Layer temp;
 
@@ -300,7 +300,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             b_BuildTexture BT(F);
 
             // load thumbnail
-            LPSTR N = BT.name;
+            pstr N = BT.name;
             if (strchr(N, '.'))
                 *(strchr(N, '.')) = 0;
             xr_strlwr(N);

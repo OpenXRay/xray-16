@@ -24,14 +24,7 @@ void CRenderTarget::mark_msaa_edges()
         TRUE, D3DCMP_ALWAYS, 0x80, 0xFF, 0x80, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
     StateManager.SetColorWriteEnable(0);
     StateManager.SetDepthFunc(D3DCMP_ALWAYS);
-    // XXX: check if resource leak was fixed!
-    // Here was resource leak
-    // due to some bug in Microsoft beta run-time we changed
-    // StateManager.SetDepthEnable( FALSE );
-    // to the next line
-    StateManager.SetDepthEnable(TRUE);
-    // Problem was in that state created with DepthEnable=0 and DepthFunc=D3D11_COMPARISON_NEVER
-    // returned in the GetDesc method other values.
+    StateManager.SetDepthEnable(FALSE);
     StateManager.SetCullMode(D3DCULL_NONE);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     StateManager.SetColorWriteEnable(D3D_COLOR_WRITE_ENABLE_ALL);

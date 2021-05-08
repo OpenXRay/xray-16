@@ -124,7 +124,7 @@ void CSoundRender_Core::env_load()
     string_path fn;
     if (FS.exist(fn, "$game_data$", SNDENV_FILENAME))
     {
-        s_environment = new SoundEnvironment_LIB();
+        s_environment = xr_new<SoundEnvironment_LIB>();
         s_environment->Load(fn);
     }
 
@@ -202,7 +202,7 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
         if (P.b2sided)
             CL.add_face_packed_D(P.v3, P.v2, P.v1, *(u32*)&P.occ, 0.01f);
     }
-    geom_SOM = new CDB::MODEL();
+    geom_SOM = xr_new<CDB::MODEL>();
     geom_SOM->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
 #endif
 
@@ -241,7 +241,7 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
 
     memcpy(_data, geom_ch->pointer(), geom_ch->length());
 
-    IReader* geom = new IReader(_data, geom_ch->length(), 0);
+    IReader* geom = xr_new<IReader>(_data, geom_ch->length(), 0);
 
     hdrCFORM H;
     geom->r(&H, sizeof(hdrCFORM));
@@ -260,7 +260,7 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     geom_ENV = ETOOLS::create_model(verts, H.vertcount, tris, H.facecount);
     env_apply();
 #else
-    geom_ENV = new CDB::MODEL();
+    geom_ENV = xr_new<CDB::MODEL>();
     geom_ENV->build(verts, H.vertcount, tris, H.facecount);
 #endif
     geom_ch->close();
@@ -273,7 +273,7 @@ bool CSoundRender_Core::create(ref_sound& S, pcstr fName, esound_type sound_type
     if (!bPresent)
         return S._handle() != nullptr;
 
-    S._p = new ref_sound_data(fName, sound_type, game_type, replaceWithNoSound);
+    S._p = xr_new<ref_sound_data>(fName, sound_type, game_type, replaceWithNoSound);
 
     if (S._handle() == nullptr && !replaceWithNoSound)
         S._p = nullptr; // no reason to keep it
@@ -314,7 +314,7 @@ void CSoundRender_Core::clone(ref_sound& S, const ref_sound& from, esound_type s
 {
     if (!bPresent)
         return;
-    S._p = new ref_sound_data();
+    S._p = xr_new<ref_sound_data>();
     S._p->handle = from._p->handle;
     S._p->dwBytesTotal = from._p->dwBytesTotal;
     S._p->fTimeTotal = from._p->fTimeTotal;
@@ -344,7 +344,7 @@ void CSoundRender_Core::play_no_feedback(
     if (!bPresent || nullptr == S._handle())
         return;
     ref_sound_data_ptr orig = S._p;
-    S._p = new ref_sound_data();
+    S._p = xr_new<ref_sound_data>();
     S._p->handle = orig->handle;
     S._p->g_type = orig->g_type;
     S._p->g_object = O;
@@ -511,8 +511,8 @@ void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
 
     u32 deferred = bDeferredEAX ? DSPROPERTY_EAXLISTENER_DEFERRED : 0;
 
-    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(LONG));
-    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(LONG));
+    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(ep.lRoom));
+    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(ep.lRoomHF));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOMROLLOFFFACTOR,
               &ep.flRoomRolloffFactor, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_DECAYTIME, &ep.flDecayTime,
@@ -520,17 +520,17 @@ void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_DECAYHFRATIO, &ep.flDecayHFRatio,
               sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REFLECTIONS, &ep.lReflections,
-              sizeof(LONG));
+              sizeof(ep.lReflections));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REFLECTIONSDELAY,
               &ep.flReflectionsDelay, sizeof(float));
-    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(LONG));
+    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(ep.lReverb));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REVERBDELAY, &ep.flReverbDelay,
               sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ENVIRONMENTDIFFUSION,
               &ep.flEnvironmentDiffusion, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_AIRABSORPTIONHF,
               &ep.flAirAbsorptionHF, sizeof(float));
-    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD));
+    i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(u32));
 }
 
 void CSoundRender_Core::i_eax_listener_get(CSound_environment* _E)

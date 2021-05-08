@@ -236,7 +236,7 @@ uint64_t _cdecl _strtoui64(const char *nptr, char **endptr, int base)
 
 CInifile* CInifile::Create(pcstr fileName, bool readOnly)
 {
-    return new CInifile(fileName, readOnly);
+    return xr_new<CInifile>(fileName, readOnly);
 }
 
 void CInifile::Destroy(CInifile* ini) { xr_delete(ini); }
@@ -451,7 +451,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             R_ASSERT(path && path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-                xr_strlwr(inc_name); // compensate removed xr_strlwr on path
+                xr_fs_nostrlwr(inc_name); // compensate removed xr_strlwr on path on Linux, etc
 
                 string_path fn;
                 strconcat(sizeof fn, fn, path, inc_name);
@@ -476,7 +476,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                     xrDebug::Fatal(DEBUG_INFO, "Duplicate section '%s' found.", *Current->Name);
                 DATA.insert(I, Current);
             }
-            Current = new Sect();
+            Current = xr_new<Sect>();
             Current->Name = nullptr;
             // start new section
             R_ASSERT3(strchr(str, ']'), "Bad ini section found: ", str);
@@ -832,7 +832,7 @@ u32 CInifile::r_color(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     u32 r = 0, g = 0, b = 0, a = 255;
-    sscanf(C, "%d,%d,%d,%d", &r, &g, &b, &a);
+    sscanf(C, "%u,%u,%u,%u", &r, &g, &b, &a);
     return color_rgba(r, g, b, a);
 }
 
@@ -941,7 +941,7 @@ void CInifile::w_string(pcstr S, pcstr L, pcstr V, pcstr comment)
     if (!section_exist(sect))
     {
         // create _new_ section
-        Sect* NEW = new Sect();
+        Sect* NEW = xr_new<Sect>();
         NEW->Name = sect;
         auto I = std::lower_bound(DATA.begin(), DATA.end(), sect, sect_pred);
         DATA.insert(I, NEW);

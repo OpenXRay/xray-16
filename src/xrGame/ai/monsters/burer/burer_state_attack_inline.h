@@ -18,15 +18,15 @@ float const health_delta = 0.01f;
 template <typename Object>
 CStateBurerAttack<Object>::CStateBurerAttack(Object* obj) : inherited(obj)
 {
-    this->add_state(eStateBurerAttack_Tele, new CStateBurerAttackTele<Object>(obj));
-    this->add_state(eStateBurerAttack_Gravi, new CStateBurerAttackGravi<Object>(obj));
-    this->add_state(eStateBurerAttack_Melee, new CStateBurerAttackMelee<Object>(obj));
-    this->add_state(eStateBurerAttack_FaceEnemy, new CStateMonsterLookToPoint<Object>(obj));
-    this->add_state(eStateBurerAttack_RunAround, new CStateBurerAttackRunAround<Object>(obj));
-    this->add_state(eStateBurerAttack_Shield, new CStateBurerShield<Object>(obj));
-    this->add_state(eStateBurerAttack_AntiAim, new CStateBurerAntiAim<Object>(obj));
-    this->add_state(eStateAttack_Run, new CStateMonsterAttackRun<Object>(obj));
-    this->add_state(eStateCustomMoveToRestrictor, new CStateMonsterMoveToRestrictor<Object>(obj));
+    this->add_state(eStateBurerAttack_Tele, xr_new<CStateBurerAttackTele<Object>>(obj));
+    this->add_state(eStateBurerAttack_Gravi, xr_new<CStateBurerAttackGravi<Object>>(obj));
+    this->add_state(eStateBurerAttack_Melee, xr_new<CStateBurerAttackMelee<Object>>(obj));
+    this->add_state(eStateBurerAttack_FaceEnemy, xr_new<CStateMonsterLookToPoint<Object>>(obj));
+    this->add_state(eStateBurerAttack_RunAround, xr_new<CStateBurerAttackRunAround<Object>>(obj));
+    this->add_state(eStateBurerAttack_Shield, xr_new<CStateBurerShield<Object>>(obj));
+    this->add_state(eStateBurerAttack_AntiAim, xr_new<CStateBurerAntiAim<Object>>(obj));
+    this->add_state(eStateAttack_Run, xr_new<CStateMonsterAttackRun<Object>>(obj));
+    this->add_state(eStateCustomMoveToRestrictor, xr_new<CStateMonsterMoveToRestrictor<Object>>(obj));
 
     m_allow_anti_aim = false;
     m_wait_state_end = false;

@@ -11,12 +11,12 @@
 #include "IPHdebug.h"
 #endif
 
-BOOL CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
+bool CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
 {
     int s_count = R.r_count();
-    BOOL res = inherited::_RayQuery(Q, R);
+    bool res = inherited::_RayQuery(Q, R);
     if (!res)
-        return FALSE;
+        return false;
 
     VERIFY(owner);
     VERIFY(owner->Visual());
@@ -65,7 +65,7 @@ BOOL CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results&
     {
     IKinematics::pick_result r;
     if( K->PickBone( owner->XFORM(), r, Q.range, Q.start, Q.dir, (u16) i->element ) )
-    return TRUE;
+    return true;
     }
     */
     VERIFY(R.r_count() >= s_count);

@@ -153,7 +153,7 @@ void CStringTable::Load(LPCSTR xml_file_full)
     uiXml.Load(CONFIG_PATH, _s, xml_file_full);
 
     //общий список всех записей таблицы в файле
-    int string_num = uiXml.GetNodesNum(uiXml.GetRoot(), "string");
+    const int string_num = uiXml.GetNodesNum(uiXml.GetRoot(), "string");
 
     for (int i = 0; i < string_num; ++i)
     {
@@ -169,7 +169,7 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
         VERIFY3(string_text, "string table entry does not has a text", string_name);
 
-        STRING_VALUE str_val = ParseLine(string_text, string_name, true);
+        const STRING_VALUE str_val = ParseLine(string_text, string_name, true);
 
         pData->m_StringTable[string_name] = str_val;
     }
@@ -189,7 +189,7 @@ void CStringTable::ReparseKeyBindings()
     if (!pData)
         return;
     auto it = pData->m_string_key_binding.begin();
-    auto it_e = pData->m_string_key_binding.end();
+    const auto it_e = pData->m_string_key_binding.end();
 
     for (; it != it_e; ++it)
     {
@@ -199,12 +199,14 @@ void CStringTable::ReparseKeyBindings()
 
 STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
 {
-    xr_string res;
-    int k = 0;
-    const char* b;
-#define ACTION_STR "$$ACTION_"
+    constexpr char   ACTION_STR[]       = "$$ACTION_";
+    constexpr char   ACTION_STR_END[]   = "$$";
+    constexpr size_t ACTION_STR_LEN     = std::size(ACTION_STR) - 1;
+    constexpr size_t ACTION_STR_END_LEN = std::size(ACTION_STR_END) - 1;
 
-#define LEN 9
+    xr_string res;
+    size_t k = 0;
+    const char* b;
 
     string256 buff;
     string256 srcbuff;
@@ -215,23 +217,32 @@ STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
         buff[0] = 0;
         srcbuff[0] = 0;
         res.append(str + k, b - str - k);
-        const char* e = strstr(b + LEN, "$$");
+        const char* e = strstr(b + ACTION_STR_LEN, ACTION_STR_END);
 
-        int len = (int)(e - b - LEN);
+        const size_t len = (e - b - ACTION_STR_LEN);
 
-        strncpy_s(srcbuff, b + LEN, len);
+        strncpy_s(srcbuff, b + ACTION_STR_LEN, len);
         srcbuff[len] = 0;
-        GetActionAllBinding(srcbuff, buff, sizeof(buff));
-        res.append(buff, xr_strlen(buff));
+        if (ActionNameToPtr(srcbuff)) // if exist, get bindings
+        {
+            [[maybe_unused]] const bool result =
+                GetActionAllBinding(srcbuff, buff, sizeof(buff));
+            VERIFY(result);
+            res.append(buff, xr_strlen(buff));
+        }
+        else // doesn't exist, insert as is
+        {
+            res.append(b, ACTION_STR_LEN + len + 2);
+        }
 
-        k = (int)(b - str);
+        k = (b - str);
         k += len;
-        k += LEN;
-        k += 2;
+        k += ACTION_STR_LEN;
+        k += ACTION_STR_END_LEN;
         b_hit = true;
     };
 
-    if (k < (int)xr_strlen(str))
+    if (k < xr_strlen(str))
     {
         res.append(str + k);
     }
@@ -248,6 +259,5 @@ STRING_VALUE CStringTable::translate(const STRING_ID& str_id) const
 
     if (pData->m_StringTable.find(str_id) != pData->m_StringTable.end())
         return pData->m_StringTable[str_id];
-    else
-        return str_id;
+    return str_id;
 }

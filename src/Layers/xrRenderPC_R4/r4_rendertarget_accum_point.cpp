@@ -158,10 +158,7 @@ void CRenderTarget::accum_point(light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
-        else
-            u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
         if (!RImplementation.o.dx10_msaa)
@@ -199,7 +196,6 @@ void CRenderTarget::accum_point(light* L)
         }
     }
 
-    // CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
     RCache.set_Scissor(0);
 
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up

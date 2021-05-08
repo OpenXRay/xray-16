@@ -155,15 +155,15 @@ void CScriptEntity::AddAction(const CScriptEntityAction* tpEntityAction, bool bH
 {
     bool empty = m_tpActionQueue.empty();
     if (!bHighPriority || m_tpActionQueue.empty())
-        m_tpActionQueue.push_back(new CScriptEntityAction(*tpEntityAction));
+        m_tpActionQueue.push_back(xr_new<CScriptEntityAction>(*tpEntityAction));
     else
     {
         VERIFY(m_tpActionQueue.front());
-        CScriptEntityAction* l_tpEntityAction = new CScriptEntityAction(*m_tpActionQueue.front());
+        CScriptEntityAction* l_tpEntityAction = xr_new<CScriptEntityAction>(*m_tpActionQueue.front());
         vfFinishAction(m_tpActionQueue.front());
         xr_delete(m_tpActionQueue.front());
         m_tpActionQueue.front() = l_tpEntityAction;
-        m_tpActionQueue.insert(m_tpActionQueue.begin(), new CScriptEntityAction(*tpEntityAction));
+        m_tpActionQueue.insert(m_tpActionQueue.begin(), xr_new<CScriptEntityAction>(*tpEntityAction));
     }
 
     if (empty && m_initialized)
@@ -398,7 +398,7 @@ bool CScriptEntity::bfAssignSound(CScriptEntityAction* tpEntityAction)
     {
         if (xr_strlen(l_tSoundAction.m_caSoundToPlay))
         {
-            m_current_sound = new ref_sound();
+            m_current_sound = xr_new<ref_sound>();
             m_current_sound->create(*l_tSoundAction.m_caSoundToPlay, st_Effect, l_tSoundAction.m_sound_type);
         }
         else
@@ -573,7 +573,7 @@ LPCSTR CScriptEntity::GetPatrolPathName()
     return (*m_tpActionQueue.back()->m_tMovementAction.m_path_name);
 }
 
-BOOL CScriptEntity::net_Spawn(CSE_Abstract* DC)
+bool CScriptEntity::net_Spawn(CSE_Abstract* DC)
 {
     m_initialized = true;
     object().setVisible(TRUE);

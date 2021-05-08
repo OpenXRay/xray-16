@@ -21,7 +21,7 @@ public:
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
     virtual void Die(IGameObject* who);
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void Load(LPCSTR section);
     virtual void Hit(SHit* pHDS);
 

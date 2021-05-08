@@ -49,7 +49,7 @@ HRESULT NVI_Image::Initialize(int width, int height, NVI_PIXEL_FORMAT fmt)
     m_nSizeX = width;
     m_nSizeY = height;
     int bytes_per_pixel = GetBytesPerPixel();
-    m_pArray = new BYTE[width * height * bytes_per_pixel];
+    m_pArray = new u8[width * height * bytes_per_pixel];
     VERIFY(m_pArray);
     return S_OK;
 }
@@ -62,8 +62,8 @@ HRESULT NVI_Image::Initialize(int width, int height, NVI_PIXEL_FORMAT fmt, u8* d
     return S_OK;
 }
 
-UINT NVI_Image::GetNumPixels() { return GetHeight() * GetWidth(); }
-UINT NVI_Image::GetBytesPerPixel()
+u32 NVI_Image::GetNumPixels() { return GetHeight() * GetWidth(); }
+u32 NVI_Image::GetBytesPerPixel()
 {
     switch (m_Format)
     {
@@ -79,7 +79,7 @@ UINT NVI_Image::GetBytesPerPixel()
     return 0;
 }
 
-UINT NVI_Image::GetImageNumBytes()
+u32 NVI_Image::GetImageNumBytes()
 {
 #ifdef _DEBUG
     float numbytes = (float)m_nSizeX * (float)m_nSizeY * (float)GetBytesPerPixel();
@@ -99,16 +99,16 @@ bool NVI_Image::IsDataValid()
 void NVI_Image::FlipTopToBottom()
 {
     assert(IsDataValid());
-    UINT bpp = GetBytesPerPixel();
+    u32 bpp = GetBytesPerPixel();
     assert(bpp >= 1);
-    UINT width = GetWidth();
-    BYTE* swap = new BYTE[width * bpp];
+    u32 width = GetWidth();
+    u8* swap = new u8[width * bpp];
     assert(swap != NULL);
-    UINT height = GetHeight();
-    for (DWORD row = 0; row < GetHeight() / 2; row++)
+    u32 height = GetHeight();
+    for (u32 row = 0; row < GetHeight() / 2; row++)
     {
-        BYTE* end_row = &(m_pArray[bpp * width * (height - row - 1)]);
-        BYTE* start_row = &(m_pArray[bpp * width * row]);
+        u8* end_row = &(m_pArray[bpp * width * (height - row - 1)]);
+        u8* start_row = &(m_pArray[bpp * width * row]);
         // copy row toward end of image into temporary swap buffer
         memcpy(swap, end_row, bpp * width);
         // copy row at beginning to row at end
@@ -129,14 +129,14 @@ void NVI_Image::AverageRGBToAlpha()
     // a8r8g8b8 implementation
     for (int k = 0; k < cnt; k++)
     {
-        DWORD pix;
+        u32 pix;
         GetPixel_ARGB8(&pix, k);
         float r = (float)((pix & 0x00FF0000) >> 16);
         float g = (float)((pix & 0x0000FF00) >> 8);
         float b = (float)((pix & 0x000000FF));
         r = (r + g + b) / 3.0f;
         pix &= 0x00FFFFFF;
-        pix |= (DWORD)r << 24;
+        pix |= (u32)r << 24;
         SetPixel_ARGB8(k, pix);
     }
 }
@@ -146,15 +146,15 @@ void NVI_Image::ABGR8_To_ARGB8()
     // swaps RGB for all pixels
     assert(IsDataValid());
     assert(GetBytesPerPixel() == 4);
-    UINT hxw = GetNumPixels();
-    for (UINT i = 0; i < hxw; i++)
+    u32 hxw = GetNumPixels();
+    for (u32 i = 0; i < hxw; i++)
     {
-        DWORD col;
+        u32 col;
         GetPixel_ARGB8(&col, i);
-        DWORD a = (col >> 24) & 0x000000FF;
-        DWORD b = (col >> 16) & 0x000000FF;
-        DWORD g = (col >> 8) & 0x000000FF;
-        DWORD r = (col >> 0) & 0x000000FF;
+        u32 a = (col >> 24) & 0x000000FF;
+        u32 b = (col >> 16) & 0x000000FF;
+        u32 g = (col >> 8) & 0x000000FF;
+        u32 r = (col >> 0) & 0x000000FF;
         col = (a << 24) | (r << 16) | (g << 8) | b;
         SetPixel_ARGB8(i, col);
     }
@@ -220,9 +220,9 @@ void NVI_ImageBordered::CopyDataFromSource()
     // size of image array
     int sx = (*m_hSrcImage)->m_nSizeX;
     int sy = (*m_hSrcImage)->m_nSizeY;
-    DWORD* pSrcArray = (DWORD*)(*m_hSrcImage)->m_pArray;
+    u32* pSrcArray = (u32*)(*m_hSrcImage)->m_pArray;
     assert(pSrcArray != NULL);
-    DWORD* pPadArray = (DWORD*)m_pArray;
+    u32* pPadArray = (u32*)m_pArray;
     assert(m_pArray != NULL);
     // Duplicate values into the padded region, taking wrapping into account
     //.	ASSERT_MSG( m_nBorderXLow < sx, "Borders larger than image not supported! ulow\n" );
@@ -234,7 +234,7 @@ void NVI_ImageBordered::CopyDataFromSource()
     {
         // j is in coords of the source image
         // low bounds are negative or zero
-        memcpy(&pPadArray[(j - m_nBorderYLow) * m_nSizeX - m_nBorderXLow], &pSrcArray[j * sx], sizeof(DWORD) * sx);
+        memcpy(&pPadArray[(j - m_nBorderYLow) * m_nSizeX - m_nBorderXLow], &pSrcArray[j * sx], sizeof(u32) * sx);
     }
     if (m_bWrap)
     {
@@ -245,24 +245,24 @@ void NVI_ImageBordered::CopyDataFromSource()
             // j is in coords of the dest padded array
             // Copy right side image pixels into left edge border padded area
             // Use (- low bound) as the low will be <= 0
-            memcpy(&pPadArray[j * m_nSizeX], &pPadArray[(j * m_nSizeX) + sx], sizeof(DWORD) * (-m_nBorderXLow));
+            memcpy(&pPadArray[j * m_nSizeX], &pPadArray[(j * m_nSizeX) + sx], sizeof(u32) * (-m_nBorderXLow));
             // Copy left side image pixels into right edge border padded area
             memcpy(&pPadArray[j * m_nSizeX - m_nBorderXLow + sx], &pPadArray[j * m_nSizeX - m_nBorderXLow],
-                sizeof(DWORD) * (m_nBorderXHigh));
+                sizeof(u32) * (m_nBorderXHigh));
         }
         for (int j = 0; j < m_nBorderYHigh; j++)
         {
             // Copy low source image pixels into upper edge border padded area
             // krn_v_lowbound is negative or zero
             memcpy(&pPadArray[(j + sy - m_nBorderYLow) * m_nSizeX], &pPadArray[(j - m_nBorderYLow) * m_nSizeX],
-                sizeof(DWORD) * m_nSizeX);
+                sizeof(u32) * m_nSizeX);
         }
         for (int j = 0; j < -m_nBorderYLow; j++)
         {
             // Copy high source image pixels into lower border padded area
             // krn_v_lowbound is negative or zero
             // This completes the image tiling into the larger padded texture
-            memcpy(&pPadArray[j * m_nSizeX], &pPadArray[(j + sy - 1) * m_nSizeX], sizeof(DWORD) * m_nSizeX);
+            memcpy(&pPadArray[j * m_nSizeX], &pPadArray[(j + sy - 1) * m_nSizeX], sizeof(u32) * m_nSizeX);
         }
     }
     else
@@ -274,14 +274,14 @@ void NVI_ImageBordered::CopyDataFromSource()
             // Copy highest source image pixel row into upper edge border padded area
             // krn_v_lowbound is negative or zero
             memcpy(&pPadArray[(j + sy - m_nBorderYLow) * m_nSizeX], &pPadArray[(sy - 1 - m_nBorderYLow) * m_nSizeX],
-                sizeof(DWORD) * m_nSizeX);
+                sizeof(u32) * m_nSizeX);
         }
         for (int j = 0; j < -m_nBorderYLow; j++)
         {
             // Copy lowest source image pixels into lower border padded area
             // krn_v_lowbound is negative or zero
             // This completes the image tiling into the larger padded texture
-            memcpy(&pPadArray[j * m_nSizeX], &pPadArray[(-m_nBorderYLow) * m_nSizeX], sizeof(DWORD) * m_nSizeX);
+            memcpy(&pPadArray[j * m_nSizeX], &pPadArray[(-m_nBorderYLow) * m_nSizeX], sizeof(u32) * m_nSizeX);
         }
         // Now copy out border pixels to left and right
         for (int j = 0; j < m_nSizeY; j++)
@@ -290,17 +290,17 @@ void NVI_ImageBordered::CopyDataFromSource()
             // Copy right side image pixel to fill the right side padded row
             for (int i = sx - m_nBorderXLow; i < m_nSizeX; i++)
             {
-                memcpy(&pPadArray[j * m_nSizeX + i], &pPadArray[j * m_nSizeX + i - 1], sizeof(DWORD));
+                memcpy(&pPadArray[j * m_nSizeX + i], &pPadArray[j * m_nSizeX + i - 1], sizeof(u32));
             }
             // Copy left side src image pixel into left edge padded area
             for (int i = -m_nBorderXLow - 1; i >= 0; i--)
             {
-                memcpy(&pPadArray[j * m_nSizeX + i], &pPadArray[j * m_nSizeX + i + 1], sizeof(DWORD));
+                memcpy(&pPadArray[j * m_nSizeX + i], &pPadArray[j * m_nSizeX + i + 1], sizeof(u32));
             }
         }
     }
     // To save the result of the padding operation:
     //	ulTarga newfile;
     //	newfile.WriteFile( "temp_result1.tga", (unsigned char*) pPadArray,
-    //						(DWORD) m_nSizeX, (DWORD) m_nSizeY, 32, 32, 0 );
+    //						(u32) m_nSizeX, (u32) m_nSizeY, 32, 32, 0 );
 }

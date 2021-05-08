@@ -77,7 +77,7 @@ void CPhysicsShellHolder::net_Destroy()
 
 enum EEnableState { stEnable = 0, stDisable, stNotDefitnite }; // stNotDefitnite? Possibly mistaken name
 static u8 st_enable_state = (u8)stNotDefitnite;
-BOOL CPhysicsShellHolder::net_Spawn(CSE_Abstract* DC)
+bool CPhysicsShellHolder::net_Spawn(CSE_Abstract* DC)
 {
     CParticlesPlayer::net_SpawnParticles();
     st_enable_state = (u8)stNotDefitnite;

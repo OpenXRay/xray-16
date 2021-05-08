@@ -34,19 +34,19 @@ CSpectator::CSpectator() : CGameObject()
     m_timer.Start();
     m_fTimeDelta = EPS_S;
     // Cameras
-    cameras[eacFirstEye] = new CCameraFirstEye(this);
+    cameras[eacFirstEye] = xr_new<CCameraFirstEye>(this);
     cameras[eacFirstEye]->Load("actor_firsteye_cam");
 
-    cameras[eacLookAt] = new CCameraLook(this);
+    cameras[eacLookAt] = xr_new<CCameraLook>(this);
     cameras[eacLookAt]->Load("actor_look_cam");
 
-    cameras[eacFreeLook] = new CCameraLook(this);
+    cameras[eacFreeLook] = xr_new<CCameraLook>(this);
     cameras[eacFreeLook]->Load("actor_free_cam");
 
-    cameras[eacFreeFly] = new CSpectrCameraFirstEye(m_fTimeDelta, this, 0);
+    cameras[eacFreeFly] = xr_new<CSpectrCameraFirstEye>(m_fTimeDelta, this, 0);
     cameras[eacFreeFly]->Load("actor_firsteye_cam");
 
-    cameras[eacFixedLookAt] = new CCameraFixedLook(this);
+    cameras[eacFixedLookAt] = xr_new<CCameraFixedLook>(this);
     cameras[eacFixedLookAt]->Load("actor_look_cam");
 
     //	cam_active				= eacFreeFly;
@@ -495,7 +495,7 @@ void CSpectator::cam_Update(CActor* A)
     };
 }
 
-BOOL CSpectator::net_Spawn(CSE_Abstract* DC)
+bool CSpectator::net_Spawn(CSE_Abstract* DC)
 {
     BOOL res = inherited::net_Spawn(DC);
     if (!res)

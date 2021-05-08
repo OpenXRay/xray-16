@@ -150,7 +150,7 @@ ETOOLS_API bool __stdcall TestRayTri2(const Fvector& C, const Fvector& D, Fvecto
     return true;
 }
 
-ETOOLS_API CDB::Collector* __stdcall create_collector() { return new CDB::Collector(); }
+ETOOLS_API CDB::Collector* __stdcall create_collector() { return xr_new<CDB::Collector>(); }
 ETOOLS_API void __stdcall destroy_collector(CDB::Collector*& M) { xr_delete(M); }
 ETOOLS_API void __stdcall collector_add_face_d(
     CDB::Collector* CL, const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 dummy)
@@ -165,7 +165,7 @@ ETOOLS_API void __stdcall collector_add_face_pd(
 
 ETOOLS_API CDB::CollectorPacked* __stdcall create_collectorp(const Fbox& bb, int apx_vertices, int apx_faces)
 {
-    return new CDB::CollectorPacked(bb, apx_vertices, apx_faces);
+    return xr_new<CDB::CollectorPacked>(bb, apx_vertices, apx_faces);
 }
 ETOOLS_API void __stdcall destroy_collectorp(CDB::CollectorPacked*& M) { xr_delete(M); }
 ETOOLS_API void __stdcall collectorp_add_face_d(
@@ -186,7 +186,7 @@ ETOOLS_API CDB::MODEL* __stdcall create_model_cl(CDB::Collector* CL)
 }
 ETOOLS_API CDB::MODEL* __stdcall create_model(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt)
 {
-    CDB::MODEL* M = new CDB::MODEL();
+    CDB::MODEL* M = xr_new<CDB::MODEL>();
     M->build(V, Vcnt, T, Tcnt);
     return M;
 }

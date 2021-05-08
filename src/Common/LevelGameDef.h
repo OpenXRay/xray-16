@@ -51,10 +51,10 @@ xr_token rpoint_type[] = {
 #define POINT_BASE 0x2000
 
 // POINT chunks
-#define RPOINT_CHUNK POINT_BASE + ptRPoint
+#define RPOINT_CHUNK (POINT_BASE + ptRPoint)
 
 // WAY chunks
-#define WAY_PATROLPATH_CHUNK WAY_BASE + wtPatrolPath
+#define WAY_PATROLPATH_CHUNK (WAY_BASE + wtPatrolPath)
 //----------------------------------------------------
 
 #define WAYOBJECT_VERSION 0x0013

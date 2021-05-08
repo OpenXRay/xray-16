@@ -2,14 +2,16 @@
 #include "xr_effgamma.h"
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
+
 #if defined(XR_PLATFORM_WINDOWS)
 #include <FreeImage/FreeImagePlus.h>
 #else
 #include <FreeImagePlus.h>
 #endif
-#if defined(USE_DX10) || defined(USE_DX11)
-#include "d3dx10tex.h"
-#endif // USE_DX10
+
+#if !defined(USE_DX9) && !defined(USE_OGL)
+#include "d3dx11tex.h"
+#endif
 
 using namespace XRay::Media;
 
@@ -145,7 +147,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     else
         Log("! Failed to make a screenshot");
 }
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
     ID3DResource* pSrcTexture;
@@ -173,21 +175,11 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
 
         //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
-
-#ifdef USE_DX11
         CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
-#else
-        CHK_DX(D3DX10LoadTextureFromTexture(pSrcTexture, NULL, pSrcSmallTexture));
-#endif
 
         // save (logical & physical)
         ID3DBlob* saved = nullptr;
-#ifdef USE_DX11
         HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
-#else
-        HRESULT hr = D3DX10SaveTextureToMemory(pSrcSmallTexture, D3DX10_IFF_DDS, &saved, 0);
-        //HRESULT hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, 0);
-#endif
         if (hr == D3D_OK)
         {
             IWriter* fs = FS.w_open(name);
@@ -220,20 +212,11 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
 
         //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
-
-#ifdef USE_DX11
         CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
-#else
-        CHK_DX(D3DX10LoadTextureFromTexture(pSrcTexture, NULL, pSrcSmallTexture));
-#endif
+
         // save (logical & physical)
         ID3DBlob* saved = nullptr;
-#ifdef USE_DX11
         HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
-#else
-        HRESULT hr = D3DX10SaveTextureToMemory(pSrcSmallTexture, D3DX10_IFF_DDS, &saved, 0);
-        //HRESULT hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, 0);
-#endif
         if (hr == D3D_OK)
         {
             if (!memory_writer)
@@ -262,12 +245,10 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         string_path buf;
         xr_sprintf(buf, sizeof buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp),
                    g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
         ID3DBlob* saved = nullptr;
-#ifdef USE_DX11
         CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_JPG, &saved, 0));
-#else
-        CHK_DX(D3DX10SaveTextureToMemory(pSrcTexture, D3DX10_IFF_JPG, &saved, 0));
-#endif
+
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
         fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
@@ -278,13 +259,10 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         { // hq
             xr_sprintf(buf, sizeof buf, "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
                        g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
             ID3DBlob* saved2 = nullptr;
-#ifdef USE_DX11
             CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_BMP, &saved2, 0));
-#else
-            CHK_DX(D3DX10SaveTextureToMemory(pSrcTexture, D3DX10_IFF_BMP, &saved2, 0));
-            //CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_TGA, pFB, 0, 0));
-#endif
+
             IWriter* fs2 = FS.w_open("$screenshots$", buf);
             R_ASSERT(fs2);
             fs2->w(saved2->GetBufferPointer(), saved2->GetBufferSize());
@@ -306,11 +284,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         HW.pContext->CopyResource(pTex, pSrcTexture);
 
         D3D_MAPPED_TEXTURE2D MappedData;
-#ifdef USE_DX11
         HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
-#else
-        pTex->Map(0, D3D_MAP_READ, 0, &MappedData);
-#endif
         // Swap r and b, but don't kill alpha
         {
             u32* pPixel = (u32*)MappedData.pData;
@@ -325,11 +299,8 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         // save
         u32* data = (u32*)xr_malloc(Device.dwHeight * Device.dwHeight * 4);
         imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)MappedData.pData, Device.dwWidth, Device.dwHeight, imf_lanczos3);
-#ifdef USE_DX11
         HW.pContext->Unmap(pTex, 0);
-#else
-        pTex->Unmap(0);
-#endif
+
         Image img;
         img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageFormat::RGBA8);
         img.SaveTGA(*fs, true);
@@ -342,7 +313,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     _RELEASE(pSrcTexture);
 }
 
-#else // USE_DX10
+#else // USE_DX9
 
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
@@ -548,7 +519,7 @@ _end_:
     _RELEASE(pFB);
 }
 
-#endif // USE_DX10
+#endif // USE_OGL
 
 void CRender::Screenshot(ScreenshotMode mode, LPCSTR name) { ScreenshotImpl(mode, name, nullptr); }
 void CRender::Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer)
@@ -575,7 +546,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
     VERIFY(!"CRender::ScreenshotAsyncEnd not implemented.");
 }
 
-#elif defined(USE_DX10) || defined(USE_DX11)
+#elif !defined(USE_DX9)
 
 void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 {
@@ -586,12 +557,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 
     D3D_MAPPED_TEXTURE2D MappedData;
 
-#ifdef USE_DX11
     HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
-#else
-    pTex->Map(0, D3D_MAP_READ, 0, &MappedData);
-#endif
-
     {
         u32* pPixel = (u32*)MappedData.pData;
         u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
@@ -607,15 +573,10 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         memory_writer.w(&Device.dwHeight, sizeof(Device.dwHeight));
         memory_writer.w(MappedData.pData, (Device.dwWidth * Device.dwHeight) * 4);
     }
-
-#ifdef USE_DX11
     HW.pContext->Unmap(pTex, 0);
-#else
-    pTex->Unmap(0);
-#endif
 }
 
-#else // USE_DX10
+#else // USE_DX9
 
 void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 {
@@ -624,7 +585,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 
     VERIFY(!m_bMakeAsyncSS);
 
-    IDirect3DSurface9* pFB = Target->pFB->pRT;
+    IDirect3DSurface9* pFB = Target->rt_async_ss->pRT;
 
     D3DLOCKED_RECT D;
     const HRESULT hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
@@ -651,7 +612,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         static const int iMaxPixelsInARow = 1024;
         D3DXFLOAT16* pPixelElement16 = (D3DXFLOAT16*)pPixel;
 
-        FLOAT tmpArray[4 * iMaxPixelsInARow];
+        float tmpArray[4 * iMaxPixelsInARow];
         while (pPixel != pEnd)
         {
             const int iProcessPixels = _min(iMaxPixelsInARow, (s32)(pEnd - pPixel));
@@ -687,6 +648,6 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
     CHK_DX(pFB->UnlockRect());
 }
 
-#endif // USE_DX10
+#endif // USE_OGL
 
 void DoAsyncScreenshot() { RImplementation.Target->DoAsyncScreenshot(); }

@@ -18,18 +18,18 @@
 // Call this to reorder the tris in this trilist to get good vertex-cache coherency.
 // *pwList is modified (but obviously not changed in size or memory location).
 // void OptimiseVertexCoherencyTriList ( WORD *pwList, int iHowManyTris, u32 mode);
-void OptimiseVertexCoherencyTriList(WORD* pwList, int iHowManyTris, u32 optimize_mode)
+void OptimiseVertexCoherencyTriList(u16* pwList, int iHowManyTris, u32 optimize_mode)
 {
     if (iHowManyTris)
     {
         DWORD* remap = xr_alloc<DWORD>(iHowManyTris);
-        WORD max_idx = 0;
+        u16 max_idx = 0;
         for (int k = 0; k < iHowManyTris * 3; k++)
             max_idx = std::max(max_idx, pwList[k]);
         HRESULT rhr = D3DXOptimizeFaces(pwList, iHowManyTris, max_idx + 1, FALSE, remap);
         R_CHK(rhr);
-        WORD* tmp = xr_alloc<WORD>(iHowManyTris * 3);
-        memcpy(tmp, pwList, sizeof(WORD) * 3 * iHowManyTris);
+        u16* tmp = xr_alloc<u16>(iHowManyTris * 3);
+        memcpy(tmp, pwList, sizeof(u16) * 3 * iHowManyTris);
         for (int it = 0; it < iHowManyTris; it++)
         {
             pwList[it * 3 + 0] = tmp[remap[it] * 3 + 0];
@@ -106,7 +106,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
     int iNumCollapses = iCurCollapse;
 
     // Add the remaining existing pts in any old order.
-    WORD wCurIndex = 0;
+    u16 wCurIndex = 0;
     for (pt = object->CurPtRoot.ListNext(); pt != NULL; pt = pt->ListNext())
     {
         if (pt->mypt.dwNewIndex == INVALID_INDEX)
@@ -143,7 +143,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
     int iCurTriBinned = 0;
 
     // Useful thing.
-    ArbitraryList<WORD> wTempIndices;
+    ArbitraryList<u16> wTempIndices;
 
     int iMaxSlidingWindowLevel = iCurSlidingWindowLevel;
 
@@ -201,9 +201,9 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
                         R_ASSERT(pTriInfo->ppt[0]->mypt.dwNewIndex < wCurIndex);
                         R_ASSERT(pTriInfo->ppt[1]->mypt.dwNewIndex < wCurIndex);
                         R_ASSERT(pTriInfo->ppt[2]->mypt.dwNewIndex < wCurIndex);
-                        *wTempIndices.item(i * 3 + 0) = (WORD)pTriInfo->ppt[0]->mypt.dwNewIndex;
-                        *wTempIndices.item(i * 3 + 1) = (WORD)pTriInfo->ppt[1]->mypt.dwNewIndex;
-                        *wTempIndices.item(i * 3 + 2) = (WORD)pTriInfo->ppt[2]->mypt.dwNewIndex;
+                        *wTempIndices.item(i * 3 + 0) = (u16)pTriInfo->ppt[0]->mypt.dwNewIndex;
+                        *wTempIndices.item(i * 3 + 1) = (u16)pTriInfo->ppt[1]->mypt.dwNewIndex;
+                        *wTempIndices.item(i * 3 + 2) = (u16)pTriInfo->ppt[2]->mypt.dwNewIndex;
                         iCurNumTris--;
                     }
 
@@ -257,9 +257,9 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
                     R_ASSERT(pTriInfo->ppt[0]->mypt.dwNewIndex < wCurIndex);
                     R_ASSERT(pTriInfo->ppt[1]->mypt.dwNewIndex < wCurIndex);
                     R_ASSERT(pTriInfo->ppt[2]->mypt.dwNewIndex < wCurIndex);
-                    *wTempIndices.item(i * 3 + 0) = (WORD)pTriInfo->ppt[0]->mypt.dwNewIndex;
-                    *wTempIndices.item(i * 3 + 1) = (WORD)pTriInfo->ppt[1]->mypt.dwNewIndex;
-                    *wTempIndices.item(i * 3 + 2) = (WORD)pTriInfo->ppt[2]->mypt.dwNewIndex;
+                    *wTempIndices.item(i * 3 + 0) = (u16)pTriInfo->ppt[0]->mypt.dwNewIndex;
+                    *wTempIndices.item(i * 3 + 1) = (u16)pTriInfo->ppt[1]->mypt.dwNewIndex;
+                    *wTempIndices.item(i * 3 + 2) = (u16)pTriInfo->ppt[2]->mypt.dwNewIndex;
                     iCurNumTris++;
                 }
 

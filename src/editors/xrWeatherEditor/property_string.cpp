@@ -10,7 +10,7 @@
 #include "property_string.hpp"
 
 property_string::property_string(string_getter_type const& getter, string_setter_type const& setter)
-    : m_getter(new string_getter_type(getter)), m_setter(new string_setter_type(setter))
+    : m_getter(xr_new<string_getter_type>(getter)), m_setter(xr_new<string_setter_type>(setter))
 {
 }
 

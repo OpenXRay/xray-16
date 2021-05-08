@@ -1,6 +1,17 @@
 #include "common.h"
 #include "iostructs\p_water.h"
 
+// Used only in ssr.h
+// Should be hidden under (SSR_QUALITY > 0) check, but I'm not sure if it won't crash
+// when engine will try to use s_half_depth when SSLR is off.
+Texture2D   s_half_depth;
+
+#if SSR_QUALITY > 0
+uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
+
+#include "ssr.h"
+#endif
+
 Texture2D	s_nmap;
 TextureCube	s_env0;
 TextureCube	s_env1;
@@ -39,6 +50,9 @@ float4 _main( v2p I )
 	float3	env0	= texCUBE (s_env0, vreflect).rgb;
 	float3	env1	= texCUBE (s_env1, vreflect).rgb;
 	float3	env	= lerp (env0,env1, L_ambient.w);
+#if SSR_QUALITY > 0
+	env = compute_ssr(I.position_w.xyz, Nw, env).xyz;
+#endif
 		env	*= env*2.0;
 
 	float	fresnel	= saturate (dot(vreflect,v2point));

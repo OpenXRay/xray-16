@@ -269,12 +269,12 @@ public:
 };
 #endif // DEBUG
 
-extern void WriteCDKey_ToRegistry(LPSTR cdkey);
+extern void WriteCDKey_ToRegistry(pstr cdkey);
 
 class CCC_GSCDKey : public CCC_String
 {
 public:
-    CCC_GSCDKey(LPCSTR N, LPSTR V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = true; };
+    CCC_GSCDKey(LPCSTR N, pstr V, int _size) : CCC_String(N, V, _size) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR arguments)
     {
         string64 cdkey;
@@ -328,7 +328,7 @@ struct SearcherClientByName
     bool operator()(IClient* client)
     {
         xrClientData* temp_client = smart_cast<xrClientData*>(client);
-        LPSTR tmp_player = NULL;
+        pstr tmp_player = NULL;
         if (!temp_client->ps)
             return false;
 
@@ -475,7 +475,7 @@ static xrClientData* exclude_command_initiator(LPCSTR args)
     }
     return NULL;
 };
-static char const* exclude_raid_from_args(LPCSTR args, LPSTR dest, size_t dest_size)
+static char const* exclude_raid_from_args(LPCSTR args, pstr dest, size_t dest_size)
 {
     strncpy_s(dest, dest_size, args, dest_size - 1);
     char* tmp_str = strrchr(dest, ' ');
@@ -1015,9 +1015,9 @@ public:
         }
         else
         {
-            // size_t ????? u32 maybe?
+            // XXX: size_t ????? u32 maybe?
             size_t player_index = 0;
-            if (sscanf(args_, "%u", &player_index) != 1)
+            if (sscanf(args_, "%zu", &player_index) != 1)
             {
                 Msg("! ERROR: bad command parameters.");
                 Msg(" Unban player. Format: \"sv_unbanplayer <banned player index | \'%s\'>. To receive list of banned "
@@ -1053,7 +1053,7 @@ public:
             return;
 
         string1024 digits;
-        LPSTR p = buff + len - 1;
+        pstr p = buff + len - 1;
         while (isdigit(*p))
         {
             if (p == buff)
@@ -1120,7 +1120,7 @@ public:
             return;
 
         string1024 digits;
-        LPSTR p = buff + len - 1;
+        pstr p = buff + len - 1;
         while (isdigit(*p))
         {
             if (p == buff)
@@ -1795,7 +1795,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         ip_address Address;
-        DWORD dwPort = 0;
+        u32 dwPort = 0;
 
         Level().GetServerAddress(Address, &dwPort);
 
@@ -1991,7 +1991,7 @@ public:
             game_sv_mp* game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
             if (game)
             {
-                LPSTR msg;
+                pstr msg;
                 STRCONCAT(msg, args);
                 if (xr_strlen(msg) > 256)
                 {
@@ -2145,7 +2145,7 @@ void register_mp_console_commands()
 //	CMD4(CCC_Integer,		"sv_statistic_save_auto", &g_bStatisticSaveAuto, 0, 1);
 
 #ifndef MASTER_GOLD
-    // Using CCC_AuthCheck twice, yes. It's not a mistake. 
+    // Using CCC_AuthCheck twice, yes. It's not a mistake.
     CMD4(CCC_AuthCheck, "sv_no_auth_check", &g_SV_Disable_Auth_Check, 0, 1);
     CMD4(CCC_AuthCheck, "sv_ignore_version_mismatch", &g_sv_ignore_version_mismatch, 0, 1);
 #endif // MASTER_GOLD

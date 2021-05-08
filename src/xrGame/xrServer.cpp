@@ -96,7 +96,7 @@ CSE_Abstract* xrServer::ID_to_entity(u16 ID)
 }
 
 //--------------------------------------------------------------------
-IClient* xrServer::client_Create() { return new xrClientData(); }
+IClient* xrServer::client_Create() { return xr_new<xrClientData>(); }
 void xrServer::client_Replicate() {}
 IClient* xrServer::client_Find_Get(ClientID ID)
 {
@@ -194,7 +194,7 @@ void xrServer::GetPooledState(xrClientData* xrCL)
 int g_Dump_Update_Write = 0;
 
 #ifdef DEBUG
-INT g_sv_SendUpdate = 0;
+bool g_sv_SendUpdate = false;
 #endif
 
 void xrServer::Update()
@@ -353,7 +353,7 @@ void xrServer::SendUpdatesToAll()
         SendUpdatePacketsToAll();
 
 #ifdef DEBUG
-        g_sv_SendUpdate = 0;
+        g_sv_SendUpdate = false;
 #endif
         if (game->sv_force_sync)
             Perform_game_export();
@@ -399,7 +399,7 @@ u32 xrServer::OnDelayedMessage(NET_Packet& P, ClientID sender) // Non-Zero means
             Msg("* Radmin [%s] is running command: %s", CL->ps->getName(), buff);
             SetLogCB(LogCallback(console_log_cb, nullptr));
             _tmp_log.clear();
-            LPSTR result_command;
+            pstr result_command;
             string64 tmp_number_str;
             xr_sprintf(tmp_number_str, " raid:%u", CL->ID.value());
             STRCONCAT(result_command, buff, tmp_number_str);
@@ -1040,7 +1040,7 @@ void xrServer::PerformCheckClientsForMaxPing()
 
                 if (Client->m_ping_warn.m_maxPingWarnings >= g_sv_maxPingWarningsCount)
                 { // kick
-                    LPSTR reason;
+                    pstr reason;
                     STRCONCAT(reason, StringTable().translate("st_kicked_by_server").c_str());
                     Level().Server->DisconnectClient(Client, reason);
                 }
@@ -1199,7 +1199,7 @@ void xrServer::initialize_screenshot_proxies()
 {
     for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
     {
-        m_screenshot_proxies[i] = new clientdata_proxy(m_file_transfers);
+        m_screenshot_proxies[i] = xr_new<clientdata_proxy>(m_file_transfers);
     }
 }
 void xrServer::deinitialize_screenshot_proxies()

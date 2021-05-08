@@ -104,6 +104,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -115,6 +116,7 @@
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -126,6 +128,7 @@
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -137,6 +140,7 @@
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -149,6 +153,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -160,6 +165,7 @@
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>

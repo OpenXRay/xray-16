@@ -82,7 +82,7 @@ public:
 };
 
 #define ADD_TEXT_TO_VIEW3(txt, st, view)              \
-    st = new CUITextWnd();                            \
+    st = xr_new<CUITextWnd>();                            \
     st->SetFont(UI().Font().pFontLetterica16Russian); \
     st->SetText(txt);                                 \
     st->SetTextComplexMode(true);                     \

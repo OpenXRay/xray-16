@@ -118,7 +118,7 @@ void SFillPropData::load()
     string_path gm_name;
     FS.update_path(gm_name, "$game_config$", GAME_CONFIG);
     R_ASSERT3(FS.exist(gm_name), "Couldn't find file", gm_name);
-    Ini = new CInifile(gm_name);
+    Ini = xr_new<CInifile>(gm_name);
 #endif // XRGAME_EXPORTS
 
     // location type
@@ -1432,8 +1432,8 @@ bool CSE_ALifeObjectHangingLamp::match_configuration() const /* noexcept */
 {
     R_ASSERT3(flags.test(flR1) || flags.test(flR2), "no renderer type set for hanging-lamp ", name_replace());
 #ifdef XRGAME_EXPORTS
-    return ((flags.test(flR1) && (GEnv.Render->get_generation() == IRender::GENERATION_R1)) ||
-    (flags.test(flR2) && (GEnv.Render->get_generation() == IRender::GENERATION_R2)));
+    return (flags.test(flR1) && GEnv.Render->GenerationIsR1())
+        || (flags.test(flR2) && GEnv.Render->GenerationIsR2OrHigher());
 #else
     return (true);
 #endif

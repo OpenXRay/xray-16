@@ -19,6 +19,9 @@ v2p _main (v_vert v)
 		P	= watermove(P);
 
 	o.v2point	= P.xyz-eye_position;
+#if SSR_QUALITY > 0
+	o.position_w= P;
+#endif
 	o.tbase		= unpack_tc_base	(v.uv,v.T.w,v.B.w);	// copy tc
 	o.tnorm0	= watermove_tc		(o.tbase*W_DISTORT_BASE_TILE_0, P.xz, W_DISTORT_AMP_0);
 	o.tnorm1	= watermove_tc		(o.tbase*W_DISTORT_BASE_TILE_1, P.xz, W_DISTORT_AMP_1);

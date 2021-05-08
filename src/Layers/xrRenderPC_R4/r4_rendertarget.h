@@ -13,7 +13,6 @@ class light;
 
 class CRenderTarget : public IRender_Target
 {
-private:
     u32 dwWidth;
     u32 dwHeight;
     u32 dwAccumulatorClearMark;
@@ -27,17 +26,7 @@ public:
 
     u32 dwLightMarkerID;
     //
-    IBlender* b_occq;
-    IBlender* b_accum_mask;
-    IBlender* b_accum_direct;
-    IBlender* b_accum_point;
     IBlender* b_accum_spot;
-    IBlender* b_accum_reflected;
-    IBlender* b_bloom;
-    IBlender* b_luminance;
-    IBlender* b_combine;
-    IBlender* b_postprocess_msaa;
-    IBlender* b_bloom_msaa;
     IBlender* b_combine_msaa[8];
     IBlender* b_accum_mask_msaa[8];
     IBlender* b_accum_spot_msaa[8];
@@ -47,12 +36,7 @@ public:
     IBlender* b_accum_volumetric_msaa[8];
     IBlender* b_accum_point_msaa[8];
     IBlender* b_accum_reflected_msaa[8];
-    IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
-
-    // compute shader for hdao
-    IBlender* b_hdao_cs;
-    IBlender* b_hdao_msaa_cs;
 
 #ifdef DEBUG
     struct dbg_line_t
@@ -71,7 +55,7 @@ public:
 
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
-    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
+    ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
     ref_rt rt_Generic_0_r; // MRT generic 0
     ref_rt rt_Generic_1_r; // MRT generic 1
     ref_rt rt_Generic;
@@ -126,8 +110,8 @@ private:
     ref_rt rt_half_depth;
     ref_shader s_ssao;
     ref_shader s_ssao_msaa[8];
-    ref_shader s_hdao_cs;
-    ref_shader s_hdao_cs_msaa;
+    ref_shader s_hdao_cs;      // compute shader
+    ref_shader s_hdao_cs_msaa; // for hdao
 
     // Accum
     ref_shader s_accum_mask;
@@ -178,7 +162,7 @@ private:
     ref_shader s_bloom_dbg_1;
     ref_shader s_bloom_dbg_2;
     ref_shader s_bloom;
-    ref_shader s_bloom_msaa;
+    ref_shader s_bloom_msaa; // if MSAA is disabled, just an alias of s_bloom
     float f_bloom_factor;
 
     // Luminance
@@ -201,7 +185,7 @@ private:
 
 public:
     ref_shader s_postprocess;
-    ref_shader s_postprocess_msaa;
+    ref_shader s_postprocess_msaa; // if MSAA is disabled, just an alias of s_bloom
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;
@@ -233,6 +217,9 @@ private:
 public:
     CRenderTarget();
     ~CRenderTarget();
+
+    void build_textures();
+
     void accum_point_geom_create();
     void accum_point_geom_destroy();
     void accum_omnip_geom_create();
@@ -246,13 +233,22 @@ public:
     ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
     ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pZRT; }
 
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
+    {
+        u_setrt(_1, _2, _3, _zb ? _zb->pZRT : nullptr);
+    }
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb);
+    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
+    {
+        u_setrt(_1, _2, _zb ? _zb->pZRT : nullptr);
+    }
+    void u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
+        ID3DDepthStencilView* zb);
+
     void u_stencil_optimize(eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);
-    void u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);
-    void u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb);
-    void u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
-        ID3DDepthStencilView* zb);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
     bool u_need_PP();

@@ -31,7 +31,7 @@ public:
         mM[1].add(C, E);
         return F->testAABB(&mM[0].x, mask);
     }
-    void _prim(DWORD prim)
+    void _prim(u32 prim)
     {
         if (bClass3)
         {
@@ -93,7 +93,7 @@ void COLLIDER::frustum_query(const MODEL* m_def, const CFrustum& F)
     // Get nodes
     const AABBNoLeafTree* T = (const AABBNoLeafTree*)m_def->tree->GetTree();
     const AABBNoLeafNode* N = T->GetNodes();
-    const DWORD mask = F.getMask();
+    const u32 mask = F.getMask();
     r_clear();
 
     // Binary dispatcher

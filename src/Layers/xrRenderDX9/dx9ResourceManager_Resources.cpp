@@ -2,8 +2,8 @@
 
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/tss.h"
-#include "Layers/xrRender/blenders/Blender.h"
-#include "Layers/xrRender/blenders/Blender_Recorder.h"
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_Recorder.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 template <class T>
@@ -29,7 +29,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
         if (pass->equal(proto))
             return pass;
 
-    SPass* P = v_passes.emplace_back(new SPass());
+    SPass* P = v_passes.emplace_back(xr_new<SPass>());
     P->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     P->state = proto.state;
     P->ps = proto.ps;
@@ -65,7 +65,7 @@ SDeclaration* CResourceManager::_CreateDecl(VertexElement* dcl)
     }
 
     // Create _new
-    SDeclaration* D = v_declarations.emplace_back(new SDeclaration());
+    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
     u32 dcl_size = GetDeclLength(dcl) + 1;
     CHK_DX(HW.pDevice->CreateVertexDeclaration(dcl, &D->dcl));
     D->dcl_code.assign(dcl, dcl + dcl_size);
@@ -123,7 +123,7 @@ SGeometry* CResourceManager::CreateGeom(VertexElement* decl, VertexBufferHandle 
             return v_geom;
     }
 
-    SGeometry* Geom = v_geoms.emplace_back(new SGeometry());
+    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
     Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     Geom->dcl = dcl;
     Geom->vb = vb;
@@ -191,13 +191,13 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         xr_strcat(name, "_3");
     if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
-    LPSTR N = LPSTR(name);
+    pstr N = pstr(name);
     map_VS::iterator I = m_vs.find(N);
     if (I != m_vs.end())
         return I->second;
     else
     {
-        SVS* _vs = new SVS();
+        SVS* _vs = xr_new<SVS>();
         _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         if (0 == xr_stricmp(_name, "null"))
@@ -229,7 +229,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
             c_target = "vs_1_1";
 
         u32 needed_len = fs->length() + 1;
-        LPSTR pfs = xr_alloc<char>(needed_len);
+        pstr pfs = xr_alloc<char>(needed_len);
         strncpy_s(pfs, needed_len, (LPCSTR)fs->pointer(), fs->length());
         pfs[fs->length()] = 0;
 
@@ -312,13 +312,13 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 //--------------------------------------------------------------------------------------------------------------
 SPS* CResourceManager::_CreatePS(LPCSTR name)
 {
-    LPSTR N = LPSTR(name);
+    pstr N = pstr(name);
     map_PS::iterator I = m_ps.find(N);
     if (I != m_ps.end())
         return I->second;
     else
     {
-        SPS* _ps = new SPS();
+        SPS* _ps = xr_new<SPS>();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
         if (0 == xr_stricmp(name, "null"))

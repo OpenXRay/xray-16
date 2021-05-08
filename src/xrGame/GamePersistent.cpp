@@ -218,9 +218,12 @@ void CGamePersistent::OnAppStart()
     Event materialsLoaded, globalsInitialized, menuCreated;
 
     // init game globals
+#ifndef XR_PLATFORM_WINDOWS
+    init_game_globals();
+#else
     TaskScheduler->AddTask("init_game_globals()", init_game_globals,
         nullptr, nullptr, &globalsInitialized);
-
+#endif
     // load game materials
     TaskScheduler->AddTask("GMLib.Load()", [&]()
     {
@@ -230,25 +233,28 @@ void CGamePersistent::OnAppStart()
     }, nullptr, nullptr, &materialsLoaded);
 
     SetupUIStyle();
-    GEnv.UI = new UICore();
+    GEnv.UI = xr_new<UICore>();
 
     TaskScheduler->AddTask("CMainMenu::CMainMenu()", [&]()
     {
-        m_pMainMenu = new CMainMenu();
+        m_pMainMenu = xr_new<CMainMenu>();
     }, nullptr, nullptr, &menuCreated);
 
     inherited::OnAppStart();
 
     if (!GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(new UILoadingScreen());
+        pApp->SetLoadingScreen(xr_new<UILoadingScreen>());
 
 #ifdef XR_PLATFORM_WINDOWS
-    ansel = new AnselManager();
+    ansel = xr_new<AnselManager>();
     ansel->Load();
     ansel->Init();
 #endif
 
+
+#ifdef XR_PLATFORM_WINDOWS
     Device.WaitEvent(globalsInitialized);
+#endif
     Device.WaitEvent(menuCreated);
     Device.WaitEvent(materialsLoaded);
 }
@@ -268,7 +274,9 @@ void CGamePersistent::OnAppEnd()
 
     GMLib.Unload();
 
+#ifdef XR_PLATFORM_WINDOWS
     xr_delete(ansel);
+#endif
 }
 
 void CGamePersistent::Start(LPCSTR op) { inherited::Start(op); }
@@ -513,11 +521,17 @@ bool allow_intro()
         return true;
 }
 
+bool allow_game_intro()
+{
+    return !strstr(Core.Params, "-nogameintro");
+}
+
 void CGamePersistent::start_logo_intro()
 {
-    if (!allow_intro()) // TODO this is dirty hack, rewrite!
+    if (!allow_intro())
     {
         m_intro_event = nullptr;
+        Console->Show();
         Console->Execute("main_menu on");
         return;
     }
@@ -528,7 +542,7 @@ void CGamePersistent::start_logo_intro()
         if (!GEnv.isDedicatedServer && 0 == xr_strlen(m_game_params.m_game_or_spawn) && NULL == g_pGameLevel)
         {
             VERIFY(NULL == m_intro);
-            m_intro = new CUISequencer();
+            m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_logo_intro);
             m_intro->Start("intro_logo");
             Console->Hide();
@@ -548,11 +562,12 @@ void CGamePersistent::game_loaded()
     if (Device.dwPrecacheFrame <= 2)
     {
         m_intro_event = nullptr;
-        if (g_pGameLevel && g_pGameLevel->bReady && (allow_intro() && g_keypress_on_start) &&
+        if (g_pGameLevel && g_pGameLevel->bReady && (allow_game_intro() && g_keypress_on_start) &&
             load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
         {
+            pApp->LoadForceFinish(); // hack
             VERIFY(NULL == m_intro);
-            m_intro = new CUISequencer();
+            m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
             if (!m_intro->Start("game_loaded"))
                 m_intro->Destroy();
@@ -563,6 +578,7 @@ void CGamePersistent::game_loaded()
 void CGamePersistent::update_game_loaded()
 {
     xr_delete(m_intro);
+    load_screen_renderer.stop();
     start_game_intro();
 }
 
@@ -579,7 +595,7 @@ void CGamePersistent::start_game_intro()
         {
             VERIFY(NULL == m_intro);
             Log("intro_start intro_game");
-            m_intro = new CUISequencer();
+            m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_intro);
             m_intro->Start("intro_game");
         }
@@ -618,15 +634,18 @@ void CGamePersistent::OnFrame()
 #ifdef DEBUG
     ++m_frame_counter;
 #endif
-    if (!GEnv.isDedicatedServer && !m_intro_event.empty())
-        m_intro_event();
-
-    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 1 && !m_intro && m_intro_event.empty())
-        pApp->LoadForceFinish(); // hack
-
-    if (!GEnv.isDedicatedServer && Device.dwPrecacheFrame == 0 && !m_intro && m_intro_event.empty())
-        load_screen_renderer.stop();
-
+    if (!GEnv.isDedicatedServer)
+    {
+        if (!m_intro_event.empty())
+            m_intro_event();
+        else if (!m_intro)
+        {
+            if (Device.dwPrecacheFrame == 0)
+                load_screen_renderer.stop();
+            else if (Device.dwPrecacheFrame == 1)
+                pApp->LoadForceFinish(); // hack
+        }
+    }
     if (!m_pMainMenu->IsActive())
         m_pMainMenu->DestroyInternal(false);
 
@@ -785,7 +804,7 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
         if (g_tutorial2)
             g_tutorial2->Stop();
 
-        LPSTR saved_name = (LPSTR)(P1);
+        pstr saved_name = (pstr)(P1);
 
         Level().remove_objects();
         game_sv_Single* game = smart_cast<game_sv_Single*>(Level().Server->GetGameState());

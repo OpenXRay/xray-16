@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/IRenderable.h"
-#include "xrEngine/CustomHUD.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "r3_R_sun_support.h"
 #include "glm/glm.hpp"
@@ -37,7 +36,7 @@ static int facetable[6][4] = {
 };
 //////////////////////////////////////////////////////////////////////////
 #define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
-#define FLT_AS_DW(F) (*(DWORD*)&(F))
+#define FLT_AS_DW(F) (*(u32*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L)==0)
 #define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L)==0x7f800000L)
@@ -86,7 +85,7 @@ struct BoundingBox
     BoundingBox(): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) { }
     BoundingBox(const BoundingBox& other): minPt(other.minPt), maxPt(other.maxPt) { }
 
-    explicit BoundingBox(const glm::vec3* points, UINT n): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
+    explicit BoundingBox(const glm::vec3* points, u32 n): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < n; i++)
             Merge(&points[i]);
@@ -983,10 +982,6 @@ void CRender::render_sun_near()
         //		fuckingsun->svis.begin					();
     }
 
-    // Actor Shadow
-    if (psDeviceFlags.test(rsDrawDynamic))
-        g_hud->Render_First();
-
     // Fill the database
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
 
@@ -1327,10 +1322,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         else r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
-
-    // Actor Shadow
-    if (cascade_ind == 0 && psDeviceFlags.test(rsDrawDynamic))
-        g_hud->Render_First();
 
     // Fill the database
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);

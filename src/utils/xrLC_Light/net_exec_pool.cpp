@@ -14,12 +14,12 @@ LPCSTR make_time(string64& buf, float fsec)
 {
     // char		buf[64];
 
-    u32 sec = iFloor(fsec);
+    int sec = iFloor(fsec);
     if (sec < 0)
         sec = 0;
     xr_sprintf(buf, "%2.0d:%2.0d:%2.0d", sec / 3600, (sec % 3600) / 60, sec % 60);
-    int len = int(xr_strlen(buf));
-    for (int i = 0; i < len; i++)
+    size_t len = xr_strlen(buf);
+    for (size_t i = 0; i < len; i++)
         if (buf[i] == ' ')
             buf[i] = '0';
     return buf;
@@ -195,7 +195,7 @@ run_task:;
     return;
 }
 
-net_execution* exec_pool::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
+net_execution* exec_pool::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
     __try
     {

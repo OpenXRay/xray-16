@@ -24,7 +24,7 @@
 #include "trader_animation.h"
 #include "xrServerEntities/clsid_game.h"
 
-CAI_Trader::CAI_Trader() { AnimMan = new CTraderAnimation(this); }
+CAI_Trader::CAI_Trader() { AnimMan = xr_new<CTraderAnimation>(this); }
 CAI_Trader::~CAI_Trader()
 {
     xr_delete(m_sound_player);
@@ -111,7 +111,7 @@ void CAI_Trader::LookAtActor(CBoneInstance* B)
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOL CAI_Trader::net_Spawn(CSE_Abstract* DC)
+bool CAI_Trader::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeTrader* l_tpTrader = smart_cast<CSE_ALifeTrader*>(e);
@@ -285,7 +285,7 @@ void CAI_Trader::UpdateCL()
         animation().update_frame();
 }
 
-BOOL CAI_Trader::UsedAI_Locations() { return (TRUE); }
+bool CAI_Trader::UsedAI_Locations() { return (TRUE); }
 void CAI_Trader::OnStartTrade()
 {
     m_busy_now = true;
@@ -345,7 +345,7 @@ ALife::ERelationType CAI_Trader::tfGetRelationType(const CEntityAlive* tpEntityA
 
 IFactoryObject* CAI_Trader::_construct()
 {
-    m_sound_player = new CSoundPlayer(this);
+    m_sound_player = xr_new<CSoundPlayer>(this);
 
     CEntityAlive::_construct();
     CInventoryOwner::_construct();

@@ -3,8 +3,8 @@
 
 #include	"Layers/xrRender/ResourceManager.h"
 #include	"Layers/xrRender/tss.h"
-#include	"Layers/xrRender/blenders/Blender.h"
-#include	"Layers/xrRender/blenders/Blender_Recorder.h"
+#include	"Layers/xrRender/Blender.h"
+#include	"Layers/xrRender/Blender_Recorder.h"
 //	adopt_compiler don't have = operator And it can't have = operator
 #include	"xrScriptEngine/script_engine.hpp"
 #include	"luabind/return_reference_to_policy.hpp"
@@ -528,7 +528,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
             return v_shader;
 
     // Create _new_ entry
-    Shader* N = v_shaders.emplace_back(new Shader(S));
+    Shader* N = v_shaders.emplace_back(xr_new<Shader>(S));
     N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     return N;
 }
@@ -549,6 +549,6 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     adopt_compiler ac = adopt_compiler(this, bFirstPass);
     element(ac, t_0, t_1, t_d);
     r_End();
-    ShaderElement* _r = RImplementation.Resources->_CreateElement(E);
+    ShaderElement* _r = RImplementation.Resources->_CreateElement(std::move(E));
     return _r;
 }

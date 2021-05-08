@@ -16,7 +16,9 @@ extern ECORE_API u32 ps_r_ssao_mode;
 extern ECORE_API const xr_token qssao_mode_token[];
 
 extern ECORE_API u32 ps_r_sun_quality; //	=	0;
+extern ECORE_API u32 ps_r_water_reflection; //	=	0;
 extern ECORE_API const xr_token qsun_quality_token[];
+extern ECORE_API const xr_token qwater_reflection_quality_token[];
 
 extern ECORE_API u32 ps_r3_msaa; //	=	0;
 extern ECORE_API const xr_token qmsaa_token[];
@@ -55,6 +57,14 @@ extern ECORE_API float ps_r__ssaHZBvsTEX;
 extern ECORE_API int ps_r__tf_Anisotropic;
 extern ECORE_API float ps_r__tf_Mipbias;
 
+enum
+{
+    RFLAG_NO_RAM_TEXTURES = (1 << 0),
+    RFLAG_ACTOR_SHADOW = (1 << 1),
+};
+
+extern ECORE_API Flags32 ps_r__common_flags;
+
 // R1
 extern ECORE_API float ps_r1_ssaLOD_A;
 extern ECORE_API float ps_r1_ssaLOD_B;
@@ -77,6 +87,9 @@ enum
 };
 
 // R2
+extern ECORE_API bool ps_r2_sun_static;
+extern ECORE_API bool ps_r2_advanced_pp; // advanced post process and effects
+
 extern ECORE_API float ps_r2_ssaLOD_A;
 extern ECORE_API float ps_r2_ssaLOD_B;
 
@@ -128,6 +141,7 @@ extern ECORE_API float ps_r2_dhemi_light_flow; // .1f
 extern ECORE_API int ps_r2_dhemi_count; // 5
 extern ECORE_API float ps_r2_slight_fade; // 1.f
 extern ECORE_API int ps_r2_wait_sleep;
+extern ECORE_API int ps_r2_wait_timeout;
 
 //	x - min (0), y - focus (1.4), z - max (100)
 extern ECORE_API Fvector3 ps_r2_dof;
@@ -197,6 +211,8 @@ enum
     R_FLAGEXT_HOM_DEPTH_DRAW = (1 << 7),
     R2FLAGEXT_SUN_ZCULLING = (1 << 8),
     R2FLAGEXT_SUN_OLD = (1 << 9),
+    R3FLAGEXT_SSR_HALF_DEPTH = (1 << 10),
+    R3FLAGEXT_SSR_JITTER = (1 << 11),
 };
 
 extern void xrRender_initconsole();

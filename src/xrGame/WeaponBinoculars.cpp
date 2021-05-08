@@ -46,7 +46,7 @@ void CWeaponBinoculars::OnZoomIn()
         if (m_bVision && !m_binoc_vision)
         {
             //.VERIFY			(!m_binoc_vision);
-            m_binoc_vision = new CBinocularsVision(cNameSect());
+            m_binoc_vision = xr_new<CBinocularsVision>(cNameSect());
         }
     }
     inherited::OnZoomIn();
@@ -66,7 +66,7 @@ void CWeaponBinoculars::OnZoomOut()
     inherited::OnZoomOut();
 }
 
-BOOL CWeaponBinoculars::net_Spawn(CSE_Abstract* DC)
+bool CWeaponBinoculars::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
     return TRUE;

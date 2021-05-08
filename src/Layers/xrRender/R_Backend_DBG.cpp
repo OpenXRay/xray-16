@@ -61,11 +61,11 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
     RImplementation.rmNormal();
     set_Stencil(FALSE);
     Render(T, vBase, 0, vcnt, iBase, pcnt);
-#else //	USE_DX10
+#else // USE_DX9
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(T, 0, vcnt, pcnt, pIdx, D3DFMT_INDEX16, pVerts, sizeof(FVF::L)));
-#endif //	USE_DX10
+#endif // USE_OGL
 }
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
@@ -85,11 +85,11 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
     RImplementation.rmFar();
     set_Stencil(FALSE);
     Render(T, vBase, pcnt);
-#else //	USE_DX10
+#else // USE_DX9
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawPrimitiveUP(T, pcnt, pVerts, sizeof(FVF::L)));
-#endif //	USE_DX10
+#endif // USE_OGL
 }
 
 #define RGBA_GETALPHA(rgb) ((rgb) >> 24)
@@ -247,12 +247,7 @@ void CBackend::dbg_OverdrawEnd()
         D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
 
     // Set the background to black
-#ifndef USE_DX9
-    FLOAT ColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    HW.pContext->ClearRenderTargetView(get_RT(), ColorRGBA);
-#else
-    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
-#endif
+    RCache.ClearRT(get_RT(), color_xrgb(255, 0, 0)); // XXX: it's red, not black. Check why.
 
     OnFrameEnd();
 

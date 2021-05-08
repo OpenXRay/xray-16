@@ -22,7 +22,7 @@ CUICustomMap::CUICustomMap()
 
 void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
 {
-    CInifile* levelIni = nullptr;
+    const CInifile* levelIni{};
     if (name == g_pGameLevel->name())
         levelIni = g_pGameLevel->pLevel;
     else
@@ -31,7 +31,7 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
         string_path fname;
         strconcat(sizeof(fname), fname, name.c_str(), DELIMITER "level.ltx");
         FS.update_path(map_cfg_fn, "$game_levels$", fname);
-        levelIni = new CInifile(map_cfg_fn);
+        levelIni = xr_new<CInifile>(map_cfg_fn);
     }
 
     if (levelIni->section_exist("level_map"))
@@ -48,7 +48,6 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
         xr_delete(levelIni);
 }
 
-CUICustomMap::~CUICustomMap() {}
 void CUICustomMap::Update()
 {
     SetPointerDistance(0.0f);
@@ -65,7 +64,7 @@ void CUICustomMap::Draw()
     UI().PopScissor();
 }
 
-void CUICustomMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     m_name = name;
 
@@ -279,9 +278,8 @@ CUIGlobalMap::CUIGlobalMap(CUIMapWnd* pMapWnd)
     Show(false);
 }
 
-CUIGlobalMap::~CUIGlobalMap() {}
 void CUIGlobalMap::Initialize() { Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default"); }
-void CUIGlobalMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIGlobalMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     //	Fvector2 size = CUIStatic::GetWndSize();
@@ -384,7 +382,6 @@ CUILevelMap::CUILevelMap(CUIMapWnd* p)
     Show(false);
 }
 
-CUILevelMap::~CUILevelMap() {}
 void CUILevelMap::Draw()
 {
     if (MapWnd())
@@ -399,19 +396,12 @@ void CUILevelMap::Draw()
                 {
                     Fvector2 sz = sp->m_originSize;
                     // XXX: try to remove if-else branches and use common code path
-                    if (!ShadowOfChernobylMode && !ClearSkyMode)
+                    if (ShadowOfChernobylMode)
                     {
-                        float k = gmz;
-
-                        if (gmz > sp->m_scale_bounds.y)
-                            k = sp->m_scale_bounds.y;
-                        else if (gmz < sp->m_scale_bounds.x)
-                            k = sp->m_scale_bounds.x;
-
-                        sz.mul(k);
+                        sz.mul(gmz);
                         sp->SetWndSize(sz);
                     }
-                    else
+                    else if (ClearSkyMode)
                     {
                         if (gmz > sp->m_scale_bounds.x && gmz < sp->m_scale_bounds.y)
                         {
@@ -424,6 +414,18 @@ void CUILevelMap::Draw()
                             sp->SetWndSize(sz);
                         }
                     }
+                    else // COP
+                    {
+                        float k = gmz;
+
+                        if (gmz > sp->m_scale_bounds.y)
+                            k = sp->m_scale_bounds.y;
+                        else if (gmz < sp->m_scale_bounds.x)
+                            k = sp->m_scale_bounds.x;
+
+                        sz.mul(k);
+                        sp->SetWndSize(sz);
+                    }
                 }
                 else if (sp->m_scale_bounds.x > 0.0f)
                     sp->SetVisible(sp->m_scale_bounds.x < gmz);
@@ -433,7 +435,7 @@ void CUILevelMap::Draw()
     inherited::Draw();
 }
 
-void CUILevelMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     Fvector4 tmp = pGameIni->r_fvector4(MapName(), "global_rect");
@@ -567,9 +569,7 @@ CUIMiniMap::CUIMiniMap()
     SetRounded(true);
 }
 
-CUIMiniMap::~CUIMiniMap() {}
-
-void CUIMiniMap::Init_internal(const shared_str& name, CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     CUIStatic::SetTextureColor(0x7fffffff);

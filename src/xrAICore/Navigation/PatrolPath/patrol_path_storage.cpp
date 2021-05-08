@@ -34,7 +34,7 @@ void CPatrolPathStorage::load_raw(
         const_iterator I = m_registry.find(patrol_name);
         VERIFY3(I == m_registry.end(), "Duplicated patrol path found", *patrol_name);
         m_registry.insert(std::make_pair(
-            patrol_name, &(new CPatrolPath(patrol_name))->load_raw(level_graph, cross, game_graph, *sub_chunk)));
+            patrol_name, &(xr_new<CPatrolPath>(patrol_name))->load_raw(level_graph, cross, game_graph, *sub_chunk)));
     }
 
     chunk->close();
@@ -106,4 +106,14 @@ void CPatrolPathStorage::save(IWriter& stream)
     }
 
     stream.close_chunk();
+}
+
+const CPatrolPath* CPatrolPathStorage::add_alias_if_exist(shared_str patrol_name, shared_str duplicate_name)
+{
+    const_iterator it = patrol_paths().find(patrol_name);
+    if (it == patrol_paths().end())
+        return nullptr;
+
+    m_registry.insert({ duplicate_name, it->second });
+    return it->second;
 }

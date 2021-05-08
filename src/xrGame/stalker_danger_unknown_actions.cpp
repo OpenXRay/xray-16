@@ -145,7 +145,7 @@ void CStalkerActionDangerUnknownSearch::execute()
     if (object().agent_manager().member().member(&object()).cover())
     {
         object().agent_manager().location().add(
-            new CDangerCoverLocation(object().agent_manager().member().member(&object()).cover(), Device.dwTimeGlobal,
+            xr_new<CDangerCoverLocation>(object().agent_manager().member().member(&object()).cover(), Device.dwTimeGlobal,
                 DANGER_INTERVAL, DANGER_DISTANCE));
         return;
     }

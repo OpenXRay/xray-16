@@ -19,7 +19,7 @@
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
 
-#if defined(XR_ARCHITECTURE_X64)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #define _finddata_t _finddata64i32_t
 #elif defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #define _finddata_t _finddata32_t
@@ -181,8 +181,8 @@ public:
 private:
     void check_cached_files(pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);
 
-    void file_from_cache_impl(IReader*& R, LPSTR fname, const file& desc);
-    void file_from_cache_impl(CStreamReader*& R, LPSTR fname, const file& desc);
+    void file_from_cache_impl(IReader*& R, pstr fname, const file& desc);
+    void file_from_cache_impl(CStreamReader*& R, pstr fname, const file& desc);
     template <typename T>
     void file_from_cache(T*& R, pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);
 

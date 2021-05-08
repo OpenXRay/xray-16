@@ -91,7 +91,7 @@ void CSoundRender_Emitter::Event_Propagade()
         return;
 
     // Inform objects
-    SoundRender->s_events.push_back(std::make_pair(owner_data, range));
+    SoundRender->s_events.emplace_back(owner_data, range);
 }
 
 void CSoundRender_Emitter::switch_to_2D()

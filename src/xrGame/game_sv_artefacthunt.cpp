@@ -1367,7 +1367,7 @@ void game_sv_ArtefactHunt::CheckForTeamElimination()
     RemoveArtefact();
 }
 
-extern INT g_sv_Skip_Winner_Waiting;
+extern int g_sv_Skip_Winner_Waiting;
 void game_sv_ArtefactHunt::CheckForTeamWin()
 {
     u8 WinTeam = 0;

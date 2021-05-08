@@ -12,6 +12,7 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/Windows/UITextFrameLineWnd.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 #include "xrUICore/Buttons/UICheckButton.h"
@@ -25,7 +26,7 @@ CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* 
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIWindow();
+    auto ui = xr_new<CUIWindow>();
     if (parent)
     {
         parent->AttachChild(ui);
@@ -46,7 +47,7 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWin
     if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
-    auto ui = new CUIStatic();
+    auto ui = xr_new<CUIStatic>();
     if (parent)
     {
         parent->AttachChild(ui);
@@ -62,7 +63,7 @@ CUIScrollView* UIHelper::CreateScrollView(CUIXml& xml, LPCSTR ui_path, CUIWindow
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIScrollView();
+    auto ui = xr_new<CUIScrollView>();
     if (parent)
     {
         parent->AttachChild(ui);
@@ -78,7 +79,7 @@ CUITextWnd* UIHelper::CreateTextWnd(CUIXml& xml, LPCSTR ui_path, CUIWindow* pare
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUITextWnd();
+    auto ui = xr_new<CUITextWnd>();
     if (parent)
     {
         parent->AttachChild(ui);
@@ -94,7 +95,7 @@ CUIEditBox* UIHelper::CreateEditBox(CUIXml& xml, LPCSTR ui_path, CUIWindow* pare
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIEditBox();
+    auto ui = xr_new<CUIEditBox>();
     if (parent)
     {
         parent->AttachChild(ui);
@@ -110,7 +111,7 @@ CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWind
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIProgressBar();
+    auto ui = xr_new<CUIProgressBar>();
     if (!CUIXmlInit::InitProgressBar(xml, ui_path, 0, ui))
     {
         R_ASSERT2(!critical, "Failed to create progress bar");
@@ -130,7 +131,7 @@ CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUI
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIProgressShape();
+    auto ui = xr_new<CUIProgressShape>();
     if (!CUIXmlInit::InitProgressShape(xml, ui_path, 0, ui))
     {
         R_ASSERT2(!critical, "Failed to create progress shape");
@@ -150,8 +151,28 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindo
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIFrameLineWnd();
+    auto ui = xr_new<CUIFrameLineWnd>();
     if (!CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create frame line");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
+    return ui;
+}
+
+CUITextFrameLineWnd* UIHelper::CreateTextFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
+{
+    // If it's not critical element, then don't crash if it doesn't exist
+    if (!critical && !xml.NavigateToNode(ui_path, 0))
+        return nullptr;
+
+    auto ui = xr_new<CUITextFrameLineWnd>();
+    if (!CUIXmlInit::InitTextFrameLine(xml, ui_path, 0, ui, critical))
     {
         R_ASSERT2(!critical, "Failed to create frame line");
         xr_delete(ui);
@@ -170,7 +191,7 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWind
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIFrameWindow();
+    auto ui = xr_new<CUIFrameWindow>();
     if (!CUIXmlInit::InitFrameWindow(xml, ui_path, 0, ui, critical))
     {
         R_ASSERT2(!critical, "Failed to create frame window");
@@ -195,7 +216,7 @@ CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, LPCSTR ui_path, int index, CU
     if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
-    auto ui = new CUI3tButton();
+    auto ui = xr_new<CUI3tButton>();
     parent->AttachChild(ui);
     ui->SetAutoDelete(true);
     CUIXmlInit::Init3tButton(xml, ui_path, index, ui);
@@ -208,7 +229,7 @@ CUICheckButton* UIHelper::CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* pa
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUICheckButton();
+    auto ui = xr_new<CUICheckButton>();
     parent->AttachChild(ui);
     ui->SetAutoDelete(true);
     CUIXmlInit::InitCheck(xml, ui_path, 0, ui);
@@ -221,7 +242,7 @@ UIHint* UIHelper::CreateHint(CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*/
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new UIHint();
+    auto ui = xr_new<UIHint>();
     ui->SetAutoDelete(true);
     ui->init_from_xml(xml, ui_path);
     return ui;
@@ -238,7 +259,7 @@ CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, i
     if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
-    auto ui = new CUIDragDropListEx();
+    auto ui = xr_new<CUIDragDropListEx>();
     parent->AttachChild(ui);
     ui->SetAutoDelete(true);
     CUIXmlInit::InitDragDropListEx(xml, ui_path, index, ui);
@@ -251,7 +272,7 @@ CUIDragDropReferenceList* UIHelper::CreateDragDropReferenceList(CUIXml& xml, LPC
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = new CUIDragDropReferenceList();
+    auto ui = xr_new<CUIDragDropReferenceList>();
     parent->AttachChild(ui);
     ui->SetAutoDelete(true);
     CUIXmlInit::InitDragDropListEx(xml, ui_path, 0, ui);

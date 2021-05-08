@@ -1,18 +1,25 @@
 #pragma once
+
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
+#include <Layers/xrRender/r__sync_point.h>
+
 #include "Layers/xrRender/PSLibrary.h"
+
 #include "r2_types.h"
 #include "gl_rendertarget.h"
+
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/DetailManager.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/WallmarksEngine.h"
+
 #include "SMAP_Allocator.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/Light_Render_Direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
+
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
 
@@ -179,9 +186,7 @@ public:
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
-//    GLuint q_sync_point[CHWCaps::MAX_GPUS];
-    GLsync q_sync_point[CHWCaps::MAX_GPUS];
-    u32 q_sync_count;
+    R_sync_point q_sync_point;
 
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
@@ -217,9 +222,9 @@ public:
 
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
-    VertexElement* getVB_Format(int id, BOOL _alt = FALSE);
-    VertexStagingBuffer* getVB(int id, BOOL _alt = FALSE);
-    IndexStagingBuffer* getIB(int id, BOOL _alt = FALSE);
+    VertexElement* getVB_Format(int id, bool alternative = false);
+    VertexStagingBuffer* getVB(int id, bool alternative = false);
+    IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();
@@ -234,10 +239,9 @@ public:
 
     ICF void apply_object(IRenderable* O)
     {
-        if (nullptr == O)
+        if (!O || !O->renderable_ROS())
             return;
-        if (nullptr == O->renderable_ROS())
-            return;
+
         CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
@@ -248,8 +252,8 @@ public:
 
     void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (nullptr == C)
+        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
+        if (!C)
             return;
         VERIFY (RC_dest_sampler == C->destination);
         VERIFY (RC_sampler == C->type);
@@ -271,10 +275,11 @@ public:
 
 public:
     // feature level
-    GenerationLevel get_generation() override { return GENERATION_R2; }
+    GenerationLevel GetGeneration() const override { return GENERATION_R2; }
+    virtual BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::OpenGL; }
 
     bool is_sun_static() override { return o.sunstatic; }
-    DWORD get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }
+    u32 get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }
 
     // Loading / Unloading
     void create() override;
@@ -287,11 +292,11 @@ public:
 
     GLuint texture_load(LPCSTR fname, u32& msize, GLenum& ret_desc);
     HRESULT shader_compile(
-        LPCSTR name,
+        pcstr name,
         IReader* fs,
-        LPCSTR pFunctionName,
-        LPCSTR pTarget,
-        DWORD Flags,
+        pcstr pFunctionName,
+        pcstr pTarget,
+        u32 Flags,
         void*& result) override;
 
     // Information
@@ -338,16 +343,16 @@ public:
     IRenderVisual* model_Create(LPCSTR name, IReader* data = nullptr) override;
     IRenderVisual* model_CreateChild(LPCSTR name, IReader* data) override;
     IRenderVisual* model_Duplicate(IRenderVisual* V) override;
-    void model_Delete(IRenderVisual* & V, BOOL bDiscard) override;
+    void model_Delete(IRenderVisual* & V, bool bDiscard) override;
     virtual void model_Delete(IRender_DetailModel* & F);
-    void model_Logging(BOOL bEnable) override { Models->Logging(bEnable); }
+    void model_Logging(bool bEnable) override { Models->Logging(bEnable); }
     void models_Prefetch() override;
-    void models_Clear(BOOL b_complete) override;
+    void models_Clear(bool b_complete) override;
 
     // Occlusion culling
-    BOOL occ_visible(vis_data& V) override;
-    BOOL occ_visible(Fbox& B) override;
-    BOOL occ_visible(sPoly& P) override;
+    bool occ_visible(vis_data& V) override;
+    bool occ_visible(Fbox& B) override;
+    bool occ_visible(sPoly& P) override;
 
     // Main
     void BeforeFrame() override;

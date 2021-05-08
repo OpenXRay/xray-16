@@ -1020,7 +1020,7 @@ public:
     }
 };
 
-BOOL _ray_query_callback(collide::rq_result& result, LPVOID params)
+bool _ray_query_callback(collide::rq_result& result, LPVOID params)
 {
     ray_query_param* param = (ray_query_param*)params;
     param->m_points->push_back(Fvector().mad(param->m_start_position, param->m_direction, result.range));

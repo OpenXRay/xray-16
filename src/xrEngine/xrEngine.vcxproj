@@ -89,16 +89,11 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
-      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
-      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -106,16 +101,11 @@
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
-      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
-      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <ClCompile>
@@ -123,16 +113,11 @@
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
-      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
-      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
     <ClCompile>
@@ -140,16 +125,11 @@
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
-      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
-      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -158,17 +138,12 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <ResourceCompile />
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
-      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
-      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -176,16 +151,11 @@
       <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level2</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <CustomBuildStep>
-      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
-      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
-      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
-      <TreatOutputAsContent>true</TreatOutputAsContent>
-    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CameraBase.h" />
@@ -417,8 +387,8 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
+    <Import Project="..\packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('..\packages\sdl2.2.0.5\build\native\sdl2.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
@@ -429,7 +399,7 @@
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.0.10\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.0.10\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
   </Target>
 </Project>

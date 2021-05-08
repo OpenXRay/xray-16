@@ -196,7 +196,7 @@ const ui_shader& InventoryUtilities::GetBuyMenuShader()
 {
     if (!g_BuyMenuShader)
     {
-        g_BuyMenuShader = new ui_shader();
+        g_BuyMenuShader = xr_new<ui_shader>();
         (*g_BuyMenuShader)->create("hud" DELIMITER "default", BUY_MENU_TEXTURE);
     }
 
@@ -207,7 +207,7 @@ const ui_shader& InventoryUtilities::GetEquipmentIconsShader()
 {
     if (!g_EquipmentIconsShader)
     {
-        g_EquipmentIconsShader = new ui_shader();
+        g_EquipmentIconsShader = xr_new<ui_shader>();
         (*g_EquipmentIconsShader)->create("hud" DELIMITER "default", EQUIPMENT_ICONS);
     }
 
@@ -218,7 +218,7 @@ const ui_shader& InventoryUtilities::GetMPCharIconsShader()
 {
     if (!g_MPCharIconsShader)
     {
-        g_MPCharIconsShader = new ui_shader();
+        g_MPCharIconsShader = xr_new<ui_shader>();
         (*g_MPCharIconsShader)->create("hud" DELIMITER "default", MP_CHAR_ICONS);
     }
 
@@ -229,7 +229,7 @@ const ui_shader& InventoryUtilities::GetOutfitUpgradeIconsShader()
 {
     if (!g_OutfitUpgradeIconsShader)
     {
-        g_OutfitUpgradeIconsShader = new ui_shader();
+        g_OutfitUpgradeIconsShader = xr_new<ui_shader>();
         (*g_OutfitUpgradeIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_armor");
     }
 
@@ -240,7 +240,7 @@ const ui_shader& InventoryUtilities::GetWeaponUpgradeIconsShader()
 {
     if (!g_WeaponUpgradeIconsShader)
     {
-        g_WeaponUpgradeIconsShader = new ui_shader();
+        g_WeaponUpgradeIconsShader = xr_new<ui_shader>();
         (*g_WeaponUpgradeIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_weapons");
     }
 
@@ -354,7 +354,7 @@ const shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID date, EDate
     return bufDate;
 }
 
-LPCSTR InventoryUtilities::GetTimePeriodAsString(LPSTR _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to)
+LPCSTR InventoryUtilities::GetTimePeriodAsString(pstr _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to)
 {
     u32 year1, month1, day1, hours1, mins1, secs1, milisecs1;
     u32 year2, month2, day2, hours2, mins2, secs2, milisecs2;
@@ -470,7 +470,7 @@ void InitCharacterInfoStrings()
     if (!charInfoReputationStrings)
     {
         // Create string->Id DB
-        charInfoReputationStrings = new CharInfoStrings();
+        charInfoReputationStrings = xr_new<CharInfoStrings>();
         // Reputation
         LoadStrings(charInfoReputationStrings, relationsLtxSection, reputationgField);
     }
@@ -478,7 +478,7 @@ void InitCharacterInfoStrings()
     if (!charInfoRankStrings)
     {
         // Create string->Id DB
-        charInfoRankStrings = new CharInfoStrings();
+        charInfoRankStrings = xr_new<CharInfoStrings>();
         // Ranks
         LoadStrings(charInfoRankStrings, relationsLtxSection, ratingField);
     }
@@ -486,7 +486,7 @@ void InitCharacterInfoStrings()
     if (!charInfoGoodwillStrings)
     {
         // Create string->Id DB
-        charInfoGoodwillStrings = new CharInfoStrings();
+        charInfoGoodwillStrings = xr_new<CharInfoStrings>();
         // Goodwills
         LoadStrings(charInfoGoodwillStrings, relationsLtxSection, goodwillField);
     }

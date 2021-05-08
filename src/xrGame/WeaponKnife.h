@@ -18,6 +18,7 @@ protected:
 
     virtual void OnAnimationEnd(u32 state);
     virtual void OnMotionMark(u32 state, const motion_marks&);
+    void OnKnifeStrike(u32 state);
     virtual void OnStateSwitch(u32 S, u32 oldState);
 
     void state_Attacking(float dt);
@@ -29,7 +30,7 @@ protected:
 
 protected:
     bool attackStarted;
-    bool hitEndAnimation;
+    bool attackMotionMarksAvailable;
     bool oldStrikeMethod;
 
     ALife::EHitType m_eHitType;
@@ -115,7 +116,7 @@ private:
         Fvector const& f_pos, Fmatrix& parent_xform_dest, Fvector& fendpos_dest, Fsphere& query_sphere);
     IGameObject* TryPick(Fvector const& start_pos, Fvector const& dir, float const dist);
 
-    static BOOL RayQueryCallback(collide::rq_result& result, LPVOID this_ptr);
+    static bool RayQueryCallback(collide::rq_result& result, LPVOID this_ptr);
     collide::rq_results m_ray_query_results;
     u16 m_except_id;
     IGameObject* m_last_picked_obj;

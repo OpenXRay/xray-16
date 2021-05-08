@@ -52,7 +52,7 @@ game_sv_mp::game_sv_mp()
     : inherited(), m_bRankUp_Allowed(false), m_bVotingReal(false),
       m_uVoteStartTime(0), m_u8SpectatorModes(0)
 {
-    m_strWeaponsData = new CItemMgr();
+    m_strWeaponsData = xr_new<CItemMgr>();
     m_bVotingActive = false;
     //------------------------------------------------------
     //	g_pGamePersistent->Environment().SetWeather("mp_weather");
@@ -644,7 +644,7 @@ void game_sv_mp::AllowDeadBodyRemove(ClientID id, u16 GameID)
 };
 
 void game_sv_mp::OnPlayerConnect(ClientID id_who) { inherited::OnPlayerConnect(id_who); }
-void game_sv_mp::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID)
+void game_sv_mp::OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameID)
 {
     //---------------------------------------------------
     NET_Packet P;

@@ -107,7 +107,7 @@ INetQueue::INetQueue()
 {
     unused.reserve(128);
     for (int i = 0; i < 16; i++)
-        unused.push_back(new NET_Packet());
+        unused.push_back(xr_new<NET_Packet>());
 }
 
 INetQueue::~INetQueue()
@@ -132,7 +132,7 @@ NET_Packet* INetQueue::Create()
 //#endif
     if (unused.empty())
     {
-        ready.push_back(new NET_Packet());
+        ready.push_back(xr_new<NET_Packet>());
         P = ready.back();
         //---------------------------------------------
         LastTimeCreate = SDL_GetTicks();
@@ -157,7 +157,7 @@ NET_Packet* INetQueue::Create(const NET_Packet& _other)
 //#endif
     if (unused.empty())
     {
-        ready.push_back(new NET_Packet());
+        ready.push_back(xr_new<NET_Packet>());
         P = ready.back();
         //---------------------------------------------
         LastTimeCreate = SDL_GetTicks();
@@ -317,7 +317,7 @@ void IPureClient::_Recieve(const void* data, u32 data_size, u32 /*param*/)
         if (psNET_Flags.test(NETFLAG_LOG_CL_PACKETS))
         {
             if (!pClNetLog)
-                pClNetLog = new INetLog("logs\\net_cl_log.log", timeServer());
+                pClNetLog = xr_new<INetLog>("logs\\net_cl_log.log", timeServer());
 
             if (pClNetLog)
                 pClNetLog->LogData(timeServer(), const_cast<void*>(data), data_size, true);
@@ -330,20 +330,13 @@ void IPureClient::_Recieve(const void* data, u32 data_size, u32 /*param*/)
 //==============================================================================
 
 IPureClient::IPureClient(CTimer* timer)
-    : net_Statistic(timer)
+    : device_timer(timer), NET(nullptr), net_Address_device(nullptr), net_Address_server(nullptr),
 #ifdef CONFIG_PROFILE_LOCKS
-    , net_csEnumeration(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration))
+    , net_csEnumeration(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration)),
 #endif // CONFIG_PROFILE_LOCKS
+      net_Connected(EnmConnectionFails), net_Syncronised(false), net_Disconnected(true), net_Statistic(timer),
+      net_Time_LastUpdate(0), net_TimeDelta(0), net_TimeDelta_Calculated(0), net_TimeDelta_User(0)
 {
-    NET = nullptr;
-    net_Address_server = nullptr;
-    net_Address_device = nullptr;
-    device_timer = timer;
-    net_TimeDelta_User = 0;
-    net_Time_LastUpdate = 0;
-    net_TimeDelta = 0;
-    net_TimeDelta_Calculated = 0;
-
     pClNetLog = nullptr; // new INetLog("logs\\net_cl_log.log", timeServer());
 }
 
@@ -601,7 +594,7 @@ bool IPureClient::Connect(pcstr options)
             string64 EnumData;
             EnumData[0] = 0;
             xr_strcat(EnumData, "ToConnect");
-            DWORD EnumSize = xr_strlen(EnumData) + 1;
+            u32 EnumSize = xr_strlen(EnumData) + 1;
             // We now have the host address so lets enum
             u32 c_port = psCL_Port;
             HRESULT res = S_FALSE;
@@ -970,14 +963,14 @@ void IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
     if (psNET_Flags.test(NETFLAG_LOG_CL_PACKETS))
     {
         if (!pClNetLog)
-            pClNetLog = new INetLog("logs\\net_cl_log.log", timeServer());
+            pClNetLog = xr_new<INetLog>("logs\\net_cl_log.log", timeServer());
         if (pClNetLog)
             pClNetLog->LogData(timeServer(), data, size);
     }
     DPN_BUFFER_DESC desc;
 
     desc.dwBufferSize = size;
-    desc.pBufferData = (BYTE*)data;
+    desc.pBufferData = (u8*)data;
 
     net_Statistic.dwBytesSended += size;
 
@@ -1098,7 +1091,7 @@ void IPureClient::Sync_Thread()
             DPN_BUFFER_DESC desc;
             DPNHANDLE hAsync = 0;
             desc.dwBufferSize = sizeof(clPing);
-            desc.pBufferData = LPBYTE(&clPing);
+            desc.pBufferData = (u8*)(&clPing);
             if (nullptr == NET || net_Disconnected)
                 break;
 
@@ -1173,11 +1166,11 @@ void IPureClient::ClearStatistic()
 }
 
 IPureClient::HOST_NODE::HOST_NODE() :
-    pdpAppDesc(new DPN_APPLICATION_DESC),
+    pdpAppDesc(xr_new<DPN_APPLICATION_DESC>()),
     pHostAddress(nullptr) {}
 
 IPureClient::HOST_NODE::HOST_NODE(const HOST_NODE& rhs) :
-    pdpAppDesc(new DPN_APPLICATION_DESC)
+    pdpAppDesc(xr_new<DPN_APPLICATION_DESC>())
 {
     *pdpAppDesc = *rhs.pdpAppDesc;
     pHostAddress = rhs.pHostAddress;
@@ -1198,7 +1191,7 @@ IPureClient::HOST_NODE::~HOST_NODE() noexcept
     xr_delete(pdpAppDesc);
 }
 
-bool IPureClient::GetServerAddress(ip_address& pAddress, DWORD* pPort)
+bool IPureClient::GetServerAddress(ip_address& pAddress, u32* pPort)
 {
     *pPort = 0;
     if (!net_Address_server)
@@ -1224,7 +1217,7 @@ bool IPureClient::GetServerAddress(ip_address& pAddress, DWORD* pPort)
     //pAddress[2] = (char)(*(struct in_addr *)*pHostEnt->h_addr_list).s_lh;
     //pAddress[3] = (char)(*(struct in_addr *)*pHostEnt->h_addr_list).s_impno;
 
-    DWORD dwPort = 0;
+    u32 dwPort = 0;
     DWORD dwPortSize = sizeof(dwPort);
     DWORD dwPortDataType = DPNA_DATATYPE_DWORD;
     CHK_DX(net_Address_server->GetComponentByName(DPNA_KEY_PORT, &dwPort, &dwPortSize, &dwPortDataType));

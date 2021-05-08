@@ -9,13 +9,13 @@
 
 CPhysicsSkeletonObject::CPhysicsSkeletonObject() {}
 CPhysicsSkeletonObject::~CPhysicsSkeletonObject() {}
-BOOL CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
+bool CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
 
     inherited::net_Spawn(DC);
     xr_delete(CForm);
-    CForm = new CCF_Skeleton(this);
+    CForm = xr_new<CCF_Skeleton>(this);
     CPHSkeleton::Spawn(e);
     setVisible(TRUE);
     setEnabled(TRUE);
@@ -70,12 +70,12 @@ void CPhysicsSkeletonObject::net_Save(NET_Packet& P)
     CPHSkeleton::SaveNetState(P);
 }
 
-BOOL CPhysicsSkeletonObject::net_SaveRelevant()
+bool CPhysicsSkeletonObject::net_SaveRelevant()
 {
     return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
-BOOL CPhysicsSkeletonObject::UsedAI_Locations() { return (FALSE); }
+bool CPhysicsSkeletonObject::UsedAI_Locations() { return (FALSE); }
 void CPhysicsSkeletonObject::UpdateCL()
 {
     inherited::UpdateCL();

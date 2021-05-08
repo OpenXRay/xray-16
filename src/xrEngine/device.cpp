@@ -38,14 +38,14 @@
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
-ENGINE_API BOOL g_bRendering = FALSE;
+ENGINE_API bool g_bRendering = false;
 
 const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
 extern int ps_always_active;
 
-BOOL g_bLoaded = FALSE;
+bool g_bLoaded = false;
 ref_light precache_light = 0;
 
 bool CRenderDevice::RenderBegin()
@@ -70,7 +70,7 @@ bool CRenderDevice::RenderBegin()
     }
     GEnv.Render->Begin();
     FPU::m24r();
-    g_bRendering = TRUE;
+    g_bRendering = true;
 
     return true;
 }
@@ -108,11 +108,11 @@ void CRenderDevice::RenderEnd(void)
             {
                 Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
                 if ((flags & SDL_WINDOW_INPUT_FOCUS) == 0)
-                    Pause(TRUE, TRUE, TRUE, "application start");
+                    Pause(true, true, true, "application start");
             }
         }
     }
-    g_bRendering = FALSE;
+    g_bRendering = false;
     // end scene
     // Present goes here, so call OA Frame end.
 #if !defined(XR_PLATFORM_LINUX)
@@ -451,7 +451,7 @@ void CRenderDevice::message_loop()
 
 void CRenderDevice::Run()
 {
-    g_bLoaded = FALSE;
+    g_bLoaded = false;
     Log("Starting engine...");
 
     // Startup timers and calculate timer delta
@@ -482,7 +482,7 @@ void CRenderDevice::Run()
     message_loop();
 
     // Stop Balance-Thread
-    mt_bMustExit = TRUE;
+    mt_bMustExit = true;
 
     seqAppEnd.Process();
     
@@ -540,17 +540,17 @@ void CRenderDevice::FrameMove()
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
     Device.seqFrame.Process();
-    g_bLoaded = TRUE;
+    g_bLoaded = true;
     // else
     // seqFrame.Process(rp_Frame);
     stats.EngineTotal.End();
     stats.EngineTotal.FrameEnd();
 }
 
-ENGINE_API BOOL bShowPauseString = TRUE;
+ENGINE_API bool bShowPauseString = true;
 #include "IGame_Persistent.h"
 
-void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
+void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
 {
     static int snd_emitters_ = -1;
     if (g_bBenchmark || GEnv.isDedicatedServer)
@@ -561,10 +561,10 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
         if (!Paused())
         {
             if (bShowPauseString && editor())
-                bShowPauseString = FALSE;
+                bShowPauseString = false;
 #ifdef DEBUG
             else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
-                bShowPauseString = FALSE;
+                bShowPauseString = false;
 #endif
         }
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
@@ -599,21 +599,21 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     }
 }
 
-BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
+bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
     u16 fActive = LOWORD(wParam);
-    const BOOL fMinimized = (BOOL)HIWORD(wParam);
+    const bool fMinimized = (bool)HIWORD(wParam);
 
-    const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
+    const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
 
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);
 
-    const BOOL isGameActive = ps_always_active || isWndActive;
+    const bool isGameActive = ps_always_active || isWndActive;
 
     if (isGameActive != Device.b_is_Active)
     {

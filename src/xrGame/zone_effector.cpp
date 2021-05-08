@@ -30,12 +30,14 @@ void CZoneEffector::Load(LPCSTR section)
     VERIFY(r_min_perc <= r_max_perc);
 }
 
+#pragma warning(push)
+#pragma warning(disable : 4826) // XXX: Do something with that cheap ID generation, remove warning
 void CZoneEffector::Activate()
 {
     m_pActor = smart_cast<CActor*>(Level().CurrentEntity());
     if (!m_pActor)
         return;
-    m_pp_effector = new CPostprocessAnimatorLerp();
+    m_pp_effector = xr_new<CPostprocessAnimatorLerp>();
     m_pp_effector->SetType(EEffectorPPType(u32(u64(this) & u32(-1))));
     m_pp_effector->SetCyclic(true);
     m_pp_effector->SetFactorFunc(GET_KOEFF_FUNC(this, &CZoneEffector::GetFactor));
@@ -52,6 +54,7 @@ void CZoneEffector::Stop()
     m_pp_effector = NULL;
     m_pActor = NULL;
 };
+#pragma warning(pop)
 
 void CZoneEffector::Update(float dist, float r, ALife::EHitType hit_type)
 {

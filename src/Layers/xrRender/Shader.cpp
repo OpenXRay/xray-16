@@ -59,7 +59,7 @@ BOOL SPass::equal(const SPass& other)
     if (cs != other.cs)
         return FALSE;
 #endif
-#endif //	USE_DX10
+#endif // !USE_DX9
     if (constants != other.constants)
         return FALSE; // is this nessesary??? (ps+vs already combines)
 
@@ -156,4 +156,16 @@ u32 STextureList::find_texture_stage(const shared_str& TexName) const
     VERIFY(_it != _end);
 
     return dwTextureStage;
+}
+
+void STextureList::create_texture(u32 stage, pcstr textureName, bool evenIfNotNull)
+{
+    for (auto& loader : *this)
+    {
+        if (loader.first == stage && (!loader.second || evenIfNotNull))
+        {
+            //  Assign correct texture
+            loader.second.create(textureName);
+        }
+    }
 }

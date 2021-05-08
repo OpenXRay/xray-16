@@ -30,12 +30,12 @@ void property_collection<flares::flares_type, flares>::display_name(
 template <>
 XRay::Editor::property_holder_base* property_collection<flares::flares_type, flares>::create()
 {
-    flare* object = new flare();
+    flare* object = xr_new<flare>();
     object->fill(this);
     return (object->object());
 }
 
-flares::flares() : m_use(false), m_shader(""), m_collection(0) { m_collection = new collection_type(&m_flares, this); }
+flares::flares() : m_use(false), m_shader(""), m_collection(0) { m_collection = xr_new<collection_type>(&m_flares, this); }
 flares::~flares()
 {
     xr_delete(m_collection);
@@ -79,7 +79,7 @@ void flares::load(CInifile& config, shared_str const& section)
     pstr result = (pstr)xr_alloca(buffer_size);
     for (u32 i = 0; i < min_flare_count; ++i)
     {
-        flare* object = new flare();
+        flare* object = xr_new<flare>();
         object->m_opacity = (float)atof(_GetItem(flare_opacity.c_str(), i, result, buffer_size));
         object->m_position = (float)atof(_GetItem(flare_position.c_str(), i, result, buffer_size));
         object->m_radius = (float)atof(_GetItem(flare_radius.c_str(), i, result, buffer_size));

@@ -192,9 +192,6 @@
     <ClInclude Include="..\xrRender\QueryHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="r2_types.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="r4.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -249,91 +246,79 @@
     <ClInclude Include="..\xrRender\LightTrack.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="SMAP_Allocator.h">
-      <Filter>Lights</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\WallmarksEngine.h">
       <Filter>Wallmarks</Filter>
     </ClInclude>
-    <ClInclude Include="blender_bloom_build.h">
+    <ClInclude Include="..\xrRender\blenders\blender_bloom_build.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_BmmD.h">
+    <ClInclude Include="..\xrRender\blenders\Blender_BmmD.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_combine.h">
+    <ClInclude Include="..\xrRender\blenders\blender_combine.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_deffer_aref.h">
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_aref.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_deffer_flat.h">
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_flat.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_deffer_model.h">
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_model.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Editor_Selection.h">
+    <ClInclude Include="..\xrRender\blenders\Blender_Editor_Selection.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Editor_Wire.h">
+    <ClInclude Include="..\xrRender\blenders\Blender_Editor_Wire.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_direct.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_direct.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_mask.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_mask.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_occq.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_occq.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_point.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_point.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_reflected.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_reflected.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_light_spot.h">
+    <ClInclude Include="..\xrRender\blenders\blender_light_spot.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_luminance.h">
+    <ClInclude Include="..\xrRender\blenders\blender_luminance.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Particle.h">
+    <ClInclude Include="..\xrRender\blenders\Blender_Particle.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="blender_ssao.h">
+    <ClInclude Include="..\xrRender\blenders\blender_ssao.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="dx11HDAOCSBlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx11HDAOCSBlender.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="dx11MinMaxSMBlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\uber_deffer.h">
+    <ClInclude Include="..\xrRender\blenders\uber_deffer.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_detail_still.h">
+    <ClInclude Include="..\xrRender\blenders\Blender_Lm(EbB).h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Lm(EbB).h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Model_EbB.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Screen_SET.h">
-      <Filter>Shading templates\R1</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_tree.h">
+    <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.h">
       <Filter>Shading templates\3dFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx10RainBlender.h">
       <Filter>Shading templates\DX10 Rain</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ModelPool.h">
@@ -376,9 +361,6 @@
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClInclude>
     <ClInclude Include="r4_rendertarget.h">
-      <Filter>Core_Target</Filter>
-    </ClInclude>
-    <ClInclude Include="r4_rendertarget_wallmarks.h">
       <Filter>Core_Target</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ColorMapManager.h">
@@ -465,13 +447,13 @@
     <ClInclude Include="..\xrRender\TextureDescrManager.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender.h">
+    <ClInclude Include="..\xrRender\Blender.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_CLSID.h">
+    <ClInclude Include="..\xrRender\Blender_CLSID.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\Blender_Recorder.h">
+    <ClInclude Include="..\xrRender\Blender_Recorder.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\tss.h">
@@ -642,7 +624,7 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h">
       <Filter>Interfase implementations\UI\UISequenceVideoItem</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\MSAA\dx10MSAABlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx10MSAABlender.h">
       <Filter>Interfase implementations\MSAARender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderDX10\dx10StateUtils.h">
@@ -717,6 +699,27 @@
     <ClInclude Include="..\xrRender\FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_detail_still.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_Model_EbB.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_tree.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\r__sync_point.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h">
+      <Filter>Core_Target</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2_types.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -734,31 +737,10 @@
     <ClCompile Include="..\xrRender\PSLibrary.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r2_blenders.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_R_calculate.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_R_lights.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r2_sector_detect.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r2_test_hw.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r4.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_loader.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r4_R_rain.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_R_render.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="r4_R_sun_support.cpp">
@@ -842,85 +824,70 @@
     <ClCompile Include="..\xrRender\WallmarksEngine.cpp">
       <Filter>Wallmarks</Filter>
     </ClCompile>
-    <ClCompile Include="blender_bloom_build.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_bloom_build.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_BmmD.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_combine.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_combine.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_aref.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_deffer_aref.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_flat.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_deffer_flat.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_model.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_deffer_model.cpp">
+    <ClCompile Include="..\xrRender\blenders\Blender_Editor_Selection.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Editor_Selection.cpp">
+    <ClCompile Include="..\xrRender\blenders\Blender_Editor_Wire.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Editor_Wire.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_direct.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_direct.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_mask.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_mask.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_occq.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_occq.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_point.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_point.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_reflected.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_reflected.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_light_spot.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_light_spot.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_luminance.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_luminance.cpp">
+    <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Particle.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx11HDAOCSBlender.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="blender_ssao.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx11MinMaxSMBlender.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="dx11HDAOCSBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="dx11MinMaxSMBlender.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\uber_deffer.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_detail_still.cpp">
+    <ClCompile Include="..\xrRender\blenders\Blender_Lm(EbB).cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Lm(EbB).cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Model_EbB.cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Screen_SET.cpp">
-      <Filter>Shading templates\R1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_tree.cpp">
+    <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.cpp">
       <Filter>Shading templates\3dFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx10RainBlender.cpp">
       <Filter>Shading templates\DX10 Rain</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ModelPool.cpp">
@@ -968,28 +935,13 @@
     <ClCompile Include="..\xrRender\occRasterizer_core.cpp">
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClCompile>
-    <ClCompile Include="r4_rendertarget.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r4_rendertarget_accum_direct.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_accum_omnipart_geom.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_accum_point.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="r4_rendertarget_accum_point_geom.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_accum_reflected.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r4_rendertarget_accum_spot.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_accum_spot_geom.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_create_minmaxSM.cpp">
@@ -998,19 +950,7 @@
     <ClCompile Include="r4_rendertarget_draw_rain.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="r4_rendertarget_draw_volume.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_enable_scissor.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r4_rendertarget_mark_msaa_edges.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_phase_accumulator.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_phase_bloom.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_combine.cpp">
@@ -1019,13 +959,7 @@
     <ClCompile Include="r4_rendertarget_phase_hdao.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="r4_rendertarget_phase_luminance.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_occq.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_phase_PP.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_rain.cpp">
@@ -1035,9 +969,6 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_smap_D.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_phase_smap_S.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_ssao.cpp">
@@ -1130,13 +1061,10 @@
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender.cpp">
+    <ClCompile Include="..\xrRender\Blender.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_Palette.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\Blender_Recorder.cpp">
+    <ClCompile Include="..\xrRender\Blender_Recorder.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\Blender_Recorder_R2.cpp">
@@ -1244,7 +1172,7 @@
     <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp">
       <Filter>Interfase implementations\UI\UISequenceVideoItem</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\MSAA\dx10MSAABlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx10MSAABlender.cpp">
       <Filter>Interfase implementations\MSAARender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX10\dx10BufferUtils.cpp">
@@ -1309,6 +1237,87 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\r__sync_point.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_sector_detect.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_blenders.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_point_geom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_spot_geom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_PP.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_enable_scissor.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_bloom.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_loader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_reflected.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_accumulator.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="r4_rendertarget_build_textures.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="r4_rendertarget_u_set_rt.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp">
+      <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

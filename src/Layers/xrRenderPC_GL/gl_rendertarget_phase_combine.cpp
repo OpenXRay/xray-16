@@ -68,19 +68,12 @@ void CRenderTarget::phase_combine()
             phase_ssao();
     }
 
-	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     // low/hi RTs
-    if (!RImplementation.o.dx10_msaa)
     {
-        HW.pDevice->ClearRenderTargetView(rt_Generic_0->pRT, ColorRGBA);
-        HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
-        u_setrt(rt_Generic_0, rt_Generic_1, nullptr, get_base_zb());
-    }
-    else
-    {
-        HW.pDevice->ClearRenderTargetView(rt_Generic_0_r->pRT, ColorRGBA);
-        HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
-        u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+        // Clear to zero
+        RCache.ClearRT(rt_Generic_0_r, {});
+        RCache.ClearRT(rt_Generic_1_r, {});
+        u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, rt_MSAADepth->pZRT);
     }
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(FALSE);
@@ -281,10 +274,7 @@ void CRenderTarget::phase_combine()
     // Forward rendering
     {
         PIX_EVENT(Forward_rendering);
-        if (!RImplementation.o.dx10_msaa)
-            u_setrt(rt_Generic_0, nullptr, nullptr, get_base_zb()); // LDR RT
-        else
-            u_setrt(rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth->pZRT); // LDR RT
+        u_setrt(rt_Generic_0_r, nullptr, nullptr, rt_MSAADepth->pZRT); // LDR RT
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
@@ -302,18 +292,9 @@ void CRenderTarget::phase_combine()
 
     if (RImplementation.o.dx10_msaa)
     {
-        glReadBuffer(GL_COLOR_ATTACHMENT0);
-        glDrawBuffer(GL_COLOR_ATTACHMENT1);
-
         // we need to resolve rt_Generic_1_r into rt_Generic_1
-        u_setrt(rt_Generic_1_r, rt_Generic_1, 0, RImplementation.Target->rt_MSAADepth->pZRT);
-        CHK_GL(glBlitFramebuffer(0, 0, Device.dwWidth, Device.dwHeight, 0, 0, Device.dwWidth, Device.dwHeight,
-            GL_COLOR_BUFFER_BIT, GL_NEAREST));
-
-        // we need to resolve rt_Generic_0_r into rt_Generic_0
-        u_setrt(rt_Generic_0_r, rt_Generic_0, 0, RImplementation.Target->rt_MSAADepth->pZRT);
-        CHK_GL(glBlitFramebuffer(0, 0, Device.dwWidth, Device.dwHeight, 0, 0, Device.dwWidth, Device.dwHeight,
-            GL_COLOR_BUFFER_BIT, GL_NEAREST));
+        rt_Generic_0_r->resolve_into(*rt_Generic_0);
+        rt_Generic_1_r->resolve_into(*rt_Generic_1);
     }
 
     // for msaa we need a resolved color buffer - Holger
@@ -327,22 +308,11 @@ void CRenderTarget::phase_combine()
         if (bDistort)
         {
             PIX_EVENT(render_distort_objects);
-            FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 0.0f, 127.0f / 255.0f};
-            if (!RImplementation.o.dx10_msaa)
-            {
-                u_setrt(rt_Generic_1, 0, 0, get_base_zb()); // Now RT is a distortion mask
-                HW.pDevice->ClearRenderTargetView(rt_Generic_1->pRT, ColorRGBA);
-            }
-            else
-            {
-                u_setrt(rt_Generic_1_r, 0, 0, RImplementation.Target->rt_MSAADepth->pZRT);
-                // Now RT is a distortion mask
-                HW.pDevice->ClearRenderTargetView(rt_Generic_1_r->pRT, ColorRGBA);
-            }
+            u_setrt(rt_Generic_1_r, 0, 0, rt_MSAADepth->pZRT); // Now RT is a distortion mask
+            RCache.ClearRT(rt_Generic_1_r, color_rgba(127, 127, 0, 127));
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
-            //CHK_DX(HW.pDevice->Clear	( 0L, nullptr, D3DCLEAR_TARGET, color_rgba(127,127,0,127), 1.0f, 0L));
             RImplementation.r_dsgraph_render_distort();
             if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
         }
@@ -603,10 +573,7 @@ void CRenderTarget::phase_wallmarks()
     // Targets
     RCache.set_RT(0, 2);
     RCache.set_RT(0, 1);
-    if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Color, nullptr, nullptr, get_base_zb());
-    else
-        u_setrt(rt_Color, nullptr, nullptr, rt_MSAADepth->pZRT);
+    u_setrt(rt_Color, nullptr, nullptr, rt_MSAADepth->pZRT);
     // Stencil	- draw only where stencil >= 0x1
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
     RCache.set_CullMode(CULL_CCW);
@@ -622,10 +589,8 @@ void CRenderTarget::phase_combine_volumetric()
     //	TODO: DX10: Remove half pixel offset here
 
     //u_setrt(rt_Generic_0,0,0,get_base_zb() );			// LDR RT
-    if (!RImplementation.o.dx10_msaa)
-        u_setrt(rt_Generic_0, rt_Generic_1, nullptr, get_base_zb());
-    else
-        u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+    u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, rt_MSAADepth->pZRT);
+
     //	Sets limits to both render targets
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
     {

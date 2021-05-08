@@ -31,7 +31,6 @@ property_holder::~property_holder()
         return;
 
     m_disposing = true;
-    delete (m_container);
 }
 
 void property_holder::on_dispose()

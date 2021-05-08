@@ -111,7 +111,7 @@ IC bool fis_denormal(const float& f) { return !(*(int*)&f & 0x7f800000); }
 // Approximated calculations
 IC float apx_InvSqrt(const float& n)
 {
-    long tmp = long(0xBE800000) - *(long*)&n >> 1;
+    long tmp = (long(0xBE800000) - *(long*)&n) >> 1;
     float y = *(float*)&tmp;
     return y * (1.47f - 0.47f * n * y * y);
 }

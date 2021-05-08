@@ -42,7 +42,7 @@ void CUIZoneMap::Init()
         m_pointerDistanceText = UIHelper::CreateStatic(uiXml, "minimap:background:dist_text", &m_background, false);
     }
 
-    m_activeMap = new CUIMiniMap();
+    m_activeMap = xr_new<CUIMiniMap>();
     m_clipFrame.AttachChild(m_activeMap);
     m_activeMap->SetAutoDelete(true);
     m_activeMap->EnableHeading(true);

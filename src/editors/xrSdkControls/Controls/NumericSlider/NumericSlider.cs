@@ -127,8 +127,7 @@ namespace XRay.SdkControls
         
         private void OnValueChanged()
         {
-            if (ValueChanged != null)
-                ValueChanged(this, null);
+            ValueChanged?.Invoke(this, null);
         }
 
         private decimal SliderPos

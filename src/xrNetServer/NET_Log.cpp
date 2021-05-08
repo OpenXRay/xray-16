@@ -47,9 +47,9 @@ string64 PacketName[] = {"M_UPDATE", // DUAL: Update state
     "MSG_FORCEDWORD"};
 //---------------------------------------------------------
 #ifdef CONFIG_PROFILE_LOCKS
-INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_pcs(new Lock(MUTEX_PROFILE_ID(NET_Log)))
+INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_pcs(xr_new<Lock>(MUTEX_PROFILE_ID(NET_Log)))
 #else
-INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_pcs(new Lock)
+INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_pcs(xr_new<Lock>())
 #endif
 {
     xr_strcpy(m_cFileName, sFileName);

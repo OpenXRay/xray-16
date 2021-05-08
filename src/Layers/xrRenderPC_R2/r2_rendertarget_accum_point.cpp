@@ -138,7 +138,7 @@ void CRenderTarget::accum_point(light* L)
         draw_volume(L);
     }
 
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE));
+    RCache.set_Scissor(0);
 
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up
     increment_light_marker();

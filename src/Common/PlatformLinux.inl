@@ -225,7 +225,7 @@ typedef struct tagTOGGLEKEYS
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
 
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
 typedef int64_t INT_PTR;
 typedef uint64_t UINT_PTR;
 typedef int64_t LONG_PTR;
@@ -233,7 +233,7 @@ typedef int64_t LONG_PTR;
 typedef int INT_PTR;
 typedef unsigned int UINT_PTR;
 typedef long LONG_PTR;
-#endif // XR_ARCHITECTURE_X64
+#endif // defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
 
 typedef void* HANDLE;
 typedef void* HMODULE;
@@ -1109,6 +1109,9 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
+#define xr_fs_strlwr(str) str
+#define xr_fs_nostrlwr(str) xr_strlwr(str)
+
 /** For backward compability of FS, for real filesystem delimiter set to back
  * @brief restore_path_separators
  * @param path
@@ -1119,3 +1122,5 @@ inline void restore_path_separators(char * path)
 }
 
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_r(time, result); }
+
+#define xr_strerror(errno, buffer, bufferSize) strerror_r(errno, buffer, sizeof(buffer))

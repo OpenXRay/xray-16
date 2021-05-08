@@ -36,14 +36,14 @@ private:
     void LoopNative();
 
     // Native specific
-    void ReportNative(LPCSTR pszTestName);
+    void ReportNative(pcstr pszTestName);
 
     // OA command handlers
     void GetAllOptions();
     void GetCurrentOptions();
     void SetOptions();
     void GetBenchmarks();
-    void RunBenchmark(LPCSTR pszName);
+    void RunBenchmark(pcstr pszName);
 
     // Effectively restores/releases some engine systems
     void TryInitEngine(bool bNoRun = true);
