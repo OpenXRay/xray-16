@@ -113,23 +113,29 @@ void CObjectSpace::Load(IReader* F, CDB::build_callback build_callback)
 void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback)
 {
     R_ASSERT(CFORM_CURRENT_VERSION == H.version);
-    if (!strstr(Core.Params, "-cdb_cache"))
-        Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+
+    string_path fName;
+    bool bUseCache = strstr(Core.Params, "-cdb_cache");
+    strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
+    FS.update_path(fName, "$app_data_root$", fName);
+    if (bUseCache && FS.exist(fName) && Static.deserialize(fName))
+    {
+#ifndef MASTER_GOLD
+        Msg("* Loaded ObjectSpace cache (%s)...", fName);
+#endif
+    }
     else
     {
-        string_path fName;
-        strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
-        FS.update_path(fName, "$app_data_root$", fName);
-        if (!FS.exist(fName))
-        {
-            Msg("* ObjectSpace cache for '%s' not found. Building the model from scratch..", fName);
-            Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+#ifndef MASTER_GOLD
+        Msg("* ObjectSpace cache for '%s' was not loaded. "
+            "Building the model from scratch..", fName);
+#endif
+        Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+
+        if (bUseCache)
             Static.serialize(fName);
-        }
-        else
-            Static.deserialize(fName);
-    }        
-    
+    }
+
     m_BoundingVolume.set(H.aabb);
     g_SpatialSpace->initialize(m_BoundingVolume);
     g_SpatialSpacePhysic->initialize(m_BoundingVolume);

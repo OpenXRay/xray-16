@@ -38,7 +38,7 @@ public:
 private:
     BoneCallback Callback;
     void* Callback_Param;
-    BOOL Callback_overwrite; // performance hint - don't calc anims
+    bool Callback_overwrite; // performance hint - don't calc anims
     u32 Callback_type;
 
 public:
@@ -47,12 +47,12 @@ public:
 public:
     IC BoneCallback callback() { return Callback; }
     IC void* callback_param() { return Callback_Param; }
-    [[nodiscard]] IC BOOL callback_overwrite() const { return Callback_overwrite; } // performance hint - don't calc anims
+    [[nodiscard]] IC bool callback_overwrite() const { return Callback_overwrite; } // performance hint - don't calc anims
     [[nodiscard]] IC u32 callback_type() const { return Callback_type; }
 public:
     IC void construct();
 
-    void set_callback(u32 Type, BoneCallback C, void* Param, BOOL overwrite = FALSE)
+    void set_callback(u32 Type, BoneCallback C, void* Param, bool overwrite = FALSE)
     {
         Callback = C;
         Callback_Param = Param;
@@ -67,7 +67,7 @@ public:
         Callback_overwrite = FALSE;
         Callback_type = 0;
     }
-    void set_callback_overwrite(BOOL v) { Callback_overwrite = v; }
+    void set_callback_overwrite(bool v) { Callback_overwrite = v; }
     void set_param(u32 idx, float data);
     float get_param(u32 idx);
 
@@ -350,7 +350,7 @@ public:
     shared_str ParentName() { return parent_name; }
     shared_str WMap() { return wmap; }
     [[nodiscard]] IC CBone* Parent() const { return parent; }
-    [[nodiscard]] IC BOOL IsRoot() const { return (parent == nullptr); }
+    [[nodiscard]] IC bool IsRoot() const { return (parent == nullptr); }
     [[maybe_unused]] shared_str& NameRef() { return name; }
     // transformation
     const Fvector& Offset() { return mot_offset; }
@@ -401,7 +401,7 @@ public:
 
     bool Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix& parent);
 
-    void Select(BOOL flag) { flags.set(flSelected, flag); }
+    void Select(bool flag) { flags.set(flSelected, flag); }
     [[nodiscard]] bool Selected() const { return flags.is(flSelected); }
     void ClampByLimits();
 

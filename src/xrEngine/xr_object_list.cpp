@@ -22,7 +22,7 @@ public:
     IC bool operator()(IGameObject* O) { return cls == O->GetClassId(); }
 };
 #ifdef DEBUG
-ENGINE_API BOOL debug_destroy = true;
+ENGINE_API bool debug_destroy = true;
 #endif
 
 void CObjectList::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)

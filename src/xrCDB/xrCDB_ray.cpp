@@ -39,11 +39,11 @@ struct ray_segment_t
 };
 
 ICF u32& uf(float& x) { return (u32&)x; }
-ICF BOOL isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
+ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
 {
     Fvector MaxT;
     MaxT.x = MaxT.y = MaxT.z = -1.0f;
-    BOOL Inside = TRUE;
+    bool Inside = TRUE;
 
     // Find candidate planes.
     if (ray.pos[0] < min[0])
@@ -156,7 +156,7 @@ static constexpr float flt_plus_inf = std::numeric_limits<float>::infinity();
 alignas(16) static constexpr float ps_cst_plus_inf[4] = { flt_plus_inf, flt_plus_inf, flt_plus_inf, flt_plus_inf },
                                    ps_cst_minus_inf[4] = { -flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf };
 
-ICF BOOL isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
+ICF bool isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
 {
     // you may already have those values hanging around somewhere
     const __m128 plus_inf = loadps(ps_cst_plus_inf), minus_inf = loadps(ps_cst_minus_inf);
@@ -193,7 +193,7 @@ ICF BOOL isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
     lmax = minss(lmax, lmax1);
     lmin = maxss(lmin, lmin1);
 
-    const BOOL ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
+    const bool ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
 
     storess(lmin, &dist);
     // storess	(lmax, &rs.t_far);
@@ -245,7 +245,7 @@ public:
     }
 
     // fpu
-    ICF BOOL _box_fpu(const Fvector& bCenter, const Fvector& bExtents, Fvector& coord)
+    ICF bool _box_fpu(const Fvector& bCenter, const Fvector& bExtents, Fvector& coord)
     {
         Fbox BB;
         BB.vMin.sub(bCenter, bExtents);
@@ -253,7 +253,7 @@ public:
         return isect_fpu(BB.vMin, BB.vMax, ray, coord);
     }
     // sse
-    ICF BOOL _box_sse(const Fvector& bCenter, const Fvector& bExtents, float& dist)
+    ICF bool _box_sse(const Fvector& bCenter, const Fvector& bExtents, float& dist)
     {
         aabb_t box;
         /*

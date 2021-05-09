@@ -177,6 +177,7 @@ bool MODEL::serialize(pcstr fileName) const
     if (!wstream)
         return false;
 
+    wstream->w_u32(version);
     wstream->w_u32(verts_count);
     wstream->w(verts, sizeof(Fvector) * verts_count);
     wstream->w_u32(tris_count);
@@ -184,7 +185,7 @@ bool MODEL::serialize(pcstr fileName) const
 
     if (tree)
         tree->Save(wstream);
-
+    FS.w_close(wstream);
     return true;
 }
 
@@ -193,6 +194,12 @@ bool MODEL::deserialize(pcstr fileName)
     IReader* rstream = FS.r_open(fileName);
     if (!rstream)
         return false;
+
+    if (version != rstream->r_u32())
+    {
+        FS.r_close(rstream);
+        return false;
+    }
 
     xr_free(verts);
     xr_free(tris);

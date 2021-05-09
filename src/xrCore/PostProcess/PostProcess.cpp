@@ -143,7 +143,7 @@ void BasicPostProcessAnimator::SetCurrentFactor(float f)
     VERIFY(_valid(m_dest_factor));
 };
 
-BOOL BasicPostProcessAnimator::Process(float dt, SPPInfo& PPInfo)
+bool BasicPostProcessAnimator::Process(float dt, SPPInfo& PPInfo)
 {
     Update(dt);
 

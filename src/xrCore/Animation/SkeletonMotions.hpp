@@ -74,7 +74,7 @@ public:
         else
             _flags &= ~mask;
     }
-    BOOL test_flag(u8 mask) const { return BOOL(_flags & mask); }
+    bool test_flag(u8 mask) const { return bool(_flags & mask); }
     void set_count(u32 cnt)
     {
         VERIFY(cnt);
@@ -203,7 +203,7 @@ struct XRCORE_API motions_value
 
     shared_str m_id;
 
-    BOOL load(LPCSTR N, IReader* data, vecBones* bones);
+    bool load(LPCSTR N, IReader* data, vecBones* bones);
     MotionVec* bone_motions(shared_str bone_name);
 
     u32 mem_usage()

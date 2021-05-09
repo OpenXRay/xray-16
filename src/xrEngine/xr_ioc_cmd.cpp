@@ -939,7 +939,7 @@ void CCC_Register()
     CMD1(CCC_HideConsole, "hide");
 
 #ifdef DEBUG
-    extern BOOL debug_destroy;
+    extern bool debug_destroy;
     CMD4(CCC_Integer, "debug_destroy", &debug_destroy, 0, 1);
 #endif
 };

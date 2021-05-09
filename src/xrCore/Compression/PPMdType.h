@@ -30,7 +30,7 @@ defined(_UNKNOWN_ENVIRONMENT_) != \
 #include <windows.h>
 #else /* _DOS32_ENVIRONMENT_ || _POSIX_ENVIRONMENT_ || _UNKNOWN_ENVIRONMENT_ */
 #include "stdafx.h"
-//typedef int BOOL;
+//typedef int bool;
 //#define FALSE 0
 //#define TRUE 1
 //typedef unsigned char BYTE;
@@ -89,7 +89,7 @@ enum { BUF_SIZE=64*1024 };
     int  put(int c) { return (--Count >= 0)?(*p++ = c):(flush(c)); }
     int  getErr() const { return Error; }
     int    tell() const { return StrPos+(p-Buf); }
-    BOOL  atEOS() const { return (Count < 0); }
+    bool  atEOS() const { return (Count < 0); }
 protected:
     int Error, StrPos, Count;
     BYTE* p, Buf[BUF_SIZE];

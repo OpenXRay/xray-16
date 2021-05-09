@@ -411,7 +411,7 @@ void _initialize_cpu()
 #define _MM_FLUSH_ZERO_MASK 0x8000
 #define _MM_FLUSH_ZERO_ON 0x8000
 
-static BOOL _denormals_are_zero_supported = TRUE;
+static bool _denormals_are_zero_supported = TRUE;
 extern void __cdecl _terminate();
 
 void _initialize_cpu_thread()

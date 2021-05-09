@@ -42,7 +42,7 @@ unsigned __stdcall DumpThread(LPVOID pData)
             pMDEI = &stMDEI;
         }
         // Got the file open.  Write it.
-        BOOL bRet =
+        bool bRet =
             MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, pParams->eType, pMDEI, NULL, NULL);
         if (bRet == TRUE)
         {

@@ -140,7 +140,7 @@ public:
     void SetCyclic(bool b) { m_bCyclic = b; }
     float GetLength();
     SPPInfo& PPinfo() { return m_EffectorParams; }
-    virtual BOOL Process(float dt, SPPInfo& PPInfo);
+    virtual bool Process(float dt, SPPInfo& PPInfo);
     void Create();
     CPostProcessParam* GetParam(pp_params param);
     void ResetParam(pp_params param);

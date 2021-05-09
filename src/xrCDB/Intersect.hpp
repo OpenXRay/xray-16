@@ -283,7 +283,7 @@ IC bool TestRayTri2(const Fvector& C, const Fvector& D, Fvector** p, float& rang
     }
 //---------------------------------------------------------------------------
 
-IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, Fvector** p, BOOL bCulling)
+IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, Fvector** p, bool bCulling)
 {
     // construct triangle normal, difference of center and vertex (18 ops)
     Fvector D, E[2], N;
@@ -385,7 +385,7 @@ IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, F
     // intersection occurs
     return true;
 }
-IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, Fvector* p, BOOL bCulling)
+IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, Fvector* p, bool bCulling)
 {
     // construct triangle normal, difference of center and vertex (18 ops)
     Fvector D, E[2], N;

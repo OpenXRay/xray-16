@@ -2,7 +2,7 @@
 #define __XR_OBJECT_LIST_H__
 
 #ifdef DEBUG
-extern ENGINE_API BOOL debug_destroy;
+extern ENGINE_API bool debug_destroy;
 #endif
 
 class IGameObject;

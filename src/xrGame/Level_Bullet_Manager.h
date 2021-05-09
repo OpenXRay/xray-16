@@ -114,8 +114,8 @@ class CBulletManager
     struct _event
     {
         EventType Type;
-        BOOL dynamic;
-        BOOL Repeated; // последовательное повторное попадание в динамический объект
+        bool dynamic;
+        bool Repeated; // последовательное повторное попадание в динамический объект
         SBullet_Hit hit_result;
         SBullet bullet;
         Fvector normal;
@@ -170,11 +170,11 @@ protected:
     void PlayWhineSound(SBullet* bullet, IGameObject* object, const Fvector& pos);
     void PlayExplodePS(const Fmatrix& xf);
     //функция обработки хитов объектов
-    static BOOL test_callback(const collide::ray_defs& rd, IGameObject* object, LPVOID params);
+    static bool test_callback(const collide::ray_defs& rd, IGameObject* object, LPVOID params);
     static bool firetrace_callback(collide::rq_result& result, LPVOID params);
 
     // Deffer event
-    void RegisterEvent(EventType Type, BOOL _dynamic, SBullet* bullet, const Fvector& end_point, collide::rq_result& R,
+    void RegisterEvent(EventType Type, bool _dynamic, SBullet* bullet, const Fvector& end_point, collide::rq_result& R,
         u16 target_material);
 
     //попадание по динамическому объекту

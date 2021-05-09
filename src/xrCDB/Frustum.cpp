@@ -88,7 +88,7 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
     return test_mask ? fcvPartial : fcvFully;
 }
 
-BOOL CFrustum::testSphere_dirty(Fvector& c, float r) const
+bool CFrustum::testSphere_dirty(Fvector& c, float r) const
 {
     XR_ASSUME(p_count);
     return planes[p_count - 1U].classify(c) <= r;
@@ -147,7 +147,7 @@ EFC_Visible CFrustum::testSAABB(Fvector& c, float r, const float* mM, u32& test_
     return test_mask ? fcvPartial : fcvFully;
 }
 
-BOOL CFrustum::testPolyInside_dirty(Fvector* p, size_t count) const
+bool CFrustum::testPolyInside_dirty(Fvector* p, size_t count) const
 {
     Fvector* e = p + count;
     for (int i = 0; i < p_count; i++)
@@ -275,7 +275,7 @@ void CFrustum::CreateOccluder(Fvector* p, size_t count, Fvector& vBase, CFrustum
     VERIFY(count < FRUSTUM_SAFE);
     VERIFY(count >= 3);
 
-    BOOL edge[FRUSTUM_SAFE];
+    bool edge[FRUSTUM_SAFE];
     float cls[FRUSTUM_SAFE];
     ZeroMemory(edge, sizeof(edge));
     for (size_t i = 0; i < clip.p_count; i++)
@@ -385,7 +385,7 @@ sPoly* CFrustum::ClipPoly(sPoly& S, sPoly& D) const
     return dest;
 }
 
-BOOL CFrustum::CreateFromClipPoly(Fvector* p, size_t count, Fvector& vBase, CFrustum& clip)
+bool CFrustum::CreateFromClipPoly(Fvector* p, size_t count, Fvector& vBase, CFrustum& clip)
 {
     VERIFY(count < FRUSTUM_MAXPLANES);
     VERIFY(count >= 3);

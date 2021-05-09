@@ -93,7 +93,7 @@ void CEnvelope::DeleteKey(float t)
     }
 }
 
-BOOL CEnvelope::ScaleKeys(float from_time, float to_time, float scale_factor, float eps)
+bool CEnvelope::ScaleKeys(float from_time, float to_time, float scale_factor, float eps)
 {
     KeyIt min_k = FindKey(from_time, eps);
     if (min_k == keys.end())

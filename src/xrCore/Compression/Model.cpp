@@ -89,7 +89,7 @@ struct PPM_CONTEXT
     inline void update2(STATE* p);
     inline SEE2_CONTEXT* makeEscFreq2() const;
     void rescale();
-    void refresh(int OldNU, BOOL Scale);
+    void refresh(int OldNU, bool Scale);
     PPM_CONTEXT* cutOff(int Order);
     PPM_CONTEXT* removeBinConts(int Order);
     void makeSuffix();
@@ -296,7 +296,7 @@ PPM_CONTEXT::write( int o, FILE* fp )
             if ( p->Successor )             p->Successor->write(o+1,fp);
 }
 */
-void PPM_CONTEXT::refresh(int OldNU, BOOL Scale)
+void PPM_CONTEXT::refresh(int OldNU, bool Scale)
 {
     int i = NumStats, EscFreq;
     STATE* p = Stats = (STATE*)ShrinkUnits(Stats, OldNU, (i + 2) >> 1);
@@ -449,7 +449,7 @@ static void RestoreModelRare(PPM_CONTEXT* pc1, PPM_CONTEXT* MinContext, PPM_CONT
     }
 }
 
-static PPM_CONTEXT* _FASTCALL CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p, PPM_CONTEXT* pc);
+static PPM_CONTEXT* _FASTCALL CreateSuccessors(bool Skip, PPM_CONTEXT::STATE* p, PPM_CONTEXT* pc);
 static PPM_CONTEXT* _FASTCALL ReduceOrder(PPM_CONTEXT::STATE* p, PPM_CONTEXT* pc)
 {
     PPM_CONTEXT::STATE *p1, *ps[MAX_O], **pps = ps;
@@ -580,7 +580,7 @@ void PPM_CONTEXT::rescale()
     Flags |= 0x04;
     FoundState = Stats;
 }
-static PPM_CONTEXT* _FASTCALL CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p, PPM_CONTEXT* pc)
+static PPM_CONTEXT* _FASTCALL CreateSuccessors(bool Skip, PPM_CONTEXT::STATE* p, PPM_CONTEXT* pc)
 {
     PPM_CONTEXT ct, *UpBranch = FoundState->Successor;
     PPM_CONTEXT::STATE *ps[MAX_O], **pps = ps;

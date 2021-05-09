@@ -109,10 +109,10 @@ public:
         return *this;
     };
 
-    IC BOOL contains(T x, T y) { return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2); };
-    IC BOOL contains(const Tvector& p) { return contains(p.x, p.y); };
-    IC BOOL contains(SelfCRef b) { return contains(b.min) && contains(b.max); };
-    IC BOOL similar(SelfCRef b) { return min.similar(b.min) && max.similar(b.max); };
+    IC bool contains(T x, T y) { return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2); };
+    IC bool contains(const Tvector& p) { return contains(p.x, p.y); };
+    IC bool contains(SelfCRef b) { return contains(b.min) && contains(b.max); };
+    IC bool similar(SelfCRef b) { return min.similar(b.min) && max.similar(b.max); };
     IC SelfRef modify(const Tvector& p)
     {
         min.min(p);
@@ -159,7 +159,7 @@ public:
     };
 
     // Detects if this box intersect other
-    IC BOOL intersect(SelfCRef box)
+    IC bool intersect(SelfCRef box)
     {
         if (max.x < box.min.x)
             return FALSE;
@@ -192,7 +192,7 @@ public:
     };
 
     // Does the vector3 intersects box
-    IC BOOL Pick(const Tvector& start, const Tvector& dir)
+    IC bool Pick(const Tvector& start, const Tvector& dir)
     {
         T alpha, xt, yt;
         Tvector rvmin, rvmax;
@@ -225,7 +225,7 @@ public:
         }
         return false;
     };
-    ICF BOOL pick_exact(const Tvector& start, const Tvector& dir)
+    ICF bool pick_exact(const Tvector& start, const Tvector& dir)
     {
         T alpha, xt, yt;
         Tvector rvmin, rvmax;
@@ -259,9 +259,9 @@ public:
     };
 
     IC u32& IR(T& x) { return (u32&)x; }
-    IC BOOL Pick2(const Tvector& origin, const Tvector& dir, Tvector& coord)
+    IC bool Pick2(const Tvector& origin, const Tvector& dir, Tvector& coord)
     {
-        BOOL Inside = TRUE;
+        bool Inside = TRUE;
         Tvector MaxT;
         MaxT.x = MaxT.y = -1.0f;
 
