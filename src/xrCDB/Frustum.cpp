@@ -90,7 +90,8 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
 
 bool CFrustum::testSphere_dirty(Fvector& c, float r) const
 {
-    XR_ASSUME(p_count);
+    if (p_count == 0U)
+        return TRUE;
     return planes[p_count - 1U].classify(c) <= r;
 }
 
