@@ -88,6 +88,9 @@
     <ClInclude Include="..\xrCommon\xr_allocator.h">
       <Filter>xrCommon</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Externals\submodule_check.hpp">
+      <Filter>Externals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">
@@ -98,6 +101,9 @@
     </Filter>
     <Filter Include="xrCommon">
       <UniqueIdentifier>{103b77e6-94b0-400a-a75f-3b0b45f13ee2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals">
+      <UniqueIdentifier>{d02f2a58-bd08-43dc-86cc-6edd8c1f08a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

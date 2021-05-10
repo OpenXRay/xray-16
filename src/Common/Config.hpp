@@ -18,3 +18,5 @@
 
 /* Debug: */
 //#define USE_LOG_TIMING
+
+#include "submodule_check.hpp"
