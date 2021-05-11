@@ -71,7 +71,7 @@ public:
     void SimplifyPoly_AABB(sPoly* P, Fplane& plane);
 
     void CreateOccluder(Fvector* p, size_t count, Fvector& vBase, CFrustum& clip);
-    BOOL CreateFromClipPoly(
+    bool CreateFromClipPoly(
         Fvector* p, size_t count, Fvector& vBase, CFrustum& clip); // returns 'false' if creation failed
     void CreateFromPoints(Fvector* p, size_t count, Fvector& vBase);
     void CreateFromMatrix(Fmatrix& M, u32 mask);
@@ -82,17 +82,17 @@ public:
 
     u32 getMask() const { return (1 << p_count) - 1; }
     EFC_Visible testSphere(Fvector& c, float r, u32& test_mask) const;
-    BOOL testSphere_dirty(Fvector& c, float r) const;
+    bool testSphere_dirty(Fvector& c, float r) const;
     EFC_Visible testAABB(const float* mM, u32& test_mask) const;
     EFC_Visible testSAABB(Fvector& c, float r, const float* mM, u32& test_mask) const;
-    BOOL testPolyInside_dirty(Fvector* p, size_t count) const;
+    bool testPolyInside_dirty(Fvector* p, size_t count) const;
 
-    IC BOOL testPolyInside(sPoly& src) const
+    IC bool testPolyInside(sPoly& src) const
     {
         sPoly d;
         return !!ClipPoly(src, d);
     }
-    IC BOOL testPolyInside(Fvector* p, size_t count) const
+    IC bool testPolyInside(Fvector* p, size_t count) const
     {
         sPoly src(p, count);
         return testPolyInside(src);
