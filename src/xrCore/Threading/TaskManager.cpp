@@ -165,7 +165,7 @@ public:
     Event event;
 } static thread_local s_tl_worker;
 
-static TaskWorker& s_main_thread_worker = s_tl_worker;
+static TaskWorker* s_main_thread_worker = nullptr;
 
 class ThreadPriorityHelper
 {
@@ -212,9 +212,7 @@ void CalcIterations()
 
 TaskManager::TaskManager()
 {
-    R_ASSERT2(&s_main_thread_worker == &s_tl_worker,
-        "s_main_thread_worker variable failed to initialize properly, "
-        "or you're initializing task manager not from main thread.");
+    s_main_thread_worker = &s_tl_worker;
 
     const u32 threads = CPU::ID.n_threads - OTHER_THREADS_COUNT;
     workers.reserve(threads);
@@ -233,6 +231,8 @@ TaskManager::TaskManager()
 
 TaskManager::~TaskManager()
 {
+    s_main_thread_worker = nullptr;
+
     shouldStop.store(true, std::memory_order_release);
     {
         ScopeLock scope(&workersLock);
@@ -315,7 +315,7 @@ void TaskManager::TaskWorkerStart()
     }
     check_main_queue:
     {
-        task = s_main_thread_worker.steal();
+        task = s_main_thread_worker->steal();
         if (task)
             goto execute;
     }
@@ -372,7 +372,7 @@ Task* TaskManager::TryToSteal(TaskWorker* thief)
     const auto count = workersCount.load(std::memory_order_relaxed);
     if (count == 1)
     {
-        if (&s_tl_worker == &s_main_thread_worker)
+        if (&s_tl_worker == s_main_thread_worker)
             return workers[0]->steal();
         return nullptr; // thread itself
     }
@@ -523,9 +523,9 @@ void TaskManager::GetStats(size_t& allocated, size_t& allocatedWithFallback, siz
 {
     allocatedWithFallback += s_task_allocator_mt.get_allocated_count();
 
-    allocated += s_main_thread_worker.allocatedTasks;
-    pushed += s_main_thread_worker.pushedTasks;
-    finished += s_main_thread_worker.finishedTasks;
+    allocated += s_main_thread_worker->allocatedTasks;
+    pushed += s_main_thread_worker->pushedTasks;
+    finished += s_main_thread_worker->finishedTasks;
 
     ScopeLock scope(&workersLock);
     for (TaskWorker* worker : workers)
