@@ -38,6 +38,19 @@ elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
     set(PROJECT_PLATFORM_E2K TRUE)
 endif()
 
+if (NOT MASTER_GOLD)
+    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        set(MASTER_GOLD ON CACHE BOOL "" FORCE)
+    else()
+        set(MASTER_GOLD OFF CACHE BOOL "" FORCE)
+    endif()
+endif()
+
+message(STATUS "MASTER_GOLD: ${MASTER_GOLD}")
+if (MASTER_GOLD)
+    add_definitions(-DMASTER_GOLD)
+endif()
+
 option(USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" OFF)
 
 # Memory allocator option
