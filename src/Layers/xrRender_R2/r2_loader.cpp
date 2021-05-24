@@ -308,20 +308,13 @@ void CRender::LoadLights(IReader* fs)
     Lights.LoadHemi();
 }
 
-struct b_portal
-{
-    u16 sector_front;
-    u16 sector_back;
-    svector<Fvector, 6> vertices;
-};
-
 void CRender::LoadSectors(IReader* fs)
 {
     // allocate memory for portals
     const u32 size = fs->find_chunk(fsL_PORTALS);
-    R_ASSERT(0 == size % sizeof(b_portal));
+    R_ASSERT(0 == size % sizeof(CPortal::b_portal));
 
-    const u32 count = size / sizeof(b_portal);
+    const u32 count = size / sizeof(CPortal::b_portal);
     Portals.resize(count);
 
     for (u32 c = 0; c < count; c++)
@@ -375,7 +368,7 @@ void CRender::LoadSectors(IReader* fs)
         fs->find_chunk(fsL_PORTALS);
         for (u32 i = 0; i < count; i++)
         {
-            b_portal P;
+            CPortal::b_portal P;
             fs->r(&P, sizeof(P));
             CPortal* __P = (CPortal*)Portals[i];
             __P->Setup(P.vertices.begin(), P.vertices.size(), (CSector*)getSector(P.sector_front),

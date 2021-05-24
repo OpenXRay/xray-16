@@ -100,7 +100,7 @@ public:
     }
     IC void assign(iterator p, int c)
     {
-        VERIFY(c > 0 && c < dim);
+        VERIFY(c > 0 && c <= dim);
         CopyMemory(array, p, c * sizeof(value_type));
         count = c;
     }
