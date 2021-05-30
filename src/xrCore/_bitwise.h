@@ -19,16 +19,16 @@
 #define fdRLE10 0x03ede5bdb // 1/ln10
 
 // integer math on floats
-#ifdef _M_AMD64
-IC bool negative(const float f) { return std::signbit(f); }
-IC bool positive(const float f) { return !negative(f); }
-IC void set_negative(float& f) { f = -fabsf(f); }
-IC void set_positive(float& f) { f = fabsf(f); }
-#else
+#ifdef XR_ARCHITECTURE_X86
 IC bool negative(const float& f) { return *(unsigned*)&f & fdSGN; }
 IC bool positive(const float& f) { return (*(unsigned*)&f & fdSGN) == 0; }
 IC void set_negative(float& f) { *(unsigned*)&f |= fdSGN; }
 IC void set_positive(float& f) { *(unsigned*)&f &= ~fdSGN; }
+#else
+IC bool negative(const float f) { return std::signbit(f); }
+IC bool positive(const float f) { return !negative(f); }
+IC void set_negative(float& f) { f = -fabsf(f); }
+IC void set_positive(float& f) { f = fabsf(f); }
 #endif
 
 /*
