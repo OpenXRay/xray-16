@@ -10,7 +10,6 @@
         $(xrExternals);
         $(xrExternals)luajit\src;
         $(xrExternals)luabind;
-        $(xrSdkDir)DXSDK/Include;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -20,7 +19,6 @@
         $(xrLibDir);
         $(xrSdkDir)libraries;
         $(xrSdkDir)libraries/$(PlatformShortName);
-        $(xrSdkDir)DXSDK/Lib/$(PlatformShortName);
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
@@ -31,7 +29,6 @@
         $(xrLibDir);
         $(xrSdkDir)libraries;
         $(xrSdkDir)libraries/$(PlatformShortName);
-        $(xrSdkDir)DXSDK/Lib/$(PlatformShortName);
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <OutputFile>$(xrLibDir)$(TargetName).lib</OutputFile>

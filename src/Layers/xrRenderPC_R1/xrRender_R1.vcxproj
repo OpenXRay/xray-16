@@ -360,6 +360,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
     <Import Project="..\..\packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" />
+    <Import Project="..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets" Condition="Exists('..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -367,5 +368,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
     <Error Condition="!Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets'))" />
   </Target>
 </Project>

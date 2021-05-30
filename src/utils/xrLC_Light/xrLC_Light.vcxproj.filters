@@ -569,4 +569,7 @@
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
