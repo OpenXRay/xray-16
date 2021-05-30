@@ -231,8 +231,6 @@ TaskManager::TaskManager()
 
 TaskManager::~TaskManager()
 {
-    s_main_thread_worker = nullptr;
-
     shouldStop.store(true, std::memory_order_release);
     {
         ScopeLock scope(&workersLock);
@@ -245,6 +243,8 @@ TaskManager::~TaskManager()
     }
     for (TaskWorker* worker : workers)
         worker->event.Set();
+
+    s_main_thread_worker = nullptr;
 }
 
 void TaskManager::task_worker_entry(void* this_ptr)
