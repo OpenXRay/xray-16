@@ -410,6 +410,8 @@ public:
 
     void get_any_p(xr_vector<value_type*, xr_allocator<value_type*>>& D)
     {
+        if (empty())
+            return;
         D.resize(size());
         value_type** _it = &D.front();
         value_type* _end = end();
