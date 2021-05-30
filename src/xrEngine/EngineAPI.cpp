@@ -121,6 +121,14 @@ void CEngineAPI::Initialize(void)
 
         pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
         R_ASSERT(pDestroy);
+
+        pInitializeGame = (InitializeGameLibraryProc)hGame->GetProcAddress("initialize_library");
+        R_ASSERT(pInitializeGame);
+
+        pFinalizeGame = (FinalizeGameLibraryProc)hGame->GetProcAddress("finalize_library");
+        R_ASSERT(pFinalizeGame);
+    	
+        pInitializeGame();
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -148,10 +156,18 @@ void CEngineAPI::Initialize(void)
 
 void CEngineAPI::Destroy(void)
 {
-    hGame = nullptr;
-    hTuner = nullptr;
+    if (pFinalizeGame)
+        pFinalizeGame();
+	
+    pInitializeGame = nullptr;
+    pFinalizeGame = nullptr;
     pCreate = nullptr;
     pDestroy = nullptr;
+	
+    hGame = nullptr;
+	
+    hTuner = nullptr;
+	
     renderers.clear();
     Engine.Event._destroy();
     XRC.r_clear_compact();

@@ -56,6 +56,9 @@ public:
 
 class ENGINE_API CEngineAPI
 {
+    using InitializeGameLibraryProc = void(*)();
+    using FinalizeGameLibraryProc = void(*)();
+
     using GetRendererModule = RendererModule*(*)();
 
     struct RendererDesc
@@ -72,6 +75,9 @@ class ENGINE_API CEngineAPI
 
     XRay::Module hGame;
     XRay::Module hTuner;
+
+    InitializeGameLibraryProc pInitializeGame;
+    FinalizeGameLibraryProc pFinalizeGame;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
