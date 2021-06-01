@@ -52,7 +52,7 @@ void nativeCpuId(int regs[4], int i)
 #ifndef XR_PLATFORM_WINDOWS
 #include <thread>
 
-void __cpuidex(int regs[4], int i, int j)
+void xr_cpuidex(int regs[4], int i, int j)
 {
     nativeCpuId(regs, i);
 }
@@ -163,7 +163,7 @@ bool query_processor_info(processor_info* pinfo)
 
     for (int i = 0; i <= nIds; ++i)
     {
-        __cpuidex(cpui.data(), i, 0);
+        xr_cpuidex(cpui.data(), i, 0);
         data.push_back(cpui);
     }
 
@@ -195,7 +195,7 @@ bool query_processor_info(processor_info* pinfo)
 
     for (int i = 0x80000000; i <= nExIds_; ++i)
     {
-        __cpuidex(cpui.data(), i, 0);
+        xr_cpuidex(cpui.data(), i, 0);
         data.push_back(cpui);
     }
 
