@@ -163,7 +163,11 @@ bool query_processor_info(processor_info* pinfo)
 
     for (int i = 0; i <= nIds; ++i)
     {
+#ifdef XR_PLATFORM_WINDOWS
+        __cpuidex(cpui.data(), i, 0);
+#else
         xr_cpuidex(cpui.data(), i, 0);
+#endif
         data.push_back(cpui);
     }
 
@@ -195,7 +199,11 @@ bool query_processor_info(processor_info* pinfo)
 
     for (int i = 0x80000000; i <= nExIds_; ++i)
     {
+#ifdef XR_PLATFORM_WINDOWS
+        __cpuidex(cpui.data(), i, 0);
+#else
         xr_cpuidex(cpui.data(), i, 0);
+#endif
         data.push_back(cpui);
     }
 
