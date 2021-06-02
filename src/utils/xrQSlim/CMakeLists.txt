@@ -57,7 +57,6 @@ add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/Externals/luabind
 )
 
 target_compile_definitions(${PROJECT_NAME}
