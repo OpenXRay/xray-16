@@ -52,7 +52,7 @@ void nativeCpuId(int regs[4], int i)
 #ifndef XR_PLATFORM_WINDOWS
 #include <thread>
 
-void __cpuidex(int regs[4], int i, int j)
+void xr_cpuidex(int regs[4], int i, int j)
 {
     nativeCpuId(regs, i);
 }
