@@ -226,7 +226,10 @@ execute_process(COMMAND git rev-parse --abbrev-ref HEAD
 
 message("git branch: " ${GIT_BRANCH})
 
-include_directories(${CMAKE_SOURCE_DIR}/Externals)
+include_directories(
+    ${CMAKE_SOURCE_DIR}/Externals
+    ${CMAKE_SOURCE_DIR}/Externals/luabind
+)
 
 add_subdirectory(Externals)
 add_subdirectory(src)
