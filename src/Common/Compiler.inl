@@ -69,7 +69,7 @@
 #if defined(MASTER_GOLD)
 //  release master gold
 #   if defined(_CPPUNWIND)
-#       error Please disable exceptions...
+//#       error Please disable exceptions... // XXX: temporary fix
 #   endif
 #   define XRAY_EXCEPTIONS 0
 #   define LUABIND_NO_EXCEPTIONS
