@@ -110,7 +110,9 @@
   <!-- Master Gold settings -->
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Master Gold'))">
     <ClCompile>
-      <PreprocessorDefinitions>MASTER_GOLD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>false</ExceptionHandling>
+      <PreprocessorDefinitions>MASTER_GOLD;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4530;%(DisableSpecificWarnings)</DisableSpecificWarnings> <!-- XXX: remove warning 4530 deactivation -->
     </ClCompile>
   </ItemDefinitionGroup>
 

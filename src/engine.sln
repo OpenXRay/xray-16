@@ -997,10 +997,10 @@ Global
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Mixed|x64.Build.0 = Release|x64
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Mixed|x86.ActiveCfg = Release|Win32
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Mixed|x86.Build.0 = Release|Win32
-		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x64.ActiveCfg = Release|x64
-		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x64.Build.0 = Release|x64
-		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x86.ActiveCfg = Release|Win32
-		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x86.Build.0 = Release|Win32
+		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x64.ActiveCfg = Release Master Gold|x64
+		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x64.Build.0 = Release Master Gold|x64
+		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x86.ActiveCfg = Release Master Gold|Win32
+		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release Master Gold|x86.Build.0 = Release Master Gold|Win32
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|x64.ActiveCfg = Release|x64
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|x64.Build.0 = Release|x64
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|x86.ActiveCfg = Release|Win32

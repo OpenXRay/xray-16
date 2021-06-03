@@ -22,7 +22,7 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <DisableSpecificWarnings>4251;4275</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4275;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemDefinitionGroup>

@@ -1,24 +1,5 @@
 #pragma once
 
-#if !defined(_CPPUNWIND)
-#error Please enable exceptions...
-#endif
-
-#ifndef _MT
-#error Please enable multi-threaded library...
-#endif
-
-#ifdef NDEBUG
-#define XRAY_EXCEPTIONS 0
-#define LUABIND_NO_EXCEPTIONS
-#else
-#define XRAY_EXCEPTIONS 1
-#endif
-
-#if !defined(DEBUG) && (defined(_DEBUG) || defined(MIXED))
-#define DEBUG
-#endif
-
 #define MACRO_TO_STRING_HELPER(a) #a
 #define MACRO_TO_STRING(a) MACRO_TO_STRING_HELPER(a)
 
@@ -31,7 +12,6 @@
 #pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4251) // object needs DLL interface
 #pragma warning(disable : 4345)
-//#pragma warning (disable : 4530 ) // C++ exception handler used, but unwind semantics are not enabled
 
 #ifdef XR_ARCHITECTURE_X64
 #pragma warning(disable : 4512)
