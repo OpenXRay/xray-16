@@ -6504,6 +6504,9 @@
     <ClInclude Include="ui\UIArtefactPanel.h">
       <Filter>UI\Common\MainIngame</Filter>
     </ClInclude>
+    <ClInclude Include="ai\monsters\chimera\chimera_attack_state.h" />
+    <ClInclude Include="ai\monsters\chimera\chimera_attack_state_inline.h" />
+    <ClInclude Include="Explosive.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9877,20 +9880,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
-      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state_inline.h">
-      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Explosive.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
-    </CustomBuild>
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>

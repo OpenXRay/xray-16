@@ -649,9 +649,9 @@
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\OpenXRay.natvis" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

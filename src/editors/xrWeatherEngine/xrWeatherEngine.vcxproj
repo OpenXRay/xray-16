@@ -94,9 +94,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
     </ProjectReference>
@@ -113,16 +110,19 @@
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets" Condition="Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" />
-    <Import Project="..\..\packages\sdl2.2.0.5\build\native\sdl2.targets" Condition="Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.redist.2.0.5\build\native\sdl2.redist.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.2.0.5\build\native\sdl2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.2.0.5\build\native\sdl2.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>
