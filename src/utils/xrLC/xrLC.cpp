@@ -8,8 +8,6 @@
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "xrCore/ModuleLookup.hpp"
 
-#pragma comment(lib, "d3dx9.lib")
-
 CBuild* pBuild = nullptr;
 u32 version = 0;
 

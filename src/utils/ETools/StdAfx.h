@@ -11,8 +11,6 @@
 #include "d3dx9.h"
 #pragma warning(pop)
 
-#pragma comment(lib, "d3dx9.lib")
-
 // Warnings
 #pragma warning(disable : 4786) // too long names
 #pragma warning(disable : 4503) // decorated name length exceeded
