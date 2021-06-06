@@ -243,6 +243,7 @@ struct DumbClipper
         }
         return true;
     }
+    
     D3DXVECTOR3 point(Fbox& bb, int i) const
     {
         return D3DXVECTOR3((i & 1) ? bb.vMin.x : bb.vMax.x, (i & 2) ? bb.vMin.y : bb.vMax.y, (i & 4) ? bb.vMin.z : bb.vMax.z);
@@ -690,8 +691,8 @@ void CRender::render_sun()
         b_receivers = view_clipper.clipped_AABB(s_receivers, xform);
         Fmatrix x_project, x_full, x_full_inverse;
         {
-            // x_project.build_projection	(deg2rad(Device.fFOV/*
-            // *Device.fASPECT*/),Device.fASPECT,ps_r2_sun_near,ps_r2_sun_near+tweak_guaranteed_range);
+            //x_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, ps_r2_sun_near,
+            //    ps_r2_sun_near + tweak_guaranteed_range);
             x_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
                 ps_r2_sun_near + tweak_guaranteed_range);
             x_full.mul(x_project, Device.mView);
@@ -903,8 +904,8 @@ void CRender::render_sun_near()
         Fbox	frustum_bb;			frustum_bb.invalidate	();
         hull.points.push_back		(Device.vCameraPosition);
         for (int it=0; it<9; it++)	{
-            Fvector	xf	= wform		(mdir_View,hull.points[it]);
-            frustum_bb.modify		(xf);
+        Fvector	xf	= wform		(mdir_View,hull.points[it]);
+        frustum_bb.modify		(xf);
         }
         float	size_x				= frustum_bb.vMax.x - frustum_bb.vMin.x;
         float	size_y				= frustum_bb.vMax.y - frustum_bb.vMin.y;
@@ -1166,10 +1167,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                 Fvector3 near_p, edge_vec;
                 for (int p = 0; p < 4; p++)
                 {
-                    // 					Fvector asd = Device.vCameraDirection;
-                    // 					asd.mul(-2);
-                    // 					asd.add(Device.vCameraPosition);
-                    // 					near_p		= Device.vCameraPosition;//wform		(fullxform_inv,asd); //
                     near_p = wform(fullxform_inv, corners[facetable[4][p]]);
 
                     edge_vec = wform(fullxform_inv, corners[facetable[5][p]]);
@@ -1194,9 +1191,13 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         float dist = light_top_plane.classify(Device.vCameraPosition);
 
         float map_size = m_sun_cascades[cascade_ind].size;
+#ifdef USE_DX9
+        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
+            map_size * 0.5f, 0.1f, dist + map_size);
+#else
         D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
             map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/ 1.41421f * map_size);
-
+#endif
         //////////////////////////////////////////////////////////////////////////
         // build viewport xform
         float view_dim = float(RImplementation.o.smapsize);
@@ -1237,13 +1238,13 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         if (cascade_ind < m_sun_cascades.size() - 1)
             m_sun_cascades[cascade_ind + 1].rays = light_cuboid.view_frustum_rays;
 
-        // #ifdef	_DEBUG
+#ifdef DEBUG
 
         static bool draw_debug = false;
         if (draw_debug && cascade_ind == 0)
             for (u32 it = 0; it < cull_planes.size(); it++)
                 RImplementation.Target->dbg_addplane(cull_planes[it], it * 0xFFF);
-        //#endifDDS
+#endif
 
         Fvector cam_shifted = L_pos;
         cam_shifted.add(lightXZshift);
@@ -1370,14 +1371,23 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     PIX_EVENT(SE_SUN_NEAR);
 
     if (cascade_ind == 0)
+    {
+        PIX_EVENT(SE_SUN_NEAR);
         Target->accum_direct_cascade(SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].xform,
             m_sun_cascades[cascade_ind].bias);
+    }
     else if (cascade_ind < m_sun_cascades.size() - 1)
+    {
+        PIX_EVENT(SE_SUN_MIDDLE);
         Target->accum_direct_cascade(SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
             m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
+    }
     else
+    {
+        PIX_EVENT(SE_SUN_FAR);
         Target->accum_direct_cascade(SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
             m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
+    }
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);

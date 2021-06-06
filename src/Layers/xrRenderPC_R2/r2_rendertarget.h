@@ -227,7 +227,10 @@ public:
     void phase_vol_accumulator();
     void shadow_direct(light* L, u32 dls_phase);
 
+    //	Generates min/max sm
+    void create_minmax_SM() {}
     bool need_to_render_sunshafts();
+    bool use_minmax_sm_this_frame() { return false; }
 
     bool enable_scissor(light* L); // true if intersects near plane
     void enable_dbt_bounds(light* L);
