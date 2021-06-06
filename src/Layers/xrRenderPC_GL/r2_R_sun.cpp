@@ -1,13 +1,15 @@
 #include "stdafx.h"
+
+#include "r2_R_sun_support.h"
+
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/IRenderable.h"
 #include "Layers/xrRender/FBasicVisual.h"
-#include "r3_R_sun_support.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/matrix_access.hpp"
-
 
 const float tweak_COP_initial_offs = 1200.f;
 const float tweak_ortho_xform_initial_offs = 1000.f; //. ?

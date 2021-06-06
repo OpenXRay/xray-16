@@ -325,6 +325,7 @@ set(SRC_FILES
     "../xrRender_R2/r2_R_calculate.cpp"
     "../xrRender_R2/r2_R_lights.cpp"
     "../xrRender_R2/r2_R_render.cpp"
+    "../xrRender_R2/r2_R_sun_support.h"
     "../xrRender_R2/r2_rendertarget_accum_omnipart_geom.cpp"
     "../xrRender_R2/r2_rendertarget_accum_point_geom.cpp"
     "../xrRender_R2/r2_rendertarget_accum_reflected.cpp"

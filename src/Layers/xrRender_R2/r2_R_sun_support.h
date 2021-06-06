@@ -1,5 +1,3 @@
-#ifndef r4_R_sun_support_included
-#define r4_R_sun_support_included
 #pragma once
 
 const u32 LIGHT_CUBOIDSIDEPOLYS_COUNT = 4;
@@ -314,14 +312,14 @@ public:
         {
             _poly& P = polys[it];
             Fvector3 t1, t2;
-            float len;
-
             t1.sub(points[P.points[0]], points[P.points[1]]);
             t2.sub(points[P.points[0]], points[P.points[2]]);
-
+#ifdef USE_DX9
+            P.planeN.crossproduct(t1, t2).normalize();
+#else
             P.planeN.crossproduct(t1, t2);
 
-            len = P.planeN.magnitude();
+            float len = P.planeN.magnitude();
 
             if (len > std::numeric_limits<float>::min())
             {
@@ -344,7 +342,7 @@ public:
                     continue;
                 }
             }
-
+#endif
             P.planeD = -P.planeN.dotproduct(points[P.points[0]]);
 
             // verify
@@ -364,41 +362,15 @@ public:
                 p301.build(p3, p0, p1);
                 VERIFY(p012.n.similar(p123.n) && p012.n.similar(p230.n) && p012.n.similar(p301.n));
             }
-
-            /*
-            t1.sub					(points[P.points[0]], points[P.points[1]]);
-
-
-            //	HACK: Igor: just make sure we calculated the plane
-
-            t2.sub					(points[P.points[0]], points[P.points[2]]);
-            P.planeN.crossproduct	(t1,t2).normalize();
-
-
-            P.planeD			= -	P.planeN.dotproduct(points[P.points[0]]);
-
-            // verify
-            if (_debug)
-            {
-                Fvector&		p0	= points[P.points[0]];
-                Fvector&		p1	= points[P.points[1]];
-                Fvector&		p2	= points[P.points[2]];
-                Fvector&		p3	= points[P.points[3]];
-                Fplane	p012;	p012.build(p0,p1,p2);
-                Fplane	p123;	p123.build(p1,p2,p3);
-                Fplane	p230;	p230.build(p2,p3,p0);
-                Fplane	p301;	p301.build(p3,p0,p1);
-                VERIFY	(p012.n.similar(p123.n) && p012.n.similar(p230.n) && p012.n.similar(p301.n));
-            }
-            */
         }
     }
+
     void compute_caster_model(xr_vector<Fplane>& dest, Fvector3 direction)
     {
         CRenderTarget& T = *RImplementation.Target;
 
         // COG
-        Fvector3 cog = {0, 0, 0};
+        Fvector3 cog = { 0, 0, 0 };
         for (int it = 0; it < int(points.size()); it++)
             cog.add(points[it]);
         cog.div(float(points.size()));
@@ -488,10 +460,8 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& P = polys[it];
-            Fplane pp = {P.planeN, P.planeD};
+            Fplane pp = { P.planeN, P.planeD };
             dest.push_back(pp);
         }
     }
 };
-
-#endif //	r3_R_sun_support_included

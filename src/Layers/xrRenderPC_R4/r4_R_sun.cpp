@@ -4,7 +4,7 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCommon/math_funcs_inline.h"
 
-#include "r4_R_sun_support.h"
+#include "r2_R_sun_support.h"
 
 const float tweak_COP_initial_offs = 1200.f;
 const float tweak_ortho_xform_initial_offs = 1000.f; //. ?

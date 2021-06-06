@@ -202,6 +202,7 @@
     <ClInclude Include="..\xrRender\blenders\blender_luminance.h" />
     <ClInclude Include="..\xrRender\blenders\blender_ssao.h" />
     <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h" />
+    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h" />
     <ClInclude Include="..\xrRender_R2\r2_types.h" />
     <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h" />
     <ClInclude Include="ComputeShader.h" />
@@ -213,7 +214,6 @@
     <ClInclude Include="..\xrRender\light_smapvis.h" />
     <ClInclude Include="r4.h" />
     <ClInclude Include="r4_rendertarget.h" />
-    <ClInclude Include="r4_R_sun_support.h" />
     <ClInclude Include="R_Backend_LOD.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -411,7 +411,6 @@
     <ClCompile Include="r4_rendertarget_phase_smap_D.cpp" />
     <ClCompile Include="r4_rendertarget_phase_ssao.cpp" />
     <ClCompile Include="r4_R_rain.cpp" />
-    <ClCompile Include="r4_R_sun_support.cpp" />
     <ClCompile Include="r4_shaders.cpp" />
     <ClCompile Include="R_Backend_LOD.cpp" />
     <ClCompile Include="stdafx.cpp">

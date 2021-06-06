@@ -633,6 +633,9 @@
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

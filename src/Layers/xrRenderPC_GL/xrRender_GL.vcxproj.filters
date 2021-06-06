@@ -573,9 +573,6 @@
     <ClCompile Include="r3_R_rain.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r3_R_sun_support.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
@@ -1091,9 +1088,6 @@
     <ClInclude Include="..\xrRender\r_sun_cascades.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="r3_R_sun_support.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\blenders\glRainBlender.h">
       <Filter>Shading templates\GL Rain</Filter>
     </ClInclude>
@@ -1140,6 +1134,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\r__dsgraph_structure.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
