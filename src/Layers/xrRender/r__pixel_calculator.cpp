@@ -1,7 +1,9 @@
 #include "stdafx.h"
+
 #include "r__pixel_calculator.h"
-#define rt_dimensions 1024
 #include "Layers/xrRender/FBasicVisual.h"
+
+static constexpr u32 rt_dimensions = 1024;
 
 void r_pixel_calculator::begin()
 {
@@ -29,11 +31,9 @@ void r_pixel_calculator::end()
     rt = nullptr;
 }
 
-// +X, -X, +Y, -Y, +Z, -Z
-static Fvector cmNorm[6] = {
-    {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, -1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}};
-static Fvector cmDir[6] = {
-    {1.f, 0.f, 0.f}, {-1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, -1.f, 0.f}, {0.f, 0.f, 1.f}, {0.f, 0.f, -1.f}};
+//                                  +X,                -X,                +Y,                 -Y,                +Z,                -Z
+static Fvector cmNorm[6] = { { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f } };
+static Fvector cmDir [6] = { { 1.f, 0.f, 0.f }, {-1.f, 0.f, 0.f }, { 0.f, 1.f,  0.f }, { 0.f,-1.f, 0.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f,-1.f } };
 
 r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 {
