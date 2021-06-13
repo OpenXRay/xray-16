@@ -592,6 +592,35 @@ bool CLocatorAPI::load_all_unloaded_archives()
     return res;
 }
 
+IC bool pred_str_ff(const _finddata_t& x, const _finddata_t& y) { return xr_strcmp(x.name, y.name) < 0; }
+bool ignore_name(const char* _name)
+{
+    if (!strcmp(_name, "Thumbs.db"))
+        return true; // ignore windows hidden Thumbs.db
+    if (!strcmp(_name, ".svn"))
+        return true; // ignore ".svn" folders
+    if (!strcmp(_name, ".vs"))
+        return true; // ignore ".vs" folders
+    const size_t len = strlen(_name);
+#define ENDS_WITH(n) (len > sizeof(n) && !strcmp(_name + len - (sizeof(n) - 1), n))
+    if (ENDS_WITH("Thumbs.db"))
+        return true;
+    if (ENDS_WITH(".VC.db"))
+        return true;
+    if (ENDS_WITH(".VC.opendb"))
+        return true;
+    if (ENDS_WITH(".sln"))
+        return true;
+    if (ENDS_WITH(".pdb"))
+        return true;
+    if (ENDS_WITH(".ipdb"))
+        return true;
+    if (ENDS_WITH(".iobj"))
+        return true;
+#undef ENDS_WITH
+    return false;
+}
+
 void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 {
     string_path N;
@@ -602,6 +631,11 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
     xr_strcpy(N, sizeof N, entry.name);
 #endif
     xr_fs_strlwr(N);
+
+    bool ignore = ignore_name(N);
+
+    if (ignore)
+        return;
 
     if (entry.attrib & _A_HIDDEN)
         return;
@@ -626,33 +660,6 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
         else
             Register(N, VFS_STANDARD_FILE, 0, 0, entry.size, entry.size, (u32)entry.time_write);
     }
-}
-
-IC bool pred_str_ff(const _finddata_t& x, const _finddata_t& y) { return xr_strcmp(x.name, y.name) < 0; }
-bool ignore_name(const char* _name)
-{
-    if (!strcmp(_name, "Thumbs.db"))
-        return true; // ignore windows hidden Thumbs.db
-    if (!strcmp(_name, ".svn"))
-        return true; // ignore ".svn" folders
-    if (!strcmp(_name, ".vs"))
-        return true; // ignore ".vs" folders
-    const size_t len = strlen(_name);
-#define ENDS_WITH(n) (len>sizeof(n) && !strcmp(_name+len-(sizeof(n)-1), n))
-    if (ENDS_WITH(".VC.db"))
-        return true;
-    if (ENDS_WITH(".VC.opendb"))
-        return true;
-    if (ENDS_WITH(".sln"))
-        return true;
-    if (ENDS_WITH(".pdb"))
-        return true;
-    if (ENDS_WITH(".ipdb"))
-        return true;
-    if (ENDS_WITH(".iobj"))
-        return true;
-#undef ENDS_WITH
-    return false;
 }
 
 // we need to check for file existance
