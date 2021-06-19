@@ -3,7 +3,9 @@
 #include "r__pixel_calculator.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
-#include <DirectXMath.h>
+#if !defined(USE_OGL) // XXX: support pixel calculator on OpenGL
+#   include <DirectXMath.h>
+#endif
 
 static constexpr u32 rt_dimensions = 1024;
 
