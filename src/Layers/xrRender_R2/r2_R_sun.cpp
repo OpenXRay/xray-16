@@ -91,7 +91,7 @@ struct BoundingBox
 //    computes the point where three planes intersect
 //    returns whether or not the point exists.
 static inline bool PlaneIntersection(
-    D3DXVECTOR3* intersectPt, const D3DXPLANE* p0, const D3DXPLANE* p1, const D3DXPLANE* p2)
+    D3DXVECTOR3& intersectPt, const D3DXPLANE* p0, const D3DXPLANE* p1, const D3DXPLANE* p2)
 {
     D3DXVECTOR3 n0(p0->a, p0->b, p0->c);
     D3DXVECTOR3 n1(p1->a, p1->b, p1->c);
@@ -103,18 +103,18 @@ static inline bool PlaneIntersection(
     D3DXVec3Cross(&n2_n0, &n2, &n0);
     D3DXVec3Cross(&n0_n1, &n0, &n1);
 
-    float cosTheta = D3DXVec3Dot(&n0, &n1_n2);
+    const float cosTheta = D3DXVec3Dot(&n0, &n1_n2);
 
     if (ALMOST_ZERO(cosTheta) || IS_SPECIAL(cosTheta))
         return false;
 
-    float const secTheta = 1.f / cosTheta;
+    const float secTheta = 1.f / cosTheta;
 
     n1_n2 = n1_n2 * p0->d;
     n2_n0 = n2_n0 * p1->d;
     n0_n1 = n0_n1 * p2->d;
 
-    *intersectPt = -(n1_n2 + n2_n0 + n0_n1) * secTheta;
+    intersectPt = -(n1_n2 + n2_n0 + n0_n1) * secTheta;
     return true;
 }
 
@@ -164,7 +164,7 @@ Frustum::Frustum(const D3DXMATRIX* matrix)
         const D3DXPLANE& p0 = (i & 1) ? camPlanes[4] : camPlanes[5];
         const D3DXPLANE& p1 = (i & 2) ? camPlanes[3] : camPlanes[2];
         const D3DXPLANE& p2 = (i & 4) ? camPlanes[0] : camPlanes[1];
-        PlaneIntersection(&pntList[i], &p0, &p1, &p2);
+        PlaneIntersection(pntList[i], &p0, &p1, &p2);
     }
 }
 
