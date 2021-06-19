@@ -147,6 +147,58 @@ static class cl_alpha_ref : public R_constant_setup
 } binder_alpha_ref;
 #endif
 
+// Defined in ResourceManager.cpp
+IReader* open_shader(pcstr shader);
+
+// Check shadow cascades type (old SOC/CS or new COP)
+static bool must_enable_old_cascades()
+{
+    bool oldCascades = false;
+#if RENDER == R_R2
+    {
+        // Check for new cascades support on R2
+        IReader* accumSunNearCascade = open_shader("accum_sun_cascade.ps");
+        oldCascades = !accumSunNearCascade;
+        FS.r_close(accumSunNearCascade);
+    }
+#elif RENDER != R_R1
+    {
+        IReader* accumSunNear = open_shader("accum_sun_near.ps");
+        R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
+        do
+        {
+            xr_string str(static_cast<cpcstr>(accumSunNear->pointer()), accumSunNear->length());
+
+            pcstr begin = strstr(str.c_str(), "float4");
+            if (!begin)
+                break;
+
+            begin = strstr(begin, "main");
+            if (!begin)
+                break;
+
+            cpcstr end = strstr(begin, "SV_Target");
+            if (!end)
+                break;
+
+            str.assign(begin, end);
+            cpcstr ptr = str.data();
+
+            if (strstr(ptr, "v2p_TL2uv"))
+            {
+                oldCascades = true;
+            }
+            else if (strstr(ptr, "v2p_volume"))
+            {
+                oldCascades = false;
+            }
+        } while (false);
+        FS.r_close(accumSunNear);
+    }
+#endif
+    return oldCascades;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -370,7 +422,7 @@ void CRender::create()
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
     o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;
     o.Tshadows = (strstr(Core.Params, "-tsh")) ? TRUE : FALSE;
-    o.oldshadowcascades = ps_r2_ls_flags_ext.test(R2FLAGEXT_SUN_OLD);
+    o.oldshadowcascades = must_enable_old_cascades() || ps_r2_ls_flags_ext.test(R2FLAGEXT_SUN_OLD);
     o.mblur = (strstr(Core.Params, "-mblur")) ? TRUE : FALSE;
     o.distortion_enabled = (strstr(Core.Params, "-nodistort")) ? FALSE : TRUE;
     o.distortion = o.distortion_enabled;
