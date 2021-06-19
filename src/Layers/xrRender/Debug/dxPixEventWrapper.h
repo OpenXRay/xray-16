@@ -23,4 +23,3 @@ public:
 };
 #endif // USE_OGL
 #endif // MASTER_GOLD
-
