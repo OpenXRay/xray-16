@@ -246,7 +246,7 @@ void dx103DFluidRenderer::CreateHHGGTexture()
 
     //	Min value is -1
     //	Max value is +1
-    PackedVector::XMConvertFloatToHalfStream(converted, 0, data, 0, std::size(data));
+    PackedVector::XMConvertFloatToHalfStream(converted, sizeof(PackedVector::HALF), data, sizeof(float), std::size(data));
 
     D3D_TEXTURE1D_DESC desc;
     desc.Width = iNumSamples;
