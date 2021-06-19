@@ -22,16 +22,8 @@
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
-#ifdef __BORLANDC__
-#include "d3d9.h"
-#include "d3dx9.h"
-#include "D3DX_Wrapper.h"
-#pragma comment(lib, "EToolsB.lib")
-#define USE_BUG_TRAP
-#else
 #define USE_BUG_TRAP
 static BOOL bException = FALSE;
-#endif
 #endif
 
 #ifndef USE_BUG_TRAP
