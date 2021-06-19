@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <xrCore/Threading/ParallelForEach.hpp>
+#include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "ResourceManager.h"
 #include "tss.h"
