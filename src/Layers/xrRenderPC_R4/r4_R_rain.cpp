@@ -6,6 +6,10 @@
 #include "xrEngine/IRenderable.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
+#include "DirectXMath.h"
+
+using namespace DirectX;
+
 const float tweak_rain_COP_initial_offs = 1200.f;
 const float tweak_rain_ortho_xform_initial_offs = 1000.f; //. ?
 
@@ -31,8 +35,6 @@ void CRender::render_rain()
 
     PIX_EVENT(render_rain);
 
-    D3DXMATRIX m_LightViewProj;
-
     //	Use light as placeholder for rain data.
     light RainLight;
 
@@ -52,7 +54,8 @@ void CRender::render_rain()
         const float fRainFar = ps_r3_dyn_wet_surf_far;
         ex_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, fRainFar);
         ex_full.mul(ex_project, Device.mView);
-        D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full_inverse),
+            XMMatrixInverse(nullptr, XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full))));
 
         //	Calculate view frustum were we can see dynamic rain radius
         {
@@ -176,12 +179,13 @@ void CRender::render_rain()
         bb.vMin.y = -fBoundingSphereRadius + vRectOffset.z;
         bb.vMax.y = fBoundingSphereRadius + vRectOffset.z;
 
-        // D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.vMin.x,bb.vMax.x,  bb.vMin.y,bb.vMax.y,
-        // bb.vMin.z-tweak_rain_ortho_xform_initial_offs,bb.vMax.z);
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project,
-            bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
-            bb.vMin.z - tweak_rain_ortho_xform_initial_offs,
-            bb.vMin.z + 2 * tweak_rain_ortho_xform_initial_offs);
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&mdir_Project),
+            XMMatrixOrthographicOffCenterLH(
+                bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
+                bb.vMin.z - tweak_rain_ortho_xform_initial_offs,
+                bb.vMin.z + 2 * tweak_rain_ortho_xform_initial_offs
+            )
+        );
 
         cull_xform.mul(mdir_Project, mdir_View);
 
@@ -193,7 +197,8 @@ void CRender::render_rain()
         Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
             0.0f, view_dim / 2.f + fTexelOffs, view_dim / 2.f + fTexelOffs, 0.0f, 1.0f};
         Fmatrix m_viewport_inv;
-        D3DXMatrixInverse((D3DXMATRIX*)&m_viewport_inv, 0, (D3DXMATRIX*)&m_viewport);
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_viewport_inv),
+            XMMatrixInverse(nullptr, XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_viewport))));
 
         // snap view-position to pixel
         //	snap zero point to pixel
@@ -231,7 +236,7 @@ void CRender::render_rain()
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, FALSE);
 
     // Finalize & Cleanup
-    RainLight.X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
+    RainLight.X.D.combine = cull_xform;
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)

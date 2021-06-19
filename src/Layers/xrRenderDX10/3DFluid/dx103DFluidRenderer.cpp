@@ -4,9 +4,14 @@
 #include "Layers/xrRender/BufferUtils.h"
 #include "dx103DFluidData.h"
 
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
+
+using namespace DirectX;
+
 struct VsInput
 {
-    D3DXVECTOR3 pos;
+    Fvector pos;
 };
 
 namespace
@@ -52,14 +57,10 @@ void dx103DFluidRenderer::Initialize(int gridWidth, int gridHeight, int gridDept
     {
         // Make a scale matrix to scale the unit-sided box to be unit-length on the
         //  side/s with maximum dimension
-        D3DXMATRIX scaleM;
-        D3DXMatrixIdentity(&scaleM);
-        D3DXMatrixScaling(&scaleM, m_vGridDim[0] / m_fMaxDim, m_vGridDim[1] / m_fMaxDim, m_vGridDim[2] / m_fMaxDim);
+        const auto scaleM = XMMatrixScaling(m_vGridDim[0] / m_fMaxDim, m_vGridDim[1] / m_fMaxDim, m_vGridDim[2] / m_fMaxDim);
         // offset grid to be centered at origin
-        D3DXMATRIX translationM;
-        D3DXMatrixTranslation(&translationM, -0.5, -0.5, -0.5);
-
-        m_gridMatrix = translationM * scaleM;
+        const auto translationM = XMMatrixTranslation(-0.5, -0.5, -0.5);
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_gridMatrix), translationM * scaleM);
         // m_gridMatrix.scale(m_vGridDim[0] / m_fMaxDim, m_vGridDim[1] / m_fMaxDim, m_vGridDim[2] / m_fMaxDim);
         // m_gridMatrix.translate_over(-0.5, -0.5, -0.5);
     }
@@ -121,9 +122,16 @@ void dx103DFluidRenderer::DestroyShaders()
 
 void dx103DFluidRenderer::CreateGridBox()
 {
-    VsInput vertices[] = {
-        {D3DXVECTOR3(0, 0, 0)}, {D3DXVECTOR3(0, 0, 1)}, {D3DXVECTOR3(0, 1, 0)}, {D3DXVECTOR3(0, 1, 1)},
-        {D3DXVECTOR3(1, 0, 0)}, {D3DXVECTOR3(1, 0, 1)}, {D3DXVECTOR3(1, 1, 0)}, {D3DXVECTOR3(1, 1, 1)},
+    VsInput vertices[] =
+    {
+        { 0, 0, 0 },
+        { 0, 0, 1 },
+        { 0, 1, 0 },
+        { 0, 1, 1 },
+        { 1, 0, 0 },
+        { 1, 0, 1 },
+        { 1, 1, 0 },
+        { 1, 1, 1 },
     };
     m_iGridBoxVertNum = sizeof(vertices) / sizeof(vertices[0]);
 
@@ -157,11 +165,13 @@ void dx103DFluidRenderer::CreateScreenQuad()
         {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, D3DDECL_END()};
 
     // Create a screen quad for all render to texture operations
-    VsInput svQuad[4];
-    svQuad[0].pos = D3DXVECTOR3(-1.0f, 1.0f, 0.0f);
-    svQuad[1].pos = D3DXVECTOR3(1.0f, 1.0f, 0.0f);
-    svQuad[2].pos = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
-    svQuad[3].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
+    VsInput svQuad[4]
+    {
+        { -1.0f,  1.0f, 0.0f },
+        {  1.0f,  1.0f, 0.0f },
+        { -1.0f, -1.0f, 0.0f },
+        {  1.0f, -1.0f, 0.0f }
+    };
 
     m_pQuadVertexBuffer.Create(sizeof(svQuad));
     u8* pData = static_cast<u8*>(m_pQuadVertexBuffer.Map());
@@ -223,7 +233,7 @@ void dx103DFluidRenderer::CreateHHGGTexture()
 {
     static const int iNumSamples = 16;
     float data[4 * iNumSamples];
-    D3DXFLOAT16 converted[4 * iNumSamples];
+    PackedVector::HALF converted[std::size(data)];
 
     for (int i = 0; i < iNumSamples; i++)
     {
@@ -236,7 +246,7 @@ void dx103DFluidRenderer::CreateHHGGTexture()
 
     //	Min value is -1
     //	Max value is +1
-    D3DXFloat32To16Array(converted, data, 4 * iNumSamples);
+    PackedVector::XMConvertFloatToHalfStream(converted, 0, data, 0, std::size(data));
 
     D3D_TEXTURE1D_DESC desc;
     desc.Width = iNumSamples;
@@ -502,51 +512,56 @@ void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, Fo
 
 void dx103DFluidRenderer::PrepareCBuffer(const dx103DFluidData &FluidData, u32 RTWidth, u32 RTHeight)
 {
-    const Fmatrix &transform = FluidData.GetTransform();
+    const Fmatrix& transform = FluidData.GetTransform();
     RCache.set_xform_world(transform);
 
     // The near and far planes are used to unproject the scene's z-buffer values
     RCache.set_c(strZNear, VIEWPORT_NEAR);
     RCache.set_c(strZFar, g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
-    D3DXMATRIX gridWorld;
-    gridWorld = *(D3DXMATRIX*)&transform;
-    D3DXMATRIX View;
-    View = *(D3DXMATRIX*)&RCache.xforms.m_v;
-    D3DXMATRIX WorldView = gridWorld * View;
+    const XMMATRIX gridWorld = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&transform));
+    const XMMATRIX View      = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&RCache.xforms.m_v));
+    XMMATRIX WorldView       = gridWorld * View;
 
     // The length of one of the axis of the worldView matrix is the length of longest side of the box
     //  in view space. This is used to convert the length of a ray from view space to grid space.
-    D3DXVECTOR3 worldXaxis = D3DXVECTOR3(WorldView._11, WorldView._12, WorldView._13);
-    float worldScale = D3DXVec3Length(&worldXaxis);
+    float worldScale = XMVectorGetX(XMVector3Length(WorldView.r[0]));
     RCache.set_c(strGridScaleFactor, worldScale);
 
     // We prepend the current world matrix with this other matrix which adds an offset (-0.5, -0.5, -0.5)
     //  and scale factors to account for unequal number of voxels on different sides of the volume box. 
     // This is because we want to preserve the aspect ratio of the original simulation grid when 
     //  raytracing through it.
-    WorldView = m_gridMatrix * WorldView;
+    const XMMATRIX gridMatrix = XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_gridMatrix));
+    WorldView = gridMatrix * WorldView;
 
     // worldViewProjection is used to transform the volume box to screen space
-    D3DXMATRIX WorldViewProjection;
-    D3DXMATRIX Projection;
-    Projection = *(D3DXMATRIX*)&RCache.xforms.m_p;
-    WorldViewProjection = WorldView * Projection;
-    RCache.set_c(strWorldViewProjection, *(Fmatrix*)&WorldViewProjection);
+    const XMMATRIX Projection = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&RCache.xforms.m_p));
+    const XMMATRIX WorldViewProjection = WorldView * Projection;
+    {
+        Fmatrix temp;
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&temp), WorldViewProjection);
+        RCache.set_c(strWorldViewProjection, temp);
+    }
 
     // invWorldViewProjection is used to transform positions in the "near" plane into grid space
-    D3DXMATRIX InvWorldViewProjection;
-    D3DXMatrixInverse((D3DXMATRIX*)&InvWorldViewProjection, nullptr, (D3DXMATRIX*)&WorldViewProjection);
-    RCache.set_c(strInvWorldViewProjection, *(Fmatrix*)&InvWorldViewProjection);
+    {
+        Fmatrix temp;
+        const XMMATRIX InvWorldViewProjection = XMMatrixInverse(nullptr, WorldViewProjection);
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&temp), InvWorldViewProjection);
+        RCache.set_c(strInvWorldViewProjection, temp);
+    }
 
-    // Compute the inverse of the worldView matrix 
-    D3DXMATRIX WorldViewInv;
-    D3DXMatrixInverse((D3DXMATRIX*)&WorldViewInv, nullptr, (D3DXMATRIX*)&WorldView);
-    // Compute the eye's position in "grid space" (the 0-1 texture coordinate cube)
-    D3DXVECTOR4 EyeInGridSpace;
-    D3DXVECTOR3 Origin(0,0,0);
-    D3DXVec3Transform((D3DXVECTOR4*)&EyeInGridSpace, (D3DXVECTOR3*)&Origin, (D3DXMATRIX*)&WorldViewInv);
-    RCache.set_c(strEyeOnGrid, *(Fvector4*)&EyeInGridSpace);
+    {
+        // Compute the inverse of the worldView matrix 
+        const XMMATRIX WorldViewInv = XMMatrixInverse(nullptr, WorldView);
+
+        // Compute the eye's position in "grid space" (the 0-1 texture coordinate cube)
+        const XMVECTOR EyeInGridSpace = XMVector3Transform(XMVectorSet(0, 0, 0, 0), WorldViewInv);
+        Fvector4 temp;
+        XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&temp), EyeInGridSpace);
+        RCache.set_c(strEyeOnGrid, temp);
+    }
 
     RCache.set_c(strRTWidth, (float)RTWidth);
     RCache.set_c(strRTHeight, (float)RTHeight);

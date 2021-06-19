@@ -6,6 +6,10 @@
 
 #include "r2_R_sun_support.h"
 
+#include <DirectXMath.h>
+
+using namespace DirectX;
+
 const float tweak_COP_initial_offs = 1200.f;
 const float tweak_ortho_xform_initial_offs = 1000.f; //. ?
 const float tweak_guaranteed_range = 20.f; //. ?
@@ -27,6 +31,7 @@ static int facetable[6][4] = {
     {0, 3, 5, 7}, {1, 6, 4, 2},
 };
 //////////////////////////////////////////////////////////////////////////
+// XXX: examine
 #define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
 #define FLT_AS_DW(F) (*(u32*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
@@ -800,15 +805,15 @@ void CRender::render_sun()
 void CRender::render_sun_near()
 {
     light* fuckingsun = (light*)Lights.sun._get();
-    D3DXMATRIX m_LightViewProj;
 
     // calculate view-frustum bounds in world space
-    Fmatrix ex_project, ex_full, ex_full_inverse;
+    Fmatrix ex_project, ex_full;
+    XMMATRIX ex_full_inverse;
     {
         ex_project.build_projection(
             deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, ps_r2_sun_near);
         ex_full.mul(ex_project, Device.mView);
-        D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
+        ex_full_inverse = XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&ex_full));
     }
 
     // Compute volume(s) - something like a frustum for infinite directional light
@@ -821,7 +826,8 @@ void CRender::render_sun_near()
     {
         FPU::m64r();
         // Lets begin from base frustum
-        Fmatrix fullxform_inv = ex_full_inverse;
+        Fmatrix fullxform_inv;
+        XMStoreFloat4x4((XMFLOAT4X4*)&fullxform_inv, ex_full_inverse);
 #ifdef _DEBUG
         typedef DumbConvexVolume<true> t_volume;
 #else
@@ -929,16 +935,17 @@ void CRender::render_sun_near()
         }
         Fbox& bb = frustum_bb;
         bb.grow(EPS);
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project,
+        XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
             bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
-            bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
+            bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z));
 
         // build viewport xform
         float view_dim = float(RImplementation.o.smapsize);
         Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
             0.0f, view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f};
         Fmatrix m_viewport_inv;
-        D3DXMatrixInverse((D3DXMATRIX*)&m_viewport_inv, 0, (D3DXMATRIX*)&m_viewport);
+        XMStoreFloat4x4((XMFLOAT4X4*)&m_viewport_inv,
+            XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&m_viewport)));
 
         // snap view-position to pixel
         cull_xform.mul(mdir_Project, mdir_View);
@@ -990,7 +997,7 @@ void CRender::render_sun_near()
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
-    fuckingsun->X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
+    fuckingsun->X.D.combine = cull_xform;
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
@@ -1094,11 +1101,12 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     light* fuckingsun = (light*)Lights.sun._get();
 
     // calculate view-frustum bounds in world space
-    Fmatrix ex_project, ex_full, ex_full_inverse;
+    Fmatrix ex_project, ex_full;
+    XMMATRIX ex_full_inverse;
     {
         ex_project = Device.mProject;
         ex_full.mul(ex_project, Device.mView);
-        D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
+        ex_full_inverse = XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&ex_full));
     }
 
     // Compute volume(s) - something like a frustum for infinite directional light
@@ -1111,7 +1119,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     {
         FPU::m64r();
         // Lets begin from base frustum
-        Fmatrix fullxform_inv = ex_full_inverse;
+        Fmatrix fullxform_inv;
+        XMStoreFloat4x4((XMFLOAT4X4*)&fullxform_inv, ex_full_inverse);
 #ifdef _DEBUG
         typedef DumbConvexVolume<true> t_volume;
 #else
@@ -1192,11 +1201,15 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         float map_size = m_sun_cascades[cascade_ind].size;
 #ifdef USE_DX9
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
-            map_size * 0.5f, 0.1f, dist + map_size);
+        XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
+            -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
+            map_size * 0.5f, 0.1f, dist + map_size)
+        );
 #else
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
-            map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/ 1.41421f * map_size);
+        XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
+            -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
+            map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/ 1.41421f * map_size)
+        );
 #endif
         //////////////////////////////////////////////////////////////////////////
         // build viewport xform
@@ -1204,7 +1217,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
             0.0f, view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f};
         Fmatrix m_viewport_inv;
-        D3DXMatrixInverse((D3DXMATRIX*)&m_viewport_inv, 0, (D3DXMATRIX*)&m_viewport);
+        XMStoreFloat4x4((XMFLOAT4X4*)&m_viewport_inv,
+            XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&m_viewport)));
 
         // snap view-position to pixel
         cull_xform.mul(mdir_Project, mdir_View);
@@ -1326,7 +1340,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
-    fuckingsun->X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
+    fuckingsun->X.D.combine = cull_xform;
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)

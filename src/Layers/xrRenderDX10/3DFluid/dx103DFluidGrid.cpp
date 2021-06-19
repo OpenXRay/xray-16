@@ -4,8 +4,8 @@
 
 struct VS_INPUT_FLUIDSIM_STRUCT
 {
-    D3DXVECTOR3 Pos; // Clip space position for slice vertices
-    D3DXVECTOR3 Tex; // Cell coordinates in 0-"texture dimension" range
+    Fvector Pos; // Clip space position for slice vertices
+    Fvector Tex; // Cell coordinates in 0-"texture dimension" range
 };
 
 namespace
@@ -145,34 +145,39 @@ void dx103DFluidGrid::DestroyVertexBuffers()
 
 void dx103DFluidGrid::InitScreenSlice(VS_INPUT_FLUIDSIM_STRUCT** vertices, int z, int& index)
 {
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex1;
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex2;
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex3;
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex4;
 
     // compute the offset (px, py) in the "flat 3D-texture" space for the slice with given 'z' coordinate
-    int column = z % m_iCols;
-    int row = (int)floorf((float)(z / m_iCols));
-    int px = column * m_vDim[0];
-    int py = row * m_vDim[1];
+    const int column = z % m_iCols;
+    const int row = (int)floorf((float)(z / m_iCols));
+    const int px = column * m_vDim[0];
+    const int py = row * m_vDim[1];
 
-    float w = float(m_vDim[0]);
-    float h = float(m_vDim[1]);
+    const float w = float(m_vDim[0]);
+    const float h = float(m_vDim[1]);
 
-    float Width = float(m_iCols * m_vDim[0]);
-    float Height = float(m_iRows * m_vDim[1]);
+    const float Width = float(m_iCols * m_vDim[0]);
+    const float Height = float(m_iRows * m_vDim[1]);
 
-    tempVertex1.Pos = D3DXVECTOR3(px * 2.0f / Width - 1.0f, -(py * 2.0f / Height) + 1.0f, 0.0f);
-    tempVertex1.Tex = D3DXVECTOR3(0, 0, float(z));
-
-    tempVertex2.Pos = D3DXVECTOR3((px + w) * 2.0f / Width - 1.0f, -((py)*2.0f / Height) + 1.0f, 0.0f);
-    tempVertex2.Tex = D3DXVECTOR3(w, 0, float(z));
-
-    tempVertex3.Pos = D3DXVECTOR3((px + w) * 2.0f / Width - 1.0f, -((py + h) * 2.0f / Height) + 1.0f, 0.0f);
-    tempVertex3.Tex = D3DXVECTOR3(w, h, float(z));
-
-    tempVertex4.Pos = D3DXVECTOR3((px)*2.0f / Width - 1.0f, -((py + h) * 2.0f / Height) + 1.0f, 0.0f);
-    tempVertex4.Tex = D3DXVECTOR3(0, h, float(z));
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex1 =
+    {
+        { px * 2.0f / Width - 1.0f, -(py * 2.0f / Height) + 1.0f, 0.0f },
+        { 0, 0, float(z) }
+    };
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex2 =
+    {
+        { (px + w) * 2.0f / Width - 1.0f, -((py) * 2.0f / Height) + 1.0f, 0.0f },
+        { w, 0, float(z) }
+    };
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex3 =
+    {
+        { (px + w) * 2.0f / Width - 1.0f, -((py + h) * 2.0f / Height) + 1.0f, 0.0f },
+        { w, h, float(z) }
+    };
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex4 =
+    {
+        { (px) * 2.0f / Width - 1.0f, -((py + h) * 2.0f / Height) + 1.0f, 0.0f },
+        { 0, h, float(z) }
+    };
 
     (*vertices)[index++] = tempVertex1;
     (*vertices)[index++] = tempVertex2;
@@ -184,25 +189,29 @@ void dx103DFluidGrid::InitScreenSlice(VS_INPUT_FLUIDSIM_STRUCT** vertices, int z
 
 void dx103DFluidGrid::InitSlice(int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
 {
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex1;
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex2;
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex3;
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex4;
+    const int w = m_vDim[0];
+    const int h = m_vDim[1];
 
-    int w = m_vDim[0];
-    int h = m_vDim[1];
-
-    tempVertex1.Pos = D3DXVECTOR3(1 * 2.0f / w - 1.0f, -1 * 2.0f / h + 1.0f, 0.0f);
-    tempVertex1.Tex = D3DXVECTOR3(1.0f, 1.0f, float(z));
-
-    tempVertex2.Pos = D3DXVECTOR3((w - 1.0f) * 2.0f / w - 1.0f, -1 * 2.0f / h + 1.0f, 0.0f);
-    tempVertex2.Tex = D3DXVECTOR3((w - 1.0f), 1.0f, float(z));
-
-    tempVertex3.Pos = D3DXVECTOR3((w - 1.0f) * 2.0f / w - 1.0f, -(h - 1) * 2.0f / h + 1.0f, 0.0f);
-    tempVertex3.Tex = D3DXVECTOR3((w - 1.0f), (h - 1.0f), float(z));
-
-    tempVertex4.Pos = D3DXVECTOR3(1 * 2.0f / w - 1.0f, -(h - 1.0f) * 2.0f / h + 1.0f, 0.0f);
-    tempVertex4.Tex = D3DXVECTOR3(1.0f, (h - 1.0f), float(z));
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex1 =
+    {
+        { 1 * 2.0f / w - 1.0f, -1 * 2.0f / h + 1.0f, 0.0f },
+        { 1.0f, 1.0f, float(z) }
+    };
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex2 =
+    {
+        { (w - 1.0f) * 2.0f / w - 1.0f, -1 * 2.0f / h + 1.0f, 0.0f },
+        { (w - 1.0f), 1.0f, float(z) }
+    };
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex3 =
+    {
+        { (w - 1.0f) * 2.0f / w - 1.0f, -(h - 1) * 2.0f / h + 1.0f, 0.0f },
+        { (w - 1.0f), (h - 1.0f), float(z) }
+    };
+    const VS_INPUT_FLUIDSIM_STRUCT tempVertex4 =
+    {
+        { 1 * 2.0f / w - 1.0f, -(h - 1.0f) * 2.0f / h + 1.0f, 0.0f },
+        { 1.0f, (h - 1.0f), float(z) }
+    };
 
     (*vertices)[index++] = tempVertex1;
     (*vertices)[index++] = tempVertex2;
@@ -215,17 +224,20 @@ void dx103DFluidGrid::InitSlice(int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int&
 void dx103DFluidGrid::InitLine(
     float x1, float y1, float x2, float y2, int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
 {
-    VS_INPUT_FLUIDSIM_STRUCT tempVertex;
     int w = m_vDim[0];
     int h = m_vDim[1];
 
-    tempVertex.Pos = D3DXVECTOR3(x1 * 2.0f / w - 1.0f, -y1 * 2.0f / h + 1.0f, 0.5f);
-    tempVertex.Tex = D3DXVECTOR3(0.0f, 0.0f, float(z));
-    (*vertices)[index++] = tempVertex;
+    (*vertices)[index++] =
+    {
+        { x1 * 2.0f / w - 1.0f, -y1 * 2.0f / h + 1.0f, 0.5f },
+        { 0.0f, 0.0f, float(z) }
+    };
 
-    tempVertex.Pos = D3DXVECTOR3(x2 * 2.0f / w - 1.0f, -y2 * 2.0f / h + 1.0f, 0.5f);
-    tempVertex.Tex = D3DXVECTOR3(0.0f, 0.0f, float(z));
-    (*vertices)[index++] = tempVertex;
+    (*vertices)[index++] =
+    {
+        { x2 * 2.0f / w - 1.0f, -y2 * 2.0f / h + 1.0f, 0.5f },
+        { 0.0f, 0.0f, float(z) }
+    };
 }
 
 void dx103DFluidGrid::InitBoundaryQuads(VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
