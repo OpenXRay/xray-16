@@ -229,8 +229,8 @@ void CheckAndSetupRenderer()
         return;
     }
 
-    if (strstr(Core.Params, "-gl"))
-        Console->Execute("renderer renderer_gl");
+    if (strstr(Core.Params, "-rgl"))
+        Console->Execute("renderer renderer_rgl");
     else if (strstr(Core.Params, "-r4"))
         Console->Execute("renderer renderer_r4");
     else if (strstr(Core.Params, "-r3"))
