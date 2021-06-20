@@ -67,6 +67,7 @@ public:
     IC void erase(iterator first, iterator last);
     IC size_type erase(const key_type& key);
     IC void clear();
+    IC void reserve(size_t new_capacity);
     IC iterator find(const key_type& key);
     IC iterator lower_bound(const key_type& key);
     IC iterator upper_bound(const key_type& key);
@@ -181,6 +182,8 @@ IC typename _associative_vector::const_reverse_iterator _associative_vector::ren
 
 TEMPLATE_SPECIALIZATION
 IC void _associative_vector::clear() { inherited::clear(); }
+TEMPLATE_SPECIALIZATION
+IC void _associative_vector::reserve(size_t new_capacity) { inherited::reserve(new_capacity); }
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::size_type _associative_vector::max_size() const { return inherited::max_size(); }
 TEMPLATE_SPECIALIZATION
