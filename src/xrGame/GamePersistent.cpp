@@ -47,6 +47,8 @@
 #include "ai_debug.h"
 #endif // _EDITOR
 
+#include "xr_level_controller.h"
+
 u32 UIStyleID = 0;
 xr_vector<xr_token> UIStyleToken;
 
@@ -125,7 +127,7 @@ CGamePersistent::CGamePersistent(void)
     m_game_params.m_e_game_type = eGameIDNoGame;
     ambient_effect_next_time = 0;
     ambient_effect_stop_time = 0;
-    ambient_particles = 0;
+    ambient_particles = nullptr;
 
     ambient_effect_wind_start = 0.f;
     ambient_effect_wind_in_time = 0.f;
@@ -143,7 +145,7 @@ CGamePersistent::CGamePersistent(void)
     m_last_stats_frame = u32(-2);
 #endif
 
-    BOOL bDemoMode = (0 != strstr(Core.Params, "-demomode "));
+    const bool bDemoMode = (0 != strstr(Core.Params, "-demomode "));
     if (bDemoMode)
     {
         string256 fname;
@@ -192,7 +194,7 @@ void CGamePersistent::RegisterModel(IRenderVisual* V)
         R_ASSERT2(GMLib.GetMaterialByIdx(def_idx)->Flags.is(SGameMtl::flDynamic), "'default_object' - must be dynamic");
         IKinematics* K = smart_cast<IKinematics*>(V);
         VERIFY(K);
-        int cnt = K->LL_BoneCount();
+        const u16 cnt = K->LL_BoneCount();
         for (u16 k = 0; k < cnt; k++)
         {
             CBoneData& bd = K->LL_GetData(k);
@@ -293,8 +295,6 @@ void CGamePersistent::Disconnect()
     m_game_params.m_e_game_type = eGameIDNoGame;
 }
 
-#include "xr_level_controller.h"
-
 void CGamePersistent::OnGameStart()
 {
     inherited::OnGameStart();
@@ -305,13 +305,13 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort)
 {
     switch (gt)
     {
-    case eGameIDSingle: return "single"; break;
-    case eGameIDDeathmatch: return (bShort) ? "dm" : "deathmatch"; break;
-    case eGameIDTeamDeathmatch: return (bShort) ? "tdm" : "teamdeathmatch"; break;
-    case eGameIDArtefactHunt: return (bShort) ? "ah" : "artefacthunt"; break;
-    case eGameIDCaptureTheArtefact: return (bShort) ? "cta" : "capturetheartefact"; break;
-    case eGameIDDominationZone: return (bShort) ? "dz" : "dominationzone"; break;
-    case eGameIDTeamDominationZone: return (bShort) ? "tdz" : "teamdominationzone"; break;
+    case eGameIDSingle:             return "single";
+    case eGameIDDeathmatch:         return (bShort) ? "dm"  : "deathmatch";
+    case eGameIDTeamDeathmatch:     return (bShort) ? "tdm" : "teamdeathmatch";
+    case eGameIDArtefactHunt:       return (bShort) ? "ah"  : "artefacthunt";
+    case eGameIDCaptureTheArtefact: return (bShort) ? "cta" : "capturetheartefact";
+    case eGameIDDominationZone:     return (bShort) ? "dz"  : "dominationzone";
+    case eGameIDTeamDominationZone: return (bShort) ? "tdz" : "teamdominationzone";
     default: return "---";
     }
 }
@@ -360,8 +360,7 @@ void CGamePersistent::WeathersUpdate()
         CEnvDescriptor* const _env = Environment().Current[data_set];
         VERIFY(_env);
 
-        CEnvAmbient* env_amb = _env->env_ambient;
-        if (env_amb)
+        if (CEnvAmbient* env_amb = _env->env_ambient; env_amb)
         {
             CEnvAmbient::SSndChannelVec& vec = env_amb->get_snd_channels();
 
@@ -381,13 +380,13 @@ void CGamePersistent::WeathersUpdate()
                     ref_sound& snd = ch.get_rnd_sound();
 
                     Fvector pos;
-                    float angle = ::Random.randF(PI_MUL_2);
+                    const float angle = ::Random.randF(PI_MUL_2);
                     pos.x = _cos(angle);
                     pos.y = 0;
                     pos.z = _sin(angle);
                     pos.normalize().mul(ch.get_rnd_sound_dist()).add(Device.vCameraPosition);
                     pos.y += 10.f;
-                    snd.play_at_pos(0, pos);
+                    snd.play_at_pos(nullptr, pos);
 
 #ifdef DEBUG
                     if (!snd._handle() && strstr(Core.Params, "-nosound"))
@@ -404,8 +403,7 @@ void CGamePersistent::WeathersUpdate()
             // start effect
             if ((FALSE == bIndoor) && (0 == ambient_particles) && Device.dwTimeGlobal > ambient_effect_next_time)
             {
-                CEnvAmbient::SEffect* eff = env_amb->get_rnd_effect();
-                if (eff)
+                if (CEnvAmbient::SEffect* eff = env_amb->get_rnd_effect(); eff)
                 {
                     Environment().wind_gust_factor = eff->wind_gust_factor;
                     ambient_effect_next_time = Device.dwTimeGlobal + env_amb->get_rnd_effect_time();
@@ -445,11 +443,11 @@ void CGamePersistent::WeathersUpdate()
         if (Device.fTimeGlobal >= ambient_effect_wind_start && Device.fTimeGlobal <= ambient_effect_wind_in_time &&
             ambient_effect_wind_on)
         {
-            float delta = ambient_effect_wind_in_time - ambient_effect_wind_start;
+            const float delta = ambient_effect_wind_in_time - ambient_effect_wind_start;
             float t;
             if (delta != 0.f)
             {
-                float cur_in = Device.fTimeGlobal - ambient_effect_wind_start;
+                const float cur_in = Device.fTimeGlobal - ambient_effect_wind_start;
                 t = cur_in / delta;
             }
             else
@@ -484,11 +482,11 @@ void CGamePersistent::WeathersUpdate()
 
         if (Device.fTimeGlobal >= ambient_effect_wind_end && Device.fTimeGlobal <= ambient_effect_wind_out_time)
         {
-            float delta = ambient_effect_wind_out_time - ambient_effect_wind_end;
+            const float delta = ambient_effect_wind_out_time - ambient_effect_wind_end;
             float t;
             if (delta != 0.f)
             {
-                float cur_in = Device.fTimeGlobal - ambient_effect_wind_end;
+                const float cur_in = Device.fTimeGlobal - ambient_effect_wind_end;
                 t = cur_in / delta;
             }
             else
