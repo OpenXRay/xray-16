@@ -206,7 +206,7 @@ void CUITalkWnd::Update()
         UpdateQuestions();
     }
     inherited::Update();
-    UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
+    //UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
 
     UITalkDialogWnd->UpdateButtonsLayout(b_disable_break, m_pOthersInvOwner->IsTradeEnabled());
 
