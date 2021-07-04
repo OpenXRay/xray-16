@@ -62,7 +62,13 @@ execute_process(
 )
 
 # Compiler options
-set(CCOPT "-O2 -fomit-frame-pointer -fno-stack-protector")
+if (PROJECT_PLATFORM_E2K) # E2K: O3 on mcst-lcc approximately equal to O2 at gcc X86/ARM
+	set(CCOPT_OPT_LEVEL "-O3")
+else()
+	set(CCOPT_OPT_LEVEL "-O2")
+endif()
+
+set(CCOPT "${CCOPT_OPT_LEVEL} -fomit-frame-pointer -fno-stack-protector")
 
 # Target-specific compiler options
 set(CCOPT_x86 "-march=i686 -msse -msse2 -mfpmath=sse")
