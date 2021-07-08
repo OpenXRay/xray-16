@@ -177,7 +177,16 @@ bool MODEL::serialize(pcstr fileName) const
     if (!wstream)
         return false;
 
+    u32 crc;
+    {
+        crc = crc32(&verts_count, sizeof(verts_count));
+        crc = crc32(verts, sizeof(Fvector) * verts_count, crc);
+        crc = crc32(&tris_count, sizeof(tris_count), crc);
+        crc = crc32(tris, sizeof(TRI) * tris_count, crc);
+    }
+
     wstream->w_u32(version);
+    wstream->w_u32(crc);
     wstream->w_u32(verts_count);
     wstream->w(verts, sizeof(Fvector) * verts_count);
     wstream->w_u32(tris_count);
@@ -201,24 +210,52 @@ bool MODEL::deserialize(pcstr fileName)
         return false;
     }
 
-    xr_free(verts);
-    xr_free(tris);
-    xr_free(tree);
+    const u32 savedDataCrc = rstream->r_u32();
+
+    const auto data = rstream->pointer();
+    const auto elapsedFromBegin = rstream->elapsed();
 
     verts_count = rstream->r_u32();
-    verts = xr_alloc<Fvector>(verts_count);
     const u32 vertsSize = verts_count * sizeof(Fvector);
-    CopyMemory(verts, rstream->pointer(), vertsSize);
+    const auto pVerts = rstream->pointer();
     rstream->advance(vertsSize);
 
     tris_count = rstream->r_u32();
-    tris = xr_alloc<TRI>(tris_count);
     const u32 trisSize = tris_count * sizeof(TRI);
-    CopyMemory(tris, rstream->pointer(), trisSize);
+    const auto pTris = rstream->pointer();
     rstream->advance(trisSize);
 
-    tree = xr_new<OPCODE_Model>();
-    tree->Load(rstream);
+    const u32 dataCrc = crc32(data, elapsedFromBegin - rstream->elapsed());
+
+    if (dataCrc != savedDataCrc)
+    {
+        verts_count = 0;
+        tris_count = 0;
+        FS.r_close(rstream);
+        return false;
+    }
+
+    auto newTree = xr_new<OPCODE_Model>();
+    if (!newTree->Load(rstream))
+    {
+        xr_delete(newTree);
+        verts_count = 0;
+        tris_count = 0;
+        FS.r_close(rstream);
+        return false;
+    }
+
+    xr_free(verts);
+    xr_free(tris);
+    xr_delete(tree);
+    tree = newTree;
+
+    verts = xr_alloc<Fvector>(verts_count);
+    CopyMemory(verts, pVerts, vertsSize);
+
+    tris = xr_alloc<TRI>(tris_count);
+    CopyMemory(tris, pTris, trisSize);
+
     FS.r_close(rstream);
     status = S_READY;
     return true;
