@@ -628,7 +628,7 @@ bool CBulletManager::trajectory_check_error(Fvector& previous_position, collide:
     bullet.dir = start_to_target;
 
     collide::ray_defs RD(start, start_to_target, distance, CDB::OPT_FULL_TEST, collide::rqtBoth);
-    BOOL const result = Level().ObjectSpace.RayQuery(
+    bool const result = Level().ObjectSpace.RayQuery(
         storage, RD, CBulletManager::firetrace_callback, &data, CBulletManager::test_callback, NULL);
     if (!result || (data.collide_time == 0.f))
     {
