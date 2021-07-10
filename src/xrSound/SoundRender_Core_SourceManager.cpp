@@ -89,7 +89,11 @@ void CSoundRender_Core::i_create_all_sources()
         }
 
         CSoundRender_Source* S = xr_new<CSoundRender_Source>();
-        S->load(id);
+        if (!S->load(id, false, false))
+        {
+            xr_delete(S);
+            return;
+        }
 
         ScopeLock scope(&s_sources_lock);
         s_sources.insert({ id, S });
