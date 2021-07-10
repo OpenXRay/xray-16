@@ -11,7 +11,7 @@
 #ifdef DEBUG
 static bool _cdb_bDebug = false;
 extern XRCDB_API bool* cdb_bDebug = &_cdb_bDebug;
-bool bDebug() { return !!(*cdb_bDebug); }
+bool bDebug() { return *cdb_bDebug; }
 #endif
 using namespace collide;
 
