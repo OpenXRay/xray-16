@@ -448,14 +448,14 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
             if (s_res.range < r_temp.r_begin()->range)
             {
                 // static nearer
-                bool need_calc = CB ? CB(s_res, user_data) : TRUE;
+                bool need_calc = CB ? CB(s_res, user_data) : true;
                 next_test = need_calc ? s_mask : rqtNone;
                 r_dest.append_result(s_res);
             }
             else
             {
                 // dynamic nearer
-                bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
+                bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : true;
                 next_test = need_calc ? d_mask : rqtNone;
                 r_dest.append_result(*r_temp.r_begin());
             }
@@ -463,14 +463,14 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
         else if (s_res.valid())
         {
             // only static return result
-            bool need_calc = CB ? CB(s_res, user_data) : TRUE;
+            bool need_calc = CB ? CB(s_res, user_data) : true;
             next_test = need_calc ? s_mask : rqtNone;
             r_dest.append_result(s_res);
         }
         else if (r_temp.r_count())
         {
             // only dynamic return result
-            bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
+            bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : true;
             next_test = need_calc ? d_mask : rqtNone;
             r_dest.append_result(*r_temp.r_begin());
         }

@@ -44,7 +44,7 @@ ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fve
 {
     Fvector MaxT;
     MaxT.x = MaxT.y = MaxT.z = -1.0f;
-    bool Inside = TRUE;
+    bool Inside = true;
 
     // Find candidate planes.
     if (ray.pos[0] < min[0])

@@ -62,7 +62,7 @@ struct ray_cache
     bool similar(const Fvector& _start, const Fvector& _dir, const float _range)
     {
         if (!_start.similar(start))
-            return FALSE;
+            return false;
         if (!fsimilar(1.f, dir.dotproduct(_dir)))
             return FALSE;
         if (!fsimilar(_range, range))
@@ -121,7 +121,7 @@ struct rq_result
             return TRUE;
         }
         else
-            return FALSE;
+            return false;
     }
     IC bool set_if_less(rq_result* R)
     {
@@ -141,7 +141,7 @@ struct rq_result
             return TRUE;
         }
         else
-            return FALSE;
+            return false;
     }
     IC bool valid() { return (element >= 0); }
 };
