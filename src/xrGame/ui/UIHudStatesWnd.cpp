@@ -387,7 +387,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             m_ui_weapon_third_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
-        if (m_ui_weapon_sign_ammo)
+        if (m_ui_weapon_sign_ammo && m_item_info.cur_ammo.size() && m_item_info.total_ammo.size())
         {
             string64 temp;
             xr_sprintf(temp, "%s/%s", m_item_info.cur_ammo.c_str(), m_item_info.total_ammo.c_str());
@@ -406,7 +406,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             }
             else
             {
-                if (m_item_info.cur_ammo.size() > 5)
+                if (xr_strlen(temp) > 5)
                 {
                     pFont = pFont22;
                 }
