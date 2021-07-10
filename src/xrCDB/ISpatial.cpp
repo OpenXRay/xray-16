@@ -45,10 +45,10 @@ bool SpatialBase::spatial_inside()
         return FALSE;
     if (spatial.sphere.P.z > spatial.node_center.z + dr)
         return FALSE;
-    return TRUE;
+    return true;
 }
 
-BOOL verify_sp(ISpatial* sp, Fvector& node_center, float node_radius)
+bool verify_sp(ISpatial* sp, Fvector& node_center, float node_radius)
 {
     float dr = -(-node_radius + sp->GetSpatialData().sphere.R);
     if (sp->GetSpatialData().sphere.P.x < node_center.x - dr)
@@ -271,7 +271,7 @@ void ISpatial_DB::insert(ISpatial* S)
 
     const auto& spatialData = S->GetSpatialData();
 
-    BOOL bValid = _valid(spatialData.sphere.R) && _valid(spatialData.sphere.P);
+    bool bValid = _valid(spatialData.sphere.R) && _valid(spatialData.sphere.P);
     if (!bValid)
     {
         IGameObject* O = dynamic_cast<IGameObject*>(S);

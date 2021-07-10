@@ -9,23 +9,23 @@
 #endif
 
 #ifdef DEBUG
-static BOOL _cdb_bDebug = false;
-extern XRCDB_API BOOL* cdb_bDebug = &_cdb_bDebug;
-bool bDebug() { return !!(*cdb_bDebug); }
+static bool _cdb_bDebug = false;
+extern XRCDB_API bool* cdb_bDebug = &_cdb_bDebug;
+bool bDebug() { return *cdb_bDebug; }
 #endif
 using namespace collide;
 
 //--------------------------------------------------------------------------------
 // RayTest - Occluded/No
 //--------------------------------------------------------------------------------
-BOOL CObjectSpace::RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
+bool CObjectSpace::RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
     collide::ray_cache* cache, IGameObject* ignore_object)
 {
-    BOOL _ret = _RayTest(start, dir, range, tgt, cache, ignore_object);
+    bool _ret = _RayTest(start, dir, range, tgt, cache, ignore_object);
     r_spatial.clear();
     return _ret;
 }
-BOOL CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
+bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
     collide::ray_cache* cache, IGameObject* ignore_object)
 {
     VERIFY(_abs(dir.magnitude() - 1) < EPS);
@@ -109,14 +109,14 @@ BOOL CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
 //--------------------------------------------------------------------------------
 // RayPick
 //--------------------------------------------------------------------------------
-BOOL CObjectSpace::RayPick(
+bool CObjectSpace::RayPick(
     const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
-    BOOL _res = _RayPick(start, dir, range, tgt, R, ignore_object);
+    bool _res = _RayPick(start, dir, range, tgt, R, ignore_object);
     r_spatial.clear();
     return _res;
 }
-BOOL CObjectSpace::_RayPick(
+bool CObjectSpace::_RayPick(
     const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
     r_temp.r_clear();
@@ -177,14 +177,14 @@ BOOL CObjectSpace::_RayPick(
 //--------------------------------------------------------------------------------
 // RayQuery
 //--------------------------------------------------------------------------------
-BOOL CObjectSpace::RayQuery(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB,
+bool CObjectSpace::RayQuery(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
-    BOOL _res = _RayQuery2(dest, R, CB, user_data, tb, ignore_object);
+    bool _res = _RayQuery2(dest, R, CB, user_data, tb, ignore_object);
     r_spatial.clear();
     return (_res);
 }
-BOOL CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
+bool CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
     // initialize query
@@ -243,7 +243,7 @@ BOOL CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_de
     return r_dest.r_count();
 }
 
-BOOL CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
+bool CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
     // initialize query
@@ -337,7 +337,7 @@ BOOL CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_de
     return r_dest.r_count();
 }
 
-BOOL CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
+bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
 #ifdef DEBUG
@@ -448,14 +448,14 @@ BOOL CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
             if (s_res.range < r_temp.r_begin()->range)
             {
                 // static nearer
-                BOOL need_calc = CB ? CB(s_res, user_data) : TRUE;
+                bool need_calc = CB ? CB(s_res, user_data) : true;
                 next_test = need_calc ? s_mask : rqtNone;
                 r_dest.append_result(s_res);
             }
             else
             {
                 // dynamic nearer
-                BOOL need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
+                bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : true;
                 next_test = need_calc ? d_mask : rqtNone;
                 r_dest.append_result(*r_temp.r_begin());
             }
@@ -463,14 +463,14 @@ BOOL CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
         else if (s_res.valid())
         {
             // only static return result
-            BOOL need_calc = CB ? CB(s_res, user_data) : TRUE;
+            bool need_calc = CB ? CB(s_res, user_data) : true;
             next_test = need_calc ? s_mask : rqtNone;
             r_dest.append_result(s_res);
         }
         else if (r_temp.r_count())
         {
             // only dynamic return result
-            BOOL need_calc = CB ? CB(*r_temp.r_begin(), user_data) : TRUE;
+            bool need_calc = CB ? CB(*r_temp.r_begin(), user_data) : true;
             next_test = need_calc ? d_mask : rqtNone;
             r_dest.append_result(*r_temp.r_begin());
         }
@@ -485,7 +485,7 @@ BOOL CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
     return r_dest.r_count();
 }
 
-BOOL CObjectSpace::RayQuery(collide::rq_results& r_dest, ICollisionForm* target, const collide::ray_defs& R)
+bool CObjectSpace::RayQuery(collide::rq_results& r_dest, ICollisionForm* target, const collide::ray_defs& R)
 {
     VERIFY(target);
     r_dest.r_clear();

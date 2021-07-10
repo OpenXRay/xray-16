@@ -249,7 +249,7 @@ public:
     void insert(ISpatial* S);
     void remove(ISpatial* S);
     void update(u32 nodes = 8);
-    BOOL verify();
+    bool verify();
 
     enum
     {
