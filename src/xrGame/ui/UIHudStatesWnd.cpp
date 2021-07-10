@@ -387,7 +387,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             m_ui_weapon_third_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
-        if (m_ui_weapon_sign_ammo )
+        if (m_ui_weapon_sign_ammo)
         {
             if (m_item_info.cur_ammo.size() && m_item_info.total_ammo.size())
             {
