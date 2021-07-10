@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "xrServer.h"
 #include "xrServer_Objects.h"
+#include "game_sv_mp_script.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrServerEntities/xrMessages.h"
 
@@ -135,7 +136,8 @@ CSE_Abstract* xrServer::Process_spawn(
         {
             R_ASSERT(e_parent);
 
-            game->OnTouch(E->ID_Parent, E->ID);
+            if (!smart_cast<game_sv_mp_script*>(game))
+                game->OnTouch(E->ID_Parent, E->ID);
 
             e_parent->children.push_back(E->ID);
         }
