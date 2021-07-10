@@ -45,7 +45,7 @@ bool SpatialBase::spatial_inside()
         return FALSE;
     if (spatial.sphere.P.z > spatial.node_center.z + dr)
         return FALSE;
-    return TRUE;
+    return true;
 }
 
 bool verify_sp(ISpatial* sp, Fvector& node_center, float node_radius)

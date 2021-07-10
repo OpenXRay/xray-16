@@ -64,7 +64,7 @@ struct ray_cache
         if (!_start.similar(start))
             return false;
         if (!fsimilar(1.f, dir.dotproduct(_dir)))
-            return FALSE;
+            return false;
         if (!fsimilar(_range, range))
             return FALSE;
         return TRUE;
@@ -118,7 +118,7 @@ struct rq_result
         if (I->range < range)
         {
             set(0, I->range, I->id);
-            return TRUE;
+            return true;
         }
         else
             return false;
@@ -131,14 +131,14 @@ struct rq_result
             return TRUE;
         }
         else
-            return FALSE;
+            return false;
     }
     IC bool set_if_less(IGameObject* _who, float _range, int _element)
     {
         if (_range < range)
         {
             set(_who, _range, _element);
-            return TRUE;
+            return true;
         }
         else
             return false;
