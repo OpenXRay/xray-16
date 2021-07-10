@@ -561,8 +561,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 #endif
 
 template <typename T>
-T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
-    pcstr fallbackShader /*= nullptr*/, u32 flags /*= 0*/)
+T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32 flags /*= 0*/)
 {
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
     pstr N = pstr(name);
@@ -603,22 +602,20 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         // Try to open
         IReader* file = FS.r_open(cname);
 
-        // Here we can fallback to fallbackShader and then to "stub_default"
+        // Here we can fallback to "stub_default"
         bool fallback = m_shader_fallback_allowed;
-        if (!file && (fallback || fallbackShader))
+        if (!file && fallback)
         {
         fallback:
-            if (!fallbackShader)
-                fallback = false;
+            fallback = false;
 
             string_path tmp;
-            strconcat(sizeof(tmp), tmp, fallbackShader ? fallbackShader : "stub_default", ShaderTypeTraits<T>::GetShaderExt());
+            strconcat(sizeof(tmp), tmp, "stub_default", ShaderTypeTraits<T>::GetShaderExt());
 
             Msg("CreateShader: %s is missing. Replacing it with %s", cname, tmp);
             strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), tmp);
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
-            fallbackShader = nullptr;
         }
         R_ASSERT3(file, "Shader file doesnt exist", cname);
 

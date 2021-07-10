@@ -149,7 +149,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     u32 flags = 0;
     if (ps->constants.dx9compatibility)
         flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs, nullptr, flags);
+    SVS* vs = RImplementation.Resources->_CreateVS(_vs, flags);
     SGS* gs = RImplementation.Resources->_CreateGS(_gs);
     dest.ps = ps;
     dest.vs = vs;

@@ -177,7 +177,7 @@ public:
     SPS* _CreatePS(LPCSTR Name);
     void _DeletePS(const SPS* PS);
 
-    SVS* _CreateVS(cpcstr shader, cpcstr fallbackShader = nullptr, u32 flags = 0);
+    SVS* _CreateVS(cpcstr shader, u32 flags = 0);
     void _DeleteVS(const SVS* VS);
 
     SPass* _CreatePass(const SPass& proto);
@@ -259,8 +259,7 @@ private:
     T& GetShaderMap();
 
     template <typename T>
-    T* CreateShader(cpcstr name, pcstr filename = nullptr,
-        pcstr fallbackShader = nullptr, u32 flags = 0);
+    T* CreateShader(cpcstr name, pcstr filename = nullptr, u32 flags = 0);
 
     template <typename T>
     bool DestroyShader(const T* sh);

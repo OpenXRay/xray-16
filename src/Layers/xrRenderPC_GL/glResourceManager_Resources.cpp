@@ -82,7 +82,7 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullptr*/, u32 flags /*= 0*/)
+SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
     string_path name;
     xr_strcpy(name, shader);
@@ -105,7 +105,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullpt
         break;
     }
 
-    return CreateShader<SVS>(name, shader, fallbackShader, flags);
+    return CreateShader<SVS>(name, shader, flags);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
@@ -143,7 +143,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         break;
     }
 
-    return CreateShader<SPS>(name, _name, nullptr);
+    return CreateShader<SPS>(name, _name);
 }
 
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
