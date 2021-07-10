@@ -90,9 +90,10 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
 
 bool CFrustum::testSphere_dirty(Fvector& c, float r) const
 {
-    if (p_count == 0U)
-        return TRUE;
-    return planes[p_count - 1U].classify(c) <= r;
+	VERIFY(p_count <= FRUSTUM_MAXPLANES); // '<=' is not a typo, this check is correct
+    if (p_count == 0)
+        return true;
+    return planes[p_count - 1].classify(c) <= r;
 }
 
 EFC_Visible CFrustum::testAABB(const float* mM, u32& test_mask) const
