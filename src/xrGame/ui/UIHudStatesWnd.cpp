@@ -387,31 +387,38 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             m_ui_weapon_third_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
-        if (m_ui_weapon_sign_ammo && m_item_info.cur_ammo.size() && m_item_info.total_ammo.size())
+        if (m_ui_weapon_sign_ammo )
         {
-            string64 temp;
-            xr_sprintf(temp, "%s/%s", m_item_info.cur_ammo.c_str(), m_item_info.total_ammo.c_str());
-
-            m_ui_weapon_sign_ammo->Show(true);
-            m_ui_weapon_sign_ammo->SetText(temp);
-
-            // hack ^ begin
-            CGameFont* pFont32 = GEnv.UI->Font().pFontGraffiti32Russian;
-            CGameFont* pFont22 = GEnv.UI->Font().pFontGraffiti22Russian;
-            CGameFont* pFont = pFont32;
-
-            if (UICore::is_widescreen())
+            if (m_item_info.cur_ammo.size() && m_item_info.total_ammo.size())
             {
-                pFont = pFont22;
-            }
-            else
-            {
-                if (xr_strlen(temp) > 5)
+                string64 temp;
+                xr_sprintf(temp, "%s/%s", m_item_info.cur_ammo.c_str(), m_item_info.total_ammo.c_str());
+
+                m_ui_weapon_sign_ammo->Show(true);
+                m_ui_weapon_sign_ammo->SetText(temp);
+
+                // hack ^ begin
+                CGameFont* pFont32 = GEnv.UI->Font().pFontGraffiti32Russian;
+                CGameFont* pFont22 = GEnv.UI->Font().pFontGraffiti22Russian;
+                CGameFont* pFont = pFont32;
+
+                if (UICore::is_widescreen())
                 {
                     pFont = pFont22;
                 }
+                else
+                {
+                    if (xr_strlen(temp) > 5)
+                    {
+                        pFont = pFont22;
+                    }
+                }
+                m_ui_weapon_sign_ammo->SetFont(pFont);
             }
-            m_ui_weapon_sign_ammo->SetFont(pFont);
+            else
+            {
+                m_ui_weapon_sign_ammo->Show(false);  
+            }
         }
 
         m_fire_mode->Show(true);
