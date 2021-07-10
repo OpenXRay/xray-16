@@ -276,13 +276,8 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
     return true;
 }
 
-bool OPCODE_Model::Load(IReader* stream)
+void OPCODE_Model::Load(IReader* stream)
 {
-    const u32 savedCrc = stream->r_u32();
-    const u32 dataCrc  = crc32(stream->pointer(), stream->elapsed());
-    if (savedCrc != dataCrc)
-        return false;
-
     mNoLeaf    = stream->r_u32();
     mQuantized = stream->r_u32();
 
@@ -306,26 +301,16 @@ bool OPCODE_Model::Load(IReader* stream)
     else
     {
         NODEFAULT; // Not used by engine so not supported
-        return false;
     }
-    return true;
 }
 
 void OPCODE_Model::Save(IWriter* stream) const
 {
-    const auto crc_pos = stream->tell();
-
-    stream->w_u32(0);
-
     stream->w_u32(mNoLeaf);
     stream->w_u32(mQuantized);
 
     const u32 nodesNum = mTree->GetNbNodes();
-    stream->w_u32(nodesNum);
-
-    u32 crc = crc32(&mNoLeaf, sizeof(mNoLeaf));
-    crc     = crc32(&mQuantized, sizeof(mQuantized), crc);
-    crc     = crc32(&nodesNum, sizeof(nodesNum), crc);
+    stream->w_u32(mTree->GetNbNodes());
 
     void* pData = nullptr;
     if (mNoLeaf && !mQuantized)
@@ -343,14 +328,11 @@ void OPCODE_Model::Save(IWriter* stream) const
             if (!ptr->HasLeaf2())
                 ptr->mData2 -= (uintptr_t)rootPtr;
         }
-        crc = crc32(pData, size, crc);
     }
     else
     {
         NODEFAULT; // Not used by engine so not supported
     }
     stream->w(pData, mTree->GetUsedBytes());
-    stream->seek(crc_pos);
-    stream->w_u32(crc);
     xr_free(pData);
 }
