@@ -6,7 +6,7 @@
 #To build the package, open a terminal, go to the xray-16/ArchLinux directory and run the makepkg -fi command
 #where the options are -f to overwrite the package if it was built before that -i install the package after the build.
 pkgname=openxray-dev                                    
-pkgver=1.6.02_
+pkgver=1.6.02_ba04387e6
 pkgrel=1          
 pkgdesc="Unofficial X-Ray Engine Linux port by OpenXRay team (Originally developed by GSC Game World)"                                          
 arch=('x86_64') 
@@ -29,7 +29,9 @@ build() {
    cd bin
    cmake .. -DCMAKE_BUILD_TYPE=Release \
    -DCMAKE_INSTALL_PREFIX=/usr \
-   -DCMAKE_INSTALL_LIBDIR=lib
+   -DCMAKE_INSTALL_LIBDIR=lib \
+   -DCMAKE_C_FLAGS="-Wno-format -Wno-error=format-security" \
+   -DCMAKE_CXX_FLAGS="-Wno-format -Wno-error=format-security"
    make
 }
 
