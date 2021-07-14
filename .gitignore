@@ -26,3 +26,8 @@ CMakeFiles/
 
 # exclude doxygen output
 doc/doxygen/html/*
+
+# exclude PKGBUILD output
+ArchLinux/pkg
+ArchLinux/src
+ArchLinux/*.tar.zst
