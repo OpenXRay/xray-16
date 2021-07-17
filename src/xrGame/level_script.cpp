@@ -662,6 +662,18 @@ bool ray_pick(const Fvector& start, const Fvector& dir, float range,
     return false;
 }
 
+// Graff46
+void jump_level(const Fvector& m_position, u32 m_level_vertex_id, GameGraph::_GRAPH_ID m_game_vertex_id, const Fvector& m_angles)
+{
+    NET_Packet p;
+    p.w_begin(M_CHANGE_LEVEL);
+    p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
+    p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
+    p.w_vec3(m_position);
+    p.w_vec3(m_angles);
+    Level().Send(p, net_flags(TRUE));
+}
+
 // XXX nitrocaster: one can export enum like class, without defining dummy type
 template<typename T>
 struct EnumCallbackType {};
@@ -878,7 +890,8 @@ IC static void CLevel_Export(lua_State* luaState)
         def("start_tutorial", &start_tutorial),
         def("stop_tutorial", &stop_tutorial),
         def("has_active_tutorial", &has_active_tutotial),
-        def("translate_string", &translate_string)
+        def("translate_string", &translate_string),
+        def("jump_level", &jump_level)
     ];
 
 };
