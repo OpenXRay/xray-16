@@ -19,7 +19,7 @@ SCRIPT_EXPORT(game_sv_Deathmatch, (game_sv_GameState),
 
     module(luaState)
     [
-        class_<game_sv_Deathmatch, WrapType, game_sv_GameState>("game_sv_Deathmatch")
+        class_<game_sv_Deathmatch, game_sv_GameState, default_holder, WrapType>("game_sv_Deathmatch")
             .def(constructor<>())
             .def("GetTeamData", &game_sv_Deathmatch::GetTeamData)
 
