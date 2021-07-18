@@ -25,6 +25,7 @@ private:
     float m_entrance_time;
     shared_str m_invite_str;
     bool m_b_enabled;
+    bool condWork;
 
     void update_actor_invitation();
     bool m_bSilentMode;

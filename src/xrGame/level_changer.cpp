@@ -37,6 +37,7 @@ void CLevelChanger::net_Destroy()
 
 bool CLevelChanger::net_Spawn(CSE_Abstract* DC)
 {
+    condWork = true;
     m_entrance_time = 0;
     m_b_enabled = true;
     m_invite_str = DEF_INVITATION;
@@ -119,6 +120,7 @@ void CLevelChanger::feel_touch_new(IGameObject* tpObject)
                 if (get_reject_pos(p, r))
                     Actor()->MoveActor(p, r);
             }
+            condWork = false;
             return;
         }
     }
@@ -185,7 +187,7 @@ bool CLevelChanger::feel_touch_contact(IGameObject* object)
 
 void CLevelChanger::update_actor_invitation()
 {
-    if (m_bSilentMode)
+    if ((m_bSilentMode) || (!condWork))
         return;
     xr_vector<IGameObject*>::iterator it = feel_touch.begin();
     xr_vector<IGameObject*>::iterator it_e = feel_touch.end();
