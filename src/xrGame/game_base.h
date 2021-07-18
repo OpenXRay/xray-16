@@ -219,7 +219,7 @@ public:
     // moved from game_sv_base (time routines)
 
 private:
-    friend static void game_GameState_script_register(lua_State* luaState);
+    friend void game_GameState_script_register(lua_State* luaState);
 
 private:
     // scripts

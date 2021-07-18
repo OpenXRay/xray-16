@@ -51,7 +51,7 @@ SCRIPT_EXPORT(game_PlayerState, (),
     ];
 });
 
-static void game_GameState_script_register(lua_State* luaState)
+void game_GameState_script_register(lua_State* luaState)
 {
     module(luaState)
     [
