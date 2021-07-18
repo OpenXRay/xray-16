@@ -105,8 +105,24 @@ void CLevelChanger::shedule_Update(u32 dt)
 }
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
+bool has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPCSTR info_id);
 void CLevelChanger::feel_touch_new(IGameObject* tpObject)
 {
+    if (m_ini_file && m_ini_file->section_exist("cond"))
+    {
+        LPCSTR p_name = m_ini_file->r_string("cond", "infop");
+        if (!has_info(ai().get_alife(), Actor()->ID(), p_name))
+        {
+            if (m_ini_file->read_if_exists<bool>("cond", "move", false))
+            {
+                Fvector p, r;
+                if (get_reject_pos(p, r))
+                    Actor()->MoveActor(p, r);
+            }
+            return;
+        }
+    }
+
     CActor* l_tpActor = smart_cast<CActor*>(tpObject);
     VERIFY(l_tpActor);
     if (!l_tpActor->g_Alive())
