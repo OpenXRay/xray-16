@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ThreadUtil.h"
+
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include <pthread.h>
 #endif
@@ -23,9 +24,15 @@ void SetThreadNameImpl(DWORD threadId, pcstr name)
         DWORD dwFlags;
     };
 
+    constexpr char namePrefix[] = "X-Ray ";
+    constexpr auto namePrefixSize = std::size(namePrefix); // includes null-character intentionally
+    auto fullNameSize = xr_strlen(name) + namePrefixSize;
+    auto fullName = static_cast<pstr>(xr_alloca(fullNameSize));
+    strconcat(fullNameSize, fullName, namePrefix, name);
+
     SThreadNameInfo info;
     info.dwType = 0x1000;
-    info.szName = name;
+    info.szName = fullName;
     info.dwThreadID = threadId;
     info.dwFlags = 0;
 
@@ -104,7 +111,7 @@ void SetThreadName(ThreadHandle threadHandle, pcstr name)
 {
     if (auto error = pthread_setname_np(threadHandle, name) != 0)
     {
-        Msg("SetThreadName: failed to set thread name to '%s'. Errno: '%s'", name, error);
+        Msg("SetThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
     }
 }
 
