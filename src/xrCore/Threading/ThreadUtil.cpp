@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ThreadUtil.h"
+
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include <pthread.h>
 #endif
@@ -11,10 +12,9 @@ ThreadId GetCurrThreadId() { return GetCurrentThreadId(); }
 
 ThreadHandle GetCurrentThreadHandle() { return GetCurrentThread(); }
 
-void SetThreadName(ThreadHandle threadHandle, pcstr name)
+void SetThreadNameImpl(DWORD threadId, pcstr name)
 {
     const DWORD MSVC_EXCEPTION = 0x406D1388;
-    DWORD threadId = threadHandle != NULL ? GetThreadId(threadHandle) : DWORD(-1);
 
     struct SThreadNameInfo
     {
@@ -24,9 +24,15 @@ void SetThreadName(ThreadHandle threadHandle, pcstr name)
         DWORD dwFlags;
     };
 
+    constexpr char namePrefix[] = "X-Ray ";
+    constexpr auto namePrefixSize = std::size(namePrefix); // includes null-character intentionally
+    auto fullNameSize = xr_strlen(name) + namePrefixSize;
+    auto fullName = static_cast<pstr>(xr_alloca(fullNameSize));
+    strconcat(fullNameSize, fullName, namePrefix, name);
+
     SThreadNameInfo info;
     info.dwType = 0x1000;
-    info.szName = name;
+    info.szName = fullName;
     info.dwThreadID = threadId;
     info.dwFlags = 0;
 
@@ -39,10 +45,21 @@ void SetThreadName(ThreadHandle threadHandle, pcstr name)
     }
 }
 
+void SetThreadName(ThreadHandle threadHandle, pcstr name)
+{
+    DWORD threadId = GetThreadId(threadHandle);
+    SetThreadNameImpl(threadId, name);
+}
+
+void SetCurrentThreadName(pcstr name)
+{
+    SetThreadNameImpl(-1, name);
+}
+
 u32 __stdcall ThreadEntry(void* params)
 {
     SThreadStartupInfo* args = (SThreadStartupInfo*)params;
-    SetThreadName(NULL, args->threadName);
+    SetCurrentThreadName(args->threadName);
     EntryFuncType entry = args->entryFunc;
     void* arglist = args->argList;
     xr_delete(args);
@@ -92,19 +109,24 @@ ThreadHandle GetCurrentThreadHandle() { return pthread_self(); }
 
 void SetThreadName(ThreadHandle threadHandle, pcstr name)
 {
-    if (!threadHandle)
+    if (auto error = pthread_setname_np(threadHandle, name) != 0)
     {
-        pthread_setname_np(pthread_self(), name);
-        return;
+        Msg("SetThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
     }
+}
 
-    pthread_setname_np(threadHandle, name);
+void SetCurrentThreadName(pcstr name)
+{
+    if (auto error = pthread_setname_np(pthread_self(), name) != 0)
+    {
+        Msg("SetCurrentThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
+    }
 }
 
 void* __cdecl ThreadEntry(void* params)
 {
     SThreadStartupInfo* args = (SThreadStartupInfo*)params;
-    SetThreadName(NULL, args->threadName);
+    SetCurrentThreadName(args->threadName);
     EntryFuncType entry = args->entryFunc;
     void* arglist = args->argList;
     xr_delete(args);
