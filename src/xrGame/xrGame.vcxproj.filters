@@ -9878,6 +9878,9 @@
     <ClCompile Include="ui\UIArtefactPanel.cpp">
       <Filter>UI\Common\MainIngame</Filter>
     </ClCompile>
+    <ClCompile Include="game_sv_deathmatch_script.cpp">
+      <Filter>Core\Server\Games\server\deathmatch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

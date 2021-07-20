@@ -2296,6 +2296,9 @@
     <ClCompile Include="game_sv_capture_the_artefact_process_event.cpp" />
     <ClCompile Include="game_sv_deathmatch.cpp" />
     <ClCompile Include="game_sv_deathmatch_process_event.cpp" />
+    <ClCompile Include="game_sv_deathmatch_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="game_sv_event_queue.cpp" />
     <ClCompile Include="game_sv_item_respawner.cpp" />
     <ClCompile Include="game_sv_mp.cpp" />
