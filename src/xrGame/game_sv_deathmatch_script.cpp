@@ -23,7 +23,7 @@ SCRIPT_EXPORT(game_sv_Deathmatch, (game_sv_GameState),
             .def(constructor<>())
             .def("GetTeamData", &game_sv_Deathmatch::GetTeamData)
 
-            .def("type_name", &WrapType::type_name, &WrapType::type_name_static)
+            .def("type_name", &game_sv_Deathmatch::type_name, &WrapType::type_name_static)
         //			.def("Money_SetStart",		&CWrapperBase<game_sv_Deathmatch>::Money_SetStart,		&CWrapperBase<game_sv_Deathmatch>::Money_SetStart_static)
     ];
 });
