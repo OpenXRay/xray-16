@@ -2254,6 +2254,12 @@
     <Filter Include="UI\Multiplayer\MM_MP\VersionList">
       <UniqueIdentifier>{04c90fd3-e247-4f21-b715-8dc556986837}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Server\Games\server\mp_script">
+      <UniqueIdentifier>{e4a3fb7b-b6ee-40f3-a25a-be388178d29e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\Games\client\mp_script">
+      <UniqueIdentifier>{3063bb58-b29e-4339-9f19-764c7e8bf9fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6476,12 +6482,6 @@
     <ClInclude Include="ui\UIActorInfo.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
-    <ClInclude Include="game_cl_mp_script.h">
-      <Filter>Core\Server\Games\client\mp</Filter>
-    </ClInclude>
-    <ClInclude Include="game_sv_mp_script.h">
-      <Filter>Core\Server\Games\server\mp</Filter>
-    </ClInclude>
     <ClInclude Include="game_sv_base.h">
       <Filter>Core\Server\Games\server\base</Filter>
     </ClInclude>
@@ -6507,6 +6507,12 @@
     <ClInclude Include="ai\monsters\chimera\chimera_attack_state.h" />
     <ClInclude Include="ai\monsters\chimera\chimera_attack_state_inline.h" />
     <ClInclude Include="Explosive.h" />
+    <ClInclude Include="game_sv_mp_script.h">
+      <Filter>Core\Server\Games\server\mp_script</Filter>
+    </ClInclude>
+    <ClInclude Include="game_cl_mp_script.h">
+      <Filter>Core\Server\Games\client\mp_script</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9841,12 +9847,6 @@
     <ClCompile Include="ui\UIActorInfo.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
-    <ClCompile Include="game_cl_mp_script.cpp">
-      <Filter>Core\Server\Games\client\mp</Filter>
-    </ClCompile>
-    <ClCompile Include="game_sv_mp_script.cpp">
-      <Filter>Core\Server\Games\server\mp</Filter>
-    </ClCompile>
     <ClCompile Include="game_base_script.cpp">
       <Filter>Core\Server\Games</Filter>
     </ClCompile>
@@ -9880,6 +9880,12 @@
     </ClCompile>
     <ClCompile Include="game_sv_deathmatch_script.cpp">
       <Filter>Core\Server\Games\server\deathmatch</Filter>
+    </ClCompile>
+    <ClCompile Include="game_sv_mp_script.cpp">
+      <Filter>Core\Server\Games\server\mp_script</Filter>
+    </ClCompile>
+    <ClCompile Include="game_cl_mp_script.cpp">
+      <Filter>Core\Server\Games\client\mp_script</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
