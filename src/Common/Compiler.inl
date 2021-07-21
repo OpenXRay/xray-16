@@ -58,24 +58,24 @@
 #error Provide your definitions here
 #endif
 
-#ifndef _CPPUNWIND//def NDEBUG
-#define XR_NOEXCEPT throw()
-#define XR_NOEXCEPT_OP(x)
-#else
+#ifdef __cpp_exceptions
 #define XR_NOEXCEPT noexcept
 #define XR_NOEXCEPT_OP(x) noexcept(x)
+#else
+#define XR_NOEXCEPT throw()
+#define XR_NOEXCEPT_OP(x)
 #endif
 
 #if defined(MASTER_GOLD)
 //  release master gold
-#   if defined(_CPPUNWIND)
-//#       error Please disable exceptions... // XXX: temporary fix
+#   if defined(__cpp_exceptions) && defined(XR_PLATFORM_WINDOWS)
+#       error Please disable exceptions...
 #   endif
 #   define XRAY_EXCEPTIONS 0
 #   define LUABIND_NO_EXCEPTIONS
 #else
 //  release, debug or mixed
-#   if !defined(_CPPUNWIND)
+#   if !defined(__cpp_exceptions)
 #       error Please enable exceptions...
 #   endif
 #   define XRAY_EXCEPTIONS 1
