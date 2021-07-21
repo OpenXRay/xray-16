@@ -451,13 +451,19 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             R_ASSERT(path && path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-                xr_fs_nostrlwr(inc_name); // compensate removed xr_strlwr on path on Linux, etc
-
                 string_path fn;
                 strconcat(sizeof fn, fn, path, inc_name);
                 if (!allow_include_func || allow_include_func(fn))
                 {
                     IReader* I = FS.r_open(fn);
+#ifdef XR_PLATFORM_LINUX
+                    if (I == nullptr)
+                    {
+                        xr_fs_nostrlwr(inc_name);
+                        strconcat(fn, path, inc_name);
+                        I = FS.r_open(fn);
+                    }
+#endif
                     R_ASSERT3(I, "Can't find include file:", inc_name);
                     const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
                     Load(I, inc_path.c_str(), allow_include_func);
