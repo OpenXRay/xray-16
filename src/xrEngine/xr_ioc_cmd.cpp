@@ -786,12 +786,6 @@ ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
 
 void CCC_Register()
 {
-#ifdef DEBUG
-    const bool isDebugMode = true;
-#else // DEBUG
-    const bool isDebugMode = !!strstr(Core.Params, "-debug");
-#endif // DEBUG
-
     // General
     CMD1(CCC_Help, "help");
     CMD1(CCC_Quit, "quit");
@@ -826,15 +820,13 @@ void CCC_Register()
     // CMD3(CCC_Mask, "rs_constant_fps", &psDeviceFlags, rsConstantFPS );
 #endif // DEBUG
 
-    // Console commands that are available with -debug key on release configuration and always available on mixed configuration
-    if (isDebugMode)
-    {
-        CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
-        CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
-        CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
-        CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
-        CMD3(CCC_Mask, "rs_wireframe", &psDeviceFlags, rsWireframe);
-    }
+#ifndef MASTER_GOLD
+    CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
+    CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
+    CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
+    CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
+    CMD3(CCC_Mask, "rs_wireframe", &psDeviceFlags, rsWireframe);
+#endif
 
     // Render device states
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
