@@ -225,8 +225,8 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_home", (void (CScriptGameObject::*)(u32, float, float, bool, float))(&CScriptGameObject::set_home))
         .def("set_home", +[](CScriptGameObject* self, pcstr name, float r_min, float r_max, bool aggressive)
         {
-            constexpr float defaultMiddleRadius = 20; // taken from COP mob_home.script
-            self->set_home(name, r_min, r_max, aggressive, defaultMiddleRadius);
+            const float r_middle = (r_min + r_max) / 2;
+            self->set_home(name, r_min, r_max, aggressive, r_middle);
         })
         .def("remove_home", &CScriptGameObject::remove_home)
         .def("berserk", &CScriptGameObject::berserk)
