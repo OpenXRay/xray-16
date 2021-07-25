@@ -74,6 +74,7 @@ public:
     u32 dwPrecacheFrame;
     bool b_is_Ready;
     bool b_is_Active;
+    bool b_is_InFocus;
     bool IsAnselActive;
 
     // Engine flow-control

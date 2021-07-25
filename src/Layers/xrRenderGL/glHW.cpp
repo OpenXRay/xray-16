@@ -16,9 +16,39 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
-CHW::CHW() {}
+CHW::CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
 
-CHW::~CHW() {}
+    Device.seqAppActivate.Add(this);
+    Device.seqAppDeactivate.Add(this);
+}
+
+CHW::~CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
+
+    Device.seqAppActivate.Remove(this);
+    Device.seqAppDeactivate.Remove(this);
+}
+
+void CHW::OnAppActivate()
+{
+    if (m_window)
+    {
+        SDL_RestoreWindow(m_window);
+    }
+}
+
+void CHW::OnAppDeactivate()
+{
+    if (m_window)
+    {
+        SDL_MinimizeWindow(m_window);
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

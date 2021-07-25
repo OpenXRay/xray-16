@@ -6,6 +6,8 @@
 #include "SDL_syswm.h"
 
 class CHW
+    : public pureAppActivate,
+      public pureAppDeactivate
 {
 public:
     CHW();
@@ -28,6 +30,10 @@ public:
     void BeginScene();
     void EndScene();
     void Present();
+
+public:
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
 
 private:
     void UpdateViews();

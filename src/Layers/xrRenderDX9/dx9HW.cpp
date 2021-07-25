@@ -6,8 +6,39 @@ ENGINE_API extern u32 Vid_SelectedRefreshRate;
 
 CHW HW;
 
-CHW::CHW() {}
-CHW::~CHW() {}
+CHW::CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
+
+    Device.seqAppActivate.Add(this);
+    Device.seqAppDeactivate.Add(this);
+}
+
+CHW::~CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
+
+    Device.seqAppActivate.Remove(this);
+    Device.seqAppDeactivate.Remove(this);
+}
+
+void CHW::OnAppActivate()
+{
+    if (!DevPP.Windowed)
+    {
+        ShowWindow(DevPP.hDeviceWindow, SW_RESTORE);
+    }
+}
+
+void CHW::OnAppDeactivate()
+{
+    if (!DevPP.Windowed)
+    {
+        ShowWindow(DevPP.hDeviceWindow, SW_MINIMIZE);
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -169,13 +200,13 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     // Create the device
     const auto GPU = selectGPU();
     auto result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
-        GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
+        GPU | D3DCREATE_MULTITHREADED | D3DCREATE_NOWINDOWCHANGES, //. ? locks at present
         &P, &pDevice);
 
     if (FAILED(result))
     {
         result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
-            GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
+            GPU | D3DCREATE_MULTITHREADED | D3DCREATE_NOWINDOWCHANGES, //. ? locks at present
             &P, &pDevice);
     }
     if (D3DERR_DEVICELOST == result)

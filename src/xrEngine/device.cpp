@@ -417,13 +417,12 @@ void CRenderDevice::Run()
     seqAppStart.Process();
 
     splash::hide();
-    SDL_HideWindow(m_sdlWnd);
+    SDL_HideWindow(m_sdlWnd); // workaround for SDL bug
+    UpdateWindowProps();
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
-    UpdateWindowProps();
     if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    OnWM_Activate(1, 0);
 
     // Message cycle
     message_loop();
@@ -556,12 +555,12 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     else
         pInput->GrabInput(false);
 
-    const bool isGameActive = ps_always_active || isWndActive;
+    b_is_Active = ps_always_active || isWndActive;
 
-    if (isGameActive != b_is_Active)
+    if (isWndActive != b_is_InFocus)
     {
-        b_is_Active = isGameActive;
-        if (b_is_Active)
+        b_is_InFocus = isWndActive;
+        if (b_is_InFocus)
         {
             seqAppActivate.Process();
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;

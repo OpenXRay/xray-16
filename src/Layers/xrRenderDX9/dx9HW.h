@@ -10,6 +10,8 @@
 #endif
 
 class CHW
+    : public pureAppActivate,
+      public pureAppDeactivate
 {
 public:
     CHW();
@@ -33,6 +35,10 @@ public:
     void BeginScene();
     void EndScene();
     void Present();
+
+public:
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
 
 public:
     void BeginPixEvent(LPCWSTR wszName) const;

@@ -10,12 +10,18 @@ CHW HW;
 
 CHW::CHW()
 {
+    if (!ThisInstanceIsGlobal())
+        return;
+
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this);
 }
 
 CHW::~CHW()
 {
+    if (!ThisInstanceIsGlobal())
+        return;
+
     Device.seqAppActivate.Remove(this);
     Device.seqAppDeactivate.Remove(this);
 }
