@@ -16,9 +16,10 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
-CHW::CHW() : pDevice(this), pPP(0), pFB(0) {}
+CHW::CHW() {}
 
 CHW::~CHW() {}
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////

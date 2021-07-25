@@ -42,10 +42,9 @@ public:
 
     u32 BackBufferCount{};
     u32 CurrentBackBuffer{};
-
-    CHW* pDevice;
-    GLuint pPP;
-    GLuint pFB;
+    
+    GLuint pPP{};
+    GLuint pFB{};
 
     SDL_Window* m_window{};
     SDL_Window* m_helper_window{};

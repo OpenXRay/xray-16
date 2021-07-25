@@ -287,8 +287,10 @@ class CCC_tf_Aniso : public CCC_Integer
 public:
     void apply()
     {
+#if !defined(USE_OGL)
         if (nullptr == HW.pDevice)
             return;
+#endif
         int val = *value;
         clamp(val, 1, 16);
 #if defined(USE_OGL)
@@ -317,8 +319,10 @@ class CCC_tf_MipBias : public CCC_Float
 public:
     void apply()
     {
+#if !defined(USE_OGL)
         if (nullptr == HW.pDevice)
             return;
+#endif
 
 #if !defined(USE_DX9) && !defined(USE_OGL)
         SSManager.SetMipLODBias(*value);
