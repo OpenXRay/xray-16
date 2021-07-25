@@ -539,7 +539,10 @@ public:
         if (it == rates->end())
             InvalidSyntax();
         else
+        {
             Vid_SelectedRefreshRate = value;
+            m_Refresh60hz.set(fl_Refresh60hz, Vid_SelectedRefreshRate == 60);
+        }
     }
 
     void GetStatus(TStatus& S) override
@@ -556,7 +559,31 @@ public:
     {
         g_monitors.FillRatesTips(tips);
     }
+
+private:
+    enum { fl_Refresh60hz = 1u << 0u };
+    inline static Flags32 m_Refresh60hz; // for rs_refresh_60hz backwards compatibility
+
+public:
+    class CCC_Refresh60hz final : public CCC_Mask
+    {
+    public:
+        CCC_Refresh60hz(pcstr name) : CCC_Mask(name, &m_Refresh60hz, fl_Refresh60hz)
+        {
+            m_Refresh60hz.set(fl_Refresh60hz, Vid_SelectedRefreshRate == 60);
+        }
+
+        void Execute(pcstr args) override
+        {
+            CCC_Mask::Execute(args);
+            if (GetValue())
+                Vid_SelectedRefreshRate = 60;
+            else
+                Vid_SelectedRefreshRate = g_monitors.GetMaximalRefreshRate();
+        }
+    };
 };
+using CCC_Refresh60hz = CCC_VidRefresh::CCC_Refresh60hz;
 //-----------------------------------------------------------------------
 class CCC_SND_Restart : public IConsole_Command
 {
@@ -881,7 +908,7 @@ void CCC_Register()
     CMD1(CCC_VSync, "rs_v_sync"); // If you change the name, you also should change it in glHW.cpp in the OpenGL renderer
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
     CMD1(CCC_Fullscreen, "rs_fullscreen");
-    CMD3(CCC_Mask, "rs_refresh_60hz", &psDeviceFlags, rsRefresh60hz);
+    CMD1(CCC_Refresh60hz, "rs_refresh_60hz");
     CMD3(CCC_Mask, "rs_stats", &psDeviceFlags, rsStatistic);
     CMD3(CCC_Mask, "rs_fps", &psDeviceFlags, rsShowFPS);
     CMD3(CCC_Mask, "rs_fps_graph", &psDeviceFlags, rsShowFPSGraph);

@@ -23,7 +23,7 @@ enum
     rsOcclusion = (1ul << 4ul),
     rsStatistic = (1ul << 5ul),
     rsDetails = (1ul << 6ul),
-    rsRefresh60hz = (1ul << 7ul),
+    //rsRefresh60hz = (1ul << 7ul), // XXX: remove, don't just left commented
     rsConstantFPS = (1ul << 8ul),
     rsDrawStatic = (1ul << 9ul),
     rsDrawDynamic = (1ul << 10ul),

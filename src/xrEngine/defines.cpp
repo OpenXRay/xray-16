@@ -11,7 +11,7 @@ u32 psCurrentWindowMode = rsFullscreen;
 u32 psCurrentBPP = 32;
 // release version always has "mt_*" enabled
 Flags32 psDeviceFlags = {
-    rsDetails | mtPhysics | mtSound | mtNetwork | rsDrawStatic | rsDrawDynamic | rsDrawParticles | rsRefresh60hz};
+    rsDetails | mtPhysics | mtSound | mtNetwork | rsDrawStatic | rsDrawDynamic | rsDrawParticles };
 
 // textures
 int psTextureLOD = 1;
