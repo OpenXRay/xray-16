@@ -116,7 +116,7 @@ void CRenderDevice::RenderEnd(void)
     // Present goes here, so call OA Frame end.
 #if !defined(XR_PLATFORM_LINUX)
     if (g_SASH.IsBenchmarkRunning())
-        g_SASH.DisplayFrame(Device.fTimeGlobal);
+        g_SASH.DisplayFrame(fTimeGlobal);
 #endif
     GEnv.Render->End();
 
@@ -198,7 +198,7 @@ bool CRenderDevice::BeforeFrame()
     }
 
 #if !defined(XR_PLATFORM_LINUX)
-    if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
+    if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
 #endif
 
@@ -288,7 +288,7 @@ void CRenderDevice::ProcessFrame()
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
-    else if (Device.Paused())
+    else if (Paused())
         updateDelta = 16; // 16 ms, ~60 FPS max while paused
 
     if (frameTime < updateDelta)
@@ -480,7 +480,7 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.Begin();
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
-    Device.seqFrame.Process();
+    seqFrame.Process();
     g_bLoaded = true;
     // else
     // seqFrame.Process(rp_Frame);
@@ -558,18 +558,18 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 
     const bool isGameActive = ps_always_active || isWndActive;
 
-    if (isGameActive != Device.b_is_Active)
+    if (isGameActive != b_is_Active)
     {
-        Device.b_is_Active = isGameActive;
-        if (Device.b_is_Active)
+        b_is_Active = isGameActive;
+        if (b_is_Active)
         {
-            Device.seqAppActivate.Process();
+            seqAppActivate.Process();
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
         }
         else
         {
             app_inactive_time_start = TimerMM.GetElapsed_ms();
-            Device.seqAppDeactivate.Process();
+            seqAppDeactivate.Process();
         }
     }
 }
