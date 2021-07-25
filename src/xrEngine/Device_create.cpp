@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
-#include "xrCore/xr_token.h"
 #include "xrCDB/xrXRC.h"
-#include "XR_IOConsole.h"
 #include "MonitorManager.hpp"
+
 #include "SDL.h"	
 #include "SDL_syswm.h"
 
@@ -56,9 +55,9 @@ void CRenderDevice::CreateInternal()
     fASPECT = 1.f;
 
     if (GEnv.isDedicatedServer || editor())
-        psDeviceFlags.set(rsFullscreen, false);
+        psCurrentWindowMode = rsWindowed;
 
-    UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
+    UpdateWindowProps();
     GEnv.Render->Create(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     Memory.mem_compact();
@@ -73,6 +72,18 @@ void CRenderDevice::CreateInternal()
     PreCache(0, false, false);
 }
 
+void CRenderDevice::SetWindowDraggable(bool draggable)
+{
+    // Only draggable if resizable too
+    const bool windowed = psCurrentWindowMode == rsWindowed || psCurrentWindowMode == rsWindowedBorderless;
+    const bool resizable = SDL_GetWindowFlags(Device.m_sdlWnd) & SDL_WINDOW_RESIZABLE;
+    m_allowWindowDrag = draggable && windowed && resizable;
+
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+    SDL_SetWindowOpacity(Device.m_sdlWnd, m_allowWindowDrag ? 0.9f : 1.0f);
+#endif
+}
+
 bool windowIntersectsWithMonitor(const SDL_Rect& window, const SDL_Rect& monitor)
 {
     const int x = std::max(window.x, monitor.x);
@@ -83,61 +94,49 @@ bool windowIntersectsWithMonitor(const SDL_Rect& window, const SDL_Rect& monitor
     return num1 >= x && num2 >= y;
 }
 
-void CRenderDevice::UpdateWindowProps(const bool windowed)
+void CRenderDevice::UpdateWindowProps()
 {
+    const bool windowed = psCurrentWindowMode != rsFullscreen;
     SelectResolution(windowed);
+
+    // Changing monitor, unset fullscreen for the previous monitor
+    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != Vid_SelectedMonitor)
+        SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
+
+    SDL_Rect rect;
+    SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
+
+    // If fullscreen or window is located on another monitor
+    if (!windowed || !windowIntersectsWithMonitor(m_rcWindowBounds, rect))
+        SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
+
+    SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
 
     if (windowed)
     {
-        static bool drawBorders = strstr(Core.Params, "-draw_borders");
-
-        bool useDesktopFullscreen = false;
-        if (b_is_Ready)
-        {
-            if (!drawBorders && g_monitors.SelectedResolutionIsMaximal())
-                useDesktopFullscreen = true;
-        }
-
-        SDL_Rect rect;
-        SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
-        
-        if (!windowIntersectsWithMonitor(m_rcWindowBounds, rect))
-            SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
+        const bool drawBorders = psCurrentWindowMode == rsWindowed;
+        const bool useDesktopFullscreen = b_is_Ready && psCurrentWindowMode == rsFullscreenBorderless;
 
         SDL_SetWindowBordered(m_sdlWnd, drawBorders ? SDL_TRUE : SDL_FALSE);
-        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
-
-        // Set SDL_WINDOW_FULLSCREEN_DESKTOP if maximal resolution is selected
+        SDL_SetWindowResizable(m_sdlWnd, !useDesktopFullscreen ? SDL_TRUE : SDL_FALSE);
         SDL_SetWindowFullscreen(m_sdlWnd, useDesktopFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_DISABLE);
     }
-    else
+    else if (b_is_Ready)
     {
-        // Changing monitor, unset fullscreen for the previous monitor
-        if (SDL_GetWindowDisplayIndex(m_sdlWnd) != Vid_SelectedMonitor)
-            SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
+        SDL_SetWindowResizable(m_sdlWnd, SDL_FALSE);
+        SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
 
-        SDL_Rect rect;
-        SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
-        SDL_SetWindowSize(m_sdlWnd, psCurrentVidMode[0], psCurrentVidMode[1]);
-        SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
-
-        if (b_is_Ready)
-        {
-            SDL_SetWindowFullscreen(m_sdlWnd, SDL_WINDOW_FULLSCREEN);
-
-            SDL_DisplayMode mode;
-            SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
-            mode.w = psCurrentVidMode[0];
-            mode.h = psCurrentVidMode[1];
-            mode.refresh_rate = Vid_SelectedRefreshRate;
-            SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
-        }
+        SDL_DisplayMode mode;
+        SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
+        mode.w = psCurrentVidMode[0];
+        mode.h = psCurrentVidMode[1];
+        mode.refresh_rate = Vid_SelectedRefreshRate;
+        SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
     }
 
     UpdateWindowRects();
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
 }
-
 
 void CRenderDevice::UpdateWindowRects()
 {
@@ -150,38 +149,35 @@ void CRenderDevice::UpdateWindowRects()
     m_rcWindowBounds.w += m_rcWindowBounds.x;
     m_rcWindowBounds.h += m_rcWindowBounds.y;
 
-#if SDL_VERSION_ATLEAST(2,0,5)
-    // Do we need code below?
+#if SDL_VERSION_ATLEAST(2, 0, 5)
     int top, left, bottom, right;
     SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
     m_rcWindowBounds.x -= left;
     m_rcWindowBounds.y -= top;
     m_rcWindowBounds.w += right;
     m_rcWindowBounds.h += bottom;
-    // XXX: check if we need this code when SDL_GetWindowBordersSize
-    // will be available for Windows
 #endif
 }
 
 void CRenderDevice::SelectResolution(const bool windowed)
 {
+    // Select maximal resolution on first launch
+    if (!psCurrentVidMode[0] || !psCurrentVidMode[1])
+    {
+        const auto& r = g_monitors.GetMaximalResolution();
+        psCurrentVidMode[0] = r.first;
+        psCurrentVidMode[1] = r.second;
+    }
+
     // Dedicated server hardcoded resolution
     // XXX: to be removed
     if (GEnv.isDedicatedServer)
     {
-        dwWidth = psCurrentVidMode[0] = 640;
-        dwHeight = psCurrentVidMode[1] = 480;
+        psCurrentVidMode[0] = 640;
+        psCurrentVidMode[1] = 480;
     }
-    else if (windowed)
+    else if (!windowed) // check
     {
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
-    }
-    else // check
-    {
-        string32 buff;
-        xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
-
         if (!g_monitors.SelectedResolutionIsSafe()) // not found
         { // select safe
             SDL_DisplayMode current;
@@ -191,14 +187,16 @@ void CRenderDevice::SelectResolution(const bool windowed)
 
             SDL_DisplayMode closest; // try closest mode
             if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
-                xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", closest.w, closest.h);
+            {
+                psCurrentVidMode[0] = closest.w;
+                psCurrentVidMode[1] = closest.h;
+            }
             else // or just use maximal
             {
                 const auto& r = g_monitors.GetMaximalResolution();
-                xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", r.first, r.second);
+                psCurrentVidMode[0] = r.first;
+                psCurrentVidMode[1] = r.second;
             }
-
-            Console->Execute(buff);
         }
 
         if (!g_monitors.SelectedRefreshRateIsSafe())
@@ -209,19 +207,16 @@ void CRenderDevice::SelectResolution(const bool windowed)
 
             SDL_DisplayMode closest; // try closest mode
             if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
-                xr_sprintf(buff, sizeof(buff), "vid_refresh %d", closest.refresh_rate);
+                Vid_SelectedRefreshRate = closest.refresh_rate;
             else // or just use maximal
             {
-                const u32 rate = g_monitors.GetMaximalRefreshRate();
-                xr_sprintf(buff, sizeof(buff), "vid_refresh %d", rate);
+                Vid_SelectedRefreshRate = g_monitors.GetMaximalRefreshRate();
             }
-
-            Console->Execute(buff);
         }
-
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
     }
+
+    dwWidth = psCurrentVidMode[0];
+    dwHeight = psCurrentVidMode[1];
 }
 
 SDL_Window* CRenderDevice::GetApplicationWindow()
@@ -236,5 +231,5 @@ void CRenderDevice::DisableFullscreen()
 
 void CRenderDevice::ResetFullscreen()
 {
-    UpdateWindowProps(!psDeviceFlags.test(rsFullscreen));
+    UpdateWindowProps();
 }

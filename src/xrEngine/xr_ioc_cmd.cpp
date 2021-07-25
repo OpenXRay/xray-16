@@ -425,6 +425,51 @@ public:
     }
 };
 //-----------------------------------------------------------------------
+class CCC_VidWindowMode final : public CCC_Token
+{
+    inline static xr_token vid_window_mode_token[] =
+    {
+        { "st_opt_windowed",                rsWindowed             },
+        { "st_opt_windowed_borderless",     rsWindowedBorderless   },
+        { "st_opt_fullscreen",              rsFullscreen           },
+        { "st_opt_fullscreen_borderless",   rsFullscreenBorderless },
+        { nullptr,                          -1                     },
+    };
+
+public:
+    CCC_VidWindowMode(pcstr name) : CCC_Token(name, &psCurrentWindowMode, vid_window_mode_token) {}
+
+    void Execute(pcstr args) override
+    {
+        CCC_Token::Execute(args);
+        m_fullscreen.set(fl_fullscreen, psCurrentWindowMode == rsFullscreen);
+    }
+
+private:
+    enum { fl_fullscreen = 1u << 0u };
+    inline static Flags32 m_fullscreen; // for rs_fullscreen backwards compatibility
+
+public:
+    class CCC_Fullscreen final : public CCC_Mask
+    {
+    public:
+        CCC_Fullscreen(pcstr name) : CCC_Mask(name, &m_fullscreen, fl_fullscreen)
+        {
+            m_fullscreen.set(fl_fullscreen, psCurrentWindowMode == rsFullscreen);
+        }
+
+        void Execute(pcstr args) override
+        {
+            CCC_Mask::Execute(args);
+            if (GetValue())
+                psCurrentWindowMode = rsFullscreen;
+            else
+                psCurrentWindowMode = rsWindowedBorderless;
+        }
+    };
+};
+using CCC_Fullscreen = CCC_VidWindowMode::CCC_Fullscreen;
+//-----------------------------------------------------------------------
 class CCC_VidMonitor : public IConsole_Command
 {
 public:
@@ -835,7 +880,7 @@ void CCC_Register()
     CMD4(CCC_Integer, "rs_loadingstages", &ps_rs_loading_stages, 0, 1);
     CMD1(CCC_VSync, "rs_v_sync"); // If you change the name, you also should change it in glHW.cpp in the OpenGL renderer
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
-    CMD3(CCC_Mask, "rs_fullscreen", &psDeviceFlags, rsFullscreen);
+    CMD1(CCC_Fullscreen, "rs_fullscreen");
     CMD3(CCC_Mask, "rs_refresh_60hz", &psDeviceFlags, rsRefresh60hz);
     CMD3(CCC_Mask, "rs_stats", &psDeviceFlags, rsStatistic);
     CMD3(CCC_Mask, "rs_fps", &psDeviceFlags, rsShowFPS);
@@ -861,6 +906,7 @@ void CCC_Register()
 
     // General video control
     CMD1(CCC_VidMode, "vid_mode");
+    CMD1(CCC_VidWindowMode, "vid_window_mode");
     CMD1(CCC_VidMonitor, "vid_monitor");
     CMD1(CCC_VidRefresh, "vid_refresh")
 

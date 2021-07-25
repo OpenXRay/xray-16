@@ -393,10 +393,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
-        Device.AllowWindowDrag = true;
-#if SDL_VERSION_ATLEAST(2,0,5)
-        SDL_SetWindowOpacity(Device.m_sdlWnd, 0.9f);
-#endif
+        Device.SetWindowDraggable(true);
     }
 
     if (SDL_SCANCODE_F12 == dik)
@@ -417,10 +414,7 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
-        Device.AllowWindowDrag = false;
-#if SDL_VERSION_ATLEAST(2,0,5)
-        SDL_SetWindowOpacity(Device.m_sdlWnd, 1.f);
-#endif
+        Device.SetWindowDraggable(false);
     }
 
 

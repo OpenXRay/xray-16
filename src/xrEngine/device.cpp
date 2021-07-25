@@ -339,14 +339,13 @@ void CRenderDevice::message_loop()
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                 {
-                    if (!psDeviceFlags.is(rsFullscreen))
+                    if (psCurrentWindowMode != rsFullscreen)
                     {
                         if (psCurrentVidMode[0] == event.window.data1 && psCurrentVidMode[1] == event.window.data2)
                             break; // we don't need to reset device if resolution wasn't really changed
 
-                        string32 buff;
-                        xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
-                        Console->Execute(buff);
+                        psCurrentVidMode[0] = event.window.data1;
+                        psCurrentVidMode[1] = event.window.data2;
 
                         Reset();
                     }
@@ -421,7 +420,7 @@ void CRenderDevice::Run()
     SDL_HideWindow(m_sdlWnd);
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
-    UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
+    UpdateWindowProps();
     if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     OnWM_Activate(1, 0);

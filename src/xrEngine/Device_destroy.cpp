@@ -48,13 +48,13 @@ void CRenderDevice::ResetInternal(bool precache)
 
     const auto tm_start = TimerAsync();
 
-    UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
+    UpdateWindowProps();
     GEnv.Render->Reset(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     // Update window props again for DX9 renderer
     const bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
     if (isDX9Renderer)
-        UpdateWindowProps(!psDeviceFlags.is(rsFullscreen)); // hack
+        UpdateWindowProps(); // hack
 
     if (g_pGamePersistent)
         g_pGamePersistent->Environment().bNeed_re_create_env = true;

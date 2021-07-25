@@ -14,6 +14,7 @@
 extern bool g_bDisableRedText;
 static Flags32 s_hud_flag = {0};
 static Flags32 s_dev_flags = {0};
+static u32     s_window_mode = {0};
 
 bool stored_weapon;
 bool stored_cross;
@@ -196,11 +197,13 @@ void CDemoRecord::MakeLevelMapProcess()
     {
     case 0:
     {
+        s_window_mode = psCurrentWindowMode;
         s_dev_flags = psDeviceFlags;
         s_hud_flag.assign(psHUD_Flags);
         psDeviceFlags.zero();
-        psDeviceFlags.set(rsClearBB | rsFullscreen | rsDrawStatic, true);
-        if (!psDeviceFlags.equal(s_dev_flags, rsFullscreen))
+        psDeviceFlags.set(rsClearBB | rsDrawStatic, true);
+        psCurrentWindowMode = rsFullscreen;
+        if (psCurrentWindowMode != s_window_mode)
             Device.Reset();
     }
     break;
@@ -232,11 +235,13 @@ void CDemoRecord::MakeLevelMapProcess()
         if (m_iLMScreenshotFragment == -1 || m_iLMScreenshotFragment == 4)
         {
             psHUD_Flags.assign(s_hud_flag);
-
-            bool bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
             psDeviceFlags = s_dev_flags;
+
+            const bool bDevReset = psCurrentWindowMode != s_window_mode;
+            psCurrentWindowMode = s_window_mode;
             if (bDevReset)
                 Device.Reset();
+
             m_bMakeLevelMap = false;
             m_iLMScreenshotFragment = -1;
         }

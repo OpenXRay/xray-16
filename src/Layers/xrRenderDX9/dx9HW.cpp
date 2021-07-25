@@ -35,7 +35,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
+    const bool bWindowed = ThisInstanceIsGlobal() ? psCurrentWindowMode != rsFullscreen : true;
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -233,7 +233,7 @@ void CHW::Reset()
     DevPP.BackBufferHeight = Device.dwHeight;
 
     // Windoze
-    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
+    const bool bWindowed = ThisInstanceIsGlobal() ? psCurrentWindowMode != rsFullscreen : true;
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)

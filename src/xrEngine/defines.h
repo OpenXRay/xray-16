@@ -16,7 +16,7 @@ ENGINE_API extern int psTextureLOD;
 // psDeviceFlags
 enum
 {
-    rsFullscreen = (1ul << 0ul),
+    //rsFullscreen = (1ul << 0ul), // XXX: remove, don't just left commented
     rsClearBB = (1ul << 1ul),
     rsVSync = (1ul << 2ul),
     rsWireframe = (1ul << 3ul),
@@ -41,12 +41,21 @@ enum
 
     rsShowFPS = (1ul << 19ul),
     rsShowFPSGraph = (1ul << 20ul),
-    rsDrawParticles = (1ul << 21ul),
+    rsDrawParticles = (1ul << 21ul), // XXX: place after rsDrawDynamic
     // 22-32 bit - reserved to Editor
+};
+
+enum
+{
+    rsWindowed,
+    rsWindowedBorderless,
+    rsFullscreenBorderless, // windowed + topmost + resolution matches desktop resolution + without borders = looks like fullscreen
+    rsFullscreen,           // true, exclusive fullscreen
 };
 
 //. ENGINE_API extern u32 psCurrentMode ;
 ENGINE_API extern u32 psCurrentVidMode[];
+ENGINE_API extern u32 psCurrentWindowMode;
 ENGINE_API extern u32 psCurrentBPP;
 ENGINE_API extern Flags32 psDeviceFlags;
 

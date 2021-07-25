@@ -75,7 +75,6 @@ public:
     bool b_is_Ready;
     bool b_is_Active;
     bool IsAnselActive;
-    bool AllowWindowDrag; // For windowed mode
 
     // Engine flow-control
     u32 dwFrame;
@@ -112,6 +111,8 @@ protected:
     u32 Timer_MM_Delta;
     CTimer_paused Timer;
     CTimer_paused TimerGlobal;
+
+    bool m_allowWindowDrag; // For windowed mode
 
 public:
     // Registrators
@@ -242,14 +243,17 @@ public:
     void Destroy(void);
     void Reset(bool precache = true);
 
-    void UpdateWindowProps(const bool windowed);
+    void UpdateWindowProps();
     void UpdateWindowRects();
-    void SelectResolution(const bool windowed);
+    void SelectResolution(bool windowed);
 
     void Initialize(void);
     void ShutDown(void);
     virtual const RenderDeviceStatictics& GetStats() const override { return stats; }
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
+    void SetWindowDraggable(bool draggable);
+    bool IsWindowDraggable() const { return m_allowWindowDrag; }
 
     SDL_Window* GetApplicationWindow() override;
     void DisableFullscreen() override;

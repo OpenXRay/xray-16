@@ -86,7 +86,7 @@ void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, void* /*data*/)
 {
-    if (!Device.AllowWindowDrag)
+    if (!Device.IsWindowDraggable())
         return SDL_HITTEST_NORMAL;
 
     SDL_Point area = *pArea; // copy
