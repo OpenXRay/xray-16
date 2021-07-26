@@ -46,7 +46,8 @@ void CHW::OnAppDeactivate()
 {
     if (m_window)
     {
-        SDL_MinimizeWindow(m_window);
+        if (psCurrentWindowMode == rsFullscreen || psCurrentWindowMode == rsFullscreenBorderless)
+            SDL_MinimizeWindow(m_window);
     }
 }
 

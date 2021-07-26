@@ -40,7 +40,8 @@ void CHW::OnAppDeactivate()
     if (m_pSwapChain && !m_ChainDesc.Windowed)
     {
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
-        ShowWindow(m_ChainDesc.OutputWindow, SW_MINIMIZE);
+        if (psCurrentWindowMode == rsFullscreen || psCurrentWindowMode == rsFullscreenBorderless)
+            ShowWindow(m_ChainDesc.OutputWindow, SW_MINIMIZE);
     }
 }
 

@@ -36,7 +36,8 @@ void CHW::OnAppDeactivate()
 {
     if (!DevPP.Windowed)
     {
-        ShowWindow(DevPP.hDeviceWindow, SW_MINIMIZE);
+        if (psCurrentWindowMode == rsFullscreen || psCurrentWindowMode == rsFullscreenBorderless)
+            ShowWindow(DevPP.hDeviceWindow, SW_MINIMIZE);
     }
 }
 
