@@ -42,8 +42,6 @@ ENGINE_API bool g_bRendering = false;
 const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
-extern int ps_always_active;
-
 bool g_bLoaded = false;
 ref_light precache_light = 0;
 
@@ -103,7 +101,7 @@ void CRenderDevice::RenderEnd(void)
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
             FIND_CHUNK_COUNTER_FLUSH();
             CheckPrivilegySlowdown();
-            if (g_pGamePersistent->GameType() == 1 && !ps_always_active) // haCk
+            if (g_pGamePersistent->GameType() == 1 && !psDeviceFlags.test(rsAlwaysActive)) // haCk
             {
                 Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
                 if ((flags & SDL_WINDOW_INPUT_FOCUS) == 0)
@@ -555,7 +553,7 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     else
         pInput->GrabInput(false);
 
-    b_is_Active = ps_always_active || isWndActive;
+    b_is_Active = isWndActive || psDeviceFlags.test(rsAlwaysActive);
 
     if (isWndActive != b_is_InFocus)
     {
