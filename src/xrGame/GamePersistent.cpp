@@ -846,9 +846,13 @@ float CGamePersistent::MtlTransparent(u32 mtl_idx)
 }
 static BOOL bRestorePause = FALSE;
 static BOOL bEntryFlag = TRUE;
+extern ENGINE_API int ps_always_active;
 
 void CGamePersistent::OnAppActivate()
 {
+    if (ps_always_active)
+        return;
+
     bool bIsMP = (g_pGameLevel && Level().game && GameID() != eGameIDSingle);
     bIsMP &= !Device.Paused();
 
@@ -862,7 +866,7 @@ void CGamePersistent::OnAppActivate()
 
 void CGamePersistent::OnAppDeactivate()
 {
-    if (!bEntryFlag)
+    if (!bEntryFlag || ps_always_active)
         return;
 
     bool bIsMP = (g_pGameLevel && Level().game && GameID() != eGameIDSingle);
