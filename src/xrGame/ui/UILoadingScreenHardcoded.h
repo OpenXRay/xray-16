@@ -89,8 +89,8 @@ constexpr pcstr LoadingScreenXMLClearSky =
             <texture>ui_mm_loading_progress_bar</texture>\
         </progress>\
     </loading_progress>\
-    <loading_stage x=\"310\" y=\"700\" width=\"405\" height=\"20\" stretch=\"1\" always_show=\"1\">\
-        <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti19\"/>\
+    <loading_stage x=\"310\" y=\"698\" width=\"405\" height=\"20\" stretch=\"1\" always_show=\"1\">\
+        <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti22\"/>\
     </loading_stage>\
 </w>";
 
@@ -113,8 +113,8 @@ constexpr pcstr LoadingScreenXML16x9ClearSky =
             <texture>ui_mm_loading_progress_bar</texture>\
         </progress>\
     </loading_progress>\
-    <loading_stage x=\"310\" y=\"700\" width=\"405\" height=\"20\" stretch=\"1\" always_show=\"1\">\
-        <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti19\"/>\
+    <loading_stage x=\"310\" y=\"698\" width=\"405\" height=\"20\" stretch=\"1\" always_show=\"1\">\
+        <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti22\"/>\
     </loading_stage>\
 </w>";
 
@@ -131,8 +131,8 @@ constexpr pcstr LoadingScreenXML16x9ShadowOfChernobyl =
             <texture>ui_mm_loading_progress_bar</texture>\
         </progress>\
     </loading_progress>\
-    <loading_stage x=\"310\" y=\"700\" width=\"405\" height=\"20\" stretch=\"1\" always_show=\"1\">\
-        <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti19\"/>\
+    <loading_stage x=\"310\" y=\"698\" width=\"405\" height=\"20\" stretch=\"1\" always_show=\"1\">\
+        <text align=\"c\" r=\"157\" g=\"140\" b=\"120\" font=\"graffiti22\"/>\
     </loading_stage>\
 </w>";
 
@@ -148,6 +148,7 @@ constexpr cpcstr LoadingScreenXMLTexturesDescription =
    </file>\
 </w>";
 
+// XXX: maybe apply Russian and English backgrounds (though, they don't have left and right bars for auto_statics)
 constexpr cpcstr LoadingScreenXMLClearSkyTexturesDescription =
 "<w>\
     <file name=\"ui\\ui_load\">\

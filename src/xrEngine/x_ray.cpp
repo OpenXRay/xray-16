@@ -59,7 +59,7 @@ pcstr _GetFontTexName(pcstr section)
 
     if (h <= 600)
         idx = 0;
-    else if (h < 1024)
+    else if (h <= 1024)
         idx = 1;
     else
         idx = 2;
