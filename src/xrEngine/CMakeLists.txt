@@ -18,7 +18,6 @@ set(SRC_FILES
     "Device_destroy.cpp"
     "device.h"
     "Device_Initialize.cpp"
-    "Device_Misc.cpp"
     "Device_overdraw.cpp"
     #"Device_wndproc.cpp"
     "edit_actions.cpp"

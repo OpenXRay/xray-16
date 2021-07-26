@@ -614,9 +614,6 @@
     <ClCompile Include="Device_Initialize.cpp">
       <Filter>Rendering Device</Filter>
     </ClCompile>
-    <ClCompile Include="Device_Misc.cpp">
-      <Filter>Rendering Device</Filter>
-    </ClCompile>
     <ClCompile Include="Device_overdraw.cpp">
       <Filter>Rendering Device</Filter>
     </ClCompile>
