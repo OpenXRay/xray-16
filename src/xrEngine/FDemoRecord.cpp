@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "IGame_Level.h"
-#include "x_ray.h"
 
 #include "GameFont.h"
 #include "FDemoRecord.h"
@@ -10,6 +9,8 @@
 #include "Render.h"
 #include "CustomHUD.h"
 #include "CameraManager.h"
+
+constexpr cpcstr DEMO_RECORD_HELP_FONT = "ui_font_letterica18_russian"; // "ui_font_graffiti19_russian";
 
 extern bool g_bDisableRedText;
 static Flags32 s_hud_flag = {0};
@@ -57,9 +58,48 @@ Fbox get_level_screenshot_bound()
 
     return res;
 }
-void _InitializeFont(CGameFont*& F, pcstr section, u32 flags);
-CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDemo, life_time /*,false*/)
+
+pcstr GetFontTexName(pcstr section)
 {
+    static const char* tex_names[] = { "texture800", "texture", "texture1600" };
+    int def_idx = 1; // default 1024x768
+    int idx = def_idx;
+
+#if 0
+    u32 w = Device.dwWidth;
+
+    if (w <= 800)
+        idx = 0;
+    else if (w <= 1280)
+        idx = 1;
+    else
+        idx = 2;
+#else
+    u32 h = Device.dwHeight;
+
+    if (h <= 600)
+        idx = 0;
+    else if (h <= 1024)
+        idx = 1;
+    else
+        idx = 2;
+#endif
+
+    while (idx >= 0)
+    {
+        if (pSettings->line_exist(section, tex_names[idx]))
+            return pSettings->r_string(section, tex_names[idx]);
+        --idx;
+    }
+    return pSettings->r_string(section, tex_names[def_idx]);
+}
+
+CDemoRecord::CDemoRecord(const char* name, float life_time)
+    : CEffectorCam(cefDemo, life_time /*,false*/),
+      m_Font(pSettings->r_string(DEMO_RECORD_HELP_FONT, "shader"), GetFontTexName(DEMO_RECORD_HELP_FONT))
+{
+    Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
+
     stored_red_text = g_bDisableRedText;
     g_bDisableRedText = true;
     m_iLMScreenshotFragment = -1;
@@ -314,27 +354,27 @@ bool CDemoRecord::ProcessCam(SCamEffectorInfo& info)
     {
         if (IR_GetKeyState(SDL_SCANCODE_F1))
         {
-            pApp->pFontSystem->SetColor(color_rgba(255, 0, 0, 255));
-            pApp->pFontSystem->SetAligment(CGameFont::alCenter);
-            pApp->pFontSystem->OutSetI(0, -.05f);
-            pApp->pFontSystem->OutNext("%s", "RECORDING");
-            pApp->pFontSystem->OutNext("Key frames count: %d", iCount);
-            pApp->pFontSystem->SetAligment(CGameFont::alLeft);
-            pApp->pFontSystem->OutSetI(-0.2f, +.05f);
-            pApp->pFontSystem->OutNext("SPACE");
-            pApp->pFontSystem->OutNext("BACK");
-            pApp->pFontSystem->OutNext("ESC");
-            pApp->pFontSystem->OutNext("F11");
-            pApp->pFontSystem->OutNext("LCONTROL+F11");
-            pApp->pFontSystem->OutNext("F12");
-            pApp->pFontSystem->SetAligment(CGameFont::alLeft);
-            pApp->pFontSystem->OutSetI(0, +.05f);
-            pApp->pFontSystem->OutNext("= Append Key");
-            pApp->pFontSystem->OutNext("= Cube Map");
-            pApp->pFontSystem->OutNext("= Quit");
-            pApp->pFontSystem->OutNext("= Level Map ScreenShot");
-            pApp->pFontSystem->OutNext("= Level Map ScreenShot(High Quality)");
-            pApp->pFontSystem->OutNext("= ScreenShot");
+            m_Font.SetColor(color_rgba(255, 0, 0, 255));
+            m_Font.SetAligment(CGameFont::alCenter);
+            m_Font.OutSetI(0, -.05f);
+            m_Font.OutNext("%s", "RECORDING");
+            m_Font.OutNext("Key frames count: %d", iCount);
+            m_Font.SetAligment(CGameFont::alLeft);
+            m_Font.OutSetI(-0.2f, +.05f);
+            m_Font.OutNext("SPACE");
+            m_Font.OutNext("BACK");
+            m_Font.OutNext("ESC");
+            m_Font.OutNext("F11");
+            m_Font.OutNext("LCONTROL+F11");
+            m_Font.OutNext("F12");
+            m_Font.SetAligment(CGameFont::alLeft);
+            m_Font.OutSetI(0, +.05f);
+            m_Font.OutNext("= Append Key");
+            m_Font.OutNext("= Cube Map");
+            m_Font.OutNext("= Quit");
+            m_Font.OutNext("= Level Map ScreenShot");
+            m_Font.OutNext("= Level Map ScreenShot(High Quality)");
+            m_Font.OutNext("= ScreenShot");
         }
 
         m_vVelocity.lerp(m_vVelocity, m_vT, 0.3f);
@@ -582,4 +622,4 @@ void CDemoRecord::MakeLevelMapScreenshot(bool bHQ)
     m_Stage = 0;
 }
 
-void CDemoRecord::OnRender() { pApp->pFontSystem->OnRender(); }
+void CDemoRecord::OnRender() { m_Font.OnRender(); }

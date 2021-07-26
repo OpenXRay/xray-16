@@ -14,6 +14,7 @@ private:
         bool set_position;
         Fvector p;
     } g_position;
+    CGameFont m_Font;
     int iCount;
     IWriter* file;
     Fvector m_HPB;
