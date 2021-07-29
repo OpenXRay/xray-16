@@ -30,7 +30,7 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;discord-rpc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -663,6 +663,7 @@
     <ClInclude Include="detail_path_manager.h" />
     <ClInclude Include="detail_path_manager_inline.h" />
     <ClInclude Include="detail_path_manager_space.h" />
+    <ClInclude Include="DiscordRPC.h" />
     <ClInclude Include="doors.h" />
     <ClInclude Include="doors_actor.h" />
     <ClInclude Include="doors_door.h" />
@@ -2162,6 +2163,7 @@
     </ClCompile>
     <ClCompile Include="detail_path_manager.cpp" />
     <ClCompile Include="detail_path_manager_smooth.cpp" />
+    <ClCompile Include="DiscordRPC.cpp" />
     <ClCompile Include="doors_actor.cpp" />
     <ClCompile Include="doors_door.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>

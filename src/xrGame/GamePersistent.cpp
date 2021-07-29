@@ -38,6 +38,7 @@
 #include "xrCore/Threading/TaskManager.hpp"
 
 #include "xrPhysics/IPHWorld.h"
+#include "DiscordRPC.h"
 
 #ifndef MASTER_GOLD
 #include "CustomMonster.h"
@@ -251,6 +252,7 @@ void CGamePersistent::OnAppStart()
         pApp->SetLoadingScreen(xr_new<UILoadingScreen>());
 
 #ifdef XR_PLATFORM_WINDOWS
+    g_DiscordRPC->Init();
     ansel = xr_new<AnselManager>();
     ansel->Load();
     ansel->Init();
@@ -279,6 +281,7 @@ void CGamePersistent::OnAppEnd()
     GMLib.Unload();
 
 #ifdef XR_PLATFORM_WINDOWS
+    g_DiscordRPC->Deinit();
     xr_delete(ansel);
 #endif
 }
@@ -938,6 +941,22 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
 
         pApp->LoadTitleInt(
             StringTable().translate("ls_header").c_str(), tmp.c_str(), StringTable().translate(buff).c_str());
+
+        if (g_pGameLevel)
+        {
+            const char* temp_map_name;
+            if (map_name == "zaton")
+                temp_map_name = "Затон";
+            else if (map_name == "jupiter")
+                temp_map_name = "Окрестности «Юпитера»";
+            else if (map_name == "jupiter_underground")
+                temp_map_name = "Путепровод «Припять-1»";
+            else if (map_name == "pripyat")
+                temp_map_name = "Припять";
+            else if (map_name == "labx8")
+                temp_map_name = "Лаборатория X8";
+            g_DiscordRPC->Update(temp_map_name);
+        }
     }
 }
 

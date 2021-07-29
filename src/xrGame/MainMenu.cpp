@@ -39,6 +39,7 @@
 #include "stats_submitter.h"
 #include "atlas_submit_queue.h"
 #include "xrEngine/xr_input.h"
+#include "DiscordRPC.h"
 
 // fwd. decl.
 extern ENGINE_API bool bShowPauseString;
@@ -235,7 +236,9 @@ void CMainMenu::Activate(bool bActivate)
             }
             Device.seqRender.Remove(g_pGameLevel);
             CCameraManager::ResetPP();
-        };
+        }
+        else
+            g_DiscordRPC->Update("Главное меню");
         Device.seqRender.Add(this, 4); // 1-console 2-cursor 3-tutorial
 
         Console->Execute("stat_memory");
