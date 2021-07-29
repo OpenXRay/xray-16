@@ -2260,6 +2260,9 @@
     <Filter Include="Core\Server\Games\client\mp_script">
       <UniqueIdentifier>{3063bb58-b29e-4339-9f19-764c7e8bf9fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Discord">
+      <UniqueIdentifier>{2b4b1289-f0c9-41cc-9799-98305a90061b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6513,6 +6516,9 @@
     <ClInclude Include="game_cl_mp_script.h">
       <Filter>Core\Server\Games\client\mp_script</Filter>
     </ClInclude>
+    <ClInclude Include="DiscordRPC.h">
+      <Filter>Core\Client\Discord</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9886,6 +9892,9 @@
     </ClCompile>
     <ClCompile Include="game_cl_mp_script.cpp">
       <Filter>Core\Server\Games\client\mp_script</Filter>
+    </ClCompile>
+    <ClCompile Include="DiscordRPC.cpp">
+      <Filter>Core\Client\Discord</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
