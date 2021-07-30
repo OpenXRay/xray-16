@@ -176,6 +176,17 @@ struct NodeCompressedOld
     NodeCompressed::SCover cover;
     u16 plane;
     NodePosition p;
+
+    operator NodeCompressed() const
+    {
+        NodeCompressed  node;
+        CopyMemory      (node.data, data, sizeof(data) / sizeof(u8));
+        node.high   =   cover;
+        node.low    =   cover;
+        node.plane  =   plane;
+        node.p      =   p;
+        return node;
+    }
 };
 
 #endif
