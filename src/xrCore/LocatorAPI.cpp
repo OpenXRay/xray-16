@@ -40,10 +40,10 @@ static constexpr pcstr FSLTX = "fsgame.ltx";
 #endif
 
 static command_line_key<bool> auto_load_arch("-auto_load_arch", "auto_load_arch", false);
-static command_line_key<pstr> overlaypath("-overlaypath", "overlaypath", "");
+static command_line_key<pcstr> overlaypath("-overlaypath", "overlaypath", "");
 static command_line_key<bool> nolog("-nolog", "nolog", false);
 
-extern command_line_key<pstr> fsltx_path;
+extern command_line_key<pcstr> fsltx_path;
 extern command_line_key<bool> shoc_flag, soc_flag, cs_flag;
 
 

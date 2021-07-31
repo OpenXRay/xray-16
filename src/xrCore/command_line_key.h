@@ -34,7 +34,7 @@ private:
     static command_line_key<T> *l_head;
 };
 
-inline static bool IsOptionFlag(const char *buf)
+inline static bool IsOptionFlag(pcstr buf)
 {
     return (buf && buf[0] == '-');
 }

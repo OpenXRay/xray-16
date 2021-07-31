@@ -37,7 +37,7 @@ static command_line_key<bool> no_splash("-nosplash", "no splash screen", false);
 static command_line_key<bool> splash_notop("-splashnotop", "splash no top", false);
 static command_line_key<bool> sv_dedicated("-dedicated", "run dedicated server", false);
 
-extern command_line_key<pstr> fsltx_path;
+extern command_line_key<pcstr> fsltx_path;
 
 bool HandleArguments(int argc, char *argv[])
 {

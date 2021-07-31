@@ -4,13 +4,13 @@
 
 template<> command_line_key<bool> *command_line_key<bool>::l_head = nullptr;
 template<> command_line_key<int> *command_line_key<int>::l_head = nullptr;
-template<> command_line_key<pstr> *command_line_key<pstr>::l_head = nullptr;
+template<> command_line_key<pcstr> *command_line_key<pcstr>::l_head = nullptr;
 
 // command_line_key
 
 // when adding make sure it's beginning with a '-'
 template<typename T>
-command_line_key<T>::command_line_key(pcstr opname, pcstr desc, const T defval, bool req)
+command_line_key<T>::command_line_key(pcstr opname, pcstr desc,T defval, bool req)
     : provided(false), required(req)
 {
     if(!IsOptionFlag(opname))
@@ -39,7 +39,7 @@ void command_line_key<T>::copy_argument(T arg) {
 }
 
 template<>
-void command_line_key<pstr>::copy_argument(pstr arg) {
+void command_line_key<pcstr>::copy_argument(pcstr arg) {
     argument = xr_strdup(arg);
 }
 
@@ -49,7 +49,7 @@ void command_line_key<T>::free_argument() {
 }
 
 template<>
-void command_line_key<pstr>::free_argument() {
+void command_line_key<pcstr>::free_argument() {
     xr_free(argument);
 }
 
@@ -57,7 +57,7 @@ void command_line_key<pstr>::free_argument() {
 template<typename T>
 command_line_key<T> *command_line_key<T>::find_option(pcstr flag_name)
 {
-    command_line_key<T> *current_node =  command_line_key<T>::l_head;
+    auto current_node =  command_line_key<T>::l_head;
     while(current_node != nullptr)
     {
         if (!xr_strcmp(current_node->option_name, flag_name)) break;
@@ -106,7 +106,7 @@ T command_line_key<T>::OptionValue() const
 template<typename T>
 bool command_line_key<T>::CheckArguments()
 {
-    command_line_key<T> *current_node =  command_line_key<T>::l_head;
+    auto current_node =  command_line_key<T>::l_head;
     while(current_node != nullptr)
     {
         if(current_node->required && !current_node->provided)
@@ -142,9 +142,9 @@ bool command_line_key<int>::parse_option(pcstr option, pcstr arg)
 }
 
 template<>
-bool command_line_key<pstr>::parse_option(pcstr option, pcstr arg)
+bool command_line_key<pcstr>::parse_option(pcstr option, pcstr arg)
 {
-    auto clkey = command_line_key<pstr>::find_option(option);
+    auto clkey = command_line_key<pcstr>::find_option(option);
     if(!clkey) return false; // not found
 
     clkey->argument = xr_strdup(arg);
@@ -154,7 +154,7 @@ bool command_line_key<pstr>::parse_option(pcstr option, pcstr arg)
 
 template<typename T>
 void command_line_key<T>::PrintHelp() {
-    command_line_key<T> *current_node = command_line_key<T>::l_head;
+    auto current_node = command_line_key<T>::l_head;
     while(current_node != nullptr)
     {
         pcstr isreq = current_node->required ? "(mandatory)" : "(optional)";
@@ -186,7 +186,7 @@ bool ParseCommandLine(int argc, char **argv)
             return false;
         }
         else if(command_line_key<int>::parse_option(argv[n], argv[n + 1])
-                || command_line_key<pstr>::parse_option(argv[n], argv[n + 1]))
+                || command_line_key<pcstr>::parse_option(argv[n], argv[n + 1]))
         {
             n++;
             continue;
@@ -202,15 +202,15 @@ bool CLCheckAllArguments()
 {
     return (command_line_key<bool>::CheckArguments()
             && command_line_key<int>::CheckArguments()
-            && command_line_key<pstr>::CheckArguments());
+            && command_line_key<pcstr>::CheckArguments());
 }
 
 XRCORE_API void CLPrintAllHelp() {
     command_line_key<bool>::PrintHelp();
     command_line_key<int>::PrintHelp();
-    command_line_key<pstr>::PrintHelp();
+    command_line_key<pcstr>::PrintHelp();
 }
 
 template class XRCORE_API command_line_key<bool>;
 template class XRCORE_API command_line_key<int>;
-template class XRCORE_API command_line_key<pstr>;
+template class XRCORE_API command_line_key<pcstr>;

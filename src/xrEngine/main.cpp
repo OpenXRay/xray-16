@@ -43,7 +43,7 @@ ENGINE_API bool ClearSkyMode = false;
 ENGINE_API bool ShadowOfChernobylMode = false;
 
 static command_line_key<bool> unlock_game_mode("-unlock_game_mode", "unlock_game_mode", false);
-static command_line_key<pstr> ltx_flag("-ltx", "ltx", "");
+static command_line_key<pcstr> ltx_flag("-ltx", "ltx", "");
 static command_line_key<bool> captureInput("-i", "Capture input", false);
 static command_line_key<bool> gl_flag("-rgl", "opengl renderer", false);
 static command_line_key<bool> r4_flag("-r4", "r4 renderer", false);
@@ -58,7 +58,7 @@ static command_line_key<bool> slowdown2x_flag("-slowdown2x", "slowdown2x", false
 #endif
 
 
-extern command_line_key<pstr> fsltx_path;
+extern command_line_key<pcstr> fsltx_path;
 extern command_line_key<bool> shoc_flag, soc_flag, cs_flag, cop_flag;
 
 namespace
