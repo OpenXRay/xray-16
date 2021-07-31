@@ -12,6 +12,7 @@
 #include "encyclopedia_article.h"
 #include "ui/UIMapWnd.h"
 #include "xrCore/buffer_vector.h"
+#include "DiscordRPC.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -269,6 +270,7 @@ void CGameTaskManager::SetActiveTask(CGameTask* task)
         g_active_task_id[type] = task->m_ID;
         m_flags.set(eChanged, TRUE);
         task->m_read = true;
+        g_DiscordRPC.SetTask(StringTable().translate(task ? task->m_Title : "st_no_active_task").c_str());
     }
 }
 
