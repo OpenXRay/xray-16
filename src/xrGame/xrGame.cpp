@@ -58,5 +58,9 @@ extern "C"
         xr_delete(UIStyles);
         StringTable().Destroy();
         CCC_DeregisterInput(); // XXX: Remove if possible
+
+#ifdef DEBUG
+        xr_delete(g_profiler);
+#endif
  }
 }

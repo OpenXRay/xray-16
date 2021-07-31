@@ -44,7 +44,9 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
         m_name = name;
     }
     if (levelIni != g_pGameLevel->pLevel)
-        xr_delete(levelIni);
+    {
+        xr_delete(const_cast<CInifile*>(levelIni));
+    }
 }
 
 void CUICustomMap::Update()
