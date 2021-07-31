@@ -9,7 +9,7 @@ template<typename T>
 class XRCORE_API command_line_key
 {
 public:
-    command_line_key(pcstr flag_name, pcstr desc, const T defval, bool req = false);
+    command_line_key(pcstr flag_name, pcstr desc,T defval, bool req = false);
     ~command_line_key();
     bool IsProvided() const;          // was the option provided in the CLI?
     T OptionValue() const;            // value provided with the option
