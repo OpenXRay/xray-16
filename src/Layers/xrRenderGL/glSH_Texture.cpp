@@ -6,6 +6,8 @@
 #ifdef XR_PLATFORM_WINDOWS // TODO
 #include "../../xrEngine/tntQAVI.h"
 #endif
+
+#include "../../xrEngine/tntQAVI.h"
 #include "../../xrEngine/xrTheora_Surface.h"
 
 #define		PRIORITY_HIGH	12
@@ -16,7 +18,6 @@ void resptrcode_texture::create(LPCSTR _name)
 {
     _set(RImplementation.Resources->_CreateTexture(_name));
 }
-
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -1,6 +1,5 @@
 #pragma once
-#ifndef DISABLING_PARAMS_H
-#define DISABLING_PARAMS_H
+
 #include "xrPhysics.h"
 
 // fwd. decl.
@@ -28,6 +27,4 @@ struct SAllDDWParams
     float reanable_factor;
 };
 
-extern SAllDDWParams worldDisablingParams;
-
-#endif
+extern XRPHYSICS_API SAllDDWParams worldDisablingParams;

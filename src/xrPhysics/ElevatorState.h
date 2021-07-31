@@ -9,16 +9,14 @@ class IClimableObject;
 class CElevatorState : public IElevatorState
 {
 public:
-private:
-    Estate m_state;
-
     struct SEnertionState
     {
         float dist;
         u32 time;
     };
 
-    static SEnertionState m_etable[::clbNoState][::clbNoState];
+private:
+    Estate m_state;
 
     IClimableObject* m_ladder;
     CPHCharacter* m_character;
