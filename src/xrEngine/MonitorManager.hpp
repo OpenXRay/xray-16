@@ -31,17 +31,14 @@ public:
 
     // For current resolution
     RefreshRatesVec* GetRefreshRates(); 
-
-    ResolutionPair GetMinimalResolution();
-    ResolutionPair GetMaximalResolution();
-
-    u32 GetMinimalRefreshRate();
-    u32 GetMaximalRefreshRate();
+    
+    ResolutionPair GetDesktopResolution();
+    
+    u32 GetDesktopRefreshRate();
 
     // Not thread-safe, for backwards compatibility only
     const TokenVector& GetTokensForCurrentMonitor();
-
-    bool SelectedResolutionIsMaximal();
+    
     bool SelectedResolutionIsSafe();
     bool SelectedRefreshRateIsSafe();
 

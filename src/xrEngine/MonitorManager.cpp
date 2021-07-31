@@ -3,13 +3,15 @@
 #include "MonitorManager.hpp"
 
 ENGINE_API u32 Vid_SelectedMonitor = 0;
-ENGINE_API u32 Vid_SelectedRefreshRate = 60;
+ENGINE_API u32 Vid_SelectedRefreshRate = 0;
 
 MonitorsManager g_monitors;
 
 void MonitorsManager::Initialize()
 {
     FillMonitorsMap();
+    std::tie(psCurrentVidMode[0], psCurrentVidMode[1]) = GetDesktopResolution();
+    Vid_SelectedRefreshRate = GetDesktopRefreshRate();
 }
 
 void MonitorsManager::Destroy()
@@ -35,47 +37,18 @@ MonitorsManager::RefreshRatesVec* MonitorsManager::GetRefreshRates()
     return nullptr;
 }
 
-MonitorsManager::ResolutionPair MonitorsManager::GetMinimalResolution()
+MonitorsManager::ResolutionPair MonitorsManager::GetDesktopResolution()
 {
-    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
-    const auto it = resolutions.cbegin();
-    return it->first;
+    SDL_DisplayMode current;
+    SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+    return { current.w, current.h };
 }
 
-MonitorsManager::ResolutionPair MonitorsManager::GetMaximalResolution()
+u32 MonitorsManager::GetDesktopRefreshRate()
 {
-    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
-    const auto it = resolutions.crbegin();
-    return it->first;
-}
-
-
-u32 MonitorsManager::GetMinimalRefreshRate()
-{
-    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
-    const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
-    const auto resolutionIt = resolutions.find(selectedResolution);
-
-    if (resolutionIt == resolutions.end())
-        return 0; // windowed with custom resolution?
-
-    const RefreshRatesVec& rates = resolutionIt->second;
-
-    return rates.front();
-}
-
-u32 MonitorsManager::GetMaximalRefreshRate()
-{
-    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
-    const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
-    const auto resolutionIt = resolutions.find(selectedResolution);
-
-    if (resolutionIt == resolutions.end())
-        return 0; // windowed with custom resolution?
-
-    const RefreshRatesVec& rates = resolutionIt->second;
-
-    return rates.back();
+    SDL_DisplayMode current;
+    SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+    return current.refresh_rate;
 }
 
 const MonitorsManager::TokenVector& MonitorsManager::GetTokensForCurrentMonitor()
@@ -102,13 +75,6 @@ const MonitorsManager::TokenVector& MonitorsManager::GetTokensForCurrentMonitor(
     tokens.emplace_back(nullptr, -1);
 
     return tokens;
-}
-
-bool MonitorsManager::SelectedResolutionIsMaximal()
-{
-    const ResolutionPair r = g_monitors.GetMaximalResolution();
-
-    return psCurrentVidMode[0] == r.first && psCurrentVidMode[1] == r.second;
 }
 
 bool MonitorsManager::SelectedResolutionIsSafe()

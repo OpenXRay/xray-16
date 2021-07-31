@@ -579,7 +579,7 @@ public:
             if (GetValue())
                 Vid_SelectedRefreshRate = 60;
             else
-                Vid_SelectedRefreshRate = g_monitors.GetMaximalRefreshRate();
+                Vid_SelectedRefreshRate = g_monitors.GetDesktopRefreshRate();
         }
     };
 };

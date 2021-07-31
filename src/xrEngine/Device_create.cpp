@@ -164,7 +164,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
     // Select maximal resolution on first launch
     if (!psCurrentVidMode[0] || !psCurrentVidMode[1])
     {
-        const auto& r = g_monitors.GetMaximalResolution();
+        const auto& r = g_monitors.GetDesktopResolution();
         psCurrentVidMode[0] = r.first;
         psCurrentVidMode[1] = r.second;
     }
@@ -191,9 +191,9 @@ void CRenderDevice::SelectResolution(const bool windowed)
                 psCurrentVidMode[0] = closest.w;
                 psCurrentVidMode[1] = closest.h;
             }
-            else // or just use maximal
+            else // or just use desktop
             {
-                const auto& r = g_monitors.GetMaximalResolution();
+                const auto& r = g_monitors.GetDesktopResolution();
                 psCurrentVidMode[0] = r.first;
                 psCurrentVidMode[1] = r.second;
             }
@@ -210,7 +210,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
                 Vid_SelectedRefreshRate = closest.refresh_rate;
             else // or just use maximal
             {
-                Vid_SelectedRefreshRate = g_monitors.GetMaximalRefreshRate();
+                Vid_SelectedRefreshRate = g_monitors.GetDesktopRefreshRate();
             }
         }
     }
