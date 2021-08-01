@@ -4,15 +4,20 @@ class DiscordRPC
 {
     int64_t start_time{};
     string64 build_name{};
-    string64 current_level_name{};
-    pcstr current_task_name{};
+    string256 current_level_name{};
+    string256 current_task_name{};
 
 public:
+    enum DiscordStatusType
+    {
+        UPDATE_LEVEL,
+        UPDATE_TASK
+    };
+
     void Init();
     void Deinit();
 
-    void Update(pcstr level_name = nullptr);
-    void SetTask(pcstr task_name);
+    void Update(DiscordStatusType updateType, pcstr updateData);
 };
 
 extern DiscordRPC g_DiscordRPC;
