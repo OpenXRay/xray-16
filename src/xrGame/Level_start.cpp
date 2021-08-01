@@ -156,7 +156,8 @@ bool CLevel::net_start2()
         Server->SLS_Default();
         map_data.m_name = Server->level_name(m_caServerOptions);
         if (map_data.m_name.size())
-            g_DiscordRPC.Update(StringTable().translate(map_data.m_name).c_str());
+            g_DiscordRPC.Update(DiscordRPC::DiscordStatusType::UpdateLevel,
+                StringTable().translate(map_data.m_name).c_str());
         if (!GEnv.isDedicatedServer)
             g_pGamePersistent->LoadTitle(true, map_data.m_name);
     }
