@@ -64,6 +64,7 @@ class CMainMenu : public IMainMenu,
         flRestoreCursor = (1 << 5),
         flGameSaveScreenshot = (1 << 6),
         flNeedVidRestart = (1 << 7),
+        flNeedUIRestart = (1 << 8),
     };
     Flags16 m_Flags;
     string_path m_screenshot_name;
@@ -134,7 +135,6 @@ protected:
 
 public:
     u32 m_deactivated_frame;
-    bool m_wasForceReloaded;
     void DestroyInternal(bool bForce) override;
 
     CMainMenu();

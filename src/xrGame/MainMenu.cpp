@@ -571,9 +571,10 @@ void CMainMenu::OnFrame()
     if (IsActive())
     {
         CheckForErrorDlg();
-        if (m_wasForceReloaded)
+        if (m_Flags.test(flNeedUIRestart))
         {
-            m_wasForceReloaded = false;
+            m_Flags.set(flNeedUIRestart, false);
+            ReloadUI();
             m_startDialog->SendMessage(m_startDialog, MAIN_MENU_RELOADED, NULL);
         }
     }
@@ -772,12 +773,9 @@ void CMainMenu::OnDeviceReset()
 
 void CMainMenu::OnUIReset()
 {
-    const bool main_menu_is_active = IsActive();
-    VERIFY2(main_menu_is_active, "Trying to reload main menu while it's inactive. That's unsupported.");
-    if (!main_menu_is_active)
-        return;
-    ReloadUI();
-    m_wasForceReloaded = true;
+    // At this point, we may still be executing Lua script.
+    // It is not safe to recreate the menu here.
+    m_Flags.set(flNeedUIRestart, true);
 }
 
 // -------------------------------------------------------------------------------------------------
