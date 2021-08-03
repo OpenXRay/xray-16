@@ -86,11 +86,7 @@ CGameTask* CGameTaskManager::HasGameTask(const TASK_ID& id, bool only_inprocess)
     FindTaskByID key(id, only_inprocess);
     auto it = std::find_if(GetGameTasks().begin(), GetGameTasks().end(), key);
     if (it != GetGameTasks().end())
-    {
-        g_DiscordRPC.Update(DiscordRPC::DiscordStatusType::UpdateTask,
-            StringTable().translate((*it).game_task ? (*it).game_task->m_Title : "st_no_active_task").c_str());
         return (*it).game_task;
-    }
 
     return 0;
 }
@@ -274,6 +270,7 @@ void CGameTaskManager::SetActiveTask(CGameTask* task)
         g_active_task_id[type] = task->m_ID;
         m_flags.set(eChanged, TRUE);
         task->m_read = true;
+        g_DiscordRPC.SetTask(StringTable().translate(task ? task->m_Title : "st_no_active_task").c_str());
     }
 }
 
