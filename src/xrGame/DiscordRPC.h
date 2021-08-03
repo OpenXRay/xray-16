@@ -10,8 +10,8 @@ class DiscordRPC
 public:
     enum DiscordStatusType
     {
-        UPDATE_LEVEL,
-        UPDATE_TASK
+        UpdateLevel,
+        UpdateTask,
     };
 
     void Init();

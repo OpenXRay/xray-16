@@ -30,9 +30,9 @@ void DiscordRPC::Update(DiscordStatusType updateType, pcstr updateData)
     static std::locale locale("");
     xr_string tempData = StringToUTF8(updateData, locale);
 
-    if (updateType == DiscordRPC::DiscordStatusType::UPDATE_LEVEL)
+    if (updateType == DiscordStatusType::UpdateLevel)
         xr_strcpy(current_level_name, tempData.c_str());
-    else if (updateType == DiscordRPC::DiscordStatusType::UPDATE_TASK)
+    else if (updateType == DiscordStatusType::UpdateTask)
         xr_strcpy(current_task_name, tempData.c_str());
 
     discordPresence.startTimestamp  = start_time;
