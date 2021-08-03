@@ -162,8 +162,8 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         STextureParams tp;
         tp.Load(*F);
         FS.r_close(F);
-        if (STextureParams::ttImage == tp.type || STextureParams::ttTerrain == tp.type ||
-            STextureParams::ttNormalMap == tp.type)
+        const auto thm_format = ShadowOfChernobylMode ? tp.fmt : tp.type;
+        if (thm_format == STextureParams::ttImage || thm_format == STextureParams::ttTerrain || thm_format == STextureParams::ttNormalMap)
         {
             lock.Enter();
             texture_desc& desc = m_texture_details[fn];
