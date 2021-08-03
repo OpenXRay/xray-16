@@ -861,6 +861,15 @@ void _terminate()
 
 static void handler_base(const char* reason)
 {
+    auto windowHandler = xrDebug::GetWindowHandler();
+    if (windowHandler)
+    {
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+        SDL_CaptureMouse(SDL_FALSE);
+        SDL_ShowCursor(SDL_ENABLE);
+        SDL_SetWindowGrab(windowHandler->GetApplicationWindow(), SDL_FALSE);
+    }
+
     bool ignoreAlways = false;
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
