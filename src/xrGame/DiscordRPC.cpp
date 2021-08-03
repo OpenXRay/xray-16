@@ -24,33 +24,24 @@ void DiscordRPC::Deinit()
     Discord_Shutdown();
 }
 
-void DiscordRPC::Update(pcstr level_name)
+void DiscordRPC::Update(DiscordStatusType updateType, pcstr updateData)
 {
     DiscordRichPresence discordPresence{};
+    static std::locale locale("");
+    xr_string tempData = StringToUTF8(updateData, locale);
+
+    if (updateType == DiscordStatusType::UpdateLevel)
+        xr_strcpy(current_level_name, tempData.c_str());
+    else if (updateType == DiscordStatusType::UpdateTask)
+        xr_strcpy(current_task_name, tempData.c_str());
 
     discordPresence.startTimestamp  = start_time;
-    discordPresence.smallImageText  = build_name;
     discordPresence.largeImageKey   = "current_level_name";
     discordPresence.smallImageKey   = "build_name";
-
-    if (level_name)
-    {
-        std::locale myLocale("");
-        xr_string temp = StringToUTF8(level_name, myLocale);
-        xr_sprintf(current_level_name, "%s", temp);
-    }
-
-    discordPresence.state           = current_level_name;
     discordPresence.largeImageText  = current_level_name;
+    discordPresence.smallImageText  = build_name;
+    discordPresence.state           = current_level_name;
     discordPresence.details         = current_task_name;
 
     Discord_UpdatePresence(&discordPresence);
-}
-
-void DiscordRPC::SetTask(pcstr task_name)
-{
-    std::locale myLocale("");
-    xr_string temp = StringToUTF8(task_name, myLocale);
-    current_task_name = temp.c_str();
-    Update();
 }
