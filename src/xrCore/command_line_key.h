@@ -16,7 +16,7 @@ public:
 
     static bool CheckArguments();
     static void PrintHelp();
-    friend bool ParseCommandLine(int argc, char *argv[]);
+    friend XRCORE_API bool ParseCommandLine(int argc, char *argv[]);
 
 private:
     pstr option_name = nullptr;
