@@ -1,18 +1,12 @@
 #include "stdafx.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#pragma hdrstop
 
-#include <intrin.h> // __rdtsc
+#if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
 
 #if defined(XR_COMPILER_MSVC)
 #include <powerbase.h>
 #elif defined(XR_COMPILER_GCC)
 #include <float.h> // _controlfp
-//#include_next <float.h>
-//how to include mingw32\i686-w64-mingw32\include\float.h
-//instead of mingw32\lib\gcc\i686-w64-mingw32\7.3.0\include\float.h
-//?
 #endif
 
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
@@ -56,27 +50,6 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
 #define _FPU_RC_NEAREST 0
-
-#if defined(XR_ARCHITECTURE_ARM)
-static class PerfInit
-{
-public:
-    int fddev = -1;
-
-public:
-    PerfInit()
-    {
-        static struct perf_event_attr attr;
-        attr.type = PERF_TYPE_HARDWARE;
-        attr.config = PERF_COUNT_HW_CPU_CYCLES;
-        fddev = syscall(__NR_perf_event_open, &attr, 0, -1, -1, 0);
-    }
-    ~PerfInit()
-    {
-        close(fddev);
-    }
-} s_perf_init;
-#endif // defined(XR_ARCHITECTURE_ARM)
 #endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
 
 typedef struct _PROCESSOR_POWER_INFORMATION
@@ -217,10 +190,12 @@ void initialize()
     else
         m24r();
 
-#if defined(XR_PLATFORM_WINDOWS)
-    ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
+#if defined(XR_PLATFORM_WINDOWS) // XXX: make crossplatform instead of separate versions for Windows and Linux
+    ::Random.seed(u32(CPU::QPC() % (1i64 << 32i64)));
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-    ::Random.seed(u32(CPU::GetCLK() % ((u64)0x1 << 32)));
+    ::Random.seed(u32(CPU::QPC() % ((u64)0x1 << 32)));
+#else
+#   error Add your platform here
 #endif
 }
 };
@@ -243,41 +218,6 @@ XRCORE_API u64 QPC() noexcept
 XRCORE_API u32 GetTicks()
 {
     return SDL_GetTicks();
-}
-
-XRCORE_API u64 GetCLK()
-{
-#if defined(XR_COMPILER_MSVC)
-
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
-    return __rdtsc();
-#elif defined(XR_ARCHITECTURE_ARM)
-    return __rdpmccntr64();
-#elif defined(XR_ARCHITECTURE_ARM64)
-    return _ReadStatusReg(ARM64_PMCCNTR_EL0);
-#else
-#error Unsupported architecture
-#endif
-
-#elif defined(XR_COMPILER_GCC)
-
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-    return __rdtsc();
-#elif defined(XR_ARCHITECTURE_ARM)
-    long long result = 0;
-    if (read(s_perf_init.fddev, &result, sizeof(result)) < sizeof(result))
-        return 0;
-    return result;
-#elif defined(XR_ARCHITECTURE_ARM64)
-    int64_t virtual_timer_value;
-    asm volatile("mrs %0, pmccntr_el0" : "=r"(virtual_timer_value));
-    return virtual_timer_value;
-#endif
-
-#else
-#error Unsupported compiler
-#endif
-    return 0;
 }
 
 XRCORE_API u32 GetCurrentCPU()

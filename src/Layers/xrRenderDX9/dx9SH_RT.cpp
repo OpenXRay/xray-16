@@ -43,7 +43,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         return;
 
     R_ASSERT(HW.pDevice && Name && Name[0] && w && h);
-    _order = CPU::GetCLK(); // RDEVICE.GetTimerGlobal()->GetElapsed_clk();
+    _order = CPU::QPC(); // RDEVICE.GetTimerGlobal()->GetElapsed_clk();
 
     HRESULT _hr;
 
@@ -192,7 +192,7 @@ CRTC::~CRTC			()
 void CRTC::create	(LPCSTR Name, u32 size,	D3DFORMAT f)
 {
     R_ASSERT	(HW.pDevice && Name && Name[0] && size && btwIsPow2(size));
-    _order		= CPU::GetCLK();	//RDEVICE.GetTimerGlobal()->GetElapsed_clk();
+    _order		= CPU::QPC();	//RDEVICE.GetTimerGlobal()->GetElapsed_clk();
 
     HRESULT		_hr;
 

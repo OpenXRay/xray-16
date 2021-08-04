@@ -63,7 +63,7 @@ CSE_ALifeInventoryItem::CSE_ALifeInventoryItem(LPCSTR caSection) : m_self(nullpt
     m_freeze_time = 0;
 #endif
 
-    m_relevent_random.seed(u32(CPU::GetCLK() & u32(-1)));
+    m_relevent_random.seed(u32(CPU::QPC() & u32(-1)));
     freezed = false;
 }
 

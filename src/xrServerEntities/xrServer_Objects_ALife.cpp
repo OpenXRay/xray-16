@@ -873,7 +873,7 @@ CSE_ALifeObjectPhysic::CSE_ALifeObjectPhysic(LPCSTR caSection)
 #else
     m_freeze_time = 0;
 #endif
-    m_relevent_random.seed(u32(CPU::GetCLK() & u32(-1)));
+    m_relevent_random.seed(u32(CPU::QPC() & u32(-1)));
 }
 
 CSE_ALifeObjectPhysic::~CSE_ALifeObjectPhysic() {}

@@ -23,7 +23,6 @@ XRCORE_API extern u64 QPC() noexcept;
 
 XRCORE_API u32 GetTicks();
 
-XRCORE_API u64 GetCLK();
 XRCORE_API u32 GetCurrentCPU();
 }
 
