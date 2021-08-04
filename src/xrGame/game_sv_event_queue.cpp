@@ -38,7 +38,7 @@ GameEvent* GameEventQueue::Create()
 #ifdef _DEBUG
 //		Msg ("* GameEventQueue::Create - ready %d, unused %d", ready.size(), unused.size());
 #endif
-        LastTimeCreate = SDL_GetTicks();
+        LastTimeCreate = CPU::GetTicks();
         //---------------------------------------------
     }
     else
@@ -78,7 +78,7 @@ GameEvent* GameEventQueue::Create(NET_Packet& P, u16 type, u32 time, ClientID cl
 #ifdef _DEBUG
 //		Msg ("* GameEventQueue::Create - ready %d, unused %d", ready.size(), unused.size());
 #endif
-        LastTimeCreate = SDL_GetTicks();
+        LastTimeCreate = CPU::GetTicks();
         //---------------------------------------------
     }
     else
@@ -104,7 +104,7 @@ GameEvent* GameEventQueue::Retreive()
     //---------------------------------------------
     else
     {
-        u32 tmp_time = SDL_GetTicks() - 60000;
+        u32 tmp_time = CPU::GetTicks() - 60000;
         u32 size = unused.size();
         if ((LastTimeCreate < tmp_time) && (size > 32))
         {
@@ -125,7 +125,7 @@ void GameEventQueue::Release()
     pcs->Enter();
     R_ASSERT(!ready.empty());
     //---------------------------------------------
-    u32 tmp_time = SDL_GetTicks() - 60000;
+    u32 tmp_time = CPU::GetTicks() - 60000;
     u32 size = unused.size();
     if ((LastTimeCreate < tmp_time) && (size > 32))
     {
@@ -175,7 +175,7 @@ u32 GameEventQueue::EraseEvents(event_predicate to_del)
     while (need_to_erase != ready.end())
     {
         //-----
-        u32 tmp_time = SDL_GetTicks() - 60000;
+        u32 tmp_time = CPU::GetTicks() - 60000;
         u32 size = unused.size();
         if ((LastTimeCreate < tmp_time) && (size > 32))
         {

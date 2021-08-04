@@ -363,7 +363,7 @@ bool CLevel::Connect2Server(const char* options)
     if (psNET_direct_connect)
         m_bConnectResultReceived = true;
 
-    u32 EndTime = SDL_GetTicks() + ConnectionTimeOut;
+    u32 EndTime = CPU::GetTicks() + ConnectionTimeOut;
     while (!m_bConnectResultReceived)
     {
         ClientReceive();
@@ -371,7 +371,7 @@ bool CLevel::Connect2Server(const char* options)
         if (Server)
             Server->Update();
         //-----------------------------------------
-        u32 CurTime = SDL_GetTicks();
+        u32 CurTime = CPU::GetTicks();
         if (CurTime > EndTime)
         {
             NET_Packet P;

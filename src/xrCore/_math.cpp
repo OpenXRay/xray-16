@@ -240,6 +240,11 @@ XRCORE_API u64 QPC() noexcept
     return _dest;
 }
 
+XRCORE_API u32 GetTicks()
+{
+    return SDL_GetTicks();
+}
+
 XRCORE_API u64 GetCLK()
 {
 #if defined(XR_COMPILER_MSVC)
