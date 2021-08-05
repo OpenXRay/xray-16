@@ -1,6 +1,6 @@
 ![Open for everyone](OpenXRayCover.png)
 
-OpenXRay [![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv) [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg)](https://opencollective.com/openxray)
+OpenXRay [![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv) [![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray) [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg)](https://opencollective.com/openxray)
 ==========================
 OpenXRay is an improved version of the X-Ray Engine, the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World.
 
