@@ -71,7 +71,10 @@ void CRenderDevice::CleanupVideoModes()
     vid_mode_token.clear();
 
     for (auto& token : vid_monitor_token)
-        xr_free(token.name);
+    {
+        pstr tokenName = const_cast<pstr>(token.name);
+        xr_free(tokenName);
+    }
     vid_monitor_token.clear();
 }
 

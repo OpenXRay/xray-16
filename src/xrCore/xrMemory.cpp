@@ -15,8 +15,11 @@
 
 // On other platforms these options are controlled by CMake
 #if defined(XR_PLATFORM_WINDOWS)
-#  define USE_MIMALLOC
-//#  define USE_PURE_ALLOC
+#   ifdef _DEBUG
+#       define USE_PURE_ALLOC
+#   else
+#       define USE_MIMALLOC
+#   endif
 #endif
 
 #if defined(USE_MIMALLOC)
