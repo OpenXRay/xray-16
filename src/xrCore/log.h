@@ -11,7 +11,6 @@ template <class T> struct _matrix; typedef _matrix<float> Fmatrix;
 
 #define VPUSH(a) ((a).x), ((a).y), ((a).z)
 
-void XRCORE_API Set_error_log_mode(bool mode);
 void XRCORE_API __cdecl Msg(LPCSTR format, ...);
 void XRCORE_API Log(LPCSTR msg);
 void XRCORE_API Log(LPCSTR msg);

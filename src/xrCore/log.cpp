@@ -10,7 +10,6 @@ BOOL LogExecCB = TRUE;
 string_path logFName = "engine.log";
 string_path log_file_name = "engine.log";
 BOOL no_log = TRUE;
-bool error_log_mode = true;
 #ifdef CONFIG_PROFILE_LOCKS
 Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
@@ -35,27 +34,19 @@ void FlushLog()
     }
 }
 
-void Set_error_log_mode(bool mode) 
-{
-    error_log_mode = mode;
-    if (mode)
-        Log("Errors log show");
-    else 
-        Log("Errors log not show");
-}
-
 void AddOne(const char* split)
 {
     logCS.Enter();
+
     OutputDebugString(split);
     OutputDebugString("\n");
 
-    if(error_log_mode || split[0]!='!')
-        LogFile.push_back(split);
+    LogFile.push_back(split);
 
     // exec CallBack
     if (LogExecCB && LogCB)
         LogCB(split);
+
     if (LogWriter)
     {
 #ifdef USE_LOG_TIMING
