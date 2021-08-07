@@ -37,7 +37,7 @@ static command_line_key<bool> no_splash("-nosplash", "no splash screen", false);
 static command_line_key<bool> splash_notop("-splashnotop", "splash no top", false);
 static command_line_key<bool> sv_dedicated("-dedicated", "run dedicated server", false);
 
-extern command_line_key<pcstr> fsltx_path;
+extern XRCORE_API command_line_key<pcstr> fsltx_path;
 
 bool HandleArguments(int argc, char *argv[])
 {
@@ -125,17 +125,13 @@ int StackoverflowFilter(const int exceptionCode)
 int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int cmdShow)
 {
     int result = 0;
-    int argc;
-    char **argv;
     // BugTrap can't handle stack overflow exception, so handle it here
     __try
     {
-        argv = CommandLineToArgvW(commandLine, &argc);
-        if (HandleArguments(argc, argv))
+        if (HandleArguments(__argc, __argv))
             result = entry_point(commandLine);
         else
             result = EXIT_FAILURE;
-        LocalFree(argv);
     }
     __except (StackoverflowFilter(GetExceptionCode()))
     {
