@@ -196,6 +196,32 @@ public:
 };
 
 //-----------------------------------------------------------------------
+class CCC_Set_error_log_mode : public IConsole_Command
+{
+public:
+    CCC_Set_error_log_mode(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(pcstr args)
+    {
+        bool mode = 1;
+        if (!xr_strcmp(args, "on"))
+            mode = true;
+        else if (!xr_strcmp(args, "off"))
+            mode = false;
+        else if (!xr_strcmp(args, "true"))
+            mode = true;
+        else if (!xr_strcmp(args, "false"))
+            mode = false;
+        else if (!xr_strcmp(args, "1"))
+            mode = true;
+        else if (!xr_strcmp(args, "0"))
+            mode = false;
+        else
+            InvalidSyntax();
+        Set_error_log_mode(mode);
+    }
+};
+
+//-----------------------------------------------------------------------
 class CCC_SaveCFG : public IConsole_Command
 {
 public:
@@ -1006,4 +1032,6 @@ void CCC_Register()
     extern BOOL debug_destroy;
     CMD4(CCC_Integer, "debug_destroy", &debug_destroy, 0, 1);
 #endif
+
+    CMD1(CCC_Set_error_log_mode, "errors_show_mode");
 };
