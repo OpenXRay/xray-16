@@ -74,7 +74,8 @@ static optimizer vtune;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-ENGINE_API bool g_bDisableRedText = false;
+ENGINE_API bool g_bDisableRedText = 0;
+bool show_errors = true;
 CStats::CStats()
 {
     statsFont = nullptr;
@@ -212,7 +213,7 @@ void CStats::Show()
         font.SetHeight(refHeight);
     }
 #ifdef DEBUG
-    if (!g_bDisableRedText && errors.size())
+    if (!g_bDisableRedText && errors.size() && show_errors)
     {
         font.SetColor(color_rgba(255, 16, 16, 191));
         font.OutSet(400, 0);
@@ -264,7 +265,6 @@ void CStats::OnDeviceCreate()
         fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 30, color_xrgb(70, 70, 70)); // Mid
         fpsGraph->SetMinMax(0.0f, 100.0f, 500);
     }
-
 #ifdef DEBUG
     if (!g_bDisableRedText)
     {

@@ -22,6 +22,8 @@ extern u32 Vid_SelectedMonitor;
 extern u32 Vid_SelectedRefreshRate;
 xr_vector<xr_token> VidQualityToken;
 
+extern bool show_errors;
+
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 
 const xr_token snd_precache_all_token[] = {{"off", 0}, {"on", 1}, {nullptr, 0}};
@@ -192,6 +194,40 @@ public:
     {
         int _mode = atoi(args);
         _dump_open_files(_mode);
+    }
+};
+
+//-----------------------------------------------------------------------
+class CCC_Set_error_log_mode : public IConsole_Command
+{
+public:
+    CCC_Set_error_log_mode(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    virtual void Execute(pcstr args)
+    {
+        bool mode = 1;
+        if (!xr_strcmp(args, "on"))
+            mode = true;
+        else if (!xr_strcmp(args, "off"))
+            mode = false;
+        else if (!xr_strcmp(args, "true"))
+            mode = true;
+        else if (!xr_strcmp(args, "false"))
+            mode = false;
+        else if (!xr_strcmp(args, "1"))
+            mode = true;
+        else if (!xr_strcmp(args, "0"))
+            mode = false;
+        else
+            InvalidSyntax();
+        show_errors = mode;
+        if (mode)
+        {
+            Log("error log visible");
+        }
+        else 
+        {
+            Log("error log hidden");
+        }
     }
 };
 
@@ -1005,5 +1041,9 @@ void CCC_Register()
 #ifdef DEBUG
     extern BOOL debug_destroy;
     CMD4(CCC_Integer, "debug_destroy", &debug_destroy, 0, 1);
+
+    CMD1(CCC_Set_error_log_mode, "error_show_mode");
 #endif
+
+    
 };
