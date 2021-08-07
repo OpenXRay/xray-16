@@ -1,3 +1,5 @@
+#include "stdafx.h"
+#pragma hdrstop
 #include "command_line_key.h"
 #include "xrMemory.h"
 #include "log.h"

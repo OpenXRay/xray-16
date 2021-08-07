@@ -46,6 +46,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Animation\Motion.cpp" />
     <ClCompile Include="Animation\SkeletonMotions.cpp" />
     <ClCompile Include="clsid.cpp" />
+    <ClCompile Include="command_line_key.cpp" />
     <ClCompile Include="Compression\lzo_compressor.cpp" />
     <ClCompile Include="Compression\Model.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -141,6 +142,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="buffer_vector_inline.h" />
     <ClInclude Include="cdecl_cast.hpp" />
     <ClInclude Include="clsid.h" />
+    <ClInclude Include="command_line_key.h" />
     <ClInclude Include="Compression\Coder.hpp" />
     <ClInclude Include="Compression\compression_ppmd_stream.h" />
     <ClInclude Include="Compression\compression_ppmd_stream_inline.h" />

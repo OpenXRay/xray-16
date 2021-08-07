@@ -130,7 +130,7 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
     // BugTrap can't handle stack overflow exception, so handle it here
     __try
     {
-        argv = CommandLineToArgv(commandLine, &argc);
+        argv = CommandLineToArgvW(commandLine, &argc);
         if (HandleArguments(argc, argv))
             result = entry_point(commandLine);
         else

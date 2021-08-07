@@ -58,8 +58,8 @@ static command_line_key<bool> slowdown2x_flag("-slowdown2x", "slowdown2x", false
 #endif
 
 
-extern command_line_key<pcstr> fsltx_path;
-extern command_line_key<bool> shoc_flag, soc_flag, cs_flag, cop_flag;
+extern XRCORE_API command_line_key<pcstr> fsltx_path;
+extern XRCORE_API command_line_key<bool> shoc_flag, soc_flag, cs_flag, cop_flag;
 
 namespace
 {
