@@ -923,7 +923,7 @@ void xrDebug::OnThreadSpawn()
 #endif
 }
 
-void xrDebug::Initialize()
+void xrDebug::Initialize(pcstr commandLine)
 {
     *BugReportFile = 0;
     OnThreadSpawn();
@@ -936,6 +936,6 @@ void xrDebug::Initialize()
 #ifdef DEBUG
     ShowErrorMessage = true;
 #else
-    ShowErrorMessage = show_error_window.OptionValue();
+    ShowErrorMessage = commandLine ? !!strstr(commandLine, "-show_error_window") : false;
 #endif
 }

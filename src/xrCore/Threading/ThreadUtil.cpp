@@ -75,7 +75,7 @@ u32 __stdcall ThreadEntry(void* params)
 
 bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 {
-    xrDebug::Initialize();
+    xrDebug::Initialize(Core.Params);
 
     SThreadStartupInfo* info = xr_new<SThreadStartupInfo>();
     info->threadName = name;
@@ -144,7 +144,7 @@ void* __cdecl ThreadEntry(void* params)
 
 bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 {
-    xrDebug::Initialize();
+    xrDebug::Initialize(Core.Params);
 
     SThreadStartupInfo* info = xr_new<SThreadStartupInfo>();
     info->threadName = name;
