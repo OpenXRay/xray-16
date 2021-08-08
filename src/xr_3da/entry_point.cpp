@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 #include "resource.h"
 #if defined(XR_PLATFORM_WINDOWS)

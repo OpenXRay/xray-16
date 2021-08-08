@@ -13,6 +13,7 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 static command_line_key<bool> ivtune("-tune", "intel vtune", false);
+static command_line_key<bool> nogame("-nogame", "nogame", false);
 
 extern xr_vector<xr_token> VidQualityToken;
 
@@ -280,6 +281,11 @@ void CEngineAPI::CreateRendererList()
             Log(mode.name);
     }
     modes.emplace_back(nullptr, -1);
+}
+
+bool CEngineAPI::CanSkipGameModuleLoading() const
+{
+    return nogame.OptionValue();
 }
 
 bool is_r2_available()

@@ -160,8 +160,9 @@ void command_line_key<T>::PrintHelp() {
     while(current_node != nullptr)
     {
         pcstr isreq = current_node->required ? "(mandatory)" : "(optional)";
-        Msg("%-10s \t %-10s \t %-25s", current_node->option_name,
+        Msg("%-20s \t %-10s \t %-25s", current_node->option_name,
             isreq, current_node->description);
+        current_node = current_node->l_next;
     }
 }
 

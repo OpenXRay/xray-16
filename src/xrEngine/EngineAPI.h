@@ -13,8 +13,6 @@
 
 #include <memory>
 
-inline static command_line_key<bool> nogame("-nogame", "nogame", false);
-
 class IFactoryObject
 {
 public:
@@ -101,7 +99,7 @@ public:
     void Destroy();
 
     void CreateRendererList();
-    bool CanSkipGameModuleLoading() const { return nogame.OptionValue(); }
+    bool CanSkipGameModuleLoading() const;
 
     CEngineAPI();
     ~CEngineAPI();
