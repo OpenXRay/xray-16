@@ -265,6 +265,7 @@ void CStats::OnDeviceCreate()
         fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 30, color_xrgb(70, 70, 70)); // Mid
         fpsGraph->SetMinMax(0.0f, 100.0f, 500);
     }
+
 #ifdef DEBUG
     if (!g_bDisableRedText)
     {

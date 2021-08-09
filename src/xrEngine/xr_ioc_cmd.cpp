@@ -1007,6 +1007,6 @@ void CCC_Register()
     CMD4(CCC_Integer, "debug_destroy", &debug_destroy, 0, 1);
 
     extern int g_bShowRedText;
-    CMD4(CCC_Integer, "error_show_mode", &g_bShowRedText, 0, 1);
+    CMD4(CCC_Integer, "debug_show_red_text", &g_bShowRedText, 0, 1);
 #endif
 };
