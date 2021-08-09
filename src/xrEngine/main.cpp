@@ -187,7 +187,7 @@ ENGINE_API void InitConsole()
 
 ENGINE_API void InitInput()
 {
-    pInput = xr_new<CInput>(captureInput.OptionValue());
+    pInput = xr_new<CInput>(!captureInput.OptionValue() && !GEnv.isEditor);
 }
 
 ENGINE_API void destroyInput() { xr_delete(pInput); }
