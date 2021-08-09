@@ -34,29 +34,40 @@ command_line_key<T>::command_line_key(pcstr opname, pcstr desc,T defval, bool re
     l_head = this;
 }
 
-
-template<typename T>
-void command_line_key<T>::copy_argument(T arg) {
+template < typename T >
+void command_line_key<T>::copy_argument(T arg)
+{
     argument = arg;
 }
 
 template<>
-void command_line_key<pcstr>::copy_argument(pcstr arg) {
+void command_line_key<pcstr>::copy_argument(pcstr arg)
+{
     argument = xr_strdup(arg);
 }
 
-template<typename T>
-void command_line_key<T>::free_argument() {
+template < typename T >
+void command_line_key<T>::set_argument(T arg)
+{
+    copy_argument(arg);
+    provided = true;
+}
+
+
+template< typename T >
+void command_line_key<T>::free_argument()
+{
     return;
 }
 
 template<>
-void command_line_key<pcstr>::free_argument() {
+void command_line_key<pcstr>::free_argument()
+{
     xr_free(argument);
 }
 
 
-template<typename T>
+template < typename T >
 command_line_key<T> *command_line_key<T>::find_option(pcstr flag_name)
 {
     auto current_node =  command_line_key<T>::l_head;
@@ -68,7 +79,7 @@ command_line_key<T> *command_line_key<T>::find_option(pcstr flag_name)
     return current_node;
 }
 
-template<typename T>
+template < typename T >
 command_line_key<T>::~command_line_key()
 {
     xr_free(option_name);
@@ -155,7 +166,8 @@ bool command_line_key<pcstr>::parse_option(pcstr option, pcstr arg)
 }
 
 template<typename T>
-void command_line_key<T>::PrintHelp() {
+void command_line_key<T>::PrintHelp()
+{
     auto current_node = command_line_key<T>::l_head;
     while(current_node != nullptr)
     {
@@ -178,23 +190,33 @@ bool ParseCommandLine(int argc, char **argv)
         }
 
         // is this a bool option?
-        if(command_line_key<bool>::parse_option(argv[n], nullptr))
+        if(auto clkey = command_line_key<bool>::find_option(argv[n]))
         {
+            clkey->set_argument(true);
             continue;
         }
-        // the rest of the flags will require an argument
-        else if((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
+        // is this an int argument?
+        else if (auto clkey = command_line_key<int>::find_option(argv[n]))
         {
-            Msg("Error: Missing argument for command line option <%s>", argv[n]);
-            return false;
-        }
-        else if(command_line_key<int>::parse_option(argv[n], argv[n + 1])
-                || command_line_key<pcstr>::parse_option(argv[n], argv[n + 1]))
-        {
-            n++;
+            if((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
+            {
+                Msg("Error: Missing int argument for command line option <%s>", argv[n]);
+                return false;
+            }
+            clkey->set_argument( std::stoi(argv[++n]) );
             continue;
         }
-
+        // is this a string argument?
+        else if (auto clkey = command_line_key<pcstr>::find_option(argv[n]))
+        {
+            if((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
+            {
+                Msg("Error: Missing string argument for command line option <%s>", argv[n]);
+                return false;
+            }
+            clkey->set_argument(argv[++n]);
+            continue;
+        }
         Msg("Unknown option <%s>", argv[n]);
     }
     return true;
@@ -208,7 +230,8 @@ bool CLCheckAllArguments()
             && command_line_key<pcstr>::CheckArguments());
 }
 
-XRCORE_API void CLPrintAllHelp() {
+XRCORE_API void CLPrintAllHelp()
+{
     command_line_key<bool>::PrintHelp();
     command_line_key<int>::PrintHelp();
     command_line_key<pcstr>::PrintHelp();
