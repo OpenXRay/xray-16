@@ -3,9 +3,9 @@
 #include "xrCommon/xr_list.h"
 #include "_std_extensions.h"
 
-template<typename T> class XRCORE_API command_line_key;
+template < typename T > class XRCORE_API command_line_key;
 
-template<typename T>
+template < typename T >
 class XRCORE_API command_line_key
 {
 public:
@@ -16,7 +16,7 @@ public:
 
     static bool CheckArguments();
     static void PrintHelp();
-    friend XRCORE_API bool ParseCommandLine(int argc, char *argv[]);
+    friend XRCORE_API bool ParseCommandLine(int argc, char* argv[]);
 
 private:
     pstr option_name = nullptr;
@@ -40,6 +40,6 @@ inline static bool IsOptionFlag(pcstr buf)
     return (buf && buf[0] == '-');
 }
 
-XRCORE_API bool ParseCommandLine(int argc, char *argv[]);
+XRCORE_API bool ParseCommandLine(int argc, char* argv[]);
 XRCORE_API bool CLCheckAllArguments();
 XRCORE_API void CLPrintAllHelp();

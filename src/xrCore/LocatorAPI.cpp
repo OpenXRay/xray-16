@@ -39,11 +39,12 @@ static constexpr pcstr FSLTX = "fs.ltx"
 static constexpr pcstr FSLTX = "fsgame.ltx";
 #endif
 
+XRCORE_API command_line_key<pcstr> fsltx_path("-fsltx", "path to game config ltx", "");
+
 static command_line_key<bool> auto_load_arch("-auto_load_arch", "auto_load_arch", false);
 static command_line_key<pcstr> overlaypath("-overlaypath", "overlaypath", "");
 static command_line_key<bool> nolog("-nolog", "nolog", false);
 
-extern command_line_key<pcstr> fsltx_path;
 extern command_line_key<bool> shoc_flag, soc_flag, cs_flag;
 
 

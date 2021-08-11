@@ -11,11 +11,11 @@ template<> command_line_key<pcstr> *command_line_key<pcstr>::l_head = nullptr;
 // command_line_key
 
 // when adding make sure it's beginning with a '-'
-template<typename T>
+template < typename T >
 command_line_key<T>::command_line_key(pcstr opname, pcstr desc,T defval, bool req)
     : provided(false), required(req)
 {
-    if(!IsOptionFlag(opname))
+    if (!IsOptionFlag(opname))
     {
         size_t opsz = xr_strlen(opname) + 1;
         option_name = xr_alloc<char>(opsz);
@@ -71,9 +71,11 @@ template < typename T >
 command_line_key<T> *command_line_key<T>::find_option(pcstr flag_name)
 {
     auto current_node =  command_line_key<T>::l_head;
-    while(current_node != nullptr)
+    while (current_node != nullptr)
     {
-        if (!xr_strcmp(current_node->option_name, flag_name)) break;
+        if (!xr_strcmp(current_node->option_name, flag_name))
+            break;
+
         current_node = current_node->l_next;
     }
     return current_node;
@@ -86,43 +88,45 @@ command_line_key<T>::~command_line_key()
     xr_free(description);
     free_argument();
 
-    command_line_key<T> *current_node =  command_line_key<T>::l_head;
+    auto current_node =  command_line_key<T>::l_head;
     command_line_key<T> *prev_node = nullptr;
-    while(current_node != nullptr)
+    while (current_node != nullptr)
     {
-        if (current_node == this) break;
+	    if (current_node == this)
+            break;
+
         prev_node = current_node;
         current_node = current_node->l_next;
     }
 
-    if(!current_node)
+    if (!current_node)
         return;
 
-    if(prev_node)
+    if (prev_node)
         prev_node->l_next = current_node->l_next;
     else
         command_line_key<T>::l_head = current_node->l_next;
 }
 
-template<typename T>
+template < typename T >
 bool command_line_key<T>::IsProvided() const
 {
     return provided;
 }
 
-template<typename T>
+template < typename T >
 T command_line_key<T>::OptionValue() const
 {
     return argument;
 }
 
-template<typename T>
+template < typename T >
 bool command_line_key<T>::CheckArguments()
 {
     auto current_node =  command_line_key<T>::l_head;
-    while(current_node != nullptr)
+    while (current_node != nullptr)
     {
-        if(current_node->required && !current_node->provided)
+        if (current_node->required && !current_node->provided)
         {
             Log("Error: Required option %s", current_node->option_name);
             return false;
@@ -136,7 +140,9 @@ template<>
 bool command_line_key<bool>::parse_option(pcstr option, pcstr arg)
 {
     auto clkey = command_line_key<bool>::find_option(option);
-    if(!clkey) return false; // not found
+
+    if (!clkey)
+        return false; // not found
 
     clkey->argument = true;
     clkey->provided = true;
@@ -147,7 +153,9 @@ template<>
 bool command_line_key<int>::parse_option(pcstr option, pcstr arg)
 {
     auto clkey = command_line_key<int>::find_option(option);
-    if(!clkey) return false; // not found
+
+    if (!clkey)
+        return false; // not found
 
     clkey->argument = std::stoi(arg); // may throw
     clkey->provided = true;
@@ -158,18 +166,20 @@ template<>
 bool command_line_key<pcstr>::parse_option(pcstr option, pcstr arg)
 {
     auto clkey = command_line_key<pcstr>::find_option(option);
-    if(!clkey) return false; // not found
+
+    if (!clkey)
+        return false; // not found
 
     clkey->argument = xr_strdup(arg);
     clkey->provided = true;
     return true;
 }
 
-template<typename T>
+template < typename T >
 void command_line_key<T>::PrintHelp()
 {
     auto current_node = command_line_key<T>::l_head;
-    while(current_node != nullptr)
+    while (current_node != nullptr)
     {
         pcstr isreq = current_node->required ? "(mandatory)" : "(optional)";
         Msg("%-20s \t %-10s \t %-25s", current_node->option_name,
@@ -178,19 +188,19 @@ void command_line_key<T>::PrintHelp()
     }
 }
 
-bool ParseCommandLine(int argc, char **argv)
+bool ParseCommandLine(int argc, char** argv)
 {
     // put these back into class methods?
-    for(int n = 1; n < argc; n++)
+    for (int n = 1; n < argc; n++)
     {
-        if(!IsOptionFlag(argv[n]))
+        if (!IsOptionFlag(argv[n]))
         {
             Msg("Unknown option/argument <%s>", argv[n]);
             continue;
         }
 
         // is this a bool option?
-        if(auto clkey = command_line_key<bool>::find_option(argv[n]))
+        if (auto clkey = command_line_key<bool>::find_option(argv[n]))
         {
             clkey->set_argument(true);
             continue;
@@ -198,7 +208,7 @@ bool ParseCommandLine(int argc, char **argv)
         // is this an int argument?
         else if (auto clkey = command_line_key<int>::find_option(argv[n]))
         {
-            if((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
+            if ((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
             {
                 Msg("Error: Missing int argument for command line option <%s>", argv[n]);
                 return false;
@@ -209,7 +219,7 @@ bool ParseCommandLine(int argc, char **argv)
         // is this a string argument?
         else if (auto clkey = command_line_key<pcstr>::find_option(argv[n]))
         {
-            if((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
+            if ((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
             {
                 Msg("Error: Missing string argument for command line option <%s>", argv[n]);
                 return false;

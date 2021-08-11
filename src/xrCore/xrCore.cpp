@@ -30,7 +30,8 @@ extern compression::ppmd::stream* trained_model;
 
 XRCORE_API xrCore Core;
 
-XRCORE_API command_line_key<pcstr> fsltx_path("-fsltx", "path to game config ltx", "");
+extern command_line_key<pcstr> fsltx_path;
+
 XRCORE_API command_line_key<bool> shoc_flag("-shoc", "Shadow of Chernobyl Mode", false);
 XRCORE_API command_line_key<bool> soc_flag("-soc", "Shadow of Chernobyl Mode", false);
 XRCORE_API command_line_key<bool> cs_flag("-cs", "Clear Sky Mode", false);
