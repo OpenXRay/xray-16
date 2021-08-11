@@ -4,12 +4,12 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
-#include "command_line_key.h"
 #elif defined(XR_PLATFORM_LINUX)
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
+#include "command_line_key.h"
 
 // On other platforms these options are controlled by CMake
 #if defined(XR_PLATFORM_WINDOWS)
