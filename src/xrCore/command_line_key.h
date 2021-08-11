@@ -28,7 +28,6 @@ private:
     T argument;
 
     void copy_argument(T arg);
-    void set_argument(T arg);
     void free_argument();
     static command_line_key<T> *find_option(pcstr flag_name);
     static bool parse_option(pcstr option, pcstr arg);

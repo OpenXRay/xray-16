@@ -46,14 +46,6 @@ void command_line_key<pcstr>::copy_argument(pcstr arg)
     argument = xr_strdup(arg);
 }
 
-template < typename T >
-void command_line_key<T>::set_argument(T arg)
-{
-    copy_argument(arg);
-    provided = true;
-}
-
-
 template< typename T >
 void command_line_key<T>::free_argument()
 {
@@ -202,7 +194,8 @@ bool ParseCommandLine(int argc, char** argv)
         // is this a bool option?
         if (auto clkey = command_line_key<bool>::find_option(argv[n]))
         {
-            clkey->set_argument(true);
+            clkey->copy_argument(true);
+            clkey->provided = true;
             continue;
         }
         // is this an int argument?
@@ -213,7 +206,8 @@ bool ParseCommandLine(int argc, char** argv)
                 Msg("Error: Missing int argument for command line option <%s>", argv[n]);
                 return false;
             }
-            clkey->set_argument( std::stoi(argv[++n]) );
+            clkey->copy_argument( std::stoi(argv[++n]) );
+            clkey->provided = true;
             continue;
         }
         // is this a string argument?
@@ -224,7 +218,8 @@ bool ParseCommandLine(int argc, char** argv)
                 Msg("Error: Missing string argument for command line option <%s>", argv[n]);
                 return false;
             }
-            clkey->set_argument(argv[++n]);
+            clkey->copy_argument(argv[++n]);
+            clkey->provided = true;
             continue;
         }
         Msg("Unknown option <%s>", argv[n]);
