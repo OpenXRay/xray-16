@@ -6,6 +6,7 @@ ECORE_API bool bDebug = false;
 #endif
 
 // Video
+u32 psCurrentMonitor    = 0;
 u32 psCurrentVidMode[3] = { 0u, 0u, 0u };
 u32 psCurrentWindowMode = rsFullscreen;
 u32 psCurrentBPP        = 32;

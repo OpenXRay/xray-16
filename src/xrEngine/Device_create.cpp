@@ -7,8 +7,6 @@
 #include "SDL.h"	
 #include "SDL_syswm.h"
 
-extern u32 Vid_SelectedMonitor;
-
 extern XRCDB_API bool* cdb_bDebug;
 
 void CRenderDevice::_SetupStates()
@@ -99,11 +97,11 @@ void CRenderDevice::UpdateWindowProps()
     SelectResolution(windowed);
 
     // Changing monitor, unset fullscreen for the previous monitor
-    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != Vid_SelectedMonitor)
+    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != psCurrentMonitor)
         SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
 
     SDL_Rect rect;
-    SDL_GetDisplayBounds(Vid_SelectedMonitor, &rect);
+    SDL_GetDisplayBounds(psCurrentMonitor, &rect);
 
     // If fullscreen or window is located on another monitor
     if (!windowed || !windowIntersectsWithMonitor(m_rcWindowBounds, rect))
@@ -180,12 +178,12 @@ void CRenderDevice::SelectResolution(const bool windowed)
         if (!g_monitors.SelectedResolutionIsSafe()) // not found
         { // select safe
             SDL_DisplayMode current;
-            SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+            SDL_GetCurrentDisplayMode(psCurrentMonitor, &current);
             current.w = psCurrentVidMode[0];
             current.h = psCurrentVidMode[1];
 
             SDL_DisplayMode closest; // try closest mode
-            if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
+            if (SDL_GetClosestDisplayMode(psCurrentMonitor, &current, &closest))
             {
                 psCurrentVidMode[0] = closest.w;
                 psCurrentVidMode[1] = closest.h;
@@ -201,11 +199,11 @@ void CRenderDevice::SelectResolution(const bool windowed)
         if (!g_monitors.SelectedRefreshRateIsSafe())
         {
             SDL_DisplayMode current;
-            SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+            SDL_GetCurrentDisplayMode(psCurrentMonitor, &current);
             current.refresh_rate = psCurrentVidMode[2];
 
             SDL_DisplayMode closest; // try closest mode
-            if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
+            if (SDL_GetClosestDisplayMode(psCurrentMonitor, &current, &closest))
                 psCurrentVidMode[2] = closest.refresh_rate;
             else // or just use maximal
             {

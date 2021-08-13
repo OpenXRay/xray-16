@@ -18,7 +18,6 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
-extern u32 Vid_SelectedMonitor;
 xr_vector<xr_token> VidQualityToken;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
@@ -487,12 +486,12 @@ public:
         if (result != 1 || id < 1 || id > count)
             InvalidSyntax();
         else
-            Vid_SelectedMonitor = id - 1;
+            psCurrentMonitor = id - 1;
     }
 
     void GetStatus(TStatus& S) override
     {
-        const u32 id = Vid_SelectedMonitor; // readability
+        const u32 id = psCurrentMonitor;
         xr_sprintf(S, sizeof(S), "%d. %s", id + 1, SDL_GetDisplayName(id));
     }
 

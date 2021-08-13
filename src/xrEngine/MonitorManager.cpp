@@ -2,8 +2,6 @@
 
 #include "MonitorManager.hpp"
 
-ENGINE_API u32 Vid_SelectedMonitor = 0;
-
 MonitorsManager g_monitors;
 
 void MonitorsManager::Initialize()
@@ -27,7 +25,7 @@ MonitorsManager::RefreshRatesVec* MonitorsManager::GetRefreshRates()
 {
     const ResolutionPair selected = { psCurrentVidMode[0], psCurrentVidMode[1] };
 
-    ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
+    ResolutionsMap& resolutions = Monitors[psCurrentMonitor];
     const auto it = resolutions.find(selected);
 
     if (it != resolutions.end())
@@ -39,14 +37,14 @@ MonitorsManager::RefreshRatesVec* MonitorsManager::GetRefreshRates()
 MonitorsManager::ResolutionPair MonitorsManager::GetDesktopResolution()
 {
     SDL_DisplayMode current;
-    SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+    SDL_GetCurrentDisplayMode(psCurrentMonitor, &current);
     return { current.w, current.h };
 }
 
 u32 MonitorsManager::GetDesktopRefreshRate()
 {
     SDL_DisplayMode current;
-    SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
+    SDL_GetCurrentDisplayMode(psCurrentMonitor, &current);
     return current.refresh_rate;
 }
 
@@ -64,7 +62,7 @@ const MonitorsManager::TokenVector& MonitorsManager::GetTokensForCurrentMonitor(
         tokens.emplace_back(xr_strdup(buf), i++); // It's important to have postfix increment!
     };
 
-    for (const auto& map : Monitors[Vid_SelectedMonitor])
+    for (const auto& map : Monitors[psCurrentMonitor])
     {
         const ResolutionPair resolution = map.first;
 
@@ -78,7 +76,7 @@ const MonitorsManager::TokenVector& MonitorsManager::GetTokensForCurrentMonitor(
 
 bool MonitorsManager::SelectedResolutionIsSafe()
 {
-    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
+    const ResolutionsMap& resolutions = Monitors[psCurrentMonitor];
     const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
     const auto it = resolutions.find(selectedResolution);
 
@@ -87,7 +85,7 @@ bool MonitorsManager::SelectedResolutionIsSafe()
 
 bool MonitorsManager::SelectedRefreshRateIsSafe()
 {
-    const ResolutionsMap& resolutions = Monitors[Vid_SelectedMonitor];
+    const ResolutionsMap& resolutions = Monitors[psCurrentMonitor];
     const ResolutionPair selectedResolution = { psCurrentVidMode[0], psCurrentVidMode[1] };
     const auto resolutionIt = resolutions.find(selectedResolution);
     
@@ -110,7 +108,7 @@ void MonitorsManager::FillMonitorsTips(IConsole_Command::vecTips& tips)
         tips.push_back(buf);
     };
 
-    pushString("%d. %s (current)", Vid_SelectedMonitor);
+    pushString("%d. %s (current)", psCurrentMonitor);
 
     auto it = Monitors.begin();
     const auto ite = Monitors.end();
@@ -132,7 +130,7 @@ void MonitorsManager::FillResolutionsTips(IConsole_Command::vecTips& tips)
 
     pushString("%dx%d (current)", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-    for (const auto& map : Monitors[Vid_SelectedMonitor])
+    for (const auto& map : Monitors[psCurrentMonitor])
     {
         const ResolutionPair resolution = map.first;
 
@@ -151,7 +149,7 @@ void MonitorsManager::FillRatesTips(IConsole_Command::vecTips& tips)
 
     pushString("%d (current)", psCurrentVidMode[2]);
 
-    ResolutionsMap& monitor = Monitors[Vid_SelectedMonitor];
+    ResolutionsMap& monitor = Monitors[psCurrentMonitor];
     const RefreshRatesVec& resolution = monitor[{psCurrentVidMode[0], psCurrentVidMode[1]}];
 
     for (const auto& rate : resolution)
