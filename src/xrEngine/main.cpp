@@ -28,7 +28,6 @@
 #include "xrSASH.h"
 #endif
 #include "xr_ioc_cmd.h"
-#include "MonitorManager.hpp"
 
 #include "xrCore/Threading/TaskManager.hpp"
 
@@ -338,7 +337,7 @@ ENGINE_API void Startup()
     else
         Console->Destroy();
 #endif
-    g_monitors.Destroy();
+    Device.CleanupVideoModes();
     destroyEngine();
     destroySound();
 }
@@ -374,7 +373,7 @@ ENGINE_API int RunApplication()
 
     FPU::m24r();
 
-    g_monitors.Initialize();
+    Device.FillVideoModes();
     InitInput();
     InitConsole();
 

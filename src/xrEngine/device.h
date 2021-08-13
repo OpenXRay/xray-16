@@ -71,6 +71,9 @@ public:
     // Real game window resolution
     SDL_Rect m_rcWindowClient;
 
+    // Main window
+    SDL_Window* m_sdlWnd;
+
     u32 dwPrecacheFrame;
     bool b_is_Ready;
     bool b_is_Active;
@@ -123,8 +126,6 @@ public:
     MessageRegistry<pureAppStart> seqAppStart;
     MessageRegistry<pureAppEnd> seqAppEnd;
     MessageRegistry<pureFrame> seqFrame;
-
-    SDL_Window* m_sdlWnd;
 };
 
 class ENGINE_API CRenderDeviceBase : public IRenderDevice, public CRenderDeviceData
@@ -249,6 +250,10 @@ public:
 
     void Initialize(void);
     void ShutDown(void);
+
+    void FillVideoModes();
+    void CleanupVideoModes();
+
     virtual const RenderDeviceStatictics& GetStats() const override { return stats; }
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 

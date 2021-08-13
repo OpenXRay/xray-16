@@ -34,7 +34,7 @@ void CHW::OnAppDeactivate()
 {
     if (!DevPP.Windowed)
     {
-        if (psCurrentWindowMode == rsFullscreen || psCurrentWindowMode == rsFullscreenBorderless)
+        if (psDeviceMode.WindowStyle == rsFullscreen || psDeviceMode.WindowStyle == rsFullscreenBorderless)
             ShowWindow(DevPP.hDeviceWindow, SW_MINIMIZE);
     }
 }
@@ -65,7 +65,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    const bool bWindowed = ThisInstanceIsGlobal() ? psCurrentWindowMode != rsFullscreen : true;
+    const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -103,7 +103,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     }
     else
     {
-        switch (psCurrentBPP)
+        switch (psDeviceMode.BitsPerPixel)
         {
         case 32:
             fTarget = D3DFMT_X8R8G8B8;
@@ -192,7 +192,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     else
     {
         P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        P.FullScreen_RefreshRateInHz = psCurrentVidMode[2];
+        P.FullScreen_RefreshRateInHz = psDeviceMode.RefreshRate;
     }
 
 
@@ -263,13 +263,13 @@ void CHW::Reset()
     DevPP.BackBufferHeight = Device.dwHeight;
 
     // Windoze
-    const bool bWindowed = ThisInstanceIsGlobal() ? psCurrentWindowMode != rsFullscreen : true;
+    const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
     {
         DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        DevPP.FullScreen_RefreshRateInHz = psCurrentVidMode[2];
+        DevPP.FullScreen_RefreshRateInHz = psDeviceMode.RefreshRate;
     }
     else
     {

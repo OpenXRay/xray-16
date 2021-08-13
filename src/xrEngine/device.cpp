@@ -337,13 +337,13 @@ void CRenderDevice::message_loop()
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                 {
-                    if (psCurrentWindowMode != rsFullscreen)
+                    if (psDeviceMode.WindowStyle != rsFullscreen)
                     {
-                        if (psCurrentVidMode[0] == event.window.data1 && psCurrentVidMode[1] == event.window.data2)
+                        if (psDeviceMode.Width == event.window.data1 && psDeviceMode.Height == event.window.data2)
                             break; // we don't need to reset device if resolution wasn't really changed
 
-                        psCurrentVidMode[0] = event.window.data1;
-                        psCurrentVidMode[1] = event.window.data2;
+                        psDeviceMode.Width = event.window.data1;
+                        psDeviceMode.Height = event.window.data2;
 
                         Reset();
                     }

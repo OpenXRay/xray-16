@@ -51,8 +51,8 @@ IC void MouseRayFromPoint(Fvector& direction, int x, int y, Fmatrix& m_CamMat)
 #if defined(USE_OGL)
 bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWORD& bufferSize, bool gamesave = false)
 {
-    const u32 width = psCurrentVidMode[0];
-    const u32 height = psCurrentVidMode[1];
+    const u32 width = psDeviceMode.Width;
+    const u32 height = psDeviceMode.Height;
 
     constexpr u32 colorMode = 3;
     constexpr u8 bits = 24;

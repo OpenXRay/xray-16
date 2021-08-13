@@ -3,7 +3,6 @@
 
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
-#include "MonitorManager.hpp"
 
 xrSASH ENGINE_API g_SASH;
 
@@ -514,7 +513,7 @@ void xrSASH::ReleaseEngine()
 
     destroyInput();
     Console->Destroy();
-    g_monitors.Destroy();
+    Device.CleanupVideoModes();
     destroySound();
     destroyEngine();
 }

@@ -237,13 +237,13 @@ void CDemoRecord::MakeLevelMapProcess()
     {
     case 0:
     {
-        s_window_mode = psCurrentWindowMode;
+        s_window_mode = psDeviceMode.WindowStyle;
         s_dev_flags = psDeviceFlags;
         s_hud_flag.assign(psHUD_Flags);
         psDeviceFlags.zero();
         psDeviceFlags.set(rsClearBB | rsDrawStatic, true);
-        psCurrentWindowMode = rsFullscreen;
-        if (psCurrentWindowMode != s_window_mode)
+        psDeviceMode.WindowStyle = rsFullscreen;
+        if (psDeviceMode.WindowStyle != s_window_mode)
             Device.Reset();
     }
     break;
@@ -277,8 +277,8 @@ void CDemoRecord::MakeLevelMapProcess()
             psHUD_Flags.assign(s_hud_flag);
             psDeviceFlags = s_dev_flags;
 
-            const bool bDevReset = psCurrentWindowMode != s_window_mode;
-            psCurrentWindowMode = s_window_mode;
+            const bool bDevReset = psDeviceMode.WindowStyle != s_window_mode;
+            psDeviceMode.WindowStyle = s_window_mode;
             if (bDevReset)
                 Device.Reset();
 

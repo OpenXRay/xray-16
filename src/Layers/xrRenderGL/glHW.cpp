@@ -46,7 +46,7 @@ void CHW::OnAppDeactivate()
 {
     if (m_window)
     {
-        if (psCurrentWindowMode == rsFullscreen || psCurrentWindowMode == rsFullscreenBorderless)
+        if (psDeviceMode.WindowStyle == rsFullscreen || psDeviceMode.WindowStyle == rsFullscreenBorderless)
             SDL_MinimizeWindow(m_window);
     }
 }
@@ -257,8 +257,8 @@ std::pair<u32, u32> CHW::GetSurfaceSize()
 {
     return
     {
-        psCurrentVidMode[0],
-        psCurrentVidMode[1]
+        psDeviceMode.Width,
+        psDeviceMode.Height
     };
 }
 

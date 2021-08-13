@@ -47,14 +47,21 @@ enum
 {
     rsWindowed,
     rsWindowedBorderless,
-    rsFullscreenBorderless, // windowed + topmost + resolution matches desktop resolution + without borders = looks like fullscreen
+    rsFullscreenBorderless, // windowed + topmost + window is scaled to desktop resolution + without borders = looks like fullscreen
     rsFullscreen,           // true, exclusive fullscreen
 };
 
-ENGINE_API extern u32 psCurrentMonitor;
-ENGINE_API extern u32 psCurrentVidMode[3]; // width, height, refresh rate
-ENGINE_API extern u32 psCurrentWindowMode;
-ENGINE_API extern u32 psCurrentBPP;
+struct DeviceMode
+{
+    u32 Monitor;
+    u32 WindowStyle;
+    u32 Width;
+    u32 Height;
+    u32 RefreshRate;
+    u32 BitsPerPixel;
+};
+
+ENGINE_API extern DeviceMode psDeviceMode;
 ENGINE_API extern Flags32 psDeviceFlags;
 
 #include "Common/FSMacros.hpp"
