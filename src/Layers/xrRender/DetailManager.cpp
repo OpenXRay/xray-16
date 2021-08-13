@@ -373,7 +373,7 @@ void CDetailManager::Render()
 #ifndef _EDITOR
     if (nullptr == dtFS)
         return;
-    if (!psDeviceFlags.is(rsDetails))
+    if (!psDeviceFlags.is(rsDrawDetails))
         return;
 #endif
 
@@ -409,7 +409,7 @@ void __stdcall CDetailManager::MT_CALC()
         return; // possibly deleted
     if (nullptr == dtFS)
         return;
-    if (!psDeviceFlags.is(rsDetails))
+    if (!psDeviceFlags.is(rsDrawDetails))
         return;
 #endif
 

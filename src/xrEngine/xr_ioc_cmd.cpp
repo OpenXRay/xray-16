@@ -884,14 +884,13 @@ void CCC_Register()
     CMD1(CCC_E_Signal, "e_signal");
 
     CMD3(CCC_Mask, "rs_clear_bb", &psDeviceFlags, rsClearBB);
-    CMD3(CCC_Mask, "rs_occlusion", &psDeviceFlags, rsOcclusion);
 
     // CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175 );
     // CMD3(CCC_Mask, "rs_constant_fps", &psDeviceFlags, rsConstantFPS );
 #endif // DEBUG
 
 #ifndef MASTER_GOLD
-    CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
+    CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDrawDetails);
     CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
     CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
     CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
@@ -916,7 +915,6 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_cam_pos", &psDeviceFlags, rsCameraPos);
 #ifdef DEBUG
     CMD3(CCC_Mask, "rs_occ_draw", &psDeviceFlags, rsOcclusionDraw);
-    CMD3(CCC_Mask, "rs_occ_stats", &psDeviceFlags, rsOcclusionStats);
 // CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128 );
 #endif // DEBUG
 
