@@ -51,8 +51,7 @@ enum
     rsFullscreen,           // true, exclusive fullscreen
 };
 
-//. ENGINE_API extern u32 psCurrentMode ;
-ENGINE_API extern u32 psCurrentVidMode[];
+ENGINE_API extern u32 psCurrentVidMode[3]; // width, height, refresh rate
 ENGINE_API extern u32 psCurrentWindowMode;
 ENGINE_API extern u32 psCurrentBPP;
 ENGINE_API extern Flags32 psDeviceFlags;

@@ -19,7 +19,6 @@
 #include "xr_object_list.h"
 
 extern u32 Vid_SelectedMonitor;
-extern u32 Vid_SelectedRefreshRate;
 xr_vector<xr_token> VidQualityToken;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
@@ -540,14 +539,14 @@ public:
             InvalidSyntax();
         else
         {
-            Vid_SelectedRefreshRate = value;
-            m_Refresh60hz.set(fl_Refresh60hz, Vid_SelectedRefreshRate == 60);
+            psCurrentVidMode[2] = value;
+            m_Refresh60hz.set(fl_Refresh60hz, psCurrentVidMode[2] == 60);
         }
     }
 
     void GetStatus(TStatus& S) override
     {
-        xr_sprintf(S, sizeof(S), "%d", Vid_SelectedRefreshRate);
+        xr_sprintf(S, sizeof(S), "%d", psCurrentVidMode[2]);
     }
 
     void Info(TInfo& I) override
@@ -570,16 +569,16 @@ public:
     public:
         CCC_Refresh60hz(pcstr name) : CCC_Mask(name, &m_Refresh60hz, fl_Refresh60hz)
         {
-            m_Refresh60hz.set(fl_Refresh60hz, Vid_SelectedRefreshRate == 60);
+            m_Refresh60hz.set(fl_Refresh60hz, psCurrentVidMode[2] == 60);
         }
 
         void Execute(pcstr args) override
         {
             CCC_Mask::Execute(args);
             if (GetValue())
-                Vid_SelectedRefreshRate = 60;
+                psCurrentVidMode[2] = 60;
             else
-                Vid_SelectedRefreshRate = g_monitors.GetDesktopRefreshRate();
+                psCurrentVidMode[2] = g_monitors.GetDesktopRefreshRate();
         }
     };
 };

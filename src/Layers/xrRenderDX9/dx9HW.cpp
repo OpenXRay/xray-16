@@ -2,8 +2,6 @@
 
 #include "dx9HW.h"
 
-ENGINE_API extern u32 Vid_SelectedRefreshRate;
-
 CHW HW;
 
 CHW::CHW()
@@ -194,7 +192,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     else
     {
         P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        P.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+        P.FullScreen_RefreshRateInHz = psCurrentVidMode[2];
     }
 
 
@@ -271,7 +269,7 @@ void CHW::Reset()
     if (!bWindowed)
     {
         DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        DevPP.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+        DevPP.FullScreen_RefreshRateInHz = psCurrentVidMode[2];
     }
     else
     {

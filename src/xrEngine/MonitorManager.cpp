@@ -3,7 +3,6 @@
 #include "MonitorManager.hpp"
 
 ENGINE_API u32 Vid_SelectedMonitor = 0;
-ENGINE_API u32 Vid_SelectedRefreshRate = 0;
 
 MonitorsManager g_monitors;
 
@@ -11,7 +10,7 @@ void MonitorsManager::Initialize()
 {
     FillMonitorsMap();
     std::tie(psCurrentVidMode[0], psCurrentVidMode[1]) = GetDesktopResolution();
-    Vid_SelectedRefreshRate = GetDesktopRefreshRate();
+    psCurrentVidMode[2] = GetDesktopRefreshRate();
 }
 
 void MonitorsManager::Destroy()
@@ -97,7 +96,7 @@ bool MonitorsManager::SelectedRefreshRateIsSafe()
 
     const RefreshRatesVec& rates = resolutionIt->second;
 
-    const auto it = std::find(rates.begin(), rates.end(), Vid_SelectedRefreshRate);
+    const auto it = std::find(rates.begin(), rates.end(), psCurrentVidMode[2]);
 
     return it != rates.end();
 }
@@ -150,7 +149,7 @@ void MonitorsManager::FillRatesTips(IConsole_Command::vecTips& tips)
         tips.push_back(buf);
     };
 
-    pushString("%d (current)", Vid_SelectedRefreshRate);
+    pushString("%d (current)", psCurrentVidMode[2]);
 
     ResolutionsMap& monitor = Monitors[Vid_SelectedMonitor];
     const RefreshRatesVec& resolution = monitor[{psCurrentVidMode[0], psCurrentVidMode[1]}];

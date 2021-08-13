@@ -8,7 +8,6 @@
 #include "SDL_syswm.h"
 
 extern u32 Vid_SelectedMonitor;
-extern u32 Vid_SelectedRefreshRate;
 
 extern XRCDB_API bool* cdb_bDebug;
 
@@ -130,7 +129,7 @@ void CRenderDevice::UpdateWindowProps()
         SDL_GetWindowDisplayMode(m_sdlWnd, &mode);
         mode.w = psCurrentVidMode[0];
         mode.h = psCurrentVidMode[1];
-        mode.refresh_rate = Vid_SelectedRefreshRate;
+        mode.refresh_rate = psCurrentVidMode[2];
         SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
     }
 
@@ -203,14 +202,14 @@ void CRenderDevice::SelectResolution(const bool windowed)
         {
             SDL_DisplayMode current;
             SDL_GetCurrentDisplayMode(Vid_SelectedMonitor, &current);
-            current.refresh_rate = Vid_SelectedRefreshRate;
+            current.refresh_rate = psCurrentVidMode[2];
 
             SDL_DisplayMode closest; // try closest mode
             if (SDL_GetClosestDisplayMode(Vid_SelectedMonitor, &current, &closest))
-                Vid_SelectedRefreshRate = closest.refresh_rate;
+                psCurrentVidMode[2] = closest.refresh_rate;
             else // or just use maximal
             {
-                Vid_SelectedRefreshRate = g_monitors.GetDesktopRefreshRate();
+                psCurrentVidMode[2] = g_monitors.GetDesktopRefreshRate();
             }
         }
     }
