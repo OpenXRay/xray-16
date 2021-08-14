@@ -383,6 +383,7 @@ public:
     Fvector m_tNextPosition;
     Fvector m_tAngles;
     shared_str m_caLevelToChange;
+    LPCSTR destLeveName;
     shared_str m_caLevelPointToChange;
     BOOL m_bSilentMode;
 
