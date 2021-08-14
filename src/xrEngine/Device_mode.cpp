@@ -79,7 +79,7 @@ void CRenderDevice::SetWindowDraggable(bool draggable)
     m_allowWindowDrag = draggable && windowed && resizable;
 
 #if SDL_VERSION_ATLEAST(2, 0, 5)
-    SDL_SetWindowOpacity(Device.m_sdlWnd, m_allowWindowDrag ? 0.9f : 1.0f);
+    SDL_SetWindowOpacity(Device.m_sdlWnd, m_allowWindowDrag ? 0.95f : 1.0f);
 #endif
 }
 
