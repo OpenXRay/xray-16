@@ -327,22 +327,30 @@ void CRenderDevice::message_loop()
 
             switch (event.type)
             {
+#if SDL_VERSION_ATLEAST(2, 0, 9)
             case SDL_DISPLAYEVENT:
             {
                 switch (event.display.type)
                 {
                 case SDL_DISPLAYEVENT_ORIENTATION:
+#if SDL_VERSION_ATLEAST(2, 0, 14)
                 case SDL_DISPLAYEVENT_CONNECTED:
                 case SDL_DISPLAYEVENT_DISCONNECTED:
+#endif
                     CleanupVideoModes();
                     FillVideoModes();
-                    if (event.display.type != SDL_DISPLAYEVENT_CONNECTED && event.display.display == psDeviceMode.Monitor)
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+                    if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
+#else
+                    if (event.display.display == psDeviceMode.Monitor)
+#endif
                         Reset();
                     else
                         UpdateWindowProps();
                     break;
                 }
             }
+#endif
             case SDL_WINDOWEVENT:
             {
                 switch (event.window.event)
