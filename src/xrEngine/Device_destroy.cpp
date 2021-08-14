@@ -36,10 +36,6 @@ void CRenderDevice::Reset(bool precache /*= true*/)
     ResetInternal(precache);
 }
 
-#include "IGame_Level.h"
-#include "CustomHUD.h"
-extern bool bNeed_re_create_env;
-
 void CRenderDevice::ResetInternal(bool precache)
 {
     const auto dwWidth_before = dwWidth;
@@ -56,8 +52,6 @@ void CRenderDevice::ResetInternal(bool precache)
     if (isDX9Renderer)
         UpdateWindowProps(); // hack
 
-    if (g_pGamePersistent)
-        g_pGamePersistent->Environment().bNeed_re_create_env = true;
     _SetupStates();
 
     if (precache)

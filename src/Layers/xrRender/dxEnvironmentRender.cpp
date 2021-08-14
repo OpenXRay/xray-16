@@ -228,21 +228,6 @@ void dxEnvironmentRender::OnLoad()
 void dxEnvironmentRender::OnUnload() { tonemap = nullptr; }
 void dxEnvironmentRender::RenderSky(CEnvironment& env)
 {
-    // clouds_sh.create		("clouds","null");
-    //. this is the bug-fix for the case when the sky is broken
-    //. for some unknown reason the geoms happen to be invalid sometimes
-    //. if vTune show this in profile, please add simple cache (move-to-forward last found)
-    //. to the following functions:
-    //.		CResourceManager::_CreateDecl
-    //.		CResourceManager::CreateGeom
-    if (env.bNeed_re_create_env)
-    {
-        sh_2sky.create(&m_b_skybox, "skybox_2t");
-        sh_2geom.create(v_skybox_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-        clouds_sh.create("clouds", "null");
-        clouds_geom.create(v_clouds_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-        env.bNeed_re_create_env = FALSE;
-    }
     GEnv.Render->rmFar();
 
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
@@ -380,4 +365,16 @@ void dxEnvironmentRender::OnDeviceDestroy()
     sh_2geom.destroy();
     clouds_sh.destroy();
     clouds_geom.destroy();
+}
+
+void dxEnvironmentRender::OnDeviceReset()
+{
+    //. this is the bug-fix for the case when the sky is broken
+    //. for some unknown reason the geoms happen to be invalid sometimes
+    //. if vTune show this in profile, please add simple cache (move-to-forward last found)
+    //. to the following functions:
+    //.		CResourceManager::_CreateDecl
+    //.		CResourceManager::CreateGeom
+    OnDeviceDestroy();
+    OnDeviceCreate();
 }
