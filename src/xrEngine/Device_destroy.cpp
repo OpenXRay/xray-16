@@ -33,11 +33,6 @@ void CRenderDevice::Destroy()
 
 void CRenderDevice::Reset(bool precache /*= true*/)
 {
-    ResetInternal(precache);
-}
-
-void CRenderDevice::ResetInternal(bool precache)
-{
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
     pInput->GrabInput(false);

@@ -235,7 +235,6 @@ public:
 private:
     // Creation & Destroying
     void CreateInternal();
-    void ResetInternal(bool precache = true);
 
 public:
     void Create();
