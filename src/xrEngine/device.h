@@ -363,7 +363,6 @@ class CDeviceResetNotifier : public pureDeviceReset
 public:
     CDeviceResetNotifier(const int prio = REG_PRIORITY_NORMAL) { Device.seqDeviceReset.Add(this, prio); }
     virtual ~CDeviceResetNotifier() { Device.seqDeviceReset.Remove(this); }
-    void OnDeviceReset() override {}
 };
 
 class CUIResetNotifier : public pureUIReset
@@ -378,8 +377,6 @@ public:
     {
         Device.seqUIReset.Remove(this);
     }
-
-    void OnUIReset() override {}
 };
 
 #endif
