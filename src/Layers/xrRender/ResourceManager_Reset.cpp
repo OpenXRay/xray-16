@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include "xrCore/buffer_vector.h"
+
 #include "ResourceManager.h"
 #ifdef _EDITOR
 #include "Include/xrAPI/xrAPI.h"
@@ -64,9 +66,9 @@ void CResourceManager::reset_end()
 
     // create RTs in the same order as them was first created
     {
-// RT
-#pragma todo("container is created in stack!")
-        xr_vector<CRT*> sorted_rts;
+        // RT
+        const size_t buffer_size = m_rtargets.size() * sizeof(CRT*);
+        buffer_vector<CRT*> sorted_rts(xr_alloca(buffer_size), m_rtargets.size());
         for (auto& rt_pair : m_rtargets)
             sorted_rts.push_back(rt_pair.second);
 
@@ -76,13 +78,12 @@ void CResourceManager::reset_end()
             rt->reset_end();
     }
     {
-// RTc
-#pragma todo("container is created in stack!")
-    //DX10 cut        xr_vector<CRTC*>    rt;
-    //DX10 cut        for (map_RTCIt rt_it=m_rtargets_c.begin(); rt_it!=m_rtargets_c.end(); rt_it++)
-    //rt.push_back(rt_it->second);
-    //DX10 cut        std::sort(rt.begin(),rt.end(),cmp_rtc);
-    //DX10 cut        for (u32 _it=0; _it<rt.size(); _it++)   rt[_it]->reset_end  ();
+        // RTc
+    //DX10 cut		const size_t buffer_size = m_rtargets_c.size() * sizeof(CRTC*);
+    //DX10 cut		buffer_vector<CRTC*> sorted_rtcs(xr_alloca(buffer_size), m_rtargets_c.size());
+    //DX10 cut		for (map_RTCIt rt_it=m_rtargets_c.begin(); rt_it!=m_rtargets_c.end(); rt_it++)	sorted_rtcs.push_back(rt_it->second);
+    //DX10 cut		std::sort(sorted_rtcs.begin(),sorted_rtcs.end(),cmp_rtc);
+    //DX10 cut		for (u32 _it=0; _it<sorted_rtcs.size(); _it++)	sorted_rtcs[_it]->reset_end	();
     }
 
     // create state-blocks
