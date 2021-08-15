@@ -1,11 +1,7 @@
 #include "stdafx.h"
-#include "Include/xrRender/DrawUtils.h"
+
 #include "Render.h"
-#include "IGame_Persistent.h"
-#include "XR_IOConsole.h"
 #include "xr_input.h"
-#include "SDL.h"
-#include "SDL_syswm.h"
 
 void CRenderDevice::Destroy()
 {
