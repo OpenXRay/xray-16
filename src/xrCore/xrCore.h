@@ -54,6 +54,7 @@
 #include "xr_shared.h"
 #include "string_concatenations.h"
 #include "_flags.h"
+#include "command_line_key.h"
 
 // stl ext
 struct XRCORE_API xr_rtoken

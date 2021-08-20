@@ -5,7 +5,6 @@
 #include "resource.h"
 #include "log.h"
 #include "xrCore/Threading/Lock.hpp"
-#include "command_line_key.h"
 
 BOOL LogExecCB = TRUE;
 string_path logFName = "engine.log";

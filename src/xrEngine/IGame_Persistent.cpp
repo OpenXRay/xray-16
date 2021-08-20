@@ -4,7 +4,6 @@
 #include "IGame_Persistent.h"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
-#include "xrCore/command_line_key.h"
 
 #ifndef _EDITOR
 #include "Environment.h"

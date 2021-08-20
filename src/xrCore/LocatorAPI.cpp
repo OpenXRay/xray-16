@@ -19,7 +19,6 @@
 #include "file_stream_reader.h"
 #include "xrCore/Threading/Lock.hpp"
 #include "Crypto/trivial_encryptor.h"
-#include "command_line_key.h"
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
 #include "SDL.h"

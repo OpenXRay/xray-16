@@ -3,7 +3,6 @@
 #include "xrCore/Threading/Lock.hpp"
 
 #ifdef DEBUG
-#include "command_line_key.h"
 static command_line_key<bool> auth_debug("auth_debug", "auth_debug", false);
 static command_line_key<int> b_extern_auth("asdf", "b_extern_auth", 0);
 #endif

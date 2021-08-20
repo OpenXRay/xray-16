@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
-#include "xrCore/command_line_key.h"
 #include "xrCDB/xrXRC.h"
 
 static command_line_key<bool> gpu_sw("-gpu_sw", "gpu_sw", false);

@@ -12,7 +12,6 @@
 #endif
 #include "xrEngine/main.h"
 #include "xrEngine/splash.h"
-#include "xrCore/command_line_key.h"
 #include <SDL.h>
 
 //#define PROFILE_TASK_SYSTEM

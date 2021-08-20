@@ -28,7 +28,6 @@
 #include "xr_ioc_cmd.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
-#include "xrCore/command_line_key.h"
 
 // global variables
 ENGINE_API CInifile* pGameIni = nullptr;

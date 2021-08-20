@@ -7,7 +7,6 @@
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
-#include "xrCore/command_line_key.h"
 
 static command_line_key<bool> weather("-weather", "initialize weather editor", 0);
 

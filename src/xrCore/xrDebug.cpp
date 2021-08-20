@@ -7,7 +7,6 @@
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "log.h"
-#include "command_line_key.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Debug/dxerr.h"
 #endif
