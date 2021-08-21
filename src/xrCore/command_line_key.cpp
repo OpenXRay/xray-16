@@ -13,51 +13,13 @@ template<> command_line_key<pcstr> *command_line_key<pcstr>::l_head = nullptr;
 // when adding make sure it's beginning with a '-'
 template < typename T >
 command_line_key<T>::command_line_key(pcstr opname, pcstr desc,T defval, bool req)
-    : provided(false), required(req)
+    : option_name(opname), description(desc), provided(false),
+      required(req), argument(defval)
 {
-    if (!IsOptionFlag(opname))
-    {
-        size_t opsz = xr_strlen(opname) + 1;
-        option_name = xr_alloc<char>(opsz);
-        option_name[0] = '-';
-        xr_strcpy(&option_name[1], opsz - 1, opname);
-    }
-    else
-    {
-        option_name = xr_strdup(opname);
-    }
-    description = xr_strdup(desc);
-    copy_argument(defval);
-
     // add the option list node
     l_next = l_head;
     l_head = this;
 }
-
-template < typename T >
-void command_line_key<T>::copy_argument(T arg)
-{
-    argument = arg;
-}
-
-template<>
-void command_line_key<pcstr>::copy_argument(pcstr arg)
-{
-    argument = xr_strdup(arg);
-}
-
-template< typename T >
-void command_line_key<T>::free_argument()
-{
-    return;
-}
-
-template<>
-void command_line_key<pcstr>::free_argument()
-{
-    xr_free(argument);
-}
-
 
 template < typename T >
 command_line_key<T> *command_line_key<T>::find_option(pcstr flag_name)
@@ -76,10 +38,6 @@ command_line_key<T> *command_line_key<T>::find_option(pcstr flag_name)
 template < typename T >
 command_line_key<T>::~command_line_key()
 {
-    xr_free(option_name);
-    xr_free(description);
-    free_argument();
-
     auto current_node =  command_line_key<T>::l_head;
     command_line_key<T> *prev_node = nullptr;
     while (current_node != nullptr)
@@ -128,45 +86,6 @@ bool command_line_key<T>::CheckArguments()
     return true;
 }
 
-template<>
-bool command_line_key<bool>::parse_option(pcstr option, pcstr arg)
-{
-    auto clkey = command_line_key<bool>::find_option(option);
-
-    if (!clkey)
-        return false; // not found
-
-    clkey->argument = true;
-    clkey->provided = true;
-    return true;                // found and set
-}
-
-template<>
-bool command_line_key<int>::parse_option(pcstr option, pcstr arg)
-{
-    auto clkey = command_line_key<int>::find_option(option);
-
-    if (!clkey)
-        return false; // not found
-
-    clkey->argument = std::stoi(arg); // may throw
-    clkey->provided = true;
-    return true;
-}
-
-template<>
-bool command_line_key<pcstr>::parse_option(pcstr option, pcstr arg)
-{
-    auto clkey = command_line_key<pcstr>::find_option(option);
-
-    if (!clkey)
-        return false; // not found
-
-    clkey->argument = xr_strdup(arg);
-    clkey->provided = true;
-    return true;
-}
-
 template < typename T >
 void command_line_key<T>::PrintHelp()
 {
@@ -191,34 +110,40 @@ bool ParseCommandLine(int argc, char** argv)
             continue;
         }
 
+        pcstr current_arg = argv[n];
+        // this is for later
+        // pcstr current_arg = &argv[n][1];
+
         // is this a bool option?
-        if (auto clkey = command_line_key<bool>::find_option(argv[n]))
+        if (auto clkey = command_line_key<bool>::find_option(current_arg))
         {
-            clkey->copy_argument(true);
+            clkey->argument = true;
             clkey->provided = true;
             continue;
         }
         // is this an int argument?
-        else if (auto clkey = command_line_key<int>::find_option(argv[n]))
+        else if (auto clkey = command_line_key<int>::find_option(current_arg))
         {
             if ((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
             {
-                Msg("Error: Missing int argument for command line option <%s>", argv[n]);
+                Msg("Error: Missing int argument for command line option <%s>",
+                    current_arg);
                 return false;
             }
-            clkey->copy_argument( std::stoi(argv[++n]) );
+            clkey->argument = std::stoi(argv[++n]);
             clkey->provided = true;
             continue;
         }
         // is this a string argument?
-        else if (auto clkey = command_line_key<pcstr>::find_option(argv[n]))
+        else if (auto clkey = command_line_key<pcstr>::find_option(current_arg))
         {
             if ((n + 1 >= argc) || IsOptionFlag(argv[n + 1]))
             {
-                Msg("Error: Missing string argument for command line option <%s>", argv[n]);
+                Msg("Error: Missing string argument for command line option <%s>",
+                    current_arg);
                 return false;
             }
-            clkey->copy_argument(argv[++n]);
+            clkey->argument = argv[++n];
             clkey->provided = true;
             continue;
         }

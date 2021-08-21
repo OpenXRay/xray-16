@@ -3,7 +3,10 @@
 #include "xrCommon/xr_list.h"
 #include "_std_extensions.h"
 
-template < typename T > class XRCORE_API command_line_key;
+// This requires the keys be initialized as global variables
+// flag name, option name, description must be static strings
+// the flag name must be provided without a '-', it is
+// implied when parsing the command line
 
 template < typename T >
 class XRCORE_API command_line_key
@@ -19,18 +22,15 @@ public:
     friend XRCORE_API bool ParseCommandLine(int argc, char* argv[]);
 
 private:
-    pstr option_name = nullptr;
-    pstr description = nullptr;
+    pcstr option_name = nullptr;
+    pcstr description = nullptr;
     bool required;
     bool provided = false;
     command_line_key<T> *l_next;
 
     T argument;
 
-    void copy_argument(T arg);
-    void free_argument();
     static command_line_key<T> *find_option(pcstr flag_name);
-    static bool parse_option(pcstr option, pcstr arg);
     static command_line_key<T> *l_head;
 };
 
