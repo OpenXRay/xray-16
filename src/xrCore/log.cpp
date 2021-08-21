@@ -22,7 +22,7 @@ bool ForceFlushLog = false;
 IWriter* LogWriter = nullptr;
 //size_t CachedLog = 0;
 
-static command_line_key<bool> force_flushlog("-force_flushlog", "force_flushlog", false);
+static command_line_key<bool> force_flushlog("force_flushlog", "force_flushlog", false);
 
 void FlushLog()
 {

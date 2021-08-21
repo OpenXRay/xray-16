@@ -3,10 +3,10 @@
 #include "Render.h"
 #include "xrCDB/xrXRC.h"
 
-static command_line_key<bool> gpu_sw("-gpu_sw", "gpu_sw", false);
-static command_line_key<bool> gpu_nopure("-gpu_nopure", "gpu_nopure", false);
-static command_line_key<bool> gpu_ref("-gpu_ref", "gpu_ref", false);
-static command_line_key<bool> draw_borders("-draw_borders", "draw_borders", false);
+static command_line_key<bool> gpu_sw("gpu_sw", "gpu_sw", false);
+static command_line_key<bool> gpu_nopure("gpu_nopure", "gpu_nopure", false);
+static command_line_key<bool> gpu_ref("gpu_ref", "gpu_ref", false);
+static command_line_key<bool> draw_borders("draw_borders", "draw_borders", false);
 
 extern XRCDB_API bool* cdb_bDebug;
 

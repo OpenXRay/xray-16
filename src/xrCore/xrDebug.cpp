@@ -64,7 +64,7 @@ static BOOL bException = FALSE;
 #   endif
 #endif // XR_PLATFORM_WINDOWS
 
-static command_line_key<bool> show_error_window("-show_error_window",
+static command_line_key<bool> show_error_window("show_error_window",
                                         "show error window", false);
 
 constexpr SDL_MessageBoxButtonData buttons[] =

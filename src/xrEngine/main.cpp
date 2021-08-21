@@ -41,19 +41,19 @@ ENGINE_API bool CallOfPripyatMode = false;
 ENGINE_API bool ClearSkyMode = false;
 ENGINE_API bool ShadowOfChernobylMode = false;
 
-static command_line_key<bool> unlock_game_mode("-unlock_game_mode", "unlock_game_mode", false);
-static command_line_key<pcstr> ltx_flag("-ltx", "ltx", "");
-static command_line_key<bool> captureInput("-i", "Capture input", false);
-static command_line_key<bool> gl_flag("-rgl", "opengl renderer", false);
-static command_line_key<bool> r4_flag("-r4", "r4 renderer", false);
-static command_line_key<bool> r3_flag("-r3", "r3 renderer", false);
-static command_line_key<bool> r25_flag("-r2.5", "r2.5 renderer", false);
-static command_line_key<bool> r2a_flag("-r2a", "r2a renderer", false);
-static command_line_key<bool> r2_flag("-r2", "r2 renderer", false);
-static command_line_key<bool> r1_flag("-r1", "r1 renderer", false);
+static command_line_key<bool> unlock_game_mode("unlock_game_mode", "unlock_game_mode", false);
+static command_line_key<pcstr> ltx_flag("ltx", "ltx", "");
+static command_line_key<bool> captureInput("i", "Capture input", false);
+static command_line_key<bool> gl_flag("rgl", "opengl renderer", false);
+static command_line_key<bool> r4_flag("r4", "r4 renderer", false);
+static command_line_key<bool> r3_flag("r3", "r3 renderer", false);
+static command_line_key<bool> r25_flag("r2.5", "r2.5 renderer", false);
+static command_line_key<bool> r2a_flag("r2a", "r2a renderer", false);
+static command_line_key<bool> r2_flag("r2", "r2 renderer", false);
+static command_line_key<bool> r1_flag("r1", "r1 renderer", false);
 #ifdef DEBUG
-static command_line_key<bool> slowdown_flag("-slowdown", "slowdown", false);
-static command_line_key<bool> slowdown2x_flag("-slowdown2x", "slowdown2x", false);
+static command_line_key<bool> slowdown_flag("slowdown", "slowdown", false);
+static command_line_key<bool> slowdown2x_flag("slowdown2x", "slowdown2x", false);
 #endif
 
 

@@ -48,7 +48,7 @@ constexpr size_t xr_reserved_tail = 0;
 constexpr size_t DEFAULT_ALIGNMENT = 16;
 
 #if defined(XR_PLATFORM_WINDOWS)
-static command_line_key<bool> swap_on_compact("-swap_on_compact", "swap_on_compact", false);
+static command_line_key<bool> swap_on_compact("swap_on_compact", "swap_on_compact", false);
 #endif
 
 

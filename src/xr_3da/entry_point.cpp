@@ -30,10 +30,10 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
-static command_line_key<bool> clhelp("-help", "print this help and exit", false);
-static command_line_key<bool> no_splash("-nosplash", "no splash screen", false);
-static command_line_key<bool> splash_notop("-splashnotop", "splash no top", false);
-static command_line_key<bool> sv_dedicated("-dedicated", "run dedicated server", false);
+static command_line_key<bool> clhelp("help", "print this help and exit", false);
+static command_line_key<bool> no_splash("nosplash", "no splash screen", false);
+static command_line_key<bool> splash_notop("splashnotop", "splash no top", false);
+static command_line_key<bool> sv_dedicated("dedicated", "run dedicated server", false);
 
 extern XRCORE_API command_line_key<pcstr> fsltx_path;
 

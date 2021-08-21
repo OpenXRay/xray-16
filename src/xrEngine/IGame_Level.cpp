@@ -15,7 +15,7 @@
 
 ENGINE_API IGame_Level* g_pGameLevel = NULL;
 
-static command_line_key<bool> nes_texture_storing("-nes_texture_storing",
+static command_line_key<bool> nes_texture_storing("nes_texture_storing",
                                                   "nes_texture_storing", false);
 extern bool g_bLoaded;
 

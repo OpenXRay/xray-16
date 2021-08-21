@@ -18,7 +18,7 @@
 #include "Include/editor/ide.hpp"
 
 #ifndef _EDITOR
-static command_line_key<bool> noprefetch("-noprefetch", "noprefetch", false);
+static command_line_key<bool> noprefetch("noprefetch", "noprefetch", false);
 #endif
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;

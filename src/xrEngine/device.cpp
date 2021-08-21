@@ -45,7 +45,7 @@ constexpr size_t MAX_WINDOW_EVENTS = 32;
 bool g_bLoaded = false;
 ref_light precache_light = 0;
 
-static command_line_key<bool> center_screen("-center_screen", "center_screen", false);
+static command_line_key<bool> center_screen("center_screen", "center_screen", false);
 
 bool CRenderDevice::RenderBegin()
 {

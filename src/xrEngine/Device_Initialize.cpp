@@ -8,7 +8,7 @@
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
-static command_line_key<bool> weather("-weather", "initialize weather editor", 0);
+static command_line_key<bool> weather("weather", "initialize weather editor", 0);
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 

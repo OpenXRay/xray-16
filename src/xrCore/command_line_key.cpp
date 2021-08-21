@@ -93,7 +93,7 @@ void command_line_key<T>::PrintHelp()
     while (current_node != nullptr)
     {
         pcstr isreq = current_node->required ? "(mandatory)" : "(optional)";
-        Msg("%-20s \t %-10s \t %-25s", current_node->option_name,
+        Msg("-%-20s \t %-10s \t %-25s", current_node->option_name,
             isreq, current_node->description);
         current_node = current_node->l_next;
     }
@@ -110,9 +110,7 @@ bool ParseCommandLine(int argc, char** argv)
             continue;
         }
 
-        pcstr current_arg = argv[n];
-        // this is for later
-        // pcstr current_arg = &argv[n][1];
+        pcstr current_arg = &argv[n][1];
 
         // is this a bool option?
         if (auto clkey = command_line_key<bool>::find_option(current_arg))

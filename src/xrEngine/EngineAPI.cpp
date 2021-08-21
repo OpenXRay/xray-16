@@ -12,8 +12,8 @@
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-static command_line_key<bool> ivtune("-tune", "intel vtune", false);
-static command_line_key<bool> nogame("-nogame", "nogame", false);
+static command_line_key<bool> ivtune("tune", "intel vtune", false);
+static command_line_key<bool> nogame("nogame", "nogame", false);
 
 extern xr_vector<xr_token> VidQualityToken;
 

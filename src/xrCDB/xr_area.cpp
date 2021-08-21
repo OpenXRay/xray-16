@@ -16,7 +16,7 @@ thread_local xr_vector<ISpatial*> CObjectSpaceData::r_spatial;
 
 using namespace collide;
 
-static command_line_key<bool> cdb_cache("-cdb_cache", "Cache CDB data", false);
+static command_line_key<bool> cdb_cache("cdb_cache", "Cache CDB data", false);
 
 //----------------------------------------------------------------------
 // Class	: CObjectSpace

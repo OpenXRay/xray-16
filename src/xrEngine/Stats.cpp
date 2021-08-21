@@ -18,7 +18,7 @@
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
 
-static command_line_key<bool> xclsx("-xclsx", "xclsx", false);
+static command_line_key<bool> xclsx("xclsx", "xclsx", false);
 
 ENGINE_API CStatTimer gTestTimer0;
 ENGINE_API CStatTimer gTestTimer1;

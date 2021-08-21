@@ -14,7 +14,7 @@ namespace Opcode
 using namespace CDB;
 using namespace Opcode;
 
-static command_line_key<bool> mt_cdb("-mt_cdb", "mt_cdb", false);
+static command_line_key<bool> mt_cdb("mt_cdb", "mt_cdb", false);
 
 // Model building
 MODEL::MODEL() :

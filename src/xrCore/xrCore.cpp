@@ -31,16 +31,16 @@ XRCORE_API xrCore Core;
 
 extern command_line_key<pcstr> fsltx_path;
 
-XRCORE_API command_line_key<bool> shoc_flag("-shoc", "Shadow of Chernobyl Mode", false);
-XRCORE_API command_line_key<bool> soc_flag("-soc", "Shadow of Chernobyl Mode", false);
-XRCORE_API command_line_key<bool> cs_flag("-cs", "Clear Sky Mode", false);
-XRCORE_API command_line_key<bool> cop_flag("-cop", "Call of Pripyat Mode", false);
+XRCORE_API command_line_key<bool> shoc_flag("shoc", "Shadow of Chernobyl Mode", false);
+XRCORE_API command_line_key<bool> soc_flag("soc", "Shadow of Chernobyl Mode", false);
+XRCORE_API command_line_key<bool> cs_flag("cs", "Clear Sky Mode", false);
+XRCORE_API command_line_key<bool> cop_flag("cop", "Call of Pripyat Mode", false);
 
-static command_line_key<bool> build_flag("-build", "build", false);
-static command_line_key<bool> ebuild_flag("-ebuild", "ebuild", false);
-static command_line_key<bool> cache_flag("-cache", "cache files", false);
-static command_line_key<bool> file_activity("-file_activity", "dump file activity", false);
-static command_line_key<pcstr> wdir_path("-wf", "work directory", "");
+static command_line_key<bool> build_flag("build", "build", false);
+static command_line_key<bool> ebuild_flag("ebuild", "ebuild", false);
+static command_line_key<bool> cache_flag("cache", "cache files", false);
+static command_line_key<bool> file_activity("file_activity", "dump file activity", false);
+static command_line_key<pcstr> wdir_path("wf", "work directory", "");
 
 static u32 init_counter = 0;
 
