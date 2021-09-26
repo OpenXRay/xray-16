@@ -218,3 +218,11 @@ void CRenderDevice::ResetFullscreen()
 {
     UpdateWindowProps();
 }
+
+void CRenderDevice::GiveBackCursor()
+{
+    SDL_SetRelativeMouseMode(SDL_FALSE);
+    SDL_CaptureMouse(SDL_FALSE);
+    SDL_ShowCursor(SDL_ENABLE);
+    SDL_SetWindowGrab(m_sdlWnd, SDL_FALSE);
+}
