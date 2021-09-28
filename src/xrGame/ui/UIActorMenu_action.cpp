@@ -324,7 +324,16 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {
-            OnPressUserKey();
+            OnPressUserKey(true);
+        }
+        return true;
+    }
+
+    if (IsBinded(kR_LOOKOUT, dik))
+    {
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+        {
+            OnPressUserKey(false);
         }
         return true;
     }
@@ -355,7 +364,7 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-void CUIActorMenu::OnPressUserKey()
+void CUIActorMenu::OnPressUserKey(bool take)
 {
     switch (m_currMenuMode)
     {
@@ -365,7 +374,14 @@ void CUIActorMenu::OnPressUserKey()
         //		OnBtnPerformTrade( this, 0 );
         break;
     case mmUpgrade: TrySetCurUpgrade(); break;
-    case mmDeadBodySearch: TakeAllFromPartner(this, 0); break;
+    case mmDeadBodySearch: 
+    {
+        if (take)
+            TakeAllFromPartner(this, 0);
+        else
+            StoreAllToPartner(this, 0);
+        break;
+    }
     default: R_ASSERT(0); break;
     }
 }
