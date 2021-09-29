@@ -324,16 +324,14 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {
-            OnPressUserKey(true);
-        }
-        return true;
-    }
-
-    if (IsBinded(kR_LOOKOUT, dik))
-    {
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-        {
-            OnPressUserKey(false);
+            if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LCTRL))
+            {
+                OnPressUserKey(false);
+            }
+            else
+            {
+                OnPressUserKey(true);
+            }
         }
         return true;
     }
