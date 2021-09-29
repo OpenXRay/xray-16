@@ -498,9 +498,14 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     static Lock lock;
 #endif
     lock.Enter();
+
+    if (auto windowHandler = xrDebug::GetWindowHandler())
+    {
+        windowHandler->DisableFullscreen();
+    }
+
     ErrorAfterDialog = true;
     string4096 assertionInfo;
-    auto size = sizeof(assertionInfo);
     GatherInfo(assertionInfo, sizeof(assertionInfo), loc, expr, desc, arg1, arg2);
 
     if (ShowErrorMessage)
@@ -861,11 +866,6 @@ void _terminate()
 
 static void handler_base(const char* reason)
 {
-    if (auto windowHandler = xrDebug::GetWindowHandler())
-    {
-        windowHandler->GiveBackCursor();
-    }
-
     bool ignoreAlways = false;
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }

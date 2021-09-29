@@ -262,7 +262,6 @@ public:
     SDL_Window* GetApplicationWindow() override;
     void DisableFullscreen() override;
     void ResetFullscreen() override;
-    void GiveBackCursor() override;
 
     void time_factor(const float& time_factor)
     {

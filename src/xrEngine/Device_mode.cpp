@@ -2,6 +2,8 @@
 
 #include "xrCore/xr_token.h"
 
+#include "xr_input.h"
+
 xr_vector<xr_token> vid_monitor_token;
 xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 
@@ -185,7 +187,8 @@ void CRenderDevice::SelectResolution(const bool windowed)
                 SDL_PIXELFORMAT_UNKNOWN,
                 (int)psDeviceMode.Width,
                 (int)psDeviceMode.Height,
-                (int)psDeviceMode.RefreshRate
+                (int)psDeviceMode.RefreshRate,
+                nullptr
             };
 
             SDL_DisplayMode closest; // try closest or fallback to desktop mode
@@ -212,17 +215,11 @@ SDL_Window* CRenderDevice::GetApplicationWindow()
 void CRenderDevice::DisableFullscreen()
 {
     SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
+    pInput->GrabInput(false);
 }
 
 void CRenderDevice::ResetFullscreen()
 {
     UpdateWindowProps();
-}
-
-void CRenderDevice::GiveBackCursor()
-{
-    SDL_SetRelativeMouseMode(SDL_FALSE);
-    SDL_CaptureMouse(SDL_FALSE);
-    SDL_ShowCursor(SDL_ENABLE);
-    SDL_SetWindowGrab(m_sdlWnd, SDL_FALSE);
+    pInput->GrabInput(true);
 }

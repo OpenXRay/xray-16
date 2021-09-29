@@ -425,7 +425,7 @@ bool CInput::iGetAsyncGpadBtnState(const int btn)
 void CInput::GrabInput(const bool grab)
 {
     // Self descriptive
-    SDL_ShowCursor(grab ? SDL_FALSE : SDL_TRUE);
+    SDL_ShowCursor(grab ? SDL_DISABLE : SDL_ENABLE);
 
     // Clip cursor to the current window
     // If SDL_HINT_GRAB_KEYBOARD is set then the keyboard will be grabbed too

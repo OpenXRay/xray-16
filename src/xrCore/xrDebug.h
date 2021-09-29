@@ -56,7 +56,6 @@ public:
     virtual SDL_Window* GetApplicationWindow() = 0;
     virtual void DisableFullscreen() = 0;
     virtual void ResetFullscreen() = 0;
-    virtual void GiveBackCursor() = 0;
 };
 
 class XRCORE_API xrDebug
