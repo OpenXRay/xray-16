@@ -24,17 +24,6 @@ constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
 float stop_vibration_time = flt_max;
 
-static void OnErrorDialog(bool before)
-{
-    if (!pInput || !pInput->IsExclusiveMode() || Device.editor())
-        return;
-
-    if (before)
-        pInput->GrabInput(false);
-    else
-        pInput->GrabInput(true);
-}
-
 bool CInput::InitJoystick()
 {
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0)
@@ -168,8 +157,6 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
 
     //===================== Dummy pack
     iCapture(&dummyController);
-
-    xrDebug::SetDialogHandler(OnErrorDialog);
 
     SDL_StopTextInput(); // sanity
 

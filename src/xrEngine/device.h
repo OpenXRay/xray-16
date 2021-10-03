@@ -260,8 +260,7 @@ public:
     bool IsWindowDraggable() const { return m_allowWindowDrag; }
 
     SDL_Window* GetApplicationWindow() override;
-    void DisableFullscreen() override;
-    void ResetFullscreen() override;
+    void OnErrorDialog(bool beforeDialog) override;
 
     void time_factor(const float& time_factor)
     {

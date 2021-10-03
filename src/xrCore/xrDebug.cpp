@@ -176,8 +176,6 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
 IWindowHandler* xrDebug::windowHandler = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
-xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
-xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
 bool xrDebug::ShowErrorMessage = false;
@@ -498,9 +496,12 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     static Lock lock;
 #endif
     lock.Enter();
+
+    if (windowHandler)
+        windowHandler->OnErrorDialog(true); // Call it only after locking so that multiple threads won't call this function simultaneously.
+
     ErrorAfterDialog = true;
     string4096 assertionInfo;
-    auto size = sizeof(assertionInfo);
     GatherInfo(assertionInfo, sizeof(assertionInfo), loc, expr, desc, arg1, arg2);
 
     if (ShowErrorMessage)
@@ -513,16 +514,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
             "\r\n");
     }
 
-    if (OnCrash)
-        OnCrash();
-
-    if (OnDialog)
-        OnDialog(true);
-
     FlushLog();
-
-    if (windowHandler)
-        windowHandler->DisableFullscreen();
 
     bool resetFullscreen = false;
     AssertionResult result = AssertionResult::abort;
@@ -559,11 +551,8 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
         } // switch (result)
     }
 
-    if (OnDialog)
-        OnDialog(false);
-
     if (resetFullscreen)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false); // Call it only before unlocking so that multiple threads won't call this function simultaneously.
 
     lock.Leave();
     return result;
@@ -578,10 +567,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 void xrDebug::DoExit(const std::string& message)
 {
     if (windowHandler)
-        windowHandler->DisableFullscreen();
-
-    if (OnDialog)
-        OnDialog(true);
+        windowHandler->OnErrorDialog(true);
 
     FlushLog();
 
@@ -600,11 +586,8 @@ void xrDebug::DoExit(const std::string& message)
     exit(1);
 #endif
     // if you're under debugger, you can jump here manually
-    if (OnDialog)
-        OnDialog(false);
-
     if (windowHandler)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false);
 }
 
 LPCSTR xrDebug::ErrorToString(long code)
@@ -798,10 +781,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     FlushLog();
 
     if (windowHandler)
-        windowHandler->DisableFullscreen();
-
-    if (OnDialog)
-        OnDialog(true);
+        windowHandler->OnErrorDialog(true);
 
     constexpr pcstr fatalError = "Fatal error";
 
@@ -832,11 +812,8 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (PrevFilter)
         PrevFilter(exPtrs);
 
-    if (OnDialog)
-        OnDialog(false);
-
     if (windowHandler)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false);
 
     return EXCEPTION_CONTINUE_SEARCH;
 #else

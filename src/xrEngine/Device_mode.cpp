@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "xrCore/xr_token.h"
+#include "xr_input.h"
 
 xr_vector<xr_token> vid_monitor_token;
 xr_map<u32, xr_vector<xr_token>> vid_mode_token;
@@ -209,12 +210,16 @@ SDL_Window* CRenderDevice::GetApplicationWindow()
     return m_sdlWnd;
 }
 
-void CRenderDevice::DisableFullscreen()
+void CRenderDevice::OnErrorDialog(bool beforeDialog)
 {
-    SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
-}
+    const bool restore = !beforeDialog;
+    const bool needUpdateInput = pInput && pInput->IsExclusiveMode() && !editor();
 
-void CRenderDevice::ResetFullscreen()
-{
-    UpdateWindowProps();
+    if (restore)
+        UpdateWindowProps();
+    else
+        SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
+
+    if (needUpdateInput)
+        pInput->GrabInput(restore);
 }

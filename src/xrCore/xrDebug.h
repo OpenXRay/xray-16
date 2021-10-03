@@ -54,24 +54,19 @@ class IWindowHandler
 {
 public:
     virtual SDL_Window* GetApplicationWindow() = 0;
-    virtual void DisableFullscreen() = 0;
-    virtual void ResetFullscreen() = 0;
+    virtual void OnErrorDialog(bool beforeDialog) = 0;
 };
 
 class XRCORE_API xrDebug
 {
 public:
     using OutOfMemoryCallbackFunc = void(*)();
-    using CrashHandler = void(*)();
-    using DialogHandler = void(*)(bool);
     using UnhandledExceptionFilter = LONG(WINAPI*)(EXCEPTION_POINTERS* exPtrs);
 
 private:
     static IWindowHandler* windowHandler;
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
-    static CrashHandler OnCrash;
-    static DialogHandler OnDialog;
     static string_path BugReportFile;
     static bool ErrorAfterDialog;
     static bool ShowErrorMessage;
@@ -89,10 +84,6 @@ public:
     static void SetWindowHandler(IWindowHandler* handler) { windowHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
-    static CrashHandler GetCrashHandler() { return OnCrash; }
-    static void SetCrashHandler(CrashHandler handler) { OnCrash = handler; }
-    static DialogHandler GetDialogHandler() { return OnDialog; }
-    static void SetDialogHandler(DialogHandler handler) { OnDialog = handler; }
     static const char* ErrorToString(long code);
     static void SetBugReportFile(const char* fileName);
     static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
