@@ -339,7 +339,7 @@ protected:
     void SendEvent_Item_Eat(PIItem pItem, u16 parent);
     void SendEvent_ActivateSlot(u16 slot, u16 recipient);
     void DropAllCurrentItem();
-    void OnPressUserKey();
+    void OnPressUserKey(bool take);
 
     // trade
     void InitPartnerInventoryContents();
@@ -386,7 +386,9 @@ public:
     void xr_stdcall OnBtnPerformTradeSell(CUIWindow* w, void* d);
     void xr_stdcall OnBtnExitClicked(CUIWindow* w, void* d);
     void xr_stdcall TakeAllFromPartner(CUIWindow* w, void* d);
+    void xr_stdcall StoreAllToPartner(CUIWindow* w, void* d);
     void TakeAllFromInventoryBox();
+    void StoreAllToInventoryBox();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
 
