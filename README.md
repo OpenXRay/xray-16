@@ -16,7 +16,7 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 |CI|Platform|Compiler|Configurations|Platforms|Status|
 |---|---|---|---|---|---|
 |AppVeyor|Windows, Linux|MSVC, GCC|Debug, Mixed, Release, Release Master Gold|x64, x86|[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
-|Travis|Linux|GCC|Debug, Release|ARM64, x64, x86|[![Travis Build Status](https://api.travis-ci.org/OpenXRay/xray-16.svg?branch=xd_dev)](https://travis-ci.org/OpenXRay/xray-16)|
+|Travis|Linux|GCC|Debug, Release|ARM64, x64, x86|[![Travis Build Status](https://api.travis-ci.com/OpenXRay/xray-16.svg?branch=dev)](https://app.travis-ci.com/github/OpenXRay/xray-16)|
 |GitHub Actions|Windows, Linux|MSVC, GCC|Debug, Mixed, Release, Release Master Gold|x64, x86|[![GitHub Actions Build Status](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml/badge.svg)](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml)
 
 ### Contributing
