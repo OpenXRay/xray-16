@@ -360,15 +360,16 @@ void CElevatorState::Deactivate()
     m_character = NULL;
 }
 
-XRPHYSICS_API CElevatorState::SEnertionState m_etable[clbNoState][clbNoState] =
+CElevatorState::SEnertionState CElevatorState::m_etable[clbNoState][clbNoState] =
 {
-    /*clbNone         */ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
-    /*clbNearUp       */ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
-    /*clbNearDown     */ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
-    /*clbClimbingUp   */ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
-    /*clbClimbingDown */ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
-    /*clbDepart       */ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {depart_dist, depart_time}},
-    /*clbNoLadder     */ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+    //                     clbNone      clbNearUp    clbNearDown  clbClimbingUp  clbClimbingDown clbDepart    clbNoLadder
+    /*clbNone         */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbNone
+    /*clbNearUp       */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbNearUp
+    /*clbNearDown     */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbNearDown
+    /*clbClimbingUp   */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbClimbingUp
+    /*clbClimbingDown */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbClimbingDown
+    /*clbDepart       */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { depart_dist, depart_time } }, // clbDepart
+    /*clbNoLadder     */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } } // clbNoLadder
 };
 
 bool CElevatorState::StateSwitchInertion(Estate new_state)

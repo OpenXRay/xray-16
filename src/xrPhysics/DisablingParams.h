@@ -27,4 +27,4 @@ struct SAllDDWParams
     float reanable_factor;
 };
 
-extern XRPHYSICS_API SAllDDWParams worldDisablingParams;
+extern SAllDDWParams worldDisablingParams;
