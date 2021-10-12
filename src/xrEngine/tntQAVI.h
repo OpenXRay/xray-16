@@ -91,7 +91,7 @@ protected:
 
 public:
     CAviPlayerCustom();
-    ~CAviPlayerCustom();
+    virtual ~CAviPlayerCustom();
 
     u32 m_dwWidth, m_dwHeight;
 

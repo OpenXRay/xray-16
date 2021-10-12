@@ -8,7 +8,6 @@ class IClimableObject;
 
 class CElevatorState : public IElevatorState
 {
-public:
 private:
     Estate m_state;
 

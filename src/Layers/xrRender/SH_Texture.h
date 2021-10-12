@@ -4,7 +4,7 @@
 
 #include "xrCore/xr_resource.h"
 
-class ENGINE_API CAviPlayerCustom;
+class CAviPlayerCustom;
 class CTheoraSurface;
 
 class ECORE_API CTexture : public xr_resource_named
