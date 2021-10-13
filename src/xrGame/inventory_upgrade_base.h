@@ -34,6 +34,7 @@ enum UpgradeStateResult
     result_e_group,
     result_e_precondition_money,
     result_e_precondition_quest,
+    result_e_cant_do,
 
     result_count
 };

@@ -95,42 +95,50 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
         }
 
         inventory::upgrade::UpgradeStateResult upg_res = m_upgrade->can_install(*inv_item, false);
-        inventory::upgrade::UpgradeStateResult upg_res_script = m_upgrade->get_preconditions();
-        string512 str_res = "";
+        string512 str_res{};
         m_prereq->SetTextColor(color_rgba(255, 90, 90, 255));
-        if (upg_res == inventory::upgrade::result_e_installed)
+
+        switch (upg_res)
         {
+        case inventory::upgrade::result_ok:
+            // nothing
+            break;
+
+        case inventory::upgrade::result_e_installed:
             m_prereq->SetTextColor(color_rgba(117, 255, 123, 255));
-            xr_sprintf(str_res, sizeof(str_res), "%s", StringTable().translate("st_upgr_installed").c_str());
-        }
-        else if (upg_res == inventory::upgrade::result_e_unknown)
-        {
-            xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
+            xr_sprintf(str_res, "%s", StringTable().translate("st_upgr_installed").c_str());
+            break;
+
+        case inventory::upgrade::result_e_unknown:
+            xr_sprintf(str_res, "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
                 StringTable().translate("st_upgr_unknown").c_str());
             if (m_cost)
                 m_cost->Show(false);
-        }
-        else if (upg_res == inventory::upgrade::result_e_group)
-            xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
-                StringTable().translate("st_upgr_group").c_str());
-        else if (upg_res_script == inventory::upgrade::result_e_precondition_money)
-            xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
-                StringTable().translate("st_upgr_cant_do").c_str());
-        else
-        {
-            if (upg_res != inventory::upgrade::result_ok)
-            {
-                xr_sprintf(str_res, sizeof(str_res), "%s:\\n%s", StringTable().translate("st_upgr_disable").c_str(),
-                    m_upgrade->get_prerequisites());
-                if (upg_res == inventory::upgrade::result_e_parents)
-                    xr_sprintf(str_res, sizeof(str_res), "%s\\n - %s", str_res,
-                        StringTable().translate("st_upgr_parents").c_str());
+            break;
 
-                if (upg_res == inventory::upgrade::result_e_precondition_money)
-                    xr_sprintf(str_res, sizeof(str_res), "%s:\\n - %s",
-                        StringTable().translate("st_upgr_disable").c_str(),
-                        StringTable().translate("st_upgr_cant_do").c_str());
-            }
+        case inventory::upgrade::result_e_group:
+            xr_sprintf(str_res, "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
+                StringTable().translate("st_upgr_group").c_str());
+            break;
+
+        case inventory::upgrade::result_e_cant_do:
+            xr_sprintf(str_res, "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
+                StringTable().translate("st_upgr_cant_do").c_str());
+            break;
+
+        default:
+        {
+            xr_sprintf(str_res, "%s:\\n%s", StringTable().translate("st_upgr_disable").c_str(), m_upgrade->get_prerequisites());
+
+            if (upg_res == inventory::upgrade::result_e_parents)
+                xr_sprintf(str_res, "%s\\n - %s", str_res,
+                    StringTable().translate("st_upgr_parents").c_str());
+
+            else if (upg_res == inventory::upgrade::result_e_precondition_money)
+                xr_sprintf(str_res, "%s:\\n - %s",
+                           StringTable().translate("st_upgr_disable").c_str(),
+                           StringTable().translate("st_upgr_cant_do").c_str()); break;
+        }
         }
         m_prereq->SetText(str_res);
     }

@@ -95,7 +95,6 @@ public:
     IC LPCSTR description_text() const;
 
     LPCSTR get_prerequisites();
-    UpgradeStateResult get_preconditions();
     IC bool get_highlight() const;
     IC shared_str const& get_property_name(u8 index = 0) const;
     IC Ivector2 const& get_scheme_index() const;

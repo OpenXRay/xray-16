@@ -390,6 +390,7 @@ void UIUpgrade::update_item(CInventoryItem* inv_item)
         m_state_lock = true;
         break;
     case inventory::upgrade::result_e_precondition_money:
+    case inventory::upgrade::result_e_cant_do:
         m_state = STATE_DISABLED_PREC_MONEY;
         m_state_lock = false;
         break;
