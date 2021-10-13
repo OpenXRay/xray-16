@@ -45,10 +45,10 @@ void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
     CUIXmlInit::InitWindow(ui_xml, "main_frame", 0, this);
 
     m_background = UIHelper::CreateFrameWindow(ui_xml, "background_frame", this);
-    m_name = UIHelper::CreateTextWnd(ui_xml, "info_name", this);
-    m_cost = UIHelper::CreateTextWnd(ui_xml, "info_cost", this, false);
-    m_desc = UIHelper::CreateTextWnd(ui_xml, "info_desc", this);
-    m_prereq = UIHelper::CreateTextWnd(ui_xml, "info_prerequisites", this);
+    m_name = UIHelper::CreateStatic(ui_xml, "info_name", this);
+    m_cost = UIHelper::CreateStatic(ui_xml, "info_cost", this, false);
+    m_desc = UIHelper::CreateStatic(ui_xml, "info_desc", this);
+    m_prereq = UIHelper::CreateStatic(ui_xml, "info_prerequisites", this);
 
     m_properties_wnd = xr_new<UIInvUpgPropertiesWnd>();
     AttachChild(m_properties_wnd);
@@ -80,44 +80,6 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
 
     m_name->SetText(m_upgrade->name());
     m_desc->SetText(m_upgrade->description_text());
-
-    if (m_upgrade->is_known())
-    {
-        m_desc->SetText(m_upgrade->description_text());
-        m_prereq->Show(true);
-
-        inventory::upgrade::UpgradeStateResult upg_res = m_upgrade->can_install(*inv_item, false);
-        if (upg_res == inventory::upgrade::result_ok || upg_res == inventory::upgrade::result_e_precondition_money
-            || upg_res == inventory::upgrade::result_e_precondition_quest)
-        {
-            m_prereq->SetText(m_upgrade->get_prerequisites());
-        }
-        else
-        {
-            string32 str_res;
-            switch (upg_res)
-            {
-            case inventory::upgrade::result_e_unknown:
-                xr_strcpy(str_res, sizeof(str_res), "st_upgr_unknown");
-                break;
-            case inventory::upgrade::result_e_installed:
-                xr_strcpy(str_res, sizeof(str_res), "st_upgr_installed");
-                break;
-            case inventory::upgrade::result_e_parents:
-                xr_strcpy(str_res, sizeof(str_res), "st_upgr_parents");
-                break;
-            case inventory::upgrade::result_e_group:
-                xr_strcpy(str_res, sizeof(str_res), "st_upgr_group");
-                break;
-            //case inventory::upgrade::result_e_precondition:
-            default:
-                xr_strcpy(str_res, sizeof(str_res), "st_upgr_unknown");
-                break;
-            }
-            m_prereq->SetTextST(str_res);
-        }
-        m_properties_wnd->Show(true);
-    }
 
     if (m_upgrade->is_known())
     {
@@ -174,7 +136,6 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
     }
     else
     {
-        m_desc->SetTextST("st_desc_unknown");
         m_prereq->Show(false);
         m_properties_wnd->Show(false);
         if (m_cost)
