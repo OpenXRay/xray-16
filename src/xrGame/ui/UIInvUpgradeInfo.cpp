@@ -94,53 +94,80 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
             m_cost->Show(true);
         }
 
-        inventory::upgrade::UpgradeStateResult upg_res = m_upgrade->can_install(*inv_item, false);
-        string512 str_res{};
-        m_prereq->SetTextColor(color_rgba(255, 90, 90, 255));
+        m_prereq->SetText(nullptr);
+        if (!ClearSkyMode)
+            m_prereq->SetTextColor(color_rgba(255, 90, 90, 255));
 
+        string512 str_res{};
+        auto set_result_string = [&](pcstr desc, bool add = false)
+        {
+            if (ClearSkyMode)
+            {
+                xr_strcpy(str_res, StringTable().translate(desc).c_str());
+            }
+            else if (add)
+            {
+                xr_sprintf(str_res, "%s\\n - %s", str_res,
+                    StringTable().translate(desc).c_str());
+            }
+            else
+            {
+                xr_sprintf(str_res, "%s:\\n - %s",
+                    StringTable().translate("st_upgr_disable").c_str(),
+                    StringTable().translate(desc).c_str());
+            }
+        };
+
+        const auto upg_res = m_upgrade->can_install(*inv_item, false);
         switch (upg_res)
         {
-        case inventory::upgrade::result_ok:
-            // nothing
-            break;
-
         case inventory::upgrade::result_e_installed:
-            m_prereq->SetTextColor(color_rgba(117, 255, 123, 255));
-            xr_sprintf(str_res, "%s", StringTable().translate("st_upgr_installed").c_str());
+            if (!ClearSkyMode)
+                m_prereq->SetTextColor(color_rgba(117, 255, 123, 255));
+            m_prereq->SetTextST("st_upgr_installed");
             break;
 
         case inventory::upgrade::result_e_unknown:
-            xr_sprintf(str_res, "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
-                StringTable().translate("st_upgr_unknown").c_str());
+            set_result_string("st_upgr_unknown");
             if (m_cost)
                 m_cost->Show(false);
             break;
 
         case inventory::upgrade::result_e_group:
-            xr_sprintf(str_res, "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
-                StringTable().translate("st_upgr_group").c_str());
+            set_result_string("st_upgr_group");
             break;
 
         case inventory::upgrade::result_e_cant_do:
-            xr_sprintf(str_res, "%s:\\n - %s", StringTable().translate("st_upgr_disable").c_str(),
-                StringTable().translate("st_upgr_cant_do").c_str());
+            set_result_string("st_upgr_cant_do");
             break;
 
         default:
         {
-            xr_sprintf(str_res, "%s:\\n%s", StringTable().translate("st_upgr_disable").c_str(), m_upgrade->get_prerequisites());
+            switch (upg_res)
+            {
+            case inventory::upgrade::result_ok:
+            case inventory::upgrade::result_e_precondition_money:
+            case inventory::upgrade::result_e_precondition_quest:
+                if (ClearSkyMode)
+                {
+                    m_prereq->SetText(m_upgrade->get_prerequisites());
+                    break;
+                }
 
-            if (upg_res == inventory::upgrade::result_e_parents)
-                xr_sprintf(str_res, "%s\\n - %s", str_res,
-                    StringTable().translate("st_upgr_parents").c_str());
+                if (upg_res != inventory::upgrade::result_e_precondition_quest)
+                    break;
+                [[fallthrough]];
 
-            else if (upg_res == inventory::upgrade::result_e_precondition_money)
-                xr_sprintf(str_res, "%s:\\n - %s",
-                           StringTable().translate("st_upgr_disable").c_str(),
-                           StringTable().translate("st_upgr_cant_do").c_str()); break;
+            default:
+                strconcat(str_res, StringTable().translate("st_upgr_disable").c_str(), ":\\n", m_upgrade->get_prerequisites());
+
+                if (upg_res == inventory::upgrade::result_e_parents)
+                    set_result_string("st_upgr_parents", true);
+            }
         }
-        }
-        m_prereq->SetText(str_res);
+        } // switch (upg_res)
+        if (str_res[0])
+            m_prereq->SetText(str_res);            
     }
     else
     {

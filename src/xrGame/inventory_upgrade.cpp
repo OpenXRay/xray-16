@@ -166,6 +166,12 @@ UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
         return res;
 
     case result_script_e_cant_do:
+        if (ClearSkyMode)
+        {
+            if (res != result_ok)
+                return res;
+            return result_e_precondition_money;
+        }
         return result_e_cant_do;
 
     case result_script_e_precondition_any:
