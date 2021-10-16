@@ -225,7 +225,6 @@ private:
 protected:
     void Construct();
     void InitializeUniversal(CUIXml& uiXml);
-    void InitializeUpgradeMode(CUIXml& uiXml);
 
     // Old style UI
     void InitializeInventoryMode(CUIXml& uiXml);
