@@ -201,6 +201,13 @@ void CUITalkWnd::Update()
             HideDialog();
     }
 
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
+    if (pGameSP)
+    {
+        if (pGameSP->TopInputReceiver() == this && !UITalkDialogWnd->IsShown())
+            UITalkDialogWnd->Show();
+    }
+
     if (m_bNeedToUpdateQuestions)
     {
         UpdateQuestions();
@@ -315,12 +322,11 @@ void CUITalkWnd::SwitchToTrade()
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
         if (pGameSP)
         {
-            /*			if ( pGameSP->MainInputReceiver() )
-                        {
-                            pGameSP->MainInputReceiver()->HideDialog();
-                        }*/
+            UITalkDialogWnd->Hide();
+            StopSnd();
+
             pGameSP->StartTrade(m_pOurInvOwner, m_pOthersInvOwner);
-        } // pGameSP
+        }
     }
 }
 
@@ -331,10 +337,9 @@ void CUITalkWnd::SwitchToUpgrade()
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
         if (pGameSP)
         {
-            /*			if ( pGameSP->MainInputReceiver() )
-                        {
-                            pGameSP->MainInputReceiver()->HideDialog();
-                        }*/
+            UITalkDialogWnd->Hide();
+            StopSnd();
+
             pGameSP->StartUpgrade(m_pOurInvOwner, m_pOthersInvOwner);
         }
     }
