@@ -221,7 +221,7 @@ void CUITalkWnd::Update()
     {
         CGameObject* pOtherGO = smart_cast<CGameObject*>(m_pOthersInvOwner);
         Fvector P = pOtherGO->Position();
-        P.y += 1.8f;
+        P.y += 1.8f; // XXX: get head bone position or maybe even track this automatically in the sound system, if possible. Look at CUITalkWnd::PlaySnd()
         m_sound.set_position(P);
     }
 }
@@ -311,7 +311,7 @@ void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)
     }
     PlaySnd(text.c_str());
 
-    bool i_am = (0 == xr_strcmp(SpeakerName, m_pOurInvOwner->Name()));
+    bool i_am = (0 == xr_strcmp(SpeakerName, m_pOurInvOwner->Name())); // XXX: not reliable when both persons have same names
     UITalkDialogWnd->AddAnswer(SpeakerName, *StringTable().translate(text), i_am);
 }
 
@@ -401,7 +401,7 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
         {
             CGameObject* pOtherGO = smart_cast<CGameObject*>(m_pOthersInvOwner);
             Fvector P = pOtherGO->Position();
-            P.y += 1.8f;
+            P.y += 1.8f; // XXX: check if we can automatically track head bone position, look at CUITalkWnd::Update()
             m_sound.create(fn, st_Effect, sg_SourceType);
             m_sound.play_at_pos(0, P);
         }
