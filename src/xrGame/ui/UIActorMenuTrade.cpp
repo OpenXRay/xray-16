@@ -356,12 +356,12 @@ void CUIActorMenu::UpdateActor()
 
 void CUIActorMenu::UpdatePartnerBag()
 {
-    /*CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
+    CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
     if (monster || m_pPartnerInvOwner->use_simplified_visual())
     {
-        m_PartnerWeight->SetText("");
+        m_PartnerMoney->SetText("");
     }
-    else*/ if (m_pPartnerInvOwner->InfinitiveMoney())
+    else if (m_pPartnerInvOwner->InfinitiveMoney())
     {
         m_PartnerMoney->SetText("--- RU");
     }

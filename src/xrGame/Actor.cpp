@@ -1340,7 +1340,7 @@ void CActor::shedule_Update(u32 DT)
         CGameObject* game_object = smart_cast<CGameObject*>(RQ.O);
         m_pUsableObject = game_object;
         m_pInvBoxWeLookingAt = smart_cast<CInventoryBox*>(game_object);
-        m_pPersonWeLookingAt = smart_cast<CInventoryOwner*>(game_object);
+        m_pPersonWeLookingAt = game_object->cast_inventory_owner();
         m_pVehicleWeLookingAt = smart_cast<CHolderCustom*>(game_object);
         CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(game_object);
 
