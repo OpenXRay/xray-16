@@ -1538,7 +1538,7 @@ void CScriptGameObject::IterateFeelTouch(luabind::functor<void> functor)
     {
         for (const auto& game_object : touch->feel_touch)
         {
-            // Xottab_DUTY: Do we need this cast from IGameObject* to IGameObject* ?
+            // XXX Xottab_DUTY: Do we need this cast from IGameObject* to IGameObject* ?
             IGameObject* o = smart_cast<IGameObject*>(game_object);
             if (o)
                 functor(game_object->ID());
