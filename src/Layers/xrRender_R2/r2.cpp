@@ -199,6 +199,20 @@ static bool must_enable_old_cascades()
     return oldCascades;
 }
 
+// Returns true if compute shaders for HDAO Ultra exist
+static bool ssao_hdao_cs_shaders_exist()
+{
+    IReader* hdao_cs      = open_shader("ssao_hdao.cs");
+    IReader* hdao_cs_msaa = open_shader("ssao_hdao_msaa.cs");
+
+    const bool exist      = hdao_cs && hdao_cs_msaa;
+
+    FS.r_close(hdao_cs);
+    FS.r_close(hdao_cs_msaa);
+
+    return exist;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -434,13 +448,14 @@ void CRender::create()
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
 #ifdef USE_OGL
     // TODO: OGL: temporary disabled HBAO/HDAO, need to fix it
-    o.ssao_hdao = false;
+    o.ssao_hbao = false;
     o.ssao_hdao = false;
 #else
 #   ifdef USE_DX9
     o.ssao_hdao = false;
 #   else
     o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
+    o.ssao_ultra = HW.ComputeShadersSupported && ssao_hdao_cs_shaders_exist();
 #   endif
     o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
 #endif

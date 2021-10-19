@@ -230,13 +230,6 @@ void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr render
 CRenderTarget::CRenderTarget()
 {
     u32 SampleCount = 1;
-
-    if (ps_r_ssao_mode != 2 /*hdao*/)
-        ps_r_ssao = _min(ps_r_ssao, 3);
-
-#ifndef USE_DX9
-    RImplementation.o.ssao_ultra = ps_r_ssao > 3 && HW.ComputeShadersSupported;
-#endif
     if (RImplementation.o.dx10_msaa)
         SampleCount = RImplementation.o.dx10_msaa_samples;
 
@@ -631,6 +624,12 @@ CRenderTarget::CRenderTarget()
         f_bloom_factor = 0.5f;
     }
 
+#ifndef USE_DX9
+    // Check if SSAO Ultra is allowed
+    if (ps_r_ssao_mode != 2 /*hdao*/ || !RImplementation.o.ssao_ultra)
+        ps_r_ssao = _min(ps_r_ssao, 3);
+#endif
+
     // HBAO
     if (RImplementation.o.ssao_opt_data)
     {
@@ -659,7 +658,7 @@ CRenderTarget::CRenderTarget()
 #ifdef USE_DX9
     constexpr bool ssao_hdao_ultra = false;
 #else
-    const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra;
+    const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra && ps_r_ssao > 3;
 #endif
     if (ssao_blur_on || ssao_hdao_ultra)
     {
