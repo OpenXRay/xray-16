@@ -19,8 +19,7 @@ public:
     virtual bool IsShown() = 0;
 
     virtual void Update(int stagesCompleted, int stagesTotal) = 0;
-    virtual void ForceDrop() = 0;
-    virtual void ForceFinish() = 0;
+    virtual void Draw() = 0;
 
     virtual void SetLevelLogo(const char* name) = 0;
     virtual void SetStageTitle(const char* title) = 0;

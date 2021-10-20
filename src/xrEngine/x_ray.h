@@ -50,11 +50,9 @@ public:
     void LoadBegin();
     void LoadEnd();
     void LoadTitleInt(pcstr str1, pcstr str2, pcstr str3);
-    void LoadStage();
+    void LoadStage(bool draw = true);
     void LoadSwitch();
     void LoadDraw();
-    void LoadForceDrop();
-    void LoadForceFinish();
 
     void SetLoadStageTitle(pcstr ls_title);
 
@@ -65,7 +63,7 @@ public:
     virtual ~CApplication();
 
     virtual void OnFrame();
-    void load_draw_internal(bool precaching = false);
+    void load_draw_internal();
 
     void SetLoadingScreen(ILoadingScreen* newScreen);
     void DestroyLoadingScreen();

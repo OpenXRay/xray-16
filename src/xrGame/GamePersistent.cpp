@@ -563,9 +563,8 @@ void CGamePersistent::game_loaded()
     {
         m_intro_event = nullptr;
         if (g_pGameLevel && g_pGameLevel->bReady && (allow_game_intro() && g_keypress_on_start) &&
-            load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
+            load_screen_renderer.NeedsUserInput() && m_game_params.m_e_game_type == eGameIDSingle)
         {
-            pApp->LoadForceFinish(); // hack
             VERIFY(NULL == m_intro);
             m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
@@ -578,7 +577,7 @@ void CGamePersistent::game_loaded()
 void CGamePersistent::update_game_loaded()
 {
     xr_delete(m_intro);
-    load_screen_renderer.stop();
+    load_screen_renderer.Stop();
     start_game_intro();
 }
 
@@ -641,9 +640,7 @@ void CGamePersistent::OnFrame()
         else if (!m_intro)
         {
             if (Device.dwPrecacheFrame == 0)
-                load_screen_renderer.stop();
-            else if (Device.dwPrecacheFrame == 1)
-                pApp->LoadForceFinish(); // hack
+                load_screen_renderer.Stop();
         }
     }
     if (!m_pMainMenu->IsActive())

@@ -38,8 +38,7 @@ public:
     bool IsShown() override;
 
     void Update(const int stagesCompleted, const int stagesTotal) override;
-    void ForceDrop() override;
-    void ForceFinish() override;
+    void Draw() override;
 
     void SetLevelLogo(const char* name) override;
     void SetStageTitle(const char* title) override;

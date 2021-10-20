@@ -123,7 +123,7 @@ void CRenderDevice::RenderEnd(void)
 }
 
 #include "IGame_Level.h"
-void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
+void CRenderDevice::PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input)
 {
     if (GEnv.isDedicatedServer)
         amount = 0;
@@ -140,10 +140,9 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
         precache_light->set_range(5.0f);
         precache_light->set_active(true);
     }
-    if (amount && b_draw_loadscreen && !load_screen_renderer.b_registered)
+    if (amount && draw_loadscreen && !load_screen_renderer.IsActive())
     {
-        pApp->LoadForceDrop();
-        load_screen_renderer.start(b_wait_user_input);
+        load_screen_renderer.Start(wait_user_input);
     }
 }
 
@@ -625,28 +624,37 @@ SCRIPT_EXPORT(Device, (),
     ];
 });
 
-CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}
-void CLoadScreenRenderer::start(bool b_user_input)
+void CLoadScreenRenderer::Start(bool b_user_input)
 {
+    Device.seqFrame.Add(this, 0);
     Device.seqRender.Add(this, 0);
-    b_registered = true;
-    b_need_user_input = b_user_input;
+    m_registered = true;
+    m_need_user_input = b_user_input;
 
-    pApp->LoadForceDrop();
     pApp->ShowLoadingScreen(true);
+    pApp->LoadBegin();
 }
 
-void CLoadScreenRenderer::stop()
+void CLoadScreenRenderer::Stop()
 {
-    if (!b_registered)
+    if (!m_registered)
         return;
+    Device.seqFrame.Remove(this);
     Device.seqRender.Remove(this);
 
-    b_registered = false;
-    b_need_user_input = false;
+    m_registered = false;
+    m_need_user_input = false;
 
-    pApp->LoadForceFinish();
     pApp->ShowLoadingScreen(false);
+    pApp->LoadEnd();
 }
 
-void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(true); }
+void CLoadScreenRenderer::OnFrame()
+{
+    pApp->LoadStage(false);
+}
+
+void CLoadScreenRenderer::OnRender()
+{
+    pApp->load_draw_internal();
+}
