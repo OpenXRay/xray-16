@@ -3532,15 +3532,8 @@
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\..\sdk\binaries\x86\discord-rpc.dll">
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord-rpc-dynamic.dll">
       <FileType>Document</FileType>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">D:\Data\Programming\Git\protestant19\xray-16\bin\Win32\Debug;D:\Data\Programming\Git\protestant19\xray-16\bin\Win32\Mixed;D:\Data\Programming\Git\protestant19\xray-16\bin\Win32\Release;%(DestinationFolders)</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">D:\Data\Programming\Git\protestant19\xray-16\bin\Win32\Debug;D:\Data\Programming\Git\protestant19\xray-16\bin\Win32\Mixed;D:\Data\Programming\Git\protestant19\xray-16\bin\Win32\Release;%(DestinationFolders)</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\x64\discord-rpc.dll">
-      <FileType>Document</FileType>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">D:\Data\Programming\Git\protestant19\xray-16\bin\Win64\Debug;D:\Data\Programming\Git\protestant19\xray-16\bin\Win64\Mixed;D:\Data\Programming\Git\protestant19\xray-16\bin\Win64\Release;%(DestinationFolders)</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">D:\Data\Programming\Git\protestant19\xray-16\bin\Win64\Debug;D:\Data\Programming\Git\protestant19\xray-16\bin\Win64\Mixed;D:\Data\Programming\Git\protestant19\xray-16\bin\Win64\Release;%(DestinationFolders)</DestinationFolders>
     </CopyFileToFolders>
     <None Include="packages.config" />
   </ItemGroup>

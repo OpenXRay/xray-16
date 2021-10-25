@@ -9903,12 +9903,4 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="..\..\sdk\binaries\x86\discord-rpc.dll">
-      <Filter>Core\Client\Discord</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\x64\discord-rpc.dll">
-      <Filter>Core\Client\Discord</Filter>
-    </CopyFileToFolders>
-  </ItemGroup>
 </Project>
