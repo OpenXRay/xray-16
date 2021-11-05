@@ -127,10 +127,16 @@ public:
 
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
+
     bool iGetAsyncKeyState(const int dik);
     bool iGetAsyncBtnState(const int btn);
     bool iGetAsyncGpadBtnState(const int btn);
+
+    void iGetAsyncMousePos(Ivector2& p) const;
     void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
+
+    void iSetMousePos(const Ivector2& p) const;
+
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
 

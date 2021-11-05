@@ -119,7 +119,7 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
     if (m_bound_to_system_cursor)
     {
         Ivector2 pti;
-        IInputReceiver::IR_GetMousePosWindow(pti);
+        pInput->iGetAsyncMousePos(pti);
         vPos.x = (float)pti.x * correction.x;
         vPos.y = (float)pti.y * correction.y;
     }
@@ -139,5 +139,5 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     Ivector2 p;
     p.x = iFloor(vPos.x / correction.x);
     p.y = iFloor(vPos.y / correction.y);
-    SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
+    pInput->iSetMousePos(p);
 }

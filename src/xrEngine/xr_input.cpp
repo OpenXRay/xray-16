@@ -409,6 +409,16 @@ bool CInput::iGetAsyncGpadBtnState(const int btn)
     return controllerState[btn];
 }
 
+void CInput::iGetAsyncMousePos(Ivector2& p) const
+{
+    SDL_GetMouseState(&p.x, &p.y);
+}
+
+void CInput::iSetMousePos(const Ivector2& p) const
+{
+    SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
+}
+
 void CInput::GrabInput(const bool grab)
 {
     // Self descriptive
