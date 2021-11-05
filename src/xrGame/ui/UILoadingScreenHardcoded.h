@@ -12,13 +12,13 @@ R"(<w>
 	</background>
     <loading_logo x="0" y="173" width="1024" height="399">
     </loading_logo>
-    <loading_progress_background x="260" y="599" width="506" height="4">
-        <texture color="black" a="255">ui_mm_loading_progress_bar</texture>
-    </loading_progress_background>
     <loading_progress x="260" y="599" width="506" height="4" horz="1" min="0" max="100" pos="0" inertion="5.0">
         <progress>
             <texture>ui_mm_loading_progress_bar</texture>
         </progress>
+        <background stretch="1">
+            <texture width="506" height="4" r="0" g="0" b="0" a="255">ui_mm_loading_progress_bar</texture>
+        </background>
         <min_color r="30" g="88" b="126"/>
 		<middle_color r="60" g="118" b="156"/>
 		<max_color r="90" g="148" b="186"/>
@@ -51,13 +51,13 @@ R"(<w>
         </auto_static>
     </background>
     <loading_logo x="102" y="173" width="819" height="512" stretch="1"/>
-    <loading_progress_background x="310" y="599" width="405" height="5" stretch="1">
-        <texture width="405" height="4" color="black" a="255" stretch="1">ui_mm_loading_progress_bar</texture>
-    </loading_progress_background>
     <loading_progress x="310" y="599" width="405" height="5" horz="1" min="0" max="100" pos="0" inertion="5.0">
         <progress>
             <texture>ui_mm_loading_progress_bar</texture>
         </progress>
+        <background stretch="1">
+            <texture width="405" height="5" r="0" g="0" b="0" a="255">ui_mm_loading_progress_bar</texture>
+        </background>
         <min_color r="30" g="88" b="126"/>
 		<middle_color r="60" g="118" b="156"/>
 		<max_color r="90" g="148" b="186"/>

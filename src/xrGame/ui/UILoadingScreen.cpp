@@ -19,10 +19,9 @@
 extern ENGINE_API int ps_rs_loading_stages;
 
 UILoadingScreen::UILoadingScreen()
-    : loadingProgressBackground(nullptr), loadingProgress(nullptr),
-      loadingProgressPercent(nullptr), loadingLogo(nullptr),
-      loadingStage(nullptr), loadingHeader(nullptr),
-      loadingTipNumber(nullptr), loadingTip(nullptr)
+    : loadingProgress(nullptr), loadingProgressPercent(nullptr),
+      loadingLogo(nullptr),     loadingStage(nullptr),
+      loadingHeader(nullptr),   loadingTipNumber(nullptr), loadingTip(nullptr)
 {
     alwaysShowStage = false;
     UILoadingScreen::Initialize();
@@ -46,26 +45,15 @@ void UILoadingScreen::Initialize()
         uiXml.Set(GetLoadingScreenXML());
     }
 
-    const auto loadProgressBar = [&]()
-    {
-        loadingProgressBackground = UIHelper::CreateStatic(uiXml, "loading_progress_background", this, false);
-        loadingProgress = UIHelper::CreateProgressBar(uiXml, "loading_progress", this);
-    };
-
-    const auto loadBackground = [&]
-    {
-        CUIXmlInit::InitWindow(uiXml, "background", 0, this);
-    };
-
     if (uiXml.ReadAttribInt("loading_progress", 0, "under_background", 1))
     {
-        loadProgressBar();
-        loadBackground();
+        loadingProgress = UIHelper::CreateProgressBar(uiXml, "loading_progress", this);
+        CUIXmlInit::InitWindow(uiXml, "background", 0, this);
     }
     else
     {
-        loadBackground();
-        loadProgressBar();
+        CUIXmlInit::InitWindow(uiXml, "background", 0, this);
+        loadingProgress = UIHelper::CreateProgressBar(uiXml, "loading_progress", this);
     }
 
     alwaysShowStage = uiXml.ReadAttribInt("loading_stage", 0, "always_show");
