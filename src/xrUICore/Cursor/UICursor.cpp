@@ -116,18 +116,18 @@ Fvector2 CUICursor::GetCursorPositionDelta()
 void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 {
     vPrevPos = vPos;
-    if (m_bound_to_system_cursor)
+    if (pInput->IsExclusiveMode() || !m_bound_to_system_cursor)
+    {
+        float sens = 1.0f;
+        vPos.x += _dx * sens * correction.x;
+        vPos.y += _dy * sens * correction.y;
+    }
+    else
     {
         Ivector2 pti;
         pInput->iGetAsyncMousePos(pti);
         vPos.x = (float)pti.x * correction.x;
         vPos.y = (float)pti.y * correction.y;
-    }
-    else
-    {
-        float sens = 1.0f;
-        vPos.x += _dx * sens * correction.x;
-        vPos.y += _dy * sens * correction.y;
     }
     clamp(vPos.x, 0.f, UI_BASE_WIDTH);
     clamp(vPos.y, 0.f, UI_BASE_HEIGHT);
