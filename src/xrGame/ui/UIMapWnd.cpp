@@ -50,6 +50,7 @@ CUIMapWnd::~CUIMapWnd()
 {
     delete_data(m_ActionPlanner);
     delete_data(m_GameMaps);
+    delete_data(m_map_location_hint);
     /*
     #ifdef DEBUG
         delete_data( m_dbg_text_hint );
@@ -148,9 +149,8 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     init_xml_nav(uiXml);
 
     m_map_location_hint = xr_new<CUIMapLocationHint>();
+    m_map_location_hint->SetAutoDelete(false);
     m_map_location_hint->SetCustomDraw(true);
-    m_map_location_hint->SetAutoDelete(true);
-    AttachChild(m_map_location_hint);
     strconcat(sizeof(pth), pth, start_from, ":map_hint_item");
     m_map_location_hint->Init(uiXml, pth);
 
