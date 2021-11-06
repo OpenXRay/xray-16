@@ -93,7 +93,7 @@ struct ShaderTypeTraits<SVS>
     {
 #ifdef USE_DX9
         return D3DXGetVertexShaderProfile(HW.pDevice); // vertex "vs_2_a";
-#elif !defined(USE_DX9) && !defined(USE_OGL)
+#elif !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -186,7 +186,7 @@ struct ShaderTypeTraits<SPS>
     {
 #ifdef USE_DX9
         return D3DXGetPixelShaderProfile(HW.pDevice); // pixel "ps_2_a";
-#elif !defined(USE_DX9) && !defined(USE_OGL)
+#elif !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
