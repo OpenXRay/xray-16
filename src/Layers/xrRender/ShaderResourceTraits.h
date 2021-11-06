@@ -92,7 +92,9 @@ struct ShaderTypeTraits<SVS>
     static inline const char* GetCompilationTarget()
     {
 #ifdef USE_DX9
+#   if RENDER == R_R2
         return D3DXGetVertexShaderProfile(HW.pDevice); // vertex "vs_2_a";
+#   endif
 #elif !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {
@@ -185,7 +187,9 @@ struct ShaderTypeTraits<SPS>
     static inline const char* GetCompilationTarget()
     {
 #ifdef USE_DX9
+#   if RENDER == R_R2
         return D3DXGetPixelShaderProfile(HW.pDevice); // pixel "ps_2_a";
+#   endif
 #elif !defined(USE_OGL)
         switch (HW.FeatureLevel)
         {
