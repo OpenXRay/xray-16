@@ -16,7 +16,7 @@
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "D3DX10Core.h"
 #endif
@@ -71,7 +71,7 @@ static class cl_parallax : public R_constant_setup
     }
 } binder_parallax;
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 static class cl_LOD : public R_constant_setup
 {
     virtual void setup(R_constant* C) { RCache.LOD.set_LOD(C); }
@@ -82,12 +82,14 @@ static class cl_pos_decompress_params : public R_constant_setup
 {
     virtual void setup(R_constant* C)
     {
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+        const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
+        const float HorzTan = -VertTan / Device.fASPECT;
+#elif defined(USE_OGL)
         const float VertTan = tanf(deg2rad(Device.fFOV / 2.0f));
         const float HorzTan = VertTan / Device.fASPECT;
 #else
-        const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
-        const float HorzTan = -VertTan / Device.fASPECT;
+#error No graphics API selected or enabled!
 #endif
         RCache.set_c(
             C, HorzTan, VertTan, (2.0f * HorzTan) / (float)Device.dwWidth, (2.0f * VertTan) / (float)Device.dwHeight);
@@ -134,18 +136,18 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 static class cl_alpha_ref : public R_constant_setup
 {
     virtual void setup(R_constant* C)
     {
         // TODO: OGL: Implement AlphaRef.
-#   ifndef USE_OGL
+#   if defined(USE_DX11)
         StateManager.BindAlphaRef(C);
-#   endif
+#   endif // !USE_OGL
     }
 } binder_alpha_ref;
-#endif
+#endif // !USE_DX9
 
 // Defined in ResourceManager.cpp
 IReader* open_shader(pcstr shader);
@@ -220,7 +222,7 @@ void CRender::create()
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     m_MSAASample = -1;
 #endif
 
@@ -233,8 +235,10 @@ void CRender::create()
 #ifdef USE_DX9
     D3DFORMAT nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
     o.nullrt = HW.support(nullrt, D3DRTYPE_SURFACE, D3DUSAGE_RENDERTARGET);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     o.nullrt = false;
+#else
+#error No graphics API selected or enabled!
 #endif
     /*
     if (o.nullrt)		{
@@ -302,13 +306,15 @@ void CRender::create()
     o.HW_smap_FETCH4 = FALSE;
 #ifdef USE_DX9
     o.HW_smap = HW.support(D3DFMT_D24X8, D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     o.HW_smap = true;
+#else
+#error No graphics API selected or enabled!
 #endif
     o.HW_smap_PCF = o.HW_smap;
     if (o.HW_smap)
     {
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
         //	For ATI it's much faster on DX10 to use D32F format
         if (HW.Caps.id_vendor == 0x1002)
             o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
@@ -338,9 +344,11 @@ void CRender::create()
 #ifdef USE_DX9
     o.fp16_filter = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_FILTER);
     o.fp16_blend = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     o.fp16_filter = true;
     o.fp16_blend = true;
+#else
+#error No graphics API selected or enabled!
 #endif
 
     // emulate ATI-R4xx series
@@ -382,17 +390,19 @@ void CRender::create()
     // nv-dbt
 #ifdef USE_DX9
     o.nvdbt = HW.support((D3DFORMAT)MAKEFOURCC('N', 'V', 'D', 'B'), D3DRTYPE_SURFACE, 0);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     o.nvdbt = false;
+#else
+#error No graphics API selected or enabled!
 #endif
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
 
-#if !defined(USE_OGL)
+#if defined(USE_DX9) || defined(USE_DX11)
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)
         Msg("* Managed textures disabled");
-#endif
+#endif // !USE_OGL
 
     // options (smap-pool-size)
     if (strstr(Core.Params, "-smap1024"))
@@ -424,14 +434,14 @@ void CRender::create()
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
     o.sunstatic = ps_r2_sun_static;
     o.advancedpp = ps_r2_advanced_pp;
-#ifndef USE_DX9
-#   ifdef USE_OGL
+#if defined(USE_DX11) || defined(USE_OGL)
+#   if defined(USE_DX11)
+    o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
+#   elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
     o.volumetricfog = false;
-#   else
-    o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
 #   endif
-#endif
+#endif // !USE_DX9
     o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
     o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;
@@ -446,18 +456,20 @@ void CRender::create()
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
-#ifdef USE_OGL
-    // TODO: OGL: temporary disabled HBAO/HDAO, need to fix it
-    o.ssao_hbao = false;
+#if defined(USE_DX9) || defined(USE_DX11)
+#   if defined(USE_DX9)
     o.ssao_hdao = false;
-#else
-#   ifdef USE_DX9
-    o.ssao_hdao = false;
-#   else
+#   elif defined(USE_DX11)
     o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
     o.ssao_ultra = HW.ComputeShadersSupported && ssao_hdao_cs_shaders_exist();
 #   endif
     o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
+#elif defined(USE_OGL)
+    // TODO: OGL: temporary disabled HBAO/HDAO, need to fix it
+    o.ssao_hbao = false;
+    o.ssao_hdao = false;
+#else
+#error No graphics API selected or enabled!
 #endif
 
 #ifdef USE_DX9
@@ -466,7 +478,7 @@ void CRender::create()
         o.ssao_opt_data = false;
         o.ssao_hbao = false;
     }
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
     o.hbao_vectorized = false;
     if (o.ssao_hdao)
@@ -477,24 +489,18 @@ void CRender::create()
             o.hbao_vectorized = true;
         o.ssao_opt_data = true;
     }
-#endif
+#endif // !USE_DX9
 
-#ifndef USE_DX9
-#   ifdef USE_OGL
-    o.dx10_sm4_1 = true;
-#   else
+#if defined(USE_DX11) || defined(USE_OGL)
+#   if defined(USE_DX11)
     o.dx10_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.dx10_sm4_1 = o.dx10_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+#   elif defined(USE_OGL)
+    o.dx10_sm4_1 = true;
 #   endif
 
     //	MSAA option dependencies
-#   ifdef USE_OGL
-    // TODO: OGL: temporary disabled, need to fix it
-    o.dx10_msaa = false;
-    o.dx10_msaa_samples = 0;
-    o.dx10_msaa_opt = o.dx10_msaa;
-    o.dx10_msaa_hybrid = false;
-#   else
+#   if defined(USE_DX11)
     o.dx10_msaa = !!ps_r3_msaa;
     o.dx10_msaa_samples = (1 << ps_r3_msaa);
 
@@ -505,6 +511,12 @@ void CRender::create()
     // o.dx10_msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
     o.dx10_msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.dx10_msaa_hybrid &= !o.dx10_msaa_opt && o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+#   elif defined(USE_OGL)
+    // TODO: OGL: temporary disabled, need to fix it
+    o.dx10_msaa = false;
+    o.dx10_msaa_samples = 0;
+    o.dx10_msaa_opt = o.dx10_msaa;
+    o.dx10_msaa_hybrid = false;
 #   endif
     //	Allow alpha test MSAA for DX10.0
 
@@ -535,7 +547,7 @@ void CRender::create()
     o.dx10_minmax_sm = ps_r3_minmax_sm;
     o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
 
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     o.dx11_enable_tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 #endif
@@ -576,9 +588,9 @@ void CRender::create()
     Resources->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
     Resources->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
     Resources->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
-#   ifndef USE_OGL
+#   if defined(USE_DX11)
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
 #   endif
 #endif
@@ -594,7 +606,7 @@ void CRender::create()
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
 #endif
     marker = 0;
@@ -602,7 +614,7 @@ void CRender::create()
 
     PortalTraverser.initialize();
     //	TODO: OGL: Implement FluidManager.
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     FluidManager.Initialize(70, 70, 70);
     //	FluidManager.Initialize( 100, 100, 100 );
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
@@ -612,7 +624,7 @@ void CRender::create()
 void CRender::destroy()
 {
     m_bMakeAsyncSS = false;
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     FluidManager.Destroy();
 #endif
     PortalTraverser.destroy();
@@ -675,7 +687,7 @@ void CRender::reset_end()
     }
     //-AVO
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 #endif
     // Set this flag true to skip the first render frame,

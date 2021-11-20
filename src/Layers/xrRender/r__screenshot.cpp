@@ -9,7 +9,7 @@
 #include <FreeImagePlus.h>
 #endif
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 #include "d3dx11tex.h"
 #endif
 
@@ -48,273 +48,8 @@ IC void MouseRayFromPoint(Fvector& direction, int x, int y, Fmatrix& m_CamMat)
 #define SM_FOR_SEND_WIDTH 640
 #define SM_FOR_SEND_HEIGHT 480
 
-#if defined(USE_OGL)
-bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWORD& bufferSize, bool gamesave = false)
-{
-    const u32 width = psDeviceMode.Width;
-    const u32 height = psDeviceMode.Height;
 
-    constexpr u32 colorMode = 3;
-    constexpr u8 bits = 24;
-    const size_t bitsSize = width * height * colorMode;
-
-    const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    const u8 header[6] =
-    {
-        u8(width % 256),  u8(width / 256),
-        u8(height % 256), u8(height / 256),
-        bits, 0
-    };
-
-    const size_t headerSize = sizeof(tgaHeader) + sizeof(header);
-
-    xr_vector<u8> pixels;
-    pixels.resize(bitsSize + headerSize);
-
-    for (size_t i = 0; i < sizeof(tgaHeader); i++)
-        pixels[i] = tgaHeader[i];
-
-    for (size_t i = 0; i < sizeof(header); i++)
-        pixels[sizeof(tgaHeader) + i] = header[i];
-
-    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data() + headerSize);
-
-    // TGA format used BGR instead of RGB
-    for (size_t i = headerSize; i < bitsSize + headerSize; i += colorMode)
-        std::swap(pixels[i], pixels[i + 2]);
-
-    fipMemoryIO tmpMemFile(pixels.data(), pixels.size());
-
-    fipImage image{ FIT_BITMAP, width, height, u32(bits) };
-    image.loadFromMemory(tmpMemFile);
-
-    if (image.isValid())
-    {
-        bool result = true;
-        if (gamesave)
-            result = image.rescale(GAMESAVE_SIZE, GAMESAVE_SIZE, FILTER_LANCZOS3);
-
-        return result && image.saveToMemory(format, output) && output.acquire(&buffer, &bufferSize);
-    }
-
-    return false;
-}
-
-// XXX: Provide full implementation
-void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
-{
-    u8* buffer;
-    DWORD bufferSize;
-    fipMemoryIO output;
-    IWriter* fs = nullptr;
-
-    switch (mode)
-    {
-    case SM_NORMAL:
-    {
-        pcstr extension = "jpg";
-        FREE_IMAGE_FORMAT format = FIF_JPEG;
-        if (strstr(Core.Params, "-ss_png"))
-        {
-            extension = "png";
-            format = FIF_PNG;
-        }
-
-        string64 time;
-        string_path buf;
-        xr_sprintf(buf, sizeof(buf), "ss_%s_%s_(%s).%s", Core.UserName, timestamp(time),
-            g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu", extension);
-
-        if (CreateImage(output, format, buffer, bufferSize))
-            fs = FS.w_open("$screenshots$", buf);
-        R_ASSERT(fs);
-        break;
-    }
-    case SM_FOR_GAMESAVE:
-    {
-        if (CreateImage(output, FIF_DDS, buffer, bufferSize, true))
-            fs = FS.w_open(name);
-        break;
-    }
-    default: VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
-    }
-
-    if (fs)
-    {
-        fs->w(buffer, bufferSize);
-        FS.w_close(fs);
-    }
-    else
-        Log("! Failed to make a screenshot");
-}
-#elif !defined(USE_DX9)
-void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
-{
-    ID3DResource* pSrcTexture;
-    Target->get_base_rt()->GetResource(&pSrcTexture);
-
-    VERIFY(pSrcTexture);
-
-    // Save
-    switch (mode)
-    {
-    case IRender::SM_FOR_GAMESAVE:
-    {
-        ID3DTexture2D* pSrcSmallTexture;
-
-        D3D_TEXTURE2D_DESC desc;
-        ZeroMemory(&desc, sizeof(desc));
-        desc.Width = GAMESAVE_SIZE;
-        desc.Height = GAMESAVE_SIZE;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_BC1_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.Usage = D3D_USAGE_DEFAULT;
-        desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
-        CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
-
-        //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
-        CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
-
-        // save (logical & physical)
-        ID3DBlob* saved = nullptr;
-        HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
-        if (hr == D3D_OK)
-        {
-            IWriter* fs = FS.w_open(name);
-            if (fs)
-            {
-                fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-                FS.w_close(fs);
-            }
-        }
-        _RELEASE(saved);
-
-        // cleanup
-        _RELEASE(pSrcSmallTexture);
-    }
-    break;
-    case IRender::SM_FOR_MPSENDING:
-    {
-        ID3DTexture2D* pSrcSmallTexture;
-
-        D3D_TEXTURE2D_DESC desc;
-        ZeroMemory(&desc, sizeof(desc));
-        desc.Width = SM_FOR_SEND_WIDTH;
-        desc.Height = SM_FOR_SEND_HEIGHT;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_BC1_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.Usage = D3D_USAGE_DEFAULT;
-        desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
-        CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
-
-        //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
-        CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
-
-        // save (logical & physical)
-        ID3DBlob* saved = nullptr;
-        HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
-        if (hr == D3D_OK)
-        {
-            if (!memory_writer)
-            {
-                IWriter* fs = FS.w_open(name);
-                if (fs)
-                {
-                    fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-                    FS.w_close(fs);
-                }
-            }
-            else
-            {
-                memory_writer->w(saved->GetBufferPointer(), saved->GetBufferSize());
-            }
-        }
-        _RELEASE(saved);
-
-        // cleanup
-        _RELEASE(pSrcSmallTexture);
-    }
-        break;
-    case IRender::SM_NORMAL:
-    {
-        string64 t_stemp;
-        string_path buf;
-        xr_sprintf(buf, sizeof buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp),
-                   g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
-
-        ID3DBlob* saved = nullptr;
-        CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_JPG, &saved, 0));
-
-        IWriter* fs = FS.w_open("$screenshots$", buf);
-        R_ASSERT(fs);
-        fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-        FS.w_close(fs);
-        _RELEASE(saved);
-
-        if (strstr(Core.Params, "-ss_tga"))
-        { // hq
-            xr_sprintf(buf, sizeof buf, "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
-                       g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
-
-            ID3DBlob* saved2 = nullptr;
-            CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_BMP, &saved2, 0));
-
-            IWriter* fs2 = FS.w_open("$screenshots$", buf);
-            R_ASSERT(fs2);
-            fs2->w(saved2->GetBufferPointer(), saved2->GetBufferSize());
-            FS.w_close(fs2);
-            _RELEASE(saved2);
-        }
-    }
-        break;
-    case IRender::SM_FOR_LEVELMAP:
-    case IRender::SM_FOR_CUBEMAP:
-    {
-        string_path buf;
-        VERIFY(name);
-        strconcat(sizeof(buf), buf, name, ".tga");
-        IWriter* fs = FS.w_open("$screenshots$", buf);
-        R_ASSERT(fs);
-
-        ID3DTexture2D* pTex = Target->t_ss_async;
-        HW.pContext->CopyResource(pTex, pSrcTexture);
-
-        D3D_MAPPED_TEXTURE2D MappedData;
-        HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
-        // Swap r and b, but don't kill alpha
-        {
-            u32* pPixel = (u32*)MappedData.pData;
-            u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
-
-            for (; pPixel != pEnd; pPixel++)
-            {
-                u32 p = *pPixel;
-                *pPixel = color_argb(color_get_A(p), color_get_B(p), color_get_G(p), color_get_R(p));
-            }
-        }
-        // save
-        u32* data = (u32*)xr_malloc(Device.dwHeight * Device.dwHeight * 4);
-        imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)MappedData.pData, Device.dwWidth, Device.dwHeight, imf_lanczos3);
-        HW.pContext->Unmap(pTex, 0);
-
-        Image img;
-        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageFormat::RGBA8);
-        img.SaveTGA(*fs, true);
-        xr_free(data);
-        FS.w_close(fs);
-    }
-        break;
-    }
-
-    _RELEASE(pSrcTexture);
-}
-
-#else // USE_DX9
-
+#if defined(USE_DX9)
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
     if (!Device.b_is_Ready)
@@ -518,8 +253,273 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 _end_:
     _RELEASE(pFB);
 }
+#elif defined(USE_DX11)
+void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+{
+    ID3DResource* pSrcTexture;
+    Target->get_base_rt()->GetResource(&pSrcTexture);
 
-#endif // USE_OGL
+    VERIFY(pSrcTexture);
+
+    // Save
+    switch (mode)
+    {
+    case IRender::SM_FOR_GAMESAVE:
+    {
+        ID3DTexture2D* pSrcSmallTexture;
+
+        D3D_TEXTURE2D_DESC desc;
+        ZeroMemory(&desc, sizeof(desc));
+        desc.Width = GAMESAVE_SIZE;
+        desc.Height = GAMESAVE_SIZE;
+        desc.MipLevels = 1;
+        desc.ArraySize = 1;
+        desc.Format = DXGI_FORMAT_BC1_UNORM;
+        desc.SampleDesc.Count = 1;
+        desc.Usage = D3D_USAGE_DEFAULT;
+        desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+        CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
+
+        //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
+        CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
+
+        // save (logical & physical)
+        ID3DBlob* saved = nullptr;
+        HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
+        if (hr == D3D_OK)
+        {
+            IWriter* fs = FS.w_open(name);
+            if (fs)
+            {
+                fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
+                FS.w_close(fs);
+            }
+        }
+        _RELEASE(saved);
+
+        // cleanup
+        _RELEASE(pSrcSmallTexture);
+    }
+    break;
+    case IRender::SM_FOR_MPSENDING:
+    {
+        ID3DTexture2D* pSrcSmallTexture;
+
+        D3D_TEXTURE2D_DESC desc;
+        ZeroMemory(&desc, sizeof(desc));
+        desc.Width = SM_FOR_SEND_WIDTH;
+        desc.Height = SM_FOR_SEND_HEIGHT;
+        desc.MipLevels = 1;
+        desc.ArraySize = 1;
+        desc.Format = DXGI_FORMAT_BC1_UNORM;
+        desc.SampleDesc.Count = 1;
+        desc.Usage = D3D_USAGE_DEFAULT;
+        desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
+        CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
+
+        //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
+        CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
+
+        // save (logical & physical)
+        ID3DBlob* saved = nullptr;
+        HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
+        if (hr == D3D_OK)
+        {
+            if (!memory_writer)
+            {
+                IWriter* fs = FS.w_open(name);
+                if (fs)
+                {
+                    fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
+                    FS.w_close(fs);
+                }
+            }
+            else
+            {
+                memory_writer->w(saved->GetBufferPointer(), saved->GetBufferSize());
+            }
+        }
+        _RELEASE(saved);
+
+        // cleanup
+        _RELEASE(pSrcSmallTexture);
+    }
+        break;
+    case IRender::SM_NORMAL:
+    {
+        string64 t_stemp;
+        string_path buf;
+        xr_sprintf(buf, sizeof buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp),
+                   g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
+        ID3DBlob* saved = nullptr;
+        CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_JPG, &saved, 0));
+
+        IWriter* fs = FS.w_open("$screenshots$", buf);
+        R_ASSERT(fs);
+        fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
+        FS.w_close(fs);
+        _RELEASE(saved);
+
+        if (strstr(Core.Params, "-ss_tga"))
+        { // hq
+            xr_sprintf(buf, sizeof buf, "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
+                       g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
+            ID3DBlob* saved2 = nullptr;
+            CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_BMP, &saved2, 0));
+
+            IWriter* fs2 = FS.w_open("$screenshots$", buf);
+            R_ASSERT(fs2);
+            fs2->w(saved2->GetBufferPointer(), saved2->GetBufferSize());
+            FS.w_close(fs2);
+            _RELEASE(saved2);
+        }
+    }
+        break;
+    case IRender::SM_FOR_LEVELMAP:
+    case IRender::SM_FOR_CUBEMAP:
+    {
+        string_path buf;
+        VERIFY(name);
+        strconcat(sizeof(buf), buf, name, ".tga");
+        IWriter* fs = FS.w_open("$screenshots$", buf);
+        R_ASSERT(fs);
+
+        ID3DTexture2D* pTex = Target->t_ss_async;
+        HW.pContext->CopyResource(pTex, pSrcTexture);
+
+        D3D_MAPPED_TEXTURE2D MappedData;
+        HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
+        // Swap r and b, but don't kill alpha
+        {
+            u32* pPixel = (u32*)MappedData.pData;
+            u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
+
+            for (; pPixel != pEnd; pPixel++)
+            {
+                u32 p = *pPixel;
+                *pPixel = color_argb(color_get_A(p), color_get_B(p), color_get_G(p), color_get_R(p));
+            }
+        }
+        // save
+        u32* data = (u32*)xr_malloc(Device.dwHeight * Device.dwHeight * 4);
+        imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)MappedData.pData, Device.dwWidth, Device.dwHeight, imf_lanczos3);
+        HW.pContext->Unmap(pTex, 0);
+
+        Image img;
+        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageFormat::RGBA8);
+        img.SaveTGA(*fs, true);
+        xr_free(data);
+        FS.w_close(fs);
+    }
+        break;
+    }
+
+    _RELEASE(pSrcTexture);
+}
+#elif defined(USE_OGL)
+bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWORD& bufferSize, bool gamesave = false)
+{
+    const u32 width = psDeviceMode.Width;
+    const u32 height = psDeviceMode.Height;
+
+    constexpr u32 colorMode = 3;
+    constexpr u8 bits = 24;
+    const size_t bitsSize = width * height * colorMode;
+
+    const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    const u8 header[6] =
+    {
+        u8(width % 256),  u8(width / 256),
+        u8(height % 256), u8(height / 256),
+        bits, 0
+    };
+
+    const size_t headerSize = sizeof(tgaHeader) + sizeof(header);
+
+    xr_vector<u8> pixels;
+    pixels.resize(bitsSize + headerSize);
+
+    for (size_t i = 0; i < sizeof(tgaHeader); i++)
+        pixels[i] = tgaHeader[i];
+
+    for (size_t i = 0; i < sizeof(header); i++)
+        pixels[sizeof(tgaHeader) + i] = header[i];
+
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data() + headerSize);
+
+    // TGA format used BGR instead of RGB
+    for (size_t i = headerSize; i < bitsSize + headerSize; i += colorMode)
+        std::swap(pixels[i], pixels[i + 2]);
+
+    fipMemoryIO tmpMemFile(pixels.data(), pixels.size());
+
+    fipImage image{ FIT_BITMAP, width, height, u32(bits) };
+    image.loadFromMemory(tmpMemFile);
+
+    if (image.isValid())
+    {
+        bool result = true;
+        if (gamesave)
+            result = image.rescale(GAMESAVE_SIZE, GAMESAVE_SIZE, FILTER_LANCZOS3);
+
+        return result && image.saveToMemory(format, output) && output.acquire(&buffer, &bufferSize);
+    }
+
+    return false;
+}
+
+// XXX: Provide full implementation
+void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+{
+    u8* buffer;
+    DWORD bufferSize;
+    fipMemoryIO output;
+    IWriter* fs = nullptr;
+
+    switch (mode)
+    {
+    case SM_NORMAL:
+    {
+        pcstr extension = "jpg";
+        FREE_IMAGE_FORMAT format = FIF_JPEG;
+        if (strstr(Core.Params, "-ss_png"))
+        {
+            extension = "png";
+            format = FIF_PNG;
+        }
+
+        string64 time;
+        string_path buf;
+        xr_sprintf(buf, sizeof(buf), "ss_%s_%s_(%s).%s", Core.UserName, timestamp(time),
+            g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu", extension);
+
+        if (CreateImage(output, format, buffer, bufferSize))
+            fs = FS.w_open("$screenshots$", buf);
+        R_ASSERT(fs);
+        break;
+    }
+    case SM_FOR_GAMESAVE:
+    {
+        if (CreateImage(output, FIF_DDS, buffer, bufferSize, true))
+            fs = FS.w_open(name);
+        break;
+    }
+    default: VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
+    }
+
+    if (fs)
+    {
+        fs->w(buffer, bufferSize);
+        FS.w_close(fs);
+    }
+    else
+        Log("! Failed to make a screenshot");
+}
+#else
+#error No graphics API selected or enabled!
+#endif
 
 void CRender::Screenshot(ScreenshotMode mode, LPCSTR name) { ScreenshotImpl(mode, name, nullptr); }
 void CRender::Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer)
@@ -538,46 +538,7 @@ void CRender::ScreenshotAsyncBegin()
     m_bMakeAsyncSS = true;
 }
 
-#if defined(USE_OGL)
-
-void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
-{
-    // TODO: OGL: Implement screenshot feature.
-    VERIFY(!"CRender::ScreenshotAsyncEnd not implemented.");
-}
-
-#elif !defined(USE_DX9)
-
-void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
-{
-    VERIFY(!m_bMakeAsyncSS);
-
-    // Don't own. No need to release.
-    ID3DTexture2D* pTex = Target->t_ss_async;
-
-    D3D_MAPPED_TEXTURE2D MappedData;
-
-    HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
-    {
-        u32* pPixel = (u32*)MappedData.pData;
-        u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
-
-        // Kill alpha and swap r and b.
-        for (; pPixel != pEnd; pPixel++)
-        {
-            u32 p = *pPixel;
-            *pPixel = color_xrgb(color_get_B(p), color_get_G(p), color_get_R(p));
-        }
-
-        memory_writer.w(&Device.dwWidth, sizeof(Device.dwWidth));
-        memory_writer.w(&Device.dwHeight, sizeof(Device.dwHeight));
-        memory_writer.w(MappedData.pData, (Device.dwWidth * Device.dwHeight) * 4);
-    }
-    HW.pContext->Unmap(pTex, 0);
-}
-
-#else // USE_DX9
-
+#if defined(USE_DX9) // USE_DX9
 void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 {
     if (!Device.b_is_Ready)
@@ -647,7 +608,42 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 
     CHK_DX(pFB->UnlockRect());
 }
+#elif defined(USE_DX11)
+void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
+{
+    VERIFY(!m_bMakeAsyncSS);
 
-#endif // USE_OGL
+    // Don't own. No need to release.
+    ID3DTexture2D* pTex = Target->t_ss_async;
+
+    D3D_MAPPED_TEXTURE2D MappedData;
+
+    HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
+    {
+        u32* pPixel = (u32*)MappedData.pData;
+        u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
+
+        // Kill alpha and swap r and b.
+        for (; pPixel != pEnd; pPixel++)
+        {
+            u32 p = *pPixel;
+            *pPixel = color_xrgb(color_get_B(p), color_get_G(p), color_get_R(p));
+        }
+
+        memory_writer.w(&Device.dwWidth, sizeof(Device.dwWidth));
+        memory_writer.w(&Device.dwHeight, sizeof(Device.dwHeight));
+        memory_writer.w(MappedData.pData, (Device.dwWidth * Device.dwHeight) * 4);
+    }
+    HW.pContext->Unmap(pTex, 0);
+}
+#elif defined(USE_OGL)
+void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
+{
+    // TODO: OGL: Implement screenshot feature.
+    VERIFY(!"CRender::ScreenshotAsyncEnd not implemented.");
+}
+#else
+#error No graphics API selected or enabled!
+#endif
 
 void DoAsyncScreenshot() { RImplementation.Target->DoAsyncScreenshot(); }

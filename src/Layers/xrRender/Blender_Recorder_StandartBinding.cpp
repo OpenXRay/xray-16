@@ -66,23 +66,7 @@ class cl_texgen : public R_constant_setup
     {
         Fmatrix mTexgen;
 
-#ifdef USE_OGL
-        Fmatrix mTexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.0f, 1.0f
-        };
-#elif !defined(USE_DX9)
-        Fmatrix mTexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.0f, 1.0f
-        };
-#else // USE_DX9
+#if defined(USE_DX9)
         float _w = float(RDEVICE.dwWidth);
         float _h = float(RDEVICE.dwHeight);
         float o_w = (.5f / _w);
@@ -94,7 +78,25 @@ class cl_texgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };
-#endif // USE_OGL
+#elif defined(USE_DX11)
+        Fmatrix mTexelAdjust =
+        {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, -0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.0f, 1.0f
+        };
+#elif defined(USE_OGL)
+        Fmatrix mTexelAdjust =
+        {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.0f, 1.0f
+        };
+#else
+#error No graphics API selected or in use!
+#endif
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_wvp);
         RCache.set_c(C, mTexgen);
@@ -108,23 +110,7 @@ class cl_VPtexgen : public R_constant_setup
     {
         Fmatrix mTexgen;
 
-#ifdef USE_OGL
-        Fmatrix mTexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.0f, 1.0f
-        };
-#elif !defined(USE_DX9)
-        Fmatrix mTexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.0f, 1.0f
-        };
-#else // USE_DX9
+#if defined(USE_DX9)
         float _w = float(RDEVICE.dwWidth);
         float _h = float(RDEVICE.dwHeight);
         float o_w = (.5f / _w);
@@ -136,7 +122,25 @@ class cl_VPtexgen : public R_constant_setup
             0.0f, 0.0f, 1.0f, 0.0f,
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };
-#endif // USE_OGL
+#elif defined(USE_DX11)
+        Fmatrix mTexelAdjust =
+        {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, -0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.0f, 1.0f
+        };
+#elif defined(USE_OGL)
+        Fmatrix mTexelAdjust =
+        {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.0f, 1.0f
+        };
+#else
+#error No graphics API selected or in use!
+#endif
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_vp);
         RCache.set_c(C, mTexgen);

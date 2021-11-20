@@ -26,18 +26,20 @@ public:
     void resolve_into(CRT& destination) const; // only RTs with same format supported
 
 public:
-#ifdef USE_OGL
+#if defined(USE_DX9) || (USE_DX11)
+    ID3DTexture2D* pSurface;
+    ID3DRenderTargetView* pRT;
+#if defined(USE_DX11)
+    ID3DDepthStencilView* pZRT;
+    ID3D11UnorderedAccessView* pUAView;
+#endif
+#elif defined(USE_OGL)
     GLuint pRT;
     GLuint pZRT;
     GLenum target;
 #else
-    ID3DTexture2D* pSurface;
-    ID3DRenderTargetView* pRT;
-#ifdef USE_DX11
-    ID3DDepthStencilView* pZRT;
-    ID3D11UnorderedAccessView* pUAView;
-#endif // USE_DX11
-#endif // USE_OGL
+#error No graphics API selected or enabled!
+#endif
 
     ref_texture pTexture;
 

@@ -29,7 +29,7 @@
 ///////////////////////////////////////////////////////////////////////
 //  SVS
 SVS::SVS() : sh(0)
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 //  ,signature(0)
 #endif
 {}
@@ -38,16 +38,18 @@ SVS::~SVS()
 {
     RImplementation.Resources->_DeleteVS(this);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     // XXX: check just in case
     //_RELEASE(signature);
     //	Now it is release automatically
 #endif
 
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+	_RELEASE(sh);
+#elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(sh);
+#error No graphics API selected or enabled!
 #endif
 }
 
@@ -55,24 +57,26 @@ SVS::~SVS()
 // SPS
 SPS::~SPS()
 {
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+	_RELEASE(sh);
+#elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
 #else
-    _RELEASE(sh);
+#error No graphics API selected or enabled!
 #endif
     
     RImplementation.Resources->_DeletePS(this);
 }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 ///////////////////////////////////////////////////////////////////////
 // SGS
 SGS::~SGS()
 {
-#ifdef USE_OGL
+#if defined(USE_DX11)
+	_RELEASE(sh);
+#elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#else
-    _RELEASE(sh);
 #endif
 
     RImplementation.Resources->_DeleteGS(this);
@@ -81,10 +85,10 @@ SGS::~SGS()
 #if defined(USE_DX11)
 SHS::~SHS()
 {
-#ifdef USE_OGL
+#if defined(USE_DX11)
+	_RELEASE(sh);
+#elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#else
-    _RELEASE(sh);
 #endif
 
     RImplementation.Resources->_DeleteHS(this);
@@ -92,10 +96,10 @@ SHS::~SHS()
 
 SDS::~SDS()
 {
-#ifdef USE_OGL
+#if defined(USE_DX11)
+	_RELEASE(sh);
+#elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#else
-    _RELEASE(sh);
 #endif
 
     RImplementation.Resources->_DeleteDS(this);
@@ -103,18 +107,18 @@ SDS::~SDS()
 
 SCS::~SCS()
 {
-#ifdef USE_OGL
+#if defined(USE_DX11)
+	_RELEASE(sh);
+#elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#else
-    _RELEASE(sh);
 #endif
 
     RImplementation.Resources->_DeleteCS(this);
 }
 #endif
-#endif // !USE_DX9
+#endif // USE_DX11 or USE_OGL
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 ///////////////////////////////////////////////////////////////////////
 //	SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)
@@ -129,7 +133,7 @@ SInputSignature::~SInputSignature()
     _RELEASE(signature);
     RImplementation.Resources->_DeleteInputSignature(this);
 }
-#endif // !USE_DX9 && !USE_OGL
+#endif // USE_DX11
 
 ///////////////////////////////////////////////////////////////////////
 //	SState
@@ -147,7 +151,7 @@ SDeclaration::~SDeclaration()
     //	Release vertex layout
 #ifdef USE_OGL
     glDeleteVertexArrays(1, &dcl);
-#elif !defined(USE_DX9)
+#elif defined(USE_DX11) || defined(USE_OGL)
     xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)
@@ -155,7 +159,9 @@ SDeclaration::~SDeclaration()
         //	Release vertex layout
         _RELEASE(iLayout->second);
     }
-#else // USE_DX9
+#elif defined(USE_DX9)// USE_DX9
     _RELEASE(dcl);
+#else
+#error No graphics API selected or enabled!
 #endif
 }

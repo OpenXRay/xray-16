@@ -127,7 +127,7 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: ps        : %d", m_ps.size());
     if (!bBrief)
         mdump(m_ps);
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     Msg("* RM_Dump: gs        : %d", m_gs.size());
     if (!bBrief)
         mdump(m_gs);

@@ -183,7 +183,16 @@ void CRender::render_menu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+    pv++;
+    pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+    pv++;
+    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+    pv++;
+    pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+    pv++;
+#elif defined(USE_OGL)
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
     pv++;
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
@@ -193,15 +202,8 @@ void CRender::render_menu()
     pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
     pv++;
 #else
-    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
-    pv++;
-    pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
-    pv++;
-    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
-    pv++;
-    pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
-    pv++;
-#endif // USE_OGL
+#error No graphics API selected or enabled!
+#endif
     RCache.Vertex.Unlock(4, Target->g_menu->vb_stride);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
@@ -214,7 +216,7 @@ void CRender::Render()
     g_r = 1;
     VERIFY(0 == mapDistort.size());
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
 #endif
 
@@ -230,7 +232,7 @@ void CRender::Render()
 
     if (!(g_pGameLevel && g_hud) || bMenu)
     {
-#ifndef USE_DX9 // XXX: probably we can just enable this on DX9 too
+#if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
         Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
 #endif
         return;
@@ -349,7 +351,7 @@ void CRender::Render()
     Target->phase_occq();
     LP_normal.clear();
     LP_pending.clear();
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     if (o.dx10_msaa)
     {
         RCache.set_ZB(Target->rt_MSAADepth->pZRT);
@@ -466,7 +468,7 @@ void CRender::Render()
         Lights_LastFrame.clear();
     }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     // full screen pass to mark msaa-edge pixels in highest stencil bit
     if (o.dx10_msaa)
     {
@@ -505,10 +507,10 @@ void CRender::Render()
         RCache.set_xform_project(Device.mProject);
         RCache.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
-#ifdef USE_DX9
+#if defined(USE_DX9)
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         if (!o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,

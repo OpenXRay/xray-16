@@ -31,7 +31,15 @@ void CRenderTarget::accum_reflected(light* L)
         float _h = float(Device.dwHeight);
         float o_w = (.5f / _w);
         float o_h = (.5f / _h);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+        Fmatrix m_TexelAdjust =
+        {
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, -0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
+        };
+#elif defined(USE_OGL)
         Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -40,14 +48,8 @@ void CRenderTarget::accum_reflected(light* L)
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };
 #else
-        Fmatrix m_TexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
-        };
-#endif // USE_OGL
+#error No graphics API selected or enabled!
+#endif
         m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
     }
 
@@ -73,7 +75,7 @@ void CRenderTarget::accum_reflected(light* L)
 #ifdef USE_DX9
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
         draw_volume(L);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         if (!RImplementation.o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
@@ -98,9 +100,7 @@ void CRenderTarget::accum_reflected(light* L)
             }
             else // checked Holger
             {
-#   ifdef USE_OGL
-                VERIFY(!"Only optimized MSAA is supported in OpenGL");
-#   else
+#   if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Shader(s_accum_reflected_msaa[i]);
@@ -113,7 +113,10 @@ void CRenderTarget::accum_reflected(light* L)
                     draw_volume(L);
                 }
                 StateManager.SetSampleMask(0xffffffff);
-#   endif // USE_OGL
+#   elif defined(USE_OGL)
+                VERIFY(!"Only optimized MSAA is supported in OpenGL");
+
+#   endif // USE_DX11
             }
         }
 #endif // USE_DX9
@@ -127,7 +130,7 @@ void CRenderTarget::accum_reflected(light* L)
         RCache.set_c("m_texgen", m_Texgen);
 #ifdef USE_DX9
         draw_volume(L);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         if (!RImplementation.o.dx10_msaa)
         {
             // per pixel
@@ -148,9 +151,7 @@ void CRenderTarget::accum_reflected(light* L)
             }
             else // checked holger
             {
-#   ifdef USE_OGL
-                VERIFY(!"Only optimized MSAA is supported in OpenGL");
-#   else
+#   if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
@@ -159,9 +160,12 @@ void CRenderTarget::accum_reflected(light* L)
                     draw_volume(L);
                 }
                 StateManager.SetSampleMask(0xffffffff);
-#   endif // USE_OGL
+#   elif defined(USE_OGL)
+                VERIFY(!"Only optimized MSAA is supported in OpenGL");
+
+#   endif // USE_DX11
             }
-#   ifndef USE_OGL // XXX: not sure why this is needed. Just preserving original behaviour
+#   if defined(USE_DX9) || defined(USE_DX11) // XXX: not sure why this is needed. Just preserving original behaviour
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
 #   endif // !USE_OGL
         }

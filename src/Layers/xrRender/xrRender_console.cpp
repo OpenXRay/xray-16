@@ -22,12 +22,11 @@ const xr_token qsmapsize_token[] =
     { "3072", 3072 },
     { "3584", 3584 },
     { "4096", 4096 },
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)  // XXX: check if this really supported on OpenGL
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
     { "8192", 8192 },
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if this really supported on OpenGL
     { "9216", 9216 },
     { "10240", 10240 },
     { "11264", 11264 },
@@ -36,7 +35,6 @@ const xr_token qsmapsize_token[] =
     { "14336", 14336 },
     { "15360", 15360 },
     { "16384", 16384 },
-#endif // defined(USE_DX11) || defined(USE_OGL)
 #endif // !USE_DX9
     { nullptr, 0 }
 };
@@ -49,14 +47,14 @@ const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 4},
 #endif
     {nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
-#if !defined(USE_DX9) && !defined(USE_OGL) // TODO: OGL: fix ultra and extreme settings
+#if defined(USE_DX11) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
 #endif // !USE_DX9
     {nullptr, 0}};
@@ -248,7 +246,7 @@ float ps_r2_gloss_factor = 4.0f;
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 #include "Layers/xrRenderDX10/StateManager/dx10SamplerStateCache.h"
 #endif
 
@@ -287,19 +285,21 @@ class CCC_tf_Aniso : public CCC_Integer
 public:
     void apply()
     {
-#if !defined(USE_OGL)
+#if defined(USE_DX9) || defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
 #endif
         int val = *value;
         clamp(val, 1, 16);
-#if defined(USE_OGL)
-        // OGL: don't set aniso here because it will be updated after vid restart
-#elif !defined(USE_DX9)
-        SSManager.SetMaxAnisotropy(val);
-#else
+#if defined(USE_DX9)
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
+#elif defined(USE_DX11)
+        SSManager.SetMaxAnisotropy(val);
+#elif defined(USE_OGL)
+        // OGL: don't set aniso here because it will be updated after vid restart
+#else
+#error No graphics API selected or enabled!
 #endif
     }
     CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
@@ -319,16 +319,16 @@ class CCC_tf_MipBias : public CCC_Float
 public:
     void apply()
     {
-#if !defined(USE_OGL)
+#if defined(USE_DX9) || defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
 #endif
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-        SSManager.SetMipLODBias(*value);
-#elif defined(USE_DX9)
+#if defined(USE_DX9)
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
+#elif defined(USE_DX11)
+        SSManager.SetMipLODBias(*value);
 #endif
     }
 
@@ -486,7 +486,7 @@ public:
     virtual void Execute(LPCSTR /*args*/)
     {
         // TODO: OGL: Implement memory usage statistics.
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
         u32 m_base = 0;
         u32 c_base = 0;
         u32 m_lmaps = 0;
@@ -520,7 +520,7 @@ public:
 
         Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + rt_video,
             textures_managed + vb_managed + ib_managed + rt_managed, vb_system + ib_system + rt_system);
-#endif // USE_OGL
+#endif // !USE_OGL
     }
 };
 

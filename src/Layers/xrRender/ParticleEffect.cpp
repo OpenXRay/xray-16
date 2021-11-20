@@ -32,23 +32,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
 {
     Fmatrix mTexgen;
 
-#ifdef USE_OGL
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-#elif !defined(USE_DX9)
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-#else // USE_DX9
+#if defined(USE_DX9)// USE_DX9
     float _w = float(RDEVICE.dwWidth);
     float _h = float(RDEVICE.dwHeight);
     float o_w = (.5f / _w);
@@ -60,6 +44,24 @@ static void ApplyTexgen(const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
     };
+#elif defined(USE_DX11)
+    Fmatrix mTexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
+#elif defined(USE_OGL)
+    Fmatrix mTexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
+#else
+#error No graphics API selected or enabled!
 #endif
 
     mTexgen.mul(mTexelAdjust, mVP);

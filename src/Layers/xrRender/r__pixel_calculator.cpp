@@ -3,7 +3,7 @@
 #include "r__pixel_calculator.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
-#if !defined(USE_OGL) // XXX: support pixel calculator on OpenGL
+#if defined(USE_DX9) || defined(USE_DX11)// XXX: support pixel calculator on OpenGL
 #   include <DirectXMath.h>
 #endif
 
@@ -17,7 +17,7 @@ void r_pixel_calculator::begin()
     RCache.set_RT(rt->pRT);
 #ifdef USE_DX11
     RCache.set_ZB(zb->pZRT);
-#else
+#elif defined(USE_DX9) || defined(USE_OGL)
     RCache.set_ZB(zb->pRT);
 #endif
 
@@ -41,10 +41,7 @@ static Fvector cmDir [6] = { { 1.f, 0.f, 0.f }, {-1.f, 0.f, 0.f }, { 0.f, 1.f,  
 
 r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 {
-#ifdef USE_OGL
-    VERIFY(!"Not implemented!");
-    return {};
-#else
+#if defined(USE_DX9) || defined(USE_DX11)
     using namespace DirectX;
 
     r_aabb_ssa result = {0};
@@ -91,6 +88,11 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
     }
 
     return result;
+#elif defined(USE_OGL)
+    VERIFY(!"Not implemented!");
+    return {};
+#else
+#error No graphics API selected or enabled!
 #endif
 }
 

@@ -10,26 +10,7 @@
 // TODO: DX10: Implement equivalent for SimulatorStates::record for DX10
 void SimulatorStates::record(ID3DState*& state)
 {
-#ifdef USE_OGL
-    state = ID3DState::Create();
-    for (SimulatorStates::State& S : States)
-    {
-        // Update aniso value
-        if (S.type == 2 && S.v2 == D3DSAMP_MAXANISOTROPY)
-            S.v3 = ps_r__tf_Anisotropic;
-
-        // Update states
-        switch (S.type)
-        {
-        case 0:	state->UpdateRenderState(S.v1, S.v2); break;
-        //case 1: VERIFY(!"Texture environment not supported"); break;
-        case 2: state->UpdateSamplerState(S.v1, S.v2, S.v3); break;
-        }
-    }
-#elif !defined(USE_DX9)
-    // VERIFY(!"SimulatorStates::record not implemented!");
-    state = ID3DState::Create(*this);
-#else
+#if defined(USE_DX9)
     CHK_DX(HW.pDevice->BeginStateBlock());
     for (u32 it = 0; it < States.size(); it++)
     {
@@ -47,6 +28,27 @@ void SimulatorStates::record(ID3DState*& state)
         }
     }
     CHK_DX(HW.pDevice->EndStateBlock(&state));
+#elif defined(USE_DX11)
+    // VERIFY(!"SimulatorStates::record not implemented!");
+    state = ID3DState::Create(*this);
+#elif defined(USE_OGL)
+    state = ID3DState::Create();
+    for (SimulatorStates::State& S : States)
+    {
+        // Update aniso value
+        if (S.type == 2 && S.v2 == D3DSAMP_MAXANISOTROPY)
+            S.v3 = ps_r__tf_Anisotropic;
+
+        // Update states
+        switch (S.type)
+        {
+        case 0:	state->UpdateRenderState(S.v1, S.v2); break;
+        //case 1: VERIFY(!"Texture environment not supported"); break;
+        case 2: state->UpdateSamplerState(S.v1, S.v2, S.v3); break;
+        }
+    }
+#else
+#error No graphics API selected or enabled!
 #endif
 }
 
@@ -118,7 +120,7 @@ BOOL SimulatorStates::equal(SimulatorStates& S)
 
 void SimulatorStates::clear() { States.clear(); }
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 #include "Layers/xrRenderDX10/dx10StateUtils.h"
 
 void SimulatorStates::UpdateState(dx10State& state) const

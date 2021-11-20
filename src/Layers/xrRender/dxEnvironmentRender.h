@@ -14,7 +14,20 @@ public:
     virtual void Compile(CBlender_Compile& C)
     {
         C.r_Pass("sky2", "sky2", FALSE, TRUE, FALSE);
-#ifdef USE_OGL
+#if defined(USE_DX9)
+        C.r_Sampler_clf("s_sky0", "$null");
+        C.r_Sampler_clf("s_sky1", "$null");
+        C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
+#elif defined(USE_DX11)
+        // C.r_Sampler_clf		("s_sky0",		"$null"			);
+        // C.r_Sampler_clf		("s_sky1",		"$null"			);
+        C.r_dx10Texture("s_sky0", "$null");
+        C.r_dx10Texture("s_sky1", "$null");
+        C.r_dx10Sampler("smp_rtlinear");
+        // C.r_Sampler_rtf		("s_tonemap",	"$user$tonemap"	);	//. hack
+        C.r_dx10Texture("s_tonemap", "$user$tonemap"); //. hack
+        C.PassSET_ZB(FALSE, FALSE);
+#elif defined(USE_OGL)
         if (HW.Caps.geometry.bVTF)
         {
             C.r_Sampler_clf("s_sky0", "$null");
@@ -28,19 +41,8 @@ public:
             C.r_Sampler_rtf("s_tonemap", r2_RT_luminance_cur);
         }
         C.PassSET_ZB(FALSE, FALSE);
-#elif !defined(USE_DX9)
-        // C.r_Sampler_clf		("s_sky0",		"$null"			);
-        // C.r_Sampler_clf		("s_sky1",		"$null"			);
-        C.r_dx10Texture("s_sky0", "$null");
-        C.r_dx10Texture("s_sky1", "$null");
-        C.r_dx10Sampler("smp_rtlinear");
-        // C.r_Sampler_rtf		("s_tonemap",	"$user$tonemap"	);	//. hack
-        C.r_dx10Texture("s_tonemap", "$user$tonemap"); //. hack
-        C.PassSET_ZB(FALSE, FALSE);
-#else // USE_DX9
-        C.r_Sampler_clf("s_sky0", "$null");
-        C.r_Sampler_clf("s_sky1", "$null");
-        C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
+#else
+#error No graphics API selected or enabled!
 #endif
         C.r_End();
     }

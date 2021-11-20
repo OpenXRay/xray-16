@@ -3,55 +3,38 @@
 #pragma once
 
 //	Interface
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+IC HRESULT CreateQuery(ID3DQuery** ppQuery);
+IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize);
+IC HRESULT BeginQuery(ID3DQuery* pQuery);
+IC HRESULT EndQuery(ID3DQuery* pQuery);
+IC HRESULT ReleaseQuery(ID3DQuery *pQuery);
+#elif defined(USE_OGL)
 IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type);
 IC HRESULT GetData(GLuint query, void* pData, u32 DataSize);
 IC HRESULT BeginQuery(GLuint query);
 IC HRESULT EndQuery(GLuint query);
 IC HRESULT ReleaseQuery(GLuint pQuery);
 #else
-IC HRESULT CreateQuery(ID3DQuery** ppQuery);
-IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize);
-IC HRESULT BeginQuery(ID3DQuery* pQuery);
-IC HRESULT EndQuery(ID3DQuery* pQuery);
-IC HRESULT ReleaseQuery(ID3DQuery *pQuery);
+#error No graphics API selected or enabled!
 #endif
 
 //	Implementation
 
-#if defined(USE_OGL)
+#if defined(USE_DX9) // USE_DX9
 
-IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type)
+IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type) { return HW.pDevice->CreateQuery(type, ppQuery); }
+IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
 {
-    R_ASSERT(type == D3D_QUERY_OCCLUSION);
-    glGenQueries(1, pQuery);
-    return S_OK;
+    return pQuery->GetData(pData, DataSize, D3DGETDATA_FLUSH);
 }
 
-IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
-{
-    if (DataSize == sizeof(GLint64))
-        CHK_GL(glGetQueryObjecti64v(query, GL_QUERY_RESULT, (GLint64*)pData));
-    else
-        CHK_GL(glGetQueryObjectiv(query, GL_QUERY_RESULT, (GLint*)pData));
-    return S_OK;
-}
+IC HRESULT BeginQuery(ID3DQuery* pQuery) { return pQuery->Issue(D3DISSUE_BEGIN); }
+IC HRESULT EndQuery(ID3DQuery* pQuery) { return pQuery->Issue(D3DISSUE_END); }
 
-IC HRESULT BeginQuery(GLuint query)
+IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
 {
-    CHK_GL(glBeginQuery(GL_SAMPLES_PASSED, query));
-    return S_OK;
-}
-
-IC HRESULT EndQuery(GLuint query)
-{
-    CHK_GL(glEndQuery(GL_SAMPLES_PASSED));
-    return S_OK;
-}
-
-IC HRESULT ReleaseQuery(GLuint query)
-{
-    CHK_GL(glDeleteQueries(1, &query));
+    _RELEASE(pQuery);
     return S_OK;
 }
 
@@ -89,23 +72,44 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
     return S_OK;
 }
 
-#else // USE_DX9
+#elif defined(USE_OGL)
 
-IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type) { return HW.pDevice->CreateQuery(type, ppQuery); }
-IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
+IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type)
 {
-    return pQuery->GetData(pData, DataSize, D3DGETDATA_FLUSH);
-}
-
-IC HRESULT BeginQuery(ID3DQuery* pQuery) { return pQuery->Issue(D3DISSUE_BEGIN); }
-IC HRESULT EndQuery(ID3DQuery* pQuery) { return pQuery->Issue(D3DISSUE_END); }
-
-IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
-{
-    _RELEASE(pQuery);
+    R_ASSERT(type == D3D_QUERY_OCCLUSION);
+    glGenQueries(1, pQuery);
     return S_OK;
 }
 
+IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
+{
+    if (DataSize == sizeof(GLint64))
+        CHK_GL(glGetQueryObjecti64v(query, GL_QUERY_RESULT, (GLint64*)pData));
+    else
+        CHK_GL(glGetQueryObjectiv(query, GL_QUERY_RESULT, (GLint*)pData));
+    return S_OK;
+}
+
+IC HRESULT BeginQuery(GLuint query)
+{
+    CHK_GL(glBeginQuery(GL_SAMPLES_PASSED, query));
+    return S_OK;
+}
+
+IC HRESULT EndQuery(GLuint query)
+{
+    CHK_GL(glEndQuery(GL_SAMPLES_PASSED));
+    return S_OK;
+}
+
+IC HRESULT ReleaseQuery(GLuint query)
+{
+    CHK_GL(glDeleteQueries(1, &query));
+    return S_OK;
+}
+
+#else
+#error No graphics API selected or enabled!
 #endif
 
 #endif // QueryHelper_included

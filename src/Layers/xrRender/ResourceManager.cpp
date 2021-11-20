@@ -346,13 +346,17 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
                 }
             }
         }
-#else // USE_DX9
+#elif defined(USE_DX9) || defined(USE_OGL)// USE_DX9 
+//original comment specifies DX9, but code was also used while OGL was set due to blanket else condition for USE_DX11 being set.
+
 #ifndef _EDITOR
         if (_lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
         else
 #endif
             return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
+#else
+#error No graphics API selected or enabled!
 #endif
     }
     return nullptr;
@@ -372,11 +376,13 @@ void CResourceManager::DeferredUpload()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
-#else
+#elif defined(USE_OGL)
     for (auto& texture : m_textures)
         texture.second->Load();
+#else
+#error No graphics API selected or enabled!
 #endif
 }
 
@@ -385,11 +391,13 @@ void CResourceManager::DeferredUnload()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
-#else
+#elif defined(USE_OGL)
     for (auto& texture : m_textures)
         texture.second->Unload();
+#else
+#error No graphics API selected or enabled!
 #endif
 }
 

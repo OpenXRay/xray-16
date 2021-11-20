@@ -115,7 +115,9 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
             {
                 RCache.set_VS(vs_it->first);
 
-#ifndef USE_DX9
+#if defined(USE_DX9)
+                    mapNormalPS& ps = vs_it->second;
+#elif defined(USE_DX11) || defined(USE_OGL)
                 //	GS setup
                 mapNormalGS& gs = vs_it->second;
                 gs.ssa = 0;
@@ -128,7 +130,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                     mapNormalPS& ps = gs_it->second;
 #else
-                    mapNormalPS& ps = vs_it->second;
+#error No graphics API selected or enabled!
 #endif
                     ps.ssa = 0;
 
@@ -142,8 +144,10 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                         RCache.set_DS(ps_it->second.ds);
 
                         mapNormalCS& cs = ps_it->second.mapCS;
-#else
+#elif defined(USE_DX9) || defined(USE_OGL)
                         mapNormalCS& cs = ps_it->second;
+#else
+#error No graphics API selected or enabled!
 #endif
                         cs.ssa = 0;
 
@@ -200,7 +204,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                     }
                     nrmPS.clear();
                     ps.clear();
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
                 }
                 nrmGS.clear();
                 gs.clear();
@@ -225,7 +229,9 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         {
             RCache.set_VS(vs_id->first);
 
-#ifndef USE_DX9
+#if defined(USE_DX9)
+                mapMatrixPS& ps = vs_id->second;
+#elif defined(USE_DX11) || defined(USE_OGL)
             mapMatrixGS& gs = vs_id->second;
             gs.ssa = 0;
 
@@ -237,7 +243,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                 mapMatrixPS& ps = gs_it->second;
 #else
-                mapMatrixPS& ps = vs_id->second;
+#error No graphics API selected or enabled!
 #endif
                 ps.ssa = 0;
 
@@ -251,8 +257,10 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                     RCache.set_DS(ps_it->second.ds);
 
                     mapMatrixCS& cs = ps_it->second.mapCS;
-#else
+#elif defined(USE_DX9) || defined(USE_OGL)
                     mapMatrixCS& cs = ps_it->second;
+#else
+#error No graphics API selected or enabled!
 #endif
                     cs.ssa = 0;
 
@@ -313,7 +321,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                 }
                 matPS.clear();
                 ps.clear();
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
             }
             matGS.clear();
             gs.clear();

@@ -18,7 +18,7 @@ void dxDebugRender::Render()
         return;
 
     RCache.set_xform_world(Fidentity);
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     RCache.set_Shader(RImplementation.m_WireShader);
     const u32 color = m_line_vertices[0].color;
     RCache.set_c("tfactor", float(color_get_R(color)) / 255.f, float(color_get_G(color)) / 255.f, \
@@ -97,12 +97,14 @@ void dxDebugRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_worl
 void dxDebugRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
 void dxDebugRender::SetAmbient(u32 colour)
 {
-#ifndef USE_DX9
+#if defined(USE_DX9)
+    CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
+#elif defined(USE_DX11) || defined(USE_OGL)
     //	TODO: DX10: Check if need this for DX10
     VERIFY(!"Not implemented for DX10");
     UNUSED(colour);
 #else
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
+#error No graphics API selected or enabled!
 #endif
 }
 
