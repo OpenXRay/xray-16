@@ -161,7 +161,6 @@ void CRenderTarget::accum_reflected(light* L)
                 StateManager.SetSampleMask(0xffffffff);
 #   elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
-
 #   endif // USE_DX11
             }
 #   if defined(USE_DX9) || defined(USE_DX11) // XXX: not sure why this is needed. Just preserving original behaviour
