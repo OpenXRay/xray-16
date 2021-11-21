@@ -163,7 +163,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
             const u32 smp_location_sky = CTexture::rstVertex + 1 /* m_WVP */;
             const u32 smp_location_clouds = CTexture::rstVertex + 1 /* m_WVP */;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
             mixRen.sky_r_textures.push_back(std::make_pair(smp_location_sky, tonemap)); //. hack
             mixRen.clouds_r_textures.push_back(std::make_pair(smp_location_clouds, tonemap)); //. hack
@@ -264,7 +264,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     if (HW.Caps.geometry.bVTF)
         RCache.set_Textures(&mixRen.sky_r_textures);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
@@ -364,7 +364,7 @@ void dxEnvironmentRender::OnDeviceDestroy()
     tclouds0->surface_set(GL_TEXTURE_2D, 0);
     tclouds1->surface_set(GL_TEXTURE_2D, 0);
 #else
-#	error No graphics API slected or defined!
+#    error No graphics API slected or defined!
 #endif
 
     sh_2sky.destroy();

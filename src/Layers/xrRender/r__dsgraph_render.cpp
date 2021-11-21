@@ -130,7 +130,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                     mapNormalPS& ps = gs_it->second;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
                     ps.ssa = 0;
 
@@ -147,7 +147,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #elif defined(USE_DX9) || defined(USE_OGL)
                         mapNormalCS& cs = ps_it->second;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
                         cs.ssa = 0;
 
@@ -243,7 +243,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                 mapMatrixPS& ps = gs_it->second;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
                 ps.ssa = 0;
 
@@ -260,7 +260,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #elif defined(USE_DX9) || defined(USE_OGL)
                     mapMatrixCS& cs = ps_it->second;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
                     cs.ssa = 0;
 

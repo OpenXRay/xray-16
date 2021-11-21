@@ -25,7 +25,7 @@ void D3DXRenderBase::setGamma(float fGamma)
 #elif defined(USE_OGL)
     UNUSED(fGamma);
 #else
-#	error No graphics API selected or in use!
+#    error No graphics API selected or in use!
 #endif
 }
 
@@ -36,7 +36,7 @@ void D3DXRenderBase::setBrightness(float fGamma)
 #elif defined(USE_OGL)
     UNUSED(fGamma);
 #else
-#	error No graphics API selected or in use!
+#    error No graphics API selected or in use!
 #endif
 }
 
@@ -47,7 +47,7 @@ void D3DXRenderBase::setContrast(float fGamma)
 #elif defined(USE_OGL)
     UNUSED(fGamma);
 #else
-#	error No graphics API selected or in use!
+#    error No graphics API selected or in use!
 #endif
 }
 

@@ -104,7 +104,7 @@ void dxDebugRender::SetAmbient(u32 colour)
     VERIFY(!"Not implemented for DX10");
     UNUSED(colour);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }
 

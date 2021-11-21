@@ -356,7 +356,7 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
 #endif
             return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     }
     return nullptr;
@@ -382,7 +382,7 @@ void CResourceManager::DeferredUpload()
     for (auto& texture : m_textures)
         texture.second->Load();
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }
 
@@ -397,7 +397,7 @@ void CResourceManager::DeferredUnload()
     for (auto& texture : m_textures)
         texture.second->Unload();
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }
 

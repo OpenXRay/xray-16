@@ -40,7 +40,7 @@ private:
 #elif defined(USE_DX9) || defined(USE_OGL)
     void GenLUT(D3DGAMMARAMP& G);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 };
 

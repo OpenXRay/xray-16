@@ -33,7 +33,7 @@ struct ECORE_API SVS : public xr_resource_named
 #elif defined(USE_OGL)
     GLuint sh;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     R_constant_table constants;
 #if defined(USE_DX11)
@@ -53,7 +53,7 @@ struct ECORE_API SPS : public xr_resource_named
 #elif defined(USE_OGL)
     GLuint sh;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     R_constant_table constants;
     ~SPS();
@@ -139,7 +139,7 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
     u32 FVF;
     GLuint dcl;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
     //	Use this for DirectX10 to cache DX9 declaration for comparison purpose only

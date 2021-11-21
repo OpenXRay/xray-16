@@ -49,7 +49,7 @@ SVS::~SVS()
 #elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }
 
@@ -62,7 +62,7 @@ SPS::~SPS()
 #elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     
     RImplementation.Resources->_DeletePS(this);
@@ -73,49 +73,49 @@ SPS::~SPS()
 // SGS
 SGS::~SGS()
 {
-#if defined(USE_DX11)
+#    if defined(USE_DX11)
 	_RELEASE(sh);
-#elif defined(USE_OGL)
+#    elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#endif
+#    endif
 
     RImplementation.Resources->_DeleteGS(this);
 }
 
-#if defined(USE_DX11)
+#    if defined(USE_DX11)
 SHS::~SHS()
 {
-#if defined(USE_DX11)
+#    if defined(USE_DX11)
 	_RELEASE(sh);
-#elif defined(USE_OGL)
+#    elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#endif
+#    endif
 
     RImplementation.Resources->_DeleteHS(this);
 }
 
 SDS::~SDS()
 {
-#if defined(USE_DX11)
+#    if defined(USE_DX11)
 	_RELEASE(sh);
-#elif defined(USE_OGL)
+#    elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#endif
+#    endif
 
     RImplementation.Resources->_DeleteDS(this);
 }
 
 SCS::~SCS()
 {
-#if defined(USE_DX11)
+#    if defined(USE_DX11)
 	_RELEASE(sh);
-#elif defined(USE_OGL)
+#    elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
-#endif
+#    endif
 
     RImplementation.Resources->_DeleteCS(this);
 }
-#endif
+#    endif
 #endif // USE_DX11 or USE_OGL
 
 #if defined(USE_DX11)
@@ -162,6 +162,6 @@ SDeclaration::~SDeclaration()
 #elif defined(USE_DX9)// USE_DX9
     _RELEASE(dcl);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }

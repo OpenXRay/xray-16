@@ -23,7 +23,7 @@ private:
 #elif defined(USE_OGL)
         GLuint Q;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     };
 
@@ -39,7 +39,7 @@ public:
 #elif defined(USE_DX9) || defined(USE_OGL)
     typedef u32 occq_result;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 public:
     R_occlusion();

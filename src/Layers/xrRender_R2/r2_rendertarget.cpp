@@ -32,7 +32,7 @@ void CRenderTarget::u_stencil_optimize(BOOL common_stencil)
 #elif defined(USE_DX11) || defined(USE_OGL)
 void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 {
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -94,7 +94,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
     UNUSED(eSOM);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }
 
@@ -115,7 +115,7 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 #elif defined(USE_OGL)
         0.0f, 0.5f, 0.0f, 0.0f,
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         0.0f, 0.0f, 1.0f, 0.0f,
 #ifdef USE_DX9
@@ -123,7 +123,7 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 #elif defined(USE_DX11) || defined(USE_OGL)
         0.5f, 0.5f, 0.0f, 1.0f
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     };
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
@@ -141,7 +141,7 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
 #elif defined(USE_OGL)
         0.0f, 0.5f, 0.0f, 0.0f,
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
@@ -482,7 +482,7 @@ CRenderTarget::CRenderTarget()
 #elif defined(USE_DX11) || defined(USE_OGL)
             s_accum_direct_volumetric.create("accum_volumetric_sun_nomsaa");
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
             manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
@@ -632,7 +632,7 @@ CRenderTarget::CRenderTarget()
             CBlender_bloom_build_msaa b_bloom_msaa;
             s_bloom_msaa.create(&b_bloom_msaa, "r2" DELIMITER "bloom");
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         }
         f_bloom_factor = 0.5f;
@@ -674,7 +674,7 @@ CRenderTarget::CRenderTarget()
 #elif defined(USE_DX11) || defined(USE_OGL)
     const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra && ps_r_ssao > 3;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     if (ssao_blur_on || ssao_hdao_ultra)
     {
@@ -753,7 +753,7 @@ CRenderTarget::CRenderTarget()
             D3DDECL_END()
         };
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         CBlender_combine b_combine;
         s_combine.create(&b_combine, "r2" DELIMITER "combine");
@@ -769,7 +769,7 @@ CRenderTarget::CRenderTarget()
 #elif defined(USE_DX11) || defined(USE_OGL)
         g_combine_cuboid.create(dwDecl, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         u32 fvf_aa_blur = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
@@ -801,7 +801,7 @@ CRenderTarget::CRenderTarget()
         CBlender_postprocess_msaa b_postprocess_msaa;
         s_postprocess_msaa.create(&b_postprocess_msaa, "r2" DELIMITER "post");
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     }
 
@@ -902,7 +902,7 @@ CRenderTarget::~CRenderTarget()
     t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &t_noise_surf_mipped);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     //
     accum_spot_geom_destroy();
@@ -983,7 +983,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Element(s_occq->E[2]);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         RCache.set_Geometry(g_combine);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);

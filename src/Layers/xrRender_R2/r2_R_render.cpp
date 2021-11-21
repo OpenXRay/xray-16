@@ -202,7 +202,7 @@ void CRender::render_menu()
     pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
     pv++;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     RCache.Vertex.Unlock(4, Target->g_menu->vb_stride);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);

@@ -35,11 +35,11 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
 #if defined(USE_DX11) || defined(USE_OGL)
     SGS* gs = RImplementation.Resources->_CreateGS("null");
     dest.gs = gs;
-#ifdef USE_DX11
+#    ifdef USE_DX11
     dest.hs = RImplementation.Resources->_CreateHS("null");
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
-#endif
+#    endif
 #endif // !USE_DX9
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);
@@ -140,7 +140,7 @@ u32 CBlender_Compile::r_Sampler(
 #elif defined(USE_DX9) || defined(USE_OGL)
         i_Texture(dwStage, texture);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
         // force ANISO-TF for "s_base"

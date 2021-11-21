@@ -95,7 +95,7 @@ class cl_texgen : public R_constant_setup
             0.5f, 0.5f, 0.0f, 1.0f
         };
 #else
-#	error No graphics API selected or in use!
+#    error No graphics API selected or in use!
 #endif
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_wvp);
@@ -139,7 +139,7 @@ class cl_VPtexgen : public R_constant_setup
             0.5f, 0.5f, 0.0f, 1.0f
         };
 #else
-#	error No graphics API selected or in use!
+#    error No graphics API selected or in use!
 #endif
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_vp);

@@ -89,7 +89,7 @@ static class cl_pos_decompress_params : public R_constant_setup
         const float VertTan = tanf(deg2rad(Device.fFOV / 2.0f));
         const float HorzTan = VertTan / Device.fASPECT;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         RCache.set_c(
             C, HorzTan, VertTan, (2.0f * HorzTan) / (float)Device.dwWidth, (2.0f * VertTan) / (float)Device.dwHeight);
@@ -238,7 +238,7 @@ void CRender::create()
 #elif defined(USE_DX11) || defined(USE_OGL)
     o.nullrt = false;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     /*
     if (o.nullrt)		{
@@ -309,7 +309,7 @@ void CRender::create()
 #elif defined(USE_DX11) || defined(USE_OGL)
     o.HW_smap = true;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     o.HW_smap_PCF = o.HW_smap;
     if (o.HW_smap)
@@ -348,7 +348,7 @@ void CRender::create()
     o.fp16_filter = true;
     o.fp16_blend = true;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
     // emulate ATI-R4xx series
@@ -393,7 +393,7 @@ void CRender::create()
 #elif defined(USE_DX11) || defined(USE_OGL)
     o.nvdbt = false;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
@@ -469,7 +469,7 @@ void CRender::create()
     o.ssao_hbao = false;
     o.ssao_hdao = false;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
 #ifdef USE_DX9

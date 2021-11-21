@@ -16,7 +16,7 @@ IC HRESULT BeginQuery(GLuint query);
 IC HRESULT EndQuery(GLuint query);
 IC HRESULT ReleaseQuery(GLuint pQuery);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
 //	Implementation
@@ -109,7 +109,7 @@ IC HRESULT ReleaseQuery(GLuint query)
 }
 
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
 #endif // QueryHelper_included

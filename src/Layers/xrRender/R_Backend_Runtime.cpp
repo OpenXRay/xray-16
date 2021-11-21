@@ -189,7 +189,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
     UNUSED(count);
     return;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif //USE_DX9
 }
 
@@ -207,7 +207,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
         return;
     }
@@ -409,7 +409,7 @@ void CBackend::set_Textures(STextureList* _T)
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     }
     // clear remaining stages (VS)
@@ -434,7 +434,7 @@ void CBackend::set_Textures(STextureList* _T)
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
     }
 
@@ -541,6 +541,6 @@ void CBackend::SetupStates()
 #elif defined(USE_OGL)
     // TODO: OGL: Implement SetupStates().
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }

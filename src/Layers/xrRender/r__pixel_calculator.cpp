@@ -92,7 +92,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
     VERIFY(!"Not implemented!");
     return {};
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 }
 

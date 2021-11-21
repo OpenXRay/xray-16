@@ -154,7 +154,7 @@ struct ShaderTypeTraits<SVS>
         else
             res = GLCompileShader<GL_VERTEX_SHADER>(buffer, size, name);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
         return res;
@@ -518,7 +518,7 @@ struct ShaderTypeTraits<SCS>
         else
             res = GLCompileShader<GL_COMPUTE_SHADER>(buffer, size, name);
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif
 
         return res;

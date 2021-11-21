@@ -103,7 +103,7 @@ void CRenderTarget::phase_luminance()
         pv->uv3.set(b_3.x, b_3.y);
         pv++;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif // USE_OGL
         RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
         RCache.set_Element(s_luminance->E[0]);
@@ -163,7 +163,7 @@ void CRenderTarget::phase_luminance()
             pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x); // xy/yx	- right+down
         pv++;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif // !USE_OGL
         RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
         RCache.set_Element(s_luminance->E[1]);
@@ -224,7 +224,7 @@ void CRenderTarget::phase_luminance()
             pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x); // xy/yx	- right+down
         pv++;
 #else
-#	error No graphics API selected or enabled!
+#    error No graphics API selected or enabled!
 #endif // !USE_OGL
         RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
