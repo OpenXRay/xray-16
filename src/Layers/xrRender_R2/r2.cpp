@@ -547,7 +547,7 @@ void CRender::create()
     o.dx10_minmax_sm = ps_r3_minmax_sm;
     o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     o.dx11_enable_tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 #endif
