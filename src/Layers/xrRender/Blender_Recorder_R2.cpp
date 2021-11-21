@@ -140,7 +140,7 @@ u32 CBlender_Compile::r_Sampler(
 #elif defined(USE_DX9) || defined(USE_OGL)
         i_Texture(dwStage, texture);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
         // force ANISO-TF for "s_base"

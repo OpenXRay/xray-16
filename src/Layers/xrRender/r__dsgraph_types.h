@@ -59,7 +59,7 @@ using vs_type = GLuint;
 using ps_type = GLuint;
 using gs_type = GLuint;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 // NORMAL
@@ -103,7 +103,7 @@ struct mapNormalPS : public xr_fixed_map<ps_type, mapNormalCS>
     float ssa;
 };
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif // !USE_DX9 && !USE_OGL
 
 
@@ -117,7 +117,7 @@ struct mapNormalGS : public xr_fixed_map<gs_type, mapNormalPS>
 
 struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalGS> {};
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif // !USE_DX9
 
 using mapNormal_T = mapNormalVS;
@@ -164,7 +164,7 @@ struct mapMatrixPS : public xr_fixed_map<ps_type, mapMatrixCS>
     float ssa;
 };
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif // !USE_DX9 && !USE_OGL
 
 
@@ -178,7 +178,7 @@ struct mapMatrixGS : public xr_fixed_map<gs_type, mapMatrixPS>
 
 struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixGS> {};
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 using mapMatrix_T = mapMatrixVS;

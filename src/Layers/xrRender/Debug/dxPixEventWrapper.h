@@ -22,6 +22,6 @@ public:
     ~dxPixEventWrapper() { HW.EndPixEvent(); }
 };
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif // USE_OGL
 #endif // MASTER_GOLD

@@ -61,7 +61,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
         0.5f, 0.5f, 0.0f, 1.0f
     };
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     mTexgen.mul(mTexelAdjust, mVP);

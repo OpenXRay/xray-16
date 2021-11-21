@@ -9,7 +9,7 @@
 #elif defined(USE_OGL) //the compiler should know to dedup this, defined explicitly for organization
 #   define FVF_COLOR(c) (c)
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 //-----------------------------------------------------------------------------

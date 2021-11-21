@@ -48,7 +48,7 @@ void CRenderTarget::accum_reflected(light* L)
             0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
         };
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
         m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
     }

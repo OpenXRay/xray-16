@@ -49,7 +49,7 @@ SVS::~SVS()
 #elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 
@@ -62,7 +62,7 @@ SPS::~SPS()
 #elif defined(USE_OGL)
     CHK_GL(glDeleteProgram(sh));
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
     
     RImplementation.Resources->_DeletePS(this);
@@ -162,6 +162,6 @@ SDeclaration::~SDeclaration()
 #elif defined(USE_DX9)// USE_DX9
     _RELEASE(dcl);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }

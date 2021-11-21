@@ -106,7 +106,7 @@ private:
     GLuint pRT[4];
     GLuint pZB;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     // Vertices/Indices/etc
@@ -136,7 +136,7 @@ private:
     ID3D11DomainShader* ds;
     ID3D11ComputeShader* cs;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 #ifdef DEBUG
@@ -185,7 +185,7 @@ private:
 #elif defined(USE_OGL)
     CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
 //#else
-//#error No graphics API selected or enabled! //no error, just means DX9 is in use!
+//#	error No graphics API selected or enabled! //no error, just means DX9 is in use!
 #endif
 
 #ifdef _EDITOR
@@ -273,7 +273,7 @@ public:
     IC GLuint get_RT(u32 ID = 0);
     IC GLuint get_ZB();
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -293,7 +293,7 @@ public:
     IC bool ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects);
     IC bool ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     ICF void ClearRT(ref_rt& rt, const Fcolor& color) { ClearRT(rt->pRT, color); }
@@ -317,7 +317,7 @@ public:
         return ClearZBRect(zb->pRT, depth, numRects, rects);
     }
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     IC void set_Constants(R_constant_table* C);
@@ -347,7 +347,7 @@ public:
 #elif defined(USE_OGL)
     ICF void set_PS(GLuint _ps, LPCSTR _n = 0);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     ICF void set_PS(ref_ps& _ps) { set_PS(_ps->sh, _ps->cName.c_str()); }
@@ -377,7 +377,7 @@ public:
 #elif defined(USE_OGL)
     ICF bool is_TessEnabled() { return false; }
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     ICF void set_VS(ref_vs& _vs);
@@ -393,7 +393,7 @@ protected: //	In DX11+ we need input shader signature which is stored in ref_vs
 #elif defined(USE_OGL)
     ICF void set_VS(GLuint _vs, LPCSTR _n = 0);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX11)

@@ -42,7 +42,7 @@ public:
         }
         C.PassSET_ZB(FALSE, FALSE);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
         C.r_End();
     }

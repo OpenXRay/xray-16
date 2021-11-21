@@ -66,7 +66,7 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(T, 0, vcnt, pcnt, pIdx, D3DFMT_INDEX16, pVerts, sizeof(FVF::L)));
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
@@ -92,7 +92,7 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawPrimitiveUP(T, pcnt, pVerts, sizeof(FVF::L)));
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 
@@ -261,7 +261,7 @@ void CBackend::dbg_OverdrawEnd()
 #elif defined(USE_DX11) || defined(USE_OGL)
     set_Geometry(vs_TL);
 #else
-#error No graphics API defined or enabled!
+#	error No graphics API defined or enabled!
 #endif
 
     // Render gradients
@@ -290,7 +290,7 @@ void CBackend::dbg_OverdrawEnd()
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
         Render(D3DPT_TRIANGLESTRIP, vBase, 4);
 #else
-#error No graphics API defined or enabled!
+#	error No graphics API defined or enabled!
 #endif
     }
     set_Stencil(FALSE);
@@ -303,7 +303,7 @@ void CBackend::dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)
 #elif defined(USE_DX11) || defined(USE_OGL)
     VERIFY(!"Not implemented");
 #else
-#error No graphics API defined or enabled!
+#	error No graphics API defined or enabled!
 #endif
 }
 
@@ -314,6 +314,6 @@ void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
 #elif defined(USE_DX11) || defined(USE_OGL)
     VERIFY(!"Not implemented");
 #else
-#error No graphics API defined or enabled!
+#	error No graphics API defined or enabled!
 #endif
 }

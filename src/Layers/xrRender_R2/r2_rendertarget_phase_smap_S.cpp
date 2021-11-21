@@ -81,7 +81,7 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
         pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
         pv++;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif // !USE_OGL
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);

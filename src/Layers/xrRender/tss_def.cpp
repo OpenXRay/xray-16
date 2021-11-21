@@ -48,7 +48,7 @@ void SimulatorStates::record(ID3DState*& state)
         }
     }
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 

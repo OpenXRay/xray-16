@@ -43,7 +43,7 @@ public:
 #	endif
     };
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -70,7 +70,7 @@ public:
         rstGeometry = rstVertex + mtMaxVertexShaderTextures,
     };
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 public:
@@ -93,7 +93,7 @@ public:
     void surface_set(GLenum target, GLuint surf);
     GLuint surface_get();
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     BOOL isUser() { return flags.bUser; }
@@ -187,7 +187,7 @@ private:
     GLuint desc_cache;
     GLenum desc;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX11)

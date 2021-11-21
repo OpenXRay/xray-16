@@ -38,7 +38,7 @@ public:
     GLuint pZRT;
     GLenum target;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     ref_texture pTexture;

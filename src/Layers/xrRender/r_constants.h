@@ -82,7 +82,7 @@ struct ECORE_API R_constant_load
 
     R_constant_load() : index(u16(-1)), cls(u16(-1)), location(0), program(0) {};
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     BOOL equal(R_constant_load& C)
@@ -92,7 +92,7 @@ struct ECORE_API R_constant_load
 #elif defined(USE_OGL)
         return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif // USE_OGL
     }
 };

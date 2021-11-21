@@ -194,7 +194,7 @@ public:
 #elif defined(USE_DX11) || defined(USE_OGL)
     void hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     // get unpacked slot

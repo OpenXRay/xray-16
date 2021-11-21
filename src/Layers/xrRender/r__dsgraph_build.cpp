@@ -137,7 +137,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 //this whole "block" may need to be refactored again for organization
@@ -149,7 +149,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
 #elif defined(USE_DX9) || defined(USE_OGL)
         auto& Ncs = Nps[pass.constants._get()];
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
         auto& Nstate = Ncs[&*pass.state];
         auto& Ntex = Nstate[pass.T._get()];
@@ -174,7 +174,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
                     {
                         Nps.ssa = SSA;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 #if defined(USE_DX11) || defined(USE_OGL)
                         if (SSA > Ngs.ssa)
@@ -290,7 +290,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX9)
@@ -303,7 +303,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 #elif defined(USE_OGL)
         auto& Ncs = Nps[pass.constants._get()];
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
         auto& Nstate = Ncs[&*pass.state];
         auto& Ntex = Nstate[pass.T._get()];
@@ -332,7 +332,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                     {
                         Nps.ssa = SSA;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX11) || defined(USE_OGL)

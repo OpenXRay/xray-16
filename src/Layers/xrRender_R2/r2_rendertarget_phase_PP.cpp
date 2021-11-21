@@ -165,7 +165,7 @@ void CRenderTarget::phase_pp()
     pv->set(du + float(_w), dv + float(_h), p_color, p_gray, r1.x, r1.y, l1.x, l1.y, n1.x, n1.y);
     pv++;
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif // !USE_OGL
     RCache.Vertex.Unlock(4, g_postprocess.stride());
 

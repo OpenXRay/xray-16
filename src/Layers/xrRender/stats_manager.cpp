@@ -52,7 +52,7 @@ void stats_manager::increment_stats_rtarget(ID3DTexture2D* buff)
     D3D_TEXTURE2D_DESC desc;
     buff->GetDesc(&desc);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     u32 size = desc.Height * desc.Width * get_format_pixel_size(desc.Format);
@@ -73,7 +73,7 @@ void stats_manager::increment_stats_vb(ID3DVertexBuffer* buff)
     buff->GetDesc(&desc);
     increment_stats(desc.ByteWidth, enum_stats_buffer_type_vertex, D3DPOOL_MANAGED, buff);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 
@@ -91,7 +91,7 @@ void stats_manager::increment_stats_ib(ID3DIndexBuffer* buff)
     buff->GetDesc(&desc);
     increment_stats(desc.ByteWidth, enum_stats_buffer_type_index, D3DPOOL_MANAGED, buff);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 
@@ -114,7 +114,7 @@ void stats_manager::decrement_stats_rtarget(ID3DTexture2D* buff)
     D3D_TEXTURE2D_DESC desc;
     buff->GetDesc(&desc);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 
     u32 size = desc.Height * desc.Width * get_format_pixel_size(desc.Format);
@@ -140,7 +140,7 @@ void stats_manager::decrement_stats_vb(ID3DVertexBuffer* buff)
     buff->GetDesc(&desc);
     decrement_stats(desc.ByteWidth, enum_stats_buffer_type_vertex, D3DPOOL_MANAGED, buff);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 
@@ -163,7 +163,7 @@ void stats_manager::decrement_stats_ib(ID3DIndexBuffer* buff)
     buff->GetDesc(&desc);
     decrement_stats(desc.ByteWidth, enum_stats_buffer_type_index, D3DPOOL_MANAGED, buff);
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
 }
 

@@ -299,7 +299,7 @@ public:
 #elif defined(USE_OGL)
         // OGL: don't set aniso here because it will be updated after vid restart
 #else
-#error No graphics API selected or enabled!
+#	error No graphics API selected or enabled!
 #endif
     }
     CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
