@@ -92,7 +92,7 @@ void CSoundRender_Core::i_create_all_sources()
         if (!S->load(id, false, false))
         {
             xr_delete(S);
-            return;
+            continue;
         }
 
         ScopeLock scope(&s_sources_lock);
