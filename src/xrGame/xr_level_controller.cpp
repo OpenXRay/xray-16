@@ -48,7 +48,9 @@ void remap_keys()
             kb.key_local_name = buff;
         else
         {
+#ifndef MASTER_GOLD
             Msg("! Can't find a key name for %s", kb.key_name);
+#endif
             if (kb.key_local_name.empty())
                 kb.key_local_name = kb.key_name;
         }
