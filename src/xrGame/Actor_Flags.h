@@ -13,6 +13,7 @@ enum
     AF_IMPORTANT_SAVE = (1 << 9),
     AF_CROUCH_TOGGLE = (1 << 10),
     AF_MULTI_ITEM_PICKUP = (1 << 11),
+    AF_LOADING_STAGES = (1 << 12),
 };
 
 extern Flags32 psActorFlags;

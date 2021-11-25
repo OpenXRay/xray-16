@@ -780,7 +780,6 @@ extern Flags32 psEnvFlags;
 // extern float r__dtex_range;
 
 extern int g_ErrorLineCount;
-extern int ps_rs_loading_stages;
 
 ENGINE_API int ps_r__Supersample = 1;
 ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
@@ -832,7 +831,6 @@ void CCC_Register()
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
     CMD4(CCC_Integer, "r__wallmarks_on_skeleton", &ps_r__WallmarksOnSkeleton, 0, 1);
 
-    CMD4(CCC_Integer, "rs_loadingstages", &ps_rs_loading_stages, 0, 1); // XXX: rename to g_loading_stages
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD1(CCC_VSync, "rs_v_sync"); // If you change the name, you also should change it in glHW.cpp in the OpenGL renderer
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );

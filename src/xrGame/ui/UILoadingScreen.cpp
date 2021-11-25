@@ -16,8 +16,6 @@
 #include "UIHelper.h"
 #include "xrUICore/XML/UITextureMaster.h"
 
-extern ENGINE_API int ps_rs_loading_stages;
-
 UILoadingScreen::UILoadingScreen()
     : loadingProgress(nullptr), loadingProgressPercent(nullptr),
       loadingLogo(nullptr),     loadingStage(nullptr),
@@ -100,7 +98,7 @@ void UILoadingScreen::SetStageTitle(const char* title)
 {
     // Only if enabled by user or forced to be displayed by XML
     // And if exist at all
-    if ((ps_rs_loading_stages || alwaysShowStage) && loadingStage)
+    if ((psActorFlags.test(AF_LOADING_STAGES) || alwaysShowStage) && loadingStage)
     {
         ScopeLock scope(&loadingLock);
 
