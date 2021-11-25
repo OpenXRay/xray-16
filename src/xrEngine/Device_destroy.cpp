@@ -39,8 +39,7 @@ void CRenderDevice::Reset(bool precache /*= true*/)
     GEnv.Render->Reset(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     // Update window props again for DX9 renderer
-    const bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-    if (isDX9Renderer)
+    if (GEnv.Render->GetBackendAPI() == IRender::BackendAPI::D3D9) // XXX: I don't remember why this hack is needed, thus, I'm not sure if it is needed at all
         UpdateWindowProps(); // hack
 
     _SetupStates();
