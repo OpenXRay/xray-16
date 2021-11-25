@@ -646,34 +646,6 @@ public:
 };
 bool CCC_renderer::cmd_lock = false;
 
-class CCC_VSync : public CCC_Mask
-{
-    using inherited = CCC_Mask;
-
-public:
-    CCC_VSync(pcstr name) : CCC_Mask(name, &psDeviceFlags, rsVSync) {}
-
-    void Execute(pcstr args) override
-    {
-        // `apply` means that renderer asks to apply vsync settings
-        // and we don't need to change it
-        if (0 != xr_strcmp(args, "apply"))
-            inherited::Execute(args);
-
-        if (GEnv.Render->GetBackendAPI() != IRender::BackendAPI::OpenGL)
-            return;
-
-        if (psDeviceFlags.test(rsVSync))
-        {
-            // Try adaptive vsync first
-            if (SDL_GL_SetSwapInterval(-1) == -1)
-                SDL_GL_SetSwapInterval(1);
-        }
-        else
-            SDL_GL_SetSwapInterval(0);
-    }
-};
-
 class CCC_soundDevice : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -832,7 +804,7 @@ void CCC_Register()
     CMD4(CCC_Integer, "r__wallmarks_on_skeleton", &ps_r__WallmarksOnSkeleton, 0, 1);
 
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
-    CMD1(CCC_VSync, "rs_v_sync"); // If you change the name, you also should change it in glHW.cpp in the OpenGL renderer
+    CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
     CMD1(CCC_Fullscreen, "rs_fullscreen");
     CMD1(CCC_Refresh60hz, "rs_refresh_60hz");
