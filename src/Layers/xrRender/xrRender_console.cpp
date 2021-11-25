@@ -681,9 +681,9 @@ public:
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
-#ifdef DEBUG
+#   ifndef MASTER_GOLD
 
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
+#   include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 
 class CCC_Fog_Reload : public IConsole_Command
 {
@@ -691,7 +691,7 @@ public:
     CCC_Fog_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR /*args*/) { FluidManager.UpdateProfiles(); }
 };
-#endif // DEBUG
+#   endif // MASTER_GOLD
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
 //-----------------------------------------------------------------------
@@ -932,9 +932,9 @@ void xrRender_initconsole()
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
-#ifdef DEBUG
+#   ifndef MASTER_GOLD
     CMD1(CCC_Fog_Reload, "r3_fog_reload");
-#endif // DEBUG
+#   endif
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
