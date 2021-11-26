@@ -52,10 +52,10 @@ dx103DFluidData::dx103DFluidData()
 
 dx103DFluidData::~dx103DFluidData()
 {
-//  Allow real-time config reload
-#ifdef DEBUG
+#ifndef MASTER_GOLD
+    // Allow real-time config reload
     FluidManager.DeregisterFluidData(this);
-#endif //   DEBUG
+#endif
 
     for (int rtIndex = 0; rtIndex < VP_NUM_TARGETS; rtIndex++)
     {
@@ -213,17 +213,17 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
         }
     }
 
-//  Allow real-time config reload
-#ifdef DEBUG
+#ifndef MASTER_GOLD
+    // Allow real-time config reload
     FluidManager.RegisterFluidData(this, Profile);
-#endif //   DEBUG
+#endif
 }
 
-//  Allow real-time config reload
-#ifdef DEBUG
+#ifndef MASTER_GOLD
+// Allow real-time config reload
 void dx103DFluidData::ReparseProfile(const xr_string& Profile)
 {
     m_Emitters.clear();
     ParseProfile(Profile);
 }
-#endif //   DEBUG
+#endif // !MASTER_GOLD

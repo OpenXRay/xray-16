@@ -52,12 +52,13 @@ public:
     float GetImpulseSize() const { return m_fImpulseSize; }
     static LPCSTR* GetEngineTextureNames() { return m_pEngineTextureNames; }
     static LPCSTR* GetShaderTextureNames() { return m_pShaderTextureNames; }
-//	Allow real-time config reload
-#ifdef DEBUG
+
+#ifndef MASTER_GOLD
+    // Allow real-time config reload
     void RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName);
     void DeregisterFluidData(dx103DFluidData* pData);
     void UpdateProfiles();
-#endif //	DEBUG
+#endif
 
 private:
     enum SimulationShader
@@ -136,15 +137,11 @@ private:
     int m_iTextureHeight;
     int m_iTextureDepth;
 
-//	Allow real-time config reload
-#ifdef DEBUG
+#ifndef MASTER_GOLD
+    // Allow real-time config reload
     xr_vector<xr_string> m_lstSectionNames;
     xr_vector<dx103DFluidData*> m_lstFluidData;
-#endif //	DEBUG
-
-//	Allow real-time config reload
-#ifdef DEBUG
-#endif //	DEBUG
+#endif
 };
 
 extern dx103DFluidManager FluidManager;

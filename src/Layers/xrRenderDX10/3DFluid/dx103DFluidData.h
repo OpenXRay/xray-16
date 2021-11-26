@@ -63,10 +63,11 @@ public:
     const xr_vector<Fmatrix>& GetObstaclesList() const { return m_Obstacles; }
     const xr_vector<dx103DFluidEmitters::CEmitter>& GetEmittersList() const { return m_Emitters; }
     const Settings& GetSettings() const { return m_Settings; }
-//	Allow real-time config reload
-#ifdef DEBUG
+
+#ifndef MASTER_GOLD
+    //	Allow real-time config reload
     void ReparseProfile(const xr_string& Profile);
-#endif //	DEBUG
+#endif
 
 private:
     typedef dx103DFluidEmitters::CEmitter CEmitter;
