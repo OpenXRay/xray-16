@@ -451,7 +451,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="$(WindowsSdkDir)Redist\D3D\$(Platform)\d3dcompiler_47.dll">
+    <CopyFileToFolders Include="$(WindowsSdkDir)Redist\D3D\$(PlatformShortName)\d3dcompiler_47.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <None Include="packages.config" />
