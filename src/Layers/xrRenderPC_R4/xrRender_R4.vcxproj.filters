@@ -1323,4 +1323,9 @@
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="$(WindowsSdkDir)Redist\D3D\$(Platform)\d3dcompiler_47.dll">
+      <Filter>Kernel</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
 </Project>
