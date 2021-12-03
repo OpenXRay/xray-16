@@ -144,10 +144,10 @@ static class cl_alpha_ref : public R_constant_setup
         // TODO: OGL: Implement AlphaRef.
 #   if defined(USE_DX11)
         StateManager.BindAlphaRef(C);
-#   endif // !USE_OGL
+#   endif
     }
 } binder_alpha_ref;
-#endif // !USE_DX9
+#endif
 
 // Defined in ResourceManager.cpp
 IReader* open_shader(pcstr shader);
@@ -222,7 +222,7 @@ void CRender::create()
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     m_MSAASample = -1;
 #endif
 
@@ -402,7 +402,7 @@ void CRender::create()
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)
         Msg("* Managed textures disabled");
-#endif // !USE_OGL
+#endif
 
     // options (smap-pool-size)
     if (strstr(Core.Params, "-smap1024"))

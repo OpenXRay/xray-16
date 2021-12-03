@@ -135,7 +135,7 @@ void CPortalTraverser::dbg_draw()
     RCache.set_xform_world(Fidentity);
     RCache.set_xform_view(Fidentity);
     RCache.set_xform_project(Fidentity);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_OGL) // when we don't have FFP support
     RCache.set_Shader(RImplementation.m_WireShader);
     RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
 #endif // !USE_DX9
