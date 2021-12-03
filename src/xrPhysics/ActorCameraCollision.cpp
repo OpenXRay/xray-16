@@ -103,7 +103,7 @@ static void cammera_shell_character_collide_callback(
 static void get_viewport_geom(Fvector& box, Fmatrix& form, const CCameraBase& camera, float _viewport_near)
 {
     box.z = _viewport_near / 2.f;
-    tviewport_size(inl_ph_world().Device(), _viewport_near, camera, box.x, box.y);
+    tviewport_size(_viewport_near, camera, box.x, box.y);
     form.identity();
     form.i.set(camera.Right());
     form.j.set(camera.Up());

@@ -312,7 +312,7 @@ void CElevatorState::UpdateDepart()
 void CElevatorState::NewState()
 {
     VERIFY(m_character);
-    m_start_time = inl_ph_world().Device().dwTimeGlobal;
+    m_start_time = Device.dwTimeGlobal;
     m_character->GetFootCenter(m_start_position);
 }
 
@@ -378,7 +378,7 @@ bool CElevatorState::StateSwitchInertion(Estate new_state)
     m_character->GetFootCenter(p);
     p.sub(m_start_position);
     if (m_etable[m_state][new_state].dist < p.magnitude() ||
-        m_etable[m_state][new_state].time < inl_ph_world().Device().dwTimeGlobal - m_start_time)
+        m_etable[m_state][new_state].time < Device.dwTimeGlobal - m_start_time)
         return true;
     else
         return false;
