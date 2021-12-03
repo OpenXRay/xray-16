@@ -441,7 +441,7 @@ void CRender::create()
     // TODO: OGL: temporary disabled, need to fix it
     o.volumetricfog = false;
 #   endif
-#endif // !USE_DX9
+#endif
     o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
     o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;
@@ -489,7 +489,7 @@ void CRender::create()
             o.hbao_vectorized = true;
         o.ssao_opt_data = true;
     }
-#endif // !USE_DX9
+#endif // USE_DX9
 
 #if defined(USE_DX11) || defined(USE_OGL)
 #   if defined(USE_DX11)
@@ -497,6 +497,8 @@ void CRender::create()
     o.dx10_sm4_1 = o.dx10_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #   elif defined(USE_OGL)
     o.dx10_sm4_1 = true;
+#else
+#   error No graphics API selected or enabled!
 #   endif
 
     //	MSAA option dependencies
@@ -517,6 +519,8 @@ void CRender::create()
     o.dx10_msaa_samples = 0;
     o.dx10_msaa_opt = o.dx10_msaa;
     o.dx10_msaa_hybrid = false;
+#else
+#   error No graphics API selected or enabled!
 #   endif
     //	Allow alpha test MSAA for DX10.0
 

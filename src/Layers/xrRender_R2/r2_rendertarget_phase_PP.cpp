@@ -166,7 +166,7 @@ void CRenderTarget::phase_pp()
     pv++;
 #else
 #    error No graphics API selected or enabled!
-#endif // !USE_OGL
+#endif // USE_DX9 || USE_DX11
     RCache.Vertex.Unlock(4, g_postprocess.stride());
 
     // Actual rendering

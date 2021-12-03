@@ -82,7 +82,7 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
         pv++;
 #else
 #    error No graphics API selected or enabled!
-#endif // !USE_OGL
+#endif // USE_DX9 || USE_DX11
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
 

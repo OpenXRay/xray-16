@@ -61,7 +61,7 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
 #if defined(USE_DX9) || defined(USE_DX11)
         m_CMap[iTex]->surface_set(nullptr);
 #elif defined(USE_OGL)
-m_CMap[iTex]->surface_set(GL_TEXTURE_2D, 0);
+        m_CMap[iTex]->surface_set(GL_TEXTURE_2D, 0);
 #else
 #    error No graphics API selected or in use!
 #endif
