@@ -75,7 +75,6 @@ extern "C" XRPHYSICS_API void __stdcall create_physics_world(
     bool mt, CObjectSpace* os, CObjectList* lo, CRenderDeviceBase* dv);
 extern "C" XRPHYSICS_API void __stdcall destroy_physics_world();
 class CGameMtlLibrary;
-extern "C" XRPHYSICS_API void __stdcall set_mtl_lib(CGameMtlLibrary* l);
 extern "C" XRPHYSICS_API CObjectSpace* __stdcall create_object_space();
 struct hdrCFORM;
 extern "C" XRPHYSICS_API CObjectSpace* __stdcall mesh_create_object_space(

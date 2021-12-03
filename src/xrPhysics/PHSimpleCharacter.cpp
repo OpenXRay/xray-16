@@ -928,7 +928,7 @@ bool CPHSimpleCharacter::ValidateWalkOnMesh()
     // if(XRC.r_end()!=XRC.r_begin()) return false;
     for (auto &Res : *XRC.r_get())
     {
-        SGameMtl* m = GMLibrary().GetMaterialByIdx(Res.material);
+        SGameMtl* m = GMLib.GetMaterialByIdx(Res.material);
         if (m->Flags.test(SGameMtl::flPassable))
             continue;
         // CDB::TRI* T = T_array + Res->id;
@@ -959,7 +959,7 @@ bool CPHSimpleCharacter::ValidateWalkOnMesh()
     for (auto &Res : *XRC.r_get())
     {
         // CDB::TRI* T = T_array + Res->id;
-        SGameMtl* m = GMLibrary().GetMaterialByIdx(Res.material);
+        SGameMtl* m = GMLib.GetMaterialByIdx(Res.material);
         if (m->Flags.test(SGameMtl::flPassable))
             continue;
         Point vertices[3] = {
@@ -1490,10 +1490,10 @@ void CPHSimpleCharacter::InitContact(dContact* c, bool& do_collide, u16 material
     const dGeomID g2 = c->geom.g2;
     bool bo1 = (g1 == m_wheel) || g1 == m_cap_transform || g1 == m_shell_transform || g1 == m_hat_transform;
 
-    // SGameMtl* tri_material=GMLibrary().GetMaterialByIdx((u16)c->surface.mode);
+    // SGameMtl* tri_material=GMLib.GetMaterialByIdx((u16)c->surface.mode);
 
     u16 contact_material = bo1 ? material_idx_2 : material_idx_1;
-    SGameMtl* tri_material = GMLibrary().GetMaterialByIdx(contact_material);
+    SGameMtl* tri_material = GMLib.GetMaterialByIdx(contact_material);
 
     bool bClimable = !!tri_material->Flags.test(SGameMtl::flClimable);
     if (is_control && m_elevator_state.ClimbingState())
@@ -2021,7 +2021,7 @@ void CPHSimpleCharacter::Collide()
 
     inherited::Collide();
     if (injuriousMaterialIDX == GAMEMTL_NONE_IDX && (*p_lastMaterialIDX) != GAMEMTL_NONE_IDX &&
-        GMLibrary().GetMaterialByIdx(*p_lastMaterialIDX)->Flags.test(SGameMtl::flInjurious))
+        GMLib.GetMaterialByIdx(*p_lastMaterialIDX)->Flags.test(SGameMtl::flInjurious))
         injuriousMaterialIDX = *p_lastMaterialIDX;
 }
 void CPHSimpleCharacter::OnStartCollidePhase() { injuriousMaterialIDX = GAMEMTL_NONE_IDX; }

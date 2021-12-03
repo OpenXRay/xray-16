@@ -171,8 +171,8 @@ void CPHAICharacter::ValidateWalkOn()
 }
 void CPHAICharacter::InitContact(dContact* c, bool& do_collide, u16 material_idx_1, u16 material_idx_2)
 {
-    SGameMtl* material_1 = GMLibrary().GetMaterialByIdx(material_idx_1);
-    SGameMtl* material_2 = GMLibrary().GetMaterialByIdx(material_idx_2);
+    SGameMtl* material_1 = GMLib.GetMaterialByIdx(material_idx_1);
+    SGameMtl* material_2 = GMLib.GetMaterialByIdx(material_idx_2);
     if ((material_1 && material_1->Flags.test(SGameMtl::flActorObstacle)) ||
         (material_2 && material_2->Flags.test(SGameMtl::flActorObstacle)))
         do_collide = true;

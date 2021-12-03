@@ -706,7 +706,7 @@ void CPHShell::AddElementRecursive(
             E->mXFORM.set(fm_position);
             u16 mtlIndex = bone_data.get_game_mtl_idx();
             if (mtlIndex == u16(-1))
-                mtlIndex = GMLibrary().GetMaterialIdx(bone_data.GetMaterialName().c_str());
+                mtlIndex = GMLib.GetMaterialIdx(bone_data.GetMaterialName().c_str());
             E->SetMaterial(mtlIndex);
             // Fvector mc;
             // fm_position.transform_tiny(mc,bone_data.center_of_mass);

@@ -220,7 +220,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
                     if (debug_output().ph_dbg_draw_mask().test(phDBgDrawTriesChangesSign))
 						debug_output().DBG_DrawTri(Tr, V_array, color_xrgb(0, 255, 0));
 #endif
-					SGameMtl* material = GMLibrary().GetMaterialByIdx(Tr->material);
+					SGameMtl* material = GMLib.GetMaterialByIdx(Tr->material);
                     VERIFY(material);
                     bool b_passable = !!material->Flags.test(SGameMtl::flPassable);
                     bool contain_pos =

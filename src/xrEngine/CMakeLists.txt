@@ -199,7 +199,6 @@ target_link_libraries(${PROJECT_NAME}
     ${THEORA_LIBRARY}
     ${OGG_LIBRARIES}
     xrCDB
-    xrPhysics
     openal
     ${LOCKFILE_LIBRARIES}
     ${SDL_LIBRARIES}
