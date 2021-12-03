@@ -84,4 +84,4 @@ void R_sync_point::End()
 }
 #else
 #    error No graphics API selected or enabled!
-#endif // USE_OGL
+#endif

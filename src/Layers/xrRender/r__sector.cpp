@@ -56,7 +56,7 @@ void CPortal::OnRender()
         RCache.set_xform_world(Fidentity);
         // draw solid
         RCache.set_Shader(RImplementation.m_SelectionShader);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_OGL) // when we don't have FFP support
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
 #endif // !USE_DX9
@@ -74,7 +74,7 @@ void CPortal::OnRender()
             Device.SetNearer(TRUE);
       
         RCache.set_Shader(RImplementation.m_WireShader);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_OGL) // when we don't have FFP support
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
 #endif // USE_DX9

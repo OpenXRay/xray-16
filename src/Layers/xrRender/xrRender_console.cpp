@@ -22,7 +22,7 @@ const xr_token qsmapsize_token[] =
     { "3072", 3072 },
     { "3584", 3584 },
     { "4096", 4096 },
-#if defined(USE_DX11) || defined(USE_OGL)  // XXX: check if this really supported on OpenGL
+#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if values more than 8192 are supported on OpenGL
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
