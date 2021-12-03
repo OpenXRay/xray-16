@@ -32,7 +32,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
 {
     Fmatrix mTexgen;
 
-#if defined(USE_DX9)// USE_DX9
+#if defined(USE_DX9)
     float _w = float(RDEVICE.dwWidth);
     float _h = float(RDEVICE.dwHeight);
     float o_w = (.5f / _w);

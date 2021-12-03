@@ -218,12 +218,12 @@ void R_constant_table::merge(R_constant_table* T)
             C->type = src->type;
             C->ps = src->ps;
             C->vs = src->vs;
-#if defined(USE_DX11)
+#ifndef USE_DX9
+            C->gs = src->gs;
+#   if defined(USE_DX11)
             C->hs = src->hs;
             C->ds = src->ds;
             C->cs = src->cs;
-#elif defined(USE_OGL)
-            C->gs = src->gs;
 #endif
             C->samp = src->samp;
             C->handler = src->handler;

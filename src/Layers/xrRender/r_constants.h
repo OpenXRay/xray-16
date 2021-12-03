@@ -93,7 +93,7 @@ struct ECORE_API R_constant_load
         return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
 #else
 #    error No graphics API selected or enabled!
-#endif // USE_OGL
+#endif
     }
 };
 
@@ -105,15 +105,13 @@ struct ECORE_API R_constant : public xr_resource
 
     R_constant_load ps;
     R_constant_load vs;
-
-#if defined(USE_DX11) || defined(USE_OGL)
-	R_constant_load gs; //ogl OR dx11
-#endif
-
-#if defined(USE_DX11)
+#ifndef USE_DX9
+    R_constant_load gs;
+#   if defined(USE_DX11)
     R_constant_load hs;
     R_constant_load ds;
     R_constant_load cs;
+#   endif
 #endif
 
     R_constant_load samp;
