@@ -224,6 +224,7 @@ void R_constant_table::merge(R_constant_table* T)
             C->hs = src->hs;
             C->ds = src->ds;
             C->cs = src->cs;
+#   endif
 #endif
             C->samp = src->samp;
             C->handler = src->handler;
