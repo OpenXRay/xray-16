@@ -48,7 +48,6 @@ void __stdcall create_physics_world(
     ph_world = xr_new<CPHWorld>(); //&commander
     VERIFY(os);
     //		VERIFY( lo );
-    VERIFY(dv);
     ph_world->Create(mt, os, lo);
 }
 

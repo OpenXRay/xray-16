@@ -48,6 +48,7 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DXRCDB_EXPORTS
+    $<$<BOOL:${STATIC_BUILD}>:OPCODE_STATIC>
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

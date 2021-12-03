@@ -46,9 +46,23 @@ if (NOT MASTER_GOLD)
     endif()
 endif()
 
+if (NOT STATIC_BUILD)
+    if (MASTER_GOLD)
+        set(STATIC_BUILD ON CACHE BOOL "" FORCE)
+    else()
+        set(STATIC_BUILD OFF CACHE BOOL "" FORCE)
+    endif()
+endif()
+
 message(STATUS "MASTER_GOLD: ${MASTER_GOLD}")
 if (MASTER_GOLD)
     add_definitions(-DMASTER_GOLD)
+endif()
+
+message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
+if (STATIC_BUILD)
+    # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
+    #add_definitions(-DXRAY_STATIC_BUILD)
 endif()
 
 option(USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" OFF)
