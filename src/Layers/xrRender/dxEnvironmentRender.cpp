@@ -336,7 +336,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_xform_world(mXFORM);
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) // XXX: why it this disabled for OGL?
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
     RCache.set_Textures(&mixRen.clouds_r_textures);
 #endif
