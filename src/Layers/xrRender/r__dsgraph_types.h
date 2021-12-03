@@ -44,16 +44,17 @@ using state_type = SState*;
 
 #if defined(USE_DX9)
 using ps_type = ID3DPixelShader*;
-
 using vs_type = ID3DVertexShader*;
+
 #elif defined(USE_DX11) // DX11+ needs shader signature to properly bind geometry to shader
 using ps_type = ID3DPixelShader*;
+using vs_type = SVS*;
+
+using gs_type = ID3DGeometryShader*;
 
 using hs_type = ID3D11HullShader*;
 using ds_type = ID3D11DomainShader*;
 
-using vs_type = SVS*;
-using gs_type = ID3DGeometryShader*;
 #elif defined(USE_OGL)
 using vs_type = GLuint;
 using ps_type = GLuint;
