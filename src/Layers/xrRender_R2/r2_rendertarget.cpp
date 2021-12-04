@@ -95,37 +95,44 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     UNUSED(eSOM);
 #else
 #   error No graphics API selected or enabled!
-#endif
+#endif // USE_DX9 || USE_DX11
 }
 
 // 2D texgen (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 {
-#ifdef USE_DX9
+#if defined(USE_DX9)
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
     float o_w = (.5f / _w);
     float o_h = (.5f / _h);
-#endif
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
-#if defined(USE_DX9) || defined(USE_DX11)
         0.0f, -0.5f, 0.0f, 0.0f,
-#elif defined(USE_OGL)
-        0.0f, 0.5f, 0.0f, 0.0f,
-#else
-#   error No graphics API selected or enabled!
-#endif
         0.0f, 0.0f, 1.0f, 0.0f,
-#ifdef USE_DX9
         0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
-#elif defined(USE_DX11) || defined(USE_OGL)
+    };
+#elif defined(USE_DX11)
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
+};
+#elif defined(USE_OGL)
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
 #else
 #   error No graphics API selected or enabled!
 #endif
-    };
+
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 }
 
@@ -307,7 +314,8 @@ CRenderTarget::CRenderTarget()
             static_cast<CBlender_SSAO_MSAA*>(b_ssao_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
         }
     }
-#endif
+#endif // USE_DX11 || USE_OGL
+
     // NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
@@ -431,12 +439,14 @@ CRenderTarget::CRenderTarget()
             CBlender_createminmax TempBlender;
             s_create_minmax_sm.create(&TempBlender, "null");
         }
-#endif // !USE_DX9
+#endif
+
         // Accum mask
         {
             CBlender_accum_direct_mask b_accum_mask;
             s_accum_mask.create(&b_accum_mask, "r2" DELIMITER "accum_mask");
         }
+
         // Accum direct
         {
 #if RENDER == R_R2
@@ -455,6 +465,7 @@ CRenderTarget::CRenderTarget()
             s_accum_direct.create(&b_accum_direct, "r2" DELIMITER "accum_direct");
 #endif // RENDER == R_R2
         }
+
         // Accum direct/mask MSAA
 #if defined(USE_DX11) || defined(USE_OGL)
         if (RImplementation.o.dx10_msaa)
@@ -470,7 +481,8 @@ CRenderTarget::CRenderTarget()
                 s_accum_mask_msaa[i].create(b_accum_mask_msaa[i], "r2" DELIMITER "accum_direct");
             }
         }
-#endif // !USE_DX9
+#endif
+
         // Accum volumetric
         if (RImplementation.o.advancedpp)
         {
@@ -514,7 +526,7 @@ CRenderTarget::CRenderTarget()
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
             }
-#endif // !USE_DX9
+#endif // USE_DX11 || USE_OGL
         }
     }
 
@@ -548,7 +560,7 @@ CRenderTarget::CRenderTarget()
             }
         }
     }
-#endif // !USE_DX9
+#endif // USE_DX11 || USE_OGL
 
 #if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.dx10_msaa)
@@ -556,7 +568,7 @@ CRenderTarget::CRenderTarget()
         CBlender_msaa TempBlender;
         s_mark_msaa_edges.create(&TempBlender, "null");
     }
-#endif // !USE_DX9
+#endif
 
     // POINT
     {
@@ -601,7 +613,7 @@ CRenderTarget::CRenderTarget()
                 s_accum_reflected_msaa[i].create(b_accum_reflected_msaa[i], "null");
             }
         }
-#endif // !USE_DX9
+#endif // USE_DX11 || USE_OGL
     }
 
     // BLOOM
@@ -642,7 +654,7 @@ CRenderTarget::CRenderTarget()
     // Check if SSAO Ultra is allowed
     if (ps_r_ssao_mode != 2 /*hdao*/ || !RImplementation.o.ssao_ultra)
         ps_r_ssao = _min(ps_r_ssao, 3);
-#endif // !USE_DX9
+#endif
 
     // HBAO
     if (RImplementation.o.ssao_opt_data)
@@ -1036,4 +1048,4 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     default: return false;
     }
 }
-#endif // !USE_DX9
+#endif
