@@ -14,21 +14,28 @@ const float tweak_rain_COP_initial_offs = 1200.f;
 const float tweak_rain_ortho_xform_initial_offs = 1000.f; //. ?
 
 //	Defined in r2_R_sun.cpp
-Fvector3 wform(Fmatrix& m, Fvector3 const& v);
+Fvector3 wform(Fmatrix const& m, Fvector3 const& v);
 
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
-static Fvector3 corners[8] = {
-    {-1, -1, 0}, {-1, -1, +1}, {-1, +1, +1}, {-1, +1, 0}, {+1, +1, +1}, {+1, +1, 0}, {+1, -1, +1}, {+1, -1, 0}};
-static int facetable[6][4] = {
-    {0, 3, 5, 7}, {1, 2, 3, 0}, {6, 7, 5, 4}, {4, 2, 1, 6}, {3, 2, 4, 5}, {1, 0, 7, 6},
+static Fvector3 corners[8] =
+{
+    {-1, -1, 0}, {-1, -1, +1},
+    {-1, +1, +1}, {-1, +1, 0},
+    {+1, +1, +1}, {+1, +1, 0},
+    {+1, -1, +1}, {+1, -1, 0}
+};
+static int facetable[6][4] =
+{
+    {0, 3, 5, 7}, {1, 2, 3, 0},
+    {6, 7, 5, 4}, {4, 2, 1, 6},
+    {3, 2, 4, 5}, {1, 0, 7, 6},
 };
 
 //////////////////////////////////////////////////////////////////////////
 void CRender::render_rain()
 {
-    // return;
     float fRainFactor = g_pGamePersistent->Environment().CurrentEnv->rain_density;
     if (fRainFactor < EPS_L)
         return;
@@ -42,8 +49,8 @@ void CRender::render_rain()
 
     static const float source_offset = 10000.f;
     RainLight.direction.set(0.0f, -1.0f, 0.0f);
-    RainLight.position.set(
-        Device.vCameraPosition.x, Device.vCameraPosition.y + source_offset, Device.vCameraPosition.z);
+    RainLight.position.set(Device.vCameraPosition.x, Device.vCameraPosition.y + source_offset,
+                           Device.vCameraPosition.z);
 
     float fBoundingSphereRadius = 0;
 
@@ -52,7 +59,7 @@ void CRender::render_rain()
     {
         //
         const float fRainFar = ps_r3_dyn_wet_surf_far;
-        ex_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, fRainFar);
+        ex_project.build_projection(deg2rad(Device.fFOV /* * Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, fRainFar);
         ex_full.mul(ex_project, Device.mView);
         XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full_inverse),
             XMMatrixInverse(nullptr, XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full))));
@@ -68,8 +75,6 @@ void CRender::render_rain()
             fBoundingSphereRadius = b_2 / (2.0f * H);
         }
     }
-
-    // Device.vCameraDirection
 
     // Compute volume(s) - something like a frustum for infinite directional light
     // Also compute virtual light position and sector it is inside
@@ -106,12 +111,12 @@ void CRender::render_rain()
         hull.compute_caster_model(cull_planes, RainLight.direction);
 #ifdef _DEBUG
         for (u32 it = 0; it < cull_planes.size(); it++)
-            RImplementation.Target->dbg_addplane(cull_planes[it], 0xffffffff);
+            Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
         //. hack: need to know real outdoor sector
-        CSector* largest_sector = 0;
+        CSector* largest_sector = nullptr;
         float largest_sector_vol = 0;
         for (u32 s = 0; s < Sectors.size(); s++)
         {
@@ -171,9 +176,12 @@ void CRender::render_rain()
         // bb.vMax.y = 50;
 
         //	Offset RainLight position to center rain shadowmap
-        Fvector3 vRectOffset;
-        vRectOffset.set(
-            fBoundingSphereRadius * Device.vCameraDirection.x, 0, fBoundingSphereRadius * Device.vCameraDirection.z);
+        Fvector3 vRectOffset =
+        {
+            fBoundingSphereRadius * Device.vCameraDirection.x,
+            0,
+            fBoundingSphereRadius * Device.vCameraDirection.z
+        };
         bb.vMin.x = -fBoundingSphereRadius + vRectOffset.x;
         bb.vMax.x = fBoundingSphereRadius + vRectOffset.x;
         bb.vMin.y = -fBoundingSphereRadius + vRectOffset.z;
@@ -189,13 +197,18 @@ void CRender::render_rain()
 
         cull_xform.mul(mdir_Project, mdir_View);
 
-        s32 limit = _min(RImplementation.o.smapsize, ps_r3_dyn_wet_surf_sm_res);
+        s32 limit = _min(o.smapsize, ps_r3_dyn_wet_surf_sm_res);
 
         // build viewport xform
         float view_dim = float(limit);
-        float fTexelOffs = (.5f / RImplementation.o.smapsize);
-        Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, view_dim / 2.f + fTexelOffs, view_dim / 2.f + fTexelOffs, 0.0f, 1.0f};
+        float fTexelOffs = .5f / o.smapsize;
+        Fmatrix m_viewport =
+        {
+            view_dim / 2.f, 0.0f, 0.0f, 0.0f,
+            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            view_dim / 2.f + fTexelOffs, view_dim / 2.f + fTexelOffs, 0.0f, 1.0f
+        };
         Fmatrix m_viewport_inv;
         XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_viewport_inv),
             XMMatrixInverse(nullptr, XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_viewport))));

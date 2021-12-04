@@ -15,7 +15,7 @@ const float tweak_COP_initial_offs = 1200.f;
 const float tweak_ortho_xform_initial_offs = 1000.f; //. ?
 const float tweak_guaranteed_range = 20.f; //. ?
 
-//float			OLES_SUN_LIMIT_27_01_07			= 180.f		;
+// float			OLES_SUN_LIMIT_27_01_07			= 180.f		;
 float OLES_SUN_LIMIT_27_01_07 = 100.f;
 
 const float MAP_SIZE_START = 6.f;
@@ -24,24 +24,27 @@ const float MAP_GROW_FACTOR = 4.f;
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
-static Fvector3 corners [8] = {
-    {-1, -1, 0}, {-1, -1, +1},
-    {-1, +1, +1}, {-1, +1, 0},
-    {+1, +1, +1}, {+1, +1, 0},
-    {+1, -1, +1}, {+1, -1, 0}
+static Fvector3 corners[8] =
+{
+    { -1, -1, +0 }, { -1, -1, +1 },
+    { -1, +1, +1 }, { -1, +1, +0 },
+    { +1, +1, +1 }, { +1, +1, +0 },
+    { +1, -1, +1 }, { +1, -1, +0 }
 };
-static int facetable[6][4] = {
-    {6, 7, 5, 4}, {1, 0, 7, 6},
-    {1, 2, 3, 0}, {3, 2, 4, 5},
+static int facetable[6][4] =
+{
+    { 6, 7, 5, 4 }, { 1, 0, 7, 6 },
+    { 1, 2, 3, 0 }, { 3, 2, 4, 5 },
     // near and far planes
-    {0, 3, 5, 7}, {1, 6, 4, 2},
+    { 0, 3, 5, 7 }, { 1, 6, 4, 2 },
 };
 //////////////////////////////////////////////////////////////////////////
+// XXX: examine
 #define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
 #define FLT_AS_DW(F) (*(u32*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
-#define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L)==0)
-#define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L)==0x7f800000L)
+#define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0)
+#define IS_SPECIAL(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0x7f800000L)
 
 void XRVec3TransformCoordArray(glm::vec3* out, const glm::vec3* in, const glm::mat4& matrix, unsigned int elements)
 {
@@ -49,7 +52,7 @@ void XRVec3TransformCoordArray(glm::vec3* out, const glm::vec3* in, const glm::m
         out[i] = glm::vec3(glm::translate(matrix, in[i]) * glm::vec4(1.f,1.f,1.f,1.f));
 }
 
-void XRMatrixOrthoOffCenterLH(Fmatrix *pout, float l, float r, float b, float t, float zn, float zf)
+void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t, float zn, float zf)
 {
     pout->identity();
     pout->m[0][0] = 2.0f / (r - l);
@@ -60,7 +63,7 @@ void XRMatrixOrthoOffCenterLH(Fmatrix *pout, float l, float r, float b, float t,
     pout->m[3][2] = zn / (zn -zf);
 }
 
-void XRMatrixInverse(Fmatrix *pout, float *pdeterminant, const Fmatrix &pm)
+void XRMatrixInverse(Fmatrix* pout, float* pdeterminant, const Fmatrix& pm)
 {
     glm::mat4 out = glm::inverse(glm::make_mat4x4(&pm.m[0][0]));
     
@@ -69,39 +72,30 @@ void XRMatrixInverse(Fmatrix *pout, float *pdeterminant, const Fmatrix &pm)
 }
 
 //////////////////////////////////////////////////////////////////////////
-struct Frustum
-{
-    Frustum();
-    Frustum(const glm::mat4* matrix);
-
-    glm::vec4 camPlanes [6];
-    int nVertexLUT [6];
-    glm::vec3 pntList [8];
-};
-
 struct BoundingBox
 {
     glm::vec3 minPt;
     glm::vec3 maxPt;
 
-    BoundingBox(): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) { }
-    BoundingBox(const BoundingBox& other): minPt(other.minPt), maxPt(other.maxPt) { }
+    BoundingBox() : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) {}
 
-    explicit BoundingBox(const glm::vec3* points, u32 n): minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
+    BoundingBox(const BoundingBox& other) : minPt(other.minPt), maxPt(other.maxPt) {}
+
+    explicit BoundingBox(const glm::vec3* points, u32 n) : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < n; i++)
             Merge(&points[i]);
     }
 
-    explicit BoundingBox(const std::vector<glm::vec3>* points): minPt(1e33f, 1e33f, 1e33f),
-                                                                maxPt(-1e33f, -1e33f, -1e33f)
+    explicit BoundingBox(const xr_vector<glm::vec3>* points)
+        : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < points->size(); i++)
             Merge(&(*points)[i]);
     }
 
-    explicit BoundingBox(const std::vector<BoundingBox>* boxes): minPt(1e33f, 1e33f, 1e33f),
-                                                                 maxPt(-1e33f, -1e33f, -1e33f)
+    explicit BoundingBox(const xr_vector<BoundingBox>* boxes)
+        : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < boxes->size(); i++)
         {
@@ -110,16 +104,14 @@ struct BoundingBox
         }
     }
 
-    void Centroid(glm::vec3* vec) const { *vec = 0.5f * (minPt + maxPt); }
-
     void Merge(const glm::vec3* vec)
     {
-        minPt.x = _min(minPt.x, vec->x);
-        minPt.y = _min(minPt.y, vec->y);
-        minPt.z = _min(minPt.z, vec->z);
-        maxPt.x = _max(maxPt.x, vec->x);
-        maxPt.y = _max(maxPt.y, vec->y);
-        maxPt.z = _max(maxPt.z, vec->z);
+        minPt.x = std::min(minPt.x, vec->x);
+        minPt.y = std::min(minPt.y, vec->y);
+        minPt.z = std::min(minPt.z, vec->z);
+        maxPt.x = std::max(maxPt.x, vec->x);
+        maxPt.y = std::max(maxPt.y, vec->y);
+        maxPt.z = std::max(maxPt.z, vec->z);
     }
 };
 
@@ -127,7 +119,7 @@ struct BoundingBox
 //  PlaneIntersection
 //    computes the point where three planes intersect
 //    returns whether or not the point exists.
-static inline BOOL PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0, const glm::vec4& p1,
+static inline bool PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0, const glm::vec4& p1,
                                      const glm::vec4& p2)
 {
     glm::vec3 n0 = glm::vec3(p0.x, p0.y, p0.z);
@@ -141,7 +133,7 @@ static inline BOOL PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0
     float cosTheta = glm::dot(n0, n1_n2);
 
     if (ALMOST_ZERO(cosTheta) || IS_SPECIAL(cosTheta))
-        return FALSE;
+        return false;
 
     float secTheta = 1.f / cosTheta;
 
@@ -150,14 +142,17 @@ static inline BOOL PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0
     n0_n1 *= p2.w;
 
     *intersectPt = -(n1_n2 + n2_n0 + n0_n1) * secTheta;
-    return TRUE;
+    return true;
 }
 
-Frustum::Frustum()
+struct Frustum
 {
-    for (int i = 0; i < 6; i++)
-        camPlanes[i] = {0.f, 0.f, 0.f, 0.f};
-}
+    Frustum(const glm::mat4* matrix);
+
+    glm::vec4 camPlanes[6];
+    int nVertexLUT[6];
+    glm::vec3 pntList[8];
+};
 
 //  build a frustum from a camera (projection, or viewProjection) matrix
 Frustum::Frustum(const glm::mat4* matrix)
@@ -205,7 +200,7 @@ Fvector3 wform(Fmatrix const& m, Fvector3 const& v)
     r.w = v.x * m._14 + v.y * m._24 + v.z * m._34 + m._44;
     // VERIFY		(r.w>0.f);
     const float invW = 1.0f / r.w;
-    return {r.x * invW, r.y * invW, r.z * invW};
+    return { r.x * invW, r.y * invW, r.z * invW };
 }
 
 Fvector3 wform(Fmatrix const& m, glm::vec3 const& v)
@@ -264,21 +259,24 @@ struct DumbClipper
             const glm::vec4 P = planes [it];
             float cls0 = glm::dot(P, glm::vec4(p0, 1));
             float cls1 = glm::dot(P, glm::vec4(p1, 1));
-            if (cls0 > 0 && cls1 > 0) return false; // fully outside
+            if (cls0 > 0 && cls1 > 0)
+                return false; // fully outside
 
             if (cls0 > 0)
             {
                 // clip p0
                 D = p1 - p0;
                 denum = glm::dot(P, glm::vec4(D, 0));
-                if (denum != 0) p0 += - D * cls0 / denum;
+                if (denum != 0)
+                    p0 += -D * cls0 / denum;
             }
             if (cls1 > 0)
             {
                 // clip p1
                 D = p0 - p1;
                 denum = glm::dot(P, glm::vec4(D, 0));
-                if (denum != 0) p1 += - D * cls1 / denum;
+                if (denum != 0)
+                    p1 += -D * cls1 / denum;
             }
         }
         return true;
@@ -295,7 +293,7 @@ struct DumbClipper
         result.invalidate();
         for (int it = 0; it < int(src.size()); it++)
         {
-            Fbox& bb = src [it];
+            Fbox& bb = src[it];
             u32 mask = frustum.getMask();
             EFC_Visible res = frustum.testAABB(&bb.vMin.x, mask);
             switch (res)
@@ -314,10 +312,12 @@ struct DumbClipper
                 {
                     for (int c1 = 0; c1 < 8; c1++)
                     {
-                        if (c0 == c1) continue;
+                        if (c0 == c1)
+                            continue;
                         glm::vec3 p0 = point(bb, c0);
                         glm::vec3 p1 = point(bb, c1);
-                        if (!clip(p0, p1)) continue;
+                        if (!clip(p0, p1))
+                            continue;
                         Fvector x0 = wform(xf, p0);
                         Fvector x1 = wform(xf, p1);
                         result.modify(x0);
@@ -325,7 +325,7 @@ struct DumbClipper
                     }
                 }
                 break;
-            }
+            } // switch (res)
         }
         return result;
     }
@@ -354,7 +354,7 @@ glm::vec2 BuildTSMProjectionMatrix_caster_depth_bounds(glm::mat4& lightSpaceBasi
 void CRender::render_sun()
 {
     PIX_EVENT(render_sun);
-    light* fuckingsun = static_cast<light*>(Lights.sun._get());
+    light* fuckingsun = (light*)Lights.sun._get();
     glm::mat4 m_LightViewProj;
 
     // calculate view-frustum bounds in world space
@@ -453,8 +453,10 @@ void CRender::render_sun()
     {
         HOM.Disable();
         phase = PHASE_SMAP;
-        if (RImplementation.o.Tshadows) r_pmask(true, true);
-        else r_pmask(true, false);
+        if (o.Tshadows)
+            r_pmask(true, true);
+        else
+            r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
 
@@ -570,7 +572,7 @@ void CRender::render_sun()
         //  transform the view frustum by the new matrix
         XRVec3TransformCoordArray(frustumPnts, frustumPnts, lightSpaceOrtho, POINTS_NUM);
 
-        glm::vec2 centerPts [2];
+        glm::vec2 centerPts[2];
         //  near plane
         centerPts[0].x = 0.25f * (frustumPnts[4].x + frustumPnts[5].x + frustumPnts[6].x + frustumPnts[7].x);
         centerPts[0].y = 0.25f * (frustumPnts[4].y + frustumPnts[5].y + frustumPnts[6].y + frustumPnts[7].y);
@@ -757,12 +759,27 @@ void CRender::render_sun()
 
         // because caster points are from coarse representation only allow to "shrink" box, not grow
         // that is the same as if we first clip casters by frustum
-        if (b_receivers.vMin.x < -1) b_receivers.vMin.x = -1;
-        if (b_receivers.vMin.y < -1) b_receivers.vMin.y = -1;
-        if (b_casters.vMin.z < 0) b_casters.vMin.z = 0;
-        if (b_receivers.vMax.x > +1) b_receivers.vMax.x = +1;
-        if (b_receivers.vMax.y > +1) b_receivers.vMax.y = +1;
-        if (b_casters.vMax.z > +1) b_casters.vMax.z = +1;
+        if (b_receivers.vMin.x < -1)
+            b_receivers.vMin.x = -1;
+        if (b_receivers.vMin.y < -1)
+            b_receivers.vMin.y = -1;
+        if (b_casters.vMin.z < 0)
+            b_casters.vMin.z = 0;
+        if (b_receivers.vMax.x > +1)
+            b_receivers.vMax.x = +1;
+        if (b_receivers.vMax.y > +1)
+            b_receivers.vMax.y = +1;
+        if (b_casters.vMax.z > +1)
+            b_casters.vMax.z = +1;
+
+        // refit?
+        /*
+        const float EPS				= 0.001f;
+        D3DXMATRIX					refit;
+        D3DXMatrixOrthoOffCenterLH	( &refit, b_receivers.vMin.x, b_receivers.vMax.x, b_receivers.vMin.y,
+        b_receivers.vMax.y, b_casters.vMin.z-EPS, b_casters.vMax.z+EPS );
+        D3DXMatrixMultiply			( &m_LightViewProj, &m_LightViewProj, &refit);
+        */
 
         float boxWidth = b_receivers.vMax.x - b_receivers.vMin.x;
         float boxHeight = b_receivers.vMax.y - b_receivers.vMin.y;
@@ -832,7 +849,7 @@ void CRender::render_sun()
 
 void CRender::render_sun_near()
 {
-    light* fuckingsun = static_cast<light*>(Lights.sun._get());
+    light* fuckingsun = (light*)Lights.sun._get();
 
     // calculate view-frustum bounds in world space
     glm::mat4 ex_full_inverse;
@@ -873,8 +890,8 @@ void CRender::render_sun_near()
         }
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
 #ifdef	_DEBUG
-		for (u32 it=0; it<cull_planes.size(); it++)
-			RImplementation.Target->dbg_addplane(cull_planes[it],0xffffffff);
+		for (u32 it = 0; it < cull_planes.size(); it++)
+			Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
@@ -919,7 +936,7 @@ void CRender::render_sun_near()
         frustum_bb.invalidate();
         for (int it = 0; it < 8; it++)
         {
-            //for (int it=0; it<9; it++)	{
+            // for (int it=0; it<9; it++)	{
             Fvector xf = wform(mdir_View, hull.points[it]);
             frustum_bb.modify(xf);
         }
@@ -927,12 +944,11 @@ void CRender::render_sun_near()
         bb.grow(EPS);
         mdir_Project = glm::ortho(bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
                                   bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
-        /**/
-
 
         // build viewport xform
-        float view_dim = float(RImplementation.o.smapsize);
-        glm::mat4 m_viewport = {
+        float view_dim = float(o.smapsize);
+        glm::mat4 m_viewport =
+        {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
             0.0f, -view_dim / 2.f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
@@ -963,7 +979,7 @@ void CRender::render_sun_near()
             Fvector xf = wform(scissor_xf, hull.points[it]);
             scissor.modify(xf);
         }
-        s32 limit = RImplementation.o.smapsize - 1;
+        s32 limit = o.smapsize - 1;
         fuckingsun->X.D.minX = clampr(iFloor(scissor.vMin.x), 0, limit);
         fuckingsun->X.D.maxX = clampr(iCeil(scissor.vMax.x), 0, limit);
         fuckingsun->X.D.minY = clampr(iFloor(scissor.vMin.y), 0, limit);
@@ -976,11 +992,13 @@ void CRender::render_sun_near()
     // Begin SMAP-render
     {
         bool bSpecialFull = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        VERIFY (!bSpecialFull);
+        VERIFY(!bSpecialFull);
         HOM.Disable();
         phase = PHASE_SMAP;
-        if (RImplementation.o.Tshadows) r_pmask(true, true);
-        else r_pmask(true, false);
+        if (o.Tshadows)
+            r_pmask(true, true);
+        else
+            r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
 
@@ -1041,7 +1059,8 @@ void CRender::render_sun_near()
 
 void CRender::render_sun_filtered()
 {
-    if (!RImplementation.o.sunfilter) return;
+    if (!o.sunfilter)
+        return;
     Target->phase_accumulator();
     PIX_EVENT(SE_SUN_LUMINANCE);
     Target->accum_direct(SE_SUN_LUMINANCE);
@@ -1074,7 +1093,7 @@ void CRender::init_cacades()
 
 void CRender::render_sun_cascades()
 {
-    bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
+    bool b_need_to_render_sunshafts = Target->need_to_render_sunshafts();
     bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
     if (b_need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
@@ -1143,13 +1162,13 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         L_pos.set(fuckingsun->position);
         L_dir.set(fuckingsun->direction).normalize();
         L_right.set(1, 0, 0);
-        if (_abs(L_right.dotproduct(L_dir)) > .99f) L_right.set(0, 0, 1);
+        if (_abs(L_right.dotproduct(L_dir)) > .99f)
+            L_right.set(0, 0, 1);
         L_up.crossproduct(L_dir, L_right).normalize();
         L_right.crossproduct(L_up, L_dir).normalize();
         mdir_View.build_camera_dir(L_pos, L_dir, L_up);
 
-
-        //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 #ifdef	_DEBUG
 		typedef		FixedConvexVolume<true>		t_cuboid;
 #else
@@ -1164,10 +1183,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                 Fvector3 near_p, edge_vec;
                 for (int p = 0; p < 4; p++)
                 {
-                    // 					Fvector asd = Device.vCameraDirection;
-                    // 					asd.mul(-2);
-                    // 					asd.add(Device.vCameraPosition);
-                    // 					near_p		= Device.vCameraPosition;//wform		(fullxform_inv,asd); //
                     near_p = wform(fullxform_inv, corners[facetable[4][p]]);
 
                     edge_vec = wform(fullxform_inv, corners[facetable[5][p]]);
@@ -1196,10 +1211,10 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                                    map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/1.41421f * map_size);
 
         //////////////////////////////////////////////////////////////////////////
-
         // build viewport xform
-        float view_dim = float(RImplementation.o.smapsize);
-        Fmatrix m_viewport = {
+        float view_dim = float(o.smapsize);
+        Fmatrix m_viewport =
+        {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
             0.0f, -view_dim / 2.f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
@@ -1213,7 +1228,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         Fmatrix cull_xform_inv;
         cull_xform_inv.invert(cull_xform);
 
-
         //		light_cuboid.light_cuboid_points.reserve		(9);
         for (int p = 0; p < 8; p++)
         {
@@ -1223,16 +1237,21 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         // only side planes
         for (int plane = 0; plane < 4; plane++)
+        {
             for (int pt = 0; pt < 4; pt++)
             {
                 int asd = facetable[plane][pt];
                 light_cuboid.light_cuboid_polys[plane].points[pt] = asd;
             }
-
+        }
 
         Fvector lightXZshift;
-        light_cuboid.compute_caster_model_fixed(cull_planes, lightXZshift, m_sun_cascades[cascade_ind].size,
-                                                m_sun_cascades[cascade_ind].reset_chain);
+        light_cuboid.compute_caster_model_fixed(
+            cull_planes, lightXZshift,
+            m_sun_cascades[cascade_ind].size,
+            m_sun_cascades[cascade_ind].reset_chain
+        );
+
         Fvector proj_view = Device.vCameraDirection;
         proj_view.y = 0;
         proj_view.normalize();
@@ -1242,13 +1261,12 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         if (cascade_ind < m_sun_cascades.size() - 1)
             m_sun_cascades[cascade_ind + 1].rays = light_cuboid.view_frustum_rays;
 
-        // #ifdef	_DEBUG
-
+#ifdef DEBUG
         static bool draw_debug = false;
         if (draw_debug && cascade_ind == 0)
             for (u32 it = 0; it < cull_planes.size(); it++)
-                RImplementation.Target->dbg_addplane(cull_planes[it], it * 0xFFF);
-        //#endifDDS
+                Target->dbg_addplane(cull_planes[it], it * 0xFFF);
+#endif
 
         Fvector cam_shifted = L_pos;
         cam_shifted.add(lightXZshift);
@@ -1259,7 +1277,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         cull_xform.identity();
         cull_xform.mul(mdir_Project, mdir_View);
         cull_xform_inv.invert(cull_xform);
-
 
         // Create frustum for query
         cull_frustum._clear();
@@ -1304,7 +1321,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         m_sun_cascades[cascade_ind].xform = cull_xform;
 
-        s32 limit = RImplementation.o.smapsize - 1;
+        s32 limit = o.smapsize - 1;
         fuckingsun->X.D.minX = 0;
         fuckingsun->X.D.maxX = limit;
         fuckingsun->X.D.minY = 0;
@@ -1317,11 +1334,13 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // Begin SMAP-render
     {
         bool bSpecialFull = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        VERIFY (!bSpecialFull);
+        VERIFY(!bSpecialFull);
         HOM.Disable();
         phase = PHASE_SMAP;
-        if (RImplementation.o.Tshadows) r_pmask(true, true);
-        else r_pmask(true, false);
+        if (o.Tshadows)
+            r_pmask(true, true);
+        else
+            r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
 
@@ -1329,7 +1348,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
-    fuckingsun->X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
+    fuckingsun->X.D.combine = cull_xform;
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
@@ -1374,14 +1393,23 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     PIX_EVENT(SE_SUN_NEAR);
 
     if (cascade_ind == 0)
+    {
+        PIX_EVENT(SE_SUN_NEAR);
         Target->accum_direct_cascade(SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].xform,
                                      m_sun_cascades[cascade_ind].bias);
+    }
     else if (cascade_ind < m_sun_cascades.size() - 1)
+    {
+        PIX_EVENT(SE_SUN_MIDDLE);
         Target->accum_direct_cascade(SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
                                      m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
+    }
     else
+    {
+        PIX_EVENT(SE_SUN_FAR);
         Target->accum_direct_cascade(SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
                                      m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
+    }
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
