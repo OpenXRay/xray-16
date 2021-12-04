@@ -7,7 +7,7 @@ extern IC u32 GetIndexCount(D3DPRIMITIVETYPE T, u32 iPrimitiveCount);
 
 void CBackend::InitializeDebugDraw()
 {
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     vs_L.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
     vs_TL.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 #endif
@@ -15,7 +15,7 @@ void CBackend::InitializeDebugDraw()
 
 void CBackend::DestroyDebugDraw()
 {
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     vs_L.destroy();
     vs_TL.destroy();
 #endif
@@ -37,7 +37,7 @@ void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV
 
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
 {
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     u32 vBase;
     {
         FVF::L* pv = (FVF::L*)Vertex.Lock(vcnt, vs_L->vb_stride, vBase);
@@ -66,12 +66,12 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(T, 0, vcnt, pcnt, pIdx, D3DFMT_INDEX16, pVerts, sizeof(FVF::L)));
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 }
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     u32 vBase;
     {
         const size_t count = GetIndexCount(T, pcnt);
@@ -92,7 +92,7 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawPrimitiveUP(T, pcnt, pVerts, sizeof(FVF::L)));
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 }
 
@@ -116,10 +116,10 @@ void CBackend::dbg_DrawOBB(Fmatrix& T, Fvector& half_dim, u32 C)
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
     set_xform_world(mL2W_Transform);
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
     dbg_Draw(D3DPT_LINELIST, aabb, 8, aabb_id, 12);
 }
 void CBackend::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C)
@@ -133,10 +133,10 @@ void CBackend::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u3
     tri[2].color = C;
 
     set_xform_world(T);
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
     dbg_Draw(D3DPT_TRIANGLESTRIP, tri, 1);
 }
 void CBackend::dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C)
@@ -148,10 +148,10 @@ void CBackend::dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C)
     line[1].color = C;
 
     set_xform_world(T);
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
     dbg_Draw(D3DPT_LINELIST, line, 1);
 }
 void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
@@ -222,10 +222,10 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
     }
 
     set_xform_world(T);
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
 
     RCache.set_FillMode(D3DFILL_WIREFRAME);
     dbg_Draw(D3DPT_TRIANGLELIST, verts, vcnt, gFaces, 224);
@@ -261,7 +261,7 @@ void CBackend::dbg_OverdrawEnd()
 #elif defined(USE_DX11) || defined(USE_OGL)
     set_Geometry(vs_TL);
 #else
-#    error No graphics API defined or enabled!
+#   error No graphics API defined or enabled!
 #endif
 
     // Render gradients
@@ -290,7 +290,7 @@ void CBackend::dbg_OverdrawEnd()
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
         Render(D3DPT_TRIANGLESTRIP, vBase, 4);
 #else
-#    error No graphics API defined or enabled!
+#   error No graphics API defined or enabled!
 #endif
     }
     set_Stencil(FALSE);
@@ -303,7 +303,7 @@ void CBackend::dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)
 #elif defined(USE_DX11) || defined(USE_OGL)
     VERIFY(!"Not implemented");
 #else
-#    error No graphics API defined or enabled!
+#   error No graphics API defined or enabled!
 #endif
 }
 
@@ -314,6 +314,6 @@ void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
 #elif defined(USE_DX11) || defined(USE_OGL)
     VERIFY(!"Not implemented");
 #else
-#    error No graphics API defined or enabled!
+#   error No graphics API defined or enabled!
 #endif
 }

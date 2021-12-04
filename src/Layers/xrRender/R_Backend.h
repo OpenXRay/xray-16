@@ -97,7 +97,6 @@ public:
 #endif
 private:
     // Render-targets
-
 #if defined(USE_DX9) || defined (USE_DX11)
     ID3DRenderTargetView* pRT[4];
     ID3DDepthStencilView* pZB;
@@ -106,7 +105,7 @@ private:
     GLuint pRT[4];
     GLuint pZB;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
     // Vertices/Indices/etc
@@ -121,36 +120,36 @@ private:
 
     // Shaders/State
     ID3DState* state;
-#if defined(USE_OGL)
-    GLuint ps;
-    GLuint vs;
-    GLuint gs;
-#elif defined(USE_DX9)
+#if defined(USE_DX9)
     ID3DPixelShader* ps;
     ID3DVertexShader* vs;
 #elif defined(USE_DX11)
-	ID3DPixelShader* ps;
+    ID3DPixelShader* ps;
     ID3DVertexShader* vs;
     ID3DGeometryShader* gs;
     ID3D11HullShader* hs;
     ID3D11DomainShader* ds;
     ID3D11ComputeShader* cs;
+#elif defined(USE_OGL)
+    GLuint ps;
+    GLuint vs;
+    GLuint gs;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
 #ifdef DEBUG
     LPCSTR ps_name;
     LPCSTR vs_name;
-#    if defined(USE_DX11)
-	LPCSTR gs_name;
+#ifndef USE_DX9
+    LPCSTR gs_name;
+#if defined(USE_DX11)
     LPCSTR hs_name;
     LPCSTR ds_name;
     LPCSTR cs_name;
-#    elif defined(USE_OGL)
-    LPCSTR gs_name;
-#    endif
-#endif
+#endif // USE_DX11
+#endif // !USE_DX9
+#endif // DEBUG
 
     u32 stencil_enable;
     u32 stencil_func;
@@ -176,16 +175,17 @@ private:
     CTexture* textures_ps[CTexture::mtMaxPixelShaderTextures]; // stages
     //CTexture* textures_vs[5]; // dmap + 4 vs
     CTexture* textures_vs[CTexture::mtMaxVertexShaderTextures]; // 4 vs
-
-#if defined(USE_DX11)
-	CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
+#ifndef USE_DX9
+    CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
+#   if defined(USE_DX11)
     CTexture* textures_hs[CTexture::mtMaxHullShaderTextures]; // 4 vs
     CTexture* textures_ds[CTexture::mtMaxDomainShaderTextures]; // 4 vs
     CTexture* textures_cs[CTexture::mtMaxComputeShaderTextures]; // 4 vs
-#elif defined(USE_OGL)
-    CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
-//#else
-//#    error No graphics API selected or enabled! //no error, just means DX9 is in use!
+#   endif
+#elif defined(USE_DX9)
+    // Nothing, because DX9 only has VS and PS
+#else
+#   error No graphics API selected or enabled!
 #endif
 
 #ifdef _EDITOR
@@ -244,10 +244,10 @@ public:
     }
 
 #if defined(USE_DX9)
-	R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
+    R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
     R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
 #elif defined(USE_DX11)
-	IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
+    IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
 #endif
 
     // API
@@ -258,7 +258,6 @@ public:
     IC const Fmatrix& get_xform_world();
     IC const Fmatrix& get_xform_view();
     IC const Fmatrix& get_xform_project();
-
 
 #if defined(USE_DX9) || defined(USE_DX11)
     IC void set_RT(ID3DRenderTargetView* RT, u32 ID = 0);
@@ -293,7 +292,7 @@ public:
     IC bool ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects);
     IC bool ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects);
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
     ICF void ClearRT(ref_rt& rt, const Fcolor& color) { ClearRT(rt->pRT, color); }
@@ -302,22 +301,22 @@ public:
         return ClearRTRect(rt->pRT, color, numRects, rects);
     }
 
-#if defined(USE_DX11)
-    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT, depth);}
-    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT, depth, stencil);}
-    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
-    {
-        return ClearZBRect(zb->pZRT, depth, numRects, rects);
-    }
-#elif defined(USE_DX9) || defined(USE_OGL)
+#if defined(USE_DX9) || defined(USE_OGL)
     ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pRT, depth);}
     ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pRT, depth, stencil);}
     ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
     {
         return ClearZBRect(zb->pRT, depth, numRects, rects);
     }
+#elif defined(USE_DX11)
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT, depth);}
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT, depth, stencil);}
+    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
+    {
+        return ClearZBRect(zb->pZRT, depth, numRects, rects);
+    }
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
     IC void set_Constants(R_constant_table* C);
@@ -347,15 +346,16 @@ public:
 #elif defined(USE_OGL)
     ICF void set_PS(GLuint _ps, LPCSTR _n = 0);
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
     ICF void set_PS(ref_ps& _ps) { set_PS(_ps->sh, _ps->cName.c_str()); }
 
-#if defined(USE_DX11)
-    ICF void set_GS(ID3DGeometryShader* _gs, LPCSTR _n = nullptr);
+#ifndef USE_DX9
+    ICF void set_GS(ref_gs& _gs) { set_GS(_gs->sh, _gs->cName.c_str()); }
 
-    ICF void set_GS(ref_gs& _gs) { set_GS(_gs->sh, _gs->cName.c_str()); } //ogl AND dx11
+#   if defined(USE_DX11)
+    ICF void set_GS(ID3DGeometryShader* _gs, LPCSTR _n = nullptr);
 
     ICF void set_HS(ID3D11HullShader* _hs, LPCSTR _n = nullptr);
     ICF void set_HS(ref_hs& _hs) { set_HS(_hs->sh, _hs->cName.c_str()); }
@@ -365,19 +365,18 @@ public:
 
     ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
     ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
-#elif defined(USE_OGL)
+#   elif defined(USE_OGL)
     ICF void set_GS(GLuint _gs, LPCSTR _n = 0);
-	ICF void set_GS(ref_gs& _gs) { set_GS(_gs->sh, _gs->cName.c_str()); } //ogl AND dx11
-#endif
+#   endif
+#endif // USE_DX9
 
-#if defined(USE_DX9)
-	ICF bool is_TessEnabled() { return false; }
+
+#if defined(USE_DX9) || defined(USE_OGL)
+    ICF bool is_TessEnabled() { return false; }
 #elif defined(USE_DX11)
     ICF bool is_TessEnabled();
-#elif defined(USE_OGL)
-    ICF bool is_TessEnabled() { return false; }
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
     ICF void set_VS(ref_vs& _vs);
@@ -386,19 +385,19 @@ public:
     ICF void set_VS(SVS* _vs);
 
 protected: //	In DX11+ we need input shader signature which is stored in ref_vs
-#endif // USE_DX11
+#endif
 
 #if defined(USE_DX9) || defined(USE_DX11)
     ICF void set_VS(ID3DVertexShader* _vs, LPCSTR _n = nullptr);
 #elif defined(USE_OGL)
     ICF void set_VS(GLuint _vs, LPCSTR _n = 0);
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX11)
 public:
-#endif // USE_DX11
+#endif
 
     ICF void set_Vertices(VertexBufferHandle _vb, u32 _vb_stride);
     ICF void set_Indices(IndexBufferHandle _ib);
@@ -532,7 +531,7 @@ private:
     void DestroyDebugDraw();
 
     // DX9 doesn't need this
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     ref_geom vs_L;
     ref_geom vs_TL;
 #endif
