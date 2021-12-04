@@ -190,13 +190,7 @@ void initialize()
     else
         m24r();
 
-#if defined(XR_PLATFORM_WINDOWS) // XXX: make crossplatform instead of separate versions for Windows and Linux
-    ::Random.seed(u32(CPU::QPC() % (1i64 << 32i64)));
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-    ::Random.seed(u32(CPU::QPC() % ((u64)0x1 << 32)));
-#else
-#   error Add your platform here
-#endif
+    ::Random.seed(u32(CPU::QPC() % (s64(1) << s32(32))));
 }
 };
 
