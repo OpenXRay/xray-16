@@ -18,12 +18,13 @@ void dxDebugRender::Render()
         return;
 
     RCache.set_xform_world(Fidentity);
-#if defined(USE_DX11) || defined(USE_OGL) // when we don't have FFP support
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_Shader(RImplementation.m_WireShader);
     const u32 color = m_line_vertices[0].color;
     RCache.set_c("tfactor", float(color_get_R(color)) / 255.f, float(color_get_G(color)) / 255.f, \
         float(color_get_B(color)) / 255.f, float(color_get_A(color)) / 255.f);
 #endif // !USE_DX9
+
     RCache.dbg_Draw(D3DPT_LINELIST, &*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
         m_line_indices.size() / 2);
     m_line_vertices.resize(0);

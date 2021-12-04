@@ -132,13 +132,15 @@ void CPortalTraverser::fade_render()
 void CPortalTraverser::dbg_draw()
 {
     RCache.OnFrameEnd();
+
     RCache.set_xform_world(Fidentity);
     RCache.set_xform_view(Fidentity);
     RCache.set_xform_project(Fidentity);
-#if defined(USE_DX11) || defined(USE_OGL) // when we don't have FFP support
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_Shader(RImplementation.m_WireShader);
     RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
-#endif // !USE_DX9
+#endif
+
     for (u32 s = 0; s < dbg_sectors.size(); s++)
     {
         CSector* S = (CSector*)dbg_sectors[s];

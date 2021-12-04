@@ -326,8 +326,16 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
 {
     if (!GEnv.isDedicatedServer)
     {
-        // TODO: DX10: When all shaders are ready switch to common path
-#ifdef USE_DX11
+#if defined(USE_DX9)
+#   ifndef _EDITOR
+        if (_lua_HasShader(s_shader))
+            return _lua_Create(s_shader, s_textures);
+        else
+#   endif
+        {
+            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
+        }
+#else // TODO: DX10: When all shaders are ready switch to common path
         if (_lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
         else
@@ -346,17 +354,6 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
                 }
             }
         }
-#elif defined(USE_DX9) || defined(USE_OGL)// USE_DX9 
-//original comment specifies DX9, but code was also used while OGL was set due to blanket else condition for USE_DX11 being set.
-
-#ifndef _EDITOR
-        if (_lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        else
-#endif
-            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
-#else
-#    error No graphics API selected or enabled!
 #endif
     }
     return nullptr;
@@ -378,11 +375,11 @@ void CResourceManager::DeferredUpload()
 
 #if defined(USE_DX9) || defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
-#elif defined(USE_OGL)
+#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Load();
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 }
 
@@ -393,11 +390,11 @@ void CResourceManager::DeferredUnload()
 
 #if defined(USE_DX9) || defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
-#elif defined(USE_OGL)
+#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Unload();
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 }
 

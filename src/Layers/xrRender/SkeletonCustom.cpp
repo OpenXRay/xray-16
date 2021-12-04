@@ -55,7 +55,7 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 #ifdef DEBUG
 void CKinematics::DebugRender(Fmatrix& XFORM)
 {
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_Shader(RImplementation.m_WireShader);
 #endif
 

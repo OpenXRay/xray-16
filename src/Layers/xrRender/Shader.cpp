@@ -59,7 +59,7 @@ BOOL SPass::equal(const SPass& other)
     if (cs != other.cs)
         return FALSE;
 #    endif
-#endif // !USE_DX9
+#endif // USE_DX11 || USE_OGL
     if (constants != other.constants)
         return FALSE; // is this nessesary??? (ps+vs already combines)
 

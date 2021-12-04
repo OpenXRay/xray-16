@@ -29,16 +29,16 @@ public:
 #if defined(USE_DX9) || (USE_DX11)
     ID3DTexture2D* pSurface;
     ID3DRenderTargetView* pRT;
-#if defined(USE_DX11)
+#   if defined(USE_DX11)
     ID3DDepthStencilView* pZRT;
     ID3D11UnorderedAccessView* pUAView;
-#endif
+#   endif
 #elif defined(USE_OGL)
     GLuint pRT;
     GLuint pZRT;
     GLenum target;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
     ref_texture pTexture;
