@@ -231,7 +231,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
-    //Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 }
 
 void CHW::CreateSwapChain(HWND hwnd)

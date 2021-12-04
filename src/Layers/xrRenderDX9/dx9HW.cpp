@@ -236,7 +236,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #endif
     const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
-    Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 }
 
 void CHW::DestroyDevice()
