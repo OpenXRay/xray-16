@@ -83,5 +83,5 @@ void R_sync_point::End()
     CHK_DX(EndQuery((ID3DQuery*)q_sync_point[q_sync_count]));
 }
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif

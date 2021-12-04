@@ -64,7 +64,7 @@ IC ID3DRenderTargetView* CBackend::get_RT(u32 ID)
 #elif defined(USE_OGL)
 IC GLuint CBackend::get_RT(u32 ID)
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 {
     VERIFY((ID >= 0) && (ID < 4));
@@ -77,7 +77,7 @@ IC ID3DDepthStencilView* CBackend::get_ZB()
 #elif defined(USE_OGL)
 IC GLuint CBackend::get_ZB()
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 {
     return pZB;

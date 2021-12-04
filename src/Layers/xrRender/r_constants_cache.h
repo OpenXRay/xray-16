@@ -11,7 +11,7 @@
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glr_constants_cache.h"
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
 /*

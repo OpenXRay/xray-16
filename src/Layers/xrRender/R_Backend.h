@@ -272,7 +272,7 @@ public:
     IC GLuint get_RT(u32 ID = 0);
     IC GLuint get_ZB();
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
 #if defined(USE_DX9) || defined(USE_DX11)

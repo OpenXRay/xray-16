@@ -235,7 +235,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     if (lmap)
         C.r_Sampler("s_hemi", C.L_textures[2], false, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif // USE_DX11
 
     if (!DO_NOT_FINISH)
