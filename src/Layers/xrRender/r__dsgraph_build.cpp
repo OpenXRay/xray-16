@@ -142,7 +142,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
 
 #if defined(USE_DX9) || defined(USE_OGL)
         auto& Ncs = Nps[pass.constants._get()];
-#elif defined(USE_11)
+#elif defined(USE_DX11)
         Nps.hs = pass.hs->sh;
         Nps.ds = pass.ds->sh;
 
