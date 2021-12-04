@@ -16,9 +16,9 @@ void CBackend::OnFrameEnd()
 {
     if (!GEnv.isDedicatedServer)
     {
-#if defined(USE_DX11) // Used to be this: #if !defined(USE_DX9) && !defined(USE_OGL)
+#if !defined(USE_DX9) && !defined(USE_OGL)
         HW.pContext->ClearState();
-#elif defined(USE_DX9) // TODO: this condition should not be possible!
+#elif defined(USE_DX9)
         for (u32 stage = 0; stage < HW.Caps.raster.dwStages; stage++)
             CHK_DX(HW.pDevice->SetTexture(0, nullptr));
         CHK_DX(HW.pDevice->SetStreamSource(0, nullptr, 0, 0));
@@ -36,16 +36,16 @@ void CBackend::OnFrameBegin()
     {
         PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));
 
-#if defined(USE_DX11) || defined(USE_OGL)
-		Invalidate();
-		// DX9 sets base rt and base zb by default
-#if defined(USE_DX11)
-        // Getting broken HUD hands for OpenGL after calling rmNormal()
+#ifndef USE_DX9
+        Invalidate();
+        // DX9 sets base rt and base zb by default
+#ifndef USE_OGL
+        // XXX: Getting broken HUD hands for OpenGL after calling rmNormal()
         RImplementation.rmNormal();
-#elif defined(USE_OGL)
+#else
         set_FB(HW.pFB);
 #endif
-		set_RT(RImplementation.Target->get_base_rt());
+        set_RT(RImplementation.Target->get_base_rt());
         set_ZB(RImplementation.Target->get_base_zb());
 #endif
 
@@ -148,7 +148,7 @@ void CBackend::Invalidate()
 
 void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)
 {
-#if defined(USE_DX9) // USE_DX9
+#if defined(USE_DX9)
     if (0 == HW.Caps.geometry.dwClipPlanes)
         return;
     if (!_enable)
@@ -189,7 +189,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
     UNUSED(count);
     return;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif //USE_DX9
 }
 
@@ -200,14 +200,14 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
         return;
     if (!_enable)
     {
-#if defined(USE_DX9) // USE_DX9
+#if defined(USE_DX9)
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, FALSE));
 #elif defined(USE_DX11) || defined(USE_OGL)
     // TODO: DX10: Implement in the corresponding vertex shaders
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
         return;
     }
@@ -230,7 +230,7 @@ void CBackend::set_Textures(STextureList* _T)
     int _last_hs = -1;
     int _last_ds = -1;
     int _last_cs = -1;
-#endif // USE_DX11
+#endif
     STextureList::iterator _it = _T->begin();
     STextureList::iterator _end = _T->end();
 
@@ -264,7 +264,7 @@ void CBackend::set_Textures(STextureList* _T)
         else
 #if defined(USE_DX11)
         if (load_id < CTexture::rstGeometry)
-#endif // USE_DX11
+#endif
         {
             // Set up pixel shader resources
             VERIFY(load_id < CTexture::rstVertex + CTexture::mtMaxVertexShaderTextures);
@@ -409,7 +409,7 @@ void CBackend::set_Textures(STextureList* _T)
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
     }
     // clear remaining stages (VS)
@@ -434,7 +434,7 @@ void CBackend::set_Textures(STextureList* _T)
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
     }
 
@@ -485,7 +485,7 @@ void CBackend::set_Textures(STextureList* _T)
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetCSResource(_last_cs, pRes);
     }
-#endif // !USE_DX9 && !USE_OGL
+#endif // USE_DX11
 }
 #else
 
@@ -497,7 +497,7 @@ void CBackend::set_Textures(STextureList* _T) {}
 void CBackend::SetupStates()
 {
     set_CullMode(CULL_CCW);
-#if defined(USE_DX9) // USE_DX9
+#if defined(USE_DX9)
     for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
     {
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, ps_r__tf_Anisotropic));
@@ -541,6 +541,6 @@ void CBackend::SetupStates()
 #elif defined(USE_OGL)
     // TODO: OGL: Implement SetupStates().
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 }
