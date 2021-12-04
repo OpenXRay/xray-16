@@ -39,7 +39,7 @@ Take a look at our [Issues](https://github.com/openxray/xray-16/issues) page:
 * See issues labeled as [good first issue](https://github.com/OpenXRay/xray-16/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Good+first+issue%22) to get familiar with the engine code in practice.
 * You may also want to look at issues labeled as [help wanted](https://github.com/OpenXRay/xray-16/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Help+wanted%22). Some of them are difficult ones, though.
 
-The `dev` branch is the default and base branch for the project. It is used for development and all Pull Requests should go there.
+The `dev` branch is the default and base branch for the project. It is used for development and all Pull Requests should go there. But, be aware that this branch, sometimes, may be broken and, rarely, we can do force pushes to this branch.
 
 Be advised that this is a community project not sanctioned by GSC Game World in any way – and they remain the copyright holders
 of all the original source code and S.T.A.L.K.E.R. franchise. <br>
