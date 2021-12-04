@@ -326,8 +326,16 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
 {
     if (!GEnv.isDedicatedServer)
     {
-        // TODO: DX10: When all shaders are ready switch to common path
-#ifdef USE_DX11
+#if defined(USE_DX9)
+#   ifndef _EDITOR
+        if (_lua_HasShader(s_shader))
+            return _lua_Create(s_shader, s_textures);
+        else
+#   endif
+        {
+            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
+        }
+#else // TODO: DX10: When all shaders are ready switch to common path
         if (_lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
         else
@@ -346,13 +354,6 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
                 }
             }
         }
-#else // USE_DX9
-#ifndef _EDITOR
-        if (_lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        else
-#endif
-            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
 #endif
     }
     return nullptr;
@@ -372,11 +373,13 @@ void CResourceManager::DeferredUpload()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
-#else
+#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Load();
+#else
+#   error No graphics API selected or enabled!
 #endif
 }
 
@@ -385,11 +388,13 @@ void CResourceManager::DeferredUnload()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
-#else
+#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Unload();
+#else
+#   error No graphics API selected or enabled!
 #endif
 }
 

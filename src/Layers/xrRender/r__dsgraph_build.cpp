@@ -125,26 +125,30 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
         auto& pass = *sh->passes[iPass];
         auto& map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
 
-#ifdef USE_OGL
+#if defined(USE_DX9)
         auto& Nvs = map[pass.vs->sh];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#elif !defined(USE_DX9)
+        auto& Nps = Nvs[pass.ps->sh];
+#elif defined(USE_DX11)
         auto& Nvs = map[&*pass.vs];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
-#else
+#elif defined(USE_OGL)
         auto& Nvs = map[pass.vs->sh];
-        auto& Nps = Nvs[pass.ps->sh];
+        auto& Ngs = Nvs[pass.gs->sh];
+        auto& Nps = Ngs[pass.ps->sh];
+#else
+#   error No graphics API selected or enabled!
 #endif
 
-#ifdef USE_DX11
+#if defined(USE_DX9) || defined(USE_OGL)
+        auto& Ncs = Nps[pass.constants._get()];
+#elif defined(USE_DX11)
         Nps.hs = pass.hs->sh;
         Nps.ds = pass.ds->sh;
 
         auto& Ncs = Nps.mapCS[pass.constants._get()];
 #else
-        auto& Ncs = Nps[pass.constants._get()];
+#   error No graphics API selected or enabled!
 #endif
         auto& Nstate = Ncs[&*pass.state];
         auto& Ntex = Nstate[pass.T._get()];
@@ -160,16 +164,18 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
                 if (SSA > Ncs.ssa)
                 {
                     Ncs.ssa = SSA;
-#ifdef USE_DX11
+#if defined(USE_DX9) || defined(USE_OGL)
+                    if (SSA > Nps.ssa)
+                    {
+                        Nps.ssa = SSA;
+#elif defined(USE_DX11)
                     if (SSA > Nps.mapCS.ssa)
                     {
                         Nps.mapCS.ssa = SSA;
 #else
-                    if (SSA > Nps.ssa)
-                    {
-                        Nps.ssa = SSA;
+#   error No graphics API selected or enabled!
 #endif
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
                         if (SSA > Ngs.ssa)
                         {
                             Ngs.ssa = SSA;
@@ -178,7 +184,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
                             {
                                 Nvs.ssa = SSA;
                             }
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
                         }
 #endif
                     }
@@ -271,26 +277,32 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         auto& pass = *sh->passes[iPass];
         auto& map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
 
-#ifdef USE_OGL
+#if defined(USE_DX9)
         auto& Nvs = map[pass.vs->sh];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#elif !defined(USE_DX9)
+        auto& Nps = Nvs[pass.ps->sh];
+#elif defined(USE_DX11)
         auto& Nvs = map[&*pass.vs];
         auto& Ngs = Nvs[pass.gs->sh];
         auto& Nps = Ngs[pass.ps->sh];
-#else
+#elif defined(USE_OGL)
         auto& Nvs = map[pass.vs->sh];
-        auto& Nps = Nvs[pass.ps->sh];
+        auto& Ngs = Nvs[pass.gs->sh];
+        auto& Nps = Ngs[pass.ps->sh];
+#else
+#   error No graphics API selected or enabled!
 #endif
 
-#ifdef USE_DX11
+#if defined(USE_DX9)
+		auto& Ncs = Nps[pass.constants._get()];
+#elif defined(USE_DX11)
         Nps.hs = pass.hs->sh;
         Nps.ds = pass.ds->sh;
 
         auto& Ncs = Nps.mapCS[pass.constants._get()];
-#else
+#elif defined(USE_OGL)
         auto& Ncs = Nps[pass.constants._get()];
+#else
+#   error No graphics API selected or enabled!
 #endif
         auto& Nstate = Ncs[&*pass.state];
         auto& Ntex = Nstate[pass.T._get()];
@@ -306,16 +318,23 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                 if (SSA > Ncs.ssa)
                 {
                     Ncs.ssa = SSA;
-#ifdef USE_DX11
-                    if (SSA > Nps.mapCS.ssa)
-                    {
-                        Nps.mapCS.ssa = SSA;
-#else
+#if defined(USE_DX9)
                     if (SSA > Nps.ssa)
                     {
                         Nps.ssa = SSA;
+#elif defined(USE_DX11)
+                    if (SSA > Nps.mapCS.ssa)
+                    {
+                        Nps.mapCS.ssa = SSA;
+#elif defined(USE_OGL)
+                    if (SSA > Nps.ssa)
+                    {
+                        Nps.ssa = SSA;
+#else
+#   error No graphics API selected or enabled!
 #endif
-#ifndef USE_DX9
+
+#if defined(USE_DX11) || defined(USE_OGL)
                         if (SSA > Ngs.ssa)
                         {
                             Ngs.ssa = SSA;
@@ -324,7 +343,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                             {
                                 Nvs.ssa = SSA;
                             }
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
                         }
 #endif
                     }

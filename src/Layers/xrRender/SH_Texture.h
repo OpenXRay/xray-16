@@ -10,7 +10,16 @@ class CTheoraSurface;
 class ECORE_API CTexture : public xr_resource_named
 {
 public:
-#ifndef USE_DX9
+#if defined(USE_DX9)
+    enum MaxTextures
+    {
+        mtMaxPixelShaderTextures = 16,
+        mtMaxVertexShaderTextures = 4,
+        mtMaxCombinedShaderTextures =
+        mtMaxPixelShaderTextures
+        + mtMaxVertexShaderTextures
+    };
+#elif defined(USE_DX11) || defined(USE_OGL)
     enum	MaxTextures
     {
         //	Actually these values are 128
@@ -32,27 +41,11 @@ public:
         + mtMaxComputeShaderTextures
 #	endif
     };
-#else // USE_DX9
-    enum MaxTextures
-    {
-        mtMaxPixelShaderTextures = 16,
-        mtMaxVertexShaderTextures = 4,
-        mtMaxCombinedShaderTextures =
-        mtMaxPixelShaderTextures
-        + mtMaxVertexShaderTextures
-    };
-#endif // !USE_DX9
-
-#ifdef USE_OGL
-    //	Since OGL doesn't differentiate between stages,
-    //	distance between enum values should be the max for that stage.
-    enum ResourceShaderType
-    {
-        rstPixel = 0,	//	Default texture offset
-        rstVertex = rstPixel + mtMaxPixelShaderTextures,
-        rstGeometry = rstVertex + mtMaxVertexShaderTextures,
-    };
 #else
+#   error No graphics API selected or enabled!
+#endif
+
+#if defined(USE_DX9) || defined(USE_DX11)
     //	Since DX10 allows up to 128 unique textures,
     //	distance between enum values should be at leas 128
     enum ResourceShaderType //	Don't change this since it's hardware-dependent
@@ -66,7 +59,18 @@ public:
         rstCompute = rstDomain + 256,
         rstInvalid = rstCompute + 256
     };
-#endif // USE_OGL
+#elif defined(USE_OGL)
+    //	Since OGL doesn't differentiate between stages,
+    //	distance between enum values should be the max for that stage.
+    enum ResourceShaderType
+    {
+        rstPixel = 0,	//	Default texture offset
+        rstVertex = rstPixel + mtMaxPixelShaderTextures,
+        rstGeometry = rstVertex + mtMaxVertexShaderTextures,
+    };
+#else
+#   error No graphics API selected or enabled!
+#endif
 
 public:
     void __stdcall apply_load(u32 stage);
@@ -81,14 +85,15 @@ public:
     void Unload(void);
     // void Apply(u32 dwStage);
 
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    void surface_set(ID3DBaseTexture* surf);
+    ID3DBaseTexture* surface_get();
+#elif defined(USE_OGL)
     void surface_set(GLenum target, GLuint surf);
     GLuint surface_get();
 #else
-    void surface_set(ID3DBaseTexture* surf);
-    ID3DBaseTexture* surface_get();
-#endif // USE_OGL
-
+#   error No graphics API selected or enabled!
+#endif
 
     BOOL isUser() { return flags.bUser; }
 
@@ -113,7 +118,7 @@ public:
     CTexture();
     virtual ~CTexture();
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     ID3DShaderResourceView* get_SRView() { return m_pSRView; }
 #endif
 
@@ -127,7 +132,7 @@ private:
     }
 
     void desc_update();
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     void Apply(u32 dwStage);
     void ProcessStaging();
     D3D_USAGE GetUsage();
@@ -141,7 +146,7 @@ public: //	Public class members (must be encapsulated further)
         u32 bUser : 1;
         u32 seqCycles : 1;
         u32 MemoryUsage : 28;
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
         u32 bLoadedAsStaging : 1;
 #endif
     } flags;
@@ -160,7 +165,17 @@ public: //	Public class members (must be encapsulated further)
     };
 
 private:
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    ID3DBaseTexture* pSurface;
+    // Sequence data
+    xr_vector<ID3DBaseTexture*> seqDATA;
+
+    // Description
+    u32 m_width;
+    u32 m_height;
+    ID3DBaseTexture* desc_cache;
+    D3D_TEXTURE2D_DESC desc;
+#elif defined(USE_OGL)
     GLuint pSurface;
     GLuint pBuffer;
     // Sequence data
@@ -171,18 +186,10 @@ private:
     GLuint desc_cache;
     GLenum desc;
 #else
-    ID3DBaseTexture* pSurface;
-    // Sequence data
-    xr_vector<ID3DBaseTexture*> seqDATA;
+#   error No graphics API selected or enabled!
+#endif
 
-    // Description
-    u32 m_width;
-    u32 m_height;
-    ID3DBaseTexture* desc_cache;
-    D3D_TEXTURE2D_DESC desc;
-#endif // USE_OGL
-
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     ID3DShaderResourceView* m_pSRView;
     // Sequence view data
     xr_vector<ID3DShaderResourceView*> m_seqSRView;

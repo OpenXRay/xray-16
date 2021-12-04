@@ -146,7 +146,16 @@ void CRenderTarget::phase_pp()
     // Fill vertex buffer
     float du = ps_r1_pps_u, dv = ps_r1_pps_v;
     TL_2c3uv* pv = (TL_2c3uv*)RCache.Vertex.Lock(4, g_postprocess.stride(), Offset);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
+    pv++;
+    pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
+    pv++;
+    pv->set(du + float(_w), dv + float(_h), p_color, p_gray, r1.x, r1.y, l1.x, l1.y, n1.x, n1.y);
+    pv++;
+    pv->set(du + float(_w), dv + 0, p_color, p_gray, r1.x, r0.y, l1.x, l0.y, n1.x, n0.y);
+    pv++;
+#elif defined(USE_OGL)
     pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
     pv++;
     pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
@@ -156,15 +165,8 @@ void CRenderTarget::phase_pp()
     pv->set(du + float(_w), dv + float(_h), p_color, p_gray, r1.x, r1.y, l1.x, l1.y, n1.x, n1.y);
     pv++;
 #else
-    pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
-    pv++;
-    pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
-    pv++;
-    pv->set(du + float(_w), dv + float(_h), p_color, p_gray, r1.x, r1.y, l1.x, l1.y, n1.x, n1.y);
-    pv++;
-    pv->set(du + float(_w), dv + 0, p_color, p_gray, r1.x, r0.y, l1.x, l0.y, n1.x, n0.y);
-    pv++;
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif // USE_DX9 || USE_DX11
     RCache.Vertex.Unlock(4, g_postprocess.stride());
 
     // Actual rendering

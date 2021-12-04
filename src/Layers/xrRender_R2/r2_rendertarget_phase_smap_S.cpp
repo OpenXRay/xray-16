@@ -5,7 +5,7 @@ void CRenderTarget::phase_smap_spot_clear()
 #ifdef USE_OGL
     u_setrt(rt_smap_surf, nullptr, nullptr, rt_smap_depth);
 #endif
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     RCache.ClearZB(rt_smap_depth, 1.0f);
 #endif
 }
@@ -62,7 +62,16 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
         p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+        pv++;
+        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+        pv++;
+        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+        pv++;
+        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+        pv++;
+#elif defined(USE_OGL)
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
         pv++;
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
@@ -72,15 +81,8 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
         pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
         pv++;
 #else
-        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
-        pv++;
-        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
-        pv++;
-        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
-        pv++;
-        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
-        pv++;
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif // USE_DX9 || USE_DX11
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
 

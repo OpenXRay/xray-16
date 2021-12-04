@@ -20,34 +20,40 @@ D3DXRenderBase::D3DXRenderBase()
 
 void D3DXRenderBase::setGamma(float fGamma)
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Gamma(fGamma);
-#else
+#elif defined(USE_OGL)
     UNUSED(fGamma);
+#else
+#    error No graphics API selected or in use!
 #endif
 }
 
 void D3DXRenderBase::setBrightness(float fGamma)
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Brightness(fGamma);
-#else
+#elif defined(USE_OGL)
     UNUSED(fGamma);
+#else
+#    error No graphics API selected or in use!
 #endif
 }
 
 void D3DXRenderBase::setContrast(float fGamma)
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Contrast(fGamma);
-#else
+#elif defined(USE_OGL)
     UNUSED(fGamma);
+#else
+#    error No graphics API selected or in use!
 #endif
 }
 
 void D3DXRenderBase::updateGamma()
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();
 #endif
 }
@@ -75,7 +81,7 @@ void D3DXRenderBase::Destroy()
 
 void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(DEBUG) && !defined(USE_OGL)
+#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
@@ -101,7 +107,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     fHeight_2 = float(dwHeight / 2);
     Resources->reset_end();
 
-#if defined(DEBUG) && !defined(USE_OGL)
+#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
     _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif
 }
@@ -116,7 +122,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 {
     // Signal everyone - device created
     RCache.OnDeviceCreate();
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();
 #endif
     Resources->OnDeviceCreate(shName);

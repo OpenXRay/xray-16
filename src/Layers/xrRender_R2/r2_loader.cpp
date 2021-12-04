@@ -8,7 +8,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 #include "Layers/xrRender/FHierrarhyVisual.h"
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
 #endif
@@ -95,7 +95,7 @@ void CRender::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle();
     LoadSectors(fs);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     // 3D Fluid
     Load3DFluid();
 #endif
@@ -440,7 +440,7 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
     }
 }
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 void CRender::Load3DFluid()
 {
     // if (strstr(Core.Params,"-no_volumetric_fog"))

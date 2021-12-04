@@ -56,10 +56,10 @@ void CPortal::OnRender()
         RCache.set_xform_world(Fidentity);
         // draw solid
         RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
-#endif // !USE_DX9
+#endif
         RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*V.begin(), V.size() / 3);
 
         // draw wire
@@ -74,10 +74,10 @@ void CPortal::OnRender()
             Device.SetNearer(TRUE);
       
         RCache.set_Shader(RImplementation.m_WireShader);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
-#endif // USE_DX9
+#endif
         RCache.dbg_Draw(D3DPT_LINESTRIP, &*V.begin(), V.size() - 1);
         if (bDebug)
             RImplementation.rmNormal();

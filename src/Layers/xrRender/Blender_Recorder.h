@@ -138,7 +138,7 @@ public:
         D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0);
 
     void r_Constant(LPCSTR name, R_constant_setup* s);
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     void r_Pass(LPCSTR vs, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE,
         BOOL bABlend = FALSE, D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE,
         u32 aRef = 0);

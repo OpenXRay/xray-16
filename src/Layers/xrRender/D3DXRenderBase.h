@@ -225,7 +225,7 @@ public:
     ref_shader m_SelectionShader;
 
 private:
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     CGammaControl m_Gamma;
-#endif // !USE_OGL
+#endif
 };

@@ -156,12 +156,14 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
              * The w/a here is to skip VS uniforms in order to get
              * correct sampler location.
              */
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+            const u32 smp_location_sky = CTexture::rstVertex;
+            const u32 smp_location_clouds = CTexture::rstVertex;
+#elif defined(USE_OGL)
             const u32 smp_location_sky = CTexture::rstVertex + 1 /* m_WVP */;
             const u32 smp_location_clouds = CTexture::rstVertex + 1 /* m_WVP */;
 #else
-            const u32 smp_location_sky = CTexture::rstVertex;
-            const u32 smp_location_clouds = CTexture::rstVertex;
+#   error No graphics API selected or enabled!
 #endif
             mixRen.sky_r_textures.push_back(std::make_pair(smp_location_sky, tonemap)); //. hack
             mixRen.clouds_r_textures.push_back(std::make_pair(smp_location_clouds, tonemap)); //. hack
@@ -203,21 +205,19 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 #endif // USE_OGL
 
 // ******************** Environment params (setting)
-#ifndef USE_DX9
-    //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
-#else
-
-#if RENDER == R_R1
+#if defined(USE_DX9)
+#   if RENDER == R_R1
     Fvector3 fog_color = env.CurrentEnv->fog_color;
     fog_color.mul(ps_r1_fog_luminance);
-#else //	RENDER==R_R1
+#   else
     Fvector3& fog_color = env.CurrentEnv->fog_color;
-#endif //	RENDER==R_R1
-
+#   endif
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGCOLOR, color_rgba_f(fog_color.x, fog_color.y, fog_color.z, 0)));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGSTART, *(u32*)(&env.CurrentEnv->fog_near)));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGEND, *(u32*)(&env.CurrentEnv->fog_far)));
-#endif // !USE_DX9
+#else
+    //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
+#endif
 }
 
 void dxEnvironmentRender::OnLoad()
@@ -256,16 +256,18 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.set_xform_world(mSky);
     RCache.set_Geometry(sh_2geom);
     RCache.set_Shader(sh_2sky);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    RCache.set_Textures(&mixRen.sky_r_textures);
+#elif defined(USE_OGL)
     if (HW.Caps.geometry.bVTF)
         RCache.set_Textures(&mixRen.sky_r_textures);
-#else // USE_OGL
-    RCache.set_Textures(&mixRen.sky_r_textures);
-#endif // USE_OGL
+#else
+#   error No graphics API selected or enabled!
+#endif
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
 #ifdef USE_OGL
-	// Sun must be rendered to generic0 only as it is done in DX
+    // Sun must be rendered to generic0 only as it is done in DX
     if (!RImplementation.o.dx10_msaa)
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, RImplementation.Target->get_base_zb());
     else
@@ -294,7 +296,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, RImplementation.Target->get_base_zb());
     else
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
- #endif // USE_OGL
+#endif // USE_OGL
 }
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
@@ -332,7 +334,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_xform_world(mXFORM);
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);
-#ifndef USE_OGL
+#ifndef USE_OGL // Fix cloud lerping on OGL
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
     RCache.set_Textures(&mixRen.clouds_r_textures);
 #endif
@@ -351,15 +353,17 @@ void dxEnvironmentRender::OnDeviceCreate()
 
 void dxEnvironmentRender::OnDeviceDestroy()
 {
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    tsky0->surface_set(nullptr);
+    tsky1->surface_set(nullptr);
+#elif defined(USE_OGL)
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
     tclouds0->surface_set(GL_TEXTURE_2D, 0);
     tclouds1->surface_set(GL_TEXTURE_2D, 0);
 #else
-    tsky0->surface_set(nullptr);
-    tsky1->surface_set(nullptr);
-#endif // USE_OGL
+#   error No graphics API slected or defined!
+#endif
 
     sh_2sky.destroy();
     sh_2geom.destroy();

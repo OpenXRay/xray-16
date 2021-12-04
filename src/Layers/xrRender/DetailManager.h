@@ -189,10 +189,12 @@ public:
     void hw_Load_Shaders();
     void hw_Unload();
     void hw_Render();
-#ifndef USE_DX9
+#if defined(USE_DX9)
+    void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
+#elif defined(USE_DX11) || defined(USE_OGL)
     void hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
 #else
-    void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
+#   error No graphics API selected or enabled!
 #endif
 
     // get unpacked slot

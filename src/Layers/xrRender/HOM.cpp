@@ -173,17 +173,19 @@ void CHOM::Render_DB(CFrustum& base)
 {
     // Update projection matrices on every frame to ensure valid HOM culling
     float view_dim = occ_dim_0;
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         view_dim / 2.f + 0 + 0, view_dim / 2.f + 0 + 0, 0.0f, 1.0f};
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         1.f / 2.f + 0 + 0, 1.f / 2.f + 0 + 0, 0.0f, 1.0f};
-#else
+#elif defined(USE_OGL)
     Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         view_dim / 2.f + 0 + 0, view_dim / 2.f + 0 + 0, 0.0f, 1.0f};
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         1.f / 2.f + 0 + 0, 1.f / 2.f + 0 + 0, 0.0f, 1.0f};
-#endif // !USE_OGL
+#else
+#   error No graphics API selected or enabled!
+#endif
     m_xform.mul(m_viewport, Device.mFullTransform);
     m_xform_01.mul(m_viewport_01, Device.mFullTransform);
 
@@ -446,10 +448,10 @@ void CHOM::OnRender()
             // draw solid
             Device.SetNearer(TRUE);
             RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
             RCache.set_c("tfactor", float(color_get_R(0x80FFFFFF)) / 255.f, float(color_get_G(0x80FFFFFF)) / 255.f, \
                 float(color_get_B(0x80FFFFFF)) / 255.f, float(color_get_A(0x80FFFFFF)) / 255.f);
-#endif // !USE_DX9
+#endif
             RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*poly.begin(), poly.size() / 3);
             Device.SetNearer(FALSE);
             // draw wire
@@ -462,9 +464,9 @@ void CHOM::OnRender()
                 Device.SetNearer(TRUE);
             }
             RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
             RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
-#endif // !USE_DX9
+#endif
             RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
             if (bDebug)
             {
