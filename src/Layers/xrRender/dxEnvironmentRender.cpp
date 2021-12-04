@@ -163,7 +163,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
             const u32 smp_location_sky = CTexture::rstVertex + 1 /* m_WVP */;
             const u32 smp_location_clouds = CTexture::rstVertex + 1 /* m_WVP */;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
             mixRen.sky_r_textures.push_back(std::make_pair(smp_location_sky, tonemap)); //. hack
             mixRen.clouds_r_textures.push_back(std::make_pair(smp_location_clouds, tonemap)); //. hack
@@ -206,19 +206,17 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 
 // ******************** Environment params (setting)
 #if defined(USE_DX9)
-	#if RENDER == R_R1
-		Fvector3 fog_color = env.CurrentEnv->fog_color;
-		fog_color.mul(ps_r1_fog_luminance);
-	#else //	RENDER==R_R1
-		Fvector3& fog_color = env.CurrentEnv->fog_color;
-	#endif //	RENDER==R_R1
-
-		CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGCOLOR, color_rgba_f(fog_color.x, fog_color.y, fog_color.z, 0)));
-		CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGSTART, *(u32*)(&env.CurrentEnv->fog_near)));
-		CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGEND, *(u32*)(&env.CurrentEnv->fog_far)));
-    
+#   if RENDER == R_R1
+    Fvector3 fog_color = env.CurrentEnv->fog_color;
+    fog_color.mul(ps_r1_fog_luminance);
+#   else
+    Fvector3& fog_color = env.CurrentEnv->fog_color;
+#   endif
+    CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGCOLOR, color_rgba_f(fog_color.x, fog_color.y, fog_color.z, 0)));
+    CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGSTART, *(u32*)(&env.CurrentEnv->fog_near)));
+    CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGEND, *(u32*)(&env.CurrentEnv->fog_far)));
 #else
-	//	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
+    //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
 #endif
 }
 
@@ -264,12 +262,12 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     if (HW.Caps.geometry.bVTF)
         RCache.set_Textures(&mixRen.sky_r_textures);
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, 12, i_offset, 20);
 
 #ifdef USE_OGL
-	// Sun must be rendered to generic0 only as it is done in DX
+    // Sun must be rendered to generic0 only as it is done in DX
     if (!RImplementation.o.dx10_msaa)
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, RImplementation.Target->get_base_zb());
     else
@@ -336,7 +334,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_xform_world(mXFORM);
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);
-#if defined(USE_DX9) || defined(USE_DX11) // XXX: why it this disabled for OGL?
+#ifndef USE_OGL // Fix cloud lerping on OGL
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
     RCache.set_Textures(&mixRen.clouds_r_textures);
 #endif
@@ -364,7 +362,7 @@ void dxEnvironmentRender::OnDeviceDestroy()
     tclouds0->surface_set(GL_TEXTURE_2D, 0);
     tclouds1->surface_set(GL_TEXTURE_2D, 0);
 #else
-#    error No graphics API slected or defined!
+#   error No graphics API slected or defined!
 #endif
 
     sh_2sky.destroy();

@@ -518,7 +518,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         Log("! Failed to make a screenshot");
 }
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
 void CRender::Screenshot(ScreenshotMode mode, LPCSTR name) { ScreenshotImpl(mode, name, nullptr); }
@@ -538,7 +538,7 @@ void CRender::ScreenshotAsyncBegin()
     m_bMakeAsyncSS = true;
 }
 
-#if defined(USE_DX9) // USE_DX9
+#if defined(USE_DX9)
 void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 {
     if (!Device.b_is_Ready)
@@ -643,7 +643,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
     VERIFY(!"CRender::ScreenshotAsyncEnd not implemented.");
 }
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif
 
 void DoAsyncScreenshot() { RImplementation.Target->DoAsyncScreenshot(); }

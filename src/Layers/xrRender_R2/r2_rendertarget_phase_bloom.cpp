@@ -156,7 +156,7 @@ void CRenderTarget::phase_bloom()
         pv->uv3.set(b_3.x, b_3.y);
         pv++;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif // USE_DX9/11
         RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
 
@@ -236,7 +236,7 @@ void CRenderTarget::phase_bloom()
         pv->uv3.set(p1.x - ddw, p1.y + ddh);
         pv++;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif // USE_OGL
         RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
         RCache.set_Geometry(g_bloom_build);
@@ -370,7 +370,7 @@ void CRenderTarget::phase_bloom()
             pv->uv7.set(1 + a_7.x, 1 + a_7.y, 1 + a_7.z, 1 + a_7.w);
             pv++;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif // !USE_OGL
             RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
@@ -502,7 +502,7 @@ void CRenderTarget::phase_bloom()
             pv->uv7.set(1 + a_7.x, 1 + a_7.y, 1 + a_7.z, 1 + a_7.w);
             pv++;
 #else
-#    error No graphics API selected or enabled!
+#   error No graphics API selected or enabled!
 #endif // !USE_OGL
             RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
