@@ -201,7 +201,13 @@ void CRender::render_rain()
         Fmatrix m_viewport =
         {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
+#if defined(USE_DX11)
+            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+#elif defined(USE_OGL)
             0.0f, view_dim / 2.f, 0.0f, 0.0f,
+#else
+#    error No graphics API selected or in use!
+#endif
             0.0f, 0.0f, 1.0f, 0.0f,
             view_dim / 2.f + fTexelOffs, view_dim / 2.f + fTexelOffs, 0.0f, 1.0f
         };
