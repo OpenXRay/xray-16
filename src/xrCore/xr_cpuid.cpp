@@ -223,6 +223,7 @@ bool query_processor_info(processor_info* pinfo)
         memcpy(pinfo->modelName + 16, data[3].data(), sizeof(cpui));
         memcpy(pinfo->modelName + 32, data[4].data(), sizeof(cpui));
     }
+    _Trim(pinfo->modelName); // spaces...
 
     // Read invariant TSC support
     if (nExIds_ >= 0x80000007)
