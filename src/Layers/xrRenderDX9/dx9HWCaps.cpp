@@ -64,7 +64,7 @@ u32 GetNVGpuNum()
 
 u32 GetATIGpuNum()
 {
-    const auto atimgpud = XRay::LoadModule("ATIMGPUD.DLL");
+    const auto atimgpud = XRay::LoadModule("ATIMGPUD");
     if (!atimgpud->IsLoaded())
         return 0;
 
