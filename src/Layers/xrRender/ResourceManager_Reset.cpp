@@ -94,7 +94,9 @@ void CResourceManager::reset_end()
 
     // create everything, renderer may use
     GEnv.Render->reset_end();
+#ifndef MASTER_GOLD
     Dump(true);
+#endif
 }
 
 template <class C>
@@ -109,7 +111,9 @@ void mdump(C c)
 CResourceManager::~CResourceManager()
 {
     DestroyNecessaryTextures();
+#ifndef MASTER_GOLD
     Dump(false);
+#endif
 }
 
 void CResourceManager::Dump(bool bBrief)

@@ -700,9 +700,9 @@ void xrRender_initconsole()
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
 
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
-#ifdef DEBUG
+#ifndef MASTER_GOLD
     CMD1(CCC_DumpResources, "dump_resources");
-#endif // DEBUG
+#endif
 
     CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175);
 

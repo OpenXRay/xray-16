@@ -766,10 +766,10 @@ void CCC_Register()
     CMD1(CCC_SaveCFG, "cfg_save");
     CMD1(CCC_LoadCFG, "cfg_load");
 
-#ifdef DEBUG
+#ifndef MASTER_GOLD
     CMD1(CCC_MotionsStat, "stat_motions");
     CMD1(CCC_TexturesStat, "stat_textures");
-#endif // DEBUG
+#endif
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);

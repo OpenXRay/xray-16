@@ -24,7 +24,9 @@ IGame_Level::IGame_Level()
     bReady = false;
     pCurrentEntity = NULL;
     pCurrentViewEntity = NULL;
+#ifndef MASTER_GOLD
     Device.DumpResourcesMemoryUsage();
+#endif
 }
 
 IGame_Level::~IGame_Level()
@@ -44,7 +46,9 @@ IGame_Level::~IGame_Level()
     ///////////////////////////////////////////
     GEnv.Sound->set_geometry_occ(nullptr);
     GEnv.Sound->set_handler(nullptr);
+#ifndef MASTER_GOLD
     Device.DumpResourcesMemoryUsage();
+#endif
 
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
     if (GEnv.Render)
