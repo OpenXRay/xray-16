@@ -21,9 +21,7 @@ set(SRC_FILES
     "glResourceManager_Resources.cpp"
     "glResourceManager_Scripting.cpp"
     "glTexture.cpp"
-    "r2_R_sun.cpp"
     "r2_test_hw.cpp"
-    "r3_R_rain.cpp"
     "rgl.h"
     "rgl_shaders.cpp"
     "stdafx.cpp"
@@ -323,6 +321,7 @@ set(SRC_FILES
     "../xrRender_R2/r2_R_calculate.cpp"
     "../xrRender_R2/r2_R_lights.cpp"
     "../xrRender_R2/r2_R_render.cpp"
+    "../xrRender_R2/r2_R_sun.cpp"
     "../xrRender_R2/r2_R_sun_support.h"
     "../xrRender_R2/r2_rendertarget_accum_omnipart_geom.cpp"
     "../xrRender_R2/r2_rendertarget_accum_point_geom.cpp"
@@ -338,6 +337,7 @@ set(SRC_FILES
     "../xrRender_R2/r2_rendertarget_phase_smap_S.cpp"
     "../xrRender_R2/r2_rendertarget_wallmarks.h"
     "../xrRender_R2/r2_types.h"
+    "../xrRender_R2/r3_R_rain.cpp"
     "../xrRender_R2/SMAP_Allocator.h"
     "../xrRenderGL/Blender_Recorder_GL.cpp"
     "../xrRenderGL/CommonTypes.h"
@@ -395,6 +395,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/Layers/xrRender
     ${CMAKE_SOURCE_DIR}/src/Include/xrRender
     ${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2
+    ${CMAKE_SOURCE_DIR}/Externals/DirectXMath/Inc
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/gli
     ${CMAKE_SOURCE_DIR}/Externals/gli/external/glm

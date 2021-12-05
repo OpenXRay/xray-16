@@ -7,6 +7,7 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCommon/math_funcs_inline.h"
 
+#define _XM_NO_XMVECTOR_OVERLOADS_
 #include <DirectXMath.h>
 
 using namespace DirectX;
@@ -108,11 +109,11 @@ static inline bool PlaneIntersection(
 
     const float secTheta = 1.f / cosTheta;
 
-    n1_n2 = n1_n2 * XMVectorGetW(n0);
-    n2_n0 = n2_n0 * XMVectorGetW(n1);
-    n0_n1 = n0_n1 * XMVectorGetW(n2);
+    n1_n2 = XMVectorScale(n1_n2, XMVectorGetW(n0));
+    n2_n0 = XMVectorScale(n2_n0, XMVectorGetW(n1));
+    n0_n1 = XMVectorScale(n0_n1, XMVectorGetW(n2));
 
-    intersectPt = -(n1_n2 + n2_n0 + n0_n1) * secTheta;
+    intersectPt = XMVectorScale(XMVectorNegate(XMVectorAdd(XMVectorAdd(n1_n2, n2_n0), n0_n1)), secTheta);
     return true;
 }
 
@@ -135,12 +136,12 @@ Frustum::Frustum(const XMFLOAT4X4* matrix)
     const XMVECTOR column3 = XMVectorSet(matrix->_13, matrix->_23, matrix->_33, matrix->_43);
 
     XMVECTOR planes[6];
-    planes[0] = column4 - column1; // left
-    planes[1] = column4 + column1; // right
-    planes[2] = column4 - column2; // bottom
-    planes[3] = column4 + column2; // top
-    planes[4] = column4 - column3; // near
-    planes[5] = column4 + column3; // far
+    planes[0] = XMVectorSubtract(column4, column1); // left
+    planes[1] = XMVectorAdd     (column4, column1); // right
+    planes[2] = XMVectorSubtract(column4, column2); // bottom
+    planes[3] = XMVectorAdd     (column4, column2); // top
+    planes[4] = XMVectorSubtract(column4, column3); // near
+    planes[5] = XMVectorAdd     (column4, column3); // far
     // ignore near & far plane
 
     for (int p = 0; p < 6; p++) // normalize the planes
@@ -202,22 +203,22 @@ struct DumbClipper
             if (cls0f > 0)
             {
                 // clip v0
-                XMVECTOR D = v1 - v0;
+                XMVECTOR D = XMVectorSubtract(v1, v0);
                 XMVECTOR denum = XMPlaneDotNormal(P, D);
                 if (XMVectorGetX(denum) != 0)
                 {
-                    v0 += -D * cls0 / denum;
+                    v0 = XMVectorAdd(v0, XMVectorDivide(XMVectorMultiply(XMVectorNegate(D), cls0), denum));
                     XMStoreFloat3(&p0, v0);
                 }
             }
             if (cls1f > 0)
             {
                 // clip v1
-                XMVECTOR D = v0 - v1;
+                XMVECTOR D = XMVectorSubtract(v0, v1);
                 XMVECTOR denum = XMPlaneDotNormal(P, D);
                 if (XMVectorGetX(denum) != 0)
                 {
-                    v1 += -D * cls1 / denum;
+                    v1 = XMVectorAdd(v1, XMVectorDivide(XMVectorMultiply(XMVectorNegate(D), cls1), denum));
                     XMStoreFloat3(&p1, v1);
                 }
             }
@@ -431,7 +432,7 @@ void CRender::render_sun()
             add_Geometry(root, cull_frustum);
         }
     }
-    set_Recorder(NULL);
+    set_Recorder(nullptr);
 
     //	Prepare to interact with D3DX code
     const XMMATRIX m_View = XMLoadFloat4x4((XMFLOAT4X4*)(&Device.mView));
@@ -522,7 +523,7 @@ void CRender::render_sun()
         XMMATRIX xlate_center(
             1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, -centerOrig.x, -centerOrig.y, 0.f, 1.f);
 
-        XMVECTOR center_dirl = XMLoadFloat2(&centerPts[1]) - XMLoadFloat2(&centerOrig);
+        XMVECTOR center_dirl = XMVectorSubtract(XMLoadFloat2(&centerPts[1]), XMLoadFloat2(&centerOrig));
         float half_center_len = XMVectorGetX(XMVector2Length(center_dirl));
         float x_len = centerPts[1].x - centerOrig.x;
         float y_len = centerPts[1].y - centerOrig.y;

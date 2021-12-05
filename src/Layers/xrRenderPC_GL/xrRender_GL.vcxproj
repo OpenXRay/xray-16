@@ -22,7 +22,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)DirectXMath\Inc;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -121,6 +121,8 @@
     <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp" />
     <ClCompile Include="gl_rendertarget_accum_direct.cpp" />
     <ClCompile Include="gl_rendertarget_accum_point.cpp" />
     <ClCompile Include="gl_rendertarget_accum_spot.cpp" />
@@ -199,9 +201,7 @@
     <ClCompile Include="glr_constants.cpp" />
     <ClCompile Include="glTexture.cpp" />
     <ClCompile Include="gl_rendertarget_u_set_rt.cpp" />
-    <ClCompile Include="r2_R_sun.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />
-    <ClCompile Include="r3_R_rain.cpp" />
     <ClCompile Include="rgl_shaders.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
