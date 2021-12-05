@@ -97,30 +97,6 @@ public:
     virtual void Execute(pcstr args) { g_pStringContainer->dump(); }
 };
 //-----------------------------------------------------------------------
-class CCC_MotionsStat : public IConsole_Command
-{
-public:
-    CCC_MotionsStat(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(pcstr args)
-    {
-        // g_pMotionsContainer->dump();
-        // TODO: move this console commant into renderer
-        VERIFY(0);
-    }
-};
-class CCC_TexturesStat : public IConsole_Command
-{
-public:
-    CCC_TexturesStat(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(pcstr args)
-    {
-        Device.DumpResourcesMemoryUsage();
-        // Device.Resources->_DumpMemoryUsage();
-        // TODO: move this console commant into renderer
-        // VERIFY(0);
-    }
-};
-//-----------------------------------------------------------------------
 class CCC_E_Dump : public IConsole_Command
 {
 public:
@@ -765,11 +741,6 @@ void CCC_Register()
     CMD1(CCC_Disconnect, "disconnect");
     CMD1(CCC_SaveCFG, "cfg_save");
     CMD1(CCC_LoadCFG, "cfg_load");
-
-#ifndef MASTER_GOLD
-    CMD1(CCC_MotionsStat, "stat_motions");
-    CMD1(CCC_TexturesStat, "stat_textures");
-#endif
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);

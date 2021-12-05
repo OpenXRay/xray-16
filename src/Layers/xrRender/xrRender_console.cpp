@@ -3,6 +3,7 @@
 
 #include "xrRender_console.h"
 #include "xrCore/xr_token.h"
+#include "xrCore/Animation/SkeletonMotions.hpp"
 
 u32 ps_Preset = 2;
 const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
@@ -524,6 +525,40 @@ public:
     }
 };
 
+class CCC_DumpResources final : public IConsole_Command
+{
+public:
+    CCC_DumpResources(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr /*args*/) override
+    {
+        RImplementation.Models->dump();
+        RImplementation.Resources->Dump(false);
+    }
+};
+
+class CCC_MotionsStat final : public IConsole_Command
+{
+public:
+    CCC_MotionsStat(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr /*args*/) override
+    {
+        g_pMotionsContainer->dump();
+    }
+};
+
+class CCC_TexturesStat final : public IConsole_Command
+{
+public:
+    CCC_TexturesStat(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr /*args*/) override
+    {
+        RImplementation.Resources->_DumpMemoryUsage();
+    }
+};
+
 #if RENDER != R_R1
 #include "r__pixel_calculator.h"
 class CCC_BuildSSA : public IConsole_Command
@@ -659,17 +694,6 @@ public:
     }
 };
 
-class CCC_DumpResources : public IConsole_Command
-{
-public:
-    CCC_DumpResources(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR /*args*/)
-    {
-        RImplementation.Models->dump();
-        RImplementation.Resources->Dump(false);
-    }
-};
-
 #ifdef DEBUG
 class CCC_SunshaftsIntensity : public CCC_Float
 {
@@ -702,6 +726,8 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
 #ifndef MASTER_GOLD
     CMD1(CCC_DumpResources, "dump_resources");
+    CMD1(CCC_MotionsStat, "stat_motions");
+    CMD1(CCC_TexturesStat, "stat_textures");
 #endif
 
     CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175);

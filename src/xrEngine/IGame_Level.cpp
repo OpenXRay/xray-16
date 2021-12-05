@@ -25,14 +25,13 @@ IGame_Level::IGame_Level()
     pCurrentEntity = NULL;
     pCurrentViewEntity = NULL;
 #ifndef MASTER_GOLD
-    Device.DumpResourcesMemoryUsage();
+    GEnv.Render->ResourcesDumpMemoryUsage();
 #endif
 }
 
 IGame_Level::~IGame_Level()
 {
     if (strstr(Core.Params, "-nes_texture_storing"))
-        // Device.Resources->StoreNecessaryTextures();
         GEnv.Render->ResourcesStoreNecessaryTextures();
     xr_delete(pLevel);
 
@@ -47,7 +46,7 @@ IGame_Level::~IGame_Level()
     GEnv.Sound->set_geometry_occ(nullptr);
     GEnv.Sound->set_handler(nullptr);
 #ifndef MASTER_GOLD
-    Device.DumpResourcesMemoryUsage();
+    GEnv.Render->ResourcesDumpMemoryUsage();
 #endif
 
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;

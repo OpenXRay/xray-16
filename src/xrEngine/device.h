@@ -167,8 +167,6 @@ public:
         // RCache.set_xform_project (mProject);
     }
 
-    void DumpResourcesMemoryUsage() { GEnv.Render->ResourcesDumpMemoryUsage(); }
-
     MessageRegistry<pureFrame> seqFrameMT;
     MessageRegistry<pureDeviceReset> seqDeviceReset;
     MessageRegistry<pureUIReset> seqUIReset;
