@@ -20,15 +20,13 @@ u32 GetNVGpuNum()
 
     //	int result = NVAPI_OK;
 
-    int iGpuNum = 0;
-
     NvAPI_Status status;
     status = NvAPI_Initialize();
 
     if (status != NVAPI_OK)
     {
         Msg("* NVAPI is missing.");
-        return iGpuNum;
+        return 0;
     }
 
     // enumerate logical gpus
@@ -36,8 +34,7 @@ u32 GetNVGpuNum()
     if (status != NVAPI_OK)
     {
         Msg("* NvAPI_EnumLogicalGPUs failed!");
-        return iGpuNum;
-        // error
+        return 0;
     }
 
     // enumerate physical gpus
@@ -45,10 +42,10 @@ u32 GetNVGpuNum()
     if (status != NVAPI_OK)
     {
         Msg("* NvAPI_EnumPhysicalGPUs failed!");
-        return iGpuNum;
-        // error
+        return 0;
     }
 
+    int iGpuNum = 0;
     Msg("* NVidia MGPU: Logical(%d), Physical(%d)", physicalGPUCount, logicalGPUCount);
 
     //	Assume that we are running on logical GPU with most physical GPUs connected.
@@ -69,22 +66,20 @@ u32 GetATIGpuNum()
 {
     const auto atimgpud = XRay::LoadModule("ATIMGPUD.DLL");
     if (!atimgpud->IsLoaded())
-        return 1;
+        return 0;
 
     using ATIQUERYMGPUCOUNT = INT(*)();
 
     const auto AtiQueryMgpuCount = (ATIQUERYMGPUCOUNT)atimgpud->GetProcAddress("AtiQueryMgpuCount");
 
     if (!AtiQueryMgpuCount)
-        return 1;
+        return 0;
 
     const int iGpuNum = AtiQueryMgpuCount();
     if (iGpuNum > 1)
-    {
         Msg("* ATI MGPU: %d-Way CrossFire detected.", iGpuNum);
-        return iGpuNum;
-    }
-    return 1;
+
+    return iGpuNum;
 }
 
 u32 GetGpuNum()
