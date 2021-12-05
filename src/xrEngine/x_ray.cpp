@@ -264,9 +264,12 @@ void CApplication::LoadTitleInt(pcstr str1, pcstr str2, pcstr str3)
 void CApplication::LoadStage(bool draw /*= true*/)
 {
     VERIFY(ll_dwReference);
-    Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
-    phase_timer.Start();
-    Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
+    if (!load_screen_renderer.IsActive())
+    {
+        Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
+        Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
+        phase_timer.Start();
+    }
 
     if (g_pGamePersistent->GameType() == 1 && !xr_strcmp(g_pGamePersistent->m_game_params.m_alife, "alife"))
         max_load_stage = 18;
