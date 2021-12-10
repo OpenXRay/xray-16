@@ -620,28 +620,6 @@ extern LPCSTR log_name();
 void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 {
 #if defined(USE_BUG_TRAP) && defined(XR_PLATFORM_WINDOWS)
-    if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady))
-        return;
-    string_path logDir;
-    __try
-    {
-        FS.update_path(logDir, "$logs$", "");
-        if (logDir[0] != _DELIMITER && logDir[1] != ':')
-        {
-            string256 currentDir;
-            _getcwd(currentDir, sizeof(currentDir));
-            string256 relDir;
-            xr_strcpy(relDir, logDir);
-            strconcat(sizeof(logDir), logDir, currentDir, DELIMITER, relDir);
-        }
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        xr_strcpy(logDir, "logs");
-    }
-    string_path temp;
-    strconcat(sizeof(temp), temp, logDir, log_name());
-    BT_AddLogFile(temp);
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
 
@@ -697,10 +675,22 @@ void xrDebug::SetupExceptionHandler()
 void xrDebug::OnFilesystemInitialized()
 {
 #ifdef USE_BUG_TRAP
-    string_path dumpPath;
-    if (FS.update_path(dumpPath, "$app_data_root$", "reports", false))
+    string_path path{};
+    FS.update_path(path, "$logs$", "", false);
+    if (!path[0] || path[0] != _DELIMITER && path[1] != ':') // relative path
     {
-        BT_SetReportFilePath(dumpPath);
+        string_path currentDir;
+        _getcwd(currentDir, sizeof(currentDir));
+        string_path relDir;
+        xr_strcpy(relDir, path);
+        strconcat(path, currentDir, DELIMITER, relDir);
+    }
+    xr_strcat(path, log_name());
+    BT_AddLogFile(path);
+
+    if (FS.update_path(path, "$app_data_root$", "reports", false))
+    {
+        BT_SetReportFilePath(path);
     }
 #endif
 }

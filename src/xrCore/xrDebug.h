@@ -53,6 +53,7 @@ public:
 class IWindowHandler
 {
 public:
+    virtual ~IWindowHandler() = default;
     virtual SDL_Window* GetApplicationWindow() = 0;
     virtual void OnErrorDialog(bool beforeDialog) = 0;
 };
