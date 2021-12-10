@@ -51,7 +51,7 @@ struct TipString
 };
 
 class ENGINE_API CConsole : public pureRender, public pureFrame,
-                            public CUIResetNotifier
+                            public CUIResetNotifier, public IUserConfigHandler
 {
 public:
     struct str_pred
@@ -117,6 +117,8 @@ public:
     
     void OnUIReset() override;
     
+    pcstr GetUserConfigFileName() override { return ConfigFile; }
+
     string64 ConfigFile;
     bool bVisible;
     vecCMD Commands;

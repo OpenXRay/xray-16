@@ -96,6 +96,7 @@ CConsole::CConsole() : m_hShader_back(NULL)
     m_cmd_history_max = cmd_history_max;
     m_disable_tips = false;
     Register_callbacks();
+    xrDebug::SetUserConfigHandler(this);
 }
 
 void CConsole::Initialize()
@@ -133,6 +134,7 @@ CConsole::~CConsole()
     xr_delete(m_hShader_back);
     xr_delete(m_editor);
     Destroy();
+    xrDebug::SetUserConfigHandler(nullptr);
 }
 
 void CConsole::Destroy()

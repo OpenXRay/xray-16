@@ -58,6 +58,13 @@ public:
     virtual void OnErrorDialog(bool beforeDialog) = 0;
 };
 
+class IUserConfigHandler
+{
+public:
+    virtual ~IUserConfigHandler() = default;
+    virtual pcstr GetUserConfigFileName() = 0;
+};
+
 class XRCORE_API xrDebug
 {
 public:
@@ -66,6 +73,7 @@ public:
 
 private:
     static IWindowHandler* windowHandler;
+    static IUserConfigHandler* userConfigHandler;
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
     static string_path BugReportFile;
@@ -83,6 +91,8 @@ public:
 
     static IWindowHandler* GetWindowHandler() { return windowHandler; }
     static void SetWindowHandler(IWindowHandler* handler) { windowHandler = handler; }
+    static IUserConfigHandler* GetUserConfigHandler() { return userConfigHandler; }
+    static void SetUserConfigHandler(IUserConfigHandler* handler) { userConfigHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
     static const char* ErrorToString(long code);

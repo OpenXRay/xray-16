@@ -166,6 +166,7 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
 }
 
 IWindowHandler* xrDebug::windowHandler = nullptr;
+IUserConfigHandler* xrDebug::userConfigHandler = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
 string_path xrDebug::BugReportFile;
@@ -620,6 +621,30 @@ extern LPCSTR log_name();
 void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 {
 #if defined(USE_BUG_TRAP) && defined(XR_PLATFORM_WINDOWS)
+    if (xr_FS && FS.m_Flags.test(CLocatorAPI::flReady))
+    {
+        string_path cfg_full_name;
+        __try
+        {
+            // Code below copied from CCC_LoadCFG::Execute (xr_ioc_cmd.cpp)
+            // XXX: Refactor Console to accept user config filename on initialization or even construction!
+            // XXX: Maybe refactor CCC_LoadCFG, move code for loading user.ltx into a generic function
+            const auto cfg_name = userConfigHandler ? userConfigHandler->GetUserConfigFileName() : "user.ltx";
+            FS.update_path(cfg_full_name, "$app_data_root$", cfg_name);
+
+            if (!FS.exist(cfg_full_name))
+                FS.update_path(cfg_full_name, "$fs_root$", cfg_name);
+
+            if (!FS.exist(cfg_full_name))
+                xr_strcpy(cfg_full_name, cfg_name);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            xr_strcpy(cfg_full_name, "user.ltx");
+        }
+        BT_AddLogFile(cfg_full_name);
+    }
+
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
 
