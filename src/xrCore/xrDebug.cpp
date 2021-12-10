@@ -76,17 +76,6 @@ constexpr SDL_MessageBoxButtonData buttons[] =
          (int)AssertionResult::abort, "Cancel" }
 };
 
-SDL_MessageBoxData messageboxdata =
-{
-    SDL_MESSAGEBOX_ERROR,
-    nullptr,
-    "Fatal error",
-    "Vse clomalocb, tashite novyy dvizhok",
-    SDL_arraysize(buttons),
-    buttons,
-    nullptr
-};
-
 AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode)
 {
 #ifdef XR_PLATFORM_WINDOWS // because Windows default Message box is fancy
@@ -132,12 +121,15 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
         return AssertionResult::ok;
     }
 
-    if (windowHandler)
-        messageboxdata.window =  windowHandler->GetApplicationWindow();
-    messageboxdata.title = title;
-    messageboxdata.message = message;
+    SDL_MessageBoxData data =
+    {
+        SDL_MESSAGEBOX_ERROR,
+        windowHandler ? windowHandler->GetApplicationWindow() : nullptr,
+        title, message, SDL_arraysize(buttons), buttons
+    };
+
     int button = -1;
-    SDL_ShowMessageBox(&messageboxdata, &button);
+    SDL_ShowMessageBox(&data, &button);
     return (AssertionResult)button;
 #endif
 }
