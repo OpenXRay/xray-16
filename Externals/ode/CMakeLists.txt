@@ -95,8 +95,6 @@ target_include_directories(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-    -DdSINGLE
-    -DdNODEBUG
     -D_SECURE_SCL=0
     -DLINUX
     -D_cdecl=

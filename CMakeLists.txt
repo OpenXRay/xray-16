@@ -199,6 +199,9 @@ message("CMake build ${CMAKE_BUILD_TYPE}, CFLAGS=${CMAKE_C_FLAGS}, CXXFLAGS=${CM
 add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION -DM_NOSTDCONTAINERS_EXT)
 add_definitions(-DLUABIND_DYNAMIC_LINK) #self-explanatory
 add_definitions(-DdSINGLE) # for ODE and xrPhysics
+if (MASTER_GOLD)
+    add_definitions(-DdNODEBUG)
+endif()
 
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
