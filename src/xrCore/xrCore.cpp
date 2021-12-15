@@ -92,106 +92,7 @@ void PrintBuildInfo()
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
-void SDLLogOutput(void* /*userdata*/,
-    int category,
-    SDL_LogPriority priority,
-    const char* message)
-{
-    pcstr from;
-    switch (category)
-    {
-    case SDL_LOG_CATEGORY_APPLICATION:
-        from = "application";
-        break;
-
-    case SDL_LOG_CATEGORY_ERROR:
-        from = "error";
-        break;
-
-    case SDL_LOG_CATEGORY_ASSERT:
-        from = "assert";
-        break;
-
-    case SDL_LOG_CATEGORY_SYSTEM:
-        from = "system";
-        break;
-
-    case SDL_LOG_CATEGORY_AUDIO:
-        from = "audio";
-        break;
-
-    case SDL_LOG_CATEGORY_VIDEO:
-        from = "video";
-        break;
-
-    case SDL_LOG_CATEGORY_RENDER:
-        from = "render";
-        break;
-
-    case SDL_LOG_CATEGORY_INPUT:
-        from = "input";
-        break;
-
-    case SDL_LOG_CATEGORY_TEST:
-        from = "test";
-        break;
-
-    case SDL_LOG_CATEGORY_CUSTOM:
-        from = "custom";
-        break;
-
-    default:
-        from = "unknown";
-        break;
-    }
-
-    char mark;
-    pcstr type;
-    switch (priority)
-    {
-    case SDL_LOG_PRIORITY_VERBOSE:
-        mark = '%';
-        type = "verbose";
-        break;
-
-    case SDL_LOG_PRIORITY_DEBUG:
-        mark = '#';
-        type = "debug";
-        break;
-
-    case SDL_LOG_PRIORITY_INFO:
-        mark = '=';
-        type = "info";
-        break;
-
-    case SDL_LOG_PRIORITY_WARN:
-        mark = '~';
-        type = "warn";
-        break;
-
-    case SDL_LOG_PRIORITY_ERROR:
-        mark = '!';
-        type = "error";
-        break;
-
-    case SDL_LOG_PRIORITY_CRITICAL:
-        mark = '$';
-        type = "critical";
-        break;
-
-    default:
-        mark = ' ';
-        type = "unknown";
-        break;
-    }
-
-    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
-    const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
-    pstr buf = (pstr)xr_alloca(size);
-
-    xr_sprintf(buf, size, format, mark, from, type, message);
-    Log(buf);
-}
+void SDLLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
 const pcstr xrCore::buildDate = __DATE__;
 const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
@@ -501,3 +402,42 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     return TRUE;
 }
 #endif
+
+void SDLLogOutput(void* /*userdata*/, int category, SDL_LogPriority priority, const char* message)
+{
+    pcstr from;
+    switch (category)
+    {
+    case SDL_LOG_CATEGORY_APPLICATION:  from = "application"; break;
+    case SDL_LOG_CATEGORY_ERROR:        from = "error"; break;
+    case SDL_LOG_CATEGORY_ASSERT:       from = "assert"; break;
+    case SDL_LOG_CATEGORY_SYSTEM:       from = "system"; break;
+    case SDL_LOG_CATEGORY_AUDIO:        from = "audio"; break;
+    case SDL_LOG_CATEGORY_VIDEO:        from = "video"; break;
+    case SDL_LOG_CATEGORY_RENDER:       from = "render"; break;
+    case SDL_LOG_CATEGORY_INPUT:        from = "input"; break;
+    case SDL_LOG_CATEGORY_TEST:         from = "test"; break;
+    case SDL_LOG_CATEGORY_CUSTOM:       from = "custom"; break;
+    default:                            from = "unknown"; break;
+    }
+
+    char mark;
+    pcstr type;
+    switch (priority)
+    {
+    case SDL_LOG_PRIORITY_VERBOSE:      mark = '%'; type = "verbose"; break;
+    case SDL_LOG_PRIORITY_DEBUG:        mark = '#'; type = "debug"; break;
+    case SDL_LOG_PRIORITY_INFO:         mark = '='; type = "info"; break;
+    case SDL_LOG_PRIORITY_WARN:         mark = '~'; type = "warn"; break;
+    case SDL_LOG_PRIORITY_ERROR:        mark = '!'; type = "error"; break;
+    case SDL_LOG_PRIORITY_CRITICAL:     mark = '$'; type = "critical"; break;
+    default:                            mark = ' '; type = "unknown"; break;
+    }
+
+    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
+    const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
+    pstr buf = (pstr)xr_alloca(size);
+
+    xr_sprintf(buf, size, format, mark, from, type, message);
+    Log(buf);
+}
