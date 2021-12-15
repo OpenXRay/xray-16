@@ -54,13 +54,59 @@ static u32 init_counter = 0;
 #define GIT_INFO_CURRENT_BRANCH unknown
 #endif
 
-void PrintBuildInfo()
+void SDLLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
+
+const pcstr xrCore::buildDate = __DATE__;
+const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
+const pcstr xrCore::buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
+
+xrCore::xrCore()
+    : ApplicationName{}, ApplicationPath{},
+      WorkingPath{},
+      UserName{}, CompName{},
+      Params(nullptr), dwFrame(0),
+      PluginMode(false)
 {
+    CalculateBuildId();
+}
+
+void xrCore::CalculateBuildId()
+{
+    const int startDay = 31;
+    const int startMonth = 1;
+    const int startYear = 1999;
+    const char* monthId[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+    const int daysInMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    int days;
+    int months = 0;
+    int years;
+    string16 month;
+    string256 buffer;
+    xr_strcpy(buffer, buildDate);
+    sscanf(buffer, "%s %d %d", month, &days, &years);
+    for (int i = 0; i < 12; i++)
+    {
+        if (xr_stricmp(monthId[i], month))
+            continue;
+        months = i;
+        break;
+    }
+    buildId = (years - startYear) * 365 + days - startDay;
+    for (int i = 0; i < months; i++)
+        buildId += daysInMonth[i];
+    for (int i = 0; i < startMonth - 1; i++)
+        buildId -= daysInMonth[i];
+}
+
+void xrCore::PrintBuildInfo()
+{
+    Msg("%s %s build %d, %s (%s)", ApplicationName, XRAY_BUILD_CONFIGURATION, buildId, buildDate, XRAY_BUILD_CONFIGURATION2);
+
     pcstr name = "Custom";
     pcstr buildId = nullptr;
     pcstr builder = nullptr;
-    pcstr commit = Core.GetBuildCommit();
-    pcstr branch = Core.GetBuildBranch();
+    pcstr commit = GetBuildCommit();
+    pcstr branch = GetBuildBranch();
 
 #if defined(CI)
 #if defined(APPVEYOR)
@@ -92,26 +138,12 @@ void PrintBuildInfo()
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
-void SDLLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
-
-const pcstr xrCore::buildDate = __DATE__;
-const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
-const pcstr xrCore::buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
-
-xrCore::xrCore()
-    : ApplicationName{}, ApplicationPath{},
-      WorkingPath{},
-      UserName{}, CompName{},
-      Params(nullptr), dwFrame(0),
-      PluginMode(false)
-{
-    CalculateBuildId();
-}
-
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     Threading::SetCurrentThreadName("Primary thread");
     xr_strcpy(ApplicationName, _ApplicationName);
+    PrintBuildInfo();
+
     if (0 == init_counter)
     {
         PluginMode = plugin;
@@ -235,8 +267,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         Memory._initialize();
 
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
-        Msg("%s %s build %d, %s", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
-        PrintBuildInfo();
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
@@ -313,63 +343,12 @@ void xrCore::_destroy()
     }
 }
 
-constexpr pcstr xrCore::GetBuildConfiguration()
-{
-#ifdef NDEBUG
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-    return "Rx64";
-#else
-    return "Rx86";
-#endif
-#elif defined(MIXED)
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-    return "Mx64";
-#else
-    return "Mx86";
-#endif
-#else
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-    return "Dx64";
-#else
-    return "Dx86";
-#endif
-#endif
-}
-
 void xrCore::CoInitializeMultithreaded() const
 {
 #if defined(XR_PLATFORM_WINDOWS)
     if (!strstr(Params, "-weather"))
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
-}
-
-void xrCore::CalculateBuildId()
-{
-    const int startDay = 31;
-    const int startMonth = 1;
-    const int startYear = 1999;
-    const char* monthId[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-    const int daysInMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    int days;
-    int months = 0;
-    int years;
-    string16 month;
-    string256 buffer;
-    xr_strcpy(buffer, buildDate);
-    sscanf(buffer, "%s %d %d", month, &days, &years);
-    for (int i = 0; i < 12; i++)
-    {
-        if (xr_stricmp(monthId[i], month))
-            continue;
-        months = i;
-        break;
-    }
-    buildId = (years - startYear) * 365 + days - startDay;
-    for (int i = 0; i < months; i++)
-        buildId += daysInMonth[i];
-    for (int i = 0; i < startMonth - 1; i++)
-        buildId -= daysInMonth[i];
 }
 
 #if defined(XR_PLATFORM_WINDOWS)
