@@ -1,7 +1,7 @@
 #pragma once
 #ifndef __FLAGS_H__
 #define __FLAGS_H__
-#include "_types.h"
+#include "xr_types.h"
 
 template <class T>
 struct _flags

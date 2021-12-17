@@ -251,7 +251,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="_sphere.h" />
     <ClInclude Include="_std_extensions.h" />
     <ClInclude Include="_stl_extensions.h" />
-    <ClInclude Include="_types.h" />
+    <ClInclude Include="xr_types.h" />
     <ClInclude Include="_vector2.h" />
     <ClInclude Include="_vector3d.h" />
     <ClInclude Include="_vector3d_ext.h" />

@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <locale>
 
-#include "_types.h"
+#include "xr_types.h"
 #include "xrMemory.h"
 
 #define BREAK_AT_STRCMP

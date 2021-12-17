@@ -5,7 +5,7 @@
 
 #ifndef fsH
 #define fsH
-#include "_types.h"
+#include "xr_types.h"
 #include "_bitwise.h"
 #include "_compressed_normal.h"
 #include "_vector2.h"

@@ -410,7 +410,7 @@
     <ClInclude Include="_sphere.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="_types.h">
+    <ClInclude Include="xr_types.h">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="_vector2.h">

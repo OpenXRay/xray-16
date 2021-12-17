@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/_flags.h"
 #include "xrCore/client_id.h"
 #include "xrCore/FTimer.h"

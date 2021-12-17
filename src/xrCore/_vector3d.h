@@ -3,7 +3,7 @@
 #define __V3D__
 #include <algorithm>
 #include <cmath>
-#include "_types.h"
+#include "xr_types.h"
 #include "_random.h"
 #include "math_constants.h"
 

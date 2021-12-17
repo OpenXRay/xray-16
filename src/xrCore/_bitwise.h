@@ -3,7 +3,7 @@
 #define _BITWISE_
 #include <cmath>
 #include "math_constants.h"
-#include "_types.h"
+#include "xr_types.h"
 
 // float values defines
 #define fdSGN 0x080000000 // mask for sign bit
