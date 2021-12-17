@@ -180,7 +180,6 @@ target_include_directories(${PROJECT_NAME}
     ${SDL_INCLUDE_DIRS}
     ${FREEIMAGE_INCLUDE_PATH}
     ${FREEIMAGEPLUS_INCLUDE_PATH}
-    ${LOCKFILE_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -200,7 +199,6 @@ target_link_libraries(${PROJECT_NAME}
     ${OGG_LIBRARIES}
     xrCDB
     openal
-    ${LOCKFILE_LIBRARIES}
     ${SDL_LIBRARIES}
 )
 

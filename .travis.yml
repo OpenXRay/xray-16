@@ -74,7 +74,7 @@ before_script:
   - mkdir bin && cd bin
 
   - if [ $TARGET_CPU == x64 ]; then
-       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libcrypto++-dev liblockfile-dev libfreeimage3 libfreeimage-dev libfreeimageplus-dev liblua5.1-0-dev libssl-dev libogg-dev libtheora-bin libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libpcre3-dev libsdl2-2.0-0 libsdl2-dev libgl1 libgl1-mesa-dev libgl1-mesa-dev libgl-dev;
+       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libcrypto++-dev libfreeimage3 libfreeimage-dev libfreeimageplus-dev liblua5.1-0-dev libssl-dev libogg-dev libtheora-bin libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libpcre3-dev libsdl2-2.0-0 libsdl2-dev libgl1 libgl1-mesa-dev libgl1-mesa-dev libgl-dev;
        
        if [ $TRAVIS_CPU_ARCH == arm64 ]; then
           sudo apt-get install -y snapd

@@ -4,8 +4,6 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
-#elif defined(XR_PLATFORM_LINUX)
-#include <lockfile.h>
 #endif
 #include <locale.h>
 
@@ -30,10 +28,6 @@
 #include "xr_ioc_cmd.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
-
-#ifdef MASTER_GOLD
-#define NO_MULTI_INSTANCES
-#endif
 
 // global variables
 ENGINE_API CInifile* pGameIni = nullptr;
@@ -209,9 +203,6 @@ ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
-#if defined(XR_PLATFORM_LINUX)
-    lockfile_remove("/var/lock/stalker-cop.lock");
-#endif
 }
 
 void execUserScript()
@@ -346,20 +337,6 @@ ENGINE_API int RunApplication()
 {
     R_ASSERT2(Core.Params, "Core must be initialized");
 
-#ifdef NO_MULTI_INSTANCES
-    if (!GEnv.isDedicatedServer)
-    {
-#if defined(XR_PLATFORM_WINDOWS)
-        CreateMutex(nullptr, true, "Local\\STALKER-COP");
-        if (GetLastError() == ERROR_ALREADY_EXISTS)
-            return 2;
-#elif defined(XR_PLATFORM_LINUX)
-        int lock_res = lockfile_create("/var/lock/stalker-cop.lock", 0, L_PID);
-        if(L_ERROR == lock_res)
-            return 2;
-#endif
-    }
-#endif
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
 

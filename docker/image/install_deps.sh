@@ -33,7 +33,6 @@ apt-get install -y \
   libglew-dev \
   libfreeimage-dev \
   libfreeimageplus-dev \
-  liblockfile-dev \
   libopenal-dev \
   libcrypto++-dev \
   libogg-dev \
