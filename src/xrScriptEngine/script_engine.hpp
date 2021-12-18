@@ -17,7 +17,7 @@
 
 struct lua_State;
 
-#ifndef MASTER_GOLD
+#if !defined(MASTER_GOLD) && !defined(XR_PLATFORM_APPLE)
 #define USE_DEBUGGER
 #define USE_LUA_STUDIO
 #endif
