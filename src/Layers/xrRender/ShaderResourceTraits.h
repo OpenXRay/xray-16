@@ -2,6 +2,10 @@
 
 #include "ResourceManager.h"
 
+extern PFNGLGETPROGRAMBINARYPROC oxr_glGetProgramBinary;
+extern PFNGLPROGRAMBINARYPROC oxr_glProgramBinary;
+extern PFNGLPROGRAMPARAMETERIPROC oxr_glProgramParameteri;
+
 #ifdef USE_OGL
 static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
 {
@@ -61,10 +65,11 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
 
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
-    CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
+
+    //CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    CHK_GL(oxr_glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
     if (HW.ShaderBinarySupported)
-        CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
+        CHK_GL(oxr_glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
 
     CHK_GL(glAttachShader(program, shader));
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
@@ -92,8 +97,8 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
 
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
-    CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
+   // CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    CHK_GL(oxr_glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));

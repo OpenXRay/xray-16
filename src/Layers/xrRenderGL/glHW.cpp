@@ -65,6 +65,30 @@ void CHW::OnAppDeactivate()
     }
 }
 
+#include <dlfcn.h>
+
+static void *libgl;
+static bool open_libgl()
+{
+    libgl = dlopen("/System/Library/Frameworks/OpenGL.framework/OpenGL", RTLD_LAZY | RTLD_LOCAL);
+    if (!libgl)
+        return false;
+    return true;
+}
+
+static void close_libgl() { dlclose(libgl); }
+
+static void* get_proc(const char *proc)
+{
+    void* res;
+    *(void **)(&res) = dlsym(libgl, proc);
+    return res;
+}
+
+PFNGLGETPROGRAMBINARYPROC oxr_glGetProgramBinary = nullptr;
+PFNGLPROGRAMBINARYPROC oxr_glProgramBinary = nullptr;
+PFNGLPROGRAMPARAMETERIPROC oxr_glProgramParameteri = nullptr;
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -125,6 +149,10 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
+    if (!glewIsExtensionSupported("GL_ARB_separate_shader_objects")) {
+        R_ASSERT2(false, "Sorry, but your GPU doesn't support separate shader objects (which is required).");
+    }
+
     UpdateVSync();
 
 #ifdef DEBUG
@@ -157,6 +185,13 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     //	Create render target and depth-stencil views here
     UpdateViews();
+
+    open_libgl();
+
+    oxr_glGetProgramBinary =  (PFNGLGETPROGRAMBINARYPROC) get_proc("glGetProgramBinary");
+    oxr_glProgramBinary =  (PFNGLPROGRAMBINARYPROC) get_proc("glProgramBinary");
+    oxr_glProgramParameteri =  (PFNGLPROGRAMPARAMETERIPROC) get_proc("glProgramParameteri");
+    //printf("%ull", (unsigned long)get_proc("glProgramParameteri"));
 }
 
 void CHW::DestroyDevice()

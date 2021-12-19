@@ -247,7 +247,8 @@ ICF void CBackend::set_Vertices(GLuint _vb, u32 _vb_stride)
 #endif
         vb = _vb;
         vb_stride = _vb_stride;
-        CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
+        //CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
+        //glBindBuffer(GL_ARRAY_BUFFER, vb);
     }
 }
 

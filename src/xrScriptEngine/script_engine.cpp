@@ -768,7 +768,7 @@ CScriptEngine::~CScriptEngine()
         lua_close(m_virtual_machine);
     while (!m_script_processes.empty())
         remove_script_process(m_script_processes.begin()->first);
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(XR_PLATFORM_APPLE)
     flush_log();
 #endif
 #ifdef USE_DEBUGGER
@@ -867,12 +867,14 @@ void CScriptEngine::setup_callbacks()
 
 void CScriptEngine::lua_hook_call(lua_State* L, lua_Debug* dbg)
 {
+#if !defined(XR_PLATFORM_APPLE)
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
     if (scriptEngine->current_thread())
         scriptEngine->current_thread()->script_hook(L, dbg);
     else
         scriptEngine->m_stack_is_ready = true;
+#endif
 }
 #endif
 
@@ -973,7 +975,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
     luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
     luajit::open_lib(lua(), LUA_FFILIBNAME, luaopen_ffi);
-#ifndef MASTER_GOLD
+#if !defined(MASTER_GOLD) && !defined(XR_PLATFORM_APPLE)
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
 
@@ -1071,7 +1073,7 @@ bool CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_ex
         FS.update_path(S, "$game_scripts$", strconcat(sizeof(S1), S1, file_name, ".script"));
         if (!warn_if_not_exist && !FS.exist(S))
         {
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(XR_PLATFORM_APPLE)
             if (false) // XXX: restore (check script engine flags)
             {
                 print_stack();

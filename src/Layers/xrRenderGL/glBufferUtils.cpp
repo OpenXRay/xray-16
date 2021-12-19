@@ -167,9 +167,31 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
             continue; // Unsupported
 
         location += desc.UsageIndex;
-        CHK_GL(glVertexAttribFormat(location, size, type, normalized, desc.Offset));
-        CHK_GL(glVertexAttribBinding(location, desc.Stream));
+
+        /*
+         *
+         *
+void glVertexAttribPointer(	GLuint index,
+ 	GLint size,
+ 	GLenum type,
+ 	GLboolean normalized,
+ 	GLsizei stride,
+ 	const void * pointer);
+
+
+void glVertexAttribFormat(	GLuint attribindex,
+ 	GLint size,
+ 	GLenum type,
+ 	GLboolean normalized,
+ 	GLuint relativeoffset);
+
+         */
+
+
+        glVertexAttribPointer(location, size, type, normalized, stride, (void*)(size_t)(desc.Offset));
         CHK_GL(glEnableVertexAttribArray(location));
+        //CHK_GL(glVertexAttribFormat(location, size, type, normalized, desc.Offset));
+        //CHK_GL(glVertexAttribBinding(location, desc.Stream));
     }
 }
 
@@ -218,16 +240,18 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
     if (FVF & D3DFVF_XYZRHW)
     {
         GLuint attrib = VertexUsageList[D3DDECLUSAGE_POSITION];
-        CHK_GL(glVertexAttribFormat(attrib, 4, GL_FLOAT, GL_FALSE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
+       // CHK_GL(glVertexAttribFormat(attrib, 4, GL_FLOAT, GL_FALSE, offset));
+        //CHK_GL(glVertexAttribBinding(attrib, 0));
+        glVertexAttribPointer(attrib, 4, GL_FLOAT, GL_FALSE, stride, (void*)(size_t)(offset));
         CHK_GL(glEnableVertexAttribArray(attrib));
         offset += sizeof(Fvector4);
     }
     else if (FVF & D3DFVF_XYZ)
     {
         GLuint attrib = VertexUsageList[D3DDECLUSAGE_POSITION];
-        CHK_GL(glVertexAttribFormat(attrib, 3, GL_FLOAT, GL_FALSE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
+        //CHK_GL(glVertexAttribFormat(attrib, 3, GL_FLOAT, GL_FALSE, offset));
+        //CHK_GL(glVertexAttribBinding(attrib, 0));
+        glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, stride, (void*)(size_t)(offset));
         CHK_GL(glEnableVertexAttribArray(attrib));
         offset += sizeof(Fvector);
     }
@@ -236,8 +260,9 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
     if (FVF & D3DFVF_DIFFUSE)
     {
         GLuint attrib = VertexUsageList[D3DDECLUSAGE_COLOR];
-        CHK_GL(glVertexAttribFormat(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
+        //CHK_GL(glVertexAttribFormat(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset));
+        //CHK_GL(glVertexAttribBinding(attrib, 0));
+        glVertexAttribPointer(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (void*)(size_t)(offset));
         CHK_GL(glEnableVertexAttribArray(attrib));
         offset += sizeof(u32);
     }
@@ -246,8 +271,9 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
     if (FVF & D3DFVF_SPECULAR)
     {
         GLuint attrib = VertexUsageList[D3DDECLUSAGE_COLOR] + 1;
-        CHK_GL(glVertexAttribFormat(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
+       // CHK_GL(glVertexAttribFormat(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset));
+       // CHK_GL(glVertexAttribBinding(attrib, 0));
+        glVertexAttribPointer(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (void*)(size_t)(offset));
         CHK_GL(glEnableVertexAttribArray(attrib));
         offset += sizeof(u32);
     }
@@ -265,9 +291,10 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
         if (FVF & D3DFVF_TEXCOORDSIZE4(i))
             size = 4;
 
-        CHK_GL(glVertexAttribFormat(attrib, size, GL_FLOAT, GL_FALSE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
+       // CHK_GL(glVertexAttribFormat(attrib, size, GL_FLOAT, GL_FALSE, offset));
+       // CHK_GL(glVertexAttribBinding(attrib, 0));
         CHK_GL(glEnableVertexAttribArray(attrib));
+        glVertexAttribPointer(attrib, size, GL_FLOAT, GL_FLOAT, stride, (void*)(size_t)(offset));
         offset += size * sizeof(float);
     }
 

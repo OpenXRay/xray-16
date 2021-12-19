@@ -215,8 +215,8 @@ void CRenderTarget::build_textures()
             t_noise_mipped->surface_set(GL_TEXTURE_2D, t_noise_surf_mipped);
 
             //	Update texture. Generate mips.
-            CHK_GL(glCopyImageSubData(t_noise_surf[0], GL_TEXTURE_2D, 0, 0, 0, 0, t_noise_surf_mipped, GL_TEXTURE_2D
-                , 0, 0, 0, 0, TEX_jitter, TEX_jitter, 1));
+            //CHK_GL(glCopyImageSubData(t_noise_surf[0], GL_TEXTURE_2D, 0, 0, 0, 0, t_noise_surf_mipped, GL_TEXTURE_2D
+            //    , 0, 0, 0, 0, TEX_jitter, TEX_jitter, 1));
 
             glBindTexture(GL_TEXTURE_2D, t_noise_surf_mipped);
             CHK_GL(glGenerateMipmap(GL_TEXTURE_2D));

@@ -421,6 +421,8 @@ target_compile_definitions(${PROJECT_NAME}
     -DNO_XR_VDECLARATOR
 )
 
+target_compile_options(${PROJECT_NAME} PRIVATE -O0) # only internal
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
 )

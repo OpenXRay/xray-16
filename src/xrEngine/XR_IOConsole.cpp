@@ -622,7 +622,7 @@ void CConsole::Show()
         }
     });
 
-    m_editor->IR_Capture();
+    //m_editor->IR_Capture();
     Device.seqRender.Add(this, 1);
     Device.seqFrame.Add(this);
 }
