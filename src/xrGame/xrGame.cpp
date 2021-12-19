@@ -17,6 +17,8 @@ extern void CleanupUIStyleToken();
 
 void CCC_RegisterCommands();
 
+extern float g_fTimeFactor;
+
 extern "C"
 {
     XR_EXPORT IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
@@ -35,6 +37,8 @@ extern "C"
 
     XR_EXPORT void initialize_library()
     {
+        g_fTimeFactor = pSettings->r_float("alife", "time_factor"); // XXX: find a better place
+
         // Fill ui style token
         FillUIStyleToken();
         // register console commands
