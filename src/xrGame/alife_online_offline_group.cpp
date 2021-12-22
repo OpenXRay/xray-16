@@ -102,7 +102,7 @@ void CSE_ALifeOnlineOfflineGroup::register_member(ALife::_OBJECT_ID member_id)
     }
     VERIFY((monster->m_group_id == 0xffff) || (monster->m_group_id == ID));
     monster->m_group_id = ID;
-    m_members.insert(std::make_pair(member_id, monster));
+    m_members.emplace(member_id, monster);
 
     if (!empty)
         return;

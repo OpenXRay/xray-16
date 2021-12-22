@@ -16,7 +16,7 @@ void hits_store::add_hit(
     if (tmp_iter == m_bullet_hits.end())
     {
         bullet_hits_t* new_hits_queue = xr_new<bullet_hits_t>();
-        tmp_iter = m_bullet_hits.insert(std::make_pair(search_key, new_hits_queue)).first;
+        tmp_iter = m_bullet_hits.emplace(search_key, new_hits_queue).first;
     }
 
     bullet_hit tmp_hit;

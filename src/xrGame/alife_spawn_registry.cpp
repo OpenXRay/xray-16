@@ -233,6 +233,6 @@ void CALifeSpawnRegistry::build_story_spawns()
         if (object->m_spawn_story_id == INVALID_SPAWN_STORY_ID)
             continue;
 
-        m_spawn_story_ids.insert(std::make_pair(object->m_spawn_story_id, (*I).first));
+        m_spawn_story_ids.emplace(object->m_spawn_story_id, (*I).first);
     }
 }

@@ -37,7 +37,7 @@ void awards_store::reset_awards()
 
     for (int aidx = 0; aidx < at_awards_count; ++aidx)
     {
-        m_awards_result.insert(std::make_pair(enum_awards_t(aidx), award_data(u16(0), u32(0))));
+        m_awards_result.emplace(enum_awards_t(aidx), award_data(u16(0), u32(0)));
     };
 }
 
@@ -63,7 +63,7 @@ void awards_store::load_awards_from_ltx(CInifile& ini)
         LPCSTR tmp_award_name = get_award_name(tmp_awid);
         u16 tmp_count = ini.r_u16(tmp_award_name, award_count_line);
         u32 tmp_rdate = ini.r_u32(tmp_award_name, award_rdate_line);
-        m_ltx_awards_result.insert(std::make_pair(tmp_awid, award_data(tmp_count, tmp_rdate)));
+        m_ltx_awards_result.emplace(tmp_awid, award_data(tmp_count, tmp_rdate));
     }
 }
 void awards_store::merge_sake_to_ltx_awards()
@@ -115,7 +115,7 @@ void awards_store::process_award(SAKEField* award_params)
 
     u16 awards_count = award_params[ap_award_id].mValue.mShort;
     u32 award_rdate = award_params[ap_award_rdate].mValue.mInt;
-    m_awards_result.insert(std::make_pair(awid, award_data(awards_count, award_rdate)));
+    m_awards_result.emplace(awid, award_data(awards_count, award_rdate));
 }
 
 void awards_store::process_aw_out_response(SAKEGetMyRecordsOutput* tmp_out, int const out_fields_count)

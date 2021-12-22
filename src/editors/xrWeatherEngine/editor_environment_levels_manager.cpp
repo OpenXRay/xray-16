@@ -46,12 +46,12 @@ void manager::fill_levels(CInifile& config, pcstr section, pcstr category)
         VERIFY(config.section_exist(i.first));
         if (!config.line_exist(i.first, "weathers"))
         {
-            m_levels.insert(std::make_pair(i.first.c_str(), std::make_pair(category, s_default_weather_id)));
+            m_levels.emplace(i.first.c_str(), std::make_pair(category, s_default_weather_id));
             continue;
         }
 
         pcstr weather_id = config.r_string(i.first, "weathers");
-        m_levels.insert(std::make_pair(i.first.c_str(), std::make_pair(category, weather_id)));
+        m_levels.emplace(i.first.c_str(), std::make_pair(category, weather_id));
     }
 }
 

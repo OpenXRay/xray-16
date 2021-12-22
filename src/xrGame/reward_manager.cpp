@@ -86,7 +86,7 @@ void reward_manager::load_reward_item(CInifile& reward_config, u32 const index, 
     VERIFY2(std::find_if(m_rewards_map.begin(), m_rewards_map.end(), tmp_award_searcher) == m_rewards_map.end(),
         make_string("reward with award %s already loaded", tmp_award_searcher.m_award_name.c_str()).c_str());
 #endif
-    m_rewards_map.insert(std::make_pair(index, tmp_descriptor));
+    m_rewards_map.emplace(index, tmp_descriptor);
 }
 
 void reward_manager::process_reward(u32 const award_id)

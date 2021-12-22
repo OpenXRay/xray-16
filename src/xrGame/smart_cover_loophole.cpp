@@ -117,7 +117,7 @@ void loophole::add_action(LPCSTR type, luabind::object const& table)
        [=](std::pair<shared_str, smart_cover::action*> const& other) {
            return id._get() == other.first._get();
        }));
-    m_actions.insert(std::make_pair(type, action));
+    m_actions.emplace(type, action);
 }
 
 loophole::~loophole()

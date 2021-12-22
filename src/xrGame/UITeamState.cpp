@@ -197,7 +197,7 @@ void UITeamState::AddPlayer(ClientID const& clientId)
 
     mainUiXml->SetLocalRoot(tempRoot);
 
-    myPlayers.insert(std::make_pair(clientId, TPlayerItem(tempPlayerItem, panel_index)));
+    myPlayers.emplace(clientId, TPlayerItem(tempPlayerItem, panel_index));
 }
 
 void UITeamState::RemovePlayer(ClientID const& clientId)

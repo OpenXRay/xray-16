@@ -83,7 +83,7 @@ void game_sv_CaptureTheArtefact::OnPlayerOpenBuyMenu(xrClientData const* pclient
 #ifdef DEBUG
     Msg("--- Player [%s] opens buy menu", pclient->ps->getName());
 #endif // #ifdef DEBUG
-    m_buyMenuPlayerStates.insert(std::make_pair(pclient, buyMenuPlayerOpensBuyMenu));
+    m_buyMenuPlayerStates.emplace(pclient, buyMenuPlayerOpensBuyMenu);
 }
 
 bool game_sv_CaptureTheArtefact::CheckIfPlayerInBuyMenu(xrClientData const* pclient)
@@ -105,7 +105,7 @@ void game_sv_CaptureTheArtefact::SetReadyToSpawnPlayer(xrClientData const* pclie
 #ifdef DEBUG
     Msg("--- Player [%s] opens buy menu", pclient->ps->getName());
 #endif // #ifdef DEBUG
-    m_buyMenuPlayerStates.insert(std::make_pair(pclient, buyMenuPlayerReadyToSpawn));
+    m_buyMenuPlayerStates.emplace(pclient, buyMenuPlayerReadyToSpawn);
 }
 
 bool game_sv_CaptureTheArtefact::CanChargeFreeAmmo(char const* ammo_section)

@@ -69,7 +69,7 @@ void UITeamPanels::InitAllTeams(shared_str const& team_node)
         tempTeamPanel->Init(uiXml, team_node.c_str(), i);
         tempTeamPanel->SetAutoDelete(true);
         AttachChild(tempTeamPanel);
-        myPanels.insert(std::make_pair(shared_str(tempTeamName), tempTeamPanel));
+        myPanels.emplace(shared_str(tempTeamName), tempTeamPanel);
     }
 }
 

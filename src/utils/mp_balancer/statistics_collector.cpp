@@ -16,7 +16,7 @@ void statistics_collector::load_settings()
         if (m_wpn_collection->settings->r_line(CSV_SETTINGS, i, &key, &value) && key)
         {
             csv_files::iterator new_file_iter =
-                m_all_params.insert(std::make_pair(shared_str(key), new params_collection())).first;
+                m_all_params.emplace(shared_str(key), new params_collection()).first;
             if (value)
             {
                 get_string_collection(value, *new_file_iter->second);
