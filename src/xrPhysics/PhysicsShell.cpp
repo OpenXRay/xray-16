@@ -276,9 +276,11 @@ void phys_shell_verify_model(IKinematics& K)
 {
     // IRenderVisual* V = K.dcast_RenderVisual();
     // VERIFY( V );
+#ifdef DEBUG
     VERIFY2(has_physics_collision_shapes(K),
         make_string("Can not create physics shell for model %s because it has no physics collision shapes set",
             K.getDebugName().c_str()));
+#endif
 }
 
 void phys_shell_verify_object_model(IPhysicsShellHolder& O)

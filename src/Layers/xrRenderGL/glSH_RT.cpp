@@ -54,8 +54,14 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     // Get caps
     GLint max_width, max_height;
+#ifdef XR_PLATFORM_APPLE
+    // https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_offscreen/opengl_offscreen.html
+    CHK_GL(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_width));
+    max_height = max_width;
+#else
     CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_WIDTH, &max_width));
     CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_HEIGHT, &max_height));
+#endif
 
     // Check width-and-height of render target surface
     // XXX: While seemingly silly, assert w/h are positive?
@@ -109,12 +115,21 @@ void CRT::resolve_into(CRT& destination) const
     RCache.set_RT(pRT, 0);
     RCache.set_RT(destination.pRT, 1);
 
+#ifdef XR_PLATFORM_APPLE
+    [[maybe_unused]] GLenum status = oxr_glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+    VERIFY(status == GL_FRAMEBUFFER_COMPLETE_EXT);
+    CHK_GL(oxr_glDrawBuffersEXT(std::size(buffers), buffers));
+
+    CHK_GL(oxr_glBlitFramebufferEXT(0, 0, dwWidth, dwHeight, 0, 0, destination.dwWidth, destination.dwHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST));
+#else
     [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(std::size(buffers), buffers));
 
     CHK_GL(glBlitFramebuffer(0, 0, dwWidth, dwHeight, 0, 0, destination.dwWidth, destination.dwHeight,
         GL_COLOR_BUFFER_BIT, GL_NEAREST));
+#endif
 }
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)

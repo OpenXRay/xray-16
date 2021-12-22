@@ -88,6 +88,13 @@ static void* get_proc(const char *proc)
 PFNGLGETPROGRAMBINARYPROC oxr_glGetProgramBinary = nullptr;
 PFNGLPROGRAMBINARYPROC oxr_glProgramBinary = nullptr;
 PFNGLPROGRAMPARAMETERIPROC oxr_glProgramParameteri = nullptr;
+PFNGLGENFRAMEBUFFERSEXTPROC oxr_glGenFramebuffersEXT = nullptr;
+PFNGLBINDFRAMEBUFFEREXTPROC oxr_glBindFramebufferEXT = nullptr;
+PFNGLBLITFRAMEBUFFEREXTPROC oxr_glBlitFramebufferEXT = nullptr;
+PFNGLFRAMEBUFFERTEXTURE2DEXTPROC oxr_glFramebufferTexture2DEXT = nullptr ;
+PFNGLDELETEFRAMEBUFFERSEXTPROC oxr_glDeleteFramebuffersEXT = nullptr;
+PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC oxr_glCheckFramebufferStatusEXT = nullptr;
+PFNGLDRAWBUFFERSEXTPROC oxr_glDrawBuffersEXT = nullptr;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -155,7 +162,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     UpdateVSync();
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(XR_PLATFORM_APPLE)
     CHK_GL(glEnable(GL_DEBUG_OUTPUT));
     CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
 #endif // DEBUG
@@ -180,17 +187,25 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
     ComputeShadersSupported = false; // XXX: Implement compute shaders support
 
+    open_libgl();
+    oxr_glGetProgramBinary =  (PFNGLGETPROGRAMBINARYPROC) get_proc("glGetProgramBinary");
+    oxr_glProgramBinary =  (PFNGLPROGRAMBINARYPROC) get_proc("glProgramBinary");
+    oxr_glProgramParameteri =  (PFNGLPROGRAMPARAMETERIPROC) get_proc("glProgramParameteri");
+
+    oxr_glGenFramebuffersEXT =  (PFNGLGENFRAMEBUFFERSEXTPROC) get_proc("glGenFramebuffersEXT");
+    oxr_glBindFramebufferEXT =  (PFNGLBINDFRAMEBUFFEREXTPROC) get_proc("glBindFramebufferEXT");
+    oxr_glBlitFramebufferEXT =  (PFNGLBLITFRAMEBUFFEREXTPROC) get_proc("glBlitFramebufferEXT");
+    oxr_glFramebufferTexture2DEXT =  (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) get_proc("glFramebufferTexture2DEXT");
+    oxr_glDeleteFramebuffersEXT =  (PFNGLDELETEFRAMEBUFFERSEXTPROC) get_proc("glDeleteFramebuffersEXT");
+    oxr_glCheckFramebufferStatusEXT =  (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) get_proc("glCheckFramebufferStatusEXT");
+    oxr_glDrawBuffersEXT =  (PFNGLDRAWBUFFERSEXTPROC) get_proc("glDrawBuffersEXT");
+
     Caps.fTarget = D3DFMT_A8R8G8B8;
     Caps.fDepth = D3DFMT_D24S8;
 
     //	Create render target and depth-stencil views here
     UpdateViews();
 
-    open_libgl();
-
-    oxr_glGetProgramBinary =  (PFNGLGETPROGRAMBINARYPROC) get_proc("glGetProgramBinary");
-    oxr_glProgramBinary =  (PFNGLPROGRAMBINARYPROC) get_proc("glProgramBinary");
-    oxr_glProgramParameteri =  (PFNGLPROGRAMPARAMETERIPROC) get_proc("glProgramParameteri");
     //printf("%ull", (unsigned long)get_proc("glProgramParameteri"));
 }
 
@@ -210,7 +225,12 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
+#ifdef XR_PLATFORM_APPLE
+    CHK_GL(oxr_glDeleteFramebuffersEXT(1, &pFB));
+#else
     CHK_GL(glDeleteFramebuffers(1, &pFB));
+#endif
+
     UpdateViews();
     UpdateVSync();
 }
@@ -267,8 +287,13 @@ int CHW::MakeContextCurrent(IRender::RenderContext context) const
 void CHW::UpdateViews()
 {
     // Create the default framebuffer
+#ifdef XR_PLATFORM_APPLE
+    oxr_glGenFramebuffersEXT(1, &pFB);
+    CHK_GL(oxr_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, pFB));
+#else
     glGenFramebuffers(1, &pFB);
     CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
+#endif
 
     BackBufferCount = 1;
 }
@@ -280,6 +305,13 @@ void CHW::Present()
 {
 #if 0 // kept for historical reasons
     RImplementation.Target->phase_flip();
+#elif defined(XR_PLATFORM_APPLE)
+    oxr_glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, pFB);
+    oxr_glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+    oxr_glBlitFramebufferEXT(
+            0, 0, Device.dwWidth, Device.dwHeight,
+            0, 0, Device.dwWidth, Device.dwHeight,
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
 #else
     glBindFramebuffer(GL_READ_FRAMEBUFFER, pFB);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

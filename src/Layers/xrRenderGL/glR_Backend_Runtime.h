@@ -4,6 +4,14 @@
 
 #include "glStateUtils.h"
 
+extern PFNGLGENFRAMEBUFFERSEXTPROC oxr_glGenFramebuffersEXT;
+extern PFNGLBINDFRAMEBUFFEREXTPROC oxr_glBindFramebufferEXT;
+extern PFNGLBLITFRAMEBUFFEREXTPROC oxr_glBlitFramebufferEXT;
+extern PFNGLFRAMEBUFFERTEXTURE2DEXTPROC oxr_glFramebufferTexture2DEXT;
+extern PFNGLDELETEFRAMEBUFFERSEXTPROC oxr_glDeleteFramebuffersEXT;
+extern PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC oxr_glCheckFramebufferStatusEXT;
+extern PFNGLDRAWBUFFERSEXTPROC oxr_glDrawBuffersEXT;
+
 IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
     stat.xforms++;
@@ -22,7 +30,11 @@ IC void CBackend::set_FB(GLuint FB)
     {
         PGO(Msg("PGO:set_FB"));
         pFB = FB;
+#ifdef XR_PLATFORM_APPLE
+        CHK_GL(oxr_glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, pFB));
+#else
         CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
+#endif
     }
 }
 
@@ -34,7 +46,11 @@ IC void CBackend::set_RT(GLuint RT, u32 ID)
         stat.target_rt++;
         pRT[ID] = RT;
         // TODO: OGL: Implement support for multi-sampled render targets
+#ifdef XR_PLATFORM_APPLE
+        CHK_GL(oxr_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + ID, GL_TEXTURE_2D, RT, 0));
+#else
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, GL_TEXTURE_2D, RT, 0));
+#endif
     }
 }
 
@@ -46,14 +62,23 @@ IC void CBackend::set_ZB(GLuint ZB)
         stat.target_zb++;
         pZB = ZB;
         // TODO: OGL: Implement support for multi-sampled render targets
+#ifdef XR_PLATFORM_APPLE
+        // https://stackoverflow.com/questions/38810024/osx-opengl-depth-stencil-combination
+        CHK_GL(oxr_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, ZB, 0));
+#else
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, ZB, 0));
+#endif
     }
 }
 
 IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
 {
+#ifdef XR_PLATFORM_APPLE
+    CHK_GL(oxr_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, rt, 0));
+#else
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+#endif
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glClearColor(color.r, color.g, color.b, color.a);
@@ -64,8 +89,13 @@ IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
 IC void CBackend::ClearZB(GLuint zb, float depth)
 {
     VERIFY(pZB == zb); // do not allow to clear unbound depth
+#ifdef XR_PLATFORM_APPLE
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(oxr_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+#else
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+#endif
 
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
@@ -76,8 +106,13 @@ IC void CBackend::ClearZB(GLuint zb, float depth)
 IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
 {
     VERIFY(pZB == zb); // do not allow to clear unbound depth
+#ifdef XR_PLATFORM_APPLE
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(oxr_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+#else
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+#endif
 
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
@@ -90,8 +125,13 @@ IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
 
 IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects)
 {
+#ifdef XR_PLATFORM_APPLE
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(oxr_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, rt, 0));
+#else
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+#endif
 
     CHK_GL(glEnable(GL_SCISSOR_TEST));
 
@@ -118,8 +158,13 @@ IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, c
 
 IC bool CBackend::ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects)
 {
+#ifdef XR_PLATFORM_APPLE
+    // TODO: OGL: Implement support for multi-sampled render targets
+    CHK_GL(oxr_glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+#else
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+#endif
 
     CHK_GL(glEnable(GL_SCISSOR_TEST));
 
