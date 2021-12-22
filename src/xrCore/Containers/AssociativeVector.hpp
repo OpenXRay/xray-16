@@ -63,7 +63,7 @@ public:
     IC iterator insert(iterator where, const value_type& value);
     template <class TIterator>
     IC void insert(TIterator first, TIterator last);
-    IC insert_result emplace(key_type key, mapped_type value);
+    IC insert_result emplace(const key_type& key, const mapped_type& value);
     IC void erase(iterator element);
     IC void erase(iterator first, iterator last);
     IC size_type erase(const key_type& key);
@@ -304,8 +304,19 @@ IC void _associative_vector::insert(TIterator first, TIterator last)
 }
 
 TEMPLATE_SPECIALIZATION
-IC typename _associative_vector::insert_result _associative_vector::emplace(key_type key, mapped_type value) {
-    return insert(std::make_pair(key, value));
+IC typename _associative_vector::insert_result _associative_vector::emplace(const key_type& key, const mapped_type& value)
+{
+    actualize();
+    bool found = true;
+    iterator I = lower_bound(key);
+    if (I == end() || (*this)(key, (*I).first))
+    {
+        I = inherited::emplace(I, key, value);
+        found = false;
+    }
+    else
+        (*I).second = value;
+    return insert_result(I, !found);
 }
 
 TEMPLATE_SPECIALIZATION
