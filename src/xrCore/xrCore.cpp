@@ -46,6 +46,12 @@ static u32 init_counter = 0;
 #endif
 #endif
 
+#ifdef GITHUB_ACTIONS
+#if EXPAND(GITHUB_ACTIONS) == 1
+#undef GITHUB_ACTIONS
+#endif
+#endif
+
 #ifndef GIT_INFO_CURRENT_COMMIT
 #define GIT_INFO_CURRENT_COMMIT unknown
 #endif
@@ -116,8 +122,12 @@ void xrCore::PrintBuildInfo()
 #elif defined(TRAVIS)
     name = "Travis";
     buildId = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
+#elif defined(GITHUB_ACTIONS)
+    name = "GitHub Actions";
+    buildId = MACRO_TO_STRING(GITHUB_ACTION);
+    builder = MACRO_TO_STRING(GITHUB_ACTOR);
 #else
-#pragma TODO("PrintCI for other CIs")
+#pragma TODO("PrintBuildInfo for other CIs")
     name = "CI";
     builder = "Unknown CI";
 #endif

@@ -23,7 +23,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)lzo\include;$(xrExternals)mimalloc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_ACTION=$(GITHUB_ACTION);GITHUB_ACTOR=$(GITHUB_ACTOR);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
