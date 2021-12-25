@@ -114,6 +114,8 @@
       <PreprocessorDefinitions>
         MASTER_GOLD;
         _HAS_EXCEPTIONS=0;
+        LUABIND_NO_EXCEPTIONS;
+        LUABIND_NO_ERROR_CHECKING;
         dNODEBUG;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>
