@@ -200,6 +200,8 @@ add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION 
 add_definitions(-DLUABIND_DYNAMIC_LINK) #self-explanatory
 add_definitions(-DdSINGLE) # for ODE and xrPhysics
 if (MASTER_GOLD)
+    add_definitions(-DLUABIND_NO_EXCEPTIONS)
+    add_definitions(-DLUABIND_NO_ERROR_CHECKING)
     add_definitions(-DdNODEBUG)
 endif()
 
