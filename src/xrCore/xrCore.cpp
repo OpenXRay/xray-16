@@ -108,36 +108,45 @@ void xrCore::PrintBuildInfo()
 {
     Msg("%s %s build %d, %s (%s)", ApplicationName, XRAY_BUILD_CONFIGURATION, buildId, buildDate, XRAY_BUILD_CONFIGURATION2);
 
-    pcstr name = "Custom";
-    pcstr buildId = nullptr;
-    pcstr builder = nullptr;
-    pcstr commit = GetBuildCommit();
-    pcstr branch = GetBuildBranch();
+    pcstr name      = "Custom";
+    pcstr buildUniqueId = nullptr;
+    pcstr buildId   = nullptr;
+    pcstr builder   = nullptr;
+    pcstr commit    = GetBuildCommit();
+    pcstr branch    = GetBuildBranch();
 
 #if defined(CI)
-#if defined(APPVEYOR)
-    name = "AppVeyor";
-    buildId = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
-    builder = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
-#elif defined(TRAVIS)
-    name = "Travis";
-    buildId = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
-#elif defined(GITHUB_ACTIONS)
-    name = "GitHub Actions";
-    buildId = MACRO_TO_STRING(GITHUB_ACTION);
-    builder = MACRO_TO_STRING(GITHUB_ACTOR);
+#   if defined(APPVEYOR)
+    name            = "AppVeyor";
+    buildUniqueId   = MACRO_TO_STRING(APPVEYOR_BUILD_ID);
+    buildId         = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
+    builder         = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
+#   elif defined(TRAVIS)
+    name            = "Travis";
+    buildUniqueId   = MACRO_TO_STRING(TRAVIS_BUILD_ID);
+    buildId         = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
+    builder         = MACRO_TO_STRING(TRAVIS_REPO_SLUG);
+#   elif defined(GITHUB_ACTIONS)
+    name            = "GitHub Actions";
+    buildUniqueId   = MACRO_TO_STRING(GITHUB_RUN_ID);
+    buildId         = MACRO_TO_STRING(GITHUB_RUN_NUMBER);
+    builder         = MACRO_TO_STRING(GITHUB_REPOSITORY);
 #else
-#pragma TODO("PrintBuildInfo for other CIs")
-    name = "CI";
-    builder = "Unknown CI";
-#endif
+#   pragma TODO("PrintBuildInfo for other CIs")
+    name            = "CI";
+    builder         = "Unknown CI";
+#   endif
 #endif
 
     string512 buf;
     strconcat(buf, name, " build "); // "%s build "
 
     if (buildId)
+    {
         strconcat(buf, buf, buildId, " "); // "id "
+        if (buildUniqueId)
+            strconcat(buf, buf, "(", buildUniqueId, ") "); // "(unique id) "
+    }
 
     strconcat(buf, buf, "from commit[", commit, "]"); // "from commit[hash]"
     strconcat(buf, buf, " branch[", branch, "]"); // " branch[name]"
