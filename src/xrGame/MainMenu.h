@@ -161,6 +161,7 @@ public:
 
     void IR_OnControllerPress(int btn) override;
     void IR_OnControllerRelease(int btn) override;
+    void IR_OnControllerHold(int btn) override;
 
     bool OnRenderPPUI_query();
     void OnRenderPPUI_main();

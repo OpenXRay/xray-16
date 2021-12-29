@@ -620,6 +620,11 @@ void CLevel::IR_OnControllerRelease(int btn)
     IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
 }
 
+void CLevel::IR_OnControllerHold(int btn)
+{
+    IR_OnKeyboardHold(ControllerButtonToKey[btn]);
+}
+
 void CLevel::IR_OnActivate()
 {
     if (!pInput)

@@ -331,8 +331,10 @@ void CInput::GameControllerUpdate()
     }
 
     for (int i = 0; i < COUNT_CONTROLLER_BUTTONS; ++i)
+    {
         if (controllerState[i] && controllerPrev[i])
-            cbStack.back()->IR_OnKeyboardHold(ControllerButtonToKey[i]);
+            cbStack.back()->IR_OnControllerHold(i);
+    }
 }
 
 bool KbdKeyToButtonName(const int dik, xr_string& name)

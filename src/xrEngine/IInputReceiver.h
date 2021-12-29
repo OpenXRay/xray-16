@@ -47,6 +47,7 @@ public:
     virtual void IR_OnControllerMove(int /*axis*/, int /*value*/) {}
     virtual void IR_OnControllerPress(int /*dik*/) {}
     virtual void IR_OnControllerRelease(int /*dik*/) {}
+    virtual void IR_OnControllerHold(int /*dik*/) {}
 };
 
 ENGINE_API extern float psMouseSens;
