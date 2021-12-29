@@ -153,7 +153,6 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
     keyboardState.reset();
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
-    ZeroMemory(offs, sizeof(offs));
 
     //===================== Dummy pack
     iCapture(&dummyController);
@@ -197,10 +196,9 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 void CInput::MouseUpdate()
 {
-    const auto mousePrev = mouseState;
-
     bool mouseMoved = false;
-    offs[0] = offs[1] = offs[2] = 0;
+    int offs[COUNT_MOUSE_AXIS]{};
+    const auto mousePrev = mouseState;
 
     SDL_Event events[MAX_MOUSE_EVENTS];
     SDL_PumpEvents();
@@ -239,8 +237,10 @@ void CInput::MouseUpdate()
     }
 
     for (int i = 0; i < MOUSE_COUNT; ++i)
+    {
         if (mouseState[i] && mousePrev[i])
             cbStack.back()->IR_OnMouseHold(i);
+    }
 
     if (mouseMoved)
     {
@@ -455,7 +455,6 @@ void CInput::iCapture(IInputReceiver* p)
 
     // prepare for _new_ controller
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
-    ZeroMemory(offs, sizeof(offs));
 }
 
 void CInput::iRelease(IInputReceiver* p)
@@ -489,7 +488,6 @@ void CInput::OnAppActivate(void)
     keyboardState.reset();
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
-    ZeroMemory(offs, sizeof(offs));
 }
 
 void CInput::OnAppDeactivate(void)
@@ -501,7 +499,6 @@ void CInput::OnAppDeactivate(void)
     keyboardState.reset();
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
-    ZeroMemory(offs, sizeof(offs));
 }
 
 void CInput::OnFrame(void)

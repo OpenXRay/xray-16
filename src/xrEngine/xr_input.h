@@ -93,8 +93,6 @@ private:
 
     u32 mouseTimeStamp[COUNT_MOUSE_AXIS];
 
-    int offs[COUNT_MOUSE_AXIS];
-
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
@@ -133,8 +131,6 @@ public:
     bool iGetAsyncGpadBtnState(const int btn);
 
     void iGetAsyncMousePos(Ivector2& p) const;
-    void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
-
     void iSetMousePos(const Ivector2& p) const;
 
     void GrabInput(const bool grab);
