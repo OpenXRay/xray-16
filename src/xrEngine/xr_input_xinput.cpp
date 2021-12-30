@@ -422,9 +422,9 @@ keyboard_key keyboards[] =
     { "kAPP1",                  SDL_SCANCODE_APP1,               "App 1" },
     { "kAPP2",                  SDL_SCANCODE_APP2,               "App 2" },
 
-    { "mouse1",                 MOUSE_1,                         "LMB" },
-    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake because init algorithm was changed.
-    { "mouse2",                 MOUSE_2,                         "RMB" },
+    { "mouse1",                 MOUSE_1,                         "Left mouse button" },
+    { "mouse2",                 MOUSE_2,                         "Right mouse button" },
+    { "mouse3",                 MOUSE_3,                         "Mouse wheel button" },
     { "mouse4",                 MOUSE_4,                         "Mouse X1" },
     { "mouse5",                 MOUSE_5,                         "Mouse X2" },
 
