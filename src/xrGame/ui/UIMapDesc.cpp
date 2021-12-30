@@ -147,12 +147,7 @@ bool CUIMapDesc::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
         break;
 
-    default:
-        // XXX: bind return key to game action
-        if (dik != SDL_SCANCODE_RETURN)
-            break;
-        [[fallthrough]];
-
+    case kENTER:
     case kJUMP:
         HideDialog();
         dm->OnMapInfoAccept();

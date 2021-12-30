@@ -78,7 +78,8 @@ bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (dik == SDL_SCANCODE_KP_ENTER || dik == SDL_SCANCODE_RETURN || IsBinded(kJUMP, dik))
+        auto action = GetBindedAction(dik);
+        if (action == kENTER || action == kJUMP)
         {
             m_pMessageBox->OnYesOk();
             return true;

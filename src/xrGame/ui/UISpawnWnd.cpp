@@ -164,10 +164,8 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         HideDialog();
         game->OnTeamSelect(-1);
         return true;
-    }
-    switch (dik)
-    {
-    case SDL_SCANCODE_RETURN:
+
+    case kENTER:
         HideDialog();
         if (m_pImage1->GetSelectedState())
             game->OnTeamSelect(0);
@@ -176,7 +174,7 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         else
             game->OnTeamSelect(-1);
         return true;
-    }
+    } // switch (action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

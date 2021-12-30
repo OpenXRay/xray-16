@@ -207,6 +207,7 @@ ENGINE_API void destroyEngine()
 
 void execUserScript()
 {
+    Console->Execute("bind enter kRETURN"); // original game does not have 'enter' action, hence no default binding
     Console->Execute("default_controls");
     Console->ExecuteScript(Console->ConfigFile);
 }

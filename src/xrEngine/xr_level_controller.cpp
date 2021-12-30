@@ -71,6 +71,7 @@ game_action actions[] = {
     { "chat",              kCHAT,              _both },
     { "chat_team",         kCHAT_TEAM,         _both },
     { "screenshot",        kSCREENSHOT,        _both },
+    { "enter",             kENTER,             _both },
     { "quit",              kQUIT,              _both },
     { "console",           kCONSOLE,           _both },
     { "inventory",         kINVENTORY,         _both },

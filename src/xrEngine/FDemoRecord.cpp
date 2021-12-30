@@ -461,18 +461,6 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     else if (dik == SDL_SCANCODE_F11)
         MakeLevelMapScreenshot(IR_GetKeyState(SDL_SCANCODE_LCTRL));
 
-#ifndef MASTER_GOLD
-    else if (dik == SDL_SCANCODE_RETURN)
-    {
-        IGameObject* entity = g_pGameLevel->CurrentEntity();
-        if (entity)
-        {
-            entity->ForceTransformAndDirection(m_Camera);
-            fLifeTime = -1;
-        }
-    }
-#endif
-
     switch (GetBindedAction(dik))
     {
     case kCONSOLE:
@@ -490,6 +478,19 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     case kQUIT:
         fLifeTime = -1;
         break;
+
+#ifndef MASTER_GOLD
+    case kENTER:
+    {
+        IGameObject* entity = g_pGameLevel->CurrentEntity();
+        if (entity)
+        {
+            entity->ForceTransformAndDirection(m_Camera);
+            fLifeTime = -1;
+        }
+        break;
+    }
+#endif
 
     case kPAUSE:
         Device.Pause(!Device.Paused(), true, true, "demo_record");

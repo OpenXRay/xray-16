@@ -172,15 +172,15 @@ void xr_stdcall CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
 
 bool CUIServerInfo::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    switch (dik)
+    switch (GetBindedAction(dik))
     {
-    case SDL_SCANCODE_SPACE:
-    case SDL_SCANCODE_RETURN:
+    case kJUMP:
+    case kENTER:
     {
         OnNextBtnClick(NULL, 0);
         return true;
     }
-    break;
-    }; // switch (dik)
+    } // switch (GetBindedAction(dik))
+
     return false;
 }

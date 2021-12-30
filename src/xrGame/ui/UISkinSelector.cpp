@@ -278,15 +278,25 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     switch (action)
     {
-    case kQUIT: OnBtnCancel(); return true;
+    case kQUIT:
+        OnBtnCancel();
+        return true;
+
     case kJUMP: // do autoselect
         m_iActiveIndex = -1;
-    case kLEFT: OnKeyLeft(); return true;
-    case kRIGHT: OnKeyRight(); return true;
-    }
-    switch (dik)
-    {
-    case SDL_SCANCODE_RETURN: OnBtnOK(); return true;
+        [[fallthrough]];
+
+    case kENTER:
+        OnBtnOK();
+        return true;
+
+    case kLEFT:
+        OnKeyLeft();
+        return true;
+
+    case kRIGHT:
+        OnKeyRight();
+        return true;
     }
 
     return false;

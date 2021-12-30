@@ -61,6 +61,7 @@ enum EGameActions : u32
     kCHAT,
     kCHAT_TEAM,
     kSCREENSHOT,
+    kENTER,
     kQUIT,
     kCONSOLE,
     kINVENTORY,
