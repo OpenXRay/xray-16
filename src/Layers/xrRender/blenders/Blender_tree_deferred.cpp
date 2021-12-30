@@ -147,7 +147,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
-            C.r_Pass(tvs_s, "shadow_direct_base", FALSE);
+            C.r_Pass(tvs_s, "null", FALSE);
         C.SampledImage("smp_linear", "s_base", C.L_textures[0]);
         C.r_ColorWriteEnable(false, false, false, false);
         C.r_End();
