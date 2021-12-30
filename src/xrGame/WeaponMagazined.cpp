@@ -14,7 +14,6 @@
 #include "xrEngine/xr_level_controller.h"
 #include "UIGameCustom.h"
 #include "Common/object_broker.h"
-#include "string_table.h"
 #include "MPPlayersBag.h"
 #include "ui/UIXmlInit.h"
 #include "xrUICore/Static/UIStatic.h"
@@ -1305,7 +1304,6 @@ void CWeaponMagazined::net_Import(NET_Packet& P)
     SetQueueSize(GetCurrentFireMode());
 }
 
-#include "string_table.h"
 bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
 {
     VERIFY(m_pInventory);

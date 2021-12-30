@@ -883,7 +883,6 @@ void CWeaponMagazinedWGrenade::net_Spawn_install_upgrades(Upgrades_type saved_up
     // this is intended behaviour
 }
 
-#include "string_table.h"
 bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
 {
     VERIFY(m_pInventory);

@@ -5,7 +5,6 @@
 #include "UIEditKeyBind.h"
 #include "xrUICore/ScrollView/UIScrollView.h"
 #include "xrEngine/xr_level_controller.h"
-#include "string_table.h"
 
 CUIKeyBinding::CUIKeyBinding() : m_isGamepadBinds(false)
 {

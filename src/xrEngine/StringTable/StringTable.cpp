@@ -1,11 +1,17 @@
-#include "StdAfx.h"
-#include "string_table.h"
-#include "xrUICore/XML/xrUIXmlParser.h"
-#include "xrEngine/xr_level_controller.h"
+#include "stdafx.h"
+#include "StringTable.h"
+
+#include "xr_level_controller.h"
+
+#include "xrCore/XML/XMLDocument.hpp"
 
 constexpr pcstr OPENXRAY_XML = "openxray.xml";
 
-CStringTable& StringTable() { return *((CStringTable*)gStringTable); }
+CStringTable& StringTable()
+{
+    static CStringTable string_table;
+    return string_table;
+}
 
 xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
@@ -146,7 +152,7 @@ xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data()
 
 void CStringTable::Load(LPCSTR xml_file_full)
 {
-    CUIXml uiXml;
+    XMLDocument uiXml;
     string_path _s;
     strconcat(sizeof(_s), _s, "text" DELIMITER, pData->m_sLanguage.c_str());
 
@@ -199,9 +205,9 @@ void CStringTable::ReparseKeyBindings()
 
 STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
 {
-    constexpr char   ACTION_STR[]       = "$$ACTION_";
-    constexpr char   ACTION_STR_END[]   = "$$";
-    constexpr size_t ACTION_STR_LEN     = std::size(ACTION_STR) - 1;
+    constexpr char   ACTION_STR[] = "$$ACTION_";
+    constexpr char   ACTION_STR_END[] = "$$";
+    constexpr size_t ACTION_STR_LEN = std::size(ACTION_STR) - 1;
     constexpr size_t ACTION_STR_END_LEN = std::size(ACTION_STR_END) - 1;
 
     xr_string res;

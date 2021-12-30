@@ -1738,9 +1738,6 @@
     <Filter Include="Core\Common\SmartCast">
       <UniqueIdentifier>{e7bec78e-5e80-44b6-8e48-6b6f965e6dde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Common\StringTable">
-      <UniqueIdentifier>{22979b2b-2fb5-4c33-8c62-9462ec6ec171}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Common\Registry">
       <UniqueIdentifier>{9465b693-0ca7-42b5-bd72-821076494f14}</UniqueIdentifier>
     </Filter>
@@ -5484,9 +5481,6 @@
     <ClInclude Include="..\xrServerEntities\smart_cast_impl2.h">
       <Filter>Core\Common\SmartCast</Filter>
     </ClInclude>
-    <ClInclude Include="string_table.h">
-      <Filter>Core\Common\StringTable</Filter>
-    </ClInclude>
     <ClInclude Include="RegistryFuncs.h">
       <Filter>Core\Common\Registry</Filter>
     </ClInclude>
@@ -8755,9 +8749,6 @@
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\smart_cast_stats.cpp">
       <Filter>Core\Common\SmartCast</Filter>
-    </ClCompile>
-    <ClCompile Include="string_table.cpp">
-      <Filter>Core\Common\StringTable</Filter>
     </ClCompile>
     <ClCompile Include="RegistryFuncs.cpp">
       <Filter>Core\Common\Registry</Filter>

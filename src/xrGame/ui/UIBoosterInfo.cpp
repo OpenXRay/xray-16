@@ -7,7 +7,6 @@
 #include "ActorCondition.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
-#include "string_table.h"
 
 CUIBoosterInfo::CUIBoosterInfo()
 {

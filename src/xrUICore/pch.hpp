@@ -4,6 +4,7 @@
 
 #include "xrEngine/stdafx.h"
 #include "xrEngine/xr_level_controller.h"
+#include "xrEngine/StringTable/StringTable.h"
 
 #include "xrServerEntities/smart_cast.h"
 

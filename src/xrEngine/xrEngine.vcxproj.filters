@@ -384,10 +384,7 @@
     <ClInclude Include="Stats.h">
       <Filter>Rendering Device</Filter>
     </ClInclude>
-    <ClInclude Include="StringTable\IStringTable.h">
-      <Filter>Game API\StringTable</Filter>
-    </ClInclude>
-    <ClInclude Include="StringTable\IStringTableDefs.h">
+    <ClInclude Include="StringTable\StringTable.h">
       <Filter>Game API\StringTable</Filter>
     </ClInclude>
     <ClInclude Include="embedded_resources_management.h">
@@ -626,7 +623,7 @@
     <ClCompile Include="Stats.cpp">
       <Filter>Rendering Device</Filter>
     </ClCompile>
-    <ClCompile Include="StringTable\IStringTable.cpp">
+    <ClCompile Include="StringTable\StringTable.cpp">
       <Filter>Game API\StringTable</Filter>
     </ClCompile>
     <ClCompile Include="Device_mode.cpp">

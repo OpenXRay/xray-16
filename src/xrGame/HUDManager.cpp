@@ -11,7 +11,6 @@
 #include "Car.h"
 #include "UIGameCustom.h"
 #include "xrUICore/Cursor/UICursor.h"
-#include "string_table.h"
 #include "game_cl_base.h"
 #ifdef DEBUG
 #include "PHDebug.h"

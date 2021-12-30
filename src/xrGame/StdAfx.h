@@ -147,7 +147,7 @@
 #include "xrPhysics/PHUpdateObject.h" // ~95 - includes PHItemList.h
 //#include "xrPhysics/PHItemList.h" // ~110 - template class, so better include in pch
 #include "xrGame/Weapon.h" // ~125, VERY heavy to compile
-#include "xrGame/string_table.h" // ~100, somewhat heavy to compile
+#include "xrEngine/StringTable/StringTable.h" // ~100, somewhat heavy to compile
 #include "xrGame/WeaponMagazined.h" // ~70, VERY heavy to compile
 #include "visual_memory_manager.h" // only ~40, quite heavy to compile
 #include "xrNetServer/NET_Messages.h" // only ~60, depends on dplay macros

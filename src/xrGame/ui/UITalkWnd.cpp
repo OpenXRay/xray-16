@@ -10,7 +10,6 @@
 #include "PhraseDialog.h"
 #include "PhraseDialogManager.h"
 #include "game_cl_base.h"
-#include "string_table.h"
 #include "xrEngine/xr_level_controller.h"
 #include "xrEngine/CameraBase.h"
 #include "UIXmlInit.h"

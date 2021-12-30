@@ -24,7 +24,6 @@
 #include "UIHelper.h"
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ui_base.h"
-#include "string_table.h"
 #include "UIOutfitSlot.h"
 
 constexpr cpcstr ACTOR_MENU_XML      = "actor_menu.xml";

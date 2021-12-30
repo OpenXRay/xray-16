@@ -12,7 +12,6 @@
 #include "ui/UIVote.h"
 #include "ui/TeamInfo.h"
 #include "game_base_menu_events.h"
-#include "string_table.h"
 #include "game_cl_capture_the_artefact.h"
 #include "clsid_game.h"
 #include "Actor.h"

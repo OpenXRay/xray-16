@@ -3,7 +3,7 @@
 #include "xr_level_controller.h"
 #include "xr_input.h"
 
-#include "StringTable/IStringTable.h"
+#include "StringTable/StringTable.h"
 
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
@@ -680,7 +680,7 @@ bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
     }
     if (!binding->m_keyboard[0] && !binding->m_keyboard[1] && !binding->m_keyboard[2])
     {
-        xr_sprintf(dst_buff, dst_buff_sz, "%s", gStringTable->translate("st_key_notbinded").c_str());
+        xr_sprintf(dst_buff, dst_buff_sz, "%s", StringTable().translate("st_key_notbinded").c_str());
     }
     else
     {
@@ -763,7 +763,7 @@ public:
             }
         }
 
-        gStringTable->ReparseKeyBindings();
+        CStringTable::ReparseKeyBindings();
     }
 
     virtual void Save(IWriter* f)
@@ -793,7 +793,7 @@ public:
         key_binding* binding = &g_key_bindings[actionId];
         binding->m_keyboard[m_workIdx] = nullptr;
 
-        gStringTable->ReparseKeyBindings();
+        CStringTable::ReparseKeyBindings();
     }
 };
 

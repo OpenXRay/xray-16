@@ -141,7 +141,7 @@ void CUIChangeMap::OnBtnOk()
         HideDialog();
     }
 }
-#include "string_table.h"
+
 void CUIChangeMap::FillUpList()
 {
     lst->Clear();

@@ -24,7 +24,6 @@
 #include "ui/UISpeechMenu.h"
 #include "UIGameMP.h"
 
-#include "string_table.h"
 #include "clsid_game.h"
 #include "MainMenu.h"
 #include "WeaponKnife.h"

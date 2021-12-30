@@ -10,7 +10,6 @@
 #include "xrUICore/ComboBox/UIComboBox.h"
 #include "xrUICore/ListBox/UIListBoxItem.h"
 #include "xrEngine/XR_IOConsole.h"
-#include "string_table.h"
 #include "Common/object_broker.h"
 #include "game_base.h"
 #include "ui/UICDkey.h"

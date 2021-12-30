@@ -7,7 +7,6 @@
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
-#include "string_table.h"
 #include "inventory_item.h"
 #include "UIInventoryUtilities.h"
 #include "PhysicsShellHolder.h"

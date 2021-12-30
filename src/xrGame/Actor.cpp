@@ -45,7 +45,6 @@
 #include "game_cl_base.h"
 #include "game_cl_single.h"
 #include "xrMessages.h"
-#include "string_table.h"
 #include "xrCDB/Intersect.hpp"
 
 #include "alife_registry_wrappers.h"

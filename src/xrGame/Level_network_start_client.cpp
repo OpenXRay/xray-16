@@ -18,7 +18,7 @@
 extern pureFrame* g_pNetProcessor;
 
 bool CLevel::net_Start_client(const char* options) { return false; }
-#include "string_table.h"
+
 bool CLevel::net_start_client1()
 {
     pApp->LoadBegin();

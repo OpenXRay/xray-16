@@ -9,7 +9,6 @@
 #include "ai_space.h"
 #include "xrEngine/GameMtlLib.h"
 #include "Level.h"
-#include "string_table.h"
 
 #define BULLET_MANAGER_SECTION "bullet_manager"
 

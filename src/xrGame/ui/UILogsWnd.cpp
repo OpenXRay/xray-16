@@ -22,7 +22,6 @@
 #include "game_news.h"
 #include "alife_time_manager.h"
 #include "alife_registry_wrappers.h"
-#include "string_table.h"
 #include "UINewsItemWnd.h"
 #include "xrEngine/xr_input.h"
 

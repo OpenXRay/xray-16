@@ -17,7 +17,6 @@
 #include "xrGameSpy/GameSpy_Browser.h"
 #include "xrGameSpy/xrGameSpy.h"
 #include "CdkeyDecode/cdkeydecode.h"
-#include "string_table.h"
 #include "xrCore/os_clipboard.h"
 #include "xrGame/game_type.h"
 

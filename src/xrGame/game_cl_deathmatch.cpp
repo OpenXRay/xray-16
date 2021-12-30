@@ -13,7 +13,6 @@
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIVote.h"
 #include "GamePersistent.h"
-#include "string_table.h"
 #include "map_manager.h"
 #include "map_location.h"
 #include "clsid_game.h"

@@ -9,7 +9,6 @@
 #include "ui/UIGameTutorial.h"
 #include "ui/UIMessagesWindow.h"
 #include "ui/UIDialogWnd.h"
-#include "string_table.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "game_sv_mp_vote_flags.h"
 #include "xrNetServer/NET_Messages.h"

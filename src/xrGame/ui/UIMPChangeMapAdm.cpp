@@ -9,7 +9,6 @@
 #include "Level.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "UIGameCustom.h"
-#include "string_table.h"
 
 CUIMpChangeMapAdm::CUIMpChangeMapAdm()
 {

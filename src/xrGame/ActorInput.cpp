@@ -18,7 +18,6 @@
 #include "xrEngine/xr_level_controller.h"
 #include "ActorCondition.h"
 #include "actor_input_handler.h"
-#include "string_table.h"
 #include "xrUICore/Static/UIStatic.h"
 #include "ui/UIActorMenu.h"
 #include "ui/UIDragDropReferenceList.h"

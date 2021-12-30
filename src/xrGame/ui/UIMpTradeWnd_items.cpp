@@ -5,7 +5,6 @@
 #include "Common/object_broker.h"
 #include "UICellItem.h"
 #include "UIDragDropListEx.h"
-#include "string_table.h"
 #include "UIMpItemsStoreWnd.h"
 #include "Weapon.h"
 #include "WeaponMagazinedWGrenade.h"

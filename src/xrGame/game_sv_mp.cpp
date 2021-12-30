@@ -1912,7 +1912,6 @@ void game_sv_mp::RejectGameItem(CSE_Abstract* entity)
     Level().Send(P, net_flags(TRUE, TRUE));
 }
 
-#include "string_table.h"
 void game_sv_mp::DumpOnlineStatistic()
 {
     xrGameSpyServer* srv = smart_cast<xrGameSpyServer*>(m_server);

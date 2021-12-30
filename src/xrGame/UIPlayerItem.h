@@ -7,7 +7,6 @@
 #include "ui/UIXmlInit.h"
 
 #include "game_cl_base.h"
-#include "string_table.h"
 #include "Level.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "xrCore/buffer_vector.h"

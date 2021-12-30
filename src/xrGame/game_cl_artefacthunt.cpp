@@ -20,7 +20,6 @@
 #include "Inventory.h"
 #include "ActorCondition.h"
 #include "ui/TeamInfo.h"
-#include "string_table.h"
 #include "CustomOutfit.h"
 #include "clsid_game.h"
 #include "ui/UIActorMenu.h"
@@ -158,8 +157,6 @@ void game_cl_ArtefactHunt::net_import_state(NET_Packet& P)
     else
         dReinforcementTime = 0;
 }
-
-#include "string_table.h"
 
 void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
 {

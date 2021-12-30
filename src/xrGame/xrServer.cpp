@@ -12,7 +12,6 @@
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "ai_space.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "string_table.h"
 #include "Common/object_broker.h"
 #include "xrEngine/Engine.h"
 #include "xrEngine/GameFont.h"

@@ -30,7 +30,6 @@
 #include "UIPdaMsgListItem.h"
 #include "UIPdaWnd.h"
 #include "alife_registry_wrappers.h"
-#include "string_table.h"
 #ifdef DEBUG
 #include "attachable_item.h"
 #include "xrEngine/xr_input.h"

@@ -8,7 +8,6 @@
 
 #include "pch_script.h"
 #include "UIInvUpgradeInfo.h"
-#include "string_table.h"
 #include "Actor.h"
 
 #include "xrUICore/Static/UIStatic.h"

@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "ServerList.h"
 #include "UIXmlInit.h"
-#include "string_table.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrUICore/EditBox/UIEditBox.h"
 #include "UIMessageBoxEx.h"

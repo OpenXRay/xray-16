@@ -33,7 +33,6 @@ bool CUIDebugFonts::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     return true;
 }
-#include "string_table.h"
 
 void CUIDebugFonts::FillUpList()
 {

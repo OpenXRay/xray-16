@@ -20,7 +20,6 @@
 #include "clsid_game.h"
 #include "ui/UIBuyWndShared.h"
 #include "UIGameCTA.h"
-#include "string_table.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrNetServer/NET_Messages.h"
 

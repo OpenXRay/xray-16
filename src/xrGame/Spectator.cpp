@@ -20,7 +20,6 @@
 #include "Inventory.h"
 #include "HudItem.h"
 #include "game_cl_mp.h"
-#include "string_table.h"
 #include "map_manager.h"
 
 const float CSpectator::cam_inert_value = 0.7f;

@@ -8,7 +8,6 @@
 #include "GametaskManager.h"
 #include "GameTask.h"
 #include "UIInventoryUtilities.h"
-#include "string_table.h"
 #include "UIHelper.h"
 
 constexpr cpcstr HINT_ITEM_XML = "hint_item.xml";

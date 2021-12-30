@@ -896,7 +896,7 @@ void CGamePersistent::OnRenderPPUI_main()
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
-#include "string_table.h"
+
 #include "xrEngine/x_ray.h"
 void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
 {

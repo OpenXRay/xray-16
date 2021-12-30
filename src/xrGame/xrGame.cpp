@@ -48,13 +48,11 @@ extern "C"
 #ifdef DEBUG
         g_profiler = xr_new<CProfiler>();
 #endif
-        gStringTable = xr_new<CStringTable>();
         StringTable().Init();
     }
 
     XR_EXPORT void finalize_library()
     {
         CleanupUIStyleToken();
-        xr_delete(gStringTable);
     }
 }
