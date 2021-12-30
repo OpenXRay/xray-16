@@ -382,7 +382,8 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     if (!IsActive())
         return;
 
-    if (IsBinded(kCONSOLE, dik))
+    auto action = GetBindedAction(dik);
+    if (action == kCONSOLE)
     {
         Console->Show();
         return;
@@ -396,7 +397,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         Device.SetWindowDraggable(true);
     }
 
-    if (SDL_SCANCODE_F12 == dik)
+    if (action == kSCREENSHOT)
     {
         GEnv.Render->Screenshot();
         return;

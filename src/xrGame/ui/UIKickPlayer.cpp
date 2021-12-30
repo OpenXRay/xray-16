@@ -85,7 +85,7 @@ void CUIKickPlayer::InitKick(CUIXml& xml_doc)
 
 bool CUIKickPlayer::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == SDL_SCANCODE_ESCAPE)
+    if (IsBinded(kQUIT, dik))
     {
         OnBtnCancel();
         return true;

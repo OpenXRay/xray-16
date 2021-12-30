@@ -21,11 +21,15 @@ void CUIDebugFonts::InitDebugFonts(Frect&& r)
 
 bool CUIDebugFonts::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (SDL_SCANCODE_ESCAPE == dik)
+    switch (GetBindedAction(dik))
+    {
+    case kQUIT:
         HideDialog();
+        break;
 
-    if (SDL_SCANCODE_F12 == dik)
+    case kSCREENSHOT:
         return false;
+    }
 
     return true;
 }

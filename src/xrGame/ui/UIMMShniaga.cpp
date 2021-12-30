@@ -398,20 +398,27 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (WINDOW_KEY_PRESSED == keyboard_action)
     {
-        switch (dik)
+        switch (GetBindedAction(dik))
         {
-        case SDL_SCANCODE_UP:
+        case kUP:
+        case kFWD:
             if (m_selected_btn > 0)
                 SelectBtn(m_selected_btn - 1);
             return true;
-        case SDL_SCANCODE_DOWN:
+        case kDOWN:
+        case kBACK:
             if (m_selected_btn < BtnCount() - 1)
                 SelectBtn(m_selected_btn + 1);
             return true;
-        case SDL_SCANCODE_RETURN: OnBtnClick(); return true;
-        case SDL_SCANCODE_ESCAPE:
+        case kQUIT:
             if (m_page != epi_main)
                 ShowMain();
+            return true;
+        }
+        switch (dik)
+        {
+        case SDL_SCANCODE_RETURN:
+            OnBtnClick();
             return true;
         }
     }

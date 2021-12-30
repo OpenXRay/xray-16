@@ -45,7 +45,7 @@ bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
     CUIDialogWnd::OnKeyboardAction(dik, keyboardAction);
     if (WINDOW_KEY_PRESSED == keyboardAction)
     {
-        if (SDL_SCANCODE_ESCAPE == dik)
+        if (IsBinded(kQUIT, dik))
         {
             OnCancel();
             return true;

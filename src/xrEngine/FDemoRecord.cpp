@@ -455,21 +455,14 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
         g_pGameLevel->IR_OnKeyboardPress(dik);
         return;
     }
-    if (dik == SDL_SCANCODE_GRAVE)
-        Console->Show();
-    if (dik == SDL_SCANCODE_SPACE)
-        RecordKey();
+
     if (dik == SDL_SCANCODE_BACKSPACE)
         MakeCubemap();
-    if (dik == SDL_SCANCODE_F11)
+    else if (dik == SDL_SCANCODE_F11)
         MakeLevelMapScreenshot(IR_GetKeyState(SDL_SCANCODE_LCTRL));
-    if (dik == SDL_SCANCODE_F12)
-        MakeScreenshot();
-    if (dik == SDL_SCANCODE_ESCAPE)
-        fLifeTime = -1;
 
 #ifndef MASTER_GOLD
-    if (dik == SDL_SCANCODE_RETURN)
+    else if (dik == SDL_SCANCODE_RETURN)
     {
         IGameObject* entity = g_pGameLevel->CurrentEntity();
         if (entity)
@@ -480,8 +473,28 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     }
 #endif
 
-    if (dik == SDL_SCANCODE_PAUSE)
+    switch (GetBindedAction(dik))
+    {
+    case kCONSOLE:
+        Console->Show();
+        break;
+
+    case kJUMP:
+        RecordKey();
+        break;
+
+    case kSCREENSHOT:
+        MakeScreenshot();
+        break;
+
+    case kQUIT:
+        fLifeTime = -1;
+        break;
+
+    case kPAUSE:
         Device.Pause(!Device.Paused(), true, true, "demo_record");
+        break;
+    }
 }
 
 static void update_whith_timescale(Fvector& v, const Fvector& v_delta)

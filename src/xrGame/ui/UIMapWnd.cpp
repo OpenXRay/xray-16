@@ -398,29 +398,30 @@ void CUIMapWnd::DrawHint()
 
 bool CUIMapWnd::OnKeyboardHold(int dik)
 {
-    switch (dik)
-    {
-    case SDL_SCANCODE_UP:
-    case SDL_SCANCODE_DOWN:
-    case SDL_SCANCODE_LEFT:
-    case SDL_SCANCODE_RIGHT:
-    {
-        Fvector2 pos_delta;
-        pos_delta.set(0.0f, 0.0f);
+    Fvector2 pos_delta{};
 
-        if (dik == SDL_SCANCODE_UP)
-            pos_delta.y += m_map_move_step;
-        if (dik == SDL_SCANCODE_DOWN)
-            pos_delta.y -= m_map_move_step;
-        if (dik == SDL_SCANCODE_LEFT)
-            pos_delta.x += m_map_move_step;
-        if (dik == SDL_SCANCODE_RIGHT)
-            pos_delta.x -= m_map_move_step;
+    switch (GetBindedAction(dik))
+    {
+    case kUP:
+        pos_delta.y += m_map_move_step;
+        break;
+    case kDOWN:
+        pos_delta.y -= m_map_move_step;
+        break;
+    case kLEFT:
+        pos_delta.x += m_map_move_step;
+        break;
+    case kRIGHT:
+        pos_delta.x -= m_map_move_step;
+        break;
+    }
+
+    if (pos_delta.x || pos_delta.y)
+    {
         MoveMap(pos_delta);
         return true;
     }
-    break;
-    }
+
     return inherited::OnKeyboardHold(dik);
 }
 

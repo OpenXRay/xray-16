@@ -78,13 +78,13 @@ bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (dik == SDL_SCANCODE_KP_ENTER || dik == SDL_SCANCODE_RETURN || dik == SDL_SCANCODE_SPACE)
+        if (dik == SDL_SCANCODE_KP_ENTER || dik == SDL_SCANCODE_RETURN || IsBinded(kJUMP, dik))
         {
             m_pMessageBox->OnYesOk();
             return true;
             /*
                     }else
-                        if ( dik == SDL_SCANCODE_ESCAPE )
+                        if ( IsBinded(kQUIT, dik) )
                     {
                         CUIMessageBox::E_MESSAGEBOX_STYLE style = m_pMessageBox->GetBoxStyle();
                         if(style != CUIMessageBox::MESSAGEBOX_INFO)
