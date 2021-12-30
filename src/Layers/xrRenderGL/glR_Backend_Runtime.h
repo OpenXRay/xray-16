@@ -63,6 +63,7 @@ IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
 
 IC void CBackend::ClearZB(GLuint zb, float depth)
 {
+    VERIFY(pZB == zb); // do not allow to clear unbound depth
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
 
@@ -74,6 +75,7 @@ IC void CBackend::ClearZB(GLuint zb, float depth)
 
 IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
 {
+    VERIFY(pZB == zb); // do not allow to clear unbound depth
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
 

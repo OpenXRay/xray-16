@@ -3,7 +3,7 @@
 void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
 {
     // Targets
-    u_setrt(rt_smap_surf, nullptr, nullptr, rt_smap_depth->pZRT);
+    u_setrt(rt_smap_surf, nullptr, nullptr, rt_smap_depth);
 
     //	Don't have rect clear for DX10
     //	TODO: DX9:	Full clear must be faster for the near phase for SLI
