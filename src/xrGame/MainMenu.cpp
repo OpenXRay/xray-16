@@ -5,7 +5,7 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/CameraManager.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrUICore/XML/UITextureMaster.h"
 #include "ui/UIXmlInit.h"
 #include "SDL.h"

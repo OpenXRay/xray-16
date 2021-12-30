@@ -17,7 +17,6 @@
 
 #include "UITextureMaster.h"
 #include "Lines/UILines.h"
-#include "xrEngine/xr_input_xinput.h"
 
 #define ARIAL_FONT_NAME "arial"
 

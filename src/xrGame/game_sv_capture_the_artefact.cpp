@@ -10,7 +10,7 @@
 #include "Actor.h"
 #include "Artefact.h"
 #include "game_cl_base.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "HudItem.h"
 #include "Weapon.h"
 #include "eatable_item_object.h"

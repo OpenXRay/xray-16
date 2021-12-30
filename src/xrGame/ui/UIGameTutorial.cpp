@@ -5,7 +5,7 @@
 #include "UIXmlInit.h"
 #include "Common/object_broker.h"
 #include "xrEngine/xr_input.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 #include "xrEngine/XR_IOConsole.h"

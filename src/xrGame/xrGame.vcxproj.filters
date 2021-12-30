@@ -1228,9 +1228,6 @@
     <Filter Include="Core\Client\Level\LevelNetworkDemo">
       <UniqueIdentifier>{d79d3201-de20-4eb4-88ed-e76454a00fde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Level Controller">
-      <UniqueIdentifier>{488043bb-30c6-4821-b111-b31aabf92136}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Level Debug">
       <UniqueIdentifier>{dd7f6a82-3b47-4884-831a-9a03b196b28c}</UniqueIdentifier>
     </Filter>
@@ -4740,9 +4737,6 @@
     <ClInclude Include="Message_Filter.h">
       <Filter>Core\Client\Level\LevelNetworkDemo</Filter>
     </ClInclude>
-    <ClInclude Include="xr_level_controller.h">
-      <Filter>Core\Client\Level Controller</Filter>
-    </ClInclude>
     <ClInclude Include="level_debug.h">
       <Filter>Core\Client\Level Debug</Filter>
     </ClInclude>
@@ -8035,9 +8029,6 @@
     </ClCompile>
     <ClCompile Include="Message_Filter.cpp">
       <Filter>Core\Client\Level\LevelNetworkDemo</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_level_controller.cpp">
-      <Filter>Core\Client\Level Controller</Filter>
     </ClCompile>
     <ClCompile Include="level_debug.cpp">
       <Filter>Core\Client\Level Debug</Filter>

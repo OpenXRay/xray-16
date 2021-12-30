@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "game_cl_mp.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrMessages.h"
 #include "Actor.h"
 #include "ExplosiveItem.h"

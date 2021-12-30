@@ -9,7 +9,7 @@
 #include "Level.h"
 #include "game_cl_teamdeathmatch.h"
 #include "UIMapInfo.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "UIStatsPlayerList.h"
 
 CUIMapDesc::CUIMapDesc()

@@ -5,7 +5,6 @@
 #include "XML/UIXmlInitBase.h"
 #include "XML/UITextureMaster.h"
 #include "Cursor/UICursor.h"
-#include "xrEngine/xr_input_xinput.h"
 
 CUIScrollBar::CUIScrollBar()
 {

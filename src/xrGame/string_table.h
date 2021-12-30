@@ -26,13 +26,13 @@ public:
     void Init();
     static void Destroy();
 
-    STRING_VALUE translate(const STRING_ID& str_id) const;
-    void rescan();
+    STRING_VALUE translate(const STRING_ID& str_id) const override;
+    void rescan() override;
 
     void ReloadLanguage();
 
     static BOOL m_bWriteErrorsToLog;
-    static void ReparseKeyBindings();
+    void ReparseKeyBindings() override;
 
     xr_token* GetLanguagesToken() const;
     static u32 LanguageID;

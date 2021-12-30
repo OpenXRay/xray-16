@@ -3,7 +3,7 @@
 #include "Common/Common.hpp"
 
 #include "xrEngine/stdafx.h"
-#include "xrEngine/xr_input_xinput.h"
+#include "xrEngine/xr_level_controller.h"
 
 #include "xrServerEntities/smart_cast.h"
 

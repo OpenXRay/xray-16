@@ -7,7 +7,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrEngine/FDemoRecord.h"
 #include "Level.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "game_cl_base.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "Inventory.h"

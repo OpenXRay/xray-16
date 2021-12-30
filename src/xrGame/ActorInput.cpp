@@ -15,7 +15,7 @@
 #include "Inventory.h"
 #include "Level.h"
 #include "game_cl_base.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "ActorCondition.h"
 #include "actor_input_handler.h"
 #include "string_table.h"

@@ -11,7 +11,7 @@
 #include "xrServer_Objects.h"
 #include "game_cl_base.h"
 #include "Level.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "seniority_hierarchy_holder.h"
 #include "team_hierarchy_holder.h"
 #include "squad_hierarchy_holder.h"

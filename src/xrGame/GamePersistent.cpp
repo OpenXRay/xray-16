@@ -47,7 +47,7 @@
 #include "ai_debug.h"
 #endif // _EDITOR
 
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 u32 UIStyleID = 0;
 xr_vector<xr_token> UIStyleToken;

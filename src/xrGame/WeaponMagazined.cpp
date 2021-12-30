@@ -11,7 +11,7 @@
 #include "xrServer_Objects_ALife_Items.h"
 #include "ActorEffector.h"
 #include "EffectorZoomInertion.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "UIGameCustom.h"
 #include "Common/object_broker.h"
 #include "string_table.h"

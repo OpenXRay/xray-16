@@ -12,7 +12,7 @@
 #include "Inventory.h"
 #include "InventoryOwner.h"
 #include "xrServer_Objects_ALife_Items.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "game_cl_deathmatch.h"
 #include "ui/UIMoneyIndicator.h"

@@ -13,6 +13,8 @@ public:
 
     virtual STRING_VALUE translate(const STRING_ID& str_id) const = 0;
     virtual void rescan() = 0;
+
+    virtual void ReparseKeyBindings() = 0;
 };
 
 extern ENGINE_API IStringTable* gStringTable;

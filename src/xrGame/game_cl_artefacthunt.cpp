@@ -14,7 +14,7 @@
 #include "ui/UIMapDesc.h"
 #include "ui/UIMessageBoxEx.h"
 #include "xrUICore/Static/UIStatic.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Artefact.h"
 #include "map_location.h"
 #include "Inventory.h"

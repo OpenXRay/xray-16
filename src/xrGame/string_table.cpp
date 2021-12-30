@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "string_table.h"
 #include "xrUICore/XML/xrUIXmlParser.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 constexpr pcstr OPENXRAY_XML = "openxray.xml";
 

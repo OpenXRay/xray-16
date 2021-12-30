@@ -4,7 +4,7 @@
 #include "inventory_item.h"
 #include "UIDragDropListEx.h"
 #include "eatable_item.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/xr_input.h"
 #include "Level.h"
 #include "Common/object_broker.h"

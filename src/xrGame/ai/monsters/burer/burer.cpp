@@ -17,7 +17,7 @@
 #include "ai/monsters/anti_aim_ability.h"
 #include "Inventory.h"
 #include "ActorCondition.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Weapon.h"
 #include "xrCore/_vector3d_ext.h"
 #include "ai/monsters/control_direction_base.h"

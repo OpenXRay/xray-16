@@ -5,7 +5,6 @@
 #include "UIScrollBox.h"
 #include "XML/UIXmlInitBase.h"
 #include "Cursor/UICursor.h"
-#include "xrEngine/xr_input_xinput.h"
 
 CUIFixedScrollBar::CUIFixedScrollBar()
 {

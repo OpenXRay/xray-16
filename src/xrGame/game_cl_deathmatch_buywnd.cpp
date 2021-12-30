@@ -7,7 +7,7 @@
 #include "Weapon.h"
 #include "WeaponMagazinedWGrenade.h"
 #include "WeaponKnife.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "eatable_item_object.h"
 #include "Missile.h"
 #include "ui/UIMpTradeWnd.h"

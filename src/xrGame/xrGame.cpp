@@ -9,7 +9,7 @@
 #include "StdAfx.h"
 #include "object_factory.h"
 #include "xrUICore/XML/xrUIXmlParser.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/profiler.h"
 
 extern void FillUIStyleToken();

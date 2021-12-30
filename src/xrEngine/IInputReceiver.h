@@ -6,7 +6,7 @@
 #ifndef IINPUTRECEIVERH
 #define IINPUTRECEIVERH
 #include "xrCore/_flags.h"
-#include "xrGame/xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 // fwd. decl.
 template <class T>

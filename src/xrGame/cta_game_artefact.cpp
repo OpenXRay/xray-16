@@ -11,7 +11,7 @@
 #include "cta_game_artefact_activation.h"
 #include "game_cl_capture_the_artefact.h"
 #include "xrServer_Objects_ALife_Items.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 CtaGameArtefact::CtaGameArtefact()
 {

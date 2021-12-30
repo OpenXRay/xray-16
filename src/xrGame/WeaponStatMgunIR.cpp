@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "WeaponStatMgun.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/IInputReceiver.h"
 
 void CWeaponStatMgun::OnMouseMove(int dx, int dy)

@@ -4,7 +4,7 @@
 #include "UIGameDM.h"
 #include "Spectator.h"
 #include "Level.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Actor.h"
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
