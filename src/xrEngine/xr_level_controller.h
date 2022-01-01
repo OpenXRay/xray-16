@@ -10,11 +10,6 @@ enum EGameActions : u32
     kRIGHT,
     kUP,
     kDOWN,
-    kJUMP,
-    kCROUCH,
-    kCROUCH_TOGGLE,
-    kACCEL,
-    kSPRINT_TOGGLE,
 
     kFWD,
     kBACK,
@@ -23,6 +18,12 @@ enum EGameActions : u32
 
     kL_LOOKOUT,
     kR_LOOKOUT,
+
+    kJUMP,
+    kCROUCH,
+    kCROUCH_TOGGLE,
+    kACCEL,
+    kSPRINT_TOGGLE,
 
     kENGINE,
 

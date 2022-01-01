@@ -19,11 +19,6 @@ game_action actions[] = {
     { "right",             kRIGHT,             _both },
     { "up",                kUP,                _both },
     { "down",              kDOWN,              _both },
-    { "jump",              kJUMP,              _both },
-    { "crouch",            kCROUCH,            _both },
-    { "crouch_toggle",     kCROUCH_TOGGLE,     _both },
-    { "accel",             kACCEL,             _both },
-    { "sprint_toggle",     kSPRINT_TOGGLE,     _both },
 
     { "forward",           kFWD,               _both },
     { "back",              kBACK,              _both },
@@ -32,6 +27,12 @@ game_action actions[] = {
 
     { "llookout",          kL_LOOKOUT,         _both },
     { "rlookout",          kR_LOOKOUT,         _both },
+
+    { "jump",              kJUMP,              _both },
+    { "crouch",            kCROUCH,            _both },
+    { "crouch_toggle",     kCROUCH_TOGGLE,     _both },
+    { "accel",             kACCEL,             _both },
+    { "sprint_toggle",     kSPRINT_TOGGLE,     _both },
 
     { "turn_engine",       kENGINE,            _sp},
 
