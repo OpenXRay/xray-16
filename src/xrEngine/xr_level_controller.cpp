@@ -463,8 +463,8 @@ keyboard_key keyboards[] =
 
     { "gpAXIS_LEFT",            XR_CONTROLLER_AXIS_LEFT,            "Gamepad Axis Left" },
     { "gpAXIS_RIGHT",           XR_CONTROLLER_AXIS_RIGHT,           "Gamepad Axis Right" },
-    { "gpAXIS_TRIGGER_LEFT",    XR_CONTROLLER_AXIS_LEFT,            "Gamepad Trigger Left" },
-    { "gpAXIS_TRIGGER_RIGHT",   XR_CONTROLLER_AXIS_RIGHT,           "Gamepad Trigger Right" },
+    { "gpAXIS_TRIGGER_LEFT",    XR_CONTROLLER_AXIS_TRIGGER_LEFT,    "Gamepad Trigger Left" },
+    { "gpAXIS_TRIGGER_RIGHT",   XR_CONTROLLER_AXIS_TRIGGER_RIGHT,   "Gamepad Trigger Right" },
 
     { nullptr,                  -1,                              "(null)" }
 };
