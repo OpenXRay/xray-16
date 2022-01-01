@@ -366,12 +366,29 @@ void CActor::IR_OnMouseMove(int dx, int dy)
 
 void CActor::IR_OnControllerPress(int cmd, float x, float y)
 {
-    IR_OnControllerHold(cmd, x, y); // XXX: maybe temporary
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+    case kMOVE_AROUND:
+        IR_OnControllerHold(cmd, x, y); // XXX: maybe temporary
+        break;
+
+    case kNOTBINDED:
+        break;
+
+    default:
+        // bypass as keyboard
+        IR_OnKeyboardPress(cmd);
+    } // switch (GetBindedAction(axis))}
 }
 
 void CActor::IR_OnControllerRelease(int cmd, float x, float y)
 {
+    if (cmd == kNOTBINDED)
+        return;
 
+    // bypass as keyboard
+    IR_OnKeyboardRelease(cmd);
 }
 
 void CActor::IR_OnControllerHold(int cmd, float x, float y)
@@ -414,20 +431,34 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
     {
         if (!fis_zero(x))
         {
-            if (x > 0.f)
+            if (x > 35.f)
                 mstate_wishful |= mcRStrafe;
-            else
+            else if (x < -35.f)
                 mstate_wishful |= mcLStrafe;
         }
         if (!fis_zero(y))
         {
-            if (y > 0.f)
+            if (y > 35.f)
                 mstate_wishful |= mcBack;
-            else
+            else if (y < -35.f)
                 mstate_wishful |= mcFwd;
+
+            if (std::abs(y) < 65.f)
+                mstate_wishful |= mcAccel;
+            else if (y < -85.f)
+                mstate_wishful |= mcSprint;
+            else
+                mstate_wishful &= ~mcSprint;
         }
         break;
     }
+
+    case kNOTBINDED:
+        break;
+
+    default:
+        // bypass as keyboard
+        IR_OnKeyboardHold(cmd);
     } // switch (GetBindedAction(axis))
 }
 
