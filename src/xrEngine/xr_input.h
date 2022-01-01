@@ -45,8 +45,7 @@ enum EControllerButton
     XR_CONTROLLER_BUTTON_COUNT = XR_CONTROLLER_BUTTON_MAX - XR_CONTROLLER_BUTTON_INVALID - 1
 };
 
-static_assert(XR_CONTROLLER_BUTTON_COUNT == SDL_CONTROLLER_BUTTON_MAX, "Please, update xr_controller buttons definitions");
-
+// SDL has separate axes for X and Y, we don't. Except trigger. Trigger should be separated.
 enum EControllerAxis
 {
     XR_CONTROLLER_AXIS_INVALID = XR_CONTROLLER_BUTTON_MAX,
@@ -57,10 +56,6 @@ enum EControllerAxis
     XR_CONTROLLER_AXIS_MAX,
     XR_CONTROLLER_AXIS_COUNT = XR_CONTROLLER_AXIS_MAX - XR_CONTROLLER_AXIS_INVALID - 1
 };
-
-// SDL has separate axes for X and Y, we don't. Except trigger. Trigger should be separated.
-static_assert(XR_CONTROLLER_AXIS_COUNT == 4, "Please, update xr_controller axis definitions");
-static_assert(SDL_CONTROLLER_AXIS_MAX == 6, "Please, update xr_controller axis definitions");
 
 constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5 };
 
