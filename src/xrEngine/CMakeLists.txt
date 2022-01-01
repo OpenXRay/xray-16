@@ -140,8 +140,8 @@ set(SRC_FILES
     "xrImage_Resampler.h"
     "xr_input.cpp"
     "xr_input.h"
-    "xr_input_xinput.cpp"
-    "xr_input_xinput.h"
+    "xr_level_controller.cpp"
+    "xr_level_controller.h"
     "xr_ioc_cmd.cpp"
     "xr_ioc_cmd.h"
     "XR_IOConsole_callback.cpp"
@@ -162,9 +162,8 @@ set(SRC_FILES
     "xrTheora_Stream.h"
     "xrTheora_Surface.cpp"
     "xrTheora_Surface.h"
-    "StringTable/IStringTable.cpp"
-    "StringTable/IStringTable.h"
-    "StringTable/IStringTableDefs.h"
+    "StringTable/StringTable.cpp"
+    "StringTable/StringTable.h"
 )
 
 group_sources(SRC_FILES)
