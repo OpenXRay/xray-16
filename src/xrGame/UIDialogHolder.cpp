@@ -410,3 +410,99 @@ bool CDialogHolder::IR_UIOnMouseMove(int dx, int dy)
     };
     return true;
 }
+
+bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
+{
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        return IR_UIOnKeyboardPress(dik);
+    }
+
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+    if (GetUICursor().IsVisible())
+    {
+        if (IsBinded(kLOOK_AROUND, dik))
+        {
+            GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
+            Fvector2 cPos = GetUICursor().GetCursorPosition();
+            TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
+        }
+    }
+    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    {
+        IGameObject* O = Level().CurrentEntity();
+        if (O)
+        {
+            IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
+            if (IR)
+                IR->IR_OnControllerPress(dik, x, y);
+            return false;
+        }
+    };
+    return true;
+}
+
+bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
+{
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        return IR_UIOnKeyboardRelease(dik);
+    }
+
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+    if (!TIR->StopAnyMove() && g_pGameLevel)
+    {
+        IGameObject* O = Level().CurrentEntity();
+        if (O)
+        {
+            IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
+            if (IR)
+                IR->IR_OnControllerRelease(dik, x, y);
+            return false;
+        }
+    };
+    return true;
+}
+
+bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
+{
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        return IR_UIOnKeyboardHold(dik);
+    }
+
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+    if (GetUICursor().IsVisible())
+    {
+        if (IsBinded(kLOOK_AROUND, dik))
+        {
+            GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
+            Fvector2 cPos = GetUICursor().GetCursorPosition();
+            TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
+        }
+    }
+    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    {
+        IGameObject* O = Level().CurrentEntity();
+        if (O)
+        {
+            IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
+            if (IR)
+                IR->IR_OnControllerHold(dik, x, y);
+            return false;
+        }
+    };
+    return true;
+}

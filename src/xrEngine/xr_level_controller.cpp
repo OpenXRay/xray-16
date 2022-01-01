@@ -15,11 +15,13 @@ ENGINE_API EKeyGroup g_current_keygroup = _sp;
 
 // clang-format off
 game_action actions[] = {
+    { "look_around",       kLOOK_AROUND,       _both }, // gamepad
     { "left",              kLEFT,              _both },
     { "right",             kRIGHT,             _both },
     { "up",                kUP,                _both },
     { "down",              kDOWN,              _both },
 
+    { "move_around",       kMOVE_AROUND,       _both }, // gamepad
     { "forward",           kFWD,               _both },
     { "back",              kBACK,              _both },
     { "lstrafe",           kL_STRAFE,          _both },
@@ -437,21 +439,32 @@ keyboard_key keyboards[] =
     { "mouse4",                 MOUSE_4,                         "Mouse X1" },
     { "mouse5",                 MOUSE_5,                         "Mouse X2" },
 
-    { "kGAMEPAD_A",             XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
-    { "kGAMEPAD_B",             XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
-    { "kGAMEPAD_X",             XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
-    { "kGAMEPAD_Y",             XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
-    { "kGAMEPAD_BACK",          XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
-    { "kGAMEPAD_GUIDE",         XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
-    { "kGAMEPAD_START",         XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
-    { "kGAMEPAD_LEFTSTICK",     XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
-    { "kGAMEPAD_RIGHTSTICK",    XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
-    { "kGAMEPAD_LEFTSHOULDER",  XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
-    { "kGAMEPAD_RIGHTSHOULDER", XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
-    { "kGAMEPAD_DPAD_UP",       XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
-    { "kGAMEPAD_DPAD_DOWN",     XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
-    { "kGAMEPAD_DPAD_LEFT",     XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
-    { "kGAMEPAD_DPAD_RIGHT",    XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
+    { "gpA",                    XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
+    { "gpB",                    XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
+    { "gpX",                    XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
+    { "gpY",                    XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
+    { "gpBACK",                 XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
+    { "gpGUIDE",                XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
+    { "gpSTART",                XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
+    { "gpLEFT_STICK",           XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
+    { "gpRIGHT_STICK",          XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
+    { "gpLEFT_SHOULDER",        XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
+    { "gpRIGHT_SHOULDER",       XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
+    { "gpDPAD_UP",              XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
+    { "gpDPAD_DOWN",            XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
+    { "gpDPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
+    { "gpDPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
+    { "gpMISC1",                XR_CONTROLLER_BUTTON_MISC1,         "Gamepad Misc1" },
+    { "gpPADDLE_P1",            XR_CONTROLLER_BUTTON_PADDLE1,       "Gamepad P1" },
+    { "gpPADDLE_P2",            XR_CONTROLLER_BUTTON_PADDLE2,       "Gamepad P2" },
+    { "gpPADDLE_P3",            XR_CONTROLLER_BUTTON_PADDLE3,       "Gamepad P3" },
+    { "gpPADDLE_P4",            XR_CONTROLLER_BUTTON_PADDLE4,       "Gamepad P4" },
+    { "gpTOUCHPAD",             XR_CONTROLLER_BUTTON_TOUCHPAD,      "Gamepad Touchpad" },
+
+    { "gpAXIS_LEFT",            XR_CONTROLLER_AXIS_LEFT,            "Gamepad Axis Left" },
+    { "gpAXIS_RIGHT",           XR_CONTROLLER_AXIS_RIGHT,           "Gamepad Axis Right" },
+    { "gpAXIS_TRIGGER_LEFT",    XR_CONTROLLER_AXIS_LEFT,            "Gamepad Trigger Left" },
+    { "gpAXIS_TRIGGER_RIGHT",   XR_CONTROLLER_AXIS_RIGHT,           "Gamepad Trigger Right" },
 
     { nullptr,                  -1,                              "(null)" }
 };

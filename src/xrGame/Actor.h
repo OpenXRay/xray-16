@@ -444,6 +444,10 @@ public:
     virtual void IR_OnKeyboardRelease(int dik);
     virtual void IR_OnKeyboardHold(int dik);
 
+    void IR_OnControllerPress(int dik, float x, float y) override;
+    void IR_OnControllerRelease(int dik, float x, float y) override;
+    void IR_OnControllerHold(int dik, float x, float y) override;
+
     virtual float GetLookFactor();
 
 public:

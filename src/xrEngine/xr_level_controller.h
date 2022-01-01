@@ -6,11 +6,13 @@
 
 enum EGameActions : u32
 {
+    kLOOK_AROUND, // gamepad
     kLEFT,
     kRIGHT,
     kUP,
     kDOWN,
 
+    kMOVE_AROUND, // gamepad
     kFWD,
     kBACK,
     kL_STRAFE,

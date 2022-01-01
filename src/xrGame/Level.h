@@ -318,9 +318,9 @@ public:
     void IR_OnMouseStop(int, int) override;
     void IR_OnMouseWheel(int x, int y) override;
 
-    void IR_OnControllerPress(int btn) override;
-    void IR_OnControllerRelease(int btn) override;
-    void IR_OnControllerHold(int btn) override;
+    void IR_OnControllerPress(int key, float x, float y) override;
+    void IR_OnControllerRelease(int key, float x, float y) override;
+    void IR_OnControllerHold(int key, float x, float y) override;
 
     void IR_OnActivate(void) override;
 

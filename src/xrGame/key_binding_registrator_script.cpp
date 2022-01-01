@@ -18,12 +18,14 @@ SCRIPT_EXPORT(KeyBindings, (),
         class_<EnumGameActions>("key_bindings")
             .enum_("commands")
             [
+                value("kMOVE_AROUND",               int(kMOVE_AROUND)),
                 value("kFWD",                       int(kFWD)),
                 value("kBACK",                      int(kBACK)),
                 value("kL_STRAFE",                  int(kL_STRAFE)),
                 value("kR_STRAFE",                  int(kR_STRAFE)),
                 value("kL_LOOKOUT",                 int(kL_LOOKOUT)),
                 value("kR_LOOKOUT",                 int(kR_LOOKOUT)),
+                value("kLOOK_AROUND",               int(kLOOK_AROUND)),
                 value("kLEFT",                      int(kLEFT)),
                 value("kRIGHT",                     int(kRIGHT)),
                 value("kUP",                        int(kUP)),
@@ -369,7 +371,13 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("GAMEPAD_DPAD_UP",            int(XR_CONTROLLER_BUTTON_DPAD_UP)),
                 value("GAMEPAD_DPAD_DOWN",          int(XR_CONTROLLER_BUTTON_DPAD_DOWN)),
                 value("GAMEPAD_DPAD_LEFT",          int(XR_CONTROLLER_BUTTON_DPAD_LEFT)),
-                value("GAMEPAD_DPAD_RIGHT",         int(XR_CONTROLLER_BUTTON_DPAD_RIGHT))
+                value("GAMEPAD_DPAD_RIGHT",         int(XR_CONTROLLER_BUTTON_DPAD_RIGHT)),
+                value("GAMEPAD_DPAD_MISC1",         int(XR_CONTROLLER_BUTTON_MISC1)),
+                value("GAMEPAD_DPAD_PADDLE1",       int(XR_CONTROLLER_BUTTON_PADDLE1)),
+                value("GAMEPAD_DPAD_PADDLE2",       int(XR_CONTROLLER_BUTTON_PADDLE2)),
+                value("GAMEPAD_DPAD_PADDLE3",       int(XR_CONTROLLER_BUTTON_PADDLE3)),
+                value("GAMEPAD_DPAD_PADDLE4",       int(XR_CONTROLLER_BUTTON_PADDLE4)),
+                value("GAMEPAD_DPAD_TOUCHPAD",      int(XR_CONTROLLER_BUTTON_TOUCHPAD))
         ]
     ];
 });

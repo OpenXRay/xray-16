@@ -837,6 +837,12 @@ void CCC_Register()
     psMouseSens = 0.12f;
     CMD4(CCC_Float, "mouse_sens", &psMouseSens, 0.001f, 0.6f);
 
+    // Gamepad
+    psControllerSens = 0.12f;
+    CMD4(CCC_Float, "gamepad_sens", &psControllerSens, 0.001f, 0.6f);
+    psControllerDeadZoneSens = 15.f;
+    CMD4(CCC_Float, "gamepad_deadzone_sens", &psControllerDeadZoneSens, 1.f, 35.f);
+
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);
     CMD2(CCC_Float, "cam_slide_inert", &psCamSlideInert);

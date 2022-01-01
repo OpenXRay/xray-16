@@ -88,9 +88,6 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
         if (!m_keyboard)
             return true;
 
-        if (m_isGamepadBinds && (mouse_btn <= XR_CONTROLLER_BUTTON_A || mouse_btn >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
-            return true;
-
         SetValue();
         OnFocusLost();
 
@@ -123,7 +120,7 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         if (!m_keyboard)
             return true;
 
-        if (m_isGamepadBinds && (dik <= XR_CONTROLLER_BUTTON_A || dik >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
+        if (m_isGamepadBinds && (dik <= XR_CONTROLLER_BUTTON_INVALID || dik >= XR_CONTROLLER_BUTTON_MAX))
             return true;
 
         SetValue();

@@ -17,6 +17,9 @@ ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
 ENGINE_API Flags32 psMouseInvert = {false};
 
+ENGINE_API float psControllerSens = 1.f;
+ENGINE_API float psControllerDeadZoneSens = 0.f;
+
 // Max events per frame
 constexpr size_t MAX_KEYBOARD_EVENTS = 64;
 constexpr size_t MAX_MOUSE_EVENTS = 256;
@@ -153,6 +156,7 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
     keyboardState.reset();
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
+    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
 
     //===================== Dummy pack
     iCapture(&dummyController);
@@ -299,7 +303,11 @@ void CInput::KeyUpdate()
 
 void CInput::GameControllerUpdate()
 {
+    const int controllerDeadZone = int(psControllerDeadZoneSens * (SDL_JOYSTICK_AXIS_MAX / 100.f)); // raw
+
     const auto controllerPrev = controllerState;
+    decltype(controllerAxisState) controllerAxisStatePrev;
+    CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
 
     SDL_Event events[MAX_CONTROLLER_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
@@ -312,16 +320,29 @@ void CInput::GameControllerUpdate()
         switch (event.type)
         {
         case SDL_CONTROLLERAXISMOTION:
-            Log("Controller do axis motion");
-            
+        {
+            if (event.caxis.axis >= COUNT_CONTROLLER_AXIS)
+                break; // SDL added new axis, not supported by engine yet
+
+            if (std::abs(event.caxis.value) < controllerDeadZone)
+                controllerAxisState[event.caxis.axis] = 0;
+            else
+                controllerAxisState[event.caxis.axis] = event.caxis.value;
             break;
+        }
         case SDL_CONTROLLERBUTTONDOWN:
+            if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
+                break; // SDL added new button, not supported by engine yet
+
             controllerState[event.cbutton.button] = true;
-            cbStack.back()->IR_OnControllerPress(event.cbutton.button);
+            cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], 1.f, 0.f);
             break;
         case SDL_CONTROLLERBUTTONUP:
+            if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
+                break; // SDL added new button, not supported by engine yet
+
             controllerState[event.cbutton.button] = false;
-            cbStack.back()->IR_OnControllerRelease(event.cbutton.button);
+            cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], 0.f, 0.f);
             break;
         case SDL_CONTROLLERDEVICEADDED:
         case SDL_CONTROLLERDEVICEREMOVED:
@@ -333,8 +354,31 @@ void CInput::GameControllerUpdate()
     for (int i = 0; i < COUNT_CONTROLLER_BUTTONS; ++i)
     {
         if (controllerState[i] && controllerPrev[i])
-            cbStack.back()->IR_OnControllerHold(i);
+            cbStack.back()->IR_OnControllerHold(ControllerButtonToKey[i], 1.f, 0.f);
     }
+
+    const auto checkAxis = [this](int axis, int rawX, int rawY, int prevRawX, int prevRawY)
+    {
+        const auto quantize = [](int value)
+        {
+            return value / (SDL_JOYSTICK_AXIS_MAX / 100.f);
+        };
+
+        const auto x = quantize(rawX), y = quantize(rawY), prevX = quantize(prevRawX), prevY = quantize(prevRawY);
+        const bool xActive = !fis_zero(x), yActive = !fis_zero(y), prevXActive = !fis_zero(prevX), prevYActive = !fis_zero(prevY);
+
+        if ((xActive && prevXActive) || (yActive && prevYActive))
+            cbStack.back()->IR_OnControllerHold(axis, x, y);
+        else if (xActive || yActive)
+            cbStack.back()->IR_OnControllerPress(axis, x, y);
+        else if (prevXActive || prevYActive)
+            cbStack.back()->IR_OnControllerRelease(axis, 0.f, 0.f);
+    };
+
+    checkAxis(XR_CONTROLLER_AXIS_LEFT,          controllerAxisState[0], controllerAxisState[1], controllerAxisStatePrev[0], controllerAxisStatePrev[1]);
+    checkAxis(XR_CONTROLLER_AXIS_RIGHT,         controllerAxisState[2], controllerAxisState[3], controllerAxisStatePrev[2], controllerAxisStatePrev[3]);
+    checkAxis(XR_CONTROLLER_AXIS_TRIGGER_LEFT,  controllerAxisState[4], 0,                      controllerAxisStatePrev[4], 0);
+    checkAxis(XR_CONTROLLER_AXIS_TRIGGER_RIGHT, controllerAxisState[5], 0,                      controllerAxisStatePrev[5], 0);
 }
 
 bool KbdKeyToButtonName(const int dik, xr_string& name)
@@ -352,12 +396,10 @@ bool KbdKeyToButtonName(const int dik, xr_string& name)
 
 bool OtherDevicesKeyToButtonName(const int btn, xr_string& name)
 {
-    int idx = btn - MOUSE_1;
-
-    if (idx >= 0)
+    if (btn > CInput::COUNT_KB_BUTTONS)
     {
-        name = keyboards[idx].key_local_name;
-        return true;
+        // XXX: Not implemented
+        return false; // true;
     }
 
     return false;
@@ -385,15 +427,15 @@ bool CInput::iGetAsyncKeyState(const int dik)
     if (dik < COUNT_KB_BUTTONS)
         return keyboardState[dik];
 
-    if (dik >= MOUSE_1 && dik < MOUSE_MAX)
+    if (dik > MOUSE_INVALID && dik < MOUSE_MAX)
     {
-        const int mk = dik - MOUSE_1;
+        const int mk = dik - (MOUSE_INVALID + 1);
         return iGetAsyncBtnState(mk);
     }
 
-    if (dik >= XR_CONTROLLER_BUTTON_A && dik < XR_CONTROLLER_BUTTON_MAX)
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
     {
-        const int mk = dik - XR_CONTROLLER_BUTTON_A;
+        const int mk = dik - (XR_CONTROLLER_BUTTON_INVALID + 1);
         return iGetAsyncGpadBtnState(mk);
     }
 
@@ -455,6 +497,7 @@ void CInput::iCapture(IInputReceiver* p)
 
     // prepare for _new_ controller
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
+    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
 }
 
 void CInput::iRelease(IInputReceiver* p)
@@ -488,6 +531,7 @@ void CInput::OnAppActivate(void)
     keyboardState.reset();
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
+    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
 }
 
 void CInput::OnAppDeactivate(void)
@@ -499,6 +543,7 @@ void CInput::OnAppDeactivate(void)
     keyboardState.reset();
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
+    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
 }
 
 void CInput::OnFrame(void)

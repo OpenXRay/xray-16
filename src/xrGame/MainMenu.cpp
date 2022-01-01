@@ -445,28 +445,43 @@ void CMainMenu::IR_OnMouseWheel(int x, int y)
     CDialogHolder::IR_UIOnMouseWheel(x, y);
 }
 
-void CMainMenu::IR_OnControllerPress(int btn)
+void CMainMenu::IR_OnControllerPress(int dik, float x, float y)
 {
     if (!IsActive())
         return;
 
-    IR_OnKeyboardPress(ControllerButtonToKey[btn]);
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardPress(dik);
+        return;
+    }
+    CDialogHolder::IR_UIOnControllerPress(dik, x, y);
 }
 
-void CMainMenu::IR_OnControllerRelease(int btn)
+void CMainMenu::IR_OnControllerRelease(int dik, float x, float y)
 {
     if (!IsActive())
         return;
 
-    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardRelease(dik);
+        return;
+    }
+    CDialogHolder::IR_UIOnControllerRelease(dik, x, y);
 }
 
-void CMainMenu::IR_OnControllerHold(int btn)
+void CMainMenu::IR_OnControllerHold(int dik, float x, float y)
 {
     if (!IsActive())
         return;
 
-    IR_OnKeyboardHold(ControllerButtonToKey[btn]);
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardHold(dik);
+        return;
+    }
+    CDialogHolder::IR_UIOnControllerHold(dik, x, y);
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }

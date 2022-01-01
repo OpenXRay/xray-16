@@ -7,19 +7,20 @@
 // but in X-Ray this is a right button
 enum EMouseButton
 {
-    MOUSE_1 = SDL_NUM_SCANCODES + SDL_BUTTON_LEFT,
-    MOUSE_2 = SDL_NUM_SCANCODES + SDL_BUTTON_RIGHT,
-    MOUSE_3 = SDL_NUM_SCANCODES + SDL_BUTTON_MIDDLE,
-    MOUSE_4 = SDL_NUM_SCANCODES + SDL_BUTTON_X1,
-    MOUSE_5 = SDL_NUM_SCANCODES + SDL_BUTTON_X2,
+    MOUSE_INVALID = SDL_NUM_SCANCODES,
+    MOUSE_1, // Left
+    MOUSE_2, // Right
+    MOUSE_3, // Middle
+    MOUSE_4, // X1
+    MOUSE_5, // X2
     MOUSE_MAX,
-    MOUSE_COUNT = MOUSE_5 - SDL_NUM_SCANCODES
+    MOUSE_COUNT = MOUSE_MAX - MOUSE_INVALID - 1
 };
 
 enum EControllerButton
 {
-    XR_CONTROLLER_BUTTON_INVALID = -1,
-    XR_CONTROLLER_BUTTON_A = SDL_CONTROLLER_BUTTON_A + MOUSE_MAX,
+    XR_CONTROLLER_BUTTON_INVALID = MOUSE_MAX,
+    XR_CONTROLLER_BUTTON_A,
     XR_CONTROLLER_BUTTON_B,
     XR_CONTROLLER_BUTTON_X,
     XR_CONTROLLER_BUTTON_Y,
@@ -34,9 +35,32 @@ enum EControllerButton
     XR_CONTROLLER_BUTTON_DPAD_DOWN,
     XR_CONTROLLER_BUTTON_DPAD_LEFT,
     XR_CONTROLLER_BUTTON_DPAD_RIGHT,
+    XR_CONTROLLER_BUTTON_MISC1,    /* Xbox Series X share button, PS5 microphone button, Nintendo Switch Pro capture button */
+    XR_CONTROLLER_BUTTON_PADDLE1,  /* Xbox Elite paddle P1 */
+    XR_CONTROLLER_BUTTON_PADDLE2,  /* Xbox Elite paddle P3 */
+    XR_CONTROLLER_BUTTON_PADDLE3,  /* Xbox Elite paddle P2 */
+    XR_CONTROLLER_BUTTON_PADDLE4,  /* Xbox Elite paddle P4 */
+    XR_CONTROLLER_BUTTON_TOUCHPAD, /* PS4/PS5 touchpad button */
     XR_CONTROLLER_BUTTON_MAX,
-    XR_CONTROLLER_BUTTON_COUNT = XR_CONTROLLER_BUTTON_MAX - XR_CONTROLLER_BUTTON_A
+    XR_CONTROLLER_BUTTON_COUNT = XR_CONTROLLER_BUTTON_MAX - XR_CONTROLLER_BUTTON_INVALID - 1
 };
+
+static_assert(XR_CONTROLLER_BUTTON_COUNT == SDL_CONTROLLER_BUTTON_MAX, "Please, update xr_controller buttons definitions");
+
+enum EControllerAxis
+{
+    XR_CONTROLLER_AXIS_INVALID = XR_CONTROLLER_BUTTON_MAX,
+    XR_CONTROLLER_AXIS_LEFT,
+    XR_CONTROLLER_AXIS_RIGHT,
+    XR_CONTROLLER_AXIS_TRIGGER_LEFT,
+    XR_CONTROLLER_AXIS_TRIGGER_RIGHT,
+    XR_CONTROLLER_AXIS_MAX,
+    XR_CONTROLLER_AXIS_COUNT = XR_CONTROLLER_AXIS_MAX - XR_CONTROLLER_AXIS_INVALID - 1
+};
+
+// SDL has separate axes for X and Y, we don't. Except trigger. Trigger should be separated.
+static_assert(XR_CONTROLLER_AXIS_COUNT == 4, "Please, update xr_controller axis definitions");
+static_assert(SDL_CONTROLLER_AXIS_MAX == 6, "Please, update xr_controller axis definitions");
 
 constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5 };
 
@@ -56,7 +80,13 @@ constexpr int ControllerButtonToKey[] =
     XR_CONTROLLER_BUTTON_DPAD_UP,
     XR_CONTROLLER_BUTTON_DPAD_DOWN,
     XR_CONTROLLER_BUTTON_DPAD_LEFT,
-    XR_CONTROLLER_BUTTON_DPAD_RIGHT
+    XR_CONTROLLER_BUTTON_DPAD_RIGHT,
+    XR_CONTROLLER_BUTTON_MISC1,
+    XR_CONTROLLER_BUTTON_PADDLE1,
+    XR_CONTROLLER_BUTTON_PADDLE2,
+    XR_CONTROLLER_BUTTON_PADDLE3,
+    XR_CONTROLLER_BUTTON_PADDLE4,
+    XR_CONTROLLER_BUTTON_TOUCHPAD,
 };
 
 class ENGINE_API IInputReceiver;
@@ -70,7 +100,7 @@ public:
     enum
     {
         COUNT_MOUSE_AXIS = 4,
-        COUNT_CONTROLLER_AXIS = 4
+        COUNT_CONTROLLER_AXIS = SDL_CONTROLLER_AXIS_MAX
     };
 
     enum
@@ -96,6 +126,7 @@ private:
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
+    int controllerAxisState[COUNT_CONTROLLER_AXIS];
 
     xr_vector<IInputReceiver*> cbStack;
 

@@ -40,14 +40,16 @@ public:
     virtual void IR_OnKeyboardHold(int /*dik*/) {}
     virtual void IR_OnTextInput(pcstr text) {}
 
-    virtual void IR_OnControllerMove(int /*axis*/, int /*value*/) {}
-    virtual void IR_OnControllerPress(int /*dik*/) {}
-    virtual void IR_OnControllerRelease(int /*dik*/) {}
-    virtual void IR_OnControllerHold(int /*dik*/) {}
+    virtual void IR_OnControllerPress(int /*dik*/, float /*x*/, float /*y*/) {}
+    virtual void IR_OnControllerRelease(int /*dik*/, float /*x*/, float /*y*/) {}
+    virtual void IR_OnControllerHold(int /*dik*/, float /*x*/, float /*y*/) {}
 };
 
 ENGINE_API extern float psMouseSens;
 ENGINE_API extern float psMouseSensScale;
 ENGINE_API extern Flags32 psMouseInvert;
+
+ENGINE_API extern float psControllerSens;
+ENGINE_API extern float psControllerDeadZoneSens;
 
 #endif

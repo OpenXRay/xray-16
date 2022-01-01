@@ -363,6 +363,74 @@ void CActor::IR_OnMouseMove(int dx, int dy)
         cam_Active()->Move((d > 0) ? kUP : kDOWN, _abs(d));
     }
 }
+
+void CActor::IR_OnControllerPress(int cmd, float x, float y)
+{
+    IR_OnControllerHold(cmd, x, y); // XXX: maybe temporary
+}
+
+void CActor::IR_OnControllerRelease(int cmd, float x, float y)
+{
+
+}
+
+void CActor::IR_OnControllerHold(int cmd, float x, float y)
+{
+    PIItem iitem = inventory().ActiveItem();
+    if (iitem && iitem->cast_hud_item())
+        iitem->cast_hud_item()->ResetSubStateTime();
+
+    if (Remote())
+        return;
+
+    if (m_holder)
+    {
+        //m_holder->OnControllerHold(cmd, x, y); // XXX: implement
+        return;
+    }
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+    {
+        float LookFactor = GetLookFactor();
+
+        CCameraBase* C = cameras[cam_active];
+        float scale = (C->f_fov / g_fov) * psControllerSens * psMouseSensScale / 50.f / LookFactor; // XXX: use psControllerSensScale
+        if (x)
+        {
+            float d = float(x) * scale;
+            cam_Active()->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
+        }
+        if (y)
+        {
+            float d = ((psMouseInvert.test(1)) ? -1 : 1) * float(y) * scale * 3.f / 4.f;
+            cam_Active()->Move((d > 0) ? kUP : kDOWN, _abs(d));
+        }
+        break;
+    }
+
+    case kMOVE_AROUND:
+    {
+        if (!fis_zero(x))
+        {
+            if (x > 0.f)
+                mstate_wishful |= mcRStrafe;
+            else
+                mstate_wishful |= mcLStrafe;
+        }
+        if (!fis_zero(y))
+        {
+            if (y > 0.f)
+                mstate_wishful |= mcBack;
+            else
+                mstate_wishful |= mcFwd;
+        }
+        break;
+    }
+    } // switch (GetBindedAction(axis))
+}
+
 #include "HudItem.h"
 bool CActor::use_Holder(CHolderCustom* holder)
 {
