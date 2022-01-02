@@ -848,6 +848,39 @@ public:
 
 class CCC_DefControls : public CCC_UnBindAll
 {
+    struct binding
+    {
+        EGameActions action;
+        int keys[bindtypes_count];
+    };
+
+    constexpr static binding predefined_bindings[] =
+    {
+        { kLOOK_AROUND,         { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_RIGHT } },
+        { kMOVE_AROUND,         { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_LEFT } },
+
+        { kJUMP,                { SDL_SCANCODE_SPACE,       SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_A } },
+        { kCROUCH_TOGGLE,       { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_B } },
+
+        { kTORCH,               { SDL_SCANCODE_L,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSTICK } },
+
+        { kWPN_FIRE,            { MOUSE_1,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
+        { kWPN_ZOOM,            { MOUSE_2,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
+
+        { kWPN_RELOAD,          { SDL_SCANCODE_R,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_X } },
+
+        { kUSE,                 { SDL_SCANCODE_F,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_Y } },
+        { kENTER,               { SDL_SCANCODE_RETURN,      SDL_SCANCODE_KP_ENTER,  XR_CONTROLLER_BUTTON_START } },
+        { kQUIT,                { SDL_SCANCODE_ESCAPE,      SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_BACK } },
+        { kINVENTORY,           { SDL_SCANCODE_I,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
+        { kACTIVE_JOBS,         { SDL_SCANCODE_P,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
+
+        { kQUICK_USE_1,         { SDL_SCANCODE_F1,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_UP } },
+        { kQUICK_USE_2,         { SDL_SCANCODE_F2,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
+        { kQUICK_USE_3,         { SDL_SCANCODE_F3,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_DOWN } },
+        { kQUICK_USE_4,         { SDL_SCANCODE_F4,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_LEFT } },
+    };
+
 public:
     CCC_DefControls(LPCSTR n) : CCC_UnBindAll(n) {}
 
@@ -859,6 +892,17 @@ public:
         FS.update_path(cfg, "$game_config$", "default_controls.ltx");
         strconcat(sizeof(cmd), cmd, "cfg_load", " ", cfg);
         Console->Execute(cmd);
+
+        for (const auto& [action, keys] : predefined_bindings)
+        {
+            key_binding& binding = g_key_bindings[action];
+
+            for (u8 i = 0; i < bindtypes_count; ++i)
+            {
+                if (!binding.m_keyboard[i])
+                    binding.m_keyboard[i] = DikToPtr(keys[i], true);
+            }
+        }
     }
 };
 
