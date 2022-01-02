@@ -396,56 +396,57 @@ void CUIMapWnd::DrawHint()
     }
 }
 
-bool CUIMapWnd::OnKeyboardHold(int dik)
-{
-    Fvector2 pos_delta{};
-
-    switch (GetBindedAction(dik))
-    {
-    case kUP:
-        pos_delta.y += m_map_move_step;
-        break;
-    case kDOWN:
-        pos_delta.y -= m_map_move_step;
-        break;
-    case kLEFT:
-        pos_delta.x += m_map_move_step;
-        break;
-    case kRIGHT:
-        pos_delta.x -= m_map_move_step;
-        break;
-    }
-
-    if (pos_delta.x || pos_delta.y)
-    {
-        MoveMap(pos_delta);
-        return true;
-    }
-
-    return inherited::OnKeyboardHold(dik);
-}
-
 bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    switch (dik)
+    switch (keyboard_action)
     {
-    case SDL_SCANCODE_KP_MINUS:
+    case WINDOW_KEY_PRESSED:
     {
-        // SetZoom(GetZoom()/1.5f);
-        UpdateZoom(false);
-        // ResetActionPlanner();
-        return true;
+        switch (dik)
+        {
+        case SDL_SCANCODE_KP_MINUS:
+            // SetZoom(GetZoom()/1.5f);
+            UpdateZoom(false);
+            // ResetActionPlanner();
+            return true;
+
+        case SDL_SCANCODE_KP_PLUS:
+            // SetZoom(GetZoom()*1.5f);
+            UpdateZoom(true);
+            // ResetActionPlanner();
+            return true;
+        } // switch (dik)
     }
     break;
-    case SDL_SCANCODE_KP_PLUS:
+
+    case WINDOW_KEY_HOLD:
     {
-        // SetZoom(GetZoom()*1.5f);
-        UpdateZoom(true);
-        // ResetActionPlanner();
-        return true;
+        Fvector2 pos_delta{};
+
+        switch (GetBindedAction(dik))
+        {
+        case kUP:
+            pos_delta.y += m_map_move_step;
+            break;
+        case kDOWN:
+            pos_delta.y -= m_map_move_step;
+            break;
+        case kLEFT:
+            pos_delta.x += m_map_move_step;
+            break;
+        case kRIGHT:
+            pos_delta.x -= m_map_move_step;
+            break;
+        }
+
+        if (pos_delta.x || pos_delta.y)
+        {
+            MoveMap(pos_delta);
+            return true;
+        }
     }
     break;
-    }
+    } // switch (keyboard_action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

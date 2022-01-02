@@ -368,34 +368,6 @@ bool CUIWindow::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIWindow::OnKeyboardHold(int dik)
-{
-    bool result;
-
-    if (NULL != m_pKeyboardCapturer)
-    {
-        result = m_pKeyboardCapturer->OnKeyboardHold(dik);
-
-        if (result)
-            return true;
-    }
-
-    WINDOW_LIST::reverse_iterator it = m_ChildWndList.rbegin();
-
-    for (; it != m_ChildWndList.rend(); ++it)
-    {
-        if ((*it)->IsEnabled())
-        {
-            result = (*it)->OnKeyboardHold(dik);
-
-            if (result)
-                return true;
-        }
-    }
-
-    return false;
-}
-
 //реакция на геймпад
 bool CUIWindow::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
 {

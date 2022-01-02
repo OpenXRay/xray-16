@@ -342,7 +342,7 @@ bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
     if (!TIR->IR_process())
         return false;
 
-    if (TIR->OnKeyboardHold(dik))
+    if (TIR->OnKeyboardAction(dik, WINDOW_KEY_HOLD))
         return true;
 
     if (!TIR->StopAnyMove() && g_pGameLevel)

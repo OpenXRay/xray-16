@@ -141,17 +141,20 @@ void CUIFixedScrollBar::ClampByViewRect()
 }
 
 u32 last_hold_tm = 0;
-bool CUIFixedScrollBar::OnKeyboardHold(int dik)
+bool CUIFixedScrollBar::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == MOUSE_1 && (last_hold_tm + m_hold_delay) < Device.dwTimeContinual)
+    if (keyboard_action == WINDOW_KEY_HOLD)
     {
-        if (OnMouseDownEx())
+        if (dik == MOUSE_1 && (last_hold_tm + m_hold_delay) < Device.dwTimeContinual)
         {
-            last_hold_tm = Device.dwTimeContinual;
-            return true;
+            if (OnMouseDownEx())
+            {
+                last_hold_tm = Device.dwTimeContinual;
+                return true;
+            }
         }
     }
-    return inherited::OnKeyboardHold(dik);
+    return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
 bool CUIFixedScrollBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
