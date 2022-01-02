@@ -423,14 +423,11 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
         return false;
     if (!TIR->IR_process())
         return false;
-    if (GetUICursor().IsVisible())
+    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
     {
-        if (IsBinded(kLOOK_AROUND, dik))
-        {
-            GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-            Fvector2 cPos = GetUICursor().GetCursorPosition();
-            TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-        }
+        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
+        Fvector2 cPos = GetUICursor().GetCursorPosition();
+        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
     }
     else if (!TIR->StopAnyMove() && g_pGameLevel)
     {
@@ -484,14 +481,11 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
         return false;
     if (!TIR->IR_process())
         return false;
-    if (GetUICursor().IsVisible())
+    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
     {
-        if (IsBinded(kLOOK_AROUND, dik))
-        {
-            GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-            Fvector2 cPos = GetUICursor().GetCursorPosition();
-            TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-        }
+        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
+        Fvector2 cPos = GetUICursor().GetCursorPosition();
+        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
     }
     else if (!TIR->StopAnyMove() && g_pGameLevel)
     {
