@@ -438,6 +438,54 @@ void CUISequencer::IR_OnKeyboardPress(int dik)
         m_pStoredInputReceiver->IR_OnKeyboardPress(dik);
 }
 
+void CUISequencer::IR_OnControllerPress(int key, float x, float y)
+{
+    if (m_sequencer_items.size())
+        m_sequencer_items.front()->OnControllerPress(key);
+
+    bool b = true;
+    if (m_sequencer_items.size())
+        b &= m_sequencer_items.front()->AllowKey(key);
+
+    bool binded = IsBinded(kQUIT, key);
+    if (b && binded)
+    {
+        Stop();
+        return;
+    }
+
+    if (binded && CurrentGameUI())
+    {
+        if (CurrentGameUI()->GetActorMenu().IsShown())
+        {
+            CurrentGameUI()->HideActorMenu();
+            return;
+        }
+        if (CurrentGameUI()->GetPdaMenu().IsShown())
+        {
+            CurrentGameUI()->HidePdaMenu();
+            return;
+        }
+        Console->Execute("main_menu");
+        return;
+    }
+
+    if (b && !GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnControllerPress(key, x, y);
+}
+
+void CUISequencer::IR_OnControllerRelease(int key, float x, float y)
+{
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnControllerRelease(key, x, y);
+}
+
+void CUISequencer::IR_OnControllerHold(int key, float x, float y)
+{
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnControllerHold(key, x, y);
+}
+
 void CUISequencer::IR_OnActivate()
 {
     if (!pInput)

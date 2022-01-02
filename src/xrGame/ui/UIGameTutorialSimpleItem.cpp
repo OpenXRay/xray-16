@@ -380,3 +380,8 @@ void CUISequenceSimpleItem::OnMousePress(int btn)
     }
     OnKeyboardPress(dik);
 }
+
+void CUISequenceSimpleItem::OnControllerPress(int key)
+{
+    OnKeyboardPress(key);
+}
