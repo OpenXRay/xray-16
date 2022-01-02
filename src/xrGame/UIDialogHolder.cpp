@@ -423,6 +423,10 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
         return false;
     if (!TIR->IR_process())
         return false;
+
+    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_PRESSED))
+        return true;
+
     if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
     {
         GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
@@ -455,6 +459,10 @@ bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
         return false;
     if (!TIR->IR_process())
         return false;
+
+    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_RELEASED))
+        return true;
+
     if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
@@ -481,6 +489,10 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
         return false;
     if (!TIR->IR_process())
         return false;
+
+    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
+        return true;
+
     if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
     {
         GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));

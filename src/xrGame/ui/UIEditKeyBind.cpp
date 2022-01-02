@@ -135,6 +135,34 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
+bool CUIEditKeyBind::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (CUIStatic::OnControllerAction(axis, x, y, controller_action))
+        return true;
+
+    if (m_isEditMode)
+    {
+        m_keyboard = DikToPtr(axis, true);
+        if (!m_keyboard)
+            return true;
+
+        if (m_isGamepadBinds && (axis <= XR_CONTROLLER_AXIS_INVALID || axis >= XR_CONTROLLER_AXIS_MAX))
+            return true;
+
+        SetValue();
+
+        string64 message;
+        xr_strcpy(message, m_action->action_name);
+        xr_strcat(message, "=");
+        xr_strcat(message, m_keyboard->key_name);
+        OnFocusLost();
+        SendMessage2Group("key_binding", message);
+        return true;
+    }
+
+    return false;
+}
+
 void CUIEditKeyBind::Update()
 { 
     CUIStatic::Update();

@@ -396,6 +396,37 @@ bool CUIWindow::OnKeyboardHold(int dik)
     return false;
 }
 
+//реакция на геймпад
+bool CUIWindow::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    bool result;
+
+    //если есть дочернее окно,захватившее клавиатуру, то
+    //сообщение направляем ему сразу
+    // XXX: introduce m_pControllerCapturer?
+    if (NULL != m_pKeyboardCapturer)
+    {
+        result = m_pKeyboardCapturer->OnControllerAction(axis, x, y, controller_action);
+
+        if (result)
+            return true;
+    }
+
+    WINDOW_LIST::reverse_iterator it = m_ChildWndList.rbegin();
+
+    for (; it != m_ChildWndList.rend(); ++it)
+    {
+        if ((*it)->IsEnabled())
+        {
+            result = (*it)->OnControllerAction(axis, x, y, controller_action);
+
+            if (result)
+                return true;
+        }
+    }
+    return false;
+}
+
 bool CUIWindow::OnTextInput(pcstr text)
 {
     bool result;

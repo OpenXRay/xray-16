@@ -21,6 +21,8 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool OnKeyboardHold(int dik);
 
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
+
     CDialogHolder* GetHolder() { return m_pParentHolder; }
     void SetHolder(CDialogHolder* h) { m_pParentHolder = h; }
     virtual bool StopAnyMove() { return true; }
