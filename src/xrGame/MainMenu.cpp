@@ -293,7 +293,7 @@ void CMainMenu::Activate(bool bActivate)
            if we are in main menu and game level exist
 
            The first time is normal reset
-           The second one happens when 
+           The second one happens when
            we are closing main menu
 
            Probable reason is that level needs to be precached
@@ -347,7 +347,7 @@ void CMainMenu::IR_OnMousePress(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardPress(MouseButtonToKey[btn]);
+    IR_OnKeyboardPress(btn);
 };
 
 void CMainMenu::IR_OnMouseRelease(int btn)
@@ -355,7 +355,7 @@ void CMainMenu::IR_OnMouseRelease(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardRelease(MouseButtonToKey[btn]);
+    IR_OnKeyboardRelease(btn);
 };
 
 void CMainMenu::IR_OnMouseHold(int btn)
@@ -363,7 +363,7 @@ void CMainMenu::IR_OnMouseHold(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardHold(MouseButtonToKey[btn]);
+    IR_OnKeyboardHold(btn);
 };
 
 void CMainMenu::IR_OnMouseMove(int x, int y)

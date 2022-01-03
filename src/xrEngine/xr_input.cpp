@@ -200,6 +200,10 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 void CInput::MouseUpdate()
 {
+    // Mouse2 is a middle button in SDL,
+    // but in X-Ray this is a right button
+    constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5 };
+
     bool mouseMoved = false;
     int offs[COUNT_MOUSE_AXIS]{};
     const auto mousePrev = mouseState;
@@ -224,11 +228,11 @@ void CInput::MouseUpdate()
             break;
         case SDL_MOUSEBUTTONDOWN:
             mouseState[event.button.button - 1] = true;
-            cbStack.back()->IR_OnMousePress(event.button.button - 1);
+            cbStack.back()->IR_OnMousePress(MouseButtonToKey[event.button.button - 1]);
             break;
         case SDL_MOUSEBUTTONUP:
             mouseState[event.button.button - 1] = false;
-            cbStack.back()->IR_OnMouseRelease(event.button.button - 1);
+            cbStack.back()->IR_OnMouseRelease(MouseButtonToKey[event.button.button - 1]);
             break;
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
@@ -243,7 +247,7 @@ void CInput::MouseUpdate()
     for (int i = 0; i < MOUSE_COUNT; ++i)
     {
         if (mouseState[i] && mousePrev[i])
-            cbStack.back()->IR_OnMouseHold(i);
+            cbStack.back()->IR_OnMouseHold(MouseButtonToKey[i]);
     }
 
     if (mouseMoved)
@@ -303,6 +307,31 @@ void CInput::KeyUpdate()
 
 void CInput::GameControllerUpdate()
 {
+    constexpr int ControllerButtonToKey[] =
+    {
+        XR_CONTROLLER_BUTTON_A,
+        XR_CONTROLLER_BUTTON_B,
+        XR_CONTROLLER_BUTTON_X,
+        XR_CONTROLLER_BUTTON_Y,
+        XR_CONTROLLER_BUTTON_BACK,
+        XR_CONTROLLER_BUTTON_GUIDE,
+        XR_CONTROLLER_BUTTON_START,
+        XR_CONTROLLER_BUTTON_LEFTSTICK,
+        XR_CONTROLLER_BUTTON_RIGHTSTICK,
+        XR_CONTROLLER_BUTTON_LEFTSHOULDER,
+        XR_CONTROLLER_BUTTON_RIGHTSHOULDER,
+        XR_CONTROLLER_BUTTON_DPAD_UP,
+        XR_CONTROLLER_BUTTON_DPAD_DOWN,
+        XR_CONTROLLER_BUTTON_DPAD_LEFT,
+        XR_CONTROLLER_BUTTON_DPAD_RIGHT,
+        XR_CONTROLLER_BUTTON_MISC1,
+        XR_CONTROLLER_BUTTON_PADDLE1,
+        XR_CONTROLLER_BUTTON_PADDLE2,
+        XR_CONTROLLER_BUTTON_PADDLE3,
+        XR_CONTROLLER_BUTTON_PADDLE4,
+        XR_CONTROLLER_BUTTON_TOUCHPAD,
+    };
+
     const int controllerDeadZone = int(psControllerDeadZoneSens * (SDL_JOYSTICK_AXIS_MAX / 100.f)); // raw
 
     const auto controllerPrev = controllerState;
@@ -510,7 +539,7 @@ void CInput::iRelease(IInputReceiver* p)
     }
     else
     {
-        // we are not topmost receiver, so remove the nearest one        
+        // we are not topmost receiver, so remove the nearest one
         for (size_t cnt = cbStack.size(); cnt > 0; --cnt)
             if (cbStack[cnt - 1] == p)
             {
@@ -586,7 +615,7 @@ void CInput::ExclusiveMode(const bool exclusive)
     GrabInput(true);
 }
 
-bool CInput::IsExclusiveMode() const 
+bool CInput::IsExclusiveMode() const
 {
     return exclusiveInput;
 }

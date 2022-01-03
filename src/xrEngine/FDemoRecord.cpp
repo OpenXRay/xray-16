@@ -587,7 +587,7 @@ void CDemoRecord::IR_OnMouseHold(int btn)
         return;
     }
     Fvector vT_delta = Fvector().set(0, 0, 0);
-    switch (MouseButtonToKey[btn])
+    switch (btn)
     {
     case MOUSE_1:
         vT_delta.z += 1.0f;

@@ -370,15 +370,7 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
 
 void CUISequenceSimpleItem::OnMousePress(int btn)
 {
-    int dik = 0;
-    switch (btn)
-    {
-    case 0: dik = MOUSE_1; break;
-    case 1: dik = MOUSE_2; break;
-    case 2: dik = MOUSE_3; break;
-    default: return;
-    }
-    OnKeyboardPress(dik);
+    OnKeyboardPress(btn);
 }
 
 void CUISequenceSimpleItem::OnControllerPress(int key)

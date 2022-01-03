@@ -71,9 +71,10 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     }
 }
 
-void CLevel::IR_OnMousePress(int btn) {IR_OnKeyboardPress(MouseButtonToKey[btn]); }
-void CLevel::IR_OnMouseRelease(int btn) {IR_OnKeyboardRelease(MouseButtonToKey[btn]); }
-void CLevel::IR_OnMouseHold(int btn) {IR_OnKeyboardHold(MouseButtonToKey[btn]); }
+void CLevel::IR_OnMousePress(int btn) { IR_OnKeyboardPress(btn); }
+void CLevel::IR_OnMouseRelease(int btn) { IR_OnKeyboardRelease(btn); }
+void CLevel::IR_OnMouseHold(int btn) { IR_OnKeyboardHold(btn); }
+
 void CLevel::IR_OnMouseMove(int dx, int dy)
 {
     if (g_bDisableAllInput)
