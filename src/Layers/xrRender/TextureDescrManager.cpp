@@ -207,7 +207,15 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
             }
         }
     };
-    xr_parallel_for_each(flist, processFile);
+    if (!listTHM)
+        xr_parallel_for_each(flist, processFile);
+    else
+    {
+        // We need precise info in the log when listTHM is specified.
+        // Load in single thread, file by file.
+        for (const FS_File& file : flist)
+            processFile(file);
+    }
 }
 
 void CTextureDescrMngr::Load()
