@@ -3,26 +3,32 @@
 #include "xrEngine/xr_level_controller.h"
 #include "xrEngine/IInputReceiver.h"
 
+void CWeaponStatMgun::OnAxisMove(float x, float y, float scale, bool invert)
+{
+    float h, p;
+    m_destEnemyDir.getHP(h, p);
+    if (!fis_zero(x))
+    {
+        const float d = x * scale;
+        h -= d;
+        SetDesiredDir(h, p);
+    }
+    if (!fis_zero(y))
+    {
+        const float d = (invert ? -1.f : 1.f) * y * scale * 3.f / 4.f;
+        p -= d;
+        SetDesiredDir(h, p);
+    }
+}
+
+
 void CWeaponStatMgun::OnMouseMove(int dx, int dy)
 {
     if (Remote())
         return;
 
-    float scale = psMouseSens * psMouseSensScale / 50.f;
-    float h, p;
-    m_destEnemyDir.getHP(h, p);
-    if (dx)
-    {
-        float d = float(dx) * scale;
-        h -= d;
-        SetDesiredDir(h, p);
-    }
-    if (dy)
-    {
-        float d = ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * 3.f / 4.f;
-        p -= d;
-        SetDesiredDir(h, p);
-    }
+    const float scale = psMouseSens * psMouseSensScale / 50.f;
+    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
 }
 
 void CWeaponStatMgun::OnKeyboardPress(int dik)
@@ -46,4 +52,57 @@ void CWeaponStatMgun::OnKeyboardRelease(int dik)
     };
 }
 
-void CWeaponStatMgun::OnKeyboardHold(int dik) {}
+void CWeaponStatMgun::OnKeyboardHold(int dik)
+{
+
+}
+
+void CWeaponStatMgun::OnControllerPress(int cmd, float x, float y)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+    {
+        const float scale = psControllerSens * psMouseSensScale / 50.f; // XXX: use psControllerSensScale
+        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
+        break;
+    }
+
+    default:
+        OnKeyboardPress(cmd);
+        break;
+    };
+}
+
+void CWeaponStatMgun::OnControllerRelease(int cmd, float x, float y)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+        break;
+
+    default:
+        OnKeyboardRelease(cmd);
+        break;
+    };
+}
+
+void CWeaponStatMgun::OnControllerHold(int cmd, float x, float y)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+        const float scale = psControllerSens * psMouseSensScale / 50.f; // XXX: use psControllerSensScale
+        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
+        break;
+    }; // switch (cmd)
+}

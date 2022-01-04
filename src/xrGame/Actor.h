@@ -437,6 +437,7 @@ public:
     // User input/output
     //////////////////////////////////////////////////////////////////////////
 public:
+    void OnAxisMove(float x, float y, float scale, bool invert);
     virtual void IR_OnMouseMove(int x, int y);
     virtual void IR_OnMouseWheel(int x, int y);
 

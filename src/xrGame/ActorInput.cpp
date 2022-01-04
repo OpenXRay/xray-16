@@ -327,6 +327,20 @@ void CActor::IR_OnKeyboardHold(int cmd)
     }
 }
 
+void CActor::OnAxisMove(float x, float y, float scale, bool invert)
+{
+    if (!fis_zero(x))
+    {
+        const float d = x * scale;
+        cam_Active()->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
+    }
+    if (!fis_zero(y))
+    {
+        const float d = (invert ? -1.f : 1.f) * y * scale * 3.f / 4.f;
+        cam_Active()->Move((d > 0) ? kUP : kDOWN, _abs(d));
+    }
+}
+
 void CActor::IR_OnMouseMove(int dx, int dy)
 {
     if (hud_adj_mode)
@@ -347,21 +361,10 @@ void CActor::IR_OnMouseMove(int dx, int dy)
         m_holder->OnMouseMove(dx, dy);
         return;
     }
-
-    float LookFactor = GetLookFactor();
-
-    CCameraBase* C = cameras[cam_active];
-    float scale = (C->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f / LookFactor;
-    if (dx)
-    {
-        float d = float(dx) * scale;
-        cam_Active()->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
-    }
-    if (dy)
-    {
-        float d = ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * 3.f / 4.f;
-        cam_Active()->Move((d > 0) ? kUP : kDOWN, _abs(d));
-    }
+    
+    const float LookFactor = GetLookFactor();
+    const float scale = (cam_Active()->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f / LookFactor;
+    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
 }
 
 void CActor::IR_OnControllerPress(int cmd, float x, float y)
@@ -369,40 +372,33 @@ void CActor::IR_OnControllerPress(int cmd, float x, float y)
     switch (cmd)
     {
     case kLOOK_AROUND:
-    case kMOVE_AROUND:
-        IR_OnControllerHold(cmd, x, y); // XXX: maybe temporary
-        break;
-
-    case kNOTBINDED:
-        break;
-
-    default:
-        // bypass as keyboard
-        IR_OnKeyboardPress(cmd);
-    } // switch (GetBindedAction(axis))}
-}
-
-void CActor::IR_OnControllerRelease(int cmd, float x, float y)
-{
-    if (cmd == kNOTBINDED)
-        return;
-
-    // bypass as keyboard
-    IR_OnKeyboardRelease(cmd);
-}
-
-void CActor::IR_OnControllerHold(int cmd, float x, float y)
-{
-    PIItem iitem = inventory().ActiveItem();
-    if (iitem && iitem->cast_hud_item())
-        iitem->cast_hud_item()->ResetSubStateTime();
-
-    if (Remote())
-        return;
-
-    if (m_holder)
     {
-        //m_holder->OnControllerHold(cmd, x, y); // XXX: implement
+        PIItem iitem = inventory().ActiveItem();
+        if (iitem && iitem->cast_hud_item())
+            iitem->cast_hud_item()->ResetSubStateTime();
+        break;
+    }
+
+    case kWPN_FIRE:
+    {
+        // special case for multiplayer
+        IR_OnKeyboardPress(kWPN_FIRE);
+        return;
+    }
+    } // switch (cmd)
+
+    if (Remote() || !g_Alive())
+        return;
+
+    if (m_input_external_handler && !m_input_external_handler->authorized(cmd))
+        return;
+
+    if (m_holder && kUSE != cmd)
+    {
+        m_holder->OnControllerPress(cmd, x, y);
+
+        if (m_holder->allowWeapon())
+            inventory().Action((u16)cmd, CMD_START);
         return;
     }
 
@@ -410,20 +406,10 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        float LookFactor = GetLookFactor();
-
+        const float LookFactor = GetLookFactor();
         CCameraBase* C = cameras[cam_active];
-        float scale = (C->f_fov / g_fov) * psControllerSens * psMouseSensScale / 50.f / LookFactor; // XXX: use psControllerSensScale
-        if (x)
-        {
-            float d = float(x) * scale;
-            cam_Active()->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
-        }
-        if (y)
-        {
-            float d = ((psMouseInvert.test(1)) ? -1 : 1) * float(y) * scale * 3.f / 4.f;
-            cam_Active()->Move((d > 0) ? kUP : kDOWN, _abs(d));
-        }
+        float scale = (cam_Active()->f_fov / g_fov) * psControllerSens * psMouseSensScale / 50.f / LookFactor; // XXX: use psControllerSensScale
+        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
         break;
     }
 
@@ -453,12 +439,106 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
         break;
     }
 
-    case kNOTBINDED:
+    default:
+        // bypass as keyboard
+        IR_OnKeyboardPress(cmd);
+        break;
+    } // switch (GetBindedAction(axis))}
+}
+
+void CActor::IR_OnControllerRelease(int cmd, float x, float y)
+{
+    if (Remote() || !g_Alive())
+        return;
+
+    if (m_input_external_handler && !m_input_external_handler->authorized(cmd))
+        return;
+
+    if (m_holder)
+    {
+        m_holder->OnControllerRelease(cmd, x, y);
+
+        if (m_holder->allowWeapon())
+            inventory().Action((u16)cmd, CMD_STOP);
+        return;
+    }
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+    case kMOVE_AROUND:
         break;
 
     default:
         // bypass as keyboard
+        IR_OnKeyboardRelease(cmd);
+        break;
+    }
+}
+
+void CActor::IR_OnControllerHold(int cmd, float x, float y)
+{
+    if (cmd == kLOOK_AROUND)
+    {
+        PIItem iitem = inventory().ActiveItem();
+        if (iitem && iitem->cast_hud_item())
+            iitem->cast_hud_item()->ResetSubStateTime();
+    }
+
+    if (Remote() || !g_Alive())
+        return;
+    if (m_input_external_handler && !m_input_external_handler->authorized(cmd))
+        return;
+    if (IsTalking())
+        return;
+
+    if (m_holder)
+    {
+        m_holder->OnControllerHold(cmd, x, y);
+        return;
+    }
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+    {
+        const float LookFactor = GetLookFactor();
+        CCameraBase* C = cameras[cam_active];
+        float scale = (cam_Active()->f_fov / g_fov) * psControllerSens * psMouseSensScale / 50.f / LookFactor; // XXX: use psControllerSensScale
+        OnAxisMove(x, y, scale,  false); // XXX: controller axes invert
+        break;
+    }
+
+    case kMOVE_AROUND:
+    {
+        if (!fis_zero(x))
+        {
+            if (x > 35.f)
+                mstate_wishful |= mcRStrafe;
+            else if (x < -35.f)
+                mstate_wishful |= mcLStrafe;
+        }
+        if (!fis_zero(y))
+        {
+            if (y > 35.f)
+                mstate_wishful |= mcBack;
+            else if (y < -35.f)
+                mstate_wishful |= mcFwd;
+
+            if (std::abs(y) < 65.f)
+                mstate_wishful |= mcAccel;
+            else if (y < -85.f)
+                mstate_wishful |= mcSprint;
+            else
+                mstate_wishful &= ~mcSprint;
+        }
+        break;
+    }
+
+    default:
+        // bypass as keyboard
         IR_OnKeyboardHold(cmd);
+        break;
     } // switch (GetBindedAction(axis))
 }
 

@@ -28,6 +28,9 @@ public:
     virtual void OnKeyboardPress(int dik) = 0;
     virtual void OnKeyboardRelease(int dik) = 0;
     virtual void OnKeyboardHold(int dik) = 0;
+    virtual void OnControllerPress(int cmd, float x, float y) = 0;
+    virtual void OnControllerRelease(int cmd, float x, float y) = 0;
+    virtual void OnControllerHold(int cmd, float x, float y) = 0;
     // Inventory for the car
     virtual CInventory* GetInventory() = 0;
 
