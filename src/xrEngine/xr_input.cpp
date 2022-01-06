@@ -627,6 +627,7 @@ bool CInput::IsExclusiveMode() const
 
 void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 {
+#if SDL_VERSION_ATLEAST(2, 0, 9)
     const u16 s1_rumble = iFloor(u16(-1) * clampr(s1, 0.0f, 1.0f));
     const u16 s2_rumble = iFloor(u16(-1) * clampr(s2, 0.0f, 1.0f));
     const u32 duration_ms = duration < 0.f ? 0 : iFloor(duration * 1000.f);
@@ -634,18 +635,25 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
     switch (type)
     {
     case FeedbackController:
+    {
         for (SDL_GameController* controller : controllers)
             SDL_GameControllerRumble(controller, s1_rumble, s2_rumble, duration_ms);
         break;
+    }
 
     case FeedbackTriggers:
+    {
+#if SDL_VERSION_ATLEAST(2, 0, 14)
         if (last_input_controller != -1)
         {
             const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
             SDL_GameControllerRumbleTriggers(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
+#endif
+    }
 
     default: NODEFAULT;
     }
+#endif
 }
