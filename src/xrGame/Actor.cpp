@@ -603,10 +603,8 @@ void CActor::Hit(SHit* pHDS)
 
     // Feedback with low freq for a little,
     // feedback with high freq rest of the time.
-    bool long_feedback_started = false;
-    if (!GEnv.isDedicatedServer && feedback_duration > default_feedback_duration)
+    if (!GEnv.isDedicatedServer && ALife::eHitTypeExplosion == HDS.hit_type)
     {
-        long_feedback_started = true;
         m_controller_feedback =
         {
             /*.high_freq    =*/ high_freq_feedback,
@@ -617,7 +615,7 @@ void CActor::Hit(SHit* pHDS)
         };
     }
 
-    if (!GEnv.isDedicatedServer && !long_feedback_started)
+    if (!GEnv.isDedicatedServer && !m_sndShockEffector)
     {
         pInput->Feedback(CInput::FeedbackController, low_freq_feedback, high_freq_feedback, feedback_duration);
     }
