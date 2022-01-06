@@ -82,7 +82,7 @@ void CInput::OpenController(int idx)
 
 void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
-    font.OutNext("*** INPUT:    %2.2fms", pInput->GetStats().FrameTime.result);
+    font.OutNext("*** INPUT:    %2.2fms", GetStats().FrameTime.result);
 }
 
 void CInput::MouseUpdate()
@@ -113,14 +113,17 @@ void CInput::MouseUpdate()
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
             break;
+
         case SDL_MOUSEBUTTONDOWN:
             mouseState[event.button.button - 1] = true;
             cbStack.back()->IR_OnMousePress(MouseButtonToKey[event.button.button - 1]);
             break;
+
         case SDL_MOUSEBUTTONUP:
             mouseState[event.button.button - 1] = false;
             cbStack.back()->IR_OnMouseRelease(MouseButtonToKey[event.button.button - 1]);
             break;
+
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
             mouseTimeStamp[2] = m_curTime + event.wheel.timestamp;
