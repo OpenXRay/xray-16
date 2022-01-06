@@ -689,19 +689,19 @@ bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
     {
         xr_strcpy(sec, binding->m_keyboard[1]->key_local_name.c_str());
     }
-    if (binding->m_keyboard[2])
+    if (binding->m_keyboard[2] && pInput->IsControllerAvailable())
     {
         xr_strcpy(gpad, binding->m_keyboard[2]->key_local_name.c_str());
     }
     if (!binding->m_keyboard[0] && !binding->m_keyboard[1] && !binding->m_keyboard[2])
     {
-        xr_sprintf(dst_buff, dst_buff_sz, "%s", StringTable().translate("st_key_notbinded").c_str());
+        xr_strcpy(dst_buff, dst_buff_sz, StringTable().translate("st_key_notbinded").c_str());
     }
     else
     {
-        xr_sprintf(dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "",
-            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "",
-            ((gpad[0] && prim[0]) || (gpad[0] && sec[0])) ? " , " : "", gpad[0] ? gpad : "");
+        strconcat(dst_buff_sz, dst_buff, prim,
+            sec[0] && prim[0] ? ", " : "", sec,
+            (gpad[0] && prim[0] || gpad[0] && sec[0]) ? ", " : "", gpad);
     }
     return true;
 }

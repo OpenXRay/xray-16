@@ -149,6 +149,8 @@ public:
 
     IInputReceiver* CurrentIR();
 
+    bool IsControllerAvailable() const { return availableController; }
+
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;
