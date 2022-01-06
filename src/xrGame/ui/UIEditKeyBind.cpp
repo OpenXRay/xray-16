@@ -116,11 +116,14 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     string64 message;
     if (m_isEditMode)
     {
-        m_keyboard = DikToPtr(dik, true);
-        if (!m_keyboard)
+        const bool is_gamepad_key = dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX;
+
+        // strictly separate keyboard/mouse from gamepad bindings
+        if (m_isGamepadBinds != is_gamepad_key)
             return true;
 
-        if (m_isGamepadBinds && (dik <= XR_CONTROLLER_BUTTON_INVALID || dik >= XR_CONTROLLER_BUTTON_MAX))
+        m_keyboard = DikToPtr(dik, true);
+        if (!m_keyboard)
             return true;
 
         SetValue();
@@ -142,11 +145,12 @@ bool CUIEditKeyBind::OnControllerAction(int axis, float x, float y, EUIMessages 
 
     if (m_isEditMode)
     {
-        m_keyboard = DikToPtr(axis, true);
-        if (!m_keyboard)
+        // strictly separate keyboard/mouse from gamepad bindings
+        if (!m_isGamepadBinds)
             return true;
 
-        if (m_isGamepadBinds && (axis <= XR_CONTROLLER_AXIS_INVALID || axis >= XR_CONTROLLER_AXIS_MAX))
+        m_keyboard = DikToPtr(axis, true);
+        if (!m_keyboard)
             return true;
 
         SetValue();
