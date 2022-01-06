@@ -10,9 +10,6 @@
 CInput* pInput = nullptr;
 IInputReceiver dummyController;
 
-xr_vector<xr_token> JoysticksToken;
-xr_vector<xr_token> ControllersToken;
-
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
 ENGINE_API Flags32 psMouseInvert = {false};
@@ -25,127 +22,16 @@ constexpr size_t MAX_KEYBOARD_EVENTS = 64;
 constexpr size_t MAX_MOUSE_EVENTS = 256;
 constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
-bool CInput::InitJoystick()
-{
-    if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0)
-    {
-        SDL_Joystick* joystick;
-        int count = SDL_NumJoysticks();
-        for (int i = 0; i < count; ++i)
-        {
-            joystick = SDL_JoystickOpen(i);
-            if (joystick)
-            {
-                JoysticksToken.emplace_back(xr_strdup(SDL_JoystickName(joystick)), i);
-                joysticks.emplace_back(joystick);
-                continue;
-            }
-
-            Log("SDL_JoystickOpen failed: ", SDL_GetError());
-            return false;
-        }
-
-        if (joysticks.empty())
-        {
-            Log("No joysticks available");
-            JoysticksToken.emplace_back(nullptr, -1);
-            return false;
-        }
-
-        availableJoystick = true;
-    }
-    else
-    {
-        Log("Joystick SDL_InitSubSystem failed: ", SDL_GetError());
-        return false;
-    }
-
-    return true;
-}
-
-void CInput::InitGameController()
-{
-    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
-    {
-        SDL_GameController* controller;
-        int count = SDL_NumJoysticks();
-        for (int i = 0; i < count; ++i)
-        {
-            if (SDL_IsGameController(i))
-            {
-                controller = SDL_GameControllerOpen(i);
-                if (controller)
-                {
-                    ControllersToken.emplace_back(xr_strdup(SDL_GameControllerName(controller)), i);
-                    controllers.emplace_back(controller);
-                    continue;
-                }
-
-                Log("SDL_GameControllerOpen failed: ", SDL_GetError());
-                return;
-            }
-        }
-
-        availableController = true;
-    }
-    else
-    {
-        Log("Game Controller SDL_InitSubSystem failed: ", SDL_GetError());
-        return;
-    }
-}
-
-void CInput::DisplayDevicesList()
-{
-    if (availableController && !controllers.empty())
-    {
-        Msg("Available game controllers[%d]:", controllers.size());
-
-        for (auto& token : ControllersToken)
-            if (token.name)
-                Log(token.name);
-    }
-    else
-        Log("No game controllers available");
-
-    if (joysticks.size() > controllers.size())
-    {
-        Msg("Available joysticks[%d]:", joysticks.size() - controllers.size());
-
-        if(controllers.size() > 0)
-        {
-            size_t it = 0;
-            for (auto& token : JoysticksToken)
-            {
-                if (it < ControllersToken.size())
-                {
-                    if (token.id == ControllersToken[it].id)
-                    {
-                        ++it;
-                        continue;
-                    }
-                }
-
-                if (token.name)
-                    Log(token.name);
-            }
-        }
-    }
-
-    ControllersToken.emplace_back(nullptr, -1);
-    JoysticksToken.emplace_back(nullptr, -1);
-}
-
-CInput::CInput(const bool exclusive): availableJoystick(false), availableController(false)
+CInput::CInput(const bool exclusive)
 {
     exclusiveInput = exclusive;
 
     Log("Starting INPUT device...");
 
-    if (CInput::InitJoystick())
+    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
     {
-        CInput::InitGameController();
-        CInput::DisplayDevicesList();
+        for (int i = 0; i < SDL_NumJoysticks(); ++i)
+            OpenController(i);
     }
 
     m_mouseDelta = 25;
@@ -171,23 +57,25 @@ CInput::~CInput()
 {
     GrabInput(false);
 
-    for (auto& joystick : joysticks)
-        SDL_JoystickClose(joystick);
-
     for (auto& controller : controllers)
         SDL_GameControllerClose(controller);
-
-    for (auto& token : JoysticksToken)
-        xr_free(token.name);
-    JoysticksToken.clear();
-
-    for (auto& token : ControllersToken)
-        xr_free(token.name);
-    ControllersToken.clear();
+    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
     Device.seqAppActivate.Remove(this);
+}
+
+void CInput::OpenController(int idx)
+{
+    if (!SDL_IsGameController(idx))
+        return;
+
+    const auto controller = SDL_GameControllerOpen(idx);
+    if (!controller)
+        return;
+
+    controllers.emplace_back(controller);
 }
 
 //-----------------------------------------------------------------------
@@ -304,7 +192,7 @@ void CInput::KeyUpdate()
             cbStack.back()->IR_OnKeyboardHold(i);
 }
 
-void CInput::GameControllerUpdate()
+void CInput::ControllerUpdate()
 {
     constexpr int ControllerButtonToKey[] =
     {
@@ -331,19 +219,31 @@ void CInput::GameControllerUpdate()
         XR_CONTROLLER_BUTTON_TOUCHPAD,
     };
 
+    SDL_Event events[MAX_CONTROLLER_EVENTS];
+    auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
+        SDL_GETEVENT, SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEADDED);
+
+    for (int i = 0; i < count; ++i)
+    {
+        const SDL_Event& event = events[i];
+        OpenController(event.cdevice.which);
+    }
+
+    if (!IsControllerAvailable())
+        return;
+
     const int controllerDeadZone = int(psControllerDeadZoneSens * (SDL_JOYSTICK_AXIS_MAX / 100.f)); // raw
 
     const auto controllerPrev = controllerState;
     decltype(controllerAxisState) controllerAxisStatePrev;
     CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
 
-    SDL_Event events[MAX_CONTROLLER_EVENTS];
-    const auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERDEVICEREMAPPED);
+    count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
+        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERDEVICEREMOVED);
 
     for (int i = 0; i < count; ++i)
     {
-        const SDL_Event event = events[i];
+        const SDL_Event& event = events[i];
 
         switch (event.type)
         {
@@ -361,6 +261,7 @@ void CInput::GameControllerUpdate()
                 controllerAxisState[event.caxis.axis] = event.caxis.value;
             break;
         }
+
         case SDL_CONTROLLERBUTTONDOWN:
             if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
                 break; // SDL added new button, not supported by engine yet
@@ -368,6 +269,7 @@ void CInput::GameControllerUpdate()
             controllerState[event.cbutton.button] = true;
             cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], 1.f, 0.f);
             break;
+
         case SDL_CONTROLLERBUTTONUP:
             if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
                 break; // SDL added new button, not supported by engine yet
@@ -375,11 +277,20 @@ void CInput::GameControllerUpdate()
             controllerState[event.cbutton.button] = false;
             cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], 0.f, 0.f);
             break;
+
         case SDL_CONTROLLERDEVICEADDED:
+            OpenController(event.cdevice.which);
+            break;
+
         case SDL_CONTROLLERDEVICEREMOVED:
-        case SDL_CONTROLLERDEVICEREMAPPED:
+        {
+            const auto controller = SDL_GameControllerFromInstanceID(event.cdevice.which);
+            const auto it = std::find(controllers.begin(), controllers.end(), controller);
+            if (it != controllers.end())
+                controllers.erase(it);
             break;
         }
+        } // switch (event.type)
     }
 
     for (int i = 0; i < COUNT_CONTROLLER_BUTTONS; ++i)
@@ -590,9 +501,7 @@ void CInput::OnFrame(void)
     {
         KeyUpdate();
         MouseUpdate();
-
-        if (availableController)
-            GameControllerUpdate();
+        ControllerUpdate();
     }
 
     stats.FrameTime.End();

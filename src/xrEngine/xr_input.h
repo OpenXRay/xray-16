@@ -103,22 +103,17 @@ private:
 
     xr_vector<IInputReceiver*> cbStack;
 
-    xr_vector<SDL_Joystick*> joysticks;
     xr_vector<SDL_GameController*> controllers;
 
     void MouseUpdate();
     void KeyUpdate();
-    void GameControllerUpdate();
+    void ControllerUpdate();
 
-    bool InitJoystick();
-    void InitGameController();
-    void DisplayDevicesList();
+    void OpenController(int idx);
 
     InputStatistics stats;
     bool exclusiveInput;
     bool inputGrabbed;
-    bool availableJoystick;
-    bool availableController;
 
 public:
     u32 m_curTime;
@@ -149,7 +144,7 @@ public:
 
     IInputReceiver* CurrentIR();
 
-    bool IsControllerAvailable() const { return availableController; }
+    bool IsControllerAvailable() const { return !controllers.empty(); }
 
 public:
     void ExclusiveMode(const bool exclusive);
