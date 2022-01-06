@@ -63,6 +63,12 @@ class ENGINE_API CInput
       public pureAppDeactivate
 {
 public:
+    enum FeedbackType
+    {
+        FeedbackController, // Entire gamepad
+        FeedbackTriggers,
+    };
+
     enum
     {
         COUNT_MOUSE_AXIS = 4,
@@ -93,6 +99,7 @@ private:
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
     int controllerAxisState[COUNT_CONTROLLER_AXIS];
+    s32 last_input_controller;
 
     xr_vector<IInputReceiver*> cbStack;
 
@@ -147,7 +154,16 @@ public:
     bool IsExclusiveMode() const;
     bool GetKeyName(const int dik, pstr dest, int dest_sz);
 
-    void Feedback(u16 s1, u16 s2, float time);
+    /**
+    *  Start a gamepad vibration effect
+    *  Each call to this function cancels any previous vibration effect, and calling it with 0 intensity stops any vibration.
+    *
+    *  @param type Feedback source
+    *  @param s1 The intensity of the low frequency (left) motor or left trigger motor, from 0 to 1
+    *  @param s2 The intensity of the high frequency (right) motor or right trigger motor, from 0 to 1
+    *  @param duration The duration of the rumble effect, in seconds
+    */
+    void Feedback(FeedbackType type, float s1, float s2, float duration);
 };
 
 extern ENGINE_API CInput* pInput;

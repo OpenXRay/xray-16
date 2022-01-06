@@ -451,6 +451,16 @@ public:
 
     virtual float GetLookFactor();
 
+private:
+    struct controller_feedback
+    {
+        float high_freq;
+        float duration;
+        float submit_time;
+        float update_time;
+        bool needs_update;
+    } m_controller_feedback{};
+
 public:
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
     virtual void g_fireParams(const CHudItem* pHudItem, Fvector& P, Fvector& D);

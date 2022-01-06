@@ -25,8 +25,6 @@ constexpr size_t MAX_KEYBOARD_EVENTS = 64;
 constexpr size_t MAX_MOUSE_EVENTS = 256;
 constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
-float stop_vibration_time = flt_max;
-
 bool CInput::InitJoystick()
 {
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0)
@@ -157,6 +155,7 @@ CInput::CInput(const bool exclusive): availableJoystick(false), availableControl
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
+    last_input_controller = -1;
 
     //===================== Dummy pack
     iCapture(&dummyController);
@@ -353,6 +352,9 @@ void CInput::GameControllerUpdate()
             if (event.caxis.axis >= COUNT_CONTROLLER_AXIS)
                 break; // SDL added new axis, not supported by engine yet
 
+            if (last_input_controller != event.caxis.which) // don't write if don't really need to
+                last_input_controller = event.caxis.which;
+
             if (std::abs(event.caxis.value) < controllerDeadZone)
                 controllerAxisState[event.caxis.axis] = 0;
             else
@@ -527,6 +529,7 @@ void CInput::iCapture(IInputReceiver* p)
     // prepare for _new_ controller
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
+    last_input_controller = -1;
 }
 
 void CInput::iRelease(IInputReceiver* p)
@@ -561,6 +564,7 @@ void CInput::OnAppActivate(void)
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
+    last_input_controller = -1;
 }
 
 void CInput::OnAppDeactivate(void)
@@ -573,6 +577,7 @@ void CInput::OnAppDeactivate(void)
     controllerState.reset();
     ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
+    last_input_controller = -1;
 }
 
 void CInput::OnFrame(void)
@@ -620,7 +625,27 @@ bool CInput::IsExclusiveMode() const
     return exclusiveInput;
 }
 
-void CInput::Feedback(u16 s1, u16 s2, float time)
+void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 {
-    stop_vibration_time = RDEVICE.fTimeGlobal + time;
+    const u16 s1_rumble = iFloor(u16(-1) * clampr(s1, 0.0f, 1.0f));
+    const u16 s2_rumble = iFloor(u16(-1) * clampr(s2, 0.0f, 1.0f));
+    const u32 duration_ms = duration < 0.f ? 0 : iFloor(duration * 1000.f);
+
+    switch (type)
+    {
+    case FeedbackController:
+        for (SDL_GameController* controller : controllers)
+            SDL_GameControllerRumble(controller, s1_rumble, s2_rumble, duration_ms);
+        break;
+
+    case FeedbackTriggers:
+        if (last_input_controller != -1)
+        {
+            const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
+            SDL_GameControllerRumbleTriggers(controller, s1_rumble, s2_rumble, duration_ms);
+        }
+        break;
+
+    default: NODEFAULT;
+    }
 }
