@@ -96,6 +96,8 @@ pcstr GetFontTexName(pcstr section)
 
 CDemoRecord::CDemoRecord(const char* name, float life_time)
     : CEffectorCam(cefDemo, life_time /*,false*/),
+      m_speed(speed_0),
+      m_angle_speed(speed_0),
       m_Font(pSettings->r_string(DEMO_RECORD_HELP_FONT, "shader"), GetFontTexName(DEMO_RECORD_HELP_FONT))
 {
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
@@ -381,21 +383,21 @@ bool CDemoRecord::ProcessCam(SCamEffectorInfo& info)
         m_vAngularVelocity.lerp(m_vAngularVelocity, m_vR, 0.3f);
 
         float speed = m_fSpeed1, ang_speed = m_fAngSpeed1;
-
-        if (IR_GetKeyState(SDL_SCANCODE_LSHIFT))
+        switch (m_speed)
         {
-            speed = m_fSpeed0;
-            ang_speed = m_fAngSpeed0;
+        case speed_0: speed = m_fSpeed0; break;
+        case speed_1: speed = m_fSpeed1; break;
+        case speed_2: speed = m_fSpeed2; break;
+        case speed_3: speed = m_fSpeed3; break;
+        default: NODEFAULT;
         }
-        else if (IR_GetKeyState(SDL_SCANCODE_LALT))
+        switch (m_angle_speed)
         {
-            speed = m_fSpeed2;
-            ang_speed = m_fAngSpeed2;
-        }
-        else if (IR_GetKeyState(SDL_SCANCODE_LCTRL))
-        {
-            speed = m_fSpeed3;
-            ang_speed = m_fAngSpeed3;
+        case speed_0: ang_speed = m_fAngSpeed0; break;
+        case speed_1: ang_speed = m_fAngSpeed1; break;
+        case speed_2: ang_speed = m_fAngSpeed2; break;
+        case speed_3: ang_speed = m_fAngSpeed3; break;
+        default: NODEFAULT;
         }
 
         m_vT.mul(m_vVelocity, Device.fTimeDelta * speed);
@@ -463,6 +465,47 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
 
     switch (GetBindedAction(dik))
     {
+    case kACCEL:
+        m_speed = speed_0;
+        m_angle_speed = speed_0;
+        break;
+
+    case kSPRINT_TOGGLE:
+        m_speed = speed_2;
+        m_angle_speed = speed_2;
+        break;
+
+    case kCROUCH:
+    case kCROUCH_TOGGLE:
+        m_speed = speed_3;
+        m_angle_speed = speed_3;
+        break;
+
+    default:
+    {
+        switch (dik)
+        {
+        case SDL_SCANCODE_LSHIFT:
+            m_speed = speed_0;
+            m_angle_speed = speed_0;
+            break;
+
+        case SDL_SCANCODE_LALT:
+            m_speed = speed_2;
+            m_angle_speed = speed_2;
+            break;
+
+        case SDL_SCANCODE_LCTRL:
+            m_speed = speed_3;
+            m_angle_speed = speed_3;
+            break;
+        } // switch (dik)
+        break;
+    }
+    } // switch (GetBindedAction(dik))
+
+    switch (GetBindedAction(dik))
+    {
     case kCONSOLE:
         Console->Show();
         break;
@@ -517,46 +560,123 @@ void CDemoRecord::IR_OnKeyboardHold(int dik)
 
     switch (dik)
     {
-    case SDL_SCANCODE_A:
     case SDL_SCANCODE_KP_1:
-    case SDL_SCANCODE_LEFT:
         vT_delta.x -= 1.0f;
         break; // Slide Left
-    case SDL_SCANCODE_D:
+
     case SDL_SCANCODE_KP_3:
-    case SDL_SCANCODE_RIGHT:
         vT_delta.x += 1.0f;
         break; // Slide Right
-    case SDL_SCANCODE_S:
-        vT_delta.y -= 1.0f;
-        break; // Slide Down
-    case SDL_SCANCODE_W:
-        vT_delta.y += 1.0f;
-        break; // Slide Up
-    // rotate
+
+    // rotation
     case SDL_SCANCODE_KP_2:
         vR_delta.x -= 1.0f;
         break; // Pitch Down
+
     case SDL_SCANCODE_KP_8:
         vR_delta.x += 1.0f;
         break; // Pitch Up
-    case SDL_SCANCODE_E:
+
     case SDL_SCANCODE_KP_6:
         vR_delta.y += 1.0f;
         break; // Turn Left
-    case SDL_SCANCODE_Q:
+
     case SDL_SCANCODE_KP_4:
         vR_delta.y -= 1.0f;
         break; // Turn Right
+
     case SDL_SCANCODE_KP_9:
         vR_delta.z -= 2.0f;
         break; // Turn Right
+
     case SDL_SCANCODE_KP_7:
         vR_delta.z += 2.0f;
         break; // Turn Right
+
+    default:
+    {
+        switch (GetBindedAction(dik))
+        {
+        case kWPN_FIRE:
+            vT_delta.z += 1.0f;
+            break; // Move Backward
+
+        case kWPN_ZOOM:
+            vT_delta.z -= 1.0f;
+            break; // Move Forward
+
+        case kL_STRAFE:
+        case kLEFT:
+            vT_delta.x -= 1.0f;
+            break; // Slide Left
+
+        case kR_STRAFE:
+        case kRIGHT:
+            vT_delta.x += 1.0f;
+            break; // Slide Right
+
+        case kBACK:
+        case kDOWN:
+            vT_delta.y -= 1.0f;
+            break; // Slide Down
+
+        case kFWD:
+        case kUP:
+            vT_delta.y += 1.0f;
+            break; // Slide Up
+
+        // rotation
+        case kL_LOOKOUT:
+            vR_delta.y += 1.0f;
+            break; // Turn Left
+
+        case kR_LOOKOUT:
+            vR_delta.y -= 1.0f;
+            break; // Turn Right
+        } // switch (GetBindedAction(dik))
+        break;
     }
+    } // switch (dik)
 
     update_whith_timescale(m_vT, vT_delta);
+    update_whith_timescale(m_vR, vR_delta);
+}
+
+void CDemoRecord::IR_OnKeyboardRelease(int dik)
+{
+    switch (GetBindedAction(dik))
+    {
+    case kACCEL:
+    case kSPRINT_TOGGLE:
+    case kCROUCH:
+    case kCROUCH_TOGGLE:
+        goto set_normal_speed;
+
+    default:
+    {
+        switch (dik)
+        {
+        case SDL_SCANCODE_LSHIFT:
+        case SDL_SCANCODE_LALT:
+        case SDL_SCANCODE_LCTRL:
+        set_normal_speed:
+            m_speed = speed_1;
+            m_angle_speed = speed_1;
+            break;
+        } // switch (dik)
+        break;
+    }
+    } // switch (GetBindedAction(dik))
+}
+
+void CDemoRecord::OnAxisMove(float x, float y, float scale, bool invert)
+{
+    Fvector vR_delta = Fvector().set(0, 0, 0);
+    if (!fis_zero(x) || !fis_zero(y))
+    {
+        vR_delta.y += x * scale; // heading
+        vR_delta.x += (invert ? -1.f : 1.f) * y * scale * (3.f / 4.f); // pitch
+    }
     update_whith_timescale(m_vR, vR_delta);
 }
 
@@ -567,16 +687,9 @@ void CDemoRecord::IR_OnMouseMove(int dx, int dy)
         g_pGameLevel->IR_OnMouseMove(dx, dy);
         return;
     }
-
-    Fvector vR_delta = Fvector().set(0, 0, 0);
-
-    float scale = .5f; // psMouseSens;
-    if (dx || dy)
-    {
-        vR_delta.y += float(dx) * scale; // heading
-        vR_delta.x += ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * (3.f / 4.f); // pitch
-    }
-    update_whith_timescale(m_vR, vR_delta);
+    
+    const float scale = .5f; // psMouseSens;
+    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
 }
 
 void CDemoRecord::IR_OnMouseHold(int btn)
@@ -586,17 +699,115 @@ void CDemoRecord::IR_OnMouseHold(int btn)
         g_pGameLevel->IR_OnMouseHold(btn);
         return;
     }
-    Fvector vT_delta = Fvector().set(0, 0, 0);
-    switch (btn)
+    IR_OnKeyboardHold(btn);
+}
+
+void CDemoRecord::IR_OnControllerPress(int key, float x, float y)
+{
+    if (m_b_redirect_input_to_level)
     {
-    case MOUSE_1:
-        vT_delta.z += 1.0f;
+        g_pGameLevel->IR_OnControllerPress(key, x, y);
+        return;
+    }
+
+    IR_OnKeyboardPress(key);
+}
+
+void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
+{
+    if (m_b_redirect_input_to_level)
+    {
+        g_pGameLevel->IR_OnControllerHold(key, x, y);
+        return;
+    }
+
+    const float look = std::max(std::abs(x), std::abs(y));
+    movement_speed speed = speed_1;
+    if (look >= 90.f)
+        speed = speed_3;
+    else if (look >= 75.f)
+        speed = speed_2;
+    else if (look < 45.f)
+        speed = speed_0;
+
+    switch (GetBindedAction(key))
+    {
+    case kLOOK_AROUND:
+    {
+        m_angle_speed = speed;
+        const float scale = .05f; // psControllerSens;
+        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
+        break;
+    }
+
+    case kWPN_FIRE:
+    {
+        m_speed = speed;
+        Fvector vT_delta = Fvector().set(0, 0, 1.0f);
+        update_whith_timescale(m_vT, vT_delta);
         break; // Move Backward
-    case MOUSE_2:
-        vT_delta.z -= 1.0f;
+    }
+
+    case kWPN_ZOOM:
+    {
+        m_speed = speed;
+        Fvector vT_delta = Fvector().set(0, 0, -1.0f);
+        update_whith_timescale(m_vT, vT_delta);
         break; // Move Forward
     }
-    update_whith_timescale(m_vT, vT_delta);
+
+    case kMOVE_AROUND:
+    {
+        m_speed = speed;
+        Fvector vT_delta = Fvector().set(0, 0, 0);
+
+        if (!fis_zero(x))
+        {
+            if (x > 35.f)
+                vT_delta.x += 1.0f;
+            else if (x < -35.f)
+                vT_delta.x -= 1.0f;
+        }
+        if (!fis_zero(y))
+        {
+            if (y > 35.f)
+                vT_delta.y -= 1.0f;
+            else if (y < -35.f)
+                vT_delta.y += 1.0f;
+        }
+
+        update_whith_timescale(m_vT, vT_delta);
+        break;
+    }
+
+    default:
+        IR_OnKeyboardHold(key);
+        break;
+    }
+}
+
+void CDemoRecord::IR_OnControllerRelease(int key, float x, float y)
+{
+    if (m_b_redirect_input_to_level)
+    {
+        g_pGameLevel->IR_OnControllerRelease(key, x, y);
+        return;
+    }
+
+    switch (GetBindedAction(key))
+    {
+    case kLOOK_AROUND:
+        m_angle_speed = speed_1;
+        break;
+
+    case kMOVE_AROUND:
+        m_speed = speed_1;
+        break;
+
+    default:
+        IR_OnKeyboardRelease(key);
+        break;
+    }
 }
 
 void CDemoRecord::RecordKey()
