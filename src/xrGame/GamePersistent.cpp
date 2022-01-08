@@ -684,7 +684,7 @@ void CGamePersistent::OnFrame()
 
                     Actor()->Cameras().UpdateFromCamera(C);
                     Actor()->Cameras().ApplyDevice();
-#ifdef DEBUG
+
                     if (psActorFlags.test(AF_NO_CLIP))
                     {
                         Actor()->SetDbgUpdateFrame(0);
@@ -715,7 +715,6 @@ void CGamePersistent::OnFrame()
                             }
                         }
                     }
-#endif // DEBUG
                 }
             }
         }

@@ -704,9 +704,10 @@ public:
     virtual void OnPrevWeaponSlot();
     void SwitchNightVision();
     void SwitchTorch();
-#ifdef DEBUG
+
+#ifndef MASTER_GOLD
     void NoClipFly(int cmd);
-#endif // DEBUG
+#endif
 
 public:
     virtual void on_weapon_shot_start(CWeapon* weapon);
