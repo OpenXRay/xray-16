@@ -3532,7 +3532,7 @@
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord-rpc-dynamic.dll">
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord-rpc.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <None Include="packages.config" />
