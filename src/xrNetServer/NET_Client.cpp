@@ -12,7 +12,6 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#include <malloc.h>
 #include "xrCore/Debug/dxerr.h"
 
 #include <WINSOCK2.H>

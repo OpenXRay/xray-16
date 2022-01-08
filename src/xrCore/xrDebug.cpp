@@ -17,7 +17,6 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Debug/MiniDump.h"
 #pragma warning(pop)
-#include <malloc.h>
 #include <direct.h>
 #endif
 

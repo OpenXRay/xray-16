@@ -9,13 +9,6 @@
 
 #if NET_USE_COMPRESSION
 
-#ifdef DEBUG
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-#endif // DEBUG
-
 #if NET_USE_LZO_COMPRESSION
 #define ENCODE rtc9_compress
 #define DECODE rtc9_decompress

@@ -13,11 +13,6 @@
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
 #endif
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 void CRender::level_Load(IReader* fs)
 {
     R_ASSERT(g_pGameLevel);

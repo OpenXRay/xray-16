@@ -91,6 +91,7 @@
 // We use xr_* instead of defining e.g. strupr => _strupr, since the macro definition could
 // come before the std. header file declaring it, and thereby renaming that one too.
 #ifdef _MSC_VER
+#include <malloc.h>
 #define xr_alloca _alloca
 #define xr_strupr _strupr
 #define xr_strlwr _strlwr

@@ -10,11 +10,6 @@
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "xrCore/buffer_vector.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 static INetLog* pSvNetLog = nullptr;
 
 #define NET_BANNED_STR "Player banned by server!"

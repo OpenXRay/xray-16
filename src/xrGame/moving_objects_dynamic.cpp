@@ -19,11 +19,6 @@
 #include "ai_debug.h"
 #endif // MASTER_GOLD
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 
 struct priority

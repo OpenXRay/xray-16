@@ -24,11 +24,6 @@
 #include "enemy_manager.h"
 #include "memory_space_impl.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 const float wounded_enemy_reached_distance = 3.f;
 
 const u32 __c0 = 0x55555555;
