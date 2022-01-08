@@ -687,14 +687,18 @@ void CGamePersistent::OnFrame()
 
                     if (psActorFlags.test(AF_NO_CLIP))
                     {
+#ifdef DEBUG
                         Actor()->SetDbgUpdateFrame(0);
                         Actor()->GetSchedulerData().dbg_update_shedule = 0;
+#endif
                         Device.dwTimeDelta = 0;
                         Device.fTimeDelta = 0.01f;
                         Actor()->UpdateCL();
                         Actor()->shedule_Update(0);
+#ifdef DEBUG
                         Actor()->SetDbgUpdateFrame(0);
                         Actor()->GetSchedulerData().dbg_update_shedule = 0;
+#endif
 
                         CSE_Abstract* e = Level().Server->ID_to_entity(Actor()->ID());
                         VERIFY(e);
@@ -706,12 +710,16 @@ void CGamePersistent::OnFrame()
                             IGameObject* obj = Level().Objects.net_Find(*it);
                             if (obj && Engine.Sheduler.Registered(obj))
                             {
+#ifdef DEBUG
                                 obj->GetSchedulerData().dbg_update_shedule = 0;
                                 obj->SetDbgUpdateFrame(0);
+#endif
                                 obj->shedule_Update(0);
                                 obj->UpdateCL();
+#ifdef DEBUG
                                 obj->GetSchedulerData().dbg_update_shedule = 0;
                                 obj->SetDbgUpdateFrame(0);
+#endif
                             }
                         }
                     }
