@@ -149,7 +149,7 @@ set(SRC_FILES
     "XR_IOConsole.cpp"
     "XR_IOConsole_get.cpp"
     "XR_IOConsole.h"
-    "xrLoadSurface.cpp"
+    #"xrLoadSurface.cpp"
     "xr_object.cpp"
     "xr_object.h"
     "xr_object_list.cpp"
@@ -177,15 +177,11 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${SDL_INCLUDE_DIRS}
-    ${FREEIMAGE_INCLUDE_PATH}
-    ${FREEIMAGEPLUS_INCLUDE_PATH}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-    xrMiscMath #xrRenderGL ?
-    ${FREEIMAGE_LIBRARY} #xrRenderGL
-    ${FREEIMAGEPLUS_LIBRARY} #xrRenderGL
+    xrMiscMath
     PRIVATE
     xrCore
     xrLuabind

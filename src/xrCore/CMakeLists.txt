@@ -164,6 +164,7 @@ set(SRC_FILES
     "Math/SkinXW_SSE.hpp"
     "Media/Image.cpp"
     "Media/Image.hpp"
+    "Media/ImageJPEG.cpp"
     "Memory/xalloc.h"
     #"Memory/xrMemory_align.cpp"
     #"Memory/xrMemory_align.h"
@@ -235,6 +236,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
+    ${JPEG_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -246,6 +248,7 @@ target_link_libraries(${PROJECT_NAME}
     xrMiscMath
     dl
     $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
+    ${JPEG_LIBRARIES}
     ${PCRE_LIBRARIES}
     ${LZO_LIBRARIES}
 )

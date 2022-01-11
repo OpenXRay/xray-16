@@ -5,32 +5,8 @@
 #include "xrCore/Compression/ppmd_compressor.h"
 #include "screenshots_writer.h"
 
-#ifdef DEBUG
-#define CXIMAGE_AS_SHARED_LIBRARY
-#endif
-
-#ifdef XR_PLATFORM_WINDOWS
-#include <ddraw.h>
-#endif
-
 #include "ximage.h"
 #include "xmemfile.h"
-
-void* cxalloc(size_t size) { return xr_malloc(size); }
-void cxfree(void* ptr) { xr_free(ptr); }
-void* cxrealloc(void* ptr, size_t size) { return xr_realloc(ptr, size); }
-/*
-void jpeg_encode_callback(long progress)
-{
-#ifdef DEBUG
-    Msg("* JPEG encoding progress : %d%%", progress);
-#endif
-    if (progress % 5 == 0)
-    {
-        if (!SwitchToThread())
-            Sleep(10);
-    }
-}*/
 
 screenshot_manager::screenshot_manager()
 {

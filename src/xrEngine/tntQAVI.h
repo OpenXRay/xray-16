@@ -6,8 +6,6 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include "vfw.h"
 #include "mmsystem.h"
-#elif defined(XR_PLATFORM_LINUX)
-#include <FreeImage.h>
 #endif
 
 // replaced with standard AVIIF_KEYFRAME

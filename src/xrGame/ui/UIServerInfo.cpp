@@ -12,9 +12,6 @@
 #include "ximage.h"
 #include "xmemfile.h"
 
-// XXX: uncomment, test and remove CxImage that is currectly used
-//#include <FreeImage/FreeImagePlus.h>
-
 CUIServerInfo::CUIServerInfo()
 {
     m_dds_file_created = false;
@@ -94,18 +91,6 @@ void CUIServerInfo::InitCallbacks()
 char const* CUIServerInfo::tmp_logo_file_name = "tmp_sv_logo.dds";
 void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
 {
-    // XXX: uncomment, test and remove CxImage that is currectly used
-    /*fipImage tmpImage;
-    fipMemoryIO tmpMemFile(const_cast<BYTE*>(data_ptr), data_size);
-    
-    tmpImage.loadFromMemory(tmpMemFile);
-
-    if (!tmpImage.isValid() || tmpImage.getFIF() != FIF_JPEG);
-    {
-        Msg("! ERROR: Failed to decode server logo image as JPEG formatted.");
-        return;
-    }*/
-
     CxMemFile tmp_memfile(const_cast<u8*>(data_ptr), data_size);
     CxImage tmp_image;
     if (!tmp_image.Decode(&tmp_memfile, CXIMAGE_FORMAT_JPG))
