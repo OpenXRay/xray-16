@@ -34,6 +34,7 @@ lib/
 *.yml
 
 *.xml
+*.cmake
 *.natvis
 *.props
 *.vcxproj
@@ -52,3 +53,5 @@ lib/
 *.exe
 *.dll
 *.lib
+*.so
+*.o
