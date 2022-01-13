@@ -237,6 +237,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
     ${JPEG_INCLUDE_DIRS}
+    ${PCRE_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}

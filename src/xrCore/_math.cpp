@@ -10,13 +10,6 @@
 #endif
 
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-#include <x86intrin.h> // __rdtsc
-#elif defined(XR_ARCHITECTURE_ARM)
-#include <sys/syscall.h>
-#include <linux/perf_event.h>
-#endif // defined(XR_ARCHITECTURE_ARM)
-
 #ifdef XR_PLATFORM_LINUX
 #include <fpu_control.h>
 #elif defined(XR_PLATFORM_FREEBSD)
@@ -39,8 +32,10 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <string>
 #include <stdint.h>
 #include <string.h>
-#include <pcre.h>
 #include <iostream>
+#if __has_include(<pcre.h>)
+#   include <pcre.h>
+#endif
 #endif
 #include <thread>
 #include "SDL.h"
@@ -240,7 +235,7 @@ u32 cpufreq()
         getline(cpuMaxFreq, parcedFreq);
         cpuFreq = atol(parcedFreq.c_str()) / 1000;
     }
-#else
+#elif __has_include(<pcre.h>)
     // CPU frequency is stored in /proc/cpuinfo in lines beginning with "cpu MHz"
     pcstr pattern = "^cpu MHz\\s*:\\s*(\\d+)";
     pcstr pcreErrorStr = nullptr;
@@ -350,7 +345,9 @@ void _initialize_cpu()
             i, cpuInfo.CurrentMhz, cpuInfo.MaxMhz);
     }
 #else
-    Msg("* CPU current freq: %u MHz", cpufreq());
+    const auto freq =  cpufreq();
+    if (freq > 0)
+        Msg("* CPU current freq: %u MHz",);
 #endif
     Log("");
     Fidentity.identity(); // Identity matrix
