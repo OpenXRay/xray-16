@@ -4,11 +4,9 @@
 #include "../xrRender/ResourceManager.h"
 
 #ifdef XR_PLATFORM_WINDOWS // TODO
-#include "../../xrEngine/tntQAVI.h"
+#include "xrEngine/tntQAVI.h"
 #endif
-
-#include "../../xrEngine/tntQAVI.h"
-#include "../../xrEngine/xrTheora_Surface.h"
+#include "xrEngine/xrTheora_Surface.h"
 
 #define		PRIORITY_HIGH	12
 #define		PRIORITY_NORMAL	8
