@@ -347,7 +347,7 @@ void _initialize_cpu()
 #else
     const auto freq =  cpufreq();
     if (freq > 0)
-        Msg("* CPU current freq: %u MHz",);
+        Msg("* CPU current freq: %u MHz", freq);
 #endif
     Log("");
     Fidentity.identity(); // Identity matrix
