@@ -62,13 +62,6 @@ XRCORE_API Fmatrix Fidentity;
 XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-u32 timeGetTime()
-{
-    return SDL_GetTicks();
-}
-#endif
-
 /*
 Функции управления точностью вычислений с плавающей точкой.
 Более подробную информацию можно получить здесь:

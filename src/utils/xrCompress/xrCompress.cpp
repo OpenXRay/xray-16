@@ -347,7 +347,7 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
     filesVFS = 0;
     filesALIAS = 0;
 
-    dwTimeStart = timeGetTime();
+    dwTimeStart = CPU::GetTicks();
     if (config_ltx && config_ltx->section_exist("header"))
     {
         CMemoryWriter W;
@@ -401,7 +401,7 @@ void xrCompressor::ClosePack()
     Msg("Data size: %d. Desc size: %d.", bytesDST, fs_desc.size());
     FS.w_close(fs_pack_writer);
     Msg("Pack saved.");
-    u32 dwTimeEnd = timeGetTime();
+    u32 dwTimeEnd = CPU::GetTicks();
     printf(
         "\n\nFiles total/skipped/VFS/aliased: %d/%d/%d/%d\nOveral: %dK/%dK, %3.1f%%\nElapsed time: %d:%d\nCompression "
         "speed: %3.1f Mb/s",
