@@ -211,7 +211,6 @@ if (NOT WIN32)
     find_package(Ogg REQUIRED)
     find_package(SDL REQUIRED)
     find_package(LZO REQUIRED)
-    find_package(PCRE)
 endif()
 
 # XXX: move to LuaJIT
