@@ -488,7 +488,7 @@ void initialize_bindings()
                 break;
             if (k1.dik == k2.dik && i1 != i2)
             {
-                Msg("%s==%s", k1.key_name, k2.key_name);
+                Msg("%s == %s", k1.key_name, k2.key_name);
             }
             ++i2;
         }

@@ -204,7 +204,7 @@ public:
             Msg("Config-file [%s] saved successfully", cfg_full_name);
         }
         else
-            Msg("!Cannot store config file [%s]", cfg_full_name);
+            Msg("! Cannot store config file [%s]", cfg_full_name);
     }
 };
 CCC_LoadCFG::CCC_LoadCFG(pcstr N) : IConsole_Command(N){};

@@ -83,7 +83,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
     {
         float pixels = (float)RImplementation.HWOCC.occq_get(id[it]);
         float coeff = clampr(pixels / area, float(0), float(1));
-        Msg("[%d]ssa_c: %1.3f,%f/%f", it, coeff, pixels, area);
+        Msg(" - [%d] ssa_c: %1.3f,%f/%f", it, coeff, pixels, area);
         result.ssa[it] = (u8)clampr(iFloor(coeff * 255.f + 0.5f), int(0), int(255));
     }
 
@@ -98,6 +98,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 
 void r_pixel_calculator::run()
 {
+    Log("----- ssa build start -----");
     begin();
     for (u32 it = 0; it < RImplementation.Visuals.size(); it++)
     {
@@ -107,4 +108,5 @@ void r_pixel_calculator::run()
         calculate((dxRender_Visual*)RImplementation.Visuals[it]);
     }
     end();
+    Log("----- ssa build end -----");
 }

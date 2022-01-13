@@ -258,7 +258,7 @@ void CUISequenceSimpleItem::Start()
 
         if (!ui_game_sp)
         {
-            Msg("!%s:: failed to get ui_game_sp", __FUNCTION__);
+            Msg("! %s:: failed to get ui_game_sp", __FUNCTION__);
             return;
         }
 

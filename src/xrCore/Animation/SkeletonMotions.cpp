@@ -18,7 +18,7 @@ u16 CPartition::part_id(const shared_str& name) const
         if (pd.Name == name)
             return i;
     }
-    Msg("!there is no part named [%s]", name.c_str());
+    Msg("! there is no part named [%s]", name.c_str());
     return u16(-1);
 }
 
@@ -110,13 +110,13 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
                 if (*b_it == BI_NONE)
                 {
                     bRes = false;
-                    Msg("!Can't find bone: '%s'", buf);
+                    Msg("! Can't find bone: '%s'", buf);
                 }
 
                 if (rm_bones.size() <= m_idx)
                 {
                     bRes = false;
-                    Msg("!Can't load: '%s' invalid bones count", N);
+                    Msg("! Can't load: '%s' invalid bones count", N);
                 }
 #else
                 VERIFY3(*b_it != BI_NONE, "Can't find bone:", buf);
@@ -131,7 +131,7 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
         if (part_bone_cnt != (u16)bones->size())
         {
             bRes = false;
-            Msg("!Different bone count[%s] [Object: '%d' <-> Motions: '%d']", N, bones->size(), part_bone_cnt);
+            Msg("! Different bone count[%s] [Object: '%d' <-> Motions: '%d']", N, bones->size(), part_bone_cnt);
         }
 #else
         VERIFY3(part_bone_cnt == (u16)bones->size(), "Different bone count '%s'", N);

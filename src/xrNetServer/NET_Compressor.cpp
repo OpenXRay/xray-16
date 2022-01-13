@@ -369,7 +369,7 @@ u16 NET_Compressor::Compress(u8* dest, const u32& dest_size, u8* src, const u32&
 #endif // NET_USE_COMPRESSION_CRC
 
 #if NET_LOG_COMPRESSION
-        Msg("#compress %u->%u  %02X (%08X)", count, compressed_size, *dest, *((u32*)(src + 1)));
+        Msg("# compress %u->%u  %02X (%08X)", count, compressed_size, *dest, *((u32*)(src + 1)));
 #endif
 #if NET_DUMP_COMPRESSION
 #if NET_USE_LZO_COMPRESSION
@@ -396,7 +396,7 @@ u16 NET_Compressor::Compress(u8* dest, const u32& dest_size, u8* src, const u32&
         CopyMemory(dest + 1, src, count);
 
 #if NET_LOG_COMPRESSION
-        Msg("#compress/as-is %u->%u  %02X", count, compressed_size, *dest);
+        Msg("# compress/as-is %u->%u  %02X", count, compressed_size, *dest);
 #endif
     }
     if (g_net_compressor_gather_stats && b_compress_packet)
@@ -434,7 +434,7 @@ u16 NET_Compressor::Decompress(u8* dest, const u32& dest_size, u8* src, const u3
     VERIFY(count);
 
 #if NET_LOG_COMPRESSION
-    Msg("#decompress %u  %02X (%08X)", count, src[0], *((u32*)(src + 1)));
+    Msg("# decompress %u  %02X (%08X)", count, src[0], *((u32*)(src + 1)));
 #endif
 
 #if NET_USE_COMPRESSSION
@@ -474,7 +474,7 @@ u16 NET_Compressor::Decompress(u8* dest, const u32& dest_size, u8* src, const u3
     u32 crc = crc32(src + offset, count);
     //Msg("decompressed %d -> ? [0x%08x]", count, crc);
     if (crc != *((u32*)(src + 1)))
-        Msg("!CRC mismatch");
+        Msg("! CRC mismatch");
 
     R_ASSERT2(crc == *((u32*)(src + 1)), make_string("crc is different! (0x%08x != 0x%08x)", crc, *((u32*)(src + 1))));
 #endif // NET_USE_COMPRESSION_CRC

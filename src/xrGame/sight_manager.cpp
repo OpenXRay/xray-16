@@ -675,8 +675,8 @@ void CSightManager::compute_aiming(float const time_delta, float const angular_s
             if (!fis_zero(time_delta))
             {
 #ifdef DEBUG
-                Msg("!animation movement controller wasn't created");
-#endif // #ifdef DEBUG
+                Log("! Animation movement controller wasn't created"); // XXX: this log is telling about a bug
+#endif
                 if (m_object->animation_movement())
                     slerp_rotations(time_delta, m_object->animation_movement()->IsBlending() ? .1f : angular_speed);
             }

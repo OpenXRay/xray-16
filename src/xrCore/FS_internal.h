@@ -38,7 +38,7 @@ public:
             const int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
 #ifdef _EDITOR
             if (handle == -1)
-                Msg("!Can't create file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
+                Msg("! Can't create file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
 #endif
             hf = _fdopen(handle, "wb");
         }
