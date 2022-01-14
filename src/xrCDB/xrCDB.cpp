@@ -177,14 +177,22 @@ bool MODEL::serialize(pcstr fileName) const
     if (!wstream)
         return false;
 
-    wstream->w_u32(version);
-    wstream->w_u32(verts_count);
-    wstream->w(verts, sizeof(Fvector) * verts_count);
-    wstream->w_u32(tris_count);
-    wstream->w(tris, sizeof(TRI) * tris_count);
+    CMemoryWriter memory;
 
+    // Write to buffer, to be able to calculate crc
+    memory.w_u32(version);
+    memory.w_u32(verts_count);
+    memory.w(verts, sizeof(Fvector) * verts_count);
+    memory.w_u32(tris_count);
+    memory.w(tris, sizeof(TRI) * tris_count);
     if (tree)
-        tree->Save(wstream);
+        tree->Save(&memory);
+
+    // Actually write to file
+    const u32 crc = crc32(memory.pointer(), memory.size());
+    wstream->w_u32(crc);
+    wstream->w(memory.pointer(), memory.size());
+
     FS.w_close(wstream);
     return true;
 }
@@ -195,7 +203,10 @@ bool MODEL::deserialize(pcstr fileName)
     if (!rstream)
         return false;
 
-    if (version != rstream->r_u32())
+    const u32 crc = rstream->r_u32();
+    const u32 actualCrc = crc32(rstream->pointer(), rstream->elapsed());
+
+    if (crc != actualCrc || version != rstream->r_u32())
     {
         FS.r_close(rstream);
         return false;
@@ -219,8 +230,9 @@ bool MODEL::deserialize(pcstr fileName)
 
     tree = xr_new<OPCODE_Model>();
     tree->Load(rstream);
-    FS.r_close(rstream);
     status = S_READY;
+
+    FS.r_close(rstream);
     return true;
 }
 

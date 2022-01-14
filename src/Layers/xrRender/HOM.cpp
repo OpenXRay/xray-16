@@ -113,7 +113,7 @@ void CHOM::Load()
     // Create AABB-tree
     m_pModel = xr_new<CDB::MODEL>();
     m_pModel->set_version(fs->get_age());
-    bool bUseCache = strstr(Core.Params, "-cdb_cache");
+    bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
 
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
     FS.update_path(fName, "$app_data_root$", fName);

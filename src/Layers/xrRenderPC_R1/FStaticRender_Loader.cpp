@@ -344,7 +344,7 @@ void CRender::LoadSectors(IReader* fs)
     if (count)
     {
         bool do_rebuild = true;
-        const bool use_cache = strstr(Core.Params, "-cdb_cache");
+        const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
 
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
