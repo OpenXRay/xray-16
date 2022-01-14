@@ -68,5 +68,5 @@ void smart_cover::action::add_animation(LPCSTR type, luabind::object const& tabl
         animations->push_back(animation);
     }
 
-    m_animations.insert(std::make_pair(type, animations));
+    m_animations.emplace(type, animations);
 }

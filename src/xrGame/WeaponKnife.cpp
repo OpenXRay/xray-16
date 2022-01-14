@@ -756,7 +756,7 @@ void CWeaponKnife::fill_shots_list(
             victims_hits_count_t::iterator tmp_vhits_iter = m_victims_hits_count.find(curr_bone.m_victim_id);
             if (m_perv_hits_count && (tmp_vhits_iter == m_victims_hits_count.end()))
             {
-                m_victims_hits_count.insert(std::make_pair(curr_bone.m_victim_id, u16(1)));
+                m_victims_hits_count.emplace(curr_bone.m_victim_id, u16(1));
             }
             else if (m_perv_hits_count && (tmp_vhits_iter->second < m_perv_hits_count))
             {

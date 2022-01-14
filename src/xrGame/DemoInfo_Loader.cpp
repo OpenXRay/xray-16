@@ -46,7 +46,7 @@ demo_info const* demo_info_loader::get_demofile_info(LPCSTR demo_file_name)
     {
         demo_info* tmp_demoinfo = load_demofile(demo_file_name);
         R_ASSERT(tmp_demoinfo);
-        return m_demo_info_cache.insert(std::make_pair(shared_str(demo_file_name), tmp_demoinfo)).first->second;
+        return m_demo_info_cache.emplace(shared_str(demo_file_name), tmp_demoinfo).first->second;
     }
     return tmp_iter->second;
 }

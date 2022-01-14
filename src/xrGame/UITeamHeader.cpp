@@ -41,7 +41,7 @@ void UITeamHeader::InitColumnsStatics(CUIXml& uiXml)
         tempColumn->SetAutoDelete(true);
         CUIXmlInit::InitStatic(uiXml, COLUMN_NODE_NAME, i, tempColumn);
         // tempColumn->SetTextST(tempColumnName);
-        m_columns_statics.insert(std::make_pair(shared_str(tempColumnName), tempColumn));
+        m_columns_statics.emplace(shared_str(tempColumnName), tempColumn);
     }
 }
 
@@ -61,8 +61,8 @@ void UITeamHeader::InitFieldsStatics(CUIXml& uiXml)
         this->AttachChild(static_cast<CUIWindow*>(tempField));
         tempField->SetAutoDelete(true);
         CUIXmlInit::InitStatic(uiXml, FILED_NODE_NAME, i, tempField);
-        m_translated_strings.insert(std::make_pair(shared_str(tempFieldName), StringTable().translate(tempFieldName)));
-        m_field_fillers.insert(std::make_pair(shared_str(tempFieldName), tempField));
+        m_translated_strings.emplace(shared_str(tempFieldName), StringTable().translate(tempFieldName));
+        m_field_fillers.emplace(shared_str(tempFieldName), tempField);
     }
 }
 

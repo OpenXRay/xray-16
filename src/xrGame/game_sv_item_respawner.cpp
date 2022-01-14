@@ -219,7 +219,7 @@ item_respawn_manager::respawn_section_iter item_respawn_manager::load_respawn_se
         }
     }
     std::pair<respawn_section_iter, bool> insert_res =
-        m_respawn_sections_cache.insert(std::make_pair(section_name, tmp_sect_items));
+        m_respawn_sections_cache.emplace(section_name, tmp_sect_items);
     if (insert_res.second)
         return insert_res.first;
 

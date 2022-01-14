@@ -1120,7 +1120,7 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
 void CScriptEngine::add_script_process(const ScriptProcessor& process_id, CScriptProcess* script_process)
 {
     VERIFY(m_script_processes.find(process_id) == m_script_processes.end());
-    m_script_processes.insert(std::make_pair(process_id, script_process));
+    m_script_processes.emplace(process_id, script_process);
 }
 
 CScriptProcess* CScriptEngine::script_process(const ScriptProcessor& process_id) const

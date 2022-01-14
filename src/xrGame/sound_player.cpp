@@ -76,7 +76,7 @@ u32 CSoundPlayer::add(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priori
     const SOUND_COLLECTION_PAIR& pair = sound_collection_storage().object(sound_params);
     VERIFY(pair.first == (CSoundCollectionParams&)sound_params);
     VERIFY(pair.second);
-    m_sounds.insert(std::make_pair(internal_type, std::make_pair(sound_params, pair.second)));
+    m_sounds.emplace(internal_type, std::make_pair(sound_params, pair.second));
     return (pair.second->m_sounds.size());
 }
 

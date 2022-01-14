@@ -2413,7 +2413,7 @@ void game_sv_CaptureTheArtefact::RespawnPlayer(ClientID id_who, bool NoSpectator
 
         if (ti == m_invTimeouts.end())
         {
-            m_invTimeouts.insert(std::make_pair(id_who, invLostTime));
+            m_invTimeouts.emplace(id_who, invLostTime);
         }
         else
         {
