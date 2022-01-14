@@ -144,7 +144,7 @@ public:
     float m_time_length;
     string64 m_pda_section;
     Fvector2 m_desired_cursor_pos;
-    int m_continue_dik_guard;
+    EGameActions m_continue_action_guard;
     xr_vector<SActionItem> m_actions;
 
 public:

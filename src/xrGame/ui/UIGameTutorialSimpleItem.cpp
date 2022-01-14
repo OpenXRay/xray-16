@@ -71,19 +71,18 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_flags.set(etiNeedPauseSound, 0 == xr_stricmp(str, "on"));
 
     str = xml->Read("guard_key", 0, NULL);
-    m_continue_dik_guard = -1;
+    m_continue_action_guard = kNOTBINDED;
     if (str && !xr_stricmp(str, "any"))
     {
-        m_continue_dik_guard = 9999;
+        m_continue_action_guard = kLASTACTION;
         str = nullptr;
     }
     if (str)
     {
-        EGameActions cmd = ActionNameToId(str);
-        m_continue_dik_guard = GetActionDik(cmd);
+        m_continue_action_guard = ActionNameToId(str);
     }
 
-    m_flags.set(etiCanBeStopped, (m_continue_dik_guard == -1));
+    m_flags.set(etiCanBeStopped, (m_continue_action_guard == kNOTBINDED));
 
     LPCSTR str_grab_input = xml->Read("grab_input", 0, "on");
     m_flags.set(etiGrabInput, (0 == xr_stricmp(str_grab_input, "on") || 0 == xr_stricmp(str_grab_input, "1")));
@@ -339,11 +338,11 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
 {
     if (!m_flags.test(etiCanBeStopped))
     {
-        VERIFY(m_continue_dik_guard != -1);
-        if (m_continue_dik_guard == -1)
+        VERIFY(m_continue_action_guard != kNOTBINDED);
+        if (m_continue_action_guard == kNOTBINDED)
             m_flags.set(etiCanBeStopped, TRUE); // not binded action :(
 
-        if (m_continue_dik_guard == 9999 || dik == m_continue_dik_guard)
+        else if (m_continue_action_guard == kLASTACTION || IsBinded(m_continue_action_guard, dik))
             m_flags.set(etiCanBeStopped, TRUE); // match key
     }
 
