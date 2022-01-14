@@ -6,6 +6,7 @@
 
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/UIShader.h"
+#include "xr_level_controller.h" // XXX: only for bindtypes_count, better to remove
 
 // refs
 class ENGINE_API CGameFont;
@@ -88,7 +89,7 @@ protected:
     bool m_disable_tips;
 
 private:
-    int lastBindedKeys[2];
+    int lastBindedKeys[bindtypes_count];
 
     vecHistory m_cmd_history;
     u32 m_cmd_history_max;

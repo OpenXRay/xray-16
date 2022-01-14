@@ -189,7 +189,27 @@ ENGINE_API EGameActions GetBindedAction(int dik);
 
 ENGINE_API bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz);
 
-ENGINE_API std::pair<int, int> GetKeysBindedTo(EGameActions action_id);
+template <typename Invocable>
+void ForAllActionKeys(EGameActions action_id, Invocable&& invocable)
+{
+    for (size_t i = 0; i < bindtypes_count; ++i)
+    {
+        const int key = GetActionDik(action_id, i);
+        if (key == SDL_SCANCODE_UNKNOWN)
+            continue;
+
+        if constexpr (std::is_invocable_r_v<bool, Invocable, size_t, int>)
+        {
+            if (invocable(i, key))
+                break;
+        }
+        else
+        {
+            static_assert(std::is_invocable_v<Invocable, size_t, int>);
+            invocable(i, key);
+        }
+    }
+}
 
 extern ENGINE_API void CCC_RegisterInput();
 

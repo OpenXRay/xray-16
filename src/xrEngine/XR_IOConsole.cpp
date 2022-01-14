@@ -613,15 +613,14 @@ void CConsole::Show()
     reset_selected_tip();
     update_tips();
 
-    auto [key1, key2] = GetKeysBindedTo(kCONSOLE);
-
-    if (key1 > -1 && key1 < CInput::COUNT_KB_BUTTONS)
-        ec().assign_callback(key1, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
-    if (key2 > -1 && key2 < CInput::COUNT_KB_BUTTONS)
-        ec().assign_callback(key2, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
-
-    lastBindedKeys[0] = key1;
-    lastBindedKeys[1] = key2;
+    ForAllActionKeys(kCONSOLE, [&](size_t keyboard_index, int key)
+    {
+        if (key < CInput::COUNT_KB_BUTTONS)
+        {
+            ec().assign_callback(key, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
+            lastBindedKeys[keyboard_index] = key;
+        }
+    });
 
     m_editor->IR_Capture();
     Device.seqRender.Add(this, 1);
@@ -647,8 +646,12 @@ void CConsole::Hide()
     reset_selected_tip();
     update_tips();
 
-    ec().remove_callback(lastBindedKeys[0]);
-    ec().remove_callback(lastBindedKeys[1]);
+    for (int key : lastBindedKeys)
+    {
+        if (key)
+            ec().remove_callback(key);
+    }
+    ZeroMemory(lastBindedKeys, sizeof(lastBindedKeys));
 
     Device.seqFrame.Remove(this);
     Device.seqRender.Remove(this);

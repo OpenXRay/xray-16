@@ -706,18 +706,6 @@ bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
     return true;
 }
 
-#pragma todo("Artur to All: Gamepads has own bindings. Add m_keyboard[2]")
-
-std::pair<int, int> GetKeysBindedTo(EGameActions action_id)
-{
-    const key_binding& binding = g_key_bindings[action_id];
-    return
-    {
-        binding.m_keyboard[0] ? binding.m_keyboard[0]->dik : -1,
-        binding.m_keyboard[1] ? binding.m_keyboard[1]->dik : -1
-    };
-}
-
 ConsoleBindCmds g_consoleBindCmds;
 BOOL g_remapped = false;
 

@@ -259,7 +259,7 @@ void line_edit_control::assign_callback(int const dik, key_state state, Callback
 void line_edit_control::remove_callback(int dik)
 {
     VERIFY(dik < CInput::COUNT_KB_BUTTONS);
-    if (dik > -1 && dik < CInput::COUNT_KB_BUTTONS)
+    if (dik < CInput::COUNT_KB_BUTTONS)
         xr_delete(m_actions[dik]);
 }
 
