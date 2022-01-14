@@ -17,6 +17,8 @@ ENGINE_API Flags32 psMouseInvert = {false};
 ENGINE_API float psControllerSens = 1.f;
 ENGINE_API float psControllerDeadZoneSens = 0.f;
 
+static bool AltF4Pressed = false;
+
 // Max events per frame
 constexpr size_t MAX_KEYBOARD_EVENTS = 64;
 constexpr size_t MAX_MOUSE_EVENTS = 256;
@@ -47,6 +49,7 @@ CInput::CInput(const bool exclusive)
     iCapture(&dummyController);
 
     SDL_StopTextInput(); // sanity
+    SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1"); // We need to handle it manually
 
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
@@ -102,7 +105,7 @@ void CInput::MouseUpdate()
 
     for (int i = 0; i < count; ++i)
     {
-        const SDL_Event event = events[i];
+        const SDL_Event& event = events[i];
 
         switch (event.type)
         {
@@ -162,9 +165,10 @@ void CInput::KeyUpdate()
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
         SDL_GETEVENT, SDL_KEYDOWN, SDL_TEXTINPUT);
 
+    // Let iGetAsyncKeyState work correctly during this frame immediately
     for (int i = 0; i < count; ++i)
     {
-        const SDL_Event event = events[i];
+        const SDL_Event& event = events[i];
 
         switch (event.type)
         {
@@ -172,20 +176,40 @@ void CInput::KeyUpdate()
             if (event.key.repeat)
                 continue;
             keyboardState[event.key.keysym.scancode] = true;
-            cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
             break;
 
         case SDL_KEYUP:
             keyboardState[event.key.keysym.scancode] = false;
+            break;
+        }
+    }
+
+    if (keyboardState[SDL_SCANCODE_F4] && (keyboardState[SDL_SCANCODE_LALT] || keyboardState[SDL_SCANCODE_RALT]))
+    {
+        AltF4Pressed = true;
+        Engine.Event.Defer("KERNEL:disconnect");
+        Engine.Event.Defer("KERNEL:quit");
+        return;
+    }
+
+    for (int i = 0; i < count; ++i)
+    {
+        const SDL_Event& event = events[i];
+
+        switch (event.type)
+        {
+        case SDL_KEYDOWN:
+            if (event.key.repeat)
+                continue;
+            cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
+            break;
+
+        case SDL_KEYUP:
             cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
             break;
 
         case SDL_TEXTINPUT:
             cbStack.back()->IR_OnTextInput(event.text.text);
-            break;
-
-        default:
-            // Nothing here
             break;
         }
     }
@@ -496,15 +520,18 @@ void CInput::OnAppDeactivate(void)
 
 void CInput::OnFrame(void)
 {
+    if (AltF4Pressed)
+        return;
+
     stats.FrameStart();
     stats.FrameTime.Begin();
     m_curTime = RDEVICE.TimerAsync_MMT();
 
     if (Device.dwPrecacheFrame == 0 && !Device.IsAnselActive)
     {
+        ControllerUpdate();
         KeyUpdate();
         MouseUpdate();
-        ControllerUpdate();
     }
 
     stats.FrameTime.End();

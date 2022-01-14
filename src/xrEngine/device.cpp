@@ -400,8 +400,8 @@ void CRenderDevice::message_loop()
                     break;
 
                 case SDL_WINDOWEVENT_CLOSE:
-                    SDL_Event quit = { SDL_QUIT };
-                    SDL_PushEvent(&quit);
+                    Engine.Event.Defer("KERNEL:disconnect");
+                    Engine.Event.Defer("KERNEL:quit");
                 }
             }
             }
