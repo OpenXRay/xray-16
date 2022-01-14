@@ -12,28 +12,33 @@
 #include "CameraLook.h"
 #include "CameraFirstEye.h"
 #include "script_entity_action.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Level.h"
 #include "CarWeapon.h"
+
+void CCar::OnAxisMove(float x, float y, float scale, bool invert)
+{
+    CCameraBase* C = active_camera;
+    if (!fis_zero(x))
+    {
+        const float d = x * scale;
+        C->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
+    }
+    if (!fis_zero(y))
+    {
+        const float d = (invert ? -1.f : 1.f) * y * scale * 3.f / 4.f;
+        C->Move((d > 0) ? kUP : kDOWN, _abs(d));
+    }
+}
 
 void CCar::OnMouseMove(int dx, int dy)
 {
     if (Remote())
         return;
 
-    CCameraBase* C = active_camera;
-    float scale = (C->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f;
-    if (dx)
-    {
-        float d = float(dx) * scale;
-        C->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
-    }
-    if (dy)
-    {
-        float d = ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * 3.f / 4.f;
-        C->Move((d > 0) ? kUP : kDOWN, _abs(d));
-    }
+    const float scale = (active_camera->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f;
+    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
 }
 
 bool CCar::bfAssignMovement(CScriptEntityAction* tpEntityAction)
@@ -221,6 +226,135 @@ void CCar::OnKeyboardHold(int cmd)
     //	clamp(m_vCamDeltaHP.x, -PI_DIV_2,	PI_DIV_2);
     //	clamp(m_vCamDeltaHP.y, active_camera->lim_pitch.x,	active_camera->lim_pitch.y);
 }
+
+void CCar::OnControllerPress(int cmd, float x, float y)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+    {
+        const float scale = (active_camera->f_fov / g_fov) * psControllerSens * psMouseSensScale / 50.f; // XXX: use psControllerSensScale
+        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
+        break;
+    }
+
+    case kMOVE_AROUND:
+    {
+        if (!fis_zero(x))
+        {
+            if (x > 35.f)
+                OnKeyboardPress(kR_STRAFE);
+            else if (x < -35.f)
+                OnKeyboardPress(kL_STRAFE);
+        }
+        if (!fis_zero(y))
+        {
+            if (y > 35.f)
+                OnKeyboardPress(kBACK);
+            else if (y < -35.f)
+                OnKeyboardPress(kFWD);
+        }
+        break;
+    }
+
+    default:
+        OnKeyboardPress(cmd);
+        break;
+    };
+}
+
+void CCar::OnControllerRelease(int cmd, float x, float y)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+        break;
+
+    case kMOVE_AROUND:
+        OnKeyboardRelease(kFWD);
+        OnKeyboardRelease(kBACK);
+        OnKeyboardRelease(kL_STRAFE);
+        OnKeyboardRelease(kR_STRAFE);
+        break;
+
+    default:
+        OnKeyboardPress(cmd);
+        break;
+    };
+}
+
+void CCar::OnControllerHold(int cmd, float x, float y)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kLOOK_AROUND:
+    {
+        const float scale = (active_camera->f_fov / g_fov) * psControllerSens * psMouseSensScale / 50.f; // XXX: use psControllerSensScale
+        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
+        break;
+    }
+
+    case kMOVE_AROUND:
+    {
+        if (!fis_zero(x))
+        {
+            if (x > 35.f && !rsp) // right
+            {
+                OnKeyboardRelease(kL_STRAFE);
+                OnKeyboardPress(kR_STRAFE);
+            }
+            else if (x < -35.f && !lsp) // left
+            {
+                OnKeyboardRelease(kR_STRAFE);
+                OnKeyboardPress(kL_STRAFE);
+            }
+            else
+            {
+                if (lsp)
+                    OnKeyboardRelease(kL_STRAFE);
+                if (rsp)
+                    OnKeyboardRelease(kR_STRAFE);
+            }
+        }
+        if (!fis_zero(y))
+        {
+            if (y > 35.f && !bkp) // backward
+            {
+                OnKeyboardRelease(kFWD);
+                OnKeyboardPress(kBACK);
+            }
+            else if (y < -35.f && !fwp) // forward
+            {
+                OnKeyboardRelease(kBACK);
+                OnKeyboardPress(kFWD);
+            }
+            else
+            {
+                if (fwp)
+                    OnKeyboardRelease(kFWD);
+                if (bkp)
+                    OnKeyboardRelease(kBACK);
+            }
+        }
+        break;
+    }
+
+    default:
+        OnKeyboardPress(cmd);
+        break;
+    }
+}
+
+
 void CCar::Action(u16 id, u32 flags)
 {
     if (m_car_weapon)

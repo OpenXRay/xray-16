@@ -6,7 +6,6 @@
 #include "eatable_item.h"
 #include "Level.h"
 #include "date_time.h"
-#include "string_table.h"
 #include "Inventory.h"
 #include "InventoryOwner.h"
 #include "InfoPortion.h"

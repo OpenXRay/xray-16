@@ -13,11 +13,6 @@
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 void obstacles_query::set_intersection(const obstacles_query& query)
 {
     // XXX: probably replace alloca

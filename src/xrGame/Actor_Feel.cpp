@@ -4,7 +4,7 @@
 #include "MercuryBall.h"
 #include "Inventory.h"
 #include "character_info.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "CustomZone.h"
 #include "xrEngine/GameMtlLib.h"
 #include "ui/UIMainIngameWnd.h"

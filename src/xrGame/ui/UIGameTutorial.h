@@ -1,5 +1,5 @@
 #pragma once
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/pure.h"
 #include "xrEngine/IInputReceiver.h"
 #include "xrScriptEngine/Functor.hpp"
@@ -46,6 +46,10 @@ public:
     virtual void IR_OnKeyboardPress(int dik);
     virtual void IR_OnKeyboardRelease(int dik);
     virtual void IR_OnKeyboardHold(int dik);
+
+    void IR_OnControllerPress(int key, float x, float y) override;
+    void IR_OnControllerRelease(int key, float x, float y) override;
+    void IR_OnControllerHold(int key, float x, float y) override;
 
     virtual void IR_OnMouseWheel(int x, int y);
     virtual void IR_OnActivate(void);
@@ -101,6 +105,7 @@ public:
     virtual void OnRender() = 0;
     virtual void OnKeyboardPress(int dik) = 0;
     virtual void OnMousePress(int btn) = 0;
+    virtual void OnControllerPress(int key) = 0;
 
     virtual bool IsPlaying() = 0;
 
@@ -154,6 +159,7 @@ public:
     virtual void OnRender();
     virtual void OnKeyboardPress(int dik);
     virtual void OnMousePress(int btn);
+    void OnControllerPress(int key) override;
 
     virtual bool IsPlaying();
 
@@ -196,6 +202,7 @@ public:
     virtual void OnRender();
     virtual void OnKeyboardPress(int dik) {}
     virtual void OnMousePress(int btn){};
+    void OnControllerPress(int /*key*/) override {}
 
     virtual bool IsPlaying();
 };

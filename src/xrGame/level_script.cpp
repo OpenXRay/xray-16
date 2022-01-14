@@ -33,7 +33,6 @@
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
 #include "ui/UIGameTutorial.h"
-#include "string_table.h"
 #include "ui/UIInventoryUtilities.h"
 #include "alife_object_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"

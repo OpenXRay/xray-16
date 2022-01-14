@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "UIXmlInit.h"
 #include "Level.h"
-#include "string_table.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "xrUICore/Buttons/UICheckButton.h"
 #include "xrUICore/SpinBox/UICustomSpin.h"

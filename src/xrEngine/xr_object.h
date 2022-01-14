@@ -26,7 +26,7 @@ class CInifile;
 #define CROW_RADIUS2 (60.f)
 
 class IPhysicsShell;
-xr_pure_interface IObjectPhysicsCollision;
+class IObjectPhysicsCollision;
 
 class CAttachmentOwner;
 class CInventoryOwner;

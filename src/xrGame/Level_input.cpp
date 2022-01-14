@@ -7,7 +7,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrEngine/FDemoRecord.h"
 #include "Level.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "game_cl_base.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "Inventory.h"
@@ -56,12 +56,14 @@ void CLevel::IR_OnMouseWheel(int x, int y)
 
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
         return;
-    if (Device.Paused()
-#ifdef DEBUG
-        && !psActorFlags.test(AF_NO_CLIP)
-#endif // DEBUG
-            )
-        return;
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused())
+            return;
+    }
 
     if (CURRENT_ENTITY())
     {
@@ -71,9 +73,10 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     }
 }
 
-void CLevel::IR_OnMousePress(int btn) {IR_OnKeyboardPress(MouseButtonToKey[btn]); }
-void CLevel::IR_OnMouseRelease(int btn) {IR_OnKeyboardRelease(MouseButtonToKey[btn]); }
-void CLevel::IR_OnMouseHold(int btn) {IR_OnKeyboardHold(MouseButtonToKey[btn]); }
+void CLevel::IR_OnMousePress(int btn) { IR_OnKeyboardPress(btn); }
+void CLevel::IR_OnMouseRelease(int btn) { IR_OnKeyboardRelease(btn); }
+void CLevel::IR_OnMouseHold(int btn) { IR_OnKeyboardHold(btn); }
+
 void CLevel::IR_OnMouseMove(int dx, int dy)
 {
     if (g_bDisableAllInput)
@@ -87,12 +90,15 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
         return;
-    if (Device.Paused() && !IsDemoPlay()
-#ifdef DEBUG
-        && !psActorFlags.test(AF_NO_CLIP)
-#endif // DEBUG
-            )
-        return;
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused() && !IsDemoPlay())
+            return;
+    }
+
     if (CURRENT_ENTITY())
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
@@ -136,12 +142,12 @@ void CLevel::IR_OnKeyboardPress(int key)
 
         if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay()))
         {
-#ifdef DEBUG
-            if (psActorFlags.test(AF_NO_CLIP))
-                Device.Pause(!Device.Paused(), TRUE, TRUE, "li_pause_key_no_clip");
-            else
-#endif // DEBUG
-                Device.Pause(!Device.Paused(), TRUE, TRUE, "li_pause_key");
+#ifdef MASTER_GOLD
+            pcstr reason = "li_pause_key";
+#else
+            pcstr reason = psActorFlags.test(AF_NO_CLIP) ? "li_pause_key_no_clip" : "li_pause_key";
+#endif
+            Device.Pause(!Device.Paused(), TRUE, TRUE, reason);
         }
         return;
     }
@@ -196,12 +202,13 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (b_ui_exist && CurrentGameUI()->IR_UIOnKeyboardPress(key))
         return;
 
-    if (Device.Paused() && !IsDemoPlay()
-#ifdef DEBUG
-        && !psActorFlags.test(AF_NO_CLIP)
-#endif // DEBUG
-            )
-        return;
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused() && !IsDemoPlay())
+            return;
+    }
 
     if (game && game->OnKeyboardPress(GetBindedAction(key)))
         return;
@@ -521,12 +528,14 @@ void CLevel::IR_OnKeyboardRelease(int key)
         return;
     if (game && game->OnKeyboardRelease(GetBindedAction(key)))
         return;
-    if (Device.Paused()
-#ifdef DEBUG
-        && !psActorFlags.test(AF_NO_CLIP)
-#endif // DEBUG
-            )
-        return;
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused())
+            return;
+    }
 
     if (CURRENT_ENTITY())
     {
@@ -578,12 +587,15 @@ void CLevel::IR_OnKeyboardHold(int key)
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardHold(key))
         return;
-    if (Device.Paused() && !Level().IsDemoPlay()
-#ifdef DEBUG
-        && !psActorFlags.test(AF_NO_CLIP)
-#endif // DEBUG
-            )
-        return;
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused() && !IsDemoPlay())
+            return;
+    }
+
     if (CURRENT_ENTITY())
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
@@ -610,14 +622,113 @@ void CLevel::IR_OnTextInput(pcstr text)
 
 void CLevel::IR_OnMouseStop(int /**axis**/, int /**value**/) {}
 
-void CLevel::IR_OnControllerPress(int btn) 
-{ 
-    IR_OnKeyboardPress(ControllerButtonToKey[btn]); 
+void CLevel::IR_OnControllerPress(int key, float x, float y)
+{
+    if (g_bDisableAllInput)
+        return;
+
+    if (key > XR_CONTROLLER_BUTTON_INVALID && key < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardPress(key);
+        return;
+    }
+
+    /* avo: script callback */
+    if (g_actor)
+    {
+        g_actor->callback(GameObject::eControllerPress)(key, x, y);
+    }
+
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerPress(key, x, y))
+        return;
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused() && !IsDemoPlay())
+            return;
+    }
+
+    if (CURRENT_ENTITY())
+    {
+        IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
+        if (IR)
+            IR->IR_OnControllerPress(GetBindedAction(key), x, y);
+    }
+
 }
 
-void CLevel::IR_OnControllerRelease(int btn)
+void CLevel::IR_OnControllerRelease(int key, float x, float y)
 {
-    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
+    if (g_bDisableAllInput)
+        return;
+
+    if (key > XR_CONTROLLER_BUTTON_INVALID && key < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardRelease(key);
+        return;
+    }
+
+    /* avo: script callback */
+    if (g_actor)
+    {
+        g_actor->callback(GameObject::eControllerRelease)(key, x, y);
+    }
+
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerRelease(key, x, y))
+        return;
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused() && !IsDemoPlay())
+            return;
+    }
+
+    if (CURRENT_ENTITY())
+    {
+        IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
+        if (IR)
+            IR->IR_OnControllerRelease(GetBindedAction(key), x, y);
+    }
+}
+
+void CLevel::IR_OnControllerHold(int key, float x, float y)
+{
+    if (g_bDisableAllInput)
+        return;
+
+    if (key > XR_CONTROLLER_BUTTON_INVALID && key < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardHold(key);
+        return;
+    }
+
+    /* avo: script callback */
+    if (g_actor)
+    {
+        g_actor->callback(GameObject::eControllerHold)(key, x, y);
+    }
+
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerHold(key, x, y))
+        return;
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused() && !IsDemoPlay())
+            return;
+    }
+
+    if (CURRENT_ENTITY())
+    {
+        IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
+        if (IR)
+            IR->IR_OnControllerHold(GetBindedAction(key), x, y);
+    }
 }
 
 void CLevel::IR_OnActivate()

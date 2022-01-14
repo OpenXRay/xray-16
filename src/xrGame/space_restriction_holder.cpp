@@ -15,11 +15,6 @@
 #include "space_restriction_composition.h"
 #include "restriction_space.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 const u32 time_to_delete = 300000;
 
 CSpaceRestrictionHolder::~CSpaceRestrictionHolder() { clear(); }

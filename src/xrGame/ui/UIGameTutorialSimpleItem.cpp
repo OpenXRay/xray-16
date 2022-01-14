@@ -5,7 +5,7 @@
 #include "UIXmlInit.h"
 #include "Common/object_broker.h"
 #include "xrEngine/xr_input.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "UIGameSP.h"
 #include "Level.h"
 #include "UIPdaWnd.h"
@@ -258,7 +258,7 @@ void CUISequenceSimpleItem::Start()
 
         if (!ui_game_sp)
         {
-            Msg("!%s:: failed to get ui_game_sp", __FUNCTION__);
+            Msg("! %s:: failed to get ui_game_sp", __FUNCTION__);
             return;
         }
 
@@ -370,13 +370,10 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
 
 void CUISequenceSimpleItem::OnMousePress(int btn)
 {
-    int dik = 0;
-    switch (btn)
-    {
-    case 0: dik = MOUSE_1; break;
-    case 1: dik = MOUSE_2; break;
-    case 2: dik = MOUSE_3; break;
-    default: return;
-    }
-    OnKeyboardPress(dik);
+    OnKeyboardPress(btn);
+}
+
+void CUISequenceSimpleItem::OnControllerPress(int key)
+{
+    OnKeyboardPress(key);
 }

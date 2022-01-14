@@ -75,11 +75,6 @@ void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fv
     faces.push_back(T);
 }
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 #pragma pack(push, 1)
 struct edge
 {

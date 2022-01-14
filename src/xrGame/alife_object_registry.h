@@ -11,11 +11,6 @@
 #include "xrServer_Objects_ALife.h"
 #include "xrEngine/profiler.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 class CALifeObjectRegistry
 {
 public:

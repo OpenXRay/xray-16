@@ -9,7 +9,6 @@
 #include "game_sv_event_queue.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
-#include "string_table.h"
 #include "xrNetServer/NET_Messages.h"
 
 #include "debug_renderer.h"

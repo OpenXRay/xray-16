@@ -7,7 +7,7 @@
 #include "xrUICore/Cursor/UICursor.h"
 #include "UIGameCustom.h"
 #include "game_cl_deathmatch.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Level.h"
 #include "Common/object_broker.h"
 
@@ -231,9 +231,11 @@ bool CUISkinSelectorWnd::OnMouseAction(float x, float y, EUIMessages mouse_actio
 
 bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    auto action = GetBindedAction(dik);
+
     if (WINDOW_KEY_PRESSED != keyboard_action)
     {
-        if (dik == SDL_SCANCODE_TAB)
+        if (action == kSCORES)
         {
             ShowChildren(true);
             game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -244,7 +246,7 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (dik == SDL_SCANCODE_TAB)
+    if (action == kSCORES)
     {
         ShowChildren(false);
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -274,14 +276,27 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     //	game_cl_Deathmatch * dm = smart_cast<game_cl_Deathmatch *>(&(Game()));
 
-    switch (dik)
+    switch (action)
     {
-    case SDL_SCANCODE_ESCAPE: OnBtnCancel(); return true;
-    case SDL_SCANCODE_SPACE: // do autoselect
+    case kQUIT:
+        OnBtnCancel();
+        return true;
+
+    case kJUMP: // do autoselect
         m_iActiveIndex = -1;
-    case SDL_SCANCODE_RETURN: OnBtnOK(); return true;
-    case SDL_SCANCODE_LEFT: OnKeyLeft(); return true;
-    case SDL_SCANCODE_RIGHT: OnKeyRight(); return true;
+        [[fallthrough]];
+
+    case kENTER:
+        OnBtnOK();
+        return true;
+
+    case kLEFT:
+        OnKeyLeft();
+        return true;
+
+    case kRIGHT:
+        OnKeyRight();
+        return true;
     }
 
     return false;

@@ -7,7 +7,7 @@
 #include "Common/object_broker.h"
 #include "ai_sounds.h"
 #include "WeaponAmmo.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "game_object_space.h"
 
 void CCarWeapon::BoneCallbackX(CBoneInstance* B)

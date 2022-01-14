@@ -437,12 +437,29 @@ public:
     // User input/output
     //////////////////////////////////////////////////////////////////////////
 public:
+    void OnAxisMove(float x, float y, float scale, bool invert);
     virtual void IR_OnMouseMove(int x, int y);
+    virtual void IR_OnMouseWheel(int x, int y);
+
     virtual void IR_OnKeyboardPress(int dik);
     virtual void IR_OnKeyboardRelease(int dik);
     virtual void IR_OnKeyboardHold(int dik);
-    virtual void IR_OnMouseWheel(int x, int y);
+
+    void IR_OnControllerPress(int dik, float x, float y) override;
+    void IR_OnControllerRelease(int dik, float x, float y) override;
+    void IR_OnControllerHold(int dik, float x, float y) override;
+
     virtual float GetLookFactor();
+
+private:
+    struct controller_feedback
+    {
+        float high_freq;
+        float duration;
+        float submit_time;
+        float update_time;
+        bool needs_update;
+    } m_controller_feedback{};
 
 public:
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
@@ -687,9 +704,10 @@ public:
     virtual void OnPrevWeaponSlot();
     void SwitchNightVision();
     void SwitchTorch();
-#ifdef DEBUG
+
+#ifndef MASTER_GOLD
     void NoClipFly(int cmd);
-#endif // DEBUG
+#endif
 
 public:
     virtual void on_weapon_shot_start(CWeapon* weapon);

@@ -12,7 +12,6 @@
 #include "game_cl_base.h"
 #include "game_cl_mp.h"
 #include "xrEngine/XR_IOConsole.h"
-#include "string_table.h"
 #include "xrCore/xr_token.h"
 
 extern int g_sv_adm_menu_ping_limit;

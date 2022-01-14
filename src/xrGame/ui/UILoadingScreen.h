@@ -33,7 +33,7 @@ public:
 
     void Initialize() override;
 
-    void Show(bool status) override;
+    void Show(bool show) override;
     bool IsShown() override;
 
     void Update(const int stagesCompleted, const int stagesTotal) override;

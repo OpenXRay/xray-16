@@ -396,20 +396,39 @@ void CUIMMShniaga::OnBtnClick()
 
 bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (WINDOW_KEY_PRESSED == keyboard_action)
+    if (WINDOW_KEY_PRESSED == keyboard_action || WINDOW_KEY_HOLD == keyboard_action)
     {
-        switch (dik)
+        switch (GetBindedAction(dik))
         {
-        case SDL_SCANCODE_UP:
+        case kUP:
+        case kFWD:
+            if (WINDOW_KEY_HOLD == keyboard_action && !m_flags.test(fl_MovingStoped))
+                return true;
+
             if (m_selected_btn > 0)
                 SelectBtn(m_selected_btn - 1);
+            else
+                SelectBtn(BtnCount() - 1);
             return true;
-        case SDL_SCANCODE_DOWN:
+
+        case kDOWN:
+        case kBACK:
+            if (WINDOW_KEY_HOLD == keyboard_action && !m_flags.test(fl_MovingStoped))
+                return true;
+
             if (m_selected_btn < BtnCount() - 1)
                 SelectBtn(m_selected_btn + 1);
+            else
+                SelectBtn(0);
             return true;
-        case SDL_SCANCODE_RETURN: OnBtnClick(); return true;
-        case SDL_SCANCODE_ESCAPE:
+
+        case kENTER:
+        case kJUMP:
+        case kUSE:
+            OnBtnClick();
+            return true;
+
+        case kQUIT:
             if (m_page != epi_main)
                 ShowMain();
             return true;
@@ -417,6 +436,35 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     }
 
     return CUIWindow::OnKeyboardAction(dik, keyboard_action);
+}
+
+bool CUIMMShniaga::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (WINDOW_KEY_PRESSED == controller_action || WINDOW_KEY_HOLD == controller_action)
+    {
+        if (IsBinded(kMOVE_AROUND, axis) && !fis_zero(y))
+        {
+            if (!m_flags.test(fl_MovingStoped))
+                return true;
+
+            if (y < 0) // scroll up
+            {
+                if (m_selected_btn > 0)
+                    SelectBtn(m_selected_btn - 1);
+                else
+                    SelectBtn(BtnCount() - 1);
+            }
+            else // scroll down
+            {
+                if (m_selected_btn < BtnCount() - 1)
+                    SelectBtn(m_selected_btn + 1);
+                else
+                    SelectBtn(0);
+            }
+            return true;
+        }
+    }
+    return CUIWindow::OnControllerAction(axis, x, y, controller_action);
 }
 
 int CUIMMShniaga::BtnCount()

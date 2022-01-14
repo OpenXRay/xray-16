@@ -47,7 +47,7 @@
 #include "ai_debug.h"
 #endif // _EDITOR
 
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 u32 UIStyleID = 0;
 xr_vector<xr_token> UIStyleToken;
@@ -684,17 +684,21 @@ void CGamePersistent::OnFrame()
 
                     Actor()->Cameras().UpdateFromCamera(C);
                     Actor()->Cameras().ApplyDevice();
-#ifdef DEBUG
+
                     if (psActorFlags.test(AF_NO_CLIP))
                     {
+#ifdef DEBUG
                         Actor()->SetDbgUpdateFrame(0);
                         Actor()->GetSchedulerData().dbg_update_shedule = 0;
+#endif
                         Device.dwTimeDelta = 0;
                         Device.fTimeDelta = 0.01f;
                         Actor()->UpdateCL();
                         Actor()->shedule_Update(0);
+#ifdef DEBUG
                         Actor()->SetDbgUpdateFrame(0);
                         Actor()->GetSchedulerData().dbg_update_shedule = 0;
+#endif
 
                         CSE_Abstract* e = Level().Server->ID_to_entity(Actor()->ID());
                         VERIFY(e);
@@ -706,16 +710,19 @@ void CGamePersistent::OnFrame()
                             IGameObject* obj = Level().Objects.net_Find(*it);
                             if (obj && Engine.Sheduler.Registered(obj))
                             {
+#ifdef DEBUG
                                 obj->GetSchedulerData().dbg_update_shedule = 0;
                                 obj->SetDbgUpdateFrame(0);
+#endif
                                 obj->shedule_Update(0);
                                 obj->UpdateCL();
+#ifdef DEBUG
                                 obj->GetSchedulerData().dbg_update_shedule = 0;
                                 obj->SetDbgUpdateFrame(0);
+#endif
                             }
                         }
                     }
-#endif // DEBUG
                 }
             }
         }
@@ -896,7 +903,7 @@ void CGamePersistent::OnRenderPPUI_main()
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
-#include "string_table.h"
+
 #include "xrEngine/x_ray.h"
 void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
 {

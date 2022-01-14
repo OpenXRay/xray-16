@@ -22,7 +22,6 @@
 #include "game_news.h"
 #include "alife_time_manager.h"
 #include "alife_registry_wrappers.h"
-#include "string_table.h"
 #include "UINewsItemWnd.h"
 #include "xrEngine/xr_input.h"
 
@@ -356,25 +355,21 @@ bool CUILogsWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         break;
         }
     }
+    else if (keyboard_action == WINDOW_KEY_HOLD)
+    {
+        switch (dik)
+        {
+        case SDL_SCANCODE_UP:
+        case SDL_SCANCODE_DOWN:
+        case SDL_SCANCODE_PAGEUP:
+        case SDL_SCANCODE_PAGEDOWN:
+            on_scroll_keys(dik);
+            return true;
+        }
+    }
+
     m_ctrl_press = false;
     return inherited::OnKeyboardAction(dik, keyboard_action);
-}
-
-bool CUILogsWnd::OnKeyboardHold(int dik)
-{
-    switch (dik)
-    {
-    case SDL_SCANCODE_UP:
-    case SDL_SCANCODE_DOWN:
-    case SDL_SCANCODE_PAGEUP:
-    case SDL_SCANCODE_PAGEDOWN:
-    {
-        on_scroll_keys(dik);
-        return true;
-    }
-    break;
-    }
-    return inherited::OnKeyboardHold(dik);
 }
 
 void CUILogsWnd::on_scroll_keys(int dik)

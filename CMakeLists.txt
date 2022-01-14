@@ -38,27 +38,20 @@ elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
     set(PROJECT_PLATFORM_E2K TRUE)
 endif()
 
-if (NOT MASTER_GOLD)
-    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        set(MASTER_GOLD ON CACHE BOOL "" FORCE)
-    else()
-        set(MASTER_GOLD OFF CACHE BOOL "" FORCE)
-    endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(MASTER_GOLD_DEFAULT_VALUE ON)
+else()
+    set(MASTER_GOLD_DEFAULT_VALUE OFF)
 endif()
 
-if (NOT STATIC_BUILD)
-    if (MASTER_GOLD)
-        set(STATIC_BUILD ON CACHE BOOL "" FORCE)
-    else()
-        set(STATIC_BUILD OFF CACHE BOOL "" FORCE)
-    endif()
-endif()
-
+option(MASTER_GOLD "Build with MASTER_GOLD" ${MASTER_GOLD_DEFAULT_VALUE})
 message(STATUS "MASTER_GOLD: ${MASTER_GOLD}")
 if (MASTER_GOLD)
     add_definitions(-DMASTER_GOLD)
 endif()
 
+option(STATIC_BUILD "Use static build" ${MASTER_GOLD})
 message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
 if (STATIC_BUILD)
     # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
@@ -200,6 +193,8 @@ add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION 
 add_definitions(-DLUABIND_DYNAMIC_LINK) #self-explanatory
 add_definitions(-DdSINGLE) # for ODE and xrPhysics
 if (MASTER_GOLD)
+    add_definitions(-DLUABIND_NO_EXCEPTIONS)
+    add_definitions(-DLUABIND_NO_ERROR_CHECKING)
     add_definitions(-DdNODEBUG)
 endif()
 
@@ -207,18 +202,15 @@ set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
 if (NOT WIN32)
     find_package(GLEW REQUIRED)
-    find_package(FreeImage REQUIRED)
-    find_package(FreeImagePlus REQUIRED)
     find_package(OpenAL REQUIRED)
     if (USE_CRYPTOPP)
         find_package(Crypto++ REQUIRED)
     endif()
+    find_package(JPEG)
     find_package(Theora REQUIRED)
     find_package(Ogg REQUIRED)
     find_package(SDL REQUIRED)
     find_package(LZO REQUIRED)
-    find_package(JPEG REQUIRED)
-    find_package(PCRE REQUIRED)
 endif()
 
 # XXX: move to LuaJIT

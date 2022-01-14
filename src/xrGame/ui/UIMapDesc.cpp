@@ -9,7 +9,7 @@
 #include "Level.h"
 #include "game_cl_teamdeathmatch.h"
 #include "UIMapInfo.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "UIStatsPlayerList.h"
 
 CUIMapDesc::CUIMapDesc()
@@ -113,9 +113,11 @@ void CUIMapDesc::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 bool CUIMapDesc::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    auto action = GetBindedAction(dik);
+
     if (WINDOW_KEY_RELEASED == keyboard_action)
     {
-        if (dik == SDL_SCANCODE_TAB)
+        if (action == kSCORES)
         {
             ShowChildren(true);
             game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -126,7 +128,7 @@ bool CUIMapDesc::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (dik == SDL_SCANCODE_TAB)
+    if (action == kSCORES)
     {
         ShowChildren(false);
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -137,22 +139,20 @@ bool CUIMapDesc::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     game_cl_mp* dm = smart_cast<game_cl_mp*>(&(Game()));
 
-    switch (dik)
+    switch (action)
     {
-    case SDL_SCANCODE_ESCAPE:
+    case kQUIT:
         HideDialog();
         dm->OnSpectatorSelect();
         return true;
         break;
-    case SDL_SCANCODE_SPACE:
-    case SDL_SCANCODE_RETURN:
+
+    case kENTER:
+    case kJUMP:
         HideDialog();
         dm->OnMapInfoAccept();
         return true;
         break;
-    }
-    if (int x = sizeof x)
-    {
     }
 
     return false;

@@ -5,17 +5,17 @@
 
 using namespace XRay::Media;
 
-Image& Image::Create(u16 width, u16 height, void* data, ImageFormat format)
+Image& Image::Create(u16 width, u16 height, void* data, ImageDataFormat format)
 {
     this->width = width;
     this->height = height;
     this->data = data;
     this->format = format;
-    channelCount = format == ImageFormat::RGB8 ? 3 : 4;
+    channelCount = format == ImageDataFormat::RGB8 ? 3 : 4;
     return *this;
 }
 
-void Image::SaveTGA(const char* name, ImageFormat format, bool align)
+void Image::SaveTGA(const char* name, ImageDataFormat format, bool align)
 {
     FILE* file = std::fopen(name, "wb");
     auto writerFunc = [&](void* data, size_t dataSize) { std::fwrite(data, dataSize, 1, file); };
@@ -24,7 +24,7 @@ void Image::SaveTGA(const char* name, ImageFormat format, bool align)
 }
 
 void Image::SaveTGA(IWriter& writer, bool align) { SaveTGA(writer, format, align); }
-void Image::SaveTGA(IWriter& writer, ImageFormat format, bool align)
+void Image::SaveTGA(IWriter& writer, ImageDataFormat format, bool align)
 {
     auto writerFunc = [&](void* data, size_t dataSize) { writer.w(data, dataSize); };
     SaveTGA(writerFunc, format, align);
@@ -32,7 +32,7 @@ void Image::SaveTGA(IWriter& writer, ImageFormat format, bool align)
 
 void Image::SaveTGA(const char* name, bool align) { SaveTGA(name, format, align); }
 template <typename TWriter>
-void Image::SaveTGA(TWriter& writerFunc, ImageFormat format, bool align)
+void Image::SaveTGA(TWriter& writerFunc, ImageDataFormat format, bool align)
 {
     R_ASSERT(data);
     R_ASSERT(width);
@@ -44,7 +44,7 @@ void Image::SaveTGA(TWriter& writerFunc, ImageFormat format, bool align)
     int scanLength = width * channelCount;
     switch (format)
     {
-    case ImageFormat::RGB8:
+    case ImageDataFormat::RGB8:
     {
         hdr.BPP = 24;
         // XXX: generally should be set to zero
@@ -66,7 +66,7 @@ void Image::SaveTGA(TWriter& writerFunc, ImageFormat format, bool align)
         }
         break;
     }
-    case ImageFormat::RGBA8:
+    case ImageDataFormat::RGBA8:
     {
         hdr.BPP = 32;
         hdr.ImageDesc = 0x0f | 32;

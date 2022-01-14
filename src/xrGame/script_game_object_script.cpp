@@ -90,6 +90,9 @@ SCRIPT_EXPORT(CScriptGameObject, (), {
                 value("key_hold", int(GameObject::eKeyHold)),
                 value("mouse_move", int(GameObject::eMouseMove)),
                 value("mouse_wheel", int(GameObject::eMouseWheel)),
+                value("controller_press", int(GameObject::eControllerPress)),
+                value("controller_release", int(GameObject::eControllerRelease)),
+                value("controller_hold", int(GameObject::eControllerHold)),
                 // Inventory
                 value("item_to_belt", int(GameObject::eItemToBelt)),
                 value("item_to_slot", int(GameObject::eItemToSlot)),

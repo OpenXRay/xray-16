@@ -3,7 +3,6 @@
 #include "Cursor/UICursor.h"
 #include "Include/xrRender/DebugRender.h"
 #include "Include/xrRender/UIRender.h"
-#include "xrEngine/xr_input_xinput.h"
 
 xr_vector<Frect> g_wnds_rects;
 BOOL g_show_wnd_rect2 = FALSE;
@@ -369,13 +368,17 @@ bool CUIWindow::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIWindow::OnKeyboardHold(int dik)
+//реакция на геймпад
+bool CUIWindow::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
 {
     bool result;
 
+    //если есть дочернее окно,захватившее клавиатуру, то
+    //сообщение направляем ему сразу
+    // XXX: introduce m_pControllerCapturer?
     if (NULL != m_pKeyboardCapturer)
     {
-        result = m_pKeyboardCapturer->OnKeyboardHold(dik);
+        result = m_pKeyboardCapturer->OnControllerAction(axis, x, y, controller_action);
 
         if (result)
             return true;
@@ -387,13 +390,12 @@ bool CUIWindow::OnKeyboardHold(int dik)
     {
         if ((*it)->IsEnabled())
         {
-            result = (*it)->OnKeyboardHold(dik);
+            result = (*it)->OnControllerAction(axis, x, y, controller_action);
 
             if (result)
                 return true;
         }
     }
-
     return false;
 }
 

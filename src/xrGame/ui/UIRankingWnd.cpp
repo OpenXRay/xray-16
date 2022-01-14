@@ -21,7 +21,6 @@
 #include "character_community.h"
 #include "character_reputation.h"
 #include "relation_registry.h"
-#include "string_table.h"
 #include "UICharacterInfo.h"
 #include "xrUICore/ui_base.h"
 

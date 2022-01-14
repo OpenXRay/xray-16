@@ -3,12 +3,6 @@
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#include <FreeImage/FreeImagePlus.h>
-#else
-#include <FreeImagePlus.h>
-#endif
-
 #if defined(USE_DX11)
 #include "d3dx11tex.h"
 #endif
@@ -242,7 +236,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         u32* data = (u32*)xr_malloc(Device.dwHeight * Device.dwHeight * 4);
         imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)D.pBits, Device.dwWidth, Device.dwHeight, imf_lanczos3);
         Image img;
-        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageFormat::RGBA8);
+        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageDataFormat::RGBA8);
         img.SaveTGA(*fs, true);
         xr_free(data);
         FS.w_close(fs);
@@ -408,7 +402,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         HW.pContext->Unmap(pTex, 0);
 
         Image img;
-        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageFormat::RGBA8);
+        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageDataFormat::RGBA8);
         img.SaveTGA(*fs, true);
         xr_free(data);
         FS.w_close(fs);
@@ -419,103 +413,46 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     _RELEASE(pSrcTexture);
 }
 #elif defined(USE_OGL)
-bool CreateImage(fipMemoryIO& output, FREE_IMAGE_FORMAT format, u8*& buffer, DWORD& bufferSize, bool gamesave = false)
-{
-    const u32 width = psDeviceMode.Width;
-    const u32 height = psDeviceMode.Height;
-
-    constexpr u32 colorMode = 3;
-    constexpr u8 bits = 24;
-    const size_t bitsSize = width * height * colorMode;
-
-    const u8 tgaHeader[12] = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    const u8 header[6] =
-    {
-        u8(width % 256),  u8(width / 256),
-        u8(height % 256), u8(height / 256),
-        bits, 0
-    };
-
-    const size_t headerSize = sizeof(tgaHeader) + sizeof(header);
-
-    xr_vector<u8> pixels;
-    pixels.resize(bitsSize + headerSize);
-
-    for (size_t i = 0; i < sizeof(tgaHeader); i++)
-        pixels[i] = tgaHeader[i];
-
-    for (size_t i = 0; i < sizeof(header); i++)
-        pixels[sizeof(tgaHeader) + i] = header[i];
-
-    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data() + headerSize);
-
-    // TGA format used BGR instead of RGB
-    for (size_t i = headerSize; i < bitsSize + headerSize; i += colorMode)
-        std::swap(pixels[i], pixels[i + 2]);
-
-    fipMemoryIO tmpMemFile(pixels.data(), pixels.size());
-
-    fipImage image{ FIT_BITMAP, width, height, u32(bits) };
-    image.loadFromMemory(tmpMemFile);
-
-    if (image.isValid())
-    {
-        bool result = true;
-        if (gamesave)
-            result = image.rescale(GAMESAVE_SIZE, GAMESAVE_SIZE, FILTER_LANCZOS3);
-
-        return result && image.saveToMemory(format, output) && output.acquire(&buffer, &bufferSize);
-    }
-
-    return false;
-}
-
 // XXX: Provide full implementation
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
-    u8* buffer;
-    DWORD bufferSize;
-    fipMemoryIO output;
-    IWriter* fs = nullptr;
+    UNUSED(memory_writer);
 
     switch (mode)
     {
     case SM_NORMAL:
     {
         pcstr extension = "jpg";
-        FREE_IMAGE_FORMAT format = FIF_JPEG;
-        if (strstr(Core.Params, "-ss_png"))
-        {
-            extension = "png";
-            format = FIF_PNG;
-        }
 
         string64 time;
         string_path buf;
         xr_sprintf(buf, sizeof(buf), "ss_%s_%s_(%s).%s", Core.UserName, timestamp(time),
             g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu", extension);
 
-        if (CreateImage(output, format, buffer, bufferSize))
-            fs = FS.w_open("$screenshots$", buf);
+        IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
+
+        xr_vector<u8> pixels;
+        pixels.resize(Device.dwWidth * Device.dwHeight * 3);
+
+        glReadPixels(0, 0, Device.dwWidth, Device.dwHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+        Image img;
+        img.Create(u16(Device.dwWidth), u16(Device.dwHeight), pixels.data(), ImageDataFormat::RGB8);
+        if (!img.SaveJPEG(*fs, 100, true))
+            Log("! Failed to make a screenshot.");
+
+        FS.w_close(fs);
         break;
-    }
-    case SM_FOR_GAMESAVE:
-    {
-        if (CreateImage(output, FIF_DDS, buffer, bufferSize, true))
-            fs = FS.w_open(name);
-        break;
-    }
-    default: VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
     }
 
-    if (fs)
-    {
-        fs->w(buffer, bufferSize);
-        FS.w_close(fs);
+    case SM_FOR_GAMESAVE:
+        // XXX: Implement
+        break;
+
+    default:
+        VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
     }
-    else
-        Log("! Failed to make a screenshot");
 }
 #else
 #   error No graphics API selected or enabled!

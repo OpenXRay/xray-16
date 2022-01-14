@@ -4,7 +4,6 @@
 #include "Cursor/UICursor.h"
 #include "xrEngine/xr_input.h"
 #include "Windows/UIWindow.h"
-#include "xrEngine/xr_input_xinput.h"
 
 #define PUSH_OFFSET_RIGHT 1
 #define PUSH_OFFSET_DOWN 1

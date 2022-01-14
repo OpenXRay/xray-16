@@ -142,6 +142,9 @@
     <Filter Include="Game API\StringTable">
       <UniqueIdentifier>{948b4643-0f42-4027-ac44-dbe3702887f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game API\Level Controller">
+      <UniqueIdentifier>{680dcf81-2df9-4006-b22b-17db9cf15ad3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -381,17 +384,14 @@
     <ClInclude Include="Stats.h">
       <Filter>Rendering Device</Filter>
     </ClInclude>
-    <ClInclude Include="xr_input_xinput.h">
-      <Filter>Interfaces\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="StringTable\IStringTable.h">
-      <Filter>Game API\StringTable</Filter>
-    </ClInclude>
-    <ClInclude Include="StringTable\IStringTableDefs.h">
+    <ClInclude Include="StringTable\StringTable.h">
       <Filter>Game API\StringTable</Filter>
     </ClInclude>
     <ClInclude Include="embedded_resources_management.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_level_controller.h">
+      <Filter>Game API\Level Controller</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -623,14 +623,14 @@
     <ClCompile Include="Stats.cpp">
       <Filter>Rendering Device</Filter>
     </ClCompile>
-    <ClCompile Include="xr_input_xinput.cpp">
-      <Filter>Interfaces\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="StringTable\IStringTable.cpp">
+    <ClCompile Include="StringTable\StringTable.cpp">
       <Filter>Game API\StringTable</Filter>
     </ClCompile>
     <ClCompile Include="Device_mode.cpp">
       <Filter>Rendering Device</Filter>
+    </ClCompile>
+    <ClCompile Include="xr_level_controller.cpp">
+      <Filter>Game API\Level Controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

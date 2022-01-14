@@ -93,7 +93,7 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
             if (!FS.exist(fn, "$game_meshes$", name))
             {
 #ifdef _EDITOR
-                Msg("!Can't find model file '%s'.", name);
+                Msg("! Can't find model file '%s'.", name);
                 return 0;
 #else
                 xrDebug::Fatal(DEBUG_INFO, "Can't find model file '%s'.", name);

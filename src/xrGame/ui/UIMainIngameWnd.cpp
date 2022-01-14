@@ -30,7 +30,6 @@
 #include "UIPdaMsgListItem.h"
 #include "UIPdaWnd.h"
 #include "alife_registry_wrappers.h"
-#include "string_table.h"
 #ifdef DEBUG
 #include "attachable_item.h"
 #include "xrEngine/xr_input.h"
@@ -827,7 +826,7 @@ void CUIMainIngameWnd::UpdateQuickSlots()
         pcstr str = StringTable().translate(tmp).c_str();
         strncpy_s(tmp, sizeof(tmp), str, 3);
         if (tmp[2] == ',')
-            tmp[1] = '\0';
+            tmp[2] = '\0';
         slot->SetTextST(tmp);
         ++i;
     }

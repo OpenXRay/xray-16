@@ -1228,9 +1228,6 @@
     <Filter Include="Core\Client\Level\LevelNetworkDemo">
       <UniqueIdentifier>{d79d3201-de20-4eb4-88ed-e76454a00fde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Level Controller">
-      <UniqueIdentifier>{488043bb-30c6-4821-b111-b31aabf92136}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Level Debug">
       <UniqueIdentifier>{dd7f6a82-3b47-4884-831a-9a03b196b28c}</UniqueIdentifier>
     </Filter>
@@ -1740,9 +1737,6 @@
     </Filter>
     <Filter Include="Core\Common\SmartCast">
       <UniqueIdentifier>{e7bec78e-5e80-44b6-8e48-6b6f965e6dde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Common\StringTable">
-      <UniqueIdentifier>{22979b2b-2fb5-4c33-8c62-9462ec6ec171}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Common\Registry">
       <UniqueIdentifier>{9465b693-0ca7-42b5-bd72-821076494f14}</UniqueIdentifier>
@@ -4740,9 +4734,6 @@
     <ClInclude Include="Message_Filter.h">
       <Filter>Core\Client\Level\LevelNetworkDemo</Filter>
     </ClInclude>
-    <ClInclude Include="xr_level_controller.h">
-      <Filter>Core\Client\Level Controller</Filter>
-    </ClInclude>
     <ClInclude Include="level_debug.h">
       <Filter>Core\Client\Level Debug</Filter>
     </ClInclude>
@@ -5489,9 +5480,6 @@
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\smart_cast_impl2.h">
       <Filter>Core\Common\SmartCast</Filter>
-    </ClInclude>
-    <ClInclude Include="string_table.h">
-      <Filter>Core\Common\StringTable</Filter>
     </ClInclude>
     <ClInclude Include="RegistryFuncs.h">
       <Filter>Core\Common\Registry</Filter>
@@ -8036,9 +8024,6 @@
     <ClCompile Include="Message_Filter.cpp">
       <Filter>Core\Client\Level\LevelNetworkDemo</Filter>
     </ClCompile>
-    <ClCompile Include="xr_level_controller.cpp">
-      <Filter>Core\Client\Level Controller</Filter>
-    </ClCompile>
     <ClCompile Include="level_debug.cpp">
       <Filter>Core\Client\Level Debug</Filter>
     </ClCompile>
@@ -8764,9 +8749,6 @@
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\smart_cast_stats.cpp">
       <Filter>Core\Common\SmartCast</Filter>
-    </ClCompile>
-    <ClCompile Include="string_table.cpp">
-      <Filter>Core\Common\StringTable</Filter>
     </ClCompile>
     <ClCompile Include="RegistryFuncs.cpp">
       <Filter>Core\Common\Registry</Filter>

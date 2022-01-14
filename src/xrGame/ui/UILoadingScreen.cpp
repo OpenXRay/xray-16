@@ -118,9 +118,15 @@ void UILoadingScreen::SetStageTip(const char* header, const char* tipNumber, con
         loadingTip->SetText(tip);
 }
 
-void UILoadingScreen::Show(bool status)
+void UILoadingScreen::Show(bool show)
 {
-    CUIWindow::Show(status);
+    CUIWindow::Show(show);
+    if (!show)
+    {
+        loadingLogo->GetStaticItem()->GetShader()->destroy();
+        loadingStage->SetText(nullptr);
+        SetStageTip(nullptr, nullptr, nullptr);
+    }
 }
 
 bool UILoadingScreen::IsShown()

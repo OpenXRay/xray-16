@@ -4,8 +4,7 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIEditKeyBind.h"
 #include "xrUICore/ScrollView/UIScrollView.h"
-#include "xr_level_controller.h"
-#include "string_table.h"
+#include "xrEngine/xr_level_controller.h"
 
 CUIKeyBinding::CUIKeyBinding() : m_isGamepadBinds(false)
 {
@@ -38,7 +37,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
 {
     string256 buf;
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_keybinding.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, m_isGamepadBinds ? "ui_keybinding_gamepad.xml" : "ui_keybinding.xml");
 
     int groupsCount = xml_doc.GetNodesNum("", 0, "group");
 
@@ -90,7 +89,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
             if (!m_isGamepadBinds)
                 editKB->AssignProps(exe, "key_binding");
             else
-                editKB->AssignProps(exe, "key_binding_gpad");
+                editKB->AssignProps(exe, "key_binding_gamepad");
             item->AttachChild(editKB);
 
             if (!m_isGamepadBinds)

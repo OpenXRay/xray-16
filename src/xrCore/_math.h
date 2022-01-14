@@ -28,7 +28,3 @@ XRCORE_API u32 GetCurrentCPU();
 
 extern XRCORE_API void _initialize_cpu();
 extern XRCORE_API void _initialize_cpu_thread();
-
-#if defined(XR_PLATFORM_LINUX)
-XRCORE_API u32 timeGetTime();
-#endif

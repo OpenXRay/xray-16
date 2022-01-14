@@ -159,8 +159,9 @@ public:
 
     void IR_OnTextInput(pcstr text) override;
 
-    void IR_OnControllerPress(int btn) override;
-    void IR_OnControllerRelease(int btn) override;
+    void IR_OnControllerPress(int dik, float x, float y) override;
+    void IR_OnControllerRelease(int dik, float x, float y) override;
+    void IR_OnControllerHold(int dik, float x, float y) override;
 
     bool OnRenderPPUI_query();
     void OnRenderPPUI_main();

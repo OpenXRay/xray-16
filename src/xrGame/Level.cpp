@@ -832,7 +832,7 @@ void CLevel::make_NetCorrectionPrediction()
     physics_world()->StepsNum() -= m_dwNumSteps;
     if (ph_console::g_bDebugDumpPhysicsStep && m_dwNumSteps > 10)
     {
-        Msg("!!!TOO MANY PHYSICS STEPS FOR CORRECTION PREDICTION = %d !!!", m_dwNumSteps);
+        Msg("!!! TOO MANY PHYSICS STEPS FOR CORRECTION PREDICTION = %d !!!", m_dwNumSteps);
         m_dwNumSteps = 10;
     }
     physics_world()->Freeze();

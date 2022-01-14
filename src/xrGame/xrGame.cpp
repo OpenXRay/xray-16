@@ -9,13 +9,15 @@
 #include "StdAfx.h"
 #include "object_factory.h"
 #include "xrUICore/XML/xrUIXmlParser.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/profiler.h"
 
 extern void FillUIStyleToken();
 extern void CleanupUIStyleToken();
 
 void CCC_RegisterCommands();
+
+extern float g_fTimeFactor;
 
 extern "C"
 {
@@ -35,6 +37,8 @@ extern "C"
 
     XR_EXPORT void initialize_library()
     {
+        g_fTimeFactor = pSettings->r_float("alife", "time_factor"); // XXX: find a better place
+
         // Fill ui style token
         FillUIStyleToken();
         // register console commands
@@ -44,13 +48,11 @@ extern "C"
 #ifdef DEBUG
         g_profiler = xr_new<CProfiler>();
 #endif
-        gStringTable = xr_new<CStringTable>();
         StringTable().Init();
     }
 
     XR_EXPORT void finalize_library()
     {
         CleanupUIStyleToken();
-        xr_delete(gStringTable);
     }
 }

@@ -37,12 +37,12 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/Externals
+    ${JPEG_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    jpeg
+    ${JPEG_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}

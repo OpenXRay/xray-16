@@ -301,14 +301,14 @@ void CPHSkeleton::PHSplit()
     u16 spawned = u16(m_unsplited_shels.size());
     PPhysicsShellHolder()->PPhysicsShell()->SplitProcess(m_unsplited_shels);
     u16 i = u16(m_unsplited_shels.size()) - spawned;
-    //	Msg("%o,spawned,%d",this,i);
+    //	Msg("%o, spawned, %u", this, i);
     for (; i; --i)
         SpawnCopy();
 }
 
 void CPHSkeleton::UnsplitSingle(CPHSkeleton* SO)
 {
-    // Msg("%o,received has %d,",this,m_unsplited_shels.size());
+    // Msg("%o, received has %u", this, m_unsplited_shels.size());
     if (0 == m_unsplited_shels.size())
         return; //. hack
     CPhysicsShellHolder* obj = PPhysicsShellHolder();

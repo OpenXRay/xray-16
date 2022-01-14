@@ -17,18 +17,20 @@ void CUIDialogWnd::Show(bool status)
         ResetAll();
 }
 
-bool CUIDialogWnd::OnKeyboardHold(int dik)
-{
-    if (!IR_process())
-        return false;
-    return inherited::OnKeyboardHold(dik);
-}
-
 bool CUIDialogWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (!IR_process())
         return false;
     if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+    return false;
+}
+
+bool CUIDialogWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (!IR_process())
+        return false;
+    if (inherited::OnControllerAction(axis, x, y, controller_action))
         return true;
     return false;
 }

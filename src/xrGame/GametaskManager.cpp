@@ -13,11 +13,6 @@
 #include "ui/UIMapWnd.h"
 #include "xrCore/buffer_vector.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 TASK_ID g_active_task_id[eTaskTypeCount];
 
 struct FindTaskByID

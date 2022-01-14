@@ -5,7 +5,7 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/CameraManager.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrUICore/XML/UITextureMaster.h"
 #include "ui/UIXmlInit.h"
 #include "SDL.h"
@@ -17,7 +17,6 @@
 #include "xrGameSpy/GameSpy_Browser.h"
 #include "xrGameSpy/xrGameSpy.h"
 #include "CdkeyDecode/cdkeydecode.h"
-#include "string_table.h"
 #include "xrCore/os_clipboard.h"
 #include "xrGame/game_type.h"
 
@@ -294,7 +293,7 @@ void CMainMenu::Activate(bool bActivate)
            if we are in main menu and game level exist
 
            The first time is normal reset
-           The second one happens when 
+           The second one happens when
            we are closing main menu
 
            Probable reason is that level needs to be precached
@@ -348,7 +347,7 @@ void CMainMenu::IR_OnMousePress(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardPress(MouseButtonToKey[btn]);
+    IR_OnKeyboardPress(btn);
 };
 
 void CMainMenu::IR_OnMouseRelease(int btn)
@@ -356,7 +355,7 @@ void CMainMenu::IR_OnMouseRelease(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardRelease(MouseButtonToKey[btn]);
+    IR_OnKeyboardRelease(btn);
 };
 
 void CMainMenu::IR_OnMouseHold(int btn)
@@ -364,7 +363,7 @@ void CMainMenu::IR_OnMouseHold(int btn)
     if (!IsActive())
         return;
 
-    IR_OnKeyboardHold(MouseButtonToKey[btn]);
+    IR_OnKeyboardHold(btn);
 };
 
 void CMainMenu::IR_OnMouseMove(int x, int y)
@@ -382,7 +381,8 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     if (!IsActive())
         return;
 
-    if (IsBinded(kCONSOLE, dik))
+    auto action = GetBindedAction(dik);
+    if (action == kCONSOLE)
     {
         Console->Show();
         return;
@@ -396,7 +396,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         Device.SetWindowDraggable(true);
     }
 
-    if (SDL_SCANCODE_F12 == dik)
+    if (action == kSCREENSHOT)
     {
         GEnv.Render->Screenshot();
         return;
@@ -445,20 +445,43 @@ void CMainMenu::IR_OnMouseWheel(int x, int y)
     CDialogHolder::IR_UIOnMouseWheel(x, y);
 }
 
-void CMainMenu::IR_OnControllerPress(int btn)
+void CMainMenu::IR_OnControllerPress(int dik, float x, float y)
 {
     if (!IsActive())
         return;
 
-    IR_OnKeyboardPress(ControllerButtonToKey[btn]);
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardPress(dik);
+        return;
+    }
+    CDialogHolder::IR_UIOnControllerPress(dik, x, y);
 }
 
-void CMainMenu::IR_OnControllerRelease(int btn)
+void CMainMenu::IR_OnControllerRelease(int dik, float x, float y)
 {
     if (!IsActive())
         return;
 
-    IR_OnKeyboardRelease(ControllerButtonToKey[btn]);
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardRelease(dik);
+        return;
+    }
+    CDialogHolder::IR_UIOnControllerRelease(dik, x, y);
+}
+
+void CMainMenu::IR_OnControllerHold(int dik, float x, float y)
+{
+    if (!IsActive())
+        return;
+
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        IR_OnKeyboardHold(dik);
+        return;
+    }
+    CDialogHolder::IR_UIOnControllerHold(dik, x, y);
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }

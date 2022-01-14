@@ -176,7 +176,7 @@ void CUIDragDropReferenceList::UpdateLabels()
         pcstr str = StringTable().translate(tmp).c_str();
         strncpy_s(tmp, sizeof(tmp), str, 3);
         if (tmp[2] == ',')
-            tmp[1] = '\0';
+            tmp[2] = '\0';
         m_labels[i]->SetTextST(tmp);
     }
 }

@@ -9,7 +9,6 @@
 #include "pch_script.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "string_table.h"
 
 #include "inventory_upgrade_property.h"
 #include "inventory_upgrade_manager.h"

@@ -10,7 +10,7 @@
 #include "ai/monsters/control_movement_base.h"
 #include "ai/monsters/ai_monster_effector.h"
 #include "xrEngine/CameraBase.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "detail_path_manager_space.h"
 #include "detail_path_manager.h"
 #include "CharacterPhysicsSupport.h"

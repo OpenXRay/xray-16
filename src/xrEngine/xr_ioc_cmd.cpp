@@ -204,7 +204,7 @@ public:
             Msg("Config-file [%s] saved successfully", cfg_full_name);
         }
         else
-            Msg("!Cannot store config file [%s]", cfg_full_name);
+            Msg("! Cannot store config file [%s]", cfg_full_name);
     }
 };
 CCC_LoadCFG::CCC_LoadCFG(pcstr N) : IConsole_Command(N){};
@@ -836,6 +836,12 @@ void CCC_Register()
     CMD3(CCC_Mask, "mouse_invert", &psMouseInvert, 1);
     psMouseSens = 0.12f;
     CMD4(CCC_Float, "mouse_sens", &psMouseSens, 0.001f, 0.6f);
+
+    // Gamepad
+    psControllerSens = 0.12f;
+    CMD4(CCC_Float, "gamepad_sens", &psControllerSens, 0.001f, 0.6f);
+    psControllerDeadZoneSens = 15.f;
+    CMD4(CCC_Float, "gamepad_deadzone_sens", &psControllerDeadZoneSens, 1.f, 35.f);
 
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);

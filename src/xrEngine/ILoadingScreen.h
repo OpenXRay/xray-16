@@ -15,7 +15,7 @@ public:
 
     virtual void Initialize() = 0;
 
-    virtual void Show(bool status) = 0;
+    virtual void Show(bool show) = 0;
     virtual bool IsShown() = 0;
 
     virtual void Update(int stagesCompleted, int stagesTotal) = 0;

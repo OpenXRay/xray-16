@@ -10,13 +10,6 @@
 #endif
 
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-#include <x86intrin.h> // __rdtsc
-#elif defined(XR_ARCHITECTURE_ARM)
-#include <sys/syscall.h>
-#include <linux/perf_event.h>
-#endif // defined(XR_ARCHITECTURE_ARM)
-
 #ifdef XR_PLATFORM_LINUX
 #include <fpu_control.h>
 #elif defined(XR_PLATFORM_FREEBSD)
@@ -39,7 +32,6 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <string>
 #include <stdint.h>
 #include <string.h>
-#include <pcre.h>
 #include <iostream>
 #endif
 #include <thread>
@@ -66,13 +58,6 @@ typedef struct _PROCESSOR_POWER_INFORMATION
 XRCORE_API Fmatrix Fidentity;
 XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
-
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-u32 timeGetTime()
-{
-    return SDL_GetTicks();
-}
-#endif
 
 /*
 Функции управления точностью вычислений с плавающей точкой.
@@ -231,51 +216,36 @@ bool g_initialize_cpu_called = false;
 #if defined(XR_PLATFORM_LINUX)
 u32 cpufreq()
 {
-    u32 cpuFreq = 0;
-#if defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_ARM)
-    xr_string parcedFreq;
     std::ifstream cpuMaxFreq("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
     if (cpuMaxFreq.is_open())
     {
-        getline(cpuMaxFreq, parcedFreq);
-        cpuFreq = atol(parcedFreq.c_str()) / 1000;
+        xr_string parcedFreq;
+        std::getline(cpuMaxFreq, parcedFreq);
+        u32 cpuFreq = atoi(parcedFreq.c_str()) / 1000;
+        if (cpuFreq > 0)
+            return cpuFreq;
     }
-#else
+
+    u32 cpuFreq{};
+
     // CPU frequency is stored in /proc/cpuinfo in lines beginning with "cpu MHz"
-    pcstr pattern = "^cpu MHz\\s*:\\s*(\\d+)";
-    pcstr pcreErrorStr = nullptr;
-    int pcreErrorOffset = 0;
-
-    pcre* reCompiled = pcre_compile(pattern, PCRE_ANCHORED, &pcreErrorStr, &pcreErrorOffset, nullptr);
-    if(reCompiled == nullptr)
-    {
-        return 0;
-    }
-
     std::ifstream ifs("/proc/cpuinfo");
-    if(ifs.is_open())
+    if (ifs.is_open())
     {
         xr_string line;
-        int results[10];
-        while(ifs.good())
+        while (ifs.good())
         {
             std::getline(ifs, line);
-            int rc = pcre_exec(reCompiled, 0, line.c_str(), line.length(), 0, 0, results, sizeof(results)/sizeof(results[0]));
-            if(rc < 0)
+
+            const int result = sscanf(line.c_str(), "cpu MHz : %u", &cpuFreq);
+            if (result == 0)
                 continue;
-            // Match found - extract frequency
-            pcstr matchStr = nullptr;
-            pcre_get_substring(line.c_str(), results, rc, 1, &matchStr);
-            R_ASSERT(matchStr);
-            cpuFreq = atol(matchStr);
-            pcre_free_substring(matchStr);
+
+            // success or failure
             break;
         }
-        ifs.close();
     }
 
-    pcre_free(reCompiled);
-#endif
     return cpuFreq;
 }
 #elif defined(XR_PLATFORM_FREEBSD)
@@ -286,6 +256,11 @@ u32 cpufreq()
 
     sysctlbyname("dev.cpu.0.freq", &cpuFreq, &cpuFreqSz, nullptr, 0);
     return cpuFreq;
+}
+#else
+ICF u32 cpufreq()
+{
+    return 0;
 }
 #endif // #ifdef XR_PLATFORM_LINUX
 
@@ -350,7 +325,9 @@ void _initialize_cpu()
             i, cpuInfo.CurrentMhz, cpuInfo.MaxMhz);
     }
 #else
-    Msg("* CPU current freq: %u MHz", cpufreq());
+    const auto freq =  cpufreq();
+    if (freq > 0)
+        Msg("* CPU current freq: %u MHz", freq);
 #endif
     Log("");
     Fidentity.identity(); // Identity matrix

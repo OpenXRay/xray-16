@@ -6,7 +6,7 @@
 #include "Inventory.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "Weapon.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "eatable_item_object.h"
 #include "Missile.h"
 

@@ -10,7 +10,7 @@
 #include "object_actions.h"
 #include "Inventory.h"
 #include "ai/stalker/ai_stalker.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrMessages.h"
 #include "FoodItem.h"
 #include "Weapon.h"

@@ -535,7 +535,8 @@ void xrCover(bool pure_covers)
         g_cover_nodes.assign(g_nodes.size(), true);
 
     // Start threads, wait, continue --- perform all the work
-    u32 start_time = timeGetTime();
+    CTimer timer;
+    timer.Start();
     CThreadManager Threads(ProxyStatus, ProxyProgress);
     u32 stride = g_nodes.size() / NUM_THREADS;
     u32 last = g_nodes.size() - stride * (NUM_THREADS - 1);
@@ -543,7 +544,7 @@ void xrCover(bool pure_covers)
         Threads.start(
             xr_new<CoverThread>(thID, thID * stride, thID * stride + ((thID == (NUM_THREADS - 1)) ? last : stride)));
     Threads.wait();
-    Logger.clMsg("%d seconds elapsed.", (timeGetTime() - start_time) / 1000);
+    Logger.clMsg("%f seconds elapsed.", timer.GetElapsed_sec());
 
     if (!pure_covers)
     {

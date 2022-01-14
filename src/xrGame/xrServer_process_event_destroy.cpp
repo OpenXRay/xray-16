@@ -36,7 +36,7 @@ void xrServer::Process_event_destroy(NET_Packet& P, ClientID sender, u32 time, u
     if (!e_dest)
     {
 #ifndef MASTER_GOLD
-        Msg("!SV:ge_destroy: [%d] not found on server", id_dest);
+        Msg("! SV:ge_destroy: [%d] not found on server", id_dest);
 #endif // #ifndef MASTER_GOLD
         return;
     };

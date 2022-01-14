@@ -12,7 +12,6 @@
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "ai_space.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "string_table.h"
 #include "Common/object_broker.h"
 #include "xrEngine/Engine.h"
 #include "xrEngine/GameFont.h"
@@ -24,11 +23,6 @@
 #include "xrServer_info.h"
 #include "xrNetServer/NET_Messages.h"
 #include <functional>
-
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
 
 xrClientData::xrClientData() : IClient(Device.GetTimerGlobal())
 {

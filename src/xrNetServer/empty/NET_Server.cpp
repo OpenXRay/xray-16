@@ -352,7 +352,7 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
 void IPureServer::Flush_Clients_Buffers()
 {
 #if NET_LOG_PACKETS
-    Msg("#flush server send-buf");
+    Msg("# flush server send-buf");
 #endif
 
     struct LocalSenderFunctor {

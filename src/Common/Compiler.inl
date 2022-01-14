@@ -72,14 +72,12 @@
 #       error Please disable exceptions...
 #   endif
 #   define XRAY_EXCEPTIONS 0
-#   define LUABIND_NO_EXCEPTIONS
 #else
 //  release, debug or mixed
 #   if !defined(__cpp_exceptions)
 #       error Please enable exceptions...
 #   endif
 #   define XRAY_EXCEPTIONS 1
-#   define LUABIND_FORCE_ENABLE_EXCEPTIONS // XXX: add this to luabind, because it automatically defines LUABIND_NO_EXCEPTIONS when NDEBUG is defined
 #endif
 
 #ifndef _MT
@@ -93,6 +91,7 @@
 // We use xr_* instead of defining e.g. strupr => _strupr, since the macro definition could
 // come before the std. header file declaring it, and thereby renaming that one too.
 #ifdef _MSC_VER
+#include <malloc.h>
 #define xr_alloca _alloca
 #define xr_strupr _strupr
 #define xr_strlwr _strlwr

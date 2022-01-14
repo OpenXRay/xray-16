@@ -386,7 +386,7 @@ void CArtefact::UpdateXForm()
         XFORM().mul(mRes, offset());
     }
 }
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 bool CArtefact::Action(u16 cmd, u32 flags)
 {
     switch (cmd)

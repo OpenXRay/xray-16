@@ -1,6 +1,5 @@
 #pragma once
-#ifndef TYPES_H
-#define TYPES_H
+
 #include <cstdint>
 #include <limits>
 
@@ -76,11 +75,3 @@ using string2048 = char[2048];
 using string4096 = char[4096];
 
 using string_path = char[2 * max_path];
-
-// XXX: Replace __interface with either struct or class. MS defines it as struct for COM, but this project is C++.
-#if defined(XR_PLATFORM_WINDOWS)
-#define xr_pure_interface __interface
-#elif defined(XR_PLATFORM_LINUX)
-#define xr_pure_interface struct
-#endif
-#endif

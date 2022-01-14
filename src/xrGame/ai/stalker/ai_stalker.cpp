@@ -22,7 +22,7 @@
 #include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "cover_evaluators.h"
 #include "xrServer.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrServerEntities/character_info.h"
 #include "Actor.h"

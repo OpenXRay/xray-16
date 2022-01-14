@@ -9,6 +9,16 @@
 class ENGINE_API CDemoRecord : public CEffectorCam, public IInputReceiver, public pureRender
 {
 private:
+    enum movement_speed
+    {
+        speed_0,
+        speed_1,
+        speed_2,
+        speed_3,
+    };
+    movement_speed m_speed;
+    movement_speed m_angle_speed;
+
     static struct force_position
     {
         bool set_position;
@@ -53,10 +63,17 @@ public:
     CDemoRecord(const char* name, float life_time = 60 * 60 * 1000);
     virtual ~CDemoRecord();
 
-    virtual void IR_OnKeyboardPress(int dik);
-    virtual void IR_OnKeyboardHold(int dik);
+    void OnAxisMove(float x, float y, float scale, bool invert);
     virtual void IR_OnMouseMove(int dx, int dy);
     virtual void IR_OnMouseHold(int btn);
+
+    virtual void IR_OnKeyboardPress(int dik);
+    virtual void IR_OnKeyboardHold(int dik);
+    virtual void IR_OnKeyboardRelease(int dik);
+
+    void IR_OnControllerPress(int key, float x, float y) override;
+    void IR_OnControllerHold(int key, float x, float y) override;
+    void IR_OnControllerRelease(int key, float x, float y) override;
 
     virtual bool ProcessCam(SCamEffectorInfo& info);
     static void SetGlobalPosition(const Fvector& p) { g_position.p.set(p), g_position.set_position = true; }

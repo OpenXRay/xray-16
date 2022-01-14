@@ -13,7 +13,6 @@
 #include "xrCore/Text/StringConversion.hpp"
 #include "Common/object_broker.h"
 #include "xr_input.h"
-#include "xr_input_xinput.h"
 #include "SDL.h"
 
 #include "edit_actions.h"

@@ -1,23 +1,27 @@
 #include "stdafx.h"
-#include "xr_input_xinput.h"
+
+#include "xr_level_controller.h"
 #include "xr_input.h"
-#include "StringTable/IStringTable.h"
+
+#include "StringTable/StringTable.h"
+
+#include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
+
+constexpr size_t bindings_count = kLASTACTION;
 
 ENGINE_API key_binding g_key_bindings[bindings_count];
 ENGINE_API EKeyGroup g_current_keygroup = _sp;
 
 // clang-format off
 game_action actions[] = {
+    { "look_around",       kLOOK_AROUND,       _both }, // gamepad
     { "left",              kLEFT,              _both },
     { "right",             kRIGHT,             _both },
     { "up",                kUP,                _both },
     { "down",              kDOWN,              _both },
-    { "jump",              kJUMP,              _both },
-    { "crouch",            kCROUCH,            _both },
-    { "crouch_toggle",     kCROUCH_TOGGLE,     _both},
-    { "accel",             kACCEL,             _both },
-    { "sprint_toggle",     kSPRINT_TOGGLE,     _both },
 
+    { "move_around",       kMOVE_AROUND,       _both }, // gamepad
     { "forward",           kFWD,               _both },
     { "back",              kBACK,              _both },
     { "lstrafe",           kL_STRAFE,          _both },
@@ -25,6 +29,12 @@ game_action actions[] = {
 
     { "llookout",          kL_LOOKOUT,         _both },
     { "rlookout",          kR_LOOKOUT,         _both },
+
+    { "jump",              kJUMP,              _both },
+    { "crouch",            kCROUCH,            _both },
+    { "crouch_toggle",     kCROUCH_TOGGLE,     _both },
+    { "accel",             kACCEL,             _both },
+    { "sprint_toggle",     kSPRINT_TOGGLE,     _both },
 
     { "turn_engine",       kENGINE,            _sp},
 
@@ -64,6 +74,7 @@ game_action actions[] = {
     { "chat",              kCHAT,              _both },
     { "chat_team",         kCHAT_TEAM,         _both },
     { "screenshot",        kSCREENSHOT,        _both },
+    { "enter",             kENTER,             _both },
     { "quit",              kQUIT,              _both },
     { "console",           kCONSOLE,           _both },
     { "inventory",         kINVENTORY,         _both },
@@ -422,31 +433,109 @@ keyboard_key keyboards[] =
     { "kAPP1",                  SDL_SCANCODE_APP1,               "App 1" },
     { "kAPP2",                  SDL_SCANCODE_APP2,               "App 2" },
 
-    { "mouse1",                 MOUSE_1,                         "LMB" },
-    { "mouse3",                 MOUSE_3,                         "MMB" },       // This is not a mistake because init algorithm was changed.
-    { "mouse2",                 MOUSE_2,                         "RMB" },
+    { "mouse1",                 MOUSE_1,                         "Left mouse button" },
+    { "mouse2",                 MOUSE_2,                         "Right mouse button" },
+    { "mouse3",                 MOUSE_3,                         "Mouse wheel button" },
     { "mouse4",                 MOUSE_4,                         "Mouse X1" },
     { "mouse5",                 MOUSE_5,                         "Mouse X2" },
 
-    { "kGAMEPAD_A",             XR_CONTROLLER_BUTTON_A,             "Gamepad A" },
-    { "kGAMEPAD_B",             XR_CONTROLLER_BUTTON_B,             "Gamepad B" },
-    { "kGAMEPAD_X",             XR_CONTROLLER_BUTTON_X,             "Gamepad X" },
-    { "kGAMEPAD_Y",             XR_CONTROLLER_BUTTON_Y,             "Gamepad Y" },
-    { "kGAMEPAD_BACK",          XR_CONTROLLER_BUTTON_BACK,          "Gamepad Back" },
-    { "kGAMEPAD_GUIDE",         XR_CONTROLLER_BUTTON_GUIDE,         "Gamepad Guide" },
-    { "kGAMEPAD_START",         XR_CONTROLLER_BUTTON_START,         "Gamepad Start" },
-    { "kGAMEPAD_LEFTSTICK",     XR_CONTROLLER_BUTTON_LEFTSTICK,     "Gamepad Left Stick" },
-    { "kGAMEPAD_RIGHTSTICK",    XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Gamepad Right Stick" },
-    { "kGAMEPAD_LEFTSHOULDER",  XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Gamepad Left Shoulder" },
-    { "kGAMEPAD_RIGHTSHOULDER", XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Gamepad Right Shoulder" },
-    { "kGAMEPAD_DPAD_UP",       XR_CONTROLLER_BUTTON_DPAD_UP,       "Gamepad Up" },
-    { "kGAMEPAD_DPAD_DOWN",     XR_CONTROLLER_BUTTON_DPAD_DOWN,     "Gamepad Down" },
-    { "kGAMEPAD_DPAD_LEFT",     XR_CONTROLLER_BUTTON_DPAD_LEFT,     "Gamepad Left" },
-    { "kGAMEPAD_DPAD_RIGHT",    XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "Gamepad Right" },
+    { "gpA",                    XR_CONTROLLER_BUTTON_A,             "A" },
+    { "gpB",                    XR_CONTROLLER_BUTTON_B,             "B" },
+    { "gpX",                    XR_CONTROLLER_BUTTON_X,             "X" },
+    { "gpY",                    XR_CONTROLLER_BUTTON_Y,             "Y" },
+    { "gpBACK",                 XR_CONTROLLER_BUTTON_BACK,          "Back" },
+    { "gpGUIDE",                XR_CONTROLLER_BUTTON_GUIDE,         "Guide" },
+    { "gpSTART",                XR_CONTROLLER_BUTTON_START,         "Start" },
+    { "gpLEFT_STICK",           XR_CONTROLLER_BUTTON_LEFTSTICK,     "Left Stick Press" },
+    { "gpRIGHT_STICK",          XR_CONTROLLER_BUTTON_RIGHTSTICK,    "Right Stick Press" },
+    { "gpLEFT_SHOULDER",        XR_CONTROLLER_BUTTON_LEFTSHOULDER,  "Left Shoulder" },
+    { "gpRIGHT_SHOULDER",       XR_CONTROLLER_BUTTON_RIGHTSHOULDER, "Right Shoulder" },
+    { "gpDPAD_UP",              XR_CONTROLLER_BUTTON_DPAD_UP,       "D-Pad Up" },
+    { "gpDPAD_DOWN",            XR_CONTROLLER_BUTTON_DPAD_DOWN,     "D-Pad Down" },
+    { "gpDPAD_LEFT",            XR_CONTROLLER_BUTTON_DPAD_LEFT,     "D-Pad Left" },
+    { "gpDPAD_RIGHT",           XR_CONTROLLER_BUTTON_DPAD_RIGHT,    "D-Pad Right" },
+    { "gpMISC1",                XR_CONTROLLER_BUTTON_MISC1,         "Misc1" },
+    { "gpPADDLE_P1",            XR_CONTROLLER_BUTTON_PADDLE1,       "Paddle 1" },
+    { "gpPADDLE_P2",            XR_CONTROLLER_BUTTON_PADDLE2,       "Paddle 2" },
+    { "gpPADDLE_P3",            XR_CONTROLLER_BUTTON_PADDLE3,       "Paddle 3" },
+    { "gpPADDLE_P4",            XR_CONTROLLER_BUTTON_PADDLE4,       "Paddle 4" },
+    { "gpTOUCHPAD",             XR_CONTROLLER_BUTTON_TOUCHPAD,      "Touchpad" },
+
+    { "gpAXIS_LEFT",            XR_CONTROLLER_AXIS_LEFT,            "Left Stick Move" },
+    { "gpAXIS_RIGHT",           XR_CONTROLLER_AXIS_RIGHT,           "Right Stick Move" },
+    { "gpAXIS_TRIGGER_LEFT",    XR_CONTROLLER_AXIS_TRIGGER_LEFT,    "Left Trigger" },
+    { "gpAXIS_TRIGGER_RIGHT",   XR_CONTROLLER_AXIS_TRIGGER_RIGHT,   "Right Trigger" },
 
     { nullptr,                  -1,                              "(null)" }
 };
 // clang-format on
+
+void initialize_bindings()
+{
+#ifdef DEBUG
+    int i1 = 0;
+    while (true)
+    {
+        keyboard_key& k1 = keyboards[i1];
+        if (k1.key_name == NULL)
+            break;
+
+        int i2 = i1;
+        while (true)
+        {
+            keyboard_key& k2 = keyboards[i2];
+            if (k2.key_name == NULL)
+                break;
+            if (k1.dik == k2.dik && i1 != i2)
+            {
+                Msg("%s == %s", k1.key_name, k2.key_name);
+            }
+            ++i2;
+        }
+        ++i1;
+    }
+#endif
+
+    for (int idx = 0; idx < bindings_count; ++idx)
+        g_key_bindings[idx].m_action = &actions[idx];
+}
+
+void remap_keys()
+{
+    string128 buff;
+    // Log("Keys remap:");
+    for (int idx = 0; keyboards[idx].key_name; ++idx)
+    {
+        buff[0] = 0;
+        keyboard_key& kb = keyboards[idx];
+        if (pInput->GetKeyName(kb.dik, buff, sizeof(buff)))
+            kb.key_local_name = buff;
+        else
+        {
+#ifndef MASTER_GOLD
+            Msg("! Can't find a key name for %s", kb.key_name);
+#endif
+            if (kb.key_local_name.empty())
+                kb.key_local_name = kb.key_name;
+        }
+
+        // Msg("[%s]-[%s]", kb.key_name, kb.key_local_name.c_str());
+    }
+}
+
+pcstr IdToActionName(EGameActions id)
+{
+    int idx = 0;
+    while (actions[idx].action_name)
+    {
+        if (id == actions[idx].id)
+            return actions[idx].action_name;
+
+        ++idx;
+    }
+    Msg("! cant find corresponding [action_name] for id");
+    return NULL;
+}
 
 EGameActions ActionNameToId(pcstr name)
 {
@@ -498,6 +587,33 @@ int GetActionDik(EGameActions action_id, int idx)
     return SDL_SCANCODE_UNKNOWN;
 }
 
+pcstr DikToKeyname(int dik)
+{
+    keyboard_key* kb = DikToPtr(dik, true);
+    if (kb)
+        return kb->key_name;
+    else
+        return nullptr;
+}
+
+keyboard_key* DikToPtr(int dik, bool safe)
+{
+    int idx = 0;
+    while (keyboards[idx].key_name)
+    {
+        keyboard_key& kb = keyboards[idx];
+        if (kb.dik == dik)
+            return &keyboards[idx];
+
+        ++idx;
+    }
+
+    if (!safe)
+        Msg("! [DikToPtr] cant find corresponding 'keyboard_key' for dik '%d'", dik);
+
+    return nullptr;
+}
+
 int KeynameToDik(pcstr name)
 {
     keyboard_key* kb = KeynameToPtr(name);
@@ -517,6 +633,34 @@ keyboard_key* KeynameToPtr(pcstr name)
 
     Msg("! [KeynameToPtr] cant find corresponding 'keyboard_key' for keyname %s", name);
     return NULL;
+}
+
+bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2)
+{
+    return ((g1 == _sp && g2 == _mp) || (g1 == _mp && g2 == _sp));
+}
+
+bool IsGroupMatching(EKeyGroup g1, EKeyGroup g2)
+{
+    return ((g1 == g2) || (g1 == _both) || (g2 == _both));
+}
+
+EGameActions GetBindedAction(int dik)
+{
+    for (int idx = 0; idx < bindings_count; ++idx)
+    {
+        key_binding* binding = &g_key_bindings[idx];
+
+        bool isGroupMatching = IsGroupMatching(binding->m_action->key_group, g_current_keygroup);
+
+        if (!isGroupMatching)
+            continue;
+
+        for (u8 i = 0; i < bindtypes_count && isGroupMatching; ++i)
+            if (binding->m_keyboard[i] && binding->m_keyboard[i]->dik == dik)
+                return binding->m_action->id;
+    }
+    return kNOTBINDED;
 }
 
 bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
@@ -545,19 +689,19 @@ bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
     {
         xr_strcpy(sec, binding->m_keyboard[1]->key_local_name.c_str());
     }
-    if (binding->m_keyboard[2])
+    if (binding->m_keyboard[2] && pInput->IsControllerAvailable())
     {
         xr_strcpy(gpad, binding->m_keyboard[2]->key_local_name.c_str());
     }
     if (!binding->m_keyboard[0] && !binding->m_keyboard[1] && !binding->m_keyboard[2])
     {
-        xr_sprintf(dst_buff, dst_buff_sz, "%s", gStringTable->translate("st_key_notbinded").c_str());
+        xr_strcpy(dst_buff, dst_buff_sz, StringTable().translate("st_key_notbinded").c_str());
     }
     else
     {
-        xr_sprintf(dst_buff, dst_buff_sz, "%s%s%s%s%s", prim[0] ? prim : "",
-            (sec[0] && prim[0]) ? " , " : "", sec[0] ? sec : "",
-            ((gpad[0] && prim[0]) || (gpad[0] && sec[0])) ? " , " : "", gpad[0] ? gpad : "");
+        strconcat(dst_buff_sz, dst_buff, prim,
+            sec[0] && prim[0] ? ", " : "", sec,
+            (gpad[0] && prim[0] || gpad[0] && sec[0]) ? ", " : "", gpad);
     }
     return true;
 }
@@ -573,3 +717,302 @@ std::pair<int, int> GetKeysBindedTo(EGameActions action_id)
         binding.m_keyboard[1] ? binding.m_keyboard[1]->dik : -1
     };
 }
+
+ConsoleBindCmds g_consoleBindCmds;
+BOOL g_remapped = false;
+
+class CCC_Bind : public IConsole_Command
+{
+    int m_workIdx;
+
+public:
+    CCC_Bind(LPCSTR n, int idx) : IConsole_Command(n), m_workIdx(idx) {};
+
+    virtual void Execute(LPCSTR args)
+    {
+        string256 action;
+        string256 key;
+        *action = 0;
+        *key = 0;
+
+        sscanf(args, "%s %s", action, key);
+        if (!*action)
+            return;
+
+        if (!*key)
+            return;
+
+        if (!g_remapped)
+        {
+            remap_keys();
+            g_remapped = true;
+        }
+
+        if (!ActionNameToPtr(action))
+            return;
+
+        int actionId = ActionNameToId(action);
+        if (actionId == kNOTBINDED)
+            return;
+
+        keyboard_key* keyboard = KeynameToPtr(key);
+        if (!keyboard)
+            return;
+
+        key_binding* currBinding = &g_key_bindings[actionId];
+
+        currBinding->m_keyboard[m_workIdx] = keyboard;
+
+        {
+            for (int idx = 0; idx < bindings_count; ++idx)
+            {
+                key_binding* binding = &g_key_bindings[idx];
+                if (binding == currBinding)
+                    continue;
+
+                bool isConflict = !IsGroupNotConflicted(binding->m_action->key_group, currBinding->m_action->key_group);
+
+                for (u8 i = 0; i < bindtypes_count; ++i)
+                    if (binding->m_keyboard[i] == keyboard && isConflict)
+                        binding->m_keyboard[i] = nullptr;
+            }
+        }
+
+        CStringTable::ReparseKeyBindings();
+    }
+
+    virtual void Save(IWriter* f)
+    {
+        if (m_workIdx == 0)
+            f->w_printf("default_controls\r\n");
+
+        for (int idx = 0; idx < bindings_count; ++idx)
+        {
+            key_binding* binding = &g_key_bindings[idx];
+            if (binding->m_keyboard[m_workIdx])
+                f->w_printf("%s %s %s\r\n", cName, binding->m_action->action_name, binding->m_keyboard[m_workIdx]->key_name);
+        }
+    }
+};
+
+class CCC_UnBind : public IConsole_Command
+{
+    int m_workIdx;
+
+public:
+    CCC_UnBind(LPCSTR n, int idx) : IConsole_Command(n), m_workIdx(idx) { bEmptyArgsHandled = true; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        int actionId = ActionNameToId(args);
+        key_binding* binding = &g_key_bindings[actionId];
+        binding->m_keyboard[m_workIdx] = nullptr;
+
+        CStringTable::ReparseKeyBindings();
+    }
+};
+
+class CCC_ListActions : public IConsole_Command
+{
+public:
+    CCC_ListActions(LPCSTR n) : IConsole_Command(n) { bEmptyArgsHandled = true; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        Log("- --- Action list start ---");
+        for (int idx = 0; idx < bindings_count; ++idx)
+        {
+            key_binding* binding = &g_key_bindings[idx];
+            Log("-", binding->m_action->action_name);
+        }
+        Log("- --- Action list end   ---");
+    }
+};
+
+class CCC_UnBindAll : public IConsole_Command
+{
+public:
+    CCC_UnBindAll(LPCSTR n) : IConsole_Command(n) { bEmptyArgsHandled = true; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        for (int idx = 0; idx < bindings_count; ++idx)
+        {
+            key_binding* binding = &g_key_bindings[idx];
+            for (u8 i = 0; i < bindtypes_count; ++i)
+                binding->m_keyboard[i] = nullptr;
+        }
+        g_consoleBindCmds.clear();
+    }
+};
+
+class CCC_DefControls : public CCC_UnBindAll
+{
+    struct binding
+    {
+        EGameActions action;
+        int keys[bindtypes_count];
+    };
+
+    constexpr static binding predefined_bindings[] =
+    {
+        { kLOOK_AROUND,         { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_RIGHT } },
+        { kMOVE_AROUND,         { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_LEFT } },
+
+        { kJUMP,                { SDL_SCANCODE_SPACE,       SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_A } },
+        { kCROUCH_TOGGLE,       { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_B } },
+
+        { kTORCH,               { SDL_SCANCODE_L,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSTICK } },
+
+        { kWPN_FIRE,            { MOUSE_1,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
+        { kWPN_ZOOM,            { MOUSE_2,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
+
+        { kWPN_RELOAD,          { SDL_SCANCODE_R,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_X } },
+
+        { kUSE,                 { SDL_SCANCODE_F,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_Y } },
+        { kENTER,               { SDL_SCANCODE_RETURN,      SDL_SCANCODE_KP_ENTER,  XR_CONTROLLER_BUTTON_START } },
+        { kQUIT,                { SDL_SCANCODE_ESCAPE,      SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_BACK } },
+        { kINVENTORY,           { SDL_SCANCODE_I,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
+        { kACTIVE_JOBS,         { SDL_SCANCODE_P,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
+
+        { kQUICK_USE_1,         { SDL_SCANCODE_F1,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_UP } },
+        { kQUICK_USE_2,         { SDL_SCANCODE_F2,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
+        { kQUICK_USE_3,         { SDL_SCANCODE_F3,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_DOWN } },
+        { kQUICK_USE_4,         { SDL_SCANCODE_F4,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_LEFT } },
+    };
+
+public:
+    CCC_DefControls(LPCSTR n) : CCC_UnBindAll(n) {}
+
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_UnBindAll::Execute(args);
+        string_path cfg;
+        string_path cmd;
+        FS.update_path(cfg, "$game_config$", "default_controls.ltx");
+        strconcat(sizeof(cmd), cmd, "cfg_load", " ", cfg);
+        Console->Execute(cmd);
+
+        for (const auto& [action, keys] : predefined_bindings)
+        {
+            key_binding& binding = g_key_bindings[action];
+
+            for (u8 i = 0; i < bindtypes_count; ++i)
+            {
+                if (!binding.m_keyboard[i])
+                    binding.m_keyboard[i] = DikToPtr(keys[i], true);
+            }
+        }
+    }
+};
+
+class CCC_BindList : public IConsole_Command
+{
+public:
+    CCC_BindList(LPCSTR n) : IConsole_Command(n) { bEmptyArgsHandled = true; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        Log("- --- Bind list start ---");
+        string512 buff;
+
+        for (int idx = 0; idx < bindings_count; ++idx)
+        {
+            key_binding* binding = &g_key_bindings[idx];
+            xr_sprintf(buff, "[%s] primary is[%s] secondary is[%s] pad button is[%s]", binding->m_action->action_name,
+                (binding->m_keyboard[0]) ? binding->m_keyboard[0]->key_local_name.c_str() : "NULL",
+                (binding->m_keyboard[1]) ? binding->m_keyboard[1]->key_local_name.c_str() : "NULL",
+                (binding->m_keyboard[2]) ? binding->m_keyboard[2]->key_local_name.c_str() : "NULL");
+            Log(buff);
+        }
+        Log("- --- Bind list end   ---");
+    }
+};
+
+class CCC_BindConsoleCmd : public IConsole_Command
+{
+public:
+    CCC_BindConsoleCmd(LPCSTR n) : IConsole_Command(n) {};
+
+    virtual void Execute(LPCSTR args)
+    {
+        string512 consoleCmd;
+        string256 key;
+        int cnt = _GetItemCount(args, ' ');
+        _GetItems(args, 0, cnt - 1, consoleCmd, ' ');
+        _GetItem(args, cnt - 1, key, ' ');
+
+        int dik = KeynameToDik(key);
+        g_consoleBindCmds.bind(dik, consoleCmd);
+    }
+
+    virtual void Save(IWriter* f) { g_consoleBindCmds.save(f); }
+};
+
+class CCC_UnBindConsoleCmd : public IConsole_Command
+{
+public:
+    CCC_UnBindConsoleCmd(LPCSTR n) : IConsole_Command(n) { bEmptyArgsHandled = false; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        int dik = KeynameToDik(args);
+        g_consoleBindCmds.unbind(dik);
+    }
+};
+
+void ConsoleBindCmds::bind(int dik, LPCSTR n)
+{
+    con_cmd& c = m_bindConsoleCmds[dik];
+    c.cmd = n;
+}
+
+void ConsoleBindCmds::unbind(int dik)
+{
+    xr_map<int, con_cmd>::iterator it = m_bindConsoleCmds.find(dik);
+    if (it == m_bindConsoleCmds.end())
+        return;
+
+    m_bindConsoleCmds.erase(it);
+}
+
+void ConsoleBindCmds::clear() { m_bindConsoleCmds.clear(); }
+
+bool ConsoleBindCmds::execute(int dik)
+{
+    xr_map<int, con_cmd>::iterator it = m_bindConsoleCmds.find(dik);
+    if (it == m_bindConsoleCmds.end())
+        return false;
+
+    Console->Execute(it->second.cmd.c_str());
+    return true;
+}
+
+void ConsoleBindCmds::save(IWriter* f)
+{
+    xr_map<int, con_cmd>::iterator it = m_bindConsoleCmds.begin();
+
+    for (; it != m_bindConsoleCmds.end(); ++it)
+    {
+        pcstr keyname = DikToKeyname(it->first);
+        f->w_printf("bind_console %s %s\n", *it->second.cmd, keyname);
+    }
+}
+
+void CCC_RegisterInput()
+{
+    initialize_bindings();
+    CMD2(CCC_Bind, "bind", 0);
+    CMD2(CCC_Bind, "bind_sec", 1);
+    CMD2(CCC_Bind, "bind_gpad", 2);
+    CMD2(CCC_UnBind, "unbind", 0);
+    CMD2(CCC_UnBind, "unbind_sec", 1);
+    CMD2(CCC_UnBind, "unbind_gpad", 2);
+    CMD1(CCC_UnBindAll, "unbindall");
+    CMD1(CCC_DefControls, "default_controls");
+    CMD1(CCC_ListActions, "list_actions");
+
+    CMD1(CCC_BindList, "bind_list");
+    CMD1(CCC_BindConsoleCmd, "bind_console");
+    CMD1(CCC_UnBindConsoleCmd, "unbind_console");
+};

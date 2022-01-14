@@ -4,18 +4,15 @@
 #include "xrCommon/xr_map.h"
 #include "xrEngine/xr_input.h" // Don't remove this include
 
-enum EGameActions
+enum EGameActions : u32
 {
+    kLOOK_AROUND, // gamepad
     kLEFT,
     kRIGHT,
     kUP,
     kDOWN,
-    kJUMP,
-    kCROUCH,
-    kCROUCH_TOGGLE,
-    kACCEL,
-    kSPRINT_TOGGLE,
 
+    kMOVE_AROUND, // gamepad
     kFWD,
     kBACK,
     kL_STRAFE,
@@ -23,6 +20,12 @@ enum EGameActions
 
     kL_LOOKOUT,
     kR_LOOKOUT,
+
+    kJUMP,
+    kCROUCH,
+    kCROUCH_TOGGLE,
+    kACCEL,
+    kSPRINT_TOGGLE,
 
     kENGINE,
 
@@ -61,6 +64,7 @@ enum EGameActions
     kCHAT,
     kCHAT_TEAM,
     kSCREENSHOT,
+    kENTER,
     kQUIT,
     kCONSOLE,
     kINVENTORY,
@@ -130,16 +134,16 @@ enum EGameActions
     kKICK, // alpet: kick dynamic objects
 
     kLASTACTION,
-    kNOTBINDED,
-    kFORCEDWORD = u32(-1)
+    kNOTBINDED
 };
 
-struct ENGINE_API keyboard_key
+struct keyboard_key
 {
     pcstr key_name;
     int dik;
     xr_string key_local_name;
 };
+
 enum EKeyGroup
 {
     _both = (1 << 0),
@@ -147,37 +151,63 @@ enum EKeyGroup
     _mp = _both | (1 << 2),
 };
 
-extern ENGINE_API EKeyGroup g_current_keygroup;
-
-struct ENGINE_API game_action
+struct game_action
 {
     pcstr action_name;
     EGameActions id;
     EKeyGroup key_group;
 };
 
-extern ENGINE_API game_action actions[];
-extern ENGINE_API keyboard_key keyboards[];
-
-#define bindings_count kLASTACTION
 #define bindtypes_count 3
-struct ENGINE_API key_binding
+struct key_binding
 {
     game_action* m_action;
     keyboard_key* m_keyboard[bindtypes_count];
 };
 
+extern ENGINE_API EKeyGroup g_current_keygroup;
+
+extern ENGINE_API game_action actions[];
+extern ENGINE_API keyboard_key keyboards[];
+
 extern ENGINE_API key_binding g_key_bindings[];
 
+ENGINE_API bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2);
+
+ENGINE_API pcstr IdToActionName(EGameActions id);
 ENGINE_API EGameActions ActionNameToId(pcstr name);
 ENGINE_API game_action* ActionNameToPtr(pcstr name);
 
-ENGINE_API bool IsBinded(EGameActions action_id, int dik);
-ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
-
+ENGINE_API pcstr DikToKeyname(int dik);
 ENGINE_API int KeynameToDik(pcstr name);
 ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
+ENGINE_API keyboard_key* DikToPtr(int dik, bool safe);
+
+ENGINE_API bool IsBinded(EGameActions action_id, int dik);
+ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
+ENGINE_API EGameActions GetBindedAction(int dik);
 
 ENGINE_API bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz);
 
 ENGINE_API std::pair<int, int> GetKeysBindedTo(EGameActions action_id);
+
+extern ENGINE_API void CCC_RegisterInput();
+
+struct con_cmd
+{
+    shared_str cmd;
+};
+
+class ENGINE_API ConsoleBindCmds
+{
+public:
+    xr_map<int, con_cmd> m_bindConsoleCmds;
+
+    void bind(int dik, LPCSTR N);
+    void unbind(int dik);
+    bool execute(int dik);
+    void clear();
+    void save(IWriter* F);
+};
+
+extern ENGINE_API ConsoleBindCmds g_consoleBindCmds;

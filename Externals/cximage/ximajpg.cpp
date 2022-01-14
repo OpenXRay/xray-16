@@ -9,14 +9,9 @@
 
 #if CXIMAGE_SUPPORT_JPG
 
-#define XMD_H
-#define HAVE_BOOLEAN
-#include <jpeg/jmorecfg.h>
-#undef HAVE_BOOLEAN
-#undef XMD_H
-
 #include "ximaiter.h"
 #include "ximacfg.h"
+
 #include <setjmp.h>
 
 struct jpg_error_mgr {
