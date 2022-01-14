@@ -16,8 +16,3 @@
 #include "xrCore/_std_extensions.h"
 
 #include "xrPhysics.h"
-
-// XXX: WHY IS THIS HERE
-#if defined(DEBUG) && defined(XR_PLATFORM_WINDOWS)
-#include <d3d9types.h>
-#endif
