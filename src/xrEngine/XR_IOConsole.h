@@ -89,7 +89,7 @@ protected:
     bool m_disable_tips;
 
 private:
-    int lastBindedKeys[bindtypes_count];
+    int lastBindedKeys[bindtypes_count]{};
 
     vecHistory m_cmd_history;
     u32 m_cmd_history_max;
