@@ -13,17 +13,11 @@ CStringTable& StringTable()
     return string_table;
 }
 
-xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData;
+xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData{};
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 u32 CStringTable::LanguageID = std::numeric_limits<u32>::max();
 xr_vector<xr_token> CStringTable::languagesToken;
 
-CStringTable::CStringTable()
-{
-    pData = nullptr;
-}
-
-CStringTable::~CStringTable() { Destroy(); }
 void CStringTable::Destroy()
 {
     pData.reset(nullptr);

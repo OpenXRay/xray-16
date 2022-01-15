@@ -22,12 +22,9 @@ struct STRING_TABLE_DATA
     STRING_TABLE_MAP m_string_key_binding;
 };
 
-class ENGINE_API CStringTable
+class ENGINE_API CStringTable final
 {
 public:
-    CStringTable();
-    virtual ~CStringTable();
-
     void Init();
     static void Destroy();
 

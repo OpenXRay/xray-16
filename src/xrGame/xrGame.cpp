@@ -54,5 +54,6 @@ extern "C"
     XR_EXPORT void finalize_library()
     {
         CleanupUIStyleToken();
-    }
+        StringTable().Destroy();
+ }
 }
