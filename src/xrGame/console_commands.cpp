@@ -2095,7 +2095,7 @@ void CCC_RegisterCommands()
 #ifndef MASTER_GOLD
     CMD1(CCC_JumpToLevel, "jump_to_level");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
-    CMD1(CCC_ToggleNOCLIP, "g_no_clip", &psActorFlags, AF_NO_CLIP);
+    CMD1(CCC_ToggleNOCLIP, "g_no_clip");
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
     CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_Script, "run_script");
