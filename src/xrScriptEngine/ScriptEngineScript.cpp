@@ -32,7 +32,7 @@ void ErrorLog(pcstr caMessage)
     if (GEnv.ScriptEngine->debugger())
         GEnv.ScriptEngine->debugger()->Write(caMessage);
 #endif
-#ifdef DEBUG
+#if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
     bool lua_studio_connected = !!GEnv.ScriptEngine->debugger();
     if (!lua_studio_connected)
         R_ASSERT2(0, caMessage);
