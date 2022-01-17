@@ -549,7 +549,7 @@ struct raii_guard : private Noncopyable
 
     ~raii_guard()
     {
-#ifdef DEBUG
+#if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
         const bool lua_studio_connected = !!m_script_engine->debugger();
         if (!lua_studio_connected)
 #endif
