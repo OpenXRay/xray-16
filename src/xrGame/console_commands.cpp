@@ -1241,6 +1241,23 @@ public:
     };
 };
 */
+
+struct CCC_ToggleNOCLIP : public IConsole_Command
+{
+    CCC_ToggleNOCLIP(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        if (Actor() != nullptr)
+        {
+            BOOL toggle = (psActorFlags.test(AF_NO_CLIP)) ? FALSE : TRUE;
+            psActorFlags.set(AF_NO_CLIP, toggle);
+
+            Fvector accel;
+            Actor()->g_Physics(accel, 0.0f, 0.0f);
+        }
+    }
+};
 #endif
 
 #ifndef MASTER_GOLD
@@ -2078,7 +2095,7 @@ void CCC_RegisterCommands()
 #ifndef MASTER_GOLD
     CMD1(CCC_JumpToLevel, "jump_to_level");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
-    CMD3(CCC_Mask, "g_no_clip", &psActorFlags, AF_NO_CLIP);
+    CMD1(CCC_ToggleNOCLIP, "g_no_clip", &psActorFlags, AF_NO_CLIP);
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
     CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_Script, "run_script");
