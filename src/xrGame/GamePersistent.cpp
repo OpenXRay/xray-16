@@ -281,7 +281,6 @@ void CGamePersistent::OnAppEnd()
     GMLib.Unload();
 
 #ifdef XR_PLATFORM_WINDOWS
-    g_DiscordRPC.Deinit();
     xr_delete(ansel);
 #endif
 }

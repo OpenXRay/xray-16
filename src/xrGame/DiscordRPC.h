@@ -1,6 +1,6 @@
 #pragma once
 
-class DiscordRPC
+class DiscordRPC final
 {
     int64_t start_time{};
     string64 build_name{};
@@ -15,7 +15,6 @@ public:
     };
 
     void Init();
-    void Deinit();
 
     void Update(DiscordStatusType updateType, pcstr updateData);
 };

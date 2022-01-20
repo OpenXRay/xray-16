@@ -30,7 +30,7 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;discord-rpc-dynamic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;discord_game_sdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -1460,6 +1460,20 @@
     <ClCompile Include="$(xrExternals)GameSpy\src\GameSpy\md5c.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\achievement_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\activity_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\application_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\core.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\image_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\lobby_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\network_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\overlay_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\relationship_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\storage_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\store_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\types.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\user_manager.cpp" />
+    <ClCompile Include="..\..\Externals\DiscordGameSDK\voice_manager.cpp" />
     <ClCompile Include="..\xrServerEntities\alife_human_brain.cpp" />
     <ClCompile Include="..\xrServerEntities\alife_monster_brain.cpp" />
     <ClCompile Include="..\xrServerEntities\alife_space.cpp" />
@@ -3532,7 +3546,7 @@
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord-rpc.dll">
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <None Include="packages.config" />

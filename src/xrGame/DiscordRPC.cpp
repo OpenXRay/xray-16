@@ -3,45 +3,40 @@
 #include "DiscordRPC.h"
 #include "xrCore/Text/StringConversion.hpp"
 
-#include <DiscordRPC/discord_register.h>
-#include <DiscordRPC/discord_rpc.h>
+#include <DiscordGameSDK/discord.h>
 
-constexpr pcstr DISCORD_APP_ID = "869824972464488510";
+constexpr discord::ClientId DISCORD_APP_ID = 869824972464488510;
 
+discord::Core* g_discordCore{};
 DiscordRPC g_DiscordRPC;
 
 void DiscordRPC::Init()
 {
     xr_sprintf(build_name, "build %u", Core.GetBuildId());
     start_time = time(nullptr);
-    DiscordEventHandlers handle{};
-    Discord_Initialize(DISCORD_APP_ID, &handle, 1, nullptr);
-}
 
-void DiscordRPC::Deinit()
-{
-    Discord_ClearPresence();
-    Discord_Shutdown();
+    discord::Core::Create(DISCORD_APP_ID, DiscordCreateFlags_Default, &g_discordCore);
 }
 
 void DiscordRPC::Update(DiscordStatusType updateType, pcstr updateData)
 {
-    DiscordRichPresence discordPresence{};
-    static std::locale locale("");
-    xr_string tempData = StringToUTF8(updateData, locale);
+    discord::Activity discordActivity{};
+    xr_string tempData = StringToUTF8(updateData, std::locale(""));
+    pcstr updateName = tempData.c_str();
 
     if (updateType == DiscordStatusType::UpdateLevel)
-        xr_strcpy(current_level_name, tempData.c_str());
+        xr_strcpy(current_level_name, updateName);
     else if (updateType == DiscordStatusType::UpdateTask)
-        xr_strcpy(current_task_name, tempData.c_str());
+        xr_strcpy(current_task_name, updateName);
 
-    discordPresence.startTimestamp  = start_time;
-    discordPresence.largeImageKey   = "current_level_name";
-    discordPresence.smallImageKey   = "build_name";
-    discordPresence.largeImageText  = current_level_name;
-    discordPresence.smallImageText  = build_name;
-    discordPresence.state           = current_level_name;
-    discordPresence.details         = current_task_name;
+    discordActivity.GetTimestamps().SetStart(start_time);
+    discordActivity.GetAssets().SetLargeImage("current_level_name");
+    discordActivity.GetAssets().SetSmallImage("build_name");
+    discordActivity.GetAssets().SetLargeText(current_level_name);
+    discordActivity.GetAssets().SetSmallText(build_name);
+    discordActivity.SetState(current_level_name);
+    discordActivity.SetDetails(current_task_name);
 
-    Discord_UpdatePresence(&discordPresence);
+    g_discordCore->ActivityManager().UpdateActivity(discordActivity, nullptr);
+    g_discordCore->RunCallbacks();
 }
