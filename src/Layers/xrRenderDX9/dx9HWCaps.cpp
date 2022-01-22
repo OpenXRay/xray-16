@@ -104,6 +104,64 @@ u32 GetGpuNum() { return 1; }
 #endif
 }
 
+static pcstr GetVertexShaderProfile(const D3DCAPS9& caps)
+{
+    switch (caps.VertexShaderVersion)
+    {
+#if RENDER != R_R1
+    case D3DVS_VERSION(3, 0): return "vs_3_0";
+
+    case D3DVS_VERSION(2, 0):
+        if (caps.VS20Caps.NumTemps >= 13                &&
+            caps.VS20Caps.DynamicFlowControlDepth == 24 &&
+            caps.VS20Caps.Caps & D3DPS20CAPS_PREDICATION)
+        {
+            return "vs_2_a";
+        }
+        [[fallthrough]];
+#endif
+    default:                  return "vs_2_0";
+
+    case D3DVS_VERSION(1, 1): return "vs_1_1";
+    }
+}
+
+static pcstr GetPixelShaderProfile(const D3DCAPS9& caps)
+{
+#if RENDER == R_R1
+    return "ps_2_0";
+#else // R2
+    switch (caps.PixelShaderVersion)
+    {
+    case D3DPS_VERSION(3, 0): return "ps_3_0";
+
+    case D3DPS_VERSION(2, 0):
+        if (caps.PS20Caps.NumTemps >= 22                          &&
+            caps.PS20Caps.Caps & D3DPS20CAPS_ARBITRARYSWIZZLE     &&
+            caps.PS20Caps.Caps & D3DPS20CAPS_GRADIENTINSTRUCTIONS &&
+            caps.PS20Caps.Caps & D3DPS20CAPS_PREDICATION          &&
+            caps.PS20Caps.Caps & D3DPS20CAPS_NODEPENDENTREADLIMIT &&
+            caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)
+        {
+            return "ps_2_a";
+        }
+        if (caps.PS20Caps.NumTemps >= 32                          &&
+            caps.PS20Caps.Caps&D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)
+        {
+            return "ps_2_b";
+        }
+        [[fallthrough]];
+
+    default:                  return "ps_2_0";
+
+    case D3DPS_VERSION(1, 4): return "ps_1_4";
+    case D3DPS_VERSION(1, 3): return "ps_1_3";
+    case D3DPS_VERSION(1, 2): return "ps_1_2";
+    case D3DPS_VERSION(1, 1): return "ps_1_1";
+    }
+#endif
+}
+
 void CHWCaps::Update()
 {
     D3DCAPS9 caps;
@@ -112,6 +170,7 @@ void CHWCaps::Update()
     // ***************** GEOMETRY
     geometry_major = u16((u32(caps.VertexShaderVersion) & (0xf << 8ul)) >> 8);
     geometry_minor = u16((u32(caps.VertexShaderVersion) & 0xf));
+    geometry_profile = GetVertexShaderProfile(caps);
     geometry.bSoftware = (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) == 0;
     geometry.bPointSprites = FALSE;
     geometry.bNPatches = (caps.DevCaps & D3DDEVCAPS_NPATCHES) != 0;
@@ -125,6 +184,7 @@ void CHWCaps::Update()
     // ***************** PIXEL processing
     raster_major = u16(u32(u32(caps.PixelShaderVersion) & u32(0xf << 8ul)) >> 8);
     raster_minor = u16(u32(u32(caps.PixelShaderVersion) & u32(0xf)));
+    raster_profile = GetPixelShaderProfile(caps);
     raster.dwStages = caps.MaxSimultaneousTextures;
     raster.bNonPow2 = ((caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL) != 0) ||
         ((caps.TextureCaps & D3DPTEXTURECAPS_POW2) == 0);

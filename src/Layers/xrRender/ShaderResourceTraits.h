@@ -92,9 +92,7 @@ struct ShaderTypeTraits<SVS>
     static inline const char* GetCompilationTarget()
     {
 #ifdef USE_DX9
-#   if RENDER == R_R2
-        return D3DXGetVertexShaderProfile(HW.pDevice); // vertex "vs_2_a";
-#   endif
+        return HW.Caps.geometry_profile;
 #elif defined(USE_DX11)
         switch (HW.FeatureLevel)
         {
@@ -111,10 +109,8 @@ struct ShaderTypeTraits<SVS>
             return "vs_5_0";
         }
 #endif
-        if (HW.Caps.geometry_major >= 2)
-            return "vs_2_0";
-
-        return "vs_1_1";
+        NODEFAULT;
+        return nullptr;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -191,9 +187,7 @@ struct ShaderTypeTraits<SPS>
     static inline const char* GetCompilationTarget()
     {
 #ifdef USE_DX9
-#   if RENDER == R_R2
-        return D3DXGetPixelShaderProfile(HW.pDevice); // pixel "ps_2_a";
-#   endif
+        return HW.Caps.raster_profile;
 #elif defined(USE_DX11)
         switch (HW.FeatureLevel)
         {
@@ -210,8 +204,8 @@ struct ShaderTypeTraits<SPS>
             return "ps_5_0";
         }
 #endif
-
-        return "ps_2_0";
+        NODEFAULT;
+        return nullptr;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
