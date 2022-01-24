@@ -1257,7 +1257,8 @@ struct CCC_ToggleNoClip : public IConsole_Command
         if (Actor() != nullptr)
         {
             // Workaround for actor has no physics at all until first move
-            Actor()->g_Physics({}, 0.0f, 0.0f);
+            Fvector accel{};
+            Actor()->g_Physics(accel, 0.0f, 0.0f);
         }
     }
 };
