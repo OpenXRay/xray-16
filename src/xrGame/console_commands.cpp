@@ -1222,6 +1222,10 @@ struct CCC_ClearSmartCastStats : public IConsole_Command
     CCC_ClearSmartCastStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR args) { clear_smart_cast_stats(); }
 };
+
+#endif
+
+#ifndef MASTER_GOLD
 /*
 struct CCC_NoClip : public CCC_Mask
 {
@@ -1242,25 +1246,22 @@ public:
 };
 */
 
-struct CCC_ToggleNOCLIP : public IConsole_Command
+struct CCC_ToggleNoClip : public IConsole_Command
 {
-    CCC_ToggleNOCLIP(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    CCC_ToggleNoClip(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; };
 
-    virtual void Execute(LPCSTR args)
+    void Execute(pcstr /*args*/) override
     {
+        psActorFlags.invert(AF_NO_CLIP);
+        
         if (Actor() != nullptr)
         {
-            BOOL toggle = (psActorFlags.test(AF_NO_CLIP)) ? FALSE : TRUE;
-            psActorFlags.set(AF_NO_CLIP, toggle);
-
-            Fvector accel;
-            Actor()->g_Physics(accel, 0.0f, 0.0f);
+            // Workaround for actor has no physics at all until first move
+            Actor()->g_Physics({}, 0.0f, 0.0f);
         }
     }
 };
-#endif
 
-#ifndef MASTER_GOLD
 #include "xrAICore/Navigation/game_graph.h"
 struct CCC_JumpToLevel : public IConsole_Command
 {
@@ -2095,7 +2096,7 @@ void CCC_RegisterCommands()
 #ifndef MASTER_GOLD
     CMD1(CCC_JumpToLevel, "jump_to_level");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
-    CMD1(CCC_ToggleNOCLIP, "g_no_clip");
+    CMD1(CCC_ToggleNoClip, "g_no_clip");
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
     CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_Script, "run_script");
