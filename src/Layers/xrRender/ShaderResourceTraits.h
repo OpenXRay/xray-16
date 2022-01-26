@@ -91,26 +91,7 @@ struct ShaderTypeTraits<SVS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
         return HW.Caps.geometry_profile;
-#elif defined(USE_DX11)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "vs_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "vs_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "vs_5_0";
-        }
-#endif
-        NODEFAULT;
-        return nullptr;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -186,26 +167,7 @@ struct ShaderTypeTraits<SPS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
         return HW.Caps.raster_profile;
-#elif defined(USE_DX11)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "ps_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "ps_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "ps_5_0";
-        }
-#endif
-        NODEFAULT;
-        return nullptr;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
