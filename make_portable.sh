@@ -38,7 +38,7 @@ Attention!!! On some distributions, packages may be prefixed with -dev e.g. libg
    cmake .. -DCMAKE_BUILD_TYPE=Release \
    -DCMAKE_INSTALL_PREFIX=/usr \
    -DCMAKE_INSTALL_LIBDIR=lib
-   make -j5
+   make -j$(nproc)
    make DESTDIR=`pwd`/temp install
 
    mkdir -p $out/{bin,cop,cs}
