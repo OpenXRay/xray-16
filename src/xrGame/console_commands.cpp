@@ -1253,13 +1253,17 @@ struct CCC_ToggleNoClip : public IConsole_Command
     void Execute(pcstr /*args*/) override
     {
         psActorFlags.invert(AF_NO_CLIP);
-        
-        if (Actor() != nullptr)
-        {
-            // Workaround for actor has no physics at all until first move
-            Fvector accel{};
-            Actor()->g_Physics(accel, 0.0f, 0.0f);
-        }
+
+        if (!g_pGameLevel)
+            return;
+
+        CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+        if (!actor)
+            return;
+
+        // Workaround for actor has no physics at all until first move
+        Fvector accel{};
+        Actor()->g_Physics(accel, 0.0f, 0.0f);
     }
 };
 
