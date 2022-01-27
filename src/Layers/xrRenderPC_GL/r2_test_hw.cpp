@@ -38,22 +38,25 @@ public:
 
 bool TestOpenGLSupport()
 {
+#ifndef XR_PLATFORM_SWITCH
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
     if (!windowTest.successful())
         return false;
-
+#endif
     if (glewInit() != GLEW_OK)
     {
         Log("~ Could not initialize glew.");
         return false;
     }
-
+#ifndef XR_PLATFORM_SWITCH
+    // XXX: TODO Switch does not support it
     if (!glewIsSupported("GL_ARB_separate_shader_objects"))
     {
         Log("~ GL_ARB_separate_shader_objects not supported");
         return false;
     }
+#endif
     return true;
 }
 

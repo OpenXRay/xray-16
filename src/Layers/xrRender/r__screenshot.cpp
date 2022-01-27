@@ -583,4 +583,4 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
 #   error No graphics API selected or enabled!
 #endif
 
-void DoAsyncScreenshot() { RImplementation.Target->DoAsyncScreenshot(); }
+void DoAsyncScreenshot() { RImplementation->Target->DoAsyncScreenshot(); }

@@ -31,10 +31,10 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
         u32 ID = data->r_u32();
         vBase = data->r_u32();
         vCount = data->r_u32();
-        vFormat = RImplementation.getVB_Format(ID);
+        vFormat = RImplementation->getVB_Format(ID);
 
         VERIFY(nullptr == p_rm_Vertices);
-        p_rm_Vertices = RImplementation.getVB(ID);
+        p_rm_Vertices = RImplementation->getVB(ID);
         p_rm_Vertices->AddRef();
 
         // indices
@@ -45,7 +45,7 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ID);
+        p_rm_Indices = RImplementation->getIB(ID);
         p_rm_Indices->AddRef();
     }
 
@@ -201,7 +201,7 @@ void FTreeVisual_PM::Load(const char* N, IReader* data, u32 dwFlags)
     R_ASSERT(data->find_chunk(OGF_SWICONTAINER));
     {
         u32 ID = data->r_u32();
-        pSWI = RImplementation.getSWI(ID);
+        pSWI = RImplementation->getSWI(ID);
     }
 }
 void FTreeVisual_PM::Render(float LOD)

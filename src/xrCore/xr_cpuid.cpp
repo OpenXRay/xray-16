@@ -29,7 +29,7 @@ void nativeCpuId(int regs[4], int i)
 {
 #ifdef XR_PLATFORM_WINDOWS
     __cpuid((int *)regs, (int)i);
-#elif (defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)) && defined(XR_COMPILER_GCC)
+#elif (defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_SWITCH)) && defined(XR_COMPILER_GCC)
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 	__cpuid((int)i, regs[0], regs[1], regs[2], regs[3]);
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)

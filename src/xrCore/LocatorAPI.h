@@ -14,7 +14,7 @@
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_SWITCH)
 #include <stdint.h>
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
@@ -105,7 +105,7 @@ public:
 #if defined(XR_PLATFORM_WINDOWS)
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_SWITCH)
         int hSrcFile = 0;
 #endif
         CInifile* header = nullptr;

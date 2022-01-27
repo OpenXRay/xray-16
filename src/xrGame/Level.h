@@ -4,7 +4,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Client.h"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)
 #include "xrNetServer/empty/NET_Client.h"
 #endif
 #include "xrEngine/StatGraph.h"

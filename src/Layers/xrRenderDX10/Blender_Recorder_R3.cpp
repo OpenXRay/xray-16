@@ -56,7 +56,7 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool r
     R_ASSERT(C->type == RC_dx10texture);
     u32 stage = C->samp.index;
 
-    passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
+    passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation->Resources->_CreateTexture(TexName))));
 }
 
 void CBlender_Compile::i_dx10FilterAnizo(u32 s, BOOL value)
@@ -145,19 +145,19 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     PassSET_LightFog(FALSE, bFog);
 
     // Create shaders
-    SPS* ps = RImplementation.Resources->_CreatePS(_ps);
+    SPS* ps = RImplementation->Resources->_CreatePS(_ps);
     u32 flags = 0;
     if (ps->constants.dx9compatibility)
         flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs, flags);
-    SGS* gs = RImplementation.Resources->_CreateGS(_gs);
+    SVS* vs = RImplementation->Resources->_CreateVS(_vs, flags);
+    SGS* gs = RImplementation->Resources->_CreateGS(_gs);
     dest.ps = ps;
     dest.vs = vs;
     dest.gs = gs;
 #ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS("null");
-    dest.ds = RImplementation.Resources->_CreateDS("null");
-    dest.cs = RImplementation.Resources->_CreateCS("null");
+    dest.hs = RImplementation->Resources->_CreateHS("null");
+    dest.ds = RImplementation->Resources->_CreateDS("null");
+    dest.cs = RImplementation->Resources->_CreateCS("null");
 #endif
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);
@@ -177,8 +177,8 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
 {
     r_Pass(vs, gs, ps, bFog, bZtest, bZwrite, bABlend, abSRC, abDST, aTest, aRef);
 
-    dest.hs = RImplementation.Resources->_CreateHS(hs);
-    dest.ds = RImplementation.Resources->_CreateDS(ds);
+    dest.hs = RImplementation->Resources->_CreateHS(hs);
+    dest.ds = RImplementation->Resources->_CreateDS(ds);
 
     ctable.merge(&dest.hs->constants);
     ctable.merge(&dest.ds->constants);
@@ -186,7 +186,7 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
 
 void CBlender_Compile::r_ComputePass(LPCSTR cs)
 {
-    dest.cs = RImplementation.Resources->_CreateCS(cs);
+    dest.cs = RImplementation->Resources->_CreateCS(cs);
 
     ctable.merge(&dest.cs->constants);
 }

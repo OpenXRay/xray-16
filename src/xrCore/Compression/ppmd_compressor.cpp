@@ -3,7 +3,7 @@
 #include "PPMd.h"
 #include "SDL.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_SWITCH)
 
 
 LONG InterlockedExchange(LONG volatile *dest, LONG val)

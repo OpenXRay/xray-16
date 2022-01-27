@@ -9,7 +9,7 @@
 #include "game_sv_item_respawner.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Server.h"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)
 #include "xrNetServer/empty/NET_Server.h"
 #endif
 

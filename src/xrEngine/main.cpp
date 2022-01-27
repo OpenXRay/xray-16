@@ -18,11 +18,11 @@
 #include "xrCDB/ISpatial.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
 #include "xrSASH.h"
 #endif
 #include "xr_ioc_cmd.h"
@@ -126,7 +126,11 @@ ENGINE_API void InitSettings()
     includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
 
     InitConfig(pSettings, "system.ltx");
+#ifdef XR_PLATFORM_SWITCH
+    InitConfig(pSettingsAuth, "system.ltx"); // XXX: Switch issues with mmap, temp solution to get it working
+#else
     InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
+#endif
     InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
     InitConfig(pGameIni, "game.ltx");
 
@@ -315,16 +319,16 @@ ENGINE_API void Startup()
     Engine.Event.Dump();
     // Destroying
     destroyInput();
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
         destroySettings();
     LALib.OnDestroy();
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
     if (!g_bBenchmark && !g_SASH.IsRunning())
 #endif
         destroyConsole();
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
     else
         Console->Destroy();
 #endif
@@ -400,7 +404,7 @@ bool CheckBenchmark()
         const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
         g_SASH.Init(sashArg);
         g_SASH.MainLoop();
 #endif

@@ -5,7 +5,19 @@
 
 #include "Include/xrRender/UIShader.h"
 
-CUIStatsIcon::TEX_INFO CUIStatsIcon::m_tex_info[MAX_DEF_TEX][2];
+#ifndef XR_PLATFORM_SWITCH
+CUIStatsIcon::TEX_INFO2 CUIStatsIcon::m_tex_info[MAX_DEF_TEX][2];
+#else
+// XXX: Switch is linking statically, need a way to guqrantee the proper init order
+std::unique_ptr<CUIStatsIcon::TEX_INFO2> init;
+CUIStatsIcon::TEX_INFO2** CUIStatsIcon::m_tex_info = nullptr;
+
+void CUIStatsIcon::GlobalInit()
+{
+    init.reset(new CUIStatsIcon::TEX_INFO2[MAX_DEF_TEX * 2]);
+    CUIStatsIcon::m_tex_info = reinterpret_cast<CUIStatsIcon::TEX_INFO2**>(init.get());
+}
+#endif
 
 CUIStatsIcon::CUIStatsIcon()
 {

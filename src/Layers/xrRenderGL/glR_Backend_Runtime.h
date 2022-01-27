@@ -421,7 +421,10 @@ ICF void CBackend::set_FillMode(u32 _mode)
     if (fill_mode != _mode)
     {
         fill_mode = _mode;
+#ifndef XR_PLATFORM_SWITCH
+        // XXX: TODO SWITCH ???
         glPolygonMode(GL_FRONT_AND_BACK, glStateUtils::ConvertFillMode(_mode));
+#endif
     }
 }
 

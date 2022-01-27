@@ -28,6 +28,26 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
+#ifdef XR_PLATFORM_SWITCH
+#include <switch.h>
+
+struct NxLink
+{
+    NxLink()
+    {
+        socketInitializeDefault();  // Initialize sockets
+        nxlinkStdio();              // Redirect stdout and stderr over the network to nxlink
+        printf("+ NXLINK was initialized\n");
+    }
+
+    ~NxLink()
+    {
+        socketExit();
+        consoleExit(NULL);
+    }
+} static NxLinkInit;
+#endif
+
 int entry_point(pcstr commandLine)
 {
     xrDebug::Initialize(commandLine);
@@ -122,7 +142,7 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
     }
     return result;
 }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;

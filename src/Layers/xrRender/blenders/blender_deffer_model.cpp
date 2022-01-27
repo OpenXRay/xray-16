@@ -104,7 +104,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         case SE_R2_SHADOW: // smap
             if (bAref)
             {
-                if (RImplementation.o.HW_smap)
+                if (RImplementation->o.HW_smap)
                     C.r_Pass("shadow_direct_model_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE,
                         D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 220);
                 else
@@ -115,7 +115,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
             }
             else
             {
-                if (RImplementation.o.HW_smap)
+                if (RImplementation->o.HW_smap)
                     C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);
                 else
                     C.r_Pass("shadow_direct_model", "shadow_direct_base", FALSE);
@@ -153,7 +153,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         // deferred rendering
         // codepath is the same, only the shaders differ
 
-        bool bUseATOC = (bAref && RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        bool bUseATOC = (bAref && RImplementation->o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
 
         switch (C.iElement)
         {
@@ -200,7 +200,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         {
             if (bAref)
             {
-                //if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",	FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);
+                //if (RImplementation->o.HW_smap)	C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",	FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);
                 //else							C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",	FALSE);
                 C.r_Pass("shadow_direct_model_aref", "shadow_direct_base_aref", FALSE,TRUE,TRUE,FALSE, D3DBLEND_ZERO,
                          D3DBLEND_ONE,TRUE, 220);
@@ -209,7 +209,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
                 C.r_End();
                 break;
             }
-            //if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
+            //if (RImplementation->o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
             //else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
             C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE,TRUE,FALSE);
             C.r_Sampler("s_base", C.L_textures[0]);
@@ -251,7 +251,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         // deferred rendering
         // codepath is the same, only the shaders differ
 
-        bool bUseATOC = (bAref && (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC));
+        bool bUseATOC = (bAref && (RImplementation->o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC));
 
 #if RENDER == R_R4
         C.TessMethod = oTessellation.IDselected;
@@ -303,7 +303,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         case SE_R2_SHADOW: // smap
             if (bAref)
             {
-                // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",
+                // if (RImplementation->o.HW_smap)	C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",
                 // FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);
                 // else							C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",
                 // FALSE);
@@ -319,7 +319,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
             }
             else
             {
-                // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
+                // if (RImplementation->o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
                 // else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
                 C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);
                 // C.r_Sampler		("s_base",C.L_textures[0]);

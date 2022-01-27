@@ -318,7 +318,7 @@ void CRender::Render()
         split_the_scene_to_minimize_wait = TRUE;
 
     //******* Main render :: PART-0	-- first
-#ifdef USE_OGL
+#if defined (USE_OGL) && !defined(XR_PLATFORM_SWITCH) // XXX: find Switch alternative, excluded to get it building
     if (psDeviceFlags.test(rsWireframe))
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
@@ -342,7 +342,7 @@ void CRender::Render()
         r_dsgraph_render_graph(0);
         Target->disable_aniso();
     }
-#ifdef USE_OGL
+#if defined (USE_OGL) && !defined(XR_PLATFORM_SWITCH) // XXX: Same as above
     if (psDeviceFlags.test(rsWireframe))
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
@@ -489,7 +489,7 @@ void CRender::Render()
     {
         PIX_EVENT(DEFER_SUN);
         Stats.l_visible++;
-        if (!RImplementation.o.oldshadowcascades)
+        if (!RImplementation->o.oldshadowcascades)
             render_sun_cascades();
         else
         {

@@ -29,7 +29,7 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
 #ifdef USE_DX9
     RCache.OnFrameEnd();
 #else // when we don't have FFP support
-    RCache.set_Shader(RImplementation.m_WireShader);
+    RCache.set_Shader(RImplementation->m_WireShader);
     RCache.set_Z(false);
     RCache.set_c("tfactor", 1.0f, 1.0f, 1.0f, 1.0f);
 #endif

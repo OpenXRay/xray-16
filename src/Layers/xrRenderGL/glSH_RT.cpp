@@ -17,7 +17,7 @@ CRT::~CRT()
     destroy();
 
     // release external reference
-    RImplementation.Resources->_DeleteRT(this);
+    RImplementation->Resources->_DeleteRT(this);
 }
 
 bool CRT::used_as_depth() const
@@ -60,7 +60,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     if (w > u32(max_width)) return;
     if (h > u32(max_height)) return;
 
-    RImplementation.Resources->Evict();
+    RImplementation->Resources->Evict();
 
     target = (SampleCount > 1) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     glGenTextures(1, &pRT);
@@ -71,7 +71,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     else
         CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, glTextureUtils::ConvertTextureFormat(fmt), w, h));
 
-    pTexture = RImplementation.Resources->_CreateTexture(Name);
+    pTexture = RImplementation->Resources->_CreateTexture(Name);
     pTexture->surface_set(target, pRT);
 
     // OpenGL doesn't differentiate between color and depth targets
@@ -101,7 +101,9 @@ void CRT::reset_end()
 void CRT::resolve_into(CRT& destination) const
 {
     glReadBuffer(GL_COLOR_ATTACHMENT0);
-    glDrawBuffer(GL_COLOR_ATTACHMENT1);
+#ifndef XR_PLATFORM_SWITCH
+    glDrawBuffer(GL_COLOR_ATTACHMENT1); // XXX: TODO SWITCH ???
+#endif
 
     constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     RCache.set_RT(pRT, 0);
@@ -117,5 +119,5 @@ void CRT::resolve_into(CRT& destination) const
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
 {
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
+    _set(RImplementation->Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
 }

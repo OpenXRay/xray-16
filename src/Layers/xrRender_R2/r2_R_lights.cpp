@@ -40,7 +40,7 @@ void CRender::render_lights(light_Package& LP)
 
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
-            LP_smap_pool.initialize(RImplementation.o.smapsize);
+            LP_smap_pool.initialize(RImplementation->o.smapsize);
             std::sort(source.begin(), source.end(), pred_area);
             for (size_t test = 0; test < source.size(); ++test)
             {
@@ -103,7 +103,7 @@ void CRender::render_lights(light_Package& LP)
 
             // render
             phase = PHASE_SMAP;
-            if (RImplementation.o.Tshadows)
+            if (RImplementation->o.Tshadows)
                 r_pmask(true, true);
             else
                 r_pmask(true, false);
@@ -192,7 +192,7 @@ void CRender::render_lights(light_Package& LP)
             }
 
             PIX_EVENT(ACCUM_VOLUMETRIC);
-            if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
+            if (RImplementation->o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
                 for (u32 it = 0; it < L_spot_s.size(); it++)
                     Target->accum_volumetric(L_spot_s[it]);
 

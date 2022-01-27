@@ -111,7 +111,7 @@ void CSkeletonX::_Render_soft(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCou
         cache_vCount = vCount;
         cache_vOffset = vOffset;
 
-        RImplementation.BasicStats.Skinning.Begin();
+        RImplementation->BasicStats.Skinning.Begin();
         if (*Vertices1W)
         {
             Skin1W(Dest, // dest
@@ -147,7 +147,7 @@ void CSkeletonX::_Render_soft(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCou
         else
             R_ASSERT2(0, "unsupported soft rendering");
 
-        RImplementation.BasicStats.Skinning.End();
+        RImplementation->BasicStats.Skinning.End();
         _VS.Unlock(vCount, hGeom->vb_stride);
     }
 
@@ -210,14 +210,14 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         if (1 == bids.size())
         {
             // HW- single bone
-            RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
+            RenderMode = RImplementation->m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
             RMS_boneid = *bids.begin();
             GEnv.Render->shader_option_skinning(0);
         }
         else if (sw_bones_cnt <= hw_bones_cnt)
         {
             // HW- one weight
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
+            RenderMode = RImplementation->m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(1);
         }
@@ -253,7 +253,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         if (sw_bones_cnt <= hw_bones_cnt)
         {
             // HW- two weights
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_2B_HQ : RM_SKINNING_2B;
+            RenderMode = RImplementation->m_hq_skinning ? RM_SKINNING_2B_HQ : RM_SKINNING_2B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(2);
         }
@@ -286,7 +286,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
         if ((sw_bones_cnt <= hw_bones_cnt))
         {
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_3B_HQ : RM_SKINNING_3B;
+            RenderMode = RImplementation->m_hq_skinning ? RM_SKINNING_3B_HQ : RM_SKINNING_3B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(3);
         }
@@ -319,7 +319,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
         if (sw_bones_cnt <= hw_bones_cnt)
         {
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_4B_HQ : RM_SKINNING_4B;
+            RenderMode = RImplementation->m_hq_skinning ? RM_SKINNING_4B_HQ : RM_SKINNING_4B;
             RMS_bonecount = sw_bones_cnt + 1;
             GEnv.Render->shader_option_skinning(4);
         }

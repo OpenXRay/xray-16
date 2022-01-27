@@ -12,13 +12,13 @@ bool tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fve
 
 void CRenderTarget::enable_dbt_bounds(light* L)
 {
-    if (!RImplementation.o.nvdbt)
+    if (!RImplementation->o.nvdbt)
         return;
     if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
         return;
 
     u32 mask = 0xffffffff;
-    EFC_Visible vis = RImplementation.ViewBase.testSphere(L->spatial.sphere.P, L->spatial.sphere.R * 1.01f, mask);
+    EFC_Visible vis = RImplementation->ViewBase.testSphere(L->spatial.sphere.P, L->spatial.sphere.R * 1.01f, mask);
     if (vis != fcvFully)
         return;
 
@@ -44,7 +44,7 @@ void CRenderTarget::enable_dbt_bounds(light* L)
 #ifdef USE_DX9
 bool CRenderTarget::u_DBT_enable(float zMin, float zMax)
 {
-    if (!RImplementation.o.nvdbt)
+    if (!RImplementation->o.nvdbt)
         return FALSE;
     if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
         return FALSE;
@@ -59,7 +59,7 @@ bool CRenderTarget::u_DBT_enable(float zMin, float zMax)
 
 void CRenderTarget::u_DBT_disable()
 {
-    if (RImplementation.o.nvdbt && ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
+    if (RImplementation->o.nvdbt && ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
         HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X, 0);
 }
 #else // TODO: DX10: Check if DX10 supports this feature

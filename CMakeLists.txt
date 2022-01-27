@@ -208,10 +208,17 @@ if (NOT WIN32)
         find_package(Crypto++ REQUIRED)
     endif()
     find_package(JPEG)
-    find_package(Theora REQUIRED)
+    if (NOT NINTENDO_SWITCH) # XXX: Will be fixed
+        find_package(Theora REQUIRED)
+    endif()
     find_package(Ogg REQUIRED)
     find_package(SDL REQUIRED)
     find_package(LZO REQUIRED)
+endif()
+
+if (NINTENDO_SWITCH)
+    # XXX: Fix this include, should be done by devkitpro
+    include_directories("${DEVKITPRO}/portlibs/switch/include")
 endif()
 
 # XXX: move to LuaJIT

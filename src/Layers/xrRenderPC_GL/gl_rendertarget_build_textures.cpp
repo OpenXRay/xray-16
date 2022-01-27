@@ -51,7 +51,7 @@ void CRenderTarget::build_textures()
         CHK_GL(glBindTexture(GL_TEXTURE_3D, t_material_surf));
         CHK_GL(glTexStorage3D(GL_TEXTURE_3D, 1, GL_RG8, TEX_material_LdotN, TEX_material_LdotH, TEX_material_Count)
         );
-        t_material = RImplementation.Resources->_CreateTexture(r2_material);
+        t_material = RImplementation->Resources->_CreateTexture(r2_material);
         t_material->surface_set(GL_TEXTURE_3D, t_material_surf);
 
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
@@ -136,7 +136,7 @@ void CRenderTarget::build_textures()
             xr_sprintf(name, "%s%d", r2_jitter, it1);
             CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it1]));
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
-            t_noise[it1] = RImplementation.Resources->_CreateTexture(name);
+            t_noise[it1] = RImplementation->Resources->_CreateTexture(name);
             t_noise[it1]->surface_set(GL_TEXTURE_2D, t_noise_surf[it1]);
         }
 
@@ -172,7 +172,7 @@ void CRenderTarget::build_textures()
         xr_sprintf(name, "%s%d", r2_jitter, it);
         CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it]));
         CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, TEX_jitter, TEX_jitter));
-        t_noise[it] = RImplementation.Resources->_CreateTexture(name);
+        t_noise[it] = RImplementation->Resources->_CreateTexture(name);
         t_noise[it]->surface_set(GL_TEXTURE_2D, t_noise_surf[it]);
 
         // Fill it,
@@ -211,7 +211,7 @@ void CRenderTarget::build_textures()
             glGenTextures(1, &t_noise_surf_mipped);
             CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf_mipped));
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
-            t_noise_mipped = RImplementation.Resources->_CreateTexture(r2_jitter_mipped);
+            t_noise_mipped = RImplementation->Resources->_CreateTexture(r2_jitter_mipped);
             t_noise_mipped->surface_set(GL_TEXTURE_2D, t_noise_surf_mipped);
 
             //	Update texture. Generate mips.

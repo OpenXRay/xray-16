@@ -14,7 +14,7 @@
 
 void resptrcode_texture::create(LPCSTR _name)
 {
-    _set(RImplementation.Resources->_CreateTexture(_name));
+    _set(RImplementation->Resources->_CreateTexture(_name));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ CTexture::~CTexture()
 {
     Unload();
     // release external reference
-    RImplementation.Resources->_DeleteTexture(this);
+    RImplementation->Resources->_DeleteTexture(this);
 }
 
 void CTexture::surface_set(GLenum target, GLuint surf)
@@ -144,8 +144,8 @@ void CTexture::apply_normal(u32 dwStage)
 
 void CTexture::Preload()
 {
-    m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
-    m_material = RImplementation.Resources->m_textures_description.GetMaterial(cName);
+    m_bumpmap = RImplementation->Resources->m_textures_description.GetBumpName(cName);
+    m_material = RImplementation->Resources->m_textures_description.GetMaterial(cName);
 }
 
 void CTexture::Load()
@@ -275,7 +275,7 @@ void CTexture::Load()
             {
                 // Load another texture
                 u32 mem = 0;
-                pSurface = RImplementation.texture_load(buffer, mem, desc);
+                pSurface = RImplementation->texture_load(buffer, mem, desc);
                 if (pSurface)
                 {
                     // pSurface->SetPriority	(PRIORITY_LOW);
@@ -291,7 +291,7 @@ void CTexture::Load()
     {
         // Normal texture
         u32 mem = 0;
-        pSurface = RImplementation.texture_load(*cName, mem, desc);
+        pSurface = RImplementation->texture_load(*cName, mem, desc);
 
         // Calc memory usage and preload into vid-mem
         if (pSurface)

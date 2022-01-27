@@ -397,4 +397,5 @@ private:
     FS_FileSet m_file_set;
 };
 
-extern CRender RImplementation;
+// XXX: TODO Switch
+extern std::unique_ptr<CRender> RImplementation;

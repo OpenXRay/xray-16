@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "lzo_compressor.h"
-#include "lzo/lzo1x.h"
+#include <lzo/lzo1x.h>
 
 int lzo_compress_dict(
     const void* input, u32 inputSize, void* output, u32& outputSize, void* workMem, const void* dict, u32 dictSize)

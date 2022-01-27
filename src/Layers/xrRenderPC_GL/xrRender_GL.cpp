@@ -19,7 +19,7 @@ public:
             return false;
         }
         // Check if shaders are available
-        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+        if (!FS.exist("$game_shaders$", RImplementation->getShaderPath()))
         {
             Log("~ No shaders found for OpenGL");
             return false;
@@ -47,7 +47,7 @@ public:
         CheckModeConsistency(mode);
         ps_r2_sun_static = false;
         ps_r2_advanced_pp = true;
-        GEnv.Render = &RImplementation;
+        GEnv.Render = RImplementation.get(); // XXX: SWITCH fix for build
         GEnv.RenderFactory = &RenderFactoryImpl;
         GEnv.DU = &DUImpl;
         GEnv.UIRender = &UIRenderImpl;
@@ -58,10 +58,20 @@ public:
     }
 } static s_rgl_module;
 
+#ifndef XR_PLATFORM_SWITCH
 extern "C"
 {
+#endif
 XR_EXPORT RendererModule* GetRendererModule()
 {
     return &s_rgl_module;
 }
+
+XR_EXPORT void xrRenderGL_GlobalInit()
+{
+    RImplementation.reset(new CRender());
 }
+
+#ifndef XR_PLATFORM_SWITCH
+}
+#endif

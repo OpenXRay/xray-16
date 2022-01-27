@@ -461,9 +461,9 @@ void CBlender_Compile::SetMapping()
         r_Constant("dt_params", detail_scaler);
 
     // other common
-    for (u32 it = 0; it < RImplementation.Resources->v_constant_setup.size(); it++)
+    for (u32 it = 0; it < RImplementation->Resources->v_constant_setup.size(); it++)
     {
-        std::pair<shared_str, R_constant_setup*> cs = RImplementation.Resources->v_constant_setup[it];
+        std::pair<shared_str, R_constant_setup*> cs = RImplementation->Resources->v_constant_setup[it];
         r_Constant(*cs.first, cs.second);
     }
 }

@@ -184,7 +184,7 @@ void CDetailManager::hw_Render()
 
 void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id, u32 /*c_offset*/)
 {
-    RImplementation.BasicStats.DetailCount = 0;
+    RImplementation->BasicStats.DetailCount = 0;
 
     // Matrices and offsets
     u32 vOffset = 0;
@@ -217,7 +217,7 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
         {
             // Setup matrices + colors (and flush it as nesessary)
             RCache.set_Element(Object.shader->E[lod_id]);
-            RImplementation.apply_lmaterial();
+            RImplementation->apply_lmaterial();
             u32 c_base = x_array->vs.index;
             Fvector4* c_storage = RCache.get_ConstantCache_Vertex().get_array_f().access(c_base);
 
@@ -260,7 +260,7 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
                     if (dwBatch == hw_BatchSize)
                     {
                         // flush
-                        RImplementation.BasicStats.DetailCount += dwBatch;
+                        RImplementation->BasicStats.DetailCount += dwBatch;
                         u32 dwCNT_verts = dwBatch * Object.number_vertices;
                         u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
                         RCache.get_ConstantCache_Vertex().b_dirty = TRUE;
@@ -276,7 +276,7 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
             // flush if nessecary
             if (dwBatch)
             {
-                RImplementation.BasicStats.DetailCount += dwBatch;
+                RImplementation->BasicStats.DetailCount += dwBatch;
                 u32 dwCNT_verts = dwBatch * Object.number_vertices;
                 u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
                 RCache.get_ConstantCache_Vertex().b_dirty = TRUE;

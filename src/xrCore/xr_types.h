@@ -56,7 +56,7 @@ constexpr double dbl_min = type_min<double>;
 constexpr double dbl_zero = type_zero<double>;
 constexpr double dbl_eps = type_epsilon<double>;
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_SWITCH)
 constexpr size_t max_path = PATH_MAX;
 #elif defined(XR_PLATFORM_WINDOWS)
 constexpr size_t max_path = MAX_PATH;

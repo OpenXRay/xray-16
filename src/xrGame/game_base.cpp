@@ -5,8 +5,9 @@
 #include "Level.h"
 #include "xrMessages.h"
 
+// XXX: Switch when linking statically this get's initialized in the very beginning
 u64 g_qwStartGameTime = 12 * 60 * 60 * 1000;
-float g_fTimeFactor = 10;
+extern float g_fTimeFactor;
 u64 g_qwEStartGameTime = 12 * 60 * 60 * 1000;
 
 EGameIDs ParseStringToGameType(LPCSTR str);

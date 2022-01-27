@@ -47,7 +47,7 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    bool bUseATOC = (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+    bool bUseATOC = (RImplementation->o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
 
     switch (C.iElement)
     {

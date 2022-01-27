@@ -409,10 +409,27 @@ target_link_libraries(${PROJECT_NAME}
     xrParticles
     xrScriptEngine
     xrAPI
-    GL
     GLEW
     xrLuabind
 )
+
+if (NINTENDO_SWITCH)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    EGL
+    freeimage
+    png
+    theora
+    theoradec
+    theoraenc
+    GLESv2
+)
+else()
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    GL
+)
+endif()
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE

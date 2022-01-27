@@ -11,7 +11,7 @@ int rsDIB_Size = 512;
 
 void _VertexStream::Create()
 {
-    RImplementation.Resources->Evict();
+    RImplementation->Resources->Evict();
 
     mSize = rsDVB_Size * 1024;
     pVB.Create(mSize);
@@ -93,7 +93,7 @@ void _VertexStream::reset_end()
 void _IndexStream::Create()
 {
     //dxRenderDeviceRender::Instance().Resources->Evict();
-    RImplementation.Resources->Evict();
+    RImplementation->Resources->Evict();
 
     mSize = rsDIB_Size * 1024;
     pIB.Create(mSize);

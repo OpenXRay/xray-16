@@ -12,6 +12,9 @@
 #include <sys/stat.h>
 #include <pwd.h>
 #include <unistd.h>
+#elif defined(XR_PLATFORM_SWITCH)
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
 #include "xrCore.h"
 #include "Math/MathUtil.hpp"
@@ -182,6 +185,21 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
+#elif defined(XR_PLATFORM_SWITCH)
+        char buf[PATH_MAX];
+        getcwd(buf, PATH_MAX);
+        fs::path p(buf); 
+
+        p /= "GSC Game World";
+
+        if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+            p /= "S.T.A.L.K.E.R. - Shadow of Chernobyl";
+        else if (strstr(Core.Params, "-cs"))
+            p /= "S.T.A.L.K.E.R. - Clear Sky";
+        else
+            p /= "S.T.A.L.K.E.R. - Call of Pripyat";
+
+        SDL_strlcpy(ApplicationPath, p.c_str(), sizeof(ApplicationPath));
 #else
         char* pref_path = nullptr;
         if (strstr(Core.Params, "-fsltx"))
@@ -211,6 +229,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
 #if defined(XR_PLATFORM_WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
+#elif defined (XR_PLATFORM_SWITCH)
+    chdir(ApplicationPath);
 #else
         getcwd(WorkingPath, sizeof(WorkingPath));
 
@@ -284,8 +304,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #endif
 
         Memory._initialize();
-
+#ifndef XR_PLATFORM_SWITCH
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
+#endif
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
@@ -330,7 +351,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         EFS._initialize();
 #ifdef DEBUG
 #ifndef _EDITOR
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH) // FIXME!!!
         Msg("Process heap 0x%08x", GetProcessHeap());
 #endif
 #endif

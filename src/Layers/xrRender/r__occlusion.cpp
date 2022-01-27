@@ -51,7 +51,7 @@ u32 R_occlusion::occq_begin(u32& ID)
         return 0;
     }
 
-    RImplementation.BasicStats.OcclusionQueries++;
+    RImplementation->BasicStats.OcclusionQueries++;
     if (!fids.empty())
     {
         ID = fids.back();
@@ -101,7 +101,7 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
     // Msg			("get  : [%2d] - %d => %d", used[ID].order, ID, fragments);
     CTimer T;
     T.Start();
-    RImplementation.BasicStats.Wait.Begin();
+    RImplementation->BasicStats.Wait.Begin();
     // while	((hr=used[ID].Q->GetData(&fragments,sizeof(fragments),D3DGETDATA_FLUSH))==S_FALSE) {
     VERIFY2(ID < used.size(), make_string("_Pos = %d, size() = %d ", ID, used.size()));
     while ((hr = GetData(used[ID].Q, &fragments, sizeof(fragments))) == S_FALSE)
@@ -115,14 +115,14 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
             break;
         }
     }
-    RImplementation.BasicStats.Wait.End();
+    RImplementation->BasicStats.Wait.End();
 #if defined(USE_DX9) || defined(USE_DX11)
     if (hr == D3DERR_DEVICELOST)
         fragments = 0xffffffff;
 #endif
 
     if (0 == fragments)
-        RImplementation.BasicStats.OcclusionCulled++;
+        RImplementation->BasicStats.OcclusionCulled++;
 
     // insert into pool (sorting in decreasing order)
     _Q& Q = used[ID];

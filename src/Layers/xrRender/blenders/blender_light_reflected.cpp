@@ -8,7 +8,7 @@ CBlender_accum_reflected::~CBlender_accum_reflected() {}
 void CBlender_accum_reflected::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    BOOL blend = RImplementation.o.fp16_blend;
+    BOOL blend = RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
 #if RENDER == R_R2
@@ -47,7 +47,7 @@ CBlender_accum_reflected_msaa::~CBlender_accum_reflected_msaa() {}
 void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    BOOL blend = RImplementation.o.fp16_blend;
+    BOOL blend = RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)

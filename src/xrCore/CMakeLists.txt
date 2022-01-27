@@ -239,6 +239,30 @@ target_include_directories(${PROJECT_NAME}
     ${JPEG_INCLUDE_DIRS}
 )
 
+if (NINTENDO_SWITCH)
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+    ${LZO_INCLUDE_DIRS}
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    pthread
+    ${SDL_LIBRARIES}
+    ${CRYPTO++_LIBRARIES}
+    PRIVATE
+    xrMiscMath
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
+    ${PCRE_LIBRARIES}
+    ${LZO_LIBRARIES}
+    ogg 
+    #vorbisfile 
+    egl 
+    drm_nouveau 
+    glapi 
+    nxd
+)
+else()
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     pthread
@@ -251,6 +275,7 @@ target_link_libraries(${PROJECT_NAME}
     ${JPEG_LIBRARIES}
     ${LZO_LIBRARIES}
 )
+endif()
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE

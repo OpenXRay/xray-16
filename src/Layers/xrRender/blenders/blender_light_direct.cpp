@@ -10,11 +10,11 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
 #if RENDER == R_R2
-    BOOL b_HW_smap = RImplementation.o.HW_smap;
-    BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
-    BOOL blend = FALSE; // RImplementation.o.fp16_blend;
+    BOOL b_HW_smap = RImplementation->o.HW_smap;
+    BOOL b_HW_PCF = RImplementation->o.HW_smap_PCF;
+    BOOL blend = FALSE; // RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         blend = FALSE;
         dest = D3DBLEND_ZERO;
@@ -75,11 +75,11 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         break;
     }
 #elif RENDER == R_GL
-    //	BOOL	b_HW_smap		= RImplementation.o.HW_smap;
-    //	BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
-    BOOL blend = FALSE; //RImplementation.o.fp16_blend;
+    //	BOOL	b_HW_smap		= RImplementation->o.HW_smap;
+    //	BOOL	b_HW_PCF		= RImplementation->o.HW_smap_PCF;
+    BOOL blend = FALSE; //RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         blend = FALSE;
         dest = D3DBLEND_ZERO;
@@ -175,11 +175,11 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         */
     }
 #else
-    //	BOOL	b_HW_smap		= RImplementation.o.HW_smap;
-    //	BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
-    BOOL blend = FALSE; // RImplementation.o.fp16_blend;
+    //	BOOL	b_HW_smap		= RImplementation->o.HW_smap;
+    //	BOOL	b_HW_PCF		= RImplementation->o.HW_smap_PCF;
+    BOOL blend = FALSE; // RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         blend = FALSE;
         dest = D3DBLEND_ZERO;
@@ -189,7 +189,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
     {
     case SE_SUN_NEAR: // near pass - enable Z-test to perform depth-clipping
     case SE_SUN_MIDDLE: // middle pass - enable Z-test to perform depth-clipping
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_sun_near_nomsaa_nominmax",
                 false, TRUE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -219,7 +219,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         break;
     case SE_SUN_FAR: // far pass, only stencil clipping performed
         // C.r_Pass			("null",			"accum_sun_far",	false,	TRUE,	FALSE,blend,D3DBLEND_ONE,dest);
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_sun_far_nomsaa",
                 false, TRUE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -285,7 +285,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
 
     //	SE_SUN_NEAR for min/max
     case SE_SUN_NEAR_MINMAX: // near pass - enable Z-test to perform depth-clipping
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_sun_near_nomsaa_minmax",
                 false, TRUE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -360,11 +360,11 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         GEnv.Render->m_MSAASample = -1;
 
 #if RENDER == R_GL
-    //	BOOL	b_HW_smap		= RImplementation.o.HW_smap;
-    //	BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
-    BOOL blend = FALSE; //RImplementation.o.fp16_blend;
+    //	BOOL	b_HW_smap		= RImplementation->o.HW_smap;
+    //	BOOL	b_HW_PCF		= RImplementation->o.HW_smap_PCF;
+    BOOL blend = FALSE; //RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         blend = FALSE;
         dest = D3DBLEND_ZERO;
@@ -435,11 +435,11 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         break;
     }
 #else
-    //	BOOL	b_HW_smap		= RImplementation.o.HW_smap;
-    //	BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
-    BOOL blend = FALSE; // RImplementation.o.fp16_blend;
+    //	BOOL	b_HW_smap		= RImplementation->o.HW_smap;
+    //	BOOL	b_HW_PCF		= RImplementation->o.HW_smap_PCF;
+    BOOL blend = FALSE; // RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         blend = FALSE;
         dest = D3DBLEND_ZERO;
@@ -450,7 +450,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
     case SE_SUN_NEAR: // near pass - enable Z-test to perform depth-clipping
     case SE_SUN_MIDDLE: // middle pass - enable Z-test to perform depth-clipping
         // C.r_Pass			("null",			"accum_sun_near",	false,	TRUE,	FALSE,blend,D3DBLEND_ONE,dest);
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_sun_near_msaa_nominmax",
                 false, TRUE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -492,7 +492,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         break;
     case SE_SUN_FAR: // far pass, only stencil clipping performed
         // C.r_Pass			("null",			"accum_sun_far",	false,	TRUE,	FALSE,blend,D3DBLEND_ONE,dest);
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_sun_far_msaa",
                 false, TRUE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -558,7 +558,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
 
     //	SE_SUN_NEAR for minmax
     case SE_SUN_NEAR_MINMAX: // near pass - enable Z-test to perform depth-clipping
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_sun_near_msaa_minmax",
                 false, TRUE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -608,11 +608,11 @@ void CBlender_accum_direct_volumetric_msaa::Compile(CBlender_Compile& C)
     else
         GEnv.Render->m_MSAASample = -1;
 
-    //	BOOL	b_HW_smap		= RImplementation.o.HW_smap;
-    //	BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
-    BOOL blend = FALSE; // RImplementation.o.fp16_blend;
+    //	BOOL	b_HW_smap		= RImplementation->o.HW_smap;
+    //	BOOL	b_HW_PCF		= RImplementation->o.HW_smap_PCF;
+    BOOL blend = FALSE; // RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         blend = FALSE;
         dest = D3DBLEND_ZERO;
@@ -627,7 +627,7 @@ void CBlender_accum_direct_volumetric_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
         C.r_Sampler("s_noise", "fx" DELIMITER "fx_noise");
 #else
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_volumetric_sun_msaa",
                 false, TRUE, FALSE, blend, D3DBLEND_ONE, dest);
@@ -676,7 +676,7 @@ void CBlender_accum_direct_volumetric_sun_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
         C.r_Sampler_rtf("s_position", r2_RT_P);
 #else
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             // FVF::TL2uv
             C.r_Pass("stub_notransform_2uv", "accum_volumetric_sun_msaa",
                 false, false, false, true, D3DBLEND_ONE, D3DBLEND_ONE, false, 0);

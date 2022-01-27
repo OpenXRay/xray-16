@@ -17,10 +17,33 @@ extern void CleanupUIStyleToken();
 
 void CCC_RegisterCommands();
 
-extern float g_fTimeFactor;
+#ifdef XR_PLATFORM_SWITCH
+#include "ui/UIStatsIcon.h"
 
+// Since linked statically need to keep init order
+float g_fTimeFactor = 10;
+shared_str wpn_scope;
+shared_str wpn_silencer;
+shared_str wpn_grenade_launcher;
+
+void xrGame_GlobalInit()
+{
+    wpn_scope = "wpn_scope";
+    wpn_silencer = "wpn_silencer";
+    wpn_grenade_launcher = "wpn_launcher";
+    CUIStatsIcon::GlobalInit();
+}
+#else 
+float g_fTimeFactor = 10;
+shared_str wpn_scope = "wpn_scope";
+shared_str wpn_silencer = "wpn_silencer";
+shared_str wpn_grenade_launcher = "wpn_launcher";
+#endif
+
+#ifndef XR_PLATFORM_SWITCH
 extern "C"
 {
+#endif
     XR_EXPORT IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
     {
         IFactoryObject* object = object_factory().client_object(clsid);
@@ -55,5 +78,7 @@ extern "C"
     {
         CleanupUIStyleToken();
         StringTable().Destroy();
- }
+    }
+#ifndef XR_PLATFORM_SWITCH
 }
+#endif

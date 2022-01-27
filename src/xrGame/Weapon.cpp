@@ -1244,9 +1244,11 @@ bool CWeapon::IsSilencerAttached() const
 bool CWeapon::GrenadeLauncherAttachable() { return (ALife::eAddonAttachable == m_eGrenadeLauncherStatus); }
 bool CWeapon::ScopeAttachable() { return (ALife::eAddonAttachable == m_eScopeStatus); }
 bool CWeapon::SilencerAttachable() { return (ALife::eAddonAttachable == m_eSilencerStatus); }
-shared_str wpn_scope = "wpn_scope";
-shared_str wpn_silencer = "wpn_silencer";
-shared_str wpn_grenade_launcher = "wpn_launcher";
+
+// XXX: Switch init order is broken when linked statically, defined in xrGame.cpp
+extern shared_str wpn_scope; // = "wpn_scope";
+extern shared_str wpn_silencer; // = "wpn_silencer";
+extern shared_str wpn_grenade_launcher;// = "wpn_launcher";
 
 void CWeapon::UpdateHUDAddonsVisibility()
 { // actor only

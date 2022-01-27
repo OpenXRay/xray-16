@@ -17,7 +17,7 @@ struct search_entry
     const u16 type;
 };
 
-R_constant_table::~R_constant_table() { RImplementation.Resources->_DeleteConstantTable(this); }
+R_constant_table::~R_constant_table() { RImplementation->Resources->_DeleteConstantTable(this); }
 void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
 // predicates
 IC bool p_search(const ref_constant& C, cpcstr S) { return xr_strcmp(*C->name, S) < 0; }

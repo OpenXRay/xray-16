@@ -64,15 +64,15 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     PassSET_LightFog(FALSE, bFog);
 
     // Create shaders
-    SPS* ps = RImplementation.Resources->_CreatePS(_ps);
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs);
-    SGS* gs = RImplementation.Resources->_CreateGS(_gs);
+    SPS* ps = RImplementation->Resources->_CreatePS(_ps);
+    SVS* vs = RImplementation->Resources->_CreateVS(_vs);
+    SGS* gs = RImplementation->Resources->_CreateGS(_gs);
     dest.ps = ps;
     dest.vs = vs;
     dest.gs = gs;
 #ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS("null");
-    dest.ds = RImplementation.Resources->_CreateDS("null");
+    dest.hs = RImplementation->Resources->_CreateHS("null");
+    dest.ds = RImplementation->Resources->_CreateDS("null");
 #endif
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);

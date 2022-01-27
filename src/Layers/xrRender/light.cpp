@@ -50,9 +50,9 @@ light::~light()
 
 // remove from Lights_LastFrame
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    for (u32 it = 0; it < RImplementation.Lights_LastFrame.size(); it++)
-        if (this == RImplementation.Lights_LastFrame[it])
-            RImplementation.Lights_LastFrame[it] = 0;
+    for (u32 it = 0; it < RImplementation->Lights_LastFrame.size(); it++)
+        if (this == RImplementation->Lights_LastFrame[it])
+            RImplementation->Lights_LastFrame[it] = 0;
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
@@ -73,24 +73,24 @@ void light::set_texture(LPCSTR name)
 
     strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name);
     // strconcat(sizeof(temp),temp,"_nomsaa",name);
-    s_spot.create(RImplementation.Target->b_accum_spot, temp, name);
+    s_spot.create(RImplementation->Target->b_accum_spot, temp, name);
 
 #if (RENDER != R_R3) && (RENDER != R_R4) && (RENDER != R_GL)
     s_volumetric.create("accum_volumetric", name);
 #else //    (RENDER!=R_R3) && (RENDER!=R_R4) && (RENDER!=R_GL)
     s_volumetric.create("accum_volumetric_nomsaa", name);
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation->o.dx10_msaa)
     {
         int bound = 1;
 
-        if (!RImplementation.o.dx10_msaa_opt)
-            bound = RImplementation.o.dx10_msaa_samples;
+        if (!RImplementation->o.dx10_msaa_opt)
+            bound = RImplementation->o.dx10_msaa_samples;
 
         for (int i = 0; i < bound; ++i)
         {
-            s_spot_msaa[i].create(RImplementation.Target->b_accum_spot_msaa[i],
+            s_spot_msaa[i].create(RImplementation->Target->b_accum_spot_msaa[i],
                 strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name), name);
-            s_volumetric_msaa[i].create(RImplementation.Target->b_accum_volumetric_msaa[i],
+            s_volumetric_msaa[i].create(RImplementation->Target->b_accum_volumetric_msaa[i],
                 strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_volumetric_", name), name);
         }
     }
@@ -351,12 +351,12 @@ void light::Export(light_Package& package)
 
 // Holger - do we need to export msaa stuff as well ?
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-                if (RImplementation.o.dx10_msaa)
+                if (RImplementation->o.dx10_msaa)
                 {
                     int bound = 1;
 
-                    if (!RImplementation.o.dx10_msaa_opt)
-                        bound = RImplementation.o.dx10_msaa_samples;
+                    if (!RImplementation->o.dx10_msaa_opt)
+                        bound = RImplementation->o.dx10_msaa_samples;
 
                     for (int i = 0; i < bound; ++i)
                     {

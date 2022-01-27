@@ -10,7 +10,7 @@
 
 #include "xrScriptEngine/LuaStudio/Defines.hpp"
 
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
 #if defined(WIN32)
 #define CS_PLATFORM_WINDOWS_32
 #define CS_PLATFORM_ID

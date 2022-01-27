@@ -9,6 +9,9 @@
 #elif defined(__FreeBSD__)
 #   define XR_PLATFORM_FREEBSD
 #   define _XRAY_PLATFORM_MARKER "FreeBSD"
+#elif defined(__SWITCH__)
+#   define XR_PLATFORM_SWITCH
+#   define _XRAY_PLATFORM_MARKER "Switch"
 #else
 #   error Unsupported platform
 #endif
@@ -47,6 +50,8 @@
 #include "Common/PlatformLinux.inl"
 #elif defined(XR_PLATFORM_FREEBSD)
 #include "Common/PlatformBSD.inl"
+#elif defined(XR_PLATFORM_SWITCH)
+#include "Common/PlatformSwitch.inl"
 #else
 #error Provide Platform.inl file for your platform
 #endif

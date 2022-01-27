@@ -6,7 +6,7 @@ void CRenderTarget::phase_accumulator()
     if (dwAccumulatorClearMark == Device.dwFrame)
     {
         // normal operation - setup
-        if (RImplementation.o.fp16_blend)
+        if (RImplementation->o.fp16_blend)
             u_setrt(rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
         else
             u_setrt(rt_Accumulator_temp, nullptr, nullptr, rt_MSAADepth);
@@ -24,7 +24,7 @@ void CRenderTarget::phase_accumulator()
 #ifdef USE_DX11
         //	Igor: AMD bug workaround. Should be fixed in 8.7 catalyst
         //	Need for MSAA to work correctly.
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation->o.dx10_msaa)
         {
             HW.pContext->OMSetRenderTargets(1, &(rt_Accumulator->pRT), 0);
         }
@@ -41,7 +41,7 @@ void CRenderTarget::phase_accumulator()
         //RCache.set_Stencil						(TRUE,D3DCMP_ALWAYS,0x00,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
         RCache.set_CullMode							(CULL_CCW);
         RCache.set_ColorWriteEnable					();
-        RImplementation.r_dsgraph_render_emissive	();
+        RImplementation->r_dsgraph_render_emissive	();
         */
         // Stencil	- draw only where stencil >= 0x1
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
@@ -51,7 +51,7 @@ void CRenderTarget::phase_accumulator()
 
 #if defined(USE_DX11) || defined(USE_OGL)
     //	Restore viewport after shadow map rendering
-    RImplementation.rmNormal();
+    RImplementation->rmNormal();
 #endif
 }
 

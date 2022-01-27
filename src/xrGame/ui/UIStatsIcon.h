@@ -10,6 +10,16 @@ class CUIStatsIcon : public CUIStatic
 public:
     CUIStatsIcon();
     void SetValue(LPCSTR str);
+#ifdef XR_PLATFORM_SWITCH
+    // Is used to init static/global members 
+    static void GlobalInit();
+
+    typedef struct
+    {
+        ui_shader sh;
+        Frect rect;
+    } TEX_INFO2;
+#endif
 
 protected:
     enum DEF_TEX
@@ -25,13 +35,19 @@ protected:
 
         MAX_DEF_TEX
     };
+
+    static void InitTexInfo();
+    static void FreeTexInfo();
+
+#ifndef XR_PLATFORM_SWITCH
     typedef struct
     {
         ui_shader sh;
         Frect rect;
-    } TEX_INFO;
-
-    static void InitTexInfo();
-    static void FreeTexInfo();
-    static TEX_INFO m_tex_info[MAX_DEF_TEX][2];
+    } TEX_INFO2;
+    
+    static TEX_INFO2 m_tex_info[MAX_DEF_TEX][2];
+#else
+    static TEX_INFO2** m_tex_info;
+#endif
 };

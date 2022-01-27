@@ -26,7 +26,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
         RCache.set_RT(_3->pRT, 2);
     }
     RCache.set_ZB(zb);
-    //	RImplementation.rmNormal				();
+    //	RImplementation->rmNormal				();
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(3, buffers));
@@ -54,7 +54,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb)
         RCache.set_RT(_2->pRT, 1);
     }
     RCache.set_ZB(zb);
-    //	RImplementation.rmNormal				();
+    //	RImplementation->rmNormal				();
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(2, buffers));
@@ -81,7 +81,7 @@ void CRenderTarget::u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuin
         RCache.set_RT(_3, 2);
     }
     RCache.set_ZB(zb);
-    //	RImplementation.rmNormal				();
+    //	RImplementation->rmNormal				();
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(3, buffers));

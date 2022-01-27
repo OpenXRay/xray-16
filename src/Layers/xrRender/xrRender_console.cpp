@@ -395,7 +395,7 @@ class CCC_ModelPoolStat : public IConsole_Command
 {
 public:
     CCC_ModelPoolStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR /*args*/) { RImplementation.Models->dump(); }
+    virtual void Execute(LPCSTR /*args*/) { RImplementation->Models->dump(); }
 };
 
 class CCC_SSAO_Mode : public CCC_Token
@@ -493,7 +493,7 @@ public:
         u32 m_lmaps = 0;
         u32 c_lmaps = 0;
 
-        RImplementation.ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+        RImplementation->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
 
         Msg("memory usage  mb \t \t video    \t managed      \t system \n");
 
@@ -532,8 +532,8 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        RImplementation.Models->dump();
-        RImplementation.Resources->Dump(false);
+        RImplementation->Models->dump();
+        RImplementation->Resources->Dump(false);
     }
 };
 
@@ -555,7 +555,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        RImplementation.Resources->_DumpMemoryUsage();
+        RImplementation->Resources->_DumpMemoryUsage();
     }
 };
 

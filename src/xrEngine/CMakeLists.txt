@@ -197,6 +197,14 @@ target_link_libraries(${PROJECT_NAME}
     ${SDL_LIBRARIES}
 )
 
+if (NINTENDO_SWITCH)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    ogg 
+    #vorbisfile
+)
+endif()
+
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DENGINE_BUILD

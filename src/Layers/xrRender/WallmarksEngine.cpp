@@ -307,7 +307,7 @@ void CWallmarksEngine::AddStaticWallmark(
 void CWallmarksEngine::AddSkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
-    if (::RImplementation.phase != CRender::PHASE_NORMAL)
+    if (::RImplementation->phase != CRender::PHASE_NORMAL)
         return;
 
     // optimization cheat: don't allow wallmarks more than 50 m from viewer/actor
@@ -323,7 +323,7 @@ void CWallmarksEngine::AddSkeletonWallmark(
 
 void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
 {
-    if (::RImplementation.phase != CRender::PHASE_NORMAL)
+    if (::RImplementation->phase != CRender::PHASE_NORMAL)
         return;
 
     lock.Enter();
@@ -380,10 +380,10 @@ void CWallmarksEngine::Render()
     Device.mView.build_camera_dir(mViewPos, Device.vCameraDirection, Device.vCameraTop);
     RCache.set_xform_view(Device.mView);
 
-    RImplementation.BasicStats.Wallmarks.Begin();
-    RImplementation.BasicStats.StaticWMCount = 0;
-    RImplementation.BasicStats.DynamicWMCount = 0;
-    RImplementation.BasicStats.WMTriCount = 0;
+    RImplementation->BasicStats.Wallmarks.Begin();
+    RImplementation->BasicStats.StaticWMCount = 0;
+    RImplementation->BasicStats.DynamicWMCount = 0;
+    RImplementation->BasicStats.WMTriCount = 0;
 
     float ssaCLIP = r_ssaDISCARD / 4;
 
@@ -400,9 +400,9 @@ void CWallmarksEngine::Render()
         for (auto &w_it : slot->static_items)
         {
             static_wallmark* W = w_it;
-            if (RImplementation.ViewBase.testSphere_dirty(W->bounds.P, W->bounds.R))
+            if (RImplementation->ViewBase.testSphere_dirty(W->bounds.P, W->bounds.R))
             {
-                RImplementation.BasicStats.StaticWMCount++;
+                RImplementation->BasicStats.StaticWMCount++;
                 float dst = Device.vCameraPosition.distance_to_sqr(W->bounds.P);
                 float ssa = W->bounds.R * W->bounds.R / dst;
                 if (ssa >= ssaCLIP)
@@ -410,7 +410,7 @@ void CWallmarksEngine::Render()
                     u32 w_count = u32(w_verts - w_start);
                     if ((w_count + W->verts.size()) >= (MAX_TRIS * 3))
                     {
-                        RImplementation.BasicStats.WMTriCount +=
+                        RImplementation->BasicStats.WMTriCount +=
                             FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, FALSE);
                         BeginStream(hGeom, w_offset, w_verts, w_start);
                     }
@@ -431,7 +431,7 @@ void CWallmarksEngine::Render()
             }
         }
         // Flush stream
-        RImplementation.BasicStats.WMTriCount += FlushStream(
+        RImplementation->BasicStats.WMTriCount += FlushStream(
             hGeom, slot->shader, w_offset, w_verts, w_start, FALSE); //. remove line if !(suppress cull needed)
         BeginStream(hGeom, w_offset, w_verts, w_start);
 
@@ -457,11 +457,11 @@ void CWallmarksEngine::Render()
             float ssa = W->m_Bounds.R * W->m_Bounds.R / dst;
             if (ssa >= ssaCLIP)
             {
-                RImplementation.BasicStats.DynamicWMCount++;
+                RImplementation->BasicStats.DynamicWMCount++;
                 u32 w_count = u32(w_verts - w_start);
                 if ((w_count + W->VCount()) >= (MAX_TRIS * 3))
                 {
-                    RImplementation.BasicStats.WMTriCount +=
+                    RImplementation->BasicStats.WMTriCount +=
                         FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, TRUE);
                     BeginStream(hGeom, w_offset, w_verts, w_start);
                 }
@@ -483,14 +483,14 @@ void CWallmarksEngine::Render()
         }
         slot->skeleton_items.clear();
         // Flush stream
-        RImplementation.BasicStats.WMTriCount += FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, TRUE);
+        RImplementation->BasicStats.WMTriCount += FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, TRUE);
     }
 
     lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
-    RImplementation.r_dsgraph_render_wmarks();
-    RImplementation.BasicStats.Wallmarks.End();
+    RImplementation->r_dsgraph_render_wmarks();
+    RImplementation->BasicStats.Wallmarks.End();
 
     // Projection
     Device.mView = mSavedView;

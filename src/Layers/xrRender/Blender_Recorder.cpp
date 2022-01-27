@@ -65,7 +65,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
                 xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
             base = *lst[id];
         }
-        if (!RImplementation.Resources->m_textures_description.GetDetailTexture(base, detail_texture, detail_scaler))
+        if (!RImplementation->Resources->m_textures_description.GetDetailTexture(base, detail_texture, detail_scaler))
             bDetail = false;
     }
     else
@@ -97,19 +97,19 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
 
 #ifndef _EDITOR
 #if RENDER == R_R1
-    if (RImplementation.o.no_detail_textures)
+    if (RImplementation->o.no_detail_textures)
         bDetail = false;
 #endif
 #endif
 
     if (bDetail)
     {
-        RImplementation.Resources->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
+        RImplementation->Resources->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
 
 #ifndef _EDITOR
 #if RENDER != R_R1
         //	Detect the alowance of detail bump usage here.
-        if (!(RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DETAIL_BUMP)))
+        if (!(RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DETAIL_BUMP)))
         {
             bDetail_Diffuse |= bDetail_Bump;
             bDetail_Bump = false;
@@ -119,7 +119,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     }
 
     bUseSteepParallax =
-        RImplementation.Resources->m_textures_description.UseSteepParallax(base) && BT->canUseSteepParallax();
+        RImplementation->Resources->m_textures_description.UseSteepParallax(base) && BT->canUseSteepParallax();
 /*
     if (DEV->m_textures_description.UseSteepParallax(base))
     {
@@ -189,36 +189,36 @@ void CBlender_Compile::PassEnd()
     // Create pass
     if (!dest.vs)
     {
-        dest.vs = RImplementation.Resources->_CreateVS("null");
+        dest.vs = RImplementation->Resources->_CreateVS("null");
     }
 
     if (!dest.ps)
     {
-        dest.ps = RImplementation.Resources->_CreatePS("null");
+        dest.ps = RImplementation->Resources->_CreatePS("null");
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
-    dest.gs = RImplementation.Resources->_CreateGS(pass_gs);
+#ifndef USE_DX9
+    dest.gs = RImplementation->Resources->_CreateGS(pass_gs);
     ctable.merge(&dest.gs->constants);
 #ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS(pass_hs);
+    dest.hs = RImplementation->Resources->_CreateHS(pass_hs);
     ctable.merge(&dest.hs->constants);
-    dest.ds = RImplementation.Resources->_CreateDS(pass_ds);
+    dest.ds = RImplementation->Resources->_CreateDS(pass_ds);
     ctable.merge(&dest.ds->constants);
-    dest.cs = RImplementation.Resources->_CreateCS(pass_cs);
+    dest.cs = RImplementation->Resources->_CreateCS(pass_cs);
     ctable.merge(&dest.cs->constants);
 #endif // USE_DX11
 #endif // !USE_DX9
     SetMapping();
-    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
-    dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
-    dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
+    dest.state = RImplementation->Resources->_CreateState(RS.GetContainer());
+    dest.constants = RImplementation->Resources->_CreateConstantTable(ctable);
+    dest.T = RImplementation->Resources->_CreateTextureList(passTextures);
 #ifdef _EDITOR
-    dest.M = RImplementation.Resources->_CreateMatrixList(passMatrices);
+    dest.M = RImplementation->Resources->_CreateMatrixList(passMatrices);
 #endif
-    dest.C = RImplementation.Resources->_CreateConstantList(passConstants);
+    dest.C = RImplementation->Resources->_CreateConstantList(passConstants);
 
-    ref_pass _pass_ = RImplementation.Resources->_CreatePass(dest);
+    ref_pass _pass_ = RImplementation->Resources->_CreatePass(dest);
     SH->passes.push_back(_pass_);
 }
 
@@ -226,7 +226,7 @@ void CBlender_Compile::PassSET_PS(LPCSTR name)
 {
     xr_strcpy(pass_ps, name);
     xr_strlwr(pass_ps);
-    dest.ps = RImplementation.Resources->_CreatePS(pass_ps);
+    dest.ps = RImplementation->Resources->_CreatePS(pass_ps);
     ctable.merge(&dest.ps->constants);
 }
 
@@ -234,7 +234,7 @@ void CBlender_Compile::PassSET_VS(LPCSTR name)
 {
     xr_strcpy(pass_vs, name);
     xr_strlwr(pass_vs);
-    dest.vs = RImplementation.Resources->_CreateVS(pass_vs);
+    dest.vs = RImplementation->Resources->_CreateVS(pass_vs);
     ctable.merge(&dest.vs->constants);
 }
 
@@ -258,7 +258,7 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3DBLEND_ZERO);
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#ifndef USE_DX9
     //	Since in our engine D3DRS_SEPARATEALPHABLENDENABLE state is
     //	always set to false and in DirectX 10 blend functions for
     //	color and alpha are always independent, assign blend options for
@@ -345,7 +345,7 @@ void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 f
             xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
         N = *lst[id];
     }
-    passTextures.push_back(std::make_pair(Stage(), ref_texture(RImplementation.Resources->_CreateTexture(N))));
+    passTextures.push_back(std::make_pair(Stage(), ref_texture(RImplementation->Resources->_CreateTexture(N))));
     //	i_Address				(Stage(),address);
     i_Filter(Stage(), fmin, fmip, fmag);
 }
@@ -353,7 +353,7 @@ void CBlender_Compile::Stage_Matrix(LPCSTR name, int iChannel)
 {
     sh_list& lst = L_matrices;
     int id = ParseName(name);
-    CMatrix* M = RImplementation.Resources->_CreateMatrix((id >= 0) ? *lst[id] : name);
+    CMatrix* M = RImplementation->Resources->_CreateMatrix((id >= 0) ? *lst[id] : name);
     passMatrices.push_back(M);
 
     // Setup transform pipeline
@@ -379,7 +379,7 @@ void CBlender_Compile::Stage_Constant(LPCSTR name)
 {
     sh_list& lst = L_constants;
     int id = ParseName(name);
-    passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
+    passConstants.push_back(RImplementation->Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
 }
 
 void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
@@ -452,7 +452,7 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
         xr_strcpy(name, texture.c_str());
         fix_texture_name(name);
 
-        ref_texture textureResource = RImplementation.Resources->_CreateTexture(name);
+        ref_texture textureResource = RImplementation->Resources->_CreateTexture(name);
         passTextures.emplace_back(textureStage, textureResource);
     }
 

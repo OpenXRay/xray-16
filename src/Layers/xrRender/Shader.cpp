@@ -8,32 +8,32 @@
 #include "Shader.h"
 #include "ResourceManager.h"
 // XXX: render scripts should call these destructors before resource manager gets destroyed
-STextureList::~STextureList() { RImplementation.Resources->_DeleteTextureList(this); }
-SMatrixList::~SMatrixList() { RImplementation.Resources->_DeleteMatrixList(this); }
-SConstantList::~SConstantList() { RImplementation.Resources->_DeleteConstantList(this); }
-SPass::~SPass() { RImplementation.Resources->_DeletePass(this); }
-ShaderElement::~ShaderElement() { RImplementation.Resources->_DeleteElement(this); }
-SGeometry::~SGeometry() { RImplementation.Resources->DeleteGeom(this); }
-Shader::~Shader() { RImplementation.Resources->Delete(this); }
+STextureList::~STextureList() { RImplementation->Resources->_DeleteTextureList(this); }
+SMatrixList::~SMatrixList() { RImplementation->Resources->_DeleteMatrixList(this); }
+SConstantList::~SConstantList() { RImplementation->Resources->_DeleteConstantList(this); }
+SPass::~SPass() { RImplementation->Resources->_DeletePass(this); }
+ShaderElement::~ShaderElement() { RImplementation->Resources->_DeleteElement(this); }
+SGeometry::~SGeometry() { RImplementation->Resources->DeleteGeom(this); }
+Shader::~Shader() { RImplementation->Resources->Delete(this); }
 //////////////////////////////////////////////////////////////////////////
 void resptrcode_shader::create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
-    _set(RImplementation.Resources->Create(s_shader, s_textures, s_constants, s_matrices));
+    _set(RImplementation->Resources->Create(s_shader, s_textures, s_constants, s_matrices));
 }
 void resptrcode_shader::create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
-    _set(RImplementation.Resources->Create(B, s_shader, s_textures, s_constants, s_matrices));
+    _set(RImplementation->Resources->Create(B, s_shader, s_textures, s_constants, s_matrices));
 }
 
 //////////////////////////////////////////////////////////////////////////
 void resptrcode_geom::create(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
 {
-    _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
+    _set(RImplementation->Resources->CreateGeom(FVF, vb, ib));
 }
 
 void resptrcode_geom::create(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
 {
-    _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
+    _set(RImplementation->Resources->CreateGeom(decl, vb, ib));
 }
 
 

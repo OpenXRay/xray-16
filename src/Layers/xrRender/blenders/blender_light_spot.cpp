@@ -10,9 +10,9 @@ void CBlender_accum_spot::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
 #if RENDER == R_R2
-    BOOL b_HW_smap = RImplementation.o.HW_smap;
-    BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
-    BOOL blend = RImplementation.o.fp16_blend;
+    BOOL b_HW_smap = RImplementation->o.HW_smap;
+    BOOL b_HW_PCF = RImplementation->o.HW_smap_PCF;
+    BOOL blend = RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     switch (C.iElement)
@@ -90,7 +90,7 @@ void CBlender_accum_spot::Compile(CBlender_Compile& C)
         break;
     }
 #elif RENDER == R_GL
-    BOOL blend = RImplementation.o.fp16_blend;
+    BOOL blend = RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     switch (C.iElement)
@@ -144,9 +144,9 @@ void CBlender_accum_spot::Compile(CBlender_Compile& C)
         break;
     }
 #else
-    //	BOOL		b_HW_smap	= RImplementation.o.HW_smap;
-    //	BOOL		b_HW_PCF	= RImplementation.o.HW_smap_PCF;
-    BOOL blend = RImplementation.o.fp16_blend;
+    //	BOOL		b_HW_smap	= RImplementation->o.HW_smap;
+    //	BOOL		b_HW_PCF	= RImplementation->o.HW_smap_PCF;
+    BOOL blend = RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     switch (C.iElement)
@@ -270,9 +270,9 @@ void CBlender_accum_spot_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    //	BOOL		b_HW_smap	= RImplementation.o.HW_smap;
-    //	BOOL		b_HW_PCF	= RImplementation.o.HW_smap_PCF;
-    BOOL blend = RImplementation.o.fp16_blend;
+    //	BOOL		b_HW_smap	= RImplementation->o.HW_smap;
+    //	BOOL		b_HW_PCF	= RImplementation->o.HW_smap_PCF;
+    BOOL blend = RImplementation->o.fp16_blend;
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)

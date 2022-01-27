@@ -79,7 +79,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             uber_deffer(C, false, "base", "base", true);
             break;
         case SE_R2_SHADOW: // smap
-            if (RImplementation.o.HW_smap)
+            if (RImplementation->o.HW_smap)
                 C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE, D3DBLEND_ZERO,
                     D3DBLEND_ONE, TRUE, 220);
             else
@@ -122,7 +122,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     {
         C.SetParams(1, false); //.
 
-        bool bUseATOC = RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
+        bool bUseATOC = RImplementation->o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
 
         // codepath is the same, only the shaders differ
         // ***only pixel shaders differ***
@@ -175,7 +175,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
 
 
         case SE_R2_SHADOW: // smap
-            //			if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);
+            //			if (RImplementation->o.HW_smap)	C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);
             //			else							C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE);
             C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE,TRUE,FALSE);
             C.r_Sampler("s_base", C.L_textures[0]);
@@ -227,7 +227,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     {
         C.SetParams(1, false); //.
 
-        bool bUseATOC = (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        bool bUseATOC = (RImplementation->o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
 
         // codepath is the same, only the shaders differ
         // ***only pixel shaders differ***
@@ -278,7 +278,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             break;
 
         case SE_R2_SHADOW: // smap
-            //			if (RImplementation.o.HW_smap)	C.r_Pass
+            //			if (RImplementation->o.HW_smap)	C.r_Pass
             //("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);
             //			else							C.r_Pass
             //("shadow_direct_base_aref","shadow_direct_base_aref",FALSE);

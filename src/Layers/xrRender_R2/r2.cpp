@@ -21,7 +21,16 @@
 #include "D3DX10Core.h"
 #endif
 
-CRender RImplementation;
+std::unique_ptr<CRender> RImplementation;
+#ifndef XR_PLATFORM_SWITCH
+struct RenderInit
+{
+    RenderInit()
+    {
+        RImplementation.reset(new CRender());
+    }
+} static init;
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 class CGlow : public IRender_Glow
@@ -46,7 +55,7 @@ float r_dtex_range = 50.f;
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
 {
     int id = SE_R2_SHADOW;
-    if (CRender::PHASE_NORMAL == RImplementation.phase)
+    if (CRender::PHASE_NORMAL == RImplementation->phase)
     {
         id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
     }
@@ -56,7 +65,7 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float c
 ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq)
 {
     int id = SE_R2_SHADOW;
-    if (CRender::PHASE_NORMAL == RImplementation.phase)
+    if (CRender::PHASE_NORMAL == RImplementation->phase)
     {
         id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
     }

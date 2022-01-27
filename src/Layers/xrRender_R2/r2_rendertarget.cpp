@@ -37,7 +37,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 {
 #if defined(USE_DX9) || defined(USE_DX11)
     // TODO: DX10: remove half pixel offset?
-    VERIFY(RImplementation.o.nvstencil);
+    VERIFY(RImplementation->o.nvstencil);
 #   ifdef USE_DX9
     RCache.set_ColorWriteEnable(false);
 #   endif
@@ -90,7 +90,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 #elif defined(USE_OGL)
     //	TODO: OGL: should we implement stencil optimization?
-    VERIFY(RImplementation.o.nvstencil);
+    VERIFY(RImplementation->o.nvstencil);
     VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
     UNUSED(eSOM);
 #else
@@ -247,14 +247,14 @@ void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr render
 CRenderTarget::CRenderTarget()
 {
     u32 SampleCount = 1;
-    if (RImplementation.o.dx10_msaa)
-        SampleCount = RImplementation.o.dx10_msaa_samples;
+    if (RImplementation->o.dx10_msaa)
+        SampleCount = RImplementation->o.dx10_msaa_samples;
 
 #ifdef DEBUG
     Msg("MSAA samples = %d", SampleCount);
-    if (RImplementation.o.dx10_msaa_opt)
+    if (RImplementation->o.dx10_msaa_opt)
         Msg("dx10_MSAA_opt = on");
-    if (RImplementation.o.dx10_gbuffer_opt)
+    if (RImplementation->o.dx10_gbuffer_opt)
         Msg("dx10_gbuffer_opt = on");
 #endif
     param_blur = 0.f;
@@ -274,17 +274,17 @@ CRenderTarget::CRenderTarget()
     param_color_add.set(0.0f, 0.0f, 0.0f);
 
     dwAccumulatorClearMark = 0;
-    RImplementation.Resources->Evict();
+    RImplementation->Resources->Evict();
 
     // Blenders
     b_accum_spot = xr_new<CBlender_accum_spot>();
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation->o.dx10_msaa)
     {
-        int bound = RImplementation.o.dx10_msaa_samples;
+        int bound = RImplementation->o.dx10_msaa_samples;
 
-        if (RImplementation.o.dx10_msaa_opt)
+        if (RImplementation->o.dx10_msaa_opt)
             bound = 1;
 
         for (int i = 0; i < bound; ++i)
@@ -328,17 +328,17 @@ CRenderTarget::CRenderTarget()
         }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
             rt_MSAADepth = rt_Base_Depth;
         else
             rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
-        if (!RImplementation.o.dx10_gbuffer_opt)
+        if (!RImplementation->o.dx10_gbuffer_opt)
             rt_Normal.create(r2_RT_N, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
         // select albedo & accum
-        if (RImplementation.o.mrtmixdepth)
+        if (RImplementation->o.mrtmixdepth)
         {
             // NV50
             rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount);
@@ -347,10 +347,10 @@ CRenderTarget::CRenderTarget()
         else
         {
             // can't - mix-depth
-            if (RImplementation.o.fp16_blend)
+            if (RImplementation->o.fp16_blend)
             {
                 // NV40
-                if (!RImplementation.o.dx10_gbuffer_opt)
+                if (!RImplementation->o.dx10_gbuffer_opt)
                 {
                     rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount); // expand to full
                     rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
@@ -364,7 +364,7 @@ CRenderTarget::CRenderTarget()
             else
             {
                 // R4xx, no-fp-blend,-> albedo_wo
-                VERIFY(RImplementation.o.albedo_wo);
+                VERIFY(RImplementation->o.albedo_wo);
                 rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount); // normal
                 rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
                 rt_Accumulator_temp.create(r2_RT_accum_temp, w, h, D3DFMT_A16B16G16R16F, SampleCount);
@@ -377,7 +377,7 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) || defined(USE_OGL)
         rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
 #endif
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             rt_Generic_0_r = rt_Generic_0;
             rt_Generic_1_r = rt_Generic_1;
@@ -390,7 +390,7 @@ CRenderTarget::CRenderTarget()
         //	Igor: for volumetric lights
         // rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
         //	temp: for higher quality blends
-        if (RImplementation.o.advancedpp)
+        if (RImplementation->o.advancedpp)
             rt_Generic_2.create(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
     }
 
@@ -403,21 +403,21 @@ CRenderTarget::CRenderTarget()
     // DIRECT (spot)
     pcstr smapTarget = r2_RT_smap_depth;
     {
-        const u32 smapsize = RImplementation.o.smapsize;
+        const u32 smapsize = RImplementation->o.smapsize;
 
         D3DFORMAT depth_format = D3DFMT_D24X8;
         D3DFORMAT surf_format = D3DFMT_R32F;
 
         Flags32 flags{};
-        if (!RImplementation.o.HW_smap)
+        if (!RImplementation->o.HW_smap)
         {
             flags.flags = CRT::CreateSurface;
             smapTarget = r2_RT_smap_surf;
         }
         else
         {
-            depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
-            if (RImplementation.o.nullrt) // use nullrt if possible
+            depth_format = (D3DFORMAT)RImplementation->o.HW_smap_FORMAT;
+            if (RImplementation->o.nullrt) // use nullrt if possible
                 surf_format = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
             else
                 surf_format = D3DFMT_R5G6B5;
@@ -433,7 +433,7 @@ CRenderTarget::CRenderTarget()
         // otherwise - create texture with specified HW_smap_FORMAT
         rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
 #if defined(USE_DX11) || defined(USE_OGL)
-        if (RImplementation.o.dx10_minmax_sm)
+        if (RImplementation->o.dx10_minmax_sm)
         {
             rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, smapsize / 4, smapsize / 4, D3DFMT_R32F);
             CBlender_createminmax TempBlender;
@@ -450,7 +450,7 @@ CRenderTarget::CRenderTarget()
         // Accum direct
         {
 #if RENDER == R_R2
-            if (RImplementation.o.oldshadowcascades)
+            if (RImplementation->o.oldshadowcascades)
             {
                 CBlender_accum_direct b_accum_direct;
                 s_accum_direct.create(&b_accum_direct, "r2" DELIMITER "accum_direct");
@@ -468,11 +468,11 @@ CRenderTarget::CRenderTarget()
 
         // Accum direct/mask MSAA
 #if defined(USE_DX11) || defined(USE_OGL)
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation->o.dx10_msaa)
         {
-            int bound = RImplementation.o.dx10_msaa_samples;
+            int bound = RImplementation->o.dx10_msaa_samples;
 
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
                 bound = 1;
 
             for (int i = 0; i < bound; ++i)
@@ -484,10 +484,10 @@ CRenderTarget::CRenderTarget()
 #endif
 
         // Accum volumetric
-        if (RImplementation.o.advancedpp)
+        if (RImplementation->o.advancedpp)
         {
 #ifdef USE_DX9
-            if (RImplementation.o.oldshadowcascades)
+            if (RImplementation->o.oldshadowcascades)
                 s_accum_direct_volumetric.create("accum_volumetric_sun");
             else
                 s_accum_direct_volumetric.create("accum_volumetric_sun_cascade");
@@ -499,13 +499,13 @@ CRenderTarget::CRenderTarget()
             manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
 #if defined(USE_DX11) || defined(USE_OGL)
-            if (RImplementation.o.dx10_minmax_sm)
+            if (RImplementation->o.dx10_minmax_sm)
             {
                 s_accum_direct_volumetric_minmax.create("accum_volumetric_sun_nomsaa_minmax");
                 manually_assign_texture(s_accum_direct_volumetric_minmax, "s_smap", smapTarget);
             }
 
-            if (RImplementation.o.dx10_msaa)
+            if (RImplementation->o.dx10_msaa)
             {
                 static pcstr snames[] =
                 {
@@ -514,9 +514,9 @@ CRenderTarget::CRenderTarget()
                     "accum_volumetric_sun_msaa4", "accum_volumetric_sun_msaa5",
                     "accum_volumetric_sun_msaa6", "accum_volumetric_sun_msaa7"
                 };
-                int bound = RImplementation.o.dx10_msaa_samples;
+                int bound = RImplementation->o.dx10_msaa_samples;
 
-                if (RImplementation.o.dx10_msaa_opt)
+                if (RImplementation->o.dx10_msaa_opt)
                     bound = 1;
 
                 for (int i = 0; i < bound; ++i)
@@ -538,14 +538,14 @@ CRenderTarget::CRenderTarget()
         CBlender_rain TempBlender;
         s_rain.create(&TempBlender, "null");
 
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation->o.dx10_msaa)
         {
             static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
             CBlender_rain_msaa TempBlenderMSAA[8];
 
-            int bound = RImplementation.o.dx10_msaa_samples;
+            int bound = RImplementation->o.dx10_msaa_samples;
 
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
                 bound = 1;
 
             for (int i = 0; i < bound; ++i)
@@ -563,7 +563,7 @@ CRenderTarget::CRenderTarget()
 #endif // USE_DX11 || USE_OGL
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation->o.dx10_msaa)
     {
         CBlender_msaa TempBlender;
         s_mark_msaa_edges.create(&TempBlender, "null");
@@ -588,7 +588,7 @@ CRenderTarget::CRenderTarget()
     }
 
     // SPOT VOLUMETRIC
-    if (RImplementation.o.advancedpp)
+    if (RImplementation->o.advancedpp)
     {
         s_accum_volume.create("accum_volumetric", "lights" DELIMITER "lights_spot01");
         manually_assign_texture(s_accum_volume, "s_smap", smapTarget);
@@ -601,11 +601,11 @@ CRenderTarget::CRenderTarget()
         CBlender_accum_reflected b_accum_reflected;
         s_accum_reflected.create(&b_accum_reflected, "r2" DELIMITER "accum_refl");
 #if defined(USE_DX11) || defined(USE_OGL)
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation->o.dx10_msaa)
         {
-            int bound = RImplementation.o.dx10_msaa_samples;
+            int bound = RImplementation->o.dx10_msaa_samples;
 
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
                 bound = 1;
 
             for (int i = 0; i < bound; ++i)
@@ -634,7 +634,7 @@ CRenderTarget::CRenderTarget()
 
         CBlender_bloom_build b_bloom;
         s_bloom.create(&b_bloom, "r2" DELIMITER "bloom");
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
             s_bloom_msaa = s_bloom;
         else
         {
@@ -652,16 +652,16 @@ CRenderTarget::CRenderTarget()
 
 #if defined(USE_DX11) || defined(USE_OGL)
     // Check if SSAO Ultra is allowed
-    if (ps_r_ssao_mode != 2 /*hdao*/ || !RImplementation.o.ssao_ultra)
+    if (ps_r_ssao_mode != 2 /*hdao*/ || !RImplementation->o.ssao_ultra)
         ps_r_ssao = _min(ps_r_ssao, 3);
 #endif
 
     // HBAO
-    if (RImplementation.o.ssao_opt_data)
+    if (RImplementation->o.ssao_opt_data)
     {
         u32 w = 0;
         u32 h = 0;
-        if (RImplementation.o.ssao_half_data)
+        if (RImplementation->o.ssao_half_data)
         {
             w = Device.dwWidth / 2;
             h = Device.dwHeight / 2;
@@ -680,11 +680,11 @@ CRenderTarget::CRenderTarget()
     }
 
     // HDAO/SSAO
-    const bool ssao_blur_on = RImplementation.o.ssao_blur_on;
+    const bool ssao_blur_on = RImplementation->o.ssao_blur_on;
 #ifdef USE_DX9
     constexpr bool ssao_hdao_ultra = false;
 #elif defined(USE_DX11) || defined(USE_OGL)
-    const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra && ps_r_ssao > 3;
+    const bool ssao_hdao_ultra = RImplementation->o.ssao_hdao && RImplementation->o.ssao_ultra && ps_r_ssao > 3;
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -697,7 +697,7 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) // XXX: support compute shaders for OpenGL
             CBlender_CS_HDAO b_hdao_cs;
             s_hdao_cs.create(&b_hdao_cs, "r2" DELIMITER "ssao");
-            if (RImplementation.o.dx10_msaa)
+            if (RImplementation->o.dx10_msaa)
             {
                 CBlender_CS_HDAO_MSAA b_hdao_msaa_cs;
                 s_hdao_cs_msaa.create(&b_hdao_msaa_cs, "r2" DELIMITER "ssao");
@@ -711,9 +711,9 @@ CRenderTarget::CRenderTarget()
             s_ssao.create(&b_ssao, "r2" DELIMITER "ssao");
 
             /* Should be used in r*_rendertarget_phase_ssao.cpp but it's commented there.
-            if (RImplementation.o.dx10_msaa)
+            if (RImplementation->o.dx10_msaa)
             {
-                const int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
+                const int bound = RImplementation->o.dx10_msaa_opt ? 1 : RImplementation->o.dx10_msaa_samples;
 
                 for (int i = 0; i < bound; ++i)
                     s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
@@ -803,7 +803,7 @@ CRenderTarget::CRenderTarget()
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
         RCache.Vertex.Buffer(), RCache.QuadIB);
-    if (!RImplementation.o.dx10_msaa)
+    if (!RImplementation->o.dx10_msaa)
         s_postprocess_msaa = s_postprocess;
     else
     {
@@ -823,7 +823,7 @@ CRenderTarget::CRenderTarget()
 
 #if 0 // OpenGL: kept for historical reasons
     // Flip
-    t_base = RImplementation.Resources->_CreateTexture(r2_base);
+    t_base = RImplementation->Resources->_CreateTexture(r2_base);
     t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
     s_flip.create("effects" DELIMITER "screen_set", r2_base);
     g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
@@ -926,11 +926,11 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_accum_spot);
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation->o.dx10_msaa)
     {
-        int bound = RImplementation.o.dx10_msaa_samples;
+        int bound = RImplementation->o.dx10_msaa_samples;
 
-        if (RImplementation.o.dx10_msaa_opt)
+        if (RImplementation->o.dx10_msaa_opt)
             bound = 1;
 
         for (int i = 0; i < bound; ++i)
@@ -1006,7 +1006,7 @@ void CRenderTarget::increment_light_marker()
 {
     dwLightMarkerID += 2;
 
-    const u32 iMaxMarkerValue = RImplementation.o.dx10_msaa ? 127 : 255;
+    const u32 iMaxMarkerValue = RImplementation->o.dx10_msaa ? 127 : 255;
 
     if (dwLightMarkerID > iMaxMarkerValue)
         reset_light_marker(true);
@@ -1014,7 +1014,7 @@ void CRenderTarget::increment_light_marker()
 
 bool CRenderTarget::need_to_render_sunshafts()
 {
-    if (!(RImplementation.o.advancedpp && ps_r_sun_shafts))
+    if (!(RImplementation->o.advancedpp && ps_r_sun_shafts))
         return false;
 
     {
@@ -1031,7 +1031,7 @@ bool CRenderTarget::need_to_render_sunshafts()
 #if defined(USE_DX11) || defined(USE_OGL)
 bool CRenderTarget::use_minmax_sm_this_frame()
 {
-    switch (RImplementation.o.dx10_minmax_sm)
+    switch (RImplementation->o.dx10_minmax_sm)
     {
     case CRender::MMSM_ON: return true;
     case CRender::MMSM_AUTO: return need_to_render_sunshafts();
@@ -1040,7 +1040,7 @@ bool CRenderTarget::use_minmax_sm_this_frame()
         const auto& [width, height] = HW.GetSurfaceSize();
         u32 dwScreenArea = width * height;
 
-        if (dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold)
+        if (dwScreenArea >= RImplementation->o.dx10_minmax_sm_screenarea_threshold)
             return need_to_render_sunshafts();
         return false;
     }

@@ -25,7 +25,7 @@
 
 #include "Include/editor/ide.hpp"
 
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
 #include "xrSASH.h"
 #endif
 #include "IGame_Persistent.h"
@@ -112,7 +112,7 @@ void CRenderDevice::RenderEnd(void)
     g_bRendering = false;
     // end scene
     // Present goes here, so call OA Frame end.
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(fTimeGlobal);
 #endif
@@ -194,7 +194,7 @@ bool CRenderDevice::BeforeFrame()
         return false;
     }
 
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
     if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
 #endif

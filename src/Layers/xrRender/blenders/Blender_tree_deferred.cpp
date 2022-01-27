@@ -96,7 +96,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             tvs_s="shadow_direct_tree"; 
     }
 
-    bool bUseATOC = (oBlend.value && (RImplementation.o.dx10_msaa_alphatest==CRender::MSAA_ATEST_DX10_0_ATOC));
+    bool bUseATOC = (oBlend.value && (RImplementation->o.dx10_msaa_alphatest==CRender::MSAA_ATEST_DX10_0_ATOC));
 
     switch (C.iElement)
     {

@@ -14,10 +14,19 @@
 
 #include "xrParticles/psystem.h"
 
+#if defined(XR_PLATFORM_SWITCH)
+// XXX: Switch Verify with other devs
+#define GLEW_NO_GLU
+#endif
+
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include "SDL_opengl.h"
+
+#ifndef XR_PLATFORM_SWITCH
 #include <GL/glu.h>
+#endif
+
 #include "SDL_opengl_glext.h"
 
 #include "Layers/xrRenderGL/CommonTypes.h"

@@ -48,11 +48,35 @@ group_sources(SRC_FILES)
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
+if (NINTENDO_SWITCH)
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/xrEngine
-    ${CMAKE_SOURCE_DIR}/Externals/libvorbis/include
+    #${CMAKE_SOURCE_DIR}/Externals/libvorbis/include //XXX SWITCH uses vorbis from devkitpro dir
+    ${CMAKE_SOURCE_DIR}/Externals/libogg/include
+    ${CMAKE_SOURCE_DIR}/Externals/openal/include
+    ${OGG_INCLUDE_DIRS}
+    ${SDL_INCLUDE_DIRS}
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+    xrMiscMath
+    xrAPI
+    xrCDB
+    ${OGG_LIBRARIES}
+    openal
+    #vorbis
+    vorbisfile
+)
+else()
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/xrEngine
+    ${CMAKE_SOURCE_DIR}/Externals/libvorbis/include //TODO SWITCH
     ${CMAKE_SOURCE_DIR}/Externals/libogg/include
     ${CMAKE_SOURCE_DIR}/Externals/openal/include
     ${OGG_INCLUDE_DIRS}
@@ -70,6 +94,7 @@ target_link_libraries(${PROJECT_NAME}
     vorbis
     vorbisfile
 )
+endif()
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE

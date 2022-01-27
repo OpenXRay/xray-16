@@ -684,7 +684,7 @@ void CParticleEffect::Render(float)
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
                     RCache.set_xform_project(Device.mProject);
-                    RImplementation.rmNear();
+                    RImplementation->rmNear();
                     ApplyTexgen(Device.mFullTransform);
                 }
 #endif
@@ -700,7 +700,7 @@ void CParticleEffect::Render(float)
 #ifndef _EDITOR
                 if (GetHudMode())
                 {
-                    RImplementation.rmNormal();
+                    RImplementation->rmNormal();
                     Device.mProject = Pold;
                     Device.mFullTransform = FTold;
                     RCache.set_xform_project(Device.mProject);
@@ -852,7 +852,7 @@ void CParticleEffect::Render(float)
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
                     RCache.set_xform_project(Device.mProject);
-                    RImplementation.rmNear();
+                    RImplementation->rmNear();
                     ApplyTexgen(Device.mFullTransform);
                 }
 #endif
@@ -868,7 +868,7 @@ void CParticleEffect::Render(float)
 #ifndef _EDITOR
                 if (GetHudMode())
                 {
-                    RImplementation.rmNormal();
+                    RImplementation->rmNormal();
                     Device.mProject = Pold;
                     Device.mFullTransform = FTold;
                     RCache.set_xform_project(Device.mProject);

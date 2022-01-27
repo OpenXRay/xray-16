@@ -6,7 +6,7 @@
 IC u32 net_flags(
     bool bReliable = false, bool bSequental = true, bool bHighPriority = false, bool bSendImmediatelly = false)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)// FIXME!!!
     return 0;
 #else
     return (bReliable ? DPNSEND_GUARANTEED : DPNSEND_NOCOMPLETE) | (bSequental ? 0 : DPNSEND_NONSEQUENTIAL) |

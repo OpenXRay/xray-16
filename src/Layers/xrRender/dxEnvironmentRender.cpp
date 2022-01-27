@@ -60,7 +60,7 @@ void dxEnvDescriptorMixerRender::Copy(IEnvDescriptorMixerRender& _in) { *this = 
 void dxEnvironmentRender::Copy(IEnvironmentRender& _in) { *this = *(dxEnvironmentRender*)&_in; }
 particles_systems::library_interface const& dxEnvironmentRender::particles_systems_library()
 {
-    return (RImplementation.PSLibrary);
+    return (RImplementation->PSLibrary);
 }
 
 void dxEnvDescriptorMixerRender::Destroy()
@@ -129,12 +129,12 @@ void dxEnvDescriptorRender::OnDeviceDestroy()
 
 dxEnvironmentRender::dxEnvironmentRender()
 {
-    tsky0 = RImplementation.Resources->_CreateTexture("$user$sky0");
-    tsky1 = RImplementation.Resources->_CreateTexture("$user$sky1");
+    tsky0 = RImplementation->Resources->_CreateTexture("$user$sky0");
+    tsky1 = RImplementation->Resources->_CreateTexture("$user$sky1");
 #ifdef USE_OGL
     // These textures are specified in clouds.s
-    tclouds0 = RImplementation.Resources->_CreateTexture("$user$clouds0");
-    tclouds1 = RImplementation.Resources->_CreateTexture("$user$clouds1");
+    tclouds0 = RImplementation->Resources->_CreateTexture("$user$clouds0");
+    tclouds1 = RImplementation->Resources->_CreateTexture("$user$clouds1");
 #endif
 }
 
@@ -222,7 +222,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 
 void dxEnvironmentRender::OnLoad()
 {
-    tonemap = RImplementation.Resources->_CreateTexture("$user$tonemap"); //. hack
+    tonemap = RImplementation->Resources->_CreateTexture("$user$tonemap"); //. hack
 }
 
 void dxEnvironmentRender::OnUnload() { tonemap = nullptr; }
@@ -268,10 +268,10 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 #ifdef USE_OGL
     // Sun must be rendered to generic0 only as it is done in DX
-    if (!RImplementation.o.dx10_msaa)
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, nullptr, nullptr, RImplementation.Target->get_base_zb());
+    if (!RImplementation->o.dx10_msaa)
+        RImplementation->Target->u_setrt(RImplementation->Target->rt_Generic_0, nullptr, nullptr, RImplementation->Target->get_base_zb());
     else
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, nullptr, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+        RImplementation->Target->u_setrt(RImplementation->Target->rt_Generic_0_r, nullptr, nullptr, RImplementation->Target->rt_MSAADepth->pZRT);
 #endif // USE_OGL
 
     // Sun
@@ -292,10 +292,10 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 #ifdef USE_OGL
     // set low/hi RTs for clouds
-    if (!RImplementation.o.dx10_msaa)
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0, RImplementation.Target->rt_Generic_1, nullptr, RImplementation.Target->get_base_zb());
+    if (!RImplementation->o.dx10_msaa)
+        RImplementation->Target->u_setrt(RImplementation->Target->rt_Generic_0, RImplementation->Target->rt_Generic_1, nullptr, RImplementation->Target->get_base_zb());
     else
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Generic_0_r, RImplementation.Target->rt_Generic_1_r, nullptr, RImplementation.Target->rt_MSAADepth->pZRT);
+        RImplementation->Target->u_setrt(RImplementation->Target->rt_Generic_0_r, RImplementation->Target->rt_Generic_1_r, nullptr, RImplementation->Target->rt_MSAADepth->pZRT);
 #endif // USE_OGL
 }
 

@@ -24,7 +24,7 @@ class adopt_dx10options
 public:
     bool _dx10_msaa_alphatest_atoc()
     {
-        return RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
+        return RImplementation->o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
     }
 };
 
@@ -412,7 +412,7 @@ void CResourceManager::LS_Load()
 
     ScriptEngine.init(exporterFunc, false);
     // load shaders
-    const char* shaderPath = RImplementation.getShaderPath();
+    const char* shaderPath = RImplementation->getShaderPath();
     xr_vector<char*>* folder = FS.file_list_open("$game_shaders$", shaderPath, FS_ListFiles | FS_RootOnly);
     R_ASSERT3(folder, "Shader folder not found: ", shaderPath);
     for (u32 it = 0; it < folder->size(); it++)
@@ -543,12 +543,12 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     LPCSTR t_0 = *L_textures[0] ? *L_textures[0] : "null";
     LPCSTR t_1 = L_textures.size() > 1 ? *L_textures[1] : "null";
     LPCSTR t_d = detail_texture ? detail_texture : "null";
-    object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
+    object shader = RImplementation->Resources->ScriptEngine.name_space(namesp);
     functor<void> element = object_cast<functor<void>>(shader[name]);
     bool bFirstPass = false;
     adopt_compiler ac = adopt_compiler(this, bFirstPass);
     element(ac, t_0, t_1, t_d);
     r_End();
-    ShaderElement* _r = RImplementation.Resources->_CreateElement(std::move(E));
+    ShaderElement* _r = RImplementation->Resources->_CreateElement(std::move(E));
     return _r;
 }

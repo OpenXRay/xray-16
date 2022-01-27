@@ -25,6 +25,23 @@ target_link_libraries(${PROJECT_NAME}
     xrEngine
 )
 
+if (NINTENDO_SWITCH)
+# Linked statically
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrAICore
+    xrGame
+    xrParticles
+    xrRender_GL
+    xrPhysics
+    xrSound
+    xrUICore
+)
+
+# Generates Switch specific binary
+nx_create_nro(${PROJECT_NAME})
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 install(TARGETS ${PROJECT_NAME} RUNTIME

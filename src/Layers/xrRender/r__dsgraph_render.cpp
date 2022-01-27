@@ -173,7 +173,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                                 for (auto &tex_it : nrmTextures)
                                 {
                                     RCache.set_Textures(tex_it->first);
-                                    RImplementation.apply_lmaterial();
+                                    RImplementation->apply_lmaterial();
 
                                     mapNormalItems& items = tex_it->second;
                                     items.ssa = 0;
@@ -286,7 +286,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                             for (auto &tex_it : matTextures)
                             {
                                 RCache.set_Textures(tex_it->first);
-                                RImplementation.apply_lmaterial();
+                                RImplementation->apply_lmaterial();
 
                                 mapMatrixItems& items = tex_it->second;
                                 items.ssa = 0;
@@ -295,8 +295,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                                 for (auto &ni_it : items)
                                 {
                                     RCache.set_xform_world(ni_it.Matrix);
-                                    RImplementation.apply_object(ni_it.pObject);
-                                    RImplementation.apply_lmaterial();
+                                    RImplementation->apply_object(ni_it.pObject);
+                                    RImplementation->apply_lmaterial();
 
                                     float LOD = calcLOD(ni_it.ssa, ni_it.pVisual->vis.sphere.R);
 #ifdef USE_DX11
@@ -378,7 +378,7 @@ public:
         Device.mFullTransform.mul(Device.mProject, Device.mView);
         RCache.set_xform_project(Device.mProject);
 
-        RImplementation.rmNear();
+        RImplementation->rmNear();
 
         // preserve culling mode
         cullMode = RCache.get_CullMode();
@@ -387,7 +387,7 @@ public:
 
     ~hud_transform_helper()
     {
-        RImplementation.rmNormal();
+        RImplementation->rmNormal();
 
         // Restore projection
         Device.mProject = Pold;
@@ -421,8 +421,8 @@ void __fastcall render_item(const T& item)
     VERIFY(V && V->shader._get());
     RCache.set_Element(item.second.se);
     RCache.set_xform_world(item.second.Matrix);
-    RImplementation.apply_object(item.second.pObject);
-    RImplementation.apply_lmaterial();
+    RImplementation->apply_object(item.second.pObject);
+    RImplementation->apply_lmaterial();
     hud_transform_helper::apply_custom_state();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     //RCache.hemi.c_update(V);
@@ -477,15 +477,15 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
     const ref_rt rt_null;
     RCache.set_RT(0, 1);
     RCache.set_RT(0, 2);
-    auto zb = RImplementation.Target->get_base_zb();
+    auto zb = RImplementation->Target->get_base_zb();
 
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
-    if (RImplementation.o.dx10_msaa)
-        zb = RImplementation.Target->rt_MSAADepth->pZRT;
+    if (RImplementation->o.dx10_msaa)
+        zb = RImplementation->Target->rt_MSAADepth->pZRT;
 #endif
 
-    RImplementation.Target->u_setrt(
-        RImplementation.o.albedo_wo ? RImplementation.Target->rt_Accumulator : RImplementation.Target->rt_Color,
+    RImplementation->Target->u_setrt(
+        RImplementation->o.albedo_wo ? RImplementation->Target->rt_Accumulator : RImplementation->Target->rt_Color,
         rt_null, rt_null, zb);
 #endif // RENDER!=R_R1
 
@@ -560,20 +560,20 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 {
     VERIFY(_sector);
     PIX_EVENT(r_dsgraph_render_subspace);
-    RImplementation.marker++; // !!! critical here
+    RImplementation->marker++; // !!! critical here
 
-    if (_precise_portals && RImplementation.rmPortals)
+    if (_precise_portals && RImplementation->rmPortals)
     {
         // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(EPS_L * 20, EPS_L * 20, EPS_L * 20);
-        RImplementation.Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
-        RImplementation.Sectors_xrc.box_query(RImplementation.rmPortals, _cop, box_radius);
-        for (int K = 0; K < RImplementation.Sectors_xrc.r_count(); K++)
+        RImplementation->Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
+        RImplementation->Sectors_xrc.box_query(RImplementation->rmPortals, _cop, box_radius);
+        for (int K = 0; K < RImplementation->Sectors_xrc.r_count(); K++)
         {
             CPortal* pPortal =
                 (CPortal*)RImplementation
-                    .Portals[RImplementation.rmPortals->get_tris()[RImplementation.Sectors_xrc.r_begin()[K].id].dummy];
+                    ->Portals[RImplementation->rmPortals->get_tris()[RImplementation->Sectors_xrc.r_begin()[K].id].dummy];
             pPortal->bDualRender = TRUE;
         }
     }
@@ -625,7 +625,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         }
 #if RENDER != R_R1
         // Actor Shadow (Sun + Light)
-        if (g_pGameLevel && phase == RImplementation.PHASE_SMAP
+        if (g_pGameLevel && phase == RImplementation->PHASE_SMAP
             && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
         {
             do

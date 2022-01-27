@@ -56,7 +56,7 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
         uber_deffer(C, false, "base", "base", false);
         break;
     case SE_R2_SHADOW: // smap-direct
-        if (RImplementation.o.HW_smap)
+        if (RImplementation->o.HW_smap)
             C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
         else
             C.r_Pass("shadow_direct_base", "shadow_direct_base", FALSE);
@@ -83,7 +83,7 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_R2_SHADOW: // smap-direct
-        //if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base","dumb",	FALSE,TRUE,TRUE,FALSE);
+        //if (RImplementation->o.HW_smap)	C.r_Pass	("shadow_direct_base","dumb",	FALSE,TRUE,TRUE,FALSE);
         //else							C.r_Pass	("shadow_direct_base","shadow_direct_base",FALSE);
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE,TRUE,FALSE);
         C.r_Sampler("s_base", C.L_textures[0]);
@@ -114,7 +114,7 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_R2_SHADOW: // smap-direct
-        // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base","dumb",	FALSE,TRUE,TRUE,FALSE);
+        // if (RImplementation->o.HW_smap)	C.r_Pass	("shadow_direct_base","dumb",	FALSE,TRUE,TRUE,FALSE);
         // else							C.r_Pass	("shadow_direct_base","shadow_direct_base",FALSE);
 #if RENDER == R_R3
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);

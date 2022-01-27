@@ -37,7 +37,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     bool bHasDetailBump = false;
     if (C.bDetail_Bump)
     {
-        LPCSTR detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
+        LPCSTR detail_bump_texture = RImplementation->Resources->m_textures_description.GetBumpName(dt).c_str();
         // Detect and use detail bump
         if (detail_bump_texture)
         {
@@ -105,38 +105,38 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 
 // Uber-construct
 #if defined(USE_DX11)
-    if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
+    if (bump && hq && RImplementation->o.dx11_enable_tessellation && C.TessMethod != 0)
     {
         char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";
 
         if (C.TessMethod == CBlender_Compile::TESS_PN || C.TessMethod == CBlender_Compile::TESS_PN_HM)
         {
-            RImplementation.addShaderOption("TESS_PN", "1");
+            RImplementation->addShaderOption("TESS_PN", "1");
             xr_strcat(params, "TESS_PN,");
         }
 
         if (C.TessMethod == CBlender_Compile::TESS_HM || C.TessMethod == CBlender_Compile::TESS_PN_HM)
         {
-            RImplementation.addShaderOption("TESS_HM", "1");
+            RImplementation->addShaderOption("TESS_HM", "1");
             xr_strcat(params, "TESS_HM,");
         }
 
         if (lmap)
         {
-            RImplementation.addShaderOption("USE_LM_HEMI", "1");
+            RImplementation->addShaderOption("USE_LM_HEMI", "1");
             xr_strcat(params, "USE_LM_HEMI,");
         }
 
         if (C.bDetail_Diffuse)
         {
-            RImplementation.addShaderOption("USE_TDETAIL", "1");
+            RImplementation->addShaderOption("USE_TDETAIL", "1");
             xr_strcat(params, "USE_TDETAIL,");
         }
 
         if (C.bDetail_Bump)
         {
-            RImplementation.addShaderOption("USE_TDETAIL_BUMP", "1");
+            RImplementation->addShaderOption("USE_TDETAIL_BUMP", "1");
             xr_strcat(params, "USE_TDETAIL_BUMP,");
         }
 
@@ -150,7 +150,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         VERIFY(strstr(vs, "bump") != 0);
         VERIFY(strstr(ps, "bump") != 0);
         C.r_TessPass(vs, hs, ds, "null", ps, FALSE);
-        RImplementation.clearAllShaderOptions();
+        RImplementation->clearAllShaderOptions();
         u32 stage = C.r_dx10Sampler("smp_bump_ds");
         if (stage != -1)
         {
@@ -275,7 +275,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
     bool bHasDetailBump = false;
     if (C.bDetail_Bump)
     {
-        LPCSTR detail_bump_texture = RImplementation.Resources->m_textures_description.GetBumpName(dt).c_str();
+        LPCSTR detail_bump_texture = RImplementation->Resources->m_textures_description.GetBumpName(dt).c_str();
         //  Detect and use detail bump
         if (detail_bump_texture)
         {
@@ -296,38 +296,38 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         strconcat(sizeof(fnameB), fnameB, fnameA, "#");
     }
 
-    if (bump && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
+    if (bump && RImplementation->o.dx11_enable_tessellation && C.TessMethod != 0)
     {
         char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";
 
         if (C.TessMethod == CBlender_Compile::TESS_PN || C.TessMethod == CBlender_Compile::TESS_PN_HM)
         {
-            RImplementation.addShaderOption("TESS_PN", "1");
+            RImplementation->addShaderOption("TESS_PN", "1");
             xr_strcat(params, "TESS_PN,");
         }
 
         if (C.TessMethod == CBlender_Compile::TESS_HM || C.TessMethod == CBlender_Compile::TESS_PN_HM)
         {
-            RImplementation.addShaderOption("TESS_HM", "1");
+            RImplementation->addShaderOption("TESS_HM", "1");
             xr_strcat(params, "TESS_HM,");
         }
 
         if (lmap)
         {
-            RImplementation.addShaderOption("USE_LM_HEMI", "1");
+            RImplementation->addShaderOption("USE_LM_HEMI", "1");
             xr_strcat(params, "USE_LM_HEMI,");
         }
 
         if (C.bDetail_Diffuse)
         {
-            RImplementation.addShaderOption("USE_TDETAIL", "1");
+            RImplementation->addShaderOption("USE_TDETAIL", "1");
             xr_strcat(params, "USE_TDETAIL,");
         }
 
         if (C.bDetail_Bump)
         {
-            RImplementation.addShaderOption("USE_TDETAIL_BUMP", "1");
+            RImplementation->addShaderOption("USE_TDETAIL_BUMP", "1");
             xr_strcat(params, "USE_TDETAIL_BUMP,");
         }
 
@@ -338,7 +338,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         strconcat(sizeof(ds), ds, "DX11" DELIMITER "tess_shadow", params);
 
         C.r_TessPass(vs, hs, ds, "null", "dumb", FALSE, TRUE, TRUE, FALSE);
-        RImplementation.clearAllShaderOptions();
+        RImplementation->clearAllShaderOptions();
         C.r_dx10Texture("s_base", C.L_textures[0]);
         C.r_dx10Texture("s_bumpX", fnameB); // should be before base bump
         C.r_dx10Texture("s_bump", fnameA);

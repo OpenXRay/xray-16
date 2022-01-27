@@ -22,7 +22,7 @@ void CRenderTarget::phase_smap_spot(light* L)
     RCache.set_Stencil(FALSE);
     // no transparency
 #pragma todo("can optimize for multi-lights covering more than say 50%...")
-    if (RImplementation.o.HW_smap)
+    if (RImplementation->o.HW_smap)
         RCache.set_ColorWriteEnable(FALSE);
 
     // For DX10 do it once per smap generation pass in phase_smap_spot_clear
@@ -34,7 +34,7 @@ void CRenderTarget::phase_smap_spot(light* L)
 void CRenderTarget::phase_smap_spot_tsh(light* L)
 {
     VERIFY(!"Implement clear of the buffer for tsh!");
-    VERIFY(RImplementation.o.Tshadows);
+    VERIFY(RImplementation->o.Tshadows);
     RCache.set_ColorWriteEnable();
     if (IRender_Light::OMNIPART == L->flags.type)
     {

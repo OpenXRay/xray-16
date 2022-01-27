@@ -8,19 +8,19 @@ void CRenderTarget::phase_ssao()
     RCache.ClearRT(rt_ssao_temp, {});
 
     // low/hi RTs
-    if (!RImplementation.o.dx10_msaa)
+    if (!RImplementation->o.dx10_msaa)
     {
         u_setrt(rt_ssao_temp, nullptr, nullptr, 0/*get_base_zb()*/);
     }
     else
     {
-        u_setrt(rt_ssao_temp, nullptr, nullptr, 0/*RImplementation.Target->rt_MSAADepth->pZRT*/);
+        u_setrt(rt_ssao_temp, nullptr, nullptr, 0/*RImplementation->Target->rt_MSAADepth->pZRT*/);
     }
 
     RCache.set_Stencil(FALSE);
 
     /*RCache.set_Stencil					(TRUE,D3DCMP_LESSEQUAL,0x01,0xff,0x00);	// stencil should be >= 1
-    if (RImplementation.o.nvstencil)	{
+    if (RImplementation->o.nvstencil)	{
         u_stencil_optimize				(CRenderTarget::SO_Combine);
         RCache.set_ColorWriteEnable		();
     }*/
@@ -68,14 +68,14 @@ void CRenderTarget::phase_ssao()
     RCache.set_c("resolution", float(_w), float(_h), 1.0f / float(_w), 1.0f / float(_h));
 
 
-    if (!RImplementation.o.dx10_msaa)
+    if (!RImplementation->o.dx10_msaa)
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     else
     {
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         /*RCache.set_Stencil( TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0 );
         RCache.Render		( D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-        if( RImplementation.o.dx10_msaa_opt )
+        if( RImplementation->o.dx10_msaa_opt )
         {
             RCache.set_Element( s_ssao_msaa[0]->E[0]	);
             RCache.set_Stencil( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0 );
@@ -110,7 +110,7 @@ void CRenderTarget::phase_downsamp()
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 
-    if (RImplementation.o.ssao_half_data)
+    if (RImplementation->o.ssao_half_data)
     {
         RCache.SetViewport({ 0, 0, (GLsizei)Device.dwWidth / 2, (GLsizei)Device.dwHeight / 2, 0.f, 1.f });
         w /= 2;
@@ -147,6 +147,6 @@ void CRenderTarget::phase_downsamp()
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
 
-    if (RImplementation.o.ssao_half_data)
+    if (RImplementation->o.ssao_half_data)
         RCache.SetViewport({ 0, 0, (GLsizei)Device.dwWidth, (GLsizei)Device.dwHeight, 0.f, 1.f });
 }

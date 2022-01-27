@@ -28,8 +28,8 @@ void r_pixel_calculator::end()
 {
     Device.RenderEnd();
 
-    RCache.set_RT(RImplementation.Target->get_base_rt());
-    RCache.set_ZB(RImplementation.Target->get_base_zb());
+    RCache.set_RT(RImplementation->Target->get_base_rt());
+    RCache.set_ZB(RImplementation->Target->get_base_zb());
 
     zb = nullptr;
     rt = nullptr;
@@ -73,15 +73,15 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
         V->Render(1.f);
 
         // render-1
-        RImplementation.HWOCC.occq_begin(id[face]);
+        RImplementation->HWOCC.occq_begin(id[face]);
         V->Render(1.f);
-        RImplementation.HWOCC.occq_end(id[face]);
+        RImplementation->HWOCC.occq_end(id[face]);
     }
 
     //
     for (u32 it = 0; it < 6; it++)
     {
-        float pixels = (float)RImplementation.HWOCC.occq_get(id[it]);
+        float pixels = (float)RImplementation->HWOCC.occq_get(id[it]);
         float coeff = clampr(pixels / area, float(0), float(1));
         Msg(" - [%d] ssa_c: %1.3f,%f/%f", it, coeff, pixels, area);
         result.ssa[it] = (u8)clampr(iFloor(coeff * 255.f + 0.5f), int(0), int(255));
@@ -100,12 +100,12 @@ void r_pixel_calculator::run()
 {
     Log("----- ssa build start -----");
     begin();
-    for (u32 it = 0; it < RImplementation.Visuals.size(); it++)
+    for (u32 it = 0; it < RImplementation->Visuals.size(); it++)
     {
-        if (0 == dynamic_cast<IRender_Mesh*>(RImplementation.Visuals[it]))
+        if (0 == dynamic_cast<IRender_Mesh*>(RImplementation->Visuals[it]))
             continue;
         Msg("*%d*", it);
-        calculate((dxRender_Visual*)RImplementation.Visuals[it]);
+        calculate((dxRender_Visual*)RImplementation->Visuals[it]);
     }
     end();
     Log("----- ssa build end -----");

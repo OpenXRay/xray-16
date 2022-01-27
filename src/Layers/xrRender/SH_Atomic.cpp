@@ -36,7 +36,7 @@ SVS::SVS() : sh(0)
 
 SVS::~SVS()
 {
-    RImplementation.Resources->_DeleteVS(this);
+    RImplementation->Resources->_DeleteVS(this);
 
 #if defined(USE_DX11)
     // XXX: check just in case
@@ -65,7 +65,7 @@ SPS::~SPS()
 #   error No graphics API selected or enabled!
 #endif
     
-    RImplementation.Resources->_DeletePS(this);
+    RImplementation->Resources->_DeletePS(this);
 }
 
 #if defined(USE_DX11) || defined(USE_OGL)
@@ -81,7 +81,7 @@ SGS::~SGS()
 #       error No graphics API selected or enabled!
 #   endif
 
-    RImplementation.Resources->_DeleteGS(this);
+    RImplementation->Resources->_DeleteGS(this);
 }
 
 SHS::~SHS()
@@ -94,7 +94,7 @@ SHS::~SHS()
 #       error No graphics API selected or enabled!
 #   endif
 
-    RImplementation.Resources->_DeleteHS(this);
+    RImplementation->Resources->_DeleteHS(this);
 }
 
 SDS::~SDS()
@@ -105,7 +105,7 @@ SDS::~SDS()
     CHK_GL(glDeleteProgram(sh));
 #   endif
 
-    RImplementation.Resources->_DeleteDS(this);
+    RImplementation->Resources->_DeleteDS(this);
 }
 
 SCS::~SCS()
@@ -118,7 +118,7 @@ SCS::~SCS()
 #       error No graphics API selected or enabled!
 #   endif
 
-    RImplementation.Resources->_DeleteCS(this);
+    RImplementation->Resources->_DeleteCS(this);
 }
 #endif // USE_DX11 || USE_OGL
 
@@ -135,7 +135,7 @@ SInputSignature::SInputSignature(ID3DBlob* pBlob)
 SInputSignature::~SInputSignature()
 {
     _RELEASE(signature);
-    RImplementation.Resources->_DeleteInputSignature(this);
+    RImplementation->Resources->_DeleteInputSignature(this);
 }
 #endif // USE_DX11
 
@@ -144,14 +144,14 @@ SInputSignature::~SInputSignature()
 SState::~SState()
 {
     _RELEASE(state);
-    RImplementation.Resources->_DeleteState(this);
+    RImplementation->Resources->_DeleteState(this);
 }
 
 ///////////////////////////////////////////////////////////////////////
 //	SDeclaration
 SDeclaration::~SDeclaration()
 {
-    RImplementation.Resources->_DeleteDecl(this);
+    RImplementation->Resources->_DeleteDecl(this);
     //	Release vertex layout
 #ifdef USE_OGL
     glDeleteVertexArrays(1, &dcl);

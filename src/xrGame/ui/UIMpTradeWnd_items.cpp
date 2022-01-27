@@ -10,9 +10,15 @@
 #include "WeaponMagazinedWGrenade.h"
 #include "UICellCustomItems.h"
 
-extern "C" IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid);
-
-extern "C" void __cdecl xrFactory_Destroy(IFactoryObject* O);
+#ifndef XR_PLATFORM_SWITCH
+extern "C"
+{
+#endif
+IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid);
+void __cdecl xrFactory_Destroy(IFactoryObject* O);
+#ifndef XR_PLATFORM_SWITCH
+}
+#endif
 
 CUICellItem* create_cell_item(CInventoryItem* itm);
 

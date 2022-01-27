@@ -309,7 +309,7 @@ void CResourceManager::CompatibilityCheck()
         {
             check("skinning_pos", "skinning_0");
         }
-        RImplementation.m_hq_skinning = hq_skinning;
+        RImplementation->m_hq_skinning = hq_skinning;
         FS.r_close(skinh);
     }
 }

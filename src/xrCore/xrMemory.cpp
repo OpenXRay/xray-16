@@ -116,6 +116,8 @@ size_t xrMemory::mem_usage()
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
+#elif defined(XR_PLATFORM_SWITCH)
+    return switch_mem_usage();
 #endif
 }
 

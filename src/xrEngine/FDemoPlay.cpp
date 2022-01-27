@@ -10,7 +10,7 @@
 #include "Render.h"
 #include "CameraManager.h"
 
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
 #include "xrSASH.h"
 #endif
 //////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
 {
     Msg("*** Playing demo: %s", name);
     Console->Execute("hud_weapon 0");
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
     if (g_bBenchmark || g_SASH.IsRunning())
         Console->Execute("hud_draw 0");
 #endif
@@ -77,7 +77,7 @@ CDemoPlay::~CDemoPlay()
     xr_delete(m_pMotion);
     xr_delete(m_MParam);
     Console->Execute("hud_weapon 1");
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
     if (g_bBenchmark || g_SASH.IsRunning())
         Console->Execute("hud_draw 1");
 #endif
@@ -201,7 +201,7 @@ void CDemoPlay::stat_Stop()
 #define FIX(a)           \
     while (a >= m_count) \
     a -= m_count
-void spline1(float t, Fvector* p, Fvector* ret)
+void _spline1(float t, Fvector* p, Fvector* ret)
 {
     float t2 = t * t;
     float t3 = t2 * t;
@@ -319,7 +319,7 @@ bool CDemoPlay::ProcessCam(SCamEffectorInfo& info)
             v[3].x = m4->m[i][0];
             v[3].y = m4->m[i][1];
             v[3].z = m4->m[i][2];
-            spline1(t, &(v[0]), (Fvector*)&(Device.mView.m[i][0]));
+            _spline1(t, &(v[0]), (Fvector*)&(Device.mView.m[i][0]));
         }
 
         Fmatrix mInvCamera;

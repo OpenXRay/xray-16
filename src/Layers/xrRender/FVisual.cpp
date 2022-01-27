@@ -34,10 +34,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         vCount = data->r_u32();
 
         VERIFY(nullptr == p_rm_Vertices);
-        p_rm_Vertices = RImplementation.getVB(ID);
+        p_rm_Vertices = RImplementation->getVB(ID);
         p_rm_Vertices->AddRef();
 
-        vFormat = RImplementation.getVB_Format(ID);
+        vFormat = RImplementation->getVB_Format(ID);
         loaded_v = true;
 
         // indices
@@ -47,7 +47,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ID);
+        p_rm_Indices = RImplementation->getIB(ID);
         p_rm_Indices->AddRef();
 #endif
         // check for fast-vertices
@@ -70,10 +70,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast->vCount = def().r_u32();
 
             VERIFY(nullptr == m_fast->p_rm_Vertices);
-            m_fast->p_rm_Vertices = RImplementation.getVB(ID, true);
+            m_fast->p_rm_Vertices = RImplementation->getVB(ID, true);
             m_fast->p_rm_Vertices->AddRef();
 
-            fmt = RImplementation.getVB_Format(ID, true);
+            fmt = RImplementation->getVB_Format(ID, true);
 
             // indices
             ID = def().r_u32();
@@ -82,7 +82,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast->dwPrimitives = iCount / 3;
 
             VERIFY(nullptr == m_fast->p_rm_Indices);
-            m_fast->p_rm_Indices = RImplementation.getIB(ID, true);
+            m_fast->p_rm_Indices = RImplementation->getIB(ID, true);
             m_fast->p_rm_Indices->AddRef();
 
             // geom
@@ -102,10 +102,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             vCount = data->r_u32();
 
             VERIFY(nullptr == p_rm_Vertices);
-            p_rm_Vertices = RImplementation.getVB(ID);
+            p_rm_Vertices = RImplementation->getVB(ID);
             p_rm_Vertices->AddRef();
 
-            vFormat = RImplementation.getVB_Format(ID);
+            vFormat = RImplementation->getVB_Format(ID);
 #endif // !_EDITOR
         }
         else
@@ -138,7 +138,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             iCount = data->r_u32();
             dwPrimitives = iCount / 3;
             VERIFY(nullptr == p_rm_Indices);
-            p_rm_Indices = RImplementation.getIB(ID);
+            p_rm_Indices = RImplementation->getIB(ID);
             p_rm_Indices->AddRef();
 #endif // !_EDITOR
         }
@@ -171,7 +171,7 @@ void Fvisual::Render(float)
 #if RENDER == R_R1
     if (m_fast && ps_r1_force_geomx)
 #else
-    if (m_fast && (ps_r1_force_geomx || RImplementation.phase == CRender::PHASE_SMAP && !RCache.is_TessEnabled()))
+    if (m_fast && (ps_r1_force_geomx || RImplementation->phase == CRender::PHASE_SMAP && !RCache.is_TessEnabled()))
 #endif
     {
         RCache.set_Geometry(m_fast->rm_geom);

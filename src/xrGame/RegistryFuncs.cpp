@@ -6,7 +6,7 @@
 
 bool ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)// FIXME!!!
     return true;
 #else
     HKEY hKey = 0;
@@ -59,7 +59,7 @@ bool ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value)
 
 bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)// FIXME!!!
     return true;
 #else
     HKEY hKey = nullptr;
@@ -105,7 +105,7 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
 
 bool ReadRegistry_StrValue(LPCSTR rKeyName, char* value) 
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH)// FIXME!!!
     return true;
 #else
     return ReadRegistryValue(rKeyName, REG_SZ, value);
@@ -113,25 +113,25 @@ bool ReadRegistry_StrValue(LPCSTR rKeyName, char* value)
 }
 void WriteRegistry_StrValue(LPCSTR rKeyName, const char* value)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)// FIXME!!!
     WriteRegistryValue(rKeyName, REG_SZ, value);
 #endif
 }
 void ReadRegistry_DWValue(LPCSTR rKeyName, DWORD& value)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)// FIXME!!!
     ReadRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
 void WriteRegistry_DWValue(LPCSTR rKeyName, const DWORD& value) 
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)// FIXME!!
     WriteRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
 u32 const ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const buffer_size)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_SWITCH) // FIXME!!!
     return u32(0);
 #else
     HKEY hKey = 0;
@@ -165,7 +165,7 @@ u32 const ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const b
 
 void WriteRegistry_BinaryValue(LPCSTR rKeyName, u8 const* buffer_src, u32 const buffer_size)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)// FIXME!!!
     HKEY hKey;
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_WRITE, &hKey);

@@ -198,7 +198,7 @@ void CParticleGroup::SItem::Clear()
 }
 void CParticleGroup::SItem::StartRelatedChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m)
 {
-    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation.model_CreatePE(eff_name));
+    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation->model_CreatePE(eff_name));
 
     C->SetHudMode(emitter->GetHudMode());
 
@@ -230,7 +230,7 @@ void CParticleGroup::SItem::StopRelatedChild(u32 idx)
 }
 void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, PAPI::Particle& m)
 {
-    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation.model_CreatePE(nm));
+    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation->model_CreatePE(nm));
     C->SetHudMode(emitter->GetHudMode());
     if (!C->IsLooped())
     {
@@ -570,7 +570,7 @@ BOOL CParticleGroup::Compile(CPGDef* def)
         items.resize(m_Def->m_Effects.size());
         for (CPGDef::EffectVec::const_iterator e_it = m_Def->m_Effects.begin(); e_it != m_Def->m_Effects.end(); ++e_it)
         {
-            CParticleEffect* eff = (CParticleEffect*)RImplementation.model_CreatePE(*(*e_it)->m_EffectName);
+            CParticleEffect* eff = (CParticleEffect*)RImplementation->model_CreatePE(*(*e_it)->m_EffectName);
             eff->SetBirthDeadCB(OnGroupParticleBirth, OnGroupParticleDead, this, u32(e_it - m_Def->m_Effects.begin()));
             items[e_it - def->m_Effects.begin()].Set(eff);
         }

@@ -6,7 +6,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined (XR_PLATFORM_SWITCH)
 IC const int& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
 #endif
 

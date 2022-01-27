@@ -250,7 +250,7 @@ void CDetailManager::UpdateVisibleM()
 
     // Initialize 'vis' and 'cache'
     // Collect objects for rendering
-    RImplementation.BasicStats.DetailVisibility.Begin();
+    RImplementation->BasicStats.DetailVisibility.Begin();
     for (int _mz = 0; _mz < dm_cache1_line; _mz++)
     {
         for (int _mx = 0; _mx < dm_cache1_line; _mx++)
@@ -295,7 +295,7 @@ void CDetailManager::UpdateVisibleM()
                     }
                 }
 #ifndef _EDITOR
-                if (!RImplementation.HOM.visible(S.vis))
+                if (!RImplementation->HOM.visible(S.vis))
                 {
                     continue; // invisible-occlusion
                 }
@@ -365,7 +365,7 @@ void CDetailManager::UpdateVisibleM()
             }
         }
     }
-    RImplementation.BasicStats.DetailVisibility.End();
+    RImplementation->BasicStats.DetailVisibility.End();
 }
 
 void CDetailManager::Render()
@@ -380,7 +380,7 @@ void CDetailManager::Render()
     // MT
     MT_SYNC();
 
-    RImplementation.BasicStats.DetailRender.Begin();
+    RImplementation->BasicStats.DetailRender.Begin();
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
 
 #ifndef _EDITOR
@@ -398,14 +398,14 @@ void CDetailManager::Render()
     RCache.set_CullMode(CULL_CCW);
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
-    RImplementation.BasicStats.DetailRender.End();
+    RImplementation->BasicStats.DetailRender.End();
     m_frame_rendered = RDEVICE.dwFrame;
 }
 
 void __stdcall CDetailManager::MT_CALC()
 {
 #ifndef _EDITOR
-    if (nullptr == RImplementation.Details)
+    if (nullptr == RImplementation->Details)
         return; // possibly deleted
     if (nullptr == dtFS)
         return;
@@ -422,9 +422,9 @@ void __stdcall CDetailManager::MT_CALC()
             int s_x = iFloor(EYE.x / dm_slot_size + .5f);
             int s_z = iFloor(EYE.z / dm_slot_size + .5f);
 
-            RImplementation.BasicStats.DetailCache.Begin();
+            RImplementation->BasicStats.DetailCache.Begin();
             cache_Update(s_x, s_z, EYE, dm_max_decompress);
-            RImplementation.BasicStats.DetailCache.End();
+            RImplementation->BasicStats.DetailCache.End();
 
             UpdateVisibleM();
             m_frame_calc = RDEVICE.dwFrame;

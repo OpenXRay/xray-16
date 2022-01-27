@@ -35,14 +35,14 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 {
     // Choose normal code-path or filtered
     phase_accumulator();
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         accum_direct_f(sub_phase);
         return;
     }
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -101,7 +101,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
     d_Z = center_pt.z;
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
+    if (RImplementation->o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
 
     PIX_EVENT(Perform_lighting);
@@ -113,7 +113,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         RCache.set_ColorWriteEnable();
 
         // texture adjustment matrix
-        float fTexelOffs = (.5f / float(RImplementation.o.smapsize));
+        float fTexelOffs = (.5f / float(RImplementation->o.smapsize));
         float fRange = (SE_SUN_NEAR == sub_phase) ? ps_r2_sun_depth_near_scale : ps_r2_sun_depth_far_scale;
         //float fBias = (SE_SUN_NEAR==sub_phase) ? ps_r2_sun_depth_near_bias : ps_r2_sun_depth_far_bias;
         // Use this when triangle culling is not inverted.
@@ -134,7 +134,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             m_shadow.mul(xf_project, xf_invview);
 
             // tsm-bias
-            if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
+            if ((SE_SUN_FAR == sub_phase) && (RImplementation->o.HW_smap))
             {
                 Fvector bias;
                 bias.mul(L_dir, ps_r2_sun_tsm_bias);
@@ -226,7 +226,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         }
 
         // Fetch4 : enable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET4 MAKEFOURCC('G', 'E', 'T', '4')
@@ -238,7 +238,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
         // Fetch4 : disable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET1 MAKEFOURCC('G', 'E', 'T', '1')
@@ -250,7 +250,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
         // Igor: draw volumetric here
         // if (ps_r2_ls_flags.test(R2FLAG_SUN_SHAFTS))
-        if (RImplementation.o.advancedpp && (ps_r_sun_shafts > 0))
+        if (RImplementation->o.advancedpp && (ps_r_sun_shafts > 0))
             accum_direct_volumetric(sub_phase, Offset, m_shadow);
     }
 }
@@ -259,14 +259,14 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 {
     // Choose normal code-path or filtered
     phase_accumulator();
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         accum_direct_f(sub_phase);
         return;
     }
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -325,7 +325,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
     d_Z = center_pt.z;
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
+    if (RImplementation->o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
 
     PIX_EVENT(Perform_lighting);
@@ -338,7 +338,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_ColorWriteEnable();
 
         // texture adjustment matrix
-        float fTexelOffs = (0.5f / float(RImplementation.o.smapsize));
+        float fTexelOffs = (0.5f / float(RImplementation->o.smapsize));
         float fRange = (SE_SUN_NEAR == sub_phase) ? ps_r2_sun_depth_near_scale : ps_r2_sun_depth_far_scale;
         //float fBias = (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
         // Use this when triangle culling is not inverted.
@@ -359,7 +359,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             m_shadow.mul(xf_project, xf_invview);
 
             // tsm-bias
-            if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
+            if ((SE_SUN_FAR == sub_phase) && (RImplementation->o.HW_smap))
             {
                 Fvector bias;
                 bias.mul(L_dir, ps_r2_sun_tsm_bias);
@@ -499,7 +499,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             RCache.set_ZFunc(D3DCMP_LESS);
 
         // Fetch4 : enable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET4 MAKEFOURCC('G', 'E', 'T', '4')
@@ -516,7 +516,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
 
         // Fetch4 : disable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET1 MAKEFOURCC('G', 'E', 'T', '1')
@@ -528,7 +528,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
         // Igor: draw volumetric here
         // if (ps_r2_ls_flags.test(R2FLAG_SUN_SHAFTS))
-        if (RImplementation.o.advancedpp && (ps_r_sun_shafts > 0) && sub_phase == SE_SUN_FAR)
+        if (RImplementation->o.advancedpp && (ps_r_sun_shafts > 0) && sub_phase == SE_SUN_FAR)
             accum_direct_volumetric(sub_phase, Offset, m_shadow);
     }
 }
@@ -537,7 +537,7 @@ void CRenderTarget::accum_direct_blend()
 {
     PIX_EVENT(accum_direct_blend);
     // blend-copy
-    if (!RImplementation.o.fp16_blend)
+    if (!RImplementation->o.fp16_blend)
     {
         u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
 
@@ -584,7 +584,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     u_setrt(rt_Generic_0, NULL, NULL, get_base_zb());
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -645,7 +645,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     d_Z = center_pt.z;
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
+    if (RImplementation->o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
 
     // Perform lighting
@@ -655,7 +655,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         RCache.set_ColorWriteEnable();
 
         // texture adjustment matrix
-        float fTexelOffs = (.5f / float(RImplementation.o.smapsize));
+        float fTexelOffs = (.5f / float(RImplementation->o.smapsize));
         float fRange = (SE_SUN_NEAR == sub_phase) ? ps_r2_sun_depth_near_scale : ps_r2_sun_depth_far_scale;
         float fBias = (SE_SUN_NEAR == sub_phase) ? ps_r2_sun_depth_near_bias : ps_r2_sun_depth_far_bias;
         Fmatrix m_TexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, fRange, 0.0f,
@@ -726,7 +726,7 @@ void CRenderTarget::accum_direct_lum()
     phase_accumulator();
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -754,7 +754,7 @@ void CRenderTarget::accum_direct_lum()
 
     // nv-stencil recompression
     /*
-    if (RImplementation.o.nvstencil  && (SE_SUN_NEAR==sub_phase))   u_stencil_optimize();   //. driver bug?
+    if (RImplementation->o.nvstencil  && (SE_SUN_NEAR==sub_phase))   u_stencil_optimize();   //. driver bug?
     */
 
     // Perform lighting
@@ -843,7 +843,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_MIDDLE) && (sub_phase != SE_SUN_FAR))
         return;
 
-    if (!(RImplementation.o.advancedpp && ps_r_sun_shafts))
+    if (!(RImplementation->o.advancedpp && ps_r_sun_shafts))
         return;
 
     {
@@ -867,7 +867,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     // Perform lighting
     {
         // *** assume accumulator setted up ***
-        light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+        light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
         // Common constants (light-related)
         Fvector L_clr;
@@ -878,7 +878,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
         // setup
         RCache.set_Element(s_accum_direct_volumetric->E[0]);
-        if (!RImplementation.o.oldshadowcascades)
+        if (!RImplementation->o.oldshadowcascades)
         {
             RCache.set_CullMode(CULL_CCW);
         }
@@ -906,7 +906,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         else
         {
             extern float OLES_SUN_LIMIT_27_01_07;
-            if (RImplementation.o.oldshadowcascades)
+            if (RImplementation->o.oldshadowcascades)
                 zMin = ps_r2_sun_near;
             else
                 zMin = 0; /////*****************************************************************************************
@@ -939,7 +939,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         }
 
         // Fetch4 : enable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET4 MAKEFOURCC('G', 'E', 'T', '4')
@@ -949,13 +949,13 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         // setup stencil: we have to draw to both lit and unlit pixels
         // RCache.set_Stencil           (TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
 
-        if (RImplementation.o.oldshadowcascades)
+        if (RImplementation->o.oldshadowcascades)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         else
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
 
         // Fetch4 : disable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET1 MAKEFOURCC('G', 'E', 'T', '1')

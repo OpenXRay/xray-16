@@ -55,7 +55,7 @@ void CPortal::OnRender()
 
         RCache.set_xform_world(Fidentity);
         // draw solid
-        RCache.set_Shader(RImplementation.m_SelectionShader);
+        RCache.set_Shader(RImplementation->m_SelectionShader);
 #ifndef USE_DX9 // when we don't have FFP support
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
@@ -69,18 +69,18 @@ void CPortal::OnRender()
         V.back().set(poly[0], portalColor);
         
         if (bDebug)
-            RImplementation.rmNear();
+            RImplementation->rmNear();
         else
             Device.SetNearer(TRUE);
       
-        RCache.set_Shader(RImplementation.m_WireShader);
+        RCache.set_Shader(RImplementation->m_WireShader);
 #ifndef USE_DX9 // when we don't have FFP support
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
             float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
 #endif
         RCache.dbg_Draw(D3DPT_LINESTRIP, &*V.begin(), V.size() - 1);
         if (bDebug)
-            RImplementation.rmNormal();
+            RImplementation->rmNormal();
         else
             Device.SetNearer(FALSE);
     }
@@ -244,7 +244,7 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
                 scissor = R_scissor;
 
                 // Cull by HOM (slower algo)
-                if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P)))
+                if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) && (!RImplementation->HOM.visible(*P)))
                     continue;
             }
             else
@@ -277,7 +277,7 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
 
                 // Cull by HOM (faster algo)
                 if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) &&
-                    !RImplementation.HOM.visible(scissor, depth))
+                    !RImplementation->HOM.visible(scissor, depth))
                 {
                     continue;
                 }
@@ -288,7 +288,7 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
             scissor = R_scissor;
 
             // Cull by HOM (slower algo)
-            if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P)))
+            if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) && (!RImplementation->HOM.visible(*P)))
                 continue;
         }
 
@@ -311,7 +311,7 @@ void CSector::load(IReader& fs)
     while (count)
     {
         u16 ID = fs.r_u16();
-        CPortal* P = (CPortal*)RImplementation.getPortal(ID);
+        CPortal* P = (CPortal*)RImplementation->getPortal(ID);
         m_portals.push_back(P);
         count--;
     }
@@ -323,6 +323,6 @@ void CSector::load(IReader& fs)
         // Assign visual
         size = fs.find_chunk(fsP_Root);
         R_ASSERT(size == 4);
-        m_root = (dxRender_Visual*)RImplementation.getVisual(fs.r_u32());
+        m_root = (dxRender_Visual*)RImplementation->getVisual(fs.r_u32());
     }
 }

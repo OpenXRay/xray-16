@@ -32,7 +32,7 @@ screenshot_manager::~screenshot_manager()
     xr_free(m_buffer_for_compress);
     if (m_make_start_event)
     {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)// FIXME!!!
         SetEvent(m_make_start_event);
         WaitForSingleObject(m_make_done_event, INFINITE); // thread stoped
         CloseHandle(m_make_done_event);
@@ -143,7 +143,7 @@ void screenshot_manager::shedule_Update(u32 dt)
         }
         else
         {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH) // FIXME!!!
             u32 thread_result = WaitForSingleObject(m_make_done_event, 0);
             R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
             if (thread_result == WAIT_OBJECT_0)
@@ -176,7 +176,7 @@ void screenshot_manager::shedule_Update(u32 dt)
                 }
         #endif //#ifdef DEBUG*/
         ULONG_PTR process_affinity_mask, tmp_dword;
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH) // FIXME!!!
         GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &tmp_dword);
         process_screenshot(btwCount1(static_cast<u32>(process_affinity_mask)) == 1);
 #endif
@@ -232,7 +232,7 @@ void screenshot_manager::set_draw_downloads(bool draw)
 
 void screenshot_manager::process_screenshot(bool singlecore)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH) // FIXME!!!
     if (m_make_start_event)
     {
         SetEvent(m_make_start_event);
@@ -258,7 +258,7 @@ void __stdcall screenshot_manager::jpeg_compress_cb(long progress)
 void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
 {
     screenshot_manager* this_ptr = static_cast<screenshot_manager*>(arg_ptr);
-#ifndef XR_PLATFORM_LINUX // FIXME!!
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)// FIXME!!
     u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {

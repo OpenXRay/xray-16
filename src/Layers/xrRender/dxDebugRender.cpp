@@ -19,7 +19,7 @@ void dxDebugRender::Render()
 
     RCache.set_xform_world(Fidentity);
 #ifndef USE_DX9 // when we don't have FFP support
-    RCache.set_Shader(RImplementation.m_WireShader);
+    RCache.set_Shader(RImplementation->m_WireShader);
     const u32 color = m_line_vertices[0].color;
     RCache.set_c("tfactor", float(color_get_R(color)) / 255.f, float(color_get_G(color)) / 255.f, \
         float(color_get_B(color)) / 255.f, float(color_get_A(color)) / 255.f);

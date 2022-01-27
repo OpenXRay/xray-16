@@ -213,8 +213,11 @@ void CalcIterations()
 TaskManager::TaskManager()
 {
     s_main_thread_worker = &s_tl_worker;
-
+#ifdef XR_PLATFORM_SWITCH
+    const u32 threads = 3; // XXX: Implement for Switch
+#else
     const u32 threads = CPU::ID.n_threads - OTHER_THREADS_COUNT;
+#endif
     workers.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {

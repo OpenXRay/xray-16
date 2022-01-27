@@ -6,7 +6,7 @@
 #include "Common/Common.hpp"
 
 #include "xrEngine/stdafx.h" // XXX: This seems bad. PCH's are for internal (building) use.
-#if !defined(XR_PLATFORM_LINUX)
+#if !defined(XR_PLATFORM_LINUX) && !defined(XR_PLATFORM_SWITCH)
 #include "DPlay/dplay8.h"
 #endif
 // xrEngine src file count is ~1100.

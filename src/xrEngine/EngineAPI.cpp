@@ -12,6 +12,12 @@
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
+#ifdef XR_PLATFORM_SWITCH
+// Required due to static linking
+#include "xrGame/xrGame.h"
+#include "Layers/xrRenderPC_GL/xrRender_GL.h"
+#endif
+
 extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
@@ -111,6 +117,23 @@ void CEngineAPI::Initialize(void)
 {
     InitializeRenderers();
 
+#ifdef XR_PLATFORM_SWITCH
+        xrGame_GlobalInit();
+
+        pCreate = (Factory_Create*)xrFactory_Create;
+        R_ASSERT(pCreate);
+
+        pDestroy = (Factory_Destroy*)xrFactory_Destroy;
+        R_ASSERT(pDestroy);
+
+        pInitializeGame = (InitializeGameLibraryProc)initialize_library;
+        R_ASSERT(pInitializeGame);
+
+        pFinalizeGame = (FinalizeGameLibraryProc)finalize_library;
+        R_ASSERT(pFinalizeGame);
+    	
+        pInitializeGame();
+#else
     hGame = XRay::LoadModule("xrGame");
     if (!CanSkipGameModuleLoading())
     {
@@ -150,7 +173,7 @@ void CEngineAPI::Initialize(void)
 
         tune_enabled = true;
     }
-
+#endif
     CloseUnusedLibraries();
 }
 
@@ -212,6 +235,14 @@ void CEngineAPI::CreateRendererList()
     }
     else
     {
+#if defined(XR_PLATFORM_SWITCH)
+        RendererModule* module = ::GetRendererModule();
+        R_ASSERT2(module, "Cant load statically linked render");
+
+        xrRenderGL_GlobalInit();
+
+        renderers.emplace_back(RendererDesc({ gl_library, nullptr, module }));
+#else
         for (pcstr library : RENDER_LIBRARIES)
         {
             loadLibrary(library);
@@ -223,6 +254,7 @@ void CEngineAPI::CreateRendererList()
         });
         if (it != renderers.end())
             r2_available = true;
+#endif
     }
 
     int modeIndex{};

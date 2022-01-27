@@ -56,7 +56,7 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 void CKinematics::DebugRender(Fmatrix& XFORM)
 {
 #ifndef USE_DX9 // when we don't have FFP support
-    RCache.set_Shader(RImplementation.m_WireShader);
+    RCache.set_Shader(RImplementation->m_WireShader);
 #endif
 
     CalculateBones();
@@ -747,7 +747,7 @@ void CKinematics::CalculateWallmarks(bool hud)
                 // append wm to WallmarkEngine
                 if (!hud && GEnv.Render->ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
                     // GEnv.Render->add_SkeletonWallmark   (wm);
-                    ::RImplementation.add_SkeletonWallmark(wm);
+                    ::RImplementation->add_SkeletonWallmark(wm);
             }
             else
             {

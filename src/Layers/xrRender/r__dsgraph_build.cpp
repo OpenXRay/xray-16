@@ -34,7 +34,7 @@ ICF float CalcSSA(float& distSQ, Fvector& C, float R)
 
 void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
 {
-    CRender& RI = RImplementation;
+    CRender& RI = *RImplementation;
 
     if (pVisual->vis.marker == RI.marker)
         return;
@@ -56,13 +56,13 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
     ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
-    if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
+    if (RImplementation->o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
         mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
     }
 
     // Select shader
-    ShaderElement* sh = RImplementation.rimp_select_sh_dynamic(pVisual, distSQ);
+    ShaderElement* sh = RImplementation->rimp_select_sh_dynamic(pVisual, distSQ);
     if (nullptr == sh)
         return;
     if (!pmask[sh->flags.iPriority / 2])
@@ -205,7 +205,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
 
 void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 {
-    CRender& RI = RImplementation;
+    CRender& RI = *RImplementation;
 
     if (pVisual->vis.marker == RI.marker)
         return;
@@ -227,13 +227,13 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
     ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
-    if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
+    if (RImplementation->o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
         mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
     }
 
     // Select shader
-    ShaderElement* sh = RImplementation.rimp_select_sh_static(pVisual, distSQ);
+    ShaderElement* sh = RImplementation->rimp_select_sh_static(pVisual, distSQ);
     if (nullptr == sh)
         return;
     if (!pmask[sh->flags.iPriority / 2])
@@ -446,7 +446,7 @@ void D3DXRenderBase::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisu
 
 void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
 {
-    if (!RImplementation.HOM.visible(pVisual->vis))
+    if (!RImplementation->HOM.visible(pVisual->vis))
         return;
 
     // Visual is 100% visible - simply add it
@@ -654,7 +654,7 @@ void D3DXRenderBase::add_Static(dxRender_Visual* pVisual, const CFrustum& view, 
     if (fcvNone == VIS)
         return;
 
-    if (!RImplementation.HOM.visible(vis))
+    if (!RImplementation->HOM.visible(vis))
         return;
 
     // If we get here visual is visible or partially visible

@@ -23,22 +23,22 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     PassSET_LightFog(FALSE, bFog);
 
     // Create shaders
-    SPS* ps = RImplementation.Resources->_CreatePS(_ps);
+    SPS* ps = RImplementation->Resources->_CreatePS(_ps);
     u32 flags = 0;
 #if defined(USE_DX11)
     if (ps->constants.dx9compatibility)
         flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 #endif
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs, flags);
+    SVS* vs = RImplementation->Resources->_CreateVS(_vs, flags);
     dest.ps = ps;
     dest.vs = vs;
 #if defined(USE_DX11) || defined(USE_OGL)
-    SGS* gs = RImplementation.Resources->_CreateGS("null");
+    SGS* gs = RImplementation->Resources->_CreateGS("null");
     dest.gs = gs;
 #    ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS("null");
-    dest.ds = RImplementation.Resources->_CreateDS("null");
-    dest.cs = RImplementation.Resources->_CreateCS("null");
+    dest.hs = RImplementation->Resources->_CreateHS("null");
+    dest.ds = RImplementation->Resources->_CreateDS("null");
+    dest.cs = RImplementation->Resources->_CreateCS("null");
 #    endif
 #endif // !USE_DX9
     ctable.merge(&ps->constants);
@@ -96,7 +96,7 @@ u32 CBlender_Compile::i_Sampler(LPCSTR _name)
 void CBlender_Compile::i_Texture(u32 s, LPCSTR name)
 {
     if (name)
-        passTextures.push_back(std::make_pair(s, ref_texture(RImplementation.Resources->_CreateTexture(name))));
+        passTextures.push_back(std::make_pair(s, ref_texture(RImplementation->Resources->_CreateTexture(name))));
 }
 
 void CBlender_Compile::i_Projective(u32 s, bool b)
@@ -193,12 +193,12 @@ void CBlender_Compile::r_Sampler_clw(LPCSTR name, LPCSTR texture, bool b_ps1x_Pr
 void CBlender_Compile::r_End()
 {
     SetMapping();
-    dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
-    dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
-    dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
+    dest.constants = RImplementation->Resources->_CreateConstantTable(ctable);
+    dest.state = RImplementation->Resources->_CreateState(RS.GetContainer());
+    dest.T = RImplementation->Resources->_CreateTextureList(passTextures);
     dest.C = nullptr;
 #ifdef _EDITOR
     dest.M = 0;
 #endif
-    SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
+    SH->passes.push_back(RImplementation->Resources->_CreatePass(dest));
 }
