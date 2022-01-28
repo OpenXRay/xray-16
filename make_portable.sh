@@ -4,7 +4,7 @@ OUT=~/OpenXRay
 DEF_COPY_PATH=~
 OS_RELEASE_FILES=("/etc/os-release" "/usr/lib/os-release")
 
-#=================================== Функция справки
+#=================================== Help function.
 
 helps(){
     whiptail --title  " Help " --msgbox  "  This script will help you easily build the OpenXRay engine and set it up to run. The script was compiled as a result of numerous requests from users who have the same type of minor errors as a result of their little preparation in order to simplify the process of building the engine.
@@ -16,14 +16,14 @@ The following functions are implemented in the Script:
     main
 }
 
-#=================================== Функция обновления
+#=================================== Source code update feature.
 
 update_src(){
     git pull
     main
 }
 
-#=================================== Функция установки зависимостей
+#=================================== Dependency installation function.
 #This function is borrowed from the MangoHud project.
 #https://github.com/flightlessmango/MangoHud/blob/master/build.sh
 
@@ -104,7 +104,7 @@ On some distributions, packages may be split into two and prefixed with -dev or 
         done
 }
 
-#=================================== Функция сборки
+#=================================== Assembly function.
 
 build(){
     dependencies
@@ -149,14 +149,14 @@ levels, localization, mp, patches, resources" 12 70
     main
 }
 
-#=================================== Функция распаковки
+#=================================== Unpack function.
 
 unpack(){
     whiptail --title  "Error" --msgbox  "Unpacking has not yet been implemented." 10 60
     main
 }
 
-#=================================== Функция копирования
+#=================================== Copy function.
 
 res_copy(){
     case $1 in
@@ -187,7 +187,7 @@ res_copy(){
     fi
 }
 
-#=================================== Главная функция
+#=================================== Main function.
 
 main(){
 
@@ -214,16 +214,14 @@ case $OPTION in
              ;;
                 "5")
                 res_copy "cop"
-
              ;;
                 "6")
                 res_copy "cs"
-
              ;;
             255)
             echo "The ESC key has been pressed.";;
 esac
 }
 
-#=================================== Точка входа
+#=================================== Point of entry.
 main
