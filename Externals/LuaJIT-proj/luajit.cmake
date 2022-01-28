@@ -321,6 +321,7 @@ if (NOT PROJECT_PLATFORM_E2K)
 			-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
 			-DCMAKE_BUILD_TYPE:STRING="Release"
 			-DLUAJIT_DIR="${LUAJIT_DIR}"
+			-DLUA_USE_POSIX="${LUA_USE_POSIX}"
 			-DHOST_ACFLAGS="${HOST_ACFLAGS}"
 			-DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
 		COMMAND ${CMAKE_COMMAND} --build HostBuildTools/minilua --config Release
@@ -575,8 +576,8 @@ target_include_directories(${LIB_NAME}
 
 target_link_libraries(${LIB_NAME}
 	PRIVATE
-	$<$<BOOL:LUA_USE_POSIX>:m>
-	$<$<BOOL:LUA_USE_DLOPEN>:dl>
+	$<$<BOOL:${LUA_USE_POSIX}>:m>
+	$<$<BOOL:${LUA_USE_DLOPEN}>:dl>
 )
 
 target_compile_options(${LIB_NAME}

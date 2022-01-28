@@ -55,7 +55,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/Externals/NVTT/src
     ${CMAKE_SOURCE_DIR}/Externals/NVTT/include
-    $<$<BOOL:CUDA_FOUND>:${CUDA_INCLUDE_PATH}>
+    $<$<BOOL:${CUDA_FOUND}>:${CUDA_INCLUDE_PATH}>
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -64,14 +64,14 @@ target_link_libraries(${PROJECT_NAME}
     nvmath
     nvimage
     squish
-    $<$<BOOL:CUDA_FOUND>:${CUDA_LIBRARIES}>
+    $<$<BOOL:${CUDA_FOUND}>:${CUDA_LIBRARIES}>
 )
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DNVTT_EXPORTS
-    $<$<BOOL:NVTT_SHARED>:-DNVTT_SHARED=1>
-    $<$<BOOL:CUDA_FOUND>:-DHAVE_CUDA>
+    $<$<BOOL:${NVTT_SHARED}>:-DNVTT_SHARED=1>
+    $<$<BOOL:${CUDA_FOUND}>:-DHAVE_CUDA>
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY

@@ -46,7 +46,7 @@ target_include_directories(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DNVCORE_EXPORTS
-    $<$<BOOL:NVCORE_SHARED>:-DNVCORE_SHARED=1>
+    $<$<BOOL:${NVCORE_SHARED}>:-DNVCORE_SHARED=1>
 )
 
 if (UNIX)
