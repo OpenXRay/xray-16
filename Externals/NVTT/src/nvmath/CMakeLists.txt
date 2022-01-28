@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DNVCORE_EXPORTS
-    $<$<BOOL:NVMATH_SHARED>:-DNVMATH_SHARED=1>
+    $<$<BOOL:${NVMATH_SHARED}>:-DNVMATH_SHARED=1>
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
