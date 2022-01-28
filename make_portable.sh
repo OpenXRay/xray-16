@@ -2,6 +2,7 @@
 
 OUT=~/OpenXRay
 DEF_COPY_PATH=~
+OS_RELEASE_FILES=("/etc/os-release" "/usr/lib/os-release")
 
 #=================================== Функция справки
 
@@ -22,15 +23,91 @@ update_src(){
     main
 }
 
+#=================================== Функция установки зависимостей
+#This function is borrowed from the MangoHud project.
+#https://github.com/flightlessmango/MangoHud/blob/master/build.sh
+
+# Correctly identify the os-release file.
+for os_release in ${OS_RELEASE_FILES[@]} ; do
+    if [[ ! -e "${os_release}" ]]; then
+        continue
+    fi
+    DISTRO=$(sed -rn 's/^ID(_LIKE)*=(.+)/\L\2/p' ${os_release} | sed 's/"//g')
+done
+
+dependencies() {
+        missing_deps() {
+
+            if (whiptail --title  "Installing dependencies." --yesno  "Missing dependencies for $DISTRO:
+$INSTALL
+
+Do you want the script to install these packages?" 15 60)  then
+                PERMISSION=install_deps
+            else
+                whiptail --title  "Attention!!!" --msgbox  "I continue without installing dependencies." 10 60
+            fi
+        }
+        dep_install() {
+            set +e
+            for i in $(eval echo $DEPS); do
+                $MANAGER_QUERY "$i" &> /dev/null
+                if [[ $? == 1 ]]; then
+                    INSTALL="$INSTALL""$i "
+                fi
+            done
+            if [[ ! -z "$INSTALL" ]]; then
+                missing_deps
+                if [[ "$PERMISSION" == "install_deps" ]]; then
+                    $SU_CMD $MANAGER_INSTALL $INSTALL
+                fi
+            fi
+            set -e
+        }
+
+        for i in $DISTRO; do
+        case $i in
+            *arch*|*manjaro*)
+                MANAGER_QUERY="pacman -Q"
+                MANAGER_INSTALL="sudo pacman -S"
+                DEPS="{gcc,cmake,make,libglvnd,libjpeg6-turbo,ncurses,glew,sdl2,openal,crypto++,libogg,libtheora,libvorbis,lzo,lzop,libjpeg-turbo}"
+                dep_install
+                break
+            ;;
+            *fedora*)
+                MANAGER_QUERY="dnf list installed"
+                MANAGER_INSTALL="sudo dnf install"
+                DEPS="{gcc,gcc-c++,cmake,make,glew-devel,openal-devel,cryptopp-devel,libogg-devel,libtheora-devel,libvorbis-devel,SDL2-devel,lzo-devel,libjpeg-turbo-devel}"
+                dep_install
+                break
+            ;;
+
+            *debian*|*ubuntu*|*deepin*)
+                MANAGER_QUERY="dpkg-query -s"
+                MANAGER_INSTALL="sudo apt install"
+                DEPS="{gcc,g++,cmake,make,libglew-dev,libopenal-dev,libcrypto++-dev,libogg-dev,libtheora-dev,libvorbis-dev,libsdl2-dev,liblzo2-dev,libjpeg-dev,libncurses5-dev}"
+                dep_install
+                break
+            ;;
+            *suse*)
+                MANAGER_QUERY="rpm -q"
+                MANAGER_INSTALL="sudo zypper install"
+                DEPS="{ }"
+                dep_install
+                break
+            ;;
+            *)
+                whiptail --title  "Error!!!" --msgbox  "Could not find information about your distribution! Automatic installation of dependencies is not available. Trying to build the OpenXRay engine no matter what. If an error occurs during compilation make sure you have the following packages installed:
+gcc cmake make libglvnd libjpeg6-turbo ncurses glew sdl2 openal crypto++ libogg libtheora libvorbis lzo lzop libjpeg-turbo
+
+On some distributions, packages may be split into two and prefixed with -dev or -devel, such as lzo lzo-dev, these packages should also be installed." 16 80
+        esac
+        done
+}
+
 #=================================== Функция сборки
 
 build(){
-    if (whiptail --title  " Dependencies " --yes-button  "Build" --no-button  "Cancel" --yesno  "   Before building the OpenXRay engine, you should make sure you have the following packages installed:
-
-gcc cmake make libglvnd libjpeg6-turbo ncurses glew sdl2 openal crypto++ libogg libtheora libvorbis lzo lzop libjpeg-turbo
-
-Attention!!! On some distributions, packages may be prefixed with -dev e.g. libglvnd-dev libjpeg6-turbo-dev " 14 130)  then
-
+    dependencies
 #   rm -f -R bin
    mkdir -p bin
    cd bin
@@ -70,9 +147,6 @@ END
 You need to copy the following directories:
 levels, localization, mp, patches, resources" 12 70
     main
-    else
-    main
-    fi
 }
 
 #=================================== Функция распаковки
