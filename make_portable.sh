@@ -1,7 +1,7 @@
 #! /bin/bash
 
-out=~/OpenXRay
-def_copy_path=~
+OUT=~/OpenXRay
+DEF_COPY_PATH=~
 
 #=================================== Функция справки
 
@@ -31,7 +31,6 @@ gcc cmake make libglvnd libjpeg6-turbo ncurses glew sdl2 openal crypto++ libogg 
 
 Attention!!! On some distributions, packages may be prefixed with -dev e.g. libglvnd-dev libjpeg6-turbo-dev " 14 130)  then
 
-
 #   rm -f -R bin
    mkdir -p bin
    cd bin
@@ -41,32 +40,32 @@ Attention!!! On some distributions, packages may be prefixed with -dev e.g. libg
    make -j$(nproc)
    make DESTDIR=`pwd`/temp install
 
-   mkdir -p $out/{bin,cop,cs}
-   cp -v temp/usr/bin/xr_3da $out/bin/
-   cp -v ../src/xr_3da/xr_3da.sh $out/bin/xr_3da.sh
-   chmod 755 $out/bin/xr_3da.sh
-   cp -v temp/usr/lib/*.so $out/bin/
-   cp -v -r temp/usr/share/openxray/* $out/cop/
-   cp -v -r temp/usr/share/openxray/* $out/cs/
+   mkdir -p $OUT/{bin,cop,cs}
+   cp -v temp/usr/bin/xr_3da $OUT/bin/
+   cp -v ../src/xr_3da/xr_3da.sh $OUT/bin/xr_3da.sh
+   chmod 755 $OUT/bin/xr_3da.sh
+   cp -v temp/usr/lib/*.so $OUT/bin/
+   cp -v -r temp/usr/share/openxray/* $OUT/cop/
+   cp -v -r temp/usr/share/openxray/* $OUT/cs/
 
-cat >$out/Start_cop.sh <<END
+cat >$OUT/Start_cop.sh <<END
 #!/bin/sh
 
 cd bin
 ./xr_3da.sh -fsltx ../cop/fsgame.ltx
 END
 
-cat >$out/Start_cs.sh <<END
+cat >$OUT/Start_cs.sh <<END
 #!/bin/sh
 
 cd bin
 ./xr_3da.sh -cs -fsltx ../cs/fsgame.ltx
 END
 
-    chmod 755 $out/Start_cop.sh
-    chmod 755 $out/Start_cs.sh
+    chmod 755 $OUT/Start_cop.sh
+    chmod 755 $OUT/Start_cs.sh
 
-    whiptail --title  "Completed" --msgbox  "   OpenXRay engine is built and placed in $out In order to run the game you should copy the game resources from the original licensed copy.
+    whiptail --title  "Completed" --msgbox  "   OpenXRay engine is built and placed in $OUT In order to run the game you should copy the game resources from the original licensed copy.
 
 You need to copy the following directories:
 levels, localization, mp, patches, resources" 12 70
@@ -88,26 +87,26 @@ unpack(){
 res_copy(){
     case $1 in
         cop)
-        out_path=$out/cop
-        titles=Call\ of\ Pripyat
+        OUT_PATH=$OUT/cop
+        TITLES_GAME=Call\ of\ Pripyat
         ;;
         cs)
-        out_path=$out/cs
-        titles=Clear\ Sky
+        OUT_PATH=$OUT/cs
+        TITLES_GAME=Clear\ Sky
         ;;
     *)
         echo "Error"
         ;;
     esac
 
-    PET=$(whiptail --title  "Copying game resources." --inputbox  "   Specify the directory with the installed game S.T.A.L.K.E.R. - $titles" 10 60 $def_copy_path 3>&1 1>&2 2>&3)
+    PET=$(whiptail --title  "Copying game resources." --inputbox  "   Specify the directory with the installed game S.T.A.L.K.E.R. - $TITLES_GAME" 10 60 $DEF_COPY_PATH 3>&1 1>&2 2>&3)
     exitstatus=$?
     if [ $exitstatus = 0 ];  then
         echo "Copying in progress, please wait..."
-        mkdir -p $out_path/{levels,localization,mp,patches,resources}
-        cp -r -u -v $PET/{levels,mp,patches,resources} $out_path
-        cp -r -u -v $PET/*ocalization/* $out_path/localization
-        whiptail --title  "Done" --msgbox  "S.T.A.L.K.E.R - $titles resources copied successfully" 10 60
+        mkdir -p $OUT_PATH/{levels,localization,mp,patches,resources}
+        cp -r -u -v $PET/{levels,mp,patches,resources} $OUT_PATH
+        cp -r -u -v $PET/*ocalization/* $OUT_PATH/localization
+        whiptail --title  "Done" --msgbox  "S.T.A.L.K.E.R - $TITLES_GAME resources copied successfully" 10 60
         main
     else
         main
@@ -118,7 +117,7 @@ res_copy(){
 
 main(){
 
-OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished engine wakes up $out" 15 70 7 \
+OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished engine wakes up $OUT" 15 70 7 \
 "1" "Brief reference." \
 "2" "Update the source tree. " \
 "3" "Build the OpenXRay engine." \
