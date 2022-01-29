@@ -876,9 +876,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
         SDL_free(pref_path);
     }
 #elif defined(XR_PLATFORM_SWITCH)
-    //strncpy(full_current_directory, "sdmc:/switch/stalker/S.T.A.L.K.E.R. - Call of Pripyat", strlen("sdmc:/switch/stalker/S.T.A.L.K.E.R. - Call of Pripyat"));
     strncpy(full_current_directory, Core.ApplicationPath, strlen(Core.ApplicationPath));
-    printf("AAAAAA full_current_directory %s\n", full_current_directory);
 #endif
 
     FS_Path* path = xr_new<FS_Path>(full_current_directory, "", "", "", 0);

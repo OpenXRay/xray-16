@@ -174,7 +174,7 @@ void CSCompiler::end()
     // Samplers create by us, thou they should not be AddRef'ed
 
     m_Target.Construct(
-        m_cs, RImplementation.Resources->_CreateConstantTable(m_constants), m_Samplers, m_Textures, m_Outputs);
+        m_cs, RImplementation->Resources->_CreateConstantTable(m_constants), m_Samplers, m_Textures, m_Outputs);
 }
 
 void CSCompiler::compile(const char* name)

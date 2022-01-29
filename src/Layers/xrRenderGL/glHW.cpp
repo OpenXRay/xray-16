@@ -95,6 +95,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
+#ifndef XR_PLATFORM_SWITCH // XXX: TODO SWITCH Sort this out
     {
         const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL;
 
@@ -110,6 +111,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         // just in case
         SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
     }
+#endif
 
     if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
@@ -148,7 +150,12 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL shading language version: %s", ShadingVersion);
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
+#ifdef XR_PLATFORM_SWITCH
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
+#else
+    ShaderBinarySupported = true;
+#endif
+
     ComputeShadersSupported = false; // XXX: Implement compute shaders support
 
     Caps.fTarget = D3DFMT_A8R8G8B8;
@@ -248,7 +255,7 @@ void CHW::EndScene() { }
 void CHW::Present()
 {
 #if 0 // kept for historical reasons
-    RImplementation.Target->phase_flip();
+    RImplementation->Target->phase_flip();
 #else
     glBindFramebuffer(GL_READ_FRAMEBUFFER, pFB);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

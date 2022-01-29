@@ -62,12 +62,12 @@ BOOL CRenderTarget::Create()
 
     rt_Generic.create(r1_RT_generic, rtWidth, rtHeight, HW.Caps.fTarget);
     rt_distort.create(rt_RT_distort, rtWidth, rtHeight, HW.Caps.fTarget);
-    if (RImplementation.o.color_mapping)
+    if (RImplementation->o.color_mapping)
     {
         //rt_color_map.create(rt_RT_color_map, rtWidth, rtHeight, HW.Caps.fTarget);
         rt_color_map.create(rt_RT_color_map, curWidth, curHeight, HW.Caps.fTarget);
     }
-    // RImplementation.o.color_mapping = RT_color_map->valid();
+    // RImplementation->o.color_mapping = RT_color_map->valid();
 
     if ((rtHeight != Device.dwHeight) || (rtWidth != Device.dwWidth))
     {
@@ -87,12 +87,12 @@ BOOL CRenderTarget::Create()
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
-    if (RImplementation.o.distortion)
+    if (RImplementation->o.distortion)
         s_postprocess_D[0].create("postprocess_d");
-    if (RImplementation.o.color_mapping)
+    if (RImplementation->o.color_mapping)
     {
         s_postprocess[1].create("postprocess_cm");
-        if (RImplementation.o.distortion)
+        if (RImplementation->o.distortion)
             s_postprocess_D[1].create("postprocess_dcm");
         if (!s_postprocess[1] || !s_postprocess_D[1])
         {
@@ -100,7 +100,7 @@ BOOL CRenderTarget::Create()
             s_postprocess[1].destroy();
             s_postprocess_D[1].destroy();
             rt_color_map->destroy();
-            RImplementation.o.color_mapping = FALSE;
+            RImplementation->o.color_mapping = FALSE;
         }
     }
     g_postprocess.create(
@@ -183,7 +183,7 @@ void CRenderTarget::calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0,
 
 bool CRenderTarget::NeedColorMapping()
 {
-    return RImplementation.o.color_mapping && (param_color_map_influence > 0.001f);
+    return RImplementation->o.color_mapping && (param_color_map_influence > 0.001f);
 }
 
 BOOL CRenderTarget::NeedPostProcess()
@@ -225,7 +225,7 @@ BOOL CRenderTarget::NeedPostProcess()
 
 BOOL CRenderTarget::Perform()
 {
-    return Available() && (((BOOL)RImplementation.m_bMakeAsyncSS) || NeedPostProcess() || (ps_r__Supersample > 1) ||
+    return Available() && (((BOOL)RImplementation->m_bMakeAsyncSS) || NeedPostProcess() || (ps_r__Supersample > 1) ||
                               (frame_distort == (Device.dwFrame - 1)));
 }
 
@@ -292,7 +292,7 @@ void CRenderTarget::DoAsyncScreenshot()
 {
     //  Igor: screenshot will not have postprocess applied.
     //  TODO: fox that later
-    if (RImplementation.m_bMakeAsyncSS)
+    if (RImplementation->m_bMakeAsyncSS)
     {
         HRESULT hr;
 
@@ -307,7 +307,7 @@ void CRenderTarget::DoAsyncScreenshot()
 
         // pFBSrc->Release();
 
-        RImplementation.m_bMakeAsyncSS = false;
+        RImplementation->m_bMakeAsyncSS = false;
     }
 }
 
@@ -318,10 +318,10 @@ void CRenderTarget::End()
 
     // find if distortion is needed at all
     BOOL bPerform = Perform();
-    BOOL bDistort = RImplementation.o.distortion;
+    BOOL bDistort = RImplementation->o.distortion;
     BOOL bCMap = NeedColorMapping();
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-    if ((0 == RImplementation.mapDistort.size()) && !_menu_pp)
+    if ((0 == RImplementation->mapDistort.size()) && !_menu_pp)
         bDistort = FALSE;
     if (bDistort)
         phase_distortion();
@@ -411,9 +411,9 @@ void CRenderTarget::phase_distortion()
     RCache.ClearRT(rt_distort, color_rgba(127, 127, 127, 127));
 
     if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->OnRenderPPUI_query())
-        RImplementation.r_dsgraph_render_distort();
+        RImplementation->r_dsgraph_render_distort();
     else
-        RImplementation.mapDistort.clear();
+        RImplementation->mapDistort.clear();
 
     if (g_pGamePersistent)
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI

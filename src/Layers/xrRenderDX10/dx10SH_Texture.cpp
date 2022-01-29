@@ -11,7 +11,7 @@
 #define PRIORITY_NORMAL 8
 #define PRIORITY_LOW 4
 
-void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
+void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation->Resources->_CreateTexture(_name)); }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ CTexture::~CTexture()
     Unload();
 
     // release external reference
-    RImplementation.Resources->_DeleteTexture(this);
+    RImplementation->Resources->_DeleteTexture(this);
 }
 
 void CTexture::surface_set(ID3DBaseTexture* surf)
@@ -230,7 +230,7 @@ void CTexture::Apply(u32 dwStage)
     if (flags.bLoadedAsStaging)
         ProcessStaging();
 
-    // if( !RImplementation.o.dx10_msaa )
+    // if( !RImplementation->o.dx10_msaa )
     //   VERIFY( !((!pSurface)^(!m_pSRView)) );	//	Both present or both missing
     // else
     //{
@@ -370,8 +370,8 @@ void CTexture::apply_normal(u32 dwStage)
 
 void CTexture::Preload()
 {
-    m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
-    m_material = RImplementation.Resources->m_textures_description.GetMaterial(cName);
+    m_bumpmap = RImplementation->Resources->m_textures_description.GetBumpName(cName);
+    m_material = RImplementation->Resources->m_textures_description.GetMaterial(cName);
 }
 
 void CTexture::Load()
@@ -524,7 +524,7 @@ void CTexture::Load()
             {
                 // Load another texture
                 u32 mem = 0;
-                pSurface = ::RImplementation.texture_load(buffer, mem);
+                pSurface = ::RImplementation->texture_load(buffer, mem);
                 if (pSurface)
                 {
                     // pSurface->SetPriority	(PRIORITY_LOW);
@@ -542,8 +542,8 @@ void CTexture::Load()
     {
         // Normal texture
         u32 mem = 0;
-        // pSurface = ::RImplementation.texture_load	(*cName,mem);
-        pSurface = ::RImplementation.texture_load(*cName, mem, true);
+        // pSurface = ::RImplementation->texture_load	(*cName,mem);
+        pSurface = ::RImplementation->texture_load(*cName, mem, true);
 
         if (GetUsage() == D3D_USAGE_STAGING)
         {

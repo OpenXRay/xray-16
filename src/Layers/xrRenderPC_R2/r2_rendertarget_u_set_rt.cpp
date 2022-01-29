@@ -18,7 +18,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     else
         RCache.set_RT(NULL, 2);
     RCache.set_ZB(zb);
-    //RImplementation.rmNormal();
+    //RImplementation->rmNormal();
 }
 
 void CRenderTarget::u_setrt(
@@ -32,5 +32,5 @@ void CRenderTarget::u_setrt(
     RCache.set_RT(_2, 1);
     RCache.set_RT(_3, 2);
     RCache.set_ZB(zb);
-    //RImplementation.rmNormal();
+    //RImplementation->rmNormal();
 }

@@ -33,7 +33,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 {
     // Choose normal code-path or filtered
     phase_accumulator();
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         accum_direct_f(sub_phase);
         return;
@@ -46,7 +46,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
     //	TODO: DX10: Remove half pixe offset
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -95,7 +95,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         // if (stencil>=1 && aref_pass)	stencil = light_id
         //	Done in blender!
         // RCache.set_ColorWriteEnable	(FALSE		);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP,
                 D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -109,7 +109,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample rendering
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
                 RCache.set_CullMode(CULL_NONE);
@@ -119,7 +119,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             }
             else
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_DIRECT]); // masker
                     RCache.set_CullMode(CULL_NONE);
@@ -142,7 +142,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
     d_Z = center_pt.z;
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
+    if (RImplementation->o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
 
     PIX_EVENT(Perform_lighting);
@@ -154,7 +154,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         RCache.set_ColorWriteEnable();
 
         // texture adjustment matrix
-        // float			fTexelOffs			= (.5f / float(RImplementation.o.smapsize));
+        // float			fTexelOffs			= (.5f / float(RImplementation->o.smapsize));
         // float			fRange				=
         // (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_scale:ps_r2_sun_depth_far_scale;
         // float			fBias				=
@@ -187,7 +187,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             m_shadow.mul(xf_project, xf_invview);
 
             // tsm-bias
-            if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
+            if ((SE_SUN_FAR == sub_phase) && (RImplementation->o.HW_smap))
             {
                 Fvector bias;
                 bias.mul(L_dir, ps_r2_sun_tsm_bias);
@@ -287,14 +287,14 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         //		}
 
         // Fetch4 : enable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
         // setup stencil
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -306,7 +306,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_direct_msaa[0]->E[uiElementIndex]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
@@ -315,7 +315,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             }
             else
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_direct_msaa[i]->E[uiElementIndex]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
@@ -329,7 +329,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         }
 
         // Fetch4 : disable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
@@ -341,7 +341,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
         //	Igor: draw volumetric here
         // if (ps_r2_ls_flags.test(R2FLAG_SUN_SHAFTS))
-        if (RImplementation.o.advancedpp && (ps_r_sun_shafts > 0))
+        if (RImplementation->o.advancedpp && (ps_r_sun_shafts > 0))
             accum_direct_volumetric(sub_phase, Offset, m_shadow);
     }
 }
@@ -350,7 +350,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 {
     // Choose normal code-path or filtered
     phase_accumulator();
-    if (RImplementation.o.sunfilter)
+    if (RImplementation->o.sunfilter)
     {
         accum_direct_f(sub_phase);
         return;
@@ -363,7 +363,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
     //	TODO: DX10: Remove half pixe offset
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -412,7 +412,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // if (stencil>=1 && aref_pass)	stencil = light_id
         //	Done in blender!
         // RCache.set_ColorWriteEnable	(FALSE		);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP,
                 D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -426,7 +426,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample rendering
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
                 RCache.set_CullMode(CULL_NONE);
@@ -436,7 +436,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             }
             else
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_DIRECT]); // masker
                     RCache.set_CullMode(CULL_NONE);
@@ -459,7 +459,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
     d_Z = center_pt.z;
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
+    if (RImplementation->o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
 
     PIX_EVENT(Perform_lighting);
@@ -471,7 +471,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_ColorWriteEnable();
 
         // texture adjustment matrix
-        // float			fTexelOffs			= (.5f / float(RImplementation.o.smapsize));
+        // float			fTexelOffs			= (.5f / float(RImplementation->o.smapsize));
         // float			fRange				=
         // (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_scale:ps_r2_sun_depth_far_scale;
         // float			fBias				=
@@ -505,7 +505,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             m_shadow.mul(xf_project, xf_invview);
 
             // tsm-bias
-            if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
+            if ((SE_SUN_FAR == sub_phase) && (RImplementation->o.HW_smap))
             {
                 Fvector bias;
                 bias.mul(L_dir, ps_r2_sun_tsm_bias);
@@ -638,7 +638,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         //		}
 
         // Fetch4 : enable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
@@ -662,7 +662,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         }
 
         // setup stencil
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             // RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
             RCache.set_Stencil(
@@ -678,7 +678,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_direct_msaa[0]->E[uiElementIndex]);
 
@@ -696,7 +696,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             }
             else
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_direct_msaa[i]->E[uiElementIndex]);
 
@@ -719,7 +719,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         }
 
         // Fetch4 : disable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
@@ -731,7 +731,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
         //	Igor: draw volumetric here
         // if (ps_r2_ls_flags.test(R2FLAG_SUN_SHAFTS))
-        if (RImplementation.o.advancedpp && (ps_r_sun_shafts > 0) && sub_phase == SE_SUN_FAR)
+        if (RImplementation->o.advancedpp && (ps_r_sun_shafts > 0) && sub_phase == SE_SUN_FAR)
             accum_direct_volumetric(sub_phase, Offset, m_shadow);
     }
 }
@@ -740,7 +740,7 @@ void CRenderTarget::accum_direct_blend()
 {
     PIX_EVENT(accum_direct_blend);
     // blend-copy
-    if (!RImplementation.o.fp16_blend)
+    if (!RImplementation->o.fp16_blend)
     {
         u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
 
@@ -776,7 +776,7 @@ void CRenderTarget::accum_direct_blend()
         RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_2D]);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -788,7 +788,7 @@ void CRenderTarget::accum_direct_blend()
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_2D]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
@@ -796,7 +796,7 @@ void CRenderTarget::accum_direct_blend()
             }
             else // checked Holger
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_2D]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
@@ -825,7 +825,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     u_setrt(rt_Generic_0_r, NULL, NULL, rt_MSAADepth->pZRT);
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -875,7 +875,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         // if (stencil>=1 && aref_pass)	stencil = light_id
         //	Done in blender!
         // RCache.set_ColorWriteEnable	(FALSE		);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP,
                 D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -889,7 +889,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
                 RCache.set_Stencil(TRUE, D3DCMP_LESS, dwLightMarkerID, 0x81, 0x7f, D3DSTENCILOP_KEEP,
@@ -899,7 +899,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
             }
             else
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_DIRECT]); // masker
                     RCache.set_Stencil(TRUE, D3DCMP_LESS, dwLightMarkerID, 0x81, 0x7f, D3DSTENCILOP_KEEP,
@@ -922,7 +922,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     d_Z = center_pt.z;
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
+    if (RImplementation->o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(); //. driver bug?
 
     // Perform lighting
@@ -932,7 +932,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         RCache.set_ColorWriteEnable();
 
         // texture adjustment matrix
-        float fTexelOffs = (.5f / float(RImplementation.o.smapsize));
+        float fTexelOffs = (.5f / float(RImplementation->o.smapsize));
         float fRange = (SE_SUN_NEAR == sub_phase) ? ps_r2_sun_depth_near_scale : ps_r2_sun_depth_far_scale;
         // float			fBias				=
         // (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
@@ -998,7 +998,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
 
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             // setup stencil
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
@@ -1011,7 +1011,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample // checked Holger
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_direct_msaa[0]->E[sub_phase]);
                 RCache.set_CullMode(CULL_NONE);
@@ -1020,7 +1020,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
             }
             else
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_direct_msaa[i]->E[sub_phase]);
                     RCache.set_CullMode(CULL_NONE);
@@ -1046,7 +1046,7 @@ void CRenderTarget::accum_direct_lum()
     phase_accumulator();
 
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -1074,7 +1074,7 @@ void CRenderTarget::accum_direct_lum()
 
     // nv-stencil recompression
     /*
-    if (RImplementation.o.nvstencil  && (SE_SUN_NEAR==sub_phase))	u_stencil_optimize();	//. driver bug?
+    if (RImplementation->o.nvstencil  && (SE_SUN_NEAR==sub_phase))	u_stencil_optimize();	//. driver bug?
     */
 
     // Perform lighting
@@ -1151,7 +1151,7 @@ void CRenderTarget::accum_direct_lum()
     RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
     RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
 
-    if (!RImplementation.o.dx10_msaa)
+    if (!RImplementation->o.dx10_msaa)
     {
         // setup stencil
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
@@ -1164,7 +1164,7 @@ void CRenderTarget::accum_direct_lum()
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
         // per sample
-        if (RImplementation.o.dx10_msaa_opt)
+        if (RImplementation->o.dx10_msaa_opt)
         {
             RCache.set_Element(s_accum_direct_msaa[0]->E[SE_SUN_LUMINANCE]);
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
@@ -1173,7 +1173,7 @@ void CRenderTarget::accum_direct_lum()
         }
         else
         {
-            for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+            for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
             {
                 RCache.set_Element(s_accum_direct_msaa[i]->E[SE_SUN_LUMINANCE]);
                 StateManager.SetSampleMask(u32(1) << i);
@@ -1217,7 +1217,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     // Perform lighting
     {
         // *** assume accumulator setted up ***
-        light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+        light* fuckingsun = (light*)RImplementation->Lights.sun._get();
 
         // Common constants (light-related)
         Fvector L_clr;
@@ -1229,7 +1229,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         // setup
         // RCache.set_Element			(s_accum_direct_volumetric->E[sub_phase]);
         RCache.set_Element(Element);
-        if (useMinMaxSMThisFrame || !RImplementation.o.oldshadowcascades)
+        if (useMinMaxSMThisFrame || !RImplementation->o.oldshadowcascades)
         {
             RCache.set_CullMode(CULL_CCW);
         }
@@ -1256,7 +1256,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         else
         {
             extern float OLES_SUN_LIMIT_27_01_07;
-            if (RImplementation.o.oldshadowcascades)
+            if (RImplementation->o.oldshadowcascades)
                 zMin = ps_r2_sun_near;
             else
                 zMin = 0; /////*****************************************************************************************
@@ -1290,7 +1290,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         }
 
         // Fetch4 : enable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
@@ -1298,9 +1298,9 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
         // setup stencil: we have to draw to both lit and unlit pixels
         // RCache.set_Stencil			(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-        // if( ! RImplementation.o.dx10_msaa )
+        // if( ! RImplementation->o.dx10_msaa )
         {
-            if (RImplementation.o.oldshadowcascades)
+            if (RImplementation->o.oldshadowcascades)
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
             else
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
@@ -1312,7 +1312,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
           RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
 
           // per sample
-        if( RImplementation.o.dx10_msaa_opt )
+        if( RImplementation->o.dx10_msaa_opt )
         {
               RCache.set_Element	(s_accum_direct_volumetric_msaa[0]->E[0]);
            RCache.set_Stencil	(TRUE,D3DCMP_ALWAYS,0xff,0xff,0xff);
@@ -1324,7 +1324,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         }
         else
         {
-             for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
+             for( u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i )
              {
                    RCache.set_Element	      (s_accum_direct_volumetric_msaa[i]->E[0]);
               StateManager.SetSampleMask ( u32(1) << i );
@@ -1342,7 +1342,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
      */
 
         // Fetch4 : disable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );

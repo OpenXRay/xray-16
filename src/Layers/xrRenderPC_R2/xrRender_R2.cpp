@@ -21,7 +21,7 @@ public:
             return FALSE;
         }
         // Check if shaders are available
-        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+        if (!FS.exist("$game_shaders$", RImplementation->getShaderPath()))
         {
             Log("~ No shaders found for xrRender_R2");
             return FALSE;

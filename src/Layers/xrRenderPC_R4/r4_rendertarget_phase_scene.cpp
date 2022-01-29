@@ -16,7 +16,7 @@ void CRenderTarget::phase_scene_prepare()
 
     //	TODO: DX10: Check if complete clear of _ALL_ rendertargets will increase
     //	FPS. Make check for SLI configuration.
-    if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
+    if (RImplementation->o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
                                             ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
         //	TODO: DX10: Check if we need to set RT here.
@@ -26,7 +26,7 @@ void CRenderTarget::phase_scene_prepare()
         RCache.ClearRT(rt_Position, color);
         // RCache.ClearRT(rt_Normal, color);
         // RCache.ClearRT(rt_Color, color);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
             RCache.ClearZB(get_base_zb(), 1.0f, 0);
         else
         {
@@ -52,16 +52,16 @@ void CRenderTarget::phase_scene_prepare()
 void CRenderTarget::phase_scene_begin()
 {
     // Targets, use accumulator for temporary storage
-    if (!RImplementation.o.dx10_gbuffer_opt)
+    if (!RImplementation->o.dx10_gbuffer_opt)
     {
-        if (RImplementation.o.albedo_wo)
+        if (RImplementation->o.albedo_wo)
             u_setrt(rt_Position, rt_Normal, rt_Accumulator, rt_MSAADepth->pZRT);
         else
             u_setrt(rt_Position, rt_Normal, rt_Color, rt_MSAADepth->pZRT);
     }
     else
     {
-        if (RImplementation.o.albedo_wo)
+        if (RImplementation->o.albedo_wo)
             u_setrt(rt_Position, rt_Accumulator, rt_MSAADepth->pZRT);
         else
             u_setrt(rt_Position, rt_Color, rt_MSAADepth->pZRT);
@@ -92,14 +92,14 @@ void CRenderTarget::phase_scene_end()
 {
     disable_aniso();
 
-    if (!RImplementation.o.albedo_wo)
+    if (!RImplementation->o.albedo_wo)
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
     u_setrt(rt_Color, 0, 0, rt_MSAADepth->pZRT);
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
-    if (RImplementation.o.nvstencil)
+    if (RImplementation->o.nvstencil)
         u_stencil_optimize(CRenderTarget::SO_Combine);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     RCache.set_ColorWriteEnable();

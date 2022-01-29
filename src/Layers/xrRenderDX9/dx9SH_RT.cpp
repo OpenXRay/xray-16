@@ -16,7 +16,7 @@ CRT::~CRT()
     destroy();
 
     // release external reference
-    RImplementation.Resources->_DeleteRT(this);
+    RImplementation->Resources->_DeleteRT(this);
 }
 
 bool CRT::used_as_depth() const
@@ -104,7 +104,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         return;
 
     // Try to create texture/surface
-    RImplementation.Resources->Evict();
+    RImplementation->Resources->Evict();
 
     switch (type)
     {
@@ -135,7 +135,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         return; // special case (when type == D3DRTYPE_SURFACE)
 
     R_CHK(pSurface->GetSurfaceLevel(0, &pRT));
-    pTexture = RImplementation.Resources->_CreateTexture(Name);
+    pTexture = RImplementation->Resources->_CreateTexture(Name);
     pTexture->surface_set(pSurface);
 }
 
@@ -166,7 +166,7 @@ void CRT::resolve_into(CRT& destination) const
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
 {
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
+    _set(RImplementation->Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
 }
 
 //////////////////////////////////////////////////////////////////////////

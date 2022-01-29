@@ -340,7 +340,7 @@ HRESULT CRender::shader_compile(
     ++len;
 
     //	Igor: need restart options
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER))
+    if (RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER))
     {
         defines[def_it].Name = "USE_SOFT_WATER";
         defines[def_it].Definition = "1";
@@ -354,7 +354,7 @@ HRESULT CRender::shader_compile(
         ++len;
     }
 
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES))
+    if (RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES))
     {
         defines[def_it].Name = "USE_SOFT_PARTICLES";
         defines[def_it].Definition = "1";
@@ -368,7 +368,7 @@ HRESULT CRender::shader_compile(
         ++len;
     }
 
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DOF))
+    if (RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DOF))
     {
         defines[def_it].Name = "USE_DOF";
         defines[def_it].Definition = "1";
@@ -382,7 +382,7 @@ HRESULT CRender::shader_compile(
         ++len;
     }
 
-    if (RImplementation.o.advancedpp && ps_r_sun_shafts)
+    if (RImplementation->o.advancedpp && ps_r_sun_shafts)
     {
         xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);
         defines[def_it].Name = "SUN_SHAFTS_QUALITY";
@@ -397,7 +397,7 @@ HRESULT CRender::shader_compile(
         ++len;
     }
 
-    if (RImplementation.o.advancedpp && ps_r_ssao)
+    if (RImplementation->o.advancedpp && ps_r_ssao)
     {
         xr_sprintf(c_ssao, "%d", ps_r_ssao);
         defines[def_it].Name = "SSAO_QUALITY";
@@ -412,7 +412,7 @@ HRESULT CRender::shader_compile(
         ++len;
     }
 
-    if (RImplementation.o.advancedpp && ps_r_sun_quality)
+    if (RImplementation->o.advancedpp && ps_r_sun_quality)
     {
         xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
         defines[def_it].Name = "SUN_QUALITY";
@@ -427,7 +427,7 @@ HRESULT CRender::shader_compile(
         ++len;
     }
 
-    if (RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX))
+    if (RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX))
     {
         defines[def_it].Name = "ALLOW_STEEPPARALLAX";
         defines[def_it].Definition = "1";

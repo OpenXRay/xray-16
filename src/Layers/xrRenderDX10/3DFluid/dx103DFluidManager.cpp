@@ -92,7 +92,7 @@ dx103DFluidManager::~dx103DFluidManager() { Destroy(); }
 void dx103DFluidManager::Initialize(int width, int height, int depth)
 {
     // if (strstr(Core.Params,"-no_volumetric_fog"))
-    if (!RImplementation.o.volumetricfog)
+    if (!RImplementation->o.volumetricfog)
         return;
 
     Destroy();
@@ -212,7 +212,7 @@ void dx103DFluidManager::DestroyShaders()
 
 void dx103DFluidManager::PrepareTexture(size_t rtIndex)
 {
-    pRTTextures[rtIndex] = RImplementation.Resources->_CreateTexture(m_pEngineTextureNames[rtIndex]);
+    pRTTextures[rtIndex] = RImplementation->Resources->_CreateTexture(m_pEngineTextureNames[rtIndex]);
 }
 
 void dx103DFluidManager::CreateRTTextureAndViews(size_t rtIndex, D3D_TEXTURE3D_DESC TexDesc)
@@ -338,11 +338,11 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     DetachAndSwapFluidData(FluidData);
 
     //  Restore render state
-    CRenderTarget* pTarget = RImplementation.Target;
+    CRenderTarget* pTarget = RImplementation->Target;
     pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
-    RImplementation.rmNormal();
-    // RImplementation.Target->phase_scene_begin();
+    RImplementation->rmNormal();
+    // RImplementation->Target->phase_scene_begin();
 }
 
 void dx103DFluidManager::AttachFluidData(dx103DFluidData& FluidData)
@@ -713,10 +713,10 @@ void dx103DFluidManager::RenderFluid(dx103DFluidData& FluidData)
     pRTTextures[RENDER_TARGET_COLOR_IN]->surface_set(0);
 
     //  Restore render state
-    CRenderTarget* pTarget = RImplementation.Target;
+    CRenderTarget* pTarget = RImplementation->Target;
     pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
-    RImplementation.rmNormal();
+    RImplementation->rmNormal();
 }
 
 void dx103DFluidManager::UpdateObstacles(const dx103DFluidData& FluidData, float timestep)

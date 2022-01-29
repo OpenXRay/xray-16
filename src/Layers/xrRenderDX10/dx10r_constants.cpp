@@ -321,7 +321,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                      ? CB_BufferVertexShader : CB_BufferGeometryShader;*/
 
                 parseConstants(pTable, updatedDest);
-                ref_cbuffer tempBuffer = RImplementation.Resources->_CreateConstantBuffer(pTable);
+                ref_cbuffer tempBuffer = RImplementation->Resources->_CreateConstantBuffer(pTable);
                 m_CBTable.push_back(cb_table_record(uiBufferIndex, tempBuffer));
             }
         }

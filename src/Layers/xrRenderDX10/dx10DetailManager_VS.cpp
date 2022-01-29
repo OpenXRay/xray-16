@@ -110,7 +110,7 @@ void CDetailManager::hw_Render_dump(
     static shared_str strArray("array");
     static shared_str strXForm("xform");
 
-    RImplementation.BasicStats.DetailCount = 0;
+    RImplementation->BasicStats.DetailCount = 0;
 
     // Matrices and offsets
     u32 vOffset = 0;
@@ -137,7 +137,7 @@ void CDetailManager::hw_Render_dump(
                 // Setup matrices + colors (and flush it as necessary)
                 // RCache.set_Element				(Object.shader->E[lod_id]);
                 RCache.set_Element(Object.shader->E[lod_id], iPass);
-                RImplementation.apply_lmaterial();
+                RImplementation->apply_lmaterial();
 
                 //	This could be cached in the corresponding consatant buffer
                 //	as it is done for DX9
@@ -196,7 +196,7 @@ void CDetailManager::hw_Render_dump(
                         if (dwBatch == hw_BatchSize)
                         {
                             // flush
-                            RImplementation.BasicStats.DetailCount += dwBatch;
+                            RImplementation->BasicStats.DetailCount += dwBatch;
                             u32 dwCNT_verts = dwBatch * Object.number_vertices;
                             u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
                             // RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
@@ -220,7 +220,7 @@ void CDetailManager::hw_Render_dump(
                 // flush if necessary
                 if (dwBatch)
                 {
-                    RImplementation.BasicStats.DetailCount += dwBatch;
+                    RImplementation->BasicStats.DetailCount += dwBatch;
                     u32 dwCNT_verts = dwBatch * Object.number_vertices;
                     u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
                     // RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;

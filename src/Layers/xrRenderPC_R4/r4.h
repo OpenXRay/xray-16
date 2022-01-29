@@ -388,4 +388,4 @@ private:
     FS_FileSet m_file_set;
 };
 
-extern CRender RImplementation;
+extern std::unique_ptr<CRender> RImplementation;

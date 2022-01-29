@@ -7,7 +7,7 @@
 
 void CRenderTarget::DoAsyncScreenshot()
 {
-    if (RImplementation.m_bMakeAsyncSS)
+    if (RImplementation->m_bMakeAsyncSS)
     {
         HRESULT hr;
 
@@ -23,7 +23,7 @@ void CRenderTarget::DoAsyncScreenshot()
 
         //  pFBSrc->Release();
 
-        RImplementation.m_bMakeAsyncSS = false;
+        RImplementation->m_bMakeAsyncSS = false;
     }
 }
 
@@ -46,12 +46,12 @@ void CRenderTarget::phase_combine()
 
     RCache.set_CullMode(CULL_NONE);
 
-    if (RImplementation.o.ssao_opt_data)
+    if (RImplementation->o.ssao_opt_data)
     {
         phase_downsamp();
         // phase_ssao();
     }
-    else if (RImplementation.o.ssao_blur_on)
+    else if (RImplementation->o.ssao_blur_on)
         phase_ssao();
 
     // low/hi RTs
@@ -75,9 +75,9 @@ void CRenderTarget::phase_combine()
     }
 
     //
-    // if (RImplementation.o.bug)   {
+    // if (RImplementation->o.bug)   {
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
-    if (RImplementation.o.nvstencil)
+    if (RImplementation->o.nvstencil)
     {
         u_stencil_optimize(FALSE);
         RCache.set_ColorWriteEnable();
@@ -151,7 +151,7 @@ void CRenderTarget::phase_combine()
 
         // sun-params
         {
-            light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+            light* fuckingsun = (light*)RImplementation->Lights.sun._get();
             Fvector L_dir, L_clr;
             float L_spec;
             L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
@@ -227,7 +227,7 @@ void CRenderTarget::phase_combine()
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
         // g_pGamePersistent->Environment().RenderClouds    ();
-        RImplementation.render_forward();
+        RImplementation->render_forward();
         if (g_pGamePersistent)
             g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
@@ -242,9 +242,9 @@ void CRenderTarget::phase_combine()
     phase_bloom(); // HDR RT invalidated here
 
     // Distortion filter
-    BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
+    BOOL bDistort = RImplementation->o.distortion_enabled; // This can be modified
     {
-        if ((0 == RImplementation.mapDistort.size()) && !_menu_pp)
+        if ((0 == RImplementation->mapDistort.size()) && !_menu_pp)
             bDistort = FALSE;
         if (bDistort)
         {
@@ -254,7 +254,7 @@ void CRenderTarget::phase_combine()
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
-            RImplementation.r_dsgraph_render_distort();
+            RImplementation->r_dsgraph_render_distort();
             if (g_pGamePersistent)
                 g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
         }
@@ -262,7 +262,7 @@ void CRenderTarget::phase_combine()
 
     // PP enabled ?
     //  Render to RT texture to be able to copy RT even in windowed mode.
-    BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
+    BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation->m_bMakeAsyncSS;
     if (_menu_pp)
         PP_Complex = FALSE;
 
@@ -365,7 +365,7 @@ void CRenderTarget::phase_combine()
     RCache.set_Stencil(FALSE);
 
     //  if FP16-BLEND !not! supported - draw flares here, overwise they are already in the bloom target
-    /* if (!RImplementation.o.fp16_blend)*/
+    /* if (!RImplementation->o.fp16_blend)*/
     PIX_EVENT(LENS_FLARES);
     g_pGamePersistent->Environment().RenderFlares(); // lens-flares
 
@@ -572,7 +572,7 @@ void CRenderTarget::phase_combine_volumetric()
 
         // sun-params
         {
-            light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+            light* fuckingsun = (light*)RImplementation->Lights.sun._get();
             Fvector L_dir, L_clr;
             float L_spec;
             L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);

@@ -18,7 +18,16 @@
 #include "Layers/xrRender/dxUIShader.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
-CRender RImplementation;
+std::unique_ptr<CRender> RImplementation;
+#ifndef XR_PLATFORM_SWITCH
+struct RenderInit
+{
+    RenderInit()
+    {
+        RImplementation->reset(new CRender());
+    }
+} static FSTatic_Render_init;
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/)
@@ -26,7 +35,7 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /
     switch (phase)
     {
     case PHASE_NORMAL:
-        return (RImplementation.L_Projector->shadowing() ?
+        return (RImplementation->L_Projector->shadowing() ?
             pVisual->shader->E[SE_R1_NORMAL_HQ] : pVisual->shader->E[SE_R1_NORMAL_LQ])._get();
     case PHASE_POINT: return pVisual->shader->E[SE_R1_LPOINT]._get();
     case PHASE_SPOT: return pVisual->shader->E[SE_R1_LSPOT]._get();
@@ -395,7 +404,7 @@ void CRender::apply_object(IRenderable* O)
         RCache.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
         // shadowing
         if ((LT.shadow_recv_frame == Device.dwFrame) && O->renderable_ShadowReceive())
-            RImplementation.L_Projector->setup(LT.shadow_recv_slot);
+            RImplementation->L_Projector->setup(LT.shadow_recv_slot);
     }
 }
 
@@ -409,9 +418,9 @@ IC void gm_SetNearer(BOOL bNearer)
     {
         gm_Nearer = bNearer;
         if (gm_Nearer)
-            RImplementation.rmNear();
+            RImplementation->rmNear();
         else
-            RImplementation.rmNormal();
+            RImplementation->rmNormal();
     }
 }
 

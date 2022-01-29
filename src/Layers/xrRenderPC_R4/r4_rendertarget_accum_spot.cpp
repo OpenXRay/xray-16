@@ -6,7 +6,7 @@
 void CRenderTarget::accum_spot(light* L)
 {
     phase_accumulator();
-    RImplementation.Stats.l_visible++;
+    RImplementation->Stats.l_visible++;
 
     // *** assume accumulator already setup ***
     // *****************************	Mask by stencil		*************************************
@@ -52,7 +52,7 @@ void CRenderTarget::accum_spot(light* L)
 
         // backfaces: if (stencil>=1 && zfail)			stencil = light_id
         RCache.set_CullMode(CULL_CW);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
         else
@@ -62,7 +62,7 @@ void CRenderTarget::accum_spot(light* L)
 
         // frontfaces: if (stencil>=light_id && zfail)	stencil = 0x1
         RCache.set_CullMode(CULL_CCW);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
             RCache.set_Stencil(
                 TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
         else
@@ -72,7 +72,7 @@ void CRenderTarget::accum_spot(light* L)
     }
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil)
+    if (RImplementation->o.nvstencil)
         u_stencil_optimize();
 
     // *****************************	Minimize overdraw	*************************************
@@ -89,7 +89,7 @@ void CRenderTarget::accum_spot(light* L)
     // Shadow xform (+texture adjustment matrix)
     Fmatrix m_Shadow, m_Lmap;
     {
-        float smapsize = float(RImplementation.o.smapsize);
+        float smapsize = float(RImplementation->o.smapsize);
         float fTexelOffs = (.5f / smapsize);
         float view_dim = float(L->X.S.size - 2) / smapsize;
         float view_sx = float(L->X.S.posX + 1) / smapsize;
@@ -137,7 +137,7 @@ void CRenderTarget::accum_spot(light* L)
         u32 _id = 0;
         if (L->flags.bShadow)
         {
-            bool bFullSize = (L->X.S.size == RImplementation.o.smapsize);
+            bool bFullSize = (L->X.S.size == RImplementation->o.smapsize);
             if (L->X.S.transluent)
                 _id = SE_L_TRANSLUENT;
             else if (bFullSize)
@@ -166,13 +166,13 @@ void CRenderTarget::accum_spot(light* L)
         RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
 
         // Fetch4 : enable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
@@ -185,7 +185,7 @@ void CRenderTarget::accum_spot(light* L)
             RCache.set_CullMode(D3DCULL_CW);
             draw_volume(L);
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(shader_msaa[0]->E[_id]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
@@ -194,7 +194,7 @@ void CRenderTarget::accum_spot(light* L)
             }
             else // checked Holger
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(shader_msaa[i]->E[_id]);
                     StateManager.SetSampleMask(u32(1) << i);
@@ -208,7 +208,7 @@ void CRenderTarget::accum_spot(light* L)
         }
 
         // Fetch4 : disable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
@@ -216,13 +216,13 @@ void CRenderTarget::accum_spot(light* L)
     }
 
     // blend-copy
-    if (!RImplementation.o.fp16_blend)
+    if (!RImplementation->o.fp16_blend)
     {
         u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
         RCache.set_c("m_texgen_J", m_Texgen_J);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
@@ -234,7 +234,7 @@ void CRenderTarget::accum_spot(light* L)
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
@@ -242,7 +242,7 @@ void CRenderTarget::accum_spot(light* L)
             }
             else // checked Holger
             {
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
                     StateManager.SetSampleMask(u32(1) << i);
@@ -309,7 +309,7 @@ void CRenderTarget::accum_volumetric(light* L)
     Fmatrix mFrustumSrc;
     CFrustum ClipFrustum;
     {
-        float smapsize = float(RImplementation.o.smapsize);
+        float smapsize = float(RImplementation->o.smapsize);
         float fTexelOffs = (.5f / smapsize);
         float view_dim = float(L->X.S.size - 2) / smapsize;
         float view_sx = float(L->X.S.posX + 1) / smapsize;
@@ -422,7 +422,7 @@ void CRenderTarget::accum_volumetric(light* L)
         // Select shader
         u32		_id					= 0;
         if (L->flags.bShadow)		{
-            bool	bFullSize			= (L->X.S.size == RImplementation.o.smapsize);
+            bool	bFullSize			= (L->X.S.size == RImplementation->o.smapsize);
             if (L->X.S.transluent)	_id	= SE_L_TRANSLUENT;
             else if		(bFullSize)	_id	= SE_L_FULLSIZE;
             else					_id	= SE_L_NORMAL;
@@ -506,7 +506,7 @@ void CRenderTarget::accum_volumetric(light* L)
         */
 
         // Fetch4 : enable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
@@ -519,7 +519,7 @@ void CRenderTarget::accum_volumetric(light* L)
         RCache.Render(D3DPT_TRIANGLELIST, 0, 0, VOLUMETRIC_SLICES * 4, 0, VOLUMETRIC_SLICES * 2);
 
         /*
-        if( !RImplementation.o.dx10_msaa )
+        if( !RImplementation->o.dx10_msaa )
             RCache.Render(D3DPT_TRIANGLELIST,0,0,iNumSlises*4,0,iNumSlises*2);
         else
         {
@@ -529,7 +529,7 @@ void CRenderTarget::accum_volumetric(light* L)
             RCache.Render(D3DPT_TRIANGLELIST,0,0,iNumSlises*4,0,iNumSlises*2);
 
             // per sample
-            if( RImplementation.o.dx10_msaa_opt )
+            if( RImplementation->o.dx10_msaa_opt )
             {
                 // per sample
                 RCache.set_Element	(shader_msaa[0]->E[0]);
@@ -538,7 +538,7 @@ void CRenderTarget::accum_volumetric(light* L)
             }
             else
             {
-                for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
+                for( u32 i = 0; i < RImplementation->o.dx10_msaa_samples; ++i )
                 {
                     RCache.set_Element	      (shader_msaa[i]->E[0]);
                     StateManager.SetSampleMask ( u32(1) << i );
@@ -552,7 +552,7 @@ void CRenderTarget::accum_volumetric(light* L)
         RCache.set_ColorWriteEnable();
 
         // Fetch4 : disable
-        //		if (RImplementation.o.HW_smap_FETCH4)	{
+        //		if (RImplementation->o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
         //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
@@ -563,7 +563,7 @@ void CRenderTarget::accum_volumetric(light* L)
     }
     /*
         // blend-copy
-        if (!RImplementation.o.fp16_blend)	{
+        if (!RImplementation->o.fp16_blend)	{
             u_setrt						(rt_Accumulator,NULL,NULL,get_base_zb());
             RCache.set_Element			(s_accum_mask->E[SE_MASK_ACCUM_VOL]	);
             RCache.set_c				("m_texgen",		m_Texgen);

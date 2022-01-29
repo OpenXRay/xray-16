@@ -21,7 +21,7 @@ CRT::~CRT()
     destroy();
 
     // release external reference
-    RImplementation.Resources->_DeleteRT(this);
+    RImplementation->Resources->_DeleteRT(this);
 }
 
 bool CRT::used_as_depth() const
@@ -127,7 +127,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         return;
 
     // Try to create texture/surface
-    RImplementation.Resources->Evict();
+    RImplementation->Resources->Evict();
 
     // Create the render target texture
     D3D_TEXTURE2D_DESC desc;
@@ -149,7 +149,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         else
         {
             desc.BindFlags = (useAsDepth ? D3D_BIND_DEPTH_STENCIL : (initialBindFlag | D3D_BIND_RENDER_TARGET));
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation->o.dx10_msaa_opt)
             {
                 desc.SampleDesc.Quality = u32(D3D_STANDARD_MULTISAMPLE_PATTERN);
             }
@@ -241,7 +241,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         return;
     }
 
-    pTexture = RImplementation.Resources->_CreateTexture(Name);
+    pTexture = RImplementation->Resources->_CreateTexture(Name);
     pTexture->surface_set(pSurface);
 }
 
@@ -274,7 +274,7 @@ void CRT::resolve_into(CRT& destination) const
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= 0*/)
 {
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
+    _set(RImplementation->Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
 }
 
 //////////////////////////////////////////////////////////////////////////

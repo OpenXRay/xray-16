@@ -13,7 +13,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
         D3D_DEPTH_STENCIL_VIEW_DESC desc;
         zb->GetDesc(&desc);
 
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
             VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
 
         ID3DResource* pRes;
@@ -44,7 +44,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     else
         RCache.set_RT(NULL, 2);
     RCache.set_ZB(zb);
-    //	RImplementation.rmNormal				();
+    //	RImplementation->rmNormal				();
 }
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
@@ -59,7 +59,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
     {
         D3D_DEPTH_STENCIL_VIEW_DESC desc;
         zb->GetDesc(&desc);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation->o.dx10_msaa)
             VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
 
         ID3DResource* pRes;
@@ -86,7 +86,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
     else
         RCache.set_RT(NULL, 1);
     RCache.set_ZB(zb);
-    //	RImplementation.rmNormal				();
+    //	RImplementation->rmNormal				();
 }
 
 void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
@@ -100,5 +100,5 @@ void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTa
     RCache.set_RT(_2, 1);
     RCache.set_RT(_3, 2);
     RCache.set_ZB(zb);
-    //	RImplementation.rmNormal				();
+    //	RImplementation->rmNormal				();
 }

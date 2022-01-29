@@ -48,6 +48,21 @@ extern "C" {
 		void * mStack;
 	} GSIThreadID;
 	typedef void (*GSThreadFunc)(void *arg);
+	
+#elif defined(__SWITCH__)
+       typedef pthread_mutex_t GSICriticalSection;
+       typedef struct
+       {
+               pthread_mutex_t mLock;
+               gsi_i32 mValue;
+               gsi_i32 mMax;
+       } GSISemaphoreID;
+       typedef struct
+	   {
+               pthread_t thread;
+               pthread_attr_t attr;
+       } GSIThreadID;
+       typedef void (*GSThreadFunc)(void *arg);
 
 #elif defined(_REVOLUTION)
 	typedef OSMutex GSICriticalSection;

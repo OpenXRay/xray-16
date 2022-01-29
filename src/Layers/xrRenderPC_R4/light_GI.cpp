@@ -10,7 +10,7 @@ void light::gi_generate()
     CRandom random;
     random.seed(0x12071980);
 
-    xrXRC& xrc = RImplementation.Sectors_xrc;
+    xrXRC& xrc = RImplementation->Sectors_xrc;
     CDB::MODEL* model = g_pGameLevel->ObjectSpace.GetStaticModel();
     CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
@@ -29,7 +29,7 @@ void light::gi_generate()
         xrc.ray_query(model, position, dir, range);
         if (!xrc.r_count())
             continue;
-        CDB::RESULT* R = RImplementation.Sectors_xrc.r_begin();
+        CDB::RESULT* R = RImplementation->Sectors_xrc.r_begin();
         CDB::TRI& T = tris[R->id];
         Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
         Fvector TN;

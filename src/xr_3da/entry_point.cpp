@@ -57,7 +57,7 @@ int entry_point(pcstr commandLine)
     if (!strstr(commandLine, "-nosplash"))
     {
         const bool topmost = !strstr(commandLine, "-splashnotop");
-#ifndef PROFILE_TASK_SYSTEM
+#if !defined(PROFILE_TASK_SYSTEM) && !defined(XR_PLATFORM_SWITCH)
         splash::show(topmost);
 #endif
     }

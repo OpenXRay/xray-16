@@ -3,7 +3,7 @@
 void CRenderTarget::accum_point(light* L)
 {
     phase_accumulator();
-    RImplementation.Stats.l_visible++;
+    RImplementation->Stats.l_visible++;
 
     ref_shader shader = L->s_point;
     if (!shader)
@@ -22,7 +22,7 @@ void CRenderTarget::accum_point(light* L)
 
         Device.mFullTransform.mul(Device.mProject, Device.mView);
         RCache.set_xform_project(Device.mProject);
-        RImplementation.rmNear();
+        RImplementation->rmNear();
     }
 
     // Common
@@ -63,7 +63,7 @@ void CRenderTarget::accum_point(light* L)
     draw_volume(L);
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil)
+    if (RImplementation->o.nvstencil)
         u_stencil_optimize();
 
     // *****************************	Minimize overdraw	*************************************
@@ -87,7 +87,7 @@ void CRenderTarget::accum_point(light* L)
         u32 _id = 0;
         if (L->flags.bShadow)
         {
-            bool bFullSize = (L->X.S.size == u32(RImplementation.o.smapsize));
+            bool bFullSize = (L->X.S.size == u32(RImplementation->o.smapsize));
             if (L->X.S.transluent)
                 _id = SE_L_TRANSLUENT;
             else if (bFullSize)
@@ -108,7 +108,7 @@ void CRenderTarget::accum_point(light* L)
         RCache.set_c("m_texgen", m_Texgen);
 
         // Fetch4 : enable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET4 MAKEFOURCC('G', 'E', 'T', '4')
@@ -121,7 +121,7 @@ void CRenderTarget::accum_point(light* L)
         draw_volume(L);
 
         // Fetch4 : disable
-        if (RImplementation.o.HW_smap_FETCH4)
+        if (RImplementation->o.HW_smap_FETCH4)
         {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET1 MAKEFOURCC('G', 'E', 'T', '1')
@@ -130,7 +130,7 @@ void CRenderTarget::accum_point(light* L)
     }
 
     // blend-copy
-    if (!RImplementation.o.fp16_blend)
+    if (!RImplementation->o.fp16_blend)
     {
         u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
@@ -147,7 +147,7 @@ void CRenderTarget::accum_point(light* L)
 
     if (L->flags.bHudMode)
     {
-        RImplementation.rmNormal();
+        RImplementation->rmNormal();
         // Restore projection
         Device.mProject = Pold;
         Device.mFullTransform = FTold;

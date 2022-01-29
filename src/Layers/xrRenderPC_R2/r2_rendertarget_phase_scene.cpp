@@ -14,7 +14,7 @@ void CRenderTarget::phase_scene_prepare()
     //  TODO: add multiplication by sun color here
     // if (fValue<0.0001) FlagSunShafts = 0;
 
-    if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
+    if (RImplementation->o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
         ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
         u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, get_base_zb());
@@ -39,7 +39,7 @@ void CRenderTarget::phase_scene_begin()
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, ps_r__tf_Anisotropic));
 
     // Targets, use accumulator for temporary storage
-    if (RImplementation.o.albedo_wo)
+    if (RImplementation->o.albedo_wo)
         u_setrt(rt_Position, rt_Normal, rt_Accumulator, get_base_zb());
     else
         u_setrt(rt_Position, rt_Normal, rt_Color, get_base_zb());
@@ -66,14 +66,14 @@ void CRenderTarget::phase_scene_end()
 {
     disable_aniso();
 
-    if (!RImplementation.o.albedo_wo)
+    if (!RImplementation->o.albedo_wo)
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
     u_setrt(rt_Color, 0, 0, get_base_zb());
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
-    if (RImplementation.o.nvstencil)
+    if (RImplementation->o.nvstencil)
         u_stencil_optimize(FALSE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     RCache.set_ColorWriteEnable();

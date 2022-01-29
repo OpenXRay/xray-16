@@ -197,7 +197,7 @@ void CLightShadows::calculate()
             {
                 bRTS = TRUE;
                 RCache.set_RT(rt_temp->pRT);
-                RCache.set_ZB(RImplementation.Target->rt_temp_zb->pRT);
+                RCache.set_ZB(RImplementation->Target->rt_temp_zb->pRT);
                 RCache.ClearRT(rt_temp, { 1.0f, 1.0f, 1.0f, 1.0f });
             }
 
@@ -331,12 +331,12 @@ void CLightShadows::calculate()
         // Fill VB
         u32 Offset;
         FVF::TL4uv* pv = (FVF::TL4uv*)RCache.Vertex.Lock(4, geom_Blur.stride(), Offset);
-        RImplementation.ApplyBlur4(pv, rt_size, rt_size, S_blur_kernel);
+        RImplementation->ApplyBlur4(pv, rt_size, rt_size, S_blur_kernel);
         RCache.Vertex.Unlock(4, geom_Blur.stride());
 
         // Actual rendering (pass0, temp2real)
         RCache.set_RT(rt_shadow->pRT);
-        RCache.set_ZB(RImplementation.Target->rt_temp_zb->pRT);
+        RCache.set_ZB(RImplementation->Target->rt_temp_zb->pRT);
         RCache.set_Shader(sh_BlurTR);
         RCache.set_Geometry(geom_Blur);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);

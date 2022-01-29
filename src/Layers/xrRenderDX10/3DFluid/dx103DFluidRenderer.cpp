@@ -210,7 +210,7 @@ void dx103DFluidRenderer::CreateJitterTexture()
 
     CHK_DX(HW.pDevice->CreateTexture2D(&desc, &dataDesc, &NoiseTexture));
 
-    m_JitterTexture = RImplementation.Resources->_CreateTexture("$user$NVjitterTex");
+    m_JitterTexture = RImplementation->Resources->_CreateTexture("$user$NVjitterTex");
     m_JitterTexture->surface_set(NoiseTexture);
 
     _RELEASE(NoiseTexture);
@@ -266,7 +266,7 @@ void dx103DFluidRenderer::CreateHHGGTexture()
 
     CHK_DX(HW.pDevice->CreateTexture1D(&desc, &dataDesc, &HHGGTexture));
 
-    m_HHGGTexture = RImplementation.Resources->_CreateTexture("$user$NVHHGGTex");
+    m_HHGGTexture = RImplementation->Resources->_CreateTexture("$user$NVHHGGTex");
     m_HHGGTexture->surface_set(HHGGTexture);
 
     _RELEASE(HHGGTexture);
@@ -320,7 +320,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     //	We don't need ZB anyway
     RCache.set_ZB(nullptr);
 
-    CRenderTarget* pTarget = RImplementation.Target;
+    CRenderTarget* pTarget = RImplementation->Target;
     const dx103DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
     const bool bRenderFire = (VolumeSettings.m_SimulationType == dx103DFluidData::ST_FIRE);
 
@@ -351,7 +351,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
 
     pTarget->u_setrt(RT[RRT_RayCastTex], nullptr, nullptr, nullptr); // LDR RT
 
-    RImplementation.rmNormal();
+    RImplementation->rmNormal();
 
     if (bRenderFire)
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastFire]);
@@ -371,7 +371,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     else
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastCopyFog]);
 
-    RImplementation.rmNormal();
+    RImplementation->rmNormal();
 
     PrepareCBuffer(FluidData, Device.dwWidth, Device.dwHeight);
     RCache.set_c(strDiffuseLight, LightData.m_vLightIntencity.x, LightData.m_vLightIntencity.y,
@@ -385,11 +385,11 @@ void dx103DFluidRenderer::ComputeRayData(const dx103DFluidData &FluidData)
     // Clear the color buffer to zero
     RCache.ClearRT(RT[RRT_RayDataTex], {});
 
-    CRenderTarget* pTarget = RImplementation.Target;
+    CRenderTarget* pTarget = RImplementation->Target;
     pTarget->u_setrt(RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Back]);
 
-    RImplementation.rmNormal();
+    RImplementation->rmNormal();
 
     PrepareCBuffer(FluidData, Device.dwWidth, Device.dwHeight);
 
@@ -410,12 +410,12 @@ void dx103DFluidRenderer::ComputeRayData(const dx103DFluidData &FluidData)
 
 void dx103DFluidRenderer::ComputeEdgeTexture(const dx103DFluidData &FluidData)
 {
-    CRenderTarget* pTarget = RImplementation.Target;
+    CRenderTarget* pTarget = RImplementation->Target;
     pTarget->u_setrt(RT[RRT_RayDataTexSmall], nullptr, nullptr, nullptr); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_QuadDownSampleRayDataTexture]);
 
     // First setup viewport to match the size of the destination low-res texture
-    RImplementation.rmNormal();
+    RImplementation->rmNormal();
 
     PrepareCBuffer(FluidData, m_iRenderTextureWidth, m_iRenderTextureHeight);
 

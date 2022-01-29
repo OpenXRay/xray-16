@@ -19,20 +19,20 @@ const float SSM_tex_size = 32.f;
 //////////////////////////////////////////////////////////////////////////
 void cl_light_PR::setup(R_constant* C)
 {
-    Fvector& P = RImplementation.r1_dlight_light->position;
-    float R = RImplementation.r1_dlight_light->range;
-    if (RImplementation.phase == CRender::PHASE_POINT)
+    Fvector& P = RImplementation->r1_dlight_light->position;
+    float R = RImplementation->r1_dlight_light->range;
+    if (RImplementation->phase == CRender::PHASE_POINT)
         RCache.set_c(C, P.x, P.y, P.z, .5f / R);
     else
         RCache.set_c(C, P.x, P.y, P.z, 1.f / R);
 }
 void cl_light_C::setup(R_constant* C)
 {
-    Fcolor _C = RImplementation.r1_dlight_light->color;
-    _C.mul_rgb(RImplementation.r1_dlight_scale);
+    Fcolor _C = RImplementation->r1_dlight_light->color;
+    _C.mul_rgb(RImplementation->r1_dlight_scale);
     RCache.set_c(C, _C.r, _C.g, _C.b, 1.f);
 }
-void cl_light_XFORM::setup(R_constant* C) { RCache.set_c(C, RImplementation.r1_dlight_tcgen); }
+void cl_light_XFORM::setup(R_constant* C) { RCache.set_c(C, RImplementation->r1_dlight_tcgen); }
 //////////////////////////////////////////////////////////////////////////
 /*
 IC void mk_vertex                   (CLightR_Vertex& D, Fvector& P, Fvector& N, Fvector& C, float r2)
@@ -56,12 +56,12 @@ void CLightR_Manager::render_point  ()
     RCache.set_xform_world      (Fidentity);
     RCache.set_xform_project    (Device.mProject);
 
-    RImplementation.r1_dlight_light     = selected_point.front();
+    RImplementation->r1_dlight_light     = selected_point.front();
     RCache.set_Shader                   (hShader);
     for (xr_vector<light*>::iterator it=selected_point.begin(); it!=selected_point.end(); it++)
     {
         //      2. Set global light-params to be used by shading
-        RImplementation.r1_dlight_light     = *it;
+        RImplementation->r1_dlight_light     = *it;
         light&  PPL                         = *(*it);
 
         // Culling
@@ -69,7 +69,7 @@ void CLightR_Manager::render_point  ()
         if (PPL.color.magnitude_sqr_rgb()<EPS)                                      continue;
         float   alpha       = Device.vCameraPosition.distance_to(PPL.position)/MAX_DISTANCE;
         if (alpha>=1)                                                               continue;
-        if (!RImplementation.ViewBase.testSphere_dirty (PPL.position,PPL.range))    continue;
+        if (!RImplementation->ViewBase.testSphere_dirty (PPL.position,PPL.range))    continue;
 
         // Calculations and rendering
         Device.Statistic->RenderDUMP_Lights.Begin();
@@ -187,19 +187,19 @@ void CLightR_Manager::render_point(u32 _priority)
         L_texgen.mul(m_TexelAdjust, L_combine);
 
         // 2. Set global light-params to be used by shading
-        RImplementation.r1_dlight_light = L;
-        RImplementation.r1_dlight_scale = clampr(lc_scale, 0.f, 1.f);
-        RImplementation.r1_dlight_tcgen = L_texgen;
+        RImplementation->r1_dlight_light = L;
+        RImplementation->r1_dlight_scale = clampr(lc_scale, 0.f, 1.f);
+        RImplementation->r1_dlight_tcgen = L_texgen;
 
         // 3. Calculate visibility for light + build soring tree
         VERIFY(L->spatial.sector);
         if (_priority == 1)
-            RImplementation.r_pmask(false, true);
+            RImplementation->r_pmask(false, true);
 
-        RImplementation.r_dsgraph_render_subspace(L->spatial.sector, L_combine, L_pos, true, true);
+        RImplementation->r_dsgraph_render_subspace(L->spatial.sector, L_combine, L_pos, true, true);
 
         if (_priority == 1)
-            RImplementation.r_pmask(true, true);
+            RImplementation->r_pmask(true, true);
 
         // 4. Analyze if HUD intersects light volume
         BOOL bHUD = FALSE;
@@ -211,9 +211,9 @@ void CLightR_Manager::render_point(u32 _priority)
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
             g_hud->Render_Last();
-        RImplementation.r_dsgraph_render_graph(_priority);
+        RImplementation->r_dsgraph_render_graph(_priority);
         if (bHUD && _priority == 0)
-            RImplementation.r_dsgraph_render_hud();
+            RImplementation->r_dsgraph_render_hud();
     }
     // ??? grass ???
 }
@@ -262,22 +262,22 @@ void CLightR_Manager::render_spot(u32 _priority)
         L_texgen.mul(m_TexelAdjust, L_combine);
 
         // 2. Set global light-params to be used by shading
-        RImplementation.r1_dlight_light = L;
-        RImplementation.r1_dlight_scale = clampr(lc_scale, 0.f, 1.f);
-        RImplementation.r1_dlight_tcgen = L_texgen;
+        RImplementation->r1_dlight_light = L;
+        RImplementation->r1_dlight_scale = clampr(lc_scale, 0.f, 1.f);
+        RImplementation->r1_dlight_tcgen = L_texgen;
 
         // 3. Calculate visibility for light + build soring tree
         VERIFY(L->spatial.sector);
-        // RImplementation.marker                   ++;
+        // RImplementation->marker                   ++;
         if (_priority == 1)
-            RImplementation.r_pmask(false, true);
+            RImplementation->r_pmask(false, true);
 
-        RImplementation.r_dsgraph_render_subspace(L->spatial.sector, L_combine, L_pos, TRUE,
+        RImplementation->r_dsgraph_render_subspace(L->spatial.sector, L_combine, L_pos, TRUE,
             TRUE // precise portals
             );
 
         if (_priority == 1)
-            RImplementation.r_pmask(true, true);
+            RImplementation->r_pmask(true, true);
 
         // 4. Analyze if HUD intersects light volume
         BOOL bHUD = FALSE;
@@ -291,9 +291,9 @@ void CLightR_Manager::render_spot(u32 _priority)
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
             g_hud->Render_Last();
-        RImplementation.r_dsgraph_render_graph(_priority);
+        RImplementation->r_dsgraph_render_graph(_priority);
         if (bHUD && _priority == 0)
-            RImplementation.r_dsgraph_render_hud();
+            RImplementation->r_dsgraph_render_hud();
         //RCache.set_ClipPlanes(false, &L_combine);
     }
     // ??? grass ???l
@@ -303,7 +303,7 @@ void CLightR_Manager::render(u32 _priority)
 {
     if (selected_spot.size())
     {
-        RImplementation.phase = CRender::PHASE_SPOT;
+        RImplementation->phase = CRender::PHASE_SPOT;
         render_spot(_priority);
 
         if (_priority == 1)
@@ -311,7 +311,7 @@ void CLightR_Manager::render(u32 _priority)
     }
     if (selected_point.size())
     {
-        RImplementation.phase = CRender::PHASE_POINT;
+        RImplementation->phase = CRender::PHASE_POINT;
         render_point(_priority);
 
         if (_priority == 1)

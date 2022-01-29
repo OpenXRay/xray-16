@@ -62,7 +62,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
             CHK_DX(D3DGetInputSignatureBlob(buffer, buffer_size, &pSignatureBlob));
             VERIFY(pSignatureBlob);
 
-            svs_result->signature = RImplementation.Resources->_CreateInputSignature(pSignatureBlob);
+            svs_result->signature = RImplementation->Resources->_CreateInputSignature(pSignatureBlob);
 
             _RELEASE(pSignatureBlob);
         }
@@ -339,24 +339,24 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     //	Igor: need restart options
     // Soft water
     {
-        const bool softWater = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER);
+        const bool softWater = RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_WATER);
         appendShaderOption(softWater, "USE_SOFT_WATER", "1");
     }
 
     // Soft particles
     {
-        const bool useSoftParticles = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES);
+        const bool useSoftParticles = RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES);
         appendShaderOption(useSoftParticles, "USE_SOFT_PARTICLES", "1");
     }
 
     // Depth of field
     {
-        const bool dof = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DOF);
+        const bool dof = RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DOF);
         appendShaderOption(dof, "USE_DOF", "1");
     }
 
     // Sun shafts
-    if (RImplementation.o.advancedpp && ps_r_sun_shafts)
+    if (RImplementation->o.advancedpp && ps_r_sun_shafts)
     {
         xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);
         options.add("SUN_SHAFTS_QUALITY", c_sun_shafts);
@@ -365,7 +365,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     else
         sh_name.append(static_cast<u32>(0));
 
-    if (RImplementation.o.advancedpp && ps_r_ssao)
+    if (RImplementation->o.advancedpp && ps_r_ssao)
     {
         xr_sprintf(c_ssao, "%d", ps_r_ssao);
         options.add("SSAO_QUALITY", c_ssao);
@@ -375,7 +375,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(static_cast<u32>(0));
 
     // Sun quality
-    if (RImplementation.o.advancedpp && ps_r_sun_quality)
+    if (RImplementation->o.advancedpp && ps_r_sun_quality)
     {
         xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
         options.add("SUN_QUALITY", c_sun_quality);
@@ -386,7 +386,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Steep parallax
     {
-        const bool steepParallax = RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX);
+        const bool steepParallax = RImplementation->o.advancedpp && ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX);
         appendShaderOption(steepParallax, "ALLOW_STEEPPARALLAX", "1");
     }
 

@@ -101,7 +101,7 @@ void CGlowManager::Load(IReader* fs)
         G->direction.set(0, 0, 0);
 
         u16 S = fs->r_u16();
-        G->shader = ::RImplementation.getShader(S);
+        G->shader = ::RImplementation->getShader(S);
 
         G->fade = 255.f;
         G->dwFrame = 0x0;
