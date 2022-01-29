@@ -80,7 +80,13 @@ Do you want the script to install these packages?" 15 60)  then
                 dep_install
                 break
             ;;
-
+            *rosa*)
+                MANAGER_QUERY="dnf list installed"
+                MANAGER_INSTALL="dnf install"
+                DEPS="{gcc,gcc-c++,cmake,make,glew,ncurses,openal,lib64ncurses-devel,lib64openal-devel,lib64cryptopp-devel,lib64ogg-devel,lib64theora-devel,lib64vorbis-devel,lib64SDL2-devel,lib64lzo-devel,lib64jpeg-devel}"
+                dep_install
+                break
+            ;;
             *debian*|*ubuntu*|*deepin*)
                 MANAGER_QUERY="dpkg-query -s"
                 MANAGER_INSTALL="apt install"
