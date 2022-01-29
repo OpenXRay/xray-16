@@ -224,12 +224,8 @@ OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished en
 }
 
 #=================================== Point of entry.
-    if [ $DISTRO == *fedora* ]; then
-        if test -f "/usr/bin/whiptail"; then
-            main
-        else
-            echo "It looks like you are using Fedora for the script to work correctly, you need to install the newt package."
-        fi
-    else
+    if test -f "/usr/bin/whiptail"; then
         main
+    else
+        echo -e "\033[37;1;41mFor the script to work, you need to install the newt package.\033[0m"
     fi
