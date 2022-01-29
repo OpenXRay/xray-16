@@ -19,8 +19,14 @@ The following functions are implemented in the Script:
 #=================================== Source code update feature.
 
 update_src(){
-    git pull
-    main
+    if test -f "/usr/bin/gits"; then
+        git pull
+        git submodule update --init --recursive
+        main
+    else
+        whiptail --title  "Error!!!" --msgbox  "git not found, please install git." 10 60
+        main
+    fi
 }
 
 #=================================== Dependency installation function.
