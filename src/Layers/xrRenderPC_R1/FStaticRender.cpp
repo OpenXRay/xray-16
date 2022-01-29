@@ -24,7 +24,7 @@ struct RenderInit
 {
     RenderInit()
     {
-        RImplementation->reset(new CRender());
+        RImplementation.reset(new CRender());
     }
 } static FSTatic_Render_init;
 #endif

@@ -30,9 +30,9 @@ public:
         now_iterating_in_net_players = false;
         now_iterating_in_net_players_disconn = false;
 #ifdef DEBUG
-        #ifdef XR_PLATFORM_WINDOWS
+        #ifdef XR_PLATFORM_WINDOWS || defined(XR_PLATFORM_LINUX)
             iterator_thread_id = 0;
-        #elif defined(XR_PLATFORM_SWITCH) || defined(XR_PLATFORM_LINUX)
+        #elif defined(XR_PLATFORM_SWITCH) 
             iterator_thread_id = nullptr;
         #endif
 #endif

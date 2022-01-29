@@ -27,7 +27,7 @@ struct RenderInit
 {
     RenderInit()
     {
-        RImplementation->reset(new CRender());
+        RImplementation.reset(new CRender());
     }
 } static r2_init;
 #endif

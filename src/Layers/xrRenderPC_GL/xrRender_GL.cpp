@@ -47,7 +47,7 @@ public:
         CheckModeConsistency(mode);
         ps_r2_sun_static = false;
         ps_r2_advanced_pp = true;
-        GEnv.Render = RImplementation->get(); // XXX: SWITCH fix for build
+        GEnv.Render = RImplementation.get(); // XXX: SWITCH fix for build
         GEnv.RenderFactory = &RenderFactoryImpl;
         GEnv.DU = &DUImpl;
         GEnv.UIRender = &UIRenderImpl;
@@ -69,7 +69,7 @@ XR_EXPORT RendererModule* GetRendererModule()
 
 XR_EXPORT void xrRenderGL_GlobalInit()
 {
-    RImplementation->reset(new CRender());
+    RImplementation.reset(new CRender());
 }
 
 #ifndef XR_PLATFORM_SWITCH
