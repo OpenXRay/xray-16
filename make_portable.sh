@@ -19,7 +19,7 @@ The following functions are implemented in the Script:
 #=================================== Source code update feature.
 
 update_src(){
-    if test -f "/usr/bin/gits"; then
+    if test -f "/usr/bin/git"; then
         git pull
         git submodule update --init --recursive
         main
