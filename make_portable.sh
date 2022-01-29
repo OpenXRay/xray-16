@@ -160,11 +160,11 @@ unpack(){
 
 res_copy(){
     case $1 in
-        cop)
+        *cop*)
         OUT_PATH=$OUT/cop
         TITLES_GAME=Call\ of\ Pripyat
         ;;
-        cs)
+        *cs*)
         OUT_PATH=$OUT/cs
         TITLES_GAME=Clear\ Sky
         ;;
@@ -200,28 +200,36 @@ OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished en
 "6" "Copy files S.T.A.L.K.E.R. - Clear Sky." 3>&1 1>&2 2>&3)
  
     case $OPTION in
-        "1")
+        *1*)
         helps
         ;;
-        "2")
+        *2*)
         update_src
         ;;
-        "3")
+        *3*)
         build
         ;;
-        "4")
+        *4*)
         unpack
         ;;
-        "5")
-        res_copy "cop"
+        *5*)
+        res_copy *cop*
         ;;
-        "6")
-        res_copy "cs"
+        *6*)
+        res_copy *cs*
         ;;
-        255)
+        *255*)
         echo "The ESC key has been pressed.";;
     esac
 }
 
 #=================================== Point of entry.
-main
+    if [ $DISTRO == *fedora* ]; then
+        if test -f "/usr/bin/whiptail"; then
+            main
+        else
+            echo "It looks like you are using Fedora for the script to work correctly, you need to install the newt package."
+        fi
+    else
+        main
+    fi
