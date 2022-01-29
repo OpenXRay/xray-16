@@ -91,7 +91,7 @@ Do you want the script to install these packages?" 15 60)  then
             *suse*)
                 MANAGER_QUERY="rpm -q"
                 MANAGER_INSTALL="zypper install"
-                DEPS="{ }"
+                DEPS="{gcc,gcc-c++,cmake,make,glew-devel,libcryptopp-devel,libogg-devel,libtheora-devel,libvorbis-devel,libSDL2-devel,libjpeg-turbo,openal-soft-devel,lzo-devel,openjpeg2-devel,libjpeg62-devel}"
                 dep_install
                 break
             ;;
@@ -198,7 +198,7 @@ OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished en
 "4" "Unpack the distribution." \
 "5" "Copy files S.T.A.L.K.E.R. - Call of Pripyat." \
 "6" "Copy files S.T.A.L.K.E.R. - Clear Sky." 3>&1 1>&2 2>&3)
- 
+
     case $OPTION in
         *1*)
         helps
@@ -224,6 +224,7 @@ OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished en
 }
 
 #=================================== Point of entry.
+
     if test -f "/usr/bin/whiptail"; then
         main
     else
