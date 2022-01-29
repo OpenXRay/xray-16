@@ -95,6 +95,13 @@ Do you want the script to install these packages?" 15 60)  then
                 dep_install
                 break
             ;;
+            *void*)
+                MANAGER_QUERY="xbps-query -Rs"
+                MANAGER_INSTALL="xbps-install -Su"
+                DEPS="{gcc,cmake,make,glew-devel,libogg-devel,libtheora-devel,libvorbis-devel,SDL2-devel,libjpeg-turbo-devel,libopenal-devel,lzo-devel,libopenjpeg2-devel,ncurses-devel}"
+                dep_install
+                break
+            ;;
             *)
                 whiptail --title  "Error!!!" --msgbox  "Could not find information about your distribution! Automatic installation of dependencies is not available. Trying to build the OpenXRay engine no matter what. If an error occurs during compilation make sure you have the following packages installed:
 gcc cmake make libglvnd libjpeg6-turbo ncurses glew sdl2 openal crypto++ libogg libtheora libvorbis lzo lzop libjpeg-turbo
