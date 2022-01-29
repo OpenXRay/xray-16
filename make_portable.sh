@@ -58,7 +58,7 @@ Do you want the script to install these packages?" 15 60)  then
             if [[ ! -z "$INSTALL" ]]; then
                 missing_deps
                 if [[ "$PERMISSION" == "install_deps" ]]; then
-                    $SU_CMD $MANAGER_INSTALL $INSTALL
+                    sudo $MANAGER_INSTALL $INSTALL
                 fi
             fi
             set -e
@@ -68,14 +68,14 @@ Do you want the script to install these packages?" 15 60)  then
         case $i in
             *arch*|*manjaro*)
                 MANAGER_QUERY="pacman -Q"
-                MANAGER_INSTALL="sudo pacman -S"
+                MANAGER_INSTALL="pacman -S"
                 DEPS="{gcc,cmake,make,libglvnd,libjpeg6-turbo,ncurses,glew,sdl2,openal,crypto++,libogg,libtheora,libvorbis,lzo,lzop,libjpeg-turbo}"
                 dep_install
                 break
             ;;
             *fedora*)
                 MANAGER_QUERY="dnf list installed"
-                MANAGER_INSTALL="sudo dnf install"
+                MANAGER_INSTALL="dnf install"
                 DEPS="{gcc,gcc-c++,cmake,make,glew-devel,openal-devel,cryptopp-devel,libogg-devel,libtheora-devel,libvorbis-devel,SDL2-devel,lzo-devel,libjpeg-turbo-devel}"
                 dep_install
                 break
@@ -83,14 +83,14 @@ Do you want the script to install these packages?" 15 60)  then
 
             *debian*|*ubuntu*|*deepin*)
                 MANAGER_QUERY="dpkg-query -s"
-                MANAGER_INSTALL="sudo apt install"
+                MANAGER_INSTALL="apt install"
                 DEPS="{gcc,g++,cmake,make,libglew-dev,libopenal-dev,libcrypto++-dev,libogg-dev,libtheora-dev,libvorbis-dev,libsdl2-dev,liblzo2-dev,libjpeg-dev,libncurses5-dev}"
                 dep_install
                 break
             ;;
             *suse*)
                 MANAGER_QUERY="rpm -q"
-                MANAGER_INSTALL="sudo zypper install"
+                MANAGER_INSTALL="zypper install"
                 DEPS="{ }"
                 dep_install
                 break
