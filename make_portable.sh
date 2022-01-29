@@ -199,28 +199,28 @@ OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished en
 "5" "Copy files S.T.A.L.K.E.R. - Call of Pripyat." \
 "6" "Copy files S.T.A.L.K.E.R. - Clear Sky." 3>&1 1>&2 2>&3)
  
-case $OPTION in
-                "1")
-                helps
-             ;;
-                "2")
-                update_src
-             ;;
-                "3")
-                build
-             ;;
-                "4")
-                unpack
-             ;;
-                "5")
-                res_copy "cop"
-             ;;
-                "6")
-                res_copy "cs"
-             ;;
-            255)
-            echo "The ESC key has been pressed.";;
-esac
+    case $OPTION in
+        "1")
+        helps
+        ;;
+        "2")
+        update_src
+        ;;
+        "3")
+        build
+        ;;
+        "4")
+        unpack
+        ;;
+        "5")
+        res_copy "cop"
+        ;;
+        "6")
+        res_copy "cs"
+        ;;
+        255)
+        echo "The ESC key has been pressed.";;
+    esac
 }
 
 #=================================== Point of entry.
