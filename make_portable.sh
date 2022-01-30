@@ -7,13 +7,23 @@ OS_RELEASE_FILES=("/etc/os-release" "/usr/lib/os-release")
 #=================================== Help function.
 
 helps(){
-    whiptail --title  " Help " --msgbox  "  This script will help you easily build the OpenXRay engine and set it up to run. The script was compiled as a result of numerous requests from users who have the same type of minor errors as a result of their little preparation in order to simplify the process of building the engine.
+    whiptail --title "Help." --msgbox "This script will help you easily build the OpenXRay engine and set it up to run. The script was compiled \
+as a result of numerous requests from users who have the same type of minor errors as a result of their little preparation in order to simplify the \
+process of building the engine.
 The following functions are implemented in the Script:
 1) Updating the source code tree.
 2) Building the OpenXRay engine
 3) Unpacking the installation package with the game. (system must have innoextract installed)
 4) Copying game resources" 14 100
     main
+}
+
+helpres(){
+    whiptail --title "Help Resource manager." --msgbox  "To run the game, you need the game resources of the original licensed copy of \
+S.T.A.L.K.E.R. - Call of Pripyat version 1.6.02 and S.T.A.L.K.E.R. - Clear Sky version 1.5.10. If you have the game installed, you can use the \
+first two menu options, the script will copy the necessary files to the output directory. If you have a distribution kit for the game, then you \
+can use the appropriate menu items to unpack it and get the necessary resources." 14 100
+    resmanager
 }
 
 #=================================== Source code update feature.
@@ -115,7 +125,8 @@ Do you want the script to install these packages?" 15 60)  then
                 break
             ;;
             *)
-                whiptail --title  "Error!!!" --msgbox  "Could not find information about your distribution! Automatic installation of dependencies is not available. Trying to build the OpenXRay engine no matter what. If an error occurs during compilation make sure you have the following packages installed:
+                whiptail --title "Error!!!" --msgbox  "Could not find information about your distribution! Automatic installation of dependencies is not available. \
+Trying to build the OpenXRay engine no matter what. If an error occurs during compilation make sure you have the following packages installed:
 gcc cmake make libglvnd libjpeg6-turbo ncurses glew sdl2 openal crypto++ libogg libtheora libvorbis lzo lzop libjpeg-turbo
 
 On some distributions, packages may be split into two and prefixed with -dev or -devel, such as lzo lzo-dev, these packages should also be installed." 16 80
@@ -161,17 +172,10 @@ END
     chmod 755 $OUT/Start_cop.sh
     chmod 755 $OUT/Start_cs.sh
 
-    whiptail --title  "Completed" --msgbox  "   OpenXRay engine is built and placed in $OUT In order to run the game you should copy the game resources from the original licensed copy.
+    whiptail --title "Completed" --msgbox "OpenXRay engine is built and placed in $OUT In order to run the game you should copy the game resources from the original licensed copy.
 
 You need to copy the following directories:
 levels, localization, mp, patches, resources" 12 70
-    main
-}
-
-#=================================== Unpack function.
-
-unpack(){
-    whiptail --title  "Error" --msgbox  "Unpacking has not yet been implemented." 10 60
     main
 }
 
@@ -187,12 +191,12 @@ res_copy(){
         OUT_PATH=$OUT/cs
         TITLES_GAME=Clear\ Sky
         ;;
-    *)
+        *)
         echo "Error"
         ;;
     esac
 
-    PET=$(whiptail --title  "Copying game resources." --inputbox  "   Specify the directory with the installed game S.T.A.L.K.E.R. - $TITLES_GAME" 10 60 $DEF_COPY_PATH 3>&1 1>&2 2>&3)
+    PET=$(whiptail --title "Copying game resources." --inputbox "Specify the directory with the installed game S.T.A.L.K.E.R. - $TITLES_GAME" 10 60 $DEF_COPY_PATH 3>&1 1>&2 2>&3)
     exitstatus=$?
     if [ $exitstatus = 0 ];  then
         echo "Copying in progress, please wait..."
@@ -206,17 +210,69 @@ res_copy(){
     fi
 }
 
+#=================================== Resource manager function.
+
+resmanager(){
+    RES=$(whiptail --title "Resource manager." --menu "Доступные операции." 15 70 7 \
+"1" "Справка по меню." \
+"2" "Copy files S.T.A.L.K.E.R. - Call of Pripyat." \
+"3" "Copy files S.T.A.L.K.E.R. - Clear Sky." \
+"4" "Unpack S.T.A.L.K.E.R. - Call of Pripyat." \
+"5" "Unpack S.T.A.L.K.E.R. - Call of Pripyat GOG." \
+"6" "Unpack S.T.A.L.K.E.R. - Clear Sky." \
+"7" "Unpack S.T.A.L.K.E.R. - Clear Sky GOG." 3>&1 1>&2 2>&3)
+    condactor(){
+    UNPACKPET=$(whiptail --title "Путь к дистрибутиву" --inputbox "Укажите путь в папку дистрибутива." 10 60 ~/ 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [ $exitstatus = 0 ];  then
+        DSETUP=$(whiptail --title "Путь к дистрибутиву" --inputbox "Укажите имя установочного файла, обычно он называется setup.exe
+==================================================================
+$(find $UNPACKPET -maxdepth 1 -name "*.exe")" 15 70 setup.exe 3>&1 1>&2 2>&3)
+        exitstatus=$?
+        if [ $exitstatus = 1 ];  then
+            main
+        fi
+    else
+        main
+    fi
+}
+    case $RES in
+        *1*)
+        helpres
+        ;;
+        *2*)
+        res_copy *cop*
+        ;;
+        *3*)
+        res_copy *cs*
+        ;;
+        *4*)
+        condactor
+        innoextract $UNPACKPET/$DSETUP -L -d $UNPACKPET/temp
+        ;;
+        *5*)
+        innoextract $UNPACKPET/$DSETUP -L --gog -d $UNPACKPET/temp
+        ;;
+        *6*)
+        innoextract $UNPACKPET/$DSETUP -L -d $UNPACKPET/temp
+        ;;
+        *7*)
+        innoextract $UNPACKPET/$DSETUP -L --gog -d $UNPACKPET/temp
+        ;;
+        *)
+        main
+    esac
+}
+
 #=================================== Main function.
 
 main(){
 
-OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished engine wakes up $OUT" 15 70 7 \
+    OPTION=$(whiptail --title "Build Menu" --menu "The finished engine will be located $OUT" 15 70 4 \
 "1" "Brief reference." \
 "2" "Update the source tree. " \
 "3" "Build the OpenXRay engine." \
-"4" "Unpack the distribution." \
-"5" "Copy files S.T.A.L.K.E.R. - Call of Pripyat." \
-"6" "Copy files S.T.A.L.K.E.R. - Clear Sky." 3>&1 1>&2 2>&3)
+"4" "Resource manager." 3>&1 1>&2 2>&3)
 
     case $OPTION in
         *1*)
@@ -229,13 +285,7 @@ OPTION=$(whiptail --title  "Build Menu" --menu  "The folder with the finished en
         build
         ;;
         *4*)
-        unpack
-        ;;
-        *5*)
-        res_copy *cop*
-        ;;
-        *6*)
-        res_copy *cs*
+        resmanager 
         ;;
         *255*)
         echo "The ESC key has been pressed.";;
