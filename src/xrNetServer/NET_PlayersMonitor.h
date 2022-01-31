@@ -18,7 +18,7 @@ class PlayersMonitor
     bool now_iterating_in_net_players;
     bool now_iterating_in_net_players_disconn;
 #ifdef DEBUG
-    u32 iterator_thread_id;
+    Threading::ThreadId iterator_thread_id;
 #endif
 public:
     PlayersMonitor()
