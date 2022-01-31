@@ -72,7 +72,6 @@ inline char* _strupr_l(char* str, locale_t loc)
 
 #define __except(X) catch(X)
 
-#define tid_t pthread_t
 #define GetCurrentProcessId getpid
 #define GetCurrentThreadId pthread_self
 

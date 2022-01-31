@@ -43,7 +43,7 @@ private:
      * @brief m_secondary_crows - list of items of the secondary thread
      */
     Objects m_primary_crows, m_secondary_crows;
-    tid_t m_owner_thread_id;
+    Threading::ThreadId m_owner_thread_id;
     ObjectUpdateStatistics stats;
     u32 statsFrame;
 

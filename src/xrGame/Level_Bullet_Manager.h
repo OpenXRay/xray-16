@@ -137,7 +137,7 @@ protected:
     xr_vector<_event> m_Events;
 
 #ifdef DEBUG
-    tid_t m_thread_id;
+    Threading::ThreadId m_thread_id;
 
     typedef xr_vector<Fvector> BulletPoints;
     BulletPoints m_bullet_points;
