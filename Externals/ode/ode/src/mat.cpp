@@ -207,7 +207,7 @@ void dMatrix::makeRandom (dReal range)
 }
 
 
-void dMatrix::print (char *fmt, FILE *f)
+void dMatrix::print (const char *fmt, FILE *f)
 {
   for (int i=0; i<n; i++) {
     for (int j=0; j<m; j++) fprintf (f,fmt,data[i*m+j]);
