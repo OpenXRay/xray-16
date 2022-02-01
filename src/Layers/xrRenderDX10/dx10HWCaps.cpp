@@ -95,7 +95,7 @@ u32 GetATIGpuNum()
         /*.Software       =*/ nullptr,
         /*.Flags          =*/ 0,
         /*.pFeatureLevels =*/ featureLevels,
-        /*.FeatureLevels  =*/ std::size(featureLevels),
+        /*.FeatureLevels  =*/ UINT(std::size(featureLevels)),
         /*.SDKVersion     =*/ D3D11_SDK_VERSION,
     };
 
