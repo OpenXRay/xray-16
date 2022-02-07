@@ -575,8 +575,11 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
     {
     case FeedbackController:
     {
-        for (SDL_GameController* controller : controllers)
+        if (last_input_controller != -1)
+        {
+            const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
             SDL_GameControllerRumble(controller, s1_rumble, s2_rumble, duration_ms);
+        }
         break;
     }
 
