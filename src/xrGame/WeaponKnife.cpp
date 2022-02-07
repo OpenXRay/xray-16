@@ -282,7 +282,7 @@ void CWeaponKnife::MakeShot(Fvector const& pos, Fvector const& dir, float const 
     bool SendHit = SendHitAllowed(H_Parent());
 
     PlaySound("sndShot", pos);
-    if (smart_cast<CActor*>(Level().CurrentControlEntity()))
+    if (ParentIsActor())
     {
         const bool left = (IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT) || IsBinded(kWPN_ZOOM, XR_CONTROLLER_AXIS_TRIGGER_LEFT)) && !g_player_hud->attached_item(1);
         const bool right = IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT) || IsBinded(kWPN_ZOOM, XR_CONTROLLER_AXIS_TRIGGER_LEFT);
