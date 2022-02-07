@@ -36,6 +36,7 @@
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
     <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_occq.cpp" />
     <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_rain.cpp" />
+    <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_scene.cpp" />
     <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_smap_D.cpp" />
     <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_ssao.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
@@ -134,7 +135,6 @@
     <ClCompile Include="gl_rendertarget_mark_msaa_edges.cpp" />
     <ClCompile Include="gl_rendertarget_phase_combine.cpp" />
     <ClCompile Include="gl_rendertarget_phase_flip.cpp" />
-    <ClCompile Include="gl_rendertarget_phase_scene.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />

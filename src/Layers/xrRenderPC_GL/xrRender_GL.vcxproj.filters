@@ -552,9 +552,6 @@
     <ClCompile Include="gl_rendertarget_phase_combine.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_scene.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\r__screenshot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -685,6 +682,9 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_occq.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_scene.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
