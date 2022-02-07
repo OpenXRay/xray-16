@@ -20,6 +20,7 @@
 #include "debug_renderer.h"
 #include "static_cast_checked.hpp"
 #include "clsid_game.h"
+#include "WeaponKnife.h"
 #include "WeaponBinocularsVision.h"
 #include "xrUICore/Windows/UIWindow.h"
 #include "ui/UIXmlInit.h"
@@ -958,9 +959,19 @@ bool CWeapon::Action(u16 cmd, u32 flags)
                 return false;
 
             if (flags & CMD_START)
+            {
+                if (ParentIsActor() && !smart_cast<CWeaponKnife*>(this)) // for knife it is handled differently
+                {
+                    const bool left = IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT);
+                    const bool right = IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_RIGHT);
+                    pInput->Feedback(CInput::FeedbackTriggers, left ? 0.5f : 0.0f, right ? 0.5f : 0.0f, 0.1f);
+                }
                 FireStart();
+            }
             else
+            {
                 FireEnd();
+            }
         };
     }
         return true;
