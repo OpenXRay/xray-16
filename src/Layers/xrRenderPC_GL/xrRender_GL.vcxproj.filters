@@ -561,9 +561,6 @@
     <ClCompile Include="gl_rendertarget_phase_scene.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_smap_D.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\r__screenshot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -685,6 +682,9 @@
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_ssao.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderPC_R4\r4_rendertarget_phase_smap_D.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
