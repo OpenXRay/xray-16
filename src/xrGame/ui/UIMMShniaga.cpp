@@ -398,7 +398,10 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (WINDOW_KEY_PRESSED == keyboard_action || WINDOW_KEY_HOLD == keyboard_action)
     {
-        switch (GetBindedAction(dik))
+        int action = GetBindedAction(dik);
+
+    try_again:
+        switch (action)
         {
         case kUP:
         case kFWD:
@@ -422,6 +425,10 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 SelectBtn(0);
             return true;
 
+        case kLEFT:
+        case kRIGHT:
+            break;
+
         case kENTER:
         case kJUMP:
         case kUSE:
@@ -432,7 +439,18 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             if (m_page != epi_main)
                 ShowMain();
             return true;
+
+        default:
+        {
+            switch (dik)
+            {
+            case XR_CONTROLLER_BUTTON_DPAD_UP:    action = kUP;    goto try_again;
+            case XR_CONTROLLER_BUTTON_DPAD_DOWN:  action = kDOWN;  goto try_again;
+            case XR_CONTROLLER_BUTTON_DPAD_LEFT:  action = kLEFT;  goto try_again;
+            case XR_CONTROLLER_BUTTON_DPAD_RIGHT: action = kRIGHT; goto try_again;
+            }
         }
+        } // switch (GetBindedAction(dik))
     }
 
     return CUIWindow::OnKeyboardAction(dik, keyboard_action);
