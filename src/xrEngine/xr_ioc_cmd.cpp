@@ -838,6 +838,7 @@ void CCC_Register()
     CMD4(CCC_Float, "mouse_sens", &psMouseSens, 0.001f, 0.6f);
 
     // Gamepad
+    CMD3(CCC_Mask, "gamepad_invert_y", &psControllerInvertY, 1);
     psControllerSens = 0.02f;
     CMD4(CCC_Float, "gamepad_sens", &psControllerSens, 0.001f, 0.6f);
     psControllerDeadZoneSens = 15.f;

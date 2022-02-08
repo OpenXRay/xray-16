@@ -316,7 +316,7 @@ void CSpectator::IR_OnKeyboardHold(int cmd)
     }
 }
 
-void CSpectator::IR_OnMouseMove(int dx, int dy)
+void CSpectator::IR_OnMouseMove(int dx, int dy) // XXX: Move code to OnAxisMove and support gamepad input
 {
     if (Remote())
         return;

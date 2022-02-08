@@ -16,6 +16,7 @@ ENGINE_API Flags32 psMouseInvert = {false};
 
 ENGINE_API float psControllerSens = 1.f;
 ENGINE_API float psControllerDeadZoneSens = 0.f;
+ENGINE_API Flags32 psControllerInvertY = { false };
 
 static bool AltF4Pressed = false;
 

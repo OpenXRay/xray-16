@@ -736,7 +736,7 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
     {
         m_angle_speed = speed;
         const float scale = .05f; // psControllerSens;
-        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
+        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
     }
 
