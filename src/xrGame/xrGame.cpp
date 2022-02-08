@@ -44,7 +44,7 @@ extern "C"
         // register console commands
         CCC_RegisterCommands();
         // keyboard binding
-        CCC_RegisterInput();
+        CCC_RegisterInput(); // XXX: Move to xrEngine
 #ifdef DEBUG
         g_profiler = xr_new<CProfiler>();
 #endif
@@ -54,6 +54,7 @@ extern "C"
     XR_EXPORT void finalize_library()
     {
         CleanupUIStyleToken();
+        CCC_DeregisterInput(); // XXX: Remove if possible
         StringTable().Destroy();
  }
 }

@@ -12,6 +12,13 @@ CUIKeyBinding::CUIKeyBinding() : m_isGamepadBinds(false)
         AttachChild(&m_header[i]);
 
     AttachChild(&m_frame);
+
+    pInput->RegisterKeyMapChangeWatcher(this, REG_PRIORITY_NORMAL);
+}
+
+CUIKeyBinding::~CUIKeyBinding()
+{
+    pInput->RemoveKeyMapChangeWatcher(this);
 }
 
 void CUIKeyBinding::InitFromXml(CUIXml& xml_doc, LPCSTR path)
@@ -108,6 +115,21 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
 #ifdef DEBUG
     CheckStructure(xml_doc);
 #endif
+}
+
+void CUIKeyBinding::OnKeyMapChanged()
+{
+    for (CUIWindow* item : m_scroll_wnd->Items())
+    {
+        for (CUIWindow* wnd : item->GetChildWndList())
+        {
+            CUIEditKeyBind* keybind = smart_cast<CUIEditKeyBind*>(wnd);
+            if (!keybind)
+                continue;
+
+            keybind->SetValue(); // re-apply
+        }
+    }
 }
 
 #ifdef DEBUG

@@ -212,6 +212,7 @@ void ForAllActionKeys(EGameActions action_id, Invocable&& invocable)
 }
 
 extern ENGINE_API void CCC_RegisterInput();
+extern ENGINE_API void CCC_DeregisterInput();
 
 struct con_cmd
 {

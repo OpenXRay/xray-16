@@ -500,7 +500,7 @@ void initialize_bindings()
         g_key_bindings[idx].m_action = &actions[idx];
 }
 
-void remap_keys()
+static void RemapKeys()
 {
     string128 buff;
     // Log("Keys remap:");
@@ -706,6 +706,27 @@ bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
     return true;
 }
 
+static class KeyMapWatcher final : public pureKeyMapChanged
+{
+public:
+    void Initialize()
+    {
+        pInput->RegisterKeyMapChangeWatcher(this, REG_PRIORITY_HIGH);
+    }
+
+    void Destroy() 
+    {
+        if (pInput) // XXX: this check should not exist
+            pInput->RemoveKeyMapChangeWatcher(this);
+    }
+
+    void OnKeyMapChanged() override
+    {
+        RemapKeys();
+        CStringTable::ReparseKeyBindings();
+    }
+} s_keymap_watcher;
+
 ConsoleBindCmds g_consoleBindCmds;
 BOOL g_remapped = false;
 
@@ -732,7 +753,8 @@ public:
 
         if (!g_remapped)
         {
-            remap_keys();
+            RemapKeys();
+            s_keymap_watcher.Initialize();
             g_remapped = true;
         }
 
@@ -1004,3 +1026,9 @@ void CCC_RegisterInput()
     CMD1(CCC_BindConsoleCmd, "bind_console");
     CMD1(CCC_UnBindConsoleCmd, "unbind_console");
 };
+
+void CCC_DeregisterInput()
+{
+    if (g_remapped)
+        s_keymap_watcher.Destroy();
+}

@@ -165,7 +165,7 @@ void CInput::KeyUpdate()
 {
     SDL_Event events[MAX_KEYBOARD_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
-        SDL_GETEVENT, SDL_KEYDOWN, SDL_TEXTINPUT);
+        SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED);
 
     // Let iGetAsyncKeyState work correctly during this frame immediately
     for (int i = 0; i < count; ++i)
@@ -212,6 +212,10 @@ void CInput::KeyUpdate()
 
         case SDL_TEXTINPUT:
             cbStack.back()->IR_OnTextInput(event.text.text);
+            break;
+
+        case SDL_KEYMAPCHANGED:
+            seqKeyMapChanged.Process();
             break;
         }
     }
@@ -454,6 +458,16 @@ void CInput::GrabInput(const bool grab)
 bool CInput::InputIsGrabbed() const
 {
     return inputGrabbed;
+}
+
+void CInput::RegisterKeyMapChangeWatcher(pureKeyMapChanged* watcher, int priority /*= REG_PRIORITY_NORMAL*/)
+{
+    seqKeyMapChanged.Add(watcher, priority);
+}
+
+void CInput::RemoveKeyMapChangeWatcher(pureKeyMapChanged* watcher)
+{
+    seqKeyMapChanged.Remove(watcher);
 }
 
 void CInput::iCapture(IInputReceiver* p)

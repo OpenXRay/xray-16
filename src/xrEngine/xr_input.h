@@ -3,6 +3,8 @@
 #include "SDL.h"
 #include <bitset>
 
+DECLARE_MESSAGE(KeyMapChanged);
+
 enum EMouseButton
 {
     MOUSE_INVALID = SDL_NUM_SCANCODES,
@@ -115,6 +117,8 @@ private:
     bool exclusiveInput;
     bool inputGrabbed;
 
+    MessageRegistry<pureKeyMapChanged> seqKeyMapChanged;
+
 public:
     u32 m_curTime;
     u32 m_mouseDelta;
@@ -134,6 +138,9 @@ public:
 
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
+
+    void RegisterKeyMapChangeWatcher(pureKeyMapChanged* watcher, int priority = REG_PRIORITY_NORMAL);
+    void RemoveKeyMapChangeWatcher(pureKeyMapChanged* watcher);
 
     CInput(const bool exclusive = true);
     ~CInput();
