@@ -14,14 +14,15 @@ public:
     CUIKeyBinding();
     void InitFromXml(CUIXml& xml_doc, LPCSTR path);
 
+protected:
+    void FillUpList(CUIXml& xml_doc, LPCSTR path);
+
 #ifdef DEBUG
     void CheckStructure(CUIXml& xml_doc);
     bool IsActionExist(LPCSTR action, CUIXml& xml_doc);
 #endif
 
 protected:
-    void FillUpList(CUIXml& xml_doc, LPCSTR path);
-
     bool m_isGamepadBinds;
 
     CUIFrameLineWnd m_header[3];
