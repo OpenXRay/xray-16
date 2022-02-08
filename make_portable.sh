@@ -1,5 +1,6 @@
 #! /bin/bash
 
+DTOOLS="dialog"
 OUT=~/OpenXRay
 DEF_COPY_PATH=~
 OS_RELEASE_FILES=("/etc/os-release" "/usr/lib/os-release")
@@ -7,7 +8,7 @@ OS_RELEASE_FILES=("/etc/os-release" "/usr/lib/os-release")
 #=================================== Help function.
 
 helps(){
-    whiptail --title "Help." --msgbox "This script will help you easily build the OpenXRay engine and set it up to run. The script was compiled \
+    $DTOOLS --backtitle "OpenXRay Tools" --title "Help." --msgbox "This script will help you easily build the OpenXRay engine and set it up to run. The script was compiled \
 as a result of numerous requests from users who have the same type of minor errors as a result of their little preparation in order to simplify the \
 process of building the engine.
 The following functions are implemented in the Script:
@@ -19,7 +20,7 @@ The following functions are implemented in the Script:
 }
 
 helpres(){
-    whiptail --title "Help Resource manager." --msgbox  "To run the game, you need the game resources of the original licensed copy of \
+    $DTOOLS --backtitle "OpenXRay Tools" --title "Help Resource manager." --msgbox  "To run the game, you need the game resources of the original licensed copy of \
 S.T.A.L.K.E.R. - Call of Pripyat version 1.6.02 and S.T.A.L.K.E.R. - Clear Sky version 1.5.10. If you have the game installed, you can use the \
 first two menu options, the script will copy the necessary files to the output directory. If you have a distribution kit for the game, then you \
 can use the appropriate menu items to unpack it and get the necessary resources." 14 100
@@ -34,7 +35,7 @@ update_src(){
         git submodule update --init --recursive
         main
     else
-        whiptail --title  "Error!!!" --msgbox  "git not found, please install git." 10 60
+        $DTOOLS --backtitle "OpenXRay Tools" --title  "Error!!!" --msgbox  "git not found, please install git." 10 60
         main
     fi
 }
@@ -54,13 +55,13 @@ done
 dependencies() {
         missing_deps() {
 
-            if (whiptail --title  "Installing dependencies." --yesno  "Missing dependencies for $DISTRO:
+            if ($DTOOLS --backtitle "OpenXRay Tools" --title  "Installing dependencies." --yesno  "Missing dependencies for $DISTRO:
 $INSTALL
 
 Do you want the script to install these packages?" 15 60)  then
                 PERMISSION=install_deps
             else
-                whiptail --title  "Attention!!!" --msgbox  "I continue without installing dependencies." 10 60
+                $DTOOLS --backtitle "OpenXRay Tools" --title  "Attention!!!" --msgbox  "I continue without installing dependencies." 10 60
             fi
         }
         dep_install() {
@@ -125,7 +126,7 @@ Do you want the script to install these packages?" 15 60)  then
                 break
             ;;
             *)
-                whiptail --title "Error!!!" --msgbox  "Could not find information about your distribution! Automatic installation of dependencies is not available. \
+                $DTOOLS --backtitle "OpenXRay Tools" --title "Error!!!" --msgbox  "Could not find information about your distribution! Automatic installation of dependencies is not available. \
 Trying to build the OpenXRay engine no matter what. If an error occurs during compilation make sure you have the following packages installed:
 gcc cmake make libglvnd libjpeg6-turbo ncurses glew sdl2 openal crypto++ libogg libtheora libvorbis lzo lzop libjpeg-turbo
 
@@ -138,7 +139,7 @@ On some distributions, packages may be split into two and prefixed with -dev or 
 
 build(){
     dependencies
-#   rm -f -R bin
+   rm -f -R bin
    mkdir -p bin
    cd bin
    cmake .. -DCMAKE_BUILD_TYPE=Release \
@@ -172,7 +173,7 @@ END
     chmod 755 $OUT/Start_cop.sh
     chmod 755 $OUT/Start_cs.sh
 
-    whiptail --title "Completed" --msgbox "OpenXRay engine is built and placed in $OUT In order to run the game you should copy the game resources from the original licensed copy.
+    $DTOOLS --backtitle "OpenXRay Tools" --title "Completed" --msgbox "OpenXRay engine is built and placed in $OUT In order to run the game you should copy the game resources from the original licensed copy.
 
 You need to copy the following directories:
 levels, localization, mp, patches, resources" 12 70
@@ -196,14 +197,14 @@ res_copy(){
         ;;
     esac
 
-    PET=$(whiptail --title "Copying game resources." --inputbox "Specify the directory with the installed game S.T.A.L.K.E.R. - $TITLES_GAME" 10 60 $DEF_COPY_PATH 3>&1 1>&2 2>&3)
+    PET=$($DTOOLS --backtitle "OpenXRay Tools" --title "Copying game resources." --inputbox "Specify the directory with the installed game S.T.A.L.K.E.R. - $TITLES_GAME" 10 60 $DEF_COPY_PATH 3>&1 1>&2 2>&3)
     exitstatus=$?
     if [ $exitstatus = 0 ];  then
         echo "Copying in progress, please wait..."
         mkdir -p $OUT_PATH/{levels,localization,mp,patches,resources}
         cp -r -u -v $PET/{levels,mp,patches,resources} $OUT_PATH
         cp -r -u -v $PET/*ocalization/* $OUT_PATH/localization
-        whiptail --title  "Done" --msgbox  "S.T.A.L.K.E.R - $TITLES_GAME resources copied successfully" 10 60
+        $DTOOLS --backtitle "OpenXRay Tools" --title  "Done" --msgbox  "S.T.A.L.K.E.R - $TITLES_GAME resources copied successfully" 10 60
         main
     else
         main
@@ -213,7 +214,7 @@ res_copy(){
 #=================================== Resource manager function.
 
 resmanager(){
-    RES=$(whiptail --title "Resource manager." --menu "Доступные операции." 15 70 7 \
+    RES=$($DTOOLS --backtitle "OpenXRay Tools" --title "Resource manager." --menu "Доступные операции." 15 70 7 \
 "1" "Справка по меню." \
 "2" "Copy files S.T.A.L.K.E.R. - Call of Pripyat." \
 "3" "Copy files S.T.A.L.K.E.R. - Clear Sky." \
@@ -222,10 +223,10 @@ resmanager(){
 "6" "Unpack S.T.A.L.K.E.R. - Clear Sky." \
 "7" "Unpack S.T.A.L.K.E.R. - Clear Sky GOG." 3>&1 1>&2 2>&3)
     condactor(){
-    UNPACKPET=$(whiptail --title "Путь к дистрибутиву" --inputbox "Укажите путь в папку дистрибутива." 10 60 ~/ 3>&1 1>&2 2>&3)
+    UNPACKPET=$($DTOOLS --backtitle "OpenXRay Tools" --title "Путь к дистрибутиву" --inputbox "Укажите путь в папку дистрибутива." 10 60 ~/ 3>&1 1>&2 2>&3)
     exitstatus=$?
     if [ $exitstatus = 0 ];  then
-        DSETUP=$(whiptail --title "Путь к дистрибутиву" --inputbox "Укажите имя установочного файла, обычно он называется setup.exe
+        DSETUP=$($DTOOLS --backtitle "OpenXRay Tools" --title "Путь к дистрибутиву" --inputbox "Укажите имя установочного файла, обычно он называется setup.exe
 ==================================================================
 $(find $UNPACKPET -maxdepth 1 -name "*.exe")" 15 70 setup.exe 3>&1 1>&2 2>&3)
         exitstatus=$?
@@ -268,34 +269,38 @@ $(find $UNPACKPET -maxdepth 1 -name "*.exe")" 15 70 setup.exe 3>&1 1>&2 2>&3)
 
 main(){
 
-    OPTION=$(whiptail --title "Build Menu" --menu "The finished engine will be located $OUT" 15 70 4 \
-"1" "Brief reference." \
-"2" "Update the source tree. " \
-"3" "Build the OpenXRay engine." \
-"4" "Resource manager." 3>&1 1>&2 2>&3)
+    OPTION=$($DTOOLS --backtitle "OpenXRay Tools" --title "Build Menu" --menu "The finished engine will be located $OUT" 15 70 4 \
+    "1" "Brief reference." \
+    "2" "Update the source tree. " \
+    "3" "Build the OpenXRay engine." \
+    "4" "Resource manager." 3>&1 1>&2 2>&3)
 
     case $OPTION in
         *1*)
-        helps
+            clear
+            helps
         ;;
         *2*)
-        update_src
+            clear
+            update_src
         ;;
         *3*)
-        build
+            clear
+            build
         ;;
         *4*)
-        resmanager 
-        ;;
-        *255*)
-        echo "The ESC key has been pressed.";;
+            clear
+            resmanager 
     esac
+
+    clear
 }
 
 #=================================== Point of entry.
 
-    if test -f "/usr/bin/whiptail"; then
+    if test -f "/usr/bin/$DTOOLS"; then
         main
+        clear
     else
-        echo -e "\033[37;1;41mFor the script to work, you need to install the newt package.\033[0m"
+        echo -e "\033[37;1;41mFor the script to work, you need to install the dialog package.\033[0m"
     fi
