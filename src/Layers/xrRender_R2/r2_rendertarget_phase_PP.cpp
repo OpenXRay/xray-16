@@ -2,18 +2,8 @@
 
 void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
-#if defined(USE_OGL)
-    // XXX: OGL uniforms need to be separated by types. Otherwise, accessing them
-    // by a magical index will likely cause a wrong resource being selected (like 
-    // in the case below).
-    // This is happening because of flatten uniforms enumeration and the constants,
-    // which are obtained by reflection first, shift slots of the following texture
-    // bindings.
-    const u32 noise_slot_n = u_need_CM() ? 6 : 3;
-#else
-    const u32 noise_slot_n = 2;
-#endif
-    CTexture* T = RCache.get_ActiveTexture(noise_slot_n);
+    static shared_str noiseTextureName = "fx\\fx_noise2";
+    CTexture* T = RCache.GetBoundTextureByName(noiseTextureName, CTexture::rstPixel);
     VERIFY2(T, "Texture #3 in noise shader should be setted up");
     u32 tw = iCeil(float(T->get_Width()) * param_noise_scale + EPS_S);
     u32 th = iCeil(float(T->get_Height()) * param_noise_scale + EPS_S);

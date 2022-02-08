@@ -242,6 +242,29 @@ public:
         VERIFY(!"Invalid texture stage");
         return nullptr;
     }
+    CTexture* GetBoundTextureByName(shared_str name, u32 stage)
+    {
+        size_t maxSlot = 0;
+        CTexture** ptrArray = nullptr;
+
+        switch (stage)
+        {
+        case CTexture::rstPixel:
+            maxSlot = CTexture::mtMaxPixelShaderTextures;
+            ptrArray = textures_ps;
+            break;
+        default:
+            R_ASSERT2(0, "XXX: add other stages if needed");
+        }
+        for (int i = 0; i < maxSlot; ++ptrArray, ++i)
+        {
+            if (*ptrArray && ((*ptrArray)->cName == name))
+            {
+                return *ptrArray;
+            }
+        }
+        return nullptr;
+    }
 
 #if defined(USE_DX9)
     R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
