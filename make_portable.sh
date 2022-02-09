@@ -1,8 +1,7 @@
 #! /bin/bash
 
 DTOOLS="dialog"
-OUT=~/OpenXRay
-DEF_COPY_PATH=~
+OUT_DIR=$HOME/OpenXRay/
 OS_RELEASE_FILES=("/etc/os-release" "/usr/lib/os-release")
 
 #=================================== Help function.
@@ -139,129 +138,288 @@ On some distributions, packages may be split into two and prefixed with -dev or 
 
 build(){
     dependencies
-   rm -f -R bin
-   mkdir -p bin
-   cd bin
-   cmake .. -DCMAKE_BUILD_TYPE=Release \
-   -DCMAKE_INSTALL_PREFIX=/usr \
-   -DCMAKE_INSTALL_LIBDIR=lib
-   make -j$(nproc)
-   make DESTDIR=`pwd`/temp install
+    rm -f -R bin
+    mkdir -p bin
+    cd bin
+    cmake .. -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_INSTALL_LIBDIR=lib
+    make -j$(nproc)
+    make DESTDIR=`pwd`/temp install
 
-   mkdir -p $OUT/{bin,cop,cs}
-   cp -v temp/usr/bin/xr_3da $OUT/bin/
-   cp -v ../src/xr_3da/xr_3da.sh $OUT/bin/xr_3da.sh
-   chmod 755 $OUT/bin/xr_3da.sh
-   cp -v temp/usr/lib/*.so $OUT/bin/
-   cp -v -r temp/usr/share/openxray/* $OUT/cop/
-   cp -v -r temp/usr/share/openxray/* $OUT/cs/
+    mkdir -p $OUT_DIR/{bin,cop,cs}
+    cp -v temp/usr/bin/xr_3da $OUT_DIR/bin/
+    cp -v ../src/xr_3da/xr_3da.sh $OUT_DIR/bin/xr_3da.sh
+    chmod 755 $OUT_DIR/bin/xr_3da.sh
+    cp -v temp/usr/lib/*.so $OUT_DIR/bin/
+    cp -v -r temp/usr/share/openxray/* $OUT_DIR/cop/
+    cp -v -r temp/usr/share/openxray/* $OUT_DIR/cs/
 
-cat >$OUT/Start_cop.sh <<END
+cat >$OUT_DIR/Start_cop.sh <<END
 #!/bin/sh
 
 cd bin
 ./xr_3da.sh -fsltx ../cop/fsgame.ltx
 END
 
-cat >$OUT/Start_cs.sh <<END
+cat >$OUT_DIR/Start_cs.sh <<END
 #!/bin/sh
 
 cd bin
 ./xr_3da.sh -cs -fsltx ../cs/fsgame.ltx
 END
 
-    chmod 755 $OUT/Start_cop.sh
-    chmod 755 $OUT/Start_cs.sh
+    chmod 755 $OUT_DIR/Start_cop.sh
+    chmod 755 $OUT_DIR/Start_cs.sh
 
-    $DTOOLS --backtitle "OpenXRay Tools" --title "Completed" --msgbox "OpenXRay engine is built and placed in $OUT In order to run the game you should copy the game resources from the original licensed copy.
+    $DTOOLS --backtitle "OpenXRay Tools" --title "Completed" --msgbox "OpenXRay engine is built and placed in $OUT_DIR In order to run the game you should copy the game resources from the original licensed copy.
 
 You need to copy the following directories:
 levels, localization, mp, patches, resources" 12 70
     main
+    clear
 }
 
 #=================================== Copy function.
 
-res_copy(){
-    case $1 in
-        *cop*)
-        OUT_PATH=$OUT/cop
-        TITLES_GAME=Call\ of\ Pripyat
-        ;;
-        *cs*)
-        OUT_PATH=$OUT/cs
-        TITLES_GAME=Clear\ Sky
-        ;;
-        *)
-        echo "Error"
-        ;;
-    esac
+copyfile() {
+    DESTRDIR=$1
+    {
+        # Check for compatibility 
+        CSPATCHVER=`find $DESTRDIR -name xpatch_10.db`
+        if [[ -f $CSPATCHVER ]]; then
+            $DTOOLS --backtitle "OpenXRay Tools" --title "Detected" --msgbox "Distribution S.T.A.L.K.E.R.: Clear Sky version 1.5.10 detected." 10 60
+            GAMEDIR="cs"
+        else
+            COPATCHVER=`find $DESTRDIR -name xpatch_02.db`
+            if [[ -f $COPATCHVER ]]; then
+                $DTOOLS --backtitle "OpenXRay Tools" --title "Detected" --msgbox "Distribution S.T.A.L.K.E.R.: Call of Pripyat version 1.6.02 discovered." 10 60
+                GAMEDIR="cop"
+            else
+                $DTOOLS --backtitle "OpenXRay Tools" --title "ERROR!!!" \
+                --msgbox "No supported game version found! Make sure you specify the correct directory with the unpacked distribution of S.T.A.L.K.E.R.: Clear Sky version 1.5.10 or S.T.A.L.K.E.R.: Call of Pripyat version 1.6.02." 10 60
+                main
+            fi
+        fi
 
-    PET=$($DTOOLS --backtitle "OpenXRay Tools" --title "Copying game resources." --inputbox "Specify the directory with the installed game S.T.A.L.K.E.R. - $TITLES_GAME" 10 60 $DEF_COPY_PATH 3>&1 1>&2 2>&3)
-    exitstatus=$?
-    if [ $exitstatus = 0 ];  then
-        echo "Copying in progress, please wait..."
-        mkdir -p $OUT_PATH/{levels,localization,mp,patches,resources}
-        cp -r -u -v $PET/{levels,mp,patches,resources} $OUT_PATH
-        cp -r -u -v $PET/*ocalization/* $OUT_PATH/localization
-        $DTOOLS --backtitle "OpenXRay Tools" --title  "Done" --msgbox  "S.T.A.L.K.E.R - $TITLES_GAME resources copied successfully" 10 60
-        main
-    else
-        main
-    fi
+        # Preparing the target directory
+        rm -rf $OUT_DIR/$GAMEDIR/{levels,localization,mp,patches,resources}
+        mkdir -p $OUT_DIR/$GAMEDIR/{levels,localization,mp,patches,resources}
+
+        # Search for available localizations 
+        LANGEN="Not available"
+        FILEEN=`find $DESTRDIR -name xenglish.db`
+        if [[ -f $FILEEN ]]; then
+            LANGEN="Available"
+        fi
+
+        LANGFR="Not available"
+        FILEFR=`find $DESTRDIR -name xfrench.db`
+        if [[ -f $FILEFR ]]; then
+            LANGFR="Available"
+        fi
+
+        LANGDE="Not available"
+        FILEDE=`find $DESTRDIR -name xgerman.db`
+        if [[ -f $FILEDE ]]; then
+            LANGDE="Available"
+        fi
+
+        LANGIT="Not available"
+        FILEIT=`find $DESTRDIR -name xitalian.db`
+        if [[ -f $FILEIT ]]; then
+            LANGIT="Available"
+        fi
+
+        LANGSP="Not available"
+        FILESP=`find $DESTRDIR -name xspanish.db`
+        if [[ -f $FILESP ]]; then
+            LANGSP="Available"
+        fi
+
+        LANGRU="Not available"
+        FILERU=`find $DESTRDIR -name xrussian.db`
+        if [[ -f $FILERU ]]; then
+            LANGRU="Available"
+        fi
+
+        LANGPO="Not available"
+        FILEPO=`find $DESTRDIR -name xpolish_texts.db`
+        if [[ -f $FILEPO ]]; then
+            LANGPO="Available"
+        else
+            FILEPO=`find $DESTRDIR -name xpolish_mpck0.db`
+            if [[ -f $FILEPO ]]; then
+                LANGPO="Available"
+            fi
+        fi
+
+        # Localization selection dialog
+        # NOTE: I don't know yet how to add elements dynamically.
+        LANGUAGE=$($DTOOLS --backtitle "OpenXRay Tools" --title  "Language" --radiolist \
+        "Choose an available language pack" 15 60 4 \
+        "English" "$LANGEN" OFF \
+        "French" "$LANGFR" OFF \
+        "Deutsch" "$LANGDE" OFF \
+        "Italian" "$LANGIT" OFF \
+        "Spanish" "$LANGSP" OFF \
+        "Russian" "$LANGRU" OFF \
+        "Polish" "$LANGPO" OFF 3>&1 1>&2 2>&3)
+
+        case $LANGUAGE in
+            *English*)
+                LANGPACK="base_sounds.db xefis_movies.db xenglish.db"
+                let numfiles=3+35
+            ;;
+            *French*)
+                LANGPACK="base_sounds.db xefis_movies.db xfrench.db"
+                let numfiles=3+35
+            ;;
+            *Deutsch*)
+                LANGPACK="base_sounds.db xefis_movies.db xgerman.db"
+                let numfiles=3+35
+            ;;
+            *Italian*)
+                LANGPACK="base_sounds.db xefis_movies.db xitalian.db"
+                let numfiles=3+35
+            ;;
+            *Spanish*)
+                LANGPACK="base_sounds.db xefis_movies.db xspanish.db"
+                let numfiles=3+35
+            ;;
+            *Russian*)
+                LANGPACK="base_sounds.db xefis_movies.db xrussian.db"
+                let numfiles=3+35
+            ;;
+            *Polish*)
+                LANGPACK="base_sounds.db xpolish_texts.db xrus_sounds.db xxpolish_sounds.db xpolish_mpck0.db xpolish_p_patch.db"
+                let numfiles=6+35
+            ;;
+            *)
+                # FIXME: When canceling, we return to the main menu as intended, but when you exit the main menu, the search for files begins instead of just exiting 
+                main
+                clear
+            ;;
+        esac
+    }
+
+    {
+        # Search and copy all available patches
+        for RESFILE in xpatch_02.db xpatch_03_steam.db xpatch_04.db xpatch_05.db xpatch_07.db xpatch_08.db xpatch_10.db
+        do
+            let i++
+            find $DESTRDIR -name $RESFILE -exec cp {} $OUT_DIR/$GAMEDIR/patches \;
+            echo "scale=2;$i/$numfiles*100" | bc -l | cut -d. -f1
+        done
+
+        # Search and copy resources
+        let i++
+        find $DESTRDIR -name configs.db -exec cp {} $OUT_DIR/$GAMEDIR/resources \;
+        echo "scale=2;$i/$numfiles*100" | bc -l | cut -d. -f1
+
+        for RESFILE in levels.db0 levels.db1 levels.db2 resources.db0 resources.db1 resources.db2 resources.db3 resources.db4
+        do
+            let i++
+            find $DESTRDIR -name $RESFILE -exec cp {} $OUT_DIR/$GAMEDIR/${RESFILE%.*} \;
+            echo "scale=2;$i/$numfiles*100" | bc -l | cut -d. -f1
+        done
+
+        # Search and copy multiplayer maps
+        # NOTE: At the moment, multiplayer is not supported, maybe it's not worth copying and saving about 800 megabytes of disk space?
+        for RESFILE in mp_agroprom.db mp_atp.db mp_autostation.db mp_bath.db mp_darkvalley.db mp_factory.db mp_firestation.db mp_garbage.db mp_limansk.db mp_lost_village.db mp_pool.db mp_railroad.db mp_rembasa.db mp_rostok.db mp_sport_center.db mp_workshop.db mp_pripyat.db mp_close_combat.db mp_military1.db
+        do
+            let i++
+            find $DESTRDIR -name $RESFILE -exec cp {} $OUT_DIR/$GAMEDIR/mp \;
+            echo "scale=2;$i/$numfiles*100" | bc -l | cut -d. -f1
+        done
+
+        # Finding and copying localization files
+        for RESFILE in $LANGPACK
+        do
+            let i++
+            find $DESTRDIR -name $RESFILE -exec cp {} $OUT_DIR/$GAMEDIR/localization \;
+            echo "scale=2;$i/$numfiles*100" | bc -l | cut -d. -f1
+        done
+
+    } | $DTOOLS --backtitle "OpenXRay Tools" --gauge "Copying files..." 6 60 0
+
+    clear
 }
 
 #=================================== Resource manager function.
 
-resmanager(){
-    RES=$($DTOOLS --backtitle "OpenXRay Tools" --title "Resource manager." --menu "Доступные операции." 15 70 7 \
-"1" "Справка по меню." \
-"2" "Copy files S.T.A.L.K.E.R. - Call of Pripyat." \
-"3" "Copy files S.T.A.L.K.E.R. - Clear Sky." \
-"4" "Unpack S.T.A.L.K.E.R. - Call of Pripyat." \
-"5" "Unpack S.T.A.L.K.E.R. - Call of Pripyat GOG." \
-"6" "Unpack S.T.A.L.K.E.R. - Clear Sky." \
-"7" "Unpack S.T.A.L.K.E.R. - Clear Sky GOG." 3>&1 1>&2 2>&3)
-    condactor(){
-    UNPACKPET=$($DTOOLS --backtitle "OpenXRay Tools" --title "Путь к дистрибутиву" --inputbox "Укажите путь в папку дистрибутива." 10 60 ~/ 3>&1 1>&2 2>&3)
-    exitstatus=$?
-    if [ $exitstatus = 0 ];  then
-        DSETUP=$($DTOOLS --backtitle "OpenXRay Tools" --title "Путь к дистрибутиву" --inputbox "Укажите имя установочного файла, обычно он называется setup.exe
-==================================================================
-$(find $UNPACKPET -maxdepth 1 -name "*.exe")" 15 70 setup.exe 3>&1 1>&2 2>&3)
-        exitstatus=$?
-        if [ $exitstatus = 1 ];  then
-            main
-        fi
-    else
-        main
-    fi
-}
+resmanager() {
+
+    unpack_distribution() {
+
+        DSETUP=$($DTOOLS --backtitle "OpenXRay Tools" --stdout --title "Select setup file (setup.exe) " --fselect $HOME/ 15 80)
+
+        case $? in
+            *0*)
+                clear
+                innoextract $DSETUP $1
+                copyfile $OUT_DIR/temp/
+                main
+                clear
+            ;;
+            *1*)
+                clear
+                resmanager
+                clear
+            ;;
+            *)
+                clear
+                resmanager
+                clear
+            ;;
+        esac
+    }
+
+    RES=$($DTOOLS --backtitle "OpenXRay Tools" --title "Resource manager." --menu "Available actions." 15 70 7 \
+    "1" "Справка по меню." \
+    "2" "Copy files S.T.A.L.K.E.R." \
+    "3" "Unpack distribution S.T.A.L.K.E.R." \
+    "4" "Unpack GOG distribution S.T.A.L.K.E.R." 3>&1 1>&2 2>&3)
+
+
     case $RES in
         *1*)
-        helpres
+            helpres
         ;;
         *2*)
-        res_copy *cop*
+            DIRS=$($DTOOLS --backtitle "OpenXRay Tools" --title "Specify a directory" --stdout --dselect $HOME/ 15 80)
+            case $? in
+                *0*)
+                    clear
+                    copyfile $DIRS
+                    clear
+                ;;
+                *1*)
+                    clear
+                    resmanager
+                    clear
+                ;;
+                *)
+                    clear
+                    resmanager
+                    clear
+                ;;
+            esac
         ;;
         *3*)
-        res_copy *cs*
+            rm -fr $OUT_DIR/temp/
+            unpack_distribution "-L -m -d $OUT_DIR/temp/"
+            rm -fr $OUT_DIR/temp/
         ;;
         *4*)
-        condactor
-        innoextract $UNPACKPET/$DSETUP -L -d $UNPACKPET/temp
-        ;;
-        *5*)
-        innoextract $UNPACKPET/$DSETUP -L --gog -d $UNPACKPET/temp
-        ;;
-        *6*)
-        innoextract $UNPACKPET/$DSETUP -L -d $UNPACKPET/temp
-        ;;
-        *7*)
-        innoextract $UNPACKPET/$DSETUP -L --gog -d $UNPACKPET/temp
+            rm -fr $OUT_DIR/temp/
+            unpack_distribution "-L -m --gog -d $OUT_DIR/temp/"
+            rm -fr $OUT_DIR/temp/
         ;;
         *)
-        main
+            main
+            clear
+        ;;
     esac
 }
 
@@ -269,7 +427,7 @@ $(find $UNPACKPET -maxdepth 1 -name "*.exe")" 15 70 setup.exe 3>&1 1>&2 2>&3)
 
 main(){
 
-    OPTION=$($DTOOLS --backtitle "OpenXRay Tools" --title "Build Menu" --menu "The finished engine will be located $OUT" 15 70 4 \
+    OPTION=$($DTOOLS --cancel-label "Exit" --backtitle "OpenXRay Tools" --title "Build Menu" --menu "The finished engine will be located $OUT_DIR" 15 70 4 \
     "1" "Brief reference." \
     "2" "Update the source tree. " \
     "3" "Build the OpenXRay engine." \
