@@ -236,7 +236,7 @@ void CCar::OnControllerPress(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scale = (active_camera->f_fov / g_fov) * psControllerSens * psControllerSensScale / 50.f;
+        const float scale = (active_camera->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f;
         OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
     }
@@ -298,7 +298,7 @@ void CCar::OnControllerHold(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scale = (active_camera->f_fov / g_fov) * psControllerSens * psControllerSensScale / 50.f;
+        const float scale = (active_camera->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f;
         OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
     }

@@ -66,7 +66,7 @@ void CWeaponStatMgun::OnControllerPress(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scale = psControllerSens * psControllerSensScale / 50.f;
+        const float scale = psControllerStickSens * psControllerStickSensScale / 50.f;
         OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
     }
@@ -101,7 +101,7 @@ void CWeaponStatMgun::OnControllerHold(int cmd, float x, float y)
     switch (cmd)
     {
     case kLOOK_AROUND:
-        const float scale = psControllerSens * psControllerSensScale / 50.f;
+        const float scale = psControllerStickSens * psControllerStickSensScale / 50.f;
         OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
     }; // switch (cmd)

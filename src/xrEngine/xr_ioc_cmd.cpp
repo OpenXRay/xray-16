@@ -839,10 +839,10 @@ void CCC_Register()
 
     // Gamepad
     CMD3(CCC_Mask, "gamepad_invert_y", &psControllerInvertY, 1);
-    psControllerSens = 0.02f;
-    CMD4(CCC_Float, "gamepad_sens", &psControllerSens, 0.001f, 0.6f);
-    psControllerDeadZoneSens = 15.f;
-    CMD4(CCC_Float, "gamepad_deadzone_sens", &psControllerDeadZoneSens, 1.f, 35.f);
+    psControllerStickSens = 0.02f;
+    CMD4(CCC_Float, "gamepad_stick_sens", &psControllerStickSens, 0.001f, 0.6f);
+    psControllerStickDeadZone = 15.f;
+    CMD4(CCC_Float, "gamepad_stick_deadzone", &psControllerStickDeadZone, 1.f, 35.f);
 
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);

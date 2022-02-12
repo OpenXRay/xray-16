@@ -14,9 +14,9 @@ ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
 ENGINE_API Flags32 psMouseInvert = {false};
 
-ENGINE_API float psControllerSens = 1.f;
-ENGINE_API float psControllerSensScale = 1.f;
-ENGINE_API float psControllerDeadZoneSens = 0.f;
+ENGINE_API float psControllerStickSens = 1.f;
+ENGINE_API float psControllerStickSensScale = 1.f;
+ENGINE_API float psControllerStickDeadZone = 0.f;
 ENGINE_API Flags32 psControllerInvertY = { false };
 
 static bool AltF4Pressed = false;
@@ -265,7 +265,7 @@ void CInput::ControllerUpdate()
     if (!IsControllerAvailable())
         return;
 
-    const int controllerDeadZone = int(psControllerDeadZoneSens * (SDL_JOYSTICK_AXIS_MAX / 100.f)); // raw
+    const int controllerDeadZone = int(psControllerStickDeadZone * (SDL_JOYSTICK_AXIS_MAX / 100.f)); // raw
 
     const auto controllerPrev = controllerState;
     decltype(controllerAxisState) controllerAxisStatePrev;

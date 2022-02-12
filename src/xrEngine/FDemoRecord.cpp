@@ -735,7 +735,7 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
     case kLOOK_AROUND:
     {
         m_angle_speed = speed;
-        const float scale = .05f; // psControllerSens;
+        const float scale = .05f; // psControllerStickSens;
         OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
     }
