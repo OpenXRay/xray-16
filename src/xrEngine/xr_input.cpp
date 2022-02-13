@@ -82,7 +82,9 @@ void CInput::OpenController(int idx)
     if (!controller)
         return;
 
+#if SDL_VERSION_ATLEAST(2, 0, 14)
     SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+#endif
     controllers.emplace_back(controller);
 }
 
@@ -274,8 +276,14 @@ void CInput::ControllerUpdate()
     decltype(controllerAxisState) controllerAxisStatePrev;
     CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
 
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+    constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERSENSORUPDATE;
+#else
+    constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERDEVICEREMAPPED;
+#endif
+
     count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERSENSORUPDATE);
+        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, MAX_EVENT);
 
     for (int i = 0; i < count; ++i)
     {
@@ -333,6 +341,7 @@ void CInput::ControllerUpdate()
             break;
         }
 
+#if SDL_VERSION_ATLEAST(2, 0, 14)
         case SDL_CONTROLLERSENSORUPDATE:
         {
             if (last_input_controller != event.csensor.which) // only use data from the recently used controller
@@ -345,6 +354,7 @@ void CInput::ControllerUpdate()
                 cbStack.back()->IR_OnControllerAttitudeChange(gyro);
             break;
         }
+#endif
         } // switch (event.type)
     }
 
