@@ -57,5 +57,6 @@ ENGINE_API extern float psControllerStickDeadZone;
 ENGINE_API extern float psControllerSensorSens;
 ENGINE_API extern float psControllerSensorDeadZone;
 ENGINE_API extern Flags32 psControllerInvertY;
+ENGINE_API extern Flags32 psControllerEnableSensors;
 
 #endif

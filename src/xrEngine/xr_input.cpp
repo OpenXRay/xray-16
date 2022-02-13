@@ -20,6 +20,7 @@ ENGINE_API float psControllerStickDeadZone = 0.f;
 ENGINE_API float psControllerSensorSens = 1.f;
 ENGINE_API float psControllerSensorDeadZone = 0.f;
 ENGINE_API Flags32 psControllerInvertY = { false };
+ENGINE_API Flags32 psControllerEnableSensors = { true };
 
 static bool AltF4Pressed = false;
 
@@ -83,9 +84,16 @@ void CInput::OpenController(int idx)
         return;
 
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-    SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+    if (psControllerEnableSensors.test(1))
+        SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
 #endif
     controllers.emplace_back(controller);
+}
+
+void CInput::EnableControllerSensors(bool enable)
+{
+    for (auto controller : controllers)
+        SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, enable ? SDL_TRUE : SDL_FALSE);
 }
 
 //-----------------------------------------------------------------------

@@ -152,6 +152,7 @@ public:
     IInputReceiver* CurrentIR();
 
     bool IsControllerAvailable() const { return !controllers.empty(); }
+    void EnableControllerSensors(bool enable);
 
 public:
     void ExclusiveMode(const bool exclusive);
