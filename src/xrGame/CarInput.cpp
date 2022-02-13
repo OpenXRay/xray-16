@@ -354,6 +354,11 @@ void CCar::OnControllerHold(int cmd, float x, float y)
     }
 }
 
+void CCar::OnControllerAttitudeChange(Fvector change)
+{
+    const float scale = (active_camera->f_fov / g_fov) * psControllerSensorSens / 50.f;
+    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+}
 
 void CCar::Action(u16 id, u32 flags)
 {

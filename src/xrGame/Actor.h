@@ -449,6 +449,8 @@ public:
     void IR_OnControllerRelease(int dik, float x, float y) override;
     void IR_OnControllerHold(int dik, float x, float y) override;
 
+    void IR_OnControllerAttitudeChange(Fvector change) override;
+
     virtual float GetLookFactor();
 
 private:

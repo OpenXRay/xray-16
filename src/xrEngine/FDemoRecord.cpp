@@ -810,6 +810,18 @@ void CDemoRecord::IR_OnControllerRelease(int key, float x, float y)
     }
 }
 
+void CDemoRecord::IR_OnControllerAttitudeChange(Fvector change)
+{
+    if (m_b_redirect_input_to_level)
+    {
+        g_pGameLevel->IR_OnControllerAttitudeChange(change);
+        return;
+    }
+    
+    const float scale = 5.f; // psControllerSensorSens;
+    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+}
+
 void CDemoRecord::RecordKey()
 {
     Fmatrix g_matView;

@@ -24,13 +24,19 @@ public:
     virtual void UpdateEx(float fov){}; // called by owner
     virtual CHolderCustom* cast_holder_custom() { return this; }
     bool Engaged() { return m_owner != NULL; }
+
     virtual void OnMouseMove(int x, int y) = 0;
+
     virtual void OnKeyboardPress(int dik) = 0;
     virtual void OnKeyboardRelease(int dik) = 0;
     virtual void OnKeyboardHold(int dik) = 0;
+
     virtual void OnControllerPress(int cmd, float x, float y) = 0;
     virtual void OnControllerRelease(int cmd, float x, float y) = 0;
     virtual void OnControllerHold(int cmd, float x, float y) = 0;
+
+    virtual void OnControllerAttitudeChange(Fvector change) = 0;
+
     // Inventory for the car
     virtual CInventory* GetInventory() = 0;
 

@@ -322,6 +322,8 @@ public:
     void IR_OnControllerRelease(int key, float x, float y) override;
     void IR_OnControllerHold(int key, float x, float y) override;
 
+    void IR_OnControllerAttitudeChange(Fvector change) override;
+
     void IR_OnActivate(void) override;
 
     // Returns respawn point ID

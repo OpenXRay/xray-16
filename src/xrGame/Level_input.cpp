@@ -731,6 +731,32 @@ void CLevel::IR_OnControllerHold(int key, float x, float y)
     }
 }
 
+void CLevel::IR_OnControllerAttitudeChange(Fvector change)
+{
+    if (g_bDisableAllInput)
+        return;
+
+    if (g_actor)
+    {
+        g_actor->callback(GameObject::eControllerAttitudeChange)(change);
+    }
+
+#ifndef MASTER_GOLD
+    if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+    {
+        if (Device.Paused() && !IsDemoPlay())
+            return;
+    }
+
+    if (CURRENT_ENTITY())
+    {
+        IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
+        if (IR)
+            IR->IR_OnControllerAttitudeChange(change);
+    }
+}
+
 void CLevel::IR_OnActivate()
 {
     if (!pInput)

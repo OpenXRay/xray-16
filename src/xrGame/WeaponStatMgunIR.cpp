@@ -106,3 +106,9 @@ void CWeaponStatMgun::OnControllerHold(int cmd, float x, float y)
         break;
     }; // switch (cmd)
 }
+
+void CWeaponStatMgun::OnControllerAttitudeChange(Fvector change)
+{
+    const float scale = psControllerSensorSens / 50.f;
+    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+}
