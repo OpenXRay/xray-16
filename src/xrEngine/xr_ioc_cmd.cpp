@@ -844,8 +844,8 @@ void CCC_Register()
     psControllerStickDeadZone = 15.f;
     CMD4(CCC_Float, "gamepad_stick_deadzone", &psControllerStickDeadZone, 1.f, 35.f);
     psControllerSensorSens = 0.5f;
-    CMD4(CCC_Float, "gamepad_sensor_sens", &psControllerSensorSens, 0.01f, 2.f);
-    psControllerSensorDeadZone = 0.05f;
+    CMD4(CCC_Float, "gamepad_sensor_sens", &psControllerSensorSens, 0.01f, 3.f);
+    psControllerSensorDeadZone = 0.005f;
     CMD4(CCC_Float, "gamepad_sensor_deadzone", &psControllerSensorDeadZone, 0.001f, 1.f);
 
     // Camera
