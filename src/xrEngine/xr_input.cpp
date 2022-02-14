@@ -92,8 +92,10 @@ void CInput::OpenController(int idx)
 
 void CInput::EnableControllerSensors(bool enable)
 {
+#if SDL_VERSION_ATLEAST(2, 0, 14)
     for (auto controller : controllers)
         SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, enable ? SDL_TRUE : SDL_FALSE);
+#endif
 }
 
 //-----------------------------------------------------------------------
