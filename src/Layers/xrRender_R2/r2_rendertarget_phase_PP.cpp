@@ -4,6 +4,11 @@ void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
     static shared_str noiseTextureName = "fx\\fx_noise2";
     CTexture* T = RCache.GetBoundTextureByName(noiseTextureName, CTexture::rstPixel);
+    if (T == nullptr)
+    {
+        // fallback to vanilla policy, in case if the texture was renamed
+        T = RCache.get_ActiveTexture(2);
+    }
     VERIFY2(T, "Texture #3 in noise shader should be setted up");
     u32 tw = iCeil(float(T->get_Width()) * param_noise_scale + EPS_S);
     u32 th = iCeil(float(T->get_Height()) * param_noise_scale + EPS_S);
