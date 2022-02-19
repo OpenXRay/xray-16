@@ -202,7 +202,7 @@ void CBlender_Screen_SET::CompileProgrammed(CBlender_Compile& C)
     }
 
     VERIFY2(C.L_textures.size() > 0, "Not enough textures");
-    const u32 stage = C.SampledImage("s_base", "s_base", C.L_textures[0]);
+    const u32 stage = C.SampledImage("smp_base", "s_base", C.L_textures[0]);
     if (oClamp.value)
     {
         C.i_Address(stage, D3DTADDRESS_CLAMP);
