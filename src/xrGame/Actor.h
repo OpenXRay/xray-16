@@ -530,7 +530,7 @@ public:
     virtual void net_Destroy();
     virtual bool net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
     virtual void net_Relcase(IGameObject* O); //
-    virtual void xr_stdcall on_requested_spawn(IGameObject* object);
+    virtual void on_requested_spawn(IGameObject* object);
     // object serialization
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);

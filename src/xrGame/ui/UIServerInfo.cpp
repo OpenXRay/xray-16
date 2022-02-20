@@ -137,7 +137,7 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
     m_text_body->AdjustHeightToText();
 }
 
-void xr_stdcall CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
+void CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
 {
     game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(mp_game);
@@ -146,7 +146,7 @@ void xr_stdcall CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
     mp_game->OnSpectatorSelect();
 }
 
-void xr_stdcall CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
+void CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
 {
     game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(mp_game);

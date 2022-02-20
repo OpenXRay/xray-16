@@ -190,7 +190,7 @@ public:
     game_cl_mp();
     virtual ~game_cl_mp();
 
-    void xr_stdcall OnBuySpawn(CUIWindow* pWnd, void* p);
+    void OnBuySpawn(CUIWindow* pWnd, void* p);
     virtual void TranslateGameMessage(u32 msg, NET_Packet& P);
     virtual void CommonMessageOut(pcstr msg);
 

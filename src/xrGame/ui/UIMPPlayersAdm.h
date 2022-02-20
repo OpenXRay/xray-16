@@ -33,7 +33,7 @@ public:
     void Init(CUIXml& xml_doc);
     void RefreshPlayersList();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
-    void xr_stdcall FillPlayersList(u32 const);
+    void FillPlayersList(u32 const);
     void SetMaxPingLimit();
     void SetMaxPingLimitText();
     void GetSelPlayerScreenshot();

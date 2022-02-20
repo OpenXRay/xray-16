@@ -59,10 +59,10 @@ private:
     typedef property_collection<weather_container_type, manager> collection_type;
 
 private:
-    pcstr const* xr_stdcall weathers_getter() const;
-    u32 xr_stdcall weathers_size_getter() const;
-    pcstr const* xr_stdcall frames_getter(pcstr weather_id) const;
-    u32 xr_stdcall frames_size_getter(pcstr weather_id) const;
+    pcstr const* weathers_getter() const;
+    u32 weathers_size_getter() const;
+    pcstr const* frames_getter(pcstr weather_id) const;
+    u32 frames_size_getter(pcstr weather_id) const;
 
 private:
     weather_container_type m_weathers;

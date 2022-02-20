@@ -43,10 +43,10 @@ public:
 protected:
     void Register_callbacks();
 
-    void xr_stdcall nothing();
-    void xr_stdcall press_escape();
-    void xr_stdcall press_commit();
-    void xr_stdcall press_tab();
+    void nothing();
+    void press_escape();
+    void press_commit();
+    void press_tab();
 
 protected:
     typedef fastdelegate::FastDelegate0<void> Callback;

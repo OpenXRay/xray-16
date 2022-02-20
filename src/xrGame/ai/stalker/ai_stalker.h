@@ -730,7 +730,7 @@ private:
     void on_enemy_wounded_or_killed(const CAI_Stalker* wounded_or_killed);
     void notify_on_wounded_or_killed(IGameObject* object);
     void notify_on_wounded_or_killed();
-    void xr_stdcall remove_critical_hit();
+    void remove_critical_hit();
     //////////////////////////////////////////////////////////////////////////
 private:
     bool m_registered_in_combat_on_migration;

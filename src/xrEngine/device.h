@@ -191,11 +191,11 @@ public:
     bool Paused();
 
 private:
-    void xr_stdcall ProcessParallelSequence(Task&, void*);
+    void ProcessParallelSequence(Task&, void*);
 
 public:
     // Scene control
-    void xr_stdcall ProcessFrame();
+    void ProcessFrame();
 
     void PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input);
 
@@ -292,7 +292,7 @@ private:
 
 public:
 #if !defined(XR_PLATFORM_LINUX)
-    bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
+    bool on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif
 
 private:

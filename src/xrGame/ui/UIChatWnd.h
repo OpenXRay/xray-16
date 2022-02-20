@@ -35,6 +35,6 @@ protected:
     Frect inprogress_prefix_rect;
     Frect inprogress_edit_rect;
 
-    void xr_stdcall OnChatCommit(CUIWindow* w, void* d);
-    void xr_stdcall OnChatCancel(CUIWindow* w, void* d);
+    void OnChatCommit(CUIWindow* w, void* d);
+    void OnChatCancel(CUIWindow* w, void* d);
 };

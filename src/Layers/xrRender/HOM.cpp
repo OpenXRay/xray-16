@@ -271,7 +271,7 @@ void CHOM::Render(CFrustum& base)
     stats.Total.End();
 }
 
-void xr_stdcall CHOM::MT_RENDER(Task& /*thisTask*/, void* /*data*/)
+void CHOM::MT_RENDER(Task& /*thisTask*/, void* /*data*/)
 {
     CFrustum ViewBase;
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);

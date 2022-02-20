@@ -257,15 +257,15 @@ protected:
     xr_vector<EDDListType> m_allowed_drops[iListTypeMax];
     bool AllowItemDrops(EDDListType from, EDDListType to);
 
-    bool xr_stdcall OnItemDrop(CUICellItem* itm);
-    bool xr_stdcall OnItemStartDrag(CUICellItem* itm);
-    bool xr_stdcall OnItemDbClick(CUICellItem* itm);
-    bool xr_stdcall OnItemSelected(CUICellItem* itm);
-    bool xr_stdcall OnItemRButtonClick(CUICellItem* itm);
-    bool xr_stdcall OnItemFocusReceive(CUICellItem* itm);
-    bool xr_stdcall OnItemFocusLost(CUICellItem* itm);
-    bool xr_stdcall OnItemFocusedUpdate(CUICellItem* itm);
-    void xr_stdcall OnDragItemOnTrash(CUIDragItem* item, bool b_receive);
+    bool OnItemDrop(CUICellItem* itm);
+    bool OnItemStartDrag(CUICellItem* itm);
+    bool OnItemDbClick(CUICellItem* itm);
+    bool OnItemSelected(CUICellItem* itm);
+    bool OnItemRButtonClick(CUICellItem* itm);
+    bool OnItemFocusReceive(CUICellItem* itm);
+    bool OnItemFocusLost(CUICellItem* itm);
+    bool OnItemFocusedUpdate(CUICellItem* itm);
+    void OnDragItemOnTrash(CUIDragItem* item, bool b_receive);
     bool OnItemDropped(PIItem itm, CUIDragDropListEx* new_owner, CUIDragDropListEx* old_owner);
 
     void ResetMode();
@@ -299,7 +299,7 @@ protected:
 
     void ActivatePropertiesBox();
     void TryHidePropertiesBox();
-    void xr_stdcall ProcessPropertiesBoxClicked(CUIWindow* w, void* d);
+    void ProcessPropertiesBoxClicked(CUIWindow* w, void* d);
 
     void CheckDistance();
     void UpdateItemsPlace();
@@ -320,7 +320,7 @@ protected:
     void UpdateOutfit();
     void MoveArtefactsToBag();
     bool TryActiveSlot(CUICellItem* itm);
-    void xr_stdcall TryRepairItem(CUIWindow* w, void* d);
+    void TryRepairItem(CUIWindow* w, void* d);
     bool CanUpgradeItem(PIItem item);
 
     bool ToActorTrade(CUICellItem* itm, bool b_use_cursor_pos);
@@ -366,8 +366,8 @@ public:
 
     void CallMessageBoxYesNo(LPCSTR text);
     void CallMessageBoxOK(LPCSTR text);
-    void xr_stdcall OnMesBoxYes(CUIWindow*, void*);
-    void xr_stdcall OnMesBoxNo(CUIWindow*, void*);
+    void OnMesBoxYes(CUIWindow*, void*);
+    void OnMesBoxNo(CUIWindow*, void*);
 
     void OnInventoryAction(PIItem pItem, u16 action_type);
     void ShowRepairButton(bool status);
@@ -380,12 +380,12 @@ public:
     void UpdatePartnerBag();
     void UpdateDeadBodyBag();
 
-    void xr_stdcall OnBtnPerformTrade(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPerformTradeBuy(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPerformTradeSell(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnExitClicked(CUIWindow* w, void* d);
-    void xr_stdcall TakeAllFromPartner(CUIWindow* w, void* d);
-    void xr_stdcall StoreAllToPartner(CUIWindow* w, void* d);
+    void OnBtnPerformTrade(CUIWindow* w, void* d);
+    void OnBtnPerformTradeBuy(CUIWindow* w, void* d);
+    void OnBtnPerformTradeSell(CUIWindow* w, void* d);
+    void OnBtnExitClicked(CUIWindow* w, void* d);
+    void TakeAllFromPartner(CUIWindow* w, void* d);
+    void StoreAllToPartner(CUIWindow* w, void* d);
     void TakeAllFromInventoryBox();
     void StoreAllToInventoryBox();
 

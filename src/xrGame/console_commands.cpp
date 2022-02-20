@@ -1793,7 +1793,7 @@ private:
     std::atomic<bool> m_checkInProgress = false;
     bool m_informNoPatch = true;
 
-    void xr_stdcall ResultCallback(bool success, pcstr VersionName, pcstr URL)
+    void ResultCallback(bool success, pcstr VersionName, pcstr URL)
     {
         auto mm = MainMenu();
         if ((success || m_informNoPatch) && mm != nullptr)

@@ -70,21 +70,21 @@ private:
 
     void UpdateNav();
 
-    void xr_stdcall OnBtnLegend_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnUp_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnZoomMore_Push(CUIWindow*, void*);
+    void OnBtnLegend_Push(CUIWindow*, void*);
+    void OnBtnUp_Push(CUIWindow*, void*);
+    void OnBtnZoomMore_Push(CUIWindow*, void*);
 
-    void xr_stdcall OnBtnLeft_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnActor_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnRight_Push(CUIWindow*, void*);
+    void OnBtnLeft_Push(CUIWindow*, void*);
+    void OnBtnActor_Push(CUIWindow*, void*);
+    void OnBtnRight_Push(CUIWindow*, void*);
 
-    void xr_stdcall OnBtnZoomLess_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnDown_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnZoomReset_Push(CUIWindow*, void*);
+    void OnBtnZoomLess_Push(CUIWindow*, void*);
+    void OnBtnDown_Push(CUIWindow*, void*);
+    void OnBtnZoomReset_Push(CUIWindow*, void*);
 
 private:
-    void xr_stdcall OnScrollV(CUIWindow*, void*);
-    void xr_stdcall OnScrollH(CUIWindow*, void*);
+    void OnScrollV(CUIWindow*, void*);
+    void OnScrollH(CUIWindow*, void*);
 
     void OnToolNextMapClicked(CUIWindow*, void*);
     void OnToolPrevMapClicked(CUIWindow*, void*);

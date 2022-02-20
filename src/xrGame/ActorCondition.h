@@ -82,8 +82,8 @@ public:
     void ConditionWalk(float weight, bool accel, bool sprint);
     void ConditionStand(float weight);
     IC float MaxWalkWeight() const { return m_MaxWalkWeight; }
-    float xr_stdcall GetAlcohol() { return m_fAlcohol; }
-    float xr_stdcall GetPsy() { return 1.0f - GetPsyHealth(); }
+    float GetAlcohol() { return m_fAlcohol; }
+    float GetPsy() { return 1.0f - GetPsyHealth(); }
     float GetSatiety() { return m_fSatiety; }
     IC float GetSatietyPower() const { return m_fV_SatietyPower * m_fSatiety; };
     void AffectDamage_InjuriousMaterialAndMonstersInfluence();
@@ -178,7 +178,7 @@ class CActorDeathEffector
     ref_sound m_death_sound;
     bool m_b_actual;
     float m_start_health;
-    void xr_stdcall OnPPEffectorReleased();
+    void OnPPEffectorReleased();
 
 public:
     CActorDeathEffector(CActorCondition* parent, LPCSTR sect); // -((

@@ -64,7 +64,7 @@ private:
 
 public:
     explicit PathIncludePred(const xr_auth_strings_t* ignoredPaths) : ignored(ignoredPaths) {}
-    bool xr_stdcall IsIncluded(pcstr path)
+    bool IsIncluded(pcstr path)
     {
         if (!ignored)
             return true;

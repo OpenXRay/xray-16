@@ -183,20 +183,20 @@ public:
 
     void SwitchToMultiplayerMenu();
 
-    void xr_stdcall OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL);
-    void xr_stdcall OnDownloadPatch(CUIWindow*, void*);
-    void xr_stdcall OnConnectToMasterServerOkClicked(CUIWindow*, void*);
+    void OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL);
+    void OnDownloadPatch(CUIWindow*, void*);
+    void OnConnectToMasterServerOkClicked(CUIWindow*, void*);
 
     void Show_DownloadMPMap(LPCSTR text, LPCSTR url);
-    void xr_stdcall OnDownloadMPMap_CopyURL(CUIWindow*, void*);
-    void xr_stdcall OnDownloadMPMap(CUIWindow*, void*);
+    void OnDownloadMPMap_CopyURL(CUIWindow*, void*);
+    void OnDownloadMPMap(CUIWindow*, void*);
 
     void OnSessionTerminate(LPCSTR reason);
     void OnLoadError(LPCSTR module);
 
-    void xr_stdcall OnDownloadPatchResult(bool success);
-    void xr_stdcall OnDownloadPatchProgress(u64 received, u64 total);
-    void xr_stdcall OnRunDownloadedPatch(CUIWindow*, void*);
+    void OnDownloadPatchResult(bool success);
+    void OnDownloadPatchProgress(u64 received, u64 total);
+    void OnRunDownloadedPatch(CUIWindow*, void*);
 
     void Show_CTMS_Dialog();
     void Hide_CTMS_Dialog();
