@@ -41,7 +41,7 @@ public:
     void SetTaskState(const TASK_ID& id, ETaskState state);
     void SetTaskState(CGameTask* t, ETaskState state);
 
-    void __stdcall UpdateTasks();
+    void UpdateTasks();
 
     CGameTask* ActiveTask(ETaskType type = eTaskTypeStoryline);
     //void SetActiveTask(const TASK_ID& id, ETaskType type = eTaskTypeStoryline);

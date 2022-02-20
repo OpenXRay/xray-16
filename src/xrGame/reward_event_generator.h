@@ -53,7 +53,7 @@ private:
 
     u32 const m_max_rewards;
     u32 m_rewarded;
-    void __stdcall AddRewardTask(u32 award_id);
+    void AddRewardTask(u32 award_id);
 }; // class reward_event_generator
 
 } // namespace award_system

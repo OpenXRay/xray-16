@@ -436,16 +436,16 @@ XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_ac
 XRPHYSICS_API CPhysicsShell* P_build_Shell(
     IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map, LPCSTR fixed_bones);
 
-extern "C" XRPHYSICS_API CPhysicsShell* __stdcall P_build_Shell(
+extern "C" XRPHYSICS_API CPhysicsShell* P_build_Shell(
     IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map = 0, bool not_set_bone_callbacks = false);
 
 XRPHYSICS_API CPhysicsShell* P_build_SimpleShell(IPhysicsShellHolder* obj, float mass, bool not_active_state);
 XRPHYSICS_API void ApplySpawnIniToPhysicShell(CInifile const* ini, CPhysicsShell* physics_shell, bool fixed);
 void fix_bones(LPCSTR fixed_bones, CPhysicsShell* shell);
 
-extern "C" XRPHYSICS_API void __stdcall destroy_physics_shell(CPhysicsShell*& p);
+extern "C" XRPHYSICS_API void destroy_physics_shell(CPhysicsShell*& p);
 
-extern "C" XRPHYSICS_API bool __stdcall can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O);
+extern "C" XRPHYSICS_API bool can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O);
 
 struct NearestToPointCallback
 {

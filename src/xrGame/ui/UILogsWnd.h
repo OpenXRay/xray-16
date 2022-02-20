@@ -99,7 +99,7 @@ protected:
     protected:
         void		add_faction			( CUIXml& xml, shared_str const& faction_id );
         void		clear_all_factions		();
-        bool	__stdcall	SortingLessFunction		( CUIWindow* left, CUIWindow* right );
+        bool		SortingLessFunction		( CUIWindow* left, CUIWindow* right );
     */
 }; // class CUILogsWnd
 

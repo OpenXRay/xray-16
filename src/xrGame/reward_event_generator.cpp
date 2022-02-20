@@ -155,7 +155,7 @@ void reward_event_generator::OnRoundStart()
     m_state_accum->OnRoundStart();
 }
 
-void __stdcall reward_event_generator::AddRewardTask(u32 award_id)
+void reward_event_generator::AddRewardTask(u32 award_id)
 {
     game_cl_mp* tmp_cl_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(tmp_cl_game);

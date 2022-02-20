@@ -132,7 +132,7 @@ void server_info_uploader::execute_complete_cb()
     m_complete_cb.clear();
 }
 
-void __stdcall server_info_uploader::upload_server_info_callback(
+void server_info_uploader::upload_server_info_callback(
     file_transfer::sending_status_t status, u32 uploaded, u32 total)
 {
     switch (status)

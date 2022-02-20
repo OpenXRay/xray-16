@@ -272,7 +272,7 @@ void configs_dumper::dumper_thread(void* my_ptr)
 #endif
 }
 
-void __stdcall configs_dumper::yield_cb(long progress)
+void configs_dumper::yield_cb(long progress)
 {
     if (progress % 5 == 0)
     {
@@ -280,7 +280,7 @@ void __stdcall configs_dumper::yield_cb(long progress)
     }
 }
 
-void __stdcall configs_dumper::switch_thread()
+void configs_dumper::switch_thread()
 {
     if (!SwitchToThread())
         Sleep(10);

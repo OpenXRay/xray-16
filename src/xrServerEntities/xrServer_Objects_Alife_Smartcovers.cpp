@@ -288,7 +288,7 @@ void CSE_SmartCover::check_enterable_loopholes(shared_str const& description)
 class CSE_SmartVisual : public CSE_Visual
 {
 public:
-    virtual CSE_Visual* __stdcall visual() { return (this); }
+    virtual CSE_Visual* visual() { return (this); }
 }; // class CSE_SmartVisual
 
 void CSE_SmartCover::fill_visuals()

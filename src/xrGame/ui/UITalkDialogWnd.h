@@ -78,10 +78,10 @@ private:
     // Text colour of our replics
     u32 m_uOurReplicsColor;
 
-    void __stdcall OnTradeClicked(CUIWindow* w, void*);
-    void __stdcall OnUpgradeClicked(CUIWindow* w, void*);
-    void __stdcall OnQuestionClicked(CUIWindow* w, void*);
-    void __stdcall OnExitClicked(CUIWindow* w, void*);
+    void OnTradeClicked(CUIWindow* w, void*);
+    void OnUpgradeClicked(CUIWindow* w, void*);
+    void OnQuestionClicked(CUIWindow* w, void*);
+    void OnExitClicked(CUIWindow* w, void*);
 };
 
 class CUIQuestionItem : public CUIWindow, public CUIWndCallback
@@ -97,7 +97,7 @@ public:
     void Init(LPCSTR val, LPCSTR text);
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
-    void __stdcall OnTextClicked(CUIWindow* w, void*);
+    void OnTextClicked(CUIWindow* w, void*);
 };
 
 class CUIAnswerItem : public CUIWindow

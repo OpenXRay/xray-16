@@ -52,7 +52,7 @@ public:
     void feel_vision_clear();
     void feel_vision_query(Fmatrix& mFull, Fvector& P);
     void feel_vision_update(IGameObject* parent, Fvector& P, float dt, float vis_threshold);
-    void __stdcall feel_vision_relcase(IGameObject* object);
+    void feel_vision_relcase(IGameObject* object);
     void feel_vision_get(xr_vector<IGameObject*>& R)
     {
         R.clear();

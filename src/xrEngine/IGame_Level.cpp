@@ -70,12 +70,12 @@ void IGame_Level::net_Stop()
 
 //-------------------------------------------------------------------------------------------
 // extern CStatTimer tscreate;
-void __stdcall _sound_event(const ref_sound_data_ptr& S, float range)
+void _sound_event(const ref_sound_data_ptr& S, float range)
 {
     if (g_pGameLevel && S && S->feedback)
         g_pGameLevel->SoundEvent_Register(S, range);
 }
-static void __stdcall build_callback(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt, void* params)
+static void build_callback(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt, void* params)
 {
     g_pGameLevel->Load_GameSpecific_CFORM(T, Tcnt);
 }

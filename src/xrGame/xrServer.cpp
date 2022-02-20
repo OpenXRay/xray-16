@@ -242,7 +242,7 @@ void xrServer::Update()
     stats.Update.End();
 }
 
-void _stdcall xrServer::SendGameUpdateTo(IClient* client)
+void xrServer::SendGameUpdateTo(IClient* client)
 {
     xrClientData* xr_client = static_cast<xrClientData*>(client);
     VERIFY(xr_client);

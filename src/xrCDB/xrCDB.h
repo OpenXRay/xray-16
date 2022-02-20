@@ -55,7 +55,7 @@ public:
 static_assert(sizeof(TRI) == 16, "TRI always should be 16 bytes on any architecture.");
 
 // Build callback
-typedef void __stdcall build_callback(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
+typedef void build_callback(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
 
 // Model definition
 class XRCDB_API MODEL : Noncopyable

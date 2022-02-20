@@ -15,7 +15,7 @@ class CMapManager : public CUIResetNotifier
 public:
     CMapManager();
     ~CMapManager();
-    void __stdcall Update();
+    void Update();
     /*ICF */ vLocations& Locations(); //{return *m_locations;}
     CMapLocation* AddMapLocation(const shared_str& spot_type, u16 id);
     CMapLocation* AddRelationLocation(CInventoryOwner* pInvOwner);

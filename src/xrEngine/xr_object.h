@@ -93,7 +93,7 @@ class IGameObject : public virtual IFactoryObject,
                     public virtual ICollidable
 {
 public:
-    using visual_callback = void(__stdcall*)(IKinematics*);
+    using visual_callback = void(*)(IKinematics*);
     using CALLBACK_VECTOR = svector<visual_callback, 6>;
     using CALLBACK_VECTOR_IT = CALLBACK_VECTOR::iterator;
     using CScriptCallbackExVoid = CScriptCallbackEx<void>;

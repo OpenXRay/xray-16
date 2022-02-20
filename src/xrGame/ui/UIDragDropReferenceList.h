@@ -27,6 +27,6 @@ public:
     void ReloadReferences(CInventoryOwner* pActor);
     void UpdateLabels();
 
-    virtual void __stdcall OnItemDBClick(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemDrop(CUIWindow* w, void* pData);
+    virtual void OnItemDBClick(CUIWindow* w, void* pData);
+    virtual void OnItemDrop(CUIWindow* w, void* pData);
 };

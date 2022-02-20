@@ -14,7 +14,7 @@ static BOOL g_bOptimiseVertexOrder = FALSE;
 static u32 g_bMaxSlidingWindow = u32(-1);
 static VIPM_Result* g_pResult = 0;
 
-ETOOLS_API void __stdcall VIPM_Init()
+ETOOLS_API void VIPM_Init()
 {
     //.	OutputDebugString("VIPM_INIT-------------------\n");
     R_ASSERT2(0 == g_pObject, "VIPM already in use!");
@@ -24,7 +24,7 @@ ETOOLS_API void __stdcall VIPM_Init()
     g_pObject->iCurSlidingWindowLevel = 0;
 }
 
-ETOOLS_API void __stdcall VIPM_AppendVertex(const Fvector3& p, const Fvector2& uv)
+ETOOLS_API void VIPM_AppendVertex(const Fvector3& p, const Fvector2& uv)
 {
     MeshPt* pt = xr_new<MeshPt>(&g_pObject->CurPtRoot);
     g_ppTempPts.push_back(pt);
@@ -34,7 +34,7 @@ ETOOLS_API void __stdcall VIPM_AppendVertex(const Fvector3& p, const Fvector2& u
     pt->mypt.dwIndex = g_ppTempPts.size() - 1;
 }
 
-ETOOLS_API void __stdcall VIPM_AppendFace(u16 v0, u16 v1, u16 v2)
+ETOOLS_API void VIPM_AppendFace(u16 v0, u16 v1, u16 v2)
 {
     xr_new<MeshTri>(g_ppTempPts[v0], g_ppTempPts[v1], g_ppTempPts[v2], &g_pObject->CurTriRoot, &g_pObject->CurEdgeRoot);
 }
@@ -146,7 +146,7 @@ void CalculateAllCollapses(
     }
 }
 
-ETOOLS_API VIPM_Result* __stdcall VIPM_Convert(u32 max_sliding_window, float error_tolerance, u32 optimize_vertex_order)
+ETOOLS_API VIPM_Result* VIPM_Convert(u32 max_sliding_window, float error_tolerance, u32 optimize_vertex_order)
 {
     g_pObject->Initialize();
     if (!g_pObject->Valid())
@@ -158,7 +158,7 @@ ETOOLS_API VIPM_Result* __stdcall VIPM_Convert(u32 max_sliding_window, float err
         return NULL;
 }
 
-ETOOLS_API void __stdcall VIPM_Destroy()
+ETOOLS_API void VIPM_Destroy()
 {
     //.	OutputDebugString	("VIPM_DESTROY-------------------\n");
     xr_delete(g_pResult);

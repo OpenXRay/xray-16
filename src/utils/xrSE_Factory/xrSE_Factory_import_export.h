@@ -14,8 +14,8 @@
 #endif
 
 extern "C" {
-FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section);
-FACTORY_API void __stdcall destroy_entity(IServerEntity*&);
+FACTORY_API IServerEntity* create_entity(LPCSTR section);
+FACTORY_API void destroy_entity(IServerEntity*&);
 };
 
 #endif

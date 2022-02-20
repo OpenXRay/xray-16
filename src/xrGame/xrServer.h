@@ -141,7 +141,7 @@ private:
     u32 OnDelayedMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
 
     void SendUpdatesToAll();
-    void _stdcall SendGameUpdateTo(IClient* client);
+    void SendGameUpdateTo(IClient* client);
 
 private:
     typedef CID_Generator<u32, // time identifier type
@@ -204,7 +204,7 @@ public:
 
     xrClientData* SelectBestClientToMigrateTo(CSE_Abstract* E, BOOL bForceAnother = FALSE);
     void SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr);
-    void __stdcall SendConfigFinished(ClientID const& clientId);
+    void SendConfigFinished(ClientID const& clientId);
     void SendProfileCreationError(IClient* CL, char const* reason);
     void AttachNewClient(IClient* CL);
     virtual void OnBuildVersionRespond(IClient* CL, NET_Packet& P);

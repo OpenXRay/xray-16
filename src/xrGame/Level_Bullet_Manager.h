@@ -199,7 +199,7 @@ protected:
     void add_bullet_point(Fvector const& start_position, Fvector& previous_position, Fvector const& start_velocity,
         Fvector const& gravity, float const ait_resistance, float const current_time);
     bool process_bullet(collide::rq_results& rq_storage, SBullet& bullet, float delta_time);
-    void __stdcall UpdateWorkload();
+    void UpdateWorkload();
 
 public:
     CBulletManager();

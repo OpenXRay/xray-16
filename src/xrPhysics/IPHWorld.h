@@ -67,15 +67,15 @@ public:
 #endif
 };
 
-extern "C" XRPHYSICS_API IPHWorld* __stdcall physics_world();
+extern "C" XRPHYSICS_API IPHWorld* physics_world();
 class CObjectSpace;
 class CObjectList;
-extern "C" XRPHYSICS_API void __stdcall create_physics_world(
+extern "C" XRPHYSICS_API void create_physics_world(
     bool mt, CObjectSpace* os, CObjectList* lo);
-extern "C" XRPHYSICS_API void __stdcall destroy_physics_world();
+extern "C" XRPHYSICS_API void destroy_physics_world();
 class CGameMtlLibrary;
-extern "C" XRPHYSICS_API CObjectSpace* __stdcall create_object_space();
+extern "C" XRPHYSICS_API CObjectSpace* create_object_space();
 struct hdrCFORM;
-extern "C" XRPHYSICS_API CObjectSpace* __stdcall mesh_create_object_space(
+extern "C" XRPHYSICS_API CObjectSpace* mesh_create_object_space(
     Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback);
-extern "C" XRPHYSICS_API void __stdcall destroy_object_space(CObjectSpace*& os);
+extern "C" XRPHYSICS_API void destroy_object_space(CObjectSpace*& os);
