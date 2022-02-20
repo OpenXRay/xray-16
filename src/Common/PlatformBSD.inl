@@ -43,6 +43,7 @@
 #define _fastcall //__attribute__((fastcall))
 
 #define __cdecl
+#define __stdcall
 
 //#define __declspec
 #define __forceinline FORCE_INLINE
