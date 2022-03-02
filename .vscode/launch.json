@@ -1,0 +1,52 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(gdb) Debug CoP",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/x64/Debug/xr_3da",
+      "args": [
+        "-nointro",
+        "-fsltx",
+        "${COP_LTX_FILE_PATH}",
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin",
+      "environment": [
+        {
+          "name": "LD_LIBRARY_PATH",
+          "value": "${workspaceFolder}/bin/x64/Debug"
+        }
+      ],
+      "preLaunchTask": "Compile",
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "(gdb) Debug CoC",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/x64/Debug/xr_3da",
+      "args": [
+        "-nointro",
+        "-fsltx",
+        "${COC_LTX_FILE_PATH}",
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin",
+      "environment": [
+        {
+          "name": "LD_LIBRARY_PATH",
+          "value": "${workspaceFolder}/bin/x64/Debug"
+        }
+      ],
+      "preLaunchTask": "Compile",
+      "externalConsole": false,
+      "MIMode": "gdb"
+    }
+  ]
+}
