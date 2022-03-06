@@ -1648,8 +1648,6 @@ void CCar::ResetKeys()
     rsp = false;
 }
 
-#undef _USE_MATH_DEFINES
-
 void CCar::OnEvent(NET_Packet& P, u16 type)
 {
     inherited::OnEvent(P, type);
