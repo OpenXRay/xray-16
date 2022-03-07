@@ -28,6 +28,7 @@ CLevelGraph::CLevelGraph()
 void CLevelGraph::Initialize(const char* filePath)
 {
     m_reader = FS.r_open(filePath);
+    R_ASSERT3(m_reader, "Please, compile AI for the level.", filePath);
     // m_header & data
     m_header = (CHeader*)m_reader->pointer();
     ASSERT_XRAI_VERSION_MATCH(header().version(), "Level graph version mismatch");
