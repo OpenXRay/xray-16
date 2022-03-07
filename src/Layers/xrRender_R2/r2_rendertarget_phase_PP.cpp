@@ -2,19 +2,19 @@
 
 void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
-#if defined(USE_OGL)
-    // XXX: OGL uniforms need to be separated by types. Otherwise, accessing them
-    // by a magical index will likely cause a wrong resource being selected (like 
-    // in the case below).
-    // This is happening because of flatten uniforms enumeration and the constants,
-    // which are obtained by reflection first, shift slots of the following texture
-    // bindings.
-    const u32 noise_slot_n = u_need_CM() ? 6 : 3;
+    R_constant* C = RCache.get_c(RImplementation.c_snoise)._get(); // get texture
+    VERIFY2(C, "s_noise texture in noise shader should be set");
+    VERIFY(RC_dest_sampler == C->destination);
+#if defined(USE_DX9) || defined(USE_OGL)
+    VERIFY(RC_sampler == C->type);
+#elif defined(USE_DX11)
+    VERIFY(RC_dx10texture == C->type);
 #else
-    const u32 noise_slot_n = 2;
+#   error Select correct check for your graphics API
 #endif
-    CTexture* T = RCache.get_ActiveTexture(noise_slot_n);
-    VERIFY2(T, "Texture #3 in noise shader should be setted up");
+
+    CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
+    VERIFY2(T, "s_noise texture in noise shader should be set");
     u32 tw = iCeil(float(T->get_Width()) * param_noise_scale + EPS_S);
     u32 th = iCeil(float(T->get_Height()) * param_noise_scale + EPS_S);
     VERIFY2(tw && th, "Noise scale can't be zero in any way");
