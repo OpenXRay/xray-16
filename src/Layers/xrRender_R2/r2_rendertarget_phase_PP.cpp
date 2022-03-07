@@ -3,7 +3,7 @@
 void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
     R_constant* C = RCache.get_c(RImplementation.c_snoise)._get(); // get texture
-    VERIFY(C, "s_noise texture in noise shader should be set");
+    VERIFY2(C, "s_noise texture in noise shader should be set");
     VERIFY(RC_dest_sampler == C->destination);
 #if defined(USE_DX9) || defined(USE_OGL)
     VERIFY(RC_sampler == C->type);
