@@ -22,7 +22,7 @@ private:
 
 public:
     property_string_values_value_shared_str(
-        XRay::Editor::engine_base* engine, shared_str& value, LPCSTR const* values, u32 const& value_count);
+        XRay::Editor::engine_base* engine, shared_str& value, pcstr const* values, u32 const& value_count);
 
     virtual collection_type ^ values() { return m_collection; };
 

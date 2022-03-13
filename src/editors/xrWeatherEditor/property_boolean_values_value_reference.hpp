@@ -24,7 +24,7 @@ private:
     typedef System::Object Object;
 
 public:
-    property_boolean_values_value_reference(bool& value, LPCSTR values[2]);
+    property_boolean_values_value_reference(bool& value, pcstr values[2]);
     virtual void SetValue(Object ^ object) override;
 
 public:
