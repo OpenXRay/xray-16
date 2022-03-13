@@ -71,15 +71,15 @@ bool engine_impl::quit_requested() const
     return SDL_QuitRequested();
 }
 
-void engine_impl::value(LPCSTR value, shared_str& result) { result = value; }
-LPCSTR engine_impl::value(shared_str const& value) { return (value.c_str()); }
+void engine_impl::value(pcstr value, shared_str& result) { result = value; }
+pcstr engine_impl::value(shared_str const& value) { return (value.c_str()); }
 
 CEnvironment* engine_impl::environment()
 {
     return xr_new<editor::environment::manager>();
 }
 
-void engine_impl::weather(LPCSTR value)
+void engine_impl::weather(pcstr value)
 {
     if (!g_pGamePersistent)
         return;
@@ -101,7 +101,7 @@ void engine_impl::weather(LPCSTR value)
     g_pGamePersistent->Environment().SelectEnvs(game_time);
 }
 
-LPCSTR engine_impl::weather()
+pcstr engine_impl::weather()
 {
     if (!g_pGamePersistent)
         return ("");
@@ -109,7 +109,7 @@ LPCSTR engine_impl::weather()
     return (g_pGamePersistent->Environment().GetWeather().c_str());
 }
 
-void engine_impl::current_weather_frame(LPCSTR frame_id)
+void engine_impl::current_weather_frame(pcstr frame_id)
 {
     if (!g_pGamePersistent)
         return;
@@ -148,7 +148,7 @@ void engine_impl::current_weather_frame(LPCSTR frame_id)
         }
 }
 
-LPCSTR engine_impl::current_weather_frame()
+pcstr engine_impl::current_weather_frame()
 {
     if (!g_pGamePersistent)
         return ("");

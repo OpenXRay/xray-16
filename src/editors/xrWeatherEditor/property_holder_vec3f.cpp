@@ -17,7 +17,7 @@ ref class property_converter_vec3f;
 using Flobbster::Windows::Forms::PropertySpec;
 using System::String;
 
-XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(pcstr identifier, pcstr category, pcstr description,
     XRay::Editor::vec3f const& default_value, vec3f_getter_type const& getter, vec3f_setter_type const& setter,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
     password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid)
@@ -30,7 +30,7 @@ XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, L
     return (nullptr);
 }
 
-XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(pcstr identifier, pcstr category, pcstr description,
     XRay::Editor::vec3f const& default_value, XRay::Editor::vec3f& value, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)
