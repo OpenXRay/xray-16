@@ -157,7 +157,6 @@ inline int xr_unlink(const char *path)
 
 #include <inttypes.h>
 typedef int32_t BOOL;
-typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 typedef int32_t LONG;
@@ -474,7 +473,7 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
 
-#define RGB(r,g,b) ( ((DWORD)(BYTE)r)|((DWORD)((BYTE)g)<<8)|((DWORD)((BYTE)b)<<16) )
+#define RGB(r,g,b) ( ((DWORD)(uint8_t)r)|((DWORD)((uint8_t)g)<<8)|((DWORD)((uint8_t)b)<<16) )
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 #define S_OK 0x00000000
@@ -491,8 +490,8 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)  \
-    ((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) |  \
-    ((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24 ))
+    ((DWORD)(uint8_t)(ch0) | ((DWORD)(uint8_t)(ch1) << 8) |  \
+    ((DWORD)(uint8_t)(ch2) << 16) | ((DWORD)(uint8_t)(ch3) << 24 ))
 #endif
 
 typedef enum _D3DFORMAT {
@@ -639,10 +638,10 @@ typedef enum _D3DBLENDOP {
 typedef struct _D3DVERTEXELEMENT9 {
   WORD    Stream;
   WORD    Offset;
-  BYTE    Type;
-  BYTE    Method;
-  BYTE    Usage;
-  BYTE    UsageIndex;
+  uint8_t Type;
+  uint8_t Method;
+  uint8_t Usage;
+  uint8_t UsageIndex;
 } D3DVERTEXELEMENT9, *LPD3DVERTEXELEMENT9;
 
 #define MAXD3DDECLLENGTH         64 /* +end marker */
