@@ -244,7 +244,6 @@ typedef long LRESULT;
 typedef long _W64;
 typedef void* HWND;
 typedef void* HDC;
-typedef float FLOAT;
 typedef unsigned char UINT8;
 
 typedef struct _RECT {
