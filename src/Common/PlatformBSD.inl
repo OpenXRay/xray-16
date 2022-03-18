@@ -230,7 +230,6 @@ typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef long HRESULT;
 typedef long LRESULT;
-typedef long _W64;
 typedef void* HWND;
 typedef void* HDC;
 typedef unsigned char UINT8;
