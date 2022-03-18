@@ -207,8 +207,8 @@ void configs_dumper::dump_config(complete_callback_t complete_cb)
         return;
     }
 
-    ULONG_PTR process_affinity_mask, tmp_dword;
 #ifndef XR_PLATFORM_LINUX // FIXME!!!
+    ULONG_PTR process_affinity_mask, tmp_dword;
     GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &tmp_dword);
     bool single_core = (btwCount1(static_cast<u32>(process_affinity_mask)) == 1);
     if (single_core)
