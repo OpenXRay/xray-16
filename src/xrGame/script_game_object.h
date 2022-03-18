@@ -434,6 +434,7 @@ public:
     void SetCallback(
         GameObject::ECallbackType type, const luabind::functor<void>& functor, const luabind::adl::object& object);
     void SetCallback(GameObject::ECallbackType type);
+    void ClearCallbacks();
 
     void set_patrol_extrapolate_callback(const luabind::functor<bool>& functor);
     void set_patrol_extrapolate_callback(const luabind::functor<bool>& functor, const luabind::adl::object& object);
