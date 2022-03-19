@@ -240,7 +240,6 @@ typedef long HRESULT;
 typedef long LRESULT;
 typedef void* HWND;
 typedef void* HDC;
-typedef unsigned char UINT8;
 
 typedef struct _RECT {
     long left;
