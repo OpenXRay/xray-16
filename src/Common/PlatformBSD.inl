@@ -160,8 +160,6 @@ typedef char* LPTSTR;
 typedef const char* LPCSTR;
 typedef const char* LPCTSTR;
 typedef unsigned int UINT;
-typedef int INT;
-typedef unsigned long ULONG;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
 
