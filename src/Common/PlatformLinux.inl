@@ -176,11 +176,6 @@ typedef unsigned long ULONG;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
 
-typedef unsigned short* LPWORD;
-typedef unsigned long* LPDWORD;
-typedef const void* LPCVOID;
-typedef long long int* PLARGE_INTEGER;
-
 typedef wchar_t WCHAR;
 
 #define WAVE_FORMAT_PCM  0x0001
