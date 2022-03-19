@@ -63,15 +63,9 @@ inline char* _strupr_l(char* str, locale_t loc)
 }
 */
 
-#define VOID void
-#define HKL void*
-#define ActivateKeyboardLayout(x, y) {}
-#define ScreenToClient(hwnd, p) {}
-
 #define __except(X) catch(X)
 
 #define GetCurrentProcessId getpid
-#define GetCurrentThreadId pthread_self
 
 inline void Sleep(int ms)
 {
@@ -476,9 +470,6 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define _MAX_DIR	256
 #define _MAX_FNAME	256
 #define _MAX_EXT	256
-
-#define SEM_FAILCRITICALERRORS 1
-#define SetErrorMode(x) {}
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)  \
