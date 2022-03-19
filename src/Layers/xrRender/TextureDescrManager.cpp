@@ -148,11 +148,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         string_path fn;
         FS.update_path(fn, initial, it.name.c_str());
         IReader* F = FS.r_open(fn);
-
-#ifdef XR_PLATFORM_LINUX
-        if (nullptr == F)
-            FATAL_F("Failed to open file (upper register?): %s", it.name.c_str());
-#endif
+        R_ASSERT3(F, "Failed to open THM (case-sensitivity problem?)", it.name.c_str());
 
         xr_strcpy(fn, it.name.c_str());
         fix_texture_thm_name(fn);
