@@ -62,7 +62,7 @@ HRESULT dx10State::Apply()
     SSManager.CSApplySamplers(m_CSSamplers);
 #endif
 
-    //	static const FLOAT BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
+    //	static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
     //	static const UINT SampleMask = 0xffffffff;
 
     //	VERIFY(m_pRasterizerState);
