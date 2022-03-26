@@ -334,8 +334,9 @@ bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
     settings_overrides();
     
     CHARACTER_COMMUNITY community;
-    community.set("monster");
-    CInventoryOwner::SetCommunity(community.index());
+    community.set("monster", true);
+    if (community.index() != NO_COMMUNITY_INDEX)
+        CInventoryOwner::SetCommunity(community.index());
 
     if (GetScriptControl())
     {

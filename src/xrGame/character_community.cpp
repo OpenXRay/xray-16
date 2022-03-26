@@ -21,7 +21,7 @@ CHARACTER_COMMUNITY::SYMPATHY_TABLE CHARACTER_COMMUNITY::m_sympathy_table;
 //////////////////////////////////////////////////////////////////////////
 CHARACTER_COMMUNITY::CHARACTER_COMMUNITY() { m_current_index = NO_COMMUNITY_INDEX; }
 CHARACTER_COMMUNITY::~CHARACTER_COMMUNITY() {}
-void CHARACTER_COMMUNITY::set(CHARACTER_COMMUNITY_ID id) { m_current_index = IdToIndex(id); }
+void CHARACTER_COMMUNITY::set(CHARACTER_COMMUNITY_ID id, bool no_assert /*= false*/) { m_current_index = IdToIndex(id, NO_COMMUNITY_INDEX, no_assert); }
 CHARACTER_COMMUNITY_ID CHARACTER_COMMUNITY::id() const { return IndexToId(m_current_index); }
 u8 CHARACTER_COMMUNITY::team() const { return (*m_pItemDataVector)[m_current_index].team; }
 void CHARACTER_COMMUNITY::InitIdToIndex()
