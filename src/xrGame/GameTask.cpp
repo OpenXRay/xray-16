@@ -54,6 +54,11 @@ u16 storyId2GameId(ALife::_STORY_ID id)
     return u16(-1);
 }
 
+SGameTaskObjective::SGameTaskObjective()
+    : m_task_state(eTaskStateDummy),
+      m_task_type(eTaskTypeDummy),
+      m_idx(ROOT_TASK_OBJECTIVE) {}
+
 SGameTaskObjective::SGameTaskObjective(CGameTask* parent, TASK_OBJECTIVE_ID idx)
     : m_parent(parent),
       m_task_state(eTaskStateDummy),
@@ -62,6 +67,12 @@ SGameTaskObjective::SGameTaskObjective(CGameTask* parent, TASK_OBJECTIVE_ID idx)
 
 CGameTask::CGameTask()
     : SGameTaskObjective(this, ROOT_TASK_OBJECTIVE) {}
+
+CGameTask::CGameTask(const TASK_ID& id)
+    : SGameTaskObjective(this, ROOT_TASK_OBJECTIVE)
+{
+    Load(id);
+}
 
 void CGameTask::Load(const TASK_ID& id)
 {
@@ -85,7 +96,7 @@ void CGameTask::Load(const TASK_ID& id)
     m_Title = g_gameTaskXml->Read(g_gameTaskXml->GetLocalRoot(), "title", 0, nullptr);
     m_priority = g_gameTaskXml->ReadAttribInt(g_gameTaskXml->GetLocalRoot(), "prio", -1);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     if (m_priority == u32(-1))
     {
         Msg("Game Task [%s] has no priority", id.c_str());
@@ -605,15 +616,31 @@ void SGameTaskObjective::load(IReader& stream)
 void CGameTask::save(IWriter& stream)
 {
     save_data(m_ID, stream);
-    SGameTaskObjective::save(stream);
     save_data(m_priority, stream);
+    SGameTaskObjective::save(stream);
+
+    const u32 count = static_cast<u32>(m_Objectives.size());
+    save_data(count, stream);
+
+    for (auto& objective : m_Objectives)
+        save_data(objective, stream);
 }
 
 void CGameTask::load(IReader& stream)
 {
     load_data(m_ID, stream);
-    SGameTaskObjective::load(stream);
     load_data(m_priority, stream);
+    SGameTaskObjective::load(stream);
+
+    u32 count;
+    load_data(count, stream);
+    m_Objectives.resize(count);
+
+    for (u32 i = 0; i < count; ++i)
+    {
+        m_Objectives[i].m_parent = this;
+        load_data(m_Objectives[i], stream);
+    }
 
     CommitScriptHelperContents();
     CreateMapLocation(true);

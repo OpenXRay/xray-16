@@ -86,6 +86,7 @@ private:
     task_state_functors m_lua_functions_on_fail;
 
 public:
+    SGameTaskObjective();
     SGameTaskObjective(CGameTask* parent, TASK_OBJECTIVE_ID idx);
 
     CGameTask* GetParent() const { return m_parent; }
@@ -171,7 +172,9 @@ private:
 
 public:
     CGameTask();
+    CGameTask(const TASK_ID& id);
 
+public:
     void Load(const TASK_ID& id);
 
     void save(IWriter& stream) override;
