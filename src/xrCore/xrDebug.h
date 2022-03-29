@@ -88,6 +88,7 @@ public:
     static void OnFilesystemInitialized();
 
     static bool DebuggerIsPresent();
+    static bool ProcessingFailure() { return failLock.IsLocked(); }
 
     static IWindowHandler* GetWindowHandler() { return windowHandler; }
     static void SetWindowHandler(IWindowHandler* handler) { windowHandler = handler; }
@@ -116,6 +117,8 @@ public:
 private:
     static bool symEngineInitialized;
     static Lock dbgHelpLock;
+    static Lock failLock;
+
     static void FormatLastError(char* buffer, const size_t& bufferSize);
     static void SetupExceptionHandler();
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
