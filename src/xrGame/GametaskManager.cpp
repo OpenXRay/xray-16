@@ -107,7 +107,7 @@ CGameTask* CGameTaskManager::GiveGameTaskToActor(CGameTask* t, u32 timeToComplet
 
     m_flags.set(eChanged, TRUE);
 
-    auto key = GetGameTasks().emplace_back(t->m_ID);
+    SGameTaskKey& key = GetGameTasks().emplace_back(t->m_ID);
     key.game_task = t;
     t->m_ReceiveTime = Level().GetGameTime();
     t->m_TimeToComplete = t->m_ReceiveTime + timeToComplete * 1000; // ms
