@@ -93,5 +93,9 @@ SCRIPT_EXPORT(CGameTask, (),
             .def("get_objective", &CGameTask::GetObjective_script)
 
             .def("get_objectives_cnt", &CGameTask::GetObjectivesCount)
+            .def("get_objectives_cnt", +[](CGameTask* self)
+            {
+                return self->GetObjectivesCount(false);
+            })
     ];
 });

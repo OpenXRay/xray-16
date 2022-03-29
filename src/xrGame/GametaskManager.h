@@ -39,8 +39,8 @@ public:
     CGameTask* HasGameTask(const TASK_ID& id, bool only_inprocess);
     CGameTask* GiveGameTaskToActor(const TASK_ID& id, u32 timeToComplete, bool bCheckExisting = true, u32 timer_ttl = 0);
     CGameTask* GiveGameTaskToActor(CGameTask* t, u32 timeToComplete, bool bCheckExisting, u32 timer_ttl);
-    void SetTaskState(const TASK_ID& id, ETaskState state, TASK_OBJECTIVE_ID objective_id = NO_TASK_OBJECTIVE);
-    void SetTaskState(CGameTask* t, ETaskState state, TASK_OBJECTIVE_ID objective_id = NO_TASK_OBJECTIVE);
+    void SetTaskState(const TASK_ID& id, ETaskState state, TASK_OBJECTIVE_ID objective_id = ROOT_TASK_OBJECTIVE);
+    void SetTaskState(CGameTask* t, ETaskState state, TASK_OBJECTIVE_ID objective_id = ROOT_TASK_OBJECTIVE);
 
     void UpdateTasks();
 

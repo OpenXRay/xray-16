@@ -168,7 +168,7 @@ public:
 
 private:
     OBJECTIVES_VECTOR m_Objectives;
-    TASK_OBJECTIVE_ID m_active_objective{ NO_TASK_OBJECTIVE };
+    TASK_OBJECTIVE_ID m_active_objective{ ROOT_TASK_OBJECTIVE };
 
 public:
     CGameTask();
@@ -183,12 +183,12 @@ public:
     void ChangeStateCallback() override;
 
     TASK_OBJECTIVE_ID ActiveObjectiveIdx() const;
-    SGameTaskObjective* ActiveObjective();
+    auto ActiveObjective() { return Objective(m_active_objective); }
     SGameTaskObjective& Objective(TASK_OBJECTIVE_ID idx);
     const SGameTaskObjective& Objective(TASK_OBJECTIVE_ID idx) const;
     ETaskState ObjectiveState(TASK_OBJECTIVE_ID idx) const;
     void SetActiveObjective(TASK_OBJECTIVE_ID idx);
-    TASK_OBJECTIVE_ID GetObjectivesCount() const;
+    TASK_OBJECTIVE_ID GetObjectivesCount(bool without_root = false) const;
 
     using SGameTaskObjective::SetTaskState;
     void SetTaskState(ETaskState state, TASK_OBJECTIVE_ID objective_id);
