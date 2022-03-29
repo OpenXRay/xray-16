@@ -582,8 +582,34 @@ void SGameTaskObjective::save(IWriter& stream)
     save_data(m_map_object_id, stream);
 }
 
+int g_dbg_load_pre_c5ef6c7_saves = 0;
+
 void SGameTaskObjective::load(IReader& stream)
 {
+    if (g_dbg_load_pre_c5ef6c7_saves) // XXX: to be removed
+    {
+        load_data(m_task_state, stream);
+        load_data(m_task_type, stream);
+
+        load_data(m_ReceiveTime, stream);
+        load_data(m_FinishTime, stream);
+        load_data(m_TimeToComplete, stream);
+        load_data(m_timer_finish, stream);
+
+        load_data(m_idx, stream);
+        load_data(m_Title, stream);
+        load_data(m_Description, stream);
+
+        load_data(m_pScriptHelper, stream);
+
+        load_data(m_icon_texture_name, stream);
+
+        load_data(m_map_hint, stream);
+        load_data(m_map_location, stream);
+        load_data(m_map_object_id, stream);
+        return;
+    }
+
     load_data(m_task_state, stream);
     load_data(m_task_type, stream);
 
@@ -625,6 +651,17 @@ void CGameTask::save(IWriter& stream)
 
 void CGameTask::load(IReader& stream)
 {
+    if (g_dbg_load_pre_c5ef6c7_saves)
+    {
+        load_data(m_ID, stream);
+        SGameTaskObjective::load(stream);
+        load_data(m_priority, stream);
+
+        CommitScriptHelperContents();
+        CreateMapLocation(true);
+        return;
+    }
+
     load_data(m_ID, stream);
     load_data(m_priority, stream);
     SGameTaskObjective::load(stream);

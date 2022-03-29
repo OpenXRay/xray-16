@@ -2374,6 +2374,9 @@ void CCC_RegisterCommands()
     CMD3(CCC_String, "slot_2", g_quick_use_slots[2], 32);
     CMD3(CCC_String, "slot_3", g_quick_use_slots[3], 32);
 
+    extern int g_dbg_load_pre_c5ef6c7_saves;
+    CMD4(CCC_Integer, "dbg_load_pre_c5ef6c7_saves", &g_dbg_load_pre_c5ef6c7_saves, 0, 1); //Alundaio
+
     CMD4(CCC_Integer, "keypress_on_start", &g_keypress_on_start, 0, 1);
     register_mp_console_commands();
 }
