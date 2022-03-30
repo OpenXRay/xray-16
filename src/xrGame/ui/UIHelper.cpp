@@ -27,12 +27,16 @@ CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* 
         return nullptr;
 
     auto ui = xr_new<CUIWindow>();
-    if (parent)
+    if (!CUIXmlInit::InitWindow(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create CUIWindow");
+        xr_delete(ui);
+    }
+    else if (parent)
     {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitWindow(xml, ui_path, 0, ui);
     return ui;
 }
 
@@ -48,12 +52,16 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWin
         return nullptr;
 
     auto ui = xr_new<CUIStatic>();
-    if (parent)
+    if (!CUIXmlInit::InitStatic(xml, ui_path, index, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create CUIStatic");
+        xr_delete(ui);
+    }
+    else if (parent)
     {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitStatic(xml, ui_path, index, ui);
     return ui;
 }
 
@@ -64,12 +72,16 @@ CUIScrollView* UIHelper::CreateScrollView(CUIXml& xml, LPCSTR ui_path, CUIWindow
         return nullptr;
 
     auto ui = xr_new<CUIScrollView>();
-    if (parent)
+    if (!CUIXmlInit::InitScrollView(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create CUIScrollView");
+        xr_delete(ui);
+    }
+    else if (parent)
     {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitScrollView(xml, ui_path, 0, ui);
     return ui;
 }
 
@@ -80,12 +92,16 @@ CUITextWnd* UIHelper::CreateTextWnd(CUIXml& xml, LPCSTR ui_path, CUIWindow* pare
         return nullptr;
 
     auto ui = xr_new<CUITextWnd>();
-    if (parent)
+    if (!CUIXmlInit::InitTextWnd(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create CUITextWnd");
+        xr_delete(ui);
+    }
+    else if (parent)
     {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitTextWnd(xml, ui_path, 0, ui);
     return ui;
 }
 
@@ -96,12 +112,16 @@ CUIEditBox* UIHelper::CreateEditBox(CUIXml& xml, LPCSTR ui_path, CUIWindow* pare
         return nullptr;
 
     auto ui = xr_new<CUIEditBox>();
-    if (parent)
+    if (!CUIXmlInit::InitEditBox(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create CUIEditBox");
+        xr_delete(ui);
+    }
+    else if (parent)
     {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
-    CUIXmlInit::InitEditBox(xml, ui_path, 0, ui);
     return ui;
 }
 
@@ -114,7 +134,7 @@ CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWind
     auto ui = xr_new<CUIProgressBar>();
     if (!CUIXmlInit::InitProgressBar(xml, ui_path, 0, ui))
     {
-        R_ASSERT2(!critical, "Failed to create progress bar");
+        R_ASSERT2(!critical, "Failed to create CUIProgressBar");
         xr_delete(ui);
     }
     else if (parent)
@@ -134,7 +154,7 @@ CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUI
     auto ui = xr_new<CUIProgressShape>();
     if (!CUIXmlInit::InitProgressShape(xml, ui_path, 0, ui))
     {
-        R_ASSERT2(!critical, "Failed to create progress shape");
+        R_ASSERT2(!critical, "Failed to create CUIProgressShape");
         xr_delete(ui);
     }
     else if (parent)
@@ -154,7 +174,7 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindo
     auto ui = xr_new<CUIFrameLineWnd>();
     if (!CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui, critical))
     {
-        R_ASSERT2(!critical, "Failed to create frame line");
+        R_ASSERT2(!critical, "Failed to create CUIFrameLineWnd");
         xr_delete(ui);
     }
     else if (parent)
@@ -174,7 +194,7 @@ CUITextFrameLineWnd* UIHelper::CreateTextFrameLine(CUIXml& xml, LPCSTR ui_path, 
     auto ui = xr_new<CUITextFrameLineWnd>();
     if (!CUIXmlInit::InitTextFrameLine(xml, ui_path, 0, ui, critical))
     {
-        R_ASSERT2(!critical, "Failed to create frame line");
+        R_ASSERT2(!critical, "Failed to create CUITextFrameLineWnd");
         xr_delete(ui);
     }
     else if (parent)
@@ -194,7 +214,7 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWind
     auto ui = xr_new<CUIFrameWindow>();
     if (!CUIXmlInit::InitFrameWindow(xml, ui_path, 0, ui, critical))
     {
-        R_ASSERT2(!critical, "Failed to create frame window");
+        R_ASSERT2(!critical, "Failed to create CUIFrameWindow");
         xr_delete(ui);
     }
     else if (parent)
@@ -217,9 +237,16 @@ CUI3tButton* UIHelper::Create3tButton(CUIXml& xml, LPCSTR ui_path, int index, CU
         return nullptr;
 
     auto ui = xr_new<CUI3tButton>();
-    parent->AttachChild(ui);
-    ui->SetAutoDelete(true);
-    CUIXmlInit::Init3tButton(xml, ui_path, index, ui);
+    if (!CUIXmlInit::Init3tButton(xml, ui_path, index, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create CUI3tButton");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
     return ui;
 }
 
@@ -230,9 +257,16 @@ CUICheckButton* UIHelper::CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* pa
         return nullptr;
 
     auto ui = xr_new<CUICheckButton>();
-    parent->AttachChild(ui);
-    ui->SetAutoDelete(true);
-    CUIXmlInit::InitCheck(xml, ui_path, 0, ui);
+    if (!CUIXmlInit::InitCheck(xml, ui_path, 0, ui, critical))
+    {
+        R_ASSERT2(!critical, "Failed to create CUICheckButton");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
     return ui;
 }
 
@@ -260,9 +294,16 @@ CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, i
         return nullptr;
 
     auto ui = xr_new<CUIDragDropListEx>();
-    parent->AttachChild(ui);
-    ui->SetAutoDelete(true);
-    CUIXmlInit::InitDragDropListEx(xml, ui_path, index, ui);
+    if (!CUIXmlInit::InitDragDropListEx(xml, ui_path, index, ui)) // XXX: doesn't support 'critical' param, crashes if xml node is missing
+    {
+        R_ASSERT2(!critical, "Failed to create CUIDragDropListEx");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
     return ui;
 }
 
@@ -273,8 +314,15 @@ CUIDragDropReferenceList* UIHelper::CreateDragDropReferenceList(CUIXml& xml, LPC
         return nullptr;
 
     auto ui = xr_new<CUIDragDropReferenceList>();
-    parent->AttachChild(ui);
-    ui->SetAutoDelete(true);
-    CUIXmlInit::InitDragDropListEx(xml, ui_path, 0, ui);
+    if (!CUIXmlInit::InitDragDropListEx(xml, ui_path, 0, ui)) // XXX: doesn't support 'critical' param, crashes if xml node is missing
+    {
+        R_ASSERT2(!critical, "Failed to create CUIDragDropReferenceList");
+        xr_delete(ui);
+    }
+    else if (parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
     return ui;
 }
