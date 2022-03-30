@@ -443,6 +443,8 @@ void TaskManager::WaitForChildren(const Task& task)
     while (!task.HasChildren())
     {
         ExecuteOneTask();
+        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+            SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 
