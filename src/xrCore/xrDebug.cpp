@@ -837,7 +837,7 @@ void _terminate()
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
 #endif
-    ScopeLock lock(&failLock);
+    //ScopeLock lock(&failLock);
 
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo,sizeof(assertionInfo), DEBUG_INFO, nullptr, "Unexpected application termination");
