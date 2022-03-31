@@ -146,7 +146,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         AddCallback(m_UIMainScrollV, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollV));
     }
 
-    init_xml_nav(uiXml);
+    init_xml_nav(uiXml, start_from, critical);
 
     m_map_location_hint = xr_new<CUIMapLocationHint>();
     m_map_location_hint->SetAutoDelete(false);
@@ -362,7 +362,8 @@ void CUIMapWnd::Draw()
         m_dbg_info->Draw		();
     #endif // DEBUG */
 
-    m_btn_nav_parent->Draw();
+    if (m_btn_nav_parent)
+        m_btn_nav_parent->Draw();
 }
 
 void CUIMapWnd::MapLocationRelcase(CMapLocation* ml)
