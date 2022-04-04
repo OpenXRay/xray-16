@@ -90,7 +90,7 @@ const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autod
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
 
-Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW }; // All renders
+Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW | RFLAG_NO_RAM_TEXTURES }; // All renders
 
 //int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
