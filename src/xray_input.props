@@ -9,6 +9,7 @@
         $(xrSdkDir)include;
         $(xrExternals);
         $(xrExternals)luajit\src;
+        $(xrExternals)xrLuaFS\src;
         $(xrExternals)luabind;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>

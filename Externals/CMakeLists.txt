@@ -4,6 +4,7 @@ add_subdirectory(cximage)
 add_subdirectory(GameSpy)
 add_subdirectory(OPCODE)
 add_subdirectory(ode)
+add_subdirectory(xrLuaFS)
 #add_subdirectory(NVTT)
 
 if (MEMORY_ALLOCATOR STREQUAL "mimalloc")

@@ -46,3 +46,7 @@
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
+[submodule "Externals/xrLuaFS"]
+	path = Externals/xrLuaFS
+	url = https://github.com/ChugunovRoman/luafilesystem.git
+	branch = open-x-ray-coc
