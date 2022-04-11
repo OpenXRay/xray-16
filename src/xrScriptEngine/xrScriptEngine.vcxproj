@@ -24,6 +24,11 @@
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <AdditionalIncludeDirectories>
+        $(xrExternals)\lua_extensions;
+        $(xrExternals)\lua_extensions\src;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BindingsDumper.hpp" />
@@ -86,6 +91,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Externals\LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)lua_extensions.vcxproj">
+      <Project>{1e07bca7-6fc2-4d7c-9542-5090cc513cdd}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

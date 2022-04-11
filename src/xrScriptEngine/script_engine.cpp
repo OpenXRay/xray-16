@@ -16,6 +16,7 @@
 #include "script_debugger.hpp"
 #endif
 #include <stdarg.h>
+#include <lua_extensions.h>
 #include "Common/Noncopyable.hpp"
 #include "xrCore/ModuleLookup.hpp"
 #include "luabind/class_info.hpp"
@@ -688,11 +689,11 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
         return;
     }
 
-    s_create_world = 
+    s_create_world =
         (create_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_create_world@12");
     R_ASSERT2(s_create_world, "can't find function \"cs_lua_studio_backend_create_world\"");
 
-    s_destroy_world = 
+    s_destroy_world =
         (destroy_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_destroy_world@4");
     R_ASSERT2(s_destroy_world, "can't find function \"cs_lua_studio_backend_destroy_world\" in the library");
 
@@ -934,7 +935,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     {
         const bool nilConversion =
             pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", true);
-     
+
         luabind::allow_nil_conversion(nilConversion);
         luabind::disable_super_deprecation();
 
@@ -973,6 +974,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
     luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
     luajit::open_lib(lua(), LUA_FFILIBNAME, luaopen_ffi);
+    luajit::open_lib(lua(), LUA_EXTENSIONSLIBNAME, luaopen_lua_extensions);
 #ifndef MASTER_GOLD
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif

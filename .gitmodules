@@ -46,3 +46,7 @@
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
+[submodule "Externals/lua_extensions"]
+	path = Externals/lua_extensions
+	url = https://github.com/ChugunovRoman/lua_extensions.git
+	branch = master
