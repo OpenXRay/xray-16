@@ -9869,6 +9869,9 @@
     <ClCompile Include="game_cl_mp_script.cpp">
       <Filter>Core\Server\Games\client\mp_script</Filter>
     </ClCompile>
+    <ClCompile Include="CustomOutfit_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
