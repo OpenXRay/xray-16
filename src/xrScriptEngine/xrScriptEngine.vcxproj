@@ -25,9 +25,9 @@
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <AdditionalIncludeDirectories>
-        $(xrExternals)xrLuaFS\lua-marshal;
-        %(AdditionalIncludeDirectories)
-      </AdditionalIncludeDirectories>
+      $(xrExternals)xrLuaFS\lua-marshal;
+      %(AdditionalIncludeDirectories)
+    </AdditionalIncludeDirectories>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BindingsDumper.hpp" />
