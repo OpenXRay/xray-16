@@ -173,8 +173,18 @@ void CPHDestroyable::Load(CInifile* ini, LPCSTR section)
         if (data.Data.size() > 0)
             m_flags.set(fl_destroyable, true);
         for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
+        {
             if (I->first.size())
-                m_destroyed_obj_visual_names.push_back(I->first);
+            {
+                u8 count = 1;
+                if (I->second.c_str())
+                    count = u8(atoi(I->second.c_str()));
+                    //if (!count) count = 1;
+
+                for (u8 i = 0; i < count; ++i)
+                    m_destroyed_obj_visual_names.push_back(I->first);
+            }
+        }
     }
 }
 void CPHDestroyable::Load(LPCSTR section)
