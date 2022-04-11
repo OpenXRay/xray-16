@@ -46,3 +46,7 @@
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
+[submodule "Externals/lua-marshal"]
+	path = Externals/lua-marshal
+	url = https://github.com/ChugunovRoman/lua-marshal.git
+	branch = open-x-ray-coc

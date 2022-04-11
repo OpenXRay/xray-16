@@ -238,6 +238,7 @@ message("git branch: " ${GIT_BRANCH})
 include_directories(
     ${CMAKE_SOURCE_DIR}/Externals
     ${CMAKE_SOURCE_DIR}/Externals/luabind
+    ${CMAKE_SOURCE_DIR}/Externals/lua-marshal
 )
 
 add_subdirectory(Externals)
