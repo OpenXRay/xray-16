@@ -54,6 +54,7 @@ public:
     void save_at_end(bool b);
     void remove_line(pcstr S, pcstr L);
     void set_override_names(bool b);
+    void set_readonly(bool b);
     u32 section_count();
 };
 

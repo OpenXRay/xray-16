@@ -22,6 +22,13 @@ class IReader;
 class XRCORE_API CInifile
 {
 public:
+    enum
+    {
+        eSaveAtEnd = 1 << 0,
+        eReadOnly = 1 << 1,
+        eOverrideNames = 1 << 2,
+    };
+    Flags8 m_flags;
     struct XRCORE_API Item
     {
         shared_str first;
@@ -59,13 +66,6 @@ public:
     }
 
 private:
-    enum
-    {
-        eSaveAtEnd = 1 << 0,
-        eReadOnly = 1 << 1,
-        eOverrideNames = 1 << 2,
-    };
-    Flags8 m_flags;
     string_path m_file_name;
     Root DATA;
 
