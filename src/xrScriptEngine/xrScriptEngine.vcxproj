@@ -25,10 +25,10 @@
       <PreprocessorDefinitions>_USRDLL;XRSCRIPTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <AdditionalIncludeDirectories>
-        $(xrExternals)\lua_extensions;
-        $(xrExternals)\lua_extensions\src;
-        %(AdditionalIncludeDirectories)
-      </AdditionalIncludeDirectories>
+      $(xrExternals)\lua_extensions;
+      $(xrExternals)\lua_extensions\src;
+      %(AdditionalIncludeDirectories)
+    </AdditionalIncludeDirectories>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BindingsDumper.hpp" />
