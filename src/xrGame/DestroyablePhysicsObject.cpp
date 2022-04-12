@@ -58,6 +58,16 @@ bool CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
             m_destroy_sound.create(ini->r_string("sound", "break_sound"), st_Effect, sg_SourceType);
         if (ini->section_exist("particles"))
             m_destroy_particles = ini->r_string("particles", "destroy_particles");
+
+        if (ini->section_exist("hit_from"))
+        {
+            CInifile::Sect& data = ini->r_section("hit_from");
+            if (data.Data.size() > 0)
+            {
+                for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
+                    hit_object_name.push_back(I->first.c_str());
+            }
+        }
     }
     CParticlesPlayer::LoadParticles(K);
     RunStartupAnim(DC);
