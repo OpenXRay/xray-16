@@ -70,8 +70,12 @@ bool CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
 void CDestroyablePhysicsObject::Hit(SHit* pHDS)
 {
     SHit HDS = *pHDS;
-    callback(GameObject::eHit)(
-        lua_game_object(), HDS.power, HDS.dir, smart_cast<const CGameObject*>(HDS.who)->lua_game_object(), HDS.bone());
+    IGameObject* who = HDS.who;
+    callback(GameObject::eHit)(lua_game_object(), HDS.power, HDS.dir, who->lua_game_object(), HDS.bone());
+ 
+    if ((hit_object_name.size()) && (std::find(hit_object_name.begin(), hit_object_name.end(), who->Name()) == hit_object_name.end()))
+        return;
+
     HDS.power = CHitImmunity::AffectHit(HDS.power, HDS.hit_type);
     float hit_scale = 1.f, wound_scale = 1.f;
     CDamageManager::HitScale(HDS.bone(), hit_scale, wound_scale);
