@@ -116,7 +116,7 @@ Thank you for your support!
   * [Vincent](https://github.com/0xBADEAFFE) – for work on the Linux port.
   * [abramcumner](https://github.com/abramcumner) – for useful fixes and additions.
   * [Morrey](https://github.com/morrey) – for work on Clear Sky support and his Return to Clear Sky mod.
-* Companies
+* Companies:
   * [CoderGears](https://www.cppdepend.com) – thanks for providing a [free Pro Licence for CppDepend](https://www.cppdepend.com/cppdependfoross), an amazing and powerful tool for C and C++.
     [![CppDepend logo](https://www.cppdepend.com/images/cppdependlogo.png)](https://www.cppdepend.com)
 
