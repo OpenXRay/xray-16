@@ -14,6 +14,9 @@
 #include "object_factory.h"
 #include "xrCore/xrDebug.h"
 
+using namespace luabind;
+using namespace luabind::policy;
+
 CScriptIniFile::CScriptIniFile(IReader* F, LPCSTR path) : inherited(F, path) {}
 CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
     : inherited(update(szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
@@ -224,7 +227,6 @@ void CScriptIniFile::section_for_each(const luabind::functor<void>& functor)
         functor(section->Name.c_str());
     }
 }
-
 
 void CScriptIniFile::set_readonly(bool b)
 {
