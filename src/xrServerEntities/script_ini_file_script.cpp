@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "Common/object_type_traits.h"
 
 using namespace luabind;
 using namespace luabind::policy;
