@@ -2,6 +2,11 @@
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "2.0.0",
+  "options": {
+    "env": {
+      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x64/Release"
+    }
+  },
   "tasks": [
     {
       "label": "clear",
@@ -12,8 +17,9 @@
       "command": "rm",
       "args": [
         "-rf",
-        "bin",
-      ]
+        "bin"
+      ],
+      "problemMatcher": []
     },
     {
       "label": "mkdir",
@@ -24,7 +30,7 @@
       },
       "args": [
         "-p",
-        "bin",
+        "bin"
       ]
     },
     {
@@ -36,7 +42,8 @@
       "command": "cmake .. -DCMAKE_BUILD_TYPE=Debug",
       "dependsOn": [
         "mkdir"
-      ]
+      ],
+      "problemMatcher": []
     },
     {
       "label": "Configure Release",
@@ -82,7 +89,8 @@
       "dependsOn": [
         "mkdir",
         "Configure Release"
-      ]
+      ],
+      "problemMatcher": []
     },
     {
       "label": "Compile Mixed",
@@ -106,6 +114,15 @@
       "dependsOn": [
         "mkdir"
       ]
+    },
+    {
+      "label": "Run Release",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x64/Release"
+      },
+      "command": "./xr_3da -nointro -fsltx ${COC_LTX_FILE_PATH}",
+      "problemMatcher": []
     },
   ]
 }
