@@ -96,6 +96,8 @@ void CALifeGraphRegistry::setup_current_level()
     int id = pApp->Level_ID(*(*I).second.name(), "1.0", true);
     VERIFY3(id >= 0, "Level is corrupted or doesn't exist", *(*I).second.name());
     ai().load(*(*I).second.name());
+
+    g_start_game_vertex_id = 0;
 }
 
 void CALifeGraphRegistry::attach(CSE_Abstract& object, CSE_ALifeInventoryItem* item,
