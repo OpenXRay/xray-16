@@ -561,3 +561,12 @@ bool CScriptGameObject::is_there_items_to_pickup() const
     }
     return (!!stalker->memory().item().selected());
 }
+
+void CScriptGameObject::ResetBoneProtections(pcstr imm_sect, pcstr bone_sect)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+
+    stalker->ResetBoneProtections(imm_sect, bone_sect);
+}
