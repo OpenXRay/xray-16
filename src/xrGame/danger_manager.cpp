@@ -104,6 +104,15 @@ void CDangerManager::update()
     STOP_PROFILE
 }
 
+void CDangerManager::remove(const CDangerObject& object)
+{
+    if (m_selected && m_selected == &object)
+        m_selected = 0;
+    m_objects.erase(std::remove_if(m_objects.begin(), m_objects.end(), CFindPredicate(object)), m_objects.end());
+    update();
+}
+
+
 void CDangerManager::remove_links(const IGameObject* object)
 {
     if (m_selected && (m_selected->object() == object))

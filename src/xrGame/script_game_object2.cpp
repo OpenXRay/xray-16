@@ -561,3 +561,40 @@ bool CScriptGameObject::is_there_items_to_pickup() const
     }
     return (!!stalker->memory().item().selected());
 }
+
+
+void CScriptGameObject::RemoveDanger(const CDangerObject& dobject)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+
+    stalker->memory().danger().remove(dobject);
+}
+
+void CScriptGameObject::RemoveMemorySoundObject(const MemorySpace::CSoundObject &memory_object)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+
+    stalker->memory().sound().remove(&memory_object);
+}
+
+void CScriptGameObject::RemoveMemoryHitObject(const MemorySpace::CHitObject &memory_object)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+
+    stalker->memory().hit().remove(&memory_object);
+}
+
+void CScriptGameObject::RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject &memory_object)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+
+    stalker->memory().visual().remove(&memory_object);
+}
