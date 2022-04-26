@@ -49,6 +49,8 @@ set(SRC_FILES
     "Actor.h"
     "ActorHelmet.cpp"
     "ActorHelmet.h"
+    "ActorBackpack.cpp"
+    "ActorBackpack.h"
     "ActorInput.cpp"
     "actor_input_handler.cpp"
     "actor_input_handler.h"
