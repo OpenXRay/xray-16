@@ -689,11 +689,11 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
         return;
     }
 
-    s_create_world =
+    s_create_world = 
         (create_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_create_world@12");
     R_ASSERT2(s_create_world, "can't find function \"cs_lua_studio_backend_create_world\"");
 
-    s_destroy_world =
+    s_destroy_world = 
         (destroy_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_destroy_world@4");
     R_ASSERT2(s_destroy_world, "can't find function \"cs_lua_studio_backend_destroy_world\" in the library");
 
@@ -935,7 +935,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     {
         const bool nilConversion =
             pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", true);
-
+     
         luabind::allow_nil_conversion(nilConversion);
         luabind::disable_super_deprecation();
 
