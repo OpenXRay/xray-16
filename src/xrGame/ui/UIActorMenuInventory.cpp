@@ -45,6 +45,7 @@ void CUIActorMenu::InitInventoryMode()
     m_pLists[eInventoryOutfitList]->Show(true);
     ShowIfExist(m_pLists[eInventoryHelmetList], true);
     ShowIfExist(m_pLists[eInventoryDetectorList], true);
+    m_pLists[eInventoryKnifeList]->Show(true);
     m_pLists[eInventoryPistolList]->Show(true);
     m_pLists[eInventoryAutomaticList]->Show(true);
     ShowIfExist(m_pQuickSlot, true);
@@ -235,7 +236,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 {
     CUIDragDropListEx* all_lists[] =
     {
-        m_pLists[eInventoryBeltList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
+        m_pLists[eInventoryBeltList], m_pLists[eInventoryKnifeList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
         m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList], m_pLists[eInventoryBagList],
         m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
     };
@@ -568,6 +569,9 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         if (m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != DETECTOR_SLOT)
             return false;
 
+        if (slot_id == KNIFE_SLOT && m_pActorInvOwner->inventory().CanPutInSlot(iitem, KNIFE_SLOT))
+            return ToSlot(itm, force_place, KNIFE_SLOT);
+
         if (slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3))
             return ToSlot(itm, force_place, INV_SLOT_3);
 
@@ -735,6 +739,8 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     }
     switch (slot_idx)
     {
+    case KNIFE_SLOT: return m_pLists[eInventoryKnifeList]; break;
+
     case INV_SLOT_2: return m_pLists[eInventoryPistolList]; break;
 
     case INV_SLOT_3: return m_pLists[eInventoryAutomaticList]; break;
@@ -749,7 +755,6 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     case TORCH_SLOT:
     case ARTEFACT_SLOT:
     case BINOCULAR_SLOT:
-    case KNIFE_SLOT:
 
     case GRENADE_SLOT: // fake
         if (m_currMenuMode == mmTrade)
