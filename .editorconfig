@@ -2,7 +2,7 @@ root = true
 
 [*]
 charset = utf-8
-insert_final_newline = false
+insert_final_newline = true
 
 [*.{c,h,cpp,hpp}]
 indent_style = space
