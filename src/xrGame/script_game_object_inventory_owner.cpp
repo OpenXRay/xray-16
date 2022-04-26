@@ -1949,7 +1949,7 @@ float CScriptGameObject::GetAdditionalMaxWeight() const
     if (outfit)
         return outfit->m_additional_weight2;
 
-    pBackpack->m_additional_weight2;
+    return pBackpack->m_additional_weight2;
 }
 
 float CScriptGameObject::GetAdditionalMaxWalkWeight() const
@@ -1966,7 +1966,7 @@ float CScriptGameObject::GetAdditionalMaxWalkWeight() const
     if (outfit)
         return outfit->m_additional_weight2;
 
-    pBackpack->m_additional_weight2;
+    return pBackpack->m_additional_weight2;
 }
 
 void CScriptGameObject::SetAdditionalMaxWeight(float add_max_weight)
