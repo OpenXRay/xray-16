@@ -157,41 +157,18 @@ bool Manager::item_upgrades_exist(shared_str const& item_id)
 
 void Manager::load_all_inventory()
 {
-    LPCSTR items_section = "upgraded_inventory";
-
-    if (!pSettings->section_exist(items_section) && ShadowOfChernobylMode)
-        return;
-
-    VERIFY2(pSettings->section_exist(items_section), make_string("Section [%s] does not exist !", items_section));
-    VERIFY2(pSettings->line_count(items_section), make_string("Section [%s] is empty !", items_section));
-
-    if (g_upgrades_log == 1)
+    //Alundaio: No longer the need to define upgradeable sections in [upgraded_inventory]
+    for (auto& section : pSettings->sections())
     {
-        Msg("# Inventory upgrade manager is loaded.");
-    }
+        if (!pSettings->line_exist(section->Name, "upgrades") || !pSettings->r_string(section->Name, "upgrades"))
+            continue;
 
-    CInifile::Sect& inv_section = pSettings->r_section(items_section);
-    auto ib = inv_section.Data.begin();
-    auto ie = inv_section.Data.end();
-    for (; ib != ie; ++ib)
-    {
-        shared_str root_id((*ib).first);
-        //		if ( !item_upgrades_exist( root_id ) ) continue;
-        item_upgrades_exist(root_id);
-        add_root(root_id);
-    }
+        if (!pSettings->line_exist(section->Name, "upgrade_scheme") || !pSettings->r_string(section->Name, "upgrade_scheme"))
+            continue;
 
-    if (g_upgrades_log == 1)
-    {
-        Msg("# Upgrades of inventory items loaded.");
+        add_root(section->Name);
     }
-
-    /*
-    float low, high; ///? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    LPCSTR param = "cost";
-    compute_range( param, low ,high );
-    Msg( "Parameter <%s> min = %.3f, max = %.3f", param, low, high );
-    */
+    //-Alundaio
 }
 
 void Manager::load_all_properties()
