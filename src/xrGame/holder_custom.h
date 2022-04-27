@@ -14,11 +14,16 @@ private:
 protected:
     CGameObject* Owner() { return m_owner; }
     CActor* OwnerActor() { return m_ownerActor; }
+    bool m_bEnterLocked;
+    bool m_bExitLocked;
+
 public:
     CHolderCustom()
     {
         m_owner = NULL;
         m_ownerActor = NULL;
+        m_bEnterLocked = false;
+        m_bExitLocked = false;
     }
     virtual ~CHolderCustom() { ; }
     virtual void UpdateEx(float fov){}; // called by owner
@@ -53,4 +58,9 @@ public:
     virtual void Action(u16 id, u32 flags){};
     virtual void SetParam(int id, Fvector2 val){};
     virtual void SetParam(int id, Fvector val){};
+
+    virtual bool EnterLocked() { return m_bEnterLocked; }
+    virtual bool ExitLocked() { return m_bExitLocked; }
+    virtual void SetEnterLocked(const bool v) { m_bEnterLocked = v; }
+    virtual void SetExitLocked(const bool v) { m_bExitLocked = v; }
 };
