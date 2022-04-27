@@ -799,6 +799,8 @@ public:
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
     void SetHealthEx(float hp); //AVO
     //Alundaio
+    void inactualize_level_path();
+    void inactualize_game_path();
     float GetLuminocityHemi();
     float GetLuminocity();
     bool Use(CScriptGameObject* obj);
