@@ -97,6 +97,7 @@ CUISequencer::CUISequencer()
 {
     m_UIWindow = nullptr;
     m_pStoredInputReceiver = nullptr;
+    m_name = "invalid";
     m_flags.zero();
 }
 
@@ -118,6 +119,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
+    m_name = tutor_name;
     m_UIWindow = xr_new<CUIWindow>();
 
     m_flags.set(etsPlayEachItem, !!uiXml.ReadInt("play_each_item", 0, 0));

@@ -24,6 +24,7 @@ protected:
     shared_str m_stop_lua_function;
 
 public:
+    LPCSTR m_name;
     IInputReceiver* m_pStoredInputReceiver;
     CUISequencer();
     bool Start(LPCSTR tutor_name);
