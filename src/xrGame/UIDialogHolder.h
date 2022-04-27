@@ -39,7 +39,6 @@ class CDialogHolder : public pureFrame
 
     void StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators);
     void StopMenu(CUIDialogWnd* pDialog);
-    void SetMainInputReceiver(CUIDialogWnd* ir, bool _find_remove);
 
 protected:
     void DoRenderDialogs();
@@ -54,6 +53,7 @@ public:
     CUIDialogWnd* TopInputReceiver();
     void AddDialogToRender(CUIWindow* pDialog);
     void RemoveDialogToRender(CUIWindow* pDialog);
+    void SetMainInputReceiver(CUIDialogWnd* ir, bool _find_remove);
     virtual void OnFrame();
     virtual bool UseIndicators() { return true; }
     virtual void StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators);

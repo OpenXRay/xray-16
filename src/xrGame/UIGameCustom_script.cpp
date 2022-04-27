@@ -13,6 +13,8 @@ SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
                          .def("wnd", &StaticDrawableWrapper::wnd),
 
         class_<CUIGameCustom, CDialogHolder>("CUIGameCustom")
+            .def("TopInputReceiver", &CUIGameCustom::TopInputReceiver)
+            .def("SetMainInputReceiver", &CUIGameCustom::SetMainInputReceiver)
             .def("AddDialogToRender", &CUIGameCustom::AddDialogToRender)
             .def("RemoveDialogToRender", &CUIGameCustom::RemoveDialogToRender)
             .def("AddCustomStatic", +[](CUIGameCustom* self, pcstr id, bool singleInstance)
@@ -23,6 +25,7 @@ SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
             .def("RemoveCustomStatic", &CUIGameCustom::RemoveCustomStatic)
             .def("HideActorMenu", &CUIGameCustom::HideActorMenu)
              //Alundaio
+            .def("ShowActorMenu", &CUIGameCustom::ShowActorMenu)
             .def("UpdateActorMenu", &CUIGameCustom::UpdateActorMenu)
             .def("CurrentItemAtCell", &CUIGameCustom::CurrentItemAtCell)
             //-Alundaio
