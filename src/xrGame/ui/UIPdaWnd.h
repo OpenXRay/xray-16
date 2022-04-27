@@ -84,4 +84,5 @@ public:
     virtual bool StopAnyMove() { return false; }
     void UpdatePda();
     void UpdateRankingWnd();
+    IC bool IsShown() { return GetVisible(); }
 };

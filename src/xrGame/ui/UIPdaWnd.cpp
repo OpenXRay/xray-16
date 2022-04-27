@@ -28,6 +28,7 @@
 #include "UIActorInfo.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
+#include "UIScriptWnd.h"
 
 #define PDA_XML "pda.xml"
 
@@ -239,6 +240,15 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     else if (section == "eptLogs" && pUILogsWnd)
     {
         m_pActiveDialog = pUILogsWnd;
+    }
+
+    luabind::functor<CUIDialogWndEx*> funct;
+    if (GEnv.ScriptEngine->functor("pda.set_active_subdialog", funct))
+    {
+        CUIDialogWndEx* ret = funct((LPCSTR)section.c_str());
+        CUIWindow* pScriptWnd = ret ? smart_cast<CUIWindow*>(ret) : (0);
+        if (pScriptWnd)
+            m_pActiveDialog = pScriptWnd;
     }
 
     R_ASSERT(m_pActiveDialog);
