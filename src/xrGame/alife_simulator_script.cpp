@@ -23,6 +23,7 @@
 #include "xrNetServer/NET_Messages.h"
 
 using namespace luabind;
+using namespace luabind::policy;
 
 typedef xr_vector<std::pair<shared_str, int>> STORY_PAIRS;
 typedef STORY_PAIRS SPAWN_STORY_PAIRS;
@@ -323,6 +324,82 @@ void iterate_objects(const CALifeSimulator* self, luabind::functor<bool> functor
     }
 }
 
+CSE_Abstract* reprocess_spawn(CALifeSimulator* self, CSE_Abstract* object)
+{
+    NET_Packet packet;
+    packet.w_begin(M_SPAWN);
+    packet.w_stringZ(object->s_name);
+
+    object->Spawn_Write(packet, FALSE);
+    self->server().FreeID(object->ID, 0);
+    F_entity_Destroy(object);
+
+    ClientID clientID;
+    clientID.set(0xffff);
+
+    u16 dummy;
+    packet.r_begin(dummy);
+
+    return self->server().Process_spawn(packet, clientID);
+}
+CSE_Abstract* try_to_clone_object(CALifeSimulator* self, CSE_Abstract* object, pcstr section, const Fvector& position,
+                                  u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent,
+                                  bool bRegister = true)
+{
+    CSE_ALifeItemWeaponMagazined* wpnmag = smart_cast<CSE_ALifeItemWeaponMagazined*>(object);
+    if (!wpnmag)
+        return nullptr;
+
+    CSE_Abstract* absClone = self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent, false);
+    if (!absClone)
+        return nullptr;
+
+    CSE_ALifeItemWeaponMagazined * clone = smart_cast<CSE_ALifeItemWeaponMagazined*>(absClone);
+    if (!clone)
+        return nullptr;
+
+    clone->wpn_flags = wpnmag->wpn_flags;
+    clone->m_addon_flags = wpnmag->m_addon_flags;
+    clone->m_fCondition = wpnmag->m_fCondition;
+    clone->ammo_type.data = wpnmag->ammo_type.data;
+    clone->m_upgrades = wpnmag->m_upgrades;
+    clone->a_elapsed.data = wpnmag->a_elapsed.data;
+    clone->a_current_addon.data = wpnmag->a_current_addon.data;
+
+    return bRegister ? reprocess_spawn(self, absClone) : absClone;
+}
+CSE_Abstract* try_to_clone_object(CALifeSimulator* self, CSE_Abstract* object, pcstr section, const Fvector& position,
+    u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent)
+{
+    return try_to_clone_object(self, object, section, position, level_vertex_id, game_vertex_id, id_parent, true);
+}
+
+void set_objects_per_update(CALifeSimulator* self, u32 count)
+{
+    self->objects_per_update(count);
+}
+
+void set_process_time(CALifeSimulator* self, int micro)
+{
+    self->set_process_time(micro);
+}
+
+xr_vector<u16>& get_children(const CALifeSimulator* self, CSE_Abstract* object)
+{
+    VERIFY(self);
+    return object->children;
+}
+
+void IterateInfo(const CALifeSimulator* alife, const ALife::_OBJECT_ID& id, const luabind::functor<void>& functor)
+{
+    const auto known_info = registry(alife, id);
+    if (!known_info)
+        return;
+
+    for (const auto& it : *known_info)
+        functor(id, it.info_id);
+}
+
 SCRIPT_EXPORT(CALifeSimulator, (),
 {
     module(luaState)
@@ -370,7 +447,16 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             //Alundaio: extend alife simulator exports
             .def("teleport_object", &teleport_object)
             //Alundaio: END
-            .def("iterate_objects", &iterate_objects),
+            .def("iterate_objects", &iterate_objects)
+            .def("iterate_info", &IterateInfo)
+            .def("clone_weapon", (CSE_Abstract* (*)(CALifeSimulator*, CSE_Abstract*, pcstr, const Fvector&, u32,
+                GameGraph::_GRAPH_ID, ALife::_OBJECT_ID))&try_to_clone_object)
+            .def("clone_weapon", (CSE_Abstract* (*)(CALifeSimulator*, CSE_Abstract*, pcstr, const Fvector&, u32,
+                GameGraph::_GRAPH_ID, ALife::_OBJECT_ID, bool))&try_to_clone_object)
+            .def("register", &reprocess_spawn)
+            .def("set_objects_per_update", &set_objects_per_update)
+            .def("set_process_time", &set_process_time)
+			.def("get_children", &get_children, return_stl_iterator()),
 
         def("alife", &alife)
     ];
