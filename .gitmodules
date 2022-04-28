@@ -53,3 +53,7 @@
 	path = Externals/lua-marshal
 	url = https://github.com/ChugunovRoman/lua-marshal.git
 	branch = open-x-ray-coc
+[submodule "Externals/lua_extensions"]
+	path = Externals/lua_extensions
+	url = https://github.com/ChugunovRoman/lua_extensions.git
+	branch = master

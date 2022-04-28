@@ -6,6 +6,7 @@ add_subdirectory(OPCODE)
 add_subdirectory(ode)
 add_subdirectory(xrLuaFS)
 add_subdirectory(lua-marshal)
+add_subdirectory(lua_extensions)
 #add_subdirectory(NVTT)
 
 if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
