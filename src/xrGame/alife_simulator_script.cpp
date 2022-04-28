@@ -323,6 +323,15 @@ void iterate_objects(const CALifeSimulator* self, luabind::functor<bool> functor
     }
 }
 
+void set_start_position(Fvector& pos)
+{
+    g_start_position = pos;
+}
+void set_start_game_vertex_id(int id)
+{
+    g_start_game_vertex_id = id;
+}
+
 SCRIPT_EXPORT(CALifeSimulator, (),
 {
     module(luaState)
@@ -372,7 +381,9 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             //Alundaio: END
             .def("iterate_objects", &iterate_objects),
 
-        def("alife", &alife)
+        def("alife", &alife),
+        def("set_start_position", &set_start_position),
+        def("set_start_game_vertex_id", &set_start_game_vertex_id)
     ];
     class CALifeSimulatorExporter1
     {
