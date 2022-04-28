@@ -396,10 +396,30 @@ void CUIMMShniaga::OnBtnClick()
 
 bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (WINDOW_KEY_PRESSED == keyboard_action || WINDOW_KEY_HOLD == keyboard_action)
-    {
-        int action = GetBindedAction(dik);
+    int action = GetBindedAction(dik);
 
+    // Check here only for key press to fix too fast clicks
+    if (WINDOW_KEY_PRESSED == keyboard_action)
+    {
+        switch (action)
+        {
+        case kENTER:
+        case kJUMP:
+        case kUSE:
+            if (WINDOW_KEY_HOLD == keyboard_action)
+                return false;
+            OnBtnClick();
+            return true;
+
+        case kQUIT:
+            if (m_page != epi_main)
+                ShowMain();
+            return true;
+        } // switch (GetBindedAction(dik))
+    }
+    // CInput sends both 'key hold' and 'key press' during one frame, no need to check WINDOW_KEY_PRESSED here
+    else if (WINDOW_KEY_HOLD == keyboard_action)
+    {
     try_again:
         switch (action)
         {
@@ -428,17 +448,6 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         case kLEFT:
         case kRIGHT:
             break;
-
-        case kENTER:
-        case kJUMP:
-        case kUSE:
-            OnBtnClick();
-            return true;
-
-        case kQUIT:
-            if (m_page != epi_main)
-                ShowMain();
-            return true;
 
         default:
         {
