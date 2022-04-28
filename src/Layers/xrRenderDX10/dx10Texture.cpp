@@ -213,8 +213,8 @@ IC  void    TW_Iterate_1OP
         t_dst->LockRect             (i,&Rdst,0,0);
         for (u32 y = 0; y < desc.Height; y++)   {
             for (u32 x = 0; x < desc.Width; x++)    {
-                DWORD&  pSrc    = *(((DWORD*)((BYTE*)Rsrc.pBits + (y * Rsrc.Pitch)))+x);
-                DWORD&  pDst    = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch)))+x);
+                DWORD&  pSrc    = *(((DWORD*)((u8*)Rsrc.pBits + (y * Rsrc.Pitch)))+x);
+                DWORD&  pDst    = *(((DWORD*)((u8*)Rdst.pBits + (y * Rdst.Pitch)))+x);
                 pDst            = pred(pDst,pSrc);
             }
         }
@@ -249,9 +249,9 @@ IC  void    TW_Iterate_2OP
         t_dst->LockRect             (i,&Rdst,   0,0);
         for (u32 y = 0; y < desc.Height; y++)   {
             for (u32 x = 0; x < desc.Width; x++)    {
-                DWORD&  pSrc0   = *(((DWORD*)((BYTE*)Rsrc0.pBits + (y * Rsrc0.Pitch)))+x);
-                DWORD&  pSrc1   = *(((DWORD*)((BYTE*)Rsrc1.pBits + (y * Rsrc1.Pitch)))+x);
-                DWORD&  pDst    = *(((DWORD*)((BYTE*)Rdst.pBits  + (y * Rdst.Pitch)))+x);
+                DWORD&  pSrc0   = *(((DWORD*)((u8*)Rsrc0.pBits + (y * Rsrc0.Pitch)))+x);
+                DWORD&  pSrc1   = *(((DWORD*)((u8*)Rsrc1.pBits + (y * Rsrc1.Pitch)))+x);
+                DWORD&  pDst    = *(((DWORD*)((u8*)Rdst.pBits  + (y * Rdst.Pitch)))+x);
                 pDst            = pred(pDst,pSrc0,pSrc1);
             }
         }

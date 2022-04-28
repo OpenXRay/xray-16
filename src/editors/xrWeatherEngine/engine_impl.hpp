@@ -34,17 +34,17 @@ private:
     virtual void disconnect();
     bool quit_requested() const override;
 
-    virtual void value(LPCSTR value, shared_str& result);
-    virtual LPCSTR value(shared_str const& value);
+    virtual void value(pcstr value, shared_str& result);
+    virtual pcstr value(shared_str const& value);
 
     // manager
     CEnvironment* environment() override;
 
-    virtual void weather(LPCSTR value);
-    virtual LPCSTR weather();
+    virtual void weather(pcstr value);
+    virtual pcstr weather();
 
-    virtual void current_weather_frame(LPCSTR frame_id);
-    virtual LPCSTR current_weather_frame();
+    virtual void current_weather_frame(pcstr frame_id);
+    virtual pcstr current_weather_frame();
 
     virtual void track_frame(float const& time);
     virtual float track_frame();

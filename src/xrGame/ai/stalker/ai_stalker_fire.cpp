@@ -821,13 +821,14 @@ bool CAI_Stalker::fire_make_sense()
         return (false);
 
     // if we do not have automatic weapon
-    switch (best_weapon()->object().ef_weapon_type())
+    const int weapon_type = best_weapon()->object().ef_weapon_type();
+    switch (StalkerSpace::convert_weapon_type(weapon_type))
     {
-    case 6:
-    case 7:
-    case 8:
-    case 10: break;
-    default: return (false);
+    case WeaponTypes::SubmashineGun:
+    case WeaponTypes::MashineGun:
+        break;
+    default:
+        return (false);
     }
 
     return (true);
@@ -1223,20 +1224,21 @@ bool CAI_Stalker::too_far_to_kill_enemy(const Fvector& position)
     VERIFY(memory().enemy().selected());
     VERIFY(best_weapon());
 
-    int weapon_type = best_weapon()->object().ef_weapon_type();
-    float distance = position.distance_to(Position());
-    switch (weapon_type)
+    const float distance = position.distance_to(Position());
+    const int weapon_type = best_weapon()->object().ef_weapon_type();
+    switch (convert_weapon_type(weapon_type))
     {
-    // pistols
-    case 5:
+    case WeaponTypes::Pistol:
         return (distance > 10.f);
-    // shotguns
-    case 9:
+
+    case WeaponTypes::Shotgun:
         return (distance > 5.f);
-    // sniper rifles
-    case 11:
-    case 12: return (distance > 70.f);
-    default: return (distance > 5.f);
+
+    case WeaponTypes::SniperRifle:
+        return (distance > 70.f);
+
+    default:
+        return (distance > 5.f);
     }
 #endif
 }

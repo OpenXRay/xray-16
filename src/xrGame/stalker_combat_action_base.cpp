@@ -92,25 +92,13 @@ void CStalkerActionCombatBase::aim_ready_force_full()
 void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& min_queue_size, u32& max_queue_size,
     u32& min_queue_interval, u32& max_queue_interval) const
 {
-    int weapon_type = 6;
+    WeaponTypes weapon_type = WeaponTypes::Unknown;
     if (object().best_weapon())
-        weapon_type = object().best_weapon()->object().ef_weapon_type();
-
-    if (ClearSkyMode || ShadowOfChernobylMode)
-    {
-        // remap
-        switch (weapon_type)
-        {
-        case 6: weapon_type = 666; break; // random number so that we can get to the default case
-        case 7: weapon_type = 9; break; // shotguns
-        case 8: weapon_type = 11; break; // sniper rifles
-        }
-    }
+        weapon_type = convert_weapon_type(object().best_weapon()->object().ef_weapon_type());
 
     switch (weapon_type)
     {
-    // pistols
-    case 5:
+    case WeaponTypes::Pistol:
     {
         if (distance > object().pstl_queue_fire_dist_far())
         {
@@ -136,8 +124,7 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
 
         break;
     }
-    // shotguns
-    case 9:
+    case WeaponTypes::Shotgun:
     {
         if (distance > object().shtg_queue_fire_dist_far())
         {
@@ -163,9 +150,7 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
 
         break;
     }
-    // sniper rifles
-    case 11:
-    case 12:
+    case WeaponTypes::SniperRifle:
     {
         if (distance > object().snp_queue_fire_dist_far())
         {
@@ -191,11 +176,8 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
 
         break;
     }
-    // machine guns
-    case 6:
-    case 7:
-    case 8:
-    case 10:
+    case WeaponTypes::SubmashineGun:
+    case WeaponTypes::MashineGun:
     {
         if (distance > object().mchg_queue_fire_dist_far())
         {

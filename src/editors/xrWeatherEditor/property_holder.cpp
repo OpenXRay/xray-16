@@ -17,7 +17,7 @@ using XRay::Editor::property_holder_holder;
 
 typedef property_holder::collection_type collection_type;
 
-property_holder::property_holder(XRay::Editor::engine_base* engine, LPCSTR display_name, property_holder_collection* collection,
+property_holder::property_holder(XRay::Editor::engine_base* engine, pcstr display_name, property_holder_collection* collection,
     XRay::Editor::property_holder_holder* holder)
     : m_engine(engine), m_display_name(to_string(display_name)), m_collection(collection), m_holder(holder),
       m_disposing(false)

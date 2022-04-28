@@ -12,7 +12,7 @@
 using System::String;
 
 property_boolean_values_value::property_boolean_values_value(
-    boolean_getter_type const& getter, boolean_setter_type const& setter, LPCSTR values[2])
+    boolean_getter_type const& getter, boolean_setter_type const& setter, pcstr values[2])
     : inherited(getter, setter), m_collection(gcnew collection_type())
 {
     for (u32 i = 0; i < 2; ++i)

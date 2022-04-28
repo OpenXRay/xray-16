@@ -17,6 +17,7 @@
 #endif
 #include <lfs.h>
 #include <stdarg.h>
+#include <lmarshal.h>
 #include "Common/Noncopyable.hpp"
 #include "xrCore/ModuleLookup.hpp"
 #include "luabind/class_info.hpp"
@@ -676,6 +677,7 @@ static void log_callback(void* context, const char* message)
 
 void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine)
 {
+#ifdef XR_PLATFORM_WINDOWS
     engine = 0;
     world = 0;
     u32 const old_error_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -688,11 +690,11 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
         return;
     }
 
-    s_create_world = 
+    s_create_world =
         (create_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_create_world@12");
     R_ASSERT2(s_create_world, "can't find function \"cs_lua_studio_backend_create_world\"");
 
-    s_destroy_world = 
+    s_destroy_world =
         (destroy_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_destroy_world@4");
     R_ASSERT2(s_destroy_world, "can't find function \"cs_lua_studio_backend_destroy_world\" in the library");
 
@@ -703,10 +705,14 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
     s_old_log_callback = SetLogCB(LogCallback(log_callback, this));
     RunJITCommand(state, "off()");
     world->add(state);
+#else
+    VERIFY(!"Not implemented");
+#endif
 }
 
 void CScriptEngine::finalize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine)
 {
+#ifdef XR_PLATFORM_WINDOWS
     world->remove(state);
     VERIFY(world);
     s_destroy_world(world);
@@ -714,6 +720,9 @@ void CScriptEngine::finalize_lua_studio(lua_State* state, cs::lua_studio::world*
     VERIFY(engine);
     xr_delete(engine);
     SetLogCB(s_old_log_callback);
+#else
+    VERIFY(!"Not implemented");
+#endif
 }
 
 void CScriptEngine::try_connect_to_debugger()
@@ -927,7 +936,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     {
         const bool nilConversion =
             pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", true);
-     
+
         luabind::allow_nil_conversion(nilConversion);
         luabind::disable_super_deprecation();
 
@@ -967,6 +976,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
     luajit::open_lib(lua(), LUA_FFILIBNAME, luaopen_ffi);
     luajit::open_lib(lua(), LUA_FSLIBNAME, luaopen_lfs);
+    luajit::open_lib(lua(), LUA_MARSHALLIBNAME, luaopen_marshal);
 #ifndef MASTER_GOLD
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif

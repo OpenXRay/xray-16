@@ -49,4 +49,7 @@
 [submodule "Externals/xrLuaFS"]
 	path = Externals/xrLuaFS
 	url = https://github.com/ChugunovRoman/luafilesystem.git
+[submodule "Externals/lua-marshal"]
+	path = Externals/lua-marshal
+	url = https://github.com/ChugunovRoman/lua-marshal.git
 	branch = open-x-ray-coc

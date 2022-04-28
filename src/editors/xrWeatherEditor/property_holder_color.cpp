@@ -17,7 +17,7 @@ ref class property_converter_color;
 
 using Flobbster::Windows::Forms::PropertySpec;
 
-XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(pcstr identifier, pcstr category, pcstr description,
     XRay::Editor::color const& default_value, color_getter_type const& getter, color_setter_type const& setter,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
     password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid)
@@ -30,7 +30,7 @@ XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, L
     return (nullptr);
 }
 
-XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(pcstr identifier, pcstr category, pcstr description,
     XRay::Editor::color const& default_value, XRay::Editor::color& value, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)

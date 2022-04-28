@@ -23,9 +23,6 @@
 #define IS_2_POW_N(X) (((X) & (X - 1)) == 0)
 #define PTR_SZ sizeof(void*)
 
-#ifdef __BORLANDC__
-typedef _W64 unsigned int uintptr_t;
-#endif
 /***
 *
 * |1|___6___|2|3|4|_________5__________|_6_|

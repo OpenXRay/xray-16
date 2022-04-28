@@ -8,6 +8,7 @@
 
 #include "pch_script.h"
 #include "ai_stalker.h"
+#include "ai_stalker_space.h"
 #include "cover_point.h"
 #include "cover_evaluators.h"
 #include "ai_space.h"
@@ -77,33 +78,24 @@ void CAI_Stalker::compute_enemy_distances(float& minimum_enemy_distance, float& 
     if (!best_weapon())
         return;
 
-    int weapon_type = best_weapon()->object().ef_weapon_type();
-    switch (weapon_type)
+    const int weapon_type = best_weapon()->object().ef_weapon_type();
+    switch (StalkerSpace::convert_weapon_type(weapon_type))
     {
-    // pistols
-    case 5:
-    {
+    case StalkerSpace::WeaponTypes::Pistol:
         maximum_enemy_distance = 10.f;
         break;
-    }
-    // shotguns
-    case 9:
-    {
+
+    case StalkerSpace::WeaponTypes::Shotgun:
         maximum_enemy_distance = 5.f;
         break;
-    }
-    // sniper rifles
-    case 11:
-    case 12:
-    {
+
+    case StalkerSpace::WeaponTypes::SniperRifle:
         minimum_enemy_distance = 20.f;
         break;
-    }
+
     default:
-    {
         maximum_enemy_distance = 20.f;
         break;
-    }
     }
 
     minimum_enemy_distance = std::min(minimum_enemy_distance, maximum_enemy_distance);

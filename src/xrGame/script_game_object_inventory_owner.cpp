@@ -796,21 +796,25 @@ LPCSTR CScriptGameObject::sound_voice_prefix() const
 }
 
 #include "GametaskManager.h"
-ETaskState CScriptGameObject::GetGameTaskState(LPCSTR task_id)
+ETaskState CScriptGameObject::GetGameTaskState(LPCSTR task_id, TASK_OBJECTIVE_ID objective_id)
 {
     shared_str shared_name = task_id;
     CGameTask* t = Level().GameTaskManager().HasGameTask(shared_name, true);
 
     if (NULL == t)
         return eTaskStateDummy;
-
-    return t->GetTaskState();
+    if (objective_id >= t->GetObjectivesCount())
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "wrong objective num", task_id);
+        return eTaskStateDummy;
+    }
+    return t->ObjectiveState(objective_id);
 }
 
-void CScriptGameObject::SetGameTaskState(ETaskState state, LPCSTR task_id)
+void CScriptGameObject::SetGameTaskState(ETaskState state, LPCSTR task_id, TASK_OBJECTIVE_ID objective_id)
 {
     shared_str shared_name = task_id;
-    Level().GameTaskManager().SetTaskState(shared_name, state);
+    Level().GameTaskManager().SetTaskState(shared_name, state, objective_id);
 }
 
 //////////////////////////////////////////////////////////////////////////

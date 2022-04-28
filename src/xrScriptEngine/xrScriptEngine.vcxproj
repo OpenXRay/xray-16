@@ -94,6 +94,8 @@
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)xrLuaFS.vcxproj">
       <Project>{b23d8795-0c38-4684-a7a0-0155804c2e96}</Project>
+    <ProjectReference Include="$(xrExternals)lua-marshal.vcxproj">
+      <Project>{b67b8b20-8f49-4d6b-91a4-e4cd0a28c745}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

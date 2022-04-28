@@ -94,6 +94,7 @@ typedef struct tagcomplex {
 #include <string.h>
 #include <ctype.h>
 
+typedef uint8_t        BYTE;
 typedef DWORD          COLORREF;
 typedef void*          HRGN;
 typedef void*          HDC;

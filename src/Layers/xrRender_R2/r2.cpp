@@ -601,6 +601,7 @@ void CRender::create()
 
     c_lmaterial = "L_material";
     c_sbase = "s_base";
+    c_snoise = "s_noise";
 
     m_bMakeAsyncSS = false;
 

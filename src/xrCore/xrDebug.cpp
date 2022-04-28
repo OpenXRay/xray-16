@@ -174,6 +174,11 @@ bool xrDebug::ShowErrorMessage = false;
 
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
+#ifdef PROFILE_CRITICAL_SECTIONS
+Lock xrDebug::failLock(MUTEX_PROFILE_ID(xrDebug::Backend));
+#else
+Lock xrDebug::failLock;
+#endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
@@ -482,12 +487,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
                    const char* arg2)
 {
-#ifdef PROFILE_CRITICAL_SECTIONS
-    static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
-#else
-    static Lock lock;
-#endif
-    lock.Enter();
+    ScopeLock lock(&failLock);
 
     if (windowHandler)
         windowHandler->OnErrorDialog(true); // Call it only after locking so that multiple threads won't call this function simultaneously.
@@ -546,7 +546,6 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     if (resetFullscreen)
         windowHandler->OnErrorDialog(false); // Call it only before unlocking so that multiple threads won't call this function simultaneously.
 
-    lock.Leave();
     return result;
 }
 
@@ -558,6 +557,8 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 
 void xrDebug::DoExit(const std::string& message)
 {
+    ScopeLock lock(&failLock);
+
     if (windowHandler)
         windowHandler->OnErrorDialog(true);
 
@@ -752,6 +753,8 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 {
 #if defined(XR_PLATFORM_WINDOWS)
+    ScopeLock lock(&failLock);
+
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
     if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
@@ -834,6 +837,8 @@ void _terminate()
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
 #endif
+    //ScopeLock lock(&failLock);
+
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo,sizeof(assertionInfo), DEBUG_INFO, nullptr, "Unexpected application termination");
     xr_strcat(assertionInfo, "Press OK to abort execution\r\n");

@@ -37,15 +37,17 @@ public:
     vGameTasks& GetGameTasks();
     CGameTask* HasGameTask(const CMapLocation* ml, bool only_inprocess);
     CGameTask* HasGameTask(const TASK_ID& id, bool only_inprocess);
+    CGameTask* GiveGameTaskToActor(const TASK_ID& id, u32 timeToComplete, bool bCheckExisting = true, u32 timer_ttl = 0);
     CGameTask* GiveGameTaskToActor(CGameTask* t, u32 timeToComplete, bool bCheckExisting, u32 timer_ttl);
-    void SetTaskState(const TASK_ID& id, ETaskState state);
-    void SetTaskState(CGameTask* t, ETaskState state);
+    void SetTaskState(const TASK_ID& id, ETaskState state, TASK_OBJECTIVE_ID objective_id = ROOT_TASK_OBJECTIVE);
+    void SetTaskState(CGameTask* t, ETaskState state, TASK_OBJECTIVE_ID objective_id = ROOT_TASK_OBJECTIVE);
 
     void UpdateTasks();
 
     CGameTask* ActiveTask(ETaskType type = eTaskTypeStoryline);
     //void SetActiveTask(const TASK_ID& id, ETaskType type = eTaskTypeStoryline);
     void SetActiveTask(CGameTask* task);
+    void SetActiveTask(CGameTask* task, TASK_OBJECTIVE_ID objective_id);
     u32 ActualFrame() const { return m_actual_frame; }
     CGameTask* IterateGet(CGameTask* t, ETaskState state, ETaskType type, bool bForward);
     u32 GetTaskIndex(CGameTask* t, ETaskState state, ETaskType type = eTaskTypeStoryline);

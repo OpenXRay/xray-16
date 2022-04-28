@@ -156,6 +156,7 @@ public:
     xr_vector<Fbox3> main_coarse_structure;
 
     shared_str c_sbase;
+    shared_str c_snoise;
     shared_str c_lmaterial;
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];

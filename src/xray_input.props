@@ -10,6 +10,7 @@
         $(xrExternals);
         $(xrExternals)luajit\src;
         $(xrExternals)xrLuaFS\src;
+        $(xrExternals)lua-marshal;
         $(xrExternals)luabind;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>

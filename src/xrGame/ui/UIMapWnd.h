@@ -64,7 +64,7 @@ private:
         btn_zoom_reset = 8,
         max_btn_nav = 9
     };
-    CUI3tButton* m_btn_nav[max_btn_nav];
+    CUI3tButton* m_btn_nav[max_btn_nav]{};
     CUIStatic* m_btn_nav_parent;
     u32 m_nav_timing;
 
@@ -106,7 +106,7 @@ public:
     UIHint* hint_wnd;
 
 protected:
-    void init_xml_nav(CUIXml& xml);
+    void init_xml_nav(CUIXml& xml, pcstr start_from, bool critical);
     void ShowHint(bool extra = false);
     void Activated();
 
