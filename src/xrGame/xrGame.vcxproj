@@ -2142,6 +2142,10 @@
     </ClCompile>
     <ClCompile Include="CustomMonster_VCPU.cpp" />
     <ClCompile Include="CustomOutfit.cpp" />
+    <ClCompile Include="CustomOutfit_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
     <ClCompile Include="CustomRocket.cpp" />
     <ClCompile Include="CustomZone.cpp" />
     <ClCompile Include="DamagableItem.cpp" />

@@ -382,6 +382,7 @@ set(SRC_FILES
     "CustomMonster.h"
     "CustomMonster_inline.h"
     "CustomMonster_VCPU.cpp"
+    "CustomOutfit_script.cpp"
     "CustomOutfit.cpp"
     "CustomOutfit.h"
     "CustomRocket.cpp"
