@@ -50,6 +50,8 @@
 #include "xrEngine/Feel_Touch.h"
 #include "level_path_manager.h"
 #include "game_path_manager.h"
+#include "danger_manager.h"
+#include "danger_object.h"
 #endif
 //-Alundaio
 
