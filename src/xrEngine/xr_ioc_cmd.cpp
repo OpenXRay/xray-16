@@ -8,8 +8,6 @@
 #include "xrSASH.h"
 #endif
 
-#include "MonitorManager.hpp"
-
 #include "CameraManager.h"
 #include "Environment.h"
 #include "xr_input.h"
@@ -18,9 +16,10 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
-extern u32 Vid_SelectedMonitor;
-extern u32 Vid_SelectedRefreshRate;
 xr_vector<xr_token> VidQualityToken;
+
+extern xr_vector<xr_token> vid_monitor_token;
+extern xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 
@@ -96,30 +95,6 @@ class CCC_DbgStrDump : public IConsole_Command
 public:
     CCC_DbgStrDump(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(pcstr args) { g_pStringContainer->dump(); }
-};
-//-----------------------------------------------------------------------
-class CCC_MotionsStat : public IConsole_Command
-{
-public:
-    CCC_MotionsStat(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(pcstr args)
-    {
-        // g_pMotionsContainer->dump();
-        // TODO: move this console commant into renderer
-        VERIFY(0);
-    }
-};
-class CCC_TexturesStat : public IConsole_Command
-{
-public:
-    CCC_TexturesStat(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(pcstr args)
-    {
-        Device.DumpResourcesMemoryUsage();
-        // Device.Resources->_DumpMemoryUsage();
-        // TODO: move this console commant into renderer
-        // VERIFY(0);
-    }
 };
 //-----------------------------------------------------------------------
 class CCC_E_Dump : public IConsole_Command
@@ -229,7 +204,7 @@ public:
             Msg("Config-file [%s] saved successfully", cfg_full_name);
         }
         else
-            Msg("!Cannot store config file [%s]", cfg_full_name);
+            Msg("! Cannot store config file [%s]", cfg_full_name);
     }
 };
 CCC_LoadCFG::CCC_LoadCFG(pcstr N) : IConsole_Command(N){};
@@ -379,24 +354,38 @@ public:
     }
 };
 //-----------------------------------------------------------------------
+class CCC_VidMonitor : public CCC_Token
+{
+public:
+    CCC_VidMonitor(pcstr name) : CCC_Token(name, &psDeviceMode.Monitor, nullptr) {}
+
+    const xr_token* GetToken() noexcept override
+    {
+        return vid_monitor_token.data();
+    }
+};
+//-----------------------------------------------------------------------
 class CCC_VidMode : public CCC_Token
 {
     u32 _dummy = 0;
 
 public:
-    CCC_VidMode(pcstr name) : CCC_Token(name, &_dummy, nullptr)
-    {
-        bEmptyArgsHandled = false;
-    }
+    CCC_VidMode(pcstr name) : CCC_Token(name, &_dummy, nullptr) {}
 
     void Execute(pcstr args) override
     {
-        u32 w, h;
-        const int cnt = sscanf(args, "%dx%d", &w, &h);
-        if (cnt == 2)
+        u32 w, h, r = 0;
+        const int cnt = sscanf(args, "%ux%u (%uHz)", &w, &h, &r);
+        if (cnt >= 2)
         {
-            psCurrentVidMode[0] = w;
-            psCurrentVidMode[1] = h;
+            psDeviceMode.Width = w;
+            psDeviceMode.Height = h;
+
+            if (cnt == 3)
+            {
+                psDeviceMode.RefreshRate = r;
+                m_Refresh60hz.set(fl_Refresh60hz, psDeviceMode.RefreshRate == 60);
+            }
         }
         else
         {
@@ -406,24 +395,57 @@ public:
 
     const xr_token* GetToken() noexcept override
     {
-        return g_monitors.GetTokensForCurrentMonitor().data();
+        return vid_mode_token[psDeviceMode.Monitor].data();
     }
 
     void GetStatus(TStatus& S) override
     {
-        xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
+        xr_sprintf(S, "%ux%u (%uHz)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
     }
 
     void Info(TInfo& I) override
     {
-        xr_strcpy(I, sizeof(I), "change screen resolution WxH");
+        xr_strcpy(I, sizeof(I), "change screen resolution WxH (RHz)");
     }
 
     void fill_tips(vecTips& tips, u32 /*mode*/) override
     {
-        g_monitors.FillResolutionsTips(tips);
+        TStatus buf;
+        xr_sprintf(buf, "%ux%u (%dHz) (current)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
+        tips.push_back(buf);
+
+        const xr_token* tok = GetToken();
+        while (tok->name)
+        {
+            tips.push_back(tok->name);
+            tok++;
+        }
     }
+
+private:
+    enum { fl_Refresh60hz = 1u << 0u };
+    inline static Flags32 m_Refresh60hz; // for rs_refresh_60hz backwards compatibility
+
+public:
+    class CCC_Refresh60hz final : public CCC_Mask
+    {
+    public:
+        CCC_Refresh60hz(pcstr name) : CCC_Mask(name, &m_Refresh60hz, fl_Refresh60hz)
+        {
+            m_Refresh60hz.set(fl_Refresh60hz, psDeviceMode.RefreshRate == 60);
+        }
+
+        void Execute(pcstr args) override
+        {
+            CCC_Mask::Execute(args);
+            if (GetValue())
+                psDeviceMode.RefreshRate = 60;
+            else
+                psDeviceMode.RefreshRate = 0; // Device will adjust
+        }
+    };
 };
+using CCC_Refresh60hz = CCC_VidMode::CCC_Refresh60hz;
 //-----------------------------------------------------------------------
 class CCC_VidWindowMode final : public CCC_Token
 {
@@ -437,12 +459,12 @@ class CCC_VidWindowMode final : public CCC_Token
     };
 
 public:
-    CCC_VidWindowMode(pcstr name) : CCC_Token(name, &psCurrentWindowMode, vid_window_mode_token) {}
+    CCC_VidWindowMode(pcstr name) : CCC_Token(name, &psDeviceMode.WindowStyle, vid_window_mode_token) {}
 
     void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
-        m_fullscreen.set(fl_fullscreen, psCurrentWindowMode == rsFullscreen);
+        m_fullscreen.set(fl_fullscreen, psDeviceMode.WindowStyle == rsFullscreen);
     }
 
 private:
@@ -455,135 +477,20 @@ public:
     public:
         CCC_Fullscreen(pcstr name) : CCC_Mask(name, &m_fullscreen, fl_fullscreen)
         {
-            m_fullscreen.set(fl_fullscreen, psCurrentWindowMode == rsFullscreen);
+            m_fullscreen.set(fl_fullscreen, psDeviceMode.WindowStyle == rsFullscreen);
         }
 
         void Execute(pcstr args) override
         {
             CCC_Mask::Execute(args);
             if (GetValue())
-                psCurrentWindowMode = rsFullscreen;
+                psDeviceMode.WindowStyle = rsFullscreen;
             else
-                psCurrentWindowMode = rsWindowedBorderless;
+                psDeviceMode.WindowStyle = rsWindowedBorderless;
         }
     };
 };
 using CCC_Fullscreen = CCC_VidWindowMode::CCC_Fullscreen;
-//-----------------------------------------------------------------------
-class CCC_VidMonitor : public IConsole_Command
-{
-public:
-    CCC_VidMonitor(pcstr name) : IConsole_Command(name)
-    {
-        bEmptyArgsHandled = false;
-    }
-
-    void Execute(pcstr args) override
-    {
-        u32 id = 0;
-
-        const auto result = sscanf(args, "%u*", &id);
-        const auto count = g_monitors.GetMonitorsCount();
-
-        if (result != 1 || id < 1 || id > count)
-            InvalidSyntax();
-        else
-            Vid_SelectedMonitor = id - 1;
-    }
-
-    void GetStatus(TStatus& S) override
-    {
-        const u32 id = Vid_SelectedMonitor; // readability
-        xr_sprintf(S, sizeof(S), "%d. %s", id + 1, SDL_GetDisplayName(id));
-    }
-
-    void Info(TInfo& I) override
-    {
-        xr_strcpy(I, sizeof(I), "change monitor");
-    }
-
-    void fill_tips(vecTips& tips, u32 /*mode*/) override
-    {
-        g_monitors.FillMonitorsTips(tips);
-    }
-};
-//-----------------------------------------------------------------------
-class CCC_VidRefresh : public IConsole_Command
-{
-public:
-    CCC_VidRefresh(pcstr name) : IConsole_Command(name)
-    {
-        bEmptyArgsHandled = false;
-    }
-
-    void Execute(pcstr args) override
-    {
-        if (!g_monitors.SelectedResolutionIsSafe())
-        {
-            Log("~ It's unsafe to set refresh rate for your resolution");
-            return;
-        }
-
-        auto rates = g_monitors.GetRefreshRates();
-
-        if (!rates)
-        {
-            Log("! No refresh rates for current resolution?!");
-            return;
-        }
-
-        u32 value = static_cast<u32>(std::atoi(args));
-
-        const auto it = std::find(rates->begin(), rates->end(), value);
-
-        if (it == rates->end())
-            InvalidSyntax();
-        else
-        {
-            Vid_SelectedRefreshRate = value;
-            m_Refresh60hz.set(fl_Refresh60hz, Vid_SelectedRefreshRate == 60);
-        }
-    }
-
-    void GetStatus(TStatus& S) override
-    {
-        xr_sprintf(S, sizeof(S), "%d", Vid_SelectedRefreshRate);
-    }
-
-    void Info(TInfo& I) override
-    {
-        xr_strcpy(I, sizeof(I), "change screen refresh rate");
-    }
-
-    void fill_tips(vecTips& tips, u32 /*mode*/) override
-    {
-        g_monitors.FillRatesTips(tips);
-    }
-
-private:
-    enum { fl_Refresh60hz = 1u << 0u };
-    inline static Flags32 m_Refresh60hz; // for rs_refresh_60hz backwards compatibility
-
-public:
-    class CCC_Refresh60hz final : public CCC_Mask
-    {
-    public:
-        CCC_Refresh60hz(pcstr name) : CCC_Mask(name, &m_Refresh60hz, fl_Refresh60hz)
-        {
-            m_Refresh60hz.set(fl_Refresh60hz, Vid_SelectedRefreshRate == 60);
-        }
-
-        void Execute(pcstr args) override
-        {
-            CCC_Mask::Execute(args);
-            if (GetValue())
-                Vid_SelectedRefreshRate = 60;
-            else
-                Vid_SelectedRefreshRate = g_monitors.GetMaximalRefreshRate();
-        }
-    };
-};
-using CCC_Refresh60hz = CCC_VidRefresh::CCC_Refresh60hz;
 //-----------------------------------------------------------------------
 class CCC_SND_Restart : public IConsole_Command
 {
@@ -715,34 +622,6 @@ public:
 };
 bool CCC_renderer::cmd_lock = false;
 
-class CCC_VSync : public CCC_Mask
-{
-    using inherited = CCC_Mask;
-
-public:
-    CCC_VSync(pcstr name) : CCC_Mask(name, &psDeviceFlags, rsVSync) {}
-
-    void Execute(pcstr args) override
-    {
-        // `apply` means that renderer asks to apply vsync settings
-        // and we don't need to change it
-        if (0 != xr_strcmp(args, "apply"))
-            inherited::Execute(args);
-
-        if (GEnv.Render->GetBackendAPI() != IRender::BackendAPI::OpenGL)
-            return;
-
-        if (psDeviceFlags.test(rsVSync))
-        {
-            // Try adaptive vsync first
-            if (SDL_GL_SetSwapInterval(-1) == -1)
-                SDL_GL_SetSwapInterval(1);
-        }
-        else
-            SDL_GL_SetSwapInterval(0);
-    }
-};
-
 class CCC_soundDevice : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -833,6 +712,19 @@ public:
     }
 };
 
+class CCC_ControllerSensorEnable final : public CCC_Mask
+{
+public:
+    CCC_ControllerSensorEnable(pcstr name, Flags32* value, u32 mask)
+        : CCC_Mask(name, value, mask) {}
+
+    void Execute(pcstr args) override
+    {
+        CCC_Mask::Execute(args);
+        pInput->EnableControllerSensors(GetValue());
+    }
+};
+
 ENGINE_API float g_fov = 67.5f;
 ENGINE_API float psHUD_FOV = 0.45f;
 
@@ -849,7 +741,6 @@ extern Flags32 psEnvFlags;
 // extern float r__dtex_range;
 
 extern int g_ErrorLineCount;
-extern int ps_rs_loading_stages;
 
 ENGINE_API int ps_r__Supersample = 1;
 ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
@@ -863,11 +754,6 @@ void CCC_Register()
     CMD1(CCC_Disconnect, "disconnect");
     CMD1(CCC_SaveCFG, "cfg_save");
     CMD1(CCC_LoadCFG, "cfg_load");
-
-#ifdef DEBUG
-    CMD1(CCC_MotionsStat, "stat_motions");
-    CMD1(CCC_TexturesStat, "stat_textures");
-#endif // DEBUG
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);
@@ -884,14 +770,13 @@ void CCC_Register()
     CMD1(CCC_E_Signal, "e_signal");
 
     CMD3(CCC_Mask, "rs_clear_bb", &psDeviceFlags, rsClearBB);
-    CMD3(CCC_Mask, "rs_occlusion", &psDeviceFlags, rsOcclusion);
 
     // CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175 );
     // CMD3(CCC_Mask, "rs_constant_fps", &psDeviceFlags, rsConstantFPS );
 #endif // DEBUG
 
 #ifndef MASTER_GOLD
-    CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
+    CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDrawDetails);
     CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
     CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
     CMD3(CCC_Mask, "rs_render_particles", &psDeviceFlags, rsDrawParticles);
@@ -902,9 +787,8 @@ void CCC_Register()
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
     CMD4(CCC_Integer, "r__wallmarks_on_skeleton", &ps_r__WallmarksOnSkeleton, 0, 1);
 
-    CMD4(CCC_Integer, "rs_loadingstages", &ps_rs_loading_stages, 0, 1); // XXX: rename to g_loading_stages
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
-    CMD1(CCC_VSync, "rs_v_sync"); // If you change the name, you also should change it in glHW.cpp in the OpenGL renderer
+    CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
     CMD1(CCC_Fullscreen, "rs_fullscreen");
     CMD1(CCC_Refresh60hz, "rs_refresh_60hz");
@@ -916,7 +800,6 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_cam_pos", &psDeviceFlags, rsCameraPos);
 #ifdef DEBUG
     CMD3(CCC_Mask, "rs_occ_draw", &psDeviceFlags, rsOcclusionDraw);
-    CMD3(CCC_Mask, "rs_occ_stats", &psDeviceFlags, rsOcclusionStats);
 // CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128 );
 #endif // DEBUG
 
@@ -931,13 +814,12 @@ void CCC_Register()
     CMD4(CCC_Integer, "net_dedicated_sleep", &psNET_DedicatedSleep, 0, 64);
 
     // General video control
+    CMD1(CCC_VidMonitor, "vid_monitor");
     CMD1(CCC_VidMode, "vid_mode");
     CMD1(CCC_VidWindowMode, "vid_window_mode");
-    CMD1(CCC_VidMonitor, "vid_monitor");
-    CMD1(CCC_VidRefresh, "vid_refresh")
 
 #ifdef DEBUG
-    CMD3(CCC_Token, "vid_bpp", &psCurrentBPP, vid_bpp_token);
+    CMD3(CCC_Token, "vid_bpp", &psDeviceMode.BitsPerPixel, vid_bpp_token);
 #endif // DEBUG
 
     CMD1(CCC_VID_Reset, "vid_restart");
@@ -967,6 +849,18 @@ void CCC_Register()
     CMD3(CCC_Mask, "mouse_invert", &psMouseInvert, 1);
     psMouseSens = 0.12f;
     CMD4(CCC_Float, "mouse_sens", &psMouseSens, 0.001f, 0.6f);
+
+    // Gamepad
+    CMD3(CCC_Mask, "gamepad_invert_y", &psControllerInvertY, 1);
+    psControllerStickSens = 0.02f;
+    CMD4(CCC_Float, "gamepad_stick_sens", &psControllerStickSens, 0.001f, 0.6f);
+    psControllerStickDeadZone = 15.f;
+    CMD4(CCC_Float, "gamepad_stick_deadzone", &psControllerStickDeadZone, 1.f, 35.f);
+    psControllerSensorSens = 0.5f;
+    CMD4(CCC_Float, "gamepad_sensor_sens", &psControllerSensorSens, 0.01f, 3.f);
+    psControllerSensorDeadZone = 0.005f;
+    CMD4(CCC_Float, "gamepad_sensor_deadzone", &psControllerSensorDeadZone, 0.001f, 1.f);
+    CMD3(CCC_ControllerSensorEnable, "gamepad_sensors_enable", &psControllerEnableSensors, 1);
 
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);
@@ -1005,5 +899,8 @@ void CCC_Register()
 #ifdef DEBUG
     extern BOOL debug_destroy;
     CMD4(CCC_Integer, "debug_destroy", &debug_destroy, 0, 1);
+
+    extern int g_bShowRedText;
+    CMD4(CCC_Integer, "debug_show_red_text", &g_bShowRedText, 0, 1);
 #endif
 };

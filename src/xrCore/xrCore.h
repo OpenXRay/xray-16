@@ -135,12 +135,11 @@ public:
     static pcstr GetBuildCommit() { return buildCommit; }
     static pcstr GetBuildBranch() { return buildBranch; }
 
-    static constexpr pcstr GetBuildConfiguration();
-
     void CoInitializeMultithreaded() const;
 
 private:
     void CalculateBuildId();
+    void PrintBuildInfo();
 };
 
 extern XRCORE_API xrCore Core;

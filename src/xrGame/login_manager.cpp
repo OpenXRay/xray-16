@@ -227,7 +227,7 @@ void login_manager::reinit_connection_tasks()
 }
 
 void login_manager::delete_profile_obj() { xr_delete(m_current_profile); }
-void __stdcall login_manager::only_log_login(profile const* res_profile, char const* description)
+void login_manager::only_log_login(profile const* res_profile, char const* description)
 {
     if (!res_profile)
     {

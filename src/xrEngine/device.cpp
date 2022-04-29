@@ -123,7 +123,7 @@ void CRenderDevice::RenderEnd(void)
 }
 
 #include "IGame_Level.h"
-void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
+void CRenderDevice::PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input)
 {
     if (GEnv.isDedicatedServer)
         amount = 0;
@@ -140,10 +140,9 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
         precache_light->set_range(5.0f);
         precache_light->set_active(true);
     }
-    if (amount && b_draw_loadscreen && !load_screen_renderer.b_registered)
+    if (amount && draw_loadscreen && !load_screen_renderer.IsActive())
     {
-        pApp->LoadForceDrop();
-        load_screen_renderer.start(b_wait_user_input);
+        load_screen_renderer.Start(wait_user_input);
     }
 }
 
@@ -327,6 +326,30 @@ void CRenderDevice::message_loop()
 
             switch (event.type)
             {
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+            case SDL_DISPLAYEVENT:
+            {
+                switch (event.display.type)
+                {
+                case SDL_DISPLAYEVENT_ORIENTATION:
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+                case SDL_DISPLAYEVENT_CONNECTED:
+                case SDL_DISPLAYEVENT_DISCONNECTED:
+#endif
+                    CleanupVideoModes();
+                    FillVideoModes();
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+                    if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
+#else
+                    if (event.display.display == psDeviceMode.Monitor)
+#endif
+                        Reset();
+                    else
+                        UpdateWindowProps();
+                    break;
+                }
+            }
+#endif
             case SDL_WINDOWEVENT:
             {
                 switch (event.window.event)
@@ -337,13 +360,13 @@ void CRenderDevice::message_loop()
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                 {
-                    if (psCurrentWindowMode != rsFullscreen)
+                    if (psDeviceMode.WindowStyle != rsFullscreen)
                     {
-                        if (psCurrentVidMode[0] == event.window.data1 && psCurrentVidMode[1] == event.window.data2)
+                        if (psDeviceMode.Width == event.window.data1 && psDeviceMode.Height == event.window.data2)
                             break; // we don't need to reset device if resolution wasn't really changed
 
-                        psCurrentVidMode[0] = event.window.data1;
-                        psCurrentVidMode[1] = event.window.data2;
+                        psDeviceMode.Width = event.window.data1;
+                        psDeviceMode.Height = event.window.data2;
 
                         Reset();
                     }
@@ -377,8 +400,8 @@ void CRenderDevice::message_loop()
                     break;
 
                 case SDL_WINDOWEVENT_CLOSE:
-                    SDL_Event quit = { SDL_QUIT };
-                    SDL_PushEvent(&quit);
+                    Engine.Event.Defer("KERNEL:disconnect");
+                    Engine.Event.Defer("KERNEL:quit");
                 }
             }
             }
@@ -403,10 +426,10 @@ void CRenderDevice::Run()
     dwTimeGlobal = 0;
     Timer_MM_Delta = 0;
     {
-        u32 time_mm = timeGetTime();
-        while (timeGetTime() == time_mm)
+        u32 time_mm = CPU::GetTicks();
+        while (CPU::GetTicks() == time_mm)
             ; // wait for next tick
-        u32 time_system = timeGetTime();
+        u32 time_system = CPU::GetTicks();
         u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
     }
@@ -601,28 +624,37 @@ SCRIPT_EXPORT(Device, (),
     ];
 });
 
-CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}
-void CLoadScreenRenderer::start(bool b_user_input)
+void CLoadScreenRenderer::Start(bool b_user_input)
 {
+    Device.seqFrame.Add(this, 0);
     Device.seqRender.Add(this, 0);
-    b_registered = true;
-    b_need_user_input = b_user_input;
+    m_registered = true;
+    m_need_user_input = b_user_input;
 
-    pApp->LoadForceDrop();
     pApp->ShowLoadingScreen(true);
+    pApp->LoadBegin();
 }
 
-void CLoadScreenRenderer::stop()
+void CLoadScreenRenderer::Stop()
 {
-    if (!b_registered)
+    if (!m_registered)
         return;
+    Device.seqFrame.Remove(this);
     Device.seqRender.Remove(this);
 
-    b_registered = false;
-    b_need_user_input = false;
+    m_registered = false;
+    m_need_user_input = false;
 
-    pApp->LoadForceFinish();
     pApp->ShowLoadingScreen(false);
+    pApp->LoadEnd();
 }
 
-void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(true); }
+void CLoadScreenRenderer::OnFrame()
+{
+    pApp->LoadStage(false);
+}
+
+void CLoadScreenRenderer::OnRender()
+{
+    pApp->load_draw_internal();
+}

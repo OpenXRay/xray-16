@@ -41,24 +41,23 @@
 // BOOL		g_bDebugDumpPhysicsStep				= 0;
 CPHWorld* ph_world = 0;
 
-IPHWorld* __stdcall physics_world() { return ph_world; }
-void __stdcall create_physics_world(
-    bool mt, CObjectSpace* os, CObjectList* lo, CRenderDeviceBase* dv) // IPHWorldUpdateCallbck &commander,
+IPHWorld* physics_world() { return ph_world; }
+void create_physics_world(
+    bool mt, CObjectSpace* os, CObjectList* lo) // IPHWorldUpdateCallbck &commander,
 {
     ph_world = xr_new<CPHWorld>(); //&commander
     VERIFY(os);
     //		VERIFY( lo );
-    VERIFY(dv);
-    ph_world->Create(mt, os, lo, dv);
+    ph_world->Create(mt, os, lo);
 }
 
-void __stdcall destroy_physics_world()
+void destroy_physics_world()
 {
     ph_world->Destroy();
     xr_delete(ph_world);
 }
 
-CObjectSpace* __stdcall create_object_space()
+CObjectSpace* create_object_space()
 {
     // CFileReader* fr =	new CFileReader("D:/STALKER/resources/gamedata/levels/stohe_selo/level.cform");
     CFileReader* fr = xr_new<CFileReader>("ActorEditorLevel.cform");
@@ -69,7 +68,7 @@ CObjectSpace* __stdcall create_object_space()
     // xr_delete(fr);
     return os;
 }
-CObjectSpace* __stdcall mesh_create_object_space(
+CObjectSpace* mesh_create_object_space(
     Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback)
 {
     CObjectSpace* os = xr_new<CObjectSpace>();
@@ -78,8 +77,7 @@ CObjectSpace* __stdcall mesh_create_object_space(
     os->Create(verts, tris, H, build_callback);
     return os;
 }
-void __stdcall set_mtl_lib(CGameMtlLibrary* l) { GEnv.PGMLib = l; }
-void __stdcall destroy_object_space(CObjectSpace*& os) { xr_delete(os); }
+void destroy_object_space(CObjectSpace*& os) { xr_delete(os); }
 void CPHMesh::Create(dSpaceID space, dWorldID world)
 {
     Geom = dCreateTriList(space, 0, 0);
@@ -118,7 +116,7 @@ CPHWorld::CPHWorld()
     : // IPHWorldUpdateCallbck		*_update_callback
       m_update_callback(&empty_update_callback),
       m_default_contact_shotmark(0), m_default_character_contact_shotmark(0), physics_step_time_callback(0),
-      m_object_space(0), m_level_objects(0), m_device(0)
+      m_object_space(0), m_level_objects(0)
 {
     disable_count = 0;
     m_frame_time = 0.f;
@@ -145,21 +143,20 @@ void CPHWorld::SetStep(float s)
     world_damping = 1.0f * DAMPING(world_cfm, world_erp);
     if (ph_world && ph_world->Exist())
     {
-        float frame_time = Device().fTimeDelta;
+        float frame_time = Device.fTimeDelta;
         u32 it_number = iFloor(frame_time / fixed_step);
         frame_time -= it_number * fixed_step;
         ph_world->m_previous_frame_time = frame_time;
         ph_world->m_frame_time = frame_time;
     }
 }
-void CPHWorld::Create(bool mt, CObjectSpace* os, CObjectList* lo, CRenderDeviceBase* dv)
+void CPHWorld::Create(bool mt, CObjectSpace* os, CObjectList* lo)
 {
     LoadParams();
     dWorldID phWorld = 0;
     m_object_space = os;
     m_level_objects = lo;
-    m_device = dv;
-    Device().AddSeqFrame(this, mt);
+    Device.AddSeqFrame(this, mt);
 
 // m_commander							=new CPHCommander();
 // dVector3 extensions={2048,256,2048};
@@ -225,7 +222,7 @@ void CPHWorld::Destroy()
     dCloseODE();
     dCylinderClassUser = -1;
     dRayMotionsClassUser = -1;
-    Device().RemoveSeqFrame(this);
+    Device.RemoveSeqFrame(this);
     b_exist = false;
 }
 void CPHWorld::SetGravity(float g)
@@ -250,7 +247,7 @@ Device.Statistic->TEST0.End			();
 // DBG_DrawStatBeforeFrameStep();
 #endif
     stats.MovCollision.Begin();
-    FrameStep(Device().fTimeDelta);
+    FrameStep(Device.fTimeDelta);
     stats.MovCollision.End();
 #ifdef DEBUG
 // DBG_DrawStatAfterFrameStep();
@@ -262,7 +259,7 @@ Device.Statistic->TEST0.End			();
 void CPHWorld::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     stats.FrameEnd();
-    float engineTotal = Device().GetStats().EngineTotal.result;
+    float engineTotal = Device.GetStats().EngineTotal.result;
     float percentage = 100.0f * stats.MovCollision.result / engineTotal;
     font.OutNext("Physics:      %2.2fms, %2.1f%%", stats.MovCollision.result, percentage);
     font.OutNext("- collider:   %2.2fms", stats.Collision.result);
@@ -517,9 +514,9 @@ void CPHWorld::FrameStep(dReal step)
 #endif
     b_processing = true;
 
-    start_time = Device().dwTimeGlobal; // - u32(m_frame_time*1000);
+    start_time = Device.dwTimeGlobal; // - u32(m_frame_time*1000);
     if (ph_console::g_bDebugDumpPhysicsStep && it_number > 20)
-        Msg("!!!TOO MANY PHYSICS STEPS PER FRAME = %d !!!", it_number);
+        Msg("!!! TOO MANY PHYSICS STEPS PER FRAME = %d !!!", it_number);
     for (u32 i = 0; i < it_number; ++i)
         Step();
     b_processing = false;

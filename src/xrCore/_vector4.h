@@ -2,7 +2,7 @@
 #ifndef _VECTOR4_H
 #define _VECTOR4_H
 
-#include "_types.h"
+#include "xr_types.h"
 
 template <class T>
 struct _vector4

@@ -1,7 +1,7 @@
 #ifndef UIRender_included
 #define UIRender_included
 #pragma once
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 
 // fwd. decl.
 class IUIShader;

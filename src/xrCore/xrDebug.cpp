@@ -17,7 +17,6 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Debug/MiniDump.h"
 #pragma warning(pop)
-#include <malloc.h>
 #include <direct.h>
 #endif
 
@@ -76,17 +75,6 @@ constexpr SDL_MessageBoxButtonData buttons[] =
          (int)AssertionResult::abort, "Cancel" }
 };
 
-SDL_MessageBoxData messageboxdata =
-{
-    SDL_MESSAGEBOX_ERROR,
-    nullptr,
-    "Fatal error",
-    "Vse clomalocb, tashite novyy dvizhok",
-    SDL_arraysize(buttons),
-    buttons,
-    nullptr
-};
-
 AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode)
 {
 #ifdef XR_PLATFORM_WINDOWS // because Windows default Message box is fancy
@@ -132,12 +120,15 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
         return AssertionResult::ok;
     }
 
-    if (windowHandler)
-        messageboxdata.window =  windowHandler->GetApplicationWindow();
-    messageboxdata.title = title;
-    messageboxdata.message = message;
+    SDL_MessageBoxData data =
+    {
+        SDL_MESSAGEBOX_ERROR,
+        windowHandler ? windowHandler->GetApplicationWindow() : nullptr,
+        title, message, SDL_arraysize(buttons), buttons
+    };
+
     int button = -1;
-    SDL_ShowMessageBox(&messageboxdata, &button);
+    SDL_ShowMessageBox(&data, &button);
     return (AssertionResult)button;
 #endif
 }
@@ -174,16 +165,20 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
 }
 
 IWindowHandler* xrDebug::windowHandler = nullptr;
+IUserConfigHandler* xrDebug::userConfigHandler = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
-xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
-xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
 bool xrDebug::ShowErrorMessage = false;
 
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
+#ifdef PROFILE_CRITICAL_SECTIONS
+Lock xrDebug::failLock(MUTEX_PROFILE_ID(xrDebug::Backend));
+#else
+Lock xrDebug::failLock;
+#endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
@@ -492,15 +487,13 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
                    const char* arg2)
 {
-#ifdef PROFILE_CRITICAL_SECTIONS
-    static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
-#else
-    static Lock lock;
-#endif
-    lock.Enter();
+    ScopeLock lock(&failLock);
+
+    if (windowHandler)
+        windowHandler->OnErrorDialog(true); // Call it only after locking so that multiple threads won't call this function simultaneously.
+
     ErrorAfterDialog = true;
     string4096 assertionInfo;
-    auto size = sizeof(assertionInfo);
     GatherInfo(assertionInfo, sizeof(assertionInfo), loc, expr, desc, arg1, arg2);
 
     if (ShowErrorMessage)
@@ -513,16 +506,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
             "\r\n");
     }
 
-    if (OnCrash)
-        OnCrash();
-
-    if (OnDialog)
-        OnDialog(true);
-
     FlushLog();
-
-    if (windowHandler)
-        windowHandler->DisableFullscreen();
 
     bool resetFullscreen = false;
     AssertionResult result = AssertionResult::abort;
@@ -559,13 +543,9 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
         } // switch (result)
     }
 
-    if (OnDialog)
-        OnDialog(false);
-
     if (resetFullscreen)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false); // Call it only before unlocking so that multiple threads won't call this function simultaneously.
 
-    lock.Leave();
     return result;
 }
 
@@ -577,11 +557,10 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 
 void xrDebug::DoExit(const std::string& message)
 {
-    if (windowHandler)
-        windowHandler->DisableFullscreen();
+    ScopeLock lock(&failLock);
 
-    if (OnDialog)
-        OnDialog(true);
+    if (windowHandler)
+        windowHandler->OnErrorDialog(true);
 
     FlushLog();
 
@@ -600,11 +579,8 @@ void xrDebug::DoExit(const std::string& message)
     exit(1);
 #endif
     // if you're under debugger, you can jump here manually
-    if (OnDialog)
-        OnDialog(false);
-
     if (windowHandler)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false);
 }
 
 LPCSTR xrDebug::ErrorToString(long code)
@@ -645,28 +621,30 @@ extern LPCSTR log_name();
 void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 {
 #if defined(USE_BUG_TRAP) && defined(XR_PLATFORM_WINDOWS)
-    if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady))
-        return;
-    string_path logDir;
-    __try
+    if (xr_FS && FS.m_Flags.test(CLocatorAPI::flReady))
     {
-        FS.update_path(logDir, "$logs$", "");
-        if (logDir[0] != _DELIMITER && logDir[1] != ':')
+        string_path cfg_full_name;
+        __try
         {
-            string256 currentDir;
-            _getcwd(currentDir, sizeof(currentDir));
-            string256 relDir;
-            xr_strcpy(relDir, logDir);
-            strconcat(sizeof(logDir), logDir, currentDir, DELIMITER, relDir);
+            // Code below copied from CCC_LoadCFG::Execute (xr_ioc_cmd.cpp)
+            // XXX: Refactor Console to accept user config filename on initialization or even construction!
+            // XXX: Maybe refactor CCC_LoadCFG, move code for loading user.ltx into a generic function
+            const auto cfg_name = userConfigHandler ? userConfigHandler->GetUserConfigFileName() : "user.ltx";
+            FS.update_path(cfg_full_name, "$app_data_root$", cfg_name);
+
+            if (!FS.exist(cfg_full_name))
+                FS.update_path(cfg_full_name, "$fs_root$", cfg_name);
+
+            if (!FS.exist(cfg_full_name))
+                xr_strcpy(cfg_full_name, cfg_name);
         }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            xr_strcpy(cfg_full_name, "user.ltx");
+        }
+        BT_AddLogFile(cfg_full_name);
     }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        xr_strcpy(logDir, "logs");
-    }
-    string_path temp;
-    strconcat(sizeof(temp), temp, logDir, log_name());
-    BT_AddLogFile(temp);
+
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
 
@@ -722,10 +700,22 @@ void xrDebug::SetupExceptionHandler()
 void xrDebug::OnFilesystemInitialized()
 {
 #ifdef USE_BUG_TRAP
-    string_path dumpPath;
-    if (FS.update_path(dumpPath, "$app_data_root$", "reports", false))
+    string_path path{};
+    FS.update_path(path, "$logs$", "", false);
+    if (!path[0] || path[0] != _DELIMITER && path[1] != ':') // relative path
     {
-        BT_SetReportFilePath(dumpPath);
+        string_path currentDir;
+        _getcwd(currentDir, sizeof(currentDir));
+        string_path relDir;
+        xr_strcpy(relDir, path);
+        strconcat(path, currentDir, DELIMITER, relDir);
+    }
+    xr_strcat(path, log_name());
+    BT_AddLogFile(path);
+
+    if (FS.update_path(path, "$app_data_root$", "reports", false))
+    {
+        BT_SetReportFilePath(path);
     }
 #endif
 }
@@ -763,6 +753,8 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 {
 #if defined(XR_PLATFORM_WINDOWS)
+    ScopeLock lock(&failLock);
+
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
     if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
@@ -798,10 +790,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     FlushLog();
 
     if (windowHandler)
-        windowHandler->DisableFullscreen();
-
-    if (OnDialog)
-        OnDialog(true);
+        windowHandler->OnErrorDialog(true);
 
     constexpr pcstr fatalError = "Fatal error";
 
@@ -832,11 +821,8 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (PrevFilter)
         PrevFilter(exPtrs);
 
-    if (OnDialog)
-        OnDialog(false);
-
     if (windowHandler)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false);
 
     return EXCEPTION_CONTINUE_SEARCH;
 #else
@@ -851,6 +837,8 @@ void _terminate()
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
 #endif
+    //ScopeLock lock(&failLock);
+
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo,sizeof(assertionInfo), DEBUG_INFO, nullptr, "Unexpected application termination");
     xr_strcat(assertionInfo, "Press OK to abort execution\r\n");

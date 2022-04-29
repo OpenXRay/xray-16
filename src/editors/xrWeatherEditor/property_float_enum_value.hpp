@@ -23,7 +23,7 @@ private:
     typedef property_float inherited;
     typedef System::Collections::ArrayList collection_type;
     typedef System::Object Object;
-    typedef std::pair<float, LPCSTR> pair;
+    typedef std::pair<float, pcstr> pair;
 
 public:
     property_float_enum_value(

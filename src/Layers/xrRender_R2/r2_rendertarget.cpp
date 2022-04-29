@@ -15,30 +15,27 @@
 #include "Layers/xrRender/blenders/blender_light_direct_cascade.h"
 #endif
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 #   include "Layers/xrRender/blenders/dx10MSAABlender.h"
 #   include "Layers/xrRender/blenders/dx10RainBlender.h"
 
-#   ifdef USE_DX11
+#   if defined(USE_DX11)
 #       include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
 #       include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
-#   else
+#   elif defined(USE_OGL)
 #       include "Layers/xrRender/blenders/dx10MinMaxSMBlender.h"
 #   endif
 #endif
 
-#ifdef USE_DX9
+#if defined(USE_DX9)
 void CRenderTarget::u_stencil_optimize(BOOL common_stencil)
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
 void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
+#else
+#   error No graphics API selected or enabled!
 #endif
 {
-#ifdef USE_OGL
-    //	TODO: OGL: should we implement stencil optimization?
-    VERIFY(RImplementation.o.nvstencil);
-    VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
-    UNUSED(eSOM);
-#else
+#if defined(USE_DX9) || defined(USE_DX11)
     // TODO: DX10: remove half pixel offset?
     VERIFY(RImplementation.o.nvstencil);
 #   ifdef USE_DX9
@@ -59,7 +56,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     pv++;
     pv->set(float(_w + eps), eps, eps, 1.f, C, 0, 0);
     pv++;
-#   else
+#   elif defined(USE_DX11)
     float eps = 0;
     float _dw = 0.5f;
     float _dh = 0.5f;
@@ -80,7 +77,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 #   endif
     RCache.set_Element(s_occq->E[1]);
 
-#   ifndef USE_DX9
+#   if defined(USE_DX11)
     switch (eSOM)
     {
     case SO_Light: StateManager.SetStencilRef(dwLightMarkerID); break;
@@ -91,33 +88,51 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-#endif
+#elif defined(USE_OGL)
+    //	TODO: OGL: should we implement stencil optimization?
+    VERIFY(RImplementation.o.nvstencil);
+    VERIFY(!"CRenderTarget::u_stencil_optimize no implemented");
+    UNUSED(eSOM);
+#else
+#   error No graphics API selected or enabled!
+#endif // USE_DX9 || USE_DX11
 }
 
 // 2D texgen (texture adjustment matrix)
 void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 {
-#ifdef USE_DX9
+#if defined(USE_DX9)
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
     float o_w = (.5f / _w);
     float o_h = (.5f / _h);
-#endif
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
-#ifdef USE_OGL
-        0.0f, 0.5f, 0.0f, 0.0f,
-#else
         0.0f, -0.5f, 0.0f, 0.0f,
-#endif
         0.0f, 0.0f, 1.0f, 0.0f,
-#ifdef USE_DX9
         0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
-#else
-        0.5f, 0.5f, 0.0f, 1.0f
-#endif
     };
+#elif defined(USE_DX11)
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+};
+#elif defined(USE_OGL)
+    Fmatrix m_TexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
+#else
+#   error No graphics API selected or enabled!
+#endif
+
     m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
 }
 
@@ -128,10 +143,12 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
     Fmatrix m_TexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+        0.0f, -0.5f, 0.0f, 0.0f,
+#elif defined(USE_OGL)
         0.0f, 0.5f, 0.0f, 0.0f,
 #else
-        0.0f, -0.5f, 0.0f, 0.0f,
+#   error No graphics API selected or enabled!
 #endif
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
@@ -230,13 +247,6 @@ void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr render
 CRenderTarget::CRenderTarget()
 {
     u32 SampleCount = 1;
-
-    if (ps_r_ssao_mode != 2 /*hdao*/)
-        ps_r_ssao = _min(ps_r_ssao, 3);
-
-#ifndef USE_DX9
-    RImplementation.o.ssao_ultra = ps_r_ssao > 3 && HW.ComputeShadersSupported;
-#endif
     if (RImplementation.o.dx10_msaa)
         SampleCount = RImplementation.o.dx10_msaa_samples;
 
@@ -269,7 +279,7 @@ CRenderTarget::CRenderTarget()
     // Blenders
     b_accum_spot = xr_new<CBlender_accum_spot>();
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.dx10_msaa)
     {
         int bound = RImplementation.o.dx10_msaa_samples;
@@ -304,7 +314,8 @@ CRenderTarget::CRenderTarget()
             static_cast<CBlender_SSAO_MSAA*>(b_ssao_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
         }
     }
-#endif
+#endif // USE_DX11 || USE_OGL
+
     // NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
@@ -363,7 +374,7 @@ CRenderTarget::CRenderTarget()
         // generic(LDR) RTs
         rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, 1);
         rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
         rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
 #endif
         if (!RImplementation.o.dx10_msaa)
@@ -421,7 +432,7 @@ CRenderTarget::CRenderTarget()
         // Create D3DFMT_D24X8 depth-stencil surface if HW smap is not supported,
         // otherwise - create texture with specified HW_smap_FORMAT
         rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
         if (RImplementation.o.dx10_minmax_sm)
         {
             rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, smapsize / 4, smapsize / 4, D3DFMT_R32F);
@@ -429,11 +440,13 @@ CRenderTarget::CRenderTarget()
             s_create_minmax_sm.create(&TempBlender, "null");
         }
 #endif
+
         // Accum mask
         {
             CBlender_accum_direct_mask b_accum_mask;
             s_accum_mask.create(&b_accum_mask, "r2" DELIMITER "accum_mask");
         }
+
         // Accum direct
         {
 #if RENDER == R_R2
@@ -452,8 +465,9 @@ CRenderTarget::CRenderTarget()
             s_accum_direct.create(&b_accum_direct, "r2" DELIMITER "accum_direct");
 #endif // RENDER == R_R2
         }
+
         // Accum direct/mask MSAA
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
         if (RImplementation.o.dx10_msaa)
         {
             int bound = RImplementation.o.dx10_msaa_samples;
@@ -467,7 +481,8 @@ CRenderTarget::CRenderTarget()
                 s_accum_mask_msaa[i].create(b_accum_mask_msaa[i], "r2" DELIMITER "accum_direct");
             }
         }
-#endif // !USE_DX9
+#endif
+
         // Accum volumetric
         if (RImplementation.o.advancedpp)
         {
@@ -476,12 +491,14 @@ CRenderTarget::CRenderTarget()
                 s_accum_direct_volumetric.create("accum_volumetric_sun");
             else
                 s_accum_direct_volumetric.create("accum_volumetric_sun_cascade");
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
             s_accum_direct_volumetric.create("accum_volumetric_sun_nomsaa");
+#else
+#   error No graphics API selected or enabled!
 #endif
             manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
             if (RImplementation.o.dx10_minmax_sm)
             {
                 s_accum_direct_volumetric_minmax.create("accum_volumetric_sun_nomsaa_minmax");
@@ -509,14 +526,14 @@ CRenderTarget::CRenderTarget()
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
             }
-#endif // !USE_DX9
+#endif // USE_DX11 || USE_OGL
         }
     }
 
     // RAIN
     // TODO: DX10: Create resources only when DX10 rain is enabled.
     // Or make DX10 rain switch dynamic?
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     {
         CBlender_rain TempBlender;
         s_rain.create(&TempBlender, "null");
@@ -543,15 +560,15 @@ CRenderTarget::CRenderTarget()
             }
         }
     }
-#endif // !USE_DX9
+#endif // USE_DX11 || USE_OGL
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.dx10_msaa)
     {
         CBlender_msaa TempBlender;
         s_mark_msaa_edges.create(&TempBlender, "null");
     }
-#endif // !USE_DX9
+#endif
 
     // POINT
     {
@@ -583,7 +600,7 @@ CRenderTarget::CRenderTarget()
     {
         CBlender_accum_reflected b_accum_reflected;
         s_accum_reflected.create(&b_accum_reflected, "r2" DELIMITER "accum_refl");
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
         if (RImplementation.o.dx10_msaa)
         {
             int bound = RImplementation.o.dx10_msaa_samples;
@@ -596,7 +613,7 @@ CRenderTarget::CRenderTarget()
                 s_accum_reflected_msaa[i].create(b_accum_reflected_msaa[i], "null");
             }
         }
-#endif // !USE_DX9
+#endif // USE_DX11 || USE_OGL
     }
 
     // BLOOM
@@ -623,13 +640,21 @@ CRenderTarget::CRenderTarget()
         {
 #ifdef USE_DX9
             NODEFAULT;
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
             CBlender_bloom_build_msaa b_bloom_msaa;
             s_bloom_msaa.create(&b_bloom_msaa, "r2" DELIMITER "bloom");
+#else
+#   error No graphics API selected or enabled!
 #endif
         }
         f_bloom_factor = 0.5f;
     }
+
+#if defined(USE_DX11) || defined(USE_OGL)
+    // Check if SSAO Ultra is allowed
+    if (ps_r_ssao_mode != 2 /*hdao*/ || !RImplementation.o.ssao_ultra)
+        ps_r_ssao = _min(ps_r_ssao, 3);
+#endif
 
     // HBAO
     if (RImplementation.o.ssao_opt_data)
@@ -658,8 +683,10 @@ CRenderTarget::CRenderTarget()
     const bool ssao_blur_on = RImplementation.o.ssao_blur_on;
 #ifdef USE_DX9
     constexpr bool ssao_hdao_ultra = false;
+#elif defined(USE_DX11) || defined(USE_OGL)
+    const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra && ps_r_ssao > 3;
 #else
-    const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra;
+#   error No graphics API selected or enabled!
 #endif
     if (ssao_blur_on || ssao_hdao_ultra)
     {
@@ -667,7 +694,7 @@ CRenderTarget::CRenderTarget()
 
         if (ssao_hdao_ultra)
         {
-#if !defined(USE_DX9) && !defined(USE_OGL) // XXX: support compute shaders for OpenGL
+#if defined(USE_DX11) // XXX: support compute shaders for OpenGL
             CBlender_CS_HDAO b_hdao_cs;
             s_hdao_cs.create(&b_hdao_cs, "r2" DELIMITER "ssao");
             if (RImplementation.o.dx10_msaa)
@@ -731,12 +758,14 @@ CRenderTarget::CRenderTarget()
             { 0, 20, D3DDECLTYPE_FLOAT2,   D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
             D3DDECL_END()
         };
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         static D3DVERTEXELEMENT9 dwDecl[] =
         {
             { 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, // pos+uv
             D3DDECL_END()
         };
+#else
+#   error No graphics API selected or enabled!
 #endif
         CBlender_combine b_combine;
         s_combine.create(&b_combine, "r2" DELIMITER "combine");
@@ -749,8 +778,10 @@ CRenderTarget::CRenderTarget()
         g_combine_2UV.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
 #ifdef USE_DX9
         g_combine_cuboid.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         g_combine_cuboid.create(dwDecl, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+#else
+#   error No graphics API selected or enabled!
 #endif
         u32 fvf_aa_blur = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
@@ -778,9 +809,11 @@ CRenderTarget::CRenderTarget()
     {
 #ifdef USE_DX9
         NODEFAULT;
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         CBlender_postprocess_msaa b_postprocess_msaa;
         s_postprocess_msaa.create(&b_postprocess_msaa, "r2" DELIMITER "post");
+#else
+#   error No graphics API selected or enabled!
 #endif
     }
 
@@ -803,35 +836,8 @@ CRenderTarget::CRenderTarget()
 
 CRenderTarget::~CRenderTarget()
 {
-#ifdef USE_OGL
-    glDeleteTextures(1, &t_ss_async);
-
-    // Textures
-    t_material->surface_set(GL_TEXTURE_3D, 0);
-    glDeleteTextures(1, &t_material_surf);
-    t_material.destroy();
-
-    t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
-    t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
-    t_LUM_src.destroy();
-    t_LUM_dest.destroy();
-
-    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    t_envmap_0.destroy();
-    t_envmap_1.destroy();
-
-    // Jitter
-    for (int it = 0; it < TEX_jitter_count; it++)
-    {
-        t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
-    }
-    glDeleteTextures(TEX_jitter_count, t_noise_surf);
-
-    t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
-    glDeleteTextures(1, &t_noise_surf_mipped);
-#else
-#   ifndef USE_DX9
+#if defined(USE_DX9) || defined(USE_DX11)
+#   if defined(USE_DX11)
     _RELEASE(t_ss_async);
 #   endif
     // Textures
@@ -873,13 +879,42 @@ CRenderTarget::~CRenderTarget()
         _RELEASE(t_noise_surf[it]);
     }
 
-#   ifndef USE_DX9
+#   if defined(USE_DX11)
     t_noise_mipped->surface_set(NULL);
 #       ifdef DEBUG
     _SHOW_REF("t_noise_surf_mipped", t_noise_surf_mipped);
 #       endif // DEBUG
     _RELEASE(t_noise_surf_mipped);
 #   endif
+#elif defined(USE_OGL)
+    glDeleteTextures(1, &t_ss_async);
+
+    // Textures
+    t_material->surface_set(GL_TEXTURE_3D, 0);
+    glDeleteTextures(1, &t_material_surf);
+    t_material.destroy();
+
+    t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
+    t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
+    t_LUM_src.destroy();
+    t_LUM_dest.destroy();
+
+    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    t_envmap_0.destroy();
+    t_envmap_1.destroy();
+
+    // Jitter
+    for (int it = 0; it < TEX_jitter_count; it++)
+    {
+        t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
+    }
+    glDeleteTextures(TEX_jitter_count, t_noise_surf);
+
+    t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &t_noise_surf_mipped);
+#else
+#   error No graphics API selected or enabled!
 #endif
     //
     accum_spot_geom_destroy();
@@ -890,7 +925,7 @@ CRenderTarget::~CRenderTarget()
     // Blenders
     xr_delete(b_accum_spot);
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.dx10_msaa)
     {
         int bound = RImplementation.o.dx10_msaa_samples;
@@ -944,7 +979,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, dwLightMarkerID, 0x00, 0xFE,
             D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
         RCache.set_Element(s_occq->E[1]);
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         float eps = 0;
         float _dw = 0.5f;
         float _dh = 0.5f;
@@ -959,6 +994,8 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Element(s_occq->E[2]);
+#else
+#   error No graphics API selected or enabled!
 #endif
         RCache.set_Geometry(g_combine);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -991,7 +1028,7 @@ bool CRenderTarget::need_to_render_sunshafts()
     return true;
 }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 bool CRenderTarget::use_minmax_sm_this_frame()
 {
     switch (RImplementation.o.dx10_minmax_sm)

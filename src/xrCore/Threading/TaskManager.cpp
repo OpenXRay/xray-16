@@ -22,6 +22,7 @@
 
 #include <thread>
 #include <mutex>
+#include <SDL_events.h>
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <immintrin.h>
@@ -432,6 +433,8 @@ void TaskManager::Wait(const Task& task)
     while (!task.IsFinished())
     {
         ExecuteOneTask();
+        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+            SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 
@@ -440,6 +443,8 @@ void TaskManager::WaitForChildren(const Task& task)
     while (!task.HasChildren())
     {
         ExecuteOneTask();
+        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+            SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 

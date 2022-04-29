@@ -14,7 +14,6 @@
 #include "character_community.h"
 #include "character_reputation.h"
 #include "relation_registry.h"
-#include "string_table.h"
 
 constexpr cpcstr ACTOR_STATISTIC_XML = "actor_statistic.xml";
 constexpr cpcstr ACTOR_CHARACTER_XML = "pda_dialog_character.xml";

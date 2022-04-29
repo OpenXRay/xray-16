@@ -77,10 +77,10 @@ struct ShaderTypeTraits<SVS>
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
+#if defined(USE_DX9)
     using LinkageType = void*;
+#elif defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
 #endif
     using HWShaderType = ID3DVertexShader*;
     using BufferType = DWORD const*;
@@ -91,28 +91,7 @@ struct ShaderTypeTraits<SVS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
-        return D3DXGetVertexShaderProfile(HW.pDevice); // vertex "vs_2_a";
-#elif !defined(USE_DX9) && !defined(USE_OGL)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "vs_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "vs_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "vs_5_0";
-        }
-#endif
-        if (HW.Caps.geometry_major >= 2)
-            return "vs_2_0";
-
-        return "vs_1_1";
+        return HW.Caps.geometry_profile;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -142,15 +121,19 @@ struct ShaderTypeTraits<SVS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#if defined(USE_DX9)
+        res = HW.pDevice->CreateVertexShader(buffer, &sh);
+        UNUSED(linkage, name);
+#elif defined(USE_DX11)
+        res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_VERTEX_SHADER>(buffer, size, name);
-#elif defined(USE_DX11)
-        res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
 #else
-        res = HW.pDevice->CreateVertexShader(buffer, &sh);
+#   error No graphics API selected or enabled!
 #endif
 
         return res;
@@ -164,16 +147,16 @@ struct ShaderTypeTraits<SPS>
 {
     using MapType = CResourceManager::map_PS;
 
-#ifdef USE_OGL
+#if defined(USE_OGL)
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
 #else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
+#if defined(USE_DX9)
     using LinkageType = void*;
+#elif defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
 #endif
     using HWShaderType = ID3DPixelShader*;
     using BufferType = DWORD const*;
@@ -184,26 +167,7 @@ struct ShaderTypeTraits<SPS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
-        return D3DXGetPixelShaderProfile(HW.pDevice); // pixel "ps_2_a";
-#elif !defined(USE_DX9) && !defined(USE_OGL)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "ps_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "ps_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "ps_5_0";
-        }
-#endif
-
-        return "ps_2_0";
+        return HW.Caps.raster_profile;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -247,15 +211,19 @@ struct ShaderTypeTraits<SPS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#if defined(USE_DX9)
+        res = HW.pDevice->CreatePixelShader(buffer, &sh);
+        UNUSED(linkage, name);
+#elif defined(USE_DX11)
+        res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_FRAGMENT_SHADER>(buffer, size, name);
-#elif defined(USE_DX11)
-        res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
 #else
-        res = HW.pDevice->CreatePixelShader(buffer, &sh);
+#       error No graphics API selected or enabled!
 #endif
 
         return res;
@@ -264,33 +232,31 @@ struct ShaderTypeTraits<SPS>
     static inline u32 GetShaderDest() { return RC_dest_pixel; }
 };
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 template <>
 struct ShaderTypeTraits<SGS>
 {
     using MapType = CResourceManager::map_GS;
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
+    using HWShaderType = ID3DGeometryShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
+#   elif defined(USE_OGL)
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
-    using HWShaderType = ID3DGeometryShader*;
-    using BufferType = DWORD const*;
-    using ResultType = HRESULT;
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
     static inline const char* GetShaderExt() { return ".gs"; }
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX11
+#   ifdef USE_DX11
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -299,13 +265,13 @@ struct ShaderTypeTraits<SGS>
             return "gs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
+#       ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
-#endif
+#       endif
             return "gs_5_0";
         }
-#endif // USE_DX11
+#   endif // USE_DX11
         NODEFAULT;
         return "gs_4_0";
     }
@@ -321,45 +287,42 @@ struct ShaderTypeTraits<SGS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+        res = HW.pDevice->CreateGeometryShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#   elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_GEOMETRY_SHADER>(buffer, size, name);
-#elif defined(USE_DX11)
-        res = HW.pDevice->CreateGeometryShader(buffer, size, linkage, &sh);
-#else
-        res = HW.pDevice->CreateGeometryShader(buffer, size, &sh);
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
         return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_geometry; }
 };
-#endif
 
-#ifndef USE_DX9
 template <>
 struct ShaderTypeTraits<SHS>
 {
     using MapType = CResourceManager::map_HS;
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
+    using HWShaderType = ID3D11HullShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
+#   elif defined(USE_OGL)
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
-    using HWShaderType = ID3D11HullShader*;
-    using BufferType = DWORD const*;
-    using ResultType = HRESULT;
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
     static inline const char* GetShaderExt() { return ".hs"; }
 
@@ -379,14 +342,17 @@ struct ShaderTypeTraits<SHS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+        res = HW.pDevice->CreateHullShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#   elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_TESS_CONTROL_SHADER>(buffer, size, name);
-#else
-        res = HW.pDevice->CreateHullShader(buffer, size, linkage, &sh);
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
         return res;
     }
@@ -399,20 +365,18 @@ struct ShaderTypeTraits<SDS>
 {
     using MapType = CResourceManager::map_DS;
 
-#ifdef USE_OGL
+#if defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
+    using HWShaderType = ID3D11DomainShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
+#elif defined(USE_OGL)
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
-    using HWShaderType = ID3D11DomainShader*;
-    using BufferType = DWORD const*;
-    using ResultType = HRESULT;
+#   else
+#       error No graphics API selected or enabled!
 #endif
 
     static inline const char* GetShaderExt() { return ".ds"; }
@@ -433,14 +397,17 @@ struct ShaderTypeTraits<SDS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+        res = HW.pDevice->CreateDomainShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#   elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_TESS_EVALUATION_SHADER>(buffer, size, name);
-#else
-        res = HW.pDevice->CreateDomainShader(buffer, size, linkage, &sh);
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
         return res;
     }
@@ -453,27 +420,25 @@ struct ShaderTypeTraits<SCS>
 {
     using MapType = CResourceManager::map_CS;
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
+    using HWShaderType = ID3D11ComputeShader*;
+    using BufferType = DWORD const*;
+    using ResultType = HRESULT;
+#   elif defined(USE_OGL)
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
-    using HWShaderType = ID3D11ComputeShader*;
-    using BufferType = DWORD const*;
-    using ResultType = HRESULT;
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
     static inline const char* GetShaderExt() { return ".cs"; }
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX11
+#   ifdef USE_DX11
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -482,13 +447,13 @@ struct ShaderTypeTraits<SCS>
             return "cs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
+#       ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
-#endif
+#       endif
             return "cs_5_0";
         }
-#endif // USE_DX11
+#   endif // USE_DX11
 
         return "cs_5_0";
     }
@@ -503,14 +468,17 @@ struct ShaderTypeTraits<SCS>
         LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
-        
-#ifdef USE_OGL
+
+#if defined(USE_DX11)
+        res = HW.pDevice->CreateComputeShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_COMPUTE_SHADER>(buffer, size, name);
 #else
-        res = HW.pDevice->CreateComputeShader(buffer, size, linkage, &sh);
+#   error No graphics API selected or enabled!
 #endif
 
         return res;
@@ -532,15 +500,13 @@ inline CResourceManager::map_VS& CResourceManager::GetShaderMap()
     return m_vs;
 }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 template <>
 inline CResourceManager::map_GS& CResourceManager::GetShaderMap()
 {
     return m_gs;
 }
-#endif
 
-#ifndef USE_DX9
 template <>
 inline CResourceManager::map_DS& CResourceManager::GetShaderMap()
 {
@@ -558,7 +524,7 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 {
     return m_cs;
 }
-#endif
+#endif // USE_DX11 || USE_OGL
 
 template <typename T>
 T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32 flags /*= 0*/)
@@ -629,17 +595,17 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
         pcstr c_target, c_entry;
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-#   ifdef NDEBUG
-        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#   else
-        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | (xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0);
-#   endif
-#elif defined(USE_DX9)
+#if defined(USE_DX9)
 #   ifdef NDEBUG
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
 #   else
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | (xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0);
+#   endif
+#elif defined(USE_DX11)
+#   ifdef NDEBUG
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+#   else
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | (xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0);
 #   endif
 #endif
 

@@ -44,7 +44,7 @@ void rat_state_manager::add_state(state_id_type const& state_id, rat_state_base*
 {
     VERIFY(!this->state(state_id));
     state->construct(m_object);
-    m_states.insert(std::make_pair(state_id, state));
+    m_states.emplace(state_id, state);
 }
 
 void rat_state_manager::update()

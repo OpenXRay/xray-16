@@ -39,7 +39,7 @@ bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
     displace.sub(pos, current_pos);
     float disp_mag = displace.magnitude();
 
-    if (fis_zero(disp_mag) || fis_zero(inl_ph_world().Device().fTimeDelta))
+    if (fis_zero(disp_mag) || fis_zero(Device.fTimeDelta))
         return true;
     const u32 max_steps = 15;
     const float fmax_steps = float(max_steps);
@@ -97,7 +97,7 @@ bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
 #endif
 
     SetPosition(pos_new);
-    m_last_move.sub(pos_new, current_pos).mul(1.f / inl_ph_world().Device().fTimeDelta);
+    m_last_move.sub(pos_new, current_pos).mul(1.f / Device.fTimeDelta);
     m_body_interpolation.UpdatePositions();
     m_body_interpolation.UpdatePositions();
     if (ret)
@@ -171,8 +171,8 @@ void CPHAICharacter::ValidateWalkOn()
 }
 void CPHAICharacter::InitContact(dContact* c, bool& do_collide, u16 material_idx_1, u16 material_idx_2)
 {
-    SGameMtl* material_1 = GMLibrary().GetMaterialByIdx(material_idx_1);
-    SGameMtl* material_2 = GMLibrary().GetMaterialByIdx(material_idx_2);
+    SGameMtl* material_1 = GMLib.GetMaterialByIdx(material_idx_1);
+    SGameMtl* material_2 = GMLib.GetMaterialByIdx(material_idx_2);
     if ((material_1 && material_1->Flags.test(SGameMtl::flActorObstacle)) ||
         (material_2 && material_2->Flags.test(SGameMtl::flActorObstacle)))
         do_collide = true;

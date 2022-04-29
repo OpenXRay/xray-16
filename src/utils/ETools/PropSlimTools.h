@@ -27,11 +27,11 @@ struct VIPM_Result
 };
 
 extern "C" {
-ETOOLS_API void xr_stdcall VIPM_Init();
-ETOOLS_API void xr_stdcall VIPM_AppendVertex(const Fvector3& pt, const Fvector2& uv);
-ETOOLS_API void xr_stdcall VIPM_AppendFace(u16 v0, u16 v1, u16 v2);
-ETOOLS_API VIPM_Result* __stdcall VIPM_Convert(
+ETOOLS_API void VIPM_Init();
+ETOOLS_API void VIPM_AppendVertex(const Fvector3& pt, const Fvector2& uv);
+ETOOLS_API void VIPM_AppendFace(u16 v0, u16 v1, u16 v2);
+ETOOLS_API VIPM_Result* VIPM_Convert(
     u32 max_sliding_window = u32(-1), float error_tolerance = 0.1f, u32 optimize_vertex_order = 1);
-ETOOLS_API void xr_stdcall VIPM_Destroy();
+ETOOLS_API void VIPM_Destroy();
 };
 

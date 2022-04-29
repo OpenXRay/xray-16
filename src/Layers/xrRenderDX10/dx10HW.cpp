@@ -31,7 +31,7 @@ void CHW::OnAppActivate()
     if (m_pSwapChain && !m_ChainDesc.Windowed)
     {
         ShowWindow(m_ChainDesc.OutputWindow, SW_RESTORE);
-        m_pSwapChain->SetFullscreenState(ThisInstanceIsGlobal() ? psCurrentWindowMode == rsFullscreen : false, NULL);
+        m_pSwapChain->SetFullscreenState(ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle == rsFullscreen : false, NULL);
     }
 }
 
@@ -40,7 +40,7 @@ void CHW::OnAppDeactivate()
     if (m_pSwapChain && !m_ChainDesc.Windowed)
     {
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
-        if (psCurrentWindowMode == rsFullscreen || psCurrentWindowMode == rsFullscreenBorderless)
+        if (psDeviceMode.WindowStyle == rsFullscreen || psDeviceMode.WindowStyle == rsFullscreenBorderless)
             ShowWindow(m_ChainDesc.OutputWindow, SW_MINIMIZE);
     }
 }
@@ -231,7 +231,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
-    //Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 }
 
 void CHW::CreateSwapChain(HWND hwnd)
@@ -276,7 +275,7 @@ void CHW::CreateSwapChain(HWND hwnd)
 
     sd.OutputWindow = hwnd;
 
-    sd.Windowed = ThisInstanceIsGlobal() ? psCurrentWindowMode != rsFullscreen : true;
+    sd.Windowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
 
     //  Additional set up
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -328,7 +327,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.Scaling = DXGI_SCALING_STRETCH;
 
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc{};
-    fulldesc.Windowed = ThisInstanceIsGlobal() ? psCurrentWindowMode != rsFullscreen : true;
+    fulldesc.Windowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
 
     // Additional setup
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -415,7 +414,7 @@ void CHW::DestroyDevice()
 void CHW::Reset()
 {
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
-    const bool bWindowed = ThisInstanceIsGlobal() ? psCurrentWindowMode != rsFullscreen : true;
+    const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
     cd.Windowed = bWindowed;
     m_pSwapChain->SetFullscreenState(!bWindowed, NULL);
     DXGI_MODE_DESC& desc = m_ChainDesc.BufferDesc;
@@ -472,7 +471,7 @@ void CHW::EndScene() { }
 
 void CHW::Present()
 {
-    const bool bUseVSync = psCurrentWindowMode == rsFullscreen &&
+    const bool bUseVSync = psDeviceMode.WindowStyle == rsFullscreen &&
         psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
     m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
 #ifdef HAS_DX11_2

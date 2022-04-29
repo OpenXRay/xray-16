@@ -17,6 +17,7 @@ void CHWCaps::Update()
     // ***************** GEOMETRY
     geometry_major = 4;
     geometry_minor = 0;
+    geometry_profile = "vs_4_0";
     geometry.bSoftware = FALSE;
     geometry.bPointSprites = FALSE;
     geometry.bNPatches = FALSE;
@@ -32,6 +33,7 @@ void CHWCaps::Update()
     // ***************** PIXEL processing
     raster_major = 4;
     raster_minor = 0;
+    raster_profile = "ps_4_0";
     // XXX: review this
     raster.dwStages = 15; // Previuos value is 16, but it's out of bounds
     raster.bNonPow2 = TRUE;

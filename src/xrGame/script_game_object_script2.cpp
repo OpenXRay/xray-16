@@ -125,6 +125,7 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_callback", (void (CScriptGameObject::*)(GameObject::ECallbackType, const luabind::functor<void>&,
                                  const luabind::object&))(&CScriptGameObject::SetCallback))
         .def("set_callback", (void (CScriptGameObject::*)(GameObject::ECallbackType))(&CScriptGameObject::SetCallback))
+        .def("clear_callbacks", &CScriptGameObject::ClearCallbacks) //Graff46
 
         .def("set_patrol_extrapolate_callback",
             (void (CScriptGameObject::*)())(&CScriptGameObject::set_patrol_extrapolate_callback))

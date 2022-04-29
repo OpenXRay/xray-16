@@ -41,22 +41,26 @@ struct _LodItem
 };
 
 using state_type = SState*;
-#ifndef USE_OGL
+
+#if defined(USE_DX9)
 using ps_type = ID3DPixelShader*;
-#if !defined(USE_DX9) // DX11+ needs shader signature to properly bind geometry to shader
-using vs_type = SVS*;
-using gs_type = ID3DGeometryShader*;
-#else
 using vs_type = ID3DVertexShader*;
-#endif
-#ifdef USE_DX11
+
+#elif defined(USE_DX11) // DX11+ needs shader signature to properly bind geometry to shader
+using ps_type = ID3DPixelShader*;
+using vs_type = SVS*;
+
+using gs_type = ID3DGeometryShader*;
+
 using hs_type = ID3D11HullShader*;
 using ds_type = ID3D11DomainShader*;
-#endif
-#else
+
+#elif defined(USE_OGL)
 using vs_type = GLuint;
 using ps_type = GLuint;
 using gs_type = GLuint;
+#else
+#   error No graphics API selected or enabled!
 #endif
 
 // NORMAL
@@ -82,7 +86,7 @@ struct mapNormalCS : public xr_fixed_map<R_constant_table*, mapNormalStates>
     float ssa;
 };
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 struct mapNormalAdvStages
 {
     hs_type hs;
@@ -94,14 +98,19 @@ struct mapNormalPS : public xr_fixed_map<ps_type, mapNormalAdvStages>
 {
     float ssa;
 };
-#else
+#elif defined(USE_DX9) || defined(USE_OGL)
 struct mapNormalPS : public xr_fixed_map<ps_type, mapNormalCS>
 {
     float ssa;
 };
+#else
+#   error No graphics API selected or enabled!
 #endif // !USE_DX9 && !USE_OGL
 
-#ifndef USE_DX9
+
+#if defined(USE_DX9)
+struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalPS> {};
+#elif defined(USE_DX11) || defined(USE_OGL)
 struct mapNormalGS : public xr_fixed_map<gs_type, mapNormalPS>
 {
     float ssa;
@@ -109,7 +118,7 @@ struct mapNormalGS : public xr_fixed_map<gs_type, mapNormalPS>
 
 struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalGS> {};
 #else
-struct mapNormalVS : public xr_fixed_map<vs_type, mapNormalPS> {};
+#   error No graphics API selected or enabled!
 #endif // !USE_DX9
 
 using mapNormal_T = mapNormalVS;
@@ -138,7 +147,7 @@ struct mapMatrixCS : public xr_fixed_map<R_constant_table*, mapMatrixStates>
     float ssa;
 };
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 struct mapMatrixAdvStages
 {
     hs_type hs;
@@ -150,14 +159,19 @@ struct mapMatrixPS : public xr_fixed_map<ps_type, mapMatrixAdvStages>
 {
     float ssa;
 };
-#else 
+#elif defined(USE_DX9) || defined(USE_OGL)
 struct mapMatrixPS : public xr_fixed_map<ps_type, mapMatrixCS>
 {
     float ssa;
 };
+#else
+#   error No graphics API selected or enabled!
 #endif // !USE_DX9 && !USE_OGL
 
-#ifndef USE_DX9
+
+#if defined(USE_DX9)
+struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixPS> {};
+#elif defined(USE_DX11) || defined(USE_OGL)
 struct mapMatrixGS : public xr_fixed_map<gs_type, mapMatrixPS>
 {
     float ssa;
@@ -165,8 +179,8 @@ struct mapMatrixGS : public xr_fixed_map<gs_type, mapMatrixPS>
 
 struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixGS> {};
 #else
-struct mapMatrixVS : public xr_fixed_map<vs_type, mapMatrixPS> {};
-#endif // !USE_DX9
+#   error No graphics API selected or enabled!
+#endif
 
 using mapMatrix_T = mapMatrixVS;
 using mapMatrixPasses_T = mapMatrix_T[SHADER_PASSES_MAX];

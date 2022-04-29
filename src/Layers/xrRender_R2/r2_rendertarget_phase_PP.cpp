@@ -2,8 +2,19 @@
 
 void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
-    CTexture* T = RCache.get_ActiveTexture(2);
-    VERIFY2(T, "Texture #3 in noise shader should be setted up");
+    R_constant* C = RCache.get_c(RImplementation.c_snoise)._get(); // get texture
+    VERIFY2(C, "s_noise texture in noise shader should be set");
+    VERIFY(RC_dest_sampler == C->destination);
+#if defined(USE_DX9) || defined(USE_OGL)
+    VERIFY(RC_sampler == C->type);
+#elif defined(USE_DX11)
+    VERIFY(RC_dx10texture == C->type);
+#else
+#   error Select correct check for your graphics API
+#endif
+
+    CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
+    VERIFY2(T, "s_noise texture in noise shader should be set");
     u32 tw = iCeil(float(T->get_Width()) * param_noise_scale + EPS_S);
     u32 th = iCeil(float(T->get_Height()) * param_noise_scale + EPS_S);
     VERIFY2(tw && th, "Noise scale can't be zero in any way");
@@ -146,7 +157,16 @@ void CRenderTarget::phase_pp()
     // Fill vertex buffer
     float du = ps_r1_pps_u, dv = ps_r1_pps_v;
     TL_2c3uv* pv = (TL_2c3uv*)RCache.Vertex.Lock(4, g_postprocess.stride(), Offset);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
+    pv++;
+    pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
+    pv++;
+    pv->set(du + float(_w), dv + float(_h), p_color, p_gray, r1.x, r1.y, l1.x, l1.y, n1.x, n1.y);
+    pv++;
+    pv->set(du + float(_w), dv + 0, p_color, p_gray, r1.x, r0.y, l1.x, l0.y, n1.x, n0.y);
+    pv++;
+#elif defined(USE_OGL)
     pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
     pv++;
     pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
@@ -156,15 +176,8 @@ void CRenderTarget::phase_pp()
     pv->set(du + float(_w), dv + float(_h), p_color, p_gray, r1.x, r1.y, l1.x, l1.y, n1.x, n1.y);
     pv++;
 #else
-    pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
-    pv++;
-    pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
-    pv++;
-    pv->set(du + float(_w), dv + float(_h), p_color, p_gray, r1.x, r1.y, l1.x, l1.y, n1.x, n1.y);
-    pv++;
-    pv->set(du + float(_w), dv + 0, p_color, p_gray, r1.x, r0.y, l1.x, l0.y, n1.x, n0.y);
-    pv++;
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif // USE_DX9 || USE_DX11
     RCache.Vertex.Unlock(4, g_postprocess.stride());
 
     // Actual rendering

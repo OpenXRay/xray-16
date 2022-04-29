@@ -52,7 +52,7 @@ public:
     BOOL equal(SimulatorStates& S);
     void clear();
     void record(ID3DState*& state);
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     void UpdateState(dx10State& state) const;
     void UpdateDesc(D3D_RASTERIZER_DESC& desc) const;
     void UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const;

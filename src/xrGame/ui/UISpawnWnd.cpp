@@ -6,7 +6,7 @@
 #include "UIStatix.h"
 #include "xrUICore/ScrollView/UIScrollView.h"
 #include "xrUICore/Buttons/UI3tButton.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "UIGameCustom.h"
 
@@ -116,9 +116,11 @@ void CUISpawnWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    auto action = GetBindedAction(dik);
+
     if (WINDOW_KEY_PRESSED != keyboard_action)
     {
-        if (dik == SDL_SCANCODE_TAB)
+        if (action == kSCORES)
         {
             ShowChildren(true);
             game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -128,7 +130,7 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (dik == SDL_SCANCODE_TAB)
+    if (action == kSCORES)
     {
         ShowChildren(false);
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -151,17 +153,19 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             game->OnTeamSelect(1);
         return true;
     }
-    switch (dik)
+    switch (action)
     {
-    case SDL_SCANCODE_ESCAPE:
+    case kQUIT:
         HideDialog();
         game->OnTeamMenuBack();
         return true;
-    case SDL_SCANCODE_SPACE:
+
+    case kJUMP:
         HideDialog();
         game->OnTeamSelect(-1);
         return true;
-    case SDL_SCANCODE_RETURN:
+
+    case kENTER:
         HideDialog();
         if (m_pImage1->GetSelectedState())
             game->OnTeamSelect(0);
@@ -170,7 +174,7 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         else
             game->OnTeamSelect(-1);
         return true;
-    }
+    } // switch (action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

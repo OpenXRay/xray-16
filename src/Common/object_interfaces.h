@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 
 class NET_Packet;
 class IReader;

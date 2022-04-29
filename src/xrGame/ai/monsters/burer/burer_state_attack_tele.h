@@ -53,7 +53,7 @@ private:
 
     // internal for FindObjects
     void FindFreeObjects(xr_vector<IGameObject*>& tpObjects, const Fvector& pos);
-    void xr_stdcall OnGrenadeDestroyed(CGrenade* const grenade);
+    void OnGrenadeDestroyed(CGrenade* const grenade);
 
     void FireAllToEnemy();
     void deactivate();

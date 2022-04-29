@@ -6,12 +6,21 @@ ECORE_API bool bDebug = false;
 #endif
 
 // Video
-u32 psCurrentVidMode[2] = { 0u, 0u };
-u32 psCurrentWindowMode = rsFullscreen;
-u32 psCurrentBPP = 32;
+DeviceMode psDeviceMode =
+{
+    /* .Monitor        = */ 0,
+    /* .WindowStyle    = */ rsFullscreen,
+    /* .Width          = */ 0,
+    /* .Height         = */ 0,
+    /* .RefreshRate    = */ 0,
+    /* .BitsPerPixel   = */ 32
+};
+
 // release version always has "mt_*" enabled
-Flags32 psDeviceFlags = {
-    rsDetails | mtPhysics | mtSound | mtNetwork | rsDrawStatic | rsDrawDynamic | rsDrawParticles };
+Flags32 psDeviceFlags =
+{
+   rsDrawStatic | rsDrawDynamic | rsDrawDetails | rsDrawParticles | mtPhysics | mtSound | mtNetwork
+};
 
 // textures
 int psTextureLOD = 1;

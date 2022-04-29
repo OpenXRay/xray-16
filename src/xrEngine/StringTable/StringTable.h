@@ -3,8 +3,13 @@
 //////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrEngine/StringTable/IStringTable.h"
+
 #include "xrCommon/xr_map.h"
+#include "xrCore/xrstring.h"
+#include "xrCore/xr_token.h"
+
+using STRING_ID = shared_str;
+using STRING_VALUE = shared_str;
 
 using STRING_TABLE_MAP = xr_map<STRING_ID, STRING_VALUE>;
 
@@ -17,12 +22,9 @@ struct STRING_TABLE_DATA
     STRING_TABLE_MAP m_string_key_binding;
 };
 
-class CStringTable : public IStringTable
+class ENGINE_API CStringTable final
 {
 public:
-    CStringTable();
-    virtual ~CStringTable();
-
     void Init();
     static void Destroy();
 
@@ -46,4 +48,4 @@ private:
     static xr_vector<xr_token> languagesToken;
 };
 
-CStringTable& StringTable();
+ENGINE_API CStringTable& StringTable();

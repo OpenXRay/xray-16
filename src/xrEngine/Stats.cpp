@@ -75,6 +75,7 @@ static optimizer vtune;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 ENGINE_API bool g_bDisableRedText = false;
+int g_bShowRedText = 1;
 CStats::CStats()
 {
     statsFont = nullptr;
@@ -212,7 +213,7 @@ void CStats::Show()
         font.SetHeight(refHeight);
     }
 #ifdef DEBUG
-    if (!g_bDisableRedText && errors.size())
+    if (!g_bDisableRedText && errors.size() && g_bShowRedText)
     {
         font.SetColor(color_rgba(255, 16, 16, 191));
         font.OutSet(400, 0);

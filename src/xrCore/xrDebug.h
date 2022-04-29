@@ -1,5 +1,5 @@
 #pragma once
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCommon/xr_string.h"
 #include "xrCommon/xr_vector.h"
 #include "Threading/Lock.hpp"
@@ -53,25 +53,29 @@ public:
 class IWindowHandler
 {
 public:
+    virtual ~IWindowHandler() = default;
     virtual SDL_Window* GetApplicationWindow() = 0;
-    virtual void DisableFullscreen() = 0;
-    virtual void ResetFullscreen() = 0;
+    virtual void OnErrorDialog(bool beforeDialog) = 0;
+};
+
+class IUserConfigHandler
+{
+public:
+    virtual ~IUserConfigHandler() = default;
+    virtual pcstr GetUserConfigFileName() = 0;
 };
 
 class XRCORE_API xrDebug
 {
 public:
     using OutOfMemoryCallbackFunc = void(*)();
-    using CrashHandler = void(*)();
-    using DialogHandler = void(*)(bool);
     using UnhandledExceptionFilter = LONG(WINAPI*)(EXCEPTION_POINTERS* exPtrs);
 
 private:
     static IWindowHandler* windowHandler;
+    static IUserConfigHandler* userConfigHandler;
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
-    static CrashHandler OnCrash;
-    static DialogHandler OnDialog;
     static string_path BugReportFile;
     static bool ErrorAfterDialog;
     static bool ShowErrorMessage;
@@ -84,15 +88,14 @@ public:
     static void OnFilesystemInitialized();
 
     static bool DebuggerIsPresent();
+    static bool ProcessingFailure() { return failLock.IsLocked(); }
 
     static IWindowHandler* GetWindowHandler() { return windowHandler; }
     static void SetWindowHandler(IWindowHandler* handler) { windowHandler = handler; }
+    static IUserConfigHandler* GetUserConfigHandler() { return userConfigHandler; }
+    static void SetUserConfigHandler(IUserConfigHandler* handler) { userConfigHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
-    static CrashHandler GetCrashHandler() { return OnCrash; }
-    static void SetCrashHandler(CrashHandler handler) { OnCrash = handler; }
-    static DialogHandler GetDialogHandler() { return OnDialog; }
-    static void SetDialogHandler(DialogHandler handler) { OnDialog = handler; }
     static const char* ErrorToString(long code);
     static void SetBugReportFile(const char* fileName);
     static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
@@ -114,6 +117,8 @@ public:
 private:
     static bool symEngineInitialized;
     static Lock dbgHelpLock;
+    static Lock failLock;
+
     static void FormatLastError(char* buffer, const size_t& bufferSize);
     static void SetupExceptionHandler();
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);

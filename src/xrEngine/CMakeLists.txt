@@ -18,6 +18,7 @@ set(SRC_FILES
     "Device_destroy.cpp"
     "device.h"
     "Device_Initialize.cpp"
+    "Device_mode.cpp"
     "Device_overdraw.cpp"
     #"Device_wndproc.cpp"
     "edit_actions.cpp"
@@ -83,8 +84,6 @@ set(SRC_FILES
     "mailSlot.cpp"
     "main.cpp"
     "main.h"
-    "MonitorManager.cpp"
-    "MonitorManager.hpp"
     "mp_logging.h"
     "ObjectAnimator.cpp"
     "ObjectAnimator.h"
@@ -141,8 +140,8 @@ set(SRC_FILES
     "xrImage_Resampler.h"
     "xr_input.cpp"
     "xr_input.h"
-    "xr_input_xinput.cpp"
-    "xr_input_xinput.h"
+    "xr_level_controller.cpp"
+    "xr_level_controller.h"
     "xr_ioc_cmd.cpp"
     "xr_ioc_cmd.h"
     "XR_IOConsole_callback.cpp"
@@ -150,7 +149,7 @@ set(SRC_FILES
     "XR_IOConsole.cpp"
     "XR_IOConsole_get.cpp"
     "XR_IOConsole.h"
-    "xrLoadSurface.cpp"
+    #"xrLoadSurface.cpp"
     "xr_object.cpp"
     "xr_object.h"
     "xr_object_list.cpp"
@@ -163,9 +162,8 @@ set(SRC_FILES
     "xrTheora_Stream.h"
     "xrTheora_Surface.cpp"
     "xrTheora_Surface.h"
-    "StringTable/IStringTable.cpp"
-    "StringTable/IStringTable.h"
-    "StringTable/IStringTableDefs.h"
+    "StringTable/StringTable.cpp"
+    "StringTable/StringTable.h"
 )
 
 group_sources(SRC_FILES)
@@ -179,16 +177,11 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${SDL_INCLUDE_DIRS}
-    ${FREEIMAGE_INCLUDE_PATH}
-    ${FREEIMAGEPLUS_INCLUDE_PATH}
-    ${LOCKFILE_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-    xrMiscMath #xrRenderGL ?
-    ${FREEIMAGE_LIBRARY} #xrRenderGL
-    ${FREEIMAGEPLUS_LIBRARY} #xrRenderGL
+    xrMiscMath
     PRIVATE
     xrCore
     xrLuabind
@@ -200,9 +193,7 @@ target_link_libraries(${PROJECT_NAME}
     ${THEORA_LIBRARY}
     ${OGG_LIBRARIES}
     xrCDB
-    xrPhysics
     openal
-    ${LOCKFILE_LIBRARIES}
     ${SDL_LIBRARIES}
 )
 

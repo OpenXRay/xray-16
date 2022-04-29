@@ -18,7 +18,7 @@ class PlayersMonitor
     bool now_iterating_in_net_players;
     bool now_iterating_in_net_players_disconn;
 #ifdef DEBUG
-    u32 iterator_thread_id;
+    Threading::ThreadId iterator_thread_id;
 #endif
 public:
     PlayersMonitor()
@@ -34,7 +34,7 @@ public:
     {
         if (now_iterating_in_net_players || now_iterating_in_net_players_disconn)
         {
-            if (iterator_thread_id == Threading::GetCurrThreadId())
+            if (Threading::ThreadIdsAreEqual(iterator_thread_id, Threading::GetCurrThreadId()))
             {
                 return true;
             }

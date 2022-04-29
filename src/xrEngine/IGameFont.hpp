@@ -1,6 +1,6 @@
 #pragma once
 #include <stdarg.h>
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/_vector2.h"
 
 class IGameFont

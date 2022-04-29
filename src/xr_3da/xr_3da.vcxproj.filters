@@ -51,12 +51,6 @@
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\AnselSDK$(PlatformArchitecture).dll">
       <Filter>Dependecies</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\FreeImage.dll">
-      <Filter>Dependecies</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\FreeImagePlus.dll">
-      <Filter>Dependecies</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\Externals\AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll">
       <Filter>Dependecies</Filter>
     </CopyFileToFolders>

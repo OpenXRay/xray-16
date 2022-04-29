@@ -12,7 +12,6 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#include <malloc.h>
 #include "xrCore/Debug/dxerr.h"
 
 #include <WINSOCK2.H>
@@ -135,7 +134,7 @@ NET_Packet* INetQueue::Create()
         ready.push_back(xr_new<NET_Packet>());
         P = ready.back();
         //---------------------------------------------
-        LastTimeCreate = SDL_GetTicks();
+        LastTimeCreate = CPU::GetTicks();
         //---------------------------------------------
     }
     else
@@ -160,7 +159,7 @@ NET_Packet* INetQueue::Create(const NET_Packet& _other)
         ready.push_back(xr_new<NET_Packet>());
         P = ready.back();
         //---------------------------------------------
-        LastTimeCreate = SDL_GetTicks();
+        LastTimeCreate = CPU::GetTicks();
         //---------------------------------------------
     }
     else
@@ -186,7 +185,7 @@ NET_Packet* INetQueue::Retreive()
     //---------------------------------------------
     else
     {
-        u32 tmp_time = SDL_GetTicks() - 60000;
+        u32 tmp_time = CPU::GetTicks() - 60000;
         u32 size = unused.size();
         if ((LastTimeCreate < tmp_time) && (size > 32))
         {
@@ -207,7 +206,7 @@ void INetQueue::Release()
 //#endif
     VERIFY(!ready.empty());
     //---------------------------------------------
-    u32 tmp_time = SDL_GetTicks() - 60000;
+    u32 tmp_time = CPU::GetTicks() - 60000;
     u32 size = unused.size();
     ready.front()->B.count = 0;
     if ((LastTimeCreate < tmp_time) && (size > 32))

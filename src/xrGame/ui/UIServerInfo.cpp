@@ -12,9 +12,6 @@
 #include "ximage.h"
 #include "xmemfile.h"
 
-// XXX: uncomment, test and remove CxImage that is currectly used
-//#include <FreeImage/FreeImagePlus.h>
-
 CUIServerInfo::CUIServerInfo()
 {
     m_dds_file_created = false;
@@ -94,18 +91,6 @@ void CUIServerInfo::InitCallbacks()
 char const* CUIServerInfo::tmp_logo_file_name = "tmp_sv_logo.dds";
 void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
 {
-    // XXX: uncomment, test and remove CxImage that is currectly used
-    /*fipImage tmpImage;
-    fipMemoryIO tmpMemFile(const_cast<BYTE*>(data_ptr), data_size);
-    
-    tmpImage.loadFromMemory(tmpMemFile);
-
-    if (!tmpImage.isValid() || tmpImage.getFIF() != FIF_JPEG);
-    {
-        Msg("! ERROR: Failed to decode server logo image as JPEG formatted.");
-        return;
-    }*/
-
     CxMemFile tmp_memfile(const_cast<u8*>(data_ptr), data_size);
     CxImage tmp_image;
     if (!tmp_image.Decode(&tmp_memfile, CXIMAGE_FORMAT_JPG))
@@ -152,7 +137,7 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
     m_text_body->AdjustHeightToText();
 }
 
-void xr_stdcall CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
+void CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
 {
     game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(mp_game);
@@ -161,7 +146,7 @@ void xr_stdcall CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
     mp_game->OnSpectatorSelect();
 }
 
-void xr_stdcall CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
+void CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
 {
     game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(mp_game);
@@ -172,15 +157,15 @@ void xr_stdcall CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
 
 bool CUIServerInfo::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    switch (dik)
+    switch (GetBindedAction(dik))
     {
-    case SDL_SCANCODE_SPACE:
-    case SDL_SCANCODE_RETURN:
+    case kJUMP:
+    case kENTER:
     {
         OnNextBtnClick(NULL, 0);
         return true;
     }
-    break;
-    }; // switch (dik)
+    } // switch (GetBindedAction(dik))
+
     return false;
 }

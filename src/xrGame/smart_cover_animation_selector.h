@@ -45,9 +45,9 @@ public:
     void initialize();
     void execute();
     void finalize();
-    MotionID xr_stdcall select_animation(bool& animation_movement_controller);
-    void xr_stdcall on_animation_end();
-    void xr_stdcall modify_animation(CBlend* blend);
+    MotionID select_animation(bool& animation_movement_controller);
+    void on_animation_end();
+    void modify_animation(CBlend* blend);
     void save(NET_Packet& packet);
     void load(IReader& packet);
     void setup(CAI_Stalker* object, CPropertyStorage* storage);

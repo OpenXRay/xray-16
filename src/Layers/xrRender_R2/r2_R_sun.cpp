@@ -1,10 +1,11 @@
 #include "stdafx.h"
+
+#include "r2_R_sun_support.h"
+
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/IRenderable.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCommon/math_funcs_inline.h"
-
-#include "r2_R_sun_support.h"
 
 #include <DirectXMath.h>
 
@@ -23,16 +24,23 @@ const float MAP_GROW_FACTOR = 4.f;
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
-static Fvector3 corners[8] = {
-    {-1, -1, 0}, {-1, -1, +1}, {-1, +1, +1}, {-1, +1, 0}, {+1, +1, +1}, {+1, +1, 0}, {+1, -1, +1}, {+1, -1, 0}};
-static int facetable[6][4] = {
-    {6, 7, 5, 4}, {1, 0, 7, 6}, {1, 2, 3, 0}, {3, 2, 4, 5},
+static Fvector3 corners[8] =
+{
+    { -1, -1, +0 }, { -1, -1, +1 },
+    { -1, +1, +1 }, { -1, +1, +0 },
+    { +1, +1, +1 }, { +1, +1, +0 },
+    { +1, -1, +1 }, { +1, -1, +0 }
+};
+static int facetable[6][4] =
+{
+    { 6, 7, 5, 4 }, { 1, 0, 7, 6 },
+    { 1, 2, 3, 0 }, { 3, 2, 4, 5 },
     // near and far planes
-    {0, 3, 5, 7}, {1, 6, 4, 2},
+    { 0, 3, 5, 7 }, { 1, 6, 4, 2 },
 };
 //////////////////////////////////////////////////////////////////////////
 // XXX: examine
-#define DW_AS_FLT(DW) (*(FLOAT*)&(DW))
+#define DW_AS_FLT(DW) (*(float*)&(DW))
 #define FLT_AS_DW(F) (*(u32*)&(F))
 #define FLT_SIGN(F) ((FLT_AS_DW(F) & 0x80000000L))
 #define ALMOST_ZERO(F) ((FLT_AS_DW(F) & 0x7f800000L) == 0)
@@ -79,10 +87,6 @@ struct BoundingBox
         maxPt.x = std::max(maxPt.x, vec->x);
         maxPt.y = std::max(maxPt.y, vec->y);
         maxPt.z = std::max(maxPt.z, vec->z);
-    }
-    XMFLOAT3 Point(int i) const
-    {
-        return XMFLOAT3((i & 1) ? minPt.x : maxPt.x, (i & 2) ? minPt.y : maxPt.y, (i & 4) ? minPt.z : maxPt.z);
     }
 };
 
@@ -161,7 +165,7 @@ Frustum::Frustum(const XMFLOAT4X4* matrix)
 }
 
 //////////////////////////////////////////////////////////////////////////
-Fvector3 wform(Fmatrix& m, Fvector3 const& v)
+Fvector3 wform(Fmatrix const& m, Fvector3 const& v)
 {
     Fvector4 r;
     r.x = v.x * m._11 + v.y * m._21 + v.z * m._31 + m._41;
@@ -170,8 +174,7 @@ Fvector3 wform(Fmatrix& m, Fvector3 const& v)
     r.w = v.x * m._14 + v.y * m._24 + v.z * m._34 + m._44;
     // VERIFY		(r.w>0.f);
     const float invW = 1.0f / r.w;
-    Fvector3 r3 = {r.x * invW, r.y * invW, r.z * invW};
-    return r3;
+    return { r.x * invW, r.y * invW, r.z * invW };
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -265,7 +268,7 @@ struct DumbClipper
                     }
                 }
                 break;
-            };
+            } // switch (res)
         }
         return result;
     }
@@ -346,7 +349,7 @@ void CRender::render_sun()
 
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
         //. hack: need to know real outdoor sector
-        CSector* largest_sector = 0;
+        CSector* largest_sector = nullptr;
         float largest_sector_vol = 0;
         for (u32 s = 0; s < Sectors.size(); s++)
         {
@@ -404,7 +407,7 @@ void CRender::render_sun()
     {
         HOM.Disable();
         phase = PHASE_SMAP;
-        if (RImplementation.o.Tshadows)
+        if (o.Tshadows)
             r_pmask(true, true);
         else
             r_pmask(true, false);
@@ -812,12 +815,12 @@ void CRender::render_sun_near()
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
 #ifdef _DEBUG
         for (u32 it = 0; it < cull_planes.size(); it++)
-            RImplementation.Target->dbg_addplane(cull_planes[it], 0xffffffff);
+            Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
         //. hack: need to know real outdoor sector
-        CSector* largest_sector = 0;
+        CSector* largest_sector = nullptr;
         float largest_sector_vol = 0;
         for (u32 s = 0; s < Sectors.size(); s++)
         {
@@ -901,9 +904,14 @@ void CRender::render_sun_near()
             bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z));
 
         // build viewport xform
-        float view_dim = float(RImplementation.o.smapsize);
-        Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f};
+        float view_dim = float(o.smapsize);
+        Fmatrix m_viewport =
+        {
+            view_dim / 2.f, 0.0f, 0.0f, 0.0f,
+            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
+        };
         Fmatrix m_viewport_inv;
         XMStoreFloat4x4((XMFLOAT4X4*)&m_viewport_inv,
             XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&m_viewport)));
@@ -931,7 +939,7 @@ void CRender::render_sun_near()
             Fvector xf = wform(scissor_xf, hull.points[it]);
             scissor.modify(xf);
         }
-        s32 limit = RImplementation.o.smapsize - 1;
+        s32 limit = o.smapsize - 1;
         fuckingsun->X.D.minX = clampr(iFloor(scissor.vMin.x), 0, limit);
         fuckingsun->X.D.maxX = clampr(iCeil(scissor.vMax.x), 0, limit);
         fuckingsun->X.D.minY = clampr(iFloor(scissor.vMin.y), 0, limit);
@@ -947,7 +955,7 @@ void CRender::render_sun_near()
         VERIFY(!bSpecialFull);
         HOM.Disable();
         phase = PHASE_SMAP;
-        if (RImplementation.o.Tshadows)
+        if (o.Tshadows)
             r_pmask(true, true);
         else
             r_pmask(true, false);
@@ -1011,7 +1019,7 @@ void CRender::render_sun_near()
 
 void CRender::render_sun_filtered()
 {
-    if (!RImplementation.o.sunfilter)
+    if (!o.sunfilter)
         return;
     Target->phase_accumulator();
     PIX_EVENT(SE_SUN_LUMINANCE);
@@ -1045,7 +1053,7 @@ void CRender::init_cacades()
 
 void CRender::render_sun_cascades()
 {
-    bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
+    bool b_need_to_render_sunshafts = Target->need_to_render_sunshafts();
     bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
     if (b_need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
@@ -1091,7 +1099,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         //******************************* Need to be placed after cuboid built **************************
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
         //. hack: need to know real outdoor sector
-        CSector* largest_sector = 0;
+        CSector* largest_sector = nullptr;
         float largest_sector_vol = 0;
         for (u32 s = 0; s < Sectors.size(); s++)
         {
@@ -1174,9 +1182,14 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 #endif
         //////////////////////////////////////////////////////////////////////////
         // build viewport xform
-        float view_dim = float(RImplementation.o.smapsize);
-        Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f};
+        float view_dim = float(o.smapsize);
+        Fmatrix m_viewport =
+        {
+            view_dim / 2.f, 0.0f, 0.0f, 0.0f,
+            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
+        };
         Fmatrix m_viewport_inv;
         XMStoreFloat4x4((XMFLOAT4X4*)&m_viewport_inv,
             XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&m_viewport)));
@@ -1205,7 +1218,11 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         Fvector lightXZshift;
         light_cuboid.compute_caster_model_fixed(
-            cull_planes, lightXZshift, m_sun_cascades[cascade_ind].size, m_sun_cascades[cascade_ind].reset_chain);
+            cull_planes, lightXZshift,
+            m_sun_cascades[cascade_ind].size,
+            m_sun_cascades[cascade_ind].reset_chain
+        );
+
         Fvector proj_view = Device.vCameraDirection;
         proj_view.y = 0;
         proj_view.normalize();
@@ -1216,11 +1233,10 @@ void CRender::render_sun_cascade(u32 cascade_ind)
             m_sun_cascades[cascade_ind + 1].rays = light_cuboid.view_frustum_rays;
 
 #ifdef DEBUG
-
         static bool draw_debug = false;
         if (draw_debug && cascade_ind == 0)
             for (u32 it = 0; it < cull_planes.size(); it++)
-                RImplementation.Target->dbg_addplane(cull_planes[it], it * 0xFFF);
+                Target->dbg_addplane(cull_planes[it], it * 0xFFF);
 #endif
 
         Fvector cam_shifted = L_pos;
@@ -1276,7 +1292,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         m_sun_cascades[cascade_ind].xform = cull_xform;
 
-        s32 limit = RImplementation.o.smapsize - 1;
+        s32 limit = o.smapsize - 1;
         fuckingsun->X.D.minX = 0;
         fuckingsun->X.D.maxX = limit;
         fuckingsun->X.D.minY = 0;
@@ -1292,7 +1308,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         VERIFY(!bSpecialFull);
         HOM.Disable();
         phase = PHASE_SMAP;
-        if (RImplementation.o.Tshadows)
+        if (o.Tshadows)
             r_pmask(true, true);
         else
             r_pmask(true, false);

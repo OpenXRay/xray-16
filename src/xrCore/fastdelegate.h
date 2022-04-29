@@ -53,10 +53,6 @@
 
 #include <memory.h> // to allow <,> comparisons
 
-//////////////////////////////////////////////////
-#define xr_stdcall __stdcall
-///////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////////////
 //      Compiler identification for workarounds
 //
@@ -189,7 +185,7 @@ class GenericClass;
 #endif
 
 // The size of a single inheritance member function pointer.
-const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (xr_stdcall GenericClass::*)());
+const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());
 
 //      SimplifyMemFunc< >::Convert()
 //
@@ -207,7 +203,7 @@ template <int N>
 struct SimplifyMemFunc
 {
     template <class X, class XFuncType, class GenericMemFuncType>
-    inline static GenericClass* xr_stdcall Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
+    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
     {
         // Unsupported member function type -- force a compile failure.
         // (it's illegal to have a array with negative size).
@@ -222,7 +218,7 @@ template <>
 struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE>
 {
     template <class X, class XFuncType, class GenericMemFuncType>
-    inline static GenericClass* xr_stdcall Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
+    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
     {
 #if defined __DMC__
         // Digital Mars doesn't allow you to cast between abitrary PMF's,
@@ -257,7 +253,7 @@ template <>
 struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + sizeof(int)>
 {
     template <class X, class XFuncType, class GenericMemFuncType>
-    inline static GenericClass* xr_stdcall Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
+    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
     {
         // We need to use a horrible_cast to do this conversion.
         // In MSVC, a multiple inheritance member pointer is internally defined as:
@@ -314,7 +310,7 @@ template <>
 struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2 * sizeof(int)>
 {
     template <class X, class XFuncType, class GenericMemFuncType>
-    inline static GenericClass* xr_stdcall Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
+    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
     {
 #pragma pack(push)
 #pragma pack(1)
@@ -355,7 +351,7 @@ template <>
 struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3 * sizeof(int)>
 {
     template <class X, class XFuncType, class GenericMemFuncType>
-    inline static GenericClass* xr_stdcall Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
+    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
     {
         // There is an apalling but obscure compiler bug in MSVC6 and earlier:
         // vtable_index and 'vtordisp' are always set to 0 in the
@@ -396,7 +392,7 @@ template <>
 struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3 * sizeof(int)>
 {
     template <class X, class XFuncType, class GenericMemFuncType>
-    inline static GenericClass* xr_stdcall Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
+    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
     {
         // The member function pointer is 16 bytes long. We can't use a normal cast, but
         // we can use a union to do the conversion.
@@ -536,7 +532,7 @@ public:
     inline bool operator<(const DelegateMemento& right) { return IsLess(right); }
     inline bool operator>(const DelegateMemento& right) { return right.IsLess(*this); }
     DelegateMemento(const DelegateMemento& right)
-        : m_pFunction(right.m_pFunction), m_pthis(right.m_pthis)
+        : m_pthis(right.m_pthis), m_pFunction(right.m_pFunction)
     {
     }
 
@@ -708,8 +704,8 @@ template <typename RetType, typename... Arguments>
 class FastDelegate<RetType(Arguments...)>
 {
 private:
-    typedef RetType(xr_stdcall* StaticFunctionPtr)(Arguments... args);
-    typedef RetType(xr_stdcall detail::GenericClass::* GenericMemFn)(Arguments... args);
+    typedef RetType(* StaticFunctionPtr)(Arguments... args);
+    typedef RetType(detail::GenericClass::* GenericMemFn)(Arguments... args);
     typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr> ClosureType;
     ClosureType m_Closure;
 
@@ -729,36 +725,36 @@ public:
 
     // Binding to non-const member functions
     template <class X, class Y>
-    FastDelegate(Y* pthis, RetType (xr_stdcall X::*function_to_bind)(Arguments... args))
+    FastDelegate(Y* pthis, RetType (X::*function_to_bind)(Arguments... args))
     {
         m_Closure.bindmemfunc(detail::implicit_cast<X*>(pthis), function_to_bind);
     }
     template <class X, class Y>
-    inline void bind(Y* pthis, RetType (xr_stdcall X::*function_to_bind)(Arguments... args))
+    inline void bind(Y* pthis, RetType (X::*function_to_bind)(Arguments... args))
     {
         m_Closure.bindmemfunc(detail::implicit_cast<X*>(pthis), function_to_bind);
     }
 
     // Binding to const member functions.
     template <class X, class Y>
-    FastDelegate(const Y* pthis, RetType (xr_stdcall X::*function_to_bind)(Arguments... args) const)
+    FastDelegate(const Y* pthis, RetType (X::*function_to_bind)(Arguments... args) const)
     {
         m_Closure.bindmemfunc(detail::implicit_cast<const X*>(pthis), function_to_bind);
     }
     template <class X, class Y>
-    inline void bind(const Y* pthis, RetType (xr_stdcall X::*function_to_bind)(Arguments... args) const)
+    inline void bind(const Y* pthis, RetType (X::*function_to_bind)(Arguments... args) const)
     {
         m_Closure.bindmemfunc(detail::implicit_cast<const X*>(pthis), function_to_bind);
     }
 
     // Static functions. We convert them into a member function call.
     // This constructor also provides implicit conversion
-    FastDelegate(RetType(xr_stdcall* function_to_bind)(Arguments... args)) { bind(function_to_bind); }
+    FastDelegate(RetType(* function_to_bind)(Arguments... args)) { bind(function_to_bind); }
 
     // for efficiency, prevent creation of a temporary
-    void operator=(RetType(xr_stdcall* function_to_bind)(Arguments... args)) { bind(function_to_bind); }
+    void operator=(RetType(* function_to_bind)(Arguments... args)) { bind(function_to_bind); }
 
-    inline void bind(RetType(xr_stdcall* function_to_bind)(Arguments... args))
+    inline void bind(RetType(* function_to_bind)(Arguments... args))
     {
         m_Closure.bindstaticfunc(this, &FastDelegate::InvokeStaticFunction, function_to_bind);
     }
@@ -796,7 +792,7 @@ public:
 private: // Invoker for static functions
     // this -- parameter, function
     // p1 - function,     parameter
-    RetType xr_stdcall InvokeStaticFunction(Arguments... args) const
+    RetType InvokeStaticFunction(Arguments... args) const
     {
         return (*(m_Closure.GetStaticFunction()))(args...);
     }
@@ -869,19 +865,19 @@ auto MakeDelegate(const Invokable& invokable)
 }
 
 template <typename RetType, typename... Arguments>
-FastDelegate<RetType(Arguments...)> MakeDelegate(RetType(xr_stdcall* func)(Arguments... args))
+FastDelegate<RetType(Arguments...)> MakeDelegate(RetType(* func)(Arguments... args))
 {
     return FastDelegate<RetType(Arguments...)>(func);
 }
 
 template <class X, class Y, class RetType, typename... Arguments>
-FastDelegate<RetType(Arguments...)> MakeDelegate(Y* x, RetType(xr_stdcall X::* func)(Arguments... args))
+FastDelegate<RetType(Arguments...)> MakeDelegate(Y* x, RetType(X::* func)(Arguments... args))
 {
     return FastDelegate<RetType(Arguments...)>(x, func);
 }
 
 template <class X, class Y, class RetType, typename... Arguments>
-FastDelegate<RetType(Arguments...)> MakeDelegate(Y* x, RetType(xr_stdcall X::* func)(Arguments... args) const)
+FastDelegate<RetType(Arguments...)> MakeDelegate(Y* x, RetType(X::* func)(Arguments... args) const)
 {
     return FastDelegate<RetType(Arguments...)>(x, func);
 }

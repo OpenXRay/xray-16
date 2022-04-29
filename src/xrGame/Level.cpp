@@ -544,7 +544,6 @@ void CLevel::OnFrame()
     if (!GEnv.isDedicatedServer)
         GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
     m_ph_commander->update();
-    m_ph_commander_scripts->UpdateDeferred();
     m_ph_commander_scripts->update();
     stats.BulletManagerCommit.Begin();
     BulletManager().CommitRenderSet();
@@ -833,7 +832,7 @@ void CLevel::make_NetCorrectionPrediction()
     physics_world()->StepsNum() -= m_dwNumSteps;
     if (ph_console::g_bDebugDumpPhysicsStep && m_dwNumSteps > 10)
     {
-        Msg("!!!TOO MANY PHYSICS STEPS FOR CORRECTION PREDICTION = %d !!!", m_dwNumSteps);
+        Msg("!!! TOO MANY PHYSICS STEPS FOR CORRECTION PREDICTION = %d !!!", m_dwNumSteps);
         m_dwNumSteps = 10;
     }
     physics_world()->Freeze();

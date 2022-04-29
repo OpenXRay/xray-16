@@ -11,7 +11,7 @@
 
 using System::String;
 
-property_boolean_values_value_reference::property_boolean_values_value_reference(bool& value, LPCSTR values[2])
+property_boolean_values_value_reference::property_boolean_values_value_reference(bool& value, pcstr values[2])
     : inherited(value), m_collection(gcnew collection_type())
 {
     for (u32 i = 0; i < 2; ++i)

@@ -1912,7 +1912,6 @@ void game_sv_mp::RejectGameItem(CSE_Abstract* entity)
     Level().Send(P, net_flags(TRUE, TRUE));
 }
 
-#include "string_table.h"
 void game_sv_mp::DumpOnlineStatistic()
 {
     xrGameSpyServer* srv = smart_cast<xrGameSpyServer*>(m_server);
@@ -2030,7 +2029,7 @@ void game_sv_mp::WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult)
 
 void game_sv_mp::async_statistics_collector::operator()(IClient* client)
 {
-    async_responses.insert(std::make_pair(client->ID, false));
+    async_responses.emplace(client->ID, false);
 }
 
 bool game_sv_mp::async_statistics_collector::all_ready() const

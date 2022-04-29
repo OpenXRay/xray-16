@@ -35,7 +35,11 @@ set(SRC_FILES
 
 group_sources(SRC_FILES)
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+if (STATIC_BUILD)
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+else()
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
@@ -65,6 +69,7 @@ target_compile_definitions(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
+    POSITION_INDEPENDENT_CODE ON
 )
 
 target_precompile_headers(${PROJECT_NAME}

@@ -35,8 +35,8 @@ public:
     virtual sounds_type& sounds();
 
 private:
-    pcstr xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(pcstr value);
+    pcstr id_getter() const;
+    void id_setter(pcstr value);
 
 public:
     using sound_container_type = xr_vector<source*>;

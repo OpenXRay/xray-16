@@ -9,7 +9,6 @@
 #include "pch_script.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "string_table.h"
 
 #include "inventory_upgrade.h"
 #include "inventory_upgrade_manager.h"
@@ -131,6 +130,19 @@ void Upgrade::fill_root_container(Root* root)
     inherited::fill_root_container(root);
 }
 
+enum UpgradeStateResultScript
+{
+    result_script_ok                    = 0,
+
+    // Call of Pripyat meaning
+    result_script_e_cant_do             = 1,
+    result_script_e_precondition_any    = 2,
+
+    // Clear Sky meaning
+    result_script_e_precondition_money  = 1,
+    result_script_e_precondition_quest  = 2,
+};
+
 UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
 {
     UpgradeStateResult res = inherited::can_install(item, loading);
@@ -140,27 +152,30 @@ UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
     }
 
     res = m_parent_group->can_install(item, *this, loading);
-    if (res != result_ok)
-    {
-        return res;
-    }
-
     if (loading)
     {
-        return result_ok; // later script check
+        return res; // later script check
     }
 
-    int res_prec = m_preconditions();
-    if (res_prec == 0)
+    int script_res = m_preconditions();
+
+    switch (script_res)
     {
-        return result_ok;
-    }
-    else if (res_prec == 1)
-    {
-        return result_e_precondition_money;
-    }
-    else if (res_prec == 2)
-    {
+    case result_script_ok:
+        return res;
+
+    case result_script_e_cant_do:
+        if (ClearSkyMode)
+        {
+            if (res != result_ok)
+                return res;
+            return result_e_precondition_money;
+        }
+        return result_e_cant_do;
+
+    case result_script_e_precondition_any:
+        if (res != result_ok)
+            return res;
         return result_e_precondition_quest;
     }
 
@@ -173,24 +188,6 @@ bool Upgrade::check_scheme_index(Ivector2 const& scheme_index)
 }
 
 LPCSTR Upgrade::get_prerequisites() { return m_prerequisites(); }
-UpgradeStateResult Upgrade::get_preconditions()
-{
-    int res_prec = m_preconditions();
-    if (res_prec == 0)
-    {
-        return result_ok;
-    }
-    else if (res_prec == 1)
-    {
-        return result_e_precondition_money;
-    }
-    else if (res_prec == 2)
-    {
-        return result_e_precondition_quest;
-    }
-
-    return result_ok;
-}
 
 void Upgrade::run_effects(bool loading)
 {

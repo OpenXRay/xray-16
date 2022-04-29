@@ -6,7 +6,6 @@
 #include "Actor.h"
 #include "Level.h"
 #include "xrServerEntities/character_info.h"
-#include "string_table.h"
 #include "relation_registry.h"
 
 #include "xrUICore/XML/xrUIXmlParser.h"

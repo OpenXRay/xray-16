@@ -50,6 +50,7 @@ CUIMapWnd::~CUIMapWnd()
 {
     delete_data(m_ActionPlanner);
     delete_data(m_GameMaps);
+    delete_data(m_map_location_hint);
     /*
     #ifdef DEBUG
         delete_data( m_dbg_text_hint );
@@ -145,12 +146,11 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         AddCallback(m_UIMainScrollV, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollV));
     }
 
-    init_xml_nav(uiXml);
+    init_xml_nav(uiXml, start_from, critical);
 
     m_map_location_hint = xr_new<CUIMapLocationHint>();
+    m_map_location_hint->SetAutoDelete(false);
     m_map_location_hint->SetCustomDraw(true);
-    m_map_location_hint->SetAutoDelete(true);
-    AttachChild(m_map_location_hint);
     strconcat(sizeof(pth), pth, start_from, ":map_hint_item");
     m_map_location_hint->Init(uiXml, pth);
 
@@ -362,7 +362,8 @@ void CUIMapWnd::Draw()
         m_dbg_info->Draw		();
     #endif // DEBUG */
 
-    m_btn_nav_parent->Draw();
+    if (m_btn_nav_parent)
+        m_btn_nav_parent->Draw();
 }
 
 void CUIMapWnd::MapLocationRelcase(CMapLocation* ml)
@@ -396,55 +397,57 @@ void CUIMapWnd::DrawHint()
     }
 }
 
-bool CUIMapWnd::OnKeyboardHold(int dik)
-{
-    switch (dik)
-    {
-    case SDL_SCANCODE_UP:
-    case SDL_SCANCODE_DOWN:
-    case SDL_SCANCODE_LEFT:
-    case SDL_SCANCODE_RIGHT:
-    {
-        Fvector2 pos_delta;
-        pos_delta.set(0.0f, 0.0f);
-
-        if (dik == SDL_SCANCODE_UP)
-            pos_delta.y += m_map_move_step;
-        if (dik == SDL_SCANCODE_DOWN)
-            pos_delta.y -= m_map_move_step;
-        if (dik == SDL_SCANCODE_LEFT)
-            pos_delta.x += m_map_move_step;
-        if (dik == SDL_SCANCODE_RIGHT)
-            pos_delta.x -= m_map_move_step;
-        MoveMap(pos_delta);
-        return true;
-    }
-    break;
-    }
-    return inherited::OnKeyboardHold(dik);
-}
-
 bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    switch (dik)
+    switch (keyboard_action)
     {
-    case SDL_SCANCODE_KP_MINUS:
+    case WINDOW_KEY_PRESSED:
     {
-        // SetZoom(GetZoom()/1.5f);
-        UpdateZoom(false);
-        // ResetActionPlanner();
-        return true;
+        switch (dik)
+        {
+        case SDL_SCANCODE_KP_MINUS:
+            // SetZoom(GetZoom()/1.5f);
+            UpdateZoom(false);
+            // ResetActionPlanner();
+            return true;
+
+        case SDL_SCANCODE_KP_PLUS:
+            // SetZoom(GetZoom()*1.5f);
+            UpdateZoom(true);
+            // ResetActionPlanner();
+            return true;
+        } // switch (dik)
     }
     break;
-    case SDL_SCANCODE_KP_PLUS:
+
+    case WINDOW_KEY_HOLD:
     {
-        // SetZoom(GetZoom()*1.5f);
-        UpdateZoom(true);
-        // ResetActionPlanner();
-        return true;
+        Fvector2 pos_delta{};
+
+        switch (GetBindedAction(dik))
+        {
+        case kUP:
+            pos_delta.y += m_map_move_step;
+            break;
+        case kDOWN:
+            pos_delta.y -= m_map_move_step;
+            break;
+        case kLEFT:
+            pos_delta.x += m_map_move_step;
+            break;
+        case kRIGHT:
+            pos_delta.x -= m_map_move_step;
+            break;
+        }
+
+        if (pos_delta.x || pos_delta.y)
+        {
+            MoveMap(pos_delta);
+            return true;
+        }
     }
     break;
-    }
+    } // switch (keyboard_action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

@@ -6,7 +6,7 @@
 #include "xrMessages.h"
 
 u64 g_qwStartGameTime = 12 * 60 * 60 * 1000;
-float g_fTimeFactor = pSettings->r_float("alife", "time_factor");
+float g_fTimeFactor = 10;
 u64 g_qwEStartGameTime = 12 * 60 * 60 * 1000;
 
 EGameIDs ParseStringToGameType(LPCSTR str);

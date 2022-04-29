@@ -1274,6 +1274,14 @@ CGameObject::CScriptCallbackExVoid& CGameObject::callback(GameObject::ECallbackT
     return ((*m_callbacks)[type]);
 }
 
+void CGameObject::clear_callbacks() const
+{
+    for (auto& callback : *m_callbacks)
+    {
+        callback.second.clear();
+    }
+}
+
 LPCSTR CGameObject::visual_name(CSE_Abstract* server_entity)
 {
     const CSE_Visual* visual = smart_cast<const CSE_Visual*>(server_entity);

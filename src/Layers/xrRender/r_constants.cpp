@@ -220,11 +220,11 @@ void R_constant_table::merge(R_constant_table* T)
             C->vs = src->vs;
 #ifndef USE_DX9
             C->gs = src->gs;
-#ifdef USE_DX11
+#   if defined(USE_DX11)
             C->hs = src->hs;
             C->ds = src->ds;
             C->cs = src->cs;
-#endif
+#   endif
 #endif
             C->samp = src->samp;
             C->handler = src->handler;
@@ -254,7 +254,7 @@ void R_constant_table::merge(R_constant_table* T)
         std::sort(table.begin(), table.end(), p_sort);
     }
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     //	TODO:	DX10:	Implement merge with validity check
     m_CBTable.reserve(m_CBTable.size() + T->m_CBTable.size());
     for (u32 i = 0; i < T->m_CBTable.size(); ++i)
@@ -268,7 +268,7 @@ void R_constant_table::clear()
     for (u32 it = 0; it < table.size(); it++)
         table[it] = 0; //.g_constant_allocator.destroy(table[it]);
     table.clear();
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     m_CBTable.clear();
 #endif
 }

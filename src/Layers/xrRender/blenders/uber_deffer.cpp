@@ -104,7 +104,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     }
 
 // Uber-construct
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
     {
         char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
@@ -205,7 +205,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         C.r_dx10Texture("s_hemi", C.L_textures[2]);
         C.r_dx10Sampler("smp_rtlinear");
     }
-#else // ^^^^^ DX11+ / DX9/OpenGL vvvvv
+#elif defined(USE_DX9) || defined(USE_OGL)
     C.r_Pass(vs, ps, FALSE);
     VERIFY(C.L_textures[0].size());
     if (bump)
@@ -234,13 +234,15 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     }
     if (lmap)
         C.r_Sampler("s_hemi", C.L_textures[2], false, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
-#endif // !USE_DX9 && !USE_OGL
+#else
+#   error No graphics API selected or enabled!
+#endif // USE_DX11
 
     if (!DO_NOT_FINISH)
         C.r_End();
 }
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 {
     // Uber-parse

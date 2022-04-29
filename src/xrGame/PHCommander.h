@@ -85,6 +85,7 @@ public:
     void add_call_threadsafety(CPHCondition* condition, CPHAction* action);
     void AddCallDeferred(CPHCondition* condition, CPHAction* action);
 
+    void remove_call(PHCALL_I i);
     bool has_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
     PHCALL_I find_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
     void remove_call(CPHReqComparerV* cmp_condition, CPHReqComparerV* cmp_action);
@@ -92,13 +93,13 @@ public:
     void remove_calls_threadsafety(CPHReqComparerV* cmp_object);
     void RemoveCallsDeferred(CPHReqComparerV* comparer);
 
-    void UpdateDeferred();
     void update();
     void update_threadsafety();
     
     void clear();
 
 private:
+    void UpdateDeferred();
     virtual void update_step() { update_threadsafety(); }
     virtual void phys_shell_relcase(CPhysicsShell* sh);
 };

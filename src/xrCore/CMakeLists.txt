@@ -77,7 +77,6 @@ set(SRC_FILES
     "string_concatenations.cpp"
     "string_concatenations.h"
     "string_concatenations_inline.h"
-    "_types.h"
     "_vector2.h"
     "_vector3d_ext.h"
     "_vector3d.h"
@@ -108,6 +107,7 @@ set(SRC_FILES
     "xr_token.h"
     "xr_trims.cpp"
     "xr_trims.h"
+    "xr_types.h"
     "xr_vector_defs.h"
     "Animation/Bone.cpp"
     "Animation/BoneEditor.cpp"
@@ -164,6 +164,7 @@ set(SRC_FILES
     "Math/SkinXW_SSE.hpp"
     "Media/Image.cpp"
     "Media/Image.hpp"
+    "Media/ImageJPEG.cpp"
     "Memory/xalloc.h"
     #"Memory/xrMemory_align.cpp"
     #"Memory/xrMemory_align.h"
@@ -235,6 +236,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
+    ${JPEG_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -246,15 +248,25 @@ target_link_libraries(${PROJECT_NAME}
     xrMiscMath
     dl
     $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
-    ${PCRE_LIBRARIES}
+    ${JPEG_LIBRARIES}
     ${LZO_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DXRCORE_EXPORTS
+    -DCI=$ENV{CI}
+    -DTRAVIS=$ENV{TRAVIS}
+    -DTRAVIS_BUILD_ID=$ENV{TRAVIS_BUILD_ID}
+    -DTRAVIS_BUILD_NUMBER=$ENV{TRAVIS_BUILD_NUMBER}
+    -DTRAVIS_REPO_SLUG=$ENV{TRAVIS_REPO_SLUG}
+    -DGITHUB_ACTIONS=$ENV{GITHUB_ACTIONS}
+    -DGITHUB_RUN_ID=$ENV{GITHUB_RUN_ID}
+    -DGITHUB_RUN_NUMBER=$ENV{GITHUB_RUN_NUMBER}
+    -DGITHUB_REPOSITORY=$ENV{GITHUB_REPOSITORY}
     -DGIT_INFO_CURRENT_COMMIT=${GIT_SHA1}
     -DGIT_INFO_CURRENT_BRANCH=${GIT_BRANCH}
+    -DCMAKE_INSTALL_FULL_DATAROOTDIR=${CMAKE_INSTALL_FULL_DATAROOTDIR}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

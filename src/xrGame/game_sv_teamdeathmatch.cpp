@@ -4,7 +4,6 @@
 #include "xrServer.h"
 #include "Level.h"
 #include "game_cl_mp.h"
-#include "string_table.h"
 #include "clsid_game.h"
 #include <functional>
 #include "xrNetServer/NET_Messages.h"

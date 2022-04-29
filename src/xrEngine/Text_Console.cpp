@@ -355,22 +355,17 @@ void TextLoadingScreen::Show(bool status)
 
 }
 
+void TextLoadingScreen::Draw()
+{
+
+}
+
 bool TextLoadingScreen::IsShown()
 {
     return false;
 }
 
 void TextLoadingScreen::Update(int stagesCompleted, int stagesTotal)
-{
-
-}
-
-void TextLoadingScreen::ForceDrop()
-{
-
-}
-
-void TextLoadingScreen::ForceFinish()
 {
 
 }

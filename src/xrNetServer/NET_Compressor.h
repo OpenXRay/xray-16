@@ -3,7 +3,7 @@
 #define AFX_NET_COMPRESSOR_H__21E1ED1C_BF92_4BF0_94A8_18A27486EBFD__INCLUDED_
 
 #include "Common/Noncopyable.hpp"
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCommon/xr_map.h"
 
 class Lock;

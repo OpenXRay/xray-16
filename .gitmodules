@@ -25,9 +25,6 @@
 [submodule "Externals/libtheora"]
 	path = Externals/libtheora
 	url = https://github.com/xiph/theora.git
-[submodule "Externals/jpeg"]
-	path = Externals/jpeg
-	url = https://github.com/OpenXRay/libjpeg.git
 [submodule "Externals/BugTrap"]
 	path = Externals/BugTrap
 	url = https://github.com/OpenXRay/BugTrap.git

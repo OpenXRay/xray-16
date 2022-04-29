@@ -17,7 +17,7 @@
 #include "ai/monsters/control_rotation_jump.h"
 #include "sound_player.h"
 #include "xrEngine/CameraBase.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "ActorCondition.h"
 #include "PHDestroyable.h"
 #include "CharacterPhysicsSupport.h"

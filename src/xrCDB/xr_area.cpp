@@ -116,7 +116,7 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
     R_ASSERT(CFORM_CURRENT_VERSION == H.version);
 
     string_path fName;
-    bool bUseCache = strstr(Core.Params, "-cdb_cache");
+    bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
     FS.update_path(fName, "$app_data_root$", fName);
     if (bUseCache && FS.exist(fName) && Static.deserialize(fName))

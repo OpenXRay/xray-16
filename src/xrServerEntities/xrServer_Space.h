@@ -9,7 +9,7 @@
 #pragma once
 #ifndef xrServer_SpaceH
 #define xrServer_SpaceH
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/_vector3d.h"
 #include "xrCommon/xr_vector.h"
 

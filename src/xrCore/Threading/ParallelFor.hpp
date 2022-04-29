@@ -153,7 +153,7 @@ public:
     }
 
 private:
-    static void xr_stdcall task_func(Task& thisTask, void* data_ptr)
+    static void task_func(Task& thisTask, void* data_ptr)
     {
         auto& data = *static_cast<TaskData*>(data_ptr);
         auto& range = data.range;

@@ -373,7 +373,7 @@ void CDetailManager::Render()
 #ifndef _EDITOR
     if (nullptr == dtFS)
         return;
-    if (!psDeviceFlags.is(rsDetails))
+    if (!psDeviceFlags.is(rsDrawDetails))
         return;
 #endif
 
@@ -402,14 +402,14 @@ void CDetailManager::Render()
     m_frame_rendered = RDEVICE.dwFrame;
 }
 
-void __stdcall CDetailManager::MT_CALC()
+void CDetailManager::MT_CALC()
 {
 #ifndef _EDITOR
     if (nullptr == RImplementation.Details)
         return; // possibly deleted
     if (nullptr == dtFS)
         return;
-    if (!psDeviceFlags.is(rsDetails))
+    if (!psDeviceFlags.is(rsDrawDetails))
         return;
 #endif
 

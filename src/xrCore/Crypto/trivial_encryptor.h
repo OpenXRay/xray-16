@@ -1,10 +1,5 @@
 #pragma once
 
-#pragma warning(push)
-#pragma warning(disable:4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 class XRCORE_API trivial_encryptor
 {
     using type = u8;

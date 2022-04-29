@@ -8,15 +8,10 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 #include "Layers/xrRender/FHierrarhyVisual.h"
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
 #endif
-
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
 
 void CRender::level_Load(IReader* fs)
 {
@@ -95,7 +90,7 @@ void CRender::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle();
     LoadSectors(fs);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     // 3D Fluid
     Load3DFluid();
 #endif
@@ -241,7 +236,9 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             // count, size
             const u32 vCount = fs->r_u32();
             const u32 vSize = GetDeclVertexSize(dcl, 0);
+#ifndef MASTER_GOLD
             Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount * vSize) / 1024);
+#endif
 
             // Create and fill
             //  TODO: DX10: Check fragmentation.
@@ -266,7 +263,9 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
         for (u32 i = 0; i < count; i++)
         {
             const u32 iCount = fs->r_u32();
+#ifndef MASTER_GOLD
             Msg("* [Loading IB] %d indices, %d Kb", iCount, (iCount * 2) / 1024);
+#endif
 
             // Create and fill
             //  TODO: DX10: Check fragmentation.
@@ -340,7 +339,7 @@ void CRender::LoadSectors(IReader* fs)
     if (count)
     {
         bool do_rebuild = true;
-        const bool use_cache = strstr(Core.Params, "-cdb_cache");
+        const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
 
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
@@ -440,7 +439,7 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
     }
 }
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 void CRender::Load3DFluid()
 {
     // if (strstr(Core.Params,"-no_volumetric_fog"))

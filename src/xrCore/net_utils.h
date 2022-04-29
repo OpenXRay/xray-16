@@ -2,7 +2,7 @@
 #ifndef _INCDEF_NETUTILS_H_
 #define _INCDEF_NETUTILS_H_
 #include <string.h>
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "client_id.h"
 #include "xrCommon/xr_string.h"
 
@@ -93,7 +93,7 @@ public:
     bool w_allow;
 
 public:
-    NET_Packet() : inistream(nullptr), r_pos(0), timeReceive(0), w_allow(true), B() {}
+    NET_Packet() : inistream(nullptr), B(), r_pos(0), timeReceive(0), w_allow(true) {}
     // writing - main
     IC void write_start()
     {

@@ -47,7 +47,7 @@ void main ()
 
 #ifndef HDAO // AMDs hdao turned off
 #if SSAO_OPT_DATA == 2	
-	return  float4(P.zzzz);
+	SV_Target = float4(P.zzzz);
 #else	//	SSAO_OPT_DATA == 2
 	gbd = gbuffer_load_data( GLD_P(I.tc0.xy, I.pos2d, ISAMPLE) );
 	SV_Target = float4(gbd.P.zzzz);

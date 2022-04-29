@@ -54,7 +54,7 @@ public:
     void Disable();
     void Enable();
 
-    void xr_stdcall MT_RENDER(Task& /*thisTask*/, void* /*data*/);
+    void MT_RENDER(Task& /*thisTask*/, void* /*data*/);
 
     BOOL visible(vis_data& vis) const;
     BOOL visible(const Fbox3& B) const;

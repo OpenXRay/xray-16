@@ -13,6 +13,9 @@
             (x) = nullptr;\
         }\
     }
+#ifdef MASTER_GOLD
+#define _SHOW_REF(msg, x) { /* do nothing */ }
+#else
 #define _SHOW_REF(msg, x)\
     {\
         if ((x))\
@@ -21,3 +24,4 @@
             Log(msg, u32((x)->Release()));\
         }\
     }
+#endif

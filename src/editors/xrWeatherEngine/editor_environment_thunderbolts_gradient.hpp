@@ -30,11 +30,11 @@ public:
         ::editor::environment::manager& environment, pcstr name, pcstr description, XRay::Editor::property_holder_base& holder);
 
 private:
-    pcstr xr_stdcall shader_getter() const;
-    void xr_stdcall shader_setter(pcstr value);
+    pcstr shader_getter() const;
+    void shader_setter(pcstr value);
 
-    pcstr xr_stdcall texture_getter() const;
-    void xr_stdcall texture_setter(pcstr value);
+    pcstr texture_getter() const;
+    void texture_setter(pcstr value);
 
 private:
     XRay::Editor::property_holder_base* m_property_holder;

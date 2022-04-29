@@ -162,9 +162,9 @@ private:
     void reach_enter_location(u32 const& time_delta);
 
 private:
-    MotionID xr_stdcall select_animation(bool& animation_movement_controller);
-    void xr_stdcall on_animation_end();
-    void xr_stdcall modify_animation(CBlend* blend);
+    MotionID select_animation(bool& animation_movement_controller);
+    void on_animation_end();
+    void modify_animation(CBlend* blend);
     bool test_pick(Fvector source, Fvector destination) const;
 
 private:

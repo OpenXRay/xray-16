@@ -14,7 +14,7 @@
 #include "xrPhysics/IPHWorld.h"
 #include "xrPhysics/ActorCameraCollision.h"
 #include "Level.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "game_cl_base.h"
 #include "InfoPortion.h"
 #include "alife_registry_wrappers.h"

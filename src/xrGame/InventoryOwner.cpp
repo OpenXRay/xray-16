@@ -29,31 +29,22 @@
 #include "xrNetServer/NET_Messages.h"
 
 CInventoryOwner::CInventoryOwner()
+    : m_inventory(xr_new<CInventory>()),
+      bDisableBreakDialog(false),
+      m_tmp_active_slot_num(NO_ACTIVE_SLOT),
+      m_play_show_hide_reload_sounds(true),
+      m_known_info_registry(xr_new<CInfoPortionWrapper>()),
+      m_pCharacterInfo(xr_new<CCharacterInfo>()),
+      m_need_osoznanie_mode(false),
+      m_deadbody_can_take(true),
+      m_deadbody_closed(false)
 {
-    m_pTrade = NULL;
-    m_trade_parameters = 0;
-
-    m_inventory = xr_new<CInventory>();
-    m_pCharacterInfo = xr_new<CCharacterInfo>();
-
     EnableTalk();
     EnableTrade();
-    bDisableBreakDialog = false;
-
-    m_known_info_registry = xr_new<CInfoPortionWrapper>();
-    m_tmp_active_slot_num = NO_ACTIVE_SLOT;
-    m_need_osoznanie_mode = FALSE;
-
-    m_deadbody_can_take = true;
-    m_deadbody_closed = false;
-    m_play_show_hide_reload_sounds = true;
 }
 
 IFactoryObject* CInventoryOwner::_construct()
 {
-    m_trade_parameters = 0;
-    m_purchase_list = 0;
-
     return (smart_cast<IFactoryObject*>(this));
 }
 
@@ -72,14 +63,7 @@ void CInventoryOwner::Load(LPCSTR section)
     if (pSettings->line_exist(section, "inv_max_weight"))
         m_inventory->SetMaxWeight(pSettings->r_float(section, "inv_max_weight"));
 
-    if (pSettings->line_exist(section, "need_osoznanie_mode"))
-    {
-        m_need_osoznanie_mode = pSettings->r_bool(section, "need_osoznanie_mode");
-    }
-    else
-    {
-        m_need_osoznanie_mode = FALSE;
-    }
+    m_need_osoznanie_mode = pSettings->read_if_exists(section, "need_osoznanie_mode", false);
 }
 
 void CInventoryOwner::reload(LPCSTR section)
@@ -91,7 +75,7 @@ void CInventoryOwner::reload(LPCSTR section)
     m_money = 0;
     m_bTrading = false;
     m_bTalking = false;
-    m_pTalkPartner = NULL;
+    m_pTalkPartner = nullptr;
 
     CAttachmentOwner::reload(section);
 }
@@ -395,6 +379,7 @@ void CInventoryOwner::SetCommunity(CHARACTER_COMMUNITY_INDEX new_community)
         EA->ChangeTeam(CharacterInfo().Community().team(), EA->g_Squad(), EA->g_Group());
     }
 
+    // XXX: special case for trader, investigate if we can get rid of it
     CSE_ALifeTraderAbstract* trader = smart_cast<CSE_ALifeTraderAbstract*>(e_entity);
     if (!trader)
         return;

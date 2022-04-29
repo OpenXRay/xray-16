@@ -21,7 +21,6 @@
 #include "xrUICore/Hint/UIHint.h"
 
 #include "UIInventoryUtilities.h"
-#include "string_table.h"
 #include "Level.h"
 
 UIMapLegend::UIMapLegend() {}

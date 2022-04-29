@@ -3,7 +3,6 @@
 #include "XML/UITextureMaster.h"
 #include "ScrollBar/UIScrollBar.h"
 #include "ListBox/UIListBoxItem.h"
-#include "xrEngine/StringTable/IStringTable.h"
 #include "xrCore/xr_token.h"
 
 #define CB_HEIGHT 20.0f
@@ -151,7 +150,7 @@ void CUIComboBox::SetCurrentOptValue()
         tok++;
     }
     
-    LPCSTR cur_val = *gStringTable->translate(GetOptTokenValue());
+    LPCSTR cur_val = *StringTable().translate(GetOptTokenValue());
     m_text.SetText(cur_val);
     m_list_box.SetSelectedText(cur_val);
 

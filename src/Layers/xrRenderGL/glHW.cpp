@@ -16,6 +16,20 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
+void UpdateVSync()
+{
+    if (psDeviceFlags.test(rsVSync))
+    {
+        // Try adaptive vsync first
+        if (SDL_GL_SetSwapInterval(-1) == -1)
+            SDL_GL_SetSwapInterval(1);
+    }
+    else
+    {
+        SDL_GL_SetSwapInterval(0);
+    }
+}
+
 CHW::CHW()
 {
     if (!ThisInstanceIsGlobal())
@@ -46,7 +60,7 @@ void CHW::OnAppDeactivate()
 {
     if (m_window)
     {
-        if (psCurrentWindowMode == rsFullscreen || psCurrentWindowMode == rsFullscreenBorderless)
+        if (psDeviceMode.WindowStyle == rsFullscreen || psDeviceMode.WindowStyle == rsFullscreenBorderless)
             SDL_MinimizeWindow(m_window);
     }
 }
@@ -111,7 +125,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
-    Console->Execute("rs_v_sync apply");
+    UpdateVSync();
 
 #ifdef DEBUG
     CHK_GL(glEnable(GL_DEBUG_OUTPUT));
@@ -163,6 +177,7 @@ void CHW::Reset()
     CHK_GL(glDeleteProgramPipelines(1, &pPP));
     CHK_GL(glDeleteFramebuffers(1, &pFB));
     UpdateViews();
+    UpdateVSync();
 }
 
 void CHW::SetPrimaryAttributes()
@@ -257,8 +272,8 @@ std::pair<u32, u32> CHW::GetSurfaceSize()
 {
     return
     {
-        psCurrentVidMode[0],
-        psCurrentVidMode[1]
+        psDeviceMode.Width,
+        psDeviceMode.Height
     };
 }
 

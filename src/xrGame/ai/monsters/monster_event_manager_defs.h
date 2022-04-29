@@ -16,5 +16,3 @@ enum EEventType
 class IEventData
 {
 };
-
-#define DEFINE_DELEGATE void __stdcall

@@ -36,6 +36,7 @@ public:
     virtual bool OnMouseDown(int mouse_btn);
     virtual void OnFocusLost();
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
 
     virtual void SetText(LPCSTR text);
     void SetEditMode(bool b);

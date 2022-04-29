@@ -83,7 +83,7 @@ public:
     virtual CSE_Abstract* cast_abstract() { return nullptr; };
     virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return this; };
     // end of the virtual inheritance dependant code
-    void __stdcall OnChangeProfile(PropValue* sender);
+    void OnChangeProfile(PropValue* sender);
 
 #ifdef XRGAME_EXPORTS
     virtual void add_online(const bool& update_registries);
@@ -199,7 +199,7 @@ class CSE_ALifeTorridZone : public CSE_ALifeCustomZone, public CSE_Motion
 public:
     CSE_ALifeTorridZone(LPCSTR caSection);
     virtual ~CSE_ALifeTorridZone();
-    virtual CSE_Motion* __stdcall motion();
+    virtual CSE_Motion* motion();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -216,7 +216,7 @@ public:
     shared_str attack_animation;
     CSE_ALifeZoneVisual(LPCSTR caSection);
     virtual ~CSE_ALifeZoneVisual();
-    virtual CSE_Visual* __stdcall visual();
+    virtual CSE_Visual* visual();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);

@@ -24,7 +24,6 @@
 #include "UIHelper.h"
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ui_base.h"
-#include "string_table.h"
 #include "UIOutfitSlot.h"
 
 constexpr cpcstr ACTOR_MENU_XML      = "actor_menu.xml";
@@ -123,7 +122,6 @@ void CUIActorMenu::Construct()
         CUIXml actorMenuXml;
         actorMenuXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, ACTOR_MENU_XML);
         InitializeUniversal(actorMenuXml);
-        InitializeUpgradeMode(actorMenuXml);
         InitSounds(actorMenuXml);
     }
     InitCallbacks();
@@ -149,6 +147,15 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
     m_LeftBackground = UIHelper::CreateStatic(uiXml, "left_background", this);
+
+    m_pUpgradeWnd = xr_new<CUIInventoryUpgradeWnd>();
+    if (!m_pUpgradeWnd->Init())
+        xr_delete(m_pUpgradeWnd);
+    else
+    {
+        AttachChild(m_pUpgradeWnd);
+        m_pUpgradeWnd->SetAutoDelete(true);
+    }
 
     m_ActorCharacterInfo = xr_new<CUICharacterInfo>();
     m_TradeActorCharacterInfo = m_ActorCharacterInfo;
@@ -262,18 +269,6 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     m_ItemInfo->InitItemInfo(ACTOR_MENU_ITEM_XML);
     //-	m_ItemInfo->SetAutoDelete			(true);
     //-	AttachChild							(m_ItemInfo);
-}
-
-void CUIActorMenu::InitializeUpgradeMode(CUIXml& /*uiXml*/)
-{
-    m_pUpgradeWnd = xr_new<CUIInventoryUpgradeWnd>();
-    if (!m_pUpgradeWnd->Init())
-        xr_delete(m_pUpgradeWnd);
-    else
-    {
-        AttachChild(m_pUpgradeWnd);
-        m_pUpgradeWnd->SetAutoDelete(true);
-    }
 
     if (ai().get_alife())
     {

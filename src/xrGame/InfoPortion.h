@@ -23,6 +23,9 @@ struct SInfoPortionData : CSharedResource
     //нужно заменить одну статью другой)
     ARTICLE_ID_VECTOR m_ArticlesDisable;
 
+    //присоединенные задания
+    TASK_ID_VECTOR m_GameTasks;
+
     //скриптовые действия, которые активируется после того как
     //информацию получает персонаж
     CDialogScriptHelper m_InfoScriptHelper;
@@ -52,6 +55,7 @@ public:
     virtual void Load(shared_str info_str_id);
     const ARTICLE_ID_VECTOR& Articles() const { return info_data()->m_Articles; }
     const ARTICLE_ID_VECTOR& ArticlesDisable() const { return info_data()->m_ArticlesDisable; }
+    const TASK_ID_VECTOR& GameTasks() const { return info_data()->m_GameTasks; }
     const DIALOG_ID_VECTOR& DialogNames() const { return info_data()->m_DialogNames; }
     const SInfoPortionData::INFO_ID_VECTOR& DisableInfos() const { return info_data()->m_DisableInfo; }
 

@@ -25,14 +25,17 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
         auto I = m_TexCache.find(strTexName);
         if (I != m_TexCache.end())
         {
-#ifdef USE_OGL
-            GLuint e0 = I->second->surface_get();
-            m_CMap[iTex]->surface_set(GL_TEXTURE_2D, e0);
-#else
+
+#if defined(USE_DX9) || defined(USE_DX11)
             ID3DBaseTexture* e0 = I->second->surface_get();
             m_CMap[iTex]->surface_set(e0);
             _RELEASE(e0);
-#endif // USE_OGL
+#elif defined(USE_OGL)
+            GLuint e0 = I->second->surface_get();
+            m_CMap[iTex]->surface_set(GL_TEXTURE_2D, e0);
+#else
+#    error No graphics API selected or in use!
+#endif
         }
         else
         {
@@ -41,22 +44,26 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
 
             m_TexCache.insert(std::make_pair(strTexName, tmp));
 
-#ifdef USE_OGL
-            GLuint e0 = tmp->surface_get();
-            m_CMap[iTex]->surface_set(GL_TEXTURE_2D, e0);
-#else
+#if defined(USE_DX9) || defined(USE_DX11)
             ID3DBaseTexture* e0 = tmp->surface_get();
             m_CMap[iTex]->surface_set(e0);
             _RELEASE(e0);
-#endif // USE_OGL
+#elif defined(USE_OGL)
+            GLuint e0 = tmp->surface_get();
+            m_CMap[iTex]->surface_set(GL_TEXTURE_2D, e0);
+#else
+#    error No graphics API selected or in use!
+#endif
         }
     }
     else
     {
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+        m_CMap[iTex]->surface_set(nullptr);
+#elif defined(USE_OGL)
         m_CMap[iTex]->surface_set(GL_TEXTURE_2D, 0);
 #else
-        m_CMap[iTex]->surface_set(nullptr);
-#endif // USE_OGL
+#    error No graphics API selected or in use!
+#endif
     }
 }

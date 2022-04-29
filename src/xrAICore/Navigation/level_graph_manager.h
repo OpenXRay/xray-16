@@ -6,70 +6,62 @@ namespace LevelGraph
 {
 class CLevelGraphManager
 {
-    bool compatibilityMode;
-    xr_vector<CLevelVertex*> m_nodes; // nodes array
+    bool m_compatibility_mode{};
+    CLevelVertex* m_nodes; // nodes array
+    size_t m_vertex_count;
 
 public:
-    CLevelGraphManager(IReader* stream, size_t vertex_count, u32 version)
+    CLevelGraphManager(IReader* stream, size_t vertex_count, u32 version) : m_vertex_count(vertex_count)
     {
-        m_nodes.resize(vertex_count);
-        if (version <= 8)
+        if (version == XRAI_VERSION_COP || version == XRAI_VERSION_CS)
         {
-            compatibilityMode = true;
-            NodeCompressedOld* nodes = static_cast<NodeCompressedOld*>(stream->pointer());
-            CLevelVertex* newNodes = new CLevelVertex[vertex_count];
+            m_nodes = static_cast<CLevelVertex*>(stream->pointer());
+        }
+        else if (version == XRAI_VERSION_SOC)
+        {
+            m_compatibility_mode = true;
+            m_nodes = new CLevelVertex[vertex_count + 1]; // additional one, so we don't trigger access violation
+            NodeCompressedOld* oldNodes = static_cast<NodeCompressedOld*>(stream->pointer());
+
             for (size_t i = 0; i < vertex_count; ++i)
             {
-                CLevelVertex& vertex = newNodes[i];
-                NodeCompressed& newNode = vertex;
-                NodeCompressedOld& oldNode = nodes[i];
-
-                CopyMemory(newNode.data, oldNode.data, sizeof(oldNode.data) / sizeof(u8));
-                newNode.high = oldNode.cover;
-                newNode.low = oldNode.cover;
-                newNode.plane = oldNode.plane;
-                newNode.p = oldNode.p;
-
-                m_nodes[i] = &vertex;
+                NodeCompressedOld& oldNode = oldNodes[i];
+                NodeCompressed& newNode = m_nodes[i];
+                newNode = oldNode;
             }
+
+            // Mark end node as END NODE SOC
+            // so we can spot that in debugger, if we need
+            NodeCompressed& endNode = m_nodes[vertex_count + 1];
+            endNode.data[0]  = 'E';
+            endNode.data[1]  = 'N';
+            endNode.data[2]  = 'D';
+            endNode.data[3]  = ' ';
+            endNode.data[4]  = 'N';
+            endNode.data[5]  = 'O';
+            endNode.data[6]  = 'D';
+            endNode.data[7]  = 'E';
+            endNode.data[8]  = ' ';
+            endNode.data[9]  = 'S';
+            endNode.data[10] = 'O';
+            endNode.data[11] = 'C';
+            static_assert(sizeof(endNode.data) == 12, "If you have changed the NodeCompressed structure, please update the code above.");
         }
         else
         {
-            compatibilityMode = false;
-            CLevelVertex* begin = static_cast<CLevelVertex*>(stream->pointer());
-            CLevelVertex* end = begin + vertex_count;
-            for (size_t i = 0; begin != end; ++begin, ++i)
-            {
-                m_nodes[i] = begin;
-            }
+            FATAL("Unsupported level graph version.");
         }
     }
 
     ~CLevelGraphManager()
     {
-        if (compatibilityMode)
+        if (m_compatibility_mode)
         {
-            for (auto& node : m_nodes)
-                xr_delete(node); // XXX: should be deleted with delete[]
+            delete[] m_nodes;
         }
-        m_nodes.clear();
     }
-
-    [[nodiscard]] CLevelVertex* front() { return m_nodes.front(); }
-    [[nodiscard]] CLevelVertex* back() { return m_nodes.back(); }
-
-    [[nodiscard]] auto begin() { return m_nodes.begin(); }
-    [[nodiscard]] auto end() { return m_nodes.end(); }
-
-    [[nodiscard]] auto cbegin() const { return m_nodes.cbegin(); }
-    [[nodiscard]] auto cend() const { return m_nodes.cend(); }
-
-    [[nodiscard]] CLevelVertex* at(size_t id) { VERIFY(id < size()); return m_nodes[id]; }
-    [[nodiscard]] CLevelVertex* operator[](size_t id) { return m_nodes[id]; }
     
-    [[nodiscard]] CLevelVertex* operator+(size_t id) { return m_nodes[id]; }
-
-    [[nodiscard]] bool empty() const { return m_nodes.empty(); }
-    [[nodiscard]] size_t size() const { return m_nodes.size(); }
+    [[nodiscard]] CLevelVertex* begin() { return m_nodes; }
+    [[nodiscard]] CLevelVertex* end() { return m_nodes + m_vertex_count; }
 };
 } // namespace LevelGraph

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "xr_effgamma.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
 
 void CGammaControl::Update()
 {
@@ -56,7 +56,7 @@ void CGammaControl::GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA
     }
 }
 
-#else // !USE_DX9 && !USE_OGL
+#elif defined(USE_DX9) || defined(USE_OGL) // !USE_DX9 && !USE_OGL
 
 IC u16 clr2gamma(float c)
 {

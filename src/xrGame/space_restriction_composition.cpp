@@ -15,11 +15,6 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrAICore/Navigation/graph_engine.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 #ifdef DEBUG
 #include "Level.h"
 #include "space_restrictor.h"

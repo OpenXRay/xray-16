@@ -1,11 +1,7 @@
 #include "stdafx.h"
-#include "Include/xrRender/DrawUtils.h"
+
 #include "Render.h"
-#include "IGame_Persistent.h"
-#include "XR_IOConsole.h"
 #include "xr_input.h"
-#include "SDL.h"
-#include "SDL_syswm.h"
 
 void CRenderDevice::Destroy()
 {
@@ -33,15 +29,6 @@ void CRenderDevice::Destroy()
 
 void CRenderDevice::Reset(bool precache /*= true*/)
 {
-    ResetInternal(precache);
-}
-
-#include "IGame_Level.h"
-#include "CustomHUD.h"
-extern bool bNeed_re_create_env;
-
-void CRenderDevice::ResetInternal(bool precache)
-{
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
     pInput->GrabInput(false);
@@ -52,12 +39,9 @@ void CRenderDevice::ResetInternal(bool precache)
     GEnv.Render->Reset(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
 
     // Update window props again for DX9 renderer
-    const bool isDX9Renderer = GEnv.Render->get_dx_level() == 0x00090000;
-    if (isDX9Renderer)
+    if (GEnv.Render->GetBackendAPI() == IRender::BackendAPI::D3D9) // XXX: I don't remember why this hack is needed, thus, I'm not sure if it is needed at all
         UpdateWindowProps(); // hack
 
-    if (g_pGamePersistent)
-        g_pGamePersistent->Environment().bNeed_re_create_env = true;
     _SetupStates();
 
     if (precache)

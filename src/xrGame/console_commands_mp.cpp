@@ -16,7 +16,6 @@
 #include "game_sv_capture_the_artefact.h"
 #include "date_time.h"
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "string_table.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "DemoPlay_Control.h"
 #include "account_manager_console.h"
@@ -120,8 +119,8 @@ extern Flags8 g_sv_traffic_optimization_level;
 extern Flags8 g_sv_available_traffic_optimization_level;
 
 void XRNETSERVER_API DumpNetCompressorStats(bool brief);
-BOOL XRNETSERVER_API g_net_compressor_enabled;
-BOOL XRNETSERVER_API g_net_compressor_gather_stats;
+extern BOOL XRNETSERVER_API g_net_compressor_enabled;
+extern BOOL XRNETSERVER_API g_net_compressor_gather_stats;
 
 class CCC_Restart : public IConsole_Command
 {
@@ -243,7 +242,7 @@ public:
                 IGameObject* pObj = Level().Objects.net_Find(CObjID[CO]);
                 char color = (pObj->ID() == pEntity->ID) ? '-' : '!';
 
-                Msg("%c%4d: Client - %20s[%5d] <===> Server - %s [%d]", color, CO + 1, *(pObj->cNameSect()), pObj->ID(),
+                Msg("%c %4d: Client - %20s[%5d] <===> Server - %s [%d]", color, CO + 1, *(pObj->cNameSect()), pObj->ID(),
                     pEntity->s_name.c_str(), pEntity->ID);
             }
             else

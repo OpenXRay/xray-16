@@ -21,5 +21,5 @@ public:
         IWallMarkArray& wallmarks_vector, int t);
     void PlaceWallmarks(const Fvector& start_pos);
 
-    void __stdcall StartWorkflow();
+    void StartWorkflow();
 };

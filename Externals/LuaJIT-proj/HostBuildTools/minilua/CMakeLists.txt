@@ -18,7 +18,7 @@ target_compile_options(minilua
 
 target_link_libraries(minilua
 	PRIVATE
-	$<$<BOOL:LUA_USE_POSIX>:m>
+	$<$<BOOL:${LUA_USE_POSIX}>:m>
 )
 
 target_link_options(minilua

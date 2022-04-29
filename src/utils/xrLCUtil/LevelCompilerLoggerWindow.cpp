@@ -123,7 +123,7 @@ void LevelCompilerLoggerWindow::LogThreadProc()
             // timing
             if (progress > 0.005f)
             {
-                u32 dwCurrentTime = timeGetTime();
+                u32 dwCurrentTime = CPU::GetTicks();
                 u32 dwTimeDiff = dwCurrentTime - phase_start_time;
                 u32 secElapsed = dwTimeDiff / 1000;
                 u32 secRemain = u32(float(secElapsed) / progress) - secElapsed;
@@ -229,12 +229,12 @@ void LevelCompilerLoggerWindow::Phase(const char* phaseName)
     // Replace phase name with TIME:Name
     char tbuf[512];
     bPhaseChange = TRUE;
-    phase_total_time = timeGetTime() - phase_start_time;
+    phase_total_time = CPU::GetTicks() - phase_start_time;
     xr_sprintf(tbuf, "%s : %s", make_time(phase_total_time / 1000).c_str(), phase);
     SendMessage(hwPhaseTime, LB_DELETESTRING, SendMessage(hwPhaseTime, LB_GETCOUNT, 0, 0) - 1, 0);
     SendMessage(hwPhaseTime, LB_ADDSTRING, 0, (LPARAM)tbuf);
     // Start new phase
-    phase_start_time = timeGetTime();
+    phase_start_time = CPU::GetTicks();
     xr_strcpy(phase, phaseName);
     SetWindowText(hwStage, phaseName);
     xr_sprintf(tbuf, "--:--:-- * %s", phase);

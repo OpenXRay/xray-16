@@ -72,10 +72,10 @@ private:
     void load_profile_fields();
 
     void loaded_fields(bool const result, char const* err_descr);
-    void __stdcall loaded_best_scores(bool const result, char const* err_descr);
+    void loaded_best_scores(bool const result, char const* err_descr);
 
-    void __stdcall onlylog_operation(bool const result, char const* err_descr);
-    void __stdcall onlylog_completion(bool const result, char const* err_descr);
+    void onlylog_operation(bool const result, char const* err_descr);
+    void onlylog_completion(bool const result, char const* err_descr);
 
     static void __cdecl get_my_fields_cb(
         SAKE sake, SAKERequest request, SAKERequestResult result, void* inputData, void* outputData, void* userData);

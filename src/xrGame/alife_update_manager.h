@@ -33,7 +33,7 @@ protected:
     bool m_changing_level;
 
 public:
-    void __stdcall update();
+    void update();
 
 protected:
     void new_game(LPCSTR save_name);

@@ -12,7 +12,6 @@
 
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
-#include "string_table.h"
 #include "Actor.h"
 #include "xrScriptEngine/script_process.hpp"
 #include "Inventory.h"

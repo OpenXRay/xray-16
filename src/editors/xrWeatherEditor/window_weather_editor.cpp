@@ -123,11 +123,11 @@ void window_weather_editor::fill_weathers()
 
     WeathersComboBox->Items->Clear();
 
-    LPCSTR const* weathers_ids = (*m_weathers_getter)();
+    pcstr const* weathers_ids = (*m_weathers_getter)();
     for (u32 i = 0, n = (*m_weathers_size_getter)(); i < n; ++i)
         WeathersComboBox->Items->Add(to_string(weathers_ids[i]));
 
-    LPCSTR current_weather_id = m_engine.weather();
+    pcstr current_weather_id = m_engine.weather();
     int index = WeathersComboBox->Items->IndexOf(to_string(current_weather_id));
     if ((index == -1) && WeathersComboBox->Items->Count)
         index = 0;
@@ -142,11 +142,11 @@ void window_weather_editor::fill_weathers()
     fill_frames(current_weather_id);
 }
 
-void window_weather_editor::fill_frames(LPCSTR current_weather_id)
+void window_weather_editor::fill_frames(pcstr current_weather_id)
 {
     FramesComboBox->Items->Clear();
 
-    LPCSTR const* frames_ids = (*m_frames_getter)(current_weather_id);
+    pcstr const* frames_ids = (*m_frames_getter)(current_weather_id);
     for (u32 i = 0, n = (*m_frames_size_getter)(current_weather_id); i < n; ++i)
         FramesComboBox->Items->Add(to_string(frames_ids[i]));
 

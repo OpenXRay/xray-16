@@ -124,6 +124,7 @@ public:
 
 protected:
     virtual void AddEncyclopediaArticle(const CInfoPortion* info_portion) const;
+    virtual void AddGameTask(const CInfoPortion* info_portion) const;
 
     struct SDefNewsMsg
     {
@@ -437,12 +438,31 @@ public:
     // User input/output
     //////////////////////////////////////////////////////////////////////////
 public:
+    void OnAxisMove(float x, float y, float scale, bool invert);
     virtual void IR_OnMouseMove(int x, int y);
+    virtual void IR_OnMouseWheel(int x, int y);
+
     virtual void IR_OnKeyboardPress(int dik);
     virtual void IR_OnKeyboardRelease(int dik);
     virtual void IR_OnKeyboardHold(int dik);
-    virtual void IR_OnMouseWheel(int x, int y);
+
+    void IR_OnControllerPress(int dik, float x, float y) override;
+    void IR_OnControllerRelease(int dik, float x, float y) override;
+    void IR_OnControllerHold(int dik, float x, float y) override;
+
+    void IR_OnControllerAttitudeChange(Fvector change) override;
+
     virtual float GetLookFactor();
+
+private:
+    struct controller_feedback
+    {
+        float high_freq;
+        float duration;
+        float submit_time;
+        float update_time;
+        bool needs_update;
+    } m_controller_feedback{};
 
 public:
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
@@ -511,7 +531,7 @@ public:
     virtual void net_Destroy();
     virtual bool net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
     virtual void net_Relcase(IGameObject* O); //
-    virtual void xr_stdcall on_requested_spawn(IGameObject* object);
+    virtual void on_requested_spawn(IGameObject* object);
     // object serialization
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
@@ -687,9 +707,10 @@ public:
     virtual void OnPrevWeaponSlot();
     void SwitchNightVision();
     void SwitchTorch();
-#ifdef DEBUG
+
+#ifndef MASTER_GOLD
     void NoClipFly(int cmd);
-#endif // DEBUG
+#endif
 
 public:
     virtual void on_weapon_shot_start(CWeapon* weapon);

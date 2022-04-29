@@ -52,9 +52,11 @@ public:
     // caps itself
     u16 geometry_major;
     u16 geometry_minor;
+    pcstr geometry_profile;
     caps_Geometry geometry;
     u16 raster_major;
     u16 raster_minor;
+    pcstr raster_profile;
     caps_Raster raster;
 
     u32 id_vendor;
@@ -71,7 +73,7 @@ public:
     bool hasFixedPipeline{ false };     // device has support for fixed pipeline
     bool useCombinedSamplers{ false };  // texture and sampler settings represented as single object
 
+public:
     void Update(void);
 };
-
 #endif

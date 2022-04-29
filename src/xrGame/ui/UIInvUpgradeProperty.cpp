@@ -31,17 +31,11 @@ UIProperty::UIProperty()
 UIProperty::~UIProperty() {}
 void UIProperty::init_from_xml(CUIXml& ui_xml)
 {
-    m_ui_icon = xr_new<CUIStatic>();
-    m_ui_text = xr_new<CUITextWnd>();
-    AttachChild(m_ui_icon);
-    AttachChild(m_ui_text);
-    m_ui_icon->SetAutoDelete(true);
-    m_ui_text->SetAutoDelete(true);
-
     CUIXmlInit::InitWindow(ui_xml, "properties", 0, this);
     SetWndPos(Fvector2().set(0, 0));
-    CUIXmlInit::InitStatic(ui_xml, "properties:icon", 0, m_ui_icon);
-    CUIXmlInit::InitTextWnd(ui_xml, "properties:text", 0, m_ui_text);
+
+    m_ui_icon = UIHelper::CreateStatic(ui_xml, "properties:icon", this);
+    m_ui_text = UIHelper::CreateStatic(ui_xml, "properties:text", this);
 }
 
 bool UIProperty::init_property(shared_str const& property_id)

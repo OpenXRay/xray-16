@@ -95,7 +95,7 @@ u32 GetATIGpuNum()
         /*.Software       =*/ nullptr,
         /*.Flags          =*/ 0,
         /*.pFeatureLevels =*/ featureLevels,
-        /*.FeatureLevels  =*/ std::size(featureLevels),
+        /*.FeatureLevels  =*/ UINT(std::size(featureLevels)),
         /*.SDKVersion     =*/ D3D11_SDK_VERSION,
     };
 
@@ -144,8 +144,30 @@ u32 GetGpuNum() { return 1; }
 void CHWCaps::Update()
 {
     // ***************** GEOMETRY
-    geometry_major = 4;
-    geometry_minor = 0;
+    switch (HW.FeatureLevel)
+    {
+    case D3D_FEATURE_LEVEL_10_0:
+        geometry_profile = "vs_4_0";
+        geometry_major = 4;
+        geometry_minor = 0;
+        break;
+    case D3D_FEATURE_LEVEL_10_1:
+        geometry_profile = "vs_4_1";
+        geometry_major = 4;
+        geometry_minor = 1;
+        break;
+    case D3D_FEATURE_LEVEL_11_0:
+    case D3D_FEATURE_LEVEL_11_1:
+#ifdef HAS_DX11_3
+    case D3D_FEATURE_LEVEL_12_0:
+    case D3D_FEATURE_LEVEL_12_1:
+#endif
+        geometry_profile = "vs_5_0";
+        geometry_major = 5;
+        geometry_minor = 0;
+        break;
+    default: NODEFAULT;
+    }
     geometry.bSoftware = FALSE;
     geometry.bPointSprites = FALSE;
     geometry.bNPatches = FALSE;
@@ -157,8 +179,30 @@ void CHWCaps::Update()
     geometry.bVTF = TRUE;
 
     // ***************** PIXEL processing
-    raster_major = 4;
-    raster_minor = 0;
+    switch (HW.FeatureLevel)
+    {
+    case D3D_FEATURE_LEVEL_10_0:
+        raster_profile = "ps_4_0";
+        raster_major = 4;
+        raster_minor = 0;
+        break;
+    case D3D_FEATURE_LEVEL_10_1:
+        raster_profile = "ps_4_1";
+        raster_major = 4;
+        raster_minor = 1;
+        break;
+    case D3D_FEATURE_LEVEL_11_0:
+    case D3D_FEATURE_LEVEL_11_1:
+#ifdef HAS_DX11_3
+    case D3D_FEATURE_LEVEL_12_0:
+    case D3D_FEATURE_LEVEL_12_1:
+#endif
+        raster_profile = "ps_5_0";
+        raster_major = 5;
+        raster_minor = 0;
+        break;
+    default: NODEFAULT;
+    }
     // XXX: review this
     raster.dwStages = 15; // Previuos value is 16, but it's out of bounds
     raster.bNonPow2 = TRUE;
@@ -176,10 +220,6 @@ void CHWCaps::Update()
         CAP_VERSION(raster_major, raster_minor));
     // *******1********** Vertex cache
     Msg("* GPU vertex cache: %s, %d", "unrecognized", u32(geometry.dwVertexCache));
-
-    // *******1********** Compatibility : vertex shader
-    if (0 == raster_major)
-        geometry_major = 0; // Disable VS if no PS
 
     //
     bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);

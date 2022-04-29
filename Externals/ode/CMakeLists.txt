@@ -82,7 +82,11 @@ set(SRC_FILES
 
 group_sources(SRC_FILES)
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+if (STATIC_BUILD)
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+else()
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
@@ -91,12 +95,14 @@ target_include_directories(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-    -DdSINGLE
-    -DdNODEBUG
     -D_SECURE_SCL=0
     -DLINUX
     -D_cdecl=
     -D__forceinline=inline
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY

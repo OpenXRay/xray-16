@@ -213,6 +213,7 @@ void CBaseMonster::reload(LPCSTR section)
     if (!CCustomMonster::use_simplified_visual())
         CStepManager::reload(section);
 
+    CInventoryOwner::reload(section);
     movement().reload(section);
 
     // load base sounds
@@ -262,6 +263,7 @@ void CBaseMonster::reload(LPCSTR section)
 void CBaseMonster::reinit()
 {
     inherited::reinit();
+    CInventoryOwner::reinit();
 
     EnemyMemory.clear();
     SoundMemory.clear();
@@ -330,6 +332,11 @@ bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
         "There is no AI-Map, level graph, cross table, or graph is not compiled into the game graph!");
     monster_squad().register_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
     settings_overrides();
+    
+    CHARACTER_COMMUNITY community;
+    community.set("monster", true);
+    if (community.index() != NO_COMMUNITY_INDEX)
+        CInventoryOwner::SetCommunity(community.index());
 
     if (GetScriptControl())
     {
@@ -384,6 +391,7 @@ void CBaseMonster::net_Destroy()
         StateMan->critical_finalize();
 
     inherited::net_Destroy();
+    CInventoryOwner::net_Destroy();
 
     m_pPhysics_support->in_NetDestroy();
 
@@ -538,5 +546,5 @@ void CBaseMonster::fill_bones_body_parts(LPCSTR body_part, CriticalWoundType wou
     auto I = body_part_section.Data.cbegin();
     auto E = body_part_section.Data.cend();
     for (; I != E; ++I)
-        m_bones_body_parts.insert(std::make_pair(kinematics->LL_BoneID((*I).first), u32(wound_type)));
+        m_bones_body_parts.emplace(kinematics->LL_BoneID((*I).first), u32(wound_type));
 }

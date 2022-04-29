@@ -31,9 +31,7 @@ apt-get install -y \
   wget \
   autoconf \
   libglew-dev \
-  libfreeimage-dev \
-  libfreeimageplus-dev \
-  liblockfile-dev \
+  libjpeg-dev \
   libopenal-dev \
   libcrypto++-dev \
   libogg-dev \
@@ -41,5 +39,4 @@ apt-get install -y \
   libvorbis-dev \
   libsdl2-dev \
   liblzo2-dev \
-  libjpeg-dev \
   libreadline-dev

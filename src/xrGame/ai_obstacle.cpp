@@ -14,11 +14,6 @@
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 const bool use_additional_radius = true;
 
 static const Fvector local_points[8] = {Fvector().set(-1.f, -1.f, -1.f), Fvector().set(-1.f, -1.f, +1.f),

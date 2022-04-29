@@ -350,6 +350,7 @@ public:
     virtual void MoveTo(const Fvector& position) override {}
     // the only usage: aimers::base::fill_bones
     virtual CScriptCallbackExVoid& callback(GameObject::ECallbackType type) const override;
+    void clear_callbacks() const;
     virtual LPCSTR visual_name(CSE_Abstract* server_entity) override;
     virtual void On_B_NotCurrentEntity() override {}
     virtual bool is_ai_obstacle() const override;

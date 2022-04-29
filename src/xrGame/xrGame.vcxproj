@@ -14,6 +14,18 @@
   <PropertyGroup Condition="$(Configuration.Contains('Release'))" Label="Configuration">
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -30,7 +42,7 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;FreeImage.lib;FreeImagePlus.lib;discord_game_sdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;discord_game_sdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -1256,7 +1268,6 @@
     <ClInclude Include="steering_behaviour_separation.h" />
     <ClInclude Include="step_manager.h" />
     <ClInclude Include="step_manager_defs.h" />
-    <ClInclude Include="string_table.h" />
     <ClInclude Include="team_base_zone.h" />
     <ClInclude Include="team_hierarchy_holder.h" />
     <ClInclude Include="team_hierarchy_holder_inline.h" />
@@ -1449,7 +1460,6 @@
     <ClInclude Include="xrServer_info.h" />
     <ClInclude Include="xrServer_svclient_validation.h" />
     <ClInclude Include="xrServer_updates_compressor.h" />
-    <ClInclude Include="xr_level_controller.h" />
     <ClInclude Include="xr_time.h" />
     <ClInclude Include="ZoneCampfire.h" />
     <ClInclude Include="ZoneVisual.h" />
@@ -3162,7 +3172,6 @@
     </ClCompile>
     <ClCompile Include="steering_behaviour.cpp" />
     <ClCompile Include="step_manager.cpp" />
-    <ClCompile Include="string_table.cpp" />
     <ClCompile Include="team_base_zone.cpp" />
     <ClCompile Include="team_hierarchy_holder.cpp" />
     <ClCompile Include="TeleWhirlwind.cpp" />
@@ -3488,7 +3497,6 @@
     <ClCompile Include="xrServer_sls_clear.cpp" />
     <ClCompile Include="xrServer_svclient_validation.cpp" />
     <ClCompile Include="xrServer_updates_compressor.cpp" />
-    <ClCompile Include="xr_level_controller.cpp" />
     <ClCompile Include="xr_time.cpp" />
     <ClCompile Include="ZoneCampfire.cpp" />
     <ClCompile Include="ZoneVisual.cpp" />
@@ -3553,14 +3561,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

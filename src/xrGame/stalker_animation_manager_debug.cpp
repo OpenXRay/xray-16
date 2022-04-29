@@ -12,11 +12,6 @@
 #include "stalker_animation_manager.h"
 #include "ai/stalker/ai_stalker.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 typedef std::pair<shared_str, shared_str> ANIMATION_ID;
 
 struct animation_id_predicate

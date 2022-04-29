@@ -48,7 +48,7 @@
 #include "ai_debug.h"
 #endif // _EDITOR
 
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 u32 UIStyleID = 0;
 xr_vector<xr_token> UIStyleToken;
@@ -564,10 +564,9 @@ void CGamePersistent::game_loaded()
     if (Device.dwPrecacheFrame <= 2)
     {
         m_intro_event = nullptr;
-        if (g_pGameLevel && g_pGameLevel->bReady && (allow_game_intro() && g_keypress_on_start) &&
-            load_screen_renderer.b_need_user_input && m_game_params.m_e_game_type == eGameIDSingle)
+        if (g_pGameLevel && g_pGameLevel->bReady && g_keypress_on_start &&
+            load_screen_renderer.NeedsUserInput() && m_game_params.m_e_game_type == eGameIDSingle)
         {
-            pApp->LoadForceFinish(); // hack
             VERIFY(NULL == m_intro);
             m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
@@ -580,13 +579,13 @@ void CGamePersistent::game_loaded()
 void CGamePersistent::update_game_loaded()
 {
     xr_delete(m_intro);
-    load_screen_renderer.stop();
+    load_screen_renderer.Stop();
     start_game_intro();
 }
 
 void CGamePersistent::start_game_intro()
 {
-    if (!allow_intro())
+    if (!allow_game_intro())
     {
         return;
     }
@@ -643,9 +642,7 @@ void CGamePersistent::OnFrame()
         else if (!m_intro)
         {
             if (Device.dwPrecacheFrame == 0)
-                load_screen_renderer.stop();
-            else if (Device.dwPrecacheFrame == 1)
-                pApp->LoadForceFinish(); // hack
+                load_screen_renderer.Stop();
         }
     }
     if (!m_pMainMenu->IsActive())
@@ -689,17 +686,21 @@ void CGamePersistent::OnFrame()
 
                     Actor()->Cameras().UpdateFromCamera(C);
                     Actor()->Cameras().ApplyDevice();
-#ifdef DEBUG
+
                     if (psActorFlags.test(AF_NO_CLIP))
                     {
+#ifdef DEBUG
                         Actor()->SetDbgUpdateFrame(0);
                         Actor()->GetSchedulerData().dbg_update_shedule = 0;
+#endif
                         Device.dwTimeDelta = 0;
                         Device.fTimeDelta = 0.01f;
                         Actor()->UpdateCL();
                         Actor()->shedule_Update(0);
+#ifdef DEBUG
                         Actor()->SetDbgUpdateFrame(0);
                         Actor()->GetSchedulerData().dbg_update_shedule = 0;
+#endif
 
                         CSE_Abstract* e = Level().Server->ID_to_entity(Actor()->ID());
                         VERIFY(e);
@@ -711,16 +712,19 @@ void CGamePersistent::OnFrame()
                             IGameObject* obj = Level().Objects.net_Find(*it);
                             if (obj && Engine.Sheduler.Registered(obj))
                             {
+#ifdef DEBUG
                                 obj->GetSchedulerData().dbg_update_shedule = 0;
                                 obj->SetDbgUpdateFrame(0);
+#endif
                                 obj->shedule_Update(0);
                                 obj->UpdateCL();
+#ifdef DEBUG
                                 obj->GetSchedulerData().dbg_update_shedule = 0;
                                 obj->SetDbgUpdateFrame(0);
+#endif
                             }
                         }
                     }
-#endif // DEBUG
                 }
             }
         }
@@ -901,7 +905,7 @@ void CGamePersistent::OnRenderPPUI_main()
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
-#include "string_table.h"
+
 #include "xrEngine/x_ray.h"
 void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
 {

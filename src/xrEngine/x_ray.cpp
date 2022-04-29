@@ -26,8 +26,6 @@
 ENGINE_API CApplication* pApp = nullptr;
 extern CRenderDevice Device;
 
-ENGINE_API int ps_rs_loading_stages = 0;
-
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
 #endif // #ifdef MASTER_GOLD
@@ -253,16 +251,6 @@ void CApplication::LoadDraw()
     Device.RenderEnd();
 }
 
-void CApplication::LoadForceDrop()
-{
-    loadingScreen->ForceDrop();
-}
-
-void CApplication::LoadForceFinish()
-{
-    loadingScreen->ForceFinish();
-}
-
 void CApplication::SetLoadStageTitle(pcstr _ls_title)
 {
     loadingScreen->SetStageTitle(_ls_title);
@@ -273,12 +261,15 @@ void CApplication::LoadTitleInt(pcstr str1, pcstr str2, pcstr str3)
     loadingScreen->SetStageTip(str1, str2, str3);
 }
 
-void CApplication::LoadStage()
+void CApplication::LoadStage(bool draw /*= true*/)
 {
     VERIFY(ll_dwReference);
-    Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
-    phase_timer.Start();
-    Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
+    if (!load_screen_renderer.IsActive())
+    {
+        Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
+        Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
+        phase_timer.Start();
+    }
 
     if (g_pGamePersistent->GameType() == 1 && !xr_strcmp(g_pGamePersistent->m_game_params.m_alife, "alife"))
         max_load_stage = 18;
@@ -286,7 +277,10 @@ void CApplication::LoadStage()
         max_load_stage = 14;
 
     loadingScreen->Show(true);
-    LoadDraw();
+    loadingScreen->Update(load_stage, max_load_stage);
+
+    if (draw)
+        LoadDraw();
     ++load_stage;
 }
 
@@ -477,17 +471,7 @@ void CApplication::LoadAllArchives()
     }
 }
 
-void CApplication::load_draw_internal(bool precaching /*= false*/)
+void CApplication::load_draw_internal()
 {
-    if (precaching)
-    {
-        const u32 total = Device.dwPrecacheTotal;
-        loadingScreen->Update(total - Device.dwPrecacheFrame, total);
-    }
-
-    else if (loadingScreen->IsShown())
-        loadingScreen->Update(load_stage, max_load_stage);
-
-    else
-        GEnv.Render->ClearTarget();
+    loadingScreen->Draw();
 }

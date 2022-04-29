@@ -739,8 +739,8 @@ void dx103DFluidManager::UpdateObstacles(const dx103DFluidData& FluidData, float
     RCache.set_RT(0, 1);
 }
 
-//  Allow real-time config reload
-#ifdef DEBUG
+#ifndef MASTER_GOLD
+// Allow real-time config reload
 void dx103DFluidManager::RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName)
 {
     const size_t iDataNum = m_lstFluidData.size();
@@ -799,4 +799,4 @@ void dx103DFluidManager::UpdateProfiles()
     }
 }
 
-#endif //   DEBUG
+#endif // !MASTER_GOLD

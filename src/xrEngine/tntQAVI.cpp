@@ -461,7 +461,7 @@ int CAviPlayerCustom::SetSpeed(int nPercent)
 {
     int res = int(m_fCurrentRate / m_fRate * 100);
 
-    m_fCurrentRate = m_fRate * FLOAT(nPercent / 100.0f);
+    m_fCurrentRate = m_fRate * float(nPercent / 100.0f);
 
     return res;
 }
