@@ -217,12 +217,12 @@ void CScriptIniFile::set_override_names(bool b)
     inherited::set_override_names(b);
 }
 
-void CScriptIniFile::section_for_each(const luabind::functor<void>& functor)
+void CScriptIniFile::section_for_each(const luabind::functor<void>& functor) const
 {
     using sections_type = CInifile::Root;
-    sections_type& sections = this->sections();
+    sections_type const& s = sections();
 
-    for (auto& section : sections)
+    for (auto& section : s)
     {
         functor(section->Name.c_str());
     }
@@ -230,7 +230,7 @@ void CScriptIniFile::section_for_each(const luabind::functor<void>& functor)
 
 void CScriptIniFile::set_readonly(bool b)
 {
-    inherited::m_flags.set(eReadOnly, b);
+    inherited::set_readonly(b);
 }
 
 u32 CScriptIniFile::section_count()

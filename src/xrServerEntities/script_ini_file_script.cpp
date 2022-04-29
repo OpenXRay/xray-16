@@ -105,7 +105,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("section_for_each", &CScriptIniFile::section_for_each)
             .def("set_readonly", &CScriptIniFile::set_readonly)
             //Alundaio: END
-            .def("fname", REMOVE_NOEXCEPT(&CScriptIniFile::fname))
+            .def("fname", &CScriptIniFile::fname)
             .def("section_exist", &CScriptIniFile::section_exist)
             .def("line_exist", (bool (CScriptIniFile::*)(LPCSTR, LPCSTR) const)&CScriptIniFile::line_exist)
             .def("r_clsid", &CScriptIniFile::r_clsid)

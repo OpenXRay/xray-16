@@ -22,13 +22,6 @@ class IReader;
 class XRCORE_API CInifile
 {
 public:
-    enum
-    {
-        eSaveAtEnd = 1 << 0,
-        eReadOnly = 1 << 1,
-        eOverrideNames = 1 << 2,
-    };
-    Flags8 m_flags;
     struct XRCORE_API Item
     {
         shared_str first;
@@ -66,6 +59,13 @@ public:
     }
 
 private:
+    enum
+    {
+        eSaveAtEnd = 1 << 0,
+        eReadOnly = 1 << 1,
+        eOverrideNames = 1 << 2,
+    };
+    Flags8 m_flags;
     string_path m_file_name;
     Root DATA;
 
@@ -257,6 +257,7 @@ public:
     void w_bool(pcstr S, pcstr L, bool V, pcstr comment = nullptr);
 
     void remove_line(pcstr S, pcstr L);
+    void set_readonly(bool b);
 };
 
 #define READ_IF_EXISTS(ltx, method, section, name, default_value) \
