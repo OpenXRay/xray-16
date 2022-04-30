@@ -9,7 +9,7 @@
 #include "pch_script.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-#include "Common/object_type_traits.h"
+#include "xrScriptEngine/Functor.hpp"
 
 using namespace luabind;
 using namespace luabind::policy;
@@ -102,7 +102,16 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("remove_line", &CScriptIniFile::remove_line)
             .def("set_override_names", &CScriptIniFile::set_override_names)
             .def("section_count", &CScriptIniFile::section_count)
-            .def("section_for_each", &CScriptIniFile::section_for_each)
+            .def("section_for_each", +[](CScriptIniFile* self, const luabind::functor<void>& functor)
+            {
+                using sections_type = CInifile::Root;
+                sections_type const& sections = self->sections();
+
+                for (auto& section : sections)
+                {
+                    functor(section->Name.c_str());
+                }
+            })
             .def("set_readonly", &CScriptIniFile::set_readonly)
             //Alundaio: END
             .def("fname", &CScriptIniFile::fname)

@@ -9,7 +9,6 @@
 #pragma once
 
 #include "script_token_list.h"
-#include "xrScriptEngine/Functor.hpp"
 
 class CScriptIniFile : public CInifile
 {
@@ -55,8 +54,6 @@ public:
     void save_at_end(bool b);
     void remove_line(pcstr S, pcstr L);
     void set_override_names(bool b);
-    void section_for_each(const luabind::functor<void>& functor) const;
-    void set_readonly(bool b);
     u32 section_count();
 };
 
