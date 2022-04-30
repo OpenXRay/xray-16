@@ -187,30 +187,30 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
     constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
     {
-        // { id,                   "xml_section_name",         "condition_indicator,   "highlighter",             "blocker", is_it_critical_and_required }
-        { eInventoryPistolList,    "dragdrop_pistol",          "progess_bar_weapon1",  "inv_slot2_highlight",     nullptr,            true },
-        { eInventoryAutomaticList, "dragdrop_automatic",       "progess_bar_weapon2",  "inv_slot3_highlight",     nullptr,            true },
+        // { id,                   "xml_section_name",         "condition_indicator,  "highlighter",             "blocker", is_it_critical_and_required }
+        { eInventoryPistolList,    "dragdrop_pistol",          "progess_bar_weapon1", "inv_slot2_highlight",     nullptr,            true },
+        { eInventoryAutomaticList, "dragdrop_automatic",       "progess_bar_weapon2", "inv_slot3_highlight",     nullptr,            true },
 
-        { eInventoryOutfitList,    "dragdrop_outfit",          "progess_bar_outfit",   "outfit_slot_highlight",   nullptr,            true },
-        { eInventoryHelmetList,    "dragdrop_helmet",          "progess_bar_helmet",   "helmet_slot_highlight",   "helmet_over",      false },
+        { eInventoryOutfitList,    "dragdrop_outfit",          "progess_bar_outfit",  "outfit_slot_highlight",   nullptr,            true },
+        { eInventoryHelmetList,    "dragdrop_helmet",          "progess_bar_helmet",  "helmet_slot_highlight",   "helmet_over",      false },
 
-        { eInventoryBeltList,      "dragdrop_belt",            nullptr,                "artefact_slot_highlight", "belt_list_over",   true },
-        { eInventoryDetectorList,  "dragdrop_detector",        nullptr,                "detector_slot_highlight", nullptr,            true },
+        { eInventoryBeltList,      "dragdrop_belt",            nullptr,               "artefact_slot_highlight", "belt_list_over",   true },
+        { eInventoryDetectorList,  "dragdrop_detector",        nullptr,               "detector_slot_highlight", nullptr,            true },
 
-        { eInventoryBagList,       "dragdrop_bag",             nullptr,                nullptr,                   nullptr,            true },
+        { eInventoryBagList,       "dragdrop_bag",             nullptr,               nullptr,                   nullptr,            true },
 
-        { eTradeActorList,         "dragdrop_actor_trade",     nullptr,                nullptr,                   nullptr,            true },
-        { eTradeActorBagList,      "dragdrop_actor_trade_bag", nullptr,                nullptr,                   nullptr,            true },
+        { eTradeActorList,         "dragdrop_actor_trade",     nullptr,               nullptr,                   nullptr,            true },
+        { eTradeActorBagList,      "dragdrop_actor_trade_bag", nullptr,               nullptr,                   nullptr,            true },
 
-        { eTradePartnerList,       "dragdrop_partner_trade",   nullptr,                nullptr,                   nullptr,            true },
-        { eTradePartnerBagList,    "dragdrop_partner_bag",     nullptr,                nullptr,                   nullptr,            true },
+        { eTradePartnerList,       "dragdrop_partner_trade",   nullptr,               nullptr,                   nullptr,            true },
+        { eTradePartnerBagList,    "dragdrop_partner_bag",     nullptr,               nullptr,                   nullptr,            true },
 
-        { eSearchLootBagList,      "dragdrop_deadbody_bag",    nullptr,                nullptr,                   nullptr,            true },
-        { eSearchLootActorBagList, nullptr,                    nullptr,                nullptr,                   nullptr,            false },
+        { eSearchLootBagList,      "dragdrop_deadbody_bag",    nullptr,               nullptr,                   nullptr,            true },
+        { eSearchLootActorBagList, nullptr,                    nullptr,               nullptr,                   nullptr,            false },
 
-        { eTrashList,              "dragdrop_trash",           nullptr,                nullptr,                   nullptr,            false },
+        { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
 
-        { eInventorybackpackList,  "dragdrop_backpack",        nullptr,                "backpack_slot_highlight", nullptr,            true },
+        { eInventorybackpackList,  "dragdrop_backpack",        nullptr,                "backpack_slot_highlight", nullptr,           false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
