@@ -105,7 +105,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("section_for_each", +[](CScriptIniFile* self, const luabind::functor<void>& functor)
             {
                 using sections_type = CInifile::Root;
-                sections_type const& sections = self->sections();
+                const sections_type& sections = self->sections();
 
                 for (auto& section : sections)
                 {
