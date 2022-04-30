@@ -6,7 +6,6 @@
 //	Description : Script ini file class export
 ////////////////////////////////////////////////////////////////////////////
 
-#include "pch_script.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/Functor.hpp"
