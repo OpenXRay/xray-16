@@ -40,7 +40,7 @@ bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind
 
     N = "";
     V = "";
-
+    
     cpcstr v = READ_IF_EXISTS(self, r_string, S, L, nullptr);
     if (!v)
         return false;
