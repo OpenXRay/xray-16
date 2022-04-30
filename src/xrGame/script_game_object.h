@@ -797,8 +797,6 @@ public:
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
     
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
-    void inactualize_level_path();
-    void inactualize_game_path();
     void SetHealthEx(float hp); //AVO
     //Alundaio
     float GetLuminocityHemi();
@@ -814,9 +812,6 @@ public:
     void SetRestrictionType(u8 type);
 
     //Weapon
-    LPCSTR Weapon_GetAmmoSection(u8 ammo_type);
-    void Weapon_SetCurrentScope(u8 type);
-    u8 Weapon_GetCurrentScope();
     void Weapon_AddonAttach(CScriptGameObject* item);
     void Weapon_AddonDetach(pcstr item_section);
     bool HasAmmoType(u8 type);
@@ -833,7 +828,6 @@ public:
     bool InstallUpgrade(pcstr upgrade);
     bool HasUpgrade(pcstr upgrade) const;
     void IterateInstalledUpgrades(luabind::functor<void> functor);
-    bool WeaponInGrenadeMode();
 
     //Car
     CScriptGameObject* GetAttachedVehicle();
@@ -863,11 +857,6 @@ public:
     void SetArtefactSatietyRestoreSpeed(float value);
     void SetArtefactPowerRestoreSpeed(float value);
     void SetArtefactBleedingRestoreSpeed(float value);
-
-    //CWeaponAmmo
-    u16 AmmoGetCount();
-    void AmmoSetCount(u16 count);
-    u16 AmmoBoxSize();
 
     //CAI_Stalker
     void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
