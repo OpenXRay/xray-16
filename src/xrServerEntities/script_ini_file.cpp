@@ -6,7 +6,6 @@
 //	Description : Script ini file class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "pch_script.h"
 #include "StdAfx.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/script_engine.hpp"
