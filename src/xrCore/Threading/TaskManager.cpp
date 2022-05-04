@@ -194,7 +194,7 @@ public:
 // Get fast spin-loop timings
 void CalcIterations()
 {
-    ThreadPriorityHelper priority;
+    [[maybe_unused]] ThreadPriorityHelper priority;
 
     volatile bool dummy = false;
     const u64 frequency = CPU::qpc_freq;
@@ -297,7 +297,7 @@ void TaskManager::TaskWorkerStart()
 
     const u32 fastIterations = ttapi_dwFastIter;
 
-    int iteration = 0;
+    u32 iteration = 0;
     Task* task;
     while (true)
     {

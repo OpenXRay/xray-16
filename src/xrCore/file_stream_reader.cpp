@@ -37,7 +37,6 @@ void CFileStreamReader::destroy()
     CloseHandle(file_mapping_handle);
     CloseHandle(m_file_handle);
 #elif defined(XR_PLATFORM_LINUX)
-    int file_mapping_handle = this->file_mapping_handle();
     inherited::destroy();
     ::close(m_file_handle);
     m_file_handle = -1;

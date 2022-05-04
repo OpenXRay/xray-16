@@ -148,10 +148,10 @@ private:
     void check_pathes();
 
     files_set m_files;
-    bool bNoRecurse;
+    bool bNoRecurse{ true };
 
     Lock* m_auth_lock;
-    u64 m_auth_code;
+    u64 m_auth_code{};
 
     const file* RegisterExternal(pcstr name);
     const file* Register(pcstr name, size_t vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);

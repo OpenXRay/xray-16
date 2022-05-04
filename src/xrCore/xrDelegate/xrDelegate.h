@@ -253,7 +253,7 @@ public:
     }
 
 private:
-    template<std::size_t... index>
+    template<size_t... index>
     Result run(tuple_type& tup, std::index_sequence<index...>) const
     {
         return d_function(std::forward<Args>(std::get<index>(tup))...);
