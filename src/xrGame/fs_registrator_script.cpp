@@ -11,6 +11,9 @@ LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
     string_path temp;
     shared_str temp_2;
     fs->update_path(temp, initial, src);
+#ifdef XR_PLATFORM_LINUX
+    normalize_path_separators(temp);
+#endif
     temp_2 = temp;
     return *temp_2;
 }
