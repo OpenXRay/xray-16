@@ -1085,13 +1085,4 @@ inline void restore_path_separators(char * path)
     while (char* sep = strchr(path, '/')) *sep = '\\'; //
 }
 
-/** Replace windows path separator on Linux path separator 
- * @brief normalize_path_separators
- * @param path
- */
-inline void normalize_path_separators(char * path)
-{
-    while (char* sep = strchr(path, '\\')) *sep = '/'; //
-}
-
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_r(time, result); }
