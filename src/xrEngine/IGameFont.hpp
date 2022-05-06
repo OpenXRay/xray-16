@@ -1,7 +1,8 @@
 #pragma once
-#include <stdarg.h>
+
 #include "xrCore/xr_types.h"
 #include "xrCore/_vector2.h"
+#include "xrCore/Text/StringConversion.hpp"
 
 class IGameFont
 {
@@ -36,7 +37,7 @@ public:
     virtual void SetInterval(const Fvector2& v) = 0;
     virtual void SetAligment(EAligment aligment) = 0;
     virtual float SizeOf_(pcstr s) = 0;
-    virtual float SizeOf_(const wchar_t* wsStr) = 0;
+    virtual float SizeOf_(const xr_wide_char* wsStr) = 0;
     virtual float SizeOf_(const char cChar) = 0; // only ANSI
     virtual float CurrentHeight_() = 0;
     virtual void OutSetI(float x, float y) = 0;

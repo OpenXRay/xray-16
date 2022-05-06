@@ -203,7 +203,7 @@ u16 CGameFont::GetCutLengthPos(float fTargetWidth, pcstr pszText)
 {
     VERIFY(pszText);
 
-    wchar_t wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
+    xr_wide_char wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
     float fCurWidth = 0.0f, fDelta = 0.0f;
 
     u16 len = mbhMulti2Wide(wsStr, wsPos, MAX_MB_CHARS, pszText);
@@ -229,7 +229,7 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
 {
     VERIFY(puBuffer && uBufferSize && pszText);
 
-    wchar_t wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
+    xr_wide_char wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
     float fCurWidth = 0.0f, fDelta = 0.0f;
     u16 nLines = 0;
 
@@ -330,7 +330,7 @@ float CGameFont::SizeOf_(pcstr s)
 
     if (IsMultibyte())
     {
-        wchar_t wsStr[MAX_MB_CHARS];
+        xr_wide_char wsStr[MAX_MB_CHARS];
 
         mbhMulti2Wide(wsStr, NULL, MAX_MB_CHARS, s);
 
@@ -346,7 +346,7 @@ float CGameFont::SizeOf_(pcstr s)
     return (X * vInterval.x);
 }
 
-float CGameFont::SizeOf_(const wchar_t* wsStr)
+float CGameFont::SizeOf_(const xr_wide_char* wsStr)
 {
     if (!(wsStr && wsStr[0]))
         return 0;
