@@ -14,6 +14,9 @@ public:
     void OnRender(CGameFont& owner) override;
 
 private:
+    ICF float ProcessSymbol(const CGameFont& owner, FVF::TL*& v, float X, float Y, float Y2, u32 clr, u32 clr2, Fvector l);
+
+private:
     ref_shader pShader;
     ref_geom pGeom;
 };

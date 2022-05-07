@@ -137,6 +137,8 @@ enum EGameActions : u32
     kNOTBINDED
 };
 
+constexpr char GAME_ACTION_MARK = 27; // escape symbol
+
 struct keyboard_key
 {
     pcstr key_name;
@@ -187,7 +189,7 @@ ENGINE_API bool IsBinded(EGameActions action_id, int dik);
 ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
 ENGINE_API EGameActions GetBindedAction(int dik);
 
-ENGINE_API bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz);
+ENGINE_API pcstr GetActionBinding(EGameActions action);
 
 template <typename Invocable>
 void ForAllActionKeys(EGameActions action_id, Invocable&& invocable)
