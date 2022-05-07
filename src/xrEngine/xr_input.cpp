@@ -322,12 +322,14 @@ void CInput::ControllerUpdate()
 
             if (last_input_controller != event.caxis.which) // don't write if don't really need to
                 last_input_controller = event.caxis.which;
-            SetCurrentInputType(Controller);
 
             if (std::abs(event.caxis.value) < controllerDeadZone)
                 controllerAxisState[event.caxis.axis] = 0;
             else
+            {
                 controllerAxisState[event.caxis.axis] = event.caxis.value;
+                SetCurrentInputType(Controller);
+            }
             break;
         }
 
