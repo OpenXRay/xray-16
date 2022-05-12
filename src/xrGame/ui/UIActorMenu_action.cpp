@@ -69,12 +69,43 @@ void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
         item->SetCustomDraw(NULL);
 }
 
+bool CUIActorMenu::OnItemDropOnItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner)
+{
+    //Alundaio: Here we export the action of dragging one inventory item on top of another! 
+    luabind::functor<bool> funct1;
+    if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemDropped", funct1))
+    {
+        //If list only has 1 item, get it, otherwise try to get item at current drag position
+        CUICellItem* _citem = new_owner->ItemsCount() == 1 ? new_owner->GetItemIdx(0) : nullptr;
+        if (!_citem)
+        {
+            CUICellContainer* c = old_owner->GetContainer();
+            Ivector2 c_pos = c->PickCell(old_owner->GetDragItemPosition());
+            if (c->ValidCell(c_pos))
+            {
+                CUICell& ui_cell = c->GetCellAt(c_pos);
+                if (!ui_cell.Empty())
+                    _citem = ui_cell.m_item;
+            }
+        }
+
+        const PIItem _iitem = _citem ? static_cast<PIItem>(_citem->m_pData) : nullptr;
+
+        CGameObject* GO1 = smart_cast<CGameObject*>(CurrentIItem());
+        CGameObject* GO2 = _iitem ? smart_cast<CGameObject*>(_iitem) : nullptr;
+        if (funct1(GO1 ? GO1->lua_game_object() : 0,
+            GO2 ? GO2->lua_game_object() : 0, (int)t_old, (int)t_new) == false)
+            return false;
+    }
+    //-Alundaio
+    return false;
+}
 bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 {
     InfoCurItem(NULL);
     CUIDragDropListEx* old_owner = itm->OwnerList();
     CUIDragDropListEx* new_owner = CUIDragDropListEx::m_drag_item->BackList();
-    if (old_owner == new_owner || !old_owner || !new_owner)
+    if (!old_owner || !new_owner)
     {
         return false;
     }
@@ -108,9 +139,16 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
         u16 slot_to_place;
         if (CanSetItemToList(CurrentIItem(), new_owner, slot_to_place))
             ToSlot(itm, true, slot_to_place);
+
+        OnItemDropOnItem(t_old, t_new, old_owner, new_owner);
     }
     break;
-    case iActorBag: { ToBag(itm, true);
+    case iActorBag:
+    {
+        if(!OnItemDropOnItem(t_old, t_new, old_owner, new_owner))
+            return false;
+
+        ToBag(itm, true);
     }
     break;
     case iActorBelt: { ToBelt(itm, true);
