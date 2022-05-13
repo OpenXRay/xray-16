@@ -57,7 +57,6 @@ public:
     void SwitchNightVision();
     void SwitchNightVision(bool light_on, bool use_sounds = true);
 
-    void SetNightVisionAllowed(bool bAllow) { m_bNightVisionEnabled = bAllow; }
     bool GetNightVisionStatus() { return m_bNightVisionOn; }
     CNightVisionEffector* GetNightVision() { return m_night_vision; }
 protected:
