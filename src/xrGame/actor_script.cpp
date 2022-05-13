@@ -7,13 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "Torch.h"
 #include "Actor.h"
 #include "ActorCondition.h"
 #include "level_changer.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-#include "holder_custom.h"
-#include "script_game_object.h"
 
 using namespace luabind;
 
