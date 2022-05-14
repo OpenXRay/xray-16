@@ -18,7 +18,12 @@ matrix:
   include:
     - arch: arm64
       env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      addons: *gcc8
+      addons: &gcc8
+        apt:
+          sources:
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - g++-8
 
     - arch: arm64
       env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
