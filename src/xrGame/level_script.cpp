@@ -215,11 +215,6 @@ void map_add_object_spot(u16 id, LPCSTR spot_type, LPCSTR text)
     }
 }
 
-bool valid_vertex(u32 level_vertex_id)
-{
-    return ai().level_graph().valid_vertex_id(level_vertex_id);
-}
-
 void map_add_object_spot_ser(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().AddMapLocation(spot_type, id);
@@ -578,19 +573,6 @@ void stop_tutorial()
         g_tutorial->Stop();
 }
 
-LPCSTR tutorial_name()
-{
-    if (g_tutorial)
-        return g_tutorial->m_name;
-
-    return "invalid";
-}
-
-void reload_language()
-{
-    StringTable().ReloadLanguage();
-}
-
 LPCSTR translate_string(LPCSTR str) { return *StringTable().translate(str); }
 bool has_active_tutotial() { return (g_tutorial != NULL); }
 
@@ -662,11 +644,6 @@ void iterate_online_objects(luabind::functor<bool> functor)
     }
 }
 
-xrTime get_start_time()
-{
-    return xrTime(Level().GetStartGameTime());
-}
-
 // KD: raypick
 bool ray_pick(const Fvector& start, const Fvector& dir, float range,
               collide::rq_target tgt, script_rq_result& script_R,
@@ -708,8 +685,11 @@ IC static void CLevel_Export(lua_State* luaState)
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
-        def("get_start_time", &get_start_time),
-        def("valid_vertex", &valid_vertex),
+        def("get_start_time", +[]() { return xrTime(Level().GetStartGameTime()); }),
+        def("valid_vertex", +[](u32 level_vertex_id)
+        {
+            return ai().level_graph().valid_vertex_id(level_vertex_id);
+        }),
         //Alundaio: END
 
         def("iterate_online_objects", &iterate_online_objects),
@@ -902,9 +882,15 @@ IC static void CLevel_Export(lua_State* luaState)
         def("start_tutorial", &start_tutorial),
         def("stop_tutorial", &stop_tutorial),
         def("has_active_tutorial", &has_active_tutotial),
-	    def("active_tutorial_name", &tutorial_name),
+	    def("active_tutorial_name", +[]()
+        {
+            if (g_tutorial)
+                return g_tutorial->m_name;
+
+            return "invalid";
+        }),
         def("translate_string", &translate_string),
-        def("reload_language", &reload_language),
+        def("reload_language", +[]() { StringTable().ReloadLanguage(); }),
         def("log_stack_trace", &xrDebug::LogStackTrace)
     ];
 
