@@ -22,22 +22,6 @@ matrix:
     - arch: arm64
       env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
 
-    - arch: arm64-graviton2
-      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      virt: lxd
-
-    - arch: arm64-graviton2
-      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      virt: lxd
-
-    - arch: arm64-graviton2
-      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      virt: vm
-
-    - arch: arm64-graviton2
-      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      virt: vm
-
 install:
   - export CC=${C_COMPILER}
   - export CXX=${CXX_COMPILER}
