@@ -40,7 +40,7 @@ bool CUIDialogWnd::IR_process()
     if (!IsEnabled())
         return false;
 
-    if (GetHolder() && GetHolder()->IgnorePause())
+    if (GetHolder()->IgnorePause())
         return true;
 
     if (Device.Paused() && !WorkInPause())

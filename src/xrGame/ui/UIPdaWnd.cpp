@@ -35,6 +35,7 @@
 u32 g_pda_info_state = 0;
 
 void RearrangeTabButtons(CUITabControl* pTab);
+CDialogHolder* CurrentDialogHolder();
 
 CUIPdaWnd::CUIPdaWnd()
 {
@@ -247,7 +248,10 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     {
         CUIDialogWndEx* scriptWnd = functor(section.c_str());
         if (scriptWnd)
+        {
+            scriptWnd->SetHolder(CurrentDialogHolder());
             m_pActiveDialog = scriptWnd;
+        }
     }
 
     R_ASSERT(m_pActiveDialog);
