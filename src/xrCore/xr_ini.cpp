@@ -122,7 +122,7 @@ int _cdecl _ui64toa_s(uint64_t value, char *str, size_t size, int radix)
             *--pos = 'a' + digit - 10;
     } while (value != 0);
 
-    if (buffer - pos + 65 > size)
+    if (static_cast<size_t>(buffer - pos + 65) > size)
     {
         return MSVCRT_EINVAL;
     }
@@ -414,7 +414,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
         pstr comm = strchr(str, ';');
         pstr comm_1 = strchr(str, '/');
 
-        if (comm_1 && *(comm_1 + 1) == '/' && (!comm || comm && comm_1 < comm))
+        if (comm_1 && *(comm_1 + 1) == '/' && (!comm || (comm && comm_1 < comm)))
         {
             comm = comm_1;
         }

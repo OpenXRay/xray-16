@@ -437,7 +437,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     {
         size_t demangledBufSize = 0;
         char* demangledName = nullptr;
-        for (size_t i = 0; i < nptrs; i++)
+        for (int i = 0; i < nptrs; i++)
         {
             char* functionName = strings[i];
 
@@ -586,8 +586,8 @@ void xrDebug::DoExit(const std::string& message)
 LPCSTR xrDebug::ErrorToString(long code)
 {
     const char* result = nullptr;
-    static string1024 descStorage;
 #if defined(XR_PLATFORM_WINDOWS)
+    static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
     {
@@ -853,10 +853,10 @@ static void handler_base(const char* reason)
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* function, const wchar_t* file,
                                       unsigned int line, uintptr_t reserved)
 {
-#if defined(XR_PLATFORM_WINDOWS)
     bool ignoreAlways = false;
     string4096 mbExpression;
     string4096 mbFunction;
@@ -878,10 +878,13 @@ static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* 
         xr_strcpy(mbFile, __FILE__);
     }
     xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
-#endif
 }
+#endif
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void pure_call_handler() { handler_base("pure virtual function call"); }
+#endif
+
 #ifdef XRAY_USE_EXCEPTIONS
 static void unexpected_handler() { handler_base("unexpected program termination"); }
 #endif

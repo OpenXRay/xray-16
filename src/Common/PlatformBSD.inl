@@ -290,7 +290,7 @@ inline int strcpy_s(char *dest, size_t num, const char *source)
     return ERANGE;
 }
 
-template <std::size_t num>
+template <size_t num>
 inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(dest, num, source); }
 
 inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
@@ -330,7 +330,7 @@ inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t n
     return EINVAL;
 }
 
-template <std::size_t dst_sz>
+template <size_t dst_sz>
 inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { return strncpy_s(dest, dst_sz, source, num); }
 
 inline int strcat_s(char * dest, size_t num, const char * source)
@@ -1068,7 +1068,13 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
-#define xr_fs_strlwr(str) str
+template <typename T>
+decltype(auto) do_nothing(const T& obj)
+{
+    return obj;
+}
+
+#define xr_fs_strlwr(str) do_nothing(str)
 #define xr_fs_nostrlwr(str) xr_strlwr(str)
 
 inline void convert_path_separators(char * path)
