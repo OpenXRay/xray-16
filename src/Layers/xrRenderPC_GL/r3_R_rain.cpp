@@ -84,8 +84,8 @@ void CRender::render_rain()
         FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv = ex_full_inverse;
-#ifdef	_DEBUG
-		typedef		DumbConvexVolume<true>	t_volume;
+#ifdef _DEBUG
+        typedef DumbConvexVolume<true> t_volume;
 #else
         typedef DumbConvexVolume<false> t_volume;
 #endif
@@ -106,9 +106,9 @@ void CRender::render_rain()
         }
         // hull.compute_caster_model	(cull_planes,fuckingsun->direction);
         hull.compute_caster_model(cull_planes, RainLight.direction);
-#ifdef	_DEBUG
-		for (u32 it = 0; it < cull_planes.size(); it++)
-			Target->dbg_addplane(cull_planes[it], 0xffffffff);
+#ifdef _DEBUG
+        for (u32 it = 0; it < cull_planes.size(); it++)
+            Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
@@ -232,8 +232,7 @@ void CRender::render_rain()
 
     // Begin SMAP-render
     {
-        bool bSpecialFull = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        VERIFY(!bSpecialFull);
+        VERIFY2(mapNormalPasses[1][0].empty() && mapMatrixPasses[1][0].empty() && mapSorted.empty(), "Special should be empty at this stage, but it's not empty...");
         HOM.Disable();
         phase = PHASE_SMAP;
         r_pmask(true, false);
@@ -249,8 +248,8 @@ void CRender::render_rain()
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
-        bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
+        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);

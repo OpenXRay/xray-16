@@ -298,7 +298,6 @@ struct DumbClipper
             EFC_Visible res = frustum.testAABB(&bb.vMin.x, mask);
             switch (res)
             {
-            case fcvNone: continue;
             case fcvFully:
                 for (int c = 0; c < 8; c++)
                 {
@@ -647,7 +646,7 @@ void CRender::render_sun()
         float max_slope = -1e32f;
         float min_slope = 1e32f;
 
-        for (int i = 0; i < POINTS_NUM; i++)
+        for (size_t i = 0; i < POINTS_NUM; i++)
         {
             glm::vec2 tmp(frustumPnts[i].x * x_scale, frustumPnts[i].y * y_scale);
             float x_dist = tmp.x - projectionPtQ.x;
@@ -713,7 +712,7 @@ void CRender::render_sun()
         DumbClipper view_clipper;
         glm::mat4 xform = m_LightViewProj;
         view_clipper.frustum.CreateFromMatrix(*(Fmatrix*)glm::value_ptr(ex_full), FRUSTUM_P_ALL);
-        for (int p = 0; p < view_clipper.frustum.p_count; p++)
+        for (size_t p = 0; p < view_clipper.frustum.p_count; p++)
         {
             Fplane& P = view_clipper.frustum.planes [p];
             view_clipper.planes.push_back({P.n.x, P.n.y, P.n.z, P.d});
@@ -803,8 +802,8 @@ void CRender::render_sun()
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
-        bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
+        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);
@@ -868,10 +867,10 @@ void CRender::render_sun_near()
     {
         FPU::m64r();
         // Lets begin from base frustum
-#ifdef	_DEBUG
-		typedef		DumbConvexVolume<true>	t_volume;
+#ifdef _DEBUG
+        using t_volume = DumbConvexVolume<true>;
 #else
-        typedef DumbConvexVolume<false> t_volume;
+        using t_volume = DumbConvexVolume<false>;
 #endif
         t_volume hull;
         {
@@ -889,9 +888,9 @@ void CRender::render_sun_near()
             }
         }
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
-#ifdef	_DEBUG
-		for (u32 it = 0; it < cull_planes.size(); it++)
-			Target->dbg_addplane(cull_planes[it], 0xffffffff);
+#ifdef _DEBUG
+        for (u32 it = 0; it < cull_planes.size(); it++)
+            Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
@@ -991,8 +990,7 @@ void CRender::render_sun_near()
 
     // Begin SMAP-render
     {
-        bool bSpecialFull = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        VERIFY(!bSpecialFull);
+        VERIFY2(mapNormalPasses[1][0].empty() && mapMatrixPasses[1][0].empty() && mapSorted.empty(), "Special should be empty at this stage, but it's not empty...");
         HOM.Disable();
         phase = PHASE_SMAP;
         if (o.Tshadows)
@@ -1011,8 +1009,8 @@ void CRender::render_sun_near()
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
-        bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
+        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(fuckingsun, SE_SUN_NEAR);
@@ -1128,11 +1126,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv = ex_full_inverse;
-#ifdef	_DEBUG
-		typedef		DumbConvexVolume<true>	t_volume;
-#else
-        typedef DumbConvexVolume<false> t_volume;
-#endif
 
         //******************************* Need to be placed after cuboid built **************************
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
@@ -1169,8 +1162,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         mdir_View.build_camera_dir(L_pos, L_dir, L_up);
 
 //////////////////////////////////////////////////////////////////////////
-#ifdef	_DEBUG
-		typedef		FixedConvexVolume<true>		t_cuboid;
+#ifdef _DEBUG
+        typedef FixedConvexVolume<true> t_cuboid;
 #else
         typedef FixedConvexVolume<false> t_cuboid;
 #endif
@@ -1333,8 +1326,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
     // Begin SMAP-render
     {
-        bool bSpecialFull = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        VERIFY(!bSpecialFull);
+        VERIFY2(mapNormalPasses[1][0].empty() && mapMatrixPasses[1][0].empty() && mapSorted.empty(), "Special should be empty at this stage, but it's not empty...");
         HOM.Disable();
         phase = PHASE_SMAP;
         if (o.Tshadows)
@@ -1353,8 +1345,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
-        bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
+        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);

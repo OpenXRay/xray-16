@@ -905,7 +905,7 @@ CRenderTarget::~CRenderTarget()
     t_envmap_1.destroy();
 
     // Jitter
-    for (int it = 0; it < TEX_jitter_count; it++)
+    for (u32 it = 0; it < TEX_jitter_count; it++)
     {
         t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
     }

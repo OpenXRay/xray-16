@@ -237,7 +237,7 @@ void CRender::render_rain()
 
     // Begin SMAP-render
     {
-        bool bSpecialFull = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+        [[maybe_unused]] bool bSpecialFull = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
         VERIFY(!bSpecialFull);
         HOM.Disable();
         phase = PHASE_SMAP;
@@ -254,8 +254,8 @@ void CRender::render_rain()
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
-        bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
+        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);

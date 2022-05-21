@@ -989,7 +989,6 @@ void CRenderTarget::accum_direct_lum()
     Fvector2 p0, p1;
     p0.set(.5f / _w, .5f / _h);
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
-    float d_Z = EPS_S; //, d_W = 1.f;
 
     // Common constants (light-related)
     Fvector L_dir, L_clr;
@@ -1003,7 +1002,6 @@ void CRenderTarget::accum_direct_lum()
     Fvector center_pt;
     center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r2_sun_near);
     Device.mFullTransform.transform(center_pt);
-    d_Z = center_pt.z;
 
     // nv-stencil recompression
     /*

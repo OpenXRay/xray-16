@@ -59,7 +59,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
             if (phase == PHASE_NORMAL)
             {
                 uLastLTRACK++;
-                if (lstRenderables.size())
+                if (!lstRenderables.empty())
                     uID_LTRACK = uLastLTRACK % lstRenderables.size();
 
                 // update light-vis for current entity / actor
@@ -214,7 +214,7 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
     g_r = 1;
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 
 #if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
@@ -359,8 +359,6 @@ void CRender::Render()
 #endif
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-        // perform tests
-        auto count = 0;
         light_Package& LP = Lights.package;
 
         // stats
@@ -369,10 +367,11 @@ void CRender::Render()
         Stats.l_total = Stats.l_shadowed + Stats.l_unshadowed;
 
         // perform tests
+        size_t count = 0;
         count = _max(count, LP.v_point.size());
         count = _max(count, LP.v_spot.size());
         count = _max(count, LP.v_shadowed.size());
-        for (auto it = 0; it < count; it++)
+        for (size_t it = 0; it < count; it++)
         {
             if (it < LP.v_point.size())
             {
@@ -547,12 +546,12 @@ void CRender::Render()
         Target->phase_combine();
     }
 
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 }
 
 void CRender::render_forward()
 {
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
     o.distortion = o.distortion_enabled; // enable distorion
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)

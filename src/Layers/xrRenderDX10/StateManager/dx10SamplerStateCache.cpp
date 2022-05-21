@@ -100,21 +100,21 @@ void dx10SamplerStateCache::PrepareSamplerStates(HArray& samplers,
 
 void dx10SamplerStateCache::VSApplySamplers(HArray& samplers)
 {
-    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = { nullptr };
+    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = {};
     PrepareSamplerStates(samplers, pSS);
     HW.pContext->VSSetSamplers(0, D3D_COMMONSHADER_SAMPLER_SLOT_COUNT, pSS);
 }
 
 void dx10SamplerStateCache::PSApplySamplers(HArray& samplers)
 {
-    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = { nullptr };
+    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = {};
     PrepareSamplerStates(samplers, pSS);
     HW.pContext->PSSetSamplers(0, D3D_COMMONSHADER_SAMPLER_SLOT_COUNT, pSS);
 }
 
 void dx10SamplerStateCache::GSApplySamplers(HArray& samplers)
 {
-    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = { nullptr };
+    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = {};
     PrepareSamplerStates(samplers, pSS);
     HW.pContext->GSSetSamplers(0, D3D_COMMONSHADER_SAMPLER_SLOT_COUNT, pSS);
 }
@@ -122,21 +122,21 @@ void dx10SamplerStateCache::GSApplySamplers(HArray& samplers)
 #ifdef USE_DX11
 void dx10SamplerStateCache::HSApplySamplers(HArray& samplers)
 {
-    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = { nullptr };
+    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = {};
     PrepareSamplerStates(samplers, pSS);
     HW.pContext->HSSetSamplers(0, D3D_COMMONSHADER_SAMPLER_SLOT_COUNT, pSS);
 }
 
 void dx10SamplerStateCache::DSApplySamplers(HArray& samplers)
 {
-    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = { nullptr };
+    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = {};
     PrepareSamplerStates(samplers, pSS);
     HW.pContext->DSSetSamplers(0, D3D_COMMONSHADER_SAMPLER_SLOT_COUNT, pSS);
 }
 
 void dx10SamplerStateCache::CSApplySamplers(HArray& samplers)
 {
-    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = { nullptr };
+    ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT] = {};
     PrepareSamplerStates(samplers, pSS);
     HW.pContext->CSSetSamplers(0, D3D_COMMONSHADER_SAMPLER_SLOT_COUNT, pSS);
 }

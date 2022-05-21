@@ -201,7 +201,7 @@ static bool must_enable_old_cascades()
 }
 
 // Returns true if compute shaders for HDAO Ultra exist
-static bool ssao_hdao_cs_shaders_exist()
+[[maybe_unused]] static bool ssao_hdao_cs_shaders_exist()
 {
     IReader* hdao_cs      = open_shader("ssao_hdao.cs");
     IReader* hdao_cs_msaa = open_shader("ssao_hdao_msaa.cs");
@@ -929,7 +929,7 @@ void CRender::rmNormal()
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CRender::CRender() : m_bFirstFrameAfterReset(false), Sectors_xrc("render")
+CRender::CRender() : Sectors_xrc("render")
 {
     init_cacades();
 }

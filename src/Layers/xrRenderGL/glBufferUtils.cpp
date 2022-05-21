@@ -150,7 +150,7 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
     RCache.set_Format(decl);
 
     // XXX: tamlin: use 'stride', or drop it.
-    GLsizei stride = GetDeclVertexSize(dxdecl, 0);
+    // GLsizei stride = GetDeclVertexSize(dxdecl, 0);
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
     {
         const D3DVERTEXELEMENT9& desc = dxdecl[i];
@@ -212,7 +212,6 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
 {
     RCache.set_Format(decl);
 
-    GLsizei stride = GetFVFVertexSize(FVF);
     u32 offset = 0;
 
     // Position attribute
@@ -272,7 +271,7 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
         offset += size * sizeof(float);
     }
 
-    VERIFY(stride == offset);
+    VERIFY(offset == GetFVFVertexSize(FVF));
 }
 
 u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
@@ -285,12 +284,6 @@ u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
 }
 
 //-----------------------------------------------------------------------------
-VertexStagingBuffer::VertexStagingBuffer()
-    : m_DeviceBuffer{ 0 }
-    , m_HostBuffer{ nullptr }
-{
-}
-
 VertexStagingBuffer::~VertexStagingBuffer()
 {
     Destroy();
@@ -383,12 +376,6 @@ size_t VertexStagingBuffer::GetVideoMemoryUsage() const
 }
 
 //-----------------------------------------------------------------------------
-IndexStagingBuffer::IndexStagingBuffer()
-    : m_DeviceBuffer{ 0 }
-    , m_HostBuffer{ nullptr }
-{
-}
-
 IndexStagingBuffer::~IndexStagingBuffer()
 {
     Destroy();
@@ -481,11 +468,6 @@ size_t IndexStagingBuffer::GetVideoMemoryUsage() const
 }
 
 //-----------------------------------------------------------------------------
-VertexStreamBuffer::VertexStreamBuffer()
-    : m_DeviceBuffer(0)
-{
-}
-
 VertexStreamBuffer::~VertexStreamBuffer()
 {
     Destroy();
@@ -534,11 +516,6 @@ bool VertexStreamBuffer::IsValid() const
 }
 
 //-----------------------------------------------------------------------------
-IndexStreamBuffer::IndexStreamBuffer()
-    : m_DeviceBuffer(0)
-{
-}
-
 IndexStreamBuffer::~IndexStreamBuffer()
 {
     Destroy();
