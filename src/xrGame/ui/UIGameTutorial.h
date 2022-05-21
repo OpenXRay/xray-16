@@ -24,7 +24,6 @@ protected:
     shared_str m_stop_lua_function;
 
 public:
-    pcstr m_name;
     IInputReceiver* m_pStoredInputReceiver;
     CUISequencer();
     bool Start(LPCSTR tutor_name);
@@ -55,6 +54,7 @@ public:
     virtual void IR_OnMouseWheel(int x, int y);
     virtual void IR_OnActivate(void);
     bool Persistent() { return !!m_flags.test(etsPersistent); }
+    pcstr GetTutorName() { return m_name; }
     fastdelegate::FastDelegate0<> m_on_destroy_event;
 
     enum
@@ -68,6 +68,9 @@ public:
         etsOverMainMenu = (1 << 6),
     };
     Flags32 m_flags;
+
+private:
+    pcstr m_name;
 };
 
 class CUISequenceItem

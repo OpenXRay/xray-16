@@ -885,7 +885,7 @@ IC static void CLevel_Export(lua_State* luaState)
 	    def("active_tutorial_name", +[]()
         {
             if (g_tutorial)
-                return g_tutorial->m_name;
+                return g_tutorial->GetTutorName();
 
             return "invalid";
         }),
