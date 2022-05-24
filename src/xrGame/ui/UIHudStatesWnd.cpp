@@ -494,15 +494,57 @@ void CUIHudStatesWnd::SetAmmoIcon(const shared_str& sect_name)
     texture_rect.rb.add(texture_rect.lt);
     m_ui_weapon_icon->GetUIStaticItem().SetTextureRect(texture_rect);
     m_ui_weapon_icon->SetStretchTexture(true);
-
     float h = texture_rect.height() * 0.8f;
     float w = texture_rect.width() * 0.8f;
-
-    // now perform only width scale for ammo, which (W)size >2
-    if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
-        w = INV_GRID_WIDTH * 1.5f;
-
-    m_ui_weapon_icon->SetWidth(w * UI().get_current_kx());
+	if (CallOfPripyatMode)
+	{
+		// now perform only width scale for ammo, which (W)size >2
+		if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
+			w = INV_GRID_WIDTH * 1.5f;
+		m_ui_weapon_icon->SetWidth(w * UI().get_current_kx());
+	}
+	else if (ClearSkyMode)
+	{
+		h = texture_rect.height() * 0.65f;
+		w = texture_rect.width() * 0.65f;
+		float posx_16 = 8.33f;
+		float posx = 10.0f;
+		if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
+		{
+			w = INV_GRID_WIDTH * 1.5f;
+		}
+		if (texture_rect.width() < 1.01f * INV_GRID_WIDTH)
+		{
+			m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 0.0f);
+		}
+		else
+		{
+			m_ui_weapon_icon->SetTextureOffset(0.0f, 0.0f);
+		}
+		m_ui_weapon_icon->SetWidth(UI().is_widescreen() ? w * 0.833f : w );
+	}
+	else
+	{
+		h = texture_rect.height() * 0.8f;
+		w = texture_rect.width() * (UI().is_widescreen() ? 0.7f : 0.8f );
+		float posx_16 = 30.0f;
+		float posx = 32.0f;
+		if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
+		{
+		w = INV_GRID_WIDTH * 1.6f;
+		}
+		if (texture_rect.width() < 1.01f * INV_GRID_WIDTH)
+		{
+			m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 5.0f);
+		}
+		else
+		{
+			posx_16 = 12.f;
+			posx = 14.f;
+			m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 5.0f);
+		}
+		m_ui_weapon_icon->SetWidth(w);
+	}
     m_ui_weapon_icon->SetHeight(h);
 }
 // ------------------------------------------------------------------------------------------------
