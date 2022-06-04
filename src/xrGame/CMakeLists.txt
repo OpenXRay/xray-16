@@ -440,6 +440,8 @@ set(SRC_FILES
     "detail_path_manager_inline.h"
     "detail_path_manager_smooth.cpp"
     "detail_path_manager_space.h"
+	"DiscordRPC.cpp"
+	"DiscordRPC.h"
     "doors_actor.cpp"
     "doors_actor.h"
     "doors_door.cpp"
