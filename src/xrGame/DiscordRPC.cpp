@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "DiscordRPC.h"
 #include "xrCore/Text/StringConversion.hpp"
