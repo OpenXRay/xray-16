@@ -169,7 +169,7 @@ void FileCompress(pcstr fn, pcstr sign, void* data, size_t size)
 
     int H = _open(fn, O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
     R_ASSERT2(H > 0, fn);
-    _write(H, &M, 8);
+    std::ignore = _write(H, &M, 8);
     _writeLZ(H, data, size);
     _close(H);
 }
@@ -181,7 +181,7 @@ void* FileDecompress(pcstr fn, pcstr sign, size_t* size)
 
     int H = _open(fn, O_BINARY | O_RDONLY);
     R_ASSERT2(H > 0, fn);
-    _read(H, &F, 8);
+    std::ignore = _read(H, &F, 8);
     if (strncmp(M, F, 8) != 0)
     {
         F[8] = 0;

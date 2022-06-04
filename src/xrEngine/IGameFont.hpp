@@ -1,7 +1,8 @@
 #pragma once
-#include <stdarg.h>
+
 #include "xrCore/xr_types.h"
 #include "xrCore/_vector2.h"
+#include "xrCore/Text/StringConversion.hpp"
 
 class IGameFont
 {
@@ -36,7 +37,7 @@ public:
     virtual void SetInterval(const Fvector2& v) = 0;
     virtual void SetAligment(EAligment aligment) = 0;
     virtual float SizeOf_(pcstr s) = 0;
-    virtual float SizeOf_(const wchar_t* wsStr) = 0;
+    virtual float SizeOf_(const xr_wide_char* wsStr) = 0;
     virtual float SizeOf_(const char cChar) = 0; // only ANSI
     virtual float CurrentHeight_() = 0;
     virtual void OutSetI(float x, float y) = 0;
@@ -45,6 +46,7 @@ public:
     virtual void MasterOut(bool bCheckDevice, bool bUseCoords, bool bScaleCoords, bool bUseSkip, float _x, float _y,
         float _skip, pcstr fmt, va_list p) = 0;
     virtual u32 smart_strlen(pcstr S) = 0;
+    virtual u32 get_actions_text_length(pcstr str) = 0;
     virtual bool IsMultibyte() const = 0;
     virtual u16 SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, pcstr pszText) = 0;
     virtual u16 GetCutLengthPos(float fTargetWidth, pcstr pszText) = 0;

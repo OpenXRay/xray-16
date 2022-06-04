@@ -18,6 +18,7 @@ void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
 
 extern ENGINE_API bool g_bRendering;
 extern ENGINE_API Fvector2 g_current_font_scale;
+
 void dxFontRender::OnRender(CGameFont& owner)
 {
     VERIFY(g_bRendering);
@@ -45,15 +46,18 @@ void dxFontRender::OnRender(CGameFont& owner)
         int count = 1;
 
         int length = owner.smart_strlen(owner.strings[i].string);
+        u32 actions = owner.get_actions_text_length(owner.strings[i].string);
 
         while ((i + count) < owner.strings.size())
         {
             int L = owner.smart_strlen(owner.strings[i + count].string);
+            u32 A = owner.get_actions_text_length(owner.strings[i + count].string);
 
             if ((L + length) < MAX_MB_CHARS)
             {
                 count++;
                 length += L;
+                actions += A;
             }
             else
                 break;
@@ -61,7 +65,7 @@ void dxFontRender::OnRender(CGameFont& owner)
 
         // lock AGP memory
         u32 vOffset;
-        FVF::TL* v = (FVF::TL*)RCache.Vertex.Lock(length * 4, pGeom.stride(), vOffset);
+        FVF::TL* v = (FVF::TL*)RCache.Vertex.Lock((length + actions) * 4, pGeom.stride(), vOffset);
         FVF::TL* start = v;
 
         // fill vertices
@@ -69,7 +73,7 @@ void dxFontRender::OnRender(CGameFont& owner)
         for (; i < last; i++)
         {
             CGameFont::String& PS = owner.strings[i];
-            wchar_t wsStr[MAX_MB_CHARS];
+            xr_wide_char wsStr[MAX_MB_CHARS];
 
             int len = owner.IsMultibyte() ? mbhMulti2Wide(wsStr, nullptr, MAX_MB_CHARS, PS.string) : xr_strlen(PS.string);
 
@@ -107,44 +111,60 @@ void dxFontRender::OnRender(CGameFont& owner)
                 Y2 -= 0.5f;
 #endif // !USE_DX9
 
-                float tu, tv;
                 for (int j = 0; j < len; j++)
                 {
-                    Fvector l;
-
-                    l = owner.IsMultibyte() ? owner.GetCharTC(wsStr[1 + j]) : owner.GetCharTC((u16)(u8)PS.string[j]);
-
-                    float scw = l.z * g_current_font_scale.x;
-
-                    float fTCWidth = l.z / owner.vTS.x;
-
-                    if (!fis_zero(l.z))
-                    {
-                        //tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
-                        //tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
-                        tu = (l.x / owner.vTS.x);
-                        tv = (l.y / owner.vTS.y);
-#ifdef USE_DX9
-                        //  Make half pixel offset for 1 to 1 mapping
-                        tu += (0.5f / owner.vTS.x);
-                        tv += (0.5f / owner.vTS.y);
-#endif // USE_DX9
-
-                        v->set(X, Y2, clr2, tu, tv + owner.fTCHeight);
-                        v++;
-                        v->set(X, Y, clr, tu, tv);
-                        v++;
-                        v->set(X + scw, Y2, clr2, tu + fTCWidth, tv + owner.fTCHeight);
-                        v++;
-                        v->set(X + scw, Y, clr, tu + fTCWidth, tv);
-                        v++;
-                    }
-                    X += scw * owner.vInterval.x;
                     if (owner.IsMultibyte())
                     {
-                        X -= 2;
-                        if (IsNeedSpaceCharacter(wsStr[1 + j]))
-                            X += owner.fXStep;
+                        if (wsStr[1 + j] == GAME_ACTION_MARK)
+                        {
+                            static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+                            ++j;
+                            const EGameActions actionId = static_cast<EGameActions>(wsStr[1 + j]);
+
+                            cpcstr binding = GetActionBinding(actionId);
+
+                            const size_t sz = xr_strlen(binding);
+                            xr_wide_char* wideBinding = static_cast<xr_wide_char*>(xr_alloca(sz));
+                            mbhMulti2Wide(wideBinding, nullptr, sz, binding);
+                            ++wideBinding;
+
+                            while (wideBinding[0])
+                            {
+                                const Fvector l = owner.GetCharTC(wideBinding[0]);
+                                X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
+                                ++wideBinding;
+                            }
+                        }
+                        else
+                        {
+                            const Fvector l = owner.GetCharTC(wsStr[1 + j]);
+                            X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
+                            if (IsNeedSpaceCharacter(wsStr[1 + j]))
+                                X += owner.fXStep;
+                        }
+                    }
+                    else
+                    {
+                        if (PS.string[j] == GAME_ACTION_MARK)
+                        {
+                            static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+                            ++j;
+                            const EGameActions actionId = static_cast<EGameActions>(PS.string[j]);
+
+                            pcstr binding = GetActionBinding(actionId);
+
+                            while (binding[0])
+                            {
+                                const Fvector l = owner.GetCharTC((u16)(u8)binding[0]);
+                                X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
+                                ++binding;
+                            }
+                        }
+                        else
+                        {
+                            const Fvector l = owner.GetCharTC((u16)(u8)PS.string[j]);
+                            X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
+                        }
                     }
                 }
             }
@@ -159,4 +179,35 @@ void dxFontRender::OnRender(CGameFont& owner)
             RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
         }
     }
+}
+
+ICF float dxFontRender::ProcessSymbol(const CGameFont& owner, FVF::TL*& v, float X, float Y, float Y2, u32 clr, u32 clr2, const Fvector l)
+{
+    const float scw = l.z * g_current_font_scale.x;
+
+    const float fTCWidth = l.z / owner.vTS.x;
+
+    if (!fis_zero(l.z))
+    {
+        //tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
+        //tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
+        float tu = (l.x / owner.vTS.x);
+        float tv = (l.y / owner.vTS.y);
+#ifdef USE_DX9
+        //  Make half pixel offset for 1 to 1 mapping
+        tu += (0.5f / owner.vTS.x);
+        tv += (0.5f / owner.vTS.y);
+#endif // USE_DX9
+
+        v->set(X, Y2, clr2, tu, tv + owner.fTCHeight);
+        v++;
+        v->set(X, Y, clr, tu, tv);
+        v++;
+        v->set(X + scw, Y2, clr2, tu + fTCWidth, tv + owner.fTCHeight);
+        v++;
+        v->set(X + scw, Y, clr, tu + fTCWidth, tv);
+        v++;
+    }
+
+    return scw * owner.vInterval.x;
 }

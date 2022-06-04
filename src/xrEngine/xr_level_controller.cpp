@@ -13,6 +13,14 @@ constexpr size_t bindings_count = kLASTACTION;
 ENGINE_API key_binding g_key_bindings[bindings_count];
 ENGINE_API EKeyGroup g_current_keygroup = _sp;
 
+struct action_binding_desc
+{
+    string128 keyboard_mouse;
+    string128 controller;
+};
+
+static action_binding_desc g_action_bindings[bindings_count];
+
 // clang-format off
 game_action actions[] = {
     { "look_around",       kLOOK_AROUND,       _both }, // gamepad
@@ -500,6 +508,35 @@ void initialize_bindings()
         g_key_bindings[idx].m_action = &actions[idx];
 }
 
+static void TranslateBinding(key_binding& keyBinding, action_binding_desc& actionBinding)
+{
+    // Keyboard & mouse
+    if (keyBinding.m_keyboard[0] || keyBinding.m_keyboard[1])
+    {
+        const auto& prim = keyBinding.m_keyboard[0];
+        const auto& sec  = keyBinding.m_keyboard[1];
+
+        strconcat(actionBinding.keyboard_mouse,
+                  prim        ? prim->key_local_name.c_str() : "",
+                  sec && prim ? ", "                         : "",
+                  sec         ? sec->key_local_name.c_str()  : "");
+    }
+    else
+    {
+        xr_strcpy(actionBinding.keyboard_mouse, StringTable().translate("st_key_notbinded").c_str());
+    }
+
+    // Gamepad
+    if (keyBinding.m_keyboard[2])
+    {
+        xr_strcpy(actionBinding.controller, keyBinding.m_keyboard[2]->key_local_name.c_str());
+    }
+    else
+    {
+        xr_strcpy(actionBinding.controller, StringTable().translate("st_key_notbinded").c_str());
+    }
+}
+
 static void RemapKeys()
 {
     string128 buff;
@@ -520,6 +557,11 @@ static void RemapKeys()
         }
 
         // Msg("[%s]-[%s]", kb.key_name, kb.key_local_name.c_str());
+    }
+
+    for (size_t i = 0; i < bindings_count; ++i)
+    {
+        TranslateBinding(g_key_bindings[i], g_action_bindings[i]);
     }
 }
 
@@ -663,47 +705,20 @@ EGameActions GetBindedAction(int dik)
     return kNOTBINDED;
 }
 
-bool GetActionAllBinding(pcstr action, char* dst_buff, int dst_buff_sz)
+ENGINE_API pcstr GetActionBinding(EGameActions action)
 {
-    const int action_id = ActionNameToId(action);
-    if (action_id == kNOTBINDED)
-    {
-        // Just insert the unknown action name as is
-        xr_strcpy(dst_buff, dst_buff_sz, action);
-        return false;
-    }
-    key_binding* binding = &g_key_bindings[action_id];
+    auto& binding = g_action_bindings[action];
 
-    string128 prim;
-    string128 sec;
-    string128 gpad;
-    prim[0] = 0;
-    sec[0] = 0;
-    gpad[0] = 0;
-
-    if (binding->m_keyboard[0])
+    switch (pInput->GetCurrentInputType())
     {
-        xr_strcpy(prim, binding->m_keyboard[0]->key_local_name.c_str());
+    default:
+        NODEFAULT;
+        [[fallthrough]];
+    case CInput::KeyboardMouse:
+        return binding.keyboard_mouse;
+    case CInput::Controller:
+        return binding.controller;
     }
-    if (binding->m_keyboard[1])
-    {
-        xr_strcpy(sec, binding->m_keyboard[1]->key_local_name.c_str());
-    }
-    if (binding->m_keyboard[2] && pInput->IsControllerAvailable())
-    {
-        xr_strcpy(gpad, binding->m_keyboard[2]->key_local_name.c_str());
-    }
-    if (!binding->m_keyboard[0] && !binding->m_keyboard[1] && !binding->m_keyboard[2])
-    {
-        xr_strcpy(dst_buff, dst_buff_sz, StringTable().translate("st_key_notbinded").c_str());
-    }
-    else
-    {
-        strconcat(dst_buff_sz, dst_buff, prim,
-            sec[0] && prim[0] ? ", " : "", sec,
-            (gpad[0] && prim[0] || gpad[0] && sec[0]) ? ", " : "", gpad);
-    }
-    return true;
 }
 
 static class KeyMapWatcher final : public pureKeyMapChanged
@@ -723,7 +738,6 @@ public:
     void OnKeyMapChanged() override
     {
         RemapKeys();
-        CStringTable::ReparseKeyBindings();
     }
 } s_keymap_watcher;
 
@@ -773,22 +787,20 @@ public:
 
         currBinding->m_keyboard[m_workIdx] = keyboard;
 
+        for (int idx = 0; idx < bindings_count; ++idx)
         {
-            for (int idx = 0; idx < bindings_count; ++idx)
-            {
-                key_binding* binding = &g_key_bindings[idx];
-                if (binding == currBinding)
-                    continue;
+            key_binding* binding = &g_key_bindings[idx];
+            if (binding == currBinding)
+                continue;
 
-                bool isConflict = !IsGroupNotConflicted(binding->m_action->key_group, currBinding->m_action->key_group);
+            bool isConflict = !IsGroupNotConflicted(binding->m_action->key_group, currBinding->m_action->key_group);
 
-                for (u8 i = 0; i < bindtypes_count; ++i)
-                    if (binding->m_keyboard[i] == keyboard && isConflict)
-                        binding->m_keyboard[i] = nullptr;
-            }
+            for (u8 i = 0; i < bindtypes_count; ++i)
+                if (binding->m_keyboard[i] == keyboard && isConflict)
+                    binding->m_keyboard[i] = nullptr;
         }
 
-        CStringTable::ReparseKeyBindings();
+        TranslateBinding(g_key_bindings[actionId], g_action_bindings[actionId]);
     }
 
     virtual void Save(IWriter* f)
@@ -817,8 +829,7 @@ public:
         int actionId = ActionNameToId(args);
         key_binding* binding = &g_key_bindings[actionId];
         binding->m_keyboard[m_workIdx] = nullptr;
-
-        CStringTable::ReparseKeyBindings();
+        TranslateBinding(g_key_bindings[actionId], g_action_bindings[actionId]);
     }
 };
 
@@ -851,6 +862,8 @@ public:
             key_binding* binding = &g_key_bindings[idx];
             for (u8 i = 0; i < bindtypes_count; ++i)
                 binding->m_keyboard[i] = nullptr;
+
+            TranslateBinding(g_key_bindings[idx], g_action_bindings[idx]);
         }
         g_consoleBindCmds.clear();
     }
@@ -886,9 +899,9 @@ class CCC_DefControls : public CCC_UnBindAll
         { kACTIVE_JOBS,         { SDL_SCANCODE_P,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
 
         { kQUICK_USE_1,         { SDL_SCANCODE_F1,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_UP } },
-        { kQUICK_USE_2,         { SDL_SCANCODE_F2,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
-        { kQUICK_USE_3,         { SDL_SCANCODE_F3,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_DOWN } },
-        { kQUICK_USE_4,         { SDL_SCANCODE_F4,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_LEFT } },
+        { kQUICK_USE_2,         { SDL_SCANCODE_F2,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_LEFT } },
+        { kQUICK_USE_3,         { SDL_SCANCODE_F3,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
+        { kQUICK_USE_4,         { SDL_SCANCODE_F4,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_DOWN } },
     };
 
 public:
@@ -912,6 +925,8 @@ public:
                 if (!binding.m_keyboard[i])
                     binding.m_keyboard[i] = DikToPtr(keys[i], true);
             }
+
+            TranslateBinding(binding, g_action_bindings[action]);
         }
     }
 };

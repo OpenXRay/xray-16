@@ -59,7 +59,7 @@ public:
     virtual void SetInterval(const Fvector2& v) override { vInterval.set(v); };
     virtual void SetAligment(EAligment aligment) override { eCurrentAlignment = aligment; }
     virtual float SizeOf_(pcstr s) override;
-    virtual float SizeOf_(const wchar_t* wsStr) override;
+    virtual float SizeOf_(const xr_wide_char* wsStr) override;
     virtual float SizeOf_(const char cChar); // only ANSII
     virtual float CurrentHeight_() override;
     virtual void OutSetI(float x, float y) override;
@@ -68,6 +68,7 @@ public:
     virtual void MasterOut(bool bCheckDevice, bool bUseCoords, bool bScaleCoords, bool bUseSkip, float _x, float _y,
         float _skip, pcstr fmt, va_list p) override;
     virtual u32 smart_strlen(pcstr S) override;
+    virtual u32 get_actions_text_length(pcstr s) override;
     virtual bool IsMultibyte() const override { return (uFlags & fsMultibyte); };
     virtual u16 SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, pcstr pszText) override;
     virtual u16 GetCutLengthPos(float fTargetWidth, pcstr pszText) override;

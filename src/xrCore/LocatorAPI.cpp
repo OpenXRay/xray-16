@@ -159,7 +159,7 @@ XRCORE_API void _dump_open_files(int mode)
     Log("----total count = ", g_open_files.size());
 }
 
-CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
+CLocatorAPI::CLocatorAPI() :
 #ifdef CONFIG_PROFILE_LOCKS
     m_auth_lock(xr_new<Lock>(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock)))
 #else
@@ -415,8 +415,6 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
             int count = sscanf(read_path.c_str(), "%[^\\]s", alias_name);
             R_ASSERT2(count == 1, read_path.c_str());
-
-            auto P = m_paths.find(alias_name);
 
             FS_Path* root = nullptr;
             if (get_path("$fs_root$", &root))
@@ -895,7 +893,6 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     m_Flags.set(flags, true);
 
     // scan root directory
-    bNoRecurse = true;
     string4096 buf;
 
     // append application path
@@ -1046,7 +1043,6 @@ FileStatus CLocatorAPI::exist(pcstr fn, FSType fsType /*= FSType::Virtual*/)
     if ((fsType | FSType::External) == FSType::External)
     {
         struct stat buffer;
-        buffer.st_size;
         return FileStatus(stat(fn, &buffer) == 0, true);
     }
     return FileStatus(false, false);

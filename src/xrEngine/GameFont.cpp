@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "GameFont.h"
+#include "xr_level_controller.h"
 #include "xrCore/Text/StringConversion.hpp"
 #ifndef _EDITOR
 #include "Render.h"
@@ -193,6 +194,27 @@ void CGameFont::OutSet(float x, float y)
 
 void CGameFont::OutSetI(float x, float y) { OutSet(DI2PX(x), DI2PY(y)); }
 u32 CGameFont::smart_strlen(pcstr S) { return (IsMultibyte() ? mbhMulti2Wide(NULL, NULL, 0, S) : xr_strlen(S)); }
+
+u32 CGameFont::get_actions_text_length(pcstr s)
+{
+    u32 length = 0;
+
+    while (s[0])
+    {
+        if (s[0] == GAME_ACTION_MARK)
+        {
+            static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+            ++s;
+            const EGameActions actionId = static_cast<EGameActions>(s[0]);
+
+            cpcstr binding = GetActionBinding(actionId);
+            length += xr_strlen(binding);
+        }
+        ++s;
+    }
+    return length;
+}
+
 void CGameFont::OnRender()
 {
     pFontRender->OnRender(*this);
@@ -203,7 +225,7 @@ u16 CGameFont::GetCutLengthPos(float fTargetWidth, pcstr pszText)
 {
     VERIFY(pszText);
 
-    wchar_t wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
+    xr_wide_char wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
     float fCurWidth = 0.0f, fDelta = 0.0f;
 
     u16 len = mbhMulti2Wide(wsStr, wsPos, MAX_MB_CHARS, pszText);
@@ -229,7 +251,7 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
 {
     VERIFY(puBuffer && uBufferSize && pszText);
 
-    wchar_t wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
+    xr_wide_char wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
     float fCurWidth = 0.0f, fDelta = 0.0f;
     u16 nLines = 0;
 
@@ -330,23 +352,42 @@ float CGameFont::SizeOf_(pcstr s)
 
     if (IsMultibyte())
     {
-        wchar_t wsStr[MAX_MB_CHARS];
+        xr_wide_char wsStr[MAX_MB_CHARS];
 
         mbhMulti2Wide(wsStr, NULL, MAX_MB_CHARS, s);
 
         return SizeOf_(wsStr);
     }
 
-    int len = xr_strlen(s);
+    const size_t len = xr_strlen(s);
     float X = 0;
     if (len)
-        for (int j = 0; j < len; j++)
-            X += GetCharTC((u16)(u8)s[j]).z;
+    {
+        for (size_t j = 0; j < len; j++)
+        {
+            if (s[j] == GAME_ACTION_MARK)
+            {
+                static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+                ++j;
+                const EGameActions actionId = static_cast<EGameActions>(s[j]);
 
+                pcstr binding = GetActionBinding(actionId);
+                while (binding[0])
+                {
+                    X += GetCharTC((u16)(u8)binding[0]).z;
+                    ++binding;
+                }
+            }
+            else
+            {
+                X += GetCharTC((u16)(u8)s[j]).z;
+            }
+        }
+    }
     return (X * vInterval.x);
 }
 
-float CGameFont::SizeOf_(const wchar_t* wsStr)
+float CGameFont::SizeOf_(const xr_wide_char* wsStr)
 {
     if (!(wsStr && wsStr[0]))
         return 0;
@@ -355,14 +396,37 @@ float CGameFont::SizeOf_(const wchar_t* wsStr)
     float X = 0.0f, fDelta = 0.0f;
 
     if (len)
+    {
         for (unsigned int j = 1; j <= len; j++)
         {
-            fDelta = GetCharTC(wsStr[j]).z - 2;
-            if (IsNeedSpaceCharacter(wsStr[j]))
-                fDelta += fXStep;
-            X += fDelta;
-        }
+            if (wsStr[j] == GAME_ACTION_MARK)
+            {
+                static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+                ++j;
+                const EGameActions actionId = static_cast<EGameActions>(wsStr[j]);
 
+                cpcstr binding = GetActionBinding(actionId);
+
+                const size_t sz = xr_strlen(binding);
+                xr_wide_char* wideBinding = static_cast<xr_wide_char*>(xr_alloca(sz));
+                mbhMulti2Wide(wideBinding, nullptr, sz, binding);
+                ++wideBinding;
+
+                while (wideBinding[0])
+                {
+                    X += GetCharTC(wideBinding[0]).z - 2;
+                    ++wideBinding;
+                }
+            }
+            else
+            {
+                fDelta = GetCharTC(wsStr[j]).z - 2;
+                if (IsNeedSpaceCharacter(wsStr[j]))
+                    fDelta += fXStep;
+                X += fDelta;
+            }
+        }
+    }
     return (X * vInterval.x);
 }
 
