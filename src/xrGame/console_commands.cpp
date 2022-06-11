@@ -75,6 +75,8 @@ ENGINE_API
 extern float psHUD_FOV;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
+extern int psLUA_GCTIMEOUT;
+extern u32 ps_lua_gc_method;
 extern int g_auto_ammo_unload;
 
 extern int x_m_x;
@@ -145,6 +147,15 @@ Flags32 g_uCommonFlags;
 enum E_COMMON_FLAGS
 {
     flAiUseTorchDynamicLights = 1
+};
+
+const xr_token lua_gc_method_token[] =
+{
+    { "gc_disable", 0 },
+    { "gc_step", 1 },
+    { "gc_timeout", 2 },
+    { "gc_full", 3 },
+    { nullptr, -1 }
 };
 
 CUIOptConCom g_OptConCom;
@@ -1452,6 +1463,35 @@ public:
 
 #endif // MASTER_GOLD
 
+class CCC_LuaGCMethod : public CCC_Token
+{
+public:
+    CCC_LuaGCMethod(pcstr name) : CCC_Token(name, &ps_lua_gc_method, lua_gc_method_token) {}
+
+    void Execute(pcstr args) override
+    {
+        const auto prev = *value;
+        CCC_Token::Execute(args);
+
+        switch (*value)
+        {
+        case 0:
+            lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTOP, 0);
+            break;
+        case 1:
+        case 2:
+            if (prev == 0)
+                lua_gc(GEnv.ScriptEngine->lua(), LUA_GCRESTART, 0);
+            break;
+        case 3:
+            // Perform a full garbage collection cycle and return to previous strategy.
+            lua_gc(GEnv.ScriptEngine->lua(), LUA_GCCOLLECT, 0);
+            *value = prev;
+            break;
+        }
+    }
+};
+
 #include "GamePersistent.h"
 
 class CCC_MainMenu : public IConsole_Command
@@ -2077,8 +2117,11 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "lua_debug", &g_LuaDebug, 1);
 #endif // MASTER_GOLD
 
-#ifdef DEBUG
+    CMD1(CCC_LuaGCMethod, "lua_gc_method");
     CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);
+    CMD4(CCC_Integer, "lua_gc_timeout", &psLUA_GCTIMEOUT, 1000, 16000);
+
+#ifdef DEBUG
     CMD3(CCC_Mask, "ai_debug", &psAI_Flags, aiDebug);
     CMD3(CCC_Mask, "ai_dbg_brain", &psAI_Flags, aiBrain);
     CMD3(CCC_Mask, "ai_dbg_motion", &psAI_Flags, aiMotion);
