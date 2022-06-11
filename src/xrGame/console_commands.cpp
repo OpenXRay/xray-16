@@ -75,6 +75,8 @@ ENGINE_API
 extern float psHUD_FOV;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
+extern int psLUA_GCTIMEOUT;
+extern u32 ps_lua_gc_method;
 extern int g_auto_ammo_unload;
 
 extern int x_m_x;
@@ -150,6 +152,15 @@ enum E_COMMON_FLAGS
 };
 
 CUIOptConCom g_OptConCom;
+
+const xr_token lua_gc_method_token[] =
+{
+    { "gc_disable", 0 },
+    { "gc_step", 1 },
+    { "gc_timeout", 2 },
+    { "gc_full", 3 },
+    { nullptr, 2 }
+};
 
 static void full_memory_stats()
 {
@@ -2002,8 +2013,11 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "lua_debug", &g_LuaDebug, 1);
 #endif // MASTER_GOLD
 
-#ifdef DEBUG
+    //TODO Перед мерджем спрятать обратно под дебаг!!!
+    CMD3(CCC_Token, "lua_gc_method", &ps_lua_gc_method, lua_gc_method_token);
     CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);
+    CMD4(CCC_Integer, "lua_gc_timeout", &psLUA_GCTIMEOUT, 1000, 16000);
+#ifdef DEBUG
     CMD3(CCC_Mask, "ai_debug", &psAI_Flags, aiDebug);
     CMD3(CCC_Mask, "ai_dbg_brain", &psAI_Flags, aiBrain);
     CMD3(CCC_Mask, "ai_dbg_motion", &psAI_Flags, aiMotion);

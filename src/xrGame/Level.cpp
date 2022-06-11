@@ -559,10 +559,8 @@ void CLevel::OnFrame()
         }
         else
             m_level_sound_manager->Update();
-    }
-    // defer LUA-GC-STEP
-    if (!GEnv.isDedicatedServer)
-    {
+
+        // defer LUA-GC-STEP
         if (g_mt_config.test(mtLUA_GC))
         {
             Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
@@ -580,7 +578,37 @@ void CLevel::OnFrame()
 }
 
 int psLUA_GCSTEP = 100; // 10
-void CLevel::script_gc() { lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTEP, psLUA_GCSTEP); }
+int psLUA_GCTIMEOUT = 1000;
+
+u32 ps_lua_gc_method = 2;
+
+void CLevel::script_gc()
+{
+    AIStats.LuaGC.Begin();
+
+    switch (ps_lua_gc_method)
+    {
+    case 0:
+        lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTOP, 0);
+        break;
+    case 1:
+        lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTEP, psLUA_GCSTEP);
+        break;
+    case 2:
+        lua_gc(GEnv.ScriptEngine->lua(), LUA_GCTIMEOUT, psLUA_GCTIMEOUT);
+        break;
+    case 3:
+    {
+        lua_gc(GEnv.ScriptEngine->lua(), LUA_GCCOLLECT, 0); // Perform a full garbage collection cycle and return to the default strategy.
+        ps_lua_gc_method = 2;
+        break;
+    }
+    default:
+        break;
+    }
+
+    AIStats.LuaGC.End();
+}
 #ifdef DEBUG_PRECISE_PATH
 void test_precise_path();
 #endif
@@ -780,6 +808,7 @@ void CLevel::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("AI vision:    %2.2fms, %d", AIStats.Vis.result, AIStats.Vis.count);
     font.OutNext("- query:      %2.2fms", AIStats.VisQuery.result);
     font.OutNext("- rayCast:    %2.2fms", AIStats.VisRayTests.result);
+    font.OutNext("LUA mem:      %d Kb, %2.2fms", lua_gc(GEnv.ScriptEngine->lua(), LUA_GCCOUNT, 0), AIStats.LuaGC.result);
     AIStats.FrameStart();
 }
 
