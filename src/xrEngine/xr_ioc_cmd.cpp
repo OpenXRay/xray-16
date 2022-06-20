@@ -4,9 +4,7 @@
 #include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 
 #include "CameraManager.h"
 #include "Environment.h"
@@ -32,10 +30,8 @@ void IConsole_Command::InvalidSyntax()
     Msg("~ Invalid syntax in call to '%s'", cName);
     Msg("~ Valid arguments: %s", I);
 
-#if !defined(XR_PLATFORM_LINUX)
     g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
     g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
-#endif
 }
 
 //-----------------------------------------------------------------------

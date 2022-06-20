@@ -6,13 +6,6 @@
 
 xrSASH ENGINE_API g_SASH;
 
-xrSASH::xrSASH()
-    : m_bInited(false), m_bOpenAutomate(false), m_bBenchmarkRunning(false), m_bRunning(false), m_bReinitEngine(false),
-      m_bExecutingConsoleCommand(false)
-{
-    ;
-}
-
 xrSASH::~xrSASH()
 {
     VERIFY(!m_bRunning);
@@ -21,6 +14,7 @@ xrSASH::~xrSASH()
 
 bool xrSASH::Init(const char* pszParam)
 {
+#ifdef XR_PLATFORM_WINDOWS
     oaVersion ver;
     oaBool res = oaInit(pszParam, &ver);
     if (res)
@@ -33,6 +27,7 @@ bool xrSASH::Init(const char* pszParam)
         return true;
     }
     else
+#endif
     {
         m_bInited = true;
         xr_strcpy(m_strBenchCfgName, pszParam);
@@ -47,11 +42,13 @@ void xrSASH::MainLoop()
     m_bRunning = true;
     m_bReinitEngine = false;
 
+#ifdef XR_PLATFORM_WINDOWS
     if (m_bOpenAutomate)
     {
         LoopOA();
     }
     else
+#endif
     {
         // Native benchmarks
         LoopNative();
@@ -60,6 +57,7 @@ void xrSASH::MainLoop()
     m_bRunning = false;
 }
 
+#ifdef XR_PLATFORM_WINDOWS
 void xrSASH::LoopOA()
 {
     oaCommand Command;
@@ -110,6 +108,7 @@ void xrSASH::LoopOA()
         }
     }
 }
+#endif
 
 void xrSASH::LoopNative()
 {
@@ -220,7 +219,9 @@ void xrSASH::StartBenchmark()
     VERIFY(!m_bBenchmarkRunning);
 
     m_bBenchmarkRunning = true;
+#ifdef XR_PLATFORM_WINDOWS
     oaStartBenchmark();
+#endif
 
     if (!m_bOpenAutomate)
     {
@@ -236,7 +237,9 @@ void xrSASH::DisplayFrame(float t)
         return;
 
     VERIFY(m_bBenchmarkRunning);
+#ifdef XR_PLATFORM_WINDOWS
     oaDisplayFrame(t);
+#endif
 
     if (!m_bOpenAutomate)
     {
@@ -253,7 +256,9 @@ void xrSASH::EndBenchmark()
     VERIFY(m_bBenchmarkRunning);
 
     m_bBenchmarkRunning = false;
+#ifdef XR_PLATFORM_WINDOWS
     oaEndBenchmark();
+#endif
 }
 
 void InitInput();
@@ -263,6 +268,7 @@ void InitSound();
 void destroySound();
 void destroyEngine();
 
+#ifdef XR_PLATFORM_WINDOWS
 void xrSASH::GetAllOptions()
 {
     Msg("SASH:: GetAllOptions.");
@@ -431,6 +437,7 @@ void xrSASH::GetBenchmarks()
         // sashAddBenchmark(TEXT("map1"));
     }
 }
+#endif
 
 void Startup();
 
@@ -518,6 +525,7 @@ void xrSASH::ReleaseEngine()
     destroyEngine();
 }
 
+#ifdef XR_PLATFORM_WINDOWS
 oaOptionDataType xrSASH::GetOptionType(pcstr pszOptionName)
 {
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
@@ -738,9 +746,11 @@ void xrSASH::Message(oaErrorType MessageType, const char* pszMsg, va_list& mark)
     if (sz)
         Message(MessageType, buf);
 }
+#endif
 
 void xrSASH::OnConsoleInvalidSyntax(bool bLastLine, const char* pszMsg, ...)
 {
+#ifdef XR_PLATFORM_WINDOWS
     if (m_bInited && m_bExecutingConsoleCommand)
     {
         va_list mark;
@@ -753,4 +763,5 @@ void xrSASH::OnConsoleInvalidSyntax(bool bLastLine, const char* pszMsg, ...)
 
         va_end(mark);
     }
+#endif
 }

@@ -22,9 +22,7 @@
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "xr_ioc_cmd.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
@@ -307,27 +305,26 @@ ENGINE_API void Startup()
 
     // Main cycle
     Device.Run();
+
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
     xr_delete(g_SpatialSpace);
     DEL_INSTANCE(g_pGamePersistent);
     xr_delete(pApp);
     Engine.Event.Dump();
+
     // Destroying
     destroyInput();
-#if !defined(XR_PLATFORM_LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
-#endif
         destroySettings();
+
     LALib.OnDestroy();
-#if !defined(XR_PLATFORM_LINUX)
+
     if (!g_bBenchmark && !g_SASH.IsRunning())
-#endif
         destroyConsole();
-#if !defined(XR_PLATFORM_LINUX)
     else
         Console->Destroy();
-#endif
+
     Device.CleanupVideoModes();
     destroyEngine();
     destroySound();
@@ -400,10 +397,10 @@ bool CheckBenchmark()
         const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-#if !defined(XR_PLATFORM_LINUX)
-        g_SASH.Init(sashArg);
-        g_SASH.MainLoop();
-#endif
+
+        if (g_SASH.Init(sashArg))
+            g_SASH.MainLoop();
+
         return true;
     }
 

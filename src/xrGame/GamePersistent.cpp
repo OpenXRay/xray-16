@@ -509,16 +509,10 @@ void CGamePersistent::WeathersUpdate()
 
 bool allow_intro()
 {
-#if defined(XR_PLATFORM_WINDOWS)
     if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
-#else
-    if (0 != strstr(Core.Params, "-nointro"))
-#endif
-    {
         return false;
-    }
-    else
-        return true;
+
+    return true;
 }
 
 bool allow_game_intro()
