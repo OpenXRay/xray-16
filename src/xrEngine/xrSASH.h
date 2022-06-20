@@ -46,8 +46,9 @@ private:
     void GetCurrentOptions();
     void SetOptions();
     void GetBenchmarks();
-    void RunBenchmark(pcstr pszName);
 #endif
+
+    void RunBenchmark(pcstr pszName);
 
     // Effectively restores/releases some engine systems
     void TryInitEngine(bool bNoRun = true);
