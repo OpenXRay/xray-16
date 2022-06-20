@@ -88,8 +88,6 @@ set(SRC_FILES
     "xrDebug.cpp"
     "xrDebug.h"
     "xrDebug_macros.h"
-    "xr_cpuid.cpp"
-    "xr_cpuid.h"
     "xr_ini.cpp"
     "xr_ini.h"
     "xrMemory.cpp"

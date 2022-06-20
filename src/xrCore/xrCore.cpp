@@ -289,7 +289,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
-        R_ASSERT(CPU::ID.hasFeature(CpuFeature::SSE));
+        R_ASSERT(SDL_HasSSE());
 #endif
         TaskScheduler = xr_make_unique<TaskManager>();
         XRay::Math::Initialize();

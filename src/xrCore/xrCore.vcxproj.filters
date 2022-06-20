@@ -7,9 +7,6 @@
     <Filter Include="Math">
       <UniqueIdentifier>{2770a42d-bbc5-4a1e-acfc-6275c24b532b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math\CPU">
-      <UniqueIdentifier>{27e2c42a-a9d4-4a05-b1fd-c44c39804452}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math\STLext">
       <UniqueIdentifier>{cdb135d6-3d5a-4e89-bf80-091de3bd6ac4}</UniqueIdentifier>
     </Filter>
@@ -146,9 +143,6 @@
     </ClCompile>
     <ClCompile Include="dump_string.cpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_cpuid.cpp">
-      <Filter>Math\CPU</Filter>
     </ClCompile>
     <ClCompile Include="_std_extensions.cpp">
       <Filter>Math\Extensions</Filter>
@@ -433,9 +427,6 @@
     </ClInclude>
     <ClInclude Include="vector.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="xr_cpuid.h">
-      <Filter>Math\CPU</Filter>
     </ClInclude>
     <ClInclude Include="FixedVector.h">
       <Filter>Math\STLext</Filter>

@@ -3,9 +3,7 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
 
-#if defined(XR_COMPILER_MSVC)
-#include <powerbase.h>
-#elif defined(XR_COMPILER_GCC)
+#if defined(XR_COMPILER_GCC)
 #include <float.h> // _controlfp
 #endif
 
@@ -13,7 +11,6 @@
 #ifdef XR_PLATFORM_LINUX
 #include <fpu_control.h>
 #elif defined(XR_PLATFORM_FREEBSD)
-#include <sys/sysctl.h>
 #include <fenv.h>
 typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #define _FPU_GETCW(x) asm volatile ("fnstcw %0" : "=m" ((*&x)))
@@ -24,15 +21,12 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #define _FPU_RC_NEAREST FP_PS
 #define _FPU_DEFAULT FP_PD
 #endif
+// XXX: check if these includes needed
 #include <pthread.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <chrono>
-#include <fstream>
-#include <string>
 #include <stdint.h>
-#include <string.h>
-#include <iostream>
 #endif
 #include <thread>
 #include "SDL.h"
@@ -43,16 +37,6 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #define _FPU_SINGLE 0
 #define _FPU_RC_NEAREST 0
 #endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
-
-typedef struct _PROCESSOR_POWER_INFORMATION
-{
-    u32 Number;
-    u32 MaxMhz;
-    u32 CurrentMhz;
-    u32 MhzLimit;
-    u32 MaxIdleState;
-    u32 CurrentIdleState;
-} PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
 
 // Initialized on startup
 XRCORE_API Fmatrix Fidentity;
@@ -185,8 +169,6 @@ XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
 XRCORE_API u32 qpc_counter = 0;
 
-XRCORE_API processor_info ID;
-
 XRCORE_API u64 QPC() noexcept
 {
     u64 _dest = SDL_GetPerformanceCounter();
@@ -198,137 +180,41 @@ XRCORE_API u32 GetTicks()
 {
     return SDL_GetTicks();
 }
-
-XRCORE_API u32 GetCurrentCPU()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-    return GetCurrentProcessorNumber();
-#elif defined(XR_PLATFORM_LINUX)
-    return static_cast<u32>(sched_getcpu());
-#else
-    return 0;
-#endif
-}
 } // namespace CPU
 
 bool g_initialize_cpu_called = false;
-
-#if defined(XR_PLATFORM_LINUX)
-u32 cpufreq()
-{
-    std::ifstream cpuMaxFreq("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
-    if (cpuMaxFreq.is_open())
-    {
-        xr_string parcedFreq;
-        std::getline(cpuMaxFreq, parcedFreq);
-        u32 cpuFreq = atoi(parcedFreq.c_str()) / 1000;
-        if (cpuFreq > 0)
-            return cpuFreq;
-    }
-
-    u32 cpuFreq{};
-
-    // CPU frequency is stored in /proc/cpuinfo in lines beginning with "cpu MHz"
-    std::ifstream ifs("/proc/cpuinfo");
-    if (ifs.is_open())
-    {
-        xr_string line;
-        while (ifs.good())
-        {
-            std::getline(ifs, line);
-
-            const int result = sscanf(line.c_str(), "cpu MHz : %u", &cpuFreq);
-            if (result == 0)
-                continue;
-
-            // success or failure
-            break;
-        }
-    }
-
-    return cpuFreq;
-}
-#elif defined(XR_PLATFORM_FREEBSD)
-u32 cpufreq()
-{
-    u32 cpuFreq = 0;
-    size_t cpuFreqSz = sizeof(cpuFreq);
-
-    sysctlbyname("dev.cpu.0.freq", &cpuFreq, &cpuFreqSz, nullptr, 0);
-    return cpuFreq;
-}
-#else
-ICF u32 cpufreq()
-{
-    return 0;
-}
-#endif // #ifdef XR_PLATFORM_LINUX
 
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
 {
     // General CPU identification
-    if (!query_processor_info(&CPU::ID))
-        Log("! Can't detect CPU/FPU.");
+    string256 features{};
 
-    Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, 'rdtsc'", CPU::ID.modelName,
-        +CPU::ID.vendor, CPU::ID.family, CPU::ID.model, CPU::ID.stepping);
-
-    string256 features;
-    xr_strcpy(features, sizeof(features), "RDTSC");
-
-    if (CPU::ID.hasFeature(CpuFeature::InvariantTSC))
-        xr_strcat(features, ", Invariant TSC");
-    if (CPU::ID.hasFeature(CpuFeature::MMX))
-        xr_strcat(features, ", MMX");
-    if (CPU::ID.hasFeature(CpuFeature::AltiVec))
-        xr_strcat(features, ", AltiVec");
-    if (CPU::ID.hasFeature(CpuFeature::_3DNow))
-        xr_strcat(features, ", 3DNow!");
-    if (CPU::ID.hasFeature(CpuFeature::SSE))
-        xr_strcat(features, ", SSE");
-    if (CPU::ID.hasFeature(CpuFeature::SSE2))
-        xr_strcat(features, ", SSE2");
-    if (CPU::ID.hasFeature(CpuFeature::SSE3))
-        xr_strcat(features, ", SSE3");
-    if (CPU::ID.hasFeature(CpuFeature::MWait))
-        xr_strcat(features, ", MONITOR/MWAIT");
-    if (CPU::ID.hasFeature(CpuFeature::SSSE3))
-        xr_strcat(features, ", SSSE3");
-    if (CPU::ID.hasFeature(CpuFeature::SSE41))
-        xr_strcat(features, ", SSE4.1");
-    if (CPU::ID.hasFeature(CpuFeature::SSE42))
-        xr_strcat(features, ", SSE4.2");
-    if (CPU::ID.hasFeature(CpuFeature::HyperThreading))
-        xr_strcat(features, ", HTT");
-    if (CPU::ID.hasFeature(CpuFeature::AVX))
-        xr_strcat(features, ", AVX");
-    if (CPU::ID.hasFeature(CpuFeature::AVX2))
-        xr_strcat(features, ", AVX2");
+    const auto listFeature = [&](pcstr featureName, bool hasFeature)
+    {
+        if (hasFeature)
+        {
+            if (!features[0])
+                xr_strcpy(features, featureName);
+            else
+            {
+                xr_strcat(features, ", ");
+                xr_strcat(features, featureName);
+            }
+        }
+    };
+    listFeature("RDTSC",   SDL_HasRDTSC());
+    listFeature("MMX",     SDL_HasMMX());
+    listFeature("3DNow!",  SDL_Has3DNow());
+    listFeature("SSE",     SDL_HasSSE());
+    listFeature("AVX",     SDL_HasAVX());
+    listFeature("ARMSIMD", SDL_HasARMSIMD());
+    listFeature("NEON",    SDL_HasNEON());
+    listFeature("AltiVec", SDL_HasAltiVec());
 
     Msg("* CPU features: %s", features);
-    Msg("* CPU cores/threads: %d/%d", CPU::ID.n_cores, CPU::ID.n_threads);
+    Msg("* CPU threads: %d", std::thread::hardware_concurrency());
 
-#if defined(XR_PLATFORM_WINDOWS)
-    SYSTEM_INFO sysInfo;
-    GetSystemInfo(&sysInfo);
-    const size_t cpusCount = sysInfo.dwNumberOfProcessors;
-
-    xr_vector<PROCESSOR_POWER_INFORMATION> cpusInfo(cpusCount);
-    CallNtPowerInformation(ProcessorInformation, nullptr, 0, cpusInfo.data(),
-                           sizeof(PROCESSOR_POWER_INFORMATION) * cpusCount);
-
-    for (size_t i = 0; i < cpusInfo.size(); i++)
-    {
-        const PROCESSOR_POWER_INFORMATION& cpuInfo = cpusInfo[i];
-        Msg("* CPU%zu current freq: %lu MHz, max freq: %lu MHz",
-            i, cpuInfo.CurrentMhz, cpuInfo.MaxMhz);
-    }
-#else
-    const auto freq =  cpufreq();
-    if (freq > 0)
-        Msg("* CPU current freq: %u MHz", freq);
-#endif
     Log("");
     Fidentity.identity(); // Identity matrix
     Didentity.identity(); // Identity matrix
@@ -360,7 +246,7 @@ void _initialize_cpu_thread()
     else
         FPU::m24r();
 
-    if (CPU::ID.hasFeature(CpuFeature::SSE))
+    if (SDL_HasSSE())
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
