@@ -112,9 +112,6 @@
     <Filter Include="Compression\lzo">
       <UniqueIdentifier>{c6342a66-65de-47b5-afe5-c51a7383edc0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xrDelegate">
-      <UniqueIdentifier>{b54073c2-213d-456f-b88d-8eeb0dd440b0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Events">
       <UniqueIdentifier>{f17d865f-a3fd-41ac-b217-d7d34ed591f5}</UniqueIdentifier>
     </Filter>
@@ -706,15 +703,6 @@
     </ClInclude>
     <ClInclude Include="Events\Notifier.h">
       <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="xrDelegate\xrDelegate.h">
-      <Filter>xrDelegate</Filter>
-    </ClInclude>
-    <ClInclude Include="xrDelegate\xrDelegateArguments.h">
-      <Filter>xrDelegate</Filter>
-    </ClInclude>
-    <ClInclude Include="xrDelegate\xrDelegateBinder.h">
-      <Filter>xrDelegate</Filter>
     </ClInclude>
     <ClInclude Include="Memory\xalloc.h">
       <Filter>Memory</Filter>
