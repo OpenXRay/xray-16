@@ -208,7 +208,9 @@ void _initialize_cpu()
     listFeature("3DNow!",  SDL_Has3DNow());
     listFeature("SSE",     SDL_HasSSE());
     listFeature("AVX",     SDL_HasAVX());
+#if SDL_VERSION_ATLEAST(2, 0, 12)
     listFeature("ARMSIMD", SDL_HasARMSIMD());
+#endif
     listFeature("NEON",    SDL_HasNEON());
     listFeature("AltiVec", SDL_HasAltiVec());
 
