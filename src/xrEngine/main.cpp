@@ -174,6 +174,7 @@ ENGINE_API void InitInput()
 }
 
 ENGINE_API void destroyInput() { xr_delete(pInput); }
+ENGINE_API void InitSoundDeviceList() { ISoundManager::_create_devices_list(); }
 ENGINE_API void InitSound() { ISoundManager::_create(); }
 ENGINE_API void destroySound() { ISoundManager::_destroy(); }
 ENGINE_API void destroySettings()
@@ -264,6 +265,7 @@ void CheckPrivilegySlowdown()
 
 ENGINE_API void Startup()
 {
+    InitSoundDeviceList();
     execUserScript();
     InitSound();
 

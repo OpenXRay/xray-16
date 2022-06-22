@@ -4,6 +4,8 @@
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
 
+#include "main.h"
+
 xrSASH ENGINE_API g_SASH;
 
 xrSASH::~xrSASH()
@@ -261,13 +263,6 @@ void xrSASH::EndBenchmark()
 #endif
 }
 
-void InitInput();
-void destroyInput();
-void InitEngine();
-void InitSound();
-void destroySound();
-void destroyEngine();
-
 #ifdef XR_PLATFORM_WINDOWS
 void xrSASH::GetAllOptions()
 {
@@ -497,6 +492,9 @@ void xrSASH::TryInitEngine(bool bNoRun)
     InitInput();
 
     Engine.External.Initialize();
+
+    if (bNoRun)
+        InitSoundDeviceList();
 
     Console->Execute("unbindall");
     Console->ExecuteScript(Console->ConfigFile);

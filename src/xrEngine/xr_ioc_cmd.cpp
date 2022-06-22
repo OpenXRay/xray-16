@@ -494,8 +494,7 @@ public:
     CCC_SND_Restart(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(pcstr args)
     {
-        if (GEnv.Sound)
-            GEnv.Sound->_restart();
+        GEnv.Sound->_restart();
     }
 };
 

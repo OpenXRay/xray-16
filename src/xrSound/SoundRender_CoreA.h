@@ -65,6 +65,7 @@ public:
     CSoundRender_CoreA();
     virtual ~CSoundRender_CoreA();
 
+    void _initialize_devices_list() override;
     void _initialize() override;
     void _clear() override;
     void _restart() override;

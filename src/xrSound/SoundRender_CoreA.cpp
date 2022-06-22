@@ -18,6 +18,7 @@ CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
 }
 
 CSoundRender_CoreA::~CSoundRender_CoreA() {}
+
 #if defined(XR_PLATFORM_WINDOWS)
 bool CSoundRender_CoreA::EAXQuerySupport(bool isDeferred, const GUID* guid, u32 prop, void* val, u32 sz)
 {
@@ -72,7 +73,8 @@ bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
 #endif
 
 void CSoundRender_CoreA::_restart() { inherited::_restart(); }
-void CSoundRender_CoreA::_initialize()
+
+void CSoundRender_CoreA::_initialize_devices_list()
 {
     pDeviceList = xr_new<ALDeviceList>();
 
@@ -81,9 +83,16 @@ void CSoundRender_CoreA::_initialize()
         CHECK_OR_EXIT(0, "OpenAL: Can't create sound device.");
         xr_delete(pDeviceList);
     }
+}
+
+void CSoundRender_CoreA::_initialize()
+{
+    R_ASSERT2(pDeviceList, "Incorrect initialization order. Call _initialize_devices_list() first.");
+
     pDeviceList->SelectBestDevice();
     R_ASSERT(snd_device_id >= 0 && snd_device_id < pDeviceList->GetNumDevices());
     const ALDeviceDesc& deviceDesc = pDeviceList->GetDeviceDesc(snd_device_id);
+
     // OpenAL device
     pDevice = alcOpenDevice(deviceDesc.name);
     if (pDevice == nullptr)
@@ -120,6 +129,7 @@ void CSoundRender_CoreA::_initialize()
     Fvector orient[2] = {{0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}};
     A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&orient[0].x));
     A_CHK(alListenerf(AL_GAIN, 1.f));
+
 #if defined(XR_PLATFORM_WINDOWS)
     // Check for EAX extension
     bEAX = deviceDesc.props.eax && !deviceDesc.props.eax_unwanted;
