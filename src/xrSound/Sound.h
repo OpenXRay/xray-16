@@ -170,7 +170,7 @@ protected:
     virtual void _destroy_data(ref_sound_data& S) = 0;
 
 public:
-    virtual ~ISoundManager() {}
+    virtual ~ISoundManager() = default;
     static void _create();
     static void _destroy();
 
@@ -221,7 +221,7 @@ class CSound_UserDataVisitor;
 class CSound_UserData : public xr_resource
 {
 public:
-    virtual ~CSound_UserData() {}
+    virtual ~CSound_UserData() = default;
     virtual void accept(CSound_UserDataVisitor*) = 0;
     virtual void invalidate() = 0;
 };
