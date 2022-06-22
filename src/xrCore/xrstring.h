@@ -214,7 +214,7 @@ IC void xr_strlwr(shared_str& src)
         char* lp = xr_strdup(*src);
 #if defined(XR_PLATFORM_WINDOWS)
         xr_strlwr(lp);
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
         size_t i = 0;
         while(lp[i])
         {

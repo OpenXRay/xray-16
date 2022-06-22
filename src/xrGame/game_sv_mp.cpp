@@ -219,10 +219,10 @@ struct real_sender
     NET_Packet* P;
     u32 flags_to_send;
 
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
-    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = 0)
-#else
+#ifdef XR_PLATFORM_WINDOWS // XXX: remove this ifdef
     real_sender(xrServer* server, NET_Packet* Packet, u32 flags = DPNSEND_GUARANTEED)
+#else
+    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = 0)
 #endif
     {
         server_for_send = server;

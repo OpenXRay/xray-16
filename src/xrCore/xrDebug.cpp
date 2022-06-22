@@ -43,8 +43,14 @@ static BOOL bException = FALSE;
 #include <cxxabi.h>
 #include <dlfcn.h>
 #include <execinfo.h>
+#elif defined(XR_PLATFORM_APPLE)
+#include <sys/types.h>
+#include <sys/ptrace.h>
+#define PTRACE_TRACEME PT_TRACE_ME
+#define PTRACE_DETACH PT_DETACH
 #endif
-#pragma comment(lib, "FaultRep.lib")
+
+#pragma comment(lib, "FaultRep.lib") // XXX: remove
 
 #ifdef DEBUG
 #define USE_OWN_ERROR_MESSAGE_WINDOW
@@ -182,8 +188,10 @@ Lock xrDebug::failLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)

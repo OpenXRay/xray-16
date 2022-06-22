@@ -7,7 +7,7 @@ XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;
 XRCORE_API CInifile const* pSettingsOpenXRay = nullptr;
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 #include <stdint.h>
 #define MSVCRT_EINVAL	22
 #define MSVCRT_ERANGE	34
@@ -456,7 +456,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                 if (!allow_include_func || allow_include_func(fn))
                 {
                     IReader* I = FS.r_open(fn);
-#ifdef XR_PLATFORM_LINUX
+#ifndef XR_PLATFORM_WINDOWS // XXX: replace with runtime check for case-sensitivity
                     if (I == nullptr)
                     {
                         xr_fs_nostrlwr(inc_name);

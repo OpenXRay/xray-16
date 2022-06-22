@@ -6,9 +6,7 @@
 
 bool ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
-    return true;
-#else
+#ifdef XR_PLATFORM_WINDOWS
     HKEY hKey = 0;
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_READ, &hKey);
 
@@ -54,14 +52,14 @@ bool ReadRegistryValue(LPCSTR rKeyName, DWORD rKeyType, void* value)
 
     memcpy(value, rBuf, KeyValueSize);
     return true;
+#else
+    return true;
 #endif
 };
 
 bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
-    return true;
-#else
+#ifdef XR_PLATFORM_WINDOWS
     HKEY hKey = nullptr;
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_WRITE, &hKey);
@@ -100,40 +98,40 @@ bool WriteRegistryValue(LPCSTR rKeyName, DWORD rKeyType, const void* value)
 
     RegCloseKey(hKey);
     return true;
+#else
+    return true;
 #endif
 };
 
-bool ReadRegistry_StrValue(LPCSTR rKeyName, char* value) 
+bool ReadRegistry_StrValue(LPCSTR rKeyName, char* value)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
-    return true;
-#else
+#ifdef XR_PLATFORM_WINDOWS
     return ReadRegistryValue(rKeyName, REG_SZ, value);
+#else
+    return true;
 #endif
 }
 void WriteRegistry_StrValue(LPCSTR rKeyName, const char* value)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS
     WriteRegistryValue(rKeyName, REG_SZ, value);
 #endif
 }
 void ReadRegistry_DWValue(LPCSTR rKeyName, DWORD& value)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS
     ReadRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
-void WriteRegistry_DWValue(LPCSTR rKeyName, const DWORD& value) 
+void WriteRegistry_DWValue(LPCSTR rKeyName, const DWORD& value)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!
+#ifdef XR_PLATFORM_WINDOWS
     WriteRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
 u32 const ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const buffer_size)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
-    return u32(0);
-#else
+#ifdef XR_PLATFORM_WINDOWS
     HKEY hKey = 0;
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_READ, &hKey);
 
@@ -160,12 +158,14 @@ u32 const ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const b
     }
 
     return static_cast<u32>(tmp_buffer_size);
+#else
+    return u32(0);
 #endif
 }
 
 void WriteRegistry_BinaryValue(LPCSTR rKeyName, u8 const* buffer_src, u32 const buffer_size)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS
     HKEY hKey;
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_WRITE, &hKey);

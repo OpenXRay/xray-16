@@ -401,11 +401,7 @@ int CApplication::Level_ID(pcstr name, pcstr ver, bool bSet)
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
-#if defined(XR_PLATFORM_WINDOWS)
-        if (A.hSrcFile == nullptr)
-#elif defined(XR_PLATFORM_LINUX)
-        if (A.hSrcFile == 0)
-#endif
+        if (!A.hSrcFile)
         {
             pcstr ln = A.header->r_string("header", "level_name");
             pcstr lv = A.header->r_string("header", "level_ver");

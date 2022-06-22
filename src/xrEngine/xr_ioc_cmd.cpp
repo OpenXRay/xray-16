@@ -882,7 +882,7 @@ void CCC_Register()
 #endif
 
     CMD1(CCC_ExclusiveMode, "input_exclusive_mode");
-#if !defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_WINDOWS) // XXX: enable (remove ifdef) when text console will be available on Linux
     extern int g_svTextConsoleUpdateRate;
     CMD4(CCC_Integer, "sv_console_update_rate", &g_svTextConsoleUpdateRate, 1, 100);
 #endif

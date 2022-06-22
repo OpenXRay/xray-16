@@ -7,7 +7,7 @@
 #include <float.h> // _controlfp
 #endif
 
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 #ifdef XR_PLATFORM_LINUX
 #include <fpu_control.h>
 #elif defined(XR_PLATFORM_FREEBSD)
