@@ -797,10 +797,11 @@ public:
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
     
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
-    void SetHealthEx(float hp); //AVO
-    //Alundaio
+    // Alundaio
     void inactualize_level_path();
     void inactualize_game_path();
+
+    void SetHealthEx(float hp); //AVO
     float GetLuminocityHemi();
     float GetLuminocity();
     bool Use(CScriptGameObject* obj);
