@@ -474,7 +474,7 @@ void CScriptGameObject::inactualize_level_path()
 
 void CScriptGameObject::inactualize_game_path()
 {
-    CAI_Stalker *stalker = smart_cast<CAI_Stalker*>(&object());
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
