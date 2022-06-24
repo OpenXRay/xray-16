@@ -69,7 +69,7 @@ void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
         item->SetCustomDraw(NULL);
 }
 
-bool CUIActorMenu::OnItemDropOnItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner)
+bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner)
 {
     //Alundaio: Here we export the action of dragging one inventory item on top of another! 
     luabind::functor<bool> funct1;
@@ -140,12 +140,12 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
         if (CanSetItemToList(CurrentIItem(), new_owner, slot_to_place))
             ToSlot(itm, true, slot_to_place);
 
-        OnItemDropOnItem(t_old, t_new, old_owner, new_owner);
+        DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner);
     }
     break;
     case iActorBag:
     {
-        if(!OnItemDropOnItem(t_old, t_new, old_owner, new_owner))
+        if(!DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner))
             return false;
 
         ToBag(itm, true);

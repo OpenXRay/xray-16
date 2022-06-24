@@ -258,7 +258,7 @@ protected:
     bool AllowItemDrops(EDDListType from, EDDListType to);
 
     bool OnItemDrop(CUICellItem* itm);
-    bool OnItemDropOnItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner);
+    bool DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner);
     bool OnItemStartDrag(CUICellItem* itm);
     bool OnItemDbClick(CUICellItem* itm);
     bool OnItemSelected(CUICellItem* itm);
