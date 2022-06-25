@@ -69,8 +69,9 @@ void AttachmentCallback(IKinematics* tpKinematics)
     xr_vector<CAttachableItem*>::const_iterator E = attachment_owner->attached_objects().end();
     for (; I != E; ++I)
     {
-        (*I)->item().object().XFORM().mul_43(
-            kinematics->LL_GetBoneInstance((*I)->bone_id()).mTransform, (*I)->offset());
+        Fmatrix bone_mtx;
+        kinematics->Bone_GetAnimPos(bone_mtx, (*I)->bone_id(), u8(-1), false);
+        (*I)->item().object().XFORM().mul_43(bone_mtx, (*I)->offset());
         (*I)->item().object().XFORM().mulA_43(game_object->XFORM());
     }
 }
