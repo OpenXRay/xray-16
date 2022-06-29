@@ -16,7 +16,8 @@ using namespace luabind;
 
 IC static void CActor_Export(lua_State* luaState)
 {
-    module(luaState) [
+    module(luaState)
+    [
         class_<CActor, CGameObject>("CActor")
             .def(constructor<>())
             .def("conditions", &CActor::conditions)
