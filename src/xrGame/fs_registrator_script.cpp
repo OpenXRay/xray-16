@@ -11,7 +11,7 @@ LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
     string_path temp;
     shared_str temp_2;
     fs->update_path(temp, initial, src);
-#ifndef XR_PLATFORM_WINDOWS
+#ifndef XR_PLATFORM_WINDOWS // XXX: replace with runtime case-sensitivity flag check
     convert_path_separators(temp);
 #endif
     temp_2 = temp;
