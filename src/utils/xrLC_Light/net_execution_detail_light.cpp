@@ -87,8 +87,6 @@ bool net_execution_detail_light::execute(net_task_callback& net_callback)
     DWORDVec box_result;
     ////////////////////////////////////////////////////////
     CDB::COLLIDER DB;
-    DB.ray_options(CDB::OPT_CULL);
-    DB.box_options(CDB::OPT_FULL_TEST);
     base_lighting Selected;
 
     for (u32 i = start; i < end; ++i)
@@ -98,7 +96,7 @@ bool net_execution_detail_light::execute(net_task_callback& net_callback)
         if (gl_data.slots_data.calculate_ignore(x, z))
             continue;
         DetailSlot& DS = gl_data.slots_data.get_slot(x, z);
-        detail_slot_calculate(x, z, DS, box_result, DB, Selected);
+        detail_slot_calculate(x, z, DS, box_result, DB, CDB::OPT_FULL_TEST, CDB::OPT_CULL, Selected);
         if (!net_callback.test_connection())
             break;
     }

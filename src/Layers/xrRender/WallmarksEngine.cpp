@@ -209,8 +209,7 @@ void CWallmarksEngine::AddWallmark_internal(
         bb_query.set(contact_point, contact_point);
         bb_query.grow(sz * 2.5f);
         bb_query.get_CD(bbc, bbd);
-        xrc.box_options(CDB::OPT_FULL_TEST);
-        xrc.box_query(g_pGameLevel->ObjectSpace.GetStaticModel(), bbc, bbd);
+        xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bbc, bbd);
         u32 triCount = xrc.r_count();
         if (0 == triCount)
             return;

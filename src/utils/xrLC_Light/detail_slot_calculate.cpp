@@ -87,7 +87,7 @@ thread_local Time t_start;
 thread_local Duration t_time;
 thread_local u64 t_count = 0;
 
-IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
+IC bool RayPick(CDB::COLLIDER& DB, u32 ray_options, Fvector& P, Fvector& D, float r, R_Light& L)
 {
     // 1. Check cached polygon
     float _u, _v, range;
@@ -100,7 +100,7 @@ IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
 
     // 2. Polygon doesn't pick - real database query
     t_start = Clock::now();
-    DB.ray_query(&gl_data.RCAST_Model, P, D, r);
+    DB.ray_query(ray_options, &gl_data.RCAST_Model, P, D, r);
     t_time += Clock::now() - t_start;
     t_count += 1;
 
@@ -201,7 +201,7 @@ float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L) //, Face* skip)
     return scale;
 }
 
-float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R) //, Face* skip)
+float rayTrace(CDB::COLLIDER* DB, u32 ray_options, R_Light& L, Fvector& P, Fvector& D, float R) //, Face* skip)
 {
     R_ASSERT(DB);
 
@@ -215,7 +215,7 @@ float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R) /
     }
 
     // 2. Polygon doesn't pick - real database query
-    DB->ray_query(&gl_data.RCAST_Model, P, D, R);
+    DB->ray_query(ray_options, &gl_data.RCAST_Model, P, D, R);
 
     // 3. Analyze polygons and cache nearest if possible
     if (0 == DB->r_count())
@@ -229,7 +229,7 @@ float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R) /
     return 0;
 }
 
-void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_lighting& lights, u32 flags)
+void LightPoint(CDB::COLLIDER* DB, u32 ray_options, base_color& C, Fvector& P, Fvector& N, base_lighting& lights, u32 flags)
 {
     Fvector Ldir, Pnew;
     Pnew.mad(P, N, 0.01f);
@@ -248,7 +248,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
                     continue;
 
                 // Trace Light
-                float scale = D * L->energy * rayTrace(DB, *L, Pnew, Ldir, 1000.f);
+                float scale = D * L->energy * rayTrace(DB, ray_options, *L, Pnew, Ldir, 1000.f);
                 C.rgb.x += scale * L->diffuse.x;
                 C.rgb.y += scale * L->diffuse.y;
                 C.rgb.z += scale * L->diffuse.z;
@@ -269,7 +269,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
 
                 // Trace Light
                 float R = _sqrt(sqD);
-                float scale = D * L->energy * rayTrace(DB, *L, Pnew, Ldir, R);
+                float scale = D * L->energy * rayTrace(DB, ray_options, *L, Pnew, Ldir, R);
                 float A = scale / (L->attenuation0 + L->attenuation1 * R + L->attenuation2 * sqD);
 
                 C.rgb.x += A * L->diffuse.x;
@@ -280,7 +280,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
     }
     if (0 == (flags & LP_dont_sun))
     {
-        R_Light *L = &*(lights.sun.begin()), *E = &*(lights.sun.end());
+        R_Light* L = &*(lights.sun.begin()), * E = &*(lights.sun.end());
         for (; L != E; L++)
         {
             if (L->type == LT_DIRECT)
@@ -292,7 +292,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
                     continue;
 
                 // Trace Light
-                float scale = L->energy * rayTrace(DB, *L, Pnew, Ldir, 1000.f);
+                float scale = L->energy * rayTrace(DB, ray_options, *L, Pnew, Ldir, 1000.f);
                 C.sun += scale;
             }
             else
@@ -311,7 +311,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
 
                 // Trace Light
                 float R = _sqrt(sqD);
-                float scale = D * L->energy * rayTrace(DB, *L, Pnew, Ldir, R);
+                float scale = D * L->energy * rayTrace(DB, ray_options, *L, Pnew, Ldir, R);
                 float A = scale / (L->attenuation0 + L->attenuation1 * R + L->attenuation2 * sqD);
 
                 C.sun += A;
@@ -320,7 +320,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
     }
     if (0 == (flags & LP_dont_hemi))
     {
-        R_Light *L = &*lights.hemi.begin(), *E = &*lights.hemi.end();
+        R_Light* L = &*lights.hemi.begin(), * E = &*lights.hemi.end();
         for (; L != E; L++)
         {
             if (L->type == LT_DIRECT)
@@ -334,7 +334,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
                 // Trace Light
                 Fvector PMoved;
                 PMoved.mad(Pnew, Ldir, 0.001f);
-                float scale = L->energy * rayTrace(DB, *L, PMoved, Ldir, 1000.f);
+                float scale = L->energy * rayTrace(DB, ray_options, *L, PMoved, Ldir, 1000.f);
                 C.hemi += scale;
             }
             else
@@ -353,7 +353,7 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
 
                 // Trace Light
                 float R = _sqrt(sqD);
-                float scale = D * L->energy * rayTrace(DB, *L, Pnew, Ldir, R);
+                float scale = D * L->energy * rayTrace(DB, ray_options, *L, Pnew, Ldir, R);
                 float A = scale / (L->attenuation0 + L->attenuation1 * R + L->attenuation2 * sqD);
 
                 C.hemi += A;
@@ -371,7 +371,7 @@ bool detail_slot_process(u32 _x, u32 _z, DetailSlot& DS)
 }
 
 bool detail_slot_calculate(
-    u32 _x, u32 _z, DetailSlot& DS, DWORDVec& box_result, CDB::COLLIDER& DB, base_lighting& Selected)
+    u32 _x, u32 _z, DetailSlot& DS, DWORDVec& box_result, CDB::COLLIDER& DB, u32 box_options, u32 ray_options, base_lighting& Selected)
 {
     ///////////////////////////////////////////////////////////
     // Build slot BB & sphere
@@ -385,7 +385,7 @@ bool detail_slot_calculate(
     Fvector bbC, bbD;
     BB.get_CD(bbC, bbD);
     bbD.add(0.01f);
-    DB.box_query(&gl_data.RCAST_Model, bbC, bbD);
+    DB.box_query(box_options, &gl_data.RCAST_Model, bbC, bbD);
 
     box_result.clear();
     for (auto &it : *DB.r_get())
@@ -444,7 +444,7 @@ bool detail_slot_calculate(
                 continue;
 
             // light point
-            LightPoint(&DB, amount, P, t_n, Selected, 0);
+            LightPoint(&DB, ray_options, amount, P, t_n, Selected, 0);
             count += 1;
         }
     }

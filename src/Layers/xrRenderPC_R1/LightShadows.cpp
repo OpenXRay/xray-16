@@ -498,8 +498,7 @@ void CLightShadows::render()
             F.CreateFromMatrix(S.M, FRUSTUM_P_ALL);
 
             // Query
-            xrc.frustum_options(0);
-            xrc.frustum_query(DB, F);
+            xrc.frustum_query(0, DB, F);
             if (0 == xrc.r_count())
                 continue;
 

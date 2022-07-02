@@ -14,7 +14,6 @@ void light::gi_generate()
     CDB::MODEL* model = g_pGameLevel->ObjectSpace.GetStaticModel();
     CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
-    xrc.ray_options(CDB::OPT_CULL | CDB::OPT_ONLYNEAREST);
 
     for (int it = 0; it < int(indirect_photons * 8); it++)
     {
@@ -26,7 +25,7 @@ void light::gi_generate()
         case IRender_Light::OMNIPART: dir.random_dir(direction, cone, random); break;
         }
         dir.normalize();
-        xrc.ray_query(model, position, dir, range);
+        xrc.ray_query(CDB::OPT_CULL | CDB::OPT_ONLYNEAREST, model, position, dir, range);
         if (!xrc.r_count())
             continue;
         CDB::RESULT* R = RImplementation.Sectors_xrc.r_begin();
