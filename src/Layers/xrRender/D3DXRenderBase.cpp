@@ -6,18 +6,6 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-D3DXRenderBase::D3DXRenderBase()
-{
-    val_bRecordMP = FALSE;
-    val_feedback = nullptr;
-    val_feedback_breakp = 0;
-    val_recorder = nullptr;
-    marker = 0;
-    r_pmask(true, true);
-    b_loaded = FALSE;
-    Resources = nullptr;
-}
-
 void D3DXRenderBase::setGamma(float fGamma)
 {
 #if defined(USE_DX9) || defined(USE_DX11)
