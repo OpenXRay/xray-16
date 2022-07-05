@@ -142,6 +142,77 @@ void CGameFont::Initialize(pcstr cShader, pcstr cTextureName)
             TCMap[i].set(v.x, v.y, v[2] - v[0] + d);
         }
     }
+    else if (ini->section_exist("actions icons"))
+    {
+        constexpr std::pair<pcstr, int> actions_names[] =
+        {
+            { "lb",         XR_CONTROLLER_BUTTON_LEFTSHOULDER  }, { "l1", XR_CONTROLLER_BUTTON_LEFTSHOULDER  },
+            { "rb",         XR_CONTROLLER_BUTTON_RIGHTSHOULDER }, { "r1", XR_CONTROLLER_BUTTON_RIGHTSHOULDER },
+            { "lt",         XR_CONTROLLER_AXIS_TRIGGER_LEFT    }, { "l2", XR_CONTROLLER_AXIS_TRIGGER_LEFT    },
+            { "rt",         XR_CONTROLLER_AXIS_TRIGGER_RIGHT   }, { "r2", XR_CONTROLLER_AXIS_TRIGGER_RIGHT   },
+            { "ls",         XR_CONTROLLER_AXIS_LEFT            },
+            { "rs",         XR_CONTROLLER_AXIS_RIGHT           },
+            { "lsb",        XR_CONTROLLER_BUTTON_LEFTSTICK     }, { "l3", XR_CONTROLLER_BUTTON_LEFTSTICK     },
+            { "rsb",        XR_CONTROLLER_BUTTON_RIGHTSTICK    }, { "r3", XR_CONTROLLER_BUTTON_RIGHTSTICK    },
+
+            { "a",          XR_CONTROLLER_BUTTON_A }, { "cross",    XR_CONTROLLER_BUTTON_A },
+            { "b",          XR_CONTROLLER_BUTTON_B }, { "circle",   XR_CONTROLLER_BUTTON_B },
+            { "x",          XR_CONTROLLER_BUTTON_X }, { "square",   XR_CONTROLLER_BUTTON_X },
+            { "y",          XR_CONTROLLER_BUTTON_Y }, { "triangle", XR_CONTROLLER_BUTTON_Y },
+
+            { "dpad_up",    XR_CONTROLLER_BUTTON_DPAD_UP },
+            { "dpad_down",  XR_CONTROLLER_BUTTON_DPAD_DOWN },
+            { "dpad_left",  XR_CONTROLLER_BUTTON_DPAD_LEFT },
+            { "dpad_right", XR_CONTROLLER_BUTTON_DPAD_RIGHT },
+
+            { "back",       XR_CONTROLLER_BUTTON_BACK  }, // Xbox 360
+            { "select",     XR_CONTROLLER_BUTTON_BACK  }, // PS3
+            { "view",       XR_CONTROLLER_BUTTON_BACK  }, // Xbox One
+            { "share",      XR_CONTROLLER_BUTTON_BACK  }, // PS4
+
+            { "guide",      XR_CONTROLLER_BUTTON_GUIDE },
+            { "ps",         XR_CONTROLLER_BUTTON_GUIDE },
+            { "xbox",       XR_CONTROLLER_BUTTON_GUIDE },
+
+            { "start",      XR_CONTROLLER_BUTTON_START }, // Xbox 360/PS3
+            { "options",    XR_CONTROLLER_BUTTON_START }, // PS4
+            { "menu",       XR_CONTROLLER_BUTTON_START }, // Xbox One
+
+            { "misc1",      XR_CONTROLLER_BUTTON_MISC1 },
+            { "p1",         XR_CONTROLLER_BUTTON_PADDLE1 },
+            { "p2",         XR_CONTROLLER_BUTTON_PADDLE2 },
+            { "p3",         XR_CONTROLLER_BUTTON_PADDLE3 },
+            { "p4",         XR_CONTROLLER_BUTTON_PADDLE4 },
+            { "touchpad",   XR_CONTROLLER_BUTTON_TOUCHPAD },
+        };
+
+        pcstr controller_type = pSettings->r_string("actions icons", "controller_type");
+
+        if (0 == xr_strcmp(controller_type, "keyboard_mouse"))
+        {
+
+        }
+        else if (0 == xr_strcmp(controller_type, "xbox360"))
+        {
+
+        }
+        else if (0 == xr_strcmp(controller_type, "xboxone"))
+        {
+
+        }
+        else if (0 == xr_strcmp(controller_type, "ps3"))
+        {
+
+        }
+        else if (0 == xr_strcmp(controller_type, "ps4"))
+        {
+
+        }
+        else if (0 == xr_strcmp(controller_type, "ps5"))
+        {
+
+        }
+    }
     else
     {
         if (ini->section_exist("char widths"))

@@ -77,6 +77,24 @@ public:
         Controller,
     };
 
+    enum ControllerType
+    {
+        Unknown,
+
+        Xbox360,
+        XboxOne,
+
+        PS3,
+        PS4,
+        PS5,
+
+        NintendoSwitchPro,
+        AmazonLuna,
+        GoggleStadia,
+
+        Count
+    };
+
     enum
     {
         COUNT_MOUSE_AXIS = 4,
