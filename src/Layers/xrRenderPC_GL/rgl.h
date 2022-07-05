@@ -357,7 +357,7 @@ public:
     bool occ_visible(sPoly& P) override;
 
     // Main
-    void BeforeFrame() override;
+    void BeforeRender() override;
 
     void Calculate() override;
     void Render() override;

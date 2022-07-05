@@ -213,8 +213,9 @@ void CRenderDevice::BeforeRender()
 
     // Matrices
     mFullTransform.mul(mProject, mView);
-    GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert_44(mFullTransform);
+    GEnv.Render->BeforeRender();
+    GEnv.Render->SetCacheXform(mView, mProject);
 
     vCameraPositionSaved = vCameraPosition;
     vCameraDirectionSaved = vCameraDirection;
@@ -263,7 +264,6 @@ void CRenderDevice::ProcessFrame()
 
     const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
-    GEnv.Render->BeforeFrame();
     FrameMove();
 
     BeforeRender();
