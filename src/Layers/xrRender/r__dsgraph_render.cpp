@@ -620,7 +620,7 @@ void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFr
                 if (nullptr == renderable)
                     continue; // unknown, but renderable object (r1_glow???)
 
-                renderable->renderable_Render(renderable);
+                renderable->renderable_Render(nullptr);
             }
         }
 #if RENDER != R_R1
