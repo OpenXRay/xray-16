@@ -8,19 +8,6 @@
 #endif
 
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
-#ifdef XR_PLATFORM_LINUX
-#include <fpu_control.h>
-#elif defined(XR_PLATFORM_FREEBSD)
-#include <fenv.h>
-typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
-#define _FPU_GETCW(x) asm volatile ("fnstcw %0" : "=m" ((*&x)))
-#define _FPU_SETCW(x) asm volatile ("fldcw %0" : : "m" ((*&x)))
-#define _FPU_EXTENDED FP_PRC_FLD
-#define _FPU_DOUBLE 0x200
-#define _FPU_SINGLE 0x0
-#define _FPU_RC_NEAREST FP_PS
-#define _FPU_DEFAULT FP_PD
-#endif
 // XXX: check if these includes needed
 #include <pthread.h>
 #include <sys/time.h>
@@ -28,6 +15,26 @@ typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__)));
 #include <chrono>
 #include <stdint.h>
 #endif
+
+#if __has_include(<fpu_control.h>)
+#   include <fpu_control.h>
+#   define USE_FPU_CONTROL_H
+#elif defined(XR_PLATFORM_FREEBSD)
+#   include <fenv.h>
+#   define USE_FPU_CONTROL_H
+typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__))); // XXX: replace with type alias
+#   define _FPU_GETCW(x) asm volatile ("fnstcw %0" : "=m" ((*&x)))
+#   define _FPU_SETCW(x) asm volatile ("fldcw %0" : : "m" ((*&x)))
+#   define _FPU_EXTENDED FP_PRC_FLD
+#   define _FPU_DOUBLE 0x200
+#   define _FPU_SINGLE 0x0
+#   define _FPU_RC_NEAREST FP_PS
+#   define _FPU_DEFAULT FP_PD
+#else
+#   include <cfenv>
+#   pragma STDC FENV_ACCESS on
+#endif
+
 #include <thread>
 #include "SDL.h"
 
@@ -56,75 +63,85 @@ namespace FPU
 XRCORE_API void m24()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_ARCHITECTURE_X64
+#   ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_24, MCW_PC);
-#endif
+#   endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(USE_FPU_CONTROL_H)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE;
     _FPU_SETCW(fpu_cw);
+#else
+    std::fesetround(FE_TOWARDZERO);
 #endif
 }
 
 XRCORE_API void m24r()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_ARCHITECTURE_X64
+#   ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_24, MCW_PC);
-#endif
+#   endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(USE_FPU_CONTROL_H)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE | _FPU_RC_NEAREST;
     _FPU_SETCW(fpu_cw);
+#else
+    std::fesetround(FE_TONEAREST);
 #endif
 }
 
 XRCORE_API void m53()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_ARCHITECTURE_X64
+#   ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_53, MCW_PC);
-#endif
+#   endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(USE_FPU_CONTROL_H)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE;
     _FPU_SETCW(fpu_cw);
+#else
+    std::fesetround(FE_TOWARDZERO);
 #endif
 }
 
 XRCORE_API void m53r()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_ARCHITECTURE_X64
+#   ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_53, MCW_PC);
-#endif
+#   endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(USE_FPU_CONTROL_H)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE | _FPU_RC_NEAREST;
     _FPU_SETCW(fpu_cw);
+#else
+    std::fesetround(FE_TONEAREST);
 #endif
 }
 
 XRCORE_API void m64()
 {
 #if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_ARCHITECTURE_X64
+#   ifndef XR_ARCHITECTURE_X64
     _controlfp(_PC_64, MCW_PC);
-#endif
+#   endif
     _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(USE_FPU_CONTROL_H)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED;
     _FPU_SETCW(fpu_cw);
+#else
+    std::fesetround(FE_TOWARDZERO);
 #endif
 }
 
@@ -135,11 +152,13 @@ XRCORE_API void m64r()
     _controlfp(_PC_64, MCW_PC);
 #endif
     _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(USE_FPU_CONTROL_H)
     fpu_control_t fpu_cw;
     _FPU_GETCW(fpu_cw);
     fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED | _FPU_RC_NEAREST;
     _FPU_SETCW(fpu_cw);
+#else
+    std::fesetround(FE_TONEAREST);
 #endif
 }
 
@@ -147,10 +166,12 @@ void initialize()
 {
 #if defined(XR_PLATFORM_WINDOWS)
     _clearfp();
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(USE_FPU_CONTROL_H)
     fpu_control_t fpu_cw;
     fpu_cw = _FPU_DEFAULT;
     _FPU_SETCW(fpu_cw);
+#else
+    std::feclearexcept(FE_ALL_EXCEPT);
 #endif
 
     // По-умолчанию для плагинов экспорта из 3D-редакторов включена высокая точность вычислений с плавающей точкой
