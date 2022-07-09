@@ -8,7 +8,10 @@
 #include "AnselManager.h"
 #include "holder_custom.h"
 #include "SDL.h"
-#include "SDL_syswm.h"
+
+#ifdef XR_PLATFORM_WINDOWS
+#   include "SDL_syswm.h"
+#endif
 
 ENGINE_API extern bool bShowPauseString;
 ENGINE_API extern bool g_bDisableRedText;
