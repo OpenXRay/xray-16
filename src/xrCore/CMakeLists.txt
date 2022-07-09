@@ -231,7 +231,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
-    ${JPEG_INCLUDE_DIRS}
+    $<$<BOOL:${JPEG_FOUND}>:${JPEG_INCLUDE_DIRS}>
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -243,7 +243,7 @@ target_link_libraries(${PROJECT_NAME}
     xrMiscMath
     dl
     $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
-    ${JPEG_LIBRARIES}
+    $<$<BOOL:${JPEG_FOUND}>:${JPEG_LIBRARIES}>
     ${LZO_LIBRARIES}
 )
 
