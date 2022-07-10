@@ -2,6 +2,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #   include <float.h> // _controlfp
+#   pragma fenv_access(on)
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 // XXX: check if these includes needed
 #include <pthread.h>
@@ -15,6 +16,7 @@
 #       define USE_FPU_CONTROL_H
 #   else
 #       include <сfenv>
+#       pragma STDC FENV_ACCESS on
 #       if defined(XR_PLATFORM_FREEBSD)
 #           define USE_FPU_CONTROL_H
             typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__))); // XXX: replace with type alias
