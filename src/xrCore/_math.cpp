@@ -2,7 +2,9 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #   include <float.h> // _controlfp
-#   pragma fenv_access(on)
+#   if defined(_M_FP_PRECISE)
+#       pragma fenv_access(on)
+#   endif
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 // XXX: check if these includes needed
 #include <pthread.h>
