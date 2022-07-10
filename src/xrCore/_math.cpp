@@ -17,7 +17,7 @@
 #       include <fpu_control.h>
 #       define USE_FPU_CONTROL_H
 #   else
-#       include <сfenv>
+#       include <cfenv>
 #       pragma STDC FENV_ACCESS on
 #       if defined(XR_PLATFORM_FREEBSD)
 #           define USE_FPU_CONTROL_H
