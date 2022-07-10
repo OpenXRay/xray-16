@@ -1,12 +1,7 @@
 #include "stdafx.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
-#include <process.h>
-
-#if defined(XR_COMPILER_GCC)
-#include <float.h> // _controlfp
-#endif
-
+#   include <float.h> // _controlfp
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 // XXX: check if these includes needed
 #include <pthread.h>
@@ -14,25 +9,24 @@
 #include <sys/resource.h>
 #include <chrono>
 #include <stdint.h>
-#endif
 
-#if __has_include(<fpu_control.h>)
-#   include <fpu_control.h>
-#   define USE_FPU_CONTROL_H
-#elif defined(XR_PLATFORM_FREEBSD)
-#   include <fenv.h>
-#   define USE_FPU_CONTROL_H
-typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__))); // XXX: replace with type alias
-#   define _FPU_GETCW(x) asm volatile ("fnstcw %0" : "=m" ((*&x)))
-#   define _FPU_SETCW(x) asm volatile ("fldcw %0" : : "m" ((*&x)))
-#   define _FPU_EXTENDED FP_PRC_FLD
-#   define _FPU_DOUBLE 0x200
-#   define _FPU_SINGLE 0x0
-#   define _FPU_RC_NEAREST FP_PS
-#   define _FPU_DEFAULT FP_PD
-#else
-#   include <cfenv>
-#   pragma STDC FENV_ACCESS on
+#   if __has_include(<fpu_control.h>)
+#       include <fpu_control.h>
+#       define USE_FPU_CONTROL_H
+#   else
+#       include <сfenv>
+#       if defined(XR_PLATFORM_FREEBSD)
+#           define USE_FPU_CONTROL_H
+            typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__))); // XXX: replace with type alias
+#           define _FPU_GETCW(x) asm volatile ("fnstcw %0" : "=m" ((*&x)))
+#           define _FPU_SETCW(x) asm volatile ("fldcw %0" : : "m" ((*&x)))
+#           define _FPU_EXTENDED FP_PRC_FLD
+#           define _FPU_DOUBLE 0x200
+#           define _FPU_SINGLE 0x0
+#           define _FPU_RC_NEAREST FP_PS
+#           define _FPU_DEFAULT FP_PD
+#       endif
+#   endif
 #endif
 
 #include <thread>
