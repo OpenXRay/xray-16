@@ -11,12 +11,14 @@ void ISoundManager::_create_devices_list()
     SoundRender = SoundRenderA;
     GEnv.Sound = SoundRender;
     SoundRender->bPresent = strstr(Core.Params, "-nosound") == nullptr;
-    GEnv.Sound->_initialize_devices_list();
+    if (SoundRender->bPresent)
+        GEnv.Sound->_initialize_devices_list();
 }
 
 void ISoundManager::_create()
 {
-    GEnv.Sound->_initialize();
+    if (SoundRender->bPresent)
+        GEnv.Sound->_initialize();
 }
 
 void ISoundManager::_destroy()
