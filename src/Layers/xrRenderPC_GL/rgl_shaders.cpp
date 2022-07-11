@@ -143,7 +143,7 @@ public:
     void add(cpcstr name, cpcstr value)
     {
         // It's important to have postfix increment!
-        xr_sprintf(m_options[pos++], "#define %s\t%s\n", name, value);
+        strconcat(m_options[pos++], "#define ", name, "\t", value, "\n");
     }
 
     void finish()
@@ -165,7 +165,7 @@ class shader_sources_manager
 public:
     explicit shader_sources_manager(cpcstr name)
     {
-        xr_sprintf(m_name_comment, "// %s\n", name);
+        strconcat(m_name_comment, "// ", name, "\n");
     }
 
     ~shader_sources_manager()
