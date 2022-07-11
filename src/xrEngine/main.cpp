@@ -5,7 +5,6 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
 #endif
-#include <locale.h>
 
 #include "IGame_Persistent.h"
 #include "xrNetServer/NET_AuthCheck.h"
