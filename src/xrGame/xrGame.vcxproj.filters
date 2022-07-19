@@ -8108,6 +8108,9 @@
     <ClCompile Include="entity_alive.cpp">
       <Filter>Core\Client\Objects\base\EntityAlive</Filter>
     </ClCompile>
+    <ClCompile Include="EntityCondition_script.cpp">
+      <Filter>Core\Client\Objects\base\EntityCondition</Filter>
+    </ClCompile>
     <ClCompile Include="EntityCondition.cpp">
       <Filter>Core\Client\Objects\base\EntityCondition</Filter>
     </ClCompile>

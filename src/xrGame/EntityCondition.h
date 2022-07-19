@@ -115,6 +115,7 @@ public:
     virtual void load(IReader& input_packet);
 
     IC float GetPower() const { return m_fPower; }
+    IC void	 SetPower(float value) { m_fPower = value; clamp(m_fPower, 0.f, m_fPowerMax); }
     IC float GetRadiation() const { return m_fRadiation; }
     IC float GetPsyHealth() const { return m_fPsyHealth; }
     IC float GetSatiety() const { return 1.0f; }
