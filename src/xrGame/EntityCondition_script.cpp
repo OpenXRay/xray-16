@@ -1,13 +1,12 @@
 #include "StdAfx.h"
 #include "pch_script.h"
 #include "ActorCondition.h"
-#include "EntityCondition.h"
 #include "Wound.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+
 using namespace luabind;
 
-IC static void CEntityCondition_Export(lua_State* luaState)
-{
+SCRIPT_EXPORT(CEntityCondition, (), {
     module(luaState)
     [
         class_<CEntityCondition>("CEntityCondition")
@@ -54,52 +53,9 @@ IC static void CEntityCondition_Export(lua_State* luaState)
                 value("eBoostWoundImmunity", int(EBoostParams::eBoostWoundImmunity))
             ]
     ];
-}
+});
 
-////////////////////////////////
-
-void WoundForEach(CActorCondition* conditions, const luabind::functor<bool>& funct)
-{
-    auto const& cur_wounds = conditions->wounds();
-    auto it = conditions->wounds().begin();
-    auto it_e = conditions->wounds().end();
-    for (; it != it_e; ++it)
-    {
-        if (funct((*it)) == true)
-            break;
-    }
-}
-
-void BoosterForEach(CActorCondition* conditions, const luabind::functor<bool> &funct)
-{
-    const auto& cur_booster_influences = conditions->GetCurBoosterInfluences();
-    CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
-    CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
-    for (; it != it_e; ++it)
-    {
-        if (funct((*it).first, (*it).second.fBoostTime, (*it).second.fBoostValue) == true)
-            break;
-    }
-}
-
-bool ApplyBooster_script(CActorCondition* cond, const SBooster& B, LPCSTR sect)
-{
-	return cond->ApplyBooster(B, sect);
-}
-
-void ClearAllBoosters(CActorCondition* conditions)
-{
-    const auto& cur_booster_influences = conditions->GetCurBoosterInfluences();
-    CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
-    CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
-    for (; it != it_e; ++it)
-    {
-        conditions->DisableBoostParameters((*it).second);
-    }
-}
-
-IC static void CActorCondition_Export(lua_State* luaState)
-{
+SCRIPT_EXPORT(CActorCondition, (CEntityCondition), {
     module(luaState)
     [
 		class_<SBooster>("SBooster")
@@ -120,10 +76,10 @@ IC static void CActorCondition_Export(lua_State* luaState)
             .def("SetDestroy", &CWound::SetDestroy)
             .def("GetDestroy", &CWound::GetDestroy),
         class_<CActorCondition, CEntityCondition>("CActorCondition")
-            .def("ClearAllBoosters", &ClearAllBoosters)
-			.def("ApplyBooster", &ApplyBooster_script)
-            .def("BoosterForEach", &BoosterForEach)
-            .def("WoundForEach", &WoundForEach)
+            .def("ClearAllBoosters", &CActorCondition::ClearAllBoosters)
+			.def("ApplyBooster", &CActorCondition::ApplyBooster_script)
+            .def("BoosterForEach", &CActorCondition::BoosterForEach)
+            .def("WoundForEach", &CActorCondition::WoundForEach)
 			.def("GetSatiety", &CActorCondition::GetSatiety)
             .def("BoostMaxWeight", &CActorCondition::BoostMaxWeight)
             .def("BoostHpRestore", &CActorCondition::BoostHpRestore)
@@ -148,7 +104,4 @@ IC static void CActorCondition_Export(lua_State* luaState)
             .def("IsCantSprint", &CActorCondition::IsCantSprint)
             .def_readwrite("m_MaxWalkWeight", &CActorCondition::m_MaxWalkWeight)
     ];
-}
-
-SCRIPT_EXPORT_FUNC(CEntityCondition, (), CEntityCondition_Export);
-SCRIPT_EXPORT_FUNC(CActorCondition, (CEntityCondition), CActorCondition_Export);
+});
