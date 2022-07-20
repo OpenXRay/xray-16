@@ -13,8 +13,6 @@ SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
                          .def("wnd", &StaticDrawableWrapper::wnd),
 
         class_<CUIGameCustom, CDialogHolder>("CUIGameCustom")
-            .def("TopInputReceiver", &CUIGameCustom::TopInputReceiver)
-            .def("SetMainInputReceiver", &CUIGameCustom::SetMainInputReceiver)
             .def("AddDialogToRender", &CUIGameCustom::AddDialogToRender)
             .def("RemoveDialogToRender", &CUIGameCustom::RemoveDialogToRender)
             .def("AddCustomStatic", +[](CUIGameCustom* self, pcstr id, bool singleInstance)

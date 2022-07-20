@@ -23,6 +23,7 @@ SCRIPT_EXPORT(CDialogHolder, (CUIWindow), {
     [
         class_<CDialogHolder>("CDialogHolder")
             .def("TopInputReceiver", &CDialogHolder::TopInputReceiver)
+            .def("SetMainInputReceiver", &CDialogHolder::SetMainInputReceiver)
             .def("MainInputReceiver", &CDialogHolder::TopInputReceiver)
             .def("start_stop_menu", &CDialogHolder::StartStopMenu)
             .def("AddDialogToRender", &CDialogHolder::AddDialogToRender)
