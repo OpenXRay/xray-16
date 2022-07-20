@@ -1,7 +1,9 @@
+#include "StdAfx.h"
 #include "pch_script.h"
 #include "ActorCondition.h"
 #include "EntityCondition.h"
 #include "Wound.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 using namespace luabind;
 
 IC static void CEntityCondition_Export(lua_State* luaState)
