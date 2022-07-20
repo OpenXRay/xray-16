@@ -886,8 +886,6 @@ IC static void CLevel_Export(lua_State* luaState)
         {
             if (g_tutorial)
                 return g_tutorial->GetTutorName();
-
-            return;
         }),
         def("translate_string", &translate_string),
         def("reload_language", +[]() { StringTable().ReloadLanguage(); }),
