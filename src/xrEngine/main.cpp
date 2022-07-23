@@ -5,7 +5,6 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
 #endif
-#include <locale.h>
 
 #include "IGame_Persistent.h"
 #include "xrNetServer/NET_AuthCheck.h"
@@ -18,13 +17,11 @@
 #include "xrCDB/ISpatial.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "xr_ioc_cmd.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
@@ -176,6 +173,7 @@ ENGINE_API void InitInput()
 }
 
 ENGINE_API void destroyInput() { xr_delete(pInput); }
+ENGINE_API void InitSoundDeviceList() { ISoundManager::_create_devices_list(); }
 ENGINE_API void InitSound() { ISoundManager::_create(); }
 ENGINE_API void destroySound() { ISoundManager::_destroy(); }
 ENGINE_API void destroySettings()
@@ -266,6 +264,7 @@ void CheckPrivilegySlowdown()
 
 ENGINE_API void Startup()
 {
+    InitSoundDeviceList();
     execUserScript();
     InitSound();
 
@@ -307,27 +306,26 @@ ENGINE_API void Startup()
 
     // Main cycle
     Device.Run();
+
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
     xr_delete(g_SpatialSpace);
     DEL_INSTANCE(g_pGamePersistent);
     xr_delete(pApp);
     Engine.Event.Dump();
+
     // Destroying
     destroyInput();
-#if !defined(XR_PLATFORM_LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
-#endif
         destroySettings();
+
     LALib.OnDestroy();
-#if !defined(XR_PLATFORM_LINUX)
+
     if (!g_bBenchmark && !g_SASH.IsRunning())
-#endif
         destroyConsole();
-#if !defined(XR_PLATFORM_LINUX)
     else
         Console->Destroy();
-#endif
+
     Device.CleanupVideoModes();
     destroyEngine();
     destroySound();
@@ -400,10 +398,10 @@ bool CheckBenchmark()
         const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-#if !defined(XR_PLATFORM_LINUX)
-        g_SASH.Init(sashArg);
-        g_SASH.MainLoop();
-#endif
+
+        if (g_SASH.Init(sashArg))
+            g_SASH.MainLoop();
+
         return true;
     }
 

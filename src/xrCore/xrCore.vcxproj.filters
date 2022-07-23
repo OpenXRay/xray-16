@@ -7,9 +7,6 @@
     <Filter Include="Math">
       <UniqueIdentifier>{2770a42d-bbc5-4a1e-acfc-6275c24b532b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math\CPU">
-      <UniqueIdentifier>{27e2c42a-a9d4-4a05-b1fd-c44c39804452}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math\STLext">
       <UniqueIdentifier>{cdb135d6-3d5a-4e89-bf80-091de3bd6ac4}</UniqueIdentifier>
     </Filter>
@@ -115,9 +112,6 @@
     <Filter Include="Compression\lzo">
       <UniqueIdentifier>{c6342a66-65de-47b5-afe5-c51a7383edc0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xrDelegate">
-      <UniqueIdentifier>{b54073c2-213d-456f-b88d-8eeb0dd440b0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Events">
       <UniqueIdentifier>{f17d865f-a3fd-41ac-b217-d7d34ed591f5}</UniqueIdentifier>
     </Filter>
@@ -146,9 +140,6 @@
     </ClCompile>
     <ClCompile Include="dump_string.cpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_cpuid.cpp">
-      <Filter>Math\CPU</Filter>
     </ClCompile>
     <ClCompile Include="_std_extensions.cpp">
       <Filter>Math\Extensions</Filter>
@@ -434,9 +425,6 @@
     <ClInclude Include="vector.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="xr_cpuid.h">
-      <Filter>Math\CPU</Filter>
-    </ClInclude>
     <ClInclude Include="FixedVector.h">
       <Filter>Math\STLext</Filter>
     </ClInclude>
@@ -715,15 +703,6 @@
     </ClInclude>
     <ClInclude Include="Events\Notifier.h">
       <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="xrDelegate\xrDelegate.h">
-      <Filter>xrDelegate</Filter>
-    </ClInclude>
-    <ClInclude Include="xrDelegate\xrDelegateArguments.h">
-      <Filter>xrDelegate</Filter>
-    </ClInclude>
-    <ClInclude Include="xrDelegate\xrDelegateBinder.h">
-      <Filter>xrDelegate</Filter>
     </ClInclude>
     <ClInclude Include="Memory\xalloc.h">
       <Filter>Memory</Filter>

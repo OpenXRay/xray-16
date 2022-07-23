@@ -106,7 +106,7 @@ LPCSTR FS_Path::_update(string_path& dest, LPCSTR src) const
     string_path temp;
     xr_strcpy(temp, sizeof(temp), src);
 
-#ifdef XR_PLATFORM_LINUX
+#if !defined(XR_PLATFORM_WINDOWS) // XXX: replace with runtime check for case-sensitivity
     string_path fullPath;
     strconcat(fullPath, m_Path, temp);
     if (FS.exist(fullPath, FSType::External) || FS.exist(fullPath, FSType::Virtual))

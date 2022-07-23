@@ -45,8 +45,7 @@ void CRender::Calculate()
         float eps = VIEWPORT_NEAR + EPS_L;
         Fvector box_radius;
         box_radius.set(eps, eps, eps);
-        Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
-        Sectors_xrc.box_query(rmPortals, Device.vCameraPosition, box_radius);
+        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
         for (int K = 0; K < Sectors_xrc.r_count(); K++)
         {
             CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];

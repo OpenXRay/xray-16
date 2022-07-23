@@ -736,7 +736,7 @@ void game_sv_TeamDeathmatch::OnDetachItem(CSE_ActorMP* actor, CSE_Abstract* item
             DestroyGameItem(it);
 
         for (auto& it : to_reject)
-            DestroyGameItem(it);
+            RejectGameItem(it);
     }
 }
 

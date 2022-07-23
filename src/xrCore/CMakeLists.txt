@@ -88,8 +88,6 @@ set(SRC_FILES
     "xrDebug.cpp"
     "xrDebug.h"
     "xrDebug_macros.h"
-    "xr_cpuid.cpp"
-    "xr_cpuid.h"
     "xr_ini.cpp"
     "xr_ini.h"
     "xrMemory.cpp"
@@ -196,9 +194,6 @@ set(SRC_FILES
     "XML/tinyxmlparser.cpp"
     "XML/XMLDocument.cpp"
     "XML/XMLDocument.hpp"
-    #"xrDelegate/xrDelegateArguments.h"
-    #"xrDelegate/xrDelegateBinder.h"
-    #"xrDelegate/xrDelegate.h"
     "../Common/Common.hpp"
     "../Common/Config.hpp"
     "../Common/_d3d_extensions.h"
@@ -236,19 +231,19 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
-    ${JPEG_INCLUDE_DIRS}
+    $<$<BOOL:${JPEG_FOUND}>:${JPEG_INCLUDE_DIRS}>
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     pthread
     ${SDL_LIBRARIES}
-    ${CRYPTO++_LIBRARIES}
+    $<$<BOOL:${USE_CRYPTOPP}>:${CRYPTO++_LIBRARIES}>
     PRIVATE
     xrMiscMath
     dl
     $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
-    ${JPEG_LIBRARIES}
+    $<$<BOOL:${JPEG_FOUND}>:${JPEG_LIBRARIES}>
     ${LZO_LIBRARIES}
 )
 

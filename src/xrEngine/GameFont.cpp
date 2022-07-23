@@ -195,8 +195,9 @@ void CGameFont::OutSet(float x, float y)
 void CGameFont::OutSetI(float x, float y) { OutSet(DI2PX(x), DI2PY(y)); }
 u32 CGameFont::smart_strlen(pcstr S) { return (IsMultibyte() ? mbhMulti2Wide(NULL, NULL, 0, S) : xr_strlen(S)); }
 
-u32 CGameFont::get_actions_text_length(pcstr s)
+std::pair<u32, u32> CGameFont::get_actions_text_length(pcstr s)
 {
+    u32 count = 0;
     u32 length = 0;
 
     while (s[0])
@@ -209,16 +210,20 @@ u32 CGameFont::get_actions_text_length(pcstr s)
 
             cpcstr binding = GetActionBinding(actionId);
             length += xr_strlen(binding);
+            ++count;
         }
         ++s;
     }
-    return length;
+    return { count, length };
 }
 
 void CGameFont::OnRender()
 {
-    pFontRender->OnRender(*this);
-    strings.clear();
+    if (!strings.empty())
+    {
+        pFontRender->OnRender(*this);
+        strings.clear();
+    }
 }
 
 u16 CGameFont::GetCutLengthPos(float fTargetWidth, pcstr pszText)

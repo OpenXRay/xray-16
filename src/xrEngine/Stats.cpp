@@ -200,7 +200,6 @@ void CStats::Show()
         font.OutNext("TEST 2:      %2.2fms, %d", gTestTimer2.result, gTestTimer2.count);
         font.OutNext("TEST 3:      %2.2fms, %d", gTestTimer3.result, gTestTimer3.count);
         font.OutSkip();
-        font.OutNext("CPU: %u", CPU::GetCurrentCPU());
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
     }

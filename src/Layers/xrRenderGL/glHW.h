@@ -2,8 +2,6 @@
 
 #include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
-#include "SDL.h"
-#include "SDL_syswm.h"
 
 class CHW
     : public pureAppActivate,

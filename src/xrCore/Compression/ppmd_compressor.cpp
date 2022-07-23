@@ -3,10 +3,8 @@
 #include "PPMd.h"
 #include "SDL.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
-
-
-LONG InterlockedExchange(LONG volatile *dest, LONG val)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+LONG InterlockedExchange(LONG volatile *dest, LONG val) // XXX: replace with std
 {
     return __sync_lock_test_and_set(dest, val);
 }

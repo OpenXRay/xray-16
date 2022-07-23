@@ -190,8 +190,7 @@ void CHOM::Render_DB(CFrustum& base)
     m_xform_01.mul(m_viewport_01, Device.mFullTransform);
 
     // Query DB
-    xrc.frustum_options(0);
-    xrc.frustum_query(m_pModel, base);
+    xrc.frustum_query(0, m_pModel, base);
     if (0 == xrc.r_count())
         return;
 

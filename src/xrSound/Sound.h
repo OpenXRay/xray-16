@@ -161,6 +161,7 @@ namespace CDB
 // XXX tamlin: Tag NOVTABLE ?
 class XRSOUND_API ISoundManager
 {
+    virtual void _initialize_devices_list() = 0;
     virtual void _initialize() = 0;
     virtual void _clear() = 0;
 
@@ -170,7 +171,8 @@ protected:
     virtual void _destroy_data(ref_sound_data& S) = 0;
 
 public:
-    virtual ~ISoundManager() {}
+    virtual ~ISoundManager() = default;
+    static void _create_devices_list();
     static void _create();
     static void _destroy();
 
@@ -221,7 +223,7 @@ class CSound_UserDataVisitor;
 class CSound_UserData : public xr_resource
 {
 public:
-    virtual ~CSound_UserData() {}
+    virtual ~CSound_UserData() = default;
     virtual void accept(CSound_UserDataVisitor*) = 0;
     virtual void invalidate() = 0;
 };

@@ -910,11 +910,6 @@ public:
     virtual void Execute(LPCSTR args)
     {
         CCC_UnBindAll::Execute(args);
-        string_path cfg;
-        string_path cmd;
-        FS.update_path(cfg, "$game_config$", "default_controls.ltx");
-        strconcat(sizeof(cmd), cmd, "cfg_load", " ", cfg);
-        Console->Execute(cmd);
 
         for (const auto& [action, keys] : predefined_bindings)
         {
@@ -928,6 +923,11 @@ public:
 
             TranslateBinding(binding, g_action_bindings[action]);
         }
+
+        string_path cfg, cmd;
+        FS.update_path(cfg, "$game_config$", "default_controls.ltx");
+        strconcat(cmd, "cfg_load", " ", cfg);
+        Console->Execute(cmd);
     }
 };
 

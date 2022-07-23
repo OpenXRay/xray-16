@@ -7,7 +7,7 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #pragma comment(lib, "winmm.lib")
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -182,7 +182,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
-#else
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
         char* pref_path = nullptr;
         if (strstr(Core.Params, "-fsltx"))
             pref_path = SDL_GetBasePath();
@@ -197,6 +197,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         }
         SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
         SDL_free(pref_path);
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #ifdef _EDITOR
@@ -211,7 +213,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
 #if defined(XR_PLATFORM_WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
-#else
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
         getcwd(WorkingPath, sizeof(WorkingPath));
 
         /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
@@ -258,6 +260,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
                 symlink(tmp_lnk, tmp);
             }
         }
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -267,7 +271,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
         if(pw)
@@ -281,6 +285,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         }
 
         gethostname(CompName, sizeof(CompName));
+#else
+#   error Select or add implementation for your platform
 #endif
 
         Memory._initialize();
@@ -289,7 +295,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
-        R_ASSERT(CPU::ID.hasFeature(CpuFeature::SSE));
+        R_ASSERT(SDL_HasSSE());
 #endif
         TaskScheduler = xr_make_unique<TaskManager>();
         XRay::Math::Initialize();
@@ -328,13 +334,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #endif
         FS._initialize(flags, nullptr, fs_fname);
         EFS._initialize();
-#ifdef DEBUG
-#ifndef _EDITOR
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
-        Msg("Process heap 0x%08x", GetProcessHeap());
-#endif
-#endif
-#endif // DEBUG
     }
     SetLogCB(cb);
     init_counter++;

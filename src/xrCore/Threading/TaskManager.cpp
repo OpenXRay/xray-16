@@ -215,7 +215,7 @@ TaskManager::TaskManager()
 {
     s_main_thread_worker = &s_tl_worker;
 
-    const u32 threads = CPU::ID.n_threads - OTHER_THREADS_COUNT;
+    const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
     workers.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {

@@ -32,7 +32,7 @@ ICF float CalcSSA(float& distSQ, Fvector& C, float R)
     return R / distSQ;
 }
 
-void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
+void R_dsgraph_structure::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
 {
     CRender& RI = RImplementation;
 
@@ -203,7 +203,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
 #endif
 }
 
-void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
+void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 {
     CRender& RI = RImplementation;
 
@@ -363,7 +363,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void D3DXRenderBase::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
+void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
 {
     if (nullptr == pVisual)
         return;
@@ -444,7 +444,7 @@ void D3DXRenderBase::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisu
     }
 }
 
-void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
+void R_dsgraph_structure::add_leafs_Static(dxRender_Visual* pVisual)
 {
     if (!RImplementation.HOM.visible(pVisual->vis))
         return;
@@ -472,7 +472,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
                 add_leafs_Dynamic(pit);
         }*/
     }
-        return;
+    return;
     case MT_HIERRARHY:
     {
         // Add all children, doesn't perform any tests
@@ -484,7 +484,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
             add_leafs_Static(i);
         }
     }
-        return;
+    return;
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:
     {
@@ -498,7 +498,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
             add_leafs_Static(i);
         }
     }
-        return;
+    return;
     case MT_LOD:
     {
         FLOD* pV = (FLOD*)pVisual;
@@ -526,20 +526,20 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
             }
         }
     }
-        return;
+    return;
     case MT_TREE_PM:
     case MT_TREE_ST:
     {
         // General type of visual
         r_dsgraph_insert_static(pVisual);
     }
-        return;
+    return;
     default:
     {
         // General type of visual
         r_dsgraph_insert_static(pVisual);
     }
-        return;
+    return;
     }
 }
 
@@ -549,7 +549,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
 
 /* Xottab_DUTY: this function is only called from add_Static,
  * but we need a matrix, which is nullptr at this point
-BOOL D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
+BOOL R_dsgraph_structure::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
 {
     // Check frustum visibility and calculate distance to visual's center
     Fvector Tpos; // transformed position
@@ -645,7 +645,7 @@ BOOL D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal
     return TRUE;
 }*/
 
-void D3DXRenderBase::add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
+void R_dsgraph_structure::add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
 {
     vis_data& vis = pVisual->vis;
 

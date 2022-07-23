@@ -700,7 +700,7 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::BeforeFrame()
+void CRender::BeforeRender()
 {
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;

@@ -1,5 +1,7 @@
 #include "stdafx.h"
+
 #include "dxFontRender.h"
+
 #include "xrEngine/GameFont.h"
 #include "xrCore/Text/StringConversion.hpp"
 
@@ -7,7 +9,6 @@ dxFontRender::~dxFontRender()
 {
     pShader.destroy();
     pGeom.destroy();
-
 }
 
 void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
@@ -22,13 +23,6 @@ extern ENGINE_API Fvector2 g_current_font_scale;
 void dxFontRender::OnRender(CGameFont& owner)
 {
     VERIFY(g_bRendering);
-
-    if (owner.strings.size() == 0)
-    {
-        // early exit if there is no text to render
-        return;
-    }
-
     if (pShader)
         RCache.set_Shader(pShader);
 
@@ -45,19 +39,20 @@ void dxFontRender::OnRender(CGameFont& owner)
         // calculate first-fit
         int count = 1;
 
-        int length = owner.smart_strlen(owner.strings[i].string);
-        u32 actions = owner.get_actions_text_length(owner.strings[i].string);
+        u32 length = owner.smart_strlen(owner.strings[i].string);
+        auto [actionsCount, actionsLength] = owner.get_actions_text_length(owner.strings[i].string);
+        length += actionsLength - actionsCount * 2;
 
         while ((i + count) < owner.strings.size())
         {
-            int L = owner.smart_strlen(owner.strings[i + count].string);
-            u32 A = owner.get_actions_text_length(owner.strings[i + count].string);
+            u32 L = owner.smart_strlen(owner.strings[i + count].string);
+            auto [aC, aL] = owner.get_actions_text_length(owner.strings[i].string);
+            L += aL - aC * 2;
 
             if ((L + length) < MAX_MB_CHARS)
             {
                 count++;
                 length += L;
-                actions += A;
             }
             else
                 break;
@@ -65,7 +60,7 @@ void dxFontRender::OnRender(CGameFont& owner)
 
         // lock AGP memory
         u32 vOffset;
-        FVF::TL* v = (FVF::TL*)RCache.Vertex.Lock((length + actions) * 4, pGeom.stride(), vOffset);
+        FVF::TL* v = (FVF::TL*)RCache.Vertex.Lock(length * 4, pGeom.stride(), vOffset);
         FVF::TL* start = v;
 
         // fill vertices
@@ -131,16 +126,14 @@ void dxFontRender::OnRender(CGameFont& owner)
                             while (wideBinding[0])
                             {
                                 const Fvector l = owner.GetCharTC(wideBinding[0]);
-                                X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
+                                ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
                                 ++wideBinding;
                             }
                         }
                         else
                         {
                             const Fvector l = owner.GetCharTC(wsStr[1 + j]);
-                            X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
-                            if (IsNeedSpaceCharacter(wsStr[1 + j]))
-                                X += owner.fXStep;
+                            ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
                         }
                     }
                     else
@@ -156,14 +149,14 @@ void dxFontRender::OnRender(CGameFont& owner)
                             while (binding[0])
                             {
                                 const Fvector l = owner.GetCharTC((u16)(u8)binding[0]);
-                                X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
+                                ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
                                 ++binding;
                             }
                         }
                         else
                         {
                             const Fvector l = owner.GetCharTC((u16)(u8)PS.string[j]);
-                            X += ProcessSymbol(owner, v, X, Y, Y2, clr, clr2, l) - 2;
+                            ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
                         }
                     }
                 }
@@ -181,16 +174,16 @@ void dxFontRender::OnRender(CGameFont& owner)
     }
 }
 
-ICF float dxFontRender::ProcessSymbol(const CGameFont& owner, FVF::TL*& v, float X, float Y, float Y2, u32 clr, u32 clr2, const Fvector l)
+inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL*& v, float& X, float Y2, u32 clr2, float Y, u32 clr, xr_wide_char* wsStr, int j)
 {
-    const float scw = l.z * g_current_font_scale.x;
+    float scw = l.z * g_current_font_scale.x;
 
-    const float fTCWidth = l.z / owner.vTS.x;
+    float fTCWidth = l.z / owner.vTS.x;
 
     if (!fis_zero(l.z))
     {
-        //tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
-        //tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
+        //float tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
+        //float tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
         float tu = (l.x / owner.vTS.x);
         float tv = (l.y / owner.vTS.y);
 #ifdef USE_DX9
@@ -208,6 +201,11 @@ ICF float dxFontRender::ProcessSymbol(const CGameFont& owner, FVF::TL*& v, float
         v->set(X + scw, Y, clr, tu + fTCWidth, tv);
         v++;
     }
-
-    return scw * owner.vInterval.x;
+    X += scw * owner.vInterval.x;
+    if (owner.IsMultibyte())
+    {
+        X -= 2;
+        if (IsNeedSpaceCharacter(wsStr[1 + j]))
+            X += owner.fXStep;
+    }
 }

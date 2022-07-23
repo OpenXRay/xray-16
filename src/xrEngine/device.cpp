@@ -25,9 +25,7 @@
 
 #include "Include/editor/ide.hpp"
 
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
@@ -112,10 +110,9 @@ void CRenderDevice::RenderEnd(void)
     g_bRendering = false;
     // end scene
     // Present goes here, so call OA Frame end.
-#if !defined(XR_PLATFORM_LINUX)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(fTimeGlobal);
-#endif
+
     GEnv.Render->End();
 
     if (load_finished && m_editor)
@@ -194,10 +191,8 @@ bool CRenderDevice::BeforeFrame()
         return false;
     }
 
-#if !defined(XR_PLATFORM_LINUX)
     if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
-#endif
 
     return true;
 }
@@ -218,8 +213,9 @@ void CRenderDevice::BeforeRender()
 
     // Matrices
     mFullTransform.mul(mProject, mView);
-    GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert_44(mFullTransform);
+    GEnv.Render->BeforeRender();
+    GEnv.Render->SetCacheXform(mView, mProject);
 
     vCameraPositionSaved = vCameraPosition;
     vCameraDirectionSaved = vCameraDirection;
@@ -268,7 +264,6 @@ void CRenderDevice::ProcessFrame()
 
     const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
-    GEnv.Render->BeforeFrame();
     FrameMove();
 
     BeforeRender();

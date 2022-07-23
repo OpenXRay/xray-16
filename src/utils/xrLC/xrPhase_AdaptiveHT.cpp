@@ -79,9 +79,8 @@ void	callback_vertex_hemi	(Vertex* V)
 {
     // calc vertex attributes
     CDB::COLLIDER			DB;
-    DB.ray_options			(0);
     base_color_c			vC;
-    LightPoint				(&DB, RCAST_Model, vC, V->P, V->N, pBuild->L_static, LP_dont_rgb+LP_dont_sun,0);
+    LightPoint				(&DB, 0, RCAST_Model, vC, V->P, V->N, pBuild->L_static, LP_dont_rgb+LP_dont_sun,0);
     V->C._set				(vC);
 }
 int		smfVertex				(Vertex* V)
@@ -139,7 +138,6 @@ public:
     }
     virtual void Execute()
     {
-        DB.ray_options(0);
         for (u32 vit = _from; vit < _to; vit++)
         {
             base_color_c vC;
@@ -149,8 +147,8 @@ public:
 
             R_ASSERT(V);
             V->normalFromAdj();
-            LightPoint(
-                &DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, pBuild->L_static(), LP_dont_rgb + LP_dont_sun, 0);
+            LightPoint(&DB, 0, lc_global_data()->RCAST_Model(), vC, V->P, V->N,
+                pBuild->L_static(), LP_dont_rgb + LP_dont_sun, 0);
             vC.mul(0.5f);
             V->C._set(vC);
         }
@@ -160,7 +158,6 @@ public:
 void CBuild::xrPhase_AdaptiveHT()
 {
     CDB::COLLIDER DB;
-    DB.ray_options(0);
 
     Logger.Status("Tesselating...");
     if (1)
@@ -195,7 +192,7 @@ void CBuild::xrPhase_AdaptiveHT()
         //	base_color_c		vC;
         //	Vertex*		V		= lc_global_data()->g_vertices()[vit];
         //	V->normalFromAdj	();
-        //	LightPoint			(&DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, pBuild->L_static(),
+        //	LightPoint			(&DB, 0, lc_global_data()->RCAST_Model(), vC, V->P, V->N, pBuild->L_static(),
         // LP_dont_rgb+LP_dont_sun,0);
         //	vC.mul				(0.5f);
         //	V->C._set			(vC);

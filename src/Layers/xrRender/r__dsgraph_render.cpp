@@ -93,10 +93,10 @@ template <class T> void sort_tlist(xr_vector<typename T::value_type*>& lst, xr_v
     }
 }
 
-void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
+void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
 {
     PIX_EVENT(r_dsgraph_render_graph);
-    BasicStats.Primitives.Begin();
+    RImplementation.BasicStats.Primitives.Begin(); // XXX: Refactor a bit later
 
     // **************************************************** NORMAL
     // Perform sorting based on ScreenSpaceArea
@@ -331,7 +331,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         vs.clear();
     }
 
-    BasicStats.Primitives.End();
+    RImplementation.BasicStats.Primitives.End(); // XXX: Refactor a bit later
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -448,7 +448,7 @@ ICF void sort_back_to_front_render_and_clean(T& vec)
 
 //////////////////////////////////////////////////////////////////////////
 // HUD render
-void D3DXRenderBase::r_dsgraph_render_hud()
+void R_dsgraph_structure::r_dsgraph_render_hud()
 {
     PIX_EVENT(r_dsgraph_render_hud);
 
@@ -464,7 +464,7 @@ void D3DXRenderBase::r_dsgraph_render_hud()
 #endif
 }
 
-void D3DXRenderBase::r_dsgraph_render_hud_ui()
+void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 {
     VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
@@ -494,7 +494,7 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void D3DXRenderBase::r_dsgraph_render_sorted()
+void R_dsgraph_structure::r_dsgraph_render_sorted()
 {
     PIX_EVENT(r_dsgraph_render_sorted);
 
@@ -509,7 +509,7 @@ void D3DXRenderBase::r_dsgraph_render_sorted()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void D3DXRenderBase::r_dsgraph_render_emissive()
+void R_dsgraph_structure::r_dsgraph_render_emissive()
 {
 #if RENDER != R_R1
     PIX_EVENT(r_dsgraph_render_emissive);
@@ -526,7 +526,7 @@ void D3DXRenderBase::r_dsgraph_render_emissive()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void D3DXRenderBase::r_dsgraph_render_wmarks()
+void R_dsgraph_structure::r_dsgraph_render_wmarks()
 {
 #if RENDER != R_R1
     PIX_EVENT(r_dsgraph_render_wmarks);
@@ -537,7 +537,7 @@ void D3DXRenderBase::r_dsgraph_render_wmarks()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void D3DXRenderBase::r_dsgraph_render_distort()
+void R_dsgraph_structure::r_dsgraph_render_distort()
 {
     PIX_EVENT(r_dsgraph_render_distort);
 
@@ -546,7 +546,7 @@ void D3DXRenderBase::r_dsgraph_render_distort()
 
 //////////////////////////////////////////////////////////////////////////
 // sub-space rendering - shortcut to render with frustum extracted from matrix
-void D3DXRenderBase::r_dsgraph_render_subspace(
+void R_dsgraph_structure::r_dsgraph_render_subspace(
     IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     CFrustum temp;
@@ -555,7 +555,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(
 }
 
 // sub-space rendering - main procedure
-void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined,
+void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined,
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     VERIFY(_sector);
@@ -567,8 +567,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(EPS_L * 20, EPS_L * 20, EPS_L * 20);
-        RImplementation.Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
-        RImplementation.Sectors_xrc.box_query(RImplementation.rmPortals, _cop, box_radius);
+        RImplementation.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.rmPortals, _cop, box_radius);
         for (int K = 0; K < RImplementation.Sectors_xrc.r_count(); K++)
         {
             CPortal* pPortal =
@@ -590,7 +589,8 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
             dxRender_Visual* root = sector->root();
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
-                add_Geometry(root, sector->r_frustums[v_it]);
+                const auto& view = sector->r_frustums[v_it];
+                add_Static(root, view, view.getMask());
             }
         }
     }
@@ -620,7 +620,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
                 if (nullptr == renderable)
                     continue; // unknown, but renderable object (r1_glow???)
 
-                renderable->renderable_Render(renderable);
+                renderable->renderable_Render(nullptr);
             }
         }
 #if RENDER != R_R1
@@ -656,7 +656,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 #include "SkeletonCustom.h"
 #include "FLOD.h"
 
-void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
+void R_dsgraph_structure::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
 {
     PIX_EVENT(r_dsgraph_render_R1_box);
 

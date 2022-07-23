@@ -45,7 +45,6 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/xrServerEntities
-    ${CMAKE_SOURCE_DIR}/Externals/cximage
     ${CMAKE_SOURCE_DIR}/Externals/GameSpy/src
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/ode/include

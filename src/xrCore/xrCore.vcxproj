@@ -26,7 +26,7 @@
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID=$(APPVEYOR_BUILD_ID);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID=$(GITHUB_RUN_ID);GITHUB_RUN_NUMBER=$(GITHUB_RUN_NUMBER);GITHUB_REPOSITORY=$(GITHUB_REPOSITORY);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DbgHelp.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>where /q git
@@ -54,7 +54,6 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Compression\rt_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor9.cpp" />
     <ClCompile Include="Media\ImageJPEG.cpp" />
-    <ClCompile Include="xr_cpuid.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="Crypto\trivial_encryptor.cpp" />
     <ClCompile Include="Crypto\xr_dsa.cpp" />
@@ -153,7 +152,6 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="Containers\AssociativeVector.hpp" />
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="Containers\FixedMap.h" />
-    <ClInclude Include="xr_cpuid.h" />
     <ClInclude Include="Crypto\trivial_encryptor.h" />
     <ClInclude Include="Crypto\xr_dsa.h" />
     <ClInclude Include="Crypto\xr_dsa_signer.h" />
@@ -219,9 +217,6 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="xrCore_benchmark_macros.h" />
     <ClInclude Include="xrDebug.h" />
     <ClInclude Include="xrDebug_macros.h" />
-    <ClInclude Include="xrDelegate\xrDelegate.h" />
-    <ClInclude Include="xrDelegate\xrDelegateArguments.h" />
-    <ClInclude Include="xrDelegate\xrDelegateBinder.h" />
     <ClInclude Include="xrMemory.h" />
     <ClInclude Include="xrPool.h" />
     <ClInclude Include="xrsharedmem.h" />

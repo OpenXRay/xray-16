@@ -180,7 +180,7 @@ public:
     virtual bool occ_visible(sPoly& P) override;
 
     // Main
-    void BeforeFrame() override;
+    void BeforeRender() override;
 
     virtual void Calculate() override;
     virtual void Render() override;

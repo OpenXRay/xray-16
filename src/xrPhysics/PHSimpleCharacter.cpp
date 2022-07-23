@@ -902,8 +902,7 @@ bool CPHSimpleCharacter::ValidateWalkOnMesh()
     query.merge(tmp);
     query.get_CD(q_c, q_d);
 
-    XRC.box_options(0);
-    XRC.box_query(inl_ph_world().ObjectSpace().GetStaticModel(), q_c, q_d);
+    XRC.box_query(0, inl_ph_world().ObjectSpace().GetStaticModel(), q_c, q_d);
     // Fvector fv_dir;fv_dir.mul(accel,1.f/mag);
     Fvector sd_dir;
     sd_dir.set(-accel.z, 0, accel.x);

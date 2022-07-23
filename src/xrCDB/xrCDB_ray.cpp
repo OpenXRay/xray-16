@@ -422,7 +422,7 @@ public:
     }
 };
 
-void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
+void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
 {
     m_def->syncronize();
 
@@ -431,7 +431,7 @@ void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvect
     const AABBNoLeafNode* N = T->GetNodes();
     r_clear();
 
-    if (CPU::ID.hasFeature(CpuFeature::SSE))
+    if (SDL_HasSSE())
     {
         // SSE
         // Binary dispatcher
