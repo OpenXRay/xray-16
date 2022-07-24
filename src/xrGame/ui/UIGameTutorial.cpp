@@ -97,7 +97,7 @@ CUISequencer::CUISequencer()
 {
     m_UIWindow = nullptr;
     m_pStoredInputReceiver = nullptr;
-    m_name = "invalid";
+    m_name = nullptr;
     m_flags.zero();
 }
 

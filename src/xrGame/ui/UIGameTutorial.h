@@ -17,6 +17,7 @@ protected:
     CUIWindow* m_UIWindow;
     ref_sound m_global_sound;
     xr_deque<CUISequenceItem*> m_sequencer_items;
+    pcstr m_name;
 
     bool GrabInput();
     CUISequenceItem* GetNextItem();
@@ -68,9 +69,6 @@ public:
         etsOverMainMenu = (1 << 6),
     };
     Flags32 m_flags;
-
-private:
-    pcstr m_name;
 };
 
 class CUISequenceItem
