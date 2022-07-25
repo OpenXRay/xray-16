@@ -5,14 +5,14 @@
 #include "stdafx.h"
 #pragma hdrstop // huh?
 
+#if defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
 #pragma warning(disable : 4995)
-#if defined(XR_PLATFORM_WINDOWS)
 #include <direct.h>
 #include <sys/stat.h>
-#endif
-#include <fcntl.h>
+#include <sys/utime.h>
 #pragma warning(pop)
+#endif
 
 #include "FS_internal.h"
 #include "stream_reader.h"
