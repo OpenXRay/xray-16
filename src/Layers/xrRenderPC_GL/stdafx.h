@@ -45,7 +45,8 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/xrRender_console.h"
 
-#include "rgl.h"
+#include "r2.h"
+#include "gl_rendertarget.h"
 
 IC void jitter(CBlender_Compile& C)
 {

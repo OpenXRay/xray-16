@@ -2,12 +2,11 @@
 
 #include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
-#include <Layers/xrRender/r__sync_point.h>
+#include "Layers/xrRender/r__sync_point.h"
 
 #include "Layers/xrRender/PSLibrary.h"
 
 #include "r2_types.h"
-#include "gl_rendertarget.h"
 
 #include "Layers/xrRender/HOM.h"
 #include "Layers/xrRender/DetailManager.h"
@@ -23,10 +22,11 @@
 #include "xrEngine/IRenderable.h"
 #include "xrCore/FMesh.hpp"
 
+class CRenderTarget;
 class dxRender_Visual;
 
 // definition
-class CRender : public D3DXRenderBase
+class CRender final : public D3DXRenderBase
 {
 public:
     enum
@@ -81,6 +81,7 @@ public:
         u32 nvdbt : 1;
 
         u32 nullrt : 1;
+        u32 no_ram_textures : 1; // don't keep textures in RAM
 
         u32 distortion : 1;
         u32 distortion_enabled : 1;
@@ -96,11 +97,11 @@ public:
         u32 advancedpp : 1; //	advanced post process (DOF, SSAO, volumetrics, etc.)
         u32 volumetricfog : 1;
 
-        u32 dx10_msaa : 1; //	DX10.0 path
-        u32 dx10_msaa_hybrid : 1; //	DX10.0 main path with DX10.1 A-test msaa allowed
-        u32 dx10_msaa_opt : 1; //	DX10.1 path
-        u32 dx10_gbuffer_opt : 1; //
-        u32 dx10_sm4_1 : 1; //	DX10.1 path
+        u32 dx10_msaa : 1; // DX10.0 path
+        u32 dx10_msaa_hybrid : 1; // DX10.0 main path with DX10.1 A-test msaa allowed
+        u32 dx10_msaa_opt : 1; // DX10.1 path
+        u32 dx10_gbuffer_opt : 1;
+        u32 dx10_sm4_1 : 1; // DX10.1 path
         u32 dx10_msaa_alphatest : 2; //	A-test mode
         u32 dx10_msaa_samples : 4;
 
@@ -114,7 +115,7 @@ public:
         float forcegloss_v;
     } o;
 
-    struct RenderR4Statistics
+    struct RenderR2Statistics
     {
         u32 l_total;
         u32 l_visible;
@@ -126,7 +127,7 @@ public:
         u32 ic_total;
         u32 ic_culled;
 
-        RenderR4Statistics() { FrameStart(); }
+        RenderR2Statistics() { FrameStart(); }
         void FrameStart()
         {
             l_total = 0;
@@ -144,7 +145,7 @@ public:
     };
 
 public:
-    RenderR4Statistics Stats;
+    RenderR2Statistics Stats;
     // Sector detection and visibility
     CSector* pLastSector;
     Fvector vLastCameraPos;
@@ -192,8 +193,8 @@ public:
 
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
-    xr_vector<sun::cascade> m_sun_cascades;
 
+    xr_vector<sun::cascade> m_sun_cascades;
 
 private:
     // Loading / Unloading
@@ -203,7 +204,9 @@ private:
     void LoadPortals(IReader* fs);
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
+#if RENDER != R_R2
     void Load3DFluid();
+#endif
 
 public:
     IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
@@ -216,12 +219,15 @@ public:
     void render_sun_near();
     void render_sun_filtered();
     void render_menu();
+#if RENDER != R_R2
     void render_rain();
+#endif
 
     void render_sun_cascade(u32 cascade_ind);
     void init_cacades();
     void render_sun_cascades();
 
+public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
     VertexElement* getVB_Format(int id, bool alternative = false);
@@ -237,7 +243,15 @@ public:
     // HW-occlusion culling
     u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
     void occq_end(u32& ID) { HWOCC.occq_end(ID); }
+#if defined(USE_DX9)
+    u32 occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+#elif defined(USE_DX11)
     R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+#elif defined(USE_OGL)
+    R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+#else
+#   error No graphics API selected or enabled!
+#endif
 
     ICF void apply_object(IRenderable* O)
     {
@@ -247,9 +261,9 @@ public:
         CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
-        //o_hemi						= 0.5f*LT.get_hemi			()	;
+        // o_hemi						= 0.5f*LT.get_hemi			()	;
         o_sun = 0.75f * LT.get_sun();
-        CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES*sizeof(float));
+        CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
 
     void apply_lmaterial()
@@ -257,14 +271,24 @@ public:
         R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
         if (!C)
             return;
-        VERIFY (RC_dest_sampler == C->destination);
-        VERIFY (RC_sampler == C->type);
+
+        VERIFY(RC_dest_sampler == C->destination);
+#if defined(USE_DX9)
+        VERIFY(RC_sampler == C->type);
+#elif defined(USE_DX11)
+        VERIFY(RC_dx10texture == C->type);
+#elif defined(USE_OGL)
+        VERIFY(RC_sampler == C->type);
+#else
+#   error No graphics API selected or enabled!
+#endif
+
         CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
-        VERIFY (T);
+        VERIFY(T);
         float mtl = T->m_material;
-#ifdef	DEBUG
+#ifdef DEBUG
         if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))
-            mtl=ps_r2_gmaterial;
+            mtl = ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
         RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
@@ -277,11 +301,24 @@ public:
 
 public:
     // feature level
-    GenerationLevel GetGeneration() const override { return GENERATION_R2; }
-    virtual BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::OpenGL; }
-
+    GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
     bool is_sun_static() override { return o.sunstatic; }
+
+#if defined(USE_DX9)
+    BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D9; }
+    u32 get_dx_level() override { return 0x00090000; }
+    pcstr getShaderPath() override { return "r2\\"; }
+#elif defined(USE_DX11)
+    BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
+    u32 get_dx_level() override { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
+    pcstr getShaderPath() override { return "r3\\"; }
+#elif defined(USE_OGL)
+    BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::OpenGL; }
     u32 get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }
+    pcstr getShaderPath() override { return "gl\\"; }
+#else
+#   error No graphics API selected or enabled!
+#endif
 
     // Loading / Unloading
     void create() override;
@@ -292,19 +329,22 @@ public:
     void level_Load(IReader*) override;
     void level_Unload() override;
 
-    GLuint texture_load(LPCSTR fname, u32& msize, GLenum& ret_desc);
-    HRESULT shader_compile(
-        pcstr name,
-        IReader* fs,
-        pcstr pFunctionName,
-        pcstr pTarget,
-        u32 Flags,
-        void*& result) override;
+#if defined(USE_DX9)
+    ID3DBaseTexture* texture_load(pcstr fname, u32& msize);
+#elif defined(USE_DX11)
+    ID3DBaseTexture* texture_load(pcstr fname, u32& msize, bool bStaging = false);
+#elif defined(USE_OGL)
+    GLuint           texture_load(pcstr fname, u32& msize, GLenum& ret_desc);
+#else
+#   error No graphics API selected or enabled!
+#endif
+
+    HRESULT shader_compile(pcstr name, IReader* fs,
+        pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
 
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
-    LPCSTR getShaderPath() override { return "gl" DELIMITER; }
-    virtual ref_shader getShader(int id);
+    ref_shader getShader(int id);
     IRender_Sector* getSector(int id) override;
     IRenderVisual* getVisual(int id) override;
     IRender_Sector* detectSector(const Fvector& P) override;
@@ -317,23 +357,23 @@ public:
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 
     // wallmarks
-    virtual void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);
+    void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);
     void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
     void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
     void clear_static_wallmarks() override;
-    virtual void add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm);
-    virtual void add_SkeletonWallmark(const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start,
-                                      const Fvector& dir, float size);
+    void add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm);
+    void add_SkeletonWallmark(const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start,
+                              const Fvector& dir, float size);
     void add_SkeletonWallmark(const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start,
                               const Fvector& dir, float size) override;
 
     //
-    virtual IBlender* blender_create(CLASS_ID cls);
-    virtual void blender_destroy(IBlender* &);
+    IBlender* blender_create(CLASS_ID cls);
+    void blender_destroy(IBlender*&);
 
     //
     IRender_ObjectSpecific* ros_create(IRenderable* parent) override;
-    void ros_destroy(IRender_ObjectSpecific* &) override;
+    void ros_destroy(IRender_ObjectSpecific*&) override;
 
     // Lighting
     IRender_Light* light_create() override;
@@ -341,12 +381,12 @@ public:
 
     // Models
     IRenderVisual* model_CreateParticles(LPCSTR name) override;
-    virtual IRender_DetailModel* model_CreateDM(IReader* F);
+    IRender_DetailModel* model_CreateDM(IReader* F);
     IRenderVisual* model_Create(LPCSTR name, IReader* data = nullptr) override;
     IRenderVisual* model_CreateChild(LPCSTR name, IReader* data) override;
     IRenderVisual* model_Duplicate(IRenderVisual* V) override;
-    void model_Delete(IRenderVisual* & V, bool bDiscard) override;
-    virtual void model_Delete(IRender_DetailModel* & F);
+    void model_Delete(IRenderVisual*& V, bool bDiscard) override;
+    void model_Delete(IRender_DetailModel*& F);
     void model_Logging(bool bEnable) override { Models->Logging(bEnable); }
     void models_Prefetch() override;
     void models_Clear(bool b_complete) override;
@@ -370,9 +410,11 @@ public:
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
+#ifdef USE_OGL
     void ObtainRequiredWindowFlags(u32& windowFlags) override;
     RenderContext GetCurrentContext() const override;
     void MakeContextCurrent(RenderContext context) override;
+#endif
 
     // Render mode
     void rmNear() override;
@@ -383,13 +425,25 @@ public:
 
     // Constructor/destructor/loader
     CRender();
-    virtual ~CRender();
+    ~CRender() override;
 
+#if defined(USE_DX9)
+    // nothing
+#elif defined(USE_DX11)
+    void addShaderOption(pcstr name, pcstr value);
+    void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+
+private:
+    xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
+#elif defined(USE_OGL)
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 
 private:
     xr_string m_ShaderOptions;
+#else
+#   error No graphics API selected or enabled!
+#endif
 
 protected:
     void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;

@@ -18,7 +18,6 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
-#include "D3DX10Core.h"
 #endif
 
 CRender RImplementation;

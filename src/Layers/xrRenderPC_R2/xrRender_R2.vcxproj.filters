@@ -168,9 +168,6 @@
     <ClInclude Include="..\xrRender\PSLibrary.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="r2.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\r__dsgraph_types.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -634,6 +631,9 @@
       <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

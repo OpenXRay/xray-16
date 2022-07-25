@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "rgl.h"
+#include "r2.h"
 
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"

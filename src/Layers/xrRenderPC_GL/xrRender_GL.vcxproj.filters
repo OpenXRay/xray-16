@@ -872,9 +872,6 @@
     <ClInclude Include="..\xrRender\FHierrarhyVisual.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
     </ClInclude>
-    <ClInclude Include="rgl.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderGL\glStateUtils.h">
       <Filter>dx9 to gl Utils</Filter>
     </ClInclude>
@@ -1137,6 +1134,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
