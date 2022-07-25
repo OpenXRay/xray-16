@@ -34,6 +34,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
+    <ClCompile Include="..\xrRenderGL\glResourceManager_Resources.cpp" />
+    <ClCompile Include="..\xrRenderGL\glResourceManager_Scripting.cpp" />
+    <ClCompile Include="..\xrRenderGL\glr_constants.cpp" />
+    <ClCompile Include="..\xrRenderGL\glTexture.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
@@ -194,10 +198,6 @@
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp" />
     <ClCompile Include="..\xrRender\WallmarksEngine.cpp" />
     <ClCompile Include="..\xrRender\xrRender_console.cpp" />
-    <ClCompile Include="glResourceManager_Resources.cpp" />
-    <ClCompile Include="glResourceManager_Scripting.cpp" />
-    <ClCompile Include="glr_constants.cpp" />
-    <ClCompile Include="glTexture.cpp" />
     <ClCompile Include="gl_rendertarget_u_set_rt.cpp" />
     <ClCompile Include="r2_R_sun.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />
