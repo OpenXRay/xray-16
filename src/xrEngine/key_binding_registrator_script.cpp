@@ -1,10 +1,8 @@
-#include "pch_script.h"
-#include "xrEngine/xr_level_controller.h"
+#include "stdafx.h"
+
+#include "xr_level_controller.h"
+
 #include "xrScriptEngine/ScriptExporter.hpp"
-
-using namespace luabind;
-
-static int dik_to_bind(int dik) { return GetBindedAction(dik); }
 
 // clang-format off
 SCRIPT_EXPORT(KeyBindings, (),
@@ -12,9 +10,10 @@ SCRIPT_EXPORT(KeyBindings, (),
     class EnumGameActions {};
     class KeyBindingRegistrator {};
 
+    using namespace luabind;
     module(luaState)
     [
-        def("dik_to_bind", &dik_to_bind),
+        def("dik_to_bind", +[](int dik) -> int { return GetBindedAction(dik); }),
         class_<EnumGameActions>("key_bindings")
             .enum_("commands")
             [

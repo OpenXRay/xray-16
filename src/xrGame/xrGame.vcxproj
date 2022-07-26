@@ -2456,10 +2456,6 @@
     </ClCompile>
     <ClCompile Include="invincible_fury.cpp" />
     <ClCompile Include="item_manager.cpp" />
-    <ClCompile Include="key_binding_registrator_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="killer_victim_velocity_angle.cpp" />
     <ClCompile Include="kills_store.cpp" />
     <ClCompile Include="Level.cpp">

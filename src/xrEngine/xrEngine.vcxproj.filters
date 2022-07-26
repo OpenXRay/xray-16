@@ -145,6 +145,9 @@
     <Filter Include="Game API\Level Controller">
       <UniqueIdentifier>{680dcf81-2df9-4006-b22b-17db9cf15ad3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game API\Level Controller\KeyBindings">
+      <UniqueIdentifier>{88084f61-660e-4bb7-ab64-5fd27a09d18a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -631,6 +634,9 @@
     </ClCompile>
     <ClCompile Include="xr_level_controller.cpp">
       <Filter>Game API\Level Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="key_binding_registrator_script.cpp">
+      <Filter>Game API\Level Controller\KeyBindings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

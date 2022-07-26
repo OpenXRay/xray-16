@@ -2191,9 +2191,6 @@
     <Filter Include="ScriptClasses\UI">
       <UniqueIdentifier>{b08ee833-e28c-4687-b6b5-0907349836ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ScriptClasses\KeyBindings">
-      <UniqueIdentifier>{2be23629-93c7-4bb0-997f-7c681c5a0f1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ScriptClasses\ScriptReader">
       <UniqueIdentifier>{cfbfa419-543b-48f1-80e6-2082a84c6ecf}</UniqueIdentifier>
     </Filter>
@@ -7825,9 +7822,6 @@
     </ClCompile>
     <ClCompile Include="ui_export_script.cpp">
       <Filter>ScriptClasses\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="key_binding_registrator_script.cpp">
-      <Filter>ScriptClasses\KeyBindings</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_reader_script.cpp">
       <Filter>ScriptClasses\ScriptReader</Filter>
