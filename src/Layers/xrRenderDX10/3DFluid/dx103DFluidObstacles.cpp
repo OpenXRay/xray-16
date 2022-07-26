@@ -219,7 +219,7 @@ void dx103DFluidObstacles::ProcessDynamicObstacles(
         }
     }
 
-    if (m_lstShells.empty() || m_lstElements.empty())
+    if (m_lstShells.empty() && m_lstElements.empty())
         return;
 
     RCache.set_Element(m_ObstacleTechnique[OS_DynamicOOBB]);
