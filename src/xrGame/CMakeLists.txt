@@ -759,7 +759,6 @@ set(SRC_FILES
     "item_manager.cpp"
     "item_manager.h"
     "item_manager_inline.h"
-    "key_binding_registrator_script.cpp"
     "killer_victim_velocity_angle.cpp"
     "killer_victim_velocity_angle.h"
     "kills_store.cpp"

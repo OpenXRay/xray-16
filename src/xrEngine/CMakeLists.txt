@@ -75,6 +75,7 @@ set(SRC_FILES
     "IRenderable.h"
     "ISheduled.cpp"
     "ISheduled.h"
+	"key_binding_registrator_script.cpp"
     "LightAnimLibrary.cpp"
     "LightAnimLibrary.h"
     "line_edit_control.cpp"
