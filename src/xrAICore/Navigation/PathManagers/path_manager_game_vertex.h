@@ -24,8 +24,8 @@ protected:
         _dist_type, _index_type, _iteration_type>;
 
 protected:
-    _Parameters* m_evaluator;
-    bool m_start_is_accessible;
+    _Parameters* m_evaluator{};
+    bool m_start_is_accessible{};
 
 public:
     IC void setup(const _Graph* graph, _DataStorage* _data_storage, xr_vector<_index_type>* _path,

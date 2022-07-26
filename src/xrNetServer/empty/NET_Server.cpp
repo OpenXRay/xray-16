@@ -49,7 +49,7 @@ void IBannedClient::Load(CInifile& ini, const shared_str& sect)
 
     tm _tm_banned;
     const shared_str& time_to = ini.r_string(sect, "time_to");
-    int res_t = sscanf(time_to.c_str(), "%02d.%02d.%d_%02d:%02d:%02d", &_tm_banned.tm_mday, &_tm_banned.tm_mon,
+    [[maybe_unused]] int res_t = sscanf(time_to.c_str(), "%02d.%02d.%d_%02d:%02d:%02d", &_tm_banned.tm_mday, &_tm_banned.tm_mon,
         &_tm_banned.tm_year, &_tm_banned.tm_hour, &_tm_banned.tm_min, &_tm_banned.tm_sec);
     VERIFY(res_t == 6);
 
@@ -68,7 +68,7 @@ void IBannedClient::Save(CInifile& ini)
 
 xr_string IBannedClient::BannedTimeTo() const
 {
-    string256 res;
+    string256 res{};
 
     return res;
 }
@@ -291,9 +291,9 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
         string1024 tmp;
 #endif // DEBUG
 
-        bool bSimulator = false;
-        if (strstr(Core.Params, "-netsim"))
-            bSimulator = true;
+//        bool bSimulator = false;
+//        if (strstr(Core.Params, "-netsim"))
+//            bSimulator = true;
 
         //dump_URL("! sv ", net_Address_device);
 
@@ -471,17 +471,17 @@ bool IPureServer::HasBandwidth(IClient* C)
     if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES))
         dwInterval = 1000; // approx 2 times per second
 
-    HRESULT hr;
+//    HRESULT hr;
     if (psNET_ServerUpdate != 0 && (dwTime - C->dwTime_LastUpdate) > dwInterval) {
         // check queue for "empty" state
-        u32 dwPending;
-        if (FAILED(hr))
-            return false;
+//        u32 dwPending;
+//        if (FAILED(hr))
+//            return false;
 
-        if (dwPending > u32(psNET_ServerPending)) {
-            C->stats.dwTimesBlocked++;
-            return false;
-        }
+//        if (dwPending > u32(psNET_ServerPending)) {
+//            C->stats.dwTimesBlocked++;
+//            return false;
+//        }
 
         UpdateClientStatistic(C);
         // ok

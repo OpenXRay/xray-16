@@ -347,7 +347,7 @@ struct dxQuadTreeSpace : public dxSpace{
 };
 
 dxQuadTreeSpace::dxQuadTreeSpace(dSpaceID _space, dVector3 Center, dVector3 Extents, int Depth) : dxSpace(_space){
-	type = dQuadTreeSpaceClass;
+	type = dClassNumber::dQuadTreeSpaceClass;
 
 	int BlockCount = 0;
 	for (int i = 0; i <= Depth; i++){

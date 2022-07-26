@@ -77,7 +77,7 @@ CMainMenu::CMainMenu()
         CMainMenu* m_mainmenu;
 
     public:
-        CResetEventCb(CID cid, CMainMenu* mm) : m_mainmenu(mm), CEventNotifierCallbackWithCid(cid) {}
+        CResetEventCb(CID cid, CMainMenu* mm) : CEventNotifierCallbackWithCid(cid), m_mainmenu(mm) {}
         void ProcessEvent() override { m_mainmenu->DestroyInternal(true); }
     };
 
@@ -964,7 +964,7 @@ void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
 #else
     std::string command = "xdg-open " + std::string{url};
-    system(command.c_str());
+    std::ignore = system(command.c_str());
 #endif
 }
 

@@ -222,7 +222,7 @@ bool CAI_Rat::calc_node(Fvector const& next_position)
 Fvector CAI_Rat::calc_position()
 {
     Fvector tSavedPosition = Position();
-    SRotation tSavedTorsoTarget = movement().m_body.target;
+    // SRotation tSavedTorsoTarget = movement().m_body.target;
 
     // Update position and orientation of the planes
     float fAT = m_fASpeed * m_fTimeUpdateDelta;

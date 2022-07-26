@@ -25,7 +25,7 @@ bool IGame_Persistent::IsMainMenuActive()
 
 bool IGame_Persistent::MainMenuActiveOrLevelNotExist()
 {
-    return !g_pGameLevel || g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
+    return !g_pGameLevel || (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive());
 }
 
 IGame_Persistent::IGame_Persistent()

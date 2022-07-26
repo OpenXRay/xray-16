@@ -876,6 +876,7 @@ CSE_ALifeObjectPhysic::~CSE_ALifeObjectPhysic() {}
 void CSE_ALifeObjectPhysic::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     if (m_wVersion >= 14)
+    {
         if (m_wVersion >= 16)
         {
             inherited1::STATE_Read(tNetPacket, size);
@@ -887,6 +888,7 @@ void CSE_ALifeObjectPhysic::STATE_Read(NET_Packet& tNetPacket, u16 size)
             CSE_ALifeObject::STATE_Read(tNetPacket, size);
             visual_read(tNetPacket, m_wVersion);
         }
+    }
 
     if (m_wVersion >= 64)
         inherited2::STATE_Read(tNetPacket, size);

@@ -8,8 +8,7 @@
 
 namespace award_system
 {
-player_state_marksman::player_state_marksman(game_state_accumulator* owner) : inherited(owner) { m_spawn_time = 0; }
-u32 const player_state_marksman::get_u32_param() { return m_sniper_victims.size(); }
+u32 player_state_marksman::get_u32_param() { return m_sniper_victims.size(); }
 void player_state_marksman::reset_game()
 {
     m_spawn_time = 0;

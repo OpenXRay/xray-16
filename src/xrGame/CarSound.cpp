@@ -118,6 +118,7 @@ void CCar::SCarSound::Update()
     case sndDrive: UpdateDrive(); break;
     case sndStalling: UpdateStalling(); break;
     case sndStoping: UpdateStalling(); break;
+    default: break;
     }
 }
 

@@ -5,7 +5,7 @@
 class XRUICORE_API CUISpinNum : public CUICustomSpin
 {
 public:
-    CUISpinNum();
+    CUISpinNum() = default;
 
     virtual void InitSpin(Fvector2 pos, Fvector2 size);
 
@@ -29,18 +29,16 @@ protected:
     virtual void IncVal();
     virtual void DecVal();
 
-    int m_iMax;
-    int m_iMin;
-    int m_iStep;
-    int m_iVal;
-    int m_opt_backup_value;
+    int m_iMax{100};
+    int m_iMin{};
+    int m_iStep{1};
+    int m_iVal{};
+    int m_opt_backup_value{};
 };
 
 class XRUICORE_API CUISpinFlt : public CUICustomSpin
 {
 public:
-    CUISpinFlt();
-
     virtual void InitSpin(Fvector2 pos, Fvector2 size);
 
     // CUIOptionsItem
@@ -63,9 +61,9 @@ protected:
     virtual void IncVal();
     virtual void DecVal();
 
-    float m_fMax;
-    float m_fMin;
-    float m_fStep;
-    float m_fVal;
-    float m_opt_backup_value;
+    float m_fMax{ 100.0f };
+    float m_fMin{};
+    float m_fStep{ 0.1f };
+    float m_fVal{ 0.0f };
+    float m_opt_backup_value{};
 };

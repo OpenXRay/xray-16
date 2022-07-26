@@ -55,6 +55,7 @@ extern BOOL death_anim_debug;
 //}
 
 IC bool is_imotion(interactive_motion* im) { return im && im->is_enabled(); }
+
 CCharacterPhysicsSupport::~CCharacterPhysicsSupport()
 {
     set_collision_hit_callback(0);
@@ -72,12 +73,8 @@ CCharacterPhysicsSupport::~CCharacterPhysicsSupport()
 }
 
 CCharacterPhysicsSupport::CCharacterPhysicsSupport(EType atype, CEntityAlive* aentity)
-    : m_pPhysicsShell(aentity->PPhysicsShell()), m_EntityAlife(*aentity), mXFORM(aentity->XFORM()),
-      m_ph_sound_player(aentity), m_interactive_motion(0), m_PhysicMovementControl(xr_new<CPHMovementControl>(aentity)),
-      m_eType(atype), m_eState(esAlive), m_physics_skeleton(NULL), m_ik_controller(NULL), m_BonceDamageFactor(1.f),
-      m_collision_hit_callback(NULL), m_interactive_animation(NULL), m_physics_shell_animated(NULL),
-      m_physics_shell_animated_time_destroy(u32(-1)), m_weapon_attach_bone(0), m_active_item_obj(0),
-      m_hit_valide_time(u32(-1)), m_collision_activating_delay(NULL)
+    : m_eType(atype), m_EntityAlife(*aentity), mXFORM(aentity->XFORM()), m_pPhysicsShell(aentity->PPhysicsShell()),
+      m_PhysicMovementControl(xr_new<CPHMovementControl>(aentity)), m_ph_sound_player(aentity)
 {
     m_flags.assign(0);
     m_flags.set(fl_death_anim_on, FALSE);
@@ -986,7 +983,7 @@ void CCharacterPhysicsSupport::AddActiveWeaponCollision()
     }
     if (br2 != bl && br2 != br && br2 != -1)
     {
-        CPhysicsElement* p = m_pPhysicsShell->get_PhysicsParrentElement((u16)br2);
+        [[maybe_unused]] auto p = m_pPhysicsShell->get_PhysicsParrentElement((u16)br2);
         VERIFY(p);
         bone_chain_disable((u16)br2, weapon_attach_bone->m_SelfID, *m_pPhysicsShell->PKinematics());
     }
@@ -1030,11 +1027,11 @@ void CCharacterPhysicsSupport::CreateShell(IGameObject* who, Fvector& dp, Fvecto
     CBoneInstance& BR = K->LL_GetBoneInstance(K->LL_GetBoneRoot());
     Fmatrix start_xform;
     start_xform.identity();
-    CBlend* anim_mov_blend = 0;
+    //CBlend* anim_mov_blend = 0;
     if (anim_mov_ctrl)
     {
         m_EntityAlife.animation_movement()->ObjStartXform(start_xform);
-        anim_mov_blend = m_EntityAlife.animation_movement()->ControlBlend();
+        //anim_mov_blend = m_EntityAlife.animation_movement()->ControlBlend();
 
         m_EntityAlife.destroy_anim_mov_ctrl();
         BR.set_callback_overwrite(TRUE);

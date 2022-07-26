@@ -60,7 +60,8 @@ bool test_sides(const Fvector& center, const Fvector& side_dir, const Fvector& f
         float abs_sd0 = sg_sd0 * sd0;
         float abs_sd1 = sg_sd1 * sd1;
 
-        float sd, abs_sd, sg_sd;
+        [[maybe_unused]] float sd;
+        float abs_sd, sg_sd;
         u32 v;
         if (sg_sd0 == sg_sd1)
         {
@@ -1871,10 +1872,10 @@ void CPHSimpleCharacter::TestRestrictorContactCallbackFun(
         return;
     if (obj_data->ph_object->CastType() != tpCharacter)
         return;
-    CPHActorCharacter* actor_character = (static_cast<CPHCharacter*>(obj_data->ph_object))->CastActorCharacter();
+    auto actor_character = (static_cast<CPHCharacter*>(obj_data->ph_object))->CastActorCharacter();
     if (!actor_character)
         return;
-    CPHSimpleCharacter* ch_this = static_cast<CPHSimpleCharacter*>(retrieveGeomUserData(g_this)->ph_object);
+    [[maybe_unused]] auto ch_this = static_cast<CPHSimpleCharacter*>(retrieveGeomUserData(g_this)->ph_object);
     VERIFY(ch_this);
     save_max(restrictor_depth, c.geom.depth);
     do_colide = true;

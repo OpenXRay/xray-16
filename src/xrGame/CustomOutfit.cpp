@@ -17,7 +17,7 @@ CCustomOutfit::CCustomOutfit()
     m_flags.set(FUsingCondition, TRUE);
 
     m_HitTypeProtection.resize(ALife::eHitTypeMax);
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (int i = 0; i < static_cast<int>(ALife::eHitTypeMax); i++)
         m_HitTypeProtection[i] = 1.0f;
 
     m_boneProtection = xr_new<SBoneProtections>();
@@ -298,7 +298,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
     result |= process_if_exists(
         section, "physic_strike_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypePhysicStrike], test);
-    LPCSTR str;
+    LPCSTR str = nullptr;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
     {

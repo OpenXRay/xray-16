@@ -340,7 +340,8 @@ void CRenderDevice::message_loop()
                 {
                     if (psDeviceMode.WindowStyle != rsFullscreen)
                     {
-                        if (psDeviceMode.Width == event.window.data1 && psDeviceMode.Height == event.window.data2)
+                        if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
+                            static_cast<int>(psDeviceMode.Height) == event.window.data2)
                             break; // we don't need to reset device if resolution wasn't really changed
 
                         psDeviceMode.Width = event.window.data1;
@@ -380,8 +381,8 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_CLOSE:
                     Engine.Event.Defer("KERNEL:disconnect");
                     Engine.Event.Defer("KERNEL:quit");
-                } // switch (event.window.event)
-                break;
+                    break;
+                }
             }
             } // switch (event.type)
         } // for (int i = 0; i < count; ++i)
@@ -490,7 +491,7 @@ void CRenderDevice::FrameMove()
 ENGINE_API bool bShowPauseString = true;
 #include "IGame_Persistent.h"
 
-void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
+void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, [[maybe_unused]] pcstr reason)
 {
     static int snd_emitters_ = -1;
     if (g_bBenchmark || GEnv.isDedicatedServer)

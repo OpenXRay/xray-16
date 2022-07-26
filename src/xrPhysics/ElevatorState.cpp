@@ -50,6 +50,7 @@ void CElevatorState::PhTune(float step)
     case clbClimbingDown: UpdateStClimbingDown(); break;
     case clbDepart: UpdateDepart(); break;
     case clbNoLadder: m_ladder = NULL; break;
+    default: break;
     }
 }
 
@@ -242,7 +243,8 @@ bool CElevatorState::GetControlDir(Fvector& dir)
     {
     case clbDepart:
     case clbNoLadder:
-    case clbNone: break;
+    case clbNone:
+        break;
     case clbNearUp:
         dist = m_ladder->DDUpperP(m_character, d);
         if (dXZDotNormalized(d, m_character->CamDir()) > look_angle_cosine && !fis_zero(dist, EPS_L) &&
@@ -280,6 +282,8 @@ bool CElevatorState::GetControlDir(Fvector& dir)
 #endif
             ret = false;
         }
+        break;
+    default:
         break;
     }
     return ret;

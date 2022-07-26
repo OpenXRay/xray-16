@@ -99,9 +99,10 @@ UIArtefactParamItem* CUIArtefactParams::CreateItem(CUIXml& uiXml, pcstr section,
     case UIArtefactParamItem::InitResult::Failed:
         xr_delete(item);
         return nullptr;
-
     case UIArtefactParamItem::InitResult::Plain:
         item->SetDefaultValuesPlain(magnitude, isSignInverse, unit);
+        break;
+    default:
         break;
     }
 

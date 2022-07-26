@@ -190,7 +190,7 @@ extern	gsMemMgrContext gsMemMgrContextCurrent;
 
 // Memtype Tag stack
 #define MEM_TAG_STACK_MAX	10			// max stack depth
-static	gsi_u8			MemTagStack	[MEM_TAG_STACK_MAX]		= {0};	
+static	gsi_u8			MemTagStack	[MEM_TAG_STACK_MAX]		= {};	
 static	gsi_u32			MemTagStackIndex					= 0;
 
 

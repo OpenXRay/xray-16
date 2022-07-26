@@ -100,7 +100,7 @@ void CRenderDevice::UpdateWindowProps()
     SelectResolution(windowed);
 
     // Changing monitor, unset fullscreen for the previous monitor
-    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != psDeviceMode.Monitor)
+    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != static_cast<int>(psDeviceMode.Monitor))
         SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
 
     SDL_Rect rect;

@@ -9,24 +9,28 @@ bool CGameSpy_Available::CheckAvailableServices(shared_str& resultstr)
     while ((result = GSIAvailableCheckThink()) == GSIACWaiting)
         msleep(5);
 
-    if (result != GSIACAvailable)
-    {
-        switch (result)
-        {
-        case GSIACUnavailable: { resultstr = "! Online Services for STALKER are no longer available.";
-        }
-        break;
-        case GSIACTemporarilyUnavailable:
-        {
-            resultstr = "! Online Services for STALKER are temporarily down for maintenance.";
-        }
-        break;
-        }
-        return false;
-    }
-    else
+    if (result == GSIACAvailable)
     {
         resultstr = "Success";
-    };
-    return true;
+        return true;
+    }
+
+    switch (result)
+    {
+    case GSIACUnavailable:
+    {
+        resultstr = "! Online Services for STALKER are no longer available.";
+        break;
+    }
+    case GSIACTemporarilyUnavailable:
+    {
+        resultstr = "! Online Services for STALKER are temporarily down for maintenance.";
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+    return false;
 };

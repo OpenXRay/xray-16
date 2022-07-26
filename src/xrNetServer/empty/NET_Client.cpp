@@ -35,7 +35,7 @@ INetQueue::~INetQueue()
     delete pcs;
 }
 
-static u32 LastTimeCreate = 0;
+//static u32 LastTimeCreate = 0;
 
 NET_Packet* INetQueue::Create()
 {
@@ -102,17 +102,16 @@ void INetQueue::Release()
 {
     VERIFY(!ready.empty());
     //---------------------------------------------
-    // u32 tmp_time = SDL_GetTicks() - 60000;
-    u32 size = unused.size();
+//    u32 tmp_time = SDL_GetTicks() - 60000;
+//    u32 size = unused.size();
     ready.front()->B.count = 0;
-    /*
-   * if ((LastTimeCreate < tmp_time) && (size > 32))
-  {
-      xr_delete(ready.front());
-  }
-  else
-      unused.push_back(ready.front());
-      */
+
+//    if ((LastTimeCreate < tmp_time) && (size > 32))
+//    {
+//        xr_delete(ready.front());
+//    }
+//    else
+//        unused.push_back(ready.front());
 
     ready.pop_front();
 }
@@ -172,7 +171,7 @@ XRNETSERVER_API bool psNET_direct_connect = false;
  *
  ****************************************************************************/
 
-static HRESULT WINAPI Handler(PVOID pvUserContext,
+[[maybe_unused]] static HRESULT WINAPI Handler(PVOID pvUserContext,
     DWORD dwMessageType,
     PVOID pMessage)
 {
@@ -235,13 +234,11 @@ void IPureClient::_Recieve(const void* data, u32 data_size, u32 /*param*/)
 //==============================================================================
 #ifdef CONFIG_PROFILE_LOCKS
 IPureClient::IPureClient(CTimer* timer)
-    : net_Statistic(timer)
-    , net_csEnumeration(
-          xr_new<Lock>(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration)))
+    : net_csEnumeration(xr_new<Lock>(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration))),
+      net_Statistic(timer)
 #else
 IPureClient::IPureClient(CTimer* timer)
-    : net_Statistic(timer)
-    , net_csEnumeration(xr_new<Lock>())
+    : net_csEnumeration(xr_new<Lock>()), net_Statistic(timer)
 #endif
 {
     device_timer = timer;
@@ -329,19 +326,16 @@ bool IPureClient::Connect(pcstr options)
         net_Syncronised = false;
         net_Disconnected = false;
 
-        //---------------------------
-        string1024 tmp = "";
-//---------------------------
+//        bool bSimulator = false;
+//        if (strstr(Core.Params, "-netsim"))
+//            bSimulator = true;
 
-        bool bSimulator = false;
-        if (strstr(Core.Params, "-netsim"))
-            bSimulator = true;
-
-        // Setup client info
-        /*xr_strcpy( tmp, server_name );
-    xr_strcat( tmp, "/name=" );
-    xr_strcat( tmp, user_name_str );
-    xr_strcat( tmp, "/" );*/
+//        // Setup client info
+//        string1024 tmp = "";
+//        xr_strcpy( tmp, server_name );
+//        xr_strcat( tmp, "/name=" );
+//        xr_strcat( tmp, user_name_str );
+//        xr_strcat( tmp, "/" );
 
         if (xr_stricmp(server_name, "localhost") == 0) {
 
@@ -379,10 +373,10 @@ bool IPureClient::Connect(pcstr options)
             ZeroMemory(desc, sizeof(desc));
             net_Hosts.push_back(NODE);
         } else {
-            string64 EnumData;
-            EnumData[0] = 0;
-            xr_strcat(EnumData, "ToConnect");
-            u32 EnumSize = xr_strlen(EnumData) + 1;
+//            string64 EnumData;
+//            EnumData[0] = 0;
+//            xr_strcat(EnumData, "ToConnect");
+//            u32 EnumSize = xr_strlen(EnumData) + 1;
             // We now have the host address so lets enum
             u32 c_port = psCL_Port;
             HRESULT res = S_FALSE;
@@ -402,9 +396,9 @@ bool IPureClient::Connect(pcstr options)
                 return false;
             }
 
-            WCHAR SessionPasswordUNICODE[4096];
-            if (xr_strlen(password_str)) {
-            }
+//            WCHAR SessionPasswordUNICODE[4096];
+//            if (xr_strlen(password_str)) {
+//            }
 
             net_csEnumeration->Enter();
             // real connect
@@ -438,9 +432,9 @@ void IPureClient::Disconnect()
 {
     // Clean up Host _list_
     net_csEnumeration->Enter();
-    for (u32 i = 0; i < net_Hosts.size(); i++) {
-        HOST_NODE& N = net_Hosts[i];
-    }
+//    for (u32 i = 0; i < net_Hosts.size(); i++) {
+//        HOST_NODE& N = net_Hosts[i];
+//    }
     net_Hosts.clear();
     net_csEnumeration->Leave();
 

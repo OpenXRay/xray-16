@@ -77,6 +77,8 @@ void CControlManagerCustom::add_ability(ControlCom::EControlType type)
         m_critical_wound = xr_new<CControlCriticalWound>();
         m_man->add(m_critical_wound, ControlCom::eComCriticalWound);
         break;
+    default:
+        break;
     }
 }
 
@@ -94,6 +96,7 @@ void CControlManagerCustom::on_start_control(ControlCom::EControlType type)
     case ControlCom::eControlRunAttack: m_man->subscribe(this, ControlCom::eventRunAttackEnd); break;
     case ControlCom::eControlThreaten: m_man->subscribe(this, ControlCom::eventThreatenEnd); break;
     case ControlCom::eComCriticalWound: m_man->subscribe(this, ControlCom::eventCriticalWoundEnd); break;
+    default: break;
     }
 }
 
@@ -109,6 +112,7 @@ void CControlManagerCustom::on_stop_control(ControlCom::EControlType type)
     case ControlCom::eControlRunAttack: m_man->unsubscribe(this, ControlCom::eventRunAttackEnd); break;
     case ControlCom::eControlThreaten: m_man->unsubscribe(this, ControlCom::eventThreatenEnd); break;
     case ControlCom::eComCriticalWound: m_man->unsubscribe(this, ControlCom::eventCriticalWoundEnd); break;
+    default: break;
     }
 }
 
@@ -131,6 +135,7 @@ void CControlManagerCustom::on_event(ControlCom::EEventType type, ControlCom::IE
     case ControlCom::eventRunAttackEnd: m_man->release(this, ControlCom::eControlRunAttack); break;
     case ControlCom::eventThreatenEnd: m_man->release(this, ControlCom::eControlThreaten); break;
     case ControlCom::eventCriticalWoundEnd: m_man->release(this, ControlCom::eComCriticalWound); break;
+    default: break;
     }
 }
 

@@ -1421,13 +1421,13 @@ void game_sv_mp::OnPlayerKilled(NET_Packet P)
 
     if (!ps_killed)
     {
+#ifndef MASTER_GOLD
         CEntity* entity = smart_cast<CEntity*>(Level().Objects.net_Find(KilledID));
 
-#ifndef MASTER_GOLD
         Msg("! ERROR:  killed entity is null ! (entitty [%d][%s]), killer id [%d][%s], Frame [%d]", KilledID,
             entity ? entity->cName().c_str() : "unknown", KillerID, ps_killer ? ps_killer->getName() : "unknown",
             Device.dwFrame);
-#endif // #ifndef MASTER_GOLD
+#endif
         return;
     }
 #ifdef MP_LOGGING
@@ -1785,7 +1785,6 @@ void game_sv_mp::ReadOptions(shared_str& options)
     SetGameTimeFactor(StartEnvGameTime, g_fTimeFactor);
 };
 
-static bool g_bConsoleCommandsCreated_MP = false;
 void game_sv_mp::ConsoleCommands_Create(){};
 
 void game_sv_mp::ConsoleCommands_Clear(){};

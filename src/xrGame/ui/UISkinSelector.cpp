@@ -297,6 +297,9 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     case kRIGHT:
         OnKeyRight();
         return true;
+
+    default:
+        break;
     }
 
     return false;

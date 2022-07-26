@@ -665,7 +665,7 @@ size_t _writeLZ(int hf, void* d, size_t size)
     // Flush cache
     size_t size_out = fs.OutSize();
     if (size_out)
-        _write(hf, fs.OutPointer(), size_out);
+        std::ignore = _write(hf, fs.OutPointer(), size_out);
     fs.OutRelease();
     return size_out;
 }
@@ -696,7 +696,7 @@ size_t _readLZ(int hf, void*& d, size_t size)
 {
     // Read file in memory
     u8* data = (u8*)xr_malloc(size);
-    _read(hf, data, size);
+    std::ignore = _read(hf, data, size);
 
     fs.Init_Input(data, data + size);
 

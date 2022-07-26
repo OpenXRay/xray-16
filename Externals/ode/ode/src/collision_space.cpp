@@ -242,7 +242,7 @@ struct dxSimpleSpace : public dxSpace {
 
 dxSimpleSpace::dxSimpleSpace (dSpaceID _space) : dxSpace (_space)
 {
-  type = dSimpleSpaceClass;
+  type = dClassNumber::dSimpleSpaceClass;
 }
 
 
@@ -398,7 +398,7 @@ struct dxHashSpace : public dxSpace {
 
 dxHashSpace::dxHashSpace (dSpaceID _space) : dxSpace (_space)
 {
-  type = dHashSpaceClass;
+  type = dClassNumber::dHashSpaceClass;
   global_minlevel = -3;
   global_maxlevel = 10;
 }

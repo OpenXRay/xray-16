@@ -398,7 +398,7 @@ enum {
 };
 
 /* class numbers - each geometry object needs a unique number */
-enum {
+enum dClassNumber {
   dSphereClass = 0,
   dBoxClass,
   dCapsuleClass,

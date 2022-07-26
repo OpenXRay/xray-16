@@ -343,6 +343,10 @@ bool UITaskListWndItem::OnMouseAction(float x, float y, EUIMessages mouse_action
         hide_hint();
         break;
     }
+    default:
+    {
+        break;
+    }
     } // switch
 
     return true;

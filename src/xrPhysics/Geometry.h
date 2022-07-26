@@ -64,10 +64,10 @@ public:
         else
             return geometry_transform();
     }
-    IC const dGeomID geom() const { return dGeomTransformGetGeom(m_geom_transform); }
-    IC const dGeomID geometry_transform() const { return m_geom_transform; }
-    IC const dGeomID geometry() const { return m_geom_transform ? (geom() ? geom() : m_geom_transform) : NULL; }
-    IC const dGeomID geometry_bt() const
+    IC dGeomID geom() const { return dGeomTransformGetGeom(m_geom_transform); }
+    IC dGeomID geometry_transform() const { return m_geom_transform; }
+    IC dGeomID geometry() const { return m_geom_transform ? (geom() ? geom() : m_geom_transform) : NULL; }
+    IC dGeomID geometry_bt() const
     {
         if (is_transformed_bt())
             return geom();

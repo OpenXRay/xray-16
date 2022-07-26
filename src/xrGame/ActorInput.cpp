@@ -419,7 +419,6 @@ void CActor::IR_OnControllerPress(int cmd, float x, float y)
     case kLOOK_AROUND:
     {
         const float LookFactor = GetLookFactor();
-        CCameraBase* C = cameras[cam_active];
         float scale = (cam_Active()->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f / LookFactor;
         OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
@@ -515,7 +514,6 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
     case kLOOK_AROUND:
     {
         const float LookFactor = GetLookFactor();
-        CCameraBase* C = cameras[cam_active];
         float scale = (cam_Active()->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f / LookFactor;
         OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;

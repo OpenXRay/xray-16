@@ -414,7 +414,7 @@ void login_manager::forgot_password(char const* url)
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
 #else
     std::string command = "xdg-open " + std::string{url};
-    system(command.c_str());
+    std::ignore = system(command.c_str());
 #endif
 }
 

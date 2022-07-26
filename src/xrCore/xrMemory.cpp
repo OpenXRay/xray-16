@@ -216,6 +216,46 @@ void xrMemory::mem_free(void* ptr, size_t alignment)
     xr_internal_free(ptr, alignment);
 }
 
+void* operator new(size_t size)
+{
+    return Memory.mem_alloc(size);
+}
+
+void* operator new(size_t size, const std::nothrow_t&) noexcept
+{
+    return Memory.mem_alloc(size);
+}
+
+void* operator new(size_t size, std::align_val_t alignment)
+{
+    return Memory.mem_alloc(size, static_cast<size_t>(alignment));
+}
+
+void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
+{
+    return Memory.mem_alloc(size, static_cast<size_t>(alignment));
+}
+
+void operator delete(void* ptr) noexcept
+{
+    Memory.mem_free(ptr);
+}
+
+void operator delete(void* ptr, std::align_val_t alignment) noexcept
+{
+    Memory.mem_free(ptr, static_cast<size_t>(alignment));
+}
+
+void operator delete(void* ptr, size_t) noexcept
+{
+    Memory.mem_free(ptr);
+}
+
+void operator delete(void* ptr, size_t, std::align_val_t alignment) noexcept
+{
+    Memory.mem_free(ptr, static_cast<size_t>(alignment));
+}
+
 // xr_strdup
 XRCORE_API pstr xr_strdup(pcstr string)
 {

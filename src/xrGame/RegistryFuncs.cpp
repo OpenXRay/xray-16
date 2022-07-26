@@ -129,7 +129,7 @@ void WriteRegistry_DWValue(LPCSTR rKeyName, const DWORD& value)
     WriteRegistryValue(rKeyName, REG_DWORD, &value);
 #endif
 }
-u32 const ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const buffer_size)
+u32 ReadRegistry_BinaryValue(LPCSTR rKeyName, u8* buffer_dest, u32 const buffer_size)
 {
 #ifdef XR_PLATFORM_WINDOWS
     HKEY hKey = 0;

@@ -4,7 +4,7 @@
 // TODO: Do we really need this?
 //Lights g_lights;
 
-IC const Fvector vertex_position(const NodePosition4& Psrc, const Fbox& bb, const SAIParams& params)
+IC Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox& bb, const SAIParams& params)
 {
     Fvector Pdest;
     int x, z, row_length;

@@ -323,7 +323,7 @@ shared_str CSE_ALifeTraderAbstract::specific_character()
                 continue;
 
             bool class_found = false;
-            for (std::size_t j = 0; j < spec_char.data()->m_Classes.size(); j++)
+            for (size_t j = 0; j < spec_char.data()->m_Classes.size(); j++)
             {
                 if (char_info.data()->m_Class == spec_char.data()->m_Classes[j])
                 {

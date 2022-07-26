@@ -822,7 +822,7 @@ void xrServer::Server_Client_Check(IClient* CL)
         return;
     };
 
-    if (CL->process_id == GetCurrentProcessId())
+    if (static_cast<int>(CL->process_id) == GetCurrentProcessId())
     {
         CL->flags.bLocal = 1;
         SV_Client = (xrClientData*)CL;
@@ -1088,7 +1088,6 @@ void xrServer::GetServerInfo(CServerInfo* si)
         xr_strcat(tmp256, " [");
         xr_strcat(tmp256, xr_itoa(g_sv_ah_dwArtefactsNum, tmp, 10));
         xr_strcat(tmp256, "] ");
-        g_sv_ah_iReinforcementTime;
     }
 
     // if ( g_sv_dm_dwTimeLimit > 0 )
@@ -1160,7 +1159,7 @@ void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_
     {
         return;
     }
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (int i = 0; i < static_cast<int>(sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*)); ++i)
     {
         if (!m_screenshot_proxies[i]->is_active())
         {
@@ -1177,7 +1176,7 @@ void xrServer::MakeConfigDump(ClientID const& admin_id, ClientID const& cheater_
     {
         return;
     }
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (int i = 0; i < static_cast<int>(sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*)); ++i)
     {
         if (!m_screenshot_proxies[i]->is_active())
         {
@@ -1191,14 +1190,14 @@ void xrServer::MakeConfigDump(ClientID const& admin_id, ClientID const& cheater_
 
 void xrServer::initialize_screenshot_proxies()
 {
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (int i = 0; i < static_cast<int>(sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*)); ++i)
     {
         m_screenshot_proxies[i] = xr_new<clientdata_proxy>(m_file_transfers);
     }
 }
 void xrServer::deinitialize_screenshot_proxies()
 {
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (int i = 0; i < static_cast<int>(sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*)); ++i)
     {
         xr_delete(m_screenshot_proxies[i]);
     }

@@ -56,8 +56,8 @@ void PAPI::PAAvoid::Execute(ParticleEffect* effect, const float dt, float& tm_ma
                 m.vel = tmp * (vm / tmp.length());
             }
         }
+        break;
     }
-    break;
     case PDRectangle:
     {
         // Compute the inverse matrix of the plane basis.
@@ -152,8 +152,8 @@ void PAPI::PAAvoid::Execute(ParticleEffect* effect, const float dt, float& tm_ma
             pVector tmp = (S * (magdt / (t * t + epsilon))) + Vn;
             m.vel = tmp * (vm / tmp.length());
         }
+        break;
     }
-    break;
     case PDTriangle:
     {
         // Compute the inverse matrix of the plane basis.
@@ -247,8 +247,8 @@ void PAPI::PAAvoid::Execute(ParticleEffect* effect, const float dt, float& tm_ma
             pVector tmp = (S * (magdt / (t * t + epsilon))) + Vn;
             m.vel = tmp * (vm / tmp.length());
         }
+        break;
     }
-    break;
     case PDDisc:
     {
         float r1Sqr = _sqr(position.radius1);
@@ -310,8 +310,8 @@ void PAPI::PAAvoid::Execute(ParticleEffect* effect, const float dt, float& tm_ma
             pVector tmp = (S * (magdt / (t * t + epsilon))) + Vn;
             m.vel = tmp * (vm / tmp.length());
         }
+        break;
     }
-    break;
     case PDSphere:
     {
         float rSqr = position.radius1 * position.radius1;
@@ -348,8 +348,12 @@ void PAPI::PAAvoid::Execute(ParticleEffect* effect, const float dt, float& tm_ma
             pVector tmp = (S * (magdt / (t * t + epsilon))) + Vn;
             m.vel = tmp * (vm / tmp.length());
         }
+        break;
     }
-    break;
+    default:
+    {
+        break;
+    }
     }
 }
 void PAPI::PAAvoid::Transform(const Fmatrix& m) { position.transform(positionL, m); }
@@ -439,8 +443,8 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
             else
                 m.vel = vt * oneMinusFriction - vn * resilience;
         }
+        break;
     }
-    break;
     case PDDisc:
     {
         float r1Sqr = _sqr(position.radius1);
@@ -503,8 +507,8 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
             else
                 m.vel = vt * oneMinusFriction - vn * resilience;
         }
+        break;
     }
-    break;
     case PDPlane:
     {
         // See which particles bounce.
@@ -538,8 +542,8 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
             else
                 m.vel = vt * oneMinusFriction - vn * resilience;
         }
+        break;
     }
-    break;
     case PDRectangle:
     {
         // Compute the inverse matrix of the plane basis.
@@ -615,8 +619,8 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
             else
                 m.vel = vt * oneMinusFriction - vn * resilience;
         }
+        break;
     }
-    break;
     case PDSphere:
     {
         // Sphere that particles bounce off
@@ -670,6 +674,10 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
                 }
             }
         }
+    }
+    default:
+    {
+        break;
     }
     }
 }

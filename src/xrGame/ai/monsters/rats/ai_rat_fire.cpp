@@ -167,6 +167,10 @@ void CAI_Rat::update_morale()
         m_fMorale += m_fMoraleRestoreQuant;
         break;
     }
+    default:
+    {
+        break;
+    }
     }
 
     clamp(m_fMorale, m_fMoraleMinValue, m_fMoraleMaxValue);

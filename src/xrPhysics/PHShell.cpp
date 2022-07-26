@@ -1282,7 +1282,7 @@ void CPHShell::PlaceBindToElFormsRecursive(Fmatrix parent, u16 id, u16 element, 
 
 	if (mask.is(UINT64_C(1) << (u64)id))
     {
-        if (no_physics_shape(bone_data.shape) || joint_data.type == jtRigid && element != u16(-1))
+        if (no_physics_shape(bone_data.shape) || (joint_data.type == jtRigid && element != u16(-1)))
         {
         }
         else

@@ -576,7 +576,6 @@ void game_sv_TeamDeathmatch::ReadOptions(shared_str& options)
     g_sv_tdm_fFriendlyFireModifier = fFF;
 }
 
-static bool g_bConsoleCommandsCreated_TDM = false;
 void game_sv_TeamDeathmatch::ConsoleCommands_Create(){};
 
 void game_sv_TeamDeathmatch::ConsoleCommands_Clear() { inherited::ConsoleCommands_Clear(); };

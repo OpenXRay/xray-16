@@ -100,7 +100,7 @@ float CPerlinNoise1D::GetContinious(float v)
     float result = 0.0f;
     float amp = mAmplitude;
     v *= mFrequency;
-    for (size_t i = 0; i < mOctaves; i++)
+    for (int i = 0; i < mOctaves; i++)
     {
         float octave_time = mTimes[i];
         mTimes[i] = octave_time + v;

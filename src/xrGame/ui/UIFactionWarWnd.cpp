@@ -55,20 +55,24 @@ void CUIFactionWarWnd::Reset()
 
 bool CUIFactionWarWnd::Init()
 {
-	CUIXml xml;
+    CUIXml xml;
     if (!xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_FACTION_WAR_XML, false))
         return false;
 
-	CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
+    CUIXmlInit::InitWindow( xml, "main_wnd", 0, this );
 
     m_background = UIHelper::CreateFrameWindow(xml, "background", this, false);
     m_center_background = UIHelper::CreateFrameWindow(xml, "center_background", this, false);
 
     if (!m_background)
+    {
         m_background2 = UIHelper::CreateFrameLine(xml, "background", this, false);
+    }
 
     if (!m_center_background)
+    {
         m_center_background2 = UIHelper::CreateStatic(xml, "center_background", this, false);
+    }
 
 	m_target_static			= UIHelper::CreateStatic( xml, "target_static", this );
 	m_target_caption		= UIHelper::CreateStatic( xml, "target_caption", this );

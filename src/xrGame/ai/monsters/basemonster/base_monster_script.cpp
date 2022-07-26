@@ -142,10 +142,9 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
     case eMA_WalkFwd: anim().m_tAction = ACT_WALK_FWD; break;
 
     case eMA_RunWithLeader:
-    case eMA_Run:
-        anim().m_tAction = ACT_RUN;
-        break;
-        //		case eMA_Jump:		anim().m_tAction = ACT_JUMP;		break;
+    case eMA_Run: anim().m_tAction = ACT_RUN; break;
+//    case eMA_Jump: anim().m_tAction = ACT_JUMP; break;
+    default: break;
     }
 
     m_force_real_speed = (l_tMovementAction.m_tSpeedParam == eSP_ForceSpeed);
@@ -255,6 +254,10 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
         com_man().script_jump(l_tMovementAction.m_tDestinationPosition, l_tMovementAction.m_fDistToEnd);
         break;
     }
+    default:
+    {
+        break;
+    }
     }
 
     return (true);
@@ -301,10 +304,14 @@ bool CBaseMonster::bfAssignWatch(CScriptEntityAction* tpEntityAction)
     Fvector new_pos;
     switch (l_tWatchAction.m_tWatchType)
     {
-    case SightManager::eSightTypePosition: LookPosition(l_tWatchAction.m_tWatchVector); break;
+    case SightManager::eSightTypePosition:
+        LookPosition(l_tWatchAction.m_tWatchVector);
+        break;
     case SightManager::eSightTypeDirection:
         new_pos.mad(Position(), l_tWatchAction.m_tWatchVector, 2.f);
         LookPosition(new_pos);
+        break;
+    default:
         break;
     }
 
@@ -337,9 +344,10 @@ bool CBaseMonster::bfAssignAnimation(CScriptEntityAction* tpEntityAction)
     case eAA_Rest: anim().m_tAction = ACT_REST; break;
     case eAA_Attack: anim().m_tAction = ACT_ATTACK; break;
     case eAA_LookAround: anim().m_tAction = ACT_LOOK_AROUND; break;
+    default: break;
     }
 
-    return (true);
+    return true;
 }
 
 bool CBaseMonster::bfAssignSound(CScriptEntityAction* tpEntityAction)
@@ -368,9 +376,15 @@ bool CBaseMonster::bfAssignSound(CScriptEntityAction* tpEntityAction)
         sound().play(eMonsterSoundAggressive, 0, 0,
             (l_tAction.m_monster_sound_delay == int(-1)) ? db().m_dwAttackSndDelay : l_tAction.m_monster_sound_delay);
         break;
-    case eMonsterSoundAttackHit: sound().play(eMonsterSoundAttackHit); break;
-    case eMonsterSoundTakeDamage: sound().play(eMonsterSoundTakeDamage); break;
-    case eMonsterSoundDie: sound().play(eMonsterSoundDie); break;
+    case eMonsterSoundAttackHit:
+        sound().play(eMonsterSoundAttackHit);
+        break;
+    case eMonsterSoundTakeDamage:
+        sound().play(eMonsterSoundTakeDamage);
+        break;
+    case eMonsterSoundDie:
+        sound().play(eMonsterSoundDie);
+        break;
     case eMonsterSoundThreaten:
         sound().play(eMonsterSoundThreaten, 0, 0,
             (l_tAction.m_monster_sound_delay == int(-1)) ? db().m_dwAttackSndDelay : l_tAction.m_monster_sound_delay);
@@ -383,9 +397,11 @@ bool CBaseMonster::bfAssignSound(CScriptEntityAction* tpEntityAction)
         sound().play(eMonsterSoundPanic, 0, 0,
             (l_tAction.m_monster_sound_delay == int(-1)) ? db().m_dwAttackSndDelay : l_tAction.m_monster_sound_delay);
         break;
+    default:
+        break;
     }
 
-    return (true);
+    return true;
 }
 
 bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
@@ -401,7 +417,9 @@ bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
 
     switch (l_tAction.m_tAction)
     {
-    case eGA_Rest: StateMan->force_script_state(eStateRest); break;
+    case eGA_Rest:
+        StateMan->force_script_state(eStateRest);
+        break;
     case eGA_Eat:
         if (pE && !pE->getDestroy() && !pE->g_Alive())
         {
@@ -430,6 +448,8 @@ bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
         }
         else
             StateMan->force_script_state(eStateRest);
+        break;
+    default:
         break;
     }
 
@@ -555,6 +575,7 @@ int CBaseMonster::get_enemy_strength()
         case eStrong: return (3);
         case eNormal: return (2);
         case eWeak: return (1);
+        default: break;
         }
     }
 

@@ -306,14 +306,24 @@ bool CUIScrollBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
     switch (mouse_action)
     {
     case WINDOW_MOUSE_WHEEL_DOWN:
+    {
         TryScrollInc(true);
         return true;
-        break;
+    }
     case WINDOW_MOUSE_WHEEL_UP:
+    {
         TryScrollDec(true);
         return true;
+    }
+    case WINDOW_LBUTTON_UP:
+    {
+        m_mouse_state = 0;
         break;
-    case WINDOW_LBUTTON_UP: m_mouse_state = 0; break;
+    }
+    default:
+    {
+        break;
+    }
     };
 
     return inherited::OnMouseAction(x, y, mouse_action);
@@ -466,19 +476,13 @@ void CUIScrollBar::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 void CUIScrollBar::TryScrollInc(bool by_scrollbox)
 {
     if (ScrollInc(by_scrollbox))
-        if (m_bIsHorizontal)
-            GetMessageTarget()->SendMessage(this, SCROLLBAR_HSCROLL);
-        else
-            GetMessageTarget()->SendMessage(this, SCROLLBAR_VSCROLL);
+        GetMessageTarget()->SendMessage(this, m_bIsHorizontal ? SCROLLBAR_HSCROLL : SCROLLBAR_VSCROLL);
 }
 
 void CUIScrollBar::TryScrollDec(bool by_scrollbox)
 {
     if (ScrollDec(by_scrollbox))
-        if (m_bIsHorizontal)
-            GetMessageTarget()->SendMessage(this, SCROLLBAR_HSCROLL);
-        else
-            GetMessageTarget()->SendMessage(this, SCROLLBAR_VSCROLL);
+        GetMessageTarget()->SendMessage(this, m_bIsHorizontal ? SCROLLBAR_HSCROLL : SCROLLBAR_VSCROLL);
 }
 
 bool CUIScrollBar::ScrollDec(bool by_scrollbox)

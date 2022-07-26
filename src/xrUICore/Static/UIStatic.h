@@ -122,15 +122,15 @@ public:
     virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha);
 
 protected:
-    CUILines* m_pTextControl;
+    CUILines* m_pTextControl{};
 
-    bool m_bStretchTexture;
-    bool m_bTextureEnable;
+    bool m_bStretchTexture{};
+    bool m_bTextureEnable{ true };
     CUIStaticItem m_UIStaticItem;
 
-    bool m_bHeading;
-    bool m_bConstHeading;
-    float m_fHeading;
+    bool m_bHeading{};
+    bool m_bConstHeading{};
+    float m_fHeading{};
 
     Fvector2 m_TextureOffset;
 

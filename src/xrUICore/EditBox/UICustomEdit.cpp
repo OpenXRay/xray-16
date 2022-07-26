@@ -141,6 +141,9 @@ bool CUICustomEdit::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     case WINDOW_KEY_RELEASED:
         ec().on_key_release(dik);
         return true;
+
+    default:
+        return false;
     }
 
     return false;

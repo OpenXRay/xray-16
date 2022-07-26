@@ -79,8 +79,8 @@ void ik_anim_state::update(IKinematicsAnimated* K, const CBlend* b, u16 i)
 
         // is_step = step_all || any_idle && is_cur_step || is_new_step;
 
-        do_glue = step_all || any_idle && is_new_step;
-        is_step = (!any_idle && any_step) || any_idle && do_glue;
+        do_glue = step_all || (any_idle && is_new_step);
+        is_step = (!any_idle && any_step) || (any_idle && do_glue);
         // do_glue =true;
     }
     else

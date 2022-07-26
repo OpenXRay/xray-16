@@ -169,7 +169,7 @@ int CDbgLuaHelper::hookLuaBind(lua_State* l)
     if (!m_pThis)
         return LUA_OK; // XXX: Is it correct to return LUA_OK?
     L = l;
-    int top1 = lua_gettop(L);
+    [[maybe_unused]] int top1 = lua_gettop(L);
     Msg("hookLuaBind start");
     print_stack(L);
     if (lua_isstring(L, -1))
@@ -183,7 +183,7 @@ int CDbgLuaHelper::hookLuaBind(lua_State* l)
     print_stack(L);
     if (lua_isstring(L, -1))
         Msg("Tope string %s", lua_tostring(L, -1));
-    int top2 = lua_gettop(L);
+    [[maybe_unused]] int top2 = lua_gettop(L);
     VERIFY(top2 == top1);
     return LUA_OK; // XXX: Probably, we should show message asking what value we should return.
 }
@@ -193,7 +193,7 @@ void CDbgLuaHelper::hookLua(lua_State* l, lua_Debug* ar)
     if (!m_pThis)
         return;
     L = l;
-    int top1 = lua_gettop(L);
+    [[maybe_unused]] int top1 = lua_gettop(L);
     // Msg("hookLua start");
     // print_stack(L);
     switch (ar->event)
@@ -205,7 +205,7 @@ void CDbgLuaHelper::hookLua(lua_State* l, lua_Debug* ar)
     }
     // Msg("hookLua end");
     // print_stack(L);
-    int top2 = lua_gettop(L);
+    [[maybe_unused]] int top2 = lua_gettop(L);
     VERIFY(top2 == top1);
 }
 
@@ -240,8 +240,7 @@ void CDbgLuaHelper::DrawStackTrace()
             char szTmp[6];
             xr_strcat(szDesc, xr_itoa(ar.currentline, szTmp, 10));
             xr_strcat(szDesc, " ");
-            if (ar.short_src)
-                xr_strcat(szDesc, ar.short_src);
+            xr_strcat(szDesc, ar.short_src);
             debugger()->AddStackTrace(szDesc, ar.source + 1, ar.currentline);
         }
         nLevel++;
@@ -270,8 +269,6 @@ void CDbgLuaHelper::DrawGlobalVariables()
     debugger()->ClearGlobalVariables();
     lua_pushvalue(L, LUA_GLOBALSINDEX);
     lua_pushnil(L); // first key
-    string1024 var;
-    var[0] = 0;
     while (lua_next(L, -2))
     {
         //!!!!	TRACE2("%s - %s\n",	lua_typename(L, lua_type(L, -2)), lua_typename(L, lua_type(L, -1)));

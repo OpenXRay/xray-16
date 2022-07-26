@@ -203,11 +203,11 @@ bool CTheoraStream::Decode(u32 in_tm_play)
                             (0 == d_frame % key_rate) && theora_packet_iskeyframe(&o_packet));
                         continue;
                     }
-                    bool is_key = theora_packet_iskeyframe(&o_packet);
+                    [[maybe_unused]] bool is_key = theora_packet_iskeyframe(&o_packet);
                     VERIFY((d_frame != k_frame) || ((d_frame == k_frame) && is_key));
                     // real decode
                     //. dbg_log ((stderr,"%04d: decode\n",d_frame));
-                    int res = theora_decode_packetin(&t_state, &o_packet);
+                    [[maybe_unused]] int res = theora_decode_packetin(&t_state, &o_packet);
                     VERIFY(res != OC_BADPACKET);
                     //. dbg_log ((stderr,"%04d: granule frame\n",theora_granule_frame(&t_state,t_state.granulepos)));
                     if (d_frame >= t_frame)

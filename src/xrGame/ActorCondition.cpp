@@ -360,7 +360,7 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
     {
         m_f_time_affected += one;
 
-        for (int i = 0; i < sizeof(hits) / sizeof(hits[0]); ++i)
+        for (size_t i = 0; i < sizeof(hits) / sizeof(hits[0]); ++i)
         {
             float damage = hits[i].value;
             ALife::EHitType type = hits[i].type;
@@ -643,12 +643,9 @@ void CActorCondition::DisableBoostParameters(const SBooster& B)
 }
 void CActorCondition::WoundForEach(const luabind::functor<bool>& funct)
 {
-    auto const& cur_wounds = wounds();
-    CEntityCondition::WOUND_VECTOR::const_iterator it = wounds().begin();
-    CEntityCondition::WOUND_VECTOR::const_iterator it_e = wounds().end();
-    for (; it != it_e; ++it)
+    for (auto it = wounds().begin(); it != wounds().end(); ++it)
     {
-        if (funct(it) == true)
+        if (funct(it))
             break;
     }
 }

@@ -37,17 +37,21 @@ pDomain::pDomain(
     type = dtype;
     switch (type)
     {
-    case PDPoint: p1 = pVector(a0, a1, a2);
+    case PDPoint:
+    {
+        p1 = pVector(a0, a1, a2);
         break;
+    }
     case PDLine:
     {
         p1 = pVector(a0, a1, a2);
         pVector tmp(a3, a4, a5);
         // p2 is vector3 from p1 to other endpoint.
         p2 = tmp - p1;
-    }
         break;
+    }
     case PDBox:
+    {
         // p1 is the min corner. p2 is the max corner.
         if (a0 < a3)
         {
@@ -80,6 +84,7 @@ pDomain::pDomain(
             p2.z = a2;
         }
         break;
+    }
     case PDTriangle:
     {
         p1 = pVector(a0, a1, a2);
@@ -100,8 +105,8 @@ pDomain::pDomain(
 
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
-    }
         break;
+    }
     case PDRectangle:
     {
         p1 = pVector(a0, a1, a2);
@@ -119,8 +124,8 @@ pDomain::pDomain(
 
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
-    }
         break;
+    }
     case PDPlane:
     {
         p1 = pVector(a0, a1, a2);
@@ -129,9 +134,10 @@ pDomain::pDomain(
 
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
-    }
         break;
+    }
     case PDSphere:
+    {
         p1 = pVector(a0, a1, a2);
         if (a3 > a4)
         {
@@ -146,6 +152,7 @@ pDomain::pDomain(
         radius1Sqr = radius1 * radius1;
         radius2Sqr = radius2 * radius2;
         break;
+    }
     case PDCone:
     case PDCylinder:
     {
@@ -188,8 +195,8 @@ pDomain::pDomain(
         u = basis - n * (basis * n);
         u.normalize_safe();
         v = n ^ u;
-    }
         break;
+    }
     case PDBlob:
     {
         p1 = pVector(a0, a1, a2);
@@ -197,8 +204,8 @@ pDomain::pDomain(
         float tmp = 1.f / radius1;
         radius2Sqr = -0.5f * _sqr(tmp);
         radius2 = ONEOVERSQRT2PI * tmp;
-    }
         break;
+    }
     case PDDisc:
     {
         p1 = pVector(a0, a1, a2); // Center point
@@ -227,8 +234,12 @@ pDomain::pDomain(
         u.normalize_safe();
         v = p2 ^ u;
         radius1Sqr = -(p1 * p2); // D of the plane eqn.
-    }
         break;
+    }
+    default:
+    {
+        break;
+    }
     }
 }
 

@@ -43,8 +43,8 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
         independent = CUIXmlInit::InitStatic(uiXml, "background", 0, this, false);
     }
 
-    Fvector2 sz;
-    Fvector2 pos;
+    Fvector2 sz{};
+    Fvector2 pos{};
 
     if (!independent)
     {
@@ -87,43 +87,22 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
         }
     }
 
-    CUIStatic* state;
-
-    if ((state = UIHelper::CreateStatic(uiXml, "state_normal", this, false)))
+    auto crate_static = [&uiXml, this](LPCSTR ui_path, EState state)
     {
-        m_states[stNormal] = state;
-        state->Show(false);
-    }
+        auto ui_static = UIHelper::CreateStatic(uiXml, ui_path, this, false);
+        if (ui_static)
+        {
+            m_states[state] = ui_static;
+            ui_static->Show(false);
+        }
+    };
 
-    if ((state = UIHelper::CreateStatic(uiXml, "state_crouch", this, false)))
-    {
-        m_states[stCrouch] = state;
-        state->Show(false);
-    }
-
-    if ((state = UIHelper::CreateStatic(uiXml, "state_creep", this, false)))
-    {
-        m_states[stCreep] = state;
-        state->Show(false);
-    }
-
-    if ((state = UIHelper::CreateStatic(uiXml, "state_climb", this, false)))
-    {
-        m_states[stClimb] = state;
-        state->Show(false);
-    }
-
-    if ((state = UIHelper::CreateStatic(uiXml, "state_run", this, false)))
-    {
-        m_states[stRun] = state;
-        state->Show(false);
-    }
-
-    if ((state = UIHelper::CreateStatic(uiXml, "state_sprint", this, false)))
-    {
-        m_states[stSprint] = state;
-        state->Show(false);
-    }
+    crate_static("state_normal", stNormal);
+    crate_static("state_crouch", stCrouch);
+    crate_static("state_creep",  stCreep);
+    crate_static("state_climb",  stClimb);
+    crate_static("state_run",    stRun);
+    crate_static("state_sprint", stSprint);
 
     ShowState(stNormal);
 

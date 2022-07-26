@@ -911,7 +911,7 @@ DWORD CxImage::UnDump(const BYTE * src)
  *  - CCC = minor revision (letter)
  *  - DDDD = experimental revision
  */
-const float CxImage::GetVersionNumber()
+float CxImage::GetVersionNumber()
 {
 	return 6.000000015f;
 }

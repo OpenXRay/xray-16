@@ -142,15 +142,21 @@ void CUIMpAdminMenu::ShowMessageBox(CUIMessageBox::E_MESSAGEBOX_STYLE style, LPC
 {
     switch (style)
     {
-    case CUIMessageBox::MESSAGEBOX_RA_LOGIN: { m_pMessageBoxLogin->ShowDialog(true);
+    case CUIMessageBox::MESSAGEBOX_RA_LOGIN:
+    {
+        m_pMessageBoxLogin->ShowDialog(true);
+        break;
     }
-    break;
     case CUIMessageBox::MESSAGEBOX_OK:
     {
         m_pMessageBoxOk->SetText(reason);
         m_pMessageBoxOk->ShowDialog(true);
+        break;
     }
-    break;
+    default:
+    {
+        break;
+    }
     }
 }
 

@@ -852,21 +852,19 @@ void CSE_ALifeItemPDA::STATE_Read(NET_Packet& tNetPacket, u16 size)
     if (m_wVersion > 58)
         tNetPacket.r_u16(m_original_owner);
 
-    if (m_wVersion > 89)
-
-        if ((m_wVersion > 89) && (m_wVersion < 98))
-        {
-            int tmp, tmp2;
-            tNetPacket.r(&tmp, sizeof(int));
-            tNetPacket.r(&tmp2, sizeof(int));
-            m_info_portion = NULL;
-            m_specific_character = NULL;
-        }
-        else
-        {
-            tNetPacket.r_stringZ(m_specific_character);
-            tNetPacket.r_stringZ(m_info_portion);
-        }
+    if ((m_wVersion > 89) && (m_wVersion < 98))
+    {
+        int tmp, tmp2;
+        tNetPacket.r(&tmp, sizeof(int));
+        tNetPacket.r(&tmp2, sizeof(int));
+        m_info_portion = NULL;
+        m_specific_character = NULL;
+    }
+    else
+    {
+        tNetPacket.r_stringZ(m_specific_character);
+        tNetPacket.r_stringZ(m_info_portion);
+    }
 }
 
 void CSE_ALifeItemPDA::STATE_Write(NET_Packet& tNetPacket)

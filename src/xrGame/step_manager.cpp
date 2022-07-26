@@ -338,5 +338,5 @@ void CStepManager::material_sound::play_next(
         sound_pos.set(0, 0, 0);
 
     mtl_pair->StepSounds[m_last_step_sound_played].play_no_feedback(
-        object, b_hud_mode ? sm_2D : 0, 0, &sound_pos, &vol);
+        object, b_hud_mode ? static_cast<int>(sm_2D) : 0, 0, &sound_pos, &vol);
 }

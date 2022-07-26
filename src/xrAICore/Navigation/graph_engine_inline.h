@@ -7,7 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "xrCore/Threading/ScopeLock.hpp"
+#include "xrEngine/profiler.h"
 
 inline CGraphEngine::CGraphEngine(u32 max_vertex_count)
 {

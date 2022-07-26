@@ -23,9 +23,9 @@ protected:
     void UpdateRelation();
     bool hasOwner() { return (m_ownerID != u16(-1)); }
     // Biography
-    CUIScrollView* pUIBio;
-    bool m_bForceUpdate;
-    u16 m_ownerID;
+    CUIScrollView* pUIBio{};
+    bool m_bForceUpdate{};
+    u16 m_ownerID{ u16(-1) };
 
     enum UIItemType
     {
@@ -52,7 +52,7 @@ protected:
         eMaxCaption
     };
     CUIStatic* m_icons[eMaxCaption];
-    shared_str m_texture_name;
+    shared_str m_texture_name{};
     u32 m_deadbody_color;
 
 public:

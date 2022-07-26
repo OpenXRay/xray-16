@@ -15,7 +15,7 @@
 #include "xrCore/Threading/TaskManager.hpp"
 
 int g_ErrorLineCount = 15;
-Flags32 g_stats_flags = {0};
+Flags32 g_stats_flags = {};
 
 ENGINE_API CStatTimer gTestTimer0;
 ENGINE_API CStatTimer gTestTimer1;

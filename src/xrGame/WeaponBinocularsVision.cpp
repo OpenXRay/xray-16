@@ -169,6 +169,7 @@ void SBinocVisibleObj::Update()
                         case ALife::eRelationTypeEnemy: clr = C_ON_ENEMY; break;
                         case ALife::eRelationTypeNeutral: clr = C_ON_NEUTRAL; break;
                         case ALife::eRelationTypeFriend: clr = C_ON_FRIEND; break;
+                        default: break;
                         }
                     }
                     else

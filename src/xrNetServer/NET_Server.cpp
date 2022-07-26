@@ -872,7 +872,7 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
 
 bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, DWORD* pPort)
 {
-    WCHAR wstrHostname[256] = {0};
+    WCHAR wstrHostname[256] = {};
     DWORD dwSize = sizeof(wstrHostname);
     DWORD dwDataType = 0;
     CHK_DX(pClientAddress->GetComponentByName(DPNA_KEY_HOSTNAME, wstrHostname, &dwSize, &dwDataType));

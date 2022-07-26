@@ -25,7 +25,7 @@ void add_focused_rect_to_draw(Frect&& r)
     g_focused_wnds_rects.emplace_back(r);
 }
 
-void draw_rect(Frect& r, u32 color)
+void draw_rect([[maybe_unused]] Frect& r, [[maybe_unused]] u32 color)
 {
 #ifdef DEBUG
 
@@ -69,9 +69,7 @@ XRUICORE_API void draw_wnds_rects()
     g_focused_wnds_rects.clear();
 }
 
-CUIWindow::CUIWindow(pcstr window_name)
-    : m_windowName(window_name), m_pParentWnd(NULL), m_pMouseCapturer(NULL), m_pKeyboardCapturer(NULL), m_pMessageTarget(NULL),
-      m_dwFocusReceiveTime(0), m_bAutoDelete(false), m_bCursorOverWindow(false), m_bCustomDraw(false)
+CUIWindow::CUIWindow(pcstr window_name) : m_windowName(window_name)
 {
     Show(true);
     Enable(true);

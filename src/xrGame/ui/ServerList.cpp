@@ -129,10 +129,14 @@ void CServerList::Update()
 
 bool CServerList::NeedToRefreshCurServer()
 {
+#ifdef XR_PLATFORM_WINDOWS
     CUIListItemServer* pItem = (CUIListItemServer*)m_list[LST_SERVER].GetSelectedItem();
     if (!pItem)
         return false;
     return browser().HasAllKeys(pItem->GetInfo()->info.Index) == false;
+#else
+   return false;
+#endif
 };
 
 void CServerList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -261,17 +265,34 @@ void CServerList::AddBoolYN(const char* keyName, bool value)
         value ? *StringTable().translate("mp_si_yes") : *StringTable().translate("mp_si_no")));
 }
 
-void CServerList::AddBoolKeyED(void* s, const char* keyName, int k) { AddBoolED(keyName, browser().GetBool(s, k)); }
-void CServerList::AddBoolKeyYN(void* s, const char* keyName, int k) { AddBoolYN(keyName, browser().GetBool(s, k)); }
+void CServerList::AddBoolKeyED(void* s, const char* keyName, int k)
+{
+#ifdef XR_PLATFORM_WINDOWS
+    AddBoolED(keyName, browser().GetBool(s, k));
+#endif
+}
+
+void CServerList::AddBoolKeyYN(void* s, const char* keyName, int k)
+{
+#ifdef XR_PLATFORM_WINDOWS
+    AddBoolYN(keyName, browser().GetBool(s, k));
+#endif
+}
+
 void CServerList::AddIntKey(void* s, const char* keyName, int k)
 {
+#ifdef XR_PLATFORM_WINDOWS
     string256 tmp;
     xr_sprintf(tmp, "%d", browser().GetInt(s, k));
+
+
     AddServerDetail(GameInfo(*StringTable().translate(keyName), tmp));
+#endif
 }
 
 void CServerList::AddIntKeyN(void* s, float m, const char* keyName, const char* suffix, int k)
 {
+#ifdef XR_PLATFORM_WINDOWS
     if (browser().GetInt(s, k))
     {
         string256 tmp;
@@ -280,10 +301,12 @@ void CServerList::AddIntKeyN(void* s, float m, const char* keyName, const char* 
     }
     else
         AddServerDetail(GameInfo(*StringTable().translate(keyName), *StringTable().translate("mp_si_no")));
+#endif
 }
 
 void CServerList::AddTimeKey(void* s, const char* keyName, const char* format, const char* suffix, int k)
 {
+#ifdef XR_PLATFORM_WINDOWS
     if (browser().GetInt(s, k))
     {
         string256 tmp;
@@ -292,6 +315,7 @@ void CServerList::AddTimeKey(void* s, const char* keyName, const char* format, c
     }
     else
         AddServerDetail(GameInfo(*StringTable().translate(keyName), *StringTable().translate("mp_si_no")));
+#endif
 }
 
 void CServerList::AddString(const char* key, const char* value)
@@ -306,6 +330,7 @@ void CServerList::AddStringSt(const char* key, const char* value)
 
 void CServerList::FillUpDetailedServerInfo()
 {
+#ifdef XR_PLATFORM_WINDOWS
     bool t1 = false;
     bool t2 = false;
     bool spect = false;
@@ -479,6 +504,7 @@ void CServerList::FillUpDetailedServerInfo()
         AddBoolKeyYN(sv, "mp_si_afbearer_cant_sprint", G_BEARER_CANT_SPRINT_KEY);
     }
     AddString("Uptime", srvInfo.m_ServerUpTime);
+#endif
 }
 
 void CServerList::ClearDetailedServerInfo()
@@ -712,6 +738,7 @@ void CServerList::NetRadioChanged(bool Local)
 
 void CServerList::RefreshGameSpyList(bool Local)
 {
+#ifdef XR_PLATFORM_WINDOWS
     SetSortFunc_internal(SORT_PING, SORT_TYPE_ASCENDING, false);
     auto result = browser().RefreshList_Full(Local, m_edit_gs_filter.GetText());
     switch (result)
@@ -720,10 +747,15 @@ void CServerList::RefreshGameSpyList(bool Local)
         if (MainMenu())
             MainMenu()->Show_CTMS_Dialog();
         break;
-    case GSUpdateStatus::MasterUnreachable: MainMenu()->SetErrorDialog(CMainMenu::ErrMasterServerConnectFailed); break;
+    case GSUpdateStatus::MasterUnreachable:
+        MainMenu()->SetErrorDialog(CMainMenu::ErrMasterServerConnectFailed);
+        break;
+    default:
+        break;
     }
     ResetCurItem();
     RefreshList();
+#endif
 }
 
 void CServerList::AddServerToList(ServerInfo* pServerInfo)
@@ -812,6 +844,7 @@ public:
 
 void CServerList::RefreshList_internal()
 {
+#ifdef XR_PLATFORM_WINDOWS
     m_need_refresh_fr = u32(-1);
     SaveCurItem();
     m_list[LST_SERVER].Clear();
@@ -836,10 +869,12 @@ void CServerList::RefreshList_internal()
     }
     UpdateSizes();
     RestoreCurItem();
+#endif
 };
 
 void CServerList::RefreshQuick()
 {
+#ifdef XR_PLATFORM_WINDOWS
     CUIListItemServer* pItem = (CUIListItemServer*)m_list[LST_SERVER].GetSelectedItem();
     if (!pItem)
         return;
@@ -852,6 +887,7 @@ void CServerList::RefreshQuick()
         ClearDetailedServerInfo();
         FillUpDetailedServerInfo();
     }
+#endif
 }
 
 void CServerList::SetSortFunc(const char* func_name, bool make_sort)
@@ -871,7 +907,10 @@ void CServerList::SetSortFunc(const char* func_name, bool make_sort)
     else if (!xr_strcmp(func_name, "version"))
         mode = SORT_GAMEVERSION;
     else
+    {
         R_ASSERT2(false, "Unsupported sorting function name");
+        return;
+    }
 
     SetSortFunc_internal(mode, SORT_TYPE_AUTO, make_sort);
 }

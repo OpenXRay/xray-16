@@ -168,7 +168,7 @@ static bool must_enable_old_cascades()
         R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
         do
         {
-            xr_string str(static_cast<cpcstr>(accumSunNear->pointer()), accumSunNear->length());
+            xr_string str(static_cast<cpstr>(accumSunNear->pointer()), accumSunNear->length());
 
             pcstr begin = strstr(str.c_str(), "float4");
             if (!begin)

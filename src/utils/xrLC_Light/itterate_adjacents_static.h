@@ -73,7 +73,7 @@ private:
     }
 
 public:
-    IC const u32 current_adjacents_size() const
+    IC u32 current_adjacents_size() const
     {
         VERIFY(pTestVertex);
         return u32(pTestVertex->m_adjacents.size());

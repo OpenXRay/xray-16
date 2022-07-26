@@ -38,6 +38,7 @@ void CStateManagerFracture::execute()
         {
         case eStrong: state_id = eStatePanic; break;
         case eWeak: state_id = eStateAttack; break;
+        default: break;
         }
     }
     else if (object->HitMemory.is_hit())

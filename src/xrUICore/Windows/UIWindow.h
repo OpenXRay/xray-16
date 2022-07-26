@@ -146,34 +146,34 @@ protected:
     WINDOW_LIST m_ChildWndList;
 
     //указатель на родительское окно
-    CUIWindow* m_pParentWnd;
+    CUIWindow* m_pParentWnd{};
 
     //дочернее окно которое, захватило ввод мыши
-    CUIWindow* m_pMouseCapturer;
+    CUIWindow* m_pMouseCapturer{};
 
     //дочернее окно которое, захватило ввод клавиатуры
-    CUIWindow* m_pKeyboardCapturer;
+    CUIWindow* m_pKeyboardCapturer{};
 
     //кому шлем сообщения
-    CUIWindow* m_pMessageTarget;
+    CUIWindow* m_pMessageTarget{};
 
     // Последняя позиция мышки
     Fvector2 cursor_pos;
 
     //время прошлого клика мышки
     //для определения DoubleClick
-    u32 m_dwLastClickTime;
-    u32 m_dwFocusReceiveTime;
+    u32 m_dwLastClickTime{};
+    u32 m_dwFocusReceiveTime{};
 
     //флаг автоматического удаления во время вызова деструктора
-    bool m_bAutoDelete;
+    bool m_bAutoDelete{};
 
     // Is user input allowed
-    bool m_bIsEnabled;
+    bool m_bIsEnabled{};
 
     // Если курсор над окном
-    bool m_bCursorOverWindow;
-    bool m_bCustomDraw;
+    bool m_bCursorOverWindow{};
+    bool m_bCustomDraw{};
 
 #ifdef DEBUG
     int m_dbg_id;

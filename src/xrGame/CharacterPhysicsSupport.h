@@ -40,7 +40,7 @@ public:
 
 private:
     EType m_eType;
-    EState m_eState;
+    EState m_eState{ esAlive };
     Flags8 m_flags;
     enum Fags
     {
@@ -66,26 +66,26 @@ private:
     CEntityAlive& m_EntityAlife;
     Fmatrix& mXFORM;
     CPhysicsShell*& m_pPhysicsShell;
-    CPhysicsShell* m_physics_skeleton;
+    CPhysicsShell* m_physics_skeleton{};
     CPHMovementControl* m_PhysicMovementControl;
     CPHSoundPlayer m_ph_sound_player;
-    CIKLimbsController* m_ik_controller;
-    ICollisionHitCallback* m_collision_hit_callback;
+    CIKLimbsController* m_ik_controller{};
+    ICollisionHitCallback* m_collision_hit_callback{};
     character_hit_animation_controller m_hit_animations;
     death_anims m_death_anims;
-    float m_BonceDamageFactor;
-    interactive_motion* m_interactive_motion;
+    float m_BonceDamageFactor{1.0f};
+    interactive_motion* m_interactive_motion{};
     character_shell_control m_character_shell_control;
-    interactive_animation* m_interactive_animation;
-    physics_shell_animated* m_physics_shell_animated;
-    activating_character_delay* m_collision_activating_delay;
+    interactive_animation* m_interactive_animation{};
+    physics_shell_animated* m_physics_shell_animated{};
+    activating_character_delay* m_collision_activating_delay{};
     xr_vector<CODEGeom*> m_weapon_geoms;
     xr_vector<anim_bone_fix*> m_weapon_bone_fixes;
-    CPhysicsElement* m_weapon_attach_bone;
-    CPhysicsShellHolder* m_active_item_obj;
+    CPhysicsElement* m_weapon_attach_bone{};
+    CPhysicsShellHolder* m_active_item_obj{};
     SHit m_sv_hit;
-    u32 m_hit_valide_time;
-    u32 m_physics_shell_animated_time_destroy;
+    u32 m_hit_valide_time{ u32(-1) };
+    u32 m_physics_shell_animated_time_destroy{ u32(-1) };
 
 public:
     EType Type() { return m_eType; }

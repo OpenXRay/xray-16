@@ -195,8 +195,8 @@ void CScriptDebugger::LineHook(const char* szFile, int nLine)
         return;
     }
     if (HasBreakPoint(szFile, nLine) || m_nMode == DMOD_STEP_INTO || m_nMode == DMOD_BREAK ||
-        m_nMode == DMOD_STEP_OVER && m_nLevel <= 0 || m_nMode == DMOD_STEP_OUT && m_nLevel < 0 ||
-        m_nMode == DMOD_RUN_TO_CURSOR && xr_strcmp(m_strPathName, szFile) && m_nLine == nLine)
+        (m_nMode == DMOD_STEP_OVER && m_nLevel <= 0) || (m_nMode == DMOD_STEP_OUT && m_nLevel < 0) ||
+        (m_nMode == DMOD_RUN_TO_CURSOR && xr_strcmp(m_strPathName, szFile) && m_nLine == nLine))
     {
         DebugBreak(szFile, nLine);
         GetBreakPointsFromIde();

@@ -31,11 +31,7 @@ namespace smart_cover
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
 } // namespace smart_cover
 
-stalker_movement_manager_smart_cover::stalker_movement_manager_smart_cover(CAI_Stalker* object)
-    : inherited(object), m_property_storage(0), m_current_transition(0), m_current_transition_animation(0),
-      m_non_animated_loophole_change(false), m_apply_loophole_direction_distance(4.f), m_animation_selector(0),
-      m_entering_smart_cover_with_animation(false), m_default_behaviour(false), m_enter_cover_id(""),
-      m_enter_loophole_id(""), m_check_can_kill_enemy(false), m_combat_behaviour(false)
+stalker_movement_manager_smart_cover::stalker_movement_manager_smart_cover(CAI_Stalker* object) : inherited(object)
 {
     m_target.construct(this);
     m_target_selector = xr_new<target_selector_type>();

@@ -144,11 +144,15 @@ bool CObjectSpace::_RayPick(
             ECollisionFormType tp = collidable->GetCForm()->Type();
             if (((tgt & (rqtObject | rqtObstacle)) && (tp == cftObject)) || ((tgt & rqtShape) && (tp == cftShape)))
             {
+#ifdef DEBUG
                 u32 C = color_xrgb(64, 64, 64);
+#endif
                 Q.range = R.range;
                 if (collidable->GetCForm()->_RayQuery(Q, r_temp))
                 {
+#ifdef DEBUG
                     C = color_xrgb(128, 128, 196);
+#endif
                     R.set_if_less(r_temp.r_begin());
                 }
 #ifdef DEBUG

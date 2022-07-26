@@ -150,13 +150,13 @@ private:
         Fvector m_start_pos;
         float m_query_distance;
     }; // class victim_filter
+
     class best_victim_selector
     {
     public:
         best_victim_selector(
             u16 except_id, Fvector const& pos, float query_distance, spartial_base_t::value_type& dest_result);
-
-        best_victim_selector(best_victim_selector const& copy);
+        best_victim_selector(best_victim_selector const& copy) = default;
         void operator()(spartial_base_t::value_type const& left);
 
     private:
@@ -167,7 +167,7 @@ private:
         float m_query_distance;
         u16 m_except_id;
         spartial_base_t::value_type& m_dest_result;
-    }; // struct best_victim_selector
+    }; // class best_victim_selector
 
     static bool shapes_compare_predicate(
         victims_shapes_list_t::value_type const& left, victims_shapes_list_t::value_type const& right)

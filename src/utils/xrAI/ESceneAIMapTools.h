@@ -78,8 +78,8 @@ struct SAINode // definition of "patch" or "node"
     void LoadLTX(CInifile& ini, LPCSTR sect_name, ESceneAIMapTool*);
     void SaveLTX(CInifile& ini, LPCSTR sect_name, ESceneAIMapTool*);
 
-    void* operator new(std::size_t size);
-    void* operator new(std::size_t size, SAINode*);
+    void* operator new(size_t size);
+    void* operator new(size_t size, SAINode*);
     void operator delete(void*);
 };
 #pragma pack(pop)

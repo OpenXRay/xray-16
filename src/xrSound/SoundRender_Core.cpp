@@ -160,7 +160,7 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
 
     // check version
     R_ASSERT(I->find_chunk(0));
-    u32 version = I->r_u32();
+    [[maybe_unused]] u32 version = I->r_u32();
     VERIFY2(version == 0, "Invalid SOM version");
 
     struct SOM_poly
@@ -302,7 +302,7 @@ void CSoundRender_Core::clone(ref_sound& S, const ref_sound& from, esound_type s
     S._p->fTimeTotal = from._p->fTimeTotal;
     S._p->fn_attached[0] = from._p->fn_attached[0];
     S._p->fn_attached[1] = from._p->fn_attached[1];
-    S._p->g_type = (game_type == sg_SourceType) ? S._p->handle->game_type() : game_type;
+    S._p->g_type = (static_cast<u32>(game_type) == sg_SourceType) ? S._p->handle->game_type() : game_type;
     S._p->s_type = sound_type;
 }
 
@@ -386,7 +386,7 @@ bool CSoundRender_Core::_create_data(ref_sound_data& S, pcstr fName, esound_type
     const bool found = SoundRender->i_create_source(S.handle, fn, replaceWithNoSound);
     const bool handleAvailable = found || replaceWithNoSound;
     S.g_type = game_type;
-    if (game_type == sg_SourceType && handleAvailable)
+    if (static_cast<u32>(game_type) == sg_SourceType && handleAvailable)
         S.g_type = S.handle->game_type();
     S.s_type = sound_type;
     S.feedback = nullptr;
@@ -515,9 +515,10 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
     // XXX: old SDK functionality
     /*if (bEAX)
     {
-        CSoundRender_Environment* SE = static_cast<CSoundRender_Environment*>(src_env);
-        CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
 #if defined(XR_PLATFORM_WINDOWS)
+        auto SE = static_cast<CSoundRender_Environment*>(src_env);
+        auto DE = static_cast<CSoundRender_Environment*>(*dst_env);
+
         // set environment
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
             DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &SE->EnvironmentSize,
@@ -537,8 +538,9 @@ void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
     // XXX: old SDK functionality
     /*if (bEAX)
     {
-        CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
 #if defined(XR_PLATFORM_WINDOWS)
+        auto DE = static_cast<CSoundRender_Environment*>(*dst_env);
+
         // set environment
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
             DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &id, sizeof(id));

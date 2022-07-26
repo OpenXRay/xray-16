@@ -130,7 +130,7 @@ HRESULT Convolver::Initialize(NVI_Image** hSrcImage, const ConvolutionKernel* pK
     m_nNumKernels = numKernels;
     m_pKernels = new ConvolutionKernel[m_nNumKernels];
     assert(m_pKernels != NULL);
-    RECT maxKernSize = {0};
+    RECT maxKernSize = {};
     for (int n = 0; n < m_nNumKernels; n++)
     {
         m_pKernels[n] = pKernels[n];

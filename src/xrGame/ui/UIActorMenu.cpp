@@ -476,6 +476,7 @@ CUIItemInfo* CUIActorMenu::GetModeSpecificItemInfo()
     case mmInventory:      return m_ItemInfoInventoryMode;
     case mmTrade:          return m_ItemInfoTradeMode;
     case mmDeadBodySearch: return m_ItemInfoSearchLootMode;
+    default: break;
     }
     return nullptr;
 }
@@ -486,6 +487,7 @@ CUICharacterInfo* CUIActorMenu::GetModeSpecificActorInfo() const
     {
     case mmTrade:          return m_TradeActorCharacterInfo;
     case mmDeadBodySearch: return m_SearchLootActorCharacterInfo;
+    default: break;
     }
     return m_ActorCharacterInfo;
 }
@@ -496,13 +498,17 @@ CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo(EMenuMode fallback) c
     {
     case mmTrade:          return m_TradePartnerCharacterInfo;
     case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
+    default:               break;
     }
+
     if (m_PartnerCharacterInfo)
         return m_PartnerCharacterInfo;
+
     switch (fallback)
     {
     case mmTrade:          return m_TradePartnerCharacterInfo;
     case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
+    default:               break;
     }
     return nullptr;
 }

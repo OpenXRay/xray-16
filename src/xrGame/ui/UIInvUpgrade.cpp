@@ -94,7 +94,7 @@ void UIUpgrade::load_from_xml(CUIXml& ui_xml, int i_column, int i_cell, Frect co
     CUIXmlInit::InitWindow(ui_xml, "cell", i_cell, this);
 
     Fvector2 f2, color;
-    Frect border;
+    Frect border{};
     if (t_cell_border)
         border = *t_cell_border;
 
@@ -204,7 +204,7 @@ void UIUpgrade::Update()
 
 void UIUpgrade::update_upgrade_state()
 {
-    if (m_bCursorOverWindow || m_point && m_point->CursorOverWindow())
+    if (m_bCursorOverWindow || (m_point && m_point->CursorOverWindow()))
     {
         on_over_window();
     }
@@ -258,7 +258,7 @@ bool UIUpgrade::OnMouseAction(float x, float y, EUIMessages mouse_action)
     if (inherited::OnMouseAction(x, y, mouse_action))
         return true;
 
-    if (m_bCursorOverWindow || m_point && m_point->CursorOverWindow())
+    if (m_bCursorOverWindow || (m_point && m_point->CursorOverWindow()))
     {
         highlight_relation(true);
         if (mouse_action == WINDOW_LBUTTON_DOWN)

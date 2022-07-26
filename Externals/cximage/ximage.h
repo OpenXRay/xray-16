@@ -243,7 +243,7 @@ public:
 	DWORD	GetType() const;
 	const char*	GetLastError();
 	static const TCHAR* GetVersion();
-	static const float GetVersionNumber();
+	static float GetVersionNumber();
 
 	DWORD	GetFrameDelay() const;
 	void	SetFrameDelay(DWORD d);

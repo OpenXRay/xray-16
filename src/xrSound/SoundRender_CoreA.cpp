@@ -34,7 +34,7 @@ void CSoundRender_CoreA::_initialize()
     R_ASSERT2(pDeviceList, "Incorrect initialization order. Call _initialize_devices_list() first.");
 
     pDeviceList->SelectBestDevice();
-    R_ASSERT(snd_device_id >= 0 && snd_device_id < pDeviceList->GetNumDevices());
+    R_ASSERT(snd_device_id < pDeviceList->GetNumDevices());
     const ALDeviceDesc& deviceDesc = pDeviceList->GetDeviceDesc(snd_device_id);
 
     // OpenAL device
@@ -47,7 +47,7 @@ void CSoundRender_CoreA::_initialize()
     }
 
     // Get the device specifier.
-    const ALCchar* deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
+//    const ALCchar* deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
 
     // Create context
     pContext = alcCreateContext(pDevice, nullptr);

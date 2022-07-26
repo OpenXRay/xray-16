@@ -1837,7 +1837,7 @@ BOOL game_sv_CaptureTheArtefact::OnActivate(u16 eid_who, u16 eid_target)
         std::find_if(teams.begin(), te, [&](const TeamPair& tp) { return SearchArtefactIdFunctor()(tp, eid_target); });
 
     CSE_ActorMP* e_who = smart_cast<CSE_ActorMP*>(m_server->ID_to_entity(eid_who));
-    CSE_Abstract* e_item = m_server->ID_to_entity(eid_target);
+    [[maybe_unused]] CSE_Abstract* e_item = m_server->ID_to_entity(eid_target);
 
     VERIFY2(e_who, make_string("failed to get actor entity (id = %d)", eid_who).c_str());
 
@@ -2127,7 +2127,7 @@ void game_sv_CaptureTheArtefact::ActorDeliverArtefactOnBase(CSE_ActorMP* actor, 
     game_PlayerState* ps = xrCData->ps;
     VERIFY2(xrCData, "client data for actor sv object not found");
     VERIFY2(ps, "player state of client is NULL");
-    TeamsMap::iterator te = teams.end();
+    [[maybe_unused]] TeamsMap::iterator te = teams.end();
     TeamsMap::iterator artefactOfTeam = teams.find(teamOfArtefact);
     VERIFY2(artefactOfTeam != te, make_string("artefact owner team (%d) not found", teamOfArtefact));
     VERIFY(artefactOfTeam->second.artefact);

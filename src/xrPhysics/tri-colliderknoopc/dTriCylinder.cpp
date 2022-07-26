@@ -406,65 +406,152 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
     dReal posProj;
     dReal pointDepth = 0.f;
 
-#define TEST(vx, ox1, ox2, c)                                             \
-    {                                                                     \
-        posProj = dDOT14(v##vx, R + 1) - dDOT14(p, R + 1);                \
-                                                                          \
-        axis[0] = v##vx[0] - p[0] - R[1] * posProj;                       \
-        axis[1] = v##vx[1] - p[1] - R[5] * posProj;                       \
-        axis[2] = v##vx[2] - p[2] - R[9] * posProj;                       \
-                                                                          \
-        accurate_normalize(axis);                                         \
-                                                                          \
-        dist0 = dDOT(v0, axis) - dDOT(p, axis);                           \
-        dist1 = dDOT(v1, axis) - dDOT(p, axis);                           \
-        dist2 = dDOT(v2, axis) - dDOT(p, axis);                           \
-                                                                          \
-        isPdist0 = dist0 > 0.f;                                           \
-        isPdist1 = dist1 > 0.f;                                           \
-        isPdist2 = dist2 > 0.f;                                           \
-                                                                          \
-        depth0 = radius - dFabs(dist0);                                   \
-        depth1 = radius - dFabs(dist1);                                   \
-        depth2 = radius - dFabs(dist2);                                   \
-                                                                          \
-        sideTestV##vx##0 = depth0 > 0.f;                                  \
-        sideTestV##vx##1 = depth1 > 0.f;                                  \
-        sideTestV##vx##2 = depth2 > 0.f;                                  \
-                                                                          \
-        if (isPdist0 == isPdist1 && isPdist1 == isPdist2)                 \
-                                                                          \
-        {                                                                 \
-            if (sideTestV##vx##0 || sideTestV##vx##1 || sideTestV##vx##2) \
-            {                                                             \
-                if (!(depth##vx < depth##ox1 || depth##vx < depth##ox2))  \
-                {                                                         \
-                    if (depth##vx < outDepth && depth##vx > pointDepth)   \
-                    {                                                     \
-                        pointDepth = depth##vx;                           \
-                        signum = isPdist##vx ? 1.f : -1.f;                \
-                        outAx[0] = axis[0];                               \
-                        outAx[1] = axis[1];                               \
-                        outAx[2] = axis[2];                               \
-                        code = c;                                         \
-                    }                                                     \
-                }                                                         \
-            }                                                             \
-            else                                                          \
-                RETURN0;                                                  \
-        }                                                                 \
-    \
-}
-
     if (testV0)
-        TEST(0, 1, 2, 4)
+    {
+        posProj = dDOT14(v0, R + 1) - dDOT14(p, R + 1);
+
+        axis[0] = v0[0] - p[0] - R[1] * posProj;
+        axis[1] = v0[1] - p[1] - R[5] * posProj;
+        axis[2] = v0[2] - p[2] - R[9] * posProj;
+
+        accurate_normalize(axis);
+
+        dist0 = dDOT(v0, axis) - dDOT(p, axis);
+        dist1 = dDOT(v1, axis) - dDOT(p, axis);
+        dist2 = dDOT(v2, axis) - dDOT(p, axis);
+
+        isPdist0 = dist0 > 0.f;
+        isPdist1 = dist1 > 0.f;
+        isPdist2 = dist2 > 0.f;
+
+        depth0 = radius - dFabs(dist0);
+        depth1 = radius - dFabs(dist1);
+        depth2 = radius - dFabs(dist2);
+
+        sideTestV00 = depth0 > 0.f;
+        sideTestV01 = depth1 > 0.f;
+        sideTestV02 = depth2 > 0.f;
+
+        if (isPdist0 == isPdist1 && isPdist1 == isPdist2)
+
+        {
+            if (sideTestV00 || sideTestV01 || sideTestV02)
+            {
+                if (!(depth0 < depth1 || depth0 < depth2))
+                {
+                    if (depth0 < outDepth && depth0 > pointDepth)
+                    {
+                        pointDepth = depth0;
+                        signum = isPdist0 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        code = 4;
+                    }
+                }
+            }
+            else
+                RETURN0;
+        }
+    }
     if (testV1)
-        TEST(1, 2, 0, 5)
+    {
+        posProj = dDOT14(v1, R + 1) - dDOT14(p, R + 1);
+
+        axis[0] = v1[0] - p[0] - R[1] * posProj;
+        axis[1] = v1[1] - p[1] - R[5] * posProj;
+        axis[2] = v1[2] - p[2] - R[9] * posProj;
+
+        accurate_normalize(axis);
+
+        dist0 = dDOT(v0, axis) - dDOT(p, axis);
+        dist1 = dDOT(v1, axis) - dDOT(p, axis);
+        dist2 = dDOT(v2, axis) - dDOT(p, axis);
+
+        isPdist0 = dist0 > 0.f;
+        isPdist1 = dist1 > 0.f;
+        isPdist2 = dist2 > 0.f;
+
+        depth0 = radius - dFabs(dist0);
+        depth1 = radius - dFabs(dist1);
+        depth2 = radius - dFabs(dist2);
+
+        sideTestV10 = depth0 > 0.f;
+        sideTestV11 = depth1 > 0.f;
+        sideTestV12 = depth2 > 0.f;
+
+        if (isPdist0 == isPdist1 && isPdist1 == isPdist2)
+
+        {
+            if (sideTestV10 || sideTestV11 || sideTestV12)
+            {
+                if (!(depth1 < depth2 || depth1 < depth0))
+                {
+                    if (depth1 < outDepth && depth1 > pointDepth)
+                    {
+                        pointDepth = depth1;
+                        signum = isPdist1 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        code = 5;
+                    }
+                }
+            }
+            else
+                RETURN0;
+        }
+    }
     //&& sideTestV01
     if (testV2)
-        TEST(2, 0, 1, 6)
+    {
+        posProj = dDOT14(v2, R + 1) - dDOT14(p, R + 1);
+
+        axis[0] = v2[0] - p[0] - R[1] * posProj;
+        axis[1] = v2[1] - p[1] - R[5] * posProj;
+        axis[2] = v2[2] - p[2] - R[9] * posProj;
+
+        accurate_normalize(axis);
+
+        dist0 = dDOT(v0, axis) - dDOT(p, axis);
+        dist1 = dDOT(v1, axis) - dDOT(p, axis);
+        dist2 = dDOT(v2, axis) - dDOT(p, axis);
+
+        isPdist0 = dist0 > 0.f;
+        isPdist1 = dist1 > 0.f;
+        isPdist2 = dist2 > 0.f;
+
+        depth0 = radius - dFabs(dist0);
+        depth1 = radius - dFabs(dist1);
+        depth2 = radius - dFabs(dist2);
+
+        sideTestV20 = depth0 > 0.f;
+        sideTestV21 = depth1 > 0.f;
+        sideTestV22 = depth2 > 0.f;
+
+        if (isPdist0 == isPdist1 && isPdist1 == isPdist2)
+
+        {
+            if (sideTestV20 || sideTestV21 || sideTestV22)
+            {
+                if (!(depth2 < depth0 || depth2 < depth1))
+                {
+                    if (depth2 < outDepth && depth2 > pointDepth)
+                    {
+                        pointDepth = depth2;
+                        signum = isPdist2 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        code = 6;
+                    }
+                }
+            }
+            else
+                RETURN0;
+        }
+    }
 //&& sideTestV02 && sideTestV12
-#undef TEST
 
     dVector3 tpos, pos;
     if (code > 3)
@@ -476,64 +563,125 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
     bool outV0 = true;
     bool outV1 = true;
     bool outV2 = true;
-/////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-/// crosses between triangle sides and cylinder axis//////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-#define TEST(ax, nx, ox, c)                                                    \
-    if (cylinderCrossesLine(p, R + 1, hlz, v##ax, v##nx, triSideAx##ax, tpos)) \
-    {                                                                          \
-        dCROSS114(axis, =, triSideAx##ax, R + 1);                              \
-        accurate_normalize(axis);                                              \
-        dist##ax = dDOT(v##ax, axis) - dDOT(p, axis);                          \
-        dist##ox = dDOT(v##ox, axis) - dDOT(p, axis);                          \
-                                                                               \
-        isPdist##ax = dist##ax > 0.f;                                          \
-        isPdist##ox = dist##ox > 0.f;                                          \
-                                                                               \
-        if (isPdist##ax == isPdist##ox)                                        \
-        \
-{                                                                   \
-            \
-depth##ax = radius - dFabs(dist##ax);                                          \
-            \
-depth##ox = radius - dFabs(dist##ox);                                          \
-                                                                               \
-            if (depth##ax > 0.f)                                               \
-            {                                                                  \
-                if (depth##ax <= outDepth && depth##ax >= depth##ox)           \
-                {                                                              \
-                    outDepth = depth##ax;                                      \
-                    signum = isPdist##ax ? 1.f : -1.f;                         \
-                    outAx[0] = axis[0];                                        \
-                    outAx[1] = axis[1];                                        \
-                    outAx[2] = axis[2];                                        \
-                    pos[0] = tpos[0];                                          \
-                    pos[1] = tpos[1];                                          \
-                    pos[2] = tpos[2];                                          \
-                    code = c;                                                  \
-                }                                                              \
-            }                                                                  \
-            else if (depth##ox < 0.f)                                          \
-                RETURN0;                                                       \
-        \
-\
-}                                                                \
-    \
-}
+
+    // crosses between triangle sides and cylinder axis
 
     accurate_normalize(triSideAx0);
     if (outV0 && outV1)
-        TEST(0, 1, 2, 7)
+    {
+        if (cylinderCrossesLine(p, R + 1, hlz, v0, v1, triSideAx0, tpos))
+        {
+            dCROSS114(axis, =, triSideAx0, R + 1);
+            accurate_normalize(axis);
+            dist0 = dDOT(v0, axis) - dDOT(p, axis);
+            dist2 = dDOT(v2, axis) - dDOT(p, axis);
+
+            isPdist0 = dist0 > 0.f;
+            isPdist2 = dist2 > 0.f;
+
+            if (isPdist0 == isPdist2)
+            {
+                depth0 = radius - dFabs(dist0);
+                depth2 = radius - dFabs(dist2);
+
+                if (depth0 > 0.f)
+                {
+                    if (depth0 <= outDepth && depth0 >= depth2)
+                    {
+                        outDepth = depth0;
+                        signum = isPdist0 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        pos[0] = tpos[0];
+                        pos[1] = tpos[1];
+                        pos[2] = tpos[2];
+                        code = 7;
+                    }
+                }
+                else if (depth2 < 0.f)
+                    RETURN0;
+            }
+        }
+    }
 
     accurate_normalize(triSideAx1);
     if (outV1 && outV2)
-        TEST(1, 2, 0, 8)
+    {
+        if (cylinderCrossesLine(p, R + 1, hlz, v1, v2, triSideAx1, tpos))
+        {
+            dCROSS114(axis, =, triSideAx1, R + 1);
+            accurate_normalize(axis);
+            dist1 = dDOT(v1, axis) - dDOT(p, axis);
+            dist0 = dDOT(v0, axis) - dDOT(p, axis);
+
+            isPdist1 = dist1 > 0.f;
+            isPdist0 = dist0 > 0.f;
+
+            if (isPdist1 == isPdist0)
+            {
+                depth1 = radius - dFabs(dist1);
+                depth0 = radius - dFabs(dist0);
+
+                if (depth1 > 0.f)
+                {
+                    if (depth1 <= outDepth && depth1 >= depth0)
+                    {
+                        outDepth = depth1;
+                        signum = isPdist1 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        pos[0] = tpos[0];
+                        pos[1] = tpos[1];
+                        pos[2] = tpos[2];
+                        code = 8;
+                    }
+                }
+                else if (depth0 < 0.f)
+                    RETURN0;
+            }
+        }
+    }
 
     accurate_normalize(triSideAx2);
     if (outV2 && outV0)
-        TEST(2, 0, 1, 9)
-#undef TEST
+    {
+        if (cylinderCrossesLine(p, R + 1, hlz, v2, v0, triSideAx2, tpos))
+        {
+            dCROSS114(axis, =, triSideAx2, R + 1);
+            accurate_normalize(axis);
+            dist2 = dDOT(v2, axis) - dDOT(p, axis);
+            dist1 = dDOT(v1, axis) - dDOT(p, axis);
+
+            isPdist2 = dist2 > 0.f;
+            isPdist1 = dist1 > 0.f;
+
+            if (isPdist2 == isPdist1)
+            {
+                depth2 = radius - dFabs(dist2);
+                depth1 = radius - dFabs(dist1);
+
+                if (depth2 > 0.f)
+                {
+                    if (depth2 <= outDepth && depth2 >= depth1)
+                    {
+                        outDepth = depth2;
+                        signum = isPdist2 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        pos[0] = tpos[0];
+                        pos[1] = tpos[1];
+                        pos[2] = tpos[2];
+                        code = 9;
+                    }
+                }
+                else if (depth1 < 0.f)
+                    RETURN0;
+            }
+        }
+    }
 
     ////////////////////////////////////
     // test cylinder rings on triangle sides////
@@ -543,128 +691,231 @@ depth##ox = radius - dFabs(dist##ox);                                          \
     dReal sign;
     bool cs;
 
-#define TEST(ax, nx, ox, c)                                                         \
-    \
-{                                                                            \
-        \
-posProj = dDOT(p, triSideAx##ax) - dDOT(v##ax, triSideAx##ax);                      \
-        \
-axis[0] = p[0] - v0[0] - triSideAx##ax[0] * posProj;                                \
-        \
-axis[1] = p[1] - v0[1] - triSideAx##ax[1] * posProj;                                \
-        \
-axis[2] = p[2] - v0[2] - triSideAx##ax[2] * posProj;                                \
-        \
-sign = dDOT14(axis, R + 1) > 0.f ? 1.f : -1.f;                                      \
-        \
-cen[0] = p[0] - sign * R[1] * hlz;                                                  \
-        \
-cen[1] = p[1] - sign * R[5] * hlz;                                                  \
-        \
-cen[2] = p[2] - sign * R[9] * hlz;                                                  \
-        \
-\
-cs = circleLineIntersection(R + 1, cen, radius, triSideAx##ax, v##ax, -sign, tpos); \
-        \
-\
-axis[0] = tpos[0] - cen[0];                                                         \
-        \
-axis[1] = tpos[1] - cen[1];                                                         \
-        \
-axis[2] = tpos[2] - cen[2];                                                         \
-        \
-\
-if(cs)                                                                              \
-        {                                                                           \
-            \
-\
-cos0 = dDOT14(axis, R + 0);                                                         \
-            \
-cos2 = dDOT14(axis, R + 2);                                                         \
-            \
-tAx[0] = R[2] * cos0 - R[0] * cos2;                                                 \
-            \
-tAx[1] = R[6] * cos0 - R[4] * cos2;                                                 \
-            \
-tAx[2] = R[10] * cos0 - R[8] * cos2;                                                \
-            \
-\
-dCROSS(axis, =, triSideAx##ax, tAx);                                                \
-        \
-\
-}                                                                     \
-        \
-accurate_normalize(axis);                                                           \
-        \
-dist##ax = dDOT(v##ax, axis) - dDOT(p, axis);                                       \
-        \
-if(dist##ax* dDOT(axis, triSideAx##nx) > 0.f)                                       \
-        {                                                                           \
-            \
-\
-cos0 = dDOT14(axis, R + 0);                                                         \
-            \
-cos1 = dFabs(dDOT14(axis, R + 1));                                                  \
-            \
-cos2 = dDOT14(axis, R + 2);                                                         \
-            \
-\
-\
-sin1 = _sqrt(cos0 * cos0 + cos2 * cos2);                                            \
-            \
-\
-sidePr = cos1 * hlz + sin1 * radius;                                                \
-                                                                                    \
-            dist##ox = dDOT(v##ox, axis) - dDOT(p, axis);                           \
-                                                                                    \
-            isPdist##ax = dist##ax > 0.f;                                           \
-            isPdist##ox = dist##ox > 0.f;                                           \
-                                                                                    \
-            if (isPdist##ax == isPdist##ox)                                         \
-            \
-\
-{                                                                 \
-                \
-depth##ax = sidePr - dFabs(dist##ax);                                               \
-                \
-depth##ox = sidePr - dFabs(dist##ox);                                               \
-                                                                                    \
-                if (depth##ax > 0.f)                                                \
-                {                                                                   \
-                    if (depth##ax < outDepth)                                       \
-                    {                                                               \
-                        outDepth = depth##ax;                                       \
-                        signum = isPdist##ax ? 1.f : -1.f;                          \
-                        outAx[0] = axis[0];                                         \
-                        outAx[1] = axis[1];                                         \
-                        outAx[2] = axis[2];                                         \
-                        pos[0] = tpos[0];                                           \
-                        pos[1] = tpos[1];                                           \
-                        pos[2] = tpos[2];                                           \
-                        code = c;                                                   \
-                    }                                                               \
-                }                                                                   \
-                else if (depth##ox < 0.f)                                           \
-                    RETURN0;                                                        \
-            \
-\
-\
-}                                                              \
-        \
-}                                                                        \
-    \
-}
-
     if (7 != code)
-        TEST(0, 1, 2, 10)
+    {
+        posProj = dDOT(p, triSideAx0) - dDOT(v0, triSideAx0);
+        axis[0] = p[0] - v0[0] - triSideAx0[0] * posProj;
+        axis[1] = p[1] - v0[1] - triSideAx0[1] * posProj;
+        axis[2] = p[2] - v0[2] - triSideAx0[2] * posProj;
 
+        sign = dDOT14(axis, R + 1) > 0.f ? 1.f : -1.f;
+
+        cen[0] = p[0] - sign * R[1] * hlz;
+        cen[1] = p[1] - sign * R[5] * hlz;
+        cen[2] = p[2] - sign * R[9] * hlz;
+
+        cs = circleLineIntersection(R + 1, cen, radius, triSideAx0, v0, -sign, tpos);
+
+        axis[0] = tpos[0] - cen[0];
+        axis[1] = tpos[1] - cen[1];
+        axis[2] = tpos[2] - cen[2];
+
+        if(cs)
+        {
+            cos0 = dDOT14(axis, R + 0);
+            cos2 = dDOT14(axis, R + 2);
+
+            tAx[0] = R[2] * cos0 - R[0] * cos2;
+            tAx[1] = R[6] * cos0 - R[4] * cos2;
+            tAx[2] = R[10] * cos0 - R[8] * cos2;
+
+            dCROSS(axis, =, triSideAx0, tAx);
+        }
+
+        accurate_normalize(axis);
+
+        dist0 = dDOT(v0, axis) - dDOT(p, axis);
+
+        if(dist0* dDOT(axis, triSideAx1) > 0.f)
+        {
+            cos0 = dDOT14(axis, R + 0);
+            cos1 = dFabs(dDOT14(axis, R + 1));
+            cos2 = dDOT14(axis, R + 2);
+
+            sin1 = _sqrt(cos0 * cos0 + cos2 * cos2);
+
+            sidePr = cos1 * hlz + sin1 * radius;
+
+            dist2 = dDOT(v2, axis) - dDOT(p, axis);
+
+            isPdist0 = dist0 > 0.f;
+            isPdist2 = dist2 > 0.f;
+
+            if (isPdist0 == isPdist2)
+            {
+                depth0 = sidePr - dFabs(dist0);
+                depth2 = sidePr - dFabs(dist2);
+
+                if (depth0 > 0.f)
+                {
+                    if (depth0 < outDepth)
+                    {
+                        outDepth = depth0;
+                        signum = isPdist0 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        pos[0] = tpos[0];
+                        pos[1] = tpos[1];
+                        pos[2] = tpos[2];
+                        code = 10;
+                    }
+                }
+                else if (depth2 < 0.f)
+                    RETURN0;
+            }
+        }
+    }
     if (8 != code)
-        TEST(1, 2, 0, 11)
+    {
+        posProj = dDOT(p, triSideAx1) - dDOT(v1, triSideAx1);
+        axis[0] = p[0] - v0[0] - triSideAx1[0] * posProj;
+        axis[1] = p[1] - v0[1] - triSideAx1[1] * posProj;
+        axis[2] = p[2] - v0[2] - triSideAx1[2] * posProj;
 
+        sign = dDOT14(axis, R + 1) > 0.f ? 1.f : -1.f;
+
+        cen[0] = p[0] - sign * R[1] * hlz;
+        cen[1] = p[1] - sign * R[5] * hlz;
+        cen[2] = p[2] - sign * R[9] * hlz;
+
+        cs = circleLineIntersection(R + 1, cen, radius, triSideAx1, v1, -sign, tpos);
+
+        axis[0] = tpos[0] - cen[0];
+        axis[1] = tpos[1] - cen[1];
+        axis[2] = tpos[2] - cen[2];
+
+        if(cs)
+        {
+            cos0 = dDOT14(axis, R + 0);
+            cos2 = dDOT14(axis, R + 2);
+
+            tAx[0] = R[2] * cos0 - R[0] * cos2;
+            tAx[1] = R[6] * cos0 - R[4] * cos2;
+            tAx[2] = R[10] * cos0 - R[8] * cos2;
+
+            dCROSS(axis, =, triSideAx1, tAx);
+        }
+
+        accurate_normalize(axis);
+
+        dist1 = dDOT(v1, axis) - dDOT(p, axis);
+
+        if(dist1* dDOT(axis, triSideAx2) > 0.f)
+        {
+            cos0 = dDOT14(axis, R + 0);
+            cos1 = dFabs(dDOT14(axis, R + 1));
+            cos2 = dDOT14(axis, R + 2);
+
+            sin1 = _sqrt(cos0 * cos0 + cos2 * cos2);
+
+            sidePr = cos1 * hlz + sin1 * radius;
+
+            dist0 = dDOT(v0, axis) - dDOT(p, axis);
+
+            isPdist1 = dist1 > 0.f;
+            isPdist0 = dist0 > 0.f;
+
+            if (isPdist1 == isPdist0)
+            {
+                depth1 = sidePr - dFabs(dist1);
+                depth0 = sidePr - dFabs(dist0);
+
+                if (depth1 > 0.f)
+                {
+                    if (depth1 < outDepth)
+                    {
+                        outDepth = depth1;
+                        signum = isPdist1 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        pos[0] = tpos[0];
+                        pos[1] = tpos[1];
+                        pos[2] = tpos[2];
+                        code = 11;
+                    }
+                }
+                else if (depth0 < 0.f)
+                    RETURN0;
+            }
+        }
+    }
     if (9 != code)
-        TEST(2, 0, 1, 12)
+    {
+        posProj = dDOT(p, triSideAx2) - dDOT(v2, triSideAx2);
+        axis[0] = p[0] - v0[0] - triSideAx2[0] * posProj;
+        axis[1] = p[1] - v0[1] - triSideAx2[1] * posProj;
+        axis[2] = p[2] - v0[2] - triSideAx2[2] * posProj;
 
-#undef TEST
+        sign = dDOT14(axis, R + 1) > 0.f ? 1.f : -1.f;
+
+        cen[0] = p[0] - sign * R[1] * hlz;
+        cen[1] = p[1] - sign * R[5] * hlz;
+        cen[2] = p[2] - sign * R[9] * hlz;
+
+        cs = circleLineIntersection(R + 1, cen, radius, triSideAx2, v2, -sign, tpos);
+
+        axis[0] = tpos[0] - cen[0];
+        axis[1] = tpos[1] - cen[1];
+        axis[2] = tpos[2] - cen[2];
+
+        if(cs)
+        {
+            cos0 = dDOT14(axis, R + 0);
+            cos2 = dDOT14(axis, R + 2);
+
+            tAx[0] = R[2] * cos0 - R[0] * cos2;
+            tAx[1] = R[6] * cos0 - R[4] * cos2;
+            tAx[2] = R[10] * cos0 - R[8] * cos2;
+
+            dCROSS(axis, =, triSideAx2, tAx);
+        }
+
+        accurate_normalize(axis);
+
+        dist2 = dDOT(v2, axis) - dDOT(p, axis);
+
+        if(dist2* dDOT(axis, triSideAx0) > 0.f)
+        {
+            cos0 = dDOT14(axis, R + 0);
+            cos1 = dFabs(dDOT14(axis, R + 1));
+            cos2 = dDOT14(axis, R + 2);
+
+            sin1 = _sqrt(cos0 * cos0 + cos2 * cos2);
+
+            sidePr = cos1 * hlz + sin1 * radius;
+
+            dist1 = dDOT(v1, axis) - dDOT(p, axis);
+
+            isPdist2 = dist2 > 0.f;
+            isPdist1 = dist1 > 0.f;
+
+            if (isPdist2 == isPdist1)
+            {
+                depth2 = sidePr - dFabs(dist2);
+                depth1 = sidePr - dFabs(dist1);
+
+                if (depth2 > 0.f)
+                {
+                    if (depth2 < outDepth)
+                    {
+                        outDepth = depth2;
+                        signum = isPdist2 ? 1.f : -1.f;
+                        outAx[0] = axis[0];
+                        outAx[1] = axis[1];
+                        outAx[2] = axis[2];
+                        pos[0] = tpos[0];
+                        pos[1] = tpos[1];
+                        pos[2] = tpos[2];
+                        code = 12;
+                    }
+                }
+                else if (depth1 < 0.f)
+                    RETURN0;
+            }
+        }
+    }
 
     //}
     //////////////////////////////////////////////////////////////////////
@@ -821,14 +1072,28 @@ depth##ox = sidePr - dFabs(dist##ox);                                           
         }
         else
         {
+            // XXX: added to initialize outAx before using it here, check if correct
+            outAx[0] = axis[0];
+            outAx[1] = axis[1];
+            outAx[2] = axis[2];
+
             norm[0] = outAx[0] * signum;
             norm[1] = outAx[1] * signum;
             norm[2] = outAx[2] * signum;
         }
     }
-
     else
     { // 7-12
+        // XXX: added to initialize pos before using it here, check if correct
+        pos[0] = p[0];
+        pos[1] = p[1];
+        pos[2] = p[2];
+
+        // XXX: added to initialize outAx before using it here, check if correct
+        outAx[0] = axis[0];
+        outAx[1] = axis[1];
+        outAx[2] = axis[2];
+
         ret = 1;
         int iv0 = (code - 7) % 3;
         int iv1 = (iv0 + 1) % 3;

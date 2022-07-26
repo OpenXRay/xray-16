@@ -424,7 +424,7 @@ CMP(sd, c)                                       \
 
     unsigned int i;
 
-    dVector3 axis, outAx;
+    dVector3 axis{}, outAx{};
 
     /*
     #define TEST(ax,ox,c) \
@@ -804,9 +804,14 @@ contact2_3: BAR(2,3,pos); goto done;
         return 0;
 
     // if(0!=code){
-    contact->pos[0] = pos[0];
-    contact->pos[1] = pos[1];
-    contact->pos[2] = pos[2];
+//    contact->pos[0] = pos[0];
+//    contact->pos[1] = pos[1];
+//    contact->pos[2] = pos[2];
+
+    // XXX: what the hell is this file? setting to 0 to supress warnings
+    contact->pos[0] = 0;
+    contact->pos[1] = 0;
+    contact->pos[2] = 0;
 
     // contact->pos[0] = crossprg[0];
     // contact->pos[1] = crossprg[1];

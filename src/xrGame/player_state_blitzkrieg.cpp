@@ -5,12 +5,6 @@
 
 namespace award_system
 {
-player_blitzkrieg::player_blitzkrieg(game_state_accumulator* owner) : inherited(owner)
-{
-    m_art_drop_count = 0;
-    m_deliver_time = u32(-1);
-}
-
 void player_blitzkrieg::reset_game()
 {
     m_art_drop_count = 0;
@@ -59,5 +53,5 @@ void player_blitzkrieg::OnPlayerBringArtefact(game_PlayerState const* ps)
     m_art_drop_count = 0;
 }
 
-u32 const player_blitzkrieg::get_u32_param() { return m_deliver_time; };
+u32 player_blitzkrieg::get_u32_param() { return m_deliver_time; };
 } // namespace award_system

@@ -70,6 +70,7 @@ static void* __cdecl luabind_allocator(void* context, const void* pointer, size_
     return xr_realloc(non_const_pointer, size);
 }
 
+#ifdef XR_PLATFORM_WINDOWS
 namespace
 {
 void LuaJITLogError(lua_State* ls, const char* msg)
@@ -96,6 +97,7 @@ bool RunJITCommand(lua_State* ls, const char* command)
     return true;
 }
 }
+#endif
 
 const char* const CScriptEngine::GlobalNamespace = SCRIPT_GLOBAL_NAMESPACE;
 Lock CScriptEngine::stateMapLock;
@@ -213,7 +215,7 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level)
     const int ntype = lua_type(luaState, -1);
     const pcstr type = lua_typename(luaState, ntype);
 
-    char tabBuffer[32] = {0};
+    char tabBuffer[32] = {};
     memset(tabBuffer, '\t', level);
 
     char value[128];
@@ -430,7 +432,7 @@ bool CScriptEngine::load_file_into_namespace(LPCSTR caScriptName, LPCSTR caNames
 
 bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
 {
-    int start = lua_gettop(lua());
+    [[maybe_unused]] int start = lua_gettop(lua());
     lua_pushstring(lua(), GlobalNamespace);
     lua_rawget(lua(), LUA_GLOBALSINDEX);
     string256 S2 = { 0 };
@@ -486,7 +488,7 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
 
 bool CScriptEngine::object(LPCSTR identifier, int type)
 {
-    int start = lua_gettop(lua());
+    [[maybe_unused]] int start = lua_gettop(lua());
     lua_pushnil(lua());
     while (lua_next(lua(), -2))
     {
@@ -507,7 +509,7 @@ bool CScriptEngine::object(LPCSTR identifier, int type)
 
 bool CScriptEngine::object(LPCSTR namespace_name, LPCSTR identifier, int type)
 {
-    int start = lua_gettop(lua());
+    [[maybe_unused]] int start = lua_gettop(lua());
     if (xr_strlen(namespace_name) && !namespace_loaded(namespace_name, false))
     {
         VERIFY(lua_gettop(lua()) == start);
@@ -615,7 +617,7 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
 
 void CScriptEngine::print_error(lua_State* L, int iErrorCode)
 {
-    CScriptEngine* scriptEngine = GetInstance(L);
+    [[maybe_unused]] CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
     switch (iErrorCode)
     {
@@ -1240,7 +1242,7 @@ void CScriptEngine::collect_all_garbage()
 
 void CScriptEngine::on_error(lua_State* state)
 {
-    CScriptEngine* scriptEngine = GetInstance(state);
+    [[maybe_unused]] CScriptEngine* scriptEngine = GetInstance(state);
     VERIFY(scriptEngine);
 #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
     if (!scriptEngine->debugger())

@@ -48,7 +48,7 @@ SDisableUpdateState& SDisableUpdateState::operator&=(SDisableUpdateState& lstate
     return *this;
 }
 
-CBaseDisableData::CBaseDisableData() : m_disabled(false), m_last_frame_updated(u16(-1))
+CBaseDisableData::CBaseDisableData()
 {
     m_frames = worldDisablingParams.objects_params.L2frames;
     Reinit();

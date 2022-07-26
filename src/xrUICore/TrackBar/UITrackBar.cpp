@@ -44,19 +44,21 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
             if (pInput->iGetAsyncKeyState(MOUSE_1))
                 UpdatePosRelativeToMouse();
         }
+        break;
     }
-    break;
     case WINDOW_LBUTTON_DOWN:
     {
         m_b_mouse_capturer = m_bCursorOverWindow;
         if (m_b_mouse_capturer)
             UpdatePosRelativeToMouse();
-    }
-    break;
 
-    case WINDOW_LBUTTON_UP: { m_b_mouse_capturer = false;
+        break;
     }
-    break;
+    case WINDOW_LBUTTON_UP:
+    {
+        m_b_mouse_capturer = false;
+        break;
+    }
     case WINDOW_MOUSE_WHEEL_UP:
     {
         if (m_b_is_float)
@@ -72,8 +74,8 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
         GetMessageTarget()->SendMessage(this, BUTTON_CLICKED, NULL);
         UpdatePos();
         OnChangedOptValue();
+        break;
     }
-    break;
     case WINDOW_MOUSE_WHEEL_DOWN:
     {
         if (m_b_is_float)
@@ -89,8 +91,12 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
         GetMessageTarget()->SendMessage(this, BUTTON_CLICKED, NULL);
         UpdatePos();
         OnChangedOptValue();
+        break;
     }
-    break;
+    default:
+    {
+        break;
+    }
     };
     return true;
 }

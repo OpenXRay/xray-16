@@ -41,6 +41,7 @@ void CStateManagerBurer::execute()
         {
         case eStrong: state = eStatePanic; break;
         case eWeak: state = eStateAttack; break;
+        default: break;
         }
     }
     else if (object->HitMemory.is_hit() && (object->HitMemory.get_last_hit_time() + 10000 > Device.dwTimeGlobal))

@@ -339,7 +339,7 @@ void sake_processor::request_callback(
         me->process_out_request(tmp_in, tmp_out);
         me->m_current_offset += tmp_out->mNumRecords;
         if ((tmp_out->mNumRecords == max_request_records) &&
-            (static_cast<std::size_t>(me->m_current_offset) < me->m_request_names.size()))
+            (static_cast<size_t>(me->m_current_offset) < me->m_request_names.size()))
         {
             me->fetch();
             return;

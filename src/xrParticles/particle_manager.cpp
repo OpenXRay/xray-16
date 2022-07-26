@@ -99,11 +99,16 @@ void CParticleManager::PlayEffect(int effect_id, int alist_id)
         VERIFY(it);
         switch (it->type)
         {
-        case PASourceID: static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, false);
+        case PASourceID:
+            static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, false);
             break;
-        case PAExplosionID: static_cast<PAExplosion*>(it)->age = 0.f;
+        case PAExplosionID:
+            static_cast<PAExplosion*>(it)->age = 0.f;
             break;
-        case PATurbulenceID: static_cast<PATurbulence*>(it)->age = 0.f;
+        case PATurbulenceID:
+            static_cast<PATurbulence*>(it)->age = 0.f;
+            break;
+        default:
             break;
         }
     }
@@ -124,7 +129,10 @@ void CParticleManager::StopEffect(int effect_id, int alist_id, bool deffered)
     {
         switch (it->type)
         {
-        case PASourceID: static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, true);
+        case PASourceID:
+            static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, true);
+            break;
+        default:
             break;
         }
     }
@@ -182,12 +190,12 @@ void CParticleManager::Transform(int alist_id, const Fmatrix& full, const Fvecto
         bool r = it->m_Flags.is(ParticleAction::ALLOW_ROTATE);
         const Fmatrix& m = r ? full : mT;
         it->Transform(m);
-        switch (it->type)
+
+
+        if (it->type == PASourceID)
         {
-        case PASourceID:
             static_cast<PASource*>(it)->parent_vel =
                 pVector(vel.x, vel.y, vel.z) * static_cast<PASource*>(it)->parent_motion;
-            break;
         }
     }
     pa->unlock();

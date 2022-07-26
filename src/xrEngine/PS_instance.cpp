@@ -23,13 +23,11 @@ extern ENGINE_API bool g_bRendering;
 CPS_Instance::~CPS_Instance()
 {
     VERIFY(!g_bRendering);
-    xr_set<CPS_Instance*>::iterator it = g_pGamePersistent->ps_active.find(this);
+    auto it = g_pGamePersistent->ps_active.find(this);
     VERIFY(it != g_pGamePersistent->ps_active.end());
     g_pGamePersistent->ps_active.erase(it);
 
-    xr_vector<CPS_Instance*>::iterator it2 =
-        std::find(g_pGamePersistent->ps_destroy.begin(), g_pGamePersistent->ps_destroy.end(), this);
-
+    [[maybe_unused]] auto it2 = std::find(g_pGamePersistent->ps_destroy.begin(), g_pGamePersistent->ps_destroy.end(), this);
     VERIFY(it2 == g_pGamePersistent->ps_destroy.end());
 
     spatial_unregister();

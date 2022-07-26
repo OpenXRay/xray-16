@@ -113,10 +113,8 @@ static struct sempty_update_callback : public IPHWorldUpdateCallbck
 } empty_update_callback;
 
 CPHWorld::CPHWorld()
-    : // IPHWorldUpdateCallbck		*_update_callback
-      m_update_callback(&empty_update_callback),
-      m_default_contact_shotmark(0), m_default_character_contact_shotmark(0), physics_step_time_callback(0),
-      m_object_space(0), m_level_objects(0)
+    : // IPHWorldUpdateCallbck *_update_callback
+      m_update_callback(&empty_update_callback)
 {
     disable_count = 0;
     m_frame_time = 0.f;

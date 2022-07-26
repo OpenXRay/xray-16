@@ -93,7 +93,7 @@ void SetupUIStyle()
 
     pcstr selectedStyle = nullptr;
     for (const auto& token : UIStyleToken)
-        if (token.id == UIStyleID)
+        if (token.id == static_cast<s32>(UIStyleID))
             selectedStyle = token.name;
 
     string_path selectedStylePath;

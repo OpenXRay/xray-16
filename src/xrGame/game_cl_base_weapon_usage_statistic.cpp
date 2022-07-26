@@ -22,13 +22,8 @@ public:
 };
 
 BulletData::BulletData(shared_str FName, shared_str WName, SBullet* pBullet)
+    : FirerName(FName), WeaponName(WName), Bullet(*pBullet)
 {
-    FirerName = FName;
-    WeaponName = WName;
-    Bullet = *pBullet;
-    HitRefCount = 0;
-    HitResponds = 0;
-    Removed = false;
 };
 
 u32 const HitData::net_packet_size = (3 * 2 * sizeof(float) + 1 + 2 + 1 + 1);
@@ -811,6 +806,7 @@ void WeaponUsageStatistic::OnPlayerKillPlayer(
     case SKT_BACKSTAB: PlayerStat.m_dwSpecialKills[1]++; break;
     case SKT_KNIFEKILL: PlayerStat.m_dwSpecialKills[2]++; break;
     case SKT_EYESHOT: PlayerStat.m_dwSpecialKills[3]++; break;
+    default: break;
     };
 }
 

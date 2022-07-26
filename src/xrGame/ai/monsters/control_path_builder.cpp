@@ -226,9 +226,9 @@ void CControlPathBuilder::fix_position(const Fvector& pos, u32 node, Fvector& re
 
     if (!accessible(res_pos))
     {
+#ifdef DEBUG
         u32 level_vertex_id = restrictions().accessible_nearest(Fvector().set(res_pos), res_pos);
 
-#ifdef DEBUG
         if (level_vertex_id != node)
         {
             Msg("! src_node[%d] res_node[%d] src_pos[%f,%f,%f] res_pos[%f,%f,%f]", node, level_vertex_id, VPUSH(pos),

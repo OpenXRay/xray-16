@@ -11,10 +11,10 @@
 GSIACResult __GSIACResult	= GSIACWaiting;
 
 // this makes the gamename available to all of the SDKs
-char __GSIACGamename[64]	= {0};
+char __GSIACGamename[64]	= {};
 
 // this allows devs to do their own hostname resolution
-char GSIACHostname[64]		= {0};
+char GSIACHostname[64]		= {};
 
 // used to keep state during the check
 static struct

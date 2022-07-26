@@ -181,6 +181,7 @@ void CHUDTarget::Render()
                         case ALife::eRelationTypeEnemy: C = C_ON_ENEMY; break;
                         case ALife::eRelationTypeNeutral: C = C_ON_NEUTRAL; break;
                         case ALife::eRelationTypeFriend: C = C_ON_FRIEND; break;
+                        default: break;
                         }
 
                         if (fuzzyShowInfo > 0.5f)

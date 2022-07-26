@@ -22,9 +22,9 @@ class MxPropSlim : public MxStdSlim
 private:
     unsigned int D;
 
-    bool use_color;
-    bool use_texture;
-    bool use_normals;
+    bool use_color{};
+    bool use_texture{};
+    bool use_normals{};
 
     class edge_info : public MxHeapable
     {
@@ -69,7 +69,7 @@ protected:
     void update_pre_contract(const MxPairContraction&);
 
 public:
-    bool will_decouple_quadrics;
+    bool will_decouple_quadrics{};
 
 public:
     MxPropSlim(MxStdModel*);

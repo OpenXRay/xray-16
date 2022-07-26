@@ -15,11 +15,6 @@
 extern BOOL death_anim_debug;
 #endif // DEBUG
 
-character_shell_control::character_shell_control()
-    : m_shot_up_factor(0.f), m_after_death_velocity_factor(1.f), m_was_wounded(false), m_Pred_Time(0.0)
-{
-}
-
 void character_shell_control::Load(LPCSTR section)
 {
     skel_airr_ang_factor = pSettings->r_float(section, "ph_skeleton_airr_ang_factor");

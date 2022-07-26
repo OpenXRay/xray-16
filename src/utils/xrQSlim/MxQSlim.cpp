@@ -63,7 +63,7 @@ void MxQSlim::collect_quadrics()
         case MX_WEIGHT_AREA:
         case MX_WEIGHT_AREA_AVG:
             Q *= Q.area();
-        // no break: fallthrough
+            [[fallthrough]];
         default:
             quadrics(f[0]) += Q;
             quadrics(f[1]) += Q;
@@ -298,7 +298,7 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
     if (nfailed)
         bias += nfailed * meshing_penalty;
 
-    static u32 a = 0;
+    //static u32 a = 0;
     //	if (a)
     {
         double Nmin1 = check_local_inversion(info->v1, info->v2, info->vnew);
@@ -458,7 +458,6 @@ void MxEdgeQSlim::collect_edges(const MxEdge* edges, unsigned int count)
 void MxEdgeQSlim::update_pre_contract(const MxPairContraction& conx)
 {
     MxVertexID v1 = conx.v1, v2 = conx.v2;
-    unsigned int i, j;
 
     star.reset();
     //
@@ -468,10 +467,10 @@ void MxEdgeQSlim::update_pre_contract(const MxPairContraction& conx)
     // the total edges.  Instead, we need to collect the "star"
     // from the edge links maintained at v1.
     //
-    for (i = 0; i < (unsigned int)edge_links(v1).length(); i++)
+    for (int i = 0; i < edge_links(v1).length(); i++)
         star.add(edge_links(v1)[i]->opposite_vertex(v1));
 
-    for (i = 0; i < (unsigned int)edge_links(v2).length(); i++)
+    for (int i = 0; i < edge_links(v2).length(); i++)
     {
         MxQSlimEdge* e = edge_links(v2)(i);
         MxVertexID u = (e->v1 == v2) ? e->v2 : e->v1;
@@ -481,7 +480,8 @@ void MxEdgeQSlim::update_pre_contract(const MxPairContraction& conx)
         if (u == v1 || varray_find(star, u))
         {
             // This is a useless link --- kill it
-            bool found = varray_find(edge_links(u), e, &j);
+            unsigned int j = 0;
+            [[maybe_unused]] bool found = varray_find(edge_links(u), e, &j);
             VERIFY(found);
             edge_links(u).remove(j);
             heap.remove(e);
@@ -524,8 +524,8 @@ void MxEdgeQSlim::apply_contraction(const MxPairContraction& conx)
     star.add(conx.v1);
 
     edges.clear();
-    for (unsigned int j = 0; j < (unsigned int)star.length(); j++)
-        for (unsigned int i = 0; i < (unsigned int)edge_links(star(j)).length(); i++)
+    for (int j = 0; j < star.length(); j++)
+        for (int i = 0; i < edge_links(star(j)).length(); i++)
             edges.push_back(edge_links(star(j))[i]);
 
     //	u32 r=edges.size();

@@ -192,8 +192,8 @@ void CPHActivationShape::Create(
     switch (_type)
     {
     case etBox: m_geom = dCreateBox(nullptr, start_size.x, start_size.y, start_size.z); break;
-
     case etSphere: m_geom = dCreateSphere(nullptr, start_size.x); break;
+    default: break;
     };
 
     dGeomCreateUserData(m_geom);

@@ -460,7 +460,7 @@ float E_NlS(dBodyID body, const dReal* norm, float norm_sign) // if body c.geom.
 { // norm*norm_sign - to body
     const dReal* vel = dBodyGetLinearVel(body);
     dReal prg = -dDOT(vel, norm) * norm_sign;
-    prg = prg < 0.f ? prg = 0.f : prg;
+    prg = prg < 0.f ? 0.f : prg;
     dMass mass;
     dBodyGetMass(body, &mass);
     return mass.mass * prg * prg / 2;

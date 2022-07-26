@@ -224,7 +224,7 @@ void CUIScrollView::Draw()
         std::advance(it, m_visible_rgn.x);
         for (int idx = m_visible_rgn.x; idx <= m_visible_rgn.y; ++it, ++idx)
         {
-            CUIScrollView* sw = smart_cast<CUIScrollView*>(*it);
+            [[maybe_unused]] auto sw = smart_cast<CUIScrollView*>(*it);
             VERIFY(sw == NULL);
 
             if ((*it)->GetVisible())
@@ -294,7 +294,10 @@ bool CUIScrollView::OnMouseAction(float x, float y, EUIMessages mouse_action)
             res = true;
         }
         break;
+    default:
+        break;
     };
+
     if (prev_pos != m_VScrollBar->GetScrollPos())
         m_visible_rgn.set(-1, -1);
 

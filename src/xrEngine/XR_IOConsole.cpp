@@ -83,7 +83,10 @@ bool CConsole::is_mark(Console_mark type)
     case mark9:
     case mark10:
     case mark11:
-    case mark12: return true; break;
+    case mark12:
+        return true;
+    default:
+        break;
     }
     return false;
 }
@@ -170,7 +173,8 @@ void CConsole::OutFont(pcstr text, float& pos_y)
     float scr_width = 1.98f * Device.fWidth_2;
     if (str_length > scr_width) // 1024.0f
     {
-        float f = 0.0f;
+        // XXX: do something with 'f' after its assignment in while loop?
+        [[maybe_unused]] float f = 0.0f;
         int sz = 0;
         int ln = 0;
         PSTR one_line = (PSTR)xr_alloca((CONSOLE_BUF_SIZE + 1) * sizeof(char));
@@ -631,7 +635,7 @@ extern CInput* pInput;
 
 void CConsole::Hide()
 {
-    if (!bVisible || g_pGamePersistent && GEnv.isDedicatedServer)
+    if (!bVisible || (g_pGamePersistent && GEnv.isDedicatedServer))
         return;
 
     // if ( g_pGameLevel ||

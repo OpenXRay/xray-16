@@ -427,9 +427,11 @@ bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             UpdateZoom(true);
             // ResetActionPlanner();
             return true;
+        default:
+            break;
         } // switch (dik)
+        break;
     }
-    break;
 
     case WINDOW_KEY_HOLD:
     {
@@ -449,6 +451,8 @@ bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         case kRIGHT:
             pos_delta.x -= m_map_move_step;
             break;
+        default:
+            break;
         }
 
         if (pos_delta.x || pos_delta.y)
@@ -456,8 +460,11 @@ bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             MoveMap(pos_delta);
             return true;
         }
+        break;
     }
-    break;
+
+    default:
+        break;
     } // switch (keyboard_action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
@@ -488,16 +495,14 @@ bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
                 return true;
             }
             break;
-
         case WINDOW_MOUSE_WHEEL_DOWN:
             UpdateZoom(true);
             return true;
-            break;
         case WINDOW_MOUSE_WHEEL_UP:
             UpdateZoom(false);
             return true;
+        default:
             break;
-
         } // switch
     };
 

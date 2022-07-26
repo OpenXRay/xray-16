@@ -110,9 +110,8 @@ inline HANDLE CreateMailSlotByName(LPCSTR slotName)
 inline BOOL CheckExisting(LPCSTR slotName)
 {
 #if defined(XR_PLATFORM_WINDOWS)
-    HANDLE hFile;
     BOOL res;
-    hFile = CreateFile(slotName, GENERIC_WRITE,
+    auto hFile = CreateFile(slotName, GENERIC_WRITE,
         FILE_SHARE_READ, // required to write to a mailslot
         (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
     res = hFile != INVALID_HANDLE_VALUE;
@@ -127,16 +126,14 @@ inline BOOL CheckExisting(LPCSTR slotName)
 inline BOOL SendMailslotMessage(LPCSTR slotName, CMailSlotMsg& msg)
 {
 #if defined(XR_PLATFORM_WINDOWS)
-    BOOL fResult;
-    HANDLE hFile;
-    DWORD cbWritten;
-    hFile = CreateFile(slotName, GENERIC_WRITE,
+    auto hFile = CreateFile(slotName, GENERIC_WRITE,
         FILE_SHARE_READ, // required to write to a mailslot
         (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
     R_ASSERT(hFile != INVALID_HANDLE_VALUE);
     if (hFile == INVALID_HANDLE_VALUE)
         return false;
-    fResult = WriteFile(hFile, msg.GetBuffer(), msg.GetLen(), &cbWritten, (LPOVERLAPPED)NULL);
+    DWORD cbWritten;
+    auto fResult = WriteFile(hFile, msg.GetBuffer(), msg.GetLen(), &cbWritten, (LPOVERLAPPED)NULL);
     R_ASSERT(fResult);
     fResult = CloseHandle(hFile);
     R_ASSERT(fResult);
@@ -150,17 +147,15 @@ inline BOOL CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     DWORD cbMessage, cMessage, cbRead;
-    BOOL fResult;
-    HANDLE hEvent;
     OVERLAPPED ov;
     cbMessage = cMessage = cbRead = 0;
-    hEvent = CreateEvent(NULL, FALSE, FALSE, "__Slot");
+    auto hEvent = CreateEvent(NULL, FALSE, FALSE, "__Slot");
     if (!hEvent)
         return FALSE;
     ov.Offset = 0;
     ov.OffsetHigh = 0;
     ov.hEvent = hEvent;
-    fResult = GetMailslotInfo(hSlot, // mailslot handle
+    BOOL fResult = GetMailslotInfo(hSlot, // mailslot handle
         (LPDWORD)NULL, // no maximum message size
         &cbMessage, // size of next message
         &cMessage, // number of messages

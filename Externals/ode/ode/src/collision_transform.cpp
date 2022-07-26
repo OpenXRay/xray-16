@@ -59,7 +59,7 @@ struct dxGeomTransform : public dxGeom {
 
 dxGeomTransform::dxGeomTransform (dSpaceID space) : dxGeom (space,1)
 {
-  type = dGeomTransformClass;
+  type = dClassNumber::dGeomTransformClass;
   obj = 0;
   cleanup = 0;
   infomode = 0;

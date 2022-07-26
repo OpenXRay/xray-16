@@ -180,7 +180,7 @@ public:
 } net_DeltaArray;
 
 //-------
-XRNETSERVER_API Flags32 psNET_Flags = {0};
+XRNETSERVER_API Flags32 psNET_Flags = {};
 XRNETSERVER_API int psNET_ClientUpdate = 30; // FPS
 XRNETSERVER_API int psNET_ClientPending = 2;
 XRNETSERVER_API char psNET_Name[32] = "Player";
@@ -1119,7 +1119,7 @@ bool IPureClient::GetServerAddress(ip_address& pAddress, u32* pPort)
     if (!net_Address_server)
         return false;
 
-    WCHAR wstrHostname[2048] = {0};
+    WCHAR wstrHostname[2048] = {};
     DWORD dwHostNameSize = sizeof(wstrHostname);
     DWORD dwHostNameDataType = DPNA_DATATYPE_STRING;
     CHK_DX(

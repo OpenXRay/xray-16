@@ -636,7 +636,7 @@ void line_edit_control::move_pos_left() { --m_cur_pos; }
 void line_edit_control::move_pos_right() { ++m_cur_pos; }
 void line_edit_control::move_pos_left_word()
 {
-    size_t i = m_cur_pos - 1;
+    int i = m_cur_pos - 1;
 
     while (i >= 0 && m_edit_str[i] == ' ')
         --i;

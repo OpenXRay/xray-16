@@ -63,42 +63,9 @@ static CBoneInstance* get_capture_bone(CPHCharacter* a_character)
     return &p_kinematics->LL_GetBoneInstance(capture_bone_id);
 }
 
-/*
-CPHCharacter		*m_character;
-CPhysicsElement*	m_taget_element;
-IPhysicsShellHolder*	m_taget_object;
-dJointID			m_joint;
-dJointID			m_ajoint;
-dJointFeedback		m_joint_feedback;
-Fvector				m_capture_pos;
-float				m_back_force;
-float				m_pull_force;
-float				m_capture_force;
-float				m_capture_distance;
-float				m_pull_distance;
-u32					m_capture_time;
-u32					m_time_start;
-CBoneInstance		*m_capture_bone;
-dBodyID				m_body;
-CPHIsland			m_island;
-//bool				b_failed;
-bool				b_collide;
-bool				b_disabled;
-bool				b_character_feedback;
-*/
-
 CPHCapture::CPHCapture(
     CPHCharacter* a_character, IPhysicsShellHolder* a_taget_object, NearestToPointCallback* cb /*=0*/)
-    : m_joint(NULL), m_ajoint(NULL), m_body(NULL), m_taget_object(a_taget_object), m_character(a_character),
-      b_disabled(false), b_character_feedback(false), e_state(cstFree),
-      ///////////////////////////////////////////////////////////////
-      m_taget_element(0),
-      // dJointFeedback		m_joint_feedback;								,
-      m_capture_pos(Fvector().set(0, 0, 0)), m_back_force(0), m_pull_force(0), m_capture_force(0),
-      m_capture_distance(0), m_capture_time(0), m_time_start(0), m_capture_bone(0),
-      // CPHIsland			m_island;
-      b_collide(false)
-
+    : m_character(a_character), m_taget_object(a_taget_object)
 {
     if (!can_capture(a_character, a_taget_object))
         return;
@@ -116,17 +83,7 @@ CPHCapture::CPHCapture(
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 CPHCapture::CPHCapture(CPHCharacter* a_character, IPhysicsShellHolder* a_taget_object, u16 a_taget_element)
-    : m_joint(NULL), m_ajoint(NULL), m_body(NULL), b_disabled(false), b_character_feedback(false),
-      m_taget_object(a_taget_object), m_character(a_character), e_state(cstFree),
-
-      ///////////////////////////////////////////////////////////////
-      m_taget_element(0),
-      // dJointFeedback		m_joint_feedback;								,
-      m_capture_pos(Fvector().set(0, 0, 0)), m_back_force(0), m_pull_force(0), m_capture_force(0),
-      m_capture_distance(0), m_capture_time(0), m_time_start(0), m_capture_bone(0),
-      // CPHIsland			m_island;
-      b_collide(false)
-
+    : m_character(a_character), m_taget_object(a_taget_object)
 {
     if (!can_capture(a_character, a_taget_object, a_taget_element))
         return;

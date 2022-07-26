@@ -109,9 +109,11 @@ void awards_store::process_award(SAKEField* award_params)
     enum_awards_t awid = get_award_by_stat_name(award_params[ap_award_id].mName);
     VERIFY(awid != at_awards_count);
 
+#ifdef DEBUG
     int rdate_statid_real = get_award_reward_date_stat(awid);
     int rdate_statid_from_table = ATLAS_GET_STAT(award_params[ap_award_rdate].mName);
     VERIFY(rdate_statid_real == rdate_statid_from_table);
+#endif
 
     u16 awards_count = award_params[ap_award_id].mValue.mShort;
     u32 award_rdate = award_params[ap_award_rdate].mValue.mInt;

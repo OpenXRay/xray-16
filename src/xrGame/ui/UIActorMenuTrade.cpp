@@ -189,7 +189,7 @@ bool CUIActorMenu::ToActorTrade(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner = m_pLists[eTradeActorList];
 
-        bool result = (old_owner_type != iActorBag) ? m_pActorInvOwner->inventory().Ruck(iitem) : true;
+        [[maybe_unused]] bool result = (old_owner_type != iActorBag) ? m_pActorInvOwner->inventory().Ruck(iitem) : true;
         VERIFY(result);
         CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
 

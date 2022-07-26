@@ -20,9 +20,7 @@ MxPropSlim::MxPropSlim(MxStdModel* m0) : MxStdSlim(m0), edge_links(m0->vert_coun
     consider_normals();
 
     D = compute_dimension(m);
-
-    will_decouple_quadrics = false;
-    contraction_callback = NULL;
+    contraction_callback = nullptr;
 }
 
 void MxPropSlim::consider_color(bool will)
@@ -296,7 +294,7 @@ void MxPropSlim::collect_quadrics()
         case MX_WEIGHT_AREA:
         case MX_WEIGHT_AREA_AVG:
             Q *= Q.area();
-        // no break: fallthrough
+            [[fallthrough]];
         default:
             quadric(f[0]) += Q;
             quadric(f[1]) += Q;
@@ -672,12 +670,11 @@ void MxPropSlim::finalize_edge_update(edge_info* info)
 void MxPropSlim::update_pre_contract(const MxPairContraction& conx)
 {
     MxVertexID v1 = conx.v1, v2 = conx.v2;
-    unsigned int i, j;
 
     star.reset();
     m->collect_vertex_star(v1, star);
 
-    for (i = 0; i < (unsigned int)edge_links(v2).length(); i++)
+    for (int i = 0; i < edge_links(v2).length(); i++)
     {
         edge_info* e = edge_links(v2)(i);
         MxVertexID u = (e->v1 == v2) ? e->v2 : e->v1;
@@ -687,6 +684,7 @@ void MxPropSlim::update_pre_contract(const MxPairContraction& conx)
         if (u == v1 || varray_find(star, u))
         {
             // This is a useless link --- kill it
+            unsigned int j = 0;
             [[maybe_unused]] bool found = varray_find(edge_links(u), e, &j);
             VERIFY(found);
             edge_links(u).remove(j);

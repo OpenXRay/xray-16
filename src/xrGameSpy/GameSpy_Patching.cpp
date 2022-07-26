@@ -22,6 +22,8 @@ static char const* QueryPatchVersionString(char* dest, u32 dest_size)
     xr_sprintf(dest, dest_size, "-%s", LangID);
 
     RegCloseKey(KeyCDKey);
+#else
+    return "";
 #endif
     return dest;
 }

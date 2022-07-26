@@ -174,6 +174,9 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         else
             game->OnTeamSelect(-1);
         return true;
+
+    default:
+        break;
     } // switch (action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);

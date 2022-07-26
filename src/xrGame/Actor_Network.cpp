@@ -438,7 +438,7 @@ void CActor::net_Import_Base_proceed()
     if (Remote())
         return;
 
-    net_update N = NET.back();
+    //net_update N = NET.back();
 };
 
 void CActor::net_Import_Physic(NET_Packet& P)
@@ -500,7 +500,7 @@ void CActor::net_Import_Physic(NET_Packet& P)
         N_A.State.previous_position = N_A.State.position;
         N_A.State.previous_quaternion = N_A.State.quaternion;
         //----------- for E3 -----------------------------
-        if (Local() && OnClient() || !g_Alive())
+        if ((Local() && OnClient()) || !g_Alive())
             return;
         //		if (g_Alive() && (Remote() || OnServer()))
         {
@@ -1082,9 +1082,8 @@ extern float g_cl_lvInterp;
 
 void CActor::CalculateInterpolationParams()
 {
-    //	Fmatrix xformX0, xformX1;
-    CPHSynchronize* pSyncObj = NULL;
-    pSyncObj = PHGetSyncItem(0);
+    // Fmatrix xformX0, xformX1;
+    // auto pSyncObj = PHGetSyncItem(0);
     ///////////////////////////////////////////////
     InterpData* pIStart = &IStart;
     InterpData* pIRec = &IRec;
@@ -1355,7 +1354,7 @@ void CActor::make_Interpolation()
 /*
 void		CActor::UpdatePosStack	( u32 Time0, u32 Time1 )
 {
-        //******** Storing Last Position in stack ********
+        // Storing Last Position in stack
     CPHSynchronize* pSyncObj = NULL;
     pSyncObj = PHGetSyncItem(0);
     if (!pSyncObj) return;
@@ -1914,10 +1913,10 @@ void CActor::OnCriticalHitHealthLoss()
     if (GameID() == eGameIDSingle || !OnServer())
         return;
 
-    IGameObject* pLastHitter = Level().Objects.net_Find(m_iLastHitterID);
     IGameObject* pLastHittingWeapon = Level().Objects.net_Find(m_iLastHittingWeaponID);
 
 #ifdef DEBUG
+    IGameObject* pLastHitter = Level().Objects.net_Find(m_iLastHitterID);
     Msg("%s killed by hit from %s %s", *cName(), (pLastHitter ? *(pLastHitter->cName()) : ""),
         ((pLastHittingWeapon && pLastHittingWeapon != pLastHitter) ? *(pLastHittingWeapon->cName()) : ""));
 #endif

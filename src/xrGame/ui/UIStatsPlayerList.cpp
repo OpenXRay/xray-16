@@ -75,6 +75,7 @@ void CUIStatsPlayerList::Init(CUIXml& xml_doc, LPCSTR path)
     case eGameIDTeamDeathmatch:
         if (!m_bSpectator || m_bStatus_mode)
             InitTeamHeader(xml_doc, path);
+        [[fallthrough]];
     case eGameIDDeathmatch: InitHeader(xml_doc, path);
     default: break;
     }
@@ -220,8 +221,8 @@ void CUIStatsPlayerList::Update()
         game_PlayerState* p = (game_PlayerState*)I->second;
         if (!p || p->team != m_CurTeam)
             continue;
-        if (m_bStatus_mode || m_bSpectator && p->testFlag(GAME_PLAYER_FLAG_SPECTATOR) ||
-            !m_bSpectator && !p->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
+        if (m_bStatus_mode || (m_bSpectator && p->testFlag(GAME_PLAYER_FLAG_SPECTATOR)) ||
+            (!m_bSpectator && !p->testFlag(GAME_PLAYER_FLAG_SPECTATOR)))
         {
             items.push_back(I->second);
             // add to team info

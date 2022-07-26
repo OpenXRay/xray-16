@@ -29,6 +29,9 @@ bool CUIDebugFonts::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     case kSCREENSHOT:
         return false;
+
+    default:
+        break;
     }
 
     return true;

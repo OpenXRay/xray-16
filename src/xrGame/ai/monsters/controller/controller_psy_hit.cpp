@@ -227,7 +227,7 @@ void CControllerPsyHit::death_glide_start()
     }
 
     // Start effector
-    CEffectorCam* ce = Actor()->Cameras().GetCamEffector(eCEControllerPsyHit);
+    [[maybe_unused]] CEffectorCam* ce = Actor()->Cameras().GetCamEffector(eCEControllerPsyHit);
     VERIFY(!ce);
 
     Fvector src_pos = Actor()->cam_Active()->vPosition;

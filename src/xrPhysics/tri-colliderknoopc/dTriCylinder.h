@@ -1,8 +1,11 @@
 #ifndef D_TRI_CYLINDER_H
 #define D_TRI_CYLINDER_H
+
 #include "xrPhysics/dcylinder/dCylinder.h"
 #include "TriPrimitiveCollideClassDef.h"
 #include "dcTriListCollider.h"
+
+#include "ode/odemath.h"
 
 struct dxCylinder
 { // cylinder

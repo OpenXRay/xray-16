@@ -282,17 +282,25 @@ bool CUIMpTradeWnd::IsAddonAttached(SBuyItemInfo* itm, item_addon_type at)
         return b_res;
     switch (at)
     {
-    case at_scope: { b_res = (w->ScopeAttachable() && w->IsScopeAttached());
+    case at_scope:
+    {
+        b_res = (w->ScopeAttachable() && w->IsScopeAttached());
+        break;
     }
-    break;
-
-    case at_silencer: { b_res = (w->SilencerAttachable() && w->IsSilencerAttached());
+    case at_silencer:
+    {
+        b_res = (w->SilencerAttachable() && w->IsSilencerAttached());
+        break;
     }
-    break;
-
-    case at_glauncher: { b_res = (w->GrenadeLauncherAttachable() && w->IsGrenadeLauncherAttached());
+    case at_glauncher:
+    {
+        b_res = (w->GrenadeLauncherAttachable() && w->IsGrenadeLauncherAttached());
+        break;
     }
-    break;
+    default:
+    {
+        break;
+    }
     };
     return b_res;
 }
@@ -302,27 +310,24 @@ bool CUIMpTradeWnd::CanAttachAddon(SBuyItemInfo* itm, item_addon_type at)
     if (IsAddonAttached(itm, at))
         return false;
 
-    bool b_res = false;
     CInventoryItem* item_ = (CInventoryItem*)itm->m_cell_item->m_pData;
     CWeapon* w = smart_cast<CWeapon*>(item_);
 
     if (!w)
-        return b_res;
+        return false;
+
     switch (at)
     {
-    case at_scope: { b_res = (w->ScopeAttachable() && !w->IsScopeAttached());
-    }
-    break;
-
-    case at_silencer: { b_res = (w->SilencerAttachable() && !w->IsSilencerAttached());
-    }
-    break;
-
-    case at_glauncher: { b_res = (w->GrenadeLauncherAttachable() && !w->IsGrenadeLauncherAttached());
-    }
-    break;
+    case at_scope:
+        return w->ScopeAttachable() && !w->IsScopeAttached();
+    case at_silencer:
+        return w->SilencerAttachable() && !w->IsSilencerAttached();
+    case at_glauncher:
+        return w->GrenadeLauncherAttachable() && !w->IsGrenadeLauncherAttached();
+    default:
+        break;
     };
-    return b_res;
+    return false;
 }
 
 SBuyItemInfo* CUIMpTradeWnd::DetachAddon(SBuyItemInfo* itm, item_addon_type at)
@@ -350,19 +355,12 @@ shared_str CUIMpTradeWnd::GetAddonNameSect(SBuyItemInfo* itm, item_addon_type at
 
     switch (at)
     {
-    case at_scope: { return w->GetScopeName();
-    }
-    break;
-
-    case at_silencer: { return w->GetSilencerName();
-    }
-    break;
-
-    case at_glauncher: { return w->GetGrenadeLauncherName();
-    }
-    break;
+    case at_scope: return w->GetScopeName();
+    case at_silencer: return w->GetSilencerName();
+    case at_glauncher: return w->GetGrenadeLauncherName();
+    default: break;
     };
-    return NULL;
+    return nullptr;
 }
 
 bool CUIMpTradeWnd::AttachAddon(SBuyItemInfo* itm, item_addon_type at)

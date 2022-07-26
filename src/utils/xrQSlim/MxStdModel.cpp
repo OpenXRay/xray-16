@@ -48,8 +48,7 @@ MxVertexID MxStdModel::alloc_vertex(float x, float y, float z)
     vertex_mark_valid(id);
 
     face_links.add(xr_new<MxFaceList>());
-    unsigned int l = face_links.last_id();
-    VERIFY(l == id);
+    VERIFY(face_links.last_id() == id);
     VERIFY(neighbors(id).length() == 0);
 
     return id;
@@ -545,8 +544,7 @@ void MxStdModel::apply_expansion(const MxPairExpansion& conx)
     mxv_sub(vertex(v2), vertex(v1), conx.dv2, 3);
     mxv_subfrom(vertex(v1), conx.dv1, 3);
 
-    unsigned int i, j;
-    for (i = 0; i < (unsigned int)conx.dead_faces.length(); i++)
+    for (int i = 0; i < conx.dead_faces.length(); i++)
     {
         MxFaceID fid = conx.dead_faces(i);
         face_mark_valid(fid);
@@ -555,12 +553,13 @@ void MxStdModel::apply_expansion(const MxPairExpansion& conx)
         neighbors(face(fid)(2)).add(fid);
     }
 
-    for (i = conx.delta_pivot; i < (unsigned int)conx.delta_faces.length(); i++)
+    for (int i = conx.delta_pivot; i < conx.delta_faces.length(); i++)
     {
         MxFaceID fid = conx.delta_faces(i);
         face(fid).remap_vertex(v1, v2);
         neighbors(v2).add(fid);
-        bool found = varray_find(neighbors(v1), fid, &j);
+        unsigned int j = 0;
+        [[maybe_unused]] bool found = varray_find(neighbors(v1), fid, &j);
         VERIFY(found);
         neighbors(v1).remove(j);
     }
@@ -570,13 +569,13 @@ void MxStdModel::apply_expansion(const MxPairExpansion& conx)
     if (normal_binding() == MX_PERFACE)
     {
         float n[3];
-        for (i = 0; i < (unsigned int)conx.delta_faces.length(); i++)
+        for (int i = 0; i < conx.delta_faces.length(); i++)
         {
             compute_face_normal(conx.delta_faces[i], n);
             normal(conx.delta_faces[i]) = MxNormal(n);
         }
 
-        for (i = 0; i < (unsigned int)conx.dead_faces.length(); i++)
+        for (int i = 0; i < conx.dead_faces.length(); i++)
         {
             compute_face_normal(conx.dead_faces[i], n);
             normal(conx.dead_faces[i]) = MxNormal(n);

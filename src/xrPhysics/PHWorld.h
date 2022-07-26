@@ -50,7 +50,7 @@ private:
     bool b_processing;
     bool b_exist;
     static const u32 update_delay = 1;
-    ///	dSpaceID					Space														;
+    // dSpaceID Space;
 
     CPHMesh Mesh;
     PH_OBJECT_STORAGE m_objects;
@@ -59,10 +59,10 @@ private:
     PH_UPDATE_OBJECT_STORAGE m_update_objects;
     PH_UPDATE_OBJECT_STORAGE m_freezed_update_objects;
     dGeomID m_motion_ray;
-    // CPHCommander				*m_commander;
-    IPHWorldUpdateCallbck* m_update_callback;
-    CObjectSpace* m_object_space;
-    CObjectList* m_level_objects;
+    // CPHCommander *m_commander{};
+    IPHWorldUpdateCallbck* m_update_callback{};
+    CObjectSpace* m_object_space{};
+    CObjectList* m_level_objects{};
 
 public:
     xr_vector<ISpatial*> r_spatial;
@@ -83,9 +83,9 @@ public:
     float m_gravity;
 
 private:
-    ContactCallbackFun* m_default_contact_shotmark;
-    ContactCallbackFun* m_default_character_contact_shotmark;
-    PhysicsStepTimeCallback* physics_step_time_callback;
+    ContactCallbackFun* m_default_contact_shotmark{};
+    ContactCallbackFun* m_default_character_contact_shotmark{};
+    PhysicsStepTimeCallback* physics_step_time_callback{};
 
 public:
     CPHWorld();

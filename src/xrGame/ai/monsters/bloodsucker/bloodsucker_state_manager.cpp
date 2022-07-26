@@ -104,6 +104,7 @@ void CStateManagerBloodsucker::execute()
                 {
                 case eStrong: state_id = eStatePanic; break;
                 case eWeak: state_id = eStateAttack; break;
+                default: break;
                 }
             }
         }

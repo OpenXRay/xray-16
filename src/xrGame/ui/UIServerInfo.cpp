@@ -171,6 +171,8 @@ bool CUIServerInfo::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         OnNextBtnClick(NULL, 0);
         return true;
     }
+    default:
+        break;
     } // switch (GetBindedAction(dik))
 
     return false;

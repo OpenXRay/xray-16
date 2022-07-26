@@ -62,12 +62,12 @@ void dCloseODE();
 /* standard classes */
 
 /* class numbers */
-extern GLOBAL_SHAREDLIB_SPEC int dSphereClass;
-extern GLOBAL_SHAREDLIB_SPEC int dBoxClass;
-extern GLOBAL_SHAREDLIB_SPEC int dCapsuleClass;
-extern GLOBAL_SHAREDLIB_SPEC int dPlaneClass;
-extern GLOBAL_SHAREDLIB_SPEC int dGeomGroupClass;
-extern GLOBAL_SHAREDLIB_SPEC int dGeomTransformClass;
+//extern GLOBAL_SHAREDLIB_SPEC int dSphereClassVariable;
+//extern GLOBAL_SHAREDLIB_SPEC int dBoxClassVariable;
+//extern GLOBAL_SHAREDLIB_SPEC int dCapsuleClassVariable;
+//extern GLOBAL_SHAREDLIB_SPEC int dPlaneClassVariable;
+//extern GLOBAL_SHAREDLIB_SPEC int dGeomGroupClassVariable;
+//extern GLOBAL_SHAREDLIB_SPEC int dGeomTransformClassVariable;
 
 /* constructors */
 dGeomID dCreateSphere (dSpaceID space, dReal radius);
@@ -138,13 +138,7 @@ typedef dColliderFn * dGetColliderFnFn (int num);
 typedef void dGeomDtorFn (dGeomID o);
 typedef int dAABBTestFn (dGeomID o1, dGeomID o2, dReal aabb[6]);
 
-typedef struct dGeomClass {
-  int bytes;
-  dGetColliderFnFn *collider;
-  dGetAABBFn *aabb;
-  dAABBTestFn *aabb_test;
-  dGeomDtorFn *dtor;
-} dGeomClass;
+struct dGeomClass;
 
 int dCreateGeomClass (const dGeomClass *classptr);
 void * dGeomGetClassData (dGeomID);

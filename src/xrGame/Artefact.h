@@ -137,9 +137,9 @@ struct SArtefactDetectorsSupport
     ref_sound m_sound;
 
     Fvector m_path_moving_force;
-    u32 m_switchVisTime;
-    const CPatrolPath* m_currPatrolPath;
-    const CPatrolPath::CVertex* m_currPatrolVertex;
+    u32 m_switchVisTime{};
+    const CPatrolPath* m_currPatrolPath{};
+    const CPatrolPath::CVertex* m_currPatrolVertex{};
     Fvector m_destPoint;
 
     SArtefactDetectorsSupport(CArtefact* A);

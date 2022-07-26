@@ -22,26 +22,26 @@ public:
 
 protected:
     CPHCharacter* m_character;
-    CPhysicsElement* m_taget_element;
-    IPhysicsShellHolder* m_taget_object;
-    dJointID m_joint;
-    dJointID m_ajoint;
+    CPhysicsElement* m_taget_element{};
+    IPhysicsShellHolder* m_taget_object{};
+    dJointID m_joint{};
+    dJointID m_ajoint{};
     dJointFeedback m_joint_feedback;
-    Fvector m_capture_pos;
-    float m_back_force;
-    float m_pull_force;
-    float m_capture_force;
-    float m_capture_distance;
-    float m_pull_distance;
+    Fvector m_capture_pos{};
+    float m_back_force{};
+    float m_pull_force{};
+    float m_capture_force{};
+    float m_capture_distance{};
+    float m_pull_distance{};
     u32 m_capture_time;
-    u32 m_time_start;
-    CBoneInstance* m_capture_bone;
-    dBodyID m_body;
+    u32 m_time_start{};
+    CBoneInstance* m_capture_bone{};
+    dBodyID m_body{};
     CPHIsland m_island;
     // bool				b_failed;
-    bool b_collide;
-    bool b_disabled;
-    bool b_character_feedback;
+    bool b_collide{};
+    bool b_disabled{};
+    bool b_character_feedback{};
 
 private:
     enum
@@ -51,7 +51,7 @@ private:
         cstReleased,
         cstFree,
         cstFailed
-    } e_state;
+    } e_state{ cstFree };
 
     void PullingUpdate();
     void CapturedUpdate();
