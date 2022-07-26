@@ -33,14 +33,13 @@ void CRenderTarget::accum_spot(light* L)
         }
     }
 
-    BOOL bIntersect = FALSE; //enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
         RCache.set_xform_world(L->m_xform);
         RCache.set_xform_view(Device.mView);
         RCache.set_xform_project(Device.mProject);
-        bIntersect = enable_scissor(L);
+        enable_scissor(L);
         enable_dbt_bounds(L);
 
         // *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
@@ -260,28 +259,26 @@ void CRenderTarget::accum_volumetric(light* L)
     phase_vol_accumulator();
 
     ref_shader shader;
-    ref_shader* shader_msaa;
+    //ref_shader* shader_msaa;
 
     shader = L->s_volumetric;
-    shader_msaa = L->s_volumetric_msaa;
+    //shader_msaa = L->s_volumetric_msaa;
     if (!shader)
     {
         shader = s_accum_volume;
-        shader_msaa = s_accum_volume_msaa;
+        //shader_msaa = s_accum_volume_msaa;
     }
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
-    BOOL bIntersect = FALSE; //enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
         RCache.set_xform_world(L->m_xform);
         RCache.set_xform_view(Device.mView);
         RCache.set_xform_project(Device.mProject);
-        bIntersect = enable_scissor(L);
-
-        //enable_dbt_bounds				(L);
+        enable_scissor(L);
+        //enable_dbt_bounds(L);
     }
 
     RCache.set_ColorWriteEnable();

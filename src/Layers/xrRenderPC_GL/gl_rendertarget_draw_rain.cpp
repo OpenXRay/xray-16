@@ -147,7 +147,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         // clouds xform
         Fmatrix m_clouds_shadow;
         {
-            static float w_shift = 0;
+            //static float w_shift = 0.0f;
             Fmatrix m_xform;
             //Fvector			direction	= RainSetup.direction	;
             Fvector normal;

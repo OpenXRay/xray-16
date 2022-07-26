@@ -130,7 +130,7 @@ void CRenderTarget::build_textures()
         u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter];
 
         // Surfaces
-        for (int it1 = 0; it1 < TEX_jitter_count - 1; it1++)
+        for (u32 it1 = 0; it1 < TEX_jitter_count - 1; it1++)
         {
             string_path name;
             xr_sprintf(name, "%s%d", r2_jitter, it1);
@@ -155,7 +155,7 @@ void CRenderTarget::build_textures()
                 }
             }
         }
-        int it3 = 0;
+        u32 it3 = 0;
         while (it3 < TEX_jitter_count - 1)
         {
             CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it3]));

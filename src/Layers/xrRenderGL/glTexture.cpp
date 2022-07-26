@@ -147,11 +147,11 @@ _DDS:
             break;
         }
 
-        for (std::size_t layer = 0; layer < texture.layers(); ++layer)
+        for (size_t layer = 0; layer < texture.layers(); ++layer)
         {
-            for (std::size_t face = 0; face < texture.faces(); ++face)
+            for (size_t face = 0; face < texture.faces(); ++face)
             {
-                for (std::size_t level = 0; level < texture.levels(); ++level)
+                for (size_t level = 0; level < texture.levels(); ++level)
                 {
                     glm::tvec3<GLsizei> const tex_level_extent(texture.extent(level));
                     GLenum sub_target = gli::is_target_cube(texture.target())

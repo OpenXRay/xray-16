@@ -86,9 +86,9 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
 
         // count the total number of indices
         unsigned int numIndices = 0;
-        for (int i = 0; i < tempStrips.size(); i++)
+        for (const auto& tempStrip : tempStrips)
         {
-            numIndices += tempStrips[i]->m_faces.size() * 3;
+            numIndices += tempStrip->m_faces.size() * 3;
         }
 
         // add in the list
@@ -100,22 +100,22 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
 
         // do strips
         unsigned int indexCtr = 0;
-        for (u32 i = 0; i < tempStrips.size(); i++)
+        for (const auto& tempStrip : tempStrips)
         {
-            for (int j = 0; j < tempStrips[i]->m_faces.size(); j++)
+            for (const auto& tempStripFace : tempStrip->m_faces)
             {
-                primGroups[0].indices[indexCtr++] = u16(tempStrips[i]->m_faces[j]->m_v0);
-                primGroups[0].indices[indexCtr++] = u16(tempStrips[i]->m_faces[j]->m_v1);
-                primGroups[0].indices[indexCtr++] = u16(tempStrips[i]->m_faces[j]->m_v2);
+                primGroups[0].indices[indexCtr++] = u16(tempStripFace->m_v0);
+                primGroups[0].indices[indexCtr++] = u16(tempStripFace->m_v1);
+                primGroups[0].indices[indexCtr++] = u16(tempStripFace->m_v2);
             }
         }
 
         // do lists
-        for (u32 i = 0; i < tempFaces.size(); i++)
+        for (const auto& tempFace : tempFaces)
         {
-            primGroups[0].indices[indexCtr++] = u16(tempFaces[i]->m_v0);
-            primGroups[0].indices[indexCtr++] = u16(tempFaces[i]->m_v1);
-            primGroups[0].indices[indexCtr++] = u16(tempFaces[i]->m_v2);
+            primGroups[0].indices[indexCtr++] = u16(tempFace->m_v0);
+            primGroups[0].indices[indexCtr++] = u16(tempFace->m_v1);
+            primGroups[0].indices[indexCtr++] = u16(tempFace->m_v2);
         }
     }
     else
@@ -133,14 +133,13 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
 
         // first, the strips
         int startingLoc = 0;
-        int stripCtr;
-        for (stripCtr = 0; stripCtr < numSeparateStrips; stripCtr++)
+        for (unsigned int stripCtr = 0; stripCtr < numSeparateStrips; stripCtr++)
         {
             int stripLength = 0;
             if (numSeparateStrips != 1)
             {
                 // if we've got multiple strips, we need to figure out the correct length
-                int i;
+                unsigned int i;
                 for (i = startingLoc; i < stripIndices.size(); i++)
                 {
                     if (stripIndices[i] == -1)
@@ -171,7 +170,7 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
             primGroups[faceGroupLoc].indices = xr_alloc<u16>(tempFaces.size() * 3);
             primGroups[faceGroupLoc].numIndices = tempFaces.size() * 3;
             int indexCtr = 0;
-            for (int i = 0; i < tempFaces.size(); i++)
+            for (size_t i = 0; i < tempFaces.size(); i++)
             {
                 primGroups[faceGroupLoc].indices[indexCtr++] = u16(tempFaces[i]->m_v0);
                 primGroups[faceGroupLoc].indices[indexCtr++] = u16(tempFaces[i]->m_v1);
@@ -183,9 +182,9 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
     // clean up everything
 
     //_delete strips
-    for (u32 i = 0; i < tempStrips.size(); i++)
+    for (size_t i = 0; i < tempStrips.size(); i++)
     {
-        for (int j = 0; j < tempStrips[i]->m_faces.size(); j++)
+        for (size_t j = 0; j < tempStrips[i]->m_faces.size(); j++)
         {
             xr_delete(tempStrips[i]->m_faces[j]);
         }
@@ -193,7 +192,7 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
     }
 
     //_delete faces
-    for (u32 i = 0; i < tempFaces.size(); i++)
+    for (size_t i = 0; i < tempFaces.size(); i++)
     {
         xr_delete(tempFaces[i]);
     }
@@ -235,7 +234,7 @@ void RemapIndices(
         remappedGroups[i].numIndices = numIndices;
         remappedGroups[i].indices = xr_alloc<u16>(numIndices);
 
-        for (int j = 0; j < numIndices; j++)
+        for (unsigned int j = 0; j < numIndices; j++)
         {
             int cachedIndex = indexCache[in_primGroups[i].indices[j]];
             if (cachedIndex == -1) // we haven't seen this index before

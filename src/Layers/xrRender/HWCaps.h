@@ -70,8 +70,8 @@ public:
     D3DSTENCILOP soDec, soInc; // best stencil OPs for shadows
     u32 dwMaxStencilValue; // maximum value the stencil buffer can hold
 
-    bool hasFixedPipeline{ false };     // device has support for fixed pipeline
-    bool useCombinedSamplers{ false };  // texture and sampler settings represented as single object
+    bool hasFixedPipeline{};     // device has support for fixed pipeline
+    bool useCombinedSamplers{};  // texture and sampler settings represented as single object
 
 public:
     void Update(void);

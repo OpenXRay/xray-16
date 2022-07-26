@@ -20,7 +20,7 @@ void CRenderTarget::phase_scene_prepare()
                                             ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
         //	TODO: DX10: Check if we need to set RT here.
-        u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth->pZRT);
 
         const Fcolor color{}; // black
         RCache.ClearRT(rt_Position, color);
@@ -39,7 +39,7 @@ void CRenderTarget::phase_scene_prepare()
     else
     {
         //	TODO: DX10: Check if we need to set RT here.
-        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, rt_MSAADepth->pZRT);
         RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
     }
 
