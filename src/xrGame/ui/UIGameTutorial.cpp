@@ -195,6 +195,9 @@ bool CUISequencer::Start(LPCSTR tutor_name)
 
     if (m_start_lua_function.size())
         CallFunction(m_start_lua_function);
+
+    m_name = nullptr;
+
     return true;
 }
 
@@ -261,6 +264,8 @@ void CUISequencer::Destroy()
     {
         g_tutorial2 = nullptr;
     }
+
+    m_name = nullptr;
 }
 
 void CUISequencer::Stop()
