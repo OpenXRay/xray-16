@@ -13,72 +13,20 @@ void CRender::addShaderOption(const char* name, const char* value)
     m_ShaderOptions += "\n";
 }
 
-void show_errors(cpcstr filename, GLuint* program, GLuint* shader)
-{
-    GLint length;
-    GLchar *errors = nullptr, *sources = nullptr;
-
-    if (program)
-    {
-        CHK_GL(glGetProgramiv(*program, GL_INFO_LOG_LENGTH, &length));
-        errors = xr_alloc<GLchar>(length);
-        CHK_GL(glGetProgramInfoLog(*program, length, nullptr, errors));
-    }
-    else if (shader)
-    {
-        CHK_GL(glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &length));
-        errors = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderInfoLog(*shader, length, nullptr, errors));
-
-        CHK_GL(glGetShaderiv(*shader, GL_SHADER_SOURCE_LENGTH, &length));
-        sources = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderSource(*shader, length, nullptr, sources));
-    }
-
-    Log("! shader compilation failed:", filename);
-    if (errors)
-        Log("! error: ", errors);
-
-    if (sources)
-    {
-        Log("Shader source:");
-        Log(sources);
-        Log("Shader source end.");
-    }
-    xr_free(errors);
-    xr_free(sources);
-}
-
 template <typename T>
 static GLuint create_shader(pcstr* buffer, size_t const buffer_size, cpcstr filename,
     T*& result, const GLenum* format)
 {
-    auto [shader, program] = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh, format, filename);
-
-    const bool success = shader == 0 && program != 0 && program != GLuint(-1);
+    auto [type, output] = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh, format, filename);
 
     // Parse constant, texture, sampler binding
-    if (success)
+    if (output != 0)
     {
-        result->sh = program;
-        // Let constant table parse it's data
-        result->constants.parse(&program, ShaderTypeTraits<T>::GetShaderDest());
+        result->sh = output;
+        VERIFY(type == 'p');
+        result->constants.parse(&output, ShaderTypeTraits<T>::GetShaderDest());
     }
-    else
-    {
-        if (shader != 0 && shader != GLuint(-1))
-        {
-            show_errors(filename, nullptr, &shader);
-            glDeleteShader(shader);
-        }
-        else
-        {
-            show_errors(filename, &program, nullptr);
-            glDeleteProgram(program);
-        }
-    }
-
-    return success ? program : 0;
+    return output;
 }
 
 static GLuint create_shader(cpcstr pTarget, pcstr* buffer, size_t const buffer_size,
