@@ -561,13 +561,11 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
         if (HW.ShaderBinarySupported && program)
         {
-            GLvoid* binary{};
             GLint binaryLength{};
             GLenum binaryFormat{};
             glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
-            if (binaryLength)
-                binary = static_cast<GLvoid*>(xr_malloc(binaryLength));
 
+            GLvoid* binary = binaryLength ? xr_malloc(binaryLength) : nullptr;
             if (binary)
             {
                 glGetProgramBinary(program, binaryLength, nullptr, &binaryFormat, binary);
