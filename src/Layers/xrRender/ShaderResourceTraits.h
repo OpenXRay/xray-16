@@ -42,7 +42,7 @@ static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
 template<GLenum type>
 inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr name)
 {
-    GLuint shader = glCreateShader(type);
+    const GLuint shader = glCreateShader(type);
     R_ASSERT(shader);
     CHK_GL(glShaderSource(shader, size, buffer, nullptr));
     CHK_GL(glCompileShader(shader));
@@ -56,7 +56,10 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
         return { 's', 0 }; // 's' means "shader", 0 means error
     }
 
-    GLuint program = glCreateProgram();
+    if (!HW.SeparateShaderObjectsSupported)
+        return { 's', shader };
+
+    const GLuint program = glCreateProgram();
     R_ASSERT(program);
     CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
@@ -87,7 +90,7 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
 {
     GLint status{};
 
-    GLuint program = glCreateProgram();
+    const GLuint program = glCreateProgram();
     R_ASSERT(program);
     CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
@@ -107,6 +110,52 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
     }
 
     return { 'p', program };
+}
+
+static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint gs)
+{
+    const GLuint program = glCreateProgram();
+    R_ASSERT(program);
+    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    // XXX: support caching for monolithic programs
+    //if (HW.ShaderBinarySupported)
+    //    CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
+
+    CHK_GL(glAttachShader(program, ps));
+    CHK_GL(glAttachShader(program, vs));
+    if (gs)
+        CHK_GL(glAttachShader(program, gs));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    CHK_GL(glLinkProgram(program));
+    CHK_GL(glDetachShader(program, ps));
+    CHK_GL(glDetachShader(program, vs));
+    if (gs)
+        CHK_GL(glDetachShader(program, gs));
+
+    GLint status{};
+    CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
+    if (GLboolean(status) == GL_FALSE)
+    {
+        show_compile_errors(name, program, 0);
+        CHK_GL(glDeleteProgram(program));
+        return 0; // 0 means error
+    }
+    return program;
+}
+
+static GLuint GLGeneratePipeline(pcstr name, GLuint ps, GLuint vs, GLuint gs)
+{
+    GLuint pp;
+    CHK_GL(glGenProgramPipelines(1, &pp));
+    R_ASSERT(pp);
+    CHK_GL(glUseProgramStages(pp, GL_FRAGMENT_SHADER_BIT, ps));
+    CHK_GL(glUseProgramStages(pp, GL_VERTEX_SHADER_BIT,   vs));
+    CHK_GL(glUseProgramStages(pp, GL_GEOMETRY_SHADER_BIT, gs));
+    CHK_GL(glValidateProgramPipeline(pp));
+    return pp;
 }
 #endif
 

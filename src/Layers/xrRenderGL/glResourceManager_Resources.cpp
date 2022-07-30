@@ -21,6 +21,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
     P->ps = proto.ps;
     P->vs = proto.vs;
     P->gs = proto.gs;
+    P->pp = proto.pp;
     P->constants = proto.constants;
     P->T = proto.T;
 #ifdef _EDITOR
@@ -82,6 +83,90 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
+
+SPP* CResourceManager::_CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr ds)
+{
+    pcstr skinning{}, samples{};
+    switch (RImplementation.m_skinning)
+    {
+    case -1: skinning = "";   break;
+    case  0: skinning = "_0"; break;
+    case  1: skinning = "_1"; break;
+    case  2: skinning = "_2"; break;
+    case  3: skinning = "_3"; break;
+    case  4: skinning = "_4"; break;
+    default: NODEFAULT;
+    }
+    switch (RImplementation.m_MSAASample)
+    {
+    case -1: samples = "";   break;
+    case  0: samples = "_0"; break;
+    case  1: samples = "_1"; break;
+    case  2: samples = "_2"; break;
+    case  3: samples = "_3"; break;
+    case  4: samples = "_4"; break;
+    case  5: samples = "_5"; break;
+    case  6: samples = "_6"; break;
+    case  7: samples = "_7"; break;
+    default: NODEFAULT;
+    }
+
+    string256 name{};
+    strconcat(name, vs, skinning, "|", ps, samples, "|", gs/*, "|", hs, "|", ds*/); // XXX: Tesselation
+    
+    const auto iterator = m_pp.find(name);
+
+    if (iterator != m_pp.end())
+        return iterator->second;
+
+    SPP* pp = xr_new<SPP>();
+
+    pp->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    m_pp.emplace(pp->set_name(name), pp);
+
+    return pp;
+}
+
+bool CResourceManager::_LinkPP(SPass& pass)
+{
+    auto& pp = *pass.pp;
+    if (pp.pp)
+        return true;
+
+    if (HW.SeparateShaderObjectsSupported)
+        pp.pp = GLGeneratePipeline(pp.cName.c_str(), pass.ps->sh, pass.vs->sh, pass.gs->sh);
+    else
+    {
+        pp.pp = GLLinkMonolithicProgram(pp.cName.c_str(), pass.ps->sh, pass.vs->sh, pass.gs->sh);
+        pp.constants.parse(&pp.pp, RC_dest_all);
+
+        pass.ps = nullptr;
+        pass.vs = nullptr;
+        pass.gs = nullptr;
+    }
+
+    return pp.pp != 0;
+}
+
+void CResourceManager::_DeletePP(const SPP* pp)
+{
+    if (0 == (pp->dwFlags & xr_resource_flagged::RF_REGISTERED))
+        return;
+
+    const pstr N = const_cast<pstr>(*pp->cName);
+    auto iterator = m_pp.find(N);
+
+    if (iterator != m_pp.end())
+    {
+        m_pp.erase(iterator);
+        return;
+    }
+
+    Msg("! ERROR: Failed to find program pipeline '%s'", pp->cName.c_str());
+}
+
+//--------------------------------------------------------------------------------------------------------------
+
 SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
     string_path name;

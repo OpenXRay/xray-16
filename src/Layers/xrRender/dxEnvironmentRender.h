@@ -28,18 +28,9 @@ public:
         C.r_dx10Texture("s_tonemap", "$user$tonemap"); //. hack
         C.PassSET_ZB(FALSE, FALSE);
 #elif defined(USE_OGL)
-        if (HW.Caps.geometry.bVTF)
-        {
-            C.r_Sampler_clf("s_sky0", "$null");
-            C.r_Sampler_clf("s_sky1", "$null");
-            C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
-		}
-        else
-        {
-            C.r_Sampler_clf("s_sky0", r2_T_sky0);
-            C.r_Sampler_clf("s_sky1", r2_T_sky1);
-            C.r_Sampler_rtf("s_tonemap", r2_RT_luminance_cur);
-        }
+        C.r_Sampler_clf("s_sky0", "$null");
+        C.r_Sampler_clf("s_sky1", "$null");
+        C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
         C.PassSET_ZB(FALSE, FALSE);
 #else
 #   error No graphics API selected or enabled!
@@ -100,13 +91,18 @@ private:
 
     ref_shader sh_2sky;
     ref_geom sh_2geom;
+    u32 tonemap_tstage_2sky;
 
     ref_shader clouds_sh;
     ref_geom clouds_geom;
+    u32 tonemap_tstage_clouds;
 
     ref_texture tonemap;
     ref_texture tsky0, tsky1;
-    ref_texture tclouds0, tclouds1;
+    u32 tsky0_tstage;
+    u32 tsky1_tstage;
+    u32 tclouds0_tstage;
+    u32 tclouds1_tstage;
 };
 
 #endif //	EnvironmentRender_included

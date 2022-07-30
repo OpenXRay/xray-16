@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "LightShadows.h"
-#include "FStaticRender_Types.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "xrEngine/xr_object.h"
 #include "Layers/xrRender/FBasicVisual.h"

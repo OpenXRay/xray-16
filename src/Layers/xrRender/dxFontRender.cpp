@@ -28,7 +28,10 @@ void dxFontRender::OnRender(CGameFont& owner)
 
     if (!(owner.uFlags & CGameFont::fsValid))
     {
-        CTexture* T = RCache.get_ActiveTexture(0);
+        R_ASSERT(pShader);
+        R_constant* C = RCache.get_c(RImplementation.c_sbase)._get(); // get sampler
+        CTexture* T = RCache.get_ActiveTexture(C ? C->samp.index : 0);
+        R_ASSERT(T);
         owner.vTS.set((int)T->get_Width(), (int)T->get_Height());
         owner.fTCHeight = owner.fHeight / float(owner.vTS.y);
         owner.uFlags |= CGameFont::fsValid;

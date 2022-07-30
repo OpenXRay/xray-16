@@ -164,20 +164,12 @@ void CBlender_Compile::PassBegin()
     passMatrices.clear();
     passConstants.clear();
     ctable.clear();
+    dwStage = 0;
 
     // Set default pipeline state
     PassSET_ZB(true, true);
     PassSET_Blend(false, D3DBLEND_ONE, D3DBLEND_ZERO, false, 0);
     PassSET_LightFog(false, false);
-
-    // Set default shaders
-    xr_strcpy(pass_ps, "null");
-    xr_strcpy(pass_vs, "null");
-    xr_strcpy(pass_gs, "null");
-    xr_strcpy(pass_hs, "null");
-    xr_strcpy(pass_ds, "null");
-    xr_strcpy(pass_cs, "null");
-    dwStage = 0;
 }
 
 void CBlender_Compile::PassEnd()
@@ -187,28 +179,16 @@ void CBlender_Compile::PassEnd()
     RS.SetTSS(Stage(), D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
     // Create pass
-    if (!dest.vs)
+    if (!dest.vs) // XXX: remove
     {
         dest.vs = RImplementation.Resources->_CreateVS("null");
     }
 
-    if (!dest.ps)
+    if (!dest.ps) // XXX: remove
     {
         dest.ps = RImplementation.Resources->_CreatePS("null");
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
-    dest.gs = RImplementation.Resources->_CreateGS(pass_gs);
-    ctable.merge(&dest.gs->constants);
-#ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS(pass_hs);
-    ctable.merge(&dest.hs->constants);
-    dest.ds = RImplementation.Resources->_CreateDS(pass_ds);
-    ctable.merge(&dest.ds->constants);
-    dest.cs = RImplementation.Resources->_CreateCS(pass_cs);
-    ctable.merge(&dest.cs->constants);
-#endif // USE_DX11
-#endif // !USE_DX9
     SetMapping();
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
@@ -222,20 +202,38 @@ void CBlender_Compile::PassEnd()
     SH->passes.push_back(_pass_);
 }
 
-void CBlender_Compile::PassSET_PS(LPCSTR name)
+void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullptr*/, pcstr _hs /*= nullptr*/, pcstr _ds /*= nullptr*/)
 {
-    xr_strcpy(pass_ps, name);
-    xr_strlwr(pass_ps);
-    dest.ps = RImplementation.Resources->_CreatePS(pass_ps);
-    ctable.merge(&dest.ps->constants);
-}
-
-void CBlender_Compile::PassSET_VS(LPCSTR name)
-{
-    xr_strcpy(pass_vs, name);
-    xr_strlwr(pass_vs);
-    dest.vs = RImplementation.Resources->_CreateVS(pass_vs);
-    ctable.merge(&dest.vs->constants);
+#if defined(USE_OGL)
+    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, _gs, _hs, _ds);
+    if (HW.SeparateShaderObjectsSupported || !dest.pp->pp)
+#endif
+    {
+        dest.ps = RImplementation.Resources->_CreatePS(_ps);
+        ctable.merge(&dest.ps->constants);
+        u32 flags = 0;
+#if defined(USE_DX11)
+        if (dest.ps->constants.dx9compatibility)
+            flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+#endif
+        dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
+        ctable.merge(&dest.vs->constants);
+#if defined(USE_DX11) || defined(USE_OGL)
+        dest.gs = RImplementation.Resources->_CreateGS(_gs);
+        ctable.merge(&dest.gs->constants);
+#   ifdef USE_DX11
+        dest.hs = RImplementation.Resources->_CreateHS(_hs);
+        dest.ds = RImplementation.Resources->_CreateDS(_ds);
+        ctable.merge(&dest.hs->constants);
+        ctable.merge(&dest.ds->constants);
+        dest.cs = RImplementation.Resources->_CreateCS("null");
+#   endif
+#endif // !USE_DX9
+    }
+#if defined(USE_OGL)
+    RImplementation.Resources->_LinkPP(dest);
+    ctable.merge(&dest.pp->constants);
+#endif
 }
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)

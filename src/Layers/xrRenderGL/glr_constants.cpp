@@ -7,7 +7,13 @@ static class cl_sampler : public R_constant_setup
 {
     void setup(R_constant* C) override
     {
-        CHK_GL(glProgramUniform1i(C->samp.program, C->samp.location, C->samp.index));
+        if (HW.SeparateShaderObjectsSupported)
+            CHK_GL(glProgramUniform1i(C->samp.program, C->samp.location, C->samp.index));
+        else
+        {
+            //VERIFY(RCache.pp == C->samp.program);
+            CHK_GL(glUniform1i(C->samp.location, C->samp.index));
+        }
     }
 } binder_sampler;
 
@@ -116,7 +122,10 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 C->type = RC_sampler;
                 C->handler = &binder_sampler;
                 R_constant_load& L = C->samp;
-                L.index = u16(r_index + ((destination & 1) ? 0 : CTexture::rstVertex));
+                if (destination & RC_dest_all)
+                    L.index = r_index;
+                else
+                    L.index = u16(r_index + ((destination & RC_dest_pixel) ? 0 : CTexture::rstVertex));
                 L.cls = RC_sampler;
                 L.location = r_location;
                 L.program = program;
@@ -150,7 +159,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             C->name = name;
             C->destination = destination;
             C->type = type;
-            R_constant_load& L = destination & 1 ? C->ps : C->vs;
+            R_constant_load& L = C->get_load(destination);
             L.index = r_index;
             L.cls = r_type;
             L.location = r_location;
@@ -160,7 +169,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         {
             C->destination |= destination;
             VERIFY (C->type == type);
-            R_constant_load& L = destination & 1 ? C->ps : C->vs;
+            R_constant_load& L = C->get_load(destination);
             L.index = r_index;
             L.cls = r_type;
             L.location = r_location;

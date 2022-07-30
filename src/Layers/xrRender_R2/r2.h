@@ -186,6 +186,10 @@ public:
     shared_str c_sbase;
     shared_str c_snoise;
     shared_str c_lmaterial;
+    shared_str c_ssky0;
+    shared_str c_ssky1;
+    shared_str c_sclouds0;
+    shared_str c_sclouds1;
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;

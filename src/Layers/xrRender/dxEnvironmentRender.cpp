@@ -99,7 +99,6 @@ void dxEnvDescriptorMixerRender::lerp(IEnvDescriptorRender* inA, IEnvDescriptorR
     sky_r_textures.push_back(std::make_pair(1, pB->sky_texture));
 
     sky_r_textures_env.clear();
-
     sky_r_textures_env.push_back(std::make_pair(0, pA->sky_texture_env));
     sky_r_textures_env.push_back(std::make_pair(1, pB->sky_texture_env));
 
@@ -128,76 +127,35 @@ void dxEnvDescriptorRender::OnDeviceDestroy()
 }
 
 dxEnvironmentRender::dxEnvironmentRender()
+    : tonemap_tstage_2sky(u32(-1)), tonemap_tstage_clouds(u32(-1)),
+      tsky0_tstage(u32(-1)), tsky1_tstage(u32(-1)),
+      tclouds0_tstage(u32(-1)), tclouds1_tstage(u32(-1))
 {
-    tsky0 = RImplementation.Resources->_CreateTexture("$user$sky0");
-    tsky1 = RImplementation.Resources->_CreateTexture("$user$sky1");
-#ifdef USE_OGL
-    // These textures are specified in clouds.s
-    tclouds0 = RImplementation.Resources->_CreateTexture("$user$clouds0");
-    tclouds1 = RImplementation.Resources->_CreateTexture("$user$clouds1");
-#endif
+    tsky0 = RImplementation.Resources->_CreateTexture(r2_T_sky0);
+    tsky1 = RImplementation.Resources->_CreateTexture(r2_T_sky1);
 }
 
 void dxEnvironmentRender::OnFrame(CEnvironment& env)
 {
     dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
 
+    mixRen.sky_r_textures[0].first = tsky0_tstage;
+    mixRen.sky_r_textures[1].first = tsky1_tstage;
+    mixRen.clouds_r_textures[0].first = tclouds0_tstage;
+    mixRen.clouds_r_textures[1].first = tclouds1_tstage;
     if (GEnv.Render->GenerationIsR2OrHigher())
     {
-        //. very very ugly hack
-        if (HW.Caps.raster_major >= 3 && HW.Caps.geometry.bVTF)
-        {
-            // tonemapping in VS
-            /*
-             * This hack relies on assumption that `s_tonemap` sampler is
-             * only or the very first sampler in the VS. This is ok in case
-             * of DX, but OGL counts uniforms contiguousy disregarding their
-             * types.
-             * The w/a here is to skip VS uniforms in order to get
-             * correct sampler location.
-             */
-#if defined(USE_DX9) || defined(USE_DX11)
-            const u32 smp_location_sky = CTexture::rstVertex;
-            const u32 smp_location_clouds = CTexture::rstVertex;
-#elif defined(USE_OGL)
-            const u32 smp_location_sky = CTexture::rstVertex + 1 /* m_WVP */;
-            const u32 smp_location_clouds = CTexture::rstVertex + 1 /* m_WVP */;
-#else
-#   error No graphics API selected or enabled!
-#endif
-            mixRen.sky_r_textures.push_back(std::make_pair(smp_location_sky, tonemap)); //. hack
-            mixRen.clouds_r_textures.push_back(std::make_pair(smp_location_clouds, tonemap)); //. hack
-        }
-        else
-        {
-            // tonemapping in PS
-            /*
-             * Note: `2` here is a dangerous assumption that previous samplers
-             * (0 and 1) are defined in the shader and there are no other uniforms
-             * before the `s_tonemap` in the case of OGL.
-             */
-            mixRen.sky_r_textures.push_back(std::make_pair(2, tonemap)); //. hack
-            mixRen.clouds_r_textures.push_back(std::make_pair(2, tonemap)); //. hack
-        }
+        mixRen.sky_r_textures.emplace_back(tonemap_tstage_2sky, tonemap); //. hack
+        mixRen.clouds_r_textures.emplace_back(tonemap_tstage_clouds, tonemap); //. hack
     }
 
     //. Setup skybox textures, somewhat ugly
+    auto e0 = mixRen.sky_r_textures[0].second->surface_get();
+    auto e1 = mixRen.sky_r_textures[1].second->surface_get();
 #ifdef USE_OGL
-    GLuint e0 = mixRen.sky_r_textures[0].second->surface_get();
-    GLuint e1 = mixRen.sky_r_textures[1].second->surface_get();
-
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-
-    e0 = mixRen.clouds_r_textures[0].second->surface_get();
-    e1 = mixRen.clouds_r_textures[1].second->surface_get();
-
-    tclouds0->surface_set(GL_TEXTURE_2D, e0);
-    tclouds1->surface_set(GL_TEXTURE_2D, e1);
 #else // USE_OGL
-    ID3DBaseTexture* e0 = mixRen.sky_r_textures[0].second->surface_get();
-    ID3DBaseTexture* e1 = mixRen.sky_r_textures[1].second->surface_get();
-
     tsky0->surface_set(e0);
     _RELEASE(e0);
     tsky1->surface_set(e1);
@@ -222,7 +180,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 
 void dxEnvironmentRender::OnLoad()
 {
-    tonemap = RImplementation.Resources->_CreateTexture("$user$tonemap"); //. hack
+    tonemap = RImplementation.Resources->_CreateTexture(r2_RT_luminance_cur); //. hack
 }
 
 void dxEnvironmentRender::OnUnload() { tonemap = nullptr; }
@@ -331,13 +289,11 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.Vertex.Unlock(env.CloudsVerts.size(), clouds_geom.stride());
 
     // Render
+    dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
     RCache.set_xform_world(mXFORM);
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);
-#ifndef USE_OGL // Fix cloud lerping on OGL
-    dxEnvDescriptorMixerRender& mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
     RCache.set_Textures(&mixRen.clouds_r_textures);
-#endif
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, env.CloudsVerts.size(), i_offset, env.CloudsIndices.size() / 3);
 
     GEnv.Render->rmNormal();
@@ -349,6 +305,30 @@ void dxEnvironmentRender::OnDeviceCreate()
     sh_2geom.create(v_skybox_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
     clouds_sh.create("clouds", "null");
     clouds_geom.create(v_clouds_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+
+    if (GEnv.Render->GenerationIsR2OrHigher())
+    {
+        tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
+        tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
+        R_ASSERT(tonemap_tstage_2sky != u32(-1));
+        R_ASSERT(tonemap_tstage_clouds != u32(-1));
+    }
+
+    R_constant* C = sh_2sky->E[0]->passes[0]->constants->get(RImplementation.c_ssky0)._get();
+    R_ASSERT(C);
+    tsky0_tstage = C->samp.index;
+
+    C = sh_2sky->E[0]->passes[0]->constants->get(RImplementation.c_ssky1)._get();
+    R_ASSERT(C);
+    tsky1_tstage = C->samp.index;
+
+    C = clouds_sh->E[0]->passes[0]->constants->get(RImplementation.c_sclouds0)._get();
+    R_ASSERT(C);
+    tclouds0_tstage = C->samp.index;
+
+    C = clouds_sh->E[0]->passes[0]->constants->get(RImplementation.c_sclouds1)._get();
+    R_ASSERT(C);
+    tclouds1_tstage = C->samp.index;
 }
 
 void dxEnvironmentRender::OnDeviceDestroy()
@@ -359,8 +339,6 @@ void dxEnvironmentRender::OnDeviceDestroy()
 #elif defined(USE_OGL)
     tsky0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
     tsky1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    tclouds0->surface_set(GL_TEXTURE_2D, 0);
-    tclouds1->surface_set(GL_TEXTURE_2D, 0);
 #else
 #   error No graphics API slected or defined!
 #endif
@@ -369,6 +347,13 @@ void dxEnvironmentRender::OnDeviceDestroy()
     sh_2geom.destroy();
     clouds_sh.destroy();
     clouds_geom.destroy();
+
+    tonemap_tstage_2sky = u32(-1);
+    tonemap_tstage_clouds = u32(-1);
+    tsky0_tstage = u32(-1);
+    tsky1_tstage = u32(-1);
+    tclouds0_tstage = u32(-1);
+    tclouds1_tstage = u32(-1);
 }
 
 void dxEnvironmentRender::OnDeviceReset()

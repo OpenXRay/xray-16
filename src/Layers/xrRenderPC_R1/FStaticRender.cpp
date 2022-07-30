@@ -93,7 +93,13 @@ void CRender::create()
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
+
     c_ldynamic_props = "L_dynamic_props";
+    c_sbase = "s_base";
+    c_ssky0 = "s_sky0";
+    c_ssky1 = "s_sky1";
+    c_sclouds0 = "s_clouds0";
+    c_sclouds1 = "s_clouds1";
 
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)

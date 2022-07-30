@@ -601,6 +601,10 @@ void CRender::create()
     c_lmaterial = "L_material";
     c_sbase = "s_base";
     c_snoise = "s_noise";
+    c_ssky0 = "s_sky0";
+    c_ssky1 = "s_sky1";
+    c_sclouds0 = "s_clouds0";
+    c_sclouds1 = "s_clouds1";
 
     m_bMakeAsyncSS = false;
 

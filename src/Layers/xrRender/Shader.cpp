@@ -60,6 +60,10 @@ bool SPass::equal(const SPass& other) const
         return false;
 #    endif
 #endif // USE_DX11 || USE_OGL
+#ifdef USE_OGL
+    if (pp != other.pp)
+        return false;
+#endif
     if (constants != other.constants)
         return false; // is this nessesary??? (ps+vs already combines)
 
@@ -136,26 +140,16 @@ void STextureList::clear()
 
 u32 STextureList::find_texture_stage(const shared_str& TexName) const
 {
-    u32 dwTextureStage = 0;
-
-    STextureList::const_iterator _it = this->begin();
-    STextureList::const_iterator _end = this->end();
-    for (; _it != _end; ++_it)
+    for (const auto& [stage, texture] : *this)
     {
-        const std::pair<u32, ref_texture>& loader = *_it;
-
-        //	Shadowmap texture always uses 0 texture unit
-        if (loader.second->cName == TexName)
-        {
-            //	Assign correct texture
-            dwTextureStage = loader.first;
-            break;
-        }
+        if (!texture)
+            continue;
+        if (texture->cName == TexName)
+            return stage;
     }
 
-    VERIFY(_it != _end);
-
-    return dwTextureStage;
+    VERIFY3(false, "Couldn't find texture stage", TexName.c_str());
+    return 0;
 }
 
 void STextureList::create_texture(u32 stage, pcstr textureName, bool evenIfNotNull)

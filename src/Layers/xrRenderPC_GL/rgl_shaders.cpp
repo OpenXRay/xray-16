@@ -23,8 +23,8 @@ static GLuint create_shader(pcstr* buffer, size_t const buffer_size, cpcstr file
     if (output != 0)
     {
         result->sh = output;
-        VERIFY(type == 'p');
-        result->constants.parse(&output, ShaderTypeTraits<T>::GetShaderDest());
+        if (type == 'p')
+            result->constants.parse(&output, ShaderTypeTraits<T>::GetShaderDest());
     }
     return output;
 }
@@ -496,9 +496,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     strncpy_s(extension, pTarget, 2);
 
     u32 fileCrc = 0;
-    string_path filename, full_path;
+    string_path filename, full_path{};
     strconcat(sizeof(filename), filename, "gl" DELIMITER, name, ".", extension, DELIMITER, sh_name.c_str());
-    if (HW.ShaderBinarySupported)
+    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported)
     {
         string_path file;
         strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename);
@@ -512,7 +512,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     GLuint program = 0;
-    if (HW.ShaderBinarySupported && FS.exist(full_path))
+    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && FS.exist(full_path))
     {
         IReader* file = FS.r_open(full_path);
         if (file->length() > 8)
@@ -550,7 +550,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     if (!program)
     {
 #ifdef DEBUG
-        Log("- Compile shader:", full_path);
+        Log("- Compile shader:", filename);
 #endif
         // Compile sources list
         shader_sources_manager sources(name);
@@ -559,16 +559,16 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         // Compile the shader from sources
         program = create_shader(pTarget, sources.get(), sources.length(), filename, result, nullptr);
 
-        if (HW.ShaderBinarySupported && program)
+        if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && program)
         {
             GLint binaryLength{};
             GLenum binaryFormat{};
-            glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
+            CHK_GL(glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
             GLvoid* binary = binaryLength ? xr_malloc(binaryLength) : nullptr;
             if (binary)
             {
-                glGetProgramBinary(program, binaryLength, nullptr, &binaryFormat, binary);
+                CHK_GL(glGetProgramBinary(program, binaryLength, nullptr, &binaryFormat, binary));
                 IWriter* file = FS.w_open(full_path);
 
                 file->w_string(HW.AdapterName);

@@ -125,14 +125,21 @@ IC void CBackend::set_Matrices(SMatrixList* _M)
 IC void CBackend::set_Pass(SPass* P)
 {
     set_States(P->state);
-    set_PS(P->ps);
-    set_VS(P->vs);
-#ifdef USE_DX11
-    set_GS(P->gs);
-    set_HS(P->hs);
-    set_DS(P->ds);
-    set_CS(P->cs);
+#ifdef USE_OGL
+    if (P->pp)
+        set_PP(P->pp);
+    else
 #endif
+    {
+        set_PS(P->ps);
+        set_VS(P->vs);
+#ifdef USE_DX11
+        set_GS(P->gs);
+        set_HS(P->hs);
+        set_DS(P->ds);
+        set_CS(P->cs);
+#endif
+    }
     set_Constants(P->constants);
     set_Textures(P->T);
 #ifdef _EDITOR

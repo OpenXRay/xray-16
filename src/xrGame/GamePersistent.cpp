@@ -217,11 +217,6 @@ void CGamePersistent::RegisterModel(IRenderVisual* V)
 extern void clean_game_globals();
 extern void init_game_globals();
 
-void CGamePersistent::create_main_menu(Task&, void*)
-{
-    m_pMainMenu = xr_new<CMainMenu>();
-}
-
 void CGamePersistent::OnAppStart()
 {
     // load game materials
@@ -239,8 +234,7 @@ void CGamePersistent::OnAppStart()
 
     SetupUIStyle();
     GEnv.UI = xr_new<UICore>();
-
-    const auto& menuCreated = TaskScheduler->AddTask("CMainMenu::CMainMenu()", { this, &CGamePersistent::create_main_menu });
+    m_pMainMenu = xr_new<CMainMenu>();
 
     inherited::OnAppStart();
 
@@ -256,7 +250,6 @@ void CGamePersistent::OnAppStart()
 #ifdef XR_PLATFORM_WINDOWS
     TaskScheduler->Wait(initializeGlobals);
 #endif
-    TaskScheduler->Wait(menuCreated);
 }
 
 void CGamePersistent::OnAppEnd()

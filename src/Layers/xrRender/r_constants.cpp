@@ -145,7 +145,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                     C->destination = RC_dest_sampler;
                     C->type = RC_sampler;
                     R_constant_load& L = C->samp;
-                    L.index = u16(r_index + ((destination & 1) ? 0 : D3DVERTEXTEXTURESAMPLER0));
+                    L.index = u16(r_index + ((destination & RC_dest_pixel) ? 0 : D3DVERTEXTEXTURESAMPLER0));
                     L.cls = RC_sampler;
                 }
                 else
@@ -176,7 +176,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             C->name = name;
             C->destination = destination;
             C->type = type;
-            R_constant_load& L = (destination & 1) ? C->ps : C->vs;
+            R_constant_load& L = (destination & RC_dest_pixel) ? C->ps : C->vs;
             L.index = r_index;
             L.cls = r_type;
         }
@@ -184,7 +184,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         {
             C->destination |= destination;
             VERIFY(C->type == type);
-            R_constant_load& L = (destination & 1) ? C->ps : C->vs;
+            R_constant_load& L = (destination & RC_dest_pixel) ? C->ps : C->vs;
             L.index = r_index;
             L.cls = r_type;
         }
@@ -225,6 +225,9 @@ void R_constant_table::merge(R_constant_table* T)
             C->ds = src->ds;
             C->cs = src->cs;
 #   endif
+#endif
+#ifdef USE_OGL
+            C->pp = src->pp;
 #endif
             C->samp = src->samp;
             C->handler = src->handler;
@@ -277,10 +280,10 @@ BOOL R_constant_table::equal(R_constant_table& C)
 {
     if (table.size() != C.table.size())
         return FALSE;
-    u32 size = table.size();
-    for (u32 it = 0; it < size; it++)
+    const size_t size = table.size();
+    for (size_t it = 0; it < size; it++)
     {
-        if (!table[it]->equal(&*C.table[it]))
+        if (!table[it]->equal(*C.table[it]))
             return FALSE;
     }
 

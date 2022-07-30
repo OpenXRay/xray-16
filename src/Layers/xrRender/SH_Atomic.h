@@ -119,6 +119,21 @@ typedef resptr_core<SCS, resptr_base<SCS>> ref_cs;
 
 #endif // USE_DX11 || USE_OGL
 
+#if defined(USE_OGL)
+struct ECORE_API SPP : public xr_resource_named
+{
+    // Program pipeline object
+    // or shader program if ARB_separate_shader_objects is unavailabe
+    GLuint pp{};
+    R_constant_table constants;
+
+    SPP() = default;
+    SPP(GLuint _pp) : pp(_pp) {}
+    ~SPP();
+};
+typedef resptr_core<SPP, resptr_base<SPP>> ref_pp;
+#endif // USE_OGL
+
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SState : public xr_resource_flagged
 {

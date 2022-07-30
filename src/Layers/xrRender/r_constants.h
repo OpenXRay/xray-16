@@ -42,6 +42,7 @@ enum
     RC_dest_hull = (1 << 4), // DX11 only
     RC_dest_domain = (1 << 5), //   DX11 only
     RC_dest_compute = (1 << 6), //  DX11 only
+    RC_dest_all = (1 << 7), // OpenGL only
     RC_dest_compute_cb_index_mask = 0xF0000000, // Buffer index == 0..14
     RC_dest_compute_cb_index_shift = 28,
     RC_dest_domain_cb_index_mask = 0x0F000000, // Buffer index == 0..14
@@ -113,6 +114,9 @@ struct ECORE_API R_constant : public xr_resource
     R_constant_load cs;
 #   endif
 #endif
+#ifdef USE_OGL
+    R_constant_load pp;
+#endif
 
     R_constant_load samp;
     R_constant_setup* handler;
@@ -135,6 +139,9 @@ struct ECORE_API R_constant : public xr_resource
         case RC_dest_compute: return cs;
 #   endif
 #endif
+#ifdef USE_OGL
+        case RC_dest_all: return pp;
+#endif
         default: FATAL("invalid enumeration for shader");
         }
         return fake;
@@ -142,11 +149,25 @@ struct ECORE_API R_constant : public xr_resource
 
     BOOL equal(R_constant& C)
     {
-        return (!xr_strcmp(name, C.name)) && (type == C.type) && (destination == C.destination) && ps.equal(C.ps) &&
-            vs.equal(C.vs) && samp.equal(C.samp) && handler == C.handler;
+        return !xr_strcmp(name, C.name)
+            && type == C.type
+            && destination == C.destination
+            && ps.equal(C.ps)
+            && vs.equal(C.vs)
+#if defined(USE_DX11) || defined(USE_OGL)
+            && gs.equal(C.gs)
+#   if defined(USE_DX11)
+            && hs.equal(C.hs)
+            && ds.equal(C.ds)
+            && cs.equal(C.cs)
+#   endif
+#   if defined(USE_OGL)
+            && pp.equal(C.pp)
+#   endif
+#endif
+            && samp.equal(C.samp)
+            && handler == C.handler;
     }
-
-    BOOL equal(R_constant* C) { return equal(*C); }
 };
 typedef resptr_core<R_constant, resptr_base<R_constant>> ref_constant;
 

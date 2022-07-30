@@ -23,26 +23,33 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     PassSET_LightFog(FALSE, bFog);
 
     // Create shaders
-    SPS* ps = RImplementation.Resources->_CreatePS(_ps);
-    u32 flags = 0;
-#if defined(USE_DX11)
-    if (ps->constants.dx9compatibility)
-        flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+#if defined(USE_OGL)
+    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, "null", "null", "null");
+    if (HW.SeparateShaderObjectsSupported || !dest.pp->pp)
 #endif
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs, flags);
-    dest.ps = ps;
-    dest.vs = vs;
+    {
+        dest.ps = RImplementation.Resources->_CreatePS(_ps);
+        ctable.merge(&dest.ps->constants);
+        u32 flags = 0;
+#if defined(USE_DX11)
+        if (dest.ps->constants.dx9compatibility)
+            flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+#endif
+        dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
+        ctable.merge(&dest.vs->constants);
 #if defined(USE_DX11) || defined(USE_OGL)
-    SGS* gs = RImplementation.Resources->_CreateGS("null");
-    dest.gs = gs;
+        dest.gs = RImplementation.Resources->_CreateGS("null");
 #    ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS("null");
-    dest.ds = RImplementation.Resources->_CreateDS("null");
-    dest.cs = RImplementation.Resources->_CreateCS("null");
+        dest.hs = RImplementation.Resources->_CreateHS("null");
+        dest.ds = RImplementation.Resources->_CreateDS("null");
+        dest.cs = RImplementation.Resources->_CreateCS("null");
 #    endif
 #endif // !USE_DX9
-    ctable.merge(&ps->constants);
-    ctable.merge(&vs->constants);
+    }
+#if defined(USE_OGL)
+    RImplementation.Resources->_LinkPP(dest);
+    ctable.merge(&dest.pp->constants);
+#endif
 
     // Last Stage - disable
     if (0 == xr_stricmp(_ps, "null"))

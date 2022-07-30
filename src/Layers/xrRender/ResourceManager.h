@@ -47,6 +47,9 @@ public:
     using map_DS = xr_map<const char*, SDS*, str_pred>;
     using map_CS = xr_map<const char*, SCS*, str_pred>;
 #endif
+#if defined(USE_OGL)
+    using map_PP = xr_map<const char*, SPP*, str_pred>;
+#endif
 
     using map_PS = xr_map<const char*, SPS*, str_pred>;
     using map_TD = xr_map<const char*, texture_detail, str_pred>;
@@ -70,6 +73,9 @@ private:
     map_DS m_ds;
     map_HS m_hs;
     map_CS m_cs;
+#endif
+#if defined(USE_OGL)
+    map_PP m_pp;
 #endif
 
     map_TD m_td;
@@ -158,6 +164,13 @@ public:
 
 //	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
 //	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
+
+#if defined(USE_OGL)
+    SPP* _CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr ds);
+    bool _LinkPP(SPass& pass);
+    void _DeletePP(const SPP* p);
+#endif
+
 #if defined(USE_DX11) || defined(USE_OGL)
     SGS* _CreateGS(LPCSTR Name);
     void _DeleteGS(const SGS* GS);

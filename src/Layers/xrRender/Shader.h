@@ -98,6 +98,9 @@ struct ECORE_API SPass : public xr_resource_flagged
     ref_cs cs; // may be NULL = don't use compute shader at all
 #    endif
 #endif // !USE_DX9
+#if defined(USE_OGL)
+    ref_pp pp; // may be NULL = don't use program pipeline at all
+#endif
     ref_ctable constants; // may be NULL
 
     ref_texture_list T;

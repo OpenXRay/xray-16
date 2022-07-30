@@ -53,13 +53,6 @@ private:
     SConstantList passConstants;
     u32 dwStage;
 
-    string128 pass_vs;
-    string128 pass_ps;
-    string128 pass_gs;
-    string128 pass_hs;
-    string128 pass_ds;
-    string128 pass_cs;
-
 private:
     inline u32 BC(BOOL v) const { return v ? 1 : 0; }
     void SetupSampler(u32 stage, pcstr sampler);
@@ -99,8 +92,7 @@ public:
         PassSET_Blend(TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR, bAref, ref);
     }
     void PassSET_LightFog(BOOL bLight, BOOL bFog);
-    void PassSET_PS(LPCSTR name);
-    void PassSET_VS(LPCSTR name);
+    void PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs = "null", pcstr _hs = "null", pcstr _ds = "null");
     void PassEnd();
 
     void StageBegin();

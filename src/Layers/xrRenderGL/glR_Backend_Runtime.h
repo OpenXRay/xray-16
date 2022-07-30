@@ -168,7 +168,7 @@ ICF void CBackend::set_PS(GLuint _ps, LPCSTR _n)
         PGO(Msg("PGO:Pshader:%d,%s", _ps, _n ? _n : name));
         stat.ps++;
         ps = _ps;
-        CHK_GL(glUseProgramStages(HW.pPP, GL_FRAGMENT_SHADER_BIT, ps));
+        //CHK_GL(glUseProgramStages(HW.pPP, GL_FRAGMENT_SHADER_BIT, ps));
 #ifdef DEBUG
 		ps_name = _n;
 #endif
@@ -187,7 +187,7 @@ ICF void CBackend::set_GS(GLuint _gs, LPCSTR _n)
         //	TODO: OGL: Get statistics for G Shader change
         //stat.gs			++;
         gs = _gs;
-        CHK_GL(glUseProgramStages(HW.pPP, GL_GEOMETRY_SHADER_BIT, gs));
+        //CHK_GL(glUseProgramStages(HW.pPP, GL_GEOMETRY_SHADER_BIT, gs));
 #ifdef DEBUG
 		gs_name = _n;
 #endif
@@ -205,9 +205,33 @@ ICF void CBackend::set_VS(GLuint _vs, LPCSTR _n)
         PGO(Msg("PGO:Vshader:%d,%s", _vs, _n ? _n : name));
         stat.vs++;
         vs = _vs;
-        CHK_GL(glUseProgramStages(HW.pPP, GL_VERTEX_SHADER_BIT, vs));
+        //CHK_GL(glUseProgramStages(HW.pPP, GL_VERTEX_SHADER_BIT, vs));
 #ifdef DEBUG
 		vs_name = _n;
+#endif
+    }
+}
+
+ICF void CBackend::set_PP(GLuint _pp, pcstr _n)
+{
+    if (pp != _pp)
+    {
+#ifdef RBackend_PGO
+        string_path name;
+        if (HW.SeparateShaderObjectsSupported)
+            glGetObjectLabel(GL_PROGRAM_PIPELINE, _pp, sizeof(name), nullptr, name)
+        else
+            glGetObjectLabel(GL_PROGRAM, _pp, sizeof(name), nullptr, name)
+#endif
+        PGO(Msg("PGO:PPshader:%d,%s", _pp, _n ? _n : name));
+        stat.pp++;
+        pp = _pp;
+        if (HW.SeparateShaderObjectsSupported)
+            CHK_GL(glBindProgramPipeline(pp));
+        else
+            CHK_GL(glUseProgram(pp));
+#ifdef DEBUG
+        pp_name = _n;
 #endif
     }
 }

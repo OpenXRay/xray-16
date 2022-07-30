@@ -163,10 +163,7 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
             C->name = name;
             C->destination = destination;
             C->type = type;
-            // R_constant_load& L   =   (destination&1)?C->ps:C->vs;
-            R_constant_load& L = C->get_load(destination); /*((destination&RC_dest_pixel)
-                                  ? C->ps : (destination&RC_dest_vertex)
-                                  ? C->vs : C->gs);*/
+            R_constant_load& L = C->get_load(destination);
             L.index = r_index;
             L.cls = r_type;
         }
@@ -174,10 +171,7 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         {
             C->destination |= destination;
             VERIFY(C->type == type);
-            // R_constant_load& L   =   (destination&1)?C->ps:C->vs;
-            R_constant_load& L = C->get_load(destination); /*((destination&RC_dest_pixel)
-                                  ? C->ps : (destination&RC_dest_vertex)
-                                  ? C->vs : C->gs);*/
+            R_constant_load& L = C->get_load(destination);
             L.index = r_index;
             L.cls = r_type;
         }
