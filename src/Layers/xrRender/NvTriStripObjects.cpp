@@ -530,14 +530,10 @@ void NvStripInfo::Build(NvEdgeInfoVec& edgeInfos, NvFaceInfoVec& /*faceInfos*/)
 void NvStripInfo::Combine(const NvFaceInfoVec& forward, const NvFaceInfoVec& backward)
 {
     // add backward faces
-    auto numFaces = backward.size();
-    for (auto i = numFaces - 1; i >= 0; i--)
-        m_faces.push_back(backward[i]);
+    m_faces.insert(m_faces.end(), backward.rbegin(), backward.rend());
 
     // add forward faces
-    numFaces = forward.size();
-    for (size_t i = 0; i < numFaces; i++)
-        m_faces.push_back(forward[i]);
+    m_faces.insert(m_faces.end(), forward.begin(), forward.end());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
