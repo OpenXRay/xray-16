@@ -108,6 +108,7 @@ public:
         matTextures.clear();
         matTexturesTemp.clear();
 
+        lstLODs.clear();
         lstLODgroups.clear();
         lstRenderables.clear();
         lstSpatial.clear();
