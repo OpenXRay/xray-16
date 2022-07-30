@@ -109,7 +109,7 @@ struct ECORE_API SPass : public xr_resource_flagged
     SPass() = default;
     ~SPass();
 
-    BOOL equal(const SPass& other);
+    bool equal(const SPass& other) const;
 };
 typedef resptr_core<SPass, resptr_base<SPass>> ref_pass;
 

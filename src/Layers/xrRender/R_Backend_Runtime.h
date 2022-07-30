@@ -122,24 +122,24 @@ IC void CBackend::set_Matrices(SMatrixList* _M)
 }
 #endif
 
-IC void CBackend::set_Element(ShaderElement* S, u32 pass)
+IC void CBackend::set_Pass(SPass* P)
 {
-    SPass& P = *(S->passes[pass]);
-    set_States(P.state);
-    set_PS(P.ps);
-    set_VS(P.vs);
+    set_States(P->state);
+    set_PS(P->ps);
+    set_VS(P->vs);
 #ifdef USE_DX11
-    set_GS(P.gs);
-    set_HS(P.hs);
-    set_DS(P.ds);
-    set_CS(P.cs);
+    set_GS(P->gs);
+    set_HS(P->hs);
+    set_DS(P->ds);
+    set_CS(P->cs);
 #endif
-    set_Constants(P.constants);
-    set_Textures(P.T);
+    set_Constants(P->constants);
+    set_Textures(P->T);
 #ifdef _EDITOR
-    set_Matrices(P.M);
+    set_Matrices(P->M);
 #endif
 }
 
+ICF void CBackend::set_Element(ShaderElement* S, u32 pass) { set_Pass(S->passes[pass]); }
 ICF void CBackend::set_Shader(Shader* S, u32 pass) { set_Element(S->E[0], pass); }
 #endif

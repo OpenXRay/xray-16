@@ -40,38 +40,38 @@ void resptrcode_geom::create(VertexElement* decl, VertexBufferHandle vb, IndexBu
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-BOOL SPass::equal(const SPass& other)
+bool SPass::equal(const SPass& other) const
 {
     if (state != other.state)
-        return FALSE;
+        return false;
     if (ps != other.ps)
-        return FALSE;
+        return false;
     if (vs != other.vs)
-        return FALSE;
+        return false;
 #if defined(USE_DX11) || defined(USE_OGL)
     if (gs != other.gs)
-        return FALSE;
+        return false;
 #    ifdef USE_DX11
     if (hs != other.hs)
-        return FALSE;
+        return false;
     if (ds != other.ds)
-        return FALSE;
+        return false;
     if (cs != other.cs)
-        return FALSE;
+        return false;
 #    endif
 #endif // USE_DX11 || USE_OGL
     if (constants != other.constants)
-        return FALSE; // is this nessesary??? (ps+vs already combines)
+        return false; // is this nessesary??? (ps+vs already combines)
 
     if (T != other.T)
-        return FALSE;
+        return false;
     if (C != other.C)
-        return FALSE;
+        return false;
 #ifdef _EDITOR
     if (M != other.M)
-        return FALSE;
+        return false;
 #endif
-    return TRUE;
+    return true;
 }
 
 //

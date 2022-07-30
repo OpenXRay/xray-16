@@ -330,10 +330,13 @@ public:
     IC	void						set_Matrices(ref_matrix_list& M) { set_Matrices(&*M); }
 #endif
 
-    IC void set_Element(ShaderElement* S, u32 pass = 0);
+    IC void set_Pass(SPass* P);
+    void set_Pass(ref_pass& P) { set_Pass(&*P); }
+
+    ICF void set_Element(ShaderElement* S, u32 pass = 0);
     void set_Element(ref_selement& S, u32 pass = 0) { set_Element(&*S, pass); }
 
-    IC void set_Shader(Shader* S, u32 pass = 0);
+    ICF void set_Shader(Shader* S, u32 pass = 0);
     void set_Shader(ref_shader& S, u32 pass = 0) { set_Shader(&*S, pass); }
 
     ICF void set_States(SState* _state);

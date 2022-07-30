@@ -38,30 +38,13 @@ public:
 #endif
 
     // Runtime structures
-    xr_vector<R_dsgraph::mapNormalVS::value_type*> nrmVS;
-#ifndef USE_DX9
-    xr_vector<R_dsgraph::mapNormalGS::value_type*> nrmGS;
-#endif
-    xr_vector<R_dsgraph::mapNormalPS::value_type*> nrmPS;
-    xr_vector<R_dsgraph::mapNormalCS::value_type*> nrmCS;
-    xr_vector<R_dsgraph::mapNormalStates::value_type*> nrmStates;
-    xr_vector<R_dsgraph::mapNormalTextures::value_type*> nrmTextures;
-    xr_vector<R_dsgraph::mapNormalTextures::value_type*> nrmTexturesTemp;
-
-    xr_vector<R_dsgraph::mapMatrixVS::value_type*> matVS;
-#ifndef USE_DX9
-    xr_vector<R_dsgraph::mapMatrixGS::value_type*> matGS;
-#endif
-    xr_vector<R_dsgraph::mapMatrixPS::value_type*> matPS;
-    xr_vector<R_dsgraph::mapMatrixCS::value_type*> matCS;
-    xr_vector<R_dsgraph::mapMatrixStates::value_type*> matStates;
-    xr_vector<R_dsgraph::mapMatrixTextures::value_type*> matTextures;
-    xr_vector<R_dsgraph::mapMatrixTextures::value_type*> matTexturesTemp;
+    xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;
+    xr_vector<R_dsgraph::mapMatrix_T::value_type*> matPasses;
+    xr_vector<R_dsgraph::_LodItem> lstLODs;
     xr_vector<int> lstLODgroups;
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
     xr_vector<dxRender_Visual*> lstVisuals;
-    xr_vector<R_dsgraph::_LodItem> lstLODs;
 
     u32 counter_S{};
     u32 counter_D{};
@@ -94,19 +77,8 @@ public:
 
     void r_dsgraph_destroy()
     {
-        nrmVS.clear();
-        nrmPS.clear();
-        nrmCS.clear();
-        nrmStates.clear();
-        nrmTextures.clear();
-        nrmTexturesTemp.clear();
-
-        matVS.clear();
-        matPS.clear();
-        matCS.clear();
-        matStates.clear();
-        matTextures.clear();
-        matTexturesTemp.clear();
+        nrmPasses.clear();
+        matPasses.clear();
 
         lstLODs.clear();
         lstLODgroups.clear();

@@ -116,80 +116,20 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_V
     }
 #endif
 
-    // Create common node
-    // NOTE: Invisible elements exist only in R1
-    _MatrixItem item = { SSA, root, pVisual, xform };
-
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
-        auto& pass = *sh->passes[iPass];
-        auto& map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
+        SPass* pass = sh->passes[iPass]._get();
+        mapMatrix_T& map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
+        mapMatrixItems& matrixItems = map[pass];
 
-#if defined(USE_DX9)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Nps = Nvs[pass.ps->sh];
-#elif defined(USE_DX11)
-        auto& Nvs = map[&*pass.vs];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_OGL)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-#if defined(USE_DX9) || defined(USE_OGL)
-        auto& Ncs = Nps[pass.constants._get()];
-#elif defined(USE_DX11)
-        Nps.hs = pass.hs->sh;
-        Nps.ds = pass.ds->sh;
-
-        auto& Ncs = Nps.mapCS[pass.constants._get()];
-#else
-#   error No graphics API selected or enabled!
-#endif
-        auto& Nstate = Ncs[&*pass.state];
-        auto& Ntex = Nstate[pass.T._get()];
-        Ntex.push_back(item);
-
+        // Create common node
+        // NOTE: Invisible elements exist only in R1
+        matrixItems.emplace_back(_MatrixItem{ SSA, root, pVisual, xform });
+        
         // Need to sort for HZB efficient use
-        if (SSA > Ntex.ssa)
+        if (SSA > matrixItems.ssa)
         {
-            Ntex.ssa = SSA;
-            if (SSA > Nstate.ssa)
-            {
-                Nstate.ssa = SSA;
-                if (SSA > Ncs.ssa)
-                {
-                    Ncs.ssa = SSA;
-#if defined(USE_DX9) || defined(USE_OGL)
-                    if (SSA > Nps.ssa)
-                    {
-                        Nps.ssa = SSA;
-#elif defined(USE_DX11)
-                    if (SSA > Nps.mapCS.ssa)
-                    {
-                        Nps.mapCS.ssa = SSA;
-#else
-#   error No graphics API selected or enabled!
-#endif
-#if defined(USE_DX11) || defined(USE_OGL)
-                        if (SSA > Ngs.ssa)
-                        {
-                            Ngs.ssa = SSA;
-#endif
-                            if (SSA > Nvs.ssa)
-                            {
-                                Nvs.ssa = SSA;
-                            }
-#if defined(USE_DX11) || defined(USE_OGL)
-                        }
-#endif
-                    }
-                }
-            }
+            matrixItems.ssa = SSA;
         }
     }
 
@@ -270,85 +210,18 @@ void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 
     counter_S++;
 
-    _NormalItem item = { SSA, pVisual };
-
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
-        auto& pass = *sh->passes[iPass];
-        auto& map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
+        SPass* pass = sh->passes[iPass]._get();
+        mapNormal_T& map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
+        mapNormalItems& normalItems = map[pass];
 
-#if defined(USE_DX9)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Nps = Nvs[pass.ps->sh];
-#elif defined(USE_DX11)
-        auto& Nvs = map[&*pass.vs];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_OGL)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-#if defined(USE_DX9)
-		auto& Ncs = Nps[pass.constants._get()];
-#elif defined(USE_DX11)
-        Nps.hs = pass.hs->sh;
-        Nps.ds = pass.ds->sh;
-
-        auto& Ncs = Nps.mapCS[pass.constants._get()];
-#elif defined(USE_OGL)
-        auto& Ncs = Nps[pass.constants._get()];
-#else
-#   error No graphics API selected or enabled!
-#endif
-        auto& Nstate = Ncs[&*pass.state];
-        auto& Ntex = Nstate[pass.T._get()];
-        Ntex.push_back(item);
+        normalItems.emplace_back(_NormalItem{ SSA, pVisual });
 
         // Need to sort for HZB efficient use
-        if (SSA > Ntex.ssa)
+        if (SSA > normalItems.ssa)
         {
-            Ntex.ssa = SSA;
-            if (SSA > Nstate.ssa)
-            {
-                Nstate.ssa = SSA;
-                if (SSA > Ncs.ssa)
-                {
-                    Ncs.ssa = SSA;
-#if defined(USE_DX9)
-                    if (SSA > Nps.ssa)
-                    {
-                        Nps.ssa = SSA;
-#elif defined(USE_DX11)
-                    if (SSA > Nps.mapCS.ssa)
-                    {
-                        Nps.mapCS.ssa = SSA;
-#elif defined(USE_OGL)
-                    if (SSA > Nps.ssa)
-                    {
-                        Nps.ssa = SSA;
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-#if defined(USE_DX11) || defined(USE_OGL)
-                        if (SSA > Ngs.ssa)
-                        {
-                            Ngs.ssa = SSA;
-#endif
-                            if (SSA > Nvs.ssa)
-                            {
-                                Nvs.ssa = SSA;
-                            }
-#if defined(USE_DX11) || defined(USE_OGL)
-                        }
-#endif
-                    }
-                }
-            }
+            normalItems.ssa = SSA;
         }
     }
 
