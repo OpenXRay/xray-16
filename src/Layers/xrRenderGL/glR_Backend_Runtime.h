@@ -255,9 +255,9 @@ IC GLenum TranslateTopology(D3DPRIMITIVETYPE T)
     VERIFY(T<sizeof(translateTable) / sizeof(translateTable[0]));
     VERIFY(T >= 0);
 
-    GLenum result = translateTable[T];
+    const GLenum result = translateTable[T];
 
-    VERIFY(result != NULL);
+    VERIFY(result != GL_NONE);
 
     return result;
 }
