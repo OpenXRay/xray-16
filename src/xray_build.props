@@ -18,16 +18,12 @@
       <!--
         LUABIND_DYNAMIC_LINK : self-explanatory
         MSVC;dSINGLE;WIN32 : for ODE and xrPhysics
-        _SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE : temporary workaround for deprecated API
         -->
       <PreprocessorDefinitions>
         LUABIND_DYNAMIC_LINK;
         MSVC;
         dSINGLE;
         WIN32;
-        _SECURE_SCL=0;
-        _CRT_SECURE_NO_WARNINGS;
-        _CRT_SECURE_NO_DEPRECATE;
         USE_CRYPTOPP;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>

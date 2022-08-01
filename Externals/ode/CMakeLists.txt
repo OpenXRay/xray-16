@@ -95,7 +95,6 @@ target_include_directories(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-    -D_SECURE_SCL=0
     -DLINUX
     -D_cdecl=
     -D__forceinline=inline
