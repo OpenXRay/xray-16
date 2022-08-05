@@ -6,12 +6,9 @@
 #include "log.h"
 #include "Threading/ScopeLock.hpp"
 
-#pragma warning(push)
-#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Debug/dxerr.h"
 #include "Debug/MiniDump.h"
-#pragma warning(pop)
 #endif
 
 #include <SDL.h>

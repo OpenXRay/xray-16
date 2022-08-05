@@ -2,11 +2,9 @@
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
+
 #if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include <eax/eax.h>
-#pragma warning(pop)
 #endif
 
 CSoundRender_Environment::CSoundRender_Environment()

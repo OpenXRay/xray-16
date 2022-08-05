@@ -6,12 +6,9 @@
 #pragma hdrstop // huh?
 
 #if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include <direct.h>
 #include <sys/stat.h>
 #include <sys/utime.h>
-#pragma warning(pop)
 #endif
 
 #include "FS_internal.h"

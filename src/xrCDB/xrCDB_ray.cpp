@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop // ???
 #include "xrCore/_fbox.h"
-#pragma warning(push)
-#pragma warning(disable : 4995)
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -10,7 +9,6 @@
 #else
 #error Add your platform here
 #endif
-#pragma warning(pop)
 
 #include "xrCDB.h"
 #include "SDL.h"

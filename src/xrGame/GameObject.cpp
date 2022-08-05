@@ -41,11 +41,7 @@
 #include "xrNetServer/NET_Messages.h"
 
 #ifdef XR_PLATFORM_WINDOWS // XXX: Just use std::atomic
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include <intrin.h>
-#pragma warning(pop)
-
 #pragma intrinsic(_InterlockedCompareExchange)
 #endif
 

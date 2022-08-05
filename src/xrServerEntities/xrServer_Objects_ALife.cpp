@@ -14,9 +14,6 @@
 #include "restriction_space.h"
 #include "xrCore/xr_token.h"
 
-#ifdef XR_COMPILER_MSVC
-#pragma warning(disable: 4100) // unreferenced formal parameter
-#endif
 #ifndef AI_COMPILER
 #include "character_info.h"
 #endif // AI_COMPILER
@@ -32,12 +29,11 @@ LPCSTR GAME_CONFIG = "game.ltx";
 #ifdef XRSE_FACTORY_EXPORTS
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <luabind/luabind.hpp>
-#include <shlwapi.h>
-#pragma warning(pop)
 
+#include <luabind/luabind.hpp>
+
+// XXX: maybe remove shlwapi
+#include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
 struct logical_string_predicate

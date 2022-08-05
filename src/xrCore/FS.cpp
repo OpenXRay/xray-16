@@ -3,8 +3,6 @@
 
 #include "FS_internal.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #include <direct.h>
@@ -13,12 +11,6 @@
 #endif
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#pragma warning(pop)
-
-#ifdef M_BORLAND
-#define O_SEQUENTIAL 0
-#endif // M_BORLAND
 
 #ifdef FS_DEBUG
 XRCORE_API u32 g_file_mapped_memory = 0;

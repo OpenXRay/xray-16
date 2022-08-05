@@ -7,10 +7,7 @@
 #define CONCATENIZE(a, b) CONCATENIZE_HELPER(a, b)
 
 // Warnings
-#pragma warning(disable : 4100) // unreferenced formal parameter
 #pragma warning(disable : 4127) // conditional expression is constant
-#pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
-#pragma warning(disable : 4251) // object needs DLL interface
 #pragma warning(disable : 4345)
 
 #ifdef XR_ARCHITECTURE_X64

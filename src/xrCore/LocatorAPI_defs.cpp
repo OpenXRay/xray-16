@@ -2,15 +2,13 @@
 #pragma hdrstop
 
 #include "LocatorAPI_defs.h"
-#pragma warning(push)
-#pragma warning(disable : 4995)
+
 #if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #include <direct.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #endif
 #include <fcntl.h>
-#pragma warning(pop)
 
 //////////////////////////////////////////////////////////////////////
 // FS_File

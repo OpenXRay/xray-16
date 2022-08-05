@@ -8,16 +8,12 @@
 
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 
-#include "SDL.h"
-
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include "xrCore/Debug/dxerr.h"
+
+#include <SDL.h>
 
 #include <WINSOCK2.H>
 #include <Ws2tcpip.h>
-
-//#pragma warning(pop)
 
 // {0218FA8B-515B-4bf2-9A5F-2F079D1759F3}
 static const GUID NET_GUID = {0x218fa8b, 0x515b, 0x4bf2, {0x9a, 0x5f, 0x2f, 0x7, 0x9d, 0x17, 0x59, 0xf3}};

@@ -1,22 +1,6 @@
 #include "stdafx.h"
 #include "xrCDB/Frustum.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-// mmsystem.h
-#define MMNOSOUND
-#define MMNOMIDI
-#define MMNOAUX
-#define MMNOMIXER
-#define MMNOJOY
-#if defined(XR_PLATFORM_WINDOWS)
-#include <mmsystem.h>
-#endif
-#include "SDL.h"
-#pragma warning(pop)
-
-#include <thread>
-
 #include "x_ray.h"
 #include "Render.h"
 
@@ -31,6 +15,20 @@
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
+
+#include <thread>
+
+#include <SDL.h>
+
+// mmsystem.h
+#if defined(XR_PLATFORM_WINDOWS)
+#define MMNOSOUND
+#define MMNOMIDI
+#define MMNOAUX
+#define MMNOMIXER
+#define MMNOJOY
+#include <mmsystem.h>
+#endif
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;

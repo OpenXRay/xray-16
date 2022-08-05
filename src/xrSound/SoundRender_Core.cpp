@@ -5,11 +5,9 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 #include "SoundRender_Emitter.h"
+
 #if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include <eax/eax.h>
-#pragma warning(pop)
 #endif
 
 int psSoundTargets = 32;

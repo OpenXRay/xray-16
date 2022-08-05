@@ -1,8 +1,8 @@
 #pragma once
 
-#pragma warning(disable : 4661)
-
 #include "Common/Common.hpp"
-#include "xrCore.h"
 #include "Common/Util.hpp"
+
+#pragma warning(disable : 4661)
+#include "xrCore.h"
 #include "_std_extensions.h"
