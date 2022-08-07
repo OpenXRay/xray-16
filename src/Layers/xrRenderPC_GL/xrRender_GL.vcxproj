@@ -126,6 +126,7 @@
     <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp" />
@@ -136,7 +137,6 @@
     <ClCompile Include="gl_rendertarget_accum_spot.cpp" />
     <ClCompile Include="gl_rendertarget_build_textures.cpp" />
     <ClCompile Include="gl_rendertarget_draw_rain.cpp" />
-    <ClCompile Include="gl_rendertarget_mark_msaa_edges.cpp" />
     <ClCompile Include="gl_rendertarget_phase_combine.cpp" />
     <ClCompile Include="gl_rendertarget_phase_flip.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
