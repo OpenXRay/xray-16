@@ -70,6 +70,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
             items.clear();
 
         }
+        nrmPasses.clear();
         map.clear();
     }
 
@@ -108,6 +109,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
             }
             items.clear();
         }
+        matPasses.clear();
         map.clear();
     }
 
