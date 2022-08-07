@@ -385,6 +385,7 @@
     <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp" />
@@ -405,7 +406,6 @@
     <ClCompile Include="r4_rendertarget_accum_direct.cpp" />
     <ClCompile Include="r4_rendertarget_accum_point.cpp" />
     <ClCompile Include="r4_rendertarget_accum_spot.cpp" />
-    <ClCompile Include="r4_rendertarget_create_minmaxSM.cpp" />
     <ClCompile Include="r4_rendertarget_draw_rain.cpp" />
     <ClCompile Include="r4_rendertarget_mark_msaa_edges.cpp" />
     <ClCompile Include="r4_rendertarget_phase_combine.cpp" />

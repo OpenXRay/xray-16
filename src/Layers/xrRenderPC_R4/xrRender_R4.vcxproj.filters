@@ -944,9 +944,6 @@
     <ClCompile Include="r4_rendertarget_accum_spot.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="r4_rendertarget_create_minmaxSM.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="r4_rendertarget_draw_rain.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -1314,6 +1311,9 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>

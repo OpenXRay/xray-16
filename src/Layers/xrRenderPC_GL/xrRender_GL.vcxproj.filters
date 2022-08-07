@@ -528,9 +528,6 @@
     <ClCompile Include="gl_rendertarget_accum_spot.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_create_minmaxSM.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_draw_rain.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -686,6 +683,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderGL\glTexture.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp">
+      <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
