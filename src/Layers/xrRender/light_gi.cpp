@@ -52,7 +52,7 @@ void light::gi_generate()
         indirect.erase(indirect.begin() + indirect_photons, indirect.end());
 
     // normalize
-    if (indirect.size())
+    if (!indirect.empty())
     {
         float target_E = ps_r2_GI_refl;
         float total_E = 0;

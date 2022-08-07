@@ -247,15 +247,7 @@ public:
     // HW-occlusion culling
     u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
     void occq_end(u32& ID) { HWOCC.occq_end(ID); }
-#if defined(USE_DX9)
-    u32 occq_get(u32& ID) { return HWOCC.occq_get(ID); }
-#elif defined(USE_DX11)
-    R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
-#elif defined(USE_OGL)
-    R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
-#else
-#   error No graphics API selected or enabled!
-#endif
+    auto occq_get(u32& ID) { return HWOCC.occq_get(ID); }
 
     ICF void apply_object(IRenderable* O)
     {
