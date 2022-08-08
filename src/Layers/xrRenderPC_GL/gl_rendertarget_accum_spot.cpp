@@ -214,7 +214,7 @@ void CRenderTarget::accum_spot(light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth->pZRT);
+        u_setrt(rt_Accumulator, NULL, NULL, rt_MSAADepth);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
         RCache.set_c("m_texgen_J", m_Texgen_J);

@@ -256,11 +256,12 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
     const ref_rt rt_null;
     RCache.set_RT(0, 1);
     RCache.set_RT(0, 2);
-    auto zb = RImplementation.Target->get_base_zb();
+    auto zb = RImplementation.Target->rt_Base_Depth;
 
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
     if (RImplementation.o.msaa)
-        zb = RImplementation.Target->rt_MSAADepth->pZRT;
+        zb = RImplementation.Target->rt_MSAADepth;
+
 #endif
 
     RImplementation.Target->u_setrt(

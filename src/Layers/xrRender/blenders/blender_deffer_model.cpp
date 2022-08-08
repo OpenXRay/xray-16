@@ -211,8 +211,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
             }
             //if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
             //else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
-            C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE,TRUE,FALSE);
-            C.r_Sampler("s_base", C.L_textures[0]);
+            C.r_Pass("shadow_direct_model", "null", FALSE, TRUE,TRUE,FALSE);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_End();
             break;
