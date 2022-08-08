@@ -5,7 +5,7 @@
 #include "xrCore/xr_resource.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx10ConstantBuffer.h"
+#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
 class ECORE_API R_constant_setup;
@@ -220,7 +220,7 @@ private:
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
 
 #if defined(USE_DX11)
-#include "../xrRenderDX11/dx10ConstantBuffer_impl.h"
+#include "../xrRenderDX11/dx11ConstantBuffer_impl.h"
 #endif
 
 #endif

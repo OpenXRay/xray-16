@@ -16,14 +16,12 @@
 #endif
 
 #if defined(USE_DX11) || defined(USE_OGL)
-#   include "Layers/xrRender/blenders/dx10MSAABlender.h"
-#   include "Layers/xrRender/blenders/dx10RainBlender.h"
+#   include "Layers/xrRender/blenders/dx11MSAABlender.h"
+#   include "Layers/xrRender/blenders/dx11RainBlender.h"
 
+#   include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
 #   if defined(USE_DX11)
-#       include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
 #       include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
-#   elif defined(USE_OGL)
-#       include "Layers/xrRender/blenders/dx10MinMaxSMBlender.h"
 #   endif
 #endif
 

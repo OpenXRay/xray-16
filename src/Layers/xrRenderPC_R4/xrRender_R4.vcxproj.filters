@@ -73,7 +73,7 @@
     <Filter Include="Refactored\Execution &amp; 3D\Shaders\Resources">
       <UniqueIdentifier>{d1696d81-2d5c-416b-9e06-ecadf76f897b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Refactored\Execution &amp; 3D\Shaders\Resources\dx10_R_shader">
+    <Filter Include="Refactored\Execution &amp; 3D\Shaders\Resources\dx11_R_shader">
       <UniqueIdentifier>{5037bbed-8608-488d-9ed8-9f8d9c5ab29d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Refactored\Execution &amp; 3D\Shaders\ShaderManager">
@@ -163,7 +163,7 @@
     <Filter Include="Interface implementations\MSAARender">
       <UniqueIdentifier>{763f97a9-f305-4cc2-995d-a1adad48351c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dx9 to dx10 Utils">
+    <Filter Include="dx9 to dx11 Utils">
       <UniqueIdentifier>{4c505c0d-891a-4fa4-a5e0-920bd864322e}</UniqueIdentifier>
     </Filter>
     <Filter Include="StateManager">
@@ -309,16 +309,16 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidBlenders.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.h">
       <Filter>Shading templates\3dFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\dx10RainBlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h">
       <Filter>Shading templates\DX11 Rain</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ModelPool.h">
       <Filter>Models</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidVolume.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FLOD.h">
@@ -363,7 +363,7 @@
     <ClInclude Include="..\xrRender\HWCaps.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\dx10R_Backend_Runtime.h">
+    <ClInclude Include="..\xrRenderDX11\dx11R_Backend_Runtime.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FVF.h">
@@ -396,10 +396,10 @@
     <ClInclude Include="CSCompiler.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\dx10ConstantBuffer.h">
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\dx10ConstantBuffer_impl.h">
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\r_constants.h">
@@ -423,11 +423,11 @@
     <ClInclude Include="..\xrRender\Shader.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\dx10r_constants_cache.h">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\dx10_R_shader</Filter>
+    <ClInclude Include="..\xrRenderDX11\dx11r_constants_cache.h">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\dx11_R_shader</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\r_constants_cache.h">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\dx10_R_shader</Filter>
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\dx11_R_shader</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ETextureParams.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
@@ -618,52 +618,52 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\dx10MSAABlender.h">
+    <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h">
       <Filter>Interface implementations\MSAARender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\dx10StateUtils.h">
-      <Filter>dx9 to dx10 Utils</Filter>
+    <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h">
+      <Filter>dx9 to dx11 Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\dx10TextureUtils.h">
-      <Filter>dx9 to dx10 Utils</Filter>
+    <ClInclude Include="..\xrRenderDX11\dx11TextureUtils.h">
+      <Filter>dx9 to dx11 Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx10SamplerStateCache.h">
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.h">
       <Filter>StateManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx10ShaderResourceStateCache.h">
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.h">
       <Filter>StateManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx10State.h">
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11State.h">
       <Filter>StateManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx10StateCache.h">
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCache.h">
       <Filter>StateManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx10StateCacheImpl.h">
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCacheImpl.h">
       <Filter>StateManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\StateManager\dx10StateManager.h">
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateManager.h">
       <Filter>StateManager</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\Utils\dxHashHelper.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidData.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidData.h">
       <Filter>3DFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidEmitters.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.h">
       <Filter>3DFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidGrid.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.h">
       <Filter>3DFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidManager.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.h">
       <Filter>3DFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidObstacles.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h">
       <Filter>3DFluid</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\3DFluid\dx103DFluidRenderer.h">
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h">
       <Filter>3DFluid</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
@@ -681,14 +681,14 @@
     <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX11\dx10HW.h">
+    <ClInclude Include="..\xrRenderDX11\dx11HW.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderDX11\CommonTypes.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\BufferUtils.h">
-      <Filter>dx9 to dx10 Utils</Filter>
+      <Filter>dx9 to dx11 Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FSkinnedTypes.h">
       <Filter>Models\Visuals</Filter>
@@ -734,7 +734,7 @@
     <ClCompile Include="xrRender_R4.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10Texture.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\PSLibrary.cpp">
@@ -779,7 +779,7 @@
     <ClCompile Include="..\xrRender\DetailModel.cpp">
       <Filter>Details</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10DetailManager_VS.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp">
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\NvTriStrip.cpp">
@@ -884,16 +884,16 @@
     <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidBlenders.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.cpp">
       <Filter>Shading templates\3dFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\dx10RainBlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx11RainBlender.cpp">
       <Filter>Shading templates\DX11 Rain</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ModelPool.cpp">
       <Filter>Models</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidVolume.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp">
       <Filter>Models\Visuals</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FLOD.cpp">
@@ -962,7 +962,7 @@
     <ClCompile Include="..\xrRender\ColorMapManager.cpp">
       <Filter>Core_Target\ColorMap</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10HW.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11HW.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\R_Backend.cpp">
@@ -995,16 +995,16 @@
     <ClCompile Include="CSCompiler.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10ConstantBuffer.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10r_constants.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10SH_RT.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11SH_RT.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10SH_Texture.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\r_constants.cpp">
@@ -1022,13 +1022,13 @@
     <ClCompile Include="..\xrRender\Shader.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10r_constants_cache.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\dx10_R_shader</Filter>
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\dx11_R_shader</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10ResourceManager_Resources.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10ResourceManager_Scripting.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Scripting.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ETextureParams.cpp">
@@ -1157,52 +1157,52 @@
     <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\blenders\dx10MSAABlender.cpp">
+    <ClCompile Include="..\xrRender\blenders\dx11MSAABlender.cpp">
       <Filter>Interface implementations\MSAARender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10BufferUtils.cpp">
-      <Filter>dx9 to dx10 Utils</Filter>
+    <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp">
+      <Filter>dx9 to dx11 Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10StateUtils.cpp">
-      <Filter>dx9 to dx10 Utils</Filter>
+    <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp">
+      <Filter>dx9 to dx11 Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10TextureUtils.cpp">
-      <Filter>dx9 to dx10 Utils</Filter>
+    <ClCompile Include="..\xrRenderDX11\dx11TextureUtils.cpp">
+      <Filter>dx9 to dx11 Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx10SamplerStateCache.cpp">
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx10ShaderResourceStateCache.cpp">
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx10State.cpp">
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx10StateCache.cpp">
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx10StateManager.cpp">
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\Utils\dxHashHelper.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidData.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidData.cpp">
       <Filter>3DFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidEmitters.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.cpp">
       <Filter>3DFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidGrid.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.cpp">
       <Filter>3DFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidManager.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.cpp">
       <Filter>3DFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidObstacles.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.cpp">
       <Filter>3DFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\3DFluid\dx103DFluidRenderer.cpp">
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp">
       <Filter>3DFluid</Filter>
     </ClCompile>
     <ClCompile Include="r4_shaders.cpp">
@@ -1211,7 +1211,7 @@
     <ClCompile Include="..\xrRender\D3DXRenderBase.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\dx10HWCaps.cpp">
+    <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp">
