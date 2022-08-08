@@ -157,12 +157,12 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->get_base_zb()); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->rt_Base_Depth); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->rt_Base_Depth); // Now RT is a distortion mask
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
