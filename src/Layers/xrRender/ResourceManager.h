@@ -13,7 +13,7 @@
 // refs
 struct lua_State;
 
-class dx10ConstantBuffer;
+class dx11ConstantBuffer;
 
 // defs
 class ECORE_API CResourceManager
@@ -35,7 +35,7 @@ public:
     using map_Matrix = xr_map<const char*, CMatrix*, str_pred>;
     using map_Constant = xr_map<const char*, CConstant*, str_pred>;
     using map_RT = xr_map<const char*, CRT*, str_pred>;
-    //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
+    //	DX11 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
 
 #if defined(USE_DX11) || defined(USE_OGL)
@@ -61,7 +61,7 @@ private:
     map_Matrix m_matrices;
     map_Constant m_constants;
     map_RT m_rtargets;
-    //	DX10 cut map_RTC												m_rtargets_c;
+    //	DX11 cut map_RTC												m_rtargets_c;
     map_VS m_vs;
     map_PS m_ps;
 
@@ -86,7 +86,7 @@ private:
     xr_vector<R_constant_table*> v_constant_tables;
 
 #if defined(USE_DX11)
-    xr_vector<dx10ConstantBuffer*> v_constant_buffer;
+    xr_vector<dx11ConstantBuffer*> v_constant_buffer;
     xr_vector<SInputSignature*> v_input_signature;
 #endif
 
@@ -152,8 +152,8 @@ public:
     void _DeleteConstantTable(const R_constant_table* C);
 
 #if defined(USE_DX11)
-    dx10ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
-    void _DeleteConstantBuffer(const dx10ConstantBuffer* pBuffer);
+    dx11ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
+    void _DeleteConstantBuffer(const dx11ConstantBuffer* pBuffer);
 
     SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);
     void _DeleteInputSignature(const SInputSignature* pSignature);
@@ -162,8 +162,8 @@ public:
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {});
     void _DeleteRT(const CRT* RT);
 
-//	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
-//	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
+//	DX11 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
+//	DX11 cut void							_DeleteRTC			(const CRTC*	RT	);
 
 #if defined(USE_OGL)
     SPP* _CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr ds);

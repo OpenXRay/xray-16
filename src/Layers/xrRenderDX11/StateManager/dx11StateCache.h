@@ -3,19 +3,19 @@
 #pragma once
 
 template <class IDeviceState, class StateDecs>
-class dx10StateCache
+class dx11StateCache
 {
     //	Public interface
 public:
-    dx10StateCache();
-    ~dx10StateCache();
+    dx11StateCache();
+    ~dx11StateCache();
 
     void ClearStateArray();
 
     IDeviceState* GetState(SimulatorStates& state_code);
     IDeviceState* GetState(StateDecs& desc);
     //	Can be called on device destruction only!
-    //	dx10State holds weak links on manager's states and
+    //	dx11State holds weak links on manager's states and
     //	won't understand that state was destroyed
     // void	FlushStates();
     //	Private functionality
@@ -38,9 +38,9 @@ private:
     xr_vector<StateRecord> m_StateArray;
 };
 
-extern dx10StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
-extern dx10StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
-extern dx10StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
+extern dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
+extern dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
+extern dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
 
 #include "dx11StateCacheImpl.h"
 

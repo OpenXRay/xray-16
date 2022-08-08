@@ -2,14 +2,14 @@
 #define dx113DFluidManager_included
 #pragma once
 
-class dx103DFluidData;
-class dx103DFluidGrid;
-class dx103DFluidObstacles;
-class dx103DFluidEmitters;
+class dx113DFluidData;
+class dx113DFluidGrid;
+class dx113DFluidObstacles;
+class dx113DFluidEmitters;
 
 #include "dx113DFluidRenderer.h"
 
-class dx103DFluidManager
+class dx113DFluidManager
 {
 public:
     enum RENDER_TARGET
@@ -28,8 +28,8 @@ public:
     };
 
 public:
-    dx103DFluidManager();
-    ~dx103DFluidManager();
+    dx113DFluidManager();
+    ~dx113DFluidManager();
 
     //		Manager setup
     void Initialize(int width, int height, int depth);
@@ -41,8 +41,8 @@ public:
     }
 
     //		Interface for fluid volume
-    void Update(dx103DFluidData& FluidData, float timestep);
-    void RenderFluid(dx103DFluidData& FluidData);
+    void Update(dx113DFluidData& FluidData, float timestep);
+    void RenderFluid(dx113DFluidData& FluidData);
 
     //		Interface for blenders
     int GetTextureWidth() const { return m_iTextureWidth; }
@@ -55,8 +55,8 @@ public:
 
 #ifndef MASTER_GOLD
     // Allow real-time config reload
-    void RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName);
-    void DeregisterFluidData(dx103DFluidData* pData);
+    void RegisterFluidData(dx113DFluidData* pData, const xr_string& SectionName);
+    void DeregisterFluidData(dx113DFluidData* pData);
     void UpdateProfiles();
 #endif
 
@@ -92,19 +92,19 @@ private:
     void Reset();
 
     //		Simlulation data initialisation
-    void AttachFluidData(dx103DFluidData& FluidData);
-    void DetachAndSwapFluidData(dx103DFluidData& FluidData);
+    void AttachFluidData(dx113DFluidData& FluidData);
+    void DetachAndSwapFluidData(dx113DFluidData& FluidData);
 
     //	Simulation code
     void AdvectColorBFECC(float timestep, bool bTeperature);
     void AdvectColor(float timestep, bool bTeperature);
     void AdvectVelocity(float timestep, float fGravity);
     void ApplyVorticityConfinement(float timestep);
-    void ApplyExternalForces(const dx103DFluidData& FluidData, float timestep);
+    void ApplyExternalForces(const dx113DFluidData& FluidData, float timestep);
     void ComputeVelocityDivergence(float timestep);
     void ComputePressure(float timestep);
     void ProjectVelocity(float timestep);
-    void UpdateObstacles(const dx103DFluidData& FluidData, float timestep);
+    void UpdateObstacles(const dx113DFluidData& FluidData, float timestep);
 
 private:
     bool m_bInited;
@@ -118,10 +118,10 @@ private:
     ref_selement m_SimulationTechnique[SS_NumShaders];
 
     //
-    dx103DFluidGrid* m_pGrid;
-    dx103DFluidRenderer* m_pRenderer;
-    dx103DFluidObstacles* m_pObstaclesHandler;
-    dx103DFluidEmitters* m_pEmittersHandler;
+    dx113DFluidGrid* m_pGrid;
+    dx113DFluidRenderer* m_pRenderer;
+    dx113DFluidObstacles* m_pObstaclesHandler;
+    dx113DFluidEmitters* m_pEmittersHandler;
 
     //	Simulation options
     int m_nIterations;
@@ -140,10 +140,10 @@ private:
 #ifndef MASTER_GOLD
     // Allow real-time config reload
     xr_vector<xr_string> m_lstSectionNames;
-    xr_vector<dx103DFluidData*> m_lstFluidData;
+    xr_vector<dx113DFluidData*> m_lstFluidData;
 #endif
 };
 
-extern dx103DFluidManager FluidManager;
+extern dx113DFluidManager FluidManager;
 
 #endif //	dx113DFluidManager_included

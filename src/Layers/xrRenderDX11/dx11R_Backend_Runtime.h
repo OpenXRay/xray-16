@@ -8,7 +8,7 @@
 IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
     stat.xforms++;
-    //  TODO: DX10: Implement CBackend::set_xform
+    //  TODO: DX11: Implement CBackend::set_xform
     // VERIFY(!"Implement CBackend::set_xform");
 }
 
@@ -132,7 +132,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
     if (gs != _gs)
     {
         PGO(Msg("PGO:Gshader:%x", _ps));
-        //  TODO: DX10: Get statistics for G Shader change
+        //  TODO: DX11: Get statistics for G Shader change
         // stat.gs          ++;
         gs = _gs;
 #ifdef USE_DX11
@@ -153,7 +153,7 @@ ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
     if (hs != _hs)
     {
         PGO(Msg("PGO:Hshader:%x", _ps));
-        //  TODO: DX10: Get statistics for H Shader change
+        //  TODO: DX11: Get statistics for H Shader change
         // stat.hs          ++;
         hs = _hs;
         HW.pContext->HSSetShader(hs, 0, 0);
@@ -169,7 +169,7 @@ ICF void CBackend::set_DS(ID3D11DomainShader* _ds, LPCSTR _n)
     if (ds != _ds)
     {
         PGO(Msg("PGO:Dshader:%x", _ps));
-        //  TODO: DX10: Get statistics for D Shader change
+        //  TODO: DX11: Get statistics for D Shader change
         // stat.ds          ++;
         ds = _ds;
         HW.pContext->DSSetShader(ds, 0, 0);
@@ -185,7 +185,7 @@ ICF void CBackend::set_CS(ID3D11ComputeShader* _cs, LPCSTR _n)
     if (cs != _cs)
     {
         PGO(Msg("PGO:Cshader:%x", _ps));
-        //  TODO: DX10: Get statistics for D Shader change
+        //  TODO: DX11: Get statistics for D Shader change
         // stat.cs          ++;
         cs = _cs;
         HW.pContext->CSSetShader(cs, 0, 0);
@@ -368,7 +368,7 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
 
 IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
 {
-    //  TODO: DX10: Remove triangle fan usage from the engine
+    //  TODO: DX11: Remove triangle fan usage from the engine
     if (T == D3DPT_TRIANGLEFAN)
         return;
 
@@ -480,7 +480,7 @@ IC void CBackend::set_ZFunc(u32 _func)
 
 IC void CBackend::set_AlphaRef(u32 _value)
 {
-    //  TODO: DX10: Implement rasterizer state update to support alpha ref
+    //  TODO: DX11: Implement rasterizer state update to support alpha ref
     VERIFY(!"Not implemented.");
     // if (alpha_ref != _value)
     //{
@@ -525,7 +525,7 @@ IC void CBackend::ApplyVertexLayout()
     {
         ID3DInputLayout* pLayout;
 
-        CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx10_dcl_code[0], decl->dx10_dcl_code.size() - 1,
+        CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx11_dcl_code[0], decl->dx11_dcl_code.size() - 1,
             m_pInputSignature->GetBufferPointer(), m_pInputSignature->GetBufferSize(), &pLayout));
 
         it = decl->vs_to_layout.insert(std::pair<ID3DBlob*, ID3DInputLayout*>(m_pInputSignature, pLayout)).first;

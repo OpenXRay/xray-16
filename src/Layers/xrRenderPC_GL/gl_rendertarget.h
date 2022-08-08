@@ -126,7 +126,7 @@ private:
     //	generate min/max
     ref_shader s_create_minmax_sm;
 
-    //	DX10 Rain
+    //	DX11 Rain
     ref_shader s_rain;
 
     ref_shader s_rain_msaa[8]; // up to 8 shaders for DX10.0 support

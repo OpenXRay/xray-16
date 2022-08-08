@@ -259,7 +259,7 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
     auto zb = RImplementation.Target->get_base_zb();
 
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
         zb = RImplementation.Target->rt_MSAADepth->pZRT;
 #endif
 

@@ -82,36 +82,36 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     if (used_as_depth())
         usage = D3DUSAGE_DEPTHSTENCIL;
 
-    DXGI_FORMAT dx10FMT;
+    DXGI_FORMAT dx11FMT;
 
     switch (fmt)
     {
     case D3DFMT_D32S8X24:
-        dx10FMT = DXGI_FORMAT_R32G8X24_TYPELESS;
+        dx11FMT = DXGI_FORMAT_R32G8X24_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
 
     case D3DFMT_D24S8:
-        dx10FMT = DXGI_FORMAT_R24G8_TYPELESS;
+        dx11FMT = DXGI_FORMAT_R24G8_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
 
     case D3DFMT_D32F_LOCKABLE:
-        dx10FMT = DXGI_FORMAT_R32_TYPELESS;
+        dx11FMT = DXGI_FORMAT_R32_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
 
     case D3DFMT_D16_LOCKABLE:
-        dx10FMT = DXGI_FORMAT_R16_TYPELESS;
+        dx11FMT = DXGI_FORMAT_R16_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
 
     default:
-        dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
+        dx11FMT = dx11TextureUtils::ConvertTextureFormat(fmt);
         break;
     }
     if (createBaseTarget) // just override
-        dx10FMT = dx10TextureUtils::ConvertTextureFormat(fmt);
+        dx11FMT = dx11TextureUtils::ConvertTextureFormat(fmt);
 
     const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
 
@@ -123,7 +123,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     else
         required |= D3D_FORMAT_SUPPORT_RENDER_TARGET;
 
-    if (!HW.CheckFormatSupport(dx10FMT, required))
+    if (!HW.CheckFormatSupport(dx11FMT, required))
         return;
 
     // Try to create texture/surface
@@ -141,7 +141,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         desc.Height = dwHeight;
         desc.MipLevels = 1;
         desc.ArraySize = 1;
-        desc.Format = dx10FMT;
+        desc.Format = dx11FMT;
         desc.SampleDesc.Count = SampleCount;
         desc.Usage = D3D_USAGE_DEFAULT;
         if (SampleCount <= 1)
@@ -149,7 +149,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         else
         {
             desc.BindFlags = (useAsDepth ? D3D_BIND_DEPTH_STENCIL : (initialBindFlag | D3D_BIND_RENDER_TARGET));
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
             {
                 desc.SampleDesc.Quality = u32(D3D_STANDARD_MULTISAMPLE_PATTERN);
             }
@@ -168,9 +168,9 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 #endif
 
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));
-        // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT)); // TODO: DX10: check if texture is created?
+        // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT)); // TODO: DX11: check if texture is created?
 #ifdef DEBUG
-        Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, dx10FMT, SampleCount);
+        Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, dx11FMT, SampleCount);
 #endif // DEBUG
     }
     HW.stats_manager.increment_stats_rtarget(pSurface);
@@ -226,7 +226,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     {
         D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
         ZeroMemory(&UAVDesc, sizeof(D3D11_UNORDERED_ACCESS_VIEW_DESC));
-        UAVDesc.Format = dx10FMT;
+        UAVDesc.Format = dx11FMT;
         UAVDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
         UAVDesc.Buffer.FirstElement = 0;
         UAVDesc.Buffer.NumElements = dwWidth * dwHeight;
@@ -269,7 +269,7 @@ void CRT::resolve_into(CRT& destination) const
 {
     VERIFY(fmt == destination.fmt); // only RTs with same format supported
     HW.pContext->ResolveSubresource(destination.pTexture->surface_get(), 0,
-        pTexture->surface_get(), 0, dx10TextureUtils::ConvertTextureFormat(fmt));
+        pTexture->surface_get(), 0, dx11TextureUtils::ConvertTextureFormat(fmt));
 }
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= 0*/)
@@ -278,7 +278,7 @@ void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCo
 }
 
 //////////////////////////////////////////////////////////////////////////
-/*	DX10 cut
+/*	DX11 cut
 CRTC::CRTC			()
 {
     if (pSurface)	return;
@@ -320,7 +320,7 @@ void CRTC::create	(LPCSTR Name, u32 size,	D3DFORMAT f)
     // Check width-and-height of render target surface
     if (size>D3Dxx_REQ_TEXTURECUBE_DIMENSION)		return;
 
-    //	TODO: DX10: Validate cube texture format
+    //	TODO: DX11: Validate cube texture format
     // Validate render-target usage
     //_hr = HW.pD3D->CheckDeviceFormat(
     //	HW.DevAdapter,

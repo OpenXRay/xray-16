@@ -6,25 +6,25 @@ class SimulatorStates;
 
 #include "dx11SamplerStateCache.h"
 
-class dx10State
+class dx11State
 {
     //	Public interface
 public:
-    dx10State(); //	These have to be private bu new/xr_delete don't support this
-    ~dx10State();
+    dx11State(); //	These have to be private bu new/xr_delete don't support this
+    ~dx11State();
 
-    static dx10State* Create(SimulatorStates& state_code);
+    static dx11State* Create(SimulatorStates& state_code);
 
     //	DX9 unified interface
     HRESULT Apply();
     void Release();
 
-    //	DX10 specific
+    //	DX11 specific
     void UpdateStencilRef(u32 Ref) { m_uiStencilRef = Ref; }
     void UpdateAlphaRef(u32 Ref) { m_uiAlphaRef = Ref; }
     //	User restricted interface
 private:
-    typedef dx10SamplerStateCache::HArray tSamplerHArray;
+    typedef dx11SamplerStateCache::HArray tSamplerHArray;
 
 private:
     static void InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& state_code, int iBaseSamplerIndex);

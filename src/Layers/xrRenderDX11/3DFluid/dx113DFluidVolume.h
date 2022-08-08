@@ -5,11 +5,11 @@
 #include "dx113DFluidData.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
-class dx103DFluidVolume : public dxRender_Visual
+class dx113DFluidVolume : public dxRender_Visual
 {
 public:
-    dx103DFluidVolume();
-    virtual ~dx103DFluidVolume();
+    dx113DFluidVolume();
+    virtual ~dx113DFluidVolume();
 
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Render(float LOD); // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
@@ -20,7 +20,7 @@ private:
     //	For debug purpose only
     ref_geom m_Geom;
 
-    dx103DFluidData m_FluidData;
+    dx113DFluidData m_FluidData;
 };
 
 #endif //	dx113DFluidVolume_included

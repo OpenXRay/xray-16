@@ -12,7 +12,7 @@ shared_str strImpulseCenter("center");
 shared_str strSplatColor("splatColor");
 }
 
-dx103DFluidEmitters::dx103DFluidEmitters(int gridWidth, int gridHeight, int gridDepth, dx103DFluidGrid* pGrid)
+dx113DFluidEmitters::dx113DFluidEmitters(int gridWidth, int gridHeight, int gridDepth, dx113DFluidGrid* pGrid)
     : m_pGrid(pGrid)
 {
     m_vGridDim[0] = float(gridWidth);
@@ -22,14 +22,14 @@ dx103DFluidEmitters::dx103DFluidEmitters(int gridWidth, int gridHeight, int grid
     InitShaders();
 }
 
-dx103DFluidEmitters::~dx103DFluidEmitters()
+dx113DFluidEmitters::~dx113DFluidEmitters()
 {
     DestroyShaders();
 
     m_pGrid = 0;
 }
 
-void dx103DFluidEmitters::InitShaders()
+void dx113DFluidEmitters::InitShaders()
 {
     {
         CBlender_fluid_emitter Blender;
@@ -40,7 +40,7 @@ void dx103DFluidEmitters::InitShaders()
     }
 }
 
-void dx103DFluidEmitters::DestroyShaders()
+void dx113DFluidEmitters::DestroyShaders()
 {
     for (int i = 0; i < ET_EmittersTypeNum; ++i)
     {
@@ -49,7 +49,7 @@ void dx103DFluidEmitters::DestroyShaders()
     }
 }
 
-void dx103DFluidEmitters::RenderDensity(const dx103DFluidData& FluidData)
+void dx113DFluidEmitters::RenderDensity(const dx113DFluidData& FluidData)
 {
     const xr_vector<CEmitter>& Emitters = FluidData.GetEmittersList();
     u32 iNumEmitters = Emitters.size();
@@ -62,7 +62,7 @@ void dx103DFluidEmitters::RenderDensity(const dx103DFluidData& FluidData)
     }
 }
 
-void dx103DFluidEmitters::RenderVelocity(const dx103DFluidData& FluidData)
+void dx113DFluidEmitters::RenderVelocity(const dx113DFluidData& FluidData)
 {
     const xr_vector<CEmitter>& Emitters = FluidData.GetEmittersList();
     u32 iNumEmitters = Emitters.size();
@@ -75,7 +75,7 @@ void dx103DFluidEmitters::RenderVelocity(const dx103DFluidData& FluidData)
     }
 }
 
-void dx103DFluidEmitters::ApplyDensity(const CEmitter& Emitter)
+void dx113DFluidEmitters::ApplyDensity(const CEmitter& Emitter)
 {
     // Draw gaussian ball of color
     RCache.set_Element(m_EmitterTechnique[ET_SimpleGausian]);
@@ -114,9 +114,9 @@ void dx103DFluidEmitters::ApplyDensity(const CEmitter& Emitter)
     m_pGrid->DrawSlices();
 }
 
-//  TODO: DX10: Remove this hack
+//  TODO: DX11: Remove this hack
 static float lilrand() { return (rand() / float(RAND_MAX) - 0.5f) * 5.0f; }
-void dx103DFluidEmitters::ApplyVelocity(const CEmitter& Emitter)
+void dx113DFluidEmitters::ApplyVelocity(const CEmitter& Emitter)
 {
     // Draw gaussian ball of velocity
     RCache.set_Element(m_EmitterTechnique[ET_SimpleGausian]);

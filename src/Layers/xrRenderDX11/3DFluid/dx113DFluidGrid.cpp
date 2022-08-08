@@ -32,13 +32,13 @@ inline void ComputeRowColsForFlat3DTexture(int depth, int* outCols, int* outRows
 #define VERTICES_PER_LINE 2
 #define LINES_PER_SLICE 4
 
-dx103DFluidGrid::dx103DFluidGrid() {}
-dx103DFluidGrid::~dx103DFluidGrid()
+dx113DFluidGrid::dx113DFluidGrid() {}
+dx113DFluidGrid::~dx113DFluidGrid()
 {
     DestroyVertexBuffers();
 }
 
-void dx103DFluidGrid::Initialize(int gridWidth, int gridHeight, int gridDepth)
+void dx113DFluidGrid::Initialize(int gridWidth, int gridHeight, int gridDepth)
 {
     m_vDim[0] = gridWidth;
     m_vDim[1] = gridHeight;
@@ -51,7 +51,7 @@ void dx103DFluidGrid::Initialize(int gridWidth, int gridHeight, int gridDepth)
     CreateVertexBuffers();
 }
 
-void dx103DFluidGrid::CreateVertexBuffers()
+void dx113DFluidGrid::CreateVertexBuffers()
 {
     // Create layout
     // D3Dxx_INPUT_ELEMENT_DESC layoutDesc[] =
@@ -135,7 +135,7 @@ void dx103DFluidGrid::CreateVertexBuffers()
     m_GeomBoundaryLines.create(layoutDesc, m_pBoundaryLinesBuffer, 0);
 }
 
-void dx103DFluidGrid::DestroyVertexBuffers()
+void dx113DFluidGrid::DestroyVertexBuffers()
 {
     m_pRenderQuadBuffer.Release();
     m_pSlicesBuffer.Release();
@@ -143,7 +143,7 @@ void dx103DFluidGrid::DestroyVertexBuffers()
     m_pBoundaryLinesBuffer.Release();
 }
 
-void dx103DFluidGrid::InitScreenSlice(VS_INPUT_FLUIDSIM_STRUCT** vertices, int z, int& index)
+void dx113DFluidGrid::InitScreenSlice(VS_INPUT_FLUIDSIM_STRUCT** vertices, int z, int& index)
 {
 
     // compute the offset (px, py) in the "flat 3D-texture" space for the slice with given 'z' coordinate
@@ -187,7 +187,7 @@ void dx103DFluidGrid::InitScreenSlice(VS_INPUT_FLUIDSIM_STRUCT** vertices, int z
     (*vertices)[index++] = tempVertex4;
 }
 
-void dx103DFluidGrid::InitSlice(int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
+void dx113DFluidGrid::InitSlice(int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
 {
     const int w = m_vDim[0];
     const int h = m_vDim[1];
@@ -221,7 +221,7 @@ void dx103DFluidGrid::InitSlice(int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int&
     (*vertices)[index++] = tempVertex4;
 }
 
-void dx103DFluidGrid::InitLine(
+void dx113DFluidGrid::InitLine(
     float x1, float y1, float x2, float y2, int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
 {
     int w = m_vDim[0];
@@ -240,13 +240,13 @@ void dx103DFluidGrid::InitLine(
     };
 }
 
-void dx103DFluidGrid::InitBoundaryQuads(VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
+void dx113DFluidGrid::InitBoundaryQuads(VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
 {
     InitSlice(0, vertices, index);
     InitSlice(m_vDim[2] - 1, vertices, index);
 }
 
-void dx103DFluidGrid::InitBoundaryLines(VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
+void dx113DFluidGrid::InitBoundaryLines(VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index)
 {
     int w = m_vDim[0];
     int h = m_vDim[1];
@@ -264,7 +264,7 @@ void dx103DFluidGrid::InitBoundaryLines(VS_INPUT_FLUIDSIM_STRUCT** vertices, int
     }
 }
 
-void dx103DFluidGrid::DrawSlices(void)
+void dx113DFluidGrid::DrawSlices(void)
 {
     // UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
     // UINT offset[1] = { 0 };
@@ -275,7 +275,7 @@ void dx103DFluidGrid::DrawSlices(void)
     RCache.Render(D3DPT_TRIANGLELIST, 0, m_iNumVerticesSlices / 3);
 }
 
-void dx103DFluidGrid::DrawSlicesToScreen(void)
+void dx113DFluidGrid::DrawSlicesToScreen(void)
 {
     // UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
     // UINT offset[1] = { 0 };
@@ -286,7 +286,7 @@ void dx103DFluidGrid::DrawSlicesToScreen(void)
     RCache.Render(D3DPT_TRIANGLELIST, 0, m_iNumVerticesRenderQuad / 3);
 }
 
-void dx103DFluidGrid::DrawBoundaryQuads(void)
+void dx113DFluidGrid::DrawBoundaryQuads(void)
 {
     // UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
     // UINT offset[1] = { 0 };
@@ -297,7 +297,7 @@ void dx103DFluidGrid::DrawBoundaryQuads(void)
     RCache.Render(D3DPT_TRIANGLELIST, 0, m_iNumVerticesBoundarySlices / 3);
 }
 
-void dx103DFluidGrid::DrawBoundaryLines(void)
+void dx113DFluidGrid::DrawBoundaryLines(void)
 {
     //	UINT stride[1] = { sizeof(VS_INPUT_FLUIDSIM_STRUCT) };
     //	UINT offset[1] = { 0 };

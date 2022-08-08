@@ -11,10 +11,10 @@ void CBlender_msaa::Compile(CBlender_Compile& C)
         C.r_Pass("stub_notransform_2uv", "mark_msaa_edges", false, FALSE, FALSE, FALSE);
         C.PassSET_ZB(FALSE, FALSE, FALSE);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
 
-        C.r_dx10Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_nofilter");
 
         C.r_End();
 

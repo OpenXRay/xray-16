@@ -1,8 +1,8 @@
-#ifndef dx10SamplerStateCache_included
-#define dx10SamplerStateCache_included
+#ifndef dx11SamplerStateCache_included
+#define dx11SamplerStateCache_included
 #pragma once
 
-class dx10SamplerStateCache
+class dx11SamplerStateCache
 {
 public:
     enum
@@ -15,8 +15,8 @@ public:
     typedef xr_vector<SHandle> HArray;
 
 public:
-    dx10SamplerStateCache();
-    ~dx10SamplerStateCache();
+    dx11SamplerStateCache();
+    ~dx11SamplerStateCache();
 
     void ClearStateArray();
 
@@ -59,6 +59,6 @@ private:
     float m_uiMipLODBias;
 };
 
-extern dx10SamplerStateCache SSManager;
+extern dx11SamplerStateCache SSManager;
 
-#endif //	dx10SamplerStateCache_included
+#endif //	dx11SamplerStateCache_included

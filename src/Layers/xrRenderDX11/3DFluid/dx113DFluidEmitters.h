@@ -1,11 +1,11 @@
-#ifndef dx103DFluidEmitters_included
-#define dx103DFluidEmitters_included
+#ifndef dx113DFluidEmitters_included
+#define dx113DFluidEmitters_included
 #pragma once
 
-class dx103DFluidGrid;
-class dx103DFluidData;
+class dx113DFluidGrid;
+class dx113DFluidData;
 
-class dx103DFluidEmitters
+class dx113DFluidEmitters
 {
 public:
     enum EmitterType
@@ -47,11 +47,11 @@ public:
     };
 
 public:
-    dx103DFluidEmitters(int gridWidth, int gridHeight, int gridDepth, dx103DFluidGrid* pGrid);
-    ~dx103DFluidEmitters();
+    dx113DFluidEmitters(int gridWidth, int gridHeight, int gridDepth, dx113DFluidGrid* pGrid);
+    ~dx113DFluidEmitters();
 
-    void RenderDensity(const dx103DFluidData& FluidData);
-    void RenderVelocity(const dx103DFluidData& FluidData);
+    void RenderDensity(const dx113DFluidData& FluidData);
+    void RenderVelocity(const dx113DFluidData& FluidData);
 
 private:
     void InitShaders();
@@ -65,7 +65,7 @@ private:
 
     ref_selement m_EmitterTechnique[ET_EmittersTypeNum];
 
-    dx103DFluidGrid* m_pGrid;
+    dx113DFluidGrid* m_pGrid;
 };
 
-#endif //	dx103DFluidEmitters_included
+#endif //	dx113DFluidEmitters_included

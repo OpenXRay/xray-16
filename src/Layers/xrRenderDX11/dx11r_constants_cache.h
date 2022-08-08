@@ -143,31 +143,31 @@ private:
     template<BufferType BType, typename... Args>
     void set(R_constant* C, R_constant_load& L, Args&&... args)
     {
-        dx10ConstantBuffer& Buffer = GetCBuffer<BType>(C);
+        dx11ConstantBuffer& Buffer = GetCBuffer<BType>(C);
         Buffer.set(C, L, std::forward<Args>(args)...);
     }
 
     template<BufferType BType, typename... Args>
     void seta(R_constant* C, R_constant_load& L, u32 e, Args&&... args)
     {
-        dx10ConstantBuffer& Buffer = GetCBuffer<BType>(C);
+        dx11ConstantBuffer& Buffer = GetCBuffer<BType>(C);
         Buffer.seta(C, L, e, std::forward<Args>(args)...);
     }
 
     template<BufferType BType>
     void access_direct(R_constant* C, R_constant_load& L, void** ppData, size_t DataSize) const
     {
-        dx10ConstantBuffer& Buffer = GetCBuffer<BType>(C);
+        dx11ConstantBuffer& Buffer = GetCBuffer<BType>(C);
         *ppData = Buffer.AccessDirect(L, DataSize);
     }
 
     template<BufferType BType>
-    dx10ConstantBuffer& GetCBuffer(R_constant* C) const = delete; // no implicit specialization
+    dx11ConstantBuffer& GetCBuffer(R_constant* C) const = delete; // no implicit specialization
 };
 
-template<> dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_PixelBuffer>(R_constant* C) const;
-template<> dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_VertexBuffer>(R_constant* C) const;
-template<> dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_GeometryBuffer>(R_constant* C) const;
-template<> dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_ComputeBuffer>(R_constant* C) const;
-template<> dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_HullBuffer>(R_constant* C) const;
-template<> dx10ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_DomainBuffer>(R_constant* C) const;
+template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_PixelBuffer>(R_constant* C) const;
+template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_VertexBuffer>(R_constant* C) const;
+template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_GeometryBuffer>(R_constant* C) const;
+template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_ComputeBuffer>(R_constant* C) const;
+template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_HullBuffer>(R_constant* C) const;
+template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_DomainBuffer>(R_constant* C) const;

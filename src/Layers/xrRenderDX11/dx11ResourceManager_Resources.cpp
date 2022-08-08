@@ -176,7 +176,7 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
     //	Don't need it for DirectX 10 here
     // CHK_DX					(HW.pDevice->CreateVertexDeclaration(dcl,&D->dcl));
     D->dcl_code.assign(dcl, dcl + dcl_size);
-    ConvertVertexDeclaration(D->dcl_code, D->dx10_dcl_code);
+    ConvertVertexDeclaration(D->dcl_code, D->dx11_dcl_code);
     D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return D;
@@ -217,12 +217,12 @@ SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndex
 }
 
 //--------------------------------------------------------------------------------------------------------------
-dx10ConstantBuffer* CResourceManager::_CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable)
+dx11ConstantBuffer* CResourceManager::_CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable)
 {
     VERIFY(pTable);
-    dx10ConstantBuffer* pTempBuffer = xr_new<dx10ConstantBuffer>(pTable);
+    dx11ConstantBuffer* pTempBuffer = xr_new<dx11ConstantBuffer>(pTable);
 
-    for (dx10ConstantBuffer* buf : v_constant_buffer)
+    for (dx11ConstantBuffer* buf : v_constant_buffer)
     {
         if (pTempBuffer->Similar(*buf))
         {
@@ -236,7 +236,7 @@ dx10ConstantBuffer* CResourceManager::_CreateConstantBuffer(ID3DShaderReflection
     return pTempBuffer;
 }
 
-void CResourceManager::_DeleteConstantBuffer(const dx10ConstantBuffer* pBuffer)
+void CResourceManager::_DeleteConstantBuffer(const dx11ConstantBuffer* pBuffer)
 {
     if (0 == (pBuffer->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;

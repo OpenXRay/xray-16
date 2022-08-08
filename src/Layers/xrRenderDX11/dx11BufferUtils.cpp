@@ -54,7 +54,7 @@ static inline HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 d
 
 namespace BufferUtils
 {
-// TODO: replace by streaming buffer instance in `dx10ConstantBuffer`
+// TODO: replace by streaming buffer instance in `dx11ConstantBuffer`
 HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize)
 {
     return ::CreateConstantBuffer(ppBuffer, DataSize);
@@ -64,7 +64,7 @@ HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize)
 struct VertexFormatPairs
 {
     D3DDECLTYPE m_dx9FMT;
-    DXGI_FORMAT m_dx10FMT;
+    DXGI_FORMAT m_dx11FMT;
 };
 
 VertexFormatPairs VertexFormatList[] = {{D3DDECLTYPE_FLOAT1, DXGI_FORMAT_R32_FLOAT},
@@ -95,17 +95,17 @@ DXGI_FORMAT ConvertVertexFormat(D3DDECLTYPE dx9FMT)
     for (size_t i = 0; i < arrayLength; ++i)
     {
         if (VertexFormatList[i].m_dx9FMT == dx9FMT)
-            return VertexFormatList[i].m_dx10FMT;
+            return VertexFormatList[i].m_dx11FMT;
     }
 
-    VERIFY(!"ConvertVertexFormat didn't find appropriate dx10 vertex format!");
+    VERIFY(!"ConvertVertexFormat didn't find appropriate dx11 vertex format!");
     return DXGI_FORMAT_UNKNOWN;
 }
 
 struct VertexSemanticPairs
 {
     D3DDECLUSAGE m_dx9Semantic;
-    LPCSTR m_dx10Semantic;
+    LPCSTR m_dx11Semantic;
 };
 
 VertexSemanticPairs VertexSemanticList[] = {
@@ -131,10 +131,10 @@ LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
     for (size_t i = 0; i < arrayLength; ++i)
     {
         if (VertexSemanticList[i].m_dx9Semantic == Semantic)
-            return VertexSemanticList[i].m_dx10Semantic;
+            return VertexSemanticList[i].m_dx11Semantic;
     }
 
-    VERIFY(!"ConvertSemantic didn't find appropriate dx10 input semantic!");
+    VERIFY(!"ConvertSemantic didn't find appropriate dx11 input semantic!");
     return 0;
 }
 

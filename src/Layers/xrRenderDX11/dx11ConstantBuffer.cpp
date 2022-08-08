@@ -3,7 +3,7 @@
 
 #include "Layers/xrRender/BufferUtils.h"
 
-dx10ConstantBuffer::~dx10ConstantBuffer()
+dx11ConstantBuffer::~dx11ConstantBuffer()
 {
     RImplementation.Resources->_DeleteConstantBuffer(this);
     //	Flush();
@@ -11,7 +11,7 @@ dx10ConstantBuffer::~dx10ConstantBuffer()
     xr_free(m_pBufferData);
 }
 
-dx10ConstantBuffer::dx10ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable) : m_bChanged(true)
+dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable) : m_bChanged(true)
 {
     D3D_SHADER_BUFFER_DESC Desc;
 
@@ -49,7 +49,7 @@ dx10ConstantBuffer::dx10ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
     VERIFY(m_pBufferData);
 }
 
-bool dx10ConstantBuffer::Similar(dx10ConstantBuffer& _in)
+bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
 {
     if (m_strBufferName._get() != _in.m_strBufferName._get())
         return false;
@@ -78,7 +78,7 @@ bool dx10ConstantBuffer::Similar(dx10ConstantBuffer& _in)
     return true;
 }
 
-void dx10ConstantBuffer::Flush()
+void dx11ConstantBuffer::Flush()
 {
     if (m_bChanged)
     {

@@ -1,11 +1,11 @@
-#ifndef dx10ShaderResourceStateCache_included
-#define dx10ShaderResourceStateCache_included
+#ifndef dx11ShaderResourceStateCache_included
+#define dx11ShaderResourceStateCache_included
 #pragma once
 
-class dx10ShaderResourceStateCache
+class dx11ShaderResourceStateCache
 {
 public:
-    dx10ShaderResourceStateCache();
+    dx11ShaderResourceStateCache();
 
     void ResetDeviceState();
 
@@ -60,6 +60,6 @@ private:
 #endif
 };
 
-extern dx10ShaderResourceStateCache SRVSManager;
+extern dx11ShaderResourceStateCache SRVSManager;
 
-#endif //	dx10ShaderResourceStateCache_included
+#endif //	dx11ShaderResourceStateCache_included

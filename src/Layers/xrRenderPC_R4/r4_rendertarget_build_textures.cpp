@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include <D3DX10Tex.h>
+#include <D3DX11Tex.h>
 
 static void generate_jitter(u32* dest, u32 elem_count)
 {
@@ -291,7 +291,7 @@ void CRenderTarget::build_textures()
 
             HW.pContext->CopySubresourceRegion(t_noise_surf_mipped, 0, 0, 0, 0, t_noise_surf[0], 0, 0);
 
-            D3DX11FilterTexture(HW.pContext, t_noise_surf_mipped, 0, D3DX10_FILTER_POINT);
+            D3DX11FilterTexture(HW.pContext, t_noise_surf_mipped, 0, D3DX11_FILTER_POINT);
         }
     }
 }

@@ -225,7 +225,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             "Please try to restart the game.");
         xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     }
-    Caps.fDepth = dx10TextureUtils::ConvertTextureFormat(selectedFormat);
+    Caps.fDepth = dx11TextureUtils::ConvertTextureFormat(selectedFormat);
 
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
@@ -241,7 +241,7 @@ void CHW::CreateSwapChain(HWND hwnd)
     sd.BufferDesc.Width = Device.dwWidth;
     sd.BufferDesc.Height = Device.dwHeight;
 
-    //  TODO: DX10: implement dynamic format selection
+    //  TODO: DX11: implement dynamic format selection
     constexpr DXGI_FORMAT formats[] =
     {
         //DXGI_FORMAT_R16G16B16A16_FLOAT, // Do we even need this?
@@ -251,7 +251,7 @@ void CHW::CreateSwapChain(HWND hwnd)
 
     // Select back-buffer format
     sd.BufferDesc.Format = SelectFormat(D3D_FORMAT_SUPPORT_DISPLAY, formats);
-    Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(sd.BufferDesc.Format);
+    Caps.fTarget = dx11TextureUtils::ConvertTextureFormat(sd.BufferDesc.Format);
 
     // Buffering
     BackBufferCount = 1;
@@ -308,7 +308,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 
     // Select back-buffer format
     desc.Format = SelectFormat(D3D11_FORMAT_SUPPORT_DISPLAY, formats);
-    Caps.fTarget = dx10TextureUtils::ConvertTextureFormat(desc.Format);
+    Caps.fTarget = dx11TextureUtils::ConvertTextureFormat(desc.Format);
 
     // Buffering
     BackBufferCount = 1; // For DXGI_SWAP_EFFECT_FLIP_DISCARD we need at least two
@@ -470,7 +470,7 @@ void CHW::EndScene() { }
 void CHW::Present()
 {
     const bool bUseVSync = psDeviceMode.WindowStyle == rsFullscreen &&
-        psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
+        psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX11
     m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
 #ifdef HAS_DX11_2
     if (m_pSwapChain2 && UsingFlipPresentationModel())

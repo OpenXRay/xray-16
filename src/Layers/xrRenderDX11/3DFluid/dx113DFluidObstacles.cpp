@@ -58,7 +58,7 @@ Fvector4 UnitClipPlanes[] = {
 };
 }
 
-dx103DFluidObstacles::dx103DFluidObstacles(int gridWidth, int gridHeight, int gridDepth, dx103DFluidGrid* pGrid)
+dx113DFluidObstacles::dx113DFluidObstacles(int gridWidth, int gridHeight, int gridDepth, dx113DFluidGrid* pGrid)
     : m_pGrid(pGrid)
 {
     VERIFY(m_pGrid);
@@ -70,14 +70,14 @@ dx103DFluidObstacles::dx103DFluidObstacles(int gridWidth, int gridHeight, int gr
     InitShaders();
 }
 
-dx103DFluidObstacles::~dx103DFluidObstacles()
+dx113DFluidObstacles::~dx113DFluidObstacles()
 {
     DestroyShaders();
 
     m_pGrid = 0;
 }
 
-void dx103DFluidObstacles::InitShaders()
+void dx113DFluidObstacles::InitShaders()
 {
     {
         CBlender_fluid_obst Blender;
@@ -88,7 +88,7 @@ void dx103DFluidObstacles::InitShaders()
     }
 }
 
-void dx103DFluidObstacles::DestroyShaders()
+void dx113DFluidObstacles::DestroyShaders()
 {
     for (int i = 0; i < OS_NumShaders; ++i)
     {
@@ -97,7 +97,7 @@ void dx103DFluidObstacles::DestroyShaders()
     }
 }
 
-void dx103DFluidObstacles::ProcessObstacles(const dx103DFluidData& FluidData, float timestep)
+void dx113DFluidObstacles::ProcessObstacles(const dx113DFluidData& FluidData, float timestep)
 {
     PIX_EVENT(ProcessObstacles);
 
@@ -130,7 +130,7 @@ void dx103DFluidObstacles::ProcessObstacles(const dx103DFluidData& FluidData, fl
     ProcessStaticObstacles(FluidData, WorldToFluid);
 }
 
-void dx103DFluidObstacles::RenderStaticOOBB(const Fmatrix& Transform)
+void dx113DFluidObstacles::RenderStaticOOBB(const Fmatrix& Transform)
 {
     PIX_EVENT(RenderObstacle);
 
@@ -151,7 +151,7 @@ void dx103DFluidObstacles::RenderStaticOOBB(const Fmatrix& Transform)
     m_pGrid->DrawSlices();
 }
 
-void dx103DFluidObstacles::ProcessStaticObstacles(const dx103DFluidData& FluidData, const Fmatrix& WorldToFluid)
+void dx113DFluidObstacles::ProcessStaticObstacles(const dx113DFluidData& FluidData, const Fmatrix& WorldToFluid)
 {
     RCache.set_Element(m_ObstacleTechnique[OS_OOBB]);
 
@@ -166,8 +166,8 @@ void dx103DFluidObstacles::ProcessStaticObstacles(const dx103DFluidData& FluidDa
     }
 }
 
-void dx103DFluidObstacles::ProcessDynamicObstacles(
-    const dx103DFluidData& FluidData, const Fmatrix& WorldToFluid, float timestep)
+void dx113DFluidObstacles::ProcessDynamicObstacles(
+    const dx113DFluidData& FluidData, const Fmatrix& WorldToFluid, float timestep)
 {
     m_lstRenderables.clear();
     m_lstShells.clear();
@@ -241,8 +241,8 @@ void dx103DFluidObstacles::ProcessDynamicObstacles(
     }
 }
 
-//  TODO: DX10: Do it using instancing.
-void dx103DFluidObstacles::RenderPhysicsShell(const IPhysicsShell* pShell, const Fmatrix& WorldToFluid, float timestep)
+//  TODO: DX11: Do it using instancing.
+void dx113DFluidObstacles::RenderPhysicsShell(const IPhysicsShell* pShell, const Fmatrix& WorldToFluid, float timestep)
 {
     u16 iObstNum = pShell->get_ElementsNumber();
     for (u16 i = 0; i < iObstNum; ++i)
@@ -253,7 +253,7 @@ void dx103DFluidObstacles::RenderPhysicsShell(const IPhysicsShell* pShell, const
     }
 }
 
-void dx103DFluidObstacles::RenderPhysicsElement(
+void dx113DFluidObstacles::RenderPhysicsElement(
     const IPhysicsElement& Element, const Fmatrix& WorldToFluid, float timestep)
 {
     //  Shader must be already set up!
@@ -306,7 +306,7 @@ void dx103DFluidObstacles::RenderPhysicsElement(
 }
 
 /*
-void dx103DFluidObstacles::RenderDynamicOOBB( const IPhysicsElement &Element, const Fmatrix &WorldToFluid, float
+void dx113DFluidObstacles::RenderDynamicOOBB( const IPhysicsElement &Element, const Fmatrix &WorldToFluid, float
 timestep)
 {
     PIX_EVENT(RenderDynamicObstacle);
@@ -376,7 +376,7 @@ timestep)
 }
 */
 
-void dx103DFluidObstacles::RenderDynamicOOBB(
+void dx113DFluidObstacles::RenderDynamicOOBB(
     const IPhysicsGeometry& Geometry, const Fmatrix& WorldToFluid, float /*timestep*/)
 {
     PIX_EVENT(RenderDynamicObstacle);

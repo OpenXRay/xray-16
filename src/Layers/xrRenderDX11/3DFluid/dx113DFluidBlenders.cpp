@@ -149,28 +149,28 @@ void BindConstants(CBlender_Compile& C)
 }
 void SetupSamplers(CBlender_Compile& C)
 {
-    int smp = C.r_dx10Sampler("samPointClamp");
+    int smp = C.r_dx11Sampler("samPointClamp");
     if (smp != u32(-1))
     {
         C.i_Address(smp, D3DTADDRESS_CLAMP);
         C.i_Filter(smp, D3DTEXF_POINT, D3DTEXF_POINT, D3DTEXF_POINT);
     }
 
-    smp = C.r_dx10Sampler("samLinear");
+    smp = C.r_dx11Sampler("samLinear");
     if (smp != u32(-1))
     {
         C.i_Address(smp, D3DTADDRESS_CLAMP);
         C.i_Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
-    smp = C.r_dx10Sampler("samLinearClamp");
+    smp = C.r_dx11Sampler("samLinearClamp");
     if (smp != u32(-1))
     {
         C.i_Address(smp, D3DTADDRESS_CLAMP);
         C.i_Filter(smp, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
-    smp = C.r_dx10Sampler("samRepeat");
+    smp = C.r_dx11Sampler("samRepeat");
     if (smp != u32(-1))
     {
         C.i_Address(smp, D3DTADDRESS_WRAP);
@@ -182,24 +182,24 @@ void SetupTextures(CBlender_Compile& C)
     LPCSTR* TNames = FluidManager.GetEngineTextureNames();
     LPCSTR* RNames = FluidManager.GetShaderTextureNames();
 
-    for (int i = 0; i < dx103DFluidManager::NUM_RENDER_TARGETS; ++i)
-        C.r_dx10Texture(RNames[i], TNames[i]);
+    for (int i = 0; i < dx113DFluidManager::NUM_RENDER_TARGETS; ++i)
+        C.r_dx11Texture(RNames[i], TNames[i]);
 
     //	Renderer
-    C.r_dx10Texture("sceneDepthTex", r2_RT_P);
-    // C.r_dx10Texture("colorTex", "Texture_color");
-    C.r_dx10Texture("colorTex", TNames[dx103DFluidManager::RENDER_TARGET_COLOR_IN]);
-    C.r_dx10Texture("jitterTex", "$user$NVjitterTex");
+    C.r_dx11Texture("sceneDepthTex", r2_RT_P);
+    // C.r_dx11Texture("colorTex", "Texture_color");
+    C.r_dx11Texture("colorTex", TNames[dx113DFluidManager::RENDER_TARGET_COLOR_IN]);
+    C.r_dx11Texture("jitterTex", "$user$NVjitterTex");
 
-    C.r_dx10Texture("HHGGTex", "$user$NVHHGGTex");
+    C.r_dx11Texture("HHGGTex", "$user$NVHHGGTex");
 
-    C.r_dx10Texture("fireTransferFunction", "internal\\internal_fireTransferFunction");
+    C.r_dx11Texture("fireTransferFunction", "internal\\internal_fireTransferFunction");
 
-    TNames = dx103DFluidRenderer::GetRTNames();
-    RNames = dx103DFluidRenderer::GetResourceRTNames();
+    TNames = dx113DFluidRenderer::GetRTNames();
+    RNames = dx113DFluidRenderer::GetResourceRTNames();
 
-    for (int i = 0; i < dx103DFluidRenderer::RRT_NumRT; ++i)
-        C.r_dx10Texture(RNames[i], TNames[i]);
+    for (int i = 0; i < dx113DFluidRenderer::RRT_NumRT; ++i)
+        C.r_dx11Texture(RNames[i], TNames[i]);
 }
 } //	namespace
 

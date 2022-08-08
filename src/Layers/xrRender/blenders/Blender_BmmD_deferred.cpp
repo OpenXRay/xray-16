@@ -213,29 +213,29 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         // C.r_Sampler		("s_dn_b",	strconcat(sizeof(mask),mask,oB_Name,"_bump") );
         // C.r_Sampler		("s_dn_a",	strconcat(sizeof(mask),mask,oA_Name,"_bump") );
 
-        C.r_dx10Texture("s_mask", mask);
-        C.r_dx10Texture("s_lmap", C.L_textures[1]);
+        C.r_dx11Texture("s_mask", mask);
+        C.r_dx11Texture("s_lmap", C.L_textures[1]);
 
-        C.r_dx10Texture("s_dt_r", oR_Name);
-        C.r_dx10Texture("s_dt_g", oG_Name);
-        C.r_dx10Texture("s_dt_b", oB_Name);
-        C.r_dx10Texture("s_dt_a", oA_Name);
+        C.r_dx11Texture("s_dt_r", oR_Name);
+        C.r_dx11Texture("s_dt_g", oG_Name);
+        C.r_dx11Texture("s_dt_b", oB_Name);
+        C.r_dx11Texture("s_dt_a", oA_Name);
 
-        C.r_dx10Texture("s_dn_r", strconcat(sizeof(mask), mask, oR_Name, "_bump"));
-        C.r_dx10Texture("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
-        C.r_dx10Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
-        C.r_dx10Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
+        C.r_dx11Texture("s_dn_r", strconcat(sizeof(mask), mask, oR_Name, "_bump"));
+        C.r_dx11Texture("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
+        C.r_dx11Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
+        C.r_dx11Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
 
         if (C.bUseSteepParallax)
         {
-            C.r_dx10Texture("s_dn_rX", strconcat(sizeof(mask), mask, oR_Name, "_bump#"));
-            C.r_dx10Texture("s_dn_gX", strconcat(sizeof(mask), mask, oG_Name, "_bump#"));
-            C.r_dx10Texture("s_dn_bX", strconcat(sizeof(mask), mask, oB_Name, "_bump#"));
-            C.r_dx10Texture("s_dn_aX", strconcat(sizeof(mask), mask, oA_Name, "_bump#"));
+            C.r_dx11Texture("s_dn_rX", strconcat(sizeof(mask), mask, oR_Name, "_bump#"));
+            C.r_dx11Texture("s_dn_gX", strconcat(sizeof(mask), mask, oG_Name, "_bump#"));
+            C.r_dx11Texture("s_dn_bX", strconcat(sizeof(mask), mask, oB_Name, "_bump#"));
+            C.r_dx11Texture("s_dn_aX", strconcat(sizeof(mask), mask, oA_Name, "_bump#"));
         }
 
-        C.r_dx10Sampler("smp_base");
-        C.r_dx10Sampler("smp_linear");
+        C.r_dx11Sampler("smp_base");
+        C.r_dx11Sampler("smp_linear");
 
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
@@ -247,8 +247,8 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
 
         // C.r_Sampler		("s_lmap",	C.L_textures[1]);
 
-        C.r_dx10Texture("s_lmap", C.L_textures[1]);
-        C.r_dx10Sampler("smp_linear");
+        C.r_dx11Texture("s_lmap", C.L_textures[1]);
+        C.r_dx11Sampler("smp_linear");
 
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
@@ -260,9 +260,9 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         // else							C.r_Pass	("shadow_direct_base","shadow_direct_base",FALSE);
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
         // C.r_Sampler		("s_base",C.L_textures[0]);
-        C.r_dx10Texture("s_base", C.L_textures[0]);
-        C.r_dx10Sampler("smp_base");
-        C.r_dx10Sampler("smp_linear");
+        C.r_dx11Texture("s_base", C.L_textures[0]);
+        C.r_dx11Sampler("smp_base");
+        C.r_dx11Sampler("smp_linear");
         C.r_ColorWriteEnable(false, false, false, false);
         C.r_End();
         break;

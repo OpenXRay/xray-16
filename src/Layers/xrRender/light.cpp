@@ -79,12 +79,12 @@ void light::set_texture(LPCSTR name)
     s_volumetric.create("accum_volumetric", name);
 #else //    (RENDER!=R_R3) && (RENDER!=R_R4) && (RENDER!=R_GL)
     s_volumetric.create("accum_volumetric_nomsaa", name);
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
     {
         int bound = 1;
 
-        if (!RImplementation.o.dx10_msaa_opt)
-            bound = RImplementation.o.dx10_msaa_samples;
+        if (!RImplementation.o.msaa_opt)
+            bound = RImplementation.o.msaa_samples;
 
         for (int i = 0; i < bound; ++i)
         {
@@ -351,12 +351,12 @@ void light::Export(light_Package& package)
 
 // Holger - do we need to export msaa stuff as well ?
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-                if (RImplementation.o.dx10_msaa)
+                if (RImplementation.o.msaa)
                 {
                     int bound = 1;
 
-                    if (!RImplementation.o.dx10_msaa_opt)
-                        bound = RImplementation.o.dx10_msaa_samples;
+                    if (!RImplementation.o.msaa_opt)
+                        bound = RImplementation.o.msaa_samples;
 
                     for (int i = 0; i < bound; ++i)
                     {

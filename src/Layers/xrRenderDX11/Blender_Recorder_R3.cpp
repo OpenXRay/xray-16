@@ -30,7 +30,7 @@ void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask,
 
 void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetRS(D3DRS_STENCILREF, Ref); }
 void CBlender_Compile::r_CullMode(D3DCULL Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
-void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
+void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
 {
     if (ctable.dx9compatibility && !recursive)
     {
@@ -48,26 +48,26 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool r
     fix_texture_name(TexName);
 
     // Find index
-    ref_constant C = ctable.get(ResourceName, ctable.dx9compatibility ? RC_dx10texture : u16(-1));
+    ref_constant C = ctable.get(ResourceName, ctable.dx9compatibility ? RC_dx11texture : u16(-1));
     // VERIFY(C);
     if (!C)
         return;
 
-    R_ASSERT(C->type == RC_dx10texture);
+    R_ASSERT(C->type == RC_dx11texture);
     u32 stage = C->samp.index;
 
     passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
 }
 
-void CBlender_Compile::i_dx10FilterAnizo(u32 s, BOOL value)
+void CBlender_Compile::i_dx11FilterAnizo(u32 s, BOOL value)
 {
     VERIFY(s != u32(-1));
-    RS.SetSAMP(s, XRDX10SAMP_ANISOTROPICFILTER, value);
+    RS.SetSAMP(s, XRDX11SAMP_ANISOTROPICFILTER, value);
 }
 
-u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
+u32 CBlender_Compile::r_dx11Sampler(LPCSTR ResourceName)
 {
-    // TODO: DX10: Check if we can use dwStage
+    // TODO: DX11: Check if we can use dwStage
     u32 stage = i_Sampler(ResourceName);
 
     if (stage == u32(-1))
@@ -100,7 +100,7 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     else if (0 == xr_strcmp(ResourceName, "smp_base"))
     {
         i_Address(stage, D3DTADDRESS_WRAP);
-        i_dx10FilterAnizo(stage, TRUE);
+        i_dx11FilterAnizo(stage, TRUE);
         // i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
@@ -116,8 +116,8 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     {
         i_Address(stage, D3DTADDRESS_CLAMP);
         i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
-        RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFILTER, TRUE);
-        RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
+        RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFILTER, TRUE);
+        RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 
     else if (0 == xr_strcmp(ResourceName, "smp_jitter"))

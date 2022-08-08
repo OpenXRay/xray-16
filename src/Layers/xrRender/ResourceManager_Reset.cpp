@@ -20,8 +20,8 @@ void CResourceManager::reset_begin()
     // destroy RTs
     for (auto& rt_pair : m_rtargets)
         rt_pair.second->reset_begin();
-    //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
-    //  DX10 cut        rtc_it->second->reset_begin();
+    //  DX11 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
+    //  DX11 cut        rtc_it->second->reset_begin();
 
     // destroy DStreams
     RCache.old_QuadIB = RCache.QuadIB;
@@ -32,7 +32,7 @@ void CResourceManager::reset_begin()
 }
 
 bool cmp_rt(const CRT* A, const CRT* B) { return A->_order < B->_order; }
-//  DX10 cut bool   cmp_rtc (const CRTC* A,const CRTC* B)   { return A->_order < B->_order; }
+//  DX11 cut bool   cmp_rtc (const CRTC* A,const CRTC* B)   { return A->_order < B->_order; }
 
 void CResourceManager::reset_end()
 {
@@ -79,11 +79,11 @@ void CResourceManager::reset_end()
     }
     {
         // RTc
-    //DX10 cut		const size_t buffer_size = m_rtargets_c.size() * sizeof(CRTC*);
-    //DX10 cut		buffer_vector<CRTC*> sorted_rtcs(xr_alloca(buffer_size), m_rtargets_c.size());
-    //DX10 cut		for (map_RTCIt rt_it=m_rtargets_c.begin(); rt_it!=m_rtargets_c.end(); rt_it++)	sorted_rtcs.push_back(rt_it->second);
-    //DX10 cut		std::sort(sorted_rtcs.begin(),sorted_rtcs.end(),cmp_rtc);
-    //DX10 cut		for (u32 _it=0; _it<sorted_rtcs.size(); _it++)	sorted_rtcs[_it]->reset_end	();
+    //DX11 cut		const size_t buffer_size = m_rtargets_c.size() * sizeof(CRTC*);
+    //DX11 cut		buffer_vector<CRTC*> sorted_rtcs(xr_alloca(buffer_size), m_rtargets_c.size());
+    //DX11 cut		for (map_RTCIt rt_it=m_rtargets_c.begin(); rt_it!=m_rtargets_c.end(); rt_it++)	sorted_rtcs.push_back(rt_it->second);
+    //DX11 cut		std::sort(sorted_rtcs.begin(),sorted_rtcs.end(),cmp_rtc);
+    //DX11 cut		for (u32 _it=0; _it<sorted_rtcs.size(); _it++)	sorted_rtcs[_it]->reset_end	();
     }
 
     // create state-blocks
@@ -124,7 +124,7 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: rtargets  : %d", m_rtargets.size());
     if (!bBrief)
         mdump(m_rtargets);
-    //  DX10 cut    Msg("* RM_Dump: rtargetsc : %d", m_rtargets_c.size()); if(!bBrief) mdump(m_rtargets_c);
+    //  DX11 cut    Msg("* RM_Dump: rtargetsc : %d", m_rtargets_c.size()); if(!bBrief) mdump(m_rtargets_c);
     Msg("* RM_Dump: vs        : %d", m_vs.size());
     if (!bBrief)
         mdump(m_vs);

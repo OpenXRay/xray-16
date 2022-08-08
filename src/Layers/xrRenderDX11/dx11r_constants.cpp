@@ -110,7 +110,7 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         case D3D_SVC_STRUCT: fatal("Pclass D3DXPC_STRUCT unsupported"); break;
         case D3D_SVC_OBJECT:
         {
-            //  TODO: DX10:
+            //  TODO: DX11:
             VERIFY(!"Implement shader object parsing.");
             /*
             switch (T->Type)
@@ -190,7 +190,7 @@ BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int Res
 
         switch (ResDesc.Type)
         {
-        case D3D_SIT_TEXTURE: type = RC_dx10texture; break;
+        case D3D_SIT_TEXTURE: type = RC_dx11texture; break;
         case D3D_SIT_SAMPLER: type = RC_sampler; break;
         case D3D_SIT_UAV_RWTYPED: type = RC_dx11UAV; break;
         default: continue;

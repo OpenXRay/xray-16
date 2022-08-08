@@ -5,7 +5,7 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
     // Targets
     u_setrt(rt_smap_surf, nullptr, nullptr, rt_smap_depth->pZRT);
 
-    //	Don't have rect clear for DX10
+    //	Don't have rect clear for DX11
     //	TODO: DX9:	Full clear must be faster for the near phase for SLI
     //	inobody clears this buffer _this_ frame.
     // Clear
@@ -36,7 +36,7 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
     // Stencil	- disable
     RCache.set_Stencil(FALSE);
 
-    //	TODO: DX10:	Implement culling reverse for DX10
+    //	TODO: DX11:	Implement culling reverse for DX11
     // Misc		- draw only front/back-faces
     /*
     if (SE_SUN_NEAR==sub_phase)			RCache.set_CullMode			( CULL_CCW	);	// near

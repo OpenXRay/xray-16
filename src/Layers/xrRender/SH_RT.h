@@ -58,7 +58,7 @@ struct resptrcode_crt : public resptr_base<CRT>
 };
 typedef resptr_core<CRT, resptrcode_crt> ref_rt;
 
-/*	//	DX10 cut
+/*	//	DX11 cut
 //////////////////////////////////////////////////////////////////////////
 class		CRTC	:	public xr_resource_named	{
 public:

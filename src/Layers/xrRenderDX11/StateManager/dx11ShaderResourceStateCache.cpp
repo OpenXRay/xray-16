@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "dx11ShaderResourceStateCache.h"
 
-dx10ShaderResourceStateCache SRVSManager;
+dx11ShaderResourceStateCache SRVSManager;
 
-dx10ShaderResourceStateCache::dx10ShaderResourceStateCache() { ResetDeviceState(); }
-void dx10ShaderResourceStateCache::ResetDeviceState()
+dx11ShaderResourceStateCache::dx11ShaderResourceStateCache() { ResetDeviceState(); }
+void dx11ShaderResourceStateCache::ResetDeviceState()
 {
     ZeroMemory(m_PSViews, sizeof(m_PSViews));
     ZeroMemory(m_GSViews, sizeof(m_GSViews));
@@ -40,7 +40,7 @@ void dx10ShaderResourceStateCache::ResetDeviceState()
 #endif
 }
 
-void dx10ShaderResourceStateCache::Apply()
+void dx11ShaderResourceStateCache::Apply()
 {
     if (m_bUpdatePSViews)
     {
@@ -93,7 +93,7 @@ void dx10ShaderResourceStateCache::Apply()
 #endif
 }
 
-void dx10ShaderResourceStateCache::SetPSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
+void dx11ShaderResourceStateCache::SetPSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
 {
     VERIFY(uiSlot < CTexture::mtMaxPixelShaderTextures);
 
@@ -114,7 +114,7 @@ void dx10ShaderResourceStateCache::SetPSResource(u32 uiSlot, ID3DShaderResourceV
     }
 }
 
-void dx10ShaderResourceStateCache::SetGSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
+void dx11ShaderResourceStateCache::SetGSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
 {
     VERIFY(uiSlot < CTexture::mtMaxGeometryShaderTextures);
 
@@ -135,7 +135,7 @@ void dx10ShaderResourceStateCache::SetGSResource(u32 uiSlot, ID3DShaderResourceV
     }
 }
 
-void dx10ShaderResourceStateCache::SetVSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
+void dx11ShaderResourceStateCache::SetVSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
 {
     VERIFY(uiSlot < CTexture::mtMaxVertexShaderTextures);
 
@@ -157,7 +157,7 @@ void dx10ShaderResourceStateCache::SetVSResource(u32 uiSlot, ID3DShaderResourceV
 }
 
 #ifdef USE_DX11
-void dx10ShaderResourceStateCache::SetHSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
+void dx11ShaderResourceStateCache::SetHSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
 {
     VERIFY(uiSlot < CTexture::mtMaxHullShaderTextures);
 
@@ -178,7 +178,7 @@ void dx10ShaderResourceStateCache::SetHSResource(u32 uiSlot, ID3DShaderResourceV
     }
 }
 
-void dx10ShaderResourceStateCache::SetDSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
+void dx11ShaderResourceStateCache::SetDSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
 {
     VERIFY(uiSlot < CTexture::mtMaxHullShaderTextures);
 
@@ -199,7 +199,7 @@ void dx10ShaderResourceStateCache::SetDSResource(u32 uiSlot, ID3DShaderResourceV
     }
 }
 
-void dx10ShaderResourceStateCache::SetCSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
+void dx11ShaderResourceStateCache::SetCSResource(u32 uiSlot, ID3DShaderResourceView* pRes)
 {
     VERIFY(uiSlot < CTexture::mtMaxComputeShaderTextures);
 

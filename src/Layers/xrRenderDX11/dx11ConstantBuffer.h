@@ -1,17 +1,17 @@
-#ifndef dx10ConstantBuffer_included
-#define dx10ConstantBuffer_included
+#ifndef dx11ConstantBuffer_included
+#define dx11ConstantBuffer_included
 #pragma once
 
 struct R_constant;
 struct R_constant_load;
 
-class dx10ConstantBuffer : public xr_resource_named
+class dx11ConstantBuffer : public xr_resource_named
 {
 public:
-    dx10ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
-    ~dx10ConstantBuffer();
+    dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
+    ~dx11ConstantBuffer();
 
-    bool Similar(dx10ConstantBuffer& _in);
+    bool Similar(dx11ConstantBuffer& _in);
     ID3DBuffer* GetBuffer() { return m_pBuffer; }
     void Flush();
 
@@ -47,10 +47,10 @@ private:
     static const u32 lineSize = sizeof(Fvector4);
 
     //	Never try to copy objects of this class due to the pointer and autoptr members
-    dx10ConstantBuffer(const dx10ConstantBuffer&);
-    dx10ConstantBuffer& operator=(dx10ConstantBuffer&);
+    dx11ConstantBuffer(const dx11ConstantBuffer&);
+    dx11ConstantBuffer& operator=(dx11ConstantBuffer&);
 };
 
-typedef resptr_core<dx10ConstantBuffer, resptr_base<dx10ConstantBuffer>> ref_cbuffer;
+typedef resptr_core<dx11ConstantBuffer, resptr_base<dx11ConstantBuffer>> ref_cbuffer;
 
-#endif //	dx10ConstantBuffer_included
+#endif //	dx11ConstantBuffer_included

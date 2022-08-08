@@ -1,10 +1,10 @@
-#ifndef	dx10RainBlender_included
-#define	dx10RainBlender_included
+#ifndef	dx11RainBlender_included
+#define	dx11RainBlender_included
 
 class CBlender_rain : public IBlender
 {
 public:
-    LPCSTR getComment() override { return "INTERNAL: DX10 rain blender"; }
+    LPCSTR getComment() override { return "INTERNAL: DX11 rain blender"; }
     BOOL canBeDetailed() override { return FALSE; }
     BOOL canBeLMAPped() override { return FALSE; }
 
@@ -20,7 +20,7 @@ public:
         Definition = nullptr;
     }
 
-    LPCSTR getComment() override { return "INTERNAL: DX10 MSAA rain blender"; }
+    LPCSTR getComment() override { return "INTERNAL: DX11 MSAA rain blender"; }
     BOOL canBeDetailed() override { return FALSE; }
     BOOL canBeLMAPped() override { return FALSE; }
 
@@ -31,4 +31,4 @@ public:
     LPCSTR Definition;
 };
 
-#endif	//	dx10RainBlender_included
+#endif	//	dx11RainBlender_included

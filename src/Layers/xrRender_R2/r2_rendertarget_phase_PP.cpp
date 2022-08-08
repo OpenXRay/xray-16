@@ -8,7 +8,7 @@ void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 #if defined(USE_DX9) || defined(USE_OGL)
     VERIFY(RC_sampler == C->type);
 #elif defined(USE_DX11)
-    VERIFY(RC_dx10texture == C->type);
+    VERIFY(RC_dx11texture == C->type);
 #else
 #   error Select correct check for your graphics API
 #endif

@@ -6,25 +6,25 @@
 namespace
 {
 const xr_token simulation_type_token[] = {
-    {"Fog", dx103DFluidData::ST_FOG},
-    {"Fire", dx103DFluidData::ST_FIRE},
+    {"Fog", dx113DFluidData::ST_FOG},
+    {"Fire", dx113DFluidData::ST_FIRE},
     {0, 0}
 };
 
 const xr_token emitter_type_token[] = {
-    {"SimpleGaussian", dx103DFluidEmitters::ET_SimpleGausian},
-    {"SimpleDraught", dx103DFluidEmitters::ET_SimpleDraught},
+    {"SimpleGaussian", dx113DFluidEmitters::ET_SimpleGausian},
+    {"SimpleDraught", dx113DFluidEmitters::ET_SimpleDraught},
     {0, 0}
 };
 }
 
-DXGI_FORMAT dx103DFluidData::m_VPRenderTargetFormats[VP_NUM_TARGETS] = {
+DXGI_FORMAT dx113DFluidData::m_VPRenderTargetFormats[VP_NUM_TARGETS] = {
     DXGI_FORMAT_R16G16B16A16_FLOAT, // VP_VELOCITY0
     DXGI_FORMAT_R16_FLOAT, // VP_PRESSURE
     DXGI_FORMAT_R16_FLOAT // VP_COLOR
 };
 
-dx103DFluidData::dx103DFluidData()
+dx113DFluidData::dx113DFluidData()
 {
     D3D_TEXTURE3D_DESC desc;
     desc.BindFlags = D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET;
@@ -50,7 +50,7 @@ dx103DFluidData::dx103DFluidData()
     }
 }
 
-dx103DFluidData::~dx103DFluidData()
+dx113DFluidData::~dx113DFluidData()
 {
 #ifndef MASTER_GOLD
     // Allow real-time config reload
@@ -63,7 +63,7 @@ dx103DFluidData::~dx103DFluidData()
     }
 }
 
-void dx103DFluidData::CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC TexDesc)
+void dx113DFluidData::CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC TexDesc)
 {
     // Create the texture
     CHK_DX(HW.pDevice->CreateTexture3D(&TexDesc, NULL, &m_pRTTextures[rtIndex]));
@@ -82,13 +82,13 @@ void dx103DFluidData::CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC Te
     RCache.ClearRT(m_pRenderTargetViews[rtIndex], {});
 }
 
-void dx103DFluidData::DestroyRTTextureAndViews(int rtIndex)
+void dx113DFluidData::DestroyRTTextureAndViews(int rtIndex)
 {
     _RELEASE(m_pRTTextures[rtIndex]);
     _RELEASE(m_pRenderTargetViews[rtIndex]);
 }
 
-void dx103DFluidData::Load(IReader* data)
+void dx113DFluidData::Load(IReader* data)
 {
     //  Version 3
 
@@ -111,7 +111,7 @@ void dx103DFluidData::Load(IReader* data)
     ParseProfile(Profile);
 }
 
-void dx103DFluidData::ParseProfile(const xr_string& Profile)
+void dx113DFluidData::ParseProfile(const xr_string& Profile)
 {
     string_path fn;
     FS.update_path(fn, "$game_config$", Profile.c_str());
@@ -176,7 +176,7 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
 
         xr_sprintf(EmitterSectionName, "emitter%02d", i);
 
-        Emitter.m_eType = (dx103DFluidEmitters::EmitterType)ini.r_token(EmitterSectionName, "Type", emitter_type_token);
+        Emitter.m_eType = (dx113DFluidEmitters::EmitterType)ini.r_token(EmitterSectionName, "Type", emitter_type_token);
 
         if (ini.line_exist(EmitterSectionName, "Position"))
             Emitter.m_vPosition = ini.r_fvector3(EmitterSectionName, "Position");
@@ -203,7 +203,7 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
 
         switch (Emitter.m_eType)
         {
-        case dx103DFluidEmitters::ET_SimpleDraught:
+        case dx113DFluidEmitters::ET_SimpleDraught:
             Emitter.m_DraughtParams.m_fPeriod = ini.r_float(EmitterSectionName, "DraughtPeriod");
             Emitter.m_DraughtParams.m_fPhase = ini.r_float(EmitterSectionName, "DraughtPhase");
             Emitter.m_DraughtParams.m_fAmp = ini.r_float(EmitterSectionName, "DraughtAmp");
@@ -221,7 +221,7 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
 
 #ifndef MASTER_GOLD
 // Allow real-time config reload
-void dx103DFluidData::ReparseProfile(const xr_string& Profile)
+void dx113DFluidData::ReparseProfile(const xr_string& Profile)
 {
     m_Emitters.clear();
     ParseProfile(Profile);

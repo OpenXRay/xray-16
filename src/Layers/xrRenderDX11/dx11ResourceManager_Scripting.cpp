@@ -23,7 +23,7 @@ class adopt_dx10options
 public:
     bool _dx10_msaa_alphatest_atoc()
     {
-        return RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
+        return RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
     }
 };
 
@@ -271,12 +271,12 @@ public:
     //	DX10 specific
     adopt_dx10sampler _dx10sampler(LPCSTR _name)
     {
-        u32 s = C->r_dx10Sampler(_name);
+        u32 s = C->r_dx11Sampler(_name);
         return adopt_dx10sampler(C, s);
     }
     adopt_compiler& _dx10texture(LPCSTR _resname, LPCSTR _texname)
     {
-        C->r_dx10Texture(_resname, _texname);
+        C->r_dx11Texture(_resname, _texname);
         return *this;
     }
     adopt_compiler& _dx10Stencil(bool Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
@@ -291,7 +291,7 @@ public:
     }
     adopt_compiler& _dx10ATOC(bool Enable)
     {
-        C->RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, Enable);
+        C->RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, Enable);
         return *this;
     }
     adopt_compiler& _dx10ZFunc(u32 Func)

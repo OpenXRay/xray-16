@@ -4,7 +4,7 @@
 
 #include "dx113DFluidEmitters.h"
 
-class dx103DFluidData
+class dx113DFluidData
 {
 public:
     enum eVolumePrivateRT
@@ -31,8 +31,8 @@ public:
     };
 
 public:
-    dx103DFluidData();
-    ~dx103DFluidData();
+    dx113DFluidData();
+    ~dx113DFluidData();
 
     void Load(IReader* data);
 
@@ -61,7 +61,7 @@ public:
     }
     const Fmatrix& GetTransform() const { return m_Transform; }
     const xr_vector<Fmatrix>& GetObstaclesList() const { return m_Obstacles; }
-    const xr_vector<dx103DFluidEmitters::CEmitter>& GetEmittersList() const { return m_Emitters; }
+    const xr_vector<dx113DFluidEmitters::CEmitter>& GetEmittersList() const { return m_Emitters; }
     const Settings& GetSettings() const { return m_Settings; }
 
 #ifndef MASTER_GOLD
@@ -70,7 +70,7 @@ public:
 #endif
 
 private:
-    typedef dx103DFluidEmitters::CEmitter CEmitter;
+    typedef dx113DFluidEmitters::CEmitter CEmitter;
 
 private:
     void CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC TexDesc);

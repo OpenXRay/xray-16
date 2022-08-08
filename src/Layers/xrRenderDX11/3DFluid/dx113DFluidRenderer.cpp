@@ -29,12 +29,12 @@ shared_str strRTHeight("RTHeight");
 shared_str strDiffuseLight("DiffuseLight");
 }
 
-LPCSTR dx103DFluidRenderer::m_pRTNames[RRT_NumRT] = {
+LPCSTR dx113DFluidRenderer::m_pRTNames[RRT_NumRT] = {
     "$user$rayDataTex", "$user$rayDataTexSmall", "$user$rayCastTex", "$user$edgeTex"};
 
-LPCSTR dx103DFluidRenderer::m_pResourceRTNames[RRT_NumRT] = {"rayDataTex", "rayDataTexSmall", "rayCastTex", "edgeTex"};
+LPCSTR dx113DFluidRenderer::m_pResourceRTNames[RRT_NumRT] = {"rayDataTex", "rayDataTexSmall", "rayCastTex", "edgeTex"};
 
-dx103DFluidRenderer::dx103DFluidRenderer() : m_bInited(false)
+dx113DFluidRenderer::dx113DFluidRenderer() : m_bInited(false)
 {
     RTFormats[RRT_RayDataTex] = D3DFMT_A32B32G32R32F;
     RTFormats[RRT_RayDataTexSmall] = D3DFMT_A32B32G32R32F;
@@ -42,8 +42,8 @@ dx103DFluidRenderer::dx103DFluidRenderer() : m_bInited(false)
     RTFormats[RRT_EdgeTex] = D3DFMT_R32F;
 }
 
-dx103DFluidRenderer::~dx103DFluidRenderer() { Destroy(); }
-void dx103DFluidRenderer::Initialize(int gridWidth, int gridHeight, int gridDepth)
+dx113DFluidRenderer::~dx113DFluidRenderer() { Destroy(); }
+void dx113DFluidRenderer::Initialize(int gridWidth, int gridHeight, int gridDepth)
 {
     Destroy();
 
@@ -74,7 +74,7 @@ void dx103DFluidRenderer::Initialize(int gridWidth, int gridHeight, int gridDept
     m_bInited = true;
 }
 
-void dx103DFluidRenderer::Destroy()
+void dx113DFluidRenderer::Destroy()
 {
     if (!m_bInited)
         return;
@@ -92,7 +92,7 @@ void dx103DFluidRenderer::Destroy()
     DestroyShaders();
 }
 
-void dx103DFluidRenderer::InitShaders()
+void dx113DFluidRenderer::InitShaders()
 {
     {
         CBlender_fluid_raydata Blender;
@@ -111,7 +111,7 @@ void dx103DFluidRenderer::InitShaders()
     }
 }
 
-void dx103DFluidRenderer::DestroyShaders()
+void dx113DFluidRenderer::DestroyShaders()
 {
     for (size_t i = 0; i < RS_NumShaders; ++i)
     {
@@ -120,7 +120,7 @@ void dx103DFluidRenderer::DestroyShaders()
     }
 }
 
-void dx103DFluidRenderer::CreateGridBox()
+void dx113DFluidRenderer::CreateGridBox()
 {
     VsInput vertices[] =
     {
@@ -158,7 +158,7 @@ void dx103DFluidRenderer::CreateGridBox()
     m_GeomGridBox.create(layout, m_pGridBoxVertexBuffer, m_pGridBoxIndexBuffer);
 }
 
-void dx103DFluidRenderer::CreateScreenQuad()
+void dx113DFluidRenderer::CreateScreenQuad()
 {
     // Create our quad input layout
     static D3DVERTEXELEMENT9 quadlayout[] = {
@@ -180,7 +180,7 @@ void dx103DFluidRenderer::CreateScreenQuad()
     m_GeomQuadVertex.create(quadlayout, m_pQuadVertexBuffer, 0);
 }
 
-void dx103DFluidRenderer::CreateJitterTexture()
+void dx113DFluidRenderer::CreateJitterTexture()
 {
     u8 data[256 * 256];
     for (int i = 0; i < 256 * 256; i++)
@@ -229,7 +229,7 @@ float h0texels(float a) { return (1.0f + a - (bsW1(a) / (bsW0(a) + bsW1(a)))); }
 float h1texels(float a) { return (1.0f - a + (bsW3(a) / (bsW2(a) + bsW3(a)))); }
 }
 
-void dx103DFluidRenderer::CreateHHGGTexture()
+void dx113DFluidRenderer::CreateHHGGTexture()
 {
     static const int iNumSamples = 16;
     float data[4 * iNumSamples];
@@ -272,8 +272,8 @@ void dx103DFluidRenderer::CreateHHGGTexture()
     _RELEASE(HHGGTexture);
 }
 
-void dx103DFluidRenderer::SetScreenSize(int width, int height) { CreateRayDataResources(width, height); }
-void dx103DFluidRenderer::CalculateRenderTextureSize(int screenWidth, int screenHeight)
+void dx113DFluidRenderer::SetScreenSize(int width, int height) { CreateRayDataResources(width, height); }
+void dx113DFluidRenderer::CalculateRenderTextureSize(int screenWidth, int screenHeight)
 {
     int maxProjectedSide = int(3.0 * _sqrt(3.0) * m_fMaxDim);
     int maxScreenDim = _max(screenWidth, screenHeight);
@@ -300,7 +300,7 @@ void dx103DFluidRenderer::CalculateRenderTextureSize(int screenWidth, int screen
     }
 }
 
-void dx103DFluidRenderer::CreateRayDataResources(int width, int height)
+void dx113DFluidRenderer::CreateRayDataResources(int width, int height)
 {
     // find a good resolution for raycasting purposes
     CalculateRenderTextureSize(width, height);
@@ -315,14 +315,14 @@ void dx103DFluidRenderer::CreateRayDataResources(int width, int height)
     }
 }
 
-void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
+void dx113DFluidRenderer::Draw(const dx113DFluidData& FluidData)
 {
     //	We don't need ZB anyway
     RCache.set_ZB(nullptr);
 
     CRenderTarget* pTarget = RImplementation.Target;
-    const dx103DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
-    const bool bRenderFire = (VolumeSettings.m_SimulationType == dx103DFluidData::ST_FIRE);
+    const dx113DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
+    const bool bRenderFire = (VolumeSettings.m_SimulationType == dx113DFluidData::ST_FIRE);
 
     FogLighting LightData;
 
@@ -380,7 +380,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     DrawScreenQuad();
 }
 
-void dx103DFluidRenderer::ComputeRayData(const dx103DFluidData &FluidData)
+void dx113DFluidRenderer::ComputeRayData(const dx113DFluidData &FluidData)
 {
     // Clear the color buffer to zero
     RCache.ClearRT(RT[RRT_RayDataTex], {});
@@ -408,7 +408,7 @@ void dx103DFluidRenderer::ComputeRayData(const dx103DFluidData &FluidData)
     DrawBox();
 }
 
-void dx103DFluidRenderer::ComputeEdgeTexture(const dx103DFluidData &FluidData)
+void dx113DFluidRenderer::ComputeEdgeTexture(const dx113DFluidData &FluidData)
 {
     CRenderTarget* pTarget = RImplementation.Target;
     pTarget->u_setrt(RT[RRT_RayDataTexSmall], nullptr, nullptr, nullptr); // LDR RT
@@ -431,25 +431,25 @@ void dx103DFluidRenderer::ComputeEdgeTexture(const dx103DFluidData &FluidData)
     DrawScreenQuad();
 }
 
-void dx103DFluidRenderer::DrawScreenQuad()
+void dx113DFluidRenderer::DrawScreenQuad()
 {
     RCache.set_Geometry(m_GeomQuadVertex);
     RCache.Render(D3DPT_TRIANGLESTRIP, 0, 2);
 }
 
-void dx103DFluidRenderer::DrawBox()
+void dx113DFluidRenderer::DrawBox()
 {
     RCache.set_Geometry(m_GeomGridBox);
     RCache.Render(D3DPT_TRIANGLELIST, 0, 0, m_iGridBoxVertNum, 0, m_iGridBoxFaceNum);
 }
 
-void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, FogLighting& LightData)
+void dx113DFluidRenderer::CalculateLighting(const dx113DFluidData& FluidData, FogLighting& LightData)
 {
     m_lstRenderables.clear();
 
     LightData.Reset();
 
-    const dx103DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
+    const dx113DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
 
     Fvector4 hemi_color = g_pGamePersistent->Environment().CurrentEnv->hemi_color;
     // hemi_color.mul(0.2f);
@@ -510,7 +510,7 @@ void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, Fo
     // LightData.m_vLightIntencity.set( 1.0f, 1.0f, 1.0f);
 }
 
-void dx103DFluidRenderer::PrepareCBuffer(const dx103DFluidData &FluidData, u32 RTWidth, u32 RTHeight)
+void dx113DFluidRenderer::PrepareCBuffer(const dx113DFluidData &FluidData, u32 RTWidth, u32 RTHeight)
 {
     const Fmatrix& transform = FluidData.GetTransform();
     RCache.set_xform_world(transform);

@@ -84,7 +84,7 @@ IC GLuint CBackend::get_ZB()
 }
 ICF void CBackend::set_States(SState* _state)
 {
-//	DX10 Manages states using it's own algorithm. Don't mess with it.
+//	DX11 Manages states using it's own algorithm. Don't mess with it.
 #ifdef USE_DX9
     if (state != _state->state)
 #endif

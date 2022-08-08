@@ -82,7 +82,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         C.r_Sampler_rtf("s_patched_normal", r2_RT_accum);
 
         //	Normal can be packed into R and G
-        if (RImplementation.o.dx10_gbuffer_opt)
+        if (RImplementation.o.dx11_gbuffer_opt)
             C.r_ColorWriteEnable(true, true, false, false);
         else
             C.r_ColorWriteEnable(true, true, true, false);
@@ -163,7 +163,7 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         //C.r_Sampler		("s_water",	"water" DELIMITER "water_normal");
 
         C.r_Sampler("s_water", "water" DELIMITER "water_SBumpVolume");
-        //C.r_dx10Texture		("s_waterFall",	"water" DELIMITER "water_normal");
+        //C.r_dx11Texture		("s_waterFall",	"water" DELIMITER "water_normal");
         C.r_Sampler("s_waterFall", "water" DELIMITER "water_flowing_nmap");
 
         C.r_End();
@@ -191,7 +191,7 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_rtf("s_patched_normal", r2_RT_accum);
 
         //	Normal can be packed into R and G
-        if (RImplementation.o.dx10_gbuffer_opt)
+        if (RImplementation.o.dx11_gbuffer_opt)
             C.r_ColorWriteEnable(true, true, false, false);
         else
             C.r_ColorWriteEnable(true, true, true, false);

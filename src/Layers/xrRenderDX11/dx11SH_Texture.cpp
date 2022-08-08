@@ -230,7 +230,7 @@ void CTexture::Apply(u32 dwStage)
     if (flags.bLoadedAsStaging)
         ProcessStaging();
 
-    // if( !RImplementation.o.dx10_msaa )
+    // if( !RImplementation.o.msaa )
     //   VERIFY( !((!pSurface)^(!m_pSRView)) );	//	Both present or both missing
     // else
     //{

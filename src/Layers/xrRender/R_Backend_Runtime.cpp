@@ -75,7 +75,7 @@ void CBackend::Invalidate()
     state = nullptr;
     ps = 0;
     vs = 0;
-    DX10_ONLY(gs = NULL);
+    DX11_ONLY(gs = NULL);
 #ifdef USE_DX11
     hs = 0;
     ds = 0;
@@ -181,7 +181,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
     u32 e_mask = (1 << count) - 1;
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, e_mask));	
 #elif defined(USE_DX11) || defined(USE_OGL)
-    // TODO: DX10: Implement in the corresponding vertex shaders
+    // TODO: DX11: Implement in the corresponding vertex shaders
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
     UNUSED(_enable);
@@ -203,7 +203,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
 #if defined(USE_DX9)
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, FALSE));
 #elif defined(USE_DX11) || defined(USE_OGL)
-    // TODO: DX10: Implement in the corresponding vertex shaders
+    // TODO: DX11: Implement in the corresponding vertex shaders
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
 #else
@@ -397,14 +397,14 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_DX9)
         CHK_DX(HW.pDevice->SetTexture(_last_ps, NULL));
 #elif defined(USE_DX11)
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->PSSetShaderResources(_last_ps, 1, &pRes);
         SRVSManager.SetPSResource(_last_ps, pRes);
 #elif defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + _last_ps));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation.o.msaa)
             CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
@@ -422,14 +422,14 @@ void CBackend::set_Textures(STextureList* _T)
 #if defined(USE_DX9)
         CHK_DX(HW.pDevice->SetTexture(_last_vs + CTexture::rstVertex, NULL));
 #elif defined(USE_DX11)
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->VSSetShaderResources(_last_vs, 1, &pRes);
         SRVSManager.SetVSResource(_last_vs, pRes);
 #elif defined(USE_OGL)
         CHK_GL(glActiveTexture(GL_TEXTURE0 + CTexture::rstVertex + _last_vs));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation.o.msaa)
             CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
         CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
@@ -447,7 +447,7 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_gs[_last_gs] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->GSSetShaderResources(_last_gs, 1, &pRes);
         SRVSManager.SetGSResource(_last_gs, pRes);
@@ -459,7 +459,7 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_hs[_last_hs] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetHSResource(_last_hs, pRes);
     }
@@ -470,7 +470,7 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_ds[_last_ds] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetDSResource(_last_ds, pRes);
     }
@@ -481,7 +481,7 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_cs[_last_cs] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetCSResource(_last_cs, pRes);
     }

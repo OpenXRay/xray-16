@@ -1,10 +1,10 @@
-#ifndef dx10ConstantBuffer_impl_included
-#define dx10ConstantBuffer_impl_included
+#ifndef dx11ConstantBuffer_impl_included
+#define dx11ConstantBuffer_impl_included
 #pragma once
 
-IC Fvector4* dx10ConstantBuffer::Access(u16 offset)
+IC Fvector4* dx11ConstantBuffer::Access(u16 offset)
 {
-    //	TODO: DX10: Implement code which will check if set actually changes code.
+    //	TODO: DX11: Implement code which will check if set actually changes code.
     m_bChanged = true;
 
     //	Check buffer size in client code: don't know if actual data will cross
@@ -14,7 +14,7 @@ IC Fvector4* dx10ConstantBuffer::Access(u16 offset)
     return (Fvector4*)res;
 }
 
-IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, const Fmatrix& A)
+IC void dx11ConstantBuffer::set(R_constant* C, R_constant_load& L, const Fmatrix& A)
 {
     VERIFY(RC_float == C->type);
     //	TEST
@@ -54,7 +54,7 @@ IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, const Fmatrix
     }
 }
 
-IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, const Fvector4& A)
+IC void dx11ConstantBuffer::set(R_constant* C, R_constant_load& L, const Fvector4& A)
 {
     VERIFY(RC_float == C->type);
     VERIFY(RC_1x4 == L.cls || RC_1x3 == L.cls || RC_1x2 == L.cls);
@@ -79,7 +79,7 @@ IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, const Fvector
     // c_f.dirty	(L.index,L.index+1);
 }
 
-IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, float A)
+IC void dx11ConstantBuffer::set(R_constant* C, R_constant_load& L, float A)
 {
     VERIFY(RC_float == C->type);
     VERIFY(RC_1x1 == L.cls);
@@ -91,7 +91,7 @@ IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, float A)
     // c_f.dirty	(L.index,L.index+1);
 }
 
-IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, int A)
+IC void dx11ConstantBuffer::set(R_constant* C, R_constant_load& L, int A)
 {
     VERIFY(RC_int == C->type);
     VERIFY(RC_1x1 == L.cls);
@@ -103,7 +103,7 @@ IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, int A)
     // c_f.dirty	(L.index,L.index+1);
 }
 
-IC void dx10ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const Fmatrix& A)
+IC void dx11ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const Fmatrix& A)
 {
     //	TEST
     // return;
@@ -154,7 +154,7 @@ IC void dx10ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const
     }
 }
 
-IC void dx10ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const Fvector4& A)
+IC void dx11ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const Fvector4& A)
 {
     //	TEST
     // return;
@@ -172,7 +172,7 @@ IC void dx10ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const
     // c_f.dirty	(base,base+1);
 }
 
-IC void* dx10ConstantBuffer::AccessDirect(R_constant_load& L, size_t DataSize)
+IC void* dx11ConstantBuffer::AccessDirect(R_constant_load& L, size_t DataSize)
 {
     //	Check buffer size in client code: don't know if actual data will cross
     //	buffer boundaries.
@@ -188,4 +188,4 @@ IC void* dx10ConstantBuffer::AccessDirect(R_constant_load& L, size_t DataSize)
         return 0;
 }
 
-#endif //	dx10ConstantBuffer_impl_included
+#endif //	dx11ConstantBuffer_impl_included

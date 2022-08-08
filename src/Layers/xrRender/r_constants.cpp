@@ -258,7 +258,7 @@ void R_constant_table::merge(R_constant_table* T)
     }
 
 #if defined(USE_DX11)
-    //	TODO:	DX10:	Implement merge with validity check
+    //	TODO:	DX11:	Implement merge with validity check
     m_CBTable.reserve(m_CBTable.size() + T->m_CBTable.size());
     for (u32 i = 0; i < T->m_CBTable.size(); ++i)
         m_CBTable.push_back(T->m_CBTable[i]);

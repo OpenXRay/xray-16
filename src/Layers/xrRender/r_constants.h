@@ -16,7 +16,7 @@ enum
     RC_int = 1,
     RC_bool = 2,
     RC_sampler = 99, // DX9 shares index for sampler and texture
-    RC_dx10texture = 100, // For DX10 sampler and texture are different resources
+    RC_dx11texture = 100, // For DX11 sampler and texture are different resources
     RC_dx11UAV = 101
 };
 enum
@@ -37,8 +37,8 @@ enum
     //  Don't change this since some code relies on magic numbers
     RC_dest_pixel = (1 << 0),
     RC_dest_vertex = (1 << 1),
-    RC_dest_sampler = (1 << 2), //  For DX10 it's either sampler or texture
-    RC_dest_geometry = (1 << 3), // DX10 only
+    RC_dest_sampler = (1 << 2), //  For DX11 it's either sampler or texture
+    RC_dest_geometry = (1 << 3), // DX11 only
     RC_dest_hull = (1 << 4), // DX11 only
     RC_dest_domain = (1 << 5), //   DX11 only
     RC_dest_compute = (1 << 6), //  DX11 only

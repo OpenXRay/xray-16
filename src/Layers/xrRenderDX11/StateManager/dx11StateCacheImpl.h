@@ -3,13 +3,13 @@
 #pragma once
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
 
-using dx10StateUtils::operator==;
+using dx11StateUtils::operator==;
 
 template <class IDeviceState, class StateDecs>
-IDeviceState* dx10StateCache<IDeviceState, StateDecs>::GetState(SimulatorStates& state_code)
+IDeviceState* dx11StateCache<IDeviceState, StateDecs>::GetState(SimulatorStates& state_code)
 {
     StateDecs desc;
-    dx10StateUtils::ResetDescription(desc);
+    dx11StateUtils::ResetDescription(desc);
     state_code.UpdateDesc(desc);
 
     return GetState(desc);
@@ -33,13 +33,13 @@ IDeviceState* dx10StateCache<IDeviceState, StateDecs>::GetState(SimulatorStates&
 }
 
 template <class IDeviceState, class StateDecs>
-IDeviceState* dx10StateCache<IDeviceState, StateDecs>::GetState(StateDecs& desc)
+IDeviceState* dx11StateCache<IDeviceState, StateDecs>::GetState(StateDecs& desc)
 {
     IDeviceState* pResult;
 
-    dx10StateUtils::ValidateState(desc);
+    dx11StateUtils::ValidateState(desc);
 
-    u32 crc = dx10StateUtils::GetHash(desc);
+    u32 crc = dx11StateUtils::GetHash(desc);
 
     pResult = FindState(desc, crc);
 
@@ -56,7 +56,7 @@ IDeviceState* dx10StateCache<IDeviceState, StateDecs>::GetState(StateDecs& desc)
 }
 
 template <class IDeviceState, class StateDecs>
-IDeviceState* dx10StateCache<IDeviceState, StateDecs>::FindState(const StateDecs& desc, u32 StateCRC)
+IDeviceState* dx11StateCache<IDeviceState, StateDecs>::FindState(const StateDecs& desc, u32 StateCRC)
 {
     u32 res = 0xffffffff;
     for (u32 i = 0; i < m_StateArray.size(); ++i)

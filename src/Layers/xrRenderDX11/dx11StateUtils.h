@@ -1,8 +1,8 @@
-#ifndef dx10StateUtils_included
-#define dx10StateUtils_included
+#ifndef dx11StateUtils_included
+#define dx11StateUtils_included
 #pragma once
 
-namespace dx10StateUtils
+namespace dx11StateUtils
 {
 D3D_FILL_MODE ConvertFillMode(D3DFILLMODE Mode);
 D3D_CULL_MODE ConvertCullMode(D3DCULL Mode);
@@ -30,11 +30,11 @@ u32 GetHash(const D3D_DEPTH_STENCIL_DESC& desc);
 u32 GetHash(const D3D_BLEND_DESC& desc);
 u32 GetHash(const D3D_SAMPLER_DESC& desc);
 
-//	Modify state to meet DX10 automatic modifications
+//	Modify state to meet DX11 automatic modifications
 void ValidateState(D3D_RASTERIZER_DESC& desc);
 void ValidateState(D3D_DEPTH_STENCIL_DESC& desc);
 void ValidateState(D3D_BLEND_DESC& desc);
 void ValidateState(D3D_SAMPLER_DESC& desc);
 };
 
-#endif //	dx10StateUtils_included
+#endif //	dx11StateUtils_included

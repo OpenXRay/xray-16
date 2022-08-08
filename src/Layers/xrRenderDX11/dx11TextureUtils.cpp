@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "dx11TextureUtils.h"
 
-namespace dx10TextureUtils
+namespace dx11TextureUtils
 {
 struct TextureFormatPairs
 {
     D3DFORMAT m_dx9FMT;
-    DXGI_FORMAT m_dx10FMT;
+    DXGI_FORMAT m_dx11FMT;
 };
 
 TextureFormatPairs TextureFormatList[] = {
@@ -14,7 +14,7 @@ TextureFormatPairs TextureFormatList[] = {
     // D3DFMT_R8G8B8 Not available
     {D3DFMT_A8R8G8B8, DXGI_FORMAT_R8G8B8A8_UNORM}, // Not available
     // D3DFMT_X8R8G8B8 Not available
-    //	TODO: DX10: Remove. Need only for nullrt
+    //	TODO: DX11: Remove. Need only for nullrt
     //{ D3DFMT_R5G6B5,		DXGI_FORMAT_B5G6R5_UNORM },		// Not available
     {D3DFMT_R5G6B5, DXGI_FORMAT_R8G8B8A8_UNORM}, // Not available
     // D3DFMT_X1R5G5B5 Not available
@@ -119,19 +119,19 @@ DXGI_FORMAT ConvertTextureFormat(D3DFORMAT dx9FMT)
     for (int i = 0; i < arrayLength; ++i)
     {
         if (TextureFormatList[i].m_dx9FMT == dx9FMT)
-            return TextureFormatList[i].m_dx10FMT;
+            return TextureFormatList[i].m_dx11FMT;
     }
 
-    VERIFY(!"ConvertTextureFormat didn't find appropriate dx10 texture format!");
+    VERIFY(!"ConvertTextureFormat didn't find appropriate dx11 texture format!");
     return DXGI_FORMAT_UNKNOWN;
 }
 
-D3DFORMAT ConvertTextureFormat(DXGI_FORMAT dx10FMT)
+D3DFORMAT ConvertTextureFormat(DXGI_FORMAT dx11FMT)
 {
     int arrayLength = sizeof(TextureFormatList) / sizeof(TextureFormatList[0]);
     for (int i = 0; i < arrayLength; ++i)
     {
-        if (TextureFormatList[i].m_dx10FMT == dx10FMT)
+        if (TextureFormatList[i].m_dx11FMT == dx11FMT)
             return TextureFormatList[i].m_dx9FMT;
     }
 

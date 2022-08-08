@@ -3,24 +3,24 @@
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
 #include "dx11StateCache.h"
 
-dx10StateManager StateManager;
+dx11StateManager StateManager;
 
-//  DX10: TODO: Implement alpha referense control
+//  DX11: TODO: Implement alpha referense control
 
-dx10StateManager::dx10StateManager()
+dx11StateManager::dx11StateManager()
 {
-    //  If dx10StateManager would ever own any object
+    //  If dx11StateManager would ever own any object
     //  implement correct state manager
     Reset();
 }
 
-dx10StateManager::~dx10StateManager()
+dx11StateManager::~dx11StateManager()
 {
     //  Don't own any object so no release is needed
 }
 
 //  Set all states to default
-void dx10StateManager::Reset()
+void dx11StateManager::Reset()
 {
     UnmapConstants();
 
@@ -43,17 +43,17 @@ void dx10StateManager::Reset()
     m_bDSDInvalid = false;
     m_bBDInvalid = false;
 
-    dx10StateUtils::ResetDescription(m_RDesc);
-    dx10StateUtils::ResetDescription(m_DSDesc);
-    dx10StateUtils::ResetDescription(m_BDesc);
+    dx11StateUtils::ResetDescription(m_RDesc);
+    dx11StateUtils::ResetDescription(m_DSDesc);
+    dx11StateUtils::ResetDescription(m_BDesc);
 
     m_bOverrideScissoring = false;
     m_bOverrideScissoringValue = FALSE;
     m_uiSampleMask = 0xffffffff;
 }
 
-void dx10StateManager::UnmapConstants() { m_cAlphaRef = 0; }
-void dx10StateManager::SetRasterizerState(ID3DRasterizerState* pRState)
+void dx11StateManager::UnmapConstants() { m_cAlphaRef = 0; }
+void dx11StateManager::SetRasterizerState(ID3DRasterizerState* pRState)
 {
     m_bRSChanged = false;
     m_bRDInvalid = true;
@@ -68,7 +68,7 @@ void dx10StateManager::SetRasterizerState(ID3DRasterizerState* pRState)
         EnableScissoring(m_bOverrideScissoringValue);
 }
 
-void dx10StateManager::SetDepthStencilState(ID3DDepthStencilState* pDSState)
+void dx11StateManager::SetDepthStencilState(ID3DDepthStencilState* pDSState)
 {
     m_bDSSChanged = false;
     m_bDSDInvalid = true;
@@ -80,7 +80,7 @@ void dx10StateManager::SetDepthStencilState(ID3DDepthStencilState* pDSState)
     }
 }
 
-void dx10StateManager::SetBlendState(ID3DBlendState* pBlendState)
+void dx11StateManager::SetBlendState(ID3DBlendState* pBlendState)
 {
     m_bBSChanged = false;
     m_bBDInvalid = true;
@@ -92,7 +92,7 @@ void dx10StateManager::SetBlendState(ID3DBlendState* pBlendState)
     }
 }
 
-void dx10StateManager::SetStencilRef(u32 uiStencilRef)
+void dx11StateManager::SetStencilRef(u32 uiStencilRef)
 {
     if (m_uiStencilRef != uiStencilRef)
     {
@@ -101,7 +101,7 @@ void dx10StateManager::SetStencilRef(u32 uiStencilRef)
     }
 }
 
-void dx10StateManager::SetAlphaRef(u32 uiAlphaRef)
+void dx11StateManager::SetAlphaRef(u32 uiAlphaRef)
 {
     if (m_uiAlphaRef != uiAlphaRef)
     {
@@ -111,54 +111,54 @@ void dx10StateManager::SetAlphaRef(u32 uiAlphaRef)
     }
 }
 
-void dx10StateManager::BindAlphaRef(R_constant* C)
+void dx11StateManager::BindAlphaRef(R_constant* C)
 {
     m_cAlphaRef = C;
     if (m_cAlphaRef)
         RCache.set_c(m_cAlphaRef, (float)m_uiAlphaRef / 255.0f);
 }
 
-void dx10StateManager::ValidateRDesc()
+void dx11StateManager::ValidateRDesc()
 {
     if (m_bRDInvalid)
     {
         if (m_pRState)
             m_pRState->GetDesc(&m_RDesc);
         else
-            dx10StateUtils::ResetDescription(m_RDesc);
+            dx11StateUtils::ResetDescription(m_RDesc);
 
         m_bRDInvalid = false;
     }
 }
 
-void dx10StateManager::ValidateDSDesc()
+void dx11StateManager::ValidateDSDesc()
 {
     if (m_bDSDInvalid)
     {
         if (m_pDepthStencilState)
             m_pDepthStencilState->GetDesc(&m_DSDesc);
         else
-            dx10StateUtils::ResetDescription(m_DSDesc);
+            dx11StateUtils::ResetDescription(m_DSDesc);
 
         m_bDSDInvalid = false;
     }
 }
 
-void dx10StateManager::ValidateBDesc()
+void dx11StateManager::ValidateBDesc()
 {
     if (m_bBDInvalid)
     {
         if (m_pBlendState)
             m_pBlendState->GetDesc(&m_BDesc);
         else
-            dx10StateUtils::ResetDescription(m_BDesc);
+            dx11StateUtils::ResetDescription(m_BDesc);
 
         m_bBDInvalid = false;
     }
 }
 
-//  Sends states to DX10 runtime, creates new state objects if nessessary
-void dx10StateManager::Apply()
+//  Sends states to DX11 runtime, creates new state objects if nessessary
+void dx11StateManager::Apply()
 {
     //  Apply rasterizer state
     if (m_bRSNeedApply || m_bRSChanged)
@@ -202,7 +202,7 @@ void dx10StateManager::Apply()
     }
 }
 
-void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
+void dx11StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
 {
     ValidateDSDesc();
 
@@ -222,7 +222,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
     // if (stencil_func != _func)       { stencil_func=_func;           CHK_DX(HW.pDevice->SetRenderState   (
     // D3DRS_STENCILFUNC,
     // _func                )); }
-    D3D_COMPARISON_FUNC SFunc = dx10StateUtils::ConvertCmpFunction(D3DCMPFUNC(Func));
+    D3D_COMPARISON_FUNC SFunc = dx11StateUtils::ConvertCmpFunction(D3DCMPFUNC(Func));
 
     if ((m_DSDesc.FrontFace.StencilFunc != SFunc) || (m_DSDesc.BackFace.StencilFunc != SFunc))
     {
@@ -258,7 +258,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
     // if (stencil_fail     != _fail)       { stencil_fail=_fail;           CHK_DX(HW.pDevice->SetRenderState   (
     // D3DRS_STENCILFAIL,
     // _fail                )); }
-    D3D_STENCIL_OP SOp = dx10StateUtils::ConvertStencilOp(D3DSTENCILOP(Fail));
+    D3D_STENCIL_OP SOp = dx11StateUtils::ConvertStencilOp(D3DSTENCILOP(Fail));
     if ((m_DSDesc.FrontFace.StencilFailOp != SOp) || (m_DSDesc.BackFace.StencilFailOp != SOp))
     {
         m_bDSSChanged = true;
@@ -269,7 +269,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
     // if (stencil_pass     != _pass)       { stencil_pass=_pass;           CHK_DX(HW.pDevice->SetRenderState   (
     // D3DRS_STENCILPASS,
     // _pass                )); }
-    SOp = dx10StateUtils::ConvertStencilOp(D3DSTENCILOP(Pass));
+    SOp = dx11StateUtils::ConvertStencilOp(D3DSTENCILOP(Pass));
     if ((m_DSDesc.FrontFace.StencilPassOp != SOp) || (m_DSDesc.BackFace.StencilPassOp != SOp))
     {
         m_bDSSChanged = true;
@@ -280,7 +280,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
     // if (stencil_zfail        != _zfail)      { stencil_zfail=_zfail;         CHK_DX(HW.pDevice->SetRenderState   (
     // D3DRS_STENCILZFAIL,
     // _zfail               )); }
-    SOp = dx10StateUtils::ConvertStencilOp(D3DSTENCILOP(ZFail));
+    SOp = dx11StateUtils::ConvertStencilOp(D3DSTENCILOP(ZFail));
     if ((m_DSDesc.FrontFace.StencilDepthFailOp != SOp) || (m_DSDesc.BackFace.StencilDepthFailOp != SOp))
     {
         m_bDSSChanged = true;
@@ -289,7 +289,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
     }
 }
 
-void dx10StateManager::SetDepthFunc(u32 Func)
+void dx11StateManager::SetDepthFunc(u32 Func)
 {
     ValidateDSDesc();
 
@@ -299,7 +299,7 @@ void dx10StateManager::SetDepthFunc(u32 Func)
     //  CHK_DX(HW.pDevice->SetRenderState( D3DRS_ZFUNC, _func));
     //}
 
-    D3D_COMPARISON_FUNC DFunc = dx10StateUtils::ConvertCmpFunction(D3DCMPFUNC(Func));
+    D3D_COMPARISON_FUNC DFunc = dx11StateUtils::ConvertCmpFunction(D3DCMPFUNC(Func));
     if (m_DSDesc.DepthFunc != DFunc)
     {
         m_bDSSChanged = true;
@@ -307,7 +307,7 @@ void dx10StateManager::SetDepthFunc(u32 Func)
     }
 }
 
-void dx10StateManager::SetDepthEnable(u32 Enable)
+void dx11StateManager::SetDepthEnable(u32 Enable)
 {
     ValidateDSDesc();
 
@@ -325,7 +325,7 @@ void dx10StateManager::SetDepthEnable(u32 Enable)
     }
 }
 
-void dx10StateManager::SetColorWriteEnable(u32 WriteMask)
+void dx11StateManager::SetColorWriteEnable(u32 WriteMask)
 {
     ValidateBDesc();
 
@@ -362,7 +362,7 @@ void dx10StateManager::SetColorWriteEnable(u32 WriteMask)
     }
 }
 
-void dx10StateManager::SetSampleMask(u32 SampleMask)
+void dx11StateManager::SetSampleMask(u32 SampleMask)
 {
     if (m_uiSampleMask != SampleMask)
     {
@@ -371,14 +371,14 @@ void dx10StateManager::SetSampleMask(u32 SampleMask)
     }
 }
 
-void dx10StateManager::SetCullMode(u32 Mode)
+void dx11StateManager::SetCullMode(u32 Mode)
 {
     ValidateRDesc();
     // if (cull_mode        != _mode)       { cull_mode = _mode;            CHK_DX(HW.pDevice->SetRenderState   ( D3DRS_CULLMODE,
     // _mode
     // )); }
 
-    D3D_CULL_MODE CMode = dx10StateUtils::ConvertCullMode((D3DCULL)Mode);
+    D3D_CULL_MODE CMode = dx11StateUtils::ConvertCullMode((D3DCULL)Mode);
     if (m_RDesc.CullMode != CMode)
     {
         m_bRSChanged = true;
@@ -386,11 +386,11 @@ void dx10StateManager::SetCullMode(u32 Mode)
     }
 }
 
-void dx10StateManager::SetFillMode(u32 Mode)
+void dx11StateManager::SetFillMode(u32 Mode)
 {
     ValidateRDesc();
 
-    D3D_FILL_MODE CMode = dx10StateUtils::ConvertFillMode((D3DFILLMODE)Mode);
+    D3D_FILL_MODE CMode = dx11StateUtils::ConvertFillMode((D3DFILLMODE)Mode);
     if (m_RDesc.FillMode != CMode)
     {
         m_bRSChanged = true;
@@ -398,7 +398,7 @@ void dx10StateManager::SetFillMode(u32 Mode)
     }
 }
 
-void dx10StateManager::SetMultisample(u32 Enable)
+void dx11StateManager::SetMultisample(u32 Enable)
 {
     ValidateRDesc();
 
@@ -409,7 +409,7 @@ void dx10StateManager::SetMultisample(u32 Enable)
     }
 }
 
-void dx10StateManager::EnableScissoring(BOOL bEnable)
+void dx11StateManager::EnableScissoring(BOOL bEnable)
 {
     ValidateRDesc();
 
@@ -420,7 +420,7 @@ void dx10StateManager::EnableScissoring(BOOL bEnable)
     }
 }
 
-void dx10StateManager::OverrideScissoring(bool bOverride, BOOL bValue)
+void dx11StateManager::OverrideScissoring(bool bOverride, BOOL bValue)
 {
     m_bOverrideScissoring = bOverride;
     m_bOverrideScissoringValue = bValue;
@@ -436,7 +436,7 @@ void dx10StateManager::OverrideScissoring(bool bOverride, BOOL bValue)
             if (m_pRState)
                 m_pRState->GetDesc(&tmpDesc);
             else
-                dx10StateUtils::ResetDescription(tmpDesc);
+                dx11StateUtils::ResetDescription(tmpDesc);
 
             m_RDesc.ScissorEnable = tmpDesc.ScissorEnable;
         }

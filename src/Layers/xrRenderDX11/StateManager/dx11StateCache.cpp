@@ -1,19 +1,19 @@
 #include "stdafx.h"
 #include "dx11StateCache.h"
 
-dx10StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
-dx10StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
-dx10StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
+dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
+dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
+dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
 
 template <class IDeviceState, class StateDecs>
-dx10StateCache<IDeviceState, StateDecs>::dx10StateCache()
+dx11StateCache<IDeviceState, StateDecs>::dx11StateCache()
 {
     static const int iMasRSStates = 10;
     m_StateArray.reserve(iMasRSStates);
 }
 
 template <class IDeviceState, class StateDecs>
-dx10StateCache<IDeviceState, StateDecs>::~dx10StateCache()
+dx11StateCache<IDeviceState, StateDecs>::~dx11StateCache()
 {
     ClearStateArray();
     //	VERIFY(m_StateArray.empty());
@@ -22,7 +22,7 @@ dx10StateCache<IDeviceState, StateDecs>::~dx10StateCache()
 /*
 template <class IDeviceState, class StateDecs>
 void
-dx10StateCache<IDeviceState, StateDecs>
+dx11StateCache<IDeviceState, StateDecs>
 ::FlushStates()
 {
     ClearStateArray();
@@ -30,7 +30,7 @@ dx10StateCache<IDeviceState, StateDecs>
 */
 
 template <class IDeviceState, class StateDecs>
-void dx10StateCache<IDeviceState, StateDecs>::ClearStateArray()
+void dx11StateCache<IDeviceState, StateDecs>::ClearStateArray()
 {
     for (u32 i = 0; i < m_StateArray.size(); ++i)
     {
@@ -41,35 +41,35 @@ void dx10StateCache<IDeviceState, StateDecs>::ClearStateArray()
 }
 
 template <>
-void dx10StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC>::CreateState(
+void dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC>::CreateState(
     D3D_RASTERIZER_DESC desc, ID3DRasterizerState** ppIState)
 {
     CHK_DX(HW.pDevice->CreateRasterizerState(&desc, ppIState));
 
-//	TODO: DX10: Remove this.
+//	TODO: DX11: Remove this.
 #ifdef DEBUG
     Msg("ID3DRasterizerState #%d created.", m_StateArray.size());
 #endif //	DEBUG
 }
 
 template <>
-void dx10StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC>::CreateState(
+void dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC>::CreateState(
     D3D_DEPTH_STENCIL_DESC desc, ID3DDepthStencilState** ppIState)
 {
     CHK_DX(HW.pDevice->CreateDepthStencilState(&desc, ppIState));
 
-//	TODO: DX10: Remove this.
+//	TODO: DX11: Remove this.
 #ifdef DEBUG
     Msg("ID3DDepthStencilState #%d created.", m_StateArray.size());
 #endif //	DEBUG
 }
 
 template <>
-void dx10StateCache<ID3DBlendState, D3D_BLEND_DESC>::CreateState(D3D_BLEND_DESC desc, ID3DBlendState** ppIState)
+void dx11StateCache<ID3DBlendState, D3D_BLEND_DESC>::CreateState(D3D_BLEND_DESC desc, ID3DBlendState** ppIState)
 {
     CHK_DX(HW.pDevice->CreateBlendState(&desc, ppIState));
 
-//	TODO: DX10: Remove this.
+//	TODO: DX11: Remove this.
 #ifdef DEBUG
     Msg("ID3DBlendState #%d created.", m_StateArray.size());
 #endif //	DEBUG
@@ -78,7 +78,7 @@ void dx10StateCache<ID3DBlendState, D3D_BLEND_DESC>::CreateState(D3D_BLEND_DESC 
 /*
 template <>
 void
-dx10StateCache<ID3DxxRasterizerState, D3D_RASTERIZER_DESC>
+dx11StateCache<ID3DxxRasterizerState, D3D_RASTERIZER_DESC>
 ::ResetDescription( D3D_RASTERIZER_DESC &desc )
 {
     ZeroMemory(&desc, sizeof(desc));
@@ -96,7 +96,7 @@ dx10StateCache<ID3DxxRasterizerState, D3D_RASTERIZER_DESC>
 
 template <>
 void
-dx10StateCache<ID3DxxDepthStencilState, D3D_DEPTH_STENCIL_DESC>
+dx11StateCache<ID3DxxDepthStencilState, D3D_DEPTH_STENCIL_DESC>
 ::ResetDescription( D3D_DEPTH_STENCIL_DESC &desc )
 {
     ZeroMemory(&desc, sizeof(desc));
@@ -120,7 +120,7 @@ dx10StateCache<ID3DxxDepthStencilState, D3D_DEPTH_STENCIL_DESC>
 
 template <>
 void
-dx10StateCache< ID3DxxBlendState , D3D_BLEND_DESC >
+dx11StateCache< ID3DxxBlendState , D3D_BLEND_DESC >
 ::ResetDescription( D3D_BLEND_DESC &desc )
 {
     ZeroMemory(&desc, sizeof(desc));

@@ -211,7 +211,7 @@ void CHWCaps::Update()
     // raster.b_MRT_mixdepth		= FALSE;
     raster.b_MRT_mixdepth = TRUE;
     raster.dwInstructions = 256;
-    //	TODO: DX10: Find a way to detect cache size
+    //	TODO: DX11: Find a way to detect cache size
     geometry.dwVertexCache = 24;
 
     // ***************** Info

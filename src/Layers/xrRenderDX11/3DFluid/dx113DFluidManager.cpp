@@ -7,7 +7,7 @@
 #include "dx113DFluidObstacles.h"
 #include "dx113DFluidEmitters.h"
 
-dx103DFluidManager FluidManager;
+dx113DFluidManager FluidManager;
 
 namespace
 {
@@ -38,7 +38,7 @@ shared_str strHalfVolumeDim("halfVolumeDim");
 shared_str strGravityBuoyancy("GravityBuoyancy");
 }
 
-LPCSTR dx103DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
+LPCSTR dx113DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
     "$user$Texture_velocity1", //RENDER_TARGET_VELOCITY1 = 0,
     // Swap with object's
     "$user$Texture_color_out", //RENDER_TARGET_COLOR,
@@ -52,7 +52,7 @@ LPCSTR dx103DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
     "$user$Texture_color", //RENDER_TARGET_COLOR_IN,
 };
 
-LPCSTR dx103DFluidManager::m_pShaderTextureNames[NUM_RENDER_TARGETS] = {
+LPCSTR dx113DFluidManager::m_pShaderTextureNames[NUM_RENDER_TARGETS] = {
     "Texture_velocity1", //RENDER_TARGET_VELOCITY1 = 0,
     // Swap with object's
     "Texture_color_out", //RENDER_TARGET_COLOR,
@@ -66,7 +66,7 @@ LPCSTR dx103DFluidManager::m_pShaderTextureNames[NUM_RENDER_TARGETS] = {
     "Texture_color", // RENDER_TARGET_COLOR_IN,
 };
 
-dx103DFluidManager::dx103DFluidManager()
+dx113DFluidManager::dx113DFluidManager()
     : m_bInited(false),
       // m_nIterations(10), m_bUseBFECC(true),
       m_nIterations(6), m_bUseBFECC(true),
@@ -88,8 +88,8 @@ dx103DFluidManager::dx103DFluidManager()
     RenderTargetFormats[RENDER_TARGET_TEMPVECTOR] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 }
 
-dx103DFluidManager::~dx103DFluidManager() { Destroy(); }
-void dx103DFluidManager::Initialize(int width, int height, int depth)
+dx113DFluidManager::~dx113DFluidManager() { Destroy(); }
+void dx113DFluidManager::Initialize(int width, int height, int depth)
 {
     // if (strstr(Core.Params,"-no_volumetric_fog"))
     if (!RImplementation.o.volumetricfog)
@@ -134,16 +134,16 @@ void dx103DFluidManager::Initialize(int width, int height, int depth)
 
     Reset();
 
-    m_pGrid = xr_new<dx103DFluidGrid>();
+    m_pGrid = xr_new<dx113DFluidGrid>();
 
     m_pGrid->Initialize(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth);
 
-    m_pRenderer = xr_new<dx103DFluidRenderer>();
+    m_pRenderer = xr_new<dx113DFluidRenderer>();
     m_pRenderer->Initialize(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth);
 
-    m_pObstaclesHandler = xr_new<dx103DFluidObstacles>(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
+    m_pObstaclesHandler = xr_new<dx113DFluidObstacles>(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
 
-    m_pEmittersHandler = xr_new<dx103DFluidEmitters>(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
+    m_pEmittersHandler = xr_new<dx113DFluidEmitters>(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
 
     m_bInited = true;
 
@@ -152,7 +152,7 @@ void dx103DFluidManager::Initialize(int width, int height, int depth)
     // renderer = new VolumeRenderer( m_pD3DDevice );
 }
 
-void dx103DFluidManager::Destroy()
+void dx113DFluidManager::Destroy()
 {
     if (!m_bInited)
         return;
@@ -174,7 +174,7 @@ void dx103DFluidManager::Destroy()
     m_bInited = false;
 }
 
-void dx103DFluidManager::InitShaders()
+void dx113DFluidManager::InitShaders()
 {
     {
         CBlender_fluid_advect Blender;
@@ -201,7 +201,7 @@ void dx103DFluidManager::InitShaders()
     }
 }
 
-void dx103DFluidManager::DestroyShaders()
+void dx113DFluidManager::DestroyShaders()
 {
     for (size_t i = 0; i < SS_NumShaders; ++i)
     {
@@ -210,12 +210,12 @@ void dx103DFluidManager::DestroyShaders()
     }
 }
 
-void dx103DFluidManager::PrepareTexture(size_t rtIndex)
+void dx113DFluidManager::PrepareTexture(size_t rtIndex)
 {
     pRTTextures[rtIndex] = RImplementation.Resources->_CreateTexture(m_pEngineTextureNames[rtIndex]);
 }
 
-void dx103DFluidManager::CreateRTTextureAndViews(size_t rtIndex, D3D_TEXTURE3D_DESC TexDesc)
+void dx113DFluidManager::CreateRTTextureAndViews(size_t rtIndex, D3D_TEXTURE3D_DESC TexDesc)
 {
     // Resources must be already released by Destroy().
 
@@ -238,14 +238,14 @@ void dx103DFluidManager::CreateRTTextureAndViews(size_t rtIndex, D3D_TEXTURE3D_D
     // CTexture owns ID3DxxTexture3D interface
     pRT->Release();
 }
-void dx103DFluidManager::DestroyRTTextureAndViews(size_t rtIndex)
+void dx113DFluidManager::DestroyRTTextureAndViews(size_t rtIndex)
 {
     // pRTTextures[rtIndex]->surface_set(0);
     pRTTextures[rtIndex] = nullptr;
     _RELEASE(pRenderTargetViews[rtIndex]);
 }
 
-void dx103DFluidManager::Reset()
+void dx113DFluidManager::Reset()
 {
     for (size_t rtIndex = 0; rtIndex < NUM_OWN_RENDER_TARGETS; rtIndex++)
     {
@@ -253,12 +253,12 @@ void dx103DFluidManager::Reset()
     }
 }
 
-void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
+void dx113DFluidManager::Update(dx113DFluidData& FluidData, float timestep)
 {
     PIX_EVENT(simulate_fluid);
 
-    const dx103DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
-    const bool bSimulateFire = (VolumeSettings.m_SimulationType == dx103DFluidData::ST_FIRE);
+    const dx113DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
+    const bool bSimulateFire = (VolumeSettings.m_SimulationType == dx113DFluidData::ST_FIRE);
 
     AttachFluidData(FluidData);
 
@@ -345,45 +345,45 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     // RImplementation.Target->phase_scene_begin();
 }
 
-void dx103DFluidManager::AttachFluidData(dx103DFluidData& FluidData)
+void dx113DFluidManager::AttachFluidData(dx113DFluidData& FluidData)
 {
     PIX_EVENT(AttachFluidData);
 
-    for (size_t i = 0; i < dx103DFluidData::VP_NUM_TARGETS; ++i)
+    for (size_t i = 0; i < dx113DFluidData::VP_NUM_TARGETS; ++i)
     {
-        ID3DTexture3D* pT = FluidData.GetTexture((dx103DFluidData::eVolumePrivateRT)i);
+        ID3DTexture3D* pT = FluidData.GetTexture((dx113DFluidData::eVolumePrivateRT)i);
         pRTTextures[RENDER_TARGET_VELOCITY0 + i]->surface_set(pT);
         _RELEASE(pT);
 
         VERIFY(!pRenderTargetViews[RENDER_TARGET_VELOCITY0 + i]);
-        pRenderTargetViews[RENDER_TARGET_VELOCITY0 + i] = FluidData.GetView((dx103DFluidData::eVolumePrivateRT)i);
+        pRenderTargetViews[RENDER_TARGET_VELOCITY0 + i] = FluidData.GetView((dx113DFluidData::eVolumePrivateRT)i);
     }
 }
 
-void dx103DFluidManager::DetachAndSwapFluidData(dx103DFluidData& FluidData)
+void dx113DFluidManager::DetachAndSwapFluidData(dx113DFluidData& FluidData)
 {
     PIX_EVENT(DetachAndSwapFluidData);
 
     ID3DTexture3D* pTTarg = (ID3DTexture3D*)pRTTextures[RENDER_TARGET_COLOR]->surface_get();
-    ID3DTexture3D* pTSrc = FluidData.GetTexture(dx103DFluidData::VP_COLOR);
-    FluidData.SetTexture(dx103DFluidData::VP_COLOR, pTTarg);
+    ID3DTexture3D* pTSrc = FluidData.GetTexture(dx113DFluidData::VP_COLOR);
+    FluidData.SetTexture(dx113DFluidData::VP_COLOR, pTTarg);
     pRTTextures[RENDER_TARGET_COLOR]->surface_set(pTSrc);
     _RELEASE(pTTarg);
     _RELEASE(pTSrc);
 
-    ID3DRenderTargetView* pV = FluidData.GetView(dx103DFluidData::VP_COLOR);
-    FluidData.SetView(dx103DFluidData::VP_COLOR, pRenderTargetViews[RENDER_TARGET_COLOR]);
+    ID3DRenderTargetView* pV = FluidData.GetView(dx113DFluidData::VP_COLOR);
+    FluidData.SetView(dx113DFluidData::VP_COLOR, pRenderTargetViews[RENDER_TARGET_COLOR]);
     _RELEASE(pRenderTargetViews[RENDER_TARGET_COLOR]);
     pRenderTargetViews[RENDER_TARGET_COLOR] = pV;
 
-    for (size_t i = 0; i < dx103DFluidData::VP_NUM_TARGETS; ++i)
+    for (size_t i = 0; i < dx113DFluidData::VP_NUM_TARGETS; ++i)
     {
         pRTTextures[RENDER_TARGET_VELOCITY0 + i]->surface_set(0);
         _RELEASE(pRenderTargetViews[RENDER_TARGET_VELOCITY0 + i]);
     }
 }
 
-void dx103DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
+void dx113DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
 {
     PIX_EVENT(AdvectColorBFECC);
 
@@ -481,7 +481,7 @@ void dx103DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
     // TechniqueAdvectBFECC->GetPassByIndex(0)->Apply(0);*/
 }
 
-void dx103DFluidManager::AdvectColor(float timestep, bool bTeperature)
+void dx113DFluidManager::AdvectColor(float timestep, bool bTeperature)
 {
     PIX_EVENT(AdvectColor);
     // if(ColorTextureNumber == 0)
@@ -515,7 +515,7 @@ void dx103DFluidManager::AdvectColor(float timestep, bool bTeperature)
     m_pGrid->DrawSlices();
 }
 
-void dx103DFluidManager::AdvectVelocity(float timestep, float fGravity)
+void dx113DFluidManager::AdvectVelocity(float timestep, float fGravity)
 {
     PIX_EVENT(AdvectVelocity);
 
@@ -545,7 +545,7 @@ void dx103DFluidManager::AdvectVelocity(float timestep, float fGravity)
     // );
 }
 
-void dx103DFluidManager::ApplyVorticityConfinement(float timestep)
+void dx113DFluidManager::ApplyVorticityConfinement(float timestep)
 {
     PIX_EVENT(ApplyVorticityConfinement);
 
@@ -579,7 +579,7 @@ void dx103DFluidManager::ApplyVorticityConfinement(float timestep)
     // );
 }
 
-void dx103DFluidManager::ApplyExternalForces(const dx103DFluidData& FluidData, float /*timestep*/)
+void dx113DFluidManager::ApplyExternalForces(const dx113DFluidData& FluidData, float /*timestep*/)
 {
     PIX_EVENT(ApplyExternalForces);
 
@@ -590,7 +590,7 @@ void dx103DFluidManager::ApplyExternalForces(const dx103DFluidData& FluidData, f
     m_pEmittersHandler->RenderVelocity(FluidData);
 }
 
-void dx103DFluidManager::ComputeVelocityDivergence(float /*timestep*/)
+void dx113DFluidManager::ComputeVelocityDivergence(float /*timestep*/)
 {
     PIX_EVENT(ComputeVelocityDivergence);
 
@@ -608,7 +608,7 @@ void dx103DFluidManager::ComputeVelocityDivergence(float /*timestep*/)
     // pRenderTargetShaderViews[RENDER_TARGET_TEMPVECTOR] );
 }
 
-void dx103DFluidManager::ComputePressure(float /*timestep*/)
+void dx113DFluidManager::ComputePressure(float /*timestep*/)
 {
     PIX_EVENT(ComputePressure);
 
@@ -679,7 +679,7 @@ void dx103DFluidManager::ComputePressure(float /*timestep*/)
     // TechniqueJacobi->GetPassByIndex(0)->Apply(0);
 }
 
-void dx103DFluidManager::ProjectVelocity(float /*timestep*/)
+void dx113DFluidManager::ProjectVelocity(float /*timestep*/)
 {
     PIX_EVENT(ProjectVelocity);
 
@@ -696,13 +696,13 @@ void dx103DFluidManager::ProjectVelocity(float /*timestep*/)
     // );
 }
 
-void dx103DFluidManager::RenderFluid(dx103DFluidData& FluidData)
+void dx113DFluidManager::RenderFluid(dx113DFluidData& FluidData)
 {
     //  return;
     PIX_EVENT(render_fluid);
 
     //  Bind input texture
-    ID3DTexture3D* pT = FluidData.GetTexture(dx103DFluidData::VP_COLOR);
+    ID3DTexture3D* pT = FluidData.GetTexture(dx113DFluidData::VP_COLOR);
     pRTTextures[RENDER_TARGET_COLOR_IN]->surface_set(pT);
     _RELEASE(pT);
 
@@ -719,7 +719,7 @@ void dx103DFluidManager::RenderFluid(dx103DFluidData& FluidData)
     RImplementation.rmNormal();
 }
 
-void dx103DFluidManager::UpdateObstacles(const dx103DFluidData& FluidData, float timestep)
+void dx113DFluidManager::UpdateObstacles(const dx113DFluidData& FluidData, float timestep)
 {
     PIX_EVENT(Fluid_update_obstacles);
     //  Reset data
@@ -741,7 +741,7 @@ void dx103DFluidManager::UpdateObstacles(const dx103DFluidData& FluidData, float
 
 #ifndef MASTER_GOLD
 // Allow real-time config reload
-void dx103DFluidManager::RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName)
+void dx113DFluidManager::RegisterFluidData(dx113DFluidData* pData, const xr_string& SectionName)
 {
     const size_t iDataNum = m_lstFluidData.size();
 
@@ -764,7 +764,7 @@ void dx103DFluidManager::RegisterFluidData(dx103DFluidData* pData, const xr_stri
     }
 }
 
-void dx103DFluidManager::DeregisterFluidData(dx103DFluidData* pData)
+void dx113DFluidManager::DeregisterFluidData(dx113DFluidData* pData)
 {
     const size_t iDataNum = m_lstFluidData.size();
 
@@ -779,7 +779,7 @@ void dx103DFluidManager::DeregisterFluidData(dx103DFluidData* pData)
     if (i != iDataNum)
     {
         xr_vector<xr_string>::iterator it1 = m_lstSectionNames.begin();
-        xr_vector<dx103DFluidData*>::iterator it2 = m_lstFluidData.begin();
+        xr_vector<dx113DFluidData*>::iterator it2 = m_lstFluidData.begin();
         // it1.advance(i);
         it1 += i;
         it2 += i;
@@ -789,7 +789,7 @@ void dx103DFluidManager::DeregisterFluidData(dx103DFluidData* pData)
     }
 }
 
-void dx103DFluidManager::UpdateProfiles()
+void dx113DFluidManager::UpdateProfiles()
 {
     const size_t iDataNum = m_lstFluidData.size();
 

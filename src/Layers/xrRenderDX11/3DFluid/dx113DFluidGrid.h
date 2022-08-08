@@ -1,14 +1,14 @@
-#ifndef dx103DFluidGrid_included
-#define dx103DFluidGrid_included
+#ifndef dx113DFluidGrid_included
+#define dx113DFluidGrid_included
 #pragma once
 
 struct VS_INPUT_FLUIDSIM_STRUCT;
 
-class dx103DFluidGrid
+class dx113DFluidGrid
 {
 public:
-    dx103DFluidGrid();
-    ~dx103DFluidGrid();
+    dx113DFluidGrid();
+    ~dx113DFluidGrid();
 
     void Initialize(int gridWidth, int gridHeight, int gridDepth);
 
@@ -49,4 +49,4 @@ private:
     int m_iNumVerticesBoundaryLines;
 };
 
-#endif //	dx103DFluidGrid_included
+#endif //	dx113DFluidGrid_included

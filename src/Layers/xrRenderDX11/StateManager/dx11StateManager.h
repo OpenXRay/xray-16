@@ -1,16 +1,16 @@
-#ifndef dx10StateManager_included
-#define dx10StateManager_included
+#ifndef dx11StateManager_included
+#define dx11StateManager_included
 #pragma once
 
-class dx10StateManager
+class dx11StateManager
 {
 public:
-    dx10StateManager();
-    ~dx10StateManager();
+    dx11StateManager();
+    ~dx11StateManager();
 
     //	Set all states to default
     void Reset();
-    //	Sends states to DX10 runtime, creates new state objects if nesessary
+    //	Sends states to DX11 runtime, creates new state objects if nesessary
     void Apply();
 
     //	Unmaps all constant bindings.
@@ -91,6 +91,6 @@ private:
     u32 m_uiSampleMask;
 };
 
-extern dx10StateManager StateManager;
+extern dx11StateManager StateManager;
 
-#endif //	dx10StateManager_included
+#endif //	dx11StateManager_included

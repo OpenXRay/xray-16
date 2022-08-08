@@ -3,9 +3,9 @@
 
 #include "dx113DFluidManager.h"
 
-dx103DFluidVolume::dx103DFluidVolume() {}
-dx103DFluidVolume::~dx103DFluidVolume() {}
-void dx103DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
+dx113DFluidVolume::dx113DFluidVolume() {}
+dx113DFluidVolume::~dx113DFluidVolume() {}
+void dx113DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
 {
     //	Uncomment this if choose to read from OGF
     //	dxRender_Visual::Load		(N,data,dwFlags);
@@ -85,7 +85,7 @@ void dx103DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
     */
 }
 
-void dx103DFluidVolume::Render(float /*LOD*/) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
+void dx113DFluidVolume::Render(float /*LOD*/) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
 {
     //	Render debug box
     //	Do it BEFORE update since update resets shaders and other pipeline settings
@@ -193,5 +193,5 @@ void dx103DFluidVolume::Render(float /*LOD*/) // LOD - Level Of Detail  [0.0f - 
     FluidManager.RenderFluid(m_FluidData);
 }
 
-void dx103DFluidVolume::Copy(dxRender_Visual* pFrom) { dxRender_Visual::Copy(pFrom); }
-void dx103DFluidVolume::Release() { dxRender_Visual::Release(); }
+void dx113DFluidVolume::Copy(dxRender_Visual* pFrom) { dxRender_Visual::Copy(pFrom); }
+void dx113DFluidVolume::Release() { dxRender_Visual::Release(); }

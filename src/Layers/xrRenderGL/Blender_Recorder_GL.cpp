@@ -32,8 +32,8 @@ void CBlender_Compile::r_CullMode(D3DCULL Mode)
 
 void CBlender_Compile::i_Comparison(u32 s, u32 func)
 {
-    RS.SetSAMP(s, XRDX10SAMP_COMPARISONFILTER, TRUE);
-    RS.SetSAMP(s, XRDX10SAMP_COMPARISONFUNC, func);
+    RS.SetSAMP(s, XRDX11SAMP_COMPARISONFILTER, TRUE);
+    RS.SetSAMP(s, XRDX11SAMP_COMPARISONFUNC, func);
 }
 
 void CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
@@ -42,8 +42,8 @@ void CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_Pr
                       D3DTEXF_LINEAR);
     if (u32(-1) != s)
     {
-        RS.SetSAMP(s, XRDX10SAMP_COMPARISONFILTER, TRUE);
-        RS.SetSAMP(s, XRDX10SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
+        RS.SetSAMP(s, XRDX11SAMP_COMPARISONFILTER, TRUE);
+        RS.SetSAMP(s, XRDX11SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 }
 
