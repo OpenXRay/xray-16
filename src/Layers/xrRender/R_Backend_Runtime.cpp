@@ -4,8 +4,8 @@
 #include "xrCDB/Frustum.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/StateManager/dx10StateManager.h"
-#include "Layers/xrRenderDX10/StateManager/dx10ShaderResourceStateCache.h"
+#include "Layers/xrRenderDX11/StateManager/dx10StateManager.h"
+#include "Layers/xrRenderDX11/StateManager/dx10ShaderResourceStateCache.h"
 #endif
 
 #if defined(USE_DX9) || defined(USE_DX11)

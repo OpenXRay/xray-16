@@ -6,7 +6,7 @@
 #include "Layers/xrRender/blender.h"
 #include "Layers/xrRender/blender_recorder.h"
 #include "Layers/xrRender/BufferUtils.h"
-#include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
+#include "Layers/xrRenderDX11/dx10ConstantBuffer.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 template <class T>

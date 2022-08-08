@@ -4,7 +4,7 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "xrCore/xrPool.h"
 #include "Layers/xrRender/r_constants.h"
-#include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
+#include "Layers/xrRenderDX11/dx10ConstantBuffer.h"
 
 IC bool p_sort(const ref_constant& C1, const ref_constant& C2) { return xr_strcmp(C1->name, C2->name) < 0; }
 BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination)

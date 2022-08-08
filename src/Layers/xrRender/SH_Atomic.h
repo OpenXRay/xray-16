@@ -6,7 +6,7 @@
 #include "tss_def.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/StateManager/dx10State.h"
+#include "Layers/xrRenderDX11/StateManager/dx10State.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glState.h"
 #endif

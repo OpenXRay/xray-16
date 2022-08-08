@@ -17,7 +17,7 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
+#include "Layers/xrRenderDX11/3DFluid/dx103DFluidManager.h"
 #endif
 
 CRender RImplementation;

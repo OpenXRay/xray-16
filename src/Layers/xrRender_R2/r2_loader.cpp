@@ -10,7 +10,7 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRender/FHierrarhyVisual.h"
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
+#include "Layers/xrRenderDX11/3DFluid/dx103DFluidVolume.h"
 #endif
 
 void CRender::level_Load(IReader* fs)

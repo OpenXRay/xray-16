@@ -121,7 +121,7 @@ BOOL SimulatorStates::equal(SimulatorStates& S)
 void SimulatorStates::clear() { States.clear(); }
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/dx10StateUtils.h"
+#include "Layers/xrRenderDX11/dx10StateUtils.h"
 
 void SimulatorStates::UpdateState(dx10State& state) const
 {
