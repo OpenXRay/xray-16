@@ -251,7 +251,7 @@ CRenderTarget::CRenderTarget()
 #ifdef DEBUG
     Msg("MSAA samples = %d", SampleCount);
     if (RImplementation.o.msaa_opt)
-        Msg("dx11_MSAA_opt = on");
+        Msg("MSAA_opt = on");
     if (RImplementation.o.gbuffer_opt)
         Msg("gbuffer_opt = on");
 #endif
