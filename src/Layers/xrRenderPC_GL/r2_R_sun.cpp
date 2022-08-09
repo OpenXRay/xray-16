@@ -370,7 +370,6 @@ void CRender::render_sun()
     CFrustum cull_frustum;
     xr_vector<Fplane> cull_planes;
     Fvector3 cull_COP;
-    CSector* cull_sector;
     glm::mat4 cull_xform;
     {
         FPU::m64r();
@@ -391,23 +390,6 @@ void CRender::render_sun()
             }
         }
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
-
-        // Search for default sector - assume "default" or "outdoor" sector is the largest one
-        //. hack: need to know real outdoor sector
-        CSector* largest_sector = nullptr;
-        float largest_sector_vol = 0;
-        for (u32 s = 0; s < Sectors.size(); s++)
-        {
-            CSector* S = (CSector*)Sectors[s];
-            dxRender_Visual* V = S->root();
-            float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol)
-            {
-                largest_sector_vol = vol;
-                largest_sector = S;
-            }
-        }
-        cull_sector = largest_sector;
 
         // COP - 100 km away
         cull_COP.mad(Device.vCameraPosition, fuckingsun->direction, -tweak_COP_initial_offs);
@@ -463,7 +445,7 @@ void CRender::render_sun()
     xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
     set_Recorder(&s_casters);
-    r_dsgraph_render_subspace(cull_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
+    r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
 
     // IGNORE PORTALS
     if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
@@ -862,7 +844,6 @@ void CRender::render_sun_near()
     CFrustum cull_frustum;
     xr_vector<Fplane> cull_planes;
     Fvector3 cull_COP;
-    CSector* cull_sector;
     glm::mat4 cull_xform;
     {
         FPU::m64r();
@@ -892,23 +873,6 @@ void CRender::render_sun_near()
         for (u32 it = 0; it < cull_planes.size(); it++)
             Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
-
-        // Search for default sector - assume "default" or "outdoor" sector is the largest one
-        //. hack: need to know real outdoor sector
-        CSector* largest_sector = nullptr;
-        float largest_sector_vol = 0;
-        for (u32 s = 0; s < Sectors.size(); s++)
-        {
-            CSector* S = (CSector*)Sectors[s];
-            dxRender_Visual* V = S->root();
-            float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol)
-            {
-                largest_sector_vol = vol;
-                largest_sector = S;
-            }
-        }
-        cull_sector = largest_sector;
 
         // COP - 100 km away
         cull_COP.mad(Device.vCameraPosition, fuckingsun->direction, -tweak_COP_initial_offs);
@@ -1001,7 +965,7 @@ void CRender::render_sun_near()
     }
 
     // Fill the database
-    r_dsgraph_render_subspace(cull_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
+    r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = *(Fmatrix*)glm::value_ptr(cull_xform);
@@ -1108,43 +1072,19 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     light* fuckingsun = (light*)Lights.sun._get();
 
     // calculate view-frustum bounds in world space
-    Fmatrix ex_project, ex_full, ex_full_inverse;
-    {
-        ex_project = Device.mProject;
-        ex_full.mul(ex_project, Device.mView);
-        XRMatrixInverse(&ex_full_inverse, nullptr, ex_full);
-    }
 
     // Compute volume(s) - something like a frustum for infinite directional light
     // Also compute virtual light position and sector it is inside
     CFrustum cull_frustum;
     xr_vector<Fplane> cull_planes;
     Fvector3 cull_COP;
-    CSector* cull_sector;
     Fmatrix cull_xform;
     {
         FPU::m64r();
         // Lets begin from base frustum
-        Fmatrix fullxform_inv = ex_full_inverse;
+        Fmatrix fullxform_inv = Device.mInvFullTransform;
 
         //******************************* Need to be placed after cuboid built **************************
-        // Search for default sector - assume "default" or "outdoor" sector is the largest one
-        //. hack: need to know real outdoor sector
-        CSector* largest_sector = nullptr;
-        float largest_sector_vol = 0;
-        for (u32 s = 0; s < Sectors.size(); s++)
-        {
-            CSector* S = (CSector*)Sectors[s];
-            dxRender_Visual* V = S->root();
-            float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol)
-            {
-                largest_sector_vol = vol;
-                largest_sector = S;
-            }
-        }
-        cull_sector = largest_sector;
-
         // COP - 100 km away
         cull_COP.mad(Device.vCameraPosition, fuckingsun->direction, -tweak_COP_initial_offs);
 
@@ -1337,7 +1277,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     }
 
     // Fill the database
-    r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
+    r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;

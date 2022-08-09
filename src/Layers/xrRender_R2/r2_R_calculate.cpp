@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xrEngine/CustomHUD.h"
+#include "Layers/xrRender/FVisual.h"
 
 float g_fSCREEN;
 
@@ -29,6 +29,21 @@ void CRender::Calculate()
     // Detect camera-sector
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
     {
+        // Search for default sector - assume "default" or "outdoor" sector is the largest one
+        //. hack: need to know real outdoor sector
+        float largest_sector_vol = 0;
+        for (u32 s = 0; s < Sectors.size(); s++)
+        {
+            CSector* S = (CSector*)Sectors[s];
+            dxRender_Visual* V = S->root();
+            float vol = V->vis.box.getvolume();
+            if (vol > largest_sector_vol)
+            {
+                largest_sector_vol = vol;
+                m_largest_sector = S;
+            }
+        }
+
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
         if (pSector && (pSector != pLastSector))
             g_pGamePersistent->OnSectorChanged(translateSector(pSector));
