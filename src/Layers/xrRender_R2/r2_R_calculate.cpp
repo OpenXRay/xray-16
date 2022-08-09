@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xrEngine/CustomHUD.h"
+#include "Layers/xrRender/FVisual.h"
 
 float g_fSCREEN;
 
@@ -10,6 +10,8 @@ extern float r_ssaLOD_A;
 extern float r_ssaLOD_B;
 extern float r_ssaHZBvsTEX;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
+
+static auto constexpr DELTA_CAMERA_POS = .001f;
 
 void CRender::Calculate()
 {
@@ -27,8 +29,23 @@ void CRender::Calculate()
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
     // Detect camera-sector
-    if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
+    if (!vLastCameraPos.similar(Device.vCameraPosition, DELTA_CAMERA_POS))
     {
+        // Search for default sector - assume "default" or "outdoor" sector is the largest one
+        //. hack: need to know real outdoor sector
+        float largest_sector_vol = 0;
+        for (u32 s = 0; s < Sectors.size(); s++)
+        {
+            CSector* S = (CSector*)Sectors[s];
+            dxRender_Visual* V = S->root();
+            float vol = V->vis.box.getvolume();
+            if (vol > largest_sector_vol)
+            {
+                largest_sector_vol = vol;
+                m_largest_sector = S;
+            }
+        }
+
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
         if (pSector && (pSector != pLastSector))
             g_pGamePersistent->OnSectorChanged(translateSector(pSector));
