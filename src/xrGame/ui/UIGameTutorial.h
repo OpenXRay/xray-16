@@ -17,6 +17,7 @@ protected:
     CUIWindow* m_UIWindow;
     ref_sound m_global_sound;
     xr_deque<CUISequenceItem*> m_sequencer_items;
+    pcstr m_name;
 
     bool GrabInput();
     CUISequenceItem* GetNextItem();
@@ -54,6 +55,7 @@ public:
     virtual void IR_OnMouseWheel(int x, int y);
     virtual void IR_OnActivate(void);
     bool Persistent() { return !!m_flags.test(etsPersistent); }
+    pcstr GetTutorName() { return m_name; }
     fastdelegate::FastDelegate0<> m_on_destroy_event;
 
     enum
