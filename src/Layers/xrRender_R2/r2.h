@@ -446,7 +446,7 @@ protected:
 
 private:
     FS_FileSet m_file_set;
-    CSector* m_largest_sector{ nullptr };
+    CSector* m_largest_sector{};
 };
 
 extern CRender RImplementation;
