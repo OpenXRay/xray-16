@@ -67,10 +67,14 @@ SCRIPT_EXPORT(CSE_ALifeSpaceRestrictor, (CSE_ALifeDynamicObject, CSE_Shape), {
         CSE_ALifeSpaceRestrictor, "cse_alife_space_restrictor", CSE_ALifeDynamicObject, CSE_Shape)];
 });
 
-SCRIPT_EXPORT(CSE_ALifeLevelChanger, (CSE_ALifeSpaceRestrictor), {
-    module(luaState)[luabind_class_dynamic_alife1(
-        CSE_ALifeLevelChanger, "cse_alife_level_changer", CSE_ALifeSpaceRestrictor)
-                         .def_readonly("get_dest_level_name", &CSE_ALifeLevelChanger::destLeveName)
+SCRIPT_EXPORT(CSE_ALifeLevelChanger, (CSE_ALifeSpaceRestrictor),
+{
+    module(luaState)
+    [
+        luabind_class_dynamic_alife1(
+            CSE_ALifeLevelChanger, "cse_alife_level_changer", CSE_ALifeSpaceRestrictor
+        )
+        .property("get_dest_level_name", +[](CSE_ALifeLevelChanger* self) { return self->m_caLevelToChange.c_str(); })
     ];
 });
 
