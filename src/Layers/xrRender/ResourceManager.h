@@ -13,7 +13,7 @@
 // refs
 struct lua_State;
 
-class dx10ConstantBuffer;
+class dx11ConstantBuffer;
 
 // defs
 class ECORE_API CResourceManager
@@ -86,7 +86,7 @@ private:
     xr_vector<R_constant_table*> v_constant_tables;
 
 #if defined(USE_DX11)
-    xr_vector<dx10ConstantBuffer*> v_constant_buffer;
+    xr_vector<dx11ConstantBuffer*> v_constant_buffer;
     xr_vector<SInputSignature*> v_input_signature;
 #endif
 
@@ -152,8 +152,8 @@ public:
     void _DeleteConstantTable(const R_constant_table* C);
 
 #if defined(USE_DX11)
-    dx10ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
-    void _DeleteConstantBuffer(const dx10ConstantBuffer* pBuffer);
+    dx11ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
+    void _DeleteConstantBuffer(const dx11ConstantBuffer* pBuffer);
 
     SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);
     void _DeleteInputSignature(const SInputSignature* pSignature);

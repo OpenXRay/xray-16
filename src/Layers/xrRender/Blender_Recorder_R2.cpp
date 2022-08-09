@@ -143,7 +143,7 @@ u32 CBlender_Compile::r_Sampler(
     if (u32(-1) != dwStage)
     {
 #if defined(USE_DX11)
-        r_dx10Texture(_name, texture, true);
+        r_dx11Texture(_name, texture, true);
 #elif defined(USE_DX9) || defined(USE_OGL)
         i_Texture(dwStage, texture);
 #else

@@ -21,11 +21,11 @@ public:
 #elif defined(USE_DX11)
         // C.r_Sampler_clf		("s_sky0",		"$null"			);
         // C.r_Sampler_clf		("s_sky1",		"$null"			);
-        C.r_dx10Texture("s_sky0", "$null");
-        C.r_dx10Texture("s_sky1", "$null");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Texture("s_sky0", "$null");
+        C.r_dx11Texture("s_sky1", "$null");
+        C.r_dx11Sampler("smp_rtlinear");
         // C.r_Sampler_rtf		("s_tonemap",	"$user$tonemap"	);	//. hack
-        C.r_dx10Texture("s_tonemap", "$user$tonemap"); //. hack
+        C.r_dx11Texture("s_tonemap", "$user$tonemap"); //. hack
         C.PassSET_ZB(FALSE, FALSE);
 #elif defined(USE_OGL)
         C.r_Sampler_clf("s_sky0", "$null");

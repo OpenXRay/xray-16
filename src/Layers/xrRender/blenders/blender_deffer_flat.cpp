@@ -121,9 +121,9 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
         uber_shadow(C, "base");
 #endif
         // C.r_Sampler		("s_base",C.L_textures[0]);
-        C.r_dx10Texture("s_base", C.L_textures[0]);
-        C.r_dx10Sampler("smp_base");
-        C.r_dx10Sampler("smp_linear");
+        C.r_dx11Texture("s_base", C.L_textures[0]);
+        C.r_dx11Sampler("smp_base");
+        C.r_dx11Sampler("smp_linear");
         C.r_ColorWriteEnable(false, false, false, false);
         C.r_End();
         break;

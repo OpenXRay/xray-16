@@ -1,4 +1,4 @@
-// glHW.cpp: implementation of the DX10 specialisation of CHW.
+// glHW.cpp: implementation of the OpenGL specialisation of CHW.
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"

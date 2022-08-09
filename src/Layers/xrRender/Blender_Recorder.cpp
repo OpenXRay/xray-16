@@ -260,7 +260,7 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     //	Since in our engine D3DRS_SEPARATEALPHABLENDENABLE state is
     //	always set to false and in DirectX 10 blend functions for
     //	color and alpha are always independent, assign blend options for
-    //	alpha in DX10 identical to color.
+    //	alpha in DX11 identical to color.
     RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
 #endif // !USE_DX9
@@ -443,7 +443,7 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
     }
 
     /* Setup assigned texture */
-    const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findResource(image, RC_dx10texture);
+    const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findResource(image, RC_dx11texture);
     if (textureStage != InvalidStage && texture.size() != 0)
     {
         string256 name;

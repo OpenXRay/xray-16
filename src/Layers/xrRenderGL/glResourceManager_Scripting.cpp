@@ -24,7 +24,7 @@ class adopt_dx10options
 public:
     bool _dx10_msaa_alphatest_atoc()
     {
-        return RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
+        return RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
     }
 };
 
@@ -274,7 +274,7 @@ public:
 
     adopt_compiler& _dx10ATOC(bool Enable)
     {
-        C->RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, Enable);
+        C->RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, Enable);
         return *this;
     }
 

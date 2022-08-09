@@ -120,7 +120,7 @@ public:
     void i_Filter_Mag(u32 s, u32 f);
     void i_Filter_Aniso(u32 s, u32 f);
 #if defined(USE_DX11)
-    void i_dx10FilterAnizo(u32 s, BOOL value);
+    void i_dx11FilterAnizo(u32 s, BOOL value);
 #endif
     void i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
     void i_BorderColor(u32 s, u32 color);
@@ -147,12 +147,12 @@ public:
 #endif // !USE_DX9
 
 #if defined(USE_DX11)
-    void r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
-    void r_dx10Texture(LPCSTR ResourceName, shared_str texture, bool recursive = false)
+    void r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
+    void r_dx11Texture(LPCSTR ResourceName, shared_str texture, bool recursive = false)
     {
-        return r_dx10Texture(ResourceName, texture.c_str(), recursive);
+        return r_dx11Texture(ResourceName, texture.c_str(), recursive);
     };
-    u32 r_dx10Sampler(LPCSTR ResourceName);
+    u32 r_dx11Sampler(LPCSTR ResourceName);
 #endif // USE_DX11
 
     u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,

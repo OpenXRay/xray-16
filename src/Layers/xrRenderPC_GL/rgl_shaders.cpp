@@ -408,27 +408,27 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Geometry buffer optimization
-    appendShaderOption(o.dx10_gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
+    appendShaderOption(o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
     // Shader Model 4.1
-    appendShaderOption(o.dx10_sm4_1, "SM_4_1", "1");
+    appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");
 
     // Minmax SM
-    appendShaderOption(o.dx10_minmax_sm, "USE_MINMAX_SM", "1");
+    appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Shadow of Chernobyl compatibility
     appendShaderOption(ShadowOfChernobylMode, "USE_SHOC_RESOURCES", "1");
 
     // add a #define for DX10_1 MSAA support
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
-        appendShaderOption(o.dx10_msaa, "USE_MSAA", "1");
+        appendShaderOption(o.msaa, "USE_MSAA", "1");
 
         {
             static char samples[2];
-            samples[0] = char(o.dx10_msaa_samples) + '0';
+            samples[0] = char(o.msaa_samples) + '0';
             samples[1] = 0;
-            appendShaderOption(o.dx10_msaa_samples, "MSAA_SAMPLES", samples);
+            appendShaderOption(o.msaa_samples, "MSAA_SAMPLES", samples);
         }
 
         {
@@ -443,9 +443,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             sh_name.append(static_cast<u32>(0));
         }
 
-        appendShaderOption(o.dx10_msaa_opt, "MSAA_OPTIMIZATION", "1");
+        appendShaderOption(o.msaa_opt, "MSAA_OPTIMIZATION", "1");
 
-        switch (o.dx10_msaa_alphatest)
+        switch (o.msaa_alphatest)
         {
         case MSAA_ATEST_DX10_0_ATOC:
             options.add("MSAA_ALPHATEST_DX10_0_ATOC", "1");

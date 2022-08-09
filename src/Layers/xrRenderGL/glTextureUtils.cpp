@@ -15,7 +15,7 @@ TextureFormatPairs TextureFormatList[] =
     //D3DFMT_R8G8B8 Not available 
     {D3DFMT_A8R8G8B8, GL_RGBA8}, // Not available 
     //D3DFMT_X8R8G8B8 Not available 
-    //	TODO: DX10: Remove. Need only for nullrt
+    //	TODO: DX11: Remove. Need only for nullrt
     //D3DFMT_R5G6B5 Not available 
     {D3DFMT_R5G6B5, GL_RGBA8}, // Not available 
     //D3DFMT_X1R5G5B5 Not available 

@@ -46,7 +46,7 @@ public:
 #endif
 
 #if defined(USE_DX9) || defined(USE_DX11)
-    //	Since DX10 allows up to 128 unique textures,
+    //	Since DX11 allows up to 128 unique textures,
     //	distance between enum values should be at leas 128
     enum ResourceShaderType //	Don't change this since it's hardware-dependent
     {

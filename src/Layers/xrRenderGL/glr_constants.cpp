@@ -22,7 +22,7 @@ IC bool p_sort(const ref_constant& C1, const ref_constant& C2)
     return xr_strcmp(C1->name, C2->name) < 0;
 }
 
-// TODO: OGL: Use constant buffers like DX10.
+// TODO: OGL: Use constant buffers like DX11.
 BOOL R_constant_table::parse(void* _desc, u32 destination)
 {
     GLuint program = *(GLuint*)_desc;

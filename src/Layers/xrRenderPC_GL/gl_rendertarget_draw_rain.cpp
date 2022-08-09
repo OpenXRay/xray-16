@@ -120,7 +120,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         //float			fRange				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_scale:ps_r2_sun_depth_far_scale;
         float			fRange				=  1;
         //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
-        //	TODO: DX10: Remove this when fix inverse culling for far region
+        //	TODO: DX11: Remove this when fix inverse culling for far region
         float			fBias				= 0;
         Fmatrix			m_TexelAdjust		= 
         {
@@ -215,7 +215,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         zMax = center_pt.z	;
         */
 
-        //	TODO: DX10: Check if DX10 has analog for NV DBT
+        //	TODO: DX11: Check if DX11 has analog for NV DBT
         //		if (u_DBT_enable(zMin,zMax))	{
         // z-test always
         //			HW.pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
@@ -253,7 +253,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         RCache.set_c("m_sunmask", m_clouds_shadow);
         RCache.set_c("RainDensity", fRainFactor, 0, 0, 0);
         RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0, 0);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -265,7 +265,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
             {
                 RCache.set_Element(s_rain_msaa[0]->E[0]);
                 RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
@@ -291,7 +291,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
 
-        if (!RImplementation.o.dx10_gbuffer_opt)
+        if (!RImplementation.o.gbuffer_opt)
         {
             //	Do this in blender!
             //StateManager.SetColorWriteEnable( D3D10_COLOR_WRITE_ENABLE_RED | D3D10_COLOR_WRITE_ENABLE_GREEN | D3D10_COLOR_WRITE_ENABLE_BLUE );
@@ -303,7 +303,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
             u_setrt(rt_Position, NULL, NULL, rt_MSAADepth);
         }
 
-        if (! RImplementation.o.dx10_msaa)
+        if (! RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -315,7 +315,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
             {
                 RCache.set_Element(s_rain_msaa[0]->E[1]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
@@ -338,7 +338,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         //StateManager.SetColorWriteEnable( D3D10_COLOR_WRITE_ENABLE_ALL );
         u_setrt(rt_Color, NULL, NULL, rt_MSAADepth);
 
-        if (! RImplementation.o.dx10_msaa)
+        if (! RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -350,7 +350,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
             {
                 RCache.set_Element(s_rain_msaa[0]->E[2]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
@@ -362,7 +362,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
             }
         }
 
-        //	TODO: DX10: Check if DX10 has analog for NV DBT
+        //	TODO: DX11: Check if DX11 has analog for NV DBT
         // disable depth bounds
         //		u_DBT_disable	();
     }

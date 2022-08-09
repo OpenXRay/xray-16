@@ -8,7 +8,7 @@ void CRenderTarget::phase_ssao()
     RCache.ClearRT(rt_ssao_temp, {});
 
     // low/hi RTs
-    if (!RImplementation.o.dx10_msaa)
+    if (!RImplementation.o.msaa)
     {
         u_setrt(rt_ssao_temp, 0, 0, 0 /*get_base_zb()*/);
     }
@@ -67,14 +67,14 @@ void CRenderTarget::phase_ssao()
     RCache.set_c("ssao_kernel_size", fSSAOKernelSize);
     RCache.set_c("resolution", _w, _h, 1.0f / _w, 1.0f / _h);
 
-    if (!RImplementation.o.dx10_msaa)
+    if (!RImplementation.o.msaa)
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     else
     {
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         /*RCache.set_Stencil( TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0 );
         RCache.Render		( D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-        if( RImplementation.o.dx10_msaa_opt )
+        if( RImplementation.o.msaa_opt )
         {
             RCache.set_Element( s_ssao_msaa[0]->E[0]	);
             RCache.set_Stencil( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0 );
@@ -82,7 +82,7 @@ void CRenderTarget::phase_ssao()
         }
         else
         {
-            for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
+            for( u32 i = 0; i < RImplementation.o.msaa_samples; ++i )
             {
                 RCache.set_Element			( s_ssao_msaa[i]->E[0]	);
                 StateManager.SetSampleMask	( u32(1) << i  );

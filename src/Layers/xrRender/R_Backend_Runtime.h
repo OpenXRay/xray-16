@@ -10,8 +10,8 @@
 #if defined(USE_DX9)
 #include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
 #elif defined(USE_DX11)
-#include "Layers/xrRenderDX10/dx10R_Backend_Runtime.h"
-#include "Layers/xrRenderDX10/StateManager/dx10State.h"
+#include "Layers/xrRenderDX11/dx11R_Backend_Runtime.h"
+#include "Layers/xrRenderDX11/StateManager/dx11State.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glR_Backend_Runtime.h"
 #include "Layers/xrRenderGL/glState.h"
@@ -84,7 +84,7 @@ IC GLuint CBackend::get_ZB()
 }
 ICF void CBackend::set_States(SState* _state)
 {
-//	DX10 Manages states using it's own algorithm. Don't mess with it.
+//	DX11 Manages states using it's own algorithm. Don't mess with it.
 #ifdef USE_DX9
     if (state != _state->state)
 #endif

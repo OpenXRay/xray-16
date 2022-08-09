@@ -168,8 +168,8 @@ void CRender::render_rain()
         bb.grow(EPS);
 
         //	HACK
-        //	TODO: DX10: Calculate bounding sphere for view frustum
-        //	TODO: DX10: Reduce resolution.
+        //	TODO: DX11: Calculate bounding sphere for view frustum
+        //	TODO: DX11: Reduce resolution.
         // bb.vMin.x = -50;
         // bb.vMax.x = 50;
         // bb.vMin.y = -50;

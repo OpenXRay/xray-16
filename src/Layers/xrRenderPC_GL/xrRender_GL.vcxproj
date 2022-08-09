@@ -232,9 +232,9 @@
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\xrRenderGL\CommonTypes.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRender\blenders\glRainBlender.h" />
     <ClInclude Include="..\xrRenderGL\glHW.h" />
-    <ClInclude Include="..\xrRender\blenders\glMinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderGL\glR_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderGL\glr_constants_cache.h" />
     <ClInclude Include="..\xrRenderGL\glState.h" />

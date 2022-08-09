@@ -335,7 +335,7 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
         {
             return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
         }
-#else // TODO: DX10: When all shaders are ready switch to common path
+#else // TODO: DX11: When all shaders are ready switch to common path
         if (_lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
         else
@@ -470,7 +470,7 @@ void CResourceManager::_DumpMemoryUsage()
 
 void CResourceManager::Evict()
 {
-    // TODO: DX10: check if we really need this method
+    // TODO: DX11: check if we really need this method
 #ifdef USE_DX9
     CHK_DX(HW.pDevice->EvictManagedResources());
 #endif

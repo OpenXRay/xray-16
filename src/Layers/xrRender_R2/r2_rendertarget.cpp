@@ -16,14 +16,12 @@
 #endif
 
 #if defined(USE_DX11) || defined(USE_OGL)
-#   include "Layers/xrRender/blenders/dx10MSAABlender.h"
-#   include "Layers/xrRender/blenders/dx10RainBlender.h"
+#   include "Layers/xrRender/blenders/dx11MSAABlender.h"
+#   include "Layers/xrRender/blenders/dx11RainBlender.h"
 
+#   include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
 #   if defined(USE_DX11)
-#       include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
 #       include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
-#   elif defined(USE_OGL)
-#       include "Layers/xrRender/blenders/dx10MinMaxSMBlender.h"
 #   endif
 #endif
 
@@ -36,7 +34,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 #endif
 {
 #if defined(USE_DX9) || defined(USE_DX11)
-    // TODO: DX10: remove half pixel offset?
+    // TODO: DX11: remove half pixel offset?
     VERIFY(RImplementation.o.nvstencil);
 #   ifdef USE_DX9
     RCache.set_ColorWriteEnable(false);
@@ -247,15 +245,15 @@ void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr render
 CRenderTarget::CRenderTarget()
 {
     u32 SampleCount = 1;
-    if (RImplementation.o.dx10_msaa)
-        SampleCount = RImplementation.o.dx10_msaa_samples;
+    if (RImplementation.o.msaa)
+        SampleCount = RImplementation.o.msaa_samples;
 
 #ifdef DEBUG
     Msg("MSAA samples = %d", SampleCount);
-    if (RImplementation.o.dx10_msaa_opt)
-        Msg("dx10_MSAA_opt = on");
-    if (RImplementation.o.dx10_gbuffer_opt)
-        Msg("dx10_gbuffer_opt = on");
+    if (RImplementation.o.msaa_opt)
+        Msg("MSAA_opt = on");
+    if (RImplementation.o.gbuffer_opt)
+        Msg("gbuffer_opt = on");
 #endif
     param_blur = 0.f;
     param_gray = 0.f;
@@ -280,11 +278,11 @@ CRenderTarget::CRenderTarget()
     b_accum_spot = xr_new<CBlender_accum_spot>();
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
     {
-        int bound = RImplementation.o.dx10_msaa_samples;
+        int bound = RImplementation.o.msaa_samples;
 
-        if (RImplementation.o.dx10_msaa_opt)
+        if (RImplementation.o.msaa_opt)
             bound = 1;
 
         for (int i = 0; i < bound; ++i)
@@ -328,13 +326,13 @@ CRenderTarget::CRenderTarget()
         }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
             rt_MSAADepth = rt_Base_Depth;
         else
             rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
-        if (!RImplementation.o.dx10_gbuffer_opt)
+        if (!RImplementation.o.gbuffer_opt)
             rt_Normal.create(r2_RT_N, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
         // select albedo & accum
@@ -350,7 +348,7 @@ CRenderTarget::CRenderTarget()
             if (RImplementation.o.fp16_blend)
             {
                 // NV40
-                if (!RImplementation.o.dx10_gbuffer_opt)
+                if (!RImplementation.o.gbuffer_opt)
                 {
                     rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount); // expand to full
                     rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
@@ -377,7 +375,7 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) || defined(USE_OGL)
         rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
 #endif
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
         {
             rt_Generic_0_r = rt_Generic_0;
             rt_Generic_1_r = rt_Generic_1;
@@ -433,7 +431,7 @@ CRenderTarget::CRenderTarget()
         // otherwise - create texture with specified HW_smap_FORMAT
         rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
 #if defined(USE_DX11) || defined(USE_OGL)
-        if (RImplementation.o.dx10_minmax_sm)
+        if (RImplementation.o.minmax_sm)
         {
             rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, smapsize / 4, smapsize / 4, D3DFMT_R32F);
             CBlender_createminmax TempBlender;
@@ -468,11 +466,11 @@ CRenderTarget::CRenderTarget()
 
         // Accum direct/mask MSAA
 #if defined(USE_DX11) || defined(USE_OGL)
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation.o.msaa)
         {
-            int bound = RImplementation.o.dx10_msaa_samples;
+            int bound = RImplementation.o.msaa_samples;
 
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
                 bound = 1;
 
             for (int i = 0; i < bound; ++i)
@@ -499,13 +497,13 @@ CRenderTarget::CRenderTarget()
             manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
 #if defined(USE_DX11) || defined(USE_OGL)
-            if (RImplementation.o.dx10_minmax_sm)
+            if (RImplementation.o.minmax_sm)
             {
                 s_accum_direct_volumetric_minmax.create("accum_volumetric_sun_nomsaa_minmax");
                 manually_assign_texture(s_accum_direct_volumetric_minmax, "s_smap", smapTarget);
             }
 
-            if (RImplementation.o.dx10_msaa)
+            if (RImplementation.o.msaa)
             {
                 static pcstr snames[] =
                 {
@@ -514,9 +512,9 @@ CRenderTarget::CRenderTarget()
                     "accum_volumetric_sun_msaa4", "accum_volumetric_sun_msaa5",
                     "accum_volumetric_sun_msaa6", "accum_volumetric_sun_msaa7"
                 };
-                int bound = RImplementation.o.dx10_msaa_samples;
+                int bound = RImplementation.o.msaa_samples;
 
-                if (RImplementation.o.dx10_msaa_opt)
+                if (RImplementation.o.msaa_opt)
                     bound = 1;
 
                 for (int i = 0; i < bound; ++i)
@@ -531,21 +529,21 @@ CRenderTarget::CRenderTarget()
     }
 
     // RAIN
-    // TODO: DX10: Create resources only when DX10 rain is enabled.
-    // Or make DX10 rain switch dynamic?
+    // TODO: DX11: Create resources only when DX11 rain is enabled.
+    // Or make DX11 rain switch dynamic?
 #if defined(USE_DX11) || defined(USE_OGL)
     {
         CBlender_rain TempBlender;
         s_rain.create(&TempBlender, "null");
 
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation.o.msaa)
         {
             static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
             CBlender_rain_msaa TempBlenderMSAA[8];
 
-            int bound = RImplementation.o.dx10_msaa_samples;
+            int bound = RImplementation.o.msaa_samples;
 
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
                 bound = 1;
 
             for (int i = 0; i < bound; ++i)
@@ -563,7 +561,7 @@ CRenderTarget::CRenderTarget()
 #endif // USE_DX11 || USE_OGL
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
     {
         CBlender_msaa TempBlender;
         s_mark_msaa_edges.create(&TempBlender, "null");
@@ -601,11 +599,11 @@ CRenderTarget::CRenderTarget()
         CBlender_accum_reflected b_accum_reflected;
         s_accum_reflected.create(&b_accum_reflected, "r2" DELIMITER "accum_refl");
 #if defined(USE_DX11) || defined(USE_OGL)
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation.o.msaa)
         {
-            int bound = RImplementation.o.dx10_msaa_samples;
+            int bound = RImplementation.o.msaa_samples;
 
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
                 bound = 1;
 
             for (int i = 0; i < bound; ++i)
@@ -634,7 +632,7 @@ CRenderTarget::CRenderTarget()
 
         CBlender_bloom_build b_bloom;
         s_bloom.create(&b_bloom, "r2" DELIMITER "bloom");
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
             s_bloom_msaa = s_bloom;
         else
         {
@@ -697,7 +695,7 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) // XXX: support compute shaders for OpenGL
             CBlender_CS_HDAO b_hdao_cs;
             s_hdao_cs.create(&b_hdao_cs, "r2" DELIMITER "ssao");
-            if (RImplementation.o.dx10_msaa)
+            if (RImplementation.o.msaa)
             {
                 CBlender_CS_HDAO_MSAA b_hdao_msaa_cs;
                 s_hdao_cs_msaa.create(&b_hdao_msaa_cs, "r2" DELIMITER "ssao");
@@ -711,9 +709,9 @@ CRenderTarget::CRenderTarget()
             s_ssao.create(&b_ssao, "r2" DELIMITER "ssao");
 
             /* Should be used in r*_rendertarget_phase_ssao.cpp but it's commented there.
-            if (RImplementation.o.dx10_msaa)
+            if (RImplementation.o.msaa)
             {
-                const int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
+                const int bound = RImplementation.o.msaa_opt ? 1 : RImplementation.o.msaa_samples;
 
                 for (int i = 0; i < bound; ++i)
                     s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
@@ -803,7 +801,7 @@ CRenderTarget::CRenderTarget()
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
         RCache.Vertex.Buffer(), RCache.QuadIB);
-    if (!RImplementation.o.dx10_msaa)
+    if (!RImplementation.o.msaa)
         s_postprocess_msaa = s_postprocess;
     else
     {
@@ -926,11 +924,11 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_accum_spot);
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
     {
-        int bound = RImplementation.o.dx10_msaa_samples;
+        int bound = RImplementation.o.msaa_samples;
 
-        if (RImplementation.o.dx10_msaa_opt)
+        if (RImplementation.o.msaa_opt)
             bound = 1;
 
         for (int i = 0; i < bound; ++i)
@@ -1006,7 +1004,7 @@ void CRenderTarget::increment_light_marker()
 {
     dwLightMarkerID += 2;
 
-    const u32 iMaxMarkerValue = RImplementation.o.dx10_msaa ? 127 : 255;
+    const u32 iMaxMarkerValue = RImplementation.o.msaa ? 127 : 255;
 
     if (dwLightMarkerID > iMaxMarkerValue)
         reset_light_marker(true);
@@ -1031,7 +1029,7 @@ bool CRenderTarget::need_to_render_sunshafts()
 #if defined(USE_DX11) || defined(USE_OGL)
 bool CRenderTarget::use_minmax_sm_this_frame()
 {
-    switch (RImplementation.o.dx10_minmax_sm)
+    switch (RImplementation.o.minmax_sm)
     {
     case CRender::MMSM_ON: return true;
     case CRender::MMSM_AUTO: return need_to_render_sunshafts();
@@ -1040,7 +1038,7 @@ bool CRenderTarget::use_minmax_sm_this_frame()
         const auto& [width, height] = HW.GetSurfaceSize();
         u32 dwScreenArea = width * height;
 
-        if (dwScreenArea >= RImplementation.o.dx10_minmax_sm_screenarea_threshold)
+        if (dwScreenArea >= RImplementation.o.minmax_sm_screenarea_threshold)
             return need_to_render_sunshafts();
         return false;
     }

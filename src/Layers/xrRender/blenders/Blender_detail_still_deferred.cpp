@@ -47,7 +47,7 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    bool bUseATOC = (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+    bool bUseATOC = (RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
 
     switch (C.iElement)
     {
@@ -60,7 +60,7 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_CullMode(D3DCULL_NONE);
             //	Alpha to coverage.
-            C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+            C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
             C.r_End();
         }
 
@@ -81,7 +81,7 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
             C.r_CullMode(D3DCULL_NONE);
             C.r_ColorWriteEnable(false, false, false, false);
             //	Alpha to coverage.
-            C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+            C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
             C.r_End();
         }
 

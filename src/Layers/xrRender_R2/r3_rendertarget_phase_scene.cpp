@@ -14,19 +14,19 @@ void CRenderTarget::phase_scene_prepare()
     //	TODO: add multiplication by sun color here
     // if (fValue<0.0001) FlagSunShafts = 0;
 
-    //	TODO: DX10: Check if complete clear of _ALL_ rendertargets will increase
+    //	TODO: DX11: Check if complete clear of _ALL_ rendertargets will increase
     //	FPS. Make check for SLI configuration.
     if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
                                             ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
-        //	TODO: DX10: Check if we need to set RT here.
+        //	TODO: DX11: Check if we need to set RT here.
         u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth->pZRT);
 
         const Fcolor color{}; // black
         RCache.ClearRT(rt_Position, color);
         // RCache.ClearRT(rt_Normal, color);
         // RCache.ClearRT(rt_Color, color);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
             RCache.ClearZB(get_base_zb(), 1.0f, 0);
         else
         {
@@ -38,7 +38,7 @@ void CRenderTarget::phase_scene_prepare()
     }
     else
     {
-        //	TODO: DX10: Check if we need to set RT here.
+        //	TODO: DX11: Check if we need to set RT here.
         u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, rt_MSAADepth->pZRT);
         RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
     }
@@ -52,7 +52,7 @@ void CRenderTarget::phase_scene_prepare()
 void CRenderTarget::phase_scene_begin()
 {
     // Targets, use accumulator for temporary storage
-    if (!RImplementation.o.dx10_gbuffer_opt)
+    if (!RImplementation.o.gbuffer_opt)
     {
         if (RImplementation.o.albedo_wo)
             u_setrt(rt_Position, rt_Normal, rt_Accumulator, rt_MSAADepth);
@@ -73,7 +73,7 @@ void CRenderTarget::phase_scene_begin()
         TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 
     // Misc		- draw only front-faces
-    //	TODO: DX10: siable two-sided stencil here
+    //	TODO: DX11: siable two-sided stencil here
     // CHK_DX(HW.pDevice->SetRenderState	( D3DRS_TWOSIDEDSTENCILMODE,FALSE				));
     RCache.set_CullMode(CULL_CCW);
     RCache.set_ColorWriteEnable();
@@ -82,7 +82,7 @@ void CRenderTarget::phase_scene_begin()
 void CRenderTarget::disable_aniso()
 {
     // Disable ANISO
-    //	TODO: DX10: disable aniso here
+    //	TODO: DX11: disable aniso here
     // for (u32 i=0; i<HW.Caps.raster.dwStages; i++)
     //	CHK_DX(HW.pDevice->SetSamplerState( i, D3DSAMP_MAXANISOTROPY, 1	));
 }

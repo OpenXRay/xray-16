@@ -17,7 +17,7 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
+#include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 #endif
 
 CRender RImplementation;
@@ -314,7 +314,7 @@ void CRender::create()
     if (o.HW_smap)
     {
 #if defined(USE_DX11)
-        //	For ATI it's much faster on DX10 to use D32F format
+        //	For ATI it's much faster on DX11 to use D32F format
         if (HW.Caps.id_vendor == 0x1002)
             o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
         else
@@ -492,83 +492,83 @@ void CRender::create()
 
 #if defined(USE_DX11) || defined(USE_OGL)
 #   if defined(USE_DX11)
-    o.dx10_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
-    o.dx10_sm4_1 = o.dx10_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+    o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
+    o.dx11_sm4_1 = o.dx11_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #   elif defined(USE_OGL)
-    o.dx10_sm4_1 = true;
+    o.dx11_sm4_1 = true;
 #else
 #   error No graphics API selected or enabled!
 #   endif
 
     //	MSAA option dependencies
 #   if defined(USE_DX11)
-    o.dx10_msaa = !!ps_r3_msaa;
-    o.dx10_msaa_samples = (1 << ps_r3_msaa);
+    o.msaa = !!ps_r3_msaa;
+    o.msaa_samples = (1 << ps_r3_msaa);
 
-    o.dx10_msaa_opt = ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
-    o.dx10_msaa_opt = o.dx10_msaa_opt && o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1) ||
-        o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+    o.msaa_opt = ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
+    o.msaa_opt = o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1) ||
+        o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0);
 
-    // o.dx10_msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
-    o.dx10_msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
-    o.dx10_msaa_hybrid &= !o.dx10_msaa_opt && o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+    // o.msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
+    o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
+    o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #   elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
-    o.dx10_msaa = false;
-    o.dx10_msaa_samples = 0;
-    o.dx10_msaa_opt = o.dx10_msaa;
-    o.dx10_msaa_hybrid = false;
+    o.msaa = false;
+    o.msaa_samples = 0;
+    o.msaa_opt = o.msaa;
+    o.msaa_hybrid = false;
 #else
 #   error No graphics API selected or enabled!
 #   endif
     //	Allow alpha test MSAA for DX10.0
 
-    // o.dx10_msaa_alphatest= ps_r2_ls_flags.test((u32)R3FLAG_MSAA_ALPHATEST);
-    // o.dx10_msaa_alphatest= o.dx10_msaa_alphatest && o.dx10_msaa;
+    // o.msaa_alphatest= ps_r2_ls_flags.test((u32)R3FLAG_MSAA_ALPHATEST);
+    // o.msaa_alphatest= o.msaa_alphatest && o.msaa;
 
-    // o.dx10_msaa_alphatest_atoc= (o.dx10_msaa_alphatest && !o.dx10_msaa_opt && !o.dx10_msaa_hybrid);
+    // o.msaa_alphatest_atoc= (o.msaa_alphatest && !o.msaa_opt && !o.msaa_hybrid);
 
-    o.dx10_msaa_alphatest = 0;
-    if (o.dx10_msaa)
+    o.msaa_alphatest = 0;
+    if (o.msaa)
     {
-        if (o.dx10_msaa_opt || o.dx10_msaa_hybrid)
+        if (o.msaa_opt || o.msaa_hybrid)
         {
             if (ps_r3_msaa_atest == 1)
-                o.dx10_msaa_alphatest = MSAA_ATEST_DX10_1_ATOC;
+                o.msaa_alphatest = MSAA_ATEST_DX10_1_ATOC;
             else if (ps_r3_msaa_atest == 2)
-                o.dx10_msaa_alphatest = MSAA_ATEST_DX10_1_NATIVE;
+                o.msaa_alphatest = MSAA_ATEST_DX10_1_NATIVE;
         }
         else
         {
             if (ps_r3_msaa_atest)
-                o.dx10_msaa_alphatest = MSAA_ATEST_DX10_0_ATOC;
+                o.msaa_alphatest = MSAA_ATEST_DX10_0_ATOC;
         }
     }
 
-    o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
+    o.gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
 
-    o.dx10_minmax_sm = ps_r3_minmax_sm;
-    o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
+    o.minmax_sm = ps_r3_minmax_sm;
+    o.minmax_sm_screenarea_threshold = 1600 * 1200;
 
 #if defined(USE_DX11)
-    o.dx11_enable_tessellation =
+    o.tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 #endif
 
-    if (o.dx10_minmax_sm == MMSM_AUTODETECT)
+    if (o.minmax_sm == MMSM_AUTODETECT)
     {
-        o.dx10_minmax_sm = MMSM_OFF;
+        o.minmax_sm = MMSM_OFF;
 
         //	AMD device
         if (HW.Caps.id_vendor == 0x1002)
         {
             if (ps_r_sun_quality >= 3)
-                o.dx10_minmax_sm = MMSM_AUTO;
+                o.minmax_sm = MMSM_AUTO;
             else if (ps_r_sun_shafts >= 2)
             {
-                o.dx10_minmax_sm = MMSM_AUTODETECT;
+                o.minmax_sm = MMSM_AUTODETECT;
                 //	Check resolution in runtime in use_minmax_sm_this_frame
-                o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
+                o.minmax_sm_screenarea_threshold = 1600 * 1200;
             }
         }
 
@@ -577,9 +577,9 @@ void CRender::create()
         {
             if (ps_r_sun_shafts >= 2)
             {
-                o.dx10_minmax_sm = MMSM_AUTODETECT;
+                o.minmax_sm = MMSM_AUTODETECT;
                 //	Check resolution in runtime in use_minmax_sm_this_frame
-                o.dx10_minmax_sm_screenarea_threshold = 1280 * 1024;
+                o.minmax_sm_screenarea_threshold = 1280 * 1024;
             }
         }
     }

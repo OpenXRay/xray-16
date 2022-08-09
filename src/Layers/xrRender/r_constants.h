@@ -5,7 +5,7 @@
 #include "xrCore/xr_resource.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
+#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
 class ECORE_API R_constant_setup;
@@ -16,7 +16,7 @@ enum
     RC_int = 1,
     RC_bool = 2,
     RC_sampler = 99, // DX9 shares index for sampler and texture
-    RC_dx10texture = 100, // For DX10 sampler and texture are different resources
+    RC_dx11texture = 100, // For DX11 sampler and texture are different resources
     RC_dx11UAV = 101
 };
 enum
@@ -37,8 +37,8 @@ enum
     //  Don't change this since some code relies on magic numbers
     RC_dest_pixel = (1 << 0),
     RC_dest_vertex = (1 << 1),
-    RC_dest_sampler = (1 << 2), //  For DX10 it's either sampler or texture
-    RC_dest_geometry = (1 << 3), // DX10 only
+    RC_dest_sampler = (1 << 2), //  For DX11 it's either sampler or texture
+    RC_dest_geometry = (1 << 3), // DX11 only
     RC_dest_hull = (1 << 4), // DX11 only
     RC_dest_domain = (1 << 5), //   DX11 only
     RC_dest_compute = (1 << 6), //  DX11 only
@@ -220,7 +220,7 @@ private:
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
 
 #if defined(USE_DX11)
-#include "../xrRenderDX10/dx10ConstantBuffer_impl.h"
+#include "../xrRenderDX11/dx11ConstantBuffer_impl.h"
 #endif
 
 #endif

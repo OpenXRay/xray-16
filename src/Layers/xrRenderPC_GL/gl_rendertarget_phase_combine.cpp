@@ -15,7 +15,7 @@ void CRenderTarget::DoAsyncScreenshot()
         //u_setrt				( Device.dwWidth,Device.dwHeight,get_base_rt(),nullptr,nullptr,get_base_zb());
 
         //ID3DTexture2D *pTex = 0;
-        //if (RImplementation.o.dx10_msaa)
+        //if (RImplementation.o.msaa)
         //	pTex = rt_Generic->pSurface;
         //else
         //	pTex = rt_Color->pSurface;
@@ -36,7 +36,7 @@ void CRenderTarget::phase_combine()
 {
     PIX_EVENT(phase_combine);
 
-    //	TODO: DX10: Remove half poxel offset
+    //	TODO: DX11: Remove half poxel offset
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
 
     u32 Offset = 0;
@@ -233,7 +233,7 @@ void CRenderTarget::phase_combine()
         t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
 
         // Draw
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
             RCache.set_Element(s_combine->E[0]);
         else
             RCache.set_Element(s_combine_msaa[0]->E[0]);
@@ -251,11 +251,11 @@ void CRenderTarget::phase_combine()
         RCache.set_c("ssao_noise_tile_factor", fSSAONoise);
         RCache.set_c("ssao_kernel_size", fSSAOKernelSize);
 
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         else
         {
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
             {
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -287,7 +287,7 @@ void CRenderTarget::phase_combine()
     // Perform blooming filter and distortion if needed
     RCache.set_Stencil(FALSE);
 
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
     {
         // we need to resolve rt_Generic_1_r into rt_Generic_1
         rt_Generic_0_r->resolve_into(*rt_Generic_0);
@@ -326,7 +326,7 @@ void CRenderTarget::phase_combine()
     PP_Complex = TRUE;
 
     // Combine everything + perform AA
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
     {
         if (PP_Complex) u_setrt(rt_Generic, 0, 0, rt_Base_Depth); // LDR RT
         else u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
@@ -410,7 +410,7 @@ void CRenderTarget::phase_combine()
         vDofKernel.mul(ps_r2_dof_kernel_size);
 
         // Draw COLOR
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
         {
             if (ps_r2_ls_flags.test(R2FLAG_AA)) RCache.set_Element(s_combine->E[bDistort ? 3 : 1]);
                 // look at blender_combine.cpp
@@ -583,7 +583,7 @@ void CRenderTarget::phase_combine_volumetric()
     u32 Offset = 0;
     //Fvector2	p0,p1;
 
-    //	TODO: DX10: Remove half pixel offset here
+    //	TODO: DX11: Remove half pixel offset here
 
     //u_setrt(rt_Generic_0,0,0,get_base_zb() );			// LDR RT
     u_setrt(rt_Generic_0_r, rt_Generic_1_r, nullptr, rt_MSAADepth);

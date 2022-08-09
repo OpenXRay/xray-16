@@ -391,10 +391,10 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Geometry buffer optimization
-    appendShaderOption(o.dx10_gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
+    appendShaderOption(o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
     // Shader Model 4.1
-    appendShaderOption(o.dx10_sm4_1, "SM_4_1", "1");
+    appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");
 
     // Shader Model 5.0
     appendShaderOption(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5", "1");
@@ -409,24 +409,24 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(HW.SAD4ShaderInstructions, "SAD4_SUPPORTED", "1");
 
     // Minmax SM
-    appendShaderOption(o.dx10_minmax_sm, "USE_MINMAX_SM", "1");
+    appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Be carefull!!!!! this should be at the end to correctly generate
     // compiled shader name;
     // add a #define for DX10_1 MSAA support
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
-        appendShaderOption(o.dx10_msaa, "USE_MSAA", "1");
+        appendShaderOption(o.msaa, "USE_MSAA", "1");
 
         // Number of samples
         {
-            c_msaa_samples[0] = char(o.dx10_msaa_samples) + '0';
+            c_msaa_samples[0] = char(o.msaa_samples) + '0';
             c_msaa_samples[1] = 0;
-            appendShaderOption(o.dx10_msaa_samples, "MSAA_SAMPLES", c_msaa_samples);
+            appendShaderOption(o.msaa_samples, "MSAA_SAMPLES", c_msaa_samples);
         }
         // Current sample
         {
-            if (m_MSAASample < 0 || o.dx10_msaa_opt)
+            if (m_MSAASample < 0 || o.msaa_opt)
                 c_msaa_current_sample[0] = '0';
             else
                 c_msaa_current_sample[0] = '0' + char(m_MSAASample);
@@ -436,9 +436,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                 "ISAMPLE", c_msaa_current_sample);
         }
 
-        appendShaderOption(o.dx10_msaa_opt, "MSAA_OPTIMIZATION", "1");
+        appendShaderOption(o.msaa_opt, "MSAA_OPTIMIZATION", "1");
 
-        switch (o.dx10_msaa_alphatest)
+        switch (o.msaa_alphatest)
         {
         case MSAA_ATEST_DX10_0_ATOC:
             options.add("MSAA_ALPHATEST_DX10_0_ATOC", "1");

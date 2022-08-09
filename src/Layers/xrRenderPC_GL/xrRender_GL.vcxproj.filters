@@ -1088,9 +1088,6 @@
     <ClInclude Include="..\xrRender\blenders\glRainBlender.h">
       <Filter>Shading templates\GL Rain</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\glMinMaxSMBlender.h">
-      <Filter>Shading templates</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\blenders\glMSAABlender.h">
       <Filter>Interface implementations\MSAARender</Filter>
     </ClInclude>
@@ -1141,6 +1138,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\ShaderResourceTraits.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h">
+      <Filter>Shading templates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
