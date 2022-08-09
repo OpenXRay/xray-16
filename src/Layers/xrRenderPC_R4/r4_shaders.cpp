@@ -391,7 +391,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Geometry buffer optimization
-    appendShaderOption(o.dx11_gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
+    appendShaderOption(o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
     // Shader Model 4.1
     appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");

@@ -252,8 +252,8 @@ CRenderTarget::CRenderTarget()
     Msg("MSAA samples = %d", SampleCount);
     if (RImplementation.o.msaa_opt)
         Msg("dx11_MSAA_opt = on");
-    if (RImplementation.o.dx11_gbuffer_opt)
-        Msg("dx11_gbuffer_opt = on");
+    if (RImplementation.o.gbuffer_opt)
+        Msg("gbuffer_opt = on");
 #endif
     param_blur = 0.f;
     param_gray = 0.f;
@@ -332,7 +332,7 @@ CRenderTarget::CRenderTarget()
             rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
-        if (!RImplementation.o.dx11_gbuffer_opt)
+        if (!RImplementation.o.gbuffer_opt)
             rt_Normal.create(r2_RT_N, w, h, D3DFMT_A16B16G16R16F, SampleCount);
 
         // select albedo & accum
@@ -348,7 +348,7 @@ CRenderTarget::CRenderTarget()
             if (RImplementation.o.fp16_blend)
             {
                 // NV40
-                if (!RImplementation.o.dx11_gbuffer_opt)
+                if (!RImplementation.o.gbuffer_opt)
                 {
                     rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F, SampleCount); // expand to full
                     rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);

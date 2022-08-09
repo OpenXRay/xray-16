@@ -52,7 +52,7 @@ void CRenderTarget::phase_scene_prepare()
 void CRenderTarget::phase_scene_begin()
 {
     // Targets, use accumulator for temporary storage
-    if (!RImplementation.o.dx11_gbuffer_opt)
+    if (!RImplementation.o.gbuffer_opt)
     {
         if (RImplementation.o.albedo_wo)
             u_setrt(rt_Position, rt_Normal, rt_Accumulator, rt_MSAADepth);

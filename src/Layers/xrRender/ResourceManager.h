@@ -35,7 +35,7 @@ public:
     using map_Matrix = xr_map<const char*, CMatrix*, str_pred>;
     using map_Constant = xr_map<const char*, CConstant*, str_pred>;
     using map_RT = xr_map<const char*, CRT*, str_pred>;
-    //	DX11 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
+    //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
 
 #if defined(USE_DX11) || defined(USE_OGL)
@@ -61,7 +61,7 @@ private:
     map_Matrix m_matrices;
     map_Constant m_constants;
     map_RT m_rtargets;
-    //	DX11 cut map_RTC												m_rtargets_c;
+    //	DX10 cut map_RTC												m_rtargets_c;
     map_VS m_vs;
     map_PS m_ps;
 
@@ -162,8 +162,8 @@ public:
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {});
     void _DeleteRT(const CRT* RT);
 
-//	DX11 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
-//	DX11 cut void							_DeleteRTC			(const CRTC*	RT	);
+//	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
+//	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
 
 #if defined(USE_OGL)
     SPP* _CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr ds);

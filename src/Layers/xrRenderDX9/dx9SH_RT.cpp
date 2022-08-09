@@ -170,7 +170,7 @@ void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCo
 }
 
 //////////////////////////////////////////////////////////////////////////
-//	DX11 cut
+//	DX10 cut
 /*
 CRTC::CRTC			()
 {

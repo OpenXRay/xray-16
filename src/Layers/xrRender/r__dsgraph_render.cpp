@@ -261,7 +261,6 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
     if (RImplementation.o.msaa)
         zb = RImplementation.Target->rt_MSAADepth;
-
 #endif
 
     RImplementation.Target->u_setrt(

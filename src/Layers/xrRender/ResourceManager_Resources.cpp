@@ -144,7 +144,7 @@ void CResourceManager::_DeleteRT(const CRT* RT)
     Msg("! ERROR: Failed to find render-target '%s'", *RT->cName);
 }
 
-//	DX11 cut
+//	DX10 cut
 /*
 CRTC* CResourceManager::_CreateRTC(LPCSTR Name, u32 size, D3DFORMAT f)
 {

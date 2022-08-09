@@ -100,7 +100,7 @@ public:
         u32 msaa : 1; // DX10.0 path
         u32 msaa_hybrid : 1; // DX10.0 main path with DX10.1 A-test msaa allowed
         u32 msaa_opt : 1; // DX10.1 path
-        u32 dx11_gbuffer_opt : 1;
+        u32 gbuffer_opt : 1;
         u32 dx11_sm4_1 : 1; // DX10.1 path
         u32 msaa_alphatest : 2; //	A-test mode
         u32 msaa_samples : 4;

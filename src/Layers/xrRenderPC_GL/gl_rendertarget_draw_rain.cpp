@@ -291,7 +291,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
 
-        if (!RImplementation.o.dx11_gbuffer_opt)
+        if (!RImplementation.o.gbuffer_opt)
         {
             //	Do this in blender!
             //StateManager.SetColorWriteEnable( D3D10_COLOR_WRITE_ENABLE_RED | D3D10_COLOR_WRITE_ENABLE_GREEN | D3D10_COLOR_WRITE_ENABLE_BLUE );
