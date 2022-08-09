@@ -28,11 +28,21 @@ void CRenderTarget::draw_rain(light& RainSetup)
     W_dirZ.normalize();
 
     // Perform masking (only once - on the first/near phase)
-    //RCache.set_CullMode			(CULL_NONE	);
-    //if (SE_SUN_NEAR==sub_phase)	//.
+    // RCache.set_CullMode			(CULL_NONE	);
+    // if (SE_SUN_NEAR==sub_phase)	//.
     {
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+#if defined(USE_DX11)
+        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+        pv++;
+        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+        pv++;
+        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+        pv++;
+        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+        pv++;
+#elif defined(USE_OGL)
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p0.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p1.y);
@@ -41,6 +51,9 @@ void CRenderTarget::draw_rain(light& RainSetup)
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p1.y);
         pv++;
+#else
+#   error No graphics API selected or enabled!
+#endif
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
 
@@ -53,7 +66,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
 
         // if (stencil>=1 && aref_pass)	stencil = light_id
         //	Done in blender!
-        //RCache.set_ColorWriteEnable	(FALSE		);
+        // RCache.set_ColorWriteEnable	(FALSE		);
         //		RCache.set_Stencil			(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0x01,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
         //		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
     }
@@ -67,7 +80,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
     d_Z = center_pt.z;
 
     // nv-stencil recompression
-    //if (RImplementation.o.nvstencil  && (SE_SUN_NEAR==sub_phase))	u_stencil_optimize();	//. driver bug?
+    // if (RImplementation.o.nvstencil  && (SE_SUN_NEAR==sub_phase))	u_stencil_optimize();	//. driver bug?
 
     // Perform lighting
     {
@@ -75,12 +88,11 @@ void CRenderTarget::draw_rain(light& RainSetup)
         //		RCache.set_CullMode					(CULL_NONE);
         //		RCache.set_ColorWriteEnable			()	;
 
-
         // texture adjustment matrix
-        //float			fRange				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_scale:ps_r2_sun_depth_far_scale;
+        // float			fRange				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_scale:ps_r2_sun_depth_far_scale;
         float fRange = 1;
-        //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
-        //float			fBias				= 0.00001;
+        // float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
+        // float			fBias				= 0.00001;
         float fBias = -0.0001f;
         float smapsize = float(RImplementation.o.smapsize);
         float fTexelOffs = (.5f / smapsize);
@@ -92,6 +104,15 @@ void CRenderTarget::draw_rain(light& RainSetup)
         float view_dimY = float(RainSetup.X.D.maxX - RainSetup.X.D.minX) / smapsize;
         float view_sx = float(RainSetup.X.D.minX) / smapsize;
         float view_sy = float(RainSetup.X.D.minY) / smapsize;
+#if defined(USE_DX11)
+        Fmatrix m_TexelAdjust =
+        {
+            view_dimX / 2.f, 0.0f, 0.0f, 0.0f,
+            0.0f, -view_dimY / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, fRange, 0.0f,
+            view_dimX / 2.f + view_sx + fTexelOffs, view_dimY / 2.f + view_sy + fTexelOffs, fBias, 1.0f
+        };
+#elif defined(USE_OGL)
         Fmatrix m_TexelAdjust =
         {
             view_dimX / 2.f, 0.0f, 0.0f, 0.0f,
@@ -99,6 +120,9 @@ void CRenderTarget::draw_rain(light& RainSetup)
             0.0f, 0.0f, 0.5f * fRange, 0.0f,
             view_dimX / 2.f + view_sx + fTexelOffs, view_dimY / 2.f + view_sy + fTexelOffs, 0.5f + fBias, 1.0f
         };
+#else
+#   error No graphics API selected or enabled!
+#endif
 
         // compute xforms
         FPU::m64r();
@@ -122,13 +146,25 @@ void CRenderTarget::draw_rain(light& RainSetup)
         //float			fBias				= (SE_SUN_NEAR==sub_phase)?ps_r2_sun_depth_near_bias:ps_r2_sun_depth_far_bias;
         //	TODO: DX11: Remove this when fix inverse culling for far region
         float			fBias				= 0;
-        Fmatrix			m_TexelAdjust		= 
+#if defined(USE_DX11)
+        Fmatrix			m_TexelAdjust		=
+        {
+            0.5f,				0.0f,				0.0f,			0.0f,
+            0.0f,				-0.5f,				0.0f,			0.0f,
+            0.0f,				0.0f,				fRange,			0.0f,
+            0.5f,				0.5f,				fBias,			1.0f
+        };
+#elif defined(USE_OGL)
+        Fmatrix			m_TexelAdjust		=
         {
             0.5f,				0.0f,				0.0f,			0.0f,
             0.0f,				0.5f,				0.0f,			0.0f,
             0.0f,				0.0f,				0.5f * fRange,			0.0f,
             0.5f,				0.5f,				0.5f + fBias,			1.0f
         };
+#else
+#   error No graphics API selected or enabled!
+#endif
 
         // compute xforms
         FPU::m64r			();
@@ -149,18 +185,18 @@ void CRenderTarget::draw_rain(light& RainSetup)
         {
             //static float w_shift = 0.0f;
             Fmatrix m_xform;
-            //Fvector			direction	= RainSetup.direction	;
+            // Fvector			direction	= RainSetup.direction	;
             Fvector normal;
             normal.setHP(1, 0);
-            //w_shift		+=	0.003f*Device.fTimeDelta;
-            //Fvector			position;	position.set(0,0,0);
-            //m_xform.build_camera_dir	(position,direction,normal)	;
+            // w_shift		+=	0.003f*Device.fTimeDelta;
+            // Fvector			position;	position.set(0,0,0);
+            // m_xform.build_camera_dir	(position,direction,normal)	;
             m_xform.identity();
             Fvector localnormal;
             m_xform.transform_dir(localnormal, normal);
             localnormal.normalize();
             m_clouds_shadow.mul(m_xform, xf_invview);
-            //m_xform.scale				(0.002f,0.002f,1.f)			;
+            // m_xform.scale				(0.002f,0.002f,1.f)			;
             // 			m_xform.scale				(1.f,1.f,1.f)				;
             // 			m_clouds_shadow.mulA_44		(m_xform)					;
             // 			m_xform.translate			(localnormal.mul(w_shift))	;
@@ -170,13 +206,23 @@ void CRenderTarget::draw_rain(light& RainSetup)
         // Make jitter texture
         Fvector2 j0, j1;
         float scale_X = float(Device.dwWidth) / float(TEX_jitter);
-        //float	scale_Y				= float(Device.dwHeight)/ float(TEX_jitter);
+        // float	scale_Y				= float(Device.dwHeight)/ float(TEX_jitter);
         float offset = (.5f / float(TEX_jitter));
         j0.set(offset, offset);
         j1.set(scale_X, scale_X).add(offset);
 
         // Fill vertex buffer
         FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
+#if defined(USE_DX11)
+        pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, scale_X);
+        pv++;
+        pv->set(-1, 1, d_Z, d_W, C, 0, 0, 0, 0);
+        pv++;
+        pv->set(1, -1, d_Z, d_W, C, 1, 1, scale_X, scale_X);
+        pv++;
+        pv->set(1, 1, d_Z, d_W, C, 1, 0, scale_X, 0);
+        pv++;
+#elif defined(USE_OGL)
         pv->set(-1, -1, d_Z, d_W, C, 0, 0, 0, scale_X);
         pv++;
         pv->set(-1, 1, d_Z, d_W, C, 0, 1, 0, 0);
@@ -185,17 +231,20 @@ void CRenderTarget::draw_rain(light& RainSetup)
         pv++;
         pv->set(1, 1, d_Z, d_W, C, 1, 1, scale_X, 0);
         pv++;
+#else
+#   error No graphics API selected or enabled!
+#endif
         RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
 
         // setup
-        //RCache.set_Element			(s_accum_direct->E[sub_phase]);
-        //u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
-        //RCache.set_Element			(s_rain->E[0]);
-        //RCache.set_c				("Ldynamic_dir",		L_dir.x,L_dir.y,L_dir.z,0		);
+        // RCache.set_Element			(s_accum_direct->E[sub_phase]);
+        // u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
+        // RCache.set_Element			(s_rain->E[0]);
+        // RCache.set_c				("Ldynamic_dir",		L_dir.x,L_dir.y,L_dir.z,0		);
         //		RCache.set_c				("Ldynamic_color",		L_clr.x,L_clr.y,L_clr.z,L_spec	);
-        //RCache.set_c				("m_shadow",			m_shadow						);
-        //RCache.set_c				("m_sunmask",			m_clouds_shadow					);
+        // RCache.set_c				("m_shadow",			m_shadow						);
+        // RCache.set_c				("m_sunmask",			m_clouds_shadow					);
 
         /*
         // nv-DBT
@@ -225,7 +274,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         // Fetch4 : enable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4') 
+        //#			define FOURCC_GET4  MAKEFOURCC('G','E','T','4')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
@@ -236,23 +285,23 @@ void CRenderTarget::draw_rain(light& RainSetup)
         // Fetch4 : disable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
         //. we hacked the shader to force smap on S0
-        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1') 
+        //#			define FOURCC_GET1  MAKEFOURCC('G','E','T','1')
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1 );
         //		}
 
         //	Use for intermediate results
         //	Patch normal
-        u_setrt(rt_Accumulator,NULL,NULL, rt_MSAADepth);
+        u_setrt(rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
 
-        //u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
+        // u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
         RCache.set_Element(s_rain->E[1]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
-        RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0);
-        RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
+        RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
-        RCache.set_c("RainDensity", fRainFactor, 0, 0, 0);
-        RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0, 0);
+        RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
+        RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
         if (!RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
@@ -268,42 +317,63 @@ void CRenderTarget::draw_rain(light& RainSetup)
             if (RImplementation.o.msaa_opt)
             {
                 RCache.set_Element(s_rain_msaa[0]->E[0]);
-                RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
-                RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0);
-                RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0);
+                RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+                RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
+                RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
                 RCache.set_c("m_shadow", m_shadow);
                 RCache.set_c("m_sunmask", m_clouds_shadow);
-                RCache.set_c("RainDensity", fRainFactor, 0, 0, 0);
-                RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0, 0);
+                RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
+                RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
                 RCache.set_CullMode(CULL_NONE);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
             }
             else
             {
+#if defined(USE_DX11)
+                for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
+                {
+                    RCache.set_Element(s_rain_msaa[i]->E[0]);
+                    RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+                    RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
+                    RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
+                    RCache.set_c("m_shadow", m_shadow);
+                    RCache.set_c("m_sunmask", m_clouds_shadow);
+                    RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
+                    RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
+                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.set_CullMode(CULL_NONE);
+                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+                }
+                StateManager.SetSampleMask(0xffffffff);
+#elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
+#else
+#   error No graphics API selected or enabled!
+#endif
             }
         }
 
         //	Apply normal
         RCache.set_Element(s_rain->E[2]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
 
         if (!RImplementation.o.gbuffer_opt)
         {
             //	Do this in blender!
-            //StateManager.SetColorWriteEnable( D3D10_COLOR_WRITE_ENABLE_RED | D3D10_COLOR_WRITE_ENABLE_GREEN | D3D10_COLOR_WRITE_ENABLE_BLUE );
-            u_setrt(rt_Normal, NULL, NULL, rt_MSAADepth);
+            // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN | D3D_COLOR_WRITE_ENABLE_BLUE );
+            u_setrt(rt_Normal, nullptr, nullptr, rt_MSAADepth);
         }
         else
         {
-            //StateManager.SetColorWriteEnable( D3D10_COLOR_WRITE_ENABLE_RED | D3D10_COLOR_WRITE_ENABLE_GREEN );
-            u_setrt(rt_Position, NULL, NULL, rt_MSAADepth);
+            // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN );
+            u_setrt(rt_Position, nullptr, nullptr, rt_MSAADepth);
         }
 
-        if (! RImplementation.o.msaa)
+        if (!RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -324,21 +394,35 @@ void CRenderTarget::draw_rain(light& RainSetup)
             }
             else
             {
+#if defined(USE_DX11)
+                for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
+                {
+                    RCache.set_Element(s_rain_msaa[i]->E[1]);
+                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                    RCache.set_CullMode(CULL_NONE);
+                    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+                }
+                StateManager.SetSampleMask(0xffffffff);
+#elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
+#else
+#   error No graphics API selected or enabled!
+#endif
             }
         }
 
         //	Apply gloss
         RCache.set_Element(s_rain->E[3]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
 
         //	It is restored automatically by a set_Element call
-        //StateManager.SetColorWriteEnable( D3D10_COLOR_WRITE_ENABLE_ALL );
-        u_setrt(rt_Color, NULL, NULL, rt_MSAADepth);
+        // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_ALL );
+        u_setrt(rt_Color, nullptr, nullptr, rt_MSAADepth);
 
-        if (! RImplementation.o.msaa)
+        if (!RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -358,7 +442,20 @@ void CRenderTarget::draw_rain(light& RainSetup)
             }
             else
             {
+#if defined(USE_DX11)
+                for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
+                {
+                    RCache.set_Element(s_rain_msaa[i]->E[2]);
+                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+                }
+                StateManager.SetSampleMask(0xffffffff);
+#elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
+#else
+#   error No graphics API selected or enabled!
+#endif
             }
         }
 

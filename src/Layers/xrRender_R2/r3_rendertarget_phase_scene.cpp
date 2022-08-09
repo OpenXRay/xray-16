@@ -5,7 +5,7 @@ void CRenderTarget::phase_scene_prepare()
 {
     PIX_EVENT(phase_scene_prepare);
     // Clear depth & stencil
-    // u_setrt	( Device.dwWidth,Device.dwHeight,get_base_rt(),NULL,NULL,get_base_zb() );
+    // u_setrt	( Device.dwWidth,Device.dwHeight, get_base_rt(), nullptr, nullptr, get_base_zb() );
     // CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
     //	Igor: soft particles
 
@@ -96,7 +96,7 @@ void CRenderTarget::phase_scene_end()
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
-    u_setrt(rt_Color, 0, 0, rt_MSAADepth);
+    u_setrt(rt_Color, nullptr, nullptr, rt_MSAADepth);
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil)

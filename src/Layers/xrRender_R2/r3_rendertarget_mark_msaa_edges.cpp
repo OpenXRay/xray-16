@@ -31,7 +31,7 @@ void CRenderTarget::mark_msaa_edges()
 #endif
     RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
 #if defined(USE_DX11) // XXX: remove this difference
-    u_setrt(NULL, NULL, NULL, rt_MSAADepth->pZRT);
+    u_setrt(nullptr, nullptr, nullptr, rt_MSAADepth);
 #elif defined(USE_OGL)
     u_setrt(Device.dwWidth, Device.dwHeight, 0, 0, 0, rt_MSAADepth->pZRT);
 #endif

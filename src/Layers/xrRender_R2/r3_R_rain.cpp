@@ -6,13 +6,21 @@
 #include "xrEngine/IRenderable.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
+#if defined(USE_DX11)
+#include "DirectXMath.h"
+using namespace DirectX;
+#elif defined(USE_OGL)
+void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t, float zn, float zf);
+void XRMatrixInverse(Fmatrix* pout, float *pdeterminant, const Fmatrix& pm);
+#else
+#   error No graphics API selected or enabled!
+#endif
+
 const float tweak_rain_COP_initial_offs = 1200.f;
 const float tweak_rain_ortho_xform_initial_offs = 1000.f; //. ?
 
 //	Defined in r2_R_sun.cpp
 Fvector3 wform(Fmatrix const& m, Fvector3 const& v);
-void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t, float zn, float zf);
-void XRMatrixInverse(Fmatrix* pout, float *pdeterminant, const Fmatrix& pm);
 
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
@@ -55,11 +63,17 @@ void CRender::render_rain()
     // calculate view-frustum bounds in world space
     Fmatrix ex_project, ex_full, ex_full_inverse;
     {
-        //	
         const float fRainFar = ps_r3_dyn_wet_surf_far;
         ex_project.build_projection(deg2rad(Device.fFOV /* * Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, fRainFar);
         ex_full.mul(ex_project, Device.mView);
+#if defined(USE_DX11)
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full_inverse),
+            XMMatrixInverse(nullptr, XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full))));
+#elif defined(USE_OGL)
         XRMatrixInverse(&ex_full_inverse, nullptr, ex_full);
+#else
+#   error No graphics API selected or enabled!
+#endif
 
         //	Calculate view frustum were we can see dynamic rain radius
         {
@@ -149,10 +163,10 @@ void CRender::render_rain()
         //	HACK
         //	TODO: DX11: Calculate bounding sphere for view frustum
         //	TODO: DX11: Reduce resolution.
-        // bb.min.x = -50;
-        // bb.max.x = 50;
-        // bb.min.y = -50;
-        // bb.max.y = 50;
+        // bb.vMin.x = -50;
+        // bb.vMax.x = 50;
+        // bb.vMin.y = -50;
+        // bb.vMax.y = 50;
 
         //	Offset RainLight position to center rain shadowmap
         Fvector3 vRectOffset =
@@ -166,12 +180,23 @@ void CRender::render_rain()
         bb.vMin.y = -fBoundingSphereRadius + vRectOffset.z;
         bb.vMax.y = fBoundingSphereRadius + vRectOffset.z;
 
-        //D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.min.x,bb.max.x,  bb.min.y,bb.max.y,  bb.min.z-tweak_rain_ortho_xform_initial_offs,bb.max.z);
+#if defined(USE_DX11)
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&mdir_Project),
+            XMMatrixOrthographicOffCenterLH(
+                bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
+                bb.vMin.z - tweak_rain_ortho_xform_initial_offs,
+                bb.vMin.z + 2 * tweak_rain_ortho_xform_initial_offs
+            )
+        );
+#elif defined(USE_OGL)
         XRMatrixOrthoOffCenterLH(&mdir_Project,
             bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
             bb.vMin.z - tweak_rain_ortho_xform_initial_offs,
             bb.vMin.z + 2 * tweak_rain_ortho_xform_initial_offs
         );
+#else
+#   error No graphics API selected or enabled!
+#endif
 
         cull_xform.mul(mdir_Project, mdir_View);
 
@@ -180,6 +205,18 @@ void CRender::render_rain()
         // build viewport xform
         float view_dim = float(limit);
         float fTexelOffs = .5f / o.smapsize;
+#if defined(USE_DX11)
+        Fmatrix m_viewport =
+        {
+            view_dim / 2.f, 0.0f, 0.0f, 0.0f,
+            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            view_dim / 2.f + fTexelOffs, view_dim / 2.f + fTexelOffs, 0.0f, 1.0f
+        };
+        Fmatrix m_viewport_inv;
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_viewport_inv),
+            XMMatrixInverse(nullptr, XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_viewport))));
+#elif defined(USE_OGL)
         Fmatrix m_viewport =
         {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
@@ -189,6 +226,9 @@ void CRender::render_rain()
         };
         Fmatrix m_viewport_inv;
         XRMatrixInverse(&m_viewport_inv, nullptr, m_viewport);
+#else
+#   error No graphics API selected or enabled!
+#endif
 
         // snap view-position to pixel
         //	snap zero point to pixel
@@ -239,7 +279,7 @@ void CRender::render_rain()
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(RainLight.X.D.combine);
             r_dsgraph_render_graph(0);
-            // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))	
+            // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
             //	Details->Render					()	;
         }
     }

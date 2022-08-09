@@ -56,8 +56,8 @@ public:
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
     ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
-    ref_rt rt_Generic_0_r; // MRT generic 0
-    ref_rt rt_Generic_1_r; // MRT generic 1
+    ref_rt rt_Generic_0_r; // MRT generic 0, if MSAA is disabled, just an alias of rt_Generic_0
+    ref_rt rt_Generic_1_r; // MRT generic 1, if MSAA is disabled, just an alias of rt_Generic_1
     ref_rt rt_Generic;
     ref_rt rt_Position; // 64bit,	fat	(x,y,z,?)				(eye-space)
     ref_rt rt_Normal; // 64bit,	fat	(x,y,z,hemi)			(eye-space)
@@ -102,16 +102,7 @@ public:
 
 private:
     // OCCq
-
     ref_shader s_occq;
-
-    // SSAO
-    ref_rt rt_ssao_temp;
-    ref_rt rt_half_depth;
-    ref_shader s_ssao;
-    ref_shader s_ssao_msaa[8];
-    ref_shader s_hdao_cs;      // compute shader
-    ref_shader s_hdao_cs_msaa; // for hdao
 
     // Accum
     ref_shader s_accum_mask;
@@ -156,6 +147,14 @@ private:
     VertexStagingBuffer g_accum_volumetric_vb;
     IndexStagingBuffer g_accum_volumetric_ib;
 
+    // SSAO
+    ref_rt rt_ssao_temp;
+    ref_rt rt_half_depth;
+    ref_shader s_ssao;
+    ref_shader s_ssao_msaa[8];
+    ref_shader s_hdao_cs;      // compute shader
+    ref_shader s_hdao_cs_msaa; // for hdao
+
     // Bloom
     ref_geom g_bloom_build;
     ref_geom g_bloom_filter;
@@ -189,7 +188,10 @@ public:
     ref_geom g_postprocess;
     ref_shader s_menu;
     ref_geom g_menu;
-
+#if 0 // kept for historical reasons
+    ref_shader s_flip;
+    ref_geom g_flip;
+#endif
 private:
     float im_noise_time;
     u32 im_noise_shift_w;
@@ -216,7 +218,7 @@ private:
 
 public:
     CRenderTarget();
-    ~CRenderTarget();
+    ~CRenderTarget() override;
 
     void build_textures();
 
@@ -306,22 +308,26 @@ public:
     void phase_combine();
     void phase_combine_volumetric();
     void phase_pp();
+#if 0 // kept for historical reasons
+    void phase_flip();
+#endif
 
-    virtual void set_blur(float f) { param_blur = f; }
-    virtual void set_gray(float f) { param_gray = f; }
-    virtual void set_duality_h(float f) { param_duality_h = _abs(f); }
-    virtual void set_duality_v(float f) { param_duality_v = _abs(f); }
-    virtual void set_noise(float f) { param_noise = f; }
-    virtual void set_noise_scale(float f) { param_noise_scale = f; }
-    virtual void set_noise_fps(float f) { param_noise_fps = _abs(f) + EPS_S; }
-    virtual void set_color_base(u32 f) { param_color_base = f; }
-    virtual void set_color_gray(u32 f) { param_color_gray = f; }
-    virtual void set_color_add(const Fvector& f) { param_color_add = f; }
-    virtual u32 get_width() { return dwWidth; }
-    virtual u32 get_height() { return dwHeight; }
-    virtual void set_cm_imfluence(float f) { param_color_map_influence = f; }
-    virtual void set_cm_interpolate(float f) { param_color_map_interpolate = f; }
-    virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1)
+    u32 get_width() override { return dwWidth; }
+    u32 get_height() override { return dwHeight; }
+
+    void set_blur(float f) override { param_blur = f; }
+    void set_gray(float f) override { param_gray = f; }
+    void set_duality_h(float f) override { param_duality_h = _abs(f); }
+    void set_duality_v(float f) override { param_duality_v = _abs(f); }
+    void set_noise(float f) override { param_noise = f; }
+    void set_noise_scale(float f) override { param_noise_scale = f; }
+    void set_noise_fps(float f) override { param_noise_fps = _abs(f) + EPS_S; }
+    void set_color_base(u32 f) override { param_color_base = f; }
+    void set_color_gray(u32 f) override { param_color_gray = f; }
+    void set_color_add(const Fvector& f) override { param_color_add = f; }
+    void set_cm_imfluence(float f) override { param_color_map_influence = f; }
+    void set_cm_interpolate(float f) override { param_color_map_interpolate = f; }
+    void set_cm_textures(const shared_str& tex0, const shared_str& tex1) override
     {
         color_map_manager.SetTextures(tex0, tex1);
     }
@@ -334,14 +340,49 @@ public:
     void DoAsyncScreenshot();
 
 #ifdef DEBUG
-    void dbg_addline(Fvector& P0, Fvector& P1, u32 c)
+    void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)
     {
-        dbg_lines.push_back(dbg_line_t());
-        dbg_lines.back().P0 = P0;
-        dbg_lines.back().P1 = P1;
-        dbg_lines.back().color = c;
+        dbg_lines.emplace_back(dbg_line_t{ P0, P1, c });
     }
-    void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.push_back(P0); }
+
+    void dbg_addbox(const Fbox& box, const u32& color)
+    {
+        Fvector c, r;
+        box.getcenter(c);
+        box.getradius(r);
+        dbg_addbox(c, r.x, r.y, r.z, color);
+    }
+
+    void dbg_addbox(const Fvector& c, float rx, float ry, float rz, u32 color)
+    {
+        Fvector p1, p2, p3, p4, p5, p6, p7, p8;
+
+        p1.set(c.x + rx, c.y + ry, c.z + rz);
+        p2.set(c.x + rx, c.y - ry, c.z + rz);
+        p3.set(c.x - rx, c.y - ry, c.z + rz);
+        p4.set(c.x - rx, c.y + ry, c.z + rz);
+
+        p5.set(c.x + rx, c.y + ry, c.z - rz);
+        p6.set(c.x + rx, c.y - ry, c.z - rz);
+        p7.set(c.x - rx, c.y - ry, c.z - rz);
+        p8.set(c.x - rx, c.y + ry, c.z - rz);
+
+        dbg_addline(p1, p2, color);
+        dbg_addline(p2, p3, color);
+        dbg_addline(p3, p4, color);
+        dbg_addline(p4, p1, color);
+
+        dbg_addline(p5, p6, color);
+        dbg_addline(p6, p7, color);
+        dbg_addline(p7, p8, color);
+        dbg_addline(p8, p5, color);
+
+        dbg_addline(p1, p5, color);
+        dbg_addline(p2, p6, color);
+        dbg_addline(p3, p7, color);
+        dbg_addline(p4, p8, color);
+    }
+    void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.emplace_back(P0); }
 #else
     void dbg_addline(Fvector& /*P0*/, Fvector& /*P1*/, u32 /*c*/) {}
     void dbg_addplane(Fplane& /*P0*/, u32 /*c*/) {}

@@ -9,21 +9,19 @@ class light;
 //#define DU_CONE_NUMVERTEX	18
 //#define DU_CONE_NUMFACES	32
 //	no less than 2
-#define	VOLUMETRIC_SLICES	100
+#define VOLUMETRIC_SLICES 100
 
 class CRenderTarget : public IRender_Target
 {
-private:
     u32 dwWidth;
     u32 dwHeight;
     u32 dwAccumulatorClearMark;
+
 public:
     enum eStencilOptimizeMode
     {
-        SO_Light = 0,
-        //	Default
-        SO_Combine,
-        //	Default
+        SO_Light = 0, //	Default
+        SO_Combine, //	Default
     };
 
     u32 dwLightMarkerID;
@@ -41,13 +39,14 @@ public:
     IBlender* b_ssao_msaa[8];
 
 #ifdef DEBUG
-	struct		dbg_line_t		{
-		Fvector	P0,P1;
-		u32		color;
-	};
-	xr_vector<std::pair<Fsphere,Fcolor> >		dbg_spheres;
-	xr_vector<dbg_line_t>										dbg_lines;
-	xr_vector<Fplane>												dbg_planes;
+    struct dbg_line_t
+    {
+        Fvector P0, P1;
+        u32 color;
+    };
+    xr_vector<std::pair<Fsphere, Fcolor>> dbg_spheres;
+    xr_vector<dbg_line_t> dbg_lines;
+    xr_vector<Fplane> dbg_planes;
 #endif
 
     // Base targets
@@ -57,8 +56,8 @@ public:
     // MRT-path
     ref_rt rt_Depth; // Z-buffer like - initial depth
     ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading. If MSAA is disabled, points to rt_Base_Depth so we can reduce branching
-    ref_rt rt_Generic_0_r; // MRT generic 0
-    ref_rt rt_Generic_1_r; // MRT generic 1
+    ref_rt rt_Generic_0_r; // MRT generic 0, if MSAA is disabled, just an alias of rt_Generic_0
+    ref_rt rt_Generic_1_r; // MRT generic 1, if MSAA is disabled, just an alias of rt_Generic_1
     ref_rt rt_Generic;
     ref_rt rt_Position; // 64bit,	fat	(x,y,z,?)				(eye-space)
     ref_rt rt_Normal; // 64bit,	fat	(x,y,z,hemi)			(eye-space)
@@ -66,7 +65,7 @@ public:
 
     //
     ref_rt rt_Accumulator; // 64bit		(r,g,b,specular)
-    ref_rt rt_Accumulator_temp;// only for HW which doesn't feature fp16 blend
+    ref_rt rt_Accumulator_temp; // only for HW which doesn't feature fp16 blend
     ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Generic_1; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     //	Igor: for volumetric lights
@@ -90,28 +89,21 @@ public:
     ref_rt rt_smap_depth_minmax; //	is used for min/max sm
 
     //	Igor: for async screenshots
-    GLuint t_ss_async; //32bit		(r,g,b,a) is situated in the system memory
+    GLuint t_ss_async; // 32bit		(r,g,b,a) is situated in the system memory
 
     // Textures
     GLuint t_material_surf;
     ref_texture t_material;
 
-    GLuint t_noise_surf [TEX_jitter_count];
-    ref_texture t_noise [TEX_jitter_count];
+    GLuint t_noise_surf[TEX_jitter_count];
+    ref_texture t_noise[TEX_jitter_count];
     GLuint t_noise_surf_mipped;
     ref_texture t_noise_mipped;
 
     ref_texture t_base;
 private:
     // OCCq
-
     ref_shader s_occq;
-
-    // SSAO
-    ref_rt rt_ssao_temp;
-    ref_rt rt_half_depth;
-    ref_shader s_ssao;
-    ref_shader s_ssao_msaa[8];
 
     // Accum
     ref_shader s_accum_mask;
@@ -156,6 +148,12 @@ private:
     VertexStagingBuffer g_accum_volumetric_vb;
     IndexStagingBuffer g_accum_volumetric_ib;
 
+    // SSAO
+    ref_rt rt_ssao_temp;
+    ref_rt rt_half_depth;
+    ref_shader s_ssao;
+    ref_shader s_ssao_msaa[8];
+
     // Bloom
     ref_geom g_bloom_build;
     ref_geom g_bloom_filter;
@@ -182,6 +180,7 @@ private:
     ref_shader s_combine;
     ref_shader s_combine_msaa[8];
     ref_shader s_combine_volumetric;
+
 public:
     ref_shader s_postprocess;
     ref_shader s_postprocess_msaa; // if MSAA is disabled, just an alias of s_bloom
@@ -215,9 +214,10 @@ private:
 
     //	Igor: used for volumetric lights
     bool m_bHasActiveVolumetric;
+
 public:
     CRenderTarget();
-    ~CRenderTarget();
+    ~CRenderTarget() override;
 
     void build_textures();
 
@@ -301,6 +301,9 @@ public:
     void phase_flip();
 #endif
 
+    u32 get_width() override { return dwWidth; }
+    u32 get_height() override { return dwHeight; }
+
     void set_blur(float f) override { param_blur = f; }
     void set_gray(float f) override { param_gray = f; }
     void set_duality_h(float f) override { param_duality_h = _abs(f); }
@@ -311,10 +314,6 @@ public:
     void set_color_base(u32 f) override { param_color_base = f; }
     void set_color_gray(u32 f) override { param_color_gray = f; }
     void set_color_add(const Fvector& f) override { param_color_add = f; }
-
-    u32 get_width() override { return dwWidth; }
-    u32 get_height() override { return dwHeight; }
-
     void set_cm_imfluence(float f) override { param_color_map_influence = f; }
     void set_cm_interpolate(float f) override { param_color_map_interpolate = f; }
     void set_cm_textures(const shared_str& tex0, const shared_str& tex1) override
@@ -330,17 +329,51 @@ public:
     void DoAsyncScreenshot();
 
 #ifdef DEBUG
-	IC void						dbg_addline				(Fvector& P0, Fvector& P1, u32 c)					{
-		dbg_lines.push_back		(dbg_line_t());
-		dbg_lines.back().P0		= P0;
-		dbg_lines.back().P1		= P1;
-		dbg_lines.back().color	= c;
-	}
-	IC void dbg_addplane(Fplane& P0,  u32 /*c*/) {
-		dbg_planes.push_back(P0);
-	}
+    void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)
+    {
+        dbg_lines.emplace_back(dbg_line_t{ P0, P1, c });
+    }
+
+    void dbg_addbox(const Fbox& box, const u32& color)
+    {
+        Fvector c, r;
+        box.getcenter(c);
+        box.getradius(r);
+        dbg_addbox(c, r.x, r.y, r.z, color);
+    }
+
+    void dbg_addbox(const Fvector& c, float rx, float ry, float rz, u32 color)
+    {
+        Fvector p1, p2, p3, p4, p5, p6, p7, p8;
+
+        p1.set(c.x + rx, c.y + ry, c.z + rz);
+        p2.set(c.x + rx, c.y - ry, c.z + rz);
+        p3.set(c.x - rx, c.y - ry, c.z + rz);
+        p4.set(c.x - rx, c.y + ry, c.z + rz);
+
+        p5.set(c.x + rx, c.y + ry, c.z - rz);
+        p6.set(c.x + rx, c.y - ry, c.z - rz);
+        p7.set(c.x - rx, c.y - ry, c.z - rz);
+        p8.set(c.x - rx, c.y + ry, c.z - rz);
+
+        dbg_addline(p1, p2, color);
+        dbg_addline(p2, p3, color);
+        dbg_addline(p3, p4, color);
+        dbg_addline(p4, p1, color);
+
+        dbg_addline(p5, p6, color);
+        dbg_addline(p6, p7, color);
+        dbg_addline(p7, p8, color);
+        dbg_addline(p8, p5, color);
+
+        dbg_addline(p1, p5, color);
+        dbg_addline(p2, p6, color);
+        dbg_addline(p3, p7, color);
+        dbg_addline(p4, p8, color);
+    }
+    void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.emplace_back(P0); }
 #else
-    void dbg_addline(Fvector& P0, Fvector& P1, u32 c) {}
-    void dbg_addplane(Fplane& P0, u32 c) {}
+    void dbg_addline(Fvector& /*P0*/, Fvector& /*P1*/, u32 /*c*/) {}
+    void dbg_addplane(Fplane& /*P0*/, u32 /*c*/) {}
 #endif
 };

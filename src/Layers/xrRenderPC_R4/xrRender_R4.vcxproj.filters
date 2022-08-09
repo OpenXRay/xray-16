@@ -743,9 +743,6 @@
     <ClCompile Include="r2_test_hw.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r4_R_rain.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\r__dsgraph_build.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -936,15 +933,6 @@
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_accum_direct.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_accum_point.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_accum_spot.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_draw_rain.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_combine.cpp">
@@ -1314,6 +1302,18 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_draw_rain.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
