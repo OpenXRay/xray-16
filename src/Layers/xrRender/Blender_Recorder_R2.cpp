@@ -171,6 +171,22 @@ u32 CBlender_Compile::r_Sampler(
             fmag = D3DTEXF_ANISOTROPIC;
         }
 
+#if defined(USE_OGL)
+        if (0 == xr_strcmp(_name, "s_position"))
+        {
+            address = D3DTADDRESS_CLAMP;
+            fmin = D3DTEXF_POINT;
+            fmip = D3DTEXF_NONE;
+            fmag = D3DTEXF_POINT;
+        }
+
+        if (0 == xr_strcmp(_name, "s_smap"))
+        {
+            address = D3DTADDRESS_CLAMP;
+            fmip = D3DTEXF_NONE;
+        }
+#endif
+
         // Sampler states
         i_Address(dwStage, address);
         i_Filter(dwStage, fmin, fmip, fmag);
