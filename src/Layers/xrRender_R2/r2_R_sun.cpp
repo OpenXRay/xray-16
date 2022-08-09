@@ -1325,8 +1325,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         Target->create_minmax_SM();
     }
 
-    PIX_EVENT(SE_SUN_NEAR);
-
     if (cascade_ind == 0)
     {
         PIX_EVENT(SE_SUN_NEAR);
