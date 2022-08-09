@@ -85,8 +85,8 @@ jobs:
         fi
         if [ "${{ matrix.Platform }}" = "x86" ]; then
         sudo dpkg --add-architecture i386 && sudo apt -qq update &&
-        sudo apt install -y gcc-multilib libsdl2-dev:i386 libglew-dev:i386 libjpeg-dev:i386 liblzo2-dev:i386 &&
-        sudo apt install -y libopenal-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 &&
+        sudo apt-get install -y gcc-multilib libsdl2-dev:i386 libglew-dev:i386 libjpeg-dev:i386 liblzo2-dev:i386 &&
+        sudo apt-get install -y libopenal-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 &&
         CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
         fi
         make -j $core_count package
