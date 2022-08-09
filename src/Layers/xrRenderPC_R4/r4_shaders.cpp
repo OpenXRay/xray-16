@@ -409,7 +409,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(HW.SAD4ShaderInstructions, "SAD4_SUPPORTED", "1");
 
     // Minmax SM
-    appendShaderOption(o.dx11_minmax_sm, "USE_MINMAX_SM", "1");
+    appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Be carefull!!!!! this should be at the end to correctly generate
     // compiled shader name;

@@ -105,10 +105,10 @@ public:
         u32 msaa_alphatest : 2; //	A-test mode
         u32 msaa_samples : 4;
 
-        u32 dx11_minmax_sm : 2;
-        u32 dx11_minmax_sm_screenarea_threshold;
+        u32 minmax_sm : 2;
+        u32 minmax_sm_screenarea_threshold;
 
-        u32 dx11_enable_tessellation : 1;
+        u32 tessellation : 1;
 
         u32 forcegloss : 1;
         u32 forceskinw : 1;

@@ -431,7 +431,7 @@ CRenderTarget::CRenderTarget()
         // otherwise - create texture with specified HW_smap_FORMAT
         rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
 #if defined(USE_DX11) || defined(USE_OGL)
-        if (RImplementation.o.dx11_minmax_sm)
+        if (RImplementation.o.minmax_sm)
         {
             rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, smapsize / 4, smapsize / 4, D3DFMT_R32F);
             CBlender_createminmax TempBlender;
@@ -497,7 +497,7 @@ CRenderTarget::CRenderTarget()
             manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
 #if defined(USE_DX11) || defined(USE_OGL)
-            if (RImplementation.o.dx11_minmax_sm)
+            if (RImplementation.o.minmax_sm)
             {
                 s_accum_direct_volumetric_minmax.create("accum_volumetric_sun_nomsaa_minmax");
                 manually_assign_texture(s_accum_direct_volumetric_minmax, "s_smap", smapTarget);
@@ -1029,7 +1029,7 @@ bool CRenderTarget::need_to_render_sunshafts()
 #if defined(USE_DX11) || defined(USE_OGL)
 bool CRenderTarget::use_minmax_sm_this_frame()
 {
-    switch (RImplementation.o.dx11_minmax_sm)
+    switch (RImplementation.o.minmax_sm)
     {
     case CRender::MMSM_ON: return true;
     case CRender::MMSM_AUTO: return need_to_render_sunshafts();
@@ -1038,7 +1038,7 @@ bool CRenderTarget::use_minmax_sm_this_frame()
         const auto& [width, height] = HW.GetSurfaceSize();
         u32 dwScreenArea = width * height;
 
-        if (dwScreenArea >= RImplementation.o.dx11_minmax_sm_screenarea_threshold)
+        if (dwScreenArea >= RImplementation.o.minmax_sm_screenarea_threshold)
             return need_to_render_sunshafts();
         return false;
     }

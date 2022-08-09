@@ -414,7 +414,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");
 
     // Minmax SM
-    appendShaderOption(o.dx11_minmax_sm, "USE_MINMAX_SM", "1");
+    appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Shadow of Chernobyl compatibility
     appendShaderOption(ShadowOfChernobylMode, "USE_SHOC_RESOURCES", "1");

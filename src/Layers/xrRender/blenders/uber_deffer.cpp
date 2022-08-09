@@ -105,7 +105,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 
 // Uber-construct
 #if defined(USE_DX11)
-    if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
+    if (bump && hq && RImplementation.o.tessellation && C.TessMethod != 0)
     {
         char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";
@@ -296,7 +296,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         strconcat(sizeof(fnameB), fnameB, fnameA, "#");
     }
 
-    if (bump && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
+    if (bump && RImplementation.o.tessellation && C.TessMethod != 0)
     {
         char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";

@@ -547,28 +547,28 @@ void CRender::create()
 
     o.gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
 
-    o.dx11_minmax_sm = ps_r3_minmax_sm;
-    o.dx11_minmax_sm_screenarea_threshold = 1600 * 1200;
+    o.minmax_sm = ps_r3_minmax_sm;
+    o.minmax_sm_screenarea_threshold = 1600 * 1200;
 
 #if defined(USE_DX11)
-    o.dx11_enable_tessellation =
+    o.tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 #endif
 
-    if (o.dx11_minmax_sm == MMSM_AUTODETECT)
+    if (o.minmax_sm == MMSM_AUTODETECT)
     {
-        o.dx11_minmax_sm = MMSM_OFF;
+        o.minmax_sm = MMSM_OFF;
 
         //	AMD device
         if (HW.Caps.id_vendor == 0x1002)
         {
             if (ps_r_sun_quality >= 3)
-                o.dx11_minmax_sm = MMSM_AUTO;
+                o.minmax_sm = MMSM_AUTO;
             else if (ps_r_sun_shafts >= 2)
             {
-                o.dx11_minmax_sm = MMSM_AUTODETECT;
+                o.minmax_sm = MMSM_AUTODETECT;
                 //	Check resolution in runtime in use_minmax_sm_this_frame
-                o.dx11_minmax_sm_screenarea_threshold = 1600 * 1200;
+                o.minmax_sm_screenarea_threshold = 1600 * 1200;
             }
         }
 
@@ -577,9 +577,9 @@ void CRender::create()
         {
             if (ps_r_sun_shafts >= 2)
             {
-                o.dx11_minmax_sm = MMSM_AUTODETECT;
+                o.minmax_sm = MMSM_AUTODETECT;
                 //	Check resolution in runtime in use_minmax_sm_this_frame
-                o.dx11_minmax_sm_screenarea_threshold = 1280 * 1024;
+                o.minmax_sm_screenarea_threshold = 1280 * 1024;
             }
         }
     }
