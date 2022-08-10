@@ -207,7 +207,6 @@ public:
 
     void u_stencil_optimize(BOOL common_stencil = TRUE);
     void u_compute_texgen_screen(Fmatrix& dest);
-    void u_compute_texgen_screen_asd(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
