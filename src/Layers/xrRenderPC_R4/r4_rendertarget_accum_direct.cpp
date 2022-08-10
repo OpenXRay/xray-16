@@ -1220,8 +1220,10 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         light* fuckingsun = (light*)RImplementation.Lights.sun._get();
 
         // Common constants (light-related)
-        Fvector L_clr;
+        Fvector L_dir, L_clr;
         L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
+        Device.mView.transform_dir(L_dir, fuckingsun->direction);
+        L_dir.normalize();
 
         //	Use g_combine_2UV that was set up by accum_direct
         //	RCache.set_Geometry			(g_combine_2UV);
@@ -1233,7 +1235,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         {
             RCache.set_CullMode(CULL_CCW);
         }
-        //		RCache.set_c				("Ldynamic_dir",		L_dir.x,L_dir.y,L_dir.z,0 );
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0.f);
         RCache.set_c("m_shadow", mShadow);
         Fmatrix m_Texgen;
