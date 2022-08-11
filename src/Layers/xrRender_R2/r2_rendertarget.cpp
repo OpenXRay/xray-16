@@ -838,52 +838,6 @@ CRenderTarget::~CRenderTarget()
 #   if defined(USE_DX11)
     _RELEASE(t_ss_async);
 #   endif
-    // Textures
-    t_material->surface_set(NULL);
-
-#ifdef DEBUG
-    _SHOW_REF("t_material_surf", t_material_surf);
-#endif // DEBUG
-    _RELEASE(t_material_surf);
-
-    t_LUM_src->surface_set(NULL);
-    t_LUM_dest->surface_set(NULL);
-
-#   ifdef DEBUG
-    ID3DBaseTexture* pSurf = 0;
-
-    pSurf = t_envmap_0->surface_get();
-    if (pSurf)
-        pSurf->Release();
-    _SHOW_REF("t_envmap_0 - #small", pSurf);
-
-    pSurf = t_envmap_1->surface_get();
-    if (pSurf)
-        pSurf->Release();
-    _SHOW_REF("t_envmap_1 - #small", pSurf);
-#   endif // DEBUG
-    t_envmap_0->surface_set(NULL);
-    t_envmap_1->surface_set(NULL);
-    t_envmap_0.destroy();
-    t_envmap_1.destroy();
-
-    // Jitter
-    for (int it = 0; it < TEX_jitter_count; it++)
-    {
-        t_noise[it]->surface_set(NULL);
-#   ifdef DEBUG
-        _SHOW_REF("t_noise_surf[it]", t_noise_surf[it]);
-#   endif // DEBUG
-        _RELEASE(t_noise_surf[it]);
-    }
-
-#   if defined(USE_DX11)
-    t_noise_mipped->surface_set(NULL);
-#       ifdef DEBUG
-    _SHOW_REF("t_noise_surf_mipped", t_noise_surf_mipped);
-#       endif // DEBUG
-    _RELEASE(t_noise_surf_mipped);
-#   endif
 #elif defined(USE_OGL)
     glDeleteTextures(1, &t_ss_async);
 

@@ -92,12 +92,8 @@ public:
     ID3DTexture2D* t_ss_async; // 32bit		(r,g,b,a) is situated in the system memory
 
     // Textures
-    ID3DTexture3D* t_material_surf;
     ref_texture t_material;
-
-    ID3DTexture2D* t_noise_surf[TEX_jitter_count];
     ref_texture t_noise[TEX_jitter_count];
-    ID3DTexture2D* t_noise_surf_mipped;
     ref_texture t_noise_mipped;
 
 private:
