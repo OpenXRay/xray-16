@@ -387,24 +387,22 @@ void CHW::DestroyDevice()
     //  Must switch to windowed mode to release swap chain
     if (!m_ChainDesc.Windowed)
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
-    _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
-    _RELEASE(m_pSwapChain);
 #ifdef HAS_DX11_2
-    _SHOW_REF("refCount:m_pSwapChain2", m_pSwapChain2);
     _RELEASE(m_pSwapChain2);
 #endif
+    _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
+    _RELEASE(m_pSwapChain);
 
+    _RELEASE(pAnnotation);
     _RELEASE(pContext1);
+    _SHOW_REF("refCount:pContext", pContext);
     _RELEASE(pContext);
 
-    _SHOW_REF("refCount:pDevice:", pDevice);
-    _RELEASE(pDevice);
-
 #ifdef HAS_DX11_3
-    _SHOW_REF("refCount:pDevice3:", pDevice3);
     _RELEASE(pDevice3);
 #endif
-
+    _SHOW_REF("refCount:pDevice:", pDevice);
+    _RELEASE(pDevice);
     DestroyD3D();
 }
 
