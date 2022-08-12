@@ -160,9 +160,6 @@
     <Filter Include="Interface implementations\UI\UISequenceVideoItem">
       <UniqueIdentifier>{8e609091-9c4e-4b0f-991b-6ea121fadf76}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\MSAARender">
-      <UniqueIdentifier>{763f97a9-f305-4cc2-995d-a1adad48351c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="dx9 to dx11 Utils">
       <UniqueIdentifier>{4c505c0d-891a-4fa4-a5e0-920bd864322e}</UniqueIdentifier>
     </Filter>
@@ -177,6 +174,9 @@
     </Filter>
     <Filter Include="Debug">
       <UniqueIdentifier>{8d6caf5d-f49d-40f7-b1ae-f1fd5c4f0d58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shading templates\DX11 MSAA">
+      <UniqueIdentifier>{763f97a9-f305-4cc2-995d-a1adad48351c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -619,7 +619,7 @@
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h">
-      <Filter>Interface implementations\MSAARender</Filter>
+      <Filter>Shading templates\DX11 MSAA</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h">
       <Filter>dx9 to dx11 Utils</Filter>
@@ -1140,7 +1140,7 @@
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\dx11MSAABlender.cpp">
-      <Filter>Interface implementations\MSAARender</Filter>
+      <Filter>Shading templates\DX11 MSAA</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp">
       <Filter>dx9 to dx11 Utils</Filter>

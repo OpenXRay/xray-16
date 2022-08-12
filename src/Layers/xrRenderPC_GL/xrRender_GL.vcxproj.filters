@@ -160,14 +160,14 @@
     <Filter Include="Interface implementations\UI\UISequenceVideoItem">
       <UniqueIdentifier>{db5c1b3c-e054-4fac-8997-8b2f61df5efc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\MSAARender">
-      <UniqueIdentifier>{b5644c37-6f04-44e4-8343-56fec645ad53}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core_Target\ColorMap">
       <UniqueIdentifier>{7fdc926e-8c7d-4cba-a662-332feb1aada8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shading templates\GL Rain">
       <UniqueIdentifier>{07d880a0-66f9-4c25-a538-c4076b2cf662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shading templates\GL MSAA">
+      <UniqueIdentifier>{b5644c37-6f04-44e4-8343-56fec645ad53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -538,7 +538,7 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\glMSAABlender.cpp">
-      <Filter>Interface implementations\MSAARender</Filter>
+      <Filter>Shading templates\GL MSAA</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_flip.cpp">
       <Filter>Core_Target</Filter>
@@ -1085,9 +1085,6 @@
     <ClInclude Include="..\xrRender\r_sun_cascades.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\glMSAABlender.h">
-      <Filter>Interface implementations\MSAARender</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderGL\glHW.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
@@ -1141,6 +1138,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h">
       <Filter>Shading templates\GL Rain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h">
+      <Filter>Shading templates\GL MSAA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
