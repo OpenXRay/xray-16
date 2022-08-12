@@ -10,22 +10,20 @@ public:
     virtual void Compile(CBlender_Compile& C);
 };
 
-class CBlender_rain_msaa : public IBlender
+class CBlender_rain_msaa final : public IBlender
 {
+    pcstr Name{};
+    pcstr Definition{};
+
 public:
-    CBlender_rain_msaa()
-    {
-        Name = 0;
-        Definition = 0;
-    }
+    CBlender_rain_msaa() = default;
+    CBlender_rain_msaa(pcstr name, pcstr definition)
+        : Name(name), Definition(definition) {}
+
     virtual LPCSTR getComment() { return "INTERNAL: DX11 MSAA rain blender"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition);
-
-    LPCSTR Name;
-    LPCSTR Definition;
 };
 
 #endif //	dx11RainBlender_included

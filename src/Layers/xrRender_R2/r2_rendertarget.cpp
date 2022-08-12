@@ -244,17 +244,21 @@ void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr render
 
 CRenderTarget::CRenderTarget()
 {
-    u32 SampleCount = 1;
-    if (RImplementation.o.msaa)
-        SampleCount = RImplementation.o.msaa_samples;
+    static constexpr pcstr SAMPLE_DEFS[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
+
+    const auto& options = RImplementation.o;
+
+    const u32 SampleCount  = options.msaa ? options.msaa_samples : 1u;
+    const u32 BoundSamples = options.msaa_opt ? 1u : options.msaa_samples;
 
 #ifdef DEBUG
     Msg("MSAA samples = %d", SampleCount);
-    if (RImplementation.o.msaa_opt)
+    if (options.msaa_opt)
         Msg("MSAA_opt = on");
-    if (RImplementation.o.gbuffer_opt)
+    if (options.gbuffer_opt)
         Msg("gbuffer_opt = on");
 #endif
+
     param_blur = 0.f;
     param_gray = 0.f;
     param_noise = 0.f;
@@ -280,36 +284,10 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.msaa)
     {
-        int bound = RImplementation.o.msaa_samples;
-
-        if (RImplementation.o.msaa_opt)
-            bound = 1;
-
-        for (int i = 0; i < bound; ++i)
+        for (u32 i = 0; i < BoundSamples; ++i)
         {
-            static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
-            b_combine_msaa[i] = xr_new<CBlender_combine_msaa>();
-            b_accum_mask_msaa[i] = xr_new<CBlender_accum_direct_mask_msaa>();
-            b_accum_direct_msaa[i] = xr_new<CBlender_accum_direct_msaa>();
-            b_accum_direct_volumetric_msaa[i] = xr_new<CBlender_accum_direct_volumetric_msaa>();
-            // b_accum_direct_volumetric_sun_msaa[i]	= new CBlender_accum_direct_volumetric_sun_msaa			();
-            b_accum_spot_msaa[i] = xr_new<CBlender_accum_spot_msaa>();
-            b_accum_volumetric_msaa[i] = xr_new<CBlender_accum_volumetric_msaa>();
-            b_accum_point_msaa[i] = xr_new<CBlender_accum_point_msaa>();
-            b_accum_reflected_msaa[i] = xr_new<CBlender_accum_reflected_msaa>();
-            b_ssao_msaa[i] = xr_new<CBlender_SSAO_MSAA>();
-            static_cast<CBlender_accum_direct_mask_msaa*>(b_accum_mask_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_direct_volumetric_msaa*>(b_accum_direct_volumetric_msaa[i])
-                ->SetDefine("ISAMPLE", SampleDefs[i]);
-            // static_cast<CBlender_accum_direct_volumetric_sun_msaa*>(b_accum_direct_volumetric_sun_msaa[i])->SetDefine( "ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_direct_msaa*>(b_accum_direct_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_volumetric_msaa*>(b_accum_volumetric_msaa[i])
-                ->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_spot_msaa*>(b_accum_spot_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_point_msaa*>(b_accum_point_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_accum_reflected_msaa*>(b_accum_reflected_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_combine_msaa*>(b_combine_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
-            static_cast<CBlender_SSAO_MSAA*>(b_ssao_msaa[i])->SetDefine("ISAMPLE", SampleDefs[i]);
+            b_accum_spot_msaa[i] = xr_new<CBlender_accum_spot_msaa>("ISAMPLE", SAMPLE_DEFS[i]);
+            b_accum_volumetric_msaa[i] = xr_new<CBlender_accum_volumetric_msaa>("ISAMPLE", SAMPLE_DEFS[i]);
         }
     }
 #endif // USE_DX11 || USE_OGL
@@ -434,8 +412,8 @@ CRenderTarget::CRenderTarget()
         if (RImplementation.o.minmax_sm)
         {
             rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, smapsize / 4, smapsize / 4, D3DFMT_R32F);
-            CBlender_createminmax TempBlender;
-            s_create_minmax_sm.create(&TempBlender, "null");
+            CBlender_createminmax b_create_minmax;
+            s_create_minmax_sm.create(&b_create_minmax, "null");
         }
 #endif
 
@@ -468,15 +446,12 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) || defined(USE_OGL)
         if (RImplementation.o.msaa)
         {
-            int bound = RImplementation.o.msaa_samples;
-
-            if (RImplementation.o.msaa_opt)
-                bound = 1;
-
-            for (int i = 0; i < bound; ++i)
+            for (u32 i = 0; i < BoundSamples; ++i)
             {
-                s_accum_direct_msaa[i].create(b_accum_direct_msaa[i], "r2" DELIMITER "accum_direct");
-                s_accum_mask_msaa[i].create(b_accum_mask_msaa[i], "r2" DELIMITER "accum_direct");
+                CBlender_accum_direct_msaa b_accum_direct_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                s_accum_direct_msaa[i].create(&b_accum_direct_msaa, "r2" DELIMITER "accum_direct");
+                CBlender_accum_direct_mask_msaa b_accum_mask_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                s_accum_mask_msaa[i].create(&b_accum_mask_msaa, "r2" DELIMITER "accum_direct");
             }
         }
 #endif
@@ -505,21 +480,18 @@ CRenderTarget::CRenderTarget()
 
             if (RImplementation.o.msaa)
             {
-                static pcstr snames[] =
+                static constexpr pcstr snames[] =
                 {
                     "accum_volumetric_sun_msaa0", "accum_volumetric_sun_msaa1",
                     "accum_volumetric_sun_msaa2", "accum_volumetric_sun_msaa3",
                     "accum_volumetric_sun_msaa4", "accum_volumetric_sun_msaa5",
                     "accum_volumetric_sun_msaa6", "accum_volumetric_sun_msaa7"
                 };
-                int bound = RImplementation.o.msaa_samples;
 
-                if (RImplementation.o.msaa_opt)
-                    bound = 1;
-
-                for (int i = 0; i < bound; ++i)
+                for (u32 i = 0; i < BoundSamples; ++i)
                 {
-                    // s_accum_direct_volumetric_msaa[i].create		(b_accum_direct_volumetric_sun_msaa[i],			"r2" DELIMITER "accum_direct");
+                    // CBlender_accum_direct_volumetric_sun_msaa b_accum_direct_volumetric_sun_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                    // s_accum_direct_volumetric_msaa[i].create(&b_accum_direct_volumetric_sun_msaa, "r2" DELIMITER "accum_direct");
                     s_accum_direct_volumetric_msaa[i].create(snames[i]);
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
@@ -533,28 +505,27 @@ CRenderTarget::CRenderTarget()
     // Or make DX11 rain switch dynamic?
 #if defined(USE_DX11) || defined(USE_OGL)
     {
-        CBlender_rain TempBlender;
-        s_rain.create(&TempBlender, "null");
+        CBlender_rain b_rain;
+        s_rain.create(&b_rain, "null");
 
         if (RImplementation.o.msaa)
         {
-            static pcstr SampleDefs[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
-            CBlender_rain_msaa TempBlenderMSAA[8];
-
-            int bound = RImplementation.o.msaa_samples;
-
-            if (RImplementation.o.msaa_opt)
-                bound = 1;
-
-            for (int i = 0; i < bound; ++i)
+            for (u32 i = 0; i < BoundSamples; ++i)
             {
-                TempBlenderMSAA[i].SetDefine("ISAMPLE", SampleDefs[i]);
-                s_rain_msaa[i].create(&TempBlenderMSAA[i], "null");
+                CBlender_combine_msaa b_combine_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                s_combine_msaa[i].create(&b_combine_msaa, "r2" DELIMITER "combine");
+
+                CBlender_rain_msaa b_rain_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                s_rain_msaa[i].create(&b_rain_msaa, "null");
+
+                CBlender_accum_point_msaa b_accum_point_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                s_accum_point_msaa[i].create(&b_accum_point_msaa, "r2" DELIMITER "accum_point_s");
+
                 s_accum_spot_msaa[i].create(b_accum_spot_msaa[i], "r2" DELIMITER "accum_spot_s", "lights" DELIMITER "lights_spot01");
-                s_accum_point_msaa[i].create(b_accum_point_msaa[i], "r2" DELIMITER "accum_point_s");
-                // s_accum_volume_msaa[i].create(b_accum_direct_volumetric_msaa[i], "lights" DELIMITER "lights_spot01");
+
+                // CBlender_accum_direct_volumetric_msaa b_accum_direct_volumetric_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                // s_accum_volume_msaa[i].create(&b_accum_direct_volumetric_msaa, "lights" DELIMITER "lights_spot01");
                 s_accum_volume_msaa[i].create(b_accum_volumetric_msaa[i], "lights" DELIMITER "lights_spot01");
-                s_combine_msaa[i].create(b_combine_msaa[i], "r2" DELIMITER "combine");
             }
         }
     }
@@ -563,8 +534,8 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.msaa)
     {
-        CBlender_msaa TempBlender;
-        s_mark_msaa_edges.create(&TempBlender, "null");
+        CBlender_msaa b_msaa;
+        s_mark_msaa_edges.create(&b_msaa, "null");
     }
 #endif
 
@@ -601,14 +572,10 @@ CRenderTarget::CRenderTarget()
 #if defined(USE_DX11) || defined(USE_OGL)
         if (RImplementation.o.msaa)
         {
-            int bound = RImplementation.o.msaa_samples;
-
-            if (RImplementation.o.msaa_opt)
-                bound = 1;
-
-            for (int i = 0; i < bound; ++i)
+            for (u32 i = 0; i < BoundSamples; ++i)
             {
-                s_accum_reflected_msaa[i].create(b_accum_reflected_msaa[i], "null");
+                CBlender_accum_reflected_msaa b_accum_reflected_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                s_accum_reflected_msaa[i].create(&b_accum_reflected_msaa, "null");
             }
         }
 #endif // USE_DX11 || USE_OGL
@@ -708,13 +675,14 @@ CRenderTarget::CRenderTarget()
             CBlender_SSAO_noMSAA b_ssao;
             s_ssao.create(&b_ssao, "r2" DELIMITER "ssao");
 
-            /* Should be used in r*_rendertarget_phase_ssao.cpp but it's commented there.
-            if (RImplementation.o.msaa)
+            // Should be used in r*_rendertarget_phase_ssao.cpp but it's commented there.
+            /*if (RImplementation.o.msaa)
             {
-                const int bound = RImplementation.o.msaa_opt ? 1 : RImplementation.o.msaa_samples;
-
-                for (int i = 0; i < bound; ++i)
-                    s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
+                for (u32 i = 0; i < BoundSamples; ++i)
+                {
+                    CBlender_SSAO_MSAA b_ssao_msaa{ "ISAMPLE", SAMPLE_DEFS[i] };
+                    s_ssao_msaa[i].create(&b_ssao_msaa, "null");
+                }
             }*/
             rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
         }
@@ -876,27 +844,15 @@ CRenderTarget::~CRenderTarget()
 
     // Blenders
     xr_delete(b_accum_spot);
-
 #if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.msaa)
     {
-        int bound = RImplementation.o.msaa_samples;
+        const u32 bound = RImplementation.o.msaa_opt ? 1 : RImplementation.o.msaa_samples;
 
-        if (RImplementation.o.msaa_opt)
-            bound = 1;
-
-        for (int i = 0; i < bound; ++i)
+        for (u32 i = 0; i < bound; ++i)
         {
-            xr_delete(b_combine_msaa[i]);
-            xr_delete(b_accum_direct_msaa[i]);
-            xr_delete(b_accum_mask_msaa[i]);
-            xr_delete(b_accum_direct_volumetric_msaa[i]);
-            // xr_delete					(b_accum_direct_volumetric_sun_msaa[i]);
             xr_delete(b_accum_spot_msaa[i]);
             xr_delete(b_accum_volumetric_msaa[i]);
-            xr_delete(b_accum_point_msaa[i]);
-            xr_delete(b_accum_reflected_msaa[i]);
-            xr_delete(b_ssao_msaa[i]);
         }
     }
 #endif

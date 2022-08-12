@@ -25,8 +25,8 @@ public:
     };
 
     u32 dwLightMarkerID;
-    //
-    IBlender* b_accum_spot;
+
+    IBlender* b_accum_spot{};
 
 #ifdef DEBUG
     struct dbg_line_t

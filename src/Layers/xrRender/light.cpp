@@ -81,12 +81,11 @@ void light::set_texture(LPCSTR name)
     s_volumetric.create("accum_volumetric_nomsaa", name);
     if (RImplementation.o.msaa)
     {
-        int bound = 1;
-
+        u32 bound = 1;
         if (!RImplementation.o.msaa_opt)
             bound = RImplementation.o.msaa_samples;
 
-        for (int i = 0; i < bound; ++i)
+        for (u32 i = 0; i < bound; ++i)
         {
             s_spot_msaa[i].create(RImplementation.Target->b_accum_spot_msaa[i],
                 strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name), name);

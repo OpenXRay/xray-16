@@ -41,9 +41,6 @@ void CBlender_accum_reflected::Compile(CBlender_Compile& C)
 }
 
 #if RENDER != R_R2
-CBlender_accum_reflected_msaa::CBlender_accum_reflected_msaa() { description.CLS = 0; }
-CBlender_accum_reflected_msaa::~CBlender_accum_reflected_msaa() {}
-//	TODO: DX11: implement CBlender_accum_reflected::Compile
 void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

@@ -264,9 +264,6 @@ void CBlender_accum_point::Compile(CBlender_Compile& C)
 }
 
 #if RENDER != R_R2
-CBlender_accum_point_msaa::CBlender_accum_point_msaa() { description.CLS = 0; }
-CBlender_accum_point_msaa::~CBlender_accum_point_msaa() {}
-//	TODO: DX11: Implement CBlender_accum_point::Compile
 void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

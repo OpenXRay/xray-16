@@ -90,8 +90,6 @@ void CBlender_SSAO_noMSAA::Compile(CBlender_Compile& C)
     }
 }
 
-CBlender_SSAO_MSAA::CBlender_SSAO_MSAA() { description.CLS = 0; }
-CBlender_SSAO_MSAA::~CBlender_SSAO_MSAA() {}
 void CBlender_SSAO_MSAA::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

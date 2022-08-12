@@ -260,9 +260,6 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 }
 
 #if RENDER != R_R2
-CBlender_combine_msaa::CBlender_combine_msaa() { description.CLS = 0; }
-CBlender_combine_msaa::~CBlender_combine_msaa() {}
-//	TODO: DX11: Implement CBlender_combine::Compile
 void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

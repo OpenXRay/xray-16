@@ -264,8 +264,6 @@ void CBlender_accum_spot::Compile(CBlender_Compile& C)
 }
 
 #if RENDER != R_R2
-CBlender_accum_spot_msaa::CBlender_accum_spot_msaa() { description.CLS = 0; }
-CBlender_accum_spot_msaa::~CBlender_accum_spot_msaa() {}
 void CBlender_accum_spot_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -447,8 +445,6 @@ void CBlender_accum_spot_msaa::Compile(CBlender_Compile& C)
     GEnv.Render->m_MSAASample = -1;
 }
 
-CBlender_accum_volumetric_msaa::CBlender_accum_volumetric_msaa() { description.CLS = 0; }
-CBlender_accum_volumetric_msaa::~CBlender_accum_volumetric_msaa() {}
 void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

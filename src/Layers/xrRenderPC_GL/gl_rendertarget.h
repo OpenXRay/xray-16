@@ -25,18 +25,10 @@ public:
     };
 
     u32 dwLightMarkerID;
-    //
-    IBlender* b_accum_spot;
-    IBlender* b_combine_msaa[8];
-    IBlender* b_accum_mask_msaa[8];
-    IBlender* b_accum_spot_msaa[8];
-    IBlender* b_accum_direct_msaa[8];
-    IBlender* b_accum_direct_volumetric_msaa[8];
-    IBlender* b_accum_direct_volumetric_sun_msaa[8];
-    IBlender* b_accum_volumetric_msaa[8];
-    IBlender* b_accum_point_msaa[8];
-    IBlender* b_accum_reflected_msaa[8];
-    IBlender* b_ssao_msaa[8];
+
+    IBlender* b_accum_spot{};
+    IBlender* b_accum_spot_msaa[8]{};
+    IBlender* b_accum_volumetric_msaa[8]{};
 
 #ifdef DEBUG
     struct dbg_line_t
@@ -107,29 +99,30 @@ private:
 
     // Accum
     ref_shader s_accum_mask;
+    ref_shader s_accum_mask_msaa[8];
     ref_shader s_accum_direct;
+    ref_shader s_accum_direct_msaa[8];
     ref_shader s_accum_direct_volumetric;
+    ref_shader s_accum_direct_volumetric_msaa[8];
     ref_shader s_accum_direct_volumetric_minmax;
     ref_shader s_accum_point;
+    ref_shader s_accum_point_msaa[8];
     ref_shader s_accum_spot;
+    ref_shader s_accum_spot_msaa[8];
     ref_shader s_accum_reflected;
+    ref_shader s_accum_reflected_msaa[8];
     ref_shader s_accum_volume;
+    ref_shader s_accum_volume_msaa[8];
 
     //	generate min/max
     ref_shader s_create_minmax_sm;
 
     //	DX11 Rain
     ref_shader s_rain;
-
     ref_shader s_rain_msaa[8]; // up to 8 shaders for DX10.0 support
-    ref_shader s_accum_direct_volumetric_msaa[8];
-    ref_shader s_accum_mask_msaa[8];
-    ref_shader s_accum_direct_msaa[8];
+
+    // Mark MSAA-edge pixels
     ref_shader s_mark_msaa_edges;
-    ref_shader s_accum_point_msaa[8];
-    ref_shader s_accum_spot_msaa[8];
-    ref_shader s_accum_reflected_msaa[8];
-    ref_shader s_accum_volume_msaa[8];
 
     ref_geom g_accum_point;
     ref_geom g_accum_spot;
