@@ -141,8 +141,7 @@ private:
     ref_rt rt_half_depth;
     ref_shader s_ssao;
     ref_shader s_ssao_msaa[8];
-    ref_shader s_hdao_cs;      // compute shader
-    ref_shader s_hdao_cs_msaa; // for hdao
+    ref_shader s_hdao_cs;      // HDAO compute shader
 
     // Bloom
     ref_geom g_bloom_build;

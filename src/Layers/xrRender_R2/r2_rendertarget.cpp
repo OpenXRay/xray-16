@@ -660,12 +660,15 @@ CRenderTarget::CRenderTarget()
         if (ssao_hdao_ultra)
         {
 #if defined(USE_DX11) // XXX: support compute shaders for OpenGL
-            CBlender_CS_HDAO b_hdao_cs;
-            s_hdao_cs.create(&b_hdao_cs, "r2" DELIMITER "ssao");
             if (options.msaa)
             {
                 CBlender_CS_HDAO_MSAA b_hdao_msaa_cs;
-                s_hdao_cs_msaa.create(&b_hdao_msaa_cs, "r2" DELIMITER "ssao");
+                s_hdao_cs.create(&b_hdao_msaa_cs, "r2" DELIMITER "ssao");
+            }
+            else
+            {
+                CBlender_CS_HDAO b_hdao_cs;
+                s_hdao_cs.create(&b_hdao_cs, "r2" DELIMITER "ssao");
             }
             rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, { CRT::CreateUAV });
 #endif
