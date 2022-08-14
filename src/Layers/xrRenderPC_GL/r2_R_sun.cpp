@@ -57,10 +57,10 @@ void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t,
     pout->identity();
     pout->m[0][0] = 2.0f / (r - l);
     pout->m[1][1] = 2.0f / (t - b);
-    pout->m[2][2] = 1.0f / (zf -zn);
+    pout->m[2][2] = 2.0f / (zf -zn);
     pout->m[3][0] = -1.0f -2.0f *l / (r - l);
     pout->m[3][1] = 1.0f + 2.0f * t / (b - t);
-    pout->m[3][2] = zn / (zn -zf);
+    pout->m[3][2] = (zn + zf) / (zn -zf);
 }
 
 void XRMatrixInverse(Fmatrix* pout, float* pdeterminant, const Fmatrix& pm)
