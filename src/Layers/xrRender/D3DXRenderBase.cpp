@@ -190,7 +190,7 @@ bool D3DXRenderBase::GetForceGPU_REF()
 }
 u32 D3DXRenderBase::GetCacheStatPolys()
 {
-    return RCache.stat.polys;
+    return RCache.stat.render.polys;
 }
 void D3DXRenderBase::Begin()
 {
@@ -282,14 +282,16 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 #undef PPP
     font.OutSkip();
     const auto& rcstats = RCache.stat;
-    font.OutNext("Vertices:     %d/%d", rcstats.verts, rcstats.calls ? rcstats.verts / rcstats.calls : 0);
-    font.OutNext("Polygons:     %d/%d", rcstats.polys, rcstats.calls ? rcstats.polys / rcstats.calls : 0);
-    font.OutNext("DIP/DP:       %d", rcstats.calls);
-#ifdef DEBUG
-    font.OutNext("SH/T/M/C:     %d/%d/%d/%d", rcstats.states, rcstats.textures, rcstats.matrices, rcstats.constants);
-    font.OutNext("RT/PS/VS:     %d/%d/%d", rcstats.target_rt, rcstats.ps, rcstats.vs);
+    font.OutNext("Vertices:     %d/%d", rcstats.render.verts, rcstats.render.calls ? rcstats.render.verts / rcstats.render.calls : 0);
+    font.OutNext("Polygons:     %d/%d", rcstats.render.polys, rcstats.render.calls ? rcstats.render.polys / rcstats.render.calls : 0);
+    font.OutNext("DIP/DP:       %d", rcstats.render.calls);
+    font.OutNext("Compute:      %d", rcstats.compute.calls);
+    font.OutNext("- Groups:     %d/%d/%d", rcstats.compute.groups_x, rcstats.compute.groups_y, rcstats.compute.groups_z);
+    font.OutNext("S/T/M/C:      %d/%d/%d/%d", rcstats.states, rcstats.textures, rcstats.matrices, rcstats.constants);
+    font.OutNext("RT/ZB/PP:     %d/%d/%d", rcstats.target_rt, rcstats.target_zb, rcstats.pp);
+    font.OutNext("PS/VS/GS:     %d/%d/%d", rcstats.ps, rcstats.vs, rcstats.gs);
+    font.OutNext("HS/DS/CS:     %d/%d/%d", rcstats.hs, rcstats.ds, rcstats.cs);
     font.OutNext("DECL/VB/IB:   %d/%d/%d", rcstats.decl, rcstats.vb, rcstats.ib);
-#endif
     font.OutNext("XForms:       %d", rcstats.xforms);
     font.OutNext("Static:       %3.1f/%d", rcstats.r.s_static.verts / 1024.f, rcstats.r.s_static.dips);
     font.OutNext("Flora:        %3.1f/%d", rcstats.r.s_flora.verts / 1024.f, rcstats.r.s_flora.dips);
@@ -304,10 +306,10 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("Details:      %3.1f/%d", rcstats.r.s_details.verts / 1024.f, rcstats.r.s_details.dips);
     if (alert)
     {
-        if (rcstats.verts > 500000)
-            alert->Print(font, "Verts     > 500k: %d", rcstats.verts);
-        if (rcstats.calls > 1000)
-            alert->Print(font, "DIP/DP    > 1k:   %d", rcstats.calls);
+        if (rcstats.render.verts > 500000)
+            alert->Print(font, "Verts     > 500k: %d", rcstats.render.verts);
+        if (rcstats.render.calls > 1000)
+            alert->Print(font, "DIP/DP    > 1k:   %d", rcstats.render.calls);
         if (BasicStats.DetailCount > 1000)
             alert->Print(font, "DT_count  > 1000: %u", BasicStats.DetailCount);
     }

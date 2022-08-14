@@ -101,9 +101,7 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
     if (decl != _decl)
     {
         PGO(Msg("PGO:v_format:%x", _decl));
-#ifdef DEBUG
         stat.decl++;
-#endif
         decl = _decl;
     }
 }
@@ -132,8 +130,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
     if (gs != _gs)
     {
         PGO(Msg("PGO:Gshader:%x", _ps));
-        //  TODO: DX11: Get statistics for G Shader change
-        // stat.gs          ++;
+        stat.gs++;
         gs = _gs;
 #ifdef USE_DX11
         HW.pContext->GSSetShader(gs, 0, 0);
@@ -153,8 +150,7 @@ ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
     if (hs != _hs)
     {
         PGO(Msg("PGO:Hshader:%x", _ps));
-        //  TODO: DX11: Get statistics for H Shader change
-        // stat.hs          ++;
+        stat.hs++;
         hs = _hs;
         HW.pContext->HSSetShader(hs, 0, 0);
 
@@ -169,8 +165,7 @@ ICF void CBackend::set_DS(ID3D11DomainShader* _ds, LPCSTR _n)
     if (ds != _ds)
     {
         PGO(Msg("PGO:Dshader:%x", _ps));
-        //  TODO: DX11: Get statistics for D Shader change
-        // stat.ds          ++;
+        stat.ds++;
         ds = _ds;
         HW.pContext->DSSetShader(ds, 0, 0);
 
@@ -185,8 +180,7 @@ ICF void CBackend::set_CS(ID3D11ComputeShader* _cs, LPCSTR _n)
     if (cs != _cs)
     {
         PGO(Msg("PGO:Cshader:%x", _ps));
-        //  TODO: DX11: Get statistics for D Shader change
-        // stat.cs          ++;
+        stat.cs++;
         cs = _cs;
         HW.pContext->CSSetShader(cs, 0, 0);
 
@@ -223,9 +217,7 @@ ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
     if ((vb != _vb) || (vb_stride != _vb_stride))
     {
         PGO(Msg("PGO:VB:%x,%d", _vb, _vb_stride));
-#ifdef DEBUG
         stat.vb++;
-#endif
         vb = _vb;
         vb_stride = _vb_stride;
         // CHK_DX           (HW.pDevice->SetStreamSource(0,vb,0,vb_stride));
@@ -249,9 +241,7 @@ ICF void CBackend::set_Indices(ID3DIndexBuffer* _ib)
     if (ib != _ib)
     {
         PGO(Msg("PGO:IB:%x", _ib));
-#ifdef DEBUG
         stat.ib++;
-#endif
         ib = _ib;
         HW.pContext->IASetIndexBuffer(ib, DXGI_FORMAT_R16_UINT, 0);
     }
@@ -307,7 +297,10 @@ IC void CBackend::ApplyPrimitieTopology(D3D_PRIMITIVE_TOPOLOGY Topology)
 #ifdef USE_DX11
 IC void CBackend::Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ)
 {
-    stat.calls++;
+    stat.compute.calls++;
+    stat.compute.groups_x = ThreadGroupCountX;
+    stat.compute.groups_y = ThreadGroupCountY;
+    stat.compute.groups_z = ThreadGroupCountZ;
 
     SRVSManager.Apply();
     StateManager.Apply();
@@ -335,9 +328,9 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
     }
 #endif
 
-    stat.calls++;
-    stat.verts += countV;
-    stat.polys += PC;
+    stat.render.calls++;
+    stat.render.verts += countV;
+    stat.render.polys += PC;
 
     ApplyPrimitieTopology(Topology);
 
@@ -378,9 +371,9 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
     D3D_PRIMITIVE_TOPOLOGY Topology = TranslateTopology(T);
     u32 iVertexCount = GetIndexCount(T, PC);
 
-    stat.calls++;
-    stat.verts += 3 * PC;
-    stat.polys += PC;
+    stat.render.calls++;
+    stat.render.verts += 3 * PC;
+    stat.render.polys += PC;
 
     ApplyPrimitieTopology(Topology);
     SRVSManager.Apply();

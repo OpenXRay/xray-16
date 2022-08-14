@@ -250,9 +250,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_ps[load_id] != load_surf)
             {
                 textures_ps[load_id] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -276,9 +275,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_vs[load_id_remapped] != load_surf)
             {
                 textures_vs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -300,9 +298,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_gs[load_id_remapped] != load_surf)
             {
                 textures_gs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -323,9 +320,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_hs[load_id_remapped] != load_surf)
             {
                 textures_hs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -346,9 +342,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_ds[load_id_remapped] != load_surf)
             {
                 textures_ds[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -369,9 +364,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_cs[load_id_remapped] != load_surf)
             {
                 textures_cs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));

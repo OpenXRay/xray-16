@@ -201,13 +201,26 @@ private:
 public:
     struct _stats
     {
-        u32 polys;
-        u32 verts;
-        u32 calls;
+        struct
+        {
+            u32 calls;
+            u32 verts;
+            u32 polys;
+        } render;
+        struct
+        {
+            u32 calls;
+            u32 groups_x;
+            u32 groups_y;
+            u32 groups_z;
+        } compute;
         u32 vs;
         u32 ps;
+        u32 gs;
+        u32 hs;
+        u32 ds;
+        u32 cs;
         u32 pp;
-#ifdef DEBUG
         u32 decl;
         u32 vb;
         u32 ib;
@@ -215,7 +228,6 @@ public:
         u32 textures; // Number of times the shader-tex changes
         u32 matrices; // Number of times the shader-xform changes
         u32 constants; // Number of times the shader-consts changes
-#endif
         u32 xforms;
         u32 target_rt;
         u32 target_zb;

@@ -90,9 +90,7 @@ ICF void CBackend::set_States(SState* _state)
 #endif
     {
         PGO(Msg("PGO:state_block"));
-#ifdef DEBUG
         stat.states++;
-#endif
         state = _state->state;
         state->Apply();
     }
@@ -114,7 +112,7 @@ IC void CBackend::set_Matrices(SMatrixList* _M)
                     matrices[it] = mat;
                     mat->Calculate();
                     set_xform(D3DTS_TEXTURE0 + it, mat->xform);
-                    //				stat.matrices		++;
+                    stat.matrices++;
                 }
             }
         }

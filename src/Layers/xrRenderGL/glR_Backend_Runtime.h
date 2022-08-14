@@ -186,8 +186,7 @@ ICF void CBackend::set_GS(GLuint _gs, LPCSTR _n)
 #endif
         PGO(glGetObjectLabel(GL_PROGRAM, _gs, sizeof(name), nullptr, name));
         PGO(Msg("PGO:Gshader:%d,%s", _gs, _n ? _n : name));
-        //	TODO: OGL: Get statistics for G Shader change
-        //stat.gs			++;
+        stat.gs++;
         gs = _gs;
         //CHK_GL(glUseProgramStages(HW.pPP, GL_GEOMETRY_SHADER_BIT, gs));
 #ifdef DEBUG
@@ -314,9 +313,9 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
     GLenum Topology = TranslateTopology(T);
     u32 iIndexCount = GetIndexCount(T, PC);
 
-    stat.calls++;
-    stat.verts += countV;
-    stat.polys += PC;
+    stat.render.calls++;
+    stat.render.verts += countV;
+    stat.render.polys += PC;
     constants.flush();
     CHK_GL(glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV));
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
@@ -327,9 +326,9 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
     GLenum Topology = TranslateTopology(T);
     u32 iIndexCount = GetIndexCount(T, PC);
 
-    stat.calls++;
-    stat.verts += iIndexCount;
-    stat.polys += PC;
+    stat.render.calls++;
+    stat.render.verts += iIndexCount;
+    stat.render.polys += PC;
     constants.flush();
     CHK_GL(glDrawArrays(Topology, startV, iIndexCount));
     PGO(Msg("PGO:DIP:%dv/%df", iIndexCount, PC));
