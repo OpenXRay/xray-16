@@ -7,11 +7,6 @@ void CRenderTarget::draw_rain(light& RainSetup)
     // Common calc for quad-rendering
     u32 Offset;
     u32 C = color_rgba(255, 255, 255, 255);
-    float _w = float(Device.dwWidth);
-    float _h = float(Device.dwHeight);
-    Fvector2 p0, p1;
-    p0.set(.5f / _w, .5f / _h);
-    p1.set((_w + .5f) / _w, (_h + .5f) / _h);
     float d_Z = EPS_S, d_W = 1.f;
 
     // Common constants (light-related)
@@ -26,50 +21,6 @@ void CRenderTarget::draw_rain(light& RainSetup)
     Fvector W_dirZ;
     Device.mView.transform_dir(W_dirZ, Fvector().set(0.0f, 0.0f, 1.0f));
     W_dirZ.normalize();
-
-    // Perform masking (only once - on the first/near phase)
-    // RCache.set_CullMode			(CULL_NONE	);
-    // if (SE_SUN_NEAR==sub_phase)	//.
-    {
-        // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
-#if defined(USE_DX11)
-        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
-        pv++;
-        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
-        pv++;
-        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
-        pv++;
-        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
-        pv++;
-#elif defined(USE_OGL)
-        pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p0.y);
-        pv++;
-        pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p1.y);
-        pv++;
-        pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p0.y);
-        pv++;
-        pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p1.y);
-        pv++;
-#else
-#   error No graphics API selected or enabled!
-#endif
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
-        RCache.set_Geometry(g_combine);
-
-        // setup
-        //		float	intensity			= 0.3f*fuckingsun->color.r + 0.48f*fuckingsun->color.g + 0.22f*fuckingsun->color.b;
-        //		Fvector	dir					= L_dir;
-        //		dir.normalize().mul	(- _sqrt(intensity+EPS));
-        //		RCache.set_Element			(s_accum_mask->E[SE_MASK_DIRECT]);		// masker
-        //		RCache.set_c				("Ldynamic_dir",		dir.x,dir.y,dir.z,0		);
-
-        // if (stencil>=1 && aref_pass)	stencil = light_id
-        //	Done in blender!
-        // RCache.set_ColorWriteEnable	(FALSE		);
-        //		RCache.set_Stencil			(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0x01,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-        //		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-    }
 
     // recalculate d_Z, to perform depth-clipping
     const float fRainFar = ps_r3_dyn_wet_surf_far;
