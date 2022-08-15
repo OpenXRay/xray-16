@@ -18,20 +18,23 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        fetch-depth: 0
+        submodules: recursive
+
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
+
     - name: Setup NuGet.exe
       uses: nuget/setup-nuget@v1
       with:
         nuget-version: '5.x'
-    - name: Setup
-      run: |
-        git submodule update --init --recursive
-        nuget restore src\engine.sln
+
+    - name: Restore NuGet packages
+      run: nuget restore src\engine.sln
+
     - name: MSBuild
       working-directory: src
       run: msbuild /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
+
     - name: Prepare artifacts
       id: windows-vars
       shell: cmd
@@ -40,16 +43,19 @@ jobs:
         set PLATFORM=${{ matrix.Platform }}
         call xr_pack_build.cmd ARTIFACT_EDITION
         echo ::set-output name=Build_type::%ARTIFACT_EDITION%
+
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@v2
       with:
         name: OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
+
     - name: Upload Symbols
       uses: actions/upload-artifact@v2
       with:
         name: Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
+
     - name: Upload Utils
       uses: actions/upload-artifact@v2
       with:
@@ -74,7 +80,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
         submodules: recursive
 
     - name: Deinit Crypto++
@@ -118,17 +123,20 @@ jobs:
           export CXX=${{ matrix.CXX }}
           ${CXX} --version
           export core_count=$(nproc || echo 4) && echo core_count = $core_count
-          mkdir bin && cd bin
+          mkdir bin
 
     - name: Run CMake x64
       if: ${{ matrix.Platform == 'x64' }}
+      working-directory: build
       run: CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
 
     - name: Run CMake x86
       if: ${{ matrix.Platform == 'x86' }}
+      working-directory: build
       run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
 
     - name: Run Make
+      working-directory: build
       run: |
         make -j $core_count package
         file openxray_1.6.02_*.deb
