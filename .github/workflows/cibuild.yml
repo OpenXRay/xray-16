@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-windows:
+    name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }}
     runs-on: windows-2019
     strategy:
       fail-fast: false
@@ -55,12 +56,13 @@ jobs:
         name: Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
 
-  build-linux:
+  build-ubuntu:
+    name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }}
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        configuration: [Debug, Release]
+        Configuration: [Debug, Release]
         Platform: [x64, x86]
     steps:
     - uses: actions/checkout@v2
