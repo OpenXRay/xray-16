@@ -46,8 +46,6 @@ static BOOL bException = FALSE;
 #   define PTRACE_DETACH PT_DETACH
 #endif
 
-#pragma comment(lib, "FaultRep.lib") // XXX: remove
-
 #ifdef DEBUG
 #define USE_OWN_ERROR_MESSAGE_WINDOW
 #endif
