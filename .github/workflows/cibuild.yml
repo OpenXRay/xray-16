@@ -64,6 +64,12 @@ jobs:
       matrix:
         Configuration: [Debug, Release]
         Platform: [x64, x86]
+        include:
+          - CC: gcc
+            CXX: gcc
+          - CC: clang
+            CXX: clang
+
     steps:
     - uses: actions/checkout@v2
       with:
@@ -74,8 +80,6 @@ jobs:
         git submodule deinit Externals/cryptopp
     - name: Build
       run: |
-        export CC=gcc-9
-        export CXX=g++-9
         ${CXX} --version
         export core_count=$(nproc || echo 4) && echo core_count = $core_count
         mkdir bin && cd bin
