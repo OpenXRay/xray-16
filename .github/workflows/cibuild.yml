@@ -81,6 +81,8 @@ jobs:
         git submodule deinit Externals/cryptopp
     - name: Build
       run: |
+        export CC=${{ matrix.CC }}
+        export CXX=${{ matrix.CXX }}
         ${CXX} --version
         export core_count=$(nproc || echo 4) && echo core_count = $core_count
         mkdir bin && cd bin
