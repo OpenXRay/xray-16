@@ -64,6 +64,7 @@ jobs:
       matrix:
         Configuration: [Debug, Release]
         Platform: [x64, x86]
+        CC: [gcc, clang]
         include:
           - CC: gcc
             CXX: gcc
