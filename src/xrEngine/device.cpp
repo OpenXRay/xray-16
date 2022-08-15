@@ -210,6 +210,7 @@ void CRenderDevice::BeforeRender()
     }
 
     // Matrices
+    mInvView.invert(mView);
     mFullTransform.mul(mProject, mView);
     mInvFullTransform.invert_44(mFullTransform);
     GEnv.Render->BeforeRender();

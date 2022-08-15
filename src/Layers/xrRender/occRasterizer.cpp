@@ -173,10 +173,8 @@ void occRasterizer::on_dbg_render()
                 box_r = right_bottom;
                 box_r.sub(box_center);
 
-                Fmatrix inv;
-                inv.invert(Device.mView);
-                inv.transform(box_center);
-                inv.transform_dir(box_r);
+                Device.mInvView.transform(box_center);
+                Device.mInvView.transform_dir(box_r);
 
                 pixel_box& tmp = dbg_pixel_boxes[i * occ_dim_0 + j];
                 tmp.center = box_center;

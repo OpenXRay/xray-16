@@ -73,8 +73,10 @@ public:
     Fvector vCameraRight;
 
     Fmatrix mView;
+    Fmatrix mInvView;
     Fmatrix mProject;
     Fmatrix mFullTransform;
+    Fmatrix mInvFullTransform;
 
     // Copies of corresponding members. Used for synchronization.
     Fvector vCameraPositionSaved;
@@ -171,8 +173,6 @@ public:
     MessageRegistry<pureDeviceReset> seqDeviceReset;
     MessageRegistry<pureUIReset> seqUIReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
-
-    Fmatrix mInvFullTransform;
 
     CRenderDevice()
         : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
