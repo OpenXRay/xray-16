@@ -23,9 +23,12 @@
 
 /* per-machine configuration */
 
-#ifdef LINUX
 #include <stdint.h>
-#endif
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <math.h>
 
 #ifndef _ODE_CONFIG_H_
 
@@ -53,14 +56,6 @@ extern "C" {
 #if !defined(ODE_API)
   #define ODE_API
 #endif
-
-#include <stdio.h>
-
-#include <stdarg.h>
-
-#include <string.h>
-
-#include <math.h>
 
 /* Define the dInfinity macro */
 #ifdef INFINITY
