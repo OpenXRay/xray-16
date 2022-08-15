@@ -67,7 +67,7 @@ jobs:
         CC: [gcc-9, clang-9]
         include:
           - CC: gcc-9
-            CXX: gcc++-9
+            CXX: g++-9
           - CC: clang-9
             CXX: clang++-9
 
