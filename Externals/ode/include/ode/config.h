@@ -58,10 +58,6 @@ extern "C" {
 
 #include <stdarg.h>
 
-#ifndef FREEBSD
-#include <malloc.h>		// for alloca under windows
-#endif
-
 #include <string.h>
 
 #include <math.h>
