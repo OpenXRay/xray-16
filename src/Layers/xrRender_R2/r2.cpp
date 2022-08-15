@@ -227,6 +227,7 @@ void CRender::create()
 
     // hardware
     o.smapsize = ps_r2_smapsize;
+    o.rain_smapsize = ps_r3_dyn_wet_surf_sm_res;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 

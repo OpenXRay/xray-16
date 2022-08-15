@@ -64,6 +64,7 @@ public:
         u32 ssao_ultra : 1;
         u32 hbao_vectorized : 1;
 
+        u32 rain_smapsize : 16;
         u32 smapsize : 16;
         u32 depth16 : 1;
         u32 mrt : 1;
@@ -148,7 +149,6 @@ public:
     RenderR2Statistics Stats;
     // Sector detection and visibility
     CSector* pLastSector;
-    Fvector vLastCameraPos;
     u32 uLastLTRACK;
     xr_vector<IRender_Portal*> Portals;
     xr_vector<IRender_Sector*> Sectors;
@@ -180,6 +180,7 @@ public:
     SMAP_Allocator LP_smap_pool;
     light_Package LP_normal;
     light_Package LP_pending;
+    light RainLight;
 
     xr_vector<Fbox3> main_coarse_structure;
 

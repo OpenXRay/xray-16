@@ -131,7 +131,7 @@ void CRender::level_Unload()
     // 1.
     xr_delete(rmPortals);
     pLastSector = nullptr;
-    vLastCameraPos.set(0, 0, 0);
+    Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
     for (IRender_Sector* sector : Sectors)
