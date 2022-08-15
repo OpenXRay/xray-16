@@ -27,7 +27,6 @@ CTexture::CTexture()
     flags.bLoaded = false;
     flags.bUser = false;
     flags.seqCycles = FALSE;
-    flags.bLoadedAsStaging = FALSE;
     m_material = 1.0f;
     bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);
 }
@@ -121,9 +120,6 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
 
 ID3DBaseTexture* CTexture::surface_get()
 {
-    if (flags.bLoadedAsStaging)
-        ProcessStaging();
-
     if (pSurface)
         pSurface->AddRef();
     return pSurface;
@@ -150,92 +146,8 @@ void CTexture::apply_load(u32 dwStage)
     bind(dwStage);
 };
 
-void CTexture::ProcessStaging()
-{
-    VERIFY(pSurface);
-    VERIFY(flags.bLoadedAsStaging);
-
-    ID3DBaseTexture* pTargetSurface = 0;
-
-    D3D_RESOURCE_DIMENSION type;
-    pSurface->GetType(&type);
-
-    switch (type)
-    {
-    case D3D_RESOURCE_DIMENSION_TEXTURE2D:
-    {
-        ID3DTexture2D* T = (ID3DTexture2D*)pSurface;
-        D3D_TEXTURE2D_DESC TexDesc;
-        T->GetDesc(&TexDesc);
-        TexDesc.Usage = D3D_USAGE_DEFAULT;
-        TexDesc.BindFlags = D3D_BIND_SHADER_RESOURCE;
-        TexDesc.CPUAccessFlags = 0;
-
-        T = 0;
-
-        CHK_DX(HW.pDevice->CreateTexture2D(&TexDesc, // Texture desc
-            NULL, // Initial data
-            &T)); // [out] Texture
-
-        pTargetSurface = T;
-    }
-    break;
-    case D3D_RESOURCE_DIMENSION_TEXTURE3D:
-    {
-        ID3DTexture3D* T = (ID3DTexture3D*)pSurface;
-        D3D_TEXTURE3D_DESC TexDesc;
-        T->GetDesc(&TexDesc);
-        TexDesc.Usage = D3D_USAGE_DEFAULT;
-        TexDesc.BindFlags = D3D_BIND_SHADER_RESOURCE;
-        TexDesc.CPUAccessFlags = 0;
-
-        T = 0;
-
-        CHK_DX(HW.pDevice->CreateTexture3D(&TexDesc, // Texture desc
-            NULL, // Initial data
-            &T)); // [out] Texture
-
-        pTargetSurface = T;
-    }
-    break;
-    default: VERIFY(!"CTexture::ProcessStaging unsupported dimensions.");
-    }
-
-    HW.pContext->CopyResource(pTargetSurface, pSurface);
-    /*
-    for( int i=0; i<iNumSubresources; ++i)
-    {
-        HW.pDevice->CopySubresourceRegion(
-            pTargetSurface,
-            i,
-            0,
-            0,
-            0,
-            pSurface,
-            i,
-            0
-            );
-    }
-    */
-
-    flags.bLoadedAsStaging = FALSE;
-
-    //	Check if texture was not copied _before_ it was converted.
-    u32 RefCnt = pSurface->Release();
-    pSurface = 0;
-
-    VERIFY(!RefCnt);
-
-    surface_set(pTargetSurface);
-
-    _RELEASE(pTargetSurface);
-}
-
 void CTexture::Apply(u32 dwStage)
 {
-    if (flags.bLoadedAsStaging)
-        ProcessStaging();
-
     // if( !RImplementation.o.msaa )
     //   VERIFY( !((!pSurface)^(!m_pSRView)) );	//	Both present or both missing
     // else
@@ -548,24 +460,15 @@ void CTexture::Load()
     {
         // Normal texture
         u32 mem = 0;
-        // pSurface = ::RImplementation.texture_load	(*cName,mem);
-        pSurface = ::RImplementation.texture_load(*cName, mem, true);
-
-        if (GetUsage() == D3D_USAGE_STAGING)
-        {
-            flags.bLoadedAsStaging = TRUE;
-            bCreateView = false;
-        }
+        pSurface = ::RImplementation.texture_load(*cName, mem);
 
         // Calc memory usage and preload into vid-mem
         if (pSurface)
         {
             // pSurface->SetPriority	(PRIORITY_NORMAL);
             flags.MemoryUsage = mem;
-        }
-
-        if (pSurface && bCreateView)
             CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
+        }
     }
 
     PostLoad();
@@ -582,7 +485,6 @@ void CTexture::Unload()
     //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
 
     flags.bLoaded = FALSE;
-    flags.bLoadedAsStaging = FALSE;
     if (!seqDATA.empty())
     {
         for (u32 I = 0; I < seqDATA.size(); I++)

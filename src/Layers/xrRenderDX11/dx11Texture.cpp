@@ -293,15 +293,11 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
     (color_get_R(s)+color_get_G(s)+color_get_B(s))/3    );  // height
 }
 */
-ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStaging)
+ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
 //  Moved here just to avoid warning
     D3DX11_IMAGE_INFO IMG;
     ZeroMemory(&IMG, sizeof(IMG));
-
-    //  Staging control
-    static bool bAllowStaging = !RImplementation.o.no_ram_textures;
-    bStaging &= bAllowStaging;
 
     ID3DBaseTexture* pTexture2D = NULL;
     // IDirect3DCubeTexture9*   pTextureCUBE    = NULL;
@@ -348,7 +344,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
 
 #endif
 
-_DDS:
+    _DDS:
 {
     // Load and get header
 
@@ -383,18 +379,8 @@ _DDS_CUBE:
 
 //  Inited to default by provided default constructor
     D3DX11_IMAGE_LOAD_INFO LoadInfo;
-    // LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
-    if (bStaging)
-    {
-        LoadInfo.Usage = D3D_USAGE_STAGING;
-        LoadInfo.BindFlags = 0;
-        LoadInfo.CpuAccessFlags = D3D_CPU_ACCESS_WRITE;
-    }
-    else
-    {
-        LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
-        LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
-    }
+    LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
+    LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
 
     LoadInfo.pSrcInfo = &IMG;
 
@@ -442,18 +428,8 @@ _DDS_2D:
         Reduce(LoadInfo.Width, LoadInfo.Height, IMG.MipLevels, img_loaded_lod);
 #endif
 
-    // LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
-    if (bStaging)
-    {
-        LoadInfo.Usage = D3D_USAGE_STAGING;
-        LoadInfo.BindFlags = 0;
-        LoadInfo.CpuAccessFlags = D3D_CPU_ACCESS_WRITE;
-    }
-    else
-    {
-        LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
-        LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
-    }
+    LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
+    LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
     LoadInfo.pSrcInfo = &IMG;
 
     R_CHK2(D3DX11CreateTextureFromMemory(HW.pDevice, S->pointer(), S->length(), &LoadInfo, 0, &pTexture2D, 0), fn);

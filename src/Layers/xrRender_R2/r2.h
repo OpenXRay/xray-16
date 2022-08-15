@@ -325,10 +325,8 @@ public:
     void level_Load(IReader*) override;
     void level_Unload() override;
 
-#if defined(USE_DX9)
+#if defined(USE_DX9) || defined(USE_DX11)
     ID3DBaseTexture* texture_load(pcstr fname, u32& msize);
-#elif defined(USE_DX11)
-    ID3DBaseTexture* texture_load(pcstr fname, u32& msize, bool bStaging = false);
 #elif defined(USE_OGL)
     GLuint           texture_load(pcstr fname, u32& msize, GLenum& ret_desc);
 #else
