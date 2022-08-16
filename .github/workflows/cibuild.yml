@@ -50,5 +50,4 @@ jobs:
     - name: Run Make
       working-directory: build
       shell: alpine.sh {0}
-      run: make build
-  
+      run: make
