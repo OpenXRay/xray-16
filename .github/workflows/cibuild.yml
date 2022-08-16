@@ -165,14 +165,14 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: openxray_1.6.02_${{ matrix.Configuration }}_amd64.deb
-        path: bin/openxray_1.6.02_amd64.deb
+        path: build/openxray_1.6.02_amd64.deb
 
     - name: Upload OpenXRay artifact
       if: ${{ matrix.Platform == 'x86' }}
       uses: actions/upload-artifact@v2
       with:
         name: openxray_1.6.02_${{ matrix.Configuration }}_i386.deb
-        path: bin/openxray_1.6.02_i386.deb
+        path: build/openxray_1.6.02_i386.deb
 
   build-alpine:
     name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }}
