@@ -103,25 +103,36 @@ jobs:
 
     - name: Install GCC x64
       if: ${{ matrix.Platform == 'x64' && matrix.CC == 'gcc-9' }}
-      run: sudo apt-get install -qq -y gcc-9
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 9
+        platform: x64
 
     - name: Install GCC x86
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'gcc-9' }}
-      run: sudo apt-get install -qq -y gcc-multilib
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 9
+        platform: x86
 
     - name: Install Clang x64
       if: ${{ matrix.Platform == 'x64' && matrix.CC == 'clang-9' }}
-      run: sudo apt-get install -qq -y clang-9 lld-9 libc++-9-dev libc++abi-9-dev
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 9
+        platform: x64
 
     - name: Install Clang x86
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
-      run: sudo apt-get install -qq -y clang-9 lld-9 libc++-9-dev:i386 libc++abi-9-dev:i386 gcc-9-multilib
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 9
+        platform: x86
 
     - name: Prepare build
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
       run: |
+          export CC=${{ matrix.CC }} && echo CC=$CC
+          export CXX=${{ matrix.CXX }} && echo CXX=$CXX
           ${CXX} --version
           export core_count=$(nproc || echo 4) && echo core_count = $core_count
           mkdir build
@@ -129,24 +140,15 @@ jobs:
     - name: Run CMake x64
       if: ${{ matrix.Platform == 'x64' }}
       working-directory: build
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
       run: CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
 
     - name: Run CMake x86
       if: ${{ matrix.Platform == 'x86' }}
       working-directory: build
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
       run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
 
     - name: Run Make
       working-directory: build
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
       run: |
         make -j $core_count package
         file openxray_1.6.02_*.deb
