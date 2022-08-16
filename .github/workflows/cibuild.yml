@@ -157,7 +157,7 @@ jobs:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
       run: |
-        make package
+        make -j $(nproc || echo 4) package
         file openxray_1.6.02_*.deb
 
     - name: Upload OpenXRay artifact
@@ -217,4 +217,4 @@ jobs:
     - name: Run Make
       working-directory: build
       shell: alpine.sh {0}
-      run: make
+      run: make -j $(nproc || echo 4)
