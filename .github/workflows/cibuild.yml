@@ -128,10 +128,15 @@ jobs:
       with:
         version: 9
         platform: x86
+        
+    - name: Install libc++ for Clang x86
+      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
+      run: sudo apt-get install -qq -y libc++-9-dev:i386 libc++abi-9-dev:i386
 
     - name: Prepare build
+      id: linux-vars
       run: |
-          export core_count=$(nproc || echo 4) && echo core_count = $core_count
+          echo ::set-output name=core_count::$(nproc || echo 4)
           mkdir build
 
     - name: Run CMake x64
@@ -156,8 +161,7 @@ jobs:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
       run: |
-        echo $core_count
-        make -j $core_count package
+        make -j ${{ steps.linux-vars.outputs.core_count }} package
         file openxray_1.6.02_*.deb
 
     - name: Upload OpenXRay artifact
