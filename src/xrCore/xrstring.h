@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdio>
-#include <locale>
 
 #include "xr_types.h"
 #include "xrMemory.h"
@@ -207,35 +206,26 @@ IC int xr_strcmp(const shared_str& a, const shared_str& b) noexcept
         return xr_strcmp(*a, *b);
 }
 
+IC char* xr_strlwr(char* src)
+{
+    size_t i = 0;
+    while (src[i])
+    {
+        src[i] = (char)tolower(src[i]);// TODO rewrite locale-independent toupper_l()
+        i++;
+    }
+    return src;
+}
+
 IC void xr_strlwr(shared_str& src)
 {
     if (*src)
     {
-        char* lp = xr_strdup(*src);
-#if defined(XR_PLATFORM_WINDOWS)
+        char* lp = xr_strdup(src.c_str());
         xr_strlwr(lp);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
-        size_t i = 0;
-        while(lp[i])
-        {
-            lp[i] = (char) std::tolower(lp[i], std::locale());
-            i++;
-        }
-#endif
         src = lp;
         xr_free(lp);
     }
-}
-
-IC char * xr_strlwr(char * src)
-{
-    size_t i = 0;
-    while(src[i])
-    {
-    	src[i] = (char) tolower(src[i]);// TODO rewrite locale-independent toupper_l()
-    	i++;
-    }
-    return src;
 }
 
 #pragma pack(pop)

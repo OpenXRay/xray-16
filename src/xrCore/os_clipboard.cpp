@@ -9,10 +9,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#pragma hdrstop
-#include "SDL.h"
+
 #include "os_clipboard.h"
 #include "Text/StringConversion.hpp"
+
+#include <SDL.h>
+
+#include <locale>
 
 void os_clipboard::copy_to_clipboard(pcstr buf, bool alreadyUTF8 /*= false*/)
 {
