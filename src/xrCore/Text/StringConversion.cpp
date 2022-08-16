@@ -3,6 +3,7 @@
 #include "StringConversion.hpp"
 
 #include <codecvt>
+#include <locale>
 
 #define BITS1_MASK 0x80 // 10000000b
 #define BITS2_MASK 0xC0 // 11000000b
