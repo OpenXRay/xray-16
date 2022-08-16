@@ -43,6 +43,7 @@ jobs:
         set PLATFORM=${{ matrix.Platform }}
         call xr_pack_build.cmd ARTIFACT_EDITION
         echo ::set-output name=Build_type::%ARTIFACT_EDITION%
+
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@v2
       with:
@@ -82,14 +83,15 @@ jobs:
         submodules: recursive
 
     - name: Deinit Crypto++
-      run: |
-        git submodule deinit Externals/cryptopp
+      run: git submodule deinit Externals/cryptopp
+
     - name: Install x64 packages
       if: ${{ matrix.Platform == 'x64' }}
       run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
           sudo apt-get install -qq -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev
+
     - name: Install x86 packages
       if: ${{ matrix.Platform == 'x86' }}
       run: |
@@ -97,6 +99,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq -y libsdl2-dev:i386 libglew-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 &&
           sudo apt-get install -qq -y libopenal-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386
+
     - name: Install GCC x64
       if: ${{ matrix.Platform == 'x64' && matrix.CC == 'gcc-9' }}
       uses: egor-tensin/setup-gcc@v1
@@ -156,6 +159,7 @@ jobs:
       run: |
         make package
         file openxray_1.6.02_*.deb
+
     - name: Upload OpenXRay artifact
       if: ${{ matrix.Platform == 'x64' }}
       uses: actions/upload-artifact@v2
