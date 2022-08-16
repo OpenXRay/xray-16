@@ -115,7 +115,7 @@ jobs:
 
     - name: Install Clang x86
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
-      run: sudo apt-get install -qq -y clang-9:i386 libc++-9-dev:i386 libc++abi-9-dev:i386 lld:i386
+      run: sudo apt-get install -qq -y clang-9:i386 libc++-9-dev:i386 libc++abi-9-dev:i386 lld-9:i386
 
     - name: Prepare build
       env:
