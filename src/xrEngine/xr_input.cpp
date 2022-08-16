@@ -7,6 +7,8 @@
 #include "xrCore/Text/StringConversion.hpp"
 #include "xrCore/xr_token.h"
 
+#include <locale>
+
 CInput* pInput = nullptr;
 IInputReceiver dummyController;
 

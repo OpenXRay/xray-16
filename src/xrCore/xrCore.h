@@ -42,6 +42,8 @@
 
 //#include "_stl_extensions.h"
 #include "_std_extensions.h"
+#include "_rect.h"
+#include "_matrix.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_set.h"
 #include "xrsharedmem.h"
@@ -66,10 +68,6 @@ struct XRCORE_API xr_rtoken
 };
 
 #include "xr_shortcut.h"
-
-using RStringVec = xr_vector<shared_str>;
-using RStringSet = xr_set<shared_str>;
-using RTokenVec = xr_vector<xr_rtoken>;
 
 #include "FS.h"
 #include "log.h"

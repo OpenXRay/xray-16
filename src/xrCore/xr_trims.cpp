@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
+
 #include "xrCore/xr_token.h"
 #include "xrCore/_std_extensions.h"
 
@@ -272,133 +272,7 @@ xr_string& _ChangeSymbol(xr_string& name, char src, char dest)
     return name;
 }
 
-#ifdef M_BORLAND
-AnsiString& _Trim(AnsiString& str) { return str = str.Trim(); }
-pcstr _CopyVal(pcstr src, AnsiString& dst, char separator)
-{
-    pcstr p;
-    u32 n;
-    p = strchr(src, separator);
-    n = (p != nullptr) ? (p - src) : xr_strlen(src);
-    dst = src;
-    dst = dst.Delete(n + 1, dst.Length());
-    return dst.c_str();
-}
-
-
-
-pcstr _GetItem(pcstr src, int index, AnsiString& dst, char separator, pcstr def, bool trim)
-{
-    pcstr ptr;
-    ptr = _SetPos(src, index, separator);
-    if (ptr)
-        _CopyVal(ptr, dst, separator);
-    else
-        dst = def;
-    if (trim)
-        dst = dst.Trim();
-    return dst.c_str();
-}
-
-AnsiString _ListToSequence(const AStringVec& lst)
-{
-    AnsiString out;
-    out = "";
-    if (lst.size())
-    {
-        out = lst.front();
-        for (AStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); s_it++)
-            out += AnsiString(",") + (*s_it);
-    }
-    return out;
-}
-
-AnsiString _ListToSequence2(const AStringVec& lst)
-{
-    AnsiString out;
-    out = "";
-    if (lst.size())
-    {
-        out = lst.front();
-        for (AStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); s_it++)
-        {
-            out += AnsiString("\n") + (*s_it);
-        }
-    }
-    return out;
-}
-
-void _SequenceToList(AStringVec& lst, pcstr in, char separator)
-{
-    lst.clear();
-    int t_cnt = _GetItemCount(in, separator);
-    AnsiString T;
-    for (int i = 0; i < t_cnt; i++)
-    {
-        _GetItem(in, i, T, separator, 0);
-        _Trim(T);
-        if (!T.IsEmpty())
-            lst.push_back(T);
-    }
-}
-
-AnsiString FloatTimeToStrTime(float v, bool _h, bool _m, bool _s, bool _ms)
-{
-    AnsiString buf = "";
-    int h = 0, m = 0, s = 0, ms;
-    AnsiString t;
-    if (_h)
-    {
-        h = iFloor(v / 3600);
-        t.sprintf("%02d", h);
-        buf += t;
-    }
-    if (_m)
-    {
-        m = iFloor((v - h * 3600) / 60);
-        t.sprintf("%02d", m);
-        buf += buf.IsEmpty() ? t : ":" + t;
-    }
-    if (_s)
-    {
-        s = iFloor(v - h * 3600 - m * 60);
-        t.sprintf("%02d", s);
-        buf += buf.IsEmpty() ? t : ":" + t;
-    }
-    if (_ms)
-    {
-        ms = iFloor((v - h * 3600 - m * 60 - s) * 1000.f);
-        t.sprintf("%03d", ms);
-        buf += buf.IsEmpty() ? t : "." + t;
-    }
-    return buf;
-}
-
-float StrTimeToFloatTime(pcstr buf, bool _h, bool _m, bool _s, bool _ms)
-{
-    float t[4] = {0.f, 0.f, 0.f, 0.f};
-    int rm[4];
-    int idx = 0;
-    if (_h)
-        rm[0] = idx++;
-    if (_m)
-        rm[1] = idx++;
-    if (_s)
-        rm[2] = idx++;
-    if (_ms)
-        rm[3] = idx;
-    int cnt = _GetItemCount(buf, ':');
-    AnsiString tmp;
-    for (int k = 0; k < cnt; k++)
-    {
-        _GetItem(buf, k, tmp, ':');
-        t[rm[k]] = atof(tmp.c_str());
-    }
-    return t[0] * 3600 + t[1] * 60 + t[2];
-}
-#endif
-
-void _SequenceToList(LPSTRVec& lst, pcstr in, char separator)
+void _SequenceToList(xr_vector<pstr>& lst, pcstr in, char separator)
 {
     int t_cnt = _GetItemCount(in, separator);
     string1024 T;
@@ -425,7 +299,7 @@ void _SequenceToList(xr_vector<shared_str>& lst, pcstr in, char separator)
     }
 }
 
-void _SequenceToList(SStringVec& lst, pcstr in, char separator)
+void _SequenceToList(xr_vector<xr_string>& lst, pcstr in, char separator)
 {
     lst.clear();
     const int t_cnt = _GetItemCount(in, separator);
@@ -439,14 +313,14 @@ void _SequenceToList(SStringVec& lst, pcstr in, char separator)
     }
 }
 
-xr_string _ListToSequence(const SStringVec& lst)
+xr_string _ListToSequence(const xr_vector<xr_string>& lst)
 {
-    static xr_string out;
+    static xr_string out; // XXX: can cause crashes on exit
     out.clear();
     if (!lst.empty())
     {
         out = lst.front();
-        for (SStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); ++s_it)
+        for (auto s_it = lst.cbegin() + 1; s_it != lst.cend(); ++s_it)
             out += xr_string(",") + (*s_it);
     }
     return out;
@@ -509,13 +383,13 @@ pcstr _GetItem(pcstr src, int index, xr_string& dst, char separator, pcstr def, 
     return dst.c_str();
 }
 
-shared_str _ListToSequence(const RStringVec& lst)
+shared_str _ListToSequence(const xr_vector<shared_str>& lst)
 {
     xr_string out;
     if (lst.size())
     {
         out = *lst.front();
-        for (RStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); ++s_it)
+        for (auto s_it = lst.cbegin() + 1; s_it != lst.cend(); ++s_it)
         {
             out += ",";
             out += **s_it;

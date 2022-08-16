@@ -227,7 +227,6 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="xr_shortcut.h" />
     <ClInclude Include="xr_token.h" />
     <ClInclude Include="xr_trims.h" />
-    <ClInclude Include="xr_vector_defs.h" />
     <ClInclude Include="_bitwise.h" />
     <ClInclude Include="_color.h" />
     <ClInclude Include="_compressed_normal.h" />

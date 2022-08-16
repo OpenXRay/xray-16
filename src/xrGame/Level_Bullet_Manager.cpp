@@ -223,8 +223,8 @@ void CBulletManager::UpdateWorkload()
     // when index in vector passed through the tgt_material field
     // and we can remove them only in case when we iterate bullets
     // in the reversed order
-    BulletVec::reverse_iterator i = m_Bullets.rbegin();
-    BulletVec::reverse_iterator e = m_Bullets.rend();
+    auto i = m_Bullets.rbegin();
+    const auto e = m_Bullets.rend();
     for (u16 j = u16(e - i); i != e; ++i, --j)
     {
         if (process_bullet(rq_storage, *i, time_delta * g_bullet_time_factor))
@@ -825,16 +825,17 @@ void CBulletManager::Render()
     // 2-пробивание материала
     if (g_bDrawBulletHit)
     {
-        extern FvectorVec g_hit[];
-        FvectorIt it;
+        extern xr_vector<Fvector> g_hit[];
         u32 C[3] = {0xffff0000, 0xff00ff00, 0xff0000ff};
         // RCache.set_xform_world(Fidentity);
         GEnv.DRender->CacheSetXformWorld(Fidentity);
         for (int i = 0; i < 3; ++i)
-            for (it = g_hit[i].begin(); it != g_hit[i].end(); ++it)
+        {
+            for (auto it = g_hit[i].begin(); it != g_hit[i].end(); ++it)
             {
                 Level().debug_renderer().draw_aabb(*it, 0.01f, 0.01f, 0.01f, C[i]);
             }
+        }
     }
 #endif
 

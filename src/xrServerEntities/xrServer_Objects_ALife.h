@@ -34,12 +34,12 @@ class CSE_ALifeInventoryItem;
 
 struct SFillPropData
 {
-    RTokenVec locations[4];
-    RStringVec level_ids;
-    RTokenVec story_names;
-    RTokenVec spawn_story_names;
-    RStringVec character_profiles;
-    RStringVec smart_covers;
+    xr_vector<xr_rtoken> locations[4];
+    xr_vector<shared_str> level_ids;
+    xr_vector<xr_rtoken> story_names;
+    xr_vector<xr_rtoken> spawn_story_names;
+    xr_vector<shared_str> character_profiles;
+    xr_vector<shared_str> smart_covers;
     xr_map<shared_str, u32> location_colors;
     u32 counter;
     SFillPropData();

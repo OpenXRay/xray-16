@@ -298,7 +298,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 {
     ScopeLock Lock(&dbgHelpLock);
 
-    SStringVec traceResult;
+    xr_vector<xr_string> traceResult;
     STACKFRAME stackFrame = {};
     xr_string frameStr;
 
@@ -343,7 +343,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 }
 #endif // defined(XR_PLATFORM_WINDOWS)
 
-SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
+xr_vector<xr_string> xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     CONTEXT currentThreadCtx = {};
@@ -360,7 +360,7 @@ SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 
 void xrDebug::LogStackTrace(const char* header)
 {
-    SStringVec stackTrace = BuildStackTrace();
+    xr_vector<xr_string> stackTrace = BuildStackTrace();
     Msg("%s", header);
     for (const auto& frame : stackTrace)
     {

@@ -188,7 +188,7 @@ BOOL COMotion::NormalizeKeys(float from_time, float to_time, float speed)
     CEnvelope* E = Envelope(ctPositionX);
     float new_tm = 0;
     float t0 = E->keys.front()->time;
-    FloatVec tms;
+    xr_vector<float> tms;
     tms.push_back(t0);
     for (KeyIt it = E->keys.begin() + 1; it != E->keys.end(); ++it)
     {
@@ -221,7 +221,7 @@ BOOL COMotion::NormalizeKeys(float from_time, float to_time, float speed)
     for (size_t ch = 0; ch < ctMaxChannel; ch++)
     {
         E = Envelope(EChannelType(ch));
-        FloatIt f_it = tms.begin();
+        auto f_it = tms.begin();
         VERIFY(tms.size() == E->keys.size());
         for (KeyIt k_it = E->keys.begin(); k_it != E->keys.end(); ++k_it, ++f_it)
             (*k_it)->time = *f_it;

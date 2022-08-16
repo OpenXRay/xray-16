@@ -1194,7 +1194,7 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
     if (I == m_files.end())
         return 0;
 
-    SStringVec masks;
+    xr_vector<xr_string> masks;
     _SequenceToList(masks, mask);
     bool b_mask = !masks.empty();
 

@@ -128,13 +128,13 @@ public:
         PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, CScriptTokenList* token);
     //			RToken8Value* 		CreateRToken8	    (PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR
     //name,
-    // RTokenVec* token);
+    // xr_vector<xr_rtoken>* token);
     //			RToken16Value* 		CreateRToken16	    (PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR
     //name,
-    // RTokenVec* token);
+    // xr_vector<xr_rtoken>* token);
     //			RToken32Value* 		CreateRToken32	    (PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR
     //name,
-    // RTokenVec* token);
+    // xr_vector<xr_rtoken>* token);
     //			TokenValueSH*   	CreateTokenSH	    (PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR
     //name,
     // u32 cnt, const TokenValueSH::Item* lst);

@@ -6,6 +6,7 @@
 #include "xrCore/_obb.h"
 #include "xrCore/_cylinder.h"
 #include "xrCore/_sphere.h"
+#include "xrCore/_plane.h"
 
 // t-defs
 const u32 clGET_TRIS = (1 << 0);

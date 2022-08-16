@@ -5,7 +5,6 @@
 #include "ICollideValidator.h"
 #include "xrServerEntities/alife_space.h"
 #include "xrCore/_flags.h"
-#include "xrCore/xr_vector_defs.h"
 
 #include "xrEngine/IPhysicsShell.h"
 #include "iphysics_scripted.h"
@@ -432,7 +431,7 @@ XRPHYSICS_API CPhysicsElement* P_create_Element();
 XRPHYSICS_API CPhysicsShell* P_create_Shell();
 XRPHYSICS_API CPhysicsShell* P_create_splited_Shell();
 XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, LPCSTR fixed_bones);
-XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, U16Vec& fixed_bones);
+XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, xr_vector<u16>& fixed_bones);
 XRPHYSICS_API CPhysicsShell* P_build_Shell(
     IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map, LPCSTR fixed_bones);
 

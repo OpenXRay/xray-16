@@ -228,7 +228,6 @@ set(MATH_EXTENSIONS
     "xr_token.h"
     "xr_trims.cpp"
     "xr_trims.h"
-    "xr_vector_defs.h"
 )
 
 set(MATH_EXTENSIONS_BUFFER_VECTOR
