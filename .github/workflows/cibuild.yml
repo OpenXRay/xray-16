@@ -131,25 +131,32 @@ jobs:
 
     - name: Prepare build
       run: |
-          export CC=${{ matrix.CC }} && echo CC=$CC
-          export CXX=${{ matrix.CXX }} && echo CXX=$CXX
-          ${CXX} --version
           export core_count=$(nproc || echo 4) && echo core_count = $core_count
           mkdir build
 
     - name: Run CMake x64
       if: ${{ matrix.Platform == 'x64' }}
       working-directory: build
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
       run: CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
 
     - name: Run CMake x86
       if: ${{ matrix.Platform == 'x86' }}
       working-directory: build
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
       run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
 
     - name: Run Make
       working-directory: build
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
       run: |
+        echo $core_count
         make -j $core_count package
         file openxray_1.6.02_*.deb
 
