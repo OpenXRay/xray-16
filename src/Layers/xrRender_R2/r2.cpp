@@ -224,6 +224,7 @@ void CRender::create()
 #ifndef USE_DX9
     m_MSAASample = -1;
 #endif
+    m_SMAPSize = ps_r2_smapsize;
 
     // hardware
     o.smapsize = ps_r2_smapsize;

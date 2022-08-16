@@ -5,8 +5,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    auto const PreviousSmapSize = RImplementation.o.smapsize;
-    RImplementation.o.smapsize = RImplementation.o.rain_smapsize;
+    RImplementation.m_SMAPSize = RImplementation.o.rain_smapsize;
 
     switch (C.iElement)
     {
@@ -146,7 +145,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         break;
     }
 
-    RImplementation.o.smapsize = PreviousSmapSize;
+    RImplementation.m_SMAPSize = RImplementation.o.smapsize;
 }
 
 void CBlender_rain_msaa::Compile(CBlender_Compile& C)
@@ -154,12 +153,11 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        RImplementation.m_MSAASample = atoi(Definition);
     else
-        GEnv.Render->m_MSAASample = -1;
+        RImplementation.m_MSAASample = -1;
 
-    auto const PreviousSmapSize = RImplementation.o.smapsize;
-    RImplementation.o.smapsize = RImplementation.o.rain_smapsize;
+    RImplementation.m_SMAPSize = RImplementation.o.rain_smapsize;
 
     switch (C.iElement)
     {
@@ -268,6 +266,6 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         break;
     }
-    GEnv.Render->m_MSAASample = -1;
-    RImplementation.o.smapsize = PreviousSmapSize;
+    RImplementation.m_MSAASample = -1;
+    RImplementation.m_SMAPSize = RImplementation.o.smapsize;
 }
