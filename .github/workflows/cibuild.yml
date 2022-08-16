@@ -30,7 +30,7 @@ jobs:
       with:
         arch: ${{ matrix.Platform }}
         branch: 'latest-stable'
-        packages: build-base cmake sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
+        packages: build-base binutils-gold cmake sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
 
     - name: Create build directory
       run: mkdir build
