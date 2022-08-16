@@ -163,6 +163,8 @@ public:
 
     PSS poolSI; // pool из которого выделяются SlotItem
 
+    Fvector EYE;
+
     void UpdateVisibleM();
     void UpdateVisibleS();
 

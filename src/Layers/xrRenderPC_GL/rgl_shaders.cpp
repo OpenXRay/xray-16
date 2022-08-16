@@ -239,7 +239,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Shadow map size
     {
-        xr_itoa(o.smapsize, c_smapsize, 10);
+        xr_itoa(m_SMAPSize, c_smapsize, 10);
         options.add("SMAP_size", c_smapsize);
         sh_name.append(c_smapsize);
     }

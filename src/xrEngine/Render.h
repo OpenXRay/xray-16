@@ -284,6 +284,7 @@ public:
     bool m_hq_skinning;
     s32 m_skinning;
     s32 m_MSAASample;
+    u32 m_SMAPSize;
 
     BENCH_SEC_SCRAMBLEMEMBER1
 

@@ -11,8 +11,6 @@ extern float r_ssaLOD_B;
 extern float r_ssaHZBvsTEX;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 
-static auto constexpr DELTA_CAMERA_POS = .001f;
-
 void CRender::Calculate()
 {
     // Transfer to global space to avoid deep pointer access
@@ -29,7 +27,7 @@ void CRender::Calculate()
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
     // Detect camera-sector
-    if (!vLastCameraPos.similar(Device.vCameraPosition, DELTA_CAMERA_POS))
+    if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
     {
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
         //. hack: need to know real outdoor sector
@@ -53,7 +51,6 @@ void CRender::Calculate()
         if (!pSector)
             pSector = pLastSector;
         pLastSector = pSector;
-        vLastCameraPos.set(Device.vCameraPosition);
     }
 
     // Check if camera is too near to some portal - if so force DualRender

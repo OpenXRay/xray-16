@@ -224,9 +224,11 @@ void CRender::create()
 #ifndef USE_DX9
     m_MSAASample = -1;
 #endif
+    m_SMAPSize = ps_r2_smapsize;
 
     // hardware
     o.smapsize = ps_r2_smapsize;
+    o.rain_smapsize = ps_r3_dyn_wet_surf_sm_res;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
