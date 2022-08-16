@@ -131,6 +131,8 @@ jobs:
 
     - name: Prepare build
       run: |
+          echo "CC=${{ matrix.CC }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.CXX }}" >> $GITHUB_ENV
           ${CXX} --version
           export core_count=$(nproc || echo 4) && echo core_count = $core_count
           mkdir build
