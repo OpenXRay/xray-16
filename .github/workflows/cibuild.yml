@@ -107,7 +107,7 @@ jobs:
 
     - name: Install GCC x86
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'gcc-9' }}
-      run: sudo apt-get install -qq -y gcc-multilib g++-9-multilib
+      run: sudo apt-get install -qq -y gcc-multilib
 
     - name: Install Clang x64
       if: ${{ matrix.Platform == 'x64' && matrix.CC == 'clang-9' }}
@@ -115,7 +115,7 @@ jobs:
 
     - name: Install Clang x86
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
-      run: sudo apt-get install -qq -y clang-9 lld-9 libc++-9-dev:i386 libc++abi-9-dev:i386
+      run: sudo apt-get install -qq -y clang-9 lld-9 libc++-9-dev:i386 libc++abi-9-dev:i386 gcc-9-multilib
 
     - name: Prepare build
       env:
