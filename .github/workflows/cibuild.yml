@@ -192,7 +192,7 @@ jobs:
       run: |
         git submodule deinit Externals/cryptopp
 
-    - name: Install latest Alpine Linux for ${{ matrix.ARCH }}
+    - name: Install latest stable Alpine Linux
       uses: jirutka/setup-alpine@v1
       with:
         arch: ${{ matrix.Platform }}
