@@ -67,7 +67,6 @@
 
 #if defined(WIN32) || defined(_WIN32_WCE)
 #include <windows.h>
-#include <tchar.h>
 #endif
 
 #include <stdio.h>
@@ -100,8 +99,6 @@ typedef void*          HRGN;
 typedef void*          HDC;
 
 typedef int boolean;
-
-#define _tfopen fopen
 
 #ifndef BOOL
 #define	BOOL bool

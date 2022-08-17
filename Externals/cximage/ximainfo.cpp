@@ -5,7 +5,9 @@
 
 #include "ximage.h"
 
-#if !defined(WIN32)
+#if defined(WIN32) || defined(_WIN32_WCE)
+#include <tchar.h>
+#else
 #define _tcsnicmp(a,b,c) strcasecmp(a,b)
 #endif
 

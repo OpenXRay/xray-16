@@ -25,6 +25,7 @@ set(SRC_FILES
     "ximath.cpp"
     "ximath.h"
     "xiofile.h"
+    "xiofile.cpp"
     "xmemfile.cpp"
     "xmemfile.h"
 )
