@@ -1,24 +1,26 @@
-#include "pch.hpp"
-#include <limits>
+#include "stdafx.h"
+
 #include "xrCore/_cylinder.h"
 #include "xrCommon/math_funcs_inline.h"
+
 #ifdef DEBUG
 #include "xrCore/xrDebug_macros.h"
 #include "xrCore/log.h"
 #endif
 
-template <class T>
-int _cylinder<T>::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, T afT[2], ecode code[2]) const
+#include <limits>
+
+int Fcylinder::intersect(const Fvector3& start, const Fvector3& dir, float afT[2], ecode code[2]) const
 {
-    T fEpsilon = 1e-12f;
+    constexpr float fEpsilon = 1e-12f;
 
     // set up quadratic Q(t) = a*t^2 + 2*b*t + c
-    VEC_TYPE kU, kV, kW = m_direction;
-    VEC_TYPE::generate_orthonormal_basis(kW, kU, kV);
-    VEC_TYPE kD;
+    Fvector3 kU, kV, kW = m_direction;
+    Fvector3::generate_orthonormal_basis(kW, kU, kV);
+    Fvector3 kD;
     kD.set(kU.dotproduct(dir), kV.dotproduct(dir), kW.dotproduct(dir));
 #ifdef DEBUG
-    if (kD.square_magnitude() <= std::numeric_limits<T>::min())
+    if (kD.square_magnitude() <= std::numeric_limits<float>::min())
     {
         Msg("dir :%f,%f,%f", dir.x, dir.y, dir.z);
         Msg("kU :%f,%f,%f", kU.x, kU.y, kU.z);
@@ -27,16 +29,16 @@ int _cylinder<T>::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, T afT[2]
         VERIFY2(0, "KD is zero");
     }
 #endif
-    T fDLength = kD.normalize_magn();
-    T fInvDLength = 1.0f / fDLength;
-    VEC_TYPE kDiff;
+    const float fDLength = kD.normalize_magn();
+    const float fInvDLength = 1.0f / fDLength;
+    Fvector3 kDiff;
     kDiff.sub(start, m_center);
-    VEC_TYPE kP;
+    Fvector3 kP;
     kP.set(kU.dotproduct(kDiff), kV.dotproduct(kDiff), kW.dotproduct(kDiff));
-    T fHalfHeight = 0.5f * m_height;
-    T fRadiusSqr = m_radius * m_radius;
+    const float fHalfHeight = 0.5f * m_height;
+    const float fRadiusSqr = m_radius * m_radius;
 
-    T fInv, fA, fB, fC, fDiscr, fRoot, fT, fT0, fT1, fTmp0, fTmp1;
+    float fInv, fA, fB, fC, fDiscr, fRoot, fT, fT0, fT1, fTmp0, fTmp1;
 
     if (_abs(kD.z) >= 1.0f - fEpsilon)
     {
@@ -205,10 +207,9 @@ int _cylinder<T>::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, T afT[2]
     return iQuantity;
 }
 
-template <class T>
-typename _cylinder<T>::ERP_Result _cylinder<T>::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, T& dist) const
+Fcylinder::ERP_Result Fcylinder::intersect(const Fvector3& start, const Fvector3& dir, float& dist) const
 {
-    T afT[2];
+    float afT[2];
     ecode code[2];
     int cnt;
     if (0 != (cnt = intersect(start, dir, afT, code)))
@@ -236,10 +237,3 @@ typename _cylinder<T>::ERP_Result _cylinder<T>::intersect(const VEC_TYPE& start,
         return rpNone;
     }
 }
-
-// instantiate on float and double
-template int Fcylinder::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, float afT[2], ecode code[2]) const;
-template int Dcylinder::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, double afT[2], ecode code[2]) const;
-
-template Fcylinder::ERP_Result Fcylinder::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, TYPE& dist) const;
-template Dcylinder::ERP_Result Dcylinder::intersect(const VEC_TYPE& start, const VEC_TYPE& dir, TYPE& dist) const;

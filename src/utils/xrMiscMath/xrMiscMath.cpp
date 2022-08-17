@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "xrCore/_std_extensions.h"
 #include "xrCore/_vector3d.h"
 //#include "xrCore/math_constants.h"
 #include "xrCore/vector.h"

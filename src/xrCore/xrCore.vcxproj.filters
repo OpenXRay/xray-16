@@ -339,6 +339,9 @@
     <ClCompile Include="Media\ImageJPEG.cpp">
       <Filter>Media</Filter>
     </ClCompile>
+    <ClCompile Include="_cylinder.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">

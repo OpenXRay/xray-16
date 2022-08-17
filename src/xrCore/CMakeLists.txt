@@ -178,6 +178,7 @@ set(MATH
     "_color.h"
     "_compressed_normal.cpp"
     "_compressed_normal.h"
+    "_cylinder.cpp"
     "_cylinder.h"
     "_fbox.h"
     "_fbox2.h"

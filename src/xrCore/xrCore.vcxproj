@@ -113,6 +113,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="xr_token.cpp" />
     <ClCompile Include="xr_trims.cpp" />
     <ClCompile Include="_compressed_normal.cpp" />
+    <ClCompile Include="_cylinder.cpp" />
     <ClCompile Include="_math.cpp" />
     <ClCompile Include="_sphere.cpp" />
     <ClCompile Include="_std_extensions.cpp" />

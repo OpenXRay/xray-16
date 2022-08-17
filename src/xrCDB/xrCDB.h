@@ -23,8 +23,9 @@ namespace Opcode
 class OPCODE_Model;
 class AABBNoLeafNode;
 };
-template <class T> class _box3;
-using Fbox = _box3<float>;
+
+struct Fbox3;
+using Fbox = Fbox3;
 class Lock;
 
 
