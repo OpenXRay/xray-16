@@ -276,6 +276,23 @@ private:
 
     template <typename T>
     bool DestroyShader(const T* sh);
+
+    template <typename T>
+    bool reclaim(xr_vector<T*>& vec, const T* ptr)
+    {
+        auto it = vec.begin();
+        const auto end = vec.cend();
+
+        for (; it != end; ++it)
+        {
+            if (*it == ptr)
+            {
+                vec.erase(it);
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 #endif // ResourceManagerH
