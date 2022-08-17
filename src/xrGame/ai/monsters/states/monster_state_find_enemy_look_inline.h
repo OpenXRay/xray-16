@@ -5,8 +5,7 @@
 #include "state_custom_action.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterFindEnemyLookAbstract CStateMonsterFindEnemyLook<_Object>
 
@@ -112,3 +111,6 @@ void CStateMonsterFindEnemyLookAbstract::setup_substates()
         return;
     }
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateMonsterFindEnemyLookAbstract

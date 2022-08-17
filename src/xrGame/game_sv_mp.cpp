@@ -999,27 +999,6 @@ s32 game_sv_mp::ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vot
     return ret_time;
 }
 
-struct SearcherClientByName
-{
-    string128 player_name;
-    SearcherClientByName(LPCSTR name)
-    {
-        strncpy_s(player_name, name, sizeof(player_name) - 1);
-        xr_strlwr(player_name);
-        player_name[xr_strlen(name)] = 0;
-    }
-    bool operator()(IClient* client)
-    {
-        xrClientData* temp_client = smart_cast<xrClientData*>(client);
-
-        if (!xr_strcmp(player_name, temp_client->ps->getName()))
-        {
-            return true;
-        }
-        return false;
-    }
-};
-
 void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
 {
     if (!IsVotingEnabled())

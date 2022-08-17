@@ -44,26 +44,13 @@
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "UIArtefactPanel.h"
 
-void test_draw();
-void test_key(int dik);
-
 #include "Include/xrRender/Kinematics.h"
 
 using namespace InventoryUtilities;
+
 // BOOL		g_old_style_ui_hud			= FALSE;
-const u32 g_clWhite = 0xffffffff;
 
-#define DEFAULT_MAP_SCALE 1.f
-
-#define C_SIZE 0.025f
-#define NEAR_LIM 0.5f
-
-#define SHOW_INFO_SPEED 0.5f
-#define HIDE_INFO_SPEED 10.f
-#define C_ON_ENEMY color_xrgb(0xff, 0, 0)
-#define C_DEFAULT color_xrgb(0xff, 0xff, 0xff)
-
-#define MAININGAME_XML "maingame.xml"
+static constexpr pcstr MAININGAME_XML = "maingame.xml";
 
 CUIMainIngameWnd::CUIMainIngameWnd()
     : /*m_pGrenade(NULL),m_pItem(NULL),*/ m_pPickUpItem(nullptr), m_pMPChatWnd(nullptr), UIArtefactIcon(nullptr),

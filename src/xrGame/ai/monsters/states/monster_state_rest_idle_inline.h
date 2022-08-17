@@ -9,8 +9,7 @@
 #include "ai/monsters/ai_monster_squad_manager.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterRestIdleAbstract CStateMonsterRestIdle<_Object>
 

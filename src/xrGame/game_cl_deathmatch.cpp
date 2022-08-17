@@ -33,7 +33,12 @@
 #include "ui/UIBuyWnd.h"
 #endif
 
-#define TEAM0_MENU "deathmatch_team0"
+namespace detail::mp::deathmatch
+{
+static constexpr pcstr TEAM0_MENU = "deathmatch_team0";
+static constexpr pcstr SELF_LOCATION = "mp_self_location";
+static constexpr size_t MAX_VOTE_PARAMS = 5;
+}
 
 game_cl_Deathmatch::game_cl_Deathmatch()
 {
@@ -63,7 +68,7 @@ game_cl_Deathmatch::game_cl_Deathmatch()
 
 void game_cl_Deathmatch::Init()
 {
-    LoadTeamData(TEAM0_MENU);
+    LoadTeamData(::detail::mp::deathmatch::TEAM0_MENU);
 
     if (pSettings->line_exist("deathmatch_gamedata", "actor_spawn_effect"))
         Actor_Spawn_Effect = pSettings->r_string("deathmatch_gamedata", "actor_spawn_effect");
@@ -796,9 +801,10 @@ bool game_cl_Deathmatch::OnKeyboardRelease(int key)
     return false;
 }
 
-#define MAX_VOTE_PARAMS 5
 void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
 {
+    using namespace ::detail::mp::deathmatch;
+
     CStringTable& st = StringTable();
     inherited::OnVoteStart(P);
 
@@ -1201,16 +1207,19 @@ void game_cl_Deathmatch::SendPickUpEvent(u16 ID_who, u16 ID_what)
     u_EventSend(P);
 };
 
-const shared_str game_cl_Deathmatch::GetTeamMenu(s16 team) { return TEAM0_MENU; }
-#define SELF_LOCATION "mp_self_location"
+const shared_str game_cl_Deathmatch::GetTeamMenu(s16 team)
+{
+    return ::detail::mp::deathmatch::TEAM0_MENU;
+}
+
 void game_cl_Deathmatch::UpdateMapLocations()
 {
     inherited::UpdateMapLocations();
     if (local_player)
     {
-        if (!Level().MapManager().HasMapLocation(SELF_LOCATION, local_player->GameID))
+        if (!Level().MapManager().HasMapLocation(::detail::mp::deathmatch::SELF_LOCATION, local_player->GameID))
         {
-            (Level().MapManager().AddMapLocation(SELF_LOCATION, local_player->GameID))->EnablePointer();
+            (Level().MapManager().AddMapLocation(::detail::mp::deathmatch::SELF_LOCATION, local_player->GameID))->EnablePointer();
         }
     }
 }

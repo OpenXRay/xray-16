@@ -9,8 +9,6 @@
 
 #define CStatePoltergeistAttackHiddenAbstract CStatePoltergeistAttackHidden<_Object>
 
-#define DIST_TO_PATH_END 1.5f
-
 TEMPLATE_SPECIALIZATION
 CStatePoltergeistAttackHiddenAbstract::CStatePoltergeistAttackHidden(_Object* obj) : inherited(obj)
 {

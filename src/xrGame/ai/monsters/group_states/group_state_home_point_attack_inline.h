@@ -7,20 +7,9 @@
 #include "ai/monsters/monster_home.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupAttackMoveToHomePointAbstract CStateGroupAttackMoveToHomePoint<_Object>
-
-namespace detail
-{
-namespace dog
-{
-const float scare_distance2enemy = 20.f; // distance on which dog can be scared of enemy
-
-} // namespace dog
-
-} // namespace detail
 
 //////////////////////////////////////////////////////////////////////////
 // Construct Substates

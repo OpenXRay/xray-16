@@ -26,6 +26,8 @@
 #include "xrUICore/ui_base.h"
 #include "UIOutfitSlot.h"
 
+namespace detail::actor_menu
+{
 constexpr cpcstr ACTOR_MENU_XML      = "actor_menu.xml";
 constexpr cpcstr ACTOR_MENU_ITEM_XML = "actor_menu_item.xml";
 
@@ -33,11 +35,12 @@ constexpr cpcstr INVENTORY_XML       = "inventory_new.xml";
 constexpr cpcstr INVENTORY_ITEM_XML  = "inventory_item.xml";
 
 constexpr cpcstr TRADE_XML           = "trade.xml";
-constexpr cpcstr TRADE_CHARACTER_XML = "trade_character.xml";
 constexpr cpcstr TRADE_ITEM_XML      = "trade_item.xml";
+constexpr cpcstr TRADE_CHARACTER_XML = "trade_character.xml";
 
 constexpr cpcstr CAR_BODY_XML        = "carbody_new.xml";
 constexpr cpcstr CARBODY_ITEM_XML    = "carbody_item.xml";
+}
 
 CUIActorMenu::CUIActorMenu()
     : m_currMenuMode(mmUndefined), m_last_time(u32(-1)),
@@ -60,6 +63,8 @@ CUIActorMenu::~CUIActorMenu()
 
 void CUIActorMenu::Construct()
 {
+    using namespace ::detail::actor_menu;
+
     m_UIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
     m_UIPropertiesBox->SetWindowName("property_box");
@@ -143,6 +148,8 @@ void CUIActorMenu::Construct()
 
 void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
@@ -281,6 +288,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
 void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     AttachChild(m_ActorWeightBar);   // should be attached to 'this' to work correct
     AttachChild(m_PartnerWeightBar); // do not attach to m_pInventoryWnd or any other window than 'this'
 
@@ -341,6 +350,8 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
 
 void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     m_pTradeWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
 
     UIHelper::CreateStatic(uiXml, "top_background", m_pTradeWnd);
@@ -400,6 +411,8 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
 
 void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     m_pSearchLootWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
 
     UIHelper::CreateStatic(uiXml, "top_background", m_pSearchLootWnd);

@@ -460,6 +460,13 @@ private:
     static const u32 random_limit;
     CRandom m_relevent_random;
 
+private:
+    static constexpr
+    bool check_mask(const u8& mask, const u8& test)
+    {
+        return mask & test;
+    }
+
 public:
     enum
     {

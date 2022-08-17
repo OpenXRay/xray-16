@@ -1,3 +1,7 @@
+#pragma once
+
+// XXX: remove this file
+
 typedef xr_string::size_type StrSize;
 
 #define BEGIN "%c["

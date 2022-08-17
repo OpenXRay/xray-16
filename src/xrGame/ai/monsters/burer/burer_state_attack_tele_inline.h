@@ -2,9 +2,6 @@
 
 #include "Level.h"
 
-#define GOOD_DISTANCE_FOR_TELE 15.f
-#define MAX_TIME_CHECK_FAILURE 6000
-
 template <typename Object>
 CStateBurerAttackTele<Object>::CStateBurerAttackTele(Object* obj)
     : inherited(obj), selected_object(nullptr), time_started(0),
@@ -323,9 +320,6 @@ void CStateBurerAttackTele<Object>::ExecuteTeleContinue()
     }
 }
 
-#define HEAD_OFFSET_INDOOR 1.f
-#define HEAD_OFFSET_OUTDOOR 5.f
-
 template <typename Object>
 void CStateBurerAttackTele<Object>::ExecuteTeleFire()
 {
@@ -374,6 +368,9 @@ bool CStateBurerAttackTele<Object>::CheckTeleStart()
 //////////////////////////////////////////////////////////////////////////
 // Выбор подходящих объектов для телекинеза
 //////////////////////////////////////////////////////////////////////////
+namespace detail::burer_attack_tele
+{
+/*
 class best_object_predicate
 {
     Fvector enemy_pos;
@@ -393,8 +390,9 @@ public:
         const float dist3 = enemy_pos.distance_to(monster_pos);
 
         return dist1 < dist3 && dist2 > dist3;
-    };
+    }
 };
+*/
 
 class best_object_predicate2
 {
@@ -416,12 +414,17 @@ public:
         return dist1 < dist2;
     }
 };
+} // namespace detail::burer_attack_tele
 
 template <typename Object>
 void CStateBurerAttackTele<Object>::SelectObjects()
 {
     std::sort(tele_objects.begin(), tele_objects.end(),
-        best_object_predicate2(this->object->Position(), this->object->EnemyMan.get_enemy()->Position()));
+        ::detail::burer_attack_tele::best_object_predicate2(
+            this->object->Position(),
+            this->object->EnemyMan.get_enemy()->Position()
+        )
+    );
 
     // выбрать объект
     for (u32 i = 0; i < tele_objects.size(); ++i)

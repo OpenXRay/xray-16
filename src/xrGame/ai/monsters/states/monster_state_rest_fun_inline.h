@@ -2,14 +2,9 @@
 #include "xrPhysics/PhysicsShell.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterRestFunAbstract CStateMonsterRestFun<_Object>
-
-#define IMPULSE_TO_CORPSE 15.f
-#define MIN_DELAY 100
-#define TIME_IN_STATE 8000
 
 TEMPLATE_SPECIALIZATION
 CStateMonsterRestFunAbstract::CStateMonsterRestFun(_Object* obj) : inherited(obj), time_last_hit(0) {}
@@ -86,8 +81,5 @@ bool CStateMonsterRestFunAbstract::check_completion()
     return false;
 }
 
-#undef TIME_IN_STATE
-#undef MIN_DELAY
-#undef IMPULSE_TO_CORPSE
 #undef CStateMonsterRestFunAbstract
 #undef TEMPLATE_SPECIALIZATION
