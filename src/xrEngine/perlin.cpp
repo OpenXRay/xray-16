@@ -6,8 +6,8 @@
 
 #include "perlin.h"
 
-#define B SAMPLE_SIZE
-#define BM (SAMPLE_SIZE - 1)
+#define B PERLIN_SAMPLE_SIZE
+#define BM (PERLIN_SAMPLE_SIZE - 1)
 
 #define N 0x1000
 #define NP 12 /* 2^N */
@@ -336,3 +336,14 @@ float CPerlinNoise3D::Get(float x, float y, float z)
     }
     return result;
 }
+
+#undef B
+#undef BM
+#undef N
+#undef NP
+#undef NM
+#undef s_curve
+#undef lerp
+#undef setup
+#undef at2
+#undef at3
