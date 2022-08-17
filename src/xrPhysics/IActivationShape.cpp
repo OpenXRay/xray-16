@@ -13,7 +13,7 @@ void ActivateShapeExplosive(IPhysicsShellHolder* self_obj, const Fvector& size, 
     CPHCollideValidator::SetCharacterClassNotCollide(activation_shape);
 
     dBodySetGravityMode(activation_shape.ODEBody(), 0);
-    activation_shape.Activate(size, 1, 1.f, M_PI / 8.f);
+    activation_shape.Activate(size, 1, 1.f, float(M_PI) / 8.f);
     in_out_pos.set(activation_shape.Position());
     activation_shape.Size(out_size);
     activation_shape.Destroy();
@@ -31,7 +31,7 @@ void ActivateShapePhysShellHolder(
         activation_shape.collide_bits() = obj->ObjectPPhysicsShell()->collide_bits();
         activation_shape.collide_class_bits() = obj->ObjectPPhysicsShell()->collide_class_bits();
     }
-    activation_shape.Activate(in_size, 1, 1.f, M_PI / 8.f);
+    activation_shape.Activate(in_size, 1, 1.f, float(M_PI) / 8.f);
 
     out_pos = activation_shape.Position();
     VERIFY(valid_pos(out_pos, phBoundaries));
@@ -60,7 +60,7 @@ bool ActivateShapeCharacterPhysicsSupport(Fvector& out_pos, const Fvector& vbox,
     }
     if (set_rotation)
         activation_shape.set_rotation(mXFORM);
-    bool ret = activation_shape.Activate(vbox, 1, 1.f, M_PI / 8.f);
+    bool ret = activation_shape.Activate(vbox, 1, 1.f, float(M_PI) / 8.f);
     out_pos.set(activation_shape.Position());
     activation_shape.Destroy();
     return ret;

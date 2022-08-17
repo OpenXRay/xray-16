@@ -28,11 +28,6 @@
 #include "xrEngine/xr_object.h"
 #include "ph_valid_ode.h"
 
-IC bool PhOutOfBoundaries(const Fvector& v) { return v.y < phBoundaries.y1; }
-//#ifdef DEBUG
-
-//#endif
-
 const float LOSE_CONTROL_DISTANCE = 0.5f; // fly distance to lose control
 const float CLAMB_DISTANCE = 0.5f;
 const float CLIMB_GETUP_HEIGHT = 0.3f;
