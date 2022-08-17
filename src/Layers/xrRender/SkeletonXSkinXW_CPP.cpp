@@ -1,21 +1,13 @@
 #include "stdafx.h"
-#include "SkinXW_CPP.hpp"
 
-#include "Threading/ParallelFor.hpp"
+#include "xrCore/Animation/Bone.hpp"
+#include "SkeletonXVertRender.h"
+#include "SkeletonXSkinXW.h"
 
-#ifdef _EDITOR
-#include "SkeletonX.h"
-#include "SkeletonCustom.h"
-#else
-#include "Animation/Bone.hpp"
-#include "Layers/xrRender/SkeletonXVertRender.h"
-#endif
+#include "xrCore/Threading/ParallelFor.hpp"
 
-namespace XRay
-{
-namespace Math
-{
-void Skin1W_CPP(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
+#if !defined(XR_PLATFORM_WINDOWS) || !defined(XR_ARCHITECTURE_X86)
+void Skin1W(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
 {
     //	return;
     // Prepare
@@ -105,7 +97,7 @@ void Skin1W_CPP(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
     }
 }
 
-void Skin2W_CPP(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
+void Skin2W(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
 {
     // Prepare
     int U_Count = vCount;
@@ -142,8 +134,7 @@ void Skin2W_CPP(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
     }
 }
 
-
-void Skin3W_CPP(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
+void Skin3W(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 {
     // Prepare
     int U_Count = vCount;
@@ -191,8 +182,7 @@ void Skin3W_CPP(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
     }
 }
 
-
-void Skin4W_CPP(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
+void Skin4W(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 {
     xr_parallel_for(TaskRange<u32>(0, vCount), [&](const TaskRange<u32>& range) 
     {
@@ -241,5 +231,4 @@ void Skin4W_CPP(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
         }
     });
 }
-} // namespace Math
-} // namespace XRay
+#endif

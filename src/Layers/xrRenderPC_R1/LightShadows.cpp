@@ -4,8 +4,6 @@
 #include "xrEngine/xr_object.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
-#include "xrCore/Math/MathUtil.hpp"
-using namespace XRay::Math;
 
 const float S_distance = 144;
 const float S_distance2 = S_distance * S_distance;
@@ -350,7 +348,7 @@ void CLightShadows::calculate()
 
 #define CLS(a) color_rgba(a, a, a, a)
 
-IC bool cache_search(const CLightShadows::cache_item& A, const CLightShadows::cache_item& B)
+inline bool cache_search(const CLightShadows::cache_item& A, const CLightShadows::cache_item& B)
 {
     if (A.O < B.O)
         return true;
@@ -363,48 +361,55 @@ IC bool cache_search(const CLightShadows::cache_item& A, const CLightShadows::ca
     return false; // eq
 }
 
-// XXX: use PLC_energy from xrCore
-IC float PLC_energy(Fvector& P, Fvector& N, light* L, float E)
+static ICF float PLC_energy_SSE(const Fvector& p, const Fvector& n, const light* L, float e)
 {
-    Fvector Ldir;
+    Fvector lDir;
     if (L->flags.type == IRender_Light::DIRECT)
     {
         // Cos
-        Ldir.invert(L->direction);
-        float D = Ldir.dotproduct(N);
+        lDir.invert(L->direction);
+        const float D = lDir.dotproduct(n);
         if (D <= 0)
             return 0;
-        return E;
+        return e;
     }
-    else
-    {
-        // Distance
-        float sqD = P.distance_to_sqr(L->position);
-        if (sqD > (L->range * L->range))
-            return 0;
-
-        // Dir
-        Ldir.sub(L->position, P);
-        Ldir.normalize_safe();
-        float D = Ldir.dotproduct(N);
-        if (D <= 0)
-            return 0;
-
-        // Trace Light
-        float R = _sqrt(sqD);
-        float att = 1 - (1 / (1 + R));
-        return (E * att);
-    }
+    // Distance
+    const float sqD = p.distance_to_sqr(L->position);
+    if (sqD > L->range * L->range)
+        return 0;
+    // Dir
+    lDir.sub(L->position, p);
+    lDir.normalize_safe();
+    const float D = lDir.dotproduct(n);
+    if (D <= 0)
+        return 0;
+    // Trace Light
+    __m128 rcpr = _mm_rsqrt_ss(_mm_load_ss(&sqD));
+    rcpr = _mm_rcp_ss(_mm_add_ss(rcpr, _mm_set_ss(1.0f)));
+    float att;
+    _mm_store_ss(&att, rcpr);
+    return e * att;
 }
 
-// XXX: use PLC_calc from xrCore (maybe)
-IC int PLC_calc(Fvector& P, Fvector& N, light* L, float energy, Fvector& O)
+static ICF int iCeil_SSE(float x) { return _mm_cvt_ss2si(_mm_set_ss(x)); }
+void PLCCalc(int& c0, int& c1, int& c2, const Fvector& camPos, const Fvector* ps, const Fvector& n, const light* l,
+    float energy, const Fvector& obj)
 {
-    float E = PLC_energy(P, N, L, energy);
-    float C1 = clampr(Device.vCameraPosition.distance_to_sqr(P) / S_distance2, 0.f, 1.f);
-    float C2 = clampr(O.distance_to_sqr(P) / S_fade2, 0.f, 1.f);
-    float A = 1.f - 1.5f * E * (1.f - C1) * (1.f - C2);
-    return iCeil(255.f * A);
+    float e = PLC_energy_SSE(ps[0], n, l, energy);
+    float nc1 = clampr(camPos.distance_to_sqr(ps[0]) / S_distance2, 0.f, 1.f);
+    float nc2 = clampr(obj.distance_to_sqr(ps[0]) / S_fade2, 0.f, 1.f);
+    float a = 1.f - 1.5f * e * (1.f - nc1) * (1.f - nc2);
+    c0 = iCeil_SSE(255.f * a);
+    e = PLC_energy_SSE(ps[1], n, l, energy);
+    nc1 = clampr(camPos.distance_to_sqr(ps[1]) / S_distance2, 0.f, 1.f);
+    nc2 = clampr(obj.distance_to_sqr(ps[1]) / S_fade2, 0.f, 1.f);
+    a = 1.f - 1.5f * e * (1.f - nc1) * (1.f - nc2);
+    c1 = iCeil_SSE(255.f * a);
+    e = PLC_energy_SSE(ps[2], n, l, energy);
+    nc1 = clampr(camPos.distance_to_sqr(ps[2]) / S_distance2, 0.f, 1.f);
+    nc2 = clampr(obj.distance_to_sqr(ps[2]) / S_fade2, 0.f, 1.f);
+    a = 1.f - 1.5f * e * (1.f - nc1) * (1.f - nc2);
+    c2 = iCeil_SSE(255.f * a);
 }
 
 void CLightShadows::render()
@@ -576,13 +581,8 @@ void CLightShadows::render()
 
             if (ttp.classify(View) < 0)
                 continue;
-            /*
-            int	c0		= PLC_calc(v[0],TT.N,S.L,Le,S.C);
-            int	c1		= PLC_calc(v[1],TT.N,S.L,Le,S.C);
-            int	c2		= PLC_calc(v[2],TT.N,S.L,Le,S.C);
-            */
-            int c0, c1, c2;
 
+            int c0, c1, c2;
             PLCCalc(c0, c1, c2, Device.vCameraPosition, v, TT.N, S.L, Le, S.C);
 
             if (c0 > S_clip && c1 > S_clip && c2 > S_clip)

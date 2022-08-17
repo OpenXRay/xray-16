@@ -14,7 +14,6 @@
 #include <unistd.h>
 #endif
 #include "xrCore.h"
-#include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 #include "Threading/TaskManager.hpp"
 
@@ -298,7 +297,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         R_ASSERT(SDL_HasSSE());
 #endif
         TaskScheduler = xr_make_unique<TaskManager>();
-        XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
         rtc_initialize();
