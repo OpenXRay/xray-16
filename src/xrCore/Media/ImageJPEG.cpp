@@ -4,6 +4,9 @@
 #include <cstdio>
 
 #if __has_include(<jpeglib.h>)
+#   ifdef HAVE_STDDEF_H
+#       undef HAVE_STDDEF_H // XXX: warning workaround
+#   endif
 #   include <jpeglib.h>
 #   include <setjmp.h>
 #endif
