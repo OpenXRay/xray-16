@@ -556,12 +556,6 @@
     <Filter Include="AI\AMonsters\common\monster states\Steal">
       <UniqueIdentifier>{2fa0f717-0403-4c7e-ad7f-2530a88eb71c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad">
-      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad\Rest">
-      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AMonsters\common\monster states\Hunt">
       <UniqueIdentifier>{098ea533-6ac0-45d2-87d0-f7b07721ed96}</UniqueIdentifier>
     </Filter>
@@ -2251,6 +2245,12 @@
     <Filter Include="Core\Server\Games\client\mp_script">
       <UniqueIdentifier>{3063bb58-b29e-4339-9f19-764c7e8bf9fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\AMonsters\common\monster states\Rest\Squad">
+      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\monster states\Rest\Squad\Rest">
+      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -3271,16 +3271,16 @@
       <Filter>AI\AMonsters\common\monster states\Steal</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_attack.h">
       <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
