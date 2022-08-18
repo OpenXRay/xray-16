@@ -401,4 +401,13 @@ void Skin1W(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
     }
 }
+
+#undef transform_dir
+#undef transform_tiny
+#undef shuffle_vec
+#undef shuffle_sw4
+#undef shuffle_sw3
+#undef transform_dir2
+#undef transform_tiny2
+
 #endif

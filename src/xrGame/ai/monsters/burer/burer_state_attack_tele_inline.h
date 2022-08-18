@@ -25,7 +25,7 @@ void CStateBurerAttackTele<Object>::initialize()
     m_anim_end_tick = 0;
     m_last_grenade_scan = 0;
     m_initial_health = this->object->conditions().GetHealth();
-    m_end_tick = current_time() + this->object->m_tele_max_time;
+    m_end_tick = xr_current_time() + this->object->m_tele_max_time;
 
     // запретить взятие скриптом
     this->object->set_script_capture(false);
@@ -37,7 +37,7 @@ void CStateBurerAttackTele<Object>::execute()
     HandleGrenades();
     // 	if ( object->EnemyMan.see_enemy_now() )
     // 	{
-    // 		m_last_saw_enemy_tick					=	current_time();
+    // 		m_last_saw_enemy_tick					=	xr_current_time();
     // 	}
 
     switch (m_action)
@@ -47,12 +47,12 @@ void CStateBurerAttackTele<Object>::execute()
         if (!time_started)
         {
             float const time = this->object->anim().get_animation_length(eAnimTelekinesis, 0);
-            m_anim_end_tick = current_time() + TTime(time * 1000);
+            m_anim_end_tick = xr_current_time() + TTime(time * 1000);
             time_started = Device.dwTimeGlobal;
         }
         else
         {
-            if (current_time() > m_anim_end_tick)
+            if (xr_current_time() > m_anim_end_tick)
             {
                 m_action = ACTION_TELE_CONTINUE;
             }
@@ -69,14 +69,14 @@ void CStateBurerAttackTele<Object>::execute()
         this->object->anim().set_override_animation(eAnimTeleFire, 0);
         ExecuteTeleFire();
         float const time = this->object->anim().get_animation_length(eAnimTeleFire, 0);
-        m_anim_end_tick = current_time() + TTime(time * 1000);
+        m_anim_end_tick = xr_current_time() + TTime(time * 1000);
         m_action = ACTION_WAIT_FIRE_END;
         break;
     }
 
     case ACTION_WAIT_FIRE_END:
         this->object->anim().set_override_animation(eAnimTeleFire, 0);
-        if (current_time() > m_anim_end_tick)
+        if (xr_current_time() > m_anim_end_tick)
         {
             if (IsActiveObjects())
             {
@@ -171,7 +171,7 @@ bool CStateBurerAttackTele<Object>::check_completion()
         return true;
     }
 
-    if (current_time() > m_end_tick)
+    if (xr_current_time() > m_end_tick)
     {
         return true;
     }
@@ -469,7 +469,7 @@ void CStateBurerAttackTele<Object>::OnGrenadeDestroyed(CGrenade* const grenade)
 template <typename Object>
 void CStateBurerAttackTele<Object>::HandleGrenades()
 {
-    if (current_time() < m_last_grenade_scan + 1000)
+    if (xr_current_time() < m_last_grenade_scan + 1000)
     {
         return;
     }

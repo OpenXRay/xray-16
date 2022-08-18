@@ -105,16 +105,16 @@ bool CStateGroupAttackMoveToHomePointAbstract::check_start_conditions()
     {
         if (!m_first_tick_enemy_inaccessible)
         {
-            m_first_tick_enemy_inaccessible = current_time();
+            m_first_tick_enemy_inaccessible = xr_current_time();
         }
 
-        m_last_tick_enemy_inaccessible = current_time();
+        m_last_tick_enemy_inaccessible = xr_current_time();
 
-        return current_time() - m_first_tick_enemy_inaccessible > 3000;
+        return xr_current_time() - m_first_tick_enemy_inaccessible > 3000;
     }
     else
     {
-        if (m_last_tick_enemy_inaccessible && current_time() - m_last_tick_enemy_inaccessible > 3000)
+        if (m_last_tick_enemy_inaccessible && xr_current_time() - m_last_tick_enemy_inaccessible > 3000)
         {
             m_first_tick_enemy_inaccessible = 0;
             m_last_tick_enemy_inaccessible = 0;

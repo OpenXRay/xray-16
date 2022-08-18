@@ -1,3 +1,5 @@
+#pragma once
+
 enum
 {
     flFullVote = u16(1 << 0), // old vote sintax

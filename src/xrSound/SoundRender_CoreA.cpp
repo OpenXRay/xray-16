@@ -3,6 +3,7 @@
 
 #include "SoundRender_CoreA.h"
 #include "SoundRender_TargetA.h"
+#include "OpenALDeviceList.h"
 
 CSoundRender_CoreA* SoundRenderA = nullptr;
 

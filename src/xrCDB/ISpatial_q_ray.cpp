@@ -14,6 +14,10 @@
 #error Add your platform here
 #endif
 
+extern Fvector c_spatial_offset[8];
+
+namespace Spatial
+{
 struct alignas(16) vec_t : public Fvector3
 {
     float pad;
@@ -30,10 +34,6 @@ struct alignas(16) ray_t
     vec_t pos;
     vec_t inv_dir;
     vec_t fwd_dir;
-};
-struct ray_segment_t
-{
-    float t_near, t_far;
 };
 
 ICF u32& uf(float& x) { return (u32&)x; }
@@ -199,7 +199,16 @@ ICF bool isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
     return ret;
 }
 
-extern Fvector c_spatial_offset[8];
+#undef loadps
+#undef storess
+#undef minss
+#undef maxss
+#undef minps
+#undef maxps
+#undef mulps
+#undef subps
+#undef rotatelps
+#undef muxhps
 
 template <bool b_use_sse, bool b_first, bool b_nearest>
 class alignas(16) ray_walker
@@ -334,10 +343,13 @@ public:
         }
     }
 };
+} // namespace Spatial
 
 void ISpatial_DB::q_ray(
     xr_vector<ISpatial*>& R, u32 _o, u32 _mask_and, const Fvector& _start, const Fvector& _dir, float _range)
 {
+    using namespace Spatial;
+
     ScopeLock scope(&cs);
     Stats.Query.Begin();
     q_result = &R;

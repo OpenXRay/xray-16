@@ -8,10 +8,9 @@
 #include "Render.h"
 #include "xr_object.h"
 
-#include "Include/xrRender/DrawUtils.h"
+#include "Include/xrRender/DrawUtils.h" // for CStats::OnRender
 #include "xr_input.h"
 #include "xrCore/cdecl_cast.hpp"
-#include "xrPhysics/IPHWorld.h"
 #include "PerformanceAlert.hpp"
 #include "xrCore/Threading/TaskManager.hpp"
 
