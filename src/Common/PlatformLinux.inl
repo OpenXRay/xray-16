@@ -265,8 +265,14 @@ typedef dirent DirEntryType;
 #define O_SEQUENTIAL 0
 #define SH_DENYWR 0
 
+#if __has_include(<SDL_stdinc.h>)
+#include <SDL_stdinc.h>
 #define itoa SDL_itoa
 #define _itoa_s SDL_itoa
+#else
+#define itoa(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#define _itoa_s(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#endif // _DEBUG
 
 #define _stricmp stricmp
 #define strcmpi stricmp
