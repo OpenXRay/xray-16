@@ -33,7 +33,7 @@ jobs:
 
     - name: MSBuild
       working-directory: src
-      run: msbuild /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
+      run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
 
     - name: Prepare artifacts
       id: windows-vars
