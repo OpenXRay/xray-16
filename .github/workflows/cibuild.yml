@@ -175,7 +175,7 @@ jobs:
         path: build/openxray_1.6.02_i386.deb
 
   build-alpine:
-    name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }}
+    name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
