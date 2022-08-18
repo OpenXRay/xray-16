@@ -132,7 +132,7 @@
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
+    <ClCompile Include="..\xrLoadSurface.cpp" />
     <ClCompile Include="base_basis.cpp" />
     <ClCompile Include="base_color.cpp" />
     <ClCompile Include="base_face.cpp" />

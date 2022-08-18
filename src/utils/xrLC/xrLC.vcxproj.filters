@@ -177,9 +177,6 @@
     <ClCompile Include="xrLight.cpp">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp">
-      <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
-    </ClCompile>
     <ClCompile Include="xrOptimizeCFORM_qslim.cpp">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
     </ClCompile>
@@ -266,6 +263,9 @@
     </ClCompile>
     <ClCompile Include="..\xrLC_Light\ETextureParams.cpp">
       <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrLoadSurface.cpp">
+      <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

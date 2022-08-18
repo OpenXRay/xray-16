@@ -12,10 +12,12 @@
 
 namespace lc_net
 {
-static const u32 send_receive_result_buff_size = 512 * 1024;
+static constexpr size_t detail_light_result_buff_size = 512 * 1024;
+static constexpr size_t detail_light_task_buff_size = 8;
+
 void net_execution_detail_light::receive_result(IGenericStream* outStream)
 {
-    u8 buff[send_receive_result_buff_size];
+    u8 buff[detail_light_result_buff_size];
     INetBlockReader r(outStream, buff, sizeof(buff));
     // INetReaderGenStream r(outStream);
     u32 _start = r.r_u32();
@@ -39,7 +41,7 @@ void net_execution_detail_light::receive_result(IGenericStream* outStream)
 
 void net_execution_detail_light::send_result(IGenericStream* outStream)
 {
-    u8 buff[send_receive_result_buff_size];
+    u8 buff[detail_light_result_buff_size];
     INetMemoryBuffWriter w(outStream, sizeof(buff), buff);
     // INetIWriterGenStream w( outStream, 1024*1024 );
     VERIFY(start != u32(-1));
@@ -56,13 +58,12 @@ void net_execution_detail_light::send_result(IGenericStream* outStream)
         w_pod(w, DS);
     }
 }
-static const u32 send_receive_task_buff_size = 8;
 void net_execution_detail_light::send_task(IGenericStream* outStream)
 {
     {
         R_ASSERT(start != u32(-1));
         R_ASSERT(end != u32(-1));
-        u8 buff[send_receive_task_buff_size];
+        u8 buff[detail_light_task_buff_size];
         INetMemoryBuffWriter w(outStream, sizeof(buff), buff);
         // INetIWriterGenStream w( outStream, 100 );
         w.w_u32(start);
@@ -71,7 +72,7 @@ void net_execution_detail_light::send_task(IGenericStream* outStream)
 }
 bool net_execution_detail_light::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
-    u8 buff[send_receive_task_buff_size];
+    u8 buff[detail_light_task_buff_size];
     INetBlockReader r(inStream, buff, sizeof(buff));
     // INetReaderGenStream r( inStream );
     start = r.r_u32();
