@@ -159,9 +159,9 @@ struct CGameSvMpScriptWrapperBase : public T, public luabind::wrap_base
 
     game_PlayerState* createPlayerState() override
     {
-        return call_member<game_PlayerState*>(this, "createPlayerState");
+        return luabind::call_member<game_PlayerState*>(this, "createPlayerState");
         // XXX: investigate
-        //return call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
+        //return luabind::call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
     }
 
     static game_PlayerState* createPlayerState_static(inherited* ptr)
