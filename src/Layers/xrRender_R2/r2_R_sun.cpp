@@ -24,6 +24,8 @@ const float MAP_GROW_FACTOR = 4.f;
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
+namespace sun
+{
 static Fvector3 corners[8] =
 {
     { -1, -1, +0 }, { -1, -1, +1 },
@@ -38,6 +40,7 @@ static int facetable[6][4] =
     // near and far planes
     { 0, 3, 5, 7 }, { 1, 6, 4, 2 },
 };
+} // namespace sun
 //////////////////////////////////////////////////////////////////////////
 // XXX: examine
 #define DW_AS_FLT(DW) (*(float*)&(DW))
@@ -334,14 +337,14 @@ void CRender::render_sun()
             hull.points.reserve(8);
             for (int p = 0; p < 8; p++)
             {
-                Fvector3 xf = wform(fullxform_inv, corners[p]);
+                Fvector3 xf = wform(fullxform_inv, sun::corners[p]);
                 hull.points.push_back(xf);
             }
             for (int plane = 0; plane < 6; plane++)
             {
                 hull.polys.push_back(DumbConvexVolume<false>::_poly());
                 for (int pt = 0; pt < 4; pt++)
-                    hull.polys.back().points.push_back(facetable[plane][pt]);
+                    hull.polys.back().points.push_back(sun::facetable[plane][pt]);
             }
         }
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
@@ -651,7 +654,7 @@ void CRender::render_sun()
         }
         for (int e = 0; e < 8; e++)
         {
-            pt = wform(x_full_inverse, corners[e]); // world space
+            pt = wform(x_full_inverse, sun::corners[e]); // world space
             pt = wform(xform, pt); // trapezoid space
             b_receivers.modify(pt);
         }
@@ -783,14 +786,14 @@ void CRender::render_sun_near()
             hull.points.reserve(9);
             for (int p = 0; p < 8; p++)
             {
-                Fvector3 xf = wform(fullxform_inv, corners[p]);
+                Fvector3 xf = wform(fullxform_inv, sun::corners[p]);
                 hull.points.push_back(xf);
             }
             for (int plane = 0; plane < 6; plane++)
             {
                 hull.polys.push_back(t_volume::_poly());
                 for (int pt = 0; pt < 4; pt++)
-                    hull.polys.back().points.push_back(facetable[plane][pt]);
+                    hull.polys.back().points.push_back(sun::facetable[plane][pt]);
             }
         }
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
@@ -1109,9 +1112,9 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                 Fvector3 near_p, edge_vec;
                 for (int p = 0; p < 4; p++)
                 {
-                    near_p = wform(fullxform_inv, corners[facetable[4][p]]);
+                    near_p = wform(fullxform_inv, sun::corners[sun::facetable[4][p]]);
 
-                    edge_vec = wform(fullxform_inv, corners[facetable[5][p]]);
+                    edge_vec = wform(fullxform_inv, sun::corners[sun::facetable[5][p]]);
                     edge_vec.sub(near_p);
                     edge_vec.normalize();
 
@@ -1166,7 +1169,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         //		light_cuboid.light_cuboid_points.reserve		(9);
         for (int p = 0; p < 8; p++)
         {
-            Fvector3 xf = wform(cull_xform_inv, corners[p]);
+            Fvector3 xf = wform(cull_xform_inv, sun::corners[p]);
             light_cuboid.light_cuboid_points[p] = xf;
         }
 
@@ -1175,7 +1178,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         {
             for (int pt = 0; pt < 4; pt++)
             {
-                int asd = facetable[plane][pt];
+                int asd = sun::facetable[plane][pt];
                 light_cuboid.light_cuboid_polys[plane].points[pt] = asd;
             }
         }
