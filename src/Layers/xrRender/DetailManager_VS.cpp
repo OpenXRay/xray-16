@@ -12,8 +12,8 @@
 
 namespace detail_manager
 {
-const int quant = 16384;
-const int c_hdr = 10;
+extern const int quant = 16384;
+/*extern*/ const int c_hdr = 10;
 const int c_size = 4;
 
 static VertexElement dwDecl[] =

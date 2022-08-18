@@ -6,8 +6,8 @@
 
 namespace detail_manager
 {
-const int quant = 16384;
-//const int c_hdr = 10;
+extern const int quant;
+//extern const int c_hdr;
 }
 
 void CDetailManager::hw_Load_Shaders()
