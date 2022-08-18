@@ -3,6 +3,7 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <EnableUnitySupport Condition="'$(CI)'!=''">true</EnableUnitySupport>
   </PropertyGroup>
 
   <PropertyGroup Label="Globals">
