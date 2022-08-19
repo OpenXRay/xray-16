@@ -24,6 +24,7 @@
 #include "ai/monsters/monster_state_manager.h"
 #include "sound_player.h"
 #include "game_path_manager.h"
+#include "level_path_manager.h"
 #include "detail_path_manager.h"
 #include "patrol_path_manager.h"
 #include "script_entity_action.h"
