@@ -24,6 +24,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions Condition="'$(GITHUB_ACTIONS)'!=''">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;nvapi$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -177,6 +178,7 @@
     <ClInclude Include="..\xrRender\SkeletonAnimated.h" />
     <ClInclude Include="..\xrRender\SkeletonCustom.h" />
     <ClInclude Include="..\xrRender\SkeletonX.h" />
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h" />
     <ClInclude Include="..\xrRender\stats_manager.h" />
     <ClInclude Include="..\xrRender\TextureDescrManager.h" />
     <ClInclude Include="..\xrRender\tss.h" />
@@ -343,6 +345,8 @@
     <ClCompile Include="..\xrRender\SkeletonCustom.cpp" />
     <ClCompile Include="..\xrRender\SkeletonRigid.cpp" />
     <ClCompile Include="..\xrRender\SkeletonX.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
     <ClCompile Include="..\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
     <ClCompile Include="..\xrRender\tss_def.cpp" />

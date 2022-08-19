@@ -26,20 +26,6 @@ void fix_texture_name(LPSTR fn)
         *_ext = 0;
 }
 */
-//--------------------------------------------------------------------------------------------------------------
-template <class T>
-bool reclaim(xr_vector<T*>& vec, const T* ptr)
-{
-    auto it = vec.begin();
-    auto end = vec.end();
-    for (; it != end; ++it)
-        if (*it == ptr)
-        {
-            vec.erase(it);
-            return true;
-        }
-    return false;
-}
 
 //--------------------------------------------------------------------------------------------------------------
 IBlender* CResourceManager::_GetBlender(LPCSTR Name)

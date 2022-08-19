@@ -1326,20 +1326,20 @@ void CPHJoint::CalcAxis(int ax_num, Fvector& axis, float& lo, float& hi, const F
     }
     lo = axes[ax_num].low;
     hi = axes[ax_num].high;
-    if (lo < -M_PI)
+    if (lo < -float(M_PI))
     {
-        hi -= (lo + M_PI);
-        lo = -M_PI;
+        hi -= (lo + float(M_PI));
+        lo = -float(M_PI);
     }
     if (lo > 0.f)
     {
         hi -= lo;
         lo = 0.f;
     }
-    if (hi > M_PI)
+    if (hi > float(M_PI))
     {
-        lo -= (hi - M_PI);
-        hi = M_PI;
+        lo -= (hi - float(M_PI));
+        hi = float(M_PI);
     }
     if (hi < 0.f)
     {
@@ -1371,27 +1371,27 @@ void CPHJoint::CalcAxis(
 
     shift_angle -= axes[ax_num].zero;
 
-    if (shift_angle > M_PI)
-        shift_angle -= 2.f * M_PI;
-    if (shift_angle < -M_PI)
-        shift_angle += 2.f * M_PI;
+    if (shift_angle > float(M_PI))
+        shift_angle -= 2.f * float(M_PI);
+    if (shift_angle < -float(M_PI))
+        shift_angle += 2.f * float(M_PI);
 
     lo = axes[ax_num].low; //+shift_angle;
     hi = axes[ax_num].high; //+shift_angle;
-    if (lo < -M_PI)
+    if (lo < -float(M_PI))
     {
-        hi -= (lo + M_PI);
-        lo = -M_PI;
+        hi -= (lo + float(M_PI));
+        lo = -float(M_PI);
     }
     if (lo > 0.f)
     {
         hi -= lo;
         lo = 0.f;
     }
-    if (hi > M_PI)
+    if (hi > float(M_PI))
     {
-        lo -= (hi - M_PI);
-        hi = M_PI;
+        lo -= (hi - float(M_PI));
+        hi = float(M_PI);
     }
     if (hi < 0.f)
     {

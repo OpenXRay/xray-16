@@ -1,14 +1,6 @@
 #include "stdafx.h"
 #include "ppmd_compressor.h"
 #include "PPMd.h"
-#include "SDL.h"
-
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
-LONG InterlockedExchange(LONG volatile *dest, LONG val) // XXX: replace with std
-{
-    return __sync_lock_test_and_set(dest, val);
-}
-#endif
 
 const u32 suballocator_size = 32;
 const u32 order_model = 8;
@@ -19,15 +11,19 @@ typedef compression::ppmd::stream stream;
 extern compression::ppmd::stream* trained_model;
 
 void _STDCALL PrintInfo(_PPMD_FILE* DecodedFile, _PPMD_FILE* EncodedFile) {}
-static LONG PPMd_Locked = 0;
 
-static inline void PPMd_Lock()
+static xr_unique_ptr<Lock> PPMD_Lock; // XXX: can cause crashes on launch/exit due to alloc/free
+
+static void PPMd_Lock()
 {
-    while (::InterlockedExchange(&PPMd_Locked, 1))
-        SDL_Delay(0);
+    PPMD_Lock->Enter();
 }
 
-static inline void PPMd_Unlock() { ::InterlockedExchange(&PPMd_Locked, 0); }
+static void PPMd_Unlock()
+{
+    PPMD_Lock->Leave();
+}
+
 void ppmd_initialize()
 {
     if (trained_model)
@@ -36,6 +32,8 @@ void ppmd_initialize()
     static bool initialized = false;
     if (initialized)
         return;
+
+    PPMD_Lock = xr_make_unique<Lock>();
 
     initialized = true;
     if (StartSubAllocator(suballocator_size))

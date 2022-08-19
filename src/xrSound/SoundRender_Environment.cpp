@@ -4,6 +4,7 @@
 #include "SoundRender_Environment.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
+#define OPENAL
 #include <eax/eax.h>
 #endif
 

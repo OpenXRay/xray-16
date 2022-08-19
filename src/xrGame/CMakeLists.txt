@@ -301,7 +301,6 @@ set(SRC_FILES
     "BottleItem.h"
     "BreakableObject.cpp"
     "BreakableObject.h"
-    "CalculateTriangle.h"
     "CameraEffector.cpp"
     "CameraEffector.h"
     "CameraFirstEye.cpp"

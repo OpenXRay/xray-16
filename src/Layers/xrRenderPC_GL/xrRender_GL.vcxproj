@@ -24,6 +24,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions Condition="'$(GITHUB_ACTIONS)'!=''">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32s.lib;glu32.lib;oalib.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -107,6 +108,8 @@
     <ClCompile Include="..\xrRender\blenders\blender_light_spot.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_luminance.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
     <ClCompile Include="..\xrRender_R2\r2.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_blenders.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_loader.cpp" />
@@ -347,6 +350,7 @@
     <ClInclude Include="..\xrRender\SkeletonAnimated.h" />
     <ClInclude Include="..\xrRender\SkeletonCustom.h" />
     <ClInclude Include="..\xrRender\SkeletonX.h" />
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h" />
     <ClInclude Include="..\xrRender\TextureDescrManager.h" />
     <ClInclude Include="..\xrRender\tss.h" />
     <ClInclude Include="..\xrRender\tss_def.h" />

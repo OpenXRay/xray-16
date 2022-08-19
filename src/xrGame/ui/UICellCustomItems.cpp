@@ -14,7 +14,6 @@ struct is_helper_pred
 {
     bool operator()(CUICellItem* child) { return child->IsHelper(); }
 }; // struct is_helper_pred
-
 } // namespace detail
 
 CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
@@ -57,7 +56,7 @@ bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
 
 bool CUIInventoryCellItem::IsHelperOrHasHelperChild()
 {
-    return std::count_if(m_childs.begin(), m_childs.end(), detail::is_helper_pred()) > 0 || IsHelper();
+    return std::count_if(m_childs.begin(), m_childs.end(), ::detail::is_helper_pred()) > 0 || IsHelper();
 }
 
 CUIDragItem* CUIInventoryCellItem::CreateDragItem()
@@ -89,7 +88,7 @@ void CUIInventoryCellItem::Update()
 void CUIInventoryCellItem::UpdateItemText()
 {
     const u32 helper_count =
-        (u32)std::count_if(m_childs.begin(), m_childs.end(), detail::is_helper_pred()) + IsHelper() ? 1 : 0;
+        (u32)std::count_if(m_childs.begin(), m_childs.end(), ::detail::is_helper_pred()) + IsHelper() ? 1 : 0;
 
     const u32 count = ChildsCount() + 1 - helper_count;
 

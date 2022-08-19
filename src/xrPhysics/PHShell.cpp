@@ -27,7 +27,6 @@
 #include "debug_output.h"
 #endif
 
-IC bool PhOutOfBoundaries(const Fvector& v) { return v.y < phBoundaries.y1; }
 CPHShell::~CPHShell()
 {
     m_pKinematics = nullptr;

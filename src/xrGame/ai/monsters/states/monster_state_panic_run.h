@@ -3,6 +3,9 @@
 template <typename _Object>
 class CStateMonsterPanicRun : public CState<_Object>
 {
+    static constexpr u32 MIN_UNSEEN_TIME = 15000;
+    static constexpr float MIN_DIST_TO_ENEMY = 15.f;
+
     typedef CState<_Object> inherited;
 
 public:

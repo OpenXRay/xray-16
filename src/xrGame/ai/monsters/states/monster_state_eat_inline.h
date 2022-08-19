@@ -272,8 +272,6 @@ bool CStateMonsterEatAbstract::check_start_conditions()
         hungry() && !monster_squad().get_squad(this->object)->is_locked_corpse(this->object->CorpseMan.get_corpse()));
 }
 
-#define TIME_NOT_HUNGRY 20000
-
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterEatAbstract::hungry()
 {

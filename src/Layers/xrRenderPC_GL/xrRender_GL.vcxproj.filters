@@ -687,6 +687,12 @@
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1141,6 +1147,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h">
       <Filter>Shading templates\GL MSAA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

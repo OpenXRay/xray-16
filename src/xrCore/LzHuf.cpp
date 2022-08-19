@@ -708,3 +708,12 @@ size_t _readLZ(int hf, void*& d, size_t size)
     d = fs.OutPointer();
     return fs.OutSize();
 }
+
+#undef N
+#undef F
+#undef THRESHOLD
+#undef NIL
+#undef N_CHAR
+#undef T
+#undef R
+#undef MAX_FREQ

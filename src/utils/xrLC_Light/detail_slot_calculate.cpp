@@ -6,10 +6,12 @@
 
 #include "stdafx.h"
 #include "detail_slot_calculate.h"
+
 #include "xrCDB/Intersect.hpp"
 #include "base_lighting.h"
 #include "global_calculation_data.h"
 #include "utils/Shader_xrLC.h"
+#include "base_color.h"
 
 enum
 {
@@ -26,55 +28,6 @@ float color_intensity(Fcolor& c)
     float absolute = c.magnitude_rgb() / 1.7320508075688772935274463415059f;
     return ntsc * 0.5f + absolute * 0.5f;
 }
-
-class base_color
-{
-public:
-    Fvector rgb; // - all static lighting
-    float hemi; // - hemisphere
-    float sun; // - sun
-    float _tmp_; // ???
-    base_color()
-    {
-        rgb.set(0, 0, 0);
-        hemi = 0;
-        sun = 0;
-        _tmp_ = 0;
-    }
-
-    void mul(float s)
-    {
-        rgb.mul(s);
-        hemi *= s;
-        sun *= s;
-    };
-    void add(float s)
-    {
-        rgb.add(s);
-        hemi += s;
-        sun += s;
-    };
-    void add(base_color& s)
-    {
-        rgb.add(s.rgb);
-        hemi += s.hemi;
-        sun += s.sun;
-    };
-    void scale(int samples) { mul(1.f / float(samples)); };
-    void max(base_color& s)
-    {
-        rgb.max(s.rgb);
-        hemi = _max(hemi, s.hemi);
-        sun = _max(sun, s.sun);
-    };
-    void lerp(base_color& A, base_color& B, float s)
-    {
-        rgb.lerp(A.rgb, B.rgb, s);
-        float is = 1 - s;
-        hemi = is * A.hemi + s * B.hemi;
-        sun = is * A.sun + s * B.sun;
-    };
-};
 
 // IC	u8	u8_clr				(float a)	{ s32 _a = iFloor(a*255.f); clamp(_a,0,255); return u8(_a);		};
 // IC	u8	u8_clr				(float a)	{ s32 _a = iFloor(a*255.f); clamp(_a,0,255); return u8(_a);		};
@@ -229,7 +182,7 @@ float rayTrace(CDB::COLLIDER* DB, u32 ray_options, R_Light& L, Fvector& P, Fvect
     return 0;
 }
 
-void LightPoint(CDB::COLLIDER* DB, u32 ray_options, base_color& C, Fvector& P, Fvector& N, base_lighting& lights, u32 flags)
+void LightPoint(CDB::COLLIDER* DB, u32 ray_options, base_color_c& C, Fvector& P, Fvector& N, base_lighting& lights, u32 flags)
 {
     Fvector Ldir, Pnew;
     Pnew.mad(P, N, 0.01f);
@@ -401,7 +354,7 @@ bool detail_slot_calculate(
     Selected.select(gl_data.g_lights, S.P, S.R);
 
     // lighting itself
-    base_color amount;
+    base_color_c amount;
     u32 count = 0;
     float coeff = DETAIL_SLOT_SIZE_2 / float(LIGHT_Count);
     FPU::m64r();

@@ -25,6 +25,8 @@ Fvector3 wform(Fmatrix const& m, Fvector3 const& v);
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
+namespace rain
+{
 static Fvector3 corners[8] =
 {
     {-1, -1, 0}, {-1, -1, +1},
@@ -38,6 +40,7 @@ static int facetable[6][4] =
     {6, 7, 5, 4}, {4, 2, 1, 6},
     {3, 2, 4, 5}, {1, 0, 7, 6},
 };
+}
 
 //////////////////////////////////////////////////////////////////////////
 void CRender::render_rain()
@@ -111,14 +114,14 @@ void CRender::render_rain()
                 hull.points.reserve(9);
                 for (int p = 0; p < 8; p++)
                 {
-                    Fvector3 xf = wform(fullxform_inv, corners[p]);
+                    Fvector3 xf = wform(fullxform_inv, rain::corners[p]);
                     hull.points.push_back(xf);
                 }
                 for (int plane = 0; plane < 6; plane++)
                 {
                     hull.polys.push_back(t_volume::_poly());
                     for (int pt = 0; pt < 4; pt++)
-                        hull.polys.back().points.push_back(facetable[plane][pt]);
+                        hull.polys.back().points.push_back(rain::facetable[plane][pt]);
                 }
             }
             // hull.compute_caster_model	(cull_planes,fuckingsun->direction);

@@ -88,8 +88,8 @@ static test_property7 s_test_property7_values_enum;
 std::pair<float, pcstr> s_properties7_enum[] = {std::make_pair(10.1f, "float_property_0"),
     std::make_pair(20.1f, "float_property_1"), std::make_pair(30.1f, "float_property_2")};
 
-using editor::environment::manager;
-
+namespace editor::environment
+{
 manager::manager()
 {
     // testing properties
@@ -150,7 +150,7 @@ manager::manager()
         getter.bind(&s_test_property2, &test_property2::getter);
         setter.bind(&s_test_property2, &test_property2::setter);
         holder->add_property("string", "category", "description", s_test_property2.m_property, getter, setter, ".dds",
-            "Texture files (*.dds)|*.dds", "R:" DELIMITER "development" DELIMITER "priquel" DELIMITER "resources" DELIMITER "gamedata" DELIMITER "textures" DELIMITER "sky",
+            "Texture files (*.dds)|*.dds", "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
             "Select texture...");
     }
 
@@ -221,3 +221,4 @@ manager::manager()
             setter, s_properties7_enum, 3);
     }
 }
+} // namespace editor::environment

@@ -925,7 +925,6 @@ void CSE_ALifeObjectPhysic::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_stringZ(fixed_bones);
 }
 
-static inline bool check(const u8& mask, const u8& test) { return (!!(mask & test)); }
 const u32 CSE_ALifeObjectPhysic::m_freeze_delta_time = 5000;
 const u32 CSE_ALifeObjectPhysic::random_limit = 40;
 
@@ -984,7 +983,7 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
 
     R_ASSERT2(m_u8NumItems < (u8(1) << 5), make_string("%d", m_u8NumItems));
 
-    /*if (check(num_items.mask,animated))
+    /*if (check_mask(num_items.mask,animated))
     {
         tNetPacket.r_float(m_blend_timeCurrent);
         anim_use=true;
@@ -1005,9 +1004,9 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
         tNetPacket.r_float(State.quaternion.z);
         tNetPacket.r_float(State.quaternion.w);
 
-        State.enabled = check(num_items.mask, inventory_item_state_enabled);
+        State.enabled = check_mask(num_items.mask, inventory_item_state_enabled);
 
-        if (!check(num_items.mask, inventory_item_angular_null))
+        if (!check_mask(num_items.mask, inventory_item_angular_null))
         {
             tNetPacket.r_float(State.angular_vel.x);
             tNetPacket.r_float(State.angular_vel.y);
@@ -1016,7 +1015,7 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
         else
             State.angular_vel.set(0.f, 0.f, 0.f);
 
-        if (!check(num_items.mask, inventory_item_linear_null))
+        if (!check_mask(num_items.mask, inventory_item_linear_null))
         {
             tNetPacket.r_float(State.linear_vel.x);
             tNetPacket.r_float(State.linear_vel.y);
@@ -1025,7 +1024,7 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
         else
             State.linear_vel.set(0.f, 0.f, 0.f);
 
-        /*if (check(num_items.mask,animated))
+        /*if (check_mask(num_items.mask,animated))
         {
             anim_use=true;
         }*/
@@ -1079,7 +1078,7 @@ void CSE_ALifeObjectPhysic::UPDATE_Write(NET_Packet& tNetPacket)
 
     tNetPacket.w_u8(num_items.common);
 
-    /*if(check(num_items.mask,animated))
+    /*if(check_mask(num_items.mask,animated))
     {
         tNetPacket.w_float              (m_blend_timeCurrent);
     }*/
@@ -1095,14 +1094,14 @@ void CSE_ALifeObjectPhysic::UPDATE_Write(NET_Packet& tNetPacket)
         tNetPacket.w_float(State.quaternion.z);
         tNetPacket.w_float(State.quaternion.w);
 
-        if (!check(num_items.mask, inventory_item_angular_null))
+        if (!check_mask(num_items.mask, inventory_item_angular_null))
         {
             tNetPacket.w_float(State.angular_vel.x);
             tNetPacket.w_float(State.angular_vel.y);
             tNetPacket.w_float(State.angular_vel.z);
         }
 
-        if (!check(num_items.mask, inventory_item_linear_null))
+        if (!check_mask(num_items.mask, inventory_item_linear_null))
         {
             tNetPacket.w_float(State.linear_vel.x);
             tNetPacket.w_float(State.linear_vel.y);

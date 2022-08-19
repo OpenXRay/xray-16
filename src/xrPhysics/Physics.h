@@ -41,3 +41,5 @@ class CPHElement;
 class CPHShell;
 extern dJointGroupID ContactGroup;
 extern Fbox phBoundaries;
+
+IC bool PhOutOfBoundaries(const Fvector& v) { return v.y < phBoundaries.y1; }

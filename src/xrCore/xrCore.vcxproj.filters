@@ -228,15 +228,6 @@
     <ClCompile Include="Media\Image.cpp">
       <Filter>Media</Filter>
     </ClCompile>
-    <ClCompile Include="Math\PLC_SSE.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\SkinXW_SSE.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\MathUtil.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\Lock.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
@@ -278,12 +269,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>PCH</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\SkinXW_CPP.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\PLC_CPP.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="xr_token.cpp">
       <Filter>Math\Extensions</Filter>
@@ -551,15 +536,6 @@
     <ClInclude Include="cdecl_cast.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Math\PLC_SSE.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\SkinXW_SSE.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\MathUtil.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp">
       <Filter>Containers</Filter>
     </ClInclude>
@@ -645,12 +621,6 @@
       <Filter>PCH</Filter>
     </ClInclude>
     <ClInclude Include="math_constants.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\SkinXW_CPP.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\PLC_CPP.hpp">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="xrCore_benchmark_macros.h">

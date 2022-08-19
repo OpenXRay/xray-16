@@ -313,7 +313,7 @@ static Fvector trajectory_position(Fvector const& start_position, Fvector const&
         Fvector(parabolic_position).mad(parabolic_velocity, fall_down_time).mad(gravity, _sqr(fall_down_time) * .5f));
 }
 
-inline static float trajectory_max_error_time(float const t0, float const t1)
+float trajectory_max_error_time(float const t0, float const t1)
 {
     return ((t1 + t0) * .5f);
     // this is correct even in our case

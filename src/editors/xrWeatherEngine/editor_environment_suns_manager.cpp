@@ -17,27 +17,29 @@
 #include "property_collection.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::suns::manager;
-using editor::environment::suns::sun;
-using editor::environment::detail::logical_string_predicate;
+using suns_manager = editor::environment::suns::manager;
 
 template <>
-void property_collection<manager::container_type, manager>::display_name(
+void property_collection<suns_manager::container_type, suns_manager>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<manager::container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<suns_manager::container_type, suns_manager>::create()
 {
-    sun* object = xr_new<sun>(m_holder, generate_unique_id("sun_unique_id_").c_str());
+    using editor::environment::suns::sun;
+
+    auto* object = xr_new<sun>(m_holder, generate_unique_id("sun_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
 
-manager::manager(::editor::environment::manager* environment)
-    : m_environment(*environment), m_collection(0), m_changed(true)
+namespace editor::environment::suns
+{
+manager::manager(environment::manager* environment)
+    : m_collection(nullptr), m_changed(true), m_environment(*environment)
 {
     m_collection = xr_new<collection_type>(&m_suns, this, &m_changed);
 }
@@ -53,13 +55,13 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), true, true, false);
+    auto* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
-    sections_type& sections = config->sections();
+    const sections_type& sections = config->sections();
     m_suns.reserve(sections.size());
 
-    for (const auto &i : sections)
+    for (const auto& i : sections)
         add(*config, i->Name);
 
     xr_delete(config);
@@ -68,9 +70,9 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), false, false, true);
+    auto* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "suns.ltx"), false, false, true);
 
-    for (const auto &i : m_suns)
+    for (const auto& i : m_suns)
         i->save(*config);
 
     xr_delete(config);
@@ -121,10 +123,10 @@ manager::suns_ids_type const& manager::suns_ids() const
     m_suns_ids[0] = xr_strdup("");
 
     auto j = m_suns_ids.begin() + 1;
-    for (const auto &i : m_suns)
+    for (const auto& i : m_suns)
         *j++ = xr_strdup(i->id().c_str());
 
-    std::sort(m_suns_ids.begin(), m_suns_ids.end(), logical_string_predicate());
+    std::sort(m_suns_ids.begin(), m_suns_ids.end(), detail::logical_string_predicate());
 
     return (m_suns_ids);
 }
@@ -144,4 +146,4 @@ CLensFlareDescriptor* manager::get_flare(shared_str const& id) const
     // return ((*found)->);
     return (0);
 }
-
+} // namespace editor::environment::suns

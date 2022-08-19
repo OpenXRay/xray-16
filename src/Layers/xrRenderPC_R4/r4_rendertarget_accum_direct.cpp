@@ -5,6 +5,8 @@
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
+namespace accum_direct
+{
 static Fvector3 corners[8] =
 {
     { -1, -1, 0.7f }, { -1, -1, +1   },
@@ -30,6 +32,7 @@ static u16 facetable[16][3] =
     { 1, 4, 6 },
     { 2, 4, 1 },
 };
+} // namespace accum_direct
 
 void CRenderTarget::accum_direct(u32 sub_phase)
 {
@@ -560,13 +563,13 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // Fill vertex buffer
         u32 i_offset;
         {
-            u16* pib = RCache.Index.Lock(sizeof(facetable) / sizeof(u16), i_offset);
-            CopyMemory(pib, &facetable, sizeof(facetable));
-            RCache.Index.Unlock(sizeof(facetable) / sizeof(u16));
+            u16* pib = RCache.Index.Lock(sizeof(accum_direct::facetable) / sizeof(u16), i_offset);
+            CopyMemory(pib, &accum_direct::facetable, sizeof(accum_direct::facetable));
+            RCache.Index.Unlock(sizeof(accum_direct::facetable) / sizeof(u16));
 
             // corners
 
-            u32 ver_count = sizeof(corners) / sizeof(Fvector3);
+            u32 ver_count = sizeof(accum_direct::corners) / sizeof(Fvector3);
             Fvector4* pv = (Fvector4*)RCache.Vertex.Lock(ver_count, g_combine_cuboid.stride(), Offset);
 
             Fmatrix inv_XDcombine;
@@ -578,7 +581,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             for (u32 i = 0; i < ver_count; ++i)
             {
                 Fvector3 tmp_vec;
-                inv_XDcombine.transform(tmp_vec, corners[i]);
+                inv_XDcombine.transform(tmp_vec, accum_direct::corners[i]);
                 pv->set(tmp_vec.x, tmp_vec.y, tmp_vec.z, 1);
                 pv++;
             }

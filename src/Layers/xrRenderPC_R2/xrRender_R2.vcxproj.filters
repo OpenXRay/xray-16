@@ -636,6 +636,9 @@
     <ClInclude Include="..\xrRender_R2\r2.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1132,6 +1135,12 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

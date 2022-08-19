@@ -3,6 +3,7 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <EnableUnitySupport Condition="'$(GITHUB_ACTIONS)'!=''">true</EnableUnitySupport>
   </PropertyGroup>
 
   <PropertyGroup Label="Globals">

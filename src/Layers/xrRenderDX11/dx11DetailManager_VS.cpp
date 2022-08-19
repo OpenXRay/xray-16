@@ -4,27 +4,11 @@
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
 
-const int quant = 16384;
-const int c_hdr = 10;
-const int c_size = 4;
-
-static D3DVERTEXELEMENT9 dwDecl[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
-    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
-    D3DDECL_END()};
-
-#pragma pack(push, 1)
-struct vertHW
+namespace detail_manager
 {
-    float x, y, z;
-    short u, v, t, mid;
-};
-#pragma pack(pop)
-
-short QC(float v);
-//{
-//	int t=iFloor(v*float(quant)); clamp(t,-32768,32767);
-//	return short(t&0xffff);
-//}
+extern const int quant;
+//extern const int c_hdr;
+}
 
 void CDetailManager::hw_Load_Shaders()
 {
@@ -44,6 +28,8 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render()
 {
+    using namespace detail_manager;
+
     // Render-prepare
     //	Update timer
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!

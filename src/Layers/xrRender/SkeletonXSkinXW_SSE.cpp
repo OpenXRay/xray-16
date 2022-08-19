@@ -1,17 +1,9 @@
 #include "stdafx.h"
-#include "SkinXW_SSE.hpp"
-#ifdef _EDITOR
-#include "SkeletonX.h"
-#include "SkeletonCustom.h"
-#else
-#include "Animation/Bone.hpp"
-#include "Layers/xrRender/SkeletonXVertRender.h"
-#endif
 
-namespace XRay
-{
-namespace Math
-{
+#include "xrCore/Animation/Bone.hpp"
+#include "SkeletonXVertRender.h"
+#include "SkeletonXSkinXW.h"
+
 #if defined(XR_PLATFORM_WINDOWS) && defined(XR_ARCHITECTURE_X86)
 #define transform_dir(idx, res, SX, SY, SZ, T1) \
     \
@@ -84,7 +76,7 @@ __asm shufps SW2,                       \
 __asm shufps SW3,                       \
         SW3, _MM_SHUFFLE(1, 0, 0, 0)
 
-void Skin4W_SSE(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
+void Skin4W(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 {
     __m128 P0, P1, P2, P3;
     DWORD One;
@@ -180,7 +172,7 @@ __asm shufps SW1,                  \
 __asm shufps SW2,                  \
         SW2, _MM_SHUFFLE(1, 0, 0, 0)
 
-void Skin3W_SSE(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
+void Skin3W(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 {
     __m128 P0, P1;
     DWORD One;
@@ -282,7 +274,7 @@ transform_dir2(idx, res, SX, SY, SZ, T1) \
 __asm addps res,                                  \
         XMMWORD PTR[edx][eax][112]
 
-void Skin2W_SSE(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
+void Skin2W(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
 {
     __asm {
         // ------------------------------------------------------------------
@@ -340,7 +332,7 @@ void Skin2W_SSE(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
     }
 }
 
-void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
+void Skin1W(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
 {
     __asm {
         // ------------------------------------------------------------------
@@ -409,6 +401,13 @@ void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
     }
 }
+
+#undef transform_dir
+#undef transform_tiny
+#undef shuffle_vec
+#undef shuffle_sw4
+#undef shuffle_sw3
+#undef transform_dir2
+#undef transform_tiny2
+
 #endif
-} // namespace Math
-} // namespace XRay

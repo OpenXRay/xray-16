@@ -26,8 +26,11 @@
 
 extern u32 get_rank(const shared_str& section);
 
-static const int MAX_AMMO_ATTACH_COUNT = 1;
-static const int enough_ammo_box_count = 1;
+namespace detail::stalker
+{
+static constexpr int MAX_AMMO_ATTACH_COUNT = 1;
+static constexpr int ENOUGH_AMMO_BOX_COUNT = 1;
+}
 
 IC bool CAI_Stalker::CTradeItem::operator<(const CTradeItem& trade_item) const
 {
@@ -116,7 +119,7 @@ void CAI_Stalker::attach_available_ammo(CWeapon* weapon)
         buy_item_virtual(*I);
 
         ++count;
-        if (count >= MAX_AMMO_ATTACH_COUNT)
+        if (count >= ::detail::stalker::MAX_AMMO_ATTACH_COUNT)
             break;
     }
 }
@@ -317,7 +320,7 @@ bool CAI_Stalker::enough_ammo(const CWeapon* new_weapon) const
             continue;
 
         ++ammo_box_count;
-        if (ammo_box_count >= enough_ammo_box_count)
+        if (ammo_box_count >= ::detail::stalker::ENOUGH_AMMO_BOX_COUNT)
             return (true);
     }
 

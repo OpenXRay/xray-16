@@ -97,7 +97,6 @@ void CSE_ALifeInventoryItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
     State.position = base()->o_Position;
 }
 
-static inline bool check(const u8& mask, const u8& test) { return (!!(mask & test)); }
 const u32 CSE_ALifeInventoryItem::m_freeze_delta_time = 1000;
 const u32 CSE_ALifeInventoryItem::random_limit = 120;
 
@@ -151,7 +150,7 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
 
     tNetPacket.w_u8(num_items.common);
 
-    /*if(check(num_items.mask,animated))
+    /*if(check_mask(num_items.mask,animated))
     {
         tNetPacket.w_float				(m_blend_timeCurrent);
     }*/
@@ -167,14 +166,14 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
         tNetPacket.w_float(State.quaternion.z);
         tNetPacket.w_float(State.quaternion.w);
 
-        if (!check(num_items.mask, inventory_item_angular_null))
+        if (!check_mask(num_items.mask, inventory_item_angular_null))
         {
             tNetPacket.w_float(State.angular_vel.x);
             tNetPacket.w_float(State.angular_vel.y);
             tNetPacket.w_float(State.angular_vel.z);
         }
 
-        if (!check(num_items.mask, inventory_item_linear_null))
+        if (!check_mask(num_items.mask, inventory_item_linear_null))
         {
             tNetPacket.w_float(State.linear_vel.x);
             tNetPacket.w_float(State.linear_vel.y);
@@ -199,7 +198,7 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
 
     R_ASSERT2(m_u8NumItems < (u8(1) << 5), make_string("%d", m_u8NumItems));
 
-    /*if (check(num_items.mask,animated))
+    /*if (check_mask(num_items.mask,animated))
     {
         tNetPacket.r_float(m_blend_timeCurrent);
         anim_use=true;
@@ -240,9 +239,9 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
             tNetPacket.r_float_q8(State.quaternion.w, 0.f, 1.f);
         }
 
-        State.enabled = check(num_items.mask, inventory_item_state_enabled);
+        State.enabled = check_mask(num_items.mask, inventory_item_state_enabled);
 
-        if (!check(num_items.mask, inventory_item_angular_null))
+        if (!check_mask(num_items.mask, inventory_item_angular_null))
         {
             if (m_wVersion >= 122) // Xottab_DUTY: not sure, 121 or even 119 may be correct too
             {
@@ -260,7 +259,7 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
         else
             State.angular_vel.set(0.f, 0.f, 0.f);
 
-        if (!check(num_items.mask, inventory_item_linear_null))
+        if (!check_mask(num_items.mask, inventory_item_linear_null))
         {
             if (m_wVersion >= 122) // Xottab_DUTY: not sure, 121 or even 119 may be correct too
             {
@@ -278,7 +277,7 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
         else
             State.linear_vel.set(0.f, 0.f, 0.f);
 
-        /*if (check(num_items.mask,animated))
+        /*if (check_mask(num_items.mask,animated))
         {
             anim_use=true;
         }*/

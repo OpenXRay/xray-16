@@ -22,21 +22,25 @@
 
 #include "ai/monsters/poltergeist/poltergeist.h"
 
-u32 C_ON_ENEMY = color_rgba(0xff, 0, 0, 0x80);
-u32 C_ON_NEUTRAL = color_rgba(0xff, 0xff, 0x80, 0x80);
-u32 C_ON_FRIEND = color_rgba(0, 0xff, 0, 0x80);
+namespace detail::hud_target
+{
+static constexpr auto C_DEFAULT = color_rgba(0xff, 0xff, 0xff, 0x80);
+static constexpr auto C_SIZE = 0.025f;
+static constexpr auto NEAR_LIM = 0.5f;
 
-#define C_DEFAULT color_rgba(0xff, 0xff, 0xff, 0x80)
-#define C_SIZE 0.025f
-#define NEAR_LIM 0.5f
+static constexpr auto SHOW_INFO_SPEED = 0.5f;
+static constexpr auto HIDE_INFO_SPEED = 10.f;
 
-#define SHOW_INFO_SPEED 0.5f
-#define HIDE_INFO_SPEED 10.f
+static constexpr float recon_mindist = 2.f;
+static constexpr float recon_maxdist = 50.f;
+static constexpr float recon_minspeed = 0.5f;
+static constexpr float recon_maxspeed = 10.f;
 
-IC float recon_mindist() { return 2.f; }
-IC float recon_maxdist() { return 50.f; }
-IC float recon_minspeed() { return 0.5f; }
-IC float recon_maxspeed() { return 10.f; }
+static constexpr u32 C_ON_ENEMY   = color_rgba(0xff, 0, 0, 0x80);
+static constexpr u32 C_ON_NEUTRAL = color_rgba(0xff, 0xff, 0x80, 0x80);
+static constexpr u32 C_ON_FRIEND  = color_rgba(0, 0xff, 0, 0x80);
+}
+
 CHUDTarget::CHUDTarget()
 {
     fuzzyShowInfo = 0.f;
@@ -105,13 +109,15 @@ void CHUDTarget::CursorOnFrame()
         PP.pass = 0;
 
         if (Level().ObjectSpace.RayQuery(RQR, RD, pick_trace_callback, &PP, NULL, Level().CurrentEntity()))
-            clamp(PP.RQ.range, NEAR_LIM, PP.RQ.range);
+            clamp(PP.RQ.range, ::detail::hud_target::NEAR_LIM, PP.RQ.range);
     }
 }
 
 extern ENGINE_API bool g_bRendering;
 void CHUDTarget::Render()
 {
+    using namespace ::detail::hud_target;
+
     BOOL b_do_rendering = (psHUD_Flags.is(HUD_CROSSHAIR | HUD_CROSSHAIR_RT | HUD_CROSSHAIR_RT2));
 
     if (!b_do_rendering)
@@ -212,16 +218,16 @@ void CHUDTarget::Render()
                             else
                                 C = C_ON_FRIEND;
                         };
-                        if (PP.RQ.range >= recon_mindist() && PP.RQ.range <= recon_maxdist())
+                        if (PP.RQ.range >= recon_mindist && PP.RQ.range <= recon_maxdist)
                         {
-                            float ddist = (PP.RQ.range - recon_mindist()) / (recon_maxdist() - recon_mindist());
-                            float dspeed = recon_minspeed() + (recon_maxspeed() - recon_minspeed()) * ddist;
+                            const float ddist = (PP.RQ.range - recon_mindist) / (recon_maxdist - recon_mindist);
+                            const float dspeed = recon_minspeed + (recon_maxspeed - recon_minspeed) * ddist;
                             fuzzyShowInfo += Device.fTimeDelta / dspeed;
                         }
                         else
                         {
-                            if (PP.RQ.range < recon_mindist())
-                                fuzzyShowInfo += recon_minspeed() * Device.fTimeDelta;
+                            if (PP.RQ.range < recon_mindist)
+                                fuzzyShowInfo += recon_minspeed * Device.fTimeDelta;
                             else
                                 fuzzyShowInfo = 0;
                         };
@@ -229,8 +235,8 @@ void CHUDTarget::Render()
                         if (fuzzyShowInfo > 0.5f)
                         {
                             clamp(fuzzyShowInfo, 0.f, 1.f);
-                            int alpha_C = iFloor(255.f * (fuzzyShowInfo - 0.5f) * 2.f);
-                            u8 alpha_b = u8(alpha_C & 0x00ff);
+                            const int alpha_C = iFloor(255.f * (fuzzyShowInfo - 0.5f) * 2.f);
+                            const u8 alpha_b = u8(alpha_C & 0x00ff);
                             F->SetColor(subst_alpha(C, alpha_b));
                             F->OutNext("%s", *PP.RQ.O->cName());
                         }

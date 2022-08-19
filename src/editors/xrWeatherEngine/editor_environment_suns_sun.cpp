@@ -15,15 +15,11 @@
 #include "editor_environment_detail.hpp"
 #include "editor_environment_suns_manager.hpp"
 
-using editor::environment::suns::sun;
-using editor::environment::suns::flare;
-using editor::environment::suns::manager;
-
-sun::sun(manager const& manager, shared_str const& id)
-    : m_manager(manager), m_id(id), m_use(false), m_ignore_color(false), m_radius(0.f), m_shader(""), m_texture(""),
-      m_property_holder(0)
+namespace editor::environment::suns
 {
-}
+sun::sun(manager const& manager, shared_str const& id)
+    : m_id(id), m_shader(""), m_texture(""), m_manager(manager),
+      m_property_holder(nullptr), m_radius(0.f), m_use(false), m_ignore_color(false) {}
 
 sun::~sun()
 {
@@ -96,3 +92,4 @@ void sun::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 XRay::Editor::property_holder_base* sun::object() { return (m_property_holder); }
+} // namespace editor::environment::suns

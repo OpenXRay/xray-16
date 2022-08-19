@@ -4,8 +4,12 @@
 #include "Level.h"
 #include "Actor.h"
 #include "xrPhysics/IColisiondamageInfo.h"
-CPolterTele::CPolterTele(CPoltergeist* polter) : inherited(polter), m_pmt_object_collision_damage(0.5f) {}
+
+CPolterTele::CPolterTele(CPoltergeist* polter)
+    : inherited(polter), m_pmt_object_collision_damage(0.5f) {}
+
 CPolterTele::~CPolterTele() {}
+
 void CPolterTele::load(LPCSTR section)
 {
     inherited::load(section);
@@ -108,12 +112,15 @@ void CPolterTele::update_schedule()
 //////////////////////////////////////////////////////////////////////////
 // Выбор подходящих объектов для телекинеза
 //////////////////////////////////////////////////////////////////////////
+namespace detail::poltergeist_telekinesis
+{
+/*
 class best_object_predicate
 {
     Fvector enemy_pos;
     Fvector monster_pos;
 
-public:
+    public:
     best_object_predicate(const Fvector& m_pos, const Fvector& pos)
     {
         monster_pos = m_pos;
@@ -122,13 +129,14 @@ public:
 
     bool operator()(const CGameObject* tpObject1, const CGameObject* tpObject2) const
     {
-        float dist1 = monster_pos.distance_to(tpObject1->Position());
-        float dist2 = enemy_pos.distance_to(tpObject2->Position());
-        float dist3 = enemy_pos.distance_to(monster_pos);
+        const float dist1 = monster_pos.distance_to(tpObject1->Position());
+        const float dist2 = enemy_pos.distance_to(tpObject2->Position());
+        const float dist3 = enemy_pos.distance_to(monster_pos);
 
         return ((dist1 < dist3) && (dist2 > dist3));
-    };
+    }
 };
+*/
 
 class best_object_predicate2
 {
@@ -146,12 +154,13 @@ public:
 
     bool operator()(const CObject_ptr& tpObject1, const CObject_ptr& tpObject2) const
     {
-        float dist1 = enemy_pos.distance_to(tpObject1->Position());
-        float dist2 = enemy_pos.distance_to(tpObject2->Position());
+        const float dist1 = enemy_pos.distance_to(tpObject1->Position());
+        const float dist2 = enemy_pos.distance_to(tpObject2->Position());
 
         return (dist1 < dist2);
-    };
+    }
 };
+} // namespace detail::poltergeist_telekinesis
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -227,8 +236,9 @@ bool CPolterTele::tele_raise_objects()
     tele_find_objects(tele_objects, pos);
 
     // сортировать и оставить только необходимое количество объектов
-    std::sort(
-        tele_objects.begin(), tele_objects.end(), best_object_predicate2(m_object->Position(), Actor()->Position()));
+    std::sort(tele_objects.begin(), tele_objects.end(),
+        ::detail::poltergeist_telekinesis::best_object_predicate2(m_object->Position(), Actor()->Position())
+    );
 
     // оставить уникальные объекты
     tele_objects.erase(std::unique(tele_objects.begin(), tele_objects.end()), tele_objects.end());
@@ -263,6 +273,7 @@ bool CPolterTele::tele_raise_objects()
 
     return false;
 }
+
 struct SCollisionHitCallback : public ICollisionHitCallback
 
 {

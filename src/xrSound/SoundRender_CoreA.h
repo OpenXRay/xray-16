@@ -1,10 +1,15 @@
 #pragma once
 
 #include "SoundRender_Core.h"
-#include "OpenALDeviceList.h"
+
+#include "openal/al.h"
+#include "openal/alc.h"
+
 #if defined(XR_PLATFORM_WINDOWS)
+#define OPENAL
 #include <eax/eax.h>
 #endif
+
 #ifdef DEBUG
 #define A_CHK(expr)                                                \
     {                                                              \
@@ -30,6 +35,8 @@
         expr;        \
     }
 #endif
+
+class ALDeviceList;
 
 class CSoundRender_CoreA : public CSoundRender_Core
 {
