@@ -102,6 +102,7 @@ target_compile_definitions(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     POSITION_INDEPENDENT_CODE ON
+    UNITY_BUILD OFF
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY

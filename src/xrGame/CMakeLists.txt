@@ -2543,9 +2543,7 @@ set(SRC_FILES
     "../xrServerEntities/object_item_single_inline.h"
     "../xrServerEntities/pch_script.cpp"
     "../xrServerEntities/pch_script.h"
-    "../xrServerEntities/PHNetState.cpp"
     "../xrServerEntities/PHNetState.h"
-    "../xrServerEntities/PHSynchronize.cpp"
     "../xrServerEntities/PHSynchronize.h"
     "../xrServerEntities/PropertiesListHelper.h"
     "../xrServerEntities/PropertiesListTypes.h"
@@ -2673,11 +2671,13 @@ endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
+    UNITY_BUILD_BATCH_SIZE 50
 )
 
 target_precompile_headers(${PROJECT_NAME}
     PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:StdAfx.h>"
+    "$<$<COMPILE_LANGUAGE:CXX>:pch_script.h>"
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY

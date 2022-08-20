@@ -67,7 +67,6 @@
     <ClInclude Include="..\xrServerEntities\object_item_single.h" />
     <ClInclude Include="..\xrServerEntities\object_item_single_inline.h" />
     <ClInclude Include="..\xrServerEntities\pch_script.h" />
-    <ClInclude Include="..\xrServerEntities\PHNetState.h" />
     <ClInclude Include="..\xrServerEntities\PropertiesListTypes.h" />
     <ClInclude Include="..\xrServerEntities\restriction_space.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file.h" />
@@ -1483,9 +1482,6 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\PHNetState.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_fcolor_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>

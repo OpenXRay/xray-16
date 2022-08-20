@@ -593,6 +593,7 @@ target_link_options(${LIB_NAME}
 
 set_target_properties(${LIB_NAME} PROPERTIES
 	PREFIX ""
+    UNITY_BUILD OFF
 )
 
 install(TARGETS ${LIB_NAME} LIBRARY
