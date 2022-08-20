@@ -71,4 +71,4 @@ void game_GameState_script_register(lua_State* luaState)
             .def("StartTime", &game_GameState::StartTime)
     ];
 }
-SCRIPT_EXPORT_FUNC(game_GameState, (), game_GameState_script_register);
+SCRIPT_EXPORT_FUNC(game_GameState, (IFactoryObject), game_GameState_script_register);
