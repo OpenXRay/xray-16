@@ -2673,6 +2673,7 @@ endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
+    UNITY_BUILD_BATCH_SIZE 50
 )
 
 target_precompile_headers(${PROJECT_NAME}

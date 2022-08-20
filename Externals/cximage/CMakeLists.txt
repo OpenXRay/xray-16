@@ -51,6 +51,11 @@ target_compile_definitions(${PROJECT_NAME}
     -DCXIMAGE_BUILD
 )
 
+# XXX: Clang-9 internal error in function GetPixelColorInterpolated during optimization
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION MATCHES "9.0.0")
+    set_property(SOURCE "ximaint.cpp" PROPERTY SKIP_UNITY_BUILD_INCLUSION TRUE)
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
     POSITION_INDEPENDENT_CODE ON

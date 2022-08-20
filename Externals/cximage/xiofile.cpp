@@ -18,3 +18,7 @@ bool CxIOFile::Open(LPCTSTR filename, LPCTSTR mode)
 
     return true;
 }
+
+#if !defined(WIN32) && !defined(_WIN32_WCE)
+#undef _tfopen
+#endif

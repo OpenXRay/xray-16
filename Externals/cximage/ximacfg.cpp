@@ -17,3 +17,5 @@ void*	cxrealloc(void* ptr, size_t size)
 {
 	return xr_realloc(ptr, size);
 }
+
+#undef XRCORE_API
