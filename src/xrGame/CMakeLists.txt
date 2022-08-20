@@ -2678,6 +2678,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_precompile_headers(${PROJECT_NAME}
     PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:StdAfx.h>"
+    "$<$<COMPILE_LANGUAGE:CXX>:pch_script.h>"
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
