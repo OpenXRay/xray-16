@@ -6228,9 +6228,6 @@
     <ClInclude Include="ui\UIGameTutorial.h">
       <Filter>UI\Tutorial</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\PHNetState.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="PHShellCreator.h">
       <Filter>Physics</Filter>
     </ClInclude>
@@ -9601,9 +9598,6 @@
     </ClCompile>
     <ClCompile Include="ui\UIGameTutorialVideoItem.cpp">
       <Filter>UI\Tutorial</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\PHNetState.cpp">
-      <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="PHShellCreator.cpp">
       <Filter>Physics</Filter>

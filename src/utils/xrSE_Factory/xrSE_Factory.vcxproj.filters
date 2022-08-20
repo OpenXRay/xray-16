@@ -482,9 +482,6 @@
     <ClCompile Include="..\..\xrServerEntities\PHNetState.cpp">
       <Filter>ServerStuff\Common\PhysicsStuff</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\PHSynchronize.cpp">
-      <Filter>ServerStuff\Common\PhysicsStuff</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\character_info.cpp">
       <Filter>ServerStuff\Common\ServerStuff</Filter>
     </ClCompile>
