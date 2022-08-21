@@ -12,10 +12,10 @@
 #include "level_changer.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 IC static void CActor_Export(lua_State* luaState)
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CActor, CGameObject>("CActor")

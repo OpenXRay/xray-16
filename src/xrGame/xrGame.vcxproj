@@ -2206,7 +2206,10 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="EntityCondition_script.cpp" />
+    <ClCompile Include="EntityCondition_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
     <ClCompile Include="EntityCondition.cpp" />
     <ClCompile Include="entity_alive.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>

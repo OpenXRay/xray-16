@@ -1,12 +1,12 @@
-#include "StdAfx.h"
 #include "pch_script.h"
 #include "ActorCondition.h"
 #include "Wound.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CEntityCondition, (),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(CEntityCondition, (), {
     module(luaState)
     [
         class_<CEntityCondition>("CEntityCondition")
@@ -55,7 +55,10 @@ SCRIPT_EXPORT(CEntityCondition, (), {
     ];
 });
 
-SCRIPT_EXPORT(CActorCondition, (CEntityCondition), {
+SCRIPT_EXPORT(CActorCondition, (CEntityCondition),
+{
+    using namespace luabind;
+
     module(luaState)
     [
 		class_<SBooster>("SBooster")
