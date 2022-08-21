@@ -136,7 +136,7 @@ public:
 
 public:
     using inherited = CSE_Abstract;
-    GameGraph::_GRAPH_ID m_tGraphID;
+    GameGraph::_GRAPH_ID m_tGraphID; // game_vertex_id
     float m_fDistance;
     bool m_bOnline;
     bool m_bDirectControl;

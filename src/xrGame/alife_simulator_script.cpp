@@ -403,6 +403,15 @@ void IterateInfo(const CALifeSimulator* alife, const ALife::_OBJECT_ID& id, cons
         functor(id, it.info_id);
 }
 
+void set_start_position(Fvector& pos)
+{
+    g_start_position = pos;
+}
+void set_start_game_vertex_id(int id)
+{
+    g_start_game_vertex_id = id;
+}
+
 SCRIPT_EXPORT(CALifeSimulator, (),
 {
     module(luaState)
@@ -461,7 +470,9 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("set_process_time", &set_process_time)
 			.def("get_children", &get_children, return_stl_iterator()),
 
-        def("alife", &alife)
+        def("alife", &alife),
+        def("set_start_position", &set_start_position),
+        def("set_start_game_vertex_id", &set_start_game_vertex_id)
     ];
     class CALifeSimulatorExporter1
     {
