@@ -493,6 +493,7 @@ set(SRC_FILES
     "entity_alive_inline.h"
     "EntityCondition.cpp"
     "EntityCondition.h"
+    "EntityCondition_script.cpp"
     "Entity.cpp"
     "Entity.h"
     "event_conditions_collection.cpp"
