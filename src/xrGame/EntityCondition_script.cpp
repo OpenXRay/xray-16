@@ -61,11 +61,11 @@ SCRIPT_EXPORT(CActorCondition, (CEntityCondition),
 
     module(luaState)
     [
-		class_<SBooster>("SBooster")
-			.def(constructor<>())
-			.def_readwrite("fBoostTime", &SBooster::fBoostTime)
-			.def_readwrite("fBoostValue", &SBooster::fBoostValue)
-			.def_readwrite("m_type", &SBooster::m_type),
+        class_<SBooster>("SBooster")
+            .def(constructor<>())
+            .def_readwrite("fBoostTime", &SBooster::fBoostTime)
+            .def_readwrite("fBoostValue", &SBooster::fBoostValue)
+            .def_readwrite("m_type", &SBooster::m_type),
         class_<CWound>("CWound")
             .def("TypeSize", &CWound::TypeSize)
             .def("BloodSize", &CWound::BloodSize)
