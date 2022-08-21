@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: alife_simulator_script.cpp
-//	Created 	: 25.12.2002
-//  Modified 	: 13.05.2004
-//	Author		: Dmitriy Iassenev
-//	Description : ALife Simulator script export
+//  Module      : alife_simulator_script.cpp
+//  Created     : 25.12.2002
+//  Modified    : 13.05.2004
+//  Author      : Dmitriy Iassenev
+//  Description : ALife Simulator script export
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
@@ -424,7 +424,7 @@ SCRIPT_EXPORT(CALifeSimulator, (),
                 (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
             .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
                                alife_object))
-	        .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, pcstr))(alife_object))
+            .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, pcstr))(alife_object))
             .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(
                                      alife_story_object))
             .def("set_switch_online",
@@ -468,7 +468,7 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("register", &reprocess_spawn)
             .def("set_objects_per_update", &set_objects_per_update)
             .def("set_process_time", &set_process_time)
-			.def("get_children", &get_children, return_stl_iterator()),
+            .def("get_children", &get_children, return_stl_iterator()),
 
         def("alife", &alife),
         def("set_start_position", &set_start_position),
