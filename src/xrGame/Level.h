@@ -71,6 +71,7 @@ public:
         CStatTimer Vis; // visibility detection - total
         CStatTimer VisQuery; // visibility detection - portal traversal and frustum culling
         CStatTimer VisRayTests; // visibility detection - ray casting
+        CStatTimer LuaGC; // LuaJIT Garbage collector
 
         AIStatistics() { FrameStart(); }
         void FrameStart()
@@ -82,6 +83,7 @@ public:
             Vis.FrameStart();
             VisQuery.FrameStart();
             VisRayTests.FrameStart();
+            LuaGC.FrameStart();
         }
 
         void FrameEnd()
@@ -93,6 +95,7 @@ public:
             Vis.FrameEnd();
             VisQuery.FrameEnd();
             VisRayTests.FrameEnd();
+            LuaGC.FrameEnd();
         }
     };
     AIStatistics AIStats;
