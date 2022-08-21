@@ -6,6 +6,11 @@
 template <typename _Object>
 class CStateMonsterRestFun : public CState<_Object>
 {
+    static constexpr float IMPULSE_TO_CORPSE = 15.f;
+    static constexpr u32 MIN_DELAY = 100;
+    static constexpr u32 TIME_IN_STATE = 8000;
+
+private:
     typedef CState<_Object> inherited;
 
     u32 time_last_hit;

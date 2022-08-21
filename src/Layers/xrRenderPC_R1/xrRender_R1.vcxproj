@@ -24,6 +24,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R1_EXPORTS;USE_DX9;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions Condition="'$(GITHUB_ACTIONS)'!=''">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -154,6 +155,7 @@
     <ClInclude Include="..\xrRender\SkeletonAnimated.h" />
     <ClInclude Include="..\xrRender\SkeletonCustom.h" />
     <ClInclude Include="..\xrRender\SkeletonX.h" />
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h" />
     <ClInclude Include="..\xrRender\SkeletonXVertRender.h" />
     <ClInclude Include="..\xrRender\stats_manager.h" />
     <ClInclude Include="..\xrRender\TextureDescrManager.h" />
@@ -283,6 +285,8 @@
     <ClCompile Include="..\xrRender\SkeletonCustom.cpp" />
     <ClCompile Include="..\xrRender\SkeletonRigid.cpp" />
     <ClCompile Include="..\xrRender\SkeletonX.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
     <ClCompile Include="..\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\xrRender\Texture.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />

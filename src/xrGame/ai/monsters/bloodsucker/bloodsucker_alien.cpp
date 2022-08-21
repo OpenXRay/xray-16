@@ -68,8 +68,19 @@ void CAlienEffectorPP::Destroy()
 // Alien Camera Effector
 //////////////////////////////////////////////////////////////////////////
 
-class CAlienEffector : public CEffectorCam
+class CAlienEffector final : public CEffectorCam
 {
+    static constexpr float DELTA_ANGLE_X = 10.f * PI / 180;
+    static constexpr float DELTA_ANGLE_Y = 10.f * PI / 180;
+    static constexpr float DELTA_ANGLE_Z = 10.f * PI / 180.f;
+    static constexpr float ANGLE_SPEED = 0.2f;
+
+    static constexpr float MIN_FOV = 70.f;
+    static constexpr float MAX_FOV = 175.f;
+    static constexpr float FOV_SPEED = 80.f;
+    static constexpr float MAX_CAMERA_DIST = 3.5f;
+
+private:
     typedef CEffectorCam inherited;
 
     float m_time_total;
@@ -87,15 +98,6 @@ public:
     virtual bool ProcessCam(SCamEffectorInfo& info);
 };
 
-#define DELTA_ANGLE_X 10 * PI / 180
-#define DELTA_ANGLE_Y 10 * PI / 180
-#define DELTA_ANGLE_Z 10 * PI / 180
-#define ANGLE_SPEED 0.2f
-
-#define MIN_FOV 70.f
-#define MAX_FOV 175.f
-#define FOV_SPEED 80.f
-#define MAX_CAMERA_DIST 3.5f
 
 CAlienEffector::CAlienEffector(ECamEffectorType type, CAI_Bloodsucker* obj) : inherited(type, flt_max)
 {

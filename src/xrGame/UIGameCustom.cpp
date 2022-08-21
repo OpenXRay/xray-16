@@ -39,14 +39,24 @@ CUIGameCustom::CUIGameCustom()
     m_pMessagesWnd = nullptr;
     ShowGameIndicators(true);
     ShowCrosshair(true);
+
+    InventoryUtilities::CreateShaders();
 }
 
 bool g_b_ClearGameCaptions = false;
 
 CUIGameCustom::~CUIGameCustom()
 {
+    InventoryUtilities::DestroyShaders();
+
     delete_data(CustomStatics);
     g_b_ClearGameCaptions = false;
+}
+
+void CUIGameCustom::OnUIReset()
+{
+    InventoryUtilities::DestroyShaders();
+    InventoryUtilities::CreateShaders();
 }
 
 void CUIGameCustom::OnFrame()

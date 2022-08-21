@@ -35,4 +35,6 @@ enum ERestrictorTypes : u32
     eRestrictorTypeIn = u8(4),
     eRestrictorTypeOut = u8(5),
 };
+
+static constexpr u32 TIME_TO_REMOVE_GARBAGE = 300000;
 } // namespace RestrictionSpace

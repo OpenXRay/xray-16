@@ -1,5 +1,7 @@
 #include "stdafx.h"
+
 #include "dxFontRender.h"
+
 #include "xrEngine/GameFont.h"
 #include "xrCore/Text/StringConversion.hpp"
 
@@ -7,7 +9,6 @@ dxFontRender::~dxFontRender()
 {
     pShader.destroy();
     pGeom.destroy();
-
 }
 
 void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
@@ -18,22 +19,19 @@ void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
 
 extern ENGINE_API bool g_bRendering;
 extern ENGINE_API Fvector2 g_current_font_scale;
+
 void dxFontRender::OnRender(CGameFont& owner)
 {
     VERIFY(g_bRendering);
-
-    if (owner.strings.size() == 0)
-    {
-        // early exit if there is no text to render
-        return;
-    }
-
     if (pShader)
         RCache.set_Shader(pShader);
 
     if (!(owner.uFlags & CGameFont::fsValid))
     {
-        CTexture* T = RCache.get_ActiveTexture(0);
+        R_ASSERT(pShader);
+        R_constant* C = RCache.get_c(RImplementation.c_sbase)._get(); // get sampler
+        CTexture* T = RCache.get_ActiveTexture(C ? C->samp.index : 0);
+        R_ASSERT(T);
         owner.vTS.set((int)T->get_Width(), (int)T->get_Height());
         owner.fTCHeight = owner.fHeight / float(owner.vTS.y);
         owner.uFlags |= CGameFont::fsValid;
@@ -44,11 +42,15 @@ void dxFontRender::OnRender(CGameFont& owner)
         // calculate first-fit
         int count = 1;
 
-        int length = owner.smart_strlen(owner.strings[i].string);
+        u32 length = owner.smart_strlen(owner.strings[i].string);
+        auto [actionsCount, actionsLength] = owner.get_actions_text_length(owner.strings[i].string);
+        length += actionsLength - actionsCount * 2;
 
         while ((i + count) < owner.strings.size())
         {
-            int L = owner.smart_strlen(owner.strings[i + count].string);
+            u32 L = owner.smart_strlen(owner.strings[i + count].string);
+            auto [aC, aL] = owner.get_actions_text_length(owner.strings[i].string);
+            L += aL - aC * 2;
 
             if ((L + length) < MAX_MB_CHARS)
             {
@@ -69,7 +71,7 @@ void dxFontRender::OnRender(CGameFont& owner)
         for (; i < last; i++)
         {
             CGameFont::String& PS = owner.strings[i];
-            wchar_t wsStr[MAX_MB_CHARS];
+            xr_wide_char wsStr[MAX_MB_CHARS];
 
             int len = owner.IsMultibyte() ? mbhMulti2Wide(wsStr, nullptr, MAX_MB_CHARS, PS.string) : xr_strlen(PS.string);
 
@@ -107,44 +109,58 @@ void dxFontRender::OnRender(CGameFont& owner)
                 Y2 -= 0.5f;
 #endif // !USE_DX9
 
-                float tu, tv;
                 for (int j = 0; j < len; j++)
                 {
-                    Fvector l;
-
-                    l = owner.IsMultibyte() ? owner.GetCharTC(wsStr[1 + j]) : owner.GetCharTC((u16)(u8)PS.string[j]);
-
-                    float scw = l.z * g_current_font_scale.x;
-
-                    float fTCWidth = l.z / owner.vTS.x;
-
-                    if (!fis_zero(l.z))
-                    {
-                        //tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
-                        //tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
-                        tu = (l.x / owner.vTS.x);
-                        tv = (l.y / owner.vTS.y);
-#ifdef USE_DX9
-                        //  Make half pixel offset for 1 to 1 mapping
-                        tu += (0.5f / owner.vTS.x);
-                        tv += (0.5f / owner.vTS.y);
-#endif // USE_DX9
-
-                        v->set(X, Y2, clr2, tu, tv + owner.fTCHeight);
-                        v++;
-                        v->set(X, Y, clr, tu, tv);
-                        v++;
-                        v->set(X + scw, Y2, clr2, tu + fTCWidth, tv + owner.fTCHeight);
-                        v++;
-                        v->set(X + scw, Y, clr, tu + fTCWidth, tv);
-                        v++;
-                    }
-                    X += scw * owner.vInterval.x;
                     if (owner.IsMultibyte())
                     {
-                        X -= 2;
-                        if (IsNeedSpaceCharacter(wsStr[1 + j]))
-                            X += owner.fXStep;
+                        if (wsStr[1 + j] == GAME_ACTION_MARK)
+                        {
+                            static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+                            ++j;
+                            const EGameActions actionId = static_cast<EGameActions>(wsStr[1 + j]);
+
+                            cpcstr binding = GetActionBinding(actionId);
+
+                            const size_t sz = xr_strlen(binding);
+                            xr_wide_char* wideBinding = static_cast<xr_wide_char*>(xr_alloca(sz));
+                            mbhMulti2Wide(wideBinding, nullptr, sz, binding);
+                            ++wideBinding;
+
+                            while (wideBinding[0])
+                            {
+                                const Fvector l = owner.GetCharTC(wideBinding[0]);
+                                ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
+                                ++wideBinding;
+                            }
+                        }
+                        else
+                        {
+                            const Fvector l = owner.GetCharTC(wsStr[1 + j]);
+                            ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
+                        }
+                    }
+                    else
+                    {
+                        if (PS.string[j] == GAME_ACTION_MARK)
+                        {
+                            static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+                            ++j;
+                            const EGameActions actionId = static_cast<EGameActions>(PS.string[j]);
+
+                            pcstr binding = GetActionBinding(actionId);
+
+                            while (binding[0])
+                            {
+                                const Fvector l = owner.GetCharTC((u16)(u8)binding[0]);
+                                ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
+                                ++binding;
+                            }
+                        }
+                        else
+                        {
+                            const Fvector l = owner.GetCharTC((u16)(u8)PS.string[j]);
+                            ImprintChar(l, owner, v, X, Y2, clr2, Y, clr, wsStr, j);
+                        }
                     }
                 }
             }
@@ -158,5 +174,41 @@ void dxFontRender::OnRender(CGameFont& owner)
             RCache.set_Geometry(pGeom);
             RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
         }
+    }
+}
+
+inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL*& v, float& X, float Y2, u32 clr2, float Y, u32 clr, xr_wide_char* wsStr, int j)
+{
+    float scw = l.z * g_current_font_scale.x;
+
+    float fTCWidth = l.z / owner.vTS.x;
+
+    if (!fis_zero(l.z))
+    {
+        //float tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
+        //float tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
+        float tu = (l.x / owner.vTS.x);
+        float tv = (l.y / owner.vTS.y);
+#ifdef USE_DX9
+        //  Make half pixel offset for 1 to 1 mapping
+        tu += (0.5f / owner.vTS.x);
+        tv += (0.5f / owner.vTS.y);
+#endif // USE_DX9
+
+        v->set(X, Y2, clr2, tu, tv + owner.fTCHeight);
+        v++;
+        v->set(X, Y, clr, tu, tv);
+        v++;
+        v->set(X + scw, Y2, clr2, tu + fTCWidth, tv + owner.fTCHeight);
+        v++;
+        v->set(X + scw, Y, clr, tu + fTCWidth, tv);
+        v++;
+    }
+    X += scw * owner.vInterval.x;
+    if (owner.IsMultibyte())
+    {
+        X -= 2;
+        if (IsNeedSpaceCharacter(wsStr[1 + j]))
+            X += owner.fXStep;
     }
 }

@@ -101,8 +101,8 @@ void dxDebugRender::SetAmbient(u32 colour)
 #if defined(USE_DX9)
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
 #elif defined(USE_DX11) || defined(USE_OGL)
-    //	TODO: DX10: Check if need this for DX10
-    VERIFY(!"Not implemented for DX10");
+    //	TODO: DX11: Check if need this for DX11
+    VERIFY(!"Not implemented for DX11");
     UNUSED(colour);
 #else
 #   error No graphics API selected or enabled!

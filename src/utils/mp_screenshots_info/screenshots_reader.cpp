@@ -2,13 +2,6 @@
 #include "screenshots_common.h"
 #include "screenshots_reader.h"
 
-char const* ss_info_secion = "screenshot_info";
-char const* ss_player_name_key = "player_name";
-char const* ss_player_digest_key = "player_digest";
-char const* ss_admin_name_key = "admin_name";
-char const* ss_digital_sign_key = "digital_sign";
-char const* ss_creation_date = "creation_date";
-
 namespace screenshots
 {
 sign_verifyer::sign_verifyer() : xr_dsa_verifyer(p_number, q_number, g_number, public_key) {}

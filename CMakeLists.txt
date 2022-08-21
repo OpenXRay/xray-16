@@ -168,8 +168,13 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")
 endif()
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=lld")
+else()
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold")
+endif()
 
 if (USE_CRYPTOPP)
     add_definitions(-DUSE_CRYPTOPP)
@@ -208,6 +213,9 @@ if (NOT WIN32)
         find_package(Crypto++ REQUIRED)
     endif()
     find_package(JPEG)
+    if (JPEG_FOUND)
+        set(USE_CXIMAGE TRUE)
+    endif()
     find_package(Theora REQUIRED)
     find_package(Ogg REQUIRED)
     find_package(SDL REQUIRED)
@@ -241,6 +249,30 @@ include_directories(
 )
 
 add_subdirectory(Externals)
+
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS}"
+    "-Wall"
+    #"-Werror"
+    #"-Wextra"
+    #"-pedantic"
+    "-Wno-unknown-pragmas"
+    "-Wno-strict-aliasing"
+    "-Wno-class-memaccess"
+    "-Wno-parentheses"
+    "-Wno-unused-label"
+    "-Wno-switch"
+    #"-Wno-padded"
+    #"-Wno-c++98-compat"
+    #"-Wno-c++98-compat-pedantic"
+    #"-Wno-c++11-compat"
+    #"-Wno-c++11-compat-pedantic"
+    #"-Wno-c++14-compat"
+    #"-Wno-c++14-compat-pedantic"
+    #"-Wno-newline-eof"
+)
+string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
 add_subdirectory(src)
 add_subdirectory(res)
 

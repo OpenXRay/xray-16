@@ -1,4 +1,4 @@
-// glHW.cpp: implementation of the DX10 specialisation of CHW.
+// glHW.cpp: implementation of the OpenGL specialisation of CHW.
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -148,6 +148,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL shading language version: %s", ShadingVersion);
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
+    SeparateShaderObjectsSupported = GLEW_ARB_separate_shader_objects;
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
     ComputeShadersSupported = false; // XXX: Implement compute shaders support
 
@@ -174,7 +175,6 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
-    CHK_GL(glDeleteProgramPipelines(1, &pPP));
     CHK_GL(glDeleteFramebuffers(1, &pFB));
     UpdateViews();
     UpdateVSync();
@@ -231,10 +231,6 @@ int CHW::MakeContextCurrent(IRender::RenderContext context) const
 
 void CHW::UpdateViews()
 {
-    // Create the program pipeline used for rendering with shaders
-    glGenProgramPipelines(1, &pPP);
-    CHK_GL(glBindProgramPipeline(pPP));
-
     // Create the default framebuffer
     glGenFramebuffers(1, &pFB);
     CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));

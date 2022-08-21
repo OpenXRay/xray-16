@@ -1588,7 +1588,7 @@ struct CCC_DbgBullets : public CCC_Integer
 
     virtual void Execute(LPCSTR args)
     {
-        extern FvectorVec g_hit[];
+        extern xr_vector<Fvector> g_hit[];
         g_hit[0].clear();
         g_hit[1].clear();
         g_hit[2].clear();

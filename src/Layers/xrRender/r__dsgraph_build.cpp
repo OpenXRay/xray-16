@@ -32,7 +32,7 @@ ICF float CalcSSA(float& distSQ, Fvector& C, float R)
     return R / distSQ;
 }
 
-void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
+void R_dsgraph_structure::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
 {
     CRender& RI = RImplementation;
 
@@ -116,80 +116,20 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
     }
 #endif
 
-    // Create common node
-    // NOTE: Invisible elements exist only in R1
-    _MatrixItem item = { SSA, root, pVisual, xform };
-
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
-        auto& pass = *sh->passes[iPass];
-        auto& map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
+        SPass* pass = sh->passes[iPass]._get();
+        mapMatrix_T& map = mapMatrixPasses[sh->flags.iPriority / 2][iPass];
+        mapMatrixItems& matrixItems = map[pass];
 
-#if defined(USE_DX9)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Nps = Nvs[pass.ps->sh];
-#elif defined(USE_DX11)
-        auto& Nvs = map[&*pass.vs];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_OGL)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-#if defined(USE_DX9) || defined(USE_OGL)
-        auto& Ncs = Nps[pass.constants._get()];
-#elif defined(USE_DX11)
-        Nps.hs = pass.hs->sh;
-        Nps.ds = pass.ds->sh;
-
-        auto& Ncs = Nps.mapCS[pass.constants._get()];
-#else
-#   error No graphics API selected or enabled!
-#endif
-        auto& Nstate = Ncs[&*pass.state];
-        auto& Ntex = Nstate[pass.T._get()];
-        Ntex.push_back(item);
-
+        // Create common node
+        // NOTE: Invisible elements exist only in R1
+        matrixItems.emplace_back(_MatrixItem{ SSA, root, pVisual, xform });
+        
         // Need to sort for HZB efficient use
-        if (SSA > Ntex.ssa)
+        if (SSA > matrixItems.ssa)
         {
-            Ntex.ssa = SSA;
-            if (SSA > Nstate.ssa)
-            {
-                Nstate.ssa = SSA;
-                if (SSA > Ncs.ssa)
-                {
-                    Ncs.ssa = SSA;
-#if defined(USE_DX9) || defined(USE_OGL)
-                    if (SSA > Nps.ssa)
-                    {
-                        Nps.ssa = SSA;
-#elif defined(USE_DX11)
-                    if (SSA > Nps.mapCS.ssa)
-                    {
-                        Nps.mapCS.ssa = SSA;
-#else
-#   error No graphics API selected or enabled!
-#endif
-#if defined(USE_DX11) || defined(USE_OGL)
-                        if (SSA > Ngs.ssa)
-                        {
-                            Ngs.ssa = SSA;
-#endif
-                            if (SSA > Nvs.ssa)
-                            {
-                                Nvs.ssa = SSA;
-                            }
-#if defined(USE_DX11) || defined(USE_OGL)
-                        }
-#endif
-                    }
-                }
-            }
+            matrixItems.ssa = SSA;
         }
     }
 
@@ -203,7 +143,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual
 #endif
 }
 
-void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
+void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 {
     CRender& RI = RImplementation;
 
@@ -270,85 +210,18 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 
     counter_S++;
 
-    _NormalItem item = { SSA, pVisual };
-
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
-        auto& pass = *sh->passes[iPass];
-        auto& map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
+        SPass* pass = sh->passes[iPass]._get();
+        mapNormal_T& map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
+        mapNormalItems& normalItems = map[pass];
 
-#if defined(USE_DX9)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Nps = Nvs[pass.ps->sh];
-#elif defined(USE_DX11)
-        auto& Nvs = map[&*pass.vs];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#elif defined(USE_OGL)
-        auto& Nvs = map[pass.vs->sh];
-        auto& Ngs = Nvs[pass.gs->sh];
-        auto& Nps = Ngs[pass.ps->sh];
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-#if defined(USE_DX9)
-		auto& Ncs = Nps[pass.constants._get()];
-#elif defined(USE_DX11)
-        Nps.hs = pass.hs->sh;
-        Nps.ds = pass.ds->sh;
-
-        auto& Ncs = Nps.mapCS[pass.constants._get()];
-#elif defined(USE_OGL)
-        auto& Ncs = Nps[pass.constants._get()];
-#else
-#   error No graphics API selected or enabled!
-#endif
-        auto& Nstate = Ncs[&*pass.state];
-        auto& Ntex = Nstate[pass.T._get()];
-        Ntex.push_back(item);
+        normalItems.emplace_back(_NormalItem{ SSA, pVisual });
 
         // Need to sort for HZB efficient use
-        if (SSA > Ntex.ssa)
+        if (SSA > normalItems.ssa)
         {
-            Ntex.ssa = SSA;
-            if (SSA > Nstate.ssa)
-            {
-                Nstate.ssa = SSA;
-                if (SSA > Ncs.ssa)
-                {
-                    Ncs.ssa = SSA;
-#if defined(USE_DX9)
-                    if (SSA > Nps.ssa)
-                    {
-                        Nps.ssa = SSA;
-#elif defined(USE_DX11)
-                    if (SSA > Nps.mapCS.ssa)
-                    {
-                        Nps.mapCS.ssa = SSA;
-#elif defined(USE_OGL)
-                    if (SSA > Nps.ssa)
-                    {
-                        Nps.ssa = SSA;
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-#if defined(USE_DX11) || defined(USE_OGL)
-                        if (SSA > Ngs.ssa)
-                        {
-                            Ngs.ssa = SSA;
-#endif
-                            if (SSA > Nvs.ssa)
-                            {
-                                Nvs.ssa = SSA;
-                            }
-#if defined(USE_DX11) || defined(USE_OGL)
-                        }
-#endif
-                    }
-                }
-            }
+            normalItems.ssa = SSA;
         }
     }
 
@@ -363,7 +236,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void D3DXRenderBase::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
+void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
 {
     if (nullptr == pVisual)
         return;
@@ -444,7 +317,7 @@ void D3DXRenderBase::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisu
     }
 }
 
-void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
+void R_dsgraph_structure::add_leafs_Static(dxRender_Visual* pVisual)
 {
     if (!RImplementation.HOM.visible(pVisual->vis))
         return;
@@ -472,7 +345,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
                 add_leafs_Dynamic(pit);
         }*/
     }
-        return;
+    return;
     case MT_HIERRARHY:
     {
         // Add all children, doesn't perform any tests
@@ -484,7 +357,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
             add_leafs_Static(i);
         }
     }
-        return;
+    return;
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:
     {
@@ -498,7 +371,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
             add_leafs_Static(i);
         }
     }
-        return;
+    return;
     case MT_LOD:
     {
         FLOD* pV = (FLOD*)pVisual;
@@ -526,20 +399,20 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
             }
         }
     }
-        return;
+    return;
     case MT_TREE_PM:
     case MT_TREE_ST:
     {
         // General type of visual
         r_dsgraph_insert_static(pVisual);
     }
-        return;
+    return;
     default:
     {
         // General type of visual
         r_dsgraph_insert_static(pVisual);
     }
-        return;
+    return;
     }
 }
 
@@ -549,7 +422,7 @@ void D3DXRenderBase::add_leafs_Static(dxRender_Visual* pVisual)
 
 /* Xottab_DUTY: this function is only called from add_Static,
  * but we need a matrix, which is nullptr at this point
-BOOL D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
+BOOL R_dsgraph_structure::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal processing
 {
     // Check frustum visibility and calculate distance to visual's center
     Fvector Tpos; // transformed position
@@ -645,7 +518,7 @@ BOOL D3DXRenderBase::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // normal
     return TRUE;
 }*/
 
-void D3DXRenderBase::add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
+void R_dsgraph_structure::add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
 {
     vis_data& vis = pVisual->vis;
 

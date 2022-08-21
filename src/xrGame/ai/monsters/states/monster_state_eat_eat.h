@@ -4,6 +4,8 @@
 template <typename _Object>
 class CStateMonsterEating : public CState<_Object>
 {
+    static constexpr u32 TIME_TO_EAT = 20000;
+
 protected:
     typedef CState<_Object> inherited;
 

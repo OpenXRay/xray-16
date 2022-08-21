@@ -14,9 +14,8 @@
 #include "editor_environment_manager.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::suns::gradient;
-using editor::environment::suns::manager;
-
+namespace editor::environment::suns
+{
 gradient::gradient() : m_use(false), m_opacity(.0f), m_radius(.0f), m_shader(""), m_texture("") {}
 void gradient::load(CInifile& config, shared_str const& section)
 {
@@ -69,4 +68,4 @@ void gradient::fill(manager const& manager, XRay::Editor::property_holder_base* 
         m_texture, ".dds", "Texture files (*.dds)|*.dds", detail::real_path("$game_textures$", "").c_str(),
         "Select texture...", XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 }
-
+} // namespace editor::environment::suns

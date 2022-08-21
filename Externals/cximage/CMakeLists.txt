@@ -25,6 +25,7 @@ set(SRC_FILES
     "ximath.cpp"
     "ximath.h"
     "xiofile.h"
+    "xiofile.cpp"
     "xmemfile.cpp"
     "xmemfile.h"
 )
@@ -37,18 +38,23 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
-    ${JPEG_INCLUDE_DIRS}
+    $<$<BOOL:${JPEG_FOUND}>:${JPEG_INCLUDE_DIRS}>
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    ${JPEG_LIBRARIES}
+    $<$<BOOL:${JPEG_FOUND}>:${JPEG_LIBRARIES}>
 )
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DCXIMAGE_BUILD
 )
+
+# XXX: Clang-9 internal error in function GetPixelColorInterpolated during optimization
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION MATCHES "9.0.0")
+    set_property(SOURCE "ximaint.cpp" PROPERTY SKIP_UNITY_BUILD_INCLUSION TRUE)
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""

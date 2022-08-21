@@ -21,10 +21,8 @@
 
 float g_smart_cover_animation_speed_factor = 1.f;
 
-using smart_cover::animation_selector;
-using smart_cover::action_base;
-using smart_cover::wait_after_exit;
-
+namespace smart_cover
+{
 animation_selector::animation_selector(CAI_Stalker* object)
     : m_object(object), m_callback_called(false), m_first_time(true), m_previous_time(flt_max)
 {
@@ -107,27 +105,27 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
             return (m_skeleton_animated->ID_Cycle(m_animation.c_str()));
 
 #if 0 // ndef MASTER_GOLD
-		if (!psAI_Flags.test((u32)aiUseSmartCoversAnimationSlot))
-			return			(m_skeleton_animated->ID_Cycle( m_animation.c_str()));
+        if (!psAI_Flags.test((u32)aiUseSmartCoversAnimationSlot))
+            return			(m_skeleton_animated->ID_Cycle(m_animation.c_str()));
 
-		VERIFY				( m_object->inventory().ActiveItem() );
-		CHudItem* const		hud_item = smart_cast<CHudItem*>(m_object->inventory().ActiveItem());
-		VERIFY				( hud_item );
+        VERIFY(m_object->inventory().ActiveItem());
+        CHudItem* const		hud_item = smart_cast<CHudItem*>(m_object->inventory().ActiveItem());
+        VERIFY(hud_item);
 
-		string16			animation_slot_string;
-		R_ASSERT			( !_itoa_s( hud_item->animation_slot(), animation_slot_string, sizeof(animation_slot_string), 10 ) );
+        string16			animation_slot_string;
+        R_ASSERT(!_itoa_s(hud_item->animation_slot(), animation_slot_string, sizeof(animation_slot_string), 10));
 
-		pstr				result;
-		STRCONCAT			( result, m_animation, "_slot_", animation_slot_string);
+        pstr				result;
+        STRCONCAT(result, m_animation, "_slot_", animation_slot_string);
 
-		MotionID			animation_id = m_skeleton_animated->ID_Cycle_Safe( result );
-		if (animation_id)
-			return			(animation_id);
+        MotionID			animation_id = m_skeleton_animated->ID_Cycle_Safe(result);
+        if (animation_id)
+            return			(animation_id);
 
-		STRCONCAT			( result, m_animation, "_slot_2" );
-		animation_id		= m_skeleton_animated->ID_Cycle_Safe( result );
-		VERIFY				(animation_id);
-		return				(animation_id);
+        STRCONCAT(result, m_animation, "_slot_2");
+        animation_id = m_skeleton_animated->ID_Cycle_Safe(result);
+        VERIFY(animation_id);
+        return				(animation_id);
 #else // #ifndef MASTER_GOLD
         return (m_skeleton_animated->ID_Cycle(m_animation.c_str()));
 #endif // #ifndef MASTER_GOLD
@@ -200,3 +198,4 @@ void animation_selector::modify_animation(CBlend* blend)
 void animation_selector::save(NET_Packet& packet) { m_planner->save(packet); }
 void animation_selector::load(IReader& packet) { m_planner->load(packet); }
 void animation_selector::setup(CAI_Stalker* object, CPropertyStorage* storage) { m_planner->setup(object, storage); }
+} // namespace smart_cover

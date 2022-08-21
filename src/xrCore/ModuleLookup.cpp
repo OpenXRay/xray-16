@@ -31,6 +31,8 @@ void* ModuleHandle::Open(pcstr moduleName)
     buf += ".dll";
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
     buf += ".so";
+#elif defined(XR_PLATFORM_APPLE)
+    buf += ".dylib";
 #else
 #error add your platform-specific extension here
 #endif

@@ -236,8 +236,6 @@ void CDetailManager::UpdateVisibleM()
         for (auto& vis : m_visibles[i])
             vis.clear();
 
-    Fvector EYE = Device.vCameraPositionSaved;
-
     CFrustum View;
     View.CreateFromMatrix(Device.mFullTransformSaved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
@@ -251,9 +249,9 @@ void CDetailManager::UpdateVisibleM()
     // Initialize 'vis' and 'cache'
     // Collect objects for rendering
     RImplementation.BasicStats.DetailVisibility.Begin();
-    for (int _mz = 0; _mz < dm_cache1_line; _mz++)
+    for (u32 _mz = 0; _mz < dm_cache1_line; _mz++)
     {
-        for (int _mx = 0; _mx < dm_cache1_line; _mx++)
+        for (u32 _mx = 0; _mx < dm_cache1_line; _mx++)
         {
             CacheSlot1& MS = cache_level1[_mz][_mx];
             if (MS.empty)
@@ -413,12 +411,12 @@ void CDetailManager::MT_CALC()
         return;
 #endif
 
+    EYE = Device.vCameraPosition;
+
     MT.Enter();
     if (m_frame_calc != RDEVICE.dwFrame)
         if ((m_frame_rendered + 1) == RDEVICE.dwFrame) // already rendered
         {
-            Fvector EYE = RDEVICE.vCameraPositionSaved;
-
             int s_x = iFloor(EYE.x / dm_slot_size + .5f);
             int s_z = iFloor(EYE.z / dm_slot_size + .5f);
 

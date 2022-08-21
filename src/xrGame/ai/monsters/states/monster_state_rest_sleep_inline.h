@@ -1,8 +1,7 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterRestSleepAbstract CStateMonsterRestSleep<_Object>
 
@@ -37,3 +36,6 @@ void CStateMonsterRestSleepAbstract::critical_finalize()
     inherited::critical_finalize();
     this->object->wake_up();
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateMonsterRestSleepAbstract

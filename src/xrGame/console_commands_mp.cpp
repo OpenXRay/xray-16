@@ -27,6 +27,11 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 LPCSTR AddHyphens(LPCSTR c);
 LPCSTR DelHyphens(LPCSTR c);
 
+namespace detail::console_commands::mp
+{
+static constexpr pcstr STRING_KICKED_BY_SERVER = "st_kicked_by_server";
+}
+
 extern float g_cl_lvInterp;
 extern int g_cl_InterpolationType; // 0 - Linear, 1 - BSpline, 2 - HSpline
 extern u32 g_cl_InterpolationMaxPoints;
@@ -315,35 +320,6 @@ public:
     }
 };
 
-// most useful predicates
-struct SearcherClientByName
-{
-    string512 player_name;
-    SearcherClientByName(LPCSTR name)
-    {
-        strncpy_s(player_name, sizeof(player_name), name, sizeof(player_name) - 1);
-        xr_strlwr(player_name);
-    }
-    bool operator()(IClient* client)
-    {
-        xrClientData* temp_client = smart_cast<xrClientData*>(client);
-        pstr tmp_player = NULL;
-        if (!temp_client->ps)
-            return false;
-
-        STRCONCAT(tmp_player, temp_client->ps->getName());
-        xr_strlwr(tmp_player);
-
-        if (!xr_strcmp(player_name, tmp_player))
-        {
-            return true;
-        }
-        return false;
-    }
-};
-
-#define STRING_KICKED_BY_SERVER "st_kicked_by_server"
-
 class CCC_KickPlayerByName : public IConsole_Command
 {
 public:
@@ -378,7 +354,7 @@ public:
             xrClientData* tmpxrclient = static_cast<xrClientData*>(tmp_client);
             if (!tmpxrclient->m_admin_rights.m_has_admin_rights)
             {
-                Level().Server->DisconnectClient(tmp_client, STRING_KICKED_BY_SERVER);
+                Level().Server->DisconnectClient(tmp_client, ::detail::console_commands::mp::STRING_KICKED_BY_SERVER);
             }
             else
             {
@@ -440,7 +416,7 @@ public:
             xrClientData* tmpxrclient = static_cast<xrClientData*>(tmp_client);
             if (!tmpxrclient->m_admin_rights.m_has_admin_rights)
             {
-                Level().Server->DisconnectClient(tmp_client, STRING_KICKED_BY_SERVER);
+                Level().Server->DisconnectClient(tmp_client, ::detail::console_commands::mp::STRING_KICKED_BY_SERVER);
             }
             else
             {
@@ -940,7 +916,7 @@ public:
         IClient* to_disconnect = tmp_sv_game->BanPlayer(client_id, ban_time, exclude_command_initiator(args_));
         if (to_disconnect)
         {
-            Level().Server->DisconnectClient(to_disconnect, STRING_KICKED_BY_SERVER);
+            Level().Server->DisconnectClient(to_disconnect, ::detail::console_commands::mp::STRING_KICKED_BY_SERVER);
         }
         else
         {
@@ -1091,7 +1067,7 @@ public:
         {
             Msg("Disconnecting and Banning: %s", PlayerName);
             Level().Server->BanClient(tmp_client, ban_time);
-            Level().Server->DisconnectClient(tmp_client, STRING_KICKED_BY_SERVER);
+            Level().Server->DisconnectClient(tmp_client, ::detail::console_commands::mp::STRING_KICKED_BY_SERVER);
         }
         else
         {
@@ -1149,7 +1125,7 @@ public:
         Address.set(s_ip_addr);
         Msg("Disconnecting and Banning: %s", Address.to_string().c_str());
         Level().Server->BanAddress(Address, ban_time);
-        Level().Server->DisconnectAddress(Address, STRING_KICKED_BY_SERVER);
+        Level().Server->DisconnectAddress(Address, ::detail::console_commands::mp::STRING_KICKED_BY_SERVER);
     };
 
     virtual void Info(TInfo& I) { xr_strcpy(I, "Ban Player by IP. Format: \"sb_banplayer_ip <ip address>\""); }
@@ -1724,10 +1700,10 @@ public:
         Level().Server->GetGameState()->SetGameTimeFactor(NewTime, g_fTimeFactor);
     }
 };
-class CCC_SetWeather : public IConsole_Command
+class CCC_SVSetWeather : public IConsole_Command
 {
 public:
-    CCC_SetWeather(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    CCC_SVSetWeather(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
     virtual void Execute(LPCSTR weather_name)
     {
         if (!g_pGamePersistent)
@@ -2132,7 +2108,7 @@ void register_mp_console_commands()
 
     CMD1(CCC_StartTimeEnvironment, "sv_setenvtime");
 
-    CMD1(CCC_SetWeather, "sv_setweather");
+    CMD1(CCC_SVSetWeather, "sv_setweather");
 
     CMD4(CCC_Integer, "cl_cod_pickup_mode", &g_b_COD_PickUpMode, 0, 1);
 

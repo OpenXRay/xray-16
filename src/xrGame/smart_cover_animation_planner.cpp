@@ -27,14 +27,15 @@
 #include "clsid_game.h"
 #include "game_object_space.h"
 
-using smart_cover::animation_planner;
+namespace smart_cover
+{
 using namespace StalkerDecisionSpace;
 
 animation_planner::animation_planner(CAI_Stalker* object, LPCSTR action_name)
     : inherited(), m_time_object_hit(0), m_last_transition_time(0), m_default_idle_interval(0),
-      m_default_lookout_interval(0), m_loophole_value(1000), m_head_speed(flt_max), m_idle_min_time(0.f),
-      m_idle_max_time(0.f), m_lookout_min_time(0.f), m_lookout_max_time(0.f), m_stay_idle(true), m_last_idle_time(0),
-      m_last_lookout_time(0)
+    m_default_lookout_interval(0), m_loophole_value(1000), m_head_speed(flt_max), m_idle_min_time(0.f),
+    m_idle_max_time(0.f), m_lookout_min_time(0.f), m_lookout_max_time(0.f), m_stay_idle(true), m_last_idle_time(0),
+    m_last_lookout_time(0)
 {
 }
 
@@ -113,11 +114,11 @@ void animation_planner::add_evaluators()
     add_evaluator(
         eWorldPropertyLoopholeFireNoLookout, xr_new<CStalkerPropertyEvaluatorConst>(false, "loophole fire no lookout"));
     add_evaluator(eWorldPropertyReadyToIdle, xr_new<CStalkerPropertyEvaluatorMember>((CPropertyStorage*)0,
-                                                 eWorldPropertyReadyToIdle, true, true, "ready to idle"));
+        eWorldPropertyReadyToIdle, true, true, "ready to idle"));
     add_evaluator(eWorldPropertyReadyToLookout, xr_new<CStalkerPropertyEvaluatorMember>((CPropertyStorage*)0,
-                                                    eWorldPropertyReadyToLookout, true, true, "ready to lookout"));
+        eWorldPropertyReadyToLookout, true, true, "ready to lookout"));
     add_evaluator(eWorldPropertyReadyToFire, xr_new<CStalkerPropertyEvaluatorMember>((CPropertyStorage*)0,
-                                                 eWorldPropertyReadyToFire, true, true, "ready to fire"));
+        eWorldPropertyReadyToFire, true, true, "ready to fire"));
     add_evaluator(eWorldPropertyReadyToFireNoLookout,
         xr_new<CStalkerPropertyEvaluatorMember>(
             (CPropertyStorage*)0, eWorldPropertyReadyToFireNoLookout, true, true, "ready to fire_no_lookout"));
@@ -296,4 +297,5 @@ bool animation_planner::hit_callback(SHit const* hit)
     return (false);
 }
 
-LPCSTR animation_planner::object_name() const { return ("animation_planner"); }
+pcstr animation_planner::object_name() const { return ("animation_planner"); }
+} // namespace smart_cover

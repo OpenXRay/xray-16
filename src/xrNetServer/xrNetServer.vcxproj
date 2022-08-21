@@ -27,6 +27,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="guids.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="ip_filter.cpp" />
     <ClCompile Include="NET_AuthCheck.cpp" />
     <ClCompile Include="NET_Client.cpp" />

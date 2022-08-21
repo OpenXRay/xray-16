@@ -13,13 +13,9 @@
 #include "debug_output.h"
 #endif
 ///////////////////////////////////////////////////////////////
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#pragma warning(disable : 4267)
 #include "ode/ode/src/collision_kernel.h"
 #include "ode/ode/src/joint.h"
 #include "ode/ode/src/objects.h"
-#pragma warning(pop)
 
 extern CPHWorld* ph_world;
 ///////////////////////////////////////////////////////////////////

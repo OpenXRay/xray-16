@@ -7,6 +7,8 @@
 #include "xrCore/Text/StringConversion.hpp"
 #include "xrCore/xr_token.h"
 
+#include <locale>
+
 CInput* pInput = nullptr;
 IInputReceiver dummyController;
 
@@ -105,6 +107,14 @@ void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("*** INPUT:    %2.2fms", GetStats().FrameTime.result);
 }
 
+void CInput::SetCurrentInputType(InputType type)
+{
+    currentInputType = type;
+
+    if (type == KeyboardMouse)
+        last_input_controller = -1;
+}
+
 void CInput::MouseUpdate()
 {
     // Mouse2 is a middle button in SDL,
@@ -119,6 +129,9 @@ void CInput::MouseUpdate()
     SDL_PumpEvents();
     const auto count = SDL_PeepEvents(events, MAX_MOUSE_EVENTS,
         SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+
+    if (count)
+        SetCurrentInputType(KeyboardMouse);
 
     for (int i = 0; i < count; ++i)
     {
@@ -208,6 +221,9 @@ void CInput::KeyUpdate()
         Engine.Event.Defer("KERNEL:quit");
         return;
     }
+
+    if (count)
+        SetCurrentInputType(KeyboardMouse);
 
     for (int i = 0; i < count; ++i)
     {
@@ -312,7 +328,10 @@ void CInput::ControllerUpdate()
             if (std::abs(event.caxis.value) < controllerDeadZone)
                 controllerAxisState[event.caxis.axis] = 0;
             else
+            {
                 controllerAxisState[event.caxis.axis] = event.caxis.value;
+                SetCurrentInputType(Controller);
+            }
             break;
         }
 
@@ -322,6 +341,7 @@ void CInput::ControllerUpdate()
 
             if (last_input_controller != event.cbutton.which) // don't write if don't really need to
                 last_input_controller = event.cbutton.which;
+            SetCurrentInputType(Controller);
 
             controllerState[event.cbutton.button] = true;
             cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], 1.f, 0.f);
@@ -333,6 +353,7 @@ void CInput::ControllerUpdate()
 
             if (last_input_controller != event.cbutton.which) // don't write if don't really need to
                 last_input_controller = event.cbutton.which;
+            SetCurrentInputType(Controller);
 
             controllerState[event.cbutton.button] = false;
             cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], 0.f, 0.f);

@@ -10,17 +10,14 @@
 #include "WeaponMagazinedWGrenade.h"
 #include "UICellCustomItems.h"
 
-extern "C" IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid);
-
-extern "C" void __cdecl xrFactory_Destroy(IFactoryObject* O);
-
 CUICellItem* create_cell_item(CInventoryItem* itm);
 
 SBuyItemInfo::SBuyItemInfo() { m_item_state = e_undefined; }
 SBuyItemInfo::~SBuyItemInfo()
 {
     CInventoryItem* iitem = (CInventoryItem*)m_cell_item->m_pData;
-    xrFactory_Destroy(&iitem->object());
+    auto obj = &iitem->object();
+    DEL_INSTANCE(obj);
     delete_data(m_cell_item);
 }
 
@@ -79,7 +76,7 @@ CInventoryItem* CUIMpTradeWnd::CreateItem_internal(const shared_str& name_sect)
 {
     CLASS_ID class_id = pSettings->r_clsid(name_sect, "class");
 
-    IFactoryObject* dll_pure = xrFactory_Create(class_id);
+    IFactoryObject* dll_pure = NEW_INSTANCE(class_id);
     VERIFY(dll_pure);
     CInventoryItem* pIItem = smart_cast<CInventoryItem*>(dll_pure);
     pIItem->object().Load(name_sect.c_str());

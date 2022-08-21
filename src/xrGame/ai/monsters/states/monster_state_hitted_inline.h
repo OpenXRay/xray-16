@@ -5,8 +5,7 @@
 #include "monster_state_home_point_danger.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterHittedAbstract CStateMonsterHitted<_Object>
 

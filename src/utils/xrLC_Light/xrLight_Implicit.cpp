@@ -78,7 +78,6 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
     Jitter_Select(Jitter, Jcount);
 
     // Lighting itself
-    DB.ray_options(0);
     for (u32 V = y_start; V < y_end; V++)
     {
         for (u32 U = 0; U < defl.Width(); U++)
@@ -113,7 +112,7 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
                             wP.from_bary(V1->P, V2->P, V3->P, B);
                             wN.from_bary(V1->N, V2->N, V3->N, B);
                             wN.normalize();
-                            LightPoint(&DB, inlc_global_data()->RCAST_Model(), C, wP, wN,
+                            LightPoint(&DB, 0, inlc_global_data()->RCAST_Model(), C, wP, wN,
                                 inlc_global_data()->L_static(), (inlc_global_data()->b_nosun() ? LP_dont_sun : 0), F);
                             Fcount++;
                         }

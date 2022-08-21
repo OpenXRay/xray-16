@@ -1,33 +1,42 @@
 project(xrCDB)
 
-set(SRC_FILES
-    "Frustum.h"
-    "Frustum.cpp"
-    "Intersect.hpp"
-    "ISpatial.h"
+set(ENGINE_SRC
     "ISpatial.cpp"
+    "ISpatial.h"
     "ISpatial_q_box.cpp"
     "ISpatial_q_frustum.cpp"
     "ISpatial_q_ray.cpp"
     "ISpatial_verify.cpp"
-    "stdafx.h"
-    "StdAfx.cpp"
-    "xr_area.h"
     "xr_area.cpp"
+    "xr_area.h"
     "xr_area_query.cpp"
     "xr_area_raypick.cpp"
-    "xrCDB_box.cpp"
-    "xrCDB_Collector.cpp"
-    "xrCDB.cpp"
-    "xrCDB_frustum.cpp"
-    "xrCDB.h"
-    "xrCDB_ray.cpp"
     "xr_collide_defs.h"
-    "xrXRC.h"
     "xrXRC.cpp"
+    "xrXRC.h"
 )
 
-group_sources(SRC_FILES)
+set(KERNEL_SRC
+    "Frustum.cpp"
+    "Frustum.h"
+    "Intersect.hpp"
+    "stdafx.h"
+    "StdAfx.cpp"
+    "xrCDB.cpp"
+    "xrCDB.h"
+    "xrCDB_box.cpp"
+    "xrCDB_Collector.cpp"
+    "xrCDB_frustum.cpp"
+    "xrCDB_ray.cpp"
+)
+
+source_group("engine" FILES ${ENGINE_SRC})
+source_group("Kernel" FILES ${KERNEL_SRC})
+
+set(SRC_FILES
+    ${ENGINE_SRC}
+    ${KERNEL_SRC}
+)
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 

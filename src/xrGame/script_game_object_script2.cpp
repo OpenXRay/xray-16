@@ -274,6 +274,8 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
             (void (CScriptGameObject::*)(const Fvector*))(&CScriptGameObject::set_desired_direction))
         .def("set_patrol_path", &CScriptGameObject::set_patrol_path)
         .def("inactualize_patrol_path", &CScriptGameObject::inactualize_patrol_path)
+        .def("inactualize_level_path", &CScriptGameObject::inactualize_level_path)
+        .def("inactualize_game_path", &CScriptGameObject::inactualize_game_path)
         .def("set_dest_level_vertex_id", &CScriptGameObject::set_dest_level_vertex_id)
         .def("set_dest_game_vertex_id", &CScriptGameObject::set_dest_game_vertex_id)
         .def("set_movement_selection_type", &CScriptGameObject::set_movement_selection_type)

@@ -3,13 +3,11 @@
 #include "xrServer_script_macroses.h"
 #include "xrCore/client_id.h"
 
-using namespace luabind;
-
 template <typename T>
-struct CWrapperBase : public T, public luabind::wrap_base
+struct CGamePlayerStateWrapperBase : public T, public luabind::wrap_base
 {
     typedef T inherited;
-    typedef CWrapperBase<T> self_type;
+    typedef CGamePlayerStateWrapperBase<T> self_type;
 
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(net_Export, NET_Packet)
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(net_Import, NET_Packet)
@@ -18,8 +16,11 @@ struct CWrapperBase : public T, public luabind::wrap_base
 
 SCRIPT_EXPORT(game_PlayerState, (),
 {
+    using namespace luabind;
+
     using BaseType = game_PlayerState;
-    using WrapType = CWrapperBase<game_PlayerState>;
+    using WrapType = CGamePlayerStateWrapperBase<game_PlayerState>;
+
     module(luaState)
     [
         class_<game_PlayerState, no_bases, default_holder, WrapType>("game_PlayerState")
@@ -53,6 +54,8 @@ SCRIPT_EXPORT(game_PlayerState, (),
 
 void game_GameState_script_register(lua_State* luaState)
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<game_GameState, IFactoryObject>("game_GameState")
@@ -68,4 +71,4 @@ void game_GameState_script_register(lua_State* luaState)
             .def("StartTime", &game_GameState::StartTime)
     ];
 }
-SCRIPT_EXPORT_FUNC(game_GameState, (), game_GameState_script_register);
+SCRIPT_EXPORT_FUNC(game_GameState, (IFactoryObject), game_GameState_script_register);

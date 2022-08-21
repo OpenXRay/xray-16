@@ -580,6 +580,8 @@ bool CAI_Stalker::ready_to_detour()
     return (weapon->GetAmmoElapsed() > weapon->GetAmmoMagSize() / 2);
 }
 
+namespace detail::stalker::fire
+{
 class ray_query_param
 {
 public:
@@ -640,10 +642,13 @@ IC bool ray_query_callback(collide::rq_result& result, LPVOID params)
     param->m_pick_distance = result.range;
     return (false);
 }
+} // namespace detail::stalker::fire
 
 void CAI_Stalker::can_kill_entity(
     const Fvector& position, const Fvector& direction, float distance, collide::rq_results& rq_storage)
 {
+    using namespace ::detail::stalker::fire;
+
     VERIFY(!fis_zero(direction.square_magnitude()));
 
     collide::ray_defs ray_defs(position, direction, distance, CDB::OPT_CULL, collide::rqtBoth);

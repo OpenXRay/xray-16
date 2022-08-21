@@ -1,6 +1,14 @@
 project(xrGameSpy)
 
-set(SRC_FILES
+set(KERNEL_SRC
+    "stdafx.cpp"
+    "stdafx.h"
+    "xrGameSpy.cpp"
+    "xrGameSpy.h"
+    "xrGameSpy_MainDefs.h"
+)
+
+set(WRAPPER_SRC
     "GameSpy_ATLAS.cpp"
     "GameSpy_ATLAS.h"
     "GameSpy_Available.cpp"
@@ -26,26 +34,21 @@ set(SRC_FILES
     "GameSpy_QR2.h"
     "GameSpy_SAKE.cpp"
     "GameSpy_SAKE.h"
-    "stdafx.cpp"
-    "stdafx.h"
-    "xrGameSpy.cpp"
-    "xrGameSpy.h"
-    "xrGameSpy_MainDefs.h"
 )
 
-group_sources(SRC_FILES)
+source_group("Kernel" FILES ${KERNEL_SRC})
+source_group("Wrapper" FILES ${WRAPPER_SRC})
 
 if (STATIC_BUILD)
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+    add_library(${PROJECT_NAME} STATIC ${KERNEL_SRC} ${WRAPPER_SRC})
 else()
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+    add_library(${PROJECT_NAME} SHARED ${KERNEL_SRC} ${WRAPPER_SRC})
 endif()
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/xrServerEntities
-    ${CMAKE_SOURCE_DIR}/Externals/cximage
     ${CMAKE_SOURCE_DIR}/Externals/GameSpy/src
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/ode/include

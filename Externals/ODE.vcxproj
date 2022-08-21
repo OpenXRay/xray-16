@@ -11,6 +11,9 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="..\src\xray_project_configuration.props" />
   </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <EnableUnitySupport>false</EnableUnitySupport>
+  </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="$(Configuration.Contains('Master Gold'))">
     <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>

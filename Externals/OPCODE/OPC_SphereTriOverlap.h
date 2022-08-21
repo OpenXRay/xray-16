@@ -1,3 +1,4 @@
+#pragma once
 
 // Original code by David Eberly in Magic.
 BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2)

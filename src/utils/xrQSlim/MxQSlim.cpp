@@ -14,8 +14,6 @@ $Id: MxQSlim.cxx,v 1.42.2.2 2004/07/01 18:47:32 garland Exp $
 #include "MxGeom3D.h"
 #include "MxVector.h"
 
-typedef MxQuadric3 Quadric;
-
 MxQSlim::MxQSlim(MxStdModel* _m) : MxStdSlim(_m), quadrics(_m->vert_count())
 {
     // Externally visible variables
@@ -50,14 +48,14 @@ void MxQSlim::collect_quadrics()
 
         Vec4 p = (weighting_policy == MX_WEIGHT_RAWNORMALS) ? triangle_raw_plane<Vec3, Vec4>(v1, v2, v3) :
                                                               triangle_plane<Vec3, Vec4>(v1, v2, v3);
-        Quadric Q(p[0], p[1], p[2], p[3], m->compute_face_area(i));
+        MxQuadric3 Q(p[0], p[1], p[2], p[3], m->compute_face_area(i));
 
         switch (weighting_policy)
         {
         case MX_WEIGHT_ANGLE:
             for (j = 0; j < 3; j++)
             {
-                Quadric Q_j = Q;
+                MxQuadric3 Q_j = Q;
                 Q_j *= m->compute_corner_angle(i, j);
                 quadrics(f[j]) += Q_j;
             }
@@ -348,9 +346,9 @@ void MxEdgeQSlim::compute_target_placement(MxQSlimEdge* info)
 {
     MxVertexID i = info->v1, j = info->v2;
 
-    const Quadric &Qi = quadrics(i), &Qj = quadrics(j);
+    const MxQuadric3 &Qi = quadrics(i), &Qj = quadrics(j);
 
-    Quadric Q = Qi;
+    MxQuadric3 Q = Qi;
     Q += Qj;
     double e_min;
 
@@ -655,11 +653,11 @@ void MxFaceQSlim::compute_face_info(MxFaceID f)
     MxVertexID j = m->face(f)(1);
     MxVertexID k = m->face(f)(2);
 
-    const Quadric& Qi = quadrics(i);
-    const Quadric& Qj = quadrics(j);
-    const Quadric& Qk = quadrics(k);
+    const MxQuadric3& Qi = quadrics(i);
+    const MxQuadric3& Qj = quadrics(j);
+    const MxQuadric3& Qk = quadrics(k);
 
-    Quadric Q = Qi;
+    MxQuadric3 Q = Qi;
     Q += Qj;
     Q += Qk;
 

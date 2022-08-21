@@ -1,8 +1,7 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterFindEnemyAngryAbstract CStateMonsterFindEnemyAngry<_Object>
 
@@ -25,3 +24,6 @@ bool CStateMonsterFindEnemyAngryAbstract::check_completion()
         return false;
     return true;
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateMonsterFindEnemyAngryAbstract

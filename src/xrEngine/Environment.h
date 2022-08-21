@@ -6,7 +6,6 @@
 #include "Include/xrRender/EnvironmentRender.h"
 #include "xrCore/_vector3d.h"
 #include "xrCore/_quaternion.h"
-#include "xrCore/xr_vector_defs.h"
 #include "xrCore/xrCore_benchmark_macros.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
@@ -223,8 +222,8 @@ public:
 
 private:
     // clouds
-    FvectorVec CloudsVerts;
-    U16Vec CloudsIndices;
+    xr_vector<Fvector> CloudsVerts;
+    xr_vector<u16> CloudsIndices;
 
     float NormalizeTime(float tm);
     float TimeDiff(float prev, float cur);

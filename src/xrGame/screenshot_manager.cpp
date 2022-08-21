@@ -5,8 +5,10 @@
 #include "xrCore/Compression/ppmd_compressor.h"
 #include "screenshots_writer.h"
 
-#include "ximage.h"
-#include "xmemfile.h"
+#if __has_include("ximage.h")
+#   include "ximage.h"
+#   include "xmemfile.h"
+#endif
 
 screenshot_manager::screenshot_manager()
 {
@@ -88,6 +90,7 @@ void screenshot_manager::prepare_image()
 
 void screenshot_manager::make_jpeg_file()
 {
+#if __has_include("ximage.h")
     u32* sizes = reinterpret_cast<u32*>(m_result_writer.pointer());
     u32 width = *sizes;
     u32 height = *(++sizes);
@@ -109,8 +112,13 @@ void screenshot_manager::make_jpeg_file()
 
     m_jpeg_buffer_size = static_cast<u32>(tmp_mem_file.Tell());
 
-#ifdef DEBUG
+#   ifdef DEBUG
     Msg("* JPEG encoded to %d bytes", m_jpeg_buffer_size);
+#   endif
+#else
+    m_jpeg_buffer = nullptr;
+    m_jpeg_buffer_size = 0;
+    VERIFY(!"Not implemented.");
 #endif
 }
 
