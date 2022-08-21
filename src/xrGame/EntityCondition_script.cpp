@@ -80,10 +80,10 @@ SCRIPT_EXPORT(CActorCondition, (CEntityCondition),
             .def("GetDestroy", &CWound::GetDestroy),
         class_<CActorCondition, CEntityCondition>("CActorCondition")
             .def("ClearAllBoosters", &CActorCondition::ClearAllBoosters)
-			.def("ApplyBooster", &CActorCondition::ApplyBooster_script)
+            .def("ApplyBooster", &CActorCondition::ApplyBooster_script)
             .def("BoosterForEach", &CActorCondition::BoosterForEach)
             .def("WoundForEach", &CActorCondition::WoundForEach)
-			.def("GetSatiety", &CActorCondition::GetSatiety)
+            .def("GetSatiety", &CActorCondition::GetSatiety)
             .def("BoostMaxWeight", &CActorCondition::BoostMaxWeight)
             .def("BoostHpRestore", &CActorCondition::BoostHpRestore)
             .def("BoostPowerRestore", &CActorCondition::BoostPowerRestore)
