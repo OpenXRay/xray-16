@@ -1050,7 +1050,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     CFrustum cull_frustum;
     xr_vector<Fplane> cull_planes;
     Fvector3 cull_COP;
-    CSector* cull_sector;
     Fmatrix cull_xform;
     {
         FPU::m64r();
@@ -1064,23 +1063,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 #endif
 
         //******************************* Need to be placed after cuboid built **************************
-        // Search for default sector - assume "default" or "outdoor" sector is the largest one
-        //. hack: need to know real outdoor sector
-        CSector* largest_sector = nullptr;
-        float largest_sector_vol = 0;
-        for (u32 s = 0; s < Sectors.size(); s++)
-        {
-            CSector* S = (CSector*)Sectors[s];
-            dxRender_Visual* V = S->root();
-            float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol)
-            {
-                largest_sector_vol = vol;
-                largest_sector = S;
-            }
-        }
-        cull_sector = largest_sector;
-
         // COP - 100 km away
         cull_COP.mad(Device.vCameraPosition, fuckingsun->direction, -tweak_COP_initial_offs);
 
@@ -1283,7 +1265,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     }
 
     // Fill the database
-    r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
+    r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;
