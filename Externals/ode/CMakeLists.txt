@@ -1,4 +1,4 @@
-project(ODE)
+project(xrODE)
 
 set(SRC_FILES
     "ode/src/array.cpp"
@@ -101,6 +101,7 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
     POSITION_INDEPENDENT_CODE ON
     UNITY_BUILD OFF
 )
