@@ -56,8 +56,8 @@ int g_cl_InterpolationType = 0;
 u32 g_cl_InterpolationMaxPoints = 0;
 int g_dwInputUpdateDelta = 20;
 BOOL net_cl_inputguaranteed = FALSE;
-int g_start_game_vertex_id = NULL;
-Fvector g_start_position;
+int g_start_game_vertex_id = 0;
+Fvector g_start_position{};
 CActor* g_actor = NULL;
 
 CActor* Actor()
