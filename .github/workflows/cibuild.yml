@@ -183,6 +183,56 @@ jobs:
         name: openxray_1.6.02_${{ matrix.Configuration }}_i386.deb
         path: build/openxray_1.6.02_i386.deb
 
+  build-ubuntu-mold:
+    name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }}, mold)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        Configuration: [Release]
+        Platform: [x64]
+        CC: [clang]
+        include:
+          - CC: clang
+            CXX: clang++
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Deinit Crypto++
+      run: git submodule deinit Externals/cryptopp
+
+    - name: Install packages
+      run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
+          sudo apt-get install -qq -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev
+
+    - name: Install Clang
+      uses: egor-tensin/setup-clang@v1
+
+    - name: Install mold
+      uses: rui314/setup-mold@v1
+
+    - name: Create build directory
+      run: mkdir build
+
+    - name: Run CMake
+      working-directory: build
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
+
+    - name: Run Make
+      working-directory: build
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: make -j $(nproc || echo 4)
+
   build-alpine:
     name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)
     runs-on: ubuntu-latest
