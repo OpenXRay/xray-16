@@ -50,7 +50,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     xrCore
     xrMiscMath
-    OPCODE
+    xrOPCODE
     xrAPI
 )
 

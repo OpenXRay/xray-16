@@ -60,7 +60,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     xrCore
     xrMiscMath
-    GameSpy
+    GameSpy-oxr
     ${SDL_LIBRARIES}
 )
 
