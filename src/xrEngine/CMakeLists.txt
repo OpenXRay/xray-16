@@ -391,18 +391,18 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
     xrMiscMath
     PRIVATE
+    xrAPI
+    xrCDB
     xrCore
     xrLuabind
-    xrAPI
     xrSound
     xrScriptEngine
     xrNetServer
     ${LUA_LIBRARIES}
-    ${THEORA_LIBRARY}
-    ${OGG_LIBRARIES}
-    xrCDB
-    ${OPENAL_LIBRARY}
     ${SDL2_LIBRARIES}
+    ${OPENAL_LIBRARY}
+    ${OGG_LIBRARIES}
+    ${THEORA_LIBRARY}
 )
 
 target_compile_definitions(${PROJECT_NAME}
