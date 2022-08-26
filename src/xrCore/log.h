@@ -23,7 +23,7 @@ void XRCORE_API Log(LPCSTR msg, const Fmatrix& dop);
 void XRCORE_API LogWinErr(LPCSTR msg, long err_code);
 
 #ifdef XR_PLATFORM_APPLE
-constexpr void Log(pcstr msg, size_t dop)
+ICF void Log(pcstr msg, size_t dop)
 {
     if constexpr (sizeof(size_t) == sizeof(u32))
         return Log(msg, static_cast<u32>(dop));
