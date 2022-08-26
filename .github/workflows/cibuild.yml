@@ -132,33 +132,29 @@ jobs:
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
       run: sudo apt-get install -qq -y libc++-9-dev:i386 libc++abi-9-dev:i386
 
-    - name: Create build directory
-      run: mkdir build
-
     - name: Run CMake x64
       if: ${{ matrix.Platform == 'x64' }}
-      working-directory: build
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake x86
       if: ${{ matrix.Platform == 'x86' }}
-      working-directory: build
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
-      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
+      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
 
-    - name: Run Make
-      working-directory: build
+    - name: Run CMake Build
+      id: cmake-build
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
-      run: make -j $(nproc || echo 4)
+      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
 
     - name: Make package
+      if: ${{ steps.cmake-build.outcome == 'success' }}
       id: make-package
       working-directory: build
       #continue-on-error: true
@@ -216,22 +212,17 @@ jobs:
     - name: Install mold
       uses: rui314/setup-mold@v1
 
-    - name: Create build directory
-      run: mkdir build
-
     - name: Run CMake
-      working-directory: build
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
 
-    - name: Run Make
-      working-directory: build
+    - name: Run CMake Build
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
-      run: make -j $(nproc || echo 4)
+      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
 
   build-alpine:
     name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)
@@ -258,22 +249,16 @@ jobs:
         branch: 'latest-stable'
         packages: build-base binutils-gold cmake sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
 
-    - name: Create build directory
-      run: mkdir build
-
     - name: Run CMake x64
       if: ${{ matrix.Platform == 'x86_64' }}
-      working-directory: build
       shell: alpine.sh {0}
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake x86
       if: ${{ matrix.Platform == 'x86' }}
-      working-directory: build
       shell: alpine.sh {0}
-      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_ASM_FLAGS=-m32 -DCMAKE_UNITY_BUILD=ON
+      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_ASM_FLAGS=-m32 -DCMAKE_UNITY_BUILD=ON
 
-    - name: Run Make
-      working-directory: build
+    - name: Run CMake Build
       shell: alpine.sh {0}
-      run: make -j $(nproc || echo 4)
+      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
