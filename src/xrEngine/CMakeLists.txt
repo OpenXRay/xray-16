@@ -402,7 +402,7 @@ target_link_libraries(${PROJECT_NAME}
     ${SDL2_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${OGG_LIBRARIES}
-    ${THEORA_LIBRARY}
+    Theora::Theora
 )
 
 target_compile_definitions(${PROJECT_NAME}
