@@ -419,7 +419,6 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
     pthread
     ${SDL2_LIBRARIES}
-    $<$<BOOL:${USE_CRYPTOPP}>:${CRYPTO++_LIBRARIES}>
     PRIVATE
     xrMiscMath
     dl
