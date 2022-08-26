@@ -123,10 +123,9 @@ target_link_libraries(${PROJECT_NAME}
     xrMiscMath
     xrAPI
     xrCDB
-    ${OGG_LIBRARIES}
     ${OPENAL_LIBRARY}
-    vorbis
-    vorbisfile
+    ${OGG_LIBRARIES}
+    ${VORBIS_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}
