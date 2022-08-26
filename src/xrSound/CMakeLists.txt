@@ -125,7 +125,8 @@ target_link_libraries(${PROJECT_NAME}
     xrCDB
     ${OPENAL_LIBRARY}
     ${OGG_LIBRARIES}
-    ${VORBIS_LIBRARIES}
+    Vorbis::Vorbis
+    Vorbis::VorbisFile
 )
 
 target_compile_definitions(${PROJECT_NAME}
