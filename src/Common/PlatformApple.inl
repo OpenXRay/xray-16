@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>
+#include <sys/syslimits.h> // for PATH_MAX
 #include <errno.h>
 #include <stdarg.h>
 #include <ctype.h>
@@ -14,9 +15,9 @@
 #include <sched.h>
 
 #include <algorithm> // for min max
+#include <stddef.h>
 
 #include <string>
-#include <alloca.h>
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/mman.h> // for mmap / munmap
@@ -30,19 +31,19 @@
 #define _alloca alloca
 #endif
 
-#define _MAX_PATH PATH_MAX + 1
-#define MAX_PATH PATH_MAX + 1
+#define _MAX_PATH 4096 + 1
+#define MAX_PATH 4096 + 1
 
 #define WINAPI
 
 #define _copysign copysign
 
 #define _cdecl //__attribute__((cdecl))
+#define _stdcall //__attribute__((stdcall))
 #define _fastcall //__attribute__((fastcall))
 
 #define __cdecl
 #define __stdcall
-#define __fastcall
 
 //#define __declspec
 #define __forceinline FORCE_INLINE
@@ -51,21 +52,18 @@
 #define CALLBACK
 #define TEXT(x) strdup(x)
 
-/*
-inline char* _strlwr_l(char* str, locale_t loc)
-{
-//TODO
-}
 
-inline char* _strupr_l(char* str, locale_t loc)
-{
-//TODO
-}
-*/
+
+#define VOID void
+#define HKL void*
+#define ActivateKeyboardLayout(x, y) {}
+#define ScreenToClient(hwnd, p) {}
 
 #define __except(X) catch(X)
 
 #define GetCurrentProcessId getpid
+#define GetCurrentThreadId pthread_self
+int pthread_setname_np(pthread_t threadId, const char* name) { return pthread_setname_np(name); }
 
 inline void Sleep(int ms)
 {
@@ -135,22 +133,11 @@ inline int GetExceptionCode()
     return 0;
 }
 
-inline void convert_path_separators(char * path)
-{
-    while (char* sep = strchr(path, '\\')) *sep = '/';
-}
-
-inline int xr_unlink(const char *path)
-{
-    char* conv_fn = strdup(path);
-    convert_path_separators(conv_fn);
-    int result = unlink(conv_fn);
-    free(conv_fn);
-    return result;
-}
+#define xr_unlink unlink
 
 #include <inttypes.h>
 typedef int32_t BOOL;
+typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 typedef int32_t LONG;
@@ -164,9 +151,18 @@ typedef char* PSTR;
 typedef char* LPTSTR;
 typedef const char* LPCSTR;
 typedef const char* LPCTSTR;
+typedef unsigned char* LPBYTE;
 typedef unsigned int UINT;
+typedef int INT;
+typedef unsigned long ULONG;
+typedef unsigned long* ULONG_PTR;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
+
+typedef unsigned short* LPWORD;
+typedef unsigned long* LPDWORD;
+typedef const void* LPCVOID;
+typedef long long int* PLARGE_INTEGER;
 
 typedef wchar_t WCHAR;
 
@@ -207,7 +203,7 @@ typedef struct tagTOGGLEKEYS
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
 
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64)
 typedef int64_t INT_PTR;
 typedef uint64_t UINT_PTR;
 typedef int64_t LONG_PTR;
@@ -215,7 +211,7 @@ typedef int64_t LONG_PTR;
 typedef int INT_PTR;
 typedef unsigned int UINT_PTR;
 typedef long LONG_PTR;
-#endif // defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
+#endif // XR_ARCHITECTURE_X64
 
 typedef void* HANDLE;
 typedef void* HMODULE;
@@ -225,8 +221,11 @@ typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef long HRESULT;
 typedef long LRESULT;
+typedef long _W64;
 typedef void* HWND;
 typedef void* HDC;
+typedef float FLOAT;
+typedef unsigned char UINT8;
 
 typedef struct _RECT {
     long left;
@@ -307,7 +306,7 @@ inline int strcpy_s(char *dest, size_t num, const char *source)
     return ERANGE;
 }
 
-template <size_t num>
+template <std::size_t num>
 inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(dest, num, source); }
 
 inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
@@ -347,7 +346,7 @@ inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t n
     return EINVAL;
 }
 
-template <size_t dst_sz>
+template <std::size_t dst_sz>
 inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { return strncpy_s(dest, dst_sz, source, num); }
 
 inline int strcat_s(char * dest, size_t num, const char * source)
@@ -422,6 +421,7 @@ inline int vsnprintf_s(char* buffer, size_t size, size_t, const char* format, va
 #define wcsicmp _wcsicmp
 #define _wcsicmp wcscmp
 #define _tempnam tempnam
+#define _unlink unlink
 #define _access access
 #define _open open
 #define _close close
@@ -436,14 +436,7 @@ inline int _filelength(int fd)
     return file_info.st_size;
 }
 #define _fdopen fdopen
-inline int _rmdir(const char *path)
-{
-    char* conv_fn = strdup(path);
-    convert_path_separators(conv_fn);
-    int result = rmdir(conv_fn);
-    free(conv_fn);
-    return result;
-}
+#define _rmdir rmdir
 #define _write write
 #define _strupr strupr
 #define _read read
@@ -465,7 +458,7 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
 
-#define RGB(r,g,b) ( ((DWORD)(uint8_t)r)|((DWORD)((uint8_t)g)<<8)|((DWORD)((uint8_t)b)<<16) )
+#define RGB(r,g,b) ( ((DWORD)(BYTE)r)|((DWORD)((BYTE)g)<<8)|((DWORD)((BYTE)b)<<16) )
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 #define S_OK 0x00000000
@@ -477,10 +470,13 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define _MAX_FNAME	256
 #define _MAX_EXT	256
 
+#define SEM_FAILCRITICALERRORS 1
+#define SetErrorMode(x) {}
+
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)  \
-    ((DWORD)(uint8_t)(ch0) | ((DWORD)(uint8_t)(ch1) << 8) |  \
-    ((DWORD)(uint8_t)(ch2) << 16) | ((DWORD)(uint8_t)(ch3) << 24 ))
+    ((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) |  \
+    ((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24 ))
 #endif
 
 typedef enum _D3DFORMAT {
@@ -627,10 +623,10 @@ typedef enum _D3DBLENDOP {
 typedef struct _D3DVERTEXELEMENT9 {
   WORD    Stream;
   WORD    Offset;
-  uint8_t Type;
-  uint8_t Method;
-  uint8_t Usage;
-  uint8_t UsageIndex;
+  BYTE    Type;
+  BYTE    Method;
+  BYTE    Usage;
+  BYTE    UsageIndex;
 } D3DVERTEXELEMENT9, *LPD3DVERTEXELEMENT9;
 
 #define MAXD3DDECLLENGTH         64 /* +end marker */
@@ -1091,14 +1087,13 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
-template <typename T>
-decltype(auto) do_nothing(const T& obj)
-{
-    return obj;
-}
-
-#define xr_fs_strlwr(str) do_nothing(str)
+#define xr_fs_strlwr(str) str
 #define xr_fs_nostrlwr(str) xr_strlwr(str)
+
+inline void convert_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '\\')) *sep = '/';
+}
 
 /** For backward compability of FS, for real filesystem delimiter set to back
  * @brief restore_path_separators

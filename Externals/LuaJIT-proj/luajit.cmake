@@ -188,7 +188,7 @@ if (WIN32)
 
 	set(LJVM_MODE peobj)
 elseif (APPLE)
-	if (${MACOSX_DEPLOYMENT_TARGET} STREQUAL "")
+	if (CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
 		message(FATAL_ERROR "Missing export MACOSX_DEPLOYMENT_TARGET=XX.YY")
 	endif()
 
