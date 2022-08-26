@@ -407,7 +407,7 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
@@ -418,7 +418,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     pthread
-    ${SDL_LIBRARIES}
+    ${SDL2_LIBRARIES}
     $<$<BOOL:${USE_CRYPTOPP}>:${CRYPTO++_LIBRARIES}>
     PRIVATE
     xrMiscMath

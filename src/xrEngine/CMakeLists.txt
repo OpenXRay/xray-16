@@ -384,7 +384,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
     ${CMAKE_SOURCE_DIR}/Externals/luabind
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -402,7 +402,7 @@ target_link_libraries(${PROJECT_NAME}
     ${OGG_LIBRARIES}
     xrCDB
     ${OPENAL_LIBRARY}
-    ${SDL_LIBRARIES}
+    ${SDL2_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}

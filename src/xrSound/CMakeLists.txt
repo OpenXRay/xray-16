@@ -114,7 +114,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/Externals/libogg/include
     ${CMAKE_SOURCE_DIR}/Externals/openal/include
     ${OGG_INCLUDE_DIRS}
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
