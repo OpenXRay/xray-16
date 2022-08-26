@@ -401,7 +401,7 @@ target_link_libraries(${PROJECT_NAME}
     ${THEORA_LIBRARY}
     ${OGG_LIBRARIES}
     xrCDB
-    openal
+    ${OPENAL_LIBRARY}
     ${SDL_LIBRARIES}
 )
 

@@ -124,7 +124,7 @@ target_link_libraries(${PROJECT_NAME}
     xrAPI
     xrCDB
     ${OGG_LIBRARIES}
-    openal
+    ${OPENAL_LIBRARY}
     vorbis
     vorbisfile
 )

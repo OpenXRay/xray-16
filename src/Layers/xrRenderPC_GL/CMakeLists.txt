@@ -403,15 +403,15 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    xrCore
+    xrAPI
     xrCDB
+    xrCore
     xrEngine
     xrParticles
     xrScriptEngine
-    xrAPI
-    GL
-    GLEW
     xrLuabind
+    OpenGL::GL
+    GLEW::GLEW
 )
 
 target_compile_definitions(${PROJECT_NAME}

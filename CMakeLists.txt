@@ -232,6 +232,7 @@ endif()
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
 if (NOT WIN32)
+    find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(OpenAL REQUIRED)
     if (USE_CRYPTOPP)
