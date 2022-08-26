@@ -47,12 +47,6 @@ void SetThreadNameImpl(DWORD threadId, pcstr name)
     }
 }
 
-void SetThreadName(ThreadHandle threadHandle, pcstr name)
-{
-    DWORD threadId = GetThreadId(threadHandle);
-    SetThreadNameImpl(threadId, name);
-}
-
 void SetCurrentThreadName(pcstr name)
 {
     SetThreadNameImpl(-1, name);
@@ -110,14 +104,6 @@ ThreadId GetCurrThreadId() { return pthread_self(); }
 ThreadHandle GetCurrentThreadHandle() { return pthread_self(); }
 
 bool ThreadIdsAreEqual(ThreadId left, ThreadId right) { return !!pthread_equal(left, right); }
-
-void SetThreadName(ThreadHandle threadHandle, pcstr name)
-{
-    if (auto error = pthread_setname_np(threadHandle, name) != 0)
-    {
-        Msg("SetThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
-    }
-}
 
 void SetCurrentThreadName(pcstr name)
 {
