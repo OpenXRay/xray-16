@@ -15,9 +15,9 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 
 |CI|Platform|Compiler|Configurations|Platforms|Status|
 |---|---|---|---|---|---|
-|AppVeyor|Windows, Linux|MSVC, GCC|Debug, Mixed, Release, Release Master Gold|x64, x86|[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
-|Travis|Linux|GCC|Debug, Release|ARM64, x64, x86|[![Travis Build Status](https://api.travis-ci.com/OpenXRay/xray-16.svg?branch=dev)](https://app.travis-ci.com/github/OpenXRay/xray-16)|
-|GitHub Actions|Windows, Linux|MSVC, GCC|Debug, Mixed, Release, Release Master Gold|x64, x86|[![GitHub Actions Build Status](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml/badge.svg)](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml)
+|AppVeyor|Windows, Ubuntu|MSVC, GCC|Debug, Mixed, Release, Release Master Gold|x64, x86|[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
+|GitHub Actions|Windows, Ubuntu, Alpine Linux|MSVC, GCC, Clang|Debug, Mixed, Release, Release Master Gold|x64, x86|[![GitHub Actions Build Status](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml/badge.svg)](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml)
+|Travis|Ubuntu|GCC|Debug, Release|ARM64|[![Travis Build Status](https://api.travis-ci.com/OpenXRay/xray-16.svg?branch=dev)](https://app.travis-ci.com/github/OpenXRay/xray-16)|
 
 ### Contributing
 All contributions are more than welcomed. There are several ways how you can contribute:
@@ -116,5 +116,9 @@ Thank you for your support!
   * [Vincent](https://github.com/0xBADEAFFE) – for work on the Linux port.
   * [abramcumner](https://github.com/abramcumner) – for useful fixes and additions.
   * [Morrey](https://github.com/morrey) – for work on Clear Sky support and his Return to Clear Sky mod.
+* Companies:
+  * [CoderGears](https://www.cppdepend.com) – thanks for providing a [free Pro Licence for CppDepend](https://www.cppdepend.com/cppdependfoross), an amazing and powerful tool for C and C++.
+    [![CppDepend logo](https://www.cppdepend.com/images/cppdependlogo.png)](https://www.cppdepend.com)
+
 
 If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you.

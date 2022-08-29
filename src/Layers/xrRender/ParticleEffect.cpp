@@ -14,7 +14,7 @@
 #endif
 #endif
 
-#if defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) // XXX: remove
 #include <math.h>
 #endif
 
@@ -154,7 +154,7 @@ void CParticleEffect::OnFrame(u32 frame_dt)
         m_MemDT += frame_dt;
 
         int StepCount = 0;
-        if (m_MemDT >= uDT_STEP)
+        if (m_MemDT >= static_cast<s32>(uDT_STEP))
         {
             // allow maximum of three steps (99ms) to avoid slowdown after loading
             // it will really skip updates at less than 10fps, which is unplayable

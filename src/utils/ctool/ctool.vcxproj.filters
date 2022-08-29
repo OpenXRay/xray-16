@@ -12,11 +12,9 @@
     <ClCompile Include="ctool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="PPMT_SA.hpp">
-      <Filter>PPMTrain</Filter>
-    </CustomBuild>
+    <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\..\OpenXRay.natvis" />
+    <ClInclude Include="PPMT_SA.hpp" />
   </ItemGroup>
 </Project>

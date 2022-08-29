@@ -12,6 +12,7 @@
   </ImportGroup>
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
+    <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -79,8 +80,8 @@
       <ObjectFileName>$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
-    <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
     <ClCompile Include="..\xrLC_Light\ETextureParams.cpp" />
+    <ClCompile Include="..\xrLoadSurface.cpp" />
     <ClCompile Include="Build.cpp" />
     <ClCompile Include="Build_Load.cpp" />
     <ClCompile Include="fmesh.cpp" />

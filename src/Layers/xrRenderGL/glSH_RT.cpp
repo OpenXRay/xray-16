@@ -29,11 +29,13 @@ bool CRT::used_as_depth() const
     case D3DFMT_D15S1:
     case D3DFMT_D24X8:
     case D3DFMT_D24S8:
-    case MAKEFOURCC('D', 'F', '2', '4'):
-        return true;
-    default:
-        return false;
+        return true; 
     }
+
+    if (fmt == MAKEFOURCC('D', 'F', '2', '4'))
+        return true;
+
+    return false;
 }
 
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 /*flags = {}*/)
@@ -107,7 +109,7 @@ void CRT::resolve_into(CRT& destination) const
     RCache.set_RT(pRT, 0);
     RCache.set_RT(destination.pRT, 1);
 
-    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(std::size(buffers), buffers));
 

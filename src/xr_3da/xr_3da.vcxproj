@@ -7,6 +7,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{F4757631-E6E8-469B-AD5A-516BAA01DABD}</ProjectGuid>
     <RootNamespace>xr3da</RootNamespace>
+    <ProjectName>XR_3DA</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ImportGroup Label="PropertySheets">

@@ -618,7 +618,7 @@ bool Decode(int total_size) /* recover */
     textsize |= (fs._getb() << 24);
     if (textsize == 0)
         return false;
-    if (total_size != -1 && textsize > total_size)
+    if (total_size != -1 && static_cast<int>(textsize) > total_size)
         return false;
 
     fs.Init_Output(textsize);
@@ -708,3 +708,12 @@ size_t _readLZ(int hf, void*& d, size_t size)
     d = fs.OutPointer();
     return fs.OutSize();
 }
+
+#undef N
+#undef F
+#undef THRESHOLD
+#undef NIL
+#undef N_CHAR
+#undef T
+#undef R
+#undef MAX_FREQ

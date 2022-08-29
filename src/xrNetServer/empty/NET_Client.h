@@ -78,7 +78,7 @@ protected:
     {
         net_ClientID = local_client;
     }
-    IC virtual void SendTo_LL(void* data, u32 size,
+    virtual void SendTo_LL(void* data, u32 size,
         u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/,
         u32 dwTimeout = 0);
 

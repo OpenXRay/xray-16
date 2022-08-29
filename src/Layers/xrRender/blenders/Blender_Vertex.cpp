@@ -93,8 +93,7 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
             cpcstr tsv_hq = C.bDetail_Diffuse ? "vert_dt" : "vert";
             cpcstr tsp_hq = C.bDetail_Diffuse ? "vert_dt" : "vert";
 
-            C.PassSET_VS(tsv_hq);
-            C.PassSET_PS(tsp_hq);
+            C.PassSET_Shaders(tsv_hq, tsp_hq);
 
             C.PassSET_LightFog(false, true);
 
@@ -111,8 +110,7 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
         // Level view
         C.PassBegin();
         {
-            C.PassSET_VS("vert");
-            C.PassSET_PS("vert");
+            C.PassSET_Shaders("vert", "vert");
 
             C.PassSET_LightFog(false, true);
 
@@ -124,8 +122,7 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
     case SE_R1_LPOINT:
         C.PassBegin();
         {
-            C.PassSET_VS("vert_point");
-            C.PassSET_PS("add_point");
+            C.PassSET_Shaders("vert_point", "add_point");
 
             C.PassSET_ZB(true, false);
             C.PassSET_Blend(true, D3DBLEND_ONE, D3DBLEND_ONE, true, 0);
@@ -140,8 +137,7 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
     case SE_R1_LSPOT:
         C.PassBegin();
         {
-            C.PassSET_VS("vert_spot");
-            C.PassSET_PS("add_spot");
+            C.PassSET_Shaders("vert_spot", "add_spot");
 
             C.PassSET_ZB(true, false);
             C.PassSET_Blend(true, D3DBLEND_ONE, D3DBLEND_ONE, true, 0);
@@ -159,8 +155,7 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
     case SE_R1_LMODELS:
         C.PassBegin();
         {
-            C.PassSET_VS("vert_l");
-            C.PassSET_PS("vert_l");
+            C.PassSET_Shaders("vert_l", "vert_l");
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
         }

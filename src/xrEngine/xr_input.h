@@ -71,6 +71,12 @@ public:
         FeedbackTriggers,
     };
 
+    enum InputType
+    {
+        KeyboardMouse,
+        Controller,
+    };
+
     enum
     {
         COUNT_MOUSE_AXIS = 4,
@@ -106,6 +112,10 @@ private:
     xr_vector<IInputReceiver*> cbStack;
 
     xr_vector<SDL_GameController*> controllers;
+
+    InputType currentInputType{ KeyboardMouse };
+
+    void SetCurrentInputType(InputType type);
 
     void MouseUpdate();
     void KeyUpdate();
@@ -154,6 +164,7 @@ public:
     bool IsControllerAvailable() const { return !controllers.empty(); }
     void EnableControllerSensors(bool enable);
 
+    auto GetCurrentInputType() { return currentInputType; }
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;

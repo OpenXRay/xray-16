@@ -53,7 +53,7 @@ void hmatmult(Matrix A, Matrix B, Matrix C);
 void inverthomomatrix(Matrix N, Matrix M);
 void vecmult(float y[], float x[], Matrix M);
 void vecmult0(float y[], float x[], Matrix M);
-void qtomatrix(Matrix m, Quaternion q);
+void qtomatrix(Matrix m, const Quaternion q);
 void matrixtoq(Quaternion q, Matrix m);
 void axistoq(Quaternion q, float angle, float axis[]);
 void qtoaxis(float* angle, float axis[], Quaternion q);

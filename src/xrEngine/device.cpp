@@ -1,22 +1,6 @@
 #include "stdafx.h"
 #include "xrCDB/Frustum.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-// mmsystem.h
-#define MMNOSOUND
-#define MMNOMIDI
-#define MMNOAUX
-#define MMNOMIXER
-#define MMNOJOY
-#if defined(XR_PLATFORM_WINDOWS)
-#include <mmsystem.h>
-#endif
-#include "SDL.h"
-#pragma warning(pop)
-
-#include <thread>
-
 #include "x_ray.h"
 #include "Render.h"
 
@@ -25,14 +9,26 @@
 
 #include "Include/editor/ide.hpp"
 
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
+
+#include <thread>
+
+#include <SDL.h>
+
+// mmsystem.h
+#if defined(XR_PLATFORM_WINDOWS)
+#define MMNOSOUND
+#define MMNOMIDI
+#define MMNOAUX
+#define MMNOMIXER
+#define MMNOJOY
+#include <mmsystem.h>
+#endif
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -112,11 +108,19 @@ void CRenderDevice::RenderEnd(void)
     g_bRendering = false;
     // end scene
     // Present goes here, so call OA Frame end.
-#if !defined(XR_PLATFORM_LINUX)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(fTimeGlobal);
-#endif
+
     GEnv.Render->End();
+
+    vCameraPositionSaved = vCameraPosition;
+    vCameraDirectionSaved = vCameraDirection;
+    vCameraTopSaved = vCameraTop;
+    vCameraRightSaved = vCameraRight;
+
+    mFullTransformSaved = mFullTransform;
+    mViewSaved = mView;
+    mProjectSaved = mProject;
 
     if (load_finished && m_editor)
         m_editor->on_load_finished();
@@ -194,10 +198,8 @@ bool CRenderDevice::BeforeFrame()
         return false;
     }
 
-#if !defined(XR_PLATFORM_LINUX)
     if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
-#endif
 
     return true;
 }
@@ -217,18 +219,11 @@ void CRenderDevice::BeforeRender()
     }
 
     // Matrices
+    mInvView.invert(mView);
     mFullTransform.mul(mProject, mView);
-    GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert_44(mFullTransform);
-
-    vCameraPositionSaved = vCameraPosition;
-    vCameraDirectionSaved = vCameraDirection;
-    vCameraTopSaved = vCameraTop;
-    vCameraRightSaved = vCameraRight;
-
-    mFullTransformSaved = mFullTransform;
-    mViewSaved = mView;
-    mProjectSaved = mProject;
+    GEnv.Render->BeforeRender();
+    GEnv.Render->SetCacheXform(mView, mProject);
 }
 
 void CRenderDevice::DoRender()
@@ -268,7 +263,6 @@ void CRenderDevice::ProcessFrame()
 
     const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
-    GEnv.Render->BeforeFrame();
     FrameMove();
 
     BeforeRender();

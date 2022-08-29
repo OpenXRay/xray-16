@@ -11,18 +11,7 @@
 
 occRasterizer Raster;
 
-void __stdcall fillDW_8x(void* _p, u32 size, u32 value)
-{
-    u32* ptr = (u32*)(_p);
-    u32* end = ptr + size;
-    for (; ptr != end; ptr += 2)
-    {
-        ptr[0] = value;
-        ptr[1] = value;
-    }
-}
-
-IC void propagade_depth(LPVOID p_dest, LPVOID p_src, int dim)
+static void propagade_depth(LPVOID p_dest, LPVOID p_src, int dim)
 {
     occD* dest = (occD*)p_dest;
     occD* src = (occD*)p_src;
@@ -75,18 +64,7 @@ void occRasterizer::clear()
     MemFill32(bufDepth, *(u32 *)(&f), size);
 }
 
-IC BOOL shared(occTri* T1, occTri* T2)
-{
-    if (T1 == T2)
-        return TRUE;
-    if (T1->adjacent[0] == T2)
-        return TRUE;
-    if (T1->adjacent[1] == T2)
-        return TRUE;
-    if (T1->adjacent[2] == T2)
-        return TRUE;
-    return FALSE;
-}
+BOOL shared(occTri* T1, occTri* T2);
 
 void occRasterizer::propagade()
 {
@@ -173,10 +151,8 @@ void occRasterizer::on_dbg_render()
                 box_r = right_bottom;
                 box_r.sub(box_center);
 
-                Fmatrix inv;
-                inv.invert(Device.mView);
-                inv.transform(box_center);
-                inv.transform_dir(box_r);
+                Device.mInvView.transform(box_center);
+                Device.mInvView.transform_dir(box_r);
 
                 pixel_box& tmp = dbg_pixel_boxes[i * occ_dim_0 + j];
                 tmp.center = box_center;
@@ -205,7 +181,7 @@ void occRasterizer::on_dbg_render()
 #endif
 }
 
-IC BOOL test_Level(occD* depth, int dim, float _x0, float _y0, float _x1, float _y1, occD z)
+static BOOL test_Level(occD* depth, int dim, float _x0, float _y0, float _x1, float _y1, occD z)
 {
     int x0 = iFloor(_x0 * dim + .5f);
     clamp(x0, 0, dim - 1);

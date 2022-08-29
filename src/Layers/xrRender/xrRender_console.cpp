@@ -248,7 +248,7 @@ float ps_r2_gloss_factor = 4.0f;
 #include "xrEngine/xr_ioc_cmd.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/StateManager/dx10SamplerStateCache.h"
+#include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #endif
 
 //-----------------------------------------------------------------------
@@ -707,7 +707,7 @@ public:
 #if (RENDER == R_R3) || (RENDER == R_R4)
 #   ifndef MASTER_GOLD
 
-#   include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
+#   include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 
 class CCC_Fog_Reload : public IConsole_Command
 {

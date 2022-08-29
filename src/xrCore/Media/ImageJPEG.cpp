@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Image.hpp"
 
-#include <cstdio>
-
 #if __has_include(<jpeglib.h>)
 #   include <jpeglib.h>
+#   undef HAVE_STDDEF_H // XXX: warning workaround
+
 #   include <setjmp.h>
 #endif
 

@@ -556,12 +556,6 @@
     <Filter Include="AI\AMonsters\common\monster states\Steal">
       <UniqueIdentifier>{2fa0f717-0403-4c7e-ad7f-2530a88eb71c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad">
-      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad\Rest">
-      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AMonsters\common\monster states\Hunt">
       <UniqueIdentifier>{098ea533-6ac0-45d2-87d0-f7b07721ed96}</UniqueIdentifier>
     </Filter>
@@ -2191,9 +2185,6 @@
     <Filter Include="ScriptClasses\UI">
       <UniqueIdentifier>{b08ee833-e28c-4687-b6b5-0907349836ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ScriptClasses\KeyBindings">
-      <UniqueIdentifier>{2be23629-93c7-4bb0-997f-7c681c5a0f1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ScriptClasses\ScriptReader">
       <UniqueIdentifier>{cfbfa419-543b-48f1-80e6-2082a84c6ecf}</UniqueIdentifier>
     </Filter>
@@ -2253,6 +2244,12 @@
     </Filter>
     <Filter Include="Core\Server\Games\client\mp_script">
       <UniqueIdentifier>{3063bb58-b29e-4339-9f19-764c7e8bf9fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\monster states\Rest\Squad">
+      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\monster states\Rest\Squad\Rest">
+      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -3274,16 +3271,16 @@
       <Filter>AI\AMonsters\common\monster states\Steal</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_attack.h">
       <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
@@ -6231,9 +6228,6 @@
     <ClInclude Include="ui\UIGameTutorial.h">
       <Filter>UI\Tutorial</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\PHNetState.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="PHShellCreator.h">
       <Filter>Physics</Filter>
     </ClInclude>
@@ -7826,9 +7820,6 @@
     <ClCompile Include="ui_export_script.cpp">
       <Filter>ScriptClasses\UI</Filter>
     </ClCompile>
-    <ClCompile Include="key_binding_registrator_script.cpp">
-      <Filter>ScriptClasses\KeyBindings</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_reader_script.cpp">
       <Filter>ScriptClasses\ScriptReader</Filter>
     </ClCompile>
@@ -8107,6 +8098,9 @@
     </ClCompile>
     <ClCompile Include="entity_alive.cpp">
       <Filter>Core\Client\Objects\base\EntityAlive</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityCondition_script.cpp">
+      <Filter>Core\Client\Objects\base\EntityCondition</Filter>
     </ClCompile>
     <ClCompile Include="EntityCondition.cpp">
       <Filter>Core\Client\Objects\base\EntityCondition</Filter>
@@ -9607,9 +9601,6 @@
     </ClCompile>
     <ClCompile Include="ui\UIGameTutorialVideoItem.cpp">
       <Filter>UI\Tutorial</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\PHNetState.cpp">
-      <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="PHShellCreator.cpp">
       <Filter>Physics</Filter>

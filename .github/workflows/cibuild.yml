@@ -1,4 +1,4 @@
-name: CI
+name: Build
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-windows:
+    name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
     runs-on: windows-2019
     strategy:
       fail-fast: false
@@ -17,20 +18,23 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        fetch-depth: 0
+        submodules: recursive
+
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
+
     - name: Setup NuGet.exe
       uses: nuget/setup-nuget@v1
       with:
         nuget-version: '5.x'
-    - name: Setup
-      run: |
-        git submodule update --init --recursive
-        nuget restore src\engine.sln
+
+    - name: Restore NuGet packages
+      run: nuget restore src\engine.sln
+
     - name: MSBuild
       working-directory: src
-      run: msbuild /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
+      run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
+
     - name: Prepare artifacts
       id: windows-vars
       shell: cmd
@@ -39,68 +43,222 @@ jobs:
         set PLATFORM=${{ matrix.Platform }}
         call xr_pack_build.cmd ARTIFACT_EDITION
         echo ::set-output name=Build_type::%ARTIFACT_EDITION%
+
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@v2
       with:
         name: OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
+
     - name: Upload Symbols
       uses: actions/upload-artifact@v2
       with:
         name: Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
+
     - name: Upload Utils
       uses: actions/upload-artifact@v2
       with:
         name: Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
 
-  build-linux:
+  build-ubuntu:
+    name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        configuration: [Debug, Release]
+        Configuration: [Debug, Release]
         Platform: [x64, x86]
+        CC: [gcc-9, clang-9]
+        include:
+          - CC: gcc-9
+            CXX: g++-9
+          - CC: clang-9
+            CXX: clang++-9
+
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
-    - name: Setup
+        submodules: recursive
+
+    - name: Deinit Crypto++
+      run: git submodule deinit Externals/cryptopp
+
+    - name: Install x64 packages
+      if: ${{ matrix.Platform == 'x64' }}
       run: |
-        git submodule update --init --recursive
-        git submodule deinit Externals/cryptopp
-    - name: Build
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
+          sudo apt-get install -qq -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev
+
+    - name: Install x86 packages
+      if: ${{ matrix.Platform == 'x86' }}
       run: |
-        export CC=gcc-9
-        export CXX=g++-9
-        ${CXX} --version
-        export core_count=$(nproc || echo 4) && echo core_count = $core_count
-        mkdir bin && cd bin
-        if [ "${{ matrix.Platform }}" = "x64" ]; then
-        sudo apt-get update &&
-        sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libcrypto++-dev libjpeg-dev &&
-        sudo apt-get install -y cmake liblua5.1-0-dev libogg-dev libtheora-dev libvorbis-dev liblzo2-dev libncurses5-dev libsdl2-dev &&
-        CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
-        fi
-        if [ "${{ matrix.Platform }}" = "x86" ]; then
-        sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get install -y gcc-multilib g++-9-multilib libpulse-dev:i386 libglib2.0-dev:i386 &&
-        sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libopenal-dev:i386 libcrypto++-dev:i386 libjpeg-dev:i386 &&
-        sudo apt-get install -y cmake liblua5.1-0-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386 libncurses5-dev:i386 libsdl2-dev:i386 &&
-        CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
-        fi
-        make -j $core_count package
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y libsdl2-dev:i386 libglew-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 &&
+          sudo apt-get install -qq -y libopenal-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386
+
+    - name: Install GCC x64
+      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'gcc-9' }}
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 9
+        platform: x64
+
+    - name: Install GCC x86
+      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'gcc-9' }}
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 9
+        platform: x86
+
+    - name: Install Clang x64
+      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'clang-9' }}
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 9
+        platform: x64
+
+    - name: Install Clang x86
+      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
+      uses: egor-tensin/setup-clang@v1
+      with:
+        version: 9
+        platform: x86
+        
+    - name: Install libc++ for Clang x86
+      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
+      run: sudo apt-get install -qq -y libc++-9-dev:i386 libc++abi-9-dev:i386
+
+    - name: Run CMake x64
+      if: ${{ matrix.Platform == 'x64' }}
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+
+    - name: Run CMake x86
+      if: ${{ matrix.Platform == 'x86' }}
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
+
+    - name: Run CMake Build
+      id: cmake-build
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
+
+    - name: Make package
+      if: ${{ steps.cmake-build.outcome == 'success' }}
+      id: make-package
+      working-directory: build
+      #continue-on-error: true
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: |
+        make -j $(nproc || echo 4) package
         file openxray_1.6.02_*.deb
-    - name: Prepare artifacts
-      id: linux-vars
-      run: |
-        if [ "${{ matrix.Platform }}" = "x64" ]; then
-        echo ::set-output name=Build_type::amd64
-        elif [ "${{ matrix.Platform }}" = "x86" ]; then
-        echo ::set-output name=Build_type::i386
-        fi
+
     - name: Upload OpenXRay artifact
+      if: ${{ matrix.Platform == 'x64' && steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@v2
       with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ steps.linux-vars.outputs.Build_type }}.deb
-        path: bin/openxray_1.6.02_${{ steps.linux-vars.outputs.Build_type }}.deb
+        name: openxray_1.6.02_${{ matrix.Configuration }}_amd64.deb
+        path: build/openxray_1.6.02_amd64.deb
+
+    - name: Upload OpenXRay artifact
+      if: ${{ matrix.Platform == 'x86' && steps.make-package.outcome == 'success' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: openxray_1.6.02_${{ matrix.Configuration }}_i386.deb
+        path: build/openxray_1.6.02_i386.deb
+
+  build-ubuntu-mold:
+    name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }}, mold)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        Configuration: [Release]
+        Platform: [x64]
+        CC: [clang]
+        include:
+          - CC: clang
+            CXX: clang++
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Deinit Crypto++
+      run: git submodule deinit Externals/cryptopp
+
+    - name: Install packages
+      run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
+          sudo apt-get install -qq -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev
+
+    - name: Install Clang
+      uses: egor-tensin/setup-clang@v1
+
+    - name: Install mold
+      uses: rui314/setup-mold@v1
+
+    - name: Run CMake
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
+
+    - name: Run CMake Build
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
+
+  build-alpine:
+    name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        Configuration: [Debug, Release]
+        Platform: [x86_64, x86]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Deinit Crypto++
+      run: |
+        git submodule deinit Externals/cryptopp
+
+    - name: Install latest stable Alpine Linux
+      uses: jirutka/setup-alpine@v1
+      with:
+        arch: ${{ matrix.Platform }}
+        branch: 'latest-stable'
+        packages: build-base binutils-gold cmake sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
+
+    - name: Run CMake x64
+      if: ${{ matrix.Platform == 'x86_64' }}
+      shell: alpine.sh {0}
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+
+    - name: Run CMake x86
+      if: ${{ matrix.Platform == 'x86' }}
+      shell: alpine.sh {0}
+      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_ASM_FLAGS=-m32 -DCMAKE_UNITY_BUILD=ON
+
+    - name: Run CMake Build
+      shell: alpine.sh {0}
+      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)

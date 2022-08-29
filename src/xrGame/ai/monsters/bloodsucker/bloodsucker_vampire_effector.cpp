@@ -44,11 +44,6 @@ bool CVampirePPEffector::Process(SPPInfo& pp)
 //////////////////////////////////////////////////////////////////////////
 // Vampire Camera Effector
 //////////////////////////////////////////////////////////////////////////
-#define DELTA_ANGLE_X 10 * PI / 180
-#define DELTA_ANGLE_Y DELTA_ANGLE_X
-#define DELTA_ANGLE_Z DELTA_ANGLE_X
-#define ANGLE_SPEED 0.2f
-#define BEST_DISTANCE 0.3f
 CVampireCameraEffector::CVampireCameraEffector(float time, const Fvector& src, const Fvector& tgt)
     : inherited(eCEVampire, time)
 {

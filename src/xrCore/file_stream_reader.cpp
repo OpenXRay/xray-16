@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "file_stream_reader.h"
-#ifdef XR_PLATFORM_LINUX
+
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #include <fcntl.h>
 #endif
 
@@ -11,12 +12,12 @@ void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
 
     VERIFY(m_file_handle != INVALID_HANDLE_VALUE);
     const auto file_size = static_cast<size_t>(GetFileSize(m_file_handle, nullptr));
-    
+
     const auto file_mapping_handle = CreateFileMapping(m_file_handle, nullptr, PAGE_READONLY, 0, 0, nullptr);
     VERIFY(file_mapping_handle != INVALID_HANDLE_VALUE);
 
     inherited::construct(file_mapping_handle, 0, file_size, file_size, window_size);
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
     pstr conv_fn = xr_strdup(file_name);
     convert_path_separators(conv_fn);
     m_file_handle = ::open(conv_fn, O_RDONLY);
@@ -26,6 +27,8 @@ void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
     ::fstat(m_file_handle, &file_info);
     size_t file_size = (size_t)file_info.st_size;
     inherited::construct(m_file_handle, 0, file_size, file_size, window_size);
+#else
+#   error Select or add implementation for your platform
 #endif
 }
 
@@ -36,10 +39,11 @@ void CFileStreamReader::destroy()
     inherited::destroy();
     CloseHandle(file_mapping_handle);
     CloseHandle(m_file_handle);
-#elif defined(XR_PLATFORM_LINUX)
-    int file_mapping_handle = this->file_mapping_handle();
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
     inherited::destroy();
     ::close(m_file_handle);
     m_file_handle = -1;
+#else
+#   error Select or add implementation for your platform
 #endif
 }

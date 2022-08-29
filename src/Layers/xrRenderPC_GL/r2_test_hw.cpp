@@ -48,12 +48,6 @@ bool TestOpenGLSupport()
         Log("~ Could not initialize glew.");
         return false;
     }
-
-    if (!glewIsSupported("GL_ARB_separate_shader_objects"))
-    {
-        Log("~ GL_ARB_separate_shader_objects not supported");
-        return false;
-    }
     return true;
 }
 

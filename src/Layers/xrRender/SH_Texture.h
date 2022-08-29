@@ -46,7 +46,7 @@ public:
 #endif
 
 #if defined(USE_DX9) || defined(USE_DX11)
-    //	Since DX10 allows up to 128 unique textures,
+    //	Since DX11 allows up to 128 unique textures,
     //	distance between enum values should be at leas 128
     enum ResourceShaderType //	Don't change this since it's hardware-dependent
     {
@@ -134,7 +134,6 @@ private:
     void desc_update();
 #if defined(USE_DX11)
     void Apply(u32 dwStage);
-    void ProcessStaging();
     D3D_USAGE GetUsage();
 #endif
 
@@ -146,9 +145,6 @@ public: //	Public class members (must be encapsulated further)
         u32 bUser : 1;
         u32 seqCycles : 1;
         u32 MemoryUsage : 28;
-#if defined(USE_DX11)
-        u32 bLoadedAsStaging : 1;
-#endif
     } flags;
 
     fastdelegate::FastDelegate1<u32> bind;

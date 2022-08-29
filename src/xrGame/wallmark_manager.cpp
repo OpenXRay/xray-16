@@ -92,8 +92,7 @@ void CWalmarkManager::StartWorkflow()
     float m_wallmark_size = pSettings->r_float(sect, "size");
     u32 max_wallmarks_count = pSettings->r_u32(sect, "max_count");
 
-    XRC.box_options(0);
-    XRC.box_query(Level().ObjectSpace.GetStaticModel(), m_pos, Fvector().set(m_trace_dist, m_trace_dist, m_trace_dist));
+    XRC.box_query(0, Level().ObjectSpace.GetStaticModel(), m_pos, Fvector().set(m_trace_dist, m_trace_dist, m_trace_dist));
 
     CDB::TRI* T_array = Level().ObjectSpace.GetStaticTris();
     Fvector* V_array = Level().ObjectSpace.GetStaticVerts();

@@ -1,6 +1,5 @@
 #pragma once
-#ifndef _BITWISE_
-#define _BITWISE_
+
 #include <cmath>
 #include "math_constants.h"
 #include "xr_types.h"
@@ -108,13 +107,7 @@ IC bool fis_gremlin(const float& f)
     return value > 0xc0;
 }
 IC bool fis_denormal(const float& f) { return !(*(int*)&f & 0x7f800000); }
-// Approximated calculations
-IC float apx_InvSqrt(const float& n)
-{
-    long tmp = (long(0xBE800000) - *(long*)&n) >> 1;
-    float y = *(float*)&tmp;
-    return y * (1.47f - 0.47f * n * y * y);
-}
+
 // Only for [0..1] (positive) range
 IC float apx_asin(const float x)
 {
@@ -128,6 +121,6 @@ IC float apx_asin(const float x)
 
     return d;
 }
+
 // Only for [0..1] (positive) range
 IC float apx_acos(const float x) { return PI_DIV_2 - apx_asin(x); }
-#endif

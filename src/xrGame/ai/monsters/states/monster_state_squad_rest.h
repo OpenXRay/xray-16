@@ -5,6 +5,12 @@
 template <typename _Object>
 class CStateMonsterSquadRest : public CState<_Object>
 {
+    static constexpr u32 MIN_TIME_IDLE = 5000;
+    static constexpr u32 MAX_TIME_IDLE = 10000;
+
+    static constexpr float LEADER_RADIUS = 20.f;
+    static constexpr u32 FIND_POINT_ATTEMPTS = 5;
+
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;

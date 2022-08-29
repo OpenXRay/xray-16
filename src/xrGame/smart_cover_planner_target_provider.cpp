@@ -15,12 +15,8 @@
 #include "agent_enemy_manager.h"
 #include "Weapon.h"
 
-using smart_cover::animation_planner;
-using smart_cover::target_provider;
-using smart_cover::target_idle;
-using smart_cover::target_fire;
-using smart_cover::target_fire_no_lookout;
-
+namespace smart_cover
+{
 target_provider::target_provider(animation_planner* object, LPCSTR name,
     StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value)
     : inherited(object, name), m_world_property(world_property), m_loophole_value(loophole_value)
@@ -115,3 +111,4 @@ void target_fire_no_lookout::initialize()
     m_storage->set_property(StalkerDecisionSpace::eWorldPropertyLookedOut, false);
     inherited::initialize();
 }
+} // namespace smart_cover

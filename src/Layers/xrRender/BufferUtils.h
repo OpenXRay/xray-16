@@ -34,7 +34,6 @@ HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize);
 class VertexStagingBuffer
 {
 public:
-    VertexStagingBuffer();
     ~VertexStagingBuffer();
 
     void Create(size_t size, bool allowReadBack = false);
@@ -78,17 +77,16 @@ public:
 private:
     void Destroy();
 
-    VertexBufferHandle m_DeviceBuffer;
-    HostBufferHandle m_HostBuffer;
-    size_t m_Size{ 0 };
-    u32 m_RefCounter{ 0 };
-    bool m_AllowReadBack{ false }; // specifies whether host will want to have the data back (e.g. skinning code)
+    VertexBufferHandle m_DeviceBuffer{};
+    HostBufferHandle m_HostBuffer{};
+    size_t m_Size{};
+    u32 m_RefCounter{};
+    bool m_AllowReadBack{}; // specifies whether host will want to have the data back (e.g. skinning code)
 };
 
 class IndexStagingBuffer
 {
 public:
-    IndexStagingBuffer();
     ~IndexStagingBuffer();
 
     void Create(size_t size, bool allowReadBack = false, bool managed = true);
@@ -132,11 +130,11 @@ public:
 private:
     void Destroy();
 
-    IndexBufferHandle m_DeviceBuffer;
-    HostBufferHandle m_HostBuffer;
-    size_t m_Size{ 0 };
-    u32 m_RefCounter{ 0 };
-    bool m_AllowReadBack{ false }; // specifies whether host will want to have the data back (e.g. skinning code)
+    IndexBufferHandle m_DeviceBuffer{};
+    HostBufferHandle m_HostBuffer{};
+    size_t m_Size{};
+    u32 m_RefCounter{};
+    bool m_AllowReadBack{}; // specifies whether host will want to have the data back (e.g. skinning code)
 };
 
 /**
@@ -152,7 +150,6 @@ private:
 class VertexStreamBuffer
 {
 public:
-    VertexStreamBuffer();
     ~VertexStreamBuffer();
 
     void Create(size_t size);
@@ -185,14 +182,13 @@ public:
 private:
     void Destroy();
 
-    VertexBufferHandle m_DeviceBuffer;
+    VertexBufferHandle m_DeviceBuffer{};
     u32 m_RefCounter{};
 };
 
 class IndexStreamBuffer
 {
 public:
-    IndexStreamBuffer();
     ~IndexStreamBuffer();
 
     void Create(size_t size);
@@ -225,6 +221,6 @@ public:
 private:
     void Destroy();
 
-    IndexBufferHandle m_DeviceBuffer;
+    IndexBufferHandle m_DeviceBuffer{};
     u32 m_RefCounter{};
 };

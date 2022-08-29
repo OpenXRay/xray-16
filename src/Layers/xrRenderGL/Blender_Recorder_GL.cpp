@@ -32,8 +32,8 @@ void CBlender_Compile::r_CullMode(D3DCULL Mode)
 
 void CBlender_Compile::i_Comparison(u32 s, u32 func)
 {
-    RS.SetSAMP(s, XRDX10SAMP_COMPARISONFILTER, TRUE);
-    RS.SetSAMP(s, XRDX10SAMP_COMPARISONFUNC, func);
+    RS.SetSAMP(s, XRDX11SAMP_COMPARISONFILTER, TRUE);
+    RS.SetSAMP(s, XRDX11SAMP_COMPARISONFUNC, func);
 }
 
 void CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)
@@ -42,8 +42,8 @@ void CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_Pr
                       D3DTEXF_LINEAR);
     if (u32(-1) != s)
     {
-        RS.SetSAMP(s, XRDX10SAMP_COMPARISONFILTER, TRUE);
-        RS.SetSAMP(s, XRDX10SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
+        RS.SetSAMP(s, XRDX11SAMP_COMPARISONFILTER, TRUE);
+        RS.SetSAMP(s, XRDX11SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 }
 
@@ -64,19 +64,22 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     PassSET_LightFog(FALSE, bFog);
 
     // Create shaders
-    SPS* ps = RImplementation.Resources->_CreatePS(_ps);
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs);
-    SGS* gs = RImplementation.Resources->_CreateGS(_gs);
-    dest.ps = ps;
-    dest.vs = vs;
-    dest.gs = gs;
-#ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS("null");
-    dest.ds = RImplementation.Resources->_CreateDS("null");
+#if defined(USE_OGL)
+    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, _gs, "null", "null");
+    if (HW.SeparateShaderObjectsSupported || !dest.pp->pp)
 #endif
-    ctable.merge(&ps->constants);
-    ctable.merge(&vs->constants);
-    ctable.merge(&gs->constants);
+    {
+        dest.ps = RImplementation.Resources->_CreatePS(_ps);
+        dest.vs = RImplementation.Resources->_CreateVS(_vs);
+        dest.gs = RImplementation.Resources->_CreateGS(_gs);
+        ctable.merge(&dest.ps->constants);
+        ctable.merge(&dest.vs->constants);
+        ctable.merge(&dest.gs->constants);
+    }
+#if defined(USE_OGL)
+    RImplementation.Resources->_LinkPP(dest);
+    ctable.merge(&dest.pp->constants);
+#endif
 
     // Last Stage - disable
     if (0 == xr_stricmp(_ps, "null"))

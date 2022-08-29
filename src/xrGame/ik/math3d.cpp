@@ -810,15 +810,7 @@ void linterpmatrix(Matrix R, Matrix A, Matrix B, float t)
     vecinterp(R[3], A[3], B[3], t);
 }
 
-#define ATAN2(a, b) ((a == 0.0) && (b == 0.0) ? 0.0 : atan2(a, b))
-
-#define EPSILON 0.001f
-#define W q[0]
-#define X q[1]
-#define Y q[2]
-#define Z q[3]
-
-void qtomatrix(Matrix m, Quaternion q)
+void qtomatrix(Matrix m, const Quaternion q)
 /*
  * Convert quaterion to rotation sub-matrix of 'm'.
  * The left column of 'm' gets zeroed, and m[3][3]=1.0, but the
@@ -827,9 +819,14 @@ void qtomatrix(Matrix m, Quaternion q)
  * m = q
  */
 {
-    float x2 = X * X;
-    float y2 = Y * Y;
-    float z2 = Z * Z;
+    const auto& W = q[0];
+    const auto& X = q[1];
+    const auto& Y = q[2];
+    const auto& Z = q[3];
+
+    const float x2 = X * X;
+    const float y2 = Y * Y;
+    const float z2 = Z * Z;
 
     m[0][0] = 1 - 2 * (y2 + z2);
     m[0][1] = 2 * (X * Y + W * Z);
@@ -856,10 +853,13 @@ void matrixtoq(Quaternion q, Matrix m)
  * q = m
  */
 {
-    float f;
+    auto& W = q[0];
+    auto& X = q[1];
+    auto& Y = q[2];
+    auto& Z = q[3];
 
-    f = (1.0f + m[0][0] + m[1][1] + m[2][2]) / 4.0f;
-    if (f > EPSILON)
+    float f = (1.0f + m[0][0] + m[1][1] + m[2][2]) / 4.0f;
+    if (f > EPS_L)
     {
         W = _sqrt(f);
         X = (m[1][2] - m[2][1]) / (4 * W);
@@ -870,7 +870,7 @@ void matrixtoq(Quaternion q, Matrix m)
     {
         W = 0.0;
         f = -(m[1][1] + m[2][2]) / 2.0f;
-        if (f > EPSILON)
+        if (f > EPS_L)
         {
             X = _sqrt(f);
             Y = m[0][1] / (2 * X);
@@ -880,7 +880,7 @@ void matrixtoq(Quaternion q, Matrix m)
         {
             X = 0.0;
             f = (1 - m[2][2]) / 2.0f;
-            if (f > EPSILON)
+            if (f > EPS_L)
             {
                 Y = _sqrt(f);
                 Z = m[1][2] / (2 * Y);

@@ -27,10 +27,7 @@
 #include "xrCore/xr_token.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include <objbase.h>
-#pragma warning(pop)
 #endif
 
 #ifdef _EDITOR

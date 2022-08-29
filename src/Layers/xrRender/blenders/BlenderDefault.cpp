@@ -99,8 +99,7 @@ void CBlender_default::Compile(CBlender_Compile& C)
         // Level view
         C.PassBegin();
         {
-            C.PassSET_VS(tsv_hq);
-            C.PassSET_PS(tsp_hq);
+            C.PassSET_Shaders(tsv_hq, tsp_hq);
 
             C.PassSET_LightFog(false, true);
 
@@ -119,8 +118,7 @@ void CBlender_default::Compile(CBlender_Compile& C)
     case SE_R1_NORMAL_LQ:
         C.PassBegin();
         {
-            C.PassSET_VS("lmap");
-            C.PassSET_PS("lmap");
+            C.PassSET_Shaders("lmap", "lmap");
 
             C.PassSET_LightFog(false, true);
 
@@ -135,8 +133,7 @@ void CBlender_default::Compile(CBlender_Compile& C)
     {
         C.PassBegin();
         {
-            C.PassSET_VS("lmap_point");
-            C.PassSET_PS("add_point");
+            C.PassSET_Shaders("lmap_point", "add_point");
 
             C.PassSET_ZB(true, false);
             C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
@@ -154,8 +151,7 @@ void CBlender_default::Compile(CBlender_Compile& C)
     {
         C.PassBegin();
         {
-            C.PassSET_VS("lmap_spot");
-            C.PassSET_PS("add_spot");
+            C.PassSET_Shaders("lmap_spot", "add_spot");
 
             C.PassSET_ZB(true, false);
             C.PassSET_ablend_mode(true, D3DBLEND_ONE, D3DBLEND_ONE);
@@ -176,8 +172,7 @@ void CBlender_default::Compile(CBlender_Compile& C)
         // Lighting only, not use alpha-channel
         C.PassBegin();
         {
-            C.PassSET_VS("lmap_l");
-            C.PassSET_PS("lmap_l");
+            C.PassSET_Shaders("lmap_l", "lmap_l");
 
             C.SampledImage("s_base", "s_base", C.L_textures[0]);
             C.SampledImage("s_lmap", "s_lmap", C.L_textures[1]);

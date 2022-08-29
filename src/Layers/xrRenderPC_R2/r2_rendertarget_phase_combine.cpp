@@ -91,9 +91,7 @@ void CRenderTarget::phase_combine()
         static Fmatrix m_saved_viewproj;
 
         // (new-camera) -> (world) -> (old_viewproj)
-        Fmatrix m_invview;
-        m_invview.invert(Device.mView);
-        m_previous.mul(m_saved_viewproj, m_invview);
+        m_previous.mul(m_saved_viewproj, Device.mInvView);
         m_current.set(Device.mProject);
         m_saved_viewproj.set(Device.mFullTransform);
         float scale = ps_r2_mblur / 2.f;
@@ -104,8 +102,6 @@ void CRenderTarget::phase_combine()
     if (!_menu_pp)
     {
         // Compute params
-        Fmatrix m_v2w;
-        m_v2w.invert(Device.mView);
         CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
@@ -207,7 +203,7 @@ void CRenderTarget::phase_combine()
         RCache.set_Geometry(g_combine_VP);
         //RCache.set_Geometry(g_combine);
 
-        RCache.set_c("m_v2w", m_v2w);
+        RCache.set_c("m_v2w", Device.mInvView);
         RCache.set_c("L_ambient", ambclr);
 
         RCache.set_c("Ldynamic_color", sunclr);
@@ -533,8 +529,6 @@ void CRenderTarget::phase_combine_volumetric()
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
     {
         // Compute params
-        Fmatrix m_v2w;
-        m_v2w.invert(Device.mView);
         CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
@@ -618,7 +612,7 @@ void CRenderTarget::phase_combine_volumetric()
         RCache.set_Element(s_combine_volumetric->E[0]);
         RCache.set_Geometry(g_combine_VP);
 
-        RCache.set_c("m_v2w", m_v2w);
+        RCache.set_c("m_v2w", Device.mInvView);
         RCache.set_c("L_ambient", ambclr);
 
         RCache.set_c("Ldynamic_color", sunclr);

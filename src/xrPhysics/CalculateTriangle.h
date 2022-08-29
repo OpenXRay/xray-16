@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ExtendedGeom.h"
 #include "MathUtils.h"
 

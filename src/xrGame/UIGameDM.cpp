@@ -23,23 +23,7 @@
 #include "UITeamPanels.h"
 #include "Common/object_broker.h"
 
-#define MSGS_OFFS 510
-
-#define TIME_MSG_COLOR 0xffff0000
-#define SPECTRMODE_MSG_COLOR 0xffff0000
-#define NORMAL_MSG_COLOR 0xffffffff
-#define ROUND_RESULT_COLOR 0xfff0fff0
-#define VOTE0_MSG_COLOR 0xffff0000
-#define VOTE1_MSG_COLOR 0xff00ff00
-#define DEMOPLAY_COLOR 0xff00ff00
-#define WARM_UP_COLOR 0xff00ff00
-
-#define DI2PX(x) float(iFloor((x + 1) * float(UI_BASE_WIDTH) * 0.5f))
-#define DI2PY(y) float(iFloor((y + 1) * float(UI_BASE_HEIGHT) * 0.5f))
-#define SZ(x) x* UI_BASE_WIDTH
-
-//--------------------------------------------------------------------
-#define TEAM_PANELS_DM_XML_NAME "ui_team_panels_dm.xml"
+constexpr pcstr TEAM_PANELS_DM_XML_NAME = "ui_team_panels_dm.xml";
 
 //--------------------------------------------------------------------
 CUIGameDM::CUIGameDM()

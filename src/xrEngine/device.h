@@ -73,8 +73,10 @@ public:
     Fvector vCameraRight;
 
     Fmatrix mView;
+    Fmatrix mInvView;
     Fmatrix mProject;
     Fmatrix mFullTransform;
+    Fmatrix mInvFullTransform;
 
     // Copies of corresponding members. Used for synchronization.
     Fvector vCameraPositionSaved;
@@ -171,8 +173,6 @@ public:
     MessageRegistry<pureDeviceReset> seqDeviceReset;
     MessageRegistry<pureUIReset> seqUIReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
-
-    Fmatrix mInvFullTransform;
 
     CRenderDevice()
         : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
@@ -291,13 +291,14 @@ private:
     void CalcFrameStats();
 
 public:
-#if !defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_WINDOWS)
     bool on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 #endif
 
 private:
     void message_loop();
 
+    // XXX: ifdef editor stuff out, leave it only on Windows
 public:
     XRay::Editor::ide_base* editor() const { return m_editor; }
 

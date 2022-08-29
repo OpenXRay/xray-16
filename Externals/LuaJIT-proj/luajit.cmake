@@ -140,13 +140,13 @@ if ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_X64")
 	set(TARGET_LJARCH "x64")
 elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_X86")
 	set(TARGET_LJARCH "x86")
-elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_ARM\t")
-	set(TARGET_LJARCH "arm")
 elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_ARM64")
 	set(TARGET_LJARCH "arm64")
 	if ("${TARGET_TESTARCH}" MATCHES "__AARCH64EB__")
 		set(TARGET_ARCH "-D__AARCH64EB__=1")
 	endif()
+elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_ARM")
+	set(TARGET_LJARCH "arm")
 elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_PPC")
 	set(TARGET_LJARCH "ppc")
 	if ("${TARGET_TESTARCH}" MATCHES "LJ_LE 1")
@@ -154,7 +154,7 @@ elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_PPC")
 	else()
 		set(TARGET_ARCH "-DLJ_ARCH_ENDIAN=LUAJIT_BE")
 	endif()
-elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_MIPS\t")
+elseif ("${TARGET_TESTARCH}" MATCHES "LJ_TARGET_MIPS")
 	if ("${TARGET_TESTARCH}" MATCHES "MIPSEL")
 		set(TARGET_ARCH "-D__MIPSEL__=1")
 	endif()
@@ -188,14 +188,14 @@ if (WIN32)
 
 	set(LJVM_MODE peobj)
 elseif (APPLE)
-	if (${MACOSX_DEPLOYMENT_TARGET} STREQUAL "")
+	if (CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
 		message(FATAL_ERROR "Missing export MACOSX_DEPLOYMENT_TARGET=XX.YY")
 	endif()
 
 	#string(APPEND TARGET_STRIP "-x")
-
-	string(APPEND TARGET_XSHLDFLAGS " -dynamiclib -single_module -undefined dynamic_lookup -fPIC")
-	string(APPEND TARGET_XSHLDFLAGS " -install_name ${TARGET_DYLIBPATH} -compatibility_version ${MAJVER}.${MINVER} -current_version ${MAJVER}.${MINVER}.${RELVER}")
+	# XXX: doesn't compile with Apple Clang
+	#string(APPEND TARGET_XSHLDFLAGS " -dynamiclib -single_module -undefined dynamic_lookup -fPIC")
+	#string(APPEND TARGET_XSHLDFLAGS " -install_name ${TARGET_DYLIBPATH} -compatibility_version ${MAJVER}.${MINVER} -current_version ${MAJVER}.${MINVER}.${RELVER}")
 
 	if (${TARGET_LJARCH} STREQUAL "x64")
 		string(APPEND TARGET_XLDFLAGS " -pagezero_size 10000 -image_base 100000000 -image_base 7fff04c4a000")
@@ -255,7 +255,7 @@ if ("${TARGET_TESTARCH}" MATCHES "LJ_NO_UNWIND 1")
 endif()
 
 if ("${TARGET_TESTARCH}" MATCHES "LJ_ARCH_VERSION")
-	string(REGEX MATCH "LJ_ARCH_VERSION\t\t([0-9]+)$" _ "${TARGET_TESTARCH}")
+	string(REGEX MATCH "LJ_ARCH_VERSION ([0-9]+)$" _ "${TARGET_TESTARCH}")
 	string(APPEND DASM_FLAGS " -D VER=${CMAKE_MATCH_1}")
 else()
 	string(APPEND DASM_FLAGS " -D VER=")
@@ -428,122 +428,125 @@ SET(DEPS
 
 group_sources(DEPS)
 
-# TODO: use lj_asm_ lj_emit lj_target?
-
-set(LJCORE_C
-	${LJLIB_C}
-	"${LUAJIT_DIR}/lauxlib.h"
-	"${LUAJIT_DIR}/lib_aux.c"
-	"${LUAJIT_DIR}/lib_init.c"
-	"${LUAJIT_DIR}/lj_alloc.c"
-	"${LUAJIT_DIR}/lj_alloc.h"
-	"${LUAJIT_DIR}/lj_api.c"
-	"${LUAJIT_DIR}/lj_asm.c"
-	"${LUAJIT_DIR}/lj_asm.h"
-	"${LUAJIT_DIR}/lj_assert.c"
-	"${LUAJIT_DIR}/lj_bc.c"
-	"${LUAJIT_DIR}/lj_bc.h"
-	"${LUAJIT_DIR}/lj_bcdump.h"
-	"${LUAJIT_DIR}/lj_bcread.c"
-	"${LUAJIT_DIR}/lj_bcwrite.c"
-	"${LUAJIT_DIR}/lj_buf.c"
-	"${LUAJIT_DIR}/lj_buf.h"
-	"${LUAJIT_DIR}/lj_carith.c"
-	"${LUAJIT_DIR}/lj_carith.h"
-	"${LUAJIT_DIR}/lj_ccall.c"
-	"${LUAJIT_DIR}/lj_ccall.h"
-	"${LUAJIT_DIR}/lj_ccallback.c"
-	"${LUAJIT_DIR}/lj_ccallback.h"
-	"${LUAJIT_DIR}/lj_cconv.c"
-	"${LUAJIT_DIR}/lj_cconv.h"
-	"${LUAJIT_DIR}/lj_cdata.c"
-	"${LUAJIT_DIR}/lj_cdata.h"
-	"${LUAJIT_DIR}/lj_char.c"
-	"${LUAJIT_DIR}/lj_char.h"
-	"${LUAJIT_DIR}/lj_clib.c"
-	"${LUAJIT_DIR}/lj_clib.h"
-	"${LUAJIT_DIR}/lj_cparse.c"
-	"${LUAJIT_DIR}/lj_cparse.h"
-	"${LUAJIT_DIR}/lj_crecord.c"
-	"${LUAJIT_DIR}/lj_crecord.h"
-	"${LUAJIT_DIR}/lj_ctype.c"
-	"${LUAJIT_DIR}/lj_ctype.h"
-	"${LUAJIT_DIR}/lj_debug.c"
-	"${LUAJIT_DIR}/lj_debug.h"
-	"${LUAJIT_DIR}/lj_def.h"
-	"${LUAJIT_DIR}/lj_dispatch.c"
-	"${LUAJIT_DIR}/lj_dispatch.h"
-	"${LUAJIT_DIR}/lj_err.c"
-	"${LUAJIT_DIR}/lj_err.h"
-	"${LUAJIT_DIR}/lj_errmsg.h"
-	"${LUAJIT_DIR}/lj_ff.h"
-	"${LUAJIT_DIR}/lj_ffrecord.c"
-	"${LUAJIT_DIR}/lj_ffrecord.h"
-	"${LUAJIT_DIR}/lj_frame.h"
-	"${LUAJIT_DIR}/lj_func.c"
-	"${LUAJIT_DIR}/lj_func.h"
-	"${LUAJIT_DIR}/lj_gc.c"
-	"${LUAJIT_DIR}/lj_gc.h"
-	"${LUAJIT_DIR}/lj_gdbjit.c"
-	"${LUAJIT_DIR}/lj_gdbjit.h"
-	"${LUAJIT_DIR}/lj_ir.c"
-	"${LUAJIT_DIR}/lj_ircall.h"
-	"${LUAJIT_DIR}/lj_iropt.h"
-	"${LUAJIT_DIR}/lj_jit.h"
-	"${LUAJIT_DIR}/lj_lex.c"
-	"${LUAJIT_DIR}/lj_lex.h"
-	"${LUAJIT_DIR}/lj_lib.c"
-	"${LUAJIT_DIR}/lj_lib.h"
-	"${LUAJIT_DIR}/lj_load.c"
-	"${LUAJIT_DIR}/lj_mcode.c"
-	"${LUAJIT_DIR}/lj_mcode.h"
-	"${LUAJIT_DIR}/lj_meta.c"
-	"${LUAJIT_DIR}/lj_meta.h"
-	"${LUAJIT_DIR}/lj_obj.c"
-	"${LUAJIT_DIR}/lj_obj.h"
-	"${LUAJIT_DIR}/lj_opt_dce.c"
-	"${LUAJIT_DIR}/lj_opt_fold.c"
-	"${LUAJIT_DIR}/lj_opt_loop.c"
-	"${LUAJIT_DIR}/lj_opt_mem.c"
-	"${LUAJIT_DIR}/lj_opt_narrow.c"
-	"${LUAJIT_DIR}/lj_opt_sink.c"
-	"${LUAJIT_DIR}/lj_opt_split.c"
-	"${LUAJIT_DIR}/lj_parse.c"
-	"${LUAJIT_DIR}/lj_parse.h"
-	"${LUAJIT_DIR}/lj_prng.c"
-	"${LUAJIT_DIR}/lj_prng.h"
-	"${LUAJIT_DIR}/lj_profile.c"
-	"${LUAJIT_DIR}/lj_profile.h"
-	"${LUAJIT_DIR}/lj_record.c"
-	"${LUAJIT_DIR}/lj_record.h"
-	"${LUAJIT_DIR}/lj_snap.c"
-	"${LUAJIT_DIR}/lj_snap.h"
-	"${LUAJIT_DIR}/lj_state.c"
-	"${LUAJIT_DIR}/lj_state.h"
-	"${LUAJIT_DIR}/lj_str.c"
-	"${LUAJIT_DIR}/lj_str.h"
-	"${LUAJIT_DIR}/lj_strfmt.c"
-	"${LUAJIT_DIR}/lj_strfmt.h"
-	"${LUAJIT_DIR}/lj_strfmt_num.c"
-	"${LUAJIT_DIR}/lj_strscan.c"
-	"${LUAJIT_DIR}/lj_strscan.h"
-	"${LUAJIT_DIR}/lj_tab.c"
-	"${LUAJIT_DIR}/lj_tab.h"
-	"${LUAJIT_DIR}/lj_trace.c"
-	"${LUAJIT_DIR}/lj_trace.h"
-	"${LUAJIT_DIR}/lj_traceerr.h"
-	"${LUAJIT_DIR}/lj_udata.c"
-	"${LUAJIT_DIR}/lj_udata.h"
-	"${LUAJIT_DIR}/lj_vm.h"
-	"${LUAJIT_DIR}/lj_vmevent.c"
-	"${LUAJIT_DIR}/lj_vmevent.h"
-	"${LUAJIT_DIR}/lj_vmmath.c"
-	"${LUAJIT_DIR}/lua.h"
-	"${LUAJIT_DIR}/lua.hpp"
-	"${LUAJIT_DIR}/luaconf.h"
-	"${LUAJIT_DIR}/luajit.h"
-	"${LUAJIT_DIR}/lualib.h"
-)
+if (CMAKE_UNITY_BUILD)
+	set(LJCORE_C "${LUAJIT_DIR}/ljamalg.c")
+else()
+	# TODO: use lj_asm_ lj_emit lj_target?
+	set(LJCORE_C
+        ${LJLIB_C}
+        "${LUAJIT_DIR}/lauxlib.h"
+        "${LUAJIT_DIR}/lib_aux.c"
+        "${LUAJIT_DIR}/lib_init.c"
+        "${LUAJIT_DIR}/lj_alloc.c"
+        "${LUAJIT_DIR}/lj_alloc.h"
+        "${LUAJIT_DIR}/lj_api.c"
+        "${LUAJIT_DIR}/lj_asm.c"
+        "${LUAJIT_DIR}/lj_asm.h"
+        "${LUAJIT_DIR}/lj_assert.c"
+        "${LUAJIT_DIR}/lj_bc.c"
+        "${LUAJIT_DIR}/lj_bc.h"
+        "${LUAJIT_DIR}/lj_bcdump.h"
+        "${LUAJIT_DIR}/lj_bcread.c"
+        "${LUAJIT_DIR}/lj_bcwrite.c"
+        "${LUAJIT_DIR}/lj_buf.c"
+        "${LUAJIT_DIR}/lj_buf.h"
+        "${LUAJIT_DIR}/lj_carith.c"
+        "${LUAJIT_DIR}/lj_carith.h"
+        "${LUAJIT_DIR}/lj_ccall.c"
+        "${LUAJIT_DIR}/lj_ccall.h"
+        "${LUAJIT_DIR}/lj_ccallback.c"
+        "${LUAJIT_DIR}/lj_ccallback.h"
+        "${LUAJIT_DIR}/lj_cconv.c"
+        "${LUAJIT_DIR}/lj_cconv.h"
+        "${LUAJIT_DIR}/lj_cdata.c"
+        "${LUAJIT_DIR}/lj_cdata.h"
+        "${LUAJIT_DIR}/lj_char.c"
+        "${LUAJIT_DIR}/lj_char.h"
+        "${LUAJIT_DIR}/lj_clib.c"
+        "${LUAJIT_DIR}/lj_clib.h"
+        "${LUAJIT_DIR}/lj_cparse.c"
+        "${LUAJIT_DIR}/lj_cparse.h"
+        "${LUAJIT_DIR}/lj_crecord.c"
+        "${LUAJIT_DIR}/lj_crecord.h"
+        "${LUAJIT_DIR}/lj_ctype.c"
+        "${LUAJIT_DIR}/lj_ctype.h"
+        "${LUAJIT_DIR}/lj_debug.c"
+        "${LUAJIT_DIR}/lj_debug.h"
+        "${LUAJIT_DIR}/lj_def.h"
+        "${LUAJIT_DIR}/lj_dispatch.c"
+        "${LUAJIT_DIR}/lj_dispatch.h"
+        "${LUAJIT_DIR}/lj_err.c"
+        "${LUAJIT_DIR}/lj_err.h"
+        "${LUAJIT_DIR}/lj_errmsg.h"
+        "${LUAJIT_DIR}/lj_ff.h"
+        "${LUAJIT_DIR}/lj_ffrecord.c"
+        "${LUAJIT_DIR}/lj_ffrecord.h"
+        "${LUAJIT_DIR}/lj_frame.h"
+        "${LUAJIT_DIR}/lj_func.c"
+        "${LUAJIT_DIR}/lj_func.h"
+        "${LUAJIT_DIR}/lj_gc.c"
+        "${LUAJIT_DIR}/lj_gc.h"
+        "${LUAJIT_DIR}/lj_gdbjit.c"
+        "${LUAJIT_DIR}/lj_gdbjit.h"
+        "${LUAJIT_DIR}/lj_ir.c"
+        "${LUAJIT_DIR}/lj_ircall.h"
+        "${LUAJIT_DIR}/lj_iropt.h"
+        "${LUAJIT_DIR}/lj_jit.h"
+        "${LUAJIT_DIR}/lj_lex.c"
+        "${LUAJIT_DIR}/lj_lex.h"
+        "${LUAJIT_DIR}/lj_lib.c"
+        "${LUAJIT_DIR}/lj_lib.h"
+        "${LUAJIT_DIR}/lj_load.c"
+        "${LUAJIT_DIR}/lj_mcode.c"
+        "${LUAJIT_DIR}/lj_mcode.h"
+        "${LUAJIT_DIR}/lj_meta.c"
+        "${LUAJIT_DIR}/lj_meta.h"
+        "${LUAJIT_DIR}/lj_obj.c"
+        "${LUAJIT_DIR}/lj_obj.h"
+        "${LUAJIT_DIR}/lj_opt_dce.c"
+        "${LUAJIT_DIR}/lj_opt_fold.c"
+        "${LUAJIT_DIR}/lj_opt_loop.c"
+        "${LUAJIT_DIR}/lj_opt_mem.c"
+        "${LUAJIT_DIR}/lj_opt_narrow.c"
+        "${LUAJIT_DIR}/lj_opt_sink.c"
+        "${LUAJIT_DIR}/lj_opt_split.c"
+        "${LUAJIT_DIR}/lj_parse.c"
+        "${LUAJIT_DIR}/lj_parse.h"
+        "${LUAJIT_DIR}/lj_prng.c"
+        "${LUAJIT_DIR}/lj_prng.h"
+        "${LUAJIT_DIR}/lj_profile.c"
+        "${LUAJIT_DIR}/lj_profile.h"
+        "${LUAJIT_DIR}/lj_record.c"
+        "${LUAJIT_DIR}/lj_record.h"
+        "${LUAJIT_DIR}/lj_snap.c"
+        "${LUAJIT_DIR}/lj_snap.h"
+        "${LUAJIT_DIR}/lj_state.c"
+        "${LUAJIT_DIR}/lj_state.h"
+        "${LUAJIT_DIR}/lj_str.c"
+        "${LUAJIT_DIR}/lj_str.h"
+        "${LUAJIT_DIR}/lj_strfmt.c"
+        "${LUAJIT_DIR}/lj_strfmt.h"
+        "${LUAJIT_DIR}/lj_strfmt_num.c"
+        "${LUAJIT_DIR}/lj_strscan.c"
+        "${LUAJIT_DIR}/lj_strscan.h"
+        "${LUAJIT_DIR}/lj_tab.c"
+        "${LUAJIT_DIR}/lj_tab.h"
+        "${LUAJIT_DIR}/lj_trace.c"
+        "${LUAJIT_DIR}/lj_trace.h"
+        "${LUAJIT_DIR}/lj_traceerr.h"
+        "${LUAJIT_DIR}/lj_udata.c"
+        "${LUAJIT_DIR}/lj_udata.h"
+        "${LUAJIT_DIR}/lj_vm.h"
+        "${LUAJIT_DIR}/lj_vmevent.c"
+        "${LUAJIT_DIR}/lj_vmevent.h"
+        "${LUAJIT_DIR}/lj_vmmath.c"
+        "${LUAJIT_DIR}/lua.h"
+        "${LUAJIT_DIR}/lua.hpp"
+        "${LUAJIT_DIR}/luaconf.h"
+        "${LUAJIT_DIR}/luajit.h"
+        "${LUAJIT_DIR}/lualib.h"
+	)
+endif()
 
 group_sources(LJCORE_C)
 
@@ -593,6 +596,7 @@ target_link_options(${LIB_NAME}
 
 set_target_properties(${LIB_NAME} PROPERTIES
 	PREFIX ""
+    UNITY_BUILD OFF
 )
 
 install(TARGETS ${LIB_NAME} LIBRARY

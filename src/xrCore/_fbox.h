@@ -1,182 +1,174 @@
 #pragma once
-#ifndef __FBOX
-#define __FBOX
+
 #include "_vector3d.h"
 
-template <class T>
-class _box3
+struct Fbox3
 {
 public:
-    using TYPE = T;
-    using Self = _box3<T>;
-    using SelfRef = Self&;
-    using SelfCRef = const Self&;
-    using Tvector = _vector3<T>;
-    using Tmatrix = _matrix<T>;
-
     union
     {
         struct
         {
-            Tvector vMin;
-            Tvector vMax;
+            Fvector3 vMin;
+            Fvector3 vMax;
         };
         struct
         {
-            T x1, y1, z1;
-            T x2, y2, z2;
+            float x1, y1, z1;
+            float x2, y2, z2;
         };
     };
 
     bool is_valid() const noexcept { return (x2 >= x1) && (y2 >= y1) && (z2 >= z1); }
-    const T* data() const noexcept { return &vMin.x; }
+    const float* data() const noexcept { return &vMin.x; }
 
-    SelfRef set(const Tvector& _min, const Tvector& _max)
+    auto& set(const Fvector3& _min, const Fvector3& _max)
     {
         vMin.set(_min);
         vMax.set(_max);
         return *this;
     }
 
-    SelfRef set(T x1, T y1, T z1, T x2, T y2, T z2)
+    auto& set(float x1, float y1, float z1, float x2, float y2, float z2)
     {
         vMin.set(x1, y1, z1);
         vMax.set(x2, y2, z2);
         return *this;
     }
 
-    SelfRef set(SelfCRef b)
+    auto& set(const Fbox3& b)
     {
         vMin.set(b.vMin);
         vMax.set(b.vMax);
         return *this;
     }
 
-    SelfRef setb(const Tvector& center, const Tvector& dim)
+    auto& setb(const Fvector3& center, const Fvector3& dim)
     {
         vMin.sub(center, dim);
         vMax.add(center, dim);
         return *this;
     }
 
-    SelfRef set_zero()
+    auto& set_zero()
     {
         vMin.set(0, 0, 0);
         vMax.set(0, 0, 0);
         return *this;
     }
 
-    SelfRef identity()
+    auto& identity()
     {
         vMin.set(-0.5, -0.5, -0.5);
         vMax.set(0.5, 0.5, 0.5);
         return *this;
     }
 
-    SelfRef invalidate()
+    auto& invalidate()
     {
-        vMin.set(type_max<T>, type_max<T>, type_max<T>);
-        vMax.set(type_min<T>, type_min<T>, type_min<T>);
+        vMin.set(type_max<float>, type_max<float>, type_max<float>);
+        vMax.set(type_min<float>, type_min<float>, type_min<float>);
         return *this;
     }
 
-    SelfRef shrink(T s)
-    {
-        vMin.add(s);
-        vMax.sub(s);
-        return *this;
-    }
-
-    SelfRef shrink(const Tvector& s)
+    auto& shrink(float s)
     {
         vMin.add(s);
         vMax.sub(s);
         return *this;
     }
 
-    SelfRef grow(T s)
+    auto& shrink(const Fvector3& s)
+    {
+        vMin.add(s);
+        vMax.sub(s);
+        return *this;
+    }
+
+    auto& grow(float s)
     {
         vMin.sub(s);
         vMax.add(s);
         return *this;
     }
 
-    SelfRef grow(const Tvector& s)
+    auto& grow(const Fvector3& s)
     {
         vMin.sub(s);
         vMax.add(s);
         return *this;
     }
 
-    SelfRef add(const Tvector& p)
+    auto& add(const Fvector3& p)
     {
         vMin.add(p);
         vMax.add(p);
         return *this;
     }
 
-    SelfRef sub(const Tvector& p)
+    auto& sub(const Fvector3& p)
     {
         vMin.sub(p);
         vMax.sub(p);
         return *this;
     }
 
-    SelfRef offset(const Tvector& p)
+    auto& offset(const Fvector3& p)
     {
         vMin.add(p);
         vMax.add(p);
         return *this;
     }
 
-    SelfRef add(SelfCRef b, const Tvector& p)
+    auto& add(const Fbox3& b, const Fvector3& p)
     {
         vMin.add(b.vMin, p);
         vMax.add(b.vMax, p);
         return *this;
     }
 
-    ICF bool contains(T x, T y, T z) const
+    ICF bool contains(float x, float y, float z) const
     {
         return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2) && (z >= z1) && (z <= z2);
     }
 
-    ICF bool contains(const Tvector& p) const { return contains(p.x, p.y, p.z); }
-    ICF bool contains(SelfCRef b) const { return contains(b.vMin) && contains(b.vMax); }
-    bool similar(SelfCRef b) const { return vMin.similar(b.vMin) && vMax.similar(b.vMax); }
+    ICF bool contains(const Fvector3& p) const { return contains(p.x, p.y, p.z); }
+    ICF bool contains(const Fbox3& b) const { return contains(b.vMin) && contains(b.vMax); }
 
-    ICF SelfRef modify(const Tvector& p)
+    [[nodiscard]] bool similar(const Fbox3& b) const { return vMin.similar(b.vMin) && vMax.similar(b.vMax); }
+
+    ICF auto& modify(const Fvector3& p)
     {
         vMin.min(p);
         vMax.max(p);
         return *this;
     }
 
-    ICF SelfRef modify(T x, T y, T z)
+    ICF auto& modify(float x, float y, float z)
     {
-        _vector3<T> tmp = {x, y, z};
-        return modify(tmp);
+        return modify(Fvector3{ x, y, z });
     }
 
-    SelfRef merge(SelfCRef b)
+    auto& merge(const Fbox3& b)
     {
         modify(b.vMin);
         modify(b.vMax);
         return *this;
     }
 
-    SelfRef merge(SelfCRef b1, SelfCRef b2)
+    auto& merge(const Fbox3& b1, const Fbox3& b2)
     {
         invalidate();
         merge(b1);
         merge(b2);
         return *this;
     }
-    ICF SelfRef xform(SelfCRef B, const Tmatrix& m)
+
+    ICF auto& xform(const Fbox3& B, const Fmatrix& m)
     {
         // The three edges transformed: you can efficiently transform an X-only vector3
         // by just getting the "X" column of the matrix
-        Tvector vx, vy, vz;
+        Fvector3 vx, vy, vz;
         vx.mul(m.i, B.vMax.x - B.vMin.x);
         vy.mul(m.j, B.vMax.y - B.vMin.y);
         vz.mul(m.k, B.vMax.z - B.vMin.z);
@@ -225,36 +217,37 @@ public:
             vMax.z += vz.z;
         return *this;
     }
-    ICF SelfRef xform(const Tmatrix& m)
+
+    ICF auto& xform(const Fmatrix& m)
     {
-        Self b;
+        Fbox3 b;
         b.set(*this);
         return xform(b, m);
     }
 
-    void getsize(Tvector& R) const { R.sub(vMax, vMin); }
+    void getsize(Fvector3& R) const { R.sub(vMax, vMin); }
 
-    void getradius(Tvector& R) const
+    void getradius(Fvector3& R) const
     {
         getsize(R);
         R.mul(0.5f);
     }
 
-    T getradius() const
+    float getradius() const
     {
-        Tvector R;
+        Fvector3 R;
         getradius(R);
         return R.magnitude();
     }
 
-    T getvolume() const
+    float getvolume() const
     {
-        Tvector sz;
+        Fvector3 sz;
         getsize(sz);
         return sz.x * sz.y * sz.z;
     }
 
-    SelfCRef getcenter(Tvector& C) const
+    const auto& getcenter(Fvector3& C) const
     {
         C.x = (vMin.x + vMax.x) * 0.5f;
         C.y = (vMin.y + vMax.y) * 0.5f;
@@ -262,14 +255,14 @@ public:
         return *this;
     }
 
-    SelfCRef get_CD(Tvector& bc, Tvector& bd) const // center + dimensions
+    const auto& get_CD(Fvector3& bc, Fvector3& bd) const // center + dimensions
     {
         bd.sub(vMax, vMin).mul(.5f);
         bc.add(vMin, bd);
         return *this;
     }
 
-    SelfRef scale(float s) // 0.1 means make 110%, -0.1 means make 90%
+    auto& scale(float s) // 0.1 means make 110%, -0.1 means make 90%
     {
         Fvector bd;
         bd.sub(vMax, vMin).mul(s);
@@ -277,7 +270,7 @@ public:
         return *this;
     }
 
-    SelfCRef getsphere(Tvector& C, T& R) const
+    const auto& getsphere(Fvector3& C, float& R) const
     {
         getcenter(C);
         R = C.distance_to(vMax);
@@ -285,7 +278,7 @@ public:
     }
 
     // Detects if this box intersect other
-    ICF bool intersect(SelfCRef box)
+    ICF bool intersect(const Fbox3& box) const
     {
         if (vMax.x < box.vMin.x)
             return false;
@@ -303,10 +296,10 @@ public:
     }
 
     // Does the vector3 intersects box
-    bool Pick(const Tvector& start, const Tvector& dir)
+    bool Pick(const Fvector3& start, const Fvector3& dir) const
     {
-        T alpha, xt, yt, zt;
-        Tvector rvmin, rvmax;
+        float alpha, xt, yt, zt;
+        Fvector3 rvmin, rvmax;
 
         rvmin.sub(vMin, start);
         rvmax.sub(vMax, start);
@@ -373,7 +366,7 @@ public:
         return false;
     };
 
-    u32& IntRref(T& x) { return (u32&)x; }
+    u32& IntRref(float& x) { return (u32&)x; }
 
     enum ERP_Result
     {
@@ -383,10 +376,10 @@ public:
         fcv_forcedword = u32(-1)
     };
 
-    ERP_Result Pick2(const Tvector& origin, const Tvector& dir, Tvector& coord)
+    ERP_Result Pick2(const Fvector3& origin, const Fvector3& dir, Fvector3& coord)
     {
         bool Inside = true;
-        Tvector MaxT;
+        Fvector3 MaxT;
         MaxT.x = MaxT.y = MaxT.z = -1.0f;
 
         // Find candidate planes.
@@ -498,7 +491,7 @@ public:
         return rpNone;
     }
 
-    void getpoint(int index, Tvector& result) const
+    void getpoint(int index, Fvector3& result) const
     {
         switch (index)
         {
@@ -514,7 +507,7 @@ public:
         }
     }
 
-    void getpoints(Tvector* result)
+    void getpoints(Fvector3* result) const
     {
         result[0].set(vMin.x, vMin.y, vMin.z);
         result[1].set(vMin.x, vMin.y, vMax.z);
@@ -526,9 +519,9 @@ public:
         result[7].set(vMax.x, vMax.y, vMin.z);
     }
 
-    SelfRef modify(SelfCRef src, const Tmatrix& M)
+    auto& modify(const Fbox3& src, const Fmatrix& M)
     {
-        Tvector pt;
+        Fvector3 pt;
         for (int i = 0; i < 8; i++)
         {
             src.getpoint(i, pt);
@@ -539,16 +532,9 @@ public:
     }
 };
 
-using Fbox = _box3<float>;
-using Fbox3 = _box3<float>;
+using Fbox = Fbox3;
 
-using Dbox = _box3<double>;
-using Dbox3 = _box3<double>;
-
-template <class T>
-bool _valid(const _box3<T>& c)
+inline bool _valid(const Fbox3& c)
 {
     return _valid(c.vMin) && _valid(c.vMax);
 }
-
-#endif

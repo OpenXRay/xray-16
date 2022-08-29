@@ -28,6 +28,8 @@ set(COMPILE_OUTPUT_FOLDER ${CMAKE_SOURCE_DIR}/bin/${ARCH_TYPE}/${CMAKE_BUILD_TYP
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
@@ -57,8 +59,6 @@ if (STATIC_BUILD)
     # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
     #add_definitions(-DXRAY_STATIC_BUILD)
 endif()
-
-option(USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" OFF)
 
 # Memory allocator option
 set(MEMORY_ALLOCATOR "mimalloc" CACHE STRING "Use specific memory allocator (mimalloc/standard)")
@@ -130,18 +130,37 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # XXX: Remove -fdelayed-template-parsing
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdelayed-template-parsing -Wno-unused-command-line-argument -Wno-inconsistent-missing-override")
-    if (NOT USED_CXX_LIB)
-        set(USED_CXX_LIB "libcpp" CACHE STRING "" FORCE)
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
+    if (NOT XRAY_CXX_LIB)
+        include(CheckCXXCompilerFlag)
+        CHECK_CXX_COMPILER_FLAG("-stdlib=libc++" LIBCPP_AVAILABLE)
+        CHECK_CXX_COMPILER_FLAG("-stdlib=libstdc++" LIBSTDCPP_AVAILABLE)
+
+        if (LIBCPP_AVAILABLE)
+            set(XRAY_CXX_LIB "libc++" CACHE STRING "" FORCE)
+        elseif (LIBSTDCPP_AVAILABLE)
+            set(XRAY_CXX_LIB "libstdc++" CACHE STRING "" FORCE)
+        else()
+            message("Neither libstdc++ nor libc++ are available. Hopefully, system has another custom stdlib?")
+        endif()
     endif()
-    if (USED_CXX_LIB STREQUAL "libstdcpp")
+
+    if (XRAY_CXX_LIB STREQUAL "libstdc++")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
-    elseif (USED_CXX_LIB STREQUAL "libcpp")
+    elseif (XRAY_CXX_LIB STREQUAL "libc++")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
     endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes -Wl,--no-undefined -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes -fvisibility=hidden")
+if (APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-undefined,error")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined")
+endif()
 
 #set(SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=undefined -fno-sanitize=vptr")
 #if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -168,11 +187,23 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")
 endif()
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold")
+option(XRAY_USE_DEFAULT_LINKER "Don't select linker, use system default." OFF)
 
-if (USE_CRYPTOPP)
-    add_definitions(-DUSE_CRYPTOPP)
+if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER)
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-fuse-ld=gold" GOLD_LINKER_AVAILABLE)
+    CHECK_CXX_COMPILER_FLAG("-fuse-ld=lld" LLD_LINKER_AVAILABLE)
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND LLD_LINKER_AVAILABLE)
+        set(XRAY_LINKER "lld" CACHE STRING "" FORCE)
+    elseif (GOLD_LINKER_AVAILABLE)
+        set(XRAY_LINKER "gold" CACHE STRING "" FORCE)
+    endif()
+endif()
+
+if (XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=${XRAY_LINKER}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=${XRAY_LINKER}")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -202,15 +233,17 @@ endif()
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
 if (NOT WIN32)
+    find_package(SDL2 REQUIRED)
+    find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(OpenAL REQUIRED)
-    if (USE_CRYPTOPP)
-        find_package(Crypto++ REQUIRED)
-    endif()
     find_package(JPEG)
-    find_package(Theora REQUIRED)
+    if (JPEG_FOUND)
+        set(USE_CXIMAGE TRUE)
+    endif()
     find_package(Ogg REQUIRED)
-    find_package(SDL REQUIRED)
+    find_package(Vorbis REQUIRED)
+    find_package(Theora REQUIRED)
     find_package(LZO REQUIRED)
 endif()
 
@@ -242,6 +275,30 @@ include_directories(
 )
 
 add_subdirectory(Externals)
+
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS}"
+    "-Wall"
+    #"-Werror"
+    #"-Wextra"
+    #"-pedantic"
+    "-Wno-unknown-pragmas"
+    "-Wno-strict-aliasing"
+    "-Wno-class-memaccess"
+    "-Wno-parentheses"
+    "-Wno-unused-label"
+    "-Wno-switch"
+    #"-Wno-padded"
+    #"-Wno-c++98-compat"
+    #"-Wno-c++98-compat-pedantic"
+    #"-Wno-c++11-compat"
+    #"-Wno-c++11-compat-pedantic"
+    #"-Wno-c++14-compat"
+    #"-Wno-c++14-compat-pedantic"
+    #"-Wno-newline-eof"
+)
+string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
 add_subdirectory(src)
 add_subdirectory(res)
 

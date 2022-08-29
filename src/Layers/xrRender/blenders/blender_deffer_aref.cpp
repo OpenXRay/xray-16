@@ -122,7 +122,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     {
         C.SetParams(1, false); //.
 
-        bool bUseATOC = RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
+        bool bUseATOC = RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
 
         // codepath is the same, only the shaders differ
         // ***only pixel shaders differ***
@@ -138,7 +138,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
                 C.r_ColorWriteEnable(false, false, false, false);
                 C.r_StencilRef(0x01);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -161,7 +161,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -200,14 +200,14 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
                 // C.r_Sampler_clf		("s_hemi",	*C.L_textures[2]);
                 // C.r_Sampler			("s_env",	r2_T_envs0,		false,D3DTADDRESS_CLAMP);
 
-                C.r_dx10Texture("s_base", C.L_textures[0]);
-                C.r_dx10Texture("s_lmap", C.L_textures[1]);
-                C.r_dx10Texture("s_hemi", *C.L_textures[2]);
-                C.r_dx10Texture("s_env", r2_T_envs0);
+                C.r_dx11Texture("s_base", C.L_textures[0]);
+                C.r_dx11Texture("s_lmap", C.L_textures[1]);
+                C.r_dx11Texture("s_hemi", *C.L_textures[2]);
+                C.r_dx11Texture("s_env", r2_T_envs0);
 
-                C.r_dx10Sampler("smp_base");
-                C.r_dx10Sampler("smp_linear");
-                C.r_dx10Sampler("smp_rtlinear");
+                C.r_dx11Sampler("smp_base");
+                C.r_dx11Sampler("smp_linear");
+                C.r_dx11Sampler("smp_rtlinear");
                 C.r_End();
             }
             else
@@ -215,8 +215,8 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
                 C.r_Pass("vert", "vert", TRUE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE,
                     oAREF.value);
                 // C.r_Sampler			("s_base",	C.L_textures[0]	);
-                C.r_dx10Texture("s_base", C.L_textures[0]);
-                C.r_dx10Sampler("smp_base");
+                C.r_dx11Texture("s_base", C.L_textures[0]);
+                C.r_dx11Sampler("smp_base");
                 C.r_End();
             }
             break;
@@ -227,7 +227,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     {
         C.SetParams(1, false); //.
 
-        bool bUseATOC = (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        bool bUseATOC = (RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
 
         // codepath is the same, only the shaders differ
         // ***only pixel shaders differ***
@@ -243,7 +243,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
                 C.r_ColorWriteEnable(false, false, false, false);
                 C.r_StencilRef(0x01);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -265,7 +265,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -284,9 +284,9 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             //("shadow_direct_base_aref","shadow_direct_base_aref",FALSE);
             C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE);
             // C.r_Sampler		("s_base",C.L_textures[0]);
-            C.r_dx10Texture("s_base", C.L_textures[0]);
-            C.r_dx10Sampler("smp_base");
-            C.r_dx10Sampler("smp_linear");
+            C.r_dx11Texture("s_base", C.L_textures[0]);
+            C.r_dx11Sampler("smp_base");
+            C.r_dx11Sampler("smp_linear");
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_End();
             break;

@@ -48,6 +48,8 @@
 #include "eatable_item.h"
 #include "xrScriptEngine/script_callback_ex.h"
 #include "xrEngine/Feel_Touch.h"
+#include "level_path_manager.h"
+#include "game_path_manager.h"
 #endif
 //-Alundaio
 
@@ -459,6 +461,24 @@ void CScriptGameObject::inactualize_patrol_path()
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().patrol().make_inactual();
+}
+
+void CScriptGameObject::inactualize_level_path()
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+    else
+        stalker->movement().level_path().make_inactual();
+}
+
+void CScriptGameObject::inactualize_game_path()
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+    else
+        stalker->movement().game_path().make_inactual();
 }
 
 void CScriptGameObject::set_dest_level_vertex_id(u32 level_vertex_id)

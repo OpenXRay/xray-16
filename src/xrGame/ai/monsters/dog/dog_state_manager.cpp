@@ -15,15 +15,10 @@
 #include "ai/monsters/group_states/group_state_panic.h"
 #include "ai/monsters/group_states/group_state_hear_danger_sound.h"
 
-namespace detail
-{
-namespace dog
+namespace detail::dog
 {
 const float atack_decision_maxdist = 6.f;
-
-} // dog
-
-} // detail
+} // detail::dog
 
 CStateManagerDog::CStateManagerDog(CAI_Dog* monster) : inherited(monster)
 {
@@ -59,7 +54,7 @@ void CStateManagerDog::execute()
                 squad->set_home_in_danger();
             }
 
-            if (object->Position().distance_to(enemy_pos) < detail::dog::atack_decision_maxdist)
+            if (object->Position().distance_to(enemy_pos) < ::detail::dog::atack_decision_maxdist)
             {
                 squad->set_home_in_danger();
             }
