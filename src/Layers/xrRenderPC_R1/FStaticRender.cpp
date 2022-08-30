@@ -314,11 +314,11 @@ bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     set_Object(root);
-    add_leafs_Dynamic(root, (dxRender_Visual*)V, m);
+    add_leafs_Dynamic(root, (dxRender_Visual*)V, m, V->_ignore_optimization);
 }
 void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 {
-    add_Static((dxRender_Visual*)V, view, view.getMask());
+    add_Static((dxRender_Visual*)V, view, view.getMask(), nullptr);
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {

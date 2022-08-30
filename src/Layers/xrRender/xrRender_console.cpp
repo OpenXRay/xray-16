@@ -240,6 +240,10 @@ xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
     {"qt_high", 3}, {"qt_extreme", 4}, {nullptr, 0}};
 //-AVO
 
+///  Anomaly mod  ///
+int opt_static = 2;
+int opt_dynamic = 2;
+
 //- Mad Max
 float ps_r2_gloss_factor = 4.0f;
 //- Mad Max
@@ -758,6 +762,12 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.1f, 0.99f);
     CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
     CMD4(CCC_Float, "r__detail_height", &ps_r__Detail_height, 1, 2);
+    ///  Anomaly mod  ///
+    // Geometry optimization
+    CMD4(CCC_Integer, "r__optimize_static_geom", &opt_static, 0, 4);
+    CMD4(CCC_Integer, "r__optimize_dynamic_geom", &opt_dynamic, 0, 4);
+    psDeviceFlags.set(rsOptShadowGeom, TRUE);
+    CMD3(CCC_Mask, "r__optimize_shadow_geom", &psDeviceFlags, rsOptShadowGeom);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);

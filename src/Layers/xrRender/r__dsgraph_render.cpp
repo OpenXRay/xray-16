@@ -369,7 +369,7 @@ void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFr
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 const auto& view = sector->r_frustums[v_it];
-                add_Static(root, view, view.getMask());
+                add_Static(root, view, view.getMask(), nullptr);
             }
         }
     }

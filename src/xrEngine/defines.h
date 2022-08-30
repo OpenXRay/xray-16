@@ -51,6 +51,12 @@ enum
     rsFullscreen,           // true, exclusive fullscreen
 };
 
+///  Anomaly mod  ///
+enum
+{
+    rsOptShadowGeom = (1 << 0),
+};
+
 struct DeviceMode
 {
     u32 Monitor;

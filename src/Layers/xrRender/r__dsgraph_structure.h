@@ -114,9 +114,9 @@ public:
     }
 
 protected:
-    void add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
-    void add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
-    void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
+    void add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes, Fmatrix* pTransform);
+    void add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, bool ignore = false); // if detected node's full visibility
+    void add_leafs_Static(dxRender_Visual* pVisual, Fmatrix* pTransform); // if detected node's full visibility
 
 public:
     void r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center);
