@@ -76,7 +76,7 @@ void CAutosaveManager::shedule_Update(u32 dt)
 #ifdef XR_PLATFORM_WINDOWS
     SetFileAttributes(S1, FILE_ATTRIBUTE_HIDDEN);
 #endif
-    const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+    const bool compat = gameMode == gClearSky || gameMode == gShadowOfChernobyl;
     StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("autosave", true, compat ? 3.0f : -1.0f);
 }
 

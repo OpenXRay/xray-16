@@ -879,7 +879,7 @@ void CUIActorMenu::ShowMessage(pcstr text, pcstr staticMessage /*= nullptr*/, fl
 {
     if (m_message_box_ok)
         CallMessageBoxOK(text);
-    else if (staticMessage && ShadowOfChernobylMode)
+    else if (staticMessage && gameMode == gShadowOfChernobyl)
     {
         m_message_static = CurrentGameUI()->AddCustomStatic(staticMessage, true, staticMsgTtl);
     }

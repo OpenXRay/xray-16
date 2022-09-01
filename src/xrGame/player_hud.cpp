@@ -446,7 +446,7 @@ void player_hud::load(const shared_str& player_hud_sect)
         GEnv.Render->model_Delete(v);
     }
 
-    if (ShadowOfChernobylMode && !pSettings->line_exist(player_hud_sect, "visual"))
+    if (gameMode == gShadowOfChernobyl && !pSettings->line_exist(player_hud_sect, "visual"))
     {
         return;
     }

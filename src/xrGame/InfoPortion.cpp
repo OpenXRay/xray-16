@@ -43,7 +43,7 @@ void CInfoPortion::load_shared(LPCSTR)
 
     if (item_data == nullptr)
     {
-        if (ShadowOfChernobylMode || ClearSkyMode)
+        if (gameMode == gClearSky || gameMode == gShadowOfChernobyl)
             Msg("! attempt to use non-existent INFOPORTION [%s]", m_InfoId.c_str());
         return;
     }

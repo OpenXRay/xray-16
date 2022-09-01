@@ -73,7 +73,7 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual CBaseMonster* cast_base_monster() { return this; }
     virtual CGameObject* cast_game_object() { return this; }
-    virtual CInventoryOwner* cast_inventory_owner() override { return CallOfPripyatMode ? nullptr : this; }
+    virtual CInventoryOwner* cast_inventory_owner() override { return gameMode == gCallOfPripyat ? nullptr : this; }
 
 public:
     virtual void renderable_Render(IRenderable* root) override { return inherited::renderable_Render(root); }

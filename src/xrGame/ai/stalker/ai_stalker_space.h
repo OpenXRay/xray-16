@@ -184,7 +184,7 @@ constexpr WeaponTypes convert_weapon_type_soc_cs(int type)
 
 inline WeaponTypes convert_weapon_type(int type)
 {
-    if (ShadowOfChernobylMode || ClearSkyMode)
+    if (gameMode == gClearSky || gameMode == gShadowOfChernobyl)
         return convert_weapon_type_soc_cs(type);
 
     return convert_weapon_type_cop(type);

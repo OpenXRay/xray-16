@@ -200,7 +200,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
             else
                 inventory().ClientEat(itm);
 
-            const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+            const bool compat = gameMode == gClearSky || gameMode == gShadowOfChernobyl;
             StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true, compat ? 3.0f : -1.0f);
 
             string1024 str;

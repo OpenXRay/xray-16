@@ -429,7 +429,7 @@ void CBaseMonster::Hit(SHit* pHDS)
         if (!critically_wounded())
             update_critical_wounded(pHDS->boneID, pHDS->power);
 
-    const bool copOrHigher = !ShadowOfChernobylMode && !ClearSkyMode;
+    const bool copOrHigher = gameMode != gClearSky && gameMode != gShadowOfChernobyl;
     if (pHDS->hit_type == ALife::eHitTypeFireWound && copOrHigher)
     {
         float& hit_power = pHDS->power;

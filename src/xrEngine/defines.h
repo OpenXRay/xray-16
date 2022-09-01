@@ -6,9 +6,15 @@ ENGINE_API extern bool bDebug;
 #define bDebug 0
 #endif
 
-extern ENGINE_API bool CallOfPripyatMode;
-extern ENGINE_API bool ClearSkyMode;
-extern ENGINE_API bool ShadowOfChernobylMode;
+extern ENGINE_API int gameMode;
+
+enum
+{
+    gFree,
+    gCallOfPripyat,
+    gClearSky,
+    gShadowOfChernobyl,
+};
 
 // textures
 ENGINE_API extern int psTextureLOD;

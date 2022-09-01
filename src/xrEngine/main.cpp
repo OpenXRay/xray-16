@@ -34,9 +34,7 @@ ENGINE_API string512 g_sLaunchOnExit_params;
 ENGINE_API string512 g_sLaunchOnExit_app;
 ENGINE_API string_path g_sLaunchWorkingFolder;
 
-ENGINE_API bool CallOfPripyatMode = false;
-ENGINE_API bool ClearSkyMode = false;
-ENGINE_API bool ShadowOfChernobylMode = false;
+ENGINE_API int gameMode = gFree;
 
 namespace
 {
@@ -84,35 +82,7 @@ void InitConfig(T& config, pcstr name, bool fatal = true,
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 }
 
-// XXX: make it more fancy
-// некрасиво слишком
-void set_shoc_mode()
-{
-    CallOfPripyatMode = false;
-    ShadowOfChernobylMode = true;
-    ClearSkyMode = false;
-}
-
-void set_cs_mode()
-{
-    CallOfPripyatMode = false;
-    ShadowOfChernobylMode = false;
-    ClearSkyMode = true;
-}
-
-void set_cop_mode()
-{
-    CallOfPripyatMode = true;
-    ShadowOfChernobylMode = false;
-    ClearSkyMode = false;
-}
-
-void set_free_mode()
-{
-    CallOfPripyatMode = false;
-    ShadowOfChernobylMode = false;
-    ClearSkyMode = false;
-}
+void set_game_mode(int mode) { gameMode = mode; }
 
 ENGINE_API void InitSettings()
 {
@@ -128,24 +98,24 @@ ENGINE_API void InitSettings()
     InitConfig(pGameIni, "game.ltx");
 
     if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
-        set_shoc_mode();
+        set_game_mode(gShadowOfChernobyl);
     else if (strstr(Core.Params, "-cs"))
-        set_cs_mode();
+        set_game_mode(gClearSky);
     else if (strstr(Core.Params, "-cop"))
-        set_cop_mode();
+        set_game_mode(gCallOfPripyat);
     else if (strstr(Core.Params, "-unlock_game_mode"))
-        set_free_mode();
+        set_game_mode(gFree);
     else
     {
         pcstr gameMode = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
         if (xr_strcmpi("cop", gameMode) == 0)
-            set_cop_mode();
+            set_game_mode(gCallOfPripyat);
         else if (xr_strcmpi("cs", gameMode) == 0)
-            set_cs_mode();
+            set_game_mode(gClearSky);
         else if (xr_strcmpi("shoc", gameMode) == 0 || xr_strcmpi("soc", gameMode) == 0)
-            set_shoc_mode();
+            set_game_mode(gShadowOfChernobyl);
         else if (xr_strcmpi("unlock", gameMode) == 0)
-            set_free_mode();
+            set_game_mode(gFree);
     }
 }
 

@@ -31,7 +31,7 @@ CALifeStorageManager::~CALifeStorageManager() { *g_last_saved_game = 0; }
 void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;
-    if (ShadowOfChernobylMode || ClearSkyMode)
+    if (gameMode == gClearSky || gameMode == gShadowOfChernobyl)
         gameSaveExtension = SAVE_EXTENSION_LEGACY;
 
     LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;
@@ -132,7 +132,7 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
 bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;
-    if (ShadowOfChernobylMode || ClearSkyMode)
+    if (gameMode == gClearSky || gameMode == gShadowOfChernobyl)
         gameSaveExtension = SAVE_EXTENSION_LEGACY;
 
     LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;

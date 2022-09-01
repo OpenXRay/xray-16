@@ -131,7 +131,7 @@ void CUIPdaWnd::Init()
         xr_delete(UINoice);
 
     // XXX: dynamically determine if we need to rearrange the tabs
-    if (ClearSkyMode)
+    if (gameMode == gClearSky)
         RearrangeTabButtons(UITabControl);
 }
 

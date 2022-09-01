@@ -85,7 +85,7 @@ CInventory::CInventory()
         m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
 
         xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
+        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, gameMode == gShadowOfChernobyl ? defaultSlotActiveness[i] : false);
     };
 
     m_bSlotsUseful = true;

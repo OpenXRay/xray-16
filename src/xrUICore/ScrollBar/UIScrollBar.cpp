@@ -43,9 +43,9 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
     float height = xml_doc.ReadAttribFlt(profile, 0, (bIsHorizontal) ? "height" : "height_v");
     if (height == 0.0f)
     {
-        if (ShadowOfChernobylMode)
+        if (gameMode == gShadowOfChernobyl)
             height = xml_doc.ReadAttribFlt(profile, 0, "height");
-        else if (ClearSkyMode)
+        else if (gameMode == gClearSky)
             height = 16;
     }
     R_ASSERT(height > 0.0f);

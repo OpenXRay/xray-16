@@ -51,15 +51,18 @@ void CRenderDevice::Initialize()
         int icon = IDI_COP;
         pcstr title = "S.T.A.L.K.E.R.: Call of Pripyat";
 
-        if (ShadowOfChernobylMode)
+        switch (gameMode)
         {
-            icon = IDI_SOC;
-            title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
-        }
-        else if (ClearSkyMode)
-        {
-            icon = IDI_CS;
-            title = "S.T.A.L.K.E.R.: Clear Sky";
+            case gShadowOfChernobyl:
+            {
+                icon = IDI_SOC;
+                title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
+            }
+            case gClearSky:
+            {
+                icon = IDI_CS;
+                title = "S.T.A.L.K.E.R.: Clear Sky";
+            }
         }
 
         title = READ_IF_EXISTS(pSettingsOpenXRay, r_string,
