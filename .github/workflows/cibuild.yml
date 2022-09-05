@@ -26,7 +26,7 @@ jobs:
     - name: Install packages
       run: |
           brew update
-          brew install sdl2 glew lzo jpeg openal-soft libogg libvorbis libtheora
+          brew install sdl2 glew lzo jpeg openal-soft libogg libvorbis theora
 
     - name: Run CMake
       run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
