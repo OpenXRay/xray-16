@@ -43,6 +43,7 @@ jobs:
         set PLATFORM=${{ matrix.Platform }}
         call xr_pack_build.cmd ARTIFACT_EDITION
         echo ::set-output name=Build_type::%ARTIFACT_EDITION%
+
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@v2
       with:
