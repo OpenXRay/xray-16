@@ -262,3 +262,30 @@ jobs:
     - name: Run CMake Build
       shell: alpine.sh {0}
       run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
+
+  build-macos:
+    name: macOS ${{ matrix.Configuration }} ${{ matrix.Platform }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        Configuration: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Deinit Crypto++
+      run: git submodule deinit Externals/cryptopp
+
+    - name: Install packages
+      run: |
+          brew update
+          brew install sdl2 glew lzo jpeg openal-soft libogg libvorbis theora
+
+    - name: Run CMake
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+
+    - name: Run CMake Build
+      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(sysctl -n hw.ncpu || echo 4)

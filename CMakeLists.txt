@@ -189,7 +189,7 @@ endif()
 
 option(XRAY_USE_DEFAULT_LINKER "Don't select linker, use system default." OFF)
 
-if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER)
+if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER AND NOT APPLE) # XXX: check if we can remove check for Apple
     include(CheckCXXCompilerFlag)
     CHECK_CXX_COMPILER_FLAG("-fuse-ld=gold" GOLD_LINKER_AVAILABLE)
     CHECK_CXX_COMPILER_FLAG("-fuse-ld=lld" LLD_LINKER_AVAILABLE)
