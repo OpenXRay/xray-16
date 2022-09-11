@@ -164,13 +164,13 @@ R"(<w>
 inline pcstr GetLoadingScreenXML()
 {
     const bool is_wide = UICore::is_widescreen();
-    if (ShadowOfChernobylMode)
+    if (gameMode.is(shadowOfChernobylMode))
     {
         if (is_wide)
             return LoadingScreenXML16x9ShadowOfChernobyl;
         return LoadingScreenXMLClearSky;
     }
-    if (ClearSkyMode)
+    if (gameMode.is(clearSkyMode))
     {
         if (is_wide)
             return LoadingScreenXML16x9ClearSky;
@@ -184,11 +184,11 @@ inline pcstr GetLoadingScreenXML()
 
 inline pcstr GetLoadingScreenTexturesDescr()
 {
-    if (ShadowOfChernobylMode)
+    if (gameMode.is(shadowOfChernobylMode))
     {
         return LoadingScreenXMLClearSkyTexturesDescription;
     }
-    if (ClearSkyMode)
+    if (gameMode.is(clearSkyMode))
     {
         return LoadingScreenXMLClearSkyTexturesDescription;
     }

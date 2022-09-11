@@ -64,7 +64,7 @@ bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_ty
     m_progress.InitFromXml(xml_doc, buf);
 
     strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type], ":static_value");
-    if (xml_doc.NavigateToNode(buf, 0) && !CallOfPripyatMode)
+    if (xml_doc.NavigateToNode(buf, 0) && !gameMode.is(callOfPripyatMode))
     {
         CUIXmlInit::InitTextWnd(xml_doc, buf, 0, &m_value);
         m_value.Show(true);

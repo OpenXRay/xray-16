@@ -646,7 +646,7 @@ public:
 #ifdef DEBUG
         Msg("Game save overhead  : %f milliseconds", timer.GetElapsed_sec() * 1000.f);
 #endif
-        const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+        const bool compat = gameMode.is_any(clearSkyMode | shadowOfChernobylMode);
         StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true, compat ? 3.0f : -1.0f);
 
         pstr save_name;
@@ -668,7 +668,7 @@ public:
 
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
-        if (ShadowOfChernobylMode || ClearSkyMode)
+        if (gameMode.is_any(clearSkyMode | shadowOfChernobylMode))
             get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
         else
             get_files_list(tips, "$game_saves$", SAVE_EXTENSION);
@@ -746,7 +746,7 @@ public:
 
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
-        if (ShadowOfChernobylMode || ClearSkyMode)
+        if (gameMode.is_any(clearSkyMode | shadowOfChernobylMode))
             get_files_list(tips, "$game_saves$", SAVE_EXTENSION_LEGACY);
         else
             get_files_list(tips, "$game_saves$", SAVE_EXTENSION);

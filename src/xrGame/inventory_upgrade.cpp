@@ -165,7 +165,7 @@ UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
         return res;
 
     case result_script_e_cant_do:
-        if (ClearSkyMode)
+        if (gameMode.is(clearSkyMode))
         {
             if (res != result_ok)
                 return res;

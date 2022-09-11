@@ -97,7 +97,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     }
 
     m_scroll_mode = uiXml.ReadAttribInt(start_from, 0, "scroll_enable", 0) == 1;
-    if (m_scroll_mode || ShadowOfChernobylMode)
+    if (m_scroll_mode || gameMode.is(shadowOfChernobylMode))
     {
         float dx, dy, sx, sy;
         strconcat(sizeof(pth), pth, start_from, ":main_map_frame");

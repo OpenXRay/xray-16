@@ -100,7 +100,7 @@ void CUIActorMenu::Construct()
     m_ActorStateInfo = xr_new<ui_actor_state_wnd>();
     m_ActorStateInfo->SetAutoDelete(true);
 
-    if (ShadowOfChernobylMode)
+    if (gameMode.is(shadowOfChernobylMode))
     {
         CUIXml inventoryXml, tradeXml, carbodyXml;
         inventoryXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, INVENTORY_XML);
