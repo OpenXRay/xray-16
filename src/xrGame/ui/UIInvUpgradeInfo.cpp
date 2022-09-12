@@ -94,13 +94,13 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
         }
 
         m_prereq->SetText(nullptr);
-        if (!gameMode.is(clearSkyMode))
+        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "set_color_rgba_upgr", !gameMode.is(clearSkyMode)))
             m_prereq->SetTextColor(color_rgba(255, 90, 90, 255));
 
         string512 str_res{};
         auto set_result_string = [&](pcstr desc, bool add = false)
         {
-            if (gameMode.is(clearSkyMode))
+            if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "set_result_string_cs", gameMode.is(clearSkyMode)))
             {
                 xr_strcpy(str_res, StringTable().translate(desc).c_str());
             }
@@ -121,7 +121,7 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
         switch (upg_res)
         {
         case inventory::upgrade::result_e_installed:
-            if (!gameMode.is(clearSkyMode))
+            if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "set_color_rgba_upgr", !gameMode.is(clearSkyMode)))
                 m_prereq->SetTextColor(color_rgba(117, 255, 123, 255));
             m_prereq->SetTextST("st_upgr_installed");
             break;
@@ -147,7 +147,7 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
             case inventory::upgrade::result_ok:
             case inventory::upgrade::result_e_precondition_money:
             case inventory::upgrade::result_e_precondition_quest:
-                if (gameMode.is(clearSkyMode))
+                if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "set_test_upgr", gameMode.is(clearSkyMode)))
                 {
                     m_prereq->SetText(m_upgrade->get_prerequisites());
                     break;

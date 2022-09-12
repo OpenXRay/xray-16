@@ -43,7 +43,7 @@ void CInfoPortion::load_shared(LPCSTR)
 
     if (item_data == nullptr)
     {
-        if (gameMode.is_any(clearSkyMode | shadowOfChernobylMode))
+        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "log_item_data_is_nullptr", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)))
             Msg("! attempt to use non-existent INFOPORTION [%s]", m_InfoId.c_str());
         return;
     }

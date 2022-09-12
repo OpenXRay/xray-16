@@ -8,10 +8,9 @@ ENGINE_API extern bool bDebug;
 
 enum
 {
-    freeMode                   = (1ul << 0ul),
-    callOfPripyatMode          = (1ul << 1ul),
-    clearSkyMode               = (1ul << 2ul),
-    shadowOfChernobylMode      = (1ul << 3ul),
+    callOfPripyatMode       = (1ul << 0ul),
+    clearSkyMode            = (1ul << 1ul),
+    shadowOfChernobylMode   = (1ul << 2ul),
 };
 
 // textures

@@ -86,7 +86,7 @@ UpgradeStateResult Group::can_install(CInventoryItem& item, UpgradeBase& test_up
             continue;
         }
         bool cant_install; // XXX Clear Sky upgrades: find a dynamic, universal solution
-        if (gameMode.is(clearSkyMode))
+        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "cant_install", gameMode.is(clearSkyMode)))
             cant_install = !item.has_upgrade((*ib)->id());
         else
         {

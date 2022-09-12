@@ -877,9 +877,11 @@ void CUIActorMenu::ClearAllLists()
 
 void CUIActorMenu::ShowMessage(pcstr text, pcstr staticMessage /*= nullptr*/, float staticMsgTtl /*= -1.0f*/)
 {
+    const bool messageStatic = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "m_message_static", gameMode.is(shadowOfChernobylMode));
+
     if (m_message_box_ok)
         CallMessageBoxOK(text);
-    else if (staticMessage && gameMode.is(shadowOfChernobylMode))
+    else if (staticMessage && messageStatic)
     {
         m_message_static = CurrentGameUI()->AddCustomStatic(staticMessage, true, staticMsgTtl);
     }

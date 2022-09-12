@@ -230,7 +230,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
         float BoneArmor = m_boneHitProtection->getBoneArmor(HDS.bone());
         float ap = HDS.armor_piercing;
 
-        if (gameMode.is_any(clearSkyMode | shadowOfChernobylMode))
+        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "hit_power", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)))
         {
             if (ap > EPS && ap > BoneArmor)
             {

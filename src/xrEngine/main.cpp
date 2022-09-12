@@ -101,8 +101,6 @@ ENGINE_API void InitSettings()
         gameMode.assign(clearSkyMode);
     else if (strstr(Core.Params, "-cop"))
         gameMode.assign(callOfPripyatMode);
-    else if (strstr(Core.Params, "-unlock_game_mode"))
-        gameMode.assign(freeMode);
     else
     {
         pcstr gameModeLtx = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
@@ -112,8 +110,6 @@ ENGINE_API void InitSettings()
             gameMode.assign(clearSkyMode);
         else if (xr_strcmpi("shoc", gameModeLtx) == 0 || xr_strcmpi("soc", gameModeLtx) == 0)
             gameMode.assign(shadowOfChernobylMode);
-        else if (xr_strcmpi("unlock", gameModeLtx) == 0)
-            gameMode.assign(freeMode);
     }
 }
 

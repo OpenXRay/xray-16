@@ -156,7 +156,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         }
         else
         {
-            if (gameMode.is(clearSkyMode))
+            if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "load_d3dcompiler_37", gameMode.is(clearSkyMode)))
             {
                 hD3DCompiler = XRay::LoadModule("d3dcompiler_37");
                 D3DCompile = static_cast<D3DCompileFunc>(hD3DCompiler->GetProcAddress("D3DCompileFromMemory"));

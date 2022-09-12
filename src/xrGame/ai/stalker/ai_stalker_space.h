@@ -184,7 +184,7 @@ constexpr WeaponTypes convert_weapon_type_soc_cs(int type)
 
 inline WeaponTypes convert_weapon_type(int type)
 {
-    if (gameMode.is_any(clearSkyMode | shadowOfChernobylMode))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "convert_weapon_type_soc_cs", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)))
         return convert_weapon_type_soc_cs(type);
 
     return convert_weapon_type_cop(type);
