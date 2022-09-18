@@ -317,18 +317,18 @@ if (NOT PROJECT_PLATFORM_E2K)
 		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua/minilua"
 		COMMAND ${CMAKE_COMMAND}
 			-B"HostBuildTools/minilua"
-			-H"${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/minilua"
+			-H${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/minilua
 			-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
 			-DCMAKE_BUILD_TYPE:STRING="Release"
-			-DLUAJIT_DIR="${LUAJIT_DIR}"
+			-DLUAJIT_DIR=${LUAJIT_DIR}
 			-DLUA_USE_POSIX="${LUA_USE_POSIX}"
 			-DHOST_ACFLAGS="${HOST_ACFLAGS}"
 			-DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
-		COMMAND ${CMAKE_COMMAND} --build HostBuildTools/minilua --config Release
+		COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua" --config Release
 	)
 
 	add_custom_command(OUTPUT ${BUILDVM_ARCH}
-		COMMAND ${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua/minilua ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
+		COMMAND "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua/minilua" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
 		DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua/minilua"
 	)
 
@@ -354,10 +354,10 @@ add_custom_command(
 	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm/buildvm"
 	COMMAND ${CMAKE_COMMAND}
 		-B"HostBuildTools/buildvm"
-		-H"${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/buildvm"
+		-H${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/buildvm
 		-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
 		-DCMAKE_BUILD_TYPE:STRING="Release"
-		-DLUAJIT_DIR="${LUAJIT_DIR}"
+		-DLUAJIT_DIR=${LUAJIT_DIR}
 		-DBUILDVM_SRC="${BUILDVM_SRC}"
 		-DBUILDVM_ARCH="${BUILDVM_ARCH}"
 		-DHOST_ACFLAGS="${HOST_ACFLAGS}"
@@ -394,12 +394,12 @@ endif()
 
 macro(add_buildvm_target target mode)
 	add_custom_command(
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target}
-		COMMAND ${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm/buildvm ARGS -m ${mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${target} ${ARGN}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${target}"
+		COMMAND "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm/buildvm" ARGS -m ${mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${target} ${ARGN}
+		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 		DEPENDS buildvm ${ARGN}
 	)
-endmacro(add_buildvm_target)
+endmacro()
 
 if (WIN32)
 	add_buildvm_target(lj_vm.obj peobj)
