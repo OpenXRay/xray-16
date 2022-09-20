@@ -2501,6 +2501,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="map_script.cpp" />
     <ClCompile Include="map_spot.cpp" />
     <ClCompile Include="material_manager.cpp" />
     <ClCompile Include="medkit.cpp" />

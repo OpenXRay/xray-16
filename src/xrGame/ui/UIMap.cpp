@@ -556,6 +556,8 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else if (msg == MAP_SELECT_SPOT)
         MapWnd()->SpotSelected(pWnd);
+    else if (msg == MAP_SELECT_SPOT2)
+        MapWnd()->ActivatePropertiesBox(pWnd);
 }
 
 void CUILevelMap::OnFocusLost()

@@ -825,6 +825,7 @@ set(SRC_FILES
     "map_location.h"
     "map_manager.cpp"
     "map_manager.h"
+    "map_script.cpp"
     "map_spot.cpp"
     "map_spot.h"
     "material_manager.cpp"
