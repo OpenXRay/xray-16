@@ -397,12 +397,12 @@ float CGameFont::SizeOf_(const xr_wide_char* wsStr)
     if (!(wsStr && wsStr[0]))
         return 0;
 
-    unsigned int len = wsStr[0];
-    float X = 0.0f, fDelta = 0.0f;
+    const u16 len = wsStr[0];
+    float X = 0.0f;
 
     if (len)
     {
-        for (unsigned int j = 1; j <= len; j++)
+        for (u16 j = 1; j <= len; j++)
         {
             if (wsStr[j] == GAME_ACTION_MARK)
             {
@@ -412,20 +412,20 @@ float CGameFont::SizeOf_(const xr_wide_char* wsStr)
 
                 cpcstr binding = GetActionBinding(actionId);
 
-                const size_t sz = xr_strlen(binding);
-                xr_wide_char* wideBinding = static_cast<xr_wide_char*>(xr_alloca(sz));
-                mbhMulti2Wide(wideBinding, nullptr, sz, binding);
-                ++wideBinding;
+                xr_wide_char wideBinding[MAX_MB_CHARS];
+                const u16 bindingLen = mbhMulti2Wide(wideBinding, nullptr, MAX_MB_CHARS, binding);
 
-                while (wideBinding[0])
+                for (u16 i = 1; i <= bindingLen; ++i)
                 {
-                    X += GetCharTC(wideBinding[0]).z - 2;
-                    ++wideBinding;
+                    float fDelta = GetCharTC(wideBinding[i]).z - 2;
+                    if (IsNeedSpaceCharacter(wsStr[j]))
+                        fDelta += fXStep;
+                    X += fDelta;
                 }
             }
             else
             {
-                fDelta = GetCharTC(wsStr[j]).z - 2;
+                float fDelta = GetCharTC(wsStr[j]).z - 2;
                 if (IsNeedSpaceCharacter(wsStr[j]))
                     fDelta += fXStep;
                 X += fDelta;
