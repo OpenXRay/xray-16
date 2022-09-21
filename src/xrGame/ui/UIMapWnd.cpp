@@ -226,7 +226,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     m_ActionPlanner->setup(this);
     m_view_actor = true;
 
-    m_UIPropertiesBox = new CUIPropertiesBox();
+    m_UIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_UIPropertiesBox->SetAutoDelete(true);
     m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
     AttachChild(m_UIPropertiesBox);
