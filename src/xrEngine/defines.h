@@ -66,6 +66,6 @@ struct DeviceMode
 
 ENGINE_API extern DeviceMode psDeviceMode;
 ENGINE_API extern Flags32 psDeviceFlags;
-ENGINE_API extern Flags32 gameMode;
+ENGINE_API extern Flags32 psGameMode;
 
 #include "Common/FSMacros.hpp"
