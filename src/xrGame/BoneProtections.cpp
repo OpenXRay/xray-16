@@ -37,7 +37,7 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
     m_bones_koeff.clear();
 
     float defaultHitFraction = 0.1f;
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "load_default_hit_fraction", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "load_default_hit_fraction", gameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)))
     {
         defaultHitFraction = pSettings->read_if_exists<float>(bone_sect, "hit_fraction", defaultHitFraction);
     }
@@ -84,7 +84,7 @@ void SBoneProtections::add(const shared_str& bone_sect, IKinematics* kinematics)
     VERIFY(kinematics);
 
     float defaultHitFraction = 0.0f;
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "load_default_hit_fraction", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "load_default_hit_fraction", gameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)))
     {
         defaultHitFraction = READ_IF_EXISTS(pSettings, r_float, bone_sect, "hit_fraction", defaultHitFraction);
     }

@@ -127,9 +127,9 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
         _si->m_wnd->TextItemControl()->SetTextComplexMode(true);
         _si->m_wnd->Show(false);
-        if (!gameMode.is(shadowOfChernobylMode))
+        if (!gameMode.is(ShadowOfChernobylMode))
         {
-            if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "update_width_tutorial_item", gameMode.is(callOfPripyatMode)))
+            if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "update_width_tutorial_item", gameMode.is(CallOfPripyatMode)))
                 _si->m_wnd->SetWidth(_si->m_wnd->GetWidth() * UI().get_current_kx());
             else if (UI().is_widescreen())
                 _si->m_wnd->SetWidth(_si->m_wnd->GetWidth() / 1.2f); // XXX: move 1.2f to UICore as a constant

@@ -50,7 +50,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 
     pcstr ourTag = "right_character_icon";
     pcstr othersTag = "left_character_icon";
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "swap_character_icon", gameMode.is(shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "swap_character_icon", gameMode.is(ShadowOfChernobylMode)))
         std::swap(ourTag, othersTag);
 
     UIOurIcon = UIHelper::CreateStatic(*m_uiXml, ourTag, this, false);

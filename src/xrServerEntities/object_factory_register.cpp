@@ -219,7 +219,7 @@ void CObjectFactory::register_classes()
 #endif // NO_XR_GAME
 
 #ifndef NO_XR_GAME
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "register_actor_mp", gameMode.is(shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "register_actor_mp", gameMode.is(ShadowOfChernobylMode)))
         ADD_MP(CActor, CActorMP, CSE_ALifeCreatureActor, CSE_ActorMP, CLSID_OBJECT_ACTOR, "actor");
     else
 #endif
@@ -363,7 +363,7 @@ void CObjectFactory::register_classes()
     // We can't register both, since CLSID_LEVEL_CHANGER_S is created in COP scripts as "level_changer_s"
     // But in SOC scripts CLSID_LEVEL_CHANGER_S may be used as "level_changer"
 #ifndef NO_XR_GAME
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "register_level_changer", gameMode.is(shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "register_level_changer", gameMode.is(ShadowOfChernobylMode)))
     {
         ADD(CLevelChanger, CSE_ALifeLevelChanger, CLSID_LEVEL_CHANGER_S, "level_changer");
     }

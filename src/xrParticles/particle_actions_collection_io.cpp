@@ -399,7 +399,7 @@ void PATargetColor::Load(IReader& F)
     F.r_fvector3(color);
     alpha = F.r_float();
     scale = F.r_float();
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "dont_read_time_from_to", gameMode.is(shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "dont_read_time_from_to", gameMode.is(ShadowOfChernobylMode)))
         return; // XXX: make dynamic check
     timeFrom = F.r_float();
     timeTo = F.r_float();

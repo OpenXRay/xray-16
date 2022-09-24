@@ -164,47 +164,33 @@ R"(<w>
 inline pcstr GetLoadingScreenXML()
 {
     const bool is_wide = UICore::is_widescreen();
-    const u32 loadingScreenType = pSettingsOpenXRay->read_if_exists<u32>("gameplay", "loading_screen", callOfPripyatMode);
+    const pcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("gameplay", "loading_screen", "cop");
 
-    switch (loadingScreenType)
-    {
-    case shadowOfChernobylMode:
+    if (loadingScreenType == "soc" || loadingScreenType == "shoc")
     {
         if (is_wide)
             return LoadingScreenXML16x9ShadowOfChernobyl;
         return LoadingScreenXMLClearSky;
-    }
-    case clearSkyMode:
+    } else if (loadingScreenType == "cs")
     {
         if (is_wide)
             return LoadingScreenXML16x9ClearSky;
         return LoadingScreenXMLClearSky;
-    }
-    // Call of Pripyat
-    default:
+    } else
     {
         if (is_wide)
             return LoadingScreenXML16x9;
         return LoadingScreenXML;
     }
-    }
 }
 
 inline pcstr GetLoadingScreenTexturesDescr()
 {
-    const u32 loadingScreenType = pSettingsOpenXRay->read_if_exists<u32>("gameplay", "loading_screen", callOfPripyatMode);
+    const pcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("gameplay", "loading_screen", "cop");
 
-    switch (loadingScreenType)
-    {
-    case shadowOfChernobylMode:
-    case clearSkyMode:
-    {
+    if (loadingScreenType == "soc" || loadingScreenType == "shoc" || loadingScreenType == "cs")
         return LoadingScreenXMLClearSkyTexturesDescription;
-    }
-    // Call of Pripyat
-    default:
-    {
-        return LoadingScreenXMLTexturesDescription;
-    }
-    }
+
+    return LoadingScreenXMLTexturesDescription;
+
 }

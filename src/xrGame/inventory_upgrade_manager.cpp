@@ -159,7 +159,7 @@ void Manager::load_all_inventory()
 {
     LPCSTR items_section = "upgraded_inventory";
 
-    const bool returnIfNotExists = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "return_if_not_exists_upgraded_inventory", gameMode.is(shadowOfChernobylMode));
+    const bool returnIfNotExists = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "return_if_not_exists_upgraded_inventory", gameMode.is(ShadowOfChernobylMode));
 
     if (!pSettings->section_exist(items_section) && returnIfNotExists)
         return;
@@ -200,7 +200,7 @@ void Manager::load_all_properties()
 {
     LPCSTR properties_section = "upgrades_properties";
 
-    const bool returnIfNotExists = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "return_if_not_exists_upgraded_inventory", gameMode.is(shadowOfChernobylMode));
+    const bool returnIfNotExists = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "return_if_not_exists_upgraded_inventory", gameMode.is(ShadowOfChernobylMode));
 
     if (!pSettings->section_exist(properties_section) && returnIfNotExists)
         return;

@@ -78,7 +78,7 @@ CInventory::CInventory()
     m_iNextActiveSlot = NO_ACTIVE_SLOT;
     m_iPrevActiveSlot = NO_ACTIVE_SLOT;
 
-    const bool useDefaultSlotActiveness = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "default_slot_activeness", gameMode.is(shadowOfChernobylMode));
+    const bool useDefaultSlotActiveness = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "default_slot_activeness", gameMode.is(ShadowOfChernobylMode));
 
     string256 temp;
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)

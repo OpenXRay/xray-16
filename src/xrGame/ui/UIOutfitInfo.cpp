@@ -65,7 +65,7 @@ bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_ty
 
     strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type], ":static_value");
 
-    bool showOutfitImmunity = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "show_outfit_immunity", !gameMode.is(callOfPripyatMode));
+    bool showOutfitImmunity = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "show_outfit_immunity", !gameMode.is(CallOfPripyatMode));
 
     if (xml_doc.NavigateToNode(buf, 0) && showOutfitImmunity)
     {

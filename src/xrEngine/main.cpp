@@ -96,20 +96,20 @@ ENGINE_API void InitSettings()
     InitConfig(pGameIni, "game.ltx");
 
     if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
-        gameMode.assign(shadowOfChernobylMode);
+        gameMode.assign(ShadowOfChernobylMode);
     else if (strstr(Core.Params, "-cs"))
-        gameMode.assign(clearSkyMode);
+        gameMode.assign(ClearSkyMode);
     else if (strstr(Core.Params, "-cop"))
-        gameMode.assign(callOfPripyatMode);
+        gameMode.assign(CallOfPripyatMode);
     else
     {
         pcstr gameModeLtx = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
         if (xr_strcmpi("cop", gameModeLtx) == 0)
-            gameMode.assign(callOfPripyatMode);
+            gameMode.assign(CallOfPripyatMode);
         else if (xr_strcmpi("cs", gameModeLtx) == 0)
-            gameMode.assign(clearSkyMode);
+            gameMode.assign(ClearSkyMode);
         else if (xr_strcmpi("shoc", gameModeLtx) == 0 || xr_strcmpi("soc", gameModeLtx) == 0)
-            gameMode.assign(shadowOfChernobylMode);
+            gameMode.assign(ShadowOfChernobylMode);
     }
 }
 

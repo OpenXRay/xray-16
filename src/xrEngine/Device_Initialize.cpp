@@ -51,12 +51,12 @@ void CRenderDevice::Initialize()
         int icon = IDI_COP;
         pcstr title = "S.T.A.L.K.E.R.: Call of Pripyat";
 
-        if (gameMode.is(shadowOfChernobylMode))
+        if (gameMode.is(ShadowOfChernobylMode))
         {
             icon = IDI_SOC;
             title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
         }
-        else if (gameMode.is(clearSkyMode))
+        else if (gameMode.is(ClearSkyMode))
         {
             icon = IDI_CS;
             title = "S.T.A.L.K.E.R.: Clear Sky";

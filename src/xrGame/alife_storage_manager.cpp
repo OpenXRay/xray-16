@@ -31,7 +31,7 @@ CALifeStorageManager::~CALifeStorageManager() { *g_last_saved_game = 0; }
 void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "legacy_save_extension", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "legacy_save_extension", gameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)))
         gameSaveExtension = SAVE_EXTENSION_LEGACY;
 
     LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;
@@ -132,7 +132,7 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
 bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "legacy_save_extension", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "legacy_save_extension", gameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)))
         gameSaveExtension = SAVE_EXTENSION_LEGACY;
 
     LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;

@@ -100,7 +100,7 @@ void CUIActorMenu::Construct()
     m_ActorStateInfo = xr_new<ui_actor_state_wnd>();
     m_ActorStateInfo->SetAutoDelete(true);
 
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "init_more_xml", gameMode.is(shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "init_more_xml", gameMode.is(ShadowOfChernobylMode)))
     {
         CUIXml inventoryXml, tradeXml, carbodyXml;
         inventoryXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, INVENTORY_XML);

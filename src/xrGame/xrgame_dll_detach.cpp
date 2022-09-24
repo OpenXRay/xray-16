@@ -39,8 +39,8 @@ void init_game_globals()
     InitHudSoundSettings();
     if (!GEnv.isDedicatedServer)
     {
-        CInfoPortion::InitInternal(pSettingsOpenXRay->read_if_exists<bool>("gameplay", "crash_on_fail_CInfoPortion", gameMode.is_any(clearSkyMode | shadowOfChernobylMode)), true);
-        CEncyclopediaArticle::InitInternal(pSettingsOpenXRay->read_if_exists<bool>("gameplay", "crash_on_fail_CEncyclopediaArticle", gameMode.is(shadowOfChernobylMode)), true);
+        CInfoPortion::InitInternal(pSettingsOpenXRay->read_if_exists<bool>("gameplay", "crash_on_fail_CInfoPortion", gameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)), true);
+        CEncyclopediaArticle::InitInternal(pSettingsOpenXRay->read_if_exists<bool>("gameplay", "crash_on_fail_CEncyclopediaArticle", gameMode.is(ShadowOfChernobylMode)), true);
         CPhraseDialog::InitInternal();
     };
     CCharacterInfo::InitInternal();

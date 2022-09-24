@@ -1443,7 +1443,7 @@ void CUIActorMenu::UpdateOutfit()
             m_pLists[eInventoryHelmetList]->SetCellsCapacity(m_pLists[eInventoryHelmetList]->MaxCellsCapacity());
     }
 
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "reset_cells_capacity", gameMode.is(shadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "reset_cells_capacity", gameMode.is(ShadowOfChernobylMode)))
     {
         m_pLists[eInventoryBeltList]->ResetCellsCapacity();
         return;
