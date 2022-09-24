@@ -165,7 +165,7 @@ UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
         return res;
 
     case result_script_e_cant_do:
-        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "result_precondition_money", gameMode.is(ClearSkyMode)))
+        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "result_precondition_money", psGameMode.is(ClearSkyMode)))
         {
             if (res != result_ok)
                 return res;

@@ -43,12 +43,12 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
     float height = xml_doc.ReadAttribFlt(profile, 0, (bIsHorizontal) ? "height" : "height_v");
     if (height == 0.0f)
     {
-        const bool read_scroll_height = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "read_scroll_height_from_xml", gameMode.is(ShadowOfChernobylMode));
+        const bool read_scroll_height = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "read_scroll_height_from_xml", psGameMode.is(ShadowOfChernobylMode));
         const float scrollHeight = pSettingsOpenXRay->read_if_exists<float>("gameplay", "scroll_height", 16);
 
         if (read_scroll_height)
             height = xml_doc.ReadAttribFlt(profile, 0, "height");
-        else if (gameMode.is(ClearSkyMode))
+        else if (psGameMode.is(ClearSkyMode))
             height = scrollHeight;
     }
     R_ASSERT(height > 0.0f);

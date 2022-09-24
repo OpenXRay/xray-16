@@ -446,7 +446,7 @@ void player_hud::load(const shared_str& player_hud_sect)
         GEnv.Render->model_Delete(v);
     }
 
-    const bool load = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "dont_load_player_hud", gameMode.is(ShadowOfChernobylMode));
+    const bool load = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "dont_load_player_hud", psGameMode.is(ShadowOfChernobylMode));
 
     if (load && !pSettings->line_exist(player_hud_sect, "visual"))
     {
