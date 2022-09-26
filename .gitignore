@@ -17,6 +17,7 @@ intermediate/
 intermediate_plugs/
 lib/
 CMakeFiles/
+CoP/
 *.aps
 *.user
 *.PVS-Studio.*
