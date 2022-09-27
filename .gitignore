@@ -12,7 +12,8 @@ cmake_install.cmake
 cmake-build-*
 install_manifest.txt
 bin/
-build/
+build_Release/
+build_Debug/
 intermediate/
 intermediate_plugs/
 lib/
