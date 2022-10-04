@@ -69,7 +69,7 @@ void CPolterTele::update_schedule()
 
         if (m_state == eStartRaiseObjects)
         {
-            if (m_object->CTelekinesis::get_objects_count() >= m_pmt_object_count)
+            if (m_object->CTelekinesis::get_objects_total_count() >= m_pmt_object_count)
             {
                 m_state = eRaisingObjects;
                 m_time = time();
@@ -84,6 +84,7 @@ void CPolterTele::update_schedule()
         m_time = time();
         m_time_next = 0;
         m_state = eFireObjects;
+        break;
     case eFireObjects:
         if (m_time + m_time_next < time())
         {
@@ -93,7 +94,7 @@ void CPolterTele::update_schedule()
             m_time_next = m_pmt_time_to_wait_in_objects / 2 + Random.randI(m_pmt_time_to_wait_in_objects / 2);
         }
 
-        if (m_object->CTelekinesis::get_objects_count() == 0)
+        if (m_object->CTelekinesis::get_objects_total_count() == 0)
         {
             m_state = eWait;
             m_time = time();
