@@ -252,9 +252,9 @@ void CStateBurerAttackTele<Object>::FireAllToEnemy()
 
     Fvector enemy_pos = get_head_position(const_cast<CEntityAlive*>(this->object->EnemyMan.get_enemy()));
 
-    for (u32 i = 0; i <this->object->CTelekinesis::get_objects_total_count(); ++i)
+    for (u32 i = 0; i <this->object->CTelekinesis::get_objects_count(); ++i)
     {
-        u32 const prev_num_objects = this->object->CTelekinesis::get_objects_total_count();
+        u32 const prev_num_objects = this->object->CTelekinesis::get_objects_count();
 
         CPhysicsShellHolder* const cur_object = this->object->CTelekinesis::get_object_by_index(i).object;
         if (!cur_object)
@@ -266,7 +266,7 @@ void CStateBurerAttackTele<Object>::FireAllToEnemy()
 
         this->object->CTelekinesis::fire_t(cur_object, enemy_pos, fire_time);
 
-        u32 const new_num_objects = this->object->CTelekinesis::get_objects_total_count();
+        u32 const new_num_objects = this->object->CTelekinesis::get_objects_count();
         if (new_num_objects < prev_num_objects)
         {
             VERIFY(new_num_objects == prev_num_objects - 1);
