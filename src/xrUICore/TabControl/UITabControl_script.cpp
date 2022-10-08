@@ -13,7 +13,11 @@ SCRIPT_EXPORT(CUITabControl, (CUIWindow),
         class_<CUITabControl, CUIWindow>("CUITabControl")
             .def(constructor<>())
             .def("AddItem", (bool (CUITabControl::*)(CUITabButton*))(&CUITabControl::AddItem), adopt<2>())
-            .def("AddItem", (bool (CUITabControl::*)(LPCSTR, LPCSTR, Fvector2, Fvector2)) & CUITabControl::AddItem)
+            .def("AddItem", (bool (CUITabControl::*)(pcstr, pcstr, Fvector2, Fvector2)) &CUITabControl::AddItem)
+            .def("AddItem", +[](CUITabControl* self, pcstr pItemName, pcstr pTexName, float x, float y, float width, float height)
+            {
+                self->AddItem(pItemName, pTexName, { x, y }, { width, height });
+            })
             .def("RemoveItem", &CUITabControl::RemoveItemByIndex)
             .def("RemoveItem", &CUITabControl::RemoveItemById_script)
             .def("RemoveAll", &CUITabControl::RemoveAll)
