@@ -21,7 +21,6 @@ SCRIPT_EXPORT(CUITabControl, (CUIWindow),
             .def("GetActiveIndex", &CUITabControl::GetActiveIndex)
             .def("GetTabsCount", &CUITabControl::GetTabsCount)
             .def("SetActiveTab", &CUITabControl::SetActiveTab_script)
-            .def("SetActiveTab", &CUITabControl::SetActiveTabByIndex)
             .def("SetNewActiveTab", &CUITabControl::SetActiveTabByIndex)
             .def("GetButtonById", &CUITabControl::GetButtonById_script)
             .def("GetButtonByIndex", &CUITabControl::GetButtonByIndex)
