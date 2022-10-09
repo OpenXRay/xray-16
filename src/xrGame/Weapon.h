@@ -361,7 +361,7 @@ protected:
     float misfireProbability;
     float misfireConditionK;
     // modified by Peacemaker [17.10.08]
-    bool  misfireUseOldFormula;
+    bool  misfireUseOldFormula{};
     float misfireStartCondition; //изношенность, при которой появляется шанс осечки
     float misfireEndCondition; //изношеность при которой шанс осечки становится константным
     float misfireStartProbability; //шанс осечки при изношености больше чем misfireStartCondition

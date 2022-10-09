@@ -406,7 +406,7 @@ void CWeapon::Load(LPCSTR section)
         misfireProbability      = pSettings->r_float(section, "misfire_probability");
         misfireConditionK       = pSettings->read_if_exists<float>(section, "misfire_condition_k", 1.0f);
 
-        // For UI indicators to work correctly
+        // For UI indicators to work correctly, rough estimate values
         misfireStartCondition   = 0.95f;
         misfireEndCondition     = 0.0f;
         misfireStartProbability = misfireProbability;
