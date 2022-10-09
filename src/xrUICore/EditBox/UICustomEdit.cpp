@@ -95,6 +95,10 @@ void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         m_bInputFocus = false;
         GetMessageTarget()->SendMessage(this, EDIT_TEXT_COMMIT, NULL);
     }
+    else if (msg == MAIN_MENU_INPUT_ACTIVATE && m_bInputFocus)
+    {
+        CaptureFocus(true);
+    }
 }
 
 bool CUICustomEdit::OnMouseAction(float x, float y, EUIMessages mouse_action)

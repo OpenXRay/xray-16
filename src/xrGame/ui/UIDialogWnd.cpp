@@ -35,6 +35,11 @@ bool CUIDialogWnd::OnControllerAction(int axis, float x, float y, EUIMessages co
     return false;
 }
 
+void CUIDialogWnd::OnInputActivate()
+{
+    SendMessage(this, MAIN_MENU_INPUT_ACTIVATE);
+}
+
 bool CUIDialogWnd::IR_process()
 {
     if (!IsEnabled())

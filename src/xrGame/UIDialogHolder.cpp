@@ -512,3 +512,15 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     };
     return true;
 }
+
+bool CDialogHolder::IR_UIOnInputActivate()
+{
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+
+    TIR->OnInputActivate();
+    return true;
+}

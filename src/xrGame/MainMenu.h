@@ -163,6 +163,8 @@ public:
     void IR_OnControllerRelease(int dik, float x, float y) override;
     void IR_OnControllerHold(int dik, float x, float y) override;
 
+    void IR_OnActivate() override;
+
     bool OnRenderPPUI_query();
     void OnRenderPPUI_main();
     void OnRenderPPUI_PP();
