@@ -75,8 +75,8 @@ void CUICustomEdit::Init(u32 max_char_count, bool number_only_mode, bool read_mo
 
     Register_callbacks();
     ClearText();
-
-    m_bInputFocus = false;
+    
+    CaptureFocus(false);
 }
 
 void CUICustomEdit::InitCustomEdit(Fvector2 pos, Fvector2 size)
@@ -95,10 +95,6 @@ void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         m_bInputFocus = false;
         GetMessageTarget()->SendMessage(this, EDIT_TEXT_COMMIT, NULL);
     }
-    else if (msg == WINDOW_FOCUS_RECEIVED)
-        ec().on_ir_capture();
-    else if (msg == WINDOW_FOCUS_LOST)
-        ec().on_ir_release();
 }
 
 bool CUICustomEdit::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -107,15 +103,13 @@ bool CUICustomEdit::OnMouseAction(float x, float y, EUIMessages mouse_action)
     {
         if (mouse_action == WINDOW_LBUTTON_DB_CLICK && !m_bInputFocus)
         {
-            GetParent()->SetKeyboardCapture(this, true);
-            m_bInputFocus = true;
+            CaptureFocus(true);
         }
     }
 
     if (mouse_action == WINDOW_LBUTTON_DOWN && !m_bInputFocus)
     {
-        GetParent()->SetKeyboardCapture(this, true);
-        m_bInputFocus = true;
+        CaptureFocus(true);
     }
     return false;
 }
@@ -273,7 +267,7 @@ void CUICustomEdit::press_escape()
     }
     else
     {
-        m_bInputFocus = false;
+        CaptureFocus(false);
         GetParent()->SetKeyboardCapture(this, false);
         GetMessageTarget()->SendMessage(this, EDIT_TEXT_CANCEL, NULL);
     }
@@ -281,7 +275,7 @@ void CUICustomEdit::press_escape()
 
 void CUICustomEdit::press_commit()
 {
-    m_bInputFocus = false;
+    CaptureFocus(false);
     GetParent()->SetKeyboardCapture(this, false);
     GetMessageTarget()->SendMessage(this, EDIT_TEXT_COMMIT, NULL);
 }
@@ -312,3 +306,4 @@ void CUICustomEdit::CaptureFocus(bool bCapture)
 
     m_bInputFocus = bCapture;
 }
+
