@@ -26,8 +26,10 @@ protected:
 
 public:
     IInputReceiver* m_pStoredInputReceiver;
-    virtual ~CUISequencer() = default;
+
     CUISequencer();
+    virtual ~CUISequencer() = default;
+
     bool Start(LPCSTR tutor_name);
     void Stop();
     void Next();

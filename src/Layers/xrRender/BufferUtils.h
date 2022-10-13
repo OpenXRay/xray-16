@@ -10,6 +10,10 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl);
 void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl);
 void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<InputElementDesc>& declOut);
 
+#ifdef USE_OGL
+void SetGLVertexPointer(SDeclaration* decl);
+#endif
+
 namespace BufferUtils
 {
 HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize);

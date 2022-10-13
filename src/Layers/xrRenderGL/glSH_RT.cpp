@@ -52,15 +52,20 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     fmt = f;
     sampleCount = SampleCount;
 
-    // Get caps
-    GLint max_width, max_height;
-    CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_WIDTH, &max_width));
-    CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_HEIGHT, &max_height));
+    if (GLEW_VERSION_4_3) 
+    {
+        // Get caps
+        GLint max_width, max_height;
+        CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_WIDTH, &max_width));
+        CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_HEIGHT, &max_height));
 
-    // Check width-and-height of render target surface
-    // XXX: While seemingly silly, assert w/h are positive?
-    if (w > u32(max_width)) return;
-    if (h > u32(max_height)) return;
+        // Check width-and-height of render target surface
+        // XXX: While seemingly silly, assert w/h are positive?
+        if (w > u32(max_width))
+            return;
+        if (h > u32(max_height))
+            return;
+    }
 
     RImplementation.Resources->Evict();
 

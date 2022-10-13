@@ -21,8 +21,9 @@ protected:
     shared_str m_script_clsid;
 
 public:
-    virtual ~CObjectItemAbstract() = default;
     IC CObjectItemAbstract(const CLASS_ID& clsid, LPCSTR script_clsid);
+    virtual ~CObjectItemAbstract() = default;
+
     IC const CLASS_ID& clsid() const;
     IC shared_str script_clsid() const;
 #ifndef NO_XR_GAME
