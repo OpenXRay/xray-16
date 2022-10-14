@@ -26,8 +26,9 @@ bool cmp_ssa(const T &lhs, const T &rhs)
 template <typename T>
 bool cmp_pass(const T& left, const T& right)
 {
-    return left->first->equal(*right->first)
-        || left->second.ssa > right->second.ssa;
+    if (left->first->equal(*right->first))
+        return false;
+    return left->second.ssa >= right->second.ssa;
 }
 
 void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
@@ -46,7 +47,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
         auto& map = mapNormalPasses[_priority][iPass];
 
         map.get_any_p(nrmPasses);
-        std::sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass<mapNormal_T::value_type*>);
+        std::stable_sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass<mapNormal_T::value_type*>);
         for (const auto& it : nrmPasses)
         {
             RCache.set_Pass(it->first);
@@ -83,7 +84,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
         auto& map = mapMatrixPasses[_priority][iPass];
 
         map.get_any_p(matPasses);
-        std::sort(matPasses.begin(), matPasses.end(), cmp_pass<mapMatrix_T::value_type*>);
+        std::stable_sort(matPasses.begin(), matPasses.end(), cmp_pass<mapMatrix_T::value_type*>);
         for (const auto& it : matPasses)
         {
             RCache.set_Pass(it->first);
