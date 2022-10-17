@@ -119,9 +119,10 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     }
 
     // Initialize OpenGL Extension Wrangler
-    if (glewInit() != GLEW_OK)
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Msg("Could not initialize glew.");
+        Msg("Could not initialize glew: %s", glewGetErrorString(err));
         return;
     }
 
