@@ -46,7 +46,7 @@ bool TestOpenGLSupport()
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
-         Log("~ Could not initialize glew: %s", glewGetErrorString(err));
+         Msg("Could not initialize glew: %s", glewGetErrorString(err));
          return false;
     }
 
