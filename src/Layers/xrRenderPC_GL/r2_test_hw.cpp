@@ -43,11 +43,13 @@ bool TestOpenGLSupport()
     if (!windowTest.successful())
         return false;
 
-    if (glewInit() != GLEW_OK)
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Log("~ Could not initialize glew.");
-        return false;
+         Log("~ Could not initialize glew: %s", glewGetErrorString(err));
+         return false;
     }
+
     return true;
 }
 
