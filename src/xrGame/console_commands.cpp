@@ -38,6 +38,7 @@
 #include "saved_game_wrapper.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrNetServer/NET_Messages.h"
+#include "UIStyle.h"
 
 #include "CameraLook.h"
 #include "character_hit_animations_params.h"
@@ -93,9 +94,6 @@ XRUICORE_API extern BOOL g_show_wnd_rect2;
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
 
-extern u32 UIStyleID;
-extern xr_vector<xr_token> UIStyleToken;
-
 extern float g_smart_cover_factor;
 extern int g_upgrades_log;
 extern float g_smart_cover_animation_speed_factor;
@@ -105,6 +103,8 @@ float g_aim_predict_time = 0.40f;
 int g_keypress_on_start = 1;
 
 ENGINE_API extern float g_console_sensitive;
+
+extern UIStyle* UIStyleManager;
 
 //Alundaio
 extern BOOL g_ai_die_in_anomaly;
@@ -1439,16 +1439,18 @@ public:
     }
 };
 
-extern void SetupUIStyle();
 class CCC_UIStyle : public CCC_Token
 {
 public:
-    CCC_UIStyle(pcstr name) : CCC_Token(name, &UIStyleID, UIStyleToken.data()) {}
+    CCC_UIStyle(pcstr name)
+        : CCC_Token(name, &UIStyleManager->UIStyleID, UIStyleManager->UIStyleToken.data())
+    {
+    }
 
     void Execute(pcstr args)
     {
         CCC_Token::Execute(args);
-        SetupUIStyle();
+        UIStyleManager->SetupUIStyle();
     }
 };
 

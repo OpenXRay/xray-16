@@ -1290,6 +1290,7 @@
     <ClInclude Include="UIGameTDM.h" />
     <ClInclude Include="UIPanelsClassFactory.h" />
     <ClInclude Include="UIPlayerItem.h" />
+    <ClInclude Include="UIStyle.h" />
     <ClInclude Include="UITeamHeader.h" />
     <ClInclude Include="UITeamPanels.h" />
     <ClInclude Include="UITeamState.h" />
@@ -3187,6 +3188,7 @@
     <ClCompile Include="UIGameTDM.cpp" />
     <ClCompile Include="UIPanelsClassFactory.cpp" />
     <ClCompile Include="UIPlayerItem.cpp" />
+    <ClCompile Include="UIStyle.cpp" />
     <ClCompile Include="UITeamHeader.cpp" />
     <ClCompile Include="UITeamPanels.cpp" />
     <ClCompile Include="UITeamState.cpp" />
