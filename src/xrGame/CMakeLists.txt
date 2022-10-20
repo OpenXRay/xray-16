@@ -2472,6 +2472,8 @@ set(SRC_FILES
     "ui/UIStatsPlayerInfo.h"
     "ui/UIStatsPlayerList.cpp"
     "ui/UIStatsPlayerList.h"
+    "ui/UIStyle.cpp"
+    "ui/UIStyle.h"
     "ui/UITabButtonMP.cpp"
     "ui/UITabButtonMP.h"
     "ui/UITalkDialogWnd.cpp"
