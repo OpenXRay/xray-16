@@ -48,22 +48,22 @@ ICF static void UIRegistratorScriptExport(lua_State* luaState)
 
         class_<UIStyle>("UIStyle")
             .def(constructor<>())
-            .def("GetUIStyleTokens", +[]() -> xr_vector<xr_token>& { 
-                    return UIStyleManager->UIStyleToken; 
-                }, return_stl_iterator())
-
-            .def("SetUIStyle", +[](u32 styleID) { 
-                    UIStyleManager->UIStyleID = styleID;
-                    UIStyleManager->SetupUIStyle();
-                })
-
-            .def(
-                "SetUIStyle", +[](u32 styleID, bool reloadUI) {
-                    UIStyleManager->UIStyleID = styleID;
-                    UIStyleManager->SetupUIStyle();
-                    if (reloadUI)
-                        Console->Execute("ui_restart");
-                })
+            .def("GetUIStyleTokens", +[]() -> xr_vector<xr_token>&
+            {
+                return UIStyleManager->UIStyleToken; 
+            }, return_stl_iterator())
+            .def("SetUIStyle", +[](u32 styleID)
+            {
+                UIStyleManager->UIStyleID = styleID;
+                UIStyleManager->SetupUIStyle();
+            })
+            .def("SetUIStyle", +[](u32 styleID, bool reloadUI)
+            {
+                UIStyleManager->UIStyleID = styleID;
+                UIStyleManager->SetupUIStyle();
+                if (reloadUI)
+                    Console->Execute("ui_restart");
+            })
     ];
     module(luaState, "main_menu")
     [
