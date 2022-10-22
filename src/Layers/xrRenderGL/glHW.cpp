@@ -119,20 +119,21 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     }
 
     // Initialize OpenGL Extension Wrangler
-#ifdef __APPLE__
+#ifdef XR_PLATFORM_APPLE
     // This is essential for complete OpenGL 4.1 load on mac
     glewExperimental = GL_TRUE;
 #endif
-    if (glewInit() != GLEW_OK)
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Msg("Could not initialize glew.");
+        Msg("Could not initialize glew: %s", glewGetErrorString(err));
         return;
     }
 
     UpdateVSync();
 
 #ifdef DEBUG
-    if (GLEW_KHR_debug)  // NOTE: this extension isonly available strting with 4.3
+    if (GLEW_KHR_debug)  // NOTE: this extension is only available starting with OpenGL 4.3
     {
         CHK_GL(glEnable(GL_DEBUG_OUTPUT));
         CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
