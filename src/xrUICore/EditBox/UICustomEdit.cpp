@@ -145,6 +145,9 @@ bool CUICustomEdit::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 bool CUICustomEdit::OnTextInput(pcstr text)
 {
+    if (!m_bInputFocus)
+        return false;
+
     ec().on_text_input(text);
     return true;
 }
