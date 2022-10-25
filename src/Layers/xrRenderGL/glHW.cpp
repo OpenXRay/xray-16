@@ -85,13 +85,13 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     m_context = SDL_GL_CreateContext(m_window);
     if (m_context == nullptr)
     {
-        Msg("Could not create drawing context: %s", SDL_GetError());
+        Log("! Could not create drawing context:", SDL_GetError());
         return;
     }
 
     if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
-        Msg("Could not make context current. %s", SDL_GetError());
+        Log("! Could not make context current:", SDL_GetError());
         return;
     }
 
@@ -113,8 +113,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
-        Msg("Could not make context current after creating helper context."
-            " %s", SDL_GetError());
+        Log("! Could not make context current after creating helper context:", SDL_GetError());
         return;
     }
 
@@ -122,7 +121,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
-        Msg("Could not initialize glew: %s", glewGetErrorString(err));
+        Log("! Could not initialize glew:", (pcstr)glewGetErrorString(err));
         return;
     }
 
