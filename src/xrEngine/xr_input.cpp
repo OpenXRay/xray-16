@@ -249,6 +249,12 @@ void CInput::KeyUpdate()
             seqKeyMapChanged.Process();
             break;
         }
+
+        if (isFlushingKeyEvents)
+        {
+            isFlushingKeyEvents = false;
+            break;
+        }
     }
 
     for (u32 i = 0; i < COUNT_KB_BUTTONS; ++i)
@@ -539,7 +545,10 @@ void CInput::iCapture(IInputReceiver* p)
 
     // change focus
     if (!cbStack.empty())
-        cbStack.back()->IR_OnDeactivate();
+    {
+        FlushKeyEvents();
+        cbStack.back()->IR_OnDeactivate();       
+    }
     cbStack.push_back(p);
     cbStack.back()->IR_OnActivate();
 
@@ -553,6 +562,7 @@ void CInput::iRelease(IInputReceiver* p)
 {
     if (p == cbStack.back())
     {
+        FlushKeyEvents();
         cbStack.back()->IR_OnDeactivate();
         cbStack.pop_back();
         cbStack.back()->IR_OnActivate();

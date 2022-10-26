@@ -129,6 +129,9 @@ private:
 
     MessageRegistry<pureKeyMapChanged> seqKeyMapChanged;
 
+    void FlushKeyEvents() { isFlushingKeyEvents = true; };
+    bool isFlushingKeyEvents;
+
 public:
     u32 m_curTime;
     u32 m_mouseDelta;
@@ -165,6 +168,7 @@ public:
     void EnableControllerSensors(bool enable);
 
     auto GetCurrentInputType() { return currentInputType; }
+
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;
