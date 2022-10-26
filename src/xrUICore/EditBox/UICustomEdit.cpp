@@ -97,7 +97,7 @@ void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else if (msg == MAIN_MENU_INPUT_ACTIVATE && m_bInputFocus)
     {
-        CaptureFocus(true);
+        ec().on_ir_capture();
     }
 }
 
