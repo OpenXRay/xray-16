@@ -19,7 +19,6 @@ R"(<w>
         <background stretch="1">
             <texture width="506" height="4" r="0" g="0" b="0" a="255">ui_mm_loading_progress_bar</texture>
         </background>
-        <color r="60" g="119" b="156" a="255"/>
     </loading_progress>
     <loading_stage x="260" y="530" width="506" height="20">
         <text align="c" r="170" g="170" b="170" font="letterica18"/>
@@ -56,7 +55,6 @@ R"(<w>
         <background stretch="1">
             <texture width="405" height="5" r="0" g="0" b="0" a="255">ui_mm_loading_progress_bar</texture>
         </background>
-        <color r="60" g="119" b="156" a="255"/>
     </loading_progress>
     <loading_stage x="310" y="530" width="405" height="20" stretch="1">
         <text align="c" r="170" g="170" b="170" font="letterica18"/>
