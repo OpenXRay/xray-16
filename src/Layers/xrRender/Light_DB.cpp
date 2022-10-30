@@ -185,9 +185,10 @@ void CLight_DB::Update()
         VERIFY2(E.sun_dir.y < 0, "Invalid sun direction settings in evironment-config");
         Fvector dir, pos;
 
-        const bool normalizeSunlightDirection = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "normalize_sunlight_direction", !psGameMode.is(ShadowOfChernobylMode));
+        const bool trueSunlightDirection = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "true_sunlight_direction",
+            !GEnv.Render->is_sun_static() && !psGameMode.is(ShadowOfChernobylMode));
 
-        if (!GEnv.Render->is_sun_static() && normalizeSunlightDirection)
+        if (normalizeSunlightDirection)
         {
             // true sunlight direction
             dir.set(E.sun_dir).normalize();

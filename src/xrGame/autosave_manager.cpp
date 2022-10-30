@@ -76,7 +76,7 @@ void CAutosaveManager::shedule_Update(u32 dt)
 #ifdef XR_PLATFORM_WINDOWS
     SetFileAttributes(S1, FILE_ATTRIBUTE_HIDDEN);
 #endif
-    const bool compat = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "custom_static_3_sec_timeout", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
+    const bool compat = pSettingsOpenXRay->read_if_exists<bool>("ui", "custom_static_3_sec_timeout", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
     StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("autosave", true, compat ? 3.0f : -1.0f);
 }
 

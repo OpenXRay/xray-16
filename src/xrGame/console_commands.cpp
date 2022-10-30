@@ -646,7 +646,7 @@ public:
 #ifdef DEBUG
         Msg("Game save overhead  : %f milliseconds", timer.GetElapsed_sec() * 1000.f);
 #endif
-        const bool compat = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "custom_static_3_sec_timeout", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
+        const bool compat = pSettingsOpenXRay->read_if_exists<bool>("ui", "custom_static_3_sec_timeout", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
         StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true, compat ? 3.0f : -1.0f);
 
         pstr save_name;

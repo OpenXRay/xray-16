@@ -156,7 +156,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         }
         else
         {
-            if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "load_d3dcompiler_37", psGameMode.is(ClearSkyMode)))
+            if (pSettingsOpenXRay->read_if_exists<bool>("compatibility", "use_d3dcompiler_37_for_shaders", psGameMode.is(ClearSkyMode)))
             {
                 hD3DCompiler = XRay::LoadModule("d3dcompiler_37");
                 D3DCompile = static_cast<D3DCompileFunc>(hD3DCompiler->GetProcAddress("D3DCompileFromMemory"));
