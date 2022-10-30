@@ -188,7 +188,7 @@ void CLight_DB::Update()
         const bool trueSunlightDirection = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "true_sunlight_direction",
             !GEnv.Render->is_sun_static() && !psGameMode.is(ShadowOfChernobylMode));
 
-        if (normalizeSunlightDirection)
+        if (trueSunlightDirection)
         {
             // true sunlight direction
             dir.set(E.sun_dir).normalize();
