@@ -95,7 +95,7 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 
     Msg("! Can't find texture '%s'", fname);
     dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "log_dummy_texture", !psGameMode.is(ShadowOfChernobylMode)))
+    if (!psGameMode.is(ShadowOfChernobylMode))
         R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
         return 0;

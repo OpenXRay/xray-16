@@ -429,8 +429,8 @@ void CBaseMonster::Hit(SHit* pHDS)
         if (!critically_wounded())
             update_critical_wounded(pHDS->boneID, pHDS->power);
 
-    const bool isCOP = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "cop_hit_power", psGameMode.is(CallOfPripyatMode));
-    if (pHDS->hit_type == ALife::eHitTypeFireWound && isCOP)
+    const bool useOldFormula = pSettingsOpenXRay->read_if_exists<bool>("gameplay", "use_soc_cs_monster_hit_formula", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
+    if (pHDS->hit_type == ALife::eHitTypeFireWound && !useOldFormula)
     {
         float& hit_power = pHDS->power;
         float ap = pHDS->armor_piercing;
