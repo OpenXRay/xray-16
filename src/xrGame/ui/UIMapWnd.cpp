@@ -97,7 +97,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     }
 
     m_scroll_mode = uiXml.ReadAttribInt(start_from, 0, "scroll_enable", 0) == 1;
-    if (m_scroll_mode || pSettingsOpenXRay->read_if_exists<bool>("gameplay", "soc_scroll_mode", psGameMode.is(ShadowOfChernobylMode)))
+    if (m_scroll_mode || pSettingsOpenXRay->read_if_exists<bool>("ui", "soc_map_wnd_scroll_mode", psGameMode.is(ShadowOfChernobylMode)))
     {
         float dx, dy, sx, sy;
         strconcat(sizeof(pth), pth, start_from, ":main_map_frame");

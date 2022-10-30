@@ -219,7 +219,7 @@ void CObjectFactory::register_classes()
 #endif // NO_XR_GAME
 
 #ifndef NO_XR_GAME
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "register_actor_mp", psGameMode.is(ShadowOfChernobylMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("compatibility", "register_actor_mp", !psGameMode.is(ShadowOfChernobylMode)))
         ADD_MP(CActor, CActorMP, CSE_ALifeCreatureActor, CSE_ActorMP, CLSID_OBJECT_ACTOR, "actor");
     else
 #endif

@@ -131,7 +131,7 @@ void CUIPdaWnd::Init()
         xr_delete(UINoice);
 
     // XXX: dynamically determine if we need to rearrange the tabs
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "auto_rearrange_tabs_in_pda", psGameMode.is(ClearSkyMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("ui", "auto_rearrange_tabs_in_pda", psGameMode.is(ClearSkyMode)))
         RearrangeTabButtons(UITabControl);
 }
 
