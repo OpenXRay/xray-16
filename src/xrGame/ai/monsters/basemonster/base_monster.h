@@ -75,7 +75,7 @@ public:
     virtual CGameObject* cast_game_object() { return this; }
     virtual CInventoryOwner* cast_inventory_owner() override
     {
-        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "enable_cast_monster_to_inventory_owner", !psGameMode.is(CallOfPripyatMode)))
+        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "monsters_inventory", !psGameMode.is(CallOfPripyatMode)))
         {
             return this;
         }

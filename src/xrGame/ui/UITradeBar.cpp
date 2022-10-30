@@ -10,7 +10,7 @@ void CUITradeBar::init_from_xml(CUIXml& uiXml, pcstr path)
 
     uiXml.SetLocalRoot(uiXml.NavigateToNode(path, 0));
 
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "show_trade_caption", !psGameMode.is(CallOfPripyatMode)))
+    if (pSettingsOpenXRay->read_if_exists<bool>("ui", "show_trade_price_caption", !psGameMode.is(CallOfPripyatMode)))
     {
         CUITextWnd* m_TradeCaption = UIHelper::CreateTextWnd(uiXml, "trade_caption", this, false);
         if (m_TradeCaption)

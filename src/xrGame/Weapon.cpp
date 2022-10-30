@@ -509,7 +509,7 @@ void CWeapon::Load(LPCSTR section)
 
 void CWeapon::LoadScope(const shared_str& section)
 {
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "dont_load_scope", psGameMode.is(ShadowOfChernobylMode))) // XXX: temporary check for SOC mode, to be removed
+    if (psGameMode.is(ShadowOfChernobylMode)) // XXX: temporary check for SOC mode, to be removed
         return;
     pWpnScopeXml.Load();
     R_ASSERT(m_UIScope);
