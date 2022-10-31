@@ -71,9 +71,9 @@ of all the original source code and S.T.A.L.K.E.R. franchise. <br>
 However, they know about many community projects, including this, and support the S.T.A.L.K.E.R. community efforts to make the game better.
 
 #### Funding
-[![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray) [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg)](https://opencollective.com/openxray)
+[![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg?label=Financial%20contributors)](https://opencollective.com/openxray) [![Sponsors](https://img.shields.io/github/sponsors/openxray?color=brightgreen&label=Sponsors)](https://github.com/sponsors/OpenXRay) [![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray)
 
-You may provide financial support for this project by donating via [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray) or [Open Collective](https://opencollective.com/openxray). <br>
+You may provide financial support for this project by donating via [Boosty](https://boosty.to/openxray), [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray) or [Open Collective](https://opencollective.com/openxray). <br>
 Thank you for your support!
 
 ### Thanks
