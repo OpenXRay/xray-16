@@ -39,9 +39,9 @@ void init_game_globals()
     InitHudSoundSettings();
     if (!GEnv.isDedicatedServer)
     {
-        const bool ignoreMissingXMLEndTag = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "ignore_missing_end_tag_in_xmls", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode);
+        const bool ignoreMissingXMLEndTag = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "ignore_missing_end_tag_in_xmls", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
         const bool crashOnInfoPortionInit = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "crash_on_infoportion_init", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
-        const bool crashOnEncyclopediaArticleInit = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "crash_on_encyclopedia_article_init", psGameMode.is(ShadowOfChernobylMode))
+        const bool crashOnEncyclopediaArticleInit = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "crash_on_encyclopedia_article_init", psGameMode.is(ShadowOfChernobylMode));
         CInfoPortion::InitInternal(crashOnInfoPortionInit, ignoreMissingXMLEndTag);
         CEncyclopediaArticle::InitInternal(crashOnEncyclopediaArticleInit, ignoreMissingXMLEndTag);
         CPhraseDialog::InitInternal();
