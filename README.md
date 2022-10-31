@@ -4,11 +4,28 @@ OpenXRay
 ==========================
 OpenXRay is an improved version of the X-Ray Engine, the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World.
 
-### Supported games
+Main differences from original X-Ray are:
+- Support for 64-bit
+- Improved performance, better FPS
+- Original bugs fixes
+- New features for modmakers
+- Gamepad support (not yet finished, but you can try already, see [#943](https://github.com/OpenXRay/xray-16/issues/943))
+- New OpenGL renderer
+- Works on Linux, macOS support is almost finished
+
+You can see the detailed differences table [here](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Differences-from-original-X‐Ray)
+
+#### Supported games
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
 |---|---|---|
 |Yes|Release Candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
 
+### Documentation:
+Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki).
+|How to|||
+|---|---|---|
+|Build and setup|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Windows)|[On Linux](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux)|
+|Install and play|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-install-and-play)|-|
 
 ### Build status
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/40d84a83b38147c49b4e66705c47a16a)](https://www.codacy.com/app/OpenXRay/xray-16?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenXRay/xray-16&amp;utm_campaign=Badge_Grade)
@@ -21,6 +38,14 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 
 ### Contributing
 All contributions are more than welcomed. There are several ways how you can contribute:
+
+#### Community
+[![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv)
+
+Play and enjoy the game, [file an Issue](https://github.com/OpenXRay/xray-16/issues/new/choose) when you encounter any bugs, or you have an enhancement request.
+
+Join us on our [Discord](https://discord.gg/sjRMQwv), subscribe to our [YouTube channel](https://www.youtube.com/OpenXRay), join our [VK group](https://vk.com/openxray), leave a comment, put a like and communicate there! <br>
+Also you can put a star on this repository :)
 
 #### Development
 [![Contributors](https://img.shields.io/github/contributors/OpenXRay/xray-16.svg?label=Contributors)](https://github.com/OpenXRay/xray-16/graphs/contributors)
@@ -45,27 +70,11 @@ Be advised that this is a community project not sanctioned by GSC Game World in 
 of all the original source code and S.T.A.L.K.E.R. franchise. <br>
 However, they know about many community projects, including this, and support the S.T.A.L.K.E.R. community efforts to make the game better.
 
-#### Community
-[![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv)
-
-Play and enjoy the game, [file an Issue](https://github.com/OpenXRay/xray-16/issues/new/choose) when you encounter any bugs, or you have an enhancement request.
-
-Join us on our [Discord](https://discord.gg/sjRMQwv), subscribe to our [YouTube channel](https://www.youtube.com/OpenXRay), join our [VK group](https://vk.com/openxray), leave a comment, put a like and communicate there! <br>
-Also you can put a star on this repository :)
-
 #### Funding
 [![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray) [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg)](https://opencollective.com/openxray)
 
 You may provide financial support for this project by donating via [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray) or [Open Collective](https://opencollective.com/openxray). <br>
 Thank you for your support!
-
-### Documentation:
-|How to|||
-|---|---|---|
-|Build and setup|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Windows)|[On Linux](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux)|
-|Install and play|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-install-and-play)|-|
-
-[Changelist](https://github.com/OpenXRay/xray-16/wiki/Changes) and more is available in [wiki](https://github.com/OpenXRay/xray-16/wiki).
 
 ### Thanks
 * [GSC Game World](https://gsc-game.com/) – for creating S.T.A.L.K.E.R. and supporting the community;
