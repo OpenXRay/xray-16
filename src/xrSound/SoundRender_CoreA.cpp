@@ -133,7 +133,7 @@ void CSoundRender_CoreA::_initialize()
 
 #if defined(XR_PLATFORM_WINDOWS)
     // Check for EAX extension
-    bEAX = deviceDesc.props.eax && !deviceDesc.props.eax_unwanted;
+    bEAX = deviceDesc.props.eax;
 
     eaxSet = (EAXSet)alGetProcAddress((pcstr)"EAXSet");
     if (eaxSet == nullptr)

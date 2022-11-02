@@ -25,7 +25,7 @@
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>eax.lib;dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
