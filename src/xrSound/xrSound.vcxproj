@@ -24,9 +24,6 @@
       <AdditionalIncludeDirectories>$(xrExternals)libvorbis\include;$(xrExternals)libogg\include;$(xrExternals)OpenAL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>dsound.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="OpenALDeviceList.h" />
