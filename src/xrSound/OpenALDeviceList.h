@@ -2,10 +2,8 @@
 
 #include "openal/al.h"
 #include "openal/alc.h"
-#include "xrCore/_std_extensions.h"
 
-constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
-constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
+#include "xrCore/_std_extensions.h"
 
 struct ALDeviceDesc
 {
@@ -39,7 +37,9 @@ class ALDeviceList
 {
     xr_vector<ALDeviceDesc> m_devices;
     string256 m_defaultDeviceName;
+
     void Enumerate();
+    void IterateAndAddDevicesString(pcstr devices);
 
 public:
     ALDeviceList();
